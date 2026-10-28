@@ -144,7 +144,7 @@ class _ChildGalleryScreenState extends State<ChildGalleryScreen> {
                         final c = items[i];
                         return RCard(
                           padding: EdgeInsets.zero,
-                          semanticLabel: '${c.kind.label} بتاريخ ${c.day}',
+                          semanticLabel: tr2('${c.kind.label} بتاريخ ${c.day}', '${c.kind.label} on ${c.day}'),
                           onTap: () async {
                             await Navigator.push(context, MaterialPageRoute(builder: (_) => _editor(c)));
                             _load();

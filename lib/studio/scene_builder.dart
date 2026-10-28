@@ -134,7 +134,7 @@ class _SceneBuilderScreenState extends State<SceneBuilderScreen> {
                 children: [
                   for (final e in kSceneBackgrounds.entries)
                     ChoiceChip(
-                      label: Text(e.value.$1),
+                      label: Text(loc(e.value.$1)),
                       selected: _bg == e.key,
                       onSelected: (_) {
                         setState(() => _bg = e.key);

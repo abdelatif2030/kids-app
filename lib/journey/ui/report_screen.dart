@@ -18,10 +18,10 @@ const kReportAreas = ['فيديو', 'قصة', 'حرف أو كلمة', 'لعبة 
 
 /// The text a parent copies. Pure, so it is easy to check what it contains.
 String buildReportText({required String type, required String area, required String note, required String version}) =>
-    'تقرير من تطبيق رحلتي (النسخة $version)\n'
+    tr2('تقرير من تطبيق رحلتي (النسخة $version)\n'
     'النوع: $type\n'
     'المكان: $area\n'
-    'التفاصيل: ${note.trim().isEmpty ? '—' : note.trim()}\n';
+    'التفاصيل: ${note.trim().isEmpty ? '—' : note.trim()}\n', 'Report from the Rehlaty app (version $version)\nType: $type\nPlace: $area\nDetails: ${note.trim().isEmpty ? '—' : note.trim()}\n');
 
 class _ReportProblemScreenState extends State<ReportProblemScreen> {
   String _type = kReportTypes.first;
@@ -52,7 +52,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
             spacing: 8,
             children: [
               for (final t in kReportTypes)
-                ChoiceChip(label: Text(t), selected: _type == t, onSelected: (_) => setState(() => _type = t)),
+                ChoiceChip(label: Text(loc(t)), selected: _type == t, onSelected: (_) => setState(() => _type = t)),
             ],
           ),
           const SizedBox(height: 8),
@@ -61,7 +61,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
             spacing: 8,
             children: [
               for (final a in kReportAreas)
-                ChoiceChip(label: Text(a), selected: _area == a, onSelected: (_) => setState(() => _area = a)),
+                ChoiceChip(label: Text(loc(a)), selected: _area == a, onSelected: (_) => setState(() => _area = a)),
             ],
           ),
           const SizedBox(height: 8),

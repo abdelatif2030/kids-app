@@ -98,13 +98,13 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
                         RCard(
                           color: RC.lavender.withAlpha(160),
                           onTap: () => _open(s),
-                          semanticLabel: 'تابع ${s.title}',
+                          semanticLabel: tr2('تابع ${s.title}', 'Continue ${loc(s.title)}'),
                           child: Row(
                             children: [
                               Text(s.cover, style: const TextStyle(fontSize: 34)),
                               const SizedBox(width: 10),
                               Expanded(
-                                child: Text(s.title,
+                                child: Text(loc(s.title),
                                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RC.ink)),
                               ),
                               const Icon(Icons.play_circle_fill_rounded, size: 36, color: RC.outline),
@@ -132,7 +132,7 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
                         ),
                         for (final c in StoryCategory.values)
                           ChoiceChip(
-                            label: Text('${c.emoji} ${c.title}'),
+                            label: Text('${c.emoji} ${loc(c.title)}'),
                             selected: _category == c,
                             onSelected: (v) => setState(() => _category = v ? c : null),
                           ),
@@ -180,8 +180,8 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
                           ListTile(
                             dense: true,
                             leading: Text(storyById(h.storyId)!.cover, style: const TextStyle(fontSize: 26)),
-                            title: Text(storyById(h.storyId)!.title),
-                            subtitle: Text('${h.day} · ${h.completed ? loc('أكملتها') : loc('لم تكتمل')}'),
+                            title: Text(loc(storyById(h.storyId)!.title)),
+                            subtitle: Text(tr2('${h.day} · ${h.completed ? loc('أكملتها') : loc('لم تكتمل')}', '${h.day} · ${h.completed ? 'finished' : 'not finished'}')),
                           ),
                     ],
                   ],
@@ -204,7 +204,7 @@ class _StoryCard extends StatelessWidget {
     final minutes = (story.estimatedSeconds / 60).ceil();
     return RCard(
       onTap: onTap,
-      semanticLabel: '${story.title}، ${story.description}، نحو $minutes دقائق',
+      semanticLabel: tr2('${story.title}، ${story.description}، نحو $minutes دقائق', '${loc(story.title)}, ${loc(story.description)}, about $minutes minutes'),
       child: Row(
         children: [
           Container(
@@ -219,11 +219,11 @@ class _StoryCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(story.title, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: RC.ink)),
-                Text(story.description, style: const TextStyle(fontSize: 14, color: RC.ink)),
+                Text(loc(story.title), style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: RC.ink)),
+                Text(loc(story.description), style: const TextStyle(fontSize: 14, color: RC.ink)),
                 const SizedBox(height: 4),
                 Text(
-                  '≈ $minutes د · ${story.minAge}–${story.maxAge} سنة · ${story.isDeviceVoice ? loc('صوت آلي تجريبي') : loc('تسجيل')}',
+                  tr2('≈ $minutes د · ${story.minAge}–${story.maxAge} سنة · ${story.isDeviceVoice ? loc('صوت آلي تجريبي') : loc('تسجيل')}', '≈ $minutes min · ages ${story.minAge}–${story.maxAge} · ${story.isDeviceVoice ? 'demo device voice' : 'recording'}'),
                   style: const TextStyle(fontSize: 12, color: RC.ink),
                 ),
               ],
@@ -287,7 +287,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
           children: [
             ListTile(title: Text(loc('مؤقّت النوم'), style: TextStyle(fontWeight: FontWeight.bold))),
             for (final m in StoryPlayerController.sleepChoices)
-              ListTile(title: Text('بعد $m دقيقة'), onTap: () => Navigator.pop(context, m)),
+              ListTile(title: Text(tr2('بعد $m دقيقة', 'After $m minutes')), onTap: () => Navigator.pop(context, m)),
             ListTile(title: Text(loc('عند نهاية القصة')), onTap: () => Navigator.pop(context, -1)),
             ListTile(title: Text(loc('إيقاف المؤقّت')), onTap: () => Navigator.pop(context, 0)),
           ],
@@ -314,7 +314,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
             ListTile(title: Text(loc('صوت الطبيعة في الخلفية'), style: TextStyle(fontWeight: FontWeight.bold))),
             for (final e in kAmbientSounds.entries)
               ListTile(
-                title: Text(e.value.$1),
+                title: Text(loc(e.value.$1)),
                 trailing: _c.ambient == e.key ? const Icon(Icons.check_rounded) : null,
                 onTap: () => Navigator.pop(context, e.key),
               ),
@@ -333,7 +333,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
         builder: (_) => LessonRunnerScreen(
           child: widget.child,
           kind: LessonKind.pictureToWord,
-          title: 'أسئلة عن «${s.title}»',
+          title: tr2('أسئلة عن «${s.title}»', 'Questions about “${loc(s.title)}”'),
           contentBuilder: () => QuizContent([for (final q in s.questions) q.withRef('story:${s.id}')]),
         ),
       ),
@@ -369,8 +369,8 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(_mmss(pos), semanticsLabel: 'مضى ${_mmss(pos)}'),
-                    Text('-${_mmss(_c.remainingSec)}', semanticsLabel: 'المتبقي ${_mmss(_c.remainingSec)}'),
+                    Text(_mmss(pos), semanticsLabel: tr2('مضى ${_mmss(pos)}', 'Elapsed ${_mmss(pos)}')),
+                    Text('-${_mmss(_c.remainingSec)}', semanticsLabel: tr2('المتبقي ${_mmss(_c.remainingSec)}', 'Remaining ${_mmss(_c.remainingSec)}')),
                   ],
                 ),
               ),
@@ -429,7 +429,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
               const Spacer(),
               Text(widget.story.cover, style: const TextStyle(fontSize: 64)),
               const SizedBox(height: 8),
-              Text(widget.story.title, style: const TextStyle(fontSize: 22, color: Colors.white54)),
+              Text(loc(widget.story.title), style: const TextStyle(fontSize: 22, color: Colors.white54)),
               if (r != null) Text('⏳ ${_mmss(r)}', style: const TextStyle(fontSize: 18, color: Colors.white38)),
               if (_c.sleepEnded)
                 Padding(
@@ -453,7 +453,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
-        title: Text(s.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: RC.ink)),
+        title: Text(loc(s.title), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: RC.ink)),
         actions: [
           IconButton(
             tooltip: _favorite ? loc('إزالة من المفضلة') : loc('إضافة إلى المفضلة'),
@@ -483,12 +483,12 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(s.description,
+                    Text(loc(s.description),
                         textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, color: RC.ink)),
                     Padding(
                       padding: const EdgeInsets.only(top: 6),
                       child: Text(
-                        'الراوي: ${s.narrator}\n${s.themes.join(' · ')}',
+                        tr2('الراوي: ${s.narrator}\n${s.themes.join(' · ')}', 'Narrator: ${loc(s.narrator)}\n${s.themes.map(loc).join(' · ')}'),
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontSize: 13, color: RC.ink),
                       ),
@@ -524,7 +524,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                     if (_c.hasResume)
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
-                        child: Text('توقفتَ عند ${_mmss(_c.positionSec)}، اضغط تشغيل للمتابعة',
+                        child: Text(tr2('توقفتَ عند ${_mmss(_c.positionSec)}، اضغط تشغيل للمتابعة', 'You stopped at ${_mmss(_c.positionSec)}. Press play to continue'),
                             textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, color: RC.ink)),
                       ),
                     const SizedBox(height: 12),
@@ -538,11 +538,11 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                             color: i == _c.chapterIndex ? RC.yellow.withAlpha(120) : RC.card,
                             outline: i == _c.chapterIndex ? RC.star : RC.outline,
                             onTap: s.branching || _c.state == PlayState.unavailable ? null : () => _c.jumpToChapter(i),
-                            semanticLabel: 'الفصل ${i + 1}: ${s.chapters[i].title}',
+                            semanticLabel: tr2('الفصل ${i + 1}: ${s.chapters[i].title}', 'Chapter ${i + 1}: ${loc(s.chapters[i].title)}'),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(s.chapters[i].title,
+                                Text(loc(s.chapters[i].title),
                                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: RC.ink)),
                                 const SizedBox(height: 4),
                                 Text(s.chapters[i].text,
@@ -565,7 +565,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                                   width: double.infinity,
                                   child: FilledButton(
                                     onPressed: () => _c.choose(ch),
-                                    child: Text(ch.label, style: const TextStyle(fontSize: 18)),
+                                    child: Text(loc(ch.label), style: const TextStyle(fontSize: 18)),
                                   ),
                                 ),
                               ),
@@ -623,7 +623,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                             for (final v in StoryPlayerController.speeds)
                               PopupMenuItem(value: v, child: Text(v == 1.0 ? loc('عادية') : '${v}x')),
                           ],
-                          child: Chip(label: Text('السرعة ${_c.speed}x')),
+                          child: Chip(label: Text(tr2('السرعة ${_c.speed}x', 'Speed ${_c.speed}x'))),
                         ),
                         ActionChip(
                           avatar: const Icon(Icons.bedtime_rounded, size: 18),
@@ -632,7 +632,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                         ),
                         ActionChip(
                           avatar: const Icon(Icons.water_drop_rounded, size: 18),
-                          label: Text(_c.ambient == 'none' ? loc('صوت الطبيعة') : kAmbientSounds[_c.ambient]!.$1),
+                          label: Text(_c.ambient == 'none' ? loc('صوت الطبيعة') : loc(kAmbientSounds[_c.ambient]!.$1)),
                           onPressed: _ambientMenu,
                         ),
                         ActionChip(

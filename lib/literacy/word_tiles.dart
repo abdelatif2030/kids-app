@@ -68,7 +68,7 @@ class _WordTilesViewState extends State<WordTilesView> {
     });
     if (_placed == _w.word) {
       _results.add(ItemResult('word_building', !_missed, _w.word, 'word:${_w.word}'));
-      setState(() => _message = 'أحسنت! ${_w.word} ${_w.emoji}');
+      setState(() => _message = tr2('أحسنت! ${_w.word} ${_w.emoji}', 'Well done! ${_w.word} ${_w.emoji}'));
       AppAudio.say(_w.word);
       Future.delayed(const Duration(milliseconds: 1400), _next);
     }
@@ -101,7 +101,7 @@ class _WordTilesViewState extends State<WordTilesView> {
           constraints: const BoxConstraints(maxWidth: 520),
           child: Column(
             children: [
-              Text('الكلمة ${_i + 1} من ${widget.words.length}',
+              Text(tr2('الكلمة ${_i + 1} من ${widget.words.length}', 'Word ${_i + 1} of ${widget.words.length}'),
                   style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink)),
               const SizedBox(height: 10),
               Text(loc('رتّب الحروف لتكوّن الكلمة'),
@@ -123,7 +123,7 @@ class _WordTilesViewState extends State<WordTilesView> {
                   border: Border.all(color: RC.outline, width: 3),
                 ),
                 child: Semantics(
-                  label: 'الحروف المرتبة: $_placed',
+                  label: tr2('الحروف المرتبة: $_placed', 'Letters placed: $_placed'),
                   child: Text(_placed.isEmpty ? '…' : _placed,
                       style: const TextStyle(fontSize: 52, fontWeight: FontWeight.w900, color: RC.ink)),
                 ),
@@ -142,7 +142,7 @@ class _WordTilesViewState extends State<WordTilesView> {
                         width: 72,
                         height: 72,
                         child: RCard(
-                          semanticLabel: 'حرف ${letterOf(_tiles[t])?.name ?? _tiles[t]}',
+                          semanticLabel: tr2('حرف ${letterOf(_tiles[t])?.name ?? _tiles[t]}', 'Letter ${letterOf(_tiles[t])?.name ?? _tiles[t]}'),
                           onTap: _used.contains(t) ? null : () => _tap(t),
                           padding: EdgeInsets.zero,
                           child: Center(

@@ -67,7 +67,7 @@ class RestScreen extends StatelessWidget {
               child: Text(
                 _planDone
                     ? loc('العودة إلى الفيديوهات')
-                    : 'تمديد ${SessionManager.extendMinutes} دقيقة',
+                    : tr2('تمديد ${SessionManager.extendMinutes} دقيقة', 'Extend by ${SessionManager.extendMinutes} minutes'),
                 style: const TextStyle(fontSize: 20),
               ),
             ),

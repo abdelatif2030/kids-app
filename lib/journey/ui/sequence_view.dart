@@ -106,7 +106,7 @@ class _SequenceViewState extends State<SequenceView> {
             children: [
               Row(
                 children: [
-                  Flexible(flex: 2, child: Text('الجولة ${_r + 1} من ${widget.rounds.length}',
+                  Flexible(flex: 2, child: Text(tr2('الجولة ${_r + 1} من ${widget.rounds.length}', 'Round ${_r + 1} of ${widget.rounds.length}'),
                       style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink))),
                   const SizedBox(width: 12),
                   Expanded(
@@ -120,7 +120,7 @@ class _SequenceViewState extends State<SequenceView> {
               const SizedBox(height: 14),
               Semantics(
                 header: true,
-                child: Text('رتّب الخطوات: ${_round.title}',
+                child: Text(tr2('رتّب الخطوات: ${_round.title}', 'Put the steps in order: ${loc(_round.title)}'),
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: RC.ink)),
               ),
@@ -130,8 +130,8 @@ class _SequenceViewState extends State<SequenceView> {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: RCard(
                     semanticLabel: slot < _placed.length
-                        ? 'الخطوة ${slot + 1}: ${steps[_placed[slot]]}'
-                        : 'مكان الخطوة ${slot + 1} فارغ',
+                        ? tr2('الخطوة ${slot + 1}: ${steps[_placed[slot]]}', 'Step ${slot + 1}: ${steps[_placed[slot]]}')
+                        : tr2('مكان الخطوة ${slot + 1} فارغ', 'Step ${slot + 1} place is empty'),
                     color: slot < _placed.length ? RC.mint : Colors.white.withAlpha(160),
                     outline: slot < _placed.length ? RC.good : RC.outline.withAlpha(120),
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -146,7 +146,7 @@ class _SequenceViewState extends State<SequenceView> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            slot < _placed.length ? steps[_placed[slot]] : '',
+                            slot < _placed.length ? loc(steps[_placed[slot]]) : '',
                             style: const TextStyle(fontSize: 20, color: RC.ink),
                           ),
                         ),
@@ -172,12 +172,12 @@ class _SequenceViewState extends State<SequenceView> {
                       SizedBox(
                         width: 240,
                         child: RCard(
-                          semanticLabel: steps[step],
+                          semanticLabel: loc(steps[step]),
                           color: _hint && step == _placed.length ? RC.yellow : RC.card,
                           outline: _hint && step == _placed.length ? RC.star : RC.outline,
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                           onTap: () => _tap(step),
-                          child: Text(steps[step],
+                          child: Text(loc(steps[step]),
                               textAlign: TextAlign.center,
                               style: const TextStyle(fontSize: 20, color: RC.ink)),
                         ),

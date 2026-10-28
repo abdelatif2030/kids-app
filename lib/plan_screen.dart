@@ -122,11 +122,11 @@ class _PlanScreenState extends State<PlanScreen> {
                   const SizedBox(height: 4),
                   Text(
                     target > 0
-                        ? 'أكمل $done من $target هذا الأسبوع'
-                        : 'أكمل $done هذا الأسبوع (بدون هدف)',
+                        ? tr2('أكمل $done من $target هذا الأسبوع', 'Finished $done of $target this week')
+                        : tr2('أكمل $done هذا الأسبوع (بدون هدف)', 'Finished $done this week (no goal)'),
                   ),
                   Text(
-                    available == 0 ? loc('لا توجد دروس بعد') : 'الدروس المتاحة: $available',
+                    available == 0 ? loc('لا توجد دروس بعد') : tr2('الدروس المتاحة: $available', 'Available lessons: $available'),
                     style: const TextStyle(fontSize: 12),
                   ),
                 ],

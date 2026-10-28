@@ -4,6 +4,7 @@ in loc(...) so the interface language can translate them. Prints nothing; writes
 the unique source strings to tools/ar_strings.json."""
 import re, glob, json, os, sys
 
+SKIP_CONST = True
 AR = re.compile(r'[؀-ۿ]')
 EXCLUDE = ('lib/l10n/', 'lib/literacy/letters_data.dart', 'lib/library/vocab.dart', 'lib/stories/story_data.dart')
 
@@ -34,13 +35,29 @@ def scan_string(src, i):
         j += 1
     raise ValueError('unterminated')
 
+def const_ranges(src):
+    rs = []
+    for m in re.finditer(r'^(?:  )?(?:static\s+)?const\s', src, re.M):
+        i = m.start(); depth = 0; j = i
+        while j < len(src):
+            c = src[j]
+            if c == "'":
+                j, _ = scan_string(src, j); continue
+            if c in '([{': depth += 1
+            elif c in ')]}': depth -= 1
+            elif c == ';' and depth <= 0: break
+            j += 1
+        rs.append((i, j))
+    return rs
+
 def process(src):
     out = []; i = 0; keys = []
+    skip = const_ranges(src) if SKIP_CONST else []
     n = len(src)
     def handle_expr_region(s, e):
         return transform(s)
     # transform: walk code, handling comments and strings
-    def transform(code):
+    def transform(code, base=0):
         res = []; p = 0; m = len(code)
         while p < m:
             c = code[p]
@@ -73,7 +90,7 @@ def process(src):
                 if any(interps):
                     # keep as is, but recurse into ${...} for nested plain literals
                     res.append(rewrite_interp(code[p:q])); p = q; continue
-                if AR.search(text):
+                if AR.search(text) and not any(a <= base + p < b for a, b in skip):
                     res.append('loc(' + text + ')')
                     keys.append(group_value(code, starts, ends))
                 else:
@@ -97,7 +114,7 @@ def process(src):
                     elif d == '}': depth -= 1
                     q += 1
                 inner = text[p+2:q-1]
-                res.append('${' + transform(inner) + '}'); p = q; continue
+                res.append('${' + transform(inner, -10**12) + '}'); p = q; continue
             res.append(c); p += 1
         return ''.join(res)
     return transform(src), keys
@@ -122,8 +139,10 @@ def unescape(raw):
 
 def main():
     allkeys = {}
+    only = sys.argv[1:]
     for f in sorted(glob.glob('lib/**/*.dart', recursive=True)):
-        if any(f.startswith(e) or e in f for e in EXCLUDE): continue
+        if only and f not in only: continue
+        if not only and any(f.startswith(e) or e in f for e in EXCLUDE): continue
         src = open(f, encoding='utf-8').read()
         if not AR.search(src): continue
         # keep untouched lines that must not change
@@ -144,7 +163,8 @@ def main():
             new = '\n'.join(lines)
         open(f, 'w', encoding='utf-8').write(new)
         for k in keys: allkeys.setdefault(k, []).append(f)
-    json.dump(list(allkeys.keys()), open('tools/ar_strings.json', 'w'), ensure_ascii=False, indent=0)
+    json.dump(list(allkeys.keys()), open('tools/ar_strings_%d.json' % len(only), 'w'), ensure_ascii=False, indent=0)
     print(len(allkeys), 'unique strings wrapped')
 
-main()
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,336 @@
+560|A technical problem
+561|A suggestion
+562|Video
+563|Story
+564|Letter or word
+565|Game or lesson
+566|Activity with family
+567|Other
+568|Report a problem
+569|The app sends nothing by itself. Write what you noticed, then copy the message and send it yourself to the support contact set by the app's publisher. The message does not include your child's name, age or progress.
+570|Type of problem
+571|Where?
+572|What happened? (for example: the story or letter name)
+573|The message was copied
+574|Copy the message
+575|Well done! You put them all in order 🎉
+576|Correct! And what is the next step?
+577|Try another card, think about what happens first 🌈
+578|Who is playing today?
+579|Add a child (for parents)
+583|Pick the first letter
+584|Shapes and colors
+585|Counting and math
+586|Language and stories
+587|Science and nature
+588|Feelings and life
+589|Hands and movement
+590|Three round things
+591|Look around the house for three round things and put them in front of you.
+592|Ask: why is this round? Encourage the child to touch the edges and name the shape. Repeat with squares and triangles.
+593|Counting toys together
+594|Toys from the house
+595|Gather your toys and count them with your finger: one, two, three...
+596|Let the child touch each toy as they count. Then ask: how many toys if we take one away? (for older children).
+597|Naming things in a picture book
+598|A picture book
+599|Look at the picture and tell us: what do you see?
+600|Point to the picture and name it clearly, then let the child repeat. Do not correct sharply; gently say the right word again.
+601|Watching a plant
+602|A plant or a seed
+603|Water
+604|A container
+605|Water the plant with a little water, then look: did anything change?
+606|Repeat the observation every day or two for a week. Ask: what do you expect to happen? Then compare.
+607|Wash hands after touching soil, and do not let the child put any part of the plant in their mouth.
+608|Sorting by color
+609|Small colorful things
+610|Boxes or plates
+611|Put each thing on the plate that matches its color.
+612|Start with only two colors. Say each color out loud. For older children: sort by size or shape.
+613|Avoid very small things (buttons, beads) if the child is under 3 years old.
+614|Telling a story from three pictures
+615|Three pictures or drawings
+616|Put the pictures in order and tell: first, then, and finally.
+617|Ask open questions: who? where? what happened next? Do not correct the story; what matters is speaking in full sentences.
+618|A discovery walk
+619|Comfortable shoes
+620|Walk with us and look for five things: a leaf, a stone, a bird, a cloud and something colorful.
+621|Make it a treasure hunt. Ask about the colors, sizes and sounds you hear.
+622|Always stay close to the child, do not let them eat unknown plants or fruit, and do not let them touch stray animals.
+623|Float or sink?
+624|A bowl of water
+625|A spoon
+626|A piece of wood or cork
+627|A small stone
+628|Guess: will this thing float or sink? Then try it.
+629|Let the child guess before the experiment and say their guess out loud. Talk about why.
+630|Always supervise directly around water. Wipe up any water on the floor.
+631|Matching socks
+632|Socks
+633|Match each sock with the sock that looks like it.
+634|A real household task: useful work builds a child's confidence. Name the colors and patterns.
+635|Making a fruit salad
+636|Fruit
+637|Wash the fruit and put it in the bowl, and count how many pieces you put in.
+638|Adults do the cutting. Let the child count, mix and compare: which fruit is more?
+639|Knives are for adults only. Wash hands and fruit, and check there are no food allergies.
+640|Writing a letter in a tray
+641|A tray
+642|Salt or flour
+643|Write the letter with your finger in the salt, then wipe it and write again.
+644|Write the letter the child learned today. Say its name and sound while writing.
+645|Make sure the child does not put salt in their eyes or mouth, and avoid flour if they have an allergy.
+646|Three nice things
+647|Before bed, tell us three nice things that happened today.
+648|Listen without interrupting. Share a nice thing of your own too. If they cannot think of one, help with a gentle question.
+649|Measuring the room in steps
+650|Walk from the door to the window and count your steps. Would the steps be the same if Dad walked?
+651|Compare the child's steps with yours to understand the idea of a unit of measure.
+652|What is this sound?
+653|Things that make sounds (a spoon, keys, paper)
+654|Close your eyes, listen to the sound and guess what it is.
+655|Make the sound behind the child. After they guess, show the object and name it.
+656|Ordering our day
+657|Small papers or pictures
+658|Put pictures of what we do in the day in order: wake up, eat, play, sleep.
+659|This game helps with understanding routines and sequences. Ask: what comes after? what comes before?
+660|A thank-you card
+661|Paper
+662|Colors
+663|Draw a card for someone you love and say thank you.
+664|Talk about why we thank others. The child can hand over the card themselves.
+665|Shaping with clay
+666|Clay or dough
+667|Make a ball, a snake and a shape you like.
+668|It strengthens the small muscles needed for writing later. Name the shapes and colors.
+669|Make sure the child does not eat the clay. For children under 3, use edible dough.
+670|Real activities away from the screen that the child does with a grown-up. After the activity the grown-up presses “Done”. No photos or recordings are needed.
+671|All
+672|Show activities for all ages
+673|There are no activities for this choice.
+674|For the child
+675|For the parent
+676|Done this week ✓
+677|Done (confirmed by the grown-up)
+678|Your child looked at new letters but has not yet answered one right on the first try. Try “Letter practice”.
+679|letter
+680|After the story, press “Questions about the story”; listening alone does not mean the child understood.
+681|Try one activity from “Activities with family” this week.
+682|Start with a short lesson (5 minutes) from “Learn letters” or “Word library”.
+683|Picture → word
+684|Listen and choose the picture
+685|Word → picture
+686|What is this picture called?
+687|Look at the picture carefully, then read the words.
+688|Listen, then choose the right picture
+689|Which picture matches the word?
+690|Well done! You finished the lesson
+691|New lesson
+692|Search in Arabic or English
+693|Show words for all ages
+694|No matching words. Try another word or choose “All ages”.
+695|Listen in Arabic
+696|Practise this group
+697|Today's review
+698|Build words
+699|Read and understand
+700|“Build words” unlocks after practising 3 letters, and “Read and understand” after 8 letters (parents can change this).
+701|White: new · Orange: started · Yellow: practising · Green: mastered
+702|Build the word
+703|Hear the name
+704|Hear the sound
+705|Isolated
+706|At the start
+707|In the middle
+708|At the end
+709|Words with this letter
+710|Letter practice
+711|Syllables
+712|Build a word
+713|Trace the letter
+714|Lovely! You traced the letter well 🌟
+715|Trace the letter with your finger over the faint shape
+716|Clear and redo
+717|Try another letter 🌈 (the next letter from the right)
+718|Put the letters in order to make the word
+719|Kids app
+720|Time is almost up
+721|Could not load the videos
+722|There are no videos for this age
+723|There are no lessons yet for this subject
+724|Today's plan
+725|How many?
+726|Pick the answer
+727|The audio recording has not been added yet
+728|Gentle rain
+729|Waves
+730|Breeze
+731|The picture is large, choose a smaller one
+732|The CV file is large (maximum 500 KB)
+733|Notes
+734|New note
+735|No notes yet
+736|Write your note
+737|Subject (optional)
+738|No subject
+739|The PIN must be 4 digits
+740|The two PINs do not match
+741|Create a parent PIN
+742|Before your child starts, create a 4-digit PIN. Without it, no one can enter Parent settings or leave child mode.
+743|New PIN
+744|Enter the PIN again
+745|Save the PIN
+746|Wrong PIN
+747|Parent PIN
+748|Enter the PIN
+749|Open
+750|Parent settings
+751|Add, edit and delete child profiles and their plans
+752|Skills, time and the weekly report
+753|Report a problem or content
+754|A message you copy and send yourself, without any child data
+755|Read aloud, nature sound, letter order and exporting a child's data
+756|Family gallery
+757|The children's works saved on the device; you can delete them
+758|Real tasks after activities: confirm the child did them
+759|Arabic
+760|Text size
+761|Reduce motion
+762|Stops motion and effects on the child's screens
+763|Daily time limit
+764|Quiet hours
+765|Child mode will not start during these hours
+766|From
+767|To
+768|Teachers and my account
+769|Approved teachers and booking online lessons
+770|Lands, questions, rewards and plans
+771|What we keep, and deleting children's data
+772|Weekly plan and tracking
+773|Viewing summary
+774|Change the PIN
+775|The free plan: choose how many lessons you want your child to finish each week for each subject. A lesson counts when the video plays to the end.
+776|This data is saved on this device only.
+777|No lessons yet
+778|This is the last video today
+779|This video cannot be played right now.
+780|Less than a minute
+781|0 min
+782|No activity recorded this week.
+783|Suggestions:
+784|Parent options
+785|Back to the videos
+786|End the session
+787|Time to rest
+788|Well done! You finished today's plan
+789|See you in the morning, sweet dreams
+790|Well done! See you later
+791|A calm story before bed
+792|For parents
+793|Arabic letters
+794|English letters
+795|German letters
+796|French letters
+797|Colors
+798|Counting
+799|Addition
+800|Subtraction
+801|Multiplication
+802|Shapes
+803|English words
+804|Memory
+805|Ordering steps
+806|Story understanding
+807|Understanding feelings
+808|Vocabulary
+809|Listening and telling apart
+810|Letter sounds
+811|Letter position in a word
+812|Syllables and vowels
+813|Building words
+814|Reading and understanding
+815|Calm bedtime stories
+816|Kindness, honesty and sharing
+817|Feelings and fears
+818|Nature and space
+819|Educational stories
+820|Interactive stories
+822|The audio file could not be played on this device.
+823|No Arabic voice is installed on this device. You can read the text, or install an Arabic voice from the device settings.
+824|The text could not be read aloud. You can read it on the screen.
+825|Sweet night 🌙
+826|Continue where you left off
+827|❤️ Favorites
+828|Show stories for all ages
+829|No favorite stories yet. Tap the heart on any story to add it here.
+830|No stories match this choice. Try “Show stories for all ages”.
+831|Recently heard
+832|Remove from favorites
+833|Add to favorites
+834|Sleep timer
+835|At the end of the story
+836|Stop the timer
+837|Background nature sound
+838|Back 15 seconds
+839|Pause
+840|Continue
+841|Play
+842|Forward 15 seconds
+843|Show text
+844|Good night 🌙
+845|The story is read by the device's voice as a demo version. No real recordings have been added yet.
+846|Playback is not available
+847|Text
+848|What do you choose?
+849|The story has ended 🌙
+850|No other story will start automatically.
+851|Questions about the story
+852|Listen again
+853|At the end
+854|Nature sound
+855|Audio-only mode
+856|Design a character
+857|Your character
+858|Skin
+859|Skin tone
+860|Hair
+861|Hair color
+862|Hair color
+863|Eyes
+864|Mouth
+865|Shirt
+866|Shirt color
+867|Hat
+868|Drawing
+869|Scene
+870|Character
+871|Picture story
+872|Meadow
+873|Sea
+874|Night
+875|Room
+876|Short
+877|Long
+878|Buns
+879|Round
+880|Smiling
+881|Big
+882|Smile
+883|Laugh
+884|Surprised
+885|Build your scene
+886|The scene is too large to save
+887|An item in the scene
+888|Choose a picture below to put in your scene
+889|Enlarge
+890|Shrink
+891|Delete the selected item
+892|The beginning
+893|Who is the hero of the story? Where are they?
+894|Then what happened?
+895|What did they do? Did they meet anyone?
+896|The end
+897|How did the story end? How did the hero feel?
+898|Tell a story with pictures
+899|Tell your story to Mom or Dad in order

@@ -161,7 +161,7 @@ class RatingSummary {
     return RatingSummary(list.length, sum / list.length, dist);
   }
 
-  String get label => count == 0 ? loc('لا توجد تقييمات بعد') : '${average.toStringAsFixed(1)} من 5 ($count تقييم)';
+  String get label => count == 0 ? loc('لا توجد تقييمات بعد') : tr2('${average.toStringAsFixed(1)} من 5 ($count تقييم)', '${average.toStringAsFixed(1)} of 5 ($count ratings)');
 }
 
 /// Summaries per teacher, from a flat list of reviews.

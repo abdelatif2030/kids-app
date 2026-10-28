@@ -98,7 +98,7 @@ class _LandsTab extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Text('الأعمار المناسبة: ${ages[0]} إلى ${ages[1]}'),
+                        Text(tr2('الأعمار المناسبة: ${ages[0]} إلى ${ages[1]}', 'Suitable ages: ${ages[0]} to ${ages[1]}')),
                         RangeSlider(
                           values: RangeValues(ages[0].toDouble(), ages[1].toDouble()),
                           min: 1,
@@ -117,8 +117,8 @@ class _LandsTab extends StatelessWidget {
                           },
                         ),
                         Text(
-                          '$kLevelsPerLand مستويات · أسئلة مخصصة: '
-                          '${store.custom.where((q) => q.landId == land.id).length}',
+                          tr2('$kLevelsPerLand مستويات · أسئلة مخصصة: '
+                          '${store.custom.where((q) => q.landId == land.id).length}', '$kLevelsPerLand levels · custom questions: ${store.custom.where((q) => q.landId == land.id).length}'),
                           style: const TextStyle(fontSize: 13),
                         ),
                       ],
@@ -203,9 +203,9 @@ class _QuestionsTabState extends State<_QuestionsTab> {
                         child: ListTile(
                           title: Text(q.prompt, style: const TextStyle(fontWeight: FontWeight.bold)),
                           subtitle: Text(
-                            '${landById(q.landId).title} · المستوى ${q.difficulty} · '
+                            tr2('${landById(q.landId).title} · المستوى ${q.difficulty} · '
                             'الأعمار ${q.minAge}–${q.maxAge}\n'
-                            '${[for (var i = 0; i < q.options.length; i++) i == q.correct ? '✓ ${q.options[i]}' : q.options[i]].join(' | ')}',
+                            '${[for (var i = 0; i < q.options.length; i++) i == q.correct ? '✓ ${q.options[i]}' : q.options[i]].join(' | ')}', '${landById(q.landId).title} · Level ${q.difficulty} · Ages ${q.minAge}–${q.maxAge}\n${[for (var i = 0; i < q.options.length; i++) i == q.correct ? '✓ ${q.options[i]}' : q.options[i]].join(' | ')}'),
                           ),
                           isThreeLine: true,
                           leading: Switch(
@@ -336,7 +336,7 @@ class _QuestionEditorState extends State<QuestionEditor> {
                       Expanded(
                         child: TextField(
                           controller: _options[i],
-                          decoration: InputDecoration(labelText: 'الخيار ${i + 1}'),
+                          decoration: InputDecoration(labelText: tr2('الخيار ${i + 1}', 'Option ${i + 1}')),
                         ),
                       ),
                     ],
@@ -345,7 +345,7 @@ class _QuestionEditorState extends State<QuestionEditor> {
             ),
           ),
           const SizedBox(height: 12),
-          Text('المستوى الذي يظهر فيه: $_level'),
+          Text(tr2('المستوى الذي يظهر فيه: $_level', 'Level it appears in: $_level')),
           Slider(
             value: _level.toDouble(),
             min: 1,
@@ -354,7 +354,7 @@ class _QuestionEditorState extends State<QuestionEditor> {
             label: '$_level',
             onChanged: (v) => setState(() => _level = v.round()),
           ),
-          Text('الأعمار: ${_ages.start.round()} إلى ${_ages.end.round()}'),
+          Text(tr2('الأعمار: ${_ages.start.round()} إلى ${_ages.end.round()}', 'Ages: ${_ages.start.round()} to ${_ages.end.round()}')),
           RangeSlider(
             values: _ages,
             min: 1,
@@ -417,7 +417,7 @@ class _RewardsTab extends StatelessWidget {
                   child: ListTile(
                     leading: Text(b.emoji, style: const TextStyle(fontSize: 30)),
                     title: Text(b.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text(on ? '${b.description}\nالعدد المطلوب: $value' : loc('الشارة متوقفة')),
+                    subtitle: Text(on ? tr2('${b.description}\nالعدد المطلوب: $value', '${b.description}\nRequired number: $value') : loc('الشارة متوقفة')),
                     isThreeLine: on,
                     trailing: Wrap(
                       crossAxisAlignment: WrapCrossAlignment.center,
@@ -477,10 +477,10 @@ class _PlansTab extends StatelessWidget {
             for (final c in store.profiles)
               Card(
                 child: ListTile(
-                  title: Text('${c.nickname} · عمر ${c.age}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  title: Text(tr2('${c.nickname} · عمر ${c.age}', '${c.nickname} · age ${c.age}'), style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text(
-                    'الترتيب: ${(c.plan.isEmpty ? [for (final l in kLands) l.id] : c.plan).map((id) => landById(id).title).join(' ← ')}\n'
-                    '${c.dailyCount} أنشطة يومياً · ${["أسهل", "عادي", "أصعب"][c.bias + 1]} · نحو ${minutesFor(c.age)} دقائق للنشاط',
+                    tr2('الترتيب: ${(c.plan.isEmpty ? [for (final l in kLands) l.id] : c.plan).map((id) => landById(id).title).join(' ← ')}\n'
+                    '${c.dailyCount} أنشطة يومياً · ${["أسهل", "عادي", "أصعب"][c.bias + 1]} · نحو ${minutesFor(c.age)} دقائق للنشاط', 'Order: ${(c.plan.isEmpty ? [for (final l in kLands) l.id] : c.plan).map((id) => landById(id).title).join(' → ')}\n${c.dailyCount} activities a day · ${['Easier', 'Normal', 'Harder'][c.bias + 1]} · about ${minutesFor(c.age)} minutes each'),
                   ),
                   isThreeLine: true,
                   trailing: const Icon(Icons.edit_rounded),

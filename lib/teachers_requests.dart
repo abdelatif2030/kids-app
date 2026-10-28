@@ -28,9 +28,9 @@ String _err(Object e) => e is AccountException ? e.message : loc('تعذر إك�
 
 String budgetText(LearningRequest r) {
   if (r.budgetMin == null && r.budgetMax == null) return loc('غير محددة');
-  if (r.budgetMin != null && r.budgetMax != null) return '${r.budgetMin}–${r.budgetMax} جنيه للحصة';
-  if (r.budgetMax != null) return 'حتى ${r.budgetMax} جنيه للحصة';
-  return 'من ${r.budgetMin} جنيه للحصة';
+  if (r.budgetMin != null && r.budgetMax != null) return tr2('${r.budgetMin}–${r.budgetMax} جنيه للحصة', '${r.budgetMin}–${r.budgetMax} EGP per lesson');
+  if (r.budgetMax != null) return tr2('حتى ${r.budgetMax} جنيه للحصة', 'Up to ${r.budgetMax} EGP per lesson');
+  return tr2('من ${r.budgetMin} جنيه للحصة', 'From ${r.budgetMin} EGP per lesson');
 }
 
 // ------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                     title: Text('${_subject(r.subject)}: ${r.goal}', maxLines: 2, overflow: TextOverflow.ellipsis),
                     subtitle: Text(r.status == requestClosed
                         ? loc('مغلق')
-                        : (r.isExpired(now) ? loc('انتهت المدة') : 'مفتوح حتى ${fmtDay(DateTime.fromMillisecondsSinceEpoch(r.expiresMs))}')),
+                        : (r.isExpired(now) ? loc('انتهت المدة') : tr2('مفتوح حتى ${fmtDay(DateTime.fromMillisecondsSinceEpoch(r.expiresMs))}', 'Open until ${fmtDay(DateTime.fromMillisecondsSinceEpoch(r.expiresMs))}'))),
                     trailing: const Icon(Icons.chevron_left),
                     onTap: () async {
                       await Navigator.push(
@@ -211,7 +211,7 @@ class _RequestFormState extends State<RequestForm> {
             hint: Text(loc('عمر الطفل (اختياري)')),
             items: [
               DropdownMenuItem<int?>(value: null, child: Text(loc('بدون'))),
-              for (var a = 1; a <= 12; a++) DropdownMenuItem<int?>(value: a, child: Text('$a سنوات')),
+              for (var a = 1; a <= 12; a++) DropdownMenuItem<int?>(value: a, child: Text(tr2('$a سنوات', '$a years'))),
             ],
             onChanged: (v) => setState(() => _age = v),
           ),
@@ -255,7 +255,7 @@ class _RequestFormState extends State<RequestForm> {
           DropdownButton<int>(
             isExpanded: true,
             value: _days,
-            items: [for (final d in [7, 14, 30]) DropdownMenuItem(value: d, child: Text('يبقى الطلب مفتوحاً $d يوماً'))],
+            items: [for (final d in [7, 14, 30]) DropdownMenuItem(value: d, child: Text(tr2('يبقى الطلب مفتوحاً $d يوماً', 'The request stays open for $d days')))],
             onChanged: (v) => setState(() => _days = v ?? _days),
           ),
           if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
@@ -304,11 +304,11 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
       builder: (_) => AlertDialog(
         title: Text(loc('قبول العرض')),
         content: Text(
-          'ملخص الاتفاق:\n'
+          tr2('ملخص الاتفاق:\n'
           '• المدرس: ${p.teacherName}\n'
           '• السعر: ${p.priceEgp} جنيه للحصة (${p.minutes} دقيقة)\n'
           '• المواعيد: ${p.schedule.isEmpty ? loc('تُتفق لاحقاً') : p.schedule}\n\n'
-          'لا يُؤكَّد الحجز إلا بعد أن يقبل المدرس الطلب ويرسل رابط الحصة. لا يوجد دفع داخل التطبيق.',
+          'لا يُؤكَّد الحجز إلا بعد أن يقبل المدرس الطلب ويرسل رابط الحصة. لا يوجد دفع داخل التطبيق.', 'Summary of the agreement:\n• Teacher: ${p.teacherName}\n• Price: ${p.priceEgp} EGP per lesson (${p.minutes} minutes)\n• Schedule: ${p.schedule.isEmpty ? loc('تُتفق لاحقاً') : p.schedule}\n\nThe booking is only confirmed after the teacher accepts the request and sends the lesson link. There is no payment inside the app.'),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: Text(loc('رجوع'))),
@@ -328,7 +328,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
           subject: r.subject,
           whenText: p.schedule.isEmpty ? loc('حسب العرض') : p.schedule,
           childAge: r.childAge,
-          note: 'من عرض على طلب: ${r.goal}',
+          note: tr2('من عرض على طلب: ${r.goal}', 'From a proposal on a request: ${r.goal}'),
           priceEgp: p.priceEgp,
           minutes: p.minutes,
           proposalId: p.id,
@@ -356,12 +356,12 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('${_subject(r.subject)}: ${r.goal}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
-                  if (r.childAge != null) Text('عمر الطفل: ${r.childAge}'),
-                  if (r.format.isNotEmpty) Text('الطريقة: ${formatLabel(r.format)}'),
-                  if (r.schedule.isNotEmpty) Text('المواعيد: ${r.schedule}'),
-                  Text('الميزانية: ${budgetText(r)}'),
-                  if (r.approach.isNotEmpty) Text('الأسلوب: ${r.approach}'),
-                  Text(_status == requestClosed ? loc('الحالة: مغلق') : 'مفتوح حتى ${fmtDay(DateTime.fromMillisecondsSinceEpoch(r.expiresMs))}'),
+                  if (r.childAge != null) Text(tr2('عمر الطفل: ${r.childAge}', 'Child\'s age: ${r.childAge}')),
+                  if (r.format.isNotEmpty) Text(tr2('الطريقة: ${formatLabel(r.format)}', 'Format: ${formatLabel(r.format)}')),
+                  if (r.schedule.isNotEmpty) Text(tr2('المواعيد: ${r.schedule}', 'Schedule: ${r.schedule}')),
+                  Text(tr2('الميزانية: ${budgetText(r)}', 'Budget: ${budgetText(r)}')),
+                  if (r.approach.isNotEmpty) Text(tr2('الأسلوب: ${r.approach}', 'Approach: ${r.approach}')),
+                  Text(_status == requestClosed ? loc('الحالة: مغلق') : tr2('مفتوح حتى ${fmtDay(DateTime.fromMillisecondsSinceEpoch(r.expiresMs))}', 'Open until ${fmtDay(DateTime.fromMillisecondsSinceEpoch(r.expiresMs))}')),
                   if (_status == requestOpen)
                     TextButton.icon(
                       onPressed: () async {
@@ -407,8 +407,8 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                             ),
                             Text(p.message),
                             const SizedBox(height: 4),
-                            Text('${p.priceEgp} جنيه · ${p.minutes} دقيقة${p.schedule.isEmpty ? '' : ' · ${p.schedule}'}'),
-                            if (p.firstSteps.isNotEmpty) Text('أول خطوات: ${p.firstSteps}'),
+                            Text(tr2('${p.priceEgp} جنيه · ${p.minutes} دقيقة${p.schedule.isEmpty ? '' : ' · ${p.schedule}'}', '${p.priceEgp} EGP · ${p.minutes} minutes${p.schedule.isEmpty ? '' : ' · ${p.schedule}'}')),
+                            if (p.firstSteps.isNotEmpty) Text(tr2('أول خطوات: ${p.firstSteps}', 'First steps: ${p.firstSteps}')),
                             if (p.status == proposalSent || p.status == proposalShortlisted)
                               Wrap(
                                 spacing: 8,
@@ -494,14 +494,14 @@ class _OpenRequestsScreenState extends State<OpenRequestsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('${_subject(r.subject)}: ${r.goal}', style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
-                        if (r.childAge != null) Text('عمر الطفل: ${r.childAge}'),
-                        if (r.format.isNotEmpty) Text('الطريقة: ${formatLabel(r.format)}'),
-                        if (r.schedule.isNotEmpty) Text('المواعيد: ${r.schedule}'),
-                        Text('الميزانية: ${budgetText(r)}'),
-                        if (r.approach.isNotEmpty) Text('الأسلوب المفضل: ${r.approach}'),
+                        if (r.childAge != null) Text(tr2('عمر الطفل: ${r.childAge}', 'Child\'s age: ${r.childAge}')),
+                        if (r.format.isNotEmpty) Text(tr2('الطريقة: ${formatLabel(r.format)}', 'Format: ${formatLabel(r.format)}')),
+                        if (r.schedule.isNotEmpty) Text(tr2('المواعيد: ${r.schedule}', 'Schedule: ${r.schedule}')),
+                        Text(tr2('الميزانية: ${budgetText(r)}', 'Budget: ${budgetText(r)}')),
+                        if (r.approach.isNotEmpty) Text(tr2('الأسلوب المفضل: ${r.approach}', 'Preferred approach: ${r.approach}')),
                         const SizedBox(height: 6),
                         if (mine[r.id] != null) ...[
-                          Chip(label: Text('عرضك: ${_proposalStatus(mine[r.id]!.status)}')),
+                          Chip(label: Text(tr2('عرضك: ${_proposalStatus(mine[r.id]!.status)}', 'Your proposal: ${_proposalStatus(mine[r.id]!.status)}'))),
                           if (mine[r.id]!.status == proposalSent || mine[r.id]!.status == proposalShortlisted)
                             TextButton(
                               onPressed: () async {
@@ -594,7 +594,7 @@ class _ProposalFormState extends State<ProposalForm> {
         padding: const EdgeInsets.all(16),
         children: [
           Text('${_subject(widget.request.subject)}: ${widget.request.goal}', style: const TextStyle(fontWeight: FontWeight.bold)),
-          Text('الميزانية: ${budgetText(widget.request)}'),
+          Text(tr2('الميزانية: ${budgetText(widget.request)}', 'Budget: ${budgetText(widget.request)}')),
           const SizedBox(height: 8),
           TextField(
             controller: _message,
@@ -610,7 +610,7 @@ class _ProposalFormState extends State<ProposalForm> {
           DropdownButton<int>(
             isExpanded: true,
             value: _minutes,
-            items: [for (final m in [30, 45, 60, 90]) DropdownMenuItem(value: m, child: Text('مدة الحصة $m دقيقة'))],
+            items: [for (final m in [30, 45, 60, 90]) DropdownMenuItem(value: m, child: Text(tr2('مدة الحصة $m دقيقة', 'Lesson length: $m minutes')))],
             onChanged: (v) => setState(() => _minutes = v ?? _minutes),
           ),
           TextField(controller: _schedule, maxLength: 200, decoration: InputDecoration(labelText: loc('المواعيد المقترحة'))),

@@ -139,7 +139,7 @@ class StoryPlayerController extends ChangeNotifier {
       }
       state = PlayState.ready;
     } else {
-      _unavailable((story.media as NoAudio).reason);
+      _unavailable(loc((story.media as NoAudio).reason));
       return;
     }
     _notify();

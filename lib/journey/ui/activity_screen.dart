@@ -169,9 +169,9 @@ class _Completion extends StatelessWidget {
   });
 
   String get _title => switch (outcome.stars) {
-        3 => 'ممتاز يا ${child.nickname}! نجوم كاملة 🌟',
-        2 => 'رائع يا ${child.nickname}! أحسنت 👏',
-        _ => 'أحسنت يا ${child.nickname}! أكملت المغامرة 🎉',
+        3 => tr2('ممتاز يا ${child.nickname}! نجوم كاملة 🌟', 'Excellent, ${child.nickname}! All the stars 🌟'),
+        2 => tr2('رائع يا ${child.nickname}! أحسنت 👏', 'Great, ${child.nickname}! Well done 👏'),
+        _ => tr2('أحسنت يا ${child.nickname}! أكملت المغامرة 🎉', 'Well done, ${child.nickname}! You finished the adventure 🎉'),
       };
 
   @override
@@ -186,7 +186,7 @@ class _Completion extends StatelessWidget {
               Mascot(size: 96, accessory: child.accessory),
               const SizedBox(height: 8),
               Semantics(
-                label: '${outcome.stars} من 3 نجوم',
+                label: tr2('${outcome.stars} من 3 نجوم', '${outcome.stars} of 3 stars'),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -211,7 +211,7 @@ class _Completion extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: RC.ink)),
               const SizedBox(height: 4),
-              Text('أجبت ${outcome.firstTry} من ${outcome.total} من أول محاولة',
+              Text(tr2('أجبت ${outcome.firstTry} من ${outcome.total} من أول محاولة', 'You answered ${outcome.firstTry} of ${outcome.total} right on the first try'),
                   style: const TextStyle(fontSize: 18, color: RC.ink)),
               if (outcome.stars < 3)
                 Padding(
@@ -223,7 +223,7 @@ class _Completion extends StatelessWidget {
               if (outcome.xpGain > 0)
                 Chip(
                   backgroundColor: RC.yellow,
-                  label: Text('+${outcome.xpGain} نقطة خبرة',
+                  label: Text(tr2('+${outcome.xpGain} نقطة خبرة', '+${outcome.xpGain} XP'),
                       style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink)),
                 ),
               for (final b in outcome.newBadges)
@@ -236,7 +236,7 @@ class _Completion extends StatelessWidget {
                         Text(b.emoji, style: const TextStyle(fontSize: 36)),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Text('شارة جديدة: ${b.title}',
+                          child: Text(tr2('شارة جديدة: ${b.title}', 'New badge: ${b.title}'),
                               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RC.ink)),
                         ),
                       ],
@@ -253,7 +253,7 @@ class _Completion extends StatelessWidget {
                         Text(a.emoji, style: const TextStyle(fontSize: 36)),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: Text('فتحتَ ${a.name} لشخصيتك! ستجدها في «أنا»',
+                          child: Text(tr2('فتحتَ ${a.name} لشخصيتك! ستجدها في «أنا»', 'You unlocked ${a.name} for your character! Find it in “Me”'),
                               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RC.ink)),
                         ),
                       ],

@@ -285,7 +285,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text(subjectById(subject ?? '')?.label ?? 'فيديوهات لعمر $age',
+        title: Text(subjectById(subject ?? '')?.label ?? tr2('فيديوهات لعمر $age', 'Videos for age $age'),
             style: const TextStyle(fontSize: 26)),
       ),
       bottomNavigationBar: ValueListenableBuilder<int?>(

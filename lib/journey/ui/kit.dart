@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../models.dart';
+import '../../l10n/strings.dart';
 
 /// The Rehlaty palette: pastel mint, sky blue, warm yellow, lavender and peach
 /// on a light blue background, with a soft indigo outline.
@@ -85,7 +86,7 @@ class StarRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: '$stars من $max نجوم',
+      label: tr2('$stars من $max نجوم', '$stars of $max stars'),
       excludeSemantics: true,
       child: Row(
         mainAxisSize: MainAxisSize.min,

@@ -89,8 +89,8 @@ class WeekReport {
 String formatDuration(int seconds) {
   final m = (seconds / 60).round();
   if (m < 1) return seconds > 0 ? loc('أقل من دقيقة') : loc('0 د');
-  if (m < 60) return '$m د';
-  return '${m ~/ 60} س ${m % 60} د';
+  if (m < 60) return tr2('$m د', '$m min');
+  return tr2('${m ~/ 60} س ${m % 60} د', '${m ~/ 60} h ${m % 60} min');
 }
 
 DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
@@ -194,10 +194,10 @@ List<Recommendation> _recommend(
   final weak = [for (final s in skills) if (s.level == SkillLevel.needsPractice) s]
     ..sort((a, b) => a.accuracy.compareTo(b.accuracy));
   for (final s in weak.take(2)) {
-    final detail = s.missed.isEmpty ? '' : ' (أكثر ما أخطأ فيه: ${s.missed.join(loc('، '))})';
+    final detail = s.missed.isEmpty ? '' : tr2(' (أكثر ما أخطأ فيه: ${s.missed.join(loc('، '))})', ' (most often wrong in: ${s.missed.join(loc('، '))})');
     recs.add(Recommendation(
       RecKind.practice,
-      'يحتاج إلى تدريب في ${s.skill.label}$detail. جرّب لعبة «${s.skill.game}» بضع جولات كل يوم.',
+      tr2('يحتاج إلى تدريب في ${s.skill.label}$detail. جرّب لعبة «${s.skill.game}» بضع جولات كل يوم.', 'Needs practice in ${s.skill.label}$detail. Try the “${s.skill.game}” game for a few rounds every day.'),
     ));
   }
 
@@ -207,7 +207,7 @@ List<Recommendation> _recommend(
     if (subject == null || e.value <= done || !hasVideos(e.key)) continue;
     recs.add(Recommendation(
       RecKind.plan,
-      'ينقص ${e.value - done} من الدروس في «${subject.label}» لتحقيق هدف الأسبوع (${e.value}).',
+      tr2('ينقص ${e.value - done} من الدروس في «${subject.label}» لتحقيق هدف الأسبوع (${e.value}).', '${e.value - done} more lessons in “${subject.label}” to reach this week\'s goal (${e.value}).'),
     ));
   }
 
@@ -217,8 +217,8 @@ List<Recommendation> _recommend(
     recs.add(Recommendation(
       RecKind.next,
       next == null
-          ? 'أتقن ${s.skill.label}. ما شاء الله!'
-          : 'أتقن ${s.skill.label}، ويمكنه الآن تجربة «${next.label}».',
+          ? tr2('أتقن ${s.skill.label}. ما شاء الله!', 'Has mastered ${s.skill.label}. Well done!')
+          : tr2('أتقن ${s.skill.label}، ويمكنه الآن تجربة «${next.label}».', 'Has mastered ${s.skill.label} and can now try “${next.label}”.'),
     ));
   }
 
@@ -230,7 +230,7 @@ List<Recommendation> _recommend(
   for (final id in untouched.take(hasActivity ? 1 : 0)) {
     recs.add(Recommendation(
       RecKind.explore,
-      'لم يكمل درساً في «${subjectById(id)?.label ?? id}» هذا الأسبوع. ابدأ بدرس قصير من «دروسي».',
+      tr2('لم يكمل درساً في «${subjectById(id)?.label ?? id}» هذا الأسبوع. ابدأ بدرس قصير من «دروسي».', 'No lesson finished in “${subjectById(id)?.label ?? id}” this week. Start with a short lesson from “My lessons”.'),
     ));
   }
 
@@ -245,17 +245,17 @@ String _d(DateTime d) => '${d.day}/${d.month}';
 /// A plain-text version of the report, for copying into WhatsApp and so on.
 String reportAsText(WeekReport r, {String? childName, List<String> journey = const []}) {
   final b = StringBuffer()
-    ..writeln('تقرير ${childName == null ? '' : '$childName، '}أسبوع ${_d(r.start)} – ${_d(r.end)}')
-    ..writeln('الوقت في التعلم: ${formatDuration(r.secondsInApp)} (${r.activeDays} أيام نشاط)')
-    ..writeln('دروس مكتملة: ${r.videosFinished}، جولات ألعاب: ${r.gameRounds}');
+    ..writeln(tr2('تقرير ${childName == null ? '' : '$childName، '}أسبوع ${_d(r.start)} – ${_d(r.end)}', 'Report ${childName == null ? '' : '$childName, '}week ${_d(r.start)} – ${_d(r.end)}'))
+    ..writeln(tr2('الوقت في التعلم: ${formatDuration(r.secondsInApp)} (${r.activeDays} أيام نشاط)', 'Time learning: ${formatDuration(r.secondsInApp)} (${r.activeDays} active days)'))
+    ..writeln(tr2('دروس مكتملة: ${r.videosFinished}، جولات ألعاب: ${r.gameRounds}', 'Lessons finished: ${r.videosFinished}, game rounds: ${r.gameRounds}'));
   for (final line in journey) {
     b.writeln(line);
   }
   if (r.mastered.isNotEmpty) {
-    b.writeln('أتقن: ${r.mastered.map((s) => s.skill.label).join(loc('، '))}');
+    b.writeln(tr2('أتقن: ${r.mastered.map((s) => s.skill.label).join(loc('، '))}', 'Mastered: ${r.mastered.map((s) => s.skill.label).join(', ')}'));
   }
   if (r.needsPractice.isNotEmpty) {
-    b.writeln('يحتاج تدريباً: ${r.needsPractice.map((s) => s.skill.label).join(loc('، '))}');
+    b.writeln(tr2('يحتاج تدريباً: ${r.needsPractice.map((s) => s.skill.label).join(loc('، '))}', 'Needs practice: ${r.needsPractice.map((s) => s.skill.label).join(', ')}'));
   }
   if (r.recommendations.isNotEmpty) {
     b.writeln(loc('توصيات:'));

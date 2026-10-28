@@ -1,3 +1,4 @@
+import '../l10n/strings.dart';
 /// One approved vocabulary item. Lessons, the library, games and stories all
 /// refer to these by [id], so a word is written and reviewed once.
 class Vocab {
@@ -13,9 +14,10 @@ class Vocab {
 
 class VocabCategory {
   final String id;
-  final String title;
+  final String _title;
   final String emoji;
-  const VocabCategory(this.id, this.title, this.emoji);
+  String get title => loc(_title);
+  const VocabCategory(this.id, this._title, this.emoji);
 }
 
 const kVocabCategories = [

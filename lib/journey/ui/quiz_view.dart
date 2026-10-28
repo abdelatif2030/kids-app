@@ -112,14 +112,14 @@ class _QuizViewState extends State<QuizView> {
     if (q.bigText != null) {
       return Directionality(
         textDirection: TextDirection.ltr,
-        child: Text(q.bigText!,
+        child: Text(loc(q.bigText!),
             style: const TextStyle(fontSize: 56, fontWeight: FontWeight.w900, color: RC.ink)),
       );
     }
     if (q.bigEmoji != null) {
       if (q.repeat > 1) {
         return Semantics(
-          label: '${q.repeat} أشياء',
+          label: tr2('${q.repeat} أشياء', '${q.repeat} things'),
           excludeSemantics: true,
           child: Wrap(
             alignment: WrapAlignment.center,
@@ -153,21 +153,21 @@ class _QuizViewState extends State<QuizView> {
         children: [
           Text(o.emoji!, style: const TextStyle(fontSize: 46)),
           if (o.caption != null)
-            Text(o.caption!, style: const TextStyle(fontSize: 16, color: RC.ink)),
+            Text(loc(o.caption!), style: const TextStyle(fontSize: 16, color: RC.ink)),
         ],
       );
     }
     return FittedBox(
       fit: BoxFit.scaleDown,
-      child: Text(o.text!,
+      child: Text(loc(o.text!),
           textAlign: TextAlign.center,
           style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: RC.ink)),
     );
   }
 
   String _semantic(Option o) {
-    if (o.color != null) return 'اللون ${colorNameOf(o.color!)}';
-    if (o.shape != null) return 'شكل ${shapeNameOf(o.shape!.kind)}';
+    if (o.color != null) return tr2('اللون ${colorNameOf(o.color!)}', 'Color ${colorNameOf(o.color!)}');
+    if (o.shape != null) return tr2('شكل ${shapeNameOf(o.shape!.kind)}', 'Shape ${shapeNameOf(o.shape!.kind)}');
     return o.label;
   }
 
@@ -229,7 +229,7 @@ class _QuizViewState extends State<QuizView> {
             children: [
               Row(
                 children: [
-                  Flexible(flex: 2, child: Text('السؤال ${_i + 1} من $total',
+                  Flexible(flex: 2, child: Text(tr2('السؤال ${_i + 1} من $total', 'Question ${_i + 1} of $total'),
                       style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink))),
                   const SizedBox(width: 12),
                   Expanded(flex: 3, child: RProgress(value: (_i + (_right ? 1 : 0)) / total)),
@@ -240,12 +240,12 @@ class _QuizViewState extends State<QuizView> {
                 RCard(
                   color: RC.yellow.withAlpha(110),
                   outline: RC.star,
-                  child: Text(q.passage!,
+                  child: Text(loc(q.passage!),
                       style: const TextStyle(fontSize: 19, height: 1.7, color: RC.ink)),
                 ),
                 const SizedBox(height: 14),
               ],
-              Semantics(header: true, child: Text(q.prompt,
+              Semantics(header: true, child: Text(loc(q.prompt),
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: RC.ink))),
               if (q.spoken != null)
@@ -287,7 +287,7 @@ class _QuizViewState extends State<QuizView> {
                   padding: const EdgeInsets.only(top: 10),
                   child: RCard(
                     color: RC.lavender.withAlpha(140),
-                    child: Text('💡 ${q.hint}', style: const TextStyle(fontSize: 18, color: RC.ink)),
+                    child: Text('💡 ${loc(q.hint)}', style: const TextStyle(fontSize: 18, color: RC.ink)),
                   ),
                 )
               else if (!_right)
@@ -331,7 +331,7 @@ class MathPicture extends StatelessWidget {
     final String label;
     switch (h.op) {
       case '+':
-        label = 'ضع ${h.a} مع ${h.b} واعدّ الكل';
+        label = tr2('ضع ${h.a} مع ${h.b} واعدّ الكل', 'Put ${h.a} with ${h.b} and count them all');
         body = Wrap(
           alignment: WrapAlignment.center,
           crossAxisAlignment: WrapCrossAlignment.center,
@@ -344,10 +344,10 @@ class MathPicture extends StatelessWidget {
           ],
         );
       case '-':
-        label = 'عندنا ${h.a} وشطبنا ${h.b}، فكم بقي؟';
+        label = tr2('عندنا ${h.a} وشطبنا ${h.b}، فكم بقي؟', 'We have ${h.a} and crossed out ${h.b}. How many are left?');
         body = _dots(h.a, crossed: h.b);
       default:
-        label = '${h.a} صفوف، في كل صف ${h.b}';
+        label = tr2('${h.a} صفوف، في كل صف ${h.b}', '${h.a} rows, ${h.b} in each row');
         body = Column(
           children: [for (var i = 0; i < h.a; i++) _dots(h.b)],
         );

@@ -128,7 +128,7 @@ LearningSummary buildLearningSummary({
   for (final e in letterStates.entries) {
     if (e.value.sessions >= 1 && e.value.box <= 1) {
       final l = letterOf(e.key);
-      if (l != null) needs.add('حرف ${l.letter} (${l.name})');
+      if (l != null) needs.add(tr2('حرف ${l.letter} (${l.name})', 'letter ${l.letter} (${l.name})'));
     }
   }
   final tried = <String>{};
@@ -139,7 +139,7 @@ LearningSummary buildLearningSummary({
   }
   for (final id in tried.difference(understood)) {
     final v = vocabById(id);
-    if (v != null) needs.add('كلمة ${v.ar}');
+    if (v != null) needs.add(tr2('كلمة ${v.ar}', 'word ${v.ar}'));
   }
 
   final favoriteTitles = [for (final id in favorites) if (storyById(id) != null) storyById(id)!.title];
@@ -149,7 +149,7 @@ LearningSummary buildLearningSummary({
     next.add(loc('اطّلع طفلك على حروف جديدة، لكن لم يُجب بعد إجابة صحيحة من أول مرة. جرّبوا «تمرين الحرف».'));
   }
   final needsLetters = needs.where((n) => n.startsWith(loc('حرف'))).take(3).toList();
-  if (needsLetters.isNotEmpty) next.add('راجعوا معاً: ${needsLetters.join(loc('، '))}. زر «مراجعة اليوم» في تعلّم الحروف يجمعها.');
+  if (needsLetters.isNotEmpty) next.add(tr2('راجعوا معاً: ${needsLetters.join(loc('، '))}. زر «مراجعة اليوم» في تعلّم الحروف يجمعها.', 'Review together: ${needsLetters.join(', ')}. The “Today\'s review” button in the letters section collects them.'));
   if (stories.isNotEmpty && stories.values.every((s) => !s.understoodChecked) && stories.values.any((s) => s.completed)) {
     next.add(loc('بعد القصة اضغطوا «أسئلة عن القصة»؛ الاستماع وحده لا يعني أن الطفل فهم.'));
   }

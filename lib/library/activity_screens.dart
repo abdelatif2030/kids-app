@@ -39,7 +39,7 @@ class _ActivityLibraryScreenState extends State<ActivityLibraryScreen> {
   }
 
   Future<void> _mark(RealActivity a) async {
-    await HomeTasks.addDone(widget.child.id, 'activity', a.title);
+    await HomeTasks.addDone(widget.child.id, 'activity', a.titleKey);
     // A parent confirming it was done is practice, not mastery.
     await LearningRecords.add(widget.child.id, RecordType.activity, a.id, Evidence.practice);
     await _load();
@@ -74,7 +74,7 @@ class _ActivityLibraryScreenState extends State<ActivityLibraryScreen> {
                 children: [
                   ChoiceChip(label: Text(loc('الكل')), selected: _skill == null, onSelected: (_) => setState(() => _skill = null)),
                   for (final s in kSkillFilters)
-                    ChoiceChip(label: Text(s), selected: _skill == s, onSelected: (v) => setState(() => _skill = v ? s : null)),
+                    ChoiceChip(label: Text(loc(s)), selected: _skill == s, onSelected: (v) => setState(() => _skill = v ? s : null)),
                 ],
               ),
               Material(
@@ -100,8 +100,8 @@ class _ActivityLibraryScreenState extends State<ActivityLibraryScreen> {
                       data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
                       child: ExpansionTile(
                         title: Text(a.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: RC.ink)),
-                        subtitle: Text('${a.skill} · ${a.minutes} د · ${a.minAge}–${a.maxAge} سنة'),
-                        trailing: _done.contains(a.title)
+                        subtitle: Text(tr2('${a.skill} · ${a.minutes} د · ${a.minAge}–${a.maxAge} سنة', '${a.skill} · ${a.minutes} min · ages ${a.minAge}–${a.maxAge}')),
+                        trailing: _done.contains(a.titleKey)
                             ? const Icon(Icons.check_circle_rounded, color: RC.good, size: 30)
                             : const Icon(Icons.expand_more_rounded),
                         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
@@ -113,7 +113,7 @@ class _ActivityLibraryScreenState extends State<ActivityLibraryScreen> {
                           Text(loc('للوالد'), style: TextStyle(fontWeight: FontWeight.w900, color: RC.pinkDeep)),
                           Text(a.forParent, style: const TextStyle(fontSize: 15, color: RC.ink)),
                           const SizedBox(height: 8),
-                          Text('المواد: ${a.materials.isEmpty ? loc('لا شيء') : a.materials.join(loc('، '))}',
+                          Text(tr2('المواد: ${a.materials.isEmpty ? loc('لا شيء') : a.materials.join(loc('، '))}', 'Materials: ${a.materials.isEmpty ? 'none' : a.materials.map(loc).join(', ')}'),
                               style: const TextStyle(fontSize: 14, color: RC.ink)),
                           if (a.safety != null)
                             Padding(
@@ -132,7 +132,7 @@ class _ActivityLibraryScreenState extends State<ActivityLibraryScreen> {
                           const SizedBox(height: 10),
                           Align(
                             alignment: AlignmentDirectional.centerStart,
-                            child: _done.contains(a.title)
+                            child: _done.contains(a.titleKey)
                                 ? Text(loc('تمّ هذا الأسبوع ✓'), style: TextStyle(color: RC.good, fontWeight: FontWeight.bold))
                                 : FilledButton.icon(
                                     onPressed: () => _mark(a),

@@ -157,7 +157,7 @@ class _PinEntryScreenState extends State<PinEntryScreen> {
   Future<void> _refreshLock() async {
     final left = await ParentSettings.instance.lockedSecondsLeft();
     if (!mounted) return;
-    setState(() => _error = left > 0 ? 'محاولات كثيرة. انتظر $left ثانية.' : null);
+    setState(() => _error = left > 0 ? tr2('محاولات كثيرة. انتظر $left ثانية.', 'Too many attempts. Wait $left seconds.') : null);
     _ticker?.cancel();
     if (left > 0) {
       _ticker = Timer(const Duration(seconds: 1), _refreshLock);
@@ -361,7 +361,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     value: _limit,
                     items: [
                       for (final m in _limits)
-                        DropdownMenuItem(value: m, child: Text('$m دقيقة')),
+                        DropdownMenuItem(value: m, child: Text(tr2('$m دقيقة', '$m minutes'))),
                     ],
                     onChanged: (m) async {
                       if (m == null) return;

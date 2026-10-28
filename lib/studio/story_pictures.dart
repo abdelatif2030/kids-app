@@ -6,6 +6,7 @@ import '../library/vocab.dart';
 import '../media/audio.dart';
 import 'autosave.dart';
 import 'creations.dart';
+import '../l10n/app_locale.dart';
 import '../l10n/strings.dart';
 
 const _prompts = [
@@ -62,7 +63,7 @@ class _PictureStoryScreenState extends State<PictureStoryScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              Text(ready ? loc('احكِ قصتك لماما أو بابا بالترتيب') : 'اختر 3 صور لقصتك (${_pics.length} من 3)',
+              Text(ready ? loc('احكِ قصتك لماما أو بابا بالترتيب') : tr2('اختر 3 صور لقصتك (${_pics.length} من 3)', 'Pick 3 pictures for your story (${_pics.length} of 3)'),
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: RC.ink)),
               const SizedBox(height: 10),
@@ -74,7 +75,7 @@ class _PictureStoryScreenState extends State<PictureStoryScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 6),
                       child: RCard(
                         color: i == _step && ready ? RC.yellow : RC.card,
-                        semanticLabel: i < _pics.length ? 'الصورة ${i + 1}' : 'مكان فارغ ${i + 1}',
+                        semanticLabel: i < _pics.length ? tr2('الصورة ${i + 1}', 'Picture ${i + 1}') : tr2('مكان فارغ ${i + 1}', 'Empty place ${i + 1}'),
                         onTap: i < _pics.length
                             ? () {
                                 setState(() {
@@ -110,11 +111,11 @@ class _PictureStoryScreenState extends State<PictureStoryScreen> {
                   color: RC.yellow.withAlpha(120),
                   child: Column(
                     children: [
-                      Text(_prompts[_step].$1,
+                      Text(loc(_prompts[_step].$1),
                           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
-                      Text(_prompts[_step].$2, style: const TextStyle(fontSize: 17, color: RC.ink)),
+                      Text(loc(_prompts[_step].$2), style: const TextStyle(fontSize: 17, color: RC.ink)),
                       TextButton.icon(
-                        onPressed: () => AppAudio.say('${_prompts[_step].$1}. ${_prompts[_step].$2}'),
+                        onPressed: () => AppAudio.say('${loc(_prompts[_step].$1)}. ${loc(_prompts[_step].$2)}', lang: AppLocale.instance.code),
                         icon: const Icon(Icons.volume_up_rounded),
                         label: Text(loc('استمع')),
                       ),

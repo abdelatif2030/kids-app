@@ -1,20 +1,30 @@
+import '../l10n/strings.dart';
 /// Offline, supervised activities for a child and a parent. Each one names the
 /// skill it builds, what is needed, how long it takes and any safety note.
 /// Parents mark them done; no photo, recording or text is ever asked for.
 class RealActivity {
   final String id;
-  final String title;
-  final String skill; // a short Arabic skill label
+  final String _title;
+  final String _skill; // a short Arabic skill label
+  String get title => loc(_title);
+  String get skill => loc(_skill);
+
+  /// The stored (Arabic) title: what is saved in "done" lists, whatever the interface language.
+  String get titleKey => _title;
   final int minAge;
   final int maxAge;
   final int minutes;
   final List<String> materials;
-  final String forChild; // instructions the child hears
-  final String forParent; // guidance for the parent
-  final String? safety;
-  const RealActivity(this.id, this.title, this.skill, this.minAge, this.maxAge, this.minutes, this.materials,
-      this.forChild, this.forParent,
-      {this.safety});
+  final String _forChild; // instructions the child hears
+  final String _forParent; // guidance for the parent
+  final String? _safety;
+  String get forChild => loc(_forChild);
+  String get forParent => loc(_forParent);
+  String? get safety => _safety == null ? null : loc(_safety);
+  const RealActivity(this.id, this._title, this._skill, this.minAge, this.maxAge, this.minutes, this.materials,
+      this._forChild, this._forParent,
+      {String? safety})
+      : _safety = safety;
 }
 
 const kSkillFilters = ['الأشكال والألوان', 'العدّ والرياضيات', 'اللغة والقصص', 'العلوم والطبيعة', 'المشاعر والحياة', 'اليدين والحركة'];
@@ -82,7 +92,7 @@ const kRealActivities = <RealActivity>[
 
 List<RealActivity> activitiesFor({int? age, String? skill}) => [
       for (final a in kRealActivities)
-        if ((age == null || (age >= a.minAge && age <= a.maxAge)) && (skill == null || a.skill == skill)) a,
+        if ((age == null || (age >= a.minAge && age <= a.maxAge)) && (skill == null || a._skill == skill)) a,
     ];
 
 RealActivity? activityById(String id) {

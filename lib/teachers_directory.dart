@@ -66,8 +66,8 @@ class VerificationBadges extends StatelessWidget {
       spacing: 6,
       runSpacing: 4,
       children: [
-        if (teacher.identityVerified) _badge(context, loc('الهوية تم التحقق منها'), kIdentityBadgeMeaning),
-        if (teacher.qualificationVerified) _badge(context, loc('المؤهل تم التحقق منه'), kQualificationBadgeMeaning),
+        if (teacher.identityVerified) _badge(context, loc('الهوية تم التحقق منها'), loc(kIdentityBadgeMeaning)),
+        if (teacher.qualificationVerified) _badge(context, loc('المؤهل تم التحقق منه'), loc(kQualificationBadgeMeaning)),
       ],
     );
   }
@@ -75,10 +75,10 @@ class VerificationBadges extends StatelessWidget {
 
 /// One line of facts a parent compares first: price, length, experience, ages.
 List<String> teacherFacts(TeacherProfile t) => [
-      if (t.priceEgp != null) '${t.priceEgp} جنيه للحصة' else if (t.priceNote.isNotEmpty) t.priceNote,
-      if (t.lessonMinutes != null) '${t.lessonMinutes} دقيقة',
-      if (t.experienceYears != null) 'خبرة ${t.experienceYears} سنوات (يذكرها المدرس)',
-      if (t.ageMin != null && t.ageMax != null) 'من ${t.ageMin} إلى ${t.ageMax} سنوات',
+      if (t.priceEgp != null) tr2('${t.priceEgp} جنيه للحصة', '${t.priceEgp} EGP per lesson') else if (t.priceNote.isNotEmpty) t.priceNote,
+      if (t.lessonMinutes != null) tr2('${t.lessonMinutes} دقيقة', '${t.lessonMinutes} minutes'),
+      if (t.experienceYears != null) tr2('خبرة ${t.experienceYears} سنوات (يذكرها المدرس)', '${t.experienceYears} years of experience (stated by the teacher)'),
+      if (t.ageMin != null && t.ageMax != null) tr2('من ${t.ageMin} إلى ${t.ageMax} سنوات', 'Ages ${t.ageMin} to ${t.ageMax}'),
     ];
 
 /// The directory: search, filters, sort, favourites and comparison.
@@ -212,7 +212,7 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
           padding: const EdgeInsets.fromLTRB(16, 2, 16, 4),
           child: Align(
             alignment: AlignmentDirectional.centerStart,
-            child: Text('${results.length} مدرس · الترتيب: ${_sort.label}',
+            child: Text(tr2('${results.length} مدرس · الترتيب: ${_sort.label}', '${results.length} teachers · Sorted by: ${_sort.label}'),
                 style: const TextStyle(fontSize: 13)),
           ),
         ),
@@ -256,7 +256,7 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
                       Center(
                         child: TextButton(
                           onPressed: () => setState(() => _shown += pageSize),
-                          child: Text('عرض المزيد (${results.length - page.length})'),
+                          child: Text(tr2('عرض المزيد (${results.length - page.length})', 'Show more (${results.length - page.length})')),
                         ),
                       ),
                   ],
@@ -269,7 +269,7 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
               child: FilledButton.icon(
                 onPressed: () => widget.onCompare([for (final t in widget.teachers) if (_compare.contains(t.uid)) t]),
                 icon: const Icon(Icons.compare_arrows_rounded),
-                label: Text('قارن ${_compare.length} مدرسين'),
+                label: Text(tr2('قارن ${_compare.length} مدرسين', 'Compare ${_compare.length} teachers')),
               ),
             ),
           ),
@@ -372,8 +372,8 @@ class _TeacherCard extends StatelessWidget {
                 ),
               if (t.languages.isNotEmpty) Text(t.languages.join(loc('، ')), style: const TextStyle(fontSize: 13)),
               Text(
-                '${(rating ?? RatingSummary.none).label}'
-                '${earliestMs == null ? '' : ' · أقرب موعد: ${fmtDateTime(DateTime.fromMillisecondsSinceEpoch(earliestMs!))}'}',
+                tr2('${(rating ?? RatingSummary.none).label}'
+                '${earliestMs == null ? '' : ' · أقرب موعد: ${fmtDateTime(DateTime.fromMillisecondsSinceEpoch(earliestMs!))}'}', '${(rating ?? RatingSummary.none).label}${earliestMs == null ? '' : ' · Earliest slot: ${fmtDateTime(DateTime.fromMillisecondsSinceEpoch(earliestMs!))}'}'),
                 style: const TextStyle(fontSize: 13),
               ),
               Align(
@@ -426,7 +426,7 @@ class _FilterSheetState extends State<_FilterSheet> {
             children: [
               for (final o in options)
                 ChoiceChip(
-                  label: Text(label(o)),
+                  label: Text(loc(label(o))),
                   selected: selected == o,
                   onSelected: (on) => setState(() => pick(on ? o : null)),
                 ),
@@ -452,7 +452,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                 style: TextStyle(fontSize: 13)),
             _chips<String>(loc('المادة'), kSubjects.map((s) => s.id).toList(), _f.subject, _subjectLabel,
                 (v) => _f = _f.copyWith(subject: v)),
-            _chips<int>(loc('عمر الطفل'), [for (var a = 1; a <= 12; a++) a], _f.childAge, (a) => '$a سنوات',
+            _chips<int>(loc('عمر الطفل'), [for (var a = 1; a <= 12; a++) a], _f.childAge, (a) => tr2('$a سنوات', '$a years'),
                 (v) => _f = _f.copyWith(childAge: v)),
             _chips<String>(loc('اللغة'), kTeacherLanguages, _f.language, (v) => v, (v) => _f = _f.copyWith(language: v)),
             _chips<String>(loc('اللهجة'), kTeacherDialects, _f.dialect, (v) => v, (v) => _f = _f.copyWith(dialect: v)),
@@ -470,13 +470,13 @@ class _FilterSheetState extends State<_FilterSheet> {
             ),
             SwitchListTile(
               title: Text(loc('الهوية تم التحقق منها')),
-              subtitle: const Text(kIdentityBadgeMeaning, style: TextStyle(fontSize: 12)),
+              subtitle: Text(loc(kIdentityBadgeMeaning), style: TextStyle(fontSize: 12)),
               value: _f.identityVerified,
               onChanged: (v) => setState(() => _f = _f.copyWith(identityVerified: v)),
             ),
             SwitchListTile(
               title: Text(loc('المؤهل تم التحقق منه')),
-              subtitle: const Text(kQualificationBadgeMeaning, style: TextStyle(fontSize: 12)),
+              subtitle: Text(loc(kQualificationBadgeMeaning), style: TextStyle(fontSize: 12)),
               value: _f.qualificationVerified,
               onChanged: (v) => setState(() => _f = _f.copyWith(qualificationVerified: v)),
             ),
@@ -530,9 +530,9 @@ class CompareTeachersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rows = <(String, String Function(TeacherProfile))>[
-      (loc('السعر'), (t) => t.priceEgp != null ? '${t.priceEgp} جنيه' : (t.priceNote.isEmpty ? loc('غير محدد') : t.priceNote)),
-      (loc('مدة الحصة'), (t) => t.lessonMinutes == null ? loc('غير محددة') : '${t.lessonMinutes} دقيقة'),
-      (loc('الخبرة (يذكرها المدرس)'), (t) => t.experienceYears == null ? loc('غير محددة') : '${t.experienceYears} سنوات'),
+      (loc('السعر'), (t) => t.priceEgp != null ? tr2('${t.priceEgp} جنيه', '${t.priceEgp} EGP') : (t.priceNote.isEmpty ? loc('غير محدد') : t.priceNote)),
+      (loc('مدة الحصة'), (t) => t.lessonMinutes == null ? loc('غير محددة') : tr2('${t.lessonMinutes} دقيقة', '${t.lessonMinutes} minutes')),
+      (loc('الخبرة (يذكرها المدرس)'), (t) => t.experienceYears == null ? loc('غير محددة') : tr2('${t.experienceYears} سنوات', '${t.experienceYears} years')),
       (loc('الفئة العمرية'), (t) => t.ageMin == null || t.ageMax == null ? loc('غير محددة') : '${t.ageMin}–${t.ageMax}'),
       (loc('المواد'), (t) => t.subjects.map(_subjectLabel).join(loc('، '))),
       (loc('التخصصات'), (t) => t.specialties.isEmpty ? '—' : t.specialties.join(loc('، '))),

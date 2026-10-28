@@ -153,7 +153,7 @@ class HomeTab extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       onTap: () => _play(context, p.activity),
                       semanticLabel:
-                          '${activityTitle(p.activity)}، ${p.reason}، ${p.doneToday ? context.tr('home.done') : context.tr('home.notYet')}',
+                          tr2('${activityTitle(p.activity)}، ${p.reason}، ${p.doneToday ? context.tr('home.done') : context.tr('home.notYet')}', '${activityTitle(p.activity)}, ${p.reason}, ${p.doneToday ? context.tr('home.done') : context.tr('home.notYet')}'),
                       child: Row(
                         children: [
                           CircleAvatar(
@@ -280,7 +280,7 @@ class _LandCard extends StatelessWidget {
     return RCard(
       onTap: onTap,
       semanticLabel:
-          '${land.title}، أنهيت ${progress.completed} من $kLevelsPerLand مستويات، ${progress.stars} نجوم',
+          tr2('${land.title}، أنهيت ${progress.completed} من $kLevelsPerLand مستويات، ${progress.stars} نجوم', '${land.title}, finished ${progress.completed} of $kLevelsPerLand levels, ${progress.stars} stars'),
       child: Row(
         children: [
           Container(

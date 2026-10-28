@@ -4,10 +4,11 @@ import 'l10n/strings.dart';
 /// A school subject shown to the child.
 class Subject {
   final String id;
-  final String label;
+  final String _label;
+  String get label => loc(_label);
   final IconData icon;
   final Color color;
-  const Subject(this.id, this.label, this.icon, this.color);
+  const Subject(this.id, this._label, this.icon, this.color);
 }
 
 /// Subject ids match the `subject` field in assets/videos.json.

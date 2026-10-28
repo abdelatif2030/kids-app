@@ -88,7 +88,7 @@ Question audioToPicture(Vocab t, List<Vocab> pool, Random r, {int options = 3}) 
     bigText: '🔊',
     options: m.options,
     correct: m.correct,
-    hint: 'اضغط «استمع» لتسمع الكلمة مرة أخرى. الكلمة: ${t.ar}.',
+    hint: tr2('اضغط «استمع» لتسمع الكلمة مرة أخرى. الكلمة: ${t.ar}.', 'Press “Listen” to hear the word again. The word: ${t.ar}.'),
     skill: 'listening',
     spoken: t.ar,
     speakFirst: true,
@@ -108,7 +108,7 @@ Question wordToPicture(Vocab t, List<Vocab> pool, Random r, {int options = 3}) {
     bigText: t.ar,
     options: m.options,
     correct: m.correct,
-    hint: 'اقرأ الكلمة ببطء: ${t.ar}.',
+    hint: tr2('اقرأ الكلمة ببطء: ${t.ar}.', 'Read the word slowly: ${t.ar}.'),
     skill: 'vocab',
     spoken: t.ar,
     explanation: '${t.emoji} ${t.ar}',
@@ -126,15 +126,15 @@ Question countingQuestion(Vocab t, int max, Random r) {
   }
   final m = _mix(Option.text('$n'), [for (final x in nums.where((x) => x != n)) Option.text('$x')], r);
   return Question(
-    prompt: 'كم ${t.ar} في الصورة؟',
+    prompt: tr2('كم ${t.ar} في الصورة؟', 'How many ${t.en ?? t.ar} are in the picture?'),
     bigEmoji: t.emoji,
     repeat: n,
     options: m.options,
     correct: m.correct,
     hint: loc('عُدّ واحداً واحداً بإصبعك.'),
     skill: 'counting',
-    spoken: 'كم ${t.ar}؟',
-    explanation: 'العدد $n',
+    spoken: tr2('كم ${t.ar}؟', 'How many ${t.en ?? t.ar}?'),
+    explanation: tr2('العدد $n', 'The number is $n'),
     ref: 'word:${t.id}',
   );
 }

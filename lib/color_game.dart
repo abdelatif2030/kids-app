@@ -171,7 +171,7 @@ class _ColorGameState extends State<ColorGame> {
                           : null,
                     ),
                     const SizedBox(height: 8),
-                    Text(_targets[_round].name, style: const TextStyle(fontSize: 28)),
+                    Text(loc(_targets[_round].name), style: const TextStyle(fontSize: 28)),
                     const SizedBox(height: 32),
                     Wrap(
                       spacing: 20,

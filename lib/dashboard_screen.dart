@@ -258,10 +258,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _end,
     ).fold<int>(0, (s, v) => s + v);
     return [
-      'رحلة التعلّم: $week نشاطاً هذا الأسبوع، ${p.totalStars} نجمة، المستوى ${p.explorerLevel}',
+      tr2('رحلة التعلّم: $week نشاطاً هذا الأسبوع، ${p.totalStars} نجمة، المستوى ${p.explorerLevel}', 'Learning journey: $week activities this week, ${p.totalStars} stars, level ${p.explorerLevel}'),
       for (final l in kLands)
         if (p.lands[l.id]!.completed > 0)
-          '${l.title}: ${p.lands[l.id]!.completed}/$kLevelsPerLand مستويات',
+          tr2('${l.title}: ${p.lands[l.id]!.completed}/$kLevelsPerLand مستويات', '${l.title}: ${p.lands[l.id]!.completed}/$kLevelsPerLand levels'),
     ];
   }
 }
@@ -314,7 +314,7 @@ class _Hero extends StatelessWidget {
   Widget build(BuildContext context) {
     final r = report;
     final text = r.hasActivity
-        ? 'أكمل ${r.videosFinished} دروس، وتدرّب في ${r.gameRounds} جولة'
+        ? tr2('أكمل ${r.videosFinished} دروس، وتدرّب في ${r.gameRounds} جولة', 'Finished ${r.videosFinished} lessons and practised ${r.gameRounds} game rounds')
         : loc('لا توجد نشاطات في هذا الأسبوع');
     return Container(
       padding: const EdgeInsets.all(20),
@@ -524,8 +524,7 @@ class _DaysChart extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      _dayShort[report.start.add(Duration(days: i)).weekday -
-                          1],
+                      loc(_dayShort[report.start.add(Duration(days: i)).weekday - 1]),
                       style: const TextStyle(fontSize: 10),
                       maxLines: 1,
                       overflow: TextOverflow.clip,
@@ -583,12 +582,12 @@ class _Skills extends StatelessWidget {
                         Text(
                           s.missed.isEmpty
                               ? s.skill.label
-                              : '${s.skill.label} (يخطئ في: ${s.missed.join(loc('، '))})',
+                              : tr2('${s.skill.label} (يخطئ في: ${s.missed.join(loc('، '))})', '${s.skill.label} (often wrong in: ${s.missed.join(loc('، '))})'),
                         ),
                         Text(
                           s.level == SkillLevel.mastered
-                              ? 'التالي: مستوى أصعب في «${s.skill.game}»'
-                              : 'النشاط التالي: «${s.skill.game}» (${s.attempts} جولة مسجلة)',
+                              ? tr2('التالي: مستوى أصعب في «${s.skill.game}»', 'Next: a harder level in “${s.skill.game}”')
+                              : tr2('النشاط التالي: «${s.skill.game}» (${s.attempts} جولة مسجلة)', 'Next activity: “${s.skill.game}” (${s.attempts} rounds recorded)'),
                           style: const TextStyle(fontSize: 12, color: Colors.black54),
                         ),
                       ],
@@ -605,7 +604,7 @@ class _Skills extends StatelessWidget {
                     ),
                     child: Text(
                       s.attempts < kMinAttempts
-                          ? '${s.attempts} جولات'
+                          ? tr2('${s.attempts} جولات', '${s.attempts} rounds')
                           : '${(s.accuracy * 100).round()}%',
                       style: TextStyle(
                         color: color,
@@ -652,7 +651,7 @@ class _Skills extends StatelessWidget {
                   r.others,
                 ),
                 Text(
-                  'تُحسب من آخر 3 أسابيع، ولا تُحكم المهارة قبل $kMinAttempts جولات.',
+                  tr2('تُحسب من آخر 3 أسابيع، ولا تُحكم المهارة قبل $kMinAttempts جولات.', 'Calculated from the last 3 weeks. A skill is not judged before $kMinAttempts rounds.'),
                   style: const TextStyle(fontSize: 12),
                 ),
               ],
@@ -706,7 +705,7 @@ class _Lessons extends StatelessWidget {
                         const SizedBox(width: 10),
                         Text(
                           report.targets.containsKey(s.id)
-                              ? '${report.lessonsPerSubject[s.id] ?? 0} من ${report.targets[s.id]}'
+                              ? tr2('${report.lessonsPerSubject[s.id] ?? 0} من ${report.targets[s.id]}', '${report.lessonsPerSubject[s.id] ?? 0} of ${report.targets[s.id]}')
                               : '${report.lessonsPerSubject[s.id] ?? 0}',
                         ),
                       ],
@@ -779,7 +778,7 @@ class _Journey extends StatelessWidget {
     final week = weeklyCounts(store.attemptsOf(child.id), end);
     final plan = store.todayPlan(child.id);
     return _Section(
-      title: 'رحلة التعلّم · ${child.nickname}',
+      title: tr2('رحلة التعلّم · ${child.nickname}', 'Learning journey · ${child.nickname}'),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -787,10 +786,10 @@ class _Journey extends StatelessWidget {
             spacing: 14,
             runSpacing: 6,
             children: [
-              Text('⭐ ${progress.totalStars} نجمة'),
-              Text('المستوى ${progress.explorerLevel}'),
-              Text('✅ ${progress.completedTotal} نشاطاً'),
-              Text('🏅 ${progress.badges.length} شارة'),
+              Text(tr2('⭐ ${progress.totalStars} نجمة', '⭐ ${progress.totalStars} stars')),
+              Text(tr2('المستوى ${progress.explorerLevel}', 'Level ${progress.explorerLevel}')),
+              Text(tr2('✅ ${progress.completedTotal} نشاطاً', '✅ ${progress.completedTotal} activities')),
+              Text(tr2('🏅 ${progress.badges.length} شارة', '🏅 ${progress.badges.length} badges')),
             ],
           ),
           const SizedBox(height: 12),
@@ -898,7 +897,7 @@ class _Journey extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        '${p.activity.title} — ${p.reason} (${p.minutes} د)',
+                        tr2('${p.activity.title} — ${p.reason} (${p.minutes} د)', '${p.activity.title} — ${p.reason} (${p.minutes} min)'),
                       ),
                     ),
                   ],
@@ -1034,7 +1033,7 @@ class _LearningLibraryState extends State<_LearningLibrary> {
               _row(loc('اطّلع عليها (تعرّض)'), '${s.letters.exposure.length}'),
               _row(loc('تدرّب عليها'), '${s.letters.practice.length}'),
               _row(loc('أجاب صحيحاً من أول مرة'), '${s.letters.demonstrated.length}'),
-              _row(loc('متقنة (مراجعة متباعدة)'), '${s.masteredLetters} من 28'),
+              _row(loc('متقنة (مراجعة متباعدة)'), tr2('${s.masteredLetters} من 28', '${s.masteredLetters} of 28')),
               const Divider(),
               Text(loc('الكلمات'), style: TextStyle(fontWeight: FontWeight.bold)),
               _row(loc('رآها أو سمعها (تعرّض)'), '${s.words.exposure.length}'),
@@ -1043,13 +1042,13 @@ class _LearningLibraryState extends State<_LearningLibrary> {
               const Divider(),
               Text(loc('القصص'), style: TextStyle(fontWeight: FontWeight.bold)),
               _row(loc('قصص سمعها'), '${s.stories.length}'),
-              _row(loc('وقت الاستماع (تعرّض فقط)'), '$minutes د'),
+              _row(loc('وقت الاستماع (تعرّض فقط)'), tr2('$minutes د', '$minutes min')),
               for (final st in s.stories)
                 Text(
-                  '• ${st.title}${st.completed ? loc(' (أكملها)') : ''}${st.understoodChecked ? loc(' · أجاب عن أسئلتها') : ''}',
+                  tr2('• ${st.title}${st.completed ? loc(' (أكملها)') : ''}${st.understoodChecked ? loc(' · أجاب عن أسئلتها') : ''}', '• ${st.title}${st.completed ? ' (finished)' : ''}${st.understoodChecked ? ' · answered its questions' : ''}'),
                   style: const TextStyle(fontSize: 13),
                 ),
-              if (s.favoriteStories.isNotEmpty) Text('المفضلة: ${s.favoriteStories.join(loc('، '))}', style: const TextStyle(fontSize: 13)),
+              if (s.favoriteStories.isNotEmpty) Text(tr2('المفضلة: ${s.favoriteStories.join(loc('، '))}', 'Favorites: ${s.favoriteStories.join(loc('، '))}'), style: const TextStyle(fontSize: 13)),
               Text(loc('الاستماع لا يعني الإتقان: يُحسب الفهم من إجابات الأسئلة فقط.'), style: TextStyle(fontSize: 12)),
               const Divider(),
               _row(loc('أنشطة البيت المؤكَّدة'), '${s.offlineActivities}'),

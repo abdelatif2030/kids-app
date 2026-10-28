@@ -55,7 +55,7 @@ class _TeacherAvailabilityScreenState extends State<TeacherAvailabilityScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
-          ..showSnackBar(SnackBar(content: Text('أُضيفت المواعيد (${slots.length})')));
+          ..showSnackBar(SnackBar(content: Text(tr2('أُضيفت المواعيد (${slots.length})', 'Slots added (${slots.length})'))));
       }
     });
   }
@@ -98,7 +98,7 @@ class _TeacherAvailabilityScreenState extends State<TeacherAvailabilityScreen> {
                 Card(
                   child: ListTile(
                     title: Text(fmtDateTime(s.start)),
-                    subtitle: Text('${s.minutes} دقيقة'),
+                    subtitle: Text(tr2('${s.minutes} دقيقة', '${s.minutes} minutes')),
                     leading: Icon(
                       s.status == slotBooked ? Icons.event_busy_rounded : (s.status == slotBlocked ? Icons.block_rounded : Icons.event_available_rounded),
                       color: s.status == slotBooked ? Colors.orange : (s.status == slotBlocked ? Colors.grey : Colors.green),
@@ -181,13 +181,13 @@ class _AddSlotsDialogState extends State<_AddSlotsDialog> {
             DropdownButton<int>(
               isExpanded: true,
               value: _minutes,
-              items: [for (final m in [30, 45, 60, 90]) DropdownMenuItem(value: m, child: Text('مدة الحصة $m دقيقة'))],
+              items: [for (final m in [30, 45, 60, 90]) DropdownMenuItem(value: m, child: Text(tr2('مدة الحصة $m دقيقة', 'Lesson length: $m minutes')))],
               onChanged: (v) => setState(() => _minutes = v ?? _minutes),
             ),
             DropdownButton<int>(
               isExpanded: true,
               value: _weeks,
-              items: [for (final w in [1, 2, 4, 8]) DropdownMenuItem(value: w, child: Text('لمدة $w أسابيع'))],
+              items: [for (final w in [1, 2, 4, 8]) DropdownMenuItem(value: w, child: Text(tr2('لمدة $w أسابيع', 'For $w weeks')))],
               onChanged: (v) => setState(() => _weeks = v ?? _weeks),
             ),
             if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),

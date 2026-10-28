@@ -259,7 +259,7 @@ class _PlanEditorState extends State<PlanEditor> {
             setState(() {});
           },
         ),
-        Text('كل نشاط يستغرق نحو ${minutesFor(d.age)} دقائق لهذا العمر.',
+        Text(tr2('كل نشاط يستغرق نحو ${minutesFor(d.age)} دقائق لهذا العمر.', 'Each activity takes about ${minutesFor(d.age)} minutes at this age.'),
             style: const TextStyle(fontSize: 14, color: RC.ink)),
         const SizedBox(height: 16),
         Text(loc('مستوى الصعوبة'),
@@ -314,7 +314,7 @@ class ChildrenScreen extends StatelessWidget {
                           leading: const CircleAvatar(child: Icon(Icons.child_care_rounded)),
                           title: Text(c.nickname,
                               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          subtitle: Text('العمر ${c.age} · ${store.progressOf(c.id).totalStars} نجمة'),
+                          subtitle: Text(tr2('العمر ${c.age} · ${store.progressOf(c.id).totalStars} نجمة', 'Age ${c.age} · ${store.progressOf(c.id).totalStars} stars')),
                           trailing: const Icon(Icons.edit_rounded),
                           onTap: () => Navigator.push(
                             context,
@@ -358,7 +358,7 @@ class _ChildEditScreenState extends State<ChildEditScreen> {
       context: context,
       builder: (_) => AlertDialog(
         title: Text(loc('حذف الطفل؟')),
-        content: Text('سيُحذف ملف «${widget.child.nickname}» وكل تقدمه من هذا الجهاز نهائياً.'),
+        content: Text(tr2('سيُحذف ملف «${widget.child.nickname}» وكل تقدمه من هذا الجهاز نهائياً.', '“${widget.child.nickname}”\'s profile and all their progress will be deleted from this device permanently.')),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: Text(loc('إلغاء'))),
           FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(loc('حذف'))),

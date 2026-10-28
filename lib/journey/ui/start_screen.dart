@@ -179,7 +179,7 @@ class _Picker extends StatelessWidget {
                     child: RCard(
                       color: c.id == store.activeId ? RC.yellow : RC.card,
                       outline: c.id == store.activeId ? RC.star : RC.outline,
-                      semanticLabel: 'ابدأ اللعب: ${c.nickname}',
+                      semanticLabel: tr2('ابدأ اللعب: ${c.nickname}', 'Start playing: ${c.nickname}'),
                       onTap: () => _enter(context, c),
                       child: Column(
                         children: [

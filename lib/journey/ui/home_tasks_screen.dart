@@ -48,13 +48,13 @@ class _ParentHomeTasksScreenState extends State<ParentHomeTasksScreen> {
                   style: TextStyle(fontSize: 15),
                 ),
                 const SizedBox(height: 12),
-                Text('بانتظار التأكيد (${waiting.length})',
+                Text(tr2('بانتظار التأكيد (${waiting.length})', 'Waiting for confirmation (${waiting.length})'),
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 if (waiting.isEmpty) Padding(padding: EdgeInsets.all(8), child: Text(loc('لا مهام الآن.'))),
                 for (final t in waiting)
                   Card(
                     child: ListTile(
-                      title: Text(t.text),
+                      title: Text(loc(t.text)),
                       subtitle: Text('${_name(t.childId)} · ${t.day}'),
                       trailing: FilledButton(
                         onPressed: () async {
@@ -70,11 +70,11 @@ class _ParentHomeTasksScreenState extends State<ParentHomeTasksScreen> {
                     ),
                   ),
                 const SizedBox(height: 16),
-                Text('تمت (${done.length})', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(tr2('تمت (${done.length})', 'Done (${done.length})'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 for (final t in done)
                   ListTile(
                     leading: const Icon(Icons.check_circle_rounded, color: Colors.green),
-                    title: Text(t.text),
+                    title: Text(loc(t.text)),
                     subtitle: Text('${_name(t.childId)} · ${t.day}'),
                   ),
               ],
@@ -109,7 +109,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     if (!mounted) return;
     setState(() => _doneToday = {
           for (final t in all)
-            if (t.childId == widget.child.id && t.day == day && t.done) t.text,
+            if (t.childId == widget.child.id && t.day == day && t.done) loc(t.text),
         });
   }
 
@@ -141,17 +141,17 @@ class _ExploreScreenState extends State<ExploreScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: RCard(
-                    semanticLabel: '${e.$1}. ${e.$2}',
+                    semanticLabel: '${loc(e.$1)}. ${loc(e.$2)}',
                     child: Row(
                       children: [
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(e.$1,
+                              Text(loc(e.$1),
                                   style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: RC.ink)),
                               const SizedBox(height: 4),
-                              Text(e.$2, style: const TextStyle(fontSize: 16, color: RC.ink)),
+                              Text(loc(e.$2), style: const TextStyle(fontSize: 16, color: RC.ink)),
                             ],
                           ),
                         ),

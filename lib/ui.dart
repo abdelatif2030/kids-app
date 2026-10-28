@@ -20,7 +20,7 @@ const _categoryLabels = {
   'Calm': 'هدوء',
 };
 
-String categoryLabel(String category) => _categoryLabels[category] ?? category;
+String categoryLabel(String category) => loc(_categoryLabels[category] ?? category);
 
 Color categoryColor(String category) => switch (category) {
       'Learning' => const Color(0xFF29B6F6),

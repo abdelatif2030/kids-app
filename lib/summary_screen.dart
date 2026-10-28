@@ -7,7 +7,7 @@ const _weekdays = ['الاثنين', 'الثلاثاء', 'الأربعاء', 'ا
 
 String _minutes(int seconds) {
   final m = (seconds / 60).round();
-  return m < 1 ? loc('أقل من دقيقة') : '$m دقيقة';
+  return m < 1 ? loc('أقل من دقيقة') : tr2('$m دقيقة', '$m min');
 }
 
 /// Parent-only: what was watched and for how long, per day, for the last 7 days.
@@ -82,7 +82,7 @@ class _DaySection extends StatelessWidget {
     final total = perVideo.values.fold<int>(0, (sum, v) => sum + v.seconds);
     final name = key == WatchHistory.dayKey(today)
         ? loc('اليوم')
-        : '${_weekdays[day.weekday - 1]} ${day.day}/${day.month}';
+        : '${loc(_weekdays[day.weekday - 1])} ${day.day}/${day.month}';
 
     return Padding(
       padding: const EdgeInsets.only(top: 16),

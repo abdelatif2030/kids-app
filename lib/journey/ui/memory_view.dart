@@ -101,7 +101,7 @@ class _MemoryViewState extends State<MemoryView> {
             children: [
               Row(
                 children: [
-                  Flexible(flex: 2, child: Text('الأزواج: $_found من $_pairs',
+                  Flexible(flex: 2, child: Text(tr2('الأزواج: $_found من $_pairs', 'Pairs: $_found of $_pairs'),
                       style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink))),
                   const SizedBox(width: 12),
                   Expanded(flex: 3, child: RProgress(value: _found / _pairs)),
@@ -124,7 +124,7 @@ class _MemoryViewState extends State<MemoryView> {
                 children: [
                   for (var i = 0; i < _cards.length; i++)
                     RCard(
-                      semanticLabel: _faceUp(i) ? 'بطاقة ${_cards[i]}' : 'بطاقة مقلوبة رقم ${i + 1}',
+                      semanticLabel: _faceUp(i) ? tr2('بطاقة ${_cards[i]}', 'Card ${_cards[i]}') : tr2('بطاقة مقلوبة رقم ${i + 1}', 'Face-down card number ${i + 1}'),
                       color: _matched[i] ? RC.mint : (_faceUp(i) ? Colors.white : RC.lavender),
                       outline: _matched[i] ? RC.good : RC.outline,
                       padding: EdgeInsets.zero,

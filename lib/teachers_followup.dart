@@ -160,7 +160,7 @@ class LessonReportView extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              Text('مع ${booking.teacherName}${booking.start == null ? '' : ' · ${fmtDateTime(booking.start!)}'}'),
+              Text(tr2('مع ${booking.teacherName}${booking.start == null ? '' : ' · ${fmtDateTime(booking.start!)}'}', 'With ${booking.teacherName}${booking.start == null ? '' : ' · ${fmtDateTime(booking.start!)}'}')),
               const SizedBox(height: 12),
               _item(loc('ما تم شرحه'), r.covered),
               _item(loc('ما أظهره الطفل في الحصة'), r.understood),
@@ -185,7 +185,7 @@ Future<void> showReviewDialog(BuildContext context, TeacherRepository repo, Book
     context: context,
     builder: (_) => StatefulBuilder(
       builder: (context, setState) => AlertDialog(
-        title: Text('قيّم ${booking.teacherName}'),
+        title: Text(tr2('قيّم ${booking.teacherName}', 'Rate ${booking.teacherName}')),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -195,7 +195,7 @@ Future<void> showReviewDialog(BuildContext context, TeacherRepository repo, Book
                 children: [
                   for (var i = 1; i <= 5; i++)
                     IconButton(
-                      tooltip: '$i من 5',
+                      tooltip: tr2('$i من 5', '$i of 5'),
                       onPressed: () => setState(() => rating = i),
                       icon: Icon(i <= rating ? Icons.star_rounded : Icons.star_outline_rounded, color: Colors.amber, size: 34),
                     ),

@@ -136,7 +136,7 @@ class _Done extends StatelessWidget {
                 style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: RC.ink)),
             const SizedBox(height: 6),
             if (total > 0)
-              Text('أجبت $right من $total من أول محاولة',
+              Text(tr2('أجبت $right من $total من أول محاولة', 'You answered $right of $total right on the first try'),
                   style: const TextStyle(fontSize: 18, color: RC.ink)),
             const SizedBox(height: 20),
             FilledButton.icon(

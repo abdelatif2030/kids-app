@@ -50,7 +50,7 @@ class _TracingViewState extends State<TracingView> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Semantics(
-              label: 'مساحة تتبّع حرف ${widget.letter.name}',
+              label: tr2('مساحة تتبّع حرف ${widget.letter.name}', 'Tracing area for the letter ${widget.letter.name}'),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,

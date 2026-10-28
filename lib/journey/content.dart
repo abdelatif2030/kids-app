@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'lands.dart';
 import 'models.dart';
+import '../l10n/strings.dart';
 
 // ---------------------------------------------------------------------------
 // Seed content (Arabic). Everything here is original sample content written for
@@ -84,7 +85,7 @@ String colorNameOf(int value) {
   for (final c in _colors) {
     if (c.$2 == value) return c.$1;
   }
-  return 'لون';
+  return loc('لون');
 }
 
 /// The Arabic name of a shape kind.
@@ -214,22 +215,22 @@ List<Question> _letterQuestions(int d, int age, Random r) {
             r,
           );
           return Question(
-            prompt: 'أي صورة تبدأ بحرف «${item.$1}»؟',
+            prompt: tr2('أي صورة تبدأ بحرف «${item.$1}»؟', 'Which picture starts with the letter “${item.$1}”?'),
             bigText: item.$1,
             options: m.options,
             correct: m.correct,
-            hint: 'فكّر في صوت الحرف «${item.$1}»، مثل «${item.$2}».',
+            hint: tr2('فكّر في صوت الحرف «${item.$1}»، مثل «${item.$2}».', 'Think of the sound of the letter “${item.$1}”, like “${item.$2}”.'),
             skill: 'letters_ar',
             detail: item.$1,
           );
         }
         final m = _mix(Option.text(item.$1), [for (final o in others) Option.text(o.$1)], r);
         return Question(
-          prompt: 'بأي حرف تبدأ كلمة «${item.$2}»؟',
+          prompt: tr2('بأي حرف تبدأ كلمة «${item.$2}»؟', 'Which letter does the word “${item.$2}” start with?'),
           bigEmoji: item.$3,
           options: m.options,
           correct: m.correct,
-          hint: 'انطق «${item.$2}» ببطء واسمع أول صوت.',
+          hint: tr2('انطق «${item.$2}» ببطء واسمع أول صوت.', 'Say “${item.$2}” slowly and listen to the first sound.'),
           skill: 'letters_ar',
           detail: item.$1,
         );
@@ -243,7 +244,7 @@ List<Question> _numberQuestions(int d, int age, Random r) {
   Question counting(int max) {
     final n = 1 + r.nextInt(max);
     const things = ['🍎', '⭐', '🐟', '🎈', '🍓'];
-    return _numberQuestion('counting', n, 'كم عدد الأشياء؟', 'عُدّ واحداً واحداً بإصبعك.',
+    return _numberQuestion('counting', n, loc('كم عدد الأشياء؟'), loc('عُدّ واحداً واحداً بإصبعك.'),
         optionCount, r,
         bigEmoji: things[r.nextInt(things.length)], repeat: n, min: 1);
   }
@@ -251,7 +252,7 @@ List<Question> _numberQuestions(int d, int age, Random r) {
   Question add(int max) {
     final a = 1 + r.nextInt(max - 1);
     final b = 1 + r.nextInt(max - a);
-    return _numberQuestion('addition', a + b, 'ما ناتج الجمع؟', 'ابدأ من $a وعُدّ $b خطوات للأمام.',
+    return _numberQuestion('addition', a + b, loc('ما ناتج الجمع؟'), tr2('ابدأ من $a وعُدّ $b خطوات للأمام.', 'Start at $a and count $b steps forward.'),
         optionCount, r,
         bigText: '$a + $b', math: MathHelp(a, b, '+'));
   }
@@ -259,7 +260,7 @@ List<Question> _numberQuestions(int d, int age, Random r) {
   Question sub(int max) {
     final a = 2 + r.nextInt(max - 1);
     final b = 1 + r.nextInt(a - 1);
-    return _numberQuestion('subtraction', a - b, 'ما ناتج الطرح؟', 'ابدأ من $a وارجع $b خطوات للخلف.',
+    return _numberQuestion('subtraction', a - b, loc('ما ناتج الطرح؟'), tr2('ابدأ من $a وارجع $b خطوات للخلف.', 'Start at $a and go back $b steps.'),
         optionCount, r,
         bigText: '$a - $b', math: MathHelp(a, b, '-'));
   }
@@ -267,7 +268,7 @@ List<Question> _numberQuestions(int d, int age, Random r) {
   Question mul() {
     final a = 2 + r.nextInt(4);
     final b = 2 + r.nextInt(4);
-    return _numberQuestion('multiplication', a * b, 'ما ناتج الضرب؟', 'اجمع $a ما مقداره $b مرات.',
+    return _numberQuestion('multiplication', a * b, loc('ما ناتج الضرب؟'), tr2('اجمع $a ما مقداره $b مرات.', 'Add $a together $b times.'),
         optionCount, r,
         bigText: '$a × $b', min: 1, math: MathHelp(a, b, '×'));
   }
@@ -293,10 +294,10 @@ List<Question> _colorQuestions(int d, Random r) {
     final right = picked.first;
     final m = _mix(Option.color(right.$2), [for (final o in picked.skip(1)) Option.color(o.$2)], r);
     return Question(
-      prompt: 'اختر اللون ${right.$1}',
+      prompt: tr2('اختر اللون ${right.$1}', 'Pick the color ${loc(right.$1)}'),
       options: m.options,
       correct: m.correct,
-      hint: 'ابحث عن اللون ${right.$1}.',
+      hint: tr2('ابحث عن اللون ${right.$1}.', 'Look for the color ${loc(right.$1)}.'),
       skill: 'colors',
       detail: right.$1,
     );
@@ -308,10 +309,10 @@ List<Question> _colorQuestions(int d, Random r) {
     final m = _mix(Option.shape(_shape(right.$1, _neutral)),
         [for (final o in picked.skip(1)) Option.shape(_shape(o.$1, _neutral))], r);
     return Question(
-      prompt: 'اختر الشكل: ${right.$2}',
+      prompt: tr2('اختر الشكل: ${right.$2}', 'Pick the shape: ${loc(right.$2)}'),
       options: m.options,
       correct: m.correct,
-      hint: 'ابحث عن ${right.$2}.',
+      hint: tr2('ابحث عن ${right.$2}.', 'Look for the ${loc(right.$2)}.'),
       skill: 'shapes',
       detail: right.$2,
     );
@@ -328,10 +329,10 @@ List<Question> _colorQuestions(int d, Random r) {
     ];
     final m = _mix(Option.shape(right), wrong, r);
     return Question(
-      prompt: 'اختر ${s[0].$2} لونها ${c[0].$1}',
+      prompt: tr2('اختر ${s[0].$2} لونها ${c[0].$1}', 'Pick the ${loc(c[0].$1)} ${loc(s[0].$2)}'),
       options: m.options,
       correct: m.correct,
-      hint: 'يجب أن يكون الشكل ${s[0].$2} واللون ${c[0].$1} معاً.',
+      hint: tr2('يجب أن يكون الشكل ${s[0].$2} واللون ${c[0].$1} معاً.', 'It must be a ${loc(s[0].$2)} and ${loc(c[0].$1)} at the same time.'),
       skill: 'shapes',
       detail: s[0].$2,
     );
@@ -342,11 +343,11 @@ List<Question> _colorQuestions(int d, Random r) {
     final right = picked.first;
     final m = _mix(Option.text(right.$2), [for (final o in picked.skip(1)) Option.text(o.$2)], r);
     return Question(
-      prompt: 'ما اسم هذا الشكل؟',
+      prompt: loc('ما اسم هذا الشكل؟'),
       bigShape: _shape(right.$1, _neutral),
       options: m.options,
       correct: m.correct,
-      hint: 'انظر إلى الأضلاع والزوايا.',
+      hint: loc('انظر إلى الأضلاع والزوايا.'),
       skill: 'shapes',
       detail: right.$2,
     );
@@ -357,11 +358,11 @@ List<Question> _colorQuestions(int d, Random r) {
     final right = picked.first;
     final m = _mix(Option.text(right.$1), [for (final o in picked.skip(1)) Option.text(o.$1)], r);
     return Question(
-      prompt: 'ما لون هذا الشكل؟',
+      prompt: loc('ما لون هذا الشكل؟'),
       bigShape: _shape(_shapes[r.nextInt(_shapes.length)].$1, right.$2),
       options: m.options,
       correct: m.correct,
-      hint: 'تذكّر ألوان قوس المطر.',
+      hint: loc('تذكّر ألوان قوس المطر.'),
       skill: 'colors',
       detail: right.$1,
     );
@@ -391,22 +392,22 @@ List<Question> _englishQuestions(int d, Random r) {
         if (pictureToWord) {
           final m = _mix(Option.text(item.$1), [for (final o in others) Option.text(o.$1)], r);
           return Question(
-            prompt: 'ما اسم هذه الصورة بالإنجليزية؟',
+            prompt: loc('ما اسم هذه الصورة بالإنجليزية؟'),
             bigEmoji: item.$3,
             options: m.options,
             correct: m.correct,
-            hint: 'معناها بالعربية: ${item.$2}.',
+            hint: tr2('معناها بالعربية: ${item.$2}.', 'Its meaning in Arabic: ${item.$2}.'),
             skill: 'english_vocab',
             detail: item.$1,
           );
         }
         final m = _mix(Option.emoji(item.$3), [for (final o in others) Option.emoji(o.$3)], r);
         return Question(
-          prompt: 'أيّ صورة هي «${item.$1}»؟',
+          prompt: tr2('أيّ صورة هي «${item.$1}»؟', 'Which picture is “${item.$1}”?'),
           bigText: item.$1,
           options: m.options,
           correct: m.correct,
-          hint: 'معناها بالعربية: ${item.$2}.',
+          hint: tr2('معناها بالعربية: ${item.$2}.', 'Its meaning in Arabic: ${item.$2}.'),
           skill: 'english_vocab',
           detail: item.$1,
         );
@@ -423,7 +424,7 @@ List<Question> _storyQuestions(int level) {
         passage: '${story.$1}\n${story.$2}',
         options: [for (final o in q.$2) Option.text(o)],
         correct: q.$3,
-        hint: 'اقرأ القصة مرة أخرى وابحث عن الإجابة.',
+        hint: loc('اقرأ القصة مرة أخرى وابحث عن الإجابة.'),
         skill: 'story',
       ),
   ];
@@ -551,7 +552,7 @@ ActivityContent buildContent(
             prompt: c.prompt,
             options: [for (final o in c.options) Option.text(o)],
             correct: c.correct,
-            hint: 'اقرأ السؤال بتمهّل ثم اختر الإجابة.',
+            hint: loc('اقرأ السؤال بتمهّل ثم اختر الإجابة.'),
             skill: _customSkill[activity.landId] ?? 'story',
           );
         }
@@ -582,10 +583,10 @@ List<(String, Question)> assessmentQuestions(int age, {Random? random}) {
         final start = 1 + r.nextInt(5);
         final m = _mix(Option.text('${start + 2}'), [Option.text('${start + 4}'), Option.text('${start + 1}')], r);
         return Question(
-          prompt: 'ما الرقم الناقص؟   $start ، ${start + 1} ، ؟',
+          prompt: tr2('ما الرقم الناقص؟   $start ، ${start + 1} ، ؟', 'Which number is missing?   $start , ${start + 1} , ?'),
           options: m.options,
           correct: m.correct,
-          hint: 'العدّ يزيد واحداً كل مرة.',
+          hint: loc('العدّ يزيد واحداً كل مرة.'),
           skill: 'sequence',
         );
       }(),

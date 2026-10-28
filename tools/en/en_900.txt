@@ -1,0 +1,333 @@
+900|Tap a picture to remove it
+901|Previous
+902|Next
+903|Your story was saved to the family gallery ✓
+904|New story
+905|Make what you like. All your works are saved automatically to your private family gallery on this device.
+906|Draw and color
+907|Build a scene
+908|Order the pictures
+909|No works yet. Make a drawing, a scene or a character and it will appear here.
+910|Confirm deletion
+911|Deleted child
+912|Delete all works
+913|Permanently delete all works for all children?
+914|The gallery is empty.
+915|Your children's works are saved on this device only; they are not sent or published. Only you can delete them.
+916|Permanently delete this work?
+917|My lessons
+918|Total for the last 7 days
+919|Today
+920|No viewing
+921|My slots
+922|Add slots
+923|You have not added slots yet. Add your available days and hours so parents can book them.
+924|Times are in your device's time. A booked slot cannot be deleted; a slot from a cancelled or declined booking is released automatically.
+925|Booked
+926|Reopen the slot
+927|Pause the slot
+928|Delete the slot
+929|Add weekly slots
+930|Days
+931|Start time
+932|Choose at least one day
+933|Add
+934|Pending
+935|Accepted
+936|Declined
+937|Cancelled
+938|Completed
+939|Did not happen (no-show)
+940|Back
+941|Decline the request?
+942|The parent will be notified, and the slot becomes available to others again.
+943|Decline
+944|Cancel the booking?
+945|The slot will become available to others. Check the teacher's cancellation policy on their page.
+946|Cancel the booking
+947|Confirm the lesson took place?
+948|Record a no-show?
+949|After confirming, the parent can rate you and you can write the lesson report. This cannot be undone.
+950|The parent will not be able to rate a lesson that did not happen. This cannot be undone.
+951|Confirm
+952|Lesson requests
+953|No requests
+954|Upcoming and pending
+955|History
+956|Lesson link (open it yourself and stay next to your child):
+957|The link was copied
+958|Copy the link
+959|Accept
+960|Lesson done
+961|Lesson report
+962|Rate the teacher
+963|You rated this lesson
+964|Messages
+965|Lesson link
+966|Enter a valid link starting with https
+967|Accept the request
+968|OK
+969|Identity verified
+970|Qualification verified
+971|Search by name, subject or specialty
+972|Filter and sort
+973|❤️ Favorites only
+974|Clear the filter
+975|You can compare up to 3 teachers
+976|No teacher matches your choices
+977|No teachers are available right now
+978|A teacher who has not filled in a field does not appear when filtering by it.
+979|Save to favorites
+980|,
+981|Compare
+982|Choices are combined. A teacher who has not filled in the field does not appear when filtering by it.
+983|Subject
+984|Child's age
+985|Language
+986|Dialect
+987|Lesson format
+988|Curriculum
+989|Maximum price per lesson (EGP)
+990|Sort
+991|There are no paid placements. The default order is by profile completeness, then name. “Top rated” is calculated only from parents' ratings of completed lessons, and a teacher with no ratings comes last.
+992|Show results
+993|Price
+994|Not specified
+995|Lesson length
+996|Not specified
+997|Experience (stated by the teacher)
+998|Age range
+999|Subjects
+1000|Specialties
+1001|Lesson type
+1002|Languages
+1003|Teaching style
+1004|Identity
+1005|Verified
+1006|Not verified by the app
+1007|Qualification
+1008|Verified
+1009|Not verified by the app
+1010|Cancellation policy
+1011|Ratings
+1012|Compare teachers
+1013|Write what was covered in the lesson
+1014|The report could not be saved
+1015|Only the parent sees this. Write your teaching notes; this is not a diagnosis or a medical or developmental assessment.
+1016|What was covered?
+1017|What did the child show in the lesson?
+1018|What needs review
+1019|Suggested home activity
+1020|Next lesson
+1021|Save the report
+1022|The report could not be loaded
+1023|The teacher has not written a report for this lesson yet.
+1024|What was covered
+1025|What the child showed in the lesson
+1026|Needs review
+1027|These are the teacher's teaching notes, not a diagnosis.
+1028|Comment (optional)
+1029|A rating cannot be changed after it is sent, and other parents can see it.
+1030|Choose the number of stars
+1031|The rating could not be sent
+1032|Send the rating
+1033|Thank you, your rating was sent
+1034|Do not send phone numbers, email addresses or links. Communication stays inside the app.
+1035|The message could not be sent
+1036|Text messages between the parent and the teacher only, tied to this booking. Do not share phone numbers or addresses. There are no messages with the child. To report a problem use “Report this teacher”.
+1037|No messages yet
+1038|Write a message
+1039|Send
+1040|The conversation is closed because the booking was cancelled or declined.
+1041|No ratings yet
+1042|Egyptian
+1043|Standard Arabic
+1044|Gulf
+1045|Levantine
+1046|Egyptian curriculum
+1047|Saudi curriculum
+1048|British curriculum
+1049|American curriculum
+1050|International Baccalaureate
+1051|No specific curriculum
+1052|Reading foundations
+1053|Writing foundations
+1054|Math foundations
+1055|After-school support
+1056|Conversation
+1057|Memorization and review
+1058|Drawing and arts
+1059|Science and experiments
+1060|Direct explanation
+1061|Activities
+1062|Homework
+1063|Review
+1064|Online
+1065|In person
+1066|Individual
+1067|Small group
+1068|The app owner verified the teacher's identity with an official document.
+1069|The app owner verified the qualification the teacher stated with a document.
+1070|Profile photo
+1071|A short headline describing what you offer
+1072|About (at least 80 characters)
+1073|Years of experience
+1074|Qualifications
+1075|Teaching format (online/in person)
+1076|Best match (most complete profiles first)
+1077|Price: lowest first
+1078|Price: highest first
+1079|Most experienced
+1080|Top rated (from real ratings)
+1081|Earliest available slot
+1088|Teachers
+1089|Learning request
+1090|My requests
+1091|Sign out
+1092|Could not load the teachers
+1093|Teachers register themselves and are not vetted by the app, so check them before booking. The “Verified” badge only appears when the app owner has really verified, and does not appear just because a profile is complete. There is no chat in the app: when a teacher accepts your request, the lesson link appears in “My requests”. Open the link yourself and stay next to your child throughout the lesson.
+1094|Your request was sent. You will find the reply in “My requests”.
+1095|We received your report, thank you.
+1096|No CV
+1097|The CV was saved
+1098|The app owner has not verified this teacher's identity or qualification. The information below is written by the teacher.
+1099|My teaching style
+1100|Curricula
+1101|Language and dialect
+1102|Teaching styles
+1103|Qualifications (verified)
+1104|Qualifications (written by the teacher, not verified by the app)
+1105|The teacher has not set a cancellation policy yet.
+1106|Profile completeness
+1107|This is a preview of your page as parents see it.
+1108|Download the CV
+1109|Request a lesson
+1110|Report this teacher
+1111|Report a teacher
+1112|What is the problem?
+1113|Request a lesson
+1114|Preferred time
+1115|Example: Saturday afternoon
+1116|Child's age (optional)
+1117|Note (optional)
+1118|Cancellation policy: the teacher has not set one yet. Agree on it before the lesson.
+1119|Send the request
+1120|We received your report about the rating.
+1121|The ratings could not be loaded.
+1122|No ratings yet. Parents' ratings appear here only after completed lessons.
+1123|Report this rating
+1124|The slot was booked and the request sent to the teacher. Follow it in “My requests”.
+1125|Available slots
+1126|In your device's time
+1127|The slots could not be loaded. Try again
+1128|No slots are available right now. You can send a “Request a lesson” with a time of your choice.
+1129|The price is agreed with the teacher
+1130|Confirm booking the slot
+1131|The request is sent to the teacher and is only confirmed when they accept it. There is no payment inside the app.
+1132|Book
+1133|Waiting for your reply
+1134|On the shortlist
+1135|Withdrawn by the teacher
+1136|My learning requests
+1137|New request
+1138|Publish a learning request so teachers can send you their proposals.
+1139|Expired
+1140|Write the learning goal
+1141|Check the budget (the minimum must not be above the maximum)
+1142|New learning request
+1143|Registered teachers see it. Do not write your child's name, school or phone numbers; the learning goal and approximate age are enough.
+1144|Learning goal
+1145|Example: Arabic reading foundations for a six-year-old
+1146|Any format
+1147|Suitable times
+1148|Example: twice a week in the afternoon
+1149|Lowest price per lesson (EGP)
+1150|Highest price per lesson (EGP)
+1151|A style you prefer (optional)
+1152|Games, direct explanation...
+1153|Publish the request
+1154|Accept the proposal
+1155|Accept and send the request
+1156|As per the proposal
+1157|The lesson request was sent to the teacher. Follow it in “My requests”.
+1158|The request and proposals
+1159|Status: closed
+1160|Close the request
+1161|Proposals
+1162|No proposals yet.
+1163|Add to the shortlist
+1164|Your proposal was sent
+1165|Parents' requests
+1166|No open requests right now
+1167|Withdraw the proposal
+1168|Send a proposal
+1169|Write your proposal and the price (as a number)
+1170|Create your profile first
+1171|New proposal
+1172|Introduce yourself and how you will help
+1173|Price per lesson (EGP)
+1174|Suggested times
+1175|First lesson plan
+1176|Do not put phone numbers or links. Communication happens inside the app after your proposal is accepted.
+1177|Send the proposal
+1178|The teachers service is not enabled yet.\nThe app owner needs to connect a Firebase project (steps in docs/teachers-setup.md).
+1179|The account is incomplete
+1180|Enter a valid email address
+1181|The password must be at least 6 characters
+1182|Enter your name
+1183|Parent and teacher accounts
+1184|Sign in
+1185|New account
+1186|Parent
+1187|Teacher
+1188|Name
+1189|Email
+1190|Password
+1191|Create the account
+1192|We keep only your email and name. We collect no data about the child, and there are no chats inside the app.
+1193|Teacher account
+1194|Welcome
+1195|Create your profile so parents can see it
+1196|Create your profile; when you save it, parents see it right away.
+1197|Your profile is visible to parents.
+1198|Your profile has been hidden. Contact the app owner.
+1199|Save your profile again so parents can see it.
+1200|No CV uploaded
+1201|Preview my page as parents see it
+1202|Create the profile
+1203|Edit the profile
+1204|Enter your name and a short bio
+1205|Choose at least one subject and one language
+1206|Check the price and years of experience (valid numbers)
+1207|Age range: the minimum is higher than the maximum
+1208|Profile
+1209|Choose a photo
+1210|About you and your experience
+1211|Price (optional)
+1212|Example: 150 EGP per lesson
+1213|A professional profile (builds parents' trust)
+1214|Optional. Everything you write here appears to parents as your own words and is not verified by the app.
+1215|A short headline
+1216|Example: Reading and writing foundations through games
+1217|Your teaching style
+1218|Youngest age
+1219|Oldest age
+1220|Shown to parents as “written by the teacher” until the app owner verifies it.
+1221|Example: free cancellation 24 hours before
+1222|CV
+1223|No file selected
+1224|Upload the CV
+1225|Change the file
+1226|PDF or image, up to 500 KB. Parents will see it: remove your phone number and address from it.
+1227|Your profile is missing:
+1228|Verification
+1229|✓ Identity verified
+1230|Identity: not verified yet
+1231|✓ Qualification verified
+1232|Qualification: not verified yet
+1233|The app owner adds the two badges after checking documents. A complete profile does not give you a badge.
+1235|Learning
+1236|Fun
+1237|Calm
+1238|Pick a box
+1239|Again

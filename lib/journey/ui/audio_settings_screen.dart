@@ -92,7 +92,7 @@ class _AudioSettingsScreenState extends State<AudioSettingsScreen> {
                       trailing: DropdownButton<String>(
                         value: p.ambient,
                         items: [
-                          for (final e in kAmbientSounds.entries) DropdownMenuItem(value: e.key, child: Text(e.value.$1)),
+                          for (final e in kAmbientSounds.entries) DropdownMenuItem(value: e.key, child: Text(loc(e.value.$1))),
                         ],
                         onChanged: (v) => v == null ? null : p.update(ambient: v),
                       ),

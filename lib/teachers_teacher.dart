@@ -154,14 +154,14 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                         ]),
                         if (p.priceNote.isNotEmpty) ...[
                           const SizedBox(height: 12),
-                          Text('السعر: ${p.priceNote}'),
+                          Text(tr2('السعر: ${p.priceNote}', 'Price: ${p.priceNote}')),
                         ],
                         const SizedBox(height: 8),
                         Row(
                           children: [
                             const Icon(Icons.description_outlined, size: 20),
                             const SizedBox(width: 6),
-                            Text(p.cvName == null ? loc('لم ترفع سيرة ذاتية') : 'السيرة الذاتية: ${p.cvName}'),
+                            Text(p.cvName == null ? loc('لم ترفع سيرة ذاتية') : tr2('السيرة الذاتية: ${p.cvName}', 'CV: ${p.cvName}')),
                           ],
                         ),
                       ],
@@ -358,7 +358,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
             children: [
               for (final o in options)
                 FilterChip(
-                  label: Text(label(o)),
+                  label: Text(loc(label(o))),
                   selected: selected.contains(o),
                   onSelected: (on) => setState(() {
                     on ? selected.add(o) : selected.remove(o);
@@ -428,7 +428,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
             children: [
               for (final l in kTeacherLanguages)
                 FilterChip(
-                  label: Text(l),
+                  label: Text(loc(l)),
                   selected: _languages.contains(l),
                   onSelected: (on) => setState(() {
                     on ? _languages.add(l) : _languages.remove(l);
@@ -509,7 +509,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
                   hint: Text(loc('مدة الحصة')),
                   items: [
                     DropdownMenuItem<int?>(value: null, child: Text(loc('غير محددة'))),
-                    for (final m in [30, 45, 60, 90]) DropdownMenuItem<int?>(value: m, child: Text('$m دقيقة')),
+                    for (final m in [30, 45, 60, 90]) DropdownMenuItem<int?>(value: m, child: Text(tr2('$m دقيقة', '$m minutes'))),
                   ],
                   onChanged: (v) => setState(() => _minutes = v),
                 ),
@@ -591,7 +591,7 @@ class _Checklist extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('اكتمال الملف: ${c.done.length} من ${c.total}',
+            Text(tr2('اكتمال الملف: ${c.done.length} من ${c.total}', 'Profile completeness: ${c.done.length} of ${c.total}'),
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 6),
             LinearProgressIndicator(value: c.ratio, minHeight: 8, borderRadius: BorderRadius.circular(8)),

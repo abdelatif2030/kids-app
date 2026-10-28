@@ -1,0 +1,300 @@
+260|Tell him to stop and tell my teacher or family
+261|Hit him back
+262|Always stay quiet
+263|Say “stop”, then tell a grown-up.
+264|I'm worried about the exam. What helps me?
+265|Talk to someone I trust and breathe deeply
+266|Hide my worry
+267|Run away
+268|Talking and breathing ease worry.
+269|I need a moment of calm. What do I ask for?
+270|Ask for a quiet place for a few minutes
+271|You can ask for a moment of calm.
+272|A stranger asked me to go with them. What do I do?
+273|Say no, move away and tell someone I trust
+274|Go with them
+275|Give them my address
+276|We never go with strangers.
+277|I felt that something was not safe. What do I do?
+278|Tell Mom, Dad or my teacher right away
+279|Hide it
+280|Wait until I forget it
+281|Feeling unsafe matters. Tell a grown-up you trust.
+282|Someone told me not to tell my family a secret that scares me. What do I do?
+283|Tell my family anyway
+284|Keep the secret
+285|Tell strangers
+286|Secrets that scare us are told to our family.
+287|I don't like it when someone touches me in a way that bothers me. What do I say?
+288|Say: Stop! Then tell someone I trust
+289|Stay quiet
+290|Smile
+291|My body is mine, and I can say no.
+292|I got lost in the market. What do I do?
+293|Stay where I am and ask a staff member or a police officer for help
+294|Walk away alone
+295|Go with a stranger
+296|Look for a person wearing a uniform.
+297|Who can I tell when I feel afraid?
+298|Mom, Dad or my teacher
+299|Nobody
+300|Someone I don't know
+301|Choose a grown-up you trust.
+302|Read the question slowly, then choose the answer.
+303|Counting goes up by one each time.
+304|Look around the house for 3 things that start with the letter you learned today.
+305|Write a letter with your finger in sand or flour, or on Mom's or Dad's back.
+306|Bring 3 round things from the house and count them out loud.
+307|Help count the spoons or plates before eating.
+308|Find something red, something blue and something yellow in the house.
+309|Sort your toys by color.
+310|Say 3 English words you learned to Mom or Dad.
+311|Name five things in your room in English.
+312|Play “Where did it go?”: hide something under a cloth and guess where it is.
+313|Line up 3 pictures or toys from smallest to biggest.
+314|Tell Mom or Dad a story with 3 parts: the beginning, then what happened, then the end.
+315|What is the best part of the story? Tell it in your own words.
+316|Tell Mom or Dad about a time you felt happy or angry, and what you did.
+317|Draw a face that shows how you feel today.
+318|Try with a grown-up: does it float or sink? Try a spoon, a piece of wood and a piece of cork in a cup of water.
+319|Look at a plant at home and see what changes over a week.
+320|Draw what you saw today on a sheet of paper and show Mom or Dad.
+321|Tell Mom or Dad something nice you learned today.
+322|Tell Mom or Dad what you learned today.
+323|Imitating animal sounds
+324|Show a picture of an animal and say its sound, then let the child copy you.
+325|Where is the nose?
+326|Ask: where is your nose? Where is your eye? And point to each part together.
+327|Naming things at home
+328|Hold something and say its name clearly: cup, ball, shoe, then repeat.
+329|Looking at a picture book
+330|Sit together, point to each picture, name it and ask: where is the dog?
+331|Stacking blocks
+332|Build a small tower and let the child knock it down and laugh, then build it again.
+333|Dance and a song
+334|Sing a short song together with hand movements.
+335|Playing with water
+336|In the bath or a big bowl: cups, spoons and things that float (always supervised).
+337|Sorting colors
+338|Put three balls or toys of different colors and say: bring me the red one!
+339|Where did the toy go?
+340|Cover a toy with a cloth and ask: where is it? Then reveal it happily.
+341|Talking about our day
+342|Before bed, say three things you both did today.
+343|Letter Land
+344|Arabic letters and their sounds
+345|Number Garden
+346|Counting, adding and subtracting
+347|Color Island
+348|Colors and shapes
+349|English Town
+350|Simple English words
+351|Brain Club
+352|Memory and sequences
+353|Story Train
+354|Stories and comprehension questions
+355|Feelings School
+356|I name my feelings and act kindly
+357|Put the steps in order
+358|The letter and the picture
+359|Counting things
+360|Fun with numbers
+361|Colors and shapes
+362|English words
+363|A story and questions
+364|My feelings
+365|Challenge
+366|Learn the basics
+367|Arabic reading and letters
+368|Mathematics
+369|English
+370|Memory and thinking
+371|Hat
+372|Glasses
+373|Bow
+374|Crown
+375|Hero cape
+376|First step
+377|Finish one activity
+378|Letter star
+379|Finish 3 levels in Letter Land
+380|Number whiz
+381|Finish 3 levels in Number Garden
+382|Color artist
+383|Finish 3 levels in Color Island
+384|English buddy
+385|Finish 3 levels in English Town
+386|Memory champion
+387|Finish 3 levels in Brain Club
+388|Story lover
+389|Finish 3 levels in Story Train
+390|Kind heart
+391|Finish 3 levels in Feelings School
+392|Full stars
+393|Get 3 stars in an activity
+394|Explorer
+395|Try 4 different lands
+396|Hero of the day
+397|Finish today's adventure
+398|Hero of the week
+399|Finish 10 activities in a week
+400|Extra practice to strengthen the skill
+401|A new challenge because they are progressing fast
+402|A fresh start
+403|The next step on the map
+404|A new try to collect more stars
+405|Close
+406|Try again to get more stars!
+407|🏠 A task with Mom and Dad
+408|Next level
+409|Back
+410|Content management (experimental)
+411|Lands
+412|Questions
+413|Rewards
+414|Plans
+415|An experimental development screen: it works on this device only, has no separate account protection, and is not suitable for production.
+416|Published: children see it. Draft: hidden from them. Ages: lands that do not suit the child's age are not suggested in today's adventure.
+417|Draft
+418|Published
+419|Delete the question?
+420|Cancel
+421|Delete
+422|New question
+423|No custom questions yet.\nAdd a question to appear in a level and age you choose.
+424|Edit
+425|Write the question text
+426|Write at least two options
+427|The options must be different
+428|Choose the correct answer from the written options
+429|Edit the question
+430|Question text
+431|Options (select the correct one)
+432|A draft is not shown to children
+433|Save the question
+434|Badges are awarded for finishing activities, not for time. Change the required number or switch the badge off. The weekly goal on the child's screen = the “Hero of the week” number.
+435|The badge is off
+436|Fewer
+437|More
+438|Character accessories (unlocked by stars)
+439|Add a child first to see their plan here.
+440|Sound and learning
+441|Reading letters, words and stories aloud with the device's voice happens on the device itself; no audio or text is sent anywhere. The app needs no microphone or camera.
+442|Read aloud
+443|Read letters, words and questions with the device's voice
+444|Sound effects
+445|There are no sound effects in this version; your choice is saved for the future
+446|Reading speed
+447|Slow
+448|Normal
+449|Fast
+450|Nature sound with stories
+451|Nature sound volume
+452|Bedtime stories during quiet hours
+453|Allows the “Calm story before bed” button on the rest screen
+454|Learn letters
+455|Letter order
+456|Alphabetical
+457|Similar letters together
+458|Letters unlocked at each stage
+459|Unlock all letters
+460|For children who already know the letters
+461|Export a child's data
+462|A readable copy of everything the app keeps about the child on this device
+463|Choose a child to see everything the app keeps about them on this device. You can copy and save it. Nothing is sent anywhere.
+464|There are no child profiles.
+465|The copy could not be created.
+466|Copied
+467|Copy
+468|Create
+469|Creative studio
+470|Free drawing
+471|Drawing lessons
+472|Discover more
+473|Word library
+474|Sweet night
+475|Activities with family
+476|My Journey
+477|Educational videos
+478|Carefully chosen songs and lessons
+479|Child
+480|Home activities
+481|After each activity the app suggests a real task away from the screen. Press “Done” after the child does it with you. There are no stars for these tasks and no photos; everything stays on this device.
+482|No tasks right now.
+483|Done
+484|Explore with Mom and Dad
+485|At this age, playing with family matters more than any screen. Pick one or two activities today.
+486|We tried it
+487|Finish the previous level first 🔒
+488|Available now
+489|Locked
+490|Try it at home
+491|Try
+492|Video lesson
+493|✅ Watched
+494|🏠 Try it with Mom and Dad
+495|After doing it, a parent presses “Done” in Parent settings.
+496|Done, go back
+497|Badge
+498|Activity
+499|My goals
+500|Today's goal
+501|This week's goal
+502|Activities finished in the last seven days
+503|My character
+504|None
+505|My badges
+506|My lands
+507|Flip two cards and find the matching pictures
+508|Well done! You found a pair 🎉
+509|Close! Remember where the pictures are 🌈
+510|Look carefully... 👀
+511|Hint: show me the cards
+512|The child's nickname, age and goals (we do not ask for a full name or a photo).
+513|Activity results: stars, levels and what they answered correctly.
+514|Daily usage time and the videos they watched.
+515|Your notes, time settings and the PIN (encrypted).
+516|No ads, no tracking, no analytics packages.
+517|No chats, no messages, no social contact.
+518|No location, no contacts, no microphone.
+519|No external links on the child's screens.
+520|Delete the children's data?
+521|These will be permanently deleted from this device: child profiles, their progress, results, watch history, weekly plan and notes.\nThe PIN and time limits stay.
+522|Delete everything
+523|The children's data was deleted from this device.
+524|Privacy and data
+525|Your children's data stays on this device only. We do not send it to any server.
+526|What we keep on the device
+527|What we never do
+528|Clear notices
+529|• Videos play in the official YouTube player, and Google's data policies may apply to it. We show selected videos only and do not offer search.\n• The parent and teacher account (if enabled) keeps the email and name in the Firebase service, and keeps no data about the child except an optional age in a lesson request.\n• This is a trial version: see docs/PRODUCTION.md before using the app with real children.
+530|Delete the children's data from this device
+531|Child's name or nickname
+532|A friendly nickname is enough; do not write the full name
+533|Age
+534|What would you like your child to learn?
+535|What do they like?
+536|Lands and order
+537|The top comes first. Untick a land to hide it from today's plan.
+538|Up
+539|Down
+540|Difficulty level
+541|Children
+542|Add a child
+543|No children yet
+544|Enter a name or nickname for the child
+545|Delete the child?
+546|Save
+547|Delete this child and their progress
+548|Well done! 🎉
+549|Great! ⭐
+550|Excellent! 👏
+551|Bravo! 🌟
+552|Try again, you can do it! 💪
+553|So close! Try another answer 🌈
+554|It's OK, trying is learning 😊
+555|Listen
+556|Hint
+557|Inappropriate content
+558|Wrong information or pronunciation
+559|A sound problem

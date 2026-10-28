@@ -1,0 +1,244 @@
+0|Red
+1|Blue
+2|Yellow
+3|Green
+4|Orange
+5|Purple
+6|Colors game
+7|Well done!
+8|Play again
+9|Pick the same color
+10|Arabic
+11|English
+12|Math
+13|Science
+14|Religion
+15|Quran
+16|Stories
+17|Drawing
+18|German
+19|French
+20|Discover
+21|Songs
+22|Calm and sleep
+23|Monday
+24|Tuesday
+25|Wednesday
+26|Thursday
+27|Friday
+28|Saturday
+29|Sunday
+30|Child progress board
+31|Report copied. Paste it into WhatsApp or any app.
+32|Copy the report
+33|Weekly plan
+34|Viewing details
+35|This data is saved on this device only and is not sent anywhere.
+36|Previous week
+37|Next week
+38|No activity this week
+39|Weekly report
+40|Time learning
+41|Lessons finished
+42|Game rounds
+43|Active days
+44|Time day by day
+45|Skill map
+46|When your child plays letter, color and math games, their skills appear here.
+47|Mastered
+48|Needs practice
+49|Still learning
+50|Lessons by subject
+51|Your child did not finish any lessons this week. You can set goals in “Weekly plan”.
+52|Suggestions for next week
+53|Everything is going well. Keep it up!
+54|Activities finished day by day
+55|The percentage = answers right on the first try (the last 10 activities in the land).
+56|Suggested activities for today
+57|Your child finished all the enabled lands.
+58|Difficulty
+59|Easier
+60|Normal
+61|Harder
+62|Today's adventure activities
+63|Edit the plan, lands and data
+64|Letters, words and stories
+65|This section could not be loaded.
+66|Try again
+67|Your child did not use letters, words or stories this week. When they do, only real results will appear here.
+68|Letters
+69|Looked at them (exposure)
+70|Practised them
+71|Answered right on the first try
+72|Mastered (spaced review)
+73|Words
+74|Saw or heard them (exposure)
+75|Stories
+76|Stories they listened to
+77|Listening time (exposure only)
+78|Listening does not mean mastery: understanding is counted only from the answers to questions.
+79|Confirmed home activities
+80|New creative works
+81|Needs more practice
+82|Suggested steps
+83|These are tracking tools only, not a diagnosis or a medical or developmental assessment.
+84|This data is saved on this device only. It was not sent anywhere.
+85|Large
+86|Extra large
+87|The drawing is too large to save
+88|Saved ✓
+89|Learn to draw
+90|Eraser
+91|Undo
+92|Clear all
+93|I'm done
+94|This email is already in use
+95|The email address is not valid
+96|The password is too weak (at least 6 characters)
+97|The email or password is incorrect
+98|Too many attempts, try again later
+99|No internet connection
+100|Could not complete the operation, please try again
+101|You do not have permission for this operation
+102|Could not reach the server, please try again
+103|This slot is no longer available, choose another one
+104|Pop the balloons
+105|Where's the animal?
+106|Letters and words
+107|Memory game
+108|Games
+125|Pink
+126|Brown
+127|Circle
+128|Square
+129|Triangle
+130|Heart
+131|Rectangle
+132|Color
+133|Before bed
+134|🪥 We brush our teeth
+135|📖 We listen to a story
+136|😴 We sleep
+137|A plant growing
+138|🌱 A small seed
+139|💧 We water it
+140|🌷 It becomes a flower
+141|Morning
+142|⏰ We wake up
+143|🥣 We have breakfast
+144|🎒 We go to school
+145|Before eating
+146|🧼 We wash our hands
+147|🍽️ We eat
+148|🥛 We drink water
+149|👕 We put on pajamas
+150|🌿 The leaves grow
+151|The sandwich
+152|🍞 We take the bread
+153|🧀 We add the cheese
+154|🥪 We close the sandwich
+155|😋 We eat
+156|Drawing a picture
+157|✏️ We hold the pencil
+158|🖍️ We draw the shape
+159|🎨 We color it in
+160|🖼️ We hang the picture
+161|How many things are there?
+162|Count them one by one with your finger.
+163|What is the sum?
+164|What is the difference?
+165|What is the product?
+166|What is this shape called?
+167|Look at the sides and corners.
+168|What color is this shape?
+169|Remember the colors of the rainbow.
+170|What is this picture called in English?
+171|Read the story again and look for the answer.
+172|How does this face feel?
+173|Happy
+174|Sad
+175|Angry
+176|The face is smiling.
+177|Scared
+178|There are tears on the face.
+179|Sleepy
+180|The eyebrows are low and the mouth is tight.
+181|The eyes are wide open.
+182|Excited
+183|The eyes are closed.
+184|The eyes are bright and happy.
+185|My building fell and I'm angry. What do I do first?
+186|Take a deep breath
+187|Hit my brother
+188|Shout at everyone
+189|Deep breathing calms the body.
+190|I feel sad because my friend moved away. What do I do?
+191|Tell Mom or Dad how I feel
+192|Hide my feelings and say nothing
+193|Break my toy
+194|Talking about feelings helps.
+195|I'm afraid of the dark. What do I say?
+196|Tell Mom or Dad that I'm scared
+197|Stay silent
+198|Just scream
+199|Ask for help with calm words.
+200|I'm so excited about the party! How do I show it?
+201|Say I'm excited and smile
+202|Slam the door
+203|Cry
+204|We say happy feelings out loud too.
+205|I got angry and want to calm down. What helps?
+206|Count to 10 slowly
+207|Kick the chair
+208|Throw my toy
+209|Counting slowly gives time to calm down.
+210|I feel bored. What do I do?
+211|Pick a game or a book
+212|Bother my sister
+213|Think about what you like to do.
+214|I pushed my friend by mistake and he fell. What do I say?
+215|I'm sorry, are you OK?
+216|Nothing
+217|It's his fault
+218|A sincere apology fixes things.
+219|I have a toy and my friend wants it. What is the kind thing to do?
+220|We take turns playing
+221|Hide it
+222|Say: nobody plays with it
+223|Sharing makes both of you happy.
+224|My brother took my candy without asking. What do I do?
+225|Say calmly: ask me first
+226|Hit him
+227|Take his candy
+228|Say what you want in a calm voice.
+229|My friend is sad because he lost the game. What do I say?
+230|It's OK, we'll play again
+231|You always lose
+232|Laugh at him
+233|Kind words bring comfort.
+234|I waited a long time for my turn. What do I do?
+235|Wait and breathe calmly
+236|Push the others
+237|Walk away angry
+238|Patience is hard but it works.
+239|I broke a cup by accident. What do I do?
+240|Tell Mom and say sorry
+241|Hide it
+242|Blame my brother
+243|Honesty is always better.
+244|I don't understand the homework. What do I do?
+245|Ask for help
+246|Tear up the notebook
+247|Leave the homework and cry
+248|Asking for help is a strength.
+249|I can't find my shoes and I'm late. What do I do?
+250|Ask Mom to help me
+251|Shout
+252|Throw everything
+253|Ask for help with words.
+254|I can't open the box. What do I say?
+255|Could you help me, please?
+256|Throw it
+257|Cry without words
+258|Say “please” and “thank you”.
+259|My friend is bothering me and won't stop. What do I do?

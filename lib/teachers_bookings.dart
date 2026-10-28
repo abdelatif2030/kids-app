@@ -201,7 +201,7 @@ class _BookingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final b = booking;
-    final who = asTeacher ? 'ولي الأمر: ${b.parentName}' : 'المدرس: ${b.teacherName}';
+    final who = asTeacher ? tr2('ولي الأمر: ${b.parentName}', 'Parent: ${b.parentName}') : tr2('المدرس: ${b.teacherName}', 'Teacher: ${b.teacherName}');
     final canChat = b.status == bookingRequested || b.status == bookingAccepted || b.status == bookingCompleted;
     return Card(
       child: Padding(
@@ -217,14 +217,14 @@ class _BookingCard extends StatelessWidget {
                 Chip(label: Text(_statusLabel(b.status))),
               ],
             ),
-            Text('المادة: ${subjectById(b.subject)?.label ?? b.subject}'),
+            Text(tr2('المادة: ${subjectById(b.subject)?.label ?? b.subject}', 'Subject: ${subjectById(b.subject)?.label ?? b.subject}')),
             if (b.scheduled)
-              Text('الموعد: ${fmtDateTime(b.start!)} (${b.minutes ?? ''} دقيقة، بتوقيت جهازك)')
+              Text(tr2('الموعد: ${fmtDateTime(b.start!)} (${b.minutes ?? ''} دقيقة، بتوقيت جهازك)', 'Time: ${fmtDateTime(b.start!)} (${b.minutes ?? ''} minutes, in your device\'s time)'))
             else
-              Text('الوقت المطلوب: ${b.whenText}'),
-            if (b.priceEgp != null) Text('السعر: ${b.priceEgp} جنيه للحصة (لا دفع داخل التطبيق)'),
-            if (b.childAge != null) Text('عمر الطفل: ${b.childAge}'),
-            if (b.note.isNotEmpty) Text('ملاحظة: ${b.note}'),
+              Text(tr2('الوقت المطلوب: ${b.whenText}', 'Requested time: ${b.whenText}')),
+            if (b.priceEgp != null) Text(tr2('السعر: ${b.priceEgp} جنيه للحصة (لا دفع داخل التطبيق)', 'Price: ${b.priceEgp} EGP per lesson (no payment inside the app)')),
+            if (b.childAge != null) Text(tr2('عمر الطفل: ${b.childAge}', 'Child\'s age: ${b.childAge}')),
+            if (b.note.isNotEmpty) Text(tr2('ملاحظة: ${b.note}', 'Note: ${b.note}')),
             if (!asTeacher && b.status == bookingAccepted && b.lessonLink != null) ...[
               const SizedBox(height: 8),
               Text(loc('رابط الحصة (افتحه بنفسك وكن بجانب طفلك):')),

@@ -4,11 +4,13 @@ import '../l10n/strings.dart';
 /// A "land" on the learning map: one subject area with five levels.
 class Land {
   final String id;
-  final String title;
-  final String subtitle;
+  final String _title;
+  String get title => loc(_title);
+  final String _subtitle;
+  String get subtitle => loc(_subtitle);
   final IconData icon;
   final Color color;
-  const Land(this.id, this.title, this.subtitle, this.icon, this.color);
+  const Land(this.id, this._title, this._subtitle, this.icon, this.color);
 }
 
 const kLands = [
@@ -38,7 +40,7 @@ class Activity {
 
   String get id => '${landId}_$level';
   Land get land => landById(landId);
-  String get title => '${land.title} · المستوى $level';
+  String get title => tr2('${land.title} · المستوى $level', '${land.title} · Level $level');
 
   /// A short name for the activity itself.
   String get kindLabel => switch (kind) {
@@ -82,9 +84,10 @@ int minutesFor(int age) => age <= 4 ? 3 : (age <= 6 ? 4 : 5);
 
 class Goal {
   final String id;
-  final String title;
+  final String _title;
+  String get title => loc(_title);
   final List<String> lands;
-  const Goal(this.id, this.title, this.lands);
+  const Goal(this.id, this._title, this.lands);
 }
 
 const kGoals = [
@@ -97,10 +100,11 @@ const kGoals = [
 
 class Accessory {
   final String id;
-  final String name;
+  final String _name;
+  String get name => loc(_name);
   final String emoji;
   final int starsNeeded;
-  const Accessory(this.id, this.name, this.emoji, this.starsNeeded);
+  const Accessory(this.id, this._name, this.emoji, this.starsNeeded);
 }
 
 /// Unlocked by total stars: stars come only from finishing activities.
@@ -114,8 +118,10 @@ const kAccessories = [
 
 class BadgeDef {
   final String id;
-  final String title;
-  final String description;
+  final String _title;
+  String get title => loc(_title);
+  final String _description;
+  String get description => loc(_description);
   final String emoji;
 
   /// What counts: 'any' (all finished activities), a land id, 'perfect' (3-star
@@ -123,7 +129,7 @@ class BadgeDef {
   /// reached) or 'weekly' (finished activities in the last 7 days).
   final String counts;
   final int threshold;
-  const BadgeDef(this.id, this.title, this.description, this.emoji, this.counts, this.threshold);
+  const BadgeDef(this.id, this._title, this._description, this.emoji, this.counts, this.threshold);
 
   BadgeDef withThreshold(int t) => BadgeDef(id, title, description, emoji, counts, t);
 }

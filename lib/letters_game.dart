@@ -7,6 +7,7 @@ import 'journey/repository.dart';
 import 'progress_store.dart';
 import 'rest_screen.dart';
 import 'ui.dart';
+import 'l10n/strings.dart';
 
 class _Word {
   final String emoji;
@@ -146,7 +147,7 @@ class _LettersGameState extends State<LettersGame> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: const Text('حروف وكلمات', style: TextStyle(fontSize: 26)),
+        title: Text(loc('حروف وكلمات'), style: const TextStyle(fontSize: 26)),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -160,7 +161,7 @@ class _LettersGameState extends State<LettersGame> {
                 children: [
                   for (final l in _langs)
                     ChoiceChip(
-                      label: Text(l.label, style: const TextStyle(fontSize: 20)),
+                      label: Text(loc(l.label), style: const TextStyle(fontSize: 20)),
                       selected: identical(l, _lang),
                       onSelected: (_) => setState(() {
                         _lang = l;
@@ -174,7 +175,7 @@ class _LettersGameState extends State<LettersGame> {
                 StarDone(onAgain: _again)
               else ...[
                 Text(
-                  _matched ? 'أحسنت!' : 'اختار أول حرف',
+                  _matched ? loc('أحسنت!') : loc('اختار أول حرف'),
                   style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),

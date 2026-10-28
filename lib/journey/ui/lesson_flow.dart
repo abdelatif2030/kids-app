@@ -146,7 +146,7 @@ class _Apply extends StatelessWidget {
           child: Column(
             children: [
               if (right != null) ...[
-                Text('أجبت $right من $total من أول محاولة 👏',
+                Text(tr2('أجبت $right من $total من أول محاولة 👏', 'You answered $right of $total right on the first try 👏'),
                     textAlign: TextAlign.center,
                     style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
                 const SizedBox(height: 14),

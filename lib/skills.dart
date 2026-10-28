@@ -2,14 +2,15 @@ import 'l10n/strings.dart';
 /// A skill the games can measure, with the Arabic text a parent reads.
 class Skill {
   final String id;
-  final String label;
+  final String _label;
+  String get label => loc(_label);
 
   /// The game that practises it, as named in the games list.
   final String game;
 
   /// The subject (curriculum.dart) whose lessons help with it.
   final String subject;
-  const Skill(this.id, this.label, this.game, this.subject);
+  const Skill(this.id, this._label, this.game, this.subject);
 }
 
 const kSkills = [

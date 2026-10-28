@@ -75,7 +75,7 @@ class _CharacterCreatorScreenState extends State<CharacterCreatorScreen> {
         spacing: 6,
         children: [
           for (var i = 0; i < labels.length; i++)
-            ChoiceChip(label: Text(labels[i].isEmpty ? loc('بدون') : labels[i]), selected: i == selected, onSelected: (_) => pick(i)),
+            ChoiceChip(label: Text(labels[i].isEmpty ? loc('بدون') : loc(labels[i])), selected: i == selected, onSelected: (_) => pick(i)),
         ],
       );
 

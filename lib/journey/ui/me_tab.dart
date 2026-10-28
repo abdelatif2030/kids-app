@@ -59,11 +59,11 @@ class MeTab extends StatelessWidget {
                       Text(profile.nickname,
                           style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: RC.ink)),
                       const SizedBox(height: 6),
-                      Text('المستوى ${progress.explorerLevel} · ${progress.xp} نقطة خبرة',
+                      Text(tr2('المستوى ${progress.explorerLevel} · ${progress.xp} نقطة خبرة', 'Level ${progress.explorerLevel} · ${progress.xp} XP'),
                           style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink)),
                       const SizedBox(height: 6),
                       Semantics(
-                        label: '${progress.xpIntoLevel} من 100 للمستوى التالي',
+                        label: tr2('${progress.xpIntoLevel} من 100 للمستوى التالي', '${progress.xpIntoLevel} of 100 to the next level'),
                         child: RProgress(value: progress.xpIntoLevel / 100),
                       ),
                       const SizedBox(height: 10),
@@ -136,7 +136,7 @@ class MeTab extends StatelessWidget {
                           locked: !unlocked.contains(a.id),
                           semantic: unlocked.contains(a.id)
                               ? a.name
-                              : '${a.name}، تُفتح عند ${a.starsNeeded} نجمة',
+                              : tr2('${a.name}، تُفتح عند ${a.starsNeeded} نجمة', '${a.name}, unlocks at ${a.starsNeeded} stars'),
                           onTap: unlocked.contains(a.id)
                               ? () => store.updateProfile(profile.copyWith(accessory: a.id))
                               : null,
@@ -230,7 +230,7 @@ class _Goal extends StatelessWidget {
       color: reached ? RC.mint : RC.card,
       outline: reached ? RC.good : RC.outline,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      semanticLabel: '$title: $done من $target${reached ? loc('، تحقق') : ''}',
+      semanticLabel: tr2('$title: $done من $target${reached ? loc('، تحقق') : ''}', '$title: $done of $target${reached ? ', reached' : ''}'),
       child: Row(
         children: [
           Icon(reached ? Icons.emoji_events_rounded : Icons.flag_rounded,
@@ -307,7 +307,7 @@ class _BadgeTile extends StatelessWidget {
         color: earned ? RC.lavender : Colors.white.withAlpha(150),
         outline: earned ? RC.outline : RC.outline.withAlpha(100),
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-        semanticLabel: earned ? '${badge.title}، تم الحصول عليها' : '${badge.title}، ${badge.description}',
+        semanticLabel: earned ? tr2('${badge.title}، تم الحصول عليها', '${badge.title}, earned') : tr2('${badge.title}، ${badge.description}', '${badge.title}, ${badge.description}'),
         child: Column(
           children: [
             Opacity(opacity: earned ? 1 : 0.3, child: Text(badge.emoji, style: const TextStyle(fontSize: 34))),

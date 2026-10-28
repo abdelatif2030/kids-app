@@ -78,7 +78,7 @@ class LandMapScreen extends StatelessWidget {
                                       color: land.color,
                                     ),
                                     const SizedBox(height: 4),
-                                    Text('${progress.completed} من $kLevelsPerLand مستويات',
+                                    Text(tr2('${progress.completed} من $kLevelsPerLand مستويات', '${progress.completed} of $kLevelsPerLand levels'),
                                         style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink)),
                                   ],
                                 ),
@@ -142,7 +142,7 @@ class _Node extends StatelessWidget {
   Widget build(BuildContext context) {
     final n = activity.level;
     final status = state.completed
-        ? 'مكتمل بـ ${state.bestStars} نجوم'
+        ? tr2('مكتمل بـ ${state.bestStars} نجوم', 'completed with ${state.bestStars} stars')
         : (state.unlocked ? loc('متاح الآن') : loc('مغلق'));
     final Color fill = state.completed
         ? RC.mint
@@ -150,7 +150,7 @@ class _Node extends StatelessWidget {
     final Color border = state.completed ? RC.good : (state.unlocked ? color : RC.outline.withAlpha(120));
     return Semantics(
       button: true,
-      label: 'المستوى $n، ${activity.kindLabel}، $status',
+      label: tr2('المستوى $n، ${activity.kindLabel}، $status', 'Level $n, ${activity.kindLabel}, $status'),
       excludeSemantics: true,
       child: Tappable(
         onTap: onTap,

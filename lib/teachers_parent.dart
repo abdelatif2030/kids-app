@@ -301,7 +301,7 @@ class TeacherDetailScreen extends StatelessWidget {
                   _section(loc('سياسة الإلغاء'),
                       Text(t.cancellationPolicy.isEmpty ? loc('لم يحدد المدرس سياسة إلغاء بعد.') : t.cancellationPolicy)),
                   _section(loc('التقييمات'), ReviewsSection(repo: repo, teacher: t, canReport: !preview)),
-                  _section(loc('اكتمال الملف'), Text('${done.done.length} من ${done.total} (يكتبه المدرس بنفسه، وليس شارة تحقق)')),
+                  _section(loc('اكتمال الملف'), Text(tr2('${done.done.length} من ${done.total} (يكتبه المدرس بنفسه، وليس شارة تحقق)', '${done.done.length} of ${done.total} (written by the teacher, not a verification badge)'))),
                 ],
               ),
             ),
@@ -468,7 +468,7 @@ class _BookingDialogState extends State<BookingDialog> {
             Text(
               widget.teacher.cancellationPolicy.isEmpty
                   ? loc('سياسة الإلغاء: لم يحدد المدرس سياسة بعد. اتفقا عليها قبل الحصة.')
-                  : 'سياسة الإلغاء: ${widget.teacher.cancellationPolicy}',
+                  : tr2('سياسة الإلغاء: ${widget.teacher.cancellationPolicy}', 'Cancellation policy: ${widget.teacher.cancellationPolicy}'),
               style: const TextStyle(fontSize: 13),
             ),
           ],
@@ -529,7 +529,7 @@ class _ReviewsSectionState extends State<ReviewsSection> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('★ ${summary.average.toStringAsFixed(1)} من 5 · ${summary.count} تقييم (متوسط حقيقي من تقييمات الحصص المكتملة)',
+            Text(tr2('★ ${summary.average.toStringAsFixed(1)} من 5 · ${summary.count} تقييم (متوسط حقيقي من تقييمات الحصص المكتملة)', '★ ${summary.average.toStringAsFixed(1)} of 5 · ${summary.count} ratings (a real average from completed lessons\' reviews)'),
                 style: const TextStyle(fontWeight: FontWeight.w600)),
             for (final r in list.where((r) => r.text.isNotEmpty).take(10))
               ListTile(
@@ -633,7 +633,7 @@ class _SlotsSectionState extends State<SlotsSection> {
                   children: [
                     for (final s in slots)
                       ActionChip(
-                        label: Text('${fmtDateTime(s.start)} · ${s.minutes} د'),
+                        label: Text(tr2('${fmtDateTime(s.start)} · ${s.minutes} د', '${fmtDateTime(s.start)} · ${s.minutes} min')),
                         onPressed: () => _book(s),
                       ),
                   ],
@@ -681,7 +681,7 @@ class _SlotBookingDialogState extends State<SlotBookingDialog> {
   Widget build(BuildContext context) {
     final t = widget.teacher;
     final s = widget.slot;
-    final price = t.priceEgp != null ? '${t.priceEgp} جنيه للحصة' : (t.priceNote.isEmpty ? loc('السعر يُتفق عليه مع المدرس') : t.priceNote);
+    final price = t.priceEgp != null ? tr2('${t.priceEgp} جنيه للحصة', '${t.priceEgp} EGP per lesson') : (t.priceNote.isEmpty ? loc('السعر يُتفق عليه مع المدرس') : t.priceNote);
     return AlertDialog(
       title: Text(loc('تأكيد حجز الموعد')),
       content: SingleChildScrollView(
@@ -689,8 +689,8 @@ class _SlotBookingDialogState extends State<SlotBookingDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${t.name}\n${fmtDateTime(s.start)} · ${s.minutes} دقيقة', style: const TextStyle(fontWeight: FontWeight.bold)),
-            Text('السعر: $price'),
+            Text(tr2('${t.name}\n${fmtDateTime(s.start)} · ${s.minutes} دقيقة', '${t.name}\n${fmtDateTime(s.start)} · ${s.minutes} minutes'), style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(tr2('السعر: $price', 'Price: $price')),
             DropdownButton<String>(
               isExpanded: true,
               value: _subject,
@@ -712,7 +712,7 @@ class _SlotBookingDialogState extends State<SlotBookingDialog> {
             Text(
               t.cancellationPolicy.isEmpty
                   ? loc('سياسة الإلغاء: لم يحدد المدرس سياسة بعد. اتفقا عليها قبل الحصة.')
-                  : 'سياسة الإلغاء: ${t.cancellationPolicy}',
+                  : tr2('سياسة الإلغاء: ${t.cancellationPolicy}', 'Cancellation policy: ${t.cancellationPolicy}'),
               style: const TextStyle(fontSize: 13),
             ),
             Text(

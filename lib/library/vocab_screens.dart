@@ -121,7 +121,7 @@ class _VocabLibraryScreenState extends State<VocabLibraryScreen> {
                         itemBuilder: (context, i) {
                           final v = items[i];
                           return RCard(
-                            semanticLabel: v.en == null ? v.ar : '${v.ar}، ${v.en}',
+                            semanticLabel: v.en == null ? v.ar : tr2('${v.ar}، ${v.en}', '${v.ar}, ${v.en}'),
                             onTap: () => showVocabDetail(context, widget.child, v),
                             padding: const EdgeInsets.all(8),
                             child: FittedBox(

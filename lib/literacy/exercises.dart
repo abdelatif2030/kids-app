@@ -21,11 +21,11 @@ Question nameQuestion(ArabicLetter l, Random r) {
     bigText: '🔊',
     options: m.options,
     correct: m.correct,
-    hint: 'اسم الحرف: ${l.name}.',
+    hint: tr2('اسم الحرف: ${l.name}.', 'The letter\'s name: ${l.name}.'),
     skill: 'phonics',
     spoken: l.name,
     speakFirst: true,
-    explanation: '${l.letter} اسمه ${l.name}',
+    explanation: tr2('${l.letter} اسمه ${l.name}', '${l.letter} is called ${l.name}'),
     ref: 'letter:${l.letter}',
     detail: l.letter,
   );
@@ -39,11 +39,11 @@ Question soundQuestion(ArabicLetter l, Random r) {
     bigText: '🔊',
     options: m.options,
     correct: m.correct,
-    hint: 'الصوت: ${l.soundFatha}',
+    hint: tr2('الصوت: ${l.soundFatha}', 'The sound: ${l.soundFatha}'),
     skill: 'phonics',
     spoken: l.soundFatha,
     speakFirst: true,
-    explanation: 'صوت ${l.letter} هو ${l.soundFatha}',
+    explanation: tr2('صوت ${l.letter} هو ${l.soundFatha}', 'The sound of ${l.letter} is ${l.soundFatha}'),
     ref: 'letter:${l.letter}',
     detail: l.letter,
   );
@@ -65,14 +65,14 @@ Question startsWithQuestion(ArabicLetter l, Random r) {
   }
   final m = _mix(Option.emoji(right.emoji), [for (final w in wrong) Option.emoji(w.emoji)], r);
   return Question(
-    prompt: 'أي صورة تبدأ بحرف «${l.letter}»؟',
+    prompt: tr2('أي صورة تبدأ بحرف «${l.letter}»؟', 'Which picture starts with the letter “${l.letter}”?'),
     bigText: l.letter,
     options: m.options,
     correct: m.correct,
-    hint: 'قل الكلمة ببطء واسمع أول صوت: ${right.word}.',
+    hint: tr2('قل الكلمة ببطء واسمع أول صوت: ${right.word}.', 'Say the word slowly and listen to the first sound: ${right.word}.'),
     skill: 'phonics',
     spoken: right.word,
-    explanation: '${right.emoji} ${right.word} تبدأ بحرف ${l.letter}',
+    explanation: tr2('${right.emoji} ${right.word} تبدأ بحرف ${l.letter}', '${right.emoji} ${right.word} starts with the letter ${l.letter}'),
     ref: 'letter:${l.letter}',
     detail: l.letter,
   );
@@ -88,14 +88,14 @@ Question positionQuestion(ArabicLetter l, Random r) {
     r,
   );
   return Question(
-    prompt: 'أين حرف «${l.letter}» في كلمة «${w.word}»؟',
+    prompt: tr2('أين حرف «${l.letter}» في كلمة «${w.word}»؟', 'Where is the letter “${l.letter}” in the word “${w.word}”?'),
     bigEmoji: w.emoji,
     options: m.options,
     correct: m.correct,
     hint: loc('ابدأ من اليمين: الحرف الأول هو البداية، والأخير هو النهاية.'),
     skill: 'letter_position',
     spoken: w.word,
-    explanation: 'حرف ${l.letter} ${pos.label} في «${w.word}»',
+    explanation: tr2('حرف ${l.letter} ${pos.label} في «${w.word}»', 'The letter ${l.letter} is ${pos.label} in “${w.word}”'),
     ref: 'letter:${l.letter}',
     detail: l.letter,
   );
@@ -115,7 +115,7 @@ Question syllableQuestion(ArabicLetter l, Random r) {
     skill: 'syllables',
     spoken: target,
     speakFirst: true,
-    explanation: 'قرأنا $target',
+    explanation: tr2('قرأنا $target', 'We read $target'),
     ref: 'letter:${l.letter}',
     detail: l.letter,
   );

@@ -361,9 +361,9 @@ const Object _keep = Object();
 
 String _plain(String s) => s
     .replaceAll(RegExp('[\u064B-\u0652\u0670]'), '')
-    .replaceAll(RegExp(loc('[أإآٱ]')), loc('ا'))
-    .replaceAll(loc('ة'), loc('ه'))
-    .replaceAll(loc('ى'), loc('ي'))
+    .replaceAll(RegExp('[أإآٱ]'), 'ا')
+    .replaceAll('ة', 'ه')
+    .replaceAll('ى', 'ي')
     .toLowerCase();
 
 bool teacherMatches(TeacherProfile t, TeacherFilters f, String Function(String subjectId) subjectLabel) {

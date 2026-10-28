@@ -119,7 +119,7 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
                               onResults: (r) => recordLetterResults(id, r),
                             )),
                             icon: const Icon(Icons.history_rounded),
-                            label: Text('مراجعة اليوم (${_due.length})'),
+                            label: Text(tr2('مراجعة اليوم (${_due.length})', 'Today\'s review (${_due.length})')),
                           ),
                         OutlinedButton.icon(
                           onPressed: wordsOpen
@@ -173,8 +173,8 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
                               color: unlocked.contains(l.letter) ? _boxColor(_states[l.letter]) : Colors.black12,
                               padding: EdgeInsets.zero,
                               semanticLabel: unlocked.contains(l.letter)
-                                  ? 'حرف ${l.name}${_states[l.letter]?.mastered == true ? loc('، متقن') : ''}'
-                                  : 'حرف ${l.name}، مقفل',
+                                  ? tr2('حرف ${l.name}${_states[l.letter]?.mastered == true ? loc('، متقن') : ''}', 'Letter ${l.name}${_states[l.letter]?.mastered == true ? ', mastered' : ''}')
+                                  : tr2('حرف ${l.name}، مقفل', 'Letter ${l.name}, locked'),
                               onTap: unlocked.contains(l.letter)
                                   ? () => _open(LetterLessonScreen(child: widget.child, letter: l))
                                   : null,
@@ -263,7 +263,7 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
-        title: Text('حرف ${l.name}',
+        title: Text(tr2('حرف ${l.name}', 'Letter ${l.name}'),
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
       body: PastelBackground(
@@ -275,12 +275,12 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
                 child: Column(
                   children: [
                     Semantics(
-                      label: 'الحرف ${l.name}',
+                      label: tr2('الحرف ${l.name}', 'The letter ${l.name}'),
                       child: Text(l.letter,
                           style: const TextStyle(fontSize: 150, fontWeight: FontWeight.w900, color: RC.ink, height: 1.1)),
                     ),
-                    Text('اسمه: ${l.name}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: RC.ink)),
-                    Text('صوته: ${l.soundFatha}   ${l.soundDamma}   ${l.soundKasra}',
+                    Text(tr2('اسمه: ${l.name}', 'Name: ${l.name}'), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: RC.ink)),
+                    Text(tr2('صوته: ${l.soundFatha}   ${l.soundDamma}   ${l.soundKasra}', 'Sound: ${l.soundFatha}   ${l.soundDamma}   ${l.soundKasra}'),
                         style: const TextStyle(fontSize: 24, color: RC.ink)),
                     const SizedBox(height: 8),
                     Wrap(
@@ -331,7 +331,7 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
                         title: Text(w.word, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
                         subtitle: Text('${l.letter} ${pos.label}'),
                         trailing: IconButton(
-                          tooltip: 'استمع إلى ${w.word}',
+                          tooltip: tr2('استمع إلى ${w.word}', 'Listen to ${w.word}'),
                           icon: const Icon(Icons.volume_up_rounded),
                           onPressed: () => AppAudio.say(w.word),
                         ),
@@ -356,7 +356,7 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
                   OutlinedButton.icon(
                     onPressed: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => run('تمرين حرف ${l.name}', () => QuizContent(letterSession(l)))),
+                      MaterialPageRoute(builder: (_) => run(tr2('تمرين حرف ${l.name}', 'Practice the letter ${l.name}'), () => QuizContent(letterSession(l)))),
                     ),
                     icon: const Icon(Icons.play_arrow_rounded),
                     label: Text(loc('تمرين الحرف')),
@@ -422,7 +422,7 @@ class _TraceScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
-        title: Text('تتبّع حرف ${letter.name}',
+        title: Text(tr2('تتبّع حرف ${letter.name}', 'Trace the letter ${letter.name}'),
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
       body: PastelBackground(

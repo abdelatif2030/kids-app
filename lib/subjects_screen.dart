@@ -51,7 +51,7 @@ class SubjectsScreen extends StatelessWidget {
                       label: s.label,
                       icon: s.icon,
                       color: s.color,
-                      badge: (counts[s.id] ?? 0) > 0 ? '${counts[s.id]} دروس' : null,
+                      badge: (counts[s.id] ?? 0) > 0 ? tr2('${counts[s.id]} دروس', '${counts[s.id]} lessons') : null,
                       // Subjects with no lessons for this age stay visible but faded.
                       dim: s.id != 'drawing' && (counts[s.id] ?? 0) == 0,
                       onTap: () => _open(context, s),
