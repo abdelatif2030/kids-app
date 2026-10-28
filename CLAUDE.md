@@ -58,3 +58,11 @@ F. Teachers/accounts: BUILT on branch feature/teachers (user approved the safe d
     - No star counter was added: stars stay "only for finishing an activity" and are not accumulated.
   - Not tested on a real device or in the browser by the user yet.
 - Step 4: built, awaiting user test. lib/session_manager.dart (counts foreground time per day in shared_preferences keys used_YYYY-MM-DD / bonus_YYYY-MM-DD; reason notifier), lib/rest_screen.dart (Arabic "time to rest", PIN -> extend 15 min or end), PinEntryScreen(returnResult). Picking an age = parent starts child mode. A playing video always finishes; paused video is closed once time is up. No new packages.
+
+## Rehlaty (branch feature/rehlaty, on top of feature/ui-uploads)
+User asked for a "Rehlaty | رحلتي" app (learning map, daily plan, rewards, parent dashboard, admin). Built in the existing Flutter app (not Next.js).
+- DECISION: no streaks (rule above); stars/XP/badges come only from finishing activities.
+- Domain in lib/journey/ (models, lands, content, progress, recommender, repository `JourneyStore`); UI in lib/journey/ui/. Data local only (keys rj_*).
+- Dashboard is per child; data reset in lib/data_reset.dart; docs/PRODUCTION.md lists limits; README updated.
+- Accessibility: `Tappable` (lib/ui.dart) gives keyboard focus; tests in test/accessibility_test.dart (320 px, text x1.6). 179 tests pass, `flutter analyze` clean except the old `_round` warning.
+- Not done: Android build, real device test, Firebase emulator, voice commands, lock mode. Old games (balloons, animal, memory) still do not check the timer.

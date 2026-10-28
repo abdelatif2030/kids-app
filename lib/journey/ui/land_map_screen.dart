@@ -5,6 +5,7 @@ import '../models.dart';
 import '../progress.dart';
 import '../repository.dart';
 import 'activity_screen.dart';
+import '../../ui.dart' show Tappable;
 import 'kit.dart';
 
 /// The path of five levels of one land: finished levels show their stars, the
@@ -150,8 +151,9 @@ class _Node extends StatelessWidget {
       button: true,
       label: 'المستوى $n، ${activity.kindLabel}، $status',
       excludeSemantics: true,
-      child: GestureDetector(
+      child: Tappable(
         onTap: onTap,
+        radius: 44,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

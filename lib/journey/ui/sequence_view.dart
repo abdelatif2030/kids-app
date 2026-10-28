@@ -105,10 +105,11 @@ class _SequenceViewState extends State<SequenceView> {
             children: [
               Row(
                 children: [
-                  Text('الجولة ${_r + 1} من ${widget.rounds.length}',
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink)),
+                  Flexible(flex: 2, child: Text('الجولة ${_r + 1} من ${widget.rounds.length}',
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink))),
                   const SizedBox(width: 12),
                   Expanded(
+                    flex: 3,
                     child: RProgress(
                       value: (_r + _placed.length / steps.length) / widget.rounds.length,
                     ),

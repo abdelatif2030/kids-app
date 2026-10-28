@@ -100,10 +100,10 @@ class _MemoryViewState extends State<MemoryView> {
             children: [
               Row(
                 children: [
-                  Text('الأزواج: $_found من $_pairs',
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink)),
+                  Flexible(flex: 2, child: Text('الأزواج: $_found من $_pairs',
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink))),
                   const SizedBox(width: 12),
-                  Expanded(child: RProgress(value: _found / _pairs)),
+                  Expanded(flex: 3, child: RProgress(value: _found / _pairs)),
                 ],
               ),
               const SizedBox(height: 14),

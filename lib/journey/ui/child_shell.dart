@@ -10,7 +10,7 @@ import '../repository.dart';
 import 'home_tab.dart';
 import 'kit.dart';
 import 'me_tab.dart';
-import '../../ui.dart' show BigTile;
+import '../../ui.dart' show BigTile, Tappable;
 
 /// The child's whole world: four big tabs (home, games, create, me). Leaving it
 /// needs the parent PIN, and closing it ends the session's time counting.
@@ -114,9 +114,9 @@ class _NavItem extends StatelessWidget {
       selected: selected,
       label: label,
       excludeSemantics: true,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
+      child: Tappable(
         onTap: onTap,
+        radius: 18,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

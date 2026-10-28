@@ -122,10 +122,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                   children: [
                     Row(
                       children: [
-                        Text('الخطوة ${_step + 1} من 4',
-                            style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink)),
+                        Flexible(flex: 2, child: Text('الخطوة ${_step + 1} من 4',
+                            style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink))),
                         const SizedBox(width: 12),
-                        Expanded(child: RProgress(value: (_step + 1) / 4, color: RC.pinkDeep)),
+                        Expanded(flex: 3, child: RProgress(value: (_step + 1) / 4, color: RC.pinkDeep)),
                       ],
                     ),
                     const SizedBox(height: 16),

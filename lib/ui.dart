@@ -153,6 +153,47 @@ class OutlinedTitle extends StatelessWidget {
   }
 }
 
+/// A tap target that also works from a keyboard or switch: it can take focus,
+/// Enter/Space activate it, and a focus ring is drawn around it.
+class Tappable extends StatefulWidget {
+  final VoidCallback onTap;
+  final double radius;
+  final Widget child;
+  const Tappable({super.key, required this.onTap, required this.child, this.radius = 20});
+
+  @override
+  State<Tappable> createState() => _TappableState();
+}
+
+class _TappableState extends State<Tappable> {
+  bool _focused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return FocusableActionDetector(
+      onShowFocusHighlight: (v) => setState(() => _focused = v),
+      actions: {
+        ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) {
+          widget.onTap();
+          return null;
+        }),
+      },
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.onTap,
+        child: DecoratedBox(
+          position: DecorationPosition.foreground,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(widget.radius),
+            border: _focused ? Border.all(color: const Color(0xFF1B3A8A), width: 3) : null,
+          ),
+          child: widget.child,
+        ),
+      ),
+    );
+  }
+}
+
 /// The big green "let's play" button.
 class PlayButton extends StatelessWidget {
   final String label;
@@ -161,8 +202,9 @@ class PlayButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return Tappable(
       onTap: onTap,
+      radius: 38,
       child: Container(
         width: 300,
         height: 76,

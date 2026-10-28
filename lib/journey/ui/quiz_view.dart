@@ -211,10 +211,10 @@ class _QuizViewState extends State<QuizView> {
             children: [
               Row(
                 children: [
-                  Text('السؤال ${_i + 1} من $total',
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink)),
+                  Flexible(flex: 2, child: Text('السؤال ${_i + 1} من $total',
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink))),
                   const SizedBox(width: 12),
-                  Expanded(child: RProgress(value: (_i + (_right ? 1 : 0)) / total)),
+                  Expanded(flex: 3, child: RProgress(value: (_i + (_right ? 1 : 0)) / total)),
                 ],
               ),
               const SizedBox(height: 14),
