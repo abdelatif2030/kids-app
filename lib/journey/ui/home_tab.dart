@@ -20,6 +20,7 @@ import '../../stories/story_screens.dart';
 import '../../games/game_catalog.dart';
 import '../my_day.dart';
 import '../resume.dart';
+import 'library_screen.dart';
 import 'my_day_cards.dart';
 import 'home_tasks_screen.dart';
 import 'land_map_screen.dart';
@@ -163,6 +164,8 @@ class HomeTab extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
+                FeelingCard(child: child, now: now),
+                const SizedBox(height: 12),
                 MyDayCard(
                   child: child,
                   now: now,
@@ -227,6 +230,7 @@ class HomeTab extends StatelessWidget {
                   spacing: 10,
                   runSpacing: 10,
                   children: [
+                    _MoreCard('📚', tr2('مكتبتي', 'My library'), RC.sky, () => MyLibraryScreen(child: child)),
                     _MoreCard('🖼️', loc('مكتبة الكلمات'), RC.mint, () => VocabLibraryScreen(child: child)),
                     _MoreCard('🏠', loc('أنشطة مع الأهل'), RC.yellow, () => ActivityLibraryScreen(child: child)),
                     _MoreCard('▶️', loc('فيديوهات تعليمية'), RC.lavender, () => SubjectsScreen(age: child.age)),

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'journey/avatars.dart';
+import 'journey/favorites.dart';
+import 'journey/feelings.dart';
 import 'journey/repository.dart';
 import 'journey/resume.dart';
 import 'l10n/strings.dart';
@@ -25,6 +27,8 @@ Future<void> deleteChildData() async {
         key == 'family_gallery' ||
         key == 'last_age' ||
         key == 'resume_state' ||
+        key == 'feeling_log' ||
+        key == 'favorites' ||
         key.startsWith('child_photo_') ||
         key.startsWith('used_') ||
         key.startsWith('bonus_') ||
@@ -65,6 +69,8 @@ Future<void> deleteOneChild(String childId) async {
   await dropKey('literacy_state');
   await ChildPhotoStore.delete(childId);
   await ResumeStore.forget(childId);
+  await FeelingStore.forget(childId);
+  await FavoritesStore.forget(childId);
   await JourneyStore.instance.deleteProfile(childId);
 }
 

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../games/game_catalog.dart';
 import '../../library/activity_screens.dart' show ActivityLibraryScreen;
 import '../day_prefs.dart';
+import '../feelings.dart';
 import '../../games/word_book_game.dart';
 import '../../l10n/app_locale.dart';
 import '../../l10n/strings.dart';
@@ -529,4 +530,82 @@ class _GardenPainter extends CustomPainter {
   @override
   bool shouldRepaint(_GardenPainter old) =>
       old.g.flowers != g.flowers || old.g.stage != g.stage;
+}
+
+/// «كيف تشعر اليوم؟»: an optional face. No score, no judgement, and it is not shown to anyone else.
+class FeelingCard extends StatefulWidget {
+  final ChildProfile child;
+  final DateTime? now;
+  const FeelingCard({super.key, required this.child, this.now});
+
+  @override
+  State<FeelingCard> createState() => _FeelingCardState();
+}
+
+class _FeelingCardState extends State<FeelingCard> {
+  Feeling? _picked;
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    FeelingStore.today(widget.child.id, now: widget.now).then((f) {
+      if (mounted) {
+        setState(() {
+          _picked = f;
+          _loaded = true;
+        });
+      }
+    });
+  }
+
+  Future<void> _pick(Feeling f) async {
+    setState(() => _picked = f);
+    await FeelingStore.set(widget.child.id, f.id, now: widget.now);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_loaded) return const SizedBox.shrink();
+    return RCard(
+      key: const ValueKey('feeling'),
+      color: Colors.white.withAlpha(220),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(tr2('كيف تشعر اليوم؟', 'How do you feel today?'), style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: RC.ink)),
+          Text(tr2('اختياري. اختر وجهاً إن أردت.', 'Optional. Pick a face if you like.'), style: const TextStyle(fontSize: 12, color: RC.ink)),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final f in kFeelings)
+                Semantics(
+                  button: true,
+                  selected: _picked?.id == f.id,
+                  label: f.label(),
+                  child: GestureDetector(
+                    key: ValueKey('feeling_${f.id}'),
+                    onTap: () => _pick(f),
+                    child: Container(
+                      width: 52,
+                      height: 52,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _picked?.id == f.id ? RC.yellow : Colors.white,
+                        border: Border.all(color: _picked?.id == f.id ? RC.pinkDeep : RC.outline, width: _picked?.id == f.id ? 4 : 2),
+                      ),
+                      child: Text(f.emoji, style: const TextStyle(fontSize: 28)),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          if (_picked != null) Padding(padding: const EdgeInsets.only(top: 6), child: Text(_picked!.reply(), key: const ValueKey('feeling_reply'), style: const TextStyle(fontSize: 14, color: RC.ink))),
+        ],
+      ),
+    );
+  }
 }

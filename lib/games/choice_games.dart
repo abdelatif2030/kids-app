@@ -13,7 +13,8 @@ class ChoiceRound {
   final List<String> options;
   final int correct;
   final String? prompt; // overrides the game's instruction for this round
-  const ChoiceRound(this.display, this.options, this.correct, {this.prompt});
+  final String? ref; // what the round is about (a vocabulary id), for records
+  const ChoiceRound(this.display, this.options, this.correct, {this.prompt, this.ref});
 }
 
 const kChoiceRounds = 5;
@@ -148,6 +149,9 @@ class ChoiceGame extends StatefulWidget {
   /// How to draw the choices: emojis ('pictures'), or labelled group buttons ('groups').
   final List<String>? groupTitles;
   final List<String>? groupEmojis;
+
+  /// Called when a round is answered: the round and whether it was right on the first try.
+  final void Function(ChoiceRound round, bool firstTry)? onRoundDone;
   const ChoiceGame({
     super.key,
     required this.childId,
@@ -158,6 +162,7 @@ class ChoiceGame extends StatefulWidget {
     this.random,
     this.groupTitles,
     this.groupEmojis,
+    this.onRoundDone,
   });
 
   @override
@@ -170,13 +175,17 @@ class _ChoiceGameState extends State<ChoiceGame> {
   int _i = 0;
   final Set<int> _faded = {};
   bool _right = false;
+  bool _missedThisRound = false;
 
   Future<void> _tap(int o) async {
     if (_right || _faded.contains(o)) return;
     if (o != _rounds[_i].correct) {
+      _missedThisRound = true;
       setState(() => _faded.add(o));
       return;
     }
+    widget.onRoundDone?.call(_rounds[_i], !_missedThisRound);
+    _missedThisRound = false;
     setState(() => _right = true);
     await Future<void>.delayed(const Duration(milliseconds: 650));
     if (!mounted) return;

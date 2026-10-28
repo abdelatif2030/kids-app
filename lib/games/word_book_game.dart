@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../journey/ui/kit.dart';
 import '../l10n/strings.dart';
+import '../journey/ui/heart_button.dart';
 import '../library/learning_records.dart';
 import '../library/vocab.dart';
 import '../media/audio.dart';
@@ -249,12 +250,15 @@ class _WordBookGameState extends State<WordBookGame> {
 /// Opens a word card and records, locally, that the child met the word (exposure, not mastery).
 Future<void> openWordCard(BuildContext context, String childId, Vocab w) async {
   LearningRecords.add(childId, RecordType.word, w.id, Evidence.exposure);
-  await Navigator.push(context, MaterialPageRoute(builder: (_) => WordCardScreen(word: w)));
+  await Navigator.push(context, MaterialPageRoute(builder: (_) => WordCardScreen(word: w, childId: childId)));
 }
 
 class WordCardScreen extends StatelessWidget {
   final Vocab word;
-  const WordCardScreen({super.key, required this.word});
+
+  /// With a child, the card shows a heart that saves the word to «مكتبتي».
+  final String? childId;
+  const WordCardScreen({super.key, required this.word, this.childId});
 
   @override
   Widget build(BuildContext context) {
@@ -279,6 +283,7 @@ class WordCardScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
+            if (childId != null) Align(alignment: AlignmentDirectional.centerEnd, child: HeartButton(childId: childId!, kind: 'word', refId: word.id)),
             // An illustration (an emoji drawing), not a photograph of the object.
             Semantics(
               label: tr2(

@@ -286,6 +286,7 @@ void main() {
       for (final land in kLands) {
         expect(find.text(land.title), findsWidgets);
       }
+      await tester.scrollUntilVisible(find.text('فيديوهات تعليمية'), 400, scrollable: find.byType(Scrollable).first);
       expect(find.text('فيديوهات تعليمية'), findsOneWidget);
     });
 

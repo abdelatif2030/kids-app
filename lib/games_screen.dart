@@ -5,6 +5,7 @@ import 'games/game_catalog.dart';
 import 'games/game_common.dart';
 import 'journey/models.dart';
 import 'journey/resume.dart';
+import 'journey/ui/heart_button.dart';
 import 'journey/ui/kit.dart';
 import 'letters_game.dart';
 import 'math_game.dart';
@@ -220,6 +221,7 @@ class _LearningGamesListState extends State<LearningGamesList> {
                           ],
                         ),
                       ),
+                      HeartButton(childId: widget.childId, kind: 'game', refId: g.id, size: 26),
                       if (done.contains(g.id)) const Icon(Icons.check_circle_rounded, color: Colors.green),
                     ],
                   ),
