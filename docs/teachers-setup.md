@@ -76,3 +76,18 @@ const kFirebaseEnabled = true;
    The two badges are separate. Remove the field (or set `false`) to take a badge away. A teacher cannot add, change or remove either field, and a complete profile never gives a badge.
 3. Keep your own private record of what you checked and when (there is no audit log in the app yet).
 4. Existing teachers keep working: every new field is optional.
+
+## Portfolio and intro video (added 2026-11)
+
+- Teachers add work samples (worksheet, lesson plan, activity, story) from **Teacher account -> My portfolio**.
+  Each has a title, a short description and an optional small picture (up to 100 KB, base64 in Firestore, because
+  Storage needs the paid plan). There is no file or video upload. A teacher can hold up to 20 items.
+- **Draft** is seen only by the teacher; **published** is seen by parents on the teacher page, before booking.
+  To hide one item, open `portfolio/{id}` in the console and set `status` to `hidden`. A teacher cannot lift it
+  (the rules refuse), and the app shows them "hidden by the app owner".
+- The optional intro video is an **https link** (30-60 seconds). Parents see it as a link to copy; nothing plays
+  or opens by itself, and there is no player.
+- Everything in the portfolio is written by the teacher and is NOT reviewed by the app; the page says so.
+- **You must re-publish `firestore.rules`** (new `portfolio` collection and the `introVideoUrl` check).
+  The rules were tested with the emulator (`cd rules_test && npm test`: 28 tests pass).
+- "Preview as parents" on the teacher account already shows the page exactly as parents see it, including the portfolio.

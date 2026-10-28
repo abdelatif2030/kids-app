@@ -352,3 +352,76 @@ test('proposals: the teacher can withdraw, and then cannot be accepted', async (
   await assertSucceeds(updateDoc(doc(as('t1'), 'proposals', 'r1_t1'), { status: 'withdrawn' }));
   await assertFails(updateDoc(doc(as('p1'), 'proposals', 'r1_t1'), { status: 'accepted' }));
 });
+
+// portfolio -----------------------------------------------------------------
+const work = (over = {}) => ({ teacherUid: 't1', type: 'worksheet', title: 'Letter ba', description: 'tracing', status: 'published', ...over });
+async function seedWork(id, over = {}) {
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(doc(ctx.firestore(), 'portfolio', id), work(over));
+  });
+}
+
+test('a teacher can create a draft or published work; parents cannot create works', async () => {
+  await assertSucceeds(setDoc(doc(as('t1'), 'portfolio', 'w1'), work({ status: 'draft' })));
+  await assertSucceeds(setDoc(doc(as('t1'), 'portfolio', 'w2'), work()));
+  await assertFails(setDoc(doc(as('p1'), 'portfolio', 'w3'), work({ teacherUid: 'p1' })));
+});
+
+test('a teacher cannot create a work for someone else, nor as hidden, nor with bad fields', async () => {
+  await assertFails(setDoc(doc(as('t1'), 'portfolio', 'w1'), work({ teacherUid: 't2' })));
+  await assertFails(setDoc(doc(as('t1'), 'portfolio', 'w1'), work({ status: 'hidden' })));
+  await assertFails(setDoc(doc(as('t1'), 'portfolio', 'w1'), work({ title: '' })));
+  await assertFails(setDoc(doc(as('t1'), 'portfolio', 'w1'), work({ title: 'x'.repeat(81) })));
+  await assertFails(setDoc(doc(as('t1'), 'portfolio', 'w1'), work({ description: 'x'.repeat(601) })));
+  await assertFails(setDoc(doc(as('t1'), 'portfolio', 'w1'), work({ type: 'video' })));
+  await assertFails(setDoc(doc(as('t1'), 'portfolio', 'w1'), work({ imageB64: 'x'.repeat(150000) })));
+});
+
+test('parents read published works only; drafts and hidden works are private', async () => {
+  await seedWork('pub'); await seedWork('dr', { status: 'draft' }); await seedWork('hid', { status: 'hidden' });
+  await assertSucceeds(getDoc(doc(as('p1'), 'portfolio', 'pub')));
+  await assertFails(getDoc(doc(as('p1'), 'portfolio', 'dr')));
+  await assertFails(getDoc(doc(as('p1'), 'portfolio', 'hid')));
+  const published = query(collection(as('p1'), 'portfolio'), where('teacherUid', '==', 't1'), where('status', '==', 'published'));
+  const snap = await assertSucceeds(getDocs(published));
+  assert.equal(snap.size, 1);
+  await assertFails(getDocs(query(collection(as('p1'), 'portfolio'), where('teacherUid', '==', 't1')))); // a list that could include drafts
+  // the owner teacher reads all of their own
+  await assertSucceeds(getDoc(doc(as('t1'), 'portfolio', 'dr')));
+  await assertSucceeds(getDocs(query(collection(as('t1'), 'portfolio'), where('teacherUid', '==', 't1'))));
+  await assertFails(getDoc(doc(as('t2'), 'portfolio', 'dr')));
+});
+
+test('a teacher can publish, unpublish and edit their own work, but not change its owner', async () => {
+  await seedWork('w1', { status: 'draft' });
+  await assertSucceeds(updateDoc(doc(as('t1'), 'portfolio', 'w1'), { status: 'published' }));
+  await assertSucceeds(updateDoc(doc(as('t1'), 'portfolio', 'w1'), { status: 'draft', title: 'New title' }));
+  await assertFails(updateDoc(doc(as('t1'), 'portfolio', 'w1'), { teacherUid: 't2' }));
+  await assertFails(updateDoc(doc(as('t1'), 'portfolio', 'w1'), { status: 'hidden' }));
+  await assertFails(updateDoc(doc(as('t2'), 'portfolio', 'w1'), { title: 'Hijacked' }));
+});
+
+test('a teacher cannot lift or edit a work the owner hid', async () => {
+  await seedWork('h1', { status: 'hidden' });
+  await assertFails(updateDoc(doc(as('t1'), 'portfolio', 'h1'), { status: 'published' }));
+  await assertFails(updateDoc(doc(as('t1'), 'portfolio', 'h1'), { title: 'Edited' }));
+  await assertSucceeds(deleteDoc(doc(as('t1'), 'portfolio', 'h1'))); // they may still remove their own
+});
+
+test('only the owner teacher can delete a work', async () => {
+  await seedWork('w1');
+  await assertFails(deleteDoc(doc(as('t2'), 'portfolio', 'w1')));
+  await assertFails(deleteDoc(doc(as('p1'), 'portfolio', 'w1')));
+  await assertSucceeds(deleteDoc(doc(as('t1'), 'portfolio', 'w1')));
+});
+
+test('the intro video link must be a short https link', async () => {
+  const base = { name: 'T1', bio: 'b', subjects: ['math'], languages: ['العربية'], priceNote: '', status: 'approved' };
+  await assertSucceeds(updateDoc(doc(as('t1'), 'teachers', 't1'), { introVideoUrl: 'https://example.com/v/1' }));
+  await assertSucceeds(updateDoc(doc(as('t1'), 'teachers', 't1'), { introVideoUrl: '' }));
+  await assertFails(updateDoc(doc(as('t1'), 'teachers', 't1'), { introVideoUrl: 'http://example.com/v' }));
+  await assertFails(updateDoc(doc(as('t1'), 'teachers', 't1'), { introVideoUrl: 'javascript:alert(1)' }));
+  await assertFails(updateDoc(doc(as('t1'), 'teachers', 't1'), { introVideoUrl: 'https://exa mple.com' }));
+  await assertFails(updateDoc(doc(as('t1'), 'teachers', 't1'), { introVideoUrl: 'https://' + 'a'.repeat(300) }));
+  void base;
+});

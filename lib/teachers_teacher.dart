@@ -10,6 +10,8 @@ import 'teachers_bookings.dart';
 import 'teachers_requests.dart';
 import 'teachers_directory.dart' show VerificationBadges;
 import 'teachers_models.dart';
+import 'teachers_portfolio.dart';
+import 'teachers_portfolio_screens.dart';
 import 'teachers_parent.dart' show TeacherDetailScreen;
 import 'teachers_widgets.dart';
 import 'l10n/strings.dart';
@@ -181,6 +183,16 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                   icon: const Icon(Icons.visibility_outlined),
                   label: Text(loc('معاينة صفحتي كما يراها الأهل')),
                 ),
+              if (p != null)
+                OutlinedButton.icon(
+                  key: const ValueKey('open_portfolio'),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => TeacherPortfolioScreen(repo: widget.repo)),
+                  ),
+                  icon: const Icon(Icons.collections_bookmark_outlined),
+                  label: Text(tr2('معرض أعمالي', 'My portfolio')),
+                ),
               FilledButton.icon(
                 onPressed: () => _edit(p),
                 icon: const Icon(Icons.edit),
@@ -221,6 +233,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
   late final _philosophy = TextEditingController(text: widget.existing?.philosophy ?? '');
   late final _qualifications = TextEditingController(text: widget.existing?.qualifications ?? '');
   late final _cancellation = TextEditingController(text: widget.existing?.cancellationPolicy ?? '');
+  late final _introVideo = TextEditingController(text: widget.existing?.introVideoUrl ?? '');
   late final _priceEgp = TextEditingController(text: widget.existing?.priceEgp?.toString() ?? '');
   late final _experience = TextEditingController(text: widget.existing?.experienceYears?.toString() ?? '');
   late int? _ageMin = widget.existing?.ageMin;
@@ -247,6 +260,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
     _philosophy.dispose();
     _qualifications.dispose();
     _cancellation.dispose();
+    _introVideo.dispose();
     _priceEgp.dispose();
     _experience.dispose();
     super.dispose();
@@ -297,6 +311,10 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
       setState(() => _error = loc('تحقق من السعر وسنوات الخبرة (أرقام صحيحة)'));
       return;
     }
+    if (!introVideoLinkOk(_introVideo.text)) {
+      setState(() => _error = tr2('رابط الفيديو يجب أن يبدأ بـ https وألا يتجاوز $kIntroVideoMax حرفاً', 'The video link must start with https and be at most $kIntroVideoMax characters'));
+      return;
+    }
     if (_ageMin != null && _ageMax != null && _ageMin! > _ageMax!) {
       setState(() => _error = loc('الفئة العمرية: الحد الأدنى أكبر من الأقصى'));
       return;
@@ -332,6 +350,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
           experienceYears: years,
           qualifications: _qualifications.text.trim(),
           cancellationPolicy: _cancellation.text.trim(),
+          introVideoUrl: _introVideo.text.trim(),
           // Never written from here: the owner sets the badges in the console.
           identityVerified: widget.existing?.identityVerified ?? false,
           qualificationVerified: widget.existing?.qualificationVerified ?? false,
@@ -533,6 +552,17 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
                   maxLines: 2,
                   maxLength: 300,
                   decoration: InputDecoration(labelText: loc('سياسة الإلغاء'), hintText: loc('مثال: إلغاء مجاني قبل 24 ساعة')),
+                ),
+                TextField(
+                  key: const ValueKey('intro_video'),
+                  controller: _introVideo,
+                  keyboardType: TextInputType.url,
+                  textDirection: TextDirection.ltr,
+                  decoration: InputDecoration(
+                    labelText: tr2('رابط فيديو تعريفي (اختياري)', 'Intro video link (optional)'),
+                    helperText: tr2('رابط https لفيديو من 30 إلى 60 ثانية. يظهر للأهل كرابط للنسخ، دون تشغيل تلقائي.', 'An https link to a 30-60 second video. Parents see it as a link to copy, with no autoplay.'),
+                    helperMaxLines: 2,
+                  ),
                 ),
               ],
             ),

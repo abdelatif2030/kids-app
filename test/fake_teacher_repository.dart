@@ -1,5 +1,6 @@
 import 'package:kids_app/teachers_market.dart';
 import 'package:kids_app/teachers_models.dart';
+import 'package:kids_app/teachers_portfolio.dart';
 
 /// In-memory stand-in for Firebase that follows the same rules as
 /// firestore.rules: new teacher profiles are pending, only [approve] (the app
@@ -9,6 +10,7 @@ class FakeTeacherRepository implements TeacherRepository {
   final Map<String, TeacherProfile> _teachers = {};
   final List<Booking> _bookings = [];
   final Map<String, CvFile> _cvs = {};
+  final List<PortfolioItem> _portfolio = [];
   final List<({String teacherUid, String reporterUid, String reason})> reports = [];
   AppUser? _current;
   int _nextId = 1;
@@ -86,6 +88,45 @@ class FakeTeacherRepository implements TeacherRepository {
 
   @override
   Future<CvFile?> loadCv(String teacherUid) async => _cvs[teacherUid];
+
+  /// The app owner hiding one item in the console (the teacher cannot lift it).
+  void hideItem(String id) {
+    final i = _portfolio.indexWhere((x) => x.id == id);
+    _portfolio[i] = _portfolio[i].copyWith(status: portfolioHidden);
+  }
+
+  @override
+  Future<List<PortfolioItem>> portfolioOf(String teacherUid) async {
+    final mine = _current?.uid == teacherUid;
+    return [
+      for (final i in _portfolio)
+        if (i.teacherUid == teacherUid && (mine || i.published)) i,
+    ];
+  }
+
+  @override
+  Future<void> savePortfolioItem(PortfolioItem item) async {
+    final me = _current!.uid;
+    if (_users[me]?.role != UserRole.teacher) throw const AccountException('ليس لديك صلاحية لهذه العملية');
+    final problem = validatePortfolioItem(item);
+    if (problem != null) throw AccountException(problem);
+    if (item.id.isEmpty) {
+      if (_portfolio.where((x) => x.teacherUid == me).length >= kPortfolioMaxItems) {
+        throw const AccountException('وصلت إلى الحد الأقصى للأعمال');
+      }
+      _portfolio.add(item.copyWith(id: 'w${_nextId++}', teacherUid: me));
+      return;
+    }
+    final i = _portfolio.indexWhere((x) => x.id == item.id && x.teacherUid == me);
+    if (i < 0) throw const AccountException('ليس لديك صلاحية لهذه العملية');
+    // A hidden item stays hidden: the teacher cannot lift the owner's decision.
+    _portfolio[i] = item.copyWith(teacherUid: me, status: _portfolio[i].hidden ? portfolioHidden : item.status);
+  }
+
+  @override
+  Future<void> deletePortfolioItem(String id) async {
+    _portfolio.removeWhere((x) => x.id == id && x.teacherUid == _current!.uid);
+  }
 
   @override
   Future<void> reportTeacher(String teacherUid, String reason) async =>

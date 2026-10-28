@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'teachers_market.dart';
+import 'teachers_portfolio.dart';
 import 'l10n/strings.dart';
 
 enum UserRole { parent, teacher }
@@ -93,6 +94,9 @@ class TeacherProfile {
   final String qualifications; // the teacher's own words
   final String cancellationPolicy;
 
+  /// An optional https link to a short intro video. Shown to parents as text to copy.
+  final String introVideoUrl;
+
   /// Set ONLY by the app owner in the console, never by the teacher.
   final bool identityVerified;
   final bool qualificationVerified;
@@ -122,6 +126,7 @@ class TeacherProfile {
     this.experienceYears,
     this.qualifications = '',
     this.cancellationPolicy = '',
+    this.introVideoUrl = '',
     this.identityVerified = false,
     this.qualificationVerified = false,
   });
@@ -169,6 +174,7 @@ class TeacherProfile {
         experienceYears: experienceYears,
         qualifications: qualifications,
         cancellationPolicy: cancellationPolicy,
+        introVideoUrl: introVideoUrl,
         identityVerified: identityVerified ?? this.identityVerified,
         qualificationVerified: qualificationVerified ?? this.qualificationVerified,
       );
@@ -199,6 +205,7 @@ class TeacherProfile {
         'experienceYears': ?experienceYears,
         if (qualifications.isNotEmpty) 'qualifications': qualifications,
         if (cancellationPolicy.isNotEmpty) 'cancellationPolicy': cancellationPolicy,
+        if (introVideoUrl.isNotEmpty) 'introVideoUrl': introVideoUrl,
       };
 
   static List<String> _list(Object? v) => [for (final s in (v as List<dynamic>? ?? [])) s as String];
@@ -228,6 +235,7 @@ class TeacherProfile {
         experienceYears: (m['experienceYears'] as num?)?.toInt(),
         qualifications: (m['qualifications'] as String?) ?? '',
         cancellationPolicy: (m['cancellationPolicy'] as String?) ?? '',
+        introVideoUrl: (m['introVideoUrl'] as String?) ?? '',
         // Read-only here: only the console can set these.
         identityVerified: m['identityVerified'] == true,
         qualificationVerified: m['qualificationVerified'] == true,
@@ -581,6 +589,16 @@ abstract class TeacherRepository {
 
   /// A parent's report about a teacher. Only the app owner can read it (console).
   Future<void> reportTeacher(String teacherUid, String reason);
+
+  // --- portfolio -------------------------------------------------------------
+
+  /// A teacher's work samples. Parents get only the published ones; a teacher gets all of their own.
+  Future<List<PortfolioItem>> portfolioOf(String teacherUid);
+
+  /// Creates (empty id) or updates one of the signed-in teacher's items. The owner-only `hidden`
+  /// status can never be set or lifted from the app.
+  Future<void> savePortfolioItem(PortfolioItem item);
+  Future<void> deletePortfolioItem(String id);
 
   Future<void> requestBooking(Booking booking);
 

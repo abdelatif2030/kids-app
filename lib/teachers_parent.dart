@@ -8,6 +8,7 @@ import 'teachers_requests.dart';
 import 'teachers_time.dart';
 import 'media_picker.dart';
 import 'teachers_models.dart';
+import 'teachers_portfolio_screens.dart';
 import 'teachers_widgets.dart';
 import 'l10n/strings.dart';
 
@@ -298,6 +299,7 @@ class TeacherDetailScreen extends StatelessWidget {
                       t.qualificationVerified ? loc('المؤهلات (تم التحقق منها)') : loc('المؤهلات (كتبها المدرس ولم يتحقق منها التطبيق)'),
                       Text(t.qualifications),
                     ),
+                  _section(tr2('معرض الأعمال', 'Work samples'), PortfolioSection(repo: repo, teacher: t)),
                   _section(loc('سياسة الإلغاء'),
                       Text(t.cancellationPolicy.isEmpty ? loc('لم يحدد المدرس سياسة إلغاء بعد.') : t.cancellationPolicy)),
                   _section(loc('التقييمات'), ReviewsSection(repo: repo, teacher: t, canReport: !preview)),

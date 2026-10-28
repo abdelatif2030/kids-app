@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'teachers_market.dart';
 import 'teachers_models.dart';
+import 'teachers_portfolio.dart';
 import 'l10n/strings.dart';
 
 /// Firebase implementation. Data lives in three Firestore collections:
@@ -13,7 +14,7 @@ import 'l10n/strings.dart';
 /// Optional profile fields: cleared ones are deleted on update.
 const _optionalKeys = [
   'photoB64', 'cvName', 'headline', 'philosophy', 'ageMin', 'ageMax', 'lessonMinutes', 'priceEgp',
-  'experienceYears', 'qualifications', 'cancellationPolicy',
+  'experienceYears', 'qualifications', 'cancellationPolicy', 'introVideoUrl',
 ];
 
 class FirebaseTeacherRepository implements TeacherRepository {
@@ -146,6 +147,38 @@ class FirebaseTeacherRepository implements TeacherRepository {
         if (data == null) return null;
         return CvFile(data['cvName'] as String, base64Decode(data['cvB64'] as String));
       });
+
+  @override
+  Future<List<PortfolioItem>> portfolioOf(String teacherUid) => _guard(() async {
+        final mine = _auth.currentUser?.uid == teacherUid;
+        // Parents may only ask for published items (the rules require it); the teacher reads all of their own.
+        final q = mine
+            ? _db.collection('portfolio').where('teacherUid', isEqualTo: teacherUid)
+            : _db.collection('portfolio').where('teacherUid', isEqualTo: teacherUid).where('status', isEqualTo: portfolioPublished);
+        final snap = await q.get();
+        final list = [
+          for (final d in snap.docs) (PortfolioItem.fromMap(d.id, d.data()), (d.data()['createdAt'] as Timestamp?)?.millisecondsSinceEpoch ?? 0),
+        ]..sort((a, b) => b.$2.compareTo(a.$2));
+        return [for (final e in list) e.$1];
+      });
+
+  @override
+  Future<void> savePortfolioItem(PortfolioItem item) => _guard(() async {
+        final problem = validatePortfolioItem(item);
+        if (problem != null) throw AccountException(problem);
+        final col = _db.collection('portfolio');
+        if (item.id.isEmpty) {
+          await col.add({...item.toMap(), 'createdAt': FieldValue.serverTimestamp()});
+        } else {
+          final map = item.toMap();
+          map.remove('teacherUid');
+          map['imageB64'] ??= FieldValue.delete();
+          await col.doc(item.id).update({...map, 'updatedAt': FieldValue.serverTimestamp()});
+        }
+      });
+
+  @override
+  Future<void> deletePortfolioItem(String id) => _guard(() => _db.collection('portfolio').doc(id).delete());
 
   @override
   Future<void> reportTeacher(String teacherUid, String reason) => _guard(() async {

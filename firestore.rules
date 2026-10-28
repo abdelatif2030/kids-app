@@ -24,10 +24,19 @@ service cloud.firestore {
         && d.get('philosophy', '').size() <= 600
         && d.get('qualifications', '').size() <= 800
         && d.get('cancellationPolicy', '').size() <= 400
+        && d.get('introVideoUrl', '').size() <= 300
+        && (d.get('introVideoUrl', '') == '' || d.get('introVideoUrl', '').matches('^https://[^ ]+$'))
         && d.get('priceEgp', 0) >= 0 && d.get('priceEgp', 0) <= 100000
         && d.get('lessonMinutes', 30) >= 10 && d.get('lessonMinutes', 30) <= 240
         && d.get('experienceYears', 0) >= 0 && d.get('experienceYears', 0) <= 60
         && d.get('ageMin', 0) >= 0 && d.get('ageMax', 12) <= 18;
+    }
+
+    function portfolioFieldsOk(d) {
+      return d.title is string && d.title.size() > 0 && d.title.size() <= 80
+        && d.get('description', '').size() <= 600
+        && d.get('imageB64', '').size() < 150000
+        && d.type in ['worksheet', 'lesson_plan', 'activity', 'story', 'other'];
     }
 
     // users/{uid}: role and display name, readable only by the owner.
@@ -62,6 +71,24 @@ service cloud.firestore {
         && request.resource.data.get('identityVerified', false) == resource.data.get('identityVerified', false)
         && request.resource.data.get('qualificationVerified', false) == resource.data.get('qualificationVerified', false);
       allow delete: if false;
+    }
+
+    // portfolio/{id}: a teacher's work samples. Parents (any signed-in user) can read only published
+    // items; the teacher reads and writes their own. Status "hidden" is set by the owner in the console:
+    // the teacher cannot set it, and cannot change an item that is hidden.
+    match /portfolio/{id} {
+      allow read: if signedIn()
+        && (resource.data.status == 'published' || resource.data.teacherUid == request.auth.uid);
+      allow create: if signedIn() && role() == 'teacher'
+        && request.resource.data.teacherUid == request.auth.uid
+        && request.resource.data.status in ['draft', 'published']
+        && portfolioFieldsOk(request.resource.data);
+      allow update: if signedIn() && resource.data.teacherUid == request.auth.uid
+        && resource.data.status in ['draft', 'published']
+        && request.resource.data.teacherUid == resource.data.teacherUid
+        && request.resource.data.status in ['draft', 'published']
+        && portfolioFieldsOk(request.resource.data);
+      allow delete: if signedIn() && resource.data.teacherUid == request.auth.uid;
     }
 
     // teacherFiles/{uid}: the CV (small, base64). The teacher writes their own;
