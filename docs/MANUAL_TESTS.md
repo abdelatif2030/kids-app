@@ -109,6 +109,20 @@ Run on a physical Android device.
 - **Device or environment:** Device: 
 - **Notes:** 
 
+### A8 - Release build and the network permission
+
+- [ ] Not tested
+- **Test ID:** A8
+- **Preconditions:** A release APK (`flutter build apk --release`). The main `AndroidManifest.xml` currently declares no `INTERNET` permission (only the debug and profile manifests do), so a release build may not reach YouTube or Firebase.
+- **Steps:**
+  1. Install the release APK on a phone with a working connection.
+  2. Open a video from the list and look at the thumbnails.
+- **Expected result:** If videos and thumbnails fail only in the release build, the missing permission is the cause and the manifest needs a decision from the owner before it is changed.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Device model, Android version: 
+- **Notes:** Found by reading the manifests, not yet confirmed on a device.
+
 ## B. Audio listening
 
 A person must listen. Playback succeeding does not prove a voice sounds natural or is pronounced correctly.
