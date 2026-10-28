@@ -54,6 +54,8 @@ class MeTab extends StatelessWidget {
               children: [
                 GardenCard(child: profile),
                 const SizedBox(height: 12),
+                StickerAlbumCard(child: profile),
+                const SizedBox(height: 12),
                 RCard(
                   color: RC.lavender.withAlpha(170),
                   radius: 28,

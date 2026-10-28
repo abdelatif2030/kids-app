@@ -6,6 +6,7 @@ import '../../games/game_catalog.dart';
 import '../../library/activity_screens.dart' show ActivityLibraryScreen;
 import '../day_prefs.dart';
 import '../feelings.dart';
+import '../stickers.dart';
 import '../../games/word_book_game.dart';
 import '../../l10n/app_locale.dart';
 import '../../l10n/strings.dart';
@@ -606,6 +607,57 @@ class _FeelingCardState extends State<FeelingCard> {
           if (_picked != null) Padding(padding: const EdgeInsets.only(top: 6), child: Text(_picked!.reply(), key: const ValueKey('feeling_reply'), style: const TextStyle(fontSize: 14, color: RC.ink))),
         ],
       ),
+    );
+  }
+}
+
+/// «ألبوم الملصقات»: the stickers earned so far in full colour, the next ones as question marks.
+class StickerAlbumCard extends StatelessWidget {
+  final ChildProfile child;
+  const StickerAlbumCard({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<int>(
+      future: finishedCount(child.id),
+      builder: (context, snap) {
+        final n = stickersUnlocked(snap.data ?? 0);
+        return RCard(
+          key: const ValueKey('stickers'),
+          color: const Color(0xFFFFF1D6),
+          semanticLabel: tr2('ألبوم الملصقات: $n من ${kStickers.length}', 'Sticker album: $n of ${kStickers.length}'),
+          child: Column(
+            children: [
+              Text(tr2('ألبوم الملصقات', 'Sticker album'), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: RC.ink)),
+              Text(tr2('ملصق جديد مع كل شيء تُنهيه.', 'A new sticker for everything you finish.'), style: const TextStyle(fontSize: 13, color: RC.ink)),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                alignment: WrapAlignment.center,
+                children: [
+                  for (var i = 0; i < kStickers.length; i++)
+                    Semantics(
+                      label: i < n ? kStickers[i].name() : tr2('ملصق مقفل', 'Locked sticker'),
+                      child: Container(
+                        key: ValueKey(i < n ? 'sticker_$i' : 'locked_$i'),
+                        width: 46,
+                        height: 46,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: i < n ? Colors.white : Colors.black12,
+                          border: Border.all(color: RC.outline, width: 2),
+                        ),
+                        child: Text(i < n ? kStickers[i].emoji : '?', style: TextStyle(fontSize: i < n ? 26 : 20, color: RC.ink)),
+                      ),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

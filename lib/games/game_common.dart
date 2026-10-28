@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../journey/resume.dart';
+import '../journey/stickers.dart';
 import '../journey/ui/kit.dart';
 import '../l10n/strings.dart';
 import '../library/learning_records.dart';
@@ -141,6 +142,7 @@ class GameFinishPanel extends StatefulWidget {
 
 class _GameFinishPanelState extends State<GameFinishPanel> {
   bool? _earned;
+  Sticker? _sticker;
   bool _saving = false;
 
   @override
@@ -159,7 +161,21 @@ class _GameFinishPanelState extends State<GameFinishPanel> {
     } catch (_) {
       earned = false; // storage trouble: no star claimed we could not record
     }
-    if (mounted) setState(() => _earned = earned);
+    Sticker? sticker;
+    if (earned) {
+      try {
+        // The sticker for this new finish: the album unlocks one per real finished thing.
+        sticker = newestSticker(await finishedCount(widget.childId));
+      } catch (_) {
+        sticker = null;
+      }
+    }
+    if (mounted) {
+      setState(() {
+        _earned = earned;
+        _sticker = sticker;
+      });
+    }
   }
 
   @override
@@ -189,6 +205,16 @@ class _GameFinishPanelState extends State<GameFinishPanel> {
                 color: RC.ink,
               ),
             ),
+            if (_sticker != null)
+              Padding(
+                key: const ValueKey('new_sticker'),
+                padding: const EdgeInsets.only(top: 10),
+                child: Column(children: [
+                  Text(_sticker!.emoji, style: const TextStyle(fontSize: 64)),
+                  Text(tr2('ملصق جديد: ${_sticker!.name()}!', 'A new sticker: ${_sticker!.name()}!'),
+                      textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: RC.ink)),
+                ]),
+              ),
             if (earned == false)
               Padding(
                 padding: const EdgeInsets.only(top: 8),
