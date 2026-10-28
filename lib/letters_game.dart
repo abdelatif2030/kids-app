@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'progress_store.dart';
 import 'rest_screen.dart';
 import 'ui.dart';
 
@@ -15,17 +17,18 @@ class _Word {
 }
 
 class _Lang {
+  final String id;
   final String label;
   final bool rtl;
   final String alphabet;
   final List<_Word> words;
-  const _Lang(this.label, this.rtl, this.alphabet, this.words);
+  const _Lang(this.id, this.label, this.rtl, this.alphabet, this.words);
 }
 
 const _latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 const _langs = [
-  _Lang('عربي', true, 'أبتثجحخدذرزسشصضطظعغفقكلمنهوي', [
+  _Lang('ar', 'عربي', true, 'أبتثجحخدذرزسشصضطظعغفقكلمنهوي', [
     _Word('🍎', 'تفاحة'),
     _Word('🍌', 'موز'),
     _Word('🐘', 'فيل'),
@@ -36,7 +39,7 @@ const _langs = [
     _Word('🐦', 'عصفور'),
     _Word('🐱', 'قطة'),
   ]),
-  _Lang('English', false, _latin, [
+  _Lang('en', 'English', false, _latin, [
     _Word('🍎', 'Apple'),
     _Word('🐱', 'Cat'),
     _Word('🐶', 'Dog'),
@@ -46,7 +49,7 @@ const _langs = [
     _Word('🍌', 'Banana'),
     _Word('🏠', 'House'),
   ]),
-  _Lang('Deutsch', false, _latin, [
+  _Lang('de', 'Deutsch', false, _latin, [
     _Word('🍎', 'Apfel'),
     _Word('🐱', 'Katze'),
     _Word('🐶', 'Hund'),
@@ -56,7 +59,7 @@ const _langs = [
     _Word('🏠', 'Haus'),
     _Word('🐘', 'Elefant'),
   ]),
-  _Lang('Français', false, _latin, [
+  _Lang('fr', 'Français', false, _latin, [
     _Word('🍎', 'Pomme'),
     _Word('🐱', 'Chat'),
     _Word('🐶', 'Chien'),
@@ -87,6 +90,7 @@ class _LettersGameState extends State<LettersGame> {
   final Set<int> _faded = {};
   int _round = 0;
   bool _matched = false;
+  bool _missed = false; // a wrong tap in this round
 
   bool get _done => _round >= _rounds;
 
@@ -110,14 +114,18 @@ class _LettersGameState extends State<LettersGame> {
     _options = [answer, ...others.take(2)]..shuffle(_random);
     _faded.clear();
     _matched = false;
+    _missed = false;
   }
 
   Future<void> _tap(int i) async {
     if (_matched || _faded.contains(i)) return;
     if (_options[i] != _questions[_round].letter) {
+      _missed = true;
       setState(() => _faded.add(i));
       return;
     }
+    unawaited(ProgressStore.record('letters_${_lang.id}', !_missed,
+        detail: _questions[_round].letter));
     setState(() => _matched = true);
     await Future.delayed(const Duration(milliseconds: 900));
     if (!mounted) return;

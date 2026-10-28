@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'dashboard_screen.dart';
 import 'notes_screen.dart';
 import 'parent_settings.dart';
 import 'plan_screen.dart';
@@ -231,6 +232,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               children: [
+                ListTile(
+                  leading: const Icon(Icons.insights_rounded),
+                  title: const Text('لوحة متابعة الطفل'),
+                  subtitle: const Text('المهارات والوقت وتقرير الأسبوع'),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                  ),
+                ),
+                const Divider(),
                 ListTile(
                   title: const Text('الحد اليومي للوقت'),
                   trailing: DropdownButton<int>(

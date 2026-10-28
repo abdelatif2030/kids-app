@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'progress_store.dart';
 import 'rest_screen.dart';
 import 'ui.dart';
 
@@ -10,7 +12,10 @@ class _Question {
   final int? objects;
   final String prompt;
   final int answer;
-  const _Question(this.prompt, this.answer, {this.objects});
+
+  /// The skill id in skills.dart.
+  final String skill;
+  const _Question(this.prompt, this.answer, this.skill, {this.objects});
 }
 
 /// رياضيات حسب العمر: عدّ (4-5)، جمع (6-7)، جمع وطرح (8-9)، ضرب (10-12).
@@ -32,6 +37,7 @@ class _MathGameState extends State<MathGame> {
   final Set<int> _faded = {};
   int _round = 0;
   bool _matched = false;
+  bool _missed = false; // a wrong tap in this round
 
   bool get _done => _round >= _rounds;
 
@@ -45,26 +51,26 @@ class _MathGameState extends State<MathGame> {
     final age = widget.age;
     if (age <= 5) {
       final n = 1 + _random.nextInt(age <= 4 ? 5 : 10);
-      return _Question('كام؟', n, objects: n);
+      return _Question('كام؟', n, 'counting', objects: n);
     }
     if (age <= 7) {
       final max = age == 6 ? 10 : 20;
       final a = 1 + _random.nextInt(max - 1);
       final b = 1 + _random.nextInt(max - a);
-      return _Question('$a + $b = ?', a + b);
+      return _Question('$a + $b = ?', a + b, 'addition');
     }
     if (age <= 9) {
       final a = 10 + _random.nextInt(41);
       if (_random.nextBool()) {
         final b = 1 + _random.nextInt(50);
-        return _Question('$a + $b = ?', a + b);
+        return _Question('$a + $b = ?', a + b, 'addition');
       }
       final b = 1 + _random.nextInt(a - 1);
-      return _Question('$a - $b = ?', a - b);
+      return _Question('$a - $b = ?', a - b, 'subtraction');
     }
     final a = 2 + _random.nextInt(8);
     final b = 2 + _random.nextInt(11);
-    return _Question('$a × $b = ?', a * b);
+    return _Question('$a × $b = ?', a * b, 'multiplication');
   }
 
   void _newGame() {
@@ -82,14 +88,17 @@ class _MathGameState extends State<MathGame> {
     _options = [answer, ...wrong.take(2)]..shuffle(_random);
     _faded.clear();
     _matched = false;
+    _missed = false;
   }
 
   Future<void> _tap(int i) async {
     if (_matched || _faded.contains(i)) return;
     if (_options[i] != _questions[_round].answer) {
+      _missed = true;
       setState(() => _faded.add(i));
       return;
     }
+    unawaited(ProgressStore.record(_questions[_round].skill, !_missed));
     setState(() => _matched = true);
     await Future.delayed(const Duration(milliseconds: 900));
     if (!mounted) return;

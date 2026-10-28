@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'progress_store.dart';
 import 'rest_screen.dart';
 
 class _GameColor {
@@ -40,6 +42,7 @@ class _ColorGameState extends State<ColorGame> {
   final Set<int> _faded = {};
   int _round = 0;
   bool _matched = false;
+  bool _missed = false; // a wrong tap in this round
 
   bool get _done => _round >= _rounds;
 
@@ -64,15 +67,18 @@ class _ColorGameState extends State<ColorGame> {
     _choices = [target, ...others.take(_options - 1)]..shuffle(_random);
     _faded.clear();
     _matched = false;
+    _missed = false;
   }
 
   Future<void> _tap(int i) async {
     if (_matched || _faded.contains(i)) return;
     if (_choices[i] != _targets[_round]) {
       // Just fade the wrong color; no failure message.
+      _missed = true;
       setState(() => _faded.add(i));
       return;
     }
+    unawaited(ProgressStore.record('colors', !_missed, detail: _targets[_round].name));
     setState(() => _matched = true);
     await Future.delayed(const Duration(milliseconds: 900));
     if (!mounted) return;

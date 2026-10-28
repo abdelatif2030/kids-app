@@ -87,6 +87,7 @@ class SessionManager with WidgetsBindingObserver {
   Future<void> start(int age) async {
     await _load();
     currentAge = age;
+    unawaited(SharedPreferences.getInstance().then((p) => p.setInt('last_age', age)));
     reason.value = _evaluate();
     _publishRemaining();
     WidgetsBinding.instance.addObserver(this);
