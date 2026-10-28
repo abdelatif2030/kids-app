@@ -111,12 +111,18 @@ class FirebaseTeacherRepository implements TeacherRepository {
         }
         final ref = _db.collection('teachers').doc(uid);
         final map = p.toMap();
-        if ((await ref.get()).exists) {
-          // A teacher can never change their own approval.
-          map.remove('status');
+        final existing = (await ref.get()).data();
+        if (existing != null) {
+          // A teacher can never lift a suspension. An old pending profile
+          // becomes visible when saved.
+          if (existing['status'] == teacherStatusPending) {
+            map['status'] = teacherStatusApproved;
+          } else {
+            map.remove('status');
+          }
           await ref.update(map);
         } else {
-          map['status'] = teacherStatusPending;
+          map['status'] = teacherStatusApproved;
           await ref.set(map);
         }
       });
@@ -126,6 +132,16 @@ class FirebaseTeacherRepository implements TeacherRepository {
         final data = (await _db.collection('teacherFiles').doc(teacherUid).get()).data();
         if (data == null) return null;
         return CvFile(data['cvName'] as String, base64Decode(data['cvB64'] as String));
+      });
+
+  @override
+  Future<void> reportTeacher(String teacherUid, String reason) => _guard(() async {
+        await _db.collection('reports').add({
+          'teacherUid': teacherUid,
+          'reporterUid': _auth.currentUser!.uid,
+          'reason': reason,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
       });
 
   @override

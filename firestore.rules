@@ -1,8 +1,10 @@
 rules_version = '2';
 
 // Paste into Firebase console > Firestore > Rules (see docs/teachers-setup.md).
-// Teachers are approved by YOU: open teachers/{uid} in the console and change
-// status from "pending" to "approved". The app can never approve anyone.
+// Teachers are visible to parents as soon as they save their profile. To hide a
+// teacher, open teachers/{uid} in the console and set status to "suspended"
+// (a teacher can never lift that). Parents' reports are in the "reports"
+// collection, readable only in the console.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -24,17 +26,18 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // teachers/{uid}: parents see approved profiles only. A teacher sees and
-    // edits their own, but can never change their own status.
+    // teachers/{uid}: parents see profiles whose status is "approved". A teacher
+    // sees and edits their own, but can never lift a suspension.
     match /teachers/{uid} {
       allow read: if signedIn()
         && (resource.data.status == 'approved' || request.auth.uid == uid);
       allow create: if signedIn() && request.auth.uid == uid
         && role() == 'teacher'
-        && request.resource.data.status == 'pending'
+        && request.resource.data.status == 'approved'
         && request.resource.data.get('photoB64', '').size() < 150000;
       allow update: if signedIn() && request.auth.uid == uid
-        && request.resource.data.status == resource.data.status
+        && (request.resource.data.status == resource.data.status
+            || (resource.data.status == 'pending' && request.resource.data.status == 'approved'))
         && request.resource.data.get('photoB64', '').size() < 150000;
       allow delete: if false;
     }
@@ -51,6 +54,16 @@ service cloud.firestore {
         && request.resource.data.cvName.size() < 120
         && request.resource.data.cvB64.size() < 700000;
       allow delete: if false;
+    }
+
+    // reports/{id}: a parent reports a teacher. Nobody can read them in the app;
+    // you read them in the Firebase console.
+    match /reports/{id} {
+      allow create: if signedIn() && role() == 'parent'
+        && request.resource.data.keys().hasOnly(['teacherUid', 'reporterUid', 'reason', 'createdAt'])
+        && request.resource.data.reporterUid == request.auth.uid
+        && request.resource.data.reason.size() < 500;
+      allow read, update, delete: if false;
     }
 
     // bookings/{id}: lesson requests. Only the parent and the teacher involved

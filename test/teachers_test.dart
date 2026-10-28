@@ -85,7 +85,7 @@ void main() {
     expect(find.text('البريد أو كلمة المرور غير صحيحة'), findsOneWidget);
   });
 
-  testWidgets('teacher -> approval -> parent request -> teacher accepts -> parent sees link',
+  testWidgets('teacher visible at once -> parent report and request -> teacher accepts -> link',
       (tester) async {
     // A tall screen so the whole profile form is on screen.
     tester.view.physicalSize = const Size(800, 2000);
@@ -95,11 +95,10 @@ void main() {
     final picker = FakeMediaPicker();
     mediaPicker = picker;
 
-    // 1. A teacher registers and creates a profile. It starts as pending.
+    // 1. A teacher registers and creates a profile. It is visible at once.
     await _open(tester, repo);
     await _register(tester, name: 'أ. سارة', email: 'sara@example.com', teacher: true);
-    expect(find.text('أنشئ ملفك الشخصي ليراجعه صاحب التطبيق، وبعد الموافقة يظهر للأهل.'),
-        findsOneWidget);
+    expect(find.text('أنشئ ملفك الشخصي، وعند الحفظ يظهر للأهل مباشرة.'), findsOneWidget);
 
     await tester.tap(find.text('إنشاء الملف الشخصي'));
     await tester.pumpAndSettle();
@@ -120,23 +119,14 @@ void main() {
     expect(find.text('cv.pdf'), findsWidgets);
     await tester.tap(find.text('حفظ'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('قيد المراجعة'), findsOneWidget);
+    expect(find.text('ملفك ظاهر للأهل.'), findsOneWidget);
 
-    // 2. A parent registers: no teacher is visible until the owner approves.
+    // 2. A parent registers and sees the teacher straight away, with a warning.
     await repo.signOut();
     await _open(tester, repo);
     await _register(tester, name: 'أم أحمد', email: 'mom@example.com', teacher: false);
-    expect(find.text('لا يوجد مدرسون متاحون الآن'), findsOneWidget);
-
-    repo.approve(repo.teacherUid);
-    await tester.tap(find.byIcon(Icons.logout));
-    await tester.pumpAndSettle();
-    await _open(tester, repo);
-    await tester.enterText(_field('البريد الإلكتروني'), 'mom@example.com');
-    await tester.enterText(_field('كلمة المرور'), '123456');
-    await tester.tap(find.widgetWithText(FilledButton, 'دخول'));
-    await tester.pumpAndSettle();
     expect(find.text('أ. سارة'), findsOneWidget);
+    expect(find.textContaining('ولا يفحصهم التطبيق'), findsOneWidget);
 
     // 3. The parent asks for a lesson.
     await tester.tap(find.text('أ. سارة'));
@@ -144,6 +134,16 @@ void main() {
     await tester.tap(find.text('تنزيل السيرة الذاتية'));
     await tester.pumpAndSettle();
     expect(picker.savedCvName, 'cv.pdf');
+
+    // A parent can report the teacher; the report goes to the owner only.
+    await tester.tap(find.text('إبلاغ عن هذا المدرس'));
+    await tester.pumpAndSettle();
+    await tester.enterText(_field('ما المشكلة؟'), 'سلوك غير مناسب');
+    await tester.tap(find.text('إرسال'));
+    await tester.pumpAndSettle();
+    expect(find.text('وصلنا بلاغك، شكراً لك.'), findsOneWidget);
+    expect(repo.reports.single.reason, 'سلوك غير مناسب');
+    expect(repo.reports.single.teacherUid, repo.teacherUid);
     await tester.tap(find.text('اطلب حصة'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('إرسال الطلب')); // needs a time first
@@ -168,7 +168,7 @@ void main() {
     await tester.enterText(_field('كلمة المرور'), '123456');
     await tester.tap(find.widgetWithText(FilledButton, 'دخول'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('ملفك معتمد'), findsOneWidget);
+    expect(find.text('ملفك ظاهر للأهل.'), findsOneWidget);
 
     await tester.tap(find.byTooltip('طلبات الحصص'));
     await tester.pumpAndSettle();
@@ -208,7 +208,30 @@ void main() {
     expect(isValidLessonLink('hello'), isFalse);
   });
 
-  test('a teacher cannot approve themselves through saving a profile', () async {
+  test('a teacher cannot lift a suspension by saving their profile again', () async {
+    final repo = FakeTeacherRepository();
+    await repo.register(email: 't@example.com', password: '123456', name: 'T', role: UserRole.teacher);
+    TeacherProfile profile(String status) => TeacherProfile(
+          uid: repo.currentUser!.uid,
+          name: 'T',
+          bio: 'b',
+          subjects: const ['math'],
+          languages: const ['العربية'],
+          priceNote: '',
+          status: status,
+        );
+    await repo.saveTeacherProfile(profile(teacherStatusPending));
+    expect((await repo.myTeacherProfile())!.approved, isTrue); // visible at once
+    expect(await repo.approvedTeachers(), hasLength(1));
+
+    repo.suspend(repo.teacherUid); // the owner hides them
+    expect(await repo.approvedTeachers(), isEmpty);
+    await repo.saveTeacherProfile(profile(teacherStatusApproved)); // tries to undo it
+    expect((await repo.myTeacherProfile())!.suspended, isTrue);
+    expect(await repo.approvedTeachers(), isEmpty);
+  });
+
+  testWidgets('a suspended teacher is told, and parents do not see them', (tester) async {
     final repo = FakeTeacherRepository();
     await repo.register(email: 't@example.com', password: '123456', name: 'T', role: UserRole.teacher);
     await repo.saveTeacherProfile(TeacherProfile(
@@ -218,10 +241,18 @@ void main() {
       subjects: const ['math'],
       languages: const ['العربية'],
       priceNote: '',
-      status: teacherStatusApproved, // trying to self-approve
     ));
-    expect((await repo.myTeacherProfile())!.approved, isFalse);
-    expect(await repo.approvedTeachers(), isEmpty);
+    repo.suspend(repo.teacherUid);
+    mediaPicker = FakeMediaPicker();
+
+    await tester.pumpWidget(_app(TeachersEntryScreen(repo: repo)));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('تم إيقاف ظهور ملفك'), findsOneWidget);
+
+    await repo.register(email: 'p@example.com', password: '123456', name: 'P', role: UserRole.parent);
+    await tester.pumpWidget(_app(TeachersEntryScreen(repo: repo)));
+    await tester.pumpAndSettle();
+    expect(find.text('لا يوجد مدرسون متاحون الآن'), findsOneWidget);
   });
 
   testWidgets('a too-large photo shows the error and does not change the form', (tester) async {

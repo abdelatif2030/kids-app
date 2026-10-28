@@ -80,11 +80,11 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                 const TeacherHeader(
                   avatar: TeacherAvatar(photo: null, radius: 36),
                   title: 'أهلاً بك',
-                  subtitle: 'أنشئ ملفك ليظهر للأهل بعد المراجعة',
+                  subtitle: 'أنشئ ملفك ليظهر للأهل',
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'أنشئ ملفك الشخصي ليراجعه صاحب التطبيق، وبعد الموافقة يظهر للأهل.',
+                  'أنشئ ملفك الشخصي، وعند الحفظ يظهر للأهل مباشرة.',
                   style: TextStyle(fontSize: 18),
                 ),
               ] else ...[
@@ -101,15 +101,17 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                     child: Row(
                       children: [
                         Icon(
-                          p.approved ? Icons.verified_rounded : Icons.hourglass_top_rounded,
+                          p.approved ? Icons.visibility_rounded : Icons.visibility_off_rounded,
                           color: p.approved ? Colors.green : Colors.amber.shade800,
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             p.approved
-                                ? 'ملفك معتمد ويظهر للأهل.'
-                                : 'ملفك قيد المراجعة. سيظهر للأهل بعد موافقة صاحب التطبيق.',
+                                ? 'ملفك ظاهر للأهل.'
+                                : p.suspended
+                                    ? 'تم إيقاف ظهور ملفك. تواصل مع صاحب التطبيق.'
+                                    : 'احفظ ملفك مرة أخرى ليظهر للأهل.',
                             style: const TextStyle(fontSize: 17),
                           ),
                         ),
@@ -247,7 +249,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
           subjects: _subjects.toList(),
           languages: _languages.toList(),
           priceNote: _price.text.trim(),
-          status: widget.existing?.status ?? teacherStatusPending,
+          status: widget.existing?.status ?? teacherStatusApproved,
           photoB64: _photo == null ? null : base64Encode(_photo!),
           cvName: _cvName,
         ),

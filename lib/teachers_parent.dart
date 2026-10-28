@@ -86,8 +86,9 @@ class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
                 child: Padding(
                   padding: EdgeInsets.all(12),
                   child: Text(
-                    'لا توجد محادثة داخل التطبيق. عند قبول المدرس لطلبك يظهر رابط الحصة '
-                    'في «طلباتي». افتح الرابط بنفسك وكن بجانب طفلك أثناء الحصة.',
+                    'المدرسون يسجّلون بأنفسهم ولا يفحصهم التطبيق، فتحقق منهم قبل الحجز. '
+                    'لا توجد محادثة داخل التطبيق: عند قبول المدرس لطلبك يظهر رابط الحصة '
+                    'في «طلباتي». افتح الرابط بنفسك وكن بجانب طفلك طوال الحصة.',
                   ),
                 ),
               ),
@@ -201,6 +202,26 @@ class TeacherDetailScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _report(BuildContext context) async {
+    final reason = await showDialog<String>(
+      context: context,
+      builder: (_) => const _ReportDialog(),
+    );
+    if (reason == null) return;
+    String message;
+    try {
+      await repo.reportTeacher(teacher.uid, reason);
+      message = 'وصلنا بلاغك، شكراً لك.';
+    } on AccountException catch (e) {
+      message = e.message;
+    }
+    if (context.mounted) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
   Future<void> _downloadCv(BuildContext context) async {
     String message;
     try {
@@ -266,8 +287,54 @@ class TeacherDetailScreen extends StatelessWidget {
             icon: const Icon(Icons.event_available),
             label: const Text('اطلب حصة'),
           ),
+          TextButton.icon(
+            onPressed: () => _report(context),
+            icon: const Icon(Icons.flag_outlined),
+            label: const Text('إبلاغ عن هذا المدرس'),
+          ),
         ],
       ),
+    );
+  }
+}
+
+/// A short reason for reporting a teacher. Returns the text, or null.
+class _ReportDialog extends StatefulWidget {
+  const _ReportDialog();
+
+  @override
+  State<_ReportDialog> createState() => _ReportDialogState();
+}
+
+class _ReportDialogState extends State<_ReportDialog> {
+  final _reason = TextEditingController();
+
+  @override
+  void dispose() {
+    _reason.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('إبلاغ عن مدرس'),
+      content: TextField(
+        controller: _reason,
+        maxLines: 4,
+        maxLength: 400,
+        decoration: const InputDecoration(labelText: 'ما المشكلة؟'),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('إلغاء')),
+        FilledButton(
+          onPressed: () {
+            final text = _reason.text.trim();
+            if (text.isNotEmpty) Navigator.pop(context, text);
+          },
+          child: const Text('إرسال'),
+        ),
+      ],
     );
   }
 }

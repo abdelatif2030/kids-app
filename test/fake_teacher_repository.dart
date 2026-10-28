@@ -8,6 +8,7 @@ class FakeTeacherRepository implements TeacherRepository {
   final Map<String, TeacherProfile> _teachers = {};
   final List<Booking> _bookings = [];
   final Map<String, CvFile> _cvs = {};
+  final List<({String teacherUid, String reporterUid, String reason})> reports = [];
   AppUser? _current;
   int _nextId = 1;
 
@@ -47,8 +48,8 @@ class FakeTeacherRepository implements TeacherRepository {
   @override
   Future<void> signOut() async => _current = null;
 
-  /// The app owner approving a teacher in the Firebase console.
-  void approve(String uid) {
+  /// The app owner hiding a teacher in the Firebase console.
+  void suspend(String uid) {
     final t = _teachers[uid]!;
     _teachers[uid] = TeacherProfile(
       uid: uid,
@@ -57,7 +58,7 @@ class FakeTeacherRepository implements TeacherRepository {
       subjects: t.subjects,
       languages: t.languages,
       priceNote: t.priceNote,
-      status: teacherStatusApproved,
+      status: teacherStatusSuspended,
       photoB64: t.photoB64,
       cvName: t.cvName,
     );
@@ -83,7 +84,10 @@ class FakeTeacherRepository implements TeacherRepository {
       subjects: p.subjects,
       languages: p.languages,
       priceNote: p.priceNote,
-      status: old?.status ?? teacherStatusPending, // never taken from the caller
+      // Visible at once; a suspension can never be lifted by the teacher.
+      status: old == null || old.status == teacherStatusPending
+          ? teacherStatusApproved
+          : old.status,
       photoB64: p.photoB64,
       cvName: p.cvName,
     );
@@ -91,6 +95,10 @@ class FakeTeacherRepository implements TeacherRepository {
 
   @override
   Future<CvFile?> loadCv(String teacherUid) async => _cvs[teacherUid];
+
+  @override
+  Future<void> reportTeacher(String teacherUid, String reason) async =>
+      reports.add((teacherUid: teacherUid, reporterUid: _current!.uid, reason: reason));
 
   @override
   Future<void> requestBooking(Booking b) async {

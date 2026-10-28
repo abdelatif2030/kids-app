@@ -25,8 +25,12 @@ class AccountException implements Exception {
   String toString() => message;
 }
 
-const teacherStatusPending = 'pending';
+const teacherStatusPending = 'pending'; // old profiles only; saving one makes it visible
+/// New profiles are visible to parents straight away.
 const teacherStatusApproved = 'approved';
+
+/// Set by the app owner in the Firebase console to hide a teacher.
+const teacherStatusSuspended = 'suspended';
 
 /// Languages a teacher can offer, as shown to parents.
 const kTeacherLanguages = ['العربية', 'English', 'Deutsch', 'Français'];
@@ -45,7 +49,7 @@ class TeacherProfile {
   final List<String> subjects; // subject ids from curriculum.dart
   final List<String> languages;
   final String priceNote; // free text, e.g. "150 جنيه للحصة"
-  final String status; // pending until the app owner approves it
+  final String status; // approved (visible) or suspended (hidden by the owner)
   final String? photoB64; // small JPEG, base64
   final String? cvName; // the CV file itself is loaded on demand (loadCv)
 
@@ -56,12 +60,13 @@ class TeacherProfile {
     required this.subjects,
     required this.languages,
     required this.priceNote,
-    this.status = teacherStatusPending,
+    this.status = teacherStatusApproved,
     this.photoB64,
     this.cvName,
   });
 
   bool get approved => status == teacherStatusApproved;
+  bool get suspended => status == teacherStatusSuspended;
 
   Uint8List? get photoBytes => photoB64 == null ? null : base64Decode(photoB64!);
 
@@ -84,7 +89,7 @@ class TeacherProfile {
         subjects: [for (final s in (m['subjects'] as List<dynamic>? ?? [])) s as String],
         languages: [for (final s in (m['languages'] as List<dynamic>? ?? [])) s as String],
         priceNote: (m['priceNote'] as String?) ?? '',
-        status: (m['status'] as String?) ?? teacherStatusPending,
+        status: (m['status'] as String?) ?? teacherStatusApproved,
         photoB64: m['photoB64'] as String?,
         cvName: m['cvName'] as String?,
       );
@@ -170,16 +175,20 @@ abstract class TeacherRepository {
   Future<void> signIn(String email, String password);
   Future<void> signOut();
 
-  /// Only teachers the app owner approved.
+  /// Teachers that are visible (not suspended by the app owner).
   Future<List<TeacherProfile>> approvedTeachers();
   Future<TeacherProfile?> myTeacherProfile();
 
-  /// A new profile starts as pending; saving never changes the status.
+  /// A new profile is visible at once. Saving never lets a teacher change a
+  /// suspension.
   /// [newCv], when given, replaces the stored CV (profile.cvName should match).
   Future<void> saveTeacherProfile(TeacherProfile profile, {CvFile? newCv});
 
   /// The CV of an approved teacher (or your own), or null if there is none.
   Future<CvFile?> loadCv(String teacherUid);
+
+  /// A parent's report about a teacher. Only the app owner can read it (console).
+  Future<void> reportTeacher(String teacherUid, String reason);
 
   Future<void> requestBooking(Booking booking);
 
