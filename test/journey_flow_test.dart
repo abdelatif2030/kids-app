@@ -282,6 +282,19 @@ void main() {
       expect(find.text('فيديوهات تعليمية'), findsOneWidget);
     });
 
+    testWidgets('English: tabs, greeting and today\'s adventure follow the interface language', (tester) async {
+      await tester.runAsync(() => AppLocale.instance.set('en'));
+      addTearDown(() => AppLocale.instance.set('ar'));
+      await openShell(tester);
+      expect(find.text('Hello سلمى!'), findsOneWidget);
+      expect(find.text('Today\'s adventure'), findsOneWidget);
+      expect(find.text('Start today\'s journey'), findsOneWidget);
+      expect(find.text('Games'), findsOneWidget);
+      expect(find.text('Home'), findsOneWidget);
+      expect(find.text('0 of 3 activities · about 4 minutes each'), findsOneWidget);
+      expect(find.text('Letter Land · Level 1'), findsWidgets);
+    });
+
     testWidgets('today\'s adventure ticks off finished activities', (tester) async {
       await openShell(tester);
       final planned = JourneyStore.instance.todayPlan('kid1');

@@ -204,6 +204,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         decoration: InputDecoration(
           labelText: context.tr('ob.child.name'),
           helperText: context.tr('ob.child.nameHelp'),
+              helperMaxLines: 2,
           filled: true,
           fillColor: DS.surface,
           errorText: _error,

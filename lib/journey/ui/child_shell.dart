@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../games_screen.dart';
+import '../../l10n/strings.dart';
 import '../../parent_screens.dart';
 import '../../parent_settings.dart';
 import '../../drawing_screen.dart';
@@ -78,7 +79,7 @@ class _ChildShellState extends State<ChildShell> {
                       Expanded(
                         child: _NavItem(
                           icon: item.$1,
-                          label: item.$2,
+                          label: context.tr(item.$2),
                           selected: _tab == i,
                           onTap: () => setState(() => _tab = i),
                         ),
@@ -94,10 +95,10 @@ class _ChildShellState extends State<ChildShell> {
   }
 
   static const _items = [
-    (Icons.home_rounded, 'الرئيسية'),
-    (Icons.sports_esports_rounded, 'ألعاب'),
-    (Icons.palette_rounded, 'إبداع'),
-    (Icons.face_rounded, 'أنا'),
+    (Icons.home_rounded, 'tab.home'),
+    (Icons.sports_esports_rounded, 'tab.games'),
+    (Icons.palette_rounded, 'tab.create'),
+    (Icons.face_rounded, 'tab.me'),
   ];
 }
 

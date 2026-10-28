@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'app_locale.dart';
+import 'strings_home.dart';
 import 'strings_letters.dart';
 import 'strings_onboarding.dart';
 
@@ -56,7 +57,7 @@ String trKey(String key, [String? lang]) {
 }
 
 /// Every dictionary the app uses; add new screens' dictionaries here.
-const List<Map<String, Map<String, String>>> kAllStrings = [kStrings, kOnboardingStrings, kLetterStrings];
+const List<Map<String, Map<String, String>>> kAllStrings = [kStrings, kOnboardingStrings, kLetterStrings, kHomeStrings];
 
 /// `{name}`-style placeholders filled in.
 String trArgs(String key, Map<String, Object> args) {

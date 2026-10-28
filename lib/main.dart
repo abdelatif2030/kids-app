@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'curriculum.dart';
+import 'design/tokens.dart';
 import 'display_prefs.dart';
 import 'l10n/app_locale.dart';
 import 'media/audio.dart';
@@ -37,7 +38,7 @@ class KidsApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'تطبيق الأطفال',
       theme: ThemeData(
-        colorSchemeSeed: Colors.orange,
+        colorSchemeSeed: DS.primary,
         useMaterial3: true,
         fontFamily: 'Tajawal',
         scaffoldBackgroundColor: RC.bg,

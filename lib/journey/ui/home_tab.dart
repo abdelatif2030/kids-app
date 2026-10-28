@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/strings.dart';
 import '../../main.dart' show VideoListScreen;
 import '../../parent_screens.dart';
 import '../../subjects_screen.dart';
@@ -54,7 +55,7 @@ class HomeTab extends StatelessWidget {
                 Row(
                   children: [
                     IconButton(
-                      tooltip: 'خروج (للأهل)',
+                      tooltip: context.tr('home.exit'),
                       onPressed: onExit,
                       icon: const Icon(Icons.lock_outline_rounded, color: RC.ink),
                     ),
@@ -70,10 +71,10 @@ class HomeTab extends StatelessWidget {
                           ),
                           child: Column(
                             children: [
-                              Text('أهلاً ${child.nickname}!',
+                              Text(trArgs('home.hello', {'name': child.nickname}),
                                   style: const TextStyle(
                                       fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
-                              Text('⭐ ${progress.totalStars}   ·   المستوى ${progress.explorerLevel}',
+                              Text('⭐ ${progress.totalStars}   ·   ${trArgs('home.level', {'n': progress.explorerLevel})}',
                                   style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink)),
                             ],
                           ),
@@ -81,7 +82,7 @@ class HomeTab extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      tooltip: 'إعدادات الوالدين',
+                      tooltip: context.tr('home.parent'),
                       onPressed: () => openParentArea(context),
                       icon: const Icon(Icons.settings_rounded, color: RC.ink),
                     ),
@@ -96,8 +97,8 @@ class HomeTab extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   onTap: next == null ? null : () => _play(context, next!.activity),
                   semanticLabel: plan.isEmpty
-                      ? 'مغامرة اليوم'
-                      : 'مغامرة اليوم، أنهيت $done من ${plan.length}',
+                      ? context.tr('home.today')
+                      : trArgs('home.todayAria', {'done': done, 'total': plan.length}),
                   child: Row(
                     children: [
                       Container(
@@ -111,15 +112,15 @@ class HomeTab extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(allDone ? 'أحسنت! أنهيت مغامرة اليوم 🏅' : 'مغامرة اليوم',
+                            Text(allDone ? context.tr('home.todayDone') : context.tr('home.today'),
                                 style: const TextStyle(
                                     fontSize: 24, fontWeight: FontWeight.w900, color: RC.ink)),
                             const SizedBox(height: 4),
                             if (plan.isEmpty)
-                              const Text('أنهيت كل الأراضي! جرّب جمع نجوم أكثر من الخريطة.',
-                                  style: TextStyle(fontSize: 15, color: RC.ink))
+                              Text(context.tr('home.allLands'),
+                                  style: const TextStyle(fontSize: 15, color: RC.ink))
                             else ...[
-                              Text('$done من ${plan.length} أنشطة · نحو ${plan.first.minutes} دقائق لكل نشاط',
+                              Text(trArgs('home.progress', {'done': done, 'total': plan.length, 'm': plan.first.minutes}),
                                   style: const TextStyle(fontSize: 15, color: RC.ink)),
                               const SizedBox(height: 8),
                               RProgress(value: done / plan.length, color: RC.pinkDeep),
@@ -140,8 +141,8 @@ class HomeTab extends StatelessWidget {
                       ),
                       onPressed: () => _play(context, next!.activity),
                       icon: const Icon(Icons.play_arrow_rounded, size: 34),
-                      label: const Text('ابدأ رحلة اليوم',
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+                      label: Text(context.tr('home.start'),
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
                     ),
                   ),
                 const SizedBox(height: 12),
@@ -152,7 +153,7 @@ class HomeTab extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       onTap: () => _play(context, p.activity),
                       semanticLabel:
-                          '${p.activity.title}، ${p.reason}، ${p.doneToday ? 'تم' : 'لم يتم بعد'}',
+                          '${activityTitle(p.activity)}، ${p.reason}، ${p.doneToday ? context.tr('home.done') : context.tr('home.notYet')}',
                       child: Row(
                         children: [
                           CircleAvatar(
@@ -164,10 +165,10 @@ class HomeTab extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(p.activity.title,
+                                Text(activityTitle(p.activity),
                                     style: const TextStyle(
                                         fontSize: 17, fontWeight: FontWeight.bold, color: RC.ink)),
-                                Text('${p.reason} · ${p.minutes} دقائق',
+                                Text('${p.reason} · ${trArgs('home.minutes', {'m': p.minutes})}',
                                     style: const TextStyle(fontSize: 13, color: RC.ink)),
                               ],
                             ),
@@ -190,14 +191,14 @@ class HomeTab extends StatelessWidget {
                         context,
                         MaterialPageRoute(builder: (_) => ExploreScreen(child: child)),
                       ),
-                      semanticLabel: 'اكتشف مع ماما وبابا',
-                      child: const Row(
+                      semanticLabel: context.tr('home.explore'),
+                      child: Row(
                         children: [
-                          Text('👨‍👩‍👧', style: TextStyle(fontSize: 38)),
-                          SizedBox(width: 12),
+                          const Text('👨‍👩‍👧', style: TextStyle(fontSize: 38)),
+                          const SizedBox(width: 12),
                           Expanded(
-                            child: Text('اكتشف مع ماما وبابا',
-                                style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: RC.ink)),
+                            child: Text(context.tr('home.explore'),
+                                style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: RC.ink)),
                           ),
                           Icon(Icons.chevron_left_rounded, color: RC.ink),
                         ],
@@ -372,3 +373,6 @@ class _MoreCard extends StatelessWidget {
     );
   }
 }
+
+/// "Land · Level n" in the interface language.
+String activityTitle(Activity a) => '${trKey('land.${a.landId}')} · ${trArgs('home.level', {'n': a.level})}';

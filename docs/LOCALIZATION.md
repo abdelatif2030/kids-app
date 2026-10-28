@@ -16,3 +16,7 @@ Numbers use Western digits in both languages (common in Egypt); no Arabic-Indic 
 
 ## Update: guided Arabic letter lesson
 `lib/literacy/guided_lesson.dart` (button «ابدأ الدرس» on each letter): 6 steps (see + hear the NAME, hear the SOUND, illustrated word with the letter highlighted, find the letter in the word, pick the picture, pick the letter). Interface texts are Arabic/English; the letters and words stay Arabic. Audio is the device voice (demo), pictures are emoji: real recordings and original illustrations are still needed (docs/CONTENT_REVIEW.md). Records: opened and audio-played are exposure only; practice after the lesson; demonstrated only if all three questions were right first try.
+
+## Update: child shell
+Translated: bottom tabs, greeting, today's adventure card, start button, land names in the plan list. NOT translated: the recommender's reasons ("why this activity"), the other tabs' contents (games, create, me), lands/quiz content.
+The child's navigation is still Home / Games / Create / Me. The requested My Journey / Learn / Stories / Activities / Achievements structure is NOT built; it would need a reorganisation of the tabs and tests.
