@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'home_screen.dart';
+import 'journey/repository.dart';
+import 'journey/ui/child_shell.dart';
 import 'parent_screens.dart';
 import 'session_manager.dart';
 import 'ui.dart';
@@ -81,8 +82,9 @@ class RestScreen extends StatelessWidget {
     if (!context.mounted) return;
     if (choice == 'extend' || choice == 'back') {
       final session = SessionManager.instance;
-      final age = session.currentAge;
-      if (age == null) {
+      final child = JourneyStore.instance.active;
+      final age = child?.age ?? session.currentAge;
+      if (child == null || age == null) {
         Navigator.popUntil(context, (r) => r.isFirst);
         return;
       }
@@ -91,7 +93,7 @@ class RestScreen extends StatelessWidget {
       if (!context.mounted) return;
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => HomeScreen(age: age)),
+        MaterialPageRoute(builder: (_) => ChildShell(child: child)),
         (route) => route.isFirst,
       );
     } else if (choice == 'end') {

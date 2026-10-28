@@ -5,20 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'curriculum.dart';
-import 'drawing_screen.dart';
 import 'firebase_config.dart';
-import 'games_screen.dart';
-import 'home_screen.dart';
-import 'parent_screens.dart';
+import 'journey/repository.dart';
+import 'journey/ui/kit.dart' show RC;
+import 'journey/ui/start_screen.dart';
 import 'player_screen.dart';
 import 'rest_screen.dart';
 import 'session_manager.dart';
-import 'subjects_screen.dart';
 import 'ui.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initFirebase();
+  await JourneyStore.instance.load();
   runApp(const KidsApp());
 }
 
@@ -33,7 +32,8 @@ class KidsApp extends StatelessWidget {
       theme: ThemeData(
         colorSchemeSeed: Colors.orange,
         useMaterial3: true,
-        scaffoldBackgroundColor: kBackground,
+        fontFamily: 'Tajawal',
+        scaffoldBackgroundColor: RC.bg,
         appBarTheme: const AppBarTheme(
           centerTitle: true,
           backgroundColor: Colors.transparent,
@@ -49,7 +49,7 @@ class KidsApp extends StatelessWidget {
       // Arabic-first: the whole app is right-to-left.
       builder: (context, child) =>
           Directionality(textDirection: TextDirection.rtl, child: child!),
-      home: const AgeScreen(),
+      home: const StartScreen(),
     );
   }
 }
@@ -87,105 +87,6 @@ Future<List<Video>> loadVideos() async {
   final raw = await rootBundle.loadString('assets/videos.json');
   final list = jsonDecode(raw) as List<dynamic>;
   return [for (final e in list) Video.fromJson(e as Map<String, dynamic>)];
-}
-
-class AgeScreen extends StatelessWidget {
-  const AgeScreen({super.key});
-
-  /// Picking an age is the parent starting child mode.
-  Future<void> _startSession(BuildContext context, int age) async {
-    final session = SessionManager.instance;
-    final blocked = await session.check();
-    if (!context.mounted) return;
-    if (blocked != null) {
-      session.currentAge = age;
-      goToRest(context, blocked);
-      return;
-    }
-    await session.start(age);
-    if (!context.mounted) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => HomeScreen(age: age)),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SceneScaffold(
-      actions: [
-        IconButton(
-          iconSize: 32,
-          icon: const Icon(Icons.settings),
-          tooltip: 'إعدادات الوالدين',
-          onPressed: () => openParentArea(context),
-        ),
-      ],
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const OutlinedTitle('مدرستي', size: 52),
-              const SizedBox(height: 4),
-              const Friends(size: 120),
-              const SizedBox(height: 12),
-              const OutlinedTitle('كم عمر طفلك؟', size: 30, fill: Colors.white),
-              const SizedBox(height: 20),
-              Wrap(
-                spacing: 14,
-                runSpacing: 14,
-                alignment: WrapAlignment.center,
-                children: [
-                  for (var age = 1; age <= 12; age++)
-                    SizedBox(
-                      width: 96,
-                      height: 96,
-                      child: FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: kBright[(age - 1) % kBright.length],
-                          elevation: 4,
-                          padding: EdgeInsets.zero,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(26),
-                            side: const BorderSide(color: BigTile.outline, width: 4),
-                          ),
-                        ),
-                        onPressed: () => _startSession(context, age),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '$age',
-                              style: const TextStyle(fontSize: 40, fontWeight: FontWeight.w900),
-                            ),
-                            Text(age == 2 ? 'سنتان' : age == 1 || age >= 11 ? 'سنة' : 'سنوات',
-                                style: const TextStyle(fontSize: 13)),
-                          ],
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Opens one of the child's home sections.
-void openSection(BuildContext context, int age, String section) {
-  final Widget screen = switch (section) {
-    'subjects' => SubjectsScreen(age: age),
-    'games' => GamesScreen(age: age),
-    'draw' => const DrawingScreen(),
-    'plan' => VideoListScreen(age: age, autoPlan: true),
-    _ => VideoListScreen(age: age),
-  };
-  Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
 }
 
 class _VideoCard extends StatelessWidget {

@@ -7,10 +7,10 @@ import 'memory_game.dart';
 import 'ui.dart';
 import 'where_animal_game.dart';
 
-/// قايمة الألعاب. كل لعبة بتظهر للعمر المناسب بس.
-class GamesScreen extends StatelessWidget {
+/// The games that suit [age], as big tiles.
+class GamesGrid extends StatelessWidget {
   final int age;
-  const GamesScreen({super.key, required this.age});
+  const GamesGrid({super.key, required this.age});
 
   @override
   Widget build(BuildContext context) {
@@ -27,28 +27,39 @@ class GamesScreen extends StatelessWidget {
       for (var i = 0; i < games.length; i++)
         if (age >= games[i].$3 && age <= games[i].$4) i,
     ];
+    return Wrap(
+      spacing: 20,
+      runSpacing: 20,
+      alignment: WrapAlignment.center,
+      children: [
+        for (final i in available)
+          BigTile(
+            label: games[i].$1,
+            icon: games[i].$2,
+            color: kBright[i % kBright.length],
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => games[i].$5()),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// قايمة الألعاب. كل لعبة بتظهر للعمر المناسب بس.
+class GamesScreen extends StatelessWidget {
+  final int age;
+  const GamesScreen({super.key, required this.age});
+
+  @override
+  Widget build(BuildContext context) {
     return SceneScaffold(
       title: 'ألعاب',
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
-          child: Wrap(
-            spacing: 20,
-            runSpacing: 20,
-            alignment: WrapAlignment.center,
-            children: [
-              for (final i in available)
-                BigTile(
-                  label: games[i].$1,
-                  icon: games[i].$2,
-                  color: kBright[i % kBright.length],
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => games[i].$5()),
-                  ),
-                ),
-            ],
-          ),
+          child: GamesGrid(age: age),
         ),
       ),
     );

@@ -49,7 +49,7 @@ class BigTile extends StatelessWidget {
     this.dim = false,
   });
 
-  static const outline = Color(0xFF2F5D50);
+  static const outline = Color(0xFF6F8FD8);
 
   @override
   Widget build(BuildContext context) {
