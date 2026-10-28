@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'color_game.dart';
+import 'games/game_catalog.dart';
+import 'games/game_common.dart';
+import 'journey/models.dart';
+import 'journey/ui/kit.dart';
 import 'letters_game.dart';
 import 'math_game.dart';
 import 'memory_game.dart';
@@ -11,7 +15,11 @@ import 'l10n/strings.dart';
 /// The games that suit [age], as big tiles.
 class GamesGrid extends StatelessWidget {
   final int age;
-  const GamesGrid({super.key, required this.age});
+
+  /// The child playing, so finished games and the learning language are remembered. Without one the
+  /// educational games still open but remember nothing.
+  final ChildProfile? child;
+  const GamesGrid({super.key, required this.age, this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +36,23 @@ class GamesGrid extends StatelessWidget {
       for (var i = 0; i < games.length; i++)
         if (age >= games[i].$3 && age <= games[i].$4) i,
     ];
+    final childId = child?.id ?? 'guest';
+    final learn = gamesForAge(age);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _oldGames(context, games, available),
+        if (learn.isNotEmpty) ...[
+          const SizedBox(height: 24),
+          Text(tr2('ألعاب تعليمية', 'Learning games'), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: RC.ink)),
+          const SizedBox(height: 12),
+          LearningGamesList(age: age, childId: childId, learnLang: learnLangOf(child)),
+        ],
+      ],
+    );
+  }
+
+  Widget _oldGames(BuildContext context, List<(String, IconData, int, int, Widget Function())> games, List<int> available) {
     return Wrap(
       spacing: 20,
       runSpacing: 20,
@@ -140,6 +165,66 @@ class _BalloonGameState extends State<BalloonGame> {
                 ],
               ),
       ),
+    );
+  }
+}
+/// The new educational games as cards (title, ages, objective, a check once finished).
+class LearningGamesList extends StatefulWidget {
+  final int age;
+  final String childId;
+  final String learnLang;
+  const LearningGamesList({super.key, required this.age, required this.childId, required this.learnLang});
+
+  @override
+  State<LearningGamesList> createState() => _LearningGamesListState();
+}
+
+class _LearningGamesListState extends State<LearningGamesList> {
+  late Future<Set<String>> _done = GameRewards.doneIds(widget.childId);
+
+  @override
+  Widget build(BuildContext context) {
+    final learn = gamesForAge(widget.age);
+    return FutureBuilder<Set<String>>(
+      future: _done,
+      builder: (context, snap) {
+        final done = snap.data ?? const <String>{};
+        return Column(
+          children: [
+            for (final g in learn)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: RCard(
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => g.build(widget.childId, widget.age, widget.learnLang)),
+                    );
+                    if (mounted) setState(() => _done = GameRewards.doneIds(widget.childId));
+                  },
+                  semanticLabel: '${g.title()}. ${tr2('الأعمار', 'Ages')} ${g.ages}. ${g.objective()}',
+                  child: Row(
+                    children: [
+                      Icon(g.icon, size: 44, color: RC.pinkDeep),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(g.title(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: RC.ink)),
+                            Text(g.objective(), style: const TextStyle(fontSize: 14, color: RC.ink)),
+                            Text('${tr2('الأعمار', 'Ages')} ${g.ages}', style: const TextStyle(fontSize: 12, color: RC.ink)),
+                          ],
+                        ),
+                      ),
+                      if (done.contains(g.id)) const Icon(Icons.check_circle_rounded, color: Colors.green),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }

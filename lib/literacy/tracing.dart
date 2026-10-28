@@ -10,7 +10,11 @@ import '../l10n/strings.dart';
 class TracingView extends StatefulWidget {
   final ArabicLetter letter;
   final VoidCallback onDone;
-  const TracingView({super.key, required this.letter, required this.onDone});
+
+  /// Shows a general cue that Arabic is written from right to left. It is NOT a per-letter
+  /// stroke order: the order of strokes has not been checked against a reference.
+  final bool showDirectionCue;
+  const TracingView({super.key, required this.letter, required this.onDone, this.showDirectionCue = false});
 
   /// Total drawn length (in logical pixels) before "done" is offered.
   static const minLength = 350.0;
@@ -46,6 +50,21 @@ class _TracingViewState extends State<TracingView> {
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: RC.ink),
           ),
         ),
+        if (widget.showDirectionCue)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(
+              key: const ValueKey('direction-cue'),
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.circle, size: 14, color: RC.pinkDeep),
+                const SizedBox(width: 6),
+                Flexible(child: Text(tr2('ابدأ من اليمين', 'Start on the right'), style: const TextStyle(fontSize: 16, color: RC.ink))),
+                const SizedBox(width: 8),
+                const Icon(Icons.west_rounded, color: RC.pinkDeep),
+              ],
+            ),
+          ),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -94,7 +113,7 @@ class _TracingViewState extends State<TracingView> {
                     _length = 0;
                   }),
                   icon: const Icon(Icons.refresh_rounded),
-                  label: Text(loc('امسح وأعد'), style: TextStyle(fontSize: 18)),
+                  label: FittedBox(fit: BoxFit.scaleDown, child: Text(loc('امسح وأعد'), style: const TextStyle(fontSize: 18))),
                 ),
               ),
               const SizedBox(width: 12),
@@ -102,7 +121,7 @@ class _TracingViewState extends State<TracingView> {
                 child: FilledButton.icon(
                   onPressed: enough ? widget.onDone : null,
                   icon: const Icon(Icons.check_rounded),
-                  label: Text(loc('تم'), style: TextStyle(fontSize: 18)),
+                  label: FittedBox(fit: BoxFit.scaleDown, child: Text(loc('تم'), style: const TextStyle(fontSize: 18))),
                 ),
               ),
             ],

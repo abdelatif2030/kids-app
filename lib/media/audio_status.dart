@@ -87,3 +87,11 @@ AudioStatusSummary summarize(Iterable<AudioItemStatus> items) {
 
 List<AudioItemStatus> statusesOf(AudioManifest m, {required bool deviceVoiceEnabled}) =>
     [for (final a in m.all) audioItemStatus(a, deviceVoiceEnabled: deviceVoiceEnabled)];
+
+/// Status for a text that is spoken in [lang]: the manifest item for it when the content has one,
+/// otherwise a text with no manifest entry, which only the device voice can read.
+AudioItemStatus audioStatusForText(AudioManifest m, String lang, String text, {required bool deviceVoiceEnabled}) {
+  final a = m.forText(lang, text) ??
+      AudioAsset(id: 'adhoc.$lang.$text', lang: lang, locale: lang, kind: AudioKind.word, text: text, ref: 'text');
+  return audioItemStatus(a, deviceVoiceEnabled: deviceVoiceEnabled);
+}

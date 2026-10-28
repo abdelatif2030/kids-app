@@ -60,7 +60,7 @@ class _ChildShellState extends State<ChildShell> {
           final child = JourneyStore.instance.profileById(widget.child.id) ?? widget.child;
           final tabs = [
             HomeTab(child: child, onExit: _exit, onTab: (i) => setState(() => _tab = i)),
-            _GamesTab(age: child.age),
+            _GamesTab(child: child),
             _CreateTab(child: child),
             MeTab(child: child),
           ];
@@ -147,8 +147,8 @@ class _NavItem extends StatelessWidget {
 }
 
 class _GamesTab extends StatelessWidget {
-  final int age;
-  const _GamesTab({required this.age});
+  final ChildProfile child;
+  const _GamesTab({required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +161,7 @@ class _GamesTab extends StatelessWidget {
             Text(loc('ألعاب'),
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: RC.ink)),
             const SizedBox(height: 16),
-            GamesGrid(age: age),
+            GamesGrid(age: child.age, child: child),
           ],
         ),
       ),
