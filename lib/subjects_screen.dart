@@ -23,11 +23,8 @@ class SubjectsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: const Text('دروسي', style: TextStyle(fontSize: 26)),
-      ),
+    return SceneScaffold(
+      title: 'دروسي',
       body: FutureBuilder<List<Video>>(
         future: loadVideos(),
         builder: (context, snapshot) {

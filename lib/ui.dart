@@ -30,7 +30,8 @@ Color categoryColor(String category) => switch (category) {
     };
 
 /// The one big, friendly tile used for every child choice (sections, subjects,
-/// games): gradient, soft shadow, large icon, and an optional small badge.
+/// games): a thick outline, a big colored picture and a label bar, like a
+/// sticker. An optional small badge sits under the label.
 class BigTile extends StatelessWidget {
   final String label;
   final IconData icon;
@@ -48,66 +49,420 @@ class BigTile extends StatelessWidget {
     this.dim = false,
   });
 
+  static const outline = Color(0xFF2F5D50);
+
   @override
   Widget build(BuildContext context) {
     final hsl = HSLColor.fromColor(color);
-    final dark = hsl.withLightness((hsl.lightness - 0.12).clamp(0.0, 1.0)).toColor();
+    final dark = hsl.withLightness((hsl.lightness - 0.1).clamp(0.0, 1.0)).toColor();
+    final pale = hsl.withLightness(0.93).withSaturation(0.7).toColor();
     return Opacity(
-      opacity: dim ? 0.55 : 1,
+      opacity: dim ? 0.6 : 1,
       child: SizedBox(
         width: 156,
-        height: 168,
+        height: 172,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [color, dark],
-            ),
-            borderRadius: BorderRadius.circular(28),
-            boxShadow: [
-              BoxShadow(color: color.withAlpha(90), blurRadius: 12, offset: const Offset(0, 6)),
-            ],
+            color: pale,
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: outline, width: 4),
+            boxShadow: const [BoxShadow(color: Color(0x55000000), offset: Offset(0, 6))],
           ),
           child: Material(
             color: Colors.transparent,
+            clipBehavior: Clip.antiAlias,
+            borderRadius: BorderRadius.circular(22),
             child: InkWell(
-              borderRadius: BorderRadius.circular(28),
               onTap: onTap,
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 76,
-                      height: 76,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Color(0x33FFFFFF),
-                      ),
-                      child: Icon(icon, size: 48, color: Colors.white),
-                    ),
-                    const SizedBox(height: 8),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        label,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: Container(
+                        width: 84,
+                        height: 84,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
                           color: Colors.white,
+                          border: Border.all(color: color, width: 4),
                         ),
+                        child: Icon(icon, size: 50, color: dark),
                       ),
                     ),
-                    if (badge != null)
-                      Text(badge!, style: const TextStyle(fontSize: 14, color: Colors.white70)),
-                  ],
-                ),
+                  ),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                    color: color,
+                    child: Column(
+                      children: [
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            label,
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        if (badge != null)
+                          Text(badge!,
+                              style: const TextStyle(fontSize: 13, color: Colors.white70)),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Big playful title: yellow letters with a dark outline.
+class OutlinedTitle extends StatelessWidget {
+  final String text;
+  final double size;
+  final Color fill;
+  const OutlinedTitle(this.text, {super.key, this.size = 52, this.fill = const Color(0xFFFFC107)});
+
+  @override
+  Widget build(BuildContext context) {
+    final base = TextStyle(fontSize: size, fontWeight: FontWeight.w900, height: 1.1);
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Text(
+          text,
+          textAlign: TextAlign.center,
+          style: base.copyWith(
+            foreground: Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = size / 6
+              ..strokeJoin = StrokeJoin.round
+              ..color = const Color(0xFF6D3B12),
+          ),
+        ),
+        Text(text, textAlign: TextAlign.center, style: base.copyWith(color: fill)),
+      ],
+    );
+  }
+}
+
+/// The big green "let's play" button.
+class PlayButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+  const PlayButton({super.key, required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 300,
+        height: 76,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF7CD957), Color(0xFF45A83A)],
+          ),
+          borderRadius: BorderRadius.circular(38),
+          border: Border.all(color: BigTile.outline, width: 4),
+          boxShadow: const [BoxShadow(color: Color(0x55000000), offset: Offset(0, 6))],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(label,
+                style: const TextStyle(
+                    fontSize: 30, fontWeight: FontWeight.w900, color: Colors.white)),
+            const SizedBox(width: 12),
+            Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFB74D),
+                shape: BoxShape.circle,
+                border: Border.all(color: BigTile.outline, width: 3),
+              ),
+              child: const Icon(Icons.play_arrow_rounded, size: 34, color: Colors.white),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A scene drawn in code: sky, clouds, hills, trees and flowers.
+class SceneBackground extends StatelessWidget {
+  final Widget child;
+  const SceneBackground({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        const CustomPaint(painter: _ScenePainter()),
+        child,
+      ],
+    );
+  }
+}
+
+/// A Scaffold whose body sits on the [SceneBackground], under a transparent app bar.
+class SceneScaffold extends StatelessWidget {
+  final String? title;
+  final List<Widget>? actions;
+  final Widget body;
+  const SceneScaffold({super.key, this.title, this.actions, required this.body});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: title == null ? null : Text(title!, style: const TextStyle(fontSize: 26)),
+        actions: actions,
+      ),
+      body: SceneBackground(
+        child: SafeArea(
+          child: Padding(padding: const EdgeInsets.only(top: kToolbarHeight), child: body),
+        ),
+      ),
+    );
+  }
+}
+
+class _ScenePainter extends CustomPainter {
+  const _ScenePainter();
+
+  @override
+  void paint(Canvas canvas, Size s) {
+    final w = s.width;
+    final h = s.height;
+    final p = Paint();
+
+    // Sky.
+    p.shader = const LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [Color(0xFF8CC8F6), Color(0xFFD9F1FF)],
+    ).createShader(Rect.fromLTWH(0, 0, w, h));
+    canvas.drawRect(Rect.fromLTWH(0, 0, w, h), p);
+    p.shader = null;
+
+    // Clouds.
+    void cloud(double cx, double cy, double r) {
+      p.color = Colors.white.withAlpha(235);
+      canvas.drawCircle(Offset(cx - r * 1.1, cy + r * 0.2), r * 0.7, p);
+      canvas.drawCircle(Offset(cx, cy - r * 0.1), r, p);
+      canvas.drawCircle(Offset(cx + r * 1.2, cy + r * 0.25), r * 0.75, p);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTRB(cx - r * 1.7, cy + r * 0.2, cx + r * 1.9, cy + r * 0.95),
+          Radius.circular(r * 0.4),
+        ),
+        p,
+      );
+    }
+
+    final u = (w < h ? w : h) / 390; // a unit that scales with the screen
+    cloud(w * 0.18, h * 0.14, 26 * u);
+    cloud(w * 0.78, h * 0.09, 20 * u);
+    cloud(w * 0.55, h * 0.30, 16 * u);
+
+    // Back hill, then front hill.
+    p.color = const Color(0xFF9ED67B);
+    canvas.drawPath(
+      Path()
+        ..moveTo(0, h * 0.78)
+        ..cubicTo(w * 0.2, h * 0.66, w * 0.45, h * 0.70, w * 0.62, h * 0.76)
+        ..cubicTo(w * 0.8, h * 0.82, w * 0.92, h * 0.70, w, h * 0.72)
+        ..lineTo(w, h)
+        ..lineTo(0, h)
+        ..close(),
+      p,
+    );
+    p.color = const Color(0xFF6CC24A);
+    canvas.drawPath(
+      Path()
+        ..moveTo(0, h * 0.88)
+        ..cubicTo(w * 0.25, h * 0.80, w * 0.55, h * 0.92, w * 0.8, h * 0.85)
+        ..cubicTo(w * 0.9, h * 0.82, w * 0.96, h * 0.84, w, h * 0.83)
+        ..lineTo(w, h)
+        ..lineTo(0, h)
+        ..close(),
+      p,
+    );
+
+    // Trees.
+    void tree(double x, double base, double r) {
+      p.color = const Color(0xFF8D5B35);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(x - r * 0.18, base - r * 1.2, r * 0.36, r * 1.3),
+          Radius.circular(r * 0.1),
+        ),
+        p,
+      );
+      p.color = const Color(0xFF3E9D4A);
+      canvas.drawCircle(Offset(x, base - r * 1.5), r, p);
+      p.color = const Color(0xFF58B85C);
+      canvas.drawCircle(Offset(x - r * 0.3, base - r * 1.7), r * 0.45, p);
+    }
+
+    tree(w * 0.08, h * 0.80, 26 * u);
+    tree(w * 0.93, h * 0.78, 30 * u);
+    tree(w * 0.83, h * 0.86, 20 * u);
+
+    // Flowers.
+    const flowers = [
+      (0.22, 0.93, Color(0xFFFFFFFF)),
+      (0.36, 0.96, Color(0xFFFFC1D9)),
+      (0.5, 0.91, Color(0xFFFFFFFF)),
+      (0.66, 0.95, Color(0xFFFFE082)),
+      (0.12, 0.97, Color(0xFFFFE082)),
+      (0.9, 0.95, Color(0xFFFFFFFF)),
+    ];
+    for (final f in flowers) {
+      p.color = f.$3;
+      canvas.drawCircle(Offset(w * f.$1, h * f.$2), 4 * u, p);
+      p.color = const Color(0xFFFFB300);
+      canvas.drawCircle(Offset(w * f.$1, h * f.$2), 1.6 * u, p);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// A white bunny, drawn in code.
+class Bunny extends StatelessWidget {
+  final double size;
+  const Bunny({super.key, this.size = 100});
+
+  @override
+  Widget build(BuildContext context) =>
+      CustomPaint(size: Size(size, size), painter: _BunnyPainter());
+}
+
+class _BunnyPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size s) {
+    final w = s.width;
+    final p = Paint();
+    // Ears.
+    for (final x in [0.34, 0.66]) {
+      p.color = Colors.white;
+      canvas.drawOval(Rect.fromCenter(center: Offset(w * x, w * 0.22), width: w * 0.2, height: w * 0.46), p);
+      p.color = const Color(0xFFF8BBD0);
+      canvas.drawOval(Rect.fromCenter(center: Offset(w * x, w * 0.24), width: w * 0.09, height: w * 0.3), p);
+    }
+    // Body and head.
+    p.color = Colors.white;
+    canvas.drawOval(Rect.fromCenter(center: Offset(w / 2, w * 0.88), width: w * 0.6, height: w * 0.4), p);
+    canvas.drawCircle(Offset(w / 2, w * 0.6), w * 0.3, p);
+    p.style = PaintingStyle.stroke;
+    p.strokeWidth = w * 0.02;
+    p.color = const Color(0xFFB0BEC5);
+    canvas.drawCircle(Offset(w / 2, w * 0.6), w * 0.3, p);
+    p.style = PaintingStyle.fill;
+    // Face.
+    p.color = const Color(0xFF3E2723);
+    for (final x in [0.4, 0.6]) {
+      canvas.drawCircle(Offset(w * x, w * 0.57), w * 0.035, p);
+    }
+    p.color = const Color(0xFFF48FB1);
+    canvas.drawCircle(Offset(w / 2, w * 0.64), w * 0.03, p);
+    p.color = const Color(0x66F48FB1);
+    for (final x in [0.33, 0.67]) {
+      canvas.drawCircle(Offset(w * x, w * 0.66), w * 0.045, p);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// A gray kitten, drawn in code.
+class Kitten extends StatelessWidget {
+  final double size;
+  const Kitten({super.key, this.size = 100});
+
+  @override
+  Widget build(BuildContext context) =>
+      CustomPaint(size: Size(size, size), painter: _KittenPainter());
+}
+
+class _KittenPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size s) {
+    final w = s.width;
+    final p = Paint()..color = const Color(0xFF90A4AE);
+    // Ears.
+    for (final dir in [-1.0, 1.0]) {
+      final cx = w / 2 + dir * w * 0.22;
+      canvas.drawPath(
+        Path()
+          ..moveTo(cx - w * 0.12, w * 0.45)
+          ..lineTo(cx + dir * w * 0.02, w * 0.12)
+          ..lineTo(cx + w * 0.12, w * 0.45)
+          ..close(),
+        p,
+      );
+    }
+    canvas.drawOval(Rect.fromCenter(center: Offset(w / 2, w * 0.9), width: w * 0.6, height: w * 0.4), p);
+    canvas.drawCircle(Offset(w / 2, w * 0.6), w * 0.3, p);
+    // Muzzle.
+    p.color = const Color(0xFFECEFF1);
+    canvas.drawOval(Rect.fromCenter(center: Offset(w / 2, w * 0.69), width: w * 0.26, height: w * 0.18), p);
+    // Face.
+    p.color = const Color(0xFF263238);
+    for (final x in [0.4, 0.6]) {
+      canvas.drawCircle(Offset(w * x, w * 0.57), w * 0.035, p);
+    }
+    p.color = const Color(0xFFF48FB1);
+    canvas.drawCircle(Offset(w / 2, w * 0.65), w * 0.028, p);
+    final line = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.012
+      ..color = const Color(0xFF455A64);
+    for (final dir in [-1.0, 1.0]) {
+      canvas.drawLine(Offset(w / 2 + dir * w * 0.1, w * 0.67), Offset(w / 2 + dir * w * 0.28, w * 0.64), line);
+      canvas.drawLine(Offset(w / 2 + dir * w * 0.1, w * 0.7), Offset(w / 2 + dir * w * 0.28, w * 0.72), line);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// The three friends, side by side.
+class Friends extends StatelessWidget {
+  final double size;
+  const Friends({super.key, this.size = 120});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: size,
+      width: size * 2.6,
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          Positioned(left: 0, bottom: 0, child: Kitten(size: size * 0.8)),
+          Positioned(right: 0, bottom: 0, child: Bunny(size: size * 0.8)),
+          Align(alignment: Alignment.bottomCenter, child: Mascot(size: size)),
+        ],
       ),
     );
   }

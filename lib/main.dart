@@ -112,45 +112,44 @@ class AgeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        actions: [
-          IconButton(
-            iconSize: 32,
-            icon: const Icon(Icons.settings),
-            tooltip: 'إعدادات الوالدين',
-            onPressed: () => openParentArea(context),
-          ),
-        ],
-      ),
+    return SceneScaffold(
+      actions: [
+        IconButton(
+          iconSize: 32,
+          icon: const Icon(Icons.settings),
+          tooltip: 'إعدادات الوالدين',
+          onPressed: () => openParentArea(context),
+        ),
+      ],
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Mascot(size: 160),
-              const SizedBox(height: 16),
-              const Text(
-                'كم عمر طفلك؟',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 24),
+              const OutlinedTitle('مدرستي', size: 52),
+              const SizedBox(height: 4),
+              const Friends(size: 120),
+              const SizedBox(height: 12),
+              const OutlinedTitle('كم عمر طفلك؟', size: 30, fill: Colors.white),
+              const SizedBox(height: 20),
               Wrap(
-                spacing: 16,
-                runSpacing: 16,
+                spacing: 14,
+                runSpacing: 14,
                 alignment: WrapAlignment.center,
                 children: [
                   for (var age = 1; age <= 12; age++)
                     SizedBox(
-                      width: 104,
-                      height: 104,
+                      width: 96,
+                      height: 96,
                       child: FilledButton(
                         style: FilledButton.styleFrom(
                           backgroundColor: kBright[(age - 1) % kBright.length],
+                          elevation: 4,
+                          padding: EdgeInsets.zero,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(28),
+                            borderRadius: BorderRadius.circular(26),
+                            side: const BorderSide(color: BigTile.outline, width: 4),
                           ),
                         ),
                         onPressed: () => _startSession(context, age),
@@ -159,10 +158,10 @@ class AgeScreen extends StatelessWidget {
                           children: [
                             Text(
                               '$age',
-                              style: const TextStyle(fontSize: 44, fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontSize: 40, fontWeight: FontWeight.w900),
                             ),
                             Text(age == 2 ? 'سنتان' : age == 1 || age >= 11 ? 'سنة' : 'سنوات',
-                                style: const TextStyle(fontSize: 14)),
+                                style: const TextStyle(fontSize: 13)),
                           ],
                         ),
                       ),
@@ -183,6 +182,7 @@ void openSection(BuildContext context, int age, String section) {
     'subjects' => SubjectsScreen(age: age),
     'games' => GamesScreen(age: age),
     'draw' => const DrawingScreen(),
+    'plan' => VideoListScreen(age: age, autoPlan: true),
     _ => VideoListScreen(age: age),
   };
   Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
@@ -263,7 +263,10 @@ class VideoListScreen extends StatefulWidget {
 
   /// A subject id from curriculum.dart, or null for all videos (with "today's plan").
   final String? subject;
-  const VideoListScreen({super.key, required this.age, this.subject});
+
+  /// Start "today's plan" as soon as the list loads (the home "let's play" button).
+  final bool autoPlan;
+  const VideoListScreen({super.key, required this.age, this.subject, this.autoPlan = false});
 
   @override
   State<VideoListScreen> createState() => _VideoListScreenState();
@@ -274,6 +277,7 @@ const _planOrder = ['Learning', 'Story', 'Fun'];
 
 class _VideoListScreenState extends State<VideoListScreen> {
   final _session = SessionManager.instance;
+  bool _planStarted = false;
 
   int get age => widget.age;
   String? get subject => widget.subject;
@@ -399,6 +403,12 @@ class _VideoListScreenState extends State<VideoListScreen> {
           final plan = _buildPlan(list);
           // "Today's plan" is the first row, only on the all-videos list.
           final offset = subject == null ? 1 : 0;
+          if (widget.autoPlan && !_planStarted && plan.isNotEmpty) {
+            _planStarted = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) _runPlan(plan);
+            });
+          }
           return ListView.builder(
             padding: const EdgeInsets.all(12),
             itemCount: list.length + offset,

@@ -27,8 +27,8 @@ class GamesScreen extends StatelessWidget {
       for (var i = 0; i < games.length; i++)
         if (age >= games[i].$3 && age <= games[i].$4) i,
     ];
-    return Scaffold(
-      appBar: AppBar(title: const Text('ألعاب', style: TextStyle(fontSize: 26))),
+    return SceneScaffold(
+      title: 'ألعاب',
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),

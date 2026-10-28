@@ -23,6 +23,13 @@ class _HomeScreenState extends State<HomeScreen> {
     ('رسم', Icons.brush_rounded, 'draw'),
   ];
 
+  static const _colors = [
+    Color(0xFFE53935),
+    Color(0xFF29B6F6),
+    Color(0xFF43A047),
+    Color(0xFF8E24AA),
+  ];
+
   @override
   void dispose() {
     // Deferred so listeners are not notified in the middle of tearing down.
@@ -32,32 +39,36 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Text('أهلاً، عمره ${widget.age} سنين', style: const TextStyle(fontSize: 26)),
-      ),
+    return SceneScaffold(
+      title: 'أهلاً، عمره ${widget.age} سنين',
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Mascot(size: 120),
+              const OutlinedTitle('مدرستي', size: 56),
+              const SizedBox(height: 4),
+              const Friends(size: 110),
               const SizedBox(height: 16),
               Wrap(
-                spacing: 20,
-                runSpacing: 20,
+                spacing: 16,
+                runSpacing: 16,
                 alignment: WrapAlignment.center,
                 children: [
                   for (var i = 0; i < _sections.length; i++)
                     BigTile(
                       label: _sections[i].$1,
                       icon: _sections[i].$2,
-                      color: kBright[i % kBright.length],
+                      color: _colors[i],
                       onTap: () => openSection(context, widget.age, _sections[i].$3),
                     ),
                 ],
+              ),
+              const SizedBox(height: 20),
+              PlayButton(
+                label: 'يلا نلعب!',
+                onTap: () => openSection(context, widget.age, 'plan'),
               ),
             ],
           ),
