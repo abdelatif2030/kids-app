@@ -9,7 +9,9 @@ import '../library/learning_records.dart';
 import '../library/lesson_engine.dart';
 import '../library/lesson_runner.dart';
 import '../media/audio.dart';
+import '../l10n/strings.dart';
 import 'exercises.dart';
+import 'guided_lesson.dart';
 import 'letters_data.dart';
 import 'mastery.dart';
 import 'tracing.dart';
@@ -344,6 +346,14 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
                 alignment: WrapAlignment.center,
                 children: [
                   FilledButton.icon(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => GuidedLetterLesson(child: widget.child, letter: l)),
+                    ),
+                    icon: const Icon(Icons.school_rounded),
+                    label: Text(context.tr('let.start')),
+                  ),
+                  OutlinedButton.icon(
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => run('تمرين حرف ${l.name}', () => QuizContent(letterSession(l)))),

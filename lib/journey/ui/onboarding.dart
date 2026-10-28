@@ -269,8 +269,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   );
 
   Widget _checkStep() {
-    if (_checkDone)
+    if (_checkDone) {
       return _CheckResult(draft: _draft, onContinue: () => _go(3));
+    }
     if (!_checkStarted) {
       return Column(
         children: [

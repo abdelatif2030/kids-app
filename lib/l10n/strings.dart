@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'app_locale.dart';
+import 'strings_letters.dart';
 import 'strings_onboarding.dart';
 
 /// Interface texts. Only screens that call `context.tr` are translated; the
@@ -55,7 +56,7 @@ String trKey(String key, [String? lang]) {
 }
 
 /// Every dictionary the app uses; add new screens' dictionaries here.
-const List<Map<String, Map<String, String>>> kAllStrings = [kStrings, kOnboardingStrings];
+const List<Map<String, Map<String, String>>> kAllStrings = [kStrings, kOnboardingStrings, kLetterStrings];
 
 /// `{name}`-style placeholders filled in.
 String trArgs(String key, Map<String, Object> args) {
