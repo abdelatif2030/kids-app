@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'journey/avatars.dart';
 import 'journey/repository.dart';
 import 'l10n/strings.dart';
 
@@ -10,6 +11,7 @@ import 'l10n/strings.dart';
 /// plan and the parent's notes. The parent PIN and the time limits stay.
 Future<void> deleteChildData() async {
   await JourneyStore.instance.resetAll();
+  ChildPhotoStore.clearCache();
   final prefs = await SharedPreferences.getInstance();
   for (final key in prefs.getKeys().toList()) {
     if (key == 'watch_history' ||
@@ -21,6 +23,7 @@ Future<void> deleteChildData() async {
         key == 'literacy_state' ||
         key == 'family_gallery' ||
         key == 'last_age' ||
+        key.startsWith('child_photo_') ||
         key.startsWith('used_') ||
         key.startsWith('bonus_') ||
         key.startsWith('plan_target_')) {
@@ -58,6 +61,7 @@ Future<void> deleteOneChild(String childId) async {
   await filterList('family_gallery', (e) => e['c'] != childId);
   await dropKey('story_state');
   await dropKey('literacy_state');
+  await ChildPhotoStore.delete(childId);
   await JourneyStore.instance.deleteProfile(childId);
 }
 
@@ -84,6 +88,7 @@ Future<Map<String, dynamic>> exportChildData(String childId) async {
     'exportedAt': DateTime.now().toIso8601String(),
     'note': loc('هذه البيانات محفوظة على هذا الجهاز فقط. لم تُرسل إلى أي مكان.'),
     'profile': store.profileById(childId)?.toJson(),
+    'hasPhotoOnDevice': store.profileById(childId)?.hasPhoto ?? false,
     'activities': [for (final a in store.attemptsOf(childId)) a.toJson()],
     'skillEvents': mine('skill_events'),
     'learningRecords': mine('learning_records'),

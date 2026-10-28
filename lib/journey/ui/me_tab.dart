@@ -1,3 +1,4 @@
+import '../avatars.dart';
 import 'package:flutter/material.dart';
 
 import '../../ui.dart' show Mascot;
@@ -55,7 +56,9 @@ class MeTab extends StatelessWidget {
                   radius: 28,
                   child: Column(
                     children: [
-                      Mascot(size: 110, accessory: profile.accessory),
+                      ChildAvatar(child: profile, size: 84),
+                      const SizedBox(height: 6),
+                      Mascot(size: 90, accessory: profile.accessory),
                       Text(profile.nickname,
                           style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: RC.ink)),
                       const SizedBox(height: 6),

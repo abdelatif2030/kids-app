@@ -1,3 +1,4 @@
+import '../avatars.dart';
 import 'package:flutter/material.dart';
 
 import '../../parent_screens.dart';
@@ -183,7 +184,7 @@ class _Picker extends StatelessWidget {
                       onTap: () => _enter(context, c),
                       child: Column(
                         children: [
-                          Mascot(size: 86, accessory: c.accessory),
+                          ChildAvatar(child: c, size: 86),
                           const SizedBox(height: 4),
                           Text(c.nickname,
                               textAlign: TextAlign.center,

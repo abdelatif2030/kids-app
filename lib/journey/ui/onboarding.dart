@@ -17,6 +17,7 @@ import '../plans.dart';
 import '../recommender.dart';
 import '../repository.dart';
 import 'kit.dart' show PastelBackground, RC, RCard;
+import 'look_picker.dart';
 import 'profile_forms.dart';
 import 'quiz_view.dart';
 
@@ -82,6 +83,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       _draft.dailyCount = ((m['d'] as num?)?.toInt() ?? 3).clamp(2, 5);
       _draft.bias = ((m['b'] as num?)?.toInt() ?? 0).clamp(-1, 1);
       _draft.learnLang = const ['ar', 'en', 'both'].contains(m['l']) ? m['l'] as String : 'both';
+      _draft.gender = const ['girl', 'boy'].contains(m['gn']) ? m['gn'] as String : null;
+      _draft.avatar = m['av'] as String?;
+      _draft.birth = m['bd'] as String?;
       _draft.assessment = {
         for (final e in ((m['as'] as Map?) ?? {}).entries)
           e.key.toString(): (e.value as num).toDouble(),
@@ -107,6 +111,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         'd': _draft.dailyCount,
         'b': _draft.bias,
         'l': _draft.learnLang,
+        'gn': _draft.gender,
+        'av': _draft.avatar,
+        'bd': _draft.birth,
         'as': _draft.assessment,
         'cd': _checkDone,
       }),
@@ -173,6 +180,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     setState(() => _saving = true);
     final store = JourneyStore.instance;
     final profile = await store.addProfile(_draft.toProfile(store.newId()));
+    await _draft.applyPhoto(profile.id);
     await store.setActive(profile.id);
     await _clearDraft();
     final needPin = widget.askForPin && !await ParentSettings.instance.hasPin();
@@ -218,6 +226,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           _persist();
         },
       ),
+      const SizedBox(height: DS.s16),
+      ProfileLookPicker(draft: _draft, onChanged: () {
+        setState(() {});
+        _persist();
+      }),
       const SizedBox(height: DS.s16),
       Text(context.tr('ob.child.learnLang'), style: DS.heading),
       const SizedBox(height: DS.s4),

@@ -1,10 +1,14 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
+import '../avatars.dart';
 import '../lands.dart';
 import '../../data_reset.dart';
 import '../models.dart';
 import '../repository.dart';
 import 'kit.dart';
+import 'look_picker.dart';
 import 'onboarding.dart';
 import '../../l10n/strings.dart';
 
@@ -19,8 +23,38 @@ class ProfileDraft {
   int bias = 0;
   String learnLang = 'both';
   Map<String, double> assessment = {};
+  String? gender;
+  String? avatar;
+  String? birth; // 'YYYY-MM'
+
+  /// Real photo: only used when [photoConsent] is true. [photoBytes] is a newly picked photo;
+  /// [hadPhoto] says the child already had one; [removePhoto] asks to delete it.
+  bool photoConsent = false;
+  Uint8List? photoBytes;
+  bool hadPhoto = false;
+  bool removePhoto = false;
 
   ProfileDraft();
+
+  /// Sets the birth month and, when it gives an age of 1-12, the age too.
+  void setBirth(int? year, int month, DateTime now) {
+    if (year == null) return;
+    birth = '$year-${month.toString().padLeft(2, '0')}';
+    final a = ageFromBirth(birth, now);
+    if (a != null) age = a.clamp(1, 12);
+  }
+
+  bool get willHavePhoto => photoConsent && (photoBytes != null || (hadPhoto && !removePhoto));
+
+  /// Saves or deletes the photo for [childId] to match this draft. Call after the profile is saved.
+  Future<void> applyPhoto(String childId) async {
+    if (!photoConsent || removePhoto) {
+      if (hadPhoto || removePhoto) await ChildPhotoStore.delete(childId);
+      return;
+    }
+    final b = photoBytes;
+    if (b != null) await ChildPhotoStore.save(childId, b);
+  }
 
   factory ProfileDraft.from(ChildProfile p) => ProfileDraft()
     ..nickname = p.nickname
@@ -32,7 +66,12 @@ class ProfileDraft {
     ..dailyCount = p.dailyCount
     ..bias = p.bias
     ..learnLang = p.learnLang
-    ..assessment = {...p.assessment};
+    ..assessment = {...p.assessment}
+    ..gender = p.gender
+    ..avatar = p.avatar
+    ..birth = p.birth
+    ..hadPhoto = p.hasPhoto
+    ..photoConsent = p.hasPhoto;
 
   ChildProfile toProfile(String id, {String? accessory}) => ChildProfile(
         id: id,
@@ -46,6 +85,10 @@ class ProfileDraft {
         learnLang: learnLang,
         accessory: accessory,
         assessment: assessment,
+        gender: gender,
+        avatar: avatar,
+        birth: birth,
+        hasPhoto: willHavePhoto,
       );
 }
 
@@ -101,6 +144,8 @@ class _BasicsFormState extends State<BasicsForm> {
             widget.onChanged();
           },
         ),
+        const SizedBox(height: 12),
+        ProfileLookPicker(draft: d, onChanged: widget.onChanged),
         const SizedBox(height: 12),
         Text(loc('العمر'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RC.ink)),
         const SizedBox(height: 6),
@@ -330,7 +375,7 @@ class ChildrenScreen extends StatelessWidget {
                     for (final c in store.profiles)
                       Card(
                         child: ListTile(
-                          leading: const CircleAvatar(child: Icon(Icons.child_care_rounded)),
+                          leading: ChildAvatar(child: c, size: 44),
                           title: Text(c.nickname,
                               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                           subtitle: Text(tr2('العمر ${c.age} · ${store.progressOf(c.id).totalStars} نجمة', 'Age ${c.age} · ${store.progressOf(c.id).totalStars} stars')),
@@ -369,6 +414,7 @@ class _ChildEditScreenState extends State<ChildEditScreen> {
     }
     await JourneyStore.instance
         .updateProfile(_draft.toProfile(widget.child.id, accessory: widget.child.accessory));
+    await _draft.applyPhoto(widget.child.id);
     if (mounted) Navigator.pop(context);
   }
 

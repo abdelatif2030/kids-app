@@ -1,3 +1,4 @@
+import '../avatars.dart';
 import 'package:flutter/material.dart';
 
 import '../../l10n/strings.dart';
@@ -10,7 +11,6 @@ import '../progress.dart';
 import '../recommender.dart';
 import '../repository.dart';
 import 'activity_screen.dart';
-import '../../ui.dart' show Mascot;
 import 'kit.dart';
 import '../../library/activity_screens.dart';
 import '../../library/vocab_screens.dart';
@@ -107,7 +107,7 @@ class HomeTab extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          const Mascot(size: 84),
+                          ChildAvatar(child: child, size: 84),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Semantics(

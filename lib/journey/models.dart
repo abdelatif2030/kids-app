@@ -22,6 +22,18 @@ class ChildProfile {
   final String? accessory; // the mascot accessory the child chose
   final Map<String, double> assessment; // land id -> 0..1
 
+  /// Optional: 'girl', 'boy' or null (not said). Never required, never used to pick content.
+  final String? gender;
+
+  /// A cartoon avatar preset id (see avatars.dart), or null for the default friend.
+  final String? avatar;
+
+  /// A real photo of the child is stored on this device, with the parent's consent (see ChildPhotoStore).
+  final bool hasPhoto;
+
+  /// Optional birth month, 'YYYY-MM', used only to set the age.
+  final String? birth;
+
   const ChildProfile({
     required this.id,
     required this.nickname,
@@ -34,6 +46,10 @@ class ChildProfile {
     this.learnLang = 'both',
     this.accessory,
     this.assessment = const {},
+    this.gender,
+    this.avatar,
+    this.hasPhoto = false,
+    this.birth,
   });
 
   ChildProfile copyWith({
@@ -47,6 +63,10 @@ class ChildProfile {
     String? learnLang,
     Object? accessory = _keep,
     Map<String, double>? assessment,
+    Object? gender = _keep,
+    Object? avatar = _keep,
+    bool? hasPhoto,
+    Object? birth = _keep,
   }) =>
       ChildProfile(
         id: id,
@@ -60,6 +80,10 @@ class ChildProfile {
         learnLang: learnLang ?? this.learnLang,
         accessory: identical(accessory, _keep) ? this.accessory : accessory as String?,
         assessment: assessment ?? this.assessment,
+        gender: identical(gender, _keep) ? this.gender : gender as String?,
+        avatar: identical(avatar, _keep) ? this.avatar : avatar as String?,
+        hasPhoto: hasPhoto ?? this.hasPhoto,
+        birth: identical(birth, _keep) ? this.birth : birth as String?,
       );
 
   static const _keep = Object();
@@ -76,6 +100,10 @@ class ChildProfile {
         'l': learnLang,
         'x': ?accessory,
         's': assessment,
+        'gn': ?gender,
+        'av': ?avatar,
+        if (hasPhoto) 'ph': true,
+        'bd': ?birth,
       };
 
   factory ChildProfile.fromJson(Map<String, dynamic> j) => ChildProfile(
@@ -93,6 +121,10 @@ class ChildProfile {
           for (final e in ((j['s'] as Map<String, dynamic>?) ?? {}).entries)
             e.key: (e.value as num).toDouble(),
         },
+        gender: const ['girl', 'boy'].contains(j['gn']) ? j['gn'] as String : null,
+        avatar: j['av'] as String?,
+        hasPhoto: j['ph'] == true,
+        birth: j['bd'] as String?,
       );
 }
 
