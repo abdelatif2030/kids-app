@@ -10,6 +10,7 @@ import '../recommender.dart';
 import '../repository.dart';
 import 'activity_screen.dart';
 import 'kit.dart';
+import '../../library/activity_screens.dart';
 import '../../library/vocab_screens.dart';
 import '../../literacy/screens.dart';
 import '../../stories/story_screens.dart';
@@ -229,6 +230,7 @@ class HomeTab extends StatelessWidget {
                     _MoreCard('🔤', 'تعلّم الحروف', RC.peach, () => LettersHomeScreen(child: child)),
                     _MoreCard('🖼️', 'مكتبة الكلمات', RC.mint, () => VocabLibraryScreen(child: child)),
                     _MoreCard('🌙', 'ليلة حلوة', RC.lavender, () => StoriesHomeScreen(child: child)),
+                    _MoreCard('🏠', 'أنشطة مع الأهل', RC.yellow, () => ActivityLibraryScreen(child: child)),
                   ],
                 ),
                 const SizedBox(height: 10),

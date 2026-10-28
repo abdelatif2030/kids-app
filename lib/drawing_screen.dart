@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'journey/models.dart' show ChildProfile;
 import 'main.dart' show VideoListScreen;
 import 'rest_screen.dart';
 import 'session_manager.dart';
+import 'studio/autosave.dart';
+import 'studio/creations.dart';
 import 'ui.dart';
 
 class _Stroke {
@@ -15,7 +18,11 @@ class _Stroke {
 /// رسم حر: ألوان، 3 أحجام، ممحاة، تراجع. الرسمة مش بتتحفظ ولا بتتبعت لأي مكان.
 /// النجمة بتظهر لما الطفل يدوس "خلصت" بعد ما يرسم حاجة.
 class DrawingScreen extends StatefulWidget {
-  const DrawingScreen({super.key});
+  /// When a child is given, the drawing is saved automatically to the private
+  /// family gallery on this device (and can be reopened from there).
+  final ChildProfile? child;
+  final Creation? initial;
+  const DrawingScreen({super.key, this.child, this.initial});
 
   @override
   State<DrawingScreen> createState() => _DrawingScreenState();
@@ -35,12 +42,50 @@ class _DrawingScreenState extends State<DrawingScreen> {
   static const _sizes = [6.0, 14.0, 28.0];
 
   final List<_Stroke> _strokes = [];
+  Size _canvas = Size.zero;
+  List<DrawStroke>? _pending; // saved strokes waiting for the canvas size
+  CreationAutosaver? _autosave;
   Color _color = _palette[0];
   double _size = _sizes[1];
   bool _eraser = false;
   bool _finished = false;
 
   Color get _pen => _eraser ? Colors.white : _color;
+
+  @override
+  void initState() {
+    super.initState();
+    final child = widget.child;
+    if (child != null) {
+      _autosave = CreationAutosaver(child, CreationKind.drawing, initial: widget.initial)
+        ..onChanged = () {
+          if (mounted) setState(() {});
+        };
+      if (widget.initial != null) _pending = strokesOf(widget.initial!.data);
+    }
+  }
+
+  @override
+  void dispose() {
+    _autosave?.dispose();
+    super.dispose();
+  }
+
+  Map<String, dynamic> _snapshot() {
+    final w = _canvas.width == 0 ? 1.0 : _canvas.width;
+    final h = _canvas.height == 0 ? 1.0 : _canvas.height;
+    return drawingData([
+      for (final st in _strokes)
+        DrawStroke(
+          // ignore: deprecated_member_use
+          st.color.value,
+          st.width / w * 1000,
+          [for (final p in st.points) Offset(p.dx / w * 1000, p.dy / h * 1000)],
+        ),
+    ]);
+  }
+
+  void _changed() => _autosave?.changed(_snapshot);
 
   void _down(DragDownDetails d) =>
       setState(() => _strokes.add(_Stroke(_pen, _size, d.localPosition)));
@@ -109,6 +154,13 @@ class _DrawingScreenState extends State<DrawingScreen> {
         backgroundColor: Colors.transparent,
         title: const Text('رسم', style: TextStyle(fontSize: 26)),
         actions: [
+          if (_autosave != null)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Text(_autosave!.tooLarge ? 'الرسمة كبيرة جداً للحفظ' : (_autosave!.saved ? 'تم الحفظ ✓' : '')),
+              ),
+            ),
           IconButton(
             iconSize: 32,
             tooltip: 'تعلّم الرسم',
@@ -143,8 +195,28 @@ class _DrawingScreenState extends State<DrawingScreen> {
                         behavior: HitTestBehavior.opaque,
                         onPanDown: _down,
                         onPanUpdate: _update,
-                        child: SizedBox.expand(
-                          child: CustomPaint(painter: _DrawingPainter(_strokes)),
+                        onPanEnd: (_) => _changed(),
+                        onPanCancel: _changed,
+                        child: LayoutBuilder(
+                          builder: (context, box) {
+                            _canvas = Size(box.maxWidth, box.maxHeight);
+                            final pending = _pending;
+                            if (pending != null) {
+                              _pending = null;
+                              for (final st in pending) {
+                                _strokes.add(_Stroke(Color(st.color), st.width / 1000 * _canvas.width, Offset.zero)
+                                  ..points.clear()
+                                  ..points.addAll([
+                                    for (final p in st.points)
+                                      Offset(p.dx / 1000 * _canvas.width, p.dy / 1000 * _canvas.height),
+                                  ]));
+                              }
+                            }
+                            return CustomPaint(
+                              painter: _DrawingPainter(_strokes),
+                              child: const SizedBox.expand(),
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -176,13 +248,21 @@ class _DrawingScreenState extends State<DrawingScreen> {
                           tooltip: 'تراجع',
                           onPressed: _strokes.isEmpty
                               ? null
-                              : () => setState(_strokes.removeLast),
+                              : () {
+                                  setState(_strokes.removeLast);
+                                  _changed();
+                                },
                           icon: const Icon(Icons.undo_rounded),
                         ),
                         IconButton.filledTonal(
                           iconSize: 32,
                           tooltip: 'مسح الكل',
-                          onPressed: _strokes.isEmpty ? null : () => setState(_strokes.clear),
+                          onPressed: _strokes.isEmpty
+                              ? null
+                              : () {
+                                  setState(_strokes.clear);
+                                  _changed();
+                                },
                           icon: const Icon(Icons.delete_outline_rounded),
                         ),
                         FilledButton.icon(

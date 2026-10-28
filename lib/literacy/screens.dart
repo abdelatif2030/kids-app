@@ -76,6 +76,9 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
     if (mounted) _load();
   }
 
+  /// Letter tiles grow with the text size so large text never clips them.
+  double _scale(BuildContext context) => MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 2.0);
+
   @override
   Widget build(BuildContext context) {
     final unlocked = LiteracyStore.unlocked(_states, _cfg).map((l) => l.letter).toSet();
@@ -162,8 +165,8 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
                       children: [
                         for (final l in letterOrder(_cfg.order))
                           SizedBox(
-                            width: 72,
-                            height: 84,
+                            width: 72 * _scale(context),
+                            height: 84 * _scale(context),
                             child: RCard(
                               color: unlocked.contains(l.letter) ? _boxColor(_states[l.letter]) : Colors.black12,
                               padding: EdgeInsets.zero,
@@ -180,7 +183,10 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
                                       ? Text(l.letter,
                                           style: const TextStyle(fontSize: 38, fontWeight: FontWeight.w900, color: RC.ink))
                                       : const Icon(Icons.lock_rounded, color: Colors.black38),
-                                  Text(l.name, style: const TextStyle(fontSize: 12, color: RC.ink)),
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(l.name, style: const TextStyle(fontSize: 12, color: RC.ink)),
+                                  ),
                                 ],
                               ),
                             ),
@@ -292,8 +298,10 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    Wrap(
+                      alignment: WrapAlignment.spaceEvenly,
+                      spacing: 18,
+                      runSpacing: 6,
                       children: [
                         _form('في النهاية', l.end),
                         _form('في الوسط', l.medial),

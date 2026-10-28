@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'journey/repository.dart';
@@ -13,6 +15,10 @@ Future<void> deleteChildData() async {
         key == 'skill_events' ||
         key == 'parent_notes' ||
         key == 'home_tasks' ||
+        key == 'learning_records' ||
+        key == 'story_state' ||
+        key == 'literacy_state' ||
+        key == 'family_gallery' ||
         key == 'last_age' ||
         key.startsWith('used_') ||
         key.startsWith('bonus_') ||
@@ -20,4 +26,69 @@ Future<void> deleteChildData() async {
       await prefs.remove(key);
     }
   }
+}
+
+
+/// Deletes one child and everything this device stored about them: their
+/// profile and progress, skill results, learning records, home tasks, story
+/// place and favourites, letter review state, and their gallery. Other
+/// children, the PIN and the settings stay. Time used (a per-device total)
+/// is not tied to a child and stays.
+Future<void> deleteOneChild(String childId) async {
+  final prefs = await SharedPreferences.getInstance();
+
+  Future<void> filterList(String key, bool Function(Map<String, dynamic>) keep) async {
+    final raw = prefs.getString(key);
+    if (raw == null) return;
+    final list = [for (final e in jsonDecode(raw) as List<dynamic>) e as Map<String, dynamic>];
+    await prefs.setString(key, jsonEncode([for (final e in list) if (keep(e)) e]));
+  }
+
+  Future<void> dropKey(String key) async {
+    final raw = prefs.getString(key);
+    if (raw == null) return;
+    final map = jsonDecode(raw) as Map<String, dynamic>..remove(childId);
+    await prefs.setString(key, jsonEncode(map));
+  }
+
+  await filterList('skill_events', (e) => e['c'] != childId);
+  await filterList('learning_records', (e) => e['c'] != childId);
+  await filterList('home_tasks', (e) => e['c'] != childId);
+  await filterList('family_gallery', (e) => e['c'] != childId);
+  await dropKey('story_state');
+  await dropKey('literacy_state');
+  await JourneyStore.instance.deleteProfile(childId);
+}
+
+
+/// Everything this device holds about one child, as plain data a parent can
+/// read and keep (a data export). Nothing is sent anywhere by this function.
+Future<Map<String, dynamic>> exportChildData(String childId) async {
+  final prefs = await SharedPreferences.getInstance();
+  final store = JourneyStore.instance;
+
+  List<dynamic> mine(String key) {
+    final raw = prefs.getString(key);
+    if (raw == null) return [];
+    return [for (final e in jsonDecode(raw) as List<dynamic>) if ((e as Map<String, dynamic>)['c'] == childId) e];
+  }
+
+  dynamic byChild(String key) {
+    final raw = prefs.getString(key);
+    if (raw == null) return null;
+    return (jsonDecode(raw) as Map<String, dynamic>)[childId];
+  }
+
+  return {
+    'exportedAt': DateTime.now().toIso8601String(),
+    'note': 'هذه البيانات محفوظة على هذا الجهاز فقط. لم تُرسل إلى أي مكان.',
+    'profile': store.profileById(childId)?.toJson(),
+    'activities': [for (final a in store.attemptsOf(childId)) a.toJson()],
+    'skillEvents': mine('skill_events'),
+    'learningRecords': mine('learning_records'),
+    'homeTasks': mine('home_tasks'),
+    'gallery': mine('family_gallery'),
+    'stories': byChild('story_state'),
+    'letters': byChild('literacy_state'),
+  };
 }

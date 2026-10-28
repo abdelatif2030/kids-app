@@ -5,7 +5,9 @@ import 'package:flutter/services.dart';
 
 import 'dashboard_screen.dart';
 import 'display_prefs.dart';
+import 'journey/ui/audio_settings_screen.dart';
 import 'journey/ui/home_tasks_screen.dart';
+import 'studio/studio_screens.dart';
 import 'journey/ui/admin_screen.dart';
 import 'journey/ui/privacy_screen.dart';
 import 'journey/ui/profile_forms.dart';
@@ -253,6 +255,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.graphic_eq_rounded),
+                  title: const Text('الصوت والتعلّم'),
+                  subtitle: const Text('القراءة بالصوت، صوت الطبيعة، ترتيب الحروف، وتصدير بيانات الطفل'),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AudioSettingsScreen()),
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.photo_library_rounded),
+                  title: const Text('معرض العائلة'),
+                  subtitle: const Text('أعمال الأطفال المحفوظة على الجهاز، ويمكنك حذفها'),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ParentGalleryScreen()),
                   ),
                 ),
                 ListTile(

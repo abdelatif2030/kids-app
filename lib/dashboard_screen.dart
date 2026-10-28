@@ -3,15 +3,20 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'curriculum.dart';
+import 'journey/home_tasks.dart';
 import 'journey/lands.dart';
 import 'journey/models.dart';
 import 'journey/progress.dart';
 import 'journey/repository.dart';
 import 'journey/ui/profile_forms.dart';
+import 'library/learning_records.dart';
+import 'library/learning_summary.dart';
+import 'literacy/mastery.dart';
 import 'main.dart' show Video, loadVideos;
 import 'plan_screen.dart';
 import 'progress_report.dart';
 import 'progress_store.dart';
+import 'stories/story_store.dart';
 import 'summary_screen.dart';
 import 'ui.dart';
 import 'watch_history.dart';
@@ -168,6 +173,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ],
             const SizedBox(height: 12),
             _Skills(report: report),
+            if (child != null) ...[
+              const SizedBox(height: 12),
+              _LearningLibrary(childId: child.id, end: _end),
+            ],
             const SizedBox(height: 12),
             _Lessons(report: report),
             const SizedBox(height: 12),
@@ -932,6 +941,136 @@ class _Journey extends StatelessWidget {
             label: const Text('تعديل الخطة والأراضي والبيانات'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+/// Letters, words, stories and offline activities, with the three kinds of
+/// evidence kept apart: seen/heard (exposure), tried (practice) and answered
+/// right at the first try (demonstrated).
+class _LearningLibrary extends StatefulWidget {
+  final String childId;
+  final DateTime end;
+  const _LearningLibrary({required this.childId, required this.end});
+
+  @override
+  State<_LearningLibrary> createState() => _LearningLibraryState();
+}
+
+class _LearningLibraryState extends State<_LearningLibrary> {
+  late Future<LearningSummary> _f = _load();
+
+  @override
+  void didUpdateWidget(_LearningLibrary old) {
+    super.didUpdateWidget(old);
+    if (old.childId != widget.childId || old.end != widget.end) _f = _load();
+  }
+
+  Future<LearningSummary> _load() async {
+    final id = widget.childId;
+    final end = DateTime(widget.end.year, widget.end.month, widget.end.day);
+    final records = await LearningRecords.forChild(id, days: 7, now: end);
+    final all = await LearningRecords.forChild(id, days: 21, now: end);
+    final from = dayOf(end.subtract(const Duration(days: 6)));
+    final tasks = await HomeTasks.all();
+    final offline = tasks
+        .where((t) => t.childId == id && t.done && t.day.compareTo(from) >= 0 && t.day.compareTo(dayOf(end)) <= 0)
+        .length;
+    return buildLearningSummary(
+      records: records,
+      allRecords: all,
+      history: await StoryStore.history(id),
+      weekFrom: from,
+      favorites: await StoryStore.favorites(id),
+      letterStates: await LiteracyStore.statesOf(id),
+      offlineActivities: offline,
+    );
+  }
+
+  Widget _row(String label, String value) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 3),
+        child: Row(
+          children: [
+            Expanded(child: Text(label)),
+            Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return _Section(
+      title: 'الحروف والكلمات والقصص',
+      child: FutureBuilder<LearningSummary>(
+        future: _f,
+        builder: (context, snap) {
+          if (snap.connectionState != ConnectionState.done) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snap.hasError) {
+            return Row(
+              children: [
+                const Expanded(child: Text('تعذّر تحميل هذا القسم.')),
+                TextButton(onPressed: () => setState(() => _f = _load()), child: const Text('إعادة المحاولة')),
+              ],
+            );
+          }
+          final s = snap.data!;
+          if (s.isEmpty) {
+            return const Text(
+              'لم يستخدم طفلك الحروف أو الكلمات أو القصص هذا الأسبوع. عندما يفعل ستظهر هنا نتائج حقيقية فقط.',
+            );
+          }
+          final minutes = (s.storySeconds / 60).round();
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _row('دروس مكتملة', '${s.lessonsCompleted}'),
+              const Divider(),
+              const Text('الحروف', style: TextStyle(fontWeight: FontWeight.bold)),
+              _row('اطّلع عليها (تعرّض)', '${s.letters.exposure.length}'),
+              _row('تدرّب عليها', '${s.letters.practice.length}'),
+              _row('أجاب صحيحاً من أول مرة', '${s.letters.demonstrated.length}'),
+              _row('متقنة (مراجعة متباعدة)', '${s.masteredLetters} من 28'),
+              const Divider(),
+              const Text('الكلمات', style: TextStyle(fontWeight: FontWeight.bold)),
+              _row('رآها أو سمعها (تعرّض)', '${s.words.exposure.length}'),
+              _row('تدرّب عليها', '${s.words.practice.length}'),
+              _row('أجاب صحيحاً من أول مرة', '${s.words.demonstrated.length}'),
+              const Divider(),
+              const Text('القصص', style: TextStyle(fontWeight: FontWeight.bold)),
+              _row('قصص سمعها', '${s.stories.length}'),
+              _row('وقت الاستماع (تعرّض فقط)', '$minutes د'),
+              for (final st in s.stories)
+                Text(
+                  '• ${st.title}${st.completed ? ' (أكملها)' : ''}${st.understoodChecked ? ' · أجاب عن أسئلتها' : ''}',
+                  style: const TextStyle(fontSize: 13),
+                ),
+              if (s.favoriteStories.isNotEmpty) Text('المفضلة: ${s.favoriteStories.join('، ')}', style: const TextStyle(fontSize: 13)),
+              const Text('الاستماع لا يعني الإتقان: يُحسب الفهم من إجابات الأسئلة فقط.', style: TextStyle(fontSize: 12)),
+              const Divider(),
+              _row('أنشطة البيت المؤكَّدة', '${s.offlineActivities}'),
+              _row('أعمال إبداعية جديدة', '${s.creations}'),
+              if (s.needsPractice.isNotEmpty) ...[
+                const Divider(),
+                const Text('يحتاج إلى مزيد من التدريب', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepOrange)),
+                for (final n in s.needsPractice) Text('• $n', style: const TextStyle(fontSize: 13)),
+              ],
+              if (s.nextSteps.isNotEmpty) ...[
+                const Divider(),
+                const Text('خطوات مقترحة', style: TextStyle(fontWeight: FontWeight.bold)),
+                for (final n in s.nextSteps) Text('• $n', style: const TextStyle(fontSize: 13)),
+              ],
+              const SizedBox(height: 6),
+              const Text(
+                'هذه أدوات للمتابعة فقط، وليست تشخيصاً أو تقييماً طبياً أو نمائياً.',
+                style: TextStyle(fontSize: 12),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

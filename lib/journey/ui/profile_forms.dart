@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../lands.dart';
+import '../../data_reset.dart';
 import '../models.dart';
 import '../repository.dart';
 import 'kit.dart';
@@ -364,7 +365,7 @@ class _ChildEditScreenState extends State<ChildEditScreen> {
       ),
     );
     if (ok != true) return;
-    await JourneyStore.instance.deleteProfile(widget.child.id);
+    await deleteOneChild(widget.child.id);
     if (mounted) Navigator.pop(context);
   }
 

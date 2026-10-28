@@ -14,6 +14,16 @@ import 'package:kids_app/journey/ui/onboarding.dart';
 import 'package:kids_app/journey/ui/privacy_screen.dart';
 import 'package:kids_app/journey/ui/profile_forms.dart';
 import 'package:kids_app/journey/ui/start_screen.dart';
+import 'package:kids_app/journey/ui/audio_settings_screen.dart';
+import 'package:kids_app/library/activity_screens.dart';
+import 'package:kids_app/library/vocab_screens.dart';
+import 'package:kids_app/literacy/letters_data.dart';
+import 'package:kids_app/literacy/screens.dart';
+import 'package:kids_app/stories/story_data.dart';
+import 'package:kids_app/stories/story_screens.dart';
+import 'package:kids_app/studio/character_creator.dart';
+import 'package:kids_app/studio/scene_builder.dart';
+import 'package:kids_app/studio/studio_screens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _kid = ChildProfile(id: 'k1', nickname: 'سلمى الصغيرة', age: 5);
@@ -90,6 +100,16 @@ void main() {
     'child edit': () => const ChildEditScreen(child: _kid),
     'admin': () => const AdminScreen(),
     'privacy': () => const PrivacyScreen(),
+    'letters home': () => const LettersHomeScreen(child: _kid),
+    'letter lesson': () => LetterLessonScreen(child: _kid, letter: letterOf('ب')!),
+    'vocab library': () => const VocabLibraryScreen(child: _kid),
+    'stories home': () => const StoriesHomeScreen(child: _kid),
+    'story player': () => StoryPlayerScreen(story: storyById('moon_star')!, child: _kid),
+    'studio': () => const StudioScreen(child: _kid),
+    'scene builder': () => const SceneBuilderScreen(child: _kid),
+    'character creator': () => const CharacterCreatorScreen(child: _kid),
+    'activity library': () => const ActivityLibraryScreen(child: _kid),
+    'audio settings': () => const AudioSettingsScreen(),
   };
 
   for (final size in [const Size(320, 640), const Size(412, 915), const Size(1024, 768)]) {

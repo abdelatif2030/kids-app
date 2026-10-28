@@ -34,7 +34,7 @@ class _VocabLibraryScreenState extends State<VocabLibraryScreen> {
       ),
       body: PastelBackground(
         child: SafeArea(
-          child: Column(
+          child: ListView(
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
@@ -98,8 +98,7 @@ class _VocabLibraryScreenState extends State<VocabLibraryScreen> {
                     ],
                   ),
                 ),
-              Expanded(
-                child: items.isEmpty
+              items.isEmpty
                     ? const Center(
                         child: Padding(
                           padding: EdgeInsets.all(24),
@@ -108,12 +107,14 @@ class _VocabLibraryScreenState extends State<VocabLibraryScreen> {
                         ),
                       )
                     : GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
                         padding: const EdgeInsets.all(16),
-                        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                           maxCrossAxisExtent: 150,
                           mainAxisSpacing: 12,
                           crossAxisSpacing: 12,
-                          childAspectRatio: 0.9,
+                          mainAxisExtent: 172 * MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 2.0),
                         ),
                         itemCount: items.length,
                         itemBuilder: (context, i) {
@@ -122,23 +123,23 @@ class _VocabLibraryScreenState extends State<VocabLibraryScreen> {
                             semanticLabel: v.en == null ? v.ar : '${v.ar}، ${v.en}',
                             onTap: () => showVocabDetail(context, widget.child, v),
                             padding: const EdgeInsets.all(8),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(v.emoji, style: const TextStyle(fontSize: 46)),
-                                const SizedBox(height: 4),
-                                FittedBox(
-                                  child: Text(v.ar,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(v.emoji, style: const TextStyle(fontSize: 46)),
+                                  const SizedBox(height: 4),
+                                  Text(v.ar,
                                       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: RC.ink)),
-                                ),
-                                if (v.en != null)
-                                  Text(v.en!, style: const TextStyle(fontSize: 13, color: RC.ink)),
-                              ],
+                                  if (v.en != null)
+                                    Text(v.en!, style: const TextStyle(fontSize: 13, color: RC.ink)),
+                                ],
+                              ),
                             ),
                           );
                         },
                       ),
-              ),
             ],
           ),
         ),

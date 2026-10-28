@@ -10,6 +10,7 @@ import '../repository.dart';
 import 'home_tab.dart';
 import 'kit.dart';
 import 'me_tab.dart';
+import '../../studio/studio_screens.dart';
 import '../../ui.dart' show BigTile, Tappable;
 
 /// The child's whole world: four big tabs (home, games, create, me). Leaving it
@@ -59,7 +60,7 @@ class _ChildShellState extends State<ChildShell> {
           final tabs = [
             HomeTab(child: child, onExit: _exit),
             _GamesTab(age: child.age),
-            _CreateTab(age: child.age),
+            _CreateTab(child: child),
             MeTab(child: child),
           ];
           return Scaffold(
@@ -168,8 +169,10 @@ class _GamesTab extends StatelessWidget {
 }
 
 class _CreateTab extends StatelessWidget {
-  final int age;
-  const _CreateTab({required this.age});
+  final ChildProfile child;
+  const _CreateTab({required this.child});
+
+  int get age => child.age;
 
   @override
   Widget build(BuildContext context) {
@@ -188,12 +191,21 @@ class _CreateTab extends StatelessWidget {
               alignment: WrapAlignment.center,
               children: [
                 BigTile(
-                  label: 'رسم حر',
-                  icon: Icons.brush_rounded,
+                  label: 'استوديو الإبداع',
+                  icon: Icons.auto_awesome_rounded,
                   color: const Color(0xFF8E73D0),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const DrawingScreen()),
+                    MaterialPageRoute(builder: (_) => StudioScreen(child: child)),
+                  ),
+                ),
+                BigTile(
+                  label: 'رسم حر',
+                  icon: Icons.brush_rounded,
+                  color: const Color(0xFFB085E8),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => DrawingScreen(child: child)),
                   ),
                 ),
                 BigTile(
