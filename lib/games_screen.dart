@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'color_game.dart';
 import 'memory_game.dart';
 import 'ui.dart';
 import 'where_animal_game.dart';
@@ -16,8 +17,9 @@ class GamesScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         title: const Text('ألعاب', style: TextStyle(fontSize: 26)),
       ),
+      // Scrolls so three buttons (age 2) still fit on a short screen.
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -38,6 +40,15 @@ class GamesScreen extends StatelessWidget {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const WhereAnimalGame()),
+                  ),
+                ),
+              if (age >= 2 && age <= 3)
+                _GameButton(
+                  label: 'لعبة الألوان',
+                  color: kBright[4],
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ColorGame()),
                   ),
                 ),
               if (age >= 3 && age <= 4)
