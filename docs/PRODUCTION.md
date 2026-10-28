@@ -17,3 +17,8 @@ This app is a working prototype. Everything below is NOT done and must be handle
 7. **Android**: build, signing, screen pinning (lock mode) and voice commands are not done; the Android build was never run in this environment.
 8. **Accessibility**: tested with text scale 1.6, 320 px width and keyboard focus in widget tests; not tested with a real screen reader.
 9. **Backups and monitoring**: none. Do not add analytics for the child.
+
+
+## Added with the audio / literacy / stories / studio expansion
+See `docs/AUDIT_AND_ROADMAP.md` (what exists, risks, priorities), `docs/MEDIA_AND_PRIVACY.md` (what is stored, which audio is real) and `docs/CONTENT_REVIEW.md` (what a teacher must review).
+Still required before release: recordings, licensed artwork, Android build and device testing, background audio decision, Play Families / data-safety review, backup strategy, privacy policy page in the app.

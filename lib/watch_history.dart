@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'safe_json.dart';
+
 /// One viewing of one video. Stored only on this device, for the parent summary.
 class WatchEntry {
   final String day; // yyyy-mm-dd
@@ -37,12 +39,7 @@ class WatchHistory {
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
   static Future<List<WatchEntry>> load() async {
-    final raw = (await SharedPreferences.getInstance()).getString(_key);
-    if (raw == null) return [];
-    return [
-      for (final e in jsonDecode(raw) as List<dynamic>)
-        WatchEntry.fromJson(e as Map<String, dynamic>),
-    ];
+    return decodeList(await SharedPreferences.getInstance(), _key, WatchEntry.fromJson);
   }
 
   /// Ignores views shorter than a few seconds (accidental taps).

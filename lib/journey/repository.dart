@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../safe_json.dart';
 import 'lands.dart';
 import 'models.dart';
 import 'progress.dart';
@@ -72,15 +73,9 @@ class LocalJourneyRepository implements JourneyRepository {
 
   Future<SharedPreferences> get _p => SharedPreferences.getInstance();
 
-  Future<List<Map<String, dynamic>>> _list(String key) async {
-    final raw = (await _p).getString(key);
-    if (raw == null) return [];
-    return [for (final e in jsonDecode(raw) as List<dynamic>) e as Map<String, dynamic>];
-  }
-
   @override
   Future<List<ChildProfile>> loadProfiles() async =>
-      [for (final j in await _list(_profiles)) ChildProfile.fromJson(j)];
+      decodeList(await _p, _profiles, ChildProfile.fromJson);
 
   @override
   Future<void> saveProfiles(List<ChildProfile> profiles) async => (await _p)
@@ -97,7 +92,7 @@ class LocalJourneyRepository implements JourneyRepository {
 
   @override
   Future<List<Attempt>> loadAttempts() async =>
-      [for (final j in await _list(_attempts)) Attempt.fromJson(j)];
+      decodeList(await _p, _attempts, Attempt.fromJson);
 
   @override
   Future<void> saveAttempts(List<Attempt> attempts) async => (await _p)
@@ -105,7 +100,7 @@ class LocalJourneyRepository implements JourneyRepository {
 
   @override
   Future<List<CustomQuestion>> loadCustomQuestions() async =>
-      [for (final j in await _list(_custom)) CustomQuestion.fromJson(j)];
+      decodeList(await _p, _custom, CustomQuestion.fromJson);
 
   @override
   Future<void> saveCustomQuestions(List<CustomQuestion> questions) async => (await _p)
@@ -113,10 +108,12 @@ class LocalJourneyRepository implements JourneyRepository {
 
   @override
   Future<JourneySettings> loadSettings() async {
-    final raw = (await _p).getString(_settings);
-    return raw == null
-        ? const JourneySettings()
-        : JourneySettings.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    final map = decodeMap(await _p, _settings);
+    try {
+      return map.isEmpty ? const JourneySettings() : JourneySettings.fromJson(map);
+    } catch (_) {
+      return const JourneySettings();
+    }
   }
 
   @override

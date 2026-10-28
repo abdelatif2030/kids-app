@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../parent_screens.dart' show PinSetupScreen;
+import '../../parent_settings.dart';
+
 import '../content.dart';
 import '../lands.dart';
 import '../models.dart';
@@ -15,7 +18,10 @@ import 'quiz_view.dart';
 /// child answers, 4. a suggested learning plan the parent can edit.
 /// Returns the new [ChildProfile] (already saved) when it pops.
 class OnboardingFlow extends StatefulWidget {
-  const OnboardingFlow({super.key});
+  /// When no parent PIN exists yet, finishing asks the parent to create one,
+  /// so a child can never open the parent area on a device without a gate.
+  final bool askForPin;
+  const OnboardingFlow({super.key, this.askForPin = true});
 
   @override
   State<OnboardingFlow> createState() => _OnboardingFlowState();
@@ -73,6 +79,13 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     final store = JourneyStore.instance;
     final profile = await store.addProfile(_draft.toProfile(store.newId()));
     await store.setActive(profile.id);
+    final needPin = widget.askForPin && !await ParentSettings.instance.hasPin();
+    if (needPin && mounted) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const PinSetupScreen(popWhenDone: true)),
+      );
+    }
     if (mounted) Navigator.pop(context, profile);
   }
 

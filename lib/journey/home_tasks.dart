@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../safe_json.dart';
+
 /// Real-world activities for after the screen: the child does them with a
 /// parent, and the parent confirms. They never give stars or XP (rewards are
 /// only for finishing an activity in the app), and nothing is photographed.
@@ -89,9 +91,7 @@ class HomeTasks {
   static const keepDays = 60;
 
   static Future<List<HomeTask>> all() async {
-    final raw = (await SharedPreferences.getInstance()).getString(prefsKey);
-    if (raw == null) return [];
-    return [for (final e in jsonDecode(raw) as List<dynamic>) HomeTask.fromJson(e as Map<String, dynamic>)];
+    return decodeList(await SharedPreferences.getInstance(), prefsKey, HomeTask.fromJson);
   }
 
   static Future<void> _save(List<HomeTask> tasks) async {

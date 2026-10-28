@@ -87,7 +87,7 @@ void main() {
         (tester) async {
       _tall(tester);
       final store = await tester.runAsync(_newStore) as JourneyStore;
-      await tester.pumpWidget(_app(const OnboardingFlow()));
+      await tester.pumpWidget(_app(const OnboardingFlow(askForPin: false)));
       expect(find.text('الخطوة 1 من 4'), findsOneWidget);
 
       // Step 1 needs a nickname.
@@ -150,7 +150,7 @@ void main() {
     testWidgets('the skill check can be skipped and the plan then follows the goals', (tester) async {
       _tall(tester);
       final store = await tester.runAsync(_newStore) as JourneyStore;
-      await tester.pumpWidget(_app(const OnboardingFlow()));
+      await tester.pumpWidget(_app(const OnboardingFlow(askForPin: false)));
       await tester.enterText(_field('اسم الطفل أو لقبه'), 'عمر');
       await tester.tap(find.text('التالي'));
       await tester.pump();
@@ -172,7 +172,7 @@ void main() {
     testWidgets('going back keeps what was typed', (tester) async {
       _tall(tester);
       await tester.runAsync(_newStore);
-      await tester.pumpWidget(_app(const OnboardingFlow()));
+      await tester.pumpWidget(_app(const OnboardingFlow(askForPin: false)));
       await tester.enterText(_field('اسم الطفل أو لقبه'), 'نور');
       await tester.tap(find.text('التالي'));
       await tester.pump();

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'safe_json.dart';
 import 'watch_history.dart';
 
 /// One game round: which skill, and whether the child got it right on the
@@ -37,12 +38,7 @@ class ProgressStore {
   static const _maxEvents = 3000;
 
   static Future<List<SkillEvent>> load() async {
-    final raw = (await SharedPreferences.getInstance()).getString(_key);
-    if (raw == null) return [];
-    return [
-      for (final e in jsonDecode(raw) as List<dynamic>)
-        SkillEvent.fromJson(e as Map<String, dynamic>),
-    ];
+    return decodeList(await SharedPreferences.getInstance(), _key, SkillEvent.fromJson);
   }
 
   static Future<void> record(String skill, bool ok, {String? detail, String? childId}) async {

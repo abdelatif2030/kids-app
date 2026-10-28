@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../library/learning_records.dart' show dayOf;
+import '../safe_json.dart';
 
 class ListenEntry {
   final String storyId;
@@ -31,8 +32,7 @@ class StoryStore {
   static const maxHistory = 300;
 
   static Future<Map<String, dynamic>> _all() async {
-    final raw = (await SharedPreferences.getInstance()).getString(_key);
-    return raw == null ? {} : jsonDecode(raw) as Map<String, dynamic>;
+    return decodeMap(await SharedPreferences.getInstance(), _key);
   }
 
   static Future<void> _save(Map<String, dynamic> all) async =>

@@ -79,7 +79,7 @@ void main() {
   // text (a Flutter overflow is an exception, so pumping is the check).
   final screens = <String, Widget Function()>{
     'welcome': () => const StartScreen(),
-    'onboarding': () => const OnboardingFlow(),
+    'onboarding': () => const OnboardingFlow(askForPin: false),
     'shell': () => const ChildShell(child: _kid),
     'land map': () => LandMapScreen(land: landById('letters'), child: _kid),
     'quiz with a long story': () => ActivityScreen(
@@ -181,7 +181,7 @@ void main() {
 
     testWidgets('every big control has a spoken label', (tester) async {
       final handle = tester.ensureSemantics();
-      tester.view.physicalSize = const Size(412, 915);
+      tester.view.physicalSize = const Size(412, 2600);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       await tester.runAsync(_setup);

@@ -205,6 +205,20 @@ class HomeTab extends StatelessWidget {
                     ),
                   ),
                 const SizedBox(height: 8),
+                const Text('اكتشف المزيد',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: [
+                    _MoreCard('🔤', 'تعلّم الحروف', RC.peach, () => LettersHomeScreen(child: child)),
+                    _MoreCard('🖼️', 'مكتبة الكلمات', RC.mint, () => VocabLibraryScreen(child: child)),
+                    _MoreCard('🌙', 'ليلة حلوة', RC.lavender, () => StoriesHomeScreen(child: child)),
+                    _MoreCard('🏠', 'أنشطة مع الأهل', RC.yellow, () => ActivityLibraryScreen(child: child)),
+                  ],
+                ),
+                const SizedBox(height: 10),
                 const Text('رحلتي',
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
                 const SizedBox(height: 8),
@@ -220,20 +234,6 @@ class HomeTab extends StatelessWidget {
                       ),
                     ),
                   ),
-                const Text('اكتشف المزيد',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: [
-                    _MoreCard('🔤', 'تعلّم الحروف', RC.peach, () => LettersHomeScreen(child: child)),
-                    _MoreCard('🖼️', 'مكتبة الكلمات', RC.mint, () => VocabLibraryScreen(child: child)),
-                    _MoreCard('🌙', 'ليلة حلوة', RC.lavender, () => StoriesHomeScreen(child: child)),
-                    _MoreCard('🏠', 'أنشطة مع الأهل', RC.yellow, () => ActivityLibraryScreen(child: child)),
-                  ],
-                ),
-                const SizedBox(height: 10),
                 RCard(
                   color: RC.lavender.withAlpha(150),
                   onTap: () => Navigator.push(

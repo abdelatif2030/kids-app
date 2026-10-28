@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../library/learning_records.dart' show dayOf;
+import '../safe_json.dart';
 
 /// What a child made. Everything is plain data (no photos, no recordings, no
 /// text typed by the child) kept in the family gallery on this device.
@@ -52,9 +53,7 @@ class FamilyGallery {
   static const maxBytesPerItem = 150000;
 
   static Future<List<Creation>> all() async {
-    final raw = (await SharedPreferences.getInstance()).getString(_key);
-    if (raw == null) return [];
-    return [for (final e in jsonDecode(raw) as List<dynamic>) Creation.fromJson(e as Map<String, dynamic>)];
+    return decodeList(await SharedPreferences.getInstance(), _key, Creation.fromJson);
   }
 
   static Future<List<Creation>> forChild(String childId) async =>

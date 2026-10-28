@@ -77,3 +77,12 @@ User asked for a "Rehlaty | رحلتي" app (learning map, daily plan, rewards, 
 - Dashboard "خريطة المهارات": each skill shows the next activity to practise.
 - Not built: school/teacher classroom mode (needs Firebase), graded reading library, virtual science lab, voice commands, lock mode.
 - 191 tests pass; `flutter analyze` clean except the old `_round` warning.
+
+### Premium expansion (2026-10-28): audio, letters, stories, studio
+- Packages added with the user's approval: just_audio, flutter_tts (device voice, offline, no upload). NOT added: audio_service (no lock-screen audio), any analytics/payment/notification package.
+- lib/media/audio.dart (MediaRef, SpeechBackend, FilePlayer, AudioPrefs); assets/audio/ has 4 REAL original synthesized files (rain, waves, wind, musicbox). No story/letter recordings exist: TTS only, labelled demo.
+- lib/library: vocab (110 items), lesson_engine, lesson_runner, learning_records (Evidence: exposure < practice < demonstrated), learning_summary, activities (16 offline activities), activity_screens, vocab_screens. lib/literacy: 28 letters, exercises, word tiles, tracing, Leitner mastery + parent config. lib/stories: 8 original stories + 1 audio track, controller with sleep timer/resume/ambient. lib/studio: gallery (private, parent deletes), drawing autosave, scene, character, picture story.
+- Listening to stories is exposure only, never mastery. Stories are reachable from the rest screen (quiet hours) when allowed.
+- Safety/privacy: lib/safe_json.dart (damaged storage never crashes), deleteOneChild/exportChildData in lib/data_reset.dart, PIN required when the first child is added, report-a-problem screen (parent copies the message).
+- 344 tests pass; analyze clean except the old `_round` warning. docs/: AUDIT_AND_ROADMAP, MEDIA_AND_PRIVACY, CONTENT_REVIEW.
+- Teacher marketplace expansion requested (profiles, search, booking, requests/proposals, reviews, payments). NOT built; see docs/TEACHERS_MARKETPLACE_PLAN.md for the audit and the decisions needed (messaging vs the no-chat rule, paid Firebase plan, payments).

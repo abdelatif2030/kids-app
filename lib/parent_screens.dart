@@ -7,6 +7,7 @@ import 'dashboard_screen.dart';
 import 'display_prefs.dart';
 import 'journey/ui/audio_settings_screen.dart';
 import 'journey/ui/home_tasks_screen.dart';
+import 'journey/ui/report_screen.dart';
 import 'studio/studio_screens.dart';
 import 'journey/ui/admin_screen.dart';
 import 'journey/ui/privacy_screen.dart';
@@ -46,7 +47,10 @@ Widget _pinField(TextEditingController controller, String label, {String? error}
 }
 
 class PinSetupScreen extends StatefulWidget {
-  const PinSetupScreen({super.key});
+  /// True when shown at the end of onboarding: after saving, go back instead of
+  /// opening the settings.
+  final bool popWhenDone;
+  const PinSetupScreen({super.key, this.popWhenDone = false});
 
   @override
   State<PinSetupScreen> createState() => _PinSetupScreenState();
@@ -75,6 +79,10 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
     }
     await ParentSettings.instance.setPin(_pin.text);
     if (!mounted) return;
+    if (widget.popWhenDone) {
+      Navigator.pop(context);
+      return;
+    }
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const SettingsScreen()),
@@ -84,11 +92,19 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('إنشاء رمز سري للوالدين')),
+      appBar: AppBar(title: const Text('إنشاء رمز سري للوالدين'), automaticallyImplyLeading: !widget.popWhenDone),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
+            if (widget.popWhenDone)
+              const Padding(
+                padding: EdgeInsets.only(bottom: 12),
+                child: Text(
+                  'قبل أن يبدأ طفلك، أنشئ رمزاً سرياً من 4 أرقام. بدونه لا يمكن لأحد الدخول إلى إعدادات الوالدين أو الخروج من وضع الطفل.',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
             _pinField(_pin, 'الرمز الجديد'),
             TextField(
               controller: _confirm,
@@ -255,6 +271,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.flag_rounded),
+                  title: const Text('الإبلاغ عن مشكلة أو محتوى'),
+                  subtitle: const Text('رسالة تنسخها وترسلها بنفسك، بدون بيانات الطفل'),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ReportProblemScreen()),
                   ),
                 ),
                 ListTile(

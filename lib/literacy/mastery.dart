@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../library/learning_records.dart' show dayOf;
+import '../safe_json.dart';
 import 'letters_data.dart';
 
 /// Spaced review for letters (a Leitner box per child and letter). A fully
@@ -44,16 +45,19 @@ class LiteracyStore {
   static const _cfgKey = 'literacy_config';
 
   static Future<Map<String, Map<String, LetterState>>> _load() async {
-    final raw = (await SharedPreferences.getInstance()).getString(_key);
-    if (raw == null) return {};
-    final j = jsonDecode(raw) as Map<String, dynamic>;
-    return {
-      for (final c in j.entries)
-        c.key: {
+    final j = decodeMap(await SharedPreferences.getInstance(), _key);
+    final out = <String, Map<String, LetterState>>{};
+    for (final c in j.entries) {
+      try {
+        out[c.key] = {
           for (final l in (c.value as Map<String, dynamic>).entries)
             l.key: LetterState.fromJson(l.value as Map<String, dynamic>),
-        },
-    };
+        };
+      } catch (_) {
+        // skip one unreadable child entry
+      }
+    }
+    return out;
   }
 
   static Future<Map<String, LetterState>> statesOf(String childId) async => (await _load())[childId] ?? {};
@@ -88,8 +92,12 @@ class LiteracyStore {
   }
 
   static Future<LiteracyConfig> config() async {
-    final raw = (await SharedPreferences.getInstance()).getString(_cfgKey);
-    return raw == null ? const LiteracyConfig() : LiteracyConfig.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    final map = decodeMap(await SharedPreferences.getInstance(), _cfgKey);
+    try {
+      return map.isEmpty ? const LiteracyConfig() : LiteracyConfig.fromJson(map);
+    } catch (_) {
+      return const LiteracyConfig();
+    }
   }
 
   static Future<void> saveConfig(LiteracyConfig c) async =>

@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../safe_json.dart';
+
 /// What the app knows about a moment of learning. The three levels are kept
 /// apart on purpose: listening to a story is exposure, trying an exercise is
 /// practice, and only a right answer on the first try shows understanding.
@@ -42,9 +44,7 @@ class LearningRecords {
   static const maxRows = 2500;
 
   static Future<List<LearningRecord>> all() async {
-    final raw = (await SharedPreferences.getInstance()).getString(prefsKey);
-    if (raw == null) return [];
-    return [for (final e in jsonDecode(raw) as List<dynamic>) LearningRecord.fromJson(e as Map<String, dynamic>)];
+    return decodeList(await SharedPreferences.getInstance(), prefsKey, LearningRecord.fromJson);
   }
 
   static Future<List<LearningRecord>> forChild(String childId, {int days = 7, DateTime? now}) async {
