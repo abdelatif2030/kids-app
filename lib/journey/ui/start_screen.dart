@@ -5,6 +5,9 @@ import '../../parent_settings.dart';
 import '../../rest_screen.dart';
 import '../../session_manager.dart';
 import '../../teachers_screens.dart';
+import '../../l10n/app_locale.dart';
+import '../../l10n/language_screen.dart';
+import '../../l10n/strings.dart';
 import '../../ui.dart' show Mascot;
 import '../models.dart';
 import '../repository.dart';
@@ -20,8 +23,9 @@ class StartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: JourneyStore.instance,
+      listenable: Listenable.merge([JourneyStore.instance, AppLocale.instance]),
       builder: (context, _) {
+        if (AppLocale.instance.needsChoice) return const LanguageScreen();
         final store = JourneyStore.instance;
         return Scaffold(
           appBar: AppBar(
@@ -30,7 +34,7 @@ class StartScreen extends StatelessWidget {
             actions: [
               IconButton(
                 iconSize: 30,
-                tooltip: 'إعدادات الوالدين',
+                tooltip: context.tr('start.parentSettings'),
                 icon: const Icon(Icons.settings_rounded),
                 onPressed: () => openParentArea(context),
               ),
@@ -65,14 +69,14 @@ class _Welcome extends StatelessWidget {
             const SizedBox(height: 12),
             Semantics(
               header: true,
-              child: const Text('رحلتي',
-                  style: TextStyle(fontSize: 56, fontWeight: FontWeight.w900, color: RC.ink)),
+              child: Text(context.tr('app.name'),
+                  style: const TextStyle(fontSize: 56, fontWeight: FontWeight.w900, color: RC.ink)),
             ),
-            const Text('Rehlaty',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: RC.outline)),
+            if (AppLocale.instance.isArabic)
+              const Text('Rehlaty',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: RC.outline)),
             const SizedBox(height: 8),
-            const Text('تعلّم · العب · اكتشف',
-                style: TextStyle(fontSize: 22, color: RC.ink)),
+            Text(context.tr('app.tagline'), style: const TextStyle(fontSize: 22, color: RC.ink)),
             const SizedBox(height: 28),
             FilledButton.icon(
               style: FilledButton.styleFrom(
@@ -84,10 +88,10 @@ class _Welcome extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => const OnboardingFlow()),
               ),
               icon: const Icon(Icons.rocket_launch_rounded, size: 30),
-              label: const Text('ابدأ الرحلة', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+              label: Text(context.tr('start.begin'), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
             ),
             const SizedBox(height: 10),
-            const Text('يبدأ ولي الأمر بإضافة طفل', style: TextStyle(fontSize: 15, color: RC.ink)),
+            Text(context.tr('start.parentFirst'), style: const TextStyle(fontSize: 15, color: RC.ink)),
             const SizedBox(height: 18),
             TextButton.icon(
               onPressed: () => Navigator.push(
@@ -95,7 +99,7 @@ class _Welcome extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => const TeachersEntryScreen()),
               ),
               icon: const Icon(Icons.school_rounded),
-              label: const Text('حساب الأهل والمدرسين', style: TextStyle(fontSize: 17)),
+              label: Text(context.tr('start.accounts'), style: const TextStyle(fontSize: 17)),
             ),
             TextButton.icon(
               onPressed: () => Navigator.push(
@@ -103,7 +107,7 @@ class _Welcome extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => const PrivacyScreen()),
               ),
               icon: const Icon(Icons.privacy_tip_outlined),
-              label: const Text('الخصوصية', style: TextStyle(fontSize: 17)),
+              label: Text(context.tr('start.privacy'), style: const TextStyle(fontSize: 17)),
             ),
           ],
         ),

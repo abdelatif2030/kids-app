@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 
 import 'dashboard_screen.dart';
 import 'display_prefs.dart';
+import 'l10n/app_locale.dart';
+import 'l10n/strings.dart';
 import 'journey/ui/audio_settings_screen.dart';
 import 'journey/ui/home_tasks_screen.dart';
 import 'journey/ui/report_screen.dart';
@@ -311,9 +313,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const Divider(),
                 ListenableBuilder(
-                  listenable: DisplayPrefs.instance,
+                  listenable: Listenable.merge([DisplayPrefs.instance, AppLocale.instance]),
                   builder: (context, _) => Column(
                     children: [
+                      ListTile(
+                        leading: const Icon(Icons.language_rounded),
+                        title: Text(context.tr('lang.setting')),
+                        trailing: DropdownButton<String>(
+                          value: AppLocale.instance.code,
+                          items: const [
+                            DropdownMenuItem(value: 'ar', child: Text('العربية')),
+                            DropdownMenuItem(value: 'en', child: Text('English')),
+                          ],
+                          onChanged: (v) {
+                            if (v != null) AppLocale.instance.set(v);
+                          },
+                        ),
+                      ),
                       ListTile(
                         leading: const Icon(Icons.text_fields_rounded),
                         title: const Text('حجم الخط'),

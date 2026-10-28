@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import 'curriculum.dart';
 import 'display_prefs.dart';
+import 'l10n/app_locale.dart';
 import 'media/audio.dart';
 import 'firebase_config.dart';
 import 'journey/repository.dart';
@@ -22,6 +23,7 @@ Future<void> main() async {
   await initFirebase();
   await JourneyStore.instance.load();
   await DisplayPrefs.instance.load();
+  await AppLocale.instance.load();
   await AudioPrefs.instance.load();
   runApp(const KidsApp());
 }
@@ -51,9 +53,9 @@ class KidsApp extends StatelessWidget {
           ),
         ),
       ),
-      // Arabic-first: the whole app is right-to-left.
+      // Arabic-first: right-to-left unless the parent chose English.
       builder: (context, child) => ListenableBuilder(
-        listenable: DisplayPrefs.instance,
+        listenable: Listenable.merge([DisplayPrefs.instance, AppLocale.instance]),
         builder: (context, _) {
           final prefs = DisplayPrefs.instance;
           final media = MediaQuery.of(context);
@@ -62,7 +64,7 @@ class KidsApp extends StatelessWidget {
               textScaler: prefs.textScale == 1.0 ? media.textScaler : TextScaler.linear(prefs.textScale),
               disableAnimations: media.disableAnimations || prefs.reduceMotion,
             ),
-            child: Directionality(textDirection: TextDirection.rtl, child: child!),
+            child: Directionality(textDirection: AppLocale.instance.direction, child: child!),
           );
         },
       ),
