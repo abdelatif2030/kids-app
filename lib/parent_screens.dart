@@ -17,6 +17,7 @@ import 'journey/ui/profile_forms.dart';
 import 'notes_screen.dart';
 import 'parent_settings.dart';
 import 'plan_screen.dart';
+import 'journey/ui/day_settings_screen.dart';
 import 'print/printables_screen.dart';
 import 'summary_screen.dart';
 import 'teachers_screens.dart';
@@ -310,6 +311,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const PrintablesScreen()),
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.today_rounded),
+                  title: Text(tr2('محطات «يومي»', 'My day stations')),
+                  subtitle: Text(tr2('اختر ما يظهر لطفلك كل يوم', 'Choose what your child sees each day')),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const DaySettingsScreen()),
                   ),
                 ),
                 ListTile(

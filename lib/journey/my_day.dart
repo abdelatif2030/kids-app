@@ -181,3 +181,17 @@ Future<Garden> loadGarden(String childId) async {
   final stories = {for (final h in await StoryStore.history(childId)) if (h.completed) h.storyId}.length;
   return gardenOf(activities: activities, games: games, stories: stories);
 }
+
+/// The daily surprise: a learning game other than the game of the day, or, when there is none for the
+/// age, an activity to do with a parent. [reroll] lets the child ask for a different one.
+class Surprise {
+  final GameInfo? game; // null: a family activity
+  const Surprise(this.game);
+}
+
+Surprise surpriseOfDay(DateTime now, int age, {int reroll = 0}) {
+  final today = gameOfDay(now, age);
+  final others = [for (final g in gamesForAge(age)) if (g.id != today?.id) g];
+  if (others.isEmpty) return const Surprise(null);
+  return Surprise(others[(dayOfYear(now) + reroll) % others.length]);
+}
