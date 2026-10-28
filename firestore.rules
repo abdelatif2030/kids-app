@@ -3,7 +3,9 @@ rules_version = '2';
 // Paste into Firebase console > Firestore > Rules (see docs/teachers-setup.md).
 // Teachers are visible to parents as soon as they save their profile. To hide a
 // teacher, open teachers/{uid} in the console and set status to "suspended"
-// (a teacher can never lift that). Parents' reports are in the "reports"
+// (a teacher can never lift that). To verify a teacher set identityVerified and/or
+// qualificationVerified to true on teachers/{uid} in the console, after checking
+// documents; teachers cannot write those two fields. Parents' reports are in the "reports"
 // collection, readable only in the console.
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -13,6 +15,19 @@ service cloud.firestore {
     }
     function role() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    // Limits on what a teacher can put in a profile.
+    function profileFieldsOk(d) {
+      return d.get('bio', '').size() <= 1500
+        && d.get('headline', '').size() <= 120
+        && d.get('philosophy', '').size() <= 600
+        && d.get('qualifications', '').size() <= 800
+        && d.get('cancellationPolicy', '').size() <= 400
+        && d.get('priceEgp', 0) >= 0 && d.get('priceEgp', 0) <= 100000
+        && d.get('lessonMinutes', 30) >= 10 && d.get('lessonMinutes', 30) <= 240
+        && d.get('experienceYears', 0) >= 0 && d.get('experienceYears', 0) <= 60
+        && d.get('ageMin', 0) >= 0 && d.get('ageMax', 12) <= 18;
     }
 
     // users/{uid}: role and display name, readable only by the owner.
@@ -34,11 +49,18 @@ service cloud.firestore {
       allow create: if signedIn() && request.auth.uid == uid
         && role() == 'teacher'
         && request.resource.data.status == 'approved'
-        && request.resource.data.get('photoB64', '').size() < 150000;
+        && request.resource.data.get('photoB64', '').size() < 150000
+        && profileFieldsOk(request.resource.data)
+        // The verification badges can only be set by the owner in the console.
+        && !('identityVerified' in request.resource.data)
+        && !('qualificationVerified' in request.resource.data);
       allow update: if signedIn() && request.auth.uid == uid
         && (request.resource.data.status == resource.data.status
             || (resource.data.status == 'pending' && request.resource.data.status == 'approved'))
-        && request.resource.data.get('photoB64', '').size() < 150000;
+        && request.resource.data.get('photoB64', '').size() < 150000
+        && profileFieldsOk(request.resource.data)
+        && request.resource.data.get('identityVerified', false) == resource.data.get('identityVerified', false)
+        && request.resource.data.get('qualificationVerified', false) == resource.data.get('qualificationVerified', false);
       allow delete: if false;
     }
 

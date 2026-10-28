@@ -8,6 +8,12 @@ import 'teachers_models.dart';
 /// Firebase implementation. Data lives in three Firestore collections:
 /// users/{uid} (role, name), teachers/{uid} (profile, status) and
 /// bookings/{id}. Access is limited by firestore.rules.
+/// Optional profile fields: cleared ones are deleted on update.
+const _optionalKeys = [
+  'photoB64', 'cvName', 'headline', 'philosophy', 'ageMin', 'ageMax', 'lessonMinutes', 'priceEgp',
+  'experienceYears', 'qualifications', 'cancellationPolicy',
+];
+
 class FirebaseTeacherRepository implements TeacherRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -119,6 +125,11 @@ class FirebaseTeacherRepository implements TeacherRepository {
             map['status'] = teacherStatusApproved;
           } else {
             map.remove('status');
+          }
+          // A field the teacher cleared is removed; the verification badges are
+          // never written from the app (only the owner sets them in the console).
+          for (final key in _optionalKeys) {
+            if (!map.containsKey(key)) map[key] = FieldValue.delete();
           }
           await ref.update(map);
         } else {

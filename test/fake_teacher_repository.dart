@@ -50,19 +50,16 @@ class FakeTeacherRepository implements TeacherRepository {
 
   /// The app owner hiding a teacher in the Firebase console.
   void suspend(String uid) {
-    final t = _teachers[uid]!;
-    _teachers[uid] = TeacherProfile(
-      uid: uid,
-      name: t.name,
-      bio: t.bio,
-      subjects: t.subjects,
-      languages: t.languages,
-      priceNote: t.priceNote,
-      status: teacherStatusSuspended,
-      photoB64: t.photoB64,
-      cvName: t.cvName,
-    );
+    _teachers[uid] = _teachers[uid]!.copyWith(status: teacherStatusSuspended);
   }
+
+  /// The app owner verifying a teacher in the console.
+  void verify(String uid, {bool? identity, bool? qualification}) {
+    _teachers[uid] = _teachers[uid]!.withVerification(identity: identity, qualification: qualification);
+  }
+
+  /// Puts a ready-made profile in the "database" (as if the teacher had saved it).
+  void seed(TeacherProfile p) => _teachers[p.uid] = p;
 
   String get teacherUid => _teachers.keys.single;
 
@@ -77,19 +74,12 @@ class FakeTeacherRepository implements TeacherRepository {
   Future<void> saveTeacherProfile(TeacherProfile p, {CvFile? newCv}) async {
     final old = _teachers[_current!.uid];
     if (newCv != null) _cvs[_current!.uid] = newCv;
-    _teachers[_current!.uid] = TeacherProfile(
-      uid: _current!.uid,
-      name: p.name,
-      bio: p.bio,
-      subjects: p.subjects,
-      languages: p.languages,
-      priceNote: p.priceNote,
-      // Visible at once; a suspension can never be lifted by the teacher.
-      status: old == null || old.status == teacherStatusPending
-          ? teacherStatusApproved
-          : old.status,
-      photoB64: p.photoB64,
-      cvName: p.cvName,
+    // Visible at once; a suspension can never be lifted by the teacher, and a
+    // teacher can never set or change the verification badges.
+    _teachers[_current!.uid] = p.copyWith(
+      status: old == null || old.status == teacherStatusPending ? teacherStatusApproved : old.status,
+      identityVerified: old?.identityVerified ?? false,
+      qualificationVerified: old?.qualificationVerified ?? false,
     );
   }
 

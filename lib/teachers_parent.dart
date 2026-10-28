@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'curriculum.dart';
 import 'teachers_bookings.dart';
+import 'teachers_directory.dart';
 import 'media_picker.dart';
 import 'teachers_models.dart';
 import 'teachers_widgets.dart';
@@ -21,8 +22,6 @@ class ParentTeachersScreen extends StatefulWidget {
 
 class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
   late Future<List<TeacherProfile>> _teachers;
-  String? _subject;
-
   @override
   void initState() {
     super.initState();
@@ -76,90 +75,34 @@ class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
             );
           }
           final all = snapshot.data!;
-          final subjects = {for (final t in all) ...t.subjects};
-          final shown =
-              all.where((t) => _subject == null || t.subjects.contains(_subject)).toList();
-          return ListView(
-            padding: const EdgeInsets.all(16),
+          return Column(
             children: [
               const Card(
+                margin: EdgeInsets.fromLTRB(16, 8, 16, 0),
                 child: Padding(
                   padding: EdgeInsets.all(12),
                   child: Text(
                     'المدرسون يسجّلون بأنفسهم ولا يفحصهم التطبيق، فتحقق منهم قبل الحجز. '
+                    'شارة «تم التحقق» تظهر فقط حين يتحقق صاحب التطبيق فعلاً، ولا تظهر بمجرد اكتمال الملف. '
                     'لا توجد محادثة داخل التطبيق: عند قبول المدرس لطلبك يظهر رابط الحصة '
                     'في «طلباتي». افتح الرابط بنفسك وكن بجانب طفلك طوال الحصة.',
+                    style: TextStyle(fontSize: 13),
                   ),
                 ),
               ),
-              if (subjects.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Wrap(
-                    spacing: 8,
-                    children: [
-                      ChoiceChip(
-                        label: const Text('الكل'),
-                        selected: _subject == null,
-                        onSelected: (_) => setState(() => _subject = null),
-                      ),
-                      for (final id in subjects)
-                        ChoiceChip(
-                          label: Text(subjectById(id)?.label ?? id),
-                          selected: _subject == id,
-                          onSelected: (_) => setState(() => _subject = id),
-                        ),
-                    ],
+              Expanded(
+                child: TeacherDirectory(
+                  teachers: all,
+                  onOpen: (t) => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => TeacherDetailScreen(repo: widget.repo, teacher: t)),
+                  ),
+                  onCompare: (list) => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => CompareTeachersScreen(teachers: list)),
                   ),
                 ),
-              if (shown.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(32),
-                  child: Center(
-                    child: Text('لا يوجد مدرسون متاحون الآن', style: TextStyle(fontSize: 20)),
-                  ),
-                ),
-              for (final t in shown)
-                Card(
-                  margin: const EdgeInsets.symmetric(vertical: 6),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(20),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => TeacherDetailScreen(repo: widget.repo, teacher: t),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(14),
-                      child: Row(
-                        children: [
-                          TeacherAvatar(photo: t.photoBytes, radius: 34),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(t.name,
-                                    style: const TextStyle(
-                                        fontSize: 19, fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 6),
-                                Wrap(spacing: 6, runSpacing: 6, children: [
-                                  for (final id in t.subjects) SubjectChip(id: id),
-                                ]),
-                                const SizedBox(height: 6),
-                                Text(t.languages.join('، '),
-                                    style: const TextStyle(fontSize: 14)),
-                              ],
-                            ),
-                          ),
-                          const Icon(Icons.chevron_left),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+              ),
             ],
           );
         },
@@ -171,7 +114,10 @@ class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
 class TeacherDetailScreen extends StatelessWidget {
   final TeacherRepository repo;
   final TeacherProfile teacher;
-  const TeacherDetailScreen({super.key, required this.repo, required this.teacher});
+
+  /// A teacher looking at their own page as parents see it: no booking, report or CV buttons.
+  final bool preview;
+  const TeacherDetailScreen({super.key, required this.repo, required this.teacher, this.preview = false});
 
   Future<void> _request(BuildContext context) async {
     final user = repo.currentUser;
@@ -243,55 +189,106 @@ class TeacherDetailScreen extends StatelessWidget {
     }
   }
 
+  Widget _section(String title, Widget child) => Padding(
+        padding: const EdgeInsets.only(top: 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            child,
+          ],
+        ),
+      );
+
+  Widget _chips(List<String> items) =>
+      Wrap(spacing: 6, runSpacing: 6, children: [for (final i in items) Chip(label: Text(i), visualDensity: VisualDensity.compact)]);
+
   @override
   Widget build(BuildContext context) {
+    final t = teacher;
+    final facts = teacherFacts(t);
+    final done = profileCompleteness(t);
     return Scaffold(
-      appBar: AppBar(title: Text(teacher.name)),
+      appBar: AppBar(title: Text(t.name)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           TeacherHeader(
-            avatar: TeacherAvatar(photo: teacher.photoBytes, radius: 44),
-            title: teacher.name,
-            subtitle: teacher.languages.join('، '),
+            avatar: TeacherAvatar(photo: t.photoBytes, radius: 44),
+            title: t.name,
+            subtitle: t.headline.isNotEmpty ? t.headline : t.languages.join('، '),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
+          VerificationBadges(teacher: t),
+          if (!t.identityVerified && !t.qualificationVerified)
+            const Text('لم يتحقق صاحب التطبيق من هوية هذا المدرس أو مؤهله. المعلومات أدناه يكتبها المدرس بنفسه.',
+                style: TextStyle(fontSize: 13)),
+          if (facts.isNotEmpty)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Wrap(
+                  spacing: 16,
+                  runSpacing: 6,
+                  children: [for (final f in facts) Text(f, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600))],
+                ),
+              ),
+            ),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(teacher.bio, style: const TextStyle(fontSize: 17)),
-                  const SizedBox(height: 12),
-                  Wrap(spacing: 8, runSpacing: 8, children: [
-                    for (final id in teacher.subjects) SubjectChip(id: id),
-                  ]),
-                  if (teacher.priceNote.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    Text('السعر: ${teacher.priceNote}', style: const TextStyle(fontSize: 17)),
-                  ],
+                  Text(t.bio, style: const TextStyle(fontSize: 17)),
+                  if (t.philosophy.isNotEmpty) _section('أسلوبي في التعليم', Text(t.philosophy)),
+                  _section('المواد', Wrap(spacing: 8, runSpacing: 8, children: [for (final id in t.subjects) SubjectChip(id: id)])),
+                  if (t.specialties.isNotEmpty) _section('التخصصات', _chips(t.specialties)),
+                  if (t.curricula.isNotEmpty) _section('المناهج', _chips(t.curricula)),
+                  if (t.languages.isNotEmpty || t.dialects.isNotEmpty)
+                    _section('اللغة واللهجة', _chips([...t.languages, ...t.dialects])),
+                  if (t.formats.isNotEmpty || t.classTypes.isNotEmpty)
+                    _section('نوع الحصة', _chips([...t.formats.map(formatLabel), ...t.classTypes.map(classTypeLabel)])),
+                  if (t.styles.isNotEmpty) _section('أساليب التدريس', _chips(t.styles)),
+                  if (t.qualifications.isNotEmpty)
+                    _section(
+                      t.qualificationVerified ? 'المؤهلات (تم التحقق منها)' : 'المؤهلات (كتبها المدرس ولم يتحقق منها التطبيق)',
+                      Text(t.qualifications),
+                    ),
+                  _section('سياسة الإلغاء',
+                      Text(t.cancellationPolicy.isEmpty ? 'لم يحدد المدرس سياسة إلغاء بعد.' : t.cancellationPolicy)),
+                  _section('التقييمات',
+                      const Text('لا توجد تقييمات بعد. ستظهر هنا تقييمات أولياء الأمور بعد حصص مكتملة فقط.')),
+                  _section('اكتمال الملف', Text('${done.done.length} من ${done.total} (يكتبه المدرس بنفسه، وليس شارة تحقق)')),
                 ],
               ),
             ),
           ),
-          if (teacher.cvName != null)
-            OutlinedButton.icon(
-              onPressed: () => _downloadCv(context),
-              icon: const Icon(Icons.description_outlined),
-              label: const Text('تنزيل السيرة الذاتية'),
+          if (preview)
+            const Padding(
+              padding: EdgeInsets.only(top: 12),
+              child: Text('هذه معاينة لصفحتك كما يراها الأهل.', textAlign: TextAlign.center),
+            )
+          else ...[
+            if (t.cvName != null)
+              OutlinedButton.icon(
+                onPressed: () => _downloadCv(context),
+                icon: const Icon(Icons.description_outlined),
+                label: const Text('تنزيل السيرة الذاتية'),
+              ),
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              onPressed: () => _request(context),
+              icon: const Icon(Icons.event_available),
+              label: const Text('اطلب حصة'),
             ),
-          const SizedBox(height: 12),
-          FilledButton.icon(
-            onPressed: () => _request(context),
-            icon: const Icon(Icons.event_available),
-            label: const Text('اطلب حصة'),
-          ),
-          TextButton.icon(
-            onPressed: () => _report(context),
-            icon: const Icon(Icons.flag_outlined),
-            label: const Text('إبلاغ عن هذا المدرس'),
-          ),
+            TextButton.icon(
+              onPressed: () => _report(context),
+              icon: const Icon(Icons.flag_outlined),
+              label: const Text('إبلاغ عن هذا المدرس'),
+            ),
+          ],
         ],
       ),
     );
@@ -424,6 +421,13 @@ class _BookingDialogState extends State<BookingDialog> {
               controller: _note,
               maxLines: 3,
               decoration: const InputDecoration(labelText: 'ملاحظة (اختياري)'),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              widget.teacher.cancellationPolicy.isEmpty
+                  ? 'سياسة الإلغاء: لم يحدد المدرس سياسة بعد. اتفقا عليها قبل الحصة.'
+                  : 'سياسة الإلغاء: ${widget.teacher.cancellationPolicy}',
+              style: const TextStyle(fontSize: 13),
             ),
           ],
         ),

@@ -42,6 +42,26 @@ class CvFile {
   const CvFile(this.name, this.bytes);
 }
 
+/// Choices a teacher picks from, so parents can filter on them.
+const kTeacherDialects = ['مصري', 'فصحى', 'خليجي', 'شامي'];
+const kTeacherCurricula = ['المنهج المصري', 'المنهج السعودي', 'المنهج البريطاني', 'المنهج الأمريكي', 'البكالوريا الدولية', 'بدون منهج محدد'];
+const kTeacherSpecialties = ['تأسيس القراءة', 'تأسيس الكتابة', 'تأسيس الرياضيات', 'تقوية بعد المدرسة', 'محادثة', 'حفظ ومراجعة', 'رسم وفنون', 'علوم وتجارب'];
+const kTeacherStyles = ['ألعاب', 'شرح مباشر', 'أنشطة', 'واجبات', 'مراجعة'];
+
+const formatOnline = 'online';
+const formatInPerson = 'in_person';
+const classIndividual = 'individual';
+const classSmallGroup = 'small_group';
+
+String formatLabel(String f) => f == formatOnline ? 'أونلاين' : 'حضوري';
+String classTypeLabel(String c) => c == classIndividual ? 'فردية' : 'مجموعة صغيرة';
+
+/// What each verification badge means. A badge is shown only when the app owner
+/// set it after checking; a teacher can never set or keep one by editing their
+/// own profile (the rules and the repository both block it).
+const kIdentityBadgeMeaning = 'تحقق صاحب التطبيق من هوية المدرس بمستند رسمي.';
+const kQualificationBadgeMeaning = 'تحقق صاحب التطبيق من المؤهل الدراسي الذي ذكره المدرس بمستند.';
+
 class TeacherProfile {
   final String uid;
   final String name;
@@ -53,6 +73,27 @@ class TeacherProfile {
   final String? photoB64; // small JPEG, base64
   final String? cvName; // the CV file itself is loaded on demand (loadCv)
 
+  // Professional profile (all written by the teacher; none of it is verified).
+  final String headline; // a short, outcome-focused line
+  final String philosophy;
+  final int? ageMin;
+  final int? ageMax;
+  final List<String> specialties;
+  final List<String> curricula;
+  final List<String> dialects;
+  final List<String> formats; // formatOnline / formatInPerson
+  final List<String> styles;
+  final List<String> classTypes; // classIndividual / classSmallGroup
+  final int? lessonMinutes;
+  final int? priceEgp; // per lesson, a number so it can be filtered and sorted
+  final int? experienceYears;
+  final String qualifications; // the teacher's own words
+  final String cancellationPolicy;
+
+  /// Set ONLY by the app owner in the console, never by the teacher.
+  final bool identityVerified;
+  final bool qualificationVerified;
+
   const TeacherProfile({
     required this.uid,
     required this.name,
@@ -63,6 +104,23 @@ class TeacherProfile {
     this.status = teacherStatusApproved,
     this.photoB64,
     this.cvName,
+    this.headline = '',
+    this.philosophy = '',
+    this.ageMin,
+    this.ageMax,
+    this.specialties = const [],
+    this.curricula = const [],
+    this.dialects = const [],
+    this.formats = const [],
+    this.styles = const [],
+    this.classTypes = const [],
+    this.lessonMinutes,
+    this.priceEgp,
+    this.experienceYears,
+    this.qualifications = '',
+    this.cancellationPolicy = '',
+    this.identityVerified = false,
+    this.qualificationVerified = false,
   });
 
   bool get approved => status == teacherStatusApproved;
@@ -70,6 +128,49 @@ class TeacherProfile {
 
   Uint8List? get photoBytes => photoB64 == null ? null : base64Decode(photoB64!);
 
+  bool teachesAge(int age) => ageMin != null && ageMax != null && age >= ageMin! && age <= ageMax!;
+
+  /// A copy with the owner-only badges replaced (used by the owner tools and tests).
+  TeacherProfile withVerification({bool? identity, bool? qualification}) => copyWith(
+        identityVerified: identity ?? identityVerified,
+        qualificationVerified: qualification ?? qualificationVerified,
+      );
+
+  TeacherProfile copyWith({
+    String? status,
+    bool? identityVerified,
+    bool? qualificationVerified,
+  }) =>
+      TeacherProfile(
+        uid: uid,
+        name: name,
+        bio: bio,
+        subjects: subjects,
+        languages: languages,
+        priceNote: priceNote,
+        status: status ?? this.status,
+        photoB64: photoB64,
+        cvName: cvName,
+        headline: headline,
+        philosophy: philosophy,
+        ageMin: ageMin,
+        ageMax: ageMax,
+        specialties: specialties,
+        curricula: curricula,
+        dialects: dialects,
+        formats: formats,
+        styles: styles,
+        classTypes: classTypes,
+        lessonMinutes: lessonMinutes,
+        priceEgp: priceEgp,
+        experienceYears: experienceYears,
+        qualifications: qualifications,
+        cancellationPolicy: cancellationPolicy,
+        identityVerified: identityVerified ?? this.identityVerified,
+        qualificationVerified: qualificationVerified ?? this.qualificationVerified,
+      );
+
+  /// What a teacher is allowed to write. The verification badges are NOT here.
   Map<String, dynamic> toMap() => {
         'name': name,
         'bio': bio,
@@ -80,19 +181,243 @@ class TeacherProfile {
         // Omitted when empty: the rules read these fields and null would break them.
         'photoB64': ?photoB64,
         'cvName': ?cvName,
+        if (headline.isNotEmpty) 'headline': headline,
+        if (philosophy.isNotEmpty) 'philosophy': philosophy,
+        'ageMin': ?ageMin,
+        'ageMax': ?ageMax,
+        'specialties': specialties,
+        'curricula': curricula,
+        'dialects': dialects,
+        'formats': formats,
+        'styles': styles,
+        'classTypes': classTypes,
+        'lessonMinutes': ?lessonMinutes,
+        'priceEgp': ?priceEgp,
+        'experienceYears': ?experienceYears,
+        if (qualifications.isNotEmpty) 'qualifications': qualifications,
+        if (cancellationPolicy.isNotEmpty) 'cancellationPolicy': cancellationPolicy,
       };
+
+  static List<String> _list(Object? v) => [for (final s in (v as List<dynamic>? ?? [])) s as String];
 
   factory TeacherProfile.fromMap(String uid, Map<String, dynamic> m) => TeacherProfile(
         uid: uid,
         name: (m['name'] as String?) ?? '',
         bio: (m['bio'] as String?) ?? '',
-        subjects: [for (final s in (m['subjects'] as List<dynamic>? ?? [])) s as String],
-        languages: [for (final s in (m['languages'] as List<dynamic>? ?? [])) s as String],
+        subjects: _list(m['subjects']),
+        languages: _list(m['languages']),
         priceNote: (m['priceNote'] as String?) ?? '',
         status: (m['status'] as String?) ?? teacherStatusApproved,
         photoB64: m['photoB64'] as String?,
         cvName: m['cvName'] as String?,
+        headline: (m['headline'] as String?) ?? '',
+        philosophy: (m['philosophy'] as String?) ?? '',
+        ageMin: (m['ageMin'] as num?)?.toInt(),
+        ageMax: (m['ageMax'] as num?)?.toInt(),
+        specialties: _list(m['specialties']),
+        curricula: _list(m['curricula']),
+        dialects: _list(m['dialects']),
+        formats: _list(m['formats']),
+        styles: _list(m['styles']),
+        classTypes: _list(m['classTypes']),
+        lessonMinutes: (m['lessonMinutes'] as num?)?.toInt(),
+        priceEgp: (m['priceEgp'] as num?)?.toInt(),
+        experienceYears: (m['experienceYears'] as num?)?.toInt(),
+        qualifications: (m['qualifications'] as String?) ?? '',
+        cancellationPolicy: (m['cancellationPolicy'] as String?) ?? '',
+        // Read-only here: only the console can set these.
+        identityVerified: m['identityVerified'] == true,
+        qualificationVerified: m['qualificationVerified'] == true,
       );
+}
+
+/// How complete a profile is, for the teacher's checklist and for the default
+/// order (a plain, published rule: complete profiles first, then by name).
+class ProfileCompleteness {
+  final List<String> done;
+  final List<String> missing;
+  const ProfileCompleteness(this.done, this.missing);
+  int get total => done.length + missing.length;
+  double get ratio => total == 0 ? 0 : done.length / total;
+}
+
+ProfileCompleteness profileCompleteness(TeacherProfile p) {
+  final checks = <String, bool>{
+    'صورة شخصية': p.photoB64 != null,
+    'عنوان قصير يصف ما تقدمه': p.headline.trim().length >= 10,
+    'نبذة (80 حرفاً على الأقل)': p.bio.trim().length >= 80,
+    'المواد': p.subjects.isNotEmpty,
+    'الفئة العمرية': p.ageMin != null && p.ageMax != null,
+    'السعر': p.priceEgp != null || p.priceNote.trim().isNotEmpty,
+    'مدة الحصة': p.lessonMinutes != null,
+    'سنوات الخبرة': p.experienceYears != null,
+    'المؤهلات': p.qualifications.trim().isNotEmpty,
+    'طريقة التدريس (أونلاين/حضوري)': p.formats.isNotEmpty,
+    'سياسة الإلغاء': p.cancellationPolicy.trim().isNotEmpty,
+    'اللغات': p.languages.isNotEmpty,
+  };
+  return ProfileCompleteness(
+    [for (final e in checks.entries) if (e.value) e.key],
+    [for (final e in checks.entries) if (!e.value) e.key],
+  );
+}
+
+enum TeacherSort { relevance, priceLow, priceHigh, experience }
+
+extension TeacherSortText on TeacherSort {
+  String get label => switch (this) {
+        TeacherSort.relevance => 'الأنسب (الملفات الأكثر اكتمالاً أولاً)',
+        TeacherSort.priceLow => 'السعر: الأقل أولاً',
+        TeacherSort.priceHigh => 'السعر: الأعلى أولاً',
+        TeacherSort.experience => 'الأكثر خبرة',
+      };
+}
+
+/// Parent-chosen filters. Filters combine (all must match). A teacher who left a
+/// field empty does not match a filter on that field: the app never assumes.
+class TeacherFilters {
+  final String query;
+  final String? subject;
+  final int? childAge;
+  final String? language;
+  final String? dialect;
+  final String? format;
+  final String? curriculum;
+  final int? maxPrice;
+  final bool identityVerified;
+  final bool qualificationVerified;
+  const TeacherFilters({
+    this.query = '',
+    this.subject,
+    this.childAge,
+    this.language,
+    this.dialect,
+    this.format,
+    this.curriculum,
+    this.maxPrice,
+    this.identityVerified = false,
+    this.qualificationVerified = false,
+  });
+
+  static const none = TeacherFilters();
+
+  bool get isEmpty =>
+      query.trim().isEmpty &&
+      subject == null &&
+      childAge == null &&
+      language == null &&
+      dialect == null &&
+      format == null &&
+      curriculum == null &&
+      maxPrice == null &&
+      !identityVerified &&
+      !qualificationVerified;
+
+  int get activeCount => [
+        query.trim().isNotEmpty,
+        subject != null,
+        childAge != null,
+        language != null,
+        dialect != null,
+        format != null,
+        curriculum != null,
+        maxPrice != null,
+        identityVerified,
+        qualificationVerified,
+      ].where((x) => x).length;
+
+  TeacherFilters copyWith({
+    String? query,
+    Object? subject = _keep,
+    Object? childAge = _keep,
+    Object? language = _keep,
+    Object? dialect = _keep,
+    Object? format = _keep,
+    Object? curriculum = _keep,
+    Object? maxPrice = _keep,
+    bool? identityVerified,
+    bool? qualificationVerified,
+  }) =>
+      TeacherFilters(
+        query: query ?? this.query,
+        subject: identical(subject, _keep) ? this.subject : subject as String?,
+        childAge: identical(childAge, _keep) ? this.childAge : childAge as int?,
+        language: identical(language, _keep) ? this.language : language as String?,
+        dialect: identical(dialect, _keep) ? this.dialect : dialect as String?,
+        format: identical(format, _keep) ? this.format : format as String?,
+        curriculum: identical(curriculum, _keep) ? this.curriculum : curriculum as String?,
+        maxPrice: identical(maxPrice, _keep) ? this.maxPrice : maxPrice as int?,
+        identityVerified: identityVerified ?? this.identityVerified,
+        qualificationVerified: qualificationVerified ?? this.qualificationVerified,
+      );
+}
+
+const Object _keep = Object();
+
+String _plain(String s) => s
+    .replaceAll(RegExp('[\u064B-\u0652\u0670]'), '')
+    .replaceAll(RegExp('[أإآٱ]'), 'ا')
+    .replaceAll('ة', 'ه')
+    .replaceAll('ى', 'ي')
+    .toLowerCase();
+
+bool teacherMatches(TeacherProfile t, TeacherFilters f, String Function(String subjectId) subjectLabel) {
+  final q = _plain(f.query.trim());
+  if (q.isNotEmpty) {
+    final haystack = _plain([
+      t.name,
+      t.headline,
+      t.bio,
+      ...t.specialties,
+      ...t.subjects.map(subjectLabel),
+    ].join(' '));
+    if (!haystack.contains(q)) return false;
+  }
+  if (f.subject != null && !t.subjects.contains(f.subject)) return false;
+  if (f.childAge != null && !t.teachesAge(f.childAge!)) return false;
+  if (f.language != null && !t.languages.contains(f.language)) return false;
+  if (f.dialect != null && !t.dialects.contains(f.dialect)) return false;
+  if (f.format != null && !t.formats.contains(f.format)) return false;
+  if (f.curriculum != null && !t.curricula.contains(f.curriculum)) return false;
+  if (f.maxPrice != null && (t.priceEgp == null || t.priceEgp! > f.maxPrice!)) return false;
+  if (f.identityVerified && !t.identityVerified) return false;
+  if (f.qualificationVerified && !t.qualificationVerified) return false;
+  return true;
+}
+
+/// Filters and sorts. The order is fixed and public: by the chosen sort, then
+/// by profile completeness, then by name. Nothing is paid for and nothing
+/// depends on ratings (there are none yet). Teachers missing the sort field go last.
+List<TeacherProfile> searchTeachers(
+  List<TeacherProfile> all,
+  TeacherFilters f,
+  TeacherSort sort,
+  String Function(String subjectId) subjectLabel,
+) {
+  final list = [for (final t in all) if (teacherMatches(t, f, subjectLabel)) t];
+  int byName(TeacherProfile a, TeacherProfile b) => a.name.compareTo(b.name);
+  int byCompleteness(TeacherProfile a, TeacherProfile b) {
+    final c = profileCompleteness(b).ratio.compareTo(profileCompleteness(a).ratio);
+    return c != 0 ? c : byName(a, b);
+  }
+
+  int nullsLast(int? a, int? b, {bool desc = false}) {
+    if (a == null && b == null) return 0;
+    if (a == null) return 1;
+    if (b == null) return -1;
+    return desc ? b.compareTo(a) : a.compareTo(b);
+  }
+
+  list.sort((a, b) {
+    final primary = switch (sort) {
+      TeacherSort.relevance => 0,
+      TeacherSort.priceLow => nullsLast(a.priceEgp, b.priceEgp),
+      TeacherSort.priceHigh => nullsLast(a.priceEgp, b.priceEgp, desc: true),
+      TeacherSort.experience => nullsLast(a.experienceYears, b.experienceYears, desc: true),
+    };
+    return primary != 0 ? primary : byCompleteness(a, b);
+  });
+  return list;
 }
 
 const bookingRequested = 'requested';

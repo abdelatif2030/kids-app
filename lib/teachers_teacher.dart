@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'curriculum.dart';
 import 'media_picker.dart';
 import 'teachers_bookings.dart';
+import 'teachers_directory.dart' show VerificationBadges;
 import 'teachers_models.dart';
+import 'teachers_parent.dart' show TeacherDetailScreen;
 import 'teachers_widgets.dart';
 
 /// A teacher's home: their profile (and its approval status) and incoming requests.
@@ -119,6 +121,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                     ),
                   ),
                 ),
+                _Checklist(profile: p),
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -148,6 +151,17 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                 ),
               ],
               const SizedBox(height: 16),
+              if (p != null)
+                OutlinedButton.icon(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TeacherDetailScreen(repo: widget.repo, teacher: p, preview: true),
+                    ),
+                  ),
+                  icon: const Icon(Icons.visibility_outlined),
+                  label: const Text('معاينة صفحتي كما يراها الأهل'),
+                ),
               FilledButton.icon(
                 onPressed: () => _edit(p),
                 icon: const Icon(Icons.edit),
@@ -184,6 +198,21 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
   late final _price = TextEditingController(text: widget.existing?.priceNote ?? '');
   late final Set<String> _subjects = {...?widget.existing?.subjects};
   late final Set<String> _languages = {...?widget.existing?.languages};
+  late final _headline = TextEditingController(text: widget.existing?.headline ?? '');
+  late final _philosophy = TextEditingController(text: widget.existing?.philosophy ?? '');
+  late final _qualifications = TextEditingController(text: widget.existing?.qualifications ?? '');
+  late final _cancellation = TextEditingController(text: widget.existing?.cancellationPolicy ?? '');
+  late final _priceEgp = TextEditingController(text: widget.existing?.priceEgp?.toString() ?? '');
+  late final _experience = TextEditingController(text: widget.existing?.experienceYears?.toString() ?? '');
+  late int? _ageMin = widget.existing?.ageMin;
+  late int? _ageMax = widget.existing?.ageMax;
+  late int? _minutes = widget.existing?.lessonMinutes;
+  late final Set<String> _specialties = {...?widget.existing?.specialties};
+  late final Set<String> _curricula = {...?widget.existing?.curricula};
+  late final Set<String> _dialects = {...?widget.existing?.dialects};
+  late final Set<String> _formats = {...?widget.existing?.formats};
+  late final Set<String> _styles = {...?widget.existing?.styles};
+  late final Set<String> _classTypes = {...?widget.existing?.classTypes};
   late Uint8List? _photo = widget.existing?.photoBytes;
   late String? _cvName = widget.existing?.cvName;
   CvFile? _newCv;
@@ -195,6 +224,12 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
     _name.dispose();
     _bio.dispose();
     _price.dispose();
+    _headline.dispose();
+    _philosophy.dispose();
+    _qualifications.dispose();
+    _cancellation.dispose();
+    _priceEgp.dispose();
+    _experience.dispose();
     super.dispose();
   }
 
@@ -236,6 +271,17 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
       setState(() => _error = 'اختر مادة ولغة على الأقل');
       return;
     }
+    final price = _priceEgp.text.trim().isEmpty ? null : int.tryParse(_priceEgp.text.trim());
+    final years = _experience.text.trim().isEmpty ? null : int.tryParse(_experience.text.trim());
+    if ((_priceEgp.text.trim().isNotEmpty && (price == null || price < 0 || price > 100000)) ||
+        (_experience.text.trim().isNotEmpty && (years == null || years < 0 || years > 60))) {
+      setState(() => _error = 'تحقق من السعر وسنوات الخبرة (أرقام صحيحة)');
+      return;
+    }
+    if (_ageMin != null && _ageMax != null && _ageMin! > _ageMax!) {
+      setState(() => _error = 'الفئة العمرية: الحد الأدنى أكبر من الأقصى');
+      return;
+    }
     setState(() {
       _busy = true;
       _error = null;
@@ -252,6 +298,24 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
           status: widget.existing?.status ?? teacherStatusApproved,
           photoB64: _photo == null ? null : base64Encode(_photo!),
           cvName: _cvName,
+          headline: _headline.text.trim(),
+          philosophy: _philosophy.text.trim(),
+          ageMin: _ageMin,
+          ageMax: _ageMax,
+          specialties: _specialties.toList(),
+          curricula: _curricula.toList(),
+          dialects: _dialects.toList(),
+          formats: _formats.toList(),
+          styles: _styles.toList(),
+          classTypes: _classTypes.toList(),
+          lessonMinutes: _minutes,
+          priceEgp: price,
+          experienceYears: years,
+          qualifications: _qualifications.text.trim(),
+          cancellationPolicy: _cancellation.text.trim(),
+          // Never written from here: the owner sets the badges in the console.
+          identityVerified: widget.existing?.identityVerified ?? false,
+          qualificationVerified: widget.existing?.qualificationVerified ?? false,
         ),
         newCv: _newCv,
       );
@@ -262,6 +326,29 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
       if (mounted) setState(() => _busy = false);
     }
   }
+
+  Widget _chipGroup(String title, List<String> options, Set<String> selected, String Function(String) label) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 12, bottom: 4),
+            child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          Wrap(
+            spacing: 8,
+            children: [
+              for (final o in options)
+                FilterChip(
+                  label: Text(label(o)),
+                  selected: selected.contains(o),
+                  onSelected: (on) => setState(() {
+                    on ? selected.add(o) : selected.remove(o);
+                  }),
+                ),
+            ],
+          ),
+        ],
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -330,6 +417,107 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
                 ),
             ],
           ),
+          const SizedBox(height: 8),
+          Card(
+            child: ExpansionTile(
+              title: const Text('ملف احترافي (يزيد ثقة الأهل)', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: const Text('اختياري. كل ما تكتبه هنا يظهر للأهل على أنه من كلامك أنت، لا يتحقق منه التطبيق.'),
+              childrenPadding: const EdgeInsets.all(16),
+              expandedCrossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: _headline,
+                  maxLength: 100,
+                  decoration: const InputDecoration(labelText: 'عنوان قصير', hintText: 'مثال: تأسيس القراءة والكتابة بالألعاب'),
+                ),
+                TextField(
+                  controller: _philosophy,
+                  maxLines: 3,
+                  maxLength: 500,
+                  decoration: const InputDecoration(labelText: 'أسلوبك في التعليم'),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButton<int?>(
+                        isExpanded: true,
+                        value: _ageMin,
+                        hint: const Text('أصغر عمر'),
+                        items: [
+                          const DropdownMenuItem<int?>(value: null, child: Text('غير محدد')),
+                          for (var a = 1; a <= 12; a++) DropdownMenuItem<int?>(value: a, child: Text('$a')),
+                        ],
+                        onChanged: (v) => setState(() => _ageMin = v),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: DropdownButton<int?>(
+                        isExpanded: true,
+                        value: _ageMax,
+                        hint: const Text('أكبر عمر'),
+                        items: [
+                          const DropdownMenuItem<int?>(value: null, child: Text('غير محدد')),
+                          for (var a = 1; a <= 12; a++) DropdownMenuItem<int?>(value: a, child: Text('$a')),
+                        ],
+                        onChanged: (v) => setState(() => _ageMax = v),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _priceEgp,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(labelText: 'سعر الحصة (جنيه)'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: _experience,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(labelText: 'سنوات الخبرة'),
+                      ),
+                    ),
+                  ],
+                ),
+                DropdownButton<int?>(
+                  isExpanded: true,
+                  value: _minutes,
+                  hint: const Text('مدة الحصة'),
+                  items: [
+                    const DropdownMenuItem<int?>(value: null, child: Text('غير محددة')),
+                    for (final m in [30, 45, 60, 90]) DropdownMenuItem<int?>(value: m, child: Text('$m دقيقة')),
+                  ],
+                  onChanged: (v) => setState(() => _minutes = v),
+                ),
+                _chipGroup('طريقة الحصة', [formatOnline, formatInPerson], _formats, formatLabel),
+                _chipGroup('نوع الحصة', [classIndividual, classSmallGroup], _classTypes, classTypeLabel),
+                _chipGroup('التخصصات', kTeacherSpecialties, _specialties, (v) => v),
+                _chipGroup('المناهج', kTeacherCurricula, _curricula, (v) => v),
+                _chipGroup('اللهجة', kTeacherDialects, _dialects, (v) => v),
+                _chipGroup('أساليب التدريس', kTeacherStyles, _styles, (v) => v),
+                TextField(
+                  controller: _qualifications,
+                  maxLines: 3,
+                  maxLength: 600,
+                  decoration: const InputDecoration(
+                    labelText: 'المؤهلات',
+                    helperText: 'تظهر للأهل كـ «كتبها المدرس» حتى يتحقق منها صاحب التطبيق.',
+                  ),
+                ),
+                TextField(
+                  controller: _cancellation,
+                  maxLines: 2,
+                  maxLength: 300,
+                  decoration: const InputDecoration(labelText: 'سياسة الإلغاء', hintText: 'مثال: إلغاء مجاني قبل 24 ساعة'),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 16),
           Card(
             child: Padding(
@@ -364,6 +552,46 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
           const SizedBox(height: 16),
           FilledButton(onPressed: _busy ? null : _save, child: const Text('حفظ')),
         ],
+      ),
+    );
+  }
+}
+
+
+/// What is still missing from the profile, and the (owner-set) verification status.
+class _Checklist extends StatelessWidget {
+  final TeacherProfile profile;
+  const _Checklist({required this.profile});
+
+  @override
+  Widget build(BuildContext context) {
+    final c = profileCompleteness(profile);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('اكتمال الملف: ${c.done.length} من ${c.total}',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 6),
+            LinearProgressIndicator(value: c.ratio, minHeight: 8, borderRadius: BorderRadius.circular(8)),
+            if (c.missing.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              const Text('ينقص ملفك:'),
+              for (final m in c.missing) Text('• $m', style: const TextStyle(fontSize: 14)),
+            ],
+            const Divider(),
+            const Text('التحقق', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(profile.identityVerified ? '✓ الهوية تم التحقق منها' : 'الهوية: لم يتم التحقق بعد'),
+            Text(profile.qualificationVerified ? '✓ المؤهل تم التحقق منه' : 'المؤهل: لم يتم التحقق بعد'),
+            const Text(
+              'يضيف صاحب التطبيق الشارتين بعد فحص مستندات. اكتمال الملف لا يمنحك شارة.',
+              style: TextStyle(fontSize: 12),
+            ),
+            VerificationBadges(teacher: profile),
+          ],
+        ),
       ),
     );
   }

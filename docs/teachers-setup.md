@@ -66,3 +66,13 @@ const kFirebaseEnabled = true;
 - المدرسون والحسابات في منطقة الوالدين خلف الرمز السري، ولا يصل إليها الطفل.
 - التطبيق لا يفتح روابط خارجية: رابط الحصة يظهر لولي الأمر للنسخ، ويفتحه بنفسه ويجلس بجانب طفله.
 - جرّب القواعد بحسابات تجريبية قبل أي استخدام حقيقي.
+
+## Verification badges and the professional profile (stage 1 of the marketplace)
+
+1. **Re-publish `firestore.rules`** (Firestore → Rules → paste → Publish). The new rules limit field sizes/ranges and stop teachers from writing the two badge fields.
+2. To verify a teacher: check their documents yourself, outside the app. Then open `teachers/{uid}` in the console and add a boolean field:
+   - `identityVerified = true` after checking an official ID, and/or
+   - `qualificationVerified = true` after checking the qualification they claim.
+   The two badges are separate. Remove the field (or set `false`) to take a badge away. A teacher cannot add, change or remove either field, and a complete profile never gives a badge.
+3. Keep your own private record of what you checked and when (there is no audit log in the app yet).
+4. Existing teachers keep working: every new field is optional.
