@@ -56,3 +56,9 @@ Not present: availability, calendar, double-booking protection, reviews, request
 2. **Hosting.** Stay on the free Spark plan (rules only; simpler, weaker guarantees) or move to Blaze for Cloud Functions (strong server-side booking/review/payment logic; costs money, needs a card).
 3. **Requests and proposals.** Build them now (stage 5) or after bookings and reviews are reliable.
 4. **Payments.** Which country/provider (e.g. Paymob, Fawry, Stripe where available)? Nothing will be built before the provider is chosen.
+
+## Stage 2 (built): slots, booking, reviews, reports, messages, requests/proposals
+- Rules-only on the free Spark plan; `firestore.rules` proven against the real emulator (`cd rules_test && npm test`, 21 tests incl. a double-booking race). **Re-publish `firestore.rules` in the console.**
+- Slots (`${teacherUid}_${startMs}`), atomic booking (booking + slot in one batch), cancel/decline reopens the slot, completion only after the start time, one immutable review per completed booking, lesson reports (teacher writes; that parent + teacher read), text-only messages inside a booking (no phone/email/links, closed after cancel), requests (no child identity) and proposals.
+- Not built: payments (no payment in app, shown to parents), reminders (need a server), video classroom, AI matching, analytics, admin panel (owner uses the console).
+- Tests: `test/teachers_marketplace_test.dart`, `test/marketplace_flow_test.dart` (fake mirrors the rules). Not tested against real Firebase from the app.

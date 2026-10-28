@@ -88,6 +88,38 @@ service cloud.firestore {
       allow read, update, delete: if false;
     }
 
+    function nowMs() {
+      return request.time.toMillis();
+    }
+    function bookingDoc(id) {
+      return get(/databases/$(database)/documents/bookings/$(id));
+    }
+    function bookingAfter(id) {
+      return getAfter(/databases/$(database)/documents/bookings/$(id));
+    }
+
+    // A booking that names a slot must match that (still open) slot exactly.
+    // The same batch must also mark the slot booked for this very booking, so a
+    // booking can never exist for a slot that stays open.
+    function slotMatches(b, bookingId) {
+      let s = get(/databases/$(database)/documents/slots/$(b.slotId)).data;
+      let after = getAfter(/databases/$(database)/documents/slots/$(b.slotId)).data;
+      return s.status == 'open'
+        && s.teacherUid == b.teacherUid
+        && s.startMs == b.startMs
+        && s.minutes == b.minutes
+        && s.startMs > nowMs()
+        && after.status == 'booked'
+        && after.get('bookingId', '') == bookingId;
+    }
+    // A booking made from an accepted proposal must match that proposal.
+    function proposalMatches(b) {
+      let p = getAfter(/databases/$(database)/documents/proposals/$(b.proposalId)).data;
+      return p.status == 'accepted'
+        && p.parentUid == b.parentUid
+        && p.teacherUid == b.teacherUid;
+    }
+
     // bookings/{id}: lesson requests. Only the parent and the teacher involved
     // can read one. No child data except an optional age.
     match /bookings/{id} {
@@ -98,17 +130,202 @@ service cloud.firestore {
         && request.resource.data.parentUid == request.auth.uid
         && request.resource.data.status == 'requested'
         && request.resource.data.lessonLink == null
-        && get(/databases/$(database)/documents/teachers/$(request.resource.data.teacherUid)).data.status == 'approved';
-      // The teacher accepts (with an https lesson link) or declines.
+        && get(/databases/$(database)/documents/teachers/$(request.resource.data.teacherUid)).data.status == 'approved'
+        && (!('slotId' in request.resource.data) || slotMatches(request.resource.data, id))
+        && (!('proposalId' in request.resource.data) || proposalMatches(request.resource.data));
+      // The teacher accepts (with an https lesson link) or declines a pending request.
       allow update: if signedIn() && resource.data.teacherUid == request.auth.uid
+        && resource.data.status == 'requested'
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'lessonLink'])
         && request.resource.data.status in ['accepted', 'declined']
         && (request.resource.data.status == 'declined'
             || request.resource.data.lessonLink.matches('https://.+'));
-      // The parent can only cancel.
+      // The teacher marks an accepted, scheduled lesson completed or no-show, but
+      // only once its start time has passed.
+      allow update: if signedIn() && resource.data.teacherUid == request.auth.uid
+        && resource.data.status == 'accepted'
+        && resource.data.get('startMs', null) != null
+        && nowMs() >= resource.data.startMs
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['completed', 'no_show'];
+      // The parent can only cancel a request that is still open.
       allow update: if signedIn() && resource.data.parentUid == request.auth.uid
+        && resource.data.status in ['requested', 'accepted']
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
         && request.resource.data.status == 'cancelled';
+      allow delete: if false;
+
+      // Messages between the parent and the teacher of this booking (adults only;
+      // the child has no account). Text only, never edited or deleted.
+      match /messages/{mid} {
+        allow read: if signedIn()
+          && (bookingDoc(id).data.parentUid == request.auth.uid
+              || bookingDoc(id).data.teacherUid == request.auth.uid);
+        allow create: if signedIn()
+          && (bookingDoc(id).data.parentUid == request.auth.uid
+              || bookingDoc(id).data.teacherUid == request.auth.uid)
+          && bookingDoc(id).data.status in ['requested', 'accepted', 'completed']
+          && request.resource.data.keys().hasOnly(['senderUid', 'text', 'createdAt'])
+          && request.resource.data.senderUid == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() >= 1
+          && request.resource.data.text.size() <= 500
+          && request.resource.data.createdAt == request.time;
+        allow update, delete: if false;
+      }
+    }
+
+    // slots/{teacherUid_startMs}: a bookable time. The id contains the start, so
+    // a teacher cannot create two slots at the same time. A parent books by
+    // changing open -> booked in the same batch that creates the booking, so two
+    // parents cannot book the same slot (the second batch finds it booked).
+    match /slots/{slotId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && role() == 'teacher'
+        && request.resource.data.keys().hasOnly(['teacherUid', 'startMs', 'minutes', 'status'])
+        && request.resource.data.teacherUid == request.auth.uid
+        && slotId == request.auth.uid + '_' + string(request.resource.data.startMs)
+        && request.resource.data.status == 'open'
+        && request.resource.data.minutes is int
+        && request.resource.data.minutes >= 15 && request.resource.data.minutes <= 180
+        && request.resource.data.startMs is int
+        && request.resource.data.startMs > nowMs();
+      // A parent books an open slot.
+      allow update: if signedIn() && role() == 'parent'
+        && resource.data.status == 'open'
+        && resource.data.startMs > nowMs()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'bookingId'])
+        && request.resource.data.status == 'booked'
+        && existsAfter(/databases/$(database)/documents/bookings/$(request.resource.data.bookingId))
+        && bookingAfter(request.resource.data.bookingId).data.slotId == slotId
+        && bookingAfter(request.resource.data.bookingId).data.parentUid == request.auth.uid
+        && bookingAfter(request.resource.data.bookingId).data.teacherUid == resource.data.teacherUid
+        && bookingAfter(request.resource.data.bookingId).data.status == 'requested';
+      // The teacher blocks or reopens a free slot.
+      allow update: if signedIn() && resource.data.teacherUid == request.auth.uid
+        && resource.data.status in ['open', 'blocked']
+        && request.resource.data.status in ['open', 'blocked']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+      // The slot is freed when its booking was cancelled or declined.
+      allow update: if signedIn() && resource.data.status == 'booked'
+        && request.resource.data.status == 'open'
+        && !('bookingId' in request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'bookingId'])
+        && bookingAfter(resource.data.bookingId).data.status in ['cancelled', 'declined']
+        && (bookingAfter(resource.data.bookingId).data.parentUid == request.auth.uid
+            || bookingAfter(resource.data.bookingId).data.teacherUid == request.auth.uid);
+      allow delete: if signedIn() && resource.data.teacherUid == request.auth.uid
+        && resource.data.status != 'booked';
+    }
+
+    // lessonReports/{bookingId}: written by the teacher of a completed lesson,
+    // read only by that teacher and that booking's parent. A teacher's opinion,
+    // not a diagnosis.
+    match /lessonReports/{bookingId} {
+      allow read: if signedIn()
+        && (resource.data.parentUid == request.auth.uid
+            || resource.data.teacherUid == request.auth.uid);
+      allow create, update: if signedIn() && role() == 'teacher'
+        && bookingDoc(bookingId).data.teacherUid == request.auth.uid
+        && bookingDoc(bookingId).data.status == 'completed'
+        && request.resource.data.teacherUid == request.auth.uid
+        && request.resource.data.parentUid == bookingDoc(bookingId).data.parentUid
+        && request.resource.data.keys().hasOnly(['teacherUid', 'parentUid', 'covered', 'understood', 'needsReview', 'homeActivity', 'nextLesson', 'updatedAt'])
+        && request.resource.data.covered.size() <= 600
+        && request.resource.data.understood.size() <= 600
+        && request.resource.data.needsReview.size() <= 600
+        && request.resource.data.homeActivity.size() <= 600
+        && request.resource.data.nextLesson.size() <= 400
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    // reviews/{bookingId}: one per booking (the id is the booking id), only by
+    // that booking's parent, only after the lesson was completed, never edited.
+    match /reviews/{bookingId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && role() == 'parent'
+        && bookingDoc(bookingId).data.parentUid == request.auth.uid
+        && bookingDoc(bookingId).data.status == 'completed'
+        && request.resource.data.keys().hasOnly(['bookingId', 'teacherUid', 'parentUid', 'rating', 'text', 'createdAt'])
+        && request.resource.data.bookingId == bookingId
+        && request.resource.data.parentUid == request.auth.uid
+        && request.resource.data.teacherUid == bookingDoc(bookingId).data.teacherUid
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1 && request.resource.data.rating <= 5
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 400
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+
+    // reviewReports/{id}: someone reports a review. Read in the console only.
+    match /reviewReports/{id} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['bookingId', 'reporterUid', 'reason', 'createdAt'])
+        && request.resource.data.reporterUid == request.auth.uid
+        && request.resource.data.reason.size() <= 500
+        && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if false;
+    }
+
+    // requests/{id}: a parent's learning request. No child name, photo, school
+    // or contact details: only an optional age. Open requests are visible to teachers.
+    match /requests/{id} {
+      allow read: if signedIn()
+        && (resource.data.parentUid == request.auth.uid
+            || (role() == 'teacher' && resource.data.status == 'open'));
+      allow create: if signedIn() && role() == 'parent'
+        && request.resource.data.keys().hasOnly(['parentUid', 'subject', 'goal', 'childAge', 'format', 'schedule', 'budgetMin', 'budgetMax', 'approach', 'status', 'createdAt', 'expiresMs'])
+        && request.resource.data.parentUid == request.auth.uid
+        && request.resource.data.status == 'open'
+        && request.resource.data.goal.size() >= 1 && request.resource.data.goal.size() <= 500
+        && request.resource.data.get('schedule', '').size() <= 200
+        && request.resource.data.get('approach', '').size() <= 300
+        && request.resource.data.get('childAge', 6) >= 1 && request.resource.data.get('childAge', 6) <= 12
+        && request.resource.data.get('budgetMin', 0) >= 0
+        && request.resource.data.get('budgetMax', 0) <= 100000
+        && request.resource.data.get('budgetMin', 0) <= request.resource.data.get('budgetMax', 100000)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.expiresMs > nowMs()
+        && request.resource.data.expiresMs <= nowMs() + 7776000000;
+      allow update: if signedIn() && resource.data.parentUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'closed';
+      allow delete: if false;
+    }
+
+    // proposals/{requestId_teacherUid}: one proposal per teacher per request.
+    match /proposals/{pid} {
+      allow read: if signedIn()
+        && (resource.data.parentUid == request.auth.uid
+            || resource.data.teacherUid == request.auth.uid);
+      allow create: if signedIn() && role() == 'teacher'
+        && get(/databases/$(database)/documents/teachers/$(request.auth.uid)).data.status == 'approved'
+        && request.resource.data.keys().hasOnly(['requestId', 'parentUid', 'teacherUid', 'teacherName', 'message', 'priceEgp', 'minutes', 'schedule', 'firstSteps', 'status', 'createdAt'])
+        && pid == request.resource.data.requestId + '_' + request.auth.uid
+        && request.resource.data.teacherUid == request.auth.uid
+        && request.resource.data.status == 'sent'
+        && get(/databases/$(database)/documents/requests/$(request.resource.data.requestId)).data.status == 'open'
+        && get(/databases/$(database)/documents/requests/$(request.resource.data.requestId)).data.expiresMs > nowMs()
+        && request.resource.data.parentUid == get(/databases/$(database)/documents/requests/$(request.resource.data.requestId)).data.parentUid
+        && request.resource.data.message.size() >= 1 && request.resource.data.message.size() <= 800
+        && request.resource.data.firstSteps.size() <= 500
+        && request.resource.data.schedule.size() <= 200
+        && request.resource.data.priceEgp is int
+        && request.resource.data.priceEgp >= 0 && request.resource.data.priceEgp <= 100000
+        && request.resource.data.minutes is int
+        && request.resource.data.minutes >= 15 && request.resource.data.minutes <= 240
+        && request.resource.data.createdAt == request.time;
+      // The teacher withdraws; the parent shortlists, declines or accepts.
+      allow update: if signedIn() && resource.data.teacherUid == request.auth.uid
+        && resource.data.status in ['sent', 'shortlisted']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'withdrawn';
+      allow update: if signedIn() && resource.data.parentUid == request.auth.uid
+        && resource.data.status in ['sent', 'shortlisted']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['shortlisted', 'declined', 'accepted'];
       allow delete: if false;
     }
   }

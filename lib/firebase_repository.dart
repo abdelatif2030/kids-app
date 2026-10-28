@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'teachers_market.dart';
 import 'teachers_models.dart';
 
 /// Firebase implementation. Data lives in three Firestore collections:
@@ -184,4 +185,207 @@ class FirebaseTeacherRepository implements TeacherRepository {
             'status': status,
             'lessonLink': ?lessonLink,
           }));
+
+  // --- availability and scheduled bookings ---------------------------------
+
+  String get _uid => _auth.currentUser!.uid;
+
+  @override
+  Future<void> addSlots(List<Slot> slots) => _guard(() async {
+        // One batch (max 500 writes). create-only: a slot that already exists is skipped.
+        final existing = {for (final s in await slotsOf(_uid)) s.id};
+        final batch = _db.batch();
+        var n = 0;
+        for (final s in slots.take(400)) {
+          if (existing.contains(s.id)) continue;
+          batch.set(_db.collection('slots').doc(s.id), s.toMap());
+          n++;
+        }
+        if (n > 0) await batch.commit();
+      });
+
+  @override
+  Future<List<Slot>> slotsOf(String teacherUid) => _guard(() async {
+        final snap = await _db.collection('slots').where('teacherUid', isEqualTo: teacherUid).get();
+        final list = [for (final d in snap.docs) Slot.fromMap(d.data())]..sort((a, b) => a.startMs.compareTo(b.startMs));
+        return list;
+      });
+
+  @override
+  Future<void> setSlotBlocked(String slotId, bool blocked) => _guard(
+        () => _db.collection('slots').doc(slotId).update({'status': blocked ? slotBlocked : slotOpen}),
+      );
+
+  @override
+  Future<void> deleteSlot(String slotId) => _guard(() => _db.collection('slots').doc(slotId).delete());
+
+  @override
+  Future<void> bookSlot(Booking booking) async {
+    try {
+      await _guard(() async {
+        final ref = _db.collection('bookings').doc();
+        final batch = _db.batch();
+        batch.set(ref, {...booking.toMap(), 'createdAt': FieldValue.serverTimestamp()});
+        batch.update(_db.collection('slots').doc(booking.slotId), {'status': slotBooked, 'bookingId': ref.id});
+        await batch.commit();
+      });
+    } on AccountException catch (e) {
+      // The slot was taken or changed meanwhile.
+      if (e.message == 'ليس لديك صلاحية لهذه العملية') {
+        throw const AccountException('هذا الموعد لم يعد متاحاً، اختر موعداً آخر');
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> cancelOrDecline(Booking booking, {required String status}) => _guard(() async {
+        final batch = _db.batch();
+        batch.update(_db.collection('bookings').doc(booking.id), {'status': status});
+        if (booking.slotId != null) {
+          batch.update(_db.collection('slots').doc(booking.slotId), {'status': slotOpen, 'bookingId': FieldValue.delete()});
+        }
+        await batch.commit();
+      });
+
+  @override
+  Future<void> finishLesson(Booking booking, {required String status}) =>
+      _guard(() => _db.collection('bookings').doc(booking.id).update({'status': status}));
+
+  // --- reports, reviews, messages --------------------------------------------
+
+  @override
+  Future<void> saveLessonReport(LessonReport r) => _guard(
+        () => _db.collection('lessonReports').doc(r.bookingId).set({...r.toMap(), 'updatedAt': FieldValue.serverTimestamp()}),
+      );
+
+  @override
+  Future<LessonReport?> lessonReportFor(String bookingId) => _guard(() async {
+        final doc = await _db.collection('lessonReports').doc(bookingId).get();
+        final data = doc.data();
+        return data == null ? null : LessonReport.fromMap(bookingId, data);
+      });
+
+  @override
+  Future<void> submitReview(Review r) => _guard(
+        () => _db.collection('reviews').doc(r.bookingId).set({
+          'bookingId': r.bookingId,
+          'teacherUid': r.teacherUid,
+          'parentUid': r.parentUid,
+          'rating': r.rating,
+          'text': r.text,
+          'createdAt': FieldValue.serverTimestamp(),
+        }),
+      );
+
+  @override
+  Future<List<Review>> reviewsFor(String teacherUid) => _guard(() async {
+        final snap = await _db.collection('reviews').where('teacherUid', isEqualTo: teacherUid).get();
+        return [for (final d in snap.docs) Review.fromMap(d.data())];
+      });
+
+  @override
+  Future<List<Review>> allReviews() => _guard(() async {
+        final snap = await _db.collection('reviews').limit(1000).get();
+        return [for (final d in snap.docs) Review.fromMap(d.data())];
+      });
+
+  @override
+  Future<void> reportReview(String bookingId, String reason) => _guard(
+        () => _db.collection('reviewReports').add({
+          'bookingId': bookingId,
+          'reporterUid': _uid,
+          'reason': reason,
+          'createdAt': FieldValue.serverTimestamp(),
+        }),
+      );
+
+  @override
+  Future<List<ChatMessage>> messagesOf(String bookingId) => _guard(() async {
+        final snap = await _db.collection('bookings').doc(bookingId).collection('messages').orderBy('createdAt').get();
+        return [
+          for (final d in snap.docs)
+            ChatMessage(
+              id: d.id,
+              senderUid: d.data()['senderUid'] as String,
+              text: d.data()['text'] as String,
+              createdMs: (d.data()['createdAt'] as Timestamp?)?.millisecondsSinceEpoch ?? 0,
+            ),
+        ];
+      });
+
+  @override
+  Future<void> sendMessage(String bookingId, String text) => _guard(
+        () => _db.collection('bookings').doc(bookingId).collection('messages').add({
+          'senderUid': _uid,
+          'text': text,
+          'createdAt': FieldValue.serverTimestamp(),
+        }),
+      );
+
+  // --- requests and proposals --------------------------------------------------
+
+  LearningRequest _request(QueryDocumentSnapshot<Map<String, dynamic>> d) => LearningRequest.fromMap(
+        d.id,
+        d.data(),
+        createdMs: (d.data()['createdAt'] as Timestamp?)?.millisecondsSinceEpoch ?? 0,
+      );
+
+  @override
+  Future<void> createRequest(LearningRequest r) => _guard(
+        () => _db.collection('requests').add({...r.toMap(), 'createdAt': FieldValue.serverTimestamp()}),
+      );
+
+  @override
+  Future<List<LearningRequest>> myRequests() => _guard(() async {
+        final snap = await _db.collection('requests').where('parentUid', isEqualTo: _uid).get();
+        return [for (final d in snap.docs) _request(d)]..sort((a, b) => b.createdMs.compareTo(a.createdMs));
+      });
+
+  @override
+  Future<List<LearningRequest>> openRequests() => _guard(() async {
+        final snap = await _db.collection('requests').where('status', isEqualTo: requestOpen).get();
+        final now = DateTime.now();
+        return [for (final d in snap.docs) _request(d)]
+            .where((r) => !r.isExpired(now))
+            .toList()
+          ..sort((a, b) => b.createdMs.compareTo(a.createdMs));
+      });
+
+  @override
+  Future<void> closeRequest(String requestId) =>
+      _guard(() => _db.collection('requests').doc(requestId).update({'status': requestClosed}));
+
+  @override
+  Future<void> submitProposal(Proposal p) => _guard(
+        () => _db.collection('proposals').doc(p.id).set({...p.toMap(), 'createdAt': FieldValue.serverTimestamp()}),
+      );
+
+  @override
+  Future<List<Proposal>> proposalsForRequest(String requestId) => _guard(() async {
+        final snap = await _db
+            .collection('proposals')
+            .where('requestId', isEqualTo: requestId)
+            .where('parentUid', isEqualTo: _uid)
+            .get();
+        return [for (final d in snap.docs) Proposal.fromMap(d.data())];
+      });
+
+  @override
+  Future<List<Proposal>> myProposals() => _guard(() async {
+        final snap = await _db.collection('proposals').where('teacherUid', isEqualTo: _uid).get();
+        return [for (final d in snap.docs) Proposal.fromMap(d.data())];
+      });
+
+  @override
+  Future<void> setProposalStatus(String proposalId, String status) =>
+      _guard(() => _db.collection('proposals').doc(proposalId).update({'status': status}));
+
+  @override
+  Future<void> acceptProposal(Proposal proposal, Booking booking) => _guard(() async {
+        final batch = _db.batch();
+        batch.update(_db.collection('proposals').doc(proposal.id), {'status': proposalAccepted});
+        batch.set(_db.collection('bookings').doc(), {...booking.toMap(), 'createdAt': FieldValue.serverTimestamp()});
+        await batch.commit();
+      });
 }

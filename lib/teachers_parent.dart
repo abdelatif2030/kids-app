@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'curriculum.dart';
 import 'teachers_bookings.dart';
 import 'teachers_directory.dart';
+import 'teachers_market.dart';
+import 'teachers_requests.dart';
+import 'teachers_time.dart';
 import 'media_picker.dart';
 import 'teachers_models.dart';
 import 'teachers_widgets.dart';
@@ -21,17 +24,37 @@ class ParentTeachersScreen extends StatefulWidget {
 }
 
 class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
-  late Future<List<TeacherProfile>> _teachers;
+  late Future<_DirectoryData> _teachers;
+
+  Future<_DirectoryData> _load() async {
+    final teachers = await widget.repo.approvedTeachers();
+    // Real reviews and each teacher's soonest open slot. If either fails the
+    // directory still works, just without ratings or availability.
+    var ratings = <String, RatingSummary>{};
+    try {
+      ratings = ratingSummaries(await widget.repo.allReviews());
+    } catch (_) {}
+    final earliest = <String, int>{};
+    final now = DateTime.now();
+    for (final t in teachers.take(40)) {
+      try {
+        final s = earliestOpen(await widget.repo.slotsOf(t.uid), now);
+        if (s != null) earliest[t.uid] = s.startMs;
+      } catch (_) {}
+    }
+    return _DirectoryData(teachers, ratings, earliest);
+  }
+
   @override
   void initState() {
     super.initState();
-    _teachers = widget.repo.approvedTeachers();
+    _teachers = _load();
   }
 
   void _reload() {
-    final teachers = widget.repo.approvedTeachers();
+    final f = _load();
     setState(() {
-      _teachers = teachers;
+      _teachers = f;
     });
   }
 
@@ -41,6 +64,14 @@ class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
       appBar: AppBar(
         title: const Text('المدرسون'),
         actions: [
+          IconButton(
+            tooltip: 'طلب تعليمي',
+            icon: const Icon(Icons.post_add_rounded),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => MyRequestsScreen(repo: widget.repo)),
+            ),
+          ),
           IconButton(
             tooltip: 'طلباتي',
             icon: const Icon(Icons.event_note_rounded),
@@ -56,7 +87,7 @@ class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
           ),
         ],
       ),
-      body: FutureBuilder<List<TeacherProfile>>(
+      body: FutureBuilder<_DirectoryData>(
         future: _teachers,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
@@ -74,7 +105,8 @@ class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
               ),
             );
           }
-          final all = snapshot.data!;
+          final data = snapshot.data!;
+          final all = data.teachers;
           return Column(
             children: [
               const Card(
@@ -93,13 +125,15 @@ class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
               Expanded(
                 child: TeacherDirectory(
                   teachers: all,
+                  ratings: data.ratings,
+                  earliest: data.earliest,
                   onOpen: (t) => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => TeacherDetailScreen(repo: widget.repo, teacher: t)),
                   ),
                   onCompare: (list) => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => CompareTeachersScreen(teachers: list)),
+                    MaterialPageRoute(builder: (_) => CompareTeachersScreen(teachers: list, ratings: data.ratings)),
                   ),
                 ),
               ),
@@ -109,6 +143,13 @@ class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
       ),
     );
   }
+}
+
+class _DirectoryData {
+  final List<TeacherProfile> teachers;
+  final Map<String, RatingSummary> ratings;
+  final Map<String, int> earliest;
+  const _DirectoryData(this.teachers, this.ratings, this.earliest);
 }
 
 class TeacherDetailScreen extends StatelessWidget {
@@ -258,13 +299,13 @@ class TeacherDetailScreen extends StatelessWidget {
                     ),
                   _section('سياسة الإلغاء',
                       Text(t.cancellationPolicy.isEmpty ? 'لم يحدد المدرس سياسة إلغاء بعد.' : t.cancellationPolicy)),
-                  _section('التقييمات',
-                      const Text('لا توجد تقييمات بعد. ستظهر هنا تقييمات أولياء الأمور بعد حصص مكتملة فقط.')),
+                  _section('التقييمات', ReviewsSection(repo: repo, teacher: t, canReport: !preview)),
                   _section('اكتمال الملف', Text('${done.done.length} من ${done.total} (يكتبه المدرس بنفسه، وليس شارة تحقق)')),
                 ],
               ),
             ),
           ),
+          if (!preview) SlotsSection(repo: repo, teacher: t),
           if (preview)
             const Padding(
               padding: EdgeInsets.only(top: 12),
@@ -435,6 +476,273 @@ class _BookingDialogState extends State<BookingDialog> {
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: const Text('إلغاء')),
         FilledButton(onPressed: _send, child: const Text('إرسال الطلب')),
+      ],
+    );
+  }
+}
+
+
+/// A teacher's real ratings, from review records of completed lessons only.
+class ReviewsSection extends StatefulWidget {
+  final TeacherRepository repo;
+  final TeacherProfile teacher;
+  final bool canReport;
+  const ReviewsSection({super.key, required this.repo, required this.teacher, this.canReport = true});
+
+  @override
+  State<ReviewsSection> createState() => _ReviewsSectionState();
+}
+
+class _ReviewsSectionState extends State<ReviewsSection> {
+  late final Future<List<Review>> _reviews = widget.repo.reviewsFor(widget.teacher.uid);
+
+  Future<void> _report(Review r) async {
+    final reason = await showDialog<String>(context: context, builder: (_) => const _ReportDialog());
+    if (reason == null) return;
+    String message;
+    try {
+      await widget.repo.reportReview(r.bookingId, reason);
+      message = 'وصلنا بلاغك عن التقييم.';
+    } on AccountException catch (e) {
+      message = e.message;
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<Review>>(
+      future: _reviews,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) return const LinearProgressIndicator();
+        if (snap.hasError) return const Text('تعذر تحميل التقييمات.');
+        final list = snap.data!;
+        final summary = RatingSummary.of(list);
+        if (list.isEmpty) {
+          return const Text('لا توجد تقييمات بعد. تظهر هنا تقييمات أولياء الأمور بعد حصص مكتملة فقط.');
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('★ ${summary.average.toStringAsFixed(1)} من 5 · ${summary.count} تقييم (متوسط حقيقي من تقييمات الحصص المكتملة)',
+                style: const TextStyle(fontWeight: FontWeight.w600)),
+            for (final r in list.where((r) => r.text.isNotEmpty).take(10))
+              ListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                title: Text('${'★' * r.rating}${'☆' * (5 - r.rating)}'),
+                subtitle: Text(r.text),
+                trailing: widget.canReport
+                    ? IconButton(
+                        tooltip: 'إبلاغ عن هذا التقييم',
+                        icon: const Icon(Icons.flag_outlined, size: 18),
+                        onPressed: () => _report(r),
+                      )
+                    : null,
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Real, bookable times. Booking changes the slot and creates the request in
+/// one step; the screen says "sent" only after that succeeded.
+class SlotsSection extends StatefulWidget {
+  final TeacherRepository repo;
+  final TeacherProfile teacher;
+  const SlotsSection({super.key, required this.repo, required this.teacher});
+
+  @override
+  State<SlotsSection> createState() => _SlotsSectionState();
+}
+
+class _SlotsSectionState extends State<SlotsSection> {
+  late Future<List<Slot>> _slots = _load();
+
+  Future<List<Slot>> _load() async {
+    final now = DateTime.now();
+    return [for (final s in await widget.repo.slotsOf(widget.teacher.uid)) if (s.isBookableAt(now)) s].take(12).toList();
+  }
+
+  void _reload() {
+    final f = _load();
+    setState(() {
+      _slots = f;
+    });
+  }
+
+  Future<void> _book(Slot s) async {
+    final user = widget.repo.currentUser;
+    if (user == null) return;
+    final name = await widget.repo.displayName();
+    if (!mounted) return;
+    final booking = await showDialog<Booking>(
+      context: context,
+      builder: (_) => SlotBookingDialog(teacher: widget.teacher, slot: s, parentUid: user.uid, parentName: name),
+    );
+    if (booking == null) return;
+    String message;
+    try {
+      await widget.repo.bookSlot(booking);
+      message = 'تم حجز الموعد وإرسال الطلب إلى المدرس. تابعه في «طلباتي».';
+    } on AccountException catch (e) {
+      message = e.message;
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(message)));
+      _reload();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('المواعيد المتاحة', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+            const Text('بتوقيت جهازك', style: TextStyle(fontSize: 12)),
+            FutureBuilder<List<Slot>>(
+              future: _slots,
+              builder: (context, snap) {
+                if (snap.connectionState != ConnectionState.done) return const LinearProgressIndicator();
+                if (snap.hasError) {
+                  return TextButton(onPressed: _reload, child: const Text('تعذر تحميل المواعيد. إعادة المحاولة'));
+                }
+                final slots = snap.data!;
+                if (slots.isEmpty) {
+                  return const Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Text('لا توجد مواعيد متاحة الآن. يمكنك إرسال «اطلب حصة» بوقت من اختيارك.'),
+                  );
+                }
+                return Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final s in slots)
+                      ActionChip(
+                        label: Text('${fmtDateTime(s.start)} · ${s.minutes} د'),
+                        onPressed: () => _book(s),
+                      ),
+                  ],
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Everything a parent must see before booking: time, length, price, the
+/// cancellation terms, and that nothing is paid in the app.
+class SlotBookingDialog extends StatefulWidget {
+  final TeacherProfile teacher;
+  final Slot slot;
+  final String parentUid;
+  final String parentName;
+  const SlotBookingDialog({
+    super.key,
+    required this.teacher,
+    required this.slot,
+    required this.parentUid,
+    required this.parentName,
+  });
+
+  @override
+  State<SlotBookingDialog> createState() => _SlotBookingDialogState();
+}
+
+class _SlotBookingDialogState extends State<SlotBookingDialog> {
+  late String _subject = widget.teacher.subjects.first;
+  final _note = TextEditingController();
+  int? _age;
+
+  @override
+  void dispose() {
+    _note.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = widget.teacher;
+    final s = widget.slot;
+    final price = t.priceEgp != null ? '${t.priceEgp} جنيه للحصة' : (t.priceNote.isEmpty ? 'السعر يُتفق عليه مع المدرس' : t.priceNote);
+    return AlertDialog(
+      title: const Text('تأكيد حجز الموعد'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('${t.name}\n${fmtDateTime(s.start)} · ${s.minutes} دقيقة', style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text('السعر: $price'),
+            DropdownButton<String>(
+              isExpanded: true,
+              value: _subject,
+              items: [for (final id in t.subjects) DropdownMenuItem(value: id, child: Text(subjectById(id)?.label ?? id))],
+              onChanged: (v) => setState(() => _subject = v ?? _subject),
+            ),
+            DropdownButton<int?>(
+              isExpanded: true,
+              value: _age,
+              hint: const Text('عمر الطفل (اختياري)'),
+              items: [
+                const DropdownMenuItem<int?>(value: null, child: Text('بدون')),
+                for (var a = 1; a <= 12; a++) DropdownMenuItem<int?>(value: a, child: Text('$a')),
+              ],
+              onChanged: (v) => setState(() => _age = v),
+            ),
+            TextField(controller: _note, maxLines: 2, decoration: const InputDecoration(labelText: 'ملاحظة (اختياري)')),
+            const SizedBox(height: 8),
+            Text(
+              t.cancellationPolicy.isEmpty
+                  ? 'سياسة الإلغاء: لم يحدد المدرس سياسة بعد. اتفقا عليها قبل الحصة.'
+                  : 'سياسة الإلغاء: ${t.cancellationPolicy}',
+              style: const TextStyle(fontSize: 13),
+            ),
+            const Text(
+              'يُرسل الطلب إلى المدرس ولا يُؤكَّد إلا بقبوله. لا يوجد دفع داخل التطبيق.',
+              style: TextStyle(fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('رجوع')),
+        FilledButton(
+          onPressed: () => Navigator.pop(
+            context,
+            Booking(
+              parentUid: widget.parentUid,
+              teacherUid: t.uid,
+              teacherName: t.name,
+              parentName: widget.parentName,
+              subject: _subject,
+              whenText: fmtDateTime(s.start),
+              childAge: _age,
+              note: _note.text.trim(),
+              slotId: s.id,
+              startMs: s.startMs,
+              minutes: s.minutes,
+              priceEgp: t.priceEgp,
+            ),
+          ),
+          child: const Text('احجز'),
+        ),
       ],
     );
   }

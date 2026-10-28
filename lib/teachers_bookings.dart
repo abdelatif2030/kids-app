@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'curriculum.dart';
+import 'teachers_followup.dart';
 import 'teachers_models.dart';
+import 'teachers_time.dart';
 
 String _statusLabel(String s) => switch (s) {
       bookingRequested => 'قيد الانتظار',
       bookingAccepted => 'تم القبول',
       bookingDeclined => 'مرفوض',
       bookingCancelled => 'ملغي',
+      bookingCompleted => 'اكتملت',
+      bookingNoShow => 'لم تتم (غياب)',
       _ => s,
     };
 
@@ -23,10 +27,18 @@ class BookingsScreen extends StatefulWidget {
 }
 
 class _BookingsScreenState extends State<BookingsScreen> {
-  late Future<(UserRole?, List<Booking>)> _data = _load();
+  late Future<(UserRole?, List<Booking>, Set<String>)> _data = _load();
 
-  Future<(UserRole?, List<Booking>)> _load() async =>
-      (await widget.repo.currentRole(), await widget.repo.myBookings());
+  Future<(UserRole?, List<Booking>, Set<String>)> _load() async {
+    final role = await widget.repo.currentRole();
+    final bookings = await widget.repo.myBookings();
+    // Which completed lessons already have a review (parents only).
+    var reviewed = <String>{};
+    if (role == UserRole.parent && bookings.any((b) => b.status == bookingCompleted)) {
+      reviewed = {for (final r in await widget.repo.allReviews()) r.bookingId};
+    }
+    return (role, bookings, reviewed);
+  }
 
   void _reload() {
     final data = _load();
@@ -35,30 +47,75 @@ class _BookingsScreenState extends State<BookingsScreen> {
     });
   }
 
-  Future<void> _update(String id, String status, {String? link}) async {
+  Future<void> _run(Future<void> Function() action) async {
     try {
-      await widget.repo.updateBooking(id, status: status, lessonLink: link);
+      await action();
     } on AccountException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text(e.message)));
       }
     }
     if (mounted) _reload();
   }
+
+  Future<bool> _confirm(String title, String body, String yes) async =>
+      await showDialog<bool>(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text(title),
+          content: Text(body),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('رجوع')),
+            FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(yes)),
+          ],
+        ),
+      ) ??
+      false;
 
   Future<void> _accept(Booking b) async {
     final link = await showDialog<String>(
       context: context,
       builder: (_) => const _LinkDialog(),
     );
-    if (link != null) await _update(b.id, bookingAccepted, link: link);
+    if (link != null) await _run(() => widget.repo.updateBooking(b.id, status: bookingAccepted, lessonLink: link));
+  }
+
+  Future<void> _decline(Booking b) async {
+    if (!await _confirm('رفض الطلب؟', 'سيُبلَّغ ولي الأمر، ويعود الموعد متاحاً لغيره.', 'رفض')) return;
+    await _run(() => b.slotId != null
+        ? widget.repo.cancelOrDecline(b, status: bookingDeclined)
+        : widget.repo.updateBooking(b.id, status: bookingDeclined));
+  }
+
+  Future<void> _cancel(Booking b) async {
+    if (!await _confirm('إلغاء الحجز؟', 'سيعود الموعد متاحاً لغيرك. راجع سياسة إلغاء المدرس في صفحته.', 'إلغاء الحجز')) return;
+    await _run(() => b.slotId != null
+        ? widget.repo.cancelOrDecline(b, status: bookingCancelled)
+        : widget.repo.updateBooking(b.id, status: bookingCancelled));
+  }
+
+  Future<void> _finish(Booking b, String status) async {
+    final done = status == bookingCompleted;
+    if (!await _confirm(done ? 'تأكيد أن الحصة تمت؟' : 'تسجيل غياب؟',
+        done ? 'بعد التأكيد يستطيع ولي الأمر تقييمك، وتستطيع كتابة تقرير الحصة. لا يمكن التراجع.' : 'لن يستطيع ولي الأمر تقييم حصة لم تتم. لا يمكن التراجع.',
+        'تأكيد')) {
+      return;
+    }
+    await _run(() => widget.repo.finishLesson(b, status: status));
+  }
+
+  Future<void> _open(Widget screen) async {
+    await Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+    if (mounted) _reload();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('طلبات الحصص')),
-      body: FutureBuilder<(UserRole?, List<Booking>)>(
+      body: FutureBuilder<(UserRole?, List<Booking>, Set<String>)>(
         future: _data,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
@@ -69,21 +126,43 @@ class _BookingsScreenState extends State<BookingsScreen> {
               child: FilledButton(onPressed: _reload, child: const Text('إعادة المحاولة')),
             );
           }
-          final (role, bookings) = snapshot.data!;
+          final (role, bookings, reviewed) = snapshot.data!;
           if (bookings.isEmpty) {
             return const Center(child: Text('لا توجد طلبات', style: TextStyle(fontSize: 20)));
           }
+          final asTeacher = role == UserRole.teacher;
+          final active = [for (final b in bookings) if (b.status == bookingRequested || b.status == bookingAccepted) b]
+            ..sort((a, b) => (a.startMs ?? 1 << 50).compareTo(b.startMs ?? 1 << 50));
+          final history = [for (final b in bookings) if (b.status != bookingRequested && b.status != bookingAccepted) b];
+          Widget card(Booking b) => _BookingCard(
+                booking: b,
+                asTeacher: asTeacher,
+                reviewed: reviewed.contains(b.id),
+                onAccept: () => _accept(b),
+                onDecline: () => _decline(b),
+                onCancel: () => _cancel(b),
+                onDone: () => _finish(b, bookingCompleted),
+                onNoShow: () => _finish(b, bookingNoShow),
+                onMessages: () => _open(ConversationScreen(repo: widget.repo, booking: b)),
+                onReport: () => _open(asTeacher
+                    ? LessonReportForm(repo: widget.repo, booking: b)
+                    : LessonReportView(repo: widget.repo, booking: b)),
+                onReview: () async {
+                  await showReviewDialog(context, widget.repo, b);
+                  if (mounted) _reload();
+                },
+              );
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              for (final b in bookings)
-                _BookingCard(
-                  booking: b,
-                  asTeacher: role == UserRole.teacher,
-                  onAccept: () => _accept(b),
-                  onDecline: () => _update(b.id, bookingDeclined),
-                  onCancel: () => _update(b.id, bookingCancelled),
+              if (active.isNotEmpty) const Text('القادمة والمعلّقة', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+              for (final b in active) card(b),
+              if (history.isNotEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(top: 12),
+                  child: Text('السجل', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
                 ),
+              for (final b in history) card(b),
             ],
           );
         },
@@ -95,21 +174,34 @@ class _BookingsScreenState extends State<BookingsScreen> {
 class _BookingCard extends StatelessWidget {
   final Booking booking;
   final bool asTeacher;
+  final bool reviewed;
   final VoidCallback onAccept;
   final VoidCallback onDecline;
   final VoidCallback onCancel;
+  final VoidCallback onDone;
+  final VoidCallback onNoShow;
+  final VoidCallback onMessages;
+  final VoidCallback onReport;
+  final VoidCallback onReview;
   const _BookingCard({
     required this.booking,
     required this.asTeacher,
+    required this.reviewed,
     required this.onAccept,
     required this.onDecline,
     required this.onCancel,
+    required this.onDone,
+    required this.onNoShow,
+    required this.onMessages,
+    required this.onReport,
+    required this.onReview,
   });
 
   @override
   Widget build(BuildContext context) {
     final b = booking;
     final who = asTeacher ? 'ولي الأمر: ${b.parentName}' : 'المدرس: ${b.teacherName}';
+    final canChat = b.status == bookingRequested || b.status == bookingAccepted || b.status == bookingCompleted;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -125,7 +217,11 @@ class _BookingCard extends StatelessWidget {
               ],
             ),
             Text('المادة: ${subjectById(b.subject)?.label ?? b.subject}'),
-            Text('الوقت المطلوب: ${b.whenText}'),
+            if (b.scheduled)
+              Text('الموعد: ${fmtDateTime(b.start!)} (${b.minutes ?? ''} دقيقة، بتوقيت جهازك)')
+            else
+              Text('الوقت المطلوب: ${b.whenText}'),
+            if (b.priceEgp != null) Text('السعر: ${b.priceEgp} جنيه للحصة (لا دفع داخل التطبيق)'),
             if (b.childAge != null) Text('عمر الطفل: ${b.childAge}'),
             if (b.note.isNotEmpty) Text('ملاحظة: ${b.note}'),
             if (!asTeacher && b.status == bookingAccepted && b.lessonLink != null) ...[
@@ -156,9 +252,22 @@ class _BookingCard extends StatelessWidget {
                   FilledButton(onPressed: onAccept, child: const Text('قبول')),
                   OutlinedButton(onPressed: onDecline, child: const Text('رفض')),
                 ],
-                if (!asTeacher &&
-                    (b.status == bookingRequested || b.status == bookingAccepted))
-                  OutlinedButton(onPressed: onCancel, child: const Text('إلغاء الطلب')),
+                if (asTeacher && b.status == bookingAccepted && b.scheduled && b.started) ...[
+                  FilledButton(onPressed: onDone, child: const Text('تمّت الحصة')),
+                  OutlinedButton(onPressed: onNoShow, child: const Text('لم تتم (غياب)')),
+                ],
+                if (asTeacher && b.status == bookingCompleted)
+                  OutlinedButton(onPressed: onReport, child: const Text('تقرير الحصة')),
+                if (!asTeacher && b.status == bookingCompleted) ...[
+                  OutlinedButton(onPressed: onReport, child: const Text('تقرير الحصة')),
+                  if (!reviewed)
+                    FilledButton(onPressed: onReview, child: const Text('قيّم المدرس'))
+                  else
+                    const Chip(label: Text('قيّمتَ هذه الحصة')),
+                ],
+                if (!asTeacher && (b.status == bookingRequested || b.status == bookingAccepted))
+                  OutlinedButton(onPressed: onCancel, child: const Text('إلغاء الحجز')),
+                if (canChat) TextButton.icon(onPressed: onMessages, icon: const Icon(Icons.chat_bubble_outline), label: const Text('الرسائل')),
               ],
             ),
           ],

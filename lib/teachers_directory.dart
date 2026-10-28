@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'curriculum.dart';
+import 'teachers_market.dart';
 import 'teachers_models.dart';
+import 'teachers_time.dart';
 import 'teachers_widgets.dart';
 
 String _subjectLabel(String id) => subjectById(id)?.label ?? id;
@@ -83,7 +85,18 @@ class TeacherDirectory extends StatefulWidget {
   final List<TeacherProfile> teachers;
   final void Function(TeacherProfile) onOpen;
   final void Function(List<TeacherProfile>) onCompare;
-  const TeacherDirectory({super.key, required this.teachers, required this.onOpen, required this.onCompare});
+
+  /// Real review summaries and each teacher's soonest open slot (UTC ms), by teacher uid.
+  final Map<String, RatingSummary> ratings;
+  final Map<String, int> earliest;
+  const TeacherDirectory({
+    super.key,
+    required this.teachers,
+    required this.onOpen,
+    required this.onCompare,
+    this.ratings = const {},
+    this.earliest = const {},
+  });
 
   @override
   State<TeacherDirectory> createState() => _TeacherDirectoryState();
@@ -132,7 +145,8 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
 
   @override
   Widget build(BuildContext context) {
-    var results = searchTeachers(widget.teachers, _filters, _sort, _subjectLabel);
+    var results = searchTeachers(widget.teachers, _filters, _sort, _subjectLabel,
+        ratings: widget.ratings, earliestStartMs: widget.earliest);
     if (_onlyFavorites) results = [for (final t in results) if (_favorites.contains(t.uid)) t];
     final page = results.take(_shown).toList();
     final active = _filters.activeCount - (_filters.query.trim().isNotEmpty ? 1 : 0);
@@ -217,6 +231,8 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
                     for (final t in page)
                       _TeacherCard(
                         teacher: t,
+                        rating: widget.ratings[t.uid],
+                        earliestMs: widget.earliest[t.uid],
                         favorite: _favorites.contains(t.uid),
                         comparing: _compare.contains(t.uid),
                         onOpen: () => widget.onOpen(t),
@@ -291,6 +307,8 @@ class _Empty extends StatelessWidget {
 
 class _TeacherCard extends StatelessWidget {
   final TeacherProfile teacher;
+  final RatingSummary? rating;
+  final int? earliestMs;
   final bool favorite;
   final bool comparing;
   final VoidCallback onOpen;
@@ -298,6 +316,8 @@ class _TeacherCard extends StatelessWidget {
   final void Function(bool) onCompare;
   const _TeacherCard({
     required this.teacher,
+    required this.rating,
+    required this.earliestMs,
     required this.favorite,
     required this.comparing,
     required this.onOpen,
@@ -350,6 +370,11 @@ class _TeacherCard extends StatelessWidget {
                   child: Text(facts.join(' · '), style: const TextStyle(fontSize: 13)),
                 ),
               if (t.languages.isNotEmpty) Text(t.languages.join('، '), style: const TextStyle(fontSize: 13)),
+              Text(
+                '${(rating ?? RatingSummary.none).label}'
+                '${earliestMs == null ? '' : ' · أقرب موعد: ${fmtDateTime(DateTime.fromMillisecondsSinceEpoch(earliestMs!))}'}',
+                style: const TextStyle(fontSize: 13),
+              ),
               Align(
                 alignment: AlignmentDirectional.centerEnd,
                 child: FilterChip(
@@ -467,7 +492,7 @@ class _FilterSheetState extends State<_FilterSheet> {
             ),
             const SizedBox(height: 8),
             const Text(
-              'لا توجد مواضع مدفوعة: الترتيب الافتراضي حسب اكتمال الملف ثم الاسم. لا ترتيب حسب التقييم لأنه لا توجد تقييمات بعد.',
+              'لا توجد مواضع مدفوعة. الترتيب الافتراضي حسب اكتمال الملف ثم الاسم. «الأعلى تقييماً» يُحسب من تقييمات أولياء أمور لحصص مكتملة فقط، والمدرس بلا تقييمات يأتي أخيراً.',
               style: TextStyle(fontSize: 12),
             ),
             const SizedBox(height: 12),
@@ -498,7 +523,8 @@ class _FilterSheetState extends State<_FilterSheet> {
 /// Up to three teachers side by side.
 class CompareTeachersScreen extends StatelessWidget {
   final List<TeacherProfile> teachers;
-  const CompareTeachersScreen({super.key, required this.teachers});
+  final Map<String, RatingSummary> ratings;
+  const CompareTeachersScreen({super.key, required this.teachers, this.ratings = const {}});
 
   @override
   Widget build(BuildContext context) {
@@ -517,7 +543,7 @@ class CompareTeachersScreen extends StatelessWidget {
       ('الهوية', (t) => t.identityVerified ? 'تم التحقق منها' : 'لم يتحقق منها التطبيق'),
       ('المؤهل', (t) => t.qualificationVerified ? 'تم التحقق منه' : 'لم يتحقق منه التطبيق'),
       ('سياسة الإلغاء', (t) => t.cancellationPolicy.isEmpty ? 'غير محددة' : t.cancellationPolicy),
-      ('التقييمات', (_) => 'لا توجد بعد'),
+      ('التقييمات', (t) => (ratings[t.uid] ?? RatingSummary.none).label),
     ];
     return Scaffold(
       appBar: AppBar(title: const Text('مقارنة المدرسين')),

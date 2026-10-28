@@ -328,7 +328,7 @@ void main() {
       expect(find.text('مقارنة المدرسين'), findsOneWidget);
       expect(find.text('250 جنيه'), findsOneWidget);
       expect(find.text('غير محدد'), findsWidgets);
-      expect(find.text('لا توجد بعد'), findsNWidgets(3)); // no ratings exist
+      expect(find.text('لا توجد تقييمات بعد'), findsWidgets); // no ratings exist (the table row says so too)
       expect(find.text('تم التحقق منها'), findsOneWidget);
       expect(find.text('لم يتحقق منها التطبيق'), findsNWidgets(2));
     });
@@ -337,8 +337,8 @@ void main() {
       tall(tester);
       final repo = await _repoWith([for (var i = 0; i < 14; i++) _t('t$i', 'مدرس ${i.toString().padLeft(2, '0')}')]);
       await _open(tester, repo);
+      await tester.scrollUntilVisible(find.text('عرض المزيد (4)'), 300, scrollable: find.byType(Scrollable).last);
       expect(find.text('عرض المزيد (4)'), findsOneWidget);
-      await tester.ensureVisible(find.text('عرض المزيد (4)'));
       await tester.tap(find.text('عرض المزيد (4)'));
       await tester.pump();
       expect(find.textContaining('عرض المزيد'), findsNothing);

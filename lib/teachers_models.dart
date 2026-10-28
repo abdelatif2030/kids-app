@@ -9,6 +9,8 @@ library;
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'teachers_market.dart';
+
 enum UserRole { parent, teacher }
 
 class AppUser {
@@ -262,7 +264,7 @@ ProfileCompleteness profileCompleteness(TeacherProfile p) {
   );
 }
 
-enum TeacherSort { relevance, priceLow, priceHigh, experience }
+enum TeacherSort { relevance, priceLow, priceHigh, experience, rating, earliest }
 
 extension TeacherSortText on TeacherSort {
   String get label => switch (this) {
@@ -270,6 +272,8 @@ extension TeacherSortText on TeacherSort {
         TeacherSort.priceLow => 'السعر: الأقل أولاً',
         TeacherSort.priceHigh => 'السعر: الأعلى أولاً',
         TeacherSort.experience => 'الأكثر خبرة',
+        TeacherSort.rating => 'الأعلى تقييماً (من تقييمات حقيقية)',
+        TeacherSort.earliest => 'أقرب موعد متاح',
       };
 }
 
@@ -385,6 +389,16 @@ bool teacherMatches(TeacherProfile t, TeacherFilters f, String Function(String s
   return true;
 }
 
+int _byRating(RatingSummary? a, RatingSummary? b) {
+  final ra = (a == null || a.count == 0) ? null : a;
+  final rb = (b == null || b.count == 0) ? null : b;
+  if (ra == null && rb == null) return 0;
+  if (ra == null) return 1;
+  if (rb == null) return -1;
+  final c = rb.average.compareTo(ra.average);
+  return c != 0 ? c : rb.count.compareTo(ra.count);
+}
+
 /// Filters and sorts. The order is fixed and public: by the chosen sort, then
 /// by profile completeness, then by name. Nothing is paid for and nothing
 /// depends on ratings (there are none yet). Teachers missing the sort field go last.
@@ -392,8 +406,10 @@ List<TeacherProfile> searchTeachers(
   List<TeacherProfile> all,
   TeacherFilters f,
   TeacherSort sort,
-  String Function(String subjectId) subjectLabel,
-) {
+  String Function(String subjectId) subjectLabel, {
+  Map<String, RatingSummary> ratings = const {},
+  Map<String, int> earliestStartMs = const {},
+}) {
   final list = [for (final t in all) if (teacherMatches(t, f, subjectLabel)) t];
   int byName(TeacherProfile a, TeacherProfile b) => a.name.compareTo(b.name);
   int byCompleteness(TeacherProfile a, TeacherProfile b) {
@@ -414,6 +430,9 @@ List<TeacherProfile> searchTeachers(
       TeacherSort.priceLow => nullsLast(a.priceEgp, b.priceEgp),
       TeacherSort.priceHigh => nullsLast(a.priceEgp, b.priceEgp, desc: true),
       TeacherSort.experience => nullsLast(a.experienceYears, b.experienceYears, desc: true),
+      // Reviewed teachers first by average, then by number of reviews; unreviewed ones last.
+      TeacherSort.rating => _byRating(ratings[a.uid], ratings[b.uid]),
+      TeacherSort.earliest => nullsLast(earliestStartMs[a.uid], earliestStartMs[b.uid]),
     };
     return primary != 0 ? primary : byCompleteness(a, b);
   });
@@ -424,6 +443,8 @@ const bookingRequested = 'requested';
 const bookingAccepted = 'accepted';
 const bookingDeclined = 'declined';
 const bookingCancelled = 'cancelled';
+const bookingCompleted = 'completed';
+const bookingNoShow = 'no_show';
 
 class Booking {
   final String id;
@@ -432,11 +453,18 @@ class Booking {
   final String teacherName;
   final String parentName;
   final String subject;
-  final String whenText; // the parent's preferred time, free text
+  final String whenText; // the parent's preferred time (free text) or a readable copy of the slot time
   final int? childAge; // optional
   final String note;
   final String status;
   final String? lessonLink; // set by the teacher on accepting
+
+  /// Set when the booking was made from a teacher's slot (a real, scheduled lesson).
+  final String? slotId;
+  final int? startMs; // UTC milliseconds
+  final int? minutes;
+  final int? priceEgp; // the teacher's price when it was booked
+  final String? proposalId; // set when it comes from an accepted proposal
 
   const Booking({
     this.id = '',
@@ -450,7 +478,35 @@ class Booking {
     this.note = '',
     this.status = bookingRequested,
     this.lessonLink,
+    this.slotId,
+    this.startMs,
+    this.minutes,
+    this.priceEgp,
+    this.proposalId,
   });
+
+  bool get scheduled => startMs != null;
+  DateTime? get start => startMs == null ? null : DateTime.fromMillisecondsSinceEpoch(startMs!);
+  bool get started => startMs != null && DateTime.now().millisecondsSinceEpoch >= startMs!;
+
+  Booking copyWith({String? id, String? status, String? lessonLink}) => Booking(
+        id: id ?? this.id,
+        parentUid: parentUid,
+        teacherUid: teacherUid,
+        teacherName: teacherName,
+        parentName: parentName,
+        subject: subject,
+        whenText: whenText,
+        childAge: childAge,
+        note: note,
+        status: status ?? this.status,
+        lessonLink: lessonLink ?? this.lessonLink,
+        slotId: slotId,
+        startMs: startMs,
+        minutes: minutes,
+        priceEgp: priceEgp,
+        proposalId: proposalId,
+      );
 
   Map<String, dynamic> toMap() => {
         'parentUid': parentUid,
@@ -463,6 +519,11 @@ class Booking {
         'note': note,
         'status': status,
         'lessonLink': lessonLink,
+        'slotId': ?slotId,
+        'startMs': ?startMs,
+        'minutes': ?minutes,
+        'priceEgp': ?priceEgp,
+        'proposalId': ?proposalId,
       };
 
   factory Booking.fromMap(String id, Map<String, dynamic> m) => Booking(
@@ -477,6 +538,11 @@ class Booking {
         note: (m['note'] as String?) ?? '',
         status: (m['status'] as String?) ?? bookingRequested,
         lessonLink: m['lessonLink'] as String?,
+        slotId: m['slotId'] as String?,
+        startMs: (m['startMs'] as num?)?.toInt(),
+        minutes: (m['minutes'] as num?)?.toInt(),
+        priceEgp: (m['priceEgp'] as num?)?.toInt(),
+        proposalId: m['proposalId'] as String?,
       );
 }
 
@@ -522,4 +588,47 @@ abstract class TeacherRepository {
 
   /// [status] is one of the booking* constants; [lessonLink] only when accepting.
   Future<void> updateBooking(String id, {required String status, String? lessonLink});
+
+  // --- availability and scheduled bookings -------------------------------------
+
+  /// A teacher publishes bookable times (UTC). Existing ones at the same start are left alone.
+  Future<void> addSlots(List<Slot> slots);
+
+  /// A teacher's slots. A parent sees only the open, future ones.
+  Future<List<Slot>> slotsOf(String teacherUid);
+  Future<void> setSlotBlocked(String slotId, bool blocked);
+  Future<void> deleteSlot(String slotId);
+
+  /// Books a slot. Atomic: the booking and the slot change together or not at all.
+  /// Throws [AccountException] ("not available any more") when someone else got it.
+  Future<void> bookSlot(Booking booking);
+
+  /// Cancel (parent) or decline (teacher) a booking and free its slot in the same step.
+  Future<void> cancelOrDecline(Booking booking, {required String status});
+
+  /// The teacher records the lesson as completed or no-show (after its start).
+  Future<void> finishLesson(Booking booking, {required String status});
+
+  // --- lesson reports, reviews, messages ----------------------------------------
+  Future<void> saveLessonReport(LessonReport report);
+  Future<LessonReport?> lessonReportFor(String bookingId);
+  Future<void> submitReview(Review review);
+  Future<List<Review>> reviewsFor(String teacherUid);
+  Future<List<Review>> allReviews();
+  Future<void> reportReview(String bookingId, String reason);
+  Future<List<ChatMessage>> messagesOf(String bookingId);
+  Future<void> sendMessage(String bookingId, String text);
+
+  // --- requests and proposals -----------------------------------------------------
+  Future<void> createRequest(LearningRequest request);
+  Future<List<LearningRequest>> myRequests();
+  Future<List<LearningRequest>> openRequests();
+  Future<void> closeRequest(String requestId);
+  Future<void> submitProposal(Proposal proposal);
+  Future<List<Proposal>> proposalsForRequest(String requestId);
+  Future<List<Proposal>> myProposals();
+  Future<void> setProposalStatus(String proposalId, String status);
+
+  /// Accepting a proposal also creates the booking, in one step.
+  Future<void> acceptProposal(Proposal proposal, Booking booking);
 }

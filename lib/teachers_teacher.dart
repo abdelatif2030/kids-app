@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 
 import 'curriculum.dart';
 import 'media_picker.dart';
+import 'teachers_availability.dart';
 import 'teachers_bookings.dart';
+import 'teachers_requests.dart';
 import 'teachers_directory.dart' show VerificationBadges;
 import 'teachers_models.dart';
 import 'teachers_parent.dart' show TeacherDetailScreen;
@@ -53,6 +55,22 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
       appBar: AppBar(
         title: const Text('حساب المدرس'),
         actions: [
+          IconButton(
+            tooltip: 'مواعيدي',
+            icon: const Icon(Icons.edit_calendar_rounded),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => TeacherAvailabilityScreen(repo: widget.repo)),
+            ),
+          ),
+          IconButton(
+            tooltip: 'طلبات الأهل',
+            icon: const Icon(Icons.inbox_rounded),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => OpenRequestsScreen(repo: widget.repo)),
+            ),
+          ),
           IconButton(
             tooltip: 'طلبات الحصص',
             icon: const Icon(Icons.event_note_rounded),
