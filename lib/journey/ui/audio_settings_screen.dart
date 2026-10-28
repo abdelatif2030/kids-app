@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter/services.dart';
 
 import '../../data_reset.dart';
 import '../../literacy/mastery.dart';
 import '../../media/audio.dart';
 import '../../media/audio_admin_screens.dart';
+import '../../media/audio_status_screen.dart';
 import '../repository.dart';
 import '../../l10n/strings.dart';
 
@@ -94,6 +96,12 @@ class _AudioSettingsScreenState extends State<AudioSettingsScreen> {
                           ),
                         ),
                       ),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.fact_check_outlined),
+                      title: Text(tr2('حالة صوت الدروس', 'Lesson audio status')),
+                      subtitle: Text(tr2('تسجيل أم صوت الجهاز أم لا يوجد صوت، وهل اعتُمد', 'Recorded, device voice or none, and whether it is approved')),
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ParentAudioStatusScreen())),
                     ),
                     ListTile(
                       leading: const Icon(Icons.compare_rounded),
