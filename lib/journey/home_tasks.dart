@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../safe_json.dart';
-import '../l10n/strings.dart';
 
 /// Real-world activities for after the screen: the child does them with a
 /// parent, and the parent confirms. They never give stars or XP (rewards are

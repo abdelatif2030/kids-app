@@ -186,7 +186,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
   String _title() => switch (_step) {
     0 => context.tr('ob.child.title'),
-    1 => context.tr('ob.goals.title'),
+    1 => context.tr('ob.goals.bar'),
     2 => context.tr('ob.check.title'),
     3 => context.tr('ob.plan.title'),
     _ => context.tr('ob.done.title'),
@@ -247,6 +247,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   Widget _goalsStep() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
+      Text(context.tr('ob.goals.title'), style: DS.heading),
+      const SizedBox(height: DS.s4),
       Text(context.tr('ob.goals.intro'), style: DS.body),
       const SizedBox(height: DS.s12),
       for (final g in kGoals) ...[

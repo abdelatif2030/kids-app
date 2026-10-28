@@ -1,22 +1,32 @@
 # Localization (Arabic / English)
 
-- `lib/l10n/app_locale.dart`: interface language (`ar` RTL, `en` LTR), saved on the device as `ui_lang`. No saved choice -> the first screen asks (`LanguageScreen`).
-- `lib/l10n/strings.dart`: `kStrings` + `context.tr(key)`. Missing English -> Arabic -> the key. A test checks both languages have the same keys.
-- The interface language is separate from each child's learning language and from the language of content (videos, stories, letters).
-- Switcher: Parent settings -> "لغة التطبيق / App language".
+Arabic is the default; English is chosen on the first screen (or in Parent settings -> App language). The choice is
+saved on the device (`ui_lang`). Changing it rebuilds every screen already open, so none keeps the old language.
+The interface language is separate from each child's learning language and from the language of the content.
 
-## Coverage (honest)
-Translated: language screen, start/welcome screen, parent-settings language row.
-NOT translated yet (still Arabic only, even in English mode): onboarding, child home, lessons/games, letters, stories, studio, dashboard, reports, marketplace, privacy. Migrate screen by screen by moving strings into `kStrings`.
-Note: Material pickers/dialog chrome use English because `flutter_localizations` is not added (needs the user's approval).
+## How texts are translated
+- `lib/l10n/app_locale.dart`: the language, direction (RTL/LTR) and the rebuild of open screens.
+- `loc('نص عربي')` (lib/l10n/strings.dart): static Arabic text -> English from `lib/l10n/en_dictionary.dart`
+  (generated: see `tools/README.md`). Unknown text falls back to the Arabic text.
+- `tr2('عربي $x', 'English $x')`: texts with values inside.
+- `context.tr('key')` + `lib/l10n/strings*.dart`: key-based texts (start, onboarding, letters lesson, child home).
+- Data classes (lands, skills, subjects, badges, real activities...) translate through getters.
 
-## Update: onboarding (redesigned)
-Translated now: shared components (step header, retry, cancel), the whole child-setup flow (child, goals, optional skill check, three plans, completion), goal and land names in the flow. The plan editor's land list (inside "Customize") and the quiz questions themselves are still Arabic-only.
-Numbers use Western digits in both languages (common in Egypt); no Arabic-Indic conversion.
+## Tests
+- `test/dictionary_test.dart`: every `loc('...')` text has an English entry.
+- `test/english_coverage_test.dart`: 59 screens/tabs are opened in English and fail if Arabic interface text remains
+  (Arabic learning content such as letters and words is allowed on the letter/vocabulary/story screens).
+- `test/localization_test.dart`: saved choice, first-launch language screen, switching while screens are open.
 
-## Update: guided Arabic letter lesson
-`lib/literacy/guided_lesson.dart` (button «ابدأ الدرس» on each letter): 6 steps (see + hear the NAME, hear the SOUND, illustrated word with the letter highlighted, find the letter in the word, pick the picture, pick the letter). Interface texts are Arabic/English; the letters and words stay Arabic. Audio is the device voice (demo), pictures are emoji: real recordings and original illustrations are still needed (docs/CONTENT_REVIEW.md). Records: opened and audio-played are exposure only; practice after the lesson; demonstrated only if all three questions were right first try.
+## What stays Arabic in English mode (on purpose: it is the content being taught)
+Arabic letters, words and their sounds; the 8 story texts and their comprehension questions (the story TITLES,
+descriptions, themes and chapter titles are translated); the reading-comprehension stories in the quizzes;
+video titles come from `assets/videos.json` as written. The device voice that reads Arabic content speaks Arabic.
 
-## Update: child shell
-Translated: bottom tabs, greeting, today's adventure card, start button, land names in the plan list. NOT translated: the recommender's reasons ("why this activity"), the other tabs' contents (games, create, me), lands/quiz content.
-The child's navigation is still Home / Games / Create / Me. The requested My Journey / Learn / Stories / Activities / Achievements structure is NOT built; it would need a reorganisation of the tabs and tests.
+## Known limits
+- English versions of the stories are NOT written (content work).
+- Date/time pickers and other Material dialogs use English chrome in both languages (no `flutter_localizations`).
+- Numbers use Western digits in both languages.
+- Screens were checked in their first state plus the three child tabs; deeper dialog states are covered by the
+  dictionary test but not each one opened.
+- Translations were written by the app's developer, not a professional translator: they need a native review.

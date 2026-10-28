@@ -16,6 +16,17 @@ for i, a in enumerate(ar):
         rows.append(f"  {lit(a)}: {lit(en[i])},")
     else:
         missing.append((i, a))
+extra = {}
+for line in open('tools/en/extra.txt', encoding='utf-8').read().split('\n'):
+    if '|' in line:
+        a, _, e = line.partition('|')
+        extra[a] = e
+have = set(ar)
+for a, e in extra.items():
+    if a in have:
+        print('duplicate key (kept the first):', a)
+    else:
+        rows.append(f"  {lit(a)}: {lit(e)},")
 out = ["/// English texts for static Arabic source strings (see `loc` in strings.dart).",
        "/// Generated from tools/ar_all.json + tools/en/*.txt; edit those and rebuild.",
        "const Map<String, String> kEnglish = {"] + rows + ["};", ""]

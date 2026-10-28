@@ -4,6 +4,7 @@ import 'package:kids_app/journey/ui/start_screen.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/l10n/language_screen.dart';
 import 'package:kids_app/l10n/strings.dart';
+import 'package:kids_app/parent_screens.dart';
 import 'package:kids_app/journey/repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -58,4 +59,45 @@ void main() {
     expect(Directionality.of(tester.element(find.byType(StartScreen))), TextDirection.ltr);
     await AppLocale.instance.set('ar');
   });
+
+  testWidgets('changing the language in parent settings updates screens already on the stack', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await tester.runAsync(() => AppLocale.instance.set('ar'));
+    addTearDown(() => AppLocale.instance.set('ar'));
+    await tester.pumpWidget(MaterialApp(
+      builder: (c, child) => ListenableBuilder(
+        listenable: AppLocale.instance,
+        builder: (_, _) => Directionality(textDirection: AppLocale.instance.direction, child: child!),
+      ),
+      home: const _Probe(),
+    ));
+    expect(find.text('عربي'), findsOneWidget);
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(DropdownButton<String>).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('English').last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(AppLocale.instance.code, 'en');
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('Arabic'), findsOneWidget); // the page below was rebuilt in English
+    expect(find.text('عربي'), findsNothing);
+  });
+}
+
+class _Probe extends StatelessWidget {
+  const _Probe();
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: Column(children: [
+          Text(loc('عربي')),
+          TextButton(
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen())),
+            child: const Text('open'),
+          ),
+        ]),
+      );
 }

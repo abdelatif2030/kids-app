@@ -18,6 +18,24 @@ class AppLocale extends ChangeNotifier {
   TextDirection get direction => isArabic ? TextDirection.rtl : TextDirection.ltr;
   Locale get locale => Locale(code);
 
+  /// Screens already on the navigation stack hold texts of the old language.
+  /// Marking every element dirty rebuilds them all (the same thing a hot reload
+  /// does), so no screen keeps the previous language.
+  void _rebuildAll() {
+    final root = WidgetsBinding.instance.rootElement;
+    if (root == null) return;
+    void visit(Element e) {
+      e.markNeedsBuild();
+      e.visitChildren(visit);
+    }
+
+    try {
+      visit(root);
+    } catch (_) {
+      // Called while a frame is building: the listeners above already refresh the visible screen.
+    }
+  }
+
   Future<void> load() async {
     final saved = (await SharedPreferences.getInstance()).getString('ui_lang');
     if (saved != null && supported.contains(saved)) {
@@ -34,6 +52,7 @@ class AppLocale extends ChangeNotifier {
     code = lang;
     needsChoice = false;
     notifyListeners();
+    _rebuildAll();
     try {
       await (await SharedPreferences.getInstance()).setString('ui_lang', lang);
     } catch (_) {

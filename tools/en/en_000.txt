@@ -242,3 +242,4 @@
 257|Cry without words
 258|Say “please” and “thank you”.
 259|My friend is bothering me and won't stop. What do I do?
+122|Star

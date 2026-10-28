@@ -1,3 +1,4 @@
+import '../l10n/strings.dart';
 /// Arabic letters for the literacy module. Content here must be reviewed by an
 /// Arabic teacher before release (see docs/CONTENT_REVIEW.md).
 const _zwj = '‍';
@@ -15,9 +16,9 @@ enum LetterPosition { beginning, middle, end }
 
 extension LetterPositionText on LetterPosition {
   String get label => switch (this) {
-        LetterPosition.beginning => 'في البداية',
-        LetterPosition.middle => 'في الوسط',
-        LetterPosition.end => 'في النهاية',
+        LetterPosition.beginning => loc('في البداية'),
+        LetterPosition.middle => loc('في الوسط'),
+        LetterPosition.end => loc('في النهاية'),
       };
 }
 

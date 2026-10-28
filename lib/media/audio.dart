@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../l10n/strings.dart';
 
 /// Where a piece of audio comes from. Content metadata only names a source;
 /// the player decides how to play it, so a local file, an authorized remote

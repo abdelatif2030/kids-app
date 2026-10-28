@@ -21,7 +21,7 @@ String buildReportText({required String type, required String area, required Str
     tr2('تقرير من تطبيق رحلتي (النسخة $version)\n'
     'النوع: $type\n'
     'المكان: $area\n'
-    'التفاصيل: ${note.trim().isEmpty ? '—' : note.trim()}\n', 'Report from the Rehlaty app (version $version)\nType: $type\nPlace: $area\nDetails: ${note.trim().isEmpty ? '—' : note.trim()}\n');
+    'التفاصيل: ${note.trim().isEmpty ? '—' : note.trim()}\n', 'Report from the Rehlaty app (version $version)\nType: ${loc(type)}\nPlace: ${loc(area)}\nDetails: ${note.trim().isEmpty ? '—' : note.trim()}\n');
 
 class _ReportProblemScreenState extends State<ReportProblemScreen> {
   String _type = kReportTypes.first;

@@ -1,3 +1,4 @@
+import '../l10n/app_locale.dart';
 import 'package:flutter/material.dart';
 
 import '../journey/models.dart';
@@ -193,7 +194,7 @@ class _SceneBuilderScreenState extends State<SceneBuilderScreen> {
                   children: [
                     for (final v in pool)
                       IconButton(
-                        tooltip: v.ar,
+                        tooltip: AppLocale.instance.isArabic ? v.ar : (v.en ?? v.ar),
                         iconSize: 44,
                         onPressed: () => _add(v.emoji),
                         icon: Text(v.emoji, style: const TextStyle(fontSize: 38)),

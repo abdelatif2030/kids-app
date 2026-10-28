@@ -1,3 +1,4 @@
+import '../l10n/strings.dart';
 /// Texts for the shared components and the redesigned onboarding.
 const Map<String, Map<String, String>> kOnboardingStrings = {
   'ar': {
@@ -17,6 +18,7 @@ const Map<String, Map<String, String>> kOnboardingStrings = {
     'ob.child.nameError': 'اكتب اسماً أو لقباً للطفل',
     'ob.child.age': 'العمر',
     'ob.goals.title': 'ماذا تريد أن يتعلم طفلك؟',
+    'ob.goals.bar': 'أهداف التعلّم',
     'ob.goals.intro': 'اختر هدفًا أو أكثر. يمكنك تغييرها لاحقًا.',
     'ob.check.title': 'اختبار مهارات سريع',
     'ob.check.intro': 'أسئلة قصيرة يجيب عنها الطفل لنبدأ من المستوى المناسب. ليست اختبارًا رسميًا ولا تشخيصًا، ولا توجد إجابات خاطئة.',
@@ -85,6 +87,7 @@ const Map<String, Map<String, String>> kOnboardingStrings = {
     'ob.child.nameError': 'Enter a name or nickname for your child',
     'ob.child.age': 'Age',
     'ob.goals.title': 'What would you like your child to learn?',
+    'ob.goals.bar': 'Learning goals',
     'ob.goals.intro': 'Pick one or more. You can change them later.',
     'ob.check.title': 'Quick skill check',
     'ob.check.intro': 'A few short questions your child answers so we can start at the right level. It is not a formal test or a diagnosis, and there are no wrong answers.',

@@ -168,7 +168,7 @@ class _QuizViewState extends State<QuizView> {
   String _semantic(Option o) {
     if (o.color != null) return tr2('اللون ${colorNameOf(o.color!)}', 'Color ${colorNameOf(o.color!)}');
     if (o.shape != null) return tr2('شكل ${shapeNameOf(o.shape!.kind)}', 'Shape ${shapeNameOf(o.shape!.kind)}');
-    return o.label;
+    return loc(o.label);
   }
 
   @override
