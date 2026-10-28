@@ -286,8 +286,11 @@ class _VideoListScreenState extends State<VideoListScreen> {
 
   /// One random video per category, in a balanced order. Categories with no
   /// video for this age are skipped.
-  List<Video> _buildPlan(List<Video> forAge) {
+  List<Video> _buildPlan(List<Video> allForAge) {
     final random = Random();
+    // Foreign-language lessons are opened from "دروسي", not picked at random.
+    final forAge =
+        allForAge.where((v) => v.subject != 'german' && v.subject != 'french').toList();
     return [
       for (final category in _planOrder)
         if (forAge.any((v) => v.category == category))

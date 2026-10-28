@@ -141,7 +141,7 @@ void main() {
     expect(find.text('خطة اليوم'), findsNothing);
     expect(find.textContaining('الأرقام'), findsWidgets);
 
-    await tester.pumpWidget(_app(const VideoListScreen(age: 4, subject: 'quran')));
+    await tester.pumpWidget(_app(const VideoListScreen(age: 4, subject: 'drawing')));
     await _load(tester);
     expect(find.text('لا توجد دروس بعد لهذه المادة'), findsOneWidget);
   });
