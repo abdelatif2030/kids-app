@@ -14,68 +14,41 @@ class GamesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // (label, min age, max age, screen). Order = order on screen.
-    final games = <(String, int, int, Widget Function())>[
-      ('افرقع البالونات', 1, 2, () => const BalloonGame()),
-      ('فين الحيوان؟', 1, 2, () => const WhereAnimalGame()),
-      ('لعبة الألوان', 2, 3, () => const ColorGame()),
-      ('حروف وكلمات', 3, 8, () => const LettersGame()),
-      ('لعبة الذاكرة', 3, 6, () => const MemoryGame()),
-      ('رياضيات', 4, 12, () => MathGame(age: age)),
+    // (label, icon, min age, max age, screen). Order = order on screen.
+    final games = <(String, IconData, int, int, Widget Function())>[
+      ('افرقع البالونات', Icons.celebration_rounded, 1, 2, () => const BalloonGame()),
+      ('فين الحيوان؟', Icons.pets_rounded, 1, 2, () => const WhereAnimalGame()),
+      ('لعبة الألوان', Icons.palette_rounded, 2, 3, () => const ColorGame()),
+      ('حروف وكلمات', Icons.sort_by_alpha_rounded, 3, 8, () => const LettersGame()),
+      ('لعبة الذاكرة', Icons.grid_view_rounded, 3, 6, () => const MemoryGame()),
+      ('رياضيات', Icons.calculate_rounded, 4, 12, () => MathGame(age: age)),
     ];
     final available = [
       for (var i = 0; i < games.length; i++)
-        if (age >= games[i].$2 && age <= games[i].$3) i,
+        if (age >= games[i].$3 && age <= games[i].$4) i,
     ];
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: const Text('ألعاب', style: TextStyle(fontSize: 26)),
-      ),
-      // Scrolls so several buttons still fit on a short screen.
+      appBar: AppBar(title: const Text('ألعاب', style: TextStyle(fontSize: 26))),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+          child: Wrap(
+            spacing: 20,
+            runSpacing: 20,
+            alignment: WrapAlignment.center,
             children: [
               for (final i in available)
-                _GameButton(
+                BigTile(
                   label: games[i].$1,
+                  icon: games[i].$2,
                   color: kBright[i % kBright.length],
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => games[i].$4()),
+                    MaterialPageRoute(builder: (_) => games[i].$5()),
                   ),
                 ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _GameButton extends StatelessWidget {
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-  const _GameButton({required this.label, required this.color, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: SizedBox(
-        width: 280,
-        height: 120,
-        child: FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: color,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-          ),
-          onPressed: onTap,
-          child: Text(label, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
         ),
       ),
     );

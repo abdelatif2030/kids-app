@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/color_game.dart';
+import 'package:kids_app/curriculum.dart';
 import 'package:kids_app/drawing_screen.dart';
 import 'package:kids_app/games_screen.dart';
 import 'package:kids_app/letters_game.dart';
@@ -91,7 +95,8 @@ void main() {
     FilledButton finish() => tester.widget<FilledButton>(find.byType(FilledButton));
     expect(finish().onPressed, isNull);
 
-    await tester.drag(find.byType(GestureDetector).first, const Offset(120, 60));
+    final canvas = find.byWidgetPredicate((w) => w is GestureDetector && w.onPanDown != null);
+    await tester.drag(canvas, const Offset(120, 60));
     await tester.pump();
     expect(finish().onPressed, isNotNull);
 
@@ -141,7 +146,7 @@ void main() {
     expect(find.text('خطة اليوم'), findsNothing);
     expect(find.textContaining('الأرقام'), findsWidgets);
 
-    await tester.pumpWidget(_app(const VideoListScreen(age: 4, subject: 'drawing')));
+    await tester.pumpWidget(_app(const VideoListScreen(age: 2, subject: 'drawing')));
     await _load(tester);
     expect(find.text('لا توجد دروس بعد لهذه المادة'), findsOneWidget);
   });
@@ -203,5 +208,23 @@ void main() {
     await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 200)));
     await tester.pumpAndSettle();
     expect(find.text('حان وقت الراحة'), findsOneWidget);
+  });
+
+  test('videos.json: valid, unique, known subjects, every age 1-12 has lessons', () {
+    final list = jsonDecode(File('assets/videos.json').readAsStringSync()) as List<dynamic>;
+    final ids = <String>{};
+    final subjects = {for (final s in kSubjects) s.id};
+    for (final v in list.cast<Map<String, dynamic>>()) {
+      final id = v['youtubeId'] as String;
+      expect(RegExp(r'^[A-Za-z0-9_-]{11}$').hasMatch(id), isTrue, reason: id);
+      expect(ids.add(id), isTrue, reason: 'duplicate $id');
+      expect(subjects, contains(v['subject']), reason: id);
+      expect(v['minAge'] as int, lessThanOrEqualTo(v['maxAge'] as int), reason: id);
+      expect(['Learning', 'Story', 'Fun', 'Calm'], contains(v['category']), reason: id);
+    }
+    for (var age = 1; age <= 12; age++) {
+      final n = list.where((v) => age >= v['minAge'] && age <= v['maxAge']).length;
+      expect(n, greaterThan(5), reason: 'age $age has only $n videos');
+    }
   });
 }

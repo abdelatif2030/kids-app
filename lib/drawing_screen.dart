@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'main.dart' show VideoListScreen;
 import 'rest_screen.dart';
+import 'session_manager.dart';
 import 'ui.dart';
 
 class _Stroke {
@@ -106,6 +108,22 @@ class _DrawingScreenState extends State<DrawingScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         title: const Text('رسم', style: TextStyle(fontSize: 26)),
+        actions: [
+          IconButton(
+            iconSize: 32,
+            tooltip: 'تعلّم الرسم',
+            icon: const Icon(Icons.ondemand_video_rounded),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => VideoListScreen(
+                  age: SessionManager.instance.currentAge ?? 6,
+                  subject: 'drawing',
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: _finished
           ? Center(child: StarDone(onAgain: _again))

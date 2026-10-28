@@ -29,6 +29,11 @@ class KidsApp extends StatelessWidget {
         colorSchemeSeed: Colors.orange,
         useMaterial3: true,
         scaffoldBackgroundColor: kBackground,
+        appBarTheme: const AppBarTheme(
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          scrolledUnderElevation: 0,
+        ),
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
             minimumSize: const Size(64, 56),
@@ -144,9 +149,16 @@ class AgeScreen extends StatelessWidget {
                           ),
                         ),
                         onPressed: () => _startSession(context, age),
-                        child: Text(
-                          '$age',
-                          style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '$age',
+                              style: const TextStyle(fontSize: 44, fontWeight: FontWeight.bold),
+                            ),
+                            Text(age == 2 ? 'سنتان' : age == 1 || age >= 11 ? 'سنة' : 'سنوات',
+                                style: const TextStyle(fontSize: 14)),
+                          ],
                         ),
                       ),
                     ),

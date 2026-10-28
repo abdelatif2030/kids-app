@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 alignment: WrapAlignment.center,
                 children: [
                   for (var i = 0; i < _sections.length; i++)
-                    _SectionTile(
+                    BigTile(
                       label: _sections[i].$1,
                       icon: _sections[i].$2,
                       color: kBright[i % kBright.length],
@@ -61,44 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionTile extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _SectionTile({
-    required this.label,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 150,
-      height: 150,
-      child: FilledButton(
-        style: FilledButton.styleFrom(
-          backgroundColor: color,
-          padding: const EdgeInsets.all(8),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-        ),
-        onPressed: onTap,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 56),
-            const SizedBox(height: 8),
-            Text(label, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-          ],
         ),
       ),
     );

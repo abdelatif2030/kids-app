@@ -29,6 +29,90 @@ Color categoryColor(String category) => switch (category) {
       _ => const Color(0xFF90A4AE),
     };
 
+/// The one big, friendly tile used for every child choice (sections, subjects,
+/// games): gradient, soft shadow, large icon, and an optional small badge.
+class BigTile extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+  final String? badge;
+  final bool dim;
+  const BigTile({
+    super.key,
+    required this.label,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+    this.badge,
+    this.dim = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hsl = HSLColor.fromColor(color);
+    final dark = hsl.withLightness((hsl.lightness - 0.12).clamp(0.0, 1.0)).toColor();
+    return Opacity(
+      opacity: dim ? 0.55 : 1,
+      child: SizedBox(
+        width: 156,
+        height: 168,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [color, dark],
+            ),
+            borderRadius: BorderRadius.circular(28),
+            boxShadow: [
+              BoxShadow(color: color.withAlpha(90), blurRadius: 12, offset: const Offset(0, 6)),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(28),
+              onTap: onTap,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 76,
+                      height: 76,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0x33FFFFFF),
+                      ),
+                      child: Icon(icon, size: 48, color: Colors.white),
+                    ),
+                    const SizedBox(height: 8),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        label,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    if (badge != null)
+                      Text(badge!, style: const TextStyle(fontSize: 14, color: Colors.white70)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// The finish screen of a game: a star (only for finishing) and "play again".
 class StarDone extends StatelessWidget {
   final VoidCallback onAgain;
