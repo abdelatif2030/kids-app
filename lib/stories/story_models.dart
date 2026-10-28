@@ -1,16 +1,17 @@
 import '../journey/models.dart';
 import '../media/audio.dart';
+import '../l10n/strings.dart';
 
 enum StoryCategory { calm, virtues, emotions, nature, educational, interactive }
 
 extension StoryCategoryText on StoryCategory {
   String get title => switch (this) {
-        StoryCategory.calm => 'قصص هادئة للنوم',
-        StoryCategory.virtues => 'اللطف والصدق والمشاركة',
-        StoryCategory.emotions => 'مشاعر ومخاوف',
-        StoryCategory.nature => 'الطبيعة والفضاء',
-        StoryCategory.educational => 'قصص تعليمية',
-        StoryCategory.interactive => 'قصص تفاعلية',
+        StoryCategory.calm => loc('قصص هادئة للنوم'),
+        StoryCategory.virtues => loc('اللطف والصدق والمشاركة'),
+        StoryCategory.emotions => loc('مشاعر ومخاوف'),
+        StoryCategory.nature => loc('الطبيعة والفضاء'),
+        StoryCategory.educational => loc('قصص تعليمية'),
+        StoryCategory.interactive => loc('قصص تفاعلية'),
       };
 
   String get emoji => switch (this) {

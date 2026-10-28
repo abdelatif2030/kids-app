@@ -5,6 +5,7 @@ import '../journey/ui/kit.dart';
 import '../library/vocab.dart';
 import 'autosave.dart';
 import 'creations.dart';
+import '../l10n/strings.dart';
 
 /// Build a simple scene: pick a background, add pictures from the vocabulary,
 /// drag them, make them bigger or smaller. Saved automatically.
@@ -57,13 +58,13 @@ class _SceneBuilderScreenState extends State<SceneBuilderScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
-        title: const Text('ابنِ مشهدك',
+        title: Text(loc('ابنِ مشهدك'),
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
         actions: [
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(_save.tooLarge ? 'المشهد كبير جداً للحفظ' : (_save.saved ? 'تم الحفظ ✓' : ''),
+              child: Text(_save.tooLarge ? loc('المشهد كبير جداً للحفظ') : (_save.saved ? loc('تم الحفظ ✓') : ''),
                   style: const TextStyle(color: RC.ink)),
             ),
           ),
@@ -103,7 +104,7 @@ class _SceneBuilderScreenState extends State<SceneBuilderScreen> {
                                 },
                                 onPanEnd: (_) => _changed(),
                                 child: Semantics(
-                                  label: 'عنصر في المشهد',
+                                  label: loc('عنصر في المشهد'),
                                   child: Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: BoxDecoration(
@@ -117,8 +118,8 @@ class _SceneBuilderScreenState extends State<SceneBuilderScreen> {
                               ),
                             ),
                           if (_items.isEmpty)
-                            const Center(
-                              child: Text('اختر صورة من الأسفل لتضعها في مشهدك',
+                            Center(
+                              child: Text(loc('اختر صورة من الأسفل لتضعها في مشهدك'),
                                   style: TextStyle(fontSize: 18, color: Colors.black54)),
                             ),
                         ],
@@ -141,17 +142,17 @@ class _SceneBuilderScreenState extends State<SceneBuilderScreen> {
                       },
                     ),
                   IconButton(
-                    tooltip: 'تكبير',
+                    tooltip: loc('تكبير'),
                     onPressed: _selected == null ? null : () => _scale(1.25),
                     icon: const Icon(Icons.zoom_in_rounded),
                   ),
                   IconButton(
-                    tooltip: 'تصغير',
+                    tooltip: loc('تصغير'),
                     onPressed: _selected == null ? null : () => _scale(0.8),
                     icon: const Icon(Icons.zoom_out_rounded),
                   ),
                   IconButton(
-                    tooltip: 'حذف العنصر المحدد',
+                    tooltip: loc('حذف العنصر المحدد'),
                     onPressed: _selected == null
                         ? null
                         : () {

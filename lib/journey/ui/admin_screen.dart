@@ -4,6 +4,7 @@ import '../lands.dart';
 import '../models.dart';
 import '../repository.dart';
 import 'profile_forms.dart';
+import '../../l10n/strings.dart';
 
 /// Lands that can take custom multiple-choice questions.
 const kCustomLands = ['letters', 'numbers', 'colors', 'english'];
@@ -20,10 +21,10 @@ class AdminScreen extends StatelessWidget {
       length: 4,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('إدارة المحتوى (تجريبي)'),
-          bottom: const TabBar(
+          title: Text(loc('إدارة المحتوى (تجريبي)')),
+          bottom: TabBar(
             isScrollable: true,
-            tabs: [Tab(text: 'الأقسام'), Tab(text: 'الأسئلة'), Tab(text: 'المكافآت'), Tab(text: 'الخطط')],
+            tabs: [Tab(text: loc('الأقسام')), Tab(text: loc('الأسئلة')), Tab(text: loc('المكافآت')), Tab(text: loc('الخطط'))],
           ),
         ),
         body: Column(
@@ -32,9 +33,9 @@ class AdminScreen extends StatelessWidget {
               width: double.infinity,
               color: Colors.amber.shade100,
               padding: const EdgeInsets.all(10),
-              child: const Text(
-                'واجهة تجريبية للتطوير: تعمل على هذا الجهاز فقط ولا تحمي نفسها بحساب مستقل، '
-                'وليست مناسبة للإنتاج.',
+              child: Text(
+                loc('واجهة تجريبية للتطوير: تعمل على هذا الجهاز فقط ولا تحمي نفسها بحساب مستقل، '
+                'وليست مناسبة للإنتاج.'),
                 style: TextStyle(fontSize: 13),
               ),
             ),
@@ -61,10 +62,10 @@ class _LandsTab extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(12),
           children: [
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(4),
               child: Text(
-                'منشور: يراه الأطفال. مسودة: مخفي عنهم. الأعمار: الأراضي التي لا تناسب عمر الطفل لا تُقترح في مغامرة اليوم.',
+                loc('منشور: يراه الأطفال. مسودة: مخفي عنهم. الأعمار: الأراضي التي لا تناسب عمر الطفل لا تُقترح في مغامرة اليوم.'),
                 style: TextStyle(fontSize: 13),
               ),
             ),
@@ -86,7 +87,7 @@ class _LandsTab extends StatelessWidget {
                               child: Text(land.title,
                                   style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
                             ),
-                            Text(draft ? 'مسودة' : 'منشور'),
+                            Text(draft ? loc('مسودة') : loc('منشور')),
                             Switch(
                               value: !draft,
                               onChanged: (publish) => store.saveSettings(s.copyWith(
@@ -157,11 +158,11 @@ class _QuestionsTabState extends State<_QuestionsTab> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('حذف السؤال؟'),
+        title: Text(loc('حذف السؤال؟')),
         content: Text(q.prompt),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('حذف')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(loc('إلغاء'))),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(loc('حذف'))),
         ],
       ),
     );
@@ -181,14 +182,14 @@ class _QuestionsTabState extends State<_QuestionsTab> {
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () => _edit(null),
             icon: const Icon(Icons.add),
-            label: const Text('سؤال جديد', style: TextStyle(fontSize: 17)),
+            label: Text(loc('سؤال جديد'), style: TextStyle(fontSize: 17)),
           ),
           body: store.custom.isEmpty
-              ? const Center(
+              ? Center(
                   child: Padding(
                     padding: EdgeInsets.all(24),
                     child: Text(
-                      'لا توجد أسئلة مخصصة بعد.\nأضف سؤالاً ليظهر ضمن مستوى وعمر تحددهما.',
+                      loc('لا توجد أسئلة مخصصة بعد.\nأضف سؤالاً ليظهر ضمن مستوى وعمر تحددهما.'),
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 17),
                     ),
@@ -215,12 +216,12 @@ class _QuestionsTabState extends State<_QuestionsTab> {
                           trailing: Wrap(
                             children: [
                               IconButton(
-                                tooltip: 'تعديل',
+                                tooltip: loc('تعديل'),
                                 icon: const Icon(Icons.edit_rounded),
                                 onPressed: () => _edit(q),
                               ),
                               IconButton(
-                                tooltip: 'حذف',
+                                tooltip: loc('حذف'),
                                 icon: const Icon(Icons.delete_outline_rounded),
                                 onPressed: () => _delete(q),
                               ),
@@ -278,13 +279,13 @@ class _QuestionEditorState extends State<QuestionEditor> {
       for (var i = 0; i < _options.length; i++)
         if (_options[i].text.trim().isNotEmpty) (i, _options[i].text.trim()),
     ];
-    if (prompt.isEmpty) return setState(() => _error = 'اكتب نص السؤال');
-    if (filled.length < 2) return setState(() => _error = 'اكتب خيارين على الأقل');
+    if (prompt.isEmpty) return setState(() => _error = loc('اكتب نص السؤال'));
+    if (filled.length < 2) return setState(() => _error = loc('اكتب خيارين على الأقل'));
     if (filled.map((e) => e.$2).toSet().length != filled.length) {
-      return setState(() => _error = 'الخيارات يجب أن تكون مختلفة');
+      return setState(() => _error = loc('الخيارات يجب أن تكون مختلفة'));
     }
     final correctPos = filled.indexWhere((e) => e.$1 == _correct);
-    if (correctPos < 0) return setState(() => _error = 'اختر الإجابة الصحيحة من الخيارات المكتوبة');
+    if (correctPos < 0) return setState(() => _error = loc('اختر الإجابة الصحيحة من الخيارات المكتوبة'));
     Navigator.pop(
       context,
       CustomQuestion(
@@ -304,7 +305,7 @@ class _QuestionEditorState extends State<QuestionEditor> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.existing == null ? 'سؤال جديد' : 'تعديل السؤال')),
+      appBar: AppBar(title: Text(widget.existing == null ? loc('سؤال جديد') : loc('تعديل السؤال'))),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -319,10 +320,10 @@ class _QuestionEditorState extends State<QuestionEditor> {
           TextField(
             controller: _prompt,
             maxLines: 2,
-            decoration: const InputDecoration(labelText: 'نص السؤال'),
+            decoration: InputDecoration(labelText: loc('نص السؤال')),
           ),
           const SizedBox(height: 12),
-          const Text('الخيارات (اختر الصحيح)', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(loc('الخيارات (اختر الصحيح)'), style: TextStyle(fontWeight: FontWeight.bold)),
           RadioGroup<int>(
             groupValue: _correct,
             onChanged: (v) => setState(() => _correct = v ?? 0),
@@ -363,8 +364,8 @@ class _QuestionEditorState extends State<QuestionEditor> {
             onChanged: (v) => setState(() => _ages = v),
           ),
           SwitchListTile(
-            title: const Text('منشور'),
-            subtitle: const Text('المسودة لا تظهر للأطفال'),
+            title: Text(loc('منشور')),
+            subtitle: Text(loc('المسودة لا تظهر للأطفال')),
             value: _published,
             onChanged: (v) => setState(() => _published = v),
           ),
@@ -374,7 +375,7 @@ class _QuestionEditorState extends State<QuestionEditor> {
               child: Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 16)),
             ),
           const SizedBox(height: 12),
-          FilledButton(onPressed: _save, child: const Text('حفظ السؤال')),
+          FilledButton(onPressed: _save, child: Text(loc('حفظ السؤال'))),
         ],
       ),
     );
@@ -394,11 +395,11 @@ class _RewardsTab extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(12),
           children: [
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(4),
               child: Text(
-                'الشارات تُمنح عند إنهاء أنشطة، لا عن الوقت. غيّر العدد المطلوب أو أوقف الشارة. '
-                'هدف الأسبوع في شاشة الطفل = عدد «بطل الأسبوع».',
+                loc('الشارات تُمنح عند إنهاء أنشطة، لا عن الوقت. غيّر العدد المطلوب أو أوقف الشارة. '
+                'هدف الأسبوع في شاشة الطفل = عدد «بطل الأسبوع».'),
                 style: TextStyle(fontSize: 13),
               ),
             ),
@@ -416,18 +417,18 @@ class _RewardsTab extends StatelessWidget {
                   child: ListTile(
                     leading: Text(b.emoji, style: const TextStyle(fontSize: 30)),
                     title: Text(b.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text(on ? '${b.description}\nالعدد المطلوب: $value' : 'الشارة متوقفة'),
+                    subtitle: Text(on ? '${b.description}\nالعدد المطلوب: $value' : loc('الشارة متوقفة')),
                     isThreeLine: on,
                     trailing: Wrap(
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         IconButton(
-                          tooltip: 'أقل',
+                          tooltip: loc('أقل'),
                           onPressed: on && value > 1 ? () => set(value - 1) : null,
                           icon: const Icon(Icons.remove_circle_outline),
                         ),
                         IconButton(
-                          tooltip: 'أكثر',
+                          tooltip: loc('أكثر'),
                           onPressed: on && value < 50 ? () => set(value + 1) : null,
                           icon: const Icon(Icons.add_circle_outline),
                         ),
@@ -441,9 +442,9 @@ class _RewardsTab extends StatelessWidget {
                 );
               }),
             const Divider(),
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(8),
-              child: Text('إكسسوارات الشخصية (تُفتح بعدد النجوم)', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: Text(loc('إكسسوارات الشخصية (تُفتح بعدد النجوم)'), style: TextStyle(fontWeight: FontWeight.bold)),
             ),
             for (final a in kAccessories)
               ListTile(
@@ -468,7 +469,7 @@ class _PlansTab extends StatelessWidget {
       builder: (context, _) {
         final store = JourneyStore.instance;
         if (store.profiles.isEmpty) {
-          return const Center(child: Text('أضف طفلاً أولاً لتظهر خطته هنا.', style: TextStyle(fontSize: 17)));
+          return Center(child: Text(loc('أضف طفلاً أولاً لتظهر خطته هنا.'), style: TextStyle(fontSize: 17)));
         }
         return ListView(
           padding: const EdgeInsets.all(12),

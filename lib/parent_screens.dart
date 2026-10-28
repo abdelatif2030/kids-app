@@ -72,11 +72,11 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
 
   Future<void> _save() async {
     if (_pin.text.length != 4) {
-      setState(() => _error = 'يجب أن يتكون الرمز من 4 أرقام');
+      setState(() => _error = loc('يجب أن يتكون الرمز من 4 أرقام'));
       return;
     }
     if (_pin.text != _confirm.text) {
-      setState(() => _error = 'الرمزان غير متطابقين');
+      setState(() => _error = loc('الرمزان غير متطابقين'));
       return;
     }
     await ParentSettings.instance.setPin(_pin.text);
@@ -94,20 +94,20 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('إنشاء رمز سري للوالدين'), automaticallyImplyLeading: !widget.popWhenDone),
+      appBar: AppBar(title: Text(loc('إنشاء رمز سري للوالدين')), automaticallyImplyLeading: !widget.popWhenDone),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
             if (widget.popWhenDone)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(bottom: 12),
                 child: Text(
-                  'قبل أن يبدأ طفلك، أنشئ رمزاً سرياً من 4 أرقام. بدونه لا يمكن لأحد الدخول إلى إعدادات الوالدين أو الخروج من وضع الطفل.',
+                  loc('قبل أن يبدأ طفلك، أنشئ رمزاً سرياً من 4 أرقام. بدونه لا يمكن لأحد الدخول إلى إعدادات الوالدين أو الخروج من وضع الطفل.'),
                   style: TextStyle(fontSize: 16),
                 ),
               ),
-            _pinField(_pin, 'الرمز الجديد'),
+            _pinField(_pin, loc('الرمز الجديد')),
             TextField(
               controller: _confirm,
               obscureText: true,
@@ -116,10 +116,10 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 32, letterSpacing: 12),
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: InputDecoration(labelText: 'أعد إدخال الرمز', errorText: _error),
+              decoration: InputDecoration(labelText: loc('أعد إدخال الرمز'), errorText: _error),
             ),
             const SizedBox(height: 16),
-            FilledButton(onPressed: _save, child: const Text('حفظ الرمز')),
+            FilledButton(onPressed: _save, child: Text(loc('حفظ الرمز'))),
           ],
         ),
       ),
@@ -178,21 +178,21 @@ class _PinEntryScreenState extends State<PinEntryScreen> {
     } else {
       _pin.clear();
       await _refreshLock();
-      if (mounted && _error == null) setState(() => _error = 'رمز خاطئ');
+      if (mounted && _error == null) setState(() => _error = loc('رمز خاطئ'));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('رمز الوالدين')),
+      appBar: AppBar(title: Text(loc('رمز الوالدين'))),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            _pinField(_pin, 'أدخل الرمز', error: _error),
+            _pinField(_pin, loc('أدخل الرمز'), error: _error),
             const SizedBox(height: 16),
-            FilledButton(onPressed: _submit, child: const Text('فتح')),
+            FilledButton(onPressed: _submit, child: Text(loc('فتح'))),
           ],
         ),
       ),
@@ -252,15 +252,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('إعدادات الوالدين')),
+      appBar: AppBar(title: Text(loc('إعدادات الوالدين'))),
       body: !_loaded
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               children: [
                 ListTile(
                   leading: const Icon(Icons.child_care_rounded),
-                  title: const Text('الأطفال'),
-                  subtitle: const Text('إضافة وتعديل وحذف ملفات الأطفال وخططهم'),
+                  title: Text(loc('الأطفال')),
+                  subtitle: Text(loc('إضافة وتعديل وحذف ملفات الأطفال وخططهم')),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const ChildrenScreen()),
@@ -268,8 +268,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.insights_rounded),
-                  title: const Text('لوحة متابعة الطفل'),
-                  subtitle: const Text('المهارات والوقت وتقرير الأسبوع'),
+                  title: Text(loc('لوحة متابعة الطفل')),
+                  subtitle: Text(loc('المهارات والوقت وتقرير الأسبوع')),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const DashboardScreen()),
@@ -277,8 +277,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.flag_rounded),
-                  title: const Text('الإبلاغ عن مشكلة أو محتوى'),
-                  subtitle: const Text('رسالة تنسخها وترسلها بنفسك، بدون بيانات الطفل'),
+                  title: Text(loc('الإبلاغ عن مشكلة أو محتوى')),
+                  subtitle: Text(loc('رسالة تنسخها وترسلها بنفسك، بدون بيانات الطفل')),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const ReportProblemScreen()),
@@ -286,8 +286,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.graphic_eq_rounded),
-                  title: const Text('الصوت والتعلّم'),
-                  subtitle: const Text('القراءة بالصوت، صوت الطبيعة، ترتيب الحروف، وتصدير بيانات الطفل'),
+                  title: Text(loc('الصوت والتعلّم')),
+                  subtitle: Text(loc('القراءة بالصوت، صوت الطبيعة، ترتيب الحروف، وتصدير بيانات الطفل')),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const AudioSettingsScreen()),
@@ -295,8 +295,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.photo_library_rounded),
-                  title: const Text('معرض العائلة'),
-                  subtitle: const Text('أعمال الأطفال المحفوظة على الجهاز، ويمكنك حذفها'),
+                  title: Text(loc('معرض العائلة')),
+                  subtitle: Text(loc('أعمال الأطفال المحفوظة على الجهاز، ويمكنك حذفها')),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const ParentGalleryScreen()),
@@ -304,8 +304,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.home_rounded),
-                  title: const Text('أنشطة البيت'),
-                  subtitle: const Text('مهام حقيقية بعد الأنشطة: أكّد أن الطفل فعلها'),
+                  title: Text(loc('أنشطة البيت')),
+                  subtitle: Text(loc('مهام حقيقية بعد الأنشطة: أكّد أن الطفل فعلها')),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const ParentHomeTasksScreen()),
@@ -321,8 +321,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         title: Text(context.tr('lang.setting')),
                         trailing: DropdownButton<String>(
                           value: AppLocale.instance.code,
-                          items: const [
-                            DropdownMenuItem(value: 'ar', child: Text('العربية')),
+                          items: [
+                            DropdownMenuItem(value: 'ar', child: Text(loc('العربية'))),
                             DropdownMenuItem(value: 'en', child: Text('English')),
                           ],
                           onChanged: (v) {
@@ -332,7 +332,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       ListTile(
                         leading: const Icon(Icons.text_fields_rounded),
-                        title: const Text('حجم الخط'),
+                        title: Text(loc('حجم الخط')),
                         trailing: DropdownButton<double>(
                           value: DisplayPrefs.instance.textScale,
                           items: [
@@ -346,8 +346,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       SwitchListTile(
                         secondary: const Icon(Icons.animation_rounded),
-                        title: const Text('تقليل الحركة'),
-                        subtitle: const Text('يوقف الحركات والتأثيرات في شاشات الطفل'),
+                        title: Text(loc('تقليل الحركة')),
+                        subtitle: Text(loc('يوقف الحركات والتأثيرات في شاشات الطفل')),
                         value: DisplayPrefs.instance.reduceMotion,
                         onChanged: DisplayPrefs.instance.setReduceMotion,
                       ),
@@ -356,7 +356,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const Divider(),
                 ListTile(
-                  title: const Text('الحد اليومي للوقت'),
+                  title: Text(loc('الحد اليومي للوقت')),
                   trailing: DropdownButton<int>(
                     value: _limit,
                     items: [
@@ -371,8 +371,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 SwitchListTile(
-                  title: const Text('ساعات الهدوء'),
-                  subtitle: const Text('لن يبدأ وضع الطفل خلال هذه الساعات'),
+                  title: Text(loc('ساعات الهدوء')),
+                  subtitle: Text(loc('لن يبدأ وضع الطفل خلال هذه الساعات')),
                   value: _quietOn,
                   onChanged: (v) async {
                     await _settings.setQuietEnabled(v);
@@ -381,21 +381,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 ListTile(
                   enabled: _quietOn,
-                  title: const Text('من'),
+                  title: Text(loc('من')),
                   trailing: Text(_quietStart.format(context)),
                   onTap: () => _pickTime(_quietStart, true),
                 ),
                 ListTile(
                   enabled: _quietOn,
-                  title: const Text('إلى'),
+                  title: Text(loc('إلى')),
                   trailing: Text(_quietEnd.format(context)),
                   onTap: () => _pickTime(_quietEnd, false),
                 ),
                 const Divider(),
                 ListTile(
                   leading: const Icon(Icons.school_rounded),
-                  title: const Text('المدرسون وحسابي'),
-                  subtitle: const Text('مدرسون معتمدون وحجز حصص أونلاين'),
+                  title: Text(loc('المدرسون وحسابي')),
+                  subtitle: Text(loc('مدرسون معتمدون وحجز حصص أونلاين')),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const TeachersEntryScreen()),
@@ -403,8 +403,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.dashboard_customize_rounded),
-                  title: const Text('إدارة المحتوى (تجريبي)'),
-                  subtitle: const Text('الأقسام والأسئلة والمكافآت والخطط'),
+                  title: Text(loc('إدارة المحتوى (تجريبي)')),
+                  subtitle: Text(loc('الأقسام والأسئلة والمكافآت والخطط')),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const AdminScreen()),
@@ -412,8 +412,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.privacy_tip_outlined),
-                  title: const Text('الخصوصية والبيانات'),
-                  subtitle: const Text('ما نحفظه، وحذف بيانات الأطفال'),
+                  title: Text(loc('الخصوصية والبيانات')),
+                  subtitle: Text(loc('ما نحفظه، وحذف بيانات الأطفال')),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const PrivacyScreen()),
@@ -421,7 +421,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.checklist_rounded),
-                  title: const Text('الخطة الأسبوعية والمتابعة'),
+                  title: Text(loc('الخطة الأسبوعية والمتابعة')),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const PlanScreen()),
@@ -429,7 +429,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.edit_note_rounded),
-                  title: const Text('ملاحظات'),
+                  title: Text(loc('ملاحظات')),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const NotesScreen()),
@@ -437,7 +437,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.bar_chart),
-                  title: const Text('ملخص المشاهدة'),
+                  title: Text(loc('ملخص المشاهدة')),
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const WatchSummaryScreen()),
@@ -445,7 +445,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.lock_reset),
-                  title: const Text('تغيير الرمز السري'),
+                  title: Text(loc('تغيير الرمز السري')),
                   onTap: () => Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (_) => const PinSetupScreen()),

@@ -4,6 +4,7 @@ import 'firebase_config.dart';
 import 'teachers_models.dart';
 import 'teachers_parent.dart';
 import 'teachers_teacher.dart';
+import 'l10n/strings.dart';
 
 /// Entry to teachers and accounts. Reachable only from Parent settings (behind
 /// the PIN), never from the child's screens.
@@ -52,7 +53,7 @@ class _TeachersEntryScreenState extends State<TeachersEntryScreen> {
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return Scaffold(
-            appBar: AppBar(title: const Text('المدرسون')),
+            appBar: AppBar(title: Text(loc('المدرسون'))),
             body: const Center(child: CircularProgressIndicator()),
           );
         }
@@ -78,13 +79,13 @@ class _NotActivated extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('المدرسون')),
-      body: const Center(
+      appBar: AppBar(title: Text(loc('المدرسون'))),
+      body: Center(
         child: Padding(
           padding: EdgeInsets.all(24),
           child: Text(
-            'خدمة المدرسين غير مفعّلة بعد.\nيحتاج صاحب التطبيق إلى ربط مشروع Firebase '
-            '(الخطوات في docs/teachers-setup.md).',
+            loc('خدمة المدرسين غير مفعّلة بعد.\nيحتاج صاحب التطبيق إلى ربط مشروع Firebase '
+            '(الخطوات في docs/teachers-setup.md).'),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 20),
           ),
@@ -101,16 +102,16 @@ class _IncompleteAccount extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('المدرسون')),
+      appBar: AppBar(title: Text(loc('المدرسون'))),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('الحساب غير مكتمل', style: TextStyle(fontSize: 20)),
+            Text(loc('الحساب غير مكتمل'), style: TextStyle(fontSize: 20)),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: onSignOut,
-              child: const Text('تسجيل الخروج'),
+              child: Text(loc('تسجيل الخروج')),
             ),
           ],
         ),
@@ -149,15 +150,15 @@ class _AuthScreenState extends State<AuthScreen> {
   Future<void> _submit() async {
     final email = _email.text.trim();
     if (!email.contains('@') || !email.contains('.')) {
-      setState(() => _error = 'اكتب بريداً إلكترونياً صحيحاً');
+      setState(() => _error = loc('اكتب بريداً إلكترونياً صحيحاً'));
       return;
     }
     if (_password.text.length < 6) {
-      setState(() => _error = 'كلمة المرور 6 أحرف على الأقل');
+      setState(() => _error = loc('كلمة المرور 6 أحرف على الأقل'));
       return;
     }
     if (_register && _name.text.trim().isEmpty) {
-      setState(() => _error = 'اكتب اسمك');
+      setState(() => _error = loc('اكتب اسمك'));
       return;
     }
     setState(() {
@@ -186,15 +187,15 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('حساب الأهل والمدرسين')),
+      appBar: AppBar(title: Text(loc('حساب الأهل والمدرسين'))),
       body: AutofillGroup(
         child: ListView(
           padding: const EdgeInsets.all(24),
           children: [
             SegmentedButton<bool>(
-              segments: const [
-                ButtonSegment(value: false, label: Text('دخول')),
-                ButtonSegment(value: true, label: Text('حساب جديد')),
+              segments: [
+                ButtonSegment(value: false, label: Text(loc('دخول'))),
+                ButtonSegment(value: true, label: Text(loc('حساب جديد'))),
               ],
               selected: {_register},
               onSelectionChanged: (s) => setState(() {
@@ -205,9 +206,9 @@ class _AuthScreenState extends State<AuthScreen> {
             const SizedBox(height: 16),
             if (_register) ...[
               SegmentedButton<UserRole>(
-                segments: const [
-                  ButtonSegment(value: UserRole.parent, label: Text('ولي أمر')),
-                  ButtonSegment(value: UserRole.teacher, label: Text('مدرس')),
+                segments: [
+                  ButtonSegment(value: UserRole.parent, label: Text(loc('ولي أمر'))),
+                  ButtonSegment(value: UserRole.teacher, label: Text(loc('مدرس'))),
                 ],
                 selected: {_role},
                 onSelectionChanged: (s) => setState(() => _role = s.first),
@@ -216,7 +217,7 @@ class _AuthScreenState extends State<AuthScreen> {
               TextField(
                 controller: _name,
                 autofillHints: const [AutofillHints.name],
-                decoration: const InputDecoration(labelText: 'الاسم'),
+                decoration: InputDecoration(labelText: loc('الاسم')),
               ),
             ],
             TextField(
@@ -224,7 +225,7 @@ class _AuthScreenState extends State<AuthScreen> {
               autofillHints: const [AutofillHints.email],
               keyboardType: TextInputType.emailAddress,
               textDirection: TextDirection.ltr,
-              decoration: const InputDecoration(labelText: 'البريد الإلكتروني'),
+              decoration: InputDecoration(labelText: loc('البريد الإلكتروني')),
             ),
             TextField(
               controller: _password,
@@ -233,7 +234,7 @@ class _AuthScreenState extends State<AuthScreen> {
               ],
               obscureText: true,
               textDirection: TextDirection.ltr,
-              decoration: const InputDecoration(labelText: 'كلمة المرور'),
+              decoration: InputDecoration(labelText: loc('كلمة المرور')),
             ),
             if (_error != null)
               Padding(
@@ -246,12 +247,12 @@ class _AuthScreenState extends State<AuthScreen> {
             const SizedBox(height: 16),
             FilledButton(
               onPressed: _busy ? null : _submit,
-              child: Text(_register ? 'إنشاء الحساب' : 'دخول'),
+              child: Text(_register ? loc('إنشاء الحساب') : loc('دخول')),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'نحفظ بريدك واسمك فقط. لا نجمع أي بيانات عن الطفل، ولا توجد محادثات '
-              'داخل التطبيق.',
+            Text(
+              loc('نحفظ بريدك واسمك فقط. لا نجمع أي بيانات عن الطفل، ولا توجد محادثات '
+              'داخل التطبيق.'),
               style: TextStyle(fontSize: 14),
               textAlign: TextAlign.center,
             ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'teachers_market.dart';
 import 'teachers_models.dart';
 import 'teachers_time.dart';
+import 'l10n/strings.dart';
 
 /// A teacher's calendar: weekly hours become real, bookable slots. A booked
 /// slot cannot be changed or deleted here; cancelled bookings free their slot.
@@ -62,26 +63,26 @@ class _TeacherAvailabilityScreenState extends State<TeacherAvailabilityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('مواعيدي')),
+      appBar: AppBar(title: Text(loc('مواعيدي'))),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _add,
         icon: const Icon(Icons.add),
-        label: const Text('إضافة مواعيد'),
+        label: Text(loc('إضافة مواعيد')),
       ),
       body: FutureBuilder<List<Slot>>(
         future: _slots,
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
           if (snap.hasError) {
-            return Center(child: FilledButton(onPressed: _reload, child: const Text('إعادة المحاولة')));
+            return Center(child: FilledButton(onPressed: _reload, child: Text(loc('إعادة المحاولة'))));
           }
           final slots = snap.data!;
           if (slots.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
                 padding: EdgeInsets.all(32),
                 child: Text(
-                  'لم تضف مواعيد بعد. أضف أيامك وساعاتك المتاحة ليحجز الأهل منها.',
+                  loc('لم تضف مواعيد بعد. أضف أيامك وساعاتك المتاحة ليحجز الأهل منها.'),
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 18),
                 ),
@@ -91,7 +92,7 @@ class _TeacherAvailabilityScreenState extends State<TeacherAvailabilityScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
             children: [
-              const Text('الأوقات بتوقيت جهازك. لا يمكن حذف موعد محجوز؛ يتحرر موعد الحجز الملغي أو المرفوض تلقائياً.',
+              Text(loc('الأوقات بتوقيت جهازك. لا يمكن حذف موعد محجوز؛ يتحرر موعد الحجز الملغي أو المرفوض تلقائياً.'),
                   style: TextStyle(fontSize: 13)),
               for (final s in slots)
                 Card(
@@ -103,17 +104,17 @@ class _TeacherAvailabilityScreenState extends State<TeacherAvailabilityScreen> {
                       color: s.status == slotBooked ? Colors.orange : (s.status == slotBlocked ? Colors.grey : Colors.green),
                     ),
                     trailing: s.status == slotBooked
-                        ? const Chip(label: Text('محجوز'))
+                        ? Chip(label: Text(loc('محجوز')))
                         : Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                tooltip: s.status == slotBlocked ? 'إعادة فتح الموعد' : 'إيقاف الموعد مؤقتاً',
+                                tooltip: s.status == slotBlocked ? loc('إعادة فتح الموعد') : loc('إيقاف الموعد مؤقتاً'),
                                 icon: Icon(s.status == slotBlocked ? Icons.lock_open_rounded : Icons.lock_outline_rounded),
                                 onPressed: () => _run(() => widget.repo.setSlotBlocked(s.id, s.status != slotBlocked)),
                               ),
                               IconButton(
-                                tooltip: 'حذف الموعد',
+                                tooltip: loc('حذف الموعد'),
                                 icon: const Icon(Icons.delete_outline_rounded),
                                 onPressed: () => _run(() => widget.repo.deleteSlot(s.id)),
                               ),
@@ -148,13 +149,13 @@ class _AddSlotsDialogState extends State<_AddSlotsDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('إضافة مواعيد أسبوعية'),
+      title: Text(loc('إضافة مواعيد أسبوعية')),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('الأيام'),
+            Text(loc('الأيام')),
             Wrap(
               spacing: 6,
               children: [
@@ -168,7 +169,7 @@ class _AddSlotsDialogState extends State<_AddSlotsDialog> {
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('وقت البدء'),
+              title: Text(loc('وقت البدء')),
               trailing: OutlinedButton(
                 onPressed: () async {
                   final t = await showTimePicker(context: context, initialTime: _time);
@@ -194,11 +195,11 @@ class _AddSlotsDialogState extends State<_AddSlotsDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('إلغاء')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(loc('إلغاء'))),
         FilledButton(
           onPressed: () {
             if (_days.isEmpty) {
-              setState(() => _error = 'اختر يوماً واحداً على الأقل');
+              setState(() => _error = loc('اختر يوماً واحداً على الأقل'));
               return;
             }
             Navigator.pop(
@@ -214,7 +215,7 @@ class _AddSlotsDialogState extends State<_AddSlotsDialog> {
               ),
             );
           },
-          child: const Text('إضافة'),
+          child: Text(loc('إضافة')),
         ),
       ],
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'l10n/strings.dart';
 
 const kBackground = Color(0xFFFFF8E1);
 
@@ -522,11 +523,11 @@ class StarDone extends StatelessWidget {
       children: [
         const Icon(Icons.star_rounded, size: 120, color: Colors.amber),
         const SizedBox(height: 16),
-        const Text('أحسنت!', style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
+        Text(loc('أحسنت!'), style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
         const SizedBox(height: 24),
         FilledButton(
           onPressed: onAgain,
-          child: const Text('العب تاني', style: TextStyle(fontSize: 24)),
+          child: Text(loc('العب تاني'), style: TextStyle(fontSize: 24)),
         ),
       ],
     );

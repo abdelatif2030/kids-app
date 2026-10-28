@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../models.dart';
 import 'kit.dart';
 import 'quiz_view.dart';
+import '../../l10n/strings.dart';
 
 /// Put the steps in the right order by tapping them one after another. A wrong
 /// tap only shakes the message ("try another one"); after two misses the next
@@ -60,7 +61,7 @@ class _SequenceViewState extends State<SequenceView> {
       setState(() {
         _placed.add(step);
         _hint = false;
-        _message = _placed.length == _round.steps.length ? 'أحسنت! رتّبتها كلها 🎉' : 'صحيح! والخطوة التالية؟';
+        _message = _placed.length == _round.steps.length ? loc('أحسنت! رتّبتها كلها 🎉') : loc('صحيح! والخطوة التالية؟');
       });
       if (_placed.length == _round.steps.length) {
         _results.add(ItemResult('sequence', !_missed));
@@ -70,7 +71,7 @@ class _SequenceViewState extends State<SequenceView> {
       setState(() {
         _missed = true;
         _wrong++;
-        _message = 'جرّب بطاقة أخرى، فكّر ماذا يحدث أولاً 🌈';
+        _message = loc('جرّب بطاقة أخرى، فكّر ماذا يحدث أولاً 🌈');
         if (_wrong >= 2) _hint = true;
       });
     }
@@ -187,7 +188,7 @@ class _SequenceViewState extends State<SequenceView> {
                 TextButton.icon(
                   onPressed: () => setState(() => _hint = true),
                   icon: const Icon(Icons.lightbulb_outline_rounded),
-                  label: const Text('تلميح', style: TextStyle(fontSize: 18)),
+                  label: Text(loc('تلميح'), style: TextStyle(fontSize: 18)),
                 ),
             ],
           ),

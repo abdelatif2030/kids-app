@@ -4,6 +4,7 @@ import 'curriculum.dart';
 import 'drawing_screen.dart';
 import 'main.dart' show Video, VideoListScreen, loadVideos;
 import 'ui.dart';
+import 'l10n/strings.dart';
 
 /// "دروسي": one big card per subject, with how many lessons exist for this age.
 class SubjectsScreen extends StatelessWidget {
@@ -24,7 +25,7 @@ class SubjectsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SceneScaffold(
-      title: 'دروسي',
+      title: loc('دروسي'),
       body: FutureBuilder<List<Video>>(
         future: loadVideos(),
         builder: (context, snapshot) {

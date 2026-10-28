@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/strings.dart';
 
 /// A "land" on the learning map: one subject area with five levels.
 class Land {
@@ -41,16 +42,16 @@ class Activity {
 
   /// A short name for the activity itself.
   String get kindLabel => switch (kind) {
-        ActivityKind.memory => 'لعبة الذاكرة',
-        ActivityKind.sequence => 'رتّب الخطوات',
+        ActivityKind.memory => loc('لعبة الذاكرة'),
+        ActivityKind.sequence => loc('رتّب الخطوات'),
         ActivityKind.quiz => switch (landId) {
-            'letters' => 'الحرف والصورة',
-            'numbers' => level <= 2 ? 'عدّ الأشياء' : 'حساب ممتع',
-            'colors' => 'ألوان وأشكال',
-            'english' => 'كلمات إنجليزية',
-            'stories' => 'قصة وأسئلة',
-            'feelings' => 'مشاعري',
-            _ => 'تحدٍّ',
+            'letters' => loc('الحرف والصورة'),
+            'numbers' => level <= 2 ? loc('عدّ الأشياء') : loc('حساب ممتع'),
+            'colors' => loc('ألوان وأشكال'),
+            'english' => loc('كلمات إنجليزية'),
+            'stories' => loc('قصة وأسئلة'),
+            'feelings' => loc('مشاعري'),
+            _ => loc('تحدٍّ'),
           },
       };
 }

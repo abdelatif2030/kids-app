@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'l10n/strings.dart';
 
 /// Reading and motion comfort, set by the parent: text size and less motion.
 /// Stored on the device (shared_preferences `text_scale`, `reduce_motion`).
@@ -8,7 +9,7 @@ class DisplayPrefs extends ChangeNotifier {
   static final DisplayPrefs instance = DisplayPrefs._();
 
   /// 1.0 normal, 1.2 large, 1.4 extra large.
-  static final scales = <double, String>{1.0: 'عادي', 1.2: 'كبير', 1.4: 'كبير جدًا'};
+  static final scales = <double, String>{1.0: loc('عادي'), 1.2: loc('كبير'), 1.4: loc('كبير جدًا')};
 
   double textScale = 1.0;
   bool reduceMotion = false;

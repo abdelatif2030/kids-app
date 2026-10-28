@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'journey/repository.dart';
+import 'l10n/strings.dart';
 
 /// Deletes what the app learned about the children from this device: profiles,
 /// finished activities, skill results, watch history, daily time, the weekly
@@ -81,7 +82,7 @@ Future<Map<String, dynamic>> exportChildData(String childId) async {
 
   return {
     'exportedAt': DateTime.now().toIso8601String(),
-    'note': 'هذه البيانات محفوظة على هذا الجهاز فقط. لم تُرسل إلى أي مكان.',
+    'note': loc('هذه البيانات محفوظة على هذا الجهاز فقط. لم تُرسل إلى أي مكان.'),
     'profile': store.profileById(childId)?.toJson(),
     'activities': [for (final a in store.attemptsOf(childId)) a.toJson()],
     'skillEvents': mine('skill_events'),

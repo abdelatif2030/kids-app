@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'curriculum.dart';
 import 'main.dart' show Video, loadVideos;
 import 'watch_history.dart';
+import 'l10n/strings.dart';
 
 /// Parent-only: a weekly target of finished lessons per subject, and how many
 /// the child finished in the last 7 days. Stored on this device only.
@@ -66,26 +67,26 @@ class _PlanScreenState extends State<PlanScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('الخطة الأسبوعية')),
+      appBar: AppBar(title: Text(loc('الخطة الأسبوعية'))),
       body: !_loaded
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(bottom: 12),
                   child: Text(
-                    'الخطة المجانية: اختر كم درساً تريد أن يكمله طفلك في الأسبوع لكل مادة. '
-                    'يُحسب الدرس عندما ينتهي الفيديو حتى آخره.',
+                    loc('الخطة المجانية: اختر كم درساً تريد أن يكمله طفلك في الأسبوع لكل مادة. '
+                    'يُحسب الدرس عندما ينتهي الفيديو حتى آخره.'),
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
                 for (final s in kSubjects)
                   if (s.id != 'drawing') _row(s),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 16),
                   child: Text(
-                    'تُحفظ هذه البيانات على هذا الجهاز فقط.',
+                    loc('تُحفظ هذه البيانات على هذا الجهاز فقط.'),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -125,7 +126,7 @@ class _PlanScreenState extends State<PlanScreen> {
                         : 'أكمل $done هذا الأسبوع (بدون هدف)',
                   ),
                   Text(
-                    available == 0 ? 'لا توجد دروس بعد' : 'الدروس المتاحة: $available',
+                    available == 0 ? loc('لا توجد دروس بعد') : 'الدروس المتاحة: $available',
                     style: const TextStyle(fontSize: 12),
                   ),
                 ],
@@ -135,7 +136,7 @@ class _PlanScreenState extends State<PlanScreen> {
               value: target,
               items: [
                 for (var t = 0; t <= _maxTarget; t++)
-                  DropdownMenuItem(value: t, child: Text(t == 0 ? 'بدون' : '$t')),
+                  DropdownMenuItem(value: t, child: Text(t == 0 ? loc('بدون') : '$t')),
               ],
               onChanged: (t) {
                 if (t != null) _setTarget(s.id, t);

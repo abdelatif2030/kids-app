@@ -4,6 +4,7 @@ import '../stories/story_data.dart';
 import '../stories/story_store.dart';
 import 'learning_records.dart';
 import 'vocab.dart';
+import '../l10n/strings.dart';
 
 /// Who was exposed to, practised and demonstrated an item. Kept as three sets
 /// so a screen can never mix "listened to" with "understood".
@@ -145,16 +146,16 @@ LearningSummary buildLearningSummary({
 
   final next = <String>[];
   if (letters.exposure.isNotEmpty && letters.demonstrated.isEmpty) {
-    next.add('اطّلع طفلك على حروف جديدة، لكن لم يُجب بعد إجابة صحيحة من أول مرة. جرّبوا «تمرين الحرف».');
+    next.add(loc('اطّلع طفلك على حروف جديدة، لكن لم يُجب بعد إجابة صحيحة من أول مرة. جرّبوا «تمرين الحرف».'));
   }
-  final needsLetters = needs.where((n) => n.startsWith('حرف')).take(3).toList();
-  if (needsLetters.isNotEmpty) next.add('راجعوا معاً: ${needsLetters.join('، ')}. زر «مراجعة اليوم» في تعلّم الحروف يجمعها.');
+  final needsLetters = needs.where((n) => n.startsWith(loc('حرف'))).take(3).toList();
+  if (needsLetters.isNotEmpty) next.add('راجعوا معاً: ${needsLetters.join(loc('، '))}. زر «مراجعة اليوم» في تعلّم الحروف يجمعها.');
   if (stories.isNotEmpty && stories.values.every((s) => !s.understoodChecked) && stories.values.any((s) => s.completed)) {
-    next.add('بعد القصة اضغطوا «أسئلة عن القصة»؛ الاستماع وحده لا يعني أن الطفل فهم.');
+    next.add(loc('بعد القصة اضغطوا «أسئلة عن القصة»؛ الاستماع وحده لا يعني أن الطفل فهم.'));
   }
-  if (offlineActivities == 0) next.add('جرّبوا نشاطاً واحداً من «أنشطة مع الأهل» هذا الأسبوع.');
+  if (offlineActivities == 0) next.add(loc('جرّبوا نشاطاً واحداً من «أنشطة مع الأهل» هذا الأسبوع.'));
   if (lessons == 0 && letters.practice.isEmpty && words.practice.isEmpty) {
-    next.add('ابدؤوا بدرس قصير (5 دقائق) من «تعلّم الحروف» أو «مكتبة الكلمات».');
+    next.add(loc('ابدؤوا بدرس قصير (5 دقائق) من «تعلّم الحروف» أو «مكتبة الكلمات».'));
   }
 
   return LearningSummary(

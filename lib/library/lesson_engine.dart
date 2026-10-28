@@ -4,6 +4,7 @@ import '../journey/content.dart';
 import '../journey/lands.dart';
 import '../journey/models.dart';
 import 'vocab.dart';
+import '../l10n/strings.dart';
 
 /// The kinds of multimedia exercise the engine can build from the shared
 /// vocabulary. Every one is built from approved [Vocab] items, so the picture,
@@ -12,12 +13,12 @@ enum LessonKind { pictureToWord, audioToPicture, wordToPicture, counting, sequen
 
 extension LessonKindText on LessonKind {
   String get title => switch (this) {
-        LessonKind.pictureToWord => 'صورة ← كلمة',
-        LessonKind.audioToPicture => 'استمع واختر الصورة',
-        LessonKind.wordToPicture => 'كلمة ← صورة',
-        LessonKind.counting => 'عدّ الأشياء',
-        LessonKind.sequence => 'رتّب الخطوات',
-        LessonKind.memory => 'لعبة الذاكرة',
+        LessonKind.pictureToWord => loc('صورة ← كلمة'),
+        LessonKind.audioToPicture => loc('استمع واختر الصورة'),
+        LessonKind.wordToPicture => loc('كلمة ← صورة'),
+        LessonKind.counting => loc('عدّ الأشياء'),
+        LessonKind.sequence => loc('رتّب الخطوات'),
+        LessonKind.memory => loc('لعبة الذاكرة'),
       };
 
   String get emoji => switch (this) {
@@ -64,11 +65,11 @@ Question pictureToWord(Vocab t, List<Vocab> pool, Random r, {int options = 3}) {
     r,
   );
   return Question(
-    prompt: 'ما اسم هذه الصورة؟',
+    prompt: loc('ما اسم هذه الصورة؟'),
     bigEmoji: t.emoji,
     options: m.options,
     correct: m.correct,
-    hint: 'انظر إلى الصورة جيداً ثم اقرأ الكلمات.',
+    hint: loc('انظر إلى الصورة جيداً ثم اقرأ الكلمات.'),
     skill: 'vocab',
     spoken: t.ar,
     explanation: '${t.emoji} ${t.ar}${t.en == null ? '' : ' = ${t.en}'}',
@@ -83,7 +84,7 @@ Question audioToPicture(Vocab t, List<Vocab> pool, Random r, {int options = 3}) 
     r,
   );
   return Question(
-    prompt: 'استمع ثم اختر الصورة الصحيحة',
+    prompt: loc('استمع ثم اختر الصورة الصحيحة'),
     bigText: '🔊',
     options: m.options,
     correct: m.correct,
@@ -103,7 +104,7 @@ Question wordToPicture(Vocab t, List<Vocab> pool, Random r, {int options = 3}) {
     r,
   );
   return Question(
-    prompt: 'أي صورة تناسب الكلمة؟',
+    prompt: loc('أي صورة تناسب الكلمة؟'),
     bigText: t.ar,
     options: m.options,
     correct: m.correct,
@@ -130,7 +131,7 @@ Question countingQuestion(Vocab t, int max, Random r) {
     repeat: n,
     options: m.options,
     correct: m.correct,
-    hint: 'عُدّ واحداً واحداً بإصبعك.',
+    hint: loc('عُدّ واحداً واحداً بإصبعك.'),
     skill: 'counting',
     spoken: 'كم ${t.ar}؟',
     explanation: 'العدد $n',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'l10n/strings.dart';
 
 /// A school subject shown to the child.
 class Subject {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../journey/ui/kit.dart';
 import 'letters_data.dart';
+import '../l10n/strings.dart';
 
 /// Trace a letter with a finger or the mouse. The big faint letter is the
 /// guide; the screen only checks that the child really drew along it for a
@@ -40,7 +41,7 @@ class _TracingViewState extends State<TracingView> {
         Padding(
           padding: const EdgeInsets.all(12),
           child: Text(
-            enough ? 'جميل! تتبّعتَ الحرف بإتقان 🌟' : 'تتبّع الحرف بإصبعك فوق الشكل الباهت',
+            enough ? loc('جميل! تتبّعتَ الحرف بإتقان 🌟') : loc('تتبّع الحرف بإصبعك فوق الشكل الباهت'),
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: RC.ink),
           ),
@@ -93,7 +94,7 @@ class _TracingViewState extends State<TracingView> {
                     _length = 0;
                   }),
                   icon: const Icon(Icons.refresh_rounded),
-                  label: const Text('امسح وأعد', style: TextStyle(fontSize: 18)),
+                  label: Text(loc('امسح وأعد'), style: TextStyle(fontSize: 18)),
                 ),
               ),
               const SizedBox(width: 12),
@@ -101,7 +102,7 @@ class _TracingViewState extends State<TracingView> {
                 child: FilledButton.icon(
                   onPressed: enough ? widget.onDone : null,
                   icon: const Icon(Icons.check_rounded),
-                  label: const Text('تم', style: TextStyle(fontSize: 18)),
+                  label: Text(loc('تم'), style: TextStyle(fontSize: 18)),
                 ),
               ),
             ],

@@ -5,14 +5,15 @@ import 'curriculum.dart';
 import 'teachers_followup.dart';
 import 'teachers_models.dart';
 import 'teachers_time.dart';
+import 'l10n/strings.dart';
 
 String _statusLabel(String s) => switch (s) {
-      bookingRequested => 'قيد الانتظار',
-      bookingAccepted => 'تم القبول',
-      bookingDeclined => 'مرفوض',
-      bookingCancelled => 'ملغي',
-      bookingCompleted => 'اكتملت',
-      bookingNoShow => 'لم تتم (غياب)',
+      bookingRequested => loc('قيد الانتظار'),
+      bookingAccepted => loc('تم القبول'),
+      bookingDeclined => loc('مرفوض'),
+      bookingCancelled => loc('ملغي'),
+      bookingCompleted => loc('اكتملت'),
+      bookingNoShow => loc('لم تتم (غياب)'),
       _ => s,
     };
 
@@ -67,7 +68,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
           title: Text(title),
           content: Text(body),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('رجوع')),
+            TextButton(onPressed: () => Navigator.pop(context, false), child: Text(loc('رجوع'))),
             FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(yes)),
           ],
         ),
@@ -83,14 +84,14 @@ class _BookingsScreenState extends State<BookingsScreen> {
   }
 
   Future<void> _decline(Booking b) async {
-    if (!await _confirm('رفض الطلب؟', 'سيُبلَّغ ولي الأمر، ويعود الموعد متاحاً لغيره.', 'رفض')) return;
+    if (!await _confirm(loc('رفض الطلب؟'), loc('سيُبلَّغ ولي الأمر، ويعود الموعد متاحاً لغيره.'), loc('رفض'))) return;
     await _run(() => b.slotId != null
         ? widget.repo.cancelOrDecline(b, status: bookingDeclined)
         : widget.repo.updateBooking(b.id, status: bookingDeclined));
   }
 
   Future<void> _cancel(Booking b) async {
-    if (!await _confirm('إلغاء الحجز؟', 'سيعود الموعد متاحاً لغيرك. راجع سياسة إلغاء المدرس في صفحته.', 'إلغاء الحجز')) return;
+    if (!await _confirm(loc('إلغاء الحجز؟'), loc('سيعود الموعد متاحاً لغيرك. راجع سياسة إلغاء المدرس في صفحته.'), loc('إلغاء الحجز'))) return;
     await _run(() => b.slotId != null
         ? widget.repo.cancelOrDecline(b, status: bookingCancelled)
         : widget.repo.updateBooking(b.id, status: bookingCancelled));
@@ -98,9 +99,9 @@ class _BookingsScreenState extends State<BookingsScreen> {
 
   Future<void> _finish(Booking b, String status) async {
     final done = status == bookingCompleted;
-    if (!await _confirm(done ? 'تأكيد أن الحصة تمت؟' : 'تسجيل غياب؟',
-        done ? 'بعد التأكيد يستطيع ولي الأمر تقييمك، وتستطيع كتابة تقرير الحصة. لا يمكن التراجع.' : 'لن يستطيع ولي الأمر تقييم حصة لم تتم. لا يمكن التراجع.',
-        'تأكيد')) {
+    if (!await _confirm(done ? loc('تأكيد أن الحصة تمت؟') : loc('تسجيل غياب؟'),
+        done ? loc('بعد التأكيد يستطيع ولي الأمر تقييمك، وتستطيع كتابة تقرير الحصة. لا يمكن التراجع.') : loc('لن يستطيع ولي الأمر تقييم حصة لم تتم. لا يمكن التراجع.'),
+        loc('تأكيد'))) {
       return;
     }
     await _run(() => widget.repo.finishLesson(b, status: status));
@@ -114,7 +115,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('طلبات الحصص')),
+      appBar: AppBar(title: Text(loc('طلبات الحصص'))),
       body: FutureBuilder<(UserRole?, List<Booking>, Set<String>)>(
         future: _data,
         builder: (context, snapshot) {
@@ -123,12 +124,12 @@ class _BookingsScreenState extends State<BookingsScreen> {
           }
           if (snapshot.hasError) {
             return Center(
-              child: FilledButton(onPressed: _reload, child: const Text('إعادة المحاولة')),
+              child: FilledButton(onPressed: _reload, child: Text(loc('إعادة المحاولة'))),
             );
           }
           final (role, bookings, reviewed) = snapshot.data!;
           if (bookings.isEmpty) {
-            return const Center(child: Text('لا توجد طلبات', style: TextStyle(fontSize: 20)));
+            return Center(child: Text(loc('لا توجد طلبات'), style: TextStyle(fontSize: 20)));
           }
           final asTeacher = role == UserRole.teacher;
           final active = [for (final b in bookings) if (b.status == bookingRequested || b.status == bookingAccepted) b]
@@ -155,12 +156,12 @@ class _BookingsScreenState extends State<BookingsScreen> {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              if (active.isNotEmpty) const Text('القادمة والمعلّقة', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+              if (active.isNotEmpty) Text(loc('القادمة والمعلّقة'), style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
               for (final b in active) card(b),
               if (history.isNotEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 12),
-                  child: Text('السجل', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                  child: Text(loc('السجل'), style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
                 ),
               for (final b in history) card(b),
             ],
@@ -226,7 +227,7 @@ class _BookingCard extends StatelessWidget {
             if (b.note.isNotEmpty) Text('ملاحظة: ${b.note}'),
             if (!asTeacher && b.status == bookingAccepted && b.lessonLink != null) ...[
               const SizedBox(height: 8),
-              const Text('رابط الحصة (افتحه بنفسك وكن بجانب طفلك):'),
+              Text(loc('رابط الحصة (افتحه بنفسك وكن بجانب طفلك):')),
               SelectableText(
                 b.lessonLink!,
                 textDirection: TextDirection.ltr,
@@ -237,11 +238,11 @@ class _BookingCard extends StatelessWidget {
                   await Clipboard.setData(ClipboardData(text: b.lessonLink!));
                   if (context.mounted) {
                     ScaffoldMessenger.of(context)
-                        .showSnackBar(const SnackBar(content: Text('تم نسخ الرابط')));
+                        .showSnackBar(SnackBar(content: Text(loc('تم نسخ الرابط'))));
                   }
                 },
                 icon: const Icon(Icons.copy),
-                label: const Text('نسخ الرابط'),
+                label: Text(loc('نسخ الرابط')),
               ),
             ],
             const SizedBox(height: 8),
@@ -249,25 +250,25 @@ class _BookingCard extends StatelessWidget {
               spacing: 8,
               children: [
                 if (asTeacher && b.status == bookingRequested) ...[
-                  FilledButton(onPressed: onAccept, child: const Text('قبول')),
-                  OutlinedButton(onPressed: onDecline, child: const Text('رفض')),
+                  FilledButton(onPressed: onAccept, child: Text(loc('قبول'))),
+                  OutlinedButton(onPressed: onDecline, child: Text(loc('رفض'))),
                 ],
                 if (asTeacher && b.status == bookingAccepted && b.scheduled && b.started) ...[
-                  FilledButton(onPressed: onDone, child: const Text('تمّت الحصة')),
-                  OutlinedButton(onPressed: onNoShow, child: const Text('لم تتم (غياب)')),
+                  FilledButton(onPressed: onDone, child: Text(loc('تمّت الحصة'))),
+                  OutlinedButton(onPressed: onNoShow, child: Text(loc('لم تتم (غياب)'))),
                 ],
                 if (asTeacher && b.status == bookingCompleted)
-                  OutlinedButton(onPressed: onReport, child: const Text('تقرير الحصة')),
+                  OutlinedButton(onPressed: onReport, child: Text(loc('تقرير الحصة'))),
                 if (!asTeacher && b.status == bookingCompleted) ...[
-                  OutlinedButton(onPressed: onReport, child: const Text('تقرير الحصة')),
+                  OutlinedButton(onPressed: onReport, child: Text(loc('تقرير الحصة'))),
                   if (!reviewed)
-                    FilledButton(onPressed: onReview, child: const Text('قيّم المدرس'))
+                    FilledButton(onPressed: onReview, child: Text(loc('قيّم المدرس')))
                   else
-                    const Chip(label: Text('قيّمتَ هذه الحصة')),
+                    Chip(label: Text(loc('قيّمتَ هذه الحصة'))),
                 ],
                 if (!asTeacher && (b.status == bookingRequested || b.status == bookingAccepted))
-                  OutlinedButton(onPressed: onCancel, child: const Text('إلغاء الحجز')),
-                if (canChat) TextButton.icon(onPressed: onMessages, icon: const Icon(Icons.chat_bubble_outline), label: const Text('الرسائل')),
+                  OutlinedButton(onPressed: onCancel, child: Text(loc('إلغاء الحجز'))),
+                if (canChat) TextButton.icon(onPressed: onMessages, icon: const Icon(Icons.chat_bubble_outline), label: Text(loc('الرسائل'))),
               ],
             ),
           ],
@@ -298,7 +299,7 @@ class _LinkDialogState extends State<_LinkDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('رابط الحصة'),
+      title: Text(loc('رابط الحصة')),
       content: TextField(
         controller: _link,
         textDirection: TextDirection.ltr,
@@ -309,17 +310,17 @@ class _LinkDialogState extends State<_LinkDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('إلغاء')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(loc('إلغاء'))),
         FilledButton(
           onPressed: () {
             final link = _link.text.trim();
             if (!isValidLessonLink(link)) {
-              setState(() => _error = 'اكتب رابطاً صحيحاً يبدأ بـ https');
+              setState(() => _error = loc('اكتب رابطاً صحيحاً يبدأ بـ https'));
               return;
             }
             Navigator.pop(context, link);
           },
-          child: const Text('قبول الطلب'),
+          child: Text(loc('قبول الطلب')),
         ),
       ],
     );

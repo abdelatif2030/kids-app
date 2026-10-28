@@ -12,6 +12,7 @@ import 'teachers_directory.dart' show VerificationBadges;
 import 'teachers_models.dart';
 import 'teachers_parent.dart' show TeacherDetailScreen;
 import 'teachers_widgets.dart';
+import 'l10n/strings.dart';
 
 /// A teacher's home: their profile (and its approval status) and incoming requests.
 class TeacherHomeScreen extends StatefulWidget {
@@ -53,10 +54,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('حساب المدرس'),
+        title: Text(loc('حساب المدرس')),
         actions: [
           IconButton(
-            tooltip: 'مواعيدي',
+            tooltip: loc('مواعيدي'),
             icon: const Icon(Icons.edit_calendar_rounded),
             onPressed: () => Navigator.push(
               context,
@@ -64,7 +65,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
             ),
           ),
           IconButton(
-            tooltip: 'طلبات الأهل',
+            tooltip: loc('طلبات الأهل'),
             icon: const Icon(Icons.inbox_rounded),
             onPressed: () => Navigator.push(
               context,
@@ -72,7 +73,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
             ),
           ),
           IconButton(
-            tooltip: 'طلبات الحصص',
+            tooltip: loc('طلبات الحصص'),
             icon: const Icon(Icons.event_note_rounded),
             onPressed: () => Navigator.push(
               context,
@@ -80,7 +81,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
             ),
           ),
           IconButton(
-            tooltip: 'تسجيل الخروج',
+            tooltip: loc('تسجيل الخروج'),
             icon: const Icon(Icons.logout),
             onPressed: widget.onSignOut,
           ),
@@ -97,21 +98,21 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
             padding: const EdgeInsets.all(16),
             children: [
               if (p == null) ...[
-                const TeacherHeader(
+                TeacherHeader(
                   avatar: TeacherAvatar(photo: null, radius: 36),
-                  title: 'أهلاً بك',
-                  subtitle: 'أنشئ ملفك ليظهر للأهل',
+                  title: loc('أهلاً بك'),
+                  subtitle: loc('أنشئ ملفك ليظهر للأهل'),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'أنشئ ملفك الشخصي، وعند الحفظ يظهر للأهل مباشرة.',
+                Text(
+                  loc('أنشئ ملفك الشخصي، وعند الحفظ يظهر للأهل مباشرة.'),
                   style: TextStyle(fontSize: 18),
                 ),
               ] else ...[
                 TeacherHeader(
                   avatar: TeacherAvatar(photo: p.photoBytes, radius: 36),
                   title: p.name,
-                  subtitle: p.languages.join('، '),
+                  subtitle: p.languages.join(loc('، ')),
                 ),
                 const SizedBox(height: 12),
                 Card(
@@ -128,10 +129,10 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                         Expanded(
                           child: Text(
                             p.approved
-                                ? 'ملفك ظاهر للأهل.'
+                                ? loc('ملفك ظاهر للأهل.')
                                 : p.suspended
-                                    ? 'تم إيقاف ظهور ملفك. تواصل مع صاحب التطبيق.'
-                                    : 'احفظ ملفك مرة أخرى ليظهر للأهل.',
+                                    ? loc('تم إيقاف ظهور ملفك. تواصل مع صاحب التطبيق.')
+                                    : loc('احفظ ملفك مرة أخرى ليظهر للأهل.'),
                             style: const TextStyle(fontSize: 17),
                           ),
                         ),
@@ -160,7 +161,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                           children: [
                             const Icon(Icons.description_outlined, size: 20),
                             const SizedBox(width: 6),
-                            Text(p.cvName == null ? 'لم ترفع سيرة ذاتية' : 'السيرة الذاتية: ${p.cvName}'),
+                            Text(p.cvName == null ? loc('لم ترفع سيرة ذاتية') : 'السيرة الذاتية: ${p.cvName}'),
                           ],
                         ),
                       ],
@@ -178,12 +179,12 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                     ),
                   ),
                   icon: const Icon(Icons.visibility_outlined),
-                  label: const Text('معاينة صفحتي كما يراها الأهل'),
+                  label: Text(loc('معاينة صفحتي كما يراها الأهل')),
                 ),
               FilledButton.icon(
                 onPressed: () => _edit(p),
                 icon: const Icon(Icons.edit),
-                label: Text(p == null ? 'إنشاء الملف الشخصي' : 'تعديل الملف الشخصي'),
+                label: Text(p == null ? loc('إنشاء الملف الشخصي') : loc('تعديل الملف الشخصي')),
               ),
             ],
           );
@@ -282,22 +283,22 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
 
   Future<void> _save() async {
     if (_name.text.trim().isEmpty || _bio.text.trim().isEmpty) {
-      setState(() => _error = 'اكتب الاسم ونبذة عنك');
+      setState(() => _error = loc('اكتب الاسم ونبذة عنك'));
       return;
     }
     if (_subjects.isEmpty || _languages.isEmpty) {
-      setState(() => _error = 'اختر مادة ولغة على الأقل');
+      setState(() => _error = loc('اختر مادة ولغة على الأقل'));
       return;
     }
     final price = _priceEgp.text.trim().isEmpty ? null : int.tryParse(_priceEgp.text.trim());
     final years = _experience.text.trim().isEmpty ? null : int.tryParse(_experience.text.trim());
     if ((_priceEgp.text.trim().isNotEmpty && (price == null || price < 0 || price > 100000)) ||
         (_experience.text.trim().isNotEmpty && (years == null || years < 0 || years > 60))) {
-      setState(() => _error = 'تحقق من السعر وسنوات الخبرة (أرقام صحيحة)');
+      setState(() => _error = loc('تحقق من السعر وسنوات الخبرة (أرقام صحيحة)'));
       return;
     }
     if (_ageMin != null && _ageMax != null && _ageMin! > _ageMax!) {
-      setState(() => _error = 'الفئة العمرية: الحد الأدنى أكبر من الأقصى');
+      setState(() => _error = loc('الفئة العمرية: الحد الأدنى أكبر من الأقصى'));
       return;
     }
     setState(() {
@@ -371,7 +372,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('الملف الشخصي')),
+      appBar: AppBar(title: Text(loc('الملف الشخصي'))),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
@@ -383,7 +384,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
                   end: 0,
                   bottom: 0,
                   child: IconButton.filled(
-                    tooltip: 'اختيار صورة',
+                    tooltip: loc('اختيار صورة'),
                     onPressed: _pickPhoto,
                     icon: const Icon(Icons.photo_camera_rounded),
                   ),
@@ -392,21 +393,21 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
             ),
           ),
           const SizedBox(height: 16),
-          TextField(controller: _name, decoration: const InputDecoration(labelText: 'الاسم')),
+          TextField(controller: _name, decoration: InputDecoration(labelText: loc('الاسم'))),
           TextField(
             controller: _bio,
             maxLines: 5,
-            decoration: const InputDecoration(labelText: 'نبذة عنك وخبرتك'),
+            decoration: InputDecoration(labelText: loc('نبذة عنك وخبرتك')),
           ),
           TextField(
             controller: _price,
-            decoration: const InputDecoration(
-              labelText: 'السعر (اختياري)',
-              hintText: 'مثال: 150 جنيه للحصة',
+            decoration: InputDecoration(
+              labelText: loc('السعر (اختياري)'),
+              hintText: loc('مثال: 150 جنيه للحصة'),
             ),
           ),
           const SizedBox(height: 16),
-          const Text('المواد', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(loc('المواد'), style: TextStyle(fontWeight: FontWeight.bold)),
           Wrap(
             spacing: 8,
             children: [
@@ -421,7 +422,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
             ],
           ),
           const SizedBox(height: 16),
-          const Text('اللغات', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(loc('اللغات'), style: TextStyle(fontWeight: FontWeight.bold)),
           Wrap(
             spacing: 8,
             children: [
@@ -438,21 +439,21 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
           const SizedBox(height: 8),
           Card(
             child: ExpansionTile(
-              title: const Text('ملف احترافي (يزيد ثقة الأهل)', style: TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: const Text('اختياري. كل ما تكتبه هنا يظهر للأهل على أنه من كلامك أنت، لا يتحقق منه التطبيق.'),
+              title: Text(loc('ملف احترافي (يزيد ثقة الأهل)'), style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text(loc('اختياري. كل ما تكتبه هنا يظهر للأهل على أنه من كلامك أنت، لا يتحقق منه التطبيق.')),
               childrenPadding: const EdgeInsets.all(16),
               expandedCrossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextField(
                   controller: _headline,
                   maxLength: 100,
-                  decoration: const InputDecoration(labelText: 'عنوان قصير', hintText: 'مثال: تأسيس القراءة والكتابة بالألعاب'),
+                  decoration: InputDecoration(labelText: loc('عنوان قصير'), hintText: loc('مثال: تأسيس القراءة والكتابة بالألعاب')),
                 ),
                 TextField(
                   controller: _philosophy,
                   maxLines: 3,
                   maxLength: 500,
-                  decoration: const InputDecoration(labelText: 'أسلوبك في التعليم'),
+                  decoration: InputDecoration(labelText: loc('أسلوبك في التعليم')),
                 ),
                 Row(
                   children: [
@@ -460,9 +461,9 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
                       child: DropdownButton<int?>(
                         isExpanded: true,
                         value: _ageMin,
-                        hint: const Text('أصغر عمر'),
+                        hint: Text(loc('أصغر عمر')),
                         items: [
-                          const DropdownMenuItem<int?>(value: null, child: Text('غير محدد')),
+                          DropdownMenuItem<int?>(value: null, child: Text(loc('غير محدد'))),
                           for (var a = 1; a <= 12; a++) DropdownMenuItem<int?>(value: a, child: Text('$a')),
                         ],
                         onChanged: (v) => setState(() => _ageMin = v),
@@ -473,9 +474,9 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
                       child: DropdownButton<int?>(
                         isExpanded: true,
                         value: _ageMax,
-                        hint: const Text('أكبر عمر'),
+                        hint: Text(loc('أكبر عمر')),
                         items: [
-                          const DropdownMenuItem<int?>(value: null, child: Text('غير محدد')),
+                          DropdownMenuItem<int?>(value: null, child: Text(loc('غير محدد'))),
                           for (var a = 1; a <= 12; a++) DropdownMenuItem<int?>(value: a, child: Text('$a')),
                         ],
                         onChanged: (v) => setState(() => _ageMax = v),
@@ -489,7 +490,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
                       child: TextField(
                         controller: _priceEgp,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(labelText: 'سعر الحصة (جنيه)'),
+                        decoration: InputDecoration(labelText: loc('سعر الحصة (جنيه)')),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -497,7 +498,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
                       child: TextField(
                         controller: _experience,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(labelText: 'سنوات الخبرة'),
+                        decoration: InputDecoration(labelText: loc('سنوات الخبرة')),
                       ),
                     ),
                   ],
@@ -505,33 +506,33 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
                 DropdownButton<int?>(
                   isExpanded: true,
                   value: _minutes,
-                  hint: const Text('مدة الحصة'),
+                  hint: Text(loc('مدة الحصة')),
                   items: [
-                    const DropdownMenuItem<int?>(value: null, child: Text('غير محددة')),
+                    DropdownMenuItem<int?>(value: null, child: Text(loc('غير محددة'))),
                     for (final m in [30, 45, 60, 90]) DropdownMenuItem<int?>(value: m, child: Text('$m دقيقة')),
                   ],
                   onChanged: (v) => setState(() => _minutes = v),
                 ),
-                _chipGroup('طريقة الحصة', [formatOnline, formatInPerson], _formats, formatLabel),
-                _chipGroup('نوع الحصة', [classIndividual, classSmallGroup], _classTypes, classTypeLabel),
-                _chipGroup('التخصصات', kTeacherSpecialties, _specialties, (v) => v),
-                _chipGroup('المناهج', kTeacherCurricula, _curricula, (v) => v),
-                _chipGroup('اللهجة', kTeacherDialects, _dialects, (v) => v),
-                _chipGroup('أساليب التدريس', kTeacherStyles, _styles, (v) => v),
+                _chipGroup(loc('طريقة الحصة'), [formatOnline, formatInPerson], _formats, formatLabel),
+                _chipGroup(loc('نوع الحصة'), [classIndividual, classSmallGroup], _classTypes, classTypeLabel),
+                _chipGroup(loc('التخصصات'), kTeacherSpecialties, _specialties, (v) => v),
+                _chipGroup(loc('المناهج'), kTeacherCurricula, _curricula, (v) => v),
+                _chipGroup(loc('اللهجة'), kTeacherDialects, _dialects, (v) => v),
+                _chipGroup(loc('أساليب التدريس'), kTeacherStyles, _styles, (v) => v),
                 TextField(
                   controller: _qualifications,
                   maxLines: 3,
                   maxLength: 600,
-                  decoration: const InputDecoration(
-                    labelText: 'المؤهلات',
-                    helperText: 'تظهر للأهل كـ «كتبها المدرس» حتى يتحقق منها صاحب التطبيق.',
+                  decoration: InputDecoration(
+                    labelText: loc('المؤهلات'),
+                    helperText: loc('تظهر للأهل كـ «كتبها المدرس» حتى يتحقق منها صاحب التطبيق.'),
                   ),
                 ),
                 TextField(
                   controller: _cancellation,
                   maxLines: 2,
                   maxLength: 300,
-                  decoration: const InputDecoration(labelText: 'سياسة الإلغاء', hintText: 'مثال: إلغاء مجاني قبل 24 ساعة'),
+                  decoration: InputDecoration(labelText: loc('سياسة الإلغاء'), hintText: loc('مثال: إلغاء مجاني قبل 24 ساعة')),
                 ),
               ],
             ),
@@ -543,19 +544,19 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('السيرة الذاتية (CV)',
+                  Text(loc('السيرة الذاتية (CV)'),
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
                   const SizedBox(height: 4),
-                  Text(_cvName ?? 'لم يتم اختيار ملف'),
+                  Text(_cvName ?? loc('لم يتم اختيار ملف')),
                   const SizedBox(height: 8),
                   OutlinedButton.icon(
                     onPressed: _pickCv,
                     icon: const Icon(Icons.upload_file_rounded),
-                    label: Text(_cvName == null ? 'رفع السيرة الذاتية' : 'تغيير الملف'),
+                    label: Text(_cvName == null ? loc('رفع السيرة الذاتية') : loc('تغيير الملف')),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'PDF أو صورة، حتى 500 كيلوبايت. سيراها الأهل: احذف رقم هاتفك وعنوانك منها.',
+                  Text(
+                    loc('PDF أو صورة، حتى 500 كيلوبايت. سيراها الأهل: احذف رقم هاتفك وعنوانك منها.'),
                     style: TextStyle(fontSize: 13),
                   ),
                 ],
@@ -568,7 +569,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
               child: Text(_error!, style: const TextStyle(color: Colors.red)),
             ),
           const SizedBox(height: 16),
-          FilledButton(onPressed: _busy ? null : _save, child: const Text('حفظ')),
+          FilledButton(onPressed: _busy ? null : _save, child: Text(loc('حفظ'))),
         ],
       ),
     );
@@ -596,15 +597,15 @@ class _Checklist extends StatelessWidget {
             LinearProgressIndicator(value: c.ratio, minHeight: 8, borderRadius: BorderRadius.circular(8)),
             if (c.missing.isNotEmpty) ...[
               const SizedBox(height: 8),
-              const Text('ينقص ملفك:'),
+              Text(loc('ينقص ملفك:')),
               for (final m in c.missing) Text('• $m', style: const TextStyle(fontSize: 14)),
             ],
             const Divider(),
-            const Text('التحقق', style: TextStyle(fontWeight: FontWeight.bold)),
-            Text(profile.identityVerified ? '✓ الهوية تم التحقق منها' : 'الهوية: لم يتم التحقق بعد'),
-            Text(profile.qualificationVerified ? '✓ المؤهل تم التحقق منه' : 'المؤهل: لم يتم التحقق بعد'),
-            const Text(
-              'يضيف صاحب التطبيق الشارتين بعد فحص مستندات. اكتمال الملف لا يمنحك شارة.',
+            Text(loc('التحقق'), style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(profile.identityVerified ? loc('✓ الهوية تم التحقق منها') : loc('الهوية: لم يتم التحقق بعد')),
+            Text(profile.qualificationVerified ? loc('✓ المؤهل تم التحقق منه') : loc('المؤهل: لم يتم التحقق بعد')),
+            Text(
+              loc('يضيف صاحب التطبيق الشارتين بعد فحص مستندات. اكتمال الملف لا يمنحك شارة.'),
               style: TextStyle(fontSize: 12),
             ),
             VerificationBadges(teacher: profile),

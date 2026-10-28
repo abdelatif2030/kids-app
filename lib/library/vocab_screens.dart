@@ -7,6 +7,7 @@ import 'learning_records.dart';
 import 'lesson_engine.dart';
 import 'lesson_runner.dart';
 import 'vocab.dart';
+import '../l10n/strings.dart';
 
 /// «مكتبة الكلمات»: a searchable, age-filtered library of the approved words.
 class VocabLibraryScreen extends StatefulWidget {
@@ -29,7 +30,7 @@ class _VocabLibraryScreenState extends State<VocabLibraryScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
-        title: const Text('مكتبة الكلمات',
+        title: Text(loc('مكتبة الكلمات'),
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
       body: PastelBackground(
@@ -40,7 +41,7 @@ class _VocabLibraryScreenState extends State<VocabLibraryScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
                 child: TextField(
                   decoration: InputDecoration(
-                    hintText: 'ابحث بالعربية أو الإنجليزية',
+                    hintText: loc('ابحث بالعربية أو الإنجليزية'),
                     prefixIcon: const Icon(Icons.search_rounded),
                     filled: true,
                     fillColor: Colors.white,
@@ -56,7 +57,7 @@ class _VocabLibraryScreenState extends State<VocabLibraryScreen> {
                   runSpacing: 4,
                   children: [
                     ChoiceChip(
-                      label: const Text('الكل'),
+                      label: Text(loc('الكل')),
                       selected: _category == null,
                       onSelected: (_) => setState(() => _category = null),
                     ),
@@ -75,7 +76,7 @@ class _VocabLibraryScreenState extends State<VocabLibraryScreen> {
                   dense: true,
                   value: _allAges,
                   onChanged: (v) => setState(() => _allAges = v ?? false),
-                  title: const Text('إظهار كلمات كل الأعمار'),
+                  title: Text(loc('إظهار كلمات كل الأعمار')),
                 ),
               ),
               if (_category != null)
@@ -99,10 +100,10 @@ class _VocabLibraryScreenState extends State<VocabLibraryScreen> {
                   ),
                 ),
               items.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Padding(
                           padding: EdgeInsets.all(24),
-                          child: Text('لا توجد كلمات مطابقة. جرّب كلمة أخرى أو اختر «كل الأعمار».',
+                          child: Text(loc('لا توجد كلمات مطابقة. جرّب كلمة أخرى أو اختر «كل الأعمار».'),
                               textAlign: TextAlign.center, style: TextStyle(fontSize: 18, color: RC.ink)),
                         ),
                       )
@@ -175,7 +176,7 @@ Future<void> showVocabDetail(BuildContext context, ChildProfile child, Vocab v) 
                 FilledButton.icon(
                   onPressed: () => AppAudio.say(v.ar),
                   icon: const Icon(Icons.volume_up_rounded),
-                  label: const Text('استمع بالعربية'),
+                  label: Text(loc('استمع بالعربية')),
                 ),
                 if (v.en != null)
                   OutlinedButton.icon(
@@ -201,7 +202,7 @@ Future<void> showVocabDetail(BuildContext context, ChildProfile child, Vocab v) 
                 );
               },
               icon: const Icon(Icons.quiz_rounded),
-              label: const Text('تدرّب على هذه المجموعة'),
+              label: Text(loc('تدرّب على هذه المجموعة')),
             ),
           ],
         ),

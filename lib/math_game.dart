@@ -7,6 +7,7 @@ import 'journey/repository.dart';
 import 'progress_store.dart';
 import 'rest_screen.dart';
 import 'ui.dart';
+import 'l10n/strings.dart';
 
 class _Question {
   /// Objects to count (ages 4-5), or null for a written sum.
@@ -52,7 +53,7 @@ class _MathGameState extends State<MathGame> {
     final age = widget.age;
     if (age <= 5) {
       final n = 1 + _random.nextInt(age <= 4 ? 5 : 10);
-      return _Question('كام؟', n, 'counting', objects: n);
+      return _Question(loc('كام؟'), n, 'counting', objects: n);
     }
     if (age <= 7) {
       final max = age == 6 ? 10 : 20;
@@ -120,7 +121,7 @@ class _MathGameState extends State<MathGame> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: const Text('رياضيات', style: TextStyle(fontSize: 26)),
+        title: Text(loc('رياضيات'), style: TextStyle(fontSize: 26)),
       ),
       body: Center(
         child: _done
@@ -131,7 +132,7 @@ class _MathGameState extends State<MathGame> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      _matched ? 'أحسنت!' : 'اختار الإجابة',
+                      _matched ? loc('أحسنت!') : loc('اختار الإجابة'),
                       style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 24),

@@ -7,6 +7,7 @@ import 'stories/story_screens.dart';
 import 'parent_screens.dart';
 import 'session_manager.dart';
 import 'ui.dart';
+import 'l10n/strings.dart';
 
 /// Replaces the child screens (keeping only the first route) with the rest screen.
 void goToRest(BuildContext context, RestReason reason) {
@@ -57,7 +58,7 @@ class RestScreen extends StatelessWidget {
     final choice = await showDialog<String>(
       context: context,
       builder: (_) => SimpleDialog(
-        title: const Text('خيارات الوالدين'),
+        title: Text(loc('خيارات الوالدين')),
         children: [
           SimpleDialogOption(
             onPressed: () => Navigator.pop(context, _planDone ? 'back' : 'extend'),
@@ -65,7 +66,7 @@ class RestScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Text(
                 _planDone
-                    ? 'العودة إلى الفيديوهات'
+                    ? loc('العودة إلى الفيديوهات')
                     : 'تمديد ${SessionManager.extendMinutes} دقيقة',
                 style: const TextStyle(fontSize: 20),
               ),
@@ -73,9 +74,9 @@ class RestScreen extends StatelessWidget {
           ),
           SimpleDialogOption(
             onPressed: () => Navigator.pop(context, 'end'),
-            child: const Padding(
+            child: Padding(
               padding: EdgeInsets.symmetric(vertical: 8),
-              child: Text('إنهاء الجلسة', style: TextStyle(fontSize: 20)),
+              child: Text(loc('إنهاء الجلسة'), style: TextStyle(fontSize: 20)),
             ),
           ),
         ],
@@ -122,17 +123,17 @@ class RestScreen extends StatelessWidget {
                   Icon(quiet ? Icons.nightlight_round : Icons.bedtime,
                       size: 56, color: Colors.indigo),
                   const SizedBox(height: 16),
-                  const Text(
-                    'حان وقت الراحة',
+                  Text(
+                    loc('حان وقت الراحة'),
                     style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
                   Text(
                     _planDone
-                        ? 'أحسنت! أكملت خطة اليوم'
+                        ? loc('أحسنت! أكملت خطة اليوم')
                         : quiet
-                            ? 'نراك في الصباح، أحلاماً سعيدة'
-                            : 'أحسنت! نلتقي لاحقاً',
+                            ? loc('نراك في الصباح، أحلاماً سعيدة')
+                            : loc('أحسنت! نلتقي لاحقاً'),
                     style: const TextStyle(fontSize: 24),
                   ),
                   if (stars > 0) ...[
@@ -157,13 +158,13 @@ class RestScreen extends StatelessWidget {
                         ),
                       ),
                       icon: const Text('🌙', style: TextStyle(fontSize: 22)),
-                      label: const Text('قصة هادئة قبل النوم', style: TextStyle(fontSize: 18)),
+                      label: Text(loc('قصة هادئة قبل النوم'), style: TextStyle(fontSize: 18)),
                     ),
                   ],
                   const SizedBox(height: 48),
                   TextButton(
                     onPressed: () => _parent(context),
-                    child: const Text('للوالدين', style: TextStyle(fontSize: 18)),
+                    child: Text(loc('للوالدين'), style: TextStyle(fontSize: 18)),
                   ),
                 ],
               ),

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../library/learning_records.dart' show dayOf;
 import '../safe_json.dart';
+import '../l10n/strings.dart';
 
 /// What a child made. Everything is plain data (no photos, no recordings, no
 /// text typed by the child) kept in the family gallery on this device.
@@ -13,10 +14,10 @@ enum CreationKind { drawing, scene, character, story }
 
 extension CreationKindText on CreationKind {
   String get label => switch (this) {
-        CreationKind.drawing => 'رسمة',
-        CreationKind.scene => 'مشهد',
-        CreationKind.character => 'شخصية',
-        CreationKind.story => 'قصة بالصور',
+        CreationKind.drawing => loc('رسمة'),
+        CreationKind.scene => loc('مشهد'),
+        CreationKind.character => loc('شخصية'),
+        CreationKind.story => loc('قصة بالصور'),
       };
   String get emoji => switch (this) {
         CreationKind.drawing => '🎨',

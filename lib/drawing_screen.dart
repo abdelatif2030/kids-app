@@ -7,6 +7,7 @@ import 'session_manager.dart';
 import 'studio/autosave.dart';
 import 'studio/creations.dart';
 import 'ui.dart';
+import 'l10n/strings.dart';
 
 class _Stroke {
   final Color color;
@@ -152,18 +153,18 @@ class _DrawingScreenState extends State<DrawingScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: const Text('رسم', style: TextStyle(fontSize: 26)),
+        title: Text(loc('رسم'), style: TextStyle(fontSize: 26)),
         actions: [
           if (_autosave != null)
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(_autosave!.tooLarge ? 'الرسمة كبيرة جداً للحفظ' : (_autosave!.saved ? 'تم الحفظ ✓' : '')),
+                child: Text(_autosave!.tooLarge ? loc('الرسمة كبيرة جداً للحفظ') : (_autosave!.saved ? loc('تم الحفظ ✓') : '')),
               ),
             ),
           IconButton(
             iconSize: 32,
-            tooltip: 'تعلّم الرسم',
+            tooltip: loc('تعلّم الرسم'),
             icon: const Icon(Icons.ondemand_video_rounded),
             onPressed: () => Navigator.push(
               context,
@@ -236,7 +237,7 @@ class _DrawingScreenState extends State<DrawingScreen> {
                         for (final s in _sizes) _sizeDot(s),
                         IconButton.filledTonal(
                           iconSize: 32,
-                          tooltip: 'ممحاة',
+                          tooltip: loc('ممحاة'),
                           style: IconButton.styleFrom(
                             backgroundColor: _eraser ? Colors.amber : null,
                           ),
@@ -245,7 +246,7 @@ class _DrawingScreenState extends State<DrawingScreen> {
                         ),
                         IconButton.filledTonal(
                           iconSize: 32,
-                          tooltip: 'تراجع',
+                          tooltip: loc('تراجع'),
                           onPressed: _strokes.isEmpty
                               ? null
                               : () {
@@ -256,7 +257,7 @@ class _DrawingScreenState extends State<DrawingScreen> {
                         ),
                         IconButton.filledTonal(
                           iconSize: 32,
-                          tooltip: 'مسح الكل',
+                          tooltip: loc('مسح الكل'),
                           onPressed: _strokes.isEmpty
                               ? null
                               : () {
@@ -271,7 +272,7 @@ class _DrawingScreenState extends State<DrawingScreen> {
                               ? null
                               : () => setState(() => _finished = true),
                           icon: const Icon(Icons.check_rounded),
-                          label: const Text('خلصت', style: TextStyle(fontSize: 22)),
+                          label: Text(loc('خلصت'), style: TextStyle(fontSize: 22)),
                         ),
                       ],
                     ),

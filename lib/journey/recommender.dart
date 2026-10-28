@@ -1,6 +1,7 @@
 import 'lands.dart';
 import 'models.dart';
 import 'progress.dart';
+import '../l10n/strings.dart';
 
 class PlannedActivity {
   final Activity activity;
@@ -74,7 +75,7 @@ List<PlannedActivity> planToday({
         runs.last.accuracy <= kStruggleBelow &&
         lp.levels[activityById(runs.last.activityId)!.level - 1].bestStars <= 1) {
       pick = activityById(runs.last.activityId);
-      reason = 'تدريب إضافي لتثبيت المهارة';
+      reason = loc('تدريب إضافي لتثبيت المهارة');
     } else {
       final next = lp.levels.indexWhere((l) => l.unlocked && !l.completed);
       if (next >= 0) {
@@ -83,14 +84,14 @@ List<PlannedActivity> planToday({
             runs[runs.length - 1].accuracy >= kStrongFrom &&
             runs[runs.length - 2].accuracy >= kStrongFrom;
         reason = strong
-            ? 'تحدٍّ جديد لأنه يتقدّم بسرعة'
-            : (lp.completed == 0 ? 'بداية جديدة' : 'الخطوة التالية على الخريطة');
+            ? loc('تحدٍّ جديد لأنه يتقدّم بسرعة')
+            : (lp.completed == 0 ? loc('بداية جديدة') : loc('الخطوة التالية على الخريطة'));
       } else {
         // Everything is finished: only suggest levels that can still earn stars.
         final weakest = lp.levels.indexWhere((l) => l.bestStars < 3);
         if (weakest >= 0) {
           pick = list[weakest];
-          reason = 'محاولة جديدة لجمع نجوم أكثر';
+          reason = loc('محاولة جديدة لجمع نجوم أكثر');
         }
       }
     }

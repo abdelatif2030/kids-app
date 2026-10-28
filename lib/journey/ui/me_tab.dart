@@ -6,6 +6,7 @@ import '../models.dart';
 import '../progress.dart';
 import '../repository.dart';
 import 'kit.dart';
+import '../../l10n/strings.dart';
 
 /// "Me": level and stars, the day's and week's goals, badges, the mascot's
 /// accessories (unlocked with stars) and a progress summary per land.
@@ -69,24 +70,24 @@ class MeTab extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _Stat('⭐', '${progress.totalStars}', 'نجمة'),
-                          _Stat('🏅', '${progress.badges.length}', 'شارة'),
-                          _Stat('✅', '${progress.completedTotal}', 'نشاط'),
+                          _Stat('⭐', '${progress.totalStars}', loc('نجمة')),
+                          _Stat('🏅', '${progress.badges.length}', loc('شارة')),
+                          _Stat('✅', '${progress.completedTotal}', loc('نشاط')),
                         ],
                       ),
                     ],
                   ),
                 ),
                 section(
-                  'أهدافي',
+                  loc('أهدافي'),
                   Column(
                     children: [
-                      _Goal('هدف اليوم', dailyDone, profile.dailyCount),
+                      _Goal(loc('هدف اليوم'), dailyDone, profile.dailyCount),
                       const SizedBox(height: 8),
-                      _Goal('هدف الأسبوع', progress.weekCompleted, weeklyGoal),
+                      _Goal(loc('هدف الأسبوع'), progress.weekCompleted, weeklyGoal),
                       const SizedBox(height: 10),
                       Semantics(
-                        label: 'الأنشطة المنجزة في آخر سبعة أيام',
+                        label: loc('الأنشطة المنجزة في آخر سبعة أيام'),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -115,14 +116,14 @@ class MeTab extends StatelessWidget {
                   ),
                 ),
                 section(
-                  'شخصيتي',
+                  loc('شخصيتي'),
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
                     children: [
                       _AccessoryChip(
                         emoji: '🙂',
-                        label: 'بدون',
+                        label: loc('بدون'),
                         selected: profile.accessory == null,
                         locked: false,
                         onTap: () => store.updateProfile(profile.copyWith(accessory: null)),
@@ -144,7 +145,7 @@ class MeTab extends StatelessWidget {
                   ),
                 ),
                 section(
-                  'شاراتي',
+                  loc('شاراتي'),
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
@@ -159,7 +160,7 @@ class MeTab extends StatelessWidget {
                   ),
                 ),
                 section(
-                  'أراضيّ',
+                  loc('أراضيّ'),
                   Column(
                     children: [
                       for (final land in store.publishedLands)
@@ -229,7 +230,7 @@ class _Goal extends StatelessWidget {
       color: reached ? RC.mint : RC.card,
       outline: reached ? RC.good : RC.outline,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      semanticLabel: '$title: $done من $target${reached ? '، تحقق' : ''}',
+      semanticLabel: '$title: $done من $target${reached ? loc('، تحقق') : ''}',
       child: Row(
         children: [
           Icon(reached ? Icons.emoji_events_rounded : Icons.flag_rounded,

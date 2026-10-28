@@ -6,6 +6,7 @@ import '../library/learning_records.dart';
 import '../media/audio.dart';
 import 'story_models.dart';
 import 'story_store.dart';
+import '../l10n/strings.dart';
 
 enum PlayState { loading, ready, playing, paused, waitingChoice, completed, unavailable }
 
@@ -106,7 +107,7 @@ class StoryPlayerController extends ChangeNotifier {
       final p = _player = _newPlayer();
       final len = await p.load(story.media);
       if (len == null) {
-        _unavailable('تعذّر تشغيل الملف الصوتي على هذا الجهاز.');
+        _unavailable(loc('تعذّر تشغيل الملف الصوتي على هذا الجهاز.'));
         return;
       }
       _duration = len.inSeconds;
@@ -122,7 +123,7 @@ class StoryPlayerController extends ChangeNotifier {
       state = PlayState.ready;
     } else if (story.media is DeviceVoice) {
       if (!await _speech.isAvailable('ar')) {
-        _unavailable('لا يوجد صوت عربي مثبّت على هذا الجهاز. يمكنك قراءة النص، أو تثبيت صوت عربي من إعدادات الجهاز.');
+        _unavailable(loc('لا يوجد صوت عربي مثبّت على هذا الجهاز. يمكنك قراءة النص، أو تثبيت صوت عربي من إعدادات الجهاز.'));
         return;
       }
       if (story.branching) {
@@ -211,7 +212,7 @@ class StoryPlayerController extends ChangeNotifier {
       try {
         await _speech.speak(seg.text, rate: speed);
       } catch (_) {
-        if (gen == _gen) _unavailable('تعذّرت قراءة النص بالصوت. يمكنك قراءته على الشاشة.');
+        if (gen == _gen) _unavailable(loc('تعذّرت قراءة النص بالصوت. يمكنك قراءته على الشاشة.'));
         return;
       }
       if (gen != _gen) return;

@@ -7,6 +7,7 @@ import '../repository.dart';
 import 'activity_screen.dart';
 import '../../ui.dart' show Tappable;
 import 'kit.dart';
+import '../../l10n/strings.dart';
 
 /// The path of five levels of one land: finished levels show their stars, the
 /// next one is open, and the rest are locked until the one before is finished.
@@ -22,7 +23,7 @@ class LandMapScreen extends StatelessWidget {
     if (!state.unlocked) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text('أنهِ المستوى السابق أولاً 🔒')));
+        ..showSnackBar(SnackBar(content: Text(loc('أنهِ المستوى السابق أولاً 🔒'))));
       return;
     }
     Navigator.push(
@@ -142,7 +143,7 @@ class _Node extends StatelessWidget {
     final n = activity.level;
     final status = state.completed
         ? 'مكتمل بـ ${state.bestStars} نجوم'
-        : (state.unlocked ? 'متاح الآن' : 'مغلق');
+        : (state.unlocked ? loc('متاح الآن') : loc('مغلق'));
     final Color fill = state.completed
         ? RC.mint
         : (state.unlocked ? color : Colors.white.withAlpha(180));

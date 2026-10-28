@@ -158,7 +158,7 @@ class _GamesTab extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('ألعاب',
+            Text(loc('ألعاب'),
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: RC.ink)),
             const SizedBox(height: 16),
             GamesGrid(age: age),
@@ -183,7 +183,7 @@ class _CreateTab extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('إبداع',
+            Text(loc('إبداع'),
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: RC.ink)),
             const SizedBox(height: 16),
             Wrap(
@@ -192,7 +192,7 @@ class _CreateTab extends StatelessWidget {
               alignment: WrapAlignment.center,
               children: [
                 BigTile(
-                  label: 'استوديو الإبداع',
+                  label: loc('استوديو الإبداع'),
                   icon: Icons.auto_awesome_rounded,
                   color: const Color(0xFF8E73D0),
                   onTap: () => Navigator.push(
@@ -201,7 +201,7 @@ class _CreateTab extends StatelessWidget {
                   ),
                 ),
                 BigTile(
-                  label: 'رسم حر',
+                  label: loc('رسم حر'),
                   icon: Icons.brush_rounded,
                   color: const Color(0xFFB085E8),
                   onTap: () => Navigator.push(
@@ -210,19 +210,19 @@ class _CreateTab extends StatelessWidget {
                   ),
                 ),
                 BigTile(
-                  label: 'دروس الرسم',
+                  label: loc('دروس الرسم'),
                   icon: Icons.draw_rounded,
                   color: const Color(0xFFE56B9A),
                   onTap: () => openVideos(context, age, 'drawing'),
                 ),
                 BigTile(
-                  label: 'أناشيد',
+                  label: loc('أناشيد'),
                   icon: Icons.music_note_rounded,
                   color: const Color(0xFFF2A33A),
                   onTap: () => openVideos(context, age, 'fun'),
                 ),
                 BigTile(
-                  label: 'قصص',
+                  label: loc('قصص'),
                   icon: Icons.local_library_rounded,
                   color: const Color(0xFF4A90E2),
                   onTap: () => openVideos(context, age, 'stories'),

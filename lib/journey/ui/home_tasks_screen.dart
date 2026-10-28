@@ -4,6 +4,7 @@ import '../home_tasks.dart';
 import '../models.dart';
 import '../repository.dart';
 import 'kit.dart';
+import '../../l10n/strings.dart';
 
 /// Parent area: the real-world tasks the app suggested, waiting for a "done".
 class ParentHomeTasksScreen extends StatefulWidget {
@@ -27,7 +28,7 @@ class _ParentHomeTasksScreenState extends State<ParentHomeTasksScreen> {
     if (mounted) setState(() => _tasks = all.reversed.toList());
   }
 
-  String _name(String id) => JourneyStore.instance.profileById(id)?.nickname ?? 'طفل';
+  String _name(String id) => JourneyStore.instance.profileById(id)?.nickname ?? loc('طفل');
 
   @override
   Widget build(BuildContext context) {
@@ -35,21 +36,21 @@ class _ParentHomeTasksScreenState extends State<ParentHomeTasksScreen> {
     final waiting = [for (final t in tasks ?? <HomeTask>[]) if (!t.done) t];
     final done = [for (final t in tasks ?? <HomeTask>[]) if (t.done) t];
     return Scaffold(
-      appBar: AppBar(title: const Text('أنشطة البيت')),
+      appBar: AppBar(title: Text(loc('أنشطة البيت'))),
       body: tasks == null
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                const Text(
-                  'بعد كل نشاط يقترح التطبيق مهمة حقيقية بعيدًا عن الشاشة. اضغط «تم» بعد أن يفعلها الطفل معك. '
-                  'لا نجوم على هذه المهام ولا تصوير، وكل شيء يبقى على هذا الجهاز.',
+                Text(
+                  loc('بعد كل نشاط يقترح التطبيق مهمة حقيقية بعيدًا عن الشاشة. اضغط «تم» بعد أن يفعلها الطفل معك. '
+                  'لا نجوم على هذه المهام ولا تصوير، وكل شيء يبقى على هذا الجهاز.'),
                   style: TextStyle(fontSize: 15),
                 ),
                 const SizedBox(height: 12),
                 Text('بانتظار التأكيد (${waiting.length})',
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                if (waiting.isEmpty) const Padding(padding: EdgeInsets.all(8), child: Text('لا مهام الآن.')),
+                if (waiting.isEmpty) Padding(padding: EdgeInsets.all(8), child: Text(loc('لا مهام الآن.'))),
                 for (final t in waiting)
                   Card(
                     child: ListTile(
@@ -60,7 +61,7 @@ class _ParentHomeTasksScreenState extends State<ParentHomeTasksScreen> {
                           await HomeTasks.confirm(t);
                           await _load();
                         },
-                        child: const Text('تم'),
+                        child: Text(loc('تم')),
                       ),
                       onLongPress: () async {
                         await HomeTasks.remove(t);
@@ -120,7 +121,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
-        title: const Text('اكتشف مع ماما وبابا',
+        title: Text(loc('اكتشف مع ماما وبابا'),
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
       body: PastelBackground(
@@ -128,10 +129,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              const RCard(
+              RCard(
                 color: Color(0xFFFFF3C4),
                 child: Text(
-                  'في هذا العمر اللعب مع الأهل أهم من أي شاشة. اختاروا نشاطًا واحدًا أو اثنين اليوم.',
+                  loc('في هذا العمر اللعب مع الأهل أهم من أي شاشة. اختاروا نشاطًا واحدًا أو اثنين اليوم.'),
                   style: TextStyle(fontSize: 17, color: RC.ink),
                 ),
               ),
@@ -162,7 +163,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                   await HomeTasks.addDone(widget.child.id, 'explore', e.$1);
                                   await _load();
                                 },
-                                child: const Text('جرّبناه'),
+                                child: Text(loc('جرّبناه')),
                               ),
                       ],
                     ),

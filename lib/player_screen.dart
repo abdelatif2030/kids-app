@@ -4,6 +4,7 @@ import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'main.dart' show Video;
 import 'session_manager.dart';
 import 'watch_history.dart';
+import 'l10n/strings.dart';
 
 class PlayerScreen extends StatefulWidget {
   final Video video;
@@ -94,11 +95,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
         valueListenable: _session.reason,
         builder: (context, reason, _) => reason == null
             ? const SizedBox.shrink()
-            : const SafeArea(
+            : SafeArea(
                 child: Padding(
                   padding: EdgeInsets.all(12),
                   child: Text(
-                    'هذا آخر فيديو اليوم',
+                    loc('هذا آخر فيديو اليوم'),
                     textAlign: TextAlign.center,
                     textDirection: TextDirection.rtl,
                     style: TextStyle(fontSize: 20),
@@ -108,10 +109,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
       ),
       body: Center(
         child: _hasError
-            ? const Padding(
+            ? Padding(
                 padding: EdgeInsets.all(24),
                 child: Text(
-                  'لا يمكن تشغيل هذا الفيديو الآن.',
+                  loc('لا يمكن تشغيل هذا الفيديو الآن.'),
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 24),
                 ),

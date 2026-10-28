@@ -4,15 +4,16 @@ import 'curriculum.dart';
 import 'teachers_market.dart';
 import 'teachers_models.dart';
 import 'teachers_time.dart';
+import 'l10n/strings.dart';
 
 String _subject(String id) => subjectById(id)?.label ?? id;
 
 String _proposalStatus(String s) => switch (s) {
-      proposalSent => 'بانتظار ردّك',
-      proposalShortlisted => 'في القائمة المختصرة',
-      proposalAccepted => 'تم القبول',
-      proposalDeclined => 'مرفوض',
-      proposalWithdrawn => 'سحبه المدرس',
+      proposalSent => loc('بانتظار ردّك'),
+      proposalShortlisted => loc('في القائمة المختصرة'),
+      proposalAccepted => loc('تم القبول'),
+      proposalDeclined => loc('مرفوض'),
+      proposalWithdrawn => loc('سحبه المدرس'),
       _ => s,
     };
 
@@ -23,10 +24,10 @@ Future<void> _snack(BuildContext context, String text) async {
     ..showSnackBar(SnackBar(content: Text(text)));
 }
 
-String _err(Object e) => e is AccountException ? e.message : 'تعذر إكمال العملية، حاول مرة أخرى';
+String _err(Object e) => e is AccountException ? e.message : loc('تعذر إكمال العملية، حاول مرة أخرى');
 
 String budgetText(LearningRequest r) {
-  if (r.budgetMin == null && r.budgetMax == null) return 'غير محددة';
+  if (r.budgetMin == null && r.budgetMax == null) return loc('غير محددة');
   if (r.budgetMin != null && r.budgetMax != null) return '${r.budgetMin}–${r.budgetMax} جنيه للحصة';
   if (r.budgetMax != null) return 'حتى ${r.budgetMax} جنيه للحصة';
   return 'من ${r.budgetMin} جنيه للحصة';
@@ -57,7 +58,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('طلباتي التعليمية')),
+      appBar: AppBar(title: Text(loc('طلباتي التعليمية'))),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           final ok = await Navigator.push<bool>(
@@ -67,19 +68,19 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
           if (ok == true) _reload();
         },
         icon: const Icon(Icons.add),
-        label: const Text('طلب جديد'),
+        label: Text(loc('طلب جديد')),
       ),
       body: FutureBuilder<List<LearningRequest>>(
         future: _list,
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
-          if (snap.hasError) return Center(child: FilledButton(onPressed: _reload, child: const Text('إعادة المحاولة')));
+          if (snap.hasError) return Center(child: FilledButton(onPressed: _reload, child: Text(loc('إعادة المحاولة'))));
           final list = snap.data!;
           if (list.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
                 padding: EdgeInsets.all(32),
-                child: Text('انشر طلباً تعليمياً ليقدّم لك المدرسون عروضهم.', textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+                child: Text(loc('انشر طلباً تعليمياً ليقدّم لك المدرسون عروضهم.'), textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
               ),
             );
           }
@@ -92,8 +93,8 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
                   child: ListTile(
                     title: Text('${_subject(r.subject)}: ${r.goal}', maxLines: 2, overflow: TextOverflow.ellipsis),
                     subtitle: Text(r.status == requestClosed
-                        ? 'مغلق'
-                        : (r.isExpired(now) ? 'انتهت المدة' : 'مفتوح حتى ${fmtDay(DateTime.fromMillisecondsSinceEpoch(r.expiresMs))}')),
+                        ? loc('مغلق')
+                        : (r.isExpired(now) ? loc('انتهت المدة') : 'مفتوح حتى ${fmtDay(DateTime.fromMillisecondsSinceEpoch(r.expiresMs))}')),
                     trailing: const Icon(Icons.chevron_left),
                     onTap: () async {
                       await Navigator.push(
@@ -145,14 +146,14 @@ class _RequestFormState extends State<RequestForm> {
 
   Future<void> _publish() async {
     if (_goal.text.trim().isEmpty) {
-      setState(() => _error = 'اكتب هدف التعلم');
+      setState(() => _error = loc('اكتب هدف التعلم'));
       return;
     }
     final min = _min.text.trim().isEmpty ? null : int.tryParse(_min.text.trim());
     final max = _max.text.trim().isEmpty ? null : int.tryParse(_max.text.trim());
     if ((_min.text.trim().isNotEmpty && min == null) || (_max.text.trim().isNotEmpty && max == null) ||
         (min != null && max != null && min > max)) {
-      setState(() => _error = 'تحقق من الميزانية (الحد الأدنى لا يزيد على الأقصى)');
+      setState(() => _error = loc('تحقق من الميزانية (الحد الأدنى لا يزيد على الأقصى)'));
       return;
     }
     setState(() {
@@ -183,12 +184,12 @@ class _RequestFormState extends State<RequestForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('طلب تعليمي جديد')),
+      appBar: AppBar(title: Text(loc('طلب تعليمي جديد'))),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
-            'يراه المدرسون المسجلون. لا تكتب اسم طفلك أو مدرسته أو أرقام هاتف؛ يكفي هدف التعلم والعمر التقريبي.',
+          Text(
+            loc('يراه المدرسون المسجلون. لا تكتب اسم طفلك أو مدرسته أو أرقام هاتف؛ يكفي هدف التعلم والعمر التقريبي.'),
             style: TextStyle(fontSize: 13),
           ),
           const SizedBox(height: 8),
@@ -202,14 +203,14 @@ class _RequestFormState extends State<RequestForm> {
             controller: _goal,
             maxLines: 3,
             maxLength: 500,
-            decoration: const InputDecoration(labelText: 'هدف التعلم', hintText: 'مثال: تأسيس قراءة عربي لطفل في السادسة'),
+            decoration: InputDecoration(labelText: loc('هدف التعلم'), hintText: loc('مثال: تأسيس قراءة عربي لطفل في السادسة')),
           ),
           DropdownButton<int?>(
             isExpanded: true,
             value: _age,
-            hint: const Text('عمر الطفل (اختياري)'),
+            hint: Text(loc('عمر الطفل (اختياري)')),
             items: [
-              const DropdownMenuItem<int?>(value: null, child: Text('بدون')),
+              DropdownMenuItem<int?>(value: null, child: Text(loc('بدون'))),
               for (var a = 1; a <= 12; a++) DropdownMenuItem<int?>(value: a, child: Text('$a سنوات')),
             ],
             onChanged: (v) => setState(() => _age = v),
@@ -217,15 +218,15 @@ class _RequestFormState extends State<RequestForm> {
           Wrap(
             spacing: 8,
             children: [
-              ChoiceChip(label: const Text('أي طريقة'), selected: _format.isEmpty, onSelected: (_) => setState(() => _format = '')),
-              ChoiceChip(label: const Text('أونلاين'), selected: _format == formatOnline, onSelected: (_) => setState(() => _format = formatOnline)),
-              ChoiceChip(label: const Text('حضوري'), selected: _format == formatInPerson, onSelected: (_) => setState(() => _format = formatInPerson)),
+              ChoiceChip(label: Text(loc('أي طريقة')), selected: _format.isEmpty, onSelected: (_) => setState(() => _format = '')),
+              ChoiceChip(label: Text(loc('أونلاين')), selected: _format == formatOnline, onSelected: (_) => setState(() => _format = formatOnline)),
+              ChoiceChip(label: Text(loc('حضوري')), selected: _format == formatInPerson, onSelected: (_) => setState(() => _format = formatInPerson)),
             ],
           ),
           TextField(
             controller: _schedule,
             maxLength: 200,
-            decoration: const InputDecoration(labelText: 'المواعيد المناسبة', hintText: 'مثال: مرتين أسبوعياً بعد العصر'),
+            decoration: InputDecoration(labelText: loc('المواعيد المناسبة'), hintText: loc('مثال: مرتين أسبوعياً بعد العصر')),
           ),
           Row(
             children: [
@@ -233,7 +234,7 @@ class _RequestFormState extends State<RequestForm> {
                 child: TextField(
                   controller: _min,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'أقل سعر للحصة (جنيه)'),
+                  decoration: InputDecoration(labelText: loc('أقل سعر للحصة (جنيه)')),
                 ),
               ),
               const SizedBox(width: 12),
@@ -241,7 +242,7 @@ class _RequestFormState extends State<RequestForm> {
                 child: TextField(
                   controller: _max,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'أعلى سعر للحصة (جنيه)'),
+                  decoration: InputDecoration(labelText: loc('أعلى سعر للحصة (جنيه)')),
                 ),
               ),
             ],
@@ -249,7 +250,7 @@ class _RequestFormState extends State<RequestForm> {
           TextField(
             controller: _approach,
             maxLength: 300,
-            decoration: const InputDecoration(labelText: 'أسلوب تفضله (اختياري)', hintText: 'ألعاب، شرح مباشر...'),
+            decoration: InputDecoration(labelText: loc('أسلوب تفضله (اختياري)'), hintText: loc('ألعاب، شرح مباشر...')),
           ),
           DropdownButton<int>(
             isExpanded: true,
@@ -259,7 +260,7 @@ class _RequestFormState extends State<RequestForm> {
           ),
           if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
           const SizedBox(height: 8),
-          FilledButton(onPressed: _busy ? null : _publish, child: const Text('نشر الطلب')),
+          FilledButton(onPressed: _busy ? null : _publish, child: Text(loc('نشر الطلب'))),
         ],
       ),
     );
@@ -301,17 +302,17 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('قبول العرض'),
+        title: Text(loc('قبول العرض')),
         content: Text(
           'ملخص الاتفاق:\n'
           '• المدرس: ${p.teacherName}\n'
           '• السعر: ${p.priceEgp} جنيه للحصة (${p.minutes} دقيقة)\n'
-          '• المواعيد: ${p.schedule.isEmpty ? 'تُتفق لاحقاً' : p.schedule}\n\n'
+          '• المواعيد: ${p.schedule.isEmpty ? loc('تُتفق لاحقاً') : p.schedule}\n\n'
           'لا يُؤكَّد الحجز إلا بعد أن يقبل المدرس الطلب ويرسل رابط الحصة. لا يوجد دفع داخل التطبيق.',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('رجوع')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('قبول وإرسال الطلب')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(loc('رجوع'))),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(loc('قبول وإرسال الطلب'))),
         ],
       ),
     );
@@ -325,7 +326,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
           teacherName: p.teacherName,
           parentName: await widget.repo.displayName(),
           subject: r.subject,
-          whenText: p.schedule.isEmpty ? 'حسب العرض' : p.schedule,
+          whenText: p.schedule.isEmpty ? loc('حسب العرض') : p.schedule,
           childAge: r.childAge,
           note: 'من عرض على طلب: ${r.goal}',
           priceEgp: p.priceEgp,
@@ -333,7 +334,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
           proposalId: p.id,
         ),
       );
-      if (mounted) await _snack(context, 'أُرسل طلب الحصة إلى المدرس. تابعه في «طلباتي».');
+      if (mounted) await _snack(context, loc('أُرسل طلب الحصة إلى المدرس. تابعه في «طلباتي».'));
     } catch (e) {
       if (mounted) await _snack(context, _err(e));
     }
@@ -344,7 +345,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
   Widget build(BuildContext context) {
     final r = widget.request;
     return Scaffold(
-      appBar: AppBar(title: const Text('الطلب والعروض')),
+      appBar: AppBar(title: Text(loc('الطلب والعروض'))),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -360,7 +361,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                   if (r.schedule.isNotEmpty) Text('المواعيد: ${r.schedule}'),
                   Text('الميزانية: ${budgetText(r)}'),
                   if (r.approach.isNotEmpty) Text('الأسلوب: ${r.approach}'),
-                  Text(_status == requestClosed ? 'الحالة: مغلق' : 'مفتوح حتى ${fmtDay(DateTime.fromMillisecondsSinceEpoch(r.expiresMs))}'),
+                  Text(_status == requestClosed ? loc('الحالة: مغلق') : 'مفتوح حتى ${fmtDay(DateTime.fromMillisecondsSinceEpoch(r.expiresMs))}'),
                   if (_status == requestOpen)
                     TextButton.icon(
                       onPressed: () async {
@@ -372,23 +373,23 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                         }
                       },
                       icon: const Icon(Icons.close_rounded),
-                      label: const Text('إغلاق الطلب'),
+                      label: Text(loc('إغلاق الطلب')),
                     ),
                 ],
               ),
             ),
           ),
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 12, bottom: 4),
-            child: Text('العروض', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            child: Text(loc('العروض'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),
           FutureBuilder<List<Proposal>>(
             future: _proposals,
             builder: (context, snap) {
               if (snap.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
-              if (snap.hasError) return FilledButton(onPressed: _reload, child: const Text('إعادة المحاولة'));
+              if (snap.hasError) return FilledButton(onPressed: _reload, child: Text(loc('إعادة المحاولة')));
               final list = snap.data!;
-              if (list.isEmpty) return const Text('لم تصلك عروض بعد.');
+              if (list.isEmpty) return Text(loc('لم تصلك عروض بعد.'));
               return Column(
                 children: [
                   for (final p in list)
@@ -413,9 +414,9 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
                                 spacing: 8,
                                 children: [
                                   if (p.status == proposalSent)
-                                    OutlinedButton(onPressed: () => _set(p, proposalShortlisted), child: const Text('إضافة للقائمة المختصرة')),
-                                  FilledButton(onPressed: () => _accept(p), child: const Text('قبول')),
-                                  OutlinedButton(onPressed: () => _set(p, proposalDeclined), child: const Text('رفض')),
+                                    OutlinedButton(onPressed: () => _set(p, proposalShortlisted), child: Text(loc('إضافة للقائمة المختصرة'))),
+                                  FilledButton(onPressed: () => _accept(p), child: Text(loc('قبول'))),
+                                  OutlinedButton(onPressed: () => _set(p, proposalDeclined), child: Text(loc('رفض'))),
                                 ],
                               ),
                           ],
@@ -463,7 +464,7 @@ class _OpenRequestsScreenState extends State<OpenRequestsScreen> {
       MaterialPageRoute(builder: (_) => ProposalForm(repo: widget.repo, request: r)),
     );
     if (ok == true) {
-      if (mounted) await _snack(context, 'تم إرسال عرضك');
+      if (mounted) await _snack(context, loc('تم إرسال عرضك'));
       _reload();
     }
   }
@@ -471,16 +472,16 @@ class _OpenRequestsScreenState extends State<OpenRequestsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('طلبات الأهل')),
+      appBar: AppBar(title: Text(loc('طلبات الأهل'))),
       body: FutureBuilder<(List<LearningRequest>, List<Proposal>)>(
         future: _data,
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
-          if (snap.hasError) return Center(child: FilledButton(onPressed: _reload, child: const Text('إعادة المحاولة')));
+          if (snap.hasError) return Center(child: FilledButton(onPressed: _reload, child: Text(loc('إعادة المحاولة'))));
           final (requests, proposals) = snap.data!;
           final mine = {for (final p in proposals) p.requestId: p};
           if (requests.isEmpty) {
-            return const Center(child: Text('لا توجد طلبات مفتوحة الآن', style: TextStyle(fontSize: 18)));
+            return Center(child: Text(loc('لا توجد طلبات مفتوحة الآن'), style: TextStyle(fontSize: 18)));
           }
           return ListView(
             padding: const EdgeInsets.all(16),
@@ -511,10 +512,10 @@ class _OpenRequestsScreenState extends State<OpenRequestsScreen> {
                                 }
                                 if (mounted) _reload();
                               },
-                              child: const Text('سحب العرض'),
+                              child: Text(loc('سحب العرض')),
                             ),
                         ] else
-                          FilledButton(onPressed: () => _propose(r), child: const Text('قدّم عرضاً')),
+                          FilledButton(onPressed: () => _propose(r), child: Text(loc('قدّم عرضاً'))),
                       ],
                     ),
                   ),
@@ -556,7 +557,7 @@ class _ProposalFormState extends State<ProposalForm> {
   Future<void> _send() async {
     final price = int.tryParse(_price.text.trim());
     if (_message.text.trim().isEmpty || price == null || price < 0) {
-      setState(() => _error = 'اكتب عرضك والسعر (رقماً)');
+      setState(() => _error = loc('اكتب عرضك والسعر (رقماً)'));
       return;
     }
     setState(() {
@@ -565,7 +566,7 @@ class _ProposalFormState extends State<ProposalForm> {
     });
     try {
       final me = await widget.repo.myTeacherProfile();
-      if (me == null) throw const AccountException('أنشئ ملفك الشخصي أولاً');
+      if (me == null) throw AccountException(loc('أنشئ ملفك الشخصي أولاً'));
       await widget.repo.submitProposal(Proposal(
         requestId: widget.request.id,
         parentUid: widget.request.parentUid,
@@ -588,7 +589,7 @@ class _ProposalFormState extends State<ProposalForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('عرض جديد')),
+      appBar: AppBar(title: Text(loc('عرض جديد'))),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -599,12 +600,12 @@ class _ProposalFormState extends State<ProposalForm> {
             controller: _message,
             maxLines: 4,
             maxLength: 800,
-            decoration: const InputDecoration(labelText: 'تعريف بنفسك وكيف ستساعد', border: OutlineInputBorder()),
+            decoration: InputDecoration(labelText: loc('تعريف بنفسك وكيف ستساعد'), border: OutlineInputBorder()),
           ),
           TextField(
             controller: _price,
             keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'سعر الحصة (جنيه)'),
+            decoration: InputDecoration(labelText: loc('سعر الحصة (جنيه)')),
           ),
           DropdownButton<int>(
             isExpanded: true,
@@ -612,11 +613,11 @@ class _ProposalFormState extends State<ProposalForm> {
             items: [for (final m in [30, 45, 60, 90]) DropdownMenuItem(value: m, child: Text('مدة الحصة $m دقيقة'))],
             onChanged: (v) => setState(() => _minutes = v ?? _minutes),
           ),
-          TextField(controller: _schedule, maxLength: 200, decoration: const InputDecoration(labelText: 'المواعيد المقترحة')),
-          TextField(controller: _steps, maxLength: 500, maxLines: 2, decoration: const InputDecoration(labelText: 'خطة أول حصة')),
-          const Text('لا تضع أرقام هاتف أو روابط. التواصل يتم داخل التطبيق بعد قبول عرضك.', style: TextStyle(fontSize: 12)),
+          TextField(controller: _schedule, maxLength: 200, decoration: InputDecoration(labelText: loc('المواعيد المقترحة'))),
+          TextField(controller: _steps, maxLength: 500, maxLines: 2, decoration: InputDecoration(labelText: loc('خطة أول حصة'))),
+          Text(loc('لا تضع أرقام هاتف أو روابط. التواصل يتم داخل التطبيق بعد قبول عرضك.'), style: TextStyle(fontSize: 12)),
           if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
-          FilledButton(onPressed: _busy ? null : _send, child: const Text('إرسال العرض')),
+          FilledButton(onPressed: _busy ? null : _send, child: Text(loc('إرسال العرض'))),
         ],
       ),
     );

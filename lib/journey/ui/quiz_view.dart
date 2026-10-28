@@ -6,6 +6,7 @@ import '../../media/audio.dart';
 import '../content.dart';
 import '../models.dart';
 import 'kit.dart';
+import '../../l10n/strings.dart';
 
 /// What one question, round or pair taught us (feeds the parent dashboard).
 class ItemResult {
@@ -73,8 +74,8 @@ class _QuizViewState extends State<QuizView> {
       setState(() {
         _right = true;
         _message = _q.explanation == null
-            ? _praise[_i % _praise.length]
-            : '${_praise[_i % _praise.length]}  ${_q.explanation}';
+            ? loc(_praise[_i % _praise.length])
+            : '${loc(_praise[_i % _praise.length])}  ${loc(_q.explanation!)}';
       });
       _timer = Timer(const Duration(milliseconds: 1100), _next);
     } else {
@@ -82,7 +83,7 @@ class _QuizViewState extends State<QuizView> {
         _missed = true;
         _faded.add(index);
         _wrongCount++;
-        _message = _encourage[(_wrongCount - 1) % _encourage.length];
+        _message = loc(_encourage[(_wrongCount - 1) % _encourage.length]);
         if (_wrongCount >= 2) _hint = true;
       });
     }
@@ -253,7 +254,7 @@ class _QuizViewState extends State<QuizView> {
                   child: TextButton.icon(
                     onPressed: () => AppAudio.say(q.spoken!, lang: q.spokenLang),
                     icon: const Icon(Icons.volume_up_rounded, size: 30),
-                    label: const Text('استمع', style: TextStyle(fontSize: 20)),
+                    label: Text(loc('استمع'), style: TextStyle(fontSize: 20)),
                   ),
                 ),
               const SizedBox(height: 12),
@@ -293,7 +294,7 @@ class _QuizViewState extends State<QuizView> {
                 TextButton.icon(
                   onPressed: () => setState(() => _hint = true),
                   icon: const Icon(Icons.lightbulb_outline_rounded),
-                  label: const Text('تلميح', style: TextStyle(fontSize: 18)),
+                  label: Text(loc('تلميح'), style: TextStyle(fontSize: 18)),
                 ),
             ],
           ),

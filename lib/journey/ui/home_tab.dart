@@ -206,21 +206,21 @@ class HomeTab extends StatelessWidget {
                     ),
                   ),
                 const SizedBox(height: 8),
-                const Text('اكتشف المزيد',
+                Text(loc('اكتشف المزيد'),
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 10,
                   runSpacing: 10,
                   children: [
-                    _MoreCard('🔤', 'تعلّم الحروف', RC.peach, () => LettersHomeScreen(child: child)),
-                    _MoreCard('🖼️', 'مكتبة الكلمات', RC.mint, () => VocabLibraryScreen(child: child)),
-                    _MoreCard('🌙', 'ليلة حلوة', RC.lavender, () => StoriesHomeScreen(child: child)),
-                    _MoreCard('🏠', 'أنشطة مع الأهل', RC.yellow, () => ActivityLibraryScreen(child: child)),
+                    _MoreCard('🔤', loc('تعلّم الحروف'), RC.peach, () => LettersHomeScreen(child: child)),
+                    _MoreCard('🖼️', loc('مكتبة الكلمات'), RC.mint, () => VocabLibraryScreen(child: child)),
+                    _MoreCard('🌙', loc('ليلة حلوة'), RC.lavender, () => StoriesHomeScreen(child: child)),
+                    _MoreCard('🏠', loc('أنشطة مع الأهل'), RC.yellow, () => ActivityLibraryScreen(child: child)),
                   ],
                 ),
                 const SizedBox(height: 10),
-                const Text('رحلتي',
+                Text(loc('رحلتي'),
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
                 const SizedBox(height: 8),
                 for (final land in store.publishedLands)
@@ -241,8 +241,8 @@ class HomeTab extends StatelessWidget {
                     context,
                     MaterialPageRoute(builder: (_) => SubjectsScreen(age: child.age)),
                   ),
-                  semanticLabel: 'فيديوهات تعليمية',
-                  child: const Row(
+                  semanticLabel: loc('فيديوهات تعليمية'),
+                  child: Row(
                     children: [
                       Icon(Icons.play_circle_rounded, size: 40, color: RC.outline),
                       SizedBox(width: 12),
@@ -250,9 +250,9 @@ class HomeTab extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('فيديوهات تعليمية',
+                            Text(loc('فيديوهات تعليمية'),
                                 style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: RC.ink)),
-                            Text('أغانٍ ودروس مختارة بعناية', style: TextStyle(fontSize: 14, color: RC.ink)),
+                            Text(loc('أغانٍ ودروس مختارة بعناية'), style: TextStyle(fontSize: 14, color: RC.ink)),
                           ],
                         ),
                       ),

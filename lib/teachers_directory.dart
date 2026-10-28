@@ -8,6 +8,7 @@ import 'teachers_market.dart';
 import 'teachers_models.dart';
 import 'teachers_time.dart';
 import 'teachers_widgets.dart';
+import 'l10n/strings.dart';
 
 String _subjectLabel(String id) => subjectById(id)?.label ?? id;
 
@@ -52,7 +53,7 @@ class VerificationBadges extends StatelessWidget {
             builder: (_) => AlertDialog(
               title: Text(label),
               content: Text(meaning),
-              actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('حسناً'))],
+              actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text(loc('حسناً')))],
             ),
           ),
         ),
@@ -65,8 +66,8 @@ class VerificationBadges extends StatelessWidget {
       spacing: 6,
       runSpacing: 4,
       children: [
-        if (teacher.identityVerified) _badge(context, 'الهوية تم التحقق منها', kIdentityBadgeMeaning),
-        if (teacher.qualificationVerified) _badge(context, 'المؤهل تم التحقق منه', kQualificationBadgeMeaning),
+        if (teacher.identityVerified) _badge(context, loc('الهوية تم التحقق منها'), kIdentityBadgeMeaning),
+        if (teacher.qualificationVerified) _badge(context, loc('المؤهل تم التحقق منه'), kQualificationBadgeMeaning),
       ],
     );
   }
@@ -159,8 +160,8 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
               Expanded(
                 child: TextField(
                   controller: _search,
-                  decoration: const InputDecoration(
-                    hintText: 'ابحث بالاسم أو المادة أو التخصص',
+                  decoration: InputDecoration(
+                    hintText: loc('ابحث بالاسم أو المادة أو التخصص'),
                     prefixIcon: Icon(Icons.search_rounded),
                     border: OutlineInputBorder(),
                     isDense: true,
@@ -173,7 +174,7 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
                 isLabelVisible: active > 0,
                 label: Text('$active'),
                 child: IconButton.filledTonal(
-                  tooltip: 'تصفية وترتيب',
+                  tooltip: loc('تصفية وترتيب'),
                   onPressed: _openFilters,
                   icon: const Icon(Icons.tune_rounded),
                 ),
@@ -186,7 +187,7 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
           child: Row(
             children: [
               FilterChip(
-                label: const Text('❤️ المفضلة فقط'),
+                label: Text(loc('❤️ المفضلة فقط')),
                 selected: _onlyFavorites,
                 onSelected: (v) => setState(() {
                   _onlyFavorites = v;
@@ -202,7 +203,7 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
                     _apply(TeacherFilters.none);
                   },
                   icon: const Icon(Icons.filter_alt_off_rounded),
-                  label: const Text('مسح التصفية'),
+                  label: Text(loc('مسح التصفية')),
                 ),
             ],
           ),
@@ -245,7 +246,7 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
                           if (on && _compare.length >= 3) {
                             ScaffoldMessenger.of(context)
                               ..hideCurrentSnackBar()
-                              ..showSnackBar(const SnackBar(content: Text('يمكنك مقارنة 3 مدرسين كحد أقصى')));
+                              ..showSnackBar(SnackBar(content: Text(loc('يمكنك مقارنة 3 مدرسين كحد أقصى'))));
                             return;
                           }
                           on ? _compare.add(t.uid) : _compare.remove(t.uid);
@@ -291,13 +292,13 @@ class _Empty extends StatelessWidget {
             children: [
               const Icon(Icons.search_off_rounded, size: 56),
               const SizedBox(height: 8),
-              Text(filtered ? 'لا يوجد مدرس يطابق اختياراتك' : 'لا يوجد مدرسون متاحون الآن',
+              Text(filtered ? loc('لا يوجد مدرس يطابق اختياراتك') : loc('لا يوجد مدرسون متاحون الآن'),
                   textAlign: TextAlign.center, style: const TextStyle(fontSize: 20)),
               if (filtered) ...[
                 const SizedBox(height: 4),
-                const Text('المدرس الذي لم يملأ حقلاً لا يظهر عند التصفية به.', textAlign: TextAlign.center),
+                Text(loc('المدرس الذي لم يملأ حقلاً لا يظهر عند التصفية به.'), textAlign: TextAlign.center),
                 const SizedBox(height: 12),
-                FilledButton(onPressed: onReset, child: const Text('مسح التصفية')),
+                FilledButton(onPressed: onReset, child: Text(loc('مسح التصفية'))),
               ],
             ],
           ),
@@ -354,7 +355,7 @@ class _TeacherCard extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    tooltip: favorite ? 'إزالة من المفضلة' : 'حفظ في المفضلة',
+                    tooltip: favorite ? loc('إزالة من المفضلة') : loc('حفظ في المفضلة'),
                     onPressed: onFavorite,
                     icon: Icon(favorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                         color: favorite ? Colors.pink : null),
@@ -369,7 +370,7 @@ class _TeacherCard extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(facts.join(' · '), style: const TextStyle(fontSize: 13)),
                 ),
-              if (t.languages.isNotEmpty) Text(t.languages.join('، '), style: const TextStyle(fontSize: 13)),
+              if (t.languages.isNotEmpty) Text(t.languages.join(loc('، ')), style: const TextStyle(fontSize: 13)),
               Text(
                 '${(rating ?? RatingSummary.none).label}'
                 '${earliestMs == null ? '' : ' · أقرب موعد: ${fmtDateTime(DateTime.fromMillisecondsSinceEpoch(earliestMs!))}'}',
@@ -378,7 +379,7 @@ class _TeacherCard extends StatelessWidget {
               Align(
                 alignment: AlignmentDirectional.centerEnd,
                 child: FilterChip(
-                  label: const Text('قارن'),
+                  label: Text(loc('قارن')),
                   selected: comparing,
                   onSelected: onCompare,
                   visualDensity: VisualDensity.compact,
@@ -445,43 +446,43 @@ class _FilterSheetState extends State<_FilterSheet> {
           controller: controller,
           padding: const EdgeInsets.all(16),
           children: [
-            const Text('تصفية وترتيب', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(loc('تصفية وترتيب'), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            const Text('تُجمع الاختيارات معاً. المدرس الذي لم يملأ الحقل لا يظهر عند التصفية به.',
+            Text(loc('تُجمع الاختيارات معاً. المدرس الذي لم يملأ الحقل لا يظهر عند التصفية به.'),
                 style: TextStyle(fontSize: 13)),
-            _chips<String>('المادة', kSubjects.map((s) => s.id).toList(), _f.subject, _subjectLabel,
+            _chips<String>(loc('المادة'), kSubjects.map((s) => s.id).toList(), _f.subject, _subjectLabel,
                 (v) => _f = _f.copyWith(subject: v)),
-            _chips<int>('عمر الطفل', [for (var a = 1; a <= 12; a++) a], _f.childAge, (a) => '$a سنوات',
+            _chips<int>(loc('عمر الطفل'), [for (var a = 1; a <= 12; a++) a], _f.childAge, (a) => '$a سنوات',
                 (v) => _f = _f.copyWith(childAge: v)),
-            _chips<String>('اللغة', kTeacherLanguages, _f.language, (v) => v, (v) => _f = _f.copyWith(language: v)),
-            _chips<String>('اللهجة', kTeacherDialects, _f.dialect, (v) => v, (v) => _f = _f.copyWith(dialect: v)),
-            _chips<String>('طريقة الحصة', [formatOnline, formatInPerson], _f.format, formatLabel,
+            _chips<String>(loc('اللغة'), kTeacherLanguages, _f.language, (v) => v, (v) => _f = _f.copyWith(language: v)),
+            _chips<String>(loc('اللهجة'), kTeacherDialects, _f.dialect, (v) => v, (v) => _f = _f.copyWith(dialect: v)),
+            _chips<String>(loc('طريقة الحصة'), [formatOnline, formatInPerson], _f.format, formatLabel,
                 (v) => _f = _f.copyWith(format: v)),
-            _chips<String>('المنهج', kTeacherCurricula, _f.curriculum, (v) => v, (v) => _f = _f.copyWith(curriculum: v)),
+            _chips<String>(loc('المنهج'), kTeacherCurricula, _f.curriculum, (v) => v, (v) => _f = _f.copyWith(curriculum: v)),
             Padding(
               padding: const EdgeInsets.only(top: 12),
               child: TextField(
                 controller: _price,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'أقصى سعر للحصة (جنيه)', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: loc('أقصى سعر للحصة (جنيه)'), border: OutlineInputBorder()),
                 onChanged: (v) => _f = _f.copyWith(maxPrice: int.tryParse(v)),
               ),
             ),
             SwitchListTile(
-              title: const Text('الهوية تم التحقق منها'),
+              title: Text(loc('الهوية تم التحقق منها')),
               subtitle: const Text(kIdentityBadgeMeaning, style: TextStyle(fontSize: 12)),
               value: _f.identityVerified,
               onChanged: (v) => setState(() => _f = _f.copyWith(identityVerified: v)),
             ),
             SwitchListTile(
-              title: const Text('المؤهل تم التحقق منه'),
+              title: Text(loc('المؤهل تم التحقق منه')),
               subtitle: const Text(kQualificationBadgeMeaning, style: TextStyle(fontSize: 12)),
               value: _f.qualificationVerified,
               onChanged: (v) => setState(() => _f = _f.copyWith(qualificationVerified: v)),
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(top: 8),
-              child: Text('الترتيب', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: Text(loc('الترتيب'), style: TextStyle(fontWeight: FontWeight.bold)),
             ),
             Wrap(
               spacing: 8,
@@ -491,8 +492,8 @@ class _FilterSheetState extends State<_FilterSheet> {
               ],
             ),
             const SizedBox(height: 8),
-            const Text(
-              'لا توجد مواضع مدفوعة. الترتيب الافتراضي حسب اكتمال الملف ثم الاسم. «الأعلى تقييماً» يُحسب من تقييمات أولياء أمور لحصص مكتملة فقط، والمدرس بلا تقييمات يأتي أخيراً.',
+            Text(
+              loc('لا توجد مواضع مدفوعة. الترتيب الافتراضي حسب اكتمال الملف ثم الاسم. «الأعلى تقييماً» يُحسب من تقييمات أولياء أمور لحصص مكتملة فقط، والمدرس بلا تقييمات يأتي أخيراً.'),
               style: TextStyle(fontSize: 12),
             ),
             const SizedBox(height: 12),
@@ -501,14 +502,14 @@ class _FilterSheetState extends State<_FilterSheet> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context, (TeacherFilters.none, TeacherSort.relevance)),
-                    child: const Text('مسح الكل'),
+                    child: Text(loc('مسح الكل')),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: FilledButton(
                     onPressed: () => Navigator.pop(context, (_f, _sort)),
-                    child: const Text('عرض النتائج'),
+                    child: Text(loc('عرض النتائج')),
                   ),
                 ),
               ],
@@ -529,24 +530,24 @@ class CompareTeachersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rows = <(String, String Function(TeacherProfile))>[
-      ('السعر', (t) => t.priceEgp != null ? '${t.priceEgp} جنيه' : (t.priceNote.isEmpty ? 'غير محدد' : t.priceNote)),
-      ('مدة الحصة', (t) => t.lessonMinutes == null ? 'غير محددة' : '${t.lessonMinutes} دقيقة'),
-      ('الخبرة (يذكرها المدرس)', (t) => t.experienceYears == null ? 'غير محددة' : '${t.experienceYears} سنوات'),
-      ('الفئة العمرية', (t) => t.ageMin == null || t.ageMax == null ? 'غير محددة' : '${t.ageMin}–${t.ageMax}'),
-      ('المواد', (t) => t.subjects.map(_subjectLabel).join('، ')),
-      ('التخصصات', (t) => t.specialties.isEmpty ? '—' : t.specialties.join('، ')),
-      ('طريقة الحصة', (t) => t.formats.isEmpty ? 'غير محددة' : t.formats.map(formatLabel).join('، ')),
-      ('نوع الحصة', (t) => t.classTypes.isEmpty ? 'غير محدد' : t.classTypes.map(classTypeLabel).join('، ')),
-      ('اللغات', (t) => t.languages.join('، ')),
-      ('اللهجة', (t) => t.dialects.isEmpty ? '—' : t.dialects.join('، ')),
-      ('أسلوب التدريس', (t) => t.styles.isEmpty ? '—' : t.styles.join('، ')),
-      ('الهوية', (t) => t.identityVerified ? 'تم التحقق منها' : 'لم يتحقق منها التطبيق'),
-      ('المؤهل', (t) => t.qualificationVerified ? 'تم التحقق منه' : 'لم يتحقق منه التطبيق'),
-      ('سياسة الإلغاء', (t) => t.cancellationPolicy.isEmpty ? 'غير محددة' : t.cancellationPolicy),
-      ('التقييمات', (t) => (ratings[t.uid] ?? RatingSummary.none).label),
+      (loc('السعر'), (t) => t.priceEgp != null ? '${t.priceEgp} جنيه' : (t.priceNote.isEmpty ? loc('غير محدد') : t.priceNote)),
+      (loc('مدة الحصة'), (t) => t.lessonMinutes == null ? loc('غير محددة') : '${t.lessonMinutes} دقيقة'),
+      (loc('الخبرة (يذكرها المدرس)'), (t) => t.experienceYears == null ? loc('غير محددة') : '${t.experienceYears} سنوات'),
+      (loc('الفئة العمرية'), (t) => t.ageMin == null || t.ageMax == null ? loc('غير محددة') : '${t.ageMin}–${t.ageMax}'),
+      (loc('المواد'), (t) => t.subjects.map(_subjectLabel).join(loc('، '))),
+      (loc('التخصصات'), (t) => t.specialties.isEmpty ? '—' : t.specialties.join(loc('، '))),
+      (loc('طريقة الحصة'), (t) => t.formats.isEmpty ? loc('غير محددة') : t.formats.map(formatLabel).join(loc('، '))),
+      (loc('نوع الحصة'), (t) => t.classTypes.isEmpty ? loc('غير محدد') : t.classTypes.map(classTypeLabel).join(loc('، '))),
+      (loc('اللغات'), (t) => t.languages.join(loc('، '))),
+      (loc('اللهجة'), (t) => t.dialects.isEmpty ? '—' : t.dialects.join(loc('، '))),
+      (loc('أسلوب التدريس'), (t) => t.styles.isEmpty ? '—' : t.styles.join(loc('، '))),
+      (loc('الهوية'), (t) => t.identityVerified ? loc('تم التحقق منها') : loc('لم يتحقق منها التطبيق')),
+      (loc('المؤهل'), (t) => t.qualificationVerified ? loc('تم التحقق منه') : loc('لم يتحقق منه التطبيق')),
+      (loc('سياسة الإلغاء'), (t) => t.cancellationPolicy.isEmpty ? loc('غير محددة') : t.cancellationPolicy),
+      (loc('التقييمات'), (t) => (ratings[t.uid] ?? RatingSummary.none).label),
     ];
     return Scaffold(
-      appBar: AppBar(title: const Text('مقارنة المدرسين')),
+      appBar: AppBar(title: Text(loc('مقارنة المدرسين'))),
       body: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: SingleChildScrollView(

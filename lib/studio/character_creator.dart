@@ -4,6 +4,7 @@ import '../journey/models.dart';
 import '../journey/ui/kit.dart';
 import 'autosave.dart';
 import 'creations.dart';
+import '../l10n/strings.dart';
 
 /// Design a friendly character: face, hair, hat and clothes. A made-up
 /// character, not a picture of the child. Saved automatically.
@@ -74,7 +75,7 @@ class _CharacterCreatorScreenState extends State<CharacterCreatorScreen> {
         spacing: 6,
         children: [
           for (var i = 0; i < labels.length; i++)
-            ChoiceChip(label: Text(labels[i].isEmpty ? 'بدون' : labels[i]), selected: i == selected, onSelected: (_) => pick(i)),
+            ChoiceChip(label: Text(labels[i].isEmpty ? loc('بدون') : labels[i]), selected: i == selected, onSelected: (_) => pick(i)),
         ],
       );
 
@@ -84,13 +85,13 @@ class _CharacterCreatorScreenState extends State<CharacterCreatorScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
-        title: const Text('صمّم شخصية',
+        title: Text(loc('صمّم شخصية'),
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
         actions: [
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(_save.saved ? 'تم الحفظ ✓' : '', style: const TextStyle(color: RC.ink)),
+              child: Text(_save.saved ? loc('تم الحفظ ✓') : '', style: const TextStyle(color: RC.ink)),
             ),
           ),
         ],
@@ -102,7 +103,7 @@ class _CharacterCreatorScreenState extends State<CharacterCreatorScreen> {
             children: [
               Center(
                 child: Semantics(
-                  label: 'شخصيتك',
+                  label: loc('شخصيتك'),
                   child: Container(
                     width: 220,
                     height: 260,
@@ -115,20 +116,20 @@ class _CharacterCreatorScreenState extends State<CharacterCreatorScreen> {
                   ),
                 ),
               ),
-              _row('البشرة', _colors(kSkinTones, _spec.skin, (i) => _set(_spec.copyWith(skin: i)), 'لون بشرة')),
-              _row('الشعر', _choices(kHairStyles, _spec.hairStyle, (i) => _set(_spec.copyWith(hairStyle: i)))),
-              _row('لون الشعر', _colors(kHairColors, _spec.hairColor, (i) => _set(_spec.copyWith(hairColor: i)), 'لون شعر')),
-              _row('العيون', _choices(kEyeStyles, _spec.eyes, (i) => _set(_spec.copyWith(eyes: i)))),
-              _row('الفم', _choices(kMouthStyles, _spec.mouth, (i) => _set(_spec.copyWith(mouth: i)))),
-              _row('القميص', _colors(kShirtColors, _spec.shirt, (i) => _set(_spec.copyWith(shirt: i)), 'لون قميص')),
+              _row(loc('البشرة'), _colors(kSkinTones, _spec.skin, (i) => _set(_spec.copyWith(skin: i)), loc('لون بشرة'))),
+              _row(loc('الشعر'), _choices(kHairStyles, _spec.hairStyle, (i) => _set(_spec.copyWith(hairStyle: i)))),
+              _row(loc('لون الشعر'), _colors(kHairColors, _spec.hairColor, (i) => _set(_spec.copyWith(hairColor: i)), loc('لون شعر'))),
+              _row(loc('العيون'), _choices(kEyeStyles, _spec.eyes, (i) => _set(_spec.copyWith(eyes: i)))),
+              _row(loc('الفم'), _choices(kMouthStyles, _spec.mouth, (i) => _set(_spec.copyWith(mouth: i)))),
+              _row(loc('القميص'), _colors(kShirtColors, _spec.shirt, (i) => _set(_spec.copyWith(shirt: i)), loc('لون قميص'))),
               _row(
-                'القبعة',
+                loc('القبعة'),
                 Wrap(
                   spacing: 6,
                   children: [
                     for (var i = 0; i < kHats.length; i++)
                       ChoiceChip(
-                        label: Text(kHats[i].isEmpty ? 'بدون' : kHats[i], style: const TextStyle(fontSize: 22)),
+                        label: Text(kHats[i].isEmpty ? loc('بدون') : kHats[i], style: const TextStyle(fontSize: 22)),
                         selected: _spec.hat == i,
                         onSelected: (_) => _set(_spec.copyWith(hat: i)),
                       ),

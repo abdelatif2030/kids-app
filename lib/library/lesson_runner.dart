@@ -9,6 +9,7 @@ import '../progress_store.dart';
 import '../rest_screen.dart';
 import 'learning_records.dart';
 import 'lesson_engine.dart';
+import '../l10n/strings.dart';
 
 /// Plays a lesson built by the engine and keeps the completion record:
 /// skill events for the dashboard, and learning records that keep exposure,
@@ -131,7 +132,7 @@ class _Done extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text('✅', style: TextStyle(fontSize: 72)),
-            const Text('أحسنت! أنهيت الدرس',
+            Text(loc('أحسنت! أنهيت الدرس'),
                 style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: RC.ink)),
             const SizedBox(height: 6),
             if (total > 0)
@@ -141,11 +142,11 @@ class _Done extends StatelessWidget {
             FilledButton.icon(
               onPressed: onAgain,
               icon: const Icon(Icons.replay_rounded),
-              label: const Text('درس جديد', style: TextStyle(fontSize: 20)),
+              label: Text(loc('درس جديد'), style: TextStyle(fontSize: 20)),
             ),
             TextButton(
               onPressed: () => Navigator.maybePop(context),
-              child: const Text('العودة', style: TextStyle(fontSize: 18)),
+              child: Text(loc('العودة'), style: TextStyle(fontSize: 18)),
             ),
           ],
         ),

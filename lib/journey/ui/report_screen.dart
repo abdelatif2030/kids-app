@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../l10n/strings.dart';
 
 /// Parent area: report wrong or inappropriate content, or a problem. The app
 /// has no server, so this writes a short message the parent copies and sends
@@ -37,16 +38,16 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
   Widget build(BuildContext context) {
     final text = buildReportText(type: _type, area: _area, note: _note.text, version: '1.0.0');
     return Scaffold(
-      appBar: AppBar(title: const Text('الإبلاغ عن مشكلة')),
+      appBar: AppBar(title: Text(loc('الإبلاغ عن مشكلة'))),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
-            'لا يرسل التطبيق شيئاً من تلقاء نفسه. اكتب ما لاحظته ثم انسخ الرسالة وأرسلها بنفسك إلى جهة الدعم التي يحددها ناشر التطبيق. '
-            'لا تتضمن الرسالة اسم طفلك ولا عمره ولا تقدمه.',
+          Text(
+            loc('لا يرسل التطبيق شيئاً من تلقاء نفسه. اكتب ما لاحظته ثم انسخ الرسالة وأرسلها بنفسك إلى جهة الدعم التي يحددها ناشر التطبيق. '
+            'لا تتضمن الرسالة اسم طفلك ولا عمره ولا تقدمه.'),
           ),
           const SizedBox(height: 12),
-          const Text('نوع المشكلة', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(loc('نوع المشكلة'), style: TextStyle(fontWeight: FontWeight.bold)),
           Wrap(
             spacing: 8,
             children: [
@@ -55,7 +56,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          const Text('أين؟', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(loc('أين؟'), style: TextStyle(fontWeight: FontWeight.bold)),
           Wrap(
             spacing: 8,
             children: [
@@ -68,8 +69,8 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
             controller: _note,
             maxLines: 4,
             maxLength: 400,
-            decoration: const InputDecoration(
-              labelText: 'ما الذي حدث؟ (مثلاً: اسم القصة أو الحرف)',
+            decoration: InputDecoration(
+              labelText: loc('ما الذي حدث؟ (مثلاً: اسم القصة أو الحرف)'),
               border: OutlineInputBorder(),
             ),
             onChanged: (_) => setState(() {}),
@@ -80,11 +81,11 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
             onPressed: () async {
               await Clipboard.setData(ClipboardData(text: text));
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم نسخ الرسالة')));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(loc('تم نسخ الرسالة'))));
               }
             },
             icon: const Icon(Icons.copy_rounded),
-            label: const Text('نسخ الرسالة'),
+            label: Text(loc('نسخ الرسالة')),
           ),
         ],
       ),

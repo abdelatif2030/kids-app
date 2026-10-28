@@ -7,6 +7,7 @@ import '../../data_reset.dart';
 import '../../literacy/mastery.dart';
 import '../../media/audio.dart';
 import '../repository.dart';
+import '../../l10n/strings.dart';
 
 /// Parent area: sound, reading and letter-learning settings.
 class AudioSettingsScreen extends StatefulWidget {
@@ -41,7 +42,7 @@ class _AudioSettingsScreenState extends State<AudioSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('الصوت والتعلّم')),
+      appBar: AppBar(title: Text(loc('الصوت والتعلّم'))),
       body: !_loaded
           ? const Center(child: CircularProgressIndicator())
           : ListenableBuilder(
@@ -50,44 +51,44 @@ class _AudioSettingsScreenState extends State<AudioSettingsScreen> {
                 final p = AudioPrefs.instance;
                 return ListView(
                   children: [
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.all(16),
                       child: Text(
-                        'قراءة الحروف والكلمات والقصص بصوت الجهاز الآلي تتم على الجهاز نفسه، ولا يُرسل أي صوت ولا نص إلى أي مكان. '
-                        'لا يحتاج التطبيق إلى الميكروفون ولا الكاميرا.',
+                        loc('قراءة الحروف والكلمات والقصص بصوت الجهاز الآلي تتم على الجهاز نفسه، ولا يُرسل أي صوت ولا نص إلى أي مكان. '
+                        'لا يحتاج التطبيق إلى الميكروفون ولا الكاميرا.'),
                         style: TextStyle(fontSize: 14),
                       ),
                     ),
                     SwitchListTile(
                       secondary: const Icon(Icons.record_voice_over_rounded),
-                      title: const Text('القراءة بالصوت'),
-                      subtitle: const Text('قراءة الحروف والكلمات والأسئلة بصوت الجهاز'),
+                      title: Text(loc('القراءة بالصوت')),
+                      subtitle: Text(loc('قراءة الحروف والكلمات والأسئلة بصوت الجهاز')),
                       value: p.voiceOn,
                       onChanged: (v) => p.update(voiceOn: v),
                     ),
                     SwitchListTile(
                       secondary: const Icon(Icons.music_note_rounded),
-                      title: const Text('المؤثرات الصوتية'),
-                      subtitle: const Text('لا توجد مؤثرات في هذه النسخة؛ اختيارك محفوظ للمستقبل'),
+                      title: Text(loc('المؤثرات الصوتية')),
+                      subtitle: Text(loc('لا توجد مؤثرات في هذه النسخة؛ اختيارك محفوظ للمستقبل')),
                       value: p.effectsOn,
                       onChanged: (v) => p.update(effectsOn: v),
                     ),
                     ListTile(
                       leading: const Icon(Icons.speed_rounded),
-                      title: const Text('سرعة القراءة'),
+                      title: Text(loc('سرعة القراءة')),
                       trailing: DropdownButton<double>(
                         value: p.speechRate,
-                        items: const [
-                          DropdownMenuItem(value: 0.75, child: Text('بطيئة')),
-                          DropdownMenuItem(value: 1.0, child: Text('عادية')),
-                          DropdownMenuItem(value: 1.25, child: Text('سريعة')),
+                        items: [
+                          DropdownMenuItem(value: 0.75, child: Text(loc('بطيئة'))),
+                          DropdownMenuItem(value: 1.0, child: Text(loc('عادية'))),
+                          DropdownMenuItem(value: 1.25, child: Text(loc('سريعة'))),
                         ],
                         onChanged: (v) => v == null ? null : p.update(speechRate: v),
                       ),
                     ),
                     ListTile(
                       leading: const Icon(Icons.water_drop_rounded),
-                      title: const Text('صوت الطبيعة مع القصص'),
+                      title: Text(loc('صوت الطبيعة مع القصص')),
                       trailing: DropdownButton<String>(
                         value: p.ambient,
                         items: [
@@ -98,7 +99,7 @@ class _AudioSettingsScreenState extends State<AudioSettingsScreen> {
                     ),
                     ListTile(
                       leading: const Icon(Icons.volume_down_rounded),
-                      title: const Text('مستوى صوت الطبيعة'),
+                      title: Text(loc('مستوى صوت الطبيعة')),
                       subtitle: Slider(
                         value: p.ambientVolume,
                         min: 0.05,
@@ -108,23 +109,23 @@ class _AudioSettingsScreenState extends State<AudioSettingsScreen> {
                     ),
                     SwitchListTile(
                       secondary: const Icon(Icons.bedtime_rounded),
-                      title: const Text('قصص النوم في ساعات الهدوء'),
-                      subtitle: const Text('يسمح بزر «قصة هادئة قبل النوم» في شاشة الراحة'),
+                      title: Text(loc('قصص النوم في ساعات الهدوء')),
+                      subtitle: Text(loc('يسمح بزر «قصة هادئة قبل النوم» في شاشة الراحة')),
                       value: p.storiesInQuietHours,
                       onChanged: (v) => p.update(storiesInQuietHours: v),
                     ),
                     const Divider(),
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
-                      child: Text('تعلّم الحروف', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      child: Text(loc('تعلّم الحروف'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     ),
                     ListTile(
-                      title: const Text('ترتيب الحروف'),
+                      title: Text(loc('ترتيب الحروف')),
                       trailing: DropdownButton<String>(
                         value: _cfg.order,
-                        items: const [
-                          DropdownMenuItem(value: 'alphabet', child: Text('الأبجدي')),
-                          DropdownMenuItem(value: 'shapes', child: Text('الحروف المتشابهة معاً')),
+                        items: [
+                          DropdownMenuItem(value: 'alphabet', child: Text(loc('الأبجدي'))),
+                          DropdownMenuItem(value: 'shapes', child: Text(loc('الحروف المتشابهة معاً'))),
                         ],
                         onChanged: (v) => v == null
                             ? null
@@ -132,7 +133,7 @@ class _AudioSettingsScreenState extends State<AudioSettingsScreen> {
                       ),
                     ),
                     ListTile(
-                      title: const Text('عدد الحروف التي تُفتح في كل مرحلة'),
+                      title: Text(loc('عدد الحروف التي تُفتح في كل مرحلة')),
                       trailing: DropdownButton<int>(
                         value: _cfg.groupSize,
                         items: [for (final n in [2, 4, 6, 8]) DropdownMenuItem(value: n, child: Text('$n'))],
@@ -142,16 +143,16 @@ class _AudioSettingsScreenState extends State<AudioSettingsScreen> {
                       ),
                     ),
                     SwitchListTile(
-                      title: const Text('فتح كل الحروف'),
-                      subtitle: const Text('للأطفال الذين يعرفون الحروف مسبقاً'),
+                      title: Text(loc('فتح كل الحروف')),
+                      subtitle: Text(loc('للأطفال الذين يعرفون الحروف مسبقاً')),
                       value: _cfg.unlockAll,
                       onChanged: (v) => _setCfg(LiteracyConfig(order: _cfg.order, groupSize: _cfg.groupSize, unlockAll: v)),
                     ),
                     const Divider(),
                     ListTile(
                       leading: const Icon(Icons.download_rounded),
-                      title: const Text('تصدير بيانات الطفل'),
-                      subtitle: const Text('نسخة مقروءة من كل ما يحفظه التطبيق عن الطفل على هذا الجهاز'),
+                      title: Text(loc('تصدير بيانات الطفل')),
+                      subtitle: Text(loc('نسخة مقروءة من كل ما يحفظه التطبيق عن الطفل على هذا الجهاز')),
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const DataExportScreen()),
@@ -188,13 +189,13 @@ class _DataExportScreenState extends State<DataExportScreen> {
   Widget build(BuildContext context) {
     final profiles = JourneyStore.instance.profiles;
     return Scaffold(
-      appBar: AppBar(title: const Text('تصدير بيانات الطفل')),
+      appBar: AppBar(title: Text(loc('تصدير بيانات الطفل'))),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text('اختر طفلاً لعرض كل ما يحفظه التطبيق عنه على هذا الجهاز. يمكنك نسخه وحفظه. لا يُرسل شيء إلى أي مكان.'),
+          Text(loc('اختر طفلاً لعرض كل ما يحفظه التطبيق عنه على هذا الجهاز. يمكنك نسخه وحفظه. لا يُرسل شيء إلى أي مكان.')),
           const SizedBox(height: 8),
-          if (profiles.isEmpty) const Text('لا توجد ملفات أطفال.'),
+          if (profiles.isEmpty) Text(loc('لا توجد ملفات أطفال.')),
           Wrap(
             spacing: 8,
             children: [
@@ -209,7 +210,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
                 if (snap.connectionState != ConnectionState.done) {
                   return const Padding(padding: EdgeInsets.all(24), child: Center(child: CircularProgressIndicator()));
                 }
-                if (snap.hasError) return const Text('تعذّر إنشاء النسخة.');
+                if (snap.hasError) return Text(loc('تعذّر إنشاء النسخة.'));
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -218,11 +219,11 @@ class _DataExportScreenState extends State<DataExportScreen> {
                       onPressed: () async {
                         await Clipboard.setData(ClipboardData(text: snap.data!));
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم النسخ')));
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(loc('تم النسخ'))));
                         }
                       },
                       icon: const Icon(Icons.copy_rounded),
-                      label: const Text('نسخ'),
+                      label: Text(loc('نسخ')),
                     ),
                     const SizedBox(height: 8),
                     Directionality(

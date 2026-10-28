@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'kit.dart';
 import 'quiz_view.dart';
+import '../../l10n/strings.dart';
 
 /// Match the identical cards. A mismatch just turns the cards back over; one
 /// "peek" hint shows all the cards for a moment.
@@ -25,7 +26,7 @@ class _MemoryViewState extends State<MemoryView> {
   bool _peek = false;
   bool _peeked = false;
   int _misses = 0;
-  String _message = 'اقلب بطاقتين وابحث عن الصورتين المتشابهتين';
+  String _message = loc('اقلب بطاقتين وابحث عن الصورتين المتشابهتين');
   Timer? _timer;
 
   int get _pairs => widget.emojis.length;
@@ -50,7 +51,7 @@ class _MemoryViewState extends State<MemoryView> {
         _matched[a] = true;
         _matched[b] = true;
         _open.clear();
-        _message = 'أحسنت! وجدت زوجاً 🎉';
+        _message = loc('أحسنت! وجدت زوجاً 🎉');
       });
       if (_found == _pairs) {
         _busy = true;
@@ -59,7 +60,7 @@ class _MemoryViewState extends State<MemoryView> {
     } else {
       _busy = true;
       _misses++;
-      setState(() => _message = 'قريب! تذكّر أماكن الصور 🌈');
+      setState(() => _message = loc('قريب! تذكّر أماكن الصور 🌈'));
       _timer = Timer(const Duration(milliseconds: 900), () {
         if (!mounted) return;
         setState(() {
@@ -81,7 +82,7 @@ class _MemoryViewState extends State<MemoryView> {
     setState(() {
       _peek = true;
       _peeked = true;
-      _message = 'انظر جيداً... 👀';
+      _message = loc('انظر جيداً... 👀');
     });
     _timer = Timer(const Duration(milliseconds: 1500), () {
       if (mounted) setState(() => _peek = false);
@@ -142,7 +143,7 @@ class _MemoryViewState extends State<MemoryView> {
                 TextButton.icon(
                   onPressed: _doPeek,
                   icon: const Icon(Icons.lightbulb_outline_rounded),
-                  label: const Text('تلميح: أرني البطاقات', style: TextStyle(fontSize: 18)),
+                  label: Text(loc('تلميح: أرني البطاقات'), style: TextStyle(fontSize: 18)),
                 ),
             ],
           ),

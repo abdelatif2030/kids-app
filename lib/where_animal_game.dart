@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'ui.dart';
+import 'l10n/strings.dart';
 
 /// فين الحيوان؟ الطفل يلمس صندوق، ويطلع الحيوان اللي جواه. مفيش غلط ومفيش خسارة.
 class WhereAnimalGame extends StatefulWidget {
@@ -46,14 +47,14 @@ class _WhereAnimalGameState extends State<WhereAnimalGame> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: const Text('فين الحيوان؟', style: TextStyle(fontSize: 26)),
+        title: Text(loc('فين الحيوان؟'), style: TextStyle(fontSize: 26)),
       ),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              _opened == null ? 'اختار صندوق' : 'أحسنت!',
+              _opened == null ? loc('اختار صندوق') : loc('أحسنت!'),
               style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
@@ -86,7 +87,7 @@ class _WhereAnimalGameState extends State<WhereAnimalGame> {
             if (_opened != null)
               FilledButton(
                 onPressed: _next,
-                child: const Text('تاني', style: TextStyle(fontSize: 24)),
+                child: Text(loc('تاني'), style: TextStyle(fontSize: 24)),
               ),
           ],
         ),

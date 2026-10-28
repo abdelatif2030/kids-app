@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'journey/repository.dart';
 import 'progress_store.dart';
 import 'rest_screen.dart';
+import 'l10n/strings.dart';
 
 class _GameColor {
   final String name;
@@ -116,7 +117,7 @@ class _ColorGameState extends State<ColorGame> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: const Text('لعبة الألوان', style: TextStyle(fontSize: 26)),
+        title: Text(loc('لعبة الألوان'), style: TextStyle(fontSize: 26)),
       ),
       body: Center(
         child: _done
@@ -125,12 +126,12 @@ class _ColorGameState extends State<ColorGame> {
                 children: [
                   const Icon(Icons.star_rounded, size: 120, color: Colors.amber),
                   const SizedBox(height: 16),
-                  const Text('أحسنت!',
+                  Text(loc('أحسنت!'),
                       style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 24),
                   FilledButton(
                     onPressed: _again,
-                    child: const Text('العب تاني', style: TextStyle(fontSize: 24)),
+                    child: Text(loc('العب تاني'), style: TextStyle(fontSize: 24)),
                   ),
                 ],
               )
@@ -157,7 +158,7 @@ class _ColorGameState extends State<ColorGame> {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      _matched ? 'أحسنت!' : 'اختار نفس اللون',
+                      _matched ? loc('أحسنت!') : loc('اختار نفس اللون'),
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                     ),

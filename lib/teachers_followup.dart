@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'teachers_market.dart';
 import 'teachers_models.dart';
 import 'teachers_time.dart';
+import 'l10n/strings.dart';
 
 Future<void> _showError(BuildContext context, Object e) async {
-  final text = e is AccountException ? e.message : 'تعذر إكمال العملية، حاول مرة أخرى';
+  final text = e is AccountException ? e.message : loc('تعذر إكمال العملية، حاول مرة أخرى');
   if (!context.mounted) return;
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
@@ -61,7 +62,7 @@ class _LessonReportFormState extends State<LessonReportForm> {
 
   Future<void> _save() async {
     if (_covered.text.trim().isEmpty) {
-      setState(() => _error = 'اكتب ما تم شرحه في الحصة');
+      setState(() => _error = loc('اكتب ما تم شرحه في الحصة'));
       return;
     }
     setState(() {
@@ -82,7 +83,7 @@ class _LessonReportFormState extends State<LessonReportForm> {
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
       if (mounted) {
-        setState(() => _error = e is AccountException ? e.message : 'تعذر حفظ التقرير');
+        setState(() => _error = e is AccountException ? e.message : loc('تعذر حفظ التقرير'));
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -102,22 +103,22 @@ class _LessonReportFormState extends State<LessonReportForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('تقرير الحصة')),
+      appBar: AppBar(title: Text(loc('تقرير الحصة'))),
       body: !_loaded
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                const Text('يراه ولي الأمر فقط. اكتب ملاحظاتك التعليمية؛ هذا ليس تشخيصاً ولا تقييماً طبياً أو نمائياً.',
+                Text(loc('يراه ولي الأمر فقط. اكتب ملاحظاتك التعليمية؛ هذا ليس تشخيصاً ولا تقييماً طبياً أو نمائياً.'),
                     style: TextStyle(fontSize: 13)),
                 const SizedBox(height: 12),
-                _field(_covered, 'ما الذي تم شرحه؟'),
-                _field(_understood, 'ما الذي أظهره الطفل في الحصة؟'),
-                _field(_review, 'ما يحتاج إلى مراجعة'),
-                _field(_home, 'نشاط مقترح في البيت'),
-                _field(_next, 'الحصة القادمة'),
+                _field(_covered, loc('ما الذي تم شرحه؟')),
+                _field(_understood, loc('ما الذي أظهره الطفل في الحصة؟')),
+                _field(_review, loc('ما يحتاج إلى مراجعة')),
+                _field(_home, loc('نشاط مقترح في البيت')),
+                _field(_next, loc('الحصة القادمة')),
                 if (_error != null) Text(_error!, style: const TextStyle(color: Colors.red)),
-                FilledButton(onPressed: _busy ? null : _save, child: const Text('حفظ التقرير')),
+                FilledButton(onPressed: _busy ? null : _save, child: Text(loc('حفظ التقرير'))),
               ],
             ),
     );
@@ -146,27 +147,27 @@ class LessonReportView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('تقرير الحصة')),
+      appBar: AppBar(title: Text(loc('تقرير الحصة'))),
       body: FutureBuilder<LessonReport?>(
         future: repo.lessonReportFor(booking.id),
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
-          if (snap.hasError) return const Center(child: Text('تعذر تحميل التقرير'));
+          if (snap.hasError) return Center(child: Text(loc('تعذر تحميل التقرير')));
           final r = snap.data;
           if (r == null) {
-            return const Center(child: Text('لم يكتب المدرس تقريراً لهذه الحصة بعد.', style: TextStyle(fontSize: 18)));
+            return Center(child: Text(loc('لم يكتب المدرس تقريراً لهذه الحصة بعد.'), style: TextStyle(fontSize: 18)));
           }
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
               Text('مع ${booking.teacherName}${booking.start == null ? '' : ' · ${fmtDateTime(booking.start!)}'}'),
               const SizedBox(height: 12),
-              _item('ما تم شرحه', r.covered),
-              _item('ما أظهره الطفل في الحصة', r.understood),
-              _item('يحتاج إلى مراجعة', r.needsReview),
-              _item('نشاط مقترح في البيت', r.homeActivity),
-              _item('الحصة القادمة', r.nextLesson),
-              const Text('هذه ملاحظات المدرس التعليمية وليست تشخيصاً.', style: TextStyle(fontSize: 12)),
+              _item(loc('ما تم شرحه'), r.covered),
+              _item(loc('ما أظهره الطفل في الحصة'), r.understood),
+              _item(loc('يحتاج إلى مراجعة'), r.needsReview),
+              _item(loc('نشاط مقترح في البيت'), r.homeActivity),
+              _item(loc('الحصة القادمة'), r.nextLesson),
+              Text(loc('هذه ملاحظات المدرس التعليمية وليست تشخيصاً.'), style: TextStyle(fontSize: 12)),
             ],
           );
         },
@@ -204,19 +205,19 @@ Future<void> showReviewDialog(BuildContext context, TeacherRepository repo, Book
                 controller: text,
                 maxLines: 3,
                 maxLength: 400,
-                decoration: const InputDecoration(labelText: 'تعليق (اختياري)'),
+                decoration: InputDecoration(labelText: loc('تعليق (اختياري)')),
               ),
-              const Text('لا يمكن تعديل التقييم بعد إرساله، ويظهر للأهل الآخرين.', style: TextStyle(fontSize: 12)),
+              Text(loc('لا يمكن تعديل التقييم بعد إرساله، ويظهر للأهل الآخرين.'), style: TextStyle(fontSize: 12)),
               if (error != null) Text(error!, style: const TextStyle(color: Colors.red)),
             ],
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(loc('إلغاء'))),
           FilledButton(
             onPressed: () async {
               if (rating == 0) {
-                setState(() => error = 'اختر عدد النجوم');
+                setState(() => error = loc('اختر عدد النجوم'));
                 return;
               }
               try {
@@ -229,10 +230,10 @@ Future<void> showReviewDialog(BuildContext context, TeacherRepository repo, Book
                 ));
                 if (context.mounted) Navigator.pop(context, true);
               } catch (e) {
-                setState(() => error = e is AccountException ? e.message : 'تعذر إرسال التقييم');
+                setState(() => error = e is AccountException ? e.message : loc('تعذر إرسال التقييم'));
               }
             },
-            child: const Text('إرسال التقييم'),
+            child: Text(loc('إرسال التقييم')),
           ),
         ],
       ),
@@ -241,7 +242,7 @@ Future<void> showReviewDialog(BuildContext context, TeacherRepository repo, Book
   if (done == true && context.mounted) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(content: Text('شكراً، تم إرسال تقييمك')));
+      ..showSnackBar(SnackBar(content: Text(loc('شكراً، تم إرسال تقييمك'))));
   }
 }
 
@@ -273,7 +274,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     final t = _text.text.trim();
     if (t.isEmpty) return;
     if (looksLikeContactDetails(t)) {
-      setState(() => _error = 'لا ترسل أرقام هاتف أو بريداً أو روابط. التواصل يبقى داخل التطبيق.');
+      setState(() => _error = loc('لا ترسل أرقام هاتف أو بريداً أو روابط. التواصل يبقى داخل التطبيق.'));
       return;
     }
     setState(() {
@@ -288,7 +289,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
       _messages = f;
     });
     } catch (e) {
-      if (mounted) setState(() => _error = e is AccountException ? e.message : 'تعذر إرسال الرسالة');
+      if (mounted) setState(() => _error = e is AccountException ? e.message : loc('تعذر إرسال الرسالة'));
     } finally {
       if (mounted) setState(() => _sending = false);
     }
@@ -298,14 +299,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
   Widget build(BuildContext context) {
     final me = widget.repo.currentUser!.uid;
     return Scaffold(
-      appBar: AppBar(title: const Text('الرسائل')),
+      appBar: AppBar(title: Text(loc('الرسائل'))),
       body: Column(
         children: [
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(12),
             child: Text(
-              'رسائل نصية بين ولي الأمر والمدرس فقط، مرتبطة بهذا الحجز. لا تشارك أرقام هاتف أو عناوين. '
-              'لا توجد رسائل مع الطفل. للإبلاغ عن مشكلة استخدم «إبلاغ عن هذا المدرس».',
+              loc('رسائل نصية بين ولي الأمر والمدرس فقط، مرتبطة بهذا الحجز. لا تشارك أرقام هاتف أو عناوين. '
+              'لا توجد رسائل مع الطفل. للإبلاغ عن مشكلة استخدم «إبلاغ عن هذا المدرس».'),
               style: TextStyle(fontSize: 12),
             ),
           ),
@@ -318,12 +319,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
                   return Center(
                     child: FilledButton(
                       onPressed: () => setState(() => _messages = widget.repo.messagesOf(widget.booking.id)),
-                      child: const Text('إعادة المحاولة'),
+                      child: Text(loc('إعادة المحاولة')),
                     ),
                   );
                 }
                 final list = snap.data!;
-                if (list.isEmpty) return const Center(child: Text('لا توجد رسائل بعد'));
+                if (list.isEmpty) return Center(child: Text(loc('لا توجد رسائل بعد')));
                 return ListView(
                   padding: const EdgeInsets.all(12),
                   children: [
@@ -357,11 +358,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       child: TextField(
                         controller: _text,
                         maxLength: 500,
-                        decoration: const InputDecoration(hintText: 'اكتب رسالة', counterText: '', border: OutlineInputBorder()),
+                        decoration: InputDecoration(hintText: loc('اكتب رسالة'), counterText: '', border: OutlineInputBorder()),
                       ),
                     ),
                     IconButton.filled(
-                      tooltip: 'إرسال',
+                      tooltip: loc('إرسال'),
                       onPressed: _sending ? null : _send,
                       icon: const Icon(Icons.send_rounded),
                     ),
@@ -370,7 +371,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
               ),
             )
           else
-            const Padding(padding: EdgeInsets.all(16), child: Text('أُغلقت المحادثة لأن الحجز ملغي أو مرفوض.')),
+            Padding(padding: EdgeInsets.all(16), child: Text(loc('أُغلقت المحادثة لأن الحجز ملغي أو مرفوض.'))),
         ],
       ),
     );

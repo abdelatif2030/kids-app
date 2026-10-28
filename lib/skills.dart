@@ -1,3 +1,4 @@
+import 'l10n/strings.dart';
 /// A skill the games can measure, with the Arabic text a parent reads.
 class Skill {
   final String id;

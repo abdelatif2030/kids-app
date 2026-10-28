@@ -2,6 +2,7 @@ import 'dart:math';
 
 import '../journey/models.dart';
 import 'letters_data.dart';
+import '../l10n/strings.dart';
 
 ({List<Option> options, int correct}) _mix(Option right, List<Option> wrong, Random r) {
   final all = [right, ...wrong]..shuffle(r);
@@ -16,7 +17,7 @@ List<ArabicLetter> _others(ArabicLetter l, int n, Random r) =>
 Question nameQuestion(ArabicLetter l, Random r) {
   final m = _mix(Option.text(l.letter), [for (final o in _others(l, 2, r)) Option.text(o.letter)], r);
   return Question(
-    prompt: 'استمع إلى اسم الحرف واختره',
+    prompt: loc('استمع إلى اسم الحرف واختره'),
     bigText: '🔊',
     options: m.options,
     correct: m.correct,
@@ -34,7 +35,7 @@ Question nameQuestion(ArabicLetter l, Random r) {
 Question soundQuestion(ArabicLetter l, Random r) {
   final m = _mix(Option.text(l.letter), [for (final o in _others(l, 2, r)) Option.text(o.letter)], r);
   return Question(
-    prompt: 'استمع إلى صوت الحرف واختره',
+    prompt: loc('استمع إلى صوت الحرف واختره'),
     bigText: '🔊',
     options: m.options,
     correct: m.correct,
@@ -91,7 +92,7 @@ Question positionQuestion(ArabicLetter l, Random r) {
     bigEmoji: w.emoji,
     options: m.options,
     correct: m.correct,
-    hint: 'ابدأ من اليمين: الحرف الأول هو البداية، والأخير هو النهاية.',
+    hint: loc('ابدأ من اليمين: الحرف الأول هو البداية، والأخير هو النهاية.'),
     skill: 'letter_position',
     spoken: w.word,
     explanation: 'حرف ${l.letter} ${pos.label} في «${w.word}»',
@@ -106,11 +107,11 @@ Question syllableQuestion(ArabicLetter l, Random r) {
   final target = syl[r.nextInt(syl.length)];
   final m = _mix(Option.text(target), [for (final s in syl.where((s) => s != target)) Option.text(s)], r);
   return Question(
-    prompt: 'استمع ثم اختر المقطع الصحيح',
+    prompt: loc('استمع ثم اختر المقطع الصحيح'),
     bigText: '🔊',
     options: m.options,
     correct: m.correct,
-    hint: 'الفتحة فوق الحرف (َ) والضمة (ُ) والكسرة تحته (ِ).',
+    hint: loc('الفتحة فوق الحرف (َ) والضمة (ُ) والكسرة تحته (ِ).'),
     skill: 'syllables',
     spoken: target,
     speakFirst: true,
@@ -126,11 +127,11 @@ Question blendQuestion(Random r) {
   final wrong = ([...kSyllableWords]..remove(w)..shuffle(r)).take(2).toList();
   final m = _mix(Option.emoji(w.emoji), [for (final x in wrong) Option.emoji(x.emoji)], r);
   return Question(
-    prompt: 'اجمع المقاطع لتقرأ الكلمة',
+    prompt: loc('اجمع المقاطع لتقرأ الكلمة'),
     bigText: w.syllables.join(' + '),
     options: m.options,
     correct: m.correct,
-    hint: 'انطق المقاطع بسرعة أكبر حتى تصير كلمة.',
+    hint: loc('انطق المقاطع بسرعة أكبر حتى تصير كلمة.'),
     skill: 'syllables',
     spoken: w.word,
     explanation: '${w.syllables.join(' + ')} = ${w.word} ${w.emoji}',
@@ -146,7 +147,7 @@ Question readingQuestion(Random r) {
     passage: item.sentence,
     options: m.options,
     correct: m.correct,
-    hint: 'اقرأ الجملة مرة أخرى بهدوء.',
+    hint: loc('اقرأ الجملة مرة أخرى بهدوء.'),
     skill: 'reading',
     spoken: item.sentence,
     explanation: item.sentence,

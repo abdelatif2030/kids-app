@@ -11,6 +11,7 @@ import 'story_data.dart';
 import 'story_models.dart';
 import 'story_player.dart';
 import 'story_store.dart';
+import '../l10n/strings.dart';
 
 String _mmss(int s) => '${(s ~/ 60).toString().padLeft(2, '0')}:${(s % 60).toString().padLeft(2, '0')}';
 
@@ -79,7 +80,7 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
-        title: const Text('ليلة حلوة 🌙',
+        title: Text(loc('ليلة حلوة 🌙'),
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
       body: PastelBackground(
@@ -90,7 +91,7 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
                   padding: const EdgeInsets.all(16),
                   children: [
                     if (resumable.isNotEmpty) ...[
-                      const Text('تابع من حيث توقفت',
+                      Text(loc('تابع من حيث توقفت'),
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: RC.ink)),
                       const SizedBox(height: 6),
                       for (final s in resumable)
@@ -117,7 +118,7 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
                       runSpacing: 4,
                       children: [
                         ChoiceChip(
-                          label: const Text('الكل'),
+                          label: Text(loc('الكل')),
                           selected: _category == null && !_onlyFavorites,
                           onSelected: (_) => setState(() {
                             _category = null;
@@ -125,7 +126,7 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
                           }),
                         ),
                         ChoiceChip(
-                          label: const Text('❤️ المفضلة'),
+                          label: Text(loc('❤️ المفضلة')),
                           selected: _onlyFavorites,
                           onSelected: (v) => setState(() => _onlyFavorites = v),
                         ),
@@ -143,7 +144,7 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
                         dense: true,
                         value: _allAges,
                         onChanged: (v) => setState(() => _allAges = v ?? false),
-                        title: const Text('إظهار قصص كل الأعمار'),
+                        title: Text(loc('إظهار قصص كل الأعمار')),
                       ),
                     ),
                     if (stories.isEmpty)
@@ -151,8 +152,8 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
                         padding: const EdgeInsets.all(24),
                         child: Text(
                           _onlyFavorites
-                              ? 'لا توجد قصص مفضلة بعد. اضغط على القلب في أي قصة لتضيفها هنا.'
-                              : 'لا توجد قصص مناسبة لهذا الاختيار. جرّب «إظهار قصص كل الأعمار».',
+                              ? loc('لا توجد قصص مفضلة بعد. اضغط على القلب في أي قصة لتضيفها هنا.')
+                              : loc('لا توجد قصص مناسبة لهذا الاختيار. جرّب «إظهار قصص كل الأعمار».'),
                           textAlign: TextAlign.center,
                           style: const TextStyle(fontSize: 17, color: RC.ink),
                         ),
@@ -172,7 +173,7 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
                       ),
                     if (_history.isNotEmpty) ...[
                       const SizedBox(height: 8),
-                      const Text('سمعتُ مؤخراً',
+                      Text(loc('سمعتُ مؤخراً'),
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: RC.ink)),
                       for (final h in _history.reversed.take(5))
                         if (storyById(h.storyId) != null)
@@ -180,7 +181,7 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
                             dense: true,
                             leading: Text(storyById(h.storyId)!.cover, style: const TextStyle(fontSize: 26)),
                             title: Text(storyById(h.storyId)!.title),
-                            subtitle: Text('${h.day} · ${h.completed ? 'أكملتها' : 'لم تكتمل'}'),
+                            subtitle: Text('${h.day} · ${h.completed ? loc('أكملتها') : loc('لم تكتمل')}'),
                           ),
                     ],
                   ],
@@ -222,14 +223,14 @@ class _StoryCard extends StatelessWidget {
                 Text(story.description, style: const TextStyle(fontSize: 14, color: RC.ink)),
                 const SizedBox(height: 4),
                 Text(
-                  '≈ $minutes د · ${story.minAge}–${story.maxAge} سنة · ${story.isDeviceVoice ? 'صوت آلي تجريبي' : 'تسجيل'}',
+                  '≈ $minutes د · ${story.minAge}–${story.maxAge} سنة · ${story.isDeviceVoice ? loc('صوت آلي تجريبي') : loc('تسجيل')}',
                   style: const TextStyle(fontSize: 12, color: RC.ink),
                 ),
               ],
             ),
           ),
           IconButton(
-            tooltip: favorite ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة',
+            tooltip: favorite ? loc('إزالة من المفضلة') : loc('إضافة إلى المفضلة'),
             onPressed: onFavorite,
             icon: Icon(favorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                 color: favorite ? RC.pinkDeep : RC.ink),
@@ -284,11 +285,11 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
         child: ListView(
           shrinkWrap: true,
           children: [
-            const ListTile(title: Text('مؤقّت النوم', style: TextStyle(fontWeight: FontWeight.bold))),
+            ListTile(title: Text(loc('مؤقّت النوم'), style: TextStyle(fontWeight: FontWeight.bold))),
             for (final m in StoryPlayerController.sleepChoices)
               ListTile(title: Text('بعد $m دقيقة'), onTap: () => Navigator.pop(context, m)),
-            ListTile(title: const Text('عند نهاية القصة'), onTap: () => Navigator.pop(context, -1)),
-            ListTile(title: const Text('إيقاف المؤقّت'), onTap: () => Navigator.pop(context, 0)),
+            ListTile(title: Text(loc('عند نهاية القصة')), onTap: () => Navigator.pop(context, -1)),
+            ListTile(title: Text(loc('إيقاف المؤقّت')), onTap: () => Navigator.pop(context, 0)),
           ],
         ),
       ),
@@ -310,7 +311,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
         child: ListView(
           shrinkWrap: true,
           children: [
-            const ListTile(title: Text('صوت الطبيعة في الخلفية', style: TextStyle(fontWeight: FontWeight.bold))),
+            ListTile(title: Text(loc('صوت الطبيعة في الخلفية'), style: TextStyle(fontWeight: FontWeight.bold))),
             for (final e in kAmbientSounds.entries)
               ListTile(
                 title: Text(e.value.$1),
@@ -380,21 +381,21 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             IconButton(
-              tooltip: 'رجوع 15 ثانية',
+              tooltip: loc('رجوع 15 ثانية'),
               iconSize: 40,
               onPressed: canSeek ? () => _c.skip(-StoryPlayerController.skipSeconds) : null,
               icon: const Icon(Icons.replay_10_rounded),
             ),
             const SizedBox(width: 8),
             IconButton.filled(
-              tooltip: _c.playing ? 'إيقاف مؤقت' : (_c.hasResume ? 'تابع' : 'تشغيل'),
+              tooltip: _c.playing ? loc('إيقاف مؤقت') : (_c.hasResume ? loc('تابع') : loc('تشغيل')),
               iconSize: large ? 72 : 56,
               onPressed: unavailable || _c.state == PlayState.waitingChoice ? null : _c.toggle,
               icon: Icon(_c.playing ? Icons.pause_rounded : Icons.play_arrow_rounded),
             ),
             const SizedBox(width: 8),
             IconButton(
-              tooltip: 'تقدّم 15 ثانية',
+              tooltip: loc('تقدّم 15 ثانية'),
               iconSize: 40,
               onPressed: canSeek ? () => _c.skip(StoryPlayerController.skipSeconds) : null,
               icon: const Icon(Icons.forward_10_rounded),
@@ -422,7 +423,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                 child: TextButton.icon(
                   onPressed: () => setState(() => _voiceOnly = false),
                   icon: const Icon(Icons.visibility_rounded),
-                  label: const Text('عرض النص'),
+                  label: Text(loc('عرض النص')),
                 ),
               ),
               const Spacer(),
@@ -431,9 +432,9 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
               Text(widget.story.title, style: const TextStyle(fontSize: 22, color: Colors.white54)),
               if (r != null) Text('⏳ ${_mmss(r)}', style: const TextStyle(fontSize: 18, color: Colors.white38)),
               if (_c.sleepEnded)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(12),
-                  child: Text('تصبح على خير 🌙', style: TextStyle(fontSize: 24, color: Colors.white54)),
+                  child: Text(loc('تصبح على خير 🌙'), style: TextStyle(fontSize: 24, color: Colors.white54)),
                 ),
               const SizedBox(height: 16),
               _controls(context, large: true),
@@ -455,7 +456,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
         title: Text(s.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: RC.ink)),
         actions: [
           IconButton(
-            tooltip: _favorite ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة',
+            tooltip: _favorite ? loc('إزالة من المفضلة') : loc('إضافة إلى المفضلة'),
             onPressed: () async {
               final added = await StoryStore.toggleFavorite(widget.child.id, s.id);
               setState(() => _favorite = added);
@@ -493,12 +494,12 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                       ),
                     ),
                     if (s.isDeviceVoice)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(top: 8),
                         child: RCard(
                           color: Color(0xFFFFF3C4),
                           child: Text(
-                            'تُقرأ القصة بصوت الجهاز الآلي كنسخة تجريبية. لم تُضف تسجيلات حقيقية بعد.',
+                            loc('تُقرأ القصة بصوت الجهاز الآلي كنسخة تجريبية. لم تُضف تسجيلات حقيقية بعد.'),
                             style: TextStyle(fontSize: 14, color: RC.ink),
                           ),
                         ),
@@ -513,7 +514,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                               const Icon(Icons.volume_off_rounded, color: RC.ink),
                               const SizedBox(width: 8),
                               Expanded(
-                                child: Text(_c.message ?? 'التشغيل غير متاح',
+                                child: Text(_c.message ?? loc('التشغيل غير متاح'),
                                     style: const TextStyle(fontSize: 15, color: RC.ink)),
                               ),
                             ],
@@ -527,7 +528,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                             textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, color: RC.ink)),
                       ),
                     const SizedBox(height: 12),
-                    const Text('النص',
+                    Text(loc('النص'),
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: RC.ink)),
                     for (var i = 0; i < s.chapters.length; i++)
                       if (!s.branching || i == _c.chapterIndex)
@@ -555,7 +556,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                         padding: const EdgeInsets.only(top: 12),
                         child: Column(
                           children: [
-                            const Text('ماذا تختار؟',
+                            Text(loc('ماذا تختار؟'),
                                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: RC.ink)),
                             for (final ch in _c.chapter.choices)
                               Padding(
@@ -579,10 +580,10 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                           child: Column(
                             children: [
                               Text(
-                                _c.sleepEnded ? 'تصبح على خير 🌙' : 'انتهت القصة 🌙',
+                                _c.sleepEnded ? loc('تصبح على خير 🌙') : loc('انتهت القصة 🌙'),
                                 style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink),
                               ),
-                              const Text('لن تبدأ قصة أخرى تلقائياً.', style: TextStyle(fontSize: 14, color: RC.ink)),
+                              Text(loc('لن تبدأ قصة أخرى تلقائياً.'), style: TextStyle(fontSize: 14, color: RC.ink)),
                               const SizedBox(height: 8),
                               Wrap(
                                 spacing: 8,
@@ -591,9 +592,9 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                                     FilledButton.icon(
                                       onPressed: _quiz,
                                       icon: const Icon(Icons.quiz_rounded),
-                                      label: const Text('أسئلة عن القصة'),
+                                      label: Text(loc('أسئلة عن القصة')),
                                     ),
-                                  OutlinedButton(onPressed: _c.play, child: const Text('اسمعها مرة أخرى')),
+                                  OutlinedButton(onPressed: _c.play, child: Text(loc('اسمعها مرة أخرى'))),
                                 ],
                               ),
                             ],
@@ -616,27 +617,27 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                       spacing: 6,
                       children: [
                         PopupMenuButton<double>(
-                          tooltip: 'سرعة القراءة',
+                          tooltip: loc('سرعة القراءة'),
                           onSelected: _c.setSpeed,
                           itemBuilder: (_) => [
                             for (final v in StoryPlayerController.speeds)
-                              PopupMenuItem(value: v, child: Text(v == 1.0 ? 'عادية' : '${v}x')),
+                              PopupMenuItem(value: v, child: Text(v == 1.0 ? loc('عادية') : '${v}x')),
                           ],
                           child: Chip(label: Text('السرعة ${_c.speed}x')),
                         ),
                         ActionChip(
                           avatar: const Icon(Icons.bedtime_rounded, size: 18),
-                          label: Text(r != null ? '⏳ ${_mmss(r)}' : (_c.sleepAtEnd ? 'عند النهاية' : 'مؤقّت النوم')),
+                          label: Text(r != null ? '⏳ ${_mmss(r)}' : (_c.sleepAtEnd ? loc('عند النهاية') : loc('مؤقّت النوم'))),
                           onPressed: _sleepMenu,
                         ),
                         ActionChip(
                           avatar: const Icon(Icons.water_drop_rounded, size: 18),
-                          label: Text(_c.ambient == 'none' ? 'صوت الطبيعة' : kAmbientSounds[_c.ambient]!.$1),
+                          label: Text(_c.ambient == 'none' ? loc('صوت الطبيعة') : kAmbientSounds[_c.ambient]!.$1),
                           onPressed: _ambientMenu,
                         ),
                         ActionChip(
                           avatar: const Icon(Icons.nights_stay_rounded, size: 18),
-                          label: const Text('وضع الصوت فقط'),
+                          label: Text(loc('وضع الصوت فقط')),
                           onPressed: () => setState(() => _voiceOnly = true),
                         ),
                       ],

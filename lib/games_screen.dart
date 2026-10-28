@@ -6,6 +6,7 @@ import 'math_game.dart';
 import 'memory_game.dart';
 import 'ui.dart';
 import 'where_animal_game.dart';
+import 'l10n/strings.dart';
 
 /// The games that suit [age], as big tiles.
 class GamesGrid extends StatelessWidget {
@@ -16,12 +17,12 @@ class GamesGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     // (label, icon, min age, max age, screen). Order = order on screen.
     final games = <(String, IconData, int, int, Widget Function())>[
-      ('افرقع البالونات', Icons.celebration_rounded, 1, 2, () => const BalloonGame()),
-      ('فين الحيوان؟', Icons.pets_rounded, 1, 2, () => const WhereAnimalGame()),
-      ('لعبة الألوان', Icons.palette_rounded, 2, 3, () => const ColorGame()),
-      ('حروف وكلمات', Icons.sort_by_alpha_rounded, 3, 8, () => const LettersGame()),
-      ('لعبة الذاكرة', Icons.grid_view_rounded, 3, 6, () => const MemoryGame()),
-      ('رياضيات', Icons.calculate_rounded, 4, 12, () => MathGame(age: age)),
+      (loc('افرقع البالونات'), Icons.celebration_rounded, 1, 2, () => const BalloonGame()),
+      (loc('فين الحيوان؟'), Icons.pets_rounded, 1, 2, () => const WhereAnimalGame()),
+      (loc('لعبة الألوان'), Icons.palette_rounded, 2, 3, () => const ColorGame()),
+      (loc('حروف وكلمات'), Icons.sort_by_alpha_rounded, 3, 8, () => const LettersGame()),
+      (loc('لعبة الذاكرة'), Icons.grid_view_rounded, 3, 6, () => const MemoryGame()),
+      (loc('رياضيات'), Icons.calculate_rounded, 4, 12, () => MathGame(age: age)),
     ];
     final available = [
       for (var i = 0; i < games.length; i++)
@@ -55,7 +56,7 @@ class GamesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SceneScaffold(
-      title: 'ألعاب',
+      title: loc('ألعاب'),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -97,7 +98,7 @@ class _BalloonGameState extends State<BalloonGame> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: const Text('افرقع البالونات', style: TextStyle(fontSize: 26)),
+        title: Text(loc('افرقع البالونات'), style: TextStyle(fontSize: 26)),
       ),
       body: Center(
         child: done
@@ -106,12 +107,12 @@ class _BalloonGameState extends State<BalloonGame> {
                 children: [
                   const Icon(Icons.star_rounded, size: 120, color: Colors.amber),
                   const SizedBox(height: 16),
-                  const Text('أحسنت!',
+                  Text(loc('أحسنت!'),
                       style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 24),
                   FilledButton(
                     onPressed: _restart,
-                    child: const Text('العب تاني', style: TextStyle(fontSize: 24)),
+                    child: Text(loc('العب تاني'), style: TextStyle(fontSize: 24)),
                   ),
                 ],
               )

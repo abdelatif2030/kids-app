@@ -6,6 +6,7 @@ import '../journey/ui/kit.dart';
 import '../journey/ui/quiz_view.dart' show ItemResult;
 import '../media/audio.dart';
 import 'letters_data.dart';
+import '../l10n/strings.dart';
 
 /// Build a word from movable letter tiles. A wrong tile only fades and wobbles
 /// its message; nothing is lost. Placed letters are shown joined, as they are
@@ -56,7 +57,7 @@ class _WordTilesViewState extends State<WordTilesView> {
     if (_tiles[tile] != next) {
       setState(() {
         _missed = true;
-        _message = 'جرّب حرفاً آخر 🌈 (الحرف التالي من اليمين)';
+        _message = loc('جرّب حرفاً آخر 🌈 (الحرف التالي من اليمين)');
       });
       return;
     }
@@ -103,14 +104,14 @@ class _WordTilesViewState extends State<WordTilesView> {
               Text('الكلمة ${_i + 1} من ${widget.words.length}',
                   style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink)),
               const SizedBox(height: 10),
-              const Text('رتّب الحروف لتكوّن الكلمة',
+              Text(loc('رتّب الحروف لتكوّن الكلمة'),
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
               const SizedBox(height: 8),
               Text(_w.emoji, style: const TextStyle(fontSize: 88)),
               TextButton.icon(
                 onPressed: () => AppAudio.say(_w.word),
                 icon: const Icon(Icons.volume_up_rounded),
-                label: const Text('استمع', style: TextStyle(fontSize: 18)),
+                label: Text(loc('استمع'), style: TextStyle(fontSize: 18)),
               ),
               Container(
                 width: double.infinity,

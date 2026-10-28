@@ -4,6 +4,7 @@
 library;
 
 import 'dart:convert';
+import '../l10n/strings.dart';
 
 class ChildProfile {
   final String id;
@@ -184,7 +185,7 @@ class Option {
         shape = null;
 
   /// What a screen reader says.
-  String get label => text ?? caption ?? emoji ?? shape?.kind ?? 'لون';
+  String get label => text ?? caption ?? emoji ?? shape?.kind ?? loc('لون');
 }
 
 /// The numbers behind an arithmetic question, so a wrong answer can be

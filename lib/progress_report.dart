@@ -3,6 +3,7 @@ import 'main.dart' show Video;
 import 'progress_store.dart';
 import 'skills.dart';
 import 'watch_history.dart';
+import 'l10n/strings.dart';
 
 /// A skill needs this many rounds before we say anything about it.
 const kMinAttempts = 5;
@@ -87,7 +88,7 @@ class WeekReport {
 
 String formatDuration(int seconds) {
   final m = (seconds / 60).round();
-  if (m < 1) return seconds > 0 ? 'أقل من دقيقة' : '0 د';
+  if (m < 1) return seconds > 0 ? loc('أقل من دقيقة') : loc('0 د');
   if (m < 60) return '$m د';
   return '${m ~/ 60} س ${m % 60} د';
 }
@@ -193,7 +194,7 @@ List<Recommendation> _recommend(
   final weak = [for (final s in skills) if (s.level == SkillLevel.needsPractice) s]
     ..sort((a, b) => a.accuracy.compareTo(b.accuracy));
   for (final s in weak.take(2)) {
-    final detail = s.missed.isEmpty ? '' : ' (أكثر ما أخطأ فيه: ${s.missed.join('، ')})';
+    final detail = s.missed.isEmpty ? '' : ' (أكثر ما أخطأ فيه: ${s.missed.join(loc('، '))})';
     recs.add(Recommendation(
       RecKind.practice,
       'يحتاج إلى تدريب في ${s.skill.label}$detail. جرّب لعبة «${s.skill.game}» بضع جولات كل يوم.',
@@ -234,7 +235,7 @@ List<Recommendation> _recommend(
   }
 
   if (!hasActivity) {
-    recs.add(const Recommendation(RecKind.info, 'لا توجد نشاطات مسجّلة في هذا الأسبوع.'));
+    recs.add(Recommendation(RecKind.info, loc('لا توجد نشاطات مسجّلة في هذا الأسبوع.')));
   }
   return recs.take(5).toList();
 }
@@ -251,13 +252,13 @@ String reportAsText(WeekReport r, {String? childName, List<String> journey = con
     b.writeln(line);
   }
   if (r.mastered.isNotEmpty) {
-    b.writeln('أتقن: ${r.mastered.map((s) => s.skill.label).join('، ')}');
+    b.writeln('أتقن: ${r.mastered.map((s) => s.skill.label).join(loc('، '))}');
   }
   if (r.needsPractice.isNotEmpty) {
-    b.writeln('يحتاج تدريباً: ${r.needsPractice.map((s) => s.skill.label).join('، ')}');
+    b.writeln('يحتاج تدريباً: ${r.needsPractice.map((s) => s.skill.label).join(loc('، '))}');
   }
   if (r.recommendations.isNotEmpty) {
-    b.writeln('توصيات:');
+    b.writeln(loc('توصيات:'));
     for (final rec in r.recommendations) {
       b.writeln('- ${rec.text}');
     }

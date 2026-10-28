@@ -92,7 +92,7 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
-        title: const Text('تعلّم الحروف',
+        title: Text(loc('تعلّم الحروف'),
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
       body: PastelBackground(
@@ -112,7 +112,7 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
                             onPressed: () => _open(LessonRunnerScreen(
                               child: widget.child,
                               kind: LessonKind.pictureToWord,
-                              title: 'مراجعة اليوم',
+                              title: loc('مراجعة اليوم'),
                               contentBuilder: () => QuizContent(reviewSession([
                                 for (final l in _due) if (letterOf(l) != null) letterOf(l)!,
                               ])),
@@ -126,14 +126,14 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
                               ? () => _open(_wordTiles(widget.child, _states, _cfg))
                               : null,
                           icon: const Icon(Icons.extension_rounded),
-                          label: const Text('كوّن كلمات'),
+                          label: Text(loc('كوّن كلمات')),
                         ),
                         OutlinedButton.icon(
                           onPressed: readingOpen
                               ? () => _open(LessonRunnerScreen(
                                     child: widget.child,
                                     kind: LessonKind.wordToPicture,
-                                    title: 'اقرأ وافهم',
+                                    title: loc('اقرأ وافهم'),
                                     contentBuilder: () {
                                       final r = Random();
                                       return QuizContent([
@@ -146,15 +146,15 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
                                   ))
                               : null,
                           icon: const Icon(Icons.menu_book_rounded),
-                          label: const Text('اقرأ وافهم'),
+                          label: Text(loc('اقرأ وافهم')),
                         ),
                       ],
                     ),
                     if (!wordsOpen || !readingOpen)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(top: 8),
                         child: Text(
-                          'تُفتح «كوّن كلمات» بعد تدرّب 3 حروف، و«اقرأ وافهم» بعد 8 حروف (يمكن للأهل تغيير ذلك).',
+                          loc('تُفتح «كوّن كلمات» بعد تدرّب 3 حروف، و«اقرأ وافهم» بعد 8 حروف (يمكن للأهل تغيير ذلك).'),
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 14, color: RC.ink),
                         ),
@@ -173,7 +173,7 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
                               color: unlocked.contains(l.letter) ? _boxColor(_states[l.letter]) : Colors.black12,
                               padding: EdgeInsets.zero,
                               semanticLabel: unlocked.contains(l.letter)
-                                  ? 'حرف ${l.name}${_states[l.letter]?.mastered == true ? '، متقن' : ''}'
+                                  ? 'حرف ${l.name}${_states[l.letter]?.mastered == true ? loc('، متقن') : ''}'
                                   : 'حرف ${l.name}، مقفل',
                               onTap: unlocked.contains(l.letter)
                                   ? () => _open(LetterLessonScreen(child: widget.child, letter: l))
@@ -196,7 +196,7 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    const Text('أبيض: جديد · برتقالي: بداية · أصفر: تتدرّب · أخضر: أتقنته',
+                    Text(loc('أبيض: جديد · برتقالي: بداية · أصفر: تتدرّب · أخضر: أتقنته'),
                         textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: RC.ink)),
                   ],
                 ),
@@ -217,7 +217,7 @@ Widget _wordTiles(ChildProfile child, Map<String, LetterState> states, LiteracyC
   return LessonRunnerScreen(
     child: child,
     kind: LessonKind.wordToPicture,
-    title: 'كوّن الكلمة',
+    title: loc('كوّن الكلمة'),
     customBuilder: (done) => WordTilesView(words: words, onFinished: done),
   );
 }
@@ -290,12 +290,12 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
                         FilledButton.icon(
                           onPressed: () => AppAudio.say(l.name),
                           icon: const Icon(Icons.volume_up_rounded),
-                          label: const Text('اسمع الاسم'),
+                          label: Text(loc('اسمع الاسم')),
                         ),
                         OutlinedButton.icon(
                           onPressed: () => AppAudio.say(l.soundFatha),
                           icon: const Icon(Icons.volume_up_rounded),
-                          label: const Text('اسمع الصوت'),
+                          label: Text(loc('اسمع الصوت')),
                         ),
                       ],
                     ),
@@ -305,10 +305,10 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
                       spacing: 18,
                       runSpacing: 6,
                       children: [
-                        _form('منفصل', l.isolated),
-                        _form('في البداية', l.initial),
-                        _form('في الوسط', l.medial),
-                        _form('في النهاية', l.end),
+                        _form(loc('منفصل'), l.isolated),
+                        _form(loc('في البداية'), l.initial),
+                        _form(loc('في الوسط'), l.medial),
+                        _form(loc('في النهاية'), l.end),
                       ],
                     ),
                   ],
@@ -320,7 +320,7 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('كلمات فيها هذا الحرف',
+                    Text(loc('كلمات فيها هذا الحرف'),
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: RC.ink)),
                     const SizedBox(height: 6),
                     for (final (w, pos) in l.placedWords)
@@ -359,20 +359,20 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
                       MaterialPageRoute(builder: (_) => run('تمرين حرف ${l.name}', () => QuizContent(letterSession(l)))),
                     ),
                     icon: const Icon(Icons.play_arrow_rounded),
-                    label: const Text('تمرين الحرف'),
+                    label: Text(loc('تمرين الحرف')),
                   ),
                   OutlinedButton.icon(
                     onPressed: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => run('المقاطع', () {
+                        builder: (_) => run(loc('المقاطع'), () {
                           final r = Random();
                           return QuizContent([syllableQuestion(l, r), syllableQuestion(l, r), blendQuestion(r)]);
                         }),
                       ),
                     ),
                     icon: const Icon(Icons.record_voice_over_rounded),
-                    label: const Text('المقاطع'),
+                    label: Text(loc('المقاطع')),
                   ),
                   OutlinedButton.icon(
                     onPressed: () {
@@ -384,14 +384,14 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
                           builder: (_) => LessonRunnerScreen(
                             child: widget.child,
                             kind: LessonKind.wordToPicture,
-                            title: 'كوّن الكلمة',
+                            title: loc('كوّن الكلمة'),
                             customBuilder: (done) => WordTilesView(words: words.take(3).toList(), onFinished: done),
                           ),
                         ),
                       );
                     },
                     icon: const Icon(Icons.extension_rounded),
-                    label: const Text('كوّن كلمة'),
+                    label: Text(loc('كوّن كلمة')),
                   ),
                   OutlinedButton.icon(
                     onPressed: () => Navigator.push(
@@ -399,7 +399,7 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
                       MaterialPageRoute(builder: (_) => _TraceScreen(child: widget.child, letter: l)),
                     ),
                     icon: const Icon(Icons.draw_rounded),
-                    label: const Text('تتبّع الحرف'),
+                    label: Text(loc('تتبّع الحرف')),
                   ),
                 ],
               ),

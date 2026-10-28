@@ -12,6 +12,7 @@ import 'kit.dart';
 import 'memory_view.dart';
 import 'quiz_view.dart';
 import 'sequence_view.dart';
+import '../../l10n/strings.dart';
 
 class _Outcome {
   final int stars;
@@ -126,7 +127,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
         leading: IconButton(
-          tooltip: 'إغلاق',
+          tooltip: loc('إغلاق'),
           icon: const Icon(Icons.close_rounded),
           onPressed: () => Navigator.maybePop(context),
         ),
@@ -213,9 +214,9 @@ class _Completion extends StatelessWidget {
               Text('أجبت ${outcome.firstTry} من ${outcome.total} من أول محاولة',
                   style: const TextStyle(fontSize: 18, color: RC.ink)),
               if (outcome.stars < 3)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 6),
-                  child: Text('جرّب مرة أخرى لتحصل على نجوم أكثر!',
+                  child: Text(loc('جرّب مرة أخرى لتحصل على نجوم أكثر!'),
                       style: TextStyle(fontSize: 16, color: RC.ink)),
                 ),
               const SizedBox(height: 12),
@@ -267,7 +268,7 @@ class _Completion extends StatelessWidget {
                     outline: RC.star,
                     child: Column(
                       children: [
-                        const Text('🏠 مهمة مع ماما وبابا',
+                        Text(loc('🏠 مهمة مع ماما وبابا'),
                             style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: RC.ink)),
                         const SizedBox(height: 4),
                         Text(task!.text,
@@ -284,7 +285,7 @@ class _Completion extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: onNext,
                     icon: const Icon(Icons.arrow_back_rounded),
-                    label: const Text('المستوى التالي', style: TextStyle(fontSize: 20)),
+                    label: Text(loc('المستوى التالي'), style: TextStyle(fontSize: 20)),
                   ),
                 ),
               const SizedBox(height: 10),
@@ -293,12 +294,12 @@ class _Completion extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: onAgain,
                   icon: const Icon(Icons.replay_rounded),
-                  label: const Text('العب تاني', style: TextStyle(fontSize: 20)),
+                  label: Text(loc('العب تاني'), style: TextStyle(fontSize: 20)),
                 ),
               ),
               TextButton(
                 onPressed: () => Navigator.maybePop(context),
-                child: const Text('العودة', style: TextStyle(fontSize: 18)),
+                child: Text(loc('العودة'), style: TextStyle(fontSize: 18)),
               ),
             ],
           ),

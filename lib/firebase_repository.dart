@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'teachers_market.dart';
 import 'teachers_models.dart';
+import 'l10n/strings.dart';
 
 /// Firebase implementation. Data lives in three Firestore collections:
 /// users/{uid} (role, name), teachers/{uid} (profile, status) and
@@ -39,16 +40,16 @@ class FirebaseTeacherRepository implements TeacherRepository {
       ((await _userDoc.get()).data()?['name'] as String?) ?? '';
 
   String _authMessage(FirebaseAuthException e) => switch (e.code) {
-        'email-already-in-use' => 'هذا البريد مستخدم بالفعل',
-        'invalid-email' => 'البريد الإلكتروني غير صحيح',
-        'weak-password' => 'كلمة المرور ضعيفة (6 أحرف على الأقل)',
+        'email-already-in-use' => loc('هذا البريد مستخدم بالفعل'),
+        'invalid-email' => loc('البريد الإلكتروني غير صحيح'),
+        'weak-password' => loc('كلمة المرور ضعيفة (6 أحرف على الأقل)'),
         'wrong-password' ||
         'user-not-found' ||
         'invalid-credential' =>
-          'البريد أو كلمة المرور غير صحيحة',
-        'too-many-requests' => 'محاولات كثيرة، حاول لاحقاً',
-        'network-request-failed' => 'لا يوجد اتصال بالإنترنت',
-        _ => 'تعذر إكمال العملية، حاول مرة أخرى',
+          loc('البريد أو كلمة المرور غير صحيحة'),
+        'too-many-requests' => loc('محاولات كثيرة، حاول لاحقاً'),
+        'network-request-failed' => loc('لا يوجد اتصال بالإنترنت'),
+        _ => loc('تعذر إكمال العملية، حاول مرة أخرى'),
       };
 
   Future<T> _guard<T>(Future<T> Function() run) async {
@@ -58,8 +59,8 @@ class FirebaseTeacherRepository implements TeacherRepository {
       throw AccountException(_authMessage(e));
     } on FirebaseException catch (e) {
       throw AccountException(e.code == 'permission-denied'
-          ? 'ليس لديك صلاحية لهذه العملية'
-          : 'تعذر الاتصال بالخادم، حاول مرة أخرى');
+          ? loc('ليس لديك صلاحية لهذه العملية')
+          : loc('تعذر الاتصال بالخادم، حاول مرة أخرى'));
     }
   }
 
@@ -232,7 +233,7 @@ class FirebaseTeacherRepository implements TeacherRepository {
     } on AccountException catch (e) {
       // The slot was taken or changed meanwhile.
       if (e.message == 'ليس لديك صلاحية لهذه العملية') {
-        throw const AccountException('هذا الموعد لم يعد متاحاً، اختر موعداً آخر');
+        throw AccountException(loc('هذا الموعد لم يعد متاحاً، اختر موعداً آخر'));
       }
       rethrow;
     }

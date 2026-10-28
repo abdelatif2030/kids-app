@@ -10,6 +10,7 @@ import 'character_creator.dart';
 import 'creations.dart';
 import 'scene_builder.dart';
 import 'story_pictures.dart';
+import '../l10n/strings.dart';
 
 /// «استوديو الإبداع»: optional, calm making activities.
 class StudioScreen extends StatelessWidget {
@@ -39,7 +40,7 @@ class StudioScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
-        title: const Text('استوديو الإبداع',
+        title: Text(loc('استوديو الإبداع'),
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
       body: PastelBackground(
@@ -48,7 +49,7 @@ class StudioScreen extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                const Text('اصنع ما تحب. كل أعمالك تُحفظ تلقائياً في معرض عائلتك الخاص على هذا الجهاز.',
+                Text(loc('اصنع ما تحب. كل أعمالك تُحفظ تلقائياً في معرض عائلتك الخاص على هذا الجهاز.'),
                     textAlign: TextAlign.center, style: TextStyle(fontSize: 16, color: RC.ink)),
                 const SizedBox(height: 14),
                 Wrap(
@@ -56,17 +57,17 @@ class StudioScreen extends StatelessWidget {
                   runSpacing: 12,
                   alignment: WrapAlignment.center,
                   children: [
-                    tile('🎨', 'رسم وتلوين', RC.pink, () => DrawingScreen(child: child)),
-                    tile('🏞️', 'ابنِ مشهداً', RC.mint, () => SceneBuilderScreen(child: child)),
-                    tile('🧑‍🎨', 'صمّم شخصية', RC.peach, () => CharacterCreatorScreen(child: child)),
-                    tile('📖', 'قصة بالصور', RC.yellow, () => PictureStoryScreen(child: child)),
+                    tile('🎨', loc('رسم وتلوين'), RC.pink, () => DrawingScreen(child: child)),
+                    tile('🏞️', loc('ابنِ مشهداً'), RC.mint, () => SceneBuilderScreen(child: child)),
+                    tile('🧑‍🎨', loc('صمّم شخصية'), RC.peach, () => CharacterCreatorScreen(child: child)),
+                    tile('📖', loc('قصة بالصور'), RC.yellow, () => PictureStoryScreen(child: child)),
                     tile(
                       '↕️',
-                      'رتّب الصور',
+                      loc('رتّب الصور'),
                       RC.sky,
-                      () => LessonRunnerScreen(child: child, kind: LessonKind.sequence, title: 'رتّب الخطوات'),
+                      () => LessonRunnerScreen(child: child, kind: LessonKind.sequence, title: loc('رتّب الخطوات')),
                     ),
-                    tile('🖼️', 'معرض العائلة', RC.lavender, () => ChildGalleryScreen(child: child)),
+                    tile('🖼️', loc('معرض العائلة'), RC.lavender, () => ChildGalleryScreen(child: child)),
                   ],
                 ),
               ],
@@ -116,7 +117,7 @@ class _ChildGalleryScreenState extends State<ChildGalleryScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
-        title: const Text('معرض العائلة',
+        title: Text(loc('معرض العائلة'),
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
       body: PastelBackground(
@@ -124,10 +125,10 @@ class _ChildGalleryScreenState extends State<ChildGalleryScreen> {
           child: items == null
               ? const Center(child: CircularProgressIndicator())
               : items.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Padding(
                         padding: EdgeInsets.all(24),
-                        child: Text('لا توجد أعمال بعد. اصنع رسمة أو مشهداً أو شخصية وستظهر هنا.',
+                        child: Text(loc('لا توجد أعمال بعد. اصنع رسمة أو مشهداً أو شخصية وستظهر هنا.'),
                             textAlign: TextAlign.center, style: TextStyle(fontSize: 18, color: RC.ink)),
                       ),
                     )
@@ -195,11 +196,11 @@ class _ParentGalleryScreenState extends State<ParentGalleryScreen> {
       await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('تأكيد الحذف'),
+          title: Text(loc('تأكيد الحذف')),
           content: Text(text),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء')),
-            FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('حذف')),
+            TextButton(onPressed: () => Navigator.pop(context, false), child: Text(loc('إلغاء'))),
+            FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(loc('حذف'))),
           ],
         ),
       ) ??
@@ -208,17 +209,17 @@ class _ParentGalleryScreenState extends State<ParentGalleryScreen> {
   @override
   Widget build(BuildContext context) {
     final items = _items;
-    String name(String id) => JourneyStore.instance.profileById(id)?.nickname ?? 'طفل محذوف';
+    String name(String id) => JourneyStore.instance.profileById(id)?.nickname ?? loc('طفل محذوف');
     return Scaffold(
       appBar: AppBar(
-        title: const Text('معرض العائلة'),
+        title: Text(loc('معرض العائلة')),
         actions: [
           if (items != null && items.isNotEmpty)
             IconButton(
-              tooltip: 'حذف كل الأعمال',
+              tooltip: loc('حذف كل الأعمال'),
               icon: const Icon(Icons.delete_sweep_rounded),
               onPressed: () async {
-                if (await _confirm('حذف كل الأعمال لكل الأطفال نهائياً؟')) {
+                if (await _confirm(loc('حذف كل الأعمال لكل الأطفال نهائياً؟'))) {
                   await FamilyGallery.deleteEverything();
                   _load();
                 }
@@ -229,14 +230,14 @@ class _ParentGalleryScreenState extends State<ParentGalleryScreen> {
       body: items == null
           ? const Center(child: CircularProgressIndicator())
           : items.isEmpty
-              ? const Center(child: Padding(padding: EdgeInsets.all(24), child: Text('المعرض فارغ.')))
+              ? Center(child: Padding(padding: EdgeInsets.all(24), child: Text(loc('المعرض فارغ.'))))
               : ListView(
                   padding: const EdgeInsets.all(12),
                   children: [
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.all(8),
                       child: Text(
-                        'أعمال أطفالك محفوظة على هذا الجهاز فقط، ولا تُرسل ولا تُنشر. أنت وحدك من يستطيع حذفها.',
+                        loc('أعمال أطفالك محفوظة على هذا الجهاز فقط، ولا تُرسل ولا تُنشر. أنت وحدك من يستطيع حذفها.'),
                         style: TextStyle(fontSize: 14),
                       ),
                     ),
@@ -247,10 +248,10 @@ class _ParentGalleryScreenState extends State<ParentGalleryScreen> {
                           title: Text('${c.kind.label} · ${name(c.childId)}'),
                           subtitle: Text(c.day),
                           trailing: IconButton(
-                            tooltip: 'حذف',
+                            tooltip: loc('حذف'),
                             icon: const Icon(Icons.delete_outline_rounded),
                             onPressed: () async {
-                              if (await _confirm('حذف هذا العمل نهائياً؟')) {
+                              if (await _confirm(loc('حذف هذا العمل نهائياً؟'))) {
                                 await FamilyGallery.delete(c.id);
                                 _load();
                               }

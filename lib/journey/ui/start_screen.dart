@@ -159,12 +159,12 @@ class _Picker extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('رحلتي',
+            Text(loc('رحلتي'),
                 style: TextStyle(fontSize: 44, fontWeight: FontWeight.w900, color: RC.ink)),
             const SizedBox(height: 6),
             Semantics(
               header: true,
-              child: const Text('من سيلعب اليوم؟',
+              child: Text(loc('من سيلعب اليوم؟'),
                   style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: RC.ink)),
             ),
             const SizedBox(height: 20),
@@ -201,14 +201,14 @@ class _Picker extends StatelessWidget {
                   width: 150,
                   child: RCard(
                     color: Colors.white.withAlpha(170),
-                    semanticLabel: 'إضافة طفل (للأهل)',
+                    semanticLabel: loc('إضافة طفل (للأهل)'),
                     onTap: () => _addChild(context),
-                    child: const Column(
+                    child: Column(
                       children: [
                         SizedBox(height: 14),
                         Icon(Icons.add_circle_rounded, size: 58, color: RC.outline),
                         SizedBox(height: 10),
-                        Text('إضافة طفل',
+                        Text(loc('إضافة طفل'),
                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RC.ink)),
                         SizedBox(height: 14),
                       ],

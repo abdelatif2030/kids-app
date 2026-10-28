@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'teachers_models.dart';
+import 'l10n/strings.dart';
 
 /// Size limits so a photo and a CV fit in Firestore (1 MB per document) on the
 /// free Spark plan, where Firebase Storage is not available.
@@ -37,7 +38,7 @@ class DeviceMediaPicker implements MediaPicker {
     if (picked == null) return null;
     final bytes = await picked.readAsBytes();
     if (bytes.length > kMaxPhotoBytes) {
-      throw const AccountException('الصورة كبيرة، اختر صورة أصغر');
+      throw AccountException(loc('الصورة كبيرة، اختر صورة أصغر'));
     }
     return bytes;
   }
@@ -51,7 +52,7 @@ class DeviceMediaPicker implements MediaPicker {
     if (file == null) return null;
     final bytes = await file.readAsBytes();
     if (bytes.length > kMaxCvBytes) {
-      throw const AccountException('ملف السيرة الذاتية كبير (الحد الأقصى 500 كيلوبايت)');
+      throw AccountException(loc('ملف السيرة الذاتية كبير (الحد الأقصى 500 كيلوبايت)'));
     }
     return CvFile(file.name, bytes);
   }

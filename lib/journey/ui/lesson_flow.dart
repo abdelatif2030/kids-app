@@ -8,6 +8,7 @@ import '../lands.dart';
 import '../models.dart';
 import 'kit.dart';
 import 'quiz_view.dart';
+import '../../l10n/strings.dart';
 
 /// Which land's questions fit a video subject (null: no quiz, only the task).
 String? landForSubject(String subject) => switch (subject) {
@@ -85,14 +86,14 @@ class _LessonFlowScreenState extends State<LessonFlowScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final steps = _questions.isEmpty ? const ['طبّق'] : const ['جرّب', 'طبّق'];
+    final steps = _questions.isEmpty ? [loc('طبّق')] : [loc('جرّب'), loc('طبّق')];
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
-        title: const Text('درس الفيديو', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
+        title: Text(loc('درس الفيديو'), style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
         leading: IconButton(
-          tooltip: 'إغلاق',
+          tooltip: loc('إغلاق'),
           icon: const Icon(Icons.close_rounded),
           onPressed: () => Navigator.maybePop(context),
         ),
@@ -107,7 +108,7 @@ class _LessonFlowScreenState extends State<LessonFlowScreen> {
                   alignment: WrapAlignment.center,
                   spacing: 8,
                   children: [
-                    const Chip(label: Text('✅ شاهدت')),
+                    Chip(label: Text(loc('✅ شاهدت'))),
                     for (var i = 0; i < steps.length; i++)
                       Chip(
                         backgroundColor: (_questions.isEmpty ? _step == 1 : i == _step) ? RC.yellow : null,
@@ -155,14 +156,14 @@ class _Apply extends StatelessWidget {
                 outline: RC.star,
                 child: Column(
                   children: [
-                    const Text('🏠 طبّق مع ماما وبابا',
+                    Text(loc('🏠 طبّق مع ماما وبابا'),
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: RC.ink)),
                     const SizedBox(height: 8),
                     Text(task?.text ?? '...',
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontSize: 19, height: 1.6, color: RC.ink)),
                     const SizedBox(height: 8),
-                    const Text('بعد أن تفعلها، ليضغط أحد الوالدين «تم» في إعدادات الوالدين.',
+                    Text(loc('بعد أن تفعلها، ليضغط أحد الوالدين «تم» في إعدادات الوالدين.'),
                         textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: RC.ink)),
                   ],
                 ),
@@ -172,7 +173,7 @@ class _Apply extends StatelessWidget {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: () => Navigator.maybePop(context),
-                  child: const Text('تم، رجوع', style: TextStyle(fontSize: 20)),
+                  child: Text(loc('تم، رجوع'), style: TextStyle(fontSize: 20)),
                 ),
               ),
             ],

@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'curriculum.dart';
 import 'watch_history.dart';
+import 'l10n/strings.dart';
 
 /// A parent's note about the child (e.g. "struggles with the letter ع").
 /// Stored only on this device.
@@ -80,17 +81,17 @@ class _NotesScreenState extends State<NotesScreen> {
   Widget build(BuildContext context) {
     final notes = _notes;
     return Scaffold(
-      appBar: AppBar(title: const Text('ملاحظات')),
+      appBar: AppBar(title: Text(loc('ملاحظات'))),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: notes == null ? null : _add,
         icon: const Icon(Icons.add),
-        label: const Text('ملاحظة جديدة', style: TextStyle(fontSize: 18)),
+        label: Text(loc('ملاحظة جديدة'), style: TextStyle(fontSize: 18)),
       ),
       body: notes == null
           ? const Center(child: CircularProgressIndicator())
           : notes.isEmpty
-              ? const Center(
-                  child: Text('لا توجد ملاحظات بعد', style: TextStyle(fontSize: 20)),
+              ? Center(
+                  child: Text(loc('لا توجد ملاحظات بعد'), style: TextStyle(fontSize: 20)),
                 )
               : ListView.builder(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
@@ -105,7 +106,7 @@ class _NotesScreenState extends State<NotesScreen> {
                           subject == null ? n.day : '${n.day} · ${subject.label}',
                         ),
                         trailing: IconButton(
-                          tooltip: 'حذف',
+                          tooltip: loc('حذف'),
                           icon: const Icon(Icons.delete_outline),
                           onPressed: () => _delete(i),
                         ),
@@ -146,7 +147,7 @@ class _NoteDialogState extends State<_NoteDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('ملاحظة جديدة'),
+      title: Text(loc('ملاحظة جديدة')),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -155,15 +156,15 @@ class _NoteDialogState extends State<_NoteDialog> {
               controller: _text,
               autofocus: true,
               maxLines: 4,
-              decoration: const InputDecoration(hintText: 'اكتب ملاحظتك'),
+              decoration: InputDecoration(hintText: loc('اكتب ملاحظتك')),
             ),
             const SizedBox(height: 12),
             DropdownButton<String?>(
               isExpanded: true,
               value: _subject,
-              hint: const Text('المادة (اختياري)'),
+              hint: Text(loc('المادة (اختياري)')),
               items: [
-                const DropdownMenuItem<String?>(value: null, child: Text('بدون مادة')),
+                DropdownMenuItem<String?>(value: null, child: Text(loc('بدون مادة'))),
                 for (final s in kSubjects)
                   DropdownMenuItem<String?>(value: s.id, child: Text(s.label)),
               ],
@@ -173,8 +174,8 @@ class _NoteDialogState extends State<_NoteDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('إلغاء')),
-        FilledButton(onPressed: _save, child: const Text('حفظ')),
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(loc('إلغاء'))),
+        FilledButton(onPressed: _save, child: Text(loc('حفظ'))),
       ],
     );
   }

@@ -18,6 +18,7 @@ import 'player_screen.dart';
 import 'rest_screen.dart';
 import 'session_manager.dart';
 import 'ui.dart';
+import 'l10n/strings.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +37,7 @@ class KidsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'تطبيق الأطفال',
+      title: loc('تطبيق الأطفال'),
       theme: ThemeData(
         colorSchemeSeed: DS.primary,
         useMaterial3: true,
@@ -293,11 +294,11 @@ class _VideoListScreenState extends State<VideoListScreen> {
           if (left == null || left <= 0 || left > 120) {
             return const SizedBox.shrink();
           }
-          return const SafeArea(
+          return SafeArea(
             child: Padding(
               padding: EdgeInsets.all(12),
               child: Text(
-                'سينتهي الوقت قريباً',
+                loc('سينتهي الوقت قريباً'),
                 textAlign: TextAlign.center,
                 textDirection: TextDirection.rtl,
                 style: TextStyle(fontSize: 20),
@@ -310,8 +311,8 @@ class _VideoListScreenState extends State<VideoListScreen> {
         future: loadVideos(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return const Center(
-              child: Text('تعذر تحميل الفيديوهات', style: TextStyle(fontSize: 24)),
+            return Center(
+              child: Text(loc('تعذر تحميل الفيديوهات'), style: TextStyle(fontSize: 24)),
             );
           }
           if (!snapshot.hasData) {
@@ -324,7 +325,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
           if (list.isEmpty) {
             return Center(
               child: Text(
-                subject == null ? 'لا توجد فيديوهات لهذا العمر' : 'لا توجد دروس بعد لهذه المادة',
+                subject == null ? loc('لا توجد فيديوهات لهذا العمر') : loc('لا توجد دروس بعد لهذه المادة'),
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 24),
               ),
@@ -356,8 +357,8 @@ class _VideoListScreenState extends State<VideoListScreen> {
                     ),
                     onPressed: plan.isEmpty ? null : () => _runPlan(plan),
                     icon: const Icon(Icons.star_rounded, size: 36),
-                    label: const Text(
-                      'خطة اليوم',
+                    label: Text(
+                      loc('خطة اليوم'),
                       style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
                     ),
                   ),

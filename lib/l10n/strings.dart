@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'app_locale.dart';
+import 'en_dictionary.dart';
 import 'strings_home.dart';
 import 'strings_letters.dart';
 import 'strings_onboarding.dart';
@@ -70,3 +71,13 @@ extension TrContext on BuildContext {
   /// Rebuilds are driven by `MaterialApp` listening to `AppLocale`.
   String tr(String key) => trKey(key);
 }
+
+/// Translates a static Arabic source text. Arabic stays as written; English
+/// looks the text up in the dictionary and falls back to the Arabic text.
+String loc(String ar) {
+  if (AppLocale.instance.isArabic) return ar;
+  return kEnglish[ar] ?? ar;
+}
+
+/// Inline pair for texts with values already interpolated in both languages.
+String tr2(String ar, String en) => AppLocale.instance.isArabic ? ar : en;

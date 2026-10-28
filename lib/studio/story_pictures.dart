@@ -6,6 +6,7 @@ import '../library/vocab.dart';
 import '../media/audio.dart';
 import 'autosave.dart';
 import 'creations.dart';
+import '../l10n/strings.dart';
 
 const _prompts = [
   ('البداية', 'من هو بطل القصة؟ وأين هو؟'),
@@ -53,7 +54,7 @@ class _PictureStoryScreenState extends State<PictureStoryScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
-        title: const Text('احكِ قصة بالصور',
+        title: Text(loc('احكِ قصة بالصور'),
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
       body: PastelBackground(
@@ -61,7 +62,7 @@ class _PictureStoryScreenState extends State<PictureStoryScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              Text(ready ? 'احكِ قصتك لماما أو بابا بالترتيب' : 'اختر 3 صور لقصتك (${_pics.length} من 3)',
+              Text(ready ? loc('احكِ قصتك لماما أو بابا بالترتيب') : 'اختر 3 صور لقصتك (${_pics.length} من 3)',
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: RC.ink)),
               const SizedBox(height: 10),
@@ -99,9 +100,9 @@ class _PictureStoryScreenState extends State<PictureStoryScreen> {
                 ],
               ),
               if (_pics.isNotEmpty && !ready)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 6),
-                  child: Text('اضغط على صورة لتزيلها', textAlign: TextAlign.center, style: TextStyle(color: RC.ink)),
+                  child: Text(loc('اضغط على صورة لتزيلها'), textAlign: TextAlign.center, style: TextStyle(color: RC.ink)),
                 ),
               if (ready) ...[
                 const SizedBox(height: 12),
@@ -115,18 +116,18 @@ class _PictureStoryScreenState extends State<PictureStoryScreen> {
                       TextButton.icon(
                         onPressed: () => AppAudio.say('${_prompts[_step].$1}. ${_prompts[_step].$2}'),
                         icon: const Icon(Icons.volume_up_rounded),
-                        label: const Text('استمع'),
+                        label: Text(loc('استمع')),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           TextButton(
                             onPressed: _step == 0 ? null : () => setState(() => _step--),
-                            child: const Text('السابق'),
+                            child: Text(loc('السابق')),
                           ),
                           TextButton(
                             onPressed: _step == 2 ? null : () => setState(() => _step++),
-                            child: const Text('التالي'),
+                            child: Text(loc('التالي')),
                           ),
                         ],
                       ),
@@ -134,14 +135,14 @@ class _PictureStoryScreenState extends State<PictureStoryScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(_save.saved ? 'حُفظت قصتك في معرض العائلة ✓' : '',
+                Text(_save.saved ? loc('حُفظت قصتك في معرض العائلة ✓') : '',
                     textAlign: TextAlign.center, style: const TextStyle(color: RC.ink)),
                 TextButton(
                   onPressed: () => setState(() {
                     _pics.clear();
                     _step = 0;
                   }),
-                  child: const Text('قصة جديدة'),
+                  child: Text(loc('قصة جديدة')),
                 ),
               ] else ...[
                 const SizedBox(height: 10),

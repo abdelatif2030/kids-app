@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'ui.dart';
+import 'l10n/strings.dart';
 
 /// لعبة الذاكرة: اقلب كرتين وافتكر الأزواج المتشابهة. مفيش غلط ومفيش خسارة.
 class MemoryGame extends StatefulWidget {
@@ -73,7 +74,7 @@ class _MemoryGameState extends State<MemoryGame> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: const Text('لعبة الذاكرة', style: TextStyle(fontSize: 26)),
+        title: Text(loc('لعبة الذاكرة'), style: TextStyle(fontSize: 26)),
       ),
       body: Center(
         child: done
@@ -82,12 +83,12 @@ class _MemoryGameState extends State<MemoryGame> {
                 children: [
                   const Icon(Icons.star_rounded, size: 120, color: Colors.amber),
                   const SizedBox(height: 16),
-                  const Text('أحسنت!',
+                  Text(loc('أحسنت!'),
                       style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 24),
                   FilledButton(
                     onPressed: () => setState(_newGame),
-                    child: const Text('العب تاني', style: TextStyle(fontSize: 24)),
+                    child: Text(loc('العب تاني'), style: TextStyle(fontSize: 24)),
                   ),
                 ],
               )

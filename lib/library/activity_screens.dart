@@ -5,6 +5,7 @@ import '../journey/models.dart';
 import '../journey/ui/kit.dart';
 import 'activities.dart';
 import 'learning_records.dart';
+import '../l10n/strings.dart';
 
 /// Offline activities to do together. Completion is a parent's confirmation:
 /// one tap, no photo, no recording, no typing.
@@ -51,7 +52,7 @@ class _ActivityLibraryScreenState extends State<ActivityLibraryScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
-        title: const Text('أنشطة مع الأهل',
+        title: Text(loc('أنشطة مع الأهل'),
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
       body: PastelBackground(
@@ -59,10 +60,10 @@ class _ActivityLibraryScreenState extends State<ActivityLibraryScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              const RCard(
+              RCard(
                 color: Color(0xFFFFF3C4),
                 child: Text(
-                  'أنشطة حقيقية بعيدة عن الشاشة، يقوم بها الطفل مع أحد الكبار. بعد النشاط يضغط الكبير «تمّ». لا حاجة لصور أو تسجيلات.',
+                  loc('أنشطة حقيقية بعيدة عن الشاشة، يقوم بها الطفل مع أحد الكبار. بعد النشاط يضغط الكبير «تمّ». لا حاجة لصور أو تسجيلات.'),
                   style: TextStyle(fontSize: 15, color: RC.ink),
                 ),
               ),
@@ -71,7 +72,7 @@ class _ActivityLibraryScreenState extends State<ActivityLibraryScreen> {
                 spacing: 8,
                 runSpacing: 4,
                 children: [
-                  ChoiceChip(label: const Text('الكل'), selected: _skill == null, onSelected: (_) => setState(() => _skill = null)),
+                  ChoiceChip(label: Text(loc('الكل')), selected: _skill == null, onSelected: (_) => setState(() => _skill = null)),
                   for (final s in kSkillFilters)
                     ChoiceChip(label: Text(s), selected: _skill == s, onSelected: (v) => setState(() => _skill = v ? s : null)),
                 ],
@@ -82,13 +83,13 @@ class _ActivityLibraryScreenState extends State<ActivityLibraryScreen> {
                   dense: true,
                   value: _allAges,
                   onChanged: (v) => setState(() => _allAges = v ?? false),
-                  title: const Text('إظهار أنشطة كل الأعمار'),
+                  title: Text(loc('إظهار أنشطة كل الأعمار')),
                 ),
               ),
               if (list.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(24),
-                  child: Text('لا توجد أنشطة لهذا الاختيار.', textAlign: TextAlign.center),
+                  child: Text(loc('لا توجد أنشطة لهذا الاختيار.'), textAlign: TextAlign.center),
                 ),
               for (final a in list)
                 Padding(
@@ -106,13 +107,13 @@ class _ActivityLibraryScreenState extends State<ActivityLibraryScreen> {
                         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
                         expandedCrossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('للطفل', style: TextStyle(fontWeight: FontWeight.w900, color: RC.pinkDeep)),
+                          Text(loc('للطفل'), style: TextStyle(fontWeight: FontWeight.w900, color: RC.pinkDeep)),
                           Text(a.forChild, style: const TextStyle(fontSize: 16, color: RC.ink)),
                           const SizedBox(height: 8),
-                          const Text('للوالد', style: TextStyle(fontWeight: FontWeight.w900, color: RC.pinkDeep)),
+                          Text(loc('للوالد'), style: TextStyle(fontWeight: FontWeight.w900, color: RC.pinkDeep)),
                           Text(a.forParent, style: const TextStyle(fontSize: 15, color: RC.ink)),
                           const SizedBox(height: 8),
-                          Text('المواد: ${a.materials.isEmpty ? 'لا شيء' : a.materials.join('، ')}',
+                          Text('المواد: ${a.materials.isEmpty ? loc('لا شيء') : a.materials.join(loc('، '))}',
                               style: const TextStyle(fontSize: 14, color: RC.ink)),
                           if (a.safety != null)
                             Padding(
@@ -132,11 +133,11 @@ class _ActivityLibraryScreenState extends State<ActivityLibraryScreen> {
                           Align(
                             alignment: AlignmentDirectional.centerStart,
                             child: _done.contains(a.title)
-                                ? const Text('تمّ هذا الأسبوع ✓', style: TextStyle(color: RC.good, fontWeight: FontWeight.bold))
+                                ? Text(loc('تمّ هذا الأسبوع ✓'), style: TextStyle(color: RC.good, fontWeight: FontWeight.bold))
                                 : FilledButton.icon(
                                     onPressed: () => _mark(a),
                                     icon: const Icon(Icons.check_rounded),
-                                    label: const Text('تمّ (يؤكدها الكبير)'),
+                                    label: Text(loc('تمّ (يؤكدها الكبير)')),
                                   ),
                           ),
                         ],

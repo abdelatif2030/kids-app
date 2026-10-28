@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'teachers_market.dart';
+import 'l10n/strings.dart';
 
 enum UserRole { parent, teacher }
 
@@ -55,8 +56,8 @@ const formatInPerson = 'in_person';
 const classIndividual = 'individual';
 const classSmallGroup = 'small_group';
 
-String formatLabel(String f) => f == formatOnline ? 'أونلاين' : 'حضوري';
-String classTypeLabel(String c) => c == classIndividual ? 'فردية' : 'مجموعة صغيرة';
+String formatLabel(String f) => f == formatOnline ? loc('أونلاين') : loc('حضوري');
+String classTypeLabel(String c) => c == classIndividual ? loc('فردية') : loc('مجموعة صغيرة');
 
 /// What each verification badge means. A badge is shown only when the app owner
 /// set it after checking; a teacher can never set or keep one by editing their
@@ -245,18 +246,18 @@ class ProfileCompleteness {
 
 ProfileCompleteness profileCompleteness(TeacherProfile p) {
   final checks = <String, bool>{
-    'صورة شخصية': p.photoB64 != null,
-    'عنوان قصير يصف ما تقدمه': p.headline.trim().length >= 10,
-    'نبذة (80 حرفاً على الأقل)': p.bio.trim().length >= 80,
-    'المواد': p.subjects.isNotEmpty,
-    'الفئة العمرية': p.ageMin != null && p.ageMax != null,
-    'السعر': p.priceEgp != null || p.priceNote.trim().isNotEmpty,
-    'مدة الحصة': p.lessonMinutes != null,
-    'سنوات الخبرة': p.experienceYears != null,
-    'المؤهلات': p.qualifications.trim().isNotEmpty,
-    'طريقة التدريس (أونلاين/حضوري)': p.formats.isNotEmpty,
-    'سياسة الإلغاء': p.cancellationPolicy.trim().isNotEmpty,
-    'اللغات': p.languages.isNotEmpty,
+    loc('صورة شخصية'): p.photoB64 != null,
+    loc('عنوان قصير يصف ما تقدمه'): p.headline.trim().length >= 10,
+    loc('نبذة (80 حرفاً على الأقل)'): p.bio.trim().length >= 80,
+    loc('المواد'): p.subjects.isNotEmpty,
+    loc('الفئة العمرية'): p.ageMin != null && p.ageMax != null,
+    loc('السعر'): p.priceEgp != null || p.priceNote.trim().isNotEmpty,
+    loc('مدة الحصة'): p.lessonMinutes != null,
+    loc('سنوات الخبرة'): p.experienceYears != null,
+    loc('المؤهلات'): p.qualifications.trim().isNotEmpty,
+    loc('طريقة التدريس (أونلاين/حضوري)'): p.formats.isNotEmpty,
+    loc('سياسة الإلغاء'): p.cancellationPolicy.trim().isNotEmpty,
+    loc('اللغات'): p.languages.isNotEmpty,
   };
   return ProfileCompleteness(
     [for (final e in checks.entries) if (e.value) e.key],
@@ -268,12 +269,12 @@ enum TeacherSort { relevance, priceLow, priceHigh, experience, rating, earliest 
 
 extension TeacherSortText on TeacherSort {
   String get label => switch (this) {
-        TeacherSort.relevance => 'الأنسب (الملفات الأكثر اكتمالاً أولاً)',
-        TeacherSort.priceLow => 'السعر: الأقل أولاً',
-        TeacherSort.priceHigh => 'السعر: الأعلى أولاً',
-        TeacherSort.experience => 'الأكثر خبرة',
-        TeacherSort.rating => 'الأعلى تقييماً (من تقييمات حقيقية)',
-        TeacherSort.earliest => 'أقرب موعد متاح',
+        TeacherSort.relevance => loc('الأنسب (الملفات الأكثر اكتمالاً أولاً)'),
+        TeacherSort.priceLow => loc('السعر: الأقل أولاً'),
+        TeacherSort.priceHigh => loc('السعر: الأعلى أولاً'),
+        TeacherSort.experience => loc('الأكثر خبرة'),
+        TeacherSort.rating => loc('الأعلى تقييماً (من تقييمات حقيقية)'),
+        TeacherSort.earliest => loc('أقرب موعد متاح'),
       };
 }
 
@@ -360,9 +361,9 @@ const Object _keep = Object();
 
 String _plain(String s) => s
     .replaceAll(RegExp('[\u064B-\u0652\u0670]'), '')
-    .replaceAll(RegExp('[أإآٱ]'), 'ا')
-    .replaceAll('ة', 'ه')
-    .replaceAll('ى', 'ي')
+    .replaceAll(RegExp(loc('[أإآٱ]')), loc('ا'))
+    .replaceAll(loc('ة'), loc('ه'))
+    .replaceAll(loc('ى'), loc('ي'))
     .toLowerCase();
 
 bool teacherMatches(TeacherProfile t, TeacherFilters f, String Function(String subjectId) subjectLabel) {

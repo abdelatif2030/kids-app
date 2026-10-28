@@ -6,6 +6,7 @@ import '../models.dart';
 import '../repository.dart';
 import 'kit.dart';
 import 'onboarding.dart';
+import '../../l10n/strings.dart';
 
 /// A child profile being edited (before it is saved).
 class ProfileDraft {
@@ -86,9 +87,9 @@ class _BasicsFormState extends State<BasicsForm> {
           controller: _name,
           maxLength: 20,
           textInputAction: TextInputAction.done,
-          decoration: const InputDecoration(
-            labelText: 'اسم الطفل أو لقبه',
-            helperText: 'يكفي لقب لطيف، لا تكتب الاسم الكامل',
+          decoration: InputDecoration(
+            labelText: loc('اسم الطفل أو لقبه'),
+            helperText: loc('يكفي لقب لطيف، لا تكتب الاسم الكامل'),
             filled: true,
             fillColor: Colors.white,
           ),
@@ -98,7 +99,7 @@ class _BasicsFormState extends State<BasicsForm> {
           },
         ),
         const SizedBox(height: 12),
-        const Text('العمر', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RC.ink)),
+        Text(loc('العمر'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RC.ink)),
         const SizedBox(height: 6),
         Wrap(
           spacing: 8,
@@ -115,7 +116,7 @@ class _BasicsFormState extends State<BasicsForm> {
         ],
         if (first && second) const SizedBox(height: 16),
         if (second) ...[
-        const Text('ماذا تريد أن يتعلم طفلك؟',
+        Text(loc('ماذا تريد أن يتعلم طفلك؟'),
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RC.ink)),
         const SizedBox(height: 6),
         Wrap(
@@ -131,7 +132,7 @@ class _BasicsFormState extends State<BasicsForm> {
           ],
         ),
         const SizedBox(height: 16),
-        const Text('ما الذي يحبه؟',
+        Text(loc('ما الذي يحبه؟'),
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RC.ink)),
         const SizedBox(height: 6),
         Wrap(
@@ -202,9 +203,9 @@ class _PlanEditorState extends State<PlanEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('الأراضي والترتيب',
+        Text(loc('الأراضي والترتيب'),
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RC.ink)),
-        const Text('الأعلى يأتي أولاً. أزل العلامة عن الأرض لإخفائها من خطة اليوم.',
+        Text(loc('الأعلى يأتي أولاً. أزل العلامة عن الأرض لإخفائها من خطة اليوم.'),
             style: TextStyle(fontSize: 14, color: RC.ink)),
         const SizedBox(height: 8),
         for (var i = 0; i < _order.length; i++)
@@ -232,12 +233,12 @@ class _PlanEditorState extends State<PlanEditor> {
                         )),
                   ),
                   IconButton(
-                    tooltip: 'أعلى',
+                    tooltip: loc('أعلى'),
                     onPressed: i == 0 ? null : () => _move(i, -1),
                     icon: const Icon(Icons.keyboard_arrow_up_rounded),
                   ),
                   IconButton(
-                    tooltip: 'أسفل',
+                    tooltip: loc('أسفل'),
                     onPressed: i == _order.length - 1 ? null : () => _move(i, 1),
                     icon: const Icon(Icons.keyboard_arrow_down_rounded),
                   ),
@@ -246,7 +247,7 @@ class _PlanEditorState extends State<PlanEditor> {
             );
           }),
         const SizedBox(height: 16),
-        const Text('أنشطة مغامرة اليوم',
+        Text(loc('أنشطة مغامرة اليوم'),
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RC.ink)),
         const SizedBox(height: 6),
         SegmentedButton<int>(
@@ -261,14 +262,14 @@ class _PlanEditorState extends State<PlanEditor> {
         Text('كل نشاط يستغرق نحو ${minutesFor(d.age)} دقائق لهذا العمر.',
             style: const TextStyle(fontSize: 14, color: RC.ink)),
         const SizedBox(height: 16),
-        const Text('مستوى الصعوبة',
+        Text(loc('مستوى الصعوبة'),
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RC.ink)),
         const SizedBox(height: 6),
         SegmentedButton<int>(
-          segments: const [
-            ButtonSegment(value: -1, label: Text('أسهل')),
-            ButtonSegment(value: 0, label: Text('عادي')),
-            ButtonSegment(value: 1, label: Text('أصعب')),
+          segments: [
+            ButtonSegment(value: -1, label: Text(loc('أسهل'))),
+            ButtonSegment(value: 0, label: Text(loc('عادي'))),
+            ButtonSegment(value: 1, label: Text(loc('أصعب'))),
           ],
           selected: {d.bias},
           onSelectionChanged: (s) {
@@ -293,17 +294,17 @@ class ChildrenScreen extends StatelessWidget {
       builder: (context, _) {
         final store = JourneyStore.instance;
         return Scaffold(
-          appBar: AppBar(title: const Text('الأطفال')),
+          appBar: AppBar(title: Text(loc('الأطفال'))),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const OnboardingFlow()),
             ),
             icon: const Icon(Icons.person_add_alt_1_rounded),
-            label: const Text('إضافة طفل', style: TextStyle(fontSize: 18)),
+            label: Text(loc('إضافة طفل'), style: TextStyle(fontSize: 18)),
           ),
           body: store.profiles.isEmpty
-              ? const Center(child: Text('لا يوجد أطفال بعد', style: TextStyle(fontSize: 20)))
+              ? Center(child: Text(loc('لا يوجد أطفال بعد'), style: TextStyle(fontSize: 20)))
               : ListView(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
                   children: [
@@ -344,7 +345,7 @@ class _ChildEditScreenState extends State<ChildEditScreen> {
 
   Future<void> _save() async {
     if (_draft.nickname.trim().isEmpty) {
-      setState(() => _error = 'اكتب اسماً أو لقباً للطفل');
+      setState(() => _error = loc('اكتب اسماً أو لقباً للطفل'));
       return;
     }
     await JourneyStore.instance
@@ -356,11 +357,11 @@ class _ChildEditScreenState extends State<ChildEditScreen> {
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('حذف الطفل؟'),
+        title: Text(loc('حذف الطفل؟')),
         content: Text('سيُحذف ملف «${widget.child.nickname}» وكل تقدمه من هذا الجهاز نهائياً.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('إلغاء')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('حذف')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(loc('إلغاء'))),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(loc('حذف'))),
         ],
       ),
     );
@@ -385,12 +386,12 @@ class _ChildEditScreenState extends State<ChildEditScreen> {
               child: Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 16)),
             ),
           const SizedBox(height: 16),
-          FilledButton(onPressed: _save, child: const Text('حفظ')),
+          FilledButton(onPressed: _save, child: Text(loc('حفظ'))),
           const SizedBox(height: 8),
           TextButton.icon(
             onPressed: _delete,
             icon: const Icon(Icons.delete_outline_rounded),
-            label: const Text('حذف هذا الطفل وتقدمه'),
+            label: Text(loc('حذف هذا الطفل وتقدمه')),
           ),
         ],
       ),

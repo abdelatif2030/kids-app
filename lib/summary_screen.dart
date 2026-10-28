@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'watch_history.dart';
+import 'l10n/strings.dart';
 
 const _weekdays = ['الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد'];
 
 String _minutes(int seconds) {
   final m = (seconds / 60).round();
-  return m < 1 ? 'أقل من دقيقة' : '$m دقيقة';
+  return m < 1 ? loc('أقل من دقيقة') : '$m دقيقة';
 }
 
 /// Parent-only: what was watched and for how long, per day, for the last 7 days.
@@ -16,7 +17,7 @@ class WatchSummaryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('ملخص المشاهدة')),
+      appBar: AppBar(title: Text(loc('ملخص المشاهدة'))),
       body: FutureBuilder<List<WatchEntry>>(
         future: WatchHistory.load(),
         builder: (context, snapshot) {
@@ -36,7 +37,7 @@ class WatchSummaryScreen extends StatelessWidget {
             children: [
               Card(
                 child: ListTile(
-                  title: const Text('مجموع آخر 7 أيام', style: TextStyle(fontSize: 20)),
+                  title: Text(loc('مجموع آخر 7 أيام'), style: TextStyle(fontSize: 20)),
                   trailing: Text(
                     _minutes(weekTotal),
                     style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -44,10 +45,10 @@ class WatchSummaryScreen extends StatelessWidget {
                 ),
               ),
               for (final day in days) _DaySection(day: day, today: today, entries: entries),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(top: 16),
                 child: Text(
-                  'تُحفظ هذه البيانات على هذا الجهاز فقط.',
+                  loc('تُحفظ هذه البيانات على هذا الجهاز فقط.'),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -80,7 +81,7 @@ class _DaySection extends StatelessWidget {
     }
     final total = perVideo.values.fold<int>(0, (sum, v) => sum + v.seconds);
     final name = key == WatchHistory.dayKey(today)
-        ? 'اليوم'
+        ? loc('اليوم')
         : '${_weekdays[day.weekday - 1]} ${day.day}/${day.month}';
 
     return Padding(
@@ -99,9 +100,9 @@ class _DaySection extends StatelessWidget {
             ],
           ),
           if (perVideo.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 8),
-              child: Text('لا توجد مشاهدة'),
+              child: Text(loc('لا توجد مشاهدة')),
             ),
           for (final v in perVideo.values)
             ListTile(

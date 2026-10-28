@@ -20,6 +20,7 @@ import 'stories/story_store.dart';
 import 'summary_screen.dart';
 import 'ui.dart';
 import 'watch_history.dart';
+import 'l10n/strings.dart';
 
 const _dayShort = [
   'الاثنين',
@@ -90,7 +91,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('لوحة متابعة الطفل')),
+      appBar: AppBar(title: Text(loc('لوحة متابعة الطفل'))),
       body: FutureBuilder<_Data>(
         future: _data,
         builder: (context, snapshot) {
@@ -204,16 +205,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ScaffoldMessenger.of(context)
                         ..hideCurrentSnackBar()
                         ..showSnackBar(
-                          const SnackBar(
+                          SnackBar(
                             content: Text(
-                              'تم نسخ التقرير. الصقه في واتساب أو أي تطبيق.',
+                              loc('تم نسخ التقرير. الصقه في واتساب أو أي تطبيق.'),
                             ),
                           ),
                         );
                     }
                   },
                   icon: const Icon(Icons.copy_rounded),
-                  label: const Text('نسخ التقرير'),
+                  label: Text(loc('نسخ التقرير')),
                 ),
                 OutlinedButton.icon(
                   onPressed: () => Navigator.push(
@@ -221,7 +222,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     MaterialPageRoute(builder: (_) => const PlanScreen()),
                   ),
                   icon: const Icon(Icons.checklist_rounded),
-                  label: const Text('الخطة الأسبوعية'),
+                  label: Text(loc('الخطة الأسبوعية')),
                 ),
                 OutlinedButton.icon(
                   onPressed: () => Navigator.push(
@@ -231,14 +232,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   icon: const Icon(Icons.bar_chart),
-                  label: const Text('تفاصيل المشاهدة'),
+                  label: Text(loc('تفاصيل المشاهدة')),
                 ),
               ],
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(top: 16),
               child: Text(
-                'تُحفظ هذه البيانات على هذا الجهاز فقط ولا تُرسل إلى أي مكان.',
+                loc('تُحفظ هذه البيانات على هذا الجهاز فقط ولا تُرسل إلى أي مكان.'),
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 13),
               ),
@@ -284,7 +285,7 @@ class _WeekBar extends StatelessWidget {
     return Row(
       children: [
         IconButton(
-          tooltip: 'الأسبوع السابق',
+          tooltip: loc('الأسبوع السابق'),
           onPressed: onPrev,
           icon: const Icon(Icons.chevron_right_rounded, size: 32),
         ),
@@ -296,7 +297,7 @@ class _WeekBar extends StatelessWidget {
           ),
         ),
         IconButton(
-          tooltip: 'الأسبوع التالي',
+          tooltip: loc('الأسبوع التالي'),
           onPressed: onNext,
           icon: const Icon(Icons.chevron_left_rounded, size: 32),
         ),
@@ -314,7 +315,7 @@ class _Hero extends StatelessWidget {
     final r = report;
     final text = r.hasActivity
         ? 'أكمل ${r.videosFinished} دروس، وتدرّب في ${r.gameRounds} جولة'
-        : 'لا توجد نشاطات في هذا الأسبوع';
+        : loc('لا توجد نشاطات في هذا الأسبوع');
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -333,8 +334,8 @@ class _Hero extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'تقرير الأسبوع',
+                Text(
+                  loc('تقرير الأسبوع'),
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -415,25 +416,25 @@ class _Stats extends StatelessWidget {
         icon: Icons.schedule_rounded,
         color: const Color(0xFF5C6BC0),
         value: formatDuration(r.secondsInApp),
-        label: 'الوقت في التعلم',
+        label: loc('الوقت في التعلم'),
       ),
       _StatCard(
         icon: Icons.play_circle_rounded,
         color: const Color(0xFF43A047),
         value: '${r.videosFinished}',
-        label: 'دروس مكتملة',
+        label: loc('دروس مكتملة'),
       ),
       _StatCard(
         icon: Icons.extension_rounded,
         color: const Color(0xFFFB8C00),
         value: '${r.gameRounds}',
-        label: 'جولات ألعاب',
+        label: loc('جولات ألعاب'),
       ),
       _StatCard(
         icon: Icons.event_available_rounded,
         color: const Color(0xFFE53935),
         value: '${r.activeDays} / 7',
-        label: 'أيام النشاط',
+        label: loc('أيام النشاط'),
       ),
     ];
     return Column(
@@ -495,7 +496,7 @@ class _DaysChart extends StatelessWidget {
     final values = report.secondsPerDay;
     final maxV = values.fold<int>(0, (m, v) => v > m ? v : m);
     return _Section(
-      title: 'الوقت يوماً بيوم',
+      title: loc('الوقت يوماً بيوم'),
       child: SizedBox(
         height: 150,
         child: Row(
@@ -582,7 +583,7 @@ class _Skills extends StatelessWidget {
                         Text(
                           s.missed.isEmpty
                               ? s.skill.label
-                              : '${s.skill.label} (يخطئ في: ${s.missed.join('، ')})',
+                              : '${s.skill.label} (يخطئ في: ${s.missed.join(loc('، '))})',
                         ),
                         Text(
                           s.level == SkillLevel.mastered
@@ -624,28 +625,28 @@ class _Skills extends StatelessWidget {
   Widget build(BuildContext context) {
     final r = report;
     return _Section(
-      title: 'خريطة المهارات',
+      title: loc('خريطة المهارات'),
       child: r.skills.isEmpty
-          ? const Text(
-              'عندما يلعب طفلك ألعاب الحروف والألوان والرياضيات تظهر مهاراته هنا.',
+          ? Text(
+              loc('عندما يلعب طفلك ألعاب الحروف والألوان والرياضيات تظهر مهاراته هنا.'),
             )
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _group(
-                  'أتقنها',
+                  loc('أتقنها'),
                   Colors.green.shade700,
                   Icons.verified_rounded,
                   r.mastered,
                 ),
                 _group(
-                  'تحتاج إلى تدريب',
+                  loc('تحتاج إلى تدريب'),
                   Colors.deepOrange,
                   Icons.fitness_center_rounded,
                   r.needsPractice,
                 ),
                 _group(
-                  'قيد التعلّم',
+                  loc('قيد التعلّم'),
                   Colors.blueGrey,
                   Icons.trending_up_rounded,
                   r.others,
@@ -674,10 +675,10 @@ class _Lessons extends StatelessWidget {
           s,
     ];
     return _Section(
-      title: 'الدروس حسب المادة',
+      title: loc('الدروس حسب المادة'),
       child: rows.isEmpty
-          ? const Text(
-              'لم يكمل طفلك دروساً في هذا الأسبوع. يمكنك وضع أهداف من «الخطة الأسبوعية».',
+          ? Text(
+              loc('لم يكمل طفلك دروساً في هذا الأسبوع. يمكنك وضع أهداف من «الخطة الأسبوعية».'),
             )
           : Column(
               children: [
@@ -732,9 +733,9 @@ class _Recommendations extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _Section(
-      title: 'توصيات للأسبوع القادم',
+      title: loc('توصيات للأسبوع القادم'),
       child: report.recommendations.isEmpty
-          ? const Text('كل شيء يسير جيداً. استمر!')
+          ? Text(loc('كل شيء يسير جيداً. استمر!'))
           : Column(
               children: [
                 for (final rec in report.recommendations)
@@ -793,8 +794,8 @@ class _Journey extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          const Text(
-            'الأنشطة المنجزة يوماً بيوم',
+          Text(
+            loc('الأنشطة المنجزة يوماً بيوم'),
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 6),
@@ -869,18 +870,18 @@ class _Journey extends StatelessWidget {
                 },
               ),
             ),
-          const Text(
-            'النسبة = الإجابات الصحيحة من أول محاولة (آخر 10 أنشطة في الأرض).',
+          Text(
+            loc('النسبة = الإجابات الصحيحة من أول محاولة (آخر 10 أنشطة في الأرض).'),
             style: TextStyle(fontSize: 12),
           ),
           const SizedBox(height: 14),
-          const Text(
-            'الأنشطة المقترحة لهذا اليوم',
+          Text(
+            loc('الأنشطة المقترحة لهذا اليوم'),
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           if (plan.isEmpty)
-            const Text('أنهى طفلك كل الأراضي المفعّلة.')
+            Text(loc('أنهى طفلك كل الأراضي المفعّلة.'))
           else
             for (final p in plan)
               Padding(
@@ -904,21 +905,21 @@ class _Journey extends StatelessWidget {
                 ),
               ),
           const Divider(height: 28),
-          const Text('الصعوبة', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(loc('الصعوبة'), style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           SegmentedButton<int>(
-            segments: const [
-              ButtonSegment(value: -1, label: Text('أسهل')),
-              ButtonSegment(value: 0, label: Text('عادي')),
-              ButtonSegment(value: 1, label: Text('أصعب')),
+            segments: [
+              ButtonSegment(value: -1, label: Text(loc('أسهل'))),
+              ButtonSegment(value: 0, label: Text(loc('عادي'))),
+              ButtonSegment(value: 1, label: Text(loc('أصعب'))),
             ],
             selected: {child.bias},
             onSelectionChanged: (s) =>
                 store.updateProfile(child.copyWith(bias: s.first)),
           ),
           const SizedBox(height: 10),
-          const Text(
-            'أنشطة مغامرة اليوم',
+          Text(
+            loc('أنشطة مغامرة اليوم'),
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 6),
@@ -938,7 +939,7 @@ class _Journey extends StatelessWidget {
               MaterialPageRoute(builder: (_) => ChildEditScreen(child: child)),
             ),
             icon: const Icon(Icons.tune_rounded),
-            label: const Text('تعديل الخطة والأراضي والبيانات'),
+            label: Text(loc('تعديل الخطة والأراضي والبيانات')),
           ),
         ],
       ),
@@ -1002,7 +1003,7 @@ class _LearningLibraryState extends State<_LearningLibrary> {
   @override
   Widget build(BuildContext context) {
     return _Section(
-      title: 'الحروف والكلمات والقصص',
+      title: loc('الحروف والكلمات والقصص'),
       child: FutureBuilder<LearningSummary>(
         future: _f,
         builder: (context, snap) {
@@ -1012,60 +1013,60 @@ class _LearningLibraryState extends State<_LearningLibrary> {
           if (snap.hasError) {
             return Row(
               children: [
-                const Expanded(child: Text('تعذّر تحميل هذا القسم.')),
-                TextButton(onPressed: () => setState(() => _f = _load()), child: const Text('إعادة المحاولة')),
+                Expanded(child: Text(loc('تعذّر تحميل هذا القسم.'))),
+                TextButton(onPressed: () => setState(() => _f = _load()), child: Text(loc('إعادة المحاولة'))),
               ],
             );
           }
           final s = snap.data!;
           if (s.isEmpty) {
-            return const Text(
-              'لم يستخدم طفلك الحروف أو الكلمات أو القصص هذا الأسبوع. عندما يفعل ستظهر هنا نتائج حقيقية فقط.',
+            return Text(
+              loc('لم يستخدم طفلك الحروف أو الكلمات أو القصص هذا الأسبوع. عندما يفعل ستظهر هنا نتائج حقيقية فقط.'),
             );
           }
           final minutes = (s.storySeconds / 60).round();
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _row('دروس مكتملة', '${s.lessonsCompleted}'),
+              _row(loc('دروس مكتملة'), '${s.lessonsCompleted}'),
               const Divider(),
-              const Text('الحروف', style: TextStyle(fontWeight: FontWeight.bold)),
-              _row('اطّلع عليها (تعرّض)', '${s.letters.exposure.length}'),
-              _row('تدرّب عليها', '${s.letters.practice.length}'),
-              _row('أجاب صحيحاً من أول مرة', '${s.letters.demonstrated.length}'),
-              _row('متقنة (مراجعة متباعدة)', '${s.masteredLetters} من 28'),
+              Text(loc('الحروف'), style: TextStyle(fontWeight: FontWeight.bold)),
+              _row(loc('اطّلع عليها (تعرّض)'), '${s.letters.exposure.length}'),
+              _row(loc('تدرّب عليها'), '${s.letters.practice.length}'),
+              _row(loc('أجاب صحيحاً من أول مرة'), '${s.letters.demonstrated.length}'),
+              _row(loc('متقنة (مراجعة متباعدة)'), '${s.masteredLetters} من 28'),
               const Divider(),
-              const Text('الكلمات', style: TextStyle(fontWeight: FontWeight.bold)),
-              _row('رآها أو سمعها (تعرّض)', '${s.words.exposure.length}'),
-              _row('تدرّب عليها', '${s.words.practice.length}'),
-              _row('أجاب صحيحاً من أول مرة', '${s.words.demonstrated.length}'),
+              Text(loc('الكلمات'), style: TextStyle(fontWeight: FontWeight.bold)),
+              _row(loc('رآها أو سمعها (تعرّض)'), '${s.words.exposure.length}'),
+              _row(loc('تدرّب عليها'), '${s.words.practice.length}'),
+              _row(loc('أجاب صحيحاً من أول مرة'), '${s.words.demonstrated.length}'),
               const Divider(),
-              const Text('القصص', style: TextStyle(fontWeight: FontWeight.bold)),
-              _row('قصص سمعها', '${s.stories.length}'),
-              _row('وقت الاستماع (تعرّض فقط)', '$minutes د'),
+              Text(loc('القصص'), style: TextStyle(fontWeight: FontWeight.bold)),
+              _row(loc('قصص سمعها'), '${s.stories.length}'),
+              _row(loc('وقت الاستماع (تعرّض فقط)'), '$minutes د'),
               for (final st in s.stories)
                 Text(
-                  '• ${st.title}${st.completed ? ' (أكملها)' : ''}${st.understoodChecked ? ' · أجاب عن أسئلتها' : ''}',
+                  '• ${st.title}${st.completed ? loc(' (أكملها)') : ''}${st.understoodChecked ? loc(' · أجاب عن أسئلتها') : ''}',
                   style: const TextStyle(fontSize: 13),
                 ),
-              if (s.favoriteStories.isNotEmpty) Text('المفضلة: ${s.favoriteStories.join('، ')}', style: const TextStyle(fontSize: 13)),
-              const Text('الاستماع لا يعني الإتقان: يُحسب الفهم من إجابات الأسئلة فقط.', style: TextStyle(fontSize: 12)),
+              if (s.favoriteStories.isNotEmpty) Text('المفضلة: ${s.favoriteStories.join(loc('، '))}', style: const TextStyle(fontSize: 13)),
+              Text(loc('الاستماع لا يعني الإتقان: يُحسب الفهم من إجابات الأسئلة فقط.'), style: TextStyle(fontSize: 12)),
               const Divider(),
-              _row('أنشطة البيت المؤكَّدة', '${s.offlineActivities}'),
-              _row('أعمال إبداعية جديدة', '${s.creations}'),
+              _row(loc('أنشطة البيت المؤكَّدة'), '${s.offlineActivities}'),
+              _row(loc('أعمال إبداعية جديدة'), '${s.creations}'),
               if (s.needsPractice.isNotEmpty) ...[
                 const Divider(),
-                const Text('يحتاج إلى مزيد من التدريب', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepOrange)),
+                Text(loc('يحتاج إلى مزيد من التدريب'), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepOrange)),
                 for (final n in s.needsPractice) Text('• $n', style: const TextStyle(fontSize: 13)),
               ],
               if (s.nextSteps.isNotEmpty) ...[
                 const Divider(),
-                const Text('خطوات مقترحة', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(loc('خطوات مقترحة'), style: TextStyle(fontWeight: FontWeight.bold)),
                 for (final n in s.nextSteps) Text('• $n', style: const TextStyle(fontSize: 13)),
               ],
               const SizedBox(height: 6),
-              const Text(
-                'هذه أدوات للمتابعة فقط، وليست تشخيصاً أو تقييماً طبياً أو نمائياً.',
+              Text(
+                loc('هذه أدوات للمتابعة فقط، وليست تشخيصاً أو تقييماً طبياً أو نمائياً.'),
                 style: TextStyle(fontSize: 12),
               ),
             ],
