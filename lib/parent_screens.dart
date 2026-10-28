@@ -7,6 +7,7 @@ import 'notes_screen.dart';
 import 'parent_settings.dart';
 import 'plan_screen.dart';
 import 'summary_screen.dart';
+import 'teachers_screens.dart';
 
 /// Entry point from the child-facing screens: creates a PIN the first time,
 /// otherwise asks for it, then opens the settings.
@@ -267,6 +268,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () => _pickTime(_quietEnd, false),
                 ),
                 const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.school_rounded),
+                  title: const Text('المدرسون وحسابي'),
+                  subtitle: const Text('مدرسون معتمدون وحجز حصص أونلاين'),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const TeachersEntryScreen()),
+                  ),
+                ),
                 ListTile(
                   leading: const Icon(Icons.checklist_rounded),
                   title: const Text('الخطة الأسبوعية والمتابعة'),

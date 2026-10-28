@@ -1,0 +1,64 @@
+rules_version = '2';
+
+// Paste into Firebase console > Firestore > Rules (see docs/teachers-setup.md).
+// Teachers are approved by YOU: open teachers/{uid} in the console and change
+// status from "pending" to "approved". The app can never approve anyone.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function role() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    // users/{uid}: role and display name, readable only by the owner.
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['role', 'name', 'createdAt'])
+        && request.resource.data.role in ['parent', 'teacher'];
+      allow update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.role == resource.data.role;
+      allow delete: if false;
+    }
+
+    // teachers/{uid}: parents see approved profiles only. A teacher sees and
+    // edits their own, but can never change their own status.
+    match /teachers/{uid} {
+      allow read: if signedIn()
+        && (resource.data.status == 'approved' || request.auth.uid == uid);
+      allow create: if signedIn() && request.auth.uid == uid
+        && role() == 'teacher'
+        && request.resource.data.status == 'pending';
+      allow update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.status == resource.data.status;
+      allow delete: if false;
+    }
+
+    // bookings/{id}: lesson requests. Only the parent and the teacher involved
+    // can read one. No child data except an optional age.
+    match /bookings/{id} {
+      allow read: if signedIn()
+        && (resource.data.parentUid == request.auth.uid
+            || resource.data.teacherUid == request.auth.uid);
+      allow create: if signedIn() && role() == 'parent'
+        && request.resource.data.parentUid == request.auth.uid
+        && request.resource.data.status == 'requested'
+        && request.resource.data.lessonLink == null
+        && get(/databases/$(database)/documents/teachers/$(request.resource.data.teacherUid)).data.status == 'approved';
+      // The teacher accepts (with an https lesson link) or declines.
+      allow update: if signedIn() && resource.data.teacherUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'lessonLink'])
+        && request.resource.data.status in ['accepted', 'declined']
+        && (request.resource.data.status == 'declined'
+            || request.resource.data.lessonLink.matches('https://.+'));
+      // The parent can only cancel.
+      allow update: if signedIn() && resource.data.parentUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'cancelled';
+      allow delete: if false;
+    }
+  }
+}

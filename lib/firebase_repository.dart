@@ -1,0 +1,144 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'teachers_models.dart';
+
+/// Firebase implementation. Data lives in three Firestore collections:
+/// users/{uid} (role, name), teachers/{uid} (profile, status) and
+/// bookings/{id}. Access is limited by firestore.rules.
+class FirebaseTeacherRepository implements TeacherRepository {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  @override
+  AppUser? get currentUser {
+    final u = _auth.currentUser;
+    return u == null ? null : AppUser(u.uid, u.email ?? '');
+  }
+
+  DocumentReference<Map<String, dynamic>> get _userDoc =>
+      _db.collection('users').doc(_auth.currentUser!.uid);
+
+  @override
+  Future<UserRole?> currentRole() async {
+    final role = (await _userDoc.get()).data()?['role'] as String?;
+    return UserRole.values.where((r) => r.name == role).firstOrNull;
+  }
+
+  @override
+  Future<String> displayName() async =>
+      ((await _userDoc.get()).data()?['name'] as String?) ?? '';
+
+  String _authMessage(FirebaseAuthException e) => switch (e.code) {
+        'email-already-in-use' => 'هذا البريد مستخدم بالفعل',
+        'invalid-email' => 'البريد الإلكتروني غير صحيح',
+        'weak-password' => 'كلمة المرور ضعيفة (6 أحرف على الأقل)',
+        'wrong-password' ||
+        'user-not-found' ||
+        'invalid-credential' =>
+          'البريد أو كلمة المرور غير صحيحة',
+        'too-many-requests' => 'محاولات كثيرة، حاول لاحقاً',
+        'network-request-failed' => 'لا يوجد اتصال بالإنترنت',
+        _ => 'تعذر إكمال العملية، حاول مرة أخرى',
+      };
+
+  Future<T> _guard<T>(Future<T> Function() run) async {
+    try {
+      return await run();
+    } on FirebaseAuthException catch (e) {
+      throw AccountException(_authMessage(e));
+    } on FirebaseException catch (e) {
+      throw AccountException(e.code == 'permission-denied'
+          ? 'ليس لديك صلاحية لهذه العملية'
+          : 'تعذر الاتصال بالخادم، حاول مرة أخرى');
+    }
+  }
+
+  @override
+  Future<void> register({
+    required String email,
+    required String password,
+    required String name,
+    required UserRole role,
+  }) =>
+      _guard(() async {
+        final cred = await _auth.createUserWithEmailAndPassword(
+          email: email.trim(),
+          password: password,
+        );
+        await _db.collection('users').doc(cred.user!.uid).set({
+          'role': role.name,
+          'name': name.trim(),
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      });
+
+  @override
+  Future<void> signIn(String email, String password) => _guard(
+        () => _auth.signInWithEmailAndPassword(email: email.trim(), password: password),
+      );
+
+  @override
+  Future<void> signOut() => _auth.signOut();
+
+  @override
+  Future<List<TeacherProfile>> approvedTeachers() => _guard(() async {
+        final snap = await _db
+            .collection('teachers')
+            .where('status', isEqualTo: teacherStatusApproved)
+            .get();
+        return [for (final d in snap.docs) TeacherProfile.fromMap(d.id, d.data())];
+      });
+
+  @override
+  Future<TeacherProfile?> myTeacherProfile() => _guard(() async {
+        final uid = _auth.currentUser!.uid;
+        final doc = await _db.collection('teachers').doc(uid).get();
+        final data = doc.data();
+        return data == null ? null : TeacherProfile.fromMap(uid, data);
+      });
+
+  @override
+  Future<void> saveTeacherProfile(TeacherProfile p) => _guard(() async {
+        final ref = _db.collection('teachers').doc(_auth.currentUser!.uid);
+        final map = p.toMap();
+        if ((await ref.get()).exists) {
+          // A teacher can never change their own approval.
+          map.remove('status');
+          await ref.update(map);
+        } else {
+          map['status'] = teacherStatusPending;
+          await ref.set(map);
+        }
+      });
+
+  @override
+  Future<void> requestBooking(Booking b) => _guard(() async {
+        await _db.collection('bookings').add({
+          ...b.toMap(),
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      });
+
+  @override
+  Future<List<Booking>> myBookings() => _guard(() async {
+        final uid = _auth.currentUser!.uid;
+        final field = await currentRole() == UserRole.teacher ? 'teacherUid' : 'parentUid';
+        final snap = await _db.collection('bookings').where(field, isEqualTo: uid).get();
+        final list = [for (final d in snap.docs) (Booking.fromMap(d.id, d.data()), d.data())];
+        // Newest first, sorted here so no Firestore index is needed.
+        list.sort((a, b) {
+          final ta = a.$2['createdAt'] as Timestamp?;
+          final tb = b.$2['createdAt'] as Timestamp?;
+          return (tb?.millisecondsSinceEpoch ?? 0).compareTo(ta?.millisecondsSinceEpoch ?? 0);
+        });
+        return [for (final e in list) e.$1];
+      });
+
+  @override
+  Future<void> updateBooking(String id, {required String status, String? lessonLink}) =>
+      _guard(() => _db.collection('bookings').doc(id).update({
+            'status': status,
+            'lessonLink': ?lessonLink,
+          }));
+}

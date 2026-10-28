@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import 'curriculum.dart';
 import 'drawing_screen.dart';
+import 'firebase_config.dart';
 import 'games_screen.dart';
 import 'home_screen.dart';
 import 'parent_screens.dart';
@@ -15,7 +16,11 @@ import 'session_manager.dart';
 import 'subjects_screen.dart';
 import 'ui.dart';
 
-void main() => runApp(const KidsApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initFirebase();
+  runApp(const KidsApp());
+}
 
 class KidsApp extends StatelessWidget {
   const KidsApp({super.key});
