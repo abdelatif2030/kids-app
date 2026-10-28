@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'journey/avatars.dart';
 import 'journey/repository.dart';
+import 'journey/resume.dart';
 import 'l10n/strings.dart';
 
 /// Deletes what the app learned about the children from this device: profiles,
@@ -23,6 +24,7 @@ Future<void> deleteChildData() async {
         key == 'literacy_state' ||
         key == 'family_gallery' ||
         key == 'last_age' ||
+        key == 'resume_state' ||
         key.startsWith('child_photo_') ||
         key.startsWith('used_') ||
         key.startsWith('bonus_') ||
@@ -62,6 +64,7 @@ Future<void> deleteOneChild(String childId) async {
   await dropKey('story_state');
   await dropKey('literacy_state');
   await ChildPhotoStore.delete(childId);
+  await ResumeStore.forget(childId);
   await JourneyStore.instance.deleteProfile(childId);
 }
 

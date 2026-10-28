@@ -18,6 +18,7 @@ import 'letters_data.dart';
 import 'mastery.dart';
 import 'tracing.dart';
 import 'word_tiles.dart';
+import '../journey/resume.dart';
 import 'adaptive.dart';
 import 'adaptive_session.dart';
 
@@ -33,6 +34,7 @@ Future<void> recordLetterResults(String childId, List<ItemResult> results) async
   }
   for (final e in byLetter.entries) {
     await LiteracyStore.record(childId, e.key, e.value.every((r) => r.ok));
+    await ResumeStore.clear(childId, 'letter', e.key);
   }
 }
 
@@ -256,6 +258,7 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
     super.initState();
     // Looking at the lesson is exposure, not mastery.
     LearningRecords.add(widget.child.id, RecordType.letter, widget.letter.letter, Evidence.exposure);
+    ResumeStore.mark(widget.child.id, 'letter', widget.letter.letter);
   }
 
   Widget _form(String label, String glyph) => Column(

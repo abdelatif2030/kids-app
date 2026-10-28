@@ -4,6 +4,7 @@ import 'color_game.dart';
 import 'games/game_catalog.dart';
 import 'games/game_common.dart';
 import 'journey/models.dart';
+import 'journey/resume.dart';
 import 'journey/ui/kit.dart';
 import 'letters_game.dart';
 import 'math_game.dart';
@@ -196,6 +197,8 @@ class _LearningGamesListState extends State<LearningGamesList> {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: RCard(
                   onTap: () async {
+                    await ResumeStore.mark(widget.childId, 'game', g.id);
+                    if (!context.mounted) return;
                     await Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => g.build(widget.childId, widget.age, widget.learnLang)),

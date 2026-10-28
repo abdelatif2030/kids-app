@@ -14,8 +14,11 @@ import 'activity_screen.dart';
 import 'kit.dart';
 import '../../library/activity_screens.dart';
 import '../../library/vocab_screens.dart';
+import '../../literacy/letters_data.dart' show letterOf;
 import '../../literacy/screens.dart';
 import '../../stories/story_screens.dart';
+import '../../games/game_catalog.dart';
+import '../resume.dart';
 import 'home_tasks_screen.dart';
 import 'land_map_screen.dart';
 
@@ -153,6 +156,7 @@ class HomeTab extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
+                _ResumeCard(child: child),
                 if (plan.isNotEmpty) _TodayPath(plan: plan, done: done, onTap: (a) => _play(context, a)),
                 const SizedBox(height: 12),
                 _Shortcuts(
@@ -480,3 +484,65 @@ class _MoreCard extends StatelessWidget {
 
 /// "Land · Level n" in the interface language.
 String activityTitle(Activity a) => '${trKey('land.${a.landId}')} · ${trArgs('home.level', {'n': a.level})}';
+
+/// «كمّل من حيث توقفت»: the game or letter the child opened and did not finish (last 7 days).
+class _ResumeCard extends StatelessWidget {
+  final ChildProfile child;
+  const _ResumeCard({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<ResumeEntry?>(
+      future: ResumeStore.last(child.id),
+      builder: (context, snap) {
+        final e = snap.data;
+        if (e == null) return const SizedBox.shrink();
+        String? title;
+        Widget Function()? build;
+        IconData icon = Icons.play_circle_fill_rounded;
+        if (e.kind == 'game') {
+          for (final g in kEducationalGames) {
+            if (g.id == e.ref && g.fitsAge(child.age)) {
+              title = g.title();
+              icon = g.icon;
+              build = () => g.build(child.id, child.age, learnLangOf(child));
+            }
+          }
+        } else if (e.kind == 'letter') {
+          final l = letterOf(e.ref);
+          if (l != null) {
+            title = tr2('الحرف ${l.letter} (${l.name})', 'The letter ${l.letter} (${l.name})');
+            build = () => LetterLessonScreen(child: child, letter: l);
+          }
+        }
+        if (title == null || build == null) return const SizedBox.shrink();
+        final open = build;
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: RCard(
+            color: RC.mint,
+            semanticLabel: tr2('كمّل من حيث توقفت: $title', 'Continue where you stopped: $title'),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => open())),
+            child: Row(
+              children: [
+                Icon(icon, size: 40, color: RC.ink),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(tr2('كمّل من حيث توقفت', 'Continue where you stopped'),
+                          style: const TextStyle(fontSize: 14, color: RC.ink)),
+                      Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: RC.ink)),
+                    ],
+                  ),
+                ),
+                const Icon(Icons.chevron_left_rounded, color: RC.ink),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

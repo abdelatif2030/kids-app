@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../journey/resume.dart';
 import '../journey/ui/kit.dart';
 import '../l10n/strings.dart';
 import '../library/learning_records.dart';
@@ -148,6 +149,7 @@ class _GameFinishPanelState extends State<GameFinishPanel> {
     bool earned;
     try {
       earned = await GameRewards.complete(widget.childId, widget.gameId);
+      await ResumeStore.clear(widget.childId, 'game', widget.gameId);
     } catch (_) {
       earned = false; // storage trouble: no star claimed we could not record
     }
