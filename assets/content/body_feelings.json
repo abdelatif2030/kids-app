@@ -1,0 +1,33 @@
+{
+  "decks": [
+    {
+      "id": "body",
+      "title": "جسمي",
+      "emoji": "🧍",
+      "minAge": 1,
+      "maxAge": 6,
+      "cards": [
+        { "title": "عين",   "emoji": "👁️", "caption": "أرى بعيني" },
+        { "title": "أذن",   "emoji": "👂", "caption": "أسمع بأذني" },
+        { "title": "أنف",   "emoji": "👃", "caption": "أشم بأنفي" },
+        { "title": "فم",    "emoji": "👄", "caption": "أتكلم وآكل بفمي" },
+        { "title": "يد",    "emoji": "✋", "caption": "أمسك بيدي" },
+        { "title": "قدم",   "emoji": "🦶", "caption": "أمشي بقدمي" },
+        { "title": "أسنان", "emoji": "🦷", "caption": "أنظف أسناني كل يوم", "minAge": 2 },
+        { "title": "لسان",  "emoji": "👅", "caption": "أتذوق الطعام بلساني", "minAge": 3 }
+      ]
+    },
+    {
+      "id": "feelings",
+      "title": "مشاعري",
+      "emoji": "😊",
+      "minAge": 3,
+      "maxAge": 6,
+      "cards": [
+        { "title": "سعيد",  "face": "happy",  "caption": "أنا سعيد عندما ألعب مع أصدقائي" },
+        { "title": "حزين",  "face": "sad",    "caption": "أنا حزين عندما أفقد لعبتي، وأحتاج إلى حضن" },
+        { "title": "خائف",  "face": "scared", "caption": "أنا خائف أحياناً، وأخبر ماما أو بابا" }
+      ]
+    }
+  ]
+}

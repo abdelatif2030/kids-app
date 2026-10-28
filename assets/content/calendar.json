@@ -1,0 +1,54 @@
+{
+  "decks": [
+    {
+      "id": "days",
+      "title": "أيام الأسبوع",
+      "emoji": "📅",
+      "minAge": 4,
+      "maxAge": 6,
+      "cards": [
+        { "title": "الأحد",    "emoji": "1️⃣", "caption": "اليوم الأول" },
+        { "title": "الاثنين",  "emoji": "2️⃣", "caption": "اليوم الثاني" },
+        { "title": "الثلاثاء", "emoji": "3️⃣", "caption": "اليوم الثالث" },
+        { "title": "الأربعاء", "emoji": "4️⃣", "caption": "اليوم الرابع" },
+        { "title": "الخميس",   "emoji": "5️⃣", "caption": "اليوم الخامس" },
+        { "title": "الجمعة",   "emoji": "6️⃣", "caption": "اليوم السادس" },
+        { "title": "السبت",    "emoji": "7️⃣", "caption": "اليوم السابع" }
+      ]
+    },
+    {
+      "id": "months",
+      "title": "شهور السنة",
+      "emoji": "🗓️",
+      "minAge": 5,
+      "maxAge": 6,
+      "cards": [
+        { "title": "يناير",   "emoji": "❄️", "caption": "الشهر الأول" },
+        { "title": "فبراير",  "emoji": "🌧️", "caption": "الشهر الثاني" },
+        { "title": "مارس",    "emoji": "🌱", "caption": "الشهر الثالث" },
+        { "title": "أبريل",   "emoji": "🌷", "caption": "الشهر الرابع" },
+        { "title": "مايو",    "emoji": "🌼", "caption": "الشهر الخامس" },
+        { "title": "يونيو",   "emoji": "☀️", "caption": "الشهر السادس" },
+        { "title": "يوليو",   "emoji": "🏖️", "caption": "الشهر السابع" },
+        { "title": "أغسطس",   "emoji": "🍉", "caption": "الشهر الثامن" },
+        { "title": "سبتمبر",  "emoji": "🎒", "caption": "الشهر التاسع" },
+        { "title": "أكتوبر",  "emoji": "🍂", "caption": "الشهر العاشر" },
+        { "title": "نوفمبر",  "emoji": "🌬️", "caption": "الشهر الحادي عشر" },
+        { "title": "ديسمبر",  "emoji": "☃️", "caption": "الشهر الثاني عشر" }
+      ]
+    },
+    {
+      "id": "seasons",
+      "title": "فصول السنة",
+      "emoji": "🌦️",
+      "minAge": 4,
+      "maxAge": 6,
+      "cards": [
+        { "title": "الربيع",  "emoji": "🌸", "caption": "تتفتح الزهور" },
+        { "title": "الصيف",   "emoji": "☀️", "caption": "الجو حار ونسبح" },
+        { "title": "الخريف",  "emoji": "🍂", "caption": "تتساقط أوراق الشجر" },
+        { "title": "الشتاء",  "emoji": "❄️", "caption": "الجو بارد ونلبس معطفاً" }
+      ]
+    }
+  ]
+}

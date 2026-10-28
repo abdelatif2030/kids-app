@@ -1,0 +1,32 @@
+{
+  "letters": [
+    { "letter": "أ", "name": "ألف",  "word": "أرنب",   "emoji": "🐰" },
+    { "letter": "ب", "name": "باء",  "word": "بطة",    "emoji": "🦆" },
+    { "letter": "ت", "name": "تاء",  "word": "تفاحة",  "emoji": "🍎" },
+    { "letter": "ث", "name": "ثاء",  "word": "ثعلب",   "emoji": "🦊" },
+    { "letter": "ج", "name": "جيم",  "word": "جمل",    "emoji": "🐪" },
+    { "letter": "ح", "name": "حاء",  "word": "حصان",   "emoji": "🐴" },
+    { "letter": "خ", "name": "خاء",  "word": "خروف",   "emoji": "🐑" },
+    { "letter": "د", "name": "دال",  "word": "دب",     "emoji": "🐻" },
+    { "letter": "ذ", "name": "ذال",  "word": "ذرة",    "emoji": "🌽" },
+    { "letter": "ر", "name": "راء",  "word": "راديو",  "emoji": "📻" },
+    { "letter": "ز", "name": "زاي",  "word": "زرافة",  "emoji": "🦒" },
+    { "letter": "س", "name": "سين",  "word": "سمكة",   "emoji": "🐟" },
+    { "letter": "ش", "name": "شين",  "word": "شمس",    "emoji": "☀️" },
+    { "letter": "ص", "name": "صاد",  "word": "صاروخ",  "emoji": "🚀" },
+    { "letter": "ض", "name": "ضاد",  "word": "ضفدع",   "emoji": "🐸" },
+    { "letter": "ط", "name": "طاء",  "word": "طائرة",  "emoji": "✈️" },
+    { "letter": "ظ", "name": "ظاء",  "word": "ظرف",    "emoji": "✉️" },
+    { "letter": "ع", "name": "عين",  "word": "عنب",    "emoji": "🍇" },
+    { "letter": "غ", "name": "غين",  "word": "غيمة",   "emoji": "☁️" },
+    { "letter": "ف", "name": "فاء",  "word": "فيل",    "emoji": "🐘" },
+    { "letter": "ق", "name": "قاف",  "word": "قمر",    "emoji": "🌙" },
+    { "letter": "ك", "name": "كاف",  "word": "كرة",    "emoji": "⚽" },
+    { "letter": "ل", "name": "لام",  "word": "ليمون",  "emoji": "🍋" },
+    { "letter": "م", "name": "ميم",  "word": "موزة",   "emoji": "🍌" },
+    { "letter": "ن", "name": "نون",  "word": "نحلة",   "emoji": "🐝" },
+    { "letter": "ه", "name": "هاء",  "word": "هدية",   "emoji": "🎁" },
+    { "letter": "و", "name": "واو",  "word": "وردة",   "emoji": "🌹" },
+    { "letter": "ي", "name": "ياء",  "word": "يد",     "emoji": "✋" }
+  ]
+}

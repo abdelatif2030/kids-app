@@ -1,0 +1,144 @@
+import 'package:flutter/material.dart';
+
+import 'main.dart' show VideoListScreen;
+import 'parent_screens.dart';
+import 'session_manager.dart';
+import 'ui.dart';
+
+/// Replaces the child screens (keeping only the first route) with the rest screen.
+void goToRest(BuildContext context, RestReason reason) {
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (_) => RestScreen(reason: reason)),
+    (route) => route.isFirst,
+  );
+}
+
+/// Shown after the last video of "Today's plan". [stars] is how many plan
+/// videos the child finished.
+void goToPlanDone(BuildContext context, int stars) {
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (_) => RestScreen(stars: stars)),
+    (route) => route.isFirst,
+  );
+}
+
+/// A null [reason] means the plan was completed rather than time running out.
+class RestScreen extends StatelessWidget {
+  final RestReason? reason;
+  final int stars;
+  const RestScreen({super.key, this.reason, this.stars = 0});
+
+  bool get _planDone => reason == null;
+
+  Future<void> _parent(BuildContext context) async {
+    final ok = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(builder: (_) => const PinEntryScreen(returnResult: true)),
+    );
+    if (ok != true || !context.mounted) return;
+    final choice = await showDialog<String>(
+      context: context,
+      builder: (_) => SimpleDialog(
+        title: const Text('خيارات الوالدين'),
+        children: [
+          SimpleDialogOption(
+            onPressed: () => Navigator.pop(context, _planDone ? 'back' : 'extend'),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                _planDone
+                    ? 'العودة إلى الفيديوهات'
+                    : 'تمديد ${SessionManager.extendMinutes} دقيقة',
+                style: const TextStyle(fontSize: 20),
+              ),
+            ),
+          ),
+          SimpleDialogOption(
+            onPressed: () => Navigator.pop(context, 'end'),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Text('إنهاء الجلسة', style: TextStyle(fontSize: 20)),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (!context.mounted) return;
+    if (choice == 'extend' || choice == 'back') {
+      final session = SessionManager.instance;
+      final age = session.currentAge;
+      if (age == null) {
+        Navigator.popUntil(context, (r) => r.isFirst);
+        return;
+      }
+      if (choice == 'extend') await session.extend();
+      await session.start(age);
+      if (!context.mounted) return;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => VideoListScreen(age: age)),
+        (route) => route.isFirst,
+      );
+    } else if (choice == 'end') {
+      Navigator.popUntil(context, (r) => r.isFirst);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final quiet = reason == RestReason.quiet;
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFE8EAF6),
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Mascot(size: 140),
+                  const SizedBox(height: 8),
+                  Icon(quiet ? Icons.nightlight_round : Icons.bedtime,
+                      size: 56, color: Colors.indigo),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'حان وقت الراحة',
+                    style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    _planDone
+                        ? 'أحسنت! أكملت خطة اليوم'
+                        : quiet
+                            ? 'نراك في الصباح، أحلاماً سعيدة'
+                            : 'أحسنت! نلتقي لاحقاً',
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                  if (stars > 0) ...[
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        for (var i = 0; i < stars; i++)
+                          const Icon(Icons.star_rounded, size: 56, color: Colors.amber),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 48),
+                  TextButton(
+                    onPressed: () => _parent(context),
+                    child: const Text('للوالدين', style: TextStyle(fontSize: 18)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
