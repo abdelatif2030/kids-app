@@ -10,6 +10,7 @@ import '../progress.dart';
 import '../recommender.dart';
 import '../repository.dart';
 import 'activity_screen.dart';
+import '../../ui.dart' show Mascot;
 import 'kit.dart';
 import '../../library/activity_screens.dart';
 import '../../library/vocab_screens.dart';
@@ -18,16 +19,23 @@ import '../../stories/story_screens.dart';
 import 'home_tasks_screen.dart';
 import 'land_map_screen.dart';
 
-/// The child's home: today's adventure, the learning lands and the videos.
+/// The child's home: one obvious next step ("Continue My Journey"), today's path and goal,
+/// four big shortcuts, the latest wins, and the learning lands. Everything else is one tap away.
 class HomeTab extends StatelessWidget {
   final ChildProfile child;
   final VoidCallback onExit;
-  const HomeTab({super.key, required this.child, required this.onExit});
+
+  /// Switches the shell's tab (1 = games, 3 = me).
+  final void Function(int tab)? onTab;
+  const HomeTab({super.key, required this.child, required this.onExit, this.onTab});
 
   void _play(BuildContext context, Activity a) => Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => ActivityScreen(activity: a, child: child)),
       );
+
+  void _open(BuildContext context, Widget screen) =>
+      Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +54,7 @@ class HomeTab extends StatelessWidget {
             break;
           }
         }
+        final young = child.age <= 6;
         return Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 560),
@@ -60,23 +69,22 @@ class HomeTab extends StatelessWidget {
                       icon: const Icon(Icons.lock_outline_rounded, color: RC.ink),
                     ),
                     Expanded(
-                      child: Semantics(
-                        header: true,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: RC.sky,
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(color: RC.outline, width: 3),
-                          ),
-                          child: Column(
-                            children: [
-                              Text(trArgs('home.hello', {'name': child.nickname}),
-                                  style: const TextStyle(
-                                      fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
-                              Text('⭐ ${progress.totalStars}   ·   ${trArgs('home.level', {'n': progress.explorerLevel})}',
+                      child: Center(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Semantics(
+                            label: '${progress.totalStars} ${trKey('home.stars')}, ${trArgs('home.level', {'n': progress.explorerLevel})}',
+                            excludeSemantics: true,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                              decoration: BoxDecoration(
+                                color: RC.sky,
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(color: RC.outline, width: 2),
+                              ),
+                              child: Text('⭐ ${progress.totalStars}   ·   ${trArgs('home.level', {'n': progress.explorerLevel})}',
                                   style: const TextStyle(fontWeight: FontWeight.bold, color: RC.ink)),
-                            ],
+                            ),
                           ),
                         ),
                       ),
@@ -88,109 +96,82 @@ class HomeTab extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                // Today's adventure.
+                const SizedBox(height: 8),
+                // The hero: mascot, greeting and the one big action.
                 RCard(
                   color: RC.pink,
                   outline: RC.pinkDeep,
                   radius: 28,
                   padding: const EdgeInsets.all(16),
-                  onTap: next == null ? null : () => _play(context, next!.activity),
-                  semanticLabel: plan.isEmpty
-                      ? context.tr('home.today')
-                      : trArgs('home.todayAria', {'done': done, 'total': plan.length}),
-                  child: Row(
+                  child: Column(
                     children: [
-                      Container(
-                        width: 76,
-                        height: 76,
-                        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                        child: const Icon(Icons.rocket_launch_rounded, size: 44, color: RC.pinkDeep),
-                      ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(allDone ? context.tr('home.todayDone') : context.tr('home.today'),
-                                style: const TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.w900, color: RC.ink)),
-                            const SizedBox(height: 4),
-                            if (plan.isEmpty)
-                              Text(context.tr('home.allLands'),
-                                  style: const TextStyle(fontSize: 15, color: RC.ink))
-                            else ...[
-                              Text(trArgs('home.progress', {'done': done, 'total': plan.length, 'm': plan.first.minutes}),
-                                  style: const TextStyle(fontSize: 15, color: RC.ink)),
-                              const SizedBox(height: 8),
-                              RProgress(value: done / plan.length, color: RC.pinkDeep),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (next != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size.fromHeight(60),
-                        backgroundColor: RC.good,
-                      ),
-                      onPressed: () => _play(context, next!.activity),
-                      icon: const Icon(Icons.play_arrow_rounded, size: 34),
-                      label: Text(context.tr('home.start'),
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
-                    ),
-                  ),
-                const SizedBox(height: 12),
-                for (final p in plan)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: RCard(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                      onTap: () => _play(context, p.activity),
-                      semanticLabel:
-                          tr2('${activityTitle(p.activity)}، ${p.reason}، ${p.doneToday ? context.tr('home.done') : context.tr('home.notYet')}', '${activityTitle(p.activity)}, ${p.reason}, ${p.doneToday ? context.tr('home.done') : context.tr('home.notYet')}'),
-                      child: Row(
+                      Row(
                         children: [
-                          CircleAvatar(
-                            backgroundColor: p.activity.land.color.withAlpha(50),
-                            child: Icon(p.activity.land.icon, color: p.activity.land.color),
-                          ),
+                          const Mascot(size: 84),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(activityTitle(p.activity),
-                                    style: const TextStyle(
-                                        fontSize: 17, fontWeight: FontWeight.bold, color: RC.ink)),
-                                Text('${p.reason} · ${trArgs('home.minutes', {'m': p.minutes})}',
-                                    style: const TextStyle(fontSize: 13, color: RC.ink)),
-                              ],
+                            child: Semantics(
+                              header: true,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(trArgs('home.hello', {'name': child.nickname}),
+                                      style: TextStyle(fontSize: young ? 28 : 24, fontWeight: FontWeight.w900, color: RC.ink)),
+                                  if (next != null)
+                                    Text(trArgs('home.nextUp', {'title': activityTitle(next.activity)}),
+                                        style: const TextStyle(fontSize: 15, color: RC.ink)),
+                                  if (allDone)
+                                    Text(context.tr('home.todayDone'),
+                                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: RC.ink)),
+                                ],
+                              ),
                             ),
-                          ),
-                          Icon(
-                            p.doneToday ? Icons.check_circle_rounded : Icons.play_circle_fill_rounded,
-                            color: p.doneToday ? RC.good : RC.pinkDeep,
-                            size: 32,
                           ),
                         ],
                       ),
-                    ),
+                      const SizedBox(height: 12),
+                      FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          minimumSize: Size.fromHeight(young ? 76 : 64),
+                          backgroundColor: RC.good,
+                        ),
+                        onPressed: next != null
+                            ? () => _play(context, next!.activity)
+                            : (plan.isNotEmpty
+                                ? () => _open(context, LandMapScreen(land: plan.first.activity.land, child: child))
+                                : null),
+                        icon: Icon(allDone ? Icons.explore_rounded : Icons.play_arrow_rounded, size: 36),
+                        label: Text(context.tr(allDone ? 'home.playMore' : 'home.continue'),
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+                      ),
+                      if (plan.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Text(context.tr('home.allLands'), style: const TextStyle(fontSize: 15, color: RC.ink)),
+                        ),
+                    ],
                   ),
+                ),
+                const SizedBox(height: 12),
+                if (plan.isNotEmpty) _TodayPath(plan: plan, done: done, onTap: (a) => _play(context, a)),
+                const SizedBox(height: 12),
+                _Shortcuts(
+                  items: [
+                    (Icons.sort_by_alpha_rounded, context.tr('home.shortcut.learn'), RC.peach, () => _open(context, LettersHomeScreen(child: child))),
+                    (Icons.auto_stories_rounded, context.tr('home.shortcut.stories'), RC.lavender, () => _open(context, StoriesHomeScreen(child: child))),
+                    (Icons.sports_esports_rounded, context.tr('home.shortcut.games'), RC.mint, () => onTab?.call(1)),
+                    (Icons.emoji_events_rounded, context.tr('home.shortcut.wins'), RC.yellow, () => onTab?.call(3)),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _RecentWins(progress: progress),
+                const SizedBox(height: 16),
                 if (child.age <= 3)
                   Padding(
-                    padding: const EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.only(bottom: 10),
                     child: RCard(
                       color: RC.peach.withAlpha(170),
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => ExploreScreen(child: child)),
-                      ),
+                      onTap: () => _open(context, ExploreScreen(child: child)),
                       semanticLabel: context.tr('home.explore'),
                       child: Row(
                         children: [
@@ -200,28 +181,13 @@ class HomeTab extends StatelessWidget {
                             child: Text(context.tr('home.explore'),
                                 style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: RC.ink)),
                           ),
-                          Icon(Icons.chevron_left_rounded, color: RC.ink),
+                          const Icon(Icons.chevron_left_rounded, color: RC.ink),
                         ],
                       ),
                     ),
                   ),
-                const SizedBox(height: 8),
-                Text(loc('اكتشف المزيد'),
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: [
-                    _MoreCard('🔤', loc('تعلّم الحروف'), RC.peach, () => LettersHomeScreen(child: child)),
-                    _MoreCard('🖼️', loc('مكتبة الكلمات'), RC.mint, () => VocabLibraryScreen(child: child)),
-                    _MoreCard('🌙', loc('ليلة حلوة'), RC.lavender, () => StoriesHomeScreen(child: child)),
-                    _MoreCard('🏠', loc('أنشطة مع الأهل'), RC.yellow, () => ActivityLibraryScreen(child: child)),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Text(loc('رحلتي'),
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
+                Text(context.tr('home.myLands'),
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
                 const SizedBox(height: 8),
                 for (final land in store.publishedLands)
                   Padding(
@@ -229,42 +195,180 @@ class HomeTab extends StatelessWidget {
                     child: _LandCard(
                       land: land,
                       progress: progress.lands[land.id]!,
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => LandMapScreen(land: land, child: child)),
-                      ),
+                      onTap: () => _open(context, LandMapScreen(land: land, child: child)),
                     ),
                   ),
-                RCard(
-                  color: RC.lavender.withAlpha(150),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => SubjectsScreen(age: child.age)),
-                  ),
-                  semanticLabel: loc('فيديوهات تعليمية'),
-                  child: Row(
-                    children: [
-                      Icon(Icons.play_circle_rounded, size: 40, color: RC.outline),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(loc('فيديوهات تعليمية'),
-                                style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: RC.ink)),
-                            Text(loc('أغانٍ ودروس مختارة بعناية'), style: TextStyle(fontSize: 14, color: RC.ink)),
-                          ],
-                        ),
-                      ),
-                      Icon(Icons.chevron_left_rounded, color: RC.ink),
-                    ],
-                  ),
+                const SizedBox(height: 4),
+                Text(context.tr('home.more'),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: RC.ink)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: [
+                    _MoreCard('🖼️', loc('مكتبة الكلمات'), RC.mint, () => VocabLibraryScreen(child: child)),
+                    _MoreCard('🏠', loc('أنشطة مع الأهل'), RC.yellow, () => ActivityLibraryScreen(child: child)),
+                    _MoreCard('▶️', loc('فيديوهات تعليمية'), RC.lavender, () => SubjectsScreen(age: child.age)),
+                  ],
                 ),
               ],
             ),
           ),
         );
       },
+    );
+  }
+}
+
+/// Today's stepping stones: done, the one to do next, and the ones after it, with the gentle daily goal.
+class _TodayPath extends StatelessWidget {
+  final List<PlannedActivity> plan;
+  final int done;
+  final void Function(Activity) onTap;
+  const _TodayPath({required this.plan, required this.done, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final nextIndex = plan.indexWhere((p) => !p.doneToday);
+    return RCard(
+      semanticLabel: trArgs('home.todayAria', {'done': done, 'total': plan.length}),
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(context.tr('home.path'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: RC.ink)),
+          const SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (var i = 0; i < plan.length; i++) ...[
+                  if (i > 0) Container(width: 24, height: 4, color: plan[i - 1].doneToday ? RC.good : RC.outline.withAlpha(90)),
+                  _Stone(planned: plan[i], current: i == nextIndex, onTap: () => onTap(plan[i].activity)),
+                ],
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          RProgress(value: done / plan.length, color: RC.pinkDeep),
+          const SizedBox(height: 4),
+          Text(trArgs('home.progress', {'done': done, 'total': plan.length, 'm': plan.first.minutes}),
+              style: const TextStyle(fontSize: 14, color: RC.ink)),
+        ],
+      ),
+    );
+  }
+}
+
+class _Stone extends StatelessWidget {
+  final PlannedActivity planned;
+  final bool current;
+  final VoidCallback onTap;
+  const _Stone({required this.planned, required this.current, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final a = planned.activity;
+    final label = '${activityTitle(a)}, ${planned.doneToday ? context.tr('home.done') : context.tr('home.notYet')}';
+    return Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
+      child: Tooltip(
+        message: label,
+        child: InkResponse(
+          onTap: onTap,
+          radius: 40,
+          child: Container(
+            width: current ? 64 : 56,
+            height: current ? 64 : 56,
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: planned.doneToday ? RC.mint : Colors.white,
+              border: Border.all(color: current ? RC.pinkDeep : a.land.color, width: current ? 4 : 3),
+            ),
+            child: Icon(planned.doneToday ? Icons.check_rounded : a.land.icon,
+                size: current ? 34 : 28, color: planned.doneToday ? RC.good : a.land.color),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+typedef _ShortcutItem = (IconData, String, Color, VoidCallback);
+
+class _Shortcuts extends StatelessWidget {
+  final List<_ShortcutItem> items;
+  const _Shortcuts({required this.items});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, c) {
+        final w = (c.maxWidth - 10) / 2;
+        return Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            for (final (icon, label, color, onTap) in items)
+              SizedBox(
+                width: w,
+                child: RCard(
+                  color: color.withAlpha(180),
+                  semanticLabel: label,
+                  onTap: onTap,
+                  child: Column(
+                    children: [
+                      Icon(icon, size: 40, color: RC.ink),
+                      const SizedBox(height: 4),
+                      Text(label,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: RC.ink)),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// The latest badges earned (earned by finishing activities, never by time), or a friendly hint.
+class _RecentWins extends StatelessWidget {
+  final ChildProgress progress;
+  const _RecentWins({required this.progress});
+
+  @override
+  Widget build(BuildContext context) {
+    final wins = progress.badges.reversed.take(3).toList();
+    return RCard(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(context.tr('home.recent'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: RC.ink)),
+          const SizedBox(height: 6),
+          if (wins.isEmpty)
+            Text(context.tr('home.noWins'), style: const TextStyle(fontSize: 15, color: RC.ink))
+          else
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              children: [
+                for (final b in wins)
+                  Chip(
+                    avatar: Text(b.emoji),
+                    label: Text(b.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    backgroundColor: RC.yellow.withAlpha(120),
+                  ),
+              ],
+            ),
+        ],
+      ),
     );
   }
 }

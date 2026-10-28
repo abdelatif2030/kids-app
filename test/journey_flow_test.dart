@@ -5,6 +5,7 @@ import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/journey/lands.dart';
 import 'package:kids_app/journey/models.dart';
 import 'package:kids_app/journey/repository.dart';
+import 'package:kids_app/journey/ui/activity_screen.dart';
 import 'package:kids_app/journey/ui/child_shell.dart';
 import 'package:kids_app/journey/ui/onboarding.dart';
 import 'package:kids_app/journey/ui/profile_forms.dart';
@@ -269,17 +270,37 @@ void main() {
       await tester.pump();
     }
 
-    testWidgets('home: greeting, today\'s adventure with three activities, and the six lands',
+    testWidgets('home: greeting, ONE big "continue my journey" action, today\'s path, shortcuts and the lands',
         (tester) async {
       await openShell(tester);
       expect(find.text('أهلاً سلمى!'), findsOneWidget);
-      expect(find.text('مغامرة اليوم'), findsOneWidget);
+      expect(find.text('كمّل رحلتي'), findsOneWidget);
+      expect(find.byType(FilledButton), findsOneWidget); // the only filled button: one obvious action
+      expect(find.text('طريق اليوم'), findsOneWidget);
       expect(find.text('0 من 3 أنشطة · نحو 4 دقائق لكل نشاط'), findsOneWidget);
-      expect(find.text('ابدأ رحلة اليوم'), findsOneWidget);
+      for (final shortcut in ['تعلّم', 'قصص', 'ألعاب', 'إنجازاتي']) {
+        expect(find.text(shortcut), findsWidgets);
+      }
+      expect(find.text('أنهِ نشاطاً لتظهر إنجازاتك هنا'), findsOneWidget); // no wins yet: a friendly hint
       for (final land in kLands) {
         expect(find.text(land.title), findsWidgets);
       }
       expect(find.text('فيديوهات تعليمية'), findsOneWidget);
+    });
+
+    testWidgets('the shortcuts for games and achievements switch the tab; the big button opens the next activity',
+        (tester) async {
+      await openShell(tester);
+      await tester.tap(find.text('ألعاب').first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.text('لعبة الذاكرة'), findsOneWidget); // the games tab for age 5
+      await tester.tap(find.text('الرئيسية').last);
+      await tester.pump();
+      await tester.tap(find.text('كمّل رحلتي'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.byType(ActivityScreen), findsOneWidget);
     });
 
     testWidgets('English: tabs, greeting and today\'s adventure follow the interface language', (tester) async {
@@ -287,12 +308,12 @@ void main() {
       addTearDown(() => AppLocale.instance.set('ar'));
       await openShell(tester);
       expect(find.text('Hello سلمى!'), findsOneWidget);
-      expect(find.text('Today\'s adventure'), findsOneWidget);
-      expect(find.text('Start today\'s journey'), findsOneWidget);
-      expect(find.text('Games'), findsOneWidget);
+      expect(find.text('Today\'s path'), findsOneWidget);
+      expect(find.text('Continue My Journey'), findsOneWidget);
+      expect(find.text('Games'), findsWidgets); // the tab and the shortcut
       expect(find.text('Home'), findsOneWidget);
       expect(find.text('0 of 3 activities · about 4 minutes each'), findsOneWidget);
-      expect(find.text('Letter Land · Level 1'), findsWidgets);
+      expect(find.textContaining(' · Level '), findsWidgets); // "Next: Land · Level n"
     });
 
     testWidgets('today\'s adventure ticks off finished activities', (tester) async {
@@ -302,7 +323,7 @@ void main() {
       await tester.runAsync(() => JourneyStore.instance.recordAttempt(_done(planned.first.activity.id)));
       await tester.pump();
       expect(find.text('1 من 3 أنشطة · نحو 4 دقائق لكل نشاط'), findsOneWidget);
-      expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.check_rounded), findsOneWidget);
     });
 
     testWidgets('all four tabs work', (tester) async {

@@ -59,7 +59,7 @@ class _ChildShellState extends State<ChildShell> {
         builder: (context, _) {
           final child = JourneyStore.instance.profileById(widget.child.id) ?? widget.child;
           final tabs = [
-            HomeTab(child: child, onExit: _exit),
+            HomeTab(child: child, onExit: _exit, onTab: (i) => setState(() => _tab = i)),
             _GamesTab(age: child.age),
             _CreateTab(child: child),
             MeTab(child: child),
