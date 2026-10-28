@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../journey/ui/kit.dart';
 import '../l10n/strings.dart';
+import '../library/learning_records.dart';
 import '../library/vocab.dart';
 import '../media/audio.dart';
 import '../media/audio_button.dart';
@@ -117,10 +118,7 @@ class _WordBookGameState extends State<WordBookGame> {
   bool get _complete => _words.every((w) => _seen.contains(w.id));
 
   Future<void> _open(Vocab w) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => _WordCard(word: w)),
-    );
+    await openWordCard(context, widget.childId, w);
     if (!mounted) return;
     setState(() => _seen = {..._seen, w.id});
     await WordBookProgress.save(widget.childId, _seen);
@@ -248,9 +246,15 @@ class _WordBookGameState extends State<WordBookGame> {
   }
 }
 
-class _WordCard extends StatelessWidget {
+/// Opens a word card and records, locally, that the child met the word (exposure, not mastery).
+Future<void> openWordCard(BuildContext context, String childId, Vocab w) async {
+  LearningRecords.add(childId, RecordType.word, w.id, Evidence.exposure);
+  await Navigator.push(context, MaterialPageRoute(builder: (_) => WordCardScreen(word: w)));
+}
+
+class WordCardScreen extends StatelessWidget {
   final Vocab word;
-  const _WordCard({required this.word});
+  const WordCardScreen({super.key, required this.word});
 
   @override
   Widget build(BuildContext context) {

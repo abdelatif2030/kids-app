@@ -29,6 +29,12 @@ class GameRewards {
   static Future<bool> isDone(String childId, String gameId) async =>
       (await _all())[childId]?.containsKey(gameId) ?? false;
 
+  /// Games this child finished on [day] (yyyy-mm-dd), counting repeats on that day.
+  static Future<Set<String>> doneOn(String childId, String day) async => {
+        for (final e in ((await _all())[childId] ?? const <String, dynamic>{}).entries)
+          if (e.value is Map && (e.value as Map)['d'] == day) e.key,
+      };
+
   static Future<Set<String>> doneIds(String childId) async =>
       ((await _all())[childId]?.keys ?? const <String>[]).toSet();
 

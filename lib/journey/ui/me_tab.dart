@@ -1,4 +1,5 @@
 import '../avatars.dart';
+import 'my_day_cards.dart';
 import 'package:flutter/material.dart';
 
 import '../../ui.dart' show Mascot;
@@ -51,6 +52,8 @@ class MeTab extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
               children: [
+                GardenCard(child: profile),
+                const SizedBox(height: 12),
                 RCard(
                   color: RC.lavender.withAlpha(170),
                   radius: 28,

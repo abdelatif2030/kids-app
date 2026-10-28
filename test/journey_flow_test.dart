@@ -273,7 +273,8 @@ void main() {
     testWidgets('home: greeting, ONE big "continue my journey" action, today\'s path, shortcuts and the lands',
         (tester) async {
       await openShell(tester);
-      expect(find.text('أهلاً سلمى!'), findsOneWidget);
+      expect(find.textContaining('يا بطل'), findsOneWidget); // the greeting follows the time of day
+      expect(find.text('سلمى'), findsWidgets);
       expect(find.text('كمّل رحلتي'), findsOneWidget);
       expect(find.byType(FilledButton), findsOneWidget); // the only filled button: one obvious action
       expect(find.text('طريق اليوم'), findsOneWidget);
@@ -307,7 +308,8 @@ void main() {
       await tester.runAsync(() => AppLocale.instance.set('en'));
       addTearDown(() => AppLocale.instance.set('ar'));
       await openShell(tester);
-      expect(find.text('Hello سلمى!'), findsOneWidget);
+      expect(find.textContaining('champion'), findsOneWidget);
+      expect(find.text('سلمى'), findsWidgets);
       expect(find.text('Today\'s path'), findsOneWidget);
       expect(find.text('Continue My Journey'), findsOneWidget);
       expect(find.text('Games'), findsWidgets); // the tab and the shortcut
@@ -347,7 +349,8 @@ void main() {
 
       await tester.tap(find.text('الرئيسية').last);
       await tester.pump();
-      expect(find.text('أهلاً سلمى!'), findsOneWidget);
+      expect(find.textContaining('يا بطل'), findsOneWidget); // the greeting follows the time of day
+      expect(find.text('سلمى'), findsWidgets);
     });
 
     testWidgets('accessories unlock with stars and can be worn', (tester) async {
@@ -406,7 +409,8 @@ void main() {
       )));
       await tester.tap(find.text('go'));
       await tester.pumpAndSettle();
-      expect(find.text('أهلاً سلمى!'), findsOneWidget);
+      expect(find.textContaining('يا بطل'), findsOneWidget); // the greeting follows the time of day
+      expect(find.text('سلمى'), findsWidgets);
 
       await tester.tap(find.byTooltip('خروج (للأهل)'));
       await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 300)));

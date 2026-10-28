@@ -18,7 +18,9 @@ import '../../literacy/letters_data.dart' show letterOf;
 import '../../literacy/screens.dart';
 import '../../stories/story_screens.dart';
 import '../../games/game_catalog.dart';
+import '../my_day.dart';
 import '../resume.dart';
+import 'my_day_cards.dart';
 import 'home_tasks_screen.dart';
 import 'land_map_screen.dart';
 
@@ -30,7 +32,9 @@ class HomeTab extends StatelessWidget {
 
   /// Switches the shell's tab (1 = games, 3 = me).
   final void Function(int tab)? onTab;
-  const HomeTab({super.key, required this.child, required this.onExit, this.onTab});
+  /// Only tests set this, to check the greeting for a given time.
+  final DateTime? now;
+  const HomeTab({super.key, required this.child, required this.onExit, this.onTab, this.now});
 
   void _play(BuildContext context, Activity a) => Navigator.push(
         context,
@@ -118,8 +122,11 @@ class HomeTab extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(trArgs('home.hello', {'name': child.nickname}),
-                                      style: TextStyle(fontSize: young ? 28 : 24, fontWeight: FontWeight.w900, color: RC.ink)),
+                                  Text(greetingFor(dayPartOf(now ?? DateTime.now())),
+                                      key: const ValueKey('greeting'),
+                                      style: TextStyle(fontSize: young ? 26 : 22, fontWeight: FontWeight.w900, color: RC.ink)),
+                                  Text(child.nickname, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: RC.ink)),
+                                  Text(hintFor(dayPartOf(now ?? DateTime.now())), style: const TextStyle(fontSize: 14, color: RC.ink)),
                                   if (next != null)
                                     Text(trArgs('home.nextUp', {'title': activityTitle(next.activity)}),
                                         style: const TextStyle(fontSize: 15, color: RC.ink)),
@@ -154,6 +161,16 @@ class HomeTab extends StatelessWidget {
                         ),
                     ],
                   ),
+                ),
+                const SizedBox(height: 12),
+                MyDayCard(
+                  child: child,
+                  now: now,
+                  onLearn: () => next != null
+                      ? _play(context, next.activity)
+                      : (plan.isNotEmpty
+                          ? _open(context, LandMapScreen(land: plan.first.activity.land, child: child))
+                          : _open(context, LettersHomeScreen(child: child))),
                 ),
                 const SizedBox(height: 12),
                 _ResumeCard(child: child),
