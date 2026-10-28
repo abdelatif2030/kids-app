@@ -303,10 +303,10 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
                       spacing: 18,
                       runSpacing: 6,
                       children: [
-                        _form('في النهاية', l.end),
-                        _form('في الوسط', l.medial),
-                        _form('في البداية', l.initial),
                         _form('منفصل', l.isolated),
+                        _form('في البداية', l.initial),
+                        _form('في الوسط', l.medial),
+                        _form('في النهاية', l.end),
                       ],
                     ),
                   ],
