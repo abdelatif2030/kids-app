@@ -11,6 +11,7 @@ import 'journey/repository.dart';
 import 'journey/ui/profile_forms.dart';
 import 'library/learning_records.dart';
 import 'library/learning_summary.dart';
+import 'literacy/adaptive.dart';
 import 'literacy/mastery.dart';
 import 'main.dart' show Video, loadVideos;
 import 'plan_screen.dart';
@@ -961,6 +962,7 @@ class _LearningLibrary extends StatefulWidget {
 
 class _LearningLibraryState extends State<_LearningLibrary> {
   late Future<LearningSummary> _f = _load();
+  AdaptivePlan _plan = const AdaptivePlan([], false, null);
 
   @override
   void didUpdateWidget(_LearningLibrary old) {
@@ -978,13 +980,19 @@ class _LearningLibraryState extends State<_LearningLibrary> {
     final offline = tasks
         .where((t) => t.childId == id && t.done && t.day.compareTo(from) >= 0 && t.day.compareTo(dayOf(end)) <= 0)
         .length;
+    final letterStates = await LiteracyStore.statesOf(id);
+    _plan = planLetters(
+      states: letterStates,
+      unlocked: LiteracyStore.unlocked(letterStates, await LiteracyStore.config()),
+      today: DateTime.now(),
+    );
     return buildLearningSummary(
       records: records,
       allRecords: all,
       history: await StoryStore.history(id),
       weekFrom: from,
       favorites: await StoryStore.favorites(id),
-      letterStates: await LiteracyStore.statesOf(id),
+      letterStates: letterStates,
       offlineActivities: offline,
     );
   }
@@ -1053,6 +1061,12 @@ class _LearningLibraryState extends State<_LearningLibrary> {
               const Divider(),
               _row(loc('أنشطة البيت المؤكَّدة'), '${s.offlineActivities}'),
               _row(loc('أعمال إبداعية جديدة'), '${s.creations}'),
+              if (_plan.steps.isNotEmpty || _plan.pauseReason != null) ...[
+                const Divider(),
+                Text(loc('خطة الحروف القادمة ولماذا'), style: const TextStyle(fontWeight: FontWeight.bold)),
+                for (final st in _plan.steps) Text('• ${st.letter}: ${st.reason}', style: const TextStyle(fontSize: 13)),
+                if (_plan.pauseReason != null) Text('• ${_plan.pauseReason}', style: const TextStyle(fontSize: 13)),
+              ],
               if (s.needsPractice.isNotEmpty) ...[
                 const Divider(),
                 Text(loc('يحتاج إلى مزيد من التدريب'), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepOrange)),

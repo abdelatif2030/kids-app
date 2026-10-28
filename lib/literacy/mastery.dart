@@ -14,13 +14,19 @@ class LetterState {
   final int box; // 0..5
   final String due; // yyyy-mm-dd
   final int sessions;
-  const LetterState(this.box, this.due, this.sessions);
+
+  /// Sessions in a row that were not fully right (0 after a perfect one).
+  final int wrongRun;
+
+  /// How many times a letter that had been moving up fell back to box 0.
+  final int lapses;
+  const LetterState(this.box, this.due, this.sessions, [this.wrongRun = 0, this.lapses = 0]);
 
   bool get mastered => box >= LiteracyStore.masteredBox;
 
-  Map<String, dynamic> toJson() => {'b': box, 'd': due, 's': sessions};
+  Map<String, dynamic> toJson() => {'b': box, 'd': due, 's': sessions, 'w': wrongRun, 'l': lapses};
   factory LetterState.fromJson(Map<String, dynamic> j) =>
-      LetterState(j['b'] as int, j['d'] as String, j['s'] as int? ?? 0);
+      LetterState(j['b'] as int, j['d'] as String, j['s'] as int? ?? 0, j['w'] as int? ?? 0, j['l'] as int? ?? 0);
 }
 
 /// Parent-set progression.
@@ -70,7 +76,13 @@ class LiteracyStore {
     final old = mine[letter] ?? const LetterState(0, '', 0);
     final box = allRight ? (old.box + 1).clamp(0, 5) : 0;
     final due = dayOf((now ?? DateTime.now()).add(Duration(days: _intervals[box])));
-    final next = LetterState(box, due, old.sessions + 1);
+    final next = LetterState(
+      box,
+      due,
+      old.sessions + 1,
+      allRight ? 0 : old.wrongRun + 1,
+      old.lapses + (!allRight && old.box >= 1 ? 1 : 0),
+    );
     mine[letter] = next;
     await (await SharedPreferences.getInstance()).setString(
       _key,

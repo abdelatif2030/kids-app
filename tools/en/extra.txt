@@ -129,3 +129,10 @@
 ورقة إجابات|Answer sheet
 نسخة جديدة|New variation
 الأعمار|Ages
+خطة اليوم|Today's plan
+مراجعة|Review
+خطوة أسهل|Easier step
+حرف جديد|New letter
+تحدّي|Challenge
+ابدأ|Start
+خطة الحروف القادمة ولماذا|Next letter plan and why

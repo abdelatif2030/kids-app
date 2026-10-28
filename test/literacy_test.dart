@@ -435,7 +435,8 @@ void main() {
       expect(find.text('مراجعة اليوم (1)'), findsOneWidget);
       expect(find.byIcon(Icons.lock_rounded), findsNWidgets(24));
       expect(find.textContaining('تُفتح «كوّن كلمات»'), findsOneWidget);
-      await tester.tap(find.text('ب').first);
+      expect(find.textContaining('خطة اليوم'), findsOneWidget); // the adaptive card
+      await tester.tap(find.text('باء')); // the grid tile (the card shows the letter itself)
       await _settle(tester);
       expect(find.text('اسمه: باء'), findsOneWidget);
     });

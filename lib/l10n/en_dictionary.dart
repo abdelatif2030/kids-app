@@ -1338,4 +1338,9 @@ const Map<String, String> kEnglish = {
   'ورقة إجابات': 'Answer sheet',
   'نسخة جديدة': 'New variation',
   'الأعمار': 'Ages',
+  'خطوة أسهل': 'Easier step',
+  'حرف جديد': 'New letter',
+  'تحدّي': 'Challenge',
+  'ابدأ': 'Start',
+  'خطة الحروف القادمة ولماذا': 'Next letter plan and why',
 };

@@ -18,6 +18,8 @@ import 'letters_data.dart';
 import 'mastery.dart';
 import 'tracing.dart';
 import 'word_tiles.dart';
+import 'adaptive.dart';
+import 'adaptive_session.dart';
 
 /// Updates the spaced-review state of every letter in [results]: a letter
 /// moves up only if all of its questions in this session were right first time.
@@ -54,6 +56,7 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
   Map<String, LetterState> _states = {};
   LiteracyConfig _cfg = const LiteracyConfig();
   List<String> _due = [];
+  AdaptivePlan _plan = const AdaptivePlan([], false, null);
   bool _loaded = false;
 
   @override
@@ -71,6 +74,7 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
       _states = states;
       _cfg = cfg;
       _due = due;
+      _plan = planLetters(states: states, unlocked: LiteracyStore.unlocked(states, cfg), today: DateTime.now());
       _loaded = true;
     });
   }
@@ -104,6 +108,17 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
               : ListView(
                   padding: const EdgeInsets.all(16),
                   children: [
+                    _AdaptiveCard(
+                      plan: _plan,
+                      onStart: () => _open(LessonRunnerScreen(
+                        child: widget.child,
+                        kind: LessonKind.pictureToWord,
+                        title: loc('خطة اليوم'),
+                        contentBuilder: () => QuizContent(questionsForPlan(_plan)),
+                        onResults: (r) => recordLetterResults(id, r),
+                      )),
+                      onNewLetter: (l) => _open(LetterLessonScreen(child: widget.child, letter: l)),
+                    ),
                     Wrap(
                       spacing: 10,
                       runSpacing: 10,
@@ -430,6 +445,73 @@ class _TraceScreen extends StatelessWidget {
               if (context.mounted) Navigator.pop(context);
             },
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Today's adaptive plan with the reason behind every step.
+class _AdaptiveCard extends StatelessWidget {
+  final AdaptivePlan plan;
+  final VoidCallback onStart;
+  final void Function(ArabicLetter) onNewLetter;
+  const _AdaptiveCard({required this.plan, required this.onStart, required this.onNewLetter});
+
+  String _label(AdaptiveAction a) => switch (a) {
+        AdaptiveAction.review => loc('مراجعة'),
+        AdaptiveAction.simplify => loc('خطوة أسهل'),
+        AdaptiveAction.learnNew => loc('حرف جديد'),
+        AdaptiveAction.challenge => loc('تحدّي'),
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final practice = [for (final s in plan.steps) if (s.action != AdaptiveAction.learnNew) s];
+    final fresh = plan.of(AdaptiveAction.learnNew);
+    if (plan.steps.isEmpty && plan.pauseReason == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: RCard(
+        color: Colors.white,
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(loc('خطة اليوم'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: RC.ink)),
+            const SizedBox(height: 6),
+            for (final s in plan.steps)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(s.letter, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: RC.ink)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text('${_label(s.action)} · ${s.reason}', style: const TextStyle(fontSize: 13, color: RC.ink)),
+                    ),
+                  ],
+                ),
+              ),
+            if (plan.pauseReason != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(plan.pauseReason!, style: const TextStyle(fontSize: 13, color: RC.ink, fontStyle: FontStyle.italic)),
+              ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (practice.isNotEmpty)
+                  FilledButton.icon(onPressed: onStart, icon: const Icon(Icons.play_arrow_rounded), label: Text(loc('ابدأ'))),
+                for (final s in fresh)
+                  if (letterOf(s.letter) != null)
+                    OutlinedButton(onPressed: () => onNewLetter(letterOf(s.letter)!), child: Text(tr2('تعلّم حرف ${s.letter}', 'Learn the letter ${s.letter}'))),
+              ],
+            ),
+          ],
         ),
       ),
     );

@@ -14,8 +14,8 @@ List<ArabicLetter> _others(ArabicLetter l, int n, Random r) =>
 
 /// Hear the letter's NAME (باء) and pick it. Name and sound are different
 /// things, so they are asked separately.
-Question nameQuestion(ArabicLetter l, Random r) {
-  final m = _mix(Option.text(l.letter), [for (final o in _others(l, 2, r)) Option.text(o.letter)], r);
+Question nameQuestion(ArabicLetter l, Random r, {int wrong = 2}) {
+  final m = _mix(Option.text(l.letter), [for (final o in _others(l, wrong, r)) Option.text(o.letter)], r);
   return Question(
     prompt: loc('استمع إلى اسم الحرف واختره'),
     bigText: '🔊',
@@ -32,8 +32,8 @@ Question nameQuestion(ArabicLetter l, Random r) {
 }
 
 /// Hear the letter's SOUND (بَ) and pick the letter.
-Question soundQuestion(ArabicLetter l, Random r) {
-  final m = _mix(Option.text(l.letter), [for (final o in _others(l, 2, r)) Option.text(o.letter)], r);
+Question soundQuestion(ArabicLetter l, Random r, {int wrong = 2}) {
+  final m = _mix(Option.text(l.letter), [for (final o in _others(l, wrong, r)) Option.text(o.letter)], r);
   return Question(
     prompt: loc('استمع إلى صوت الحرف واختره'),
     bigText: '🔊',
@@ -174,4 +174,11 @@ List<Question> reviewSession(List<ArabicLetter> letters, {Random? random}) {
     for (final l in letters.take(6))
       switch (r.nextInt(3)) { 0 => nameQuestion(l, r), 1 => soundQuestion(l, r), _ => startsWithQuestion(l, r) },
   ];
+}
+
+/// The easy step for a letter the child keeps missing: only name and sound,
+/// two choices each, nothing timed. Used by the adaptive plan.
+List<Question> simplerLetterSession(ArabicLetter l, {Random? random}) {
+  final r = random ?? Random();
+  return [nameQuestion(l, r, wrong: 1), soundQuestion(l, r, wrong: 1), nameQuestion(l, r, wrong: 1)];
 }
