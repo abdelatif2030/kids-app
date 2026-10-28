@@ -66,3 +66,14 @@ User asked for a "Rehlaty | رحلتي" app (learning map, daily plan, rewards, 
 - Dashboard is per child; data reset in lib/data_reset.dart; docs/PRODUCTION.md lists limits; README updated.
 - Accessibility: `Tappable` (lib/ui.dart) gives keyboard focus; tests in test/accessibility_test.dart (320 px, text x1.6). 179 tests pass, `flutter analyze` clean except the old `_round` warning.
 - Not done: Android build, real device test, Firebase emulator, voice commands, lock mode. Old games (balloons, animal, memory) still do not check the timer.
+
+### Rehlaty additions (2026-10-28, from the user's list of ideas)
+- Videos: 52 more (157 total) from the user's channel list (Numberblocks, Alphablocks, Super Simple Songs, SciShow Kids, Math Antics, Crash Course Kids, Sesame Street, Khan Academy Kids, Art for Kids Hub, Learn with Zakaria, Adam wa Mishmish, Baraem-style Arabic). IDs are real, copied from YouTube web-search results; NOT watched or embed-checked; titles and age ranges written by me from the search titles. The user must review each (hand-review rule). Some are long compilations (Baraem 35 min).
+- Home tasks (lib/journey/home_tasks.dart, ui/home_tasks_screen.dart): after an activity or a lesson video a real-world task is suggested and stored locally (`home_tasks`, 60 days); parent confirms in Parent settings "أنشطة البيت". No stars/XP for them. «اكتشف مع ماما وبابا» (ExploreScreen) on the home tab for ages 1-3, no scoring.
+- Video lesson flow (ui/lesson_flow.dart): after a video is watched to the end from the video list (not the daily plan): 3 quick questions (subject -> land) then a home task. Records skill events only; no attempts, no stars.
+- Math help: a wrong answer on a sum/difference/times question shows the problem as a picture (MathPicture, `Question.math`).
+- New land «مدرسة المشاعر» (feelings, 7th land, skill `feelings`, badge kind_heart): five levels of scenarios; no diagnosis; the right answer is never hitting/hiding. Assessment now has 7 questions.
+- Display settings (lib/display_prefs.dart, Parent settings): text size normal/large/extra large and reduced motion.
+- Dashboard "خريطة المهارات": each skill shows the next activity to practise.
+- Not built: school/teacher classroom mode (needs Firebase), graded reading library, virtual science lab, voice commands, lock mode.
+- 191 tests pass; `flutter analyze` clean except the old `_round` warning.

@@ -26,6 +26,7 @@ const kSkills = [
   Skill('memory', 'الذاكرة', 'نادي الذكاء', 'discover'),
   Skill('sequence', 'ترتيب الخطوات', 'نادي الذكاء', 'discover'),
   Skill('story', 'فهم القصة', 'قطار القصص', 'stories'),
+  Skill('feelings', 'فهم المشاعر', 'مدرسة المشاعر', 'discover'),
 ];
 
 Skill? skillById(String id) {

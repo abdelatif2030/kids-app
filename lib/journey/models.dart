@@ -187,6 +187,15 @@ class Option {
   String get label => text ?? caption ?? emoji ?? shape?.kind ?? 'لون';
 }
 
+/// The numbers behind an arithmetic question, so a wrong answer can be
+/// followed by a picture of the same problem (instead of repeating the text).
+class MathHelp {
+  final int a;
+  final int b;
+  final String op; // '+', '-' or '×'
+  const MathHelp(this.a, this.b, this.op);
+}
+
 class Question {
   final String prompt;
   final String? bigEmoji; // shown large above the options
@@ -199,6 +208,7 @@ class Question {
   final String hint;
   final String skill; // a skill id in skills.dart
   final String? detail; // what was asked, for "needs practice" (a letter, a color)
+  final MathHelp? math; // set for sums, so a mistake can be shown as a picture
 
   const Question({
     required this.prompt,
@@ -212,6 +222,7 @@ class Question {
     this.bigShape,
     this.passage,
     this.detail,
+    this.math,
   });
 }
 

@@ -19,6 +19,7 @@ const kLands = [
       Color(0xFF4A90E2)),
   Land('brain', 'نادي الذكاء', 'الذاكرة والتسلسل', Icons.psychology_rounded, Color(0xFF8E73D0)),
   Land('stories', 'قطار القصص', 'قصص وأسئلة فهم', Icons.auto_stories_rounded, Color(0xFFE56B9A)),
+  Land('feelings', 'مدرسة المشاعر', 'أسمّي شعوري وأتصرف بلطف', Icons.favorite_rounded, Color(0xFFD9577A)),
 ];
 
 Land landById(String id) => kLands.firstWhere((l) => l.id == id);
@@ -48,6 +49,7 @@ class Activity {
             'colors' => 'ألوان وأشكال',
             'english' => 'كلمات إنجليزية',
             'stories' => 'قصة وأسئلة',
+            'feelings' => 'مشاعري',
             _ => 'تحدٍّ',
           },
       };
@@ -133,6 +135,7 @@ const kBadges = [
   BadgeDef('english_buddy', 'صديق الإنجليزية', 'أنهِ 3 مستويات في مدينة الإنجليزية', '🌍', 'english', 3),
   BadgeDef('brain_champ', 'بطل الذاكرة', 'أنهِ 3 مستويات في نادي الذكاء', '🧠', 'brain', 3),
   BadgeDef('story_lover', 'محب القصص', 'أنهِ 3 مستويات في قطار القصص', '📚', 'stories', 3),
+  BadgeDef('kind_heart', 'قلب طيّب', 'أنهِ 3 مستويات في مدرسة المشاعر', '💛', 'feelings', 3),
   BadgeDef('perfect', 'نجوم كاملة', 'احصل على 3 نجوم في نشاط', '🌟', 'perfect', 1),
   BadgeDef('explorer', 'مستكشف', 'جرّب 4 أراضٍ مختلفة', '🧭', 'lands', 4),
   BadgeDef('daily_hero', 'بطل اليوم', 'أكمل مغامرة اليوم', '🏅', 'daily', 1),

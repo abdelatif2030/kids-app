@@ -10,6 +10,7 @@ import '../recommender.dart';
 import '../repository.dart';
 import 'activity_screen.dart';
 import 'kit.dart';
+import 'home_tasks_screen.dart';
 import 'land_map_screen.dart';
 
 /// The child's home: today's adventure, the learning lands and the videos.
@@ -172,6 +173,29 @@ class HomeTab extends StatelessWidget {
                             color: p.doneToday ? RC.good : RC.pinkDeep,
                             size: 32,
                           ),
+                        ],
+                      ),
+                    ),
+                  ),
+                if (child.age <= 3)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: RCard(
+                      color: RC.peach.withAlpha(170),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => ExploreScreen(child: child)),
+                      ),
+                      semanticLabel: 'اكتشف مع ماما وبابا',
+                      child: const Row(
+                        children: [
+                          Text('👨‍👩‍👧', style: TextStyle(fontSize: 38)),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text('اكتشف مع ماما وبابا',
+                                style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: RC.ink)),
+                          ),
+                          Icon(Icons.chevron_left_rounded, color: RC.ink),
                         ],
                       ),
                     ),

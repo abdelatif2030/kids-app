@@ -250,6 +250,11 @@ class _QuizViewState extends State<QuizView> {
                   ),
                 ),
               ),
+              if (_missed && !_right && q.math != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: MathPicture(help: q.math!),
+                ),
               if (_hint)
                 Padding(
                   padding: const EdgeInsets.only(top: 10),
@@ -266,6 +271,72 @@ class _QuizViewState extends State<QuizView> {
                 ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+
+/// Draws a sum with objects: a + b as two groups, a - b with b crossed out,
+/// a × b as a times-table grid. Shown after a wrong answer.
+class MathPicture extends StatelessWidget {
+  final MathHelp help;
+  const MathPicture({super.key, required this.help});
+
+  Widget _dots(int n, {int crossed = 0}) => Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 4,
+        runSpacing: 4,
+        children: [
+          for (var i = 0; i < n; i++)
+            Opacity(
+              opacity: i >= n - crossed ? 0.3 : 1,
+              child: Text(i >= n - crossed ? '❌' : '🔵', style: const TextStyle(fontSize: 26)),
+            ),
+        ],
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final h = help;
+    final Widget body;
+    final String label;
+    switch (h.op) {
+      case '+':
+        label = 'ضع ${h.a} مع ${h.b} واعدّ الكل';
+        body = Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 10,
+          runSpacing: 6,
+          children: [
+            SizedBox(width: 150, child: _dots(h.a)),
+            const Text('+', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: RC.ink)),
+            SizedBox(width: 150, child: _dots(h.b)),
+          ],
+        );
+      case '-':
+        label = 'عندنا ${h.a} وشطبنا ${h.b}، فكم بقي؟';
+        body = _dots(h.a, crossed: h.b);
+      default:
+        label = '${h.a} صفوف، في كل صف ${h.b}';
+        body = Column(
+          children: [for (var i = 0; i < h.a; i++) _dots(h.b)],
+        );
+    }
+    return RCard(
+      color: RC.mint.withAlpha(150),
+      child: Semantics(
+        label: label,
+        child: Column(
+          children: [
+            Text('🔍 $label',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: RC.ink)),
+            const SizedBox(height: 8),
+            body,
+          ],
         ),
       ),
     );

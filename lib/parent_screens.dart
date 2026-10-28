@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'dashboard_screen.dart';
+import 'display_prefs.dart';
+import 'journey/ui/home_tasks_screen.dart';
 import 'journey/ui/admin_screen.dart';
 import 'journey/ui/privacy_screen.dart';
 import 'journey/ui/profile_forms.dart';
@@ -251,6 +253,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const DashboardScreen()),
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.home_rounded),
+                  title: const Text('أنشطة البيت'),
+                  subtitle: const Text('مهام حقيقية بعد الأنشطة: أكّد أن الطفل فعلها'),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ParentHomeTasksScreen()),
+                  ),
+                ),
+                const Divider(),
+                ListenableBuilder(
+                  listenable: DisplayPrefs.instance,
+                  builder: (context, _) => Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.text_fields_rounded),
+                        title: const Text('حجم الخط'),
+                        trailing: DropdownButton<double>(
+                          value: DisplayPrefs.instance.textScale,
+                          items: [
+                            for (final e in DisplayPrefs.scales.entries)
+                              DropdownMenuItem(value: e.key, child: Text(e.value)),
+                          ],
+                          onChanged: (v) {
+                            if (v != null) DisplayPrefs.instance.setTextScale(v);
+                          },
+                        ),
+                      ),
+                      SwitchListTile(
+                        secondary: const Icon(Icons.animation_rounded),
+                        title: const Text('تقليل الحركة'),
+                        subtitle: const Text('يوقف الحركات والتأثيرات في شاشات الطفل'),
+                        value: DisplayPrefs.instance.reduceMotion,
+                        onChanged: DisplayPrefs.instance.setReduceMotion,
+                      ),
+                    ],
                   ),
                 ),
                 const Divider(),

@@ -567,10 +567,21 @@ class _Skills extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(
-                      s.missed.isEmpty
-                          ? s.skill.label
-                          : '${s.skill.label} (يخطئ في: ${s.missed.join('، ')})',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          s.missed.isEmpty
+                              ? s.skill.label
+                              : '${s.skill.label} (يخطئ في: ${s.missed.join('، ')})',
+                        ),
+                        Text(
+                          s.level == SkillLevel.mastered
+                              ? 'التالي: مستوى أصعب في «${s.skill.game}»'
+                              : 'النشاط التالي: «${s.skill.game}» (${s.attempts} جولة مسجلة)',
+                          style: const TextStyle(fontSize: 12, color: Colors.black54),
+                        ),
+                      ],
                     ),
                   ),
                   Container(
@@ -604,7 +615,7 @@ class _Skills extends StatelessWidget {
   Widget build(BuildContext context) {
     final r = report;
     return _Section(
-      title: 'المهارات',
+      title: 'خريطة المهارات',
       child: r.skills.isEmpty
           ? const Text(
               'عندما يلعب طفلك ألعاب الحروف والألوان والرياضيات تظهر مهاراته هنا.',

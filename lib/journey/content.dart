@@ -180,7 +180,7 @@ List<int> _numbers(int answer, int count, Random r, {int min = 0}) {
 }
 
 Question _numberQuestion(String skill, int answer, String prompt, String hint, int count, Random r,
-    {String? bigEmoji, int repeat = 1, String? bigText, int min = 0}) {
+    {String? bigEmoji, int repeat = 1, String? bigText, int min = 0, MathHelp? math}) {
   final nums = _numbers(answer, count, r, min: min);
   final m = _mix(Option.text('$answer'), [for (final n in nums.skip(1)) Option.text('$n')], r);
   return Question(
@@ -193,6 +193,7 @@ Question _numberQuestion(String skill, int answer, String prompt, String hint, i
     repeat: repeat,
     bigText: bigText,
     detail: null,
+    math: math,
   );
 }
 
@@ -252,7 +253,7 @@ List<Question> _numberQuestions(int d, int age, Random r) {
     final b = 1 + r.nextInt(max - a);
     return _numberQuestion('addition', a + b, 'ما ناتج الجمع؟', 'ابدأ من $a وعُدّ $b خطوات للأمام.',
         optionCount, r,
-        bigText: '$a + $b');
+        bigText: '$a + $b', math: MathHelp(a, b, '+'));
   }
 
   Question sub(int max) {
@@ -260,7 +261,7 @@ List<Question> _numberQuestions(int d, int age, Random r) {
     final b = 1 + r.nextInt(a - 1);
     return _numberQuestion('subtraction', a - b, 'ما ناتج الطرح؟', 'ابدأ من $a وارجع $b خطوات للخلف.',
         optionCount, r,
-        bigText: '$a - $b');
+        bigText: '$a - $b', math: MathHelp(a, b, '-'));
   }
 
   Question mul() {
@@ -268,7 +269,7 @@ List<Question> _numberQuestions(int d, int age, Random r) {
     final b = 2 + r.nextInt(4);
     return _numberQuestion('multiplication', a * b, 'ما ناتج الضرب؟', 'اجمع $a ما مقداره $b مرات.',
         optionCount, r,
-        bigText: '$a × $b', min: 1);
+        bigText: '$a × $b', min: 1, math: MathHelp(a, b, '×'));
   }
 
   return [
@@ -428,12 +429,77 @@ List<Question> _storyQuestions(int level) {
   ];
 }
 
+
+/// Feelings school: short scenarios, never a diagnosis. (prompt, big emoji,
+/// options with the right one first, hint)
+const _feelingPool = <int, List<(String, String?, List<String>, String)>>{
+  1: [
+    ('ما شعور هذا الوجه؟', '😊', ['سعيد', 'حزين', 'غاضب'], 'الوجه يبتسم.'),
+    ('ما شعور هذا الوجه؟', '😢', ['حزين', 'سعيد', 'خائف'], 'هناك دموع على الوجه.'),
+    ('ما شعور هذا الوجه؟', '😠', ['غاضب', 'سعيد', 'نعسان'], 'الحاجبان منخفضان والفم مشدود.'),
+    ('ما شعور هذا الوجه؟', '😨', ['خائف', 'سعيد', 'غاضب'], 'العينان واسعتان.'),
+    ('ما شعور هذا الوجه؟', '😴', ['نعسان', 'غاضب', 'متحمس'], 'العينان مغمضتان.'),
+    ('ما شعور هذا الوجه؟', '🤩', ['متحمس', 'حزين', 'نعسان'], 'العينان مبتهجتان.'),
+  ],
+  2: [
+    ('سقط بنائي وأنا غاضب. ماذا أفعل أولًا؟', '😠', ['آخذ نفسًا عميقًا', 'أضرب أخي', 'أصرخ على الجميع'], 'التنفس العميق يهدّئ الجسم.'),
+    ('أشعر بالحزن لأن صديقي سافر. ماذا أفعل؟', '😢', ['أخبر أمي أو أبي بشعوري', 'أخفي شعوري ولا أقول شيئًا', 'أكسر لعبتي'], 'الكلام عن المشاعر يساعد.'),
+    ('أنا خائف من الظلام. ماذا أقول؟', '🌙', ['أقول لأمي أو أبي إني خائف', 'أبقى صامتًا', 'أصرخ فقط'], 'اطلب المساعدة بكلمات هادئة.'),
+    ('أنا متحمس جدًا للحفلة! كيف أعبّر؟', '🎉', ['أقول إني متحمس وأبتسم', 'أضرب الباب', 'أبكي'], 'المشاعر الجميلة نقولها أيضًا.'),
+    ('غضبت وأريد أن أهدأ. أي شيء يساعد؟', '😤', ['أعدّ حتى 10 ببطء', 'أركل الكرسي', 'أرمي لعبتي'], 'العدّ البطيء يعطي وقتًا للهدوء.'),
+    ('أشعر بالملل. ماذا أفعل؟', '🥱', ['أختار لعبة أو كتابًا', 'أزعج أختي', 'أبكي'], 'فكّر فيما تحب أن تفعله.'),
+  ],
+  3: [
+    ('دفعت صديقي بالخطأ فسقط. ماذا أقول؟', '🤕', ['أنا آسف، هل أنت بخير؟', 'لا شيء', 'هو السبب'], 'الاعتذار الصادق يصلح الموقف.'),
+    ('عندي لعبة وصديقي يريدها. ما التصرف اللطيف؟', '🧸', ['نتناوب في اللعب', 'أخبئها', 'أقول: لا أحد يلعب بها'], 'المشاركة تفرّح الاثنين.'),
+    ('أخذ أخي حلواي دون سؤال. ماذا أفعل؟', '🍬', ['أقول له بهدوء: اسألني أولًا', 'أضربه', 'آخذ حلواه'], 'قل ما تريد بصوت هادئ.'),
+    ('صديقي حزين لأنه خسر اللعبة. ماذا أقول؟', '🫂', ['لا بأس، سنلعب مرة أخرى', 'أنت دائمًا تخسر', 'أضحك عليه'], 'الكلام اللطيف يريح.'),
+    ('انتظرت دوري في اللعب طويلًا. ماذا أفعل؟', '⏳', ['أنتظر وأتنفس بهدوء', 'أدفع الآخرين', 'أنسحب غاضبًا'], 'الصبر صعب لكنه ينفع.'),
+    ('كسرتُ كوبًا بالخطأ. ماذا أفعل؟', '🥛', ['أقول لأمي وأعتذر', 'أخفيه', 'أتهم أخي'], 'الصدق أفضل دائمًا.'),
+  ],
+  4: [
+    ('لا أفهم الواجب. ماذا أفعل؟', '📚', ['أطلب المساعدة', 'أمزّق الدفتر', 'أترك الواجب وأبكي'], 'طلب المساعدة قوة.'),
+    ('لا أجد حذائي وأنا متأخر. ماذا أفعل؟', '👟', ['أطلب من أمي أن تساعدني', 'أصرخ', 'أرمي كل الأشياء'], 'اطلب المساعدة بكلمات.'),
+    ('لا أستطيع فتح العلبة. ماذا أقول؟', '📦', ['هل تساعدني من فضلك؟', 'أرميها', 'أبكي دون كلام'], 'قل «من فضلك» و«شكرًا».'),
+    ('صديقي ضايقني ولا يتوقف. ماذا أفعل؟', '😟', ['أقول له توقف وأخبر معلمي أو أهلي', 'أرد عليه بالضرب', 'أسكت دائمًا'], 'قل «توقف» ثم أخبر شخصًا كبيرًا.'),
+    ('أنا قلق من الامتحان. ماذا يساعدني؟', '📝', ['أتكلم مع شخص أثق به وأتنفس بعمق', 'أخفي قلقي', 'أهرب'], 'الكلام والتنفس يخففان القلق.'),
+    ('أحتاج لحظة هدوء. ماذا أطلب؟', '🌿', ['أطلب مكانًا هادئًا لدقائق', 'أصرخ', 'أضرب الباب'], 'يمكنك أن تطلب لحظة هدوء.'),
+  ],
+  5: [
+    ('طلب مني أحد الغرباء أن أذهب معه. ماذا أفعل؟', '🚫', ['أقول لا وأبتعد وأخبر شخصًا أثق به', 'أذهب معه', 'أعطيه عنواني'], 'نحن لا نذهب مع الغرباء أبدًا.'),
+    ('شعرت أن أمرًا ما غير آمن. ماذا أفعل؟', '⚠️', ['أخبر أمي أو أبي أو معلمي فورًا', 'أخفي الأمر', 'أنتظر حتى أنساه'], 'الشعور بعدم الأمان مهم، قله لشخص كبير تثق به.'),
+    ('طلب مني أحد ألا أخبر أهلي بسرٍّ يخيفني. ماذا أفعل؟', '🤐', ['أخبر أهلي رغم ذلك', 'أحفظ السر', 'أخبر الغرباء'], 'الأسرار التي تخيفنا نخبر بها أهلنا.'),
+    ('لا يحب أحدٌ أن يلمسني بطريقة تضايقني. ماذا أقول؟', '✋', ['أقول: توقف! ثم أخبر شخصًا أثق به', 'أسكت', 'أبتسم'], 'جسمي ملكي، ولي أن أقول لا.'),
+    ('ضعت في السوق. ماذا أفعل؟', '🛒', ['أبقى مكاني وأطلب المساعدة من موظف أو شرطي', 'أمشي بعيدًا وحدي', 'أذهب مع غريب'], 'ابحث عن موظف يرتدي زيًّا رسميًّا.'),
+    ('من أستطيع أن أخبره عندما أشعر بالخوف؟', '🧑‍🤝‍🧑', ['أمي أو أبي أو معلمي', 'لا أحد', 'شخص لا أعرفه'], 'اختر شخصًا كبيرًا تثق به.'),
+  ],
+};
+
+List<Question> _feelingQuestions(int level, Random r) {
+  final pool = _feelingPool[level.clamp(1, 5)]!;
+  return [
+    for (final item in _some(pool, 5, r))
+      () {
+        final m = _mix(Option.text(item.$3.first), [for (final o in item.$3.skip(1)) Option.text(o)], r);
+        return Question(
+          prompt: item.$1,
+          bigEmoji: item.$2,
+          options: m.options,
+          correct: m.correct,
+          hint: item.$4,
+          skill: 'feelings',
+        );
+      }(),
+  ];
+}
+
 const _customSkill = {
   'letters': 'letters_ar',
   'numbers': 'counting',
   'colors': 'colors',
   'english': 'english_vocab',
   'stories': 'story',
+  'feelings': 'feelings',
 };
 
 /// The content of [activity] for a child of [age]. [bias] (-1, 0, 1) makes the
@@ -461,6 +527,7 @@ ActivityContent buildContent(
         'numbers' => _numberQuestions(d, age, r),
         'colors' => _colorQuestions(d, r),
         'english' => _englishQuestions(d, r),
+        'feelings' => _feelingQuestions(d, r),
         _ => _storyQuestions(activity.level),
       };
       if (activity.landId != 'stories') {
@@ -507,6 +574,7 @@ List<(String, Question)> assessmentQuestions(int age, {Random? random}) {
     ('colors', first(quiz('colors'))),
     ('english', first(quiz('english'))),
     ('stories', first(buildContent(const Activity('stories', 1, ActivityKind.quiz), age: age, random: r))),
+    ('feelings', first(quiz('feelings'))),
     // The brain club is checked with a number-order question.
     (
       'brain',

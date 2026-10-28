@@ -4,6 +4,7 @@ import '../../progress_store.dart';
 import '../../rest_screen.dart';
 import '../../ui.dart' show Mascot;
 import '../content.dart';
+import '../home_tasks.dart';
 import '../lands.dart';
 import '../models.dart';
 import '../repository.dart';
@@ -41,6 +42,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
   int _run = 0;
   final Stopwatch _watch = Stopwatch()..start();
   _Outcome? _outcome;
+  HomeTask? _task;
 
   ActivityContent _build() => widget.contentBuilder?.call() ?? buildContent(
         widget.activity,
@@ -67,11 +69,13 @@ class _ActivityScreenState extends State<ActivityScreen> {
     for (final r in results) {
       await ProgressStore.record(r.skill, r.ok, detail: r.detail, childId: id);
     }
+    final task = await HomeTasks.suggest(id, widget.activity.landId);
     final after = store.progressOf(id);
     final hadBadges = before.badges.map((b) => b.id).toSet();
     final hadAccessories = before.accessories.map((a) => a.id).toSet();
     if (!mounted) return;
     setState(() {
+      _task = task;
       _outcome = _Outcome(
         stars,
         results.length,
@@ -90,6 +94,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
       _content = _build();
       _run++;
       _outcome = null;
+      _task = null;
       _watch
         ..reset()
         ..start();
@@ -136,6 +141,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   outcome: _outcome!,
                   activity: a,
                   child: widget.child,
+                  task: _task,
                   onAgain: _again,
                   onNext: a.level < kLevelsPerLand ? () => _playNext(activitiesOf(a.landId)[a.level]) : null,
                 ),
@@ -149,12 +155,14 @@ class _Completion extends StatelessWidget {
   final _Outcome outcome;
   final Activity activity;
   final ChildProfile child;
+  final HomeTask? task;
   final VoidCallback onAgain;
   final VoidCallback? onNext;
   const _Completion({
     required this.outcome,
     required this.activity,
     required this.child,
+    required this.task,
     required this.onAgain,
     required this.onNext,
   });
@@ -247,6 +255,24 @@ class _Completion extends StatelessWidget {
                           child: Text('فتحتَ ${a.name} لشخصيتك! ستجدها في «أنا»',
                               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RC.ink)),
                         ),
+                      ],
+                    ),
+                  ),
+                ),
+              if (task != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: RCard(
+                    color: RC.yellow.withAlpha(120),
+                    outline: RC.star,
+                    child: Column(
+                      children: [
+                        const Text('🏠 مهمة مع ماما وبابا',
+                            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: RC.ink)),
+                        const SizedBox(height: 4),
+                        Text(task!.text,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 16, height: 1.5, color: RC.ink)),
                       ],
                     ),
                   ),

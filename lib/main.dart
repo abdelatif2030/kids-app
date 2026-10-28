@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'curriculum.dart';
+import 'display_prefs.dart';
 import 'firebase_config.dart';
 import 'journey/repository.dart';
 import 'journey/ui/kit.dart' show RC;
+import 'journey/ui/lesson_flow.dart';
 import 'journey/ui/start_screen.dart';
 import 'player_screen.dart';
 import 'rest_screen.dart';
@@ -18,6 +20,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initFirebase();
   await JourneyStore.instance.load();
+  await DisplayPrefs.instance.load();
   runApp(const KidsApp());
 }
 
@@ -47,8 +50,20 @@ class KidsApp extends StatelessWidget {
         ),
       ),
       // Arabic-first: the whole app is right-to-left.
-      builder: (context, child) =>
-          Directionality(textDirection: TextDirection.rtl, child: child!),
+      builder: (context, child) => ListenableBuilder(
+        listenable: DisplayPrefs.instance,
+        builder: (context, _) {
+          final prefs = DisplayPrefs.instance;
+          final media = MediaQuery.of(context);
+          return MediaQuery(
+            data: media.copyWith(
+              textScaler: prefs.textScale == 1.0 ? media.textScaler : TextScaler.linear(prefs.textScale),
+              disableAnimations: media.disableAnimations || prefs.reduceMotion,
+            ),
+            child: Directionality(textDirection: TextDirection.rtl, child: child!),
+          );
+        },
+      ),
       home: const StartScreen(),
     );
   }
@@ -243,10 +258,19 @@ class _VideoListScreenState extends State<VideoListScreen> {
   }
 
   Future<void> _play(Video video) async {
-    await Navigator.push(
+    final finished = await Navigator.push<bool>(
       context,
       MaterialPageRoute(builder: (_) => PlayerScreen(video: video)),
     );
+    if (!mounted) return;
+    // Watched to the end: watch -> try -> apply, unless time is up.
+    final child = JourneyStore.instance.active;
+    if (finished == true && child != null && _session.reason.value == null) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => LessonFlowScreen(video: video, child: child)),
+      );
+    }
     if (mounted) _checkRest();
   }
 

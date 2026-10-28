@@ -12,6 +12,7 @@ Future<void> deleteChildData() async {
     if (key == 'watch_history' ||
         key == 'skill_events' ||
         key == 'parent_notes' ||
+        key == 'home_tasks' ||
         key == 'last_age' ||
         key.startsWith('used_') ||
         key.startsWith('bonus_') ||

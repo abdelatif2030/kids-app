@@ -377,7 +377,7 @@ void main() {
       expect(order.first, 'numbers'); // missed lands before goal lands
       expect(order.take(2).toSet(), {'numbers', 'english'});
       expect(order.toSet(), {for (final l in kLands) l.id}); // all six, no repeats
-      expect(order.length, 6);
+      expect(order.length, kLands.length);
       // Goal lands come before unrelated ones once nothing was missed.
       final allRight = planFromAssessment({for (final l in kLands) l.id: 1.0}, ['english'], []);
       expect(allRight.first, 'english');

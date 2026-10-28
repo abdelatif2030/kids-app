@@ -113,8 +113,8 @@ void main() {
 
       // Step 3: the child answers six quick questions.
       expect(find.text('الخطوة 3 من 4'), findsOneWidget);
-      expect(find.text('السؤال 1 من 6'), findsOneWidget);
-      await _answerQuiz(tester, 6);
+      expect(find.text('السؤال 1 من 7'), findsOneWidget);
+      await _answerQuiz(tester, 7);
       expect(find.textContaining('أحسنت يا سلمى'), findsOneWidget);
       await tester.tap(find.text('عرض الخطة المقترحة'));
       await tester.pump();
@@ -123,7 +123,7 @@ void main() {
       expect(find.text('الخطوة 4 من 4'), findsOneWidget);
       expect(find.text('خطة التعلّم'), findsOneWidget);
       final checkboxes = find.byType(Checkbox);
-      expect(checkboxes, findsNWidgets(6));
+      expect(checkboxes, findsNWidgets(kLands.length));
       await tester.tap(checkboxes.last); // leave the last land out
       await tester.pump();
       await tester.tap(find.text('4')); // four activities a day
@@ -142,7 +142,7 @@ void main() {
       expect(p.interests, ['colors']);
       expect(p.dailyCount, 4);
       expect(p.bias, 1);
-      expect(p.plan.length, 5); // one land left out
+      expect(p.plan.length, kLands.length - 1); // one land left out
       expect(p.assessment.keys.toSet(), {for (final l in kLands) l.id}); // one score per land
       expect(store.activeId, p.id);
     });
@@ -361,7 +361,7 @@ void main() {
       final p = JourneyStore.instance.profileById('kid1')!;
       expect(p.nickname, 'سلمى الصغيرة');
       expect(p.age, 7);
-      expect(p.plan.length, 5);
+      expect(p.plan.length, kLands.length - 1);
       expect(p.plan.contains('letters'), isFalse);
 
       await tester.tap(find.text('سلمى الصغيرة'));
