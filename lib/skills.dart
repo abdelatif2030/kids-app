@@ -21,6 +21,11 @@ const kSkills = [
   Skill('addition', 'الجمع', 'رياضيات', 'math'),
   Skill('subtraction', 'الطرح', 'رياضيات', 'math'),
   Skill('multiplication', 'الضرب', 'رياضيات', 'math'),
+  Skill('shapes', 'الأشكال', 'جزيرة الألوان', 'discover'),
+  Skill('english_vocab', 'الكلمات الإنجليزية', 'مدينة الإنجليزية', 'english'),
+  Skill('memory', 'الذاكرة', 'نادي الذكاء', 'discover'),
+  Skill('sequence', 'ترتيب الخطوات', 'نادي الذكاء', 'discover'),
+  Skill('story', 'فهم القصة', 'قطار القصص', 'stories'),
 ];
 
 Skill? skillById(String id) {
