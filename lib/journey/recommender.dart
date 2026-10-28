@@ -117,8 +117,9 @@ List<PlannedActivity> planToday({
 List<String> planFromAssessment(
   Map<String, double> scores,
   List<String> goals,
-  List<String> interests,
-) {
+  List<String> interests, {
+  String learnLang = 'both',
+}) {
   final goalLands = <String>[
     for (final g in kGoals)
       if (goals.contains(g.id)) ...g.lands,
@@ -136,5 +137,13 @@ List<String> planFromAssessment(
   add(goalLands);
   add(interests);
   add([for (final l in kLands) l.id]);
+  // The language being learned decides what comes first among the language lands; the other one
+  // stays available but moves to the end of the language lands.
+  if (learnLang != 'both') {
+    final first = learnLang == 'ar' ? 'letters' : 'english';
+    final last = learnLang == 'ar' ? 'english' : 'letters';
+    if (order.remove(first)) order.insert(0, first);
+    if (order.remove(last)) order.add(last);
+  }
   return order;
 }

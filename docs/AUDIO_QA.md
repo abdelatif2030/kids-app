@@ -68,3 +68,8 @@ For each sample in `assets/audio/eval_set.json` (and each new recording):
   this environment (no audio hardware, no devices): it must be listened to.
 - Cloud neural TTS was not added: it needs a provider decision (Arabic voice quality tested on this content, licence for storing audio,
   cost) and a server-side key. See the final report for the options.
+
+## 7. Interface language vs learning language
+`ChildProfile.learnLang` ('ar', 'en' or 'both') is chosen in the setup (step 1) and in the child's edit screen. It is independent of the
+interface language (`ui_lang`): changing the app language never changes it (`test/learning_language_test.dart`). It orders the language
+lands (letters / English) in the plan; nothing is removed.

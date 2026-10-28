@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'audio_manifest.dart';
 import 'audio_service.dart';
-import '../l10n/strings.dart';
 
 /// Where a piece of audio comes from. Content metadata only names a source;
 /// the player decides how to play it, so a local file, an authorized remote

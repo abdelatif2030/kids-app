@@ -15,6 +15,10 @@ class ChildProfile {
   final List<String> plan; // land ids, in the order the child should do them
   final int dailyCount; // activities in "today's adventure" (2-5)
   final int bias; // -1 easier, 0 normal, +1 harder
+
+  /// The language the child is LEARNING first: 'ar', 'en' or 'both'. It is independent of the
+  /// language of the app's interface (the parent's choice).
+  final String learnLang;
   final String? accessory; // the mascot accessory the child chose
   final Map<String, double> assessment; // land id -> 0..1
 
@@ -27,6 +31,7 @@ class ChildProfile {
     this.plan = const [],
     this.dailyCount = 3,
     this.bias = 0,
+    this.learnLang = 'both',
     this.accessory,
     this.assessment = const {},
   });
@@ -39,6 +44,7 @@ class ChildProfile {
     List<String>? plan,
     int? dailyCount,
     int? bias,
+    String? learnLang,
     Object? accessory = _keep,
     Map<String, double>? assessment,
   }) =>
@@ -51,6 +57,7 @@ class ChildProfile {
         plan: plan ?? this.plan,
         dailyCount: dailyCount ?? this.dailyCount,
         bias: bias ?? this.bias,
+        learnLang: learnLang ?? this.learnLang,
         accessory: identical(accessory, _keep) ? this.accessory : accessory as String?,
         assessment: assessment ?? this.assessment,
       );
@@ -66,6 +73,7 @@ class ChildProfile {
         'p': plan,
         'd': dailyCount,
         'b': bias,
+        'l': learnLang,
         'x': ?accessory,
         's': assessment,
       };
@@ -79,6 +87,7 @@ class ChildProfile {
         plan: [for (final e in (j['p'] as List<dynamic>? ?? [])) e as String],
         dailyCount: (j['d'] as int?) ?? 3,
         bias: (j['b'] as int?) ?? 0,
+        learnLang: const ['ar', 'en', 'both'].contains(j['l']) ? j['l'] as String : 'both',
         accessory: j['x'] as String?,
         assessment: {
           for (final e in ((j['s'] as Map<String, dynamic>?) ?? {}).entries)

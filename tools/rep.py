@@ -6,7 +6,7 @@ def rep(path, pairs):
         if n != 1:
             print(f'!! {path}: {n} matches for: {a[:70]!r}'); continue
         s = s.replace(a, b, 1)
-    if 'l10n/strings.dart' not in s:
+    if 'l10n/strings.dart' not in s and ('loc(' in s or 'tr2(' in s):
         depth = path.count('/') - 1
         imp = '../' * depth + 'l10n/strings.dart'
         lines = s.split('\n')

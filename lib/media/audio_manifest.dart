@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 
 import '../library/vocab.dart';
 import '../literacy/letters_data.dart';
-import '../l10n/strings.dart';
 
 /// What the recording/voice of an item is allowed to be.
 enum AudioSource { recorded, deviceVoice, none }

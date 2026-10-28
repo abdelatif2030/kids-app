@@ -81,6 +81,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       if (plan.isNotEmpty) _draft.plan = plan;
       _draft.dailyCount = ((m['d'] as num?)?.toInt() ?? 3).clamp(2, 5);
       _draft.bias = ((m['b'] as num?)?.toInt() ?? 0).clamp(-1, 1);
+      _draft.learnLang = const ['ar', 'en', 'both'].contains(m['l']) ? m['l'] as String : 'both';
       _draft.assessment = {
         for (final e in ((m['as'] as Map?) ?? {}).entries)
           e.key.toString(): (e.value as num).toDouble(),
@@ -105,6 +106,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         'p': _draft.plan,
         'd': _draft.dailyCount,
         'b': _draft.bias,
+        'l': _draft.learnLang,
         'as': _draft.assessment,
         'cd': _checkDone,
       }),
@@ -140,6 +142,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       _draft.assessment,
       _draft.goals.toList(),
       _draft.interests.toList(),
+      learnLang: _draft.learnLang,
     );
   }
 
@@ -214,6 +217,26 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           if (_error != null) setState(() => _error = null);
           _persist();
         },
+      ),
+      const SizedBox(height: DS.s16),
+      Text(context.tr('ob.child.learnLang'), style: DS.heading),
+      const SizedBox(height: DS.s4),
+      Text(context.tr('ob.child.learnLangHelp'), style: DS.caption),
+      const SizedBox(height: DS.s8),
+      Wrap(
+        spacing: DS.s8,
+        runSpacing: DS.s8,
+        children: [
+          for (final l in ['ar', 'en', 'both'])
+            ChoiceChip(
+              label: Text(context.tr('ob.learn.$l'), style: const TextStyle(fontSize: 18)),
+              selected: _draft.learnLang == l,
+              onSelected: (_) {
+                setState(() => _draft.learnLang = l);
+                _persist();
+              },
+            ),
+        ],
       ),
       const SizedBox(height: DS.s16),
       Text(context.tr('ob.child.age'), style: DS.heading),

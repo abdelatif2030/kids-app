@@ -17,6 +17,7 @@ class ProfileDraft {
   List<String> plan = [for (final l in kLands) l.id];
   int dailyCount = 3;
   int bias = 0;
+  String learnLang = 'both';
   Map<String, double> assessment = {};
 
   ProfileDraft();
@@ -30,6 +31,7 @@ class ProfileDraft {
     ..plan = p.plan.isEmpty ? [for (final l in kLands) l.id] : [...p.plan]
     ..dailyCount = p.dailyCount
     ..bias = p.bias
+    ..learnLang = p.learnLang
     ..assessment = {...p.assessment};
 
   ChildProfile toProfile(String id, {String? accessory}) => ChildProfile(
@@ -41,6 +43,7 @@ class ProfileDraft {
         plan: plan,
         dailyCount: dailyCount,
         bias: bias,
+        learnLang: learnLang,
         accessory: accessory,
         assessment: assessment,
       );
@@ -113,6 +116,22 @@ class _BasicsFormState extends State<BasicsForm> {
               ),
           ],
         ),
+        ],
+        if (first) ...[
+          const SizedBox(height: 12),
+          Text(trKey('ob.child.learnLang'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: RC.ink)),
+          const SizedBox(height: 6),
+          Wrap(
+            spacing: 8,
+            children: [
+              for (final l in ['ar', 'en', 'both'])
+                ChoiceChip(
+                  label: Text(trKey('ob.learn.$l'), style: const TextStyle(fontSize: 18)),
+                  selected: d.learnLang == l,
+                  onSelected: (_) => _changed(() => d.learnLang = l),
+                ),
+            ],
+          ),
         ],
         if (first && second) const SizedBox(height: 16),
         if (second) ...[
