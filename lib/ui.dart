@@ -495,19 +495,37 @@ class StarDone extends StatelessWidget {
 /// drawn entirely in code.
 class Mascot extends StatelessWidget {
   final double size;
-  const Mascot({super.key, this.size = 140});
+
+  /// An accessory id from journey/lands.dart (hat, glasses, bow, crown, cape).
+  final String? accessory;
+  const Mascot({super.key, this.size = 140, this.accessory});
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(size: Size(size, size), painter: _MascotPainter());
+    return CustomPaint(size: Size(size, size), painter: _MascotPainter(accessory));
   }
 }
 
 class _MascotPainter extends CustomPainter {
+  final String? accessory;
+  _MascotPainter(this.accessory);
+
   @override
   void paint(Canvas canvas, Size s) {
     final w = s.width;
     final fill = Paint()..style = PaintingStyle.fill;
+
+    if (accessory == 'cape') {
+      canvas.drawPath(
+        Path()
+          ..moveTo(w * 0.2, w * 0.62)
+          ..lineTo(w * 0.8, w * 0.62)
+          ..lineTo(w * 0.95, w * 0.98)
+          ..lineTo(w * 0.05, w * 0.98)
+          ..close(),
+        fill..color = const Color(0xFFE53935),
+      );
+    }
 
     Path ear(double cx, double dir) => Path()
       ..moveTo(w * (cx - 0.13 * dir), w * 0.38)
@@ -562,8 +580,59 @@ class _MascotPainter extends CustomPainter {
         2.7,
         false,
         smile);
+
+    switch (accessory) {
+      case 'hat':
+        canvas.drawRect(Rect.fromLTWH(w * 0.38, w * 0.0, w * 0.24, w * 0.2), fill..color = const Color(0xFF37474F));
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(Rect.fromLTWH(w * 0.3, w * 0.18, w * 0.4, w * 0.045), Radius.circular(w * 0.02)),
+          fill..color = const Color(0xFF263238),
+        );
+        canvas.drawRect(Rect.fromLTWH(w * 0.38, w * 0.13, w * 0.24, w * 0.035), fill..color = const Color(0xFFE53935));
+      case 'glasses':
+        final frame = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = w * 0.025
+          ..color = const Color(0xFF263238);
+        for (final x in [0.38, 0.62]) {
+          canvas.drawCircle(Offset(w * x, w * 0.5), w * 0.1, frame);
+        }
+        canvas.drawLine(Offset(w * 0.48, w * 0.5), Offset(w * 0.52, w * 0.5), frame);
+      case 'bow':
+        final bow = fill..color = const Color(0xFFEC407A);
+        canvas.drawPath(
+          Path()
+            ..moveTo(w * 0.5, w * 0.86)
+            ..lineTo(w * 0.34, w * 0.78)
+            ..lineTo(w * 0.34, w * 0.94)
+            ..close(),
+          bow,
+        );
+        canvas.drawPath(
+          Path()
+            ..moveTo(w * 0.5, w * 0.86)
+            ..lineTo(w * 0.66, w * 0.78)
+            ..lineTo(w * 0.66, w * 0.94)
+            ..close(),
+          bow,
+        );
+        canvas.drawCircle(Offset(w * 0.5, w * 0.86), w * 0.035, fill..color = const Color(0xFFC2185B));
+      case 'crown':
+        canvas.drawPath(
+          Path()
+            ..moveTo(w * 0.36, w * 0.24)
+            ..lineTo(w * 0.34, w * 0.08)
+            ..lineTo(w * 0.43, w * 0.16)
+            ..lineTo(w * 0.5, w * 0.04)
+            ..lineTo(w * 0.57, w * 0.16)
+            ..lineTo(w * 0.66, w * 0.08)
+            ..lineTo(w * 0.64, w * 0.24)
+            ..close(),
+          fill..color = const Color(0xFFFFC107),
+        );
+    }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _MascotPainter old) => old.accessory != accessory;
 }

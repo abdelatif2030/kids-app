@@ -79,6 +79,22 @@ const _shapes = <(String, String)>[
 
 const _neutral = 0xFF607D8B;
 
+/// The Arabic name of a color value from the colors list (for screen readers).
+String colorNameOf(int value) {
+  for (final c in _colors) {
+    if (c.$2 == value) return c.$1;
+  }
+  return 'لون';
+}
+
+/// The Arabic name of a shape kind.
+String shapeNameOf(String kind) {
+  for (final s in _shapes) {
+    if (s.$1 == kind) return s.$2;
+  }
+  return kind;
+}
+
 const _stories = <(String, String, List<(String, List<String>, int)>)>[
   (
     'الأرنب والجزرة',
