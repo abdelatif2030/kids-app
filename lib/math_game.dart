@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'journey/repository.dart';
 import 'progress_store.dart';
 import 'rest_screen.dart';
 import 'ui.dart';
@@ -98,7 +99,8 @@ class _MathGameState extends State<MathGame> {
       setState(() => _faded.add(i));
       return;
     }
-    unawaited(ProgressStore.record(_questions[_round].skill, !_missed));
+    unawaited(ProgressStore.record(_questions[_round].skill, !_missed,
+        childId: JourneyStore.instance.activeId));
     setState(() => _matched = true);
     await Future.delayed(const Duration(milliseconds: 900));
     if (!mounted) return;

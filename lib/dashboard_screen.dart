@@ -3,6 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'curriculum.dart';
+import 'journey/lands.dart';
+import 'journey/models.dart';
+import 'journey/progress.dart';
+import 'journey/repository.dart';
+import 'journey/ui/profile_forms.dart';
 import 'main.dart' show Video, loadVideos;
 import 'plan_screen.dart';
 import 'progress_report.dart';
@@ -11,7 +16,15 @@ import 'summary_screen.dart';
 import 'ui.dart';
 import 'watch_history.dart';
 
-const _dayShort = ['الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد'];
+const _dayShort = [
+  'الاثنين',
+  'الثلاثاء',
+  'الأربعاء',
+  'الخميس',
+  'الجمعة',
+  'السبت',
+  'الأحد',
+];
 
 class _Data {
   final List<SkillEvent> events;
@@ -20,7 +33,14 @@ class _Data {
   final List<Video> videos;
   final Map<String, int> targets;
   final int age;
-  const _Data(this.events, this.watch, this.used, this.videos, this.targets, this.age);
+  const _Data(
+    this.events,
+    this.watch,
+    this.used,
+    this.videos,
+    this.targets,
+    this.age,
+  );
 }
 
 /// Parent-only. What the child achieved, not just screen time: skills mastered,
@@ -41,6 +61,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   late DateTime _end = _today();
   late final Future<_Data> _data = _load();
+  String? _childId;
 
   Future<_Data> _load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -58,7 +79,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  void _shift(int days) => setState(() => _end = _end.add(Duration(days: days)));
+  void _shift(int days) =>
+      setState(() => _end = _end.add(Duration(days: days)));
 
   @override
   Widget build(BuildContext context) {
@@ -71,92 +93,166 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           final d = snapshot.data!;
-          final report = buildReport(
-            end: _end,
-            events: d.events,
-            watch: d.watch,
-            usedSeconds: d.used,
-            videos: d.videos,
-            targets: d.targets,
-            age: d.age,
-          );
-          final isCurrent = !_end.isBefore(_today());
-          return Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 720),
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: [
-                  _WeekBar(
-                    start: report.start,
-                    end: report.end,
-                    onPrev: () => _shift(-7),
-                    onNext: isCurrent ? null : () => _shift(7),
-                  ),
-                  const SizedBox(height: 8),
-                  _Hero(report: report),
-                  const SizedBox(height: 12),
-                  _Stats(report: report),
-                  const SizedBox(height: 12),
-                  _DaysChart(report: report),
-                  const SizedBox(height: 12),
-                  _Skills(report: report),
-                  const SizedBox(height: 12),
-                  _Lessons(report: report),
-                  const SizedBox(height: 12),
-                  _Recommendations(report: report),
-                  const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      FilledButton.icon(
-                        onPressed: () async {
-                          await Clipboard.setData(ClipboardData(text: reportAsText(report)));
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context)
-                              ..hideCurrentSnackBar()
-                              ..showSnackBar(const SnackBar(
-                                  content: Text('تم نسخ التقرير. الصقه في واتساب أو أي تطبيق.')));
-                          }
-                        },
-                        icon: const Icon(Icons.copy_rounded),
-                        label: const Text('نسخ التقرير'),
-                      ),
-                      OutlinedButton.icon(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const PlanScreen()),
-                        ),
-                        icon: const Icon(Icons.checklist_rounded),
-                        label: const Text('الخطة الأسبوعية'),
-                      ),
-                      OutlinedButton.icon(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const WatchSummaryScreen()),
-                        ),
-                        icon: const Icon(Icons.bar_chart),
-                        label: const Text('تفاصيل المشاهدة'),
-                      ),
-                    ],
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: Text(
-                      'تُحفظ هذه البيانات على هذا الجهاز فقط ولا تُرسل إلى أي مكان.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 13),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          return ListenableBuilder(
+            listenable: JourneyStore.instance,
+            builder: (context, _) => _body(context, d),
           );
         },
       ),
     );
+  }
+
+  Widget _body(BuildContext context, _Data d) {
+    final store = JourneyStore.instance;
+    final child =
+        store.profileById(_childId ?? '') ??
+        store.active ??
+        (store.profiles.isEmpty ? null : store.profiles.first);
+    // With profiles, each child's skills are separate. Time and videos are kept
+    // per device, so they are the same for every child.
+    final events = child == null
+        ? d.events
+        : [
+            for (final e in d.events)
+              if (e.childId == child.id) e,
+          ];
+    final report = buildReport(
+      end: _end,
+      events: events,
+      watch: d.watch,
+      usedSeconds: d.used,
+      videos: d.videos,
+      targets: d.targets,
+      age: child?.age ?? d.age,
+    );
+    final isCurrent = !_end.isBefore(_today());
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 720),
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            if (store.profiles.length > 1)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Wrap(
+                  spacing: 8,
+                  children: [
+                    for (final c in store.profiles)
+                      ChoiceChip(
+                        label: Text(
+                          c.nickname,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        selected: c.id == child?.id,
+                        onSelected: (_) => setState(() => _childId = c.id),
+                      ),
+                  ],
+                ),
+              ),
+            _WeekBar(
+              start: report.start,
+              end: report.end,
+              onPrev: () => _shift(-7),
+              onNext: isCurrent ? null : () => _shift(7),
+            ),
+            const SizedBox(height: 8),
+            _Hero(report: report),
+            const SizedBox(height: 12),
+            _Stats(report: report),
+            const SizedBox(height: 12),
+            _DaysChart(report: report),
+            if (child != null) ...[
+              const SizedBox(height: 12),
+              _Journey(child: child, end: _end),
+            ],
+            const SizedBox(height: 12),
+            _Skills(report: report),
+            const SizedBox(height: 12),
+            _Lessons(report: report),
+            const SizedBox(height: 12),
+            _Recommendations(report: report),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              alignment: WrapAlignment.center,
+              children: [
+                FilledButton.icon(
+                  onPressed: () async {
+                    await Clipboard.setData(
+                      ClipboardData(
+                        text: reportAsText(
+                          report,
+                          childName: child?.nickname,
+                          journey: child == null
+                              ? const []
+                              : _journeyLines(child),
+                        ),
+                      ),
+                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context)
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'تم نسخ التقرير. الصقه في واتساب أو أي تطبيق.',
+                            ),
+                          ),
+                        );
+                    }
+                  },
+                  icon: const Icon(Icons.copy_rounded),
+                  label: const Text('نسخ التقرير'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PlanScreen()),
+                  ),
+                  icon: const Icon(Icons.checklist_rounded),
+                  label: const Text('الخطة الأسبوعية'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const WatchSummaryScreen(),
+                    ),
+                  ),
+                  icon: const Icon(Icons.bar_chart),
+                  label: const Text('تفاصيل المشاهدة'),
+                ),
+              ],
+            ),
+            const Padding(
+              padding: EdgeInsets.only(top: 16),
+              child: Text(
+                'تُحفظ هذه البيانات على هذا الجهاز فقط ولا تُرسل إلى أي مكان.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 13),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<String> _journeyLines(ChildProfile child) {
+    final store = JourneyStore.instance;
+    final p = store.progressOf(child.id, today: _end);
+    final week = weeklyCounts(
+      store.attemptsOf(child.id),
+      _end,
+    ).fold<int>(0, (s, v) => s + v);
+    return [
+      'رحلة التعلّم: $week نشاطاً هذا الأسبوع، ${p.totalStars} نجمة، المستوى ${p.explorerLevel}',
+      for (final l in kLands)
+        if (p.lands[l.id]!.completed > 0)
+          '${l.title}: ${p.lands[l.id]!.completed}/$kLevelsPerLand مستويات',
+    ];
   }
 }
 
@@ -167,7 +263,12 @@ class _WeekBar extends StatelessWidget {
   final DateTime end;
   final VoidCallback onPrev;
   final VoidCallback? onNext;
-  const _WeekBar({required this.start, required this.end, required this.onPrev, this.onNext});
+  const _WeekBar({
+    required this.start,
+    required this.end,
+    required this.onPrev,
+    this.onNext,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -223,10 +324,19 @@ class _Hero extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('تقرير الأسبوع',
-                    style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                const Text(
+                  'تقرير الأسبوع',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text(text, style: const TextStyle(color: Colors.white, fontSize: 16)),
+                Text(
+                  text,
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
+                ),
               ],
             ),
           ),
@@ -241,7 +351,12 @@ class _StatCard extends StatelessWidget {
   final Color color;
   final String value;
   final String label;
-  const _StatCard({required this.icon, required this.color, required this.value, required this.label});
+  const _StatCard({
+    required this.icon,
+    required this.color,
+    required this.value,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -260,8 +375,13 @@ class _StatCard extends StatelessWidget {
                 children: [
                   FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: Text(value,
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      value,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   Text(label, style: const TextStyle(fontSize: 13)),
                 ],
@@ -283,31 +403,47 @@ class _Stats extends StatelessWidget {
     final r = report;
     final cards = [
       _StatCard(
-          icon: Icons.schedule_rounded,
-          color: const Color(0xFF5C6BC0),
-          value: formatDuration(r.secondsInApp),
-          label: 'الوقت في التعلم'),
+        icon: Icons.schedule_rounded,
+        color: const Color(0xFF5C6BC0),
+        value: formatDuration(r.secondsInApp),
+        label: 'الوقت في التعلم',
+      ),
       _StatCard(
-          icon: Icons.play_circle_rounded,
-          color: const Color(0xFF43A047),
-          value: '${r.videosFinished}',
-          label: 'دروس مكتملة'),
+        icon: Icons.play_circle_rounded,
+        color: const Color(0xFF43A047),
+        value: '${r.videosFinished}',
+        label: 'دروس مكتملة',
+      ),
       _StatCard(
-          icon: Icons.extension_rounded,
-          color: const Color(0xFFFB8C00),
-          value: '${r.gameRounds}',
-          label: 'جولات ألعاب'),
+        icon: Icons.extension_rounded,
+        color: const Color(0xFFFB8C00),
+        value: '${r.gameRounds}',
+        label: 'جولات ألعاب',
+      ),
       _StatCard(
-          icon: Icons.event_available_rounded,
-          color: const Color(0xFFE53935),
-          value: '${r.activeDays} / 7',
-          label: 'أيام النشاط'),
+        icon: Icons.event_available_rounded,
+        color: const Color(0xFFE53935),
+        value: '${r.activeDays} / 7',
+        label: 'أيام النشاط',
+      ),
     ];
     return Column(
       children: [
-        Row(children: [Expanded(child: cards[0]), const SizedBox(width: 12), Expanded(child: cards[1])]),
+        Row(
+          children: [
+            Expanded(child: cards[0]),
+            const SizedBox(width: 12),
+            Expanded(child: cards[1]),
+          ],
+        ),
         const SizedBox(height: 12),
-        Row(children: [Expanded(child: cards[2]), const SizedBox(width: 12), Expanded(child: cards[3])]),
+        Row(
+          children: [
+            Expanded(child: cards[2]),
+            const SizedBox(width: 12),
+            Expanded(child: cards[3]),
+          ],
+        ),
       ],
     );
   }
@@ -328,7 +464,10 @@ class _Section extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 12),
             child,
           ],
@@ -358,20 +497,25 @@ class _DaysChart extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(values[i] > 0 ? '${(values[i] / 60).round()}' : '',
-                        style: const TextStyle(fontSize: 12)),
+                    Text(
+                      values[i] > 0 ? '${(values[i] / 60).round()}' : '',
+                      style: const TextStyle(fontSize: 12),
+                    ),
                     const SizedBox(height: 2),
                     Container(
                       margin: const EdgeInsets.symmetric(horizontal: 6),
                       height: maxV == 0 ? 4 : 4 + 86 * values[i] / maxV,
                       decoration: BoxDecoration(
-                        color: values[i] > 0 ? const Color(0xFF7E57C2) : Colors.black12,
+                        color: values[i] > 0
+                            ? const Color(0xFF7E57C2)
+                            : Colors.black12,
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      _dayShort[report.start.add(Duration(days: i)).weekday - 1],
+                      _dayShort[report.start.add(Duration(days: i)).weekday -
+                          1],
                       style: const TextStyle(fontSize: 10),
                       maxLines: 1,
                       overflow: TextOverflow.clip,
@@ -390,18 +534,32 @@ class _Skills extends StatelessWidget {
   final WeekReport report;
   const _Skills({required this.report});
 
-  Widget _group(String title, Color color, IconData icon, List<SkillStat> stats) {
+  Widget _group(
+    String title,
+    Color color,
+    IconData icon,
+    List<SkillStat> stats,
+  ) {
     if (stats.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(children: [
-            Icon(icon, color: color, size: 20),
-            const SizedBox(width: 6),
-            Text(title, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 16)),
-          ]),
+          Row(
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 6),
+              Text(
+                title,
+                style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 6),
           for (final s in stats)
             Padding(
@@ -416,7 +574,10 @@ class _Skills extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: color.withAlpha(30),
                       borderRadius: BorderRadius.circular(12),
@@ -425,7 +586,10 @@ class _Skills extends StatelessWidget {
                       s.attempts < kMinAttempts
                           ? '${s.attempts} جولات'
                           : '${(s.accuracy * 100).round()}%',
-                      style: TextStyle(color: color, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: color,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -448,10 +612,24 @@ class _Skills extends StatelessWidget {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _group('أتقنها', Colors.green.shade700, Icons.verified_rounded, r.mastered),
-                _group('تحتاج إلى تدريب', Colors.deepOrange, Icons.fitness_center_rounded,
-                    r.needsPractice),
-                _group('قيد التعلّم', Colors.blueGrey, Icons.trending_up_rounded, r.others),
+                _group(
+                  'أتقنها',
+                  Colors.green.shade700,
+                  Icons.verified_rounded,
+                  r.mastered,
+                ),
+                _group(
+                  'تحتاج إلى تدريب',
+                  Colors.deepOrange,
+                  Icons.fitness_center_rounded,
+                  r.needsPractice,
+                ),
+                _group(
+                  'قيد التعلّم',
+                  Colors.blueGrey,
+                  Icons.trending_up_rounded,
+                  r.others,
+                ),
                 Text(
                   'تُحسب من آخر 3 أسابيع، ولا تُحكم المهارة قبل $kMinAttempts جولات.',
                   style: const TextStyle(fontSize: 12),
@@ -471,13 +649,16 @@ class _Lessons extends StatelessWidget {
     final rows = [
       for (final s in kSubjects)
         if (s.id != 'drawing' &&
-            ((report.lessonsPerSubject[s.id] ?? 0) > 0 || report.targets.containsKey(s.id)))
+            ((report.lessonsPerSubject[s.id] ?? 0) > 0 ||
+                report.targets.containsKey(s.id)))
           s,
     ];
     return _Section(
       title: 'الدروس حسب المادة',
       child: rows.isEmpty
-          ? const Text('لم يكمل طفلك دروساً في هذا الأسبوع. يمكنك وضع أهداف من «الخطة الأسبوعية».')
+          ? const Text(
+              'لم يكمل طفلك دروساً في هذا الأسبوع. يمكنك وضع أهداف من «الخطة الأسبوعية».',
+            )
           : Column(
               children: [
                 for (final s in rows)
@@ -491,9 +672,10 @@ class _Lessons extends StatelessWidget {
                         Expanded(
                           child: report.targets.containsKey(s.id)
                               ? LinearProgressIndicator(
-                                  value: ((report.lessonsPerSubject[s.id] ?? 0) /
-                                          report.targets[s.id]!)
-                                      .clamp(0.0, 1.0),
+                                  value:
+                                      ((report.lessonsPerSubject[s.id] ?? 0) /
+                                              report.targets[s.id]!)
+                                          .clamp(0.0, 1.0),
                                   color: s.color,
                                   minHeight: 8,
                                   borderRadius: BorderRadius.circular(8),
@@ -501,9 +683,11 @@ class _Lessons extends StatelessWidget {
                               : const SizedBox.shrink(),
                         ),
                         const SizedBox(width: 10),
-                        Text(report.targets.containsKey(s.id)
-                            ? '${report.lessonsPerSubject[s.id] ?? 0} من ${report.targets[s.id]}'
-                            : '${report.lessonsPerSubject[s.id] ?? 0}'),
+                        Text(
+                          report.targets.containsKey(s.id)
+                              ? '${report.lessonsPerSubject[s.id] ?? 0} من ${report.targets[s.id]}'
+                              : '${report.lessonsPerSubject[s.id] ?? 0}',
+                        ),
                       ],
                     ),
                   ),
@@ -518,12 +702,12 @@ class _Recommendations extends StatelessWidget {
   const _Recommendations({required this.report});
 
   static (IconData, Color) _look(RecKind k) => switch (k) {
-        RecKind.practice => (Icons.fitness_center_rounded, Colors.deepOrange),
-        RecKind.plan => (Icons.flag_rounded, const Color(0xFF5C6BC0)),
-        RecKind.next => (Icons.trending_up_rounded, Colors.green),
-        RecKind.explore => (Icons.explore_rounded, const Color(0xFF00ACC1)),
-        RecKind.info => (Icons.info_outline_rounded, Colors.blueGrey),
-      };
+    RecKind.practice => (Icons.fitness_center_rounded, Colors.deepOrange),
+    RecKind.plan => (Icons.flag_rounded, const Color(0xFF5C6BC0)),
+    RecKind.next => (Icons.trending_up_rounded, Colors.green),
+    RecKind.explore => (Icons.explore_rounded, const Color(0xFF00ACC1)),
+    RecKind.info => (Icons.info_outline_rounded, Colors.blueGrey),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -539,14 +723,205 @@ class _Recommendations extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(_look(rec.kind).$1, color: _look(rec.kind).$2, size: 24),
+                        Icon(
+                          _look(rec.kind).$1,
+                          color: _look(rec.kind).$2,
+                          size: 24,
+                        ),
                         const SizedBox(width: 10),
-                        Expanded(child: Text(rec.text, style: const TextStyle(fontSize: 15))),
+                        Expanded(
+                          child: Text(
+                            rec.text,
+                            style: const TextStyle(fontSize: 15),
+                          ),
+                        ),
                       ],
                     ),
                   ),
               ],
             ),
+    );
+  }
+}
+
+/// The learning journey of one child: levels, stars and accuracy per land, the
+/// week's activities, what is suggested next, and the plan controls.
+class _Journey extends StatelessWidget {
+  final ChildProfile child;
+  final DateTime end;
+  const _Journey({required this.child, required this.end});
+
+  @override
+  Widget build(BuildContext context) {
+    final store = JourneyStore.instance;
+    final progress = store.progressOf(child.id, today: end);
+    final week = weeklyCounts(store.attemptsOf(child.id), end);
+    final plan = store.todayPlan(child.id);
+    return _Section(
+      title: 'رحلة التعلّم · ${child.nickname}',
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            spacing: 14,
+            runSpacing: 6,
+            children: [
+              Text('⭐ ${progress.totalStars} نجمة'),
+              Text('المستوى ${progress.explorerLevel}'),
+              Text('✅ ${progress.completedTotal} نشاطاً'),
+              Text('🏅 ${progress.badges.length} شارة'),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'الأنشطة المنجزة يوماً بيوم',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              for (var i = 0; i < 7; i++)
+                Expanded(
+                  child: Column(
+                    children: [
+                      Text(
+                        week[i] > 0 ? '${week[i]}' : '',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        height: 4 + week[i].clamp(0, 6) * 8.0,
+                        decoration: BoxDecoration(
+                          color: week[i] > 0
+                              ? const Color(0xFF43A047)
+                              : Colors.black12,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          for (final land in kLands)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              child: Builder(
+                builder: (context) {
+                  final lp = progress.lands[land.id]!;
+                  return Row(
+                    children: [
+                      Icon(land.icon, color: land.color),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 118,
+                        child: Text(
+                          land.title,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                      Expanded(
+                        child: LinearProgressIndicator(
+                          value: lp.completed / kLevelsPerLand,
+                          color: land.color,
+                          minHeight: 8,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${lp.completed}/$kLevelsPerLand',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 6),
+                      SizedBox(
+                        width: 44,
+                        child: Text(
+                          lp.started ? '${(lp.accuracy * 100).round()}%' : '—',
+                          textAlign: TextAlign.end,
+                          style: const TextStyle(fontSize: 13),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+          const Text(
+            'النسبة = الإجابات الصحيحة من أول محاولة (آخر 10 أنشطة في الأرض).',
+            style: TextStyle(fontSize: 12),
+          ),
+          const SizedBox(height: 14),
+          const Text(
+            'الأنشطة المقترحة لهذا اليوم',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          if (plan.isEmpty)
+            const Text('أنهى طفلك كل الأراضي المفعّلة.')
+          else
+            for (final p in plan)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3),
+                child: Row(
+                  children: [
+                    Icon(
+                      p.doneToday
+                          ? Icons.check_circle_rounded
+                          : Icons.radio_button_unchecked,
+                      size: 20,
+                      color: p.doneToday ? Colors.green : Colors.grey,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '${p.activity.title} — ${p.reason} (${p.minutes} د)',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          const Divider(height: 28),
+          const Text('الصعوبة', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 6),
+          SegmentedButton<int>(
+            segments: const [
+              ButtonSegment(value: -1, label: Text('أسهل')),
+              ButtonSegment(value: 0, label: Text('عادي')),
+              ButtonSegment(value: 1, label: Text('أصعب')),
+            ],
+            selected: {child.bias},
+            onSelectionChanged: (s) =>
+                store.updateProfile(child.copyWith(bias: s.first)),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'أنشطة مغامرة اليوم',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 6),
+          SegmentedButton<int>(
+            segments: [
+              for (var n = 2; n <= 5; n++)
+                ButtonSegment(value: n, label: Text('$n')),
+            ],
+            selected: {child.dailyCount},
+            onSelectionChanged: (s) =>
+                store.updateProfile(child.copyWith(dailyCount: s.first)),
+          ),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => ChildEditScreen(child: child)),
+            ),
+            icon: const Icon(Icons.tune_rounded),
+            label: const Text('تعديل الخطة والأراضي والبيانات'),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'journey/repository.dart';
 import 'progress_store.dart';
 import 'rest_screen.dart';
 
@@ -78,7 +79,8 @@ class _ColorGameState extends State<ColorGame> {
       setState(() => _faded.add(i));
       return;
     }
-    unawaited(ProgressStore.record('colors', !_missed, detail: _targets[_round].name));
+    unawaited(ProgressStore.record('colors', !_missed,
+        detail: _targets[_round].name, childId: JourneyStore.instance.activeId));
     setState(() => _matched = true);
     await Future.delayed(const Duration(milliseconds: 900));
     if (!mounted) return;

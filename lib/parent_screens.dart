@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'dashboard_screen.dart';
+import 'journey/ui/profile_forms.dart';
 import 'notes_screen.dart';
 import 'parent_settings.dart';
 import 'plan_screen.dart';
@@ -232,6 +233,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               children: [
+                ListTile(
+                  leading: const Icon(Icons.child_care_rounded),
+                  title: const Text('الأطفال'),
+                  subtitle: const Text('إضافة وتعديل وحذف ملفات الأطفال وخططهم'),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ChildrenScreen()),
+                  ),
+                ),
                 ListTile(
                   leading: const Icon(Icons.insights_rounded),
                   title: const Text('لوحة متابعة الطفل'),

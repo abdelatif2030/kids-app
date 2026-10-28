@@ -242,11 +242,14 @@ List<Recommendation> _recommend(
 String _d(DateTime d) => '${d.day}/${d.month}';
 
 /// A plain-text version of the report, for copying into WhatsApp and so on.
-String reportAsText(WeekReport r) {
+String reportAsText(WeekReport r, {String? childName, List<String> journey = const []}) {
   final b = StringBuffer()
-    ..writeln('تقرير أسبوع ${_d(r.start)} – ${_d(r.end)}')
+    ..writeln('تقرير ${childName == null ? '' : '$childName، '}أسبوع ${_d(r.start)} – ${_d(r.end)}')
     ..writeln('الوقت في التعلم: ${formatDuration(r.secondsInApp)} (${r.activeDays} أيام نشاط)')
     ..writeln('دروس مكتملة: ${r.videosFinished}، جولات ألعاب: ${r.gameRounds}');
+  for (final line in journey) {
+    b.writeln(line);
+  }
   if (r.mastered.isNotEmpty) {
     b.writeln('أتقن: ${r.mastered.map((s) => s.skill.label).join('، ')}');
   }

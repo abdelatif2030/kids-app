@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'journey/repository.dart';
 import 'progress_store.dart';
 import 'rest_screen.dart';
 import 'ui.dart';
@@ -125,7 +126,7 @@ class _LettersGameState extends State<LettersGame> {
       return;
     }
     unawaited(ProgressStore.record('letters_${_lang.id}', !_missed,
-        detail: _questions[_round].letter));
+        detail: _questions[_round].letter, childId: JourneyStore.instance.activeId));
     setState(() => _matched = true);
     await Future.delayed(const Duration(milliseconds: 900));
     if (!mounted) return;
