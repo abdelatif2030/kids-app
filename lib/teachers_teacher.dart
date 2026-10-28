@@ -175,7 +175,9 @@ class TeacherProfileForm extends StatefulWidget {
 }
 
 class _TeacherProfileFormState extends State<TeacherProfileForm> {
-  late final _name = TextEditingController(text: widget.existing?.name ?? widget.name);
+  // A name that is really an email (browser autofill) is not a name: start empty.
+  late final _name = TextEditingController(
+      text: widget.existing?.name ?? (widget.name.contains('@') ? '' : widget.name));
   late final _bio = TextEditingController(text: widget.existing?.bio ?? '');
   late final _price = TextEditingController(text: widget.existing?.priceNote ?? '');
   late final Set<String> _subjects = {...?widget.existing?.subjects};

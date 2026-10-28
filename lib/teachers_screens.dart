@@ -57,8 +57,14 @@ class _TeachersEntryScreenState extends State<TeachersEntryScreen> {
           );
         }
         return switch (snapshot.data) {
-          UserRole.parent => ParentTeachersScreen(repo: repo, onSignOut: _signOut),
-          UserRole.teacher => TeacherHomeScreen(repo: repo, onSignOut: _signOut),
+          UserRole.parent => ParentTeachersScreen(
+            repo: repo,
+            onSignOut: _signOut,
+          ),
+          UserRole.teacher => TeacherHomeScreen(
+            repo: repo,
+            onSignOut: _signOut,
+          ),
           null => _IncompleteAccount(onSignOut: _signOut),
         };
       },
@@ -102,7 +108,10 @@ class _IncompleteAccount extends StatelessWidget {
           children: [
             const Text('الحساب غير مكتمل', style: TextStyle(fontSize: 20)),
             const SizedBox(height: 16),
-            FilledButton(onPressed: onSignOut, child: const Text('تسجيل الخروج')),
+            FilledButton(
+              onPressed: onSignOut,
+              child: const Text('تسجيل الخروج'),
+            ),
           ],
         ),
       ),
@@ -178,66 +187,76 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('حساب الأهل والمدرسين')),
-      body: ListView(
-        padding: const EdgeInsets.all(24),
-        children: [
-          SegmentedButton<bool>(
-            segments: const [
-              ButtonSegment(value: false, label: Text('دخول')),
-              ButtonSegment(value: true, label: Text('حساب جديد')),
-            ],
-            selected: {_register},
-            onSelectionChanged: (s) => setState(() {
-              _register = s.first;
-              _error = null;
-            }),
-          ),
-          const SizedBox(height: 16),
-          if (_register) ...[
-            SegmentedButton<UserRole>(
+      body: AutofillGroup(
+        child: ListView(
+          padding: const EdgeInsets.all(24),
+          children: [
+            SegmentedButton<bool>(
               segments: const [
-                ButtonSegment(value: UserRole.parent, label: Text('ولي أمر')),
-                ButtonSegment(value: UserRole.teacher, label: Text('مدرس')),
+                ButtonSegment(value: false, label: Text('دخول')),
+                ButtonSegment(value: true, label: Text('حساب جديد')),
               ],
-              selected: {_role},
-              onSelectionChanged: (s) => setState(() => _role = s.first),
+              selected: {_register},
+              onSelectionChanged: (s) => setState(() {
+                _register = s.first;
+                _error = null;
+              }),
             ),
             const SizedBox(height: 16),
+            if (_register) ...[
+              SegmentedButton<UserRole>(
+                segments: const [
+                  ButtonSegment(value: UserRole.parent, label: Text('ولي أمر')),
+                  ButtonSegment(value: UserRole.teacher, label: Text('مدرس')),
+                ],
+                selected: {_role},
+                onSelectionChanged: (s) => setState(() => _role = s.first),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _name,
+                autofillHints: const [AutofillHints.name],
+                decoration: const InputDecoration(labelText: 'الاسم'),
+              ),
+            ],
             TextField(
-              controller: _name,
-              decoration: const InputDecoration(labelText: 'الاسم'),
+              controller: _email,
+              autofillHints: const [AutofillHints.email],
+              keyboardType: TextInputType.emailAddress,
+              textDirection: TextDirection.ltr,
+              decoration: const InputDecoration(labelText: 'البريد الإلكتروني'),
+            ),
+            TextField(
+              controller: _password,
+              autofillHints: [
+                _register ? AutofillHints.newPassword : AutofillHints.password,
+              ],
+              obscureText: true,
+              textDirection: TextDirection.ltr,
+              decoration: const InputDecoration(labelText: 'كلمة المرور'),
+            ),
+            if (_error != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(
+                  _error!,
+                  style: const TextStyle(color: Colors.red, fontSize: 16),
+                ),
+              ),
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: _busy ? null : _submit,
+              child: Text(_register ? 'إنشاء الحساب' : 'دخول'),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'نحفظ بريدك واسمك فقط. لا نجمع أي بيانات عن الطفل، ولا توجد محادثات '
+              'داخل التطبيق.',
+              style: TextStyle(fontSize: 14),
+              textAlign: TextAlign.center,
             ),
           ],
-          TextField(
-            controller: _email,
-            keyboardType: TextInputType.emailAddress,
-            textDirection: TextDirection.ltr,
-            decoration: const InputDecoration(labelText: 'البريد الإلكتروني'),
-          ),
-          TextField(
-            controller: _password,
-            obscureText: true,
-            textDirection: TextDirection.ltr,
-            decoration: const InputDecoration(labelText: 'كلمة المرور'),
-          ),
-          if (_error != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 12),
-              child: Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 16)),
-            ),
-          const SizedBox(height: 16),
-          FilledButton(
-            onPressed: _busy ? null : _submit,
-            child: Text(_register ? 'إنشاء الحساب' : 'دخول'),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'نحفظ بريدك واسمك فقط. لا نجمع أي بيانات عن الطفل، ولا توجد محادثات '
-            'داخل التطبيق.',
-            style: TextStyle(fontSize: 14),
-            textAlign: TextAlign.center,
-          ),
-        ],
+        ),
       ),
     );
   }

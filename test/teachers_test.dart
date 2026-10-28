@@ -242,4 +242,21 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('الصورة كبيرة، اختر صورة أصغر'), findsOneWidget);
   });
+
+  testWidgets('an email saved as the name is not prefilled in the profile form', (tester) async {
+    tester.view.physicalSize = const Size(800, 2000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repo = FakeTeacherRepository();
+    await repo.register(
+        email: 't@example.com', password: '123456', name: 't@example.com', role: UserRole.teacher);
+    mediaPicker = FakeMediaPicker();
+
+    await tester.pumpWidget(_app(TeachersEntryScreen(repo: repo)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('إنشاء الملف الشخصي'));
+    await tester.pumpAndSettle();
+    final name = tester.widget<TextField>(_field('الاسم'));
+    expect(name.controller!.text, isEmpty);
+  });
 }
