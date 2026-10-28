@@ -1,4 +1,3 @@
-import '../l10n/strings.dart';
 /// Texts for the shared components and the redesigned onboarding.
 const Map<String, Map<String, String>> kOnboardingStrings = {
   'ar': {

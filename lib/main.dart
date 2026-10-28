@@ -9,6 +9,7 @@ import 'design/tokens.dart';
 import 'display_prefs.dart';
 import 'l10n/app_locale.dart';
 import 'media/audio.dart';
+import 'media/audio_manifest.dart';
 import 'firebase_config.dart';
 import 'journey/repository.dart';
 import 'journey/ui/kit.dart' show RC;
@@ -27,6 +28,7 @@ Future<void> main() async {
   await DisplayPrefs.instance.load();
   await AppLocale.instance.load();
   await AudioPrefs.instance.load();
+  AppAudio.manifest = await AudioManifest.load();
   runApp(const KidsApp());
 }
 

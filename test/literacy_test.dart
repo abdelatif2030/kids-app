@@ -307,7 +307,10 @@ void main() {
       await tester.pump();
       await tester.tap(find.text('اسمع الصوت'));
       await tester.pump();
-      expect(speech.spoken, ['باء', 'بَ']);
+      // The NAME is read by the demo device voice; the isolated SOUND is never read by a
+      // synthetic voice (it would teach a wrong sound) and says so instead.
+      expect(speech.spoken, ['باء']);
+      expect(find.text('لم يُسجَّل هذا الصوت بعد. اقرأ النص الظاهر.'), findsOneWidget);
       final records = await tester.runAsync(LearningRecords.all);
       expect(records!.first.type, RecordType.letter);
       expect(records.first.evidence, Evidence.exposure);

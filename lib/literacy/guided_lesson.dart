@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -11,6 +10,9 @@ import '../journey/ui/quiz_view.dart' show ItemResult;
 import '../l10n/strings.dart';
 import '../library/learning_records.dart';
 import '../media/audio.dart';
+import '../media/audio_button.dart';
+import '../media/audio_manifest.dart';
+import '../media/audio_service.dart';
 import 'letters_data.dart';
 import 'screens.dart' show recordLetterResults;
 
@@ -41,8 +43,6 @@ class _GuidedLetterLessonState extends State<GuidedLetterLesson> {
   late final List<ArabicLetter> _letterOptions; // 3 options, exactly one is the letter
   int _step = 0;
   bool _audioPlayed = false;
-  bool _speaking = false;
-  Timer? _speakTimer;
   bool? _lastWasRight; // feedback after an answer
   final Set<String> _wrongTries = {}; // question ids with a wrong first tap
   final List<ItemResult> _results = [];
@@ -78,29 +78,24 @@ class _GuidedLetterLessonState extends State<GuidedLetterLesson> {
     _letterOptions = [l, ...letters.take(2)]..shuffle(r);
 
     LearningRecords.add(widget.child.id, RecordType.letter, l.letter, Evidence.exposure);
+    AppAudio.service.state.addListener(_onAudio);
+  }
+
+  /// Hearing is exposure only (a separate record from "opened"), never mastery,
+  /// and counts only when sound really played.
+  void _onAudio() {
+    final s = AppAudio.service.state.value;
+    if (!_audioPlayed && s.status == AudioStatus.playing) {
+      _audioPlayed = true;
+      LearningRecords.add(widget.child.id, RecordType.letter, 'audio:${widget.letter.letter}', Evidence.exposure);
+    }
   }
 
   @override
   void dispose() {
-    _speakTimer?.cancel();
+    AppAudio.service.state.removeListener(_onAudio);
     AppAudio.stopSaying();
     super.dispose();
-  }
-
-  void _say(String text) {
-    if (!_audioPlayed) {
-      _audioPlayed = true;
-      // Hearing is exposure only (a separate record from "opened"), never mastery.
-      LearningRecords.add(widget.child.id, RecordType.letter, 'audio:${widget.letter.letter}', Evidence.exposure);
-    }
-    AppAudio.say(text);
-    // Visual feedback while speaking; the speech engine reports no end here,
-    // so this is a short, honest estimate (about one second per syllable group).
-    _speakTimer?.cancel();
-    setState(() => _speaking = AudioPrefs.instance.voiceOn);
-    _speakTimer = Timer(Duration(milliseconds: 600 + text.length * 120), () {
-      if (mounted) setState(() => _speaking = false);
-    });
   }
 
   void _answer(int stepIndex, bool right, String id) {
@@ -142,23 +137,20 @@ class _GuidedLetterLessonState extends State<GuidedLetterLesson> {
     if (mounted) setState(() => _step = _total); // the summary page
   }
 
-  Widget _speaker(String label, String text, {bool primary = true}) {
-    final icon = _speaking ? Icons.graphic_eq_rounded : Icons.volume_up_rounded;
-    final button = primary
-        ? FilledButton.icon(
-            style: FilledButton.styleFrom(minimumSize: const Size(64, DS.tapTarget)),
-            onPressed: () => _say(text),
-            icon: Icon(icon),
-            label: Text(label, style: const TextStyle(fontSize: 18)),
-          )
-        : OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(minimumSize: const Size(64, DS.tapTarget)),
-            onPressed: () => _say(text),
-            icon: Icon(icon),
-            label: Text(label, style: const TextStyle(fontSize: 18)),
-          );
-    return Semantics(liveRegion: true, hint: _speaking ? context.tr('let.playing') : null, child: button);
-  }
+  Widget _speaker(String label, String assetId, {bool primary = true, bool withSlow = false}) => Column(
+        children: [
+          Wrap(
+            spacing: DS.s8,
+            runSpacing: DS.s8,
+            alignment: WrapAlignment.center,
+            children: [
+              AudioButton(assetId: assetId, label: label, filled: primary),
+              if (withSlow) AudioButton(assetId: assetId, slow: true, filled: false),
+            ],
+          ),
+          const AudioNotice(),
+        ],
+      );
 
   /// The word with every occurrence of the lesson's letter in a strong color.
   Widget _highlighted(String word, {double size = 44}) => Text.rich(
@@ -202,7 +194,7 @@ class _GuidedLetterLessonState extends State<GuidedLetterLesson> {
           ),
           Text(context.tr('let.seeHint'), style: DS.body, textAlign: TextAlign.center),
           const SizedBox(height: DS.s12),
-          _speaker(context.tr('let.hearName'), l.name),
+          _speaker(context.tr('let.hearName'), letterAudioId(l, 'name')),
         ]);
       case 1:
         return Column(children: [
@@ -211,10 +203,10 @@ class _GuidedLetterLessonState extends State<GuidedLetterLesson> {
           Text(context.tr('let.nameVsSound'), style: DS.body, textAlign: TextAlign.center),
           const SizedBox(height: DS.s12),
           Wrap(spacing: DS.s16, children: [
-            for (final s in [l.soundFatha, l.soundDamma, l.soundKasra])
+            for (final (part, s) in [('sound', l.soundFatha), ('sound_u', l.soundDamma), ('sound_i', l.soundKasra)])
               InkWell(
                 borderRadius: BorderRadius.circular(DS.rMedium),
-                onTap: () => _say(s),
+                onTap: () => AppAudio.service.play(letterAudioId(l, part)),
                 child: Padding(
                   padding: const EdgeInsets.all(DS.s8),
                   child: Text(s, style: const TextStyle(fontSize: 64, fontWeight: FontWeight.w900, color: RC.ink)),
@@ -223,7 +215,7 @@ class _GuidedLetterLessonState extends State<GuidedLetterLesson> {
           ]),
           Text(context.tr('let.soundHint'), style: DS.caption, textAlign: TextAlign.center),
           const SizedBox(height: DS.s12),
-          _speaker(context.tr('let.hearSound'), l.soundFatha),
+          _speaker(context.tr('let.hearSound'), letterAudioId(l, 'sound'), withSlow: true),
         ]);
       case 2:
         return Column(children: [
@@ -232,7 +224,7 @@ class _GuidedLetterLessonState extends State<GuidedLetterLesson> {
           _highlighted(_word.word, size: 56),
           Text(context.tr('let.wordHint'), style: DS.body, textAlign: TextAlign.center),
           const SizedBox(height: DS.s12),
-          _speaker(context.tr('let.hearWord'), _word.word),
+          _speaker(context.tr('let.hearWord'), wordAudioId(_word.word), withSlow: true),
         ]);
       case 3:
         return Column(children: [
@@ -277,7 +269,7 @@ class _GuidedLetterLessonState extends State<GuidedLetterLesson> {
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
                     onPressed: () {
-                      _say(_pictures[i].word);
+                      AppAudio.service.play(wordAudioId(_pictures[i].word));
                       _answer(4, i == _pictureAnswer, 'pic');
                     },
                     child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -296,7 +288,7 @@ class _GuidedLetterLessonState extends State<GuidedLetterLesson> {
           Text(_word.emoji, style: const TextStyle(fontSize: 72)),
           Text(trArgs('let.letterHint', {'word': _word.word}), style: DS.body, textAlign: TextAlign.center),
           const SizedBox(height: DS.s8),
-          _speaker(context.tr('let.hearWord'), _word.word, primary: false),
+          _speaker(context.tr('let.hearWord'), wordAudioId(_word.word), primary: false),
           const SizedBox(height: DS.s12),
           Wrap(
             spacing: DS.s12,

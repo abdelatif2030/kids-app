@@ -9,6 +9,8 @@ import '../library/learning_records.dart';
 import '../library/lesson_engine.dart';
 import '../library/lesson_runner.dart';
 import '../media/audio.dart';
+import '../media/audio_button.dart';
+import '../media/audio_manifest.dart';
 import '../l10n/strings.dart';
 import 'exercises.dart';
 import 'guided_lesson.dart';
@@ -287,18 +289,11 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
                       spacing: 10,
                       alignment: WrapAlignment.center,
                       children: [
-                        FilledButton.icon(
-                          onPressed: () => AppAudio.say(l.name),
-                          icon: const Icon(Icons.volume_up_rounded),
-                          label: Text(loc('اسمع الاسم')),
-                        ),
-                        OutlinedButton.icon(
-                          onPressed: () => AppAudio.say(l.soundFatha),
-                          icon: const Icon(Icons.volume_up_rounded),
-                          label: Text(loc('اسمع الصوت')),
-                        ),
+                        AudioButton(assetId: letterAudioId(l, 'name'), label: loc('اسمع الاسم')),
+                        AudioButton(assetId: letterAudioId(l, 'sound'), label: loc('اسمع الصوت'), filled: false),
                       ],
                     ),
+                    const AudioNotice(),
                     const SizedBox(height: 10),
                     Wrap(
                       alignment: WrapAlignment.spaceEvenly,
@@ -333,7 +328,7 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
                         trailing: IconButton(
                           tooltip: tr2('استمع إلى ${w.word}', 'Listen to ${w.word}'),
                           icon: const Icon(Icons.volume_up_rounded),
-                          onPressed: () => AppAudio.say(w.word),
+                          onPressed: () => AppAudio.service.play(wordAudioId(w.word)),
                         ),
                       ),
                   ],

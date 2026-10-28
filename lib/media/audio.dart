@@ -5,6 +5,10 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'audio_manifest.dart';
+import 'audio_service.dart';
+import '../l10n/strings.dart';
+
 /// Where a piece of audio comes from. Content metadata only names a source;
 /// the player decides how to play it, so a local file, an authorized remote
 /// file, the device voice or "no recording yet" can be swapped without
@@ -57,6 +61,25 @@ abstract class SpeechBackend {
 class TtsSpeech implements SpeechBackend {
   final FlutterTts _tts = FlutterTts();
   bool _ready = false;
+  final Map<String, String> _locales = {};
+
+  /// Arabic is read as Modern Standard Arabic (ar-SA) when the device has that
+  /// voice, otherwise any Arabic voice. A device with no Arabic voice reports
+  /// "unavailable" instead of reading Arabic with another language's voice.
+  Future<String?> _localeFor(String lang) async {
+    final cached = _locales[lang];
+    if (cached != null) return cached;
+    final candidates = switch (lang) {
+      'ar' => ['ar-SA', 'ar'],
+      'en' => ['en-US', 'en'],
+      _ => [lang],
+    };
+    for (final c in candidates) {
+      final r = await _tts.isLanguageAvailable(c);
+      if (r == true || r == 1) return _locales[lang] = c;
+    }
+    return null;
+  }
 
   Future<void> _init() async {
     if (_ready) return;
@@ -68,8 +91,7 @@ class TtsSpeech implements SpeechBackend {
   Future<bool> isAvailable(String lang) async {
     try {
       await _init();
-      final r = await _tts.isLanguageAvailable(lang);
-      return r == true || r == 1;
+      return await _localeFor(lang) != null;
     } catch (_) {
       return false;
     }
@@ -78,7 +100,9 @@ class TtsSpeech implements SpeechBackend {
   @override
   Future<void> speak(String text, {String lang = 'ar', double rate = 1.0}) async {
     await _init();
-    await _tts.setLanguage(lang);
+    final locale = await _localeFor(lang);
+    if (locale == null) throw StateError('No $lang voice on this device');
+    await _tts.setLanguage(locale);
     // flutter_tts: about 0.5 is a normal speed on Android.
     await _tts.setSpeechRate((0.5 * rate).clamp(0.2, 0.9));
     await _tts.setPitch(1.0);
@@ -164,25 +188,32 @@ class JustAudioFilePlayer implements FilePlayer {
 
 /// The app's audio entry points. Screens call these; tests replace them.
 class AppAudio {
-  static SpeechBackend speech = TtsSpeech();
+  static SpeechBackend _speech = TtsSpeech();
+  static SpeechBackend get speech => _speech;
+  static set speech(SpeechBackend s) {
+    _speech = s;
+    service.recheckVoices();
+  }
+
   static FilePlayer Function() newPlayer = JustAudioFilePlayer.new;
+
+  /// Every spoken item of the content and the state of its recording.
+  static AudioManifest manifest = AudioManifest.builtIn();
+
+  /// The one audio service: one clip at a time, real playback state.
+  static final AudioService service = AudioService(
+    speech: () => _speech,
+    newPlayer: () => newPlayer(),
+    manifest: () => manifest,
+  );
 
   /// Reads [text] aloud when the parent has the voice switched on. Never
   /// throws: when no voice exists the screen simply stays silent (the text is
   /// always on screen too).
-  static Future<void> say(String text, {String lang = 'ar'}) async {
-    if (!AudioPrefs.instance.voiceOn) return;
-    try {
-      await speech.stop();
-      await speech.speak(text, lang: lang, rate: AudioPrefs.instance.speechRate);
-    } catch (_) {}
-  }
+  static Future<void> say(String text, {String lang = 'ar', bool slow = false}) =>
+      service.playText(text, lang: lang, slow: slow);
 
-  static Future<void> stopSaying() async {
-    try {
-      await speech.stop();
-    } catch (_) {}
-  }
+  static Future<void> stopSaying() => service.stop();
 }
 
 /// Parent-controlled sound settings. Stored on the device only.
@@ -200,6 +231,10 @@ class AudioPrefs extends ChangeNotifier {
   /// 0.75 slow, 1.0 normal, 1.25 fast.
   double speechRate = 1.0;
 
+  /// May the phone's own voice stand in while a recording is missing? It is
+  /// always labelled as a demo, and never used for isolated letter sounds.
+  bool allowDeviceVoice = true;
+
   /// 'none', 'rain', 'waves' or 'wind'.
   String ambient = 'none';
   double ambientVolume = 0.35;
@@ -215,6 +250,7 @@ class AudioPrefs extends ChangeNotifier {
     ambient = p.getString('audio_ambient') ?? 'none';
     ambientVolume = p.getDouble('audio_ambient_vol') ?? 0.35;
     storiesInQuietHours = p.getBool('audio_stories_quiet') ?? true;
+    allowDeviceVoice = p.getBool('audio_device_voice') ?? true;
     notifyListeners();
   }
 
@@ -225,6 +261,7 @@ class AudioPrefs extends ChangeNotifier {
     String? ambient,
     double? ambientVolume,
     bool? storiesInQuietHours,
+    bool? allowDeviceVoice,
   }) async {
     this.voiceOn = voiceOn ?? this.voiceOn;
     this.effectsOn = effectsOn ?? this.effectsOn;
@@ -232,6 +269,7 @@ class AudioPrefs extends ChangeNotifier {
     this.ambient = ambient ?? this.ambient;
     this.ambientVolume = ambientVolume ?? this.ambientVolume;
     this.storiesInQuietHours = storiesInQuietHours ?? this.storiesInQuietHours;
+    this.allowDeviceVoice = allowDeviceVoice ?? this.allowDeviceVoice;
     notifyListeners();
     final p = await SharedPreferences.getInstance();
     await p.setBool('audio_voice', this.voiceOn);
@@ -240,6 +278,7 @@ class AudioPrefs extends ChangeNotifier {
     await p.setString('audio_ambient', this.ambient);
     await p.setDouble('audio_ambient_vol', this.ambientVolume);
     await p.setBool('audio_stories_quiet', this.storiesInQuietHours);
+    await p.setBool('audio_device_voice', this.allowDeviceVoice);
   }
 }
 

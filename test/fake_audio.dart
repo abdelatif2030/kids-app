@@ -8,6 +8,9 @@ class FakeSpeech implements SpeechBackend {
   final List<double> rates = [];
   bool available = true;
 
+  /// Makes [speak] fail, like a broken engine.
+  bool fail = false;
+
   /// When true, [speak] waits until the test calls [finish] (or [stop] runs),
   /// like real speech that takes time.
   bool manual = false;
@@ -19,6 +22,7 @@ class FakeSpeech implements SpeechBackend {
 
   @override
   Future<void> speak(String text, {String lang = 'ar', double rate = 1.0}) async {
+    if (fail) throw StateError('engine failure');
     spoken.add(text);
     rates.add(rate);
     if (!manual) return;

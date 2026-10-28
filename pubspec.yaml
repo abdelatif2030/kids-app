@@ -71,6 +71,12 @@ flutter:
   assets:
     - assets/videos.json
     - assets/audio/
+    - assets/audio/manifest.json
+    - assets/audio/ar/letters/
+    - assets/audio/ar/words/
+    - assets/audio/ar/numbers/
+    - assets/audio/en/letters/
+    - assets/audio/en/words/
     - assets/content/
 
   fonts:

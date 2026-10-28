@@ -67,6 +67,34 @@ class _AudioSettingsScreenState extends State<AudioSettingsScreen> {
                       onChanged: (v) => p.update(voiceOn: v),
                     ),
                     SwitchListTile(
+                      secondary: const Icon(Icons.smart_toy_outlined),
+                      title: Text(context.tr('audio.deviceVoice')),
+                      subtitle: Text(context.tr('audio.deviceVoiceHelp')),
+                      value: p.allowDeviceVoice,
+                      onChanged: (v) => p.update(allowDeviceVoice: v),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                      child: Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(context.tr('audio.status.title'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                              const SizedBox(height: 4),
+                              Text(trArgs('audio.status.body', {
+                                'approved': AppAudio.manifest.approvedCount,
+                                'total': AppAudio.manifest.total,
+                              })),
+                              const SizedBox(height: 4),
+                              Text(context.tr('audio.status.note'), style: const TextStyle(fontSize: 13)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    SwitchListTile(
                       secondary: const Icon(Icons.music_note_rounded),
                       title: Text(loc('المؤثرات الصوتية')),
                       subtitle: Text(loc('لا توجد مؤثرات في هذه النسخة؛ اختيارك محفوظ للمستقبل')),
