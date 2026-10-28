@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'dashboard_screen.dart';
+import 'journey/ui/admin_screen.dart';
+import 'journey/ui/privacy_screen.dart';
 import 'journey/ui/profile_forms.dart';
 import 'notes_screen.dart';
 import 'parent_settings.dart';
@@ -296,6 +298,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const TeachersEntryScreen()),
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.dashboard_customize_rounded),
+                  title: const Text('إدارة المحتوى (تجريبي)'),
+                  subtitle: const Text('الأقسام والأسئلة والمكافآت والخطط'),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AdminScreen()),
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.privacy_tip_outlined),
+                  title: const Text('الخصوصية والبيانات'),
+                  subtitle: const Text('ما نحفظه، وحذف بيانات الأطفال'),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PrivacyScreen()),
                   ),
                 ),
                 ListTile(

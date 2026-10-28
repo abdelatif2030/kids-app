@@ -11,6 +11,7 @@ import '../repository.dart';
 import 'child_shell.dart';
 import 'kit.dart';
 import 'onboarding.dart';
+import 'privacy_screen.dart';
 
 /// The first screen: a welcome for a new device, or "who is playing?".
 class StartScreen extends StatelessWidget {
@@ -95,6 +96,14 @@ class _Welcome extends StatelessWidget {
               ),
               icon: const Icon(Icons.school_rounded),
               label: const Text('حساب الأهل والمدرسين', style: TextStyle(fontSize: 17)),
+            ),
+            TextButton.icon(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PrivacyScreen()),
+              ),
+              icon: const Icon(Icons.privacy_tip_outlined),
+              label: const Text('الخصوصية', style: TextStyle(fontSize: 17)),
             ),
           ],
         ),
