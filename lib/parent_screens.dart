@@ -17,6 +17,7 @@ import 'journey/ui/profile_forms.dart';
 import 'notes_screen.dart';
 import 'parent_settings.dart';
 import 'plan_screen.dart';
+import 'print/printables_screen.dart';
 import 'summary_screen.dart';
 import 'teachers_screens.dart';
 
@@ -300,6 +301,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const ParentGalleryScreen()),
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.print_rounded),
+                  title: Text(loc('أوراق للطباعة')),
+                  subtitle: Text(loc('أوراق تمرين جاهزة للطباعة: تتبّع الحروف، عدّ، أشكال، قراءة')),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PrintablesScreen()),
                   ),
                 ),
                 ListTile(

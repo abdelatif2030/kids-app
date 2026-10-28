@@ -1333,4 +1333,9 @@ const Map<String, String> kEnglish = {
   '، متقن': ', mastered',
   '، تحقق': ', reached',
   'تُتفق لاحقاً': 'To be agreed later',
+  'أوراق للطباعة': 'Printable worksheets',
+  'أوراق تمرين جاهزة للطباعة: تتبّع الحروف، عدّ، أشكال، قراءة': 'Ready-to-print practice sheets: letter tracing, counting, shapes, reading',
+  'ورقة إجابات': 'Answer sheet',
+  'نسخة جديدة': 'New variation',
+  'الأعمار': 'Ages',
 };
