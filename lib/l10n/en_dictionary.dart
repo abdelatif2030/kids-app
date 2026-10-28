@@ -1343,4 +1343,6 @@ const Map<String, String> kEnglish = {
   'تحدّي': 'Challenge',
   'ابدأ': 'Start',
   'خطة الحروف القادمة ولماذا': 'Next letter plan and why',
+  'فيها أسئلة': 'Has questions',
+  'ابحث عن قصة': 'Search for a story',
 };

@@ -8,6 +8,7 @@ import '../library/lesson_engine.dart';
 import '../library/lesson_runner.dart';
 import '../media/audio.dart';
 import 'story_data.dart';
+import 'story_filter.dart';
 import 'story_models.dart';
 import 'story_player.dart';
 import 'story_store.dart';
@@ -26,6 +27,9 @@ class StoriesHomeScreen extends StatefulWidget {
 
 class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
   StoryCategory? _category;
+  StoryLength? _length;
+  bool _withQuestions = false;
+  String _query = '';
   bool _onlyFavorites = false;
   bool _allAges = false;
   Set<String> _favorites = {};
@@ -67,13 +71,16 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final stories = [
-      for (final s in publishedStories())
-        if ((_category == null || s.category == _category) &&
-            (!_onlyFavorites || _favorites.contains(s.id)) &&
-            (_allAges || s.fitsAge(widget.child.age)))
-          s,
-    ];
+    final stories = filterStories(
+      publishedStories(),
+      age: widget.child.age,
+      allAges: _allAges,
+      category: _category,
+      favorites: _onlyFavorites ? _favorites : null,
+      length: _length,
+      onlyWithQuestions: _withQuestions,
+      query: _query,
+    );
     final resumable = [for (final s in publishedStories()) if (_resume.containsKey(s.id)) s];
     return Scaffold(
       backgroundColor: RC.bg,
@@ -137,6 +144,35 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
                             onSelected: (v) => setState(() => _category = v ? c : null),
                           ),
                       ],
+                    ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        for (final (len, label) in [
+                          (StoryLength.short, tr2('قصيرة (حتى دقيقتين ونصف)', 'Short (up to 2.5 min)')),
+                          (StoryLength.medium, tr2('متوسطة', 'Medium')),
+                          (StoryLength.long, tr2('طويلة', 'Long')),
+                        ])
+                          FilterChip(
+                            label: Text(label),
+                            selected: _length == len,
+                            onSelected: (v) => setState(() => _length = v ? len : null),
+                          ),
+                        FilterChip(
+                          label: Text(loc('فيها أسئلة')),
+                          selected: _withQuestions,
+                          onSelected: (v) => setState(() => _withQuestions = v),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: TextField(
+                        decoration: InputDecoration(prefixIcon: const Icon(Icons.search_rounded), hintText: loc('ابحث عن قصة'), filled: true, fillColor: Colors.white),
+                        onChanged: (v) => setState(() => _query = v),
+                      ),
                     ),
                     Material(
                       type: MaterialType.transparency,
