@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'notes_screen.dart';
 import 'parent_settings.dart';
+import 'plan_screen.dart';
 import 'summary_screen.dart';
 
 /// Entry point from the child-facing screens: creates a PIN the first time,
@@ -265,6 +267,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () => _pickTime(_quietEnd, false),
                 ),
                 const Divider(),
+                ListTile(
+                  leading: const Icon(Icons.checklist_rounded),
+                  title: const Text('الخطة الأسبوعية والمتابعة'),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PlanScreen()),
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.edit_note_rounded),
+                  title: const Text('ملاحظات'),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const NotesScreen()),
+                  ),
+                ),
                 ListTile(
                   leading: const Icon(Icons.bar_chart),
                   title: const Text('ملخص المشاهدة'),

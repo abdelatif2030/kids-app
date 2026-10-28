@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'main.dart' show VideoListScreen;
+import 'home_screen.dart';
 import 'parent_screens.dart';
 import 'session_manager.dart';
 import 'ui.dart';
@@ -12,6 +12,19 @@ void goToRest(BuildContext context, RestReason reason) {
     MaterialPageRoute(builder: (_) => RestScreen(reason: reason)),
     (route) => route.isFirst,
   );
+}
+
+/// Call when a game or activity ends a set. If the session timer says it is
+/// time to rest, stops the session, shows the rest screen and returns true;
+/// otherwise returns false and nothing happens.
+Future<bool> restIfTimeUp(BuildContext context) async {
+  final session = SessionManager.instance;
+  final reason = session.reason.value;
+  if (reason == null) return false;
+  await session.stop();
+  if (!context.mounted) return true;
+  goToRest(context, reason);
+  return true;
 }
 
 /// Shown after the last video of "Today's plan". [stars] is how many plan
@@ -78,7 +91,7 @@ class RestScreen extends StatelessWidget {
       if (!context.mounted) return;
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => VideoListScreen(age: age)),
+        MaterialPageRoute(builder: (_) => HomeScreen(age: age)),
         (route) => route.isFirst,
       );
     } else if (choice == 'end') {

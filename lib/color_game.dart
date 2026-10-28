@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'rest_screen.dart';
-import 'session_manager.dart';
 
 class _GameColor {
   final String name;
@@ -86,14 +85,8 @@ class _ColorGameState extends State<ColorGame> {
   /// A finished set of rounds is the natural moment to honour the session
   /// timer: if time is up, go to the rest screen instead of starting again.
   Future<void> _again() async {
-    final session = SessionManager.instance;
-    final reason = session.reason.value;
-    if (reason != null) {
-      await session.stop();
-      if (mounted) goToRest(context, reason);
-      return;
-    }
-    setState(_newGame);
+    if (await restIfTimeUp(context)) return;
+    if (mounted) setState(_newGame);
   }
 
   Widget _circle(_GameColor c, double size, {Widget? child}) {

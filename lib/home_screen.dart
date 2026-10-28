@@ -1,50 +1,63 @@
 import 'package:flutter/material.dart';
 
+import 'main.dart' show openSection;
+import 'session_manager.dart';
 import 'ui.dart';
 
-/// Shown after the parent picks an age. Three sections for the child.
-class HomeScreen extends StatelessWidget {
+/// Shown after the parent picks an age: lessons, videos, games and drawing.
+/// Leaving it (back to the age screen, or the rest screen replacing it) ends
+/// the session's time counting.
+class HomeScreen extends StatefulWidget {
   final int age;
-  final void Function(String section) onSectionSelected;
+  const HomeScreen({super.key, required this.age});
 
-  const HomeScreen({
-    super.key,
-    required this.age,
-    required this.onSectionSelected,
-  });
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  static const _sections = [
+    ('دروسي', Icons.school_rounded, 'subjects'),
+    ('فيديوهات', Icons.play_circle_rounded, 'videos'),
+    ('ألعاب', Icons.extension_rounded, 'games'),
+    ('رسم', Icons.brush_rounded, 'draw'),
+  ];
+
+  @override
+  void dispose() {
+    // Deferred so listeners are not notified in the middle of tearing down.
+    WidgetsBinding.instance.addPostFrameCallback((_) => SessionManager.instance.stop());
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text('أهلاً، عمره $age سنين', style: const TextStyle(fontSize: 26)),
+        title: Text('أهلاً، عمره ${widget.age} سنين', style: const TextStyle(fontSize: 26)),
       ),
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _SectionButton(
-                label: 'تعلّم',
-                icon: Icons.school_rounded,
-                color: kBright[0],
-                onTap: () => onSectionSelected('learn'),
-              ),
-              const SizedBox(height: 20),
-              _SectionButton(
-                label: 'مرح',
-                icon: Icons.music_note_rounded,
-                color: kBright[1],
-                onTap: () => onSectionSelected('fun'),
-              ),
-              const SizedBox(height: 20),
-              _SectionButton(
-                label: 'ألعاب',
-                icon: Icons.extension_rounded,
-                color: kBright[2],
-                onTap: () => onSectionSelected('games'),
+              const Mascot(size: 120),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 20,
+                runSpacing: 20,
+                alignment: WrapAlignment.center,
+                children: [
+                  for (var i = 0; i < _sections.length; i++)
+                    _SectionTile(
+                      label: _sections[i].$1,
+                      icon: _sections[i].$2,
+                      color: kBright[i % kBright.length],
+                      onTap: () => openSection(context, widget.age, _sections[i].$3),
+                    ),
+                ],
               ),
             ],
           ),
@@ -54,13 +67,13 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-class _SectionButton extends StatelessWidget {
+class _SectionTile extends StatelessWidget {
   final String label;
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
 
-  const _SectionButton({
+  const _SectionTile({
     required this.label,
     required this.icon,
     required this.color,
@@ -70,20 +83,22 @@ class _SectionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 280,
-      height: 120,
-      child: FilledButton.icon(
+      width: 150,
+      height: 150,
+      child: FilledButton(
         style: FilledButton.styleFrom(
           backgroundColor: color,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
-          ),
+          padding: const EdgeInsets.all(8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         ),
         onPressed: onTap,
-        icon: Icon(icon, size: 40),
-        label: Text(
-          label,
-          style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 56),
+            const SizedBox(height: 8),
+            Text(label, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+          ],
         ),
       ),
     );

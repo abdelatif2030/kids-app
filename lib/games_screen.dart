@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'color_game.dart';
+import 'letters_game.dart';
+import 'math_game.dart';
 import 'memory_game.dart';
 import 'ui.dart';
 import 'where_animal_game.dart';
@@ -12,56 +14,40 @@ class GamesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // (label, min age, max age, screen). Order = order on screen.
+    final games = <(String, int, int, Widget Function())>[
+      ('افرقع البالونات', 1, 2, () => const BalloonGame()),
+      ('فين الحيوان؟', 1, 2, () => const WhereAnimalGame()),
+      ('لعبة الألوان', 2, 3, () => const ColorGame()),
+      ('حروف وكلمات', 3, 8, () => const LettersGame()),
+      ('لعبة الذاكرة', 3, 6, () => const MemoryGame()),
+      ('رياضيات', 4, 12, () => MathGame(age: age)),
+    ];
+    final available = [
+      for (var i = 0; i < games.length; i++)
+        if (age >= games[i].$2 && age <= games[i].$3) i,
+    ];
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         title: const Text('ألعاب', style: TextStyle(fontSize: 26)),
       ),
-      // Scrolls so three buttons (age 2) still fit on a short screen.
+      // Scrolls so several buttons still fit on a short screen.
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (age <= 2)
+              for (final i in available)
                 _GameButton(
-                  label: 'افرقع البالونات',
-                  color: kBright[0],
+                  label: games[i].$1,
+                  color: kBright[i % kBright.length],
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const BalloonGame()),
+                    MaterialPageRoute(builder: (_) => games[i].$4()),
                   ),
                 ),
-              if (age <= 2)
-                _GameButton(
-                  label: 'فين الحيوان؟',
-                  color: kBright[3],
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const WhereAnimalGame()),
-                  ),
-                ),
-              if (age >= 2 && age <= 3)
-                _GameButton(
-                  label: 'لعبة الألوان',
-                  color: kBright[4],
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ColorGame()),
-                  ),
-                ),
-              if (age >= 3 && age <= 4)
-                _GameButton(
-                  label: 'لعبة الذاكرة',
-                  color: kBright[1],
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const MemoryGame()),
-                  ),
-                ),
-              if (age >= 5)
-                const Text('ألعاب لعمرك قريباً', style: TextStyle(fontSize: 26)),
             ],
           ),
         ),

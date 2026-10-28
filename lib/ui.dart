@@ -29,6 +29,29 @@ Color categoryColor(String category) => switch (category) {
       _ => const Color(0xFF90A4AE),
     };
 
+/// The finish screen of a game: a star (only for finishing) and "play again".
+class StarDone extends StatelessWidget {
+  final VoidCallback onAgain;
+  const StarDone({super.key, required this.onAgain});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(Icons.star_rounded, size: 120, color: Colors.amber),
+        const SizedBox(height: 16),
+        const Text('أحسنت!', style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 24),
+        FilledButton(
+          onPressed: onAgain,
+          child: const Text('العب تاني', style: TextStyle(fontSize: 24)),
+        ),
+      ],
+    );
+  }
+}
+
 /// A simple original mascot (a round, smiling creature with pointy ears),
 /// drawn entirely in code.
 class Mascot extends StatelessWidget {

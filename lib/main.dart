@@ -4,12 +4,15 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'home_screen.dart';
+import 'curriculum.dart';
+import 'drawing_screen.dart';
 import 'games_screen.dart';
+import 'home_screen.dart';
 import 'parent_screens.dart';
 import 'player_screen.dart';
 import 'rest_screen.dart';
 import 'session_manager.dart';
+import 'subjects_screen.dart';
 import 'ui.dart';
 
 void main() => runApp(const KidsApp());
@@ -48,6 +51,7 @@ class Video {
   final int minAge;
   final int maxAge;
   final String language;
+  final String subject;
   const Video({
     required this.youtubeId,
     required this.title,
@@ -55,6 +59,7 @@ class Video {
     required this.minAge,
     required this.maxAge,
     required this.language,
+    this.subject = 'discover',
   });
 
   factory Video.fromJson(Map<String, dynamic> json) => Video(
@@ -64,6 +69,7 @@ class Video {
         minAge: json['minAge'] as int,
         maxAge: json['maxAge'] as int,
         language: json['language'] as String,
+        subject: json['subject'] as String? ?? 'discover',
       );
 }
 
@@ -90,26 +96,7 @@ class AgeScreen extends StatelessWidget {
     if (!context.mounted) return;
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => HomeScreen(
-          age: age,
-          onSectionSelected: (section) => _openSection(context, age, section),
-        ),
-      ),
-    );
-  }
-
-  void _openSection(BuildContext context, int age, String section) {
-    if (section == 'games') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => GamesScreen(age: age)),
-      );
-      return;
-    }
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => VideoListScreen(age: age)),
+      MaterialPageRoute(builder: (_) => HomeScreen(age: age)),
     );
   }
 
@@ -145,13 +132,13 @@ class AgeScreen extends StatelessWidget {
                 runSpacing: 16,
                 alignment: WrapAlignment.center,
                 children: [
-                  for (var age = 1; age <= 6; age++)
+                  for (var age = 1; age <= 12; age++)
                     SizedBox(
                       width: 104,
                       height: 104,
                       child: FilledButton(
                         style: FilledButton.styleFrom(
-                          backgroundColor: kBright[age - 1],
+                          backgroundColor: kBright[(age - 1) % kBright.length],
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(28),
                           ),
@@ -171,6 +158,17 @@ class AgeScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Opens one of the child's home sections.
+void openSection(BuildContext context, int age, String section) {
+  final Widget screen = switch (section) {
+    'subjects' => SubjectsScreen(age: age),
+    'games' => GamesScreen(age: age),
+    'draw' => const DrawingScreen(),
+    _ => VideoListScreen(age: age),
+  };
+  Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
 }
 
 class _VideoCard extends StatelessWidget {
@@ -245,7 +243,10 @@ class _VideoCard extends StatelessWidget {
 
 class VideoListScreen extends StatefulWidget {
   final int age;
-  const VideoListScreen({super.key, required this.age});
+
+  /// A subject id from curriculum.dart, or null for all videos (with "today's plan").
+  final String? subject;
+  const VideoListScreen({super.key, required this.age, this.subject});
 
   @override
   State<VideoListScreen> createState() => _VideoListScreenState();
@@ -258,6 +259,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
   final _session = SessionManager.instance;
 
   int get age => widget.age;
+  String? get subject => widget.subject;
 
   @override
   void initState() {
@@ -270,7 +272,6 @@ class _VideoListScreenState extends State<VideoListScreen> {
   @override
   void dispose() {
     _session.reason.removeListener(_checkRest);
-    _session.stop();
     super.dispose();
   }
 
@@ -329,7 +330,8 @@ class _VideoListScreenState extends State<VideoListScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text('فيديوهات لعمر $age', style: const TextStyle(fontSize: 26)),
+        title: Text(subjectById(subject ?? '')?.label ?? 'فيديوهات لعمر $age',
+            style: const TextStyle(fontSize: 26)),
       ),
       bottomNavigationBar: ValueListenableBuilder<int?>(
         valueListenable: _session.remainingSeconds,
@@ -362,19 +364,26 @@ class _VideoListScreenState extends State<VideoListScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           final list = snapshot.data!
-              .where((v) => age >= v.minAge && age <= v.maxAge)
+              .where((v) =>
+                  age >= v.minAge && age <= v.maxAge && (subject == null || v.subject == subject))
               .toList();
           if (list.isEmpty) {
-            return const Center(
-              child: Text('لا توجد فيديوهات لهذا العمر', style: TextStyle(fontSize: 24)),
+            return Center(
+              child: Text(
+                subject == null ? 'لا توجد فيديوهات لهذا العمر' : 'لا توجد دروس بعد لهذه المادة',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 24),
+              ),
             );
           }
           final plan = _buildPlan(list);
+          // "Today's plan" is the first row, only on the all-videos list.
+          final offset = subject == null ? 1 : 0;
           return ListView.builder(
             padding: const EdgeInsets.all(12),
-            itemCount: list.length + 1,
+            itemCount: list.length + offset,
             itemBuilder: (_, i) {
-              if (i == 0) {
+              if (offset == 1 && i == 0) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: FilledButton.icon(
@@ -394,7 +403,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
                   ),
                 );
               }
-              final video = list[i - 1];
+              final video = list[i - offset];
               return _VideoCard(video: video, onTap: () => _play(video));
             },
           );
