@@ -19,8 +19,11 @@ AudioManifest _withRecording({bool approved = true}) => AudioManifest.builtIn(ov
           'file': 'assets/audio/ar/letters/ba_name.mp3',
           'voice': 'speaker-a',
           'license': 'original, owned by the app',
-          'review': approved ? 'approved' : 'pending',
-          'reviewedBy': 'Reviewer 1, 2026-11-01',
+          'audioReview': approved ? 'approved' : 'pending',
+          'languageReview': approved ? 'approved' : 'pending',
+          'audioReviewer': 'Audio reviewer 1',
+          'languageReviewer': 'Arabic teacher 1',
+          'approvedAt': '2026-11-01',
           'durationMs': 900,
         },
       },
@@ -78,9 +81,10 @@ void main() {
       expect(_withRecording().validate(), isEmpty);
       expect(_withRecording().approvedCount, 1);
       final bad = AudioManifest.builtIn(overrides: {
-        'assets': {'ar.letter.0628.name': {'file': 'x.mp3', 'review': 'approved'}},
+        'assets': {'ar.letter.0628.name': {'file': 'x.mp3', 'audioReview': 'approved', 'languageReview': 'approved'}},
       });
-      expect(bad.validate().length, 3); // no reviewer, no license, no speaker
+      expect(bad.validate().length, 4); // no reviewers (2), no license, no speaker
+      expect(bad.byId('ar.letter.0628.name')!.approved, isFalse); // claiming approval is not enough
     });
 
     test('a text maps to its asset, so a recording takes over automatically', () {

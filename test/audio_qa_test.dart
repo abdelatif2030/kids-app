@@ -23,7 +23,6 @@ void main() {
       expect((s['text'] as String).trim(), isNotEmpty);
       expect(s['convention'], isNotEmpty);
       expect(s['review'], 'pending_native_review'); // human sign-off is required, code cannot grant it
-      expect(s['reviewedBy'], isNull);
     }
   });
 

@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show AssetBundle;
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'audio_manifest.dart';
+import 'audio_review.dart';
 import 'audio_service.dart';
 
 /// Where a piece of audio comes from. Content metadata only names a source;
@@ -198,6 +200,14 @@ class AppAudio {
 
   /// Every spoken item of the content and the state of its recording.
   static AudioManifest manifest = AudioManifest.builtIn();
+
+  /// Tests replace the bundle the manifest is read from.
+  static AssetBundle? manifestBundle;
+
+  /// Re-reads the bundled manifest and the review decisions made on this device.
+  static Future<void> reloadManifest() async {
+    manifest = await AudioManifest.load(bundle: manifestBundle, reviews: await AudioReviewStore.all());
+  }
 
   /// The one audio service: one clip at a time, real playback state.
   static final AudioService service = AudioService(

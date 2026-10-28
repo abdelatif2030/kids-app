@@ -79,13 +79,42 @@ class AudioService {
         _prefs = prefs ?? AudioPrefs.instance;
 
   /// Plays a manifest item by its id.
-  Future<void> play(String assetId, {bool slow = false}) async {
+  /// [preview] plays the file of an item that is not approved yet (the review tools only).
+  Future<void> play(String assetId, {bool slow = false, bool preview = false}) async {
     final asset = _manifest().byId(assetId);
     if (asset == null) {
       _set(AudioState(assetId: assetId, status: AudioStatus.error, problem: AudioProblem.missing));
       return;
     }
-    return _run(asset, slow);
+    return _run(asset, slow, preview: preview);
+  }
+
+  /// Plays any bundled file for comparison (the voice comparison tool). Not tied to the lesson content.
+  Future<void> previewFile(String path, {String label = ''}) async {
+    final my = ++_token;
+    await _halt();
+    if (my != _token) return;
+    _set(AudioState(assetId: 'file:$path', text: label, status: AudioStatus.loading));
+    try {
+      final p = _player ??= _newPlayer();
+      final len = await p.load(AssetAudio(path));
+      if (my != _token) return;
+      if (len == null) {
+        _set(AudioState(assetId: 'file:$path', text: label, status: AudioStatus.error, problem: AudioProblem.recordingFailed));
+        return;
+      }
+      await p.seek(Duration.zero);
+      await p.setSpeed(1.0);
+      _doneSub = p.completed.listen((_) {
+        if (my == _token) _set(state.value.copy(status: AudioStatus.completed));
+      });
+      await p.play();
+      if (my == _token && state.value.status == AudioStatus.loading) {
+        _set(AudioState(assetId: 'file:$path', text: label, status: AudioStatus.playing, heard: AudioSource.generated));
+      }
+    } catch (_) {
+      if (my == _token) _set(AudioState(assetId: 'file:$path', text: label, status: AudioStatus.error, problem: AudioProblem.failed));
+    }
   }
 
   /// Plays a text. If the content has an asset for it, that asset is used (so a
@@ -118,13 +147,20 @@ class AudioService {
   Future<void> pause() async {
     final s = state.value;
     if (s.status != AudioStatus.playing) return;
-    if (s.heard == AudioSource.recorded) {
+    if (s.heard == AudioSource.recorded || s.heard == AudioSource.generated) {
       _token++;
       await _player?.pause();
       _set(s.copy(status: AudioStatus.paused));
     } else {
       await stop(); // device voice cannot pause
     }
+  }
+
+  /// Drops the file player so the next clip creates a fresh one (used when the player factory is replaced).
+  void resetPlayer() {
+    _player = null;
+    _doneSub?.cancel();
+    _doneSub = null;
   }
 
   /// Forget what we learned about the device voices (after a settings change).
@@ -145,7 +181,7 @@ class AudioService {
 
   AudioState _base(AudioAsset a, bool slow) => AudioState(assetId: a.id, text: a.text, slow: slow);
 
-  Future<void> _run(AudioAsset asset, bool slow) async {
+  Future<void> _run(AudioAsset asset, bool slow, {bool preview = false}) async {
     final my = ++_token;
     _last = asset;
     _lastSlow = slow;
@@ -159,7 +195,7 @@ class AudioService {
     }
     _set(AudioState(assetId: asset.id, text: asset.text, slow: slow, status: AudioStatus.loading));
 
-    if (asset.approved) {
+    if (asset.approved || (preview && asset.hasFile)) {
       if (await _playRecording(asset, slow, my)) return;
       if (my != _token) return;
       // The recording could not be loaded: fall through to the device voice if it may be used.
@@ -193,7 +229,7 @@ class AudioService {
       await p.play();
       if (my != _token) return true;
       if (state.value.status == AudioStatus.loading) {
-        _set(AudioState(assetId: asset.id, text: asset.text, slow: slow, status: AudioStatus.playing, heard: AudioSource.recorded));
+        _set(AudioState(assetId: asset.id, text: asset.text, slow: slow, status: AudioStatus.playing, heard: asset.source));
       }
       return true;
     } catch (_) {

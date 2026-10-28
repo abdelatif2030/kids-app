@@ -73,3 +73,13 @@ For each sample in `assets/audio/eval_set.json` (and each new recording):
 `ChildProfile.learnLang` ('ar', 'en' or 'both') is chosen in the setup (step 1) and in the child's edit screen. It is independent of the
 interface language (`ui_lang`): changing the app language never changes it (`test/learning_language_test.dart`). It orders the language
 lands (letters / English) in the plan; nothing is removed.
+
+## 8. Review states and tools (added)
+See `docs/AUDIO_PROVIDERS.md`. States: missing, discovered, generated, awaiting audio review, awaiting language review, approved, rejected, needs recheck.
+Today: 360 items missing, 0 generated, 0 approved. Tools: Voice comparison and Audio review screens (Parent settings -> Sound and learning),
+`tools/audio_gen/*`.
+
+## 9. Android listening route
+1. Build and install the app on your phone (`flutter run` with the phone connected, or the web build on your network).
+2. Parent settings (PIN) -> **Sound and learning** -> **Voice comparison**: play the device voice and, once samples exist, each candidate.
+3. Create a child, open **Learn letters**, pick a letter, press **Start the lesson**, and run the listening checklist in section 5.

@@ -1,0 +1,14 @@
+{
+  "note": "Candidate voices to COMPARE. Names are taken from search-result snippets of Google's voice list and must be checked against the official list before use (the official docs host was unreachable when this file was written). Arabic is Modern Standard Arabic (ar-XA); Google documents no Neural2 voice for Arabic according to the same snippets.",
+  "candidates": [
+    {"provider": "google-cloud-tts", "lang": "ar", "locale": "ar-XA", "voiceId": "ar-XA-Wavenet-A", "model": "WaveNet", "status": "to verify"},
+    {"provider": "google-cloud-tts", "lang": "ar", "locale": "ar-XA", "voiceId": "ar-XA-Wavenet-B", "model": "WaveNet", "status": "to verify"},
+    {"provider": "google-cloud-tts", "lang": "ar", "locale": "ar-XA", "voiceId": "ar-XA-Wavenet-C", "model": "WaveNet", "status": "to verify"},
+    {"provider": "google-cloud-tts", "lang": "ar", "locale": "ar-XA", "voiceId": "ar-XA-Wavenet-D", "model": "WaveNet", "status": "to verify"},
+    {"provider": "google-cloud-tts", "lang": "ar", "locale": "ar-XA", "voiceId": "ar-XA-Standard-A", "model": "Standard", "status": "baseline"},
+    {"provider": "google-cloud-tts", "lang": "ar", "locale": "ar-XA", "voiceId": "ar-XA-Chirp3-HD-Achernar", "model": "Chirp 3 HD", "status": "to verify"},
+    {"provider": "google-cloud-tts", "lang": "en", "locale": "en-US", "voiceId": "en-US-Neural2-C", "model": "Neural2", "status": "to verify"},
+    {"provider": "google-cloud-tts", "lang": "en", "locale": "en-US", "voiceId": "en-US-Neural2-F", "model": "Neural2", "status": "to verify"},
+    {"provider": "google-cloud-tts", "lang": "en", "locale": "en-US", "voiceId": "en-US-Wavenet-F", "model": "WaveNet", "status": "to verify"}
+  ]
+}

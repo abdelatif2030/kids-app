@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../data_reset.dart';
 import '../../literacy/mastery.dart';
 import '../../media/audio.dart';
+import '../../media/audio_admin_screens.dart';
 import '../repository.dart';
 import '../../l10n/strings.dart';
 
@@ -93,6 +94,18 @@ class _AudioSettingsScreenState extends State<AudioSettingsScreen> {
                           ),
                         ),
                       ),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.compare_rounded),
+                      title: Text(tr2('مقارنة الأصوات (للمطوّر)', 'Voice comparison (developer)')),
+                      subtitle: Text(tr2('شغّل العبارة نفسها بأصوات مرشّحة وسجّل ملاحظاتك', 'Play the same phrase with candidate voices and record notes')),
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const VoiceComparisonScreen())),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.fact_check_rounded),
+                      title: Text(tr2('مراجعة الصوت واعتماده (للإدارة)', 'Audio review and approval (admin)')),
+                      subtitle: Text(tr2('تصفية وتشغيل وقبول أو رفض كل عنصر', 'Filter, play, approve or reject each item')),
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AudioReviewScreen())),
                     ),
                     SwitchListTile(
                       secondary: const Icon(Icons.music_note_rounded),

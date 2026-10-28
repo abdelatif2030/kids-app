@@ -5,17 +5,32 @@ import 'package:flutter/services.dart';
 import '../library/vocab.dart';
 import '../literacy/letters_data.dart';
 
-/// What the recording/voice of an item is allowed to be.
-enum AudioSource { recorded, deviceVoice, none }
+/// Where the audio of an item comes from.
+/// recorded = a human voice; generated = a cloud text-to-speech file made offline by
+/// tools/audio_gen (never in the app); deviceVoice = the phone's voice (temporary demo).
+enum AudioSource { recorded, generated, deviceVoice, none }
 
-/// A native speaker's decision about a recording.
-enum ReviewStatus { approved, pendingReview, rejected }
+/// One reviewer's decision.
+enum Verdict { pending, approved, rejected }
+
+/// The life of an item. Only `approved` audio may be used as the model of a pronunciation.
+enum AssetStatus {
+  missing, // no file
+  discovered, // a candidate source was found, nothing downloaded or generated
+  generated, // a file exists, nobody reviewed it yet
+  awaitingAudioReview, // the language review is done, the sound quality is not
+  awaitingLanguageReview, // the sound quality is fine, a language expert has not decided
+  approved,
+  rejected,
+  needsRecheck, // approved before, but its source/voice/text changed or its license needs checking
+}
 
 enum AudioKind { letterName, letterSound, word, syllable, number, phonics, sentence, instruction }
 
 /// One spoken item of the learning content: what must be said, in which
-/// language, and which approved recording (if any) says it. The educational
-/// text is the authority; a recording is only used once it is approved.
+/// language, and which approved audio (if any) says it. The educational
+/// text is the authority; an audio file is only used as a pronunciation model
+/// once BOTH the audio quality and the language have been approved by people.
 class AudioAsset {
   final String id;
   final String lang; // 'ar' or 'en'
@@ -23,17 +38,23 @@ class AudioAsset {
   final AudioKind kind;
   final String text; // what the child should hear
   final String ref; // content reference, e.g. letter:ب, word:قمر
-  final String? file; // bundled path, when a recording exists
+  final String? file; // bundled path, when a file exists
   final AudioSource source;
-  final String? voice; // speaker identifier, never a real name
-  final String? license;
-  final ReviewStatus review;
-  final String? reviewedBy;
+  final String? provider; // e.g. google-cloud-tts, or a recording studio
+  final String? voice; // voice id or speaker identifier, never a real name
+  final String? license; // what allows the app to ship this file
+  final Verdict audioReview; // clear, natural, no clipping, volume
+  final Verdict languageReview; // correct pronunciation, a qualified Arabic/English reviewer
+  final String? audioReviewer;
+  final String? languageReviewer;
+  final String? approvedAt; // ISO date
   final int? durationMs;
   final int version;
+  final bool discovered;
+  final bool recheck;
   final String note; // pronunciation convention for the speaker and reviewer
 
-  /// May the phone's text-to-speech stand in while there is no recording?
+  /// May the phone's text-to-speech stand in while there is no approved file?
   /// False for isolated sounds: a synthetic voice cannot say them correctly.
   final bool deviceVoiceAllowed;
 
@@ -46,17 +67,23 @@ class AudioAsset {
     required this.ref,
     this.file,
     this.source = AudioSource.none,
+    this.provider,
     this.voice,
     this.license,
-    this.review = ReviewStatus.pendingReview,
-    this.reviewedBy,
+    this.audioReview = Verdict.pending,
+    this.languageReview = Verdict.pending,
+    this.audioReviewer,
+    this.languageReviewer,
+    this.approvedAt,
     this.durationMs,
     this.version = 1,
+    this.discovered = false,
+    this.recheck = false,
     this.note = '',
     this.deviceVoiceAllowed = true,
   });
 
-  /// Where the recording for this item is expected (file name for the speaker).
+  /// Where the file for this item is expected (file name for a speaker or the generator).
   String get suggestedFile {
     final folder = switch (kind) {
       AudioKind.letterName || AudioKind.letterSound || AudioKind.phonics => '$lang/letters',
@@ -66,34 +93,78 @@ class AudioAsset {
     return 'assets/audio/$folder/$id.mp3';
   }
 
-  bool get hasRecording => source == AudioSource.recorded && file != null;
+  /// A synthetic voice cannot be the model of an isolated sound, however good it sounds.
+  bool get syntheticNotAllowed =>
+      source == AudioSource.generated && (kind == AudioKind.letterSound || kind == AudioKind.phonics);
 
-  /// A recording that a native speaker approved: the only audio that may serve as
-  /// the authoritative model of a pronunciation.
-  bool get approved => hasRecording && review == ReviewStatus.approved;
+  bool get hasFile => file != null && (source == AudioSource.recorded || source == AudioSource.generated);
 
-  AudioAsset withOverride(Map<String, dynamic> j) => AudioAsset(
-        id: id,
-        lang: lang,
-        locale: locale,
-        kind: kind,
-        text: text,
-        ref: ref,
-        file: j['file'] as String? ?? file,
-        source: j['file'] != null ? AudioSource.recorded : source,
-        voice: j['voice'] as String? ?? voice,
-        license: j['license'] as String? ?? license,
-        review: switch (j['review']) {
-          'approved' => ReviewStatus.approved,
-          'rejected' => ReviewStatus.rejected,
-          _ => review,
-        },
-        reviewedBy: j['reviewedBy'] as String? ?? reviewedBy,
-        durationMs: (j['durationMs'] as num?)?.toInt() ?? durationMs,
-        version: (j['version'] as num?)?.toInt() ?? version,
-        note: note,
-        deviceVoiceAllowed: deviceVoiceAllowed,
-      );
+  /// Kept for older code: a file of a human or generated voice exists.
+  bool get hasRecording => hasFile;
+
+  /// The license that lets the app ship this file has been confirmed (not empty, not marked 'unconfirmed').
+  bool get licenseConfirmed => (license ?? '').isNotEmpty && !(license!).startsWith('unconfirmed');
+
+  /// All the evidence an approval needs: a file, a license, two different decisions made by named people.
+  bool get approved =>
+      hasFile &&
+      !recheck &&
+      !syntheticNotAllowed &&
+      audioReview == Verdict.approved &&
+      languageReview == Verdict.approved &&
+      licenseConfirmed &&
+      (audioReviewer ?? '').isNotEmpty &&
+      (languageReviewer ?? '').isNotEmpty;
+
+  AssetStatus get status {
+    if (recheck && hasFile) return AssetStatus.needsRecheck;
+    if (!hasFile) return discovered ? AssetStatus.discovered : AssetStatus.missing;
+    if (audioReview == Verdict.rejected || languageReview == Verdict.rejected || syntheticNotAllowed) {
+      return AssetStatus.rejected;
+    }
+    if (approved) return AssetStatus.approved;
+    if (audioReview == Verdict.approved) return AssetStatus.awaitingLanguageReview;
+    if (languageReview == Verdict.approved) return AssetStatus.awaitingAudioReview;
+    return AssetStatus.generated;
+  }
+
+  AudioAsset withOverride(Map<String, dynamic> j) {
+    Verdict v(dynamic x, Verdict old) => switch (x) {
+          'approved' => Verdict.approved,
+          'rejected' => Verdict.rejected,
+          'pending' => Verdict.pending,
+          _ => old,
+        };
+    final file0 = j['file'] as String? ?? file;
+    return AudioAsset(
+      id: id,
+      lang: lang,
+      locale: locale,
+      kind: kind,
+      text: text,
+      ref: ref,
+      file: file0,
+      source: switch (j['source']) {
+        'recorded' => AudioSource.recorded,
+        'generated' => AudioSource.generated,
+        _ => j['file'] != null && source == AudioSource.none ? AudioSource.recorded : source,
+      },
+      provider: j['provider'] as String? ?? provider,
+      voice: j['voice'] as String? ?? voice,
+      license: j['license'] as String? ?? license,
+      audioReview: v(j['audioReview'], audioReview),
+      languageReview: v(j['languageReview'], languageReview),
+      audioReviewer: j['audioReviewer'] as String? ?? audioReviewer,
+      languageReviewer: j['languageReviewer'] as String? ?? languageReviewer,
+      approvedAt: j['approvedAt'] as String? ?? approvedAt,
+      durationMs: (j['durationMs'] as num?)?.toInt() ?? durationMs,
+      version: (j['version'] as num?)?.toInt() ?? version,
+      discovered: j['discovered'] as bool? ?? discovered,
+      recheck: j['recheck'] as bool? ?? recheck,
+      note: note,
+      deviceVoiceAllowed: deviceVoiceAllowed,
+    );
+  }
 }
 
 /// Stable id part for a text: its code points in hex.
@@ -136,7 +207,16 @@ class AudioManifest {
 
   int get total => _byId.length;
   int get approvedCount => _byId.values.where((a) => a.approved).length;
-  int get recordedCount => _byId.values.where((a) => a.hasRecording).length;
+  int get recordedCount => _byId.values.where((a) => a.hasFile).length;
+
+  /// How many items are in each stage of the review.
+  Map<AssetStatus, int> get byStatus {
+    final m = <AssetStatus, int>{};
+    for (final a in _byId.values) {
+      m[a.status] = (m[a.status] ?? 0) + 1;
+    }
+    return m;
+  }
 
   /// Items waiting for a recording, by kind.
   Map<AudioKind, int> get awaiting {
@@ -147,15 +227,17 @@ class AudioManifest {
     return m;
   }
 
-  /// Problems that would make the manifest unsafe: duplicate ids, an approved item
-  /// without a file, or a recording without a reviewer.
+  /// Problems that make the manifest unsafe: a review decision without a named reviewer, a file without a
+  /// license or voice, a synthetic voice approved as an isolated sound, an unknown audio source.
   List<String> validate() {
     final problems = <String>[];
     for (final a in _byId.values) {
-      if (a.review == ReviewStatus.approved && !a.hasRecording) problems.add('${a.id}: approved without a file');
-      if (a.review == ReviewStatus.approved && (a.reviewedBy ?? '').isEmpty) problems.add('${a.id}: approved without a reviewer');
-      if (a.hasRecording && (a.license ?? '').isEmpty) problems.add('${a.id}: recording without license information');
-      if (a.hasRecording && (a.voice ?? '').isEmpty) problems.add('${a.id}: recording without a speaker id');
+      if (a.audioReview == Verdict.approved && (a.audioReviewer ?? '').isEmpty) problems.add('${a.id}: audio approved without a reviewer');
+      if (a.languageReview == Verdict.approved && (a.languageReviewer ?? '').isEmpty) problems.add('${a.id}: language approved without a reviewer');
+      if ((a.audioReview == Verdict.approved || a.languageReview == Verdict.approved) && !a.hasFile) problems.add('${a.id}: reviewed without a file');
+      if (a.hasFile && (a.license ?? '').isEmpty) problems.add('${a.id}: file without license information');
+      if (a.hasFile && (a.voice ?? '').isEmpty) problems.add('${a.id}: file without a voice or speaker id');
+      if (a.syntheticNotAllowed && a.audioReview == Verdict.approved) problems.add('${a.id}: a synthetic voice cannot model an isolated sound');
     }
     return problems;
   }
@@ -294,13 +376,18 @@ class AudioManifest {
   }
 
   /// The built-in list with the overrides from assets/audio/manifest.json.
-  static Future<AudioManifest> load({AssetBundle? bundle}) async {
+  static Future<AudioManifest> load({AssetBundle? bundle, Map<String, Map<String, dynamic>> reviews = const {}}) async {
+    Map<String, dynamic> base = {};
     try {
       final raw = await (bundle ?? rootBundle).loadString('assets/audio/manifest.json');
-      return builtIn(overrides: jsonDecode(raw) as Map<String, dynamic>);
-    } catch (_) {
-      return builtIn();
-    }
+      base = jsonDecode(raw) as Map<String, dynamic>;
+    } catch (_) {}
+    // Review decisions made on this device (the review tool) are laid over the bundled ones.
+    final assets = <String, dynamic>{...((base['assets'] as Map?)?.cast<String, dynamic>() ?? {})};
+    reviews.forEach((id, r) {
+      assets[id] = {...((assets[id] as Map?)?.cast<String, dynamic>() ?? {}), ...r};
+    });
+    return builtIn(overrides: {...base, 'assets': assets});
   }
 }
 

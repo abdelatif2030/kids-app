@@ -96,8 +96,8 @@ class AudioNotice extends StatelessWidget {
           icon = Icons.volume_off_rounded;
         } else if (s.heard == AudioSource.deviceVoice) {
           msg = trKey('audio.demoVoice');
-        } else if (s.heard == AudioSource.recorded) {
-          msg = trKey('audio.recorded');
+        } else if (s.heard == AudioSource.recorded || s.heard == AudioSource.generated) {
+          msg = trKey(s.heard == AudioSource.generated ? 'audio.generated' : 'audio.recorded');
           icon = Icons.verified_rounded;
         }
         if (msg == null) return const SizedBox(height: 4);
