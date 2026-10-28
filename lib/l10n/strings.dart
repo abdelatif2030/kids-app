@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'app_locale.dart';
+import 'strings_onboarding.dart';
 
 /// Interface texts. Only screens that call `context.tr` are translated; the
 /// rest are still Arabic-only (see docs/LOCALIZATION.md for the coverage list).
@@ -42,7 +43,25 @@ const Map<String, Map<String, String>> kStrings = {
 
 String trKey(String key, [String? lang]) {
   final l = lang ?? AppLocale.instance.code;
-  return kStrings[l]?[key] ?? kStrings['ar']![key] ?? key;
+  for (final source in kAllStrings) {
+    final v = source[l]?[key];
+    if (v != null) return v;
+  }
+  for (final source in kAllStrings) {
+    final v = source['ar']?[key];
+    if (v != null) return v;
+  }
+  return key;
+}
+
+/// Every dictionary the app uses; add new screens' dictionaries here.
+const List<Map<String, Map<String, String>>> kAllStrings = [kStrings, kOnboardingStrings];
+
+/// `{name}`-style placeholders filled in.
+String trArgs(String key, Map<String, Object> args) {
+  var s = trKey(key);
+  args.forEach((k, v) => s = s.replaceAll('{$k}', '$v'));
+  return s;
 }
 
 extension TrContext on BuildContext {

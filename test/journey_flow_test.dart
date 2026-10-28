@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/journey/lands.dart';
 import 'package:kids_app/journey/models.dart';
 import 'package:kids_app/journey/repository.dart';
@@ -83,18 +84,18 @@ void main() {
   });
 
   group('onboarding', () {
-    testWidgets('four steps: basics, goals, skill check, plan, then the profile is saved',
+    testWidgets('five steps: child, goals, skill check, plan, completion, then the profile is saved',
         (tester) async {
       _tall(tester);
       final store = await tester.runAsync(_newStore) as JourneyStore;
       await tester.pumpWidget(_app(const OnboardingFlow(askForPin: false)));
-      expect(find.text('الخطوة 1 من 4'), findsOneWidget);
+      expect(find.text('الخطوة 1 من 5'), findsOneWidget);
 
-      // Step 1 needs a nickname.
+      // Step 1 needs a nickname, and says so next to the field.
       await tester.tap(find.text('التالي'));
       await tester.pump();
       expect(find.text('اكتب اسماً أو لقباً للطفل'), findsOneWidget);
-      expect(find.text('الخطوة 1 من 4'), findsOneWidget);
+      expect(find.text('الخطوة 1 من 5'), findsOneWidget);
 
       await tester.enterText(_field('اسم الطفل أو لقبه'), 'سلمى');
       await tester.tap(find.widgetWithText(ChoiceChip, '4'));
@@ -102,35 +103,35 @@ void main() {
       await tester.tap(find.text('التالي'));
       await tester.pump();
 
-      // Step 2: goals and interests.
-      expect(find.text('الخطوة 2 من 4'), findsOneWidget);
-      expect(find.text('الأهداف والاهتمامات'), findsOneWidget);
-      await tester.tap(find.widgetWithText(FilterChip, 'الإنجليزية'));
-      await tester.tap(find.widgetWithText(FilterChip, 'جزيرة الألوان'));
+      // Step 2: goals as cards.
+      expect(find.text('الخطوة 2 من 5'), findsOneWidget);
+      await tester.tap(find.text('الإنجليزية'));
       await tester.pump();
       await tester.tap(find.text('التالي'));
       await tester.pump();
 
-      // Step 3: the child answers six quick questions.
-      expect(find.text('الخطوة 3 من 4'), findsOneWidget);
+      // Step 3: the optional check, started by the parent.
+      expect(find.text('الخطوة 3 من 5'), findsOneWidget);
+      await tester.tap(find.text('ابدأ الأسئلة'));
+      await tester.pump();
       expect(find.text('السؤال 1 من 7'), findsOneWidget);
       await _answerQuiz(tester, 7);
       expect(find.textContaining('أحسنت يا سلمى'), findsOneWidget);
       await tester.tap(find.text('عرض الخطة المقترحة'));
       await tester.pump();
 
-      // Step 4: review and edit the plan.
-      expect(find.text('الخطوة 4 من 4'), findsOneWidget);
-      expect(find.text('خطة التعلّم'), findsOneWidget);
-      final checkboxes = find.byType(Checkbox);
-      expect(checkboxes, findsNWidgets(kLands.length));
-      await tester.tap(checkboxes.last); // leave the last land out
+      // Step 4: three real plans; picking one changes the real settings.
+      expect(find.text('الخطوة 4 من 5'), findsOneWidget);
+      expect(find.text('تعلّم متوازن'), findsOneWidget);
+      await tester.tap(find.text('تدريب مركّز'));
       await tester.pump();
-      await tester.tap(find.text('4')); // four activities a day
+      expect(find.textContaining('5 أنشطة في اليوم'), findsOneWidget);
+      await tester.tap(find.text('التالي'));
       await tester.pump();
-      await tester.tap(find.text('أصعب'));
-      await tester.pump();
-      await tester.tap(find.text('ابدأ الرحلة'));
+
+      // Step 5: completion.
+      expect(find.text('الخطوة 5 من 5'), findsOneWidget);
+      await tester.tap(find.text('ابدأ رحلة طفلك'));
       await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 300)));
       await tester.pump();
 
@@ -139,12 +140,14 @@ void main() {
       expect(p.nickname, 'سلمى');
       expect(p.age, 4);
       expect(p.goals, ['english']);
-      expect(p.interests, ['colors']);
-      expect(p.dailyCount, 4);
+      expect(p.dailyCount, 5);
       expect(p.bias, 1);
-      expect(p.plan.length, kLands.length - 1); // one land left out
+      expect(p.plan.length, kLands.length);
       expect(p.assessment.keys.toSet(), {for (final l in kLands) l.id}); // one score per land
       expect(store.activeId, p.id);
+      // The saved draft is gone once the profile exists.
+      final prefs = await tester.runAsync(SharedPreferences.getInstance);
+      expect(prefs!.getString('onboarding_draft'), isNull);
     });
 
     testWidgets('the skill check can be skipped and the plan then follows the goals', (tester) async {
@@ -154,31 +157,105 @@ void main() {
       await tester.enterText(_field('اسم الطفل أو لقبه'), 'عمر');
       await tester.tap(find.text('التالي'));
       await tester.pump();
-      await tester.tap(find.widgetWithText(FilterChip, 'الذاكرة والتفكير'));
+      await tester.tap(find.text('الذاكرة والتفكير'));
       await tester.tap(find.text('التالي'));
       await tester.pump();
       await tester.tap(find.text('تخطي الاختبار'));
       await tester.pump();
-      expect(find.text('الخطوة 4 من 4'), findsOneWidget);
-      await tester.tap(find.text('ابدأ الرحلة'));
+      expect(find.text('الخطوة 4 من 5'), findsOneWidget);
+      expect(find.textContaining('الذاكرة والتفكير'), findsWidgets);
+      await tester.tap(find.text('التالي'));
+      await tester.pump();
+      await tester.tap(find.text('ابدأ رحلة طفلك'));
       await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 300)));
       await tester.pump();
       final p = store.profiles.single;
       expect(p.assessment, isEmpty);
       expect(p.plan.first, 'brain'); // the goal's land comes first
       expect(p.age, 5); // the default age
+      expect(p.dailyCount, 3); // balanced by default
     });
 
-    testWidgets('going back keeps what was typed', (tester) async {
+    testWidgets('going back keeps every answer', (tester) async {
       _tall(tester);
       await tester.runAsync(_newStore);
       await tester.pumpWidget(_app(const OnboardingFlow(askForPin: false)));
       await tester.enterText(_field('اسم الطفل أو لقبه'), 'نور');
+      await tester.tap(find.widgetWithText(ChoiceChip, '7'));
       await tester.tap(find.text('التالي'));
       await tester.pump();
-      await tester.tap(find.text('رجوع'));
+      await tester.tap(find.text('الرياضيات'));
       await tester.pump();
+      await tester.tap(find.text('التالي'));
+      await tester.pump();
+      await tester.tap(find.text('تخطي الاختبار'));
+      await tester.pump();
+      await tester.tap(find.text('بداية هادئة'));
+      await tester.pump();
+      // Back to the very first step.
+      for (var i = 0; i < 3; i++) {
+        await tester.tap(find.byTooltip('رجوع'));
+        await tester.pump();
+      }
+      expect(find.text('الخطوة 1 من 5'), findsOneWidget);
       expect(find.text('نور'), findsOneWidget);
+      expect(tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '7')).selected, isTrue);
+      await tester.tap(find.text('التالي'));
+      await tester.pump();
+      expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget); // the math goal
+      await tester.tap(find.text('التالي'));
+      await tester.pump();
+      await tester.tap(find.text('تخطي الاختبار'));
+      await tester.pump();
+      expect(find.textContaining('نشاطان'), findsWidgets);
+      expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget); // gentle still chosen
+    });
+
+    testWidgets('an interrupted setup resumes where it stopped', (tester) async {
+      _tall(tester);
+      await tester.runAsync(_newStore);
+      await tester.pumpWidget(_app(const OnboardingFlow(askForPin: false)));
+      await tester.enterText(_field('اسم الطفل أو لقبه'), 'ياسين');
+      await tester.tap(find.text('التالي'));
+      await tester.pump();
+      await tester.tap(find.text('الإنجليزية'));
+      await tester.pump();
+      await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 100)));
+      // The app is closed and opened again.
+      await tester.pumpWidget(_app(const OnboardingFlow(askForPin: false)));
+      await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 100)));
+      await tester.pump();
+      expect(find.text('الخطوة 2 من 5'), findsOneWidget);
+      expect(find.text('أكملنا من حيث توقفت.'), findsOneWidget);
+      await tester.tap(find.byTooltip('رجوع'));
+      await tester.pump();
+      expect(find.text('ياسين'), findsOneWidget);
+    });
+
+    testWidgets('English interface: left-to-right texts and the same flow', (tester) async {
+      _tall(tester);
+      await tester.runAsync(_newStore);
+      await tester.runAsync(() => AppLocale.instance.set('en'));
+      addTearDown(() => AppLocale.instance.set('ar'));
+      await tester.pumpWidget(_app(const OnboardingFlow(askForPin: false)));
+      expect(find.text('Step 1 of 5'), findsOneWidget);
+      await tester.tap(find.text('Next'));
+      await tester.pump();
+      expect(find.text('Enter a name or nickname for your child'), findsOneWidget);
+      await tester.enterText(_field('Child\'s name or nickname'), 'Sam');
+      await tester.tap(find.text('Next'));
+      await tester.pump();
+      expect(find.text('What would you like your child to learn?'), findsOneWidget);
+      expect(find.text('Mathematics'), findsOneWidget);
+      await tester.tap(find.text('Next'));
+      await tester.pump();
+      await tester.tap(find.text('Skip the check'));
+      await tester.pump();
+      expect(find.text('Gentle start'), findsOneWidget);
+      expect(find.text('Focused practice'), findsOneWidget);
+      await tester.tap(find.text('Next'));
+      await tester.pump();
+      expect(find.text('Start Your Child\'s Journey'), findsOneWidget);
     });
   });
 

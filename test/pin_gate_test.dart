@@ -21,7 +21,9 @@ Future<void> _runOnboarding(WidgetTester tester) async {
   await tester.pump();
   await tester.tap(find.text('تخطي الاختبار'));
   await tester.pump();
-  await tester.tap(find.text('ابدأ الرحلة'));
+  await tester.tap(find.text('التالي'));
+  await tester.pump();
+  await tester.tap(find.text('ابدأ رحلة طفلك'));
   await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 300)));
   await tester.pump();
   await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 300)));
