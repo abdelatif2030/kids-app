@@ -6,6 +6,9 @@
 /// There is no chat or messaging anywhere.
 library;
 
+import 'dart:convert';
+import 'dart:typed_data';
+
 enum UserRole { parent, teacher }
 
 class AppUser {
@@ -28,6 +31,13 @@ const teacherStatusApproved = 'approved';
 /// Languages a teacher can offer, as shown to parents.
 const kTeacherLanguages = ['العربية', 'English', 'Deutsch', 'Français'];
 
+/// A teacher's CV (pdf/jpg/png), kept small so it fits in Firestore.
+class CvFile {
+  final String name;
+  final Uint8List bytes;
+  const CvFile(this.name, this.bytes);
+}
+
 class TeacherProfile {
   final String uid;
   final String name;
@@ -36,6 +46,8 @@ class TeacherProfile {
   final List<String> languages;
   final String priceNote; // free text, e.g. "150 جنيه للحصة"
   final String status; // pending until the app owner approves it
+  final String? photoB64; // small JPEG, base64
+  final String? cvName; // the CV file itself is loaded on demand (loadCv)
 
   const TeacherProfile({
     required this.uid,
@@ -45,9 +57,13 @@ class TeacherProfile {
     required this.languages,
     required this.priceNote,
     this.status = teacherStatusPending,
+    this.photoB64,
+    this.cvName,
   });
 
   bool get approved => status == teacherStatusApproved;
+
+  Uint8List? get photoBytes => photoB64 == null ? null : base64Decode(photoB64!);
 
   Map<String, dynamic> toMap() => {
         'name': name,
@@ -56,6 +72,9 @@ class TeacherProfile {
         'languages': languages,
         'priceNote': priceNote,
         'status': status,
+        // Omitted when empty: the rules read these fields and null would break them.
+        'photoB64': ?photoB64,
+        'cvName': ?cvName,
       };
 
   factory TeacherProfile.fromMap(String uid, Map<String, dynamic> m) => TeacherProfile(
@@ -66,6 +85,8 @@ class TeacherProfile {
         languages: [for (final s in (m['languages'] as List<dynamic>? ?? [])) s as String],
         priceNote: (m['priceNote'] as String?) ?? '',
         status: (m['status'] as String?) ?? teacherStatusPending,
+        photoB64: m['photoB64'] as String?,
+        cvName: m['cvName'] as String?,
       );
 }
 
@@ -154,7 +175,11 @@ abstract class TeacherRepository {
   Future<TeacherProfile?> myTeacherProfile();
 
   /// A new profile starts as pending; saving never changes the status.
-  Future<void> saveTeacherProfile(TeacherProfile profile);
+  /// [newCv], when given, replaces the stored CV (profile.cvName should match).
+  Future<void> saveTeacherProfile(TeacherProfile profile, {CvFile? newCv});
+
+  /// The CV of an approved teacher (or your own), or null if there is none.
+  Future<CvFile?> loadCv(String teacherUid);
 
   Future<void> requestBooking(Booking booking);
 

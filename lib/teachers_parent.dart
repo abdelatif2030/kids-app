@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'curriculum.dart';
 import 'teachers_bookings.dart';
+import 'media_picker.dart';
 import 'teachers_models.dart';
+import 'teachers_widgets.dart';
 
 String subjectLabels(List<String> ids) =>
     [for (final id in ids) subjectById(id)?.label ?? id].join('، ');
@@ -118,16 +120,41 @@ class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
                 ),
               for (final t in shown)
                 Card(
-                  child: ListTile(
-                    leading: const CircleAvatar(child: Icon(Icons.person)),
-                    title: Text(t.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text('${subjectLabels(t.subjects)}\n${t.languages.join('، ')}'),
-                    isThreeLine: true,
-                    trailing: const Icon(Icons.chevron_left),
+                  margin: const EdgeInsets.symmetric(vertical: 6),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => TeacherDetailScreen(repo: widget.repo, teacher: t),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Row(
+                        children: [
+                          TeacherAvatar(photo: t.photoBytes, radius: 34),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(t.name,
+                                    style: const TextStyle(
+                                        fontSize: 19, fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 6),
+                                Wrap(spacing: 6, runSpacing: 6, children: [
+                                  for (final id in t.subjects) SubjectChip(id: id),
+                                ]),
+                                const SizedBox(height: 6),
+                                Text(t.languages.join('، '),
+                                    style: const TextStyle(fontSize: 14)),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.chevron_left),
+                        ],
                       ),
                     ),
                   ),
@@ -167,7 +194,31 @@ class TeacherDetailScreen extends StatelessWidget {
       message = e.message;
     }
     if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      // Replace any message still showing, so the newest one is always visible.
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
+
+  Future<void> _downloadCv(BuildContext context) async {
+    String message;
+    try {
+      final cv = await repo.loadCv(teacher.uid);
+      if (cv == null) {
+        message = 'لا توجد سيرة ذاتية';
+      } else {
+        await mediaPicker.saveCv(cv);
+        message = 'تم حفظ السيرة الذاتية';
+      }
+    } on AccountException catch (e) {
+      message = e.message;
+    }
+    if (context.mounted) {
+      // Replace any message still showing, so the newest one is always visible.
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -176,17 +227,40 @@ class TeacherDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(teacher.name)),
       body: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(16),
         children: [
-          const Center(child: CircleAvatar(radius: 40, child: Icon(Icons.person, size: 48))),
-          const SizedBox(height: 16),
-          Text(teacher.bio, style: const TextStyle(fontSize: 18)),
-          const SizedBox(height: 16),
-          Text('المواد: ${subjectLabels(teacher.subjects)}', style: const TextStyle(fontSize: 18)),
-          Text('اللغات: ${teacher.languages.join('، ')}', style: const TextStyle(fontSize: 18)),
-          if (teacher.priceNote.isNotEmpty)
-            Text('السعر: ${teacher.priceNote}', style: const TextStyle(fontSize: 18)),
-          const SizedBox(height: 24),
+          TeacherHeader(
+            avatar: TeacherAvatar(photo: teacher.photoBytes, radius: 44),
+            title: teacher.name,
+            subtitle: teacher.languages.join('، '),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(teacher.bio, style: const TextStyle(fontSize: 17)),
+                  const SizedBox(height: 12),
+                  Wrap(spacing: 8, runSpacing: 8, children: [
+                    for (final id in teacher.subjects) SubjectChip(id: id),
+                  ]),
+                  if (teacher.priceNote.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Text('السعر: ${teacher.priceNote}', style: const TextStyle(fontSize: 17)),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          if (teacher.cvName != null)
+            OutlinedButton.icon(
+              onPressed: () => _downloadCv(context),
+              icon: const Icon(Icons.description_outlined),
+              label: const Text('تنزيل السيرة الذاتية'),
+            ),
+          const SizedBox(height: 12),
           FilledButton.icon(
             onPressed: () => _request(context),
             icon: const Icon(Icons.event_available),

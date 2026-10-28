@@ -31,9 +31,25 @@ service cloud.firestore {
         && (resource.data.status == 'approved' || request.auth.uid == uid);
       allow create: if signedIn() && request.auth.uid == uid
         && role() == 'teacher'
-        && request.resource.data.status == 'pending';
+        && request.resource.data.status == 'pending'
+        && request.resource.data.get('photoB64', '').size() < 150000;
       allow update: if signedIn() && request.auth.uid == uid
-        && request.resource.data.status == resource.data.status;
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.get('photoB64', '').size() < 150000;
+      allow delete: if false;
+    }
+
+    // teacherFiles/{uid}: the CV (small, base64). The teacher writes their own;
+    // signed-in users can read the CV of an approved teacher.
+    match /teacherFiles/{uid} {
+      allow read: if signedIn()
+        && (request.auth.uid == uid
+            || get(/databases/$(database)/documents/teachers/$(uid)).data.status == 'approved');
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && role() == 'teacher'
+        && request.resource.data.keys().hasOnly(['cvName', 'cvB64'])
+        && request.resource.data.cvName.size() < 120
+        && request.resource.data.cvB64.size() < 700000;
       allow delete: if false;
     }
 

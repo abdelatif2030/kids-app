@@ -7,6 +7,7 @@ class FakeTeacherRepository implements TeacherRepository {
   final Map<String, ({String email, String password, String name, UserRole role})> _users = {};
   final Map<String, TeacherProfile> _teachers = {};
   final List<Booking> _bookings = [];
+  final Map<String, CvFile> _cvs = {};
   AppUser? _current;
   int _nextId = 1;
 
@@ -57,6 +58,8 @@ class FakeTeacherRepository implements TeacherRepository {
       languages: t.languages,
       priceNote: t.priceNote,
       status: teacherStatusApproved,
+      photoB64: t.photoB64,
+      cvName: t.cvName,
     );
   }
 
@@ -70,8 +73,9 @@ class FakeTeacherRepository implements TeacherRepository {
   Future<TeacherProfile?> myTeacherProfile() async => _teachers[_current!.uid];
 
   @override
-  Future<void> saveTeacherProfile(TeacherProfile p) async {
+  Future<void> saveTeacherProfile(TeacherProfile p, {CvFile? newCv}) async {
     final old = _teachers[_current!.uid];
+    if (newCv != null) _cvs[_current!.uid] = newCv;
     _teachers[_current!.uid] = TeacherProfile(
       uid: _current!.uid,
       name: p.name,
@@ -80,8 +84,13 @@ class FakeTeacherRepository implements TeacherRepository {
       languages: p.languages,
       priceNote: p.priceNote,
       status: old?.status ?? teacherStatusPending, // never taken from the caller
+      photoB64: p.photoB64,
+      cvName: p.cvName,
     );
   }
+
+  @override
+  Future<CvFile?> loadCv(String teacherUid) async => _cvs[teacherUid];
 
   @override
   Future<void> requestBooking(Booking b) async {

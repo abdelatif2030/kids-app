@@ -1,8 +1,13 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 import 'curriculum.dart';
+import 'media_picker.dart';
 import 'teachers_bookings.dart';
 import 'teachers_models.dart';
+import 'teachers_widgets.dart';
 
 /// A teacher's home: their profile (and its approval status) and incoming requests.
 class TeacherHomeScreen extends StatefulWidget {
@@ -69,34 +74,78 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
           }
           final p = snapshot.data;
           return ListView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(16),
             children: [
-              if (p == null)
+              if (p == null) ...[
+                const TeacherHeader(
+                  avatar: TeacherAvatar(photo: null, radius: 36),
+                  title: 'أهلاً بك',
+                  subtitle: 'أنشئ ملفك ليظهر للأهل بعد المراجعة',
+                ),
+                const SizedBox(height: 16),
                 const Text(
                   'أنشئ ملفك الشخصي ليراجعه صاحب التطبيق، وبعد الموافقة يظهر للأهل.',
                   style: TextStyle(fontSize: 18),
-                )
-              else ...[
+                ),
+              ] else ...[
+                TeacherHeader(
+                  avatar: TeacherAvatar(photo: p.photoBytes, radius: 36),
+                  title: p.name,
+                  subtitle: p.languages.join('، '),
+                ),
+                const SizedBox(height: 12),
                 Card(
                   color: p.approved ? Colors.green.shade50 : Colors.amber.shade50,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Text(
-                      p.approved
-                          ? 'ملفك معتمد ويظهر للأهل.'
-                          : 'ملفك قيد المراجعة. سيظهر للأهل بعد موافقة صاحب التطبيق.',
-                      style: const TextStyle(fontSize: 18),
+                    child: Row(
+                      children: [
+                        Icon(
+                          p.approved ? Icons.verified_rounded : Icons.hourglass_top_rounded,
+                          color: p.approved ? Colors.green : Colors.amber.shade800,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            p.approved
+                                ? 'ملفك معتمد ويظهر للأهل.'
+                                : 'ملفك قيد المراجعة. سيظهر للأهل بعد موافقة صاحب التطبيق.',
+                            style: const TextStyle(fontSize: 17),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
-                Text(p.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                Text(p.bio),
-                Text('المواد: ${[for (final s in p.subjects) subjectById(s)?.label ?? s].join('، ')}'),
-                Text('اللغات: ${p.languages.join('، ')}'),
-                if (p.priceNote.isNotEmpty) Text('السعر: ${p.priceNote}'),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(p.bio, style: const TextStyle(fontSize: 16)),
+                        const SizedBox(height: 12),
+                        Wrap(spacing: 8, runSpacing: 8, children: [
+                          for (final s in p.subjects) SubjectChip(id: s),
+                        ]),
+                        if (p.priceNote.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Text('السعر: ${p.priceNote}'),
+                        ],
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(Icons.description_outlined, size: 20),
+                            const SizedBox(width: 6),
+                            Text(p.cvName == null ? 'لم ترفع سيرة ذاتية' : 'السيرة الذاتية: ${p.cvName}'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               FilledButton.icon(
                 onPressed: () => _edit(p),
                 icon: const Icon(Icons.edit),
@@ -131,6 +180,9 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
   late final _price = TextEditingController(text: widget.existing?.priceNote ?? '');
   late final Set<String> _subjects = {...?widget.existing?.subjects};
   late final Set<String> _languages = {...?widget.existing?.languages};
+  late Uint8List? _photo = widget.existing?.photoBytes;
+  late String? _cvName = widget.existing?.cvName;
+  CvFile? _newCv;
   bool _busy = false;
   String? _error;
 
@@ -140,6 +192,35 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
     _bio.dispose();
     _price.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickPhoto() async {
+    try {
+      final bytes = await mediaPicker.pickPhoto();
+      if (bytes != null && mounted) {
+        setState(() {
+          _photo = bytes;
+          _error = null;
+        });
+      }
+    } on AccountException catch (e) {
+      if (mounted) setState(() => _error = e.message);
+    }
+  }
+
+  Future<void> _pickCv() async {
+    try {
+      final cv = await mediaPicker.pickCv();
+      if (cv != null && mounted) {
+        setState(() {
+          _newCv = cv;
+          _cvName = cv.name;
+          _error = null;
+        });
+      }
+    } on AccountException catch (e) {
+      if (mounted) setState(() => _error = e.message);
+    }
   }
 
   Future<void> _save() async {
@@ -156,15 +237,20 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
       _error = null;
     });
     try {
-      await widget.repo.saveTeacherProfile(TeacherProfile(
-        uid: widget.repo.currentUser!.uid,
-        name: _name.text.trim(),
-        bio: _bio.text.trim(),
-        subjects: _subjects.toList(),
-        languages: _languages.toList(),
-        priceNote: _price.text.trim(),
-        status: widget.existing?.status ?? teacherStatusPending,
-      ));
+      await widget.repo.saveTeacherProfile(
+        TeacherProfile(
+          uid: widget.repo.currentUser!.uid,
+          name: _name.text.trim(),
+          bio: _bio.text.trim(),
+          subjects: _subjects.toList(),
+          languages: _languages.toList(),
+          priceNote: _price.text.trim(),
+          status: widget.existing?.status ?? teacherStatusPending,
+          photoB64: _photo == null ? null : base64Encode(_photo!),
+          cvName: _cvName,
+        ),
+        newCv: _newCv,
+      );
       if (mounted) Navigator.pop(context, true);
     } on AccountException catch (e) {
       if (mounted) setState(() => _error = e.message);
@@ -180,6 +266,23 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
+          Center(
+            child: Stack(
+              children: [
+                TeacherAvatar(photo: _photo, radius: 56),
+                PositionedDirectional(
+                  end: 0,
+                  bottom: 0,
+                  child: IconButton.filled(
+                    tooltip: 'اختيار صورة',
+                    onPressed: _pickPhoto,
+                    icon: const Icon(Icons.photo_camera_rounded),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
           TextField(controller: _name, decoration: const InputDecoration(labelText: 'الاسم')),
           TextField(
             controller: _bio,
@@ -222,6 +325,32 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
                   }),
                 ),
             ],
+          ),
+          const SizedBox(height: 16),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('السيرة الذاتية (CV)',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+                  const SizedBox(height: 4),
+                  Text(_cvName ?? 'لم يتم اختيار ملف'),
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: _pickCv,
+                    icon: const Icon(Icons.upload_file_rounded),
+                    label: Text(_cvName == null ? 'رفع السيرة الذاتية' : 'تغيير الملف'),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'PDF أو صورة، حتى 500 كيلوبايت. سيراها الأهل: احذف رقم هاتفك وعنوانك منها.',
+                    style: TextStyle(fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
           ),
           if (_error != null)
             Padding(

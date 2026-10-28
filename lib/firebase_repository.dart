@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -99,8 +101,15 @@ class FirebaseTeacherRepository implements TeacherRepository {
       });
 
   @override
-  Future<void> saveTeacherProfile(TeacherProfile p) => _guard(() async {
-        final ref = _db.collection('teachers').doc(_auth.currentUser!.uid);
+  Future<void> saveTeacherProfile(TeacherProfile p, {CvFile? newCv}) => _guard(() async {
+        final uid = _auth.currentUser!.uid;
+        if (newCv != null) {
+          await _db.collection('teacherFiles').doc(uid).set({
+            'cvName': newCv.name,
+            'cvB64': base64Encode(newCv.bytes),
+          });
+        }
+        final ref = _db.collection('teachers').doc(uid);
         final map = p.toMap();
         if ((await ref.get()).exists) {
           // A teacher can never change their own approval.
@@ -110,6 +119,13 @@ class FirebaseTeacherRepository implements TeacherRepository {
           map['status'] = teacherStatusPending;
           await ref.set(map);
         }
+      });
+
+  @override
+  Future<CvFile?> loadCv(String teacherUid) => _guard(() async {
+        final data = (await _db.collection('teacherFiles').doc(teacherUid).get()).data();
+        if (data == null) return null;
+        return CvFile(data['cvName'] as String, base64Decode(data['cvB64'] as String));
       });
 
   @override

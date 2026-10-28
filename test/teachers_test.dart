@@ -1,11 +1,36 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/media_picker.dart';
 import 'package:kids_app/teachers_models.dart';
 import 'package:kids_app/teachers_screens.dart';
 
 import 'fake_teacher_repository.dart';
 
 // A fresh key each time, so routes pushed in an earlier step do not survive.
+// A 1x1 PNG, so the photo can really be decoded.
+final _png = base64Decode(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
+
+class FakeMediaPicker implements MediaPicker {
+  String? savedCvName;
+  Object? photoError;
+
+  @override
+  Future<Uint8List?> pickPhoto() async {
+    if (photoError != null) throw photoError!;
+    return _png;
+  }
+
+  @override
+  Future<CvFile?> pickCv() async => CvFile('cv.pdf', Uint8List.fromList([1, 2, 3]));
+
+  @override
+  Future<void> saveCv(CvFile cv) async => savedCvName = cv.name;
+}
+
 Widget _app(Widget home) => MaterialApp(
       key: UniqueKey(),
       builder: (context, child) =>
@@ -67,6 +92,8 @@ void main() {
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     final repo = FakeTeacherRepository();
+    final picker = FakeMediaPicker();
+    mediaPicker = picker;
 
     // 1. A teacher registers and creates a profile. It starts as pending.
     await _open(tester, repo);
@@ -87,6 +114,10 @@ void main() {
 
     await tester.tap(find.widgetWithText(FilterChip, 'إنجليزي'));
     await tester.tap(find.widgetWithText(FilterChip, 'English'));
+    await tester.tap(find.byTooltip('اختيار صورة'));
+    await tester.tap(find.text('رفع السيرة الذاتية'));
+    await tester.pump();
+    expect(find.text('cv.pdf'), findsWidgets);
     await tester.tap(find.text('حفظ'));
     await tester.pumpAndSettle();
     expect(find.textContaining('قيد المراجعة'), findsOneWidget);
@@ -110,6 +141,9 @@ void main() {
     // 3. The parent asks for a lesson.
     await tester.tap(find.text('أ. سارة'));
     await tester.pumpAndSettle();
+    await tester.tap(find.text('تنزيل السيرة الذاتية'));
+    await tester.pumpAndSettle();
+    expect(picker.savedCvName, 'cv.pdf');
     await tester.tap(find.text('اطلب حصة'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('إرسال الطلب')); // needs a time first
@@ -188,5 +222,24 @@ void main() {
     ));
     expect((await repo.myTeacherProfile())!.approved, isFalse);
     expect(await repo.approvedTeachers(), isEmpty);
+  });
+
+  testWidgets('a too-large photo shows the error and does not change the form', (tester) async {
+    tester.view.physicalSize = const Size(800, 2000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    final repo = FakeTeacherRepository();
+    await repo.register(email: 't@example.com', password: '123456', name: 'T', role: UserRole.teacher);
+    final picker = FakeMediaPicker()
+      ..photoError = const AccountException('الصورة كبيرة، اختر صورة أصغر');
+    mediaPicker = picker;
+
+    await tester.pumpWidget(_app(TeachersEntryScreen(repo: repo)));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('إنشاء الملف الشخصي'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('اختيار صورة'));
+    await tester.pumpAndSettle();
+    expect(find.text('الصورة كبيرة، اختر صورة أصغر'), findsOneWidget);
   });
 }
