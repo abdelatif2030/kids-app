@@ -9,6 +9,11 @@
 | Trace the letter | 4-6 | 3 letters traced (real drawing needed, not graded) | Arabic only |
 | Word picture book | 2-6 | all 50 words opened (any number of visits) | the 50 words come from the app vocabulary |
 
+| Which is different? | 3-6 | 5 rounds | three pictures of one kind (animals, food, transport, nature, home) and one different |
+| Complete the pattern | 4-6 | 5 rounds | age 4: AB; age 5: AAB or ABB; age 6: ABC |
+| More and fewer | 3-6 | 5 rounds | counts up to 5 (age 3), 7 (age 4), 9 (ages 5-6); alternates "more" and "fewer" |
+| Sort into groups | 4-6 | 6 pictures sorted | two groups, three pictures each |
+
 Rules every game follows
 - A star appears only when the activity is completed, and only the first time per child (`GameRewards`, `kCompletionStars = 1`).
   Replaying shows kind words and no star. No stars for speed, score, taps, or per word.

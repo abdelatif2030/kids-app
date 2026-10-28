@@ -53,15 +53,21 @@ void main() {
 
   group('catalog', () {
     test('every game has an age range and the age filter is respected', () {
-      expect(kEducationalGames.length, 6);
-      expect({for (final g in kEducationalGames) g.id}.length, 6);
-      expect(gamesForAge(2).map((g) => g.id), [WordBookGame.gameId]);
-      expect(gamesForAge(3).map((g) => g.id), [MatchPicturesGame.gameId, WordBookGame.gameId]);
-      expect(gamesForAge(4).length, 5);
-      expect(gamesForAge(5).length, 6);
-      expect(gamesForAge(6).length, 6);
+      expect(kEducationalGames.length, 10);
+      expect({for (final g in kEducationalGames) g.id}.length, 10);
+      Set<String> ids(int age) => {for (final g in gamesForAge(age)) g.id};
+      expect(ids(2), {WordBookGame.gameId});
+      expect(ids(3), {MatchPicturesGame.gameId, WordBookGame.gameId, 'odd_one_out', 'compare'});
+      expect(ids(4).length, 9);
+      expect(ids(5).length, 10);
+      expect(ids(6).length, 10);
       expect(gamesForAge(7), isEmpty);
       expect(gamesForAge(1), isEmpty);
+      for (final g in kEducationalGames) {
+        expect(g.minAge <= g.maxAge, true);
+        expect(g.title(), isNotEmpty);
+        expect(g.objective(), isNotEmpty);
+      }
     });
   });
 
@@ -461,7 +467,7 @@ void main() {
       await tester.pumpWidget(_app(const Scaffold(body: SingleChildScrollView(child: GamesGrid(age: 2)))));
       await _settle(tester);
       expect(find.text(kEducationalGames[2].title()), findsNothing); // connect four is 5-6
-      expect(find.text(kEducationalGames.last.title()), findsOneWidget); // the word book is 2-6
+      expect(find.text(kEducationalGames[5].title()), findsOneWidget); // the word book is 2-6
     });
   });
 }

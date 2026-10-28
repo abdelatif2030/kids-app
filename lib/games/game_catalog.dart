@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../journey/models.dart';
 import '../l10n/strings.dart';
+import 'choice_games.dart';
 import 'connect_four_game.dart';
 import 'letter_fishing_game.dart';
 import 'match_pictures_game.dart';
@@ -90,6 +91,42 @@ final List<GameInfo> kEducationalGames = [
     2,
     6,
     (id, _, _) => WordBookGame(childId: id),
+  ),
+  GameInfo(
+    OddOneOutGame.gameId,
+    () => tr2('ما المختلف؟', 'Which is different?'),
+    () => tr2('التصنيف والملاحظة', 'Grouping and noticing'),
+    Icons.search_rounded,
+    3,
+    6,
+    (id, age, _) => OddOneOutGame(childId: id, age: age),
+  ),
+  GameInfo(
+    PatternGame.gameId,
+    () => tr2('أكمل النمط', 'Complete the pattern'),
+    () => tr2('اكتشاف التسلسل', 'Spotting a sequence'),
+    Icons.linear_scale_rounded,
+    4,
+    6,
+    (id, age, _) => PatternGame(childId: id, age: age),
+  ),
+  GameInfo(
+    CompareGame.gameId,
+    () => tr2('أكثر وأقل', 'More and fewer'),
+    () => tr2('مقارنة الأعداد', 'Comparing quantities'),
+    Icons.compare_arrows_rounded,
+    3,
+    6,
+    (id, age, _) => CompareGame(childId: id, age: age),
+  ),
+  GameInfo(
+    SortGame.gameId,
+    () => tr2('رتّب في مجموعات', 'Sort into groups'),
+    () => tr2('تصنيف الأشياء', 'Sorting things'),
+    Icons.category_rounded,
+    4,
+    6,
+    (id, age, _) => SortGame(childId: id, age: age),
   ),
 ];
 

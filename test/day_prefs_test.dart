@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kids_app/games/game_catalog.dart';
 import 'package:kids_app/journey/day_prefs.dart';
 import 'package:kids_app/journey/models.dart';
 import 'package:kids_app/journey/my_day.dart';

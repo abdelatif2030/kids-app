@@ -883,6 +883,22 @@ The six learning games under Games > Learning games.
 - **Device or environment:** Device: 
 - **Notes:** 
 
+
+### E13 - Four more learning games (odd one out, pattern, more/fewer, sort)
+
+- [ ] Not tested
+- **Test ID:** E13
+- **Preconditions:** Child profiles aged 3, 4, 5 and 6.
+- **Steps:**
+  1. Open Games > Learning games and check each of the four games appears only in its age range (odd one out 3-6, pattern 4-6, more/fewer 3-6, sort 4-6).
+  2. Play each one to the end, making wrong choices on purpose.
+  3. Finish each once, then play it again.
+- **Expected result:** wrong choices only fade; no failure screen; one star the first time only; the pictures are clear; the odd-one-out groups make sense to a child (e.g. 3 animals and 1 food); the patterns repeat correctly; the group with more or fewer is the right one; sorting puts each picture in its true group.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Device model, Android version: 
+- **Notes:** 
+
 ## F. Parent experience
 
 ### F1 - Audio status accuracy
