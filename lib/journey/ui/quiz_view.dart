@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../media/audio.dart';
 import '../content.dart';
 import '../models.dart';
 import 'kit.dart';
@@ -11,7 +12,8 @@ class ItemResult {
   final String skill;
   final bool ok; // right on the first try
   final String? detail;
-  const ItemResult(this.skill, this.ok, [this.detail]);
+  final String? ref; // e.g. "word:cat" or "letter:ب"
+  const ItemResult(this.skill, this.ok, [this.detail, this.ref]);
 }
 
 const _praise = ['أحسنت! 🎉', 'رائع! ⭐', 'ممتاز! 👏', 'برافو! 🌟'];
@@ -47,18 +49,32 @@ class _QuizViewState extends State<QuizView> {
   Question get _q => widget.questions[_i];
 
   @override
+  void initState() {
+    super.initState();
+    _speakFirst();
+  }
+
+  void _speakFirst() {
+    final q = _q;
+    if (q.speakFirst && q.spoken != null) AppAudio.say(q.spoken!, lang: q.spokenLang);
+  }
+
+  @override
   void dispose() {
     _timer?.cancel();
+    AppAudio.stopSaying();
     super.dispose();
   }
 
   void _tap(int index) {
     if (_right || _faded.contains(index)) return;
     if (index == _q.correct) {
-      _results.add(ItemResult(_q.skill, !_missed, _q.detail));
+      _results.add(ItemResult(_q.skill, !_missed, _q.detail, _q.ref));
       setState(() {
         _right = true;
-        _message = _praise[_i % _praise.length];
+        _message = _q.explanation == null
+            ? _praise[_i % _praise.length]
+            : '${_praise[_i % _praise.length]}  ${_q.explanation}';
       });
       _timer = Timer(const Duration(milliseconds: 1100), _next);
     } else {
@@ -87,6 +103,7 @@ class _QuizViewState extends State<QuizView> {
       _wrongCount = 0;
       _message = '';
     });
+    _speakFirst();
   }
 
   Widget _visual(Question q) {
@@ -230,6 +247,15 @@ class _QuizViewState extends State<QuizView> {
               Semantics(header: true, child: Text(q.prompt,
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: RC.ink))),
+              if (q.spoken != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: TextButton.icon(
+                    onPressed: () => AppAudio.say(q.spoken!, lang: q.spokenLang),
+                    icon: const Icon(Icons.volume_up_rounded, size: 30),
+                    label: const Text('استمع', style: TextStyle(fontSize: 20)),
+                  ),
+                ),
               const SizedBox(height: 12),
               _visual(q),
               const SizedBox(height: 18),

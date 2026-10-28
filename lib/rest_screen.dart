@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'journey/repository.dart';
 import 'journey/ui/child_shell.dart';
+import 'media/audio.dart';
+import 'stories/story_screens.dart';
 import 'parent_screens.dart';
 import 'session_manager.dart';
 import 'ui.dart';
@@ -141,6 +143,21 @@ class RestScreen extends StatelessWidget {
                         for (var i = 0; i < stars; i++)
                           const Icon(Icons.star_rounded, size: 56, color: Colors.amber),
                       ],
+                    ),
+                  ],
+                  if (!_planDone &&
+                      AudioPrefs.instance.storiesInQuietHours &&
+                      JourneyStore.instance.active != null) ...[
+                    const SizedBox(height: 24),
+                    OutlinedButton.icon(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => StoriesHomeScreen(child: JourneyStore.instance.active!),
+                        ),
+                      ),
+                      icon: const Text('🌙', style: TextStyle(fontSize: 22)),
+                      label: const Text('قصة هادئة قبل النوم', style: TextStyle(fontSize: 18)),
                     ),
                   ],
                   const SizedBox(height: 48),

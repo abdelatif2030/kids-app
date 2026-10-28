@@ -43,6 +43,8 @@ dependencies:
   cloud_firestore: ^7.1.0
   image_picker: ^1.2.4
   file_picker: ^13.3.0
+  just_audio: ^0.10.5
+  flutter_tts: ^4.2.5
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +70,8 @@ flutter:
 
   assets:
     - assets/videos.json
+    - assets/audio/
+    - assets/content/
 
   fonts:
     # Tajawal (SIL Open Font License, see assets/fonts/Tajawal-OFL.txt)

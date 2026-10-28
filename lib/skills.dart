@@ -27,6 +27,13 @@ const kSkills = [
   Skill('sequence', 'ترتيب الخطوات', 'نادي الذكاء', 'discover'),
   Skill('story', 'فهم القصة', 'قطار القصص', 'stories'),
   Skill('feelings', 'فهم المشاعر', 'مدرسة المشاعر', 'discover'),
+  Skill('vocab', 'المفردات', 'مكتبة الكلمات', 'discover'),
+  Skill('listening', 'الاستماع والتمييز', 'مكتبة الكلمات', 'discover'),
+  Skill('phonics', 'أصوات الحروف', 'تعلّم الحروف', 'arabic'),
+  Skill('letter_position', 'موقع الحرف في الكلمة', 'تعلّم الحروف', 'arabic'),
+  Skill('syllables', 'المقاطع والحركات', 'تعلّم الحروف', 'arabic'),
+  Skill('word_building', 'تكوين الكلمات', 'تعلّم الحروف', 'arabic'),
+  Skill('reading', 'القراءة والفهم', 'تعلّم الحروف', 'arabic'),
 ];
 
 Skill? skillById(String id) {

@@ -209,6 +209,32 @@ class Question {
   final String skill; // a skill id in skills.dart
   final String? detail; // what was asked, for "needs practice" (a letter, a color)
   final MathHelp? math; // set for sums, so a mistake can be shown as a picture
+  final String? spoken; // read aloud (device voice) on a speaker button
+  final String spokenLang;
+  final bool speakFirst; // read it as soon as the question appears (listening tasks)
+  final String? explanation; // shown after a right answer
+  final String? ref; // what this item teaches, e.g. "word:cat", "letter:ب" (for records)
+
+  /// The same question carrying a record reference (e.g. "story:moon_star").
+  Question withRef(String r) => Question(
+        prompt: prompt,
+        options: options,
+        correct: correct,
+        hint: hint,
+        skill: skill,
+        bigEmoji: bigEmoji,
+        repeat: repeat,
+        bigText: bigText,
+        bigShape: bigShape,
+        passage: passage,
+        detail: detail,
+        math: math,
+        spoken: spoken,
+        spokenLang: spokenLang,
+        speakFirst: speakFirst,
+        explanation: explanation,
+        ref: r,
+      );
 
   const Question({
     required this.prompt,
@@ -223,6 +249,11 @@ class Question {
     this.passage,
     this.detail,
     this.math,
+    this.spoken,
+    this.spokenLang = 'ar',
+    this.speakFirst = false,
+    this.explanation,
+    this.ref,
   });
 }
 

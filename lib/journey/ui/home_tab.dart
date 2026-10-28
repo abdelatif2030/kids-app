@@ -10,6 +10,9 @@ import '../recommender.dart';
 import '../repository.dart';
 import 'activity_screen.dart';
 import 'kit.dart';
+import '../../library/vocab_screens.dart';
+import '../../literacy/screens.dart';
+import '../../stories/story_screens.dart';
 import 'home_tasks_screen.dart';
 import 'land_map_screen.dart';
 
@@ -216,6 +219,19 @@ class HomeTab extends StatelessWidget {
                       ),
                     ),
                   ),
+                const Text('اكتشف المزيد',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: [
+                    _MoreCard('🔤', 'تعلّم الحروف', RC.peach, () => LettersHomeScreen(child: child)),
+                    _MoreCard('🖼️', 'مكتبة الكلمات', RC.mint, () => VocabLibraryScreen(child: child)),
+                    _MoreCard('🌙', 'ليلة حلوة', RC.lavender, () => StoriesHomeScreen(child: child)),
+                  ],
+                ),
+                const SizedBox(height: 10),
                 RCard(
                   color: RC.lavender.withAlpha(150),
                   onTap: () => Navigator.push(
@@ -324,3 +340,33 @@ void openVideos(BuildContext context, int age, String subject) => Navigator.push
       context,
       MaterialPageRoute(builder: (_) => VideoListScreen(age: age, subject: subject)),
     );
+
+
+class _MoreCard extends StatelessWidget {
+  final String emoji;
+  final String label;
+  final Color color;
+  final Widget Function() screen;
+  const _MoreCard(this.emoji, this.label, this.color, this.screen);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 150,
+      child: RCard(
+        color: color.withAlpha(170),
+        semanticLabel: label,
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => screen())),
+        child: Column(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 38)),
+            const SizedBox(height: 4),
+            Text(label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: RC.ink)),
+          ],
+        ),
+      ),
+    );
+  }
+}

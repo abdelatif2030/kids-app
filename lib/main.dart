@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import 'curriculum.dart';
 import 'display_prefs.dart';
+import 'media/audio.dart';
 import 'firebase_config.dart';
 import 'journey/repository.dart';
 import 'journey/ui/kit.dart' show RC;
@@ -21,6 +22,7 @@ Future<void> main() async {
   await initFirebase();
   await JourneyStore.instance.load();
   await DisplayPrefs.instance.load();
+  await AudioPrefs.instance.load();
   runApp(const KidsApp());
 }
 
