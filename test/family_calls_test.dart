@@ -11,6 +11,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/family/call_controller.dart';
 import 'package:kids_app/family/call_engine.dart';
 import 'package:kids_app/family/call_models.dart';
+import 'package:kids_app/family/call_repository.dart';
+import 'package:kids_app/family/family_repository.dart';
 import 'package:kids_app/family/family_models.dart';
 import 'package:kids_app/family/memory_family_repository.dart';
 import 'package:kids_app/l10n/app_locale.dart';
@@ -242,6 +244,69 @@ void main() {
       await t.tap(find.byKey(const ValueKey('call_hangup')));
       await settle(t);
       expect(server.calls[id]!.status, callEnded);
+    });
+  });
+
+  group('call button in the chat', () {
+    Future<void> settle(WidgetTester t) async {
+      for (var i = 0; i < 3; i++) {
+        await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 30)));
+        await t.pump(const Duration(milliseconds: 200));
+      }
+    }
+
+    Widget chat(FamilyRepository r, Side side, {bool callsOn = true, Future<bool> Function()? approve}) => MaterialApp(
+          key: UniqueKey(),
+          home: ChatScreen(
+            repo: r,
+            familyId: 'p1',
+            childId: 'c1',
+            childName: 'Lina',
+            relUid: 'n1',
+            as: side,
+            title: 'Grandmother',
+            calls: r as CallRepository,
+            callsOn: callsOn,
+            approveCall: approve,
+          ),
+        );
+
+    testWidgets('no phone button until the parent allowed calls', (t) async {
+      await t.pumpWidget(chat(nana, Side.relative, callsOn: false));
+      await settle(t);
+      expect(find.byKey(const ValueKey('chat_call')), findsNothing);
+    });
+
+    testWidgets('the relative taps the phone in the chat and the call screen opens', (t) async {
+      await parent.setRelativeCalls('n1', true);
+      final engine = FakeEngine('nana');
+      newCallEngine = () => engine;
+      addTearDown(() => newCallEngine = () => WebRtcEngine());
+      await t.pumpWidget(chat(nana, Side.relative));
+      await settle(t);
+      await t.tap(find.byKey(const ValueKey('chat_call')));
+      await settle(t);
+      expect(find.byKey(const ValueKey('call_phase')), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('call_hangup')));
+      await settle(t);
+    });
+
+    testWidgets('a child cannot start a call without the parent: refused approval means no call', (t) async {
+      await parent.setRelativeCalls('n1', true);
+      final engine = FakeEngine('parent');
+      newCallEngine = () => engine;
+      addTearDown(() => newCallEngine = () => WebRtcEngine());
+      var asked = 0;
+      await t.pumpWidget(chat(parent, Side.child, approve: () async {
+        asked++;
+        return false;
+      }));
+      await settle(t);
+      await t.tap(find.byKey(const ValueKey('chat_call')));
+      await settle(t);
+      expect(asked, 1);
+      expect(find.byKey(const ValueKey('call_phase')), findsNothing);
+      expect(server.calls, isEmpty);
     });
   });
 }

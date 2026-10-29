@@ -8,6 +8,8 @@ import '../games/game_common.dart' show GameRewards;
 import '../journey/models.dart' show dayKeyOf;
 import '../journey/repository.dart';
 import '../l10n/strings.dart';
+import '../parent_screens.dart' show PinEntryScreen, askParentQuestion;
+import '../parent_settings.dart';
 import 'call_models.dart';
 import 'call_repository.dart';
 import 'call_screens.dart';
@@ -594,7 +596,7 @@ class _ChildFamilyScreenState extends State<ChildFamilyScreen> {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ChatScreen(repo: widget.repo, familyId: widget.familyId, childId: widget.childId, childName: widget.childName, relUid: c.rel.uid, as: Side.child, title: relationLabel(c.rel.relation), canShareWin: _win),
+                        builder: (_) => ChatScreen(repo: widget.repo, familyId: widget.familyId, childId: widget.childId, childName: widget.childName, relUid: c.rel.uid, as: Side.child, title: relationLabel(c.rel.relation), canShareWin: _win, calls: widget.repo is CallRepository ? widget.repo as CallRepository : null, callsOn: c.rel.callsOn, approveCall: () => confirmParent(context)),
                       ),
                     );
                     _reload();
@@ -606,6 +608,17 @@ class _ChildFamilyScreenState extends State<ChildFamilyScreen> {
       ),
     );
   }
+}
+
+/// A call from the child's chat needs the parent: the PIN, or the grown-up question when no PIN exists yet.
+Future<bool> confirmParent(BuildContext context) async {
+  if (!await ParentSettings.instance.hasPin()) {
+    if (!context.mounted) return false;
+    return askParentQuestion(context);
+  }
+  if (!context.mounted) return false;
+  final ok = await Navigator.push<bool>(context, MaterialPageRoute(builder: (_) => const PinEntryScreen(returnResult: true)));
+  return ok == true;
 }
 
 String relationEmoji(String r) => switch (r) {
@@ -629,6 +642,12 @@ class ChatScreen extends StatefulWidget {
 
   /// Offers «أنهيت درساً اليوم» (only when the child really finished something today).
   final bool canShareWin;
+
+  /// The phone button in the title bar: shown only when the parent allowed calls with this relative. A child's
+  /// call first asks for the parent (PIN, or a grown-up question when no PIN exists yet).
+  final CallRepository? calls;
+  final bool callsOn;
+  final Future<bool> Function()? approveCall;
   const ChatScreen({
     super.key,
     required this.repo,
@@ -639,6 +658,9 @@ class ChatScreen extends StatefulWidget {
     required this.as,
     required this.title,
     this.canShareWin = false,
+    this.calls,
+    this.callsOn = false,
+    this.approveCall,
   });
 
   @override
@@ -698,10 +720,38 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  Future<void> _call() async {
+    final approve = widget.approveCall;
+    if (approve != null && !await approve()) return;
+    if (!mounted) return;
+    await startCallScreen(
+      context,
+      calls: widget.calls!,
+      familyId: widget.familyId,
+      childId: widget.childId,
+      childName: widget.childName,
+      relUid: widget.relUid,
+      from: widget.as == Side.child ? CallFrom.parent : CallFrom.relative,
+      title: widget.title,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: [
+          if (widget.calls != null && widget.callsOn)
+            IconButton(
+              key: const ValueKey('chat_call'),
+              iconSize: 28,
+              tooltip: tr2('اتصال صوتي', 'Voice call'),
+              icon: const Icon(Icons.call_rounded),
+              onPressed: _call,
+            ),
+        ],
+      ),
       body: SafeArea(
         child: ResponsiveBody(
           maxWidth: 640,
@@ -931,7 +981,7 @@ class _RelativeFamily extends StatelessWidget {
                       label: Text(c.value),
                       onPressed: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => ChatScreen(repo: repo, familyId: familyId, childId: c.key, childName: c.value, relUid: repo.uid!, as: Side.relative, title: c.value)),
+                        MaterialPageRoute(builder: (_) => ChatScreen(repo: repo, familyId: familyId, childId: c.key, childName: c.value, relUid: repo.uid!, as: Side.relative, title: c.value, calls: repo is CallRepository ? repo as CallRepository : null, callsOn: me.callsOn)),
                       ),
                     ),
                 ]),
