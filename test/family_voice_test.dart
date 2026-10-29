@@ -209,6 +209,10 @@ void main() {
       await t.pumpWidget(chat(parent, Side.child));
       await _settle(t);
       expect(find.byKey(const ValueKey('mic')), findsNothing); // the child switch is off by default
+      expect(find.byKey(const ValueKey('mic_locked')), findsOneWidget); // but a locked microphone is visible
+      await t.tap(find.byKey(const ValueKey('mic_locked')));
+      await t.pump();
+      expect(find.byKey(const ValueKey('recording_bar')), findsNothing); // pressing it records nothing
       await FamilyPrefs.save('c1', const ChildChatPrefs(chatOn: true, voiceOn: true));
       await t.pumpWidget(chat(parent, Side.child));
       await _settle(t);

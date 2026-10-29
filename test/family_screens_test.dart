@@ -223,6 +223,24 @@ void main() {
       await t.pumpWidget(const SizedBox()); // stop its timer
     });
 
+    testWidgets('the family list shows a green phone, and a blue camera only when video is allowed', (t) async {
+      big(t);
+      await approvedWithMessages();
+      await t.pumpWidget(_app(ChildFamilyScreen(repo: parent, familyId: 'p1', childId: 'c1', childName: 'Lina')));
+      await _settle(t);
+      expect(find.byKey(const ValueKey('contact_g1_call')), findsNothing); // calls are off until the parent allows them
+      await parent.setRelativeCalls('g1', true);
+      await t.pumpWidget(_app(ChildFamilyScreen(repo: parent, familyId: 'p1', childId: 'c1', childName: 'Lina')));
+      await _settle(t);
+      expect(find.byKey(const ValueKey('contact_g1_call')), findsOneWidget);
+      expect(find.byKey(const ValueKey('contact_g1_video')), findsNothing);
+      await parent.setRelativeVideo('g1', true);
+      await t.pumpWidget(_app(ChildFamilyScreen(repo: parent, familyId: 'p1', childId: 'c1', childName: 'Lina')));
+      await _settle(t);
+      expect(find.byKey(const ValueKey('contact_g1_video')), findsOneWidget);
+      expect(find.bySemanticsLabel('Video call'), findsOneWidget);
+    });
+
     testWidgets('the contacts list shows the last message and the unread count; opening the chat clears it', (t) async {
       big(t);
       await approvedWithMessages();

@@ -724,6 +724,23 @@ class _ChildFamilyScreenState extends State<ChildFamilyScreen> {
                     Text(c.last == null ? c.rel.name : '${c.last!.from == Side.child ? tr2('أنت: ', 'You: ') : ''}${c.last!.shown}', maxLines: 1, overflow: TextOverflow.ellipsis),
                     if (c.rel.nextCall.isNotEmpty) Text('📅 ${c.rel.nextCall}', key: ValueKey('next_${c.rel.uid}'), style: DS.caption),
                   ]),
+                  trailing: widget.repo is CallRepository && c.rel.callsOn
+                      ? CallButtons(
+                          keyPrefix: 'contact_${c.rel.uid}',
+                          video: c.rel.videoOn,
+                          onCall: (video) => startCallScreen(
+                            context,
+                            calls: widget.repo as CallRepository,
+                            familyId: widget.familyId,
+                            childId: widget.childId,
+                            childName: widget.childName,
+                            relUid: c.rel.uid,
+                            from: CallFrom.parent,
+                            title: relationLabel(c.rel.relation),
+                            video: video,
+                          ),
+                        )
+                      : null,
                   onTap: () async {
                     await Navigator.push(
                       context,
@@ -947,23 +964,17 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        titleSpacing: 0,
+        title: Row(children: [
+          CircleAvatar(radius: 20, backgroundColor: DS.primarySoft, child: const Icon(Icons.favorite_rounded, color: DS.primary, size: 20)),
+          const SizedBox(width: 10),
+          Flexible(child: Text(widget.title, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800))),
+        ]),
         actions: [
           if (widget.calls != null && widget.callsOn)
-            IconButton(
-              key: const ValueKey('chat_call'),
-              iconSize: 28,
-              tooltip: tr2('اتصال صوتي', 'Voice call'),
-              icon: const Icon(Icons.call_rounded),
-              onPressed: _call,
-            ),
-          if (widget.calls != null && widget.callsOn && widget.videoOn)
-            IconButton(
-              key: const ValueKey('chat_video'),
-              iconSize: 28,
-              tooltip: tr2('مكالمة فيديو', 'Video call'),
-              icon: const Icon(Icons.videocam_rounded),
-              onPressed: () => _call(video: true),
+            Padding(
+              padding: const EdgeInsetsDirectional.only(end: 8),
+              child: CallButtons(keyPrefix: 'chat', video: widget.videoOn, onCall: (video) => _call(video: video)),
             ),
         ],
       ),
@@ -990,14 +1001,20 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: Container(
                           margin: const EdgeInsets.symmetric(vertical: 4),
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          constraints: const BoxConstraints(maxWidth: 420),
                           decoration: BoxDecoration(
-                            color: (m.from == widget.as) ? DS.primarySoft : DS.surface,
-                            borderRadius: BorderRadius.circular(DS.rMedium),
+                            color: (m.from == widget.as) ? DS.primarySoft : Colors.white,
+                            borderRadius: BorderRadiusDirectional.only(
+                              topStart: const Radius.circular(20),
+                              topEnd: const Radius.circular(20),
+                              bottomStart: Radius.circular(m.from == widget.as ? 20 : 4),
+                              bottomEnd: Radius.circular(m.from == widget.as ? 4 : 20),
+                            ),
                             border: Border.all(color: DS.border),
                           ),
                           child: m.isVoice
                               ? VoiceBubble(repo: widget.repo, familyId: widget.familyId, message: m)
-                              : Text(m.shown, style: TextStyle(fontSize: m.kind == kindSticker ? 36 : 18, color: DS.ink)),
+                              : Text(m.shown, style: TextStyle(fontSize: m.kind == kindSticker ? 44 : 19, color: DS.ink)),
                         ),
                       ),
                   ]);
@@ -1005,7 +1022,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             if (_error != null) Padding(padding: const EdgeInsets.all(8), child: Text(_error!, key: const ValueKey('chat_error'), style: DS.body.copyWith(color: DS.error))),
-            _Composer(typing: _typing, sending: _sending, controller: _text, onSend: _send, voice: _voice, recording: _recording, recSecs: _recSecs, onMic: _startRecording, onStopRecording: () => _finishRecording(send: true), onCancelRecording: () => _finishRecording(send: false), phrases: phrasesFor(DateTime.now(), includeWin: widget.canShareWin && widget.as == Side.child)),
+            _Composer(voiceLocked: !_voice, typing: _typing, sending: _sending, controller: _text, onSend: _send, voice: _voice, recording: _recording, recSecs: _recSecs, onMic: _startRecording, onStopRecording: () => _finishRecording(send: true), onCancelRecording: () => _finishRecording(send: false), phrases: phrasesFor(DateTime.now(), includeWin: widget.canShareWin && widget.as == Side.child)),
           ]),
         ),
       ),
@@ -1014,6 +1031,9 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class _Composer extends StatelessWidget {
+  /// The microphone is shown even when the parent has not allowed voice notes, so the child can see it exists;
+  /// pressing it explains who can turn it on (nothing is recorded).
+  final bool voiceLocked;
   final bool typing;
   final bool sending;
   final TextEditingController controller;
@@ -1026,6 +1046,7 @@ class _Composer extends StatelessWidget {
   final VoidCallback onStopRecording;
   final VoidCallback onCancelRecording;
   const _Composer({
+    required this.voiceLocked,
     required this.typing,
     required this.sending,
     required this.controller,
@@ -1042,11 +1063,15 @@ class _Composer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: DS.surface,
-      padding: const EdgeInsets.all(8),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [BoxShadow(color: Color(0x1A000000), blurRadius: 12, offset: Offset(0, -2))],
+      ),
+      padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         SizedBox(
-          height: 56,
+          height: 52,
           child: ListView(scrollDirection: Axis.horizontal, children: [
             for (final s in kStickers)
               IconButton(
@@ -1085,31 +1110,121 @@ class _Composer extends StatelessWidget {
               IconButton.filled(key: const ValueKey('rec_send'), tooltip: tr2('إرسال', 'Send'), onPressed: onStopRecording, icon: const Icon(Icons.send_rounded)),
             ]),
           )
-        else if (voice)
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: TextButton.icon(
-              key: const ValueKey('mic'),
-              onPressed: sending ? null : onMic,
-              icon: const Icon(Icons.mic_rounded),
-              label: Text(tr2('رسالة صوتية', 'Voice message')),
-            ),
-          ),
-        if (typing)
+        else
           Row(children: [
-            Expanded(
-              child: TextField(
-                key: const ValueKey('chat_text'),
-                controller: controller,
-                maxLength: kMaxTextLength,
-                decoration: InputDecoration(hintText: tr2('اكتب رسالة', 'Write a message'), counterText: ''),
-                onSubmitted: (v) => onSend(kindText, v),
+            // Voice note: a big round microphone. Locked (grey) until the parent allows voice notes for this relative.
+            if (voice)
+              _RoundAction(
+                key: const ValueKey('mic'),
+                icon: Icons.mic_rounded,
+                color: const Color(0xFFE5484D),
+                tooltip: tr2('رسالة صوتية', 'Voice message'),
+                onPressed: sending ? null : onMic,
+              )
+            else
+              _RoundAction(
+                key: const ValueKey('mic_locked'),
+                icon: Icons.mic_off_rounded,
+                color: const Color(0xFF9AA3B2),
+                tooltip: tr2('الرسائل الصوتية مقفلة', 'Voice notes are locked'),
+                onPressed: () => showToast(context, tr2('اطلب من ماما أو بابا فتح الرسائل الصوتية من إعدادات العائلة.', 'Ask a parent to turn on voice notes in the family settings.')),
               ),
-            ),
-            IconButton(key: const ValueKey('chat_send'), tooltip: tr2('إرسال', 'Send'), onPressed: sending ? null : () => onSend(kindText, controller.text), icon: const Icon(Icons.send_rounded)),
+            const SizedBox(width: 8),
+            if (typing) ...[
+              Expanded(
+                child: TextField(
+                  key: const ValueKey('chat_text'),
+                  controller: controller,
+                  maxLength: kMaxTextLength,
+                  decoration: InputDecoration(
+                    hintText: tr2('اكتب رسالة', 'Write a message'),
+                    counterText: '',
+                    filled: true,
+                    fillColor: const Color(0xFFF1F4FA),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(28), borderSide: BorderSide.none),
+                  ),
+                  onSubmitted: (v) => onSend(kindText, v),
+                ),
+              ),
+              const SizedBox(width: 8),
+              _RoundAction(
+                key: const ValueKey('chat_send'),
+                icon: Icons.send_rounded,
+                color: DS.primary,
+                tooltip: tr2('إرسال', 'Send'),
+                onPressed: sending ? null : () => onSend(kindText, controller.text),
+              ),
+            ] else
+              Expanded(child: Text(tr2('اختر ملصقاً أو عبارة، أو سجّل رسالة صوتية.', 'Pick a sticker or a phrase, or record a voice note.'), style: DS.caption)),
           ]),
       ]),
     );
+  }
+}
+
+/// A big round button with an icon (at least 48 px, a tooltip and a spoken label).
+class _RoundAction extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String tooltip;
+  final VoidCallback? onPressed;
+  const _RoundAction({super.key, required this.icon, required this.color, required this.tooltip, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        enabled: onPressed != null,
+        label: tooltip,
+        child: Tooltip(
+          message: tooltip,
+          child: Material(
+            color: onPressed == null ? color.withAlpha(110) : color,
+            shape: const CircleBorder(),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: onPressed,
+              child: SizedBox(width: 52, height: 52, child: Icon(icon, color: Colors.white, size: 26)),
+            ),
+          ),
+        ),
+      );
+}
+
+/// Clear, coloured call buttons: green phone for a voice call, blue camera for a video call (only when the parent allowed it).
+/// Used in the chat header and on each contact in the family list. Keys: `<prefix>_call`, `<prefix>_video`.
+class CallButtons extends StatelessWidget {
+  final String keyPrefix;
+  final bool video;
+  final void Function(bool video) onCall;
+  const CallButtons({super.key, required this.keyPrefix, required this.video, required this.onCall});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget btn(String k, IconData icon, Color color, String label, bool v) => Padding(
+          padding: const EdgeInsetsDirectional.only(start: 8),
+          child: Semantics(
+            button: true,
+            label: label,
+            child: Tooltip(
+              message: label,
+              child: Material(
+                key: ValueKey(k),
+                color: color,
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () => onCall(v),
+                  child: SizedBox(width: 48, height: 48, child: Icon(icon, color: Colors.white, size: 26)),
+                ),
+              ),
+            ),
+          ),
+        );
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      btn('${keyPrefix}_call', Icons.call_rounded, const Color(0xFF2E9E5B), tr2('اتصال صوتي', 'Voice call'), false),
+      if (video) btn('${keyPrefix}_video', Icons.videocam_rounded, const Color(0xFF3B6FD8), tr2('مكالمة فيديو', 'Video call'), true),
+    ]);
   }
 }
 
