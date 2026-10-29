@@ -1,10 +1,12 @@
 import '../design/worlds.dart';
 import '../design/focusable_tap.dart';
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 
 import '../journey/ui/kit.dart';
+import '../progress_store.dart';
 import '../literacy/letters_data.dart';
 import '../media/audio_button.dart';
 import '../l10n/strings.dart';
@@ -204,6 +206,16 @@ typedef RoundMaker = List<ChoiceRound> Function(Random r);
 
 /// Shows one round at a time. A wrong choice only fades; the right one moves on; the star comes after
 /// the last round (and only the first time). No failure screen, no score.
+/// Which skill (lib/skills.dart) each choice game practises. One local event per round, first-try only; review_game records its own.
+const kChoiceGameSkills = <String, String>{
+  'listen_picture': 'listening',
+  'listen_word': 'listening',
+  'listen_letter': 'letters_ar',
+  'odd_one_out': 'shapes',
+  'pattern': 'sequence',
+  'compare': 'counting',
+};
+
 class ChoiceGame extends StatefulWidget {
   final String childId;
   final String gameId;
@@ -253,6 +265,10 @@ class _ChoiceGameState extends State<ChoiceGame> {
       _missedThisRound = true;
       setState(() => _faded.add(o));
       return;
+    }
+    final skill = kChoiceGameSkills[widget.gameId];
+    if (skill != null) {
+      unawaited(ProgressStore.record(skill, !_missedThisRound, detail: _rounds[_i].ref, childId: widget.childId));
     }
     widget.onRoundDone?.call(_rounds[_i], !_missedThisRound);
     _missedThisRound = false;
