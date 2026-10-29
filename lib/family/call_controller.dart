@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../l10n/strings.dart';
+import '../media/audio_gate.dart';
 import 'call_engine.dart';
 import 'call_models.dart';
 import 'call_repository.dart';
@@ -41,7 +42,14 @@ class CallController extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool _gated = false;
+
   Future<bool> _prepare() async {
+    // Lessons, stories and ambient sounds stop for the whole call (see AudioGate).
+    if (!_gated) {
+      _gated = true;
+      AudioGate.instance.enterCall();
+    }
     try {
       await engine.init(video: video);
     } catch (_) {
@@ -197,6 +205,10 @@ class CallController extends ChangeNotifier {
     }
     _subs.clear();
     engine.close();
+    if (_gated) {
+      _gated = false;
+      AudioGate.instance.leaveCall();
+    }
     notifyListeners();
   }
 

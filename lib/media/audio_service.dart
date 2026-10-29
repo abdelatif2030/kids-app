@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import 'audio.dart';
+import 'audio_gate.dart';
 import 'audio_manifest.dart';
 
 enum AudioStatus { idle, loading, playing, paused, completed, error }
@@ -15,6 +16,7 @@ enum AudioProblem {
   noVoice, // no voice for the language on this device
   recordingFailed, // a recording exists but could not be loaded
   failed, // playback stopped with an error
+  inCall, // a family call is on: lessons stay silent until it ends
 }
 
 class AudioState {
@@ -57,6 +59,7 @@ class AudioService {
   final FilePlayer Function() _newPlayer;
   final AudioManifest Function() _manifest;
   final AudioPrefs _prefs;
+  final AudioGate _gate;
 
   /// Notifies listeners (buttons) of every change of state.
   final ValueNotifier<AudioState> state = ValueNotifier(const AudioState());
@@ -73,10 +76,17 @@ class AudioService {
     required FilePlayer Function() newPlayer,
     required AudioManifest Function() manifest,
     AudioPrefs? prefs,
-  })  : _speech = speech,
+    AudioGate? gate,
+  })  : _gate = gate ?? AudioGate.instance,
+        _speech = speech,
         _newPlayer = newPlayer,
         _manifest = manifest,
-        _prefs = prefs ?? AudioPrefs.instance;
+        _prefs = prefs ?? AudioPrefs.instance {
+    // A call stops whatever lesson sound is playing, and nothing starts again by itself afterwards.
+    _gate.addListener(() {
+      if (_gate.inCall) stop();
+    });
+  }
 
   /// Plays a manifest item by its id.
   /// [preview] plays the file of an item that is not approved yet (the review tools only).
@@ -189,6 +199,10 @@ class AudioService {
     if (my != _token) return;
     final base = _base(asset, slow);
 
+    if (_gate.inCall) {
+      _set(AudioState(assetId: asset.id, text: asset.text, slow: slow, status: AudioStatus.error, problem: AudioProblem.inCall));
+      return;
+    }
     if (!_prefs.voiceOn) {
       _set(AudioState(assetId: asset.id, text: asset.text, slow: slow, status: AudioStatus.error, problem: AudioProblem.voiceOff));
       return;

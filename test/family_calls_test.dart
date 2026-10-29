@@ -9,6 +9,7 @@ import 'package:kids_app/journey/models.dart';
 import 'package:kids_app/journey/repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/family/call_controller.dart';
+import 'package:kids_app/media/audio_gate.dart';
 import 'package:kids_app/family/call_engine.dart';
 import 'package:kids_app/family/call_models.dart';
 import 'package:kids_app/family/call_repository.dart';
@@ -354,6 +355,41 @@ void main() {
       await pc.startOutgoing(childId: 'c1', childName: 'Lina', relUid: 'n1', from: CallFrom.parent);
       expect(pe.videoRequested, false);
       await pc.hangUp();
+    });
+  });
+
+  group('lesson audio during a call', () {
+    tearDown(() {
+      while (AudioGate.instance.inCall) {
+        AudioGate.instance.leaveCall();
+      }
+    });
+
+    test('a call closes the lesson audio gate and releases it when it ends, even when it fails', () async {
+      await parent.setRelativeCalls('n1', true);
+      final pc = ctl(parent, FakeEngine('parent'));
+      await pc.startOutgoing(childId: 'c1', childName: 'Lina', relUid: 'n1', from: CallFrom.parent);
+      expect(AudioGate.instance.inCall, true);
+      await pc.hangUp();
+      expect(AudioGate.instance.inCall, false);
+
+      final denied = ctl(parent, FakeEngine('parent', micDenied: true));
+      await denied.startOutgoing(childId: 'c1', childName: 'Lina', relUid: 'n1', from: CallFrom.parent);
+      expect(AudioGate.instance.inCall, false); // a failed start never leaves lessons muted
+    });
+
+    test('the callee closes the gate too', () async {
+      await parent.setRelativeCalls('n1', true);
+      final pc = ctl(parent, FakeEngine('parent'));
+      await pc.startOutgoing(childId: 'c1', childName: 'Lina', relUid: 'n1', from: CallFrom.parent);
+      final incoming = (await nana.watchIncoming('p1').first).single;
+      final nc = ctl(nana, FakeEngine('nana'));
+      await nc.accept(incoming);
+      await _wait();
+      expect(AudioGate.instance.inCall, true);
+      await nc.hangUp();
+      await _wait();
+      expect(AudioGate.instance.inCall, false); // both controllers released it (the counter reached zero)
     });
   });
 }

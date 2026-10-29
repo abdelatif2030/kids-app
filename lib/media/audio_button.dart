@@ -13,6 +13,7 @@ String audioProblemText(AudioProblem p) => switch (p) {
       AudioProblem.noVoice => trKey('audio.noVoice'),
       AudioProblem.recordingFailed => trKey('audio.recordingFailed'),
       AudioProblem.failed => trKey('audio.failed'),
+      AudioProblem.inCall => trKey('audio.inCall'),
       AudioProblem.none => '',
     };
 

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import '../library/learning_records.dart';
 import '../media/audio.dart';
+import '../media/audio_gate.dart';
 import 'story_models.dart';
 import 'story_store.dart';
 import '../l10n/strings.dart';
@@ -51,7 +52,16 @@ class StoryPlayerController extends ChangeNotifier {
     FilePlayer Function()? newPlayer,
   })  : _speech = speech ?? AppAudio.speech,
         _newPlayer = newPlayer ?? AppAudio.newPlayer,
-        speed = AudioPrefs.instance.speechRate;
+        speed = AudioPrefs.instance.speechRate {
+    AudioGate.instance.addListener(_onGate);
+  }
+
+  /// A family call pauses the story at once and it does NOT resume by itself when the call ends.
+  void _onGate() {
+    if (AudioGate.instance.inCall && playing) {
+      pause();
+    }
+  }
 
   static const speeds = [0.75, 1.0, 1.25];
   static const sleepChoices = [5, 10, 15, 20, 30, 45, 60]; // minutes
@@ -161,6 +171,11 @@ class StoryPlayerController extends ChangeNotifier {
 
   Future<void> play() async {
     if (state == PlayState.unavailable || state == PlayState.loading) return;
+    if (AudioGate.instance.inCall) {
+      message = loc('مكالمة عائلية جارية. يمكنك سماع القصة بعد انتهائها.');
+      _notify();
+      return;
+    }
     if (state == PlayState.completed) {
       _pos = 0;
       _segIndex = 0;
@@ -425,6 +440,7 @@ class StoryPlayerController extends ChangeNotifier {
 
   @override
   void dispose() {
+    AudioGate.instance.removeListener(_onGate);
     _disposed = true;
     _ticker?.cancel();
     _gen++;
