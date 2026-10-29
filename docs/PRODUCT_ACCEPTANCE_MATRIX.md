@@ -39,3 +39,15 @@ unused `_round`, 2 test infos), Firestore rules emulator 59/59, `flutter build w
 | H4 | Non-punitive feedback | wrong answers fade only; stars on completion only | PASS (code review + tests) | Medium | — |
 | H5 | Secrets in repo | `firebase_options.dart` is a placeholder; no key files tracked | PASS (static grep) | High | A real project's `firebase_options.dart` is public-by-design config, but rules are the real protection. |
 | H6 | Legacy invite-code rules | `firestore.rules` still allows invite create/redeem though the UI no longer uses it | PARTIAL | Low–Medium | Remove after the owner confirms no old invites are needed (needs owner decision; emulator tests must be updated). |
+
+## Update after the second pass (same day)
+Evidence: `flutter test` 850 pass / 0 fail; `flutter analyze` 9 issues (all pre-existing style infos plus the old `_round` warning; none from new code); web build not re-run after this pass; Android build not run.
+
+| ID | Change | New status |
+|---|---|---|
+| B5 | Home `RecommendationCard` from real recorded rounds (`lib/adaptive/recommender.dart`, `recommendation_card.dart`, `test/recommendation_test.dart`, 20 tests incl. ar/en and 320/768/1280). Parent skill overview and learning map strip still not built. | PARTIAL (card: PASS in tests, not seen on a device) |
+| E1 | `lib/offline/` capability model, connectivity monitor (DNS/`navigator.onLine`, approximate), `OfflineBanner` in the child shell, `OfflineGuideScreen` in Parent settings, calls explain "needs internet". `test/offline_test.dart` (11). Not tested in real airplane mode; web offline still NOT VERIFIED. | PARTIAL |
+| H3 | PIN now PBKDF2-HMAC-SHA256 (20 000 rounds) with upgrade of old PINs (`test/pin_security_test.dart`). Short PIN space remains. | PARTIAL (improved) |
+| H7 | Voice-message temp file deleted after reading (`voice_io.dart`); device check R1 pending. | PARTIAL |
+| H6 | Legacy invite rules: unchanged, needs owner decision. Security details: `docs/SECURITY_PRIVACY_AUDIT.md`. | PARTIAL |
+| V1 | Video player sized to the largest 16:9 box that fits and clipped; related whitelisted video plays after one ends (never after time is up, never in "today's plan"); `test/related_video_test.dart`. The reported width overflow could not be reproduced here (YouTube blocked), so the layout fix is unverified in a browser. | NOT VERIFIED (visual) |
