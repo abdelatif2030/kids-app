@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'firebase_repository.dart';
 import 'family/family_repository.dart';
+import 'family/memory_family_repository.dart';
 import 'family/firebase_family_repository.dart';
 import 'teachers_models.dart';
 
@@ -22,6 +23,7 @@ FamilyRepository? familyRepository;
 TeacherRepository? get teacherRepository => _repository;
 
 Future<void> initFirebase() async {
+  if (kFamilyDemo) familyRepository = demoParentRepo; // demo: no Firebase, see memory_family_repository.dart
   if (!kFirebaseEnabled) return;
   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);

@@ -3,7 +3,7 @@ import 'package:kids_app/family/family_models.dart';
 import 'package:kids_app/family/family_repository.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 
-import 'fake_family_repository.dart';
+import 'package:kids_app/family/memory_family_repository.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

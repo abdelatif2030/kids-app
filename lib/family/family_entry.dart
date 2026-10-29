@@ -5,6 +5,7 @@ import '../l10n/strings.dart';
 import '../teachers_models.dart';
 import '../teachers_screens.dart' show AuthScreen;
 import 'family_repository.dart';
+import 'memory_family_repository.dart';
 import 'family_screens.dart';
 
 /// Where the family chat starts. [asRelative] is false in Parent settings (behind the PIN) and true for the
@@ -89,4 +90,18 @@ class _FamilyEntryScreenState extends State<FamilyEntryScreen> {
       },
     );
   }
+}
+
+/// Opens the family chat: the demo (no sign-in, in-memory) when FAMILY_DEMO is on, otherwise the real entry.
+void openFamily(BuildContext context, {required bool asRelative, required TeacherRepository? auth, required FamilyRepository? family}) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => kFamilyDemo
+          ? (asRelative
+              ? RelativeHomeScreen(repo: demoRelativeRepo, name: 'Nana')
+              : FamilyParentScreen(repo: demoParentRepo, parentName: 'Demo parent'))
+          : FamilyEntryScreen(asRelative: asRelative, auth: auth, family: family),
+    ),
+  );
 }

@@ -57,3 +57,12 @@ the other person says or shows (no content filter is possible). Proposed safe de
    then collects e-mail, names and messages; and re-check the Families policy for children's apps with user-to-user
    communication (Google restricts this; read the current text before publishing).
 3. Test with two real phones (parent + relative). No test against real Firebase has been run.
+
+## Try it without Firebase (demo mode)
+```powershell
+flutter run -d web-server --web-port 8080 --dart-define=FAMILY_DEMO=true
+```
+One in-memory server holds a demo parent and a demo relative («Nana»). No sign-in, nothing saved or sent; it resets on
+restart (the per-child switches are saved locally as usual). Steps: Parent settings -> «عائلتي: المحادثات» -> invite ->
+copy the code -> back to the first screen -> «أنا من العائلة» -> enter the code -> back as parent -> Approve -> switch
+chat on for the child -> open the child -> More -> «عائلتي» -> send. Then «أنا من العائلة» to answer as Nana.

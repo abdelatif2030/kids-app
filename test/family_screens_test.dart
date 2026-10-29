@@ -9,7 +9,7 @@ import 'package:kids_app/journey/repository.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'fake_family_repository.dart';
+import 'package:kids_app/family/memory_family_repository.dart';
 
 const _kid = ChildProfile(id: 'c1', nickname: 'Lina', age: 5);
 

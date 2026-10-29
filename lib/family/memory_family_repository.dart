@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:kids_app/family/family_models.dart';
-import 'package:kids_app/family/family_repository.dart';
+import 'family_models.dart';
+import 'family_repository.dart';
 
 /// In-memory family server shared by several "devices" (one FakeFamilyRepository per signed-in account).
 class FakeFamilyServer {
@@ -125,3 +125,11 @@ class FakeFamilyRepository implements FamilyRepository {
     server._changes.add(familyId);
   }
 }
+
+/// Demo mode (`--dart-define=FAMILY_DEMO=true`): one in-memory server shared by a demo parent and a demo
+/// relative, so the whole chat can be tried in a single window without Firebase. Nothing is saved or sent;
+/// it resets when the app restarts. Never on in a normal build.
+const kFamilyDemo = bool.fromEnvironment('FAMILY_DEMO');
+final demoFamilyServer = FakeFamilyServer();
+final demoParentRepo = FakeFamilyRepository(demoFamilyServer, 'demo-parent');
+final demoRelativeRepo = FakeFamilyRepository(demoFamilyServer, 'demo-relative');

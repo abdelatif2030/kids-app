@@ -612,12 +612,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   leading: const Icon(Icons.forum_rounded),
                   title: Text(tr2('عائلتي: المحادثات', 'Family chat')),
                   subtitle: Text(tr2('أقارب موافَق عليهم يراسلون طفلك، وتقرأ أنت كل شيء', 'Approved relatives message your child; you can read everything')),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => FamilyEntryScreen(asRelative: false, auth: teacherRepository, family: familyRepository),
-                    ),
-                  ),
+                  onTap: () => openFamily(context, asRelative: false, auth: teacherRepository, family: familyRepository),
                 ),
                 ListTile(
                   leading: const Icon(Icons.dashboard_customize_rounded),

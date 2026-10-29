@@ -226,10 +226,7 @@ class _Picker extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 20),
                 child: TextButton.icon(
                   key: const ValueKey('i_am_family'),
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => FamilyEntryScreen(asRelative: true, auth: teacherRepository, family: familyRepository)),
-                  ),
+                  onPressed: () => openFamily(context, asRelative: true, auth: teacherRepository, family: familyRepository),
                   icon: const Icon(Icons.family_restroom_rounded),
                   label: Text(tr2('أنا من العائلة (جد، جدة، قريب)', 'I am family (grandparent, relative)')),
                 ),
