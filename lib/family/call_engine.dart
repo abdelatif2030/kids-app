@@ -7,8 +7,8 @@ import 'call_models.dart';
 
 /// The audio side of a call. The real one uses WebRTC; tests use a fake.
 abstract class CallEngine {
-  /// Asks for the microphone. Throws if the person says no.
-  Future<void> init();
+  /// Asks for the microphone (and the camera for a video call). Throws if the person says no.
+  Future<void> init({bool video = false});
   Future<Map<String, String>> createOffer();
   Future<Map<String, String>> acceptOffer(Map<String, String> offer);
   Future<void> setAnswer(Map<String, String> answer);
@@ -18,7 +18,14 @@ abstract class CallEngine {
   /// connecting -> connected, or failed / ended.
   Stream<CallPhase> get phases;
   void setMuted(bool muted);
+
+  /// Switches the camera on or off during a video call.
+  void setCameraOn(bool on);
   Future<void> close();
+
+  /// The other person's picture and my own small preview (video calls only; null otherwise).
+  Widget? get remoteVideoView;
+  Widget? get localVideoView;
 
   /// A tiny invisible widget the web needs so the other person's voice is played (null elsewhere).
   Widget? get audioSink;
@@ -28,15 +35,23 @@ class WebRtcEngine implements CallEngine {
   RTCPeerConnection? _pc;
   MediaStream? _local;
   final _renderer = RTCVideoRenderer();
+  final _localRenderer = RTCVideoRenderer();
+  bool _video = false;
   final _cands = StreamController<Map<String, dynamic>>.broadcast();
   final _phases = StreamController<CallPhase>.broadcast();
   bool _closed = false;
 
   @override
-  Future<void> init() async {
+  Future<void> init({bool video = false}) async {
+    _video = video;
     await _renderer.initialize();
-    // Audio only: no camera is ever requested.
-    _local = await navigator.mediaDevices.getUserMedia({'audio': true, 'video': false});
+    await _localRenderer.initialize();
+    // The camera is requested only for a video call the parent allowed; a voice call never asks for it.
+    _local = await navigator.mediaDevices.getUserMedia({
+      'audio': true,
+      'video': video ? {'facingMode': 'user', 'width': {'ideal': 640}, 'height': {'ideal': 480}, 'frameRate': {'ideal': 15}} : false,
+    });
+    if (video) _localRenderer.srcObject = _local;
     final pc = await createPeerConnection({
       'iceServers': [
         for (final s in kStunServers) {'urls': s},
@@ -44,7 +59,7 @@ class WebRtcEngine implements CallEngine {
       'sdpSemantics': 'unified-plan',
     });
     _pc = pc;
-    for (final t in _local!.getAudioTracks()) {
+    for (final t in _local!.getTracks()) {
       await pc.addTrack(t, _local!);
     }
     pc.onIceCandidate = (c) {
@@ -75,7 +90,7 @@ class WebRtcEngine implements CallEngine {
 
   @override
   Future<Map<String, String>> createOffer() async {
-    final offer = await _pc!.createOffer({'offerToReceiveAudio': true, 'offerToReceiveVideo': false});
+    final offer = await _pc!.createOffer({'offerToReceiveAudio': true, 'offerToReceiveVideo': _video});
     await _pc!.setLocalDescription(offer);
     return _desc(offer);
   }
@@ -83,7 +98,7 @@ class WebRtcEngine implements CallEngine {
   @override
   Future<Map<String, String>> acceptOffer(Map<String, String> offer) async {
     await _pc!.setRemoteDescription(RTCSessionDescription(offer['sdp'], offer['type']));
-    final answer = await _pc!.createAnswer({'offerToReceiveAudio': true, 'offerToReceiveVideo': false});
+    final answer = await _pc!.createAnswer({'offerToReceiveAudio': true, 'offerToReceiveVideo': _video});
     await _pc!.setLocalDescription(answer);
     return _desc(answer);
   }
@@ -109,6 +124,13 @@ class WebRtcEngine implements CallEngine {
   }
 
   @override
+  void setCameraOn(bool on) {
+    for (final t in _local?.getVideoTracks() ?? <MediaStreamTrack>[]) {
+      t.enabled = on;
+    }
+  }
+
+  @override
   Future<void> close() async {
     if (_closed) return;
     _closed = true;
@@ -118,11 +140,19 @@ class WebRtcEngine implements CallEngine {
     await _local?.dispose();
     await _pc?.close();
     _renderer.srcObject = null;
+    _localRenderer.srcObject = null;
     await _renderer.dispose();
+    await _localRenderer.dispose();
     await _cands.close();
     await _phases.close();
   }
 
   @override
-  Widget? get audioSink => SizedBox(width: 1, height: 1, child: RTCVideoView(_renderer));
+  Widget? get audioSink => _video ? null : SizedBox(width: 1, height: 1, child: RTCVideoView(_renderer));
+
+  @override
+  Widget? get remoteVideoView => _video ? RTCVideoView(_renderer, objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover) : null;
+
+  @override
+  Widget? get localVideoView => _video ? RTCVideoView(_localRenderer, mirror: true, objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover) : null;
 }

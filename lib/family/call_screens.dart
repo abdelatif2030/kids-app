@@ -59,7 +59,10 @@ class _CallScreenState extends State<CallScreen> {
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Column(mainAxisSize: MainAxisSize.min, children: [
-                const Icon(Icons.call_rounded, size: 72, color: DS.primary),
+                if (c.video && !c.finished)
+                  _VideoStage(controller: c)
+                else
+                  Icon(c.video ? Icons.videocam_rounded : Icons.call_rounded, size: 72, color: DS.primary),
                 const SizedBox(height: 12),
                 Text(widget.title, style: DS.title, textAlign: TextAlign.center),
                 const SizedBox(height: 8),
@@ -76,6 +79,14 @@ class _CallScreenState extends State<CallScreen> {
                       onPressed: c.toggleMute,
                       icon: Icon(c.muted ? Icons.mic_off_rounded : Icons.mic_rounded),
                     ),
+                    if (c.video)
+                      IconButton.filledTonal(
+                        key: const ValueKey('call_camera'),
+                        iconSize: 36,
+                        tooltip: c.cameraOn ? tr2('إيقاف الكاميرا', 'Camera off') : tr2('تشغيل الكاميرا', 'Camera on'),
+                        onPressed: c.toggleCamera,
+                        icon: Icon(c.cameraOn ? Icons.videocam_rounded : Icons.videocam_off_rounded),
+                      ),
                     IconButton.filled(
                       key: const ValueKey('call_hangup'),
                       iconSize: 36,
@@ -91,7 +102,7 @@ class _CallScreenState extends State<CallScreen> {
                 else
                   AppButton(key: const ValueKey('call_close'), label: tr2('إغلاق', 'Close'), onPressed: () => Navigator.of(context).pop()),
                 const SizedBox(height: 16),
-                Text(tr2('صوت فقط، ولا يُسجَّل ولا يُحفظ.', 'Voice only. It is never recorded or saved.'), style: DS.caption, textAlign: TextAlign.center),
+                Text(c.video ? tr2('مكالمة فيديو بين الجهازين فقط، ولا تُسجَّل ولا تُحفظ.', 'A video call between the two devices only. It is never recorded or saved.') : tr2('صوت فقط، ولا يُسجَّل ولا يُحفظ.', 'Voice only. It is never recorded or saved.'), style: DS.caption, textAlign: TextAlign.center),
               ]),
             ),
           ),
@@ -110,9 +121,10 @@ Future<void> startCallScreen(
   required String relUid,
   required CallFrom from,
   required String title,
+  bool video = false,
 }) {
   final c = CallController(repo: calls, engine: newCallEngine(), familyId: familyId);
-  c.startOutgoing(childId: childId, childName: childName, relUid: relUid, from: from);
+  c.startOutgoing(childId: childId, childName: childName, relUid: relUid, from: from, video: video);
   return Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(controller: c, title: title)));
 }
 
@@ -139,7 +151,7 @@ class IncomingCalls extends StatelessWidget {
               child: ListTile(
                 leading: const Icon(Icons.ring_volume_rounded, size: 36, color: DS.primary),
                 title: Text(titleOf(info), style: DS.heading),
-                subtitle: Text(tr2('مكالمة صوتية واردة', 'Incoming voice call')),
+                subtitle: Text(info.video ? tr2('مكالمة فيديو واردة', 'Incoming video call') : tr2('مكالمة صوتية واردة', 'Incoming voice call')),
                 trailing: Wrap(spacing: 4, children: [
                   IconButton.filled(
                     key: ValueKey('decline_${info.id}'),
@@ -164,6 +176,39 @@ class IncomingCalls extends StatelessWidget {
             ),
         ]);
       },
+    );
+  }
+}
+
+
+/// The other person's picture with my own small preview in a corner.
+class _VideoStage extends StatelessWidget {
+  final CallController controller;
+  const _VideoStage({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final remote = controller.engine.remoteVideoView;
+    final local = controller.engine.localVideoView;
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 480, maxHeight: 360),
+      child: AspectRatio(
+        aspectRatio: 4 / 3,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(DS.rMedium),
+          child: Stack(fit: StackFit.expand, children: [
+            Container(color: Colors.black87, child: remote),
+            if (local != null)
+              PositionedDirectional(
+                end: 8,
+                bottom: 8,
+                width: 96,
+                height: 72,
+                child: ClipRRect(borderRadius: BorderRadius.circular(8), child: controller.cameraOn ? local : Container(color: Colors.black54, child: const Icon(Icons.videocam_off_rounded, color: Colors.white))),
+              ),
+          ]),
+        ),
+      ),
     );
   }
 }

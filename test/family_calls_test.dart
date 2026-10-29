@@ -30,10 +30,20 @@ class FakeEngine implements CallEngine {
 
   void emitCandidate(String c) => _cands.add({'candidate': c});
 
+  bool videoRequested = false, cameraOn = true;
+
   @override
-  Future<void> init() async {
+  Future<void> init({bool video = false}) async {
+    videoRequested = video;
     if (micDenied) throw StateError('NotAllowedError');
   }
+
+  @override
+  void setCameraOn(bool on) => cameraOn = on;
+  @override
+  Widget? get remoteVideoView => null;
+  @override
+  Widget? get localVideoView => null;
 
   @override
   Future<Map<String, String>> createOffer() async {
@@ -304,6 +314,46 @@ void main() {
       expect(server.calls.values.single.from, CallFrom.parent);
       await t.tap(find.byKey(const ValueKey('call_hangup')));
       await settle(t);
+    });
+  });
+
+  group('video calls', () {
+    test('video needs the parent\'s separate video switch; the camera is requested only then', () async {
+      await parent.setRelativeCalls('n1', true);
+      final e1 = FakeEngine('p');
+      final c1 = ctl(parent, e1);
+      await c1.startOutgoing(childId: 'c1', childName: 'Lina', relUid: 'n1', from: CallFrom.parent, video: true);
+      expect(c1.phase, CallPhase.failed); // video switch is off
+      expect(server.calls, isEmpty);
+
+      await parent.setRelativeVideo('n1', true);
+      final pe = FakeEngine('parent');
+      final pc = ctl(parent, pe);
+      await pc.startOutgoing(childId: 'c1', childName: 'Lina', relUid: 'n1', from: CallFrom.parent, video: true);
+      expect(pc.phase, CallPhase.ringing);
+      expect(pe.videoRequested, true);
+      final incoming = (await nana.watchIncoming('p1').first).single;
+      expect(incoming.video, true);
+
+      final ne = FakeEngine('nana');
+      final nc = ctl(nana, ne);
+      await nc.accept(incoming);
+      await _wait();
+      expect(ne.videoRequested, true); // the answerer's camera follows the call type
+      expect(pc.phase, CallPhase.connected);
+      nc.toggleCamera();
+      expect(ne.cameraOn, false);
+      await pc.hangUp();
+      await _wait();
+    });
+
+    test('a voice call never asks for the camera', () async {
+      await parent.setRelativeCalls('n1', true);
+      final pe = FakeEngine('parent');
+      final pc = ctl(parent, pe);
+      await pc.startOutgoing(childId: 'c1', childName: 'Lina', relUid: 'n1', from: CallFrom.parent);
+      expect(pe.videoRequested, false);
+      await pc.hangUp();
     });
   });
 }

@@ -55,7 +55,7 @@ Future<FamilyOverview> loadFamilyOverview(FamilyRepository repo, String childId)
   final fid = repo.uid;
   if (fid == null) return const FamilyOverview([]);
   final rels = [for (final r in await repo.relatives()) if (r.active && r.children.containsKey(childId)) r];
-  final all = await repo.allMessages(fid);
+  final all = await repo.recentMessages(fid);
   final out = <FamilyContact>[];
   for (final r in rels) {
     final mine = [for (final m in all) if (m.childId == childId && m.relUid == r.uid) m]..sort((a, b) => a.at.compareTo(b.at));

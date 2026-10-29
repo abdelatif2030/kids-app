@@ -450,10 +450,13 @@ service cloud.firestore {
         && getAfter(/databases/$(database)/documents/connectRequests/$(request.resource.data.requestId)).data.status == 'accepted';
       // Only the parent decides: approve, pause, resume, remove, or change who the relative may talk with.
       allow update: if signedIn() && request.auth.uid == fid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'children', 'calls', 'nextCall', 'voice'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'children', 'calls', 'nextCall', 'voice', 'video'])
         && request.resource.data.status in ['active', 'paused', 'removed']
         && request.resource.data.get('calls', false) is bool
         && request.resource.data.get('voice', false) is bool
+        // video needs voice calls on as well
+        && request.resource.data.get('video', false) is bool
+        && (request.resource.data.get('video', false) == false || request.resource.data.get('calls', false) == true)
         && request.resource.data.get('nextCall', '').size() <= 60
         && !request.resource.data.get('nextCall', '').matches('(?i).*(https?:|www\\.|://|\\.com|\\.net|\\.org|@).*');
       allow delete: if false;
@@ -470,13 +473,16 @@ service cloud.firestore {
         && (request.auth.uid == fid
             || (resource.data.relUid == request.auth.uid && isActiveRelative(fid, request.auth.uid)));
       allow create: if signedIn()
-        && request.resource.data.keys().hasOnly(['childId', 'childName', 'relUid', 'from', 'status', 'offer', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['childId', 'childName', 'relUid', 'from', 'status', 'offer', 'video', 'createdAt'])
         && request.resource.data.status == 'ringing'
         && request.resource.data.createdAt == request.time
         && request.resource.data.childName.size() <= 40
         && request.resource.data.offer.sdp.size() <= 30000
         && isActiveRelative(fid, request.resource.data.relUid)
         && get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.get('calls', false) == true
+        && (!('video' in request.resource.data)
+            || (request.resource.data.video == true
+                && get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.get('video', false) == true))
         && request.resource.data.childId in get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.children.keys()
         && ((request.auth.uid == fid && request.resource.data.from == 'parent')
             || (request.auth.uid == request.resource.data.relUid && request.resource.data.from == 'relative'));

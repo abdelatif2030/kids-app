@@ -22,6 +22,8 @@
 | Deletion | Parent can delete one child or all data inside the app. |
 | Ads / analytics SDK | None. |
 | Permissions | INTERNET and network state. **RECORD_AUDIO** and MODIFY_AUDIO_SETTINGS for the optional family voice calls (asked only when a call starts). No camera, location or contacts permission. Photo picking uses the system picker. |
+| Camera | CAMERA is used only for video calls a parent allowed; video is not recorded or stored. |
+| Voice messages | Short recordings (<= 30 s) are stored on Firebase for 14 days, then deleted; declare as audio data collected and shared with the parent and the approved relative. |
 | Audio | Voice is transmitted in real time between devices during a call; not recorded, not stored. Answer the Data safety form accordingly and mention it in the privacy policy. |
 
 If the teacher service OR the family chat is turned on later (Firebase), the answers CHANGE (account email, teacher profile data,

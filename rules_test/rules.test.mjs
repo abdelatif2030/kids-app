@@ -761,3 +761,24 @@ test('voice: recordings are read only by the parent and that relative; only the 
   await assertFails(deleteDoc(voiceRef(as('r1'))));
   await assertSucceeds(deleteDoc(voiceRef(as('p1'))));
 });
+
+// video calls ----------------------------------------------------------------
+test('video: only the parent turns video on, and only together with calls', async () => {
+  await seedCallsOn('r1', 'active', false); // calls off
+  const ref = (db) => doc(db, 'families', 'p1', 'relatives', 'r1');
+  await assertFails(updateDoc(ref(as('r1')), { video: true }));
+  await assertFails(updateDoc(ref(as('p1')), { video: true })); // calls are off
+  await assertSucceeds(updateDoc(ref(as('p1')), { calls: true, video: true }));
+});
+
+test('video: a video call needs the video switch; a voice call is unaffected', async () => {
+  await seedCallsOn(); // calls on, video off
+  await assertSucceeds(setDoc(callRef(as('p1'), 'a'), callData()));
+  await assertFails(setDoc(callRef(as('p1'), 'b'), callData({ video: true })));
+  await assertFails(setDoc(callRef(as('r1'), 'c'), callData({ from: 'relative', video: true })));
+  await env.withSecurityRulesDisabled(async (ctx) => { await updateDoc(doc(ctx.firestore(), 'families', 'p1', 'relatives', 'r1'), { video: true }); });
+  await assertSucceeds(setDoc(callRef(as('p1'), 'd'), callData({ video: true })));
+  await assertSucceeds(setDoc(callRef(as('r1'), 'e'), callData({ from: 'relative', video: true })));
+  await assertFails(setDoc(callRef(as('p1'), 'f'), callData({ video: 'yes' })));
+  await assertFails(setDoc(callRef(as('p1'), 'g'), callData({ video: false }))); // either true or absent
+});

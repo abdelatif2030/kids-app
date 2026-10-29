@@ -57,6 +57,7 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
         children: _strMap(d['children']),
         callsOn: d['calls'] == true,
         voiceOn: d['voice'] == true,
+        videoOn: d['video'] == true,
         nextCall: (d['nextCall'] as String?) ?? '',
       );
 
@@ -163,6 +164,9 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
 
   @override
   Future<void> setRelativeCalls(String relUid, bool on) => _guard(() => _rels(uid!).doc(relUid).update({'calls': on}));
+
+  @override
+  Future<void> setRelativeVideo(String relUid, bool on) => _guard(() => _rels(uid!).doc(relUid).update({'video': on}));
 
   @override
   Future<void> setRelativeVoice(String relUid, bool on) => _guard(() => _rels(uid!).doc(relUid).update({'voice': on}));
@@ -319,7 +323,12 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
   }
 
   @override
-  Future<List<FamilyMessage>> allMessages(String familyId) => _guard(() async => _sorted(await _msgs(familyId).get()));
+  Future<List<FamilyMessage>> allMessages(String familyId) =>
+      _guard(() async => _sorted(await _msgs(familyId).orderBy('at', descending: true).limit(400).get()));
+
+  @override
+  Future<List<FamilyMessage>> recentMessages(String familyId, {int limit = 80}) =>
+      _guard(() async => _sorted(await _msgs(familyId).orderBy('at', descending: true).limit(limit).get()));
 
   @override
   Future<void> clearThread({required String familyId, required String childId, required String relUid}) => _guard(() async {
@@ -346,6 +355,7 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
         offer: _strMap(d['offer']),
         answer: d['answer'] == null ? null : _strMap(d['answer']),
         createdAt: ((d['createdAt'] as Timestamp?) ?? Timestamp.now()).toDate(),
+        video: d['video'] == true,
       );
 
   @override
@@ -356,6 +366,7 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
     required String relUid,
     required CallFrom from,
     required Map<String, String> offer,
+    bool video = false,
   }) => _guard(() async {
         final ref = await _calls(familyId).add({
           'childId': childId,
@@ -364,6 +375,7 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
           'from': from == CallFrom.parent ? 'parent' : 'relative',
           'status': callRinging,
           'offer': offer,
+          if (video) 'video': true,
           'createdAt': FieldValue.serverTimestamp(),
         });
         return ref.id;

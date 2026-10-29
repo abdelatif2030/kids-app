@@ -29,8 +29,9 @@ class _FamilyBubbleButtonState extends State<FamilyBubbleButton> {
   void initState() {
     super.initState();
     _refresh();
-    // A gentle check for new messages while the home is open. Reads only; no notifications are sent.
-    _timer = Timer.periodic(const Duration(seconds: 20), (_) => _refresh());
+    // A gentle check for new messages while the home is open (once a minute, newest 80 messages only, to stay
+    // inside the free database limits). Reads only; no notifications are sent.
+    _timer = Timer.periodic(const Duration(seconds: 60), (_) => _refresh());
   }
 
   @override

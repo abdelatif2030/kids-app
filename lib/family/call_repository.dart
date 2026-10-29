@@ -11,6 +11,7 @@ abstract class CallRepository {
     required String relUid,
     required CallFrom from,
     required Map<String, String> offer,
+    bool video = false,
   });
 
   /// Calls that are ringing for ME: a relative sees calls from the parent; the parent sees calls from relatives.

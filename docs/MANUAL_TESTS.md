@@ -1419,3 +1419,50 @@ The six learning games under Games > Learning games.
 - **Status:** Not tested
 - **Device or environment:** Browser and OS: 
 - **Notes:** 
+
+### F4 - Request by e-mail (replaces invite codes)
+
+- [ ] Not tested
+- **Test ID:** F4
+- **Preconditions:** Rules re-published; a relative account registered (e.g. nana@test.com) in a second browser.
+- **Steps:**
+  1. Parent: Family chat -> «إضافة قريب» -> the relative's e-mail, relation, children -> Send.
+  2. The request shows under "waiting for an answer" with a cancel button.
+  3. Relative: open «أنا من العائلة»: a card «طلب من ...» with Accept / Decline.
+  4. Accept: the parent's list shows the relative as active (no second approval). Try Decline and Cancel on other requests.
+- **Expected result:** Nothing is possible before Accept; only the right e-mail sees the request.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browsers: 
+- **Notes:** 
+
+### F5 - Voice messages
+
+- [ ] Not tested
+- **Test ID:** F5
+- **Preconditions:** F4 passed; microphone available.
+- **Steps:**
+  1. Parent: turn on «السماح بالرسائل الصوتية» for the relative and, under the child, «السماح بتسجيل الصوت».
+  2. Relative: open the chat, tap «رسالة صوتية», allow the microphone, speak 5 s, send.
+  3. Child chat (or the parent's "Read all conversations"): press play; you hear it.
+  4. Record 30 s: it stops and sends by itself. Cancel once: nothing is sent.
+- **Expected result:** Sound plays on both web and Android; with the switches off there is no microphone button.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browsers/phones: 
+- **Notes:** 
+
+### F6 - Video call
+
+- [ ] Not tested
+- **Test ID:** F6
+- **Preconditions:** F2 passed; camera available on both devices.
+- **Steps:**
+  1. Parent: with calls on, turn on «السماح بمكالمات الفيديو».
+  2. Tap «فيديو (child)» (or the camera icon in the chat). Allow camera and microphone.
+  3. The relative answers an incoming video call. Both see each other; try mute and camera off; hang up.
+- **Expected result:** Pictures both ways, nothing recorded, camera light off after the call. Without the video switch no video option appears.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Devices/browsers/networks: 
+- **Notes:** 

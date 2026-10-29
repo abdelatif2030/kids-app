@@ -88,6 +88,9 @@ class Relative {
   /// Voice messages with this relative: OFF until the parent turns it on.
   final bool voiceOn;
 
+  /// Video calls with this relative: OFF until the parent turns it on (needs voice calls on too).
+  final bool videoOn;
+
   /// A short note from the parent about the next planned call, for example "Friday 6 pm". Empty if none.
   final String nextCall;
   const Relative({
@@ -99,11 +102,12 @@ class Relative {
     this.callsOn = false,
     this.nextCall = '',
     this.voiceOn = false,
+    this.videoOn = false,
   });
 
   bool get active => status == kRelativeActive;
 
-  Relative copyWith({String? status, Map<String, String>? children, bool? callsOn, String? nextCall, bool? voiceOn}) => Relative(
+  Relative copyWith({String? status, Map<String, String>? children, bool? callsOn, String? nextCall, bool? voiceOn, bool? videoOn}) => Relative(
         uid: uid,
         name: name,
         relation: relation,
@@ -112,6 +116,7 @@ class Relative {
         callsOn: callsOn ?? this.callsOn,
         nextCall: nextCall ?? this.nextCall,
         voiceOn: voiceOn ?? this.voiceOn,
+        videoOn: videoOn ?? this.videoOn,
       );
 }
 

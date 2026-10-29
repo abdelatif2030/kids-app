@@ -96,3 +96,38 @@ chat on for the child -> open the child -> More -> «عائلتي» -> send. The
 - Ideas not built (and why): message reactions and read receipts (more server rules and more pressure to answer),
   voice messages (would record a child's voice), photo sharing (moderation risk), push notifications (needs a package
   and a privacy decision), a daily "ask Nana" prompt (could feel like an obligation).
+
+## Round 3 (2026-10-29): requests, voice messages, video calls, free plan
+**Adding someone is now a request, not a code.** The parent types the e-mail the person registered with, picks the
+relation and the children, and sends a request. The person sees it inside the app (a card with Accept / Decline; a
+message pops up if the screen is open) and accepts or declines. Accepting makes them active at once, because the parent
+started it. The parent can cancel a request that is still waiting. Rules: only a parent sends, only the person with that
+e-mail can answer, the accept must be in one batch with the request marked accepted (it cannot be used twice or by
+someone else). Honest limit: Firebase e-mail accounts are not verified, so someone who registers with another person's
+e-mail could see a request addressed to that e-mail (parent name and children's nicknames, nothing else). Turning on
+e-mail verification is the fix if you want it.
+**Not built: push notifications.** A request shows when the person opens the app (and live while it is open). A real
+notification when the app is closed needs Firebase Cloud Messaging (free, but a new package and service worker setup).
+Say if you want it next.
+
+**Voice messages.** Package `record`. The parent switches them on per relative («السماح بالرسائل الصوتية») and per child
+(«السماح بتسجيل الصوت», off by default; the child needs BOTH). Up to 30 s, mono 16 kHz at 24 kbps, at most 300 KB. The
+free Firebase plan has no file storage, so each recording is a small document of its own (`families/{parent}/voices`)
+and the message only points to it; the sound is fetched only when someone presses play. Recordings are deleted after 14
+days (the parent's screen cleans them when opened) and the parent can listen to every one in "Read all conversations".
+The microphone is used only while recording; nothing is kept on the device.
+
+**Video calls.** Same WebRTC engine. A separate parent switch («السماح بمكالمات الفيديو»), off by default, and only
+available when voice calls are on. The camera is requested only for a video call. Never recorded. The screen says to stay
+with the child. The server rules require the video switch for a video call.
+
+**Calls from a child need no PIN.** The parent's per-relative switch is the consent; the call only rings that approved
+relative, who chooses whether to answer.
+
+**Free plan (Spark) notes.** Firestore free quota is about 50,000 reads and 20,000 writes a day and 1 GB of storage. To
+stay inside it: the new-message count checks once a minute and reads only the newest 80 messages; the parent's full list
+reads at most 400; voice recordings live 14 days; there is no file storage; calls send only a few small documents. Calls
+and chat need no paid service. A TURN relay (needed on some mobile networks) is the one thing that may cost money.
+
+Other ideas not built: reactions and read receipts, photo sharing (moderation), group conversations, scheduled call
+reminders (need notifications), message translation.

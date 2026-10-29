@@ -19,6 +19,8 @@ class CallController extends ChangeNotifier {
 
   CallPhase phase = CallPhase.starting;
   bool muted = false;
+  bool cameraOn = true;
+  bool video = false;
   String? error;
   String? _callId;
   CallFrom? _mySide;
@@ -41,9 +43,11 @@ class CallController extends ChangeNotifier {
 
   Future<bool> _prepare() async {
     try {
-      await engine.init();
+      await engine.init(video: video);
     } catch (_) {
-      error = tr2('لا يمكن استخدام الميكروفون. اسمح به من إعدادات المتصفح أو الهاتف.', 'The microphone cannot be used. Allow it in the browser or phone settings.');
+      error = video
+          ? tr2('لا يمكن استخدام الكاميرا أو الميكروفون. اسمح بهما من إعدادات المتصفح أو الهاتف.', 'The camera or microphone cannot be used. Allow them in the browser or phone settings.')
+          : tr2('لا يمكن استخدام الميكروفون. اسمح به من إعدادات المتصفح أو الهاتف.', 'The microphone cannot be used. Allow it in the browser or phone settings.');
       _finish(CallPhase.failed);
       return false;
     }
@@ -110,12 +114,13 @@ class CallController extends ChangeNotifier {
   }
 
   /// I am calling.
-  Future<void> startOutgoing({required String childId, required String childName, required String relUid, required CallFrom from}) async {
+  Future<void> startOutgoing({required String childId, required String childName, required String relUid, required CallFrom from, bool video = false}) async {
     _mySide = from;
+    this.video = video;
     if (!await _prepare()) return;
     try {
       final offer = await engine.createOffer();
-      final id = await repo.startCall(familyId: familyId, childId: childId, childName: childName, relUid: relUid, from: from, offer: offer);
+      final id = await repo.startCall(familyId: familyId, childId: childId, childName: childName, relUid: relUid, from: from, offer: offer, video: video);
       _callId = id;
       for (final c in List.of(_pendingLocal)) {
         await repo.addCandidate(familyId, id, from, c);
@@ -137,6 +142,7 @@ class CallController extends ChangeNotifier {
 
   /// Someone is calling me and I accept.
   Future<void> accept(CallInfo info) async {
+    video = info.video;
     _mySide = info.from == CallFrom.parent ? CallFrom.relative : CallFrom.parent;
     _callId = info.id;
     if (!await _prepare()) {
@@ -158,6 +164,12 @@ class CallController extends ChangeNotifier {
       await repo.setCallStatus(familyId, info.id, callEnded).catchError((Object _) {});
       _finish(CallPhase.failed);
     }
+  }
+
+  void toggleCamera() {
+    cameraOn = !cameraOn;
+    engine.setCameraOn(cameraOn);
+    notifyListeners();
   }
 
   void toggleMute() {

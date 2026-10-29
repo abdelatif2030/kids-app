@@ -23,6 +23,9 @@ class CallInfo {
   final Map<String, String> offer;
   final Map<String, String>? answer;
   final DateTime createdAt;
+
+  /// A video call (camera on). Needs the parent's separate video switch for that relative.
+  final bool video;
   const CallInfo({
     required this.id,
     required this.familyId,
@@ -34,6 +37,7 @@ class CallInfo {
     required this.offer,
     this.answer,
     required this.createdAt,
+    this.video = false,
   });
 
   bool get ringing => status == callRinging;
@@ -52,6 +56,7 @@ class CallInfo {
         offer: offer,
         answer: answer ?? this.answer,
         createdAt: createdAt,
+        video: video,
       );
 }
 

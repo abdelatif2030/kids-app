@@ -27,6 +27,9 @@ abstract class FamilyRepository {
   /// Turns voice calls with this relative on or off. Off by default.
   Future<void> setRelativeCalls(String relUid, bool on);
 
+  /// Turns video calls with this relative on or off. Off by default.
+  Future<void> setRelativeVideo(String relUid, bool on);
+
   /// Turns voice messages with this relative on or off. Off by default.
   Future<void> setRelativeVoice(String relUid, bool on);
 
@@ -95,5 +98,9 @@ abstract class FamilyRepository {
 
   /// Parent only: every message of the family, newest last (the parent can read all conversations).
   Future<List<FamilyMessage>> allMessages(String familyId);
+
+  /// The newest [limit] messages of the whole family, oldest first. Used for the new-message count so that a busy
+  /// family does not use up the free database reads.
+  Future<List<FamilyMessage>> recentMessages(String familyId, {int limit = 80});
   Future<void> clearThread({required String familyId, required String childId, required String relUid});
 }

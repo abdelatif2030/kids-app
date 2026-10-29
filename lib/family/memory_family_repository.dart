@@ -116,6 +116,13 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   }
 
   @override
+  Future<void> setRelativeVideo(String relUid, bool on) async {
+    final r = _mine(uid!)[relUid];
+    if (r == null) throw const FamilyException('not found');
+    _mine(uid!)[relUid] = r.copyWith(videoOn: on);
+  }
+
+  @override
   Future<void> setRelativeVoice(String relUid, bool on) async {
     final r = _mine(uid!)[relUid];
     if (r == null) throw const FamilyException('not found');
@@ -265,6 +272,13 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   }
 
   @override
+  Future<List<FamilyMessage>> recentMessages(String familyId, {int limit = 80}) async {
+    if (uid != familyId) throw const FamilyException('not allowed');
+    final all = List.of(server.messages[familyId] ?? const <FamilyMessage>[]);
+    return all.length <= limit ? all : all.sublist(all.length - limit);
+  }
+
+  @override
   Future<void> clearThread({required String familyId, required String childId, required String relUid}) async {
     if (uid != familyId) throw const FamilyException('not allowed');
     server.messages[familyId]?.removeWhere((m) => m.childId == childId && m.relUid == relUid);
@@ -282,9 +296,11 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
     required String relUid,
     required CallFrom from,
     required Map<String, String> offer,
+    bool video = false,
   }) async {
     final rel = _mine(familyId)[relUid];
     if (rel == null || !rel.active || !rel.callsOn || !rel.children.containsKey(childId)) throw const FamilyException('not allowed');
+    if (video && !rel.videoOn) throw const FamilyException('not allowed');
     if (from == CallFrom.parent && uid != familyId) throw const FamilyException('not allowed');
     if (from == CallFrom.relative && uid != relUid) throw const FamilyException('not allowed');
     final id = 'call${server._n++}_${_callN++}';
@@ -298,6 +314,7 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
       status: callRinging,
       offer: offer,
       createdAt: DateTime.now(),
+      video: video,
     );
     server._callChanges.add(id);
     return id;

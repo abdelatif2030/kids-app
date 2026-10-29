@@ -29,7 +29,7 @@ messages) stored with Google Firebase. Teachers are not vetted by the app. This 
 ## Optional family chat (not active in this version)
 If switched on, a parent can invite relatives to exchange short messages and stickers with the child. Relatives create
 an account (e-mail, name). Messages, the child's nickname and the relative's name are stored with Google Firebase. The
-parent can read and delete every conversation and can remove a relative at any time. No photos, files or links. Voice calls (audio only) can be switched on by the parent for an approved relative: the voice travels directly between the two devices, is not recorded and is not stored; the microphone is used only during a call.
+parent can read and delete every conversation and can remove a relative at any time. No photos, files or links. Voice messages (a short recording, kept for 14 days and then deleted), voice calls and video calls can each be switched on by the parent for an approved relative. Recordings are stored with Google Firebase until deleted; calls travel directly between the two devices: the voice travels directly between the two devices, is not recorded and is not stored; the microphone is used only during a call.
 
 ## Children
 The app is designed for children with a parent present. Parents control the settings area with a PIN.

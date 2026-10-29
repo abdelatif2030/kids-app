@@ -1,8 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Needed by release builds for the YouTube player, video thumbnails and the optional teachers service. -->
     <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- Voice calls with approved relatives (audio only, never recorded). The microphone is requested only when a call starts. -->
+    <!-- Voice messages and calls with approved relatives (never recorded by the app). The microphone is requested only when one starts. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <!-- Camera: only for video calls the parent allowed. Not required to install. -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>

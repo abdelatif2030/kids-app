@@ -124,6 +124,20 @@ class _FamilyParentScreenState extends State<FamilyParentScreen> {
                     onChildren: (c) => _do(() => widget.repo.setRelativeChildren(r.uid, c)),
                     onCalls: (on) => _do(() => widget.repo.setRelativeCalls(r.uid, on)),
                     onVoice: (on) => _do(() => widget.repo.setRelativeVoice(r.uid, on)),
+                    onVideo: (on) => _do(() => widget.repo.setRelativeVideo(r.uid, on)),
+                    onVideoCall: widget.repo is CallRepository
+                        ? (childId, childName) => startCallScreen(
+                              context,
+                              calls: widget.repo as CallRepository,
+                              familyId: widget.repo.uid!,
+                              childId: childId,
+                              childName: childName,
+                              relUid: r.uid,
+                              from: CallFrom.parent,
+                              title: '${relationLabel(r.relation)} · ${r.name}',
+                              video: true,
+                            )
+                        : null,
                     onNextCall: (t) => _do(() => widget.repo.setRelativeNextCall(r.uid, t)),
                     onCall: widget.repo is CallRepository
                         ? (childId, childName) => startCallScreen(
@@ -381,9 +395,11 @@ class _RelativeCard extends StatelessWidget {
   final ValueChanged<Map<String, String>> onChildren;
   final ValueChanged<bool> onCalls;
   final ValueChanged<bool> onVoice;
+  final ValueChanged<bool> onVideo;
+  final void Function(String childId, String childName)? onVideoCall;
   final void Function(String childId, String childName)? onCall;
   final ValueChanged<String> onNextCall;
-  const _RelativeCard({super.key, required this.rel, required this.onStatus, required this.onChildren, required this.onCalls, required this.onVoice, this.onCall, required this.onNextCall});
+  const _RelativeCard({super.key, required this.rel, required this.onStatus, required this.onChildren, required this.onCalls, required this.onVoice, required this.onVideo, this.onVideoCall, this.onCall, required this.onNextCall});
 
   String get _statusText => switch (rel.status) {
         kRelativePending => tr2('بانتظار موافقتك', 'Waiting for your approval'),
@@ -422,6 +438,15 @@ class _RelativeCard extends StatelessWidget {
               onChanged: onCalls,
             ),
             if (rel.callsOn)
+              SwitchListTile(
+                key: ValueKey('video_${rel.uid}'),
+                contentPadding: EdgeInsets.zero,
+                title: Text(tr2('السماح بمكالمات الفيديو', 'Allow video calls')),
+                subtitle: Text(tr2('تظهر الكاميرا. تأكد أنك مع الطفل أثناء المكالمة. لا تُسجَّل.', 'The camera is shown. Stay with your child during the call. It is not recorded.')),
+                value: rel.videoOn,
+                onChanged: onVideo,
+              ),
+            if (rel.callsOn)
               Wrap(spacing: 8, children: [
                 for (final e in rel.children.entries)
                   OutlinedButton.icon(
@@ -430,6 +455,14 @@ class _RelativeCard extends StatelessWidget {
                     icon: const Icon(Icons.call_rounded),
                     label: Text(tr2('اتصل (${e.value})', 'Call (${e.value})')),
                   ),
+                if (rel.videoOn && onVideoCall != null)
+                  for (final e in rel.children.entries)
+                    OutlinedButton.icon(
+                      key: ValueKey('videocall_${rel.uid}_${e.key}'),
+                      onPressed: () => onVideoCall!(e.key, e.value),
+                      icon: const Icon(Icons.videocam_rounded),
+                      label: Text(tr2('فيديو (${e.value})', 'Video (${e.value})')),
+                    ),
               ]),
           ],
           const SizedBox(height: 8),
@@ -693,7 +726,7 @@ class _ChildFamilyScreenState extends State<ChildFamilyScreen> {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ChatScreen(repo: widget.repo, familyId: widget.familyId, childId: widget.childId, childName: widget.childName, relUid: c.rel.uid, as: Side.child, title: relationLabel(c.rel.relation), canShareWin: _win, calls: widget.repo is CallRepository ? widget.repo as CallRepository : null, callsOn: c.rel.callsOn, voiceOn: c.rel.voiceOn),
+                        builder: (_) => ChatScreen(repo: widget.repo, familyId: widget.familyId, childId: widget.childId, childName: widget.childName, relUid: c.rel.uid, as: Side.child, title: relationLabel(c.rel.relation), canShareWin: _win, calls: widget.repo is CallRepository ? widget.repo as CallRepository : null, callsOn: c.rel.callsOn, voiceOn: c.rel.voiceOn, videoOn: c.rel.videoOn),
                       ),
                     );
                     _reload();
@@ -737,6 +770,9 @@ class ChatScreen extends StatefulWidget {
 
   /// Voice messages are on for this relative (the parent's switch).
   final bool voiceOn;
+
+  /// Video calls are on for this relative (the parent's switch).
+  final bool videoOn;
   const ChatScreen({
     super.key,
     required this.repo,
@@ -751,6 +787,7 @@ class ChatScreen extends StatefulWidget {
     this.callsOn = false,
     this.approveCall,
     this.voiceOn = false,
+    this.videoOn = false,
   });
 
   @override
@@ -887,7 +924,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Future<void> _call() async {
+  Future<void> _call({bool video = false}) async {
     final approve = widget.approveCall;
     if (approve != null && !await approve()) return;
     if (!mounted) return;
@@ -900,6 +937,7 @@ class _ChatScreenState extends State<ChatScreen> {
       relUid: widget.relUid,
       from: widget.as == Side.child ? CallFrom.parent : CallFrom.relative,
       title: widget.title,
+      video: video,
     );
   }
 
@@ -916,6 +954,14 @@ class _ChatScreenState extends State<ChatScreen> {
               tooltip: tr2('اتصال صوتي', 'Voice call'),
               icon: const Icon(Icons.call_rounded),
               onPressed: _call,
+            ),
+          if (widget.calls != null && widget.callsOn && widget.videoOn)
+            IconButton(
+              key: const ValueKey('chat_video'),
+              iconSize: 28,
+              tooltip: tr2('مكالمة فيديو', 'Video call'),
+              icon: const Icon(Icons.videocam_rounded),
+              onPressed: () => _call(video: true),
             ),
         ],
       ),
@@ -1209,6 +1255,24 @@ class _RelativeFamily extends StatelessWidget {
                         icon: const Icon(Icons.call_rounded),
                         label: Text(tr2('اتصل بشأن ${c.value}', 'Call about ${c.value}')),
                       ),
+                    if (me.videoOn)
+                      for (final c in me.children.entries)
+                        OutlinedButton.icon(
+                          key: ValueKey('videocall_${c.key}'),
+                          onPressed: () => startCallScreen(
+                            context,
+                            calls: repo as CallRepository,
+                            familyId: familyId,
+                            childId: c.key,
+                            childName: c.value,
+                            relUid: repo.uid!,
+                            from: CallFrom.relative,
+                            title: tr2('عائلة $parentName', '$parentName’s family'),
+                            video: true,
+                          ),
+                          icon: const Icon(Icons.videocam_rounded),
+                          label: Text(tr2('فيديو (${c.value})', 'Video (${c.value})')),
+                        ),
                   ]),
                 Wrap(spacing: 8, children: [
                   for (final c in me.children.entries)
@@ -1217,7 +1281,7 @@ class _RelativeFamily extends StatelessWidget {
                       label: Text(c.value),
                       onPressed: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => ChatScreen(repo: repo, familyId: familyId, childId: c.key, childName: c.value, relUid: repo.uid!, as: Side.relative, title: c.value, calls: repo is CallRepository ? repo as CallRepository : null, callsOn: me.callsOn, voiceOn: me.voiceOn)),
+                        MaterialPageRoute(builder: (_) => ChatScreen(repo: repo, familyId: familyId, childId: c.key, childName: c.value, relUid: repo.uid!, as: Side.relative, title: c.value, calls: repo is CallRepository ? repo as CallRepository : null, callsOn: me.callsOn, voiceOn: me.voiceOn, videoOn: me.videoOn)),
                       ),
                     ),
                 ]),
