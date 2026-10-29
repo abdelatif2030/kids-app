@@ -1,3 +1,4 @@
+import '../design/tokens.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -136,23 +137,54 @@ class GameScaffold extends StatelessWidget {
       ),
       body: PastelBackground(
         child: SafeArea(
-          child: Column(
-            children: [
-              if (instruction != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-                  child: Text(
-                    instruction!,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: RC.ink,
+          child: LayoutBuilder(
+            builder: (context, box) {
+              // Tablet or desktop in landscape: the instruction moves to a side card so the board can use the height.
+              final sideBySide = instruction != null && box.maxWidth >= 900 && box.maxWidth > box.maxHeight * 1.2;
+              if (sideBySide) {
+                return Row(
+                  children: [
+                    SizedBox(
+                      width: 300,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                            key: const ValueKey('game_side_instruction'),
+                            padding: const EdgeInsets.all(18),
+                            decoration: BoxDecoration(
+                              color: RC.card,
+                              borderRadius: BorderRadius.circular(DS.rLarge),
+                              border: Border.all(color: RC.outline, width: 2),
+                            ),
+                            child: Text(
+                              instruction!,
+                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: RC.ink, height: 1.5),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              Expanded(child: ResponsiveBody(maxWidth: 760, child: child)),
-            ],
+                    Expanded(child: ResponsiveBody(maxWidth: 760, child: child)),
+                  ],
+                );
+              }
+              return Column(
+                children: [
+                  if (instruction != null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                      child: Text(
+                        instruction!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: RC.ink),
+                      ),
+                    ),
+                  Expanded(child: ResponsiveBody(maxWidth: 760, child: child)),
+                ],
+              );
+            },
           ),
         ),
       ),

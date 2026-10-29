@@ -131,3 +131,6 @@ Changed:
 Deferred, with reasons: real instruction audio (no recordings exist; device voice only), one shared palette (visual
 decision), a Router with deep links (a larger change; the single route is documented), tablet-specific game layouts,
 teacher statistics (would need analytics, which is not allowed).
+
+Follow-up (same day): DS palette aligned with RC (see DESIGN_SYSTEM.md), side instruction card for landscape tablets
+and desktops in `GameScaffold`, `test/ux_pass_test.dart` covers it. No visual review by a person yet; no new screenshots.

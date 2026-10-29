@@ -26,6 +26,11 @@ Two looks live side by side on purpose. They are not merged yet: unifying them i
 6. Rewards: one star only for a first finished activity; no loss, no streak, no random draw.
 7. Empty states say what is missing and what to do; error states offer "Try again".
 
-## Not decided (needs the owner)
-- One shared palette and corner radius for RC and DS.
-- Whether the parent area should look more like the child area or stay calm and plain.
+## Decisions taken (2026-10-29, owner said "do the recommended")
+- Palettes: RC and DS are now one family. DS uses RC's ink (#2D3A5C), a blue primary (#3F5FB8) from the same hue as the
+  RC outline, a pale blue soft tone and blue-grey borders; the child side stays pastel and rounded. The parent area
+  stays calm and plain (not a child look). Corner radii were left as they are (20 / 28 dp); change only after a visual review.
+- Tablet/desktop landscape games: on a window >= 900 dp wide and clearly landscape, `GameScaffold` moves the
+  instruction into a 300 dp side card and centres the board in the rest.
+- Router / deep links: NOT built, on purpose. Child mode must be started by the parent, so a URL must not open child
+  screens directly. Refresh restarts at the picker; saved progress is kept. Revisit only for parent/teacher pages.

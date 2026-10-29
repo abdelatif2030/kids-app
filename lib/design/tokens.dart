@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 /// Rehlaty design tokens. One place for colors, spacing, radii, shadows,
 /// widths, breakpoints, durations and layers, so screens stay consistent.
-/// (The child area keeps its pastel `RC` palette from journey/ui/kit.dart;
-/// these tokens drive onboarding, parent and shared components.)
+/// Child (`RC`, journey/ui/kit.dart) and adult (`DS`) palettes are one family: the same ink, the same blue
+/// outline hue and the same star yellow; the child side is pastel and rounded, the adult side calmer.
 class DS {
   DS._();
 
   // Colors: indigo primary, cream background, teal accent, warm yellow highlight.
-  static const primary = Color(0xFF4B3FA0);
-  static const primarySoft = Color(0xFFE7E3FA);
+  static const primary = Color(0xFF3F5FB8);
+  static const primarySoft = Color(0xFFE6F1FF);
   static const onPrimary = Colors.white;
   static const accent = Color(0xFF0F8B8D);
   static const accentSoft = Color(0xFFD7F1F0);
@@ -17,10 +17,10 @@ class DS {
   static const highlightSoft = Color(0xFFFFF1C9);
   static const cream = Color(0xFFFFF9EE);
   static const surface = Colors.white;
-  static const ink = Color(0xFF241F3D);
-  static const inkSoft = Color(0xFF5B5675);
-  static const border = Color(0xFFD9D4EC);
-  static const success = Color(0xFF1E8E5A);
+  static const ink = Color(0xFF2D3A5C);
+  static const inkSoft = Color(0xFF55627F);
+  static const border = Color(0xFFC5D5F2);
+  static const success = Color(0xFF2E8F5C);
   static const warning = Color(0xFFB26A00);
   static const error = Color(0xFFB3261E);
 
@@ -38,7 +38,7 @@ class DS {
   static const caption = TextStyle(fontSize: 14, color: inkSoft, height: 1.5);
 
   // Shadows and focus.
-  static const shadow = [BoxShadow(color: Color(0x1A241F3D), blurRadius: 12, offset: Offset(0, 4))];
+  static const shadow = [BoxShadow(color: Color(0x1A2D3A5C), blurRadius: 12, offset: Offset(0, 4))];
   static const focusWidth = 3.0;
   static const focusColor = Color(0xFF1B6BFF);
 

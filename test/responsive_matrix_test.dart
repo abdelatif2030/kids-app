@@ -121,7 +121,13 @@ void main() {
           final all = [for (var i = 0; i < 4; i++) t.getRect(find.byKey(ValueKey('opt$i')))];
           final left = all.map((r) => r.left).reduce((a, b) => a < b ? a : b);
           final right = all.map((r) => r.right).reduce((a, b) => a > b ? a : b);
-          expect((left + right) / 2, closeTo(e.value / 2, 40)); // centred
+          // Centred in the space left of the side instruction card (300 dp) when the window is wide and landscape.
+          final mid = (left + right) / 2;
+          final wide = e.value >= 900;
+          final ok = wide
+              ? ((mid - (e.value / 2 + 150)).abs() < 40 || (mid - (e.value / 2 - 150)).abs() < 40)
+              : (mid - e.value / 2).abs() < 40;
+          expect(ok, true, reason: 'centre $mid in a ${e.value} px window');
         });
 
         testWidgets('teacher page and portfolio: grid on wide windows, one column on a phone', (t) async {

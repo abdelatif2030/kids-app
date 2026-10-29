@@ -162,4 +162,19 @@ void main() {
       expect(find.textContaining('لم يراجعه التطبيق'), findsOneWidget);
     });
   });
+
+  group('tablet landscape games', () {
+    testWidgets('wide landscape puts the instruction in a side card; a phone keeps it on top', (t) async {
+      _size(t, const Size(1280, 800));
+      await t.pumpWidget(_app(const ConnectFourGame(childId: 'u2')));
+      await t.pumpAndSettle();
+      expect(find.byKey(const ValueKey('game_side_instruction')), findsOneWidget);
+      expect(t.takeException(), isNull);
+
+      _size(t, const Size(390, 800));
+      await t.pumpWidget(_app(const ConnectFourGame(childId: 'u2')));
+      await t.pumpAndSettle();
+      expect(find.byKey(const ValueKey('game_side_instruction')), findsNothing);
+    });
+  });
 }
