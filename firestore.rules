@@ -44,7 +44,7 @@ service cloud.firestore {
       allow read: if signedIn() && request.auth.uid == uid;
       allow create: if signedIn() && request.auth.uid == uid
         && request.resource.data.keys().hasOnly(['role', 'name', 'createdAt'])
-        && request.resource.data.role in ['parent', 'teacher'];
+        && request.resource.data.role in ['parent', 'teacher', 'relative'];
       allow update: if signedIn() && request.auth.uid == uid
         && request.resource.data.role == resource.data.role;
       allow delete: if false;
@@ -354,6 +354,85 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
         && request.resource.data.status in ['shortlisted', 'declined', 'accepted'];
       allow delete: if false;
+    }
+
+    // ---- Family chat (docs/FAMILY_CHAT_DESIGN.md) -------------------------------------------------
+    // families/{parentUid}: the parent's uid is the family id. Relatives join with a one-time invite code
+    // and stay "pending" until the parent approves. Children have no accounts: the parent's device writes
+    // for the child. Only the parent can read every message; a relative reads only their own threads.
+    function isActiveRelative(fid, uid) {
+      return exists(/databases/$(database)/documents/families/$(fid)/relatives/$(uid))
+        && get(/databases/$(database)/documents/families/$(fid)/relatives/$(uid)).data.status == 'active';
+    }
+    function chatBodyOk(d) {
+      return (d.kind == 'phrase' && d.body.matches('p_[a-z]+') && d.body.size() <= 16)
+        || (d.kind == 'sticker' && d.body.size() >= 1 && d.body.size() <= 16)
+        || (d.kind == 'text' && d.body.size() >= 1 && d.body.size() <= 200
+            && !d.body.matches('(?i).*(https?:|www\\.|://|\\.com|\\.net|\\.org|@).*'));
+    }
+
+    // invites/{code}: created by a parent; read only by exact code (no listing); redeemed once by a relative.
+    match /invites/{code} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn() && role() == 'parent'
+        && request.resource.data.keys().hasOnly(['familyId', 'parentName', 'relation', 'children', 'used', 'createdAt'])
+        && request.resource.data.familyId == request.auth.uid
+        && request.resource.data.used == false
+        && request.resource.data.parentName.size() <= 40
+        && request.resource.data.children.size() >= 1 && request.resource.data.children.size() <= 10
+        && request.resource.data.createdAt == request.time;
+      allow update: if signedIn() && role() == 'relative'
+        && resource.data.used == false
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used', 'usedBy'])
+        && request.resource.data.used == true
+        && request.resource.data.usedBy == request.auth.uid;
+      allow delete: if signedIn() && resource.data.familyId == request.auth.uid;
+    }
+
+    // A relative's own list of families they joined (a pointer; it grants nothing).
+    match /users/{uid}/families/{fid} {
+      allow read, delete: if signedIn() && request.auth.uid == uid;
+      allow create: if signedIn() && request.auth.uid == uid && role() == 'relative'
+        && request.resource.data.keys().hasOnly(['parentName'])
+        && request.resource.data.parentName.size() <= 40;
+      allow update: if false;
+    }
+
+    match /families/{fid}/relatives/{rel} {
+      allow read: if signedIn() && (request.auth.uid == fid || request.auth.uid == rel);
+      allow create: if signedIn() && request.auth.uid == rel && role() == 'relative'
+        && request.resource.data.keys().hasOnly(['name', 'relation', 'status', 'children', 'code'])
+        && request.resource.data.status == 'pending'
+        && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 40
+        && exists(/databases/$(database)/documents/invites/$(request.resource.data.code))
+        && get(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.familyId == fid
+        && get(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.used == false
+        && request.resource.data.relation == get(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.relation
+        && request.resource.data.children == get(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.children;
+      // Only the parent decides: approve, pause, resume, remove, or change who the relative may talk with.
+      allow update: if signedIn() && request.auth.uid == fid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'children'])
+        && request.resource.data.status in ['active', 'paused', 'removed'];
+      allow delete: if false;
+    }
+
+    match /families/{fid}/messages/{id} {
+      allow read: if signedIn()
+        && (request.auth.uid == fid
+            || (resource.data.relUid == request.auth.uid && isActiveRelative(fid, request.auth.uid)));
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['threadId', 'childId', 'childName', 'relUid', 'from', 'kind', 'body', 'at'])
+        && request.resource.data.threadId == request.resource.data.childId + '__' + request.resource.data.relUid
+        && request.resource.data.childName.size() <= 40
+        && request.resource.data.at == request.time
+        && chatBodyOk(request.resource.data)
+        && isActiveRelative(fid, request.resource.data.relUid)
+        && request.resource.data.childId in get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.children.keys()
+        && ((request.auth.uid == fid && request.resource.data.from == 'child')
+            || (request.auth.uid == request.resource.data.relUid && request.resource.data.from == 'relative'));
+      allow update: if false;
+      allow delete: if signedIn() && request.auth.uid == fid;
     }
   }
 }

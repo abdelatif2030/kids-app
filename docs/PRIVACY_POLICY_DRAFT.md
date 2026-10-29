@@ -26,6 +26,11 @@ created on the device.
 If turned on in a future version, parents and teachers would create accounts (email, name, profile, bookings,
 messages) stored with Google Firebase. Teachers are not vetted by the app. This policy will be updated before then.
 
+## Optional family chat (not active in this version)
+If switched on, a parent can invite relatives to exchange short messages and stickers with the child. Relatives create
+an account (e-mail, name). Messages, the child's nickname and the relative's name are stored with Google Firebase. The
+parent can read and delete every conversation and can remove a relative at any time. No photos, files, links or calls.
+
 ## Children
 The app is designed for children with a parent present. Parents control the settings area with a PIN.
 

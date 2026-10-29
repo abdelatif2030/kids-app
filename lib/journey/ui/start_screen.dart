@@ -1,3 +1,5 @@
+import '../../family/family_entry.dart';
+import '../../firebase_config.dart';
 import '../avatars.dart';
 import 'package:flutter/material.dart';
 
@@ -218,6 +220,20 @@ class _Picker extends StatelessWidget {
                 ),
               ],
             ),
+            // The door for grandparents and other relatives; hidden while the service is off.
+            if (familyRepository != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: TextButton.icon(
+                  key: const ValueKey('i_am_family'),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => FamilyEntryScreen(asRelative: true, auth: teacherRepository, family: familyRepository)),
+                  ),
+                  icon: const Icon(Icons.family_restroom_rounded),
+                  label: Text(tr2('أنا من العائلة (جد، جدة، قريب)', 'I am family (grandparent, relative)')),
+                ),
+              ),
           ],
         ),
       ),

@@ -23,7 +23,7 @@ beforeEach(async () => {
   await env.clearFirestore();
   await env.withSecurityRulesDisabled(async (ctx) => {
     const db = ctx.firestore();
-    for (const [uid, role] of [['p1', 'parent'], ['p2', 'parent'], ['t1', 'teacher'], ['t2', 'teacher']]) {
+    for (const [uid, role] of [['p1', 'parent'], ['p2', 'parent'], ['t1', 'teacher'], ['t2', 'teacher'], ['r1', 'relative'], ['r2', 'relative']]) {
       await setDoc(doc(db, 'users', uid), { role, name: uid });
     }
     await setDoc(doc(db, 'teachers', 't1'), { name: 'T1', bio: 'b', subjects: ['math'], languages: ['العربية'], priceNote: '', status: 'approved', priceEgp: 200 });
@@ -424,4 +424,129 @@ test('the intro video link must be a short https link', async () => {
   await assertFails(updateDoc(doc(as('t1'), 'teachers', 't1'), { introVideoUrl: 'https://exa mple.com' }));
   await assertFails(updateDoc(doc(as('t1'), 'teachers', 't1'), { introVideoUrl: 'https://' + 'a'.repeat(300) }));
   void base;
+});
+
+// family chat --------------------------------------------------------------
+const inviteData = (over = {}) => ({
+  familyId: 'p1', parentName: 'Sara', relation: 'grandma', children: { c1: 'Lina' }, used: false, createdAt: serverTimestamp(), ...over,
+});
+async function seedInvite(code = 'ABC123', over = {}) {
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(doc(ctx.firestore(), 'invites', code), inviteData({ createdAt: new Date(), ...over }));
+  });
+}
+async function seedRelative(rel = 'r1', status = 'active', fid = 'p1') {
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(doc(ctx.firestore(), 'families', fid, 'relatives', rel), { name: 'Nana', relation: 'grandma', status, children: { c1: 'Lina' }, code: 'ABC123' });
+  });
+}
+const fmsg = (over = {}) => ({
+  threadId: 'c1__r1', childId: 'c1', childName: 'Lina', relUid: 'r1', from: 'child', kind: 'phrase', body: 'p_love', at: serverTimestamp(), ...over,
+});
+const msgRef = (db, id = 'm1', fid = 'p1') => doc(db, 'families', fid, 'messages', id);
+
+test('family: only a parent makes an invite for their own family', async () => {
+  await assertSucceeds(setDoc(doc(as('p1'), 'invites', 'ABC123'), inviteData()));
+  await assertFails(setDoc(doc(as('p2'), 'invites', 'ZZZ'), inviteData())); // someone else's family id
+  await assertFails(setDoc(doc(as('t1'), 'invites', 'TTT'), inviteData({ familyId: 't1' }))); // not a parent
+  await assertFails(setDoc(doc(as('p1'), 'invites', 'USED'), inviteData({ used: true })));
+  await assertFails(setDoc(doc(as('p1'), 'invites', 'EMPTY'), inviteData({ children: {} })));
+});
+
+test('family: an invite can be read by its code but never listed', async () => {
+  await seedInvite();
+  await assertSucceeds(getDoc(doc(as('r1'), 'invites', 'ABC123')));
+  await assertFails(getDocs(collection(as('r1'), 'invites')));
+});
+
+test('family: a relative joins once with the code and starts pending', async () => {
+  await seedInvite();
+  const db = as('r1');
+  const b = writeBatch(db);
+  b.set(doc(db, 'families', 'p1', 'relatives', 'r1'), { name: 'Nana', relation: 'grandma', status: 'pending', children: { c1: 'Lina' }, code: 'ABC123' });
+  b.update(doc(db, 'invites', 'ABC123'), { used: true, usedBy: 'r1' });
+  b.set(doc(db, 'users', 'r1', 'families', 'p1'), { parentName: 'Sara' });
+  await assertSucceeds(b.commit());
+  // the same code cannot be used by a second person
+  const db2 = as('r2');
+  const b2 = writeBatch(db2);
+  b2.set(doc(db2, 'families', 'p1', 'relatives', 'r2'), { name: 'Uncle', relation: 'grandma', status: 'pending', children: { c1: 'Lina' }, code: 'ABC123' });
+  b2.update(doc(db2, 'invites', 'ABC123'), { used: true, usedBy: 'r2' });
+  await assertFails(b2.commit());
+});
+
+test('family: a relative cannot join as active, with a wrong code, or with more children than invited', async () => {
+  await seedInvite();
+  const rel = (over) => ({ name: 'Nana', relation: 'grandma', status: 'pending', children: { c1: 'Lina' }, code: 'ABC123', ...over });
+  await assertFails(setDoc(doc(as('r1'), 'families', 'p1', 'relatives', 'r1'), rel({ status: 'active' })));
+  await assertFails(setDoc(doc(as('r1'), 'families', 'p1', 'relatives', 'r1'), rel({ code: 'NOPE' })));
+  await assertFails(setDoc(doc(as('r1'), 'families', 'p1', 'relatives', 'r1'), rel({ children: { c1: 'Lina', c2: 'Omar' } })));
+  await assertFails(setDoc(doc(as('r1'), 'families', 'p1', 'relatives', 'r2'), rel({}))); // for someone else
+  await assertFails(setDoc(doc(as('p2'), 'families', 'p1', 'relatives', 'p2'), rel({}))); // a parent is not a relative
+});
+
+test('family: only the parent approves, pauses or removes; a relative cannot change their own status', async () => {
+  await seedRelative('r1', 'pending');
+  await assertFails(updateDoc(doc(as('r1'), 'families', 'p1', 'relatives', 'r1'), { status: 'active' }));
+  await assertFails(updateDoc(doc(as('p2'), 'families', 'p1', 'relatives', 'r1'), { status: 'active' }));
+  await assertSucceeds(updateDoc(doc(as('p1'), 'families', 'p1', 'relatives', 'r1'), { status: 'active' }));
+  await assertSucceeds(updateDoc(doc(as('p1'), 'families', 'p1', 'relatives', 'r1'), { status: 'paused' }));
+  await assertFails(updateDoc(doc(as('p1'), 'families', 'p1', 'relatives', 'r1'), { name: 'Hacker' }));
+  await assertFails(deleteDoc(doc(as('p1'), 'families', 'p1', 'relatives', 'r1')));
+});
+
+test('family: messages need an active relative linked to that child', async () => {
+  await seedRelative('r1', 'active');
+  await assertSucceeds(setDoc(msgRef(as('p1')), fmsg()));
+  await assertSucceeds(setDoc(msgRef(as('r1'), 'm2'), fmsg({ from: 'relative', kind: 'text', body: 'Good night my star' })));
+  await assertFails(setDoc(msgRef(as('p1'), 'm3'), fmsg({ childId: 'c2', threadId: 'c2__r1' }))); // not linked
+  await seedRelative('r2', 'pending');
+  await assertFails(setDoc(msgRef(as('p1'), 'm4'), fmsg({ relUid: 'r2', threadId: 'c1__r2' }))); // pending
+  await env.withSecurityRulesDisabled(async (ctx) => { await updateDoc(doc(ctx.firestore(), 'families', 'p1', 'relatives', 'r1'), { status: 'paused' }); });
+  await assertFails(setDoc(msgRef(as('p1'), 'm5'), fmsg())); // paused
+  await assertFails(setDoc(msgRef(as('r1'), 'm6'), fmsg({ from: 'relative' })));
+});
+
+test('family: nobody can write as someone else', async () => {
+  await seedRelative('r1', 'active');
+  await assertFails(setDoc(msgRef(as('r1')), fmsg({ from: 'child' }))); // a relative writing as the child
+  await assertFails(setDoc(msgRef(as('p1')), fmsg({ from: 'relative' }))); // the parent writing as the relative
+  await assertFails(setDoc(msgRef(as('r2')), fmsg({ from: 'relative' }))); // another relative
+  await assertFails(setDoc(msgRef(as('p2')), fmsg())); // another family's parent
+});
+
+test('family: message content is limited (kinds, length, no links or addresses)', async () => {
+  await seedRelative('r1', 'active');
+  const txt = (body) => fmsg({ from: 'relative', kind: 'text', body });
+  await assertSucceeds(setDoc(msgRef(as('r1'), 'a'), txt('hello')));
+  for (const [i, bad] of ['see https://x.y', 'WWW.site', 'a@b.c', 'x.com', 'ftp://a', '', 'x'.repeat(201)].entries()) {
+    await assertFails(setDoc(msgRef(as('r1'), `bad${i}`), txt(bad)));
+  }
+  await assertFails(setDoc(msgRef(as('r1'), 'k'), fmsg({ from: 'relative', kind: 'image', body: 'x' })));
+  await assertFails(setDoc(msgRef(as('p1'), 'ph'), fmsg({ body: 'drop table' }))); // phrases are ids
+  await assertFails(setDoc(msgRef(as('r1'), 'extra'), { ...fmsg({ from: 'relative' }), photo: 'x' }));
+  await assertFails(setDoc(msgRef(as('r1'), 'time'), fmsg({ from: 'relative', at: new Date(0) })));
+});
+
+test('family: the parent reads everything; a relative reads only their own thread; others nothing', async () => {
+  await seedRelative('r1', 'active');
+  await seedRelative('r2', 'active');
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    await setDoc(msgRef(db, 'x1'), { ...fmsg(), at: new Date() });
+    await setDoc(msgRef(db, 'x2'), { ...fmsg({ relUid: 'r2', threadId: 'c1__r2' }), at: new Date() });
+  });
+  await assertSucceeds(getDocs(collection(as('p1'), 'families', 'p1', 'messages')));
+  await assertSucceeds(getDocs(query(collection(as('r1'), 'families', 'p1', 'messages'), where('relUid', '==', 'r1'))));
+  await assertFails(getDocs(collection(as('r1'), 'families', 'p1', 'messages'))); // unfiltered = other threads too
+  await assertFails(getDoc(msgRef(as('r1'), 'x2'))); // r2's thread
+  await assertFails(getDocs(collection(as('p2'), 'families', 'p1', 'messages')));
+});
+
+test('family: only the parent deletes messages; nobody edits them', async () => {
+  await seedRelative('r1', 'active');
+  await env.withSecurityRulesDisabled(async (ctx) => { await setDoc(msgRef(ctx.firestore(), 'x1'), { ...fmsg(), at: new Date() }); });
+  await assertFails(updateDoc(msgRef(as('p1'), 'x1'), { body: 'p_miss' }));
+  await assertFails(deleteDoc(msgRef(as('r1'), 'x1')));
+  await assertSucceeds(deleteDoc(msgRef(as('p1'), 'x1')));
 });

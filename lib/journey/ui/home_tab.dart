@@ -1,3 +1,7 @@
+import '../../firebase_config.dart';
+import '../../family/family_models.dart';
+import '../../family/family_prefs.dart';
+import '../../family/family_screens.dart';
 import '../../design/tokens.dart';
 import '../avatars.dart';
 
@@ -369,6 +373,7 @@ class HomeTab extends StatelessWidget {
                 RC.lavender,
                 () => SubjectsScreen(age: child.age),
               ),
+              _FamilyMore(child: child),
             ],
           ),
         ];
@@ -872,6 +877,31 @@ class _ResumeCard extends StatelessWidget {
               ],
             ),
           ),
+        );
+      },
+    );
+  }
+}
+
+
+/// «عائلتي»: shown only when the parent switched chat on for this child and the service is connected.
+class _FamilyMore extends StatelessWidget {
+  final ChildProfile child;
+  const _FamilyMore({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final repo = familyRepository;
+    if (repo == null || repo.uid == null) return const SizedBox.shrink();
+    return FutureBuilder<ChildChatPrefs>(
+      future: FamilyPrefs.of(child.id),
+      builder: (context, snap) {
+        if (snap.data?.chatOn != true) return const SizedBox.shrink();
+        return _MoreCard(
+          '👨‍👩‍👧',
+          tr2('عائلتي', 'My family'),
+          RC.pink,
+          () => ChildFamilyScreen(repo: repo, familyId: repo.uid!, childId: child.id, childName: child.nickname),
         );
       },
     );

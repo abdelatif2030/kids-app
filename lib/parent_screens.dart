@@ -24,6 +24,8 @@ import 'journey/ui/day_settings_screen.dart';
 import 'print/printables_screen.dart';
 import 'summary_screen.dart';
 import 'teachers_screens.dart';
+import 'family/family_entry.dart';
+import 'firebase_config.dart';
 
 /// Entry point from the child-facing screens: creates a PIN the first time,
 /// otherwise asks for it, then opens the settings.
@@ -602,6 +604,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (_) => const TeachersEntryScreen(),
+                    ),
+                  ),
+                ),
+                ListTile(
+                  key: const ValueKey('family_chat_tile'),
+                  leading: const Icon(Icons.forum_rounded),
+                  title: Text(tr2('عائلتي: المحادثات', 'Family chat')),
+                  subtitle: Text(tr2('أقارب موافَق عليهم يراسلون طفلك، وتقرأ أنت كل شيء', 'Approved relatives message your child; you can read everything')),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => FamilyEntryScreen(asRelative: false, auth: teacherRepository, family: familyRepository),
                     ),
                   ),
                 ),

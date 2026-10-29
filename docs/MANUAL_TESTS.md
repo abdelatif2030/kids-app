@@ -1367,3 +1367,20 @@ The six learning games under Games > Learning games.
 - **Status:** Not tested
 - **Device or environment:** Phone and Android version: 
 - **Notes:** 
+
+### F1 - Family chat with two real phones
+
+- [ ] Not tested
+- **Test ID:** F1
+- **Preconditions:** Firebase connected and rules published (`docs/FAMILY_CHAT_DESIGN.md`), a parent account on phone A, a relative account on phone B.
+- **Steps:**
+  1. Parent: Parent settings -> Family chat -> Invite a relative -> pick a child -> note the code.
+  2. Relative (phone B): «أنا من العائلة» -> create account -> enter the code. Check it says waiting for approval and cannot write.
+  3. Parent: approve. Switch chat on for the child (typing stays off). Open child mode -> «عائلتي» -> send a phrase and a sticker.
+  4. Relative: reply with text, then try a text with a link.
+  5. Parent: read all conversations, pause the relative, delete the conversation.
+- **Expected result:** Nothing is possible before approval; the link is refused; paused relative cannot send; parent sees every message.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Phones and Android versions: 
+- **Notes:** 

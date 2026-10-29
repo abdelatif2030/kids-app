@@ -13,7 +13,7 @@ import 'teachers_market.dart';
 import 'teachers_portfolio.dart';
 import 'l10n/strings.dart';
 
-enum UserRole { parent, teacher }
+enum UserRole { parent, teacher, relative }
 
 class AppUser {
   final String uid;

@@ -23,7 +23,7 @@
 | Ads / analytics SDK | None. |
 | Permissions | INTERNET only. No camera, microphone, location or contacts permission. Photo picking uses the system picker. |
 
-If the teacher service is turned on later (Firebase), the answers CHANGE (account email, teacher profile data,
+If the teacher service OR the family chat is turned on later (Firebase), the answers CHANGE (account email, teacher profile data,
 bookings, messages). Redo this form and the privacy policy first.
 
 ## Before pressing "Publish"

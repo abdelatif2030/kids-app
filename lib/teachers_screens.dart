@@ -67,6 +67,8 @@ class _TeachersEntryScreenState extends State<TeachersEntryScreen> {
             repo: repo,
             onSignOut: _signOut,
           ),
+          // A relative account belongs to the family chat, not to the teachers area.
+          UserRole.relative => _IncompleteAccount(onSignOut: _signOut),
           null => _IncompleteAccount(onSignOut: _signOut),
         };
       },
@@ -125,7 +127,10 @@ class _IncompleteAccount extends StatelessWidget {
 class AuthScreen extends StatefulWidget {
   final TeacherRepository repo;
   final VoidCallback onSignedIn;
-  const AuthScreen({super.key, required this.repo, required this.onSignedIn});
+
+  /// Which kinds of account can be created here. Teachers use parent/teacher; the family chat uses one role.
+  final List<UserRole> roles;
+  const AuthScreen({super.key, required this.repo, required this.onSignedIn, this.roles = const [UserRole.parent, UserRole.teacher]});
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -136,7 +141,7 @@ class _AuthScreenState extends State<AuthScreen> {
   final _password = TextEditingController();
   final _name = TextEditingController();
   bool _register = false;
-  UserRole _role = UserRole.parent;
+  late UserRole _role = widget.roles.first;
   bool _busy = false;
   String? _error;
 
@@ -206,15 +211,24 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
             const SizedBox(height: 16),
             if (_register) ...[
-              SegmentedButton<UserRole>(
-                segments: [
-                  ButtonSegment(value: UserRole.parent, label: Text(loc('ولي أمر'))),
-                  ButtonSegment(value: UserRole.teacher, label: Text(loc('مدرس'))),
-                ],
-                selected: {_role},
-                onSelectionChanged: (s) => setState(() => _role = s.first),
-              ),
-              const SizedBox(height: 16),
+              if (widget.roles.length > 1) ...[
+                SegmentedButton<UserRole>(
+                  segments: [
+                    for (final r in widget.roles)
+                      ButtonSegment(
+                        value: r,
+                        label: Text(switch (r) {
+                          UserRole.parent => loc('ولي أمر'),
+                          UserRole.teacher => loc('مدرس'),
+                          UserRole.relative => tr2('قريب', 'Relative'),
+                        }),
+                      ),
+                  ],
+                  selected: {_role},
+                  onSelectionChanged: (s) => setState(() => _role = s.first),
+                ),
+                const SizedBox(height: 16),
+              ],
               TextField(
                 controller: _name,
                 autofillHints: const [AutofillHints.name],
