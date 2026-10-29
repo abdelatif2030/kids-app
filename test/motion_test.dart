@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/design/app_intro.dart';
+import 'package:kids_app/design/worlds.dart';
 import 'package:kids_app/design/motion.dart';
 
 Widget app(Widget w, {bool reduce = false}) => MediaQuery(
@@ -52,5 +54,85 @@ void main() {
     await t.pumpWidget(pop(true, reduce: true));
     await t.pump(const Duration(milliseconds: 100));
     expect(t.widget<ScaleTransition>(find.descendant(of: find.byType(PopOnChange), matching: find.byType(ScaleTransition))).scale.value, 1.0);
+  });
+
+  group('animated backgrounds', () {
+    tearDown(() => WorldBackground.forceMotion = null);
+
+    testWidgets('off under the test binding by default (so pumpAndSettle is never blocked)', (t) async {
+      await t.pumpWidget(app(const SizedBox(width: 400, height: 600, child: WorldBackground(world: RWorld.ocean, child: SizedBox()))));
+      expect(find.byKey(const ValueKey('world_motion_ocean')), findsNothing);
+    });
+
+    testWidgets('every moving world has a motion layer that paints over time, and it repaints without rebuilding the child', (t) async {
+      WorldBackground.forceMotion = true;
+      for (final w in [RWorld.journey, RWorld.forest, RWorld.ocean, RWorld.space, RWorld.story]) {
+        await t.pumpWidget(app(SizedBox(width: 400, height: 600, child: WorldBackground(world: w, child: const SizedBox()))));
+        expect(find.byKey(ValueKey('world_motion_${w.name}')), findsOneWidget, reason: w.name);
+        await t.pump(const Duration(seconds: 3));
+      }
+      expect(t.takeException(), isNull);
+    });
+
+    testWidgets('calm and quiet worlds stay still, and so does reduced motion', (t) async {
+      WorldBackground.forceMotion = true;
+      await t.pumpWidget(app(const SizedBox(width: 400, height: 600, child: WorldBackground(world: RWorld.calm, child: SizedBox()))));
+      expect(find.byKey(const ValueKey('world_motion_calm')), findsNothing);
+      await t.pumpWidget(app(const SizedBox(width: 400, height: 600, child: WorldBackground(world: RWorld.journey, quiet: true, child: SizedBox()))));
+      expect(find.byKey(const ValueKey('world_motion_journey')), findsNothing);
+      await t.pumpWidget(app(const SizedBox(width: 400, height: 600, child: WorldBackground(world: RWorld.journey, child: SizedBox())), reduce: true));
+      expect(find.byKey(const ValueKey('world_motion_journey')), findsNothing);
+    });
+
+    testWidgets('the motion layer takes no taps and the content on top still does', (t) async {
+      WorldBackground.forceMotion = true;
+      var tapped = 0;
+      await t.pumpWidget(app(SizedBox(width: 400, height: 600, child: WorldBackground(world: RWorld.journey, child: TextButton(onPressed: () => tapped++, child: const Text('go'))))));
+      await t.tap(find.text('go'));
+      expect(tapped, 1);
+    });
+  });
+
+  group('app intro', () {
+    tearDown(() {
+      AppIntro.forceShow = null;
+      AppIntro.resetForTest();
+      WorldBackground.forceMotion = null;
+    });
+
+    testWidgets('skipped under tests by default and with reduced motion: the app is simply there', (t) async {
+      AppIntro.resetForTest();
+      await t.pumpWidget(app(const AppIntro(child: Text('app'))));
+      expect(find.text('app'), findsOneWidget);
+      AppIntro.forceShow = true;
+      AppIntro.resetForTest();
+      await t.pumpWidget(app(const AppIntro(child: Text('app2')), reduce: true));
+      expect(find.text('Rehlaty'), findsNothing);
+      expect(find.text('رحلتي'), findsNothing);
+    });
+
+    testWidgets('shows the name, ends by itself after about 1.6 s, and a tap opens the app at once; shown once per run', (t) async {
+      AppIntro.forceShow = true;
+      AppIntro.resetForTest();
+      await t.pumpWidget(app(const AppIntro(child: Text('app'))));
+      await t.pump(const Duration(milliseconds: 800));
+      expect(find.text('رحلتي').evaluate().isNotEmpty || find.text('Rehlaty').evaluate().isNotEmpty, isTrue);
+      await t.pump(const Duration(milliseconds: 1000));
+      expect(find.text('رحلتي'), findsNothing);
+      expect(find.text('Rehlaty'), findsNothing);
+      // a second AppIntro in the same run does not play again
+      await t.pumpWidget(app(AppIntro(key: UniqueKey(), child: const Text('again'))));
+      await t.pump();
+      expect(find.text('رحلتي'), findsNothing);
+      // tapping skips
+      AppIntro.resetForTest();
+      await t.pumpWidget(app(AppIntro(key: UniqueKey(), child: const Text('app3'))));
+      await t.pump(const Duration(milliseconds: 300));
+      expect(find.byKey(const ValueKey('world_journey')), findsOneWidget); // the intro is on screen
+      await t.tapAt(const Offset(50, 50));
+      await t.pump();
+      await t.pump(const Duration(milliseconds: 50));
+      expect(find.byKey(const ValueKey('world_journey')), findsNothing); // a tap opened the app at once
+    });
   });
 }

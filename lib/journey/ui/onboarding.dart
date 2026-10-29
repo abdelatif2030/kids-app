@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import '../../assistant/assistant_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -175,7 +176,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     _persist();
   }
 
-  Future<void> _finish() async {
+  Future<void> _finish({bool openAssistant = false}) async {
     if (_saving) return;
     setState(() => _saving = true);
     final store = JourneyStore.instance;
@@ -191,6 +192,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           builder: (_) => const PinSetupScreen(popWhenDone: true),
         ),
       );
+    }
+    if (openAssistant && mounted) {
+      // The parent knows the child best: the assistant turns a few words into plans to choose from.
+      await Navigator.push(context, MaterialPageRoute(builder: (_) => PlanAssistantScreen(child: profile)));
     }
     if (mounted) Navigator.pop(context, profile);
   }
@@ -455,6 +460,13 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         expand: true,
         loading: _saving,
         onPressed: _finish,
+      ),
+      const SizedBox(height: DS.s12),
+      OutlinedButton.icon(
+        key: const ValueKey('ob_assistant'),
+        onPressed: _saving ? null : () => _finish(openAssistant: true),
+        icon: const Icon(Icons.auto_awesome_rounded),
+        label: Text(tr2('ساعدني في وضع خطة كاملة', 'Help me make a full plan')),
       ),
     ],
   );

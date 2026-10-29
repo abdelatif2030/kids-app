@@ -1,4 +1,5 @@
 import '../../design/layout.dart';
+import 'voice_picker.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -98,6 +99,8 @@ class _AudioSettingsScreenState extends State<AudioSettingsScreen> {
                         ),
                       ),
                     ),
+                    const VoicePickerTile(lang: 'ar'),
+                    const VoicePickerTile(lang: 'en'),
                     ListTile(
                       leading: const Icon(Icons.fact_check_outlined),
                       title: Text(tr2('حالة صوت الدروس', 'Lesson audio status')),

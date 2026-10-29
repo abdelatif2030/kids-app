@@ -17,6 +17,8 @@ import 'firebase_config.dart';
 import 'journey/repository.dart';
 import 'journey/ui/lesson_flow.dart';
 import 'journey/ui/start_screen.dart';
+import 'design/app_intro.dart';
+import 'design/motion.dart';
 import 'offline/connectivity.dart';
 import 'player_screen.dart';
 import 'rest_screen.dart';
@@ -50,6 +52,7 @@ class KidsApp extends StatelessWidget {
         colorSchemeSeed: DS.primary,
         useMaterial3: true,
         fontFamily: 'Tajawal',
+        pageTransitionsTheme: kSoftPageTransitions,
         // Keyboard focus and mouse hover are visible everywhere, not only on the custom tiles.
         focusColor: DS.focusColor.withAlpha(40),
         hoverColor: DS.focusColor.withAlpha(20),
@@ -86,7 +89,7 @@ class KidsApp extends StatelessWidget {
           );
         },
       ),
-      home: const StartScreen(),
+      home: const AppIntro(child: StartScreen()),
     );
   }
 }

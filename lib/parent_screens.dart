@@ -1,4 +1,6 @@
 import 'design/components.dart' show SectionHeader, showToast;
+import 'assistant/assistant_screen.dart';
+import 'journey/repository.dart' show JourneyStore;
 import 'offline/offline_ui.dart';
 import 'design/layout.dart';
 
@@ -401,6 +403,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 SectionHeader(tr2('التعلّم اليومي', 'Daily learning')),
+                ListTile(
+                  key: const ValueKey('open_assistant'),
+                  leading: const Icon(Icons.auto_awesome_rounded),
+                  title: Text(tr2('مساعد رحلتي: خطة كاملة', 'Rehlaty assistant: a full plan')),
+                  subtitle: Text(tr2('احكِ عن طفلك واحصل على ثلاث خطط مع فيديوهات', 'Tell us about your child and get three plans with videos')),
+                  onTap: () {
+                    final c = JourneyStore.instance.active ?? (JourneyStore.instance.profiles.isEmpty ? null : JourneyStore.instance.profiles.first);
+                    if (c == null) {
+                      showToast(context, tr2('أضف طفلاً أولاً.', 'Add a child first.'));
+                      return;
+                    }
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => PlanAssistantScreen(child: c)));
+                  },
+                ),
                 ListTile(
                   leading: const Icon(Icons.graphic_eq_rounded),
                   title: Text(loc('الصوت والتعلّم')),

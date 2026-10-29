@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:kids_app/media/voice_choice.dart';
 import 'package:kids_app/media/audio.dart';
 
 /// A speech backend that records what would have been said.
@@ -19,6 +20,18 @@ class FakeSpeech implements SpeechBackend {
 
   @override
   Future<bool> isAvailable(String lang) async => available;
+
+  /// Voices the fake engine offers per language, and the last preference it was given.
+  final Map<String, List<VoiceInfo>> offered = {};
+  final Map<String, String?> preferred = {};
+
+  @override
+  Future<List<VoiceInfo>> voices(String lang) async => offered[lang] ?? const [];
+
+  @override
+  Future<void> preferVoice(String lang, String? name) async {
+    preferred[lang] = name;
+  }
 
   @override
   Future<void> speak(String text, {String lang = 'ar', double rate = 1.0}) async {

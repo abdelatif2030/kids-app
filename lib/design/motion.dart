@@ -119,3 +119,28 @@ class _PopOnChangeState extends State<PopOnChange>
     child: widget.child,
   );
 }
+
+/// Page changes: a short fade with a small slide, on every platform (the web too). With reduced motion the page just
+/// appears. Built from Flutter's own transitions.
+class SoftPageTransitionsBuilder extends PageTransitionsBuilder {
+  const SoftPageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(PageRoute<T> route, BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+    if (motionReduced(context)) return child;
+    final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+    return FadeTransition(
+      opacity: curved,
+      child: SlideTransition(position: Tween(begin: const Offset(0, 0.03), end: Offset.zero).animate(curved), child: child),
+    );
+  }
+}
+
+const kSoftPageTransitions = PageTransitionsTheme(builders: {
+  TargetPlatform.android: SoftPageTransitionsBuilder(),
+  TargetPlatform.iOS: SoftPageTransitionsBuilder(),
+  TargetPlatform.windows: SoftPageTransitionsBuilder(),
+  TargetPlatform.macOS: SoftPageTransitionsBuilder(),
+  TargetPlatform.linux: SoftPageTransitionsBuilder(),
+  TargetPlatform.fuchsia: SoftPageTransitionsBuilder(),
+});

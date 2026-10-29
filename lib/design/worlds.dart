@@ -32,20 +32,68 @@ const Map<RWorld, WorldPalette> kWorldPalettes = {
 
 /// A background with decoration behind [child].
 ///
-/// - Decoration is painted once (no animation, so reduced-motion needs no special case) and sized by the window's
+/// - The static decoration is painted once and sized by the window's
 ///   SHORT side up to 520 dp: on a desktop window the art stays the same size at the edges instead of stretching.
 /// - It never takes taps, mouse clicks, focus or screen-reader attention (IgnorePointer + ExcludeSemantics).
 /// - It is not mirrored for right-to-left: the artwork is fixed in place, so the sun is always in the same corner.
+/// - A slow motion layer (clouds, bubbles, stars, lamp glow) runs on top, only when motion is allowed: never with
+///   reduced motion (app or system setting), never in `quiet` or `calm`.
 /// - [quiet] keeps only a faint ground line, for reading and audio playback.
-class WorldBackground extends StatelessWidget {
+class WorldBackground extends StatefulWidget {
   final RWorld world;
   final Widget child;
   final bool quiet;
   const WorldBackground({super.key, this.world = RWorld.journey, required this.child, this.quiet = false});
 
+  /// Tests set this to true to exercise the motion layer. Otherwise the motion layer is off under a test binding, so
+  /// `pumpAndSettle` is not held up by a background that never stops moving.
+  static bool? forceMotion;
+
+  static bool get _motionAllowedHere => forceMotion ?? !WidgetsBinding.instance.runtimeType.toString().contains('Test');
+
+  @override
+  State<WorldBackground> createState() => _WorldBackgroundState();
+}
+
+class _WorldBackgroundState extends State<WorldBackground> with SingleTickerProviderStateMixin {
+  AnimationController? _c;
+
+  bool get _wantsMotion => !widget.quiet && widget.world != RWorld.calm && WorldBackground._motionAllowedHere;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _sync();
+  }
+
+  @override
+  void didUpdateWidget(WorldBackground old) {
+    super.didUpdateWidget(old);
+    _sync();
+  }
+
+  /// One slow controller for the whole background (60 s loop). Off for reduced motion, quiet worlds and calm.
+  void _sync() {
+    final on = _wantsMotion && !(MediaQuery.maybeOf(context)?.disableAnimations ?? false);
+    if (on && _c == null) {
+      _c = AnimationController(vsync: this, duration: const Duration(seconds: 60))..repeat();
+    } else if (!on && _c != null) {
+      _c!.dispose();
+      _c = null;
+    }
+  }
+
+  @override
+  void dispose() {
+    _c?.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final world = widget.world;
     final p = kWorldPalettes[world]!;
+    final c = _c;
     return DecoratedBox(
       decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [p.top, p.bottom])),
       child: Stack(
@@ -55,16 +103,103 @@ class WorldBackground extends StatelessWidget {
             child: ExcludeSemantics(
               child: IgnorePointer(
                 child: RepaintBoundary(
-                  child: CustomPaint(key: ValueKey('world_${world.name}'), painter: WorldPainter(world, quiet: quiet || world == RWorld.calm)),
+                  child: CustomPaint(key: ValueKey('world_${world.name}'), painter: WorldPainter(world, quiet: widget.quiet || world == RWorld.calm)),
                 ),
               ),
             ),
           ),
-          child,
+          if (c != null)
+            Positioned.fill(
+              child: ExcludeSemantics(
+                child: IgnorePointer(
+                  // Its own layer: the moving part repaints without touching the screen on top.
+                  child: RepaintBoundary(child: CustomPaint(key: ValueKey('world_motion_${world.name}'), painter: WorldMotionPainter(world, c))),
+                ),
+              ),
+            ),
+          widget.child,
         ],
       ),
     );
   }
+}
+
+/// The slow, gentle movement over a world: drifting clouds (journey, forest), rising bubbles (ocean), twinkling stars
+/// (space), a breathing lamp glow (story). Everything is a function of [t] (0..1 over a 60 s loop), so it loops with
+/// no jump. Never takes taps; always faint so text on top stays readable.
+class WorldMotionPainter extends CustomPainter {
+  final RWorld world;
+  final Animation<double> t;
+  WorldMotionPainter(this.world, this.t) : super(repaint: t);
+
+  static double _frac(double v) => v - v.floorToDouble();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.isEmpty) return;
+    final u = math.min(size.shortestSide, 520.0);
+    final v = t.value;
+    switch (world) {
+      case RWorld.journey:
+      case RWorld.forest:
+        for (var i = 0; i < 3; i++) {
+          final w = u * (0.30 + 0.06 * i);
+          final x = _frac(v + i / 3) * (size.width + 2 * w) - w;
+          final y = size.height * (0.08 + 0.09 * i) + math.sin((v + i) * 2 * math.pi) * u * 0.01;
+          _cloud(canvas, Offset(x, y), w);
+        }
+      case RWorld.ocean:
+        final paint = Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2
+          ..color = const Color(0x99FFFFFF);
+        for (var i = 0; i < 7; i++) {
+          final fx = _frac(i * 0.381 + 0.11);
+          final rise = _frac(v * (1 + i % 2) + i / 7); // two speeds, both loop evenly
+          final x = size.width * (0.06 + 0.88 * fx) + math.sin(rise * 2 * math.pi * 2 + i) * u * 0.015;
+          canvas.drawCircle(Offset(x, size.height * (1 - rise)), u * (0.012 + 0.006 * (i % 3)), paint);
+        }
+      case RWorld.space:
+        for (var i = 0; i < 10; i++) {
+          final x = size.width * _frac(i * 0.618 + 0.07);
+          final y = size.height * (0.05 + 0.5 * _frac(i * 0.371 + 0.2));
+          final a = 0.25 + 0.45 * (0.5 + 0.5 * math.sin(2 * math.pi * (v * 6 + i * 0.37)));
+          _sparkle(canvas, Offset(x, y), u * 0.018, const Color(0xFFFFC94D).withValues(alpha: a));
+        }
+      case RWorld.story:
+        final pulse = 0.5 + 0.5 * math.sin(2 * math.pi * v * 4);
+        final c = Offset(size.width * 0.82, size.height * 0.14);
+        final r = u * (0.30 + 0.03 * pulse);
+        canvas.drawCircle(
+          c,
+          r,
+          Paint()..shader = RadialGradient(colors: [const Color(0xFFFFE2A8).withValues(alpha: 0.30 + 0.12 * pulse), const Color(0x00FFE2A8)]).createShader(Rect.fromCircle(center: c, radius: r)),
+        );
+      case RWorld.calm:
+        break;
+    }
+  }
+
+  void _cloud(Canvas canvas, Offset o, double w) {
+    final p = Paint()..color = const Color(0x99FFFFFF);
+    final h = w * 0.34;
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: o, width: w, height: h), Radius.circular(h / 2)), p);
+    canvas.drawCircle(o.translate(-w * 0.12, -h * 0.35), h * 0.5, p);
+    canvas.drawCircle(o.translate(w * 0.10, -h * 0.5), h * 0.62, p);
+  }
+
+  void _sparkle(Canvas canvas, Offset c, double r, Color color) {
+    final path = Path()
+      ..moveTo(c.dx, c.dy - r)
+      ..quadraticBezierTo(c.dx, c.dy, c.dx + r, c.dy)
+      ..quadraticBezierTo(c.dx, c.dy, c.dx, c.dy + r)
+      ..quadraticBezierTo(c.dx, c.dy, c.dx - r, c.dy)
+      ..quadraticBezierTo(c.dx, c.dy, c.dx, c.dy - r);
+    canvas.drawPath(path, Paint()..color = color);
+  }
+
+  @override
+  bool shouldRepaint(WorldMotionPainter old) => old.world != world;
 }
 
 /// Draws one world. Public so tests can paint it directly.

@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show AssetBundle;
 import 'package:flutter_tts/flutter_tts.dart';
+
+import 'voice_choice.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -57,6 +59,12 @@ abstract class SpeechBackend {
   /// Completes when the text has been spoken or [stop] was called.
   Future<void> speak(String text, {String lang = 'ar', double rate = 1.0});
   Future<void> stop();
+
+  /// The voices this engine offers for [lang], best first. Engines that cannot list voices return an empty list.
+  Future<List<VoiceInfo>> voices(String lang) async => const [];
+
+  /// Uses the voice called [name] for [lang] from now on (null = the best one automatically).
+  Future<void> preferVoice(String lang, String? name) async {}
 }
 
 class TtsSpeech implements SpeechBackend {
@@ -104,9 +112,17 @@ class TtsSpeech implements SpeechBackend {
     final locale = await _localeFor(lang);
     if (locale == null) throw StateError('No $lang voice on this device');
     await _tts.setLanguage(locale);
-    // flutter_tts: about 0.5 is a normal speed on Android.
-    await _tts.setSpeechRate((0.5 * rate).clamp(0.2, 0.9));
-    await _tts.setPitch(1.0);
+    final voice = await _voiceFor(lang);
+    if (voice != null) {
+      try {
+        await _tts.setVoice(voice.toEngineMap());
+      } catch (_) {
+        // A voice that cannot be set: the engine keeps its default for this language.
+      }
+    }
+    // Slightly slower than adult speed, and a touch warmer: easier for a young child to follow.
+    await _tts.setSpeechRate((kChildSpeechRate * rate).clamp(0.2, 0.9));
+    await _tts.setPitch(kChildSpeechPitch);
     await _tts.speak(text);
   }
 
@@ -115,6 +131,45 @@ class TtsSpeech implements SpeechBackend {
     try {
       await _tts.stop();
     } catch (_) {}
+  }
+
+  final Map<String, String?> _preferred = {};
+  final Map<String, List<VoiceInfo>> _voiceCache = {};
+
+  Future<List<VoiceInfo>> _allVoices(String lang) async {
+    final cached = _voiceCache[lang];
+    if (cached != null) return cached;
+    try {
+      await _init();
+      final raw = await _tts.getVoices;
+      final all = [
+        if (raw is List)
+          for (final m in raw)
+            if (m is Map) VoiceInfo.fromMap(m),
+      ];
+      return _voiceCache[lang] = rankVoices(all, lang);
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  Future<VoiceInfo?> _voiceFor(String lang) async {
+    final all = await _allVoices(lang);
+    final pref = _preferred[lang] ?? (await _storedPreference(lang));
+    return chooseVoice(all, lang, preferredName: pref);
+  }
+
+  Future<String?> _storedPreference(String lang) async {
+    final p = AudioPrefs.instance;
+    return lang == 'ar' ? p.voiceNameAr : (lang == 'en' ? p.voiceNameEn : null);
+  }
+
+  @override
+  Future<List<VoiceInfo>> voices(String lang) => _allVoices(lang);
+
+  @override
+  Future<void> preferVoice(String lang, String? name) async {
+    _preferred[lang] = name ?? '';
   }
 }
 
@@ -244,6 +299,10 @@ class AudioPrefs extends ChangeNotifier {
   /// always labelled as a demo, and never used for isolated letter sounds.
   bool allowDeviceVoice = true;
 
+  /// The voice the parent chose for each language (null/empty = the best installed voice, picked automatically).
+  String? voiceNameAr;
+  String? voiceNameEn;
+
   /// 'none', 'rain', 'waves' or 'wind'.
   String ambient = 'none';
   double ambientVolume = 0.35;
@@ -260,7 +319,30 @@ class AudioPrefs extends ChangeNotifier {
     ambientVolume = p.getDouble('audio_ambient_vol') ?? 0.35;
     storiesInQuietHours = p.getBool('audio_stories_quiet') ?? true;
     allowDeviceVoice = p.getBool('audio_device_voice') ?? true;
+    voiceNameAr = p.getString('audio_voice_ar');
+    voiceNameEn = p.getString('audio_voice_en');
     notifyListeners();
+  }
+
+  /// Saves the parent's voice choice for [lang] ('ar' or 'en'); null goes back to automatic.
+  Future<void> setVoiceName(String lang, String? name) async {
+    final clean = (name == null || name.isEmpty) ? null : name;
+    if (lang == 'ar') {
+      voiceNameAr = clean;
+    } else if (lang == 'en') {
+      voiceNameEn = clean;
+    } else {
+      return;
+    }
+    await AppAudio.speech.preferVoice(lang, clean);
+    notifyListeners();
+    final p = await SharedPreferences.getInstance();
+    final key = 'audio_voice_$lang';
+    if (clean == null) {
+      await p.remove(key);
+    } else {
+      await p.setString(key, clean);
+    }
   }
 
   Future<void> update({
