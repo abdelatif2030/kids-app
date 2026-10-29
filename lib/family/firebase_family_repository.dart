@@ -49,6 +49,7 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
         status: (d['status'] as String?) ?? kRelativePending,
         children: _strMap(d['children']),
         callsOn: d['calls'] == true,
+        nextCall: (d['nextCall'] as String?) ?? '',
       );
 
   /// 8 characters without look-alikes (no 0/O, 1/I). Single use, so guessing is not a risk.
@@ -83,6 +84,12 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
 
   @override
   Future<void> setRelativeCalls(String relUid, bool on) => _guard(() => _rels(uid!).doc(relUid).update({'calls': on}));
+
+  @override
+  Future<void> setRelativeNextCall(String relUid, String text) {
+    if (text.length > kMaxNextCallLength || containsLink(text)) throw FamilyException(tr2('النص طويل أو فيه رابط', 'Too long, or it has a link'));
+    return _guard(() => _rels(uid!).doc(relUid).update({'nextCall': text.trim()}));
+  }
 
   @override
   Future<void> setRelativeChildren(String relUid, Map<String, String> children) => _guard(() => _rels(uid!).doc(relUid).update({'children': children}));

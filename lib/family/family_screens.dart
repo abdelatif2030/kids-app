@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import '../design/components.dart';
 import '../design/layout.dart';
 import '../design/tokens.dart';
+import '../games/game_common.dart' show GameRewards;
+import '../journey/models.dart' show dayKeyOf;
 import '../journey/repository.dart';
 import '../l10n/strings.dart';
 import 'call_models.dart';
@@ -11,6 +13,7 @@ import 'call_repository.dart';
 import 'call_screens.dart';
 import 'family_models.dart';
 import 'family_prefs.dart';
+import 'family_seen.dart';
 import 'family_repository.dart';
 
 String _err(Object e) => e is FamilyException ? e.message : tr2('تعذّر إكمال العملية، حاول مرة أخرى', 'Something went wrong, please try again');
@@ -126,6 +129,7 @@ class _FamilyParentScreenState extends State<FamilyParentScreen> {
                     onStatus: (s) => _do(() => widget.repo.setRelativeStatus(r.uid, s)),
                     onChildren: (c) => _do(() => widget.repo.setRelativeChildren(r.uid, c)),
                     onCalls: (on) => _do(() => widget.repo.setRelativeCalls(r.uid, on)),
+                    onNextCall: (t) => _do(() => widget.repo.setRelativeNextCall(r.uid, t)),
                     onCall: widget.repo is CallRepository
                         ? (childId, childName) => startCallScreen(
                               context,
@@ -156,6 +160,64 @@ class _FamilyParentScreenState extends State<FamilyParentScreen> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// «مكالمة قادمة»: a short note such as "Friday 6 pm", shown to the child and to the relative. It is only a note:
+/// nothing rings by itself and no reminder is sent.
+class _NextCallRow extends StatelessWidget {
+  final Relative rel;
+  final ValueChanged<String> onSave;
+  const _NextCallRow({required this.rel, required this.onSave});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      key: ValueKey('nextcall_${rel.uid}'),
+      contentPadding: EdgeInsets.zero,
+      leading: const Icon(Icons.event_rounded),
+      title: Text(tr2('مكالمة قادمة', 'Next call')),
+      subtitle: Text(rel.nextCall.isEmpty ? tr2('لا يوجد موعد. اضغط للإضافة.', 'No time set. Tap to add one.') : rel.nextCall),
+      onTap: () async {
+        final text = await showDialog<String>(context: context, builder: (_) => _NextCallDialog(initial: rel.nextCall));
+        if (text != null) onSave(text);
+      },
+    );
+  }
+}
+
+class _NextCallDialog extends StatefulWidget {
+  final String initial;
+  const _NextCallDialog({required this.initial});
+
+  @override
+  State<_NextCallDialog> createState() => _NextCallDialogState();
+}
+
+class _NextCallDialogState extends State<_NextCallDialog> {
+  late final _c = TextEditingController(text: widget.initial);
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(tr2('موعد المكالمة القادمة', 'Time of the next call')),
+      content: TextField(
+        key: const ValueKey('nextcall_field'),
+        controller: _c,
+        maxLength: kMaxNextCallLength,
+        decoration: InputDecoration(hintText: tr2('مثلاً: الجمعة ٦ مساءً', 'For example: Friday 6 pm')),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: Text(tr2('إلغاء', 'Cancel'))),
+        FilledButton(key: const ValueKey('nextcall_save'), onPressed: () => Navigator.pop(context, _c.text), child: Text(tr2('حفظ', 'Save'))),
+      ],
     );
   }
 }
@@ -243,7 +305,8 @@ class _RelativeCard extends StatelessWidget {
   final ValueChanged<Map<String, String>> onChildren;
   final ValueChanged<bool> onCalls;
   final void Function(String childId, String childName)? onCall;
-  const _RelativeCard({super.key, required this.rel, required this.onStatus, required this.onChildren, required this.onCalls, this.onCall});
+  final ValueChanged<String> onNextCall;
+  const _RelativeCard({super.key, required this.rel, required this.onStatus, required this.onChildren, required this.onCalls, this.onCall, required this.onNextCall});
 
   String get _statusText => switch (rel.status) {
         kRelativePending => tr2('بانتظار موافقتك', 'Waiting for your approval'),
@@ -261,6 +324,8 @@ class _RelativeCard extends StatelessWidget {
           Text('${rel.name} · ${relationLabel(rel.relation)}', style: DS.heading),
           Text(_statusText, key: ValueKey('status_${rel.uid}'), style: DS.caption),
           if (rel.children.isNotEmpty) Text(tr2('يتكلم مع: ', 'Talks with: ') + rel.children.values.join('، '), style: DS.caption),
+          if (rel.active)
+            _NextCallRow(rel: rel, onSave: onNextCall),
           if (rel.active && onCall != null) ...[
             SwitchListTile(
               key: ValueKey('calls_${rel.uid}'),
@@ -449,7 +514,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
 
 /// Who a child may talk to: the active relatives linked to this child. Opened from the child home only when the
 /// parent turned chat on for this child.
-class ChildFamilyScreen extends StatelessWidget {
+class ChildFamilyScreen extends StatefulWidget {
   final FamilyRepository repo;
   final String familyId;
   final String childId;
@@ -457,30 +522,83 @@ class ChildFamilyScreen extends StatelessWidget {
   const ChildFamilyScreen({super.key, required this.repo, required this.familyId, required this.childId, required this.childName});
 
   @override
+  State<ChildFamilyScreen> createState() => _ChildFamilyScreenState();
+}
+
+class _ChildFamilyScreenState extends State<ChildFamilyScreen> {
+  late Future<FamilyOverview> _overview = loadFamilyOverview(widget.repo, widget.childId);
+  bool _win = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkWin();
+  }
+
+  /// "I finished a lesson today" can be shared only when it is true (a finished activity or game today).
+  Future<void> _checkWin() async {
+    final day = dayKeyOf(DateTime.now());
+    final planDone = JourneyStore.instance.todayPlan(widget.childId).any((p) => p.doneToday);
+    final games = await GameRewards.doneOn(widget.childId, day);
+    if (mounted) setState(() => _win = planDone || games.isNotEmpty);
+  }
+
+  void _reload() {
+    final next = loadFamilyOverview(widget.repo, widget.childId);
+    setState(() {
+      _overview = next;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(tr2('عائلتي', 'My family'))),
-      body: FutureBuilder<List<Relative>>(
-        future: repo.relatives(),
+      body: FutureBuilder<FamilyOverview>(
+        future: _overview,
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
-          final mine = [for (final r in snap.data ?? const <Relative>[]) if (r.active && r.children.containsKey(childId)) r];
+          if (snap.hasError) return ErrorState(message: _err(snap.error!), onRetry: _reload);
+          final mine = snap.data!.contacts;
           if (mine.isEmpty) {
             return EmptyState(icon: Icons.family_restroom_rounded, title: tr2('لا يوجد أحد هنا بعد', 'Nobody here yet'), message: tr2('اطلب من ماما أو بابا.', 'Ask your parent.'));
           }
           return CenteredList(padding: const EdgeInsets.all(16), children: [
-            for (final r in mine)
+            for (final c in mine)
               Card(
                 child: ListTile(
-                  key: ValueKey('talk_${r.uid}'),
-                  minTileHeight: 72,
-                  leading: const Icon(Icons.favorite_rounded, color: DS.error),
-                  title: Text(relationLabel(r.relation), style: DS.heading),
-                  subtitle: Text(r.name),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => ChatScreen(repo: repo, familyId: familyId, childId: childId, childName: childName, relUid: r.uid, as: Side.child, title: relationLabel(r.relation))),
-                  ),
+                  key: ValueKey('talk_${c.rel.uid}'),
+                  minTileHeight: 84,
+                  leading: Stack(clipBehavior: Clip.none, children: [
+                    CircleAvatar(radius: 26, backgroundColor: DS.primarySoft, child: Text(relationEmoji(c.rel.relation), style: const TextStyle(fontSize: 28))),
+                    if (c.unread > 0)
+                      PositionedDirectional(
+                        top: -4,
+                        end: -4,
+                        child: Container(
+                          key: ValueKey('unread_${c.rel.uid}'),
+                          constraints: const BoxConstraints(minWidth: 22, minHeight: 22),
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          decoration: BoxDecoration(color: const Color(0xFFE53935), borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.white, width: 2)),
+                          alignment: Alignment.center,
+                          child: Text(c.unread > 9 ? '9+' : '${c.unread}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12)),
+                        ),
+                      ),
+                  ]),
+                  title: Text(relationLabel(c.rel.relation), style: DS.heading.copyWith(fontWeight: c.unread > 0 ? FontWeight.w900 : FontWeight.w700)),
+                  subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(c.last == null ? c.rel.name : '${c.last!.from == Side.child ? tr2('أنت: ', 'You: ') : ''}${c.last!.shown}', maxLines: 1, overflow: TextOverflow.ellipsis),
+                    if (c.rel.nextCall.isNotEmpty) Text('📅 ${c.rel.nextCall}', key: ValueKey('next_${c.rel.uid}'), style: DS.caption),
+                  ]),
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChatScreen(repo: widget.repo, familyId: widget.familyId, childId: widget.childId, childName: widget.childName, relUid: c.rel.uid, as: Side.child, title: relationLabel(c.rel.relation), canShareWin: _win),
+                      ),
+                    );
+                    _reload();
+                  },
                 ),
               ),
           ]);
@@ -490,6 +608,16 @@ class ChildFamilyScreen extends StatelessWidget {
   }
 }
 
+String relationEmoji(String r) => switch (r) {
+      'grandma' => '👵',
+      'grandpa' => '👴',
+      'aunt' => '👩',
+      'uncle' => '👨',
+      'father' => '🧔',
+      'mother' => '👩',
+      _ => '🧑',
+    };
+
 class ChatScreen extends StatefulWidget {
   final FamilyRepository repo;
   final String familyId;
@@ -498,6 +626,9 @@ class ChatScreen extends StatefulWidget {
   final String relUid;
   final Side as;
   final String title;
+
+  /// Offers «أنهيت درساً اليوم» (only when the child really finished something today).
+  final bool canShareWin;
   const ChatScreen({
     super.key,
     required this.repo,
@@ -507,6 +638,7 @@ class ChatScreen extends StatefulWidget {
     required this.relUid,
     required this.as,
     required this.title,
+    this.canShareWin = false,
   });
 
   @override
@@ -579,6 +711,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 stream: widget.repo.watch(familyId: widget.familyId, childId: widget.childId, relUid: widget.relUid),
                 builder: (context, snap) {
                   final msgs = snap.data ?? const <FamilyMessage>[];
+                  if (widget.as == Side.child && msgs.isNotEmpty) {
+                    // The child is looking at this conversation, so the new-message count goes away.
+                    FamilySeen.markSeen(threadIdOf(widget.childId, widget.relUid), msgs.last.at);
+                  }
                   if (msgs.isEmpty) {
                     return Center(child: Text(tr2('قل مرحباً! 👋', 'Say hello! 👋'), style: DS.heading));
                   }
@@ -602,7 +738,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             if (_error != null) Padding(padding: const EdgeInsets.all(8), child: Text(_error!, key: const ValueKey('chat_error'), style: DS.body.copyWith(color: DS.error))),
-            _Composer(typing: _typing, sending: _sending, controller: _text, onSend: _send),
+            _Composer(typing: _typing, sending: _sending, controller: _text, onSend: _send, phrases: phrasesFor(DateTime.now(), includeWin: widget.canShareWin && widget.as == Side.child)),
           ]),
         ),
       ),
@@ -615,7 +751,8 @@ class _Composer extends StatelessWidget {
   final bool sending;
   final TextEditingController controller;
   final Future<void> Function(String kind, String body) onSend;
-  const _Composer({required this.typing, required this.sending, required this.controller, required this.onSend});
+  final List<String> phrases;
+  const _Composer({required this.typing, required this.sending, required this.controller, required this.onSend, required this.phrases});
 
   @override
   Widget build(BuildContext context) {
@@ -639,7 +776,7 @@ class _Composer extends StatelessWidget {
         SizedBox(
           height: 56,
           child: ListView(scrollDirection: Axis.horizontal, children: [
-            for (final p in kPhrases)
+            for (final p in phrases)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: ActionChip(
@@ -762,6 +899,7 @@ class _RelativeFamily extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(tr2('عائلة $parentName', '$parentName’s family'), style: DS.heading),
+              if (me != null && me.nextCall.isNotEmpty) Text('📅 ${me.nextCall}', key: const ValueKey('relative_next_call'), style: DS.caption),
               if (me == null || !me.active)
                 Text(tr2('بانتظار الموافقة', 'Waiting for approval'), key: const ValueKey('waiting'), style: DS.caption)
               else ...[

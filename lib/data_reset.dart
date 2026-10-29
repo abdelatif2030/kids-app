@@ -1,4 +1,5 @@
 import 'family/family_prefs.dart';
+import 'family/family_seen.dart';
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,6 +32,7 @@ Future<void> deleteChildData() async {
         key == 'feeling_log' ||
         key == 'favorites' ||
         key == 'family_prefs' ||
+        key == 'family_seen' ||
         key.startsWith('child_photo_') ||
         key.startsWith('used_') ||
         key.startsWith('bonus_') ||
@@ -74,6 +76,7 @@ Future<void> deleteOneChild(String childId) async {
   await FeelingStore.forget(childId);
   await FavoritesStore.forget(childId);
   await FamilyPrefs.forget(childId);
+  await FamilySeen.forget(childId);
   await JourneyStore.instance.deleteProfile(childId);
 }
 

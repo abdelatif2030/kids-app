@@ -1402,3 +1402,20 @@ The six learning games under Games > Learning games.
 - **Status:** Not tested
 - **Device or environment:** Devices, browsers, networks: 
 - **Notes:** 
+
+### F3 - Family button, unread count and next-call note
+
+- [ ] Not tested
+- **Test ID:** F3
+- **Preconditions:** F1 passed, rules re-published, chat on for a child.
+- **Steps:**
+  1. Open the child's home: the round bubble with a heart is in the header, with no number.
+  2. As the relative, send two messages. Wait up to 20 s on the child home (or reopen it): a red 2 appears on the bubble.
+  3. Tap the bubble: the contact shows the last message and a badge. Open the chat: back on the list the badge is gone.
+  4. Parent: in Family chat set «مكالمة قادمة» to "Friday 6 pm" for the relative. Child list and relative screen show it.
+  5. In the child's chat, «أنهيت درساً اليوم» appears only after finishing a lesson or game that day.
+- **Expected result:** As described; nothing rings and no notification is sent.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browser and OS: 
+- **Notes:** 

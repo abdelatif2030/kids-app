@@ -78,3 +78,21 @@ One in-memory server holds a demo parent and a demo relative («Nana»). No sign
 restart (the per-child switches are saved locally as usual). Steps: Parent settings -> «عائلتي: المحادثات» -> invite ->
 copy the code -> back to the first screen -> «أنا من العائلة» -> enter the code -> back as parent -> Approve -> switch
 chat on for the child -> open the child -> More -> «عائلتي» -> send. Then «أنا من العائلة» to answer as Nana.
+
+## Home button and related ideas (2026-10-29)
+- **Family button on the child home**: a round gradient speech bubble with a heart (drawn in code; our own mark, not a
+  copy of another app's logo) in the home header, with a red count of new messages. Shown only when the parent switched
+  chat on for that child and the service is connected. It checks for new messages every 20 s while the home is open
+  (reads only; there are no notifications).
+- **Contacts list** («عائلتي»): a card per approved relative with an avatar, the last message, a new-message badge and
+  the next-call note. Conversations with something new come first. What the child has seen is stored on the device
+  only (`family_seen`); it is removed with the child's data.
+- **Phrases follow the time of day**: «صباح الخير» in the morning, «تصبح على خير» at night, plus new phrases (how are
+  you, tell me a story, sorry, a hug).
+- **Share a win**: «أنهيت درساً اليوم! ⭐» is offered ONLY when the child really finished a lesson or a game today. It is a
+  choice, never a reminder and never a reward.
+- **Next call note** («مكالمة قادمة»): the parent writes a short note such as "Friday 6 pm" for each relative; the child and
+  the relative see it. It is only a note: nothing rings and no reminder is sent.
+- Ideas not built (and why): message reactions and read receipts (more server rules and more pressure to answer),
+  voice messages (would record a child's voice), photo sharing (moderation risk), push notifications (needs a package
+  and a privacy decision), a daily "ask Nana" prompt (could feel like an obligation).

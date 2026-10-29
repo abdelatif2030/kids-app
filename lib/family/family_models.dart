@@ -5,6 +5,7 @@ import '../l10n/strings.dart';
 /// the parent's signed-in device. See docs/FAMILY_CHAT_DESIGN.md.
 
 const kMaxTextLength = 200;
+const kMaxNextCallLength = 60;
 
 /// Kinds of message. Young children only send `phrase` and `sticker` (no typing); `text` is off unless the
 /// parent turns it on for that child.
@@ -30,7 +31,19 @@ String relationLabel(String r) => switch (r) {
     };
 
 /// Ready-made sentences a child can send by tapping. Each side shows them in its own language.
-const kPhrases = ['p_hello', 'p_miss', 'p_love', 'p_thanks', 'p_play', 'p_goodnight', 'p_call'];
+const kPhrases = [
+  'p_hello', 'p_goodmorning', 'p_howareyou', 'p_miss', 'p_love', 'p_thanks', 'p_play', 'p_story', 'p_goodnight', 'p_call', 'p_win', 'p_sorry', 'p_hug',
+];
+
+/// Offered only after the child really finished something today (never as a reminder or a reward).
+const kWinPhrase = 'p_win';
+
+/// Phrases in a sensible order for the time of day: «صباح الخير» in the morning, «تصبح على خير» at night.
+List<String> phrasesFor(DateTime now, {bool includeWin = false}) {
+  final first = (now.hour >= 19 || now.hour < 5) ? 'p_goodnight' : (now.hour < 11 ? 'p_goodmorning' : 'p_howareyou');
+  final rest = [for (final p in kPhrases) if (p != first && (includeWin || p != kWinPhrase)) p];
+  return [first, ...rest];
+}
 
 String phraseText(String id) => switch (id) {
       'p_hello' => tr2('مرحباً! 👋', 'Hello! 👋'),
@@ -40,6 +53,12 @@ String phraseText(String id) => switch (id) {
       'p_play' => tr2('تعالَ نلعب!', 'Let us play!'),
       'p_goodnight' => tr2('تصبح على خير 🌙', 'Good night 🌙'),
       'p_call' => tr2('هل نتكلم قريباً؟', 'Can we talk soon?'),
+      'p_goodmorning' => tr2('صباح الخير ☀', 'Good morning ☀'),
+      'p_howareyou' => tr2('كيف حالك؟', 'How are you?'),
+      'p_story' => tr2('احكِ لي حكاية!', 'Tell me a story!'),
+      'p_win' => tr2('أنهيت درساً اليوم! ⭐', 'I finished a lesson today! ⭐'),
+      'p_sorry' => tr2('آسف، سامحني', 'I am sorry'),
+      'p_hug' => tr2('أرسل لك حضناً 🤗', 'Sending you a hug 🤗'),
       _ => '',
     };
 
@@ -56,6 +75,9 @@ class Relative {
 
   /// Voice calls with this relative: OFF until the parent turns it on.
   final bool callsOn;
+
+  /// A short note from the parent about the next planned call, for example "Friday 6 pm". Empty if none.
+  final String nextCall;
   const Relative({
     required this.uid,
     required this.name,
@@ -63,17 +85,19 @@ class Relative {
     required this.status,
     this.children = const {},
     this.callsOn = false,
+    this.nextCall = '',
   });
 
   bool get active => status == kRelativeActive;
 
-  Relative copyWith({String? status, Map<String, String>? children, bool? callsOn}) => Relative(
+  Relative copyWith({String? status, Map<String, String>? children, bool? callsOn, String? nextCall}) => Relative(
         uid: uid,
         name: name,
         relation: relation,
         status: status ?? this.status,
         children: children ?? this.children,
         callsOn: callsOn ?? this.callsOn,
+        nextCall: nextCall ?? this.nextCall,
       );
 }
 

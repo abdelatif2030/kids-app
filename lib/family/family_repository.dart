@@ -21,6 +21,9 @@ abstract class FamilyRepository {
   Future<void> setRelativeStatus(String relUid, String status);
   /// Turns voice calls with this relative on or off. Off by default.
   Future<void> setRelativeCalls(String relUid, bool on);
+
+  /// A short note about the next planned call (<= 60 characters; empty clears it). Parent only.
+  Future<void> setRelativeNextCall(String relUid, String text);
   Future<void> setRelativeChildren(String relUid, Map<String, String> children);
 
   // --- relative side ---------------------------------------------------------

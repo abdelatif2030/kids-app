@@ -50,6 +50,14 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   }
 
   @override
+  Future<void> setRelativeNextCall(String relUid, String text) async {
+    final r = _mine(uid!)[relUid];
+    if (r == null) throw const FamilyException('not found');
+    if (text.length > kMaxNextCallLength || containsLink(text)) throw const FamilyException('invalid');
+    _mine(uid!)[relUid] = r.copyWith(nextCall: text.trim());
+  }
+
+  @override
   Future<void> setRelativeChildren(String relUid, Map<String, String> children) async {
     final r = _mine(uid!)[relUid];
     if (r == null) throw const FamilyException('not found');

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/family/family_bubble.dart';
 import 'package:kids_app/family/family_models.dart';
 import 'package:kids_app/firebase_config.dart';
 import 'package:kids_app/journey/ui/start_screen.dart';
@@ -119,11 +120,12 @@ void main() {
     await t.pumpWidget(_app(ChatScreen(repo: parent, familyId: 'p1', childId: 'c1', childName: 'Lina', relUid: 'g1', as: Side.child, title: 'Grandmother')));
     await _settle(t);
     expect(find.byKey(const ValueKey('chat_text')), findsNothing);
-    await t.tap(find.byKey(const ValueKey('phrase_p_love')));
+    final first = phrasesFor(DateTime.now()).first; // the first chip is always on screen
+    await t.tap(find.byKey(ValueKey('phrase_$first')));
     await _settle(t);
     await t.tap(find.byKey(const ValueKey('sticker_🎉')));
     await _settle(t);
-    expect(find.text('I love you ❤'), findsNWidgets(2)); // the chip and the message in the chat
+    expect(find.text(phraseText(first)), findsWidgets); // the message in the chat (and the chip)
     expect(server.messages['p1']!.length, 2);
   });
 
@@ -181,5 +183,95 @@ void main() {
     await t.pumpWidget(_app(const StartScreen()));
     await _settle(t);
     expect(find.byKey(const ValueKey('i_am_family_welcome')), findsOneWidget);
+  });
+
+  group('messenger-style button and contacts', () {
+    Future<void> approvedWithMessages() async {
+      await linked();
+      await grandma.send(familyId: 'p1', childId: 'c1', childName: 'Lina', relUid: 'g1', from: Side.relative, kind: kindText, body: 'Hello my star');
+      await grandma.send(familyId: 'p1', childId: 'c1', childName: 'Lina', relUid: 'g1', from: Side.relative, kind: kindSticker, body: '🎉');
+    }
+
+    testWidgets('the bubble is hidden until the parent turns chat on, then shows the number of new messages', (t) async {
+      big(t);
+      await approvedWithMessages();
+      familyRepository = parent;
+      addTearDown(() => familyRepository = null);
+      await t.pumpWidget(_app(const Scaffold(body: Center(child: FamilyBubbleButton(child: _kid)))));
+      await _settle(t);
+      expect(find.byKey(const ValueKey('family_bubble')), findsNothing); // chat is off for this child
+
+      await t.runAsync(() => FamilyPrefs.save('c1', const ChildChatPrefs(chatOn: true)));
+      await t.pumpWidget(_app(const Scaffold(body: Center(child: FamilyBubbleButton(child: _kid)))));
+      await _settle(t);
+      expect(find.byKey(const ValueKey('family_bubble')), findsOneWidget);
+      expect(find.descendant(of: find.byKey(const ValueKey('family_unread')), matching: find.text('2')), findsOneWidget);
+      await t.pumpWidget(const SizedBox()); // stop its timer
+    });
+
+    testWidgets('the contacts list shows the last message and the unread count; opening the chat clears it', (t) async {
+      big(t);
+      await approvedWithMessages();
+      await parent.setRelativeNextCall('g1', 'Friday 6 pm');
+      await t.pumpWidget(_app(ChildFamilyScreen(repo: parent, familyId: 'p1', childId: 'c1', childName: 'Lina')));
+      await _settle(t);
+      expect(find.byKey(const ValueKey('unread_g1')), findsOneWidget);
+      expect(find.text('🎉'), findsOneWidget); // the last message preview
+      expect(find.byKey(const ValueKey('next_g1')), findsOneWidget);
+      expect(find.textContaining('Friday 6 pm'), findsOneWidget);
+
+      await t.tap(find.byKey(const ValueKey('talk_g1')));
+      await _settle(t);
+      await t.pageBack();
+      await _settle(t);
+      await _settle(t);
+      expect(find.byKey(const ValueKey('unread_g1')), findsNothing);
+    });
+
+    test('phrases follow the time of day, and the win phrase is never offered unless it is true', () {
+      expect(phrasesFor(DateTime(2026, 1, 1, 8)).first, 'p_goodmorning');
+      expect(phrasesFor(DateTime(2026, 1, 1, 14)).first, 'p_howareyou');
+      expect(phrasesFor(DateTime(2026, 1, 1, 21)).first, 'p_goodnight');
+      expect(phrasesFor(DateTime(2026, 1, 1, 2)).first, 'p_goodnight');
+      expect(phrasesFor(DateTime(2026, 1, 1, 9)), isNot(contains(kWinPhrase)));
+      expect(phrasesFor(DateTime(2026, 1, 1, 9), includeWin: true), contains(kWinPhrase));
+      for (final p in kPhrases) {
+        expect(validateMessage(kindPhrase, p), isNull);
+        expect(phraseText(p), isNotEmpty);
+        expect(RegExp(r'^p_[a-z]+$').hasMatch(p), true, reason: '$p must match the server rule');
+      }
+    });
+
+    testWidgets('the win phrase appears in the chat only when the child finished something today', (t) async {
+      big(t);
+      await linked();
+      Future<void> open(bool win) async {
+        await t.pumpWidget(_app(ChatScreen(repo: parent, familyId: 'p1', childId: 'c1', childName: 'Lina', relUid: 'g1', as: Side.child, title: 'x', canShareWin: win)));
+        await _settle(t);
+      }
+
+      await open(false);
+      expect(find.byKey(const ValueKey('phrase_p_win')), findsNothing);
+      await open(true);
+      await t.scrollUntilVisible(find.byKey(const ValueKey('phrase_p_win')), 200, scrollable: find.byType(Scrollable).last);
+      expect(find.byKey(const ValueKey('phrase_p_win')), findsOneWidget);
+    });
+
+    testWidgets('the parent sets a next-call note; the relative sees it', (t) async {
+      big(t);
+      await linked();
+      await t.pumpWidget(_app(FamilyParentScreen(repo: parent, parentName: 'Sara')));
+      await _settle(t);
+      await t.tap(find.byKey(const ValueKey('nextcall_g1')));
+      await t.pumpAndSettle();
+      await t.enterText(find.byKey(const ValueKey('nextcall_field')), 'Friday 6 pm');
+      await t.tap(find.byKey(const ValueKey('nextcall_save')));
+      await _settle(t);
+      expect(find.text('Friday 6 pm'), findsOneWidget);
+
+      await t.pumpWidget(_app(RelativeHomeScreen(repo: grandma, name: 'Nana')));
+      await _settle(t);
+      expect(find.byKey(const ValueKey('relative_next_call')), findsOneWidget);
+    });
   });
 }

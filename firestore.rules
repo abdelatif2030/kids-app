@@ -412,9 +412,11 @@ service cloud.firestore {
         && request.resource.data.children == get(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.children;
       // Only the parent decides: approve, pause, resume, remove, or change who the relative may talk with.
       allow update: if signedIn() && request.auth.uid == fid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'children', 'calls'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'children', 'calls', 'nextCall'])
         && request.resource.data.status in ['active', 'paused', 'removed']
-        && request.resource.data.get('calls', false) is bool;
+        && request.resource.data.get('calls', false) is bool
+        && request.resource.data.get('nextCall', '').size() <= 60
+        && !request.resource.data.get('nextCall', '').matches('(?i).*(https?:|www\\.|://|\\.com|\\.net|\\.org|@).*');
       allow delete: if false;
     }
 

@@ -624,3 +624,15 @@ test('calls: network candidates are written by the right side only and kept smal
   await assertSucceeds(getDocs(collection(as('r1'), 'families', 'p1', 'calls', 'k1', 'candidates')));
   await assertFails(getDocs(collection(as('r2'), 'families', 'p1', 'calls', 'k1', 'candidates')));
 });
+
+test('family: the parent can set a short next-call note; nobody else; no links; not too long', async () => {
+  await seedRelative('r1', 'active');
+  const ref = (db) => doc(db, 'families', 'p1', 'relatives', 'r1');
+  await assertSucceeds(updateDoc(ref(as('p1')), { nextCall: 'Friday 6 pm' }));
+  await assertSucceeds(updateDoc(ref(as('p1')), { nextCall: '' }));
+  await assertFails(updateDoc(ref(as('r1')), { nextCall: 'now' }));
+  await assertFails(updateDoc(ref(as('p2')), { nextCall: 'now' }));
+  await assertFails(updateDoc(ref(as('p1')), { nextCall: 'x'.repeat(61) }));
+  await assertFails(updateDoc(ref(as('p1')), { nextCall: 'see https://x.y' }));
+  await assertFails(updateDoc(ref(as('p1')), { nextCall: 'mail a@b.c' }));
+});
