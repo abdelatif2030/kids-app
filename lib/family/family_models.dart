@@ -101,6 +101,49 @@ class Relative {
       );
 }
 
+const kRequestPending = 'pending';
+const kRequestAccepted = 'accepted';
+const kRequestDeclined = 'declined';
+const kRequestCancelled = 'cancelled';
+
+/// A parent asks someone (by the e-mail they registered with) to be able to talk with the parent's children.
+/// The person sees it in the app and accepts or declines. Nothing is possible before they accept.
+class ConnectRequest {
+  final String id;
+  final String familyId;
+  final String parentName;
+  final String toEmail;
+  final String relation;
+  final Map<String, String> children;
+  final String status;
+  const ConnectRequest({
+    required this.id,
+    required this.familyId,
+    required this.parentName,
+    required this.toEmail,
+    required this.relation,
+    this.children = const {},
+    this.status = kRequestPending,
+  });
+
+  bool get pending => status == kRequestPending;
+
+  ConnectRequest copyWith({String? status}) => ConnectRequest(
+        id: id,
+        familyId: familyId,
+        parentName: parentName,
+        toEmail: toEmail,
+        relation: relation,
+        children: children,
+        status: status ?? this.status,
+      );
+}
+
+/// E-mails are compared in lower case and without spaces.
+String normalizeEmail(String s) => s.trim().toLowerCase();
+
+bool looksLikeEmail(String s) => RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(normalizeEmail(s));
+
 class FamilyInvite {
   final String code;
   final String familyId;

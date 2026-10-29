@@ -390,6 +390,30 @@ service cloud.firestore {
       allow delete: if signedIn() && resource.data.familyId == request.auth.uid;
     }
 
+    // connectRequests/{id}: a parent asks someone (by e-mail) to talk with the parent's children. Only that person
+    // and the parent can read it; the person accepts or declines; the parent can cancel while it waits.
+    match /connectRequests/{id} {
+      allow read: if signedIn()
+        && (resource.data.familyId == request.auth.uid
+            || (role() == 'relative' && resource.data.toEmail == request.auth.token.email.lower()));
+      allow create: if signedIn() && role() == 'parent'
+        && request.resource.data.keys().hasOnly(['familyId', 'parentName', 'toEmail', 'relation', 'children', 'status', 'createdAt'])
+        && request.resource.data.familyId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.parentName.size() <= 40
+        && request.resource.data.toEmail.size() <= 120
+        && request.resource.data.toEmail.matches('^[^@ ]+@[^@ ]+\\.[^@ ]+$')
+        && request.resource.data.toEmail == request.resource.data.toEmail.lower()
+        && request.resource.data.children.size() >= 1 && request.resource.data.children.size() <= 10
+        && request.resource.data.createdAt == request.time;
+      allow update: if signedIn() && resource.data.status == 'pending'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && ((resource.data.familyId == request.auth.uid && request.resource.data.status == 'cancelled')
+            || (role() == 'relative' && resource.data.toEmail == request.auth.token.email.lower()
+                && request.resource.data.status in ['accepted', 'declined']));
+      allow delete: if false;
+    }
+
     // A relative's own list of families they joined (a pointer; it grants nothing).
     match /users/{uid}/families/{fid} {
       allow read, delete: if signedIn() && request.auth.uid == uid;
@@ -410,6 +434,18 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.used == false
         && request.resource.data.relation == get(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.relation
         && request.resource.data.children == get(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.children;
+      // Joining by accepting a request the parent sent to this person's e-mail. The same batch must mark the
+      // request accepted, so a request cannot be used twice or by someone else.
+      allow create: if signedIn() && request.auth.uid == rel && role() == 'relative'
+        && request.resource.data.keys().hasOnly(['name', 'relation', 'status', 'children', 'requestId'])
+        && request.resource.data.status == 'active'
+        && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 40
+        && get(/databases/$(database)/documents/connectRequests/$(request.resource.data.requestId)).data.familyId == fid
+        && get(/databases/$(database)/documents/connectRequests/$(request.resource.data.requestId)).data.status == 'pending'
+        && get(/databases/$(database)/documents/connectRequests/$(request.resource.data.requestId)).data.toEmail == request.auth.token.email.lower()
+        && request.resource.data.relation == get(/databases/$(database)/documents/connectRequests/$(request.resource.data.requestId)).data.relation
+        && request.resource.data.children == get(/databases/$(database)/documents/connectRequests/$(request.resource.data.requestId)).data.children
+        && getAfter(/databases/$(database)/documents/connectRequests/$(request.resource.data.requestId)).data.status == 'accepted';
       // Only the parent decides: approve, pause, resume, remove, or change who the relative may talk with.
       allow update: if signedIn() && request.auth.uid == fid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'children', 'calls', 'nextCall'])

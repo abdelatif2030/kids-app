@@ -20,6 +20,12 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
   @override
   String? get uid => _auth.currentUser?.uid;
 
+  @override
+  String? get email {
+    final e = _auth.currentUser?.email;
+    return e == null ? null : normalizeEmail(e);
+  }
+
   CollectionReference<Map<String, dynamic>> _rels(String fid) => _db.collection('families').doc(fid).collection('relatives');
   CollectionReference<Map<String, dynamic>> _msgs(String fid) => _db.collection('families').doc(fid).collection('messages');
 
@@ -71,6 +77,77 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
           'createdAt': FieldValue.serverTimestamp(),
         });
         return FamilyInvite(code: code, familyId: uid!, parentName: parentName, relation: relation, children: children);
+      });
+
+  // --- connection requests -------------------------------------------------------------------------
+  CollectionReference<Map<String, dynamic>> get _requests => _db.collection('connectRequests');
+
+  ConnectRequest _request(String id, Map<String, dynamic> d) => ConnectRequest(
+        id: id,
+        familyId: (d['familyId'] as String?) ?? '',
+        parentName: (d['parentName'] as String?) ?? '',
+        toEmail: (d['toEmail'] as String?) ?? '',
+        relation: (d['relation'] as String?) ?? 'other',
+        children: _strMap(d['children']),
+        status: (d['status'] as String?) ?? kRequestPending,
+      );
+
+  @override
+  Future<ConnectRequest> sendConnectRequest({
+    required String parentName,
+    required String toEmail,
+    required String relation,
+    required Map<String, String> children,
+  }) => _guard(() async {
+        if (!looksLikeEmail(toEmail)) throw FamilyException(tr2('اكتب بريداً إلكترونياً صحيحاً', 'Write a valid e-mail address'));
+        final data = {
+          'familyId': uid!,
+          'parentName': parentName,
+          'toEmail': normalizeEmail(toEmail),
+          'relation': relation,
+          'children': children,
+          'status': kRequestPending,
+          'createdAt': FieldValue.serverTimestamp(),
+        };
+        final ref = await _requests.add(data);
+        return ConnectRequest(id: ref.id, familyId: uid!, parentName: parentName, toEmail: normalizeEmail(toEmail), relation: relation, children: children);
+      });
+
+  @override
+  Future<List<ConnectRequest>> sentRequests() => _guard(() async {
+        final snap = await _requests.where('familyId', isEqualTo: uid).where('status', isEqualTo: kRequestPending).get();
+        return [for (final d in snap.docs) _request(d.id, d.data())];
+      });
+
+  @override
+  Future<void> cancelRequest(String requestId) => _guard(() => _requests.doc(requestId).update({'status': kRequestCancelled}));
+
+  @override
+  Stream<List<ConnectRequest>> watchIncomingRequests() {
+    final mail = email;
+    if (mail == null) return Stream.value(const []);
+    return _requests
+        .where('toEmail', isEqualTo: mail)
+        .where('status', isEqualTo: kRequestPending)
+        .snapshots()
+        .map((s) => [for (final d in s.docs) _request(d.id, d.data())]);
+  }
+
+  @override
+  Future<void> respondToRequest(ConnectRequest request, {required bool accept, required String name}) => _guard(() async {
+        final batch = _db.batch();
+        batch.update(_requests.doc(request.id), {'status': accept ? kRequestAccepted : kRequestDeclined});
+        if (accept) {
+          batch.set(_rels(request.familyId).doc(uid), {
+            'name': name.trim(),
+            'relation': request.relation,
+            'status': kRelativeActive,
+            'children': request.children,
+            'requestId': request.id,
+          });
+          batch.set(_db.collection('users').doc(uid).collection('families').doc(request.familyId), {'parentName': request.parentName});
+        }
+        await batch.commit();
       });
 
   @override

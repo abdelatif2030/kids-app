@@ -39,7 +39,7 @@ void main() {
     JourneyStore.instance = store;
     server = FakeFamilyServer();
     parent = FakeFamilyRepository(server, 'p1');
-    grandma = FakeFamilyRepository(server, 'g1');
+    grandma = FakeFamilyRepository(server, 'g1', email: 'Nana@Test.com');
   });
 
   void big(WidgetTester t) {
@@ -48,7 +48,7 @@ void main() {
     addTearDown(t.view.reset);
   }
 
-  testWidgets('parent invites a relative, approves them, and sees the status change', (t) async {
+  testWidgets('the parent sends a request by e-mail; the relative accepts and is active at once', (t) async {
     big(t);
     await t.pumpWidget(_app(FamilyParentScreen(repo: parent, parentName: 'Sara')));
     await _settle(t);
@@ -56,26 +56,42 @@ void main() {
 
     await t.tap(find.byKey(const ValueKey('invite_relative')));
     await t.pumpAndSettle();
-    await t.tap(find.byKey(const ValueKey('make_code')));
+    await t.tap(find.byKey(const ValueKey('send_request')));
     await t.pump();
-    expect(find.text('Choose at least one child'), findsOneWidget); // a code needs a child
+    expect(find.byKey(const ValueKey('request_error')), findsOneWidget); // no e-mail yet
+    await t.enterText(find.byKey(const ValueKey('request_email')), 'nana@test.com');
+    await t.tap(find.byKey(const ValueKey('send_request')));
+    await t.pump();
+    expect(find.text('Choose at least one child'), findsOneWidget);
     await t.tap(find.byKey(const ValueKey('invite_child_c1')));
-    await t.tap(find.byKey(const ValueKey('make_code')));
+    await t.tap(find.byKey(const ValueKey('send_request')));
     await _settle(t);
-    final code = (t.widget(find.byKey(const ValueKey('invite_code'))) as SelectableText).data!;
-    await t.tap(find.text('Done'));
-    await _settle(t);
+    expect(find.textContaining('Request sent'), findsOneWidget);
+    expect(find.text('nana@test.com'), findsOneWidget); // waiting for an answer
 
-    await grandma.joinWithCode(code, name: 'Nana');
+    // the person answers in their own app
+    final incoming = await t.runAsync(() => grandma.watchIncomingRequests().first);
+    expect(incoming!.single.parentName, 'Sara');
+    await t.runAsync(() => grandma.respondToRequest(incoming.single, accept: true, name: 'Nana'));
     await t.pumpWidget(_app(FamilyParentScreen(repo: parent, parentName: 'Sara')));
     await _settle(t);
-    expect(find.text('Waiting for your approval'), findsOneWidget);
-    await t.tap(find.byKey(const ValueKey('approve')));
-    await _settle(t);
     expect(find.text('Active'), findsOneWidget);
+    expect(find.byKey(const ValueKey('approve')), findsNothing); // no second approval is needed
     await t.tap(find.byKey(const ValueKey('pause')));
     await _settle(t);
     expect(find.text('Paused'), findsOneWidget);
+  });
+
+  testWidgets('the parent can cancel a request that has not been answered', (t) async {
+    big(t);
+    await parent.sendConnectRequest(parentName: 'Sara', toEmail: 'nana@test.com', relation: 'grandma', children: {'c1': 'Lina'});
+    await t.pumpWidget(_app(FamilyParentScreen(repo: parent, parentName: 'Sara')));
+    await _settle(t);
+    final id = server.requests.keys.single;
+    await t.tap(find.byKey(ValueKey('cancel_$id')));
+    await _settle(t);
+    expect(find.byKey(ValueKey('sent_$id')), findsNothing);
+    expect(await t.runAsync(() => grandma.watchIncomingRequests().first), isEmpty);
   });
 
   testWidgets('removing a relative asks first', (t) async {
@@ -157,32 +173,31 @@ void main() {
     expect(find.text('No messages yet'), findsOneWidget);
   });
 
-  testWidgets('the relative joins with a code and waits; a wrong code shows a message', (t) async {
+  testWidgets('the relative sees the request in the app and accepts or declines', (t) async {
     big(t);
-    final inv = await parent.createInvite(parentName: 'Sara', relation: 'grandma', children: {'c1': 'Lina'});
+    final r1 = await parent.sendConnectRequest(parentName: 'Sara', toEmail: 'NANA@test.com', relation: 'grandma', children: {'c1': 'Lina'});
+    await parent.sendConnectRequest(parentName: 'Other', toEmail: 'someone@else.com', relation: 'uncle', children: {'c9': 'X'});
     await t.pumpWidget(_app(RelativeHomeScreen(repo: grandma, name: 'Nana')));
     await _settle(t);
-    await t.enterText(find.byKey(const ValueKey('join_code')), 'WRONG');
-    await t.tap(find.byKey(const ValueKey('join')));
+    expect(find.byKey(ValueKey('request_${r1.id}')), findsOneWidget);
+    expect(find.textContaining('someone@else.com'), findsNothing); // only their own request
+    expect(find.byType(Card), findsOneWidget);
+    await t.tap(find.byKey(ValueKey('accept_request_${r1.id}')));
     await _settle(t);
-    expect(find.byKey(const ValueKey('join_error')), findsOneWidget);
-    await t.enterText(find.byKey(const ValueKey('join_code')), inv.code);
-    await t.tap(find.byKey(const ValueKey('join')));
-    await _settle(t);
-    expect(find.byKey(const ValueKey('waiting')), findsOneWidget);
+    expect(find.byKey(ValueKey('request_${r1.id}')), findsNothing);
+    expect((await t.runAsync(() => parent.relatives()))!.single.status, kRelativeActive);
+    expect(find.byKey(const ValueKey('write_c1')), findsOneWidget); // can write to the child now
   });
 
-  testWidgets('a relative with no child profile still finds the family door on the welcome screen', (t) async {
+  testWidgets('declining changes nothing else', (t) async {
     big(t);
-    SharedPreferences.setMockInitialValues({});
-    final empty = JourneyStore(LocalJourneyRepository());
-    await empty.load();
-    JourneyStore.instance = empty;
-    familyRepository = grandma;
-    addTearDown(() => familyRepository = null);
-    await t.pumpWidget(_app(const StartScreen()));
+    final r1 = await parent.sendConnectRequest(parentName: 'Sara', toEmail: 'nana@test.com', relation: 'grandma', children: {'c1': 'Lina'});
+    await t.pumpWidget(_app(RelativeHomeScreen(repo: grandma, name: 'Nana')));
     await _settle(t);
-    expect(find.byKey(const ValueKey('i_am_family_welcome')), findsOneWidget);
+    await t.tap(find.byKey(ValueKey('decline_request_${r1.id}')));
+    await _settle(t);
+    expect(await t.runAsync(() => parent.relatives()), isEmpty);
+    expect(server.requests[r1.id]!.status, kRequestDeclined);
   });
 
   group('messenger-style button and contacts', () {
@@ -273,5 +288,18 @@ void main() {
       await _settle(t);
       expect(find.byKey(const ValueKey('relative_next_call')), findsOneWidget);
     });
+  });
+
+  testWidgets('a relative with no child profile still finds the family door on the welcome screen', (t) async {
+    big(t);
+    SharedPreferences.setMockInitialValues({});
+    final empty = JourneyStore(LocalJourneyRepository());
+    await empty.load();
+    JourneyStore.instance = empty;
+    familyRepository = grandma;
+    addTearDown(() => familyRepository = null);
+    await t.pumpWidget(_app(const StartScreen()));
+    await _settle(t);
+    expect(find.byKey(const ValueKey('i_am_family_welcome')), findsOneWidget);
   });
 }

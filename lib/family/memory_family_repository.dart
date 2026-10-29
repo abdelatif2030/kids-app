@@ -11,6 +11,9 @@ class FakeFamilyServer {
   final relatives = <String, Map<String, Relative>>{}; // familyId -> relUid -> Relative
   final messages = <String, List<FamilyMessage>>{}; // familyId -> messages
   final _changes = StreamController<String>.broadcast();
+  final requests = <String, ConnectRequest>{};
+  final parentNames = <String, String>{}; // family id -> parent's name
+  final _requestChanges = StreamController<String>.broadcast();
   final calls = <String, CallInfo>{}; // call id -> call
   final candidates = <String, List<(CallFrom, Map<String, dynamic>)>>{};
   final _callChanges = StreamController<String>.broadcast();
@@ -21,15 +24,76 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   final FakeFamilyServer server;
   @override
   final String? uid;
-  FakeFamilyRepository(this.server, this.uid);
+  final String? _email;
+  FakeFamilyRepository(this.server, this.uid, {String? email}) : _email = email;
+
+  @override
+  String? get email => _email == null ? null : normalizeEmail(_email);
 
   Map<String, Relative> _mine(String fid) => server.relatives.putIfAbsent(fid, () => {});
 
   @override
   Future<FamilyInvite> createInvite({required String parentName, required String relation, required Map<String, String> children}) async {
     final code = 'C${1000 + server._n++}';
+    server.parentNames[uid!] = parentName;
     server.invites[code] = {'familyId': uid!, 'parentName': parentName, 'relation': relation, 'children': children, 'used': false};
     return FamilyInvite(code: code, familyId: uid!, parentName: parentName, relation: relation, children: children);
+  }
+
+  // --- connection requests -------------------------------------------------------------------------
+  @override
+  Future<ConnectRequest> sendConnectRequest({
+    required String parentName,
+    required String toEmail,
+    required String relation,
+    required Map<String, String> children,
+  }) async {
+    if (!looksLikeEmail(toEmail)) throw const FamilyException('bad e-mail');
+    if (children.isEmpty) throw const FamilyException('no child');
+    final id = 'req${server._n++}';
+    final r = ConnectRequest(id: id, familyId: uid!, parentName: parentName, toEmail: normalizeEmail(toEmail), relation: relation, children: children);
+    server.requests[id] = r;
+    server.parentNames[uid!] = parentName;
+    server._requestChanges.add(id);
+    return r;
+  }
+
+  @override
+  Future<List<ConnectRequest>> sentRequests() async => [for (final r in server.requests.values) if (r.familyId == uid && r.pending) r];
+
+  @override
+  Future<void> cancelRequest(String requestId) async {
+    final r = server.requests[requestId];
+    if (r == null || r.familyId != uid || !r.pending) throw const FamilyException('not allowed');
+    server.requests[requestId] = r.copyWith(status: kRequestCancelled);
+    server._requestChanges.add(requestId);
+  }
+
+  List<ConnectRequest> _incomingNow() => [for (final r in server.requests.values) if (r.pending && email != null && r.toEmail == email) r];
+
+  @override
+  Stream<List<ConnectRequest>> watchIncomingRequests() {
+    late StreamController<List<ConnectRequest>> c;
+    StreamSubscription<String>? sub;
+    c = StreamController<List<ConnectRequest>>(
+      onListen: () {
+        sub = server._requestChanges.stream.listen((_) => c.add(_incomingNow()));
+        c.add(_incomingNow());
+      },
+      onCancel: () => sub?.cancel(),
+    );
+    return c.stream;
+  }
+
+  @override
+  Future<void> respondToRequest(ConnectRequest request, {required bool accept, required String name}) async {
+    final r = server.requests[request.id];
+    if (r == null || !r.pending || email == null || r.toEmail != email) throw const FamilyException('not allowed');
+    server.requests[r.id] = r.copyWith(status: accept ? kRequestAccepted : kRequestDeclined);
+    if (accept) {
+      _mine(r.familyId)[uid!] = Relative(uid: uid!, name: name, relation: r.relation, status: kRelativeActive, children: r.children);
+    }
+    server._requestChanges.add(r.id);
   }
 
   @override
@@ -82,7 +146,7 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   Future<List<(String, String)>> myFamilies() async => [
         for (final e in server.relatives.entries)
           if (e.value[uid]?.status == kRelativeActive || e.value[uid]?.status == kRelativePending)
-            (e.key, server.invites.values.firstWhere((i) => i['familyId'] == e.key)['parentName'] as String),
+            (e.key, server.parentNames[e.key] ?? ''),
       ];
 
   @override
