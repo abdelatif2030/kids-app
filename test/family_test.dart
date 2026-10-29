@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'family_link.dart';
 import 'package:kids_app/family/family_models.dart';
 import 'package:kids_app/family/family_repository.dart';
 import 'package:kids_app/l10n/app_locale.dart';
@@ -30,30 +31,23 @@ void main() {
 
   group('family flow', () {
     late FakeFamilyServer server;
-    late FakeFamilyRepository parent, grandma, stranger;
+    late FakeFamilyRepository parent, grandma;
 
-    Future<void> link() async {
-      final inv = await parent.createInvite(parentName: 'Sara', relation: 'grandma', children: {'c1': 'Lina'});
-      await grandma.joinWithCode(inv.code, name: 'Nana');
-    }
+    Future<void> link() => linkRelative(parent, 'g1');
 
     setUp(() {
       server = FakeFamilyServer();
       parent = FakeFamilyRepository(server, 'p1');
       grandma = FakeFamilyRepository(server, 'g1');
-      stranger = FakeFamilyRepository(server, 's1');
     });
 
-    test('a code works once and the relative waits for approval', () async {
-      final inv = await parent.createInvite(parentName: 'Sara', relation: 'grandma', children: {'c1': 'Lina'});
-      await grandma.joinWithCode(inv.code, name: 'Nana');
-      expect((await parent.relatives()).single.status, kRelativePending);
-      expect(() => stranger.joinWithCode(inv.code, name: 'X'), throwsA(isA<FamilyException>()));
-      expect(() => stranger.joinWithCode('nope', name: 'X'), throwsA(isA<FamilyException>()));
-    });
-
-    test('nobody can write before the parent approves', () async {
-      await link();
+    test('nobody can write before the relative has accepted the parent\'s request', () async {
+      expect(
+        () => grandma.send(familyId: 'p1', childId: 'c1', childName: 'Lina', relUid: 'g1', from: Side.relative, kind: kindText, body: 'hi'),
+        throwsA(isA<FamilyException>()),
+      );
+      await parent.sendConnectRequest(parentName: 'Sara', toEmail: 'g1@test.com', relation: 'grandma', children: {'c1': 'Lina'});
+      // A request alone does not link anyone.
       expect(
         () => grandma.send(familyId: 'p1', childId: 'c1', childName: 'Lina', relUid: 'g1', from: Side.relative, kind: kindText, body: 'hi'),
         throwsA(isA<FamilyException>()),

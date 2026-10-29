@@ -427,14 +427,6 @@ test('the intro video link must be a short https link', async () => {
 });
 
 // family chat --------------------------------------------------------------
-const inviteData = (over = {}) => ({
-  familyId: 'p1', parentName: 'Sara', relation: 'grandma', children: { c1: 'Lina' }, used: false, createdAt: serverTimestamp(), ...over,
-});
-async function seedInvite(code = 'ABC123', over = {}) {
-  await env.withSecurityRulesDisabled(async (ctx) => {
-    await setDoc(doc(ctx.firestore(), 'invites', code), inviteData({ createdAt: new Date(), ...over }));
-  });
-}
 async function seedRelative(rel = 'r1', status = 'active', fid = 'p1') {
   await env.withSecurityRulesDisabled(async (ctx) => {
     await setDoc(doc(ctx.firestore(), 'families', fid, 'relatives', rel), { name: 'Nana', relation: 'grandma', status, children: { c1: 'Lina' }, code: 'ABC123' });
@@ -445,44 +437,17 @@ const fmsg = (over = {}) => ({
 });
 const msgRef = (db, id = 'm1', fid = 'p1') => doc(db, 'families', fid, 'messages', id);
 
-test('family: only a parent makes an invite for their own family', async () => {
-  await assertSucceeds(setDoc(doc(as('p1'), 'invites', 'ABC123'), inviteData()));
-  await assertFails(setDoc(doc(as('p2'), 'invites', 'ZZZ'), inviteData())); // someone else's family id
-  await assertFails(setDoc(doc(as('t1'), 'invites', 'TTT'), inviteData({ familyId: 't1' }))); // not a parent
-  await assertFails(setDoc(doc(as('p1'), 'invites', 'USED'), inviteData({ used: true })));
-  await assertFails(setDoc(doc(as('p1'), 'invites', 'EMPTY'), inviteData({ children: {} })));
-});
-
-test('family: an invite can be read by its code but never listed', async () => {
-  await seedInvite();
-  await assertSucceeds(getDoc(doc(as('r1'), 'invites', 'ABC123')));
-  await assertFails(getDocs(collection(as('r1'), 'invites')));
-});
-
-test('family: a relative joins once with the code and starts pending', async () => {
-  await seedInvite();
-  const db = as('r1');
-  const b = writeBatch(db);
-  b.set(doc(db, 'families', 'p1', 'relatives', 'r1'), { name: 'Nana', relation: 'grandma', status: 'pending', children: { c1: 'Lina' }, code: 'ABC123' });
-  b.update(doc(db, 'invites', 'ABC123'), { used: true, usedBy: 'r1' });
-  b.set(doc(db, 'users', 'r1', 'families', 'p1'), { parentName: 'Sara' });
-  await assertSucceeds(b.commit());
-  // the same code cannot be used by a second person
-  const db2 = as('r2');
-  const b2 = writeBatch(db2);
-  b2.set(doc(db2, 'families', 'p1', 'relatives', 'r2'), { name: 'Uncle', relation: 'grandma', status: 'pending', children: { c1: 'Lina' }, code: 'ABC123' });
-  b2.update(doc(db2, 'invites', 'ABC123'), { used: true, usedBy: 'r2' });
-  await assertFails(b2.commit());
-});
-
-test('family: a relative cannot join as active, with a wrong code, or with more children than invited', async () => {
-  await seedInvite();
-  const rel = (over) => ({ name: 'Nana', relation: 'grandma', status: 'pending', children: { c1: 'Lina' }, code: 'ABC123', ...over });
-  await assertFails(setDoc(doc(as('r1'), 'families', 'p1', 'relatives', 'r1'), rel({ status: 'active' })));
-  await assertFails(setDoc(doc(as('r1'), 'families', 'p1', 'relatives', 'r1'), rel({ code: 'NOPE' })));
-  await assertFails(setDoc(doc(as('r1'), 'families', 'p1', 'relatives', 'r1'), rel({ children: { c1: 'Lina', c2: 'Omar' } })));
-  await assertFails(setDoc(doc(as('r1'), 'families', 'p1', 'relatives', 'r2'), rel({}))); // for someone else
-  await assertFails(setDoc(doc(as('p2'), 'families', 'p1', 'relatives', 'p2'), rel({}))); // a parent is not a relative
+test('family: invite codes no longer exist: nobody can create, read or join with one', async () => {
+  const code = { familyId: 'p1', parentName: 'Sara', relation: 'grandma', children: { c1: 'Lina' }, used: false, createdAt: serverTimestamp() };
+  await assertFails(setDoc(doc(as('p1'), 'invites', 'ABC123'), code));
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(doc(ctx.firestore(), 'invites', 'OLD1'), { ...code, createdAt: new Date() });
+  });
+  await assertFails(getDoc(doc(as('r1'), 'invites', 'OLD1')));
+  // a relative cannot put themselves into a family by writing the relatives document directly
+  const rel = { name: 'Nana', relation: 'grandma', status: 'pending', children: { c1: 'Lina' }, code: 'OLD1' };
+  await assertFails(setDoc(doc(as('r1'), 'families', 'p1', 'relatives', 'r1'), rel));
+  await assertFails(setDoc(doc(as('r1'), 'families', 'p1', 'relatives', 'r1'), { ...rel, status: 'active' }));
 });
 
 test('family: only the parent approves, pauses or removes; a relative cannot change their own status', async () => {

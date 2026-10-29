@@ -22,7 +22,7 @@ const kMaxVoiceSeconds = 30;
 const kMaxVoiceBytes = 300000;
 const kVoiceKeepDays = 14;
 
-const kRelativePending = 'pending'; // joined with a code, waiting for the parent
+const kRelativePending = 'pending'; // waiting for the parent (older data only: a request accepted by the relative makes them active at once)
 const kRelativeActive = 'active';
 const kRelativePaused = 'paused'; // the parent paused it; can be resumed
 const kRelativeRemoved = 'removed';
@@ -172,21 +172,6 @@ class ConnectRequest {
 String normalizeEmail(String s) => s.trim().toLowerCase();
 
 bool looksLikeEmail(String s) => RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(normalizeEmail(s));
-
-class FamilyInvite {
-  final String code;
-  final String familyId;
-  final String parentName;
-  final String relation;
-  final Map<String, String> children;
-  const FamilyInvite({
-    required this.code,
-    required this.familyId,
-    required this.parentName,
-    required this.relation,
-    this.children = const {},
-  });
-}
 
 enum Side { child, relative }
 

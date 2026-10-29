@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,7 +11,7 @@ import 'family_models.dart';
 import 'family_repository.dart';
 
 /// Firebase implementation of the family chat. Layout and limits are enforced by firestore.rules; the checks
-/// here only give clearer messages. Collections: invites/{code}, families/{parentUid}/relatives/{uid},
+/// here only give clearer messages. Collections: families/{parentUid}/relatives/{uid},
 /// families/{parentUid}/messages/{id}, users/{uid}/families/{familyId}.
 class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -62,26 +61,6 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
       );
 
   /// 8 characters without look-alikes (no 0/O, 1/I). Single use, so guessing is not a risk.
-  String _newCode() {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    final r = Random.secure();
-    return String.fromCharCodes([for (var i = 0; i < 8; i++) chars.codeUnitAt(r.nextInt(chars.length))]);
-  }
-
-  @override
-  Future<FamilyInvite> createInvite({required String parentName, required String relation, required Map<String, String> children}) => _guard(() async {
-        final code = _newCode();
-        await _db.collection('invites').doc(code).set({
-          'familyId': uid!,
-          'parentName': parentName,
-          'relation': relation,
-          'children': children,
-          'used': false,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-        return FamilyInvite(code: code, familyId: uid!, parentName: parentName, relation: relation, children: children);
-      });
-
   // --- connection requests -------------------------------------------------------------------------
   CollectionReference<Map<String, dynamic>> get _requests => _db.collection('connectRequests');
 
@@ -240,28 +219,6 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
 
   @override
   Future<void> setRelativeChildren(String relUid, Map<String, String> children) => _guard(() => _rels(uid!).doc(relUid).update({'children': children}));
-
-  @override
-  Future<void> joinWithCode(String code, {required String name}) => _guard(() async {
-        final c = code.trim().toUpperCase();
-        final inv = await _db.collection('invites').doc(c).get();
-        final d = inv.data();
-        if (!inv.exists || d == null || d['used'] == true) {
-          throw FamilyException(tr2('الرمز غير صحيح أو استُخدم من قبل', 'The code is not valid or was already used'));
-        }
-        final fid = d['familyId'] as String;
-        final batch = _db.batch();
-        batch.set(_rels(fid).doc(uid), {
-          'name': name.trim(),
-          'relation': d['relation'],
-          'status': kRelativePending,
-          'children': d['children'],
-          'code': c,
-        });
-        batch.update(_db.collection('invites').doc(c), {'used': true, 'usedBy': uid});
-        batch.set(_db.collection('users').doc(uid).collection('families').doc(fid), {'parentName': d['parentName']});
-        await batch.commit();
-      });
 
   @override
   Future<List<(String, String)>> myFamilies() => _guard(() async {

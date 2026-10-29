@@ -373,25 +373,6 @@ service cloud.firestore {
             && !d.body.matches('(?i).*(https?:|www\\.|://|\\.com|\\.net|\\.org|@).*'));
     }
 
-    // invites/{code}: created by a parent; read only by exact code (no listing); redeemed once by a relative.
-    match /invites/{code} {
-      allow get: if signedIn();
-      allow list: if false;
-      allow create: if signedIn() && role() == 'parent'
-        && request.resource.data.keys().hasOnly(['familyId', 'parentName', 'relation', 'children', 'used', 'createdAt'])
-        && request.resource.data.familyId == request.auth.uid
-        && request.resource.data.used == false
-        && request.resource.data.parentName.size() <= 40
-        && request.resource.data.children.size() >= 1 && request.resource.data.children.size() <= 10
-        && request.resource.data.createdAt == request.time;
-      allow update: if signedIn() && role() == 'relative'
-        && resource.data.used == false
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used', 'usedBy'])
-        && request.resource.data.used == true
-        && request.resource.data.usedBy == request.auth.uid;
-      allow delete: if signedIn() && resource.data.familyId == request.auth.uid;
-    }
-
     // connectRequests/{id}: a parent asks someone (by e-mail) to talk with the parent's children. Only that person
     // and the parent can read it; the person accepts or declines; the parent can cancel while it waits.
     match /connectRequests/{id} {
@@ -427,15 +408,6 @@ service cloud.firestore {
 
     match /families/{fid}/relatives/{rel} {
       allow read: if signedIn() && (request.auth.uid == fid || request.auth.uid == rel);
-      allow create: if signedIn() && request.auth.uid == rel && role() == 'relative'
-        && request.resource.data.keys().hasOnly(['name', 'relation', 'status', 'children', 'code'])
-        && request.resource.data.status == 'pending'
-        && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 40
-        && exists(/databases/$(database)/documents/invites/$(request.resource.data.code))
-        && get(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.familyId == fid
-        && get(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.used == false
-        && request.resource.data.relation == get(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.relation
-        && request.resource.data.children == get(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.children;
       // Joining by accepting a request the parent sent to this person's e-mail. The same batch must mark the
       // request accepted, so a request cannot be used twice or by someone else.
       allow create: if signedIn() && request.auth.uid == rel && role() == 'relative'

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'family_link.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/family/family_bubble.dart';
@@ -96,8 +97,7 @@ void main() {
 
   testWidgets('removing a relative asks first', (t) async {
     big(t);
-    final inv = await parent.createInvite(parentName: 'Sara', relation: 'grandma', children: {'c1': 'Lina'});
-    await grandma.joinWithCode(inv.code, name: 'Nana');
+    await linkRelative(parent, 'g1');
     await t.pumpWidget(_app(FamilyParentScreen(repo: parent, parentName: 'Sara')));
     await _settle(t);
     await t.tap(find.byKey(const ValueKey('remove')));
@@ -125,8 +125,7 @@ void main() {
   });
 
   Future<void> linked() async {
-    final inv = await parent.createInvite(parentName: 'Sara', relation: 'grandma', children: {'c1': 'Lina'});
-    await grandma.joinWithCode(inv.code, name: 'Nana');
+    await linkRelative(parent, 'g1');
     await parent.setRelativeStatus('g1', kRelativeActive);
   }
 

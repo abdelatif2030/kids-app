@@ -18,8 +18,6 @@ abstract class FamilyRepository {
   String? get email;
 
   // --- parent side -----------------------------------------------------------
-  /// Creates a one-time invite for one relative. The parent gives the code to that person.
-  Future<FamilyInvite> createInvite({required String parentName, required String relation, required Map<String, String> children});
   Future<List<Relative>> relatives();
 
   /// pending -> active, active <-> paused, any -> removed. Only the parent calls this.
@@ -37,7 +35,7 @@ abstract class FamilyRepository {
   Future<void> setRelativeNextCall(String relUid, String text);
   Future<void> setRelativeChildren(String relUid, Map<String, String> children);
 
-  // --- connection requests (replace invite codes) ------------------------------------------------
+  // --- connection requests ------------------------------------------------
   /// The parent asks someone, by e-mail, to be able to talk with the chosen children.
   Future<ConnectRequest> sendConnectRequest({
     required String parentName,
@@ -57,9 +55,6 @@ abstract class FamilyRepository {
   Future<void> respondToRequest(ConnectRequest request, {required bool accept, required String name});
 
   // --- relative side ---------------------------------------------------------
-  /// Joins a family with a code. The relative stays `pending` until the parent approves.
-  Future<void> joinWithCode(String code, {required String name});
-
   /// The families a relative belongs to (usually one): family id and the parent's name.
   Future<List<(String familyId, String parentName)>> myFamilies();
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'family_link.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -99,8 +100,7 @@ void main() {
     parent = FakeFamilyRepository(server, 'p1');
     nana = FakeFamilyRepository(server, 'n1');
     other = FakeFamilyRepository(server, 'x1');
-    final inv = await parent.createInvite(parentName: 'Sara', relation: 'grandma', children: {'c1': 'Lina'});
-    await nana.joinWithCode(inv.code, name: 'Nana');
+    await linkRelative(parent, 'n1');
     await parent.setRelativeStatus('n1', kRelativeActive);
   });
 

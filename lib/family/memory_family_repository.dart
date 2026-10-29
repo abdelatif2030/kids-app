@@ -8,7 +8,6 @@ import 'family_repository.dart';
 
 /// In-memory family server shared by several "devices" (one FakeFamilyRepository per signed-in account).
 class FakeFamilyServer {
-  final invites = <String, Map<String, dynamic>>{}; // code -> {familyId, parentName, relation, children, used}
   final relatives = <String, Map<String, Relative>>{}; // familyId -> relUid -> Relative
   final messages = <String, List<FamilyMessage>>{}; // familyId -> messages
   final _changes = StreamController<String>.broadcast();
@@ -33,14 +32,6 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   String? get email => _email == null ? null : normalizeEmail(_email);
 
   Map<String, Relative> _mine(String fid) => server.relatives.putIfAbsent(fid, () => {});
-
-  @override
-  Future<FamilyInvite> createInvite({required String parentName, required String relation, required Map<String, String> children}) async {
-    final code = 'C${1000 + server._n++}';
-    server.parentNames[uid!] = parentName;
-    server.invites[code] = {'familyId': uid!, 'parentName': parentName, 'relation': relation, 'children': children, 'used': false};
-    return FamilyInvite(code: code, familyId: uid!, parentName: parentName, relation: relation, children: children);
-  }
 
   // --- connection requests -------------------------------------------------------------------------
   @override
@@ -195,20 +186,6 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
     final r = _mine(uid!)[relUid];
     if (r == null) throw const FamilyException('not found');
     _mine(uid!)[relUid] = r.copyWith(children: children);
-  }
-
-  @override
-  Future<void> joinWithCode(String code, {required String name}) async {
-    final inv = server.invites[code.trim().toUpperCase()];
-    if (inv == null || inv['used'] == true) throw const FamilyException('invalid code');
-    inv['used'] = true;
-    _mine(inv['familyId'] as String)[uid!] = Relative(
-      uid: uid!,
-      name: name,
-      relation: inv['relation'] as String,
-      status: kRelativePending,
-      children: Map<String, String>.from(inv['children'] as Map),
-    );
   }
 
   @override

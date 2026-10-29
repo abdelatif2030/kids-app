@@ -114,7 +114,7 @@ class _FamilyParentScreenState extends State<FamilyParentScreen> {
                 return EmptyState(
                   icon: Icons.family_restroom_rounded,
                   title: tr2('لا يوجد أقارب بعد', 'No relatives yet'),
-                  message: tr2('اضغط «دعوة قريب» لإنشاء رمز.', 'Tap “Invite a relative” to make a code.'),
+                  message: tr2('اضغط «إضافة قريب» وأرسل طلباً إلى بريده الإلكتروني.', 'Tap “Add a relative” and send a request to their e-mail.'),
                 );
               }
               return Column(children: [
