@@ -782,3 +782,18 @@ test('video: a video call needs the video switch; a voice call is unaffected', a
   await assertFails(setDoc(callRef(as('p1'), 'f'), callData({ video: 'yes' })));
   await assertFails(setDoc(callRef(as('p1'), 'g'), callData({ video: false }))); // either true or absent
 });
+
+test('calls: the parent can delete old call records and their network candidates; nobody else', async () => {
+  await seedCallsOn();
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    await setDoc(callRef(db), { ...callData(), status: 'ended', createdAt: new Date() });
+    await setDoc(doc(db, 'families', 'p1', 'calls', 'k1', 'candidates', 'c1'), { from: 'parent', data: '{}' });
+  });
+  const cand = (db) => doc(db, 'families', 'p1', 'calls', 'k1', 'candidates', 'c1');
+  await assertFails(deleteDoc(cand(as('r1'))));
+  await assertFails(deleteDoc(cand(as('p2'))));
+  await assertSucceeds(deleteDoc(cand(as('p1'))));
+  await assertFails(deleteDoc(callRef(as('r1'))));
+  await assertSucceeds(deleteDoc(callRef(as('p1'))));
+});

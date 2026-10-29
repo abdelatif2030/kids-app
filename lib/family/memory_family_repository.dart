@@ -27,7 +27,7 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   @override
   final String? uid;
   final String? _email;
-  FakeFamilyRepository(this.server, this.uid, {String? email}) : _email = email;
+  FakeFamilyRepository(this.server, this.uid, {String? email}) : _email = email; // ignore: prefer_initializing_formals
 
   @override
   String? get email => _email == null ? null : normalizeEmail(_email);
@@ -283,6 +283,18 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
     if (uid != familyId) throw const FamilyException('not allowed');
     server.messages[familyId]?.removeWhere((m) => m.childId == childId && m.relUid == relUid);
     server._changes.add(familyId);
+  }
+
+  @override
+  Future<int> purgeOldCalls(String familyId, {int hours = 24}) async {
+    if (uid != familyId) throw const FamilyException('not allowed');
+    final cutoff = DateTime.now().subtract(Duration(hours: hours));
+    final old = [for (final c in server.calls.values) if (c.familyId == familyId && !c.ringing && c.createdAt.isBefore(cutoff)) c.id];
+    for (final id in old) {
+      server.calls.remove(id);
+      server.candidates.remove(id);
+    }
+    return old.length;
   }
 
   // --- calls (signalling only; the audio never touches the server) ------------------------------

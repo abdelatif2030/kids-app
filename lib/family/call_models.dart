@@ -61,7 +61,10 @@ class CallInfo {
 }
 
 /// The state of one call as the screen shows it.
-enum CallPhase { starting, ringing, connecting, connected, ended, declined, missed, failed }
+enum CallPhase { starting, ringing, connecting, connected, reconnecting, ended, declined, missed, failed }
+
+/// How long a dropped connection is given to come back before the call ends.
+const kReconnectSeconds = 15;
 
 /// Public STUN only. Calls between two phones on the same Wi-Fi or on most home networks work; behind some
 /// mobile carriers or strict firewalls a TURN relay is required. Add your own TURN server here when you have

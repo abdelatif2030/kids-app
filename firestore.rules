@@ -506,7 +506,9 @@ service cloud.firestore {
           && request.resource.data.data.size() <= 2000
           && ((request.auth.uid == fid && request.resource.data.from == 'parent')
               || (request.auth.uid == get(/databases/$(database)/documents/families/$(fid)/calls/$(cid)).data.relUid && request.resource.data.from == 'relative'));
-        allow update, delete: if false;
+        allow update: if false;
+        // The parent cleans up old call records, including their network details.
+        allow delete: if signedIn() && request.auth.uid == fid;
       }
     }
 

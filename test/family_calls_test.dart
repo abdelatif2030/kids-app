@@ -31,6 +31,9 @@ class FakeEngine implements CallEngine {
 
   void emitCandidate(String c) => _cands.add({'candidate': c});
 
+  /// The test plays the network: connected, dropped, back again...
+  void emit(CallPhase p) => _phases.add(p);
+
   bool videoRequested = false, cameraOn = true;
 
   @override
@@ -390,6 +393,83 @@ void main() {
       await nc.hangUp();
       await _wait();
       expect(AudioGate.instance.inCall, false); // both controllers released it (the counter reached zero)
+    });
+  });
+
+  group('call quality', () {
+    Future<(CallController, FakeEngine)> connected({int reconnect = 15}) async {
+      await parent.setRelativeCalls('n1', true);
+      final pe = FakeEngine('parent');
+      final pc = CallController(repo: parent, engine: pe, familyId: 'p1', reconnectSeconds: reconnect);
+      await pc.startOutgoing(childId: 'c1', childName: 'Lina', relUid: 'n1', from: CallFrom.parent);
+      final incoming = (await nana.watchIncoming('p1').first).single;
+      final nc = ctl(nana, FakeEngine('nana'));
+      await nc.accept(incoming);
+      await _wait();
+      expect(pc.phase, CallPhase.connected);
+      return (pc, pe);
+    }
+
+    test('a dropped connection shows reconnecting and recovers without ending the call', () async {
+      final (pc, pe) = await connected();
+      pe.emit(CallPhase.reconnecting);
+      await _wait();
+      expect(pc.phase, CallPhase.reconnecting);
+      expect(pc.finished, false);
+      pe.emit(CallPhase.connected);
+      await _wait();
+      expect(pc.phase, CallPhase.connected);
+      await pc.hangUp();
+    });
+
+    test('a connection that does not come back ends the call with a clear message, never a stuck screen', () async {
+      final (pc, pe) = await connected(reconnect: 0);
+      pe.emit(CallPhase.reconnecting);
+      await _wait(120);
+      expect(pc.phase, CallPhase.failed);
+      expect(pc.finished, true);
+      expect(pc.error, isNotNull);
+      expect(AudioGate.instance.inCall, isA<bool>());
+    });
+
+    test('old finished call records are removed by the parent only; ringing ones stay', () async {
+      await parent.setRelativeCalls('n1', true);
+      final pc = ctl(parent, FakeEngine('p'));
+      await pc.startOutgoing(childId: 'c1', childName: 'Lina', relUid: 'n1', from: CallFrom.parent);
+      await pc.hangUp();
+      final id = server.calls.keys.single;
+      server.calls[id] = server.calls[id]!.copyWith(status: callEnded);
+      expect(await parent.purgeOldCalls('p1'), 0); // too fresh
+      final old = CallInfo(
+        id: 'old', familyId: 'p1', childId: 'c1', childName: 'Lina', relUid: 'n1', from: CallFrom.parent, status: callEnded,
+        offer: const {}, createdAt: DateTime.now().subtract(const Duration(days: 2)),
+      );
+      server.calls['old'] = old;
+      server.candidates['old'] = [(CallFrom.parent, {'candidate': 'x'})];
+      expect(() => nana.purgeOldCalls('p1'), throwsA(isA<FamilyException>()));
+      expect(await parent.purgeOldCalls('p1'), 1);
+      expect(server.calls.containsKey('old'), false);
+      expect(server.candidates.containsKey('old'), false);
+    });
+
+    testWidgets('the screen says what is on: microphone, and the camera in a video call', (t) async {
+      t.view.physicalSize = const Size(600, 1000);
+      t.view.devicePixelRatio = 1;
+      addTearDown(t.view.reset);
+      await parent.setRelativeCalls('n1', true);
+      await parent.setRelativeVideo('n1', true);
+      final engine = FakeEngine('parent');
+      final c = CallController(repo: parent, engine: engine, familyId: 'p1');
+      await t.runAsync(() => c.startOutgoing(childId: 'c1', childName: 'Lina', relUid: 'n1', from: CallFrom.parent, video: true));
+      await t.pumpWidget(MaterialApp(home: CallScreen(controller: c, title: 'Nana')));
+      await t.pump();
+      expect(find.text('Microphone is on · Camera is on'), findsOneWidget);
+      c.toggleMute();
+      c.toggleCamera();
+      await t.pump();
+      expect(find.text('Microphone muted · Camera is off'), findsOneWidget);
+      await t.runAsync(() => c.hangUp());
+      await t.pump(const Duration(seconds: 1));
     });
   });
 }

@@ -15,7 +15,7 @@ abstract class CallEngine {
   Future<void> addRemoteCandidate(Map<String, dynamic> candidate);
   Stream<Map<String, dynamic>> get localCandidates;
 
-  /// connecting -> connected, or failed / ended.
+  /// connecting -> connected, reconnecting (a drop that may recover), or failed / ended.
   Stream<CallPhase> get phases;
   void setMuted(bool muted);
 
@@ -78,6 +78,7 @@ class WebRtcEngine implements CallEngine {
         case RTCPeerConnectionState.RTCPeerConnectionStateFailed:
           _phases.add(CallPhase.failed);
         case RTCPeerConnectionState.RTCPeerConnectionStateDisconnected:
+          _phases.add(CallPhase.reconnecting); // often a short network change: give it time to come back
         case RTCPeerConnectionState.RTCPeerConnectionStateClosed:
           _phases.add(CallPhase.ended);
         default:

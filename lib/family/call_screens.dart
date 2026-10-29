@@ -18,6 +18,7 @@ String phaseText(CallPhase p) => switch (p) {
       CallPhase.ringing => tr2('جارٍ الاتصال…', 'Calling…'),
       CallPhase.connecting => tr2('جارٍ التوصيل…', 'Connecting…'),
       CallPhase.connected => tr2('متصل', 'Connected'),
+      CallPhase.reconnecting => tr2('انقطع الاتصال… نحاول إعادته', 'Connection lost… trying to reconnect'),
       CallPhase.ended => tr2('انتهت المكالمة', 'The call ended'),
       CallPhase.declined => tr2('لم يُجب', 'Not answered'),
       CallPhase.missed => tr2('لم يرد أحد', 'No answer'),
@@ -67,6 +68,7 @@ class _CallScreenState extends State<CallScreen> {
                 Text(widget.title, style: DS.title, textAlign: TextAlign.center),
                 const SizedBox(height: 8),
                 Text(phaseText(c.phase), key: const ValueKey('call_phase'), style: DS.heading),
+                if (!c.finished) _MediaIndicator(controller: c),
                 if (c.error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(c.error!, key: const ValueKey('call_error'), style: DS.body.copyWith(color: DS.error), textAlign: TextAlign.center)),
                 if (c.finished) const SizedBox.shrink() else ?c.engine.audioSink,
                 const SizedBox(height: 24),
@@ -206,6 +208,39 @@ class _VideoStage extends StatelessWidget {
                 height: 72,
                 child: ClipRRect(borderRadius: BorderRadius.circular(8), child: controller.cameraOn ? local : Container(color: Colors.black54, child: const Icon(Icons.videocam_off_rounded, color: Colors.white))),
               ),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+
+/// Tells plainly what is switched on while a call is open: the microphone, and the camera in a video call.
+class _MediaIndicator extends StatelessWidget {
+  final CallController controller;
+  const _MediaIndicator({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final c = controller;
+    final mic = c.muted ? tr2('الميكروفون مكتوم', 'Microphone muted') : tr2('الميكروفون يعمل', 'Microphone is on');
+    final cam = !c.video ? null : (c.cameraOn ? tr2('الكاميرا تعمل', 'Camera is on') : tr2('الكاميرا متوقفة', 'Camera is off'));
+    final text = cam == null ? mic : '$mic · $cam';
+    final live = !c.muted || (c.video && c.cameraOn);
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Semantics(
+        liveRegion: true,
+        label: text,
+        child: Container(
+          key: const ValueKey('media_indicator'),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(color: live ? DS.highlightSoft : DS.border, borderRadius: BorderRadius.circular(20)),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(live ? Icons.fiber_manual_record_rounded : Icons.mic_off_rounded, size: 16, color: live ? DS.error : DS.inkSoft),
+            const SizedBox(width: 6),
+            Text(text, style: DS.caption),
           ]),
         ),
       ),

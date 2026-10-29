@@ -359,6 +359,25 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
       );
 
   @override
+  Future<int> purgeOldCalls(String familyId, {int hours = 24}) => _guard(() async {
+        final cutoff = Timestamp.fromDate(DateTime.now().subtract(Duration(hours: hours)));
+        final snap = await _calls(familyId).where('createdAt', isLessThan: cutoff).limit(40).get();
+        var n = 0;
+        for (final d in snap.docs) {
+          if (d.data()['status'] == callRinging) continue;
+          final cands = await d.reference.collection('candidates').limit(200).get();
+          final batch = _db.batch();
+          for (final c in cands.docs) {
+            batch.delete(c.reference);
+          }
+          batch.delete(d.reference);
+          await batch.commit();
+          n++;
+        }
+        return n;
+      });
+
+  @override
   Future<String> startCall({
     required String familyId,
     required String childId,

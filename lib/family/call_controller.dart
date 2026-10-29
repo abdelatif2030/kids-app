@@ -16,7 +16,10 @@ class CallController extends ChangeNotifier {
 
   /// How long an outgoing call rings before it counts as missed.
   final int ringSeconds;
-  CallController({required this.repo, required this.engine, required this.familyId, this.ringSeconds = kRingSeconds});
+
+  /// How long a dropped connection may take to come back.
+  final int reconnectSeconds;
+  CallController({required this.repo, required this.engine, required this.familyId, this.ringSeconds = kRingSeconds, this.reconnectSeconds = kReconnectSeconds});
 
   CallPhase phase = CallPhase.starting;
   bool muted = false;
@@ -32,6 +35,7 @@ class CallController extends ChangeNotifier {
   final _pendingLocal = <Map<String, dynamic>>[];
   final _subs = <StreamSubscription<dynamic>>[];
   Timer? _ringTimer;
+  Timer? _reconnectTimer;
 
   String? get callId => _callId;
   bool get finished => _done;
@@ -61,8 +65,21 @@ class CallController extends ChangeNotifier {
     }
     _subs.add(engine.localCandidates.listen(_localCandidate));
     _subs.add(engine.phases.listen((p) {
-      if (p == CallPhase.connected) {
+      if (p == CallPhase.reconnecting) {
+        // The connection dropped (for example the phone changed network). Wait a little before giving up.
+        if (phase == CallPhase.connected) {
+          _set(CallPhase.reconnecting);
+          _reconnectTimer?.cancel();
+          _reconnectTimer = Timer(Duration(seconds: reconnectSeconds), () {
+            if (phase == CallPhase.reconnecting) {
+              error = tr2('انقطع الاتصال ولم يعد. جرّب الاتصال مرة أخرى.', 'The connection was lost and did not come back. Try calling again.');
+              hangUp(status: callEnded, as: CallPhase.failed);
+            }
+          });
+        }
+      } else if (p == CallPhase.connected) {
         _ringTimer?.cancel();
+        _reconnectTimer?.cancel();
         _set(CallPhase.connected);
       } else if (p == CallPhase.failed) {
         error = tr2('تعذّر الاتصال. قد تحتاج الشبكة إلى خادم TURN.', 'The connection failed. The network may need a TURN server.');
@@ -198,6 +215,7 @@ class CallController extends ChangeNotifier {
   void _finish(CallPhase p) {
     if (_done) return;
     _ringTimer?.cancel();
+    _reconnectTimer?.cancel();
     phase = p;
     _done = true;
     for (final s in _subs) {

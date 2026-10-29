@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../design/components.dart';
 import '../design/layout.dart';
@@ -43,6 +42,9 @@ class _FamilyParentScreenState extends State<FamilyParentScreen> {
     super.initState();
     // Voice recordings are removed after 14 days (keeps the free database small and respects privacy).
     widget.repo.purgeOldVoices(widget.repo.uid!).catchError((Object _) => 0);
+    // Finished call records hold network details; they are removed after a day.
+    final r = widget.repo;
+    if (r is CallRepository) (r as CallRepository).purgeOldCalls(r.uid!).catchError((Object _) => 0);
   }
 
   List<Relative> _lastRels = const [];

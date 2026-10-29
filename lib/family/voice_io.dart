@@ -1,7 +1,6 @@
 // ignore_for_file: experimental_member_use  (just_audio marks StreamAudioSource experimental; it is the way to play from memory on phones)
 import 'dart:async';
 import 'dart:io' show Directory;
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart' show XFile; // reads bytes on the web and on phones alike

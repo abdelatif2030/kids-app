@@ -29,4 +29,7 @@ abstract class CallRepository {
 
   /// New network candidates from the OTHER side.
   Stream<Map<String, dynamic>> watchCandidates(String familyId, String callId, CallFrom other);
+
+  /// Parent only: removes finished call records (they hold network details) older than [hours]. Returns how many.
+  Future<int> purgeOldCalls(String familyId, {int hours = 24});
 }
