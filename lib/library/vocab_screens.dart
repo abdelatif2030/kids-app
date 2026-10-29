@@ -1,3 +1,4 @@
+import '../design/layout.dart';
 import 'package:flutter/material.dart';
 
 import '../journey/models.dart';
@@ -35,7 +36,7 @@ class _VocabLibraryScreenState extends State<VocabLibraryScreen> {
       ),
       body: PastelBackground(
         child: SafeArea(
-          child: ListView(
+          child: CenteredList(
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),

@@ -1,3 +1,4 @@
+import '../../design/layout.dart';
 import 'package:flutter/material.dart';
 
 import '../../data_reset.dart';
@@ -74,7 +75,7 @@ class PrivacyScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(loc('الخصوصية والبيانات'))),
-      body: ListView(
+      body: CenteredList(
         padding: const EdgeInsets.all(16),
         children: [
           Text(

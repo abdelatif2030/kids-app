@@ -1,3 +1,4 @@
+import 'design/layout.dart';
 import 'package:flutter/material.dart';
 
 import 'watch_history.dart';
@@ -32,7 +33,7 @@ class WatchSummaryScreen extends StatelessWidget {
               .where((e) => weekKeys.contains(e.day))
               .fold<int>(0, (sum, e) => sum + e.seconds);
 
-          return ListView(
+          return CenteredList(
             padding: const EdgeInsets.all(16),
             children: [
               Card(

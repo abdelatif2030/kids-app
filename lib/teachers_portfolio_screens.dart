@@ -1,3 +1,4 @@
+import 'design/layout.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -50,7 +51,15 @@ class _PortfolioSectionState extends State<PortfolioSection> {
             if (items.isEmpty) {
               return Text(tr2('لم يضف المدرس نماذج من أعماله بعد.', 'The teacher has not added work samples yet.'), style: const TextStyle(fontSize: 14));
             }
-            return Column(children: [for (final i in items) PortfolioCard(item: i)]);
+            // One column on a phone, two on a wide page.
+            return LayoutBuilder(
+              builder: (context, box) {
+                final cols = columnsFor(box.maxWidth, minTileWidth: 320, maxColumns: 2);
+                if (cols == 1) return Column(children: [for (final i in items) PortfolioCard(item: i)]);
+                final w = (box.maxWidth - 12) / 2;
+                return Wrap(spacing: 12, runSpacing: 0, children: [for (final i in items) SizedBox(width: w, child: PortfolioCard(item: i))]);
+              },
+            );
           },
         ),
         Text(
@@ -196,7 +205,7 @@ class _TeacherPortfolioScreenState extends State<TeacherPortfolioScreen> {
             return Center(child: TextButton(onPressed: _reload, child: Text(tr2('تعذّر التحميل. أعد المحاولة', 'Could not load. Try again'))));
           }
           final items = snap.data ?? const <PortfolioItem>[];
-          return ListView(
+          return CenteredList(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
             children: [
               Text(
@@ -303,7 +312,7 @@ class _PortfolioEditScreenState extends State<PortfolioEditScreen> {
     final hidden = widget.item?.hidden ?? false;
     return Scaffold(
       appBar: AppBar(title: Text(widget.item == null ? tr2('عمل جديد', 'New work') : tr2('تعديل العمل', 'Edit work'))),
-      body: ListView(
+      body: CenteredList(
         padding: const EdgeInsets.all(16),
         children: [
           if (hidden)

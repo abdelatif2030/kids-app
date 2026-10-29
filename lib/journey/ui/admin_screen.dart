@@ -1,3 +1,4 @@
+import '../../design/layout.dart';
 import 'package:flutter/material.dart';
 
 import '../lands.dart';
@@ -59,7 +60,7 @@ class _LandsTab extends StatelessWidget {
       builder: (context, _) {
         final store = JourneyStore.instance;
         final s = store.settings;
-        return ListView(
+        return CenteredList(
           padding: const EdgeInsets.all(12),
           children: [
             Padding(
@@ -195,7 +196,7 @@ class _QuestionsTabState extends State<_QuestionsTab> {
                     ),
                   ),
                 )
-              : ListView(
+              : CenteredList(
                   padding: const EdgeInsets.fromLTRB(12, 12, 12, 96),
                   children: [
                     for (final q in store.custom)
@@ -306,7 +307,7 @@ class _QuestionEditorState extends State<QuestionEditor> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.existing == null ? loc('سؤال جديد') : loc('تعديل السؤال'))),
-      body: ListView(
+      body: CenteredList(
         padding: const EdgeInsets.all(16),
         children: [
           DropdownButton<String>(
@@ -392,7 +393,7 @@ class _RewardsTab extends StatelessWidget {
       builder: (context, _) {
         final store = JourneyStore.instance;
         final thr = store.settings.badgeThresholds;
-        return ListView(
+        return CenteredList(
           padding: const EdgeInsets.all(12),
           children: [
             Padding(
@@ -471,7 +472,7 @@ class _PlansTab extends StatelessWidget {
         if (store.profiles.isEmpty) {
           return Center(child: Text(loc('أضف طفلاً أولاً لتظهر خطته هنا.'), style: TextStyle(fontSize: 17)));
         }
-        return ListView(
+        return CenteredList(
           padding: const EdgeInsets.all(12),
           children: [
             for (final c in store.profiles)

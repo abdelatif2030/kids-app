@@ -1,3 +1,4 @@
+import 'design/layout.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -257,7 +258,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(title: Text(loc('إعدادات الوالدين'))),
       body: !_loaded
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
+          : CenteredList(
               children: [
                 ListTile(
                   leading: const Icon(Icons.child_care_rounded),

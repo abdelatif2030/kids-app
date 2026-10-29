@@ -49,3 +49,27 @@ int columnsFor(double width, {double minTileWidth = 280, int maxColumns = 4, dou
   final n = ((width + gap) / (minTileWidth + gap)).floor();
   return n.clamp(1, maxColumns);
 }
+
+/// A scrolling list whose content never gets wider than [maxWidth] on a wide window (the extra space
+/// becomes side padding), with the same `padding` and `children` as a plain ListView.
+class CenteredList extends StatelessWidget {
+  final EdgeInsets padding;
+  final List<Widget> children;
+  final double maxWidth;
+  final ScrollController? controller;
+  const CenteredList({super.key, this.padding = EdgeInsets.zero, required this.children, this.maxWidth = 720, this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, box) {
+        final extra = box.maxWidth > maxWidth ? (box.maxWidth - maxWidth) / 2 : 0.0;
+        return ListView(
+          controller: controller,
+          padding: padding.copyWith(left: padding.left + extra, right: padding.right + extra),
+          children: children,
+        );
+      },
+    );
+  }
+}

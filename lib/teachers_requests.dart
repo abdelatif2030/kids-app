@@ -1,3 +1,4 @@
+import 'design/layout.dart';
 import 'package:flutter/material.dart';
 
 import 'curriculum.dart';
@@ -85,7 +86,7 @@ class _MyRequestsScreenState extends State<MyRequestsScreen> {
             );
           }
           final now = DateTime.now();
-          return ListView(
+          return CenteredList(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
             children: [
               for (final r in list)
@@ -185,7 +186,7 @@ class _RequestFormState extends State<RequestForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(loc('طلب تعليمي جديد'))),
-      body: ListView(
+      body: CenteredList(
         padding: const EdgeInsets.all(16),
         children: [
           Text(
@@ -346,7 +347,7 @@ class _RequestDetailScreenState extends State<RequestDetailScreen> {
     final r = widget.request;
     return Scaffold(
       appBar: AppBar(title: Text(loc('الطلب والعروض'))),
-      body: ListView(
+      body: CenteredList(
         padding: const EdgeInsets.all(16),
         children: [
           Card(
@@ -483,7 +484,7 @@ class _OpenRequestsScreenState extends State<OpenRequestsScreen> {
           if (requests.isEmpty) {
             return Center(child: Text(loc('لا توجد طلبات مفتوحة الآن'), style: TextStyle(fontSize: 18)));
           }
-          return ListView(
+          return CenteredList(
             padding: const EdgeInsets.all(16),
             children: [
               for (final r in requests)
@@ -590,7 +591,7 @@ class _ProposalFormState extends State<ProposalForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(loc('عرض جديد'))),
-      body: ListView(
+      body: CenteredList(
         padding: const EdgeInsets.all(16),
         children: [
           Text('${_subject(widget.request.subject)}: ${widget.request.goal}', style: const TextStyle(fontWeight: FontWeight.bold)),

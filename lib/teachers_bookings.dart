@@ -1,3 +1,4 @@
+import 'design/layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -153,7 +154,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   if (mounted) _reload();
                 },
               );
-          return ListView(
+          return CenteredList(
             padding: const EdgeInsets.all(16),
             children: [
               if (active.isNotEmpty) Text(loc('القادمة والمعلّقة'), style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),

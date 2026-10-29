@@ -1,3 +1,4 @@
+import 'design/layout.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -226,7 +227,7 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
                     _apply(TeacherFilters.none);
                   },
                 )
-              : ListView(
+              : CenteredList(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 90),
                   children: [
                     for (final t in page)
@@ -442,7 +443,7 @@ class _FilterSheetState extends State<_FilterSheet> {
         expand: false,
         initialChildSize: 0.9,
         maxChildSize: 0.95,
-        builder: (context, controller) => ListView(
+        builder: (context, controller) => CenteredList(
           controller: controller,
           padding: const EdgeInsets.all(16),
           children: [

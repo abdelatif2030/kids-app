@@ -1,3 +1,4 @@
+import '../design/layout.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -94,7 +95,7 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
         child: SafeArea(
           child: !_loaded
               ? const Center(child: CircularProgressIndicator())
-              : ListView(
+              : CenteredList(
                   padding: const EdgeInsets.all(16),
                   children: [
                     if (resumable.isNotEmpty) ...[
@@ -506,7 +507,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
           child: Column(
             children: [
               Expanded(
-                child: ListView(
+                child: CenteredList(
                   padding: const EdgeInsets.all(16),
                   children: [
                     Center(

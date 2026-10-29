@@ -1,3 +1,4 @@
+import '../../design/layout.dart';
 import 'package:flutter/material.dart';
 
 import '../../l10n/strings.dart';
@@ -37,7 +38,7 @@ class _DaySettingsScreenState extends State<DaySettingsScreen> {
       appBar: AppBar(title: Text(tr2('محطات «يومي»', 'My day stations'))),
       body: p == null
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
+          : CenteredList(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16),

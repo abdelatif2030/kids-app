@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../design/layout.dart';
 import '../journey/resume.dart';
 import '../journey/stickers.dart';
 import '../journey/ui/kit.dart';
@@ -114,7 +115,7 @@ class GameScaffold extends StatelessWidget {
                     ),
                   ),
                 ),
-              Expanded(child: child),
+              Expanded(child: ResponsiveBody(maxWidth: 760, child: child)),
             ],
           ),
         ),

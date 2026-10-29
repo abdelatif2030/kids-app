@@ -1,3 +1,4 @@
+import 'design/layout.dart';
 import 'package:flutter/material.dart';
 
 import 'teachers_market.dart';
@@ -106,7 +107,7 @@ class _LessonReportFormState extends State<LessonReportForm> {
       appBar: AppBar(title: Text(loc('تقرير الحصة'))),
       body: !_loaded
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
+          : CenteredList(
               padding: const EdgeInsets.all(16),
               children: [
                 Text(loc('يراه ولي الأمر فقط. اكتب ملاحظاتك التعليمية؛ هذا ليس تشخيصاً ولا تقييماً طبياً أو نمائياً.'),
@@ -157,7 +158,7 @@ class LessonReportView extends StatelessWidget {
           if (r == null) {
             return Center(child: Text(loc('لم يكتب المدرس تقريراً لهذه الحصة بعد.'), style: TextStyle(fontSize: 18)));
           }
-          return ListView(
+          return CenteredList(
             padding: const EdgeInsets.all(16),
             children: [
               Text(tr2('مع ${booking.teacherName}${booking.start == null ? '' : ' · ${fmtDateTime(booking.start!)}'}', 'With ${booking.teacherName}${booking.start == null ? '' : ' · ${fmtDateTime(booking.start!)}'}')),
@@ -325,7 +326,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 }
                 final list = snap.data!;
                 if (list.isEmpty) return Center(child: Text(loc('لا توجد رسائل بعد')));
-                return ListView(
+                return CenteredList(
                   padding: const EdgeInsets.all(12),
                   children: [
                     for (final m in list)

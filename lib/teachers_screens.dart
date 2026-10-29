@@ -1,3 +1,4 @@
+import 'design/layout.dart';
 import 'package:flutter/material.dart';
 
 import 'firebase_config.dart';
@@ -189,7 +190,7 @@ class _AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(loc('حساب الأهل والمدرسين'))),
       body: AutofillGroup(
-        child: ListView(
+        child: CenteredList(
           padding: const EdgeInsets.all(24),
           children: [
             SegmentedButton<bool>(

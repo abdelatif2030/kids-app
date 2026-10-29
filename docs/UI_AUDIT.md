@@ -84,3 +84,26 @@ screen and needs your visual review first.
 ## Not verifiable here (needs a person)
 Real phone and tablet behaviour, browser Back/Forward, refresh behaviour, screen readers (TalkBack / VoiceOver /
 NVDA), real keyboard use, print and file dialogs, and a visual review of the new layouts.
+
+## What was changed after this audit (Phases 2-8)
+- `lib/design/layout.dart`: window classes (compact < 600, medium < 1024, expanded), `ResponsiveBody`,
+  `CenteredList` (a ListView that never gets wider than a readable width) and `columnsFor`.
+- `lib/design/focusable_tap.dart`: tap + keyboard (Tab, Enter, Space) + hover + focus ring + click cursor. It replaces
+  the bare `GestureDetector` in all learning games, the older games, the avatar picker and the feeling faces.
+  Drawing, tracing and the studio keep their pan gestures (they cannot be keyboard-only).
+- App theme: visible focus/hover colors, scrollbars on hover, mouse/trackpad drag scrolling (`AppScrollBehavior`).
+- Web: real title, description, `lang`, manifest name and orientation (the installed app is no longer locked to portrait).
+- Child shell: bottom bar on phones, side rail on medium and wide windows. Child home: one column up to 640 dp,
+  two columns (today on one side, lands and shortcuts on the other) from 900 dp. The feeling faces shrink to stay on
+  one row on a phone.
+- Parent, teacher, library, stories and audio screens use `CenteredList` (720 dp; the teacher page 960 dp); the
+  portfolio shows two columns when there is room; games are centred with a 760 dp limit.
+- Tests: `test/responsive_matrix_test.dart` (compact 360, medium 768, expanded 1280 x Arabic and English, 30
+  checks), `test/focusable_tap_test.dart` (keyboard-only play of a game), the older 320 px / 1.6x text suite.
+
+## Still recommended (not done)
+- Unify the two palettes (RC and DS) and corner radii: large and needs your visual decision.
+- A real Router for browser Back/Forward and deep links. The current `Navigator.push` pages may not create
+  browser history entries; this must be checked in a browser first.
+- Dedicated tablet landscape layouts for the games (they are centred, not redesigned).
+- `lang` in `index.html` is fixed to `ar`; it does not follow the in-app language switch.

@@ -1,3 +1,4 @@
+import '../design/layout.dart';
 import 'package:flutter/material.dart';
 
 import '../journey/home_tasks.dart';
@@ -57,7 +58,7 @@ class _ActivityLibraryScreenState extends State<ActivityLibraryScreen> {
       ),
       body: PastelBackground(
         child: SafeArea(
-          child: ListView(
+          child: CenteredList(
             padding: const EdgeInsets.all(16),
             children: [
               RCard(

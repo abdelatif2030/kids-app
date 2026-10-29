@@ -1,3 +1,4 @@
+import 'design/layout.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -70,7 +71,7 @@ class _PlanScreenState extends State<PlanScreen> {
       appBar: AppBar(title: Text(loc('الخطة الأسبوعية'))),
       body: !_loaded
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
+          : CenteredList(
               padding: const EdgeInsets.all(16),
               children: [
                 Padding(

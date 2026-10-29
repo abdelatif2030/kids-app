@@ -1,3 +1,4 @@
+import '../../design/layout.dart';
 import 'package:flutter/material.dart';
 
 import '../../games/game_catalog.dart';
@@ -65,7 +66,7 @@ class _MyLibraryScreenState extends State<MyLibraryScreen> {
               final favWords = [for (final id in words) if (vocabById(id) != null) vocabById(id)!];
               final favGames = [for (final g in kEducationalGames) if (games.contains(g.id) && g.fitsAge(c.age)) g];
               final empty = favStories.isEmpty && favWords.isEmpty && favGames.isEmpty;
-              return ListView(
+              return CenteredList(
                 padding: const EdgeInsets.all(16),
                 children: [
                   RCard(

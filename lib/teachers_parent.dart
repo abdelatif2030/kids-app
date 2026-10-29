@@ -1,3 +1,4 @@
+import 'design/layout.dart';
 import 'package:flutter/material.dart';
 
 import 'curriculum.dart';
@@ -254,7 +255,8 @@ class TeacherDetailScreen extends StatelessWidget {
     final done = profileCompleteness(t);
     return Scaffold(
       appBar: AppBar(title: Text(t.name)),
-      body: ListView(
+      body: CenteredList(
+        maxWidth: 960,
         padding: const EdgeInsets.all(16),
         children: [
           TeacherHeader(

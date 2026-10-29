@@ -1,3 +1,4 @@
+import '../../design/layout.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -369,7 +370,7 @@ class ChildrenScreen extends StatelessWidget {
           ),
           body: store.profiles.isEmpty
               ? Center(child: Text(loc('لا يوجد أطفال بعد'), style: TextStyle(fontSize: 20)))
-              : ListView(
+              : CenteredList(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
                   children: [
                     for (final c in store.profiles)
@@ -439,7 +440,7 @@ class _ChildEditScreenState extends State<ChildEditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.child.nickname)),
-      body: ListView(
+      body: CenteredList(
         padding: const EdgeInsets.all(16),
         children: [
           BasicsForm(draft: _draft, onChanged: () {}),

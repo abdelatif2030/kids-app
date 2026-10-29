@@ -1165,3 +1165,139 @@ The six learning games under Games > Learning games.
 - **Status:** Not tested
 - **Device or environment:** Device: 
 - **Notes:** 
+
+## I. Web, tablet and wide-screen UI
+
+### I1 - Keyboard-only play on the web
+
+- [ ] Not tested
+- **Test ID:** I1
+- **Preconditions:** A desktop browser with the web build open; a child profile exists.
+- **Steps:**
+  1. Press Tab repeatedly on the child home and watch the focus ring.
+  2. Open a learning game with Enter.
+  3. Choose answers with Tab and Enter or Space until the game ends.
+- **Expected result:** Every tile and answer can be reached and activated with the keyboard; the focus ring is clearly visible; nothing traps the focus.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browser and OS: 
+- **Notes:** 
+
+### I2 - Mouse hover and cursor
+
+- [ ] Not tested
+- **Test ID:** I2
+- **Preconditions:** Desktop browser.
+- **Steps:**
+  1. Move the mouse over tiles, answers and navigation items.
+- **Expected result:** The cursor becomes a pointer and the item shows a light hover tint.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browser and OS: 
+- **Notes:** 
+
+### I3 - Mouse drag and scrollbars
+
+- [ ] Not tested
+- **Test ID:** I3
+- **Preconditions:** Desktop browser with a mouse.
+- **Steps:**
+  1. Scroll long lists (parent settings, library) with the wheel, with a scrollbar and by dragging.
+- **Expected result:** All three ways scroll; the scrollbar appears on hover.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browser and OS: 
+- **Notes:** 
+
+### I4 - Browser resize
+
+- [ ] Not tested
+- **Test ID:** I4
+- **Preconditions:** Desktop browser.
+- **Steps:**
+  1. Resize the window from 360 px wide to 1400 px and back while on the child home, a game and the parent settings.
+- **Expected result:** The layout switches between bottom bar, side rail and two columns; no overflow stripes; the game or form state is kept.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browser and OS: 
+- **Notes:** 
+
+### I5 - Browser Back / Forward and refresh
+
+- [ ] Not tested
+- **Test ID:** I5
+- **Preconditions:** Desktop browser.
+- **Steps:**
+  1. Open a game from the child home, press the browser Back button.
+  2. Press Forward.
+  3. Refresh the page on a game.
+- **Expected result:** Record what happens (leaves the site, goes back one page, or restarts). This behaviour was NOT verified; if Back leaves the app, a router change is needed.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browser and OS: 
+- **Notes:** 
+
+### I6 - Wide layouts
+
+- [ ] Not tested
+- **Test ID:** I6
+- **Preconditions:** A 1366 x 768 window.
+- **Steps:**
+  1. Open the child home, the parent settings, the library and a teacher page with a portfolio.
+- **Expected result:** Content is centred with a readable width; the child home shows two columns; the portfolio shows two columns; nothing is stretched across the window.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browser and OS: 
+- **Notes:** 
+
+### I7 - Tablet and landscape
+
+- [ ] Not tested
+- **Test ID:** I7
+- **Preconditions:** A real tablet or a 820 x 1180 window, portrait and landscape.
+- **Steps:**
+  1. Open the child home and three games.
+- **Expected result:** A side rail is used instead of the bottom bar; games stay centred and readable.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browser and OS: 
+- **Notes:** 
+
+### I8 - Arabic and English layout
+
+- [ ] Not tested
+- **Test ID:** I8
+- **Preconditions:** Wide window.
+- **Steps:**
+  1. Switch the interface between Arabic and English on the child home, parent settings and a teacher page.
+- **Expected result:** The rail sits on the right in Arabic and on the left in English; the column order mirrors; no cut-off text.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browser and OS: 
+- **Notes:** 
+
+### I9 - Page title and install
+
+- [ ] Not tested
+- **Test ID:** I9
+- **Preconditions:** Desktop Chrome.
+- **Steps:**
+  1. Look at the browser tab title and install the web app.
+- **Expected result:** The title is 'رحلتي | Rehlaty' and the installed app is not locked to portrait.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browser and OS: 
+- **Notes:** 
+
+### I10 - Screen reader on the web
+
+- [ ] Not tested
+- **Test ID:** I10
+- **Preconditions:** NVDA, VoiceOver or TalkBack with the web build or the app.
+- **Steps:**
+  1. Navigate the child home and one game.
+- **Expected result:** Tiles are announced as buttons with names; selected tabs are announced. Web accessibility has not been verified.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browser and OS: 
+- **Notes:** 

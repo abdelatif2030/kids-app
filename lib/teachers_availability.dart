@@ -1,3 +1,4 @@
+import 'design/layout.dart';
 import 'package:flutter/material.dart';
 
 import 'teachers_market.dart';
@@ -89,7 +90,7 @@ class _TeacherAvailabilityScreenState extends State<TeacherAvailabilityScreen> {
               ),
             );
           }
-          return ListView(
+          return CenteredList(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
             children: [
               Text(loc('الأوقات بتوقيت جهازك. لا يمكن حذف موعد محجوز؛ يتحرر موعد الحجز الملغي أو المرفوض تلقائياً.'),

@@ -1,4 +1,5 @@
 import '../design/focusable_tap.dart';
+
 import 'package:flutter/material.dart';
 
 import '../journey/ui/kit.dart';
@@ -153,34 +154,40 @@ class _ConnectFourGameState extends State<ConnectFourGame> {
         'لعبة لاعبين اثنين على نفس الجهاز: اضغط عموداً لإسقاط قطعتك. اجمع أربعاً متصلة.',
         'Two players on one device: tap a column to drop your piece. Connect four.',
       ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(width: 36, height: 36, child: _disc(_board.current)),
-                const SizedBox(width: 10),
-                Flexible(
-                  child: Text(
-                    tr2(
-                      'دور ${_name(_board.current)}',
-                      '${_name(_board.current)}\'s turn',
-                    ),
-                    key: const ValueKey('turn'),
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: RC.ink,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(width: 36, height: 36, child: _disc(_board.current)),
+                  const SizedBox(width: 10),
+                  Flexible(
+                    child: Text(
+                      tr2(
+                        'دور ${_name(_board.current)}',
+                        '${_name(_board.current)}\'s turn',
+                      ),
+                      key: const ValueKey('turn'),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: RC.ink,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Expanded(child: _boardView()),
-        ],
+            // The board is as wide as the window allows (up to 440), so on a small phone the page scrolls.
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: _boardView(),
+            ),
+          ],
+        ),
       ),
     );
   }

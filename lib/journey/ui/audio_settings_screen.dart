@@ -1,3 +1,4 @@
+import '../../design/layout.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -52,7 +53,7 @@ class _AudioSettingsScreenState extends State<AudioSettingsScreen> {
               listenable: AudioPrefs.instance,
               builder: (context, _) {
                 final p = AudioPrefs.instance;
-                return ListView(
+                return CenteredList(
                   children: [
                     Padding(
                       padding: EdgeInsets.all(16),
@@ -239,7 +240,7 @@ class _DataExportScreenState extends State<DataExportScreen> {
     final profiles = JourneyStore.instance.profiles;
     return Scaffold(
       appBar: AppBar(title: Text(loc('تصدير بيانات الطفل'))),
-      body: ListView(
+      body: CenteredList(
         padding: const EdgeInsets.all(16),
         children: [
           Text(loc('اختر طفلاً لعرض كل ما يحفظه التطبيق عنه على هذا الجهاز. يمكنك نسخه وحفظه. لا يُرسل شيء إلى أي مكان.')),

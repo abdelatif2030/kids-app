@@ -1,3 +1,4 @@
+import 'design/layout.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -96,7 +97,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           final p = snapshot.data;
-          return ListView(
+          return CenteredList(
             padding: const EdgeInsets.all(16),
             children: [
               if (p == null) ...[
@@ -392,7 +393,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(loc('الملف الشخصي'))),
-      body: ListView(
+      body: CenteredList(
         padding: const EdgeInsets.all(24),
         children: [
           Center(

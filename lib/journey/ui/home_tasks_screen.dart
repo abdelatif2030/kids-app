@@ -1,3 +1,4 @@
+import '../../design/layout.dart';
 import 'package:flutter/material.dart';
 
 import '../home_tasks.dart';
@@ -39,7 +40,7 @@ class _ParentHomeTasksScreenState extends State<ParentHomeTasksScreen> {
       appBar: AppBar(title: Text(loc('أنشطة البيت'))),
       body: tasks == null
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
+          : CenteredList(
               padding: const EdgeInsets.all(16),
               children: [
                 Text(
@@ -126,7 +127,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       ),
       body: PastelBackground(
         child: SafeArea(
-          child: ListView(
+          child: CenteredList(
             padding: const EdgeInsets.all(16),
             children: [
               RCard(

@@ -1,3 +1,4 @@
+import '../../design/layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../l10n/strings.dart';
@@ -39,7 +40,7 @@ class _ReportProblemScreenState extends State<ReportProblemScreen> {
     final text = buildReportText(type: _type, area: _area, note: _note.text, version: '1.0.0');
     return Scaffold(
       appBar: AppBar(title: Text(loc('الإبلاغ عن مشكلة'))),
-      body: ListView(
+      body: CenteredList(
         padding: const EdgeInsets.all(16),
         children: [
           Text(

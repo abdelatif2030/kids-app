@@ -43,7 +43,7 @@ class _TracingViewState extends State<TracingView> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
           child: Text(
             enough ? loc('جميل! تتبّعتَ الحرف بإتقان 🌟') : loc('تتبّع الحرف بإصبعك فوق الشكل الباهت'),
             textAlign: TextAlign.center,

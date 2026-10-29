@@ -1,3 +1,4 @@
+import '../design/layout.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -224,7 +225,7 @@ class _AudioItemReviewScreenState extends State<AudioItemReviewScreen> {
     if (a == null) return Scaffold(appBar: AppBar(), body: Center(child: Text(tr2('العنصر غير موجود', 'Item not found'))));
     return Scaffold(
       appBar: AppBar(title: Text(a.id, style: const TextStyle(fontSize: 14))),
-      body: ListView(
+      body: CenteredList(
         padding: const EdgeInsets.all(DS.s16),
         children: [
           Center(child: Text(a.text, style: const TextStyle(fontSize: 64, fontWeight: FontWeight.w900))),
@@ -460,7 +461,7 @@ class _VoiceComparisonScreenState extends State<VoiceComparisonScreen> {
           for (final s in all) {
             phrases.putIfAbsent(s.id, () => []).add(s);
           }
-          return ListView(
+          return CenteredList(
             padding: const EdgeInsets.all(DS.s12),
             children: [
               Wrap(spacing: DS.s8, children: [

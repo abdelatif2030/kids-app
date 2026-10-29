@@ -1,3 +1,4 @@
+import '../design/layout.dart';
 import 'package:flutter/material.dart';
 
 import '../design/tokens.dart';
@@ -81,7 +82,7 @@ class _ParentAudioStatusScreenState extends State<ParentAudioStatusScreen> {
           body: Column(
             children: [
               Expanded(
-                child: ListView(
+                child: CenteredList(
                   padding: const EdgeInsets.all(DS.s12),
                   children: [
                     Card(

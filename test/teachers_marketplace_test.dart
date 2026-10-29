@@ -444,7 +444,7 @@ void main() {
       await tester.tap(find.widgetWithText(FilterChip, 'أونلاين'));
       await tester.tap(find.widgetWithText(FilterChip, 'مصري'));
       await tester.pump();
-      await tester.ensureVisible(find.text('حفظ'));
+      await tester.scrollUntilVisible(find.text('حفظ'), 400, scrollable: find.byType(Scrollable).first);
       await tester.tap(find.text('حفظ'));
       await tester.pumpAndSettle();
       final saved = (await repo.myTeacherProfile())!;
@@ -474,7 +474,7 @@ void main() {
       await tester.tap(find.text('ملف احترافي (يزيد ثقة الأهل)'));
       await tester.pumpAndSettle();
       await tester.enterText(find.widgetWithText(TextField, 'سعر الحصة (جنيه)'), '-5');
-      await tester.ensureVisible(find.text('حفظ'));
+      await tester.scrollUntilVisible(find.text('حفظ'), 400, scrollable: find.byType(Scrollable).first);
       await tester.tap(find.text('حفظ'));
       await tester.pump();
       expect(find.text('تحقق من السعر وسنوات الخبرة (أرقام صحيحة)'), findsOneWidget);
