@@ -104,6 +104,14 @@ class _Welcome extends StatelessWidget {
               icon: const Icon(Icons.school_rounded),
               label: Text(context.tr('start.accounts'), style: const TextStyle(fontSize: 17)),
             ),
+            // A relative on their own phone has no child profile; they come in through this door.
+            if (familyRepository != null)
+              TextButton.icon(
+                key: const ValueKey('i_am_family_welcome'),
+                onPressed: () => openFamily(context, asRelative: true, auth: teacherRepository, family: familyRepository),
+                icon: const Icon(Icons.family_restroom_rounded),
+                label: Text(tr2('أنا من العائلة (جد، جدة، قريب)', 'I am family (grandparent, relative)'), style: const TextStyle(fontSize: 17)),
+              ),
             TextButton.icon(
               onPressed: () => Navigator.push(
                 context,

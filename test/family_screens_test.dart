@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/family/family_models.dart';
+import 'package:kids_app/firebase_config.dart';
+import 'package:kids_app/journey/ui/start_screen.dart';
 import 'package:kids_app/family/family_prefs.dart';
 import 'package:kids_app/family/family_screens.dart';
 import 'package:kids_app/journey/models.dart';
@@ -166,5 +168,18 @@ void main() {
     await t.tap(find.byKey(const ValueKey('join')));
     await _settle(t);
     expect(find.byKey(const ValueKey('waiting')), findsOneWidget);
+  });
+
+  testWidgets('a relative with no child profile still finds the family door on the welcome screen', (t) async {
+    big(t);
+    SharedPreferences.setMockInitialValues({});
+    final empty = JourneyStore(LocalJourneyRepository());
+    await empty.load();
+    JourneyStore.instance = empty;
+    familyRepository = grandma;
+    addTearDown(() => familyRepository = null);
+    await t.pumpWidget(_app(const StartScreen()));
+    await _settle(t);
+    expect(find.byKey(const ValueKey('i_am_family_welcome')), findsOneWidget);
   });
 }
