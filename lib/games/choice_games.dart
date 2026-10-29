@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../journey/ui/kit.dart';
+import '../literacy/letters_data.dart';
+import '../media/audio_button.dart';
 import '../l10n/strings.dart';
 import '../library/vocab.dart';
 import 'game_common.dart';
@@ -15,7 +17,11 @@ class ChoiceRound {
   final int correct;
   final String? prompt; // overrides the game's instruction for this round
   final String? ref; // what the round is about (a vocabulary id), for records
-  const ChoiceRound(this.display, this.options, this.correct, {this.prompt, this.ref});
+
+  /// A text the child hears (a listening round). The audio service says it; the text stays on screen too.
+  final String? say;
+  final String sayLang;
+  const ChoiceRound(this.display, this.options, this.correct, {this.prompt, this.ref, this.say, this.sayLang = 'ar'});
 }
 
 const kChoiceRounds = 5;
@@ -48,6 +54,64 @@ List<ChoiceRound> makeOddOneOut(int age, Random r) {
     final odd = by[pair[1]]![r.nextInt(by[pair[1]]!.length)];
     final all = [...same, odd]..shuffle(r);
     rounds.add(ChoiceRound('', all, all.indexOf(odd)));
+  }
+  return rounds;
+}
+
+/// Things that can be shown as one clear picture (not actions or feelings).
+const kPicturableCategories = ['animals', 'food', 'home', 'transport', 'nature'];
+
+List<Vocab> _listenWords(int age) => [
+      for (final v in kVocab)
+        if (kPicturableCategories.contains(v.category) && age >= v.minAge && age <= v.maxAge) v,
+    ];
+
+/// «اسمع واختر الصورة»: hear a word, pick its picture. The word is also shown, so a child who cannot hear it
+/// (or a device with no Arabic voice) can still play by reading.
+List<ChoiceRound> makeListenPicture(int age, Random r) {
+  final pool = _listenWords(age);
+  final rounds = <ChoiceRound>[];
+  final used = <String>{};
+  while (rounds.length < kChoiceRounds && pool.length >= 3) {
+    final target = pool[r.nextInt(pool.length)];
+    if (used.contains(target.id) && used.length < pool.length) continue;
+    used.add(target.id);
+    final others = ([...pool]..shuffle(r)).where((v) => v.emoji != target.emoji).take(2).toList();
+    final opts = [target.emoji, ...others.map((v) => v.emoji)]..shuffle(r);
+    rounds.add(ChoiceRound('', opts, opts.indexOf(target.emoji), ref: target.id, say: target.ar));
+  }
+  return rounds;
+}
+
+/// «اسمع واختر الكلمة»: hear a word, pick the written word (reading practice for ages 5 and up).
+List<ChoiceRound> makeListenWord(int age, Random r) {
+  final pool = _listenWords(age);
+  final rounds = <ChoiceRound>[];
+  final used = <String>{};
+  while (rounds.length < kChoiceRounds && pool.length >= 3) {
+    final target = pool[r.nextInt(pool.length)];
+    if (used.contains(target.id) && used.length < pool.length) continue;
+    used.add(target.id);
+    final others = ([...pool]..shuffle(r)).where((v) => v.ar != target.ar).take(2).toList();
+    final opts = [target.ar, ...others.map((v) => v.ar)]..shuffle(r);
+    rounds.add(ChoiceRound('', opts, opts.indexOf(target.ar), ref: target.id, say: target.ar));
+  }
+  return rounds;
+}
+
+/// «اسمع واختر الحرف»: hear the letter's NAME (باء), pick the letter. Isolated letter SOUNDS are not used here:
+/// a device voice cannot say them correctly, so they wait for approved recordings.
+List<ChoiceRound> makeListenLetter(int age, Random r) {
+  final rounds = <ChoiceRound>[];
+  final used = <String>{};
+  final pool = age <= 4 ? kArabicLetters.take(14).toList() : kArabicLetters;
+  while (rounds.length < kChoiceRounds) {
+    final target = pool[r.nextInt(pool.length)];
+    if (used.contains(target.letter) && used.length < pool.length) continue;
+    used.add(target.letter);
+    final others = ([...pool]..shuffle(r)).where((l) => l.letter != target.letter).take(2).toList();
+    final opts = [target.letter, ...others.map((l) => l.letter)]..shuffle(r);
+    rounds.add(ChoiceRound('', opts, opts.indexOf(target.letter), say: target.name));
   }
   return rounds;
 }
@@ -236,6 +300,20 @@ class _ChoiceGameState extends State<ChoiceGame> {
                 textDirection: TextDirection.ltr,
                 child: Text(round.display, key: const ValueKey('display'), textAlign: TextAlign.center, style: TextStyle(fontSize: groups ? 96 : 52)),
               ),
+            if (round.say != null)
+              Padding(
+                key: const ValueKey('listen_block'),
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Column(children: [
+                  Wrap(spacing: 12, runSpacing: 8, alignment: WrapAlignment.center, children: [
+                    AudioButton(text: round.say, lang: round.sayLang),
+                    AudioButton(text: round.say, lang: round.sayLang, slow: true, filled: false),
+                  ]),
+                  const AudioNotice(),
+                  // The spoken words are always readable too (captions).
+                  Text(round.say!, key: const ValueKey('caption'), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: RC.ink)),
+                ]),
+              ),
             Text('${_i + 1} / ${_rounds.length}', style: const TextStyle(color: RC.ink)),
             const SizedBox(height: 16),
             Wrap(
@@ -365,5 +443,59 @@ class _SortGameState extends State<SortGame> {
         groupTitles: _set.groupTitles,
         groupEmojis: _set.groupEmojis,
         random: _r,
+      );
+}
+
+class ListenPictureGame extends StatelessWidget {
+  final String childId;
+  final int age;
+  final Random? random;
+  const ListenPictureGame({super.key, required this.childId, required this.age, this.random});
+  static const gameId = 'listen_picture';
+
+  @override
+  Widget build(BuildContext context) => ChoiceGame(
+        childId: childId,
+        gameId: gameId,
+        title: tr2('اسمع واختر الصورة', 'Listen and pick the picture'),
+        instruction: tr2('اضغط «استمع»، ثم اختر الصورة المناسبة.', 'Tap “Listen”, then pick the matching picture.'),
+        make: (r) => makeListenPicture(age, r),
+        random: random,
+      );
+}
+
+class ListenWordGame extends StatelessWidget {
+  final String childId;
+  final int age;
+  final Random? random;
+  const ListenWordGame({super.key, required this.childId, required this.age, this.random});
+  static const gameId = 'listen_word';
+
+  @override
+  Widget build(BuildContext context) => ChoiceGame(
+        childId: childId,
+        gameId: gameId,
+        title: tr2('اسمع واختر الكلمة', 'Listen and pick the word'),
+        instruction: tr2('استمع إلى الكلمة، ثم اختر الكلمة المكتوبة.', 'Listen to the word, then pick the written word.'),
+        make: (r) => makeListenWord(age, r),
+        random: random,
+      );
+}
+
+class ListenLetterGame extends StatelessWidget {
+  final String childId;
+  final int age;
+  final Random? random;
+  const ListenLetterGame({super.key, required this.childId, required this.age, this.random});
+  static const gameId = 'listen_letter';
+
+  @override
+  Widget build(BuildContext context) => ChoiceGame(
+        childId: childId,
+        gameId: gameId,
+        title: tr2('اسمع واختر الحرف', 'Listen and pick the letter'),
+        instruction: tr2('استمع إلى اسم الحرف، ثم اختر الحرف.', 'Listen to the letter’s name, then pick the letter.'),
+        make: (r) => makeListenLetter(age, r),
+        random: random,
       );
 }
