@@ -550,3 +550,77 @@ test('family: only the parent deletes messages; nobody edits them', async () => 
   await assertFails(deleteDoc(msgRef(as('r1'), 'x1')));
   await assertSucceeds(deleteDoc(msgRef(as('p1'), 'x1')));
 });
+
+// family calls -------------------------------------------------------------
+const callRef = (db, id = 'k1', fid = 'p1') => doc(db, 'families', fid, 'calls', id);
+const callData = (over = {}) => ({
+  childId: 'c1', childName: 'Lina', relUid: 'r1', from: 'parent', status: 'ringing', offer: { sdp: 'v=0', type: 'offer' }, createdAt: serverTimestamp(), ...over,
+});
+async function seedCallsOn(rel = 'r1', status = 'active', calls = true) {
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(doc(ctx.firestore(), 'families', 'p1', 'relatives', rel), { name: 'Nana', relation: 'grandma', status, children: { c1: 'Lina' }, code: 'ABC123', ...(calls ? { calls: true } : {}) });
+  });
+}
+
+test('calls: only the parent turns calls on for a relative', async () => {
+  await seedRelative('r1', 'active');
+  await assertFails(updateDoc(doc(as('r1'), 'families', 'p1', 'relatives', 'r1'), { calls: true }));
+  await assertFails(updateDoc(doc(as('p2'), 'families', 'p1', 'relatives', 'r1'), { calls: true }));
+  await assertSucceeds(updateDoc(doc(as('p1'), 'families', 'p1', 'relatives', 'r1'), { calls: true }));
+});
+
+test('calls: nobody can start a call until the parent switched calls on', async () => {
+  await seedCallsOn('r1', 'active', false);
+  await assertFails(setDoc(callRef(as('p1')), callData()));
+  await assertFails(setDoc(callRef(as('r1')), callData({ from: 'relative' })));
+});
+
+test('calls: the parent calls on the child behalf, the relative calls the parent, nobody else', async () => {
+  await seedCallsOn();
+  await assertSucceeds(setDoc(callRef(as('p1'), 'a'), callData()));
+  await assertSucceeds(setDoc(callRef(as('r1'), 'b'), callData({ from: 'relative' })));
+  await assertFails(setDoc(callRef(as('r1'), 'c'), callData({ from: 'parent' }))); // relative pretending to be the parent
+  await assertFails(setDoc(callRef(as('p1'), 'd'), callData({ from: 'relative' }))); // parent pretending to be the relative
+  await assertFails(setDoc(callRef(as('r2'), 'e'), callData({ from: 'relative' }))); // someone else
+  await assertFails(setDoc(callRef(as('p1'), 'f'), callData({ childId: 'c2' }))); // not linked
+  await assertFails(setDoc(callRef(as('p1'), 'g'), callData({ status: 'accepted' }))); // must start ringing
+  await assertFails(setDoc(callRef(as('p1'), 'h'), { ...callData(), video: true })); // no extra fields
+});
+
+test('calls: not for a paused relative', async () => {
+  await seedCallsOn('r1', 'paused');
+  await assertFails(setDoc(callRef(as('p1')), callData()));
+});
+
+test('calls: only the callee can answer; either side can end; nobody else touches it', async () => {
+  await seedCallsOn();
+  await env.withSecurityRulesDisabled(async (ctx) => { await setDoc(callRef(ctx.firestore()), { ...callData(), createdAt: new Date() }); });
+  const answer = { sdp: 'v=0', type: 'answer' };
+  await assertFails(updateDoc(callRef(as('p1')), { status: 'accepted', answer })); // the caller cannot answer their own call
+  await assertFails(updateDoc(callRef(as('r2')), { status: 'ended' })); // a stranger
+  await assertSucceeds(updateDoc(callRef(as('r1')), { status: 'accepted', answer }));
+  await assertFails(updateDoc(callRef(as('r1')), { offer: { sdp: 'x', type: 'offer' } })); // only status/answer
+  await assertSucceeds(updateDoc(callRef(as('p1')), { status: 'ended' }));
+});
+
+test('calls: signalling is read only by the two sides', async () => {
+  await seedCallsOn();
+  await env.withSecurityRulesDisabled(async (ctx) => { await setDoc(callRef(ctx.firestore()), { ...callData(), createdAt: new Date() }); });
+  await assertSucceeds(getDoc(callRef(as('p1'))));
+  await assertSucceeds(getDoc(callRef(as('r1'))));
+  await assertFails(getDoc(callRef(as('r2'))));
+  await assertFails(getDoc(callRef(as('p2'))));
+});
+
+test('calls: network candidates are written by the right side only and kept small', async () => {
+  await seedCallsOn();
+  await env.withSecurityRulesDisabled(async (ctx) => { await setDoc(callRef(ctx.firestore()), { ...callData(), createdAt: new Date() }); });
+  const cand = (db, from, data = '{"candidate":"x"}') => setDoc(doc(db, 'families', 'p1', 'calls', 'k1', 'candidates', String(Math.random())), { from, data });
+  await assertSucceeds(cand(as('p1'), 'parent'));
+  await assertSucceeds(cand(as('r1'), 'relative'));
+  await assertFails(cand(as('r1'), 'parent'));
+  await assertFails(cand(as('r2'), 'relative'));
+  await assertFails(cand(as('p1'), 'parent', 'x'.repeat(2001)));
+  await assertSucceeds(getDocs(collection(as('r1'), 'families', 'p1', 'calls', 'k1', 'candidates')));
+  await assertFails(getDocs(collection(as('r2'), 'families', 'p1', 'calls', 'k1', 'candidates')));
+});

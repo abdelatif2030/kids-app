@@ -40,16 +40,28 @@ Only a parent makes invites; a code works once and cannot be listed; a relative 
 changes status/children; messages need an ACTIVE relative linked to that child; nobody writes as someone else; content
 limits; a relative reads only their own thread; only the parent reads all and deletes.
 
-## NOT built: calling
-Voice/video calls need WebRTC (a package such as `flutter_webrtc`), a signalling channel (Firestore can do it), and
-**a TURN relay server** for most real networks (Firebase has none; paid or self-hosted). They also need microphone and
-camera permissions, which changes the Play "Data safety" answers and the privacy policy, and a call can carry anything
-the other person says or shows (no content filter is possible). Proposed safe design for later:
-- Calls start only from the **parent's** Family screen or are approved by the parent first ("child asks to call" ->
-  parent taps accept), never from an incoming ring on the child's screen.
-- Audio only first; video as a later, separate parent switch.
-- Parent-set call hours; calls end with the session timer; no recording; no call history beyond a local list.
-- Needs your decisions: TURN provider and budget, and approval of the WebRTC package.
+## Voice calls (built 2026-10-29, owner request)
+Package: `flutter_webrtc` (approved by the owner for calling; well known and maintained; works on Android and web).
+Audio only: the camera is never requested. The audio goes straight between the two devices; the server only carries
+the "who is calling" and connection details (Firestore `families/{parent}/calls`). Nothing is recorded or stored.
+
+Rules of the design:
+- OFF by default. The parent switches **«السماح بالمكالمات الصوتية»** on for each approved relative.
+- Calls are between the **parent's device** (the child is next to the parent) and the relative. The parent starts a call
+  from the family screen («اتصل»), or the relative starts one and it rings **only in the parent area**, never on the
+  child's screen. Only the person being called can answer. No notification package, so a call is seen only while that
+  screen is open.
+- A call that rings 45 s is "missed"; old ringing calls are ignored. Either side can hang up; leaving the screen hangs up
+  and releases the microphone.
+- The server rules (emulator-tested, 7 tests) require: relative active, calls on, child linked, the right caller, only
+  `status`/`answer` can change, only the callee can answer.
+- **Network:** only public STUN servers are configured (`kStunServers`). Calls work on many networks, but behind some
+  mobile carriers or strict firewalls a **TURN relay** is needed; there is none yet. If the call says it could not
+  connect, that is the likely reason. Adding one is a decision for you (cost, provider); the password must never be
+  committed.
+- Not built: video, group calls, ringing when the app is closed (needs push notifications), call history, recording.
+- Microphone: asked by the browser or Android only when a call starts (`RECORD_AUDIO` in the manifest). Play Data safety:
+  declare voice as "transmitted in real time, not stored".
 
 ## Before turning it on (release checklist)
 1. Create the Firebase project, set `kFirebaseEnabled = true`, publish `firestore.rules`.

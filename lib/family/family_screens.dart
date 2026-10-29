@@ -6,6 +6,9 @@ import '../design/layout.dart';
 import '../design/tokens.dart';
 import '../journey/repository.dart';
 import '../l10n/strings.dart';
+import 'call_models.dart';
+import 'call_repository.dart';
+import 'call_screens.dart';
 import 'family_models.dart';
 import 'family_prefs.dart';
 import 'family_repository.dart';
@@ -28,6 +31,7 @@ class FamilyParentScreen extends StatefulWidget {
 
 class _FamilyParentScreenState extends State<FamilyParentScreen> {
   late Future<List<Relative>> _rels = widget.repo.relatives();
+  List<Relative> _lastRels = const [];
 
   void _reload() {
     final next = widget.repo.relatives();
@@ -92,6 +96,12 @@ class _FamilyParentScreenState extends State<FamilyParentScreen> {
             ),
             style: DS.caption,
           ),
+          if (widget.repo is CallRepository)
+            IncomingCalls(
+              calls: widget.repo as CallRepository,
+              familyId: widget.repo.uid!,
+              titleOf: (c) => '${relationLabelOf(_lastRels, c.relUid)} · ${c.childName}',
+            ),
           const SizedBox(height: 12),
           SectionHeader(tr2('الأقارب', 'Relatives')),
           FutureBuilder<List<Relative>>(
@@ -100,6 +110,7 @@ class _FamilyParentScreenState extends State<FamilyParentScreen> {
               if (snap.connectionState != ConnectionState.done) return const Padding(padding: EdgeInsets.all(16), child: LinearProgressIndicator());
               if (snap.hasError) return ErrorState(message: _err(snap.error!), onRetry: _reload);
               final list = [for (final r in snap.data!) if (r.status != kRelativeRemoved) r];
+              _lastRels = list;
               if (list.isEmpty) {
                 return EmptyState(
                   icon: Icons.family_restroom_rounded,
@@ -114,6 +125,19 @@ class _FamilyParentScreenState extends State<FamilyParentScreen> {
                     rel: r,
                     onStatus: (s) => _do(() => widget.repo.setRelativeStatus(r.uid, s)),
                     onChildren: (c) => _do(() => widget.repo.setRelativeChildren(r.uid, c)),
+                    onCalls: (on) => _do(() => widget.repo.setRelativeCalls(r.uid, on)),
+                    onCall: widget.repo is CallRepository
+                        ? (childId, childName) => startCallScreen(
+                              context,
+                              calls: widget.repo as CallRepository,
+                              familyId: widget.repo.uid!,
+                              childId: childId,
+                              childName: childName,
+                              relUid: r.uid,
+                              from: CallFrom.parent,
+                              title: '${relationLabel(r.relation)} · ${r.name}',
+                            )
+                        : null,
                   ),
               ]);
             },
@@ -134,6 +158,11 @@ class _FamilyParentScreenState extends State<FamilyParentScreen> {
       ),
     );
   }
+}
+
+String relationLabelOf(List<Relative> rels, String relUid) {
+  final r = rels.where((r) => r.uid == relUid).firstOrNull;
+  return r == null ? tr2('قريب', 'Relative') : '${relationLabel(r.relation)} ${r.name}';
 }
 
 class _InviteDialog extends StatefulWidget {
@@ -212,7 +241,9 @@ class _RelativeCard extends StatelessWidget {
   final Relative rel;
   final ValueChanged<String> onStatus;
   final ValueChanged<Map<String, String>> onChildren;
-  const _RelativeCard({super.key, required this.rel, required this.onStatus, required this.onChildren});
+  final ValueChanged<bool> onCalls;
+  final void Function(String childId, String childName)? onCall;
+  const _RelativeCard({super.key, required this.rel, required this.onStatus, required this.onChildren, required this.onCalls, this.onCall});
 
   String get _statusText => switch (rel.status) {
         kRelativePending => tr2('بانتظار موافقتك', 'Waiting for your approval'),
@@ -230,6 +261,26 @@ class _RelativeCard extends StatelessWidget {
           Text('${rel.name} · ${relationLabel(rel.relation)}', style: DS.heading),
           Text(_statusText, key: ValueKey('status_${rel.uid}'), style: DS.caption),
           if (rel.children.isNotEmpty) Text(tr2('يتكلم مع: ', 'Talks with: ') + rel.children.values.join('، '), style: DS.caption),
+          if (rel.active && onCall != null) ...[
+            SwitchListTile(
+              key: ValueKey('calls_${rel.uid}'),
+              contentPadding: EdgeInsets.zero,
+              title: Text(tr2('السماح بالمكالمات الصوتية', 'Allow voice calls')),
+              subtitle: Text(tr2('صوت فقط، ولا يُسجَّل. تبدأ منك أو من القريب وتجيب أنت.', 'Voice only, never recorded. Started by you or by the relative, and you answer.')),
+              value: rel.callsOn,
+              onChanged: onCalls,
+            ),
+            if (rel.callsOn)
+              Wrap(spacing: 8, children: [
+                for (final e in rel.children.entries)
+                  OutlinedButton.icon(
+                    key: ValueKey('call_${rel.uid}_${e.key}'),
+                    onPressed: () => onCall!(e.key, e.value),
+                    icon: const Icon(Icons.call_rounded),
+                    label: Text(tr2('اتصل (${e.value})', 'Call (${e.value})')),
+                  ),
+              ]),
+          ],
           const SizedBox(height: 8),
           Wrap(spacing: 8, runSpacing: 4, children: [
             if (rel.status == kRelativePending)
@@ -713,7 +764,28 @@ class _RelativeFamily extends StatelessWidget {
               Text(tr2('عائلة $parentName', '$parentName’s family'), style: DS.heading),
               if (me == null || !me.active)
                 Text(tr2('بانتظار الموافقة', 'Waiting for approval'), key: const ValueKey('waiting'), style: DS.caption)
-              else
+              else ...[
+                if (repo is CallRepository)
+                  IncomingCalls(calls: repo as CallRepository, familyId: familyId, titleOf: (c) => tr2('عائلة $parentName', '$parentName’s family')),
+                if (repo is CallRepository && me.callsOn)
+                  Wrap(spacing: 8, children: [
+                    for (final c in me.children.entries)
+                      OutlinedButton.icon(
+                        key: ValueKey('call_${c.key}'),
+                        onPressed: () => startCallScreen(
+                          context,
+                          calls: repo as CallRepository,
+                          familyId: familyId,
+                          childId: c.key,
+                          childName: c.value,
+                          relUid: repo.uid!,
+                          from: CallFrom.relative,
+                          title: tr2('عائلة $parentName', '$parentName’s family'),
+                        ),
+                        icon: const Icon(Icons.call_rounded),
+                        label: Text(tr2('اتصل بشأن ${c.value}', 'Call about ${c.value}')),
+                      ),
+                  ]),
                 Wrap(spacing: 8, children: [
                   for (final c in me.children.entries)
                     ActionChip(
@@ -725,6 +797,7 @@ class _RelativeFamily extends StatelessWidget {
                       ),
                     ),
                 ]),
+              ],
             ]),
           ),
         );

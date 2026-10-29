@@ -1,16 +1,19 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../l10n/strings.dart';
+import 'call_models.dart';
+import 'call_repository.dart';
 import 'family_models.dart';
 import 'family_repository.dart';
 
 /// Firebase implementation of the family chat. Layout and limits are enforced by firestore.rules; the checks
 /// here only give clearer messages. Collections: invites/{code}, families/{parentUid}/relatives/{uid},
 /// families/{parentUid}/messages/{id}, users/{uid}/families/{familyId}.
-class FirebaseFamilyRepository implements FamilyRepository {
+class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
@@ -27,13 +30,13 @@ class FirebaseFamilyRepository implements FamilyRepository {
       rethrow;
     } on FirebaseException catch (e) {
       throw FamilyException(switch (e.code) {
-        'permission-denied' => tr2('غير مسموح. ربما لم يوافق ولي الأمر بعد أو الرمز غير صالح.', 'Not allowed. The parent may not have approved yet, or the code is not valid.') + ' [permission-denied]',
+        'permission-denied' => '${tr2('غير مسموح. ربما لم يوافق ولي الأمر بعد أو الرمز غير صالح.', 'Not allowed. The parent may not have approved yet, or the code is not valid.')} [permission-denied]',
         'unavailable' || 'network-request-failed' => tr2('لا يوجد اتصال بالإنترنت', 'No internet connection'),
-        _ => tr2('تعذّر إكمال العملية، حاول مرة أخرى', 'Something went wrong, please try again') + ' [${e.code}]',
+        _ => '${tr2('تعذّر إكمال العملية، حاول مرة أخرى', 'Something went wrong, please try again')} [${e.code}]',
       });
     } catch (e) {
       // Not a Firebase error (for example a bug): show what it is so it can be reported, never hide it.
-      throw FamilyException(tr2('تعذّر إكمال العملية', 'Something went wrong') + ' [$e]');
+      throw FamilyException('${tr2('تعذّر إكمال العملية', 'Something went wrong')} [$e]');
     }
   }
 
@@ -45,6 +48,7 @@ class FirebaseFamilyRepository implements FamilyRepository {
         relation: (d['relation'] as String?) ?? 'other',
         status: (d['status'] as String?) ?? kRelativePending,
         children: _strMap(d['children']),
+        callsOn: d['calls'] == true,
       );
 
   /// 8 characters without look-alikes (no 0/O, 1/I). Single use, so guessing is not a risk.
@@ -76,6 +80,9 @@ class FirebaseFamilyRepository implements FamilyRepository {
 
   @override
   Future<void> setRelativeStatus(String relUid, String status) => _guard(() => _rels(uid!).doc(relUid).update({'status': status}));
+
+  @override
+  Future<void> setRelativeCalls(String relUid, bool on) => _guard(() => _rels(uid!).doc(relUid).update({'calls': on}));
 
   @override
   Future<void> setRelativeChildren(String relUid, Map<String, String> children) => _guard(() => _rels(uid!).doc(relUid).update({'children': children}));
@@ -172,4 +179,85 @@ class FirebaseFamilyRepository implements FamilyRepository {
         }
         await batch.commit();
       });
+
+  // --- calls: signalling only (the audio goes straight between the two devices) -----------------
+
+  CollectionReference<Map<String, dynamic>> _calls(String fid) => _db.collection('families').doc(fid).collection('calls');
+
+  CallInfo _call(String familyId, String id, Map<String, dynamic> d) => CallInfo(
+        id: id,
+        familyId: familyId,
+        childId: (d['childId'] as String?) ?? '',
+        childName: (d['childName'] as String?) ?? '',
+        relUid: (d['relUid'] as String?) ?? '',
+        from: d['from'] == 'parent' ? CallFrom.parent : CallFrom.relative,
+        status: (d['status'] as String?) ?? callEnded,
+        offer: _strMap(d['offer']),
+        answer: d['answer'] == null ? null : _strMap(d['answer']),
+        createdAt: ((d['createdAt'] as Timestamp?) ?? Timestamp.now()).toDate(),
+      );
+
+  @override
+  Future<String> startCall({
+    required String familyId,
+    required String childId,
+    required String childName,
+    required String relUid,
+    required CallFrom from,
+    required Map<String, String> offer,
+  }) => _guard(() async {
+        final ref = await _calls(familyId).add({
+          'childId': childId,
+          'childName': childName,
+          'relUid': relUid,
+          'from': from == CallFrom.parent ? 'parent' : 'relative',
+          'status': callRinging,
+          'offer': offer,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+        return ref.id;
+      });
+
+  @override
+  Stream<List<CallInfo>> watchIncoming(String familyId) {
+    final me = uid;
+    final Query<Map<String, dynamic>> q = me == familyId
+        ? _calls(familyId).where('from', isEqualTo: 'relative').where('status', isEqualTo: callRinging)
+        : _calls(familyId).where('relUid', isEqualTo: me).where('status', isEqualTo: callRinging);
+    return q.snapshots().map((s) {
+      final now = DateTime.now();
+      return [
+        for (final d in s.docs)
+          if (me == familyId || d.data()['from'] == 'parent') _call(familyId, d.id, d.data()),
+      ].where((c) => c.freshAt(now)).toList();
+    });
+  }
+
+  @override
+  Stream<CallInfo?> watchCall(String familyId, String callId) =>
+      _calls(familyId).doc(callId).snapshots().map((d) => d.exists ? _call(familyId, d.id, d.data()!) : null);
+
+  @override
+  Future<void> answerCall(String familyId, String callId, Map<String, String> answer) =>
+      _guard(() => _calls(familyId).doc(callId).update({'status': callAccepted, 'answer': answer}));
+
+  @override
+  Future<void> setCallStatus(String familyId, String callId, String status) => _guard(() => _calls(familyId).doc(callId).update({'status': status}));
+
+  @override
+  Future<void> addCandidate(String familyId, String callId, CallFrom from, Map<String, dynamic> candidate) => _guard(
+        () => _calls(familyId).doc(callId).collection('candidates').add({
+          'from': from == CallFrom.parent ? 'parent' : 'relative',
+          'data': jsonEncode(candidate),
+        }),
+      );
+
+  @override
+  Stream<Map<String, dynamic>> watchCandidates(String familyId, String callId, CallFrom other) {
+    final q = _calls(familyId).doc(callId).collection('candidates').where('from', isEqualTo: other == CallFrom.parent ? 'parent' : 'relative');
+    return q.snapshots().expand((s) => [
+          for (final c in s.docChanges)
+            if (c.type == DocumentChangeType.added) jsonDecode(c.doc.data()!['data'] as String) as Map<String, dynamic>,
+        ]);
+  }
 }

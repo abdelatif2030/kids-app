@@ -412,9 +412,55 @@ service cloud.firestore {
         && request.resource.data.children == get(/databases/$(database)/documents/invites/$(request.resource.data.code)).data.children;
       // Only the parent decides: approve, pause, resume, remove, or change who the relative may talk with.
       allow update: if signedIn() && request.auth.uid == fid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'children'])
-        && request.resource.data.status in ['active', 'paused', 'removed'];
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'children', 'calls'])
+        && request.resource.data.status in ['active', 'paused', 'removed']
+        && request.resource.data.get('calls', false) is bool;
       allow delete: if false;
+    }
+
+    // Voice calls: signalling only (the audio goes straight between the devices and is never stored).
+    // Needs an ACTIVE relative with calls switched on by the parent. The parent calls on the child's behalf;
+    // the relative calls the parent. Only the callee can answer.
+    function callParty(fid, d) {
+      return request.auth.uid == fid || request.auth.uid == d.relUid;
+    }
+    match /families/{fid}/calls/{cid} {
+      allow read: if signedIn()
+        && (request.auth.uid == fid
+            || (resource.data.relUid == request.auth.uid && isActiveRelative(fid, request.auth.uid)));
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['childId', 'childName', 'relUid', 'from', 'status', 'offer', 'createdAt'])
+        && request.resource.data.status == 'ringing'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.childName.size() <= 40
+        && request.resource.data.offer.sdp.size() <= 30000
+        && isActiveRelative(fid, request.resource.data.relUid)
+        && get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.get('calls', false) == true
+        && request.resource.data.childId in get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.children.keys()
+        && ((request.auth.uid == fid && request.resource.data.from == 'parent')
+            || (request.auth.uid == request.resource.data.relUid && request.resource.data.from == 'relative'));
+      allow update: if signedIn() && callParty(fid, resource.data)
+        && isActiveRelative(fid, resource.data.relUid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'answer'])
+        && request.resource.data.status in ['accepted', 'declined', 'ended', 'missed']
+        // only the person being called can accept with an answer
+        && (!('answer' in request.resource.data.diff(resource.data).affectedKeys())
+            || (resource.data.status == 'ringing' && request.resource.data.status == 'accepted'
+                && ((resource.data.from == 'parent' && request.auth.uid == resource.data.relUid)
+                    || (resource.data.from == 'relative' && request.auth.uid == fid))));
+      allow delete: if signedIn() && request.auth.uid == fid;
+
+      match /candidates/{kid} {
+        allow read: if signedIn()
+          && (request.auth.uid == fid
+              || (get(/databases/$(database)/documents/families/$(fid)/calls/$(cid)).data.relUid == request.auth.uid && isActiveRelative(fid, request.auth.uid)));
+        allow create: if signedIn()
+          && request.resource.data.keys().hasOnly(['from', 'data'])
+          && request.resource.data.data.size() <= 2000
+          && ((request.auth.uid == fid && request.resource.data.from == 'parent')
+              || (request.auth.uid == get(/databases/$(database)/documents/families/$(fid)/calls/$(cid)).data.relUid && request.resource.data.from == 'relative'));
+        allow update, delete: if false;
+      }
     }
 
     match /families/{fid}/messages/{id} {

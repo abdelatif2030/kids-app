@@ -53,22 +53,27 @@ class Relative {
 
   /// The children (local id -> nickname) this relative may talk with. Set by the parent.
   final Map<String, String> children;
+
+  /// Voice calls with this relative: OFF until the parent turns it on.
+  final bool callsOn;
   const Relative({
     required this.uid,
     required this.name,
     required this.relation,
     required this.status,
     this.children = const {},
+    this.callsOn = false,
   });
 
   bool get active => status == kRelativeActive;
 
-  Relative copyWith({String? status, Map<String, String>? children}) => Relative(
+  Relative copyWith({String? status, Map<String, String>? children, bool? callsOn}) => Relative(
         uid: uid,
         name: name,
         relation: relation,
         status: status ?? this.status,
         children: children ?? this.children,
+        callsOn: callsOn ?? this.callsOn,
       );
 }
 

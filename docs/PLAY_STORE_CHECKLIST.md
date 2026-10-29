@@ -21,7 +21,8 @@
 | Encrypted in transit | Yes for network requests (HTTPS). |
 | Deletion | Parent can delete one child or all data inside the app. |
 | Ads / analytics SDK | None. |
-| Permissions | INTERNET only. No camera, microphone, location or contacts permission. Photo picking uses the system picker. |
+| Permissions | INTERNET and network state. **RECORD_AUDIO** and MODIFY_AUDIO_SETTINGS for the optional family voice calls (asked only when a call starts). No camera, location or contacts permission. Photo picking uses the system picker. |
+| Audio | Voice is transmitted in real time between devices during a call; not recorded, not stored. Answer the Data safety form accordingly and mention it in the privacy policy. |
 
 If the teacher service OR the family chat is turned on later (Firebase), the answers CHANGE (account email, teacher profile data,
 bookings, messages). Redo this form and the privacy policy first.

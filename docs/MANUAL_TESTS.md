@@ -1384,3 +1384,21 @@ The six learning games under Games > Learning games.
 - **Status:** Not tested
 - **Device or environment:** Phones and Android versions: 
 - **Notes:** 
+
+### F2 - Family voice call with two real devices
+
+- [ ] Not tested
+- **Test ID:** F2
+- **Preconditions:** F1 passed; rules re-published; two browsers/phones with a microphone each; headphones to avoid echo.
+- **Steps:**
+  1. Parent: Family chat -> turn on «السماح بالمكالمات الصوتية» for the relative.
+  2. Parent: tap «اتصل (الطفل)». Allow the microphone. The relative's screen should show the call within a few seconds.
+  3. Relative: answer. Speak on both sides. Try mute. Hang up from one side; the other side should end too.
+  4. Relative calls the parent: the call shows in the parent's Family screen only. Decline it, then try again and answer.
+  5. Turn calls off: no call button, and the server refuses a call.
+  6. Deny the microphone once: a clear message, no stuck call.
+- **Expected result:** Voice both ways, nothing recorded, microphone light off after the call. If it never connects on mobile data, a TURN server is needed (see docs/FAMILY_CHAT_DESIGN.md).
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Devices, browsers, networks: 
+- **Notes:** 
