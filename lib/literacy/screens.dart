@@ -1,3 +1,4 @@
+import '../design/worlds.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -97,6 +98,7 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
     final wordsOpen = practised >= 3 || _cfg.unlockAll;
     final id = widget.child.id;
     return Scaffold(
+      backgroundColor: kWorldPalettes[RWorld.forest]!.top, // the app bar blends into the sky
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
@@ -104,6 +106,7 @@ class _LettersHomeScreenState extends State<LettersHomeScreen> {
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
       body: PastelBackground(
+        world: RWorld.forest,
         child: SafeArea(
           child: !_loaded
               ? const Center(child: CircularProgressIndicator())
@@ -280,6 +283,7 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
           onResults: (r) => recordLetterResults(id, r),
         );
     return Scaffold(
+      backgroundColor: kWorldPalettes[RWorld.forest]!.top, // the app bar blends into the sky
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
@@ -287,6 +291,7 @@ class _LetterLessonScreenState extends State<LetterLessonScreen> {
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
       body: PastelBackground(
+        world: RWorld.forest,
         child: SafeArea(
           child: ListView(
             padding: const EdgeInsets.all(16),
@@ -432,6 +437,7 @@ class _TraceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: kWorldPalettes[RWorld.forest]!.top, // the app bar blends into the sky
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
@@ -439,6 +445,7 @@ class _TraceScreen extends StatelessWidget {
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
       body: PastelBackground(
+        world: RWorld.forest,
         child: SafeArea(
           child: TracingView(
             letter: letter,

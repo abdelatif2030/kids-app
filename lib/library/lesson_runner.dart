@@ -112,7 +112,7 @@ class _LessonRunnerScreenState extends State<LessonRunnerScreen> {
         title: Text(widget.title.isEmpty ? widget.kind.title : widget.title,
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
-      body: PastelBackground(child: SafeArea(child: body)),
+      body: PastelBackground(quiet: true, child: SafeArea(child: body)),
     );
   }
 }

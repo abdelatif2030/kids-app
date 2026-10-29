@@ -1,3 +1,4 @@
+import '../design/worlds.dart';
 import '../design/focusable_tap.dart';
 import 'dart:math';
 
@@ -95,6 +96,7 @@ class _NumeralsGameState extends State<NumeralsGame> {
     );
     if (_round >= _rounds.length) {
       return GameScaffold(
+      world: RWorld.space,
       confirmLeave: _round > 0,
         title: title,
         child: GameFinishPanel(
@@ -112,6 +114,7 @@ class _NumeralsGameState extends State<NumeralsGame> {
     final round = _rounds[_round];
     final ex = (round.digit + 1) % 10;
     return GameScaffold(
+      world: RWorld.space,
       title: title,
       instruction: tr2(
         'جد الرقم الذي يعني نفس الشيء',

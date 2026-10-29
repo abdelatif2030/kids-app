@@ -1,3 +1,4 @@
+import '../design/worlds.dart';
 import '../design/tokens.dart';
 import 'dart:convert';
 
@@ -79,12 +80,16 @@ class GameScaffold extends StatelessWidget {
   final String? instruction;
   final Widget child;
   final bool confirmLeave;
+
+  /// Which visual world the game lives in (forest for letters and words, ocean for listening, space for numbers).
+  final RWorld world;
   const GameScaffold({
     super.key,
     required this.title,
     this.instruction,
     required this.child,
     this.confirmLeave = false,
+    this.world = RWorld.journey,
   });
 
   Future<void> _askLeave(BuildContext context) async {
@@ -123,6 +128,7 @@ class GameScaffold extends StatelessWidget {
 
   Widget _body(BuildContext context) {
     return Scaffold(
+      backgroundColor: kWorldPalettes[world]!.top, // the app bar blends into the sky
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
@@ -136,6 +142,7 @@ class GameScaffold extends StatelessWidget {
         ),
       ),
       body: PastelBackground(
+        world: world,
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, box) {

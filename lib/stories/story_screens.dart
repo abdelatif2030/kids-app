@@ -1,3 +1,4 @@
+import '../design/worlds.dart';
 import '../design/layout.dart';
 import 'dart:async';
 
@@ -84,7 +85,7 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
     );
     final resumable = [for (final s in publishedStories()) if (_resume.containsKey(s.id)) s];
     return Scaffold(
-      backgroundColor: RC.bg,
+      backgroundColor: kWorldPalettes[RWorld.story]!.top, // the app bar blends into the sky
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
@@ -92,6 +93,8 @@ class _StoriesHomeScreenState extends State<StoriesHomeScreen> {
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
       body: PastelBackground(
+        world: RWorld.story,
+        quiet: true, // a long list of filters and cards: keep the corner decoration out of the way
         child: SafeArea(
           child: !_loaded
               ? const Center(child: CircularProgressIndicator())
@@ -487,6 +490,7 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
     final s = widget.story;
     final r = _c.sleepRemaining;
     return Scaffold(
+      backgroundColor: kWorldPalettes[RWorld.story]!.top, // the app bar blends into the sky
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
@@ -503,6 +507,8 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
         ],
       ),
       body: PastelBackground(
+        world: RWorld.story,
+        quiet: true, // reading and listening: a calmer, less decorated version
         child: SafeArea(
           child: Column(
             children: [

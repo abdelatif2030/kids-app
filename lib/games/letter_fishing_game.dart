@@ -1,3 +1,4 @@
+import '../design/worlds.dart';
 import '../design/focusable_tap.dart';
 import 'dart:math';
 
@@ -109,6 +110,7 @@ class _LetterFishingGameState extends State<LetterFishingGame> {
     final title = tr2('صيد الحروف', 'Letter fishing');
     if (_done) {
       return GameScaffold(
+      world: RWorld.forest,
         title: title,
         child: GameFinishPanel(
           childId: widget.childId,
@@ -125,6 +127,7 @@ class _LetterFishingGameState extends State<LetterFishingGame> {
     final round = _rounds[_round];
     final audioId = fishingAudioId(_lang, round.target);
     return GameScaffold(
+      world: RWorld.forest,
       confirmLeave: _round > 0,
       title: title,
       instruction: tr2(

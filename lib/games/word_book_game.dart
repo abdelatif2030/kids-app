@@ -1,3 +1,4 @@
+import '../design/worlds.dart';
 import '../design/focusable_tap.dart';
 import 'dart:convert';
 
@@ -131,12 +132,14 @@ class _WordBookGameState extends State<WordBookGame> {
     final title = tr2('كتاب الكلمات', 'Word picture book');
     if (!_loaded) {
       return GameScaffold(
+      world: RWorld.forest,
         title: title,
         child: const Center(child: CircularProgressIndicator()),
       );
     }
     if (_complete) {
       return GameScaffold(
+      world: RWorld.forest,
         title: title,
         child: GameFinishPanel(
           childId: widget.childId,
@@ -157,6 +160,7 @@ class _WordBookGameState extends State<WordBookGame> {
         if (_words.any((w) => w.category == c.id)) c,
     ];
     return GameScaffold(
+      world: RWorld.forest,
       title: title,
       instruction: tr2(
         'افتح كل بطاقة لتتعرف على الكلمة (${_seen.length} من ${_words.length})',
@@ -279,6 +283,7 @@ class WordCardScreen extends StatelessWidget {
             deviceVoiceEnabled: on,
           );
     return GameScaffold(
+      world: RWorld.forest,
       title: word.ar,
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),

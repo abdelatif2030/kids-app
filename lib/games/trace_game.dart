@@ -1,3 +1,4 @@
+import '../design/worlds.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -37,6 +38,7 @@ class _TraceGameState extends State<TraceGame> {
     final title = tr2('تتبّع الحرف', 'Trace the letter');
     if (_i >= _letters.length) {
       return GameScaffold(
+      world: RWorld.forest,
         title: title,
         child: GameFinishPanel(
           childId: widget.childId,
@@ -49,6 +51,7 @@ class _TraceGameState extends State<TraceGame> {
       );
     }
     return GameScaffold(
+      world: RWorld.forest,
       confirmLeave: _i > 0,
       title: tr2(
         '$title  ${_i + 1} / ${_letters.length}',

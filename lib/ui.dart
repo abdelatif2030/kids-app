@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'design/worlds.dart';
 import 'l10n/strings.dart';
 
 const kBackground = Color(0xFFFFF8E1);
@@ -244,21 +245,13 @@ class PlayButton extends StatelessWidget {
   }
 }
 
-/// A scene drawn in code: sky, clouds, hills, trees and flowers.
+/// The older scene background, now the journey world of lib/design/worlds.dart (one shared look for every screen).
 class SceneBackground extends StatelessWidget {
   final Widget child;
   const SceneBackground({super.key, required this.child});
 
   @override
-  Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        const CustomPaint(painter: _ScenePainter()),
-        child,
-      ],
-    );
-  }
+  Widget build(BuildContext context) => WorldBackground(world: RWorld.journey, child: child);
 }
 
 /// A Scaffold whose body sits on the [SceneBackground], under a transparent app bar.
@@ -283,109 +276,6 @@ class SceneScaffold extends StatelessWidget {
       ),
     );
   }
-}
-
-class _ScenePainter extends CustomPainter {
-  const _ScenePainter();
-
-  @override
-  void paint(Canvas canvas, Size s) {
-    final w = s.width;
-    final h = s.height;
-    final p = Paint();
-
-    // Sky.
-    p.shader = const LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [Color(0xFF8CC8F6), Color(0xFFD9F1FF)],
-    ).createShader(Rect.fromLTWH(0, 0, w, h));
-    canvas.drawRect(Rect.fromLTWH(0, 0, w, h), p);
-    p.shader = null;
-
-    // Clouds.
-    void cloud(double cx, double cy, double r) {
-      p.color = Colors.white.withAlpha(235);
-      canvas.drawCircle(Offset(cx - r * 1.1, cy + r * 0.2), r * 0.7, p);
-      canvas.drawCircle(Offset(cx, cy - r * 0.1), r, p);
-      canvas.drawCircle(Offset(cx + r * 1.2, cy + r * 0.25), r * 0.75, p);
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTRB(cx - r * 1.7, cy + r * 0.2, cx + r * 1.9, cy + r * 0.95),
-          Radius.circular(r * 0.4),
-        ),
-        p,
-      );
-    }
-
-    final u = (w < h ? w : h) / 390; // a unit that scales with the screen
-    cloud(w * 0.18, h * 0.14, 26 * u);
-    cloud(w * 0.78, h * 0.09, 20 * u);
-    cloud(w * 0.55, h * 0.30, 16 * u);
-
-    // Back hill, then front hill.
-    p.color = const Color(0xFF9ED67B);
-    canvas.drawPath(
-      Path()
-        ..moveTo(0, h * 0.78)
-        ..cubicTo(w * 0.2, h * 0.66, w * 0.45, h * 0.70, w * 0.62, h * 0.76)
-        ..cubicTo(w * 0.8, h * 0.82, w * 0.92, h * 0.70, w, h * 0.72)
-        ..lineTo(w, h)
-        ..lineTo(0, h)
-        ..close(),
-      p,
-    );
-    p.color = const Color(0xFF6CC24A);
-    canvas.drawPath(
-      Path()
-        ..moveTo(0, h * 0.88)
-        ..cubicTo(w * 0.25, h * 0.80, w * 0.55, h * 0.92, w * 0.8, h * 0.85)
-        ..cubicTo(w * 0.9, h * 0.82, w * 0.96, h * 0.84, w, h * 0.83)
-        ..lineTo(w, h)
-        ..lineTo(0, h)
-        ..close(),
-      p,
-    );
-
-    // Trees.
-    void tree(double x, double base, double r) {
-      p.color = const Color(0xFF8D5B35);
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromLTWH(x - r * 0.18, base - r * 1.2, r * 0.36, r * 1.3),
-          Radius.circular(r * 0.1),
-        ),
-        p,
-      );
-      p.color = const Color(0xFF3E9D4A);
-      canvas.drawCircle(Offset(x, base - r * 1.5), r, p);
-      p.color = const Color(0xFF58B85C);
-      canvas.drawCircle(Offset(x - r * 0.3, base - r * 1.7), r * 0.45, p);
-    }
-
-    tree(w * 0.08, h * 0.80, 26 * u);
-    tree(w * 0.93, h * 0.78, 30 * u);
-    tree(w * 0.83, h * 0.86, 20 * u);
-
-    // Flowers.
-    const flowers = [
-      (0.22, 0.93, Color(0xFFFFFFFF)),
-      (0.36, 0.96, Color(0xFFFFC1D9)),
-      (0.5, 0.91, Color(0xFFFFFFFF)),
-      (0.66, 0.95, Color(0xFFFFE082)),
-      (0.12, 0.97, Color(0xFFFFE082)),
-      (0.9, 0.95, Color(0xFFFFFFFF)),
-    ];
-    for (final f in flowers) {
-      p.color = f.$3;
-      canvas.drawCircle(Offset(w * f.$1, h * f.$2), 4 * u, p);
-      p.color = const Color(0xFFFFB300);
-      canvas.drawCircle(Offset(w * f.$1, h * f.$2), 1.6 * u, p);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 /// A white bunny, drawn in code.

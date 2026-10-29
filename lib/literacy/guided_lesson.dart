@@ -1,3 +1,4 @@
+import '../design/worlds.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -327,12 +328,14 @@ class _GuidedLetterLessonState extends State<GuidedLetterLesson> {
   Widget build(BuildContext context) {
     final done = _step >= _total;
     return Scaffold(
+      backgroundColor: kWorldPalettes[RWorld.forest]!.top, // the app bar blends into the sky
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
         title: Text(widget.letter.letter, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900)),
       ),
       body: PastelBackground(
+        world: RWorld.forest,
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(DS.s16),

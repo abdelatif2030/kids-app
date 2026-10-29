@@ -486,6 +486,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             : null,
       ),
       body: PastelBackground(
+        quiet: true,
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(DS.s16, 4, DS.s16, DS.s24),

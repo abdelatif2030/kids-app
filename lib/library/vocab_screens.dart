@@ -1,3 +1,4 @@
+import '../design/worlds.dart';
 import '../design/layout.dart';
 import 'package:flutter/material.dart';
 
@@ -28,6 +29,7 @@ class _VocabLibraryScreenState extends State<VocabLibraryScreen> {
   Widget build(BuildContext context) {
     final items = searchVocab(query: _query, category: _category, age: _allAges ? null : widget.child.age);
     return Scaffold(
+      backgroundColor: kWorldPalettes[RWorld.ocean]!.top, // the app bar blends into the sky
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
@@ -35,6 +37,7 @@ class _VocabLibraryScreenState extends State<VocabLibraryScreen> {
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
       body: PastelBackground(
+        world: RWorld.ocean,
         child: SafeArea(
           child: CenteredList(
             children: [

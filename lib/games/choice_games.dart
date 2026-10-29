@@ -1,3 +1,4 @@
+import '../design/worlds.dart';
 import '../design/focusable_tap.dart';
 import 'dart:math';
 
@@ -211,6 +212,9 @@ class ChoiceGame extends StatefulWidget {
   final RoundMaker make;
   final Random? random;
 
+  /// The visual world of the game.
+  final RWorld world;
+
   /// How to draw the choices: emojis ('pictures'), or labelled group buttons ('groups').
   final List<String>? groupTitles;
   final List<String>? groupEmojis;
@@ -225,6 +229,7 @@ class ChoiceGame extends StatefulWidget {
     required this.instruction,
     required this.make,
     this.random,
+    this.world = RWorld.journey,
     this.groupTitles,
     this.groupEmojis,
     this.onRoundDone,
@@ -272,6 +277,7 @@ class _ChoiceGameState extends State<ChoiceGame> {
   Widget build(BuildContext context) {
     if (_i >= _rounds.length) {
       return GameScaffold(
+        world: widget.world,
         title: widget.title,
         child: GameFinishPanel(
           childId: widget.childId,
@@ -288,6 +294,7 @@ class _ChoiceGameState extends State<ChoiceGame> {
     final round = _rounds[_i];
     final groups = widget.groupTitles != null;
     return GameScaffold(
+        world: widget.world,
       confirmLeave: _i > 0,
       title: widget.title,
       instruction: _promptFor(round),
@@ -396,6 +403,7 @@ class PatternGame extends StatelessWidget {
         instruction: tr2('ما الشكل الذي يأتي بعد ذلك؟', 'Which one comes next?'),
         make: (r) => makePatterns(age, r),
         random: random,
+        world: RWorld.space,
       );
 }
 
@@ -414,6 +422,7 @@ class CompareGame extends StatelessWidget {
         instruction: tr2('قارن بين المجموعتين.', 'Compare the two groups.'),
         make: (r) => makeCompare(age, r),
         random: random,
+        world: RWorld.space,
       );
 }
 
@@ -461,6 +470,7 @@ class ListenPictureGame extends StatelessWidget {
         instruction: tr2('اضغط «استمع»، ثم اختر الصورة المناسبة.', 'Tap “Listen”, then pick the matching picture.'),
         make: (r) => makeListenPicture(age, r),
         random: random,
+        world: RWorld.ocean,
       );
 }
 
@@ -479,6 +489,7 @@ class ListenWordGame extends StatelessWidget {
         instruction: tr2('استمع إلى الكلمة، ثم اختر الكلمة المكتوبة.', 'Listen to the word, then pick the written word.'),
         make: (r) => makeListenWord(age, r),
         random: random,
+        world: RWorld.ocean,
       );
 }
 
@@ -497,5 +508,6 @@ class ListenLetterGame extends StatelessWidget {
         instruction: tr2('استمع إلى اسم الحرف، ثم اختر الحرف.', 'Listen to the letter’s name, then pick the letter.'),
         make: (r) => makeListenLetter(age, r),
         random: random,
+        world: RWorld.ocean,
       );
 }

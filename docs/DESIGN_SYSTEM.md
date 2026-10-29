@@ -34,3 +34,10 @@ Two looks live side by side on purpose. They are not merged yet: unifying them i
   instruction into a 300 dp side card and centres the board in the rest.
 - Router / deep links: NOT built, on purpose. Child mode must be started by the parent, so a URL must not open child
   screens directly. Refresh restarts at the picker; saved progress is kept. Revisit only for parent/teacher pages.
+
+## Visual worlds (2026-10-29)
+Backgrounds are one component: `WorldBackground` / `PastelBackground(world:, quiet:)` in `lib/design/worlds.dart`.
+Pick the world by area (journey default, forest letters/words, ocean listening/vocabulary, space numbers/patterns, story
+stories, calm for forms) and use `quiet: true` for reading, long instructions and audio playback. Decoration is behind
+the content, takes no input, does not animate and is not mirrored. Do not put text or controls on the decoration: use a
+card. Details and decisions: `docs/BACKGROUND_DESIGN_AUDIT.md`.

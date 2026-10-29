@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
+import 'design/worlds.dart';
 import 'media/audio_gate.dart';
 import 'web_lang.dart';
 import 'package:flutter/services.dart';
@@ -14,7 +15,6 @@ import 'l10n/app_locale.dart';
 import 'media/audio.dart';
 import 'firebase_config.dart';
 import 'journey/repository.dart';
-import 'journey/ui/kit.dart' show RC;
 import 'journey/ui/lesson_flow.dart';
 import 'journey/ui/start_screen.dart';
 import 'player_screen.dart';
@@ -53,11 +53,13 @@ class KidsApp extends StatelessWidget {
         hoverColor: DS.focusColor.withAlpha(20),
         visualDensity: VisualDensity.standard,
         scrollbarTheme: ScrollbarThemeData(thumbVisibility: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.hovered)), interactive: true),
-        scaffoldBackgroundColor: RC.bg,
+        // The top of the journey sky, so an app bar over any screen blends into the world behind it.
+        scaffoldBackgroundColor: kWorldPalettes[RWorld.journey]!.top,
         appBarTheme: const AppBarTheme(
           centerTitle: true,
           backgroundColor: Colors.transparent,
           scrolledUnderElevation: 0,
+          surfaceTintColor: Colors.transparent,
         ),
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(

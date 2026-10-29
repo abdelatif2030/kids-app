@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../design/worlds.dart';
 import '../models.dart';
 import '../../l10n/strings.dart';
 
@@ -134,38 +135,16 @@ class RProgress extends StatelessWidget {
 }
 
 /// The light blue backdrop with a few soft shapes.
+/// The background of the child app. It is now one of Rehlaty's visual worlds (see lib/design/worlds.dart): the default
+/// is the journey world (sky, hills, flowers); screens choose another world or a quiet version for reading.
 class PastelBackground extends StatelessWidget {
   final Widget child;
-  const PastelBackground({super.key, required this.child});
+  final RWorld world;
+  final bool quiet;
+  const PastelBackground({super.key, required this.child, this.world = RWorld.journey, this.quiet = false});
 
   @override
-  Widget build(BuildContext context) {
-    return ColoredBox(
-      color: RC.bg,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [const CustomPaint(painter: _BlobPainter()), child],
-      ),
-    );
-  }
-}
-
-class _BlobPainter extends CustomPainter {
-  const _BlobPainter();
-
-  @override
-  void paint(Canvas canvas, Size s) {
-    final p = Paint();
-    p.color = RC.peach.withAlpha(120);
-    canvas.drawCircle(Offset(s.width * 0.95, s.height * 0.08), s.width * 0.28, p);
-    p.color = RC.lavender.withAlpha(120);
-    canvas.drawCircle(Offset(s.width * 0.02, s.height * 0.62), s.width * 0.3, p);
-    p.color = RC.mint.withAlpha(120);
-    canvas.drawCircle(Offset(s.width * 0.9, s.height * 0.95), s.width * 0.26, p);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  Widget build(BuildContext context) => WorldBackground(world: world, quiet: quiet, child: child);
 }
 
 /// A shape drawn in code (circle, square, rectangle, triangle, star, heart).
