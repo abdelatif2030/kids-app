@@ -71,20 +71,56 @@ class GameRewards {
   }
 }
 
-/// A game page: the pastel background, a title, and a one-line instruction.
+/// A game page: the pastel background, a title, and a one-line instruction. With [confirmLeave] (set
+/// while a game is half played) leaving asks first, because a half-played game is not saved.
 class GameScaffold extends StatelessWidget {
   final String title;
   final String? instruction;
   final Widget child;
+  final bool confirmLeave;
   const GameScaffold({
     super.key,
     required this.title,
     this.instruction,
     required this.child,
+    this.confirmLeave = false,
   });
+
+  Future<void> _askLeave(BuildContext context) async {
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(tr2('هل تريد الخروج من اللعبة؟', 'Leave the game?')),
+        content: Text(tr2('لن يُحفظ مكانك في هذه اللعبة. يمكنك أن تلعبها من البداية في أي وقت.', 'Your place in this game is not saved. You can play it again from the start any time.')),
+        actions: [
+          TextButton(
+            key: const ValueKey('leave_game'),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(tr2('اخرج', 'Leave')),
+          ),
+          FilledButton(
+            key: const ValueKey('keep_playing'),
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(tr2('أكمل اللعب', 'Keep playing')),
+          ),
+        ],
+      ),
+    );
+    if (leave == true && context.mounted) Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
+    return PopScope(
+      canPop: !confirmLeave,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _askLeave(context);
+      },
+      child: _body(context),
+    );
+  }
+
+  Widget _body(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,

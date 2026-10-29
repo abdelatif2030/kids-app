@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
+import 'web_lang.dart';
 import 'package:flutter/services.dart';
 
 import 'curriculum.dart';
@@ -39,7 +40,7 @@ class KidsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: loc('تطبيق الأطفال'),
+      title: tr2('رحلتي', 'Rehlaty'),
       scrollBehavior: const AppScrollBehavior(),
       theme: ThemeData(
         colorSchemeSeed: DS.primary,
@@ -69,6 +70,7 @@ class KidsApp extends StatelessWidget {
         builder: (context, _) {
           final prefs = DisplayPrefs.instance;
           final media = MediaQuery.of(context);
+          setDocumentLanguage(AppLocale.instance.code);
           return MediaQuery(
             data: media.copyWith(
               textScaler: prefs.textScale == 1.0 ? media.textScaler : TextScaler.linear(prefs.textScale),

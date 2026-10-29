@@ -224,6 +224,7 @@ class _ChoiceGameState extends State<ChoiceGame> {
     final round = _rounds[_i];
     final groups = widget.groupTitles != null;
     return GameScaffold(
+      confirmLeave: _i > 0,
       title: widget.title,
       instruction: _promptFor(round),
       child: SingleChildScrollView(

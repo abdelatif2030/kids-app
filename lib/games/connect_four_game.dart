@@ -149,6 +149,7 @@ class _ConnectFourGameState extends State<ConnectFourGame> {
       );
     }
     return GameScaffold(
+      confirmLeave: _board.grid.any((row) => row.any((c) => c != 0)),
       title: title,
       instruction: tr2(
         'لعبة لاعبين اثنين على نفس الجهاز: اضغط عموداً لإسقاط قطعتك. اجمع أربعاً متصلة.',

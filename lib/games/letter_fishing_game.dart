@@ -125,6 +125,7 @@ class _LetterFishingGameState extends State<LetterFishingGame> {
     final round = _rounds[_round];
     final audioId = fishingAudioId(_lang, round.target);
     return GameScaffold(
+      confirmLeave: _round > 0,
       title: title,
       instruction: tr2(
         'اصطد السمكة التي عليها هذا الحرف',

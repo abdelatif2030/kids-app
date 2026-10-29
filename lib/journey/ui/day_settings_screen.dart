@@ -1,6 +1,7 @@
 import '../../design/layout.dart';
 import 'package:flutter/material.dart';
 
+import '../../design/components.dart' show showToast;
 import '../../l10n/strings.dart';
 import '../day_prefs.dart';
 import '../my_day.dart';
@@ -28,7 +29,9 @@ class _DaySettingsScreenState extends State<DaySettingsScreen> {
   /// Shows the choice at once, then saves it (so quick taps never act on an old state).
   void _set(DayPrefs next) {
     setState(() => _prefs = next);
-    DayPrefs.save(next);
+    DayPrefs.save(next).then((_) {
+      if (mounted) showToast(context, tr2('تم الحفظ', 'Saved'));
+    });
   }
 
   @override

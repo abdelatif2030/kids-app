@@ -272,3 +272,28 @@ Future<T?> showAppSheet<T>(BuildContext context, {required String title, require
         ),
       ),
     );
+
+/// A heading that groups related settings or content. [title] is a short noun phrase; the optional
+/// [subtitle] is one line of help. Exposed to screen readers as a heading.
+class SectionHeader extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+  const SectionHeader(this.title, {super.key, this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(DS.s16, DS.s24, DS.s16, DS.s8),
+      child: Semantics(
+        header: true,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: DS.heading.copyWith(color: DS.primary)),
+            if (subtitle != null) Text(subtitle!, style: DS.caption),
+          ],
+        ),
+      ),
+    );
+  }
+}

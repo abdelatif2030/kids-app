@@ -144,6 +144,7 @@ class _MatchPicturesGameState extends State<MatchPicturesGame> {
         ? 3
         : (_board.cards.length <= 8 ? 4 : (_board.cards.length <= 10 ? 5 : 4));
     return GameScaffold(
+      confirmLeave: _board.matched.isNotEmpty,
       title: title,
       instruction: tr2(
         'اقلب بطاقتين وابحث عن الصورتين المتشابهتين',

@@ -49,6 +49,7 @@ class _TraceGameState extends State<TraceGame> {
       );
     }
     return GameScaffold(
+      confirmLeave: _i > 0,
       title: tr2(
         '$title  ${_i + 1} / ${_letters.length}',
         '$title  ${_i + 1} / ${_letters.length}',

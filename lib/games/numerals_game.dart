@@ -95,6 +95,7 @@ class _NumeralsGameState extends State<NumeralsGame> {
     );
     if (_round >= _rounds.length) {
       return GameScaffold(
+      confirmLeave: _round > 0,
         title: title,
         child: GameFinishPanel(
           childId: widget.childId,
