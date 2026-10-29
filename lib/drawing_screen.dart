@@ -6,15 +6,9 @@ import 'rest_screen.dart';
 import 'session_manager.dart';
 import 'studio/autosave.dart';
 import 'studio/creations.dart';
+import 'studio/drawing_model.dart';
 import 'ui.dart';
 import 'l10n/strings.dart';
-
-class _Stroke {
-  final Color color;
-  final double width;
-  final List<Offset> points;
-  _Stroke(this.color, this.width, Offset start) : points = [start];
-}
 
 /// رسم حر: ألوان، 3 أحجام، ممحاة، تراجع. الرسمة مش بتتحفظ ولا بتتبعت لأي مكان.
 /// النجمة بتظهر لما الطفل يدوس "خلصت" بعد ما يرسم حاجة.
@@ -42,9 +36,8 @@ class _DrawingScreenState extends State<DrawingScreen> {
   ];
   static const _sizes = [6.0, 14.0, 28.0];
 
-  final List<_Stroke> _strokes = [];
+  late final DrawingModel _model;
   Size _canvas = Size.zero;
-  List<DrawStroke>? _pending; // saved strokes waiting for the canvas size
   CreationAutosaver? _autosave;
   Color _color = _palette[0];
   double _size = _sizes[1];
@@ -62,8 +55,8 @@ class _DrawingScreenState extends State<DrawingScreen> {
         ..onChanged = () {
           if (mounted) setState(() {});
         };
-      if (widget.initial != null) _pending = strokesOf(widget.initial!.data);
     }
+    _model = widget.initial != null ? DrawingModel.fromData(widget.initial!.data) : DrawingModel();
   }
 
   @override
@@ -72,35 +65,71 @@ class _DrawingScreenState extends State<DrawingScreen> {
     super.dispose();
   }
 
-  Map<String, dynamic> _snapshot() {
-    final w = _canvas.width == 0 ? 1.0 : _canvas.width;
-    final h = _canvas.height == 0 ? 1.0 : _canvas.height;
-    return drawingData([
-      for (final st in _strokes)
-        DrawStroke(
-          // ignore: deprecated_member_use
-          st.color.value,
-          st.width / w * 1000,
-          [for (final p in st.points) Offset(p.dx / w * 1000, p.dy / h * 1000)],
-        ),
-    ]);
-  }
+  Map<String, dynamic> _snapshot() => _model.toData();
 
   void _changed() => _autosave?.changed(_snapshot);
 
-  void _down(DragDownDetails d) =>
-      setState(() => _strokes.add(_Stroke(_pen, _size, d.localPosition)));
+  void _down(DragDownDetails d) => setState(() =>
+      _model.begin(d.localPosition, _canvas, _pen.toARGB32(), _eraser ? _size * 1.6 : _size));
 
-  void _update(DragUpdateDetails d) {
-    if (_strokes.isEmpty) return;
-    setState(() => _strokes.last.points.add(d.localPosition));
+  void _update(DragUpdateDetails d) => setState(() => _model.extend(d.localPosition, _canvas));
+
+  void _up() {
+    if (_model.end()) {
+      setState(() {});
+      _changed();
+    }
+  }
+
+  Future<void> _confirmClear() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text(tr2('مسح الرسمة كلها؟', 'Clear the whole drawing?')),
+        content: Text(tr2('يمكنك التراجع بعدها مرة واحدة.', 'You can undo this once.')),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: Text(tr2('لا', 'No'))),
+          FilledButton(onPressed: () => Navigator.pop(c, true), child: Text(tr2('نعم، امسح', 'Yes, clear'))),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    setState(_model.clear);
+    _changed();
+  }
+
+  void _pickTemplate() async {
+    final id = await showModalBottomSheet<String>(
+      context: context,
+      builder: (c) => SafeArea(
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            for (final e in [('', '🚫'), ...kTemplates.entries.map((e) => (e.key, e.value))])
+              Semantics(
+                button: true,
+                label: e.$1.isEmpty ? tr2('بدون شكل', 'No outline') : e.$1,
+                child: InkWell(
+                  onTap: () => Navigator.pop(c, e.$1),
+                  child: SizedBox(width: 72, height: 72, child: Center(child: Text(e.$2, style: const TextStyle(fontSize: 40)))),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (id == null || !mounted) return;
+    setState(() => _model.setTemplate(id.isEmpty ? null : id));
+    _changed();
   }
 
   Future<void> _again() async {
     if (await restIfTimeUp(context)) return;
     if (!mounted) return;
     setState(() {
-      _strokes.clear();
+      _model.clear();
       _finished = false;
     });
   }
@@ -196,26 +225,18 @@ class _DrawingScreenState extends State<DrawingScreen> {
                         behavior: HitTestBehavior.opaque,
                         onPanDown: _down,
                         onPanUpdate: _update,
-                        onPanEnd: (_) => _changed(),
-                        onPanCancel: _changed,
+                        onPanEnd: (_) => _up(),
+                        onPanCancel: _up,
                         child: LayoutBuilder(
                           builder: (context, box) {
                             _canvas = Size(box.maxWidth, box.maxHeight);
-                            final pending = _pending;
-                            if (pending != null) {
-                              _pending = null;
-                              for (final st in pending) {
-                                _strokes.add(_Stroke(Color(st.color), st.width / 1000 * _canvas.width, Offset.zero)
-                                  ..points.clear()
-                                  ..points.addAll([
-                                    for (final p in st.points)
-                                      Offset(p.dx / 1000 * _canvas.width, p.dy / 1000 * _canvas.height),
-                                  ]));
-                              }
-                            }
-                            return CustomPaint(
-                              painter: _DrawingPainter(_strokes),
-                              child: const SizedBox.expand(),
+                            return Semantics(
+                              label: tr2('لوحة الرسم', 'Drawing canvas'),
+                              image: true,
+                              child: CustomPaint(
+                                painter: _CanvasPainter(_model),
+                                child: const SizedBox.expand(),
+                              ),
                             );
                           },
                         ),
@@ -246,29 +267,41 @@ class _DrawingScreenState extends State<DrawingScreen> {
                         ),
                         IconButton.filledTonal(
                           iconSize: 32,
-                          tooltip: loc('تراجع'),
-                          onPressed: _strokes.isEmpty
-                              ? null
-                              : () {
-                                  setState(_strokes.removeLast);
+                          tooltip: tr2('تراجع', 'Undo'),
+                          onPressed: _model.canUndo
+                              ? () {
+                                  setState(_model.undo);
                                   _changed();
-                                },
+                                }
+                              : null,
                           icon: const Icon(Icons.undo_rounded),
                         ),
                         IconButton.filledTonal(
                           iconSize: 32,
-                          tooltip: loc('مسح الكل'),
-                          onPressed: _strokes.isEmpty
-                              ? null
-                              : () {
-                                  setState(_strokes.clear);
+                          tooltip: tr2('إعادة', 'Redo'),
+                          onPressed: _model.canRedo
+                              ? () {
+                                  setState(_model.redo);
                                   _changed();
-                                },
+                                }
+                              : null,
+                          icon: const Icon(Icons.redo_rounded),
+                        ),
+                        IconButton.filledTonal(
+                          iconSize: 32,
+                          tooltip: tr2('أشكال للتلوين', 'Shapes to color'),
+                          onPressed: _pickTemplate,
+                          icon: const Icon(Icons.category_rounded),
+                        ),
+                        IconButton.filledTonal(
+                          iconSize: 32,
+                          tooltip: loc('مسح الكل'),
+                          onPressed: _model.isEmpty ? null : _confirmClear,
                           icon: const Icon(Icons.delete_outline_rounded),
                         ),
                         FilledButton.icon(
                           style: FilledButton.styleFrom(backgroundColor: kBright[2]),
-                          onPressed: _strokes.isEmpty
+                          onPressed: _model.isEmpty
                               ? null
                               : () => setState(() => _finished = true),
                           icon: const Icon(Icons.check_rounded),
@@ -284,31 +317,18 @@ class _DrawingScreenState extends State<DrawingScreen> {
   }
 }
 
-class _DrawingPainter extends CustomPainter {
-  final List<_Stroke> strokes;
-  _DrawingPainter(this.strokes);
+class _CanvasPainter extends CustomPainter {
+  final DrawingModel model;
+  _CanvasPainter(this.model);
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (final s in strokes) {
-      final paint = Paint()
-        ..color = s.color
-        ..strokeWidth = s.width
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round;
-      if (s.points.length == 1) {
-        // A single tap makes a dot.
-        canvas.drawCircle(s.points.first, s.width / 2, paint..style = PaintingStyle.fill);
-      } else {
-        final path = Path()..moveTo(s.points.first.dx, s.points.first.dy);
-        for (final p in s.points.skip(1)) {
-          path.lineTo(p.dx, p.dy);
-        }
-        canvas.drawPath(path, paint..style = PaintingStyle.stroke);
-      }
-    }
+    final t = model.template;
+    if (t != null) TemplatePainter(t).paint(canvas, size);
+    final live = model.live;
+    NormalizedDrawingPainter([...model.strokes, if (live != null) live]).paint(canvas, size);
   }
 
   @override
-  bool shouldRepaint(covariant _DrawingPainter oldDelegate) => true;
+  bool shouldRepaint(covariant _CanvasPainter oldDelegate) => true;
 }

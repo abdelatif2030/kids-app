@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../library/learning_records.dart' show dayOf;
 import '../safe_json.dart';
 import '../l10n/strings.dart';
+import 'drawing_model.dart';
 
 /// What a child made. Everything is plain data (no photos, no recordings, no
 /// text typed by the child) kept in the family gallery on this device.
@@ -34,6 +35,9 @@ class Creation {
   final String day;
   final Map<String, dynamic> data;
   const Creation(this.id, this.childId, this.kind, this.day, this.data);
+
+  /// The name the family gave it, if any.
+  String? get name => data['name'] is String ? data['name'] as String : null;
 
   Map<String, dynamic> toJson() => {'i': id, 'c': childId, 'k': kind.name, 'd': day, 'x': data};
 
@@ -78,6 +82,36 @@ class FamilyGallery {
     }
     await _write(list);
     return true;
+  }
+
+  static const maxNameLength = 24;
+
+  /// A safe display name: trimmed, one line, no control characters, at most [maxNameLength] characters. Empty -> null.
+  static String? cleanName(String raw) {
+    final t = raw.replaceAll(RegExp(r'[\u0000-\u001F\u007F]'), ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (t.isEmpty) return null;
+    return t.runes.length <= maxNameLength ? t : String.fromCharCodes(t.runes.take(maxNameLength));
+  }
+
+  /// Renames one creation of [childId]. Returns false when it does not exist for that child or the write failed.
+  static Future<bool> rename(String id, String childId, String name) async {
+    try {
+      final list = await all();
+      final i = list.indexWhere((c) => c.id == id && c.childId == childId);
+      if (i < 0) return false;
+      final data = {...list[i].data};
+      final n = cleanName(name);
+      if (n == null) {
+        data.remove('name');
+      } else {
+        data['name'] = n;
+      }
+      list[i] = Creation(list[i].id, list[i].childId, list[i].kind, list[i].day, data);
+      await _write(list);
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   static Future<void> delete(String id) async => _write([for (final c in await all()) if (c.id != id) c]);
@@ -386,9 +420,13 @@ class CreationThumb extends StatelessWidget {
     final d = creation.data;
     switch (creation.kind) {
       case CreationKind.drawing:
+        final m = DrawingModel.fromData(d);
         return ColoredBox(
           color: Colors.white,
-          child: CustomPaint(painter: NormalizedDrawingPainter(strokesOf(d)), child: const SizedBox.expand()),
+          child: CustomPaint(
+            painter: _ThumbPainter(m),
+            child: const SizedBox.expand(),
+          ),
         );
       case CreationKind.scene:
         return SceneView(bg: d['bg'] as String? ?? 'meadow', items: sceneItemsOf(d), baseSize: 20);
@@ -413,4 +451,19 @@ class CreationThumb extends StatelessWidget {
         );
     }
   }
+}
+
+class _ThumbPainter extends CustomPainter {
+  final DrawingModel model;
+  _ThumbPainter(this.model);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final t = model.template;
+    if (t != null) TemplatePainter(t).paint(canvas, size);
+    NormalizedDrawingPainter(model.strokes).paint(canvas, size);
+  }
+
+  @override
+  bool shouldRepaint(_ThumbPainter old) => true;
 }

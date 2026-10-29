@@ -10,6 +10,7 @@ import 'character_creator.dart';
 import 'creations.dart';
 import 'scene_builder.dart';
 import 'story_pictures.dart';
+import 'word_builder.dart';
 import '../l10n/strings.dart';
 
 /// «استوديو الإبداع»: optional, calm making activities.
@@ -67,6 +68,7 @@ class StudioScreen extends StatelessWidget {
                       RC.sky,
                       () => LessonRunnerScreen(child: child, kind: LessonKind.sequence, title: loc('رتّب الخطوات')),
                     ),
+                    tile('🔤', tr2('ركّب الكلمة', 'Build the word'), RC.yellow, () => WordBuilderScreen(child: child)),
                     tile('🖼️', loc('معرض العائلة'), RC.lavender, () => ChildGalleryScreen(child: child)),
                   ],
                 ),
@@ -101,6 +103,17 @@ class _ChildGalleryScreenState extends State<ChildGalleryScreen> {
   Future<void> _load() async {
     final list = await FamilyGallery.forChild(widget.child.id);
     if (mounted) setState(() => _items = list.reversed.toList());
+  }
+
+  Future<void> _rename(Creation c) async {
+    final text = await showDialog<String>(context: context, builder: (_) => _RenameDialog(initial: c.name ?? ''));
+    if (text == null || !mounted) return;
+    final ok = await FamilyGallery.rename(c.id, widget.child.id, text);
+    if (!mounted) return;
+    if (!ok) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr2('تعذّر حفظ الاسم', 'Could not save the name'))));
+    }
+    _load();
   }
 
   Widget _editor(Creation c) => switch (c.kind) {
@@ -144,7 +157,7 @@ class _ChildGalleryScreenState extends State<ChildGalleryScreen> {
                         final c = items[i];
                         return RCard(
                           padding: EdgeInsets.zero,
-                          semanticLabel: tr2('${c.kind.label} بتاريخ ${c.day}', '${c.kind.label} on ${c.day}'),
+                          semanticLabel: tr2('${c.name ?? c.kind.label} بتاريخ ${c.day}', '${c.name ?? c.kind.label} on ${c.day}'),
                           onTap: () async {
                             await Navigator.push(context, MaterialPageRoute(builder: (_) => _editor(c)));
                             _load();
@@ -155,8 +168,18 @@ class _ChildGalleryScreenState extends State<ChildGalleryScreen> {
                               PositionedDirectional(
                                 bottom: 4,
                                 start: 6,
-                                child: Text('${c.kind.emoji} ${c.day}',
+                                child: Text('${c.kind.emoji} ${c.name ?? c.day}',
                                     style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                              ),
+                              PositionedDirectional(
+                                top: 0,
+                                end: 0,
+                                child: IconButton(
+                                  tooltip: tr2('غيّر الاسم', 'Rename'),
+                                  iconSize: 20,
+                                  onPressed: () => _rename(c),
+                                  icon: const Icon(Icons.edit_rounded),
+                                ),
                               ),
                             ],
                           ),
@@ -263,4 +286,37 @@ class _ParentGalleryScreenState extends State<ParentGalleryScreen> {
                 ),
     );
   }
+}
+
+class _RenameDialog extends StatefulWidget {
+  final String initial;
+  const _RenameDialog({required this.initial});
+
+  @override
+  State<_RenameDialog> createState() => _RenameDialogState();
+}
+
+class _RenameDialogState extends State<_RenameDialog> {
+  late final TextEditingController _c = TextEditingController(text: widget.initial);
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+        title: Text(tr2('اسم العمل', 'Name this work')),
+        content: TextField(
+          controller: _c,
+          autofocus: true,
+          maxLength: FamilyGallery.maxNameLength,
+          decoration: InputDecoration(hintText: tr2('اكتب اسماً قصيراً', 'A short name')),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(tr2('إلغاء', 'Cancel'))),
+          FilledButton(onPressed: () => Navigator.pop(context, _c.text), child: Text(tr2('حفظ', 'Save'))),
+        ],
+      );
 }
