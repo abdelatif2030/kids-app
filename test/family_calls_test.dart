@@ -291,22 +291,19 @@ void main() {
       await settle(t);
     });
 
-    testWidgets('a child cannot start a call without the parent: refused approval means no call', (t) async {
+    testWidgets('a child taps the phone and the call starts at once (the relative must be approved and have calls on)', (t) async {
       await parent.setRelativeCalls('n1', true);
       final engine = FakeEngine('parent');
       newCallEngine = () => engine;
       addTearDown(() => newCallEngine = () => WebRtcEngine());
-      var asked = 0;
-      await t.pumpWidget(chat(parent, Side.child, approve: () async {
-        asked++;
-        return false;
-      }));
+      await t.pumpWidget(chat(parent, Side.child));
       await settle(t);
       await t.tap(find.byKey(const ValueKey('chat_call')));
       await settle(t);
-      expect(asked, 1);
-      expect(find.byKey(const ValueKey('call_phase')), findsNothing);
-      expect(server.calls, isEmpty);
+      expect(find.byKey(const ValueKey('call_phase')), findsOneWidget);
+      expect(server.calls.values.single.from, CallFrom.parent);
+      await t.tap(find.byKey(const ValueKey('call_hangup')));
+      await settle(t);
     });
   });
 }
