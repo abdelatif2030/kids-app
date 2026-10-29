@@ -2,7 +2,7 @@
     <!-- Needed by release builds for the YouTube player, video thumbnails and the optional teachers service. -->
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="kids_app"
+        android:label="رحلتي"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

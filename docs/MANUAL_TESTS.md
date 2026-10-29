@@ -1354,3 +1354,16 @@ The six learning games under Games > Learning games.
 - **Status:** Not tested
 - **Device or environment:** Browser and OS: 
 - **Notes:** 
+
+### A1 - First install on a real Android phone
+
+- [ ] Not tested
+- **Test ID:** A1
+- **Preconditions:** `docs/ANDROID_RELEASE.md` step 2 done, phone connected.
+- **Steps:**
+  1. Run the "Quick device checks" list in `docs/ANDROID_RELEASE.md`.
+- **Expected result:** All 7 checks pass; note phone model and Android version.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Phone and Android version: 
+- **Notes:** 
