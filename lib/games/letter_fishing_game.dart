@@ -1,3 +1,4 @@
+import '../design/focusable_tap.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -176,7 +177,7 @@ class _LetterFishingGameState extends State<LetterFishingGame> {
                             'سمكة عليها حرف $c',
                             'Fish with the letter $c',
                           ),
-                          child: GestureDetector(
+                          child: FocusableTap(
                             key: ValueKey('fish$c'),
                             onTap: () => _tap(c),
                             child: Container(

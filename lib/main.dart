@@ -1,6 +1,7 @@
 ﻿import 'dart:convert';
 import 'dart:math';
 
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -39,10 +40,16 @@ class KidsApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: loc('تطبيق الأطفال'),
+      scrollBehavior: const AppScrollBehavior(),
       theme: ThemeData(
         colorSchemeSeed: DS.primary,
         useMaterial3: true,
         fontFamily: 'Tajawal',
+        // Keyboard focus and mouse hover are visible everywhere, not only on the custom tiles.
+        focusColor: DS.focusColor.withAlpha(40),
+        hoverColor: DS.focusColor.withAlpha(20),
+        visualDensity: VisualDensity.standard,
+        scrollbarTheme: ScrollbarThemeData(thumbVisibility: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.hovered)), interactive: true),
         scaffoldBackgroundColor: RC.bg,
         appBarTheme: const AppBarTheme(
           centerTitle: true,
@@ -373,4 +380,19 @@ class _VideoListScreenState extends State<VideoListScreen> {
       ),
     );
   }
+}
+
+/// Lists scroll with a finger, a mouse drag, a trackpad or a stylus (the default leaves out the mouse),
+/// and desktop browsers show a scrollbar.
+class AppScrollBehavior extends MaterialScrollBehavior {
+  const AppScrollBehavior();
+
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad,
+        PointerDeviceKind.stylus,
+        PointerDeviceKind.invertedStylus,
+      };
 }

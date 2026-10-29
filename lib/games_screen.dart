@@ -1,3 +1,4 @@
+import 'design/focusable_tap.dart';
 import 'package:flutter/material.dart';
 
 import 'color_game.dart';
@@ -149,7 +150,7 @@ class _BalloonGameState extends State<BalloonGame> {
                 alignment: WrapAlignment.center,
                 children: [
                   for (var i = 0; i < _count; i++)
-                    GestureDetector(
+                    FocusableTap(
                       onTap: () => _pop(i),
                       child: AnimatedOpacity(
                         duration: const Duration(milliseconds: 300),

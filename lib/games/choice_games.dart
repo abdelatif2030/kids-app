@@ -1,3 +1,4 @@
+import '../design/focusable_tap.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -247,7 +248,7 @@ class _ChoiceGameState extends State<ChoiceGame> {
                     child: Semantics(
                       button: true,
                       label: groups ? widget.groupTitles![o] : round.options[o],
-                      child: GestureDetector(
+                      child: FocusableTap(
                         key: ValueKey('opt$o'),
                         onTap: () => _tap(o),
                         child: Container(

@@ -1,3 +1,4 @@
+import 'design/focusable_tap.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -101,7 +102,7 @@ class _MemoryGameState extends State<MemoryGame> {
                   crossAxisSpacing: 12,
                   children: [
                     for (var i = 0; i < _cards.length; i++)
-                      GestureDetector(
+                      FocusableTap(
                         onTap: () => _tap(i),
                         child: Container(
                           decoration: BoxDecoration(

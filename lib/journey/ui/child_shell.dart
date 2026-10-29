@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../design/layout.dart';
 import '../../games_screen.dart';
 import '../../l10n/strings.dart';
 import '../../parent_screens.dart';
@@ -64,8 +65,42 @@ class _ChildShellState extends State<ChildShell> {
             _CreateTab(child: child),
             MeTab(child: child),
           ];
+          final items = [
+            for (final (i, item) in _items.indexed)
+              _NavItem(
+                icon: item.$1,
+                label: context.tr(item.$2),
+                selected: _tab == i,
+                onTap: () => setState(() => _tab = i),
+              ),
+          ];
+          // Navigation fits the window: a bottom bar on phones, a side rail on wider windows.
+          final wide = context.windowClass != WindowClass.compact;
+          final content = PastelBackground(child: SafeArea(child: KeyedSubtree(key: const ValueKey('tab_body'), child: tabs[_tab])));
+          if (wide) {
+            return Scaffold(
+              body: Row(
+                children: [
+                  Container(
+                    width: 104,
+                    decoration: BoxDecoration(
+                      color: RC.sky.withAlpha(200),
+                      border: const BorderDirectional(end: BorderSide(color: RC.outline, width: 2)),
+                    ),
+                    child: SafeArea(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [for (final n in items) Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: n)],
+                      ),
+                    ),
+                  ),
+                  Expanded(child: content),
+                ],
+              ),
+            );
+          }
           return Scaffold(
-            body: PastelBackground(child: SafeArea(child: tabs[_tab])),
+            body: content,
             bottomNavigationBar: SafeArea(
               child: Container(
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
@@ -73,19 +108,7 @@ class _ChildShellState extends State<ChildShell> {
                   color: RC.sky.withAlpha(200),
                   border: const Border(top: BorderSide(color: RC.outline, width: 2)),
                 ),
-                child: Row(
-                  children: [
-                    for (final (i, item) in _items.indexed)
-                      Expanded(
-                        child: _NavItem(
-                          icon: item.$1,
-                          label: context.tr(item.$2),
-                          selected: _tab == i,
-                          onTap: () => setState(() => _tab = i),
-                        ),
-                      ),
-                  ],
-                ),
+                child: Row(children: [for (final n in items) Expanded(child: n)]),
               ),
             ),
           );

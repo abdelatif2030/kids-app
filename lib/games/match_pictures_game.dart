@@ -1,3 +1,4 @@
+import '../design/focusable_tap.dart';
 import 'dart:async';
 import 'dart:math';
 
@@ -166,7 +167,7 @@ class _MatchPicturesGameState extends State<MatchPicturesGame> {
                         label: _board.isOpen(i)
                             ? _board.cards[i]
                             : tr2('بطاقة مغلقة', 'Closed card'),
-                        child: GestureDetector(
+                        child: FocusableTap(
                           key: ValueKey('card$i'),
                           onTap: () => _tap(i),
                           child: AnimatedContainer(

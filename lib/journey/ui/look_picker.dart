@@ -1,3 +1,4 @@
+import '../../design/focusable_tap.dart';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -97,7 +98,7 @@ class _ProfileLookPickerState extends State<ProfileLookPicker> {
                 button: true,
                 selected: d.avatar == a.id,
                 label: a.name(),
-                child: GestureDetector(
+                child: FocusableTap(
                   key: ValueKey('avatar_${a.id}'),
                   onTap: () => _changed(() => d.avatar = a.id),
                   child: AvatarFace(

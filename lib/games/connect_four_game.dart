@@ -1,3 +1,4 @@
+import '../design/focusable_tap.dart';
 import 'package:flutter/material.dart';
 
 import '../journey/ui/kit.dart';
@@ -206,9 +207,8 @@ class _ConnectFourGameState extends State<ConnectFourGame> {
                   child: Semantics(
                     button: !small,
                     label: tr2('العمود ${c + 1}', 'Column ${c + 1}'),
-                    child: GestureDetector(
+                    child: FocusableTap(
                       key: ValueKey('col$c'),
-                      behavior: HitTestBehavior.opaque,
                       onTap: small
                           ? null
                           : () {

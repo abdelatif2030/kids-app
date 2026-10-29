@@ -1,3 +1,4 @@
+import '../design/focusable_tap.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -200,7 +201,7 @@ class _WordBookGameState extends State<WordBookGame> {
                   Semantics(
                     button: true,
                     label: '${w.ar} ${w.en ?? ''}',
-                    child: GestureDetector(
+                    child: FocusableTap(
                       key: ValueKey('word_${w.id}'),
                       onTap: () => _open(w),
                       child: Container(

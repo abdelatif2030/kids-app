@@ -1,12 +1,12 @@
 {
-    "name": "kids_app",
-    "short_name": "kids_app",
+    "name": "رحلتي | Rehlaty",
+    "short_name": "رحلتي",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#E3F0FF",
+    "theme_color": "#4B3FA0",
+    "description": "تعلّم آمن وممتع للأطفال. A safe, friendly learning journey for children.",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {

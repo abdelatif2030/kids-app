@@ -1,3 +1,4 @@
+import '../design/focusable_tap.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -161,7 +162,7 @@ class _NumeralsGameState extends State<NumeralsGame> {
                     child: Semantics(
                       button: true,
                       label: round.render(d),
-                      child: GestureDetector(
+                      child: FocusableTap(
                         key: ValueKey('num$d'),
                         onTap: () => _tap(d),
                         child: Container(

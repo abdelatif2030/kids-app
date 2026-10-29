@@ -1,3 +1,5 @@
+import '../../design/focusable_tap.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -574,37 +576,74 @@ class _FeelingCardState extends State<FeelingCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(tr2('كيف تشعر اليوم؟', 'How do you feel today?'), style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: RC.ink)),
-          Text(tr2('اختياري. اختر وجهاً إن أردت.', 'Optional. Pick a face if you like.'), style: const TextStyle(fontSize: 12, color: RC.ink)),
-          const SizedBox(height: 6),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: [
-              for (final f in kFeelings)
-                Semantics(
-                  button: true,
-                  selected: _picked?.id == f.id,
-                  label: f.label(),
-                  child: GestureDetector(
-                    key: ValueKey('feeling_${f.id}'),
-                    onTap: () => _pick(f),
-                    child: Container(
-                      width: 52,
-                      height: 52,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _picked?.id == f.id ? RC.yellow : Colors.white,
-                        border: Border.all(color: _picked?.id == f.id ? RC.pinkDeep : RC.outline, width: _picked?.id == f.id ? 4 : 2),
-                      ),
-                      child: Text(f.emoji, style: const TextStyle(fontSize: 28)),
-                    ),
-                  ),
-                ),
-            ],
+          Text(
+            tr2('كيف تشعر اليوم؟', 'How do you feel today?'),
+            style: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w900,
+              color: RC.ink,
+            ),
           ),
-          if (_picked != null) Padding(padding: const EdgeInsets.only(top: 6), child: Text(_picked!.reply(), key: const ValueKey('feeling_reply'), style: const TextStyle(fontSize: 14, color: RC.ink))),
+          Text(
+            tr2(
+              'اختياري. اختر وجهاً إن أردت.',
+              'Optional. Pick a face if you like.',
+            ),
+            style: const TextStyle(fontSize: 12, color: RC.ink),
+          ),
+          const SizedBox(height: 6),
+          LayoutBuilder(
+            builder: (context, box) {
+              // Six faces always fit one row on a phone: they shrink a little instead of wrapping.
+              final face = ((box.maxWidth - 5 * 6) / 6).clamp(44.0, 52.0);
+              return Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  for (final f in kFeelings)
+                    Semantics(
+                      button: true,
+                      selected: _picked?.id == f.id,
+                      label: f.label(),
+                      child: FocusableTap(
+                        key: ValueKey('feeling_${f.id}'),
+                        onTap: () => _pick(f),
+                        child: Container(
+                          width: face,
+                          height: face,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _picked?.id == f.id
+                                ? RC.yellow
+                                : Colors.white,
+                            border: Border.all(
+                              color: _picked?.id == f.id
+                                  ? RC.pinkDeep
+                                  : RC.outline,
+                              width: _picked?.id == f.id ? 4 : 2,
+                            ),
+                          ),
+                          child: Text(
+                            f.emoji,
+                            style: const TextStyle(fontSize: 28),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+          if (_picked != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                _picked!.reply(),
+                key: const ValueKey('feeling_reply'),
+                style: const TextStyle(fontSize: 14, color: RC.ink),
+              ),
+            ),
         ],
       ),
     );
@@ -625,11 +664,27 @@ class StickerAlbumCard extends StatelessWidget {
         return RCard(
           key: const ValueKey('stickers'),
           color: const Color(0xFFFFF1D6),
-          semanticLabel: tr2('ألبوم الملصقات: $n من ${kStickers.length}', 'Sticker album: $n of ${kStickers.length}'),
+          semanticLabel: tr2(
+            'ألبوم الملصقات: $n من ${kStickers.length}',
+            'Sticker album: $n of ${kStickers.length}',
+          ),
           child: Column(
             children: [
-              Text(tr2('ألبوم الملصقات', 'Sticker album'), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: RC.ink)),
-              Text(tr2('ملصق جديد مع كل شيء تُنهيه.', 'A new sticker for everything you finish.'), style: const TextStyle(fontSize: 13, color: RC.ink)),
+              Text(
+                tr2('ألبوم الملصقات', 'Sticker album'),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: RC.ink,
+                ),
+              ),
+              Text(
+                tr2(
+                  'ملصق جديد مع كل شيء تُنهيه.',
+                  'A new sticker for everything you finish.',
+                ),
+                style: const TextStyle(fontSize: 13, color: RC.ink),
+              ),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 6,
@@ -638,7 +693,9 @@ class StickerAlbumCard extends StatelessWidget {
                 children: [
                   for (var i = 0; i < kStickers.length; i++)
                     Semantics(
-                      label: i < n ? kStickers[i].name() : tr2('ملصق مقفل', 'Locked sticker'),
+                      label: i < n
+                          ? kStickers[i].name()
+                          : tr2('ملصق مقفل', 'Locked sticker'),
                       child: Container(
                         key: ValueKey(i < n ? 'sticker_$i' : 'locked_$i'),
                         width: 46,
@@ -649,7 +706,13 @@ class StickerAlbumCard extends StatelessWidget {
                           color: i < n ? Colors.white : Colors.black12,
                           border: Border.all(color: RC.outline, width: 2),
                         ),
-                        child: Text(i < n ? kStickers[i].emoji : '?', style: TextStyle(fontSize: i < n ? 26 : 20, color: RC.ink)),
+                        child: Text(
+                          i < n ? kStickers[i].emoji : '?',
+                          style: TextStyle(
+                            fontSize: i < n ? 26 : 20,
+                            color: RC.ink,
+                          ),
+                        ),
                       ),
                     ),
                 ],

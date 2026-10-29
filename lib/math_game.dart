@@ -1,3 +1,4 @@
+import 'design/focusable_tap.dart';
 import 'dart:async';
 import 'dart:math';
 
@@ -161,7 +162,7 @@ class _MathGameState extends State<MathGame> {
                           AnimatedOpacity(
                             duration: const Duration(milliseconds: 300),
                             opacity: _faded.contains(i) ? 0.15 : 1,
-                            child: GestureDetector(
+                            child: FocusableTap(
                               onTap: () => _tap(i),
                               child: Container(
                                 width: 104,

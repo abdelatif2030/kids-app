@@ -1,3 +1,4 @@
+import 'design/focusable_tap.dart';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -64,7 +65,7 @@ class _WhereAnimalGameState extends State<WhereAnimalGame> {
               alignment: WrapAlignment.center,
               children: [
                 for (var i = 0; i < _boxes; i++)
-                  GestureDetector(
+                  FocusableTap(
                     onTap: () => _tapBox(i),
                     child: Container(
                       width: 110,
