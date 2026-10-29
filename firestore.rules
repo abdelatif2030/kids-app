@@ -367,6 +367,8 @@ service cloud.firestore {
     function chatBodyOk(d) {
       return (d.kind == 'phrase' && d.body.matches('p_[a-z]+') && d.body.size() <= 16)
         || (d.kind == 'sticker' && d.body.size() >= 1 && d.body.size() <= 16)
+        || (d.kind == 'voice' && d.body.size() >= 1 && d.body.size() <= 40
+            && d.get('secs', 0) is int && d.get('secs', 0) >= 1 && d.get('secs', 0) <= 30)
         || (d.kind == 'text' && d.body.size() >= 1 && d.body.size() <= 200
             && !d.body.matches('(?i).*(https?:|www\\.|://|\\.com|\\.net|\\.org|@).*'));
     }
@@ -448,9 +450,10 @@ service cloud.firestore {
         && getAfter(/databases/$(database)/documents/connectRequests/$(request.resource.data.requestId)).data.status == 'accepted';
       // Only the parent decides: approve, pause, resume, remove, or change who the relative may talk with.
       allow update: if signedIn() && request.auth.uid == fid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'children', 'calls', 'nextCall'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'children', 'calls', 'nextCall', 'voice'])
         && request.resource.data.status in ['active', 'paused', 'removed']
         && request.resource.data.get('calls', false) is bool
+        && request.resource.data.get('voice', false) is bool
         && request.resource.data.get('nextCall', '').size() <= 60
         && !request.resource.data.get('nextCall', '').matches('(?i).*(https?:|www\\.|://|\\.com|\\.net|\\.org|@).*');
       allow delete: if false;
@@ -501,12 +504,38 @@ service cloud.firestore {
       }
     }
 
+    // Voice recordings: one small document per message (the free plan has no file storage). Only the parent and
+    // that relative read them; only the parent deletes (and the app removes them after 14 days).
+    match /families/{fid}/voices/{vid} {
+      allow read: if signedIn()
+        && (request.auth.uid == fid
+            || (resource.data.relUid == request.auth.uid && isActiveRelative(fid, request.auth.uid)));
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['childId', 'relUid', 'from', 'data', 'mime', 'secs', 'at'])
+        && request.resource.data.data is string && request.resource.data.data.size() >= 1 && request.resource.data.data.size() <= 420000
+        && request.resource.data.mime in ['audio/webm', 'audio/ogg', 'audio/mp4', 'audio/aac', 'audio/mpeg', 'audio/wav']
+        && request.resource.data.secs is int && request.resource.data.secs >= 1 && request.resource.data.secs <= 30
+        && request.resource.data.at == request.time
+        && isActiveRelative(fid, request.resource.data.relUid)
+        && get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.get('voice', false) == true
+        && request.resource.data.childId in get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.children.keys()
+        && ((request.auth.uid == fid && request.resource.data.from == 'child')
+            || (request.auth.uid == request.resource.data.relUid && request.resource.data.from == 'relative'));
+      allow update: if false;
+      allow delete: if signedIn() && request.auth.uid == fid;
+    }
+
     match /families/{fid}/messages/{id} {
       allow read: if signedIn()
         && (request.auth.uid == fid
             || (resource.data.relUid == request.auth.uid && isActiveRelative(fid, request.auth.uid)));
       allow create: if signedIn()
-        && request.resource.data.keys().hasOnly(['threadId', 'childId', 'childName', 'relUid', 'from', 'kind', 'body', 'at'])
+        && request.resource.data.keys().hasOnly(['threadId', 'childId', 'childName', 'relUid', 'from', 'kind', 'body', 'secs', 'at'])
+        // a voice message needs the parent's voice switch for that relative, and its sound document to exist
+        && (request.resource.data.kind != 'voice'
+            || (get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.get('voice', false) == true
+                && exists(/databases/$(database)/documents/families/$(fid)/voices/$(request.resource.data.body))))
+        && (request.resource.data.kind == 'voice' || !('secs' in request.resource.data))
         && request.resource.data.threadId == request.resource.data.childId + '__' + request.resource.data.relUid
         && request.resource.data.childName.size() <= 40
         && request.resource.data.at == request.time

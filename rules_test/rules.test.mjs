@@ -701,3 +701,63 @@ test('requests: decline, and the parent can cancel while it waits', async () => 
   await assertFails(updateDoc(reqRef(as('p1'), 'q3'), { status: 'accepted' })); // the parent cannot accept for them
   await assertFails(updateDoc(reqRef(asMail('r1', 'nana@test.com'), 'q3'), { status: 'accepted', toEmail: 'x@y.z' })); // only status changes
 });
+
+// voice messages ---------------------------------------------------------------
+const voiceRef = (db, id = 'v1', fid = 'p1') => doc(db, 'families', fid, 'voices', id);
+const voiceData = (over = {}) => ({ childId: 'c1', relUid: 'r1', from: 'relative', data: 'AAAA', mime: 'audio/webm', secs: 5, at: serverTimestamp(), ...over });
+async function seedVoiceOn(rel = 'r1', status = 'active', voice = true) {
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(doc(ctx.firestore(), 'families', 'p1', 'relatives', rel), { name: 'Nana', relation: 'grandma', status, children: { c1: 'Lina' }, code: 'X', ...(voice ? { voice: true } : {}) });
+  });
+}
+
+test('voice: only the parent turns voice messages on for a relative', async () => {
+  await seedRelative('r1', 'active');
+  await assertFails(updateDoc(doc(as('r1'), 'families', 'p1', 'relatives', 'r1'), { voice: true }));
+  await assertSucceeds(updateDoc(doc(as('p1'), 'families', 'p1', 'relatives', 'r1'), { voice: true }));
+  await assertFails(updateDoc(doc(as('p1'), 'families', 'p1', 'relatives', 'r1'), { voice: 'yes' }));
+});
+
+test('voice: nobody can send a recording until the parent switched voice on', async () => {
+  await seedVoiceOn('r1', 'active', false);
+  await assertFails(setDoc(voiceRef(as('r1')), voiceData()));
+  await assertFails(setDoc(voiceRef(as('p1'), 'v2'), voiceData({ from: 'child' })));
+});
+
+test('voice: the right person records for the right child; limits on size, length and type', async () => {
+  await seedVoiceOn();
+  await assertSucceeds(setDoc(voiceRef(as('r1'), 'a'), voiceData()));
+  await assertSucceeds(setDoc(voiceRef(as('p1'), 'b'), voiceData({ from: 'child' })));
+  await assertFails(setDoc(voiceRef(as('r1'), 'c'), voiceData({ from: 'child' }))); // relative pretending to be the child
+  await assertFails(setDoc(voiceRef(as('p1'), 'd'), voiceData({ from: 'relative' }))); // parent pretending to be the relative
+  await assertFails(setDoc(voiceRef(as('r2'), 'e'), voiceData())); // someone else
+  await assertFails(setDoc(voiceRef(as('r1'), 'f'), voiceData({ childId: 'c2' }))); // not linked
+  await assertFails(setDoc(voiceRef(as('r1'), 'g'), voiceData({ secs: 31 })));
+  await assertFails(setDoc(voiceRef(as('r1'), 'h'), voiceData({ secs: 0 })));
+  await assertFails(setDoc(voiceRef(as('r1'), 'i'), voiceData({ data: 'x'.repeat(420001) })));
+  await assertFails(setDoc(voiceRef(as('r1'), 'j'), voiceData({ mime: 'video/mp4' })));
+  await assertFails(setDoc(voiceRef(as('r1'), 'k'), voiceData({ at: new Date(0) })));
+  await assertFails(setDoc(voiceRef(as('r1'), 'l'), { ...voiceData(), extra: 1 }));
+});
+
+test('voice: a voice message needs its recording and the voice switch; other kinds cannot carry secs', async () => {
+  await seedVoiceOn();
+  await assertFails(setDoc(msgRef(as('r1'), 'm1'), fmsg({ from: 'relative', kind: 'voice', body: 'nope', secs: 5 }))); // no such recording
+  await assertSucceeds(setDoc(voiceRef(as('r1'), 'vv'), voiceData()));
+  await assertSucceeds(setDoc(msgRef(as('r1'), 'm2'), fmsg({ from: 'relative', kind: 'voice', body: 'vv', secs: 5 })));
+  await assertFails(setDoc(msgRef(as('r1'), 'm3'), fmsg({ from: 'relative', kind: 'voice', body: 'vv', secs: 99 })));
+  await assertFails(setDoc(msgRef(as('r1'), 'm4'), fmsg({ from: 'relative', kind: 'text', body: 'hi', secs: 5 })));
+});
+
+test('voice: recordings are read only by the parent and that relative; only the parent deletes', async () => {
+  await seedVoiceOn();
+  await seedRelative('r2', 'active');
+  await env.withSecurityRulesDisabled(async (ctx) => { await setDoc(voiceRef(ctx.firestore()), { ...voiceData(), at: new Date() }); });
+  await assertSucceeds(getDoc(voiceRef(as('p1'))));
+  await assertSucceeds(getDoc(voiceRef(as('r1'))));
+  await assertFails(getDoc(voiceRef(as('r2'))));
+  await assertFails(getDoc(voiceRef(as('p2'))));
+  await assertFails(updateDoc(voiceRef(as('p1')), { secs: 6 }));
+  await assertFails(deleteDoc(voiceRef(as('r1'))));
+  await assertSucceeds(deleteDoc(voiceRef(as('p1'))));
+});

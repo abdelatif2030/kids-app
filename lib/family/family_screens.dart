@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -14,6 +16,7 @@ import 'call_screens.dart';
 import 'family_models.dart';
 import 'family_prefs.dart';
 import 'family_seen.dart';
+import 'voice_io.dart';
 import 'family_repository.dart';
 
 String _err(Object e) => e is FamilyException ? e.message : tr2('تعذّر إكمال العملية، حاول مرة أخرى', 'Something went wrong, please try again');
@@ -34,6 +37,14 @@ class FamilyParentScreen extends StatefulWidget {
 
 class _FamilyParentScreenState extends State<FamilyParentScreen> {
   late Future<List<Relative>> _rels = widget.repo.relatives();
+
+  @override
+  void initState() {
+    super.initState();
+    // Voice recordings are removed after 14 days (keeps the free database small and respects privacy).
+    widget.repo.purgeOldVoices(widget.repo.uid!).catchError((Object _) => 0);
+  }
+
   List<Relative> _lastRels = const [];
   int _refreshTick = 0;
 
@@ -112,6 +123,7 @@ class _FamilyParentScreenState extends State<FamilyParentScreen> {
                     onStatus: (s) => _do(() => widget.repo.setRelativeStatus(r.uid, s)),
                     onChildren: (c) => _do(() => widget.repo.setRelativeChildren(r.uid, c)),
                     onCalls: (on) => _do(() => widget.repo.setRelativeCalls(r.uid, on)),
+                    onVoice: (on) => _do(() => widget.repo.setRelativeVoice(r.uid, on)),
                     onNextCall: (t) => _do(() => widget.repo.setRelativeNextCall(r.uid, t)),
                     onCall: widget.repo is CallRepository
                         ? (childId, childName) => startCallScreen(
@@ -368,9 +380,10 @@ class _RelativeCard extends StatelessWidget {
   final ValueChanged<String> onStatus;
   final ValueChanged<Map<String, String>> onChildren;
   final ValueChanged<bool> onCalls;
+  final ValueChanged<bool> onVoice;
   final void Function(String childId, String childName)? onCall;
   final ValueChanged<String> onNextCall;
-  const _RelativeCard({super.key, required this.rel, required this.onStatus, required this.onChildren, required this.onCalls, this.onCall, required this.onNextCall});
+  const _RelativeCard({super.key, required this.rel, required this.onStatus, required this.onChildren, required this.onCalls, required this.onVoice, this.onCall, required this.onNextCall});
 
   String get _statusText => switch (rel.status) {
         kRelativePending => tr2('بانتظار موافقتك', 'Waiting for your approval'),
@@ -390,6 +403,15 @@ class _RelativeCard extends StatelessWidget {
           if (rel.children.isNotEmpty) Text(tr2('يتكلم مع: ', 'Talks with: ') + rel.children.values.join('، '), style: DS.caption),
           if (rel.active)
             _NextCallRow(rel: rel, onSave: onNextCall),
+          if (rel.active)
+            SwitchListTile(
+              key: ValueKey('voice_${rel.uid}'),
+              contentPadding: EdgeInsets.zero,
+              title: Text(tr2('السماح بالرسائل الصوتية', 'Allow voice messages')),
+              subtitle: Text(tr2('تُحفظ 14 يوماً ثم تُحذف. تستطيع أنت سماع كل شيء.', 'Kept for 14 days, then deleted. You can listen to everything.')),
+              value: rel.voiceOn,
+              onChanged: onVoice,
+            ),
           if (rel.active && onCall != null) ...[
             SwitchListTile(
               key: ValueKey('calls_${rel.uid}'),
@@ -487,7 +509,7 @@ class _ChildSwitchesState extends State<_ChildSwitches> {
               title: Text(c.nickname),
               subtitle: Text(tr2('يستطيع فتح المحادثة مع الأقارب الموافَق عليهم', 'May open the chat with approved relatives')),
               value: _prefs[c.id]?.chatOn ?? false,
-              onChanged: (v) => _set(c.id, ChildChatPrefs(chatOn: v, textOn: v && (_prefs[c.id]?.textOn ?? false))),
+              onChanged: (v) => _set(c.id, ChildChatPrefs(chatOn: v, textOn: v && (_prefs[c.id]?.textOn ?? false), voiceOn: v && (_prefs[c.id]?.voiceOn ?? false))),
             ),
             if (_prefs[c.id]?.chatOn ?? false)
               SwitchListTile(
@@ -495,7 +517,15 @@ class _ChildSwitchesState extends State<_ChildSwitches> {
                 title: Text(tr2('السماح بالكتابة', 'Allow typing')),
                 subtitle: Text(tr2('بدونها: عبارات جاهزة وملصقات فقط', 'Off: ready phrases and stickers only')),
                 value: _prefs[c.id]?.textOn ?? false,
-                onChanged: (v) => _set(c.id, ChildChatPrefs(chatOn: true, textOn: v)),
+                onChanged: (v) => _set(c.id, ChildChatPrefs(chatOn: true, textOn: v, voiceOn: _prefs[c.id]?.voiceOn ?? false)),
+              ),
+            if (_prefs[c.id]?.chatOn ?? false)
+              SwitchListTile(
+                key: ValueKey('voice_on_${c.id}'),
+                title: Text(tr2('السماح بتسجيل الصوت', 'Allow voice recording')),
+                subtitle: Text(tr2('لمن فعّلت له الرسائل الصوتية فقط', 'Only for relatives you allowed voice messages for')),
+                value: _prefs[c.id]?.voiceOn ?? false,
+                onChanged: (v) => _set(c.id, ChildChatPrefs(chatOn: true, textOn: _prefs[c.id]?.textOn ?? false, voiceOn: v)),
               ),
           ]),
         ),
@@ -560,7 +590,12 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                     for (final m in e.value)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: Text('${m.from == Side.child ? m.childName : tr2('القريب', 'Relative')}: ${m.shown}'),
+                        child: m.isVoice
+                            ? Row(children: [
+                                Text('${m.from == Side.child ? m.childName : tr2('القريب', 'Relative')}: '),
+                                VoiceBubble(repo: widget.repo, familyId: widget.repo.uid!, message: m),
+                              ])
+                            : Text('${m.from == Side.child ? m.childName : tr2('القريب', 'Relative')}: ${m.shown}'),
                       ),
                   ]),
                 ),
@@ -658,7 +693,7 @@ class _ChildFamilyScreenState extends State<ChildFamilyScreen> {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ChatScreen(repo: widget.repo, familyId: widget.familyId, childId: widget.childId, childName: widget.childName, relUid: c.rel.uid, as: Side.child, title: relationLabel(c.rel.relation), canShareWin: _win, calls: widget.repo is CallRepository ? widget.repo as CallRepository : null, callsOn: c.rel.callsOn),
+                        builder: (_) => ChatScreen(repo: widget.repo, familyId: widget.familyId, childId: widget.childId, childName: widget.childName, relUid: c.rel.uid, as: Side.child, title: relationLabel(c.rel.relation), canShareWin: _win, calls: widget.repo is CallRepository ? widget.repo as CallRepository : null, callsOn: c.rel.callsOn, voiceOn: c.rel.voiceOn),
                       ),
                     );
                     _reload();
@@ -699,6 +734,9 @@ class ChatScreen extends StatefulWidget {
   final CallRepository? calls;
   final bool callsOn;
   final Future<bool> Function()? approveCall;
+
+  /// Voice messages are on for this relative (the parent's switch).
+  final bool voiceOn;
   const ChatScreen({
     super.key,
     required this.repo,
@@ -712,6 +750,7 @@ class ChatScreen extends StatefulWidget {
     this.calls,
     this.callsOn = false,
     this.approveCall,
+    this.voiceOn = false,
   });
 
   @override
@@ -721,6 +760,11 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final _text = TextEditingController();
   bool _typing = false; // whether free typing is available on this side
+  bool _voice = false; // whether this side may record (the parent's switches)
+  VoiceRecorder? _recorder;
+  bool _recording = false;
+  int _recSecs = 0;
+  Timer? _recTimer;
   bool _sending = false;
   String? _error;
 
@@ -729,17 +773,89 @@ class _ChatScreenState extends State<ChatScreen> {
     super.initState();
     if (widget.as == Side.relative) {
       _typing = true;
+      _voice = widget.voiceOn;
     } else {
       FamilyPrefs.of(widget.childId).then((p) {
-        if (mounted) setState(() => _typing = p.textOn);
+        if (mounted) {
+          setState(() {
+            _typing = p.textOn;
+            _voice = p.voiceOn && widget.voiceOn;
+          });
+        }
       });
     }
   }
 
   @override
   void dispose() {
+    _recTimer?.cancel();
+    _recorder?.cancel().whenComplete(() => _recorder?.dispose());
     _text.dispose();
     super.dispose();
+  }
+
+  Future<void> _startRecording() async {
+    if (_recording || _sending) return;
+    final rec = newVoiceRecorder();
+    bool ok;
+    try {
+      ok = await rec.start();
+    } catch (_) {
+      ok = false;
+    }
+    if (!ok) {
+      await rec.dispose();
+      if (mounted) setState(() => _error = tr2('لا يمكن استخدام الميكروفون. اسمح به من الإعدادات.', 'The microphone cannot be used. Allow it in the settings.'));
+      return;
+    }
+    _recorder = rec;
+    _recSecs = 0;
+    _recTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      setState(() => _recSecs++);
+      if (_recSecs >= kMaxVoiceSeconds) _finishRecording(send: true); // the limit sends what was said
+    });
+    setState(() {
+      _recording = true;
+      _error = null;
+    });
+  }
+
+  Future<void> _finishRecording({required bool send}) async {
+    final rec = _recorder;
+    if (rec == null) return;
+    _recTimer?.cancel();
+    _recorder = null;
+    setState(() {
+      _recording = false;
+      _sending = send;
+    });
+    try {
+      if (!send) {
+        await rec.cancel();
+        return;
+      }
+      final voice = await rec.stop();
+      if (voice == null || voice.bytes.length > kMaxVoiceBytes) {
+        if (mounted) setState(() => _error = tr2('الرسالة الصوتية طويلة. سجّل رسالة أقصر.', 'That voice message is too long. Record a shorter one.'));
+        return;
+      }
+      await widget.repo.sendVoice(
+        familyId: widget.familyId,
+        childId: widget.childId,
+        childName: widget.childName,
+        relUid: widget.relUid,
+        from: widget.as,
+        bytes: voice.bytes,
+        mime: voice.mime,
+        secs: voice.secs,
+      );
+    } catch (e) {
+      if (mounted) setState(() => _error = _err(e));
+    } finally {
+      await rec.dispose();
+      if (mounted) setState(() => _sending = false);
+    }
   }
 
   Future<void> _send(String kind, String body) async {
@@ -831,7 +947,9 @@ class _ChatScreenState extends State<ChatScreen> {
                             borderRadius: BorderRadius.circular(DS.rMedium),
                             border: Border.all(color: DS.border),
                           ),
-                          child: Text(m.shown, style: TextStyle(fontSize: m.kind == kindSticker ? 36 : 18, color: DS.ink)),
+                          child: m.isVoice
+                              ? VoiceBubble(repo: widget.repo, familyId: widget.familyId, message: m)
+                              : Text(m.shown, style: TextStyle(fontSize: m.kind == kindSticker ? 36 : 18, color: DS.ink)),
                         ),
                       ),
                   ]);
@@ -839,7 +957,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             if (_error != null) Padding(padding: const EdgeInsets.all(8), child: Text(_error!, key: const ValueKey('chat_error'), style: DS.body.copyWith(color: DS.error))),
-            _Composer(typing: _typing, sending: _sending, controller: _text, onSend: _send, phrases: phrasesFor(DateTime.now(), includeWin: widget.canShareWin && widget.as == Side.child)),
+            _Composer(typing: _typing, sending: _sending, controller: _text, onSend: _send, voice: _voice, recording: _recording, recSecs: _recSecs, onMic: _startRecording, onStopRecording: () => _finishRecording(send: true), onCancelRecording: () => _finishRecording(send: false), phrases: phrasesFor(DateTime.now(), includeWin: widget.canShareWin && widget.as == Side.child)),
           ]),
         ),
       ),
@@ -853,7 +971,25 @@ class _Composer extends StatelessWidget {
   final TextEditingController controller;
   final Future<void> Function(String kind, String body) onSend;
   final List<String> phrases;
-  const _Composer({required this.typing, required this.sending, required this.controller, required this.onSend, required this.phrases});
+  final bool voice;
+  final bool recording;
+  final int recSecs;
+  final VoidCallback onMic;
+  final VoidCallback onStopRecording;
+  final VoidCallback onCancelRecording;
+  const _Composer({
+    required this.typing,
+    required this.sending,
+    required this.controller,
+    required this.onSend,
+    required this.phrases,
+    required this.voice,
+    required this.recording,
+    required this.recSecs,
+    required this.onMic,
+    required this.onStopRecording,
+    required this.onCancelRecording,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -888,6 +1024,29 @@ class _Composer extends StatelessWidget {
               ),
           ]),
         ),
+        if (recording)
+          Container(
+            key: const ValueKey('recording_bar'),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Row(children: [
+              const Icon(Icons.fiber_manual_record_rounded, color: DS.error),
+              const SizedBox(width: 8),
+              Text('${tr2('جارٍ التسجيل', 'Recording')} $recSecs / $kMaxVoiceSeconds', key: const ValueKey('rec_secs'), style: DS.heading),
+              const Spacer(),
+              IconButton(key: const ValueKey('rec_cancel'), tooltip: tr2('إلغاء', 'Cancel'), onPressed: onCancelRecording, icon: const Icon(Icons.delete_outline_rounded)),
+              IconButton.filled(key: const ValueKey('rec_send'), tooltip: tr2('إرسال', 'Send'), onPressed: onStopRecording, icon: const Icon(Icons.send_rounded)),
+            ]),
+          )
+        else if (voice)
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton.icon(
+              key: const ValueKey('mic'),
+              onPressed: sending ? null : onMic,
+              icon: const Icon(Icons.mic_rounded),
+              label: Text(tr2('رسالة صوتية', 'Voice message')),
+            ),
+          ),
         if (typing)
           Row(children: [
             Expanded(
@@ -1058,7 +1217,7 @@ class _RelativeFamily extends StatelessWidget {
                       label: Text(c.value),
                       onPressed: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => ChatScreen(repo: repo, familyId: familyId, childId: c.key, childName: c.value, relUid: repo.uid!, as: Side.relative, title: c.value, calls: repo is CallRepository ? repo as CallRepository : null, callsOn: me.callsOn)),
+                        MaterialPageRoute(builder: (_) => ChatScreen(repo: repo, familyId: familyId, childId: c.key, childName: c.value, relUid: repo.uid!, as: Side.relative, title: c.value, calls: repo is CallRepository ? repo as CallRepository : null, callsOn: me.callsOn, voiceOn: me.voiceOn)),
                       ),
                     ),
                 ]),
@@ -1068,5 +1227,86 @@ class _RelativeFamily extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+
+/// A voice message: a play button and the length. The sound is fetched only when played, and is gone after
+/// 14 days (then it says so).
+class VoiceBubble extends StatefulWidget {
+  final FamilyRepository repo;
+  final String familyId;
+  final FamilyMessage message;
+  const VoiceBubble({super.key, required this.repo, required this.familyId, required this.message});
+
+  @override
+  State<VoiceBubble> createState() => _VoiceBubbleState();
+}
+
+class _VoiceBubbleState extends State<VoiceBubble> {
+  static VoicePlayer? _current; // one voice message at a time
+  static _VoiceBubbleState? _currentOwner;
+  VoicePlayer? _player;
+  bool _playing = false;
+  bool _loading = false;
+  bool _gone = false;
+  StreamSubscription<bool>? _sub;
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    if (_currentOwner == this) {
+      _current = null;
+      _currentOwner = null;
+    }
+    _player?.stop().whenComplete(() => _player?.dispose());
+    super.dispose();
+  }
+
+  Future<void> _toggle() async {
+    if (_playing) {
+      await _player?.stop();
+      if (mounted) setState(() => _playing = false);
+      return;
+    }
+    setState(() => _loading = true);
+    try {
+      final clip = await widget.repo.loadVoice(widget.familyId, widget.message.body, relUid: widget.message.relUid);
+      if (clip == null) {
+        if (mounted) setState(() => _gone = true);
+        return;
+      }
+      await _current?.stop();
+      _currentOwner?._playing = false;
+      final p = _player ??= newVoicePlayer();
+      _sub ??= p.playing.listen((v) {
+        if (mounted) setState(() => _playing = v);
+      });
+      _current = p;
+      _currentOwner = this;
+      await p.play(clip);
+      if (mounted) setState(() => _playing = true);
+    } catch (e) {
+      if (mounted) showToast(context, _err(e));
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_gone) return Text(tr2('انتهت صلاحية هذه الرسالة الصوتية', 'This voice message has expired'), key: const ValueKey('voice_gone'), style: DS.caption);
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      _loading
+          ? const SizedBox(width: 40, height: 40, child: Padding(padding: EdgeInsets.all(8), child: CircularProgressIndicator(strokeWidth: 3)))
+          : IconButton.filledTonal(
+              key: ValueKey('voice_${widget.message.id}'),
+              tooltip: _playing ? tr2('إيقاف', 'Stop') : tr2('تشغيل', 'Play'),
+              onPressed: _toggle,
+              icon: Icon(_playing ? Icons.stop_rounded : Icons.play_arrow_rounded),
+            ),
+      const SizedBox(width: 8),
+      Text('🎤 ${widget.message.secs} ${tr2('ث', 's')}', style: const TextStyle(fontSize: 18)),
+    ]);
   }
 }

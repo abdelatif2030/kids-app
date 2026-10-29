@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'call_models.dart';
 import 'call_repository.dart';
@@ -12,6 +13,7 @@ class FakeFamilyServer {
   final messages = <String, List<FamilyMessage>>{}; // familyId -> messages
   final _changes = StreamController<String>.broadcast();
   final requests = <String, ConnectRequest>{};
+  final voices = <String, (String familyId, String relUid, VoiceClip clip, DateTime at)>{};
   final parentNames = <String, String>{}; // family id -> parent's name
   final _requestChanges = StreamController<String>.broadcast();
   final calls = <String, CallInfo>{}; // call id -> call
@@ -111,6 +113,66 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
     final r = _mine(uid!)[relUid];
     if (r == null) throw const FamilyException('not found');
     _mine(uid!)[relUid] = r.copyWith(callsOn: on);
+  }
+
+  @override
+  Future<void> setRelativeVoice(String relUid, bool on) async {
+    final r = _mine(uid!)[relUid];
+    if (r == null) throw const FamilyException('not found');
+    _mine(uid!)[relUid] = r.copyWith(voiceOn: on);
+  }
+
+  @override
+  Future<void> sendVoice({
+    required String familyId,
+    required String childId,
+    required String childName,
+    required String relUid,
+    required Side from,
+    required Uint8List bytes,
+    required String mime,
+    required int secs,
+  }) async {
+    if (bytes.isEmpty || bytes.length > kMaxVoiceBytes || secs < 1 || secs > kMaxVoiceSeconds || !kVoiceMimes.contains(mime)) {
+      throw const FamilyException('invalid voice message');
+    }
+    final rel = _mine(familyId)[relUid];
+    if (rel == null || !rel.active || !rel.voiceOn || !rel.children.containsKey(childId)) throw const FamilyException('not allowed');
+    if (from == Side.child && uid != familyId) throw const FamilyException('not allowed');
+    if (from == Side.relative && uid != relUid) throw const FamilyException('not allowed');
+    final vid = 'v${server._n++}';
+    server.voices[vid] = (familyId, relUid, VoiceClip(bytes, mime), DateTime.now());
+    server.messages.putIfAbsent(familyId, () => []).add(FamilyMessage(
+          id: 'm${server._n++}',
+          childId: childId,
+          childName: childName,
+          relUid: relUid,
+          from: from,
+          kind: kindVoice,
+          body: vid,
+          secs: secs,
+          at: DateTime.fromMillisecondsSinceEpoch(1700000000000 + server._n * 1000),
+        ));
+    server._changes.add(familyId);
+  }
+
+  @override
+  Future<VoiceClip?> loadVoice(String familyId, String voiceId, {required String relUid}) async {
+    final v = server.voices[voiceId];
+    if (v == null || v.$1 != familyId) return null;
+    if (uid != familyId && !(uid == relUid && v.$2 == relUid)) throw const FamilyException('not allowed');
+    return v.$3;
+  }
+
+  @override
+  Future<int> purgeOldVoices(String familyId, {int days = kVoiceKeepDays}) async {
+    if (uid != familyId) throw const FamilyException('not allowed');
+    final cutoff = DateTime.now().subtract(Duration(days: days));
+    final old = [for (final e in server.voices.entries) if (e.value.$1 == familyId && e.value.$4.isBefore(cutoff)) e.key];
+    for (final k in old) {
+      server.voices.remove(k);
+    }
+    return old.length;
   }
 
   @override

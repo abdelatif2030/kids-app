@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import '../l10n/strings.dart';
 
 /// Family chat: the parent invites relatives (grandparents, aunts...), approves them, chooses which child may
@@ -12,6 +14,13 @@ const kMaxNextCallLength = 60;
 const kindPhrase = 'phrase';
 const kindSticker = 'sticker';
 const kindText = 'text';
+const kindVoice = 'voice';
+
+/// A voice message is at most this long and this big. Small on purpose: the free Firebase plan has no file
+/// storage, so the sound is kept in a small database document and removed after 14 days.
+const kMaxVoiceSeconds = 30;
+const kMaxVoiceBytes = 300000;
+const kVoiceKeepDays = 14;
 
 const kRelativePending = 'pending'; // joined with a code, waiting for the parent
 const kRelativeActive = 'active';
@@ -76,6 +85,9 @@ class Relative {
   /// Voice calls with this relative: OFF until the parent turns it on.
   final bool callsOn;
 
+  /// Voice messages with this relative: OFF until the parent turns it on.
+  final bool voiceOn;
+
   /// A short note from the parent about the next planned call, for example "Friday 6 pm". Empty if none.
   final String nextCall;
   const Relative({
@@ -86,11 +98,12 @@ class Relative {
     this.children = const {},
     this.callsOn = false,
     this.nextCall = '',
+    this.voiceOn = false,
   });
 
   bool get active => status == kRelativeActive;
 
-  Relative copyWith({String? status, Map<String, String>? children, bool? callsOn, String? nextCall}) => Relative(
+  Relative copyWith({String? status, Map<String, String>? children, bool? callsOn, String? nextCall, bool? voiceOn}) => Relative(
         uid: uid,
         name: name,
         relation: relation,
@@ -98,8 +111,19 @@ class Relative {
         children: children ?? this.children,
         callsOn: callsOn ?? this.callsOn,
         nextCall: nextCall ?? this.nextCall,
+        voiceOn: voiceOn ?? this.voiceOn,
       );
 }
+
+/// A recorded voice message as stored: the sound bytes and their type.
+class VoiceClip {
+  final Uint8List bytes;
+  final String mime;
+  const VoiceClip(this.bytes, this.mime);
+}
+
+/// Sound types the server accepts.
+const kVoiceMimes = ['audio/webm', 'audio/ogg', 'audio/mp4', 'audio/aac', 'audio/mpeg', 'audio/wav'];
 
 const kRequestPending = 'pending';
 const kRequestAccepted = 'accepted';
@@ -170,6 +194,9 @@ class FamilyMessage {
   final String kind;
   final String body;
   final DateTime at;
+
+  /// Length of a voice message in seconds (0 for other kinds).
+  final int secs;
   const FamilyMessage({
     required this.id,
     required this.childId,
@@ -179,12 +206,15 @@ class FamilyMessage {
     required this.kind,
     required this.body,
     required this.at,
+    this.secs = 0,
   });
+
+  bool get isVoice => kind == kindVoice;
 
   String get threadId => threadIdOf(childId, relUid);
 
   /// What to show: phrases are localized by id, stickers and text as written.
-  String get shown => kind == kindPhrase ? phraseText(body) : body;
+  String get shown => kind == kindPhrase ? phraseText(body) : (kind == kindVoice ? '🎤 $secs ${tr2('ث', 's')}' : body);
 }
 
 String threadIdOf(String childId, String relUid) => '${childId}__$relUid';
@@ -201,6 +231,8 @@ String? validateMessage(String kind, String body) {
       return kPhrases.contains(body) ? null : tr2('رسالة غير معروفة', 'Unknown message');
     case kindSticker:
       return kStickers.contains(body) ? null : tr2('ملصق غير معروف', 'Unknown sticker');
+    case kindVoice:
+      return body.isEmpty || body.length > 40 ? tr2('رسالة صوتية غير صالحة', 'Not a valid voice message') : null;
     case kindText:
       final t = body.trim();
       if (t.isEmpty) return tr2('اكتب رسالة أولاً', 'Write a message first');
@@ -215,9 +247,13 @@ String? validateMessage(String kind, String body) {
 class ChildChatPrefs {
   final bool chatOn;
   final bool textOn;
-  const ChildChatPrefs({this.chatOn = false, this.textOn = false});
 
-  Map<String, dynamic> toJson() => {'chatOn': chatOn, 'textOn': textOn};
-  static ChildChatPrefs fromJson(Object? j) =>
-      j is Map ? ChildChatPrefs(chatOn: j['chatOn'] == true, textOn: j['textOn'] == true) : const ChildChatPrefs();
+  /// The child may record voice messages (only to relatives whose voice switch is on). Off by default.
+  final bool voiceOn;
+  const ChildChatPrefs({this.chatOn = false, this.textOn = false, this.voiceOn = false});
+
+  Map<String, dynamic> toJson() => {'chatOn': chatOn, 'textOn': textOn, 'voiceOn': voiceOn};
+  static ChildChatPrefs fromJson(Object? j) => j is Map
+      ? ChildChatPrefs(chatOn: j['chatOn'] == true, textOn: j['textOn'] == true, voiceOn: j['voiceOn'] == true)
+      : const ChildChatPrefs();
 }

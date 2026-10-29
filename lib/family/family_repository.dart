@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'family_models.dart';
 
 class FamilyException implements Exception {
@@ -24,6 +26,9 @@ abstract class FamilyRepository {
   Future<void> setRelativeStatus(String relUid, String status);
   /// Turns voice calls with this relative on or off. Off by default.
   Future<void> setRelativeCalls(String relUid, bool on);
+
+  /// Turns voice messages with this relative on or off. Off by default.
+  Future<void> setRelativeVoice(String relUid, bool on);
 
   /// A short note about the next planned call (<= 60 characters; empty clears it). Parent only.
   Future<void> setRelativeNextCall(String relUid, String text);
@@ -68,6 +73,24 @@ abstract class FamilyRepository {
     required String kind,
     required String body,
   });
+  /// Sends a recorded voice message (<= 30 s, <= 300 KB). The sound is stored in a small separate document.
+  Future<void> sendVoice({
+    required String familyId,
+    required String childId,
+    required String childName,
+    required String relUid,
+    required Side from,
+    required Uint8List bytes,
+    required String mime,
+    required int secs,
+  });
+
+  /// The sound of one voice message, or null if it was removed (they are removed after 14 days).
+  Future<VoiceClip?> loadVoice(String familyId, String voiceId, {required String relUid});
+
+  /// Parent only: removes voice recordings older than [days]. Returns how many were removed.
+  Future<int> purgeOldVoices(String familyId, {int days = kVoiceKeepDays});
+
   Stream<List<FamilyMessage>> watch({required String familyId, required String childId, required String relUid});
 
   /// Parent only: every message of the family, newest last (the parent can read all conversations).

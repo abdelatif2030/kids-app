@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -55,6 +56,7 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
         status: (d['status'] as String?) ?? kRelativePending,
         children: _strMap(d['children']),
         callsOn: d['calls'] == true,
+        voiceOn: d['voice'] == true,
         nextCall: (d['nextCall'] as String?) ?? '',
       );
 
@@ -163,6 +165,70 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
   Future<void> setRelativeCalls(String relUid, bool on) => _guard(() => _rels(uid!).doc(relUid).update({'calls': on}));
 
   @override
+  Future<void> setRelativeVoice(String relUid, bool on) => _guard(() => _rels(uid!).doc(relUid).update({'voice': on}));
+
+  CollectionReference<Map<String, dynamic>> _voices(String fid) => _db.collection('families').doc(fid).collection('voices');
+
+  @override
+  Future<void> sendVoice({
+    required String familyId,
+    required String childId,
+    required String childName,
+    required String relUid,
+    required Side from,
+    required Uint8List bytes,
+    required String mime,
+    required int secs,
+  }) => _guard(() async {
+        if (bytes.isEmpty || bytes.length > kMaxVoiceBytes || secs < 1 || secs > kMaxVoiceSeconds) {
+          throw FamilyException(tr2('الرسالة الصوتية طويلة جداً', 'The voice message is too long'));
+        }
+        final side = from == Side.child ? 'child' : 'relative';
+        // First the sound (a small document of its own), then the message that points to it.
+        final ref = await _voices(familyId).add({
+          'childId': childId,
+          'relUid': relUid,
+          'from': side,
+          'data': base64Encode(bytes),
+          'mime': mime,
+          'secs': secs,
+          'at': FieldValue.serverTimestamp(),
+        });
+        await _msgs(familyId).add({
+          'threadId': threadIdOf(childId, relUid),
+          'childId': childId,
+          'childName': childName,
+          'relUid': relUid,
+          'from': side,
+          'kind': kindVoice,
+          'body': ref.id,
+          'secs': secs,
+          'at': FieldValue.serverTimestamp(),
+        });
+      });
+
+  @override
+  Future<VoiceClip?> loadVoice(String familyId, String voiceId, {required String relUid}) => _guard(() async {
+        final d = await _voices(familyId).doc(voiceId).get();
+        final m = d.data();
+        if (!d.exists || m == null) return null;
+        return VoiceClip(base64Decode(m['data'] as String), (m['mime'] as String?) ?? 'audio/webm');
+      });
+
+  @override
+  Future<int> purgeOldVoices(String familyId, {int days = kVoiceKeepDays}) => _guard(() async {
+        final cutoff = Timestamp.fromDate(DateTime.now().subtract(Duration(days: days)));
+        final snap = await _voices(familyId).where('at', isLessThan: cutoff).limit(200).get();
+        if (snap.docs.isEmpty) return 0;
+        final batch = _db.batch();
+        for (final d in snap.docs) {
+          batch.delete(d.reference);
+        }
+        await batch.commit();
+        return snap.docs.length;
+      });
+
+  @override
   Future<void> setRelativeNextCall(String relUid, String text) {
     if (text.length > kMaxNextCallLength || containsLink(text)) throw FamilyException(tr2('النص طويل أو فيه رابط', 'Too long, or it has a link'));
     return _guard(() => _rels(uid!).doc(relUid).update({'nextCall': text.trim()}));
@@ -238,6 +304,7 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
         kind: (d['kind'] as String?) ?? kindText,
         body: (d['body'] as String?) ?? '',
         at: ((d['at'] as Timestamp?) ?? Timestamp.now()).toDate(), // a just-sent message has no server time yet
+        secs: (d['secs'] as int?) ?? 0,
       );
 
   List<FamilyMessage> _sorted(QuerySnapshot<Map<String, dynamic>> s) =>
