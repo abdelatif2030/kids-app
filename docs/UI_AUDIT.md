@@ -106,4 +106,28 @@ NVDA), real keyboard use, print and file dialogs, and a visual review of the new
 - A real Router for browser Back/Forward and deep links. The current `Navigator.push` pages may not create
   browser history entries; this must be checked in a browser first.
 - Dedicated tablet landscape layouts for the games (they are centred, not redesigned).
-- `lang` in `index.html` is fixed to `ar`; it does not follow the in-app language switch.
+
+## Advanced UX pass (2026-10-29)
+Baseline: 671 tests passed and the analyzer showed only the 7 old items before any change.
+
+Verified in headless Chromium (desktop width): the Back button inside the child shell returns to the who-plays screen
+and does not leave the site. NOT verified: Forward, refresh (the app has one route, so a refresh restarts at the
+picker; progress is saved, an open game is not) and deep links (none exist).
+
+Changed:
+- Parent settings are grouped under headers (children and progress, daily learning, language and accessibility, screen
+  time, safety and account). Language, text size, reduced motion, daily limit, quiet hours and the "My day" switches
+  show a "Saved" toast after the write.
+- Before the FIRST PIN is created a small multiplication question is asked. This is a speed bump for small children,
+  not security; the PIN is the real protection.
+- Leaving a half-played learning game asks first (it is not saved); an untouched game closes at once.
+- Child home order: next action, My Day, resume, then the optional feeling faces.
+- Parents can filter a teacher's work samples by kind (chips only when there is more than one kind) and open a full
+  preview with the whole picture and description.
+- Web: the tab title and `<html lang/dir>` follow the in-app language (`lib/web_lang*.dart`, conditional import).
+  Checked in a release web build with headless Chromium and a seeded language: ar -> lang=ar, dir=rtl, title 'رحلتي';
+  en -> lang=en, dir=ltr, title 'Rehlaty'. Switching live inside the app is still a manual test (I11).
+
+Deferred, with reasons: real instruction audio (no recordings exist; device voice only), one shared palette (visual
+decision), a Router with deep links (a larger change; the single route is documented), tablet-specific game layouts,
+teacher statistics (would need analytics, which is not allowed).

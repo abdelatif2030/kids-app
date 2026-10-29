@@ -1301,3 +1301,56 @@ The six learning games under Games > Learning games.
 - **Status:** Not tested
 - **Device or environment:** Browser and OS: 
 - **Notes:** 
+
+### I11 - Document language and title follow the app language
+
+- [ ] Not tested
+- **Test ID:** I11
+- **Preconditions:** Web build; open DevTools.
+- **Steps:**
+  1. Switch the interface between Arabic and English in Parent settings.
+  2. Read `document.documentElement.lang`, `.dir` and `document.title`.
+- **Expected result:** `ar`/`rtl`/'رحلتي' and `en`/`ltr`/'Rehlaty'.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browser and OS: 
+- **Notes:** 
+
+### I12 - Leave a half-played game
+
+- [ ] Not tested
+- **Test ID:** I12
+- **Preconditions:** Any learning game.
+- **Steps:**
+  1. Make one move, then press Back (phone or browser) and then Escape on the dialog.
+- **Expected result:** A "Leave the game?" dialog appears; Escape and "Keep playing" stay in the game; "Leave" goes back. An untouched game closes at once.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browser and OS: 
+- **Notes:** 
+
+### I13 - Parent settings groups and Saved toast
+
+- [ ] Not tested
+- **Test ID:** I13
+- **Preconditions:** Parent settings open.
+- **Steps:**
+  1. Change the text size and the daily limit.
+- **Expected result:** Five headed groups; a "Saved" message after each change; the change is still there after reopening.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browser and OS: 
+- **Notes:** 
+
+### I14 - Teacher work samples filter and preview
+
+- [ ] Not tested
+- **Test ID:** I14
+- **Preconditions:** A teacher with at least two kinds of published works and a picture.
+- **Steps:**
+  1. Open the teacher page as a parent, use the kind chips, tap a work.
+- **Expected result:** The list filters; the preview shows the full picture and description and the "not reviewed by the app" note.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** Browser and OS: 
+- **Notes:** 
