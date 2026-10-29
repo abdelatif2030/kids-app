@@ -33,6 +33,7 @@ Future<void> deleteChildData() async {
         key == 'favorites' ||
         key == 'family_prefs' ||
         key == 'family_seen' ||
+        key == 'ai_assistant_enabled' ||
         key.startsWith('child_photo_') ||
         key.startsWith('used_') ||
         key.startsWith('bonus_') ||

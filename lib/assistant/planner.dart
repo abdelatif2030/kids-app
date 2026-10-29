@@ -113,6 +113,9 @@ class LearningPlan {
   final Map<String, int> weeklyTargets; // subject id -> lessons per week
   final List<Video> videos;
   final int minutesPerDay;
+
+  /// True for a plan an AI service suggested (already checked against the app's real content).
+  final bool fromAi;
   const LearningPlan({
     required this.id,
     required this.title,
@@ -126,6 +129,7 @@ class LearningPlan {
     required this.weeklyTargets,
     required this.videos,
     required this.minutesPerDay,
+    this.fromAi = false,
   });
 }
 
@@ -186,7 +190,7 @@ List<String> _ordered(Iterable<String> first, List<String> pool) {
   return out;
 }
 
-List<Video> _videosFor(List<String> lands, int age, String learnLang, List<Video> all, {int max = 6}) {
+List<Video> pickVideos(List<String> lands, int age, String learnLang, List<Video> all, {int max = 6}) {
   final subjects = <String>[];
   for (final l in lands) {
     for (final s in _landSubjects[l] ?? const <String>[]) {
@@ -263,7 +267,7 @@ List<LearningPlan> buildPlans(ParentIntake raw, List<Video> videos) {
     interests: loves,
     goals: goalsFor(balancedLands),
     weeklyTargets: targets(balancedLands),
-    videos: _videosFor(balancedLands, intake.age, intake.learnLang, videos),
+    videos: pickVideos(balancedLands, intake.age, intake.learnLang, videos),
     minutesPerDay: intake.minutesPerDay,
   );
 
@@ -286,7 +290,7 @@ List<LearningPlan> buildPlans(ParentIntake raw, List<Video> videos) {
     interests: loves,
     goals: goalsFor(focusLands),
     weeklyTargets: targets(focusLands, base: 2),
-    videos: _videosFor(focusLands, intake.age, intake.learnLang, videos),
+    videos: pickVideos(focusLands, intake.age, intake.learnLang, videos),
     minutesPerDay: intake.minutesPerDay,
   );
 
@@ -308,7 +312,7 @@ List<LearningPlan> buildPlans(ParentIntake raw, List<Video> videos) {
     interests: loves,
     goals: goalsFor(funLands),
     weeklyTargets: targets(funLands),
-    videos: _videosFor(funLands, intake.age, intake.learnLang, videos),
+    videos: pickVideos(funLands, intake.age, intake.learnLang, videos),
     minutesPerDay: intake.minutesPerDay,
   );
 

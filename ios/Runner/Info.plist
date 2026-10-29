@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Rehlaty uses on-device speech recognition so a parent can say a note about their child instead of typing it. Nothing is stored or sent.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>The microphone is used only while a parent dictates a note, and for family voice messages and calls the parent allowed.</string>
 </dict>
 </plist>

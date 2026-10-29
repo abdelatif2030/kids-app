@@ -49,6 +49,8 @@ dependencies:
   printing: ^5.15.1
   flutter_webrtc: ^1.6.3
   record: ^7.1.2
+  speech_to_text: ^7.5.0
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:

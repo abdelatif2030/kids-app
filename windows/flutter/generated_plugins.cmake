@@ -12,6 +12,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_webrtc
   printing
   record_windows
+  speech_to_text_windows
   url_launcher_windows
 )
 

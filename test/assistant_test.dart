@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/assistant/assistant_screen.dart';
+import 'package:kids_app/assistant/dictation.dart';
 import 'package:kids_app/assistant/planner.dart';
 import 'package:kids_app/journey/models.dart';
 import 'package:kids_app/journey/repository.dart';
@@ -139,6 +140,53 @@ void main() {
       }
     }
 
+    testWidgets('the microphone fills the note with what was heard, on the device, and a tap stops it', (t) async {
+      final fake = FakeDictation();
+      newDictation = () => fake;
+      addTearDown(() => newDictation = () => UnavailableDictation('x'));
+      await open(t, lang: 'en');
+      final list = find.byType(Scrollable).first;
+      await t.scrollUntilVisible(find.byKey(const ValueKey('dictate')), 300, scrollable: list);
+      await t.enterText(find.byKey(const ValueKey('note')), 'Loves drawing.');
+      await t.tap(find.byKey(const ValueKey('dictate')));
+      await t.pump();
+      expect(fake.starts, 1);
+      expect(fake.lang, 'en');
+      expect(find.textContaining('no audio is kept'), findsOneWidget);
+      fake.hear('and finds letters hard');
+      await t.pump();
+      expect(t.widget<TextField>(find.byKey(const ValueKey('note'))).controller!.text, 'Loves drawing. and finds letters hard');
+      fake.hear('and finds letters hard and gets tired', done: true);
+      await t.pump();
+      expect(t.widget<TextField>(find.byKey(const ValueKey('note'))).controller!.text, 'Loves drawing. and finds letters hard and gets tired');
+      await t.tap(find.byKey(const ValueKey('dictate')));
+      await t.pump();
+      expect(fake.stops, 1);
+    });
+
+    testWidgets('when the phone cannot listen offline the parent is told to type; nothing breaks', (t) async {
+      final fake = FakeDictation()..problem = 'This phone cannot recognise this language offline. Type.';
+      newDictation = () => fake;
+      addTearDown(() => newDictation = () => UnavailableDictation('x'));
+      await open(t, lang: 'en');
+      final list = find.byType(Scrollable).first;
+      await t.scrollUntilVisible(find.byKey(const ValueKey('dictate')), 300, scrollable: list);
+      await t.ensureVisible(find.byKey(const ValueKey('dictate')));
+      await t.pump();
+      await t.tap(find.byKey(const ValueKey('dictate')));
+      await t.pump();
+      expect(find.textContaining('cannot recognise this language offline'), findsOneWidget);
+      expect(find.byIcon(Icons.mic_rounded), findsOneWidget); // back to idle
+    });
+
+    testWidgets('on the web / unsupported platforms the default dictation reports it is unavailable and starts nothing', (t) async {
+      final d = UnavailableDictation('reason');
+      var problem = '';
+      await d.start(lang: 'ar', onText: (_, __) {}, onProblem: (m) => problem = m, onStopped: () {});
+      expect(await d.available(), isFalse);
+      expect(problem, 'reason');
+    });
+
     testWidgets('using a plan saves it to the child and the weekly goals, and says so', (t) async {
       await open(t);
       final list = find.byType(Scrollable).first;
@@ -161,4 +209,36 @@ void main() {
       expect(prefs!.getKeys().any((k) => k.startsWith('plan_target_')), isTrue);
     });
   });
+}
+
+class FakeDictation implements Dictation {
+  bool canListen = true;
+  String? problem;
+  void Function(String, bool)? _onText;
+  void Function()? _onStopped;
+  int starts = 0, stops = 0;
+  String? lang;
+
+  @override
+  Future<bool> available() async => canListen;
+
+  @override
+  Future<void> start({required String lang, required void Function(String text, bool done) onText, required void Function(String message) onProblem, required void Function() onStopped}) async {
+    starts++;
+    this.lang = lang;
+    _onText = onText;
+    _onStopped = onStopped;
+    if (problem != null) {
+      onProblem(problem!);
+      onStopped();
+    }
+  }
+
+  void hear(String t, {bool done = false}) => _onText?.call(t, done);
+  void finish() => _onStopped?.call();
+
+  @override
+  Future<void> stop() async {
+    stops++;
+  }
 }
