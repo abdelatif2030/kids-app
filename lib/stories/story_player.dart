@@ -56,9 +56,9 @@ class StoryPlayerController extends ChangeNotifier {
     AudioGate.instance.addListener(_onGate);
   }
 
-  /// A family call pauses the story at once and it does NOT resume by itself when the call ends.
+  /// A family call (or the app leaving the screen) pauses the story at once; it does NOT resume by itself.
   void _onGate() {
-    if (AudioGate.instance.inCall && playing) {
+    if (AudioGate.instance.silenced && playing) {
       pause();
     }
   }
@@ -172,7 +172,7 @@ class StoryPlayerController extends ChangeNotifier {
   Future<void> play() async {
     if (state == PlayState.unavailable || state == PlayState.loading) return;
     if (AudioGate.instance.inCall) {
-      message = loc('مكالمة عائلية جارية. يمكنك سماع القصة بعد انتهائها.');
+      message = tr2('مكالمة عائلية جارية. يمكنك سماع القصة بعد انتهائها.', 'A family call is on. You can listen to the story after it ends.');
       _notify();
       return;
     }

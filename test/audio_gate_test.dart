@@ -88,6 +88,40 @@ void main() {
     });
   });
 
+  group('app in the background', () {
+    test('lesson audio stops when the app leaves the screen and stays silent when it returns', () async {
+      final s = make();
+      final f = s.playText('تفاحة', lang: 'ar');
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(s.state.value.status, AudioStatus.playing);
+      gate.setBackground(true);
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(s.state.value.status, isNot(AudioStatus.playing));
+      await f;
+      speech.spoken.clear();
+      gate.setBackground(false);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(speech.spoken, isEmpty);
+      expect(gate.inCall, false);
+      expect(gate.silenced, false);
+    });
+
+    test('a story pauses in the background and does not resume by itself', () async {
+      final story = kStories.firstWhere((s) => s.media is DeviceVoice);
+      final c = StoryPlayerController(story, childId: 'k1', speech: speech, newPlayer: () => player);
+      await c.init();
+      await c.play();
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      AudioGate.instance.setBackground(true);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(c.state, PlayState.paused);
+      AudioGate.instance.setBackground(false);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(c.state, PlayState.paused);
+      c.dispose();
+    });
+  });
+
   group('stories', () {
     Story deviceStory() => kStories.firstWhere((s) => s.media is DeviceVoice);
 

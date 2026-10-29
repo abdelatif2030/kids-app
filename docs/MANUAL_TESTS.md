@@ -1466,3 +1466,80 @@ The six learning games under Games > Learning games.
 - **Status:** Not tested
 - **Device or environment:** Devices/browsers/networks: 
 - **Notes:** 
+
+## A-audio - Audio and calls on real devices (all unchecked)
+
+Environments to cover: Android phone, iPhone/iPad (if supported), Chrome desktop, a mobile browser. Use the 92-sample
+set in `assets/audio/eval_set.json` for pronunciation. Do not mark anything done unless you did it.
+
+### AU1 - Voices available
+
+- [ ] Not tested
+- **Steps:** Parent settings -> Sound -> voice comparison / audio status. Note per device: Arabic voice present? English?
+- **Expected result:** A device without an Arabic voice shows a clear message and the text; it never reads Arabic with another language's voice.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 
+
+### AU2 - Arabic voice quality
+
+- [ ] Not tested
+- **Steps:** Listen to letter names, words with shadda, tanween, sukoon, long vowels, numbers, similar letters.
+- **Expected result:** Understandable; write down every word that sounds wrong (these stay "needs review").
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 
+
+### AU3 - English voice quality
+
+- [ ] Not tested
+- **Steps:** Letter names, words, a sentence; check that one accent is used consistently.
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 
+
+### AU4 - Listening games
+
+- [ ] Not tested
+- **Steps:** Games -> «اسمع واختر الصورة», «اسمع واختر الكلمة», «اسمع واختر الحرف». Tap Listen, Slowly, answer wrong then right.
+- **Expected result:** The caption is always visible; a wrong answer only fades; with the voice off or no voice a message appears and the game still works; one star on the first finish only.
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 
+
+### AU5 - Call interrupts lessons
+
+- [ ] Not tested
+- **Steps:** Start a story and a listening game, then start (or answer) a family call.
+- **Expected result:** Lesson sound and the story stop at once; after the call nothing starts by itself; the listen button says a call is on while it lasts.
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 
+
+### AU6 - App in the background
+
+- [ ] Not tested
+- **Steps:** Play a story, press Home or lock the screen, return.
+- **Expected result:** The story is paused and does not restart by itself.
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 
+
+### AU7 - Call quality and interruptions
+
+- [ ] Not tested
+- **Steps:** During a call: switch Wi-Fi to mobile data, plug/unplug headphones, receive a phone call, deny the microphone once, mute, camera off.
+- **Expected result:** "Reconnecting" appears and recovers or ends with a message; no stuck screen; the banner always says whether the microphone and camera are on; the microphone/camera light is off after the call.
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 
+
+### AU8 - Screen readers
+
+- [ ] Not tested
+- **Steps:** TalkBack (Android), VoiceOver (iOS), NVDA or VoiceOver on the web: listen buttons, call controls, call banner, voice message play button.
+- **Expected result:** Every control has a spoken name; changes of state (playing, reconnecting) are announced.
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 

@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
+import 'media/audio_gate.dart';
 import 'web_lang.dart';
 import 'package:flutter/services.dart';
 
@@ -30,6 +31,7 @@ Future<void> main() async {
   await AppLocale.instance.load();
   await AudioPrefs.instance.load();
   await AppAudio.reloadManifest();
+  WidgetsBinding.instance.addObserver(_AudioLifecycle());
   runApp(const KidsApp());
 }
 
@@ -397,4 +399,12 @@ class AppScrollBehavior extends MaterialScrollBehavior {
         PointerDeviceKind.stylus,
         PointerDeviceKind.invertedStylus,
       };
+}
+
+/// Lesson and story sounds stop when the app leaves the screen (see AudioGate). They never restart by themselves.
+class _AudioLifecycle with WidgetsBindingObserver {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    AudioGate.instance.setBackground(state == AppLifecycleState.paused || state == AppLifecycleState.hidden || state == AppLifecycleState.detached);
+  }
 }

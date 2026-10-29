@@ -82,9 +82,9 @@ class AudioService {
         _newPlayer = newPlayer,
         _manifest = manifest,
         _prefs = prefs ?? AudioPrefs.instance {
-    // A call stops whatever lesson sound is playing, and nothing starts again by itself afterwards.
+    // A call, or the app leaving the screen, stops whatever lesson sound is playing; nothing starts again by itself.
     _gate.addListener(() {
-      if (_gate.inCall) stop();
+      if (_gate.silenced) stop();
     });
   }
 
