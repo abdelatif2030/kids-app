@@ -280,17 +280,26 @@ class _VideoListScreenState extends State<VideoListScreen> {
   }
 
   Future<void> _play(Video video) async {
+    // Videos that may follow this one: the whitelist for the child's age (nothing else is ever played).
+    List<Video> related;
+    try {
+      related = [for (final v in await loadVideos()) if (age >= v.minAge && age <= v.maxAge) v];
+    } catch (_) {
+      related = const [];
+    }
+    if (!mounted) return;
+    final current = ValueNotifier<Video>(video);
     final finished = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => PlayerScreen(video: video)),
+      MaterialPageRoute(builder: (_) => PlayerScreen(video: video, related: related, current: current)),
     );
     if (!mounted) return;
-    // Watched to the end: watch -> try -> apply, unless time is up.
+    // Watched to the end: watch -> try -> apply, unless time is up. The lesson is about the last video played.
     final child = JourneyStore.instance.active;
     if (finished == true && child != null && _session.reason.value == null) {
       await Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => LessonFlowScreen(video: video, child: child)),
+        MaterialPageRoute(builder: (_) => LessonFlowScreen(video: current.value, child: child)),
       );
     }
     if (mounted) _checkRest();

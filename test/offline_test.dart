@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/offline/capabilities.dart';
 import 'package:kids_app/offline/connectivity.dart';
@@ -14,7 +15,10 @@ Widget app(Widget w) => MaterialApp(home: Scaffold(body: w));
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  setUp(() => AppLocale.instance.set('ar'));
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+    AppLocale.instance.set('ar');
+  });
 
   group('capability model', () {
     test('ids are unique and every entry has a note and evidence', () {

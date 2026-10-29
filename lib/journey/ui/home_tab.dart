@@ -1,3 +1,4 @@
+import '../../adaptive/recommendation_card.dart';
 import '../../family/family_bubble.dart';
 import '../../design/tokens.dart';
 import '../avatars.dart';
@@ -248,6 +249,7 @@ class HomeTab extends StatelessWidget {
                         )
                       : _open(context, LettersHomeScreen(child: child))),
           ),
+          RecommendationCard(child: child, now: now),
           const SizedBox(height: 12),
           _ResumeCard(child: child),
           const SizedBox(height: 12),
