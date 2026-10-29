@@ -230,8 +230,6 @@ class HomeTab extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          FeelingCard(child: child, now: now),
-          const SizedBox(height: 12),
           MyDayCard(
             child: child,
             now: now,
@@ -249,6 +247,9 @@ class HomeTab extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _ResumeCard(child: child),
+          const SizedBox(height: 12),
+          // The optional "how do I feel" face comes after what to do next, so it never competes with it.
+          FeelingCard(child: child, now: now),
         ];
         final secondary = <Widget>[
           if (plan.isNotEmpty)

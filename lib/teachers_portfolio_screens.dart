@@ -22,6 +22,9 @@ class PortfolioSection extends StatefulWidget {
 class _PortfolioSectionState extends State<PortfolioSection> {
   late Future<List<PortfolioItem>> _items = widget.repo.portfolioOf(widget.teacher.uid);
 
+  /// null = all kinds. Filter chips appear only when the samples really span more than one kind.
+  String? _type;
+
   @override
   Widget build(BuildContext context) {
     final link = widget.teacher.introVideoUrl;
@@ -47,17 +50,43 @@ class _PortfolioSectionState extends State<PortfolioSection> {
                 ),
               ]);
             }
-            final items = [for (final i in snap.data ?? const <PortfolioItem>[]) if (i.published) i];
-            if (items.isEmpty) {
+            final all = [for (final i in snap.data ?? const <PortfolioItem>[]) if (i.published) i];
+            if (all.isEmpty) {
               return Text(tr2('لم يضف المدرس نماذج من أعماله بعد.', 'The teacher has not added work samples yet.'), style: const TextStyle(fontSize: 14));
             }
+            final kinds = [for (final t in kPortfolioTypes) if (all.any((i) => i.type == t)) t];
+            final items = _type == null ? all : [for (final i in all) if (i.type == _type) i];
+            final chips = kinds.length < 2
+                ? const SizedBox.shrink()
+                : Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Wrap(spacing: 8, children: [
+                      ChoiceChip(
+                        key: const ValueKey('portfolio_all'),
+                        label: Text(tr2('الكل', 'All')),
+                        selected: _type == null,
+                        onSelected: (_) => setState(() => _type = null),
+                      ),
+                      for (final t in kinds)
+                        ChoiceChip(
+                          key: ValueKey('portfolio_$t'),
+                          label: Text(portfolioTypeLabel(t)),
+                          selected: _type == t,
+                          onSelected: (_) => setState(() => _type = t),
+                        ),
+                    ]),
+                  );
             // One column on a phone, two on a wide page.
             return LayoutBuilder(
               builder: (context, box) {
                 final cols = columnsFor(box.maxWidth, minTileWidth: 320, maxColumns: 2);
-                if (cols == 1) return Column(children: [for (final i in items) PortfolioCard(item: i)]);
                 final w = (box.maxWidth - 12) / 2;
-                return Wrap(spacing: 12, runSpacing: 0, children: [for (final i in items) SizedBox(width: w, child: PortfolioCard(item: i))]);
+                final cards = cols == 1
+                    ? Column(children: [for (final i in items) PortfolioCard(item: i, onTap: () => showPortfolioPreview(context, i))])
+                    : Wrap(spacing: 12, runSpacing: 0, children: [
+                        for (final i in items) SizedBox(width: w, child: PortfolioCard(item: i, onTap: () => showPortfolioPreview(context, i))),
+                      ]);
+                return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [chips, cards]);
               },
             );
           },
@@ -101,13 +130,19 @@ class IntroVideoTile extends StatelessWidget {
 class PortfolioCard extends StatelessWidget {
   final PortfolioItem item;
   final Widget? trailing;
-  const PortfolioCard({super.key, required this.item, this.trailing});
+
+  /// When set the card opens a larger preview (parents); the teacher's own list leaves it null.
+  final VoidCallback? onTap;
+  const PortfolioCard({super.key, required this.item, this.trailing, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final img = item.imageBytes;
     return Card(
-      child: Padding(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+       onTap: onTap,
+       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,16 +160,54 @@ class PortfolioCard extends StatelessWidget {
                     Chip(label: Text(portfolioTypeLabel(item.type)), visualDensity: VisualDensity.compact),
                   ]),
                   Text(item.title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
-                  if (item.description.isNotEmpty) Text(item.description),
+                  if (item.description.isNotEmpty) Text(item.description, maxLines: onTap == null ? null : 3, overflow: onTap == null ? null : TextOverflow.ellipsis),
+                  if (onTap != null)
+                    Text(tr2('اضغط لعرض العمل كاملاً', 'Tap to see the whole work'), style: const TextStyle(fontSize: 12)),
                 ],
               ),
             ),
             ?trailing,
           ],
         ),
+       ),
       ),
     );
   }
+}
+
+/// A larger look at one work sample: the full picture and the whole description. Read-only.
+Future<void> showPortfolioPreview(BuildContext context, PortfolioItem item) {
+  final img = item.imageBytes;
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (_) => ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
+      child: SingleChildScrollView(
+        key: const ValueKey('portfolio_preview'),
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Chip(label: Text(portfolioTypeLabel(item.type)), visualDensity: VisualDensity.compact),
+            Text(item.title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            if (img != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: ClipRRect(borderRadius: BorderRadius.circular(12), child: Image.memory(img, fit: BoxFit.contain, width: double.infinity)),
+              ),
+            if (item.description.isNotEmpty) Text(item.description, style: const TextStyle(fontSize: 16, height: 1.5)),
+            const SizedBox(height: 12),
+            Text(
+              tr2('كتبه المدرس بنفسه ولم يراجعه التطبيق.', 'Written by the teacher; not reviewed by the app.'),
+              style: const TextStyle(fontSize: 12),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 String portfolioStatusLabel(PortfolioItem i) =>
