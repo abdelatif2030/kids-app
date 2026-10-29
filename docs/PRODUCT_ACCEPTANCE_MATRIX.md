@@ -51,3 +51,15 @@ Evidence: `flutter test` 850 pass / 0 fail; `flutter analyze` 9 issues (all pre-
 | H7 | Voice-message temp file deleted after reading (`voice_io.dart`); device check R1 pending. | PARTIAL |
 | H6 | Legacy invite rules: unchanged, needs owner decision. Security details: `docs/SECURITY_PRIVACY_AUDIT.md`. | PARTIAL |
 | V1 | Video player sized to the largest 16:9 box that fits and clipped; related whitelisted video plays after one ends (never after time is up, never in "today's plan"); `test/related_video_test.dart`. The reported width overflow could not be reproduced here (YouTube blocked), so the layout fix is unverified in a browser. | NOT VERIFIED (visual) |
+
+## Update 3 (after the owner's decisions and the remaining missions)
+Evidence: `flutter test` 882 passed / 0 failed; `flutter analyze` 9 issues (no errors/warnings besides the old `_round`); rules emulator 56/56; web build ok (90 s, main.dart.js 5.54 MB); Android build not run.
+
+| ID | Change | Status |
+|---|---|---|
+| H6 | Invite-code rules, repository code and tests removed (not deployed) | PASS in repo / NOT VERIFIED deployed (re-publish needed) |
+| H2/H7 | `allowBackup=false` set | PASS (static); Android build not run |
+| D1 | Parent insights section (`lib/adaptive/insights*.dart`, 20 tests); mastery wording needs several days; no data -> no numbers | PARTIAL (not seen on a device; no multi-week chart) |
+| C1 | Story graph validation + 2 new branching stories + library filter (`story_validation.dart`, 15 tests) | PARTIAL (new Arabic text unreviewed; no in-story activities) |
+| G1/G2 | Perf fixes P1/P2, measurements in `docs/PERFORMANCE_QUALITY_AUDIT.md` | PARTIAL (no frame/memory data) |
+| A-home | Home already shows stars and level from real journey progress (`home_tab.dart`); not changed | PASS (existing) |

@@ -10,7 +10,7 @@ import 'skill_state.dart';
 
 /// «اقتراح لك»: up to one suggestion on the child's home, from the child's own recorded rounds.
 /// Shows nothing while loading, and nothing if there is no suitable destination. No numbers, no scores, no streaks.
-class RecommendationCard extends StatelessWidget {
+class RecommendationCard extends StatefulWidget {
   final ChildProfile child;
   final DateTime? now;
 
@@ -20,15 +20,34 @@ class RecommendationCard extends StatelessWidget {
   const RecommendationCard({super.key, required this.child, this.now, this.statesFuture, this.destinations});
 
   @override
+  State<RecommendationCard> createState() => _RecommendationCardState();
+}
+
+class _RecommendationCardState extends State<RecommendationCard> {
+  // Read once per child: the home screen rebuilds often and must not re-read the progress store each time.
+  late Future<Map<String, SkillState>> _states = _load();
+  late final List<Destination> _destinations = widget.destinations ?? buildDestinations();
+
+  Future<Map<String, SkillState>> _load() => widget.statesFuture ?? loadSkillStates(widget.child.id, now: widget.now);
+
+  @override
+  void didUpdateWidget(RecommendationCard old) {
+    super.didUpdateWidget(old);
+    if (old.child.id != widget.child.id) {
+      _states = _load();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final at = now ?? DateTime.now();
+    final at = widget.now ?? DateTime.now();
     return FutureBuilder<Map<String, SkillState>>(
-      future: statesFuture ?? loadSkillStates(child.id, now: at),
+      future: _states,
       builder: (context, snap) {
         if (!snap.hasData) return const SizedBox.shrink();
-        final recs = recommend(age: child.age, states: snap.data!, destinations: destinations ?? buildDestinations(), now: at, max: 1);
+        final recs = recommend(age: widget.child.age, states: snap.data!, destinations: _destinations, now: at, max: 1);
         if (recs.isEmpty) return const SizedBox.shrink();
-        return RecommendationView(rec: recs.first, child: child);
+        return RecommendationView(rec: recs.first, child: widget.child);
       },
     );
   }

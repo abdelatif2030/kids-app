@@ -217,6 +217,9 @@ class _VideoListScreenState extends State<VideoListScreen> {
   final _session = SessionManager.instance;
   bool _planStarted = false;
 
+  // Read once per screen: build runs on every rebuild and must not parse the whitelist again.
+  late final Future<List<Video>> _videos = loadVideos();
+
   int get age => widget.age;
   String? get subject => widget.subject;
 
@@ -333,7 +336,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
         },
       ),
       body: FutureBuilder<List<Video>>(
-        future: loadVideos(),
+        future: _videos,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(

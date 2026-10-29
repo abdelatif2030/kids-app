@@ -1,4 +1,5 @@
 import 'story_models.dart';
+import 'story_validation.dart';
 
 /// How long a story takes at a normal pace.
 enum StoryLength { short, medium, long }
@@ -27,7 +28,9 @@ List<Story> filterStories(
   final q = query.trim();
   return [
     for (final s in all)
-      if ((allAges || s.fitsAge(age)) &&
+      // A story whose structure is broken (a missing chapter, a trap loop) is never offered.
+      if (storyIsSound(s) &&
+          (allAges || s.fitsAge(age)) &&
           (category == null || s.category == category) &&
           (favorites == null || favorites.contains(s.id)) &&
           (length == null || lengthOf(s) == length) &&

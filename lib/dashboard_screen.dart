@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'adaptive/insights_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -183,6 +184,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _Lessons(report: report),
             const SizedBox(height: 12),
             _Recommendations(report: report),
+            if (child != null) ...[
+              const SizedBox(height: 12),
+              ParentInsightsSection(child: child, now: _end),
+            ],
             const SizedBox(height: 16),
             Wrap(
               spacing: 12,
