@@ -125,7 +125,7 @@ Changed:
 - Parents can filter a teacher's work samples by kind (chips only when there is more than one kind) and open a full
   preview with the whole picture and description.
 - Web: the tab title and `<html lang/dir>` follow the in-app language (`lib/web_lang*.dart`, conditional import).
-  Checked in a release web build with headless Chromium and a seeded language: ar -> lang=ar, dir=rtl, title 'رحلتي';
+  Checked in a release web build with headless Chromium and a seeded language: ar -> lang=ar, dir=rtl (since changed: dir now stays ltr so embedded players are placed correctly), title 'رحلتي';
   en -> lang=en, dir=ltr, title 'Rehlaty'. Switching live inside the app is still a manual test (I11).
 
 Deferred, with reasons: real instruction audio (no recordings exist; device voice only), one shared palette (visual
