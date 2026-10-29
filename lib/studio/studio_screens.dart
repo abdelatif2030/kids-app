@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../design/motion.dart';
 import '../drawing_screen.dart';
 import '../journey/models.dart';
 import '../journey/repository.dart';
@@ -155,7 +156,9 @@ class _ChildGalleryScreenState extends State<ChildGalleryScreen> {
                       itemCount: items.length,
                       itemBuilder: (context, i) {
                         final c = items[i];
-                        return RCard(
+                        return Appear(
+                          index: i,
+                          child: RCard(
                           padding: EdgeInsets.zero,
                           semanticLabel: tr2('${c.name ?? c.kind.label} بتاريخ ${c.day}', '${c.name ?? c.kind.label} on ${c.day}'),
                           onTap: () async {
@@ -183,6 +186,7 @@ class _ChildGalleryScreenState extends State<ChildGalleryScreen> {
                               ),
                             ],
                           ),
+                        ),
                         );
                       },
                     ),

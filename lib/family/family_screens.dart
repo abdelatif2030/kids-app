@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../design/components.dart';
 import '../design/layout.dart';
+import '../design/motion.dart';
 import '../design/tokens.dart';
 import '../games/game_common.dart' show GameRewards;
 import '../journey/models.dart' show dayKeyOf;
@@ -698,8 +699,10 @@ class _ChildFamilyScreenState extends State<ChildFamilyScreen> {
             return EmptyState(icon: Icons.family_restroom_rounded, title: tr2('لا يوجد أحد هنا بعد', 'Nobody here yet'), message: tr2('اطلب من ماما أو بابا.', 'Ask your parent.'));
           }
           return CenteredList(padding: const EdgeInsets.all(16), children: [
-            for (final c in mine)
-              Card(
+            for (final (i, c) in mine.indexed)
+              Appear(
+                index: i,
+                child: Card(
                 child: ListTile(
                   key: ValueKey('talk_${c.rel.uid}'),
                   minTileHeight: 84,
@@ -751,6 +754,7 @@ class _ChildFamilyScreenState extends State<ChildFamilyScreen> {
                     _reload();
                   },
                 ),
+              ),
               ),
           ]);
         },

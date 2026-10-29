@@ -1,3 +1,4 @@
+import '../design/motion.dart';
 import '../design/worlds.dart';
 import '../design/focusable_tap.dart';
 import 'dart:async';
@@ -353,7 +354,9 @@ class _ChoiceGameState extends State<ChoiceGame> {
                       child: FocusableTap(
                         key: ValueKey('opt$o'),
                         onTap: () => _tap(o),
-                        child: Container(
+                        child: PopOnChange(
+                          trigger: _right && o == round.correct,
+                          child: Container(
                           constraints: BoxConstraints(minWidth: 96, minHeight: 96, maxWidth: groups ? 180 : 300),
                           padding: const EdgeInsets.all(10),
                           alignment: Alignment.center,
@@ -371,6 +374,7 @@ class _ChoiceGameState extends State<ChoiceGame> {
                                   textDirection: TextDirection.ltr,
                                   child: Text(round.options[o], textAlign: TextAlign.center, style: TextStyle(fontSize: round.options[o].runes.length > 3 ? 30 : 56)),
                                 ),
+                        ),
                         ),
                       ),
                     ),

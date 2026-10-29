@@ -154,6 +154,7 @@ void main() {
 
     testWidgets('has a spoken label with the reason and the destination', (t) async {
       await show(t);
+      await t.pump(const Duration(milliseconds: 600)); // the card fades in first
       final h = t.ensureSemantics();
       expect(find.bySemanticsLabel(RegExp('T-stories')), findsWidgets);
       h.dispose();
