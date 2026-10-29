@@ -27,10 +27,13 @@ class FirebaseFamilyRepository implements FamilyRepository {
       rethrow;
     } on FirebaseException catch (e) {
       throw FamilyException(switch (e.code) {
-        'permission-denied' => tr2('غير مسموح. ربما لم يوافق ولي الأمر بعد أو الرمز غير صالح.', 'Not allowed. The parent may not have approved yet, or the code is not valid.'),
+        'permission-denied' => tr2('غير مسموح. ربما لم يوافق ولي الأمر بعد أو الرمز غير صالح.', 'Not allowed. The parent may not have approved yet, or the code is not valid.') + ' [permission-denied]',
         'unavailable' || 'network-request-failed' => tr2('لا يوجد اتصال بالإنترنت', 'No internet connection'),
-        _ => tr2('تعذّر إكمال العملية، حاول مرة أخرى', 'Something went wrong, please try again'),
+        _ => tr2('تعذّر إكمال العملية، حاول مرة أخرى', 'Something went wrong, please try again') + ' [${e.code}]',
       });
+    } catch (e) {
+      // Not a Firebase error (for example a bug): show what it is so it can be reported, never hide it.
+      throw FamilyException(tr2('تعذّر إكمال العملية', 'Something went wrong') + ' [$e]');
     }
   }
 
