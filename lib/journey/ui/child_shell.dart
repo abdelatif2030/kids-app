@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../design/layout.dart';
 import '../../games_screen.dart';
 import '../../l10n/strings.dart';
+import '../../offline/offline_ui.dart';
 import '../../parent_screens.dart';
 import '../../parent_settings.dart';
 import '../../drawing_screen.dart';
@@ -76,7 +77,10 @@ class _ChildShellState extends State<ChildShell> {
           ];
           // Navigation fits the window: a bottom bar on phones, a side rail on wider windows.
           final wide = context.windowClass != WindowClass.compact;
-          final content = PastelBackground(child: SafeArea(child: KeyedSubtree(key: const ValueKey('tab_body'), child: tabs[_tab])));
+          final content = Column(children: [
+            const OfflineBanner(),
+            Expanded(child: PastelBackground(child: SafeArea(child: KeyedSubtree(key: const ValueKey('tab_body'), child: tabs[_tab])))),
+          ]);
           if (wide) {
             return Scaffold(
               body: Row(

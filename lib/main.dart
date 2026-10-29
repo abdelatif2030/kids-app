@@ -17,6 +17,7 @@ import 'firebase_config.dart';
 import 'journey/repository.dart';
 import 'journey/ui/lesson_flow.dart';
 import 'journey/ui/start_screen.dart';
+import 'offline/connectivity.dart';
 import 'player_screen.dart';
 import 'rest_screen.dart';
 import 'session_manager.dart';
@@ -32,6 +33,7 @@ Future<void> main() async {
   await AudioPrefs.instance.load();
   await AppAudio.reloadManifest();
   WidgetsBinding.instance.addObserver(_AudioLifecycle());
+  ConnectivityMonitor.instance.start();
   runApp(const KidsApp());
 }
 

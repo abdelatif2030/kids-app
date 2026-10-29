@@ -1,4 +1,5 @@
 import 'design/components.dart' show SectionHeader, showToast;
+import 'offline/offline_ui.dart';
 import 'design/layout.dart';
 
 import 'dart:async';
@@ -579,6 +580,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () => _pickTime(_quietEnd, false),
                 ),
                 SectionHeader(tr2('الأمان والحساب', 'Safety and account')),
+                ListTile(
+                  leading: const Icon(Icons.cloud_off_rounded),
+                  title: Text(tr2('العمل بلا إنترنت', 'Working offline')),
+                  subtitle: Text(tr2('ما يعمل وما يحتاج اتصالاً', 'What works and what needs a connection')),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OfflineGuideScreen())),
+                ),
                 ListTile(
                   leading: const Icon(Icons.lock_reset),
                   title: Text(loc('تغيير الرمز السري')),

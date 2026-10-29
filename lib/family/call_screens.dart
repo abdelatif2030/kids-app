@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import '../design/components.dart';
 import '../design/tokens.dart';
 import '../l10n/strings.dart';
+import '../offline/connectivity.dart';
+import '../offline/offline_ui.dart';
 import 'call_controller.dart';
 import 'call_engine.dart';
 import 'call_models.dart';
@@ -124,10 +126,15 @@ Future<void> startCallScreen(
   required CallFrom from,
   required String title,
   bool video = false,
-}) {
+}) async {
+  // No point asking for the microphone when there is no network: say so and let the person try again.
+  if (ConnectivityMonitor.instance.isOffline) {
+    final back = await explainNeedsInternet(context, 'calls');
+    if (!back || !context.mounted) return;
+  }
   final c = CallController(repo: calls, engine: newCallEngine(), familyId: familyId);
   c.startOutgoing(childId: childId, childName: childName, relUid: relUid, from: from, video: video);
-  return Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(controller: c, title: title)));
+  await Navigator.push(context, MaterialPageRoute(builder: (_) => CallScreen(controller: c, title: title)));
 }
 
 /// Shows who is calling right now (only calls that are still ringing). The person chooses; nothing rings by itself

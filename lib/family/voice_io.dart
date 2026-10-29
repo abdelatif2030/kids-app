@@ -1,6 +1,6 @@
 // ignore_for_file: experimental_member_use  (just_audio marks StreamAudioSource experimental; it is the way to play from memory on phones)
 import 'dart:async';
-import 'dart:io' show Directory;
+import 'dart:io' show Directory, File;
 
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart' show XFile; // reads bytes on the web and on phones alike
@@ -77,6 +77,12 @@ class DeviceVoiceRecorder implements VoiceRecorder {
     final path = await _rec.stop();
     if (path == null) return null;
     final bytes = await XFile(path).readAsBytes();
+    // The recording is only needed in memory from here on: remove the temporary file from the phone.
+    if (!kIsWeb) {
+      try {
+        await File(path).delete();
+      } catch (_) {}
+    }
     final secs = (_watch.elapsedMilliseconds / 1000).ceil().clamp(1, kMaxVoiceSeconds);
     if (bytes.isEmpty) return null;
     return RecordedVoice(bytes, sniffAudioMime(bytes), secs);
