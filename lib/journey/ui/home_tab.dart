@@ -321,25 +321,18 @@ class HomeTab extends StatelessWidget {
                 ),
               ),
             ),
-          Text(
-            context.tr('home.myLands'),
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-              color: RC.ink,
-            ),
+          // One quiet card instead of the whole list of lands: tapping it shows the lands.
+          _LandsSection(
+            title: context.tr('home.myLands'),
+            lands: [
+              for (final land in store.publishedLands)
+                _LandCard(
+                  land: land,
+                  progress: progress.lands[land.id]!,
+                  onTap: () => _open(context, LandMapScreen(land: land, child: child)),
+                ),
+            ],
           ),
-          const SizedBox(height: 8),
-          for (final land in store.publishedLands)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: _LandCard(
-                land: land,
-                progress: progress.lands[land.id]!,
-                onTap: () =>
-                    _open(context, LandMapScreen(land: land, child: child)),
-              ),
-            ),
           const SizedBox(height: 4),
           Text(
             context.tr('home.more'),
@@ -781,6 +774,68 @@ class _RecentWins extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+/// «أراضيّ»: collapsed by default so the home stays simple; the lands show when the child opens it.
+class _LandsSection extends StatefulWidget {
+  final String title;
+  final List<Widget> lands;
+  const _LandsSection({required this.title, required this.lands});
+
+  @override
+  State<_LandsSection> createState() => _LandsSectionState();
+}
+
+class _LandsSectionState extends State<_LandsSection> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final reduce = MediaQuery.disableAnimationsOf(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        RCard(
+          key: const ValueKey('lands_toggle'),
+          color: RC.sky.withAlpha(190),
+          semanticLabel: '${widget.title}. ${_open ? tr2('اضغط للإخفاء', 'Tap to hide') : tr2('اضغط للعرض', 'Tap to show')}',
+          onTap: () => setState(() => _open = !_open),
+          child: Row(
+            children: [
+              const Text('🗺️', style: TextStyle(fontSize: 36)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  widget.title,
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink),
+                ),
+              ),
+              AnimatedRotation(
+                turns: _open ? 0.5 : 0,
+                duration: reduce ? Duration.zero : const Duration(milliseconds: 200),
+                child: const Icon(Icons.expand_more_rounded, size: 34, color: RC.ink),
+              ),
+            ],
+          ),
+        ),
+        AnimatedSize(
+          duration: reduce ? Duration.zero : const Duration(milliseconds: 220),
+          alignment: Alignment.topCenter,
+          child: _open
+              ? Padding(
+                  key: const ValueKey('lands_list'),
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Column(
+                    children: [
+                      for (final l in widget.lands) Padding(padding: const EdgeInsets.only(bottom: 10), child: l),
+                    ],
+                  ),
+                )
+              : const SizedBox(width: double.infinity),
+        ),
+      ],
     );
   }
 }

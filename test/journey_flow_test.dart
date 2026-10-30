@@ -283,9 +283,21 @@ void main() {
         expect(find.text(shortcut), findsWidgets);
       }
       expect(find.text('أنهِ نشاطاً لتظهر إنجازاتك هنا'), findsOneWidget); // no wins yet: a friendly hint
+      // The lands are one quiet card until it is opened.
+      expect(find.byKey(const ValueKey('lands_list')), findsNothing);
+      expect(find.text(kLands.first.title), findsNothing);
+      final toggle = find.byKey(const ValueKey('lands_toggle'));
+      await tester.scrollUntilVisible(toggle, 300, scrollable: find.byType(Scrollable).first);
+      await tester.ensureVisible(toggle);
+      await tester.tap(toggle);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('lands_list')), findsOneWidget);
       for (final land in kLands) {
         expect(find.text(land.title), findsWidgets);
       }
+      await tester.tap(toggle);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('lands_list')), findsNothing); // hides again
       await tester.scrollUntilVisible(find.text('فيديوهات تعليمية'), 400, scrollable: find.byType(Scrollable).first);
       expect(find.text('فيديوهات تعليمية'), findsOneWidget);
     });

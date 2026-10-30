@@ -192,6 +192,12 @@ void main() {
       }
       expect(find.byTooltip('خروج (للأهل)'), findsOneWidget);
       expect(find.byTooltip('إعدادات الوالدين'), findsOneWidget);
+      final toggle = find.byKey(const ValueKey('lands_toggle'));
+      expect(find.bySemanticsLabel(RegExp('أراضيّ.*اضغط للعرض|أراضي.*اضغط للعرض')), findsOneWidget);
+      await tester.scrollUntilVisible(toggle, 300, scrollable: find.byType(Scrollable).first);
+      await tester.ensureVisible(toggle);
+      await tester.tap(toggle);
+      await tester.pumpAndSettle();
       expect(find.bySemanticsLabel(RegExp('أرض الحروف.*أنهيت')), findsOneWidget);
       handle.dispose();
     });
