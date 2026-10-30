@@ -22,6 +22,7 @@ import 'journey/ui/privacy_screen.dart';
 import 'journey/ui/profile_forms.dart';
 import 'notes_screen.dart';
 import 'parent_settings.dart';
+import 'permissions_screen.dart';
 import 'plan_screen.dart';
 import 'journey/ui/day_settings_screen.dart';
 import 'print/printables_screen.dart';
@@ -618,6 +619,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     context,
                     MaterialPageRoute(builder: (_) => const PrivacyScreen()),
                   ),
+                ),
+                ListTile(
+                  key: const ValueKey('permissions_tile'),
+                  leading: const Icon(Icons.admin_panel_settings_outlined),
+                  title: Text(tr2('الأذونات', 'Permissions')),
+                  subtitle: Text(tr2('الميكروفون والكاميرا والملفات: لماذا ومتى', 'Microphone, camera and files: why and when')),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PermissionsScreen())),
                 ),
                 ListTile(
                   leading: const Icon(Icons.school_rounded),
