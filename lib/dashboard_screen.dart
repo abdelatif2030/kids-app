@@ -18,6 +18,7 @@ import 'main.dart' show Video, loadVideos;
 import 'plan_screen.dart';
 import 'progress_report.dart';
 import 'progress_store.dart';
+import 'progress_trend.dart';
 import 'stories/story_store.dart';
 import 'summary_screen.dart';
 import 'ui.dart';
@@ -170,6 +171,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _Stats(report: report),
             const SizedBox(height: 12),
             _DaysChart(report: report),
+            const SizedBox(height: 12),
+            WeeksTrendCard(
+              weeks: buildTrend(end: _end, events: events, watch: d.watch, usedSeconds: d.used),
+            ),
             if (child != null) ...[
               const SizedBox(height: 12),
               _Journey(child: child, end: _end),
