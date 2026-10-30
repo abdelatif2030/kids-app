@@ -1,3 +1,4 @@
+import 'story_extras.dart';
 import '../design/worlds.dart';
 import '../design/layout.dart';
 import 'dart:async';
@@ -585,11 +586,18 @@ class _StoryPlayerScreenState extends State<StoryPlayerScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                if (kStoryScenes[s.id] != null && i < kStoryScenes[s.id]!.length)
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 8),
+                                    child: StoryScenePanel(key: ValueKey('story_scene_$i'), scene: kStoryScenes[s.id]![i]),
+                                  ),
                                 Text(loc(s.chapters[i].title),
                                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: RC.ink)),
                                 const SizedBox(height: 4),
                                 Text(s.chapters[i].text,
                                     style: const TextStyle(fontSize: 18, height: 1.8, color: RC.ink)),
+                                if (kStoryActivities[s.id]?.chapter == i)
+                                  Padding(padding: const EdgeInsets.only(top: 10), child: StoryActivityCard(activity: kStoryActivities[s.id]!)),
                               ],
                             ),
                           ),
