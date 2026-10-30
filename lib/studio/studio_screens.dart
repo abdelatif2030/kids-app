@@ -94,6 +94,7 @@ class ChildGalleryScreen extends StatefulWidget {
 
 class _ChildGalleryScreenState extends State<ChildGalleryScreen> {
   List<Creation>? _items;
+  GalleryTab _tab = GalleryTab.all;
 
   @override
   void initState() {
@@ -122,17 +123,32 @@ class _ChildGalleryScreenState extends State<ChildGalleryScreen> {
         CreationKind.scene => SceneBuilderScreen(child: widget.child, initial: c),
         CreationKind.character => CharacterCreatorScreen(child: widget.child, initial: c),
         CreationKind.story => PictureStoryScreen(child: widget.child, initial: c),
+        // A saved word opens the word builder on that same word, so the child can build it again.
+        CreationKind.word => WordBuilderScreen(child: widget.child, english: c.data['lang'] == 'en', startVocabId: c.data['v'] as String?),
       };
 
   @override
   Widget build(BuildContext context) {
-    final items = _items;
-    return Scaffold(
+    final all = _items;
+    final items = all == null ? null : inTab(all, _tab);
+    return DefaultTabController(
+      length: GalleryTab.values.length,
+      child: Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
         title: Text(loc('معرض العائلة'),
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
+        bottom: TabBar(
+          key: const ValueKey('gallery_tabs'),
+          isScrollable: true,
+          tabAlignment: TabAlignment.center,
+          labelColor: RC.ink,
+          unselectedLabelColor: RC.ink.withAlpha(150),
+          labelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+          onTap: (i) => setState(() => _tab = GalleryTab.values[i]),
+          tabs: [for (final t in GalleryTab.values) Tab(key: ValueKey('tab_${t.name}'), text: t.label)],
+        ),
       ),
       body: PastelBackground(
         child: SafeArea(
@@ -141,9 +157,19 @@ class _ChildGalleryScreenState extends State<ChildGalleryScreen> {
               : items.isEmpty
                   ? Center(
                       child: Padding(
-                        padding: EdgeInsets.all(24),
-                        child: Text(loc('لا توجد أعمال بعد. اصنع رسمة أو مشهداً أو شخصية وستظهر هنا.'),
-                            textAlign: TextAlign.center, style: TextStyle(fontSize: 18, color: RC.ink)),
+                        padding: const EdgeInsets.all(24),
+                        child: Text(
+                            all!.isEmpty
+                                ? loc('لا توجد أعمال بعد. اصنع رسمة أو مشهداً أو شخصية وستظهر هنا.')
+                                : switch (_tab) {
+                                    GalleryTab.drawings => tr2('لا توجد رسومات بعد.', 'No drawings yet.'),
+                                    GalleryTab.words => tr2('لا توجد كلمات بعد. ركّب كلمة وستظهر هنا.', 'No words yet. Build a word and it will show up here.'),
+                                    GalleryTab.stories => tr2('لا توجد قصص بعد.', 'No stories yet.'),
+                                    GalleryTab.all => '',
+                                  },
+                            key: const ValueKey('gallery_empty'),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 18, color: RC.ink)),
                       ),
                     )
                   : GridView.builder(
@@ -192,6 +218,7 @@ class _ChildGalleryScreenState extends State<ChildGalleryScreen> {
                     ),
         ),
       ),
+    ),
     );
   }
 }

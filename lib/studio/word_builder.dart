@@ -12,6 +12,7 @@ import '../library/learning_records.dart';
 import '../library/vocab.dart';
 import '../media/audio_button.dart';
 import '../progress_store.dart';
+import 'creations.dart';
 
 /// Splits a word into the tiles a child moves. A combining mark (Arabic harakat) stays with the letter before it,
 /// so a tile is never a lone mark. Letters are kept in logical (reading) order: the first tile is the first letter.
@@ -103,7 +104,10 @@ class WordBuilderScreen extends StatefulWidget {
   final ChildProfile child;
   final bool english;
   final Random? random;
-  const WordBuilderScreen({super.key, required this.child, this.english = false, this.random});
+
+  /// Open on this vocabulary word (from the gallery) instead of a random one.
+  final String? startVocabId;
+  const WordBuilderScreen({super.key, required this.child, this.english = false, this.random, this.startVocabId});
 
   @override
   State<WordBuilderScreen> createState() => _WordBuilderScreenState();
@@ -116,6 +120,7 @@ class _WordBuilderScreenState extends State<WordBuilderScreen> {
   Vocab? _item;
   WordBuilderState? _state;
   bool _wrongShown = false;
+  bool _firstRound = true;
 
   @override
   void initState() {
@@ -132,7 +137,14 @@ class _WordBuilderScreenState extends State<WordBuilderScreen> {
       _state = null;
       return;
     }
-    final v = _pool[_r.nextInt(_pool.length)];
+    var v = _pool[_r.nextInt(_pool.length)];
+    final start = _firstRound ? widget.startVocabId : null;
+    _firstRound = false;
+    if (start != null) {
+      for (final p in _pool) {
+        if (p.id == start) v = p;
+      }
+    }
     _item = v;
     _state = WordBuilderState(_word(v), random: _r);
     _wrongShown = false;
@@ -146,7 +158,22 @@ class _WordBuilderScreenState extends State<WordBuilderScreen> {
       final v = _item!;
       unawaited(ProgressStore.record('word_building', s.firstTry, detail: _word(v), childId: widget.child.id));
       unawaited(LearningRecords.add(widget.child.id, RecordType.word, v.id, Evidence.practice));
+      unawaited(_saveToGallery(v));
     }
+  }
+
+  /// A word the child built is kept in the private gallery (one entry per word and language, so it is never duplicated).
+  /// Saving never gives a star and a failed save changes nothing for the child.
+  Future<void> _saveToGallery(Vocab v) async {
+    try {
+      await FamilyGallery.save(Creation(
+        'w_${v.id}_${_english ? 'en' : 'ar'}',
+        widget.child.id,
+        CreationKind.word,
+        FamilyGallery.today(),
+        {'w': _word(v), 'v': v.id, 'e': v.emoji, 'lang': _english ? 'en' : 'ar'},
+      ));
+    } catch (_) {}
   }
 
   @override

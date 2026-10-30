@@ -11,7 +11,7 @@ import 'drawing_model.dart';
 
 /// What a child made. Everything is plain data (no photos, no recordings, no
 /// text typed by the child) kept in the family gallery on this device.
-enum CreationKind { drawing, scene, character, story }
+enum CreationKind { drawing, scene, character, story, word }
 
 extension CreationKindText on CreationKind {
   String get label => switch (this) {
@@ -19,12 +19,14 @@ extension CreationKindText on CreationKind {
         CreationKind.scene => loc('مشهد'),
         CreationKind.character => loc('شخصية'),
         CreationKind.story => loc('قصة بالصور'),
+        CreationKind.word => tr2('كلمة', 'Word'),
       };
   String get emoji => switch (this) {
         CreationKind.drawing => '🎨',
         CreationKind.scene => '🏞️',
         CreationKind.character => '🧑‍🎨',
         CreationKind.story => '📖',
+        CreationKind.word => '🔤',
       };
 }
 
@@ -55,6 +57,9 @@ class Creation {
 class FamilyGallery {
   static const _key = 'family_gallery';
   static const perChild = 25;
+
+  /// Words the child built are kept apart, so a few words can never push drawings out of the 25.
+  static const maxWordsPerChild = 12;
   static const maxBytesPerItem = 150000;
 
   static Future<List<Creation>> all() async {
@@ -76,9 +81,10 @@ class FamilyGallery {
       list[i] = c;
     } else {
       list.add(c);
-      // Over the limit: the oldest of this child's creations makes room.
-      final mine = [for (final x in list) if (x.childId == c.childId) x];
-      if (mine.length > perChild) list.remove(mine.first);
+      // Over the limit: the oldest creation of the same group (words, or everything else) makes room.
+      final isWord = c.kind == CreationKind.word;
+      final group = [for (final x in list) if (x.childId == c.childId && (x.kind == CreationKind.word) == isWord) x];
+      if (group.length > (isWord ? maxWordsPerChild : perChild)) list.remove(group.first);
     }
     await _write(list);
     return true;
@@ -437,6 +443,21 @@ class CreationThumb extends StatelessWidget {
               painter: CharacterPainter(CharacterSpec.fromJson((d['spec'] as Map).cast<String, dynamic>())),
               child: const SizedBox.expand()),
         );
+      case CreationKind.word:
+        return ColoredBox(
+          color: const Color(0xFFEAF7E6),
+          child: Center(
+            child: FittedBox(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Text('${d['e'] ?? '🔤'}', style: const TextStyle(fontSize: 44)),
+                  Text('${d['w'] ?? ''}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF2D3A5C))),
+                ]),
+              ),
+            ),
+          ),
+        );
       case CreationKind.story:
         return ColoredBox(
           color: const Color(0xFFFFF6D6),
@@ -467,3 +488,25 @@ class _ThumbPainter extends CustomPainter {
   @override
   bool shouldRepaint(_ThumbPainter old) => true;
 }
+
+/// The tabs of the private gallery. Scenes and characters appear under "All" only.
+enum GalleryTab { all, drawings, words, stories }
+
+extension GalleryTabText on GalleryTab {
+  String get label => switch (this) {
+        GalleryTab.all => tr2('الكل', 'All'),
+        GalleryTab.drawings => tr2('رسومات', 'Drawings'),
+        GalleryTab.words => tr2('كلمات', 'Words'),
+        GalleryTab.stories => tr2('قصص', 'Stories'),
+      };
+
+  bool includes(CreationKind k) => switch (this) {
+        GalleryTab.all => true,
+        GalleryTab.drawings => k == CreationKind.drawing,
+        GalleryTab.words => k == CreationKind.word,
+        GalleryTab.stories => k == CreationKind.story,
+      };
+}
+
+/// The creations a tab shows, in the same order (the caller decides the order).
+List<Creation> inTab(Iterable<Creation> all, GalleryTab tab) => [for (final c in all) if (tab.includes(c.kind)) c];
