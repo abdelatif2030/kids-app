@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/design/app_intro.dart';
+import 'package:kids_app/design/app_logo.dart';
 import 'package:kids_app/design/worlds.dart';
 import 'package:kids_app/design/motion.dart';
 
@@ -107,8 +108,7 @@ void main() {
       AppIntro.forceShow = true;
       AppIntro.resetForTest();
       await t.pumpWidget(app(const AppIntro(child: Text('app2')), reduce: true));
-      expect(find.text('Rehlaty'), findsNothing);
-      expect(find.text('رحلتي'), findsNothing);
+      expect(find.byType(AppLogo), findsNothing);
     });
 
     testWidgets('shows the name, ends by itself after about 1.6 s, and a tap opens the app at once; shown once per run', (t) async {
@@ -116,14 +116,13 @@ void main() {
       AppIntro.resetForTest();
       await t.pumpWidget(app(const AppIntro(child: Text('app'))));
       await t.pump(const Duration(milliseconds: 800));
-      expect(find.text('رحلتي').evaluate().isNotEmpty || find.text('Rehlaty').evaluate().isNotEmpty, isTrue);
+      expect(find.byType(AppLogo), findsOneWidget);
       await t.pump(const Duration(milliseconds: 1000));
-      expect(find.text('رحلتي'), findsNothing);
-      expect(find.text('Rehlaty'), findsNothing);
+      expect(find.byType(AppLogo), findsNothing);
       // a second AppIntro in the same run does not play again
       await t.pumpWidget(app(AppIntro(key: UniqueKey(), child: const Text('again'))));
       await t.pump();
-      expect(find.text('رحلتي'), findsNothing);
+      expect(find.byType(AppLogo), findsNothing);
       // tapping skips
       AppIntro.resetForTest();
       await t.pumpWidget(app(AppIntro(key: UniqueKey(), child: const Text('app3'))));

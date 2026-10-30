@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/strings.dart';
-import '../ui.dart' show Mascot;
+import 'app_logo.dart';
 import 'motion.dart';
 import 'worlds.dart';
 
@@ -77,19 +77,9 @@ class _AppIntroState extends State<AppIntro> with SingleTickerProviderStateMixin
                         final out = 1 - Curves.easeIn.transform(((c.value - 0.85) / 0.15).clamp(0.0, 1.0));
                         return Opacity(
                           opacity: out,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Transform.scale(scale: 0.4 + 0.6 * pop, child: const ExcludeSemantics(child: Mascot(size: 150))),
-                              const SizedBox(height: 16),
-                              Opacity(
-                                opacity: name,
-                                child: Transform.translate(
-                                  offset: Offset(0, (1 - name) * 10),
-                                  child: Text(tr2('رحلتي', 'Rehlaty'), style: const TextStyle(fontSize: 44, fontWeight: FontWeight.w900, color: Color(0xFF2D3A5C))),
-                                ),
-                              ),
-                            ],
+                          child: Transform.scale(
+                            scale: 0.7 + 0.3 * pop,
+                            child: Opacity(opacity: (0.35 + 0.65 * name).clamp(0.0, 1.0), child: const AppLogo(width: 300)),
                           ),
                         );
                       },

@@ -85,6 +85,7 @@ flutter:
     - assets/audio/en/words/
     - assets/audio/comparison/
     - assets/content/
+    - assets/branding/logo.png
 
   fonts:
     # Tajawal (SIL Open Font License, see assets/fonts/Tajawal-OFL.txt)

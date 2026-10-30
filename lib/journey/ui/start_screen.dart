@@ -11,7 +11,7 @@ import '../../teachers_screens.dart';
 import '../../l10n/app_locale.dart';
 import '../../l10n/language_screen.dart';
 import '../../l10n/strings.dart';
-import '../../ui.dart' show Mascot;
+import '../../design/app_logo.dart';
 import '../models.dart';
 import '../repository.dart';
 import 'child_shell.dart';
@@ -68,16 +68,15 @@ class _Welcome extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Mascot(size: 170),
-            const SizedBox(height: 12),
-            Semantics(
-              header: true,
-              child: Text(context.tr('app.name'),
-                  style: const TextStyle(fontSize: 56, fontWeight: FontWeight.w900, color: RC.ink)),
-            ),
+            const AppLogo(width: 280),
+            const SizedBox(height: 8),
+            // The logo already spells the name in Latin letters; the Arabic name is shown under it.
             if (AppLocale.instance.isArabic)
-              const Text('Rehlaty',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: RC.outline)),
+              Semantics(
+                header: true,
+                child: Text(context.tr('app.name'),
+                    style: const TextStyle(fontSize: 44, fontWeight: FontWeight.w900, color: RC.ink)),
+              ),
             const SizedBox(height: 8),
             Text(context.tr('app.tagline'), style: const TextStyle(fontSize: 22, color: RC.ink)),
             const SizedBox(height: 28),
