@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../design/app_logo.dart';
 import '../../design/focusable_tap.dart';
 import '../../design/motion.dart';
 import '../../design/worlds.dart';
@@ -135,6 +136,20 @@ class _IslandHomeState extends State<IslandHome> with SingleTickerProviderStateM
               world: RWorld.ocean,
               child: Stack(
                 children: [
+                  // The logo sits faintly in the sea, under the bridges and islands: decoration only.
+                  Positioned.fill(
+                    child: ExcludeSemantics(
+                      child: IgnorePointer(
+                        child: Center(
+                          child: Opacity(
+                            key: const ValueKey('map_logo_watermark'),
+                            opacity: 0.2,
+                            child: const AppLogo(width: 420),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   Positioned.fill(child: IgnorePointer(child: CustomPaint(painter: _BridgesPainter(layout.centers, layout.islandSize)))),
                   for (final (i, spec) in widget.islands.indexed)
                     Positioned(
