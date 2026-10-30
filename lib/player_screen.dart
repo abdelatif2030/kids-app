@@ -101,8 +101,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
       seconds: _watch.elapsed.inSeconds,
       completed: _completed,
     );
-    _watch
-      ..reset();
+    _watch.reset();
     _completed = false;
   }
 

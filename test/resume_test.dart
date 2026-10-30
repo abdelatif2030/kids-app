@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kids_app/journey/ui/kit.dart' show RCard;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/data_reset.dart';
 import 'package:kids_app/games/connect_four_game.dart';
@@ -84,7 +85,9 @@ void main() {
     await tester.runAsync(() => ResumeStore.mark('k1', 'game', 'numerals'));
     await show();
     expect(find.text('كمّل من حيث توقفت'), findsOneWidget);
-    expect(find.text(kEducationalGames[3].title()), findsOneWidget);
+    // The "My Day" station may offer the same game on some days, so check inside the resume card only.
+    final resumeCard = find.ancestor(of: find.text('كمّل من حيث توقفت'), matching: find.byType(RCard));
+    expect(find.descendant(of: resumeCard, matching: find.text(kEducationalGames[3].title())), findsOneWidget);
     // a game outside the child's age is not offered
     await tester.runAsync(() => ResumeStore.mark('k1', 'game', 'connect_four'));
     const young = ChildProfile(id: 'k1', nickname: 'Lina', age: 3);

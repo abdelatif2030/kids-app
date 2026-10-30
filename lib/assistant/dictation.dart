@@ -108,10 +108,15 @@ class DeviceDictation implements Dictation {
     }
     await _stt.listen(
       onResult: (SpeechRecognitionResult r) => onText(r.recognizedWords, r.finalResult),
-      localeId: locale,
-      listenFor: const Duration(seconds: 60),
-      pauseFor: const Duration(seconds: 4),
-      listenOptions: SpeechListenOptions(onDevice: true, partialResults: true, cancelOnError: true, listenMode: ListenMode.dictation),
+      listenOptions: SpeechListenOptions(
+        onDevice: true,
+        partialResults: true,
+        cancelOnError: true,
+        listenMode: ListenMode.dictation,
+        localeId: locale,
+        listenFor: const Duration(seconds: 60),
+        pauseFor: const Duration(seconds: 4),
+      ),
     );
   }
 

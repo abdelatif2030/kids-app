@@ -10,7 +10,9 @@ class VoicePickerTile extends StatelessWidget {
   final String lang; // 'ar' or 'en'
   const VoicePickerTile({super.key, required this.lang});
 
-  String get _sample => lang == 'ar' ? 'مرحباً! هيا نتعلم حرفاً جديداً.' : 'Hello! Let us learn a new letter.';
+  String get _sample => lang == 'ar'
+      ? 'مرحباً! هيا نتعلم حرفاً جديداً.'
+      : 'Hello! Let us learn a new letter.';
 
   @override
   Widget build(BuildContext context) {
@@ -19,9 +21,23 @@ class VoicePickerTile extends StatelessWidget {
     return ListTile(
       key: ValueKey('voice_picker_$lang'),
       leading: const Icon(Icons.record_voice_over_rounded),
-      title: Text(lang == 'ar' ? tr2('صوت القراءة العربي', 'Arabic reading voice') : tr2('صوت القراءة الإنجليزي', 'English reading voice')),
-      subtitle: Text(chosen ?? tr2('تلقائي: أفضل صوت مثبّت على الجهاز', 'Automatic: the best voice installed on this phone')),
-      onTap: () => showModalBottomSheet<void>(context: context, isScrollControlled: true, builder: (_) => _VoiceSheet(lang: lang, sample: _sample)),
+      title: Text(
+        lang == 'ar'
+            ? tr2('صوت القراءة العربي', 'Arabic reading voice')
+            : tr2('صوت القراءة الإنجليزي', 'English reading voice'),
+      ),
+      subtitle: Text(
+        chosen ??
+            tr2(
+              'تلقائي: أفضل صوت مثبّت على الجهاز',
+              'Automatic: the best voice installed on this phone',
+            ),
+      ),
+      onTap: () => showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        builder: (_) => _VoiceSheet(lang: lang, sample: _sample),
+      ),
     );
   }
 }
@@ -36,9 +52,13 @@ class _VoiceSheet extends StatefulWidget {
 }
 
 class _VoiceSheetState extends State<_VoiceSheet> {
-  late final Future<List<VoiceInfo>> _voices = AppAudio.speech.voices(widget.lang);
+  late final Future<List<VoiceInfo>> _voices = AppAudio.speech.voices(
+    widget.lang,
+  );
 
-  String? get _current => widget.lang == 'ar' ? AudioPrefs.instance.voiceNameAr : AudioPrefs.instance.voiceNameEn;
+  String? get _current => widget.lang == 'ar'
+      ? AudioPrefs.instance.voiceNameAr
+      : AudioPrefs.instance.voiceNameEn;
 
   Future<void> _preview(String? name) async {
     await AppAudio.speech.preferVoice(widget.lang, name);
@@ -64,42 +84,76 @@ class _VoiceSheetState extends State<_VoiceSheet> {
         future: _voices,
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) {
-            return const Padding(padding: EdgeInsets.all(32), child: Center(child: CircularProgressIndicator()));
+            return const Padding(
+              padding: EdgeInsets.all(32),
+              child: Center(child: CircularProgressIndicator()),
+            );
           }
           final voices = snap.data ?? const <VoiceInfo>[];
           return ListView(
             shrinkWrap: true,
             padding: const EdgeInsets.all(16),
             children: [
-              Text(tr2('اختر الصوت', 'Choose the voice'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+              Text(
+                tr2('اختر الصوت', 'Choose the voice'),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
               const SizedBox(height: 4),
-              Text(tr2('اضغط ▶ للاستماع. الأصوات من مشغّل الصوت في هاتفك، وتعمل دون إنترنت إلا إذا كُتب غير ذلك.', 'Press ▶ to listen. These voices come from your phone\'s speech engine and work offline unless it says otherwise.'),
-                  style: const TextStyle(fontSize: 13)),
+              Text(
+                tr2(
+                  'اضغط ▶ للاستماع. الأصوات من مشغّل الصوت في هاتفك، وتعمل دون إنترنت إلا إذا كُتب غير ذلك.',
+                  'Press ▶ to listen. These voices come from your phone\'s speech engine and work offline unless it says otherwise.',
+                ),
+                style: const TextStyle(fontSize: 13),
+              ),
               const SizedBox(height: 8),
               if (voices.isEmpty)
-                Text(tr2('لا يوجد صوت لهذه اللغة على هذا الجهاز. ثبّت صوتاً من إعدادات النظام: تحويل النص إلى كلام.', 'This phone has no voice for this language. Install one in system settings: Text-to-speech.'),
-                    key: const ValueKey('no_voices'))
-              else ...[
-                RadioListTile<String?>(
-                  key: const ValueKey('voice_auto'),
-                  value: null,
-                  groupValue: _current,
-                  title: Text(tr2('تلقائي (موصى به)', 'Automatic (recommended)')),
-                  subtitle: Text(voices.first.name),
-                  secondary: IconButton(icon: const Icon(Icons.play_arrow_rounded), tooltip: tr2('استمع', 'Listen'), onPressed: () => _preview(null)),
-                  onChanged: (_) => _choose(null),
-                ),
-                for (final v in voices)
-                  RadioListTile<String?>(
-                    key: ValueKey('voice_${v.name}'),
-                    value: v.name,
-                    groupValue: _current,
-                    title: Text(v.name),
-                    subtitle: Text('${v.locale}${v.needsNetwork ? ' · ${tr2('يحتاج إنترنت', 'needs internet')}' : ''}${v.quality.isEmpty ? '' : ' · ${v.quality}'}'),
-                    secondary: IconButton(icon: const Icon(Icons.play_arrow_rounded), tooltip: tr2('استمع', 'Listen'), onPressed: () => _preview(v.name)),
-                    onChanged: (_) => _choose(v.name),
+                Text(
+                  tr2(
+                    'لا يوجد صوت لهذه اللغة على هذا الجهاز. ثبّت صوتاً من إعدادات النظام: تحويل النص إلى كلام.',
+                    'This phone has no voice for this language. Install one in system settings: Text-to-speech.',
                   ),
-              ],
+                  key: const ValueKey('no_voices'),
+                )
+              else
+                RadioGroup<String?>(
+                  groupValue: _current,
+                  onChanged: _choose,
+                  child: Column(
+                    children: [
+                      RadioListTile<String?>(
+                        key: const ValueKey('voice_auto'),
+                        value: null,
+                        title: Text(
+                          tr2('تلقائي (موصى به)', 'Automatic (recommended)'),
+                        ),
+                        subtitle: Text(voices.first.name),
+                        secondary: IconButton(
+                          icon: const Icon(Icons.play_arrow_rounded),
+                          tooltip: tr2('استمع', 'Listen'),
+                          onPressed: () => _preview(null),
+                        ),
+                      ),
+                      for (final v in voices)
+                        RadioListTile<String?>(
+                          key: ValueKey('voice_${v.name}'),
+                          value: v.name,
+                          title: Text(v.name),
+                          subtitle: Text(
+                            '${v.locale}${v.needsNetwork ? ' · ${tr2('يحتاج إنترنت', 'needs internet')}' : ''}${v.quality.isEmpty ? '' : ' · ${v.quality}'}',
+                          ),
+                          secondary: IconButton(
+                            icon: const Icon(Icons.play_arrow_rounded),
+                            tooltip: tr2('استمع', 'Listen'),
+                            onPressed: () => _preview(v.name),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
             ],
           );
         },

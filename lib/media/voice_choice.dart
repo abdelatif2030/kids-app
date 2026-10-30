@@ -20,7 +20,7 @@ class VoiceInfo {
   Map<String, String> toEngineMap() => {'name': name, 'locale': locale};
 
   @override
-  bool operator ==(Object o) => o is VoiceInfo && o.name == name && o.locale == locale;
+  bool operator ==(Object other) => other is VoiceInfo && other.name == name && other.locale == locale;
 
   @override
   int get hashCode => Object.hash(name, locale);

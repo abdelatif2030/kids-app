@@ -88,8 +88,9 @@ class _PopOnChangeState extends State<PopOnChange>
   @override
   void didUpdateWidget(PopOnChange old) {
     super.didUpdateWidget(old);
-    if (old.trigger != widget.trigger && !motionReduced(context))
+    if (old.trigger != widget.trigger && !motionReduced(context)) {
       _c.forward(from: 0);
+    }
   }
 
   @override

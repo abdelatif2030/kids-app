@@ -326,7 +326,7 @@ class _CanvasPainter extends CustomPainter {
     final t = model.template;
     if (t != null) TemplatePainter(t).paint(canvas, size);
     final live = model.live;
-    NormalizedDrawingPainter([...model.strokes, if (live != null) live]).paint(canvas, size);
+    NormalizedDrawingPainter([...model.strokes, ?live]).paint(canvas, size);
   }
 
   @override

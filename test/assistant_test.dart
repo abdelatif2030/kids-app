@@ -182,7 +182,7 @@ void main() {
     testWidgets('on the web / unsupported platforms the default dictation reports it is unavailable and starts nothing', (t) async {
       final d = UnavailableDictation('reason');
       var problem = '';
-      await d.start(lang: 'ar', onText: (_, __) {}, onProblem: (m) => problem = m, onStopped: () {});
+      await d.start(lang: 'ar', onText: (a, b) {}, onProblem: (m) => problem = m, onStopped: () {});
       expect(await d.available(), isFalse);
       expect(problem, 'reason');
     });
