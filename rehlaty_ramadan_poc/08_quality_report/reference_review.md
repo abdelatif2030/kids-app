@@ -29,3 +29,7 @@ Checked by looking at 4 frames (0.0, 0.5, 1.0, 1.5 s):
 - End card checked (one frame): logo intact, Arabic and English names readable.
 - Not verified: the audio content and language of either clip, lip-sync, motion smoothness between sampled frames, the cut between clips (a 4 s dialogue exchange only; no background music was added).
 - Not made: storyboard shots 3 and 4, the second child line, music, a 20-30 s cut. Needs more credits (21 for a 7 s 480p draft).
+
+## Voice problem on clip 2 (reported by the owner, 2026-10-30)
+
+Clip 2's generated voice for Nour sounded like Adam (a boy). Higgsfield credits are 0, so the clip cannot be regenerated. ElevenLabs library check: no Egyptian child or Egyptian female voice (female Arabic voices are Saudi, Lebanese, Moroccan, MSA); creating a child voice with `creative_design_voice` was refused by ElevenLabs' safety filter. Stopgap: `07_final_video/rehlaty_ramadan_trial_03_nour_muted.mp4` = trial_02 with clip 2's audio removed (clip 1 audio and the logo card unchanged). Proper fix needs: Higgsfield credits to regenerate clip 2 with a girl voice reference, or a real/recorded child voice.
