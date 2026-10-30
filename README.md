@@ -18,7 +18,7 @@ flutter build web
 ```
 
 Branch: `feature/rehlaty`. Commits are pushed there after each step. Rules tests (Firestore emulator): `cd rules_test && npm test` (needs Java).
-Last full run in the cloud session: **1041 tests pass**; `flutter analyze` shows only old lints (7–8 infos and the old unused `_round` warning).
+Last full run in the cloud session: **1068 tests pass**; `flutter analyze` shows only old lints (7–8 infos and the old unused `_round` warning).
 
 ## What the app has
 
@@ -52,11 +52,11 @@ Videos only from the whitelist. Stars only for finishing an activity; no streaks
 
 ## Pending steps from your numbered brief (stop after each, wait for you)
 - ✅ 1 tests/analyze · ✅ 2 gallery tabs · ✅ 3 call screen layout · ✅ 4 permissions screen · ✅ 5 multi-week chart
-- ⏳ 6 pictures and small activities inside the 8 stories (emoji/shapes in code, keep the text, mark every new Arabic line "needs native review")
-- ⏳ 7 offline message queue for family chat (store offline, send on reconnect, "waiting to send", no duplicates, tests)
-- ⏳ 8 web offline check → `docs/WEB_OFFLINE.md` (what works offline, run before claiming)
-- ⏳ 9 update `docs/MANUAL_TESTS.md` and add `docs/ACCEPTANCE.md`; list Firebase, TURN, AI server and native audio review under "Needs you"
-- Privacy screen still says "no microphone" while voice messages/calls exist: needs a wording fix (its English translation is in the dictionary).
+- ✅ 6 pictures and small activities inside the stories (every new line still needs native review)
+- ✅ 7 offline message queue for family chat (not run against real Firebase)
+- ✅ 8 web offline check: `docs/WEB_OFFLINE.md` (result: the web build cannot start offline)
+- ✅ 9 `docs/MANUAL_TESTS.md` section J and `docs/ACCEPTANCE.md` (what needs you is listed there)
+- Privacy wording about the microphone: fixed.
 
 ## Needs you
 1. Re-publish `firestore.rules` in the Firebase console, then run F4 in `docs/MANUAL_TESTS.md` (user names).

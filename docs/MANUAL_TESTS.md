@@ -1544,3 +1544,142 @@ set in `assets/audio/eval_set.json` for pronunciation. Do not mark anything done
 - **Status:** Not tested
 - **Device or environment:** 
 - **Notes:** 
+
+
+## J. Added on 2026-10-30 (all unchecked: nobody has run these on a device)
+
+"Automated evidence" says what the assistant ran in the cloud session (unit/widget tests, the rules emulator, a desktop Chromium). That is not a device test: leave the boxes for the person who tests.
+
+### J1 - Island map home
+
+- [ ] Not tested
+- **Test ID:** J1
+- **Steps:** Child home -> the map icon in the header. Look at the island, tap every badge, switch back to the list, close and reopen the app, test Arabic and English, a 360 px phone and a tablet, reduce motion on.
+- **Expected result:** One island with a winding path and a badge plus name for each section (letters, numbers when the age has them, words, stories, games, create, videos, my library, with family, my wins). Every badge opens its section. The choice is remembered. Arabic starts on the right. Nothing overlaps or is cut off. Badges do not bob with reduce motion.
+- **Automated evidence:** layout tests (no overlap, inside the canvas, mirrored for Arabic, 6 widths), widget and semantics tests, one rendered test image. Never seen on a real screen or a browser by the owner.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 
+
+### J2 - List home: «أراضيّ» is one collapsed card
+
+- [ ] Not tested
+- **Test ID:** J2
+- **Steps:** Child home (list). Tap «أراضيّ» to open it, tap again to hide it.
+- **Expected result:** Closed by default; opens to the lands; hides again; spoken as "tap to show / hide".
+- **Automated evidence:** `test/journey_flow_test.dart`, `test/accessibility_test.dart`.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 
+
+### J3 - Video fills the phone screen
+
+- [ ] Not tested
+- **Test ID:** J3
+- **Preconditions:** A real Android phone (this does nothing on the web or on tablets).
+- **Steps:** Open any video from the list.
+- **Expected result:** The phone turns to landscape, the video fills the whole screen with a round back button; pressing back returns to portrait with the normal bars; a paused video is still closed when time is up.
+- **Automated evidence:** none for the rotation itself (only that the screens still build). Never run on a phone.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 
+
+### J4 - Logo: first screen, background, launcher icon
+
+- [ ] Not tested
+- **Test ID:** J4
+- **Steps:** Open the app (language screen shows the logo), the 2-second opening animation, look behind the home, games, stories and parent lists, check the launcher icon and the web favicon (hard refresh).
+- **Expected result:** The new logo (two children over «رحلتي / Rehlaty») everywhere; faint behind child screens; very faint behind adult lists; the text on top stays readable; no old flat-drawing logo.
+- **Automated evidence:** `test/logo_backdrop_test.dart`, `test/app_logo_test.dart`.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** The launcher icon is small: check the name is readable.
+
+### J5 - Permissions screen
+
+- [ ] Not tested
+- **Test ID:** J5
+- **Steps:** Parent settings -> الأذونات. Read the three cards in both languages. On the phone, refuse the microphone once when recording a voice message and check the message.
+- **Expected result:** Microphone, camera, files and photos: why, when asked, if refused, what is never done. The screen itself asks for nothing. Nothing is asked when the app opens.
+- **Automated evidence:** `test/permissions_screen_test.dart` (also checks the Android manifest: only microphone and camera are declared).
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 
+
+### J6 - Four weeks side by side (parent dashboard)
+
+- [ ] Not tested
+- **Test ID:** J6
+- **Steps:** Parent settings -> dashboard. On a new device: empty message. After using the app over two or more weeks: switch Time / Lessons / Games.
+- **Expected result:** Four weeks next to each other with dates and counts only, no percentages or verdicts; "not enough data" until two weeks have data; the device keeps only about 4 weeks.
+- **Automated evidence:** `test/progress_trend_test.dart`.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 
+
+### J7 - Pictures and small activities in the stories
+
+- [ ] Not tested
+- **Test ID:** J7
+- **Steps:** Open each story. Look at the picture on each chapter. Do the small activity (wrong tap, then right tap).
+- **Expected result:** One picture per chapter; the story text is unchanged; a wrong tap only fades the choice; the right tap says well done; no stars; a native Arabic speaker reads every new line (list in `docs/CONTENT_REVIEW.md`).
+- **Automated evidence:** `test/story_extras_test.dart` (content, widgets, 6 sizes). Arabic wording NOT reviewed by a native speaker.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 
+
+### J8 - Family chat offline queue
+
+- [ ] Not tested
+- **Test ID:** J8
+- **Preconditions:** Firebase on, rules re-published, a linked relative.
+- **Steps:** Switch the phone to airplane mode, send a phrase, a sticker and a typed message. Look at the chat. Switch the internet back on and wait up to 15 seconds. Repeat with the app closed in between (messages must still be there when you reopen). Make the parent pause the relative and send again.
+- **Expected result:** Messages show "Waiting to send", then go once, in order, with no duplicates; after a pause they show "Not sent" with Try again / Delete; nothing is sent while the app is closed; the other side sees each message once.
+- **Automated evidence:** `test/family_outbox_test.dart` (queue, retry, duplicates, chat screen) and one rules-emulator test. Not run against real Firebase or a real network.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 
+
+### J9 - Web offline
+
+- [ ] Not tested by a person
+- **Test ID:** J9
+- **Steps:** See `docs/WEB_OFFLINE.md`.
+- **Expected result:** Stated honestly in that file.
+- **Assistant run (desktop Chromium, 2026-10-30):** the web build has no service worker, so it cannot start with no internet; it works if the internet drops after it loaded (one tap tried); a default build needs Google's CanvasKit CDN. Emoji offline, a full walk-through and Android offline were NOT run.
+- **Actual result:** See the assistant run above.
+- **Status:** Failed for "opens with no internet" (by design today); the rest Not tested
+- **Device or environment:** Desktop Chromium in the cloud session
+- **Notes:** 
+
+### J10 - Add a relative by user name
+
+- [ ] Not tested
+- **Test ID:** J10
+- **Steps:** See F4 above (the same flow). Also: refuse a taken name, a name with a space, an unknown name and a partial name.
+- **Expected result:** Only an exact user name finds the relative; no e-mail is asked anywhere; no list or search of people.
+- **Automated evidence:** `test/family_test.dart`, `test/family_screens_test.dart`, 61 rules tests on the emulator. Not tested with real Firebase.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** Re-publish `firestore.rules` first.
+
+### J11 - Privacy wording about the microphone
+
+- [ ] Not tested
+- **Test ID:** J11
+- **Steps:** Parent settings -> الخصوصية والبيانات, and the audio settings screen.
+- **Expected result:** The texts say the microphone and camera are used only for family messages and calls that the parent switches on; reading aloud itself needs neither.
+- **Automated evidence:** `test/dashboard_library_test.dart`, `test/english_coverage_test.dart`.
+- **Actual result:** Not tested
+- **Status:** Not tested
+- **Device or environment:** 
+- **Notes:** 
