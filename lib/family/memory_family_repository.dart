@@ -13,6 +13,9 @@ class FakeFamilyServer {
   final _changes = StreamController<String>.broadcast();
   final requests = <String, ConnectRequest>{};
 
+  /// Tests switch this on to pretend there is no internet.
+  bool offline = false;
+
   /// user name -> account id (one name per relative, unique).
   final usernames = <String, String>{};
   final voices = <String, (String familyId, String relUid, VoiceClip clip, DateTime at)>{};
@@ -231,9 +234,13 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
     required Side from,
     required String kind,
     required String body,
+    String? clientId,
   }) async {
+    if (server.offline) throw const FamilyException('No internet connection', offline: true);
     final problem = validateMessage(kind, body);
     if (problem != null) throw FamilyException(problem);
+    // The same client id again is the same message: nothing new is written.
+    if (clientId != null && (server.messages[familyId] ?? const <FamilyMessage>[]).any((m) => m.id == clientId)) return;
     final rel = _mine(familyId)[relUid];
     if (rel == null || !rel.active || !rel.children.containsKey(childId)) {
       throw const FamilyException('not allowed');
@@ -241,7 +248,7 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
     if (from == Side.child && uid != familyId) throw const FamilyException('not allowed');
     if (from == Side.relative && uid != relUid) throw const FamilyException('not allowed');
     server.messages.putIfAbsent(familyId, () => []).add(FamilyMessage(
-          id: 'm${server._n++}',
+          id: clientId ?? 'm${server._n++}',
           childId: childId,
           childName: childName,
           relUid: relUid,

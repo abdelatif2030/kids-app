@@ -142,3 +142,16 @@ and chat need no paid service. A TURN relay (needed on some mobile networks) is 
 
 Other ideas not built: reactions and read receipts, photo sharing (moderation), group conversations, scheduled call
 reminders (need notifications), message translation.
+
+
+## Offline message queue (2026-10-30)
+Text, phrases and stickers are always written to a queue on the device first (`lib/family/outbox.dart`, key `family_outbox`),
+then sent. With no internet a message stays in the chat as "Waiting to send" (a clock) and is sent in the order it was
+written when a try works: when the next message is sent, when the chat opens, and every 15 seconds while it is open.
+No duplicates: every queued message has its own id which is also the server's message id (`messages/{id}`); the rules
+refuse a second write to an existing id (messages cannot be updated), and the app then checks the message exists and
+counts it as sent. A message the server refuses for good (relative paused, removed) or that is older than 7 days is
+marked "Not sent" with Try again / Delete. Limits: 50 waiting messages; voice messages and calls are NOT queued. The
+queue is removed when a child's data is deleted. Limits and honesty: there is no background sending: nothing is sent
+while the app is closed; a message written on one phone is only on that phone until it is sent; clocks/ordering on the
+server use the time it arrives. Tested with the in-memory fake and the rules emulator (61 tests), not on a real network.

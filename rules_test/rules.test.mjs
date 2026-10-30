@@ -713,6 +713,17 @@ test('requests: decline, and the parent can cancel while it waits', async () => 
   await assertFails(updateDoc(reqRef(as('r1'), 'q3'), { status: 'accepted', toUid: 'r2' })); // only status changes
 });
 
+// offline queue: the sender chooses the message id, so a retry cannot make a second message ------------
+test('chat: a message with a sender-chosen id can be created once; writing the same id again is refused (no duplicate)', async () => {
+  await seedRelative('r1', 'active');
+  const ref = (db) => doc(db, 'families', 'p1', 'messages', 'o1abc');
+  const msg = { threadId: 'c1__r1', childId: 'c1', childName: 'Lina', relUid: 'r1', from: 'child', kind: 'text', body: 'hello', at: serverTimestamp() };
+  await assertSucceeds(setDoc(ref(as('p1')), msg));
+  await assertFails(setDoc(ref(as('p1')), msg)); // the second write is an update: refused
+  const d = await assertSucceeds(getDoc(ref(as('p1')))); // so the client can see it already exists
+  assert.equal(d.data().body, 'hello');
+});
+
 // voice messages ---------------------------------------------------------------
 const voiceRef = (db, id = 'v1', fid = 'p1') => doc(db, 'families', fid, 'voices', id);
 const voiceData = (over = {}) => ({ childId: 'c1', relUid: 'r1', from: 'relative', data: 'AAAA', mime: 'audio/webm', secs: 5, at: serverTimestamp(), ...over });

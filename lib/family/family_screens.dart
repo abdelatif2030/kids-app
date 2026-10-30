@@ -17,6 +17,7 @@ import 'call_screens.dart';
 import 'family_models.dart';
 import 'family_prefs.dart';
 import 'family_seen.dart';
+import 'outbox.dart';
 import 'voice_io.dart';
 import 'family_repository.dart';
 
@@ -828,10 +829,16 @@ class _ChatScreenState extends State<ChatScreen> {
   Timer? _recTimer;
   bool _sending = false;
   String? _error;
+  List<OutboxItem> _waiting = const [];
+  Timer? _retryTimer;
 
   @override
   void initState() {
     super.initState();
+    FamilyOutbox.instance.addListener(_refreshWaiting);
+    _flushOutbox();
+    // While this screen is open, try again now and then; messages also go the moment the next send works.
+    _retryTimer = Timer.periodic(const Duration(seconds: 15), (_) => _flushOutbox());
     if (widget.as == Side.relative) {
       _typing = true;
       _voice = widget.voiceOn;
@@ -849,6 +856,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
+    FamilyOutbox.instance.removeListener(_refreshWaiting);
+    _retryTimer?.cancel();
     _recTimer?.cancel();
     _recorder?.cancel().whenComplete(() => _recorder?.dispose());
     _text.dispose();
@@ -919,6 +928,19 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  Future<void> _refreshWaiting() async {
+    final list = await FamilyOutbox.instance.pendingFor(familyId: widget.familyId, childId: widget.childId, relUid: widget.relUid);
+    if (mounted) setState(() => _waiting = list);
+  }
+
+  /// Sends what is waiting for this device (all conversations, oldest first).
+  Future<void> _flushOutbox() async {
+    await FamilyOutbox.instance.flush(widget.repo);
+    await _refreshWaiting();
+  }
+
+  /// Every message goes through the queue: it is stored on the device first, then sent. If there is no internet it just
+  /// stays "waiting to send" and goes later, once, in order.
   Future<void> _send(String kind, String body) async {
     if (_sending) return; // no double sends
     final problem = validateMessage(kind, body);
@@ -931,7 +953,7 @@ class _ChatScreenState extends State<ChatScreen> {
       _error = null;
     });
     try {
-      await widget.repo.send(
+      await FamilyOutbox.instance.enqueue(
         familyId: widget.familyId,
         childId: widget.childId,
         childName: widget.childName,
@@ -941,6 +963,7 @@ class _ChatScreenState extends State<ChatScreen> {
         body: body,
       );
       if (kind == kindText) _text.clear();
+      await _flushOutbox();
     } catch (e) {
       if (mounted) setState(() => _error = _err(e));
     } finally {
@@ -996,7 +1019,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     // The child is looking at this conversation, so the new-message count goes away.
                     FamilySeen.markSeen(threadIdOf(widget.childId, widget.relUid), msgs.last.at);
                   }
-                  if (msgs.isEmpty) {
+                  if (msgs.isEmpty && _waiting.isEmpty) {
                     return Center(child: Text(tr2('قل مرحباً! 👋', 'Say hello! 👋'), style: DS.heading));
                   }
                   return ListView(padding: const EdgeInsets.all(12), children: [
@@ -1022,6 +1045,10 @@ class _ChatScreenState extends State<ChatScreen> {
                               : Text(m.shown, style: TextStyle(fontSize: m.kind == kindSticker ? 44 : 19, color: DS.ink)),
                         ),
                       ),
+                    for (final w in _waiting) _WaitingBubble(item: w, onRetry: () async {
+                      await FamilyOutbox.instance.retry(w.id);
+                      await _flushOutbox();
+                    }, onDiscard: () => FamilyOutbox.instance.discard(w.id)),
                   ]);
                 },
               ),
@@ -1594,6 +1621,58 @@ class _UsernameCardState extends State<_UsernameCard> {
           ),
         );
       },
+    );
+  }
+}
+
+/// A message that has not reached the server yet: written on this device, kept, and sent when the internet is back.
+class _WaitingBubble extends StatelessWidget {
+  final OutboxItem item;
+  final VoidCallback onRetry;
+  final VoidCallback onDiscard;
+  const _WaitingBubble({required this.item, required this.onRetry, required this.onDiscard});
+
+  @override
+  Widget build(BuildContext context) {
+    final failed = item.failed;
+    final shown = item.kind == kindPhrase ? phraseText(item.body) : item.body;
+    return Align(
+      alignment: AlignmentDirectional.centerEnd,
+      child: Container(
+        key: ValueKey('waiting_${item.id}'),
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        constraints: const BoxConstraints(maxWidth: 420),
+        decoration: BoxDecoration(
+          color: failed ? const Color(0xFFFFE5E0) : const Color(0xFFFFF6D6),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: failed ? DS.error : const Color(0xFFE6C458)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(shown, style: TextStyle(fontSize: item.kind == kindSticker ? 44 : 19, color: DS.ink)),
+            const SizedBox(height: 4),
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(failed ? Icons.error_outline_rounded : Icons.schedule_rounded, size: 16, color: failed ? DS.error : const Color(0xFF8A6D00)),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  failed ? tr2('لم تُرسَل', 'Not sent') : tr2('بانتظار الإرسال', 'Waiting to send'),
+                  key: ValueKey(failed ? 'waiting_failed' : 'waiting_label'),
+                  style: DS.caption,
+                ),
+              ),
+            ]),
+            if (failed)
+              Wrap(spacing: 8, children: [
+                TextButton(key: ValueKey('retry_${item.id}'), onPressed: onRetry, child: Text(tr2('حاول مرة أخرى', 'Try again'))),
+                TextButton(key: ValueKey('discard_${item.id}'), onPressed: onDiscard, child: Text(tr2('احذف', 'Delete'))),
+              ]),
+          ],
+        ),
+      ),
     );
   }
 }

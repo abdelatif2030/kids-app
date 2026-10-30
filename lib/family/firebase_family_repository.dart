@@ -58,9 +58,9 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
     } on FirebaseException catch (e) {
       throw FamilyException(switch (e.code) {
         'permission-denied' => '${tr2('غير مسموح. ربما لم يوافق ولي الأمر بعد أو الرمز غير صالح.', 'Not allowed. The parent may not have approved yet, or the code is not valid.')} [permission-denied]',
-        'unavailable' || 'network-request-failed' => tr2('لا يوجد اتصال بالإنترنت', 'No internet connection'),
+        'unavailable' || 'network-request-failed' || 'deadline-exceeded' => tr2('لا يوجد اتصال بالإنترنت', 'No internet connection'),
         _ => '${tr2('تعذّر إكمال العملية، حاول مرة أخرى', 'Something went wrong, please try again')} [${e.code}]',
-      });
+      }, offline: const {'unavailable', 'network-request-failed', 'deadline-exceeded'}.contains(e.code));
     } catch (e) {
       // Not a Firebase error (for example a bug): show what it is so it can be reported, never hide it.
       throw FamilyException('${tr2('تعذّر إكمال العملية', 'Something went wrong')} [$e]');
@@ -273,10 +273,11 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
     required Side from,
     required String kind,
     required String body,
+    String? clientId,
   }) => _guard(() async {
         final problem = validateMessage(kind, body);
         if (problem != null) throw FamilyException(problem);
-        await _msgs(familyId).add({
+        final data = {
           'threadId': threadIdOf(childId, relUid),
           'childId': childId,
           'childName': childName,
@@ -285,7 +286,20 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
           'kind': kind,
           'body': kind == kindText ? body.trim() : body,
           'at': FieldValue.serverTimestamp(),
-        });
+        };
+        if (clientId == null) {
+          await _msgs(familyId).add(data);
+          return;
+        }
+        // The message id is chosen by the sender. If an earlier try got through but its answer was lost, the second
+        // write is refused by the rules (messages cannot be updated); then the message already exists and we are done.
+        final ref = _msgs(familyId).doc(clientId);
+        try {
+          await ref.set(data);
+        } on FirebaseException catch (e) {
+          if (e.code != 'permission-denied') rethrow;
+          if (!(await ref.get()).exists) rethrow;
+        }
       });
 
   FamilyMessage _message(String id, Map<String, dynamic> d) => FamilyMessage(

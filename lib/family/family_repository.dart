@@ -4,7 +4,11 @@ import 'family_models.dart';
 
 class FamilyException implements Exception {
   final String message;
-  const FamilyException(this.message);
+
+  /// True when the server could not be reached (no internet). The message can be tried again later; any other
+  /// failure is a refusal that retrying will not fix.
+  final bool offline;
+  const FamilyException(this.message, {this.offline = false});
   @override
   String toString() => message;
 }
@@ -75,6 +79,8 @@ abstract class FamilyRepository {
     required Side from,
     required String kind,
     required String body,
+    /// The message's own id. Sending the same [clientId] again never makes a second message (used by the offline queue).
+    String? clientId,
   });
   /// Sends a recorded voice message (<= 30 s, <= 300 KB). The sound is stored in a small separate document.
   Future<void> sendVoice({
