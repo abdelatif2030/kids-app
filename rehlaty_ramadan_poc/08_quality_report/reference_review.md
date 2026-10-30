@@ -33,3 +33,9 @@ Checked by looking at 4 frames (0.0, 0.5, 1.0, 1.5 s):
 ## Voice problem on clip 2 (reported by the owner, 2026-10-30)
 
 Clip 2's generated voice for Nour sounded like Adam (a boy). Higgsfield credits are 0, so the clip cannot be regenerated. ElevenLabs library check: no Egyptian child or Egyptian female voice (female Arabic voices are Saudi, Lebanese, Moroccan, MSA); creating a child voice with `creative_design_voice` was refused by ElevenLabs' safety filter. Stopgap: `07_final_video/rehlaty_ramadan_trial_03_nour_muted.mp4` = trial_02 with clip 2's audio removed (clip 1 audio and the logo card unchanged). Proper fix needs: Higgsfield credits to regenerate clip 2 with a girl voice reference, or a real/recorded child voice.
+
+## Girl voice for Nour (2026-10-30)
+
+`06_audio/nour_line_mini_v1.mp3`: ElevenLabs `eleven_v3`, voice "Mini - Lively Cute Little Girl" (`nUX4UWK0Tf1qh5zvFZWR`, a child voice listed as Hindi), text «واو! حلو أوي يا آدم!», 1.96 s, 20 ElevenLabs credits (about 0.2 US cents), one take. Laid over clip 2 with a 0.15 s delay: `07_final_video/rehlaty_ramadan_trial_04_girl_voice.mp4` (6.1 s; clip 1 keeps its original generated audio; logo end card silent).
+- Not verified (nobody on the assistant side can listen): that the Arabic is pronounced correctly, that the accent is Egyptian (the voice is Hindi-listed, so it may be Indian-accented), and that it fits the mouth movement (no lip-sync was run; the mouth in clip 2 was animated for the old audio).
+- No Egyptian child or Egyptian female voice exists in the ElevenLabs library; designing one was refused by the safety filter.
