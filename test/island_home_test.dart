@@ -17,41 +17,50 @@ void main() {
   });
 
   group('layout', () {
-    test('2 columns on a phone, 3 on a tablet, 4 on a desktop', () {
-      expect(IslandLayout.compute(8, 360).columns, 2);
-      expect(IslandLayout.compute(8, 768).columns, 3);
-      expect(IslandLayout.compute(8, 1280).columns, 4);
-    });
     for (final w in [320.0, 360.0, 390.0, 768.0, 1024.0, 1280.0]) {
-      test('every island is inside the canvas and none overlap at $w px (8 islands)', () {
-        final l = IslandLayout.compute(8, w);
-        expect(l.centers.length, 8);
-        for (final c in l.centers) {
-          expect(c.dx - l.islandSize / 2, greaterThanOrEqualTo(0));
-          expect(c.dx + l.islandSize / 2, lessThanOrEqualTo(w));
-          expect(c.dy - l.islandSize / 2, greaterThanOrEqualTo(0));
-          expect(c.dy + l.islandSize / 2, lessThanOrEqualTo(l.height));
-        }
-        for (var i = 0; i < 8; i++) {
-          for (var j = i + 1; j < 8; j++) {
-            final a = Rect.fromCenter(center: l.centers[i], width: l.islandSize, height: l.islandSize);
-            final b = Rect.fromCenter(center: l.centers[j], width: l.islandSize, height: l.islandSize);
-            expect(a.overlaps(b), isFalse, reason: 'islands $i and $j');
+      for (final rtl in [false, true]) {
+        test('every landmark is inside the canvas and none overlap at $w px (10 landmarks, ${rtl ? 'rtl' : 'ltr'})', () {
+          final l = WorldMapLayout.compute(10, w, rtl: rtl);
+          expect(l.centers.length, 10);
+          expect(l.width, lessThanOrEqualTo(w));
+          for (final c in l.centers) {
+            expect(c.dx - l.size / 2 - 14, greaterThanOrEqualTo(0));
+            expect(c.dx + l.size / 2 + 14, lessThanOrEqualTo(l.width));
+            expect(c.dy - l.size / 2, greaterThanOrEqualTo(0));
+            expect(c.dy + l.size / 2 + 58, lessThanOrEqualTo(l.height)); // the name plate fits too
           }
-        }
-        expect(l.islandSize, greaterThanOrEqualTo(88)); // big enough to tap
-      });
+          for (var i = 0; i < 10; i++) {
+            for (var j = i + 1; j < 10; j++) {
+              // the badge with its name plate under it
+              final a = Rect.fromLTWH(l.centers[i].dx - l.size / 2 - 14, l.centers[i].dy - l.size / 2, l.size + 28, l.size + 58);
+              final b = Rect.fromLTWH(l.centers[j].dx - l.size / 2 - 14, l.centers[j].dy - l.size / 2, l.size + 28, l.size + 58);
+              expect(a.overlaps(b), isFalse, reason: 'landmarks $i and $j');
+            }
+          }
+          expect(l.size, greaterThanOrEqualTo(88)); // big enough to tap
+        });
+      }
     }
-    test('the path is a snake: neighbours in order are always next to each other', () {
-      final l = IslandLayout.compute(8, 1280);
-      for (var i = 0; i + 1 < 8; i++) {
-        expect((l.centers[i] - l.centers[i + 1]).distance, lessThan(l.islandSize * 2.2));
+    test('it is one path going down the page: each landmark is below the one before', () {
+      final l = WorldMapLayout.compute(10, 390);
+      for (var i = 0; i + 1 < 10; i++) {
+        expect(l.centers[i + 1].dy, greaterThan(l.centers[i].dy));
       }
     });
-    test('any count works, including none and one', () {
-      expect(IslandLayout.compute(0, 400).centers, isEmpty);
-      expect(IslandLayout.compute(1, 400).centers.length, 1);
-      expect(IslandLayout.compute(9, 400).height, greaterThan(IslandLayout.compute(8, 400).height));
+    test('Arabic starts on the right, English on the left (a mirror image)', () {
+      final ltr = WorldMapLayout.compute(4, 400);
+      final rtl = WorldMapLayout.compute(4, 400, rtl: true);
+      expect(ltr.centers.first.dx, lessThan(ltr.width / 2));
+      expect(rtl.centers.first.dx, greaterThan(rtl.width / 2));
+      expect(rtl.centers.first.dx, closeTo(ltr.width - ltr.centers.first.dx, 0.01));
+    });
+    test('any count works, including none and one; more landmarks make a taller map', () {
+      expect(WorldMapLayout.compute(0, 400).centers, isEmpty);
+      expect(WorldMapLayout.compute(1, 400).centers.length, 1);
+      expect(WorldMapLayout.compute(9, 400).height, greaterThan(WorldMapLayout.compute(8, 400).height));
+    });
+    test('on a wide window the island stays a phone-sized picture in the middle', () {
+      expect(WorldMapLayout.compute(8, 1280).width, 620);
     });
   });
 

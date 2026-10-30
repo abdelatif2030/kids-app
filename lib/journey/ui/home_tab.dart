@@ -459,12 +459,28 @@ class HomeTab extends StatelessWidget {
         onTap: () => _open(context, SubjectsScreen(age: child.age)),
       ),
       IslandSpec(
+        id: 'library',
+        title: tr2('مكتبتي', 'My library'),
+        emoji: '📚',
+        grass: const Color(0xFF7FD3E8),
+        grassDark: const Color(0xFF3B9DB8),
+        onTap: () => _open(context, MyLibraryScreen(child: child)),
+      ),
+      IslandSpec(
         id: 'family_activities',
         title: tr2('مع العائلة', 'With family'),
         emoji: '🏠',
         grass: const Color(0xFFFFB27A),
         grassDark: const Color(0xFFD9803F),
         onTap: () => _open(context, ActivityLibraryScreen(child: child)),
+      ),
+      IslandSpec(
+        id: 'me',
+        title: tr2('إنجازاتي', 'My wins'),
+        emoji: '🏆',
+        grass: const Color(0xFFFFE066),
+        grassDark: const Color(0xFFE6B422),
+        onTap: () => onTab?.call(3),
       ),
     ];
     return Center(
