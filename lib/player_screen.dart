@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 import 'main.dart' show Video;
@@ -92,6 +94,22 @@ class _PlayerScreenState extends State<PlayerScreen> {
   }
 
   bool _switching = false;
+  bool _rotated = false;
+
+  /// On a phone a 16:9 video in portrait leaves most of the screen empty. So the player turns the phone to
+  /// landscape and uses the whole screen; leaving the player puts everything back. Not on the web or tablets.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_rotated || kIsWeb) return;
+    if (MediaQuery.sizeOf(context).shortestSide >= 600) return;
+    _rotated = true;
+    SystemChrome.setPreferredOrientations(const [
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
 
   void _recordCurrent() {
     _watch.stop();
@@ -123,11 +141,19 @@ class _PlayerScreenState extends State<PlayerScreen> {
     _session.reason.removeListener(_onTimeUp);
     _recordCurrent();
     _controller.close();
+    if (_rotated) {
+      SystemChrome.setPreferredOrientations(const []);
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    // Phone turned sideways: the video fills the whole screen, with a back button over the corner.
+    final fullScreen = _rotated && size.width > size.height;
+    if (fullScreen) return _fullScreen(context);
     return Scaffold(
       appBar: AppBar(title: Text(_video.title)),
       bottomNavigationBar: ValueListenableBuilder<RestReason?>(
@@ -182,6 +208,48 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   );
                 },
               ),
+      ),
+    );
+  }
+
+  Widget _fullScreen(BuildContext context) {
+    return Scaffold(
+      key: const Key('player-fullscreen'),
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: _hasError
+                ? Center(
+                    child: Text(
+                      loc('لا يمكن تشغيل هذا الفيديو الآن.'),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 24, color: Colors.white),
+                    ),
+                  )
+                : Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: YoutubePlayer(
+                      controller: _controller,
+                      aspectRatio: 16 / 9,
+                      autoFullScreen: false,
+                      enableFullScreenOnVerticalDrag: false,
+                    ),
+                  ),
+          ),
+          PositionedDirectional(
+            top: 4,
+            start: 4,
+            child: SafeArea(
+              child: IconButton.filled(
+                tooltip: tr2('رجوع', 'Back'),
+                style: IconButton.styleFrom(backgroundColor: Colors.black54, foregroundColor: Colors.white, minimumSize: const Size(52, 52)),
+                icon: const Icon(Icons.arrow_back_rounded),
+                onPressed: () => Navigator.of(context).maybePop(),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
