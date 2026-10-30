@@ -1,5 +1,6 @@
 import '../../adaptive/recommendation_card.dart';
 import '../../family/family_bubble.dart';
+import '../../design/app_logo.dart';
 import 'island_home.dart';
 import '../../assistant/planner.dart' show landsForAge;
 import '../../design/tokens.dart';
@@ -380,7 +381,7 @@ class HomeTab extends StatelessWidget {
             ],
           ),
         ];
-        return ListenableBuilder(
+        final content = ListenableBuilder(
           listenable: HomeViewPref.instance,
           builder: (context, _) {
             HomeViewPref.instance.ensureLoaded();
@@ -389,6 +390,25 @@ class HomeTab extends StatelessWidget {
             }
             return _listHome(context, header, primary, secondary);
           },
+        );
+        // The logo sits faintly behind the content: decoration only, no taps, not read aloud.
+        return Stack(
+          children: [
+            Positioned.fill(
+              child: ExcludeSemantics(
+                child: IgnorePointer(
+                  child: Center(
+                    child: Opacity(
+                      key: const ValueKey('home_logo_watermark'),
+                      opacity: 0.16,
+                      child: const AppLogo(width: 460),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            content,
+          ],
         );
       },
     );
