@@ -39,3 +39,10 @@ Clip 2's generated voice for Nour sounded like Adam (a boy). Higgsfield credits 
 `06_audio/nour_line_mini_v1.mp3`: ElevenLabs `eleven_v3`, voice "Mini - Lively Cute Little Girl" (`nUX4UWK0Tf1qh5zvFZWR`, a child voice listed as Hindi), text «واو! حلو أوي يا آدم!», 1.96 s, 20 ElevenLabs credits (about 0.2 US cents), one take. Laid over clip 2 with a 0.15 s delay: `07_final_video/rehlaty_ramadan_trial_04_girl_voice.mp4` (6.1 s; clip 1 keeps its original generated audio; logo end card silent).
 - Not verified (nobody on the assistant side can listen): that the Arabic is pronounced correctly, that the accent is Egyptian (the voice is Hindi-listed, so it may be Indian-accented), and that it fits the mouth movement (no lip-sync was run; the mouth in clip 2 was animated for the old audio).
 - No Egyptian child or Egyptian female voice exists in the ElevenLabs library; designing one was refused by the safety filter.
+
+## Wrong speaker fixed with a close-up (2026-10-30)
+
+Owner's note on trial_04: in clip 2 it was Adam's mouth that moved while Nour's voice played. Higgsfield credits are 0, so the clip could not be regenerated with Nour speaking. Workaround: `05_generated_shots/trial_clip_02_nour_closeup.mp4` crops clip 2 to Nour only (crop 454x255 scaled to 854x480, so it is softer than the rest), with the girl voice on top; `07_final_video/rehlaty_ramadan_trial_05_nour_closeup.mp4` = clip 1 + this + logo card (6.1 s).
+- Checked 4 frames: Adam is not visible; Nour smiles and looks at the lantern; mouth open in 2 of 4 frames; one blink.
+- Not verified: mouth sync with the girl voice (the animation was made for the old audio), accent, and sound.
+- Proper fix: regenerate clip 2 with Nour as the speaker (about 2 Higgsfield credits).
