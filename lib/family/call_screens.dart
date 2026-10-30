@@ -56,61 +56,160 @@ class _CallScreenState extends State<CallScreen> {
       },
       child: Scaffold(
         appBar: AppBar(title: Text(widget.title), automaticallyImplyLeading: false),
-        body: ListenableBuilder(
-          listenable: c,
-          builder: (context, _) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                if (c.video && !c.finished)
-                  _VideoStage(controller: c)
-                else
-                  Icon(c.video ? Icons.videocam_rounded : Icons.call_rounded, size: 72, color: DS.primary),
-                const SizedBox(height: 12),
-                Text(widget.title, style: DS.title, textAlign: TextAlign.center),
-                const SizedBox(height: 8),
-                Text(phaseText(c.phase), key: const ValueKey('call_phase'), style: DS.heading),
-                if (!c.finished) _MediaIndicator(controller: c),
-                if (c.error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(c.error!, key: const ValueKey('call_error'), style: DS.body.copyWith(color: DS.error), textAlign: TextAlign.center)),
-                if (c.finished) const SizedBox.shrink() else ?c.engine.audioSink,
-                const SizedBox(height: 24),
-                if (!c.finished)
-                  Wrap(spacing: 16, children: [
-                    IconButton.filledTonal(
-                      key: const ValueKey('call_mute'),
-                      iconSize: 36,
-                      tooltip: c.muted ? tr2('إلغاء الكتم', 'Unmute') : tr2('كتم', 'Mute'),
-                      onPressed: c.toggleMute,
-                      icon: Icon(c.muted ? Icons.mic_off_rounded : Icons.mic_rounded),
+        body: SafeArea(
+          child: ListenableBuilder(
+            listenable: c,
+            builder: (context, _) => Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: Column(children: [
+                  // 1. Who and what is happening: scrolls on a very small screen, so the controls below never move.
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
+                      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        if (c.video && !c.finished)
+                          _VideoStage(controller: c)
+                        else
+                          Container(
+                            width: 132,
+                            height: 132,
+                            decoration: BoxDecoration(color: DS.primarySoft, shape: BoxShape.circle, border: Border.all(color: DS.primary, width: 3)),
+                            child: Icon(c.video ? Icons.videocam_rounded : Icons.call_rounded, size: 64, color: DS.primary),
+                          ),
+                        const SizedBox(height: 16),
+                        Text(widget.title, style: DS.title, textAlign: TextAlign.center),
+                        const SizedBox(height: 8),
+                        _PhaseChip(phase: c.phase),
+                        if (!c.finished) _MediaIndicator(controller: c),
+                        if (c.error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(c.error!, key: const ValueKey('call_error'), style: DS.body.copyWith(color: DS.error), textAlign: TextAlign.center)),
+                        if (c.finished) const SizedBox.shrink() else ?c.engine.audioSink,
+                      ]),
                     ),
-                    if (c.video)
-                      IconButton.filledTonal(
-                        key: const ValueKey('call_camera'),
-                        iconSize: 36,
-                        tooltip: c.cameraOn ? tr2('إيقاف الكاميرا', 'Camera off') : tr2('تشغيل الكاميرا', 'Camera on'),
-                        onPressed: c.toggleCamera,
-                        icon: Icon(c.cameraOn ? Icons.videocam_rounded : Icons.videocam_off_rounded),
-                      ),
-                    IconButton.filled(
-                      key: const ValueKey('call_hangup'),
-                      iconSize: 36,
-                      style: IconButton.styleFrom(backgroundColor: DS.error),
-                      tooltip: tr2('إنهاء', 'Hang up'),
-                      onPressed: () async {
-                        await c.hangUp();
-                        if (context.mounted) Navigator.of(context).pop();
-                      },
-                      icon: const Icon(Icons.call_end_rounded),
+                  ),
+                  // 2. The reassurance line, then the controls in a fixed bar at the bottom: easy to reach with a thumb.
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Text(
+                      c.video ? tr2('مكالمة فيديو بين الجهازين فقط، ولا تُسجَّل ولا تُحفظ.', 'A video call between the two devices only. It is never recorded or saved.') : tr2('صوت فقط، ولا يُسجَّل ولا يُحفظ.', 'Voice only. It is never recorded or saved.'),
+                      style: DS.caption,
+                      textAlign: TextAlign.center,
                     ),
-                  ])
-                else
-                  AppButton(key: const ValueKey('call_close'), label: tr2('إغلاق', 'Close'), onPressed: () => Navigator.of(context).pop()),
-                const SizedBox(height: 16),
-                Text(c.video ? tr2('مكالمة فيديو بين الجهازين فقط، ولا تُسجَّل ولا تُحفظ.', 'A video call between the two devices only. It is never recorded or saved.') : tr2('صوت فقط، ولا يُسجَّل ولا يُحفظ.', 'Voice only. It is never recorded or saved.'), style: DS.caption, textAlign: TextAlign.center),
-              ]),
+                  ),
+                  Container(
+                    key: const ValueKey('call_controls'),
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(top: 12),
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                      boxShadow: [BoxShadow(color: Color(0x1F000000), blurRadius: 14, offset: Offset(0, -3))],
+                    ),
+                    child: c.finished
+                        ? SizedBox(width: double.infinity, child: AppButton(key: const ValueKey('call_close'), label: tr2('إغلاق', 'Close'), onPressed: () => Navigator.of(context).pop()))
+                        : Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Expanded(child: _CallControl(
+                              buttonKey: const ValueKey('call_mute'),
+                              icon: c.muted ? Icons.mic_off_rounded : Icons.mic_rounded,
+                              label: c.muted ? tr2('إلغاء الكتم', 'Unmute') : tr2('كتم', 'Mute'),
+                              active: c.muted,
+                              onPressed: c.toggleMute,
+                            )),
+                            if (c.video)
+                              Expanded(child: _CallControl(
+                                buttonKey: const ValueKey('call_camera'),
+                                icon: c.cameraOn ? Icons.videocam_rounded : Icons.videocam_off_rounded,
+                                label: c.cameraOn ? tr2('إيقاف الكاميرا', 'Camera off') : tr2('تشغيل الكاميرا', 'Camera on'),
+                                active: !c.cameraOn,
+                                onPressed: c.toggleCamera,
+                              )),
+                            Expanded(child: _CallControl(
+                              buttonKey: const ValueKey('call_hangup'),
+                              icon: Icons.call_end_rounded,
+                              label: tr2('إنهاء', 'End call'),
+                              hangUp: true,
+                              onPressed: () async {
+                                await c.hangUp();
+                                if (context.mounted) Navigator.of(context).pop();
+                              },
+                            )),
+                          ]),
+                  ),
+                ]),
+              ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// The call state as a short pill: a colour dot and the words (never colour alone).
+class _PhaseChip extends StatelessWidget {
+  final CallPhase phase;
+  const _PhaseChip({required this.phase});
+
+  @override
+  Widget build(BuildContext context) {
+    final bad = phase == CallPhase.failed || phase == CallPhase.declined || phase == CallPhase.missed;
+    final good = phase == CallPhase.connected;
+    final color = good ? const Color(0xFF2E9E5B) : (bad ? DS.error : const Color(0xFFE0A100));
+    final icon = good ? Icons.check_circle_rounded : (bad ? Icons.error_outline_rounded : Icons.hourglass_top_rounded);
+    return Semantics(
+      liveRegion: true,
+      container: true,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(color: color.withAlpha(30), borderRadius: BorderRadius.circular(24)),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(icon, size: 20, color: color),
+          const SizedBox(width: 8),
+          Flexible(child: Text(phaseText(phase), key: const ValueKey('call_phase'), style: DS.heading, textAlign: TextAlign.center)),
+        ]),
+      ),
+    );
+  }
+}
+
+/// A big round control with its name under it (at least 72 px; the red end-call button is the biggest, 84 px).
+class _CallControl extends StatelessWidget {
+  final Key buttonKey;
+  final IconData icon;
+  final String label;
+  final bool active;
+  final bool hangUp;
+  final VoidCallback onPressed;
+  const _CallControl({required this.buttonKey, required this.icon, required this.label, required this.onPressed, this.active = false, this.hangUp = false});
+
+  @override
+  Widget build(BuildContext context) {
+    final size = hangUp ? 84.0 : 72.0;
+    final bg = hangUp ? DS.error : (active ? DS.primary : DS.primarySoft);
+    final fg = hangUp || active ? Colors.white : DS.primary;
+    return Semantics(
+      button: true,
+      toggled: hangUp ? null : active,
+      label: label,
+      excludeSemantics: true,
+      onTap: onPressed,
+      child: SizedBox(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Material(
+            key: buttonKey,
+            color: bg,
+            shape: const CircleBorder(),
+            elevation: hangUp ? 3 : 0,
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: onPressed,
+              child: SizedBox(width: size, height: size, child: Icon(icon, size: hangUp ? 40 : 34, color: fg)),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(label, style: DS.body.copyWith(fontWeight: FontWeight.w700), textAlign: TextAlign.center, maxLines: 2),
+        ]),
       ),
     );
   }
@@ -247,7 +346,7 @@ class _MediaIndicator extends StatelessWidget {
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             Icon(live ? Icons.fiber_manual_record_rounded : Icons.mic_off_rounded, size: 16, color: live ? DS.error : DS.inkSoft),
             const SizedBox(width: 6),
-            Text(text, style: DS.caption),
+            Flexible(child: Text(text, style: DS.caption, textAlign: TextAlign.center)),
           ]),
         ),
       ),

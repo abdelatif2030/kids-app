@@ -471,5 +471,137 @@ void main() {
       await t.runAsync(() => c.hangUp());
       await t.pump(const Duration(seconds: 1));
     });
+
+    group('call screen layout', () {
+      Future<CallController> startCall(WidgetTester t, {bool video = false}) async {
+        await parent.setRelativeCalls('n1', true);
+        await parent.setRelativeVideo('n1', true);
+        final c = CallController(repo: parent, engine: FakeEngine('parent'), familyId: 'p1');
+        await t.runAsync(() => c.startOutgoing(childId: 'c1', childName: 'Lina', relUid: 'n1', from: CallFrom.parent, video: video));
+        return c;
+      }
+
+      Future<void> show(WidgetTester t, CallController c, {Size size = const Size(420, 900), double textScale = 1.0}) async {
+        t.view.physicalSize = size;
+        t.view.devicePixelRatio = 1;
+        addTearDown(t.view.reset);
+        await t.pumpWidget(MaterialApp(
+          key: UniqueKey(),
+          builder: (context, child) => MediaQuery(data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(textScale)), child: child!),
+          home: CallScreen(controller: c, title: 'Nana'),
+        ));
+        await t.pump();
+      }
+
+      Future<void> finish(WidgetTester t, CallController c) async {
+        await t.runAsync(() => c.hangUp());
+        await t.pump(const Duration(seconds: 1));
+      }
+
+      testWidgets('mute and end are large, labelled, and in a fixed bar at the bottom of the screen', (t) async {
+        AppLocale.instance.set('en');
+        final c = await startCall(t);
+        await show(t, c);
+        final mute = t.getSize(find.byKey(const ValueKey('call_mute')));
+        final end = t.getSize(find.byKey(const ValueKey('call_hangup')));
+        expect(mute.width, greaterThanOrEqualTo(72));
+        expect(end.width, greaterThanOrEqualTo(84)); // the end button is the biggest
+        expect(end.width, greaterThan(mute.width));
+        expect(find.text('Mute'), findsOneWidget);
+        expect(find.text('End call'), findsOneWidget);
+        final bar = t.getRect(find.byKey(const ValueKey('call_controls')));
+        expect(bar.bottom, closeTo(900, 1)); // pinned to the bottom edge
+        expect(bar.width, closeTo(420, 1));
+        // the buttons are inside the bar, below the status
+        expect(t.getTopLeft(find.byKey(const ValueKey('call_hangup'))).dy, greaterThan(t.getBottomLeft(find.byKey(const ValueKey('call_phase'))).dy));
+        await finish(t, c);
+      });
+
+      testWidgets('pressing mute changes its name and state; the call itself is untouched', (t) async {
+        AppLocale.instance.set('en');
+        final c = await startCall(t);
+        await show(t, c);
+        expect(c.muted, isFalse);
+        await t.tap(find.byKey(const ValueKey('call_mute')));
+        await t.pump();
+        expect(c.muted, isTrue);
+        expect(find.text('Unmute'), findsOneWidget);
+        expect(find.text('Microphone muted'), findsOneWidget);
+        await finish(t, c);
+      });
+
+      testWidgets('a video call adds a camera control with its own label; a voice call has none', (t) async {
+        AppLocale.instance.set('en');
+        final voice = await startCall(t);
+        await show(t, voice);
+        expect(find.byKey(const ValueKey('call_camera')), findsNothing);
+        await finish(t, voice);
+        final video = await startCall(t, video: true);
+        await show(t, video);
+        expect(find.byKey(const ValueKey('call_camera')), findsOneWidget);
+        expect(find.text('Camera off'), findsOneWidget);
+        await t.tap(find.byKey(const ValueKey('call_camera')));
+        await t.pump();
+        expect(find.text('Camera on'), findsOneWidget);
+        await finish(t, video);
+      });
+
+      testWidgets('the state is shown as words with an icon in a pill (not colour alone), and the privacy line stays visible', (t) async {
+        AppLocale.instance.set('en');
+        final c = await startCall(t);
+        await show(t, c);
+        expect(find.byKey(const ValueKey('call_phase')), findsOneWidget);
+        expect(find.byIcon(Icons.hourglass_top_rounded), findsOneWidget);
+        expect(find.text('Voice only. It is never recorded or saved.'), findsOneWidget);
+        await finish(t, c);
+      });
+
+      testWidgets('ending the call from the big red button closes the screen and releases the engine', (t) async {
+        AppLocale.instance.set('en');
+        final engine = FakeEngine('parent');
+        await parent.setRelativeCalls('n1', true);
+        final c = CallController(repo: parent, engine: engine, familyId: 'p1');
+        await t.runAsync(() => c.startOutgoing(childId: 'c1', childName: 'Lina', relUid: 'n1', from: CallFrom.parent));
+        t.view.physicalSize = const Size(420, 900);
+        t.view.devicePixelRatio = 1;
+        addTearDown(t.view.reset);
+        await t.pumpWidget(MaterialApp(home: Builder(builder: (ctx) => Scaffold(body: TextButton(onPressed: () => Navigator.push(ctx, MaterialPageRoute(builder: (_) => CallScreen(controller: c, title: 'Nana'))), child: const Text('open'))))));
+        await t.tap(find.text('open'));
+        await t.pumpAndSettle();
+        await t.tap(find.byKey(const ValueKey('call_hangup')));
+        await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+        await t.pumpAndSettle();
+        expect(find.byKey(const ValueKey('call_phase')), findsNothing);
+        expect(engine.closed, isTrue);
+      });
+
+      testWidgets('after the call ends, one big Close button replaces the controls', (t) async {
+        AppLocale.instance.set('en');
+        final c = await startCall(t);
+        await show(t, c);
+        await finish(t, c);
+        expect(find.byKey(const ValueKey('call_close')), findsOneWidget);
+        expect(find.byKey(const ValueKey('call_hangup')), findsNothing);
+      });
+
+      for (final lang in ['ar', 'en']) {
+        for (final size in [const Size(320, 640), const Size(768, 1024), const Size(1280, 800)]) {
+          for (final video in [false, true]) {
+            testWidgets('fits at ${size.width.toInt()} px, $lang, ${video ? 'video' : 'voice'}, large text, no overflow', (t) async {
+              AppLocale.instance.set(lang);
+              final c = await startCall(t, video: video);
+              await show(t, c, size: size, textScale: 1.6);
+              expect(find.byKey(const ValueKey('call_hangup')), findsOneWidget);
+              expect(find.byKey(const ValueKey('call_mute')), findsOneWidget);
+              final end = t.getRect(find.byKey(const ValueKey('call_hangup')));
+              expect(end.left, greaterThanOrEqualTo(0));
+              expect(end.right, lessThanOrEqualTo(size.width));
+              expect(end.bottom, lessThanOrEqualTo(size.height));
+              await finish(t, c);
+            });
+          }
+        }
+      }
+    });
   });
 }
