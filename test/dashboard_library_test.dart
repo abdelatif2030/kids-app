@@ -204,7 +204,7 @@ void main() {
       addTearDown(tester.view.reset);
       await tester.pumpWidget(_app(const AudioSettingsScreen()));
       await _load(tester);
-      expect(find.textContaining('لا يحتاج التطبيق إلى الميكروفون ولا الكاميرا'), findsOneWidget);
+      expect(find.textContaining('لا يحتاج هذا الإعداد إلى الميكروفون ولا الكاميرا'), findsOneWidget);
       await tester.tap(find.text('القراءة بالصوت'));
       await tester.pump();
       expect(AudioPrefs.instance.voiceOn, isFalse);

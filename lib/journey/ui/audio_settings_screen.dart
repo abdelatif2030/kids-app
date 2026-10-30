@@ -60,7 +60,7 @@ class _AudioSettingsScreenState extends State<AudioSettingsScreen> {
                       padding: EdgeInsets.all(16),
                       child: Text(
                         loc('قراءة الحروف والكلمات والقصص بصوت الجهاز الآلي تتم على الجهاز نفسه، ولا يُرسل أي صوت ولا نص إلى أي مكان. '
-                        'لا يحتاج التطبيق إلى الميكروفون ولا الكاميرا.'),
+                        'لا يحتاج هذا الإعداد إلى الميكروفون ولا الكاميرا.'),
                         style: TextStyle(fontSize: 14),
                       ),
                     ),
