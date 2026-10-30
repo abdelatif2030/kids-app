@@ -106,6 +106,17 @@ e-mail can answer, the accept must be in one batch with the request marked accep
 someone else). Honest limit: Firebase e-mail accounts are not verified, so someone who registers with another person's
 e-mail could see a request addressed to that e-mail (parent name and children's nicknames, nothing else). Turning on
 e-mail verification is the fix if you want it.
+**Update (2026-10-30): requests go to a user name, not an e-mail.** A relative picks one unique user name on their
+«أنا من العائلة» screen (3-20 letters/digits/«_», chosen once, never changed) and gives it to the child's parent. The
+parent types that exact name; the app reads the one document `usernames/{name}` and puts the relative's account id in
+the request (`toName`, `toUid`). No e-mail is typed, stored in a request, or shown. Rules: `usernames` allows only a
+single-document `get` (no list, no query, so nobody can browse or search people); a name is create-only, unique, and
+must be claimed in the same batch that writes `users/{uid}.username`; requests are readable and answerable only by the
+parent and by `toUid`; the request's `toName`/`toUid` must match the `usernames` document. Honest limits: someone who
+knows or guesses an exact user name can send that person a request (they still have to accept; it shows the parent's
+name and the children's nicknames); a parent can learn that a name exists (needed for the feature); the display name
+stored next to a user name is the account's Firebase display name, which can be empty. Old pending requests that were
+addressed to an e-mail do not match any user name and are not shown: send them again.
 **Not built: push notifications.** A request shows when the person opens the app (and live while it is open). A real
 notification when the app is closed needs Firebase Cloud Messaging (free, but a new package and service worker setup).
 Say if you want it next.

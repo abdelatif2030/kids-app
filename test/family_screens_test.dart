@@ -40,7 +40,8 @@ void main() {
     JourneyStore.instance = store;
     server = FakeFamilyServer();
     parent = FakeFamilyRepository(server, 'p1');
-    grandma = FakeFamilyRepository(server, 'g1', email: 'Nana@Test.com');
+    grandma = FakeFamilyRepository(server, 'g1', username: 'Um_Nana');
+    FakeFamilyRepository(server, 'x1', username: 'other_one'); // another person with a user name
   });
 
   void big(WidgetTester t) {
@@ -49,7 +50,7 @@ void main() {
     addTearDown(t.view.reset);
   }
 
-  testWidgets('the parent sends a request by e-mail; the relative accepts and is active at once', (t) async {
+  testWidgets('the parent sends a request by user name; the relative accepts and is active at once', (t) async {
     big(t);
     await t.pumpWidget(_app(FamilyParentScreen(repo: parent, parentName: 'Sara')));
     await _settle(t);
@@ -59,8 +60,8 @@ void main() {
     await t.pumpAndSettle();
     await t.tap(find.byKey(const ValueKey('send_request')));
     await t.pump();
-    expect(find.byKey(const ValueKey('request_error')), findsOneWidget); // no e-mail yet
-    await t.enterText(find.byKey(const ValueKey('request_email')), 'nana@test.com');
+    expect(find.byKey(const ValueKey('request_error')), findsOneWidget); // no user name yet
+    await t.enterText(find.byKey(const ValueKey('request_username')), 'um_nana');
     await t.tap(find.byKey(const ValueKey('send_request')));
     await t.pump();
     expect(find.text('Choose at least one child'), findsOneWidget);
@@ -68,7 +69,7 @@ void main() {
     await t.tap(find.byKey(const ValueKey('send_request')));
     await _settle(t);
     expect(find.textContaining('Request sent'), findsOneWidget);
-    expect(find.text('nana@test.com'), findsOneWidget); // waiting for an answer
+    expect(find.text('@um_nana'), findsOneWidget); // waiting for an answer
 
     // the person answers in their own app
     final incoming = await t.runAsync(() => grandma.watchIncomingRequests().first);
@@ -85,7 +86,7 @@ void main() {
 
   testWidgets('the parent can cancel a request that has not been answered', (t) async {
     big(t);
-    await parent.sendConnectRequest(parentName: 'Sara', toEmail: 'nana@test.com', relation: 'grandma', children: {'c1': 'Lina'});
+    await parent.sendConnectRequest(parentName: 'Sara', toName: 'um_nana', relation: 'grandma', children: {'c1': 'Lina'});
     await t.pumpWidget(_app(FamilyParentScreen(repo: parent, parentName: 'Sara')));
     await _settle(t);
     final id = server.requests.keys.single;
@@ -174,13 +175,13 @@ void main() {
 
   testWidgets('the relative sees the request in the app and accepts or declines', (t) async {
     big(t);
-    final r1 = await parent.sendConnectRequest(parentName: 'Sara', toEmail: 'NANA@test.com', relation: 'grandma', children: {'c1': 'Lina'});
-    await parent.sendConnectRequest(parentName: 'Other', toEmail: 'someone@else.com', relation: 'uncle', children: {'c9': 'X'});
+    final r1 = await parent.sendConnectRequest(parentName: 'Sara', toName: 'UM_NANA', relation: 'grandma', children: {'c1': 'Lina'});
+    await parent.sendConnectRequest(parentName: 'Other', toName: 'other_one', relation: 'uncle', children: {'c9': 'X'});
     await t.pumpWidget(_app(RelativeHomeScreen(repo: grandma, name: 'Nana')));
     await _settle(t);
     expect(find.byKey(ValueKey('request_${r1.id}')), findsOneWidget);
-    expect(find.textContaining('someone@else.com'), findsNothing); // only their own request
-    expect(find.byType(Card), findsOneWidget);
+    expect(find.textContaining('Other'), findsNothing); // only their own request
+    expect(find.byKey(const ValueKey('username_card')), findsOneWidget);
     await t.tap(find.byKey(ValueKey('accept_request_${r1.id}')));
     await _settle(t);
     expect(find.byKey(ValueKey('request_${r1.id}')), findsNothing);
@@ -190,7 +191,7 @@ void main() {
 
   testWidgets('declining changes nothing else', (t) async {
     big(t);
-    final r1 = await parent.sendConnectRequest(parentName: 'Sara', toEmail: 'nana@test.com', relation: 'grandma', children: {'c1': 'Lina'});
+    final r1 = await parent.sendConnectRequest(parentName: 'Sara', toName: 'um_nana', relation: 'grandma', children: {'c1': 'Lina'});
     await t.pumpWidget(_app(RelativeHomeScreen(repo: grandma, name: 'Nana')));
     await _settle(t);
     await t.tap(find.byKey(ValueKey('decline_request_${r1.id}')));
@@ -318,5 +319,54 @@ void main() {
     await t.pumpWidget(_app(const StartScreen()));
     await _settle(t);
     expect(find.byKey(const ValueKey('i_am_family_welcome')), findsOneWidget);
+  });
+
+  group('user name', () {
+    testWidgets('an unknown user name shows a clear message and sends nothing', (t) async {
+      big(t);
+      await t.pumpWidget(_app(FamilyParentScreen(repo: parent, parentName: 'Sara')));
+      await _settle(t);
+      await t.tap(find.byKey(const ValueKey('invite_relative')));
+      await t.pumpAndSettle();
+      await t.enterText(find.byKey(const ValueKey('request_username')), 'nobody_here');
+      await t.tap(find.byKey(const ValueKey('invite_child_c1')));
+      await t.tap(find.byKey(const ValueKey('send_request')));
+      await _settle(t);
+      expect(find.byKey(const ValueKey('request_error')), findsOneWidget);
+      expect(server.requests, isEmpty);
+    });
+
+    testWidgets('the form asks for a user name, never an e-mail', (t) async {
+      big(t);
+      await t.pumpWidget(_app(FamilyParentScreen(repo: parent, parentName: 'Sara')));
+      await _settle(t);
+      await t.tap(find.byKey(const ValueKey('invite_relative')));
+      await t.pumpAndSettle();
+      expect(find.text('User name'), findsOneWidget);
+      expect(find.textContaining('E-mail'), findsNothing);
+      expect(find.textContaining('e-mail'), findsNothing);
+    });
+
+    testWidgets('a relative without a name chooses one; it is then shown and cannot be changed', (t) async {
+      big(t);
+      final nana = FakeFamilyRepository(server, 'n9');
+      await t.pumpWidget(_app(RelativeHomeScreen(repo: nana, name: 'Nana')));
+      await _settle(t);
+      expect(find.byKey(const ValueKey('username_field')), findsOneWidget);
+      await t.enterText(find.byKey(const ValueKey('username_field')), 'bad name');
+      await t.tap(find.byKey(const ValueKey('save_username')));
+      await t.pump();
+      expect(find.byKey(const ValueKey('username_error')), findsOneWidget);
+      await t.enterText(find.byKey(const ValueKey('username_field')), 'Um_Nana'); // taken by g1
+      await t.tap(find.byKey(const ValueKey('save_username')));
+      await _settle(t);
+      expect(find.byKey(const ValueKey('username_error')), findsOneWidget);
+      await t.enterText(find.byKey(const ValueKey('username_field')), 'abu_ali');
+      await t.tap(find.byKey(const ValueKey('save_username')));
+      await _settle(t);
+      expect(find.byKey(const ValueKey('my_username')), findsOneWidget);
+      expect(find.text('@abu_ali'), findsOneWidget);
+      expect(find.byKey(const ValueKey('username_field')), findsNothing);
+    });
   });
 }

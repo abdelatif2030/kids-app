@@ -68,8 +68,8 @@ void main() {
     FlutterSecureStorage.setMockInitialValues({});
     server = FakeFamilyServer();
     parent = FakeFamilyRepository(server, 'p1');
-    nana = FakeFamilyRepository(server, 'n1', email: 'nana@test.com');
-    final r = await parent.sendConnectRequest(parentName: 'Sara', toEmail: 'nana@test.com', relation: 'grandma', children: {'c1': 'Lina'});
+    nana = FakeFamilyRepository(server, 'n1', username: 'um_nana');
+    final r = await parent.sendConnectRequest(parentName: 'Sara', toName: 'um_nana', relation: 'grandma', children: {'c1': 'Lina'});
     await nana.respondToRequest(r, accept: true, name: 'Nana');
   });
 

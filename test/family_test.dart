@@ -38,7 +38,7 @@ void main() {
     setUp(() {
       server = FakeFamilyServer();
       parent = FakeFamilyRepository(server, 'p1');
-      grandma = FakeFamilyRepository(server, 'g1');
+      grandma = FakeFamilyRepository(server, 'g1', username: 'g1_name');
     });
 
     test('nobody can write before the relative has accepted the parent\'s request', () async {
@@ -46,7 +46,7 @@ void main() {
         () => grandma.send(familyId: 'p1', childId: 'c1', childName: 'Lina', relUid: 'g1', from: Side.relative, kind: kindText, body: 'hi'),
         throwsA(isA<FamilyException>()),
       );
-      await parent.sendConnectRequest(parentName: 'Sara', toEmail: 'g1@test.com', relation: 'grandma', children: {'c1': 'Lina'});
+      await parent.sendConnectRequest(parentName: 'Sara', toName: 'g1_name', relation: 'grandma', children: {'c1': 'Lina'});
       // A request alone does not link anyone.
       expect(
         () => grandma.send(familyId: 'p1', childId: 'c1', childName: 'Lina', relUid: 'g1', from: Side.relative, kind: kindText, body: 'hi'),
@@ -99,20 +99,39 @@ void main() {
     setUp(() {
       server = FakeFamilyServer();
       parent = FakeFamilyRepository(server, 'p1');
-      nana = FakeFamilyRepository(server, 'g1', email: 'Nana@Test.com');
-      other = FakeFamilyRepository(server, 'x1', email: 'other@test.com');
+      nana = FakeFamilyRepository(server, 'g1', username: 'Um_Nana');
+      other = FakeFamilyRepository(server, 'x1', username: 'other_one');
     });
 
-    test('e-mails are compared without case or spaces; bad ones are refused', () async {
-      expect(looksLikeEmail(' Nana@Test.com '), true);
-      expect(looksLikeEmail('nana'), false);
-      expect(looksLikeEmail('a@b'), false);
-      expect(() => parent.sendConnectRequest(parentName: 'S', toEmail: 'nope', relation: 'grandma', children: {'c1': 'L'}), throwsA(isA<FamilyException>()));
-      expect(() => parent.sendConnectRequest(parentName: 'S', toEmail: 'a@b.co', relation: 'grandma', children: {}), throwsA(isA<FamilyException>()));
+    test('user names are compared without case, spaces or a leading @; bad or unknown ones are refused', () async {
+      expect(normalizeUsername(' @Um_Nana '), 'um_nana');
+      expect(validUsername('um_nana'), true);
+      expect(validUsername('جدتي_سعاد'), true);
+      for (final bad in ['no', 'has space', 'a@b.com', 'x' * 21, 'dot.name', '']) {
+        expect(validUsername(bad), false, reason: bad);
+      }
+      expect(() => parent.sendConnectRequest(parentName: 'S', toName: 'no', relation: 'grandma', children: {'c1': 'L'}), throwsA(isA<FamilyException>()));
+      expect(() => parent.sendConnectRequest(parentName: 'S', toName: 'nobody_here', relation: 'grandma', children: {'c1': 'L'}), throwsA(isA<FamilyException>()));
+      expect(() => parent.sendConnectRequest(parentName: 'S', toName: 'um_nana', relation: 'grandma', children: {}), throwsA(isA<FamilyException>()));
+    });
+
+    test('a user name is unique, chosen once, and found only by its exact name', () async {
+      final fresh = FakeFamilyRepository(server, 'n1');
+      expect(await fresh.myUsername(), isNull);
+      expect(() => fresh.claimUsername('Um_Nana'), throwsA(isA<FamilyException>())); // taken (any case)
+      expect(() => fresh.claimUsername('bad name'), throwsA(isA<FamilyException>()));
+      await fresh.claimUsername(' @Abu_Ali ');
+      expect(await fresh.myUsername(), 'abu_ali');
+      expect(() => fresh.claimUsername('another_one'), throwsA(isA<FamilyException>())); // one per person
+      // a partial name finds nobody
+      expect(() => parent.sendConnectRequest(parentName: 'S', toName: 'abu', relation: 'grandma', children: {'c1': 'L'}), throwsA(isA<FamilyException>()));
+      final r = await parent.sendConnectRequest(parentName: 'S', toName: 'ABU_ALI', relation: 'grandpa', children: {'c1': 'L'});
+      expect(r.toUid, 'n1');
+      expect(r.toName, 'abu_ali');
     });
 
     test('only the addressed person sees it and can answer; accepting makes them active at once', () async {
-      final r = await parent.sendConnectRequest(parentName: 'Sara', toEmail: ' nana@test.COM', relation: 'grandma', children: {'c1': 'Lina'});
+      final r = await parent.sendConnectRequest(parentName: 'Sara', toName: ' @Um_Nana', relation: 'grandma', children: {'c1': 'Lina'});
       expect((await nana.watchIncomingRequests().first).single.id, r.id);
       expect(await other.watchIncomingRequests().first, isEmpty);
       expect(() => other.respondToRequest(r, accept: true, name: 'Eve'), throwsA(isA<FamilyException>()));
@@ -124,7 +143,7 @@ void main() {
     });
 
     test('a cancelled or declined request is gone for everyone', () async {
-      final r = await parent.sendConnectRequest(parentName: 'Sara', toEmail: 'nana@test.com', relation: 'grandma', children: {'c1': 'Lina'});
+      final r = await parent.sendConnectRequest(parentName: 'Sara', toName: 'um_nana', relation: 'grandma', children: {'c1': 'Lina'});
       await parent.cancelRequest(r.id);
       expect(await nana.watchIncomingRequests().first, isEmpty);
       expect(() => nana.respondToRequest(r, accept: true, name: 'Nana'), throwsA(isA<FamilyException>()));

@@ -135,13 +135,16 @@ const kRequestAccepted = 'accepted';
 const kRequestDeclined = 'declined';
 const kRequestCancelled = 'cancelled';
 
-/// A parent asks someone (by the e-mail they registered with) to be able to talk with the parent's children.
-/// The person sees it in the app and accepts or declines. Nothing is possible before they accept.
+/// A parent asks someone (by the user name that person chose in the app) to be able to talk with the parent's
+/// children. The person sees it in the app and accepts or declines. Nothing is possible before they accept.
 class ConnectRequest {
   final String id;
   final String familyId;
   final String parentName;
-  final String toEmail;
+  final String toName;
+
+  /// The account behind that user name, found when the request was sent.
+  final String toUid;
   final String relation;
   final Map<String, String> children;
   final String status;
@@ -149,7 +152,8 @@ class ConnectRequest {
     required this.id,
     required this.familyId,
     required this.parentName,
-    required this.toEmail,
+    required this.toName,
+    required this.toUid,
     required this.relation,
     this.children = const {},
     this.status = kRequestPending,
@@ -161,17 +165,23 @@ class ConnectRequest {
         id: id,
         familyId: familyId,
         parentName: parentName,
-        toEmail: toEmail,
+        toName: toName,
+        toUid: toUid,
         relation: relation,
         children: children,
         status: status ?? this.status,
       );
 }
 
-/// E-mails are compared in lower case and without spaces.
-String normalizeEmail(String s) => s.trim().toLowerCase();
+/// User names are compared in lower case, without spaces and without a leading «@».
+String normalizeUsername(String s) {
+  final t = s.trim().toLowerCase();
+  return t.startsWith('@') ? t.substring(1) : t;
+}
 
-bool looksLikeEmail(String s) => RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(normalizeEmail(s));
+/// 3 to 20 characters: Arabic or Latin letters, digits and «_». No spaces, no «@», no dots, so it can never look
+/// like an e-mail address or a link. (The same rule is in firestore.rules.)
+bool validUsername(String s) => RegExp('^[a-z0-9_\u0621-\u064A]{3,20}\$').hasMatch(normalizeUsername(s));
 
 enum Side { child, relative }
 

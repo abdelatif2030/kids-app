@@ -602,11 +602,18 @@ test('family: the parent can set a short next-call note; nobody else; no links; 
   await assertFails(updateDoc(ref(as('p1')), { nextCall: 'mail a@b.c' }));
 });
 
-// connection requests (replace invite codes) -------------------------------
-const asMail = (uid, email) => env.authenticatedContext(uid, { email }).firestore();
+// connection requests: a parent finds a relative by the user name the relative chose ------------
 const reqRef = (db, id = 'q1') => doc(db, 'connectRequests', id);
 const reqData = (over = {}) => ({
-  familyId: 'p1', parentName: 'Sara', toEmail: 'nana@test.com', relation: 'grandma', children: { c1: 'Lina' }, status: 'pending', createdAt: serverTimestamp(), ...over,
+  familyId: 'p1', parentName: 'Sara', toName: 'um_nana', toUid: 'r1', relation: 'grandma', children: { c1: 'Lina' }, status: 'pending', createdAt: serverTimestamp(), ...over,
+});
+// r1 chose the user name "um_nana" (written with the rules off: the claiming itself is tested below).
+beforeEach(async () => {
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    await setDoc(doc(db, 'usernames', 'um_nana'), { uid: 'r1', displayName: 'Nana' });
+    await updateDoc(doc(db, 'users', 'r1'), { username: 'um_nana' });
+  });
 });
 async function seedReq(id = 'q1', over = {}) {
   await env.withSecurityRulesDisabled(async (ctx) => { await setDoc(reqRef(ctx.firestore(), id), reqData({ createdAt: new Date(), ...over })); });
@@ -617,54 +624,93 @@ const accept = (db, uid, reqId = 'q1', over = {}, relOver = {}) => {
   b.update(reqRef(db, reqId), { status: 'accepted', ...over });
   return b.commit();
 };
+const claim = (db, uid, name, over = {}) => {
+  const b = writeBatch(db);
+  b.set(doc(db, 'usernames', name), { uid, displayName: 'Someone', ...over });
+  b.update(doc(db, 'users', uid), { username: name });
+  return b.commit();
+};
 
-test('requests: only a parent sends one, for their own family, to a plausible e-mail, with children', async () => {
+test('user names: a relative claims one unique name, once, in one batch with the pointer on their account', async () => {
+  await assertSucceeds(claim(as('r2'), 'r2', 'abu_ali'));
+  await assertFails(claim(as('r2'), 'r2', 'another')); // already has one
+});
+
+test('user names: taken, invalid, someone else\'s, or not a relative are refused', async () => {
+  await assertFails(claim(as('r2'), 'r2', 'um_nana')); // taken
+  await assertFails(claim(as('r2'), 'r2', 'ab')); // too short
+  await assertFails(claim(as('r2'), 'r2', 'a'.repeat(21))); // too long
+  await assertFails(claim(as('r2'), 'r2', 'has space'));
+  await assertFails(claim(as('r2'), 'r2', 'a@b.com'));
+  await assertFails(claim(as('r2'), 'r2', 'UPPER')); // lower case only
+  await assertFails(claim(as('r2'), 'r2', 'abu_ali', { uid: 'r1' })); // pointing at another account
+  await assertFails(claim(as('p1'), 'p1', 'parent_name')); // only relatives
+  await assertFails(claim(as('t1'), 't1', 'teacher_name'));
+  await assertSucceeds(claim(as('r2'), 'r2', 'جدتي_أم_سعاد'.slice(0, 12))); // Arabic letters are fine
+});
+
+test('user names: a name cannot be written without the pointer, changed, deleted or listed', async () => {
+  await assertFails(setDoc(doc(as('r2'), 'usernames', 'lonely'), { uid: 'r2', displayName: 'x' })); // no pointer in the same batch
+  await assertFails(updateDoc(doc(as('r1'), 'usernames', 'um_nana'), { displayName: 'y' }));
+  await assertFails(deleteDoc(doc(as('r1'), 'usernames', 'um_nana')));
+  await assertFails(updateDoc(doc(as('r1'), 'users', 'r1'), { username: 'other_name' })); // never changes
+  await assertFails(getDocs(collection(as('p1'), 'usernames'))); // no list, no search
+  await assertFails(getDocs(query(collection(as('p1'), 'usernames'), where('uid', '==', 'r1'))));
+});
+
+test('user names: a signed-in parent can read one exact name; a signed-out person cannot', async () => {
+  const d = await assertSucceeds(getDoc(doc(as('p1'), 'usernames', 'um_nana')));
+  assert.equal(d.data().uid, 'r1');
+  await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'usernames', 'um_nana')));
+});
+
+test('requests: only a parent sends one, for their own family, to a real user name, with children', async () => {
   await assertSucceeds(setDoc(reqRef(as('p1')), reqData()));
   await assertFails(setDoc(reqRef(as('p2'), 'a'), reqData())); // someone else's family id
   await assertFails(setDoc(reqRef(as('t1'), 'b'), reqData({ familyId: 't1' }))); // a teacher
-  await assertFails(setDoc(reqRef(as('p1'), 'c'), reqData({ toEmail: 'not-an-email' })));
-  await assertFails(setDoc(reqRef(as('p1'), 'd'), reqData({ toEmail: 'Nana@Test.com' }))); // must be lower case
+  await assertFails(setDoc(reqRef(as('p1'), 'c'), reqData({ toName: 'nobody_here' }))); // no such user name
+  await assertFails(setDoc(reqRef(as('p1'), 'c2'), reqData({ toUid: 'r2' }))); // name and account do not match
+  await assertFails(setDoc(reqRef(as('p1'), 'd'), reqData({ toName: 'Um Nana' })));
   await assertFails(setDoc(reqRef(as('p1'), 'e'), reqData({ children: {} })));
   await assertFails(setDoc(reqRef(as('p1'), 'f'), reqData({ status: 'accepted' })));
+  await assertFails(setDoc(reqRef(as('p1'), 'g'), reqData({ toEmail: 'nana@test.com' }))); // e-mail is no longer a field
 });
 
-test('requests: read only by the parent and by the person it was sent to (matching e-mail)', async () => {
+test('requests: read only by the parent and by the person it was sent to', async () => {
   await seedReq();
   await assertSucceeds(getDoc(reqRef(as('p1'))));
-  await assertSucceeds(getDoc(reqRef(asMail('r1', 'Nana@Test.com'))));
-  await assertFails(getDoc(reqRef(asMail('r2', 'other@test.com'))));
+  await assertSucceeds(getDoc(reqRef(as('r1'))));
+  await assertFails(getDoc(reqRef(as('r2'))));
   await assertFails(getDoc(reqRef(as('p2'))));
-  await assertSucceeds(getDocs(query(collection(asMail('r1', 'nana@test.com'), 'connectRequests'), where('toEmail', '==', 'nana@test.com'))));
-  await assertFails(getDocs(collection(asMail('r2', 'other@test.com'), 'connectRequests')));
+  await assertSucceeds(getDocs(query(collection(as('r1'), 'connectRequests'), where('toUid', '==', 'r1'))));
+  await assertFails(getDocs(collection(as('r2'), 'connectRequests')));
 });
 
 test('requests: the right person accepts in one batch and becomes an active relative; nobody else can', async () => {
   await seedReq();
-  await assertFails(accept(asMail('r2', 'other@test.com'), 'r2', 'q1')); // wrong e-mail
-  await assertFails(accept(as('r1'), 'r1', 'q1')); // no e-mail on the account
-  await assertFails(accept(asMail('r1', 'nana@test.com'), 'r1', 'q1', {}, { status: 'pending' })); // cannot choose its own status
-  await assertFails(accept(asMail('r1', 'nana@test.com'), 'r1', 'q1', {}, { children: { c1: 'Lina', c2: 'Omar' } })); // more children than asked
-  await assertFails(accept(asMail('r1', 'nana@test.com'), 'r1', 'q1', {}, { relation: 'father' }));
-  await assertSucceeds(accept(asMail('r1', 'Nana@test.com'), 'r1', 'q1'));
-  await assertFails(accept(asMail('r1', 'nana@test.com'), 'r1', 'q1')); // already used
+  await assertFails(accept(as('r2'), 'r2', 'q1')); // not the one it was sent to
+  await assertFails(accept(as('r1'), 'r1', 'q1', {}, { status: 'pending' })); // cannot choose its own status
+  await assertFails(accept(as('r1'), 'r1', 'q1', {}, { children: { c1: 'Lina', c2: 'Omar' } })); // more children than asked
+  await assertFails(accept(as('r1'), 'r1', 'q1', {}, { relation: 'father' }));
+  await assertSucceeds(accept(as('r1'), 'r1', 'q1'));
+  await assertFails(accept(as('r1'), 'r1', 'q1')); // already used
 });
 
 test('requests: a relative cannot join without the batch marking the request accepted', async () => {
   await seedReq();
-  const db = asMail('r1', 'nana@test.com');
-  await assertFails(setDoc(doc(db, 'families', 'p1', 'relatives', 'r1'), { name: 'Nana', relation: 'grandma', status: 'active', children: { c1: 'Lina' }, requestId: 'q1' }));
+  await assertFails(setDoc(doc(as('r1'), 'families', 'p1', 'relatives', 'r1'), { name: 'Nana', relation: 'grandma', status: 'active', children: { c1: 'Lina' }, requestId: 'q1' }));
 });
 
 test('requests: decline, and the parent can cancel while it waits', async () => {
   await seedReq();
-  await assertSucceeds(updateDoc(reqRef(asMail('r1', 'nana@test.com')), { status: 'declined' }));
+  await assertSucceeds(updateDoc(reqRef(as('r1')), { status: 'declined' }));
   await assertFails(updateDoc(reqRef(as('p1')), { status: 'cancelled' })); // no longer pending
   await seedReq('q2');
   await assertFails(updateDoc(reqRef(as('p2'), 'q2'), { status: 'cancelled' })); // someone else
   await assertSucceeds(updateDoc(reqRef(as('p1'), 'q2'), { status: 'cancelled' }));
   await seedReq('q3');
   await assertFails(updateDoc(reqRef(as('p1'), 'q3'), { status: 'accepted' })); // the parent cannot accept for them
-  await assertFails(updateDoc(reqRef(asMail('r1', 'nana@test.com'), 'q3'), { status: 'accepted', toEmail: 'x@y.z' })); // only status changes
+  await assertFails(updateDoc(reqRef(as('r1'), 'q3'), { status: 'accepted', toUid: 'r2' })); // only status changes
 });
 
 // voice messages ---------------------------------------------------------------

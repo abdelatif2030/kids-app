@@ -14,8 +14,12 @@ class FamilyException implements Exception {
 abstract class FamilyRepository {
   String? get uid;
 
-  /// The signed-in account's e-mail (lower case), used to find requests sent to this person.
-  String? get email;
+  // --- user name (relatives) ----------------------------------------------------
+  /// The user name the signed-in relative chose, or null if they have not chosen one yet.
+  Future<String?> myUsername();
+
+  /// Reserves a unique user name for the signed-in relative. Throws [FamilyException] if it is taken or invalid.
+  Future<void> claimUsername(String username);
 
   // --- parent side -----------------------------------------------------------
   Future<List<Relative>> relatives();
@@ -36,10 +40,11 @@ abstract class FamilyRepository {
   Future<void> setRelativeChildren(String relUid, Map<String, String> children);
 
   // --- connection requests ------------------------------------------------
-  /// The parent asks someone, by e-mail, to be able to talk with the chosen children.
+  /// The parent asks someone, by the user name that person chose, to be able to talk with the chosen children.
+  /// Only an exact user name works (there is no search and no list of people). Throws if nobody has that name.
   Future<ConnectRequest> sendConnectRequest({
     required String parentName,
-    required String toEmail,
+    required String toName,
     required String relation,
     required Map<String, String> children,
   });
@@ -48,7 +53,7 @@ abstract class FamilyRepository {
   Future<List<ConnectRequest>> sentRequests();
   Future<void> cancelRequest(String requestId);
 
-  /// Requests addressed to the signed-in person's e-mail that are still waiting. Updates live.
+  /// Requests addressed to the signed-in person that are still waiting. Updates live.
   Stream<List<ConnectRequest>> watchIncomingRequests();
 
   /// Accepting makes the person an active relative at once (the parent started it); declining changes nothing else.

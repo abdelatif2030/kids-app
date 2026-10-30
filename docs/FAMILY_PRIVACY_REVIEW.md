@@ -32,13 +32,13 @@ real Firebase project. A hidden button is never the protection: the rules are.
 - **Call records** (they hold network addresses inside the connection details): removed by the parent's screen after
   **24 hours** (new in this pass), including the candidate documents. The audio and video of a call are never stored or
   recorded; they travel directly between the two devices.
-- Request documents keep the relative's e-mail, the parent's name and the children's nicknames until deleted; they are not
+- Request documents keep the relative's user name and account id, the parent's name and the children's nicknames until deleted; they are not
   purged automatically yet (gap, low volume).
 
 ## Gaps and risks (honest)
-1. **E-mail ownership is not verified.** Anyone can register with another person's e-mail; they could then see a request
-   addressed to that e-mail (parent name and children's nicknames). Enabling Firebase e-mail verification and checking
-   `email_verified` in the rules closes it. Not done.
+1. ~~E-mail ownership is not verified.~~ Closed on 2026-10-30: requests are addressed to a user name the relative chose,
+   which is tied to their account id, so nobody else can see it. New, smaller risk: anyone who knows an exact user name
+   can send that person a request (they must accept; nothing is shared before). There is no list or search of names.
 2. **Block / report a relative** from the app is not built: removing is the control. The generic "report a problem" screen
    exists.
 3. **No push notifications**: a call or request is seen only while the app is open.

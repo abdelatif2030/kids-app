@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 
 import '../design/components.dart';
 import '../design/layout.dart';
@@ -115,7 +116,7 @@ class _FamilyParentScreenState extends State<FamilyParentScreen> {
                 return EmptyState(
                   icon: Icons.family_restroom_rounded,
                   title: tr2('لا يوجد أقارب بعد', 'No relatives yet'),
-                  message: tr2('اضغط «إضافة قريب» وأرسل طلباً إلى بريده الإلكتروني.', 'Tap “Add a relative” and send a request to their e-mail.'),
+                  message: tr2('اضغط «إضافة قريب» واكتب اسم المستخدم الذي اختاره ليصله طلبك.', 'Tap “Add a relative” and write the user name they chose, so your request reaches them.'),
                 );
               }
               return Column(children: [
@@ -249,7 +250,7 @@ class _RequestDialog extends StatefulWidget {
 }
 
 class _RequestDialogState extends State<_RequestDialog> {
-  final _email = TextEditingController();
+  final _username = TextEditingController();
   String _relation = 'grandma';
   final _picked = <String>{};
   bool _busy = false;
@@ -257,14 +258,14 @@ class _RequestDialogState extends State<_RequestDialog> {
 
   @override
   void dispose() {
-    _email.dispose();
+    _username.dispose();
     super.dispose();
   }
 
   Future<void> _send() async {
     final kids = {for (final c in JourneyStore.instance.profiles) if (_picked.contains(c.id)) c.id: c.nickname};
-    if (!looksLikeEmail(_email.text)) {
-      setState(() => _error = tr2('اكتب بريداً إلكترونياً صحيحاً', 'Write a valid e-mail address'));
+    if (!validUsername(_username.text)) {
+      setState(() => _error = tr2('اكتب اسم المستخدم كما اختاره القريب (٣ إلى ٢٠ حرفاً أو رقماً أو «_»)', 'Write the user name the person chose (3 to 20 letters, digits or "_")'));
       return;
     }
     if (kids.isEmpty) {
@@ -276,7 +277,7 @@ class _RequestDialogState extends State<_RequestDialog> {
       _error = null;
     });
     try {
-      final r = await widget.repo.sendConnectRequest(parentName: widget.parentName, toEmail: _email.text, relation: _relation, children: kids);
+      final r = await widget.repo.sendConnectRequest(parentName: widget.parentName, toName: _username.text, relation: _relation, children: kids);
       if (mounted) Navigator.pop(context, r);
     } catch (e) {
       if (mounted) {
@@ -296,16 +297,16 @@ class _RequestDialogState extends State<_RequestDialog> {
       content: SingleChildScrollView(
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
-            tr2('اكتب البريد الذي سجّل به القريب في التطبيق. سيصله طلب ليقبله أو يرفضه.', 'Write the e-mail the person registered with in the app. They get a request to accept or decline.'),
+            tr2('اكتب اسم المستخدم الذي اختاره القريب في التطبيق (يجده في شاشة «أنا من العائلة»). سيصله طلب ليقبله أو يرفضه.', 'Write the user name the person chose in the app (they find it on their "I am family" screen). They get a request to accept or decline.'),
             style: DS.caption,
           ),
           const SizedBox(height: 8),
           TextField(
-            key: const ValueKey('request_email'),
-            controller: _email,
-            keyboardType: TextInputType.emailAddress,
-            autofillHints: const [AutofillHints.email],
-            decoration: InputDecoration(labelText: tr2('البريد الإلكتروني', 'E-mail')),
+            key: const ValueKey('request_username'),
+            controller: _username,
+            autocorrect: false,
+            enableSuggestions: false,
+            decoration: InputDecoration(labelText: tr2('اسم المستخدم', 'User name'), prefixText: '@'),
           ),
           const SizedBox(height: 8),
           DropdownButton<String>(
@@ -370,7 +371,7 @@ class _SentRequestsState extends State<_SentRequests> {
               key: ValueKey('sent_${r.id}'),
               child: ListTile(
                 leading: const Icon(Icons.hourglass_top_rounded),
-                title: Text(r.toEmail, textDirection: TextDirection.ltr),
+                title: Text('@${r.toName}'),
                 subtitle: Text('${relationLabel(r.relation)} · ${r.children.values.join('، ')}'),
                 trailing: TextButton(
                   key: ValueKey('cancel_${r.id}'),
@@ -1274,6 +1275,7 @@ class _RelativeHomeScreenState extends State<RelativeHomeScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(tr2('أنا من العائلة', 'I am family'))),
       body: CenteredList(padding: const EdgeInsets.all(16), children: [
+        _UsernameCard(repo: widget.repo),
         StreamBuilder<List<ConnectRequest>>(
           stream: widget.repo.watchIncomingRequests(),
           builder: (context, snap) {
@@ -1289,7 +1291,7 @@ class _RelativeHomeScreenState extends State<RelativeHomeScreen> {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Text(
-                  tr2('لا توجد طلبات الآن. عندما يضيفك ولي أمر طفل ببريدك (${widget.repo.email ?? ''}) سيظهر طلبه هنا.', 'No requests right now. When a child’s parent adds you with your e-mail (${widget.repo.email ?? ''}) the request shows up here.'),
+                  tr2('لا توجد طلبات الآن. أعطِ ولي أمر الطفل اسم المستخدم الخاص بك (أعلاه) وسيظهر طلبه هنا.', 'No requests right now. Give the child’s parent your user name (above) and their request will show up here.'),
                   style: DS.caption,
                 ),
               );
@@ -1493,5 +1495,105 @@ class _VoiceBubbleState extends State<VoiceBubble> {
       const SizedBox(width: 8),
       Text('🎤 ${widget.message.secs} ${tr2('ث', 's')}', style: const TextStyle(fontSize: 18)),
     ]);
+  }
+}
+
+/// The relative's user name: how a child's parent finds them. Chosen once, unique, never changes. Shown so it can be
+/// read out or copied; there is no list of people to search, so only someone who knows the exact name can ask.
+class _UsernameCard extends StatefulWidget {
+  final FamilyRepository repo;
+  const _UsernameCard({required this.repo});
+
+  @override
+  State<_UsernameCard> createState() => _UsernameCardState();
+}
+
+class _UsernameCardState extends State<_UsernameCard> {
+  late Future<String?> _name = widget.repo.myUsername();
+  final _field = TextEditingController();
+  bool _busy = false;
+  String? _error;
+
+  @override
+  void dispose() {
+    _field.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (!validUsername(_field.text)) {
+      setState(() => _error = tr2('٣ إلى ٢٠ حرفاً أو رقماً أو «_»، بلا مسافات', '3 to 20 letters, digits or "_", no spaces'));
+      return;
+    }
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await widget.repo.claimUsername(_field.text);
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _name = widget.repo.myUsername();
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _error = _err(e);
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<String?>(
+      future: _name,
+      builder: (context, snap) {
+        if (snap.connectionState != ConnectionState.done) return const SizedBox.shrink();
+        final name = snap.data;
+        return Card(
+          key: const ValueKey('username_card'),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: name != null
+                ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(tr2('اسم المستخدم الخاص بك', 'Your user name'), style: DS.heading),
+                    const SizedBox(height: 4),
+                    Row(children: [
+                      Expanded(child: SelectableText('@$name', key: const ValueKey('my_username'), style: DS.body.copyWith(fontWeight: FontWeight.w900, fontSize: 20))),
+                      IconButton(
+                        key: const ValueKey('copy_username'),
+                        tooltip: tr2('نسخ', 'Copy'),
+                        icon: const Icon(Icons.copy_rounded),
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: name));
+                          showToast(context, tr2('تم النسخ', 'Copied'));
+                        },
+                      ),
+                    ]),
+                    Text(tr2('أعطه لولي أمر الطفل ليضيفك. لا يظهر اسمك في أي قائمة.', 'Give it to the child’s parent so they can add you. Your name is not in any list.'), style: DS.caption),
+                  ])
+                : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(tr2('اختر اسم مستخدم', 'Choose a user name'), style: DS.heading),
+                    Text(tr2('يجدك به ولي أمر الطفل. لا يتغير بعد الحفظ.', 'The child’s parent finds you with it. It cannot be changed after saving.'), style: DS.caption),
+                    const SizedBox(height: 8),
+                    TextField(
+                      key: const ValueKey('username_field'),
+                      controller: _field,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      decoration: InputDecoration(labelText: tr2('اسم المستخدم', 'User name'), prefixText: '@'),
+                    ),
+                    if (_error != null) Text(_error!, key: const ValueKey('username_error'), style: DS.body.copyWith(color: DS.error)),
+                    const SizedBox(height: 8),
+                    FilledButton(key: const ValueKey('save_username'), onPressed: _busy ? null : _save, child: Text(tr2('حفظ الاسم', 'Save name'))),
+                  ]),
+          ),
+        );
+      },
+    );
   }
 }

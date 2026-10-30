@@ -1420,17 +1420,18 @@ The six learning games under Games > Learning games.
 - **Device or environment:** Browser and OS: 
 - **Notes:** 
 
-### F4 - Request by e-mail (replaces invite codes)
+### F4 - Request by user name (replaces invite codes and, from 2026-10-30, the e-mail)
 
 - [ ] Not tested
 - **Test ID:** F4
-- **Preconditions:** Rules re-published; a relative account registered (e.g. nana@test.com) in a second browser.
+- **Preconditions:** Rules re-published (they now include `usernames`); a relative account registered in a second browser.
 - **Steps:**
-  1. Parent: Family chat -> «إضافة قريب» -> the relative's e-mail, relation, children -> Send.
-  2. The request shows under "waiting for an answer" with a cancel button.
+  0. Relative: open «أنا من العائلة»: choose a user name (try a taken one, a short one, one with a space: each shows a message), save, see it with a copy button.
+  1. Parent: Family chat -> «إضافة قريب» -> that exact user name (try an unknown name and a partial name: nothing is sent), relation, children -> Send.
+  2. The request shows as «@name» under "waiting for an answer" with a cancel button.
   3. Relative: open «أنا من العائلة»: a card «طلب من ...» with Accept / Decline.
   4. Accept: the parent's list shows the relative as active (no second approval). Try Decline and Cancel on other requests.
-- **Expected result:** Nothing is possible before Accept; only the right e-mail sees the request.
+- **Expected result:** Nothing is possible before Accept; only the right person sees the request; no e-mail is asked for anywhere.
 - **Actual result:** Not tested
 - **Status:** Not tested
 - **Device or environment:** Browsers: 

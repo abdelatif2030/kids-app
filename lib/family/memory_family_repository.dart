@@ -12,6 +12,9 @@ class FakeFamilyServer {
   final messages = <String, List<FamilyMessage>>{}; // familyId -> messages
   final _changes = StreamController<String>.broadcast();
   final requests = <String, ConnectRequest>{};
+
+  /// user name -> account id (one name per relative, unique).
+  final usernames = <String, String>{};
   final voices = <String, (String familyId, String relUid, VoiceClip clip, DateTime at)>{};
   final parentNames = <String, String>{}; // family id -> parent's name
   final _requestChanges = StreamController<String>.broadcast();
@@ -25,11 +28,29 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   final FakeFamilyServer server;
   @override
   final String? uid;
-  final String? _email;
-  FakeFamilyRepository(this.server, this.uid, {String? email}) : _email = email; // ignore: prefer_initializing_formals
+  FakeFamilyRepository(this.server, this.uid, {String? username}) {
+    // Tests can start a relative with a name already chosen.
+    if (username != null && uid != null) {
+      server.usernames[normalizeUsername(username)] = uid!;
+    }
+  }
 
   @override
-  String? get email => _email == null ? null : normalizeEmail(_email);
+  Future<String?> myUsername() async {
+    for (final e in server.usernames.entries) {
+      if (e.value == uid) return e.key;
+    }
+    return null;
+  }
+
+  @override
+  Future<void> claimUsername(String username) async {
+    final n = normalizeUsername(username);
+    if (!validUsername(n)) throw const FamilyException('bad user name');
+    if (await myUsername() != null) throw const FamilyException('already has one');
+    if (server.usernames.containsKey(n)) throw const FamilyException('taken');
+    server.usernames[n] = uid!;
+  }
 
   Map<String, Relative> _mine(String fid) => server.relatives.putIfAbsent(fid, () => {});
 
@@ -37,14 +58,17 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   @override
   Future<ConnectRequest> sendConnectRequest({
     required String parentName,
-    required String toEmail,
+    required String toName,
     required String relation,
     required Map<String, String> children,
   }) async {
-    if (!looksLikeEmail(toEmail)) throw const FamilyException('bad e-mail');
+    final name = normalizeUsername(toName);
+    if (!validUsername(name)) throw const FamilyException('bad user name');
+    final toUid = server.usernames[name];
+    if (toUid == null) throw const FamilyException('no such user name');
     if (children.isEmpty) throw const FamilyException('no child');
     final id = 'req${server._n++}';
-    final r = ConnectRequest(id: id, familyId: uid!, parentName: parentName, toEmail: normalizeEmail(toEmail), relation: relation, children: children);
+    final r = ConnectRequest(id: id, familyId: uid!, parentName: parentName, toName: name, toUid: toUid, relation: relation, children: children);
     server.requests[id] = r;
     server.parentNames[uid!] = parentName;
     server._requestChanges.add(id);
@@ -62,7 +86,7 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
     server._requestChanges.add(requestId);
   }
 
-  List<ConnectRequest> _incomingNow() => [for (final r in server.requests.values) if (r.pending && email != null && r.toEmail == email) r];
+  List<ConnectRequest> _incomingNow() => [for (final r in server.requests.values) if (r.pending && uid != null && r.toUid == uid) r];
 
   @override
   Stream<List<ConnectRequest>> watchIncomingRequests() {
@@ -81,7 +105,7 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   @override
   Future<void> respondToRequest(ConnectRequest request, {required bool accept, required String name}) async {
     final r = server.requests[request.id];
-    if (r == null || !r.pending || email == null || r.toEmail != email) throw const FamilyException('not allowed');
+    if (r == null || !r.pending || uid == null || r.toUid != uid) throw const FamilyException('not allowed');
     server.requests[r.id] = r.copyWith(status: accept ? kRequestAccepted : kRequestDeclined);
     if (accept) {
       _mine(r.familyId)[uid!] = Relative(uid: uid!, name: name, relation: r.relation, status: kRelativeActive, children: r.children);

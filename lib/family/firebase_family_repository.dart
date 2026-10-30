@@ -21,10 +21,31 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
   String? get uid => _auth.currentUser?.uid;
 
   @override
-  String? get email {
-    final e = _auth.currentUser?.email;
-    return e == null ? null : normalizeEmail(e);
-  }
+  Future<String?> myUsername() => _guard(() async {
+        final me = uid;
+        if (me == null) return null;
+        final d = await _db.collection('users').doc(me).get();
+        final n = d.data()?['username'];
+        return n is String && n.isNotEmpty ? n : null;
+      });
+
+  @override
+  Future<void> claimUsername(String username) => _guard(() async {
+        final name = normalizeUsername(username);
+        if (!validUsername(name)) {
+          throw FamilyException(tr2('اسم المستخدم من ٣ إلى ٢٠ حرفاً أو رقماً أو «_» بلا مسافات', 'A user name is 3 to 20 letters, digits or "_", with no spaces'));
+        }
+        if (await myUsername() != null) throw FamilyException(tr2('لديك اسم مستخدم بالفعل', 'You already have a user name'));
+        final ref = _db.collection('usernames').doc(name);
+        if ((await ref.get()).exists) {
+          throw FamilyException(tr2('هذا الاسم مستخدم، اختر اسماً آخر', 'This user name is taken, choose another'));
+        }
+        // Both writes in one batch: the name and the pointer back on the account (the rules check both).
+        final batch = _db.batch();
+        batch.set(ref, {'uid': uid, 'displayName': (_auth.currentUser?.displayName ?? '').trim()});
+        batch.update(_db.collection('users').doc(uid), {'username': name});
+        await batch.commit();
+      });
 
   CollectionReference<Map<String, dynamic>> _rels(String fid) => _db.collection('families').doc(fid).collection('relatives');
   CollectionReference<Map<String, dynamic>> _msgs(String fid) => _db.collection('families').doc(fid).collection('messages');
@@ -68,7 +89,8 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
         id: id,
         familyId: (d['familyId'] as String?) ?? '',
         parentName: (d['parentName'] as String?) ?? '',
-        toEmail: (d['toEmail'] as String?) ?? '',
+        toName: (d['toName'] as String?) ?? '',
+        toUid: (d['toUid'] as String?) ?? '',
         relation: (d['relation'] as String?) ?? 'other',
         children: _strMap(d['children']),
         status: (d['status'] as String?) ?? kRequestPending,
@@ -77,22 +99,32 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
   @override
   Future<ConnectRequest> sendConnectRequest({
     required String parentName,
-    required String toEmail,
+    required String toName,
     required String relation,
     required Map<String, String> children,
   }) => _guard(() async {
-        if (!looksLikeEmail(toEmail)) throw FamilyException(tr2('اكتب بريداً إلكترونياً صحيحاً', 'Write a valid e-mail address'));
+        final name = normalizeUsername(toName);
+        if (!validUsername(name)) {
+          throw FamilyException(tr2('اسم المستخدم من ٣ إلى ٢٠ حرفاً أو رقماً أو «_» بلا مسافات', 'A user name is 3 to 20 letters, digits or "_", with no spaces'));
+        }
+        // One exact document is read: there is no search and no list of people.
+        final found = await _db.collection('usernames').doc(name).get();
+        final toUid = found.data()?['uid'] as String?;
+        if (!found.exists || toUid == null) {
+          throw FamilyException(tr2('لا يوجد قريب بهذا الاسم. اسأله عن اسم المستخدم الذي اختاره في التطبيق.', 'Nobody has this user name. Ask the person which user name they chose in the app.'));
+        }
         final data = {
           'familyId': uid!,
           'parentName': parentName,
-          'toEmail': normalizeEmail(toEmail),
+          'toName': name,
+          'toUid': toUid,
           'relation': relation,
           'children': children,
           'status': kRequestPending,
           'createdAt': FieldValue.serverTimestamp(),
         };
         final ref = await _requests.add(data);
-        return ConnectRequest(id: ref.id, familyId: uid!, parentName: parentName, toEmail: normalizeEmail(toEmail), relation: relation, children: children);
+        return ConnectRequest(id: ref.id, familyId: uid!, parentName: parentName, toName: name, toUid: toUid, relation: relation, children: children);
       });
 
   @override
@@ -106,10 +138,10 @@ class FirebaseFamilyRepository implements FamilyRepository, CallRepository {
 
   @override
   Stream<List<ConnectRequest>> watchIncomingRequests() {
-    final mail = email;
-    if (mail == null) return Stream.value(const []);
+    final me = uid;
+    if (me == null) return Stream.value(const []);
     return _requests
-        .where('toEmail', isEqualTo: mail)
+        .where('toUid', isEqualTo: me)
         .where('status', isEqualTo: kRequestPending)
         .snapshots()
         .map((s) => [for (final d in s.docs) _request(d.id, d.data())]);
