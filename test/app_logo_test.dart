@@ -21,12 +21,12 @@ void main() {
     expect(bytes.getUint8(3), 0, reason: 'the top-left corner is transparent (no grid background)');
   });
 
-  test('the old "since 2026" line is not in the logo (the image ends right under the name)', () async {
+  test('the logo is the new Rehlaty logo (the two 3D children over the name), trimmed to its edges', () async {
     final data = await rootBundle.load(AppLogo.asset);
     final image = (await (await ui.instantiateImageCodec(data.buffer.asUint8List())).getNextFrame()).image;
-    // The cleaned logo is about as tall as wide; the original with the extra line and grid was 655x523.
-    expect(image.width, lessThan(400));
-    expect(image.height, lessThan(400));
+    // The new logo is about 1.28 times wider than tall (the old flat-drawing logo was nearly square, 330x315).
+    expect(image.width / image.height, inInclusiveRange(1.2, 1.35));
+    expect(image.width, inInclusiveRange(600, 1000));
   });
 
   test('the launcher and web icons exist', () {
