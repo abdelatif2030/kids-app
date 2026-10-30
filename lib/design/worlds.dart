@@ -1,3 +1,4 @@
+import 'logo_backdrop.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -43,7 +44,10 @@ class WorldBackground extends StatefulWidget {
   final RWorld world;
   final Widget child;
   final bool quiet;
-  const WorldBackground({super.key, this.world = RWorld.journey, required this.child, this.quiet = false});
+
+  /// The faint Rehlaty logo in the middle. Off only where the logo is already the star of the screen.
+  final bool logo;
+  const WorldBackground({super.key, this.world = RWorld.journey, required this.child, this.quiet = false, this.logo = true});
 
   /// Tests set this to true to exercise the motion layer. Otherwise the motion layer is off under a test binding, so
   /// `pumpAndSettle` is not held up by a background that never stops moving.
@@ -117,6 +121,8 @@ class _WorldBackgroundState extends State<WorldBackground> with SingleTickerProv
                 ),
               ),
             ),
+          // Under the screen's own content, over the sky: so every screen on a world carries the logo.
+          if (widget.logo) LogoLayer(opacity: widget.quiet || world == RWorld.calm ? 0.08 : 0.14),
           widget.child,
         ],
       ),

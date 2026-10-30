@@ -1,7 +1,7 @@
+import '../design/app_logo.dart';
 import 'package:flutter/material.dart';
 
 import '../journey/ui/kit.dart';
-import '../ui.dart' show Mascot;
 import 'app_locale.dart';
 import 'strings.dart';
 
@@ -23,7 +23,7 @@ class LanguageScreen extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Mascot(size: 140),
+                    const AppLogo(width: 240),
                     const SizedBox(height: 12),
                     Semantics(
                       header: true,

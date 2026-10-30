@@ -1,3 +1,4 @@
+import 'logo_backdrop.dart';
 import 'package:flutter/material.dart';
 
 import 'tokens.dart';
@@ -64,10 +65,14 @@ class CenteredList extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, box) {
         final extra = box.maxWidth > maxWidth ? (box.maxWidth - maxWidth) / 2 : 0.0;
-        return ListView(
-          controller: controller,
-          padding: padding.copyWith(left: padding.left + extra, right: padding.right + extra),
-          children: children,
+        // The logo sits very faintly behind the list; the list scrolls over it.
+        return LogoBackdrop(
+          opacity: 0.06,
+          child: ListView(
+            controller: controller,
+            padding: padding.copyWith(left: padding.left + extra, right: padding.right + extra),
+            children: children,
+          ),
         );
       },
     );

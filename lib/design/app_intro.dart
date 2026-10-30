@@ -75,6 +75,7 @@ class _AppIntroState extends State<AppIntro> with SingleTickerProviderStateMixin
                 label: 'رحلتي Rehlaty',
                 child: WorldBackground(
                   world: RWorld.journey,
+                  logo: false,
                   child: AnimatedBuilder(
                     animation: c,
                     builder: (context, _) {

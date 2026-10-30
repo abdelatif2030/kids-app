@@ -208,7 +208,8 @@ void main() {
       await tester.tap(find.byIcon(Icons.copy_rounded));
       await tester.pump();
       expect(copied, 'https://example.com/intro');
-      expect(find.byType(Image), findsNothing); // no autoplay, no player: only the text link
+      // (the faint background logo is an Image too; it has its own key)
+      expect(find.byWidgetPredicate((w) => w is Image && w.key != const ValueKey('bg_logo')), findsNothing); // no autoplay, no player: only the text link
     });
 
     testWidgets('a teacher\'s preview shows the same page and no booking buttons', (tester) async {
