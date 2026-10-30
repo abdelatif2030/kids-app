@@ -20,3 +20,12 @@ Checked by looking at 4 frames (0.0, 0.5, 1.0, 1.5 s):
 - Not checked: smoothness between the sampled frames, the whole sequence in motion.
 - Audio: a track exists (mean -11.4 dB, peak 0 dB). I did NOT verify what is said or that it is Egyptian Arabic, and no lip-sync was verified. Someone must listen.
 - This is 2 s of the planned 30 s. Shots 2-4, music, the end logo card and the 20-30 s assembly are not made.
+
+## Trial video 02 (2026-10-30): all credits used (Higgsfield balance now 0)
+
+`07_final_video/rehlaty_ramadan_trial_02.mp4`: 6.1 s, 854x480, H.264 + AAC. Built with ffmpeg: clip 1 (2 s) + clip 2 (2 s) + 2 s end card with the supplied logo, unmodified, fading in.
+- Clip 2 (`05_generated_shots/trial_clip_02.mp4`, wan3_0, 2 credits) was generated from the last frame of clip 1 (`04_storyboard/clip01_last_frame.jpg`), prompt: Nour reacts "واو! حلو أوي يا آدم!".
+- Looked at 4 frames of clip 2: both children and the room stay consistent with clip 1; Nour ends up holding the lantern that Adam was holding (not in the prompt); Adam blinks in the first frame; no visible hand defects in those frames. The hand-over is a small continuity change from the storyboard.
+- End card checked (one frame): logo intact, Arabic and English names readable.
+- Not verified: the audio content and language of either clip, lip-sync, motion smoothness between sampled frames, the cut between clips (a 4 s dialogue exchange only; no background music was added).
+- Not made: storyboard shots 3 and 4, the second child line, music, a 20-30 s cut. Needs more credits (21 for a 7 s 480p draft).
