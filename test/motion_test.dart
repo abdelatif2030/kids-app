@@ -101,6 +101,8 @@ void main() {
       WorldBackground.forceMotion = null;
     });
 
+    test('the intro lasts two seconds', () => expect(AppIntro.duration, const Duration(seconds: 2)));
+
     testWidgets('skipped under tests by default and with reduced motion: the app is simply there', (t) async {
       AppIntro.resetForTest();
       await t.pumpWidget(app(const AppIntro(child: Text('app'))));
@@ -111,13 +113,18 @@ void main() {
       expect(find.byType(AppLogo), findsNothing);
     });
 
-    testWidgets('shows the name, ends by itself after about 1.6 s, and a tap opens the app at once; shown once per run', (t) async {
+    testWidgets('shows both names, ends by itself after 2 s, and a tap opens the app at once; shown once per run', (t) async {
       AppIntro.forceShow = true;
       AppIntro.resetForTest();
       await t.pumpWidget(app(const AppIntro(child: Text('app'))));
       await t.pump(const Duration(milliseconds: 800));
       expect(find.byType(AppLogo), findsOneWidget);
-      await t.pump(const Duration(milliseconds: 1000));
+      // both names are written: the Arabic «رحلتي» and the English «Rehlaty»
+      expect(find.byKey(const ValueKey('intro_ar')), findsOneWidget);
+      expect(find.byKey(const ValueKey('intro_en')), findsOneWidget);
+      expect(t.widget<Text>(find.byKey(const ValueKey('intro_ar'))).data, 'رحلتي');
+      expect(t.widget<Text>(find.byKey(const ValueKey('intro_en'))).data, 'Rehlaty');
+      await t.pump(const Duration(milliseconds: 1300)); // 2.1 s in total: over
       expect(find.byType(AppLogo), findsNothing);
       // a second AppIntro in the same run does not play again
       await t.pumpWidget(app(AppIntro(key: UniqueKey(), child: const Text('again'))));

@@ -7,9 +7,13 @@ import '../ui.dart' show Mascot;
 /// and a safe fallback to the drawn mascot if the file is ever missing.
 class AppLogo extends StatelessWidget {
   final double width;
-  const AppLogo({super.key, this.width = 260});
+
+  /// Only the two children and the book, without the written name (for places that write the name themselves).
+  final bool artOnly;
+  const AppLogo({super.key, this.width = 260, this.artOnly = false});
 
   static const asset = 'assets/branding/logo.png';
+  static const artAsset = 'assets/branding/logo_art.png';
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +22,7 @@ class AppLogo extends StatelessWidget {
       image: true,
       child: ExcludeSemantics(
         child: Image.asset(
-          asset,
+          artOnly ? artAsset : asset,
           key: const ValueKey('app_logo'),
           width: width,
           fit: BoxFit.contain,
