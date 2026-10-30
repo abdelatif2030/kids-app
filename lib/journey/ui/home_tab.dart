@@ -1,5 +1,7 @@
 import '../../adaptive/recommendation_card.dart';
 import '../../family/family_bubble.dart';
+import 'island_home.dart';
+import '../../assistant/planner.dart' show landsForAge;
 import '../../design/tokens.dart';
 import '../avatars.dart';
 
@@ -114,6 +116,7 @@ class HomeTab extends StatelessWidget {
                   ),
                 ),
               ),
+              const HomeViewToggle(),
               FamilyBubbleButton(child: child),
               const SizedBox(width: 4),
               IconButton(
@@ -377,58 +380,171 @@ class HomeTab extends StatelessWidget {
             ],
           ),
         ];
-        return LayoutBuilder(
-          builder: (context, box) {
-            final wide = box.maxWidth >= 900;
-            if (!wide) {
-              // Phone and medium windows: one readable column.
-              return Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: box.maxWidth >= DS.phone ? 640 : 560,
-                  ),
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                    children: [...header, ...primary, ...secondary],
-                  ),
-                ),
-              );
+        return ListenableBuilder(
+          listenable: HomeViewPref.instance,
+          builder: (context, _) {
+            HomeViewPref.instance.ensureLoaded();
+            if (HomeViewPref.instance.mapView) {
+              return _mapHome(context, header, store);
             }
-            // Wide windows: today's world on one side, the lands and shortcuts on the other.
-            return Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1120),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-                  child: Column(
-                    children: [
-                      ...header,
-                      Expanded(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: ListView(
-                                padding: const EdgeInsets.only(bottom: 24),
-                                children: primary,
-                              ),
-                            ),
-                            const SizedBox(width: 24),
-                            Expanded(
-                              child: ListView(
-                                padding: const EdgeInsets.only(bottom: 24),
-                                children: secondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+            return _listHome(context, header, primary, secondary);
           },
+        );
+      },
+    );
+  }
+
+  /// The island map: the same header, today's suggestion, and one island per section.
+  Widget _mapHome(
+    BuildContext context,
+    List<Widget> header,
+    JourneyStore store,
+  ) {
+    final pool = landsForAge(child.age, child.learnLang);
+    final lands = {for (final l in store.publishedLands) l.id};
+    final islands = <IslandSpec>[
+      if (pool.contains('letters'))
+        IslandSpec(
+          id: 'letters',
+          title: tr2('الحروف', 'Letters'),
+          emoji: '🔤',
+          grass: const Color(0xFF8BD450),
+          grassDark: const Color(0xFF5FA832),
+          onTap: () => _open(context, LettersHomeScreen(child: child)),
+        ),
+      if (pool.contains('numbers') && lands.contains('numbers'))
+        IslandSpec(
+          id: 'numbers',
+          title: tr2('الأرقام', 'Numbers'),
+          emoji: '🔢',
+          grass: const Color(0xFF7FD6B5),
+          grassDark: const Color(0xFF3FA987),
+          onTap: () => _open(
+            context,
+            LandMapScreen(land: landById('numbers'), child: child),
+          ),
+        ),
+      IslandSpec(
+        id: 'words',
+        title: tr2('الكلمات', 'Words'),
+        emoji: '🖼️',
+        grass: const Color(0xFFA7DB6A),
+        grassDark: const Color(0xFF6FAE3C),
+        onTap: () => _open(context, VocabLibraryScreen(child: child)),
+      ),
+      IslandSpec(
+        id: 'stories',
+        title: tr2('القصص', 'Stories'),
+        emoji: '📖',
+        grass: const Color(0xFFC9A6F0),
+        grassDark: const Color(0xFF9468CC),
+        onTap: () => _open(context, StoriesHomeScreen(child: child)),
+      ),
+      IslandSpec(
+        id: 'games',
+        title: tr2('الألعاب', 'Games'),
+        emoji: '🎮',
+        grass: const Color(0xFFFFC45E),
+        grassDark: const Color(0xFFE09A22),
+        onTap: () => onTab?.call(1),
+      ),
+      IslandSpec(
+        id: 'create',
+        title: tr2('الإبداع', 'Create'),
+        emoji: '🎨',
+        grass: const Color(0xFFFF9DB8),
+        grassDark: const Color(0xFFDB6A8D),
+        onTap: () => onTab?.call(2),
+      ),
+      IslandSpec(
+        id: 'videos',
+        title: tr2('الفيديوهات', 'Videos'),
+        emoji: '▶️',
+        grass: const Color(0xFF8CC8FF),
+        grassDark: const Color(0xFF4F97D9),
+        onTap: () => _open(context, SubjectsScreen(age: child.age)),
+      ),
+      IslandSpec(
+        id: 'family_activities',
+        title: tr2('مع العائلة', 'With family'),
+        emoji: '🏠',
+        grass: const Color(0xFFFFB27A),
+        grassDark: const Color(0xFFD9803F),
+        onTap: () => _open(context, ActivityLibraryScreen(child: child)),
+      ),
+    ];
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1120),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          children: [
+            ...header,
+            RecommendationCard(child: child, now: now),
+            const SizedBox(height: 12),
+            IslandHome(islands: islands),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _listHome(
+    BuildContext context,
+    List<Widget> header,
+    List<Widget> primary,
+    List<Widget> secondary,
+  ) {
+    return LayoutBuilder(
+      builder: (context, box) {
+        final wide = box.maxWidth >= 900;
+        if (!wide) {
+          // Phone and medium windows: one readable column.
+          return Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: box.maxWidth >= DS.phone ? 640 : 560,
+              ),
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                children: [...header, ...primary, ...secondary],
+              ),
+            ),
+          );
+        }
+        // Wide windows: today's world on one side, the lands and shortcuts on the other.
+        return Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1120),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+              child: Column(
+                children: [
+                  ...header,
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: ListView(
+                            padding: const EdgeInsets.only(bottom: 24),
+                            children: primary,
+                          ),
+                        ),
+                        const SizedBox(width: 24),
+                        Expanded(
+                          child: ListView(
+                            padding: const EdgeInsets.only(bottom: 24),
+                            children: secondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
@@ -882,5 +998,3 @@ class _ResumeCard extends StatelessWidget {
     );
   }
 }
-
-
