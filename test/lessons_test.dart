@@ -141,7 +141,8 @@ void main() {
         for (final size in [const Size(320, 568), const Size(844, 390)]) {
           await show(t, size: size, lang: lang, text: 1.6);
           expect(find.byKey(const ValueKey('video_empty')), findsOneWidget);
-          expect(find.byType(Image), findsNothing); // no thumbnails of unapproved videos are even requested
+          // no thumbnails of unapproved videos are even requested (the only picture is the faint app logo behind the page)
+          expect(find.byWidgetPredicate((w) => w is Image && w.key != const ValueKey('bg_logo')), findsNothing);
           expect(t.takeException(), isNull);
         }
       }

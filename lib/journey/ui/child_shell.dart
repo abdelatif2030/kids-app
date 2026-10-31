@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../games/fun_games.dart';
+
 import '../../design/layout.dart';
 import '../../design/motion_system.dart';
 import '../../design/tokens.dart';
@@ -299,23 +301,51 @@ class _NavItem extends StatelessWidget {
   }
 }
 
-class _GamesTab extends StatelessWidget {
+class _GamesTab extends StatefulWidget {
   final ChildProfile child;
   const _GamesTab({required this.child});
 
   @override
+  State<_GamesTab> createState() => _GamesTabState();
+}
+
+class _GamesTabState extends State<_GamesTab> {
+  bool _fun = false;
+
+  @override
   Widget build(BuildContext context) {
-    // The games map takes everything under a small title (no outer scrolling: the map slides sideways by itself).
+    // Two kinds of games: the learning games, and "fun" games like the casual ones on a phone (no stars, no scores).
+    // Each takes the whole area under the switch (no outer scrolling).
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-          child: Text(
-            loc('ألعاب'),
-            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: RC.ink),
+          padding: const EdgeInsets.fromLTRB(16, 6, 16, 4),
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 10,
+            runSpacing: 4,
+            children: [
+              ChoiceChip(
+                key: const ValueKey('games_edu'),
+                label: Text(tr2('ألعاب تعليمية', 'Learning games'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+                selected: !_fun,
+                onSelected: (_) => setState(() => _fun = false),
+              ),
+              ChoiceChip(
+                key: const ValueKey('games_fun'),
+                label: Text(tr2('ألعاب ترفيهية', 'Fun games'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+                selected: _fun,
+                onSelected: (_) => setState(() => _fun = true),
+              ),
+            ],
           ),
         ),
-        Expanded(child: GamesGrid(age: child.age, child: child)),
+        Expanded(
+          child: _fun
+              ? FunGamesGrid(key: const ValueKey('fun_grid'), age: widget.child.age)
+              : GamesGrid(key: const ValueKey('edu_grid'), age: widget.child.age, child: widget.child),
+        ),
       ],
     );
   }

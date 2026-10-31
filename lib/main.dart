@@ -399,7 +399,8 @@ class _VideoListScreenState extends State<VideoListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WorldBackground(world: RWorld.journey, child: Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         title: Text(
@@ -542,7 +543,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
           ]);
         },
       ),
-    );
+    ));
   }
 }
 
