@@ -53,7 +53,10 @@ void main() {
     ));
     await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
     await tester.pump();
-    await tester.tap(find.text(kEducationalGames.firstWhere((g) => g.id == 'connect_four').title())); // four in a row
+    final fourInARow = find.text(kEducationalGames.firstWhere((g) => g.id == 'connect_four').title());
+    await tester.ensureVisible(fourInARow); // the islands run sideways, so scroll to it first
+    await tester.pump();
+    await tester.tap(fourInARow); // four in a row
     await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
     await tester.pumpAndSettle();
     final mark = await tester.runAsync(() => ResumeStore.last('k1'));

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../design/worlds.dart';
+
 import '../../assistant/planner.dart' show landsForAge;
 import '../../design/layout.dart';
 import '../../l10n/strings.dart';
@@ -155,7 +157,8 @@ class CartoonsHubScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(tr2('الكرتون والحكايات', 'Cartoons and stories')),
       ),
-      body: PastelBackground(
+      body: WorldBackground(
+        world: RWorld.ocean,
         child: CenteredList(
           padding: const EdgeInsets.all(16),
           children: [

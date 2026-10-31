@@ -34,11 +34,44 @@ class GameInfo {
   String get ages => '$minAge–$maxAge';
 }
 
+/// The picture on each game's island: one clear logo per game (classic games first, then the learning games).
+const Map<String, String> kGameEmoji = {
+  'balloons': '🎈',
+  'animal': '🐾',
+  'colors': '🎨',
+  'letters': '🔤',
+  'memory': '🧠',
+  'math': '➕',
+  'snakes_ladders': '🎲',
+  'jigsaw': '🧩',
+  'maze': '🐭',
+  'treasure_hunt': '💎',
+  'connect_dots': '✏️',
+  'animal_habitats': '🦁',
+  'odd_one_out': '🔍',
+  'pattern': '🔷',
+  'compare': '⚖️',
+  'sort_groups': '🗂️',
+  'listen_picture': '👂',
+  'listen_word': '🔊',
+  'listen_letter': '🔔',
+  'connect_four': '🔴',
+  'letter_fishing': '🎣',
+  'match_pictures': '🃏',
+  'numerals': '🔢',
+  'review_words': '⭐',
+  'trace_letters': '✍️',
+  'word_book': '📖',
+};
+
 final List<GameInfo> kEducationalGames = [
   GameInfo(
     SnakesLaddersGame.gameId,
     () => tr2('السلالم والزلاجات', 'Ladders and slides'),
-    () => tr2('العدّ والتقدم على لوحة، وانتظار الدور', 'Counting along a board, taking turns'),
+    () => tr2(
+      'العدّ والتقدم على لوحة، وانتظار الدور',
+      'Counting along a board, taking turns',
+    ),
     Icons.stairs_rounded,
     4,
     6,
@@ -56,7 +89,10 @@ final List<GameInfo> kEducationalGames = [
   GameInfo(
     MazeGame.gameId,
     () => tr2('الفأر والجبن', 'Mouse and cheese'),
-    () => tr2('التخطيط وحلّ المشكلات البسيطة', 'Planning and simple problem solving'),
+    () => tr2(
+      'التخطيط وحلّ المشكلات البسيطة',
+      'Planning and simple problem solving',
+    ),
     Icons.grid_on_rounded,
     4,
     6,
@@ -65,7 +101,10 @@ final List<GameInfo> kEducationalGames = [
   GameInfo(
     TreasureHuntGame.gameId,
     () => tr2('كنز الجزيرة', 'Island treasure'),
-    () => tr2('المواقع والاتجاهات والتفكير المنطقي', 'Positions, directions and logical thinking'),
+    () => tr2(
+      'المواقع والاتجاهات والتفكير المنطقي',
+      'Positions, directions and logical thinking',
+    ),
     Icons.diamond_rounded,
     4,
     6,
@@ -150,7 +189,10 @@ final List<GameInfo> kEducationalGames = [
   GameInfo(
     ListenPictureGame.gameId,
     () => tr2('اسمع واختر الصورة', 'Listen and pick the picture'),
-    () => tr2('الاستماع وربط الكلمة بالصورة', 'Listening and linking a word to its picture'),
+    () => tr2(
+      'الاستماع وربط الكلمة بالصورة',
+      'Listening and linking a word to its picture',
+    ),
     Icons.hearing_rounded,
     3,
     6,
@@ -159,7 +201,10 @@ final List<GameInfo> kEducationalGames = [
   GameInfo(
     ListenWordGame.gameId,
     () => tr2('اسمع واختر الكلمة', 'Listen and pick the word'),
-    () => tr2('ربط الصوت بالكلمة المكتوبة', 'Linking a sound to the written word'),
+    () => tr2(
+      'ربط الصوت بالكلمة المكتوبة',
+      'Linking a sound to the written word',
+    ),
     Icons.record_voice_over_rounded,
     5,
     8,

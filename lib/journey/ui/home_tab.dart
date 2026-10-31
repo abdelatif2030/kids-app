@@ -379,30 +379,7 @@ class HomeTab extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              _MoreCard(
-                '📚',
-                tr2('مكتبتي', 'My library'),
-                RC.sky,
-                () => MyLibraryScreen(child: child),
-              ),
-              _MoreCard(
-                '🖼️',
-                loc('مكتبة الكلمات'),
-                RC.mint,
-                () => VocabLibraryScreen(child: child),
-              ),
-              _MoreCard(
-                '🏠',
-                loc('أنشطة مع الأهل'),
-                RC.yellow,
-                () => ActivityLibraryScreen(child: child),
-              ),
-              _MoreCard(
-                '▶️',
-                loc('فيديوهات تعليمية'),
-                RC.lavender,
-                () => SubjectsScreen(age: child.age),
-              ),
+              for (final m in _moreItems()) _MoreCard(m.$1, m.$2, m.$3, m.$4),
             ],
           ),
         ];
@@ -414,13 +391,41 @@ class HomeTab extends StatelessWidget {
     );
   }
 
+  /// The extra sections: shown as cards under «المزيد» and as islands on the map.
+  List<(String, String, Color, Widget Function())> _moreItems() => [
+    (
+      '📚',
+      tr2('مكتبتي', 'My library'),
+      RC.sky,
+      () => MyLibraryScreen(child: child),
+    ),
+    (
+      '🖼️',
+      loc('مكتبة الكلمات'),
+      RC.mint,
+      () => VocabLibraryScreen(child: child),
+    ),
+    (
+      '🏠',
+      loc('أنشطة مع الأهل'),
+      RC.yellow,
+      () => ActivityLibraryScreen(child: child),
+    ),
+    (
+      '▶️',
+      loc('فيديوهات تعليمية'),
+      RC.lavender,
+      () => SubjectsScreen(age: child.age),
+    ),
+  ];
+
   /// The island map: the same header, today's suggestion, and one island per section.
   Widget _mapHome(
     BuildContext context,
     List<Widget> header,
     JourneyStore store,
   ) {
-    // Only the five main destinations live on the map. Everything else is in «المزيد».
+    // The five main destinations and the four extra sections (library, words, family activities, lessons) are islands.
     final islands = <IslandSpec>[
       IslandSpec(
         id: 'games',
@@ -468,15 +473,25 @@ class HomeTab extends StatelessWidget {
         houseStyle: 3,
         onTap: () => onTab?.call(3),
       ),
+      for (final (i, m) in _moreItems().indexed)
+        IslandSpec(
+          id: 'more$i',
+          title: m.$2,
+          emoji: m.$1,
+          grass: m.$3,
+          grassDark: Color.lerp(m.$3, Colors.black, 0.25)!,
+          houseStyle: (i + 1) % 4,
+          onTap: () => _open(context, m.$4()),
+        ),
     ];
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1120),
+        constraints: const BoxConstraints(maxWidth: 1600),
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           children: [
             ...header,
-            IslandHome(islands: islands),
+            SizedBox(height: 540, child: IslandHome(islands: islands)),
           ],
         ),
       ),
