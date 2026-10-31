@@ -49,7 +49,7 @@ class _ChildShellState extends State<ChildShell> {
       FamilyTimeStore.remind(widget.child.id, widget.child.nickname);
       if (EnginePrefs.instance.autoNarration) {
         CompanionService.react(widget.child.id, CompanionMoment.greet, age: widget.child.age).then((r) {
-          if (r == null) RehlatyAudioEngine.instance.say('hello');
+          if (r == null) RehlatyAudioEngine.instance.say('welcome_back'); // Adam's greeting (an approved recording once listed, else the device voice)
         });
       }
     });

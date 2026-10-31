@@ -209,7 +209,7 @@ void main() {
       await EnginePrefs.instance.setVoice(CharacterVoice.nour, 'en', 'Girl Voice');
       await engine.say('well_done'); // Adam
       await engine.say('lion_says'); // Nour
-      await engine.say('hello'); // companion: automatic
+      await engine.say('new_star'); // companion: automatic
       expect(sp.preferred, ['en:Boy Voice', 'en:Girl Voice', null]);
       await EnginePrefs.instance.setVoice(CharacterVoice.adam, 'en', null);
       expect(EnginePrefs.instance.voiceFor(CharacterVoice.adam, 'en'), isNull);

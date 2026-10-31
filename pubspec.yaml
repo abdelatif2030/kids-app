@@ -88,6 +88,8 @@ flutter:
     - assets/content/
     - assets/branding/logo.png
     - assets/home/home_scene.jpg
+    - assets/audio/voices/approved.json
+    - assets/audio/voices/adam/ar/
     - assets/branding/logo_art.png
     - assets/characters/
 

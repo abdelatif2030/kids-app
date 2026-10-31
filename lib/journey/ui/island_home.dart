@@ -210,7 +210,11 @@ extension on double? {
 /// reduced (and in tests), leaving the same picture standing still.
 class IslandHome extends StatefulWidget {
   final List<IslandSpec> islands;
-  const IslandHome({super.key, required this.islands});
+
+  /// Many sections (the games): when the area is bounded, put them ALL in a grid on the sea that fits the area, with no
+  /// scrolling, instead of the long sideways map of islands.
+  final bool grid;
+  const IslandHome({super.key, required this.islands, this.grid = false});
 
   /// Tests set this to true to exercise the movement; otherwise it is off under a test binding.
   static bool? forceMotion;
@@ -395,7 +399,59 @@ class _IslandHomeState extends State<IslandHome>
       top: (spot.dy * h - badge / 2).clamp(0.0, h - boxH).toDouble(),
       width: boxW,
       height: boxH,
-      child: body,
+      child: spec.overlay == null
+          ? body
+          : Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned.fill(child: body),
+                PositionedDirectional(top: -6, end: -2, child: spec.overlay!),
+              ],
+            ),
+    );
+  }
+
+  /// Every section in a grid on the sea, sized to fit the area (the games page: about twenty sections, no scrolling).
+  Widget _buildGrid(BuildContext context, double w, double h, AnimationController? c) {
+    final n = widget.islands.length;
+    final rtl = Directionality.of(context) == TextDirection.rtl;
+    final cols = math.max(1, math.min(n, math.sqrt(n * w / h).ceil()));
+    final rows = (n / cols).ceil();
+    final cellW = w / cols, cellH = h / rows;
+    final badge = math.min(cellW * 0.52, cellH * 0.5).clamp(30.0, 76.0).toDouble();
+    final font = cellH < 96 ? 10.0 : 11.5;
+    final plateW = cellW * 0.96;
+    final sea = WorldMapLayout(const [], 100, w, h, 0);
+    return Center(
+      child: SizedBox(
+        key: const ValueKey('games_grid'),
+        width: w,
+        height: h,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(
+              child: ExcludeSemantics(
+                child: IgnorePointer(
+                  child: RepaintBoundary(child: CustomPaint(painter: _SeaPainter(sea, c))),
+                ),
+              ),
+            ),
+            for (final (i, spec) in widget.islands.indexed)
+              _pictureMarker(
+                spec,
+                Offset(rtl ? 1 - ((i % cols) + 0.5) / cols : ((i % cols) + 0.5) / cols, ((i ~/ cols) + 0.5) / rows),
+                i,
+                w,
+                h,
+                badge,
+                font,
+                plateW,
+                c,
+              ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -474,6 +530,9 @@ class _IslandHomeState extends State<IslandHome>
       builder: (context, box) {
         final avail = box.maxWidth.isFinite ? box.maxWidth : 400.0;
         final screen = MediaQuery.sizeOf(context);
+        if (widget.grid && box.maxHeight.isFinite && box.maxHeight > 120 && widget.islands.isNotEmpty) {
+          return _buildGrid(context, avail, box.maxHeight, _c);
+        }
         if (!IslandHome.forceTall &&
             widget.islands.isNotEmpty &&
             widget.islands.every((i) => kHomeSceneSpots.containsKey(i.id))) {

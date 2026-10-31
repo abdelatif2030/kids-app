@@ -126,8 +126,8 @@ void main() {
 
     test('each line has exactly one speaker and a structured recording path per character and language', () {
       for (final l in kDialogue) {
-        expect(l.recordingPath('ar'), 'assets/audio/voices/${l.voice.name}/ar/${l.id}.ogg');
-        expect(l.recordingPath('en'), 'assets/audio/voices/${l.voice.name}/en/${l.id}.ogg');
+        expect(l.recordingPath('ar'), 'assets/audio/voices/${l.voice.name}/ar/${l.id}.mp3');
+        expect(l.recordingPath('en'), 'assets/audio/voices/${l.voice.name}/en/${l.id}.mp3');
       }
     });
 
@@ -294,7 +294,7 @@ void main() {
       await EnginePrefs.instance.setCharacter(CharacterVoice.adam, false);
       expect(await engine.say('well_done', force: true), EngineProblem.charactersOff); // Adam
       expect(await engine.say('try_again', force: true), EngineProblem.none); // Nour still speaks
-      expect(await engine.say('hello', force: true), EngineProblem.none); // the companion too
+      expect(await engine.say('new_star', force: true), EngineProblem.none); // the companion too
       await EnginePrefs.instance.setMasterOn(false);
       expect(await engine.say('try_again', force: true), EngineProblem.charactersOff);
       expect(engine.playCue('roll'), isFalse);
@@ -353,10 +353,10 @@ void main() {
 
     test('an approved recording is played from its structured path and the phone voice stays silent', () async {
       sp.autoFinish = true;
-      engine.recordings = const ApprovedRecordings({'companion/en/hello'});
+      engine.recordings = const ApprovedRecordings({'adam/en/hello'});
       await EnginePrefs.instance.setNarrationVolume(0.5);
       await engine.say('hello');
-      expect(played, ['assets/audio/voices/companion/en/hello.ogg@0.5']);
+      expect(played, ['assets/audio/voices/adam/en/hello.mp3@0.5']);
       expect(sp.spoken, isEmpty);
       expect(engine.lastUsedRecording, isTrue);
       // the other language of the same line is still the phone voice: approval is per language

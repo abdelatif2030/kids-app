@@ -23,15 +23,15 @@ class DialogueLine {
   String text(String lang) => lang == 'ar' ? ar : en;
 
   /// Where the recording for [lang] must be saved: one folder per character and language, one file per line id.
-  String recordingPath(String lang) => 'assets/audio/voices/${voice.name}/$lang/$id.ogg';
+  String recordingPath(String lang) => 'assets/audio/voices/${voice.name}/$lang/$id.mp3';
 }
 
 const kDialogue = <DialogueLine>[
   // welcome
-  DialogueLine('hello', CharacterVoice.companion, 'أهلاً يا بطل! مستعد نكتشف حاجة جديدة؟', 'Hello, hero! Ready to discover something new?', 'greeting on the home screen', category: LineCategory.welcome, feature: 'home'),
+  DialogueLine('hello', CharacterVoice.adam, 'أهلاً يا بطل! مستعد نكتشف حاجة جديدة؟', 'Hello, hero! Ready to discover something new?', 'greeting on the home screen', category: LineCategory.welcome, feature: 'home'),
   DialogueLine('welcome_back', CharacterVoice.adam, 'يا أهلاً! وحشتنا!', 'Hi! Good to see you!', 'opening the app again', category: LineCategory.welcome, feature: 'home'),
-  DialogueLine('new_place', CharacterVoice.companion, 'تعالى نكتشف المكان الجديد!', "Let's explore the new place!", 'a newly opened place', category: LineCategory.welcome, feature: 'world'),
-  DialogueLine('lets_play', CharacterVoice.nour, 'يلا نلعب سوا!', "Let's play together!", 'opening the games', category: LineCategory.welcome, feature: 'games'),
+  DialogueLine('new_place', CharacterVoice.adam, 'تعالى نكتشف المكان الجديد!', "Let's explore the new place!", 'a newly opened place', category: LineCategory.welcome, feature: 'world'),
+  DialogueLine('lets_play', CharacterVoice.adam, 'يلا نلعب سوا!', "Let's play together!", 'opening the games', category: LineCategory.welcome, feature: 'games'),
   // encouragement
   DialogueLine('try_again', CharacterVoice.nour, 'مش مشكلة، نجرب مرة تانية سوا!', "No problem, let's try again together!", 'after a wrong try', category: LineCategory.encouragement),
   DialogueLine('great_try', CharacterVoice.nour, 'محاولة حلوة! كمّل!', 'Nice try! Keep going!', 'encouragement', category: LineCategory.encouragement),
@@ -164,7 +164,7 @@ const kVoicePipelineSteps = [
   '1. Script: the line exists in this catalogue (text in Arabic and English, speaker, context).',
   '2. Record: a human voice actor (a young-sounding boy for Adam, a young-sounding girl for Nour) records each line in each language; Arabic in simple Egyptian colloquial for conversation.',
   '3. Check: a native Arabic speaker and an English speaker listen for pronunciation, warmth and clarity; a parent-aged listener checks it is not scary or pushy.',
-  '4. Save: put the file at the path from DialogueLine.recordingPath (assets/audio/voices/<character>/<lang>/<id>.ogg), mono, 44.1 kHz or 24 kHz, normalised, short silence trimmed.',
+  '4. Save: put the file at the path from DialogueLine.recordingPath (assets/audio/voices/<character>/<lang>/<id>.mp3 (mp3, not ogg: iPhone cannot play ogg)), mono, 44.1 kHz or 24 kHz, normalised, short silence trimmed.',
   '5. Approve: add "<character>/<lang>/<id>" to assets/audio/voices/approved.json only after steps 3 and 4. A file that is not listed there is never played.',
   '6. Verify: run the test that regenerates docs/VOICE_ASSET_STATUS.md, then listen on a real phone.',
   'Licensed text-to-speech may fill gaps only if its licence allows bundling in an app for children and a person approves each result like a human recording. Credentials stay on a build machine, never in the app.',
