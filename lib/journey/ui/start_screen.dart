@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kReleaseMode;
 import '../../online_gate.dart';
 import '../../family/family_entry.dart';
 import '../../firebase_config.dart';
@@ -96,16 +97,7 @@ class _Welcome extends StatelessWidget {
             const SizedBox(height: 10),
             Text(context.tr('start.parentFirst'), style: const TextStyle(fontSize: 15, color: RC.ink)),
             const SizedBox(height: 18),
-            // Release 1 is offline: the accounts door appears only once the online release gate is open.
-            if (lastOnlineGate.open)
-              TextButton.icon(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const TeachersEntryScreen()),
-                ),
-                icon: const Icon(Icons.school_rounded),
-                label: Text(context.tr('start.accounts'), style: const TextStyle(fontSize: 17)),
-              ),
+            _accountsDoor(context),
             // A relative on their own phone has no child profile; they come in through this door.
             if (familyRepository != null)
               TextButton.icon(
@@ -230,6 +222,7 @@ class _Picker extends StatelessWidget {
                 ),
               ],
             ),
+            Padding(padding: const EdgeInsets.only(top: 16), child: _accountsDoor(context)),
             // The door for grandparents and other relatives; hidden while the service is off.
             if (familyRepository != null)
               Padding(
@@ -246,4 +239,33 @@ class _Picker extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Sign in or create an account (Google or e-mail) for a parent or teacher. Release 1 is offline: the door appears only
+/// once the online release gate is open. In a development run with ONLINE_DEV a missing Firebase config is explained.
+Widget _accountsDoor(BuildContext context) {
+  if (!lastOnlineGate.open) {
+    if (kOnlineDevOverride && !kReleaseMode) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Text(
+          tr2(
+            'وضع التجربة مفعّل لكن ملف lib/firebase_options.dart ما زال بقيم تجريبية. انسخ ملف مشروعك الحقيقي ثم أعد التشغيل.',
+            'Development mode is on, but lib/firebase_options.dart still has placeholder values. Copy your real project file and restart.',
+          ),
+          key: const ValueKey('accounts_dev_hint'),
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 13, color: Color(0xFFB3261E)),
+        ),
+      );
+    }
+    return const SizedBox.shrink();
+  }
+  return FilledButton.icon(
+    key: const ValueKey('accounts_door'),
+    style: FilledButton.styleFrom(minimumSize: const Size(260, 52), backgroundColor: Colors.white, foregroundColor: const Color(0xFF2D3A5C)),
+    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeachersEntryScreen())),
+    icon: const Icon(Icons.g_mobiledata_rounded, size: 30),
+    label: Text(tr2('تسجيل الدخول / حساب جديد (Google أو بريد)', 'Sign in / New account (Google or e-mail)'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+  );
 }

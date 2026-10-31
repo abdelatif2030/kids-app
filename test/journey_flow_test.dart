@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/online_gate.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/journey/lands.dart';
 import 'package:kids_app/journey/models.dart';
@@ -68,6 +69,21 @@ Future<void> _answerQuiz(WidgetTester tester, int questions) async {
 Finder _field(String label) => find.widgetWithText(TextField, label);
 
 void main() {
+  testWidgets('the sign-in door (Google or e-mail) is on the first screen only when the online gate is open', (tester) async {
+    _tall(tester);
+    final saved = lastOnlineGate;
+    addTearDown(() => lastOnlineGate = saved);
+    await tester.runAsync(_newStore);
+    lastOnlineGate = const OnlineGateStatus([]); // a development run with real Firebase options
+    await tester.pumpWidget(_app(const StartScreen()));
+    await tester.pump();
+    expect(find.byKey(const ValueKey('accounts_door')), findsOneWidget);
+    lastOnlineGate = const OnlineGateStatus([OnlineGateReason.notIntended]);
+    await tester.pumpWidget(_app(const StartScreen()));
+    await tester.pump();
+    expect(find.byKey(const ValueKey('accounts_door')), findsNothing);
+  });
+
   testWidgets('a new device shows the welcome, then the picker once a child exists', (tester) async {
     _tall(tester);
     final store = await tester.runAsync(_newStore) as JourneyStore;
