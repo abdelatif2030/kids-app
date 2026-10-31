@@ -15,7 +15,13 @@ class ParentSettings {
   static const _maxAttempts = 5;
   static const _lockout = Duration(seconds: 30);
 
-  final _secure = const FlutterSecureStorage();
+  /// The PIN store. The phone's secure storage is used where it works. A browser page that is not served over HTTPS (for
+  /// example a test over the local network, `http://192.168.x.x`) has no secure storage: the PIN is already salted and
+  /// stretched, so it is kept in the page's ordinary local storage instead of failing silently.
+  _PinStore _secure = _PinStore(const FlutterSecureStorage());
+
+  /// Tests: replace the secure storage (for example with one that always fails).
+  void useStorageForTest(FlutterSecureStorage storage) => _secure = _PinStore(storage);
 
   Future<bool> hasPin() async => await _secure.read(key: 'pin_hash') != null;
 
@@ -121,4 +127,47 @@ bool constantTimeEquals(String a, String b) {
     d |= a.codeUnitAt(i) ^ b.codeUnitAt(i);
   }
   return d == 0;
+}
+
+class _PinStore {
+  final FlutterSecureStorage _storage;
+  _PinStore(this._storage);
+  bool _broken = false;
+
+  static String _k(String key) => 'sec_$key';
+
+  Future<String?> read({required String key}) async {
+    if (!_broken) {
+      try {
+        return await _storage.read(key: key);
+      } catch (_) {
+        _broken = true;
+      }
+    }
+    return (await SharedPreferences.getInstance()).getString(_k(key));
+  }
+
+  Future<void> write({required String key, required String value}) async {
+    if (!_broken) {
+      try {
+        await _storage.write(key: key, value: value);
+        return;
+      } catch (_) {
+        _broken = true;
+      }
+    }
+    await (await SharedPreferences.getInstance()).setString(_k(key), value);
+  }
+
+  Future<void> delete({required String key}) async {
+    if (!_broken) {
+      try {
+        await _storage.delete(key: key);
+        return;
+      } catch (_) {
+        _broken = true;
+      }
+    }
+    await (await SharedPreferences.getInstance()).remove(_k(key));
+  }
 }

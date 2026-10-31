@@ -375,10 +375,12 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
       const SizedBox(height: 6),
       Text(
-        tr2(
-          'أول مرة؟ اختر ولي الأمر أو المدرس من «حساب جديد» ثم اضغط Google. الدخول عبر Apple غير مفعّل بعد.',
-          'First time? Pick Parent or Teacher in the sign-up form, then press Google. Apple sign-in is not available yet.',
-        ),
+        widget.roles.length > 1
+            ? tr2(
+                'أول مرة؟ اختر ولي الأمر أو المدرس من «حساب جديد» ثم اضغط Google. الدخول عبر Apple غير مفعّل بعد.',
+                'First time? Pick Parent or Teacher in the sign-up form, then press Google. Apple sign-in is not available yet.',
+              )
+            : tr2('الدخول عبر Apple غير مفعّل بعد.', 'Apple sign-in is not available yet.'),
         textAlign: TextAlign.center,
         style: const TextStyle(color: Colors.white54, fontSize: 12),
       ),
