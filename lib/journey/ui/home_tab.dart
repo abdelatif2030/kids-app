@@ -491,7 +491,7 @@ class HomeTab extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           children: [
             ...header,
-            SizedBox(height: 540, child: IslandHome(islands: islands)),
+            IslandHome(islands: islands),
           ],
         ),
       ),

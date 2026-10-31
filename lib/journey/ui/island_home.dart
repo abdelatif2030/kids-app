@@ -78,6 +78,23 @@ class IslandSpec {
   });
 }
 
+/// The owner's own picture of the home scene (cottage, barn, well, pond and bridge) and where each section's sign goes on
+/// it: fractions of the picture's width and height. A home whose sections are all listed here is drawn on the picture
+/// (everything visible at once, no scrolling); any other set of islands (the games page) uses the sea map.
+const String kHomeScenePicture = 'assets/home/home_scene.jpg';
+const double kHomeSceneAspect = 1242 / 698;
+const Map<String, Offset> kHomeSceneSpots = {
+  'games': Offset(0.29, 0.36), // the cottage
+  'stories': Offset(0.54, 0.14), // the barn
+  'learn': Offset(0.69, 0.27), // the well
+  'create': Offset(0.12, 0.60), // the picnic table
+  'rewards': Offset(0.90, 0.20), // the cherry tree
+  'more0': Offset(0.74, 0.52), // the bridge
+  'more1': Offset(0.61, 0.74), // the pond
+  'more2': Offset(0.40, 0.82), // the path
+  'more3': Offset(0.27, 0.67), // the stump
+};
+
 /// Where the landmarks go on the world map of width [width]: one zig-zag down a single floating island, first section
 /// at the top. Pure and tested: every landmark stays inside the canvas and neighbours never overlap, whatever the
 /// reading direction ([rtl] mirrors it, so Arabic starts on the right).
@@ -235,6 +252,127 @@ class _IslandHomeState extends State<IslandHome>
     super.dispose();
   }
 
+  /// The home on the owner's own picture: every section is a round sign with a moving picture on its landmark, the whole
+  /// scene visible at once (it is sized to fit the window, never scrolled).
+  Widget _buildPicture(BuildContext context, double avail, double screenH, AnimationController? c) {
+    // A narrow window (an upright phone) gets a square crop of the picture with the signs in a 3-column grid; a wide one
+    // gets the whole picture with each sign on its own landmark.
+    final narrow = avail < 600;
+    final aspect = narrow ? 1.0 : kHomeSceneAspect;
+    final maxW = math.max(240.0, (screenH - 170) * aspect);
+    final w = math.min(avail, maxW);
+    final h = w / aspect;
+    final badge = narrow ? (w * 0.15).clamp(40.0, 64.0).toDouble() : (w * 0.075).clamp(40.0, 84.0).toDouble();
+    final font = narrow ? 11.0 : (w * 0.0165).clamp(10.0, 16.0).toDouble();
+    final n = widget.islands.length;
+    final rows = (n / 3).ceil();
+    Offset spotOf(int i, IslandSpec spec) => narrow
+        ? Offset(const [0.2, 0.5, 0.8][i % 3], ((i ~/ 3) + 0.5) / rows)
+        : kHomeSceneSpots[spec.id]!;
+    return Center(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: SizedBox(
+          key: const ValueKey('home_scene'),
+          width: w,
+          height: h,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned.fill(
+                child: ExcludeSemantics(
+                  child: Image.asset(
+                    kHomeScenePicture,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => const ColoredBox(color: Color(0xFF8ED45A)),
+                  ),
+                ),
+              ),
+              for (final (i, spec) in widget.islands.indexed)
+                _pictureMarker(spec, spotOf(i, spec), i, w, h, badge, font, c),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _pictureMarker(IslandSpec spec, Offset spot, int i, double w, double h, double badgeBase, double font, AnimationController? c) {
+    var badge = badgeBase;
+    badge = badgeBase * (1 + (spec.weight - 1) * 0.5); // the main destination is a little bigger
+    final plateW = math.max(badge * 1.9, 76.0);
+    final boxW = plateW;
+    final boxH = badge + font * 2.6 + 8;
+    Widget body = FocusableTap(
+      key: ValueKey('island_${spec.id}'),
+      onTap: spec.onTap,
+      radius: 18,
+      semanticLabel: spec.title,
+      child: SizedBox(
+        width: boxW,
+        height: boxH,
+        // Large text scales the whole sign down to fit its spot instead of overflowing.
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.topCenter,
+          child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: badge,
+              height: badge,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(color: spec.grassDark, width: 4),
+                boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 8, offset: Offset(0, 3))],
+              ),
+              child: ExcludeSemantics(
+                child: _MovingEmoji(emoji: spec.emoji, fontSize: badge * 0.52, t: c, phase: (spec.id.hashCode % 97) / 97),
+              ),
+            ),
+            const SizedBox(height: 3),
+            Container(
+              constraints: BoxConstraints(maxWidth: plateW),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF3D6),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFF6B45D6), width: 2),
+              ),
+              child: Text(
+                spec.title,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: font, fontWeight: FontWeight.w900, color: const Color(0xFF4A3320), height: 1.05),
+              ),
+            ),
+          ],
+        ),
+        ),
+      ),
+    );
+    if (c != null) {
+      body = AnimatedBuilder(
+        animation: c,
+        child: body,
+        builder: (context, ch) => Transform.translate(
+          offset: Offset(0, math.sin((c.value * 6 + i * 0.31) * 2 * math.pi) * 4),
+          child: ch,
+        ),
+      );
+    }
+    return Positioned(
+      left: (spot.dx * w - boxW / 2).clamp(0.0, w - boxW).toDouble(),
+      top: (spot.dy * h - badge / 2).clamp(0.0, h - boxH).toDouble(),
+      width: boxW,
+      height: boxH,
+      child: body,
+    );
+  }
+
   /// The horizontal map: a sea with every section on its own floating island, joined by rope bridges.
   Widget _buildWide(
     BuildContext context,
@@ -310,6 +448,11 @@ class _IslandHomeState extends State<IslandHome>
       builder: (context, box) {
         final avail = box.maxWidth.isFinite ? box.maxWidth : 400.0;
         final screen = MediaQuery.sizeOf(context);
+        if (!IslandHome.forceTall &&
+            widget.islands.isNotEmpty &&
+            widget.islands.every((i) => kHomeSceneSpots.containsKey(i.id))) {
+          return _buildPicture(context, avail, screen.height, _c);
+        }
         // The map always runs sideways (owner decision), on a phone held upright too: it slides left and right
         // (it starts on the right in Arabic). The tall map stays only as a tested layout and is not shown.
         final wide = !IslandHome.forceTall;

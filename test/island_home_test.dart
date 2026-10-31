@@ -181,6 +181,33 @@ void main() {
     );
 
     testWidgets(
+      'the home sections sit on the owner\'s picture, all visible at once, in a wide window and on an upright phone',
+      (t) async {
+        const ids = ['games', 'stories', 'learn', 'create', 'rewards', 'more0', 'more1', 'more2', 'more3'];
+        for (final size in [const Size(1280, 800), const Size(390, 800)]) {
+          t.view.physicalSize = size;
+          t.view.devicePixelRatio = 1;
+          addTearDown(t.view.reset);
+          await t.pumpWidget(
+            MaterialApp(
+              key: UniqueKey(),
+              home: Scaffold(body: SingleChildScrollView(child: IslandHome(islands: [for (final id in ids) spec(id, () {})]))),
+            ),
+          );
+          await t.pump();
+          final scene = t.getRect(find.byKey(const ValueKey('home_scene')));
+          expect(scene.right, lessThanOrEqualTo(size.width + 0.5));
+          expect(find.byKey(const ValueKey('world_map_scroll')), findsNothing);
+          for (final id in ids) {
+            final r = t.getRect(find.byKey(ValueKey('island_$id')));
+            expect(scene.contains(r.center), isTrue, reason: '$id inside the picture ($size)');
+          }
+          expect(t.takeException(), isNull);
+        }
+      },
+    );
+
+    testWidgets(
       'the pictures on the houses move when motion is allowed, and stand still otherwise',
       (t) async {
         IslandHome.forceMotion = true;

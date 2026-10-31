@@ -87,6 +87,7 @@ flutter:
     - assets/audio/comparison/
     - assets/content/
     - assets/branding/logo.png
+    - assets/home/home_scene.jpg
     - assets/branding/logo_art.png
     - assets/characters/
 
