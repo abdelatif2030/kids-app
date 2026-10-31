@@ -198,6 +198,9 @@ class IslandHome extends StatefulWidget {
   /// Tests set this to true to exercise the movement; otherwise it is off under a test binding.
   static bool? forceMotion;
 
+  /// Tests only: show the old tall map (kept as a tested layout). The app always shows the sideways map.
+  static bool forceTall = false;
+
   @override
   State<IslandHome> createState() => _IslandHomeState();
 }
@@ -307,8 +310,9 @@ class _IslandHomeState extends State<IslandHome>
       builder: (context, box) {
         final avail = box.maxWidth.isFinite ? box.maxWidth : 400.0;
         final screen = MediaQuery.sizeOf(context);
-        // Landscape windows get the horizontal map; a portrait phone keeps the tall one.
-        final wide = avail >= 700 || avail > screen.height * 1.1;
+        // The map always runs sideways (owner decision), on a phone held upright too: it slides left and right
+        // (it starts on the right in Arabic). The tall map stays only as a tested layout and is not shown.
+        final wide = !IslandHome.forceTall;
         final weights = [for (final i in widget.islands) i.weight];
         final layout = wide
             ? computeWideMapLayout(
@@ -474,7 +478,7 @@ class _House extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFFFFF3D6),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFF9A6B3A), width: 3),
+                border: Border.all(color: const Color(0xFF6B45D6), width: 3),
                 boxShadow: const [
                   BoxShadow(
                     color: Color(0x33000000),
@@ -588,7 +592,7 @@ class _SeaPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFF8ED6F8), Color(0xFFD9F3FF)],
+          colors: [Color(0xFFB9A7FF), Color(0xFFEDE6FF)],
         ).createShader(Rect.fromLTWH(0, 0, s.width, horizon)),
     );
     canvas.drawRect(
@@ -597,7 +601,7 @@ class _SeaPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFF45C8E8), Color(0xFF1C8FD0), Color(0xFF1470B8)],
+          colors: [Color(0xFF4FC3F0), Color(0xFF2F7FE0), Color(0xFF4B3BB8)],
         ).createShader(Rect.fromLTWH(0, horizon, s.width, s.height - horizon)),
     );
     final cloud = Paint()..color = const Color(0xE6FFFFFF);

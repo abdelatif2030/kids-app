@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, kReleaseMode;
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'teachers_market.dart';
@@ -53,7 +53,9 @@ class FirebaseTeacherRepository implements TeacherRepository {
           loc('البريد أو كلمة المرور غير صحيحة'),
         'too-many-requests' => loc('محاولات كثيرة، حاول لاحقاً'),
         'network-request-failed' => loc('لا يوجد اتصال بالإنترنت'),
-        _ => loc('تعذر إكمال العملية، حاول مرة أخرى'),
+        // In a development run the Firebase error code is shown too, so a setup problem (a disabled provider, a blocked
+        // domain, a network cut) can be named. A release build shows only the plain message.
+        _ => kReleaseMode ? loc('تعذر إكمال العملية، حاول مرة أخرى') : '${loc('تعذر إكمال العملية، حاول مرة أخرى')} (${e.code})',
       };
 
   Future<T> _guard<T>(Future<T> Function() run) async {

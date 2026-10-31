@@ -152,12 +152,9 @@ void main() {
 
   group('IslandHome widget', () {
     testWidgets(
-      'a landscape window gets the horizontal map, a portrait phone keeps the tall one',
+      'the map always runs sideways, on a landscape window and on an upright phone',
       (t) async {
-        for (final (size, wide) in [
-          (const Size(1280, 800), true),
-          (const Size(390, 800), false),
-        ]) {
+        for (final size in [const Size(1280, 800), const Size(390, 800)]) {
           t.view.physicalSize = size;
           t.view.devicePixelRatio = 1;
           addTearDown(t.view.reset);
@@ -174,13 +171,10 @@ void main() {
             ),
           );
           await t.pump();
-          final left = t.getTopLeft(find.byKey(const ValueKey('island_w0')));
-          final last = t.getTopLeft(find.byKey(const ValueKey('island_w4')));
-          if (wide) {
-            expect((last.dx - left.dx).abs(), greaterThan(600));
-          } else {
-            expect((last.dx - left.dx).abs(), lessThan(300));
-          }
+          final first = t.getTopLeft(find.byKey(const ValueKey('island_w0')));
+          final second = t.getTopLeft(find.byKey(const ValueKey('island_w1')));
+          // neighbours sit side by side (well apart in x), never stacked down the screen
+          expect((second.dx - first.dx).abs(), greaterThan(100));
           expect(t.takeException(), isNull);
         }
       },
