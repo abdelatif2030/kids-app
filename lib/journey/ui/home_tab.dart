@@ -84,16 +84,18 @@ class HomeTab extends StatelessWidget {
           }
         }
         final young = child.age <= 6;
+        // A short screen (a phone held sideways): the greeting row becomes a small pill over the picture.
+        final compactHeader = !more && MediaQuery.sizeOf(context).height < 500;
         final header = <Widget>[
           Row(
             children: [
-              ChildAvatar(child: child, size: 48),
+              ChildAvatar(child: child, size: compactHeader ? 30 : 48),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (!more)
+                    if (!more && !compactHeader)
                       Text(
                         tr2('أهلاً يا بطل!', 'Hello, hero!'),
                         style: const TextStyle(
@@ -106,8 +108,8 @@ class HomeTab extends StatelessWidget {
                       child.nickname,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 20,
+                      style: TextStyle(
+                        fontSize: compactHeader ? 14 : 20,
                         fontWeight: FontWeight.w900,
                         color: RC.ink,
                       ),
@@ -484,6 +486,32 @@ class HomeTab extends StatelessWidget {
           onTap: () => _open(context, m.$4()),
         ),
     ];
+    // A short screen: the picture fills everything and the greeting row floats over it as a small pill.
+    if (MediaQuery.sizeOf(context).height < 500) {
+      return Stack(
+        children: [
+          Positioned.fill(child: IslandHome(islands: islands)),
+          PositionedDirectional(
+            top: 4,
+            start: 6,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Colors.white.withAlpha(215),
+                  borderRadius: BorderRadius.circular(26),
+                  boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 6)],
+                ),
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.fromSTEB(8, 2, 8, 2),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: header),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
     // The greeting row on top; the picture fills everything under it (no scrolling, no empty strip below).
     return Column(
       children: [

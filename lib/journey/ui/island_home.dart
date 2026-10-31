@@ -263,7 +263,8 @@ class _IslandHomeState extends State<IslandHome>
     final h = fill ? boundedH : w / (avail < 600 ? 1.0 : kHomeSceneAspect);
     final a = w / h;
     final n = widget.islands.length;
-    final mode = a <= 1.3 ? 0 : (a >= 2.3 ? 1 : 2); // 0: 3-column grid, 1: two rows, 2: landmarks
+    // 0: 3-column grid (upright phone), 1: two rows (a short screen: a phone held sideways), 2: landmarks.
+    final mode = a <= 1.3 ? 0 : ((a >= 2.3 || h < 460) ? 1 : 2);
     final cols = mode == 0 ? 3 : (mode == 1 ? (n / 2).ceil() : 0);
     final rows = mode == 0 ? (n / 3).ceil() : (mode == 1 ? 2 : 0);
     Offset spotOf(int i, IslandSpec spec) {
