@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../games/fun_games.dart';
 
 import '../../design/layout.dart';
 import '../../design/motion_system.dart';
@@ -334,7 +333,7 @@ class _GamesTabState extends State<_GamesTab> {
               ),
               ChoiceChip(
                 key: const ValueKey('games_fun'),
-                label: Text(tr2('ألعاب ترفيهية', 'Fun games'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
+                label: Text(tr2('ألعب مع رحلتي', 'Play with Rehlaty'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
                 selected: _fun,
                 onSelected: (_) => setState(() => _fun = true),
               ),
@@ -343,10 +342,36 @@ class _GamesTabState extends State<_GamesTab> {
         ),
         Expanded(
           child: _fun
-              ? FunGamesGrid(key: const ValueKey('fun_grid'), age: widget.child.age)
+              ? const _PlayWithRehlaty(key: ValueKey('play_with_rehlaty'))
               : GamesGrid(key: const ValueKey('edu_grid'), age: widget.child.age, child: widget.child),
         ),
       ],
+    );
+  }
+}
+
+/// «ألعب مع رحلتي»: a place kept for real games to come. It is empty on purpose for now.
+class _PlayWithRehlaty extends StatelessWidget {
+  const _PlayWithRehlaty({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('🎮', style: TextStyle(fontSize: 64)),
+            const SizedBox(height: 10),
+            Text(
+              tr2('ألعاب جديدة قريباً!', 'New games are coming soon!'),
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: RC.ink),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

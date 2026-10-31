@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:kids_app/design/layout.dart';
 import 'package:kids_app/games/fun_games.dart';
+import 'package:kids_app/games_screen.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 
 Future<void> _show(WidgetTester t, Widget w, {Size size = const Size(900, 800)}) async {
@@ -12,7 +15,10 @@ Future<void> _show(WidgetTester t, Widget w, {Size size = const Size(900, 800)})
 }
 
 void main() {
-  setUp(() => AppLocale.instance.set('ar'));
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+    return AppLocale.instance.set('ar');
+  });
   tearDown(() => AppLocale.instance.set('ar'));
 
   test('the fun games are listed by age: the youngest get the simplest', () {
@@ -22,10 +28,10 @@ void main() {
     expect(funGamesForAge(1), isEmpty);
   });
 
-  testWidgets('the fun games grid shows every game for the age at once', (t) async {
-    await _show(t, const Scaffold(body: SizedBox(height: 500, child: FunGamesGrid(age: 5))));
+  testWidgets('the casual games sit with the learning games in one grid (the "Play with Rehlaty" tab is empty for now)', (t) async {
+    await _show(t, const Scaffold(body: SizedBox(height: 520, child: GamesGrid(age: 5))), size: const Size(1300, 800));
     for (final g in funGamesForAge(5)) {
-      expect(find.byKey(ValueKey('island_fun_${g.id}')), findsOneWidget, reason: g.id);
+      expect(find.byKey(ValueKey('island_game_fun_${g.id}')), findsOneWidget, reason: g.id);
     }
     expect(find.byKey(const ValueKey('games_grid')), findsOneWidget);
   });
@@ -74,5 +80,27 @@ void main() {
     await t.pump(const Duration(seconds: 6));
     expect(t.takeException(), isNull);
     await t.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('FitHeight lays a tall game out for a short screen and scales it down: nothing overflows and taps still work', (t) async {
+    var taps = 0;
+    t.view.physicalSize = const Size(844, 330);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.reset);
+    await t.pumpWidget(MaterialApp(
+      home: Scaffold(
+        body: FitHeight(
+          child: Column(children: [
+            const SizedBox(height: 480),
+            ElevatedButton(key: const ValueKey('low_button'), onPressed: () => taps++, child: const Text('x')),
+          ]),
+        ),
+      ),
+    ));
+    await t.pump();
+    expect(t.takeException(), isNull);
+    expect(t.getRect(find.byKey(const ValueKey('low_button'))).bottom, lessThanOrEqualTo(330));
+    await t.tap(find.byKey(const ValueKey('low_button')));
+    expect(taps, 1);
   });
 }

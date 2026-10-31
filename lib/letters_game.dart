@@ -4,6 +4,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'design/layout.dart';
+
 import 'journey/repository.dart';
 import 'progress_store.dart';
 import 'rest_screen.dart';
@@ -150,7 +152,7 @@ class _LettersGameState extends State<LettersGame> {
         backgroundColor: Colors.transparent,
         title: Text(loc('حروف وكلمات'), style: const TextStyle(fontSize: 26)),
       ),
-      body: Center(
+      body: FitHeight(child: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -223,7 +225,7 @@ class _LettersGameState extends State<LettersGame> {
             ],
           ),
         ),
-      ),
+      )),
     );
   }
 }

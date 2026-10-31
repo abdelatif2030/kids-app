@@ -4,6 +4,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'design/layout.dart';
+
 import 'journey/repository.dart';
 import 'progress_store.dart';
 import 'rest_screen.dart';
@@ -124,7 +126,7 @@ class _MathGameState extends State<MathGame> {
         backgroundColor: Colors.transparent,
         title: Text(loc('رياضيات'), style: TextStyle(fontSize: 26)),
       ),
-      body: Center(
+      body: FitHeight(child: Center(
         child: _done
             ? StarDone(onAgain: _again)
             : SingleChildScrollView(
@@ -188,7 +190,7 @@ class _MathGameState extends State<MathGame> {
                   ],
                 ),
               ),
-      ),
+      )),
     );
   }
 }

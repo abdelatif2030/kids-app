@@ -78,3 +78,32 @@ class CenteredList extends StatelessWidget {
     );
   }
 }
+
+/// Lays a game out as if the screen were at least [designHeight] tall and then scales it down to fit the real screen. A
+/// phone held sideways is only about 330 px tall under the app bar: the whole game stays visible and playable without
+/// scrolling (a little smaller) instead of running off the bottom. On a taller screen it does nothing.
+class FitHeight extends StatelessWidget {
+  final double designHeight;
+  final Widget child;
+  const FitHeight({super.key, this.designHeight = 560, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, c) {
+        final h = c.maxHeight;
+        if (!h.isFinite || !c.maxWidth.isFinite || h >= designHeight) return child;
+        final w = c.maxWidth * designHeight / h;
+        final mq = MediaQuery.of(context);
+        return FittedBox(
+          fit: BoxFit.contain,
+          child: SizedBox(
+            width: w,
+            height: designHeight,
+            child: MediaQuery(data: mq.copyWith(size: Size(w, designHeight)), child: child),
+          ),
+        );
+      },
+    );
+  }
+}

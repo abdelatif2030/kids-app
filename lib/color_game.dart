@@ -4,6 +4,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'design/layout.dart';
+
 import 'journey/repository.dart';
 import 'progress_store.dart';
 import 'rest_screen.dart';
@@ -120,7 +122,7 @@ class _ColorGameState extends State<ColorGame> {
         backgroundColor: Colors.transparent,
         title: Text(loc('لعبة الألوان'), style: TextStyle(fontSize: 26)),
       ),
-      body: Center(
+      body: FitHeight(child: Center(
         child: _done
             ? Column(
                 mainAxisSize: MainAxisSize.min,
@@ -193,7 +195,7 @@ class _ColorGameState extends State<ColorGame> {
                   ],
                 ),
               ),
-      ),
+      )),
     );
   }
 }

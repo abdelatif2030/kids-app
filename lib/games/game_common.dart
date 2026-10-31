@@ -109,6 +109,10 @@ class GameScaffold extends StatelessWidget {
 
   /// Which visual world the game lives in (forest for letters and words, ocean for listening, space for numbers).
   final RWorld world;
+
+  /// Lay the game out for a taller screen and scale it down when the screen is short (a phone held sideways). Games that
+  /// already lay themselves out for landscape (the adventure games) turn it off.
+  final bool fit;
   const GameScaffold({
     super.key,
     required this.title,
@@ -116,6 +120,7 @@ class GameScaffold extends StatelessWidget {
     required this.child,
     this.confirmLeave = false,
     this.world = RWorld.journey,
+    this.fit = true,
   });
 
   Future<void> _askLeave(BuildContext context) async {
@@ -182,7 +187,7 @@ class GameScaffold extends StatelessWidget {
         child: PastelBackground(
         world: world,
         child: SafeArea(
-          child: LayoutBuilder(
+          child: _MaybeFit(fit: fit, child: LayoutBuilder(
             builder: (context, box) {
               // Tablet or desktop in landscape: the instruction moves to a side card so the board can use the height.
               final sideBySide =
@@ -244,7 +249,7 @@ class GameScaffold extends StatelessWidget {
                 ],
               );
             },
-          ),
+          )),
         ),
         ),
       ),
@@ -465,4 +470,13 @@ class _GameFinishPanelState extends State<GameFinishPanel> {
       ),
     );
   }
+}
+
+class _MaybeFit extends StatelessWidget {
+  final bool fit;
+  final Widget child;
+  const _MaybeFit({required this.fit, required this.child});
+
+  @override
+  Widget build(BuildContext context) => fit ? FitHeight(child: child) : child;
 }

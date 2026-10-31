@@ -4,8 +4,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../design/layout.dart';
 import '../design/worlds.dart';
-import '../journey/ui/island_home.dart';
 import '../l10n/strings.dart';
 
 /// «ألعاب ترفيهية»: simple original games in the style of the casual games on a phone. They are only for fun: no
@@ -29,40 +29,6 @@ final List<FunGame> kFunGames = [
 
 List<FunGame> funGamesForAge(int age) => [for (final g in kFunGames) if (age >= g.minAge) g];
 
-/// All the fun games for [age] at once, on the sea, like the learning games.
-class FunGamesGrid extends StatelessWidget {
-  final int age;
-  const FunGamesGrid({super.key, required this.age});
-
-  static const _palette = [
-    (Color(0xFFFFC45E), Color(0xFFE09A22)),
-    (Color(0xFFC9A6F0), Color(0xFF9468CC)),
-    (Color(0xFF8BD450), Color(0xFF5FA832)),
-    (Color(0xFFFF9DB8), Color(0xFFDB6A8D)),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final games = funGamesForAge(age);
-    final islands = [
-      for (final (i, g) in games.indexed)
-        IslandSpec(
-          id: 'fun_${g.id}',
-          title: g.title(),
-          emoji: g.emoji,
-          grass: _palette[i % _palette.length].$1,
-          grassDark: _palette[i % _palette.length].$2,
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => g.build())),
-        ),
-    ];
-    return LayoutBuilder(
-      builder: (context, box) => box.maxHeight.isFinite
-          ? IslandHome(islands: islands, grid: true)
-          : SizedBox(height: 420, child: IslandHome(islands: islands, grid: true)),
-    );
-  }
-}
-
 class _FunScaffold extends StatelessWidget {
   final String title;
   final Widget child;
@@ -72,7 +38,7 @@ class _FunScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(backgroundColor: Colors.transparent, title: Text(title, style: const TextStyle(fontSize: 24))),
-      body: WorldBackground(world: RWorld.journey, child: SafeArea(child: child)),
+      body: WorldBackground(world: RWorld.journey, child: SafeArea(child: FitHeight(child: child))),
     );
   }
 }

@@ -62,6 +62,10 @@ const Map<String, String> kGameEmoji = {
   'review_words': '⭐',
   'trace_letters': '✍️',
   'word_book': '📖',
+  'fun_whack': '🐹',
+  'fun_stars': '⭐',
+  'fun_xo': '❌',
+  'fun_snake': '🐍',
 };
 
 final List<GameInfo> kEducationalGames = [

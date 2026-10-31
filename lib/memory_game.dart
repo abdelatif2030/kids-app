@@ -3,6 +3,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'design/layout.dart';
+
 import 'ui.dart';
 import 'l10n/strings.dart';
 
@@ -77,7 +79,7 @@ class _MemoryGameState extends State<MemoryGame> {
         backgroundColor: Colors.transparent,
         title: Text(loc('لعبة الذاكرة'), style: TextStyle(fontSize: 26)),
       ),
-      body: Center(
+      body: FitHeight(child: Center(
         child: done
             ? Column(
                 mainAxisSize: MainAxisSize.min,
@@ -122,7 +124,7 @@ class _MemoryGameState extends State<MemoryGame> {
                   ],
                 ),
               ),
-      ),
+      )),
     );
   }
 }

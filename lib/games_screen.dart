@@ -2,7 +2,10 @@ import 'design/focusable_tap.dart';
 
 import 'package:flutter/material.dart';
 
+import 'design/layout.dart';
+
 import 'color_game.dart';
+import 'games/fun_games.dart';
 import 'games/game_catalog.dart';
 import 'games/game_common.dart';
 import 'journey/models.dart';
@@ -128,6 +131,13 @@ class _GamesGridState extends State<GamesGrid> {
                 ],
               ),
             ),
+          // The casual games (whack the mole, catch the stars, tic-tac-toe, snake): for fun, no stars or scores.
+          for (final g in funGamesForAge(age))
+            spec(
+              id: 'fun_${g.id}',
+              title: g.title(),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => g.build())),
+            ),
         ];
         // Inside a bounded area (the games tab) the map takes all of it; elsewhere it has its own height.
         return LayoutBuilder(
@@ -192,7 +202,7 @@ class _BalloonGameState extends State<BalloonGame> {
         backgroundColor: Colors.transparent,
         title: Text(loc('افرقع البالونات'), style: TextStyle(fontSize: 26)),
       ),
-      body: Center(
+      body: FitHeight(child: Center(
         child: done
             ? Column(
                 mainAxisSize: MainAxisSize.min,
@@ -240,7 +250,7 @@ class _BalloonGameState extends State<BalloonGame> {
                     ),
                 ],
               ),
-      ),
+      )),
     );
   }
 }

@@ -97,6 +97,7 @@ class _SnakesLaddersState extends State<SnakesLaddersGame> {
     final title = tr2('السلالم والزلاجات', 'Ladders and slides');
     if (_g.childFinished) {
       return GameScaffold(
+      fit: false,
         world: RWorld.story,
         title: title,
         child: GameFinishPanel(
@@ -112,6 +113,7 @@ class _SnakesLaddersState extends State<SnakesLaddersGame> {
     }
     final n = _g.board.size;
     return GameScaffold(
+      fit: false,
       world: RWorld.story,
       title: title,
       instruction: tr2('ارمِ النرد وصل إلى النهاية! السلالم تصعد بك.', 'Roll the dice and reach the end! Ladders take you up.'),
@@ -285,6 +287,7 @@ class _JigsawState extends State<JigsawGame> {
     final title = tr2('تركيب الصورة', 'Puzzle picture');
     if (_p.complete) {
       return GameScaffold(
+      fit: false,
         world: RWorld.forest,
         title: title,
         child: GameFinishPanel(childId: widget.childId, gameId: JigsawGame.gameId, onAgain: () => setState(() {
@@ -294,6 +297,7 @@ class _JigsawState extends State<JigsawGame> {
       );
     }
     return GameScaffold(
+      fit: false,
       world: RWorld.forest,
       title: title,
       instruction: tr2('اسحب كل قطعة إلى مكانها، أو اضغط القطعة ثم المكان.', 'Drag each piece to its place, or tap a piece and then a place.'),
@@ -426,6 +430,7 @@ class _MazeState extends State<MazeGame> {
     final title = tr2('الفأر والجبن', 'Mouse and cheese');
     if (_round >= _sizes.length) {
       return GameScaffold(
+      fit: false,
         world: RWorld.forest,
         title: title,
         child: GameFinishPanel(childId: widget.childId, gameId: MazeGame.gameId, onAgain: () => setState(() {
@@ -440,6 +445,7 @@ class _MazeState extends State<MazeGame> {
     final from = (_x, _y);
     final solveFromHere = _hint ? _pathFrom(from) : const <(int, int)>[];
     return GameScaffold(
+      fit: false,
       world: RWorld.forest,
       title: title,
       instruction: tr2('ساعد الفأر ليصل إلى الجبنة', 'Help the mouse reach the cheese'),
@@ -635,6 +641,7 @@ class _TreasureState extends State<TreasureHuntGame> {
     final title = tr2('كنز الجزيرة', 'Island treasure');
     if (_round >= rounds) {
       return GameScaffold(
+      fit: false,
         world: RWorld.ocean,
         title: title,
         child: GameFinishPanel(childId: widget.childId, gameId: TreasureHuntGame.gameId, onAgain: () => setState(() {
@@ -648,6 +655,7 @@ class _TreasureState extends State<TreasureHuntGame> {
     }
     final n = _map.cols;
     return GameScaffold(
+      fit: false,
       world: RWorld.ocean,
       title: title,
       instruction: tr2('اقرأ الأدلة وابحث عن الكنز على الخريطة', 'Read the clues and find the treasure on the map'),
@@ -769,6 +777,7 @@ class _DotsState extends State<ConnectDotsGame> {
     final title = tr2('وصّل النقاط', 'Connect the dots');
     if (_i >= _shapes.length) {
       return GameScaffold(
+      fit: false,
         world: RWorld.space,
         title: title,
         child: GameFinishPanel(childId: widget.childId, gameId: ConnectDotsGame.gameId, onAgain: () => setState(() {
@@ -779,6 +788,7 @@ class _DotsState extends State<ConnectDotsGame> {
       );
     }
     return GameScaffold(
+      fit: false,
       world: RWorld.space,
       title: title,
       instruction: tr2('اضغط النقاط بالترتيب: 1 ثم 2 ثم 3...', 'Tap the dots in order: 1, then 2, then 3...'),
@@ -909,6 +919,7 @@ class _HabitatsState extends State<AnimalHabitatsGame> {
     final title = tr2('أين يعيش؟', 'Where does it live?');
     if (_round >= rounds) {
       return GameScaffold(
+      fit: false,
         world: RWorld.forest,
         title: title,
         child: GameFinishPanel(childId: widget.childId, gameId: AnimalHabitatsGame.gameId, onAgain: () => setState(() {
@@ -921,6 +932,7 @@ class _HabitatsState extends State<AnimalHabitatsGame> {
     final remaining = [for (final a in _h.animals) if (!_h.placed.contains(a.id)) a];
     final homeW = ((min(MediaQuery.sizeOf(context).width, 760) - 24 - 12 * (_h.homes.length - 1)) / _h.homes.length).clamp(92.0, 170.0);
     return GameScaffold(
+      fit: false,
       world: RWorld.forest,
       title: title,
       instruction: tr2('اسحب الحيوان إلى بيته، أو اضغطه ثم اضغط بيته', 'Drag the animal to its home, or tap it and then tap its home'),

@@ -3,6 +3,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import 'design/layout.dart';
+
 import 'ui.dart';
 import 'l10n/strings.dart';
 
@@ -50,7 +52,7 @@ class _WhereAnimalGameState extends State<WhereAnimalGame> {
         backgroundColor: Colors.transparent,
         title: Text(loc('فين الحيوان؟'), style: TextStyle(fontSize: 26)),
       ),
-      body: Center(
+      body: FitHeight(child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -92,7 +94,7 @@ class _WhereAnimalGameState extends State<WhereAnimalGame> {
               ),
           ],
         ),
-      ),
+      )),
     );
   }
 }
