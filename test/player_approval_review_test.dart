@@ -47,18 +47,20 @@ void main() {
     expect(p, contains('loop: false'));
   });
 
-  test('the shipped catalogue has no approval of any kind, and the status document says 0 of 157 reviewed', () {
+  test('the shipped catalogue records the owner\'s review and nothing else: the app itself verified no video', () {
     final list = jsonDecode(File('assets/videos.json').readAsStringSync()) as List<dynamic>;
     expect(list.length, 157);
     for (final e in list.cast<Map<String, dynamic>>()) {
-      expect(e['verification'], 'unverified', reason: e['youtubeId'] as String);
-      expect(e.containsKey('approval') && e['approval'] == 'approved' && e.containsKey('reviewedBy'), isFalse);
-      expect(e.keys.where((k) => k.toLowerCase().contains('review') || k.toLowerCase().contains('approved')), isEmpty);
+      expect(e['verification'], 'unverified', reason: e['youtubeId'] as String); // never "verified" by the app
+      expect(e['ownerReviewed'], true, reason: e['youtubeId'] as String); // the owner's statement of 2026-10-31
+      expect(e.containsKey('reviewedBy') || e.containsKey('approval'), isFalse);
     }
-    expect(File('docs/VIDEO_REVIEW_STATUS.md').readAsStringSync(), contains('0 of 157'));
+    final status = File('docs/VIDEO_REVIEW_STATUS.md').readAsStringSync();
+    expect(status, contains('157 of 157'));
+    expect(status, contains('owner'));
     final csv = File('docs/VIDEO_CANDIDATES.csv').readAsLinesSync().skip(1);
     for (final line in csv) {
-      expect(line.contains('unverified candidate, not approved'), isTrue);
+      expect(line.contains('reviewed by the owner'), isTrue);
     }
   });
 

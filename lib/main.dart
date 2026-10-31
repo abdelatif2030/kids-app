@@ -144,6 +144,11 @@ class Video {
   /// video `verified`; a parent's preview and approval are the family's decision, not a verification by the app.
   final String verification;
 
+  /// True when the owner of the app reviewed this bundled video and allows it (2026-10-31: the owner said he had
+  /// watched all 157 and they are fine). It is the owner's decision, not a verification by the app, so
+  /// [verification] stays `unverified`. A parent can still hide any video on this device.
+  final bool ownerReviewed;
+
   /// `bundled` (listed in assets/videos.json) or `parent` (added by a parent by exact link on this device).
   final String origin;
   const Video({
@@ -157,6 +162,7 @@ class Video {
     this.approval = 'approved',
     this.origin = 'bundled',
     this.verification = 'unverified',
+    this.ownerReviewed = false,
   });
 
   factory Video.fromJson(Map<String, dynamic> json) => Video(
@@ -169,7 +175,11 @@ class Video {
     subject: json['subject'] as String? ?? 'discover',
     approval: json['approval'] as String? ?? 'approved',
     verification: json['verification'] as String? ?? 'unverified',
+    ownerReviewed: Video.honourOwnerReview && json['ownerReviewed'] == true,
   );
+
+  /// Tests of the parent's own approval workflow switch this off, to look at a video the owner has not reviewed.
+  static bool honourOwnerReview = true;
 
   bool get approved => approval == 'approved';
 }
@@ -187,7 +197,7 @@ Future<List<Video>> loadVideos({bool all = false}) async {
   if (all) return videos;
   final hidden = await VideoControls.hidden();
   final approved = await LessonStore.approved();
-  return [for (final v in videos) if (v.approved && approved.contains(v.youtubeId) && !hidden.contains(v.youtubeId)) v];
+  return [for (final v in videos) if (v.approved && (approved.contains(v.youtubeId) || v.ownerReviewed) && !hidden.contains(v.youtubeId)) v];
 }
 
 class _VideoCard extends StatelessWidget {

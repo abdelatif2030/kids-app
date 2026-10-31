@@ -18,8 +18,13 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await AppLocale.instance.set('en');
+    // These tests look at the parent's own preview-and-approve workflow, so the owner's bundled approval is set aside.
+    Video.honourOwnerReview = false;
   });
-  tearDown(() => AppLocale.instance.set('ar'));
+  tearDown(() {
+    Video.honourOwnerReview = true;
+    return AppLocale.instance.set('ar');
+  });
 
   group('links', () {
     test('only an exact single YouTube video link is accepted', () {

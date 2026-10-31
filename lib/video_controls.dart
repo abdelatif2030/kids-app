@@ -42,7 +42,7 @@ VideoVisibility visibilityOf(Video v, Set<String> hidden, [Set<String>? approved
   if (v.approval == 'pending') return VideoVisibility.pending;
   if (v.approval == 'rejected') return VideoVisibility.rejected;
   if (rejectedByParent != null && rejectedByParent.contains(v.youtubeId)) return VideoVisibility.rejectedByParent;
-  if (approved != null && !approved.contains(v.youtubeId)) return VideoVisibility.awaitingApproval;
+  if (approved != null && !approved.contains(v.youtubeId) && !v.ownerReviewed) return VideoVisibility.awaitingApproval;
   return hidden.contains(v.youtubeId) ? VideoVisibility.hiddenByParent : VideoVisibility.visible;
 }
 

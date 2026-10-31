@@ -12,8 +12,25 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await AppLocale.instance.set('en');
+    // These tests look at the parent's own preview-and-approve workflow, so the owner's bundled approval is set aside.
+    Video.honourOwnerReview = false;
   });
-  tearDown(() => AppLocale.instance.set('ar'));
+  tearDown(() {
+    Video.honourOwnerReview = true;
+    return AppLocale.instance.set('ar');
+  });
+
+  test('the owner reviewed the bundled videos: a child sees them by default, and a parent can still hide any of them', () async {
+    Video.honourOwnerReview = true;
+    final all = await loadVideos(all: true);
+    expect(all.every((v) => v.ownerReviewed && v.verification == 'unverified'), isTrue); // the owner approved; the app verified nothing
+    expect((await loadVideos()).length, all.length);
+    final id = all.first.youtubeId;
+    await VideoControls.setHidden(id, true);
+    expect((await loadVideos()).map((v) => v.youtubeId), isNot(contains(id)));
+    expect(visibilityOf(all.first, {id}, <String>{}), VideoVisibility.hiddenByParent);
+    expect(visibilityOf(all.last, <String>{}, <String>{}), VideoVisibility.visible);
+  });
 
   test('a video without an approval field is approved; pending and rejected are never shown', () {
     expect(Video.fromJson({'youtubeId': 'a', 'title': 't', 'category': 'Fun', 'minAge': 1, 'maxAge': 2, 'language': 'ar'}).approved, isTrue);

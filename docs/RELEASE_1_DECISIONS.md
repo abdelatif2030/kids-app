@@ -24,3 +24,6 @@
 - `--dart-define=ONLINE_DEV=true` (debug/profile builds only) opens the online gate for development with the owner's own Firebase options; release builds ignore it.
 - A development TURN relay can be passed with `TURN_URL`, `TURN_USERNAME`, `TURN_CREDENTIAL` (never committed, ignored in release): `docs/CALLS_SETUP.md`.
 - Voice for Adam: no reusable voice exists (the video model made it). Candidate chosen for the owner to hear: ElevenLabs "Piku - Expressive Kid Character" (`EeQEodFZVtBkjtgK3HBc`). Nothing is generated, bundled or approved yet.
+
+## Update: videos (owner decision, 2026-10-31)
+The owner reviewed all 157 bundled videos himself and asked for them to be shown by age and subject (Learn island -> video lessons). They carry `"ownerReviewed": true`; parents can still hide any video. The app itself verified none of them (`"verification": "unverified"`). Real-device checks of playback and `safe_player` containment are still open (docs/REAL_DEVICE_TEST_GUIDE.md, round E).
