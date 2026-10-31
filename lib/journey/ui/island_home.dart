@@ -167,8 +167,8 @@ WorldMapLayout computeWideMapLayout(
   bool rtl = false,
   List<double>? weights,
 }) {
-  final h = height.clamp(380.0, 560.0).toDouble();
-  final size = (h * 0.27).clamp(88.0, 132.0).toDouble();
+  final h = height.clamp(250.0, 560.0).toDouble();
+  final size = (h * 0.27).clamp(60.0, 132.0).toDouble();
   final sizes = [
     for (var i = 0; i < count; i++)
       math
@@ -252,26 +252,51 @@ class _IslandHomeState extends State<IslandHome>
     super.dispose();
   }
 
-  /// The home on the owner's own picture: every section is a round sign with a moving picture on its landmark, the whole
-  /// scene visible at once (it is sized to fit the window, never scrolled).
-  Widget _buildPicture(BuildContext context, double avail, double screenH, AnimationController? c) {
-    // A narrow window (an upright phone) gets a square crop of the picture with the signs in a 3-column grid; a wide one
-    // gets the whole picture with each sign on its own landmark.
-    final narrow = avail < 600;
-    final aspect = narrow ? 1.0 : kHomeSceneAspect;
-    final maxW = math.max(240.0, (screenH - 170) * aspect);
-    final w = math.min(avail, maxW);
-    final h = w / aspect;
-    final badge = narrow ? (w * 0.15).clamp(40.0, 64.0).toDouble() : (w * 0.075).clamp(40.0, 84.0).toDouble();
-    final font = narrow ? 11.0 : (w * 0.0165).clamp(10.0, 16.0).toDouble();
+  /// The home on the owner's own picture: every section is a round sign with a moving picture, the whole scene visible at
+  /// once. When the parent gives it a bounded area (the home tab) the picture FILLS that area edge to edge (cropped, not
+  /// stretched) and the signs follow the shape of the screen: on the landmarks for a landscape tablet or desktop, in two
+  /// rows for a wide short screen (a phone held sideways) and in a 3-column grid for an upright phone. With an unbounded
+  /// height (tests, scroll views) it keeps the picture's own shape.
+  Widget _buildPicture(BuildContext context, double avail, double boundedH, double screenH, AnimationController? c) {
+    final fill = boundedH.isFinite && boundedH > 120;
+    final w = fill ? avail : math.min(avail, math.max(240.0, (screenH - 170) * (avail < 600 ? 1.0 : kHomeSceneAspect)));
+    final h = fill ? boundedH : w / (avail < 600 ? 1.0 : kHomeSceneAspect);
+    final a = w / h;
     final n = widget.islands.length;
-    final rows = (n / 3).ceil();
-    Offset spotOf(int i, IslandSpec spec) => narrow
-        ? Offset(const [0.2, 0.5, 0.8][i % 3], ((i ~/ 3) + 0.5) / rows)
-        : kHomeSceneSpots[spec.id]!;
+    final mode = a <= 1.3 ? 0 : (a >= 2.3 ? 1 : 2); // 0: 3-column grid, 1: two rows, 2: landmarks
+    final cols = mode == 0 ? 3 : (mode == 1 ? (n / 2).ceil() : 0);
+    final rows = mode == 0 ? (n / 3).ceil() : (mode == 1 ? 2 : 0);
+    Offset spotOf(int i, IslandSpec spec) {
+      if (mode == 0) {
+        return Offset(const [0.2, 0.5, 0.8][i % 3], ((i ~/ 3) + 0.5) / rows);
+      }
+      if (mode == 1) {
+        final row = i ~/ cols;
+        final inRow = row == 0 ? cols : n - cols;
+        final col = i % cols;
+        return Offset((col + 0.5) / inRow * 1.0, row == 0 ? 0.27 : 0.74);
+      }
+      // landmarks: the picture is "cover"-cropped to the area, so move each spot into what is visible
+      final base = kHomeSceneSpots[spec.id]!;
+      var x = base.dx, y = base.dy;
+      if (a < kHomeSceneAspect) {
+        final f = a / kHomeSceneAspect;
+        x = (x - (1 - f) / 2) / f;
+      } else {
+        final g = kHomeSceneAspect / a;
+        y = (y - (1 - g) / 2) / g;
+      }
+      return Offset(x.clamp(0.09, 0.91).toDouble(), y.clamp(0.1, 0.84).toDouble());
+    }
+
+    final cellW = mode == 0 ? w / 3 : (mode == 1 ? w / cols : w / 7);
+    final cellH = mode == 0 ? h / rows : (mode == 1 ? h / 2 : h / 4.2);
+    final badge = math.min(cellW * 0.52, cellH * 0.52).clamp(36.0, 84.0).toDouble();
+    final font = mode == 2 ? (w * 0.0165).clamp(10.0, 16.0).toDouble() : (cellH < 110 ? 10.0 : 11.5);
+    final plateW = mode == 2 ? math.max(badge * 1.9, 76.0) : math.min(cellW * 0.96, math.max(badge * 1.9, 76.0)).toDouble();
     return Center(
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(fill ? 0 : 24),
         child: SizedBox(
           key: const ValueKey('home_scene'),
           width: w,
@@ -289,7 +314,7 @@ class _IslandHomeState extends State<IslandHome>
                 ),
               ),
               for (final (i, spec) in widget.islands.indexed)
-                _pictureMarker(spec, spotOf(i, spec), i, w, h, badge, font, c),
+                _pictureMarker(spec, spotOf(i, spec), i, w, h, badge, font, plateW, c),
             ],
           ),
         ),
@@ -297,10 +322,10 @@ class _IslandHomeState extends State<IslandHome>
     );
   }
 
-  Widget _pictureMarker(IslandSpec spec, Offset spot, int i, double w, double h, double badgeBase, double font, AnimationController? c) {
+  Widget _pictureMarker(IslandSpec spec, Offset spot, int i, double w, double h, double badgeBase, double font, double plateWidth, AnimationController? c) {
     var badge = badgeBase;
     badge = badgeBase * (1 + (spec.weight - 1) * 0.5); // the main destination is a little bigger
-    final plateW = math.max(badge * 1.9, 76.0);
+    final plateW = math.max(plateWidth, badge * 1.2);
     final boxW = plateW;
     final boxH = badge + font * 2.6 + 8;
     Widget body = FocusableTap(
@@ -451,7 +476,7 @@ class _IslandHomeState extends State<IslandHome>
         if (!IslandHome.forceTall &&
             widget.islands.isNotEmpty &&
             widget.islands.every((i) => kHomeSceneSpots.containsKey(i.id))) {
-          return _buildPicture(context, avail, screen.height, _c);
+          return _buildPicture(context, avail, box.maxHeight, screen.height, _c);
         }
         // The map always runs sideways (owner decision), on a phone held upright too: it slides left and right
         // (it starts on the right in Arabic). The tall map stays only as a tested layout and is not shown.

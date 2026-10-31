@@ -383,9 +383,11 @@ void main() {
           find.byKey(const ValueKey('greeting')),
           findsNothing,
         ); // the greeting lives under More
-        final games = t.getSize(find.byKey(const ValueKey('island_games')));
-        final other = t.getSize(find.byKey(const ValueKey('island_learn')));
-        expect(games.width, greaterThan(other.width));
+        double emojiSize(String id, String emoji) => t
+            .widget<Text>(find.descendant(of: find.byKey(ValueKey('island_$id')), matching: find.text(emoji)))
+            .style!
+            .fontSize!;
+        expect(emojiSize('games', '🎮'), greaterThan(emojiSize('learn', '🔤')));
       },
     );
 

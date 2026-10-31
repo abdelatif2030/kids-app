@@ -129,7 +129,12 @@ class _GamesGridState extends State<GamesGrid> {
               ),
             ),
         ];
-        return SizedBox(height: 520, child: IslandHome(islands: islands));
+        // Inside a bounded area (the games tab) the map takes all of it; elsewhere it has its own height.
+        return LayoutBuilder(
+          builder: (context, box) => box.maxHeight.isFinite
+              ? IslandHome(islands: islands)
+              : SizedBox(height: 520, child: IslandHome(islands: islands)),
+        );
       },
     );
   }

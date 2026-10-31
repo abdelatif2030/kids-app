@@ -91,7 +91,7 @@ void main() {
           }
           // Wide windows show today's world and the lands side by side.
           if (windowClassOf(e.value) == WindowClass.expanded) {
-            expect(find.byType(ListView).evaluate(), isNotEmpty);
+            expect(find.byKey(const ValueKey('home_scene')).evaluate(), isNotEmpty); // the home picture fills the area
           }
           for (final icon in [Icons.sports_esports_rounded, Icons.palette_rounded, Icons.face_rounded]) {
             await t.tap(find.byIcon(icon).first);

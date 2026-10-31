@@ -484,17 +484,15 @@ class HomeTab extends StatelessWidget {
           onTap: () => _open(context, m.$4()),
         ),
     ];
-    return Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1600),
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-          children: [
-            ...header,
-            IslandHome(islands: islands),
-          ],
+    // The greeting row on top; the picture fills everything under it (no scrolling, no empty strip below).
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 6),
+          child: Column(children: header),
         ),
-      ),
+        Expanded(child: IslandHome(islands: islands)),
+      ],
     );
   }
 

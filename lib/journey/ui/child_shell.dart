@@ -110,17 +110,23 @@ class _ChildShellState extends State<ChildShell> {
               onTab: (i) => setState(() => _tab = i),
             ),
           ];
+          // Upright phone: a bottom bar. A phone held sideways: a slim icon rail at the edge, over a comfortable spot for the
+          // thumb, so the picture keeps the whole height. Tablets and desktops: the full rail with names.
+          final screen = MediaQuery.sizeOf(context);
+          final phone = screen.shortestSide < 600;
+          final slim = phone && screen.width > screen.height;
+          final wide = !phone && context.windowClass != WindowClass.compact;
           final items = [
             for (final (i, item) in _items.indexed)
               _NavItem(
                 icon: item.$1,
                 label: context.tr(item.$2),
                 selected: _tab == i,
+                compact: slim,
                 onTap: () => setState(() => _tab = i),
               ),
           ];
           // Navigation fits the window: a bottom bar on phones, a side rail on wider windows.
-          final wide = context.windowClass != WindowClass.compact;
           final content = Column(
             children: [
               const OfflineBanner(),
@@ -136,6 +142,32 @@ class _ChildShellState extends State<ChildShell> {
               ),
             ],
           );
+          if (slim) {
+            return Scaffold(
+              body: Row(
+                children: [
+                  Container(
+                    width: 64,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: DS.softShadow,
+                      border: const BorderDirectional(end: BorderSide(color: DS.border, width: 1.5)),
+                    ),
+                    child: SafeArea(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          for (final n in items)
+                            Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: n),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Expanded(child: content),
+                ],
+              ),
+            );
+          }
           if (wide) {
             return Scaffold(
               body: Row(
@@ -204,11 +236,15 @@ class _NavItem extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
+
+  /// Icon only (a phone held sideways): the name stays in the accessibility label and a tooltip.
+  final bool compact;
   const _NavItem({
     required this.icon,
     required this.label,
     required this.selected,
     required this.onTap,
+    this.compact = false,
   });
 
   @override
@@ -226,8 +262,8 @@ class _NavItem extends StatelessWidget {
           children: [
             AnimatedContainer(
               duration: motion(context, 200),
-              width: 52,
-              height: 52,
+              width: compact ? 44 : 52,
+              height: compact ? 44 : 52,
               decoration: BoxDecoration(
                 gradient: selected ? DS.primaryGradient : null,
                 color: selected ? null : DS.primarySoft,
@@ -237,12 +273,13 @@ class _NavItem extends StatelessWidget {
                 selected: selected,
                 child: Icon(
                   icon,
-                  size: 30,
+                  size: compact ? 26 : 30,
                   color: selected ? Colors.white : DS.primary,
                 ),
               ),
             ),
-            const SizedBox(height: 2),
+            if (!compact) const SizedBox(height: 2),
+            if (!compact)
             FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
@@ -268,25 +305,18 @@ class _GamesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              loc('ألعاب'),
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.w900,
-                color: RC.ink,
-              ),
-            ),
-            const SizedBox(height: 16),
-            GamesGrid(age: child.age, child: child),
-          ],
+    // The games map takes everything under a small title (no outer scrolling: the map slides sideways by itself).
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+          child: Text(
+            loc('ألعاب'),
+            style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: RC.ink),
+          ),
         ),
-      ),
+        Expanded(child: GamesGrid(age: child.age, child: child)),
+      ],
     );
   }
 }
