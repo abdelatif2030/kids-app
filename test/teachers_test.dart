@@ -72,6 +72,27 @@ void main() {
     expect(find.byType(TextField), findsNothing);
   });
 
+  testWidgets('Google sign-in: a new account gets the chosen role, a cancel shows a message and signs nobody in', (tester) async {
+    final repo = FakeTeacherRepository();
+    await _open(tester, repo);
+    await tester.tap(find.text('حساب جديد'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('role_teacher')));
+    await tester.pumpAndSettle();
+    final google = find.byKey(const ValueKey('provider_google'));
+    await tester.ensureVisible(google);
+    repo.googleCancelled = true;
+    await tester.tap(google);
+    await tester.pumpAndSettle();
+    expect(find.text('تم إلغاء الدخول'), findsOneWidget);
+    expect(repo.currentUser, isNull);
+    repo.googleCancelled = false;
+    await tester.tap(google);
+    await tester.pumpAndSettle();
+    expect(repo.googleSignIns, 1);
+    expect(await repo.currentRole(), UserRole.teacher);
+  });
+
   testWidgets('sign-in validates input and shows the repository error', (tester) async {
     final repo = FakeTeacherRepository();
     await _open(tester, repo);

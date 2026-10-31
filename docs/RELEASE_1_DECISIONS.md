@@ -18,3 +18,9 @@
    no commit/push, no store submission. Tests prove local behaviour and the local emulator only; no real device or backend was used.
 5. **Camera:** the camera permission is declared (earlier owner decision) but unused while online features are off; microphone is used only
    for dictation if enabled. Reconsider before store submission (store forms must match actual use).
+
+## Update (owner approvals after the offline audit)
+- Package `google_sign_in` was added with the owner's approval (Google sign-in for parent/teacher accounts). It does nothing in Release 1: the sign-in screen is unreachable while the online gate is closed. Setup steps: `docs/FIREBASE_AND_ACCOUNTS.md`.
+- `--dart-define=ONLINE_DEV=true` (debug/profile builds only) opens the online gate for development with the owner's own Firebase options; release builds ignore it.
+- A development TURN relay can be passed with `TURN_URL`, `TURN_USERNAME`, `TURN_CREDENTIAL` (never committed, ignored in release): `docs/CALLS_SETUP.md`.
+- Voice for Adam: no reusable voice exists (the video model made it). Candidate chosen for the owner to hear: ElevenLabs "Piku - Expressive Kid Character" (`EeQEodFZVtBkjtgK3HBc`). Nothing is generated, bundled or approved yet.

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kReleaseMode;
 // Voice calls between the parent's device (the child is next to the parent) and an approved relative.
 // Audio only, never recorded, never stored. See docs/FAMILY_CHAT_DESIGN.md.
 
@@ -82,5 +83,32 @@ Future<List<Map<String, dynamic>>> stunOnlyIceServers() async => [
       for (final s in kStunServers) {'urls': s},
     ];
 
-/// Replaced (by the app start-up) once a backend that hands out TURN credentials exists. Default: STUN only.
-IceServersLoader iceServersLoader = stunOnlyIceServers;
+/// DEVELOPMENT ONLY: a TURN relay passed at run time, so calls can be tried across two different networks:
+/// `--dart-define=TURN_URL=turn:host:3478 --dart-define=TURN_USERNAME=... --dart-define=TURN_CREDENTIAL=...`.
+/// The values are never in the repository, and this is ignored in a release build (a shipped app must get short-lived
+/// credentials from the backend instead, see docs/CALLS_SETUP.md).
+const String kDevTurnUrl = String.fromEnvironment('TURN_URL');
+const String kDevTurnUsername = String.fromEnvironment('TURN_USERNAME');
+const String kDevTurnCredential = String.fromEnvironment('TURN_CREDENTIAL');
+
+/// STUN plus the development TURN relay when all three values were given. [url] may list several servers separated by commas.
+List<Map<String, dynamic>> iceServersWithDevTurn({
+  String url = kDevTurnUrl,
+  String username = kDevTurnUsername,
+  String credential = kDevTurnCredential,
+  bool release = kReleaseMode,
+}) {
+  final servers = <Map<String, dynamic>>[
+    for (final s in kStunServers) {'urls': s},
+  ];
+  if (release || url.isEmpty || username.isEmpty || credential.isEmpty) return servers;
+  final urls = [for (final u in url.split(',')) if (u.trim().isNotEmpty) u.trim()];
+  if (urls.isEmpty) return servers;
+  return [...servers, {'urls': urls, 'username': username, 'credential': credential}];
+}
+
+Future<List<Map<String, dynamic>>> devIceServers() async => iceServersWithDevTurn();
+
+/// Replaced (by the app start-up) once a backend that hands out TURN credentials exists. Default: STUN, plus a development
+/// TURN relay only in a debug/profile run that was given one.
+IceServersLoader iceServersLoader = devIceServers;

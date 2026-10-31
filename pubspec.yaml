@@ -51,6 +51,7 @@ dependencies:
   record: ^7.1.2
   speech_to_text: ^7.5.0
   http: ^1.6.0
+  google_sign_in: ^7.2.0
 
 dev_dependencies:
   flutter_test:

@@ -588,6 +588,11 @@ abstract class TeacherRepository {
   });
   Future<void> signIn(String email, String password);
 
+  /// Signs in with a Google account (a new account gets [role]; an existing one keeps its own role). Needs the Google
+  /// sign-in provider switched on in the Firebase console (docs/FIREBASE_AND_ACCOUNTS.md). Throws [AccountException]
+  /// with a short message if it is cancelled or fails.
+  Future<void> signInWithGoogle({required UserRole role});
+
   /// Sends a password-reset e-mail. It never says whether the address has an account (no account probing).
   Future<void> sendPasswordReset(String email);
   Future<void> signOut();

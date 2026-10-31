@@ -48,6 +48,24 @@ class FakeTeacherRepository implements TeacherRepository {
     _current = AppUser(hit.key, email);
   }
 
+  /// Test switch: the next Google sign-in is cancelled by the person.
+  bool googleCancelled = false;
+  int googleSignIns = 0;
+
+  @override
+  Future<void> signInWithGoogle({required UserRole role}) async {
+    if (googleCancelled) throw const AccountException('تم إلغاء الدخول');
+    googleSignIns++;
+    final hit = _users.entries.where((e) => e.value.email == 'google.user@example.com').firstOrNull;
+    if (hit != null) {
+      _current = AppUser(hit.key, 'google.user@example.com'); // an existing account keeps its role
+      return;
+    }
+    final uid = 'u${_nextId++}';
+    _users[uid] = (email: 'google.user@example.com', password: '', name: 'Google User', role: role);
+    _current = AppUser(uid, 'google.user@example.com');
+  }
+
   final List<String> resetsSent = [];
 
   @override

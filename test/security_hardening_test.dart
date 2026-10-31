@@ -108,13 +108,29 @@ void s7Tests() {
       expect((await iceServersLoader()).length, list.length);
     });
 
+    test('a development TURN relay is added only when all three values are given and never in a release build', () {
+      final stun = iceServersWithDevTurn(url: '', username: '', credential: '', release: false);
+      expect(stun.length, kStunServers.length);
+      expect(iceServersWithDevTurn(url: 'host:1', username: 'u', credential: '', release: false).length, stun.length);
+      final dev = iceServersWithDevTurn(url: 'a:1, b:2', username: 'u', credential: 'c', release: false);
+      expect(dev.length, stun.length + 1);
+      expect(dev.last['urls'], ['a:1', 'b:2']);
+      expect(iceServersWithDevTurn(url: 'a:1', username: 'u', credential: 'c', release: true).length, stun.length);
+    });
+
     test('the call engine takes its servers from the loader and the source holds no TURN address or credential', () {
       final engine = File('lib/family/call_engine.dart').readAsStringSync();
       expect(engine, contains("await iceServersLoader()"));
       for (final f in Directory('lib/family').listSync().whereType<File>()) {
         final code = f.readAsLinesSync().where((l) => !l.trimLeft().startsWith('//')).join('\n'); // comments may explain the rule
         expect(code.contains('turn:'), isFalse, reason: f.path);
-        expect(code.contains('credential'), isFalse, reason: f.path);
+        if (f.path.endsWith('call_models.dart')) {
+          // the only place that mentions a credential: a development value passed at run time, never written in the source
+          expect(code, contains("String.fromEnvironment('TURN_CREDENTIAL')"));
+          expect(RegExp(r"credential\s*[:=]\s*'[^']+'").hasMatch(code), isFalse);
+        } else {
+          expect(code.contains('credential'), isFalse, reason: f.path);
+        }
       }
     });
   });

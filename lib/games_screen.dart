@@ -106,8 +106,9 @@ class _GamesGridState extends State<GamesGrid> {
                     builder: (_) => g.build(_childId, age, learnLang),
                   ),
                 );
-                if (mounted)
+                if (mounted) {
                   setState(() => _done = GameRewards.doneIds(_childId));
+                }
               },
               overlay: Column(
                 mainAxisSize: MainAxisSize.min,

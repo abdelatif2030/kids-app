@@ -195,6 +195,25 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
+  /// Google sign-in: the new account gets the role chosen above; an existing account keeps its own.
+  Future<void> _google() async {
+    setState(() {
+      _busy = true;
+      _error = null;
+      _info = null;
+    });
+    try {
+      await widget.repo.signInWithGoogle(role: _role);
+      if (mounted) widget.onSignedIn();
+    } on AccountException catch (e) {
+      if (mounted) setState(() => _error = e.message);
+    } catch (_) {
+      if (mounted) setState(() => _error = tr2('تعذّر الاتصال بالخدمة. تحقق من الإنترنت وحاول مرة أخرى.', 'Could not reach the service. Check the internet and try again.'));
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   /// "Forgot password": sends a reset e-mail. The answer is the same whether or not the address has an account.
   Future<void> _forgot() async {
     final email = _email.text.trim();
@@ -307,8 +326,8 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  /// Google and Apple sign-in are not connected: that needs provider setup in the Firebase console and extra
-  /// packages that were not approved. They are shown switched off, with the reason, never as working buttons.
+  /// Google sign-in works (it needs the Google provider switched on in the Firebase console). Apple sign-in is not
+  /// built: it is shown switched off with the reason, never as a working button.
   Widget _providerButtons() => Column(
     children: [
       Text(
@@ -319,12 +338,27 @@ class _AuthScreenState extends State<AuthScreen> {
       Row(
         children: [
           Expanded(
-            child: _provider(
-              key: 'google',
-              label: tr2('Google', 'Google'),
-              icon: Icons.g_mobiledata_rounded,
-              bg: Colors.white,
-              fg: const Color(0xFF2D3A5C),
+            child: Semantics(
+              button: true,
+              label: '${tr2('المتابعة باستخدام', 'Continue with')} Google',
+              excludeSemantics: true,
+              child: InkWell(
+                key: const ValueKey('provider_google'),
+                borderRadius: BorderRadius.circular(16),
+                onTap: _busy ? null : _google,
+                child: Container(
+                  height: 52,
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.g_mobiledata_rounded, color: Color(0xFF2D3A5C), size: 28),
+                      SizedBox(width: 6),
+                      Text('Google', style: TextStyle(color: Color(0xFF2D3A5C), fontWeight: FontWeight.w800)),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 10),
@@ -342,8 +376,8 @@ class _AuthScreenState extends State<AuthScreen> {
       const SizedBox(height: 6),
       Text(
         tr2(
-          'الدخول عبر Google وApple غير مفعّل بعد: يحتاج إعداداً من لوحة Firebase.',
-          'Google and Apple sign-in are not switched on yet: they need setup in the Firebase console.',
+          'أول مرة؟ اختر ولي الأمر أو المدرس من «حساب جديد» ثم اضغط Google. الدخول عبر Apple غير مفعّل بعد.',
+          'First time? Pick Parent or Teacher in the sign-up form, then press Google. Apple sign-in is not available yet.',
         ),
         textAlign: TextAlign.center,
         style: const TextStyle(color: Colors.white54, fontSize: 12),

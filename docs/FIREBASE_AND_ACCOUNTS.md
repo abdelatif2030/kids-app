@@ -56,3 +56,12 @@ The owner wants online features ON in release 1. The full inventory is `docs/ONL
 
 ## Update 2026-10-31 (security phase)
 The exact services, configuration, rules, Cloud Functions, billing implications and verification steps are in `docs/FIREBASE_BACKEND_SETUP_GUIDE.md`. Draft rules for S2-S4: `rules_proposed/`. Draft functions: `functions/`. Password reset and a verification e-mail now exist in the client (not run against Firebase). The relay-server hook for calls is `iceServersLoader` (STUN only today).
+
+
+## Google sign-in (added)
+Package `google_sign_in` (approved by the owner). The button on the sign-in screen works once you set up, in your own Firebase project:
+1. Firebase console -> Authentication -> Sign-in method -> **Google** -> enable, choose a support e-mail.
+2. **Android:** add your debug and release SHA-1 and SHA-256 fingerprints in Project settings, download the new `google-services.json` (it must contain an OAuth client).
+3. **iOS:** download `GoogleService-Info.plist` and add its `REVERSED_CLIENT_ID` as a URL scheme in the Xcode project (needs a Mac).
+4. **Web:** add your domain (for example `localhost` for testing) under Authentication -> Settings -> Authorized domains. The web build uses Firebase's own Google pop-up.
+A new Google account gets the role chosen under "New account" (parent or teacher); an existing account keeps its role. Teachers still start `pending` and are approved by you in the console. Not tested against a real Google account or project.

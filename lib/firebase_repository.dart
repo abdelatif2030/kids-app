@@ -3,6 +3,8 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'teachers_market.dart';
 import 'teachers_models.dart';
@@ -106,7 +108,46 @@ class FirebaseTeacherRepository implements TeacherRepository {
       );
 
   @override
-  Future<void> signOut() => _auth.signOut();
+  Future<void> signInWithGoogle({required UserRole role}) => _guard(() async {
+        UserCredential cred;
+        try {
+          if (kIsWeb) {
+            // On the web Firebase opens Google's own pop-up (no extra client id in the page needed).
+            cred = await _auth.signInWithPopup(GoogleAuthProvider());
+          } else {
+            final google = GoogleSignIn.instance;
+            await google.initialize();
+            final account = await google.authenticate();
+            final idToken = account.authentication.idToken;
+            if (idToken == null) throw AccountException(loc('تعذر إكمال العملية، حاول مرة أخرى'));
+            cred = await _auth.signInWithCredential(GoogleAuthProvider.credential(idToken: idToken));
+          }
+        } on GoogleSignInException catch (e) {
+          throw AccountException(e.code == GoogleSignInExceptionCode.canceled
+              ? tr2('تم إلغاء الدخول', 'Sign-in was cancelled')
+              : loc('تعذر إكمال العملية، حاول مرة أخرى'));
+        }
+        final user = cred.user!;
+        final doc = _db.collection('users').doc(user.uid);
+        // A brand-new Google account gets a users/{uid} record with the chosen role; an existing one is left as it is.
+        if (!(await doc.get()).exists) {
+          await doc.set({
+            'role': role.name,
+            'name': (user.displayName ?? '').trim(),
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        }
+      });
+
+  @override
+  Future<void> signOut() async {
+    await _auth.signOut();
+    if (!kIsWeb) {
+      try {
+        await GoogleSignIn.instance.signOut();
+      } catch (_) {}
+    }
+  }
 
   @override
   Future<List<TeacherProfile>> approvedTeachers() => _guard(() async {
