@@ -40,7 +40,7 @@ void main() {
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       Future<void> show(DateTime t) async {
-        await tester.pumpWidget(MaterialApp(key: UniqueKey(), home: Scaffold(body: HomeTab(child: _kid, onExit: () {}, now: t))));
+        await tester.pumpWidget(MaterialApp(key: UniqueKey(), home: Scaffold(body: HomeTab(more: true, child: _kid, onExit: () {}, now: t))));
         await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 60)));
         await tester.pump();
       }

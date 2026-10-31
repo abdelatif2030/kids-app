@@ -1,6 +1,6 @@
 # Kids App
 
-Arabic-first kids app (ages 1-12, up to the end of primary school), Android first, Flutter. A "mini home school": the parent enters the child's age; the app shows only age-appropriate, hand-reviewed content, organised by subject.
+Arabic-first kids app (official target: ages 1-6 only; content and profiles for ages 7-12 from earlier versions are kept as legacy but not offered for new use), Android first, Flutter. A "mini home school": the parent enters the child's age; the app shows only age-appropriate, hand-reviewed content, organised by subject.
 
 ## Rules (non-negotiable)
 - Videos come only from the whitelist `assets/videos.json` (fields: youtubeId, title, category, minAge, maxAge, language). No free YouTube search for the child.
@@ -114,3 +114,17 @@ User asked for a "Rehlaty | رحلتي" app (learning map, daily plan, rewards, 
 - Family chat round 3 (2026-10-29): people are added by an e-mail REQUEST the person accepts in the app (invite codes are gone from the UI; `connectRequests` collection); a child's call needs no PIN (the parent's per-relative switch is the consent); voice messages (package `record`, `voices` collection, 30 s, deleted after 14 days, switches per relative and per child, off by default); video calls (separate parent switch, CAMERA permission); free-plan limits (message count once a minute, newest 80, no Storage). 58 rules tests, 730 app tests. NOT tested with real microphones/cameras or real Firebase. Push notifications NOT built. Owner must re-publish firestore.rules.
 - Audio and call quality pass (2026-10-29): docs/AUDIO_AUDIT.md (real findings: 0 human recordings, 0 approved of 360, device voice for 250 items, 110 isolated sounds silent), docs/AUDIO_COVERAGE.md (generated from the real manifest by test/audio_coverage_report_test.dart), docs/FAMILY_PRIVACY_REVIEW.md. `AudioGate` (lib/media/audio_gate.dart): a family call or the app leaving the screen silences lesson audio and stories, no resume by itself. Three listening games on ChoiceGame (13 learning games now). Calls: reconnecting phase, mic/camera banner, parent purges call records after 24 h. No new package. 59 rules tests. Nothing tested on real devices.
 - Visual worlds (2026-10-29): lib/design/worlds.dart (journey, forest, ocean, space, story, calm; code-drawn, no assets, no animation, IgnorePointer, capped size, not mirrored); PastelBackground and SceneBackground now delegate to it; games, letters, vocabulary, stories assigned worlds; theme scaffold colour = journey sky top. docs/BACKGROUND_DESIGN_AUDIT.md, docs/screens/bg_*.png (test-renderer images, not browser). 27 new tests. No new package, no new asset.
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+- When graphify-out/graph.json exists, run `graphify query "<question>"` before your first grep, search or source-file read for a codebase question, and put this rule in every subagent prompt that explores code. Read raw files only for lines the graph or an earlier read already located. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+- A committed graphify-out/graph.json is rewritten whole on every build, so a large diff to it in a pull request is expected. Do not flag it as churn or suggest skipping the graph rebuild or its hooks.
+
+## Release 1 decisions (2026-10-31; see docs/RELEASE_1_CONFIGURATION.md)
+Android id and iOS bundle id `com.rehlaty.app`; online features gated OFF in Release 1 (owner decision, latest: Release 1 is the offline/local app; `kOnlineFeaturesIntended = false`; code and data kept for a later online phase; `cloud_functions` and `firebase_app_check` deferred to that phase, guard test in release_config_test; S2-S4 rules applied to the LOCAL firestore.rules only, not published; see docs/RELEASE_1_DECISIONS.md); gate details: (lib/online_gate.dart: needs a real Firebase config, account deletion, verified backend; docs/ONLINE_RELEASE_GATE.md); camera/microphone permissions kept and requested only when a call/voice message/dictation starts; videos: 157 unverified candidates, a parent previews, ticks five checks and approves (docs/VIDEO_REVIEW_WORKFLOW.md), 0 reviewed so far; lib/safe_player.dart keeps the YouTube player from loading other videos or opening links (NOT verified on a device). Never invent credentials, bundle ids, Firebase config or video approvals; do not commit, push, publish or submit.

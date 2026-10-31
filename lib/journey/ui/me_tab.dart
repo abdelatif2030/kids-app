@@ -7,6 +7,12 @@ import '../lands.dart';
 import '../models.dart';
 import '../progress.dart';
 import '../repository.dart';
+import '../../adventures/adventure_screen.dart';
+import '../../everyday/everyday_screen.dart';
+import '../../family_time/family_time_screen.dart';
+import '../../museum/museum_screen.dart';
+import '../../companion/companion_ui.dart';
+import '../../world/world_screen.dart';
 import 'kit.dart';
 import '../../l10n/strings.dart';
 
@@ -52,9 +58,21 @@ class MeTab extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
               children: [
+                CompanionCard(child: profile),
+                const SizedBox(height: 12),
                 GardenCard(child: profile),
                 const SizedBox(height: 12),
                 StickerAlbumCard(child: profile),
+                const SizedBox(height: 12),
+                WorldCard(child: profile),
+                const SizedBox(height: 12),
+                AdventureCard(child: profile),
+                const SizedBox(height: 12),
+                EverydayCard(child: profile),
+                const SizedBox(height: 12),
+                FamilyTimeCard(child: profile),
+                const SizedBox(height: 12),
+                MuseumCard(child: profile),
                 const SizedBox(height: 12),
                 RCard(
                   color: RC.lavender.withAlpha(170),

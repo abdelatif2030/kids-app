@@ -75,7 +75,7 @@ void main() {
     await tester.pump();
     expect(find.text('رحلتي'), findsOneWidget);
     expect(find.text('ابدأ الرحلة'), findsOneWidget);
-    expect(find.text('حساب الأهل والمدرسين'), findsOneWidget);
+    expect(find.text('حساب الأهل والمدرسين'), findsNothing); // Release 1 is offline: no accounts door
 
     await tester.runAsync(() => store.addProfile(const ChildProfile(id: 'a', nickname: 'ليلى', age: 4)));
     await tester.pump();
@@ -182,7 +182,7 @@ void main() {
       await tester.runAsync(_newStore);
       await tester.pumpWidget(_app(const OnboardingFlow(askForPin: false)));
       await tester.enterText(_field('اسم الطفل أو لقبه'), 'نور');
-      await tester.tap(find.widgetWithText(ChoiceChip, '7'));
+      await tester.tap(find.widgetWithText(ChoiceChip, '6'));
       await tester.tap(find.text('التالي'));
       await tester.pump();
       await tester.tap(find.text('الرياضيات'));
@@ -200,7 +200,7 @@ void main() {
       }
       expect(find.text('الخطوة 1 من 5'), findsOneWidget);
       expect(find.text('نور'), findsOneWidget);
-      expect(tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '7')).selected, isTrue);
+      expect(tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '6')).selected, isTrue);
       await tester.tap(find.text('التالي'));
       await tester.pump();
       expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget); // the math goal
@@ -273,6 +273,8 @@ void main() {
     testWidgets('home: greeting, ONE big "continue my journey" action, today\'s path, shortcuts and the lands',
         (tester) async {
       await openShell(tester);
+      await tester.tap(find.text('المزيد').last);
+      await tester.pump();
       expect(find.textContaining('يا بطل'), findsOneWidget); // the greeting follows the time of day
       expect(find.text('سلمى'), findsWidgets);
       expect(find.text('كمّل رحلتي'), findsOneWidget);
@@ -309,7 +311,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
       expect(find.text('لعبة الذاكرة'), findsOneWidget); // the games tab for age 5
-      await tester.tap(find.text('الرئيسية').last);
+      await tester.tap(find.text('المزيد').last);
       await tester.pump();
       await tester.tap(find.text('كمّل رحلتي'));
       await tester.pump();
@@ -321,6 +323,8 @@ void main() {
       await tester.runAsync(() => AppLocale.instance.set('en'));
       addTearDown(() => AppLocale.instance.set('ar'));
       await openShell(tester);
+      await tester.tap(find.text('More').last);
+      await tester.pump();
       expect(find.textContaining('champion'), findsOneWidget);
       expect(find.text('سلمى'), findsWidgets);
       expect(find.text('Today\'s path'), findsOneWidget);
@@ -335,6 +339,8 @@ void main() {
       await openShell(tester);
       final planned = JourneyStore.instance.todayPlan('kid1');
       expect(planned.length, 3);
+      await tester.tap(find.text('المزيد').last);
+      await tester.pump();
       await tester.runAsync(() => JourneyStore.instance.recordAttempt(_done(planned.first.activity.id)));
       await tester.pump();
       expect(find.text('1 من 3 أنشطة · نحو 4 دقائق لكل نشاط'), findsOneWidget);
@@ -360,10 +366,25 @@ void main() {
       expect(find.text('هدف الأسبوع'), findsOneWidget);
       expect(find.text('شاراتي'), findsOneWidget);
 
-      await tester.tap(find.text('الرئيسية').last);
+      await tester.tap(find.text('المزيد').last);
       await tester.pump();
       expect(find.textContaining('يا بطل'), findsOneWidget); // the greeting follows the time of day
       expect(find.text('سلمى'), findsWidgets);
+    });
+
+    testWidgets('the home map shows only the five main destinations; the rest lives under More', (tester) async {
+      await openShell(tester);
+      for (final id in ['games', 'stories', 'learn', 'create', 'rewards']) {
+        expect(find.byKey(ValueKey('island_$id')), findsOneWidget, reason: id);
+      }
+      for (final id in ['letters', 'numbers', 'words', 'videos', 'library', 'family_activities', 'me']) {
+        expect(find.byKey(ValueKey('island_$id')), findsNothing, reason: id);
+      }
+      expect(find.text('كمّل رحلتي'), findsNothing);
+      await tester.tap(find.text('المزيد').last);
+      await tester.pump();
+      expect(find.text('كمّل رحلتي'), findsOneWidget);
+      expect(find.byKey(const ValueKey('island_games')), findsNothing);
     });
 
     testWidgets('accessories unlock with stars and can be worn', (tester) async {
@@ -478,7 +499,7 @@ void main() {
       await tester.tap(find.text('سلمى'));
       await tester.pumpAndSettle();
       await tester.enterText(_field('اسم الطفل أو لقبه'), 'سلمى الصغيرة');
-      await tester.tap(find.widgetWithText(ChoiceChip, '7'));
+      await tester.tap(find.widgetWithText(ChoiceChip, '6'));
       await tester.tap(find.byType(Checkbox).first); // leave the first land out of the plan
       await tester.tap(find.byTooltip('أسفل').first); // and move it down
       await tester.pump();
@@ -488,7 +509,7 @@ void main() {
 
       final p = JourneyStore.instance.profileById('kid1')!;
       expect(p.nickname, 'سلمى الصغيرة');
-      expect(p.age, 7);
+      expect(p.age, 6);
       expect(p.plan.length, kLands.length - 1);
       expect(p.plan.contains('letters'), isFalse);
 

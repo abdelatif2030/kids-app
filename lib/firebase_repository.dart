@@ -1,3 +1,4 @@
+import 'teachers_time.dart' show looksLikeContactDetails;
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -82,7 +83,22 @@ class FirebaseTeacherRepository implements TeacherRepository {
           'name': name.trim(),
           'createdAt': FieldValue.serverTimestamp(),
         });
+        // Ask Firebase to send the verification e-mail; failing to send it must not undo the registration.
+        try {
+          await cred.user!.sendEmailVerification();
+        } catch (_) {}
       });
+
+  @override
+  Future<void> sendPasswordReset(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+    } on FirebaseAuthException catch (e) {
+      // "user-not-found" is hidden on purpose; only a malformed address or a network problem is reported.
+      if (e.code == 'invalid-email') throw const AccountException('اكتب بريداً إلكترونياً صحيحاً');
+      if (e.code == 'network-request-failed') throw const AccountException('لا يوجد اتصال بالإنترنت');
+    }
+  }
 
   @override
   Future<void> signIn(String email, String password) => _guard(
@@ -124,8 +140,9 @@ class FirebaseTeacherRepository implements TeacherRepository {
         if (existing != null) {
           // A teacher can never lift a suspension. An old pending profile
           // becomes visible when saved.
-          if (existing['status'] == teacherStatusPending) {
-            map['status'] = teacherStatusApproved;
+          final write = teacherStatusToWrite(existing['status'] as String?);
+          if (write != null) {
+            map['status'] = write;
           } else {
             map.remove('status');
           }
@@ -136,7 +153,7 @@ class FirebaseTeacherRepository implements TeacherRepository {
           }
           await ref.update(map);
         } else {
-          map['status'] = teacherStatusApproved;
+          map['status'] = teacherStatusToWrite(null)!;
           await ref.set(map);
         }
       });
@@ -350,11 +367,15 @@ class FirebaseTeacherRepository implements TeacherRepository {
 
   @override
   Future<void> sendMessage(String bookingId, String text) => _guard(
-        () => _db.collection('bookings').doc(bookingId).collection('messages').add({
+        () async {
+          // Defence in depth (S4): the screen already checks, and the proposed server rule checks again.
+          if (looksLikeContactDetails(text)) throw const AccountException('لا ترسل أرقام هاتف أو بريداً أو روابط.');
+          await _db.collection('bookings').doc(bookingId).collection('messages').add({
           'senderUid': _uid,
           'text': text,
           'createdAt': FieldValue.serverTimestamp(),
-        }),
+          });
+        },
       );
 
   // --- requests and proposals --------------------------------------------------

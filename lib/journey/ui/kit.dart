@@ -9,23 +9,24 @@ import '../../l10n/strings.dart';
 /// The Rehlaty palette: pastel mint, sky blue, warm yellow, lavender and peach
 /// on a light blue background, with a soft indigo outline.
 class RC {
-  static const bg = Color(0xFFE6F1FF);
+  static const bg = Color(0xFFF1EBFF);
   static const ink = Color(0xFF2D3A5C);
-  static const outline = Color(0xFF6F8FD8);
+  static const outline = Color(0xFF9B83F2); // soft purple outline
   static const card = Colors.white;
-  static const pink = Color(0xFFF9B8C8);
-  static const pinkDeep = Color(0xFFE58AA5);
-  static const mint = Color(0xFFBFEBDD);
+  static const pink = Color(0xFFFFC2D8);
+  static const pinkDeep = Color(0xFFFF6B9D); // the brand pink
+  static const mint = Color(0xFFC4EFE0);
   static const yellow = Color(0xFFFFE08A);
-  static const lavender = Color(0xFFD9CCF5);
-  static const peach = Color(0xFFFFD3C2);
-  static const sky = Color(0xFFBFDDFB);
+  static const lavender = Color(0xFFDCCBFF);
+  static const peach = Color(0xFFFFD6C6);
+  static const sky = Color(0xFFC4E7FF);
   static const star = Color(0xFFFFC83D);
   static const good = Color(0xFF3BAA6E);
 }
 
 /// True when the user asked the system for less motion.
-bool reducedMotion(BuildContext context) => MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+bool reducedMotion(BuildContext context) =>
+    MediaQuery.maybeOf(context)?.disableAnimations ?? false;
 
 /// [ms] milliseconds, or zero when reduced motion is on.
 Duration motion(BuildContext context, int ms) =>
@@ -64,13 +65,18 @@ class RCard extends StatelessWidget {
           color: color,
           borderRadius: BorderRadius.circular(radius),
           border: Border.all(color: outline, width: 3),
-          boxShadow: [BoxShadow(color: outline.withAlpha(70), offset: const Offset(0, 4))],
+          boxShadow: [
+            BoxShadow(color: outline.withAlpha(70), offset: const Offset(0, 4)),
+          ],
         ),
         child: Material(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(radius - 3),
           clipBehavior: Clip.antiAlias,
-          child: InkWell(onTap: onTap, child: Padding(padding: padding, child: child)),
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(padding: padding, child: child),
+          ),
         ),
       ),
     );
@@ -109,7 +115,12 @@ class RProgress extends StatelessWidget {
   final double value; // 0..1
   final Color color;
   final double height;
-  const RProgress({super.key, required this.value, this.color = RC.star, this.height = 12});
+  const RProgress({
+    super.key,
+    required this.value,
+    this.color = RC.star,
+    this.height = 12,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +137,10 @@ class RProgress extends StatelessWidget {
           alignment: AlignmentDirectional.centerStart,
           widthFactor: value.clamp(0.0, 1.0),
           child: DecoratedBox(
-            decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(height)),
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(height),
+            ),
           ),
         ),
       ),
@@ -141,10 +155,16 @@ class PastelBackground extends StatelessWidget {
   final Widget child;
   final RWorld world;
   final bool quiet;
-  const PastelBackground({super.key, required this.child, this.world = RWorld.journey, this.quiet = false});
+  const PastelBackground({
+    super.key,
+    required this.child,
+    this.world = RWorld.journey,
+    this.quiet = false,
+  });
 
   @override
-  Widget build(BuildContext context) => WorldBackground(world: world, quiet: quiet, child: child);
+  Widget build(BuildContext context) =>
+      WorldBackground(world: world, quiet: quiet, child: child);
 }
 
 /// A shape drawn in code (circle, square, rectangle, triangle, star, heart).
@@ -178,34 +198,57 @@ class _ShapePainter extends CustomPainter {
 
     switch (spec.kind) {
       case 'circle':
-        draw(Path()..addOval(Rect.fromCircle(center: Offset(w / 2, w / 2), radius: w * 0.42)));
+        draw(
+          Path()..addOval(
+            Rect.fromCircle(center: Offset(w / 2, w / 2), radius: w * 0.42),
+          ),
+        );
       case 'square':
-        draw(Path()..addRRect(RRect.fromRectAndRadius(
-            Rect.fromLTWH(w * 0.12, w * 0.12, w * 0.76, w * 0.76), Radius.circular(w * 0.06))));
+        draw(
+          Path()..addRRect(
+            RRect.fromRectAndRadius(
+              Rect.fromLTWH(w * 0.12, w * 0.12, w * 0.76, w * 0.76),
+              Radius.circular(w * 0.06),
+            ),
+          ),
+        );
       case 'rectangle':
-        draw(Path()..addRRect(RRect.fromRectAndRadius(
-            Rect.fromLTWH(w * 0.04, w * 0.27, w * 0.92, w * 0.46), Radius.circular(w * 0.05))));
+        draw(
+          Path()..addRRect(
+            RRect.fromRectAndRadius(
+              Rect.fromLTWH(w * 0.04, w * 0.27, w * 0.92, w * 0.46),
+              Radius.circular(w * 0.05),
+            ),
+          ),
+        );
       case 'triangle':
-        draw(Path()
-          ..moveTo(w * 0.5, w * 0.1)
-          ..lineTo(w * 0.92, w * 0.84)
-          ..lineTo(w * 0.08, w * 0.84)
-          ..close());
+        draw(
+          Path()
+            ..moveTo(w * 0.5, w * 0.1)
+            ..lineTo(w * 0.92, w * 0.84)
+            ..lineTo(w * 0.08, w * 0.84)
+            ..close(),
+        );
       case 'star':
         final path = Path();
         for (var i = 0; i < 10; i++) {
           final r = i.isEven ? w * 0.46 : w * 0.2;
           final a = -math.pi / 2 + i * math.pi / 5;
-          final pt = Offset(w / 2 + r * math.cos(a), w * 0.54 + r * math.sin(a));
+          final pt = Offset(
+            w / 2 + r * math.cos(a),
+            w * 0.54 + r * math.sin(a),
+          );
           i == 0 ? path.moveTo(pt.dx, pt.dy) : path.lineTo(pt.dx, pt.dy);
         }
         draw(path..close());
       case 'heart':
-        draw(Path()
-          ..moveTo(w * 0.5, w * 0.86)
-          ..cubicTo(w * 0.02, w * 0.54, w * 0.1, w * 0.1, w * 0.5, w * 0.32)
-          ..cubicTo(w * 0.9, w * 0.1, w * 0.98, w * 0.54, w * 0.5, w * 0.86)
-          ..close());
+        draw(
+          Path()
+            ..moveTo(w * 0.5, w * 0.86)
+            ..cubicTo(w * 0.02, w * 0.54, w * 0.1, w * 0.1, w * 0.5, w * 0.32)
+            ..cubicTo(w * 0.9, w * 0.1, w * 0.98, w * 0.54, w * 0.5, w * 0.86)
+            ..close(),
+        );
     }
   }
 

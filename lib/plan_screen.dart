@@ -32,7 +32,7 @@ class _PlanScreenState extends State<PlanScreen> {
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
-    final videos = await loadVideos();
+    final videos = await loadVideos(all: true);
     final entries = await WatchHistory.load();
 
     final subjectOf = {for (final Video v in videos) v.youtubeId: v.subject};

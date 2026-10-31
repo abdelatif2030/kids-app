@@ -1,11 +1,16 @@
-﻿import 'dart:convert';
+import 'lessons/lesson_store.dart';
+import 'video_controls.dart';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
+
 import 'design/worlds.dart';
 import 'media/audio_gate.dart';
 import 'web_lang.dart';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart';
 
 import 'curriculum.dart';
@@ -25,19 +30,34 @@ import 'rest_screen.dart';
 import 'session_manager.dart';
 import 'ui.dart';
 import 'l10n/strings.dart';
+import 'media/rehlaty_audio_engine.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await lockLandscape();
   await initFirebase();
   await JourneyStore.instance.load();
   await DisplayPrefs.instance.load();
   await AppLocale.instance.load();
   await AudioPrefs.instance.load();
+  await EnginePrefs.instance.load();
+  RehlatyAudioEngine.instance.attachGameCues();
   await AppAudio.reloadManifest();
   WidgetsBinding.instance.addObserver(_AudioLifecycle());
   ConnectivityMonitor.instance.start();
   runApp(const KidsApp());
 }
+
+/// The app opens and stays in landscape on phones and tablets (both landscape sides). Not applied on the web.
+Future<void> lockLandscape() async {
+  if (kIsWeb) return;
+  await SystemChrome.setPreferredOrientations(kLandscapeOrientations);
+}
+
+const kLandscapeOrientations = [
+  DeviceOrientation.landscapeLeft,
+  DeviceOrientation.landscapeRight,
+];
 
 class KidsApp extends StatelessWidget {
   const KidsApp({super.key});
@@ -57,7 +77,12 @@ class KidsApp extends StatelessWidget {
         focusColor: DS.focusColor.withAlpha(40),
         hoverColor: DS.focusColor.withAlpha(20),
         visualDensity: VisualDensity.standard,
-        scrollbarTheme: ScrollbarThemeData(thumbVisibility: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.hovered)), interactive: true),
+        scrollbarTheme: ScrollbarThemeData(
+          thumbVisibility: WidgetStateProperty.resolveWith(
+            (s) => s.contains(WidgetState.hovered),
+          ),
+          interactive: true,
+        ),
         // The top of the journey sky, so an app bar over any screen blends into the world behind it.
         scaffoldBackgroundColor: kWorldPalettes[RWorld.journey]!.top,
         appBarTheme: const AppBarTheme(
@@ -75,17 +100,25 @@ class KidsApp extends StatelessWidget {
       ),
       // Arabic-first: right-to-left unless the parent chose English.
       builder: (context, child) => ListenableBuilder(
-        listenable: Listenable.merge([DisplayPrefs.instance, AppLocale.instance]),
+        listenable: Listenable.merge([
+          DisplayPrefs.instance,
+          AppLocale.instance,
+        ]),
         builder: (context, _) {
           final prefs = DisplayPrefs.instance;
           final media = MediaQuery.of(context);
           setDocumentLanguage(AppLocale.instance.code);
           return MediaQuery(
             data: media.copyWith(
-              textScaler: prefs.textScale == 1.0 ? media.textScaler : TextScaler.linear(prefs.textScale),
+              textScaler: prefs.textScale == 1.0
+                  ? media.textScaler
+                  : TextScaler.linear(prefs.textScale),
               disableAnimations: media.disableAnimations || prefs.reduceMotion,
             ),
-            child: Directionality(textDirection: AppLocale.instance.direction, child: child!),
+            child: Directionality(
+              textDirection: AppLocale.instance.direction,
+              child: child!,
+            ),
           );
         },
       ),
@@ -102,6 +135,17 @@ class Video {
   final int maxAge;
   final String language;
   final String subject;
+
+  /// `approved` (shown to children), `pending` (not yet reviewed: never shown) or `rejected` (never shown). Videos
+  /// without the field are approved, as before.
+  final String approval;
+
+  /// What the app team knows about this video: always `unverified` for every bundled entry. NOTHING in the app marks a
+  /// video `verified`; a parent's preview and approval are the family's decision, not a verification by the app.
+  final String verification;
+
+  /// `bundled` (listed in assets/videos.json) or `parent` (added by a parent by exact link on this device).
+  final String origin;
   const Video({
     required this.youtubeId,
     required this.title,
@@ -110,23 +154,40 @@ class Video {
     required this.maxAge,
     required this.language,
     this.subject = 'discover',
+    this.approval = 'approved',
+    this.origin = 'bundled',
+    this.verification = 'unverified',
   });
 
   factory Video.fromJson(Map<String, dynamic> json) => Video(
-        youtubeId: json['youtubeId'] as String,
-        title: json['title'] as String,
-        category: json['category'] as String,
-        minAge: json['minAge'] as int,
-        maxAge: json['maxAge'] as int,
-        language: json['language'] as String,
-        subject: json['subject'] as String? ?? 'discover',
-      );
+    youtubeId: json['youtubeId'] as String,
+    title: json['title'] as String,
+    category: json['category'] as String,
+    minAge: json['minAge'] as int,
+    maxAge: json['maxAge'] as int,
+    language: json['language'] as String,
+    subject: json['subject'] as String? ?? 'discover',
+    approval: json['approval'] as String? ?? 'approved',
+    verification: json['verification'] as String? ?? 'unverified',
+  );
+
+  bool get approved => approval == 'approved';
 }
 
-Future<List<Video>> loadVideos() async {
+/// The videos a child may see: listed (assets/videos.json or added by a parent by exact link), not rejected, APPROVED BY
+/// THE PARENT on this device, and not disabled. Nothing is visible to a child until a parent approves it. [all] is only
+/// for the parent's review screen. Never returns a video that is not in one of those two lists.
+Future<List<Video>> loadVideos({bool all = false}) async {
   final raw = await rootBundle.loadString('assets/videos.json');
   final list = jsonDecode(raw) as List<dynamic>;
-  return [for (final e in list) Video.fromJson(e as Map<String, dynamic>)];
+  final videos = [
+    for (final e in list) Video.fromJson(e as Map<String, dynamic>),
+    ...await LessonStore.added(),
+  ];
+  if (all) return videos;
+  final hidden = await VideoControls.hidden();
+  final approved = await LessonStore.approved();
+  return [for (final v in videos) if (v.approved && approved.contains(v.youtubeId) && !hidden.contains(v.youtubeId)) v];
 }
 
 class _VideoCard extends StatelessWidget {
@@ -160,14 +221,19 @@ class _VideoCard extends StatelessWidget {
                         Image.network(
                           'https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg',
                           fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => ColoredBox(color: color.withAlpha(60)),
-                          loadingBuilder: (_, child, progress) => progress == null
+                          errorBuilder: (_, _, _) =>
+                              ColoredBox(color: color.withAlpha(60)),
+                          loadingBuilder: (_, child, progress) =>
+                              progress == null
                               ? child
                               : ColoredBox(color: color.withAlpha(60)),
                         ),
                         Center(
-                          child: Icon(Icons.play_circle_fill,
-                              size: 40, color: Colors.white.withAlpha(230)),
+                          child: Icon(
+                            Icons.play_circle_fill,
+                            size: 40,
+                            color: Colors.white.withAlpha(230),
+                          ),
                         ),
                       ],
                     ),
@@ -180,7 +246,10 @@ class _VideoCard extends StatelessWidget {
                     children: [
                       Text(
                         video.title,
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 6),
                       Text(
@@ -207,7 +276,12 @@ class VideoListScreen extends StatefulWidget {
 
   /// Start "today's plan" as soon as the list loads (the home "let's play" button).
   final bool autoPlan;
-  const VideoListScreen({super.key, required this.age, this.subject, this.autoPlan = false});
+  const VideoListScreen({
+    super.key,
+    required this.age,
+    this.subject,
+    this.autoPlan = false,
+  });
 
   @override
   State<VideoListScreen> createState() => _VideoListScreenState();
@@ -219,6 +293,7 @@ const _planOrder = ['Learning', 'Story', 'Fun'];
 class _VideoListScreenState extends State<VideoListScreen> {
   final _session = SessionManager.instance;
   bool _planStarted = false;
+  String? _category;
 
   // Read once per screen: build runs on every rebuild and must not parse the whitelist again.
   late final Future<List<Video>> _videos = loadVideos();
@@ -254,12 +329,15 @@ class _VideoListScreenState extends State<VideoListScreen> {
   List<Video> _buildPlan(List<Video> allForAge) {
     final random = Random();
     // Foreign-language lessons are opened from "دروسي", not picked at random.
-    final forAge =
-        allForAge.where((v) => v.subject != 'german' && v.subject != 'french').toList();
+    final forAge = allForAge
+        .where((v) => v.subject != 'german' && v.subject != 'french')
+        .toList();
     return [
       for (final category in _planOrder)
         if (forAge.any((v) => v.category == category))
-          (forAge.where((v) => v.category == category).toList()..shuffle(random)).first,
+          (forAge.where((v) => v.category == category).toList()
+                ..shuffle(random))
+              .first,
     ];
   }
 
@@ -289,7 +367,10 @@ class _VideoListScreenState extends State<VideoListScreen> {
     // Videos that may follow this one: the whitelist for the child's age (nothing else is ever played).
     List<Video> related;
     try {
-      related = [for (final v in await loadVideos()) if (age >= v.minAge && age <= v.maxAge) v];
+      related = [
+        for (final v in await loadVideos())
+          if (age >= v.minAge && age <= v.maxAge) v,
+      ];
     } catch (_) {
       related = const [];
     }
@@ -297,7 +378,10 @@ class _VideoListScreenState extends State<VideoListScreen> {
     final current = ValueNotifier<Video>(video);
     final finished = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => PlayerScreen(video: video, related: related, current: current)),
+      MaterialPageRoute(
+        builder: (_) =>
+            PlayerScreen(video: video, related: related, current: current),
+      ),
     );
     if (!mounted) return;
     // Watched to the end: watch -> try -> apply, unless time is up. The lesson is about the last video played.
@@ -305,7 +389,9 @@ class _VideoListScreenState extends State<VideoListScreen> {
     if (finished == true && child != null && _session.reason.value == null) {
       await Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => LessonFlowScreen(video: current.value, child: child)),
+        MaterialPageRoute(
+          builder: (_) => LessonFlowScreen(video: current.value, child: child),
+        ),
       );
     }
     if (mounted) _checkRest();
@@ -316,8 +402,11 @@ class _VideoListScreenState extends State<VideoListScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text(subjectById(subject ?? '')?.label ?? tr2('فيديوهات لعمر $age', 'Videos for age $age'),
-            style: const TextStyle(fontSize: 26)),
+        title: Text(
+          subjectById(subject ?? '')?.label ??
+              tr2('فيديوهات لعمر $age', 'Videos for age $age'),
+          style: const TextStyle(fontSize: 26),
+        ),
       ),
       bottomNavigationBar: ValueListenableBuilder<int?>(
         valueListenable: _session.remainingSeconds,
@@ -343,25 +432,47 @@ class _VideoListScreenState extends State<VideoListScreen> {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
-              child: Text(loc('تعذر تحميل الفيديوهات'), style: TextStyle(fontSize: 24)),
+              child: Text(
+                loc('تعذر تحميل الفيديوهات'),
+                style: TextStyle(fontSize: 24),
+              ),
             );
           }
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
           final list = snapshot.data!
-              .where((v) =>
-                  age >= v.minAge && age <= v.maxAge && (subject == null || v.subject == subject))
+              .where(
+                (v) =>
+                    age >= v.minAge &&
+                    age <= v.maxAge &&
+                    (subject == null || v.subject == subject),
+              )
               .toList();
           if (list.isEmpty) {
             return Center(
-              child: Text(
-                subject == null ? loc('لا توجد فيديوهات لهذا العمر') : loc('لا توجد دروس بعد لهذه المادة'),
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 24),
+              child: SingleChildScrollView(
+                key: const ValueKey('video_empty'),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.video_library_outlined, size: 56, color: Colors.black45),
+                    const SizedBox(height: 12),
+                    Text(
+                      subject == null
+                          ? tr2('لا توجد فيديوهات لهذا العمر بعد. اطلب من شخص بالغ أن يختار الدروس من منطقة الوالدين.', 'No videos for this age yet. Ask a grown-up to choose lessons in the parent area.')
+                          : tr2('لا توجد دروس بعد لهذه المادة. اطلب من شخص بالغ أن يختارها.', 'No lessons for this subject yet. Ask a grown-up to choose some.'),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 22),
+                    ),
+                  ],
+                ),
               ),
             );
           }
+          final categories = {for (final v in list) v.category}.toList()..sort();
+          final shownList = _category == null ? list : [for (final v in list) if (v.category == _category) v];
           final plan = _buildPlan(list);
           // "Today's plan" is the first row, only on the all-videos list.
           final offset = subject == null ? 1 : 0;
@@ -371,9 +482,35 @@ class _VideoListScreenState extends State<VideoListScreen> {
               if (mounted) _runPlan(plan);
             });
           }
-          return ListView.builder(
+          return Column(children: [
+            AnimatedBuilder(
+              animation: ConnectivityMonitor.instance,
+              builder: (_, _) => ConnectivityMonitor.instance.isOffline
+                  ? Container(
+                      key: const ValueKey('video_offline'),
+                      width: double.infinity,
+                      color: const Color(0xFFFFF1D6),
+                      padding: const EdgeInsets.all(10),
+                      child: Text(tr2('لا يوجد إنترنت. الفيديوهات تحتاج إلى إنترنت.', 'No internet. Videos need internet.'), textAlign: TextAlign.center, style: const TextStyle(fontSize: 18)),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+            if (categories.length > 1)
+              SizedBox(
+                height: 56,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  children: [
+                    Padding(padding: const EdgeInsetsDirectional.only(end: 8), child: ChoiceChip(label: Text(tr2('الكل', 'All')), selected: _category == null, onSelected: (_) => setState(() => _category = null))),
+                    for (final c in categories)
+                      Padding(padding: const EdgeInsetsDirectional.only(end: 8), child: ChoiceChip(key: ValueKey('vcat_$c'), label: Text(categoryLabel(c)), selected: _category == c, onSelected: (_) => setState(() => _category = _category == c ? null : c))),
+                  ],
+                ),
+              ),
+            Expanded(child: ListView.builder(
             padding: const EdgeInsets.all(12),
-            itemCount: list.length + offset,
+            itemCount: shownList.length + offset,
             itemBuilder: (_, i) {
               if (offset == 1 && i == 0) {
                 return Padding(
@@ -390,15 +527,19 @@ class _VideoListScreenState extends State<VideoListScreen> {
                     icon: const Icon(Icons.star_rounded, size: 36),
                     label: Text(
                       loc('خطة اليوم'),
-                      style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 );
               }
-              final video = list[i - offset];
+              final video = shownList[i - offset];
               return _VideoCard(video: video, onTap: () => _play(video));
             },
-          );
+          )),
+          ]);
         },
       ),
     );
@@ -412,18 +553,22 @@ class AppScrollBehavior extends MaterialScrollBehavior {
 
   @override
   Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-        PointerDeviceKind.trackpad,
-        PointerDeviceKind.stylus,
-        PointerDeviceKind.invertedStylus,
-      };
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+    PointerDeviceKind.stylus,
+    PointerDeviceKind.invertedStylus,
+  };
 }
 
 /// Lesson and story sounds stop when the app leaves the screen (see AudioGate). They never restart by themselves.
 class _AudioLifecycle with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    AudioGate.instance.setBackground(state == AppLifecycleState.paused || state == AppLifecycleState.hidden || state == AppLifecycleState.detached);
+    AudioGate.instance.setBackground(
+      state == AppLifecycleState.paused ||
+          state == AppLifecycleState.hidden ||
+          state == AppLifecycleState.detached,
+    );
   }
 }

@@ -34,7 +34,7 @@ unused `_round`, 2 test infos), Firestore rules emulator 59/59, `flutter build w
 | G1 | Tests / analyze / build | see top | PARTIAL | — | Android build BLOCKED (no SDK); web build passes. |
 | G2 | Resource disposal | `CallController._disposed`, audio gate, autosave dispose | NOT VERIFIED | Medium | Reviewed in code only; no leak test. |
 | H1 | No ads / analytics / external links / public sharing | pubspec has no analytics/ads/url_launcher (grep) | PASS (static) | High | — |
-| H2 | Permissions | manifest: INTERNET, RECORD_AUDIO, CAMERA, MODIFY_AUDIO_SETTINGS, ACCESS_NETWORK_STATE, CHANGE_NETWORK_STATE | PARTIAL | Medium | RECORD_AUDIO/CAMERA are declared but requested at use only for voice/calls (not verified on a device). CHANGE_NETWORK_STATE/MODIFY_AUDIO_SETTINGS likely come from WebRTC: confirm and consider removing. |
+| H2 | Permissions | manifest (Release 1 offline): INTERNET, RECORD_AUDIO, MODIFY_AUDIO_SETTINGS, ACCESS_NETWORK_STATE; CAMERA and CHANGE_NETWORK_STATE removed | PARTIAL | Low | RECORD_AUDIO requested at use only for dictation (not verified on a device). MODIFY_AUDIO_SETTINGS is probably not needed offline: confirm on a build. |
 | H3 | Parent PIN | salted SHA-256, 5 tries then 30 s lockout, secure storage | PARTIAL | Medium | Fast hash on a 4–6 digit PIN is weak if storage is extracted; acceptable only as a child speed bump. |
 | H4 | Non-punitive feedback | wrong answers fade only; stars on completion only | PASS (code review + tests) | Medium | — |
 | H5 | Secrets in repo | `firebase_options.dart` is a placeholder; no key files tracked | PASS (static grep) | High | A real project's `firebase_options.dart` is public-by-design config, but rules are the real protection. |

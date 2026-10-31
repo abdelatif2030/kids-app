@@ -70,3 +70,17 @@ const kReconnectSeconds = 15;
 /// mobile carriers or strict firewalls a TURN relay is required. Add your own TURN server here when you have
 /// one (never put its password in the repository: pass it at build time).
 const kStunServers = ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'];
+
+/// The relay (TURN) service for calls over networks that block direct connections. NONE exists yet (S7): calls use STUN only and
+/// may fail on some mobile networks. When a TURN service is set up, its short-lived credentials must come from the backend at call
+/// time (never from a constant in the app) and be installed with [iceServersLoader]; nothing else in the call code needs to change.
+const bool kTurnConfigured = false;
+
+typedef IceServersLoader = Future<List<Map<String, dynamic>>> Function();
+
+Future<List<Map<String, dynamic>>> stunOnlyIceServers() async => [
+      for (final s in kStunServers) {'urls': s},
+    ];
+
+/// Replaced (by the app start-up) once a backend that hands out TURN credentials exists. Default: STUN only.
+IceServersLoader iceServersLoader = stunOnlyIceServers;

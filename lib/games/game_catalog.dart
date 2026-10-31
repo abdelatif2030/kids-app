@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../journey/models.dart';
 import '../l10n/strings.dart';
+import 'adventure_games.dart';
 import 'choice_games.dart';
 import 'connect_four_game.dart';
 import 'letter_fishing_game.dart';
@@ -34,6 +35,60 @@ class GameInfo {
 }
 
 final List<GameInfo> kEducationalGames = [
+  GameInfo(
+    SnakesLaddersGame.gameId,
+    () => tr2('السلالم والزلاجات', 'Ladders and slides'),
+    () => tr2('العدّ والتقدم على لوحة، وانتظار الدور', 'Counting along a board, taking turns'),
+    Icons.stairs_rounded,
+    4,
+    6,
+    (id, age, _) => SnakesLaddersGame(childId: id, age: age),
+  ),
+  GameInfo(
+    JigsawGame.gameId,
+    () => tr2('تركيب الصورة', 'Puzzle picture'),
+    () => tr2('الإدراك البصري والمطابقة', 'Visual perception and fitting'),
+    Icons.extension_rounded,
+    3,
+    6,
+    (id, age, _) => JigsawGame(childId: id, age: age),
+  ),
+  GameInfo(
+    MazeGame.gameId,
+    () => tr2('الفأر والجبن', 'Mouse and cheese'),
+    () => tr2('التخطيط وحلّ المشكلات البسيطة', 'Planning and simple problem solving'),
+    Icons.grid_on_rounded,
+    4,
+    6,
+    (id, age, _) => MazeGame(childId: id, age: age),
+  ),
+  GameInfo(
+    TreasureHuntGame.gameId,
+    () => tr2('كنز الجزيرة', 'Island treasure'),
+    () => tr2('المواقع والاتجاهات والتفكير المنطقي', 'Positions, directions and logical thinking'),
+    Icons.diamond_rounded,
+    4,
+    6,
+    (id, age, _) => TreasureHuntGame(childId: id, age: age),
+  ),
+  GameInfo(
+    ConnectDotsGame.gameId,
+    () => tr2('وصّل النقاط', 'Connect the dots'),
+    () => tr2('ترتيب الأعداد وتحكّم اليد', 'Number order and hand control'),
+    Icons.timeline_rounded,
+    3,
+    6,
+    (id, age, _) => ConnectDotsGame(childId: id, age: age),
+  ),
+  GameInfo(
+    AnimalHabitatsGame.gameId,
+    () => tr2('أين يعيش؟', 'Where does it live?'),
+    () => tr2('الحيوانات وبيئاتها', 'Animals and their homes'),
+    Icons.pets_rounded,
+    3,
+    6,
+    (id, age, _) => AnimalHabitatsGame(childId: id, age: age),
+  ),
   GameInfo(
     MatchPicturesGame.gameId,
     () => tr2('طابق الصور المتشابهة', 'Match identical pictures'),

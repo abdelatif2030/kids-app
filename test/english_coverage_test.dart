@@ -134,7 +134,7 @@ class _Teachers {
       ageMax: 9,
       formats: const [formatOnline],
     );
-    await repo.saveTeacherProfile(profile);
+    await repo.saveTeacherProfile(profile); repo.approveForTest(repo.currentUser!.uid); // the owner approves in the console
     await repo.addSlots([
       Slot(teacherUid: teacherUid, startMs: DateTime.now().add(const Duration(days: 2)).millisecondsSinceEpoch, minutes: 45),
     ]);

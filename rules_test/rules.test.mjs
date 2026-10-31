@@ -12,7 +12,7 @@ const past = (h = 5) => Date.now() - h * HOUR;
 before(async () => {
   env = await initializeTestEnvironment({
     projectId: 'demo-rehlaty',
-    firestore: { rules: readFileSync('../firestore.rules', 'utf8'), host: '127.0.0.1', port: 8081 },
+    firestore: { rules: readFileSync(process.env.RULES_FILE ?? '../firestore.rules', 'utf8'), host: '127.0.0.1', port: 8081 },
   });
 });
 after(async () => { await env.cleanup(); });
@@ -60,7 +60,9 @@ async function bookSlot(uid, ms, bookingId = 'b1', over = {}) {
 test('a teacher can never write or change the verification badges', async () => {
   const db = as('t3');
   await env.withSecurityRulesDisabled(async (ctx) => setDoc(doc(ctx.firestore(), 'users', 't3'), { role: 'teacher', name: 't3' }));
-  const base = { name: 'N', bio: 'b', subjects: ['math'], languages: ['العربية'], priceNote: '', status: 'approved' };
+  // (S2, applied 2026-10-31) a new profile is created 'pending'; 'approved' at creation is refused
+  const base = { name: 'N', bio: 'b', subjects: ['math'], languages: ['العربية'], priceNote: '', status: 'pending' };
+  await assertFails(setDoc(doc(db, 'teachers', 't3'), { ...base, status: 'approved' }));
   await assertFails(setDoc(doc(db, 'teachers', 't3'), { ...base, identityVerified: true }));
   await assertSucceeds(setDoc(doc(db, 'teachers', 't3'), base));
   await assertFails(updateDoc(doc(db, 'teachers', 't3'), { qualificationVerified: true }));
@@ -818,4 +820,99 @@ test('calls: the parent can delete old call records and their network candidates
   await assertSucceeds(deleteDoc(cand(as('p1'))));
   await assertFails(deleteDoc(callRef(as('r1'))));
   await assertSucceeds(deleteDoc(callRef(as('p1'))));
+});
+
+// ---- isolation between families and from other account types (added 2026-10-31; tests only, rules unchanged) ----
+async function seedFamilyData() {
+  await seedRelative('r1', 'active', 'p1');
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    await setDoc(msgRef(db, 'x1'), { ...fmsg(), at: new Date() });
+    await setDoc(doc(db, 'families', 'p1', 'calls', 'k1'), { childId: 'c1', childName: 'Lina', relUid: 'r1', from: 'parent', status: 'ringing', offer: { sdp: 'v=0', type: 'offer' }, createdAt: new Date() });
+    await setDoc(doc(db, 'families', 'p1', 'calls', 'k1', 'candidates', 'c1'), { from: 'parent', data: '{}' });
+    await setDoc(doc(db, 'families', 'p1', 'voices', 'v1'), { childId: 'c1', relUid: 'r1', from: 'child', data: 'AAAA', mime: 'audio/mp4', secs: 3, at: new Date() });
+    await setDoc(doc(db, 'connectRequests', 'q1'), { familyId: 'p1', parentName: 'Sara', toName: 'nana', toUid: 'r1', relation: 'grandma', children: { c1: 'Lina' }, status: 'pending', createdAt: new Date() });
+  });
+}
+
+test('isolation: a teacher account cannot read or write any family data (messages, calls, voices, relatives, requests)', async () => {
+  await seedFamilyData();
+  const t = as('t1');
+  await assertFails(getDoc(msgRef(t, 'x1')));
+  await assertFails(getDocs(collection(t, 'families', 'p1', 'messages')));
+  await assertFails(getDocs(query(collection(t, 'families', 'p1', 'messages'), where('relUid', '==', 't1'))));
+  await assertFails(getDoc(doc(t, 'families', 'p1', 'calls', 'k1')));
+  await assertFails(getDoc(doc(t, 'families', 'p1', 'calls', 'k1', 'candidates', 'c1')));
+  await assertFails(getDoc(doc(t, 'families', 'p1', 'voices', 'v1')));
+  await assertFails(getDoc(doc(t, 'families', 'p1', 'relatives', 'r1')));
+  await assertFails(getDoc(doc(t, 'connectRequests', 'q1')));
+  await assertFails(setDoc(msgRef(t, 'm9'), fmsg({ from: 'relative', relUid: 't1', threadId: 'c1__t1' })));
+  await assertFails(setDoc(doc(t, 'families', 'p1', 'relatives', 't1'), { name: 'T', relation: 'x', status: 'active', children: { c1: 'Lina' }, requestId: 'q1' }));
+  await assertFails(setDoc(callRef(t, 'k2'), callData({ relUid: 't1', from: 'relative' })));
+});
+
+test('isolation: another family\'s parent and another family\'s active relative cannot read or write this family', async () => {
+  await seedFamilyData();
+  await seedRelative('r2', 'active', 'p2'); // r2 belongs to family p2 only
+  for (const who of ['p2', 'r2']) {
+    const db = as(who);
+    await assertFails(getDoc(msgRef(db, 'x1')));
+    await assertFails(getDocs(query(collection(db, 'families', 'p1', 'messages'), where('relUid', '==', who))));
+    await assertFails(getDoc(doc(db, 'families', 'p1', 'calls', 'k1')));
+    await assertFails(getDoc(doc(db, 'families', 'p1', 'voices', 'v1')));
+    await assertFails(getDoc(doc(db, 'families', 'p1', 'relatives', 'r1')));
+    await assertFails(deleteDoc(msgRef(db, 'x1')));
+    await assertFails(deleteDoc(doc(db, 'families', 'p1', 'voices', 'v1')));
+  }
+  await assertFails(setDoc(msgRef(as('r2'), 'm9'), fmsg({ from: 'relative', relUid: 'r2', threadId: 'c1__r2' })));
+  await assertFails(setDoc(msgRef(as('p2'), 'm8'), fmsg({ relUid: 'r1' })));
+  // the real participants still can
+  await assertSucceeds(getDoc(msgRef(as('p1'), 'x1')));
+  await assertSucceeds(getDoc(doc(as('r1'), 'families', 'p1', 'calls', 'k1')));
+});
+
+test('calls: an outsider cannot join, answer, end or add network candidates to someone else\'s call', async () => {
+  await seedFamilyData();
+  await seedRelative('r2', 'active', 'p2');
+  for (const who of ['t1', 'p2', 'r2', 'r1x']) {
+    const db = as(who);
+    await assertFails(updateDoc(callRef(db, 'k1'), { status: 'accepted', answer: { sdp: 'v=0', type: 'answer' } }));
+    await assertFails(updateDoc(callRef(db, 'k1'), { status: 'ended' }));
+    await assertFails(setDoc(doc(db, 'families', 'p1', 'calls', 'k1', 'candidates', 'evil'), { from: 'relative', data: '{}' }));
+    await assertFails(getDoc(callRef(db, 'k1')));
+  }
+  // only the callee (the relative) may answer a call the parent started
+  await assertSucceeds(updateDoc(callRef(as('r1'), 'k1'), { status: 'accepted', answer: { sdp: 'v=0', type: 'answer' } }));
+});
+
+test('isolation: nobody can read another person\'s account record, and a relative cannot read bookings or requests', async () => {
+  await env.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(doc(ctx.firestore(), 'bookings', 'b1'), bookingData());
+    await setDoc(doc(ctx.firestore(), 'requests', 'rq1'), { parentUid: 'p1', subject: 'math', goal: 'x', status: 'open' });
+  });
+  await assertFails(getDoc(doc(as('t1'), 'users', 'p1')));
+  await assertFails(getDoc(doc(as('p2'), 'users', 'p1')));
+  await assertFails(getDoc(doc(as('r1'), 'bookings', 'b1')));
+  await assertFails(getDoc(doc(as('r1'), 'requests', 'rq1')));
+  await assertFails(getDoc(doc(as('p2'), 'bookings', 'b1')));
+  await assertSucceeds(getDoc(doc(as('p1'), 'users', 'p1')));
+});
+
+test('anonymous (signed-out) users can read and write nothing', async () => {
+  await seedFamilyData();
+  const anon = env.unauthenticatedContext().firestore();
+  await assertFails(getDoc(msgRef(anon, 'x1')));
+  await assertFails(getDoc(doc(anon, 'teachers', 't1')));
+  await assertFails(getDoc(doc(anon, 'users', 'p1')));
+  await assertFails(setDoc(msgRef(anon, 'm1'), fmsg()));
+  await assertFails(setDoc(doc(anon, 'users', 'new'), { role: 'parent', name: 'x', createdAt: serverTimestamp() }));
+});
+
+test('known limits documented by tests: any signed-in user can read an approved teacher profile (by design); a relative can NOT read the CV (S3); account deletion is refused', async () => {
+  await env.withSecurityRulesDisabled(async (ctx) => { await setDoc(doc(ctx.firestore(), 'teacherFiles', 't1'), { cvName: 'cv.pdf', cvB64: 'AAAA' }); });
+  await assertSucceeds(getDoc(doc(as('r1'), 'teachers', 't1'))); // a relative can see the public teacher directory
+  await assertFails(getDoc(doc(as('r1'), 'teacherFiles', 't1'))); // (S3, applied) the CV is for its teacher and for parents only
+  await assertSucceeds(getDoc(doc(as('p1'), 'teacherFiles', 't1'))); // a parent can read the CV of an approved teacher
+  await assertFails(deleteDoc(doc(as('p1'), 'users', 'p1'))); // there is no way to delete an account record: see docs/ACCOUNT_DELETION_DESIGN.md
+  await assertFails(deleteDoc(doc(as('t1'), 'teachers', 't1')));
 });

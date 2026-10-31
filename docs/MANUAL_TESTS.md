@@ -1,5 +1,8 @@
 # Rehlaty manual test checklist
 
+> **Start with `docs/TESTING_GUIDE.md`** (short sessions for a non-developer) and `docs/REAL_DEVICE_TEST_GUIDE.md` (how to install and what to check on phones and tablets). This file is the long technical checklist behind them.
+> **Corrections made 2026-10-31** (the items below were written earlier and some sentences were out of date): A1 (no language choice screen any more: the app starts in Arabic), A6 and A8 (the app now declares microphone and camera permissions for the optional family features, so "INTERNET only" is no longer true), C1 and C2 (a child sees NO videos until a parent approves them; test C after approving a few lessons, see `docs/VIDEO_REVIEW_WORKFLOW.md`), C7 (the list is a set of unverified candidates, reviewed by the parent in the Lesson library).
+
 Every test below starts as **Not tested**. Nothing here has been run by a person yet. When you run a test, change its checkbox, fill in *Actual result* and *Status* (Passed / Failed / Blocked / Not applicable), and note the device. Do not tick a box on someone else's behalf.
 
 Status legend: `Not tested` - `Passed` - `Failed` - `Blocked` - `Not applicable`
@@ -18,7 +21,7 @@ Run on a physical Android device.
 - **Steps:**
   1. Build a release or debug APK and install it.
   2. Open the app.
-- **Expected result:** The app opens to the first screen without crashing; Arabic or English choice is shown.
+- **Expected result:** The app opens (in landscape, in Arabic) without crashing. There is no separate language screen; the language can be changed later in Parent settings.
 - **Actual result:** Not tested
 - **Status:** Not tested
 - **Device or environment:** Device model, Android version: 
@@ -88,7 +91,7 @@ Run on a physical Android device.
 - **Preconditions:** Fresh install.
 - **Steps:**
   1. Open Android Settings > Apps > Rehlaty > Permissions.
-- **Expected result:** No unrelated permission is requested (no camera, microphone, contacts, location).
+- **Expected result:** No permission dialog appears at start. The app declares Internet, microphone and camera (both used only by the optional family voice/video features, which are off in this build), audio settings and network state. No contacts, location, storage or phone-state permission.
 - **Actual result:** Not tested
 - **Status:** Not tested
 - **Device or environment:** Device, Android version: 
@@ -117,7 +120,7 @@ Run on a physical Android device.
 - **Steps:**
   1. Install the release APK on a phone with a working connection.
   2. Open a video from the list and look at the thumbnails.
-- **Expected result:** Videos play and thumbnails load in the release build. In A6, INTERNET is the only permission listed.
+- **Expected result:** Approved videos play and their thumbnails load in the release build (the video list is empty until a parent approves lessons). In A6, the permissions are the ones listed in A6 (INTERNET is needed by videos).
 - **Actual result:** Not tested
 - **Status:** Not tested
 - **Device or environment:** Device model, Android version: 
@@ -276,7 +279,7 @@ The app has video playback (official YouTube player, whitelist in assets/videos.
 - **Preconditions:** Child home > Videos.
 - **Steps:**
   1. Open the videos list for the child's age.
-- **Expected result:** Only videos from the whitelist appear, with thumbnails or the color-block fallback.
+- **Expected result:** On a fresh install NO videos appear (friendly empty message). After a parent approves lessons, only those appear, with thumbnails or the color-block fallback.
 - **Actual result:** Not tested
 - **Status:** Not tested
 - **Device or environment:** Device, network: 
@@ -1683,3 +1686,31 @@ set in `assets/audio/eval_set.json` for pronunciation. Do not mark anything done
 - **Status:** Not tested
 - **Device or environment:** 
 - **Notes:** 
+
+## Added 2026-10-31 (all unchecked: nothing here has been run on a device)
+- [ ] Fresh install: the child's videos list says to ask a grown-up; no thumbnails appear.
+- [ ] Parent settings -> Lesson library: open Preview on a lesson, approve it, see it in the child's list; disable it, it disappears; withdraw approval.
+- [ ] Add a lesson by link: a playlist, a channel and a search link are refused; a single video link is saved as "waiting for approval".
+- [ ] Turn off the network while a video plays and when opening one: the offline message with Try again and Back appears; turning it on and pressing Try again plays.
+- [ ] A removed or private YouTube video shows "not available right now" without suggesting another video.
+- [ ] Landscape and small phone: the lesson library, child list and player fit; text size at maximum.
+- [ ] World: open the island screen, change theme, time of day and name; collectibles appear after finishing the matching game; the new-gift message shows once.
+- [ ] Me tab: companion talks (with sound on), weekly adventure, everyday learning, family time and museum open and show only this child's data.
+- [ ] Switch to a second child: none of the first child's gifts, adventures, museum rooms or lessons-approved state leaks (lesson approval is a family setting by design).
+
+
+## Added 2026-10-31 (release 1; all unchecked)
+- [ ] Videos: review sheet (five checks) approves only when all are ticked; Reject hides it; Reopen returns it to undecided; Withdraw and Disable remove it from the child at once.
+- [ ] Videos: with a lesson playing, tapping the YouTube logo, the title, an end-screen suggestion or "Watch on YouTube" does nothing (round E+ of the device guide).
+- [ ] Online: Family chat and Teachers show "Not available in this version yet", no sign-in form, in Arabic and English.
+- [ ] Permissions: no camera/microphone prompt at launch or during normal use; dictation prompt only on tapping dictation; refusing it leaves a working app and working narration.
+- [ ] Identity: the Android app id and iOS bundle id are `com.rehlaty.app`; the app is named Rehlaty; launch screen shows the logo; icon is the Rehlaty logo on both platforms.
+- [ ] iOS: privacy manifest present in the archive; no permission dialogs at launch; landscape on iPhone.
+
+
+## Added 2026-10-31 (security phase; all unchecked)
+- [ ] Sign-in screen (only visible if the gate is open in your build): "Forgot your password?" shows the same message for an address with and without an account; the e-mail arrives for a real account.
+- [ ] After registering, the verification e-mail arrives (Arabic/English per template).
+- [ ] A booking message containing a link, an address (a@b.c), `.com`, `www.` or a phone number is refused; a normal sentence is sent.
+- [ ] iOS: after deleting the app and reinstalling, check whether the old parent PIN still exists (the PIN hash lives in the Keychain, which iOS may keep): record what the app does (asks for the old PIN? asks to create one?). Report if it is confusing.
+- [ ] Every video door: the child list, today's plan and related-video autoplay show only approved, enabled lessons.

@@ -1,3 +1,4 @@
+import 'age_scope.dart';
 import 'design/layout.dart';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -108,7 +109,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  loc('أنشئ ملفك الشخصي، وعند الحفظ يظهر للأهل مباشرة.'),
+                  kTeachersNeedOwnerApproval
+                      ? tr2('أنشئ ملفك الشخصي. يظهر للأهل بعد أن يوافق عليه صاحب التطبيق.', 'Create your profile. Parents see it after the app owner approves it.')
+                      : loc('أنشئ ملفك الشخصي، وعند الحفظ يظهر للأهل مباشرة.'),
                   style: TextStyle(fontSize: 18),
                 ),
               ] else ...[
@@ -135,7 +138,9 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
                                 ? loc('ملفك ظاهر للأهل.')
                                 : p.suspended
                                     ? loc('تم إيقاف ظهور ملفك. تواصل مع صاحب التطبيق.')
-                                    : loc('احفظ ملفك مرة أخرى ليظهر للأهل.'),
+                                    : kTeachersNeedOwnerApproval
+                                        ? tr2('ملفك بانتظار موافقة صاحب التطبيق. لا يراه الأهل ولا تستطيع نشر مواعيد أو أعمال قبل الموافقة.', "Your profile is waiting for the app owner's approval. Parents cannot see it, and you cannot publish times or work samples until it is approved.")
+                                        : loc('احفظ ملفك مرة أخرى ليظهر للأهل.'),
                             style: const TextStyle(fontSize: 17),
                           ),
                         ),
@@ -333,7 +338,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
           subjects: _subjects.toList(),
           languages: _languages.toList(),
           priceNote: _price.text.trim(),
-          status: widget.existing?.status ?? teacherStatusApproved,
+          status: widget.existing?.status ?? (kTeachersNeedOwnerApproval ? teacherStatusPending : teacherStatusApproved),
           photoB64: _photo == null ? null : base64Encode(_photo!),
           cvName: _cvName,
           headline: _headline.text.trim(),
@@ -484,7 +489,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
                         hint: Text(loc('أصغر عمر')),
                         items: [
                           DropdownMenuItem<int?>(value: null, child: Text(loc('غير محدد'))),
-                          for (var a = 1; a <= 12; a++) DropdownMenuItem<int?>(value: a, child: Text('$a')),
+                          for (final a in ageChoices(current: _ageMin)) DropdownMenuItem<int?>(value: a, child: Text('$a')),
                         ],
                         onChanged: (v) => setState(() => _ageMin = v),
                       ),
@@ -497,7 +502,7 @@ class _TeacherProfileFormState extends State<TeacherProfileForm> {
                         hint: Text(loc('أكبر عمر')),
                         items: [
                           DropdownMenuItem<int?>(value: null, child: Text(loc('غير محدد'))),
-                          for (var a = 1; a <= 12; a++) DropdownMenuItem<int?>(value: a, child: Text('$a')),
+                          for (final a in ageChoices(current: _ageMax)) DropdownMenuItem<int?>(value: a, child: Text('$a')),
                         ],
                         onChanged: (v) => setState(() => _ageMax = v),
                       ),

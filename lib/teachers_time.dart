@@ -21,7 +21,13 @@ String fmtTime(DateTime t) => '${_two(t.toLocal().hour)}:${_two(t.toLocal().minu
 
 /// Phone numbers, e-mail addresses and links are not allowed in booking
 /// messages: contact stays inside the app between adults.
+///
+/// The pattern in [kBookingMessageLinkPattern] is the SAME one the proposed Firestore rule uses (`rules_proposed/`), so a message this
+/// check accepts is never refused by that rule for containing a link.
+final RegExp kBookingMessageLinkPattern = RegExp(r'(https?:|www\.|://|\.com|\.net|\.org|@)', caseSensitive: false);
+
 bool looksLikeContactDetails(String text) {
+  if (kBookingMessageLinkPattern.hasMatch(text)) return true;
   final digits = text.replaceAll(RegExp(r'[\s\-().]'), '');
   final arabicIndic = digits.replaceAllMapped(RegExp('[٠-٩]'), (m) => (m.group(0)!.codeUnitAt(0) - 0x0660).toString());
   if (RegExp(r'\d{8,}').hasMatch(arabicIndic)) return true;

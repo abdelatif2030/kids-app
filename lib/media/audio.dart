@@ -67,8 +67,22 @@ abstract class SpeechBackend {
   Future<void> preferVoice(String lang, String? name) async {}
 }
 
-class TtsSpeech implements SpeechBackend {
+/// Optional capability of a speech backend: shape the next lines (a character's pitch and pace, the narration volume).
+/// Backends that cannot do it simply do not implement it; the engine then speaks with their defaults.
+abstract interface class VoiceTunable {
+  void tune({double pitchScale = 1.0, double rateScale = 1.0, double volume = 1.0});
+}
+
+class TtsSpeech implements SpeechBackend, VoiceTunable {
   final FlutterTts _tts = FlutterTts();
+  double _pitchScale = 1.0, _rateScale = 1.0, _volume = 1.0;
+
+  @override
+  void tune({double pitchScale = 1.0, double rateScale = 1.0, double volume = 1.0}) {
+    _pitchScale = pitchScale;
+    _rateScale = rateScale;
+    _volume = volume;
+  }
   bool _ready = false;
   final Map<String, String> _locales = {};
 
@@ -121,8 +135,9 @@ class TtsSpeech implements SpeechBackend {
       }
     }
     // Slightly slower than adult speed, and a touch warmer: easier for a young child to follow.
-    await _tts.setSpeechRate((kChildSpeechRate * rate).clamp(0.2, 0.9));
-    await _tts.setPitch(kChildSpeechPitch);
+    await _tts.setSpeechRate((kChildSpeechRate * rate * _rateScale).clamp(0.2, 0.9));
+    await _tts.setPitch((kChildSpeechPitch * _pitchScale).clamp(0.5, 2.0));
+    await _tts.setVolume(_volume.clamp(0.0, 1.0));
     await _tts.speak(text);
   }
 

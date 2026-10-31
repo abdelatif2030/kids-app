@@ -128,34 +128,18 @@ void main() {
       await t.pump(const Duration(milliseconds: 600));
     }
 
-    testWidgets('the list is the default; the switch shows the island map and back; the choice is remembered', (t) async {
+    testWidgets('the home shows the five main destinations at every age, Games the biggest', (t) async {
       await openHome(t);
-      expect(find.byKey(const ValueKey('greeting')), findsOneWidget);
-      expect(find.byKey(const ValueKey('island_stories')), findsNothing);
-      await t.tap(find.byKey(const ValueKey('home_view_toggle')));
-      await t.pump(const Duration(milliseconds: 600));
-      expect(find.byKey(const ValueKey('island_stories')), findsOneWidget);
-      expect(find.byKey(const ValueKey('island_games')), findsOneWidget);
-      expect(find.byKey(const ValueKey('greeting')), findsNothing);
-      final prefs = await t.runAsync(SharedPreferences.getInstance);
-      expect(prefs!.getString('home_view'), 'map');
-      await t.tap(find.byKey(const ValueKey('home_view_toggle')));
-      await t.pump(const Duration(milliseconds: 600));
-      expect(find.byKey(const ValueKey('greeting')), findsOneWidget);
-      expect(prefs.getString('home_view'), 'list');
+      for (final id in ['games', 'stories', 'learn', 'create', 'rewards']) {
+        expect(find.byKey(ValueKey('island_$id')), findsOneWidget, reason: id);
+      }
+      expect(find.byKey(const ValueKey('greeting')), findsNothing); // the greeting lives under More
+      final games = t.getSize(find.byKey(const ValueKey('island_games')));
+      final other = t.getSize(find.byKey(const ValueKey('island_learn')));
+      expect(games.width, greaterThan(other.width));
     });
 
-    testWidgets('a saved map choice opens the map next time', (t) async {
-      SharedPreferences.setMockInitialValues({'home_view': 'map'});
-      await openHome(t);
-      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
-      await t.pump(const Duration(milliseconds: 600));
-      expect(find.byKey(const ValueKey('island_stories')), findsOneWidget);
-    });
-
-    testWidgets('the islands follow the child\'s age: no numbers island for a toddler', (t) async {
-      HomeViewPref.instance.resetForTest();
-      await HomeViewPref.instance.set(true);
+    testWidgets('a toddler sees the same five destinations', (t) async {
       const baby = ChildProfile(id: 'k2', nickname: 'Baby', age: 2);
       t.view.physicalSize = const Size(600, 1600);
       t.view.devicePixelRatio = 1;
@@ -167,8 +151,25 @@ void main() {
       await t.pumpWidget(MaterialApp(home: Scaffold(body: HomeTab(child: baby, onExit: () {}, onTab: (_) {}))));
       await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 80)));
       await t.pump(const Duration(milliseconds: 600));
-      expect(find.byKey(const ValueKey('island_numbers')), findsNothing);
-      expect(find.byKey(const ValueKey('island_stories')), findsOneWidget);
+      for (final id in ['games', 'stories', 'learn', 'create', 'rewards']) {
+        expect(find.byKey(ValueKey('island_$id')), findsOneWidget, reason: id);
+      }
+    });
+
+    testWidgets('weights make a destination bigger and nothing overlaps', (t) async {
+      for (final w in [320.0, 390.0, 768.0]) {
+        final l = WorldMapLayout.compute(5, w, weights: const [1.45, 1, 1, 1, 1]);
+        expect(l.sizeAt(0), greaterThan(l.sizeAt(1)));
+        for (var i = 0; i < 5; i++) {
+          final r = Rect.fromCenter(center: l.centers[i], width: l.sizeAt(i) + 28, height: l.sizeAt(i));
+          expect(r.left, greaterThanOrEqualTo(0), reason: 'w=$w i=$i');
+          expect(r.right, lessThanOrEqualTo(l.width), reason: 'w=$w i=$i');
+          for (var j = i + 1; j < 5; j++) {
+            final q = Rect.fromCenter(center: l.centers[j], width: l.sizeAt(j) + 28, height: l.sizeAt(j) + 40);
+            expect(r.overlaps(q), isFalse, reason: 'w=$w $i/$j');
+          }
+        }
+      }
     });
   });
 }

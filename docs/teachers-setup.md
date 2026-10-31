@@ -91,3 +91,5 @@ const kFirebaseEnabled = true;
 - **You must re-publish `firestore.rules`** (new `portfolio` collection and the `introVideoUrl` check).
   The rules were tested with the emulator (`cd rules_test && npm test`: 28 tests pass).
 - "Preview as parents" on the teacher account already shows the page exactly as parents see it, including the portfolio.
+
+> **Update (Release 1):** teacher profiles are created `pending` and become visible only after the owner sets `status` to `approved` in the console; teachers can never approve themselves. Earlier text saying profiles are visible at once is outdated. The teacher service is OFF in Release 1. See `docs/RELEASE_1_DECISIONS.md`.

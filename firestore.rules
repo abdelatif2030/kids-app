@@ -1,9 +1,12 @@
 rules_version = '2';
 
+// Security review changes S2, S3 and S4 (docs/ONLINE_SECURITY_REVIEW.md) were APPLIED to this working-tree file on 2026-10-31 by the
+// owner's decision. They are marked "(S2)", "(S3)", "(S4)". This file has NOT been published to any Firebase project.
+
 // Paste into Firebase console > Firestore > Rules (see docs/teachers-setup.md).
-// Teachers are visible to parents as soon as they save their profile. To hide a
-// teacher, open teachers/{uid} in the console and set status to "suspended"
-// (a teacher can never lift that). To verify a teacher set identityVerified and/or
+// A new teacher profile is created as "pending" and is NOT visible to parents until the owner opens teachers/{uid} in the console and
+// sets status to "approved" (S2). A teacher can never approve themselves. To hide a teacher later, set status to "suspended" (a
+// teacher can never lift that). To verify a teacher set identityVerified and/or
 // qualificationVerified to true on teachers/{uid} in the console, after checking
 // documents; teachers cannot write those two fields. Parents' reports are in the "reports"
 // collection, readable only in the console.
@@ -59,15 +62,16 @@ service cloud.firestore {
         && (resource.data.status == 'approved' || request.auth.uid == uid);
       allow create: if signedIn() && request.auth.uid == uid
         && role() == 'teacher'
-        && request.resource.data.status == 'approved'
+        // (S2): a new profile is created as "pending"; the owner sets "approved" in the console after checking the person.
+        && request.resource.data.status == 'pending'
         && request.resource.data.get('photoB64', '').size() < 150000
         && profileFieldsOk(request.resource.data)
         // The verification badges can only be set by the owner in the console.
         && !('identityVerified' in request.resource.data)
         && !('qualificationVerified' in request.resource.data);
       allow update: if signedIn() && request.auth.uid == uid
-        && (request.resource.data.status == resource.data.status
-            || (resource.data.status == 'pending' && request.resource.data.status == 'approved'))
+        // (S2): the teacher can never change the status (no self-approval, no lifting a suspension).
+        && request.resource.data.status == resource.data.status
         && request.resource.data.get('photoB64', '').size() < 150000
         && profileFieldsOk(request.resource.data)
         && request.resource.data.get('identityVerified', false) == resource.data.get('identityVerified', false)
@@ -82,6 +86,8 @@ service cloud.firestore {
       allow read: if signedIn()
         && (resource.data.status == 'published' || resource.data.teacherUid == request.auth.uid);
       allow create: if signedIn() && role() == 'teacher'
+        // (S2): only an approved teacher can add work samples
+        && get(/databases/$(database)/documents/teachers/$(request.auth.uid)).data.status == 'approved'
         && request.resource.data.teacherUid == request.auth.uid
         && request.resource.data.status in ['draft', 'published']
         && portfolioFieldsOk(request.resource.data);
@@ -96,9 +102,11 @@ service cloud.firestore {
     // teacherFiles/{uid}: the CV (small, base64). The teacher writes their own;
     // signed-in users can read the CV of an approved teacher.
     match /teacherFiles/{uid} {
+      // (S3): the CV is readable by its teacher and by PARENTS only (not relatives or other teachers), and only while approved.
       allow read: if signedIn()
         && (request.auth.uid == uid
-            || get(/databases/$(database)/documents/teachers/$(uid)).data.status == 'approved');
+            || (role() == 'parent'
+                && get(/databases/$(database)/documents/teachers/$(uid)).data.status == 'approved'));
       allow create, update: if signedIn() && request.auth.uid == uid
         && role() == 'teacher'
         && request.resource.data.keys().hasOnly(['cvName', 'cvB64'])
@@ -199,6 +207,9 @@ service cloud.firestore {
           && request.resource.data.text is string
           && request.resource.data.text.size() >= 1
           && request.resource.data.text.size() <= 500
+          // (S4): no links or addresses in booking messages (the family chat already forbids them). The only link a
+          // teacher can give is the https lessonLink on the booking itself, which the parent sees as text to copy.
+          && !request.resource.data.text.matches('(?i).*(https?:|www\\.|://|\\.com|\\.net|\\.org|@).*')
           && request.resource.data.createdAt == request.time;
         allow update, delete: if false;
       }
@@ -211,6 +222,8 @@ service cloud.firestore {
     match /slots/{slotId} {
       allow read: if signedIn();
       allow create: if signedIn() && role() == 'teacher'
+        // (S2): only an approved teacher can publish bookable times
+        && get(/databases/$(database)/documents/teachers/$(request.auth.uid)).data.status == 'approved'
         && request.resource.data.keys().hasOnly(['teacherUid', 'startMs', 'minutes', 'status'])
         && request.resource.data.teacherUid == request.auth.uid
         && slotId == request.auth.uid + '_' + string(request.resource.data.startMs)

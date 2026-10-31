@@ -1,0 +1,9 @@
+# Development tools: when to use which
+
+Use a tool only when the task needs it. None of these is required for every task.
+
+- **Skills in `.claude/skills/`**: follow the matching one (clean-architecture, tdd-workflow, systematic-debugging, performance-optimization, database-design, api-design, owasp-secure-coding, devops-cicd, token-context-optimization). Use the built-in `code-review` and `security-review` for reviews.
+- **Context7 (`find-docs` skill, `npx ctx7@latest`)**: before writing or changing code that depends on a library API (Flutter, Dart, Firebase, a pub.dev package). It sends only the library name and the question to Context7, never source code. It needs network access to context7.com.
+- **Graphify (`graphify query/path/explain`, `graphify update .`)**: to understand architecture and dependencies before a large refactor or a cross-cutting change. The graph is local and AST-only (`graphify-out/`); run `graphify update .` after code changes. Never send source to a hosted service without the owner's approval.
+- **21st.dev plugin (`21st` skills and MCP)**: only to research UI ideas when designing a screen. Never replace an existing Rehlaty screen with a third-party component. Any component must be rewritten to the Rehlaty tokens (`lib/design/tokens.dart`), RTL/LTR, large touch targets, and the child-safety rules. Needs `API_KEY_21ST` in the environment (never in a file). No paid generation without the owner's approval.
+- **Strix skills (`*-with-strix`)**: authorized security reviews only: local development targets or targets the owner names. Never scan production, Firebase projects or third-party systems; never run `strix cloud` or buy credits without approval; never auto-fix findings that change production behaviour (rules, auth). Report findings with severity, evidence, impact and remediation.

@@ -1,0 +1,564 @@
+rules_version = '2';
+
+// PROPOSED RULES: NOT DEPLOYED, NOT PUBLISHED. A reviewable draft of the changes S2, S3 and S4 in docs/ONLINE_SECURITY_REVIEW.md.
+// It exists so the changes can be tested on the LOCAL emulator (rules_test: npm run test:proposed). The production file is
+// ../firestore.rules and it was NOT changed. Differences from firestore.rules are marked "PROPOSED".
+//
+// Paste into Firebase console > Firestore > Rules (see docs/teachers-setup.md).
+// Teachers are visible to parents as soon as they save their profile. To hide a
+// teacher, open teachers/{uid} in the console and set status to "suspended"
+// (a teacher can never lift that). To verify a teacher set identityVerified and/or
+// qualificationVerified to true on teachers/{uid} in the console, after checking
+// documents; teachers cannot write those two fields. Parents' reports are in the "reports"
+// collection, readable only in the console.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function role() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    // Limits on what a teacher can put in a profile.
+    function profileFieldsOk(d) {
+      return d.get('bio', '').size() <= 1500
+        && d.get('headline', '').size() <= 120
+        && d.get('philosophy', '').size() <= 600
+        && d.get('qualifications', '').size() <= 800
+        && d.get('cancellationPolicy', '').size() <= 400
+        && d.get('introVideoUrl', '').size() <= 300
+        && (d.get('introVideoUrl', '') == '' || d.get('introVideoUrl', '').matches('^https://[^ ]+$'))
+        && d.get('priceEgp', 0) >= 0 && d.get('priceEgp', 0) <= 100000
+        && d.get('lessonMinutes', 30) >= 10 && d.get('lessonMinutes', 30) <= 240
+        && d.get('experienceYears', 0) >= 0 && d.get('experienceYears', 0) <= 60
+        && d.get('ageMin', 0) >= 0 && d.get('ageMax', 12) <= 18;
+    }
+
+    function portfolioFieldsOk(d) {
+      return d.title is string && d.title.size() > 0 && d.title.size() <= 80
+        && d.get('description', '').size() <= 600
+        && d.get('imageB64', '').size() < 150000
+        && d.type in ['worksheet', 'lesson_plan', 'activity', 'story', 'other'];
+    }
+
+    // users/{uid}: role and display name, readable only by the owner.
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['role', 'name', 'createdAt'])
+        && request.resource.data.role in ['parent', 'teacher', 'relative'];
+      allow update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.role == resource.data.role
+        // a user name, once chosen, never changes
+        && (!('username' in resource.data) || request.resource.data.username == resource.data.username);
+      allow delete: if false;
+    }
+
+    // teachers/{uid}: parents see profiles whose status is "approved". A teacher
+    // sees and edits their own, but can never lift a suspension.
+    match /teachers/{uid} {
+      allow read: if signedIn()
+        && (resource.data.status == 'approved' || request.auth.uid == uid);
+      allow create: if signedIn() && request.auth.uid == uid
+        && role() == 'teacher'
+        // PROPOSED (S2): a new profile is created as "pending"; the owner sets "approved" in the console after checking the person.
+        && request.resource.data.status == 'pending'
+        && request.resource.data.get('photoB64', '').size() < 150000
+        && profileFieldsOk(request.resource.data)
+        // The verification badges can only be set by the owner in the console.
+        && !('identityVerified' in request.resource.data)
+        && !('qualificationVerified' in request.resource.data);
+      allow update: if signedIn() && request.auth.uid == uid
+        // PROPOSED (S2): the teacher can never change the status (no self-approval, no lifting a suspension).
+        && request.resource.data.status == resource.data.status
+        && request.resource.data.get('photoB64', '').size() < 150000
+        && profileFieldsOk(request.resource.data)
+        && request.resource.data.get('identityVerified', false) == resource.data.get('identityVerified', false)
+        && request.resource.data.get('qualificationVerified', false) == resource.data.get('qualificationVerified', false);
+      allow delete: if false;
+    }
+
+    // portfolio/{id}: a teacher's work samples. Parents (any signed-in user) can read only published
+    // items; the teacher reads and writes their own. Status "hidden" is set by the owner in the console:
+    // the teacher cannot set it, and cannot change an item that is hidden.
+    match /portfolio/{id} {
+      allow read: if signedIn()
+        && (resource.data.status == 'published' || resource.data.teacherUid == request.auth.uid);
+      allow create: if signedIn() && role() == 'teacher'
+        // PROPOSED (S2): only an approved teacher can add work samples
+        && get(/databases/$(database)/documents/teachers/$(request.auth.uid)).data.status == 'approved'
+        && request.resource.data.teacherUid == request.auth.uid
+        && request.resource.data.status in ['draft', 'published']
+        && portfolioFieldsOk(request.resource.data);
+      allow update: if signedIn() && resource.data.teacherUid == request.auth.uid
+        && resource.data.status in ['draft', 'published']
+        && request.resource.data.teacherUid == resource.data.teacherUid
+        && request.resource.data.status in ['draft', 'published']
+        && portfolioFieldsOk(request.resource.data);
+      allow delete: if signedIn() && resource.data.teacherUid == request.auth.uid;
+    }
+
+    // teacherFiles/{uid}: the CV (small, base64). The teacher writes their own;
+    // signed-in users can read the CV of an approved teacher.
+    match /teacherFiles/{uid} {
+      // PROPOSED (S3): the CV is readable by its teacher and by PARENTS only (not relatives or other teachers), and only while approved.
+      allow read: if signedIn()
+        && (request.auth.uid == uid
+            || (role() == 'parent'
+                && get(/databases/$(database)/documents/teachers/$(uid)).data.status == 'approved'));
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && role() == 'teacher'
+        && request.resource.data.keys().hasOnly(['cvName', 'cvB64'])
+        && request.resource.data.cvName.size() < 120
+        && request.resource.data.cvB64.size() < 700000;
+      allow delete: if false;
+    }
+
+    // reports/{id}: a parent reports a teacher. Nobody can read them in the app;
+    // you read them in the Firebase console.
+    match /reports/{id} {
+      allow create: if signedIn() && role() == 'parent'
+        && request.resource.data.keys().hasOnly(['teacherUid', 'reporterUid', 'reason', 'createdAt'])
+        && request.resource.data.reporterUid == request.auth.uid
+        && request.resource.data.reason.size() < 500;
+      allow read, update, delete: if false;
+    }
+
+    function nowMs() {
+      return request.time.toMillis();
+    }
+    function bookingDoc(id) {
+      return get(/databases/$(database)/documents/bookings/$(id));
+    }
+    function bookingAfter(id) {
+      return getAfter(/databases/$(database)/documents/bookings/$(id));
+    }
+
+    // A booking that names a slot must match that (still open) slot exactly.
+    // The same batch must also mark the slot booked for this very booking, so a
+    // booking can never exist for a slot that stays open.
+    function slotMatches(b, bookingId) {
+      let s = get(/databases/$(database)/documents/slots/$(b.slotId)).data;
+      let after = getAfter(/databases/$(database)/documents/slots/$(b.slotId)).data;
+      return s.status == 'open'
+        && s.teacherUid == b.teacherUid
+        && s.startMs == b.startMs
+        && s.minutes == b.minutes
+        && s.startMs > nowMs()
+        && after.status == 'booked'
+        && after.get('bookingId', '') == bookingId;
+    }
+    // A booking made from an accepted proposal must match that proposal.
+    function proposalMatches(b) {
+      let p = getAfter(/databases/$(database)/documents/proposals/$(b.proposalId)).data;
+      return p.status == 'accepted'
+        && p.parentUid == b.parentUid
+        && p.teacherUid == b.teacherUid;
+    }
+
+    // bookings/{id}: lesson requests. Only the parent and the teacher involved
+    // can read one. No child data except an optional age.
+    match /bookings/{id} {
+      allow read: if signedIn()
+        && (resource.data.parentUid == request.auth.uid
+            || resource.data.teacherUid == request.auth.uid);
+      allow create: if signedIn() && role() == 'parent'
+        && request.resource.data.parentUid == request.auth.uid
+        && request.resource.data.status == 'requested'
+        && request.resource.data.lessonLink == null
+        && get(/databases/$(database)/documents/teachers/$(request.resource.data.teacherUid)).data.status == 'approved'
+        && (!('slotId' in request.resource.data) || slotMatches(request.resource.data, id))
+        && (!('proposalId' in request.resource.data) || proposalMatches(request.resource.data));
+      // The teacher accepts (with an https lesson link) or declines a pending request.
+      allow update: if signedIn() && resource.data.teacherUid == request.auth.uid
+        && resource.data.status == 'requested'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'lessonLink'])
+        && request.resource.data.status in ['accepted', 'declined']
+        && (request.resource.data.status == 'declined'
+            || request.resource.data.lessonLink.matches('https://.+'));
+      // The teacher marks an accepted, scheduled lesson completed or no-show, but
+      // only once its start time has passed.
+      allow update: if signedIn() && resource.data.teacherUid == request.auth.uid
+        && resource.data.status == 'accepted'
+        && resource.data.get('startMs', null) != null
+        && nowMs() >= resource.data.startMs
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['completed', 'no_show'];
+      // The parent can only cancel a request that is still open.
+      allow update: if signedIn() && resource.data.parentUid == request.auth.uid
+        && resource.data.status in ['requested', 'accepted']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'cancelled';
+      allow delete: if false;
+
+      // Messages between the parent and the teacher of this booking (adults only;
+      // the child has no account). Text only, never edited or deleted.
+      match /messages/{mid} {
+        allow read: if signedIn()
+          && (bookingDoc(id).data.parentUid == request.auth.uid
+              || bookingDoc(id).data.teacherUid == request.auth.uid);
+        allow create: if signedIn()
+          && (bookingDoc(id).data.parentUid == request.auth.uid
+              || bookingDoc(id).data.teacherUid == request.auth.uid)
+          && bookingDoc(id).data.status in ['requested', 'accepted', 'completed']
+          && request.resource.data.keys().hasOnly(['senderUid', 'text', 'createdAt'])
+          && request.resource.data.senderUid == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() >= 1
+          && request.resource.data.text.size() <= 500
+          // PROPOSED (S4): no links or addresses in booking messages (the family chat already forbids them). The only link a
+          // teacher can give is the https lessonLink on the booking itself, which the parent sees as text to copy.
+          && !request.resource.data.text.matches('(?i).*(https?:|www\\.|://|\\.com|\\.net|\\.org|@).*')
+          && request.resource.data.createdAt == request.time;
+        allow update, delete: if false;
+      }
+    }
+
+    // slots/{teacherUid_startMs}: a bookable time. The id contains the start, so
+    // a teacher cannot create two slots at the same time. A parent books by
+    // changing open -> booked in the same batch that creates the booking, so two
+    // parents cannot book the same slot (the second batch finds it booked).
+    match /slots/{slotId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && role() == 'teacher'
+        // PROPOSED (S2): only an approved teacher can publish bookable times
+        && get(/databases/$(database)/documents/teachers/$(request.auth.uid)).data.status == 'approved'
+        && request.resource.data.keys().hasOnly(['teacherUid', 'startMs', 'minutes', 'status'])
+        && request.resource.data.teacherUid == request.auth.uid
+        && slotId == request.auth.uid + '_' + string(request.resource.data.startMs)
+        && request.resource.data.status == 'open'
+        && request.resource.data.minutes is int
+        && request.resource.data.minutes >= 15 && request.resource.data.minutes <= 180
+        && request.resource.data.startMs is int
+        && request.resource.data.startMs > nowMs();
+      // A parent books an open slot.
+      allow update: if signedIn() && role() == 'parent'
+        && resource.data.status == 'open'
+        && resource.data.startMs > nowMs()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'bookingId'])
+        && request.resource.data.status == 'booked'
+        && existsAfter(/databases/$(database)/documents/bookings/$(request.resource.data.bookingId))
+        && bookingAfter(request.resource.data.bookingId).data.slotId == slotId
+        && bookingAfter(request.resource.data.bookingId).data.parentUid == request.auth.uid
+        && bookingAfter(request.resource.data.bookingId).data.teacherUid == resource.data.teacherUid
+        && bookingAfter(request.resource.data.bookingId).data.status == 'requested';
+      // The teacher blocks or reopens a free slot.
+      allow update: if signedIn() && resource.data.teacherUid == request.auth.uid
+        && resource.data.status in ['open', 'blocked']
+        && request.resource.data.status in ['open', 'blocked']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+      // The slot is freed when its booking was cancelled or declined.
+      allow update: if signedIn() && resource.data.status == 'booked'
+        && request.resource.data.status == 'open'
+        && !('bookingId' in request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'bookingId'])
+        && bookingAfter(resource.data.bookingId).data.status in ['cancelled', 'declined']
+        && (bookingAfter(resource.data.bookingId).data.parentUid == request.auth.uid
+            || bookingAfter(resource.data.bookingId).data.teacherUid == request.auth.uid);
+      allow delete: if signedIn() && resource.data.teacherUid == request.auth.uid
+        && resource.data.status != 'booked';
+    }
+
+    // lessonReports/{bookingId}: written by the teacher of a completed lesson,
+    // read only by that teacher and that booking's parent. A teacher's opinion,
+    // not a diagnosis.
+    match /lessonReports/{bookingId} {
+      allow read: if signedIn()
+        && (resource.data.parentUid == request.auth.uid
+            || resource.data.teacherUid == request.auth.uid);
+      allow create, update: if signedIn() && role() == 'teacher'
+        && bookingDoc(bookingId).data.teacherUid == request.auth.uid
+        && bookingDoc(bookingId).data.status == 'completed'
+        && request.resource.data.teacherUid == request.auth.uid
+        && request.resource.data.parentUid == bookingDoc(bookingId).data.parentUid
+        && request.resource.data.keys().hasOnly(['teacherUid', 'parentUid', 'covered', 'understood', 'needsReview', 'homeActivity', 'nextLesson', 'updatedAt'])
+        && request.resource.data.covered.size() <= 600
+        && request.resource.data.understood.size() <= 600
+        && request.resource.data.needsReview.size() <= 600
+        && request.resource.data.homeActivity.size() <= 600
+        && request.resource.data.nextLesson.size() <= 400
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    // reviews/{bookingId}: one per booking (the id is the booking id), only by
+    // that booking's parent, only after the lesson was completed, never edited.
+    match /reviews/{bookingId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && role() == 'parent'
+        && bookingDoc(bookingId).data.parentUid == request.auth.uid
+        && bookingDoc(bookingId).data.status == 'completed'
+        && request.resource.data.keys().hasOnly(['bookingId', 'teacherUid', 'parentUid', 'rating', 'text', 'createdAt'])
+        && request.resource.data.bookingId == bookingId
+        && request.resource.data.parentUid == request.auth.uid
+        && request.resource.data.teacherUid == bookingDoc(bookingId).data.teacherUid
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1 && request.resource.data.rating <= 5
+        && request.resource.data.text is string
+        && request.resource.data.text.size() <= 400
+        && request.resource.data.createdAt == request.time;
+      allow update, delete: if false;
+    }
+
+    // reviewReports/{id}: someone reports a review. Read in the console only.
+    match /reviewReports/{id} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['bookingId', 'reporterUid', 'reason', 'createdAt'])
+        && request.resource.data.reporterUid == request.auth.uid
+        && request.resource.data.reason.size() <= 500
+        && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if false;
+    }
+
+    // requests/{id}: a parent's learning request. No child name, photo, school
+    // or contact details: only an optional age. Open requests are visible to teachers.
+    match /requests/{id} {
+      allow read: if signedIn()
+        && (resource.data.parentUid == request.auth.uid
+            || (role() == 'teacher' && resource.data.status == 'open'));
+      allow create: if signedIn() && role() == 'parent'
+        && request.resource.data.keys().hasOnly(['parentUid', 'subject', 'goal', 'childAge', 'format', 'schedule', 'budgetMin', 'budgetMax', 'approach', 'status', 'createdAt', 'expiresMs'])
+        && request.resource.data.parentUid == request.auth.uid
+        && request.resource.data.status == 'open'
+        && request.resource.data.goal.size() >= 1 && request.resource.data.goal.size() <= 500
+        && request.resource.data.get('schedule', '').size() <= 200
+        && request.resource.data.get('approach', '').size() <= 300
+        && request.resource.data.get('childAge', 6) >= 1 && request.resource.data.get('childAge', 6) <= 12
+        && request.resource.data.get('budgetMin', 0) >= 0
+        && request.resource.data.get('budgetMax', 0) <= 100000
+        && request.resource.data.get('budgetMin', 0) <= request.resource.data.get('budgetMax', 100000)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.expiresMs > nowMs()
+        && request.resource.data.expiresMs <= nowMs() + 7776000000;
+      allow update: if signedIn() && resource.data.parentUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'closed';
+      allow delete: if false;
+    }
+
+    // proposals/{requestId_teacherUid}: one proposal per teacher per request.
+    match /proposals/{pid} {
+      allow read: if signedIn()
+        && (resource.data.parentUid == request.auth.uid
+            || resource.data.teacherUid == request.auth.uid);
+      allow create: if signedIn() && role() == 'teacher'
+        && get(/databases/$(database)/documents/teachers/$(request.auth.uid)).data.status == 'approved'
+        && request.resource.data.keys().hasOnly(['requestId', 'parentUid', 'teacherUid', 'teacherName', 'message', 'priceEgp', 'minutes', 'schedule', 'firstSteps', 'status', 'createdAt'])
+        && pid == request.resource.data.requestId + '_' + request.auth.uid
+        && request.resource.data.teacherUid == request.auth.uid
+        && request.resource.data.status == 'sent'
+        && get(/databases/$(database)/documents/requests/$(request.resource.data.requestId)).data.status == 'open'
+        && get(/databases/$(database)/documents/requests/$(request.resource.data.requestId)).data.expiresMs > nowMs()
+        && request.resource.data.parentUid == get(/databases/$(database)/documents/requests/$(request.resource.data.requestId)).data.parentUid
+        && request.resource.data.message.size() >= 1 && request.resource.data.message.size() <= 800
+        && request.resource.data.firstSteps.size() <= 500
+        && request.resource.data.schedule.size() <= 200
+        && request.resource.data.priceEgp is int
+        && request.resource.data.priceEgp >= 0 && request.resource.data.priceEgp <= 100000
+        && request.resource.data.minutes is int
+        && request.resource.data.minutes >= 15 && request.resource.data.minutes <= 240
+        && request.resource.data.createdAt == request.time;
+      // The teacher withdraws; the parent shortlists, declines or accepts.
+      allow update: if signedIn() && resource.data.teacherUid == request.auth.uid
+        && resource.data.status in ['sent', 'shortlisted']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status == 'withdrawn';
+      allow update: if signedIn() && resource.data.parentUid == request.auth.uid
+        && resource.data.status in ['sent', 'shortlisted']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['shortlisted', 'declined', 'accepted'];
+      allow delete: if false;
+    }
+
+    // ---- Family chat (docs/FAMILY_CHAT_DESIGN.md) -------------------------------------------------
+    // families/{parentUid}: the parent's uid is the family id. Relatives join with a one-time invite code
+    // and stay "pending" until the parent approves. Children have no accounts: the parent's device writes
+    // for the child. Only the parent can read every message; a relative reads only their own threads.
+    function isActiveRelative(fid, uid) {
+      return exists(/databases/$(database)/documents/families/$(fid)/relatives/$(uid))
+        && get(/databases/$(database)/documents/families/$(fid)/relatives/$(uid)).data.status == 'active';
+    }
+    function chatBodyOk(d) {
+      return (d.kind == 'phrase' && d.body.matches('p_[a-z]+') && d.body.size() <= 16)
+        || (d.kind == 'sticker' && d.body.size() >= 1 && d.body.size() <= 16)
+        || (d.kind == 'voice' && d.body.size() >= 1 && d.body.size() <= 40
+            && d.get('secs', 0) is int && d.get('secs', 0) >= 1 && d.get('secs', 0) <= 30)
+        || (d.kind == 'text' && d.body.size() >= 1 && d.body.size() <= 200
+            && !d.body.matches('(?i).*(https?:|www\\.|://|\\.com|\\.net|\\.org|@).*'));
+    }
+
+    // usernames/{name}: the user name a relative chose, so a parent can find them by name instead of e-mail.
+    // One exact document can be read (get); there is no list, no search and no way to browse people. A name is
+    // unique (create only, never changed or deleted), belongs to one relative, and the same batch writes the
+    // pointer users/{uid}.username, so a relative holds at most one name.
+    match /usernames/{name} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn() && role() == 'relative'
+        && name.matches('^[a-z0-9_\u0621-\u064A]{3,20}$')
+        && request.resource.data.keys().hasOnly(['uid', 'displayName'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() <= 40
+        && !('username' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data)
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.username == name;
+      allow update, delete: if false;
+    }
+
+    // connectRequests/{id}: a parent asks someone (by their user name) to talk with the parent's children. Only
+    // that person and the parent can read it; the person accepts or declines; the parent can cancel while it waits.
+    match /connectRequests/{id} {
+      allow read: if signedIn()
+        && (resource.data.familyId == request.auth.uid
+            || (role() == 'relative' && resource.data.toUid == request.auth.uid));
+      allow create: if signedIn() && role() == 'parent'
+        && request.resource.data.keys().hasOnly(['familyId', 'parentName', 'toName', 'toUid', 'relation', 'children', 'status', 'createdAt'])
+        && request.resource.data.familyId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.parentName.size() <= 40
+        && request.resource.data.toName.matches('^[a-z0-9_\u0621-\u064A]{3,20}$')
+        && get(/databases/$(database)/documents/usernames/$(request.resource.data.toName)).data.uid == request.resource.data.toUid
+        && request.resource.data.children.size() >= 1 && request.resource.data.children.size() <= 10
+        && request.resource.data.createdAt == request.time;
+      allow update: if signedIn() && resource.data.status == 'pending'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && ((resource.data.familyId == request.auth.uid && request.resource.data.status == 'cancelled')
+            || (role() == 'relative' && resource.data.toUid == request.auth.uid
+                && request.resource.data.status in ['accepted', 'declined']));
+      allow delete: if false;
+    }
+
+    // A relative's own list of families they joined (a pointer; it grants nothing).
+    match /users/{uid}/families/{fid} {
+      allow read, delete: if signedIn() && request.auth.uid == uid;
+      allow create: if signedIn() && request.auth.uid == uid && role() == 'relative'
+        && request.resource.data.keys().hasOnly(['parentName'])
+        && request.resource.data.parentName.size() <= 40;
+      allow update: if false;
+    }
+
+    match /families/{fid}/relatives/{rel} {
+      allow read: if signedIn() && (request.auth.uid == fid || request.auth.uid == rel);
+      // Joining by accepting a request the parent sent to this person's user name. The same batch must mark the
+      // request accepted, so a request cannot be used twice or by someone else.
+      allow create: if signedIn() && request.auth.uid == rel && role() == 'relative'
+        && request.resource.data.keys().hasOnly(['name', 'relation', 'status', 'children', 'requestId'])
+        && request.resource.data.status == 'active'
+        && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 40
+        && get(/databases/$(database)/documents/connectRequests/$(request.resource.data.requestId)).data.familyId == fid
+        && get(/databases/$(database)/documents/connectRequests/$(request.resource.data.requestId)).data.status == 'pending'
+        && get(/databases/$(database)/documents/connectRequests/$(request.resource.data.requestId)).data.toUid == request.auth.uid
+        && request.resource.data.relation == get(/databases/$(database)/documents/connectRequests/$(request.resource.data.requestId)).data.relation
+        && request.resource.data.children == get(/databases/$(database)/documents/connectRequests/$(request.resource.data.requestId)).data.children
+        && getAfter(/databases/$(database)/documents/connectRequests/$(request.resource.data.requestId)).data.status == 'accepted';
+      // Only the parent decides: approve, pause, resume, remove, or change who the relative may talk with.
+      allow update: if signedIn() && request.auth.uid == fid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'children', 'calls', 'nextCall', 'voice', 'video'])
+        && request.resource.data.status in ['active', 'paused', 'removed']
+        && request.resource.data.get('calls', false) is bool
+        && request.resource.data.get('voice', false) is bool
+        // video needs voice calls on as well
+        && request.resource.data.get('video', false) is bool
+        && (request.resource.data.get('video', false) == false || request.resource.data.get('calls', false) == true)
+        && request.resource.data.get('nextCall', '').size() <= 60
+        && !request.resource.data.get('nextCall', '').matches('(?i).*(https?:|www\\.|://|\\.com|\\.net|\\.org|@).*');
+      allow delete: if false;
+    }
+
+    // Voice calls: signalling only (the audio goes straight between the devices and is never stored).
+    // Needs an ACTIVE relative with calls switched on by the parent. The parent calls on the child's behalf;
+    // the relative calls the parent. Only the callee can answer.
+    function callParty(fid, d) {
+      return request.auth.uid == fid || request.auth.uid == d.relUid;
+    }
+    match /families/{fid}/calls/{cid} {
+      allow read: if signedIn()
+        && (request.auth.uid == fid
+            || (resource.data.relUid == request.auth.uid && isActiveRelative(fid, request.auth.uid)));
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['childId', 'childName', 'relUid', 'from', 'status', 'offer', 'video', 'createdAt'])
+        && request.resource.data.status == 'ringing'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.childName.size() <= 40
+        && request.resource.data.offer.sdp.size() <= 30000
+        && isActiveRelative(fid, request.resource.data.relUid)
+        && get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.get('calls', false) == true
+        && (!('video' in request.resource.data)
+            || (request.resource.data.video == true
+                && get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.get('video', false) == true))
+        && request.resource.data.childId in get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.children.keys()
+        && ((request.auth.uid == fid && request.resource.data.from == 'parent')
+            || (request.auth.uid == request.resource.data.relUid && request.resource.data.from == 'relative'));
+      allow update: if signedIn() && callParty(fid, resource.data)
+        && isActiveRelative(fid, resource.data.relUid)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'answer'])
+        && request.resource.data.status in ['accepted', 'declined', 'ended', 'missed']
+        // only the person being called can accept with an answer
+        && (!('answer' in request.resource.data.diff(resource.data).affectedKeys())
+            || (resource.data.status == 'ringing' && request.resource.data.status == 'accepted'
+                && ((resource.data.from == 'parent' && request.auth.uid == resource.data.relUid)
+                    || (resource.data.from == 'relative' && request.auth.uid == fid))));
+      allow delete: if signedIn() && request.auth.uid == fid;
+
+      match /candidates/{kid} {
+        allow read: if signedIn()
+          && (request.auth.uid == fid
+              || (get(/databases/$(database)/documents/families/$(fid)/calls/$(cid)).data.relUid == request.auth.uid && isActiveRelative(fid, request.auth.uid)));
+        allow create: if signedIn()
+          && request.resource.data.keys().hasOnly(['from', 'data'])
+          && request.resource.data.data.size() <= 2000
+          && ((request.auth.uid == fid && request.resource.data.from == 'parent')
+              || (request.auth.uid == get(/databases/$(database)/documents/families/$(fid)/calls/$(cid)).data.relUid && request.resource.data.from == 'relative'));
+        allow update: if false;
+        // The parent cleans up old call records, including their network details.
+        allow delete: if signedIn() && request.auth.uid == fid;
+      }
+    }
+
+    // Voice recordings: one small document per message (the free plan has no file storage). Only the parent and
+    // that relative read them; only the parent deletes (and the app removes them after 14 days).
+    match /families/{fid}/voices/{vid} {
+      allow read: if signedIn()
+        && (request.auth.uid == fid
+            || (resource.data.relUid == request.auth.uid && isActiveRelative(fid, request.auth.uid)));
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['childId', 'relUid', 'from', 'data', 'mime', 'secs', 'at'])
+        && request.resource.data.data is string && request.resource.data.data.size() >= 1 && request.resource.data.data.size() <= 420000
+        && request.resource.data.mime in ['audio/webm', 'audio/ogg', 'audio/mp4', 'audio/aac', 'audio/mpeg', 'audio/wav']
+        && request.resource.data.secs is int && request.resource.data.secs >= 1 && request.resource.data.secs <= 30
+        && request.resource.data.at == request.time
+        && isActiveRelative(fid, request.resource.data.relUid)
+        && get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.get('voice', false) == true
+        && request.resource.data.childId in get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.children.keys()
+        && ((request.auth.uid == fid && request.resource.data.from == 'child')
+            || (request.auth.uid == request.resource.data.relUid && request.resource.data.from == 'relative'));
+      allow update: if false;
+      allow delete: if signedIn() && request.auth.uid == fid;
+    }
+
+    match /families/{fid}/messages/{id} {
+      allow read: if signedIn()
+        && (request.auth.uid == fid
+            || (resource.data.relUid == request.auth.uid && isActiveRelative(fid, request.auth.uid)));
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['threadId', 'childId', 'childName', 'relUid', 'from', 'kind', 'body', 'secs', 'at'])
+        // a voice message needs the parent's voice switch for that relative, and its sound document to exist
+        && (request.resource.data.kind != 'voice'
+            || (get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.get('voice', false) == true
+                && exists(/databases/$(database)/documents/families/$(fid)/voices/$(request.resource.data.body))))
+        && (request.resource.data.kind == 'voice' || !('secs' in request.resource.data))
+        && request.resource.data.threadId == request.resource.data.childId + '__' + request.resource.data.relUid
+        && request.resource.data.childName.size() <= 40
+        && request.resource.data.at == request.time
+        && chatBodyOk(request.resource.data)
+        && isActiveRelative(fid, request.resource.data.relUid)
+        && request.resource.data.childId in get(/databases/$(database)/documents/families/$(fid)/relatives/$(request.resource.data.relUid)).data.children.keys()
+        && ((request.auth.uid == fid && request.resource.data.from == 'child')
+            || (request.auth.uid == request.resource.data.relUid && request.resource.data.from == 'relative'));
+      allow update: if false;
+      allow delete: if signedIn() && request.auth.uid == fid;
+    }
+  }
+}

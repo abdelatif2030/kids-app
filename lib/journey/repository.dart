@@ -1,3 +1,5 @@
+import '../notifications/notification_events.dart';
+
 import 'dart:convert';
 import 'dart:math';
 
@@ -43,25 +45,31 @@ class JourneySettings {
     Set<String>? draftLands,
     Map<String, int>? badgeThresholds,
     Map<String, List<int>>? landAges,
-  }) =>
-      JourneySettings(
-        draftLands: draftLands ?? this.draftLands,
-        badgeThresholds: badgeThresholds ?? this.badgeThresholds,
-        landAges: landAges ?? this.landAges,
-      );
+  }) => JourneySettings(
+    draftLands: draftLands ?? this.draftLands,
+    badgeThresholds: badgeThresholds ?? this.badgeThresholds,
+    landAges: landAges ?? this.landAges,
+  );
 
-  Map<String, dynamic> toJson() => {'draft': draftLands.toList(), 'thr': badgeThresholds, 'ages': landAges};
+  Map<String, dynamic> toJson() => {
+    'draft': draftLands.toList(),
+    'thr': badgeThresholds,
+    'ages': landAges,
+  };
 
   factory JourneySettings.fromJson(Map<String, dynamic> j) => JourneySettings(
-        draftLands: {for (final e in (j['draft'] as List<dynamic>? ?? [])) e as String},
-        badgeThresholds: {
-          for (final e in ((j['thr'] as Map<String, dynamic>?) ?? {}).entries) e.key: e.value as int,
-        },
-        landAges: {
-          for (final e in ((j['ages'] as Map<String, dynamic>?) ?? {}).entries)
-            e.key: [for (final v in e.value as List<dynamic>) v as int],
-        },
-      );
+    draftLands: {
+      for (final e in (j['draft'] as List<dynamic>? ?? [])) e as String,
+    },
+    badgeThresholds: {
+      for (final e in ((j['thr'] as Map<String, dynamic>?) ?? {}).entries)
+        e.key: e.value as int,
+    },
+    landAges: {
+      for (final e in ((j['ages'] as Map<String, dynamic>?) ?? {}).entries)
+        e.key: [for (final v in e.value as List<dynamic>) v as int],
+    },
+  );
 }
 
 class LocalJourneyRepository implements JourneyRepository {
@@ -103,14 +111,19 @@ class LocalJourneyRepository implements JourneyRepository {
       decodeList(await _p, _custom, CustomQuestion.fromJson);
 
   @override
-  Future<void> saveCustomQuestions(List<CustomQuestion> questions) async => (await _p)
-      .setString(_custom, jsonEncode([for (final q in questions) q.toJson()]));
+  Future<void> saveCustomQuestions(List<CustomQuestion> questions) async =>
+      (await _p).setString(
+        _custom,
+        jsonEncode([for (final q in questions) q.toJson()]),
+      );
 
   @override
   Future<JourneySettings> loadSettings() async {
     final map = decodeMap(await _p, _settings);
     try {
-      return map.isEmpty ? const JourneySettings() : JourneySettings.fromJson(map);
+      return map.isEmpty
+          ? const JourneySettings()
+          : JourneySettings.fromJson(map);
     } catch (_) {
       return const JourneySettings();
     }
@@ -123,7 +136,14 @@ class LocalJourneyRepository implements JourneyRepository {
   @override
   Future<void> resetAll() async {
     final p = await _p;
-    for (final k in [_profiles, _active, _attempts, _custom, _settings, 'skill_events']) {
+    for (final k in [
+      _profiles,
+      _active,
+      _attempts,
+      _custom,
+      _settings,
+      'skill_events',
+    ]) {
       await p.remove(k);
     }
   }
@@ -144,6 +164,7 @@ class JourneyStore extends ChangeNotifier {
   List<ChildProfile> profiles = [];
   String? activeId;
   List<Attempt> _attempts = [];
+  List<Attempt> get attempts => _attempts;
   List<CustomQuestion> custom = [];
   JourneySettings settings = const JourneySettings();
 
@@ -153,7 +174,9 @@ class JourneyStore extends ChangeNotifier {
     _attempts = await repo.loadAttempts();
     custom = await repo.loadCustomQuestions();
     settings = await repo.loadSettings();
-    if (activeId != null && !profiles.any((p) => p.id == activeId)) activeId = null;
+    if (activeId != null && !profiles.any((p) => p.id == activeId)) {
+      activeId = null;
+    }
     ready = true;
     notifyListeners();
   }
@@ -172,7 +195,10 @@ class JourneyStore extends ChangeNotifier {
     return null;
   }
 
-  List<Attempt> attemptsOf(String childId) => [for (final a in _attempts) if (a.childId == childId) a];
+  List<Attempt> attemptsOf(String childId) => [
+    for (final a in _attempts)
+      if (a.childId == childId) a,
+  ];
 
   ChildProgress progressOf(String childId, {DateTime? today}) {
     final child = profileById(childId);
@@ -197,9 +223,13 @@ class JourneyStore extends ChangeNotifier {
   }
 
   /// Published lands only (what a child sees).
-  List<Land> get publishedLands => [for (final l in kLands) if (!settings.draftLands.contains(l.id)) l];
+  List<Land> get publishedLands => [
+    for (final l in kLands)
+      if (!settings.draftLands.contains(l.id)) l,
+  ];
 
-  String newId() => '${DateTime.now().microsecondsSinceEpoch}${Random().nextInt(9999)}';
+  String newId() =>
+      '${DateTime.now().microsecondsSinceEpoch}${Random().nextInt(9999)}';
 
   Future<ChildProfile> addProfile(ChildProfile profile) async {
     profiles = [...profiles, profile];
@@ -217,8 +247,14 @@ class JourneyStore extends ChangeNotifier {
   }
 
   Future<void> deleteProfile(String id) async {
-    profiles = [for (final p in profiles) if (p.id != id) p];
-    _attempts = [for (final a in _attempts) if (a.childId != id) a];
+    profiles = [
+      for (final p in profiles)
+        if (p.id != id) p,
+    ];
+    _attempts = [
+      for (final a in _attempts)
+        if (a.childId != id) a,
+    ];
     if (activeId == id) activeId = profiles.isEmpty ? null : profiles.first.id;
     await repo.saveProfiles(profiles);
     await repo.saveAttempts(_attempts);
@@ -234,9 +270,19 @@ class JourneyStore extends ChangeNotifier {
 
   Future<void> recordAttempt(Attempt attempt) async {
     _attempts = [..._attempts, attempt];
-    if (_attempts.length > maxAttempts) _attempts = _attempts.sublist(_attempts.length - maxAttempts);
+    if (_attempts.length > maxAttempts) {
+      _attempts = _attempts.sublist(_attempts.length - maxAttempts);
+    }
     await repo.saveAttempts(_attempts);
     notifyListeners();
+    // A real finished activity: tell the child and (as a short line) the parent. Same id never notifies twice.
+    await NotificationEvents.activityFinished(
+      profileById(attempt.childId),
+      attempt.childId,
+      attempt.activityId,
+      attempt.stars,
+      _attempts.length,
+    );
   }
 
   Future<void> saveCustom(List<CustomQuestion> questions) async {

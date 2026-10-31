@@ -1,0 +1,7 @@
+# Copy this file to key.properties (same folder), fill in YOUR values, and NEVER commit key.properties or the .jks file.
+# See docs/ANDROID_SIGNING.md. These four values come from the upload keystore you create yourself; none exists in this repository.
+storePassword=CHANGE_ME
+keyPassword=CHANGE_ME
+keyAlias=upload
+# Path to your upload keystore. On Windows use double backslashes or forward slashes.
+storeFile=/absolute/path/to/rehlaty-upload.jks

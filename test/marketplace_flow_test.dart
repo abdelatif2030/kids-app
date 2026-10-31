@@ -48,7 +48,7 @@ class World {
     await repo.saveTeacherProfile(TeacherProfile(
       uid: teacherUid, name: 'أ. سارة', bio: 'مدرسة تأسيس', subjects: const ['arabic'], languages: const ['العربية'],
       priceNote: '', priceEgp: 200, cancellationPolicy: 'إلغاء مجاني قبل 24 ساعة',
-    ));
+    )); repo.approveForTest(repo.currentUser!.uid); // the owner approves in the console
     await repo.register(email: 'p1@e.com', password: '123456', name: 'أم أحمد', role: UserRole.parent);
     parentUid = repo.currentUser!.uid;
     await repo.register(email: 'p2@e.com', password: '123456', name: 'أب نور', role: UserRole.parent);

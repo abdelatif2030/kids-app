@@ -1,3 +1,5 @@
+import '../../design/rehlaty_heart.dart';
+
 import 'package:flutter/material.dart';
 
 import '../../l10n/strings.dart';
@@ -9,7 +11,13 @@ class HeartButton extends StatefulWidget {
   final String kind; // 'word' or 'game'
   final String refId;
   final double size;
-  const HeartButton({super.key, required this.childId, required this.kind, required this.refId, this.size = 30});
+  const HeartButton({
+    super.key,
+    required this.childId,
+    required this.kind,
+    required this.refId,
+    this.size = 30,
+  });
 
   @override
   State<HeartButton> createState() => _HeartButtonState();
@@ -27,7 +35,11 @@ class _HeartButtonState extends State<HeartButton> {
   }
 
   Future<void> _toggle() async {
-    final now = await FavoritesStore.toggle(widget.childId, widget.kind, widget.refId);
+    final now = await FavoritesStore.toggle(
+      widget.childId,
+      widget.kind,
+      widget.refId,
+    );
     if (mounted) setState(() => _on = now);
   }
 
@@ -35,11 +47,13 @@ class _HeartButtonState extends State<HeartButton> {
   Widget build(BuildContext context) {
     final on = _on ?? false;
     return IconButton(
-      tooltip: on ? tr2('إزالة من مكتبتي', 'Remove from my library') : tr2('أضف إلى مكتبتي', 'Add to my library'),
+      tooltip: on
+          ? tr2('إزالة من مكتبتي', 'Remove from my library')
+          : tr2('أضف إلى مكتبتي', 'Add to my library'),
       iconSize: widget.size,
       constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
       onPressed: _on == null ? null : _toggle,
-      icon: Icon(on ? Icons.favorite_rounded : Icons.favorite_border_rounded, color: Colors.redAccent),
+      icon: RehlatyHeart(size: widget.size, filled: on),
     );
   }
 }

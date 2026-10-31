@@ -504,7 +504,7 @@ const Map<String, String> kEnglish = {
   'ملاحظاتك وإعدادات الوقت والرمز السري (مشفّر).': 'Your notes, time settings and the PIN (encrypted).',
   'لا إعلانات ولا تتبع ولا حزم تحليلات.': 'No ads, no tracking, no analytics packages.',
   'لا محادثات ولا رسائل ولا تواصل اجتماعي.': 'No chats, no messages, no social contact.',
-  'لا موقع جغرافي ولا جهات اتصال. الميكروفون والكاميرا فقط في رسائل ومكالمات العائلة التي تفعّلها أنت.': 'No location, no contacts. The microphone and camera are used only for family messages and calls that you switch on.',
+  'لا موقع جغرافي ولا جهات اتصال. الميكروفون فقط عندما يضغط ولي الأمر زر الإملاء، ولا يستخدم التطبيق الكاميرا.': 'No location, no contacts. The microphone is used only when a parent presses the dictation button, and the app does not use the camera.',
   'لا روابط خارجية في شاشات الطفل.': 'No external links on the child\'s screens.',
   'حذف بيانات الأطفال؟': 'Delete the children\'s data?',
   'سيُحذف من هذا الجهاز نهائياً: ملفات الأطفال وتقدمهم ونتائجهم وسجل المشاهدة والخطة الأسبوعية والملاحظات.\nيبقى الرمز السري وحدود الوقت.': 'These will be permanently deleted from this device: child profiles, their progress, results, watch history, weekly plan and notes.\nThe PIN and time limits stay.',

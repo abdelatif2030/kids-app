@@ -1,3 +1,5 @@
+> **Superseded for signing and build steps by `docs/ANDROID_SIGNING.md`** (read that first). This older file keeps the Play Console and quick device-check notes.
+
 # Android release: step by step (run these on your Windows machine)
 
 Nothing here has been run yet: the cloud session has no Android SDK. The Gradle files were edited but NOT built.
@@ -6,8 +8,7 @@ Nothing here has been run yet: the cloud session has no Android SDK. The Gradle 
 - **Application ID** is now `com.rehlaty.app` (`android/app/build.gradle.kts`, and the package of `MainActivity.kt`).
   It can never change after the first Google Play upload. Edit both places if you want another id.
 - **App name** on the phone: «رحلتي» (AndroidManifest label).
-- **Launcher icon** is still Flutter's default. Replace it before release (needs your design; adding the
-  `flutter_launcher_icons` package needs your approval).
+- **Launcher icon** is the Rehlaty logo in all five densities (`mipmap-*`). An adaptive (round/themed) icon is not made; add one if Play or your design needs it.
 
 ## 1. Check the toolchain
 ```powershell

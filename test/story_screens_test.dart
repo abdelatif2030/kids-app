@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kids_app/design/rehlaty_heart.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/journey/models.dart';
@@ -81,7 +82,7 @@ void main() {
       expect(await tester.runAsync(() => StoryStore.favorites('k1')), isNotEmpty);
       await tester.tap(find.text('❤️ المفضلة'));
       await tester.pump();
-      expect(find.byIcon(Icons.favorite_rounded), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is RehlatyHeart && w.filled), findsOneWidget);
     });
 
     testWidgets('a story that was stopped appears under "continue" and opens the player', (tester) async {

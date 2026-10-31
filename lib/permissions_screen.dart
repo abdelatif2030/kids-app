@@ -31,7 +31,7 @@ class PermissionInfo {
   });
 }
 
-/// The permissions listed in the Android manifest that a parent can see or refuse: microphone, camera, and
+/// The permissions listed in the Android manifest that a parent can see or refuse: microphone and
 /// files/photos (which the app reaches through the phone's own picker, so there is no storage permission).
 final List<PermissionInfo> appPermissions = [
   PermissionInfo(
@@ -39,43 +39,20 @@ final List<PermissionInfo> appPermissions = [
     icon: Icons.mic_rounded,
     name: () => tr2('الميكروفون', 'Microphone'),
     usedFor: () => tr2(
-      'الرسائل الصوتية ومكالمات الصوت والفيديو مع الأقارب الموافَق عليهم (إن فعّلتها أنت)، '
-      'وإملاء الصوت في مساعد الخطة (التعرّف على الجهاز نفسه).',
-      'Voice messages and voice/video calls with approved relatives (only if you switch them on), '
-      'and speaking to the plan assistant (recognised on the phone itself).',
+      'إملاء الصوت للأهل فقط (مثل كتابة ملاحظة بصوتك)، والتعرّف على الكلام يتم على الجهاز نفسه.',
+      'Parent dictation only (for example saying a note instead of typing it). Speech is recognised on the phone itself.',
     ),
     whenAsked: () => tr2(
-      'عند أول تسجيل رسالة صوتية أو بدء مكالمة أو الضغط على زر الإملاء، وليس عند فتح التطبيق.',
-      'The first time you record a voice message, start a call or press the dictation button, not when the app opens.',
+      'عند الضغط على زر الإملاء لأول مرة، وليس عند فتح التطبيق.',
+      'The first time you press the dictation button, not when the app opens.',
     ),
     ifRefused: () => tr2(
-      'يبقى كل شيء آخر يعمل. لا تُرسل رسائل صوتية ولا تتم المكالمات، ويمكنك الكتابة بدل الإملاء.',
-      'Everything else keeps working. Voice messages and calls are not possible, and you can type instead of speaking.',
+      'يبقى كل شيء آخر يعمل، ويمكنك الكتابة بدل الإملاء.',
+      'Everything else keeps working, and you can type instead of speaking.',
     ),
     never: () => tr2(
-      'لا يسمع التطبيق في الخلفية ولا يحفظ تسجيلات من الطفل. الصوت يُستعمل فقط أثناء المكالمة أو التسجيل الذي تبدؤه.',
-      'The app never listens in the background. Sound is used only during a call or a recording that is started.',
-    ),
-  ),
-  PermissionInfo(
-    id: 'camera',
-    icon: Icons.videocam_rounded,
-    name: () => tr2('الكاميرا', 'Camera'),
-    usedFor: () => tr2(
-      'مكالمات الفيديو مع الأقارب الموافَق عليهم، وفقط إن فعّلت لهم مكالمات الفيديو.',
-      'Video calls with approved relatives, and only if you switched video calls on for them.',
-    ),
-    whenAsked: () => tr2(
-      'عند بدء أول مكالمة فيديو.',
-      'When the first video call starts.',
-    ),
-    ifRefused: () => tr2(
-      'تبقى مكالمات الصوت تعمل بلا كاميرا. لا يمكن إجراء مكالمة فيديو.',
-      'Voice calls still work without the camera. Video calls are not possible.',
-    ),
-    never: () => tr2(
-      'لا يلتقط التطبيق صوراً ولا فيديو ولا يحفظهما، ولا يشغّل الكاميرا خارج المكالمة.',
-      'The app never takes or saves photos or video, and never turns the camera on outside a call.',
+      'لا يسمع التطبيق في الخلفية ولا يحفظ أي تسجيل ولا يرسله. الصوت يُستعمل فقط أثناء الإملاء الذي تبدؤه.',
+      'The app never listens in the background and never stores or sends a recording. Sound is used only during a dictation that you start.',
     ),
   ),
   PermissionInfo(

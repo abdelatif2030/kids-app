@@ -54,7 +54,7 @@ Future<void> _register(
   await tester.tap(find.text('حساب جديد'));
   await tester.pumpAndSettle();
   if (teacher) {
-    await tester.tap(find.text('مدرس'));
+    await tester.tap(find.byKey(const ValueKey('role_teacher')));
     await tester.pumpAndSettle();
   }
   await tester.enterText(_field('الاسم'), name);
@@ -65,9 +65,11 @@ Future<void> _register(
 }
 
 void main() {
-  testWidgets('not activated: explains that Firebase is not connected', (tester) async {
+  testWidgets('not available: explains that the online service is not connected yet, and offers no sign-in', (tester) async {
     await tester.pumpWidget(_app(const TeachersEntryScreen()));
-    expect(find.textContaining('غير مفعّلة'), findsOneWidget);
+    expect(find.textContaining('غير متاح في هذا الإصدار'), findsOneWidget);
+    expect(find.textContaining('ستأتي في إصدار لاحق'), findsOneWidget); // Release 1 is offline
+    expect(find.byType(TextField), findsNothing);
   });
 
   testWidgets('sign-in validates input and shows the repository error', (tester) async {
@@ -85,7 +87,7 @@ void main() {
     expect(find.text('البريد أو كلمة المرور غير صحيحة'), findsOneWidget);
   });
 
-  testWidgets('teacher visible at once -> parent report and request -> teacher accepts -> link',
+  testWidgets('teacher pending until the owner approves -> parent report and request -> teacher accepts -> link',
       (tester) async {
     // A tall screen so the whole profile form is on screen.
     tester.view.physicalSize = const Size(800, 2000);
@@ -95,10 +97,10 @@ void main() {
     final picker = FakeMediaPicker();
     mediaPicker = picker;
 
-    // 1. A teacher registers and creates a profile. It is visible at once.
+    // 1. A teacher registers and creates a profile. It stays pending: parents do not see it until the OWNER approves it.
     await _open(tester, repo);
     await _register(tester, name: 'أ. سارة', email: 'sara@example.com', teacher: true);
-    expect(find.text('أنشئ ملفك الشخصي، وعند الحفظ يظهر للأهل مباشرة.'), findsOneWidget);
+    expect(find.text('أنشئ ملفك الشخصي. يظهر للأهل بعد أن يوافق عليه صاحب التطبيق.'), findsOneWidget);
 
     await tester.tap(find.text('إنشاء الملف الشخصي'));
     await tester.pumpAndSettle();
@@ -119,9 +121,12 @@ void main() {
     expect(find.text('cv.pdf'), findsWidgets);
     await tester.tap(find.text('حفظ'));
     await tester.pumpAndSettle();
-    expect(find.text('ملفك ظاهر للأهل.'), findsOneWidget);
+    expect(find.textContaining('ملفك بانتظار موافقة صاحب التطبيق'), findsOneWidget);
+    expect(find.text('ملفك ظاهر للأهل.'), findsNothing);
+    expect(await repo.approvedTeachers(), isEmpty); // parents cannot see a pending teacher
+    repo.approveForTest(repo.teacherUid); // the owner approves in the console
 
-    // 2. A parent registers and sees the teacher straight away, with a warning.
+    // 2. A parent registers and then sees the approved teacher, with a warning.
     await repo.signOut();
     await _open(tester, repo);
     await _register(tester, name: 'أم أحمد', email: 'mom@example.com', teacher: false);
@@ -220,8 +225,12 @@ void main() {
           priceNote: '',
           status: status,
         );
-    await repo.saveTeacherProfile(profile(teacherStatusPending));
-    expect((await repo.myTeacherProfile())!.approved, isTrue); // visible at once
+    await repo.saveTeacherProfile(profile(teacherStatusApproved)); // a teacher cannot create themselves as approved
+    expect((await repo.myTeacherProfile())!.status, teacherStatusPending);
+    expect(await repo.approvedTeachers(), isEmpty);
+    await repo.saveTeacherProfile(profile(teacherStatusApproved)); // nor approve themselves by saving again
+    expect((await repo.myTeacherProfile())!.approved, isFalse);
+    repo.approveForTest(repo.teacherUid); // the owner approves in the console
     expect(await repo.approvedTeachers(), hasLength(1));
 
     repo.suspend(repo.teacherUid); // the owner hides them
@@ -241,7 +250,7 @@ void main() {
       subjects: const ['math'],
       languages: const ['العربية'],
       priceNote: '',
-    ));
+    )); repo.approveForTest(repo.currentUser!.uid); // the owner approves in the console
     repo.suspend(repo.teacherUid);
     mediaPicker = FakeMediaPicker();
 

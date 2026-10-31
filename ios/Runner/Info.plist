@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Kids App</string>
+	<string>Rehlaty</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>kids_app</string>
+	<string>Rehlaty</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -55,7 +55,6 @@
 	<string>Main</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
-		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
@@ -69,6 +68,6 @@
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Rehlaty uses on-device speech recognition so a parent can say a note about their child instead of typing it. Nothing is stored or sent.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>The microphone is used only while a parent dictates a note, and for family voice messages and calls the parent allowed.</string>
+	<string>The microphone is used only while a parent dictates a note. Nothing is stored or sent.</string>
 </dict>
 </plist>

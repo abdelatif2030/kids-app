@@ -1,4 +1,7 @@
+import 'age_scope.dart';
+import 'design/tokens.dart';
 import 'design/layout.dart';
+
 import 'package:flutter/material.dart';
 
 import 'curriculum.dart';
@@ -20,7 +23,11 @@ String subjectLabels(List<String> ids) =>
 class ParentTeachersScreen extends StatefulWidget {
   final TeacherRepository repo;
   final VoidCallback onSignOut;
-  const ParentTeachersScreen({super.key, required this.repo, required this.onSignOut});
+  const ParentTeachersScreen({
+    super.key,
+    required this.repo,
+    required this.onSignOut,
+  });
 
   @override
   State<ParentTeachersScreen> createState() => _ParentTeachersScreenState();
@@ -72,7 +79,9 @@ class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
             icon: const Icon(Icons.post_add_rounded),
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => MyRequestsScreen(repo: widget.repo)),
+              MaterialPageRoute(
+                builder: (_) => MyRequestsScreen(repo: widget.repo),
+              ),
             ),
           ),
           IconButton(
@@ -80,7 +89,9 @@ class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
             icon: const Icon(Icons.event_note_rounded),
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => BookingsScreen(repo: widget.repo)),
+              MaterialPageRoute(
+                builder: (_) => BookingsScreen(repo: widget.repo),
+              ),
             ),
           ),
           IconButton(
@@ -101,9 +112,15 @@ class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(loc('تعذر تحميل المدرسين'), style: TextStyle(fontSize: 20)),
+                  Text(
+                    loc('تعذر تحميل المدرسين'),
+                    style: TextStyle(fontSize: 20),
+                  ),
                   const SizedBox(height: 12),
-                  FilledButton(onPressed: _reload, child: Text(loc('إعادة المحاولة'))),
+                  FilledButton(
+                    onPressed: _reload,
+                    child: Text(loc('إعادة المحاولة')),
+                  ),
                 ],
               ),
             );
@@ -117,10 +134,12 @@ class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
                 child: Padding(
                   padding: EdgeInsets.all(12),
                   child: Text(
-                    loc('المدرسون يسجّلون بأنفسهم ولا يفحصهم التطبيق، فتحقق منهم قبل الحجز. '
-                    'شارة «تم التحقق» تظهر فقط حين يتحقق صاحب التطبيق فعلاً، ولا تظهر بمجرد اكتمال الملف. '
-                    'لا توجد محادثة داخل التطبيق: عند قبول المدرس لطلبك يظهر رابط الحصة '
-                    'في «طلباتي». افتح الرابط بنفسك وكن بجانب طفلك طوال الحصة.'),
+                    loc(
+                      'المدرسون يسجّلون بأنفسهم ولا يفحصهم التطبيق، فتحقق منهم قبل الحجز. '
+                      'شارة «تم التحقق» تظهر فقط حين يتحقق صاحب التطبيق فعلاً، ولا تظهر بمجرد اكتمال الملف. '
+                      'لا توجد محادثة داخل التطبيق: عند قبول المدرس لطلبك يظهر رابط الحصة '
+                      'في «طلباتي». افتح الرابط بنفسك وكن بجانب طفلك طوال الحصة.',
+                    ),
                     style: TextStyle(fontSize: 13),
                   ),
                 ),
@@ -132,11 +151,19 @@ class _ParentTeachersScreenState extends State<ParentTeachersScreen> {
                   earliest: data.earliest,
                   onOpen: (t) => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => TeacherDetailScreen(repo: widget.repo, teacher: t)),
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          TeacherDetailScreen(repo: widget.repo, teacher: t),
+                    ),
                   ),
                   onCompare: (list) => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => CompareTeachersScreen(teachers: list, ratings: data.ratings)),
+                    MaterialPageRoute(
+                      builder: (_) => CompareTeachersScreen(
+                        teachers: list,
+                        ratings: data.ratings,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -161,7 +188,12 @@ class TeacherDetailScreen extends StatelessWidget {
 
   /// A teacher looking at their own page as parents see it: no booking, report or CV buttons.
   final bool preview;
-  const TeacherDetailScreen({super.key, required this.repo, required this.teacher, this.preview = false});
+  const TeacherDetailScreen({
+    super.key,
+    required this.repo,
+    required this.teacher,
+    this.preview = false,
+  });
 
   Future<void> _request(BuildContext context) async {
     final user = repo.currentUser;
@@ -234,19 +266,47 @@ class TeacherDetailScreen extends StatelessWidget {
   }
 
   Widget _section(String title, Widget child) => Padding(
-        padding: const EdgeInsets.only(top: 14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    padding: const EdgeInsets.only(top: 14),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-            Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            child,
+            Container(
+              width: 5,
+              height: 20,
+              decoration: BoxDecoration(
+                color: DS.pink,
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w900,
+                  color: DS.primary,
+                ),
+              ),
+            ),
           ],
         ),
-      );
+        const SizedBox(height: 6),
+        child,
+      ],
+    ),
+  );
 
-  Widget _chips(List<String> items) =>
-      Wrap(spacing: 6, runSpacing: 6, children: [for (final i in items) Chip(label: Text(i), visualDensity: VisualDensity.compact)]);
+  Widget _chips(List<String> items) => Wrap(
+    spacing: 6,
+    runSpacing: 6,
+    children: [
+      for (final i in items)
+        Chip(label: Text(i), visualDensity: VisualDensity.compact),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -262,50 +322,129 @@ class TeacherDetailScreen extends StatelessWidget {
           TeacherHeader(
             avatar: TeacherAvatar(photo: t.photoBytes, radius: 44),
             title: t.name,
-            subtitle: t.headline.isNotEmpty ? t.headline : t.languages.join(loc('، ')),
+            subtitle: t.headline.isNotEmpty
+                ? t.headline
+                : t.languages.join(loc('، ')),
           ),
           const SizedBox(height: 10),
           VerificationBadges(teacher: t),
           if (!t.identityVerified && !t.qualificationVerified)
-            Text(loc('لم يتحقق صاحب التطبيق من هوية هذا المدرس أو مؤهله. المعلومات أدناه يكتبها المدرس بنفسه.'),
-                style: TextStyle(fontSize: 13)),
+            Text(
+              loc(
+                'لم يتحقق صاحب التطبيق من هوية هذا المدرس أو مؤهله. المعلومات أدناه يكتبها المدرس بنفسه.',
+              ),
+              style: TextStyle(fontSize: 13),
+            ),
           if (facts.isNotEmpty)
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Wrap(
-                  spacing: 16,
-                  runSpacing: 6,
-                  children: [for (final f in facts) Text(f, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600))],
-                ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final f in facts)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: DS.primarySoft,
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Text(
+                        f,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: DS.primary,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
           Card(
+            elevation: 3,
+            shadowColor: const Color(0x336A3BFF),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(26),
+              side: const BorderSide(color: DS.border),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(t.bio, style: const TextStyle(fontSize: 17)),
-                  if (t.philosophy.isNotEmpty) _section(loc('أسلوبي في التعليم'), Text(t.philosophy)),
-                  _section(loc('المواد'), Wrap(spacing: 8, runSpacing: 8, children: [for (final id in t.subjects) SubjectChip(id: id)])),
-                  if (t.specialties.isNotEmpty) _section(loc('التخصصات'), _chips(t.specialties)),
-                  if (t.curricula.isNotEmpty) _section(loc('المناهج'), _chips(t.curricula)),
+                  Text(
+                    t.bio,
+                    style: const TextStyle(fontSize: 17, height: 1.5),
+                  ),
+                  if (t.philosophy.isNotEmpty)
+                    _section(loc('أسلوبي في التعليم'), Text(t.philosophy)),
+                  _section(
+                    loc('المواد'),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final id in t.subjects) SubjectChip(id: id),
+                      ],
+                    ),
+                  ),
+                  if (t.specialties.isNotEmpty)
+                    _section(loc('التخصصات'), _chips(t.specialties)),
+                  if (t.curricula.isNotEmpty)
+                    _section(loc('المناهج'), _chips(t.curricula)),
                   if (t.languages.isNotEmpty || t.dialects.isNotEmpty)
-                    _section(loc('اللغة واللهجة'), _chips([...t.languages, ...t.dialects])),
+                    _section(
+                      loc('اللغة واللهجة'),
+                      _chips([...t.languages, ...t.dialects]),
+                    ),
                   if (t.formats.isNotEmpty || t.classTypes.isNotEmpty)
-                    _section(loc('نوع الحصة'), _chips([...t.formats.map(formatLabel), ...t.classTypes.map(classTypeLabel)])),
-                  if (t.styles.isNotEmpty) _section(loc('أساليب التدريس'), _chips(t.styles)),
+                    _section(
+                      loc('نوع الحصة'),
+                      _chips([
+                        ...t.formats.map(formatLabel),
+                        ...t.classTypes.map(classTypeLabel),
+                      ]),
+                    ),
+                  if (t.styles.isNotEmpty)
+                    _section(loc('أساليب التدريس'), _chips(t.styles)),
                   if (t.qualifications.isNotEmpty)
                     _section(
-                      t.qualificationVerified ? loc('المؤهلات (تم التحقق منها)') : loc('المؤهلات (كتبها المدرس ولم يتحقق منها التطبيق)'),
+                      t.qualificationVerified
+                          ? loc('المؤهلات (تم التحقق منها)')
+                          : loc(
+                              'المؤهلات (كتبها المدرس ولم يتحقق منها التطبيق)',
+                            ),
                       Text(t.qualifications),
                     ),
-                  _section(tr2('معرض الأعمال', 'Work samples'), PortfolioSection(repo: repo, teacher: t)),
-                  _section(loc('سياسة الإلغاء'),
-                      Text(t.cancellationPolicy.isEmpty ? loc('لم يحدد المدرس سياسة إلغاء بعد.') : t.cancellationPolicy)),
-                  _section(loc('التقييمات'), ReviewsSection(repo: repo, teacher: t, canReport: !preview)),
-                  _section(loc('اكتمال الملف'), Text(tr2('${done.done.length} من ${done.total} (يكتبه المدرس بنفسه، وليس شارة تحقق)', '${done.done.length} of ${done.total} (written by the teacher, not a verification badge)'))),
+                  _section(
+                    tr2('معرض الأعمال', 'Work samples'),
+                    PortfolioSection(repo: repo, teacher: t),
+                  ),
+                  _section(
+                    loc('سياسة الإلغاء'),
+                    Text(
+                      t.cancellationPolicy.isEmpty
+                          ? loc('لم يحدد المدرس سياسة إلغاء بعد.')
+                          : t.cancellationPolicy,
+                    ),
+                  ),
+                  _section(
+                    loc('التقييمات'),
+                    ReviewsSection(repo: repo, teacher: t, canReport: !preview),
+                  ),
+                  _section(
+                    loc('اكتمال الملف'),
+                    Text(
+                      tr2(
+                        '${done.done.length} من ${done.total} (يكتبه المدرس بنفسه، وليس شارة تحقق)',
+                        '${done.done.length} of ${done.total} (written by the teacher, not a verification badge)',
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -314,7 +453,10 @@ class TeacherDetailScreen extends StatelessWidget {
           if (preview)
             Padding(
               padding: EdgeInsets.only(top: 12),
-              child: Text(loc('هذه معاينة لصفحتك كما يراها الأهل.'), textAlign: TextAlign.center),
+              child: Text(
+                loc('هذه معاينة لصفحتك كما يراها الأهل.'),
+                textAlign: TextAlign.center,
+              ),
             )
           else ...[
             if (t.cvName != null)
@@ -369,7 +511,10 @@ class _ReportDialogState extends State<_ReportDialog> {
         decoration: InputDecoration(labelText: loc('ما المشكلة؟')),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(loc('إلغاء'))),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(loc('إلغاء')),
+        ),
         FilledButton(
           onPressed: () {
             final text = _reason.text.trim();
@@ -442,7 +587,10 @@ class _BookingDialogState extends State<BookingDialog> {
               value: _subject,
               items: [
                 for (final id in widget.teacher.subjects)
-                  DropdownMenuItem(value: id, child: Text(subjectById(id)?.label ?? id)),
+                  DropdownMenuItem(
+                    value: id,
+                    child: Text(subjectById(id)?.label ?? id),
+                  ),
               ],
               onChanged: (v) => setState(() => _subject = v ?? _subject),
             ),
@@ -459,7 +607,8 @@ class _BookingDialogState extends State<BookingDialog> {
               hint: Text(loc('عمر الطفل (اختياري)')),
               items: [
                 DropdownMenuItem<int?>(value: null, child: Text(loc('بدون'))),
-                for (var a = 1; a <= 12; a++) DropdownMenuItem<int?>(value: a, child: Text('$a')),
+                for (final a in ageChoices(current: _age))
+                  DropdownMenuItem<int?>(value: a, child: Text('$a')),
               ],
               onChanged: (v) => setState(() => _age = v),
             ),
@@ -471,38 +620,55 @@ class _BookingDialogState extends State<BookingDialog> {
             const SizedBox(height: 8),
             Text(
               widget.teacher.cancellationPolicy.isEmpty
-                  ? loc('سياسة الإلغاء: لم يحدد المدرس سياسة بعد. اتفقا عليها قبل الحصة.')
-                  : tr2('سياسة الإلغاء: ${widget.teacher.cancellationPolicy}', 'Cancellation policy: ${widget.teacher.cancellationPolicy}'),
+                  ? loc(
+                      'سياسة الإلغاء: لم يحدد المدرس سياسة بعد. اتفقا عليها قبل الحصة.',
+                    )
+                  : tr2(
+                      'سياسة الإلغاء: ${widget.teacher.cancellationPolicy}',
+                      'Cancellation policy: ${widget.teacher.cancellationPolicy}',
+                    ),
               style: const TextStyle(fontSize: 13),
             ),
           ],
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(loc('إلغاء'))),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(loc('إلغاء')),
+        ),
         FilledButton(onPressed: _send, child: Text(loc('إرسال الطلب'))),
       ],
     );
   }
 }
 
-
 /// A teacher's real ratings, from review records of completed lessons only.
 class ReviewsSection extends StatefulWidget {
   final TeacherRepository repo;
   final TeacherProfile teacher;
   final bool canReport;
-  const ReviewsSection({super.key, required this.repo, required this.teacher, this.canReport = true});
+  const ReviewsSection({
+    super.key,
+    required this.repo,
+    required this.teacher,
+    this.canReport = true,
+  });
 
   @override
   State<ReviewsSection> createState() => _ReviewsSectionState();
 }
 
 class _ReviewsSectionState extends State<ReviewsSection> {
-  late final Future<List<Review>> _reviews = widget.repo.reviewsFor(widget.teacher.uid);
+  late final Future<List<Review>> _reviews = widget.repo.reviewsFor(
+    widget.teacher.uid,
+  );
 
   Future<void> _report(Review r) async {
-    final reason = await showDialog<String>(context: context, builder: (_) => const _ReportDialog());
+    final reason = await showDialog<String>(
+      context: context,
+      builder: (_) => const _ReportDialog(),
+    );
     if (reason == null) return;
     String message;
     try {
@@ -523,18 +689,29 @@ class _ReviewsSectionState extends State<ReviewsSection> {
     return FutureBuilder<List<Review>>(
       future: _reviews,
       builder: (context, snap) {
-        if (snap.connectionState != ConnectionState.done) return const LinearProgressIndicator();
+        if (snap.connectionState != ConnectionState.done) {
+          return const LinearProgressIndicator();
+        }
         if (snap.hasError) return Text(loc('تعذر تحميل التقييمات.'));
         final list = snap.data!;
         final summary = RatingSummary.of(list);
         if (list.isEmpty) {
-          return Text(loc('لا توجد تقييمات بعد. تظهر هنا تقييمات أولياء الأمور بعد حصص مكتملة فقط.'));
+          return Text(
+            loc(
+              'لا توجد تقييمات بعد. تظهر هنا تقييمات أولياء الأمور بعد حصص مكتملة فقط.',
+            ),
+          );
         }
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(tr2('★ ${summary.average.toStringAsFixed(1)} من 5 · ${summary.count} تقييم (متوسط حقيقي من تقييمات الحصص المكتملة)', '★ ${summary.average.toStringAsFixed(1)} of 5 · ${summary.count} ratings (a real average from completed lessons\' reviews)'),
-                style: const TextStyle(fontWeight: FontWeight.w600)),
+            Text(
+              tr2(
+                '★ ${summary.average.toStringAsFixed(1)} من 5 · ${summary.count} تقييم (متوسط حقيقي من تقييمات الحصص المكتملة)',
+                '★ ${summary.average.toStringAsFixed(1)} of 5 · ${summary.count} ratings (a real average from completed lessons\' reviews)',
+              ),
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
             for (final r in list.where((r) => r.text.isNotEmpty).take(10))
               ListTile(
                 dense: true,
@@ -572,7 +749,10 @@ class _SlotsSectionState extends State<SlotsSection> {
 
   Future<List<Slot>> _load() async {
     final now = DateTime.now();
-    return [for (final s in await widget.repo.slotsOf(widget.teacher.uid)) if (s.isBookableAt(now)) s].take(12).toList();
+    return [
+      for (final s in await widget.repo.slotsOf(widget.teacher.uid))
+        if (s.isBookableAt(now)) s,
+    ].take(12).toList();
   }
 
   void _reload() {
@@ -589,13 +769,20 @@ class _SlotsSectionState extends State<SlotsSection> {
     if (!mounted) return;
     final booking = await showDialog<Booking>(
       context: context,
-      builder: (_) => SlotBookingDialog(teacher: widget.teacher, slot: s, parentUid: user.uid, parentName: name),
+      builder: (_) => SlotBookingDialog(
+        teacher: widget.teacher,
+        slot: s,
+        parentUid: user.uid,
+        parentName: name,
+      ),
     );
     if (booking == null) return;
     String message;
     try {
       await widget.repo.bookSlot(booking);
-      message = loc('تم حجز الموعد وإرسال الطلب إلى المدرس. تابعه في «طلباتي».');
+      message = loc(
+        'تم حجز الموعد وإرسال الطلب إلى المدرس. تابعه في «طلباتي».',
+      );
     } on AccountException catch (e) {
       message = e.message;
     }
@@ -615,20 +802,32 @@ class _SlotsSectionState extends State<SlotsSection> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(loc('المواعيد المتاحة'), style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+            Text(
+              loc('المواعيد المتاحة'),
+              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            ),
             Text(loc('بتوقيت جهازك'), style: TextStyle(fontSize: 12)),
             FutureBuilder<List<Slot>>(
               future: _slots,
               builder: (context, snap) {
-                if (snap.connectionState != ConnectionState.done) return const LinearProgressIndicator();
+                if (snap.connectionState != ConnectionState.done) {
+                  return const LinearProgressIndicator();
+                }
                 if (snap.hasError) {
-                  return TextButton(onPressed: _reload, child: Text(loc('تعذر تحميل المواعيد. إعادة المحاولة')));
+                  return TextButton(
+                    onPressed: _reload,
+                    child: Text(loc('تعذر تحميل المواعيد. إعادة المحاولة')),
+                  );
                 }
                 final slots = snap.data!;
                 if (slots.isEmpty) {
                   return Padding(
                     padding: EdgeInsets.only(top: 8),
-                    child: Text(loc('لا توجد مواعيد متاحة الآن. يمكنك إرسال «اطلب حصة» بوقت من اختيارك.')),
+                    child: Text(
+                      loc(
+                        'لا توجد مواعيد متاحة الآن. يمكنك إرسال «اطلب حصة» بوقت من اختيارك.',
+                      ),
+                    ),
                   );
                 }
                 return Wrap(
@@ -637,7 +836,12 @@ class _SlotsSectionState extends State<SlotsSection> {
                   children: [
                     for (final s in slots)
                       ActionChip(
-                        label: Text(tr2('${fmtDateTime(s.start)} · ${s.minutes} د', '${fmtDateTime(s.start)} · ${s.minutes} min')),
+                        label: Text(
+                          tr2(
+                            '${fmtDateTime(s.start)} · ${s.minutes} د',
+                            '${fmtDateTime(s.start)} · ${s.minutes} min',
+                          ),
+                        ),
                         onPressed: () => _book(s),
                       ),
                   ],
@@ -685,7 +889,11 @@ class _SlotBookingDialogState extends State<SlotBookingDialog> {
   Widget build(BuildContext context) {
     final t = widget.teacher;
     final s = widget.slot;
-    final price = t.priceEgp != null ? tr2('${t.priceEgp} جنيه للحصة', '${t.priceEgp} EGP per lesson') : (t.priceNote.isEmpty ? loc('السعر يُتفق عليه مع المدرس') : t.priceNote);
+    final price = t.priceEgp != null
+        ? tr2('${t.priceEgp} جنيه للحصة', '${t.priceEgp} EGP per lesson')
+        : (t.priceNote.isEmpty
+              ? loc('السعر يُتفق عليه مع المدرس')
+              : t.priceNote);
     return AlertDialog(
       title: Text(loc('تأكيد حجز الموعد')),
       content: SingleChildScrollView(
@@ -693,12 +901,24 @@ class _SlotBookingDialogState extends State<SlotBookingDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(tr2('${t.name}\n${fmtDateTime(s.start)} · ${s.minutes} دقيقة', '${t.name}\n${fmtDateTime(s.start)} · ${s.minutes} minutes'), style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              tr2(
+                '${t.name}\n${fmtDateTime(s.start)} · ${s.minutes} دقيقة',
+                '${t.name}\n${fmtDateTime(s.start)} · ${s.minutes} minutes',
+              ),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             Text(tr2('السعر: $price', 'Price: $price')),
             DropdownButton<String>(
               isExpanded: true,
               value: _subject,
-              items: [for (final id in t.subjects) DropdownMenuItem(value: id, child: Text(subjectById(id)?.label ?? id))],
+              items: [
+                for (final id in t.subjects)
+                  DropdownMenuItem(
+                    value: id,
+                    child: Text(subjectById(id)?.label ?? id),
+                  ),
+              ],
               onChanged: (v) => setState(() => _subject = v ?? _subject),
             ),
             DropdownButton<int?>(
@@ -707,27 +927,42 @@ class _SlotBookingDialogState extends State<SlotBookingDialog> {
               hint: Text(loc('عمر الطفل (اختياري)')),
               items: [
                 DropdownMenuItem<int?>(value: null, child: Text(loc('بدون'))),
-                for (var a = 1; a <= 12; a++) DropdownMenuItem<int?>(value: a, child: Text('$a')),
+                for (final a in ageChoices(current: _age))
+                  DropdownMenuItem<int?>(value: a, child: Text('$a')),
               ],
               onChanged: (v) => setState(() => _age = v),
             ),
-            TextField(controller: _note, maxLines: 2, decoration: InputDecoration(labelText: loc('ملاحظة (اختياري)'))),
+            TextField(
+              controller: _note,
+              maxLines: 2,
+              decoration: InputDecoration(labelText: loc('ملاحظة (اختياري)')),
+            ),
             const SizedBox(height: 8),
             Text(
               t.cancellationPolicy.isEmpty
-                  ? loc('سياسة الإلغاء: لم يحدد المدرس سياسة بعد. اتفقا عليها قبل الحصة.')
-                  : tr2('سياسة الإلغاء: ${t.cancellationPolicy}', 'Cancellation policy: ${t.cancellationPolicy}'),
+                  ? loc(
+                      'سياسة الإلغاء: لم يحدد المدرس سياسة بعد. اتفقا عليها قبل الحصة.',
+                    )
+                  : tr2(
+                      'سياسة الإلغاء: ${t.cancellationPolicy}',
+                      'Cancellation policy: ${t.cancellationPolicy}',
+                    ),
               style: const TextStyle(fontSize: 13),
             ),
             Text(
-              loc('يُرسل الطلب إلى المدرس ولا يُؤكَّد إلا بقبوله. لا يوجد دفع داخل التطبيق.'),
+              loc(
+                'يُرسل الطلب إلى المدرس ولا يُؤكَّد إلا بقبوله. لا يوجد دفع داخل التطبيق.',
+              ),
               style: TextStyle(fontSize: 12),
             ),
           ],
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: Text(loc('رجوع'))),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(loc('رجوع')),
+        ),
         FilledButton(
           onPressed: () => Navigator.pop(
             context,

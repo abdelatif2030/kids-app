@@ -1,8 +1,11 @@
 import '../../adaptive/recommendation_card.dart';
 import '../../family/family_bubble.dart';
+import '../../notifications/notification_store.dart';
+import '../../notifications/notification_ui.dart';
+import 'home_hubs.dart';
 import 'island_home.dart';
-import '../../assistant/planner.dart' show landsForAge;
 import '../../design/tokens.dart';
+import '../../design/brand.dart';
 import '../avatars.dart';
 
 import 'package:flutter/material.dart';
@@ -34,6 +37,8 @@ import 'land_map_screen.dart';
 /// The child's home: one obvious next step ("Continue My Journey"), today's path and goal,
 /// four big shortcuts, the latest wins, and the learning lands. Everything else is one tap away.
 class HomeTab extends StatelessWidget {
+  /// true: the secondary «المزيد» page (My Day, feelings, library, family, lands...); false: the adventure map.
+  final bool more;
   final ChildProfile child;
   final VoidCallback onExit;
 
@@ -48,6 +53,7 @@ class HomeTab extends StatelessWidget {
     required this.onExit,
     this.onTab,
     this.now,
+    this.more = false,
   });
 
   void _play(BuildContext context, Activity a) => Navigator.push(
@@ -81,48 +87,74 @@ class HomeTab extends StatelessWidget {
         final header = <Widget>[
           Row(
             children: [
-              IconButton(
-                tooltip: context.tr('home.exit'),
-                onPressed: onExit,
-                icon: const Icon(Icons.lock_outline_rounded, color: RC.ink),
-              ),
+              ChildAvatar(child: child, size: 48),
+              const SizedBox(width: 10),
               Expanded(
-                child: Center(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Semantics(
-                      label:
-                          '${progress.totalStars} ${trKey('home.stars')}, ${trArgs('home.level', {'n': progress.explorerLevel})}',
-                      excludeSemantics: true,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 6,
-                          horizontal: 12,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (!more)
+                      Text(
+                        tr2('أهلاً يا بطل!', 'Hello, hero!'),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: DS.primary,
                         ),
-                        decoration: BoxDecoration(
-                          color: RC.sky,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: RC.outline, width: 2),
-                        ),
-                        child: Text(
-                          '⭐ ${progress.totalStars}   ·   ${trArgs('home.level', {'n': progress.explorerLevel})}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: RC.ink,
+                      ),
+                    Text(
+                      child.nickname,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                        color: RC.ink,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.centerEnd,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      StarBadge(
+                        stars: progress.totalStars,
+                        semanticLabel:
+                            '${progress.totalStars} ${trKey('home.stars')}, ${trArgs('home.level', {'n': progress.explorerLevel})}',
+                      ),
+                      NotificationBell(
+                        audience: NotificationAudience.child,
+                        childId: child.id,
+                        onRoute: childRouter(onTab: (i) => onTab?.call(i)),
+                      ),
+                      if (more) FamilyBubbleButton(child: child),
+                      IconButton(
+                        tooltip: context.tr('home.parent'),
+                        onPressed: () => openParentArea(context),
+                        icon: const UnreadDot(
+                          audience: NotificationAudience.parent,
+                          child: Icon(
+                            Icons.settings_rounded,
+                            color: DS.primary,
                           ),
                         ),
                       ),
-                    ),
+                      IconButton(
+                        tooltip: context.tr('home.exit'),
+                        onPressed: onExit,
+                        icon: const Icon(
+                          Icons.lock_outline_rounded,
+                          color: RC.ink,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              const HomeViewToggle(),
-              FamilyBubbleButton(child: child),
-              const SizedBox(width: 4),
-              IconButton(
-                tooltip: context.tr('home.parent'),
-                onPressed: () => openParentArea(context),
-                icon: const Icon(Icons.settings_rounded, color: RC.ink),
               ),
             ],
           ),
@@ -328,7 +360,8 @@ class HomeTab extends StatelessWidget {
                 _LandCard(
                   land: land,
                   progress: progress.lands[land.id]!,
-                  onTap: () => _open(context, LandMapScreen(land: land, child: child)),
+                  onTap: () =>
+                      _open(context, LandMapScreen(land: land, child: child)),
                 ),
             ],
           ),
@@ -373,16 +406,9 @@ class HomeTab extends StatelessWidget {
             ],
           ),
         ];
-        final content = ListenableBuilder(
-          listenable: HomeViewPref.instance,
-          builder: (context, _) {
-            HomeViewPref.instance.ensureLoaded();
-            if (HomeViewPref.instance.mapView) {
-              return _mapHome(context, header, store);
-            }
-            return _listHome(context, header, primary, secondary);
-          },
-        );
+        final content = more
+            ? _listHome(context, header, primary, secondary)
+            : _mapHome(context, header, store);
         return content;
       },
     );
@@ -394,92 +420,52 @@ class HomeTab extends StatelessWidget {
     List<Widget> header,
     JourneyStore store,
   ) {
-    final pool = landsForAge(child.age, child.learnLang);
-    final lands = {for (final l in store.publishedLands) l.id};
+    // Only the five main destinations live on the map. Everything else is in «المزيد».
     final islands = <IslandSpec>[
-      if (pool.contains('letters'))
-        IslandSpec(
-          id: 'letters',
-          title: tr2('الحروف', 'Letters'),
-          emoji: '🔤',
-          grass: const Color(0xFF8BD450),
-          grassDark: const Color(0xFF5FA832),
-          onTap: () => _open(context, LettersHomeScreen(child: child)),
-        ),
-      if (pool.contains('numbers') && lands.contains('numbers'))
-        IslandSpec(
-          id: 'numbers',
-          title: tr2('الأرقام', 'Numbers'),
-          emoji: '🔢',
-          grass: const Color(0xFF7FD6B5),
-          grassDark: const Color(0xFF3FA987),
-          onTap: () => _open(
-            context,
-            LandMapScreen(land: landById('numbers'), child: child),
-          ),
-        ),
-      IslandSpec(
-        id: 'words',
-        title: tr2('الكلمات', 'Words'),
-        emoji: '🖼️',
-        grass: const Color(0xFFA7DB6A),
-        grassDark: const Color(0xFF6FAE3C),
-        onTap: () => _open(context, VocabLibraryScreen(child: child)),
-      ),
-      IslandSpec(
-        id: 'stories',
-        title: tr2('القصص', 'Stories'),
-        emoji: '📖',
-        grass: const Color(0xFFC9A6F0),
-        grassDark: const Color(0xFF9468CC),
-        onTap: () => _open(context, StoriesHomeScreen(child: child)),
-      ),
       IslandSpec(
         id: 'games',
         title: tr2('الألعاب', 'Games'),
         emoji: '🎮',
         grass: const Color(0xFFFFC45E),
         grassDark: const Color(0xFFE09A22),
+        weight: 1.45,
+        houseStyle: 3,
         onTap: () => onTab?.call(1),
       ),
       IslandSpec(
+        id: 'stories',
+        title: tr2('الكرتون والحكايات', 'Cartoons & stories'),
+        emoji: '📺',
+        grass: const Color(0xFFC9A6F0),
+        grassDark: const Color(0xFF9468CC),
+        houseStyle: 2,
+        onTap: () => _open(context, CartoonsHubScreen(child: child)),
+      ),
+      IslandSpec(
+        id: 'learn',
+        title: tr2('اتعلم واكتشف', 'Learn & discover'),
+        emoji: '🔤',
+        grass: const Color(0xFF8BD450),
+        grassDark: const Color(0xFF5FA832),
+        houseStyle: 1,
+        onTap: () => _open(context, LearnHubScreen(child: child)),
+      ),
+      IslandSpec(
         id: 'create',
-        title: tr2('الإبداع', 'Create'),
+        title: tr2('ارسم وابتكر', 'Draw & create'),
         emoji: '🎨',
         grass: const Color(0xFFFF9DB8),
         grassDark: const Color(0xFFDB6A8D),
+        houseStyle: 0,
         onTap: () => onTab?.call(2),
       ),
       IslandSpec(
-        id: 'videos',
-        title: tr2('الفيديوهات', 'Videos'),
-        emoji: '▶️',
-        grass: const Color(0xFF8CC8FF),
-        grassDark: const Color(0xFF4F97D9),
-        onTap: () => _open(context, SubjectsScreen(age: child.age)),
-      ),
-      IslandSpec(
-        id: 'library',
-        title: tr2('مكتبتي', 'My library'),
-        emoji: '📚',
-        grass: const Color(0xFF7FD3E8),
-        grassDark: const Color(0xFF3B9DB8),
-        onTap: () => _open(context, MyLibraryScreen(child: child)),
-      ),
-      IslandSpec(
-        id: 'family_activities',
-        title: tr2('مع العائلة', 'With family'),
-        emoji: '🏠',
-        grass: const Color(0xFFFFB27A),
-        grassDark: const Color(0xFFD9803F),
-        onTap: () => _open(context, ActivityLibraryScreen(child: child)),
-      ),
-      IslandSpec(
-        id: 'me',
-        title: tr2('إنجازاتي', 'My wins'),
+        id: 'rewards',
+        title: tr2('مكافآتي', 'My rewards'),
         emoji: '🏆',
         grass: const Color(0xFFFFE066),
         grassDark: const Color(0xFFE6B422),
+        houseStyle: 3,
         onTap: () => onTab?.call(3),
       ),
     ];
@@ -490,8 +476,6 @@ class HomeTab extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           children: [
             ...header,
-            RecommendationCard(child: child, now: now),
-            const SizedBox(height: 12),
             IslandHome(islands: islands),
           ],
         ),
@@ -797,7 +781,8 @@ class _LandsSectionState extends State<_LandsSection> {
         RCard(
           key: const ValueKey('lands_toggle'),
           color: RC.sky.withAlpha(190),
-          semanticLabel: '${widget.title}. ${_open ? tr2('اضغط للإخفاء', 'Tap to hide') : tr2('اضغط للعرض', 'Tap to show')}',
+          semanticLabel:
+              '${widget.title}. ${_open ? tr2('اضغط للإخفاء', 'Tap to hide') : tr2('اضغط للعرض', 'Tap to show')}',
           onTap: () => setState(() => _open = !_open),
           child: Row(
             children: [
@@ -806,13 +791,23 @@ class _LandsSectionState extends State<_LandsSection> {
               Expanded(
                 child: Text(
                   widget.title,
-                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink),
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    color: RC.ink,
+                  ),
                 ),
               ),
               AnimatedRotation(
                 turns: _open ? 0.5 : 0,
-                duration: reduce ? Duration.zero : const Duration(milliseconds: 200),
-                child: const Icon(Icons.expand_more_rounded, size: 34, color: RC.ink),
+                duration: reduce
+                    ? Duration.zero
+                    : const Duration(milliseconds: 200),
+                child: const Icon(
+                  Icons.expand_more_rounded,
+                  size: 34,
+                  color: RC.ink,
+                ),
               ),
             ],
           ),
@@ -826,7 +821,11 @@ class _LandsSectionState extends State<_LandsSection> {
                   padding: const EdgeInsets.only(top: 10),
                   child: Column(
                     children: [
-                      for (final l in widget.lands) Padding(padding: const EdgeInsets.only(bottom: 10), child: l),
+                      for (final l in widget.lands)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: l,
+                        ),
                     ],
                   ),
                 )

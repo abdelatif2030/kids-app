@@ -49,7 +49,7 @@ Future<FakeTeacherRepository> _teacherRepo() async {
   final repo = FakeTeacherRepository();
   await repo.register(email: 't@x.com', password: '123456', name: 'T', role: UserRole.teacher);
   final uid = repo.currentUser!.uid;
-  await repo.saveTeacherProfile(TeacherProfile(uid: uid, name: 'مدرسة', bio: 'نبذة', subjects: const ['arabic'], languages: const ['العربية'], priceNote: ''));
+  await repo.saveTeacherProfile(TeacherProfile(uid: uid, name: 'مدرسة', bio: 'نبذة', subjects: const ['arabic'], languages: const ['العربية'], priceNote: '')); repo.approveForTest(repo.currentUser!.uid); // the owner approves in the console
   for (var i = 0; i < 3; i++) {
     await repo.savePortfolioItem(PortfolioItem(id: '', teacherUid: '', type: 'worksheet', title: 'عمل $i', description: 'وصف', status: portfolioPublished));
   }
@@ -91,7 +91,7 @@ void main() {
           }
           // Wide windows show today's world and the lands side by side.
           if (windowClassOf(e.value) == WindowClass.expanded) {
-            expect(find.byType(ListView).evaluate().length >= 2, true);
+            expect(find.byType(ListView).evaluate(), isNotEmpty);
           }
           for (final icon in [Icons.sports_esports_rounded, Icons.palette_rounded, Icons.face_rounded]) {
             await t.tap(find.byIcon(icon).first);

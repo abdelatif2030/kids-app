@@ -1,3 +1,4 @@
+import '../../online_gate.dart';
 import '../../family/family_entry.dart';
 import '../../firebase_config.dart';
 import '../avatars.dart';
@@ -95,14 +96,16 @@ class _Welcome extends StatelessWidget {
             const SizedBox(height: 10),
             Text(context.tr('start.parentFirst'), style: const TextStyle(fontSize: 15, color: RC.ink)),
             const SizedBox(height: 18),
-            TextButton.icon(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const TeachersEntryScreen()),
+            // Release 1 is offline: the accounts door appears only once the online release gate is open.
+            if (lastOnlineGate.open)
+              TextButton.icon(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const TeachersEntryScreen()),
+                ),
+                icon: const Icon(Icons.school_rounded),
+                label: Text(context.tr('start.accounts'), style: const TextStyle(fontSize: 17)),
               ),
-              icon: const Icon(Icons.school_rounded),
-              label: Text(context.tr('start.accounts'), style: const TextStyle(fontSize: 17)),
-            ),
             // A relative on their own phone has no child profile; they come in through this door.
             if (familyRepository != null)
               TextButton.icon(

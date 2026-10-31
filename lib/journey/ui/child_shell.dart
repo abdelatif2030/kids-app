@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../design/layout.dart';
+import '../../design/motion_system.dart';
+import '../../design/tokens.dart';
 import '../../games_screen.dart';
 import '../../l10n/strings.dart';
 import '../../offline/offline_ui.dart';
@@ -10,6 +12,12 @@ import '../../drawing_screen.dart';
 import '../../session_manager.dart';
 import '../models.dart';
 import '../repository.dart';
+import '../../companion/companion_logic.dart';
+import '../../companion/companion_service.dart';
+import '../../companion/companion_store.dart';
+import '../../family_time/family_time.dart';
+import '../../media/rehlaty_audio_engine.dart';
+import '../../notifications/notification_events.dart';
 import 'home_tab.dart';
 import 'kit.dart';
 import 'me_tab.dart';
@@ -30,9 +38,30 @@ class _ChildShellState extends State<ChildShell> {
   int _tab = 0;
 
   @override
+  void initState() {
+    super.initState();
+    CompanionStore.currentChildId = widget.child.id;
+    // Today's plan and the weekly summary become notifications once, from real data.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationEvents.refresh(widget.child);
+      // The companion greets by voice only when the parent switched automatic narration on (and never twice in a row).
+      CompanionStore.noteAge(widget.child.id, widget.child.age);
+      FamilyTimeStore.remind(widget.child.id, widget.child.nickname);
+      if (EnginePrefs.instance.autoNarration) {
+        CompanionService.react(widget.child.id, CompanionMoment.greet, age: widget.child.age).then((r) {
+          if (r == null) RehlatyAudioEngine.instance.say('hello');
+        });
+      }
+    });
+  }
+
+  @override
   void dispose() {
+    if (CompanionStore.currentChildId == widget.child.id) CompanionStore.currentChildId = null;
     // Deferred so listeners are not notified in the middle of tearing down.
-    WidgetsBinding.instance.addPostFrameCallback((_) => SessionManager.instance.stop());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => SessionManager.instance.stop(),
+    );
     super.dispose();
   }
 
@@ -44,7 +73,9 @@ class _ChildShellState extends State<ChildShell> {
     if (!mounted) return;
     final ok = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => const PinEntryScreen(returnResult: true)),
+      MaterialPageRoute(
+        builder: (_) => const PinEntryScreen(returnResult: true),
+      ),
     );
     if (ok == true && mounted) Navigator.pop(context);
   }
@@ -59,12 +90,25 @@ class _ChildShellState extends State<ChildShell> {
       child: ListenableBuilder(
         listenable: JourneyStore.instance,
         builder: (context, _) {
-          final child = JourneyStore.instance.profileById(widget.child.id) ?? widget.child;
+          final child =
+              JourneyStore.instance.profileById(widget.child.id) ??
+              widget.child;
           final tabs = [
-            HomeTab(child: child, onExit: _exit, onTab: (i) => setState(() => _tab = i)),
+            HomeTab(
+              child: child,
+              onExit: _exit,
+              onTab: (i) => setState(() => _tab = i),
+            ),
             _GamesTab(child: child),
             _CreateTab(child: child),
             MeTab(child: child),
+            HomeTab(
+              key: const ValueKey('more_tab'),
+              more: true,
+              child: child,
+              onExit: _exit,
+              onTab: (i) => setState(() => _tab = i),
+            ),
           ];
           final items = [
             for (final (i, item) in _items.indexed)
@@ -77,10 +121,21 @@ class _ChildShellState extends State<ChildShell> {
           ];
           // Navigation fits the window: a bottom bar on phones, a side rail on wider windows.
           final wide = context.windowClass != WindowClass.compact;
-          final content = Column(children: [
-            const OfflineBanner(),
-            Expanded(child: PastelBackground(child: SafeArea(child: KeyedSubtree(key: const ValueKey('tab_body'), child: tabs[_tab])))),
-          ]);
+          final content = Column(
+            children: [
+              const OfflineBanner(),
+              Expanded(
+                child: PastelBackground(
+                  child: SafeArea(
+                    child: KeyedSubtree(
+                      key: const ValueKey('tab_body'),
+                      child: tabs[_tab],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
           if (wide) {
             return Scaffold(
               body: Row(
@@ -88,13 +143,22 @@ class _ChildShellState extends State<ChildShell> {
                   Container(
                     width: 104,
                     decoration: BoxDecoration(
-                      color: RC.sky.withAlpha(200),
-                      border: const BorderDirectional(end: BorderSide(color: RC.outline, width: 2)),
+                      color: Colors.white,
+                      boxShadow: DS.softShadow,
+                      border: const BorderDirectional(
+                        end: BorderSide(color: DS.border, width: 1.5),
+                      ),
                     ),
                     child: SafeArea(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [for (final n in items) Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: n)],
+                        children: [
+                          for (final n in items)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              child: n,
+                            ),
+                        ],
                       ),
                     ),
                   ),
@@ -109,10 +173,15 @@ class _ChildShellState extends State<ChildShell> {
               child: Container(
                 padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
                 decoration: BoxDecoration(
-                  color: RC.sky.withAlpha(200),
-                  border: const Border(top: BorderSide(color: RC.outline, width: 2)),
+                  color: Colors.white,
+                  boxShadow: DS.softShadow,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
                 ),
-                child: Row(children: [for (final n in items) Expanded(child: n)]),
+                child: Row(
+                  children: [for (final n in items) Expanded(child: n)],
+                ),
               ),
             ),
           );
@@ -126,6 +195,7 @@ class _ChildShellState extends State<ChildShell> {
     (Icons.sports_esports_rounded, 'tab.games'),
     (Icons.palette_rounded, 'tab.create'),
     (Icons.face_rounded, 'tab.me'),
+    (Icons.apps_rounded, 'tab.more'),
   ];
 }
 
@@ -134,7 +204,12 @@ class _NavItem extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  const _NavItem({required this.icon, required this.label, required this.selected, required this.onTap});
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -151,21 +226,35 @@ class _NavItem extends StatelessWidget {
           children: [
             AnimatedContainer(
               duration: motion(context, 200),
-              width: 56,
+              width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: selected ? RC.pink : Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: selected ? RC.pinkDeep : RC.outline, width: 3),
+                gradient: selected ? DS.primaryGradient : null,
+                color: selected ? null : DS.primarySoft,
+                borderRadius: BorderRadius.circular(18),
               ),
-              child: Icon(icon, size: 30, color: selected ? Colors.white : RC.outline),
+              child: AnimatedNavigationItem(
+                selected: selected,
+                child: Icon(
+                  icon,
+                  size: 30,
+                  color: selected ? Colors.white : DS.primary,
+                ),
+              ),
             ),
             const SizedBox(height: 2),
-            Text(label,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                maxLines: 1,
                 style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: selected ? FontWeight.w900 : FontWeight.w600,
-                    color: RC.ink)),
+                  fontSize: 13,
+                  fontWeight: selected ? FontWeight.w900 : FontWeight.w600,
+                  color: selected ? DS.primary : RC.ink,
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -185,8 +274,14 @@ class _GamesTab extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(loc('ألعاب'),
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: RC.ink)),
+            Text(
+              loc('ألعاب'),
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.w900,
+                color: RC.ink,
+              ),
+            ),
             const SizedBox(height: 16),
             GamesGrid(age: child.age, child: child),
           ],
@@ -210,8 +305,14 @@ class _CreateTab extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(loc('إبداع'),
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: RC.ink)),
+            Text(
+              loc('إبداع'),
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.w900,
+                color: RC.ink,
+              ),
+            ),
             const SizedBox(height: 16),
             Wrap(
               spacing: 16,
@@ -224,7 +325,9 @@ class _CreateTab extends StatelessWidget {
                   color: const Color(0xFF8E73D0),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => StudioScreen(child: child)),
+                    MaterialPageRoute(
+                      builder: (_) => StudioScreen(child: child),
+                    ),
                   ),
                 ),
                 BigTile(
@@ -233,7 +336,9 @@ class _CreateTab extends StatelessWidget {
                   color: const Color(0xFFB085E8),
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => DrawingScreen(child: child)),
+                    MaterialPageRoute(
+                      builder: (_) => DrawingScreen(child: child),
+                    ),
                   ),
                 ),
                 BigTile(

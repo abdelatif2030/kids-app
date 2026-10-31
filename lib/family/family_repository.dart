@@ -30,6 +30,7 @@ abstract class FamilyRepository {
 
   /// pending -> active, active <-> paused, any -> removed. Only the parent calls this.
   Future<void> setRelativeStatus(String relUid, String status);
+
   /// Turns voice calls with this relative on or off. Off by default.
   Future<void> setRelativeCalls(String relUid, bool on);
 
@@ -57,11 +58,18 @@ abstract class FamilyRepository {
   Future<List<ConnectRequest>> sentRequests();
   Future<void> cancelRequest(String requestId);
 
+  /// Every request the parent sent, newest first (pending, accepted, declined, cancelled), at most [limit].
+  Future<List<ConnectRequest>> requestHistory({int limit = 30});
+
   /// Requests addressed to the signed-in person that are still waiting. Updates live.
   Stream<List<ConnectRequest>> watchIncomingRequests();
 
   /// Accepting makes the person an active relative at once (the parent started it); declining changes nothing else.
-  Future<void> respondToRequest(ConnectRequest request, {required bool accept, required String name});
+  Future<void> respondToRequest(
+    ConnectRequest request, {
+    required bool accept,
+    required String name,
+  });
 
   // --- relative side ---------------------------------------------------------
   /// The families a relative belongs to (usually one): family id and the parent's name.
@@ -79,9 +87,11 @@ abstract class FamilyRepository {
     required Side from,
     required String kind,
     required String body,
+
     /// The message's own id. Sending the same [clientId] again never makes a second message (used by the offline queue).
     String? clientId,
   });
+
   /// Sends a recorded voice message (<= 30 s, <= 300 KB). The sound is stored in a small separate document.
   Future<void> sendVoice({
     required String familyId,
@@ -95,12 +105,20 @@ abstract class FamilyRepository {
   });
 
   /// The sound of one voice message, or null if it was removed (they are removed after 14 days).
-  Future<VoiceClip?> loadVoice(String familyId, String voiceId, {required String relUid});
+  Future<VoiceClip?> loadVoice(
+    String familyId,
+    String voiceId, {
+    required String relUid,
+  });
 
   /// Parent only: removes voice recordings older than [days]. Returns how many were removed.
   Future<int> purgeOldVoices(String familyId, {int days = kVoiceKeepDays});
 
-  Stream<List<FamilyMessage>> watch({required String familyId, required String childId, required String relUid});
+  Stream<List<FamilyMessage>> watch({
+    required String familyId,
+    required String childId,
+    required String relUid,
+  });
 
   /// Parent only: every message of the family, newest last (the parent can read all conversations).
   Future<List<FamilyMessage>> allMessages(String familyId);
@@ -108,5 +126,9 @@ abstract class FamilyRepository {
   /// The newest [limit] messages of the whole family, oldest first. Used for the new-message count so that a busy
   /// family does not use up the free database reads.
   Future<List<FamilyMessage>> recentMessages(String familyId, {int limit = 80});
-  Future<void> clearThread({required String familyId, required String childId, required String relUid});
+  Future<void> clearThread({
+    required String familyId,
+    required String childId,
+    required String relUid,
+  });
 }

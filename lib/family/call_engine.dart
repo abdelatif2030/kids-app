@@ -53,9 +53,7 @@ class WebRtcEngine implements CallEngine {
     });
     if (video) _localRenderer.srcObject = _local;
     final pc = await createPeerConnection({
-      'iceServers': [
-        for (final s in kStunServers) {'urls': s},
-      ],
+      'iceServers': await iceServersLoader(),
       'sdpSemantics': 'unified-plan',
     });
     _pc = pc;

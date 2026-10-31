@@ -130,12 +130,12 @@ void main() {
     for (final l in kArabicLetters) {
       final pool = l.placedWords.isEmpty ? l.words : [for (final p in l.placedWords) p.$1];
       expect(pool, isNotEmpty, reason: l.letter);
-      final others = [
+      final others = {
         for (final o in kArabicLetters)
           if (o.letter != l.letter)
             for (final w in o.words)
               if (!w.word.contains(l.letter)) w.word,
-      ].toSet();
+      };
       expect(others.length, greaterThanOrEqualTo(2), reason: l.letter);
     }
   });

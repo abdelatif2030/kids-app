@@ -1,6 +1,6 @@
 // PLACEHOLDER. Running `flutterfire configure` (docs/teachers-setup.md)
-// replaces this file with your real project settings. Nothing reads it while
-// kFirebaseEnabled is false in firebase_config.dart.
+// replaces this file with your real project settings. While these values are REPLACE_ME the release gate
+// (online_gate.dart) stays closed and nothing connects to Firebase.
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 
 class DefaultFirebaseOptions {

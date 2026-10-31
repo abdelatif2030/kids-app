@@ -48,6 +48,14 @@ class FakeTeacherRepository implements TeacherRepository {
     _current = AppUser(hit.key, email);
   }
 
+  final List<String> resetsSent = [];
+
+  @override
+  Future<void> sendPasswordReset(String email) async {
+    if (!email.contains('@')) throw const AccountException('اكتب بريداً إلكترونياً صحيحاً');
+    resetsSent.add(email.trim()); // like the real service: the same result whether or not the account exists
+  }
+
   @override
   Future<void> signOut() async => _current = null;
 
@@ -70,6 +78,12 @@ class FakeTeacherRepository implements TeacherRepository {
   Future<List<TeacherProfile>> approvedTeachers() async =>
       _teachers.values.where((t) => t.approved).toList();
 
+  /// What the owner does in the Firebase console: approve (or suspend) a teacher.
+  void approveForTest(String teacherUid, {String status = teacherStatusApproved}) {
+    final t = _teachers[teacherUid];
+    if (t != null) _teachers[teacherUid] = t.copyWith(status: status);
+  }
+
   @override
   Future<TeacherProfile?> myTeacherProfile() async => _teachers[_current!.uid];
 
@@ -77,10 +91,10 @@ class FakeTeacherRepository implements TeacherRepository {
   Future<void> saveTeacherProfile(TeacherProfile p, {CvFile? newCv}) async {
     final old = _teachers[_current!.uid];
     if (newCv != null) _cvs[_current!.uid] = newCv;
-    // Visible at once; a suspension can never be lifted by the teacher, and a
-    // teacher can never set or change the verification badges.
+    // Like the real rules (S2): a new profile is pending until the OWNER approves it (see approveForTest); a teacher can never
+    // approve themselves, lift a suspension, or set or change the verification badges.
     _teachers[_current!.uid] = p.copyWith(
-      status: old == null || old.status == teacherStatusPending ? teacherStatusApproved : old.status,
+      status: teacherStatusToWrite(old?.status) ?? old!.status,
       identityVerified: old?.identityVerified ?? false,
       qualificationVerified: old?.qualificationVerified ?? false,
     );

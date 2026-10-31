@@ -1,6 +1,14 @@
+import 'adventures/adventure_store.dart';
+import 'everyday/everyday_store.dart';
+import 'family_time/family_time.dart';
+import 'companion/companion_store.dart';
+import 'world/world_look.dart';
+import 'world/world_progress.dart';
+import 'notifications/notification_store.dart';
 import 'family/family_prefs.dart';
 import 'family/family_seen.dart';
 import 'family/outbox.dart';
+
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,6 +25,7 @@ import 'l10n/strings.dart';
 /// plan and the parent's notes. The parent PIN and the time limits stay.
 Future<void> deleteChildData() async {
   await JourneyStore.instance.resetAll();
+  await NotificationStore.instance.clearAll();
   ChildPhotoStore.clearCache();
   final prefs = await SharedPreferences.getInstance();
   for (final key in prefs.getKeys().toList()) {
@@ -31,6 +40,12 @@ Future<void> deleteChildData() async {
         key == 'last_age' ||
         key == 'resume_state' ||
         key == 'feeling_log' ||
+        key == 'world_seen' ||
+        key == 'world_look' ||
+        key == 'companion_state' ||
+        key == 'adventures' ||
+        key == 'everyday_done' ||
+        key == 'family_time' ||
         key == 'favorites' ||
         key == 'family_prefs' ||
         key == 'family_seen' ||
@@ -45,7 +60,6 @@ Future<void> deleteChildData() async {
   }
 }
 
-
 /// Deletes one child and everything this device stored about them: their
 /// profile and progress, skill results, learning records, home tasks, story
 /// place and favourites, letter review state, and their gallery. Other
@@ -54,11 +68,23 @@ Future<void> deleteChildData() async {
 Future<void> deleteOneChild(String childId) async {
   final prefs = await SharedPreferences.getInstance();
 
-  Future<void> filterList(String key, bool Function(Map<String, dynamic>) keep) async {
+  Future<void> filterList(
+    String key,
+    bool Function(Map<String, dynamic>) keep,
+  ) async {
     final raw = prefs.getString(key);
     if (raw == null) return;
-    final list = [for (final e in jsonDecode(raw) as List<dynamic>) e as Map<String, dynamic>];
-    await prefs.setString(key, jsonEncode([for (final e in list) if (keep(e)) e]));
+    final list = [
+      for (final e in jsonDecode(raw) as List<dynamic>)
+        e as Map<String, dynamic>,
+    ];
+    await prefs.setString(
+      key,
+      jsonEncode([
+        for (final e in list)
+          if (keep(e)) e,
+      ]),
+    );
   }
 
   Future<void> dropKey(String key) async {
@@ -77,13 +103,19 @@ Future<void> deleteOneChild(String childId) async {
   await ChildPhotoStore.delete(childId);
   await ResumeStore.forget(childId);
   await FeelingStore.forget(childId);
+  await WorldStore.forget(childId);
+  await WorldLookStore.forget(childId);
+  await CompanionStore.forget(childId);
+  await AdventureStore.forget(childId);
+  await EverydayStore.forget(childId);
+  await FamilyTimeStore.forget(childId);
   await FavoritesStore.forget(childId);
   await FamilyPrefs.forget(childId);
   await FamilySeen.forget(childId);
   await FamilyOutbox.instance.removeForChild(childId);
+  await NotificationStore.instance.removeChild(childId);
   await JourneyStore.instance.deleteProfile(childId);
 }
-
 
 /// Everything this device holds about one child, as plain data a parent can
 /// read and keep (a data export). Nothing is sent anywhere by this function.
@@ -94,7 +126,10 @@ Future<Map<String, dynamic>> exportChildData(String childId) async {
   List<dynamic> mine(String key) {
     final raw = prefs.getString(key);
     if (raw == null) return [];
-    return [for (final e in jsonDecode(raw) as List<dynamic>) if ((e as Map<String, dynamic>)['c'] == childId) e];
+    return [
+      for (final e in jsonDecode(raw) as List<dynamic>)
+        if ((e as Map<String, dynamic>)['c'] == childId) e,
+    ];
   }
 
   dynamic byChild(String key) {
@@ -105,7 +140,9 @@ Future<Map<String, dynamic>> exportChildData(String childId) async {
 
   return {
     'exportedAt': DateTime.now().toIso8601String(),
-    'note': loc('هذه البيانات محفوظة على هذا الجهاز فقط. لم تُرسل إلى أي مكان.'),
+    'note': loc(
+      'هذه البيانات محفوظة على هذا الجهاز فقط. لم تُرسل إلى أي مكان.',
+    ),
     'profile': store.profileById(childId)?.toJson(),
     'hasPhotoOnDevice': store.profileById(childId)?.hasPhoto ?? false,
     'activities': [for (final a in store.attemptsOf(childId)) a.toJson()],
@@ -115,5 +152,11 @@ Future<Map<String, dynamic>> exportChildData(String childId) async {
     'gallery': mine('family_gallery'),
     'stories': byChild('story_state'),
     'letters': byChild('literacy_state'),
+    'world': byChild('world_seen'),
+    'worldLook': byChild('world_look'),
+    'companion': byChild('companion_state'),
+    'weeklyAdventures': byChild('adventures'),
+    'everydayLearning': byChild('everyday_done'),
+    'familyTime': byChild('family_time'),
   };
 }

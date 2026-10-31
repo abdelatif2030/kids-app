@@ -40,7 +40,10 @@ class SubjectChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: color.withAlpha(120)),
       ),
-      child: Text(s?.label ?? id, style: TextStyle(color: color, fontWeight: FontWeight.bold)),
+      child: Text(
+        s?.label ?? id,
+        style: TextStyle(color: color, fontWeight: FontWeight.bold),
+      ),
     );
   }
 }
@@ -50,7 +53,12 @@ class TeacherHeader extends StatelessWidget {
   final Widget avatar;
   final String title;
   final String? subtitle;
-  const TeacherHeader({super.key, required this.avatar, required this.title, this.subtitle});
+  const TeacherHeader({
+    super.key,
+    required this.avatar,
+    required this.title,
+    this.subtitle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -58,17 +66,27 @@ class TeacherHeader extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFFFFA726), Color(0xFFEF6C00)],
+          colors: [Color(0xFF8A5CFF), Color(0xFF4B2BC0)],
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
         ),
         borderRadius: BorderRadius.circular(28),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x556A3BFF),
+            blurRadius: 18,
+            offset: Offset(0, 6),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(4),
-            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
             child: avatar,
           ),
           const SizedBox(width: 16),
@@ -76,11 +94,19 @@ class TeacherHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: const TextStyle(
-                        color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 if (subtitle != null)
-                  Text(subtitle!, style: const TextStyle(color: Colors.white, fontSize: 15)),
+                  Text(
+                    subtitle!,
+                    style: const TextStyle(color: Colors.white, fontSize: 15),
+                  ),
               ],
             ),
           ),

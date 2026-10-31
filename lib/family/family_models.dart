@@ -27,21 +27,41 @@ const kRelativeActive = 'active';
 const kRelativePaused = 'paused'; // the parent paused it; can be resumed
 const kRelativeRemoved = 'removed';
 
-const kRelations = ['grandma', 'grandpa', 'aunt', 'uncle', 'father', 'mother', 'other'];
+const kRelations = [
+  'grandma',
+  'grandpa',
+  'aunt',
+  'uncle',
+  'father',
+  'mother',
+  'other',
+];
 
 String relationLabel(String r) => switch (r) {
-      'grandma' => tr2('جدة', 'Grandmother'),
-      'grandpa' => tr2('جد', 'Grandfather'),
-      'aunt' => tr2('عمة / خالة', 'Aunt'),
-      'uncle' => tr2('عم / خال', 'Uncle'),
-      'father' => tr2('أب', 'Father'),
-      'mother' => tr2('أم', 'Mother'),
-      _ => tr2('قريب', 'Relative'),
-    };
+  'grandma' => tr2('جدة', 'Grandmother'),
+  'grandpa' => tr2('جد', 'Grandfather'),
+  'aunt' => tr2('عمة / خالة', 'Aunt'),
+  'uncle' => tr2('عم / خال', 'Uncle'),
+  'father' => tr2('أب', 'Father'),
+  'mother' => tr2('أم', 'Mother'),
+  _ => tr2('قريب', 'Relative'),
+};
 
 /// Ready-made sentences a child can send by tapping. Each side shows them in its own language.
 const kPhrases = [
-  'p_hello', 'p_goodmorning', 'p_howareyou', 'p_miss', 'p_love', 'p_thanks', 'p_play', 'p_story', 'p_goodnight', 'p_call', 'p_win', 'p_sorry', 'p_hug',
+  'p_hello',
+  'p_goodmorning',
+  'p_howareyou',
+  'p_miss',
+  'p_love',
+  'p_thanks',
+  'p_play',
+  'p_story',
+  'p_goodnight',
+  'p_call',
+  'p_win',
+  'p_sorry',
+  'p_hug',
 ];
 
 /// Offered only after the child really finished something today (never as a reminder or a reward).
@@ -49,29 +69,47 @@ const kWinPhrase = 'p_win';
 
 /// Phrases in a sensible order for the time of day: «صباح الخير» in the morning, «تصبح على خير» at night.
 List<String> phrasesFor(DateTime now, {bool includeWin = false}) {
-  final first = (now.hour >= 19 || now.hour < 5) ? 'p_goodnight' : (now.hour < 11 ? 'p_goodmorning' : 'p_howareyou');
-  final rest = [for (final p in kPhrases) if (p != first && (includeWin || p != kWinPhrase)) p];
+  final first = (now.hour >= 19 || now.hour < 5)
+      ? 'p_goodnight'
+      : (now.hour < 11 ? 'p_goodmorning' : 'p_howareyou');
+  final rest = [
+    for (final p in kPhrases)
+      if (p != first && (includeWin || p != kWinPhrase)) p,
+  ];
   return [first, ...rest];
 }
 
 String phraseText(String id) => switch (id) {
-      'p_hello' => tr2('مرحباً! 👋', 'Hello! 👋'),
-      'p_miss' => tr2('وحشتني!', 'I miss you!'),
-      'p_love' => tr2('بحبك ❤', 'I love you ❤'),
-      'p_thanks' => tr2('شكراً!', 'Thank you!'),
-      'p_play' => tr2('تعالَ نلعب!', 'Let us play!'),
-      'p_goodnight' => tr2('تصبح على خير 🌙', 'Good night 🌙'),
-      'p_call' => tr2('هل نتكلم قريباً؟', 'Can we talk soon?'),
-      'p_goodmorning' => tr2('صباح الخير ☀', 'Good morning ☀'),
-      'p_howareyou' => tr2('كيف حالك؟', 'How are you?'),
-      'p_story' => tr2('احكِ لي حكاية!', 'Tell me a story!'),
-      'p_win' => tr2('أنهيت درساً اليوم! ⭐', 'I finished a lesson today! ⭐'),
-      'p_sorry' => tr2('آسف، سامحني', 'I am sorry'),
-      'p_hug' => tr2('أرسل لك حضناً 🤗', 'Sending you a hug 🤗'),
-      _ => '',
-    };
+  'p_hello' => tr2('مرحباً! 👋', 'Hello! 👋'),
+  'p_miss' => tr2('وحشتني!', 'I miss you!'),
+  'p_love' => tr2('بحبك ❤', 'I love you ❤'),
+  'p_thanks' => tr2('شكراً!', 'Thank you!'),
+  'p_play' => tr2('تعالَ نلعب!', 'Let us play!'),
+  'p_goodnight' => tr2('تصبح على خير 🌙', 'Good night 🌙'),
+  'p_call' => tr2('هل نتكلم قريباً؟', 'Can we talk soon?'),
+  'p_goodmorning' => tr2('صباح الخير ☀', 'Good morning ☀'),
+  'p_howareyou' => tr2('كيف حالك؟', 'How are you?'),
+  'p_story' => tr2('احكِ لي حكاية!', 'Tell me a story!'),
+  'p_win' => tr2('أنهيت درساً اليوم! ⭐', 'I finished a lesson today! ⭐'),
+  'p_sorry' => tr2('آسف، سامحني', 'I am sorry'),
+  'p_hug' => tr2('أرسل لك حضناً 🤗', 'Sending you a hug 🤗'),
+  _ => '',
+};
 
-const kStickers = ['😀', '😍', '🥰', '👍', '🎉', '⭐', '🌈', '🐱', '🐶', '🌸', '🍎', '🚗'];
+const kStickers = [
+  '😀',
+  '😍',
+  '🥰',
+  '👍',
+  '🎉',
+  '⭐',
+  '🌈',
+  '🐱',
+  '🐶',
+  '🌸',
+  '🍎',
+  '🚗',
+];
 
 class Relative {
   final String uid;
@@ -107,17 +145,24 @@ class Relative {
 
   bool get active => status == kRelativeActive;
 
-  Relative copyWith({String? status, Map<String, String>? children, bool? callsOn, String? nextCall, bool? voiceOn, bool? videoOn}) => Relative(
-        uid: uid,
-        name: name,
-        relation: relation,
-        status: status ?? this.status,
-        children: children ?? this.children,
-        callsOn: callsOn ?? this.callsOn,
-        nextCall: nextCall ?? this.nextCall,
-        voiceOn: voiceOn ?? this.voiceOn,
-        videoOn: videoOn ?? this.videoOn,
-      );
+  Relative copyWith({
+    String? status,
+    Map<String, String>? children,
+    bool? callsOn,
+    String? nextCall,
+    bool? voiceOn,
+    bool? videoOn,
+  }) => Relative(
+    uid: uid,
+    name: name,
+    relation: relation,
+    status: status ?? this.status,
+    children: children ?? this.children,
+    callsOn: callsOn ?? this.callsOn,
+    nextCall: nextCall ?? this.nextCall,
+    voiceOn: voiceOn ?? this.voiceOn,
+    videoOn: videoOn ?? this.videoOn,
+  );
 }
 
 /// A recorded voice message as stored: the sound bytes and their type.
@@ -128,7 +173,14 @@ class VoiceClip {
 }
 
 /// Sound types the server accepts.
-const kVoiceMimes = ['audio/webm', 'audio/ogg', 'audio/mp4', 'audio/aac', 'audio/mpeg', 'audio/wav'];
+const kVoiceMimes = [
+  'audio/webm',
+  'audio/ogg',
+  'audio/mp4',
+  'audio/aac',
+  'audio/mpeg',
+  'audio/wav',
+];
 
 const kRequestPending = 'pending';
 const kRequestAccepted = 'accepted';
@@ -148,6 +200,9 @@ class ConnectRequest {
   final String relation;
   final Map<String, String> children;
   final String status;
+
+  /// When it was sent (server time); null if unknown. Only used to sort the history.
+  final DateTime? at;
   const ConnectRequest({
     required this.id,
     required this.familyId,
@@ -157,20 +212,22 @@ class ConnectRequest {
     required this.relation,
     this.children = const {},
     this.status = kRequestPending,
+    this.at,
   });
 
   bool get pending => status == kRequestPending;
 
   ConnectRequest copyWith({String? status}) => ConnectRequest(
-        id: id,
-        familyId: familyId,
-        parentName: parentName,
-        toName: toName,
-        toUid: toUid,
-        relation: relation,
-        children: children,
-        status: status ?? this.status,
-      );
+    id: id,
+    familyId: familyId,
+    parentName: parentName,
+    toName: toName,
+    toUid: toUid,
+    relation: relation,
+    children: children,
+    status: status ?? this.status,
+    at: at,
+  );
 }
 
 /// User names are compared in lower case, without spaces and without a leading «@».
@@ -181,7 +238,8 @@ String normalizeUsername(String s) {
 
 /// 3 to 20 characters: Arabic or Latin letters, digits and «_». No spaces, no «@», no dots, so it can never look
 /// like an e-mail address or a link. (The same rule is in firestore.rules.)
-bool validUsername(String s) => RegExp('^[a-z0-9_\u0621-\u064A]{3,20}\$').hasMatch(normalizeUsername(s));
+bool validUsername(String s) =>
+    RegExp('^[a-z0-9_\u0621-\u064A]{3,20}\$').hasMatch(normalizeUsername(s));
 
 enum Side { child, relative }
 
@@ -214,12 +272,17 @@ class FamilyMessage {
   String get threadId => threadIdOf(childId, relUid);
 
   /// What to show: phrases are localized by id, stickers and text as written.
-  String get shown => kind == kindPhrase ? phraseText(body) : (kind == kindVoice ? '🎤 $secs ${tr2('ث', 's')}' : body);
+  String get shown => kind == kindPhrase
+      ? phraseText(body)
+      : (kind == kindVoice ? '🎤 $secs ${tr2('ث', 's')}' : body);
 }
 
 String threadIdOf(String childId, String relUid) => '${childId}__$relUid';
 
-final _link = RegExp(r'(https?:|www\.|://|\.com\b|\.net\b|\.org\b|@)', caseSensitive: false);
+final _link = RegExp(
+  r'(https?:|www\.|://|\.com\b|\.net\b|\.org\b|@)',
+  caseSensitive: false,
+);
 
 /// A very small filter: links, web addresses and e-mail addresses are not allowed in chat text.
 bool containsLink(String s) => _link.hasMatch(s);
@@ -228,16 +291,29 @@ bool containsLink(String s) => _link.hasMatch(s);
 String? validateMessage(String kind, String body) {
   switch (kind) {
     case kindPhrase:
-      return kPhrases.contains(body) ? null : tr2('رسالة غير معروفة', 'Unknown message');
+      return kPhrases.contains(body)
+          ? null
+          : tr2('رسالة غير معروفة', 'Unknown message');
     case kindSticker:
-      return kStickers.contains(body) ? null : tr2('ملصق غير معروف', 'Unknown sticker');
+      return kStickers.contains(body)
+          ? null
+          : tr2('ملصق غير معروف', 'Unknown sticker');
     case kindVoice:
-      return body.isEmpty || body.length > 40 ? tr2('رسالة صوتية غير صالحة', 'Not a valid voice message') : null;
+      return body.isEmpty || body.length > 40
+          ? tr2('رسالة صوتية غير صالحة', 'Not a valid voice message')
+          : null;
     case kindText:
       final t = body.trim();
       if (t.isEmpty) return tr2('اكتب رسالة أولاً', 'Write a message first');
-      if (t.length > kMaxTextLength) return tr2('الرسالة طويلة', 'The message is too long');
-      if (containsLink(t)) return tr2('لا يمكن إرسال روابط أو عناوين', 'Links and addresses cannot be sent');
+      if (t.length > kMaxTextLength) {
+        return tr2('الرسالة طويلة', 'The message is too long');
+      }
+      if (containsLink(t)) {
+        return tr2(
+          'لا يمكن إرسال روابط أو عناوين',
+          'Links and addresses cannot be sent',
+        );
+      }
       return null;
   }
   return tr2('رسالة غير معروفة', 'Unknown message');
@@ -250,10 +326,22 @@ class ChildChatPrefs {
 
   /// The child may record voice messages (only to relatives whose voice switch is on). Off by default.
   final bool voiceOn;
-  const ChildChatPrefs({this.chatOn = false, this.textOn = false, this.voiceOn = false});
+  const ChildChatPrefs({
+    this.chatOn = false,
+    this.textOn = false,
+    this.voiceOn = false,
+  });
 
-  Map<String, dynamic> toJson() => {'chatOn': chatOn, 'textOn': textOn, 'voiceOn': voiceOn};
+  Map<String, dynamic> toJson() => {
+    'chatOn': chatOn,
+    'textOn': textOn,
+    'voiceOn': voiceOn,
+  };
   static ChildChatPrefs fromJson(Object? j) => j is Map
-      ? ChildChatPrefs(chatOn: j['chatOn'] == true, textOn: j['textOn'] == true, voiceOn: j['voiceOn'] == true)
+      ? ChildChatPrefs(
+          chatOn: j['chatOn'] == true,
+          textOn: j['textOn'] == true,
+          voiceOn: j['voiceOn'] == true,
+        )
       : const ChildChatPrefs();
 }

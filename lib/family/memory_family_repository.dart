@@ -8,7 +8,8 @@ import 'family_repository.dart';
 
 /// In-memory family server shared by several "devices" (one FakeFamilyRepository per signed-in account).
 class FakeFamilyServer {
-  final relatives = <String, Map<String, Relative>>{}; // familyId -> relUid -> Relative
+  final relatives =
+      <String, Map<String, Relative>>{}; // familyId -> relUid -> Relative
   final messages = <String, List<FamilyMessage>>{}; // familyId -> messages
   final _changes = StreamController<String>.broadcast();
   final requests = <String, ConnectRequest>{};
@@ -18,7 +19,8 @@ class FakeFamilyServer {
 
   /// user name -> account id (one name per relative, unique).
   final usernames = <String, String>{};
-  final voices = <String, (String familyId, String relUid, VoiceClip clip, DateTime at)>{};
+  final voices =
+      <String, (String familyId, String relUid, VoiceClip clip, DateTime at)>{};
   final parentNames = <String, String>{}; // family id -> parent's name
   final _requestChanges = StreamController<String>.broadcast();
   final calls = <String, CallInfo>{}; // call id -> call
@@ -50,12 +52,15 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   Future<void> claimUsername(String username) async {
     final n = normalizeUsername(username);
     if (!validUsername(n)) throw const FamilyException('bad user name');
-    if (await myUsername() != null) throw const FamilyException('already has one');
+    if (await myUsername() != null) {
+      throw const FamilyException('already has one');
+    }
     if (server.usernames.containsKey(n)) throw const FamilyException('taken');
     server.usernames[n] = uid!;
   }
 
-  Map<String, Relative> _mine(String fid) => server.relatives.putIfAbsent(fid, () => {});
+  Map<String, Relative> _mine(String fid) =>
+      server.relatives.putIfAbsent(fid, () => {});
 
   // --- connection requests -------------------------------------------------------------------------
   @override
@@ -65,13 +70,36 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
     required String relation,
     required Map<String, String> children,
   }) async {
+    if (server.offline) {
+      throw const FamilyException('No internet connection', offline: true);
+    }
     final name = normalizeUsername(toName);
     if (!validUsername(name)) throw const FamilyException('bad user name');
     final toUid = server.usernames[name];
     if (toUid == null) throw const FamilyException('no such user name');
     if (children.isEmpty) throw const FamilyException('no child');
+    if (server.requests.values.any(
+      (r) => r.familyId == uid && r.toUid == toUid && r.pending,
+    )) {
+      throw const FamilyException(
+        'You already sent this person a request and it is still waiting.',
+      );
+    }
+    final existing = server.relatives[uid]?[toUid];
+    if (existing != null && existing.status != kRelativeRemoved) {
+      throw const FamilyException('This person is already in your family.');
+    }
     final id = 'req${server._n++}';
-    final r = ConnectRequest(id: id, familyId: uid!, parentName: parentName, toName: name, toUid: toUid, relation: relation, children: children);
+    final r = ConnectRequest(
+      id: id,
+      familyId: uid!,
+      parentName: parentName,
+      toName: name,
+      toUid: toUid,
+      relation: relation,
+      children: children,
+      at: DateTime.now(),
+    );
     server.requests[id] = r;
     server.parentNames[uid!] = parentName;
     server._requestChanges.add(id);
@@ -79,17 +107,40 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   }
 
   @override
-  Future<List<ConnectRequest>> sentRequests() async => [for (final r in server.requests.values) if (r.familyId == uid && r.pending) r];
+  Future<List<ConnectRequest>> sentRequests() async => [
+    for (final r in server.requests.values)
+      if (r.familyId == uid && r.pending) r,
+  ];
+
+  @override
+  Future<List<ConnectRequest>> requestHistory({int limit = 30}) async {
+    if (server.offline) {
+      throw const FamilyException('No internet connection', offline: true);
+    }
+    final list =
+        [
+          for (final r in server.requests.values)
+            if (r.familyId == uid) r,
+        ]..sort(
+          (a, b) => (b.at ?? DateTime(2000)).compareTo(a.at ?? DateTime(2000)),
+        );
+    return list.take(limit).toList();
+  }
 
   @override
   Future<void> cancelRequest(String requestId) async {
     final r = server.requests[requestId];
-    if (r == null || r.familyId != uid || !r.pending) throw const FamilyException('not allowed');
+    if (r == null || r.familyId != uid || !r.pending) {
+      throw const FamilyException('not allowed');
+    }
     server.requests[requestId] = r.copyWith(status: kRequestCancelled);
     server._requestChanges.add(requestId);
   }
 
-  List<ConnectRequest> _incomingNow() => [for (final r in server.requests.values) if (r.pending && uid != null && r.toUid == uid) r];
+  List<ConnectRequest> _incomingNow() => [
+    for (final r in server.requests.values)
+      if (r.pending && uid != null && r.toUid == uid) r,
+  ];
 
   @override
   Stream<List<ConnectRequest>> watchIncomingRequests() {
@@ -97,7 +148,9 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
     StreamSubscription<String>? sub;
     c = StreamController<List<ConnectRequest>>(
       onListen: () {
-        sub = server._requestChanges.stream.listen((_) => c.add(_incomingNow()));
+        sub = server._requestChanges.stream.listen(
+          (_) => c.add(_incomingNow()),
+        );
         c.add(_incomingNow());
       },
       onCancel: () => sub?.cancel(),
@@ -106,12 +159,26 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   }
 
   @override
-  Future<void> respondToRequest(ConnectRequest request, {required bool accept, required String name}) async {
+  Future<void> respondToRequest(
+    ConnectRequest request, {
+    required bool accept,
+    required String name,
+  }) async {
     final r = server.requests[request.id];
-    if (r == null || !r.pending || uid == null || r.toUid != uid) throw const FamilyException('not allowed');
-    server.requests[r.id] = r.copyWith(status: accept ? kRequestAccepted : kRequestDeclined);
+    if (r == null || !r.pending || uid == null || r.toUid != uid) {
+      throw const FamilyException('not allowed');
+    }
+    server.requests[r.id] = r.copyWith(
+      status: accept ? kRequestAccepted : kRequestDeclined,
+    );
     if (accept) {
-      _mine(r.familyId)[uid!] = Relative(uid: uid!, name: name, relation: r.relation, status: kRelativeActive, children: r.children);
+      _mine(r.familyId)[uid!] = Relative(
+        uid: uid!,
+        name: name,
+        relation: r.relation,
+        status: kRelativeActive,
+        children: r.children,
+      );
     }
     server._requestChanges.add(r.id);
   }
@@ -158,42 +225,78 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
     required String mime,
     required int secs,
   }) async {
-    if (bytes.isEmpty || bytes.length > kMaxVoiceBytes || secs < 1 || secs > kMaxVoiceSeconds || !kVoiceMimes.contains(mime)) {
+    if (bytes.isEmpty ||
+        bytes.length > kMaxVoiceBytes ||
+        secs < 1 ||
+        secs > kMaxVoiceSeconds ||
+        !kVoiceMimes.contains(mime)) {
       throw const FamilyException('invalid voice message');
     }
     final rel = _mine(familyId)[relUid];
-    if (rel == null || !rel.active || !rel.voiceOn || !rel.children.containsKey(childId)) throw const FamilyException('not allowed');
-    if (from == Side.child && uid != familyId) throw const FamilyException('not allowed');
-    if (from == Side.relative && uid != relUid) throw const FamilyException('not allowed');
+    if (rel == null ||
+        !rel.active ||
+        !rel.voiceOn ||
+        !rel.children.containsKey(childId)) {
+      throw const FamilyException('not allowed');
+    }
+    if (from == Side.child && uid != familyId) {
+      throw const FamilyException('not allowed');
+    }
+    if (from == Side.relative && uid != relUid) {
+      throw const FamilyException('not allowed');
+    }
     final vid = 'v${server._n++}';
-    server.voices[vid] = (familyId, relUid, VoiceClip(bytes, mime), DateTime.now());
-    server.messages.putIfAbsent(familyId, () => []).add(FamilyMessage(
-          id: 'm${server._n++}',
-          childId: childId,
-          childName: childName,
-          relUid: relUid,
-          from: from,
-          kind: kindVoice,
-          body: vid,
-          secs: secs,
-          at: DateTime.fromMillisecondsSinceEpoch(1700000000000 + server._n * 1000),
-        ));
+    server.voices[vid] = (
+      familyId,
+      relUid,
+      VoiceClip(bytes, mime),
+      DateTime.now(),
+    );
+    server.messages
+        .putIfAbsent(familyId, () => [])
+        .add(
+          FamilyMessage(
+            id: 'm${server._n++}',
+            childId: childId,
+            childName: childName,
+            relUid: relUid,
+            from: from,
+            kind: kindVoice,
+            body: vid,
+            secs: secs,
+            at: DateTime.fromMillisecondsSinceEpoch(
+              1700000000000 + server._n * 1000,
+            ),
+          ),
+        );
     server._changes.add(familyId);
   }
 
   @override
-  Future<VoiceClip?> loadVoice(String familyId, String voiceId, {required String relUid}) async {
+  Future<VoiceClip?> loadVoice(
+    String familyId,
+    String voiceId, {
+    required String relUid,
+  }) async {
     final v = server.voices[voiceId];
     if (v == null || v.$1 != familyId) return null;
-    if (uid != familyId && !(uid == relUid && v.$2 == relUid)) throw const FamilyException('not allowed');
+    if (uid != familyId && !(uid == relUid && v.$2 == relUid)) {
+      throw const FamilyException('not allowed');
+    }
     return v.$3;
   }
 
   @override
-  Future<int> purgeOldVoices(String familyId, {int days = kVoiceKeepDays}) async {
+  Future<int> purgeOldVoices(
+    String familyId, {
+    int days = kVoiceKeepDays,
+  }) async {
     if (uid != familyId) throw const FamilyException('not allowed');
     final cutoff = DateTime.now().subtract(Duration(days: days));
-    final old = [for (final e in server.voices.entries) if (e.value.$1 == familyId && e.value.$4.isBefore(cutoff)) e.key];
+    final old = [
+      for (final e in server.voices.entries)
+        if (e.value.$1 == familyId && e.value.$4.isBefore(cutoff)) e.key,
+    ];
     for (final k in old) {
       server.voices.remove(k);
     }
@@ -204,12 +307,17 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   Future<void> setRelativeNextCall(String relUid, String text) async {
     final r = _mine(uid!)[relUid];
     if (r == null) throw const FamilyException('not found');
-    if (text.length > kMaxNextCallLength || containsLink(text)) throw const FamilyException('invalid');
+    if (text.length > kMaxNextCallLength || containsLink(text)) {
+      throw const FamilyException('invalid');
+    }
     _mine(uid!)[relUid] = r.copyWith(nextCall: text.trim());
   }
 
   @override
-  Future<void> setRelativeChildren(String relUid, Map<String, String> children) async {
+  Future<void> setRelativeChildren(
+    String relUid,
+    Map<String, String> children,
+  ) async {
     final r = _mine(uid!)[relUid];
     if (r == null) throw const FamilyException('not found');
     _mine(uid!)[relUid] = r.copyWith(children: children);
@@ -217,13 +325,16 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
 
   @override
   Future<List<(String, String)>> myFamilies() async => [
-        for (final e in server.relatives.entries)
-          if (e.value[uid]?.status == kRelativeActive || e.value[uid]?.status == kRelativePending)
-            (e.key, server.parentNames[e.key] ?? ''),
-      ];
+    for (final e in server.relatives.entries)
+      if (e.value[uid]?.status == kRelativeActive ||
+          e.value[uid]?.status == kRelativePending)
+        (e.key, server.parentNames[e.key] ?? ''),
+  ];
 
   @override
-  Future<List<Relative>> myLinks(String familyId) async => [if (_mine(familyId)[uid] != null) _mine(familyId)[uid]!];
+  Future<List<Relative>> myLinks(String familyId) async => [
+    if (_mine(familyId)[uid] != null) _mine(familyId)[uid]!,
+  ];
 
   @override
   Future<void> send({
@@ -236,37 +347,58 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
     required String body,
     String? clientId,
   }) async {
-    if (server.offline) throw const FamilyException('No internet connection', offline: true);
+    if (server.offline) {
+      throw const FamilyException('No internet connection', offline: true);
+    }
     final problem = validateMessage(kind, body);
     if (problem != null) throw FamilyException(problem);
     // The same client id again is the same message: nothing new is written.
-    if (clientId != null && (server.messages[familyId] ?? const <FamilyMessage>[]).any((m) => m.id == clientId)) return;
+    if (clientId != null &&
+        (server.messages[familyId] ?? const <FamilyMessage>[]).any(
+          (m) => m.id == clientId,
+        )) {
+      return;
+    }
     final rel = _mine(familyId)[relUid];
     if (rel == null || !rel.active || !rel.children.containsKey(childId)) {
       throw const FamilyException('not allowed');
     }
-    if (from == Side.child && uid != familyId) throw const FamilyException('not allowed');
-    if (from == Side.relative && uid != relUid) throw const FamilyException('not allowed');
-    server.messages.putIfAbsent(familyId, () => []).add(FamilyMessage(
-          id: clientId ?? 'm${server._n++}',
-          childId: childId,
-          childName: childName,
-          relUid: relUid,
-          from: from,
-          kind: kind,
-          body: kind == kindText ? body.trim() : body,
-          at: DateTime.fromMillisecondsSinceEpoch(1700000000000 + server._n * 1000),
-        ));
+    if (from == Side.child && uid != familyId) {
+      throw const FamilyException('not allowed');
+    }
+    if (from == Side.relative && uid != relUid) {
+      throw const FamilyException('not allowed');
+    }
+    server.messages
+        .putIfAbsent(familyId, () => [])
+        .add(
+          FamilyMessage(
+            id: clientId ?? 'm${server._n++}',
+            childId: childId,
+            childName: childName,
+            relUid: relUid,
+            from: from,
+            kind: kind,
+            body: kind == kindText ? body.trim() : body,
+            at: DateTime.fromMillisecondsSinceEpoch(
+              1700000000000 + server._n * 1000,
+            ),
+          ),
+        );
     server._changes.add(familyId);
   }
 
   List<FamilyMessage> _thread(String fid, String childId, String relUid) => [
-        for (final m in server.messages[fid] ?? const <FamilyMessage>[])
-          if (m.childId == childId && m.relUid == relUid) m,
-      ];
+    for (final m in server.messages[fid] ?? const <FamilyMessage>[])
+      if (m.childId == childId && m.relUid == relUid) m,
+  ];
 
   @override
-  Stream<List<FamilyMessage>> watch({required String familyId, required String childId, required String relUid}) async* {
+  Stream<List<FamilyMessage>> watch({
+    required String familyId,
+    required String childId,
+    required String relUid,
+  }) async* {
     yield _thread(familyId, childId, relUid);
     await for (final f in server._changes.stream) {
       if (f == familyId) yield _thread(familyId, childId, relUid);
@@ -280,16 +412,25 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   }
 
   @override
-  Future<List<FamilyMessage>> recentMessages(String familyId, {int limit = 80}) async {
+  Future<List<FamilyMessage>> recentMessages(
+    String familyId, {
+    int limit = 80,
+  }) async {
     if (uid != familyId) throw const FamilyException('not allowed');
     final all = List.of(server.messages[familyId] ?? const <FamilyMessage>[]);
     return all.length <= limit ? all : all.sublist(all.length - limit);
   }
 
   @override
-  Future<void> clearThread({required String familyId, required String childId, required String relUid}) async {
+  Future<void> clearThread({
+    required String familyId,
+    required String childId,
+    required String relUid,
+  }) async {
     if (uid != familyId) throw const FamilyException('not allowed');
-    server.messages[familyId]?.removeWhere((m) => m.childId == childId && m.relUid == relUid);
+    server.messages[familyId]?.removeWhere(
+      (m) => m.childId == childId && m.relUid == relUid,
+    );
     server._changes.add(familyId);
   }
 
@@ -297,7 +438,13 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   Future<int> purgeOldCalls(String familyId, {int hours = 24}) async {
     if (uid != familyId) throw const FamilyException('not allowed');
     final cutoff = DateTime.now().subtract(Duration(hours: hours));
-    final old = [for (final c in server.calls.values) if (c.familyId == familyId && !c.ringing && c.createdAt.isBefore(cutoff)) c.id];
+    final old = [
+      for (final c in server.calls.values)
+        if (c.familyId == familyId &&
+            !c.ringing &&
+            c.createdAt.isBefore(cutoff))
+          c.id,
+    ];
     for (final id in old) {
       server.calls.remove(id);
       server.candidates.remove(id);
@@ -319,10 +466,19 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
     bool video = false,
   }) async {
     final rel = _mine(familyId)[relUid];
-    if (rel == null || !rel.active || !rel.callsOn || !rel.children.containsKey(childId)) throw const FamilyException('not allowed');
+    if (rel == null ||
+        !rel.active ||
+        !rel.callsOn ||
+        !rel.children.containsKey(childId)) {
+      throw const FamilyException('not allowed');
+    }
     if (video && !rel.videoOn) throw const FamilyException('not allowed');
-    if (from == CallFrom.parent && uid != familyId) throw const FamilyException('not allowed');
-    if (from == CallFrom.relative && uid != relUid) throw const FamilyException('not allowed');
+    if (from == CallFrom.parent && uid != familyId) {
+      throw const FamilyException('not allowed');
+    }
+    if (from == CallFrom.relative && uid != relUid) {
+      throw const FamilyException('not allowed');
+    }
     final id = 'call${server._n++}_${_callN++}';
     server.calls[id] = CallInfo(
       id: id,
@@ -341,9 +497,15 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   }
 
   List<CallInfo> _incoming(String familyId) => [
-        for (final c in server.calls.values)
-          if (c.familyId == familyId && c.ringing && c.freshAt(DateTime.now()) && (uid == familyId ? c.from == CallFrom.relative : (c.from == CallFrom.parent && c.relUid == uid))) c,
-      ];
+    for (final c in server.calls.values)
+      if (c.familyId == familyId &&
+          c.ringing &&
+          c.freshAt(DateTime.now()) &&
+          (uid == familyId
+              ? c.from == CallFrom.relative
+              : (c.from == CallFrom.parent && c.relUid == uid)))
+        c,
+  ];
 
   /// A stream that first reports the current value and then every change, without missing a change that
   /// happens right after listening starts.
@@ -363,13 +525,19 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   }
 
   @override
-  Stream<List<CallInfo>> watchIncoming(String familyId) => _live(() => _incoming(familyId), (_) => true);
+  Stream<List<CallInfo>> watchIncoming(String familyId) =>
+      _live(() => _incoming(familyId), (_) => true);
 
   @override
-  Stream<CallInfo?> watchCall(String familyId, String callId) => _live(() => server.calls[callId], (id) => id == callId);
+  Stream<CallInfo?> watchCall(String familyId, String callId) =>
+      _live(() => server.calls[callId], (id) => id == callId);
 
   @override
-  Future<void> answerCall(String familyId, String callId, Map<String, String> answer) async {
+  Future<void> answerCall(
+    String familyId,
+    String callId,
+    Map<String, String> answer,
+  ) async {
     final c = server.calls[callId];
     if (c == null || !c.ringing) throw const FamilyException('not allowed');
     server.calls[callId] = c.copyWith(status: callAccepted, answer: answer);
@@ -377,7 +545,11 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   }
 
   @override
-  Future<void> setCallStatus(String familyId, String callId, String status) async {
+  Future<void> setCallStatus(
+    String familyId,
+    String callId,
+    String status,
+  ) async {
     final c = server.calls[callId];
     if (c == null) return;
     server.calls[callId] = c.copyWith(status: status);
@@ -385,15 +557,29 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
   }
 
   @override
-  Future<void> addCandidate(String familyId, String callId, CallFrom from, Map<String, dynamic> candidate) async {
+  Future<void> addCandidate(
+    String familyId,
+    String callId,
+    CallFrom from,
+    Map<String, dynamic> candidate,
+  ) async {
     server.candidates.putIfAbsent(callId, () => []).add((from, candidate));
     server._callChanges.add('cand:$callId');
   }
 
   @override
-  Stream<Map<String, dynamic>> watchCandidates(String familyId, String callId, CallFrom other) {
+  Stream<Map<String, dynamic>> watchCandidates(
+    String familyId,
+    String callId,
+    CallFrom other,
+  ) {
     var seen = 0;
-    List<Map<String, dynamic>> now() => [for (final e in server.candidates[callId] ?? const <(CallFrom, Map<String, dynamic>)>[]) if (e.$1 == other) e.$2];
+    List<Map<String, dynamic>> now() => [
+      for (final e
+          in server.candidates[callId] ??
+              const <(CallFrom, Map<String, dynamic>)>[])
+        if (e.$1 == other) e.$2,
+    ];
     late StreamController<Map<String, dynamic>> c;
     StreamSubscription<String>? sub;
     void flush() {
@@ -419,7 +605,11 @@ class FakeFamilyRepository implements FamilyRepository, CallRepository {
 /// Demo mode (`--dart-define=FAMILY_DEMO=true`): one in-memory server shared by a demo parent and a demo
 /// relative, so the whole chat can be tried in a single window without Firebase. Nothing is saved or sent;
 /// it resets when the app restarts. Never on in a normal build.
-const kFamilyDemo = bool.fromEnvironment('FAMILY_DEMO');
+/// `dart.vm.product` is true in release and profile builds, so a release can never be switched into the demo by a build flag.
+const kFamilyDemo = !bool.fromEnvironment('dart.vm.product') && bool.fromEnvironment('FAMILY_DEMO');
 final demoFamilyServer = FakeFamilyServer();
 final demoParentRepo = FakeFamilyRepository(demoFamilyServer, 'demo-parent');
-final demoRelativeRepo = FakeFamilyRepository(demoFamilyServer, 'demo-relative');
+final demoRelativeRepo = FakeFamilyRepository(
+  demoFamilyServer,
+  'demo-relative',
+);

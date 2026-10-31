@@ -1,4 +1,9 @@
+import 'age_scope.dart';
+import 'design/tokens.dart';
+import 'teachers_redesign.dart';
+import 'design/rehlaty_heart.dart';
 import 'design/layout.dart';
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -31,7 +36,10 @@ class TeacherFavorites {
     final set = await load();
     final added = set.add(uid);
     if (!added) set.remove(uid);
-    await (await SharedPreferences.getInstance()).setString(_key, jsonEncode(set.toList()));
+    await (await SharedPreferences.getInstance()).setString(
+      _key,
+      jsonEncode(set.toList()),
+    );
     return added;
   }
 }
@@ -44,31 +52,52 @@ class VerificationBadges extends StatelessWidget {
   const VerificationBadges({super.key, required this.teacher});
 
   Widget _badge(BuildContext context, String label, String meaning) => Tooltip(
-        message: meaning,
-        child: ActionChip(
-          avatar: const Icon(Icons.verified_rounded, size: 18, color: Color(0xFF2E7D32)),
-          label: Text(label),
-          visualDensity: VisualDensity.compact,
-          onPressed: () => showDialog<void>(
-            context: context,
-            builder: (_) => AlertDialog(
-              title: Text(label),
-              content: Text(meaning),
-              actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text(loc('حسناً')))],
+    message: meaning,
+    child: ActionChip(
+      avatar: const Icon(
+        Icons.verified_rounded,
+        size: 18,
+        color: Color(0xFF2E7D32),
+      ),
+      label: Text(label),
+      visualDensity: VisualDensity.compact,
+      onPressed: () => showDialog<void>(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text(label),
+          content: Text(meaning),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(loc('حسناً')),
             ),
-          ),
+          ],
         ),
-      );
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
-    if (!teacher.identityVerified && !teacher.qualificationVerified) return const SizedBox.shrink();
+    if (!teacher.identityVerified && !teacher.qualificationVerified) {
+      return const SizedBox.shrink();
+    }
     return Wrap(
       spacing: 6,
       runSpacing: 4,
       children: [
-        if (teacher.identityVerified) _badge(context, loc('الهوية تم التحقق منها'), loc(kIdentityBadgeMeaning)),
-        if (teacher.qualificationVerified) _badge(context, loc('المؤهل تم التحقق منه'), loc(kQualificationBadgeMeaning)),
+        if (teacher.identityVerified)
+          _badge(
+            context,
+            loc('الهوية تم التحقق منها'),
+            loc(kIdentityBadgeMeaning),
+          ),
+        if (teacher.qualificationVerified)
+          _badge(
+            context,
+            loc('المؤهل تم التحقق منه'),
+            loc(kQualificationBadgeMeaning),
+          ),
       ],
     );
   }
@@ -76,11 +105,23 @@ class VerificationBadges extends StatelessWidget {
 
 /// One line of facts a parent compares first: price, length, experience, ages.
 List<String> teacherFacts(TeacherProfile t) => [
-      if (t.priceEgp != null) tr2('${t.priceEgp} جنيه للحصة', '${t.priceEgp} EGP per lesson') else if (t.priceNote.isNotEmpty) t.priceNote,
-      if (t.lessonMinutes != null) tr2('${t.lessonMinutes} دقيقة', '${t.lessonMinutes} minutes'),
-      if (t.experienceYears != null) tr2('خبرة ${t.experienceYears} سنوات (يذكرها المدرس)', '${t.experienceYears} years of experience (stated by the teacher)'),
-      if (t.ageMin != null && t.ageMax != null) tr2('من ${t.ageMin} إلى ${t.ageMax} سنوات', 'Ages ${t.ageMin} to ${t.ageMax}'),
-    ];
+  if (t.priceEgp != null)
+    tr2('${t.priceEgp} جنيه للحصة', '${t.priceEgp} EGP per lesson')
+  else if (t.priceNote.isNotEmpty)
+    t.priceNote,
+  if (t.lessonMinutes != null)
+    tr2('${t.lessonMinutes} دقيقة', '${t.lessonMinutes} minutes'),
+  if (t.experienceYears != null)
+    tr2(
+      'خبرة ${t.experienceYears} سنوات (يذكرها المدرس)',
+      '${t.experienceYears} years of experience (stated by the teacher)',
+    ),
+  if (t.ageMin != null && t.ageMax != null)
+    tr2(
+      'من ${t.ageMin} إلى ${t.ageMax} سنوات',
+      'Ages ${t.ageMin} to ${t.ageMax}',
+    ),
+];
 
 /// The directory: search, filters, sort, favourites and comparison.
 class TeacherDirectory extends StatefulWidget {
@@ -129,9 +170,9 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
   }
 
   void _apply(TeacherFilters f) => setState(() {
-        _filters = f;
-        _shown = pageSize;
-      });
+    _filters = f;
+    _shown = pageSize;
+  });
 
   Future<void> _openFilters() async {
     final result = await showModalBottomSheet<(TeacherFilters, TeacherSort)>(
@@ -147,11 +188,23 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
 
   @override
   Widget build(BuildContext context) {
-    var results = searchTeachers(widget.teachers, _filters, _sort, _subjectLabel,
-        ratings: widget.ratings, earliestStartMs: widget.earliest);
-    if (_onlyFavorites) results = [for (final t in results) if (_favorites.contains(t.uid)) t];
+    var results = searchTeachers(
+      widget.teachers,
+      _filters,
+      _sort,
+      _subjectLabel,
+      ratings: widget.ratings,
+      earliestStartMs: widget.earliest,
+    );
+    if (_onlyFavorites) {
+      results = [
+        for (final t in results)
+          if (_favorites.contains(t.uid)) t,
+      ];
+    }
     final page = results.take(_shown).toList();
-    final active = _filters.activeCount - (_filters.query.trim().isNotEmpty ? 1 : 0);
+    final active =
+        _filters.activeCount - (_filters.query.trim().isNotEmpty ? 1 : 0);
     return Column(
       children: [
         Padding(
@@ -163,8 +216,24 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
                   controller: _search,
                   decoration: InputDecoration(
                     hintText: loc('ابحث بالاسم أو المادة أو التخصص'),
-                    prefixIcon: Icon(Icons.search_rounded),
-                    border: OutlineInputBorder(),
+                    prefixIcon: const Icon(
+                      Icons.search_rounded,
+                      color: DS.primary,
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(28),
+                      borderSide: const BorderSide(color: DS.border),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(28),
+                      borderSide: const BorderSide(color: DS.border),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(28),
+                      borderSide: const BorderSide(color: DS.primary, width: 2),
+                    ),
                     isDense: true,
                   ),
                   onChanged: (v) => _apply(_filters.copyWith(query: v)),
@@ -213,8 +282,13 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
           padding: const EdgeInsets.fromLTRB(16, 2, 16, 4),
           child: Align(
             alignment: AlignmentDirectional.centerStart,
-            child: Text(tr2('${results.length} مدرس · الترتيب: ${_sort.label}', '${results.length} teachers · Sorted by: ${_sort.label}'),
-                style: const TextStyle(fontSize: 13)),
+            child: Text(
+              tr2(
+                '${results.length} مدرس · الترتيب: ${_sort.label}',
+                '${results.length} teachers · Sorted by: ${_sort.label}',
+              ),
+              style: const TextStyle(fontSize: 13),
+            ),
           ),
         ),
         Expanded(
@@ -230,6 +304,31 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
               : CenteredList(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 90),
                   children: [
+                    if (_filters.isEmpty && !_onlyFavorites) ...[
+                      const TeachersHero(),
+                      VerifiedTeachersStrip(
+                        teachers: widget.teachers,
+                        onOpen: widget.onOpen,
+                      ),
+                    ],
+                    SubjectCategories(
+                      teachers: widget.teachers,
+                      selected: _filters.subject,
+                      onSelect: (id) => _apply(
+                        TeacherFilters(
+                          query: _filters.query,
+                          subject: id,
+                          childAge: _filters.childAge,
+                          language: _filters.language,
+                          dialect: _filters.dialect,
+                          format: _filters.format,
+                          curriculum: _filters.curriculum,
+                          maxPrice: _filters.maxPrice,
+                          identityVerified: _filters.identityVerified,
+                          qualificationVerified: _filters.qualificationVerified,
+                        ),
+                      ),
+                    ),
                     for (final t in page)
                       _TeacherCard(
                         teacher: t,
@@ -247,7 +346,13 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
                           if (on && _compare.length >= 3) {
                             ScaffoldMessenger.of(context)
                               ..hideCurrentSnackBar()
-                              ..showSnackBar(SnackBar(content: Text(loc('يمكنك مقارنة 3 مدرسين كحد أقصى'))));
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    loc('يمكنك مقارنة 3 مدرسين كحد أقصى'),
+                                  ),
+                                ),
+                              );
                             return;
                           }
                           on ? _compare.add(t.uid) : _compare.remove(t.uid);
@@ -257,7 +362,12 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
                       Center(
                         child: TextButton(
                           onPressed: () => setState(() => _shown += pageSize),
-                          child: Text(tr2('عرض المزيد (${results.length - page.length})', 'Show more (${results.length - page.length})')),
+                          child: Text(
+                            tr2(
+                              'عرض المزيد (${results.length - page.length})',
+                              'Show more (${results.length - page.length})',
+                            ),
+                          ),
                         ),
                       ),
                   ],
@@ -268,9 +378,17 @@ class _TeacherDirectoryState extends State<TeacherDirectory> {
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: FilledButton.icon(
-                onPressed: () => widget.onCompare([for (final t in widget.teachers) if (_compare.contains(t.uid)) t]),
+                onPressed: () => widget.onCompare([
+                  for (final t in widget.teachers)
+                    if (_compare.contains(t.uid)) t,
+                ]),
                 icon: const Icon(Icons.compare_arrows_rounded),
-                label: Text(tr2('قارن ${_compare.length} مدرسين', 'Compare ${_compare.length} teachers')),
+                label: Text(
+                  tr2(
+                    'قارن ${_compare.length} مدرسين',
+                    'Compare ${_compare.length} teachers',
+                  ),
+                ),
               ),
             ),
           ),
@@ -286,25 +404,33 @@ class _Empty extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.search_off_rounded, size: 56),
-              const SizedBox(height: 8),
-              Text(filtered ? loc('لا يوجد مدرس يطابق اختياراتك') : loc('لا يوجد مدرسون متاحون الآن'),
-                  textAlign: TextAlign.center, style: const TextStyle(fontSize: 20)),
-              if (filtered) ...[
-                const SizedBox(height: 4),
-                Text(loc('المدرس الذي لم يملأ حقلاً لا يظهر عند التصفية به.'), textAlign: TextAlign.center),
-                const SizedBox(height: 12),
-                FilledButton(onPressed: onReset, child: Text(loc('مسح التصفية'))),
-              ],
-            ],
+    child: Padding(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.search_off_rounded, size: 56),
+          const SizedBox(height: 8),
+          Text(
+            filtered
+                ? loc('لا يوجد مدرس يطابق اختياراتك')
+                : loc('لا يوجد مدرسون متاحون الآن'),
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 20),
           ),
-        ),
-      );
+          if (filtered) ...[
+            const SizedBox(height: 4),
+            Text(
+              loc('المدرس الذي لم يملأ حقلاً لا يظهر عند التصفية به.'),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            FilledButton(onPressed: onReset, child: Text(loc('مسح التصفية'))),
+          ],
+        ],
+      ),
+    ),
+  );
 }
 
 class _TeacherCard extends StatelessWidget {
@@ -332,10 +458,15 @@ class _TeacherCard extends StatelessWidget {
     final t = teacher;
     final facts = teacherFacts(t);
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      elevation: 3,
+      shadowColor: const Color(0x336A3BFF),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(26),
+        side: const BorderSide(color: DS.border),
+      ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(26),
         onTap: onOpen,
         child: Padding(
           padding: const EdgeInsets.all(14),
@@ -350,41 +481,74 @@ class _TeacherCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(t.name, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
-                        if (t.headline.isNotEmpty) Text(t.headline, style: const TextStyle(fontSize: 14)),
+                        Text(
+                          t.name,
+                          style: const TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (t.headline.isNotEmpty)
+                          Text(
+                            t.headline,
+                            style: const TextStyle(fontSize: 14),
+                          ),
                       ],
                     ),
                   ),
                   IconButton(
-                    tooltip: favorite ? loc('إزالة من المفضلة') : loc('حفظ في المفضلة'),
+                    tooltip: favorite
+                        ? loc('إزالة من المفضلة')
+                        : loc('حفظ في المفضلة'),
                     onPressed: onFavorite,
-                    icon: Icon(favorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                        color: favorite ? Colors.pink : null),
+                    icon: RehlatyHeart(size: 26, filled: favorite),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
               VerificationBadges(teacher: t),
-              Wrap(spacing: 6, runSpacing: 6, children: [for (final id in t.subjects) SubjectChip(id: id)]),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [for (final id in t.subjects) SubjectChip(id: id)],
+              ),
               if (facts.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 6),
-                  child: Text(facts.join(' · '), style: const TextStyle(fontSize: 13)),
+                  child: Text(
+                    facts.join(' · '),
+                    style: const TextStyle(fontSize: 13),
+                  ),
                 ),
-              if (t.languages.isNotEmpty) Text(t.languages.join(loc('، ')), style: const TextStyle(fontSize: 13)),
+              if (t.languages.isNotEmpty)
+                Text(
+                  t.languages.join(loc('، ')),
+                  style: const TextStyle(fontSize: 13),
+                ),
               Text(
-                tr2('${(rating ?? RatingSummary.none).label}'
-                '${earliestMs == null ? '' : ' · أقرب موعد: ${fmtDateTime(DateTime.fromMillisecondsSinceEpoch(earliestMs!))}'}', '${(rating ?? RatingSummary.none).label}${earliestMs == null ? '' : ' · Earliest slot: ${fmtDateTime(DateTime.fromMillisecondsSinceEpoch(earliestMs!))}'}'),
+                tr2(
+                  '${(rating ?? RatingSummary.none).label}'
+                      '${earliestMs == null ? '' : ' · أقرب موعد: ${fmtDateTime(DateTime.fromMillisecondsSinceEpoch(earliestMs!))}'}',
+                  '${(rating ?? RatingSummary.none).label}${earliestMs == null ? '' : ' · Earliest slot: ${fmtDateTime(DateTime.fromMillisecondsSinceEpoch(earliestMs!))}'}',
+                ),
                 style: const TextStyle(fontSize: 13),
               ),
-              Align(
-                alignment: AlignmentDirectional.centerEnd,
-                child: FilterChip(
-                  label: Text(loc('قارن')),
-                  selected: comparing,
-                  onSelected: onCompare,
-                  visualDensity: VisualDensity.compact,
-                ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  FilterChip(
+                    label: Text(loc('قارن')),
+                    selected: comparing,
+                    onSelected: onCompare,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  const Spacer(),
+                  FilledButton(
+                    key: ValueKey('open_${t.uid}'),
+                    onPressed: onOpen,
+                    child: Text(tr2('عرض الملف', 'View profile')),
+                  ),
+                ],
               ),
             ],
           ),
@@ -406,7 +570,9 @@ class _FilterSheet extends StatefulWidget {
 class _FilterSheetState extends State<_FilterSheet> {
   late TeacherFilters _f = widget.filters;
   late TeacherSort _sort = widget.sort;
-  late final _price = TextEditingController(text: widget.filters.maxPrice?.toString() ?? '');
+  late final _price = TextEditingController(
+    text: widget.filters.maxPrice?.toString() ?? '',
+  );
 
   @override
   void dispose() {
@@ -414,27 +580,32 @@ class _FilterSheetState extends State<_FilterSheet> {
     super.dispose();
   }
 
-  Widget _chips<T>(String title, List<T> options, T? selected, String Function(T) label, void Function(T?) pick) =>
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _chips<T>(
+    String title,
+    List<T> options,
+    T? selected,
+    String Function(T) label,
+    void Function(T?) pick,
+  ) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Padding(
+        padding: const EdgeInsets.only(top: 12, bottom: 4),
+        child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+      ),
+      Wrap(
+        spacing: 8,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 12, bottom: 4),
-            child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-          ),
-          Wrap(
-            spacing: 8,
-            children: [
-              for (final o in options)
-                ChoiceChip(
-                  label: Text(loc(label(o))),
-                  selected: selected == o,
-                  onSelected: (on) => setState(() => pick(on ? o : null)),
-                ),
-            ],
-          ),
+          for (final o in options)
+            ChoiceChip(
+              label: Text(loc(label(o))),
+              selected: selected == o,
+              onSelected: (on) => setState(() => pick(on ? o : null)),
+            ),
         ],
-      );
+      ),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -447,54 +618,114 @@ class _FilterSheetState extends State<_FilterSheet> {
           controller: controller,
           padding: const EdgeInsets.all(16),
           children: [
-            Text(loc('تصفية وترتيب'), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(
+              loc('تصفية وترتيب'),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
-            Text(loc('تُجمع الاختيارات معاً. المدرس الذي لم يملأ الحقل لا يظهر عند التصفية به.'),
-                style: TextStyle(fontSize: 13)),
-            _chips<String>(loc('المادة'), kSubjects.map((s) => s.id).toList(), _f.subject, _subjectLabel,
-                (v) => _f = _f.copyWith(subject: v)),
-            _chips<int>(loc('عمر الطفل'), [for (var a = 1; a <= 12; a++) a], _f.childAge, (a) => tr2('$a سنوات', '$a years'),
-                (v) => _f = _f.copyWith(childAge: v)),
-            _chips<String>(loc('اللغة'), kTeacherLanguages, _f.language, (v) => v, (v) => _f = _f.copyWith(language: v)),
-            _chips<String>(loc('اللهجة'), kTeacherDialects, _f.dialect, (v) => v, (v) => _f = _f.copyWith(dialect: v)),
-            _chips<String>(loc('طريقة الحصة'), [formatOnline, formatInPerson], _f.format, formatLabel,
-                (v) => _f = _f.copyWith(format: v)),
-            _chips<String>(loc('المنهج'), kTeacherCurricula, _f.curriculum, (v) => v, (v) => _f = _f.copyWith(curriculum: v)),
+            Text(
+              loc(
+                'تُجمع الاختيارات معاً. المدرس الذي لم يملأ الحقل لا يظهر عند التصفية به.',
+              ),
+              style: TextStyle(fontSize: 13),
+            ),
+            _chips<String>(
+              loc('المادة'),
+              kSubjects.map((s) => s.id).toList(),
+              _f.subject,
+              _subjectLabel,
+              (v) => _f = _f.copyWith(subject: v),
+            ),
+            _chips<int>(
+              loc('عمر الطفل'),
+              ageChoices(current: _f.childAge),
+              _f.childAge,
+              (a) => tr2('$a سنوات', '$a years'),
+              (v) => _f = _f.copyWith(childAge: v),
+            ),
+            _chips<String>(
+              loc('اللغة'),
+              kTeacherLanguages,
+              _f.language,
+              (v) => v,
+              (v) => _f = _f.copyWith(language: v),
+            ),
+            _chips<String>(
+              loc('اللهجة'),
+              kTeacherDialects,
+              _f.dialect,
+              (v) => v,
+              (v) => _f = _f.copyWith(dialect: v),
+            ),
+            _chips<String>(
+              loc('طريقة الحصة'),
+              [formatOnline, formatInPerson],
+              _f.format,
+              formatLabel,
+              (v) => _f = _f.copyWith(format: v),
+            ),
+            _chips<String>(
+              loc('المنهج'),
+              kTeacherCurricula,
+              _f.curriculum,
+              (v) => v,
+              (v) => _f = _f.copyWith(curriculum: v),
+            ),
             Padding(
               padding: const EdgeInsets.only(top: 12),
               child: TextField(
                 controller: _price,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: loc('أقصى سعر للحصة (جنيه)'), border: OutlineInputBorder()),
+                decoration: InputDecoration(
+                  labelText: loc('أقصى سعر للحصة (جنيه)'),
+                  border: OutlineInputBorder(),
+                ),
                 onChanged: (v) => _f = _f.copyWith(maxPrice: int.tryParse(v)),
               ),
             ),
             SwitchListTile(
               title: Text(loc('الهوية تم التحقق منها')),
-              subtitle: Text(loc(kIdentityBadgeMeaning), style: TextStyle(fontSize: 12)),
+              subtitle: Text(
+                loc(kIdentityBadgeMeaning),
+                style: TextStyle(fontSize: 12),
+              ),
               value: _f.identityVerified,
-              onChanged: (v) => setState(() => _f = _f.copyWith(identityVerified: v)),
+              onChanged: (v) =>
+                  setState(() => _f = _f.copyWith(identityVerified: v)),
             ),
             SwitchListTile(
               title: Text(loc('المؤهل تم التحقق منه')),
-              subtitle: Text(loc(kQualificationBadgeMeaning), style: TextStyle(fontSize: 12)),
+              subtitle: Text(
+                loc(kQualificationBadgeMeaning),
+                style: TextStyle(fontSize: 12),
+              ),
               value: _f.qualificationVerified,
-              onChanged: (v) => setState(() => _f = _f.copyWith(qualificationVerified: v)),
+              onChanged: (v) =>
+                  setState(() => _f = _f.copyWith(qualificationVerified: v)),
             ),
             Padding(
               padding: EdgeInsets.only(top: 8),
-              child: Text(loc('الترتيب'), style: TextStyle(fontWeight: FontWeight.bold)),
+              child: Text(
+                loc('الترتيب'),
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
             Wrap(
               spacing: 8,
               children: [
                 for (final s in TeacherSort.values)
-                  ChoiceChip(label: Text(s.label), selected: _sort == s, onSelected: (_) => setState(() => _sort = s)),
+                  ChoiceChip(
+                    label: Text(s.label),
+                    selected: _sort == s,
+                    onSelected: (_) => setState(() => _sort = s),
+                  ),
               ],
             ),
             const SizedBox(height: 8),
             Text(
-              loc('لا توجد مواضع مدفوعة. الترتيب الافتراضي حسب اكتمال الملف ثم الاسم. «الأعلى تقييماً» يُحسب من تقييمات أولياء أمور لحصص مكتملة فقط، والمدرس بلا تقييمات يأتي أخيراً.'),
+              loc(
+                'لا توجد مواضع مدفوعة. الترتيب الافتراضي حسب اكتمال الملف ثم الاسم. «الأعلى تقييماً» يُحسب من تقييمات أولياء أمور لحصص مكتملة فقط، والمدرس بلا تقييمات يأتي أخيراً.',
+              ),
               style: TextStyle(fontSize: 12),
             ),
             const SizedBox(height: 12),
@@ -502,7 +733,10 @@ class _FilterSheetState extends State<_FilterSheet> {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context, (TeacherFilters.none, TeacherSort.relevance)),
+                    onPressed: () => Navigator.pop(context, (
+                      TeacherFilters.none,
+                      TeacherSort.relevance,
+                    )),
                     child: Text(loc('مسح الكل')),
                   ),
                 ),
@@ -526,25 +760,83 @@ class _FilterSheetState extends State<_FilterSheet> {
 class CompareTeachersScreen extends StatelessWidget {
   final List<TeacherProfile> teachers;
   final Map<String, RatingSummary> ratings;
-  const CompareTeachersScreen({super.key, required this.teachers, this.ratings = const {}});
+  const CompareTeachersScreen({
+    super.key,
+    required this.teachers,
+    this.ratings = const {},
+  });
 
   @override
   Widget build(BuildContext context) {
     final rows = <(String, String Function(TeacherProfile))>[
-      (loc('السعر'), (t) => t.priceEgp != null ? tr2('${t.priceEgp} جنيه', '${t.priceEgp} EGP') : (t.priceNote.isEmpty ? loc('غير محدد') : t.priceNote)),
-      (loc('مدة الحصة'), (t) => t.lessonMinutes == null ? loc('غير محددة') : tr2('${t.lessonMinutes} دقيقة', '${t.lessonMinutes} minutes')),
-      (loc('الخبرة (يذكرها المدرس)'), (t) => t.experienceYears == null ? loc('غير محددة') : tr2('${t.experienceYears} سنوات', '${t.experienceYears} years')),
-      (loc('الفئة العمرية'), (t) => t.ageMin == null || t.ageMax == null ? loc('غير محددة') : '${t.ageMin}–${t.ageMax}'),
+      (
+        loc('السعر'),
+        (t) => t.priceEgp != null
+            ? tr2('${t.priceEgp} جنيه', '${t.priceEgp} EGP')
+            : (t.priceNote.isEmpty ? loc('غير محدد') : t.priceNote),
+      ),
+      (
+        loc('مدة الحصة'),
+        (t) => t.lessonMinutes == null
+            ? loc('غير محددة')
+            : tr2('${t.lessonMinutes} دقيقة', '${t.lessonMinutes} minutes'),
+      ),
+      (
+        loc('الخبرة (يذكرها المدرس)'),
+        (t) => t.experienceYears == null
+            ? loc('غير محددة')
+            : tr2('${t.experienceYears} سنوات', '${t.experienceYears} years'),
+      ),
+      (
+        loc('الفئة العمرية'),
+        (t) => t.ageMin == null || t.ageMax == null
+            ? loc('غير محددة')
+            : '${t.ageMin}–${t.ageMax}',
+      ),
       (loc('المواد'), (t) => t.subjects.map(_subjectLabel).join(loc('، '))),
-      (loc('التخصصات'), (t) => t.specialties.isEmpty ? '—' : t.specialties.join(loc('، '))),
-      (loc('طريقة الحصة'), (t) => t.formats.isEmpty ? loc('غير محددة') : t.formats.map(formatLabel).join(loc('، '))),
-      (loc('نوع الحصة'), (t) => t.classTypes.isEmpty ? loc('غير محدد') : t.classTypes.map(classTypeLabel).join(loc('، '))),
+      (
+        loc('التخصصات'),
+        (t) => t.specialties.isEmpty ? '—' : t.specialties.join(loc('، ')),
+      ),
+      (
+        loc('طريقة الحصة'),
+        (t) => t.formats.isEmpty
+            ? loc('غير محددة')
+            : t.formats.map(formatLabel).join(loc('، ')),
+      ),
+      (
+        loc('نوع الحصة'),
+        (t) => t.classTypes.isEmpty
+            ? loc('غير محدد')
+            : t.classTypes.map(classTypeLabel).join(loc('، ')),
+      ),
       (loc('اللغات'), (t) => t.languages.join(loc('، '))),
-      (loc('اللهجة'), (t) => t.dialects.isEmpty ? '—' : t.dialects.join(loc('، '))),
-      (loc('أسلوب التدريس'), (t) => t.styles.isEmpty ? '—' : t.styles.join(loc('، '))),
-      (loc('الهوية'), (t) => t.identityVerified ? loc('تم التحقق منها') : loc('لم يتحقق منها التطبيق')),
-      (loc('المؤهل'), (t) => t.qualificationVerified ? loc('تم التحقق منه') : loc('لم يتحقق منه التطبيق')),
-      (loc('سياسة الإلغاء'), (t) => t.cancellationPolicy.isEmpty ? loc('غير محددة') : t.cancellationPolicy),
+      (
+        loc('اللهجة'),
+        (t) => t.dialects.isEmpty ? '—' : t.dialects.join(loc('، ')),
+      ),
+      (
+        loc('أسلوب التدريس'),
+        (t) => t.styles.isEmpty ? '—' : t.styles.join(loc('، ')),
+      ),
+      (
+        loc('الهوية'),
+        (t) => t.identityVerified
+            ? loc('تم التحقق منها')
+            : loc('لم يتحقق منها التطبيق'),
+      ),
+      (
+        loc('المؤهل'),
+        (t) => t.qualificationVerified
+            ? loc('تم التحقق منه')
+            : loc('لم يتحقق منه التطبيق'),
+      ),
+      (
+        loc('سياسة الإلغاء'),
+        (t) => t.cancellationPolicy.isEmpty
+            ? loc('غير محددة')
+            : t.cancellationPolicy,
+      ),
       (loc('التقييمات'), (t) => (ratings[t.uid] ?? RatingSummary.none).label),
     ];
     return Scaffold(
@@ -565,7 +857,12 @@ class CompareTeachersScreen extends StatelessWidget {
                 ],
               ),
               for (final r in rows)
-                TableRow(children: [_Cell(r.$1, bold: true), for (final t in teachers) _Cell(r.$2(t))]),
+                TableRow(
+                  children: [
+                    _Cell(r.$1, bold: true),
+                    for (final t in teachers) _Cell(r.$2(t)),
+                  ],
+                ),
             ],
           ),
         ),
@@ -581,7 +878,10 @@ class _Cell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.all(10),
-        child: Text(text, style: TextStyle(fontWeight: bold ? FontWeight.bold : FontWeight.normal)),
-      );
+    padding: const EdgeInsets.all(10),
+    child: Text(
+      text,
+      style: TextStyle(fontWeight: bold ? FontWeight.bold : FontWeight.normal),
+    ),
+  );
 }

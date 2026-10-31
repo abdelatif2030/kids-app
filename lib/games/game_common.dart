@@ -1,8 +1,17 @@
+import '../adventures/adventure_service.dart';
+import '../companion/companion_logic.dart';
+import '../companion/companion_store.dart';
+import '../companion/companion_service.dart';
+import '../companion/companion_ui.dart';
+import '../notifications/notification_events.dart';
 import '../design/worlds.dart';
 import '../design/tokens.dart';
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import '../media/rehlaty_audio_engine.dart';
+import 'adventure_logic.dart' show GameCue;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../design/layout.dart';
@@ -35,9 +44,23 @@ class GameRewards {
 
   /// Games this child finished on [day] (yyyy-mm-dd), counting repeats on that day.
   static Future<Set<String>> doneOn(String childId, String day) async => {
-        for (final e in ((await _all())[childId] ?? const <String, dynamic>{}).entries)
-          if (e.value is Map && (e.value as Map)['d'] == day) e.key,
-      };
+    for (final e
+        in ((await _all())[childId] ?? const <String, dynamic>{}).entries)
+      if (e.value is Map && (e.value as Map)['d'] == day) e.key,
+  };
+
+  /// The last day and the number of finishes of one game, or null when it was never finished.
+  static Future<({String day, int times})?> detail(String childId, String gameId) async {
+    final m = (await _all())[childId]?[gameId];
+    if (m is! Map) return null;
+    return (day: '${m['d'] ?? ''}', times: (m['n'] as num?)?.toInt() ?? 1);
+  }
+
+  /// Games this child finished from [from] to [to] (inclusive, yyyy-mm-dd): a replay inside the range counts again.
+  static Future<Set<String>> doneBetween(String childId, String from, String to) async => {
+    for (final e in ((await _all())[childId] ?? const <String, dynamic>{}).entries)
+      if (e.value is Map && ((e.value as Map)['d'] as String? ?? '').compareTo(from) >= 0 && ((e.value as Map)['d'] as String? ?? '').compareTo(to) <= 0) e.key,
+  };
 
   static Future<Set<String>> doneIds(String childId) async =>
       ((await _all())[childId]?.keys ?? const <String>[]).toSet();
@@ -69,6 +92,9 @@ class GameRewards {
       Evidence.practice,
       now: now,
     );
+    if (first) {
+      await NotificationEvents.gameStarEarned(childId, gameId, now: now);
+    }
     return first;
   }
 }
@@ -97,7 +123,12 @@ class GameScaffold extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         title: Text(tr2('هل تريد الخروج من اللعبة؟', 'Leave the game?')),
-        content: Text(tr2('لن يُحفظ مكانك في هذه اللعبة. يمكنك أن تلعبها من البداية في أي وقت.', 'Your place in this game is not saved. You can play it again from the start any time.')),
+        content: Text(
+          tr2(
+            'لن يُحفظ مكانك في هذه اللعبة. يمكنك أن تلعبها من البداية في أي وقت.',
+            'Your place in this game is not saved. You can play it again from the start any time.',
+          ),
+        ),
         actions: [
           TextButton(
             key: const ValueKey('leave_game'),
@@ -128,7 +159,8 @@ class GameScaffold extends StatelessWidget {
 
   Widget _body(BuildContext context) {
     return Scaffold(
-      backgroundColor: kWorldPalettes[world]!.top, // the app bar blends into the sky
+      backgroundColor:
+          kWorldPalettes[world]!.top, // the app bar blends into the sky
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
@@ -140,14 +172,23 @@ class GameScaffold extends StatelessWidget {
             color: RC.ink,
           ),
         ),
+        actions: [
+          if (instruction != null)
+            GuideSpeakButton(instruction!),
+        ],
       ),
-      body: PastelBackground(
+      body: _AutoNarrate(
+        instruction: instruction,
+        child: PastelBackground(
         world: world,
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, box) {
               // Tablet or desktop in landscape: the instruction moves to a side card so the board can use the height.
-              final sideBySide = instruction != null && box.maxWidth >= 900 && box.maxWidth > box.maxHeight * 1.2;
+              final sideBySide =
+                  instruction != null &&
+                  box.maxWidth >= 900 &&
+                  box.maxWidth > box.maxHeight * 1.2;
               if (sideBySide) {
                 return Row(
                   children: [
@@ -167,13 +208,20 @@ class GameScaffold extends StatelessWidget {
                             ),
                             child: Text(
                               instruction!,
-                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: RC.ink, height: 1.5),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                color: RC.ink,
+                                height: 1.5,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                    Expanded(child: ResponsiveBody(maxWidth: 760, child: child)),
+                    Expanded(
+                      child: ResponsiveBody(maxWidth: 760, child: child),
+                    ),
                   ],
                 );
               }
@@ -185,7 +233,11 @@ class GameScaffold extends StatelessWidget {
                       child: Text(
                         instruction!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: RC.ink),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: RC.ink,
+                        ),
                       ),
                     ),
                   Expanded(child: ResponsiveBody(maxWidth: 760, child: child)),
@@ -194,9 +246,44 @@ class GameScaffold extends StatelessWidget {
             },
           ),
         ),
+        ),
       ),
     );
   }
+}
+
+/// Reads a game's instruction by itself ONLY when the parent switched automatic narration on; always silences the
+/// characters when the child leaves the screen, so nothing keeps talking in the background of another page.
+class _AutoNarrate extends StatefulWidget {
+  final String? instruction;
+  final Widget child;
+  const _AutoNarrate({required this.instruction, required this.child});
+
+  @override
+  State<_AutoNarrate> createState() => _AutoNarrateState();
+}
+
+class _AutoNarrateState extends State<_AutoNarrate> {
+  @override
+  void initState() {
+    super.initState();
+    final text = widget.instruction;
+    if (text != null && EnginePrefs.instance.autoNarration) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final who = await currentGuide();
+        RehlatyAudioEngine.instance.sayText(who, text, priority: AudioPriority.normal);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    RehlatyAudioEngine.instance.stop();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }
 
 /// What the child sees when a game is finished. The star appears only when this
@@ -219,6 +306,7 @@ class GameFinishPanel extends StatefulWidget {
 class _GameFinishPanelState extends State<GameFinishPanel> {
   bool? _earned;
   Sticker? _sticker;
+  CompanionReaction? _said;
   bool _saving = false;
 
   @override
@@ -237,6 +325,24 @@ class _GameFinishPanelState extends State<GameFinishPanel> {
     } catch (_) {
       earned = false; // storage trouble: no star claimed we could not record
     }
+    GameCue.play('win');
+    // a finished game may complete the week's adventure: record it quietly (the adventure screen celebrates it)
+    CompanionStore.age(widget.childId).then((a) {
+      if (a != null) AdventureService.check(widget.childId, a, celebrate: false).catchError((_) => AdventureStatus.empty);
+    });
+    // The companion celebrates a first finish once (the event is claimed per child); a replay gets the plain cheer.
+    CompanionReaction? said;
+    if (earned) {
+      said = await CompanionService.react(
+        widget.childId,
+        CompanionMoment.activityDone,
+        eventId: 'game:${widget.gameId}',
+        speak: EnginePrefs.instance.autoNarration,
+      );
+    }
+    if (said == null && EnginePrefs.instance.autoNarration) {
+      RehlatyAudioEngine.instance.say(earned ? 'new_star' : 'well_done');
+    }
     Sticker? sticker;
     if (earned) {
       try {
@@ -250,6 +356,7 @@ class _GameFinishPanelState extends State<GameFinishPanel> {
       setState(() {
         _earned = earned;
         _sticker = sticker;
+        _said = said;
       });
     }
   }
@@ -285,11 +392,28 @@ class _GameFinishPanelState extends State<GameFinishPanel> {
               Padding(
                 key: const ValueKey('new_sticker'),
                 padding: const EdgeInsets.only(top: 10),
-                child: Column(children: [
-                  Text(_sticker!.emoji, style: const TextStyle(fontSize: 64)),
-                  Text(tr2('ملصق جديد: ${_sticker!.name()}!', 'A new sticker: ${_sticker!.name()}!'),
-                      textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: RC.ink)),
-                ]),
+                child: Column(
+                  children: [
+                    Text(_sticker!.emoji, style: const TextStyle(fontSize: 64)),
+                    Text(
+                      tr2(
+                        'ملصق جديد: ${_sticker!.name()}!',
+                        'A new sticker: ${_sticker!.name()}!',
+                      ),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: RC.ink,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            if (_said != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: CompanionBubble(_said!, artHeight: 80),
               ),
             if (earned == false)
               Padding(

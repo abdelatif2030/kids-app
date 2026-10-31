@@ -1,3 +1,4 @@
+import '../../age_scope.dart';
 import '../../design/layout.dart';
 import 'dart:typed_data';
 
@@ -154,7 +155,7 @@ class _BasicsFormState extends State<BasicsForm> {
           spacing: 8,
           runSpacing: 8,
           children: [
-            for (var a = 1; a <= 12; a++)
+            for (final a in ageChoices(current: d.age))
               ChoiceChip(
                 label: Text('$a', style: const TextStyle(fontSize: 18)),
                 selected: d.age == a,

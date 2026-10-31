@@ -53,7 +53,7 @@ void main() {
     ));
     await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
     await tester.pump();
-    await tester.tap(find.text(kEducationalGames[2].title())); // four in a row
+    await tester.tap(find.text(kEducationalGames.firstWhere((g) => g.id == 'connect_four').title())); // four in a row
     await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
     await tester.pumpAndSettle();
     final mark = await tester.runAsync(() => ResumeStore.last('k1'));
@@ -74,7 +74,7 @@ void main() {
     Future<void> show() async {
       await tester.pumpWidget(MaterialApp(
         key: UniqueKey(),
-        home: Scaffold(body: HomeTab(child: _kid, onExit: () {})),
+        home: Scaffold(body: HomeTab(more: true, child: _kid, onExit: () {})),
       ));
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 80)));
       await tester.pump();
@@ -87,11 +87,11 @@ void main() {
     expect(find.text('كمّل من حيث توقفت'), findsOneWidget);
     // The "My Day" station may offer the same game on some days, so check inside the resume card only.
     final resumeCard = find.ancestor(of: find.text('كمّل من حيث توقفت'), matching: find.byType(RCard));
-    expect(find.descendant(of: resumeCard, matching: find.text(kEducationalGames[3].title())), findsOneWidget);
+    expect(find.descendant(of: resumeCard, matching: find.text(kEducationalGames.firstWhere((g) => g.id == 'numerals').title())), findsOneWidget);
     // a game outside the child's age is not offered
     await tester.runAsync(() => ResumeStore.mark('k1', 'game', 'connect_four'));
     const young = ChildProfile(id: 'k1', nickname: 'Lina', age: 3);
-    await tester.pumpWidget(MaterialApp(key: UniqueKey(), home: Scaffold(body: HomeTab(child: young, onExit: () {}))));
+    await tester.pumpWidget(MaterialApp(key: UniqueKey(), home: Scaffold(body: HomeTab(more: true, child: young, onExit: () {}))));
     await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 80)));
     await tester.pump();
     expect(find.text('كمّل من حيث توقفت'), findsNothing);

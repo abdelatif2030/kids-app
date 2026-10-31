@@ -2,9 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../companion/companion_logic.dart';
+import '../companion/companion_service.dart';
 import '../library/learning_records.dart';
 import '../media/audio.dart';
 import '../media/audio_gate.dart';
+import '../media/rehlaty_audio_engine.dart';
 import 'story_models.dart';
 import 'story_store.dart';
 import '../l10n/strings.dart';
@@ -324,7 +327,11 @@ class StoryPlayerController extends ChangeNotifier {
     _gen++;
     await _ambient?.pause();
     await StoryStore.clearPosition(childId, story.id);
+    final sleeping = sleepAtEnd;
     await _flush(completed: true);
+    // a finished story is celebrated once per child; never aloud when the child is being put to sleep
+    CompanionService.react(childId, CompanionMoment.storyDone,
+        eventId: 'story:${story.id}', speak: EnginePrefs.instance.autoNarration && !sleeping);
     if (sleepAtEnd) {
       sleepEnded = true;
       sleepAtEnd = false;
@@ -352,7 +359,7 @@ class StoryPlayerController extends ChangeNotifier {
   void cancelSleepTimer() {
     sleepRemaining = null;
     sleepAtEnd = false;
-    _ambient?.setVolume(_ambientVolume);
+    _ambient?.setVolume(_level);
     _notify();
   }
 
@@ -372,16 +379,24 @@ class StoryPlayerController extends ChangeNotifier {
         await p.dispose();
       } else {
         await p.setLoop(true);
-        await p.setVolume(_ambientVolume);
+        await p.setVolume(_level);
+        RehlatyAudioEngine.instance.removeListener(_onEngine);
+        RehlatyAudioEngine.instance.addListener(_onEngine);
         if (playing) await p.play();
       }
     }
     _notify();
   }
 
+  /// The ambient level the player really uses: the story's own slider, turned down while a character speaks and
+  /// by the parent's music volume (all through the shared audio engine).
+  double get _level => _ambientVolume * RehlatyAudioEngine.instance.musicFactor * (EnginePrefs.instance.masterOn ? 1 : 0);
+
+  void _onEngine() => _ambient?.setVolume(_level);
+
   Future<void> setAmbientVolume(double v) async {
     _ambientVolume = v;
-    await _ambient?.setVolume(v);
+    await _ambient?.setVolume(_level);
     _notify();
   }
 
@@ -405,13 +420,13 @@ class StoryPlayerController extends ChangeNotifier {
       sleepRemaining = next;
       if (next <= 5 && next >= 0) {
         // A gentle fade of the ambient sound over the last five seconds.
-        await _ambient?.setVolume(_ambientVolume * next / 5);
+        await _ambient?.setVolume(_level * next / 5);
       }
       if (next <= 0) {
         sleepRemaining = null;
         sleepEnded = true;
         await pause();
-        await _ambient?.setVolume(_ambientVolume);
+        await _ambient?.setVolume(_level);
       }
     }
     if (!playing && sleepRemaining == null) {
@@ -441,6 +456,7 @@ class StoryPlayerController extends ChangeNotifier {
   @override
   void dispose() {
     AudioGate.instance.removeListener(_onGate);
+    RehlatyAudioEngine.instance.removeListener(_onEngine);
     _disposed = true;
     _ticker?.cancel();
     _gen++;

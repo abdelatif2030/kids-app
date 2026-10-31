@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- App privacy manifest for the Rehlaty app code. It is part of the Runner target (Resources phase) as of 2026-10-31, but the
+	     project has never been opened in Xcode: confirm it appears under Runner > Build Phases > Copy Bundle Resources.
+	     Declares no tracking and no collected data types. The ONLINE features (accounts, family chat, calls, teacher service) DO
+	     collect data once a backend is configured: before submitting a build with them active, add the data types listed in
+	     docs/STORE_PRIVACY_DISCLOSURES.md (e-mail address, user content, audio data, other user content) with purpose "App Functionality",
+	     linked to the user, not used for tracking. Plugins ship their own manifests. -->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>CA92.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

@@ -1,3 +1,4 @@
+import '../../age_scope.dart';
 import 'dart:convert';
 
 import '../../assistant/assistant_screen.dart';
@@ -263,7 +264,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         spacing: DS.s8,
         runSpacing: DS.s8,
         children: [
-          for (var a = 1; a <= 12; a++)
+          for (final a in ageChoices(current: _draft.age))
             ChoiceChip(
               label: Text('$a', style: const TextStyle(fontSize: 18)),
               selected: _draft.age == a,

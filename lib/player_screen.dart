@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
-import 'main.dart' show Video;
+import 'main.dart' show Video, kLandscapeOrientations;
 import 'related_video.dart';
 import 'session_manager.dart';
 import 'watch_history.dart';
 import 'l10n/strings.dart';
+import 'safe_player.dart';
+import 'offline/connectivity.dart';
 
 class PlayerScreen extends StatefulWidget {
   final Video video;
@@ -18,7 +20,16 @@ class PlayerScreen extends StatefulWidget {
 
   /// Updated with the video that is playing, so the caller knows which one was watched last.
   final ValueNotifier<Video>? current;
-  const PlayerScreen({super.key, required this.video, this.related, this.current});
+
+  /// A parent previewing a lesson: nothing is added to the watch history.
+  final bool preview;
+  const PlayerScreen({
+    super.key,
+    required this.video,
+    this.related,
+    this.current,
+    this.preview = false,
+  });
 
   @override
   State<PlayerScreen> createState() => _PlayerScreenState();
@@ -49,6 +60,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
         loop: false,
       ),
     );
+    applyChildSafeNavigation(_controller); // see safe_player.dart: no other video, no link out
     _controller.listen((value) {
       if (!mounted) return;
       // Count only the time the video is actually playing.
@@ -78,9 +90,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
   /// related video, and only once per ended video (the player may report "ended" twice).
   bool _playNext() {
     final related = widget.related;
-    if (related == null || _closing || _session.reason.value != null) return false;
+    if (related == null || _closing || _session.reason.value != null) {
+      return false;
+    }
     if (_switching) return true;
-    final next = pickRelatedVideo(_video, related, {..._played, _video.youtubeId});
+    final next = pickRelatedVideo(_video, related, {
+      ..._played,
+      _video.youtubeId,
+    });
     if (next == null) return false;
     _switching = true;
     _recordCurrent();
@@ -113,6 +130,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   void _recordCurrent() {
     _watch.stop();
+    if (widget.preview) {
+      _watch.reset();
+      return;
+    }
     WatchHistory.record(
       videoId: _video.youtubeId,
       title: _video.title,
@@ -133,7 +154,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
   Future<void> _onTimeUp() async {
     if (_session.reason.value == null || !mounted) return;
     final state = await _controller.playerState;
-    if (state != PlayerState.playing && state != PlayerState.buffering) _close();
+    if (state != PlayerState.playing && state != PlayerState.buffering) {
+      _close();
+    }
   }
 
   @override
@@ -142,7 +165,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
     _recordCurrent();
     _controller.close();
     if (_rotated) {
-      SystemChrome.setPreferredOrientations(const []);
+      // Back to the app's normal landscape lock (an empty list would allow portrait).
+      SystemChrome.setPreferredOrientations(kLandscapeOrientations);
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     }
     super.dispose();
@@ -174,20 +198,15 @@ class _PlayerScreenState extends State<PlayerScreen> {
       ),
       body: Center(
         child: _hasError
-            ? Padding(
-                padding: EdgeInsets.all(24),
-                child: Text(
-                  loc('لا يمكن تشغيل هذا الفيديو الآن.'),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 24),
-                ),
-              )
+            ? _problem(context)
             : LayoutBuilder(
                 builder: (context, box) {
                   // The largest 16:9 box that fits both the width and the height, so the video is never wider
                   // than the screen or taller than the space under the title.
                   final w = box.maxWidth.isFinite && box.maxHeight.isFinite
-                      ? (box.maxWidth < box.maxHeight * 16 / 9 ? box.maxWidth : box.maxHeight * 16 / 9)
+                      ? (box.maxWidth < box.maxHeight * 16 / 9
+                            ? box.maxWidth
+                            : box.maxHeight * 16 / 9)
                       : box.maxWidth;
                   return SizedBox(
                     key: const Key('player-box'),
@@ -212,6 +231,49 @@ class _PlayerScreenState extends State<PlayerScreen> {
     );
   }
 
+  void _retry() {
+    setState(() => _hasError = false);
+    try {
+      _controller.loadVideoById(videoId: _video.youtubeId);
+    } catch (_) {
+      setState(() => _hasError = true);
+    }
+  }
+
+  /// The video cannot be played: no network, or YouTube refused it (removed, private, not embeddable). Says so kindly,
+  /// offers to try again and to go back, and never suggests another video.
+  Widget _problem(BuildContext context) {
+    final offline = ConnectivityMonitor.instance.isOffline;
+    return SingleChildScrollView(
+      key: const ValueKey('player_problem'),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(offline ? Icons.wifi_off_rounded : Icons.videocam_off_rounded, size: 56, color: Colors.black54),
+          const SizedBox(height: 12),
+          Text(
+            offline
+                ? tr2('لا يوجد إنترنت الآن. الفيديو يحتاج إلى إنترنت.', 'There is no internet right now. Videos need internet.')
+                : tr2('هذا الفيديو غير متاح الآن.', 'This video is not available right now.'),
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 22),
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            alignment: WrapAlignment.center,
+            children: [
+              FilledButton.icon(key: const ValueKey('player_retry'), style: FilledButton.styleFrom(minimumSize: const Size(140, 52)), onPressed: _retry, icon: const Icon(Icons.refresh_rounded), label: Text(tr2('حاول مرة أخرى', 'Try again'))),
+              OutlinedButton.icon(key: const ValueKey('player_back'), style: OutlinedButton.styleFrom(minimumSize: const Size(140, 52)), onPressed: () => _close(), icon: const Icon(Icons.arrow_back_rounded), label: Text(tr2('رجوع', 'Back'))),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _fullScreen(BuildContext context) {
     return Scaffold(
       key: const Key('player-fullscreen'),
@@ -220,13 +282,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
         children: [
           Positioned.fill(
             child: _hasError
-                ? Center(
-                    child: Text(
-                      loc('لا يمكن تشغيل هذا الفيديو الآن.'),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 24, color: Colors.white),
-                    ),
-                  )
+                ? _problem(context)
                 : Directionality(
                     textDirection: TextDirection.ltr,
                     child: YoutubePlayer(
@@ -243,7 +299,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
             child: SafeArea(
               child: IconButton.filled(
                 tooltip: tr2('رجوع', 'Back'),
-                style: IconButton.styleFrom(backgroundColor: Colors.black54, foregroundColor: Colors.white, minimumSize: const Size(52, 52)),
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.black54,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(52, 52),
+                ),
                 icon: const Icon(Icons.arrow_back_rounded),
                 onPressed: () => Navigator.of(context).maybePop(),
               ),

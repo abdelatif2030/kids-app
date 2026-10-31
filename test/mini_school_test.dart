@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'approve_all.dart';
 import 'package:kids_app/color_game.dart';
 import 'package:kids_app/curriculum.dart';
 import 'package:kids_app/drawing_screen.dart';
@@ -137,6 +138,7 @@ void main() {
   });
 
   testWidgets('video list: plan button only on the all-videos list', (tester) async {
+    SharedPreferences.setMockInitialValues(approvedLessonPrefs());
     await tester.pumpWidget(_app(const VideoListScreen(age: 4)));
     await _load(tester);
     expect(find.text('خطة اليوم'), findsOneWidget);
@@ -148,7 +150,7 @@ void main() {
 
     await tester.pumpWidget(_app(const VideoListScreen(age: 2, subject: 'drawing')));
     await _load(tester);
-    expect(find.text('لا توجد دروس بعد لهذه المادة'), findsOneWidget);
+    expect(find.textContaining('لا توجد دروس بعد لهذه المادة'), findsOneWidget);
   });
 
   testWidgets('notes: add and delete', (tester) async {
@@ -210,7 +212,7 @@ void main() {
     expect(find.text('حان وقت الراحة'), findsOneWidget);
   });
 
-  test('videos.json: valid, unique, known subjects, every age 1-12 has lessons', () {
+  test('videos.json: valid, unique, known subjects, every age 1-6 has lessons (7-12 legacy kept)', () {
     final list = jsonDecode(File('assets/videos.json').readAsStringSync()) as List<dynamic>;
     final ids = <String>{};
     final subjects = {for (final s in kSubjects) s.id};
@@ -222,7 +224,7 @@ void main() {
       expect(v['minAge'] as int, lessThanOrEqualTo(v['maxAge'] as int), reason: id);
       expect(['Learning', 'Story', 'Fun', 'Calm'], contains(v['category']), reason: id);
     }
-    for (var age = 1; age <= 12; age++) {
+    for (var age = 1; age <= 6; age++) {
       final n = list.where((v) => age >= v['minAge'] && age <= v['maxAge']).length;
       expect(n, greaterThan(5), reason: 'age $age has only $n videos');
     }

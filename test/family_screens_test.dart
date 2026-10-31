@@ -92,7 +92,8 @@ void main() {
     final id = server.requests.keys.single;
     await t.tap(find.byKey(ValueKey('cancel_$id')));
     await _settle(t);
-    expect(find.byKey(ValueKey('sent_$id')), findsNothing);
+    expect(find.byKey(ValueKey('cancel_$id')), findsNothing); // no longer waiting
+    expect(find.byKey(const ValueKey('status_cancelled')), findsOneWidget);
     expect(await t.runAsync(() => grandma.watchIncomingRequests().first), isEmpty);
   });
 

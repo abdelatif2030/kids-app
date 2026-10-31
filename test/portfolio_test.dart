@@ -37,7 +37,7 @@ Future<(FakeTeacherRepository, String)> _repoWithTeacher() async {
   final repo = FakeTeacherRepository();
   await repo.register(email: 't@x.com', password: '123456', name: 'Teacher', role: UserRole.teacher);
   final uid = repo.currentUser!.uid;
-  await repo.saveTeacherProfile(TeacherProfile(uid: uid, name: 'Teacher', bio: 'bio', subjects: const ['arabic'], languages: const ['العربية'], priceNote: ''));
+  await repo.saveTeacherProfile(TeacherProfile(uid: uid, name: 'Teacher', bio: 'bio', subjects: const ['arabic'], languages: const ['العربية'], priceNote: '')); repo.approveForTest(repo.currentUser!.uid); // the owner approves in the console
   return (repo, uid);
 }
 
@@ -194,7 +194,7 @@ void main() {
       await repo.saveTeacherProfile(TeacherProfile(
         uid: uid, name: 'Teacher', bio: 'bio', subjects: const ['arabic'], languages: const ['العربية'], priceNote: '',
         introVideoUrl: 'https://example.com/intro',
-      ));
+      )); repo.approveForTest(repo.currentUser!.uid); // the owner approves in the console
       await repo.savePortfolioItem(_item(title: 'منشور', status: portfolioPublished));
       await repo.savePortfolioItem(_item(title: 'مسودة سرية'));
       final teacher = (await repo.myTeacherProfile())!;

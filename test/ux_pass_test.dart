@@ -118,7 +118,7 @@ void main() {
       final repo = FakeTeacherRepository();
       await repo.register(email: 't@x.com', password: '123456', name: 'T', role: UserRole.teacher);
       final uid = repo.currentUser!.uid;
-      await repo.saveTeacherProfile(TeacherProfile(uid: uid, name: 'T', bio: 'bio', subjects: const ['arabic'], languages: const ['العربية'], priceNote: ''));
+      await repo.saveTeacherProfile(TeacherProfile(uid: uid, name: 'T', bio: 'bio', subjects: const ['arabic'], languages: const ['العربية'], priceNote: '')); repo.approveForTest(repo.currentUser!.uid); // the owner approves in the console
       for (final i in items) {
         await repo.savePortfolioItem(i);
       }

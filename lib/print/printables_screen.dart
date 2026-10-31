@@ -24,7 +24,7 @@ class PrintablesScreen extends StatefulWidget {
 class _PrintablesScreenState extends State<PrintablesScreen> {
   WorksheetKind _kind = WorksheetKind.letterTracing;
   String _letter = 'ب';
-  late int _age = widget.initialAge.clamp(3, 12);
+  late int _age = widget.initialAge.clamp(3, 6);
   late String _lang = AppLocale.instance.code;
   bool _answers = true;
   int _seed = 1;
@@ -71,7 +71,7 @@ class _PrintablesScreenState extends State<PrintablesScreen> {
                       Text(tr2('العمر', 'Age')),
                       SizedBox(
                         width: 160,
-                        child: Slider(value: _age.toDouble(), min: 3, max: 12, divisions: 9, label: '$_age', onChanged: (v) => setState(() => _age = v.round())),
+                        child: Slider(value: _age.toDouble(), min: 3, max: 6, divisions: 3, label: '$_age', onChanged: (v) => setState(() => _age = v.round())),
                       ),
                       Text('$_age'),
                     ]),

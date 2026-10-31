@@ -29,8 +29,22 @@ class AccountException implements Exception {
   String toString() => message;
 }
 
-const teacherStatusPending = 'pending'; // old profiles only; saving one makes it visible
-/// New profiles are visible to parents straight away.
+/// S2 (applied 2026-10-31, matches `firestore.rules` in the working tree): a new profile is created `pending`, stays hidden from parents
+/// until the OWNER sets `approved` in the console, and the app never changes the status (no self-approval, no lifting a suspension).
+/// Setting this to `false` would make the app disagree with these rules; it exists so the old behaviour stays testable.
+const bool kTeachersNeedOwnerApproval = true;
+
+/// The `status` value to write when a teacher saves their profile, or null to leave it unchanged. [existingStatus] is null for a new profile.
+String? teacherStatusToWrite(String? existingStatus, {bool ownerApproval = kTeachersNeedOwnerApproval}) {
+  if (existingStatus == null) return ownerApproval ? teacherStatusPending : teacherStatusApproved;
+  if (existingStatus == teacherStatusPending && !ownerApproval) return teacherStatusApproved;
+  return null; // approved stays approved, a suspension is never lifted by the app, pending waits for the owner
+}
+
+/// A new profile starts here (with [kTeachersNeedOwnerApproval]) and is hidden from parents until the owner approves it.
+const teacherStatusPending = 'pending';
+
+/// Visible to parents. Set only by the owner in the console (or, with the old rules, by the app at creation).
 const teacherStatusApproved = 'approved';
 
 /// Set by the app owner in the Firebase console to hide a teacher.
@@ -573,6 +587,9 @@ abstract class TeacherRepository {
     required UserRole role,
   });
   Future<void> signIn(String email, String password);
+
+  /// Sends a password-reset e-mail. It never says whether the address has an account (no account probing).
+  Future<void> sendPasswordReset(String email);
   Future<void> signOut();
 
   /// Teachers that are visible (not suspended by the app owner).

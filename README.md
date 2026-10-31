@@ -1,6 +1,6 @@
 # رحلتي (Rehlaty) — Arabic-first kids learning app
 
-Flutter, Android first (a web build on port 8080 is used for previews). Ages 1–12. Child area, parent area (PIN), local content admin.
+Flutter, Android first (a web build on port 8080 is used for previews). Ages 1–6 (older content and profiles from earlier versions are kept but no longer offered). Child area, parent area (PIN), local content admin.
 Child data stays on the device. No ads, no analytics, no external links in the child area.
 The only contact feature is the parent-approved family chat and calls (`docs/FAMILY_CHAT_DESIGN.md`).
 

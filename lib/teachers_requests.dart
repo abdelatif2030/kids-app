@@ -1,3 +1,4 @@
+import 'age_scope.dart';
 import 'design/layout.dart';
 import 'package:flutter/material.dart';
 
@@ -212,7 +213,7 @@ class _RequestFormState extends State<RequestForm> {
             hint: Text(loc('عمر الطفل (اختياري)')),
             items: [
               DropdownMenuItem<int?>(value: null, child: Text(loc('بدون'))),
-              for (var a = 1; a <= 12; a++) DropdownMenuItem<int?>(value: a, child: Text(tr2('$a سنوات', '$a years'))),
+              for (final a in ageChoices(current: _age)) DropdownMenuItem<int?>(value: a, child: Text(tr2('$a سنوات', '$a years'))),
             ],
             onChanged: (v) => setState(() => _age = v),
           ),

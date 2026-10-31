@@ -20,7 +20,8 @@ class HomeViewPref extends ChangeNotifier {
     if (_loaded) return;
     _loaded = true;
     try {
-      final v = (await SharedPreferences.getInstance()).getString(_key) == 'map';
+      final v =
+          (await SharedPreferences.getInstance()).getString(_key) == 'map';
       if (v != mapView) {
         mapView = v;
         notifyListeners();
@@ -33,7 +34,10 @@ class HomeViewPref extends ChangeNotifier {
     _loaded = true;
     notifyListeners();
     try {
-      await (await SharedPreferences.getInstance()).setString(_key, map ? 'map' : 'list');
+      await (await SharedPreferences.getInstance()).setString(
+        _key,
+        map ? 'map' : 'list',
+      );
     } catch (_) {}
   }
 
@@ -52,7 +56,22 @@ class IslandSpec {
   final Color grass;
   final Color grassDark;
   final VoidCallback onTap;
-  const IslandSpec({required this.id, required this.title, required this.emoji, required this.grass, required this.grassDark, required this.onTap});
+
+  /// Relative size on the map (1 = normal). The most important destination is bigger.
+  final double weight;
+
+  /// House shape 0..3 (cottage, tall house, wide shop, tower); null picks one by position.
+  final int? houseStyle;
+  const IslandSpec({
+    required this.id,
+    required this.title,
+    required this.emoji,
+    required this.grass,
+    required this.grassDark,
+    required this.onTap,
+    this.weight = 1,
+    this.houseStyle,
+  });
 }
 
 /// Where the landmarks go on the world map of width [width]: one zig-zag down a single floating island, first section
@@ -61,56 +80,95 @@ class IslandSpec {
 class WorldMapLayout {
   final List<Offset> centers;
   final double size;
+
+  /// Each landmark's own size (the base [size] times its weight, kept inside the canvas).
+  final List<double> sizes;
   final double width;
   final double height;
 
   /// The first landmark's top edge and the island's rim: shared with the painter.
   final double rimTop;
-  const WorldMapLayout(this.centers, this.size, this.width, this.height, this.rimTop);
+  const WorldMapLayout(
+    this.centers,
+    this.size,
+    this.width,
+    this.height,
+    this.rimTop, [
+    this.sizes = const [],
+  ]);
+
+  double sizeAt(int i) => i < sizes.length ? sizes[i] : size;
 
   static const _xs = [0.28, 0.72, 0.30, 0.70];
 
-  static WorldMapLayout compute(int count, double width, {bool rtl = false}) {
+  static WorldMapLayout compute(
+    int count,
+    double width, {
+    bool rtl = false,
+    List<double>? weights,
+  }) {
     final w = math.min(width, 620.0);
     final size = (w * 0.30).clamp(88.0, 140.0);
-    // Neighbours sit in different columns, so they may share height; the same column is two steps apart.
-    final pitch = size * 0.5 + 66;
-    final rimTop = w * 0.16;
-    final first = rimTop + w * 0.10 + size / 2;
-    final centers = <Offset>[
+    final sizes = [
       for (var i = 0; i < count; i++)
-        Offset((rtl ? 1 - _xs[i % 4] : _xs[i % 4]) * w, first + i * pitch),
+        math
+            .min(
+              size * (weights != null && i < weights.length ? weights[i] : 1.0),
+              w * 0.38,
+            )
+            .toDouble(),
     ];
-    final bottom = count == 0 ? first : centers.last.dy + size / 2 + 74;
-    return WorldMapLayout(centers, size, w, bottom + w * 0.14, rimTop);
+    final rimTop = w * 0.16;
+    final first = rimTop + w * 0.10 + sizes.firstOrNull.orZero / 2;
+    final centers = <Offset>[];
+    var y = first;
+    for (var i = 0; i < count; i++) {
+      // Neighbours sit in different columns, so they may share height; the same column is two steps apart.
+      if (i > 0) y += math.max(sizes[i - 1], sizes[i]) * 0.5 + 66;
+      centers.add(Offset((rtl ? 1 - _xs[i % 4] : _xs[i % 4]) * w, y));
+    }
+    final bottom = count == 0 ? first : centers.last.dy + sizes.last / 2 + 74;
+    return WorldMapLayout(centers, size, w, bottom + w * 0.14, rimTop, sizes);
   }
 }
 
-/// The world map: ONE floating island with a winding path, a mountain and trees, and one landmark for each section of
-/// the app along the path. Original artwork drawn in code (no images). Each landmark is one big tap target with its name;
-/// they bob a little unless motion is reduced.
+extension on double? {
+  double get orZero => this ?? 0;
+}
+
+/// The world map: ONE floating island with a house for each section of the app, a winding path, a mountain, trees and
+/// flowers. Original artwork drawn in code (no images). Each house is one big tap target with its name. It moves
+/// gently: the island floats, clouds drift, chimneys smoke, trees sway, birds fly past; all of it stops when motion is
+/// reduced (and in tests), leaving the same picture standing still.
 class IslandHome extends StatefulWidget {
   final List<IslandSpec> islands;
   const IslandHome({super.key, required this.islands});
 
-  /// Tests set this to true to exercise the bobbing; otherwise it is off under a test binding.
+  /// Tests set this to true to exercise the movement; otherwise it is off under a test binding.
   static bool? forceMotion;
 
   @override
   State<IslandHome> createState() => _IslandHomeState();
 }
 
-class _IslandHomeState extends State<IslandHome> with SingleTickerProviderStateMixin {
+class _IslandHomeState extends State<IslandHome>
+    with SingleTickerProviderStateMixin {
   AnimationController? _c;
 
-  bool get _motionAllowed => IslandHome.forceMotion ?? !WidgetsBinding.instance.runtimeType.toString().contains('Test');
+  bool get _motionAllowed =>
+      IslandHome.forceMotion ??
+      !WidgetsBinding.instance.runtimeType.toString().contains('Test');
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final on = _motionAllowed && !motionReduced(context);
     if (on && _c == null) {
-      _c = AnimationController(vsync: this, duration: const Duration(seconds: 6))..repeat();
+      // One slow loop for everything (the pieces use whole multiples of it, so it never jumps).
+      _c = AnimationController(
+        vsync: this,
+        duration: const Duration(seconds: 24),
+      )..repeat();
     } else if (!on && _c != null) {
       _c!.dispose();
       _c = null;
@@ -129,28 +187,86 @@ class _IslandHomeState extends State<IslandHome> with SingleTickerProviderStateM
     return LayoutBuilder(
       builder: (context, box) {
         final avail = box.maxWidth.isFinite ? box.maxWidth : 400.0;
-        final layout = WorldMapLayout.compute(widget.islands.length, avail, rtl: rtl);
+        final layout = WorldMapLayout.compute(
+          widget.islands.length,
+          avail,
+          rtl: rtl,
+          weights: [for (final i in widget.islands) i.weight],
+        );
         final c = _c;
+        final decor = _Decor.of(layout);
+        Widget floating(Widget child) {
+          if (c == null) return child;
+          return AnimatedBuilder(
+            animation: c,
+            child: child,
+            builder: (context, ch) => Transform.translate(
+              offset: Offset(0, math.sin(c.value * 2 * math.pi * 4) * 3),
+              child: ch,
+            ),
+          );
+        }
+
         return Center(
           child: SizedBox(
             width: layout.width,
             height: layout.height,
             child: Stack(
+              clipBehavior: Clip.none,
               children: [
+                // Sky: clouds drifting behind the island.
                 Positioned.fill(
                   child: ExcludeSemantics(
                     child: IgnorePointer(
-                      child: RepaintBoundary(child: CustomPaint(key: const ValueKey('world_map_art'), painter: _WorldMapPainter(layout))),
+                      child: RepaintBoundary(
+                        child: CustomPaint(
+                          key: const ValueKey('world_map_sky'),
+                          painter: _SkyMotionPainter(layout, c),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                // The island, floating up and down a little, with the swaying trees on it.
+                Positioned.fill(
+                  child: floating(
+                    ExcludeSemantics(
+                      child: IgnorePointer(
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            RepaintBoundary(
+                              child: CustomPaint(
+                                key: const ValueKey('world_map_art'),
+                                painter: _WorldMapPainter(layout, decor),
+                              ),
+                            ),
+                            RepaintBoundary(
+                              child: CustomPaint(
+                                key: const ValueKey('world_map_trees'),
+                                painter: _TreesPainter(layout, decor, c),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
                 for (final (i, spec) in widget.islands.indexed)
                   Positioned(
-                    left: layout.centers[i].dx - layout.size / 2 - 14,
-                    top: layout.centers[i].dy - layout.size / 2,
-                    width: layout.size + 28,
-                    height: layout.size + 58,
-                    child: _bob(c, i, _Landmark(spec: spec, size: layout.size)),
+                    left: layout.centers[i].dx - layout.sizeAt(i) / 2 - 14,
+                    top: layout.centers[i].dy - layout.sizeAt(i) / 2,
+                    width: layout.sizeAt(i) + 28,
+                    height: layout.sizeAt(i) + 58,
+                    child: floating(
+                      _House(
+                        spec: spec,
+                        size: layout.sizeAt(i),
+                        style: spec.houseStyle ?? i % 4,
+                        t: c,
+                      ),
+                    ),
                   ),
               ],
             ),
@@ -159,22 +275,20 @@ class _IslandHomeState extends State<IslandHome> with SingleTickerProviderStateM
       },
     );
   }
-
-  Widget _bob(AnimationController? c, int i, Widget child) {
-    if (c == null) return child;
-    return AnimatedBuilder(
-      animation: c,
-      child: child,
-      builder: (context, ch) => Transform.translate(offset: Offset(0, math.sin((c.value + i * 0.13) * 2 * math.pi) * 3), child: ch),
-    );
-  }
 }
 
-/// One section on the map: a round, glossy badge with a big picture and a wooden name plate under it.
-class _Landmark extends StatelessWidget {
+/// One section on the map: a little house, a round sign with the picture on its wall, and a wooden name plate.
+class _House extends StatelessWidget {
   final IslandSpec spec;
   final double size;
-  const _Landmark({required this.spec, required this.size});
+  final int style;
+  final Animation<double>? t;
+  const _House({
+    required this.spec,
+    required this.size,
+    required this.style,
+    required this.t,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -186,17 +300,37 @@ class _Landmark extends StatelessWidget {
       child: Stack(
         alignment: Alignment.topCenter,
         children: [
-          Container(
-            width: size,
+          SizedBox(
+            width: size + 28,
             height: size,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(center: const Alignment(-0.3, -0.4), radius: 0.95, colors: [Color.lerp(spec.grass, Colors.white, 0.35)!, spec.grass, spec.grassDark]),
-              border: Border.all(color: Colors.white, width: 5),
-              boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 8, offset: Offset(0, 4))],
+            child: Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                Positioned.fill(
+                  child: RepaintBoundary(
+                    child: CustomPaint(
+                      painter: _HousePainter(
+                        spec.grass,
+                        spec.grassDark,
+                        style,
+                        t,
+                        spec.id.hashCode,
+                      ),
+                    ),
+                  ),
+                ),
+                // The picture on the round sign on the wall.
+                Positioned(
+                  top: size * 0.46,
+                  child: ExcludeSemantics(
+                    child: Text(
+                      spec.emoji,
+                      style: TextStyle(fontSize: size * 0.26),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            child: ExcludeSemantics(child: Text(spec.emoji, style: TextStyle(fontSize: size * 0.46))),
           ),
           Positioned(
             bottom: 0,
@@ -208,9 +342,26 @@ class _Landmark extends StatelessWidget {
                 color: const Color(0xFFFFF3D6),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: const Color(0xFF9A6B3A), width: 3),
-                boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 4, offset: Offset(0, 2))],
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x33000000),
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
               ),
-              child: Text(spec.title, textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF4A3320), height: 1.1)),
+              child: Text(
+                spec.title,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF4A3320),
+                  height: 1.1,
+                ),
+              ),
             ),
           ),
         ],
@@ -219,22 +370,437 @@ class _Landmark extends StatelessWidget {
   }
 }
 
-/// The island itself, all shapes: sky-blue shadow, a stacked orange cliff, grass in two greens, a mountain with a snow cap,
-/// a winding sand path with white stepping dots, and trees and flowers that keep clear of the path and the landmarks.
+/// A house in four shapes (cottage, tall house, wide shop, tower), coloured from the section's colours. A chimney puffs
+/// smoke when [t] is moving.
+class _HousePainter extends CustomPainter {
+  final Color color;
+  final Color dark;
+  final int style;
+  final Animation<double>? t;
+  final int seed;
+  _HousePainter(this.color, this.dark, this.style, this.t, this.seed)
+    : super(repaint: t);
+
+  @override
+  void paint(Canvas canvas, Size s) {
+    final w = s.width, h = s.height;
+    final cx = w / 2;
+    final unit = math.min(
+      w - 28,
+      h,
+    ); // the house itself is as wide as the layout's size
+    final u = unit;
+    final left = cx - u / 2;
+    Rect r(double x0, double y0, double x1, double y1) =>
+        Rect.fromLTRB(left + x0 * u, y0 * h, left + x1 * u, y1 * h);
+
+    final wall = Color.lerp(Colors.white, color, 0.28)!;
+    final wallEdge = Color.lerp(color, Colors.black, 0.15)!;
+    final roof = dark;
+    final roofLight = Color.lerp(dark, Colors.white, 0.18)!;
+
+    // shadow on the grass
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(cx, h * 0.93),
+        width: u * 1.0,
+        height: h * 0.1,
+      ),
+      Paint()..color = const Color(0x33000000),
+    );
+
+    // chimney (behind the roof) and its smoke
+    final chimneyX = style == 3 ? 0.66 : (style == 1 ? 0.7 : 0.68);
+    final chimneyTop = style == 3 ? 0.14 : 0.16;
+    final chim = r(chimneyX, chimneyTop, chimneyX + 0.1, chimneyTop + 0.2);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(chim, const Radius.circular(2)),
+      Paint()..color = const Color(0xFF9C6B4E),
+    );
+    canvas.drawRect(
+      Rect.fromLTWH(chim.left - 2, chim.top - 3, chim.width + 4, 5),
+      Paint()..color = const Color(0xFF7D5238),
+    );
+    final tt = t?.value ?? 0;
+    for (var k = 0; k < 3; k++) {
+      final p =
+          (tt * 24 / 6 + k / 3 + (seed % 7) / 7) %
+          1; // a puff every 2 s: 24 s loop, whole cycles
+      final pos = Offset(
+        chim.center.dx + math.sin((p + k) * 5) * u * 0.03 + p * u * 0.05,
+        chim.top - 4 - p * h * 0.22,
+      );
+      canvas.drawCircle(
+        pos,
+        u * (0.03 + 0.04 * p),
+        Paint()
+          ..color = Colors.white.withValues(
+            alpha: (t == null ? 0.0 : 0.75 * (1 - p)),
+          ),
+      );
+    }
+
+    // wall
+    final wallRect = switch (style) {
+      1 => r(0.18, 0.34, 0.82, 0.92),
+      2 => r(0.06, 0.48, 0.94, 0.92),
+      3 => r(0.26, 0.36, 0.74, 0.92),
+      _ => r(0.12, 0.44, 0.88, 0.92),
+    };
+    final wr = RRect.fromRectAndRadius(wallRect, const Radius.circular(8));
+    canvas.drawRRect(wr, Paint()..color = wall);
+    canvas.drawRRect(
+      wr,
+      Paint()
+        ..color = wallEdge
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5,
+    );
+
+    // roof
+    final roofPath = Path();
+    switch (style) {
+      case 1: // tall house: steep roof with an attic window
+        roofPath
+          ..moveTo(left + 0.1 * u, 0.4 * h)
+          ..lineTo(left + 0.5 * u, 0.04 * h)
+          ..lineTo(left + 0.9 * u, 0.4 * h)
+          ..close();
+      case 2: // wide shop: low roof
+        roofPath
+          ..moveTo(left + 0.0 * u, 0.52 * h)
+          ..lineTo(left + 0.18 * u, 0.28 * h)
+          ..lineTo(left + 0.82 * u, 0.28 * h)
+          ..lineTo(left + 1.0 * u, 0.52 * h)
+          ..close();
+      case 3: // tower: a cone
+        roofPath
+          ..moveTo(left + 0.2 * u, 0.42 * h)
+          ..lineTo(left + 0.5 * u, 0.02 * h)
+          ..lineTo(left + 0.8 * u, 0.42 * h)
+          ..close();
+      default: // cottage
+        roofPath
+          ..moveTo(left + 0.04 * u, 0.5 * h)
+          ..lineTo(left + 0.5 * u, 0.12 * h)
+          ..lineTo(left + 0.96 * u, 0.5 * h)
+          ..close();
+    }
+    canvas.drawPath(roofPath, Paint()..color = roof);
+    canvas.drawPath(
+      roofPath,
+      Paint()
+        ..color = Color.lerp(roof, Colors.black, 0.2)!
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5
+        ..strokeJoin = StrokeJoin.round,
+    );
+    // roof tiles: a light stripe
+    final tile = Paint()
+      ..color = roofLight
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round;
+    final b = roofPath.getBounds();
+    canvas.drawLine(
+      Offset(b.left + b.width * 0.28, b.bottom - b.height * 0.28),
+      Offset(b.right - b.width * 0.28, b.bottom - b.height * 0.28),
+      tile,
+    );
+
+    // attic window / round window
+    if (style == 1 || style == 3) {
+      final wc = Offset(left + 0.5 * u, style == 1 ? 0.27 * h : 0.3 * h);
+      canvas.drawCircle(wc, u * 0.07, Paint()..color = const Color(0xFFBFE6FF));
+      canvas.drawCircle(
+        wc,
+        u * 0.07,
+        Paint()
+          ..color = const Color(0xFF7A5A3A)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.5,
+      );
+    }
+
+    // the round sign for the picture (the emoji is drawn over it by the widget)
+    final signC = Offset(cx, wallRect.top + wallRect.height * 0.42);
+    canvas.drawCircle(
+      signC.translate(0, 2),
+      u * 0.19,
+      Paint()..color = const Color(0x33000000),
+    );
+    canvas.drawCircle(signC, u * 0.19, Paint()..color = Colors.white);
+    canvas.drawCircle(
+      signC,
+      u * 0.19,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4,
+    );
+
+    // side windows
+    final win = Paint()..color = const Color(0xFFBFE6FF);
+    final frame = Paint()
+      ..color = const Color(0xFF7A5A3A)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+    if (style != 3) {
+      for (final fx in [
+        wallRect.left + wallRect.width * 0.1,
+        wallRect.right - wallRect.width * 0.1 - u * 0.1,
+      ]) {
+        final wr2 = Rect.fromLTWH(
+          fx,
+          wallRect.top + wallRect.height * 0.12,
+          u * 0.1,
+          u * 0.1,
+        );
+        canvas.drawRect(wr2, win);
+        canvas.drawRect(wr2, frame);
+        canvas.drawLine(wr2.centerLeft, wr2.centerRight, frame);
+        canvas.drawLine(wr2.topCenter, wr2.bottomCenter, frame);
+      }
+    }
+
+    // door
+    final doorW = u * 0.16, doorH = h * 0.17;
+    final door = RRect.fromRectAndCorners(
+      Rect.fromLTWH(cx - doorW / 2, wallRect.bottom - doorH, doorW, doorH),
+      topLeft: Radius.circular(doorW / 2),
+      topRight: Radius.circular(doorW / 2),
+    );
+    canvas.drawRRect(door, Paint()..color = const Color(0xFF8A5A33));
+    canvas.drawCircle(
+      Offset(cx + doorW * 0.2, wallRect.bottom - doorH * 0.4),
+      2,
+      Paint()..color = const Color(0xFFFFD54F),
+    );
+
+    // an awning over the door for the wide shop
+    if (style == 2) {
+      for (var i = 0; i < 5; i++) {
+        final x0 = cx - u * 0.2 + i * u * 0.08;
+        canvas.drawRect(
+          Rect.fromLTWH(x0, wallRect.bottom - doorH - 8, u * 0.08, 8),
+          Paint()..color = i.isEven ? const Color(0xFFE5484D) : Colors.white,
+        );
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_HousePainter old) =>
+      old.color != color || old.dark != dark || old.style != style;
+}
+
+/// Trees and flowers are placed once per layout (the same on every repaint), keeping clear of the path and the houses.
+class _Decor {
+  final List<(Offset, double, int)> trees; // centre, radius, colour index
+  final List<Offset> flowers;
+  final List<Offset> pathSamples;
+  const _Decor(this.trees, this.flowers, this.pathSamples);
+
+  static _Decor? _last;
+  static String? _lastKey;
+
+  static _Decor of(WorldMapLayout l) {
+    final key =
+        '${l.width}:${l.height}:${l.centers.length}:${l.centers.isEmpty ? 0 : l.centers.first.dx}:${l.sizes.isEmpty ? 0 : l.sizes.first}';
+    if (_lastKey == key && _last != null) return _last!;
+    final w = l.width, top = l.rimTop, bot = l.height - w * 0.13;
+    final pts = [
+      Offset(l.centers.isEmpty ? w / 2 : l.centers.first.dx, top + w * 0.07),
+      ...l.centers,
+    ];
+    final samples = <Offset>[];
+    if (pts.length >= 2) {
+      for (final m in _WorldMapPainter._open(pts).computeMetrics()) {
+        for (var d = 0.0; d < m.length; d += 18) {
+          samples.add(m.getTangentForOffset(d)!.position);
+        }
+      }
+    }
+    bool clear(Offset p, double r) {
+      for (final (i, c) in l.centers.indexed) {
+        // the whole house, its sign and its name plate
+        final z = l.sizeAt(i);
+        if (p.dx > c.dx - z * 0.7 - r &&
+            p.dx < c.dx + z * 0.7 + r &&
+            p.dy > c.dy - z * 0.55 - r &&
+            p.dy < c.dy + z * 0.5 + 62 + r) {
+          return false;
+        }
+      }
+      for (final q in samples) {
+        if ((p - q).distance < l.size * 0.17 + r + 4) return false;
+      }
+      return true;
+    }
+
+    final rnd = math.Random(5);
+    final trees = <(Offset, double, int)>[];
+    for (var tries = 0; tries < 600 && trees.length < 26; tries++) {
+      final p = Offset(
+        w * (0.08 + 0.84 * rnd.nextDouble()),
+        top + w * 0.14 + (bot - top - w * 0.22) * rnd.nextDouble(),
+      );
+      final r = w * (0.026 + 0.018 * rnd.nextDouble());
+      if (clear(p, r * 1.3)) trees.add((p, r, trees.length % 4));
+    }
+    final flowers = <Offset>[];
+    for (var tries = 0; tries < 500 && flowers.length < 30; tries++) {
+      final p = Offset(
+        w * (0.07 + 0.86 * rnd.nextDouble()),
+        top + w * 0.12 + (bot - top - w * 0.18) * rnd.nextDouble(),
+      );
+      if (clear(p, 6) && !trees.any((t) => (t.$1 - p).distance < t.$2 + 8)) {
+        flowers.add(p);
+      }
+    }
+    _lastKey = key;
+    return _last = _Decor(trees, flowers, samples);
+  }
+}
+
+/// Clouds drifting slowly across the sky behind the island, and two birds passing. Still when [t] is null.
+class _SkyMotionPainter extends CustomPainter {
+  final WorldMapLayout l;
+  final Animation<double>? t;
+  _SkyMotionPainter(this.l, this.t) : super(repaint: t);
+
+  @override
+  void paint(Canvas canvas, Size s) {
+    final tt = t?.value ?? 0;
+    final cloud = Paint()..color = const Color(0xE6FFFFFF);
+    for (var i = 0; i < 5; i++) {
+      final speed = 1 + i % 2; // whole cycles per loop: it wraps without a jump
+      final x = ((i * 0.23 + tt * speed) % 1.0) * (s.width + 160) - 80;
+      final y = s.height * (0.08 + 0.2 * i);
+      final r = s.width * (0.05 + 0.012 * (i % 3));
+      canvas.drawCircle(Offset(x, y), r, cloud);
+      canvas.drawCircle(Offset(x + r * 0.9, y + r * 0.2), r * 0.8, cloud);
+      canvas.drawCircle(Offset(x - r * 0.9, y + r * 0.3), r * 0.7, cloud);
+      canvas.drawRect(
+        Rect.fromLTRB(x - r * 1.4, y + r * 0.3, x + r * 1.6, y + r * 0.9),
+        cloud,
+      );
+    }
+    // two birds flying across
+    final bird = Paint()
+      ..color = const Color(0xFF3A4B6B)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+    for (var i = 0; i < 2; i++) {
+      final p = (tt * 2 + i * 0.5) % 1.0;
+      final x = p * (s.width + 60) - 30;
+      final y = s.height * (0.1 + 0.07 * i) + math.sin(p * 6.28 * 2) * 8;
+      final flap = math.sin((tt * 24 * 1.5 + i) * 6.28) * 3;
+      final path = Path()
+        ..moveTo(x - 8, y + flap)
+        ..quadraticBezierTo(x - 4, y - 5, x, y)
+        ..quadraticBezierTo(x + 4, y - 5, x + 8, y + flap);
+      canvas.drawPath(path, bird);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_SkyMotionPainter old) =>
+      old.l.width != l.width || old.l.height != l.height;
+}
+
+/// The trees, swaying a little in the wind. Standing still when [t] is null.
+class _TreesPainter extends CustomPainter {
+  final WorldMapLayout l;
+  final _Decor decor;
+  final Animation<double>? t;
+  _TreesPainter(this.l, this.decor, this.t) : super(repaint: t);
+
+  static const _canopy = [
+    Color(0xFF3FA34D),
+    Color(0xFFFFB6C9),
+    Color(0xFF7BC96F),
+    Color(0xFFB59AE8),
+  ];
+
+  @override
+  void paint(Canvas canvas, Size s) {
+    final tt = t?.value ?? 0;
+    for (final (i, tree) in decor.trees.indexed) {
+      final p = tree.$1, r = tree.$2;
+      final sway = t == null
+          ? 0.0
+          : math.sin((tt * 24 / 3 + i * 0.37) * 6.28318) * r * 0.12;
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: p.translate(0, r * 1.15),
+          width: r * 1.9,
+          height: r * 0.6,
+        ),
+        Paint()..color = const Color(0x33000000),
+      );
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(
+            center: p.translate(0, r * 0.7),
+            width: r * 0.45,
+            height: r * 1.1,
+          ),
+          const Radius.circular(3),
+        ),
+        Paint()..color = const Color(0xFF8A5A33),
+      );
+      final col = _canopy[tree.$3];
+      final top = p.translate(sway, 0);
+      canvas.drawCircle(top, r, Paint()..color = col);
+      canvas.drawCircle(
+        top.translate(-r * 0.35, -r * 0.35),
+        r * 0.55,
+        Paint()..color = Color.lerp(col, Colors.white, 0.35)!,
+      );
+    }
+    final flower = [
+      const Color(0xFFFFE066),
+      Colors.white,
+      const Color(0xFFFF8FB1),
+    ];
+    for (final (i, f) in decor.flowers.indexed) {
+      final twinkle = t == null
+          ? 1.0
+          : 0.85 + 0.15 * math.sin((tt * 24 / 4 + i * 0.21) * 6.28318);
+      canvas.drawCircle(f, 4 * twinkle, Paint()..color = flower[i % 3]);
+      canvas.drawCircle(f, 1.6, Paint()..color = const Color(0xFFFFA000));
+    }
+  }
+
+  @override
+  bool shouldRepaint(_TreesPainter old) =>
+      old.l.height != l.height || old.l.width != l.width || old.decor != decor;
+}
+
+/// The island itself, all shapes: a stacked orange cliff, grass in two greens, a mountain with a snow cap and a winding
+/// sand path with white stepping dots. It stands still; the moving parts are drawn by the painters above.
 class _WorldMapPainter extends CustomPainter {
   final WorldMapLayout l;
-  _WorldMapPainter(this.l);
+  final _Decor decor;
+  _WorldMapPainter(this.l, this.decor);
 
   /// A closed smooth curve through [pts] (Catmull-Rom turned into cubic Beziers).
   static Path _blob(List<Offset> pts) {
     final n = pts.length;
     final path = Path()..moveTo(pts[0].dx, pts[0].dy);
     for (var i = 0; i < n; i++) {
-      final p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+      final p0 = pts[(i - 1 + n) % n],
+          p1 = pts[i],
+          p2 = pts[(i + 1) % n],
+          p3 = pts[(i + 2) % n];
       path.cubicTo(
-        p1.dx + (p2.dx - p0.dx) / 6, p1.dy + (p2.dy - p0.dy) / 6,
-        p2.dx - (p3.dx - p1.dx) / 6, p2.dy - (p3.dy - p1.dy) / 6,
-        p2.dx, p2.dy,
+        p1.dx + (p2.dx - p0.dx) / 6,
+        p1.dy + (p2.dy - p0.dy) / 6,
+        p2.dx - (p3.dx - p1.dx) / 6,
+        p2.dy - (p3.dy - p1.dy) / 6,
+        p2.dx,
+        p2.dy,
       );
     }
     return path..close();
@@ -243,11 +809,17 @@ class _WorldMapPainter extends CustomPainter {
   static Path _open(List<Offset> pts) {
     final path = Path()..moveTo(pts[0].dx, pts[0].dy);
     for (var i = 0; i + 1 < pts.length; i++) {
-      final p0 = pts[math.max(i - 1, 0)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[math.min(i + 2, pts.length - 1)];
+      final p0 = pts[math.max(i - 1, 0)],
+          p1 = pts[i],
+          p2 = pts[i + 1],
+          p3 = pts[math.min(i + 2, pts.length - 1)];
       path.cubicTo(
-        p1.dx + (p2.dx - p0.dx) / 6, p1.dy + (p2.dy - p0.dy) / 6,
-        p2.dx - (p3.dx - p1.dx) / 6, p2.dy - (p3.dy - p1.dy) / 6,
-        p2.dx, p2.dy,
+        p1.dx + (p2.dx - p0.dx) / 6,
+        p1.dy + (p2.dy - p0.dy) / 6,
+        p2.dx - (p3.dx - p1.dx) / 6,
+        p2.dy - (p3.dy - p1.dy) / 6,
+        p2.dx,
+        p2.dy,
       );
     }
     return path;
@@ -257,42 +829,59 @@ class _WorldMapPainter extends CustomPainter {
   void paint(Canvas canvas, Size s) {
     final w = l.width, h = l.height, top = l.rimTop, bot = h - w * 0.13;
     final rim = [
-      Offset(w * 0.50, top - w * 0.015), Offset(w * 0.80, top + w * 0.01), Offset(w * 0.965, top + w * 0.09),
-      Offset(w * 0.985, h * 0.30), Offset(w * 0.945, h * 0.50), Offset(w * 0.985, h * 0.72),
-      Offset(w * 0.90, bot - w * 0.03), Offset(w * 0.62, bot + w * 0.01), Offset(w * 0.40, bot - w * 0.02),
-      Offset(w * 0.10, bot - w * 0.04), Offset(w * 0.02, h * 0.72), Offset(w * 0.055, h * 0.50),
-      Offset(w * 0.015, h * 0.30), Offset(w * 0.04, top + w * 0.09), Offset(w * 0.20, top + w * 0.01),
+      Offset(w * 0.50, top - w * 0.015),
+      Offset(w * 0.80, top + w * 0.01),
+      Offset(w * 0.965, top + w * 0.09),
+      Offset(w * 0.985, h * 0.30),
+      Offset(w * 0.945, h * 0.50),
+      Offset(w * 0.985, h * 0.72),
+      Offset(w * 0.90, bot - w * 0.03),
+      Offset(w * 0.62, bot + w * 0.01),
+      Offset(w * 0.40, bot - w * 0.02),
+      Offset(w * 0.10, bot - w * 0.04),
+      Offset(w * 0.02, h * 0.72),
+      Offset(w * 0.055, h * 0.50),
+      Offset(w * 0.015, h * 0.30),
+      Offset(w * 0.04, top + w * 0.09),
+      Offset(w * 0.20, top + w * 0.01),
     ];
     // keep a margin of sky on both sides so it reads as a floating island, not a green page
-    final pinched = [for (final p in rim) Offset(w * 0.5 + (p.dx - w * 0.5) * 0.9, p.dy)];
+    final pinched = [
+      for (final p in rim) Offset(w * 0.5 + (p.dx - w * 0.5) * 0.9, p.dy),
+    ];
     final grass = _blob(pinched);
 
-    // a few clouds peeking out from behind the island
-    final cloud = Paint()..color = const Color(0xF2FFFFFF);
-    for (final (fx, fy, r) in const [(0.02, 0.22, 0.06), (0.99, 0.43, 0.07), (0.01, 0.66, 0.065), (0.98, 0.86, 0.06)]) {
-      final c = Offset(w * fx, h * fy);
-      canvas.drawCircle(c, w * r, cloud);
-      canvas.drawCircle(c.translate(w * r * 0.9, w * r * 0.25), w * r * 0.8, cloud);
-      canvas.drawCircle(c.translate(-w * r * 0.9, w * r * 0.3), w * r * 0.7, cloud);
-    }
-
     // soft shadow on the sky under the island
-    canvas.drawOval(Rect.fromLTWH(w * 0.12, bot + w * 0.06, w * 0.76, w * 0.07), Paint()..color = const Color(0x22000000));
+    canvas.drawOval(
+      Rect.fromLTWH(w * 0.12, bot + w * 0.06, w * 0.76, w * 0.07),
+      Paint()..color = const Color(0x22000000),
+    );
 
     // cliff: the same outline stacked downwards in orange, darker towards the bottom
     final depth = w * 0.075;
     for (var d = depth; d >= 0; d -= 3) {
       final t = d / depth;
-      canvas.drawPath(grass.shift(Offset(0, d)), Paint()..color = Color.lerp(const Color(0xFFFFC76B), const Color(0xFFE08F3C), t)!);
+      canvas.drawPath(
+        grass.shift(Offset(0, d)),
+        Paint()
+          ..color = Color.lerp(
+            const Color(0xFFFFC76B),
+            const Color(0xFFE08F3C),
+            t,
+          )!,
+      );
     }
-    // pebbly texture on the cliff
     final rnd = math.Random(11);
     for (var i = 0; i < 26; i++) {
       final x = w * (0.1 + 0.8 * rnd.nextDouble());
-      canvas.drawCircle(Offset(x, bot + depth * (0.1 + 0.5 * rnd.nextDouble()) + w * 0.01), 2 + 2 * rnd.nextDouble(), Paint()..color = const Color(0x33B25E1A));
+      canvas.drawCircle(
+        Offset(x, bot + depth * (0.1 + 0.5 * rnd.nextDouble()) + w * 0.01),
+        2 + 2 * rnd.nextDouble(),
+        Paint()..color = const Color(0x33B25E1A),
+      );
     }
 
-    // grass: dark rim, light fill, a lighter inner patch
+    // grass: dark rim, light fill
     canvas.drawPath(grass, Paint()..color = const Color(0xFF59A83A));
     canvas.save();
     canvas.translate(w / 2, h / 2);
@@ -301,7 +890,7 @@ class _WorldMapPainter extends CustomPainter {
     canvas.drawPath(grass, Paint()..color = const Color(0xFF8ED45A));
     canvas.restore();
 
-    // mountain with a snow cap, behind the first landmark
+    // mountain with a snow cap, behind the first house
     final mx = w * 0.5, mBase = top + w * 0.09, mTop = top - w * 0.12;
     final mountain = Path()
       ..moveTo(mx - w * 0.22, mBase)
@@ -312,72 +901,53 @@ class _WorldMapPainter extends CustomPainter {
     final snow = Path()
       ..moveTo(mx - w * 0.07, mTop + w * 0.06)
       ..quadraticBezierTo(mx - w * 0.03, mTop + w * 0.02, mx, mTop)
-      ..quadraticBezierTo(mx + w * 0.03, mTop + w * 0.02, mx + w * 0.07, mTop + w * 0.06)
+      ..quadraticBezierTo(
+        mx + w * 0.03,
+        mTop + w * 0.02,
+        mx + w * 0.07,
+        mTop + w * 0.06,
+      )
       ..lineTo(mx + w * 0.035, mTop + w * 0.05)
       ..lineTo(mx, mTop + w * 0.07)
       ..lineTo(mx - w * 0.035, mTop + w * 0.05)
       ..close();
     canvas.drawPath(snow, Paint()..color = Colors.white);
 
-    // the winding path through every landmark, with white stepping dots
-    final pts = [Offset(l.centers.isEmpty ? w / 2 : l.centers.first.dx, top + w * 0.07), ...l.centers];
-    final samples = <Offset>[];
+    // the winding path through every house, with white stepping dots
+    final pts = [
+      Offset(l.centers.isEmpty ? w / 2 : l.centers.first.dx, top + w * 0.07),
+      ...l.centers,
+    ];
     if (pts.length >= 2) {
       final path = _open(pts);
-      final outer = Paint()..color = const Color(0xFFD9A35B)..style = PaintingStyle.stroke..strokeWidth = l.size * 0.34..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
-      final inner = Paint()..color = const Color(0xFFF2D49B)..style = PaintingStyle.stroke..strokeWidth = l.size * 0.27..strokeCap = StrokeCap.round..strokeJoin = StrokeJoin.round;
+      final outer = Paint()
+        ..color = const Color(0xFFD9A35B)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = l.size * 0.34
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round;
+      final inner = Paint()
+        ..color = const Color(0xFFF2D49B)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = l.size * 0.27
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round;
       canvas.drawPath(path, outer);
       canvas.drawPath(path, inner);
       final dot = Paint()..color = Colors.white;
       for (final m in path.computeMetrics()) {
         for (var d = 14.0; d < m.length; d += 24) {
-          final p = m.getTangentForOffset(d)!.position;
-          canvas.drawCircle(p, 4, dot);
-        }
-        for (var d = 0.0; d < m.length; d += 18) {
-          samples.add(m.getTangentForOffset(d)!.position);
+          canvas.drawCircle(m.getTangentForOffset(d)!.position, 4, dot);
         }
       }
-    }
-
-    // trees and flowers, never on the path or under a landmark
-    bool clear(Offset p, double r) {
-      for (final c in l.centers) {
-        if ((p - c).distance < l.size * 0.62 + r) return false;
-        // the name plate under each badge
-        if (p.dx > c.dx - l.size * 0.65 - r && p.dx < c.dx + l.size * 0.65 + r && p.dy > c.dy + l.size * 0.3 && p.dy < c.dy + l.size * 0.5 + 62 + r) return false;
-      }
-      for (final q in samples) {
-        if ((p - q).distance < l.size * 0.17 + r + 4) return false;
-      }
-      return true;
-    }
-
-    final canopy = const [Color(0xFF3FA34D), Color(0xFFFFB6C9), Color(0xFF7BC96F), Color(0xFFB59AE8)];
-    final r2 = math.Random(5);
-    var placed = 0;
-    for (var tries = 0; tries < 500 && placed < 26; tries++) {
-      final p = Offset(w * (0.08 + 0.84 * r2.nextDouble()), top + w * 0.14 + (bot - top - w * 0.22) * r2.nextDouble());
-      final r = w * (0.026 + 0.018 * r2.nextDouble());
-      if (!clear(p, r * 1.2)) continue;
-      placed++;
-      canvas.drawOval(Rect.fromCenter(center: p.translate(0, r * 1.15), width: r * 1.9, height: r * 0.6), Paint()..color = const Color(0x33000000));
-      canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: p.translate(0, r * 0.7), width: r * 0.45, height: r * 1.1), const Radius.circular(3)), Paint()..color = const Color(0xFF8A5A33));
-      final col = canopy[placed % canopy.length];
-      canvas.drawCircle(p, r, Paint()..color = col);
-      canvas.drawCircle(p.translate(-r * 0.35, -r * 0.35), r * 0.55, Paint()..color = Color.lerp(col, Colors.white, 0.35)!);
-    }
-    for (var tries = 0, f = 0; tries < 400 && f < 30; tries++) {
-      final p = Offset(w * (0.07 + 0.86 * r2.nextDouble()), top + w * 0.12 + (bot - top - w * 0.18) * r2.nextDouble());
-      if (!clear(p, 6)) continue;
-      f++;
-      canvas.drawCircle(p, 4, Paint()..color = [const Color(0xFFFFE066), Colors.white, const Color(0xFFFF8FB1)][f % 3]);
-      canvas.drawCircle(p, 1.6, Paint()..color = const Color(0xFFFFA000));
     }
   }
 
   @override
-  bool shouldRepaint(_WorldMapPainter old) => old.l.height != l.height || old.l.width != l.width || old.l.centers.length != l.centers.length;
+  bool shouldRepaint(_WorldMapPainter old) =>
+      old.l.height != l.height ||
+      old.l.width != l.width ||
+      old.l.centers.length != l.centers.length;
 }
 
 /// A small switch between the two homes. The list stays the default.
@@ -392,7 +962,9 @@ class HomeViewToggle extends StatelessWidget {
         final map = HomeViewPref.instance.mapView;
         return IconButton(
           key: const ValueKey('home_view_toggle'),
-          tooltip: map ? tr2('عرض القائمة', 'List view') : tr2('عرض الخريطة', 'Map view'),
+          tooltip: map
+              ? tr2('عرض القائمة', 'List view')
+              : tr2('عرض الخريطة', 'Map view'),
           onPressed: () => HomeViewPref.instance.set(!map),
           icon: Icon(map ? Icons.view_agenda_rounded : Icons.map_rounded),
         );

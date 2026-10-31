@@ -31,10 +31,12 @@ void main() {
     expect(trKey('app.name', 'fr'), 'رحلتي');
   });
 
-  test('the choice is saved and read back; no saved choice means ask', () async {
+  test('the choice is saved and read back; no saved choice means Arabic, without asking', () async {
     SharedPreferences.setMockInitialValues({});
     await AppLocale.instance.load();
-    expect(AppLocale.instance.needsChoice, isTrue);
+    expect(AppLocale.instance.needsChoice, isFalse);
+    expect(AppLocale.instance.code, 'ar');
+    expect(AppLocale.instance.direction, TextDirection.rtl);
     await AppLocale.instance.set('en');
     expect(AppLocale.instance.direction, TextDirection.ltr);
     AppLocale.instance.code = 'ar';
@@ -44,15 +46,22 @@ void main() {
     await AppLocale.instance.set('ar');
   });
 
-  testWidgets('first launch asks for the language, English flips to left-to-right', (tester) async {
+  testWidgets('first launch shows no language screen and opens in Arabic (right-to-left)', (tester) async {
     SharedPreferences.setMockInitialValues({});
     await AppLocale.instance.load();
     JourneyStore.instance;
     await tester.pumpWidget(_app());
     await tester.pump();
-    expect(find.byType(LanguageScreen), findsOneWidget);
-    await tester.tap(find.text('English'));
-    await tester.pump();
+    expect(find.byType(LanguageScreen), findsNothing);
+    expect(find.byType(StartScreen), findsOneWidget);
+    expect(AppLocale.instance.code, 'ar');
+    expect(Directionality.of(tester.element(find.byType(StartScreen))), TextDirection.rtl);
+  });
+
+  testWidgets('a saved English choice is kept and opens left-to-right', (tester) async {
+    SharedPreferences.setMockInitialValues({'ui_lang': 'en'});
+    await AppLocale.instance.load();
+    await tester.pumpWidget(_app());
     await tester.pump();
     expect(find.byType(LanguageScreen), findsNothing);
     expect(AppLocale.instance.code, 'en');

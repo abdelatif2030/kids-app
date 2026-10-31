@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:kids_app/design/rehlaty_heart.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/data_reset.dart';
 import 'package:kids_app/games/choice_games.dart';
@@ -109,11 +110,11 @@ void main() {
     testWidgets('the heart shows the saved state and toggles it', (tester) async {
       await tester.runAsync(() => FavoritesStore.toggle('k1', 'word', 'cat'));
       await _show(tester, const HeartButton(childId: 'k1', kind: 'word', refId: 'cat'));
-      expect(find.byIcon(Icons.favorite_rounded), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is RehlatyHeart && w.filled), findsOneWidget);
       await tester.tap(find.byType(IconButton));
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
       await tester.pump();
-      expect(find.byIcon(Icons.favorite_border_rounded), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is RehlatyHeart && !w.filled), findsOneWidget);
       expect(await tester.runAsync(() => FavoritesStore.of('k1', 'word')), isEmpty);
     });
 

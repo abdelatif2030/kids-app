@@ -187,11 +187,13 @@ void main() {
       await tester.runAsync(_setup);
       await tester.pumpWidget(_app(const ChildShell(child: _kid), 1.0));
       await _settle(tester);
-      for (final label in ['الرئيسية', 'ألعاب', 'إبداع', 'أنا']) {
+      for (final label in ['الرئيسية', 'ألعاب', 'إبداع', 'أنا', 'المزيد']) {
         expect(find.bySemanticsLabel(label), findsWidgets, reason: label);
       }
       expect(find.byTooltip('خروج (للأهل)'), findsOneWidget);
       expect(find.byTooltip('إعدادات الوالدين'), findsOneWidget);
+      await tester.tap(find.text('المزيد').last);
+      await tester.pump();
       final toggle = find.byKey(const ValueKey('lands_toggle'));
       expect(find.bySemanticsLabel(RegExp('أراضيّ.*اضغط للعرض|أراضي.*اضغط للعرض')), findsOneWidget);
       await tester.scrollUntilVisible(toggle, 300, scrollable: find.byType(Scrollable).first);

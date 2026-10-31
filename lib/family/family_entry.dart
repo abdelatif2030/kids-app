@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../design/components.dart';
 import '../l10n/strings.dart';
+import '../online_unavailable.dart';
 import '../teachers_models.dart';
 import '../teachers_screens.dart' show AuthScreen;
 import 'family_repository.dart';
@@ -48,11 +49,7 @@ class _FamilyEntryScreenState extends State<FamilyEntryScreen> {
     if (auth == null || fam == null) {
       return Scaffold(
         appBar: AppBar(title: Text(title)),
-        body: EmptyState(
-          icon: Icons.cloud_off_rounded,
-          title: tr2('الخدمة غير مفعّلة بعد', 'Not switched on yet'),
-          message: tr2('تحتاج المحادثات العائلية إلى مشروع Firebase يربطه صاحب التطبيق.', 'Family chat needs a Firebase project that the app owner connects.'),
-        ),
+        body: OnlineUnavailableView(what: tr2('المحادثات والمكالمات العائلية.', 'Family chat and calls.')),
       );
     }
     if (auth.currentUser == null) {

@@ -11,11 +11,12 @@ class AppLocale extends ChangeNotifier {
 
   String code = 'ar';
 
-  /// True only when `load()` found no saved choice: the first screen then asks.
+  /// Kept for the (unused) language screen; `load()` no longer sets it, so no screen asks at first launch.
   bool needsChoice = false;
 
   bool get isArabic => code == 'ar';
-  TextDirection get direction => isArabic ? TextDirection.rtl : TextDirection.ltr;
+  TextDirection get direction =>
+      isArabic ? TextDirection.rtl : TextDirection.ltr;
   Locale get locale => Locale(code);
 
   /// Screens already on the navigation stack hold texts of the old language.
@@ -42,7 +43,10 @@ class AppLocale extends ChangeNotifier {
       code = saved;
       needsChoice = false;
     } else {
-      needsChoice = true;
+      // New installation: Arabic, with no language screen. Nothing is saved, so the first real choice (Parent
+      // settings) is stored as usual and existing users keep theirs.
+      code = 'ar';
+      needsChoice = false;
     }
     notifyListeners();
   }

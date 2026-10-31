@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:kids_app/design/layout.dart';
+import 'package:kids_app/design/rehlaty_heart.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/curriculum.dart';
 import 'package:kids_app/teachers_directory.dart';
@@ -214,13 +216,13 @@ void main() {
       final repo = FakeTeacherRepository();
       await repo.register(email: 't@example.com', password: '123456', name: 'مدرس', role: UserRole.teacher);
       // Trying to claim badges on creation is ignored.
-      await repo.saveTeacherProfile(_t(repo.currentUser!.uid, 'مدرس', idV: true, qualV: true));
+      await repo.saveTeacherProfile(_t(repo.currentUser!.uid, 'مدرس', idV: true, qualV: true)); repo.approveForTest(repo.currentUser!.uid); // the owner approves in the console
       var mine = (await repo.myTeacherProfile())!;
       expect([mine.identityVerified, mine.qualificationVerified], [false, false]);
       // The owner verifies identity only.
       repo.verify(repo.currentUser!.uid, identity: true);
       // The teacher saves again and tries to add the other badge: it stays as the owner set it.
-      await repo.saveTeacherProfile(_t(repo.currentUser!.uid, 'مدرس', qualV: true, bio: 'نبذة جديدة'));
+      await repo.saveTeacherProfile(_t(repo.currentUser!.uid, 'مدرس', qualV: true, bio: 'نبذة جديدة')); repo.approveForTest(repo.currentUser!.uid); // the owner approves in the console
       mine = (await repo.myTeacherProfile())!;
       expect([mine.identityVerified, mine.qualificationVerified], [true, false]);
       expect(mine.bio, 'نبذة جديدة');
@@ -294,13 +296,13 @@ void main() {
       expect(await tester.runAsync(TeacherFavorites.load), hasLength(1));
       await tester.tap(find.text('❤️ المفضلة فقط'));
       await tester.pump();
-      expect(find.byIcon(Icons.favorite_rounded), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is RehlatyHeart && w.filled), findsOneWidget);
       expect(find.byType(Card).evaluate().length, lessThan(5));
       // Reopening keeps it.
       await _open(tester, repo);
       await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 100)));
       await tester.pump();
-      expect(find.byIcon(Icons.favorite_rounded), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is RehlatyHeart && w.filled), findsOneWidget);
     });
 
     testWidgets('compare up to three; the fourth is refused; the table shows honest values', (tester) async {
@@ -337,7 +339,7 @@ void main() {
       tall(tester);
       final repo = await _repoWith([for (var i = 0; i < 14; i++) _t('t$i', 'مدرس ${i.toString().padLeft(2, '0')}')]);
       await _open(tester, repo);
-      await tester.scrollUntilVisible(find.text('عرض المزيد (4)'), 300, scrollable: find.byType(Scrollable).last);
+      await tester.scrollUntilVisible(find.text('عرض المزيد (4)'), 300, scrollable: find.descendant(of: find.byType(CenteredList), matching: find.byType(Scrollable)).first);
       expect(find.text('عرض المزيد (4)'), findsOneWidget);
       await tester.tap(find.text('عرض المزيد (4)'));
       await tester.pump();

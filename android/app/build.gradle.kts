@@ -7,6 +7,13 @@ val keyProps = Properties().apply {
     if (f.exists()) f.inputStream().use { load(it) }
 }
 
+if (!keyProps.containsKey("storeFile")) {
+    logger.warn(
+        "Rehlaty: android/key.properties not found. Release builds are signed with the DEBUG key and Google Play will " +
+            "refuse them. See docs/ANDROID_SIGNING.md."
+    )
+}
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.

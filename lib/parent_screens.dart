@@ -1,4 +1,12 @@
-import 'design/components.dart' show SectionHeader, showToast;
+import 'online_gate.dart';
+import 'app_info.dart';
+import 'design/tokens.dart';
+import 'journey/avatars.dart';
+import 'journey/models.dart';
+import 'media/engine_settings_screen.dart';
+import 'parent/parent_widgets.dart';
+import 'video_controls.dart';
+import 'design/components.dart' show showToast;
 import 'assistant/assistant_screen.dart';
 import 'journey/repository.dart' show JourneyStore;
 import 'offline/offline_ui.dart';
@@ -89,11 +97,17 @@ class _ParentQuestionDialogState extends State<_ParentQuestionDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      scrollable: true,
       title: Text(tr2('سؤال للكبار', 'A question for grown-ups')),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(tr2('لفتح إعدادات الوالدين: كم ناتج ${widget.a} × ${widget.b}؟', 'To open the parent settings: what is ${widget.a} × ${widget.b}?')),
+          Text(
+            tr2(
+              'لفتح إعدادات الوالدين: كم ناتج ${widget.a} × ${widget.b}؟',
+              'To open the parent settings: what is ${widget.a} × ${widget.b}?',
+            ),
+          ),
           const SizedBox(height: 12),
           TextField(
             key: const ValueKey('parent_answer'),
@@ -101,13 +115,20 @@ class _ParentQuestionDialogState extends State<_ParentQuestionDialog> {
             autofocus: true,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: InputDecoration(errorText: _wrong ? tr2('إجابة غير صحيحة', 'That is not right') : null),
+            decoration: InputDecoration(
+              errorText: _wrong
+                  ? tr2('إجابة غير صحيحة', 'That is not right')
+                  : null,
+            ),
             onSubmitted: (_) => _check(),
           ),
         ],
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(context, false), child: Text(tr2('إلغاء', 'Cancel'))),
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(tr2('إلغاء', 'Cancel')),
+        ),
         FilledButton(onPressed: _check, child: Text(tr2('متابعة', 'Continue'))),
       ],
     );
@@ -348,323 +369,540 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => isStart ? _quietStart = picked : _quietEnd = picked);
   }
 
+  /// A child's card opens the actions for THAT child: their progress, and their profile and avatar.
+  void _childActions(ChildProfile c) {
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheet) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: ChildAvatar(child: c, size: 48),
+              title: Text(c.nickname, style: DS.heading),
+              subtitle: Text(tr2('${c.age} سنوات', '${c.age} years old')),
+            ),
+            ListTile(
+              key: const ValueKey('child_sheet_progress'),
+              leading: const Icon(Icons.insights_rounded, color: DS.primary),
+              title: Text(
+                tr2('تقدم ${c.nickname}', "${c.nickname}'s progress"),
+              ),
+              onTap: () {
+                Navigator.pop(sheet);
+                _go(DashboardScreen(childId: c.id));
+              },
+            ),
+            ListTile(
+              key: const ValueKey('child_sheet_edit'),
+              leading: const Icon(Icons.edit_rounded, color: DS.primary),
+              title: Text(
+                tr2('تعديل الملف والصورة', 'Edit profile and avatar'),
+              ),
+              onTap: () {
+                Navigator.pop(sheet);
+                _go(ChildEditScreen(child: c));
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _go(Widget screen) =>
+      Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+
+  void _openAssistant() {
+    final c =
+        JourneyStore.instance.active ??
+        (JourneyStore.instance.profiles.isEmpty
+            ? null
+            : JourneyStore.instance.profiles.first);
+    if (c == null) {
+      showToast(context, tr2('أضف طفلاً أولاً.', 'Add a child first.'));
+      return;
+    }
+    _go(PlanAssistantScreen(child: c));
+  }
+
   @override
   Widget build(BuildContext context) {
+    const purple = DS.primary;
+    const teal = Color(0xFF14958F);
+    const pink = Color(0xFFD6457A);
+    const amber = Color(0xFFD98A0B);
+    const blue = Color(0xFF2B6FD6);
     return Scaffold(
-      appBar: AppBar(title: Text(loc('إعدادات الوالدين'))),
+      backgroundColor: DS.cream,
+      appBar: AppBar(
+        title: Text(loc('إعدادات الوالدين')),
+        backgroundColor: const Color(0xFF2E1A6B),
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
       body: !_loaded
           ? const Center(child: CircularProgressIndicator())
           : CenteredList(
+              padding: EdgeInsets.zero,
               children: [
-                SectionHeader(
-                  tr2('الأطفال والمتابعة', 'Children and progress'),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.child_care_rounded),
-                  title: Text(loc('الأطفال')),
-                  subtitle: Text(loc('إضافة وتعديل وحذف ملفات الأطفال وخططهم')),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ChildrenScreen()),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.insights_rounded),
-                  title: Text(loc('لوحة متابعة الطفل')),
-                  subtitle: Text(loc('المهارات والوقت وتقرير الأسبوع')),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const DashboardScreen()),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.checklist_rounded),
-                  title: Text(loc('الخطة الأسبوعية والمتابعة')),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const PlanScreen()),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.edit_note_rounded),
-                  title: Text(loc('ملاحظات')),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const NotesScreen()),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.bar_chart),
-                  title: Text(loc('ملخص المشاهدة')),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const WatchSummaryScreen(),
-                    ),
-                  ),
-                ),
-                SectionHeader(tr2('التعلّم اليومي', 'Daily learning')),
-                ListTile(
-                  key: const ValueKey('open_assistant'),
-                  leading: const Icon(Icons.auto_awesome_rounded),
-                  title: Text(tr2('مساعد رحلتي: خطة كاملة', 'Rehlaty assistant: a full plan')),
-                  subtitle: Text(tr2('احكِ عن طفلك واحصل على ثلاث خطط مع فيديوهات', 'Tell us about your child and get three plans with videos')),
-                  onTap: () {
-                    final c = JourneyStore.instance.active ?? (JourneyStore.instance.profiles.isEmpty ? null : JourneyStore.instance.profiles.first);
-                    if (c == null) {
-                      showToast(context, tr2('أضف طفلاً أولاً.', 'Add a child first.'));
-                      return;
-                    }
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => PlanAssistantScreen(child: c)));
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.graphic_eq_rounded),
-                  title: Text(loc('الصوت والتعلّم')),
-                  subtitle: Text(
-                    loc(
-                      'القراءة بالصوت، صوت الطبيعة، ترتيب الحروف، وتصدير بيانات الطفل',
-                    ),
-                  ),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const AudioSettingsScreen(),
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.today_rounded),
-                  title: Text(tr2('محطات «يومي»', 'My day stations')),
-                  subtitle: Text(
-                    tr2(
-                      'اختر ما يظهر لطفلك كل يوم',
-                      'Choose what your child sees each day',
-                    ),
-                  ),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const DaySettingsScreen(),
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.home_rounded),
-                  title: Text(loc('أنشطة البيت')),
-                  subtitle: Text(
-                    loc('مهام حقيقية بعد الأنشطة: أكّد أن الطفل فعلها'),
-                  ),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ParentHomeTasksScreen(),
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.print_rounded),
-                  title: Text(loc('أوراق للطباعة')),
-                  subtitle: Text(
-                    loc(
-                      'أوراق تمرين جاهزة للطباعة: تتبّع الحروف، عدّ، أشكال، قراءة',
-                    ),
-                  ),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const PrintablesScreen()),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.photo_library_rounded),
-                  title: Text(loc('معرض العائلة')),
-                  subtitle: Text(
-                    loc('أعمال الأطفال المحفوظة على الجهاز، ويمكنك حذفها'),
-                  ),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ParentGalleryScreen(),
-                    ),
-                  ),
-                ),
-                SectionHeader(
-                  tr2('اللغة وسهولة الاستخدام', 'Language and accessibility'),
-                ),
-                ListenableBuilder(
-                  listenable: Listenable.merge([
-                    DisplayPrefs.instance,
-                    AppLocale.instance,
-                  ]),
-                  builder: (context, _) => Column(
+                ParentHeader(onChild: _childActions),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: Row(
                     children: [
-                      ListTile(
-                        leading: const Icon(Icons.language_rounded),
-                        title: Text(context.tr('lang.setting')),
-                        trailing: DropdownButton<String>(
-                          value: AppLocale.instance.code,
-                          items: [
-                            DropdownMenuItem(
-                              value: 'ar',
-                              child: Text(loc('العربية')),
-                            ),
-                            DropdownMenuItem(
-                              value: 'en',
-                              child: Text('English'),
-                            ),
-                          ],
-                          onChanged: (v) async {
-                            if (v == null) return;
-                            await AppLocale.instance.set(v);
-                            if (context.mounted) showToast(context, tr2('تم حفظ اللغة', 'Language saved'));
-                          },
+                      Expanded(
+                        child: ParentQuickTile(
+                          keyName: 'progress',
+                          icon: Icons.insights_rounded,
+                          label: loc('لوحة متابعة الطفل'),
+                          colors: const [Color(0xFF8A5CFF), DS.primary],
+                          onTap: () => _go(const DashboardScreen()),
                         ),
                       ),
-                      ListTile(
-                        leading: const Icon(Icons.text_fields_rounded),
-                        title: Text(loc('حجم الخط')),
-                        trailing: DropdownButton<double>(
-                          value: DisplayPrefs.instance.textScale,
-                          items: [
-                            for (final e in DisplayPrefs.scales.entries)
-                              DropdownMenuItem(
-                                value: e.key,
-                                child: Text(e.value),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ParentQuickTile(
+                          keyName: 'children',
+                          icon: Icons.child_care_rounded,
+                          label: loc('الأطفال'),
+                          colors: const [Color(0xFF2EC4B6), teal],
+                          onTap: () => _go(const ChildrenScreen()),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ParentQuickTile(
+                          keyName: 'family',
+                          icon: Icons.forum_rounded,
+                          label: lastOnlineGate.open ? tr2('عائلتي: المحادثات', 'Family chat') : tr2('المحادثات: إصدار لاحق', 'Chat: later version'),
+                          colors: const [Color(0xFFFF8FB6), pink],
+                          onTap: () => openFamily(
+                            context,
+                            asRelative: false,
+                            auth: teacherRepository,
+                            family: familyRepository,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ParentQuickTile(
+                          keyName: 'privacy',
+                          icon: Icons.privacy_tip_outlined,
+                          label: loc('الخصوصية والبيانات'),
+                          colors: const [Color(0xFF5BA8FF), blue],
+                          onTap: () => _go(const PrivacyScreen()),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
+                  child: Column(
+                    children: [
+                      // A. Progress and learning
+                      ParentGroup(
+                        title: tr2('التقدم والتعلّم', 'Progress and learning'),
+                        icon: Icons.insights_rounded,
+                        color: purple,
+                        children: [
+                          ParentRow(
+                            icon: Icons.insights_rounded,
+                            color: purple,
+                            title: loc('لوحة متابعة الطفل'),
+                            subtitle: loc('المهارات والوقت وتقرير الأسبوع'),
+                            onTap: () => _go(const DashboardScreen()),
+                          ),
+                          ParentRow(
+                            icon: Icons.checklist_rounded,
+                            color: purple,
+                            title: loc('الخطة الأسبوعية والمتابعة'),
+                            onTap: () => _go(const PlanScreen()),
+                          ),
+                          ParentRow(
+                            icon: Icons.bar_chart,
+                            color: purple,
+                            title: loc('ملخص المشاهدة'),
+                            onTap: () => _go(const WatchSummaryScreen()),
+                          ),
+                          ParentRow(
+                            key: const ValueKey('open_assistant'),
+                            icon: Icons.auto_awesome_rounded,
+                            color: purple,
+                            title: tr2(
+                              'مساعد رحلتي: خطة كاملة',
+                              'Rehlaty assistant: a full plan',
+                            ),
+                            subtitle: tr2(
+                              'احكِ عن طفلك واحصل على ثلاث خطط مع فيديوهات',
+                              'Tell us about your child and get three plans with videos',
+                            ),
+                            onTap: _openAssistant,
+                          ),
+                          ParentRow(
+                            icon: Icons.home_rounded,
+                            color: purple,
+                            title: loc('أنشطة البيت'),
+                            subtitle: loc(
+                              'مهام حقيقية بعد الأنشطة: أكّد أن الطفل فعلها',
+                            ),
+                            onTap: () => _go(const ParentHomeTasksScreen()),
+                          ),
+                          ParentRow(
+                            icon: Icons.edit_note_rounded,
+                            color: purple,
+                            title: loc('ملاحظات'),
+                            onTap: () => _go(const NotesScreen()),
+                          ),
+                          ParentRow(
+                            icon: Icons.print_rounded,
+                            color: purple,
+                            title: loc('أوراق للطباعة'),
+                            subtitle: loc(
+                              'أوراق تمرين جاهزة للطباعة: تتبّع الحروف، عدّ، أشكال، قراءة',
+                            ),
+                            onTap: () => _go(const PrintablesScreen()),
+                          ),
+                          ParentRow(
+                            icon: Icons.photo_library_rounded,
+                            color: purple,
+                            title: loc('معرض العائلة'),
+                            subtitle: loc(
+                              'أعمال الأطفال المحفوظة على الجهاز، ويمكنك حذفها',
+                            ),
+                            onTap: () => _go(const ParentGalleryScreen()),
+                          ),
+                        ],
+                      ),
+                      // C. Child management
+                      ParentGroup(
+                        title: tr2('إدارة الأطفال', 'Children'),
+                        icon: Icons.child_care_rounded,
+                        color: teal,
+                        children: [
+                          ParentRow(
+                            icon: Icons.child_care_rounded,
+                            color: teal,
+                            title: loc('الأطفال'),
+                            subtitle: loc(
+                              'إضافة وتعديل وحذف ملفات الأطفال وخططهم',
+                            ),
+                            onTap: () => _go(const ChildrenScreen()),
+                          ),
+                          ParentRow(
+                            icon: Icons.today_rounded,
+                            color: teal,
+                            title: tr2('محطات «يومي»', 'My day stations'),
+                            subtitle: tr2(
+                              'اختر ما يظهر لطفلك كل يوم',
+                              'Choose what your child sees each day',
+                            ),
+                            onTap: () => _go(const DaySettingsScreen()),
+                          ),
+                        ],
+                      ),
+                      // D. Safety and privacy
+                      ParentGroup(
+                        title: tr2('الأمان والخصوصية', 'Safety and privacy'),
+                        icon: Icons.shield_rounded,
+                        color: pink,
+                        children: [
+                          ListTile(
+                            minTileHeight: 60,
+                            title: Text(
+                              loc('الحد اليومي للوقت'),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
                               ),
-                          ],
-                          onChanged: (v) async {
-                            if (v == null) return;
-                            await DisplayPrefs.instance.setTextScale(v);
-                            if (context.mounted) showToast(context, tr2('تم حفظ حجم الخط', 'Text size saved'));
-                          },
-                        ),
+                            ),
+                            trailing: DropdownButton<int>(
+                              value: _limit,
+                              items: [
+                                for (final m in _limits)
+                                  DropdownMenuItem(
+                                    value: m,
+                                    child: Text(tr2('$m دقيقة', '$m minutes')),
+                                  ),
+                              ],
+                              onChanged: (m) async {
+                                if (m == null) return;
+                                await _settings.setDailyLimitMinutes(m);
+                                setState(() => _limit = m);
+                                if (context.mounted) {
+                                  showToast(
+                                    context,
+                                    tr2(
+                                      'تم حفظ الحد اليومي',
+                                      'Daily limit saved',
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                          SwitchListTile(
+                            title: Text(
+                              loc('ساعات الهدوء'),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            subtitle: Text(
+                              loc('لن يبدأ وضع الطفل خلال هذه الساعات'),
+                            ),
+                            value: _quietOn,
+                            onChanged: (v) async {
+                              await _settings.setQuietEnabled(v);
+                              setState(() => _quietOn = v);
+                              if (context.mounted) {
+                                showToast(
+                                  context,
+                                  tr2(
+                                    'تم حفظ ساعات الهدوء',
+                                    'Quiet hours saved',
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                          ListTile(
+                            enabled: _quietOn,
+                            title: Text(loc('من')),
+                            trailing: Text(_quietStart.format(context)),
+                            onTap: () => _pickTime(_quietStart, true),
+                          ),
+                          ListTile(
+                            enabled: _quietOn,
+                            title: Text(loc('إلى')),
+                            trailing: Text(_quietEnd.format(context)),
+                            onTap: () => _pickTime(_quietEnd, false),
+                          ),
+                          ParentRow(
+                            key: const ValueKey('family_chat_tile'),
+                            icon: Icons.forum_rounded,
+                            color: pink,
+                            title: tr2('عائلتي: المحادثات', 'Family chat'),
+                            subtitle: lastOnlineGate.open
+                                ? tr2(
+                                    'أقارب موافَق عليهم يراسلون طفلك، وتقرأ أنت كل شيء',
+                                    'Approved relatives message your child; you can read everything',
+                                  )
+                                : tr2('ليس جزءاً من هذا الإصدار — يأتي لاحقاً', 'Not part of this version — planned for later'),
+                            onTap: () => openFamily(
+                              context,
+                              asRelative: false,
+                              auth: teacherRepository,
+                              family: familyRepository,
+                            ),
+                          ),
+                          ParentRow(
+                            icon: Icons.school_rounded,
+                            color: pink,
+                            title: loc('المدرسون وحسابي'),
+                            subtitle: lastOnlineGate.open
+                                ? tr2('مدرسون يسجّلون بأنفسهم (لم يراجعهم التطبيق) وحجز حصص أونلاين', 'Teachers register themselves (the app has not vetted them); book online lessons')
+                                : tr2('ليس جزءاً من هذا الإصدار — يأتي لاحقاً', 'Not part of this version — planned for later'),
+                            onTap: () => _go(const TeachersEntryScreen()),
+                          ),
+                          ParentRow(
+                            key: const ValueKey('video_review_tile'),
+                            icon: Icons.video_library_rounded,
+                            color: pink,
+                            title: tr2('مكتبة الدروس والفيديوهات', 'Lesson library'),
+                            subtitle: tr2('لا يرى طفلك أي فيديو قبل موافقتك عليه', 'Your child sees no video until you approve it'),
+                            onTap: () => _go(const VideoReviewScreen()),
+                          ),
+                          ParentRow(
+                            icon: Icons.privacy_tip_outlined,
+                            color: pink,
+                            title: loc('الخصوصية والبيانات'),
+                            subtitle: loc('ما نحفظه، وحذف بيانات الأطفال'),
+                            onTap: () => _go(const PrivacyScreen()),
+                          ),
+                          ParentRow(
+                            key: const ValueKey('permissions_tile'),
+                            icon: Icons.admin_panel_settings_outlined,
+                            color: pink,
+                            title: tr2('الأذونات', 'Permissions'),
+                            subtitle: tr2(
+                              'الميكروفون والكاميرا والملفات: لماذا ومتى',
+                              'Microphone, camera and files: why and when',
+                            ),
+                            onTap: () => _go(const PermissionsScreen()),
+                          ),
+                          ParentRow(
+                            icon: Icons.lock_reset,
+                            color: pink,
+                            title: loc('تغيير الرمز السري'),
+                            onTap: () => Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const PinSetupScreen(),
+                              ),
+                            ),
+                          ),
+                          ParentRow(
+                            icon: Icons.flag_rounded,
+                            color: pink,
+                            title: loc('الإبلاغ عن مشكلة أو محتوى'),
+                            subtitle: loc(
+                              'رسالة تنسخها وترسلها بنفسك، بدون بيانات الطفل',
+                            ),
+                            onTap: () => _go(const ReportProblemScreen()),
+                          ),
+                        ],
                       ),
-                      SwitchListTile(
-                        secondary: const Icon(Icons.animation_rounded),
-                        title: Text(loc('تقليل الحركة')),
-                        subtitle: Text(
-                          loc('يوقف الحركات والتأثيرات في شاشات الطفل'),
-                        ),
-                        value: DisplayPrefs.instance.reduceMotion,
-                        onChanged: (v) async {
-                          await DisplayPrefs.instance.setReduceMotion(v);
-                          if (context.mounted) showToast(context, tr2('تم حفظ الإعداد', 'Setting saved'));
-                        },
+                      // E. App settings
+                      ParentGroup(
+                        title: tr2('إعدادات التطبيق', 'App settings'),
+                        icon: Icons.tune_rounded,
+                        color: amber,
+                        children: [
+                          ListenableBuilder(
+                            listenable: Listenable.merge([
+                              DisplayPrefs.instance,
+                              AppLocale.instance,
+                            ]),
+                            builder: (context, _) => Column(
+                              children: [
+                                ListTile(
+                                  leading: const Icon(
+                                    Icons.language_rounded,
+                                    color: amber,
+                                  ),
+                                  title: Text(context.tr('lang.setting')),
+                                  trailing: DropdownButton<String>(
+                                    value: AppLocale.instance.code,
+                                    items: [
+                                      DropdownMenuItem(
+                                        value: 'ar',
+                                        child: Text(loc('العربية')),
+                                      ),
+                                      const DropdownMenuItem(
+                                        value: 'en',
+                                        child: Text('English'),
+                                      ),
+                                    ],
+                                    onChanged: (v) async {
+                                      if (v == null) return;
+                                      await AppLocale.instance.set(v);
+                                      if (context.mounted) {
+                                        showToast(
+                                          context,
+                                          tr2('تم حفظ اللغة', 'Language saved'),
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ),
+                                ListTile(
+                                  leading: const Icon(
+                                    Icons.text_fields_rounded,
+                                    color: amber,
+                                  ),
+                                  title: Text(loc('حجم الخط')),
+                                  trailing: DropdownButton<double>(
+                                    value: DisplayPrefs.instance.textScale,
+                                    items: [
+                                      for (final e
+                                          in DisplayPrefs.scales.entries)
+                                        DropdownMenuItem(
+                                          value: e.key,
+                                          child: Text(e.value),
+                                        ),
+                                    ],
+                                    onChanged: (v) async {
+                                      if (v == null) return;
+                                      await DisplayPrefs.instance.setTextScale(
+                                        v,
+                                      );
+                                      if (context.mounted) {
+                                        showToast(
+                                          context,
+                                          tr2(
+                                            'تم حفظ حجم الخط',
+                                            'Text size saved',
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ),
+                                SwitchListTile(
+                                  secondary: const Icon(
+                                    Icons.animation_rounded,
+                                    color: amber,
+                                  ),
+                                  title: Text(loc('تقليل الحركة')),
+                                  subtitle: Text(
+                                    loc(
+                                      'يوقف الحركات والتأثيرات في شاشات الطفل',
+                                    ),
+                                  ),
+                                  value: DisplayPrefs.instance.reduceMotion,
+                                  onChanged: (v) async {
+                                    await DisplayPrefs.instance.setReduceMotion(
+                                      v,
+                                    );
+                                    if (context.mounted) {
+                                      showToast(
+                                        context,
+                                        tr2('تم حفظ الإعداد', 'Setting saved'),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          ParentRow(
+                            icon: Icons.graphic_eq_rounded,
+                            color: amber,
+                            title: loc('الصوت والتعلّم'),
+                            subtitle: loc(
+                              'القراءة بالصوت، صوت الطبيعة، ترتيب الحروف، وتصدير بيانات الطفل',
+                            ),
+                            onTap: () => _go(const AudioSettingsScreen()),
+                          ),
+                          ParentRow(
+                            key: const ValueKey('engine_tile'),
+                            icon: Icons.record_voice_over_rounded,
+                            color: amber,
+                            title: tr2('أصوات الشخصيات', 'Character voices'),
+                            subtitle: tr2('آدم ونور والرفيق: تشغيل وإيقاف واختيار الصوت', 'Adam, Nour and the companion: on, off and voice choice'),
+                            onTap: () => _go(const EngineSettingsScreen()),
+                          ),
+                          ParentRow(
+                            icon: Icons.cloud_off_rounded,
+                            color: amber,
+                            title: tr2('العمل بلا إنترنت', 'Working offline'),
+                            subtitle: tr2(
+                              'ما يعمل وما يحتاج اتصالاً',
+                              'What works and what needs a connection',
+                            ),
+                            onTap: () => _go(const OfflineGuideScreen()),
+                          ),
+                          ParentRow(
+                            icon: Icons.dashboard_customize_rounded,
+                            color: amber,
+                            title: loc('إدارة المحتوى (تجريبي)'),
+                            subtitle: loc('الأقسام والأسئلة والمكافآت والخطط'),
+                            onTap: () => _go(const AdminScreen()),
+                          ),
+                          ParentRow(
+                            key: const ValueKey('app_version_row'),
+                            icon: Icons.info_outline_rounded,
+                            color: amber,
+                            title: tr2('إصدار التطبيق', 'App version'),
+                            subtitle: kAppVersion,
+                            onTap: () {},
+                          ),
+                        ],
                       ),
                     ],
-                  ),
-                ),
-                SectionHeader(tr2('وقت الاستخدام', 'Screen time')),
-                ListTile(
-                  title: Text(loc('الحد اليومي للوقت')),
-                  trailing: DropdownButton<int>(
-                    value: _limit,
-                    items: [
-                      for (final m in _limits)
-                        DropdownMenuItem(
-                          value: m,
-                          child: Text(tr2('$m دقيقة', '$m minutes')),
-                        ),
-                    ],
-                    onChanged: (m) async {
-                      if (m == null) return;
-                      await _settings.setDailyLimitMinutes(m);
-                      setState(() => _limit = m);
-                      if (context.mounted) showToast(context, tr2('تم حفظ الحد اليومي', 'Daily limit saved'));
-                    },
-                  ),
-                ),
-                SwitchListTile(
-                  title: Text(loc('ساعات الهدوء')),
-                  subtitle: Text(loc('لن يبدأ وضع الطفل خلال هذه الساعات')),
-                  value: _quietOn,
-                  onChanged: (v) async {
-                    await _settings.setQuietEnabled(v);
-                    setState(() => _quietOn = v);
-                    if (context.mounted) showToast(context, tr2('تم حفظ ساعات الهدوء', 'Quiet hours saved'));
-                  },
-                ),
-                ListTile(
-                  enabled: _quietOn,
-                  title: Text(loc('من')),
-                  trailing: Text(_quietStart.format(context)),
-                  onTap: () => _pickTime(_quietStart, true),
-                ),
-                ListTile(
-                  enabled: _quietOn,
-                  title: Text(loc('إلى')),
-                  trailing: Text(_quietEnd.format(context)),
-                  onTap: () => _pickTime(_quietEnd, false),
-                ),
-                SectionHeader(tr2('الأمان والحساب', 'Safety and account')),
-                ListTile(
-                  leading: const Icon(Icons.cloud_off_rounded),
-                  title: Text(tr2('العمل بلا إنترنت', 'Working offline')),
-                  subtitle: Text(tr2('ما يعمل وما يحتاج اتصالاً', 'What works and what needs a connection')),
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OfflineGuideScreen())),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.lock_reset),
-                  title: Text(loc('تغيير الرمز السري')),
-                  onTap: () => Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const PinSetupScreen()),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.privacy_tip_outlined),
-                  title: Text(loc('الخصوصية والبيانات')),
-                  subtitle: Text(loc('ما نحفظه، وحذف بيانات الأطفال')),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const PrivacyScreen()),
-                  ),
-                ),
-                ListTile(
-                  key: const ValueKey('permissions_tile'),
-                  leading: const Icon(Icons.admin_panel_settings_outlined),
-                  title: Text(tr2('الأذونات', 'Permissions')),
-                  subtitle: Text(tr2('الميكروفون والكاميرا والملفات: لماذا ومتى', 'Microphone, camera and files: why and when')),
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PermissionsScreen())),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.school_rounded),
-                  title: Text(loc('المدرسون وحسابي')),
-                  subtitle: Text(loc('مدرسون معتمدون وحجز حصص أونلاين')),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const TeachersEntryScreen(),
-                    ),
-                  ),
-                ),
-                ListTile(
-                  key: const ValueKey('family_chat_tile'),
-                  leading: const Icon(Icons.forum_rounded),
-                  title: Text(tr2('عائلتي: المحادثات', 'Family chat')),
-                  subtitle: Text(tr2('أقارب موافَق عليهم يراسلون طفلك، وتقرأ أنت كل شيء', 'Approved relatives message your child; you can read everything')),
-                  onTap: () => openFamily(context, asRelative: false, auth: teacherRepository, family: familyRepository),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.dashboard_customize_rounded),
-                  title: Text(loc('إدارة المحتوى (تجريبي)')),
-                  subtitle: Text(loc('الأقسام والأسئلة والمكافآت والخطط')),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AdminScreen()),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.flag_rounded),
-                  title: Text(loc('الإبلاغ عن مشكلة أو محتوى')),
-                  subtitle: Text(
-                    loc('رسالة تنسخها وترسلها بنفسك، بدون بيانات الطفل'),
-                  ),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ReportProblemScreen(),
-                    ),
                   ),
                 ),
               ],
