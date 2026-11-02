@@ -53,14 +53,14 @@ void main() {
 
   group('catalog', () {
     test('every game has an age range and the age filter is respected', () {
-      expect(kEducationalGames.length, 19);
-      expect({for (final g in kEducationalGames) g.id}.length, 19);
+      expect(kEducationalGames.length, 24);
+      expect({for (final g in kEducationalGames) g.id}.length, 24);
       Set<String> ids(int age) => {for (final g in gamesForAge(age)) g.id};
-      expect(ids(2), {WordBookGame.gameId});
-      expect(ids(3), {MatchPicturesGame.gameId, WordBookGame.gameId, 'odd_one_out', 'compare', 'listen_picture', 'jigsaw', 'connect_dots', 'animal_habitats'});
-      expect(ids(4).length, 17);
-      expect(ids(5).length, 19);
-      expect(ids(6).length, 19);
+      expect(ids(2), {WordBookGame.gameId, 'feed_animal', 'big_small', 'shape_finder'});
+      expect(ids(3), {MatchPicturesGame.gameId, WordBookGame.gameId, 'odd_one_out', 'compare', 'listen_picture', 'jigsaw', 'connect_dots', 'animal_habitats', 'feed_animal', 'big_small', 'next_in_day', 'shape_finder', 'where_ball'});
+      expect(ids(4).length, 22);
+      expect(ids(5).length, 24);
+      expect(ids(6).length, 24);
       expect(ids(7), {'listen_word'}); // reading practice goes on to age 8
       expect(gamesForAge(9), isEmpty);
       expect(gamesForAge(1), isEmpty);

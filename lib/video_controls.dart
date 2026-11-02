@@ -9,6 +9,7 @@ import 'design/tokens.dart';
 import 'l10n/strings.dart';
 import 'lessons/lesson_rules.dart';
 import 'lessons/lesson_store.dart';
+import 'journey/repository.dart' show JourneyStore;
 import 'main.dart' show Video, loadVideos;
 import 'player_screen.dart';
 
@@ -32,6 +33,45 @@ class VideoControls {
     hide ? set.add(youtubeId) : set.remove(youtubeId);
     final p = await SharedPreferences.getInstance();
     await p.setString(key, jsonEncode(set.toList()..sort()));
+  }
+
+  /// Videos a parent hid from ONE child only (`video_hidden_child`: child id -> youtube ids). Like [hidden] it can only
+  /// take videos away: an approval is still needed for a child to see anything.
+  static const childKey = 'video_hidden_child';
+
+  static Future<Map<String, Set<String>>> hiddenByChild() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      final raw = jsonDecode(p.getString(childKey) ?? '{}') as Map<String, dynamic>;
+      return {for (final e in raw.entries) e.key: {for (final v in e.value as List<dynamic>) '$v'}};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  /// What this child must not see: the videos hidden from every child plus the ones hidden from this child.
+  /// With no child (nobody is playing) only the shared list applies.
+  static Future<Set<String>> hiddenFor(String? childId) async {
+    final all = await hidden();
+    if (childId == null) return all;
+    return {...all, ...?(await hiddenByChild())[childId]};
+  }
+
+  static Future<void> setHiddenFor(String childId, String youtubeId, bool hide) async {
+    final map = await hiddenByChild();
+    final set = map.putIfAbsent(childId, () => {});
+    hide ? set.add(youtubeId) : set.remove(youtubeId);
+    if (set.isEmpty) map.remove(childId);
+    final p = await SharedPreferences.getInstance();
+    await p.setString(childKey, jsonEncode({for (final e in map.entries) e.key: e.value.toList()..sort()}));
+  }
+
+  /// Forgets what was hidden for one child (when the child is deleted).
+  static Future<void> forget(String childId) async {
+    final map = await hiddenByChild();
+    if (map.remove(childId) == null) return;
+    final p = await SharedPreferences.getInstance();
+    await p.setString(childKey, jsonEncode({for (final e in map.entries) e.key: e.value.toList()..sort()}));
   }
 }
 
@@ -73,6 +113,7 @@ class VideoReviewScreen extends StatefulWidget {
 class _VideoReviewState extends State<VideoReviewScreen> {
   List<Video> _videos = const [];
   Set<String> _hidden = {};
+  Map<String, Set<String>> _hiddenByChild = {};
   Set<String> _approved = {};
   Set<String> _previewed = {};
   Set<String> _rejected = {};
@@ -94,6 +135,7 @@ class _VideoReviewState extends State<VideoReviewScreen> {
     try {
       final v = await loadVideos(all: true);
       final h = await VideoControls.hidden();
+      final hc = await VideoControls.hiddenByChild();
       final a = await LessonStore.approved();
       final pv = await LessonStore.previewed();
       final rv = await LessonStore.reviews();
@@ -102,6 +144,7 @@ class _VideoReviewState extends State<VideoReviewScreen> {
         setState(() {
           _videos = v;
           _hidden = h;
+          _hiddenByChild = hc;
           _approved = a;
           _previewed = pv;
           _reviews = rv;
@@ -123,6 +166,18 @@ class _VideoReviewState extends State<VideoReviewScreen> {
   Future<void> _preview(Video v) async {
     await Navigator.push<bool>(context, MaterialPageRoute(builder: (_) => PlayerScreen(video: v, preview: true)));
     await LessonStore.markPreviewed(v.youtubeId);
+    await _load();
+  }
+
+  /// Names of the children this video is hidden from (only for that child, not for everyone).
+  List<String> _hiddenFromNames(Video v) => [
+        for (final c in JourneyStore.instance.profiles)
+          if (_hiddenByChild[c.id]?.contains(v.youtubeId) ?? false) c.nickname,
+      ];
+
+  /// One switch per child: the parent decides which child may see an approved lesson.
+  Future<void> _who(Video v) async {
+    await showDialog<void>(context: context, builder: (_) => _WhoSeesDialog(video: v));
     await _load();
   }
 
@@ -261,6 +316,8 @@ class _VideoReviewState extends State<VideoReviewScreen> {
             style: DS.caption,
           ),
           Text(status, key: ValueKey('status_${v.youtubeId}'), style: DS.caption),
+          if (_hiddenFromNames(v).isNotEmpty)
+            Text(tr2('مخفي عن: ${_hiddenFromNames(v).join('، ')}', 'Hidden from: ${_hiddenFromNames(v).join(', ')}'), key: ValueKey('hiddenfrom_${v.youtubeId}'), style: DS.caption),
           if (reviewDate != null && review!.status != ReviewStatus.previewed)
             Text(review.status == ReviewStatus.approved ? tr2('وافقتَ بتاريخ $reviewDate (هذا الجهاز)', 'Approved on $reviewDate (this device)') : tr2('رفضتَ بتاريخ $reviewDate (هذا الجهاز)', 'Rejected on $reviewDate (this device)'), key: ValueKey('reviewed_${v.youtubeId}'), style: DS.caption),
           if (v.verification == 'unverified' && v.origin == 'bundled')
@@ -281,6 +338,13 @@ class _VideoReviewState extends State<VideoReviewScreen> {
                 },
                 icon: Icon(_hidden.contains(v.youtubeId) ? Icons.visibility_rounded : Icons.visibility_off_rounded),
                 label: Text(_hidden.contains(v.youtubeId) ? tr2('فعّل', 'Enable') : tr2('عطّل', 'Disable')),
+              ),
+            if (!locked && isApproved && JourneyStore.instance.profiles.length > 1)
+              OutlinedButton.icon(
+                key: ValueKey('who_${v.youtubeId}'),
+                onPressed: () => _who(v),
+                icon: const Icon(Icons.groups_rounded),
+                label: Text(tr2('من يراه؟', 'Who sees it?')),
               ),
             if (isApproved) TextButton(key: ValueKey('unapprove_${v.youtubeId}'), onPressed: () => _withdraw(v), child: Text(tr2('ألغِ الموافقة', 'Withdraw approval'))),
             if (v.origin == 'parent') TextButton.icon(key: ValueKey('remove_${v.youtubeId}'), onPressed: () => _remove(v), icon: const Icon(Icons.delete_outline_rounded), label: Text(tr2('احذف', 'Remove'))),
@@ -427,6 +491,57 @@ class _AddLessonDialogState extends State<_AddLessonDialog> {
         TextButton(onPressed: () => Navigator.pop(context, false), child: Text(tr2('إلغاء', 'Cancel'))),
         FilledButton(key: const ValueKey('lesson_save'), onPressed: _save, child: Text(tr2('احفظ', 'Save'))),
       ],
+    );
+  }
+}
+
+
+/// Which children may see an approved lesson. A switch is on when the child can see it; turning it off hides the lesson
+/// from that child only. It saves at once (nothing to confirm) and never approves anything.
+class _WhoSeesDialog extends StatefulWidget {
+  final Video video;
+  const _WhoSeesDialog({required this.video});
+
+  @override
+  State<_WhoSeesDialog> createState() => _WhoSeesDialogState();
+}
+
+class _WhoSeesDialogState extends State<_WhoSeesDialog> {
+  Map<String, Set<String>> _hidden = {};
+
+  @override
+  void initState() {
+    super.initState();
+    VideoControls.hiddenByChild().then((m) {
+      if (mounted) setState(() => _hidden = m);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final id = widget.video.youtubeId;
+    return AlertDialog(
+      key: const ValueKey('who_dialog'),
+      title: Text(tr2('من يراه؟', 'Who sees it?')),
+      content: SizedBox(
+        width: 360,
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(widget.video.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: DS.caption),
+          for (final c in JourneyStore.instance.profiles)
+            SwitchListTile(
+              key: ValueKey('who_${id}_${c.id}'),
+              title: Text(c.nickname),
+              subtitle: Text(tr2('${c.age} سنوات', 'Age ${c.age}')),
+              value: !(_hidden[c.id]?.contains(id) ?? false),
+              onChanged: (on) async {
+                await VideoControls.setHiddenFor(c.id, id, !on);
+                final m = await VideoControls.hiddenByChild();
+                if (mounted) setState(() => _hidden = m);
+              },
+            ),
+        ]),
+      ),
+      actions: [TextButton(key: const ValueKey('who_done'), onPressed: () => Navigator.pop(context), child: Text(tr2('تم', 'Done')))],
     );
   }
 }

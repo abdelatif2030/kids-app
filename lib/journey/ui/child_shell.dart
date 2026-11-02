@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../../design/layout.dart';
 import '../../design/motion_system.dart';
 import '../../design/tokens.dart';
-import '../../games_screen.dart';
+import '../../games/games_hub.dart';
 import '../../l10n/strings.dart';
 import '../../offline/offline_ui.dart';
 import '../../parent_screens.dart';
@@ -100,7 +100,7 @@ class _ChildShellState extends State<ChildShell> {
               onExit: _exit,
               onTab: (i) => setState(() => _tab = i),
             ),
-            _GamesTab(child: child),
+            _GamesTab(child: child, onBack: () => setState(() => _tab = 0)),
             _CreateTab(child: child),
             MeTab(child: child),
             HomeTab(
@@ -120,6 +120,7 @@ class _ChildShellState extends State<ChildShell> {
           final items = [
             for (final (i, item) in _items.indexed)
               _NavItem(
+                key: ValueKey('nav_${item.$2}'),
                 icon: item.$1,
                 label: context.tr(item.$2),
                 selected: _tab == i,
@@ -241,6 +242,7 @@ class _NavItem extends StatelessWidget {
   /// Icon only (a phone held sideways): the name stays in the accessibility label and a tooltip.
   final bool compact;
   const _NavItem({
+    super.key,
     required this.icon,
     required this.label,
     required this.selected,
@@ -302,78 +304,18 @@ class _NavItem extends StatelessWidget {
 
 class _GamesTab extends StatefulWidget {
   final ChildProfile child;
-  const _GamesTab({required this.child});
+  final VoidCallback onBack;
+  const _GamesTab({required this.child, required this.onBack});
 
   @override
   State<_GamesTab> createState() => _GamesTabState();
 }
 
 class _GamesTabState extends State<_GamesTab> {
-  bool _fun = false;
-
   @override
-  Widget build(BuildContext context) {
-    // Two kinds of games: the learning games, and "fun" games like the casual ones on a phone (no stars, no scores).
-    // Each takes the whole area under the switch (no outer scrolling).
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 6, 16, 4),
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 10,
-            runSpacing: 4,
-            children: [
-              ChoiceChip(
-                key: const ValueKey('games_edu'),
-                label: Text(tr2('ألعاب تعليمية', 'Learning games'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
-                selected: !_fun,
-                onSelected: (_) => setState(() => _fun = false),
-              ),
-              ChoiceChip(
-                key: const ValueKey('games_fun'),
-                label: Text(tr2('ألعب مع رحلتي', 'Play with Rehlaty'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900)),
-                selected: _fun,
-                onSelected: (_) => setState(() => _fun = true),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: _fun
-              ? const _PlayWithRehlaty(key: ValueKey('play_with_rehlaty'))
-              : GamesGrid(key: const ValueKey('edu_grid'), age: widget.child.age, child: widget.child),
-        ),
-      ],
-    );
-  }
-}
-
-/// «ألعب مع رحلتي»: a place kept for real games to come. It is empty on purpose for now.
-class _PlayWithRehlaty extends StatelessWidget {
-  const _PlayWithRehlaty({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('🎮', style: TextStyle(fontSize: 64)),
-            const SizedBox(height: 10),
-            Text(
-              tr2('ألعاب جديدة قريباً!', 'New games are coming soon!'),
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: RC.ink),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      // The games hub: ten islands (letters, numbers, shapes...), each opening its own games. It fills the whole area.
+      GamesHub(key: const ValueKey('games_hub'), child: widget.child, onBack: widget.onBack);
 }
 
 class _CreateTab extends StatelessWidget {

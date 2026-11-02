@@ -176,7 +176,7 @@ void main() {
       expect(reached, isTrue, reason: 'the games tab never got keyboard focus');
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await _settle(tester);
-      expect(find.text('لعبة الذاكرة'), findsOneWidget); // age 5 games
+      expect(find.byKey(const ValueKey('hub_observe')), findsOneWidget); // age 5 games
     });
 
     testWidgets('every big control has a spoken label', (tester) async {

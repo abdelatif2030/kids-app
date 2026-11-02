@@ -14,6 +14,7 @@ import '../../l10n/app_locale.dart';
 import '../../l10n/language_screen.dart';
 import '../../l10n/strings.dart';
 import '../../design/app_logo.dart';
+import '../../demo/demo_mode.dart';
 import '../models.dart';
 import '../repository.dart';
 import 'child_shell.dart';
@@ -64,30 +65,32 @@ class _Welcome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // A phone held sideways is short: a smaller logo keeps the big "begin" button on the first screen.
+    final short = MediaQuery.sizeOf(context).height < 520;
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(short ? 12 : 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const AppLogo(width: 280),
+            AppLogo(width: short ? 150 : 280),
             const SizedBox(height: 8),
             // The logo already spells the name in Latin letters; the Arabic name is shown under it.
-            if (AppLocale.instance.isArabic)
+            if (AppLocale.instance.isArabic && !short)
               Semantics(
                 header: true,
                 child: Text(context.tr('app.name'),
                     style: const TextStyle(fontSize: 44, fontWeight: FontWeight.w900, color: RC.ink)),
               ),
             const SizedBox(height: 8),
-            Text(context.tr('app.tagline'), style: const TextStyle(fontSize: 22, color: RC.ink)),
-            const SizedBox(height: 28),
+            Text(context.tr('app.tagline'), style: TextStyle(fontSize: short ? 17 : 22, color: RC.ink)),
+            SizedBox(height: short ? 10 : 28),
             FilledButton.icon(
               style: FilledButton.styleFrom(
                 minimumSize: const Size(260, 64),
                 backgroundColor: RC.good,
               ),
-              onPressed: () => Navigator.push(
+              onPressed: () => DemoMode.enabled ? _demoAdd(context) : Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const OnboardingFlow()),
               ),
@@ -95,7 +98,7 @@ class _Welcome extends StatelessWidget {
               label: Text(context.tr('start.begin'), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
             ),
             const SizedBox(height: 10),
-            Text(context.tr('start.parentFirst'), style: const TextStyle(fontSize: 15, color: RC.ink)),
+            if (DemoMode.enabled) _demoBanner(context) else Text(context.tr('start.parentFirst'), style: const TextStyle(fontSize: 15, color: RC.ink)),
             const SizedBox(height: 18),
             _accountsDoor(context),
             // A relative on their own phone has no child profile; they come in through this door.
@@ -126,6 +129,7 @@ class _Picker extends StatelessWidget {
 
   /// Adding a child is a parent's job: it asks for the PIN when one is set.
   Future<void> _addChild(BuildContext context) async {
+    if (DemoMode.enabled) return _demoAdd(context);
     if (await ParentSettings.instance.hasPin()) {
       if (!context.mounted) return;
       final ok = await Navigator.push<bool>(
@@ -139,21 +143,7 @@ class _Picker extends StatelessWidget {
   }
 
   /// Picking a child starts child mode: it checks the daily limit and quiet hours first.
-  Future<void> _enter(BuildContext context, ChildProfile child) async {
-    final session = SessionManager.instance;
-    final blocked = await session.check();
-    if (!context.mounted) return;
-    await JourneyStore.instance.setActive(child.id);
-    if (!context.mounted) return;
-    if (blocked != null) {
-      session.currentAge = child.age;
-      goToRest(context, blocked);
-      return;
-    }
-    await session.start(child.age);
-    if (!context.mounted) return;
-    Navigator.push(context, MaterialPageRoute(builder: (_) => ChildShell(child: child)));
-  }
+  Future<void> _enter(BuildContext context, ChildProfile child) => enterChildMode(context, child);
 
   @override
   Widget build(BuildContext context) {
@@ -223,6 +213,7 @@ class _Picker extends StatelessWidget {
               ],
             ),
             Padding(padding: const EdgeInsets.only(top: 16), child: _accountsDoor(context)),
+            if (DemoMode.enabled) _demoBanner(context),
             // The door for grandparents and other relatives; hidden while the service is off.
             if (familyRepository != null)
               Padding(
@@ -268,4 +259,29 @@ Widget _accountsDoor(BuildContext context) {
     icon: const Icon(Icons.g_mobiledata_rounded, size: 30),
     label: Text(tr2('تسجيل الدخول / حساب جديد (Google أو بريد)', 'Sign in / New account (Google or e-mail)'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
   );
+}
+
+/// The demo's way to add a child: no PIN, no e-mail; then straight into child mode.
+Future<void> _demoAdd(BuildContext context) async {
+  final child = await Navigator.push<ChildProfile>(context, MaterialPageRoute(builder: (_) => const DemoCreateChildScreen()));
+  if (child != null && context.mounted) await enterChildMode(context, child);
+}
+
+Widget _demoBanner(BuildContext context) => DemoBanner(onReset: () => confirmAndResetDemo(context));
+
+/// Picking a child starts child mode: it checks the daily limit and quiet hours first.
+Future<void> enterChildMode(BuildContext context, ChildProfile child) async {
+  final session = SessionManager.instance;
+  final blocked = await session.check();
+  if (!context.mounted) return;
+  await JourneyStore.instance.setActive(child.id);
+  if (!context.mounted) return;
+  if (blocked != null) {
+    session.currentAge = child.age;
+    goToRest(context, blocked);
+    return;
+  }
+  await session.start(child.age);
+  if (!context.mounted) return;
+  Navigator.push(context, MaterialPageRoute(builder: (_) => ChildShell(child: child)));
 }

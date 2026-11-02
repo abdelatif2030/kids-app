@@ -41,15 +41,16 @@ class ProgressStore {
     return decodeList(await SharedPreferences.getInstance(), _key, SkillEvent.fromJson);
   }
 
+  /// Read and write happen with no await in between (SharedPreferences answers reads synchronously once it is open),
+  /// so two rounds recorded at nearly the same moment cannot overwrite each other.
   static Future<void> record(String skill, bool ok, {String? detail, String? childId}) async {
+    final prefs = await SharedPreferences.getInstance();
     final now = DateTime.now();
     final oldest = WatchHistory.dayKey(now.subtract(const Duration(days: _keepDays)));
-    var events = (await load()).where((e) => e.day.compareTo(oldest) >= 0).toList()
-      ..add(SkillEvent(
-          day: WatchHistory.dayKey(now), skill: skill, ok: ok, detail: detail, childId: childId));
+    var events = decodeList(prefs, _key, SkillEvent.fromJson).where((e) => e.day.compareTo(oldest) >= 0).toList()
+      ..add(SkillEvent(day: WatchHistory.dayKey(now), skill: skill, ok: ok, detail: detail, childId: childId));
     if (events.length > _maxEvents) events = events.sublist(events.length - _maxEvents);
-    await (await SharedPreferences.getInstance())
-        .setString(_key, jsonEncode([for (final e in events) e.toJson()]));
+    await prefs.setString(_key, jsonEncode([for (final e in events) e.toJson()]));
   }
 
   /// Seconds the child spent in child mode, per day (kept by SessionManager).

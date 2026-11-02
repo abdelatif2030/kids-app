@@ -29,6 +29,8 @@ const kSkills = [
   Skill('sequence', 'ترتيب الخطوات', 'نادي الذكاء', 'discover'),
   Skill('story', 'فهم القصة', 'قطار القصص', 'stories'),
   Skill('feelings', 'فهم المشاعر', 'مدرسة المشاعر', 'discover'),
+  Skill('nature', 'الحيوانات والطبيعة', 'أين يعيش؟', 'science'),
+  Skill('spatial', 'المواقع والتركيب', 'تركيب الصورة', 'discover'),
   Skill('vocab', 'المفردات', 'مكتبة الكلمات', 'discover'),
   Skill('listening', 'الاستماع والتمييز', 'مكتبة الكلمات', 'discover'),
   Skill('phonics', 'أصوات الحروف', 'تعلّم الحروف', 'arabic'),

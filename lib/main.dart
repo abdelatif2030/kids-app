@@ -27,6 +27,7 @@ import 'design/motion.dart';
 import 'offline/connectivity.dart';
 import 'player_screen.dart';
 import 'rest_screen.dart';
+import 'demo/demo_mode.dart';
 import 'session_manager.dart';
 import 'ui.dart';
 import 'l10n/strings.dart';
@@ -36,6 +37,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await lockLandscape();
   await initFirebase();
+  DemoMode.applyPolicies(); // demo only: videos need a parent's approval
   await JourneyStore.instance.load();
   await DisplayPrefs.instance.load();
   await AppLocale.instance.load();
@@ -187,7 +189,7 @@ class Video {
 /// The videos a child may see: listed (assets/videos.json or added by a parent by exact link), not rejected, APPROVED BY
 /// THE PARENT on this device, and not disabled. Nothing is visible to a child until a parent approves it. [all] is only
 /// for the parent's review screen. Never returns a video that is not in one of those two lists.
-Future<List<Video>> loadVideos({bool all = false}) async {
+Future<List<Video>> loadVideos({bool all = false, String? childId}) async {
   final raw = await rootBundle.loadString('assets/videos.json');
   final list = jsonDecode(raw) as List<dynamic>;
   final videos = [
@@ -195,7 +197,8 @@ Future<List<Video>> loadVideos({bool all = false}) async {
     ...await LessonStore.added(),
   ];
   if (all) return videos;
-  final hidden = await VideoControls.hidden();
+  // What THIS child may see: shared hiding plus what a parent hid from this child only (the child who is playing by default).
+  final hidden = await VideoControls.hiddenFor(childId ?? JourneyStore.instance.activeId);
   final approved = await LessonStore.approved();
   return [for (final v in videos) if (v.approved && (approved.contains(v.youtubeId) || v.ownerReviewed) && !hidden.contains(v.youtubeId)) v];
 }

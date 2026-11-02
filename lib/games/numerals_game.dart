@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../journey/ui/kit.dart';
 import '../l10n/strings.dart';
 import 'game_common.dart';
+import 'game_skills.dart';
 
 /// The ten Eastern Arabic (Hindi) digits, index = the Western digit.
 const kEasternDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
@@ -70,19 +71,23 @@ class _NumeralsGameState extends State<NumeralsGame> {
   int _round = 0;
   final Set<int> _faded = {};
   bool _matched = false;
+  late final RoundTracker _skill = RoundTracker(widget.childId, 'counting');
 
   Future<void> _tap(int d) async {
     if (_matched || _faded.contains(d)) return;
     final round = _rounds[_round];
     if (d != round.digit) {
+      _skill.miss();
       setState(() => _faded.add(d));
       return;
     }
+    _skill.solved(detail: '${round.digit}');
     setState(() => _matched = true);
     await Future<void>.delayed(const Duration(milliseconds: 700));
     if (!mounted) return;
     setState(() {
       _round++;
+      _skill.next();
       _faded.clear();
       _matched = false;
     });

@@ -1,10 +1,14 @@
 import 'design/focusable_tap.dart';
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 
 import 'design/layout.dart';
 
+import 'games/game_skills.dart';
+import 'journey/repository.dart';
+import 'progress_store.dart';
 import 'ui.dart';
 import 'l10n/strings.dart';
 
@@ -25,6 +29,7 @@ class _MemoryGameState extends State<MemoryGame> {
   late List<bool> _matched;
   final List<int> _open = [];
   bool _busy = false;
+  int _mismatches = 0;
 
   @override
   void initState() {
@@ -38,6 +43,7 @@ class _MemoryGameState extends State<MemoryGame> {
     _matched = List.filled(_cards.length, false);
     _open.clear();
     _busy = false;
+    _mismatches = 0;
   }
 
   Future<void> _tap(int i) async {
@@ -58,7 +64,13 @@ class _MemoryGameState extends State<MemoryGame> {
       });
       _open.clear();
       _busy = false;
+      if (_matched.every((m) => m)) {
+        // One memory event per finished board (same rule as the match-pictures game).
+        unawaited(ProgressStore.record('memory', memoryBoardOk(pairs: _symbols.length, mismatches: _mismatches),
+            childId: JourneyStore.instance.activeId));
+      }
     } else {
+      _mismatches++;
       // Show both cards briefly, then flip them back. No failure message.
       await Future.delayed(const Duration(milliseconds: 900));
       if (!mounted) return;

@@ -57,7 +57,7 @@ void main() {
       expect(s.game!.id, isNot(today.id));
       expect(s.game!.fitsAge(5), true);
       expect({for (var i = 0; i < 6; i++) surpriseOfDay(t, 5, reroll: i).game!.id}.length, greaterThan(1));
-      expect(surpriseOfDay(t, 2).game, isNull); // only one game for age 2: a family activity instead
+      expect(surpriseOfDay(t, 2).game!.id, isNot(gameOfDay(t, 2)!.id)); // age 2 has three learning games: the surprise is another one
       expect(surpriseOfDay(t, 1).game, isNull);
     });
   });

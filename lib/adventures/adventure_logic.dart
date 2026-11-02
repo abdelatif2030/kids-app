@@ -20,13 +20,13 @@ final List<AdventureTheme> kAdventureThemes = [
   AdventureTheme('numbers', () => tr2('مغامرة الأرقام', 'Numbers adventure'), () => tr2('نعدّ ونقارن ونلعب بالأرقام', 'We count, compare and play with numbers'),
       ['numerals', 'compare', 'connect_four', 'snakes_ladders', 'pattern']),
   AdventureTheme('animals', () => tr2('مغامرة الحيوانات', 'Animals adventure'), () => tr2('نعرف بيوت الحيوانات ونرتبها', 'We learn where animals live and sort them'),
-      ['animal_habitats', 'odd_one_out', 'sort_groups', 'listen_picture', 'jigsaw']),
+      ['animal_habitats', 'feed_animal', 'odd_one_out', 'sort_groups', 'listen_picture', 'jigsaw']),
   AdventureTheme('thinking', () => tr2('مغامرة التفكير', 'Thinking adventure'), () => tr2('ألغاز بسيطة وكنوز مخبأة', 'Simple puzzles and hidden treasure'),
-      ['maze', 'treasure_hunt', 'pattern', 'jigsaw', 'connect_dots']),
+      ['maze', 'treasure_hunt', 'pattern', 'next_in_day', 'where_ball', 'jigsaw', 'connect_dots']),
   AdventureTheme('listening', () => tr2('مغامرة الاستماع', 'Listening adventure'), () => tr2('نسمع ونختار الصح', 'We listen and choose'),
       ['listen_picture', 'listen_word', 'listen_letter', 'word_book', 'match_pictures']),
   AdventureTheme('shapes', () => tr2('مغامرة الأشكال والألوان', 'Shapes and colours adventure'), () => tr2('نوصّل النقاط ونركّب الصور', 'We join dots and build pictures'),
-      ['connect_dots', 'jigsaw', 'sort_groups', 'match_pictures', 'odd_one_out']),
+      ['connect_dots', 'jigsaw', 'shape_finder', 'big_small', 'sort_groups', 'match_pictures', 'odd_one_out']),
 ];
 
 /// The Monday of [d]'s week at midnight; weeks always run Monday to Sunday.

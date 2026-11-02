@@ -33,7 +33,8 @@ Future<void> initFirebase() async {
   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
     _repository = FirebaseTeacherRepository();
-    familyRepository = FirebaseFamilyRepository();
+    // The hosted demo login opens accounts only: family chat, calls and voice messages stay off.
+    if (!kDemoLogin) familyRepository = FirebaseFamilyRepository();
   } catch (_) {
     _repository = null;
   }

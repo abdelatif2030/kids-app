@@ -11,6 +11,7 @@ import '../media/rehlaty_audio_engine.dart' show EnginePrefs;
 import '../stories/story_data.dart';
 import '../stories/story_screens.dart' show StoryPlayerScreen;
 import 'adventure_logic.dart';
+import '../curriculum/learning_adventures.dart';
 import 'adventure_service.dart';
 import 'adventure_store.dart';
 
@@ -105,6 +106,7 @@ class _AdventureScreenState extends State<AdventureScreen> {
                       ),
                     ),
                   ),
+                LearningPathCard(theme: s.plan.theme, age: widget.child.age),
                 if (_past.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text(tr2('مغامراتي', 'My adventures'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: RC.ink)),
@@ -144,4 +146,45 @@ class AdventureCard extends StatelessWidget {
           ]),
         ),
       );
+}
+
+/// The five phases of this week's learning adventure: what to discover, learn, play, apply and how it is celebrated.
+/// Read-only text: it adds no reward and counts nothing; the steps below are the real, existing weekly adventure.
+class LearningPathCard extends StatelessWidget {
+  final AdventureTheme theme;
+  final int age;
+  const LearningPathCard({super.key, required this.theme, required this.age});
+
+  @override
+  Widget build(BuildContext context) {
+    final fit = {for (final g in kEducationalGames) if (g.fitsAge(age)) g.id};
+    final p = learningPathFor(theme, age, gamesFittingAge: fit);
+    if (p == null) return const SizedBox.shrink();
+    Widget row(PhaseKind k, String? text, IconData icon) => text == null
+        ? const SizedBox.shrink()
+        : Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Row(children: [
+              Icon(icon, size: 22, color: RC.pinkDeep),
+              const SizedBox(width: 8),
+              Text('${phaseName(k)}: ', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: RC.ink)),
+              Expanded(child: Text(text, style: const TextStyle(fontSize: 15, color: RC.ink))),
+            ]),
+          );
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: RCard(
+        key: const ValueKey('learning_path'),
+        color: Colors.white,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(tr2('رحلة التعلّم', 'Learning path'), style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: RC.ink)),
+          row(PhaseKind.discover, p.discover, Icons.explore_rounded),
+          row(PhaseKind.learn, p.learn?.objective(), Icons.lightbulb_rounded),
+          row(PhaseKind.play, p.play.isEmpty ? null : p.play.map((g) => kEducationalGames.firstWhere((x) => x.id == g).title()).join(loc('، ')), Icons.sports_esports_rounded),
+          row(PhaseKind.apply, p.apply == null ? null : '${p.apply} (${tr2('مع شخص بالغ', 'with a grown-up')})', Icons.home_rounded),
+          row(PhaseKind.celebrate, tr2('عند إنهاء الخطوات يُسجَّل إنجاز الأسبوع', "When the steps are done the week's adventure is recorded"), Icons.celebration_rounded),
+        ]),
+      ),
+    );
+  }
 }

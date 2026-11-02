@@ -18,6 +18,7 @@ import 'journey/favorites.dart';
 import 'journey/feelings.dart';
 import 'journey/repository.dart';
 import 'journey/resume.dart';
+import 'video_controls.dart' show VideoControls;
 import 'l10n/strings.dart';
 
 /// Deletes what the app learned about the children from this device: profiles,
@@ -47,6 +48,9 @@ Future<void> deleteChildData() async {
         key == 'everyday_done' ||
         key == 'family_time' ||
         key == 'favorites' ||
+        key == 'video_hidden_child' ||
+        key == 'game_completions' ||
+        key == 'wordbook_seen' ||
         key == 'family_prefs' ||
         key == 'family_seen' ||
         key == 'family_outbox' ||
@@ -111,6 +115,7 @@ Future<void> deleteOneChild(String childId) async {
   await FamilyTimeStore.forget(childId);
   await FavoritesStore.forget(childId);
   await FamilyPrefs.forget(childId);
+  await VideoControls.forget(childId);
   await FamilySeen.forget(childId);
   await FamilyOutbox.instance.removeForChild(childId);
   await NotificationStore.instance.removeChild(childId);

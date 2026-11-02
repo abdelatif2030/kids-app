@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/games/game_common.dart';
-import 'package:kids_app/games/word_book_game.dart';
 import 'package:kids_app/journey/models.dart';
 import 'package:kids_app/journey/my_day.dart';
 import 'package:kids_app/journey/ui/home_tab.dart';
@@ -62,7 +61,7 @@ void main() {
       final s = storyOfDay(_at(8), 5)!;
       expect(s.fitsAge(5), true);
       expect(storyOfDay(_at(8), 5, heard: {s.id})?.id, isNot(s.id)); // prefers a story not heard yet
-      expect(gameOfDay(_at(8), 2)?.id, WordBookGame.gameId); // the only learning game for age 2
+      expect(gameOfDay(_at(8), 2)!.fitsAge(2), true); // a learning game that suits age 2
       expect(gameOfDay(_at(8), 9), isNull);
     });
   });

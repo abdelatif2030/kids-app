@@ -326,7 +326,7 @@ void main() {
       await tester.tap(find.text('ألعاب').first);
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
-      expect(find.text('لعبة الذاكرة'), findsOneWidget); // the games tab for age 5
+      expect(find.byKey(const ValueKey('hub_observe')), findsOneWidget); // the games tab for age 5
       await tester.tap(find.text('المزيد').last);
       await tester.pump();
       await tester.tap(find.text('كمّل رحلتي'));
@@ -367,7 +367,7 @@ void main() {
       await openShell(tester);
       await tester.tap(find.text('ألعاب').last);
       await tester.pump();
-      expect(find.text('لعبة الذاكرة'), findsOneWidget); // age 5
+      expect(find.byKey(const ValueKey('hub_observe')), findsOneWidget); // age 5
 
       await tester.tap(find.text('إبداع').last);
       await tester.pump();

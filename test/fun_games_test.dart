@@ -53,22 +53,24 @@ void main() {
     expect(find.text('❌'), findsNothing);
   });
 
-  testWidgets('whack the mole: hitting the mole scores, missing costs nothing, and time ends the round gently', (t) async {
+  testWidgets('whack the mole: no countdown, a miss costs nothing, the mole waits, the round ends after 8 finds', (t) async {
     await _show(t, const WhackMoleGame());
     final status = find.byKey(const ValueKey('fun_status'));
-    expect(t.widget<Text>(status).data, contains('⏱ 30'));
-    final mole = [for (var i = 0; i < 9; i++) if (find.descendant(of: find.byKey(ValueKey('hole_$i')), matching: find.text('🐹')).evaluate().isNotEmpty) i];
-    expect(mole, hasLength(1));
-    final miss = (mole.first + 1) % 9;
-    await t.tap(find.byKey(ValueKey('hole_$miss')));
+    expect(t.widget<Text>(status).data, isNot(contains('⏱')));
+    expect(t.widget<Text>(status).data, contains('0 / 8'));
+    int moleAt() => [for (var i = 0; i < 9; i++) if (find.descendant(of: find.byKey(ValueKey('hole_$i')), matching: find.text('🐹')).evaluate().isNotEmpty) i].single;
+    final first = moleAt();
+    await t.tap(find.byKey(ValueKey('hole_${(first + 1) % 9}')));
     await t.pump();
-    expect(t.widget<Text>(status).data, contains('⭐ 0'));
-    await t.tap(find.byKey(ValueKey('hole_${mole.first}')));
-    await t.pump();
-    expect(t.widget<Text>(status).data, contains('⭐ 1'));
-    await t.pump(const Duration(seconds: 31));
+    await t.pump(const Duration(seconds: 60)); // time passing changes nothing
+    expect(moleAt(), first);
+    expect(t.widget<Text>(status).data, contains('0 / 8'));
+    for (var n = 1; n <= 8; n++) {
+      await t.tap(find.byKey(ValueKey('hole_${moleAt()}')));
+      await t.pump();
+    }
     expect(find.byKey(const ValueKey('fun_again')), findsOneWidget);
-    await t.pumpWidget(const SizedBox()); // stop the timers
+    expect(t.widget<Text>(status).data, isNot(contains('0 / 8')));
   });
 
   testWidgets('catch the stars and snake open, run and end without errors', (t) async {

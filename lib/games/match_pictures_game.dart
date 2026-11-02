@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 
 import '../journey/ui/kit.dart';
 import '../l10n/strings.dart';
+import '../progress_store.dart';
 import 'game_common.dart';
+import 'game_skills.dart';
 
 /// What happened when a card was chosen.
 enum PickResult { ignored, first, match, mismatch }
@@ -94,6 +96,7 @@ class _MatchPicturesGameState extends State<MatchPicturesGame> {
   late MatchBoard _board = MatchBoard.forAge(widget.age, random: widget.random);
   Timer? _closeTimer;
   List<int> _hint = const [];
+  bool _recorded = false;
 
   @override
   void dispose() {
@@ -104,6 +107,11 @@ class _MatchPicturesGameState extends State<MatchPicturesGame> {
   void _tap(int i) {
     final r = _board.pick(i);
     if (r == PickResult.ignored) return;
+    if (r == PickResult.match && _board.complete && !_recorded) {
+      _recorded = true;
+      unawaited(ProgressStore.record('memory', memoryBoardOk(pairs: _board.cards.length ~/ 2, mismatches: _board.mismatches),
+          childId: widget.childId));
+    }
     setState(() => _hint = const []);
     if (r == PickResult.mismatch) {
       // Both cards stay visible for a moment, then turn back. No message, no penalty.
@@ -135,7 +143,10 @@ class _MatchPicturesGameState extends State<MatchPicturesGame> {
           childId: widget.childId,
           gameId: MatchPicturesGame.gameId,
           onAgain: () => setState(
-            () => _board = MatchBoard.forAge(widget.age, random: widget.random),
+            () {
+              _board = MatchBoard.forAge(widget.age, random: widget.random);
+              _recorded = false;
+            },
           ),
         ),
       );

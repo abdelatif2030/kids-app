@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -11,8 +12,10 @@ import '../journey/ui/kit.dart';
 import '../l10n/strings.dart';
 import 'adventure_logic.dart';
 import '../design/brand.dart';
+import '../progress_store.dart';
 import 'game_art.dart';
 import 'game_common.dart';
+import 'game_skills.dart';
 
 // Six playable games. Rules for all of them: wrong tries only fade or bounce back (never a loss screen), the star comes
 // once, from GameFinishPanel (first completion), and every sound goes through GameCue so the shared audio engine can
@@ -265,6 +268,7 @@ class JigsawGame extends StatefulWidget {
 class _JigsawState extends State<JigsawGame> {
   late final Random _r = widget.random ?? Random();
   late JigsawPuzzle _p = _make();
+  late final RoundTracker _skill = RoundTracker(widget.childId, 'spatial');
   int? _selected;
   String _text = '';
 
@@ -275,6 +279,8 @@ class _JigsawState extends State<JigsawGame> {
 
   void _try(int piece, int slot) {
     final ok = _p.place(piece, slot);
+    if (!ok) _skill.miss();
+    if (ok && _p.complete) _skill.solved();
     GameCue.play(ok ? 'place' : 'gentle');
     setState(() {
       _selected = null;
@@ -292,6 +298,7 @@ class _JigsawState extends State<JigsawGame> {
         title: title,
         child: GameFinishPanel(childId: widget.childId, gameId: JigsawGame.gameId, onAgain: () => setState(() {
               _p = _make();
+              _skill.next();
               _text = '';
             })),
       );
@@ -599,6 +606,7 @@ class _TreasureState extends State<TreasureHuntGame> {
   late final Random _r = widget.random ?? Random();
   int _round = 0;
   late TreasureMap _map = _newMap();
+  late final RoundTracker _skill = RoundTracker(widget.childId, 'spatial');
   final Set<int> _faded = {};
   bool _found = false;
   String _text = '';
@@ -608,11 +616,13 @@ class _TreasureState extends State<TreasureHuntGame> {
   Future<void> _tap(int cell) async {
     if (_found || _faded.contains(cell)) return;
     if (_map.landmarks.any((l) => l.cell == cell)) {
+      _skill.miss();
       GameCue.play('gentle');
       setState(() => _text = tr2('هذا مكان معروف، الكنز ليس تحته. ابحث في مكان آخر', 'That is a landmark, the treasure is not there. Look somewhere else'));
       return;
     }
     if (cell != _map.treasure) {
+      _skill.miss();
       GameCue.play('gentle');
       setState(() {
         _faded.add(cell);
@@ -621,6 +631,7 @@ class _TreasureState extends State<TreasureHuntGame> {
       return;
     }
     GameCue.play('found');
+    _skill.solved();
     setState(() {
       _found = true;
       _text = tr2('وجدت الكنز!', 'You found the treasure!');
@@ -629,6 +640,7 @@ class _TreasureState extends State<TreasureHuntGame> {
     if (!mounted) return;
     setState(() {
       _round++;
+      _skill.next();
       _found = false;
       _faded.clear();
       _text = '';
@@ -748,11 +760,13 @@ class _DotsState extends State<ConnectDotsGame> {
   late List<DotShape> _shapes = dotShapesForAge(widget.age, _r);
   int _i = 0;
   late DotsGame _g = DotsGame(_shapes[0]);
+  late final RoundTracker _skill = RoundTracker(widget.childId, 'counting');
   String _text = '';
 
   Future<void> _tap(int index) async {
     final ok = _g.tap(index);
     if (!ok) {
+      _skill.miss();
       GameCue.play('gentle');
       setState(() => _text = tr2('جرّب الرقم ${_g.next + 1}', 'Try number ${_g.next + 1}'));
       return;
@@ -760,12 +774,14 @@ class _DotsState extends State<ConnectDotsGame> {
     GameCue.play('place');
     setState(() => _text = '');
     if (_g.complete) {
+      _skill.solved();
       GameCue.play('found');
       setState(() => _text = tr2('رسمت ${_shapeName(_g.shape.id)}!', 'You drew ${_shapeName(_g.shape.id)}!'));
       await Future<void>.delayed(const Duration(milliseconds: 1200));
       if (!mounted) return;
       setState(() {
         _i++;
+        _skill.next();
         _text = '';
         if (_i < _shapes.length) _g = DotsGame(_shapes[_i]);
       });
@@ -894,9 +910,15 @@ class _HabitatsState extends State<AnimalHabitatsGame> {
   late HabitatRound _h = makeHabitatRound(widget.age, _r);
   Animal? _selected;
   String _text = '';
+  final Set<String> _missedAnimals = {};
 
   void _place(Animal a, Habitat home) {
     final ok = _h.place(a, home);
+    if (!ok) {
+      _missedAnimals.add(a.id);
+    } else {
+      unawaited(ProgressStore.record('nature', !_missedAnimals.remove(a.id), childId: widget.childId));
+    }
     GameCue.play(ok ? 'place' : 'gentle');
     setState(() {
       _selected = null;
@@ -924,6 +946,7 @@ class _HabitatsState extends State<AnimalHabitatsGame> {
         title: title,
         child: GameFinishPanel(childId: widget.childId, gameId: AnimalHabitatsGame.gameId, onAgain: () => setState(() {
               _round = 0;
+              _missedAnimals.clear();
               _h = makeHabitatRound(widget.age, _r);
               _text = '';
             })),

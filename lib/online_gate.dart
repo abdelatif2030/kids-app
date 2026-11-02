@@ -24,6 +24,11 @@ const bool kBackendVerified = false;
 /// options are still required. Release 1 stays offline.
 const bool kOnlineDevOverride = bool.fromEnvironment('ONLINE_DEV');
 
+/// WEB DEMO ONLY. `--dart-define=DEMO_LOGIN=true` (together with DEMO=true and the FIREBASE_* defines) opens ONLY the
+/// accounts door (sign in / register) in the hosted web demo. Family chat, calls and voice messages stay off. The
+/// shipped constants above are unchanged: without this define (every normal build) the gate is exactly as before.
+const bool kDemoLogin = bool.fromEnvironment('DEMO_LOGIN');
+
 enum OnlineGateReason {
   notIntended,
   firebaseNotConfigured,
@@ -44,7 +49,8 @@ OnlineGateStatus evaluateOnlineGate({
   bool accountDeletion = kAccountDeletionReady,
   bool backendVerified = kBackendVerified,
   bool devOverride = kOnlineDevOverride && !kReleaseMode,
-}) => devOverride
+  bool demoLogin = kDemoLogin,
+}) => (devOverride || demoLogin)
     ? OnlineGateStatus([
         if (!firebaseConfigured) OnlineGateReason.firebaseNotConfigured,
       ])

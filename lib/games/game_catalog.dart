@@ -6,8 +6,10 @@ import 'adventure_games.dart';
 import 'choice_games.dart';
 import 'connect_four_game.dart';
 import 'letter_fishing_game.dart';
+import 'life_games.dart';
 import 'match_pictures_game.dart';
 import 'numerals_game.dart';
+import 'shape_games.dart';
 import 'trace_game.dart';
 import 'word_book_game.dart';
 
@@ -62,6 +64,12 @@ const Map<String, String> kGameEmoji = {
   'review_words': '⭐',
   'trace_letters': '✍️',
   'word_book': '📖',
+  'drawing': '🎨',
+  'shape_finder': '🔷',
+  'where_ball': '⚽',
+  'feed_animal': '🍌',
+  'big_small': '🐘',
+  'next_in_day': '🌅',
   'fun_whack': '🐹',
   'fun_stars': '⭐',
   'fun_xo': '❌',
@@ -258,6 +266,51 @@ final List<GameInfo> kEducationalGames = [
     4,
     6,
     (id, age, _) => SortGame(childId: id, age: age),
+  ),
+  GameInfo(
+    FeedAnimalGame.gameId,
+    () => tr2('أطعم الحيوان', 'Feed the animal'),
+    () => tr2('ماذا يأكل كل حيوان؟', 'What each animal eats'),
+    Icons.pets_rounded,
+    2,
+    6,
+    (id, age, _) => FeedAnimalGame(childId: id, age: age),
+  ),
+  GameInfo(
+    BigSmallGame.gameId,
+    () => tr2('كبير أم صغير؟', 'Big or small?'),
+    () => tr2('مقارنة الأحجام', 'Comparing sizes'),
+    Icons.straighten_rounded,
+    2,
+    6,
+    (id, age, _) => BigSmallGame(childId: id, age: age),
+  ),
+  GameInfo(
+    NextInDayGame.gameId,
+    () => tr2('رتّب يومي', 'Arrange my day'),
+    () => tr2('ترتيب أحداث اليوم', 'The order of daily routines'),
+    Icons.wb_sunny_rounded,
+    3,
+    6,
+    (id, age, _) => NextInDayGame(childId: id, age: age),
+  ),
+  GameInfo(
+    ShapeFinderGame.gameId,
+    () => tr2('أين الشكل؟', 'Find the shape'),
+    () => tr2('أسماء الأشكال وألوانها', 'Shape names and colours'),
+    Icons.change_history_rounded,
+    2,
+    6,
+    (id, age, _) => ShapeFinderGame(childId: id, age: age),
+  ),
+  GameInfo(
+    WhereIsBallGame.gameId,
+    () => tr2('أين الكرة؟', 'Where is the ball?'),
+    () => tr2('فوق وتحت وداخل وبجانب', 'On top, under, inside and next to'),
+    Icons.sports_soccer_rounded,
+    3,
+    6,
+    (id, age, _) => WhereIsBallGame(childId: id, age: age),
   ),
 ];
 

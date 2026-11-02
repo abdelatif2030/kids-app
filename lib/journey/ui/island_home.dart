@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../design/focusable_tap.dart';
+import '../../design/hub_art.dart';
 import '../../design/motion.dart';
 import '../../l10n/strings.dart';
 
@@ -327,9 +328,10 @@ class _IslandHomeState extends State<IslandHome>
     );
   }
 
-  Widget _pictureMarker(IslandSpec spec, Offset spot, int i, double w, double h, double badgeBase, double font, double plateWidth, AnimationController? c) {
+  Widget _pictureMarker(IslandSpec spec, Offset spot, int i, double w, double h, double badgeBase, double font, double plateWidth, AnimationController? c, {double? islandWidth}) {
     var badge = badgeBase;
     badge = badgeBase * (1 + (spec.weight - 1) * 0.5); // the main destination is a little bigger
+    if (islandWidth != null) badge = islandWidth * GrassIsland.heightFactor; // the floating island's height with headroom
     final plateW = math.max(plateWidth, badge * 1.2);
     final boxW = plateW;
     final boxH = badge + font * 2.6 + 8;
@@ -348,6 +350,19 @@ class _IslandHomeState extends State<IslandHome>
           child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (islandWidth != null)
+              SizedBox(
+                key: ValueKey('island_art_${spec.id}'),
+                width: islandWidth,
+                height: badge,
+                child: GrassIsland(
+                  width: islandWidth,
+                  symbol: ExcludeSemantics(
+                    child: _MovingEmoji(emoji: spec.emoji, fontSize: islandWidth * 0.46, t: c, phase: (spec.id.hashCode % 97) / 97),
+                  ),
+                ),
+              )
+            else
             Container(
               width: badge,
               height: badge,
@@ -396,7 +411,8 @@ class _IslandHomeState extends State<IslandHome>
     }
     return Positioned(
       left: (spot.dx * w - boxW / 2).clamp(0.0, w - boxW).toDouble(),
-      top: (spot.dy * h - badge / 2).clamp(0.0, h - boxH).toDouble(),
+      // a games-map island centres its whole sign (island and name) in its cell, so neighbours never touch
+      top: (islandWidth != null ? spot.dy * h - boxH / 2 : spot.dy * h - badge / 2).clamp(0.0, h - boxH).toDouble(),
       width: boxW,
       height: boxH,
       child: spec.overlay == null
@@ -419,9 +435,12 @@ class _IslandHomeState extends State<IslandHome>
     final rows = (n / cols).ceil();
     final cellW = w / cols, cellH = h / rows;
     final badge = math.min(cellW * 0.52, cellH * 0.5).clamp(30.0, 76.0).toDouble();
-    final font = cellH < 96 ? 10.0 : 11.5;
+    // A tablet has the room for larger islands and names; a phone held sideways keeps names at 11-12 and islands compact.
+    final tablet = MediaQuery.sizeOf(context).shortestSide >= 600;
+    final font = tablet ? 18.0 : (cellH < 100 ? 12.0 : 13.0);
     final plateW = cellW * 0.96;
-    final sea = WorldMapLayout(const [], 100, w, h, 0);
+    // A floating island per game: as wide as the cell allows, never taller than the cell minus its name plate.
+    final islandW = math.min(cellW * 0.9, (cellH - font * 2.6 - 14) / GrassIsland.heightFactor).clamp(34.0, tablet ? 250.0 : 132.0).toDouble();
     return Center(
       child: SizedBox(
         key: const ValueKey('games_grid'),
@@ -433,7 +452,7 @@ class _IslandHomeState extends State<IslandHome>
             Positioned.fill(
               child: ExcludeSemantics(
                 child: IgnorePointer(
-                  child: RepaintBoundary(child: CustomPaint(painter: _SeaPainter(sea, c))),
+                  child: const RepaintBoundary(child: CustomPaint(key: ValueKey('games_space'), painter: HubSkyPainter())),
                 ),
               ),
             ),
@@ -448,6 +467,7 @@ class _IslandHomeState extends State<IslandHome>
                 font,
                 plateW,
                 c,
+                islandWidth: islandW,
               ),
           ],
         ),

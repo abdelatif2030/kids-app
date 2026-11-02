@@ -10,6 +10,7 @@ import '../literacy/letters_data.dart';
 import '../media/audio_button.dart';
 import '../media/audio_manifest.dart';
 import 'game_common.dart';
+import 'game_skills.dart';
 
 /// One target letter and the letters in the pond (the target among them).
 class FishingRound {
@@ -86,20 +87,24 @@ class _LetterFishingGameState extends State<LetterFishingGame> {
   int _round = 0;
   final Set<String> _faded = {};
   bool _caught = false;
+  late final RoundTracker _skill = RoundTracker(widget.childId, _lang == 'en' ? 'letters_en' : 'letters_ar');
 
   bool get _done => _round >= _rounds.length;
 
   Future<void> _tap(String letter) async {
     if (_caught || _faded.contains(letter)) return;
     if (letter != _rounds[_round].target) {
+      _skill.miss();
       setState(() => _faded.add(letter));
       return;
     }
+    _skill.solved(detail: letter);
     setState(() => _caught = true);
     await Future<void>.delayed(const Duration(milliseconds: 700));
     if (!mounted) return;
     setState(() {
       _round++;
+      _skill.next();
       _faded.clear();
       _caught = false;
     });

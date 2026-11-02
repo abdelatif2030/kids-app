@@ -58,19 +58,20 @@ Future<void> openParentArea(BuildContext context) async {
 }
 
 /// A multiplication question that small children cannot answer. True when answered correctly.
-Future<bool> askParentQuestion(BuildContext context, {int? a, int? b}) async {
+Future<bool> askParentQuestion(BuildContext context, {int? a, int? b, String? purposeAr, String? purposeEn}) async {
   final x = a ?? 6 + DateTime.now().second % 4; // 6..9
   final y = b ?? 7 + DateTime.now().millisecond % 3; // 7..9
   final ok = await showDialog<bool>(
     context: context,
-    builder: (_) => _ParentQuestionDialog(a: x, b: y),
+    builder: (_) => _ParentQuestionDialog(a: x, b: y, purposeAr: purposeAr, purposeEn: purposeEn),
   );
   return ok == true;
 }
 
 class _ParentQuestionDialog extends StatefulWidget {
   final int a, b;
-  const _ParentQuestionDialog({required this.a, required this.b});
+  final String? purposeAr, purposeEn;
+  const _ParentQuestionDialog({required this.a, required this.b, this.purposeAr, this.purposeEn});
 
   @override
   State<_ParentQuestionDialog> createState() => _ParentQuestionDialogState();
@@ -104,8 +105,8 @@ class _ParentQuestionDialogState extends State<_ParentQuestionDialog> {
         children: [
           Text(
             tr2(
-              'لفتح إعدادات الوالدين: كم ناتج ${widget.a} × ${widget.b}؟',
-              'To open the parent settings: what is ${widget.a} × ${widget.b}?',
+              '${widget.purposeAr ?? 'لفتح إعدادات الوالدين'}: كم ناتج ${widget.a} × ${widget.b}؟',
+              '${widget.purposeEn ?? 'To open the parent settings'}: what is ${widget.a} × ${widget.b}?',
             ),
           ),
           const SizedBox(height: 12),
@@ -476,7 +477,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: ParentQuickTile(
                           keyName: 'family',
                           icon: Icons.forum_rounded,
-                          label: lastOnlineGate.open ? tr2('عائلتي: المحادثات', 'Family chat') : tr2('المحادثات: إصدار لاحق', 'Chat: later version'),
+                          label: (lastOnlineGate.open && familyRepository != null) ? tr2('عائلتي: المحادثات', 'Family chat') : tr2('المحادثات: إصدار لاحق', 'Chat: later version'),
                           colors: const [Color(0xFFFF8FB6), pink],
                           onTap: () => openFamily(
                             context,
@@ -685,7 +686,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             icon: Icons.forum_rounded,
                             color: pink,
                             title: tr2('عائلتي: المحادثات', 'Family chat'),
-                            subtitle: lastOnlineGate.open
+                            subtitle: (lastOnlineGate.open && familyRepository != null)
                                 ? tr2(
                                     'أقارب موافَق عليهم يراسلون طفلك، وتقرأ أنت كل شيء',
                                     'Approved relatives message your child; you can read everything',

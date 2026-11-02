@@ -61,11 +61,10 @@ class WhackMoleGame extends StatefulWidget {
 }
 
 class _WhackMoleState extends State<WhackMoleGame> {
-  static const _seconds = 30;
+  // No countdown and no moving target: the mole waits until it is tapped, and the round ends after a few finds.
+  static const _goal = 8;
   final _rnd = math.Random();
-  Timer? _timer;
-  int _left = _seconds;
-  int _score = 0;
+  int _found = 0;
   int? _mole;
   bool _running = false;
 
@@ -76,40 +75,27 @@ class _WhackMoleState extends State<WhackMoleGame> {
   }
 
   void _start() {
-    _timer?.cancel();
     setState(() {
-      _left = _seconds;
-      _score = 0;
+      _found = 0;
       _mole = _rnd.nextInt(9);
       _running = true;
     });
-    var ticks = 0;
-    _timer = Timer.periodic(const Duration(milliseconds: 100), (t) {
-      ticks++;
-      if (!mounted) return;
-      setState(() {
-        if (ticks % 8 == 0) _mole = _rnd.nextInt(9); // a new hole about every 0.8 s
-        if (ticks % 10 == 0) _left--;
-        if (_left <= 0) {
-          _running = false;
-          _mole = null;
-          t.cancel();
-        }
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
   }
 
   void _hit(int i) {
     if (!_running || _mole != i) return;
     setState(() {
-      _score++;
-      _mole = null;
+      _found++;
+      if (_found >= _goal) {
+        _running = false;
+        _mole = null;
+      } else {
+        var next = _rnd.nextInt(9);
+        while (next == i) {
+          next = _rnd.nextInt(9);
+        }
+        _mole = next;
+      }
     });
   }
 
@@ -126,7 +112,7 @@ class _WhackMoleState extends State<WhackMoleGame> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  _running ? '⭐ $_score   ⏱ $_left' : tr2('انتهت اللعبة! ضربت $_score', 'Done! You hit $_score'),
+                  _running ? '🐹 $_found / $_goal' : tr2('أحسنت! وجدت كل الخلدان', 'Well done! You found them all'),
                   key: const ValueKey('fun_status'),
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
                 ),

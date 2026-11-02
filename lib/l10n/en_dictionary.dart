@@ -789,6 +789,8 @@ const Map<String, String> kEnglish = {
   'الكلمات الإنجليزية': 'English words',
   'الذاكرة': 'Memory',
   'ترتيب الخطوات': 'Ordering steps',
+  'الحيوانات والطبيعة': 'Animals and nature',
+  'المواقع والتركيب': 'Places and fitting',
   'فهم القصة': 'Story understanding',
   'فهم المشاعر': 'Understanding feelings',
   'المفردات': 'Vocabulary',

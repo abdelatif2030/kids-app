@@ -22,10 +22,17 @@ class ChoiceRound {
   final String? prompt; // overrides the game's instruction for this round
   final String? ref; // what the round is about (a vocabulary id), for records
 
+  /// Pictures drawn in code (shapes, scenes) shown in place of the emoji [options]; [options] then serve as labels.
+  final List<Widget>? visuals;
+
+  /// A picture drawn in code shown above the choices, in place of [display].
+  final Widget? top;
+
   /// A text the child hears (a listening round). The audio service says it; the text stays on screen too.
   final String? say;
   final String sayLang;
-  const ChoiceRound(this.display, this.options, this.correct, {this.prompt, this.ref, this.say, this.sayLang = 'ar'});
+  const ChoiceRound(this.display, this.options, this.correct,
+      {this.prompt, this.ref, this.say, this.sayLang = 'ar', this.visuals, this.top});
 }
 
 const kChoiceRounds = 5;
@@ -215,6 +222,12 @@ const kChoiceGameSkills = <String, String>{
   'odd_one_out': 'shapes',
   'pattern': 'sequence',
   'compare': 'counting',
+  'sort_groups': 'vocab', // putting things into their kind (animals, food...) uses the words' categories
+  'shape_finder': 'shapes',
+  'where_ball': 'spatial',
+  'feed_animal': 'nature',
+  'big_small': 'shapes',
+  'next_in_day': 'sequence',
 };
 
 class ChoiceGame extends StatefulWidget {
@@ -324,6 +337,7 @@ class _ChoiceGameState extends State<ChoiceGame> {
                 textDirection: TextDirection.ltr,
                 child: Text(round.display, key: const ValueKey('display'), textAlign: TextAlign.center, style: TextStyle(fontSize: groups ? 96 : 52)),
               ),
+            if (round.top != null) Padding(padding: const EdgeInsets.only(bottom: 8), child: round.top),
             if (round.say != null)
               Padding(
                 key: const ValueKey('listen_block'),
@@ -365,7 +379,9 @@ class _ChoiceGameState extends State<ChoiceGame> {
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(color: RC.outline, width: 4),
                           ),
-                          child: groups
+                          child: round.visuals != null
+                              ? round.visuals![o]
+                              : groups
                               ? Column(mainAxisSize: MainAxisSize.min, children: [
                                   Text(widget.groupEmojis![o], style: const TextStyle(fontSize: 44)),
                                   Text(widget.groupTitles![o], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: RC.ink)),

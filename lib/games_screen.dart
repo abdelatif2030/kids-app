@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'design/layout.dart';
 
 import 'color_game.dart';
+import 'drawing_screen.dart';
 import 'games/fun_games.dart';
 import 'games/game_catalog.dart';
 import 'games/game_common.dart';
@@ -27,7 +28,10 @@ class GamesGrid extends StatefulWidget {
   /// The child playing, so finished games and the learning language are remembered. Without one the
   /// educational games still open but remember nothing.
   final ChildProfile? child;
-  const GamesGrid({super.key, required this.age, this.child});
+
+  /// Show only these games (a category of the hub); null shows every game. The id 'drawing' adds the drawing pad.
+  final Set<String>? only;
+  const GamesGrid({super.key, required this.age, this.child, this.only});
 
   @override
   State<GamesGrid> createState() => _GamesGridState();
@@ -139,11 +143,25 @@ class _GamesGridState extends State<GamesGrid> {
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => g.build())),
             ),
         ];
+        final only = widget.only;
+        if (only != null) {
+          islands.removeWhere((i) => !only.contains(i.id.substring(5)));
+          if (only.contains('drawing')) {
+            islands.insert(
+              0,
+              spec(
+                id: 'drawing',
+                title: tr2('الرسم', 'Drawing'),
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => DrawingScreen(child: widget.child))),
+              ),
+            );
+          }
+        }
         // Inside a bounded area (the games tab) the map takes all of it; elsewhere it has its own height.
         return LayoutBuilder(
           builder: (context, box) => box.maxHeight.isFinite
               ? IslandHome(islands: islands, grid: true)
-              : SizedBox(height: 520, child: IslandHome(islands: islands)),
+              : SizedBox(height: 520, child: IslandHome(islands: islands, grid: true)),
         );
       },
     );
