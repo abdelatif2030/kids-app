@@ -1,0 +1,4 @@
+{
+  "note": "Real audio samples of candidate voices, written by tools/audio_gen/compare.py. Empty until someone runs it with a provider key. Samples are TEMPORARY TESTS, never approved assets.",
+  "samples": []
+}

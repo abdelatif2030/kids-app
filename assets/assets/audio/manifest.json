@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "note": "Overrides for the built-in audio asset list (lib/media/audio_manifest.dart). Add an entry only when a real file exists. 'review: approved' needs a native-speaker sign-off (name and date in 'reviewedBy').",
+  "assets": {}
+}

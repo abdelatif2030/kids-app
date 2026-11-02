@@ -1,0 +1,14 @@
+{
+  "sections": [
+    { "id": "letters",   "title": "الحروف",                  "emoji": "🔤", "kind": "letters",  "file": "letters.json",       "minAge": 3, "maxAge": 6 },
+    { "id": "tracing",   "title": "تتبّع الحروف والأرقام",    "emoji": "✍️", "kind": "tracing",                                  "minAge": 4, "maxAge": 6 },
+    { "id": "harakat",   "title": "الحركات",                 "emoji": "🔠", "kind": "decks",    "file": "harakat.json",       "minAge": 5, "maxAge": 6 },
+    { "id": "word",      "title": "كلمة اليوم",              "emoji": "💡", "kind": "word",     "file": "words.json",         "minAge": 2, "maxAge": 6 },
+    { "id": "concepts",  "title": "المفاهيم",                "emoji": "↕️", "kind": "decks",    "file": "concepts.json",      "minAge": 2, "maxAge": 6 },
+    { "id": "calendar",  "title": "الأيام والشهور والفصول",   "emoji": "📅", "kind": "decks",    "file": "calendar.json",      "minAge": 4, "maxAge": 6 },
+    { "id": "body",      "title": "جسمي ومشاعري",            "emoji": "🙂", "kind": "decks",    "file": "body_feelings.json", "minAge": 1, "maxAge": 6 },
+    { "id": "jobs",      "title": "المهن والأماكن",          "emoji": "👨‍⚕️", "kind": "decks",    "file": "jobs_places.json",   "minAge": 3, "maxAge": 6 },
+    { "id": "transport", "title": "المواصلات",               "emoji": "🚌", "kind": "decks",    "file": "transport.json",     "minAge": 2, "maxAge": 6 },
+    { "id": "clock",     "title": "الساعة",                  "emoji": "⏰", "kind": "clock",    "file": "clock.json",         "minAge": 5, "maxAge": 6 }
+  ]
+}
