@@ -362,6 +362,13 @@ void main() {
     });
   });
 
+  test('login headers allow the inline loader of every Firebase service the app uses (core, auth, firestore; two variants)', () {
+    final csp = RegExp(r'Content-Security-Policy: (.*)').firstMatch(File('tool/headers_login').readAsStringSync())!.group(1)!;
+    final scriptSrc = RegExp(r'script-src ([^;]*)').firstMatch(csp)!.group(1)!;
+    expect(RegExp(r"'sha256-[A-Za-z0-9+/=]+'").allMatches(scriptSrc).length, 6);
+    expect(scriptSrc, isNot(contains("'unsafe-inline'")));
+  });
+
   test('Firebase start-up is bounded so a blocked script can never leave the app blank', () {
     final src = File('lib/firebase_config.dart').readAsStringSync();
     expect(src, contains('.timeout(firebaseStartTimeout)'));

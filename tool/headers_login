@@ -2,7 +2,8 @@
 # build output; the repository's web/_headers stays the strict, talks-to-nobody file).
 # Allowed on top of the strict file, only so Firebase Auth (Google popup + e-mail/password) and Firestore can work:
 #   scripts   : Google API loader (apis.google.com, www.gstatic.com), Google sign-in button script (accounts.google.com) and
-#               ONE inline script allowed by its exact hash (firebase_core_web's loader of the Firebase JS SDK)
+#               the inline loader scripts of firebase_core_web (core, auth, firestore; Chrome and Safari variants), each allowed by exact hash
+#               (hashes are for Firebase JS SDK 13.1.0 / firebase_core_web 4.1.0; recompute with tool/csp_hashes.py after a plugin upgrade)
 #   connect   : Identity Toolkit, Secure Token, Firestore, Firebase Installations
 #   frames    : the project's auth handler (kids-app-2361e.firebaseapp.com) and accounts.google.com (sign-in popup/iframe)
 # No analytics host is allowed. The Cross-Origin-Opener-Policy header is deliberately NOT set (it would break the popup).
@@ -10,7 +11,7 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-YYaa/Ai2XuluQa6sbDZmBFePjXaJErauT33uzHZRB1Y=' https://apis.google.com https://www.gstatic.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: blob: https://img.youtube.com https://i3.ytimg.com https://lh3.googleusercontent.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' data: blob: https://fonts.gstatic.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebaseinstallations.googleapis.com https://www.googleapis.com https://accounts.google.com; media-src 'self' blob: data:; worker-src 'self' blob:; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://kids-app-2361e.firebaseapp.com https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' 'sha256-YYaa/Ai2XuluQa6sbDZmBFePjXaJErauT33uzHZRB1Y=' 'sha256-YE4XeMtzbmXoK0iniV4w5yeEvANP61G11Z0qhaAcoHU=' 'sha256-lxY7MwgY05//x5PJru5QZIF5G3LSEYRi/NpG8F32UmE=' 'sha256-E5pQKGuCE4yyzi3hBHqfnUZ9xuaXZ4NGzdrGhm0zDsk=' 'sha256-N3kpEfDnGZMIvG+dJIvE5lI1NKt7qqDGQieQvkwB0/g=' 'sha256-ZWdHmF/GV+qIgh+aG+BIfWaNlYa1tnUISMgZ5MRRmf8=' https://apis.google.com https://www.gstatic.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: blob: https://img.youtube.com https://i3.ytimg.com https://lh3.googleusercontent.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' data: blob: https://fonts.gstatic.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://firebaseinstallations.googleapis.com https://www.googleapis.com https://accounts.google.com; media-src 'self' blob: data:; worker-src 'self' blob:; frame-src https://www.youtube-nocookie.com https://www.youtube.com https://kids-app-2361e.firebaseapp.com https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'
 
 /flutter_service_worker.js
   Cache-Control: no-cache
