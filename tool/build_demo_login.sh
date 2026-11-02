@@ -9,7 +9,7 @@ for v in FIREBASE_API_KEY FIREBASE_APP_ID FIREBASE_SENDER_ID FIREBASE_PROJECT_ID
   if [ -z "${!v:-}" ]; then echo "missing $v" >&2; exit 1; fi
 done
 flutter build web --release --no-web-resources-cdn -o "$out" \
-  --dart-define=DEMO=true --dart-define=DEMO_LOGIN=true \
+  --dart-define=DEMO=true --dart-define=DEMO_FULL=true --dart-define=DEMO_LOGIN=true \
   --dart-define=FIREBASE_API_KEY="$FIREBASE_API_KEY" --dart-define=FIREBASE_APP_ID="$FIREBASE_APP_ID" \
   --dart-define=FIREBASE_SENDER_ID="$FIREBASE_SENDER_ID" --dart-define=FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID" \
   --dart-define=FIREBASE_AUTH_DOMAIN="$FIREBASE_AUTH_DOMAIN"

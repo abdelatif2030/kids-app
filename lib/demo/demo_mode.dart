@@ -26,15 +26,26 @@ class DemoMode {
 
   static bool get enabled => _override ?? _compileTime;
 
+  /// `--dart-define=DEMO_FULL=true`: the hosted demo runs the WHOLE offline app (full parent onboarding with PIN,
+  /// assessment and plans, owner-reviewed videos). Only the demo notice and the erase button are added. Without it the
+  /// demo keeps its short child form and parent-approved videos.
+  static const bool kFull = bool.fromEnvironment('DEMO_FULL');
+  static bool? _fullOverride;
+  static bool get full => _fullOverride ?? kFull;
+
+  /// True when the short "make a child" form replaces the full onboarding.
+  static bool get shortChildForm => enabled && !full;
+
   /// Applies the demo's rules at start-up. In the demo the owner's pre-review flag of the bundled videos is NOT honoured:
   /// a lesson reaches a child only after a parent of this browser previews and approves it (and the parent can still hide
   /// it from one child or from all). Everything else about the video workflow is the normal app.
   static void applyPolicies() {
-    if (enabled) Video.honourOwnerReview = false;
+    if (enabled && !full) Video.honourOwnerReview = false;
   }
 
   /// Tests only.
   static void overrideForTest(bool? value) => _override = value;
+  static void overrideFullForTest(bool? value) => _fullOverride = value;
 }
 
 /// What a visitor is told, in plain words. Kept in one place so the wording is tested.

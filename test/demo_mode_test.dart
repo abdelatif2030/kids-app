@@ -340,6 +340,28 @@ void main() {
     });
   });
 
+  group('DEMO_FULL: the demo runs the whole offline app', () {
+    tearDown(() => DemoMode.overrideFullForTest(null));
+
+    test('default keeps the short form; full switches to onboarding and honours the owner review', () {
+      expect(DemoMode.shortChildForm, isTrue);
+      DemoMode.overrideFullForTest(true);
+      expect(DemoMode.shortChildForm, isFalse);
+      expect(DemoMode.enabled, isTrue, reason: 'the notice and erase button remain');
+    });
+
+    testWidgets('the begin button opens the full parent onboarding, not the short demo form', (t) async {
+      await freshBrowser();
+      DemoMode.overrideFullForTest(true);
+      await t.pumpWidget(app());
+      await t.pump();
+      await t.tap(find.byIcon(Icons.rocket_launch_rounded));
+      await t.pumpAndSettle();
+      expect(find.byType(OnboardingFlow), findsOneWidget);
+      expect(find.byType(DemoCreateChildScreen), findsNothing);
+    });
+  });
+
   shortScreenTests();
 
   test('English notice says the same, and promises no cloud backup', () async {

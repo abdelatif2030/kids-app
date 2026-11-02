@@ -90,7 +90,7 @@ class _Welcome extends StatelessWidget {
                 minimumSize: const Size(260, 64),
                 backgroundColor: RC.good,
               ),
-              onPressed: () => DemoMode.enabled ? _demoAdd(context) : Navigator.push(
+              onPressed: () => DemoMode.shortChildForm ? _demoAdd(context) : Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const OnboardingFlow()),
               ),
@@ -129,7 +129,7 @@ class _Picker extends StatelessWidget {
 
   /// Adding a child is a parent's job: it asks for the PIN when one is set.
   Future<void> _addChild(BuildContext context) async {
-    if (DemoMode.enabled) return _demoAdd(context);
+    if (DemoMode.shortChildForm) return _demoAdd(context);
     if (await ParentSettings.instance.hasPin()) {
       if (!context.mounted) return;
       final ok = await Navigator.push<bool>(
