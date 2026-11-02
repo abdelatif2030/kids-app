@@ -362,6 +362,11 @@ void main() {
     });
   });
 
+  test('Firebase start-up is bounded so a blocked script can never leave the app blank', () {
+    final src = File('lib/firebase_config.dart').readAsStringSync();
+    expect(src, contains('.timeout(firebaseStartTimeout)'));
+  });
+
   shortScreenTests();
 
   test('English notice says the same, and promises no cloud backup', () async {
