@@ -68,6 +68,6 @@ foreach ($f in $files) {
   }
 }
 $items | ConvertTo-Json -Depth 4 | Set-Content -Encoding UTF8 (Join-Path $Out 'lessons.json')
-$total = ($items | Measure-Object -Property sizeMB -Sum).Sum
+$total = [math]::Round((($items | ForEach-Object { $_['sizeMB'] }) | Measure-Object -Sum).Sum, 1)
 Write-Host "Done: $($items.Count) videos, about $total MB in $Out"
 Write-Host "Next: open $Out\lessons.json, fix titles and categories, then upload the folders 'videos' and 'posters' (docs/OWN_VIDEOS.md)."
