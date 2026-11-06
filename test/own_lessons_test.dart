@@ -148,12 +148,23 @@ void main() {
       expect(find.text('2:05'), findsOneWidget);
     });
 
+    test('letters and numbers are one category; the old ids still land there', () {
+      expect(kLessonCategories.contains('letters'), isFalse);
+      expect(kLessonCategories.contains('numbers'), isFalse);
+      expect(normalizeLessonCategory('letters'), 'letters_numbers');
+      expect(normalizeLessonCategory('numbers'), 'letters_numbers');
+      expect(normalizeLessonCategory('letters_numbers'), 'letters_numbers');
+      expect(normalizeLessonCategory('songs'), 'songs');
+      expect(normalizeLessonCategory('nonsense'), 'general');
+      expect(normalizeLessonCategory(null), 'general');
+    });
+
     testWidgets('category tabs narrow the list and show their counts; "all" brings everything back', (t) async {
       OwnLessons.sourceOverride = _FakeSource(_manifest());
       await _show(t, const OwnLessonsScreen(child: _kid));
       await t.pump(const Duration(milliseconds: 300));
       expect(find.byKey(const ValueKey('chip_all')), findsOneWidget);
-      expect(find.byKey(const ValueKey('chip_letters')), findsOneWidget);
+      expect(find.byKey(const ValueKey('chip_letters_numbers')), findsOneWidget);
       expect(find.byKey(const ValueKey('chip_songs')), findsOneWidget);
       await t.tap(find.byKey(const ValueKey('chip_songs')));
       await t.pump();

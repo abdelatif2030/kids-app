@@ -28,8 +28,8 @@ New-Item -ItemType Directory -Force -Path (Join-Path $Out 'videos'), (Join-Path 
 # Guess a category from the title (a first draft: fix it in lessons.json).
 function Get-Category([string]$t) {
   $x = $t.ToLowerInvariant()
-  if ($x -match 'حرو|alphabet|letter|ا ب|الحروف') { return 'letters' }
-  if ($x -match 'أرقام|ارقام|رقم|numbers|count|العد') { return 'numbers' }
+  if ($x -match 'حرو|alphabet|letter|ا ب|الحروف') { return 'letters_numbers' }
+  if ($x -match 'أرقام|ارقام|رقم|numbers|count|العد') { return 'letters_numbers' }
   if ($x -match 'حيوان|animal|أصوات') { return 'animals' }
   if ($x -match 'أغان|اغان|أغنية|اغنية|song|أناشيد|انشود') { return 'songs' }
   if ($x -match 'شكل|shape|ألوان|الوان|color') { return 'shapes' }
