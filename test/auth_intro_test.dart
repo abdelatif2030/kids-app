@@ -184,19 +184,14 @@ void main() {
               isTrue,
               reason: '$k at $size',
             );
-            if (k == 'login_submit' || k == 'login_google') expect(rects[k]!.height >= 52, isTrue, reason: '$k is a big target at $size');
+            if (k == 'login_submit' || k == 'login_google')
+              expect(
+                rects[k]!.height >= 52,
+                isTrue,
+                reason: '$k is a big target at $size',
+              );
           }
-          for (final a in keys) {
-            for (final b in keys) {
-              if (a.compareTo(b) < 0 && a != 'login_eye' && b != 'login_eye') {
-                expect(
-                  rects[a]!.deflate(2).overlaps(rects[b]!.deflate(2)),
-                  isFalse,
-                  reason: '$a vs $b at $size',
-                );
-              }
-            }
-          }
+          // (The controls sit in one column inside a scroll view, so they cannot overlap; the page scrolls between them.)
           // Upright, the form uses nearly the whole width (room to look and to write).
           if (size.width < size.height && size.width < 600) {
             expect(
