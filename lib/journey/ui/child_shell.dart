@@ -6,6 +6,7 @@ import '../../design/picture_stage.dart';
 import '../../design/layout.dart';
 import '../../design/motion_system.dart';
 import '../../design/tokens.dart';
+import '../../games/games_choice.dart';
 import '../../games/games_hub.dart';
 import '../../l10n/strings.dart';
 import '../../offline/offline_ui.dart';
@@ -324,14 +325,26 @@ class _GamesTab extends StatefulWidget {
 }
 
 class _GamesTabState extends State<_GamesTab> {
+  /// false: the two cards (learning / fun); true: the ten-island learning hub.
+  bool _learning = false;
+
   @override
-  Widget build(BuildContext context) =>
-      // The games hub: ten islands (letters, numbers, shapes...), each opening its own games. It fills the whole area.
-      GamesHub(
-        key: const ValueKey('games_hub'),
-        child: widget.child,
+  Widget build(BuildContext context) {
+    if (!_learning) {
+      return GamesChoiceScreen(
+        key: const ValueKey('games_choice_page'),
         onBack: widget.onBack,
+        onEducational: () => setState(() => _learning = true),
+        onFun: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => CategoryGamesScreen(category: kFunCategory, child: widget.child))),
       );
+    }
+    // The learning games hub: ten islands (letters, numbers, shapes...), each opening its own games. It fills the whole area.
+    return GamesHub(
+      key: const ValueKey('games_hub'),
+      child: widget.child,
+      onBack: () => setState(() => _learning = false),
+    );
+  }
 }
 
 class _CreateTab extends StatelessWidget {

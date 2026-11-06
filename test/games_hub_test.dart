@@ -43,6 +43,7 @@ void main() {
       for (final c in kGameCategories) {
         seen.addAll(c.games);
       }
+      seen.addAll(kFunCategory.games);
       expect(seen.toSet().length, seen.length, reason: 'a game appears on two islands');
       for (final id in every.where((id) => id != 'review_words')) {
         expect(seen, contains(id), reason: '$id is on no island');

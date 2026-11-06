@@ -39,7 +39,7 @@ class GameCategory {
 /// The ten islands, in the order of the owner's design (left to right, top row then bottom row).
 final List<GameCategory> kGameCategories = [
   GameCategory('brain', () => tr2('ألعاب الذكاء والتفكير', 'Thinking games'), const Offset(0.127, 0.478), const Offset(0.127, 0.528),
-      games: {'maze', 'sort_groups', 'treasure_hunt', 'next_in_day', 'snakes_ladders', 'connect_four', 'where_ball', 'pattern', 'fun_xo', 'fun_snake'}),
+      games: {'maze', 'sort_groups', 'treasure_hunt', 'next_in_day', 'snakes_ladders', 'connect_four', 'where_ball', 'pattern'}),
   GameCategory('letters', () => tr2('الحروف والكلمات', 'Letters and words'), const Offset(0.319, 0.478), const Offset(0.319, 0.528),
       games: {'letters', 'letter_fishing', 'trace_letters', 'word_book', 'listen_letter', 'listen_word', 'review_words'}),
   GameCategory('numbers', () => tr2('الأرقام والحساب', 'Numbers and maths'), const Offset(0.504, 0.478), const Offset(0.504, 0.528),
@@ -48,7 +48,7 @@ final List<GameCategory> kGameCategories = [
   GameCategory('animals', () => tr2('الحيوانات والطبيعة', 'Animals and nature'), const Offset(0.88, 0.478), const Offset(0.88, 0.528),
       games: {'animal', 'animal_habitats', 'feed_animal', 'listen_picture', 'balloons'}),
   GameCategory('observe', () => tr2('الذاكرة والملاحظة', 'Memory and observation'), const Offset(0.127, 0.77), const Offset(0.127, 0.8),
-      games: {'memory', 'match_pictures', 'odd_one_out', 'fun_whack', 'fun_stars'}),
+      games: {'memory', 'match_pictures', 'odd_one_out'}),
   GameCategory('feelings', () => tr2('المشاعر والاجتماعيات', 'Feelings and friends'), const Offset(0.32, 0.77), const Offset(0.32, 0.8),
       screen: (c) => LandMapScreen(land: landById('feelings'), child: c)),
   GameCategory('art', () => tr2('الإبداع والرسم', 'Creating and drawing'), const Offset(0.505, 0.77), const Offset(0.505, 0.8), screen: (c) => DrawingScreen(child: c)),
@@ -56,8 +56,12 @@ final List<GameCategory> kGameCategories = [
   GameCategory('adventures', () => tr2('مغامرات رحلتي', 'Rehlaty adventures'), const Offset(0.885, 0.77), const Offset(0.885, 0.8), screen: (c) => AdventureScreen(child: c)),
 ];
 
-/// Every game id the hub knows about, to check that no game is lost and none is listed twice.
-Set<String> allHubGameIds() => {for (final c in kGameCategories) ...c.games};
+/// «ألعاب للتسلية»: the second choice of the Games tab (the owner's picture with two cards). The four fun games live only here.
+final GameCategory kFunCategory = GameCategory('fun', () => tr2('ألعاب للتسلية', 'Fun games'), const Offset(0.5, 0.5), const Offset(0.5, 0.5),
+    games: {'fun_whack', 'fun_stars', 'fun_xo', 'fun_snake'});
+
+/// Every game id the games tab knows about (the ten islands and the fun games), to check that none is lost or listed twice.
+Set<String> allHubGameIds() => {for (final c in kGameCategories) ...c.games, ...kFunCategory.games};
 
 /// The owner's own picture of the games screen (assets/games/hub_scene.jpg, 1672 x 941): Adam and Nour above a wooden
 /// sign and ten floating islands. The picture is shown whole; every island is a large invisible button on top of it,
