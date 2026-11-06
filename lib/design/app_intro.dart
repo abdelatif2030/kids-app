@@ -46,7 +46,9 @@ class _AppIntroState extends State<AppIntro> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_done || AppIntro._shown) return;
-    final underTest = WidgetsBinding.instance.runtimeType.toString().contains('Test');
+    final underTest = WidgetsBinding.instance.runtimeType.toString().contains(
+      'Test',
+    );
     if (!(AppIntro.forceShow ?? !underTest) || motionReduced(context)) return;
     AppIntro._shown = true;
     _done = false;
@@ -76,7 +78,14 @@ class _AppIntroState extends State<AppIntro> {
       fit: StackFit.expand,
       children: [
         widget.child,
-        if (!_done) Positioned.fill(child: IntroVideoLayer(key: const ValueKey('intro_video'), onDone: _skip, onFailed: _videoFailed)),
+        if (!_done)
+          Positioned.fill(
+            child: IntroVideoLayer(
+              key: const ValueKey('intro_video'),
+              onDone: _skip,
+              onFailed: _videoFailed,
+            ),
+          ),
       ],
     );
   }
@@ -89,7 +98,11 @@ class _AppIntroState extends State<AppIntro> {
 class IntroVideoLayer extends StatefulWidget {
   final VoidCallback onDone;
   final VoidCallback onFailed;
-  const IntroVideoLayer({super.key, required this.onDone, required this.onFailed});
+  const IntroVideoLayer({
+    super.key,
+    required this.onDone,
+    required this.onFailed,
+  });
 
   @override
   State<IntroVideoLayer> createState() => _IntroVideoLayerState();
@@ -105,6 +118,9 @@ class _IntroVideoLayerState extends State<IntroVideoLayer> {
   /// The browser refused to start the video with sound before a tap (every browser does this on a fresh page). The
   /// picture stays and a big "tap to start" button asks for the tap, so the intro is played WITH its sound.
   bool _needsTap = false;
+
+  /// The video is already playing (muted) and only the small sound button is shown.
+  bool _mutedPlaying = false;
 
   @override
   void initState() {
@@ -135,7 +151,10 @@ class _IntroVideoLayerState extends State<IntroVideoLayer> {
 
   Future<void> _start() async {
     try {
-      final c = VideoPlayerController.asset(AppIntro.videoAsset, videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
+      final c = VideoPlayerController.asset(
+        AppIntro.videoAsset,
+        videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
+      );
       _vc = c;
       await c.initialize().timeout(const Duration(seconds: 8));
       if (!mounted) return;
@@ -148,16 +167,34 @@ class _IntroVideoLayerState extends State<IntroVideoLayer> {
       } catch (_) {
         // refused: handled below
       }
-      // A browser may accept play() but keep the video paused until a tap. Give it a moment, then ask for the tap.
-      await Future<void>.delayed(const Duration(milliseconds: 700));
+      // A browser may refuse sound before a tap (iPhone Safari always does). The video must still MOVE: play it muted
+      // at once, and offer a sound button that restarts it with its sound.
+      await Future<void>.delayed(const Duration(milliseconds: 600));
       if (!mounted || _ended || _failed) return;
-      if (c.value.isPlaying || c.value.isCompleted) {
-        _playing();
-      } else {
+      if (!c.value.isPlaying && !c.value.isCompleted) {
+        try {
+          await c.setVolume(0);
+          await c.play();
+          await Future<void>.delayed(const Duration(milliseconds: 600));
+        } catch (_) {}
+        if (!mounted || _ended || _failed) return;
+        if (c.value.isPlaying) {
+          _playing();
+          setState(() {
+            _needsTap = true;
+            _mutedPlaying = true;
+          }); // the small sound button, over a video that is already playing
+          return;
+        }
         _limit?.cancel();
         await c.pause();
-        if (mounted) setState(() => _needsTap = true);
+        if (mounted)
+          setState(
+            () => _needsTap = true,
+          ); // nothing plays before a tap: the big button
+        return;
       }
+      _playing();
     } catch (_) {
       _fail();
     }
@@ -167,7 +204,10 @@ class _IntroVideoLayerState extends State<IntroVideoLayer> {
   Future<void> _tapToStart() async {
     final c = _vc;
     if (c == null) return;
-    setState(() => _needsTap = false);
+    setState(() {
+      _needsTap = false;
+      _mutedPlaying = false;
+    });
     try {
       await c.setVolume(1);
       await c.seekTo(Duration.zero);
@@ -183,7 +223,9 @@ class _IntroVideoLayerState extends State<IntroVideoLayer> {
     if (v == null) return;
     if (v.hasError) {
       _fail();
-    } else if (v.isInitialized && (v.isCompleted || (v.duration > Duration.zero && v.position >= v.duration))) {
+    } else if (v.isInitialized &&
+        (v.isCompleted ||
+            (v.duration > Duration.zero && v.position >= v.duration))) {
       _finish();
     }
   }
@@ -212,16 +254,28 @@ class _IntroVideoLayerState extends State<IntroVideoLayer> {
           fit: StackFit.expand,
           children: [
             const ColoredBox(color: Color(0xFF58A8F2)),
-            Image.asset(AppIntro.posterAsset, key: const ValueKey('intro_poster'), fit: wide ? BoxFit.cover : BoxFit.contain, errorBuilder: (_, _, _) => const SizedBox()),
+            Image.asset(
+              AppIntro.posterAsset,
+              key: const ValueKey('intro_poster'),
+              fit: wide ? BoxFit.cover : BoxFit.contain,
+              errorBuilder: (_, _, _) => const SizedBox(),
+            ),
             if (_ready && vc != null && vc.value.isInitialized)
               FittedBox(
                 key: const ValueKey('intro_player'),
                 fit: wide ? BoxFit.cover : BoxFit.contain,
                 clipBehavior: Clip.hardEdge,
-                child: SizedBox(width: vc.value.size.width, height: vc.value.size.height, child: VideoPlayer(vc)),
+                child: SizedBox(
+                  width: vc.value.size.width,
+                  height: vc.value.size.height,
+                  child: VideoPlayer(vc),
+                ),
               ),
             if (_needsTap)
-              Center(
+              Align(
+                alignment: _mutedPlaying
+                    ? const Alignment(0, 0.8)
+                    : Alignment.center,
                 child: Semantics(
                   button: true,
                   label: 'اضغط لبدء الفيديو بالصوت / Tap to start with sound',
@@ -229,20 +283,49 @@ class _IntroVideoLayerState extends State<IntroVideoLayer> {
                     key: const ValueKey('intro_tap_to_start'),
                     color: const Color(0xFF5B2BB8),
                     elevation: 8,
-                    shape: const StadiumBorder(side: BorderSide(color: Colors.white, width: 3)),
+                    shape: const StadiumBorder(
+                      side: BorderSide(color: Colors.white, width: 3),
+                    ),
                     child: InkWell(
                       customBorder: const StadiumBorder(),
                       onTap: _tapToStart,
                       child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                        child: Row(mainAxisSize: MainAxisSize.min, children: [
-                          Icon(Icons.play_circle_fill_rounded, color: Colors.white, size: 44),
-                          SizedBox(width: 12),
-                          Column(mainAxisSize: MainAxisSize.min, children: [
-                            Text('اضغط للبدء 🔊', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900)),
-                            Text('Tap to start with sound', style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w700)),
-                          ]),
-                        ]),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 28,
+                          vertical: 14,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.play_circle_fill_rounded,
+                              color: Colors.white,
+                              size: 44,
+                            ),
+                            SizedBox(width: 12),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'اضغط للبدء 🔊',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                Text(
+                                  'Tap to start with sound',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -262,7 +345,20 @@ class _IntroVideoLayerState extends State<IntroVideoLayer> {
                       key: const ValueKey('intro_skip'),
                       customBorder: const StadiumBorder(),
                       onTap: _finish,
-                      child: const Padding(padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), child: Text('تخطي • Skip', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15))),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        child: Text(
+                          'تخطي • Skip',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
