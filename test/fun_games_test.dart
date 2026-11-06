@@ -36,16 +36,67 @@ void main() {
     expect(find.byKey(const ValueKey('games_grid')), findsOneWidget);
   });
 
-  testWidgets('tic-tac-toe: the child plays X and the computer answers with O; a finished game offers play again', (t) async {
+  testWidgets('tic-tac-toe with a friend: ❌ plays alone on the board, then it is ⭕\'s turn, and the turns keep alternating', (t) async {
     await _show(t, const TicTacToeGame());
+    final status = find.byKey(const ValueKey('fun_status'));
+    expect(t.widget<Text>(status).data, 'دور ❌');
     await t.tap(find.byKey(const ValueKey('cell_4')));
     await t.pump();
     expect(find.text('❌'), findsOneWidget);
+    expect(find.text('⭕'), findsNothing, reason: 'the board shows only the first mark: nobody plays O for the second person');
+    expect(t.widget<Text>(status).data, 'دور ⭕');
+    await t.pump(const Duration(seconds: 3));
+    expect(find.text('⭕'), findsNothing, reason: 'waiting never makes a move');
+    await t.tap(find.byKey(const ValueKey('cell_0')));
+    await t.pump();
     expect(find.text('⭕'), findsOneWidget);
-    // keep playing the first free cell until the game ends
-    for (var i = 0; i < 9 && find.byKey(const ValueKey('fun_again')).evaluate().isEmpty; i++) {
-      await t.tap(find.byKey(ValueKey('cell_$i')), warnIfMissed: false);
+    expect(find.text('❌'), findsOneWidget);
+    expect(t.widget<Text>(status).data, 'دور ❌');
+    // a filled square cannot be played again, and it stays the same player's turn
+    await t.tap(find.byKey(const ValueKey('cell_0')));
+    await t.pump();
+    expect(find.text('⭕'), findsOneWidget);
+    expect(t.widget<Text>(status).data, 'دور ❌');
+  });
+
+  testWidgets('tic-tac-toe with a friend: three in a row wins for that player, then play again clears the board', (t) async {
+    await _show(t, const TicTacToeGame());
+    for (final i in [0, 3, 1, 4, 2]) {
+      await t.tap(find.byKey(ValueKey('cell_$i'))); // ❌ 0,1,2  ⭕ 3,4
       await t.pump();
+    }
+    expect(t.widget<Text>(find.byKey(const ValueKey('fun_status'))).data, contains('فاز ❌'));
+    await t.tap(find.byKey(const ValueKey('cell_8')), warnIfMissed: false);
+    await t.pump();
+    expect(find.text('❌'), findsNWidgets(3), reason: 'no move after the game is over');
+    await t.tap(find.byKey(const ValueKey('fun_again')));
+    await t.pump();
+    expect(find.text('❌'), findsNothing);
+    expect(find.text('⭕'), findsNothing);
+    expect(t.widget<Text>(find.byKey(const ValueKey('fun_status'))).data, 'دور ❌');
+  });
+
+  testWidgets('tic-tac-toe vs the computer: the child sees their own ❌ first, the computer answers ⭕ only after a short wait and cannot be hurried', (t) async {
+    await _show(t, const TicTacToeGame());
+    await t.tap(find.byKey(const ValueKey('xo_mode_computer')));
+    await t.pump();
+    await t.tap(find.byKey(const ValueKey('cell_4')));
+    await t.pump();
+    expect(find.text('❌'), findsOneWidget);
+    expect(find.text('⭕'), findsNothing, reason: 'the answer is not instant');
+    expect(t.widget<Text>(find.byKey(const ValueKey('fun_status'))).data, contains('يفكّر'));
+    await t.tap(find.byKey(const ValueKey('cell_0')), warnIfMissed: false); // tapping while it thinks does nothing
+    await t.pump();
+    expect(find.text('❌'), findsOneWidget);
+    await t.pump(const Duration(milliseconds: 900));
+    expect(find.text('⭕'), findsOneWidget);
+    expect(t.widget<Text>(find.byKey(const ValueKey('fun_status'))).data, 'دور ❌');
+    // keep playing the first free cell until the game ends
+    for (var n = 0; n < 12 && find.byKey(const ValueKey('fun_again')).evaluate().isEmpty; n++) {
+      for (var i = 0; i < 9; i++) {
+        await t.tap(find.byKey(ValueKey('cell_$i')), warnIfMissed: false);
+        await t.pump(const Duration(milliseconds: 900));
+      }
     }
     expect(find.byKey(const ValueKey('fun_again')), findsOneWidget);
     await t.tap(find.byKey(const ValueKey('fun_again')));

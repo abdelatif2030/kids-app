@@ -1,7 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/design/app_intro.dart';
-import 'package:kids_app/design/app_logo.dart';
 import 'package:kids_app/design/worlds.dart';
 import 'package:kids_app/design/motion.dart';
 
@@ -101,44 +102,51 @@ void main() {
       WorldBackground.forceMotion = null;
     });
 
-    test('the intro lasts two seconds', () => expect(AppIntro.duration, const Duration(seconds: 2)));
+    test('the old code-made logo intro is gone: only the owner\'s picture and video remain', () {
+      expect(AppIntro.duration, const Duration(seconds: 2), reason: 'how long the picture stays if the video cannot play');
+      final src = File('lib/design/app_intro.dart').readAsStringSync();
+      expect(src.contains('AppLogo'), isFalse);
+      expect(src.contains('intro_ar'), isFalse);
+      expect(src.contains('_IntroSparkles'), isFalse);
+    });
 
     testWidgets('skipped under tests by default and with reduced motion: the app is simply there', (t) async {
       AppIntro.resetForTest();
       await t.pumpWidget(app(const AppIntro(child: Text('app'))));
       expect(find.text('app'), findsOneWidget);
+      expect(find.byKey(const ValueKey('intro_video')), findsNothing);
       AppIntro.forceShow = true;
       AppIntro.resetForTest();
       await t.pumpWidget(app(const AppIntro(child: Text('app2')), reduce: true));
-      expect(find.byType(AppLogo), findsNothing);
+      expect(find.byKey(const ValueKey('intro_video')), findsNothing);
     });
 
-    testWidgets('shows both names, ends by itself after 2 s, and a tap opens the app at once; shown once per run', (t) async {
+    testWidgets('shows the intro; if the video cannot play the picture stays 2 s and then the app opens; shown once per run', (t) async {
       AppIntro.forceShow = true;
       AppIntro.resetForTest();
       await t.pumpWidget(app(const AppIntro(child: Text('app'))));
-      await t.pump(const Duration(milliseconds: 800));
-      expect(find.byType(AppLogo), findsOneWidget);
-      // both names are written: the Arabic «رحلتي» and the English «Rehlaty»
-      expect(find.byKey(const ValueKey('intro_ar')), findsOneWidget);
-      expect(find.byKey(const ValueKey('intro_en')), findsOneWidget);
-      expect(t.widget<Text>(find.byKey(const ValueKey('intro_ar'))).data, 'رحلتي');
-      expect(t.widget<Text>(find.byKey(const ValueKey('intro_en'))).data, 'Rehlaty');
-      await t.pump(const Duration(milliseconds: 1300)); // 2.1 s in total: over
-      expect(find.byType(AppLogo), findsNothing);
+      await t.pump();
+      expect(find.byKey(const ValueKey('intro_video')), findsOneWidget);
+      expect(find.byKey(const ValueKey('intro_poster')), findsOneWidget, reason: 'the owner picture is shown while the video loads and instead of it');
+      // there is no video decoder under the test binding: the failure is reported, the picture holds, then the app opens
+      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 300)));
+      await t.pump(const Duration(milliseconds: 300));
+      expect(find.byKey(const ValueKey('intro_video')), findsOneWidget);
+      await t.pump(const Duration(milliseconds: 2100));
+      expect(find.byKey(const ValueKey('intro_video')), findsNothing);
       // a second AppIntro in the same run does not play again
       await t.pumpWidget(app(AppIntro(key: UniqueKey(), child: const Text('again'))));
       await t.pump();
-      expect(find.byType(AppLogo), findsNothing);
-      // tapping skips
+      expect(find.byKey(const ValueKey('intro_video')), findsNothing);
+      // tapping skips at once
       AppIntro.resetForTest();
       await t.pumpWidget(app(AppIntro(key: UniqueKey(), child: const Text('app3'))));
-      await t.pump(const Duration(milliseconds: 300));
-      expect(find.byKey(const ValueKey('world_journey')), findsOneWidget); // the intro is on screen
+      await t.pump(const Duration(milliseconds: 100));
+      expect(find.byKey(const ValueKey('intro_video')), findsOneWidget);
       await t.tapAt(const Offset(50, 50));
       await t.pump();
-      await t.pump(const Duration(milliseconds: 50));
-      expect(find.byKey(const ValueKey('world_journey')), findsNothing); // a tap opened the app at once
+      expect(find.byKey(const ValueKey('intro_video')), findsNothing);
     });
+
   });
 }

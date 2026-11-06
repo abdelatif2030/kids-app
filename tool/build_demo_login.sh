@@ -12,6 +12,12 @@ flutter build web --release --no-web-resources-cdn -o "$out" \
   --dart-define=DEMO=true --dart-define=DEMO_FULL=true --dart-define=DEMO_LOGIN=true \
   --dart-define=FIREBASE_API_KEY="$FIREBASE_API_KEY" --dart-define=FIREBASE_APP_ID="$FIREBASE_APP_ID" \
   --dart-define=FIREBASE_SENDER_ID="$FIREBASE_SENDER_ID" --dart-define=FIREBASE_PROJECT_ID="$FIREBASE_PROJECT_ID" \
-  --dart-define=FIREBASE_AUTH_DOMAIN="$FIREBASE_AUTH_DOMAIN"
+  --dart-define=FIREBASE_AUTH_DOMAIN="$FIREBASE_AUTH_DOMAIN" \
+  --dart-define=LESSONS_BASE_URL="${LESSONS_BASE_URL:-}"
 cp tool/headers_login "$out/_headers"
+# The owner's lesson videos come from one host (docs/OWN_VIDEOS.md): allow it, and only it, for video, thumbnails and the list.
+if [ -n "${LESSONS_BASE_URL:-}" ]; then
+  host="$(printf '%s' "$LESSONS_BASE_URL" | sed -E 's#^(https?://[^/]+).*#\1#')"
+  sed -i -E "s#media-src 'self'#media-src 'self' $host#; s#img-src 'self'#img-src 'self' $host#; s#connect-src 'self'#connect-src 'self' $host#" "$out/_headers"
+fi
 echo "built $out (login headers installed)"

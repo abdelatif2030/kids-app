@@ -194,17 +194,20 @@ void main() {
   });
 
   group('screens use the right world', () {
-    testWidgets('listening games live in the ocean, letters in the forest, numbers and patterns in space', (t) async {
-      await _show(t, const ListenPictureGame(childId: 'c1', age: 5), const Size(390, 800));
-      expect(find.byKey(const ValueKey('world_ocean')), findsOneWidget);
-      await _show(t, const LetterFishingGame(childId: 'c1', age: 5, lang: 'ar'), const Size(390, 800));
-      expect(find.byKey(const ValueKey('world_forest')), findsOneWidget);
-      await _show(t, const NumeralsGame(childId: 'c1', age: 5), const Size(390, 800));
-      expect(find.byKey(const ValueKey('world_space')), findsOneWidget);
-      await _show(t, const PatternGame(childId: 'c1', age: 5), const Size(390, 800));
-      expect(find.byKey(const ValueKey('world_space')), findsOneWidget);
-      await _show(t, const OddOneOutGame(childId: 'c1', age: 5), const Size(390, 800));
-      expect(find.byKey(const ValueKey('world_journey')), findsOneWidget);
+    testWidgets('every game sits on the owner\'s ONE shared game picture (no per-game painted world any more)', (t) async {
+      for (final game in <Widget>[
+        const ListenPictureGame(childId: 'c1', age: 5),
+        const LetterFishingGame(childId: 'c1', age: 5, lang: 'ar'),
+        const NumeralsGame(childId: 'c1', age: 5),
+        const PatternGame(childId: 'c1', age: 5),
+        const OddOneOutGame(childId: 'c1', age: 5),
+      ]) {
+        await _show(t, game, const Size(390, 800));
+        expect(find.byKey(const ValueKey('game_backdrop')), findsOneWidget, reason: '${game.runtimeType}');
+        for (final w in ['world_ocean', 'world_forest', 'world_space', 'world_journey']) {
+          expect(find.byKey(ValueKey(w)), findsNothing, reason: '${game.runtimeType} $w');
+        }
+      }
     });
 
     testWidgets('PastelBackground (used by ~25 screens) is now the journey world, and "quiet" removes the decoration', (t) async {

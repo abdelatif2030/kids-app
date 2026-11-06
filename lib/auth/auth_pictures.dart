@@ -1,5 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../demo/demo_mode.dart';
+import '../design/app_intro.dart';
+import '../journey/models.dart';
+import '../journey/repository.dart';
 
 import '../design/focusable_tap.dart';
 import '../design/picture_stage.dart';
@@ -231,6 +238,8 @@ class _LoginPictureScreenState extends State<LoginPictureScreen> {
               height: 44 / 1024 * h,
               child: IgnorePointer(child: _Tick(on: _remember, key: const ValueKey('login_remember_box'))),
             ),
+            // «Continue without an account» exists outside the demo only: in the demo an account is needed (owner decision).
+            if (!DemoMode.enabled)
             Positioned(
               left: 0,
               right: 0,
@@ -426,7 +435,7 @@ class _RegisterPictureScreenState extends State<RegisterPictureScreen> {
               at(710, 753, 220, 30, IgnorePointer(child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Text(tr2('من ${AccountExtras.minAge} إلى ${AccountExtras.maxAge} سنوات', 'From ${AccountExtras.minAge} to ${AccountExtras.maxAge} years'), key: const ValueKey('register_age_range'), style: TextStyle(fontFamily: 'Tajawal', fontSize: font, fontWeight: FontWeight.w900, color: _ink)))))),
               // The "register later" strip of the picture became two real buttons.
               at(
-                860,
+                DemoMode.enabled ? 775 : 860,
                 960,
                 250,
                 36,
@@ -442,6 +451,8 @@ class _RegisterPictureScreenState extends State<RegisterPictureScreen> {
                   ),
                 ),
               ),
+              // «Register later» is not offered in the demo: there the account is needed (owner decision).
+              if (!DemoMode.enabled)
               at(
                 655,
                 960,
@@ -483,12 +494,15 @@ class _Radio extends StatelessWidget {
 }
 
 /// What opens after the intro: the sign-in page when the online accounts are switched on and nobody is signed in,
-/// otherwise the normal start screen. Release 1 is offline, so there the start screen is simply the first page.
+/// otherwise [HomeEntry]. Release 1 is offline, so there the start screen is simply the first page.
 class AuthGate extends StatefulWidget {
   /// Tests: decide without the global gate.
   final bool? showLogin;
   final TeacherRepository? repo;
-  const AuthGate({super.key, this.showLogin, this.repo});
+
+  /// Tests: force the "straight to the home page" behaviour on or off (the app uses [DemoMode.enabled]).
+  final bool? autoEnter;
+  const AuthGate({super.key, this.showLogin, this.repo, this.autoEnter});
 
   @override
   State<AuthGate> createState() => _AuthGateState();
@@ -505,7 +519,84 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    if (!_login) return const StartScreen();
-    return LoginPictureScreen(repo: widget.repo, onDone: () => setState(() => _login = false));
+    if (_login) return LoginPictureScreen(repo: widget.repo, onDone: () => setState(() => _login = false));
+    return HomeEntry(autoEnter: widget.autoEnter);
+  }
+}
+
+/// After sign-in (or "continue without an account") the web demo goes STRAIGHT to the child's home page, with nothing in
+/// between:
+///  * one child already exists  -> into that child's home;
+///  * no child, but the sign-up gave the child's age -> the child is made from it (age, gender; a friendly nickname) and
+///    the home page opens;
+///  * otherwise (no child and no age, or several children) -> the normal start page, where a child is added or picked.
+/// Outside the demo (Release 1) the start page stays the first page: a parent starts child mode there.
+class HomeEntry extends StatefulWidget {
+  final bool? autoEnter;
+  const HomeEntry({super.key, this.autoEnter});
+
+  /// The nickname given to a child made from the sign-up (the parent can change it in the parent area).
+  static String nicknameFor(String? gender) => gender == 'girl' ? tr2('بطلتنا', 'Our hero') : (gender == 'boy' ? tr2('بطلنا', 'Our hero') : tr2('صغيري', 'My little one'));
+
+  @override
+  State<HomeEntry> createState() => _HomeEntryState();
+}
+
+class _HomeEntryState extends State<HomeEntry> {
+  bool _deciding = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _decide();
+  }
+
+  Future<void> _decide() async {
+    if (!(widget.autoEnter ?? DemoMode.enabled)) {
+      _deciding = false;
+      return;
+    }
+    final store = JourneyStore.instance;
+    if (!store.ready) {
+      final ready = Completer<void>();
+      void check() {
+        if (store.ready && !ready.isCompleted) ready.complete();
+      }
+
+      store.addListener(check);
+      check();
+      await ready.future.timeout(const Duration(seconds: 6), onTimeout: () {});
+      store.removeListener(check);
+    }
+    if (!mounted) return;
+    ChildProfile? child;
+    if (store.profiles.length == 1) {
+      child = store.profiles.first;
+    } else if (store.profiles.isEmpty) {
+      final x = await AccountExtras.load();
+      if (x.age != null) {
+        child = await createDemoChild(nickname: HomeEntry.nicknameFor(x.gender), age: x.age!, avatar: x.gender == 'boy' ? 'b1' : 'g1', gender: x.gender);
+      }
+    }
+    if (!mounted) return;
+    if (child == null) {
+      setState(() => _deciding = false);
+      return;
+    }
+    await enterChildMode(context, child);
+    // Leaving child mode (with the parent's PIN) comes back here: show the normal start page.
+    if (mounted) setState(() => _deciding = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_deciding) {
+      // The same picture as the intro, so nothing flashes between the sign-in page and the home page.
+      return Scaffold(
+        key: const ValueKey('home_entry_wait'),
+        body: SizedBox.expand(child: Image.asset(AppIntro.posterAsset, fit: BoxFit.cover, errorBuilder: (_, _, _) => const ColoredBox(color: Color(0xFF58A8F2)))),
+      );
+    }
+    return const StartScreen();
   }
 }

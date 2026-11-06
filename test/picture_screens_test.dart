@@ -10,10 +10,10 @@ import 'package:kids_app/journey/models.dart';
 import 'package:kids_app/journey/repository.dart';
 import 'package:kids_app/journey/ui/picture_screens.dart';
 import 'package:kids_app/l10n/app_locale.dart';
+import 'package:kids_app/lessons_own/own_lessons_screens.dart';
 import 'package:kids_app/main.dart' show VideoListScreen;
 import 'package:kids_app/journey/ui/land_map_screen.dart';
 import 'package:kids_app/stories/story_screens.dart';
-import 'package:kids_app/studio/studio_screens.dart' show StudioScreen;
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _kid = ChildProfile(id: 'k1', nickname: 'سلمى', age: 5);
@@ -194,34 +194,30 @@ void main() {
         await _settle(t);
       }
 
-      // No tile opens a video list: the app has no YouTube content.
-      for (final id in ['quran', 'deen', 'calm', 'songs']) {
+      // Every slot is an EMPTY page for now (educational videos will be added later): nothing else opens from a slot.
+      for (final id in ids) {
         await open(id);
         expect(find.byKey(const ValueKey('coming_soon')), findsOneWidget, reason: id);
+        expect(find.text('هنا ستظهر الفيديوهات التعليمية قريباً.'), findsOneWidget, reason: id);
         expect(find.byType(VideoListScreen), findsNothing, reason: id);
+        expect(find.byType(OwnLessonsScreen), findsNothing, reason: id);
+        expect(find.byType(LandMapScreen), findsNothing, reason: id);
+        expect(find.byType(DrawingScreen), findsNothing, reason: id);
         await t.pageBack();
         await _settle(t);
       }
-      await open('stories');
-      expect(find.text('هنا ستظهر القصص الصوتية قريباً.'), findsOneWidget);
-      await t.pageBack();
+    });
+
+    testWidgets('the orange «دروس الفيديو» button opens the owner\'s own lesson videos for this child', (t) async {
+      _size(t, const Size(1672, 941));
+      await _setup(t);
+      await _show(t, const LessonsPictureScreen(child: _kid));
+      final box = t.getRect(find.byKey(const ValueKey('picture_stage_box')));
+      final pill = t.getRect(find.byKey(const ValueKey('lessons_videos')));
+      expect(box.contains(pill.topLeft) && box.contains(pill.bottomRight), isTrue);
+      await t.tap(find.byKey(const ValueKey('lessons_videos')));
       await _settle(t);
-      for (final (id, land) in [('math', 'numbers'), ('english', 'english')]) {
-        await open(id);
-        expect(t.widget<LandMapScreen>(find.byType(LandMapScreen)).land.id, land, reason: id);
-        await t.pageBack();
-        await _settle(t);
-      }
-      await open('art');
-      expect(find.byType(StudioScreen), findsOneWidget);
-      await t.pageBack();
-      await _settle(t);
-      await open('puzzles');
-      expect(t.widget<CategoryGamesScreen>(find.byType(CategoryGamesScreen)).category.id, 'brain');
-      await t.pageBack();
-      await _settle(t);
-      await open('drawing');
-      expect(find.byType(DrawingScreen), findsOneWidget);
+      expect(t.widget<OwnLessonsScreen>(find.byType(OwnLessonsScreen)).child.id, 'k1');
     });
 
     testWidgets('«كل الدروس والمزيد» keeps the other subjects, letters, lands and words reachable', (t) async {

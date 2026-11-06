@@ -1,6 +1,7 @@
 import 'design/focusable_tap.dart';
 
 import 'package:flutter/material.dart';
+import 'design/picture_stage.dart';
 
 import 'design/layout.dart';
 
@@ -100,7 +101,7 @@ class _GamesGridState extends State<GamesGrid> {
                 title: g.$2,
                 onTap: () => Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => g.$5()),
+                  MaterialPageRoute(builder: (_) => GameBackdrop(child: g.$5())),
                 ),
               ),
           for (final g in learn)

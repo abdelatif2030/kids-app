@@ -13,7 +13,6 @@ import '../../teachers_screens.dart';
 import '../../l10n/app_locale.dart';
 import '../../l10n/language_screen.dart';
 import '../../l10n/strings.dart';
-import '../../design/app_logo.dart';
 import '../../demo/demo_mode.dart';
 import '../models.dart';
 import '../repository.dart';
@@ -73,7 +72,6 @@ class _Welcome extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            AppLogo(width: short ? 150 : 280),
             const SizedBox(height: 8),
             // The logo already spells the name in Latin letters; the Arabic name is shown under it.
             if (AppLocale.instance.isArabic && !short)

@@ -2,18 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../../design/focusable_tap.dart';
 import '../../design/picture_stage.dart';
-import '../../drawing_screen.dart';
-import '../../games/games_hub.dart' show CategoryGamesScreen, kGameCategories;
 import '../../l10n/app_locale.dart';
 import '../../l10n/strings.dart';
-import '../../studio/studio_screens.dart' show StudioScreen;
-import '../lands.dart' show landById;
-import 'land_map_screen.dart';
 import '../../notifications/notification_store.dart';
 import '../../notifications/notification_ui.dart';
 import '../../parent_screens.dart';
 import '../avatars.dart';
 import '../models.dart';
+import '../../lessons_own/own_lessons_screens.dart';
 import 'home_hubs.dart';
 
 // The owner's own pictures, each used whole with invisible buttons on top (see PictureStage). The numbers below are
@@ -246,21 +242,25 @@ class _LessonTile {
   const _LessonTile(this.id, this.center, this.name, this.title, this.open);
 }
 
-Widget _soon(String title) => ComingSoonScreen(title: title, message: tr2('هذا القسم قادم قريباً.', 'This section is coming soon.'), icon: Icons.hourglass_top_rounded);
+/// Every slot of «دروسي» is an empty page for now (owner decision, 2026-11-06): educational videos will be added to each
+/// slot later. Nothing else (no old lessons, no YouTube) opens from a slot.
+Widget _slot(String title) => ComingSoonScreen(
+      title: title,
+      message: tr2('هنا ستظهر الفيديوهات التعليمية قريباً.', 'Educational videos will appear here soon.'),
+      icon: Icons.play_circle_outline_rounded,
+    );
 
 final List<_LessonTile> _lessonTiles = [
-  // No YouTube content in the app (lib/content_flags.dart): tiles open what the app has, or a friendly "coming soon".
-  _LessonTile('stories', const Offset(0.163, 0.475), const Offset(0.163, 0.553), () => tr2('قصص', 'Stories'), (_, c) => ComingSoonScreen(title: tr2('قصص', 'Stories'), message: tr2('هنا ستظهر القصص الصوتية قريباً.', 'Audio stories will appear here soon.'), icon: Icons.headphones_rounded)),
-  _LessonTile('quran', const Offset(0.329, 0.475), const Offset(0.329, 0.553), () => tr2('قرآن', 'Quran'), (_, c) => _soon(tr2('قرآن', 'Quran'))),
-  _LessonTile('deen', const Offset(0.493, 0.475), const Offset(0.493, 0.553), () => tr2('دين', 'Religion'), (_, c) => _soon(tr2('دين', 'Religion'))),
-  _LessonTile('math', const Offset(0.667, 0.475), const Offset(0.667, 0.553), () => tr2('رياضيات', 'Maths'), (_, c) => LandMapScreen(land: landById('numbers'), child: c)),
-  _LessonTile('english', const Offset(0.843, 0.475), const Offset(0.843, 0.553), () => tr2('إنجليزي', 'English'), (_, c) => LandMapScreen(land: landById('english'), child: c)),
-  _LessonTile('calm', const Offset(0.164, 0.76), const Offset(0.164, 0.82), () => tr2('هدوء ونوم', 'Calm & sleep'), (_, c) => _soon(tr2('هدوء ونوم', 'Calm & sleep'))),
-  _LessonTile('songs', const Offset(0.332, 0.76), const Offset(0.332, 0.82), () => tr2('أناشيد', 'Songs'), (_, c) => _soon(tr2('أناشيد', 'Songs'))),
-  _LessonTile('art', const Offset(0.505, 0.76), const Offset(0.505, 0.82), () => tr2('فني', 'Art'), (_, c) => StudioScreen(child: c)),
-  // Puzzles are the thinking games of the games hub.
-  _LessonTile('puzzles', const Offset(0.676, 0.76), const Offset(0.676, 0.82), () => tr2('ألغاز', 'Puzzles'), (_, c) => CategoryGamesScreen(category: kGameCategories.firstWhere((g) => g.id == 'brain'), child: c)),
-  _LessonTile('drawing', const Offset(0.849, 0.76), const Offset(0.849, 0.82), () => tr2('رسم', 'Drawing'), (_, c) => DrawingScreen(child: c)),
+  _LessonTile('stories', const Offset(0.163, 0.475), const Offset(0.163, 0.553), () => tr2('قصص', 'Stories'), (_, c) => _slot(tr2('قصص', 'Stories'))),
+  _LessonTile('quran', const Offset(0.329, 0.475), const Offset(0.329, 0.553), () => tr2('قرآن', 'Quran'), (_, c) => _slot(tr2('قرآن', 'Quran'))),
+  _LessonTile('deen', const Offset(0.493, 0.475), const Offset(0.493, 0.553), () => tr2('دين', 'Religion'), (_, c) => _slot(tr2('دين', 'Religion'))),
+  _LessonTile('math', const Offset(0.667, 0.475), const Offset(0.667, 0.553), () => tr2('رياضيات', 'Maths'), (_, c) => _slot(tr2('رياضيات', 'Maths'))),
+  _LessonTile('english', const Offset(0.843, 0.475), const Offset(0.843, 0.553), () => tr2('إنجليزي', 'English'), (_, c) => _slot(tr2('إنجليزي', 'English'))),
+  _LessonTile('calm', const Offset(0.164, 0.76), const Offset(0.164, 0.82), () => tr2('هدوء ونوم', 'Calm & sleep'), (_, c) => _slot(tr2('هدوء ونوم', 'Calm & sleep'))),
+  _LessonTile('songs', const Offset(0.332, 0.76), const Offset(0.332, 0.82), () => tr2('أناشيد', 'Songs'), (_, c) => _slot(tr2('أناشيد', 'Songs'))),
+  _LessonTile('art', const Offset(0.505, 0.76), const Offset(0.505, 0.82), () => tr2('فني', 'Art'), (_, c) => _slot(tr2('فني', 'Art'))),
+  _LessonTile('puzzles', const Offset(0.676, 0.76), const Offset(0.676, 0.82), () => tr2('ألغاز', 'Puzzles'), (_, c) => _slot(tr2('ألغاز', 'Puzzles'))),
+  _LessonTile('drawing', const Offset(0.849, 0.76), const Offset(0.849, 0.82), () => tr2('رسم', 'Drawing'), (_, c) => _slot(tr2('رسم', 'Drawing'))),
 ];
 
 /// «دروسي»: the owner's picture with ten tiles. «كل الدروس والمزيد» (a small real button, not in the picture) opens the
@@ -289,6 +289,34 @@ class LessonsPictureScreen extends StatelessWidget {
               PictureSpot(t.id, t.center, 0.15, 0.27, t.title(), () => Navigator.push(context, MaterialPageRoute<void>(builder: (c) => t.open(c, child))), key: ValueKey('lesson_${t.id}')),
           ],
           overlays: (w, h) => [
+            // The owner's own lesson videos: the main thing to open from «تعلم واكتشف».
+            Positioned(
+              left: 0,
+              right: 0,
+              top: h * 0.075,
+              child: Center(
+                child: FocusableTap(
+                  key: const ValueKey('lessons_videos'),
+                  radius: 34,
+                  semanticLabel: tr2('دروس الفيديو', 'Video lessons'),
+                  onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => OwnLessonsScreen(child: child))),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: w * 0.03, vertical: h * 0.016),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(colors: [Color(0xFFFFB347), Color(0xFFFF7A1A)]),
+                      borderRadius: BorderRadius.circular(60),
+                      border: Border.all(color: Colors.white, width: 3),
+                      boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 8, offset: Offset(0, 4))],
+                    ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Icon(Icons.play_circle_fill_rounded, color: Colors.white, size: (w * 0.03).clamp(22.0, 40.0)),
+                      const SizedBox(width: 8),
+                      Text(tr2('دروس الفيديو', 'Video lessons'), style: TextStyle(fontFamily: 'Tajawal', fontSize: (w * 0.022).clamp(15.0, 28.0), fontWeight: FontWeight.w900, color: Colors.white)),
+                    ]),
+                  ),
+                ),
+              ),
+            ),
             Positioned(
               left: 0,
               right: 0,

@@ -71,12 +71,13 @@ String? validateDemoNickname(String raw) {
 
 /// Creates the child profile of the demo: nickname, age 1-6 and a cartoon avatar. Everything else takes the same
 /// defaults the normal onboarding starts from. No photo, no birth date, no gender, no real name.
-Future<ChildProfile> createDemoChild({required String nickname, required int age, String? avatar}) async {
+Future<ChildProfile> createDemoChild({required String nickname, required int age, String? avatar, String? gender}) async {
   final store = JourneyStore.instance;
   final draft = ProfileDraft()
     ..nickname = nickname.trim()
     ..age = age.clamp(1, 6)
-    ..avatar = avatar;
+    ..avatar = avatar
+    ..gender = gender == 'girl' || gender == 'boy' ? gender : null;
   final profile = await store.addProfile(draft.toProfile(store.newId()));
   await store.setActive(profile.id);
   return profile;

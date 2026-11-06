@@ -173,3 +173,30 @@ class PictureBackdrop extends StatelessWidget {
     );
   }
 }
+
+
+/// The owner's picture behind every game (treehouse sign, rainbow, castle, podium...). Everything inside gets a see-through
+/// scaffold colour, so a game keeps its own app bar and layout while the picture shows behind it. To change the picture,
+/// replace the one file [kGameBackgroundAsset].
+const String kGameBackgroundAsset = 'assets/games/game_bg.jpg';
+
+class GameBackdrop extends StatelessWidget {
+  final Widget child;
+  const GameBackdrop({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        const ColoredBox(color: Color(0xFF58A8F2)),
+        Positioned.fill(
+          child: ExcludeSemantics(
+            child: Image.asset(kGameBackgroundAsset, key: const ValueKey('game_backdrop'), fit: BoxFit.cover, alignment: Alignment.center, errorBuilder: (_, _, _) => const SizedBox()),
+          ),
+        ),
+        Theme(data: Theme.of(context).copyWith(scaffoldBackgroundColor: Colors.transparent), child: child),
+      ],
+    );
+  }
+}

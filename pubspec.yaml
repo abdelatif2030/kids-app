@@ -90,6 +90,7 @@ flutter:
     - assets/branding/logo.png
     - assets/home/home_scene.jpg
     - assets/games/hub_scene.jpg
+    - assets/games/game_bg.jpg
     - assets/home/home_main.jpg
     - assets/home/cartoons_stories.jpg
     - assets/home/lessons_scene.jpg

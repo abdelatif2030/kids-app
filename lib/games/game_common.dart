@@ -10,6 +10,7 @@ import '../design/tokens.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import '../design/picture_stage.dart';
 import '../media/rehlaty_audio_engine.dart';
 import 'adventure_logic.dart' show GameCue;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -163,9 +164,9 @@ class GameScaffold extends StatelessWidget {
   }
 
   Widget _body(BuildContext context) {
-    return Scaffold(
-      backgroundColor:
-          kWorldPalettes[world]!.top, // the app bar blends into the sky
+    // The owner's game picture is behind every game; the scaffold itself is see-through.
+    return GameBackdrop(child: Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: RC.ink,
@@ -184,8 +185,6 @@ class GameScaffold extends StatelessWidget {
       ),
       body: _AutoNarrate(
         instruction: instruction,
-        child: PastelBackground(
-        world: world,
         child: SafeArea(
           child: _MaybeFit(fit: fit, child: LayoutBuilder(
             builder: (context, box) {
@@ -251,9 +250,8 @@ class GameScaffold extends StatelessWidget {
             },
           )),
         ),
-        ),
       ),
-    );
+    ));
   }
 }
 

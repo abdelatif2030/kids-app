@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../design/picture_stage.dart';
 import 'package:flutter/services.dart';
 
 import '../design/layout.dart';
-import '../design/worlds.dart';
 import '../l10n/strings.dart';
 
 /// «ألعاب ترفيهية»: simple original games in the style of the casual games on a phone. They are only for fun: no
@@ -36,9 +36,12 @@ class _FunScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.transparent, title: Text(title, style: const TextStyle(fontSize: 24))),
-      body: WorldBackground(world: RWorld.journey, child: SafeArea(child: FitHeight(child: child))),
+    return GameBackdrop(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(backgroundColor: Colors.transparent, title: Text(title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900))),
+        body: SafeArea(child: FitHeight(child: child)),
+      ),
     );
   }
 }
@@ -290,6 +293,21 @@ class _TicTacToeState extends State<TicTacToeGame> {
   var _b = List<String>.filled(9, '');
   String? _result; // 'x', 'o' or 'draw'
 
+  /// Whose turn it is: two friends take turns on the same screen (first ❌, then ⭕).
+  String _turn = 'x';
+
+  /// Playing alone against the computer instead of with a friend. The computer waits a moment, so the child sees their own
+  /// mark first and then the answer.
+  bool _vsComputer = false;
+  bool _thinking = false;
+  Timer? _timer;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
   String? _winner(List<String> b) {
     for (final l in _lines) {
       if (b[l[0]].isNotEmpty && b[l[0]] == b[l[1]] && b[l[1]] == b[l[2]]) return b[l[0]];
@@ -311,41 +329,76 @@ class _TicTacToeState extends State<TicTacToeGame> {
     return free[_rnd.nextInt(free.length)];
   }
 
+  /// How long the computer waits before answering.
+  static const computerDelay = Duration(milliseconds: 800);
+
   void _tap(int i) {
-    if (_result != null || _b[i].isNotEmpty) return;
+    if (_result != null || _thinking || _b[i].isNotEmpty) return;
     setState(() {
-      _b[i] = 'x';
+      _b[i] = _turn;
       _result = _winner(_b);
-      if (_result == null) {
-        _b[_computerMove()] = 'o';
-        _result = _winner(_b);
+      if (_result != null) return;
+      _turn = _turn == 'x' ? 'o' : 'x';
+      if (_vsComputer && _turn == 'o') {
+        _thinking = true;
+        _timer = Timer(computerDelay, () {
+          if (!mounted) return;
+          setState(() {
+            _thinking = false;
+            _b[_computerMove()] = 'o';
+            _result = _winner(_b);
+            if (_result == null) _turn = 'x';
+          });
+        });
       }
     });
   }
 
-  void _again() => setState(() {
-        _b = List<String>.filled(9, '');
-        _result = null;
-      });
+  void _again() {
+    _timer?.cancel();
+    setState(() {
+      _b = List<String>.filled(9, '');
+      _result = null;
+      _turn = 'x';
+      _thinking = false;
+    });
+  }
+
+  void _mode(bool computer) {
+    if (_vsComputer == computer) return;
+    _vsComputer = computer;
+    _again();
+  }
 
   @override
   Widget build(BuildContext context) {
     final msg = switch (_result) {
-      'x' => tr2('فزت! برافو 🎉', 'You won! 🎉'),
-      'o' => tr2('فاز الكمبيوتر، جرّب تاني!', 'The computer won, try again!'),
+      'x' => _vsComputer ? tr2('فزت! برافو 🎉', 'You won! 🎉') : tr2('فاز ❌ برافو! 🎉', '❌ won! Well done! 🎉'),
+      'o' => _vsComputer ? tr2('فاز الكمبيوتر، جرّب تاني!', 'The computer won, try again!') : tr2('فاز ⭕ برافو! 🎉', '⭕ won! Well done! 🎉'),
       'draw' => tr2('تعادل!', "It's a draw!"),
-      _ => tr2('دورك: ضع ❌', 'Your turn: place ❌'),
+      _ => _thinking
+          ? tr2('الكمبيوتر يفكّر… ⭕', 'The computer is thinking… ⭕')
+          : (_turn == 'x' ? tr2('دور ❌', "❌'s turn") : tr2('دور ⭕', "⭕'s turn")),
     };
+    Widget chip(String key, String label, bool on, VoidCallback onTap) => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: ChoiceChip(key: ValueKey(key), label: Text(label, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800)), selected: on, onSelected: (_) => onTap()),
+        );
     return _FunScaffold(
       title: tr2('إكس أو', 'Tic-tac-toe'),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 380, maxHeight: 560),
+          constraints: const BoxConstraints(maxWidth: 380, maxHeight: 600),
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Wrap(alignment: WrapAlignment.center, runSpacing: 4, children: [
+                  chip('xo_mode_friend', tr2('مع صديق 👫', 'With a friend 👫'), !_vsComputer, () => _mode(false)),
+                  chip('xo_mode_computer', tr2('ضد الكمبيوتر 🤖', 'Vs the computer 🤖'), _vsComputer, () => _mode(true)),
+                ]),
+                const SizedBox(height: 8),
                 Text(msg, key: const ValueKey('fun_status'), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 10),
                 Flexible(

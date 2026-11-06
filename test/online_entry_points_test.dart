@@ -56,7 +56,11 @@ void main() {
     });
 
     test('all network code stays in the known places', () {
-      expect(users("package:http/http.dart"), ['lib/assistant/ai_advisor.dart']);
+      // lib/lessons_own/own_lessons.dart reads the owner's lesson list from the ONE host set at build time (LESSONS_BASE_URL);
+      // it asks nothing of any other address (test/own_lessons_test.dart checks that no address is written in the code).
+      expect(users("package:http/http.dart"), ['lib/assistant/ai_advisor.dart', 'lib/lessons_own/own_lessons.dart']);
+      // The video player package is used only for the owner's intro video (bundled) and the owner's lesson videos.
+      expect(users('package:video_player'), ['lib/design/app_intro.dart', 'lib/lessons_own/own_lessons_screens.dart']);
       expect(users('package:cloud_firestore'), ['lib/family/firebase_family_repository.dart', 'lib/firebase_repository.dart']);
       expect(users('package:firebase_auth'), ['lib/family/firebase_family_repository.dart', 'lib/firebase_repository.dart']);
       expect(users('package:flutter_webrtc'), ['lib/family/call_engine.dart']);

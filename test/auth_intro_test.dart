@@ -1,10 +1,15 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/auth/account_extras.dart';
 import 'package:kids_app/auth/auth_pictures.dart';
+import 'package:kids_app/demo/demo_mode.dart';
 import 'package:kids_app/design/app_intro.dart';
+import 'package:kids_app/journey/models.dart';
+import 'package:kids_app/journey/repository.dart';
+import 'package:kids_app/journey/ui/child_shell.dart';
 import 'package:kids_app/journey/ui/start_screen.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/teachers_models.dart';
@@ -68,6 +73,31 @@ void main() {
       await t.tap(find.byKey(const ValueKey('intro_skip')));
       expect(done, 1);
       await t.pumpWidget(const SizedBox());
+    });
+  });
+
+  group('the demo needs an account: no way around the sign-in', () {
+    tearDown(() => DemoMode.overrideForTest(null));
+
+    testWidgets('in the demo neither «continue without an account» nor «register later» is offered', (t) async {
+      DemoMode.overrideForTest(true);
+      await _show(t, LoginPictureScreen(repo: FakeTeacherRepository(), onDone: () {}));
+      expect(find.byKey(const ValueKey('login_skip')), findsNothing);
+      expect(find.byKey(const ValueKey('login_create')), findsOneWidget);
+      await _show(t, RegisterPictureScreen(repo: FakeTeacherRepository()));
+      expect(find.byKey(const ValueKey('register_later')), findsNothing);
+      expect(find.byKey(const ValueKey('register_email_submit')), findsOneWidget, reason: 'creating the account is still possible');
+      final box = t.getRect(find.byKey(const ValueKey('picture_stage_box')));
+      final r = t.getRect(find.byKey(const ValueKey('register_email_submit')));
+      expect(box.contains(r.topLeft) && box.contains(r.bottomRight), isTrue);
+    });
+
+    testWidgets('outside the demo both stay (they are part of the offline and test flows)', (t) async {
+      DemoMode.overrideForTest(false);
+      await _show(t, LoginPictureScreen(repo: FakeTeacherRepository(), onDone: () {}));
+      expect(find.byKey(const ValueKey('login_skip')), findsOneWidget);
+      await _show(t, RegisterPictureScreen(repo: FakeTeacherRepository()));
+      expect(find.byKey(const ValueKey('register_later')), findsOneWidget);
     });
   });
 
@@ -310,6 +340,82 @@ void main() {
         expect(b.length, greaterThan(100 * 1024), reason: f);
         expect(File('pubspec.yaml').readAsStringSync(), contains(f));
       }
+    });
+  });
+
+  group('straight to the home page after sign-in', () {
+    Future<JourneyStore> store(WidgetTester t, {List<ChildProfile> children = const []}) async {
+      FlutterSecureStorage.setMockInitialValues({});
+      final st = JourneyStore(LocalJourneyRepository());
+      await t.runAsync(() async {
+        await st.load();
+        for (final c in children) {
+          await st.addProfile(c);
+        }
+      });
+      JourneyStore.instance = st;
+      return st;
+    }
+
+    Future<void> pumpEntry(WidgetTester t, {bool autoEnter = true}) async {
+      t.view.physicalSize = const Size(1000, 700);
+      t.view.devicePixelRatio = 1;
+      addTearDown(t.view.reset);
+      await t.pumpWidget(MaterialApp(
+        builder: (c, child) => Directionality(textDirection: TextDirection.rtl, child: child!),
+        home: HomeEntry(autoEnter: autoEnter),
+      ));
+      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 250)));
+      await t.pump();
+      await t.pump(const Duration(milliseconds: 400));
+      await t.pump(const Duration(milliseconds: 400));
+    }
+
+    testWidgets('one child already exists: the sign-in (or skipping it) lands in that child\'s home with nothing in between', (t) async {
+      await store(t, children: const [ChildProfile(id: 'k1', nickname: 'سلمى', age: 4)]);
+      await pumpEntry(t);
+      expect(find.byType(ChildShell), findsOneWidget);
+      expect(find.byKey(const ValueKey('picture_home')), findsOneWidget, reason: 'the owner home picture');
+          });
+
+    testWidgets('no child but the sign-up gave an age: the child is made from it and the home opens', (t) async {
+      final st = await store(t);
+      await t.runAsync(() => const AccountExtras(gender: 'girl', age: 3).save());
+      await pumpEntry(t);
+      expect(st.profiles.length, 1);
+      expect(st.profiles.single.age, 3);
+      expect(st.profiles.single.gender, 'girl');
+      expect(st.profiles.single.nickname, 'بطلتنا');
+      expect(find.byType(ChildShell), findsOneWidget);
+    });
+
+    testWidgets('no child and no age: the normal start page is shown (a child has to be added once)', (t) async {
+      await store(t);
+      await pumpEntry(t);
+      expect(find.byType(ChildShell), findsNothing);
+      expect(find.byType(StartScreen), findsOneWidget);
+    });
+
+    testWidgets('several children: the start page asks who plays; outside the demo the start page is always first', (t) async {
+      await store(t, children: const [ChildProfile(id: 'a', nickname: 'أ', age: 3), ChildProfile(id: 'b', nickname: 'ب', age: 5)]);
+      await pumpEntry(t);
+      expect(find.byType(ChildShell), findsNothing);
+      expect(find.byType(StartScreen), findsOneWidget);
+      await store(t, children: const [ChildProfile(id: 'k1', nickname: 'سلمى', age: 4)]);
+      await pumpEntry(t, autoEnter: false);
+      expect(find.byType(ChildShell), findsNothing, reason: 'Release 1: a parent starts child mode');
+      expect(find.byType(StartScreen), findsOneWidget);
+    });
+
+    test('the nickname is friendly and the old logo is gone from the start page', () {
+      expect(HomeEntry.nicknameFor('girl'), 'بطلتنا');
+      expect(HomeEntry.nicknameFor('boy'), 'بطلنا');
+      expect(HomeEntry.nicknameFor(null), 'صغيري');
+      expect(File('lib/journey/ui/start_screen.dart').readAsStringSync().contains('AppLogo('), isFalse);
+      final html = File('web/index.html').readAsStringSync();
+      expect(html, contains('splash.jpg'));
+      expect(File('web/splash.js').readAsStringSync(), contains('flutter-first-frame'));
+      expect(html.contains('<script>'), isFalse, reason: 'the page headers forbid inline scripts');
     });
   });
 }
