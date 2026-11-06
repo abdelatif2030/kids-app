@@ -9,7 +9,7 @@ import '../journey/models.dart';
 import '../journey/repository.dart';
 
 import '../design/focusable_tap.dart';
-import '../design/picture_stage.dart';
+import 'auth_shell.dart';
 import '../firebase_config.dart';
 import '../journey/ui/start_screen.dart';
 import '../l10n/strings.dart';
@@ -17,90 +17,41 @@ import '../online_gate.dart';
 import '../teachers_models.dart';
 import 'account_extras.dart';
 
-// The owner's two sign-in pictures (1536 x 1024), used whole with real fields and invisible buttons on top. The
-// placeholder words painted inside the fields were erased from the pictures so a real field can show what is typed;
-// everything else in the pictures is the owner's design. Numbers below are pixels of those pictures.
+// The owner's two sign-in pictures (1536 x 1024) give the look: blurred scenery behind and the children + sign as the header
+// (see auth_shell.dart). The form is real and fills the screen, upright or sideways.
 
 const double kAuthAspect = 1536 / 1024;
 const String kLoginPicture = 'assets/auth/login.jpg';
 const String kRegisterPicture = 'assets/auth/register.jpg';
-const _ink = Color(0xFF4B2E9B);
-const _hint = Color(0xFF9A8CC4);
 
-Offset _o(double x, double y) => Offset(x / 1536, y / 1024);
+String _networkMessage() => tr2(
+  'تعذّر الاتصال بالخدمة. تحقق من الإنترنت وحاول مرة أخرى.',
+  'Could not reach the service. Check the internet and try again.',
+);
+String _unavailableMessage() => tr2(
+  'خدمة الحسابات غير متاحة الآن.',
+  'Accounts are not available right now.',
+);
 
-PictureSpot _spot(String id, double cx, double cy, double w, double h, String label, VoidCallback onTap, {double radius = 24}) =>
-    PictureSpot(id, _o(cx, cy), w / 1536, h / 1024, label, onTap, radius: radius, key: ValueKey(id));
-
-/// A real text field placed over a painted field: [x0,y0,x1,y1] in picture pixels.
-Widget _field({
-  required double w,
-  required double h,
-  required (double, double, double, double) box,
-  required TextEditingController controller,
-  required String hint,
-  required ValueKey<String> key,
-  bool obscure = false,
-  TextInputType? keyboard,
-  bool ltr = true,
-  int? maxLength,
-  void Function(String)? onSubmitted,
-  TextInputAction? action,
-}) {
-  final (x0, y0, x1, y1) = box;
-  final fh = (y1 - y0) / 1024 * h;
-  return Positioned(
-    left: x0 / 1536 * w,
-    top: y0 / 1024 * h,
-    width: (x1 - x0) / 1536 * w,
-    height: fh,
-    child: Directionality(
-      textDirection: ltr ? TextDirection.ltr : TextDirection.rtl,
-      child: Center(
-        child: TextField(
-          key: key,
-          controller: controller,
-          obscureText: obscure,
-          keyboardType: keyboard,
-          textAlign: ltr ? TextAlign.right : TextAlign.start,
-          textInputAction: action,
-          onSubmitted: onSubmitted,
-          maxLength: maxLength,
-          autocorrect: false,
-          enableSuggestions: !obscure,
-          style: TextStyle(fontFamily: 'Tajawal', fontSize: (fh * 0.42).clamp(12.0, 26.0), fontWeight: FontWeight.w800, color: _ink),
-          cursorColor: _ink,
-          decoration: InputDecoration(
-            isDense: true,
-            counterText: '',
-            border: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            filled: false,
-            contentPadding: EdgeInsets.zero,
-            hintText: hint,
-            hintStyle: TextStyle(fontFamily: 'Tajawal', fontSize: (fh * 0.42).clamp(12.0, 26.0), fontWeight: FontWeight.w800, color: _hint),
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
-String _networkMessage() => tr2('تعذّر الاتصال بالخدمة. تحقق من الإنترنت وحاول مرة أخرى.', 'Could not reach the service. Check the internet and try again.');
-String _unavailableMessage() => tr2('خدمة الحسابات غير متاحة الآن.', 'Accounts are not available right now.');
-
-bool _validEmail(String e) => e.contains('@') && e.contains('.') && e.length >= 5;
+bool _validEmail(String e) =>
+    e.contains('@') && e.contains('.') && e.length >= 5;
 
 void _say(BuildContext context, String text) {
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(content: Text(text, textDirection: Directionality.of(context))));
+    ..showSnackBar(
+      SnackBar(content: Text(text, textDirection: Directionality.of(context))),
+    );
 }
 
 Widget _busyVeil() => Positioned.fill(
-      child: ColoredBox(color: const Color(0x66FFFFFF), child: const Center(child: CircularProgressIndicator(key: ValueKey('auth_busy')))),
-    );
+  child: ColoredBox(
+    color: const Color(0x66FFFFFF),
+    child: const Center(
+      child: CircularProgressIndicator(key: ValueKey('auth_busy')),
+    ),
+  ),
+);
 
 /// The sign-in page (the owner's first picture): e-mail and password, remember me, forgot password, Google, and a way to
 /// create an account. «متابعة بدون حساب» (added, small) keeps the app usable without an account.
@@ -135,7 +86,9 @@ class _LoginPictureScreenState extends State<LoginPictureScreen> {
 
   Future<void> _loadRemembered() async {
     try {
-      final e = (await SharedPreferences.getInstance()).getString(LoginPictureScreen.rememberKey);
+      final e = (await SharedPreferences.getInstance()).getString(
+        LoginPictureScreen.rememberKey,
+      );
       if (e != null && e.isNotEmpty && mounted) {
         setState(() {
           _email.text = e;
@@ -181,8 +134,19 @@ class _LoginPictureScreenState extends State<LoginPictureScreen> {
 
   Future<void> _login() async {
     final email = _email.text.trim();
-    if (!_validEmail(email)) return _say(context, tr2('اكتب بريداً إلكترونياً صحيحاً', 'Type a valid e-mail address'));
-    if (_password.text.length < 6) return _say(context, tr2('كلمة المرور 6 أحرف على الأقل', 'The password has at least 6 characters'));
+    if (!_validEmail(email))
+      return _say(
+        context,
+        tr2('اكتب بريداً إلكترونياً صحيحاً', 'Type a valid e-mail address'),
+      );
+    if (_password.text.length < 6)
+      return _say(
+        context,
+        tr2(
+          'كلمة المرور 6 أحرف على الأقل',
+          'The password has at least 6 characters',
+        ),
+      );
     await _guard((repo) async {
       await repo.signIn(email, _password.text);
       await _storeRemember(email);
@@ -191,76 +155,254 @@ class _LoginPictureScreenState extends State<LoginPictureScreen> {
   }
 
   Future<void> _google() => _guard((repo) async {
-        await repo.signInWithGoogle(role: UserRole.parent);
-        if (mounted) widget.onDone();
-      });
+    await repo.signInWithGoogle(role: UserRole.parent);
+    if (mounted) widget.onDone();
+  });
 
   Future<void> _forgot() async {
-    final email = await showDialog<String>(context: context, builder: (_) => _ForgotDialog(initial: _email.text.trim()));
+    final email = await showDialog<String>(
+      context: context,
+      builder: (_) => _ForgotDialog(initial: _email.text.trim()),
+    );
     if (email == null || !mounted) return;
-    if (!_validEmail(email)) return _say(context, tr2('اكتب بريداً إلكترونياً صحيحاً', 'Type a valid e-mail address'));
+    if (!_validEmail(email))
+      return _say(
+        context,
+        tr2('اكتب بريداً إلكترونياً صحيحاً', 'Type a valid e-mail address'),
+      );
     await _guard((repo) async {
       await repo.sendPasswordReset(email);
       // The same message whether or not the address has an account (no account probing).
-      if (mounted) _say(context, tr2('إن كان للبريد حساب فقد أرسلنا إليه رابط إعادة التعيين.', 'If the address has an account, we sent it a reset link.'));
+      if (mounted)
+        _say(
+          context,
+          tr2(
+            'إن كان للبريد حساب فقد أرسلنا إليه رابط إعادة التعيين.',
+            'If the address has an account, we sent it a reset link.',
+          ),
+        );
     });
   }
 
   Future<void> _register() async {
-    final done = await Navigator.push<bool>(context, MaterialPageRoute<bool>(builder: (_) => RegisterPictureScreen(repo: widget.repo)));
+    final done = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute<bool>(
+        builder: (_) => RegisterPictureScreen(repo: widget.repo),
+      ),
+    );
     if (done == true && mounted) widget.onDone();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: PictureStage(
-          key: const ValueKey('login_picture'),
-          asset: kLoginPicture,
-          aspect: kAuthAspect,
-          spots: [
-            _spot('login_eye', 511, 565, 64, 64, tr2('إظهار كلمة المرور', 'Show password'), () => setState(() => _show = !_show), radius: 32),
-            _spot('login_remember', 1050, 638, 150, 50, tr2('تذكرني', 'Remember me'), () => setState(() => _remember = !_remember)),
-            _spot('login_forgot', 545, 638, 190, 44, tr2('نسيت كلمة المرور؟', 'Forgot your password?'), _forgot),
-            _spot('login_submit', 787, 713, 670, 74, tr2('تسجيل الدخول', 'Sign in'), _login, radius: 40),
-            _spot('login_google', 787, 841, 663, 66, tr2('تسجيل الدخول باستخدام جوجل', 'Sign in with Google'), _google, radius: 36),
-            _spot('login_create', 688, 923, 262, 54, tr2('أنشئ حساب الآن', 'Create an account'), _register, radius: 30),
-          ],
-          overlays: (w, h) => [
-            _field(w: w, h: h, box: (482, 448, 1034, 506), controller: _email, hint: tr2('البريد الإلكتروني', 'E-mail'), key: const ValueKey('login_email'), keyboard: TextInputType.emailAddress, action: TextInputAction.next),
-            _field(w: w, h: h, box: (548, 538, 1034, 596), controller: _password, hint: tr2('كلمة المرور', 'Password'), key: const ValueKey('login_password'), obscure: !_show, action: TextInputAction.done, onSubmitted: (_) => _login()),
-            // The painted tick box is covered by a real one that shows the real state.
-            Positioned(
-              left: (1093 - 22) / 1536 * w,
-              top: (638 - 22) / 1024 * h,
-              width: 44 / 1536 * w,
-              height: 44 / 1024 * h,
-              child: IgnorePointer(child: _Tick(on: _remember, key: const ValueKey('login_remember_box'))),
+    return AuthShell(
+      key: const ValueKey('login_picture'),
+      asset: kLoginPicture,
+      overlay: _busy ? _busyVeil() : null,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            tr2('مرحباً بعودتك مجدداً!', 'Welcome back!'),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 26,
+              fontWeight: FontWeight.w900,
+              color: authInk,
             ),
-            // «Continue without an account» exists outside the demo only: in the demo an account is needed (owner decision).
-            if (!DemoMode.enabled)
-            Positioned(
-              left: 0,
-              right: 0,
-              top: 984 / 1024 * h,
-              child: Center(
-                child: FocusableTap(
-                  key: const ValueKey('login_skip'),
-                  radius: 20,
-                  semanticLabel: tr2('متابعة بدون حساب', 'Continue without an account'),
-                  onTap: widget.onDone,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 18 / 1536 * w, vertical: 5 / 1024 * h),
-                    decoration: BoxDecoration(color: Colors.white.withAlpha(220), borderRadius: BorderRadius.circular(40), border: Border.all(color: _ink, width: 1.5)),
-                    child: Text(tr2('متابعة بدون حساب', 'Continue without an account'), style: TextStyle(fontFamily: 'Tajawal', fontSize: (w * 0.0105).clamp(11.0, 16.0), fontWeight: FontWeight.w900, color: _ink)),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            tr2(
+              'سعداء برؤيتك في رحلتنا الممتعة',
+              'Happy to see you on our fun journey',
+            ),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: authInk,
+            ),
+          ),
+          const SizedBox(height: 16),
+          AuthField(
+            fieldKey: const ValueKey('login_email'),
+            controller: _email,
+            hint: tr2('البريد الإلكتروني', 'E-mail'),
+            icon: Icons.person_rounded,
+            keyboard: TextInputType.emailAddress,
+            action: TextInputAction.next,
+          ),
+          const SizedBox(height: 12),
+          AuthField(
+            fieldKey: const ValueKey('login_password'),
+            controller: _password,
+            hint: tr2('كلمة المرور', 'Password'),
+            icon: Icons.lock_rounded,
+            obscure: !_show,
+            action: TextInputAction.done,
+            onSubmitted: (_) => _login(),
+            trailing: FocusableTap(
+              key: const ValueKey('login_eye'),
+              radius: 24,
+              semanticLabel: tr2('إظهار كلمة المرور', 'Show password'),
+              onTap: () => setState(() => _show = !_show),
+              child: SizedBox(
+                width: 48,
+                height: 48,
+                child: Icon(
+                  _show
+                      ? Icons.visibility_off_rounded
+                      : Icons.visibility_rounded,
+                  color: authPurple,
+                  size: 26,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              AuthTick(
+                on: _remember,
+                label: tr2('تذكرني', 'Remember me'),
+                onTap: () => setState(() => _remember = !_remember),
+                tapKey: const ValueKey('login_remember'),
+                boxKey: const ValueKey('login_remember_box'),
+              ),
+              FocusableTap(
+                key: const ValueKey('login_forgot'),
+                radius: 14,
+                semanticLabel: tr2(
+                  'نسيت كلمة المرور؟',
+                  'Forgot your password?',
+                ),
+                onTap: _forgot,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 4,
+                  ),
+                  child: Text(
+                    tr2('نسيت كلمة المرور؟', 'Forgot your password?'),
+                    style: const TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: authInk,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          KeyedSubtree(
+            key: const ValueKey('login_submit'),
+            child: AuthButton(
+              label: tr2('تسجيل الدخول', 'Sign in'),
+              icon: Icons.login_rounded,
+              onTap: _login,
+            ),
+          ),
+          const SizedBox(height: 14),
+          AuthOr(tr2('أو', 'or')),
+          const SizedBox(height: 14),
+          KeyedSubtree(
+            key: const ValueKey('login_google'),
+            child: AuthOutlineButton(
+              label: tr2('تسجيل الدخول باستخدام جوجل', 'Sign in with Google'),
+              leading: const GoogleG(),
+              onTap: _google,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text(
+                tr2('ليس لديك حساب؟ ', 'No account yet? '),
+                style: const TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: authInk,
+                ),
+              ),
+              FocusableTap(
+                key: const ValueKey('login_create'),
+                radius: 20,
+                semanticLabel: tr2('أنشئ حساب الآن', 'Create an account'),
+                onTap: _register,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: authPurple, width: 2),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.person_add_alt_1_rounded,
+                        color: authPurple,
+                        size: 22,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        tr2('أنشئ حساب الآن', 'Create an account'),
+                        style: const TextStyle(
+                          fontFamily: 'Tajawal',
+                          fontSize: 17,
+                          fontWeight: FontWeight.w900,
+                          color: authPurple,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // «Continue without an account» exists outside the demo only: in the demo an account is needed (owner decision).
+          if (!DemoMode.enabled) ...[
+            const SizedBox(height: 8),
+            FocusableTap(
+              key: const ValueKey('login_skip'),
+              radius: 20,
+              semanticLabel: tr2(
+                'متابعة بدون حساب',
+                'Continue without an account',
+              ),
+              onTap: widget.onDone,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Center(
+                  child: Text(
+                    tr2('متابعة بدون حساب', 'Continue without an account'),
+                    style: const TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      color: authInk,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
               ),
             ),
-            if (_busy) _busyVeil(),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -277,7 +419,9 @@ class _ForgotDialog extends StatefulWidget {
 }
 
 class _ForgotDialogState extends State<_ForgotDialog> {
-  late final TextEditingController _c = TextEditingController(text: widget.initial);
+  late final TextEditingController _c = TextEditingController(
+    text: widget.initial,
+  );
 
   @override
   void dispose() {
@@ -287,31 +431,27 @@ class _ForgotDialogState extends State<_ForgotDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-        title: Text(tr2('نسيت كلمة المرور؟', 'Forgot your password?')),
-        content: TextField(key: const ValueKey('forgot_email'), controller: _c, keyboardType: TextInputType.emailAddress, decoration: InputDecoration(labelText: tr2('البريد الإلكتروني', 'E-mail'))),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(tr2('إلغاء', 'Cancel'))),
-          FilledButton(key: const ValueKey('forgot_send'), onPressed: () => Navigator.pop(context, _c.text.trim()), child: Text(tr2('أرسل الرابط', 'Send the link'))),
-        ],
-      );
-}
-
-class _Tick extends StatelessWidget {
-  final bool on;
-  const _Tick({super.key, required this.on});
-
-  @override
-  Widget build(BuildContext context) => LayoutBuilder(builder: (context, box) {
-        final d = box.maxWidth;
-        return Container(
-          decoration: BoxDecoration(
-            color: on ? _ink : Colors.white,
-            borderRadius: BorderRadius.circular(d * 0.22),
-            border: Border.all(color: _ink, width: 2.5),
-          ),
-          child: on ? Icon(Icons.check_rounded, color: Colors.white, size: d * 0.8) : null,
-        );
-      });
+    title: Text(tr2('نسيت كلمة المرور؟', 'Forgot your password?')),
+    content: TextField(
+      key: const ValueKey('forgot_email'),
+      controller: _c,
+      keyboardType: TextInputType.emailAddress,
+      decoration: InputDecoration(
+        labelText: tr2('البريد الإلكتروني', 'E-mail'),
+      ),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: Text(tr2('إلغاء', 'Cancel')),
+      ),
+      FilledButton(
+        key: const ValueKey('forgot_send'),
+        onPressed: () => Navigator.pop(context, _c.text.trim()),
+        child: Text(tr2('أرسل الرابط', 'Send the link')),
+      ),
+    ],
+  );
 }
 
 /// The sign-up page (the owner's second picture). Required: name, e-mail and a password (or one tap on Google). The child's
@@ -348,11 +488,15 @@ class _RegisterPictureScreenState extends State<RegisterPictureScreen> {
   }
 
   void _stepAge(int delta) => setState(() {
-        final next = (_age ?? (delta > 0 ? AccountExtras.minAge - 1 : AccountExtras.maxAge + 1)) + delta;
-        _age = next.clamp(AccountExtras.minAge, AccountExtras.maxAge);
-      });
+    final next =
+        (_age ??
+            (delta > 0 ? AccountExtras.minAge - 1 : AccountExtras.maxAge + 1)) +
+        delta;
+    _age = next.clamp(AccountExtras.minAge, AccountExtras.maxAge);
+  });
 
-  Future<void> _saveExtras() => AccountExtras.clean(gender: _gender, age: _age, city: _city.text).save();
+  Future<void> _saveExtras() =>
+      AccountExtras.clean(gender: _gender, age: _age, city: _city.text).save();
 
   Future<void> _guard(Future<void> Function(TeacherRepository repo) run) async {
     final repo = _repo;
@@ -373,124 +517,319 @@ class _RegisterPictureScreenState extends State<RegisterPictureScreen> {
     final name = _name.text.trim();
     final email = _email.text.trim();
     if (name.isEmpty) return _say(context, tr2('اكتب اسمك', 'Type your name'));
-    if (!_validEmail(email)) return _say(context, tr2('اكتب بريداً إلكترونياً صحيحاً', 'Type a valid e-mail address'));
-    if (_password.text.length < 6) return _say(context, tr2('كلمة المرور 6 أحرف على الأقل', 'The password has at least 6 characters'));
+    if (!_validEmail(email))
+      return _say(
+        context,
+        tr2('اكتب بريداً إلكترونياً صحيحاً', 'Type a valid e-mail address'),
+      );
+    if (_password.text.length < 6)
+      return _say(
+        context,
+        tr2(
+          'كلمة المرور 6 أحرف على الأقل',
+          'The password has at least 6 characters',
+        ),
+      );
     await _guard((repo) async {
-      await repo.register(email: email, password: _password.text, name: name, role: UserRole.parent);
+      await repo.register(
+        email: email,
+        password: _password.text,
+        name: name,
+        role: UserRole.parent,
+      );
       await _saveExtras();
       if (mounted) Navigator.pop(context, true);
     });
   }
 
   Future<void> _google() => _guard((repo) async {
-        await repo.signInWithGoogle(role: UserRole.parent);
-        await _saveExtras();
-        if (mounted) Navigator.pop(context, true);
-      });
+    await repo.signInWithGoogle(role: UserRole.parent);
+    await _saveExtras();
+    if (mounted) Navigator.pop(context, true);
+  });
 
-  @override
-  Widget build(BuildContext context) {
-    String ageWord(int a) => a == 1 ? tr2('سنة', 'year') : (a == 2 ? tr2('سنتان', '2 years') : tr2('سنوات', 'years'));
-    return Scaffold(
-      body: SafeArea(
-        child: PictureStage(
-          key: const ValueKey('register_picture'),
-          asset: kRegisterPicture,
-          aspect: kAuthAspect,
-          spots: [
-            _spot('register_back', 72, 72, 104, 104, tr2('رجوع', 'Back'), () => Navigator.pop(context, false), radius: 52),
-            _spot('register_girl', 968, 401, 355, 112, tr2('بنت', 'Girl'), () => setState(() => _gender = _gender == 'girl' ? null : 'girl'), radius: 30),
-            _spot('register_boy', 594, 401, 335, 112, tr2('ولد', 'Boy'), () => setState(() => _gender = _gender == 'boy' ? null : 'boy'), radius: 30),
-            // In a right-to-left page the arrow pointing left goes forward (older) and the one pointing right goes back.
-            _spot('register_age_up', 505, 712, 84, 84, tr2('أكبر', 'Older'), () => _stepAge(1), radius: 42),
-            _spot('register_age_down', 887, 712, 84, 84, tr2('أصغر', 'Younger'), () => _stepAge(-1), radius: 42),
-            _spot('register_google', 775, 891, 500, 76, tr2('التسجيل باستخدام جيميل', 'Register with Gmail'), _google, radius: 38),
-          ],
-          overlays: (w, h) {
-            Widget at(double cx, double cy, double pw, double ph, Widget child) => Positioned(left: (cx - pw / 2) / 1536 * w, top: (cy - ph / 2) / 1024 * h, width: pw / 1536 * w, height: ph / 1024 * h, child: child);
-            Widget radio(double cx, double cy, bool on) => at(cx, cy, 56, 56, IgnorePointer(child: _Radio(on: on)));
-            final font = (w * 0.0125).clamp(11.0, 19.0).toDouble();
-            return [
-              _field(w: w, h: h, box: (480, 482, 1036, 526), controller: _name, hint: tr2('الاسم الكامل', 'Full name'), key: const ValueKey('register_name'), ltr: false, maxLength: 60, action: TextInputAction.next),
-              _field(w: w, h: h, box: (480, 550, 1036, 594), controller: _email, hint: tr2('البريد الإلكتروني', 'E-mail'), key: const ValueKey('register_email'), keyboard: TextInputType.emailAddress, action: TextInputAction.next),
-              _field(w: w, h: h, box: (480, 618, 1036, 662), controller: _password, hint: tr2('كلمة المرور', 'Password'), key: const ValueKey('register_password'), obscure: true, action: TextInputAction.next),
-              _field(w: w, h: h, box: (556, 788, 926, 828), controller: _city, hint: tr2('اختر أو اكتب مدينتك', 'Type your city'), key: const ValueKey('register_city'), ltr: false, maxLength: RegisterPictureScreen.maxCity, action: TextInputAction.done),
-              // The painted selection marks are covered by real ones: nothing is selected until the parent chooses.
-              radio(1100, 401, _gender == 'girl'),
-              radio(718, 401, _gender == 'boy'),
-              at(
-                683,
-                709,
-                204,
-                58,
-                IgnorePointer(
-                  child: Container(
-                    key: const ValueKey('register_age_value'),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF8A52E8), Color(0xFF5B2BB8)]), borderRadius: BorderRadius.circular(40)),
-                    child: FittedBox(fit: BoxFit.scaleDown, child: Text(_age == null ? tr2('اختر العمر', 'Pick the age') : '$_age ${ageWord(_age!)}', style: TextStyle(fontFamily: 'Tajawal', fontSize: font * 1.3, fontWeight: FontWeight.w900, color: Colors.white))),
-                  ),
+  Widget _genderCard(String id, String label, IconData icon, Color color) {
+    final on = _gender == id;
+    return Expanded(
+      child: FocusableTap(
+        key: ValueKey('register_$id'),
+        radius: 28,
+        semanticLabel: label,
+        onTap: () => setState(() => _gender = on ? null : id),
+        child: Container(
+          height: 64,
+          decoration: BoxDecoration(
+            color: on ? color.withAlpha(40) : Colors.white,
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(
+              color: on ? color : const Color(0xFFCDBDF0),
+              width: on ? 3.5 : 2,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                key: ValueKey('register_${id}_mark'),
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: on ? authInk : Colors.white,
+                  border: Border.all(color: authInk, width: 2.5),
+                ),
+                child: on
+                    ? const Icon(
+                        Icons.check_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      )
+                    : null,
+              ),
+              const SizedBox(width: 8),
+              Icon(icon, color: color, size: 30),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontFamily: 'Tajawal',
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  color: authInk,
                 ),
               ),
-              at(710, 753, 220, 30, IgnorePointer(child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Text(tr2('من ${AccountExtras.minAge} إلى ${AccountExtras.maxAge} سنوات', 'From ${AccountExtras.minAge} to ${AccountExtras.maxAge} years'), key: const ValueKey('register_age_range'), style: TextStyle(fontFamily: 'Tajawal', fontSize: font, fontWeight: FontWeight.w900, color: _ink)))))),
-              // The "register later" strip of the picture became two real buttons.
-              at(
-                DemoMode.enabled ? 775 : 860,
-                960,
-                250,
-                36,
-                FocusableTap(
-                  key: const ValueKey('register_email_submit'),
-                  radius: 20,
-                  semanticLabel: tr2('إنشاء الحساب بالبريد', 'Create the account with e-mail'),
-                  onTap: _byEmail,
-                  child: Container(
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF8A52E8), Color(0xFF5B2BB8)]), borderRadius: BorderRadius.circular(30)),
-                    child: FittedBox(fit: BoxFit.scaleDown, child: Text(tr2('إنشاء الحساب بالبريد', 'Create with e-mail'), style: TextStyle(fontFamily: 'Tajawal', fontSize: font, fontWeight: FontWeight.w900, color: Colors.white))),
-                  ),
-                ),
-              ),
-              // «Register later» is not offered in the demo: there the account is needed (owner decision).
-              if (!DemoMode.enabled)
-              at(
-                655,
-                960,
-                190,
-                36,
-                FocusableTap(
-                  key: const ValueKey('register_later'),
-                  radius: 20,
-                  semanticLabel: tr2('التسجيل لاحقاً', 'Register later'),
-                  onTap: () => Navigator.pop(context, true),
-                  child: Container(
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(30), border: Border.all(color: _ink, width: 1.5)),
-                    child: FittedBox(fit: BoxFit.scaleDown, child: Text(tr2('التسجيل لاحقاً', 'Register later'), style: TextStyle(fontFamily: 'Tajawal', fontSize: font, fontWeight: FontWeight.w900, color: _ink))),
-                  ),
-                ),
-              ),
-              if (_busy) _busyVeil(),
-            ];
-          },
+            ],
+          ),
         ),
       ),
     );
   }
-}
 
-class _Radio extends StatelessWidget {
-  final bool on;
-  const _Radio({required this.on});
+  Widget _stepButton(
+    String id,
+    IconData icon,
+    String label,
+    VoidCallback onTap,
+  ) => FocusableTap(
+    key: ValueKey(id),
+    radius: 30,
+    semanticLabel: label,
+    onTap: onTap,
+    child: Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.white,
+        border: Border.all(color: authPurple, width: 3),
+      ),
+      child: Icon(icon, color: authPurple, size: 32),
+    ),
+  );
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(builder: (context, box) {
-        final d = box.maxWidth;
-        return Container(
-          decoration: BoxDecoration(shape: BoxShape.circle, color: on ? _ink : Colors.white, border: Border.all(color: _ink, width: 3)),
-          child: on ? Icon(Icons.check_rounded, color: Colors.white, size: d * 0.7) : null,
-        );
-      });
+  Widget build(BuildContext context) {
+    String ageWord(int a) => a == 1
+        ? tr2('سنة', 'year')
+        : (a == 2 ? tr2('سنتان', '2 years') : tr2('سنوات', 'years'));
+    return AuthShell(
+      key: const ValueKey('register_picture'),
+      asset: kRegisterPicture,
+      onBack: () => Navigator.pop(context, false),
+      backLabel: tr2('رجوع', 'Back'),
+      overlay: _busy ? _busyVeil() : null,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            tr2('إنشاء حساب جديد', 'Create a new account'),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 26,
+              fontWeight: FontWeight.w900,
+              color: authInk,
+            ),
+          ),
+          const SizedBox(height: 14),
+          AuthField(
+            fieldKey: const ValueKey('register_name'),
+            controller: _name,
+            hint: tr2('الاسم الكامل', 'Full name'),
+            icon: Icons.person_rounded,
+            ltr: false,
+            maxLength: 60,
+            action: TextInputAction.next,
+          ),
+          const SizedBox(height: 10),
+          AuthField(
+            fieldKey: const ValueKey('register_email'),
+            controller: _email,
+            hint: tr2('البريد الإلكتروني', 'E-mail'),
+            icon: Icons.mail_rounded,
+            keyboard: TextInputType.emailAddress,
+            action: TextInputAction.next,
+          ),
+          const SizedBox(height: 10),
+          AuthField(
+            fieldKey: const ValueKey('register_password'),
+            controller: _password,
+            hint: tr2('كلمة المرور', 'Password'),
+            icon: Icons.lock_rounded,
+            obscure: true,
+            action: TextInputAction.next,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            tr2('طفلك (اختياري)', 'Your child (optional)'),
+            style: const TextStyle(
+              fontFamily: 'Tajawal',
+              fontSize: 17,
+              fontWeight: FontWeight.w900,
+              color: authInk,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              _genderCard(
+                'girl',
+                tr2('بنت', 'Girl'),
+                Icons.face_3_rounded,
+                const Color(0xFFE0559C),
+              ),
+              const SizedBox(width: 10),
+              _genderCard(
+                'boy',
+                tr2('ولد', 'Boy'),
+                Icons.face_6_rounded,
+                const Color(0xFF3B82E8),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _stepButton(
+                'register_age_down',
+                Icons.remove_rounded,
+                tr2('أصغر', 'Younger'),
+                () => _stepAge(-1),
+              ),
+              const SizedBox(width: 14),
+              Flexible(
+                child: Container(
+                  key: const ValueKey('register_age_value'),
+                  height: 60,
+                  constraints: const BoxConstraints(minWidth: 150),
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF8A52E8), authPurpleDark],
+                    ),
+                    borderRadius: BorderRadius.circular(34),
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      _age == null
+                          ? tr2('اختر العمر', 'Pick the age')
+                          : '$_age ${ageWord(_age!)}',
+                      style: const TextStyle(
+                        fontFamily: 'Tajawal',
+                        fontSize: 21,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              _stepButton(
+                'register_age_up',
+                Icons.add_rounded,
+                tr2('أكبر', 'Older'),
+                () => _stepAge(1),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Center(
+            child: Text(
+              tr2(
+                'من ${AccountExtras.minAge} إلى ${AccountExtras.maxAge} سنوات',
+                'From ${AccountExtras.minAge} to ${AccountExtras.maxAge} years',
+              ),
+              key: const ValueKey('register_age_range'),
+              style: const TextStyle(
+                fontFamily: 'Tajawal',
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                color: authInk,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          AuthField(
+            fieldKey: const ValueKey('register_city'),
+            controller: _city,
+            hint: tr2('اختر أو اكتب مدينتك', 'Type your city'),
+            icon: Icons.location_city_rounded,
+            ltr: false,
+            maxLength: RegisterPictureScreen.maxCity,
+            action: TextInputAction.done,
+          ),
+          const SizedBox(height: 16),
+          KeyedSubtree(
+            key: const ValueKey('register_email_submit'),
+            child: AuthButton(
+              label: tr2('إنشاء الحساب بالبريد', 'Create with e-mail'),
+              icon: Icons.check_circle_rounded,
+              onTap: _byEmail,
+            ),
+          ),
+          const SizedBox(height: 12),
+          KeyedSubtree(
+            key: const ValueKey('register_google'),
+            child: AuthOutlineButton(
+              label: tr2('التسجيل باستخدام جيميل', 'Register with Gmail'),
+              leading: const GoogleG(),
+              onTap: _google,
+            ),
+          ),
+          // «Register later» is not offered in the demo: there the account is needed (owner decision).
+          if (!DemoMode.enabled) ...[
+            const SizedBox(height: 8),
+            FocusableTap(
+              key: const ValueKey('register_later'),
+              radius: 20,
+              semanticLabel: tr2('التسجيل لاحقاً', 'Register later'),
+              onTap: () => Navigator.pop(context, true),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Center(
+                  child: Text(
+                    tr2('التسجيل لاحقاً', 'Register later'),
+                    style: const TextStyle(
+                      fontFamily: 'Tajawal',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      color: authInk,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
 }
 
 /// What opens after the intro: the sign-in page when the online accounts are switched on and nobody is signed in,
@@ -519,7 +858,11 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    if (_login) return LoginPictureScreen(repo: widget.repo, onDone: () => setState(() => _login = false));
+    if (_login)
+      return LoginPictureScreen(
+        repo: widget.repo,
+        onDone: () => setState(() => _login = false),
+      );
     return HomeEntry(autoEnter: widget.autoEnter);
   }
 }
@@ -536,7 +879,11 @@ class HomeEntry extends StatefulWidget {
   const HomeEntry({super.key, this.autoEnter});
 
   /// The nickname given to a child made from the sign-up (the parent can change it in the parent area).
-  static String nicknameFor(String? gender) => gender == 'girl' ? tr2('بطلتنا', 'Our hero') : (gender == 'boy' ? tr2('بطلنا', 'Our hero') : tr2('صغيري', 'My little one'));
+  static String nicknameFor(String? gender) => gender == 'girl'
+      ? tr2('بطلتنا', 'Our hero')
+      : (gender == 'boy'
+            ? tr2('بطلنا', 'Our hero')
+            : tr2('صغيري', 'My little one'));
 
   @override
   State<HomeEntry> createState() => _HomeEntryState();
@@ -575,7 +922,12 @@ class _HomeEntryState extends State<HomeEntry> {
     } else if (store.profiles.isEmpty) {
       final x = await AccountExtras.load();
       if (x.age != null) {
-        child = await createDemoChild(nickname: HomeEntry.nicknameFor(x.gender), age: x.age!, avatar: x.gender == 'boy' ? 'b1' : 'g1', gender: x.gender);
+        child = await createDemoChild(
+          nickname: HomeEntry.nicknameFor(x.gender),
+          age: x.age!,
+          avatar: x.gender == 'boy' ? 'b1' : 'g1',
+          gender: x.gender,
+        );
       }
     }
     if (!mounted) return;
@@ -594,7 +946,14 @@ class _HomeEntryState extends State<HomeEntry> {
       // The same picture as the intro, so nothing flashes between the sign-in page and the home page.
       return Scaffold(
         key: const ValueKey('home_entry_wait'),
-        body: SizedBox.expand(child: Image.asset(AppIntro.posterAsset, fit: BoxFit.cover, errorBuilder: (_, _, _) => const ColoredBox(color: Color(0xFF58A8F2)))),
+        body: SizedBox.expand(
+          child: Image.asset(
+            AppIntro.posterAsset,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) =>
+                const ColoredBox(color: Color(0xFF58A8F2)),
+          ),
+        ),
       );
     }
     return const StartScreen();

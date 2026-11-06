@@ -16,7 +16,8 @@ class AccountExtras {
   static const maxAge = 6;
   static const maxCity = 40;
 
-  bool get isEmpty => gender == null && age == null && (city == null || city!.isEmpty);
+  bool get isEmpty =>
+      gender == null && age == null && (city == null || city!.isEmpty);
 
   /// A clean copy: gender must be one of the two ids, age is kept inside 1 to 6, the city is trimmed and shortened.
   factory AccountExtras.clean({String? gender, int? age, String? city}) {
@@ -24,7 +25,11 @@ class AccountExtras {
     return AccountExtras(
       gender: gender == 'girl' || gender == 'boy' ? gender : null,
       age: age?.clamp(minAge, maxAge),
-      city: c == null || c.isEmpty ? null : (c.runes.length > maxCity ? String.fromCharCodes(c.runes.take(maxCity)) : c),
+      city: c == null || c.isEmpty
+          ? null
+          : (c.runes.length > maxCity
+                ? String.fromCharCodes(c.runes.take(maxCity))
+                : c),
     );
   }
 
@@ -33,7 +38,11 @@ class AccountExtras {
   static AccountExtras fromJson(Object? raw) {
     if (raw is! Map) return const AccountExtras();
     final a = raw['age'];
-    return AccountExtras.clean(gender: raw['gender'] as String?, age: a is int ? a : null, city: raw['city'] as String?);
+    return AccountExtras.clean(
+      gender: raw['gender'] as String?,
+      age: a is int ? a : null,
+      city: raw['city'] as String?,
+    );
   }
 
   static Future<AccountExtras> load() async {
