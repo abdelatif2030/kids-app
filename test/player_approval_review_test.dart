@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'video_fixture.dart';
 
 /// Second review of the video path (static checks of the source plus facts about the data). Behaviour of the approval
 /// workflow is tested in lessons_test.dart / video_controls_test.dart, the navigation rules in safe_player_test.dart.
@@ -11,6 +12,8 @@ List<String> usesOf(Pattern p) => [
     ]..sort();
 
 void main() {
+  setUp(useArchivedVideos);
+  tearDown(resetVideos);
   test('a video player is created only for a list the child may see, or for a parent preview', () {
     expect(usesOf('PlayerScreen(video'), ['lib/main.dart', 'lib/video_controls.dart']);
     final main = File('lib/main.dart').readAsStringSync();
@@ -48,7 +51,7 @@ void main() {
   });
 
   test('the shipped catalogue records the owner\'s review and nothing else: the app itself verified no video', () {
-    final list = jsonDecode(File('assets/videos.json').readAsStringSync()) as List<dynamic>;
+    final list = jsonDecode(File('test/fixtures/videos_archive.json').readAsStringSync()) as List<dynamic>;
     expect(list.length, 157);
     for (final e in list.cast<Map<String, dynamic>>()) {
       expect(e['verification'], 'unverified', reason: e['youtubeId'] as String); // never "verified" by the app

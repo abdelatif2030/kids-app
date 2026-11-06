@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../design/picture_stage.dart';
 
 import '../design/motion.dart';
 import '../drawing_screen.dart';
@@ -45,7 +46,8 @@ class StudioScreen extends StatelessWidget {
         title: Text(loc('استوديو الإبداع'),
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
-      body: PastelBackground(
+      extendBodyBehindAppBar: true,
+      body: PictureBackdrop(
         child: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16),

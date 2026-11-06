@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'video_fixture.dart';
 import 'approve_all.dart';
 import 'package:kids_app/color_game.dart';
 import 'package:kids_app/curriculum.dart';
@@ -52,6 +53,8 @@ Future<void> _playRounds(WidgetTester tester, int rounds) async {
 }
 
 void main() {
+  setUp(useArchivedVideos);
+  tearDown(resetVideos);
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     // A string cached by an earlier test would complete in that test's dead zone.
@@ -213,7 +216,7 @@ void main() {
   });
 
   test('videos.json: valid, unique, known subjects, every age 1-6 has lessons (7-12 legacy kept)', () {
-    final list = jsonDecode(File('assets/videos.json').readAsStringSync()) as List<dynamic>;
+    final list = jsonDecode(File('test/fixtures/videos_archive.json').readAsStringSync()) as List<dynamic>;
     final ids = <String>{};
     final subjects = {for (final s in kSubjects) s.id};
     for (final v in list.cast<Map<String, dynamic>>()) {

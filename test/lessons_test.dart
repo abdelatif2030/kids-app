@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'video_fixture.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/lessons/lesson_rules.dart';
 import 'package:kids_app/lessons/lesson_store.dart';
@@ -13,6 +14,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'approve_all.dart';
 
 void main() {
+  setUp(useArchivedVideos);
+  tearDown(resetVideos);
   candidateTests();
   reviewWorkflowTests();
   setUp(() async {
@@ -222,7 +225,7 @@ void candidateTests() {
       final bundled = all.where((v) => v.origin == 'bundled').toList();
       expect(bundled.length, greaterThan(100));
       expect(bundled.every((v) => v.verification == 'unverified'), isTrue);
-      final raw = File('assets/videos.json').readAsStringSync();
+      final raw = File('test/fixtures/videos_archive.json').readAsStringSync();
       expect(raw.contains('"verification": "verified"'), isFalse);
       expect(raw.contains('"approved": true'), isFalse);
     });
@@ -327,7 +330,7 @@ void reviewWorkflowTests() {
     test('the lesson library documents list every candidate and keep the unreviewed count honest', () {
       final csv = File('docs/VIDEO_CANDIDATES.csv').readAsLinesSync();
       expect(csv.length - 1, 157);
-      final json = File('assets/videos.json').readAsStringSync();
+      final json = File('test/fixtures/videos_archive.json').readAsStringSync();
       expect(RegExp('"verification": "unverified"').allMatches(json).length, 157);
       expect(File('docs/VIDEO_REVIEW_STATUS.md').readAsStringSync(), contains('0 of 157'));
     });

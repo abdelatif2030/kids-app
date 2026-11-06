@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../content_flags.dart';
+import '../../design/picture_stage.dart';
 
 import '../../design/layout.dart';
 import '../../design/motion_system.dart';
@@ -49,7 +51,11 @@ class _ChildShellState extends State<ChildShell> {
       CompanionStore.noteAge(widget.child.id, widget.child.age);
       FamilyTimeStore.remind(widget.child.id, widget.child.nickname);
       if (EnginePrefs.instance.autoNarration) {
-        CompanionService.react(widget.child.id, CompanionMoment.greet, age: widget.child.age).then((r) {
+        CompanionService.react(
+          widget.child.id,
+          CompanionMoment.greet,
+          age: widget.child.age,
+        ).then((r) {
           if (r == null) RehlatyAudioEngine.instance.say('welcome_back'); // Adam's greeting (an approved recording once listed, else the device voice)
         });
       }
@@ -58,7 +64,8 @@ class _ChildShellState extends State<ChildShell> {
 
   @override
   void dispose() {
-    if (CompanionStore.currentChildId == widget.child.id) CompanionStore.currentChildId = null;
+    if (CompanionStore.currentChildId == widget.child.id)
+      CompanionStore.currentChildId = null;
     // Deferred so listeners are not notified in the middle of tearing down.
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => SessionManager.instance.stop(),
@@ -153,14 +160,19 @@ class _ChildShellState extends State<ChildShell> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       boxShadow: DS.softShadow,
-                      border: const BorderDirectional(end: BorderSide(color: DS.border, width: 1.5)),
+                      border: const BorderDirectional(
+                        end: BorderSide(color: DS.border, width: 1.5),
+                      ),
                     ),
                     child: SafeArea(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           for (final n in items)
-                            Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: n),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: n,
+                            ),
                         ],
                       ),
                     ),
@@ -283,18 +295,18 @@ class _NavItem extends StatelessWidget {
             ),
             if (!compact) const SizedBox(height: 2),
             if (!compact)
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                label,
-                maxLines: 1,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: selected ? FontWeight.w900 : FontWeight.w600,
-                  color: selected ? DS.primary : RC.ink,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: selected ? FontWeight.w900 : FontWeight.w600,
+                    color: selected ? DS.primary : RC.ink,
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
@@ -315,7 +327,11 @@ class _GamesTabState extends State<_GamesTab> {
   @override
   Widget build(BuildContext context) =>
       // The games hub: ten islands (letters, numbers, shapes...), each opening its own games. It fills the whole area.
-      GamesHub(key: const ValueKey('games_hub'), child: widget.child, onBack: widget.onBack);
+      GamesHub(
+        key: const ValueKey('games_hub'),
+        child: widget.child,
+        onBack: widget.onBack,
+      );
 }
 
 class _CreateTab extends StatelessWidget {
@@ -326,69 +342,75 @@ class _CreateTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              loc('إبداع'),
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.w900,
-                color: RC.ink,
+    // Drawing and creativity sit on the owner's unified scenery picture, like every inner screen.
+    return PictureBackdrop(
+      child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                loc('إبداع'),
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.w900,
+                  color: RC.ink,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              alignment: WrapAlignment.center,
-              children: [
-                BigTile(
-                  label: loc('استوديو الإبداع'),
-                  icon: Icons.auto_awesome_rounded,
-                  color: const Color(0xFF8E73D0),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => StudioScreen(child: child),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                alignment: WrapAlignment.center,
+                children: [
+                  BigTile(
+                    label: loc('استوديو الإبداع'),
+                    icon: Icons.auto_awesome_rounded,
+                    color: const Color(0xFF8E73D0),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => StudioScreen(child: child),
+                      ),
                     ),
                   ),
-                ),
-                BigTile(
-                  label: loc('رسم حر'),
-                  icon: Icons.brush_rounded,
-                  color: const Color(0xFFB085E8),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => DrawingScreen(child: child),
+                  BigTile(
+                    label: loc('رسم حر'),
+                    icon: Icons.brush_rounded,
+                    color: const Color(0xFFB085E8),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DrawingScreen(child: child),
+                      ),
                     ),
                   ),
-                ),
-                BigTile(
-                  label: loc('دروس الرسم'),
-                  icon: Icons.draw_rounded,
-                  color: const Color(0xFFE56B9A),
-                  onTap: () => openVideos(context, age, 'drawing'),
-                ),
-                BigTile(
-                  label: loc('أناشيد'),
-                  icon: Icons.music_note_rounded,
-                  color: const Color(0xFFF2A33A),
-                  onTap: () => openVideos(context, age, 'fun'),
-                ),
-                BigTile(
-                  label: loc('قصص'),
-                  icon: Icons.local_library_rounded,
-                  color: const Color(0xFF4A90E2),
-                  onTap: () => openVideos(context, age, 'stories'),
-                ),
-              ],
-            ),
-          ],
+                  if (YoutubeContent.enabled)
+                    BigTile(
+                      label: loc('دروس الرسم'),
+                      icon: Icons.draw_rounded,
+                      color: const Color(0xFFE56B9A),
+                      onTap: () => openVideos(context, age, 'drawing'),
+                    ),
+                  if (YoutubeContent.enabled)
+                    BigTile(
+                      label: loc('أناشيد'),
+                      icon: Icons.music_note_rounded,
+                      color: const Color(0xFFF2A33A),
+                      onTap: () => openVideos(context, age, 'fun'),
+                    ),
+                  if (YoutubeContent.enabled)
+                    BigTile(
+                      label: loc('قصص'),
+                      icon: Icons.local_library_rounded,
+                      color: const Color(0xFF4A90E2),
+                      onTap: () => openVideos(context, age, 'stories'),
+                    ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

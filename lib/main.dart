@@ -5,6 +5,8 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
+import 'auth/auth_pictures.dart';
+import 'content_flags.dart';
 import 'design/picture_stage.dart';
 
 import 'design/worlds.dart';
@@ -22,7 +24,6 @@ import 'media/audio.dart';
 import 'firebase_config.dart';
 import 'journey/repository.dart';
 import 'journey/ui/lesson_flow.dart';
-import 'journey/ui/start_screen.dart';
 import 'design/app_intro.dart';
 import 'design/motion.dart';
 import 'offline/connectivity.dart';
@@ -125,7 +126,7 @@ class KidsApp extends StatelessWidget {
           );
         },
       ),
-      home: const AppIntro(child: StartScreen()),
+      home: const AppIntro(child: AuthGate()),
     );
   }
 }
@@ -190,8 +191,12 @@ class Video {
 /// The videos a child may see: listed (assets/videos.json or added by a parent by exact link), not rejected, APPROVED BY
 /// THE PARENT on this device, and not disabled. Nothing is visible to a child until a parent approves it. [all] is only
 /// for the parent's review screen. Never returns a video that is not in one of those two lists.
+/// How the bundled whitelist is read. Tests replace it to feed the old video machinery with a fixture.
+Future<String> Function(String path) videosAssetLoader = rootBundle.loadString;
+
 Future<List<Video>> loadVideos({bool all = false, String? childId}) async {
-  final raw = await rootBundle.loadString('assets/videos.json');
+  if (!YoutubeContent.enabled) return const []; // the app has no YouTube content (lib/content_flags.dart)
+  final raw = await videosAssetLoader('assets/videos.json');
   final list = jsonDecode(raw) as List<dynamic>;
   final videos = [
     for (final e in list) Video.fromJson(e as Map<String, dynamic>),

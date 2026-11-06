@@ -11,7 +11,9 @@ import 'package:kids_app/journey/repository.dart';
 import 'package:kids_app/journey/ui/picture_screens.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/main.dart' show VideoListScreen;
+import 'package:kids_app/journey/ui/land_map_screen.dart';
 import 'package:kids_app/stories/story_screens.dart';
+import 'package:kids_app/studio/studio_screens.dart' show StudioScreen;
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _kid = ChildProfile(id: 'k1', nickname: 'سلمى', age: 5);
@@ -136,7 +138,7 @@ void main() {
   });
 
   group('cartoons and stories', () {
-    testWidgets('two islands: cartoons opens the age videos, stories opens the story library, back leaves', (t) async {
+    testWidgets('two islands: cartoons says episodes are coming, stories opens an EMPTY page (audio stories come later), back leaves', (t) async {
       _size(t, const Size(1672, 941));
       await _setup(t);
       await _show(t, const CartoonsPictureScreen(child: _kid));
@@ -144,13 +146,17 @@ void main() {
       final b = t.getRect(find.byKey(const ValueKey('hub_stories')));
       expect(_overlap(a, b), isFalse);
       await t.tap(find.byKey(const ValueKey('hub_cartoons')));
-      await _settle(t);
-      expect(t.widget<VideoListScreen>(find.byType(VideoListScreen)).age, 5);
-      await t.pageBack();
-      await _settle(t);
+      await t.pump();
+      expect(find.text('الحلقات الكرتونية قادمة قريباً!'), findsOneWidget);
+      expect(find.byType(VideoListScreen), findsNothing, reason: 'no YouTube content');
       await t.tap(find.byKey(const ValueKey('hub_stories')));
       await _settle(t);
-      expect(find.byType(StoriesHomeScreen), findsOneWidget);
+      expect(find.byKey(const ValueKey('coming_soon')), findsOneWidget);
+      expect(find.text('هنا ستظهر القصص الصوتية قريباً.'), findsOneWidget);
+      expect(find.byType(StoriesHomeScreen), findsNothing, reason: 'the stories slot is empty on purpose');
+      await t.pageBack();
+      await _settle(t);
+      expect(find.byKey(const ValueKey('cartoons_picture')), findsOneWidget);
     });
 
     testWidgets('in English the painted Arabic names are covered by real English ones; in Arabic nothing is drawn over the picture', (t) async {
@@ -188,16 +194,26 @@ void main() {
         await _settle(t);
       }
 
-      for (final (id, subject) in [('stories', 'stories'), ('quran', 'quran'), ('deen', 'deen'), ('math', 'math'), ('english', 'english'), ('calm', 'calm'), ('art', 'drawing')]) {
+      // No tile opens a video list: the app has no YouTube content.
+      for (final id in ['quran', 'deen', 'calm', 'songs']) {
         await open(id);
-        final v = t.widget<VideoListScreen>(find.byType(VideoListScreen));
-        expect(v.subject, subject, reason: id);
-        expect(v.age, 5);
+        expect(find.byKey(const ValueKey('coming_soon')), findsOneWidget, reason: id);
+        expect(find.byType(VideoListScreen), findsNothing, reason: id);
         await t.pageBack();
         await _settle(t);
       }
-      await open('songs');
-      expect(t.widget<VideoListScreen>(find.byType(VideoListScreen)).initialCategory, 'Fun', reason: 'songs are the Fun-category videos');
+      await open('stories');
+      expect(find.text('هنا ستظهر القصص الصوتية قريباً.'), findsOneWidget);
+      await t.pageBack();
+      await _settle(t);
+      for (final (id, land) in [('math', 'numbers'), ('english', 'english')]) {
+        await open(id);
+        expect(t.widget<LandMapScreen>(find.byType(LandMapScreen)).land.id, land, reason: id);
+        await t.pageBack();
+        await _settle(t);
+      }
+      await open('art');
+      expect(find.byType(StudioScreen), findsOneWidget);
       await t.pageBack();
       await _settle(t);
       await open('puzzles');
@@ -214,20 +230,21 @@ void main() {
       await _show(t, const LessonsPictureScreen(child: _kid));
       await t.tap(find.byKey(const ValueKey('lessons_more')));
       await _settle(t);
-      expect(find.byKey(const ValueKey('hub_lessons')), findsOneWidget, reason: 'the older hub: video lessons by subject, letters, lands, words');
+      expect(find.byKey(const ValueKey('hub_words')), findsOneWidget, reason: 'the older hub: letters, lands and words');
+      expect(find.byKey(const ValueKey('hub_lessons')), findsNothing, reason: 'its video lessons tile is gone with the YouTube content');
     });
   });
 
   group('the scenery background', () {
-    testWidgets('a game category and the video list sit on the scenery picture and never show a blank screen', (t) async {
+    testWidgets('a game category and the drawing page sit on the unified scenery picture and never show a blank screen', (t) async {
       _size(t, const Size(844, 390));
       await _setup(t);
       await _show(t, CategoryGamesScreen(category: kGameCategories.first, child: _kid));
       await _settle(t);
       expect(find.byKey(const ValueKey('picture_backdrop')), findsOneWidget);
-      await _show(t, const VideoListScreen(age: 5));
+      await _show(t, const DrawingScreen(child: _kid));
       await _settle(t);
-      expect(find.byKey(const ValueKey('picture_backdrop')), findsOneWidget);
+      expect(find.byKey(const ValueKey('picture_backdrop')), findsOneWidget, reason: 'drawing uses the unified background');
     });
   });
 

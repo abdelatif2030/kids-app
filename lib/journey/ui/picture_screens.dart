@@ -6,11 +6,12 @@ import '../../drawing_screen.dart';
 import '../../games/games_hub.dart' show CategoryGamesScreen, kGameCategories;
 import '../../l10n/app_locale.dart';
 import '../../l10n/strings.dart';
-import '../../main.dart' show VideoListScreen;
+import '../../studio/studio_screens.dart' show StudioScreen;
+import '../lands.dart' show landById;
+import 'land_map_screen.dart';
 import '../../notifications/notification_store.dart';
 import '../../notifications/notification_ui.dart';
 import '../../parent_screens.dart';
-import '../../stories/story_screens.dart';
 import '../avatars.dart';
 import '../models.dart';
 import 'home_hubs.dart';
@@ -200,8 +201,8 @@ class _RealAvatar extends StatelessWidget {
       });
 }
 
-/// «الكرتون والحكايات»: the owner's picture with two islands. Cartoons opens the videos picked for the child's age
-/// (parent-approved, played with the official player); stories opens the story library.
+/// «الكرتون والحكايات»: the owner's picture with two islands. There are no cartoon episodes yet (a friendly message), and
+/// the stories island opens an empty page on purpose: audio stories will be added there.
 class CartoonsPictureScreen extends StatelessWidget {
   final ChildProfile child;
   const CartoonsPictureScreen({super.key, required this.child});
@@ -226,8 +227,8 @@ class CartoonsPictureScreen extends StatelessWidget {
           ],
           spots: [
             _back(context),
-            PictureSpot('cartoons', const Offset(0.299, 0.66), 0.40, 0.62, tr2('الكرتون', 'Cartoons'), () => push(VideoListScreen(age: child.age)), key: const ValueKey('hub_cartoons')),
-            PictureSpot('stories', const Offset(0.718, 0.66), 0.40, 0.62, tr2('القصص', 'Stories'), () => push(StoriesHomeScreen(child: child)), key: const ValueKey('hub_stories')),
+            PictureSpot('cartoons', const Offset(0.299, 0.66), 0.40, 0.62, tr2('الكرتون', 'Cartoons'), () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr2('الحلقات الكرتونية قادمة قريباً!', 'Cartoon episodes are coming soon!')))), key: const ValueKey('hub_cartoons')),
+            PictureSpot('stories', const Offset(0.718, 0.66), 0.40, 0.62, tr2('القصص', 'Stories'), () => push(ComingSoonScreen(title: tr2('القصص', 'Stories'), message: tr2('هنا ستظهر القصص الصوتية قريباً.', 'Audio stories will appear here soon.'), icon: Icons.headphones_rounded)), key: const ValueKey('hub_stories')),
           ],
         ),
       ),
@@ -245,25 +246,25 @@ class _LessonTile {
   const _LessonTile(this.id, this.center, this.name, this.title, this.open);
 }
 
-Widget _videos(ChildProfile c, String subject) => VideoListScreen(age: c.age, subject: subject);
+Widget _soon(String title) => ComingSoonScreen(title: title, message: tr2('هذا القسم قادم قريباً.', 'This section is coming soon.'), icon: Icons.hourglass_top_rounded);
 
 final List<_LessonTile> _lessonTiles = [
-  _LessonTile('stories', const Offset(0.163, 0.475), const Offset(0.163, 0.553), () => tr2('قصص', 'Stories'), (_, c) => _videos(c, 'stories')),
-  _LessonTile('quran', const Offset(0.329, 0.475), const Offset(0.329, 0.553), () => tr2('قرآن', 'Quran'), (_, c) => _videos(c, 'quran')),
-  _LessonTile('deen', const Offset(0.493, 0.475), const Offset(0.493, 0.553), () => tr2('دين', 'Religion'), (_, c) => _videos(c, 'deen')),
-  _LessonTile('math', const Offset(0.667, 0.475), const Offset(0.667, 0.553), () => tr2('رياضيات', 'Maths'), (_, c) => _videos(c, 'math')),
-  _LessonTile('english', const Offset(0.843, 0.475), const Offset(0.843, 0.553), () => tr2('إنجليزي', 'English'), (_, c) => _videos(c, 'english')),
-  _LessonTile('calm', const Offset(0.164, 0.76), const Offset(0.164, 0.82), () => tr2('هدوء ونوم', 'Calm & sleep'), (_, c) => _videos(c, 'calm')),
-  // Songs are the videos of the «Fun» category (nursery songs and counting songs), across every subject.
-  _LessonTile('songs', const Offset(0.332, 0.76), const Offset(0.332, 0.82), () => tr2('أناشيد', 'Songs'), (_, c) => VideoListScreen(age: c.age, initialCategory: 'Fun')),
-  _LessonTile('art', const Offset(0.505, 0.76), const Offset(0.505, 0.82), () => tr2('فني', 'Art'), (_, c) => _videos(c, 'drawing')),
+  // No YouTube content in the app (lib/content_flags.dart): tiles open what the app has, or a friendly "coming soon".
+  _LessonTile('stories', const Offset(0.163, 0.475), const Offset(0.163, 0.553), () => tr2('قصص', 'Stories'), (_, c) => ComingSoonScreen(title: tr2('قصص', 'Stories'), message: tr2('هنا ستظهر القصص الصوتية قريباً.', 'Audio stories will appear here soon.'), icon: Icons.headphones_rounded)),
+  _LessonTile('quran', const Offset(0.329, 0.475), const Offset(0.329, 0.553), () => tr2('قرآن', 'Quran'), (_, c) => _soon(tr2('قرآن', 'Quran'))),
+  _LessonTile('deen', const Offset(0.493, 0.475), const Offset(0.493, 0.553), () => tr2('دين', 'Religion'), (_, c) => _soon(tr2('دين', 'Religion'))),
+  _LessonTile('math', const Offset(0.667, 0.475), const Offset(0.667, 0.553), () => tr2('رياضيات', 'Maths'), (_, c) => LandMapScreen(land: landById('numbers'), child: c)),
+  _LessonTile('english', const Offset(0.843, 0.475), const Offset(0.843, 0.553), () => tr2('إنجليزي', 'English'), (_, c) => LandMapScreen(land: landById('english'), child: c)),
+  _LessonTile('calm', const Offset(0.164, 0.76), const Offset(0.164, 0.82), () => tr2('هدوء ونوم', 'Calm & sleep'), (_, c) => _soon(tr2('هدوء ونوم', 'Calm & sleep'))),
+  _LessonTile('songs', const Offset(0.332, 0.76), const Offset(0.332, 0.82), () => tr2('أناشيد', 'Songs'), (_, c) => _soon(tr2('أناشيد', 'Songs'))),
+  _LessonTile('art', const Offset(0.505, 0.76), const Offset(0.505, 0.82), () => tr2('فني', 'Art'), (_, c) => StudioScreen(child: c)),
   // Puzzles are the thinking games of the games hub.
   _LessonTile('puzzles', const Offset(0.676, 0.76), const Offset(0.676, 0.82), () => tr2('ألغاز', 'Puzzles'), (_, c) => CategoryGamesScreen(category: kGameCategories.firstWhere((g) => g.id == 'brain'), child: c)),
   _LessonTile('drawing', const Offset(0.849, 0.76), const Offset(0.849, 0.82), () => tr2('رسم', 'Drawing'), (_, c) => DrawingScreen(child: c)),
 ];
 
 /// «دروسي»: the owner's picture with ten tiles. «كل الدروس والمزيد» (a small real button, not in the picture) opens the
-/// older hub with every other subject, the letters, the learning lands and the words, so nothing becomes unreachable.
+/// older hub with the letters, the learning lands and the words, so nothing becomes unreachable.
 class LessonsPictureScreen extends StatelessWidget {
   final ChildProfile child;
   const LessonsPictureScreen({super.key, required this.child});
@@ -312,6 +313,43 @@ class LessonsPictureScreen extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+
+/// A calm, empty page for a section that has no content yet (audio stories, cartoon episodes...). It sits on the unified
+/// scenery picture and says plainly that content is coming; nothing is faked.
+class ComingSoonScreen extends StatelessWidget {
+  final String title;
+  final String message;
+  final IconData icon;
+  const ComingSoonScreen({super.key, required this.title, required this.message, this.icon = Icons.hourglass_top_rounded});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, foregroundColor: Colors.white, title: Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 24, color: Colors.white))),
+      body: PictureBackdrop(
+        child: SafeArea(
+          child: Center(
+            child: Container(
+              key: const ValueKey('coming_soon'),
+              margin: const EdgeInsets.all(24),
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 22),
+              decoration: BoxDecoration(color: Colors.white.withAlpha(235), borderRadius: BorderRadius.circular(28), border: Border.all(color: const Color(0xFF8A52E8), width: 3)),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Icon(icon, size: 56, color: const Color(0xFF5B2BB8)),
+                const SizedBox(height: 10),
+                Text(title, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Color(0xFF3A2A6E))),
+                const SizedBox(height: 6),
+                Text(message, textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, color: Color(0xFF3A2A6E))),
+              ]),
+            ),
+          ),
         ),
       ),
     );

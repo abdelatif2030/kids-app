@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'design/picture_stage.dart';
+import 'content_flags.dart';
 
 import 'journey/models.dart' show ChildProfile;
 import 'main.dart' show VideoListScreen;
@@ -191,6 +193,7 @@ class _DrawingScreenState extends State<DrawingScreen> {
                 child: Text(_autosave!.tooLarge ? loc('الرسمة كبيرة جداً للحفظ') : (_autosave!.saved ? loc('تم الحفظ ✓') : '')),
               ),
             ),
+          if (YoutubeContent.enabled)
           IconButton(
             iconSize: 32,
             tooltip: loc('تعلّم الرسم'),
@@ -207,7 +210,8 @@ class _DrawingScreenState extends State<DrawingScreen> {
           ),
         ],
       ),
-      body: _finished
+      body: PictureBackdrop(
+        child: _finished
           ? Center(child: StarDone(onAgain: _again))
           : Column(
               children: [
@@ -313,6 +317,7 @@ class _DrawingScreenState extends State<DrawingScreen> {
                 ),
               ],
             ),
+      ),
     );
   }
 }

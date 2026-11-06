@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'video_fixture.dart';
 import 'package:kids_app/online_gate.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/journey/lands.dart';
@@ -69,6 +70,8 @@ Future<void> _answerQuiz(WidgetTester tester, int questions) async {
 Finder _field(String label) => find.widgetWithText(TextField, label);
 
 void main() {
+  setUp(useArchivedVideos);
+  tearDown(resetVideos);
   testWidgets('the sign-in door (Google or e-mail) is on the first screen only when the online gate is open', (tester) async {
     _tall(tester);
     final saved = lastOnlineGate;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'video_fixture.dart';
 import 'package:kids_app/color_game.dart';
 import 'package:kids_app/dashboard_screen.dart';
 import 'package:kids_app/main.dart' show Video;
@@ -44,6 +45,8 @@ List<SkillEvent> _events(String skill, String day, int ok, int bad, {String? det
     ];
 
 void main() {
+  setUp(useArchivedVideos);
+  tearDown(resetVideos);
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     (rootBundle as CachingAssetBundle).clear();

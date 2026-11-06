@@ -229,7 +229,7 @@ void main() {
       expect(find.text('ما نحفظه على الجهاز'), findsOneWidget);
       expect(find.text('ما لا نفعله أبداً'), findsOneWidget);
       expect(find.textContaining('لا إعلانات ولا تتبع'), findsOneWidget);
-      expect(find.textContaining('مشغّل YouTube الرسمي'), findsOneWidget); // not hidden
+      expect(find.textContaining('لا يحتوي التطبيق على أي محتوى من YouTube'), findsOneWidget); // not hidden
       expect(find.textContaining('docs/PRODUCTION.md'), findsOneWidget);
     });
 

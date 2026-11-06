@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'video_fixture.dart';
 import 'package:kids_app/data_reset.dart';
 import 'package:kids_app/demo/demo_mode.dart';
 import 'package:kids_app/journey/repository.dart';
@@ -25,6 +26,8 @@ Future<void> approve(String id) async {
 }
 
 void main() {
+  setUp(useArchivedVideos);
+  tearDown(resetVideos);
   TestWidgetsFlutterBinding.ensureInitialized();
   setUp(() async {
     DemoMode.overrideForTest(true);

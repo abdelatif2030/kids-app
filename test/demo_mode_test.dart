@@ -289,7 +289,7 @@ void main() {
     expect(text, contains('مزامنة'));
   });
 
-  test('web/_headers keeps the deployed demo talking only to itself (plus fonts and YouTube thumbnails and frames)', () {
+  test('web/_headers keeps the deployed demo talking only to itself (plus fonts): no YouTube host, no frames', () {
     final text = File('web/_headers').readAsStringSync();
     final csp = RegExp(r'Content-Security-Policy: (.*)').firstMatch(text)!.group(1)!;
     expect(csp, contains("default-src 'self'"));
@@ -302,7 +302,8 @@ void main() {
     expect(connect, isNot(contains('firebase')), reason: 'no backend');
     expect(connect, isNot(contains('googleapis')));
     final hosts = RegExp(r'https://[a-z0-9.-]+').allMatches(csp).map((m) => m.group(0)).toSet();
-    expect(hosts, {'https://img.youtube.com', 'https://i3.ytimg.com', 'https://fonts.gstatic.com', 'https://www.youtube-nocookie.com', 'https://www.youtube.com'});
+    expect(hosts, {'https://fonts.gstatic.com'});
+    expect(csp, contains("frame-src 'none'"), reason: 'the app has no YouTube content, so nothing is framed');
     expect(text, contains('microphone=()'), reason: 'the browser speech service would send audio to a third party');
     expect(text, contains('camera=()'));
     expect(text, contains('Referrer-Policy: no-referrer'));
@@ -332,8 +333,8 @@ void main() {
     expect(text, contains('microphone=()'));
     final hosts = RegExp(r'https://[a-z0-9.-]+').allMatches(csp).map((m) => m.group(0)).toSet();
     expect(hosts, {
-      'https://img.youtube.com', 'https://i3.ytimg.com', 'https://lh3.googleusercontent.com', 'https://fonts.gstatic.com',
-      'https://www.youtube-nocookie.com', 'https://www.youtube.com', 'https://apis.google.com', 'https://www.gstatic.com',
+      'https://lh3.googleusercontent.com', 'https://fonts.gstatic.com',
+      'https://apis.google.com', 'https://www.gstatic.com',
       'https://identitytoolkit.googleapis.com', 'https://securetoken.googleapis.com', 'https://firestore.googleapis.com',
       'https://firebaseinstallations.googleapis.com', 'https://www.googleapis.com', 'https://kids-app-2361e.firebaseapp.com',
       'https://accounts.google.com',

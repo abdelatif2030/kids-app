@@ -37,6 +37,7 @@ import 'print/printables_screen.dart';
 import 'summary_screen.dart';
 import 'teachers_screens.dart';
 import 'family/family_entry.dart';
+import 'content_flags.dart';
 import 'firebase_config.dart';
 
 /// Entry point from the child-facing screens: creates a PIN the first time,
@@ -708,6 +709,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 : tr2('ليس جزءاً من هذا الإصدار — يأتي لاحقاً', 'Not part of this version — planned for later'),
                             onTap: () => _go(const TeachersEntryScreen()),
                           ),
+                          if (YoutubeContent.enabled)
                           ParentRow(
                             key: const ValueKey('video_review_tile'),
                             icon: Icons.video_library_rounded,

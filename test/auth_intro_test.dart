@@ -1,0 +1,315 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/auth/account_extras.dart';
+import 'package:kids_app/auth/auth_pictures.dart';
+import 'package:kids_app/design/app_intro.dart';
+import 'package:kids_app/journey/ui/start_screen.dart';
+import 'package:kids_app/l10n/app_locale.dart';
+import 'package:kids_app/teachers_models.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'fake_teacher_repository.dart';
+
+Future<void> _show(WidgetTester t, Widget w, {Size size = const Size(1536, 1024)}) async {
+  t.view.physicalSize = size;
+  t.view.devicePixelRatio = 1;
+  addTearDown(t.view.reset);
+  await t.pumpWidget(MaterialApp(
+    builder: (c, child) => Directionality(textDirection: TextDirection.rtl, child: child!),
+    home: w,
+  ));
+  await t.pump(const Duration(milliseconds: 300));
+}
+
+Rect _r(WidgetTester t, String key) => t.getRect(find.byKey(ValueKey(key)));
+
+void main() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    await AppLocale.instance.set('ar');
+  });
+
+  group('the intro video', () {
+    test('the video and its first frame are bundled and small enough for a phone', () {
+      final v = File(AppIntro.videoAsset);
+      final p = File(AppIntro.posterAsset);
+      expect(v.existsSync() && p.existsSync(), isTrue);
+      expect(v.lengthSync(), lessThan(3 * 1024 * 1024), reason: 'compressed: the owner file was 9.4 MB');
+      final pub = File('pubspec.yaml').readAsStringSync();
+      expect(pub, contains(AppIntro.videoAsset));
+      expect(pub, contains(AppIntro.posterAsset));
+      expect(pub, contains('video_player:'));
+      // an MP4 starts with an "ftyp" box
+      final head = v.openSync().readSync(12);
+      expect(String.fromCharCodes(head.sublist(4, 8)), 'ftyp');
+    });
+
+    testWidgets('if the video cannot play the app is not blocked: the code-made intro takes over and then the app opens', (t) async {
+      AppIntro.forceShow = true;
+      AppIntro.resetForTest();
+      addTearDown(() {
+        AppIntro.forceShow = null;
+        AppIntro.resetForTest();
+      });
+      var failed = false;
+      await t.pumpWidget(MaterialApp(home: IntroVideoLayer(onDone: () {}, onFailed: () => failed = true)));
+      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 300)));
+      await t.pump(const Duration(milliseconds: 300));
+      expect(failed, isTrue, reason: 'there is no video player under the test binding: it must report the failure, not hang');
+      await t.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('the skip button and a tap call onDone', (t) async {
+      var done = 0;
+      await t.pumpWidget(MaterialApp(home: IntroVideoLayer(onDone: () => done++, onFailed: () {})));
+      await t.pump();
+      await t.tap(find.byKey(const ValueKey('intro_skip')));
+      expect(done, 1);
+      await t.pumpWidget(const SizedBox());
+    });
+  });
+
+  group('the sign-in page', () {
+    testWidgets('picture is shown whole; fields, button and Google/create links sit inside it and do not overlap', (t) async {
+      await _show(t, LoginPictureScreen(repo: FakeTeacherRepository(), onDone: () {}));
+      final box = t.getRect(find.byKey(const ValueKey('picture_stage_box')));
+      const keys = ['login_email', 'login_password', 'login_submit', 'login_google', 'login_create', 'login_forgot', 'login_eye', 'login_skip'];
+      final rects = {for (final k in keys) k: _r(t, k)};
+      for (final e in rects.entries) {
+        expect(box.contains(e.value.topLeft) && box.contains(e.value.bottomRight), isTrue, reason: e.key);
+      }
+      for (final a in keys) {
+        for (final b in keys) {
+          if (a.compareTo(b) < 0) expect(rects[a]!.deflate(2).overlaps(rects[b]!.deflate(2)), isFalse, reason: '$a vs $b');
+        }
+      }
+    });
+
+    testWidgets('signing in with the right password calls onDone; a wrong one shows the message and stays', (t) async {
+      final repo = FakeTeacherRepository();
+      await repo.register(email: 'mama@example.com', password: 'secret1', name: 'Mama', role: UserRole.parent);
+      await repo.signOut();
+      var done = 0;
+      await _show(t, LoginPictureScreen(repo: repo, onDone: () => done++));
+      await t.enterText(find.byKey(const ValueKey('login_email')), 'mama@example.com');
+      await t.enterText(find.byKey(const ValueKey('login_password')), 'wrong-password');
+      await t.tap(find.byKey(const ValueKey('login_submit')));
+      await t.pump();
+      await t.pump(const Duration(milliseconds: 300));
+      expect(done, 0);
+      expect(find.text('البريد أو كلمة المرور غير صحيحة'), findsOneWidget);
+      await t.enterText(find.byKey(const ValueKey('login_password')), 'secret1');
+      await t.tap(find.byKey(const ValueKey('login_submit')));
+      await t.pump();
+      await t.pump(const Duration(milliseconds: 300));
+      expect(done, 1);
+      expect(repo.currentUser?.email, 'mama@example.com');
+    });
+
+    testWidgets('empty or malformed input is refused before any request', (t) async {
+      final repo = FakeTeacherRepository();
+      await _show(t, LoginPictureScreen(repo: repo, onDone: () {}));
+      await t.tap(find.byKey(const ValueKey('login_submit')));
+      await t.pump();
+      expect(find.text('اكتب بريداً إلكترونياً صحيحاً'), findsOneWidget);
+      await t.enterText(find.byKey(const ValueKey('login_email')), 'a@b.com');
+      await t.enterText(find.byKey(const ValueKey('login_password')), '123');
+      await t.tap(find.byKey(const ValueKey('login_submit')));
+      await t.pump();
+      expect(find.text('كلمة المرور 6 أحرف على الأقل'), findsOneWidget);
+      expect(repo.currentUser, isNull);
+    });
+
+    testWidgets('Google signs in as a parent; remember me keeps only the e-mail, never the password', (t) async {
+      final repo = FakeTeacherRepository();
+      var done = 0;
+      await _show(t, LoginPictureScreen(repo: repo, onDone: () => done++));
+      await t.tap(find.byKey(const ValueKey('login_google')));
+      await t.pump();
+      await t.pump(const Duration(milliseconds: 300));
+      expect(done, 1);
+      expect(repo.googleSignIns, 1);
+
+      final repo2 = FakeTeacherRepository();
+      await repo2.register(email: 'mama@example.com', password: 'secret1', name: 'Mama', role: UserRole.parent);
+      await repo2.signOut();
+      await _show(t, LoginPictureScreen(key: UniqueKey(), repo: repo2, onDone: () {}));
+      await t.tap(find.byKey(const ValueKey('login_remember')));
+      await t.pump();
+      await t.enterText(find.byKey(const ValueKey('login_email')), 'mama@example.com');
+      await t.enterText(find.byKey(const ValueKey('login_password')), 'secret1');
+      await t.tap(find.byKey(const ValueKey('login_submit')));
+      await t.pump();
+      await t.pump(const Duration(milliseconds: 300));
+      final p = await SharedPreferences.getInstance();
+      expect(p.getString(LoginPictureScreen.rememberKey), 'mama@example.com');
+      expect(p.getKeys().any((k) => (p.get(k) ?? '').toString().contains('secret1')), isFalse);
+    });
+
+    testWidgets('forgot password sends the reset link and says the same thing either way', (t) async {
+      final repo = FakeTeacherRepository();
+      await _show(t, LoginPictureScreen(repo: repo, onDone: () {}));
+      await t.tap(find.byKey(const ValueKey('login_forgot')));
+      await t.pumpAndSettle();
+      await t.enterText(find.byKey(const ValueKey('forgot_email')), 'nobody@example.com');
+      await t.tap(find.byKey(const ValueKey('forgot_send')));
+      await t.pumpAndSettle();
+      expect(repo.resetsSent, ['nobody@example.com']);
+      expect(find.textContaining('إن كان للبريد حساب'), findsOneWidget);
+    });
+
+    testWidgets('«continue without an account» leaves the page; create account opens the sign-up page', (t) async {
+      var done = 0;
+      await _show(t, LoginPictureScreen(repo: FakeTeacherRepository(), onDone: () => done++));
+      await t.tap(find.byKey(const ValueKey('login_create')));
+      await t.pumpAndSettle();
+      expect(find.byKey(const ValueKey('register_picture')), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('register_back')));
+      await t.pumpAndSettle();
+      expect(done, 0);
+      await t.tap(find.byKey(const ValueKey('login_skip')));
+      expect(done, 1);
+    });
+
+    testWidgets('with no service (accounts off) it says so instead of failing', (t) async {
+      await _show(t, LoginPictureScreen(onDone: () {}));
+      await t.enterText(find.byKey(const ValueKey('login_email')), 'a@b.com');
+      await t.enterText(find.byKey(const ValueKey('login_password')), 'secret1');
+      await t.tap(find.byKey(const ValueKey('login_submit')));
+      await t.pump();
+      expect(find.text('خدمة الحسابات غير متاحة الآن.'), findsOneWidget);
+    });
+  });
+
+  group('the sign-up page', () {
+    testWidgets('nothing is pre-selected; the age stays inside 1 to 6 and shows its real range', (t) async {
+      await _show(t, RegisterPictureScreen(repo: FakeTeacherRepository()));
+      expect(find.text('اختر العمر'), findsOneWidget);
+      expect(find.text('من 1 إلى 6 سنوات'), findsOneWidget, reason: 'the painted "2 to 10" was erased: the real range is shown');
+      // left arrow: older; right arrow: younger
+      for (var i = 0; i < 9; i++) {
+        await t.tap(find.byKey(const ValueKey('register_age_up')));
+      }
+      await t.pump();
+      expect(find.text('6 سنوات'), findsOneWidget);
+      for (var i = 0; i < 9; i++) {
+        await t.tap(find.byKey(const ValueKey('register_age_down')));
+      }
+      await t.pump();
+      expect(find.text('1 سنة'), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('register_age_up')));
+      await t.pump();
+      expect(find.text('2 سنتان'), findsOneWidget);
+    });
+
+    testWidgets('creating an account by e-mail needs a name, a valid e-mail and a password; extras stay on the device', (t) async {
+      final repo = FakeTeacherRepository();
+      await _show(t, RegisterPictureScreen(repo: repo));
+      await t.tap(find.byKey(const ValueKey('register_email_submit')));
+      await t.pump();
+      expect(find.text('اكتب اسمك'), findsOneWidget);
+      await t.enterText(find.byKey(const ValueKey('register_name')), 'ماما سلمى');
+      await t.enterText(find.byKey(const ValueKey('register_email')), 'salma@example.com');
+      await t.enterText(find.byKey(const ValueKey('register_password')), 'secret1');
+      await t.enterText(find.byKey(const ValueKey('register_city')), 'القاهرة');
+      await t.tap(find.byKey(const ValueKey('register_girl')));
+      await t.tap(find.byKey(const ValueKey('register_age_up')));
+      await t.tap(find.byKey(const ValueKey('register_age_up')));
+      await t.pump();
+      await t.runAsync(() async {
+        await t.tap(find.byKey(const ValueKey('register_email_submit')));
+        await Future<void>.delayed(const Duration(milliseconds: 200));
+      });
+      await t.pump(const Duration(milliseconds: 400));
+      expect(repo.currentUser?.email, 'salma@example.com');
+      final extras = await t.runAsync(AccountExtras.load);
+      expect(extras!.gender, 'girl');
+      expect(extras.age, 2);
+      expect(extras.city, 'القاهرة');
+    });
+
+    testWidgets('a boy can be chosen, and choosing the same card again clears it', (t) async {
+      await _show(t, RegisterPictureScreen(repo: FakeTeacherRepository()));
+      await t.tap(find.byKey(const ValueKey('register_boy')));
+      await t.pump();
+      expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('register_boy')));
+      await t.pump();
+      expect(find.byIcon(Icons.check_rounded), findsNothing);
+    });
+
+    testWidgets('«register later» and the back arrow leave the page; Gmail registers a parent', (t) async {
+      final repo = FakeTeacherRepository();
+      bool? result;
+      await _show(
+        t,
+        Builder(
+          builder: (context) => TextButton(
+            onPressed: () async => result = await Navigator.push<bool>(context, MaterialPageRoute<bool>(builder: (_) => RegisterPictureScreen(repo: repo))),
+            child: const Text('open'),
+          ),
+        ),
+      );
+      await t.tap(find.text('open'));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const ValueKey('register_back')));
+      await t.pumpAndSettle();
+      expect(result, false);
+      await t.tap(find.text('open'));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const ValueKey('register_later')));
+      await t.pumpAndSettle();
+      expect(result, true);
+      expect(repo.currentUser, isNull, reason: 'registering later creates nothing');
+      await t.tap(find.text('open'));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const ValueKey('register_google')));
+      await t.pumpAndSettle();
+      expect(result, true);
+      expect(repo.googleSignIns, 1);
+    });
+  });
+
+  group('account extras', () {
+    test('are cleaned: gender is one of two ids, age 1 to 6, city trimmed and shortened; nothing is sent anywhere', () async {
+      final e = AccountExtras.clean(gender: 'x', age: 99, city: '  ${'م' * 80}  ');
+      expect(e.gender, isNull);
+      expect(e.age, 6);
+      expect(e.city!.runes.length, AccountExtras.maxCity);
+      await e.save();
+      final back = await AccountExtras.load();
+      expect(back.age, 6);
+      await AccountExtras.clear();
+      expect((await AccountExtras.load()).isEmpty, isTrue);
+      // the file only uses shared_preferences: no network package
+      final src = File('lib/auth/account_extras.dart').readAsStringSync();
+      expect(src.contains('http'), isFalse);
+      expect(src.contains('firebase'), isFalse);
+    });
+  });
+
+  group('what opens after the intro', () {
+    testWidgets('with accounts off (Release 1) the start screen is the first page; with accounts on and nobody signed in it is the sign-in page', (t) async {
+      await t.pumpWidget(const MaterialApp(home: AuthGate(showLogin: false)));
+      await t.pump();
+      expect(find.byType(StartScreen), findsOneWidget);
+      expect(find.byType(LoginPictureScreen), findsNothing);
+      await t.pumpWidget(MaterialApp(home: AuthGate(key: UniqueKey(), showLogin: true, repo: FakeTeacherRepository())));
+      await t.pump();
+      expect(find.byType(LoginPictureScreen), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('login_skip')));
+      await t.pump();
+      expect(find.byType(StartScreen), findsOneWidget);
+    });
+
+    test('the two pictures are bundled with their placeholders erased and the right size', () {
+      for (final f in ['assets/auth/login.jpg', 'assets/auth/register.jpg']) {
+        final b = File(f).readAsBytesSync();
+        expect(b.length, greaterThan(100 * 1024), reason: f);
+        expect(File('pubspec.yaml').readAsStringSync(), contains(f));
+      }
+    });
+  });
+}

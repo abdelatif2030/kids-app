@@ -9,6 +9,7 @@ import '../avatars.dart';
 
 import 'package:flutter/material.dart';
 
+import '../../content_flags.dart';
 import '../../l10n/strings.dart';
 import '../../main.dart' show VideoListScreen;
 import '../../parent_screens.dart';
@@ -412,12 +413,13 @@ class HomeTab extends StatelessWidget {
       RC.yellow,
       () => ActivityLibraryScreen(child: child),
     ),
-    (
-      '▶️',
-      loc('فيديوهات تعليمية'),
-      RC.lavender,
-      () => SubjectsScreen(age: child.age),
-    ),
+    if (YoutubeContent.enabled)
+      (
+        '▶️',
+        loc('فيديوهات تعليمية'),
+        RC.lavender,
+        () => SubjectsScreen(age: child.age),
+      ),
   ];
 
   /// The main home: the owner's picture with its four islands (see picture_screens.dart). The greeting, today's path,

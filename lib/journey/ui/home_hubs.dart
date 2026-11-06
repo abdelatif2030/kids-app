@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../design/worlds.dart';
 
 import '../../assistant/planner.dart' show landsForAge;
+import '../../content_flags.dart';
 import '../../design/layout.dart';
 import '../../l10n/strings.dart';
 import '../../library/vocab_screens.dart';
@@ -127,14 +128,15 @@ class LearnHubScreen extends StatelessWidget {
               color: RC.yellow,
               onTap: () => _open(context, VocabLibraryScreen(child: child)),
             ),
-            _HubTile(
-              keyName: 'lessons',
-              emoji: '🎓',
-              title: tr2('دروس بالفيديو', 'Video lessons'),
-              hint: tr2('دروس مختارة لعمرك', 'Lessons picked for your age'),
-              color: RC.sky,
-              onTap: () => _open(context, SubjectsScreen(age: child.age)),
-            ),
+            if (YoutubeContent.enabled)
+              _HubTile(
+                keyName: 'lessons',
+                emoji: '🎓',
+                title: tr2('دروس بالفيديو', 'Video lessons'),
+                hint: tr2('دروس مختارة لعمرك', 'Lessons picked for your age'),
+                color: RC.sky,
+                onTap: () => _open(context, SubjectsScreen(age: child.age)),
+              ),
           ],
         ),
       ),
