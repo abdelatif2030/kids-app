@@ -154,7 +154,10 @@ void main() {
       expect(normalizeLessonCategory('letters'), 'letters_numbers');
       expect(normalizeLessonCategory('numbers'), 'letters_numbers');
       expect(normalizeLessonCategory('letters_numbers'), 'letters_numbers');
-      expect(normalizeLessonCategory('songs'), 'songs');
+      expect(normalizeLessonCategory('songs'), 'general');
+      expect(normalizeLessonCategory('body'), 'general');
+      expect(normalizeLessonCategory('words'), 'words');
+      expect(kLessonCategories.length, 5);
       expect(normalizeLessonCategory('nonsense'), 'general');
       expect(normalizeLessonCategory(null), 'general');
     });
@@ -165,8 +168,8 @@ void main() {
       await t.pump(const Duration(milliseconds: 300));
       expect(find.byKey(const ValueKey('chip_all')), findsOneWidget);
       expect(find.byKey(const ValueKey('chip_letters_numbers')), findsOneWidget);
-      expect(find.byKey(const ValueKey('chip_songs')), findsOneWidget);
-      await t.tap(find.byKey(const ValueKey('chip_songs')));
+      expect(find.byKey(const ValueKey('chip_general')), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('chip_general')));
       await t.pump();
       expect(find.byKey(const ValueKey('lesson_lesson_03')), findsOneWidget);
       expect(find.byKey(const ValueKey('lesson_lesson_01')), findsNothing);

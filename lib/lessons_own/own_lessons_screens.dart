@@ -32,7 +32,7 @@ class OwnLessonsScreen extends StatefulWidget {
 
 class _OwnLessonsScreenState extends State<OwnLessonsScreen> {
   late Future<LessonsResult> _future = (widget.loader ?? OwnLessons.load)();
-  late String? _category = widget.category;
+  late String? _category = widget.category == null ? null : normalizeLessonCategory(widget.category);
   final _session = SessionManager.instance;
 
   @override

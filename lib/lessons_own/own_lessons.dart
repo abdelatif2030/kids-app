@@ -12,11 +12,12 @@ import '../l10n/strings.dart';
 const String kLessonsBaseUrl = String.fromEnvironment('LESSONS_BASE_URL');
 
 /// The categories a lesson can be in, in the order the filter shows them.
-const List<String> kLessonCategories = ['letters_numbers', 'words', 'animals', 'shapes', 'body', 'songs', 'general'];
+const List<String> kLessonCategories = ['letters_numbers', 'words', 'animals', 'shapes', 'general'];
 
-/// Letters and numbers are one category (owner decision, 2026-11-06); the old ids 'letters' and 'numbers' in a list still work.
+/// Letters and numbers are one category, and body + songs + other lessons are one (owner decisions, 2026-11-06); the old ids still work.
 String normalizeLessonCategory(Object? c) {
   if (c == 'letters' || c == 'numbers') return 'letters_numbers';
+  if (c == 'body' || c == 'songs') return 'general'; // body, songs and other lessons are one category (owner decision)
   return c is String && kLessonCategories.contains(c) ? c : 'general';
 }
 
@@ -25,9 +26,7 @@ String lessonCategoryLabel(String id) => switch (id) {
       'words' => tr2('الكلمات', 'Words'),
       'animals' => tr2('الحيوانات', 'Animals'),
       'shapes' => tr2('الأشكال والألوان', 'Shapes & colours'),
-      'body' => tr2('الجسم', 'Body'),
-      'songs' => tr2('الأغاني', 'Songs'),
-      _ => tr2('دروس أخرى', 'More lessons'),
+      _ => tr2('الجسم والأغاني وغيرها', 'Body, songs & more'),
     };
 
 String lessonCategoryEmoji(String id) => switch (id) {
@@ -35,8 +34,6 @@ String lessonCategoryEmoji(String id) => switch (id) {
       'words' => '💬',
       'animals' => '🦁',
       'shapes' => '🔷',
-      'body' => '🖐️',
-      'songs' => '🎵',
       _ => '⭐',
     };
 
