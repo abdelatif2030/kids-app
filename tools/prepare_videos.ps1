@@ -1,4 +1,4 @@
-<#
+﻿<#
  Prepares the lesson videos for Rehlaty. Run it on the laptop that has the videos (Windows PowerShell).
 
    1. Install ffmpeg once:        winget install ffmpeg      (then close and reopen PowerShell)
