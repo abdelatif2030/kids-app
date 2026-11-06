@@ -146,8 +146,8 @@ void main() {
         for (final size in [const Size(320, 568), const Size(844, 390)]) {
           await show(t, size: size, lang: lang, text: 1.6);
           expect(find.byKey(const ValueKey('video_empty')), findsOneWidget);
-          // no thumbnails of unapproved videos are even requested (the only picture is the faint app logo behind the page)
-          expect(find.byWidgetPredicate((w) => w is Image && w.key != const ValueKey('bg_logo')), findsNothing);
+          // no thumbnails of unapproved videos are even requested (the only pictures are the faint app logo and the scenery background behind the page)
+          expect(find.byWidgetPredicate((w) => w is Image && w.key != const ValueKey('bg_logo') && w.key != const ValueKey('picture_backdrop')), findsNothing);
           expect(t.takeException(), isNull);
         }
       }

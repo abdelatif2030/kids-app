@@ -215,7 +215,10 @@ class IslandHome extends StatefulWidget {
   /// Many sections (the games): when the area is bounded, put them ALL in a grid on the sea that fits the area, with no
   /// scrolling, instead of the long sideways map of islands.
   final bool grid;
-  const IslandHome({super.key, required this.islands, this.grid = false});
+
+  /// Draw the painted night sky behind the grid. Off when the screen already has the owner's scenery picture behind it.
+  final bool sky;
+  const IslandHome({super.key, required this.islands, this.grid = false, this.sky = true});
 
   /// Tests set this to true to exercise the movement; otherwise it is off under a test binding.
   static bool? forceMotion;
@@ -449,13 +452,14 @@ class _IslandHomeState extends State<IslandHome>
         child: Stack(
           clipBehavior: Clip.none,
           children: [
-            Positioned.fill(
-              child: ExcludeSemantics(
-                child: IgnorePointer(
-                  child: const RepaintBoundary(child: CustomPaint(key: ValueKey('games_space'), painter: HubSkyPainter())),
+            if (widget.sky)
+              Positioned.fill(
+                child: ExcludeSemantics(
+                  child: IgnorePointer(
+                    child: const RepaintBoundary(child: CustomPaint(key: ValueKey('games_space'), painter: HubSkyPainter())),
+                  ),
                 ),
               ),
-            ),
             for (final (i, spec) in widget.islands.indexed)
               _pictureMarker(
                 spec,

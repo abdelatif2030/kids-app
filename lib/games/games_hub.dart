@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../adventures/adventure_screen.dart';
 import '../design/focusable_tap.dart';
 import '../design/hub_art.dart';
+import '../design/picture_stage.dart';
 import '../drawing_screen.dart';
 import '../games_screen.dart';
 import '../journey/lands.dart';
@@ -37,34 +38,34 @@ class GameCategory {
 
 /// The ten islands, in the order of the owner's design (left to right, top row then bottom row).
 final List<GameCategory> kGameCategories = [
-  GameCategory('brain', () => tr2('ألعاب الذكاء والتفكير', 'Thinking games'), const Offset(0.119, 0.475), const Offset(0.119, 0.534),
+  GameCategory('brain', () => tr2('ألعاب الذكاء والتفكير', 'Thinking games'), const Offset(0.127, 0.478), const Offset(0.127, 0.528),
       games: {'maze', 'sort_groups', 'treasure_hunt', 'next_in_day', 'snakes_ladders', 'connect_four', 'where_ball', 'pattern', 'fun_xo', 'fun_snake'}),
-  GameCategory('letters', () => tr2('الحروف والكلمات', 'Letters and words'), const Offset(0.323, 0.475), const Offset(0.323, 0.534),
+  GameCategory('letters', () => tr2('الحروف والكلمات', 'Letters and words'), const Offset(0.319, 0.478), const Offset(0.319, 0.528),
       games: {'letters', 'letter_fishing', 'trace_letters', 'word_book', 'listen_letter', 'listen_word', 'review_words'}),
-  GameCategory('numbers', () => tr2('الأرقام والحساب', 'Numbers and maths'), const Offset(0.505, 0.475), const Offset(0.505, 0.534),
+  GameCategory('numbers', () => tr2('الأرقام والحساب', 'Numbers and maths'), const Offset(0.504, 0.478), const Offset(0.504, 0.528),
       games: {'math', 'numerals', 'compare', 'connect_dots', 'big_small'}),
-  GameCategory('shapes', () => tr2('الألوان والأشكال', 'Colours and shapes'), const Offset(0.697, 0.475), const Offset(0.697, 0.534), games: {'colors', 'shape_finder', 'jigsaw'}),
-  GameCategory('animals', () => tr2('الحيوانات والطبيعة', 'Animals and nature'), const Offset(0.892, 0.475), const Offset(0.892, 0.534),
+  GameCategory('shapes', () => tr2('الألوان والأشكال', 'Colours and shapes'), const Offset(0.693, 0.478), const Offset(0.693, 0.528), games: {'colors', 'shape_finder', 'jigsaw'}),
+  GameCategory('animals', () => tr2('الحيوانات والطبيعة', 'Animals and nature'), const Offset(0.88, 0.478), const Offset(0.88, 0.528),
       games: {'animal', 'animal_habitats', 'feed_animal', 'listen_picture', 'balloons'}),
-  GameCategory('observe', () => tr2('الذاكرة والملاحظة', 'Memory and observation'), const Offset(0.122, 0.78), const Offset(0.122, 0.83),
+  GameCategory('observe', () => tr2('الذاكرة والملاحظة', 'Memory and observation'), const Offset(0.127, 0.77), const Offset(0.127, 0.8),
       games: {'memory', 'match_pictures', 'odd_one_out', 'fun_whack', 'fun_stars'}),
-  GameCategory('feelings', () => tr2('المشاعر والاجتماعيات', 'Feelings and friends'), const Offset(0.319, 0.78), const Offset(0.319, 0.83),
+  GameCategory('feelings', () => tr2('المشاعر والاجتماعيات', 'Feelings and friends'), const Offset(0.32, 0.77), const Offset(0.32, 0.8),
       screen: (c) => LandMapScreen(land: landById('feelings'), child: c)),
-  GameCategory('art', () => tr2('الإبداع والرسم', 'Creating and drawing'), const Offset(0.507, 0.78), const Offset(0.507, 0.83), screen: (c) => DrawingScreen(child: c)),
-  GameCategory('stories', () => tr2('القصص والكرتون', 'Stories and cartoons'), const Offset(0.702, 0.78), const Offset(0.702, 0.83), screen: (c) => StoriesHomeScreen(child: c)),
-  GameCategory('adventures', () => tr2('مغامرات رحلتي', 'Rehlaty adventures'), const Offset(0.894, 0.78), const Offset(0.894, 0.83), screen: (c) => AdventureScreen(child: c)),
+  GameCategory('art', () => tr2('الإبداع والرسم', 'Creating and drawing'), const Offset(0.505, 0.77), const Offset(0.505, 0.8), screen: (c) => DrawingScreen(child: c)),
+  GameCategory('stories', () => tr2('القصص والكرتون', 'Stories and cartoons'), const Offset(0.698, 0.77), const Offset(0.698, 0.8), screen: (c) => StoriesHomeScreen(child: c)),
+  GameCategory('adventures', () => tr2('مغامرات رحلتي', 'Rehlaty adventures'), const Offset(0.885, 0.77), const Offset(0.885, 0.8), screen: (c) => AdventureScreen(child: c)),
 ];
 
 /// Every game id the hub knows about, to check that no game is lost and none is listed twice.
 Set<String> allHubGameIds() => {for (final c in kGameCategories) ...c.games};
 
-/// The owner's own picture of the games screen (assets/games/hub_scene.jpg, 1242 x 697): Adam and Nour above a wooden
+/// The owner's own picture of the games screen (assets/games/hub_scene.jpg, 1672 x 941): Adam and Nour above a wooden
 /// sign and ten floating islands. The picture is shown whole; every island is a large invisible button on top of it,
 /// so what a child sees is exactly the design. The bell and profile picture of the design were painted out (they would
 /// be fake: the bell showed an unread count).
 const String kGamesHubPicture = 'assets/games/hub_scene.jpg';
-const double kGamesHubAspect = 1242 / 697;
-const Offset kHubBackSpot = Offset(0.055, 0.079);
+const double kGamesHubAspect = 1672 / 941;
+const Offset kHubBackSpot = Offset(0.067, 0.082);
 
 /// A phone held sideways keeps the picture alone, as large as the area allows. A tablet has room to spare, so the
 /// picture keeps its proportions (never stretched) and the spare height carries a strip of games picked for the child.
@@ -359,7 +360,7 @@ class CategoryGamesScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF6B3FCB),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: SafeArea(child: GamesGrid(key: ValueKey('category_${category.id}'), age: child.age, child: child, only: category.games)),
+      body: PictureBackdrop(child: SafeArea(child: GamesGrid(key: ValueKey('category_${category.id}'), age: child.age, child: child, only: category.games, sky: false))),
     );
   }
 }

@@ -369,9 +369,10 @@ void main() {
     }
 
     testWidgets(
-      'the home shows the five main destinations at every age, Games the biggest',
+      "the home is the owner's picture: four islands and the rewards sign, at every age",
       (t) async {
         await openHome(t);
+        expect(find.byKey(const ValueKey('picture_home')), findsOneWidget);
         for (final id in ['games', 'stories', 'learn', 'create', 'rewards']) {
           expect(
             find.byKey(ValueKey('island_$id')),
@@ -383,11 +384,6 @@ void main() {
           find.byKey(const ValueKey('greeting')),
           findsNothing,
         ); // the greeting lives under More
-        double emojiSize(String id, String emoji) => t
-            .widget<Text>(find.descendant(of: find.byKey(ValueKey('island_$id')), matching: find.text(emoji)))
-            .style!
-            .fontSize!;
-        expect(emojiSize('games', '🎮'), greaterThan(emojiSize('learn', '🔤')));
       },
     );
 

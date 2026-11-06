@@ -89,6 +89,10 @@ flutter:
     - assets/branding/logo.png
     - assets/home/home_scene.jpg
     - assets/games/hub_scene.jpg
+    - assets/home/home_main.jpg
+    - assets/home/cartoons_stories.jpg
+    - assets/home/lessons_scene.jpg
+    - assets/home/scene_bg.jpg
     - assets/audio/voices/approved.json
     - assets/audio/voices/adam/ar/
     - assets/branding/logo_art.png

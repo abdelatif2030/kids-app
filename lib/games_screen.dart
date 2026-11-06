@@ -31,7 +31,10 @@ class GamesGrid extends StatefulWidget {
 
   /// Show only these games (a category of the hub); null shows every game. The id 'drawing' adds the drawing pad.
   final Set<String>? only;
-  const GamesGrid({super.key, required this.age, this.child, this.only});
+
+  /// False when the screen already has the owner's scenery picture behind the islands.
+  final bool sky;
+  const GamesGrid({super.key, required this.age, this.child, this.only, this.sky = true});
 
   @override
   State<GamesGrid> createState() => _GamesGridState();
@@ -160,8 +163,8 @@ class _GamesGridState extends State<GamesGrid> {
         // Inside a bounded area (the games tab) the map takes all of it; elsewhere it has its own height.
         return LayoutBuilder(
           builder: (context, box) => box.maxHeight.isFinite
-              ? IslandHome(islands: islands, grid: true)
-              : SizedBox(height: 520, child: IslandHome(islands: islands, grid: true)),
+              ? IslandHome(islands: islands, grid: true, sky: widget.sky)
+              : SizedBox(height: 520, child: IslandHome(islands: islands, grid: true, sky: widget.sky)),
         );
       },
     );

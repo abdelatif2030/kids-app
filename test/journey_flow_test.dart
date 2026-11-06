@@ -459,8 +459,7 @@ void main() {
       )));
       await tester.tap(find.text('go'));
       await tester.pumpAndSettle();
-      expect(find.textContaining('يا بطل'), findsOneWidget); // the greeting follows the time of day
-      expect(find.text('سلمى'), findsWidgets);
+      expect(find.byKey(const ValueKey('picture_home')), findsOneWidget); // the owner's home picture (the greeting lives under More)
 
       await tester.tap(find.byTooltip('خروج (للأهل)'));
       await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 300)));

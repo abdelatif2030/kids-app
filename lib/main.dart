@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
+import 'design/picture_stage.dart';
 
 import 'design/worlds.dart';
 import 'media/audio_gate.dart';
@@ -289,11 +290,15 @@ class VideoListScreen extends StatefulWidget {
 
   /// Start "today's plan" as soon as the list loads (the home "let's play" button).
   final bool autoPlan;
+
+  /// Start with one category selected (for example 'Fun' for the songs tile); the child can still change it.
+  final String? initialCategory;
   const VideoListScreen({
     super.key,
     required this.age,
     this.subject,
     this.autoPlan = false,
+    this.initialCategory,
   });
 
   @override
@@ -306,7 +311,7 @@ const _planOrder = ['Learning', 'Story', 'Fun'];
 class _VideoListScreenState extends State<VideoListScreen> {
   final _session = SessionManager.instance;
   bool _planStarted = false;
-  String? _category;
+  late String? _category = widget.initialCategory;
 
   // Read once per screen: build runs on every rebuild and must not parse the whitelist again.
   late final Future<List<Video>> _videos = loadVideos();
@@ -412,7 +417,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WorldBackground(world: RWorld.journey, child: Scaffold(
+    return PictureBackdrop(child: Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: Colors.transparent,

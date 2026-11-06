@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'design/worlds.dart';
+import 'design/picture_stage.dart';
 import 'l10n/strings.dart';
 
 const kBackground = Color(0xFFFFF8E1);
@@ -251,7 +251,7 @@ class SceneBackground extends StatelessWidget {
   const SceneBackground({super.key, required this.child});
 
   @override
-  Widget build(BuildContext context) => WorldBackground(world: RWorld.journey, child: child);
+  Widget build(BuildContext context) => PictureBackdrop(child: child);
 }
 
 /// A Scaffold whose body sits on the [SceneBackground], under a transparent app bar.

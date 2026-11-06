@@ -2,8 +2,7 @@ import '../../adaptive/recommendation_card.dart';
 import '../../family/family_bubble.dart';
 import '../../notifications/notification_store.dart';
 import '../../notifications/notification_ui.dart';
-import 'home_hubs.dart';
-import 'island_home.dart';
+import 'picture_screens.dart';
 import '../../design/tokens.dart';
 import '../../design/brand.dart';
 import '../avatars.dart';
@@ -421,108 +420,13 @@ class HomeTab extends StatelessWidget {
     ),
   ];
 
-  /// The island map: the same header, today's suggestion, and one island per section.
+  /// The main home: the owner's picture with its four islands (see picture_screens.dart). The greeting, today's path,
+  /// feelings, library and family live on the «المزيد» page; the bell and the parent gear are on the picture.
   Widget _mapHome(
     BuildContext context,
     List<Widget> header,
     JourneyStore store,
-  ) {
-    // The five main destinations and the four extra sections (library, words, family activities, lessons) are islands.
-    final islands = <IslandSpec>[
-      IslandSpec(
-        id: 'games',
-        title: tr2('الألعاب', 'Games'),
-        emoji: '🎮',
-        grass: const Color(0xFFFFC45E),
-        grassDark: const Color(0xFFE09A22),
-        weight: 1.45,
-        houseStyle: 3,
-        onTap: () => onTab?.call(1),
-      ),
-      IslandSpec(
-        id: 'stories',
-        title: tr2('الكرتون والحكايات', 'Cartoons & stories'),
-        emoji: '📺',
-        grass: const Color(0xFFC9A6F0),
-        grassDark: const Color(0xFF9468CC),
-        houseStyle: 2,
-        onTap: () => _open(context, CartoonsHubScreen(child: child)),
-      ),
-      IslandSpec(
-        id: 'learn',
-        title: tr2('اتعلم واكتشف', 'Learn & discover'),
-        emoji: '🔤',
-        grass: const Color(0xFF8BD450),
-        grassDark: const Color(0xFF5FA832),
-        houseStyle: 1,
-        onTap: () => _open(context, LearnHubScreen(child: child)),
-      ),
-      IslandSpec(
-        id: 'create',
-        title: tr2('ارسم وابتكر', 'Draw & create'),
-        emoji: '🎨',
-        grass: const Color(0xFFFF9DB8),
-        grassDark: const Color(0xFFDB6A8D),
-        houseStyle: 0,
-        onTap: () => onTab?.call(2),
-      ),
-      IslandSpec(
-        id: 'rewards',
-        title: tr2('مكافآتي', 'My rewards'),
-        emoji: '🏆',
-        grass: const Color(0xFFFFE066),
-        grassDark: const Color(0xFFE6B422),
-        houseStyle: 3,
-        onTap: () => onTab?.call(3),
-      ),
-      for (final (i, m) in _moreItems().indexed)
-        IslandSpec(
-          id: 'more$i',
-          title: m.$2,
-          emoji: m.$1,
-          grass: m.$3,
-          grassDark: Color.lerp(m.$3, Colors.black, 0.25)!,
-          houseStyle: (i + 1) % 4,
-          onTap: () => _open(context, m.$4()),
-        ),
-    ];
-    // A short screen: the picture fills everything and the greeting row floats over it as a small pill.
-    if (MediaQuery.sizeOf(context).height < 500) {
-      return Stack(
-        children: [
-          Positioned.fill(child: IslandHome(islands: islands)),
-          PositionedDirectional(
-            top: 4,
-            start: 6,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 400),
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Colors.white.withAlpha(215),
-                  borderRadius: BorderRadius.circular(26),
-                  boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 6)],
-                ),
-                child: Padding(
-                  padding: const EdgeInsetsDirectional.fromSTEB(8, 2, 8, 2),
-                  child: Column(mainAxisSize: MainAxisSize.min, children: header),
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-    // The greeting row on top; the picture fills everything under it (no scrolling, no empty strip below).
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 6),
-          child: Column(children: header),
-        ),
-        Expanded(child: IslandHome(islands: islands)),
-      ],
-    );
-  }
+  ) => PictureHome(child: child, onTab: onTab, onExit: onExit);
 
   Widget _listHome(
     BuildContext context,
