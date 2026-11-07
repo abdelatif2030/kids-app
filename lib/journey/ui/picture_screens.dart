@@ -250,13 +250,13 @@ Widget _slot(String title) => ComingSoonScreen(
     );
 
 final List<_LessonTile> _lessonTiles = [
-  // The five tiles of the owner's picture (2026-11-07). Quran and drawing are empty pages for now; the others open the owner's
-  // own lesson videos on the matching category (the other categories are one tap away on the «الكل» tab).
+  // The five tiles of the owner's picture (2026-11-07). Quran, songs and drawing are empty pages for now. «Learning to speak»
+  // shows ALL the owner's lesson videos except the counting and numbers ones; «Maths» shows only those.
   _LessonTile('quran', const Offset(0.114, 0.65), const Offset(0.114, 0.707), () => tr2('القرآن الكريم', 'The Holy Quran'), (_, c) => _slot(tr2('القرآن الكريم', 'The Holy Quran'))),
-  _LessonTile('speech', const Offset(0.311, 0.65), const Offset(0.311, 0.707), () => tr2('تعليم النطق', 'Learning to speak'), (_, c) => OwnLessonsScreen(child: c, category: 'words')),
-  _LessonTile('songs', const Offset(0.502, 0.65), const Offset(0.502, 0.707), () => tr2('أناشيد', 'Songs'), (_, c) => OwnLessonsScreen(child: c, category: 'general')),
+  _LessonTile('speech', const Offset(0.311, 0.65), const Offset(0.311, 0.707), () => tr2('تعليم النطق', 'Learning to speak'), (_, c) => OwnLessonsScreen(child: c, exclude: const {'math'})),
+  _LessonTile('songs', const Offset(0.502, 0.65), const Offset(0.502, 0.707), () => tr2('أناشيد', 'Songs'), (_, c) => _slot(tr2('أناشيد', 'Songs'))),
   _LessonTile('drawing', const Offset(0.697, 0.65), const Offset(0.697, 0.707), () => tr2('الرسم', 'Drawing'), (_, c) => _slot(tr2('الرسم', 'Drawing'))),
-  _LessonTile('math', const Offset(0.891, 0.65), const Offset(0.891, 0.707), () => tr2('الرياضيات', 'Maths'), (_, c) => OwnLessonsScreen(child: c, category: 'letters_numbers')),
+  _LessonTile('math', const Offset(0.891, 0.65), const Offset(0.891, 0.707), () => tr2('الرياضيات', 'Maths'), (_, c) => OwnLessonsScreen(child: c, only: const {'math'})),
 ];
 
 /// «تعلم واكتشف»: the owner's picture with its five tiles and nothing else on it (owner decision, 2026-11-07).

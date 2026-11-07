@@ -191,7 +191,7 @@ void main() {
       expect(find.byKey(const ValueKey('lessons_more')), findsNothing);
     });
 
-    testWidgets('quran and drawing are empty pages; speech, songs and maths open the owner\'s lesson videos on their category', (t) async {
+    testWidgets('quran, songs and drawing are empty pages; speech shows every lesson video but the counting ones; maths shows only those', (t) async {
       _size(t, const Size(1672, 941));
       await _setup(t);
       await _show(t, const LessonsPictureScreen(child: _kid));
@@ -200,21 +200,23 @@ void main() {
         await _settle(t);
       }
 
-      for (final id in ['quran', 'drawing']) {
+      for (final id in ['quran', 'songs', 'drawing']) {
         await open(id);
         expect(find.byKey(const ValueKey('coming_soon')), findsOneWidget, reason: id);
         expect(find.byType(OwnLessonsScreen), findsNothing, reason: id);
         await t.pageBack();
         await _settle(t);
       }
-      for (final (id, cat) in const [('speech', 'words'), ('songs', 'general'), ('math', 'letters_numbers')]) {
-        await open(id);
-        final screen = t.widget<OwnLessonsScreen>(find.byType(OwnLessonsScreen));
-        expect(screen.child.id, 'k1', reason: id);
-        expect(screen.category, cat, reason: id);
-        await t.pageBack();
-        await _settle(t);
-      }
+      await open('speech');
+      var screen = t.widget<OwnLessonsScreen>(find.byType(OwnLessonsScreen));
+      expect(screen.child.id, 'k1');
+      expect(screen.exclude, {'math'});
+      expect(screen.only, isNull);
+      await t.pageBack();
+      await _settle(t);
+      await open('math');
+      screen = t.widget<OwnLessonsScreen>(find.byType(OwnLessonsScreen));
+      expect(screen.only, {'math'});
     });
   });
 

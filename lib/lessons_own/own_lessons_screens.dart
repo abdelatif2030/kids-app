@@ -22,9 +22,13 @@ class OwnLessonsScreen extends StatefulWidget {
   /// Start on one category (for example `songs`).
   final String? category;
 
+  /// Show only these categories (the Maths tile shows `math`), or all but these (the speech tile shows everything but `math`).
+  final Set<String>? only;
+  final Set<String> exclude;
+
   /// Tests: load from here instead of [OwnLessons.load].
   final Future<LessonsResult> Function()? loader;
-  const OwnLessonsScreen({super.key, required this.child, this.category, this.loader});
+  const OwnLessonsScreen({super.key, required this.child, this.category, this.only, this.exclude = const {}, this.loader});
 
   @override
   State<OwnLessonsScreen> createState() => _OwnLessonsScreenState();
@@ -94,7 +98,10 @@ class _OwnLessonsScreenState extends State<OwnLessonsScreen> {
                 case LessonsState.ready:
                   break;
               }
-              final forAge = [for (final l in r.lessons) if (l.fitsAge(widget.child.age)) l];
+              final forAge = [
+                for (final l in r.lessons)
+                  if (l.fitsAge(widget.child.age) && (widget.only == null || widget.only!.contains(l.category)) && !widget.exclude.contains(l.category)) l,
+              ];
               if (forAge.isEmpty) {
                 return _Message(keyName: 'lessons_empty', icon: Icons.video_library_outlined, title: tr2('لا توجد دروس لعمرك بعد', 'No lessons for this age yet'), text: tr2('سنضيف الدروس هنا قريباً.', 'We will add lessons here soon.'));
               }

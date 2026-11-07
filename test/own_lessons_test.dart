@@ -148,16 +148,14 @@ void main() {
       expect(find.text('2:05'), findsOneWidget);
     });
 
-    test('letters and numbers are one category; the old ids still land there', () {
-      expect(kLessonCategories.contains('letters'), isFalse);
-      expect(kLessonCategories.contains('numbers'), isFalse);
-      expect(normalizeLessonCategory('letters'), 'letters_numbers');
-      expect(normalizeLessonCategory('numbers'), 'letters_numbers');
-      expect(normalizeLessonCategory('letters_numbers'), 'letters_numbers');
+    test('categories: letters, words, animals, shapes, general and math; the old ids still land in the right one', () {
+      expect(kLessonCategories, ['letters', 'words', 'animals', 'shapes', 'general', 'math']);
+      expect(normalizeLessonCategory('letters_numbers'), 'letters');
+      expect(normalizeLessonCategory('numbers'), 'math');
+      expect(normalizeLessonCategory('math'), 'math');
       expect(normalizeLessonCategory('songs'), 'general');
       expect(normalizeLessonCategory('body'), 'general');
       expect(normalizeLessonCategory('words'), 'words');
-      expect(kLessonCategories.length, 5);
       expect(normalizeLessonCategory('nonsense'), 'general');
       expect(normalizeLessonCategory(null), 'general');
     });
@@ -167,7 +165,7 @@ void main() {
       await _show(t, const OwnLessonsScreen(child: _kid));
       await t.pump(const Duration(milliseconds: 300));
       expect(find.byKey(const ValueKey('chip_all')), findsOneWidget);
-      expect(find.byKey(const ValueKey('chip_letters_numbers')), findsOneWidget);
+      expect(find.byKey(const ValueKey('chip_letters')), findsOneWidget);
       expect(find.byKey(const ValueKey('chip_general')), findsOneWidget);
       await t.tap(find.byKey(const ValueKey('chip_general')));
       await t.pump();
@@ -176,6 +174,20 @@ void main() {
       await t.tap(find.byKey(const ValueKey('chip_all')));
       await t.pump();
       expect(find.byKey(const ValueKey('lesson_lesson_01')), findsOneWidget);
+    });
+
+    testWidgets('«only» shows just those categories (the Maths tile), «exclude» shows all the others (the speech tile)', (t) async {
+      OwnLessons.sourceOverride = _FakeSource(_manifest());
+      await _show(t, const OwnLessonsScreen(child: _kid, only: {'math'}));
+      await t.pump(const Duration(milliseconds: 300));
+      expect(find.byKey(const ValueKey('lesson_lesson_02')), findsOneWidget);
+      expect(find.byKey(const ValueKey('lesson_lesson_01')), findsNothing);
+      expect(find.byKey(const ValueKey('lesson_lesson_03')), findsNothing);
+      await _show(t, const OwnLessonsScreen(child: _kid, exclude: {'math'}));
+      await t.pump(const Duration(milliseconds: 300));
+      expect(find.byKey(const ValueKey('lesson_lesson_02')), findsNothing, reason: 'a counting video is not on the speech tile');
+      expect(find.byKey(const ValueKey('lesson_lesson_01')), findsOneWidget);
+      expect(find.byKey(const ValueKey('lesson_lesson_03')), findsOneWidget);
     });
 
     testWidgets('it can open on one category (the songs tile)', (t) async {
