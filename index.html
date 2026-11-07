@@ -19,7 +19,7 @@
   <meta charset="UTF-8">
   <!-- Without this tag a phone first lays the page out 980 px wide and jumps when the app adds the tag itself after loading (the picture "shook" once). -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <link rel="preload" as="image" href="splash.jpg">
+  <link rel="preload" as="image" href="splash.webp">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="رحلتي | Rehlaty: تعلّم آمن وممتع للأطفال بالعربية والإنجليزية. A safe, friendly learning journey for children.">
 
@@ -38,10 +38,10 @@
        app draws its first frame, and the app's own intro shows the same picture, so nothing flashes. -->
   <style>
     html, body { margin: 0; height: 100%; background: #58a8f2; }
-    #splash { position: fixed; inset: 0; z-index: 9999; background: #58a8f2 url("splash.jpg") center / cover no-repeat; transition: opacity .3s ease; }
+    #splash { position: fixed; inset: 0; z-index: 9999; background: #58a8f2 url("splash.webp") center / cover no-repeat; transition: opacity .3s ease; }
     @media (max-aspect-ratio: 1/1) { #splash { background-size: contain; } }
   </style>
-</head>
+<link rel="modulepreload" href="https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js" crossorigin><link rel="modulepreload" href="https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js" crossorigin><link rel="modulepreload" href="https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore-pipelines.js" crossorigin></head>
 <body>
   <div id="splash" aria-hidden="true"></div>
   <script src="splash.js"></script>
