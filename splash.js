@@ -17,6 +17,12 @@
   pre(chromium ? 'canvaskit/chromium/canvaskit.js' : 'canvaskit/canvaskit.js', 'script', true);
   pre(chromium ? 'canvaskit/chromium/canvaskit.wasm' : 'canvaskit/canvaskit.wasm', 'fetch', true);
 
+  // The small files the app asks for one after another right after it starts (font list, then the fonts, then the asset list):
+  // asking for them now takes those waiting turns out of the start-up.
+  ['assets/FontManifest.json', 'assets/AssetManifest.bin.json', 'assets/assets/fonts/Tajawal-Regular.ttf',
+   'assets/assets/fonts/Tajawal-Bold.ttf', 'assets/assets/fonts/Tajawal-ExtraBold.ttf', 'assets/fonts/MaterialIcons-Regular.otf',
+   'assets/fonts/fallback/Roboto-Regular.ttf'].forEach(function (f) { pre(f, 'fetch', true); });
+
   var MIN_MS = 0;
   var t0 = Date.now();
   function hide() {
