@@ -5,7 +5,6 @@ import '../../design/picture_stage.dart';
 import '../avatars.dart';
 import '../models.dart';
 import '../repository.dart';
-import 'kit.dart';
 import 'my_day_cards.dart';
 
 /// «أنا» (2026-11-07, owner request: simple and professional): only the child's name and picture, «رفيقي» (the companion),
@@ -29,15 +28,26 @@ class MeTab extends StatelessWidget {
                 key: const ValueKey('me_list'),
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ChildAvatar(child: profile, size: 64),
-                      const SizedBox(width: 12),
-                      Flexible(
-                        child: Text(profile.nickname, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: RC.ink)),
-                      ),
-                    ],
+                  // One calm header: the child's picture and name on a purple panel, like the owner's designs.
+                  Container(
+                    key: const ValueKey('me_header'),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF8A52E8), Color(0xFF5B2BB8)]),
+                      borderRadius: BorderRadius.circular(32),
+                      border: Border.all(color: Colors.white, width: 3),
+                      boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 10, offset: Offset(0, 5))],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ChildAvatar(child: profile, size: 84),
+                        const SizedBox(width: 16),
+                        Flexible(
+                          child: Text(profile.nickname, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontFamily: 'Tajawal', fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white)),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 14),
                   CompanionCard(child: profile),
