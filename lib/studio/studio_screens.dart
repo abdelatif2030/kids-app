@@ -13,71 +13,47 @@ import 'creations.dart';
 import 'scene_builder.dart';
 import 'story_pictures.dart';
 import 'word_builder.dart';
+import '../l10n/app_locale.dart';
 import '../l10n/strings.dart';
 
-/// «استوديو الإبداع»: optional, calm making activities.
+/// «استوديو الإبداع»: the owner's picture with seven islands (2026-11-07). Optional, calm making activities. The picture is
+/// shown whole; each island is a large invisible button, so what a child sees is exactly the design.
+const String kStudioPicture = 'assets/home/studio_scene.jpg';
+const double kStudioAspect = 1672 / 941;
+
 class StudioScreen extends StatelessWidget {
   final ChildProfile child;
   const StudioScreen({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
-    Widget tile(String emoji, String label, Color color, Widget Function() screen) => SizedBox(
-          width: 160,
-          child: RCard(
-            color: color.withAlpha(170),
-            semanticLabel: label,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => screen())),
-            child: Column(
-              children: [
-                Text(emoji, style: const TextStyle(fontSize: 42)),
-                const SizedBox(height: 4),
-                Text(label,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: RC.ink)),
-              ],
-            ),
-          ),
-        );
+    final ar = AppLocale.instance.isArabic;
+    void open(Widget Function() screen) => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => screen()));
+    // the seven islands, from the left of the picture to its right: (id, centre x, Arabic name, English name, page)
+    final islands = <(String, double, String, String, Widget Function())>[
+      ('gallery', 0.102, 'معرض العائلة', 'Family gallery', () => ChildGalleryScreen(child: child)),
+      ('word', 0.236, 'ركّب الكلمة', 'Build the word', () => WordBuilderScreen(child: child)),
+      ('order', 0.371, 'ركّب الصور', 'Order the pictures', () => LessonRunnerScreen(child: child, kind: LessonKind.sequence, title: loc('رتّب الخطوات'))),
+      ('story', 0.502, 'قصة بالصور', 'Picture story', () => PictureStoryScreen(child: child)),
+      ('character', 0.634, 'صمّم شخصية', 'Design a character', () => CharacterCreatorScreen(child: child)),
+      ('scene', 0.768, 'ابنِ مشهداً', 'Build a scene', () => SceneBuilderScreen(child: child)),
+      ('drawing', 0.903, 'رسم وتلوين', 'Draw and colour', () => DrawingScreen(child: child)),
+    ];
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        foregroundColor: RC.ink,
-        title: Text(loc('استوديو الإبداع'),
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
-      ),
-      extendBodyBehindAppBar: true,
-      body: PictureBackdrop(
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Text(loc('اصنع ما تحب. كل أعمالك تُحفظ تلقائياً في معرض عائلتك الخاص على هذا الجهاز.'),
-                    textAlign: TextAlign.center, style: TextStyle(fontSize: 16, color: RC.ink)),
-                const SizedBox(height: 14),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  alignment: WrapAlignment.center,
-                  children: [
-                    tile('🎨', loc('رسم وتلوين'), RC.pink, () => DrawingScreen(child: child)),
-                    tile('🏞️', loc('ابنِ مشهداً'), RC.mint, () => SceneBuilderScreen(child: child)),
-                    tile('🧑‍🎨', loc('صمّم شخصية'), RC.peach, () => CharacterCreatorScreen(child: child)),
-                    tile('📖', loc('قصة بالصور'), RC.yellow, () => PictureStoryScreen(child: child)),
-                    tile(
-                      '↕️',
-                      loc('رتّب الصور'),
-                      RC.sky,
-                      () => LessonRunnerScreen(child: child, kind: LessonKind.sequence, title: loc('رتّب الخطوات')),
-                    ),
-                    tile('🔤', tr2('ركّب الكلمة', 'Build the word'), RC.yellow, () => WordBuilderScreen(child: child)),
-                    tile('🖼️', loc('معرض العائلة'), RC.lavender, () => ChildGalleryScreen(child: child)),
-                  ],
-                ),
-              ],
-            ),
-          ),
+      body: SafeArea(
+        child: PictureStage(
+          key: const ValueKey('studio_picture'),
+          asset: kStudioPicture,
+          aspect: kStudioAspect,
+          showLabels: !ar,
+          labels: [
+            PictureNameLabel(const Offset(0.50, 0.195), 0.21, 0.085, tr2('استوديو الإبداع', 'Creative studio')),
+            for (final i in islands) PictureNameLabel(Offset(i.$2, 0.581), 0.125, 0.058, i.$4),
+          ],
+          spots: [
+            PictureSpot('back', const Offset(0.057, 0.085), 0.085, 0.15, tr2('رجوع', 'Back'), () => Navigator.maybePop(context), radius: 44, key: const ValueKey('studio_back')),
+            for (final i in islands) PictureSpot(i.$1, Offset(i.$2, 0.55), 0.125, 0.32, tr2(i.$3, i.$4), () => open(i.$5), radius: 34, key: ValueKey('studio_${i.$1}')),
+          ],
         ),
       ),
     );
