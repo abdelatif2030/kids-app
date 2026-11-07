@@ -213,8 +213,7 @@ void main() {
       await t.pumpAndSettle();
       expect(find.byType(NotificationCenterScreen), findsNothing); // closed
       expect(find.byType(MeTab), findsOneWidget);
-      // The Me tab is this child's own page: scroll to the profile card and check the nickname and avatar are shown.
-      await t.scrollUntilVisible(find.text('Lina'), 200, scrollable: find.descendant(of: find.byType(MeTab), matching: find.byType(Scrollable)).first);
+      // The Me tab is this child's own page: the nickname and avatar are shown on it.
       expect(find.text('Lina'), findsWidgets);
       expect(find.byType(ChildAvatar), findsWidgets);
     });

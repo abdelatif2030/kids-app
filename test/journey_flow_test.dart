@@ -380,7 +380,7 @@ void main() {
       await tester.tap(find.text('أنا').last);
       await tester.pump();
       expect(find.text('سلمى'), findsOneWidget);
-      expect(find.byKey(const ValueKey('me_list')), findsOneWidget);
+      expect(find.byKey(const ValueKey('profile_picture')), findsOneWidget);
       // the page is simple now: no level, goals or badges
       for (final gone in ['هدف اليوم', 'هدف الأسبوع', 'شاراتي', 'أراضيّ', 'شخصيتي']) {
         expect(find.text(gone), findsNothing, reason: gone);

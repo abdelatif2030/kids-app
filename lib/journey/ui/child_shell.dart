@@ -111,7 +111,7 @@ class _ChildShellState extends State<ChildShell> {
               child: child,
               onBack: () => setState(() => _tab = 0),
             ),
-            MeTab(child: child),
+            MeTab(child: child, onBack: () => setState(() => _tab = 0)),
             HomeTab(
               key: const ValueKey('more_tab'),
               more: true,
