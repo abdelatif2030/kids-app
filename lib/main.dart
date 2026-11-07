@@ -41,8 +41,9 @@ Future<void> main() async {
   DemoMode.applyPolicies(); // demo only: videos need a parent's approval
   // The start-up reads do not depend on each other, so they run together (the first screen waits for the slowest one
   // only, not for the sum of all of them).
+  // Firebase (its scripts come from Google) starts in the background: the first screen is drawn without waiting for it.
+  startFirebaseInBackground();
   await Future.wait<void>([
-    initFirebase(),
     JourneyStore.instance.load(),
     DisplayPrefs.instance.load(),
     AppLocale.instance.load(),

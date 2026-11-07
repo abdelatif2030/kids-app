@@ -19,7 +19,7 @@ cp tool/headers_login "$out/_headers"
 # after another only after it has started, and the first screen waits for them). Same files and version the plugin loads
 # (firebase_core_web 4.1.0 -> SDK 13.1.0; keep in step with tool/csp_hashes.py).
 fb=https://www.gstatic.com/firebasejs/13.1.0
-sed -i "s#</head>#<link rel=\"modulepreload\" href=\"$fb/firebase-app.js\" crossorigin><link rel=\"modulepreload\" href=\"$fb/firebase-auth.js\" crossorigin><link rel=\"modulepreload\" href=\"$fb/firebase-firestore-pipelines.js\" crossorigin></head>#" "$out/index.html"
+sed -i "s#</head>#<link rel=\"preload\" as=\"fetch\" href=\"assets/assets/auth/login.webp\" crossorigin><link rel=\"modulepreload\" href=\"$fb/firebase-app.js\" crossorigin><link rel=\"modulepreload\" href=\"$fb/firebase-auth.js\" crossorigin><link rel=\"modulepreload\" href=\"$fb/firebase-firestore-pipelines.js\" crossorigin></head>#" "$out/index.html"
 # The owner's lesson videos come from one host (docs/OWN_VIDEOS.md): allow it, and only it, for video, thumbnails and the list.
 if [ -n "${LESSONS_BASE_URL:-}" ]; then
   host="$(printf '%s' "$LESSONS_BASE_URL" | sed -E 's#^(https?://[^/]+).*#\1#')"

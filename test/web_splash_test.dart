@@ -7,6 +7,8 @@ void main() {
     final js = File('web/splash.js').readAsStringSync();
     expect(js, contains('MIN_MS = 0'));
     expect(js, contains('flutter-first-frame'));
+    expect(js, contains('assets/FontManifest.json'), reason: 'the small start-up files are asked for early');
+    expect(js, contains('assets/AssetManifest.bin.json'));
     final intro = File('lib/design/app_intro.dart').readAsStringSync();
     expect(intro, contains('if (kIsWeb) return;'), reason: 'the Flutter intro layer is not shown on the web');
     final html = File('web/index.html').readAsStringSync();

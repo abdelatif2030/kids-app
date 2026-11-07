@@ -1,5 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart' show kReleaseMode;
+import 'package:flutter/foundation.dart' show ValueNotifier, kReleaseMode;
 
 import 'online_gate.dart';
 
@@ -27,6 +27,16 @@ TeacherRepository? get teacherRepository => _repository;
 
 /// How long start-up waits for Firebase before giving up and starting the app without it.
 const Duration firebaseStartTimeout = Duration(seconds: 6);
+
+/// False while Firebase is still starting in the background (the first screen is drawn without waiting for it; the page that
+/// depends on it, sign-in or home, waits for this). True by default, so tests and offline builds never wait.
+final ValueNotifier<bool> firebaseSettled = ValueNotifier<bool>(true);
+
+/// Starts Firebase without making the caller wait: [firebaseSettled] says when it is done (or has given up).
+void startFirebaseInBackground() {
+  firebaseSettled.value = false;
+  initFirebase().whenComplete(() => firebaseSettled.value = true);
+}
 
 Future<void> initFirebase() async {
   // The in-memory demo is a developer tool: it is ignored in release builds so a release can never show fake family data.

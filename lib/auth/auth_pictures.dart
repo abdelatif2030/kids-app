@@ -849,7 +849,8 @@ class AuthGate extends StatefulWidget {
 }
 
 class _AuthGateState extends State<AuthGate> {
-  late bool _login = widget.showLogin ?? _needsLogin();
+  /// Decided once Firebase has settled (it starts in the background so the first screen does not wait for it).
+  bool? _login;
 
   static bool _needsLogin() {
     if (!lastOnlineGate.open) return false;
@@ -858,13 +859,52 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _login = widget.showLogin;
+    if (_login == null && firebaseSettled.value) _login = _needsLogin();
+    firebaseSettled.addListener(_settled);
+  }
+
+  void _settled() {
+    if (!firebaseSettled.value || _login != null || !mounted) return;
+    setState(() => _login = _needsLogin());
+  }
+
+  @override
+  void dispose() {
+    firebaseSettled.removeListener(_settled);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (_login)
+    final login = _login;
+    if (login == null) return const _BootWait(); // Firebase is still starting: the same picture as the page splash
+    if (login)
       return LoginPictureScreen(
         repo: widget.repo,
         onDone: () => setState(() => _login = false),
       );
     return HomeEntry(autoEnter: widget.autoEnter);
+  }
+}
+
+/// What shows for the moment the app waits for Firebase: the page's own splash picture (same file, already downloaded), so
+/// the logo stays on screen with no flash between the page and the app.
+class _BootWait extends StatelessWidget {
+  const _BootWait();
+
+  @override
+  Widget build(BuildContext context) {
+    final portrait = MediaQuery.sizeOf(context).aspectRatio <= 1;
+    return ColoredBox(
+      key: const ValueKey('boot_wait'),
+      color: const Color(0xFF58A8F2),
+      child: SizedBox.expand(
+        child: Image.network('splash.webp', fit: portrait ? BoxFit.contain : BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+      ),
+    );
   }
 }
 

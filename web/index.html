@@ -40,10 +40,14 @@
     html, body { margin: 0; height: 100%; background: #58a8f2; }
     #splash { position: fixed; inset: 0; z-index: 9999; background: #58a8f2 url("splash.webp") center / cover no-repeat; transition: opacity .3s ease; }
     @media (max-aspect-ratio: 1/1) { #splash { background-size: contain; } }
+    /* a thin moving bar at the bottom, so the page never looks frozen while the app downloads */
+    #splash i { position: absolute; left: 0; bottom: 0; height: 4px; width: 35%; background: rgba(255,255,255,.85); border-radius: 0 4px 4px 0; animation: splashbar 1.4s ease-in-out infinite; }
+    @keyframes splashbar { 0% { transform: translateX(-100%); } 100% { transform: translateX(300%); } }
+    @media (prefers-reduced-motion: reduce) { #splash i { animation: none; width: 100%; opacity: .5; } }
   </style>
 </head>
 <body>
-  <div id="splash" aria-hidden="true"></div>
+  <div id="splash" aria-hidden="true"><i></i></div>
   <script src="splash.js"></script>
   <!--
     You can customize the "flutter_bootstrap.js" script.
