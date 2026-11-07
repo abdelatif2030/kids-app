@@ -225,11 +225,16 @@ class _IntroVideoLayerState extends State<IntroVideoLayer> {
       _mutedPlaying = false;
     });
     try {
-      await c.setVolume(1);
-      await c.seekTo(Duration.zero);
-      await c.play();
+      // All three calls are made at once, inside the tap itself: Safari and Chrome only allow sound when play() starts
+      // within the tap (waiting for one call before the next would lose that permission).
+      final volume = c.setVolume(1);
+      final rewind = c.seekTo(Duration.zero);
+      final play = c.play();
+      await Future.wait([volume, rewind, play]);
+      _note('sound play started by tap');
       _playing();
-    } catch (_) {
+    } catch (e) {
+      _note('tap play failed: $e');
       _fail();
     }
   }
