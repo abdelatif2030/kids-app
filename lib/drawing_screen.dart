@@ -210,7 +210,7 @@ class _DrawingScreenState extends State<DrawingScreen> {
           ),
         ],
       ),
-      body: PictureBackdrop(
+      body: StudioBackdrop(
         child: _finished
           ? Center(child: StarDone(onAgain: _again))
           : Column(

@@ -200,3 +200,30 @@ class GameBackdrop extends StatelessWidget {
     );
   }
 }
+
+
+/// The owner's picture behind everything inside «استوديو الإبداع» (2026-11-07): the word builder, the picture story, the
+/// character and scene makers, the gallery, the ordering game and the drawing page. To change it, replace the one file
+/// [kStudioBackgroundAsset].
+const String kStudioBackgroundAsset = 'assets/studio/studio_bg.jpg';
+
+class StudioBackdrop extends StatelessWidget {
+  final Widget child;
+  const StudioBackdrop({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        const ColoredBox(color: Color(0xFF58A8F2)),
+        Positioned.fill(
+          child: ExcludeSemantics(
+            child: Image.asset(kStudioBackgroundAsset, key: const ValueKey('studio_backdrop'), fit: BoxFit.cover, alignment: Alignment.center, errorBuilder: (_, _, _) => const SizedBox()),
+          ),
+        ),
+        child,
+      ],
+    );
+  }
+}

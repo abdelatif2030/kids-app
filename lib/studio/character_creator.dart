@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../design/picture_stage.dart';
 
 import '../journey/models.dart';
 import '../journey/ui/kit.dart';
@@ -96,7 +97,7 @@ class _CharacterCreatorScreenState extends State<CharacterCreatorScreen> {
           ),
         ],
       ),
-      body: PastelBackground(
+      body: StudioBackdrop(
         child: SafeArea(
           child: ListView(
             padding: const EdgeInsets.all(16),

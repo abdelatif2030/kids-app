@@ -1,5 +1,6 @@
 import '../l10n/app_locale.dart';
 import 'package:flutter/material.dart';
+import '../design/picture_stage.dart';
 
 import '../journey/models.dart';
 import '../journey/ui/kit.dart';
@@ -71,7 +72,7 @@ class _SceneBuilderScreenState extends State<SceneBuilderScreen> {
           ),
         ],
       ),
-      body: PastelBackground(
+      body: StudioBackdrop(
         child: SafeArea(
           child: Column(
             children: [

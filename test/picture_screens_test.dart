@@ -229,7 +229,7 @@ void main() {
       expect(find.byKey(const ValueKey('picture_backdrop')), findsOneWidget);
       await _show(t, const DrawingScreen(child: _kid));
       await _settle(t);
-      expect(find.byKey(const ValueKey('picture_backdrop')), findsOneWidget, reason: 'drawing uses the unified background');
+      expect(find.byKey(const ValueKey('studio_backdrop')), findsOneWidget, reason: 'drawing is part of the studio: it uses the studio picture');
     });
   });
 

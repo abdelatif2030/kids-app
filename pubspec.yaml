@@ -98,6 +98,7 @@ flutter:
     - assets/home/lessons_scene.jpg
     - assets/home/create_scene.jpg
     - assets/home/studio_scene.jpg
+    - assets/studio/studio_bg.jpg
     - assets/home/scene_bg.jpg
     - assets/audio/voices/approved.json
     - assets/audio/voices/adam/ar/

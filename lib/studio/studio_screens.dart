@@ -33,7 +33,7 @@ class StudioScreen extends StatelessWidget {
     final islands = <(String, double, String, String, Widget Function())>[
       ('gallery', 0.102, 'معرض العائلة', 'Family gallery', () => ChildGalleryScreen(child: child)),
       ('word', 0.236, 'ركّب الكلمة', 'Build the word', () => WordBuilderScreen(child: child)),
-      ('order', 0.371, 'ركّب الصور', 'Order the pictures', () => LessonRunnerScreen(child: child, kind: LessonKind.sequence, title: loc('رتّب الخطوات'))),
+      ('order', 0.371, 'ركّب الصور', 'Order the pictures', () => LessonRunnerScreen(child: child, kind: LessonKind.sequence, title: loc('رتّب الخطوات'), studio: true)),
       ('story', 0.502, 'قصة بالصور', 'Picture story', () => PictureStoryScreen(child: child)),
       ('character', 0.634, 'صمّم شخصية', 'Design a character', () => CharacterCreatorScreen(child: child)),
       ('scene', 0.768, 'ابنِ مشهداً', 'Build a scene', () => SceneBuilderScreen(child: child)),
@@ -128,7 +128,7 @@ class _ChildGalleryScreenState extends State<ChildGalleryScreen> {
           tabs: [for (final t in GalleryTab.values) Tab(key: ValueKey('tab_${t.name}'), text: t.label)],
         ),
       ),
-      body: PastelBackground(
+      body: StudioBackdrop(
         child: SafeArea(
           child: items == null
               ? const Center(child: CircularProgressIndicator())

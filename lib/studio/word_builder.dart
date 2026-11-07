@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import '../design/picture_stage.dart';
 
 import '../design/focusable_tap.dart';
-import '../design/worlds.dart';
 import '../journey/models.dart';
 import '../journey/ui/kit.dart';
 import '../l10n/strings.dart';
@@ -196,8 +196,7 @@ class _WordBuilderScreenState extends State<WordBuilderScreen> {
           ),
         ],
       ),
-      body: PastelBackground(
-        world: RWorld.forest,
+      body: StudioBackdrop(
         child: SafeArea(
           child: s == null || v == null
               ? Center(

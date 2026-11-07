@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../design/picture_stage.dart';
 
 import '../journey/models.dart';
 import '../journey/ui/kit.dart';
@@ -58,7 +59,7 @@ class _PictureStoryScreenState extends State<PictureStoryScreen> {
         title: Text(loc('احكِ قصة بالصور'),
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
-      body: PastelBackground(
+      body: StudioBackdrop(
         child: SafeArea(
           child: ListView(
             padding: const EdgeInsets.all(16),

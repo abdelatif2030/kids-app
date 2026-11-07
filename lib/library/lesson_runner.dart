@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../design/picture_stage.dart';
 
 import '../journey/models.dart';
 import '../journey/ui/kit.dart';
@@ -21,6 +22,9 @@ class LessonRunnerScreen extends StatefulWidget {
   final String? category;
   final String title;
 
+  /// true when opened from «استوديو الإبداع»: the studio picture is the background.
+  final bool studio;
+
   /// Replaces the generated content (tests).
   final ActivityContent Function()? contentBuilder;
 
@@ -36,6 +40,7 @@ class LessonRunnerScreen extends StatefulWidget {
     required this.kind,
     this.category,
     this.title = '',
+    this.studio = false,
     this.contentBuilder,
     this.customBuilder,
     this.onResults,
@@ -112,7 +117,7 @@ class _LessonRunnerScreenState extends State<LessonRunnerScreen> {
         title: Text(widget.title.isEmpty ? widget.kind.title : widget.title,
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: RC.ink)),
       ),
-      body: PastelBackground(quiet: true, child: SafeArea(child: body)),
+      body: widget.studio ? StudioBackdrop(child: SafeArea(child: body)) : PastelBackground(quiet: true, child: SafeArea(child: body)),
     );
   }
 }
