@@ -89,3 +89,57 @@ class GamesChoiceScreen extends StatelessWidget {
     );
   }
 }
+
+/// The owner's picture behind the (still empty) fun games page. To change it, replace the one file [kFunScenePicture].
+const String kFunScenePicture = 'assets/games/fun_scene.jpg';
+
+/// «ألعاب للتسلية»: empty for now (owner decision, 2026-11-07). The owner's picture fills the whole page, with a friendly
+/// line at the bottom and a back arrow; new fun games will be listed here later.
+class FunGamesScreen extends StatelessWidget {
+  const FunGamesScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const ColoredBox(color: Color(0xFF58A8F2)),
+          ExcludeSemantics(child: Image.asset(kFunScenePicture, key: const ValueKey('fun_scene'), fit: BoxFit.cover, errorBuilder: (_, _, _) => const SizedBox())),
+          PositionedDirectional(
+            top: 0,
+            start: 0,
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: FocusableTap(
+                  key: const ValueKey('fun_back'),
+                  onTap: () => Navigator.maybePop(context),
+                  radius: 40,
+                  semanticLabel: tr2('رجوع', 'Back'),
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFF7A3FE0), border: Border.all(color: Colors.white, width: 3), boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 6, offset: Offset(0, 3))]),
+                    child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 30),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Align(
+            alignment: const Alignment(0, 0.88),
+            child: SafeArea(
+              child: Container(
+                key: const ValueKey('fun_empty'),
+                padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 12),
+                decoration: BoxDecoration(color: const Color(0xFF5B2BB8), borderRadius: BorderRadius.circular(40), border: Border.all(color: Colors.white, width: 3), boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 8, offset: Offset(0, 4))]),
+                child: Text(tr2('ألعاب جديدة جاية قريب', 'New games are coming soon'), style: const TextStyle(fontFamily: 'Tajawal', fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

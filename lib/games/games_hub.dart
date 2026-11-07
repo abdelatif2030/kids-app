@@ -39,7 +39,7 @@ class GameCategory {
 /// The ten islands, in the order of the owner's design (left to right, top row then bottom row).
 final List<GameCategory> kGameCategories = [
   GameCategory('brain', () => tr2('ألعاب الذكاء والتفكير', 'Thinking games'), const Offset(0.127, 0.478), const Offset(0.127, 0.528),
-      games: {'maze', 'sort_groups', 'treasure_hunt', 'next_in_day', 'snakes_ladders', 'connect_four', 'where_ball', 'pattern'}),
+      games: {'maze', 'sort_groups', 'treasure_hunt', 'next_in_day', 'snakes_ladders', 'connect_four', 'where_ball', 'pattern', 'fun_xo', 'fun_snake', 'fun_whack', 'fun_stars'}),
   GameCategory('letters', () => tr2('الحروف والكلمات', 'Letters and words'), const Offset(0.319, 0.478), const Offset(0.319, 0.528),
       games: {'letters', 'letter_fishing', 'trace_letters', 'word_book', 'listen_letter', 'listen_word', 'review_words'}),
   GameCategory('numbers', () => tr2('الأرقام والحساب', 'Numbers and maths'), const Offset(0.504, 0.478), const Offset(0.504, 0.528),
@@ -56,9 +56,10 @@ final List<GameCategory> kGameCategories = [
   GameCategory('adventures', () => tr2('مغامرات رحلتي', 'Rehlaty adventures'), const Offset(0.885, 0.77), const Offset(0.885, 0.8), screen: (c) => AdventureScreen(child: c)),
 ];
 
-/// «ألعاب للتسلية»: the second choice of the Games tab (the owner's picture with two cards). The four fun games live only here.
-final GameCategory kFunCategory = GameCategory('fun', () => tr2('ألعاب للتسلية', 'Fun games'), const Offset(0.5, 0.5), const Offset(0.5, 0.5),
-    games: {'fun_whack', 'fun_stars', 'fun_xo', 'fun_snake'});
+/// «ألعاب للتسلية»: the second choice of the Games tab (the owner's picture with two cards). It is empty for now (owner
+/// decision, 2026-11-07): the four casual games (tic-tac-toe, snake, whack the mole, catch the stars) are back on the
+/// «ألعاب الذكاء والتفكير» island of the learning games. New fun games will be listed here later.
+final GameCategory kFunCategory = GameCategory('fun', () => tr2('ألعاب للتسلية', 'Fun games'), const Offset(0.5, 0.5), const Offset(0.5, 0.5), games: const {});
 
 /// Every game id the games tab knows about (the ten islands and the fun games), to check that none is lost or listed twice.
 Set<String> allHubGameIds() => {for (final c in kGameCategories) ...c.games, ...kFunCategory.games};

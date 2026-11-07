@@ -568,6 +568,7 @@ void main() {
       addTearDown(t.view.reset);
       await t.pumpWidget(
         MaterialApp(
+          key: UniqueKey(),
           builder: (c, child) =>
               Directionality(textDirection: TextDirection.rtl, child: child!),
           home: HomeEntry(autoEnter: autoEnter),
@@ -615,17 +616,19 @@ void main() {
     );
 
     testWidgets(
-      'no child and no age: the normal start page is shown (a child has to be added once)',
+      'a new person with no child and no age (for example after Google sign-in): a child is made at once (age 4) and the home opens, never the old start page',
       (t) async {
-        await store(t);
+        final st = await store(t);
         await pumpEntry(t);
-        expect(find.byType(ChildShell), findsNothing);
-        expect(find.byType(StartScreen), findsOneWidget);
+        expect(st.profiles.length, 1);
+        expect(st.profiles.single.age, 4);
+        expect(find.byType(ChildShell), findsOneWidget);
+        expect(find.byType(StartScreen), findsNothing);
       },
     );
 
     testWidgets(
-      'several children: the start page asks who plays; outside the demo the start page is always first',
+      'several children: the demo opens the one played last (or the first) at once; outside the demo the start page is always first',
       (t) async {
         await store(
           t,
@@ -635,8 +638,8 @@ void main() {
           ],
         );
         await pumpEntry(t);
-        expect(find.byType(ChildShell), findsNothing);
-        expect(find.byType(StartScreen), findsOneWidget);
+        expect(find.byType(ChildShell), findsOneWidget);
+        expect(find.byType(StartScreen), findsNothing);
         await store(
           t,
           children: const [ChildProfile(id: 'k1', nickname: 'سلمى', age: 4)],

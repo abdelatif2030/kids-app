@@ -917,18 +917,20 @@ class _HomeEntryState extends State<HomeEntry> {
     }
     if (!mounted) return;
     ChildProfile? child;
-    if (store.profiles.length == 1) {
-      child = store.profiles.first;
-    } else if (store.profiles.isEmpty) {
+    if (store.profiles.isNotEmpty) {
+      // One or several children: the one played last (or the first) opens at once. The old start page is not shown.
+      child = store.active ?? store.profiles.first;
+    } else {
+      // A new person (for example after «sign in with Google»): a child is made at once so the home page opens straight
+      // away. The age comes from the sign-up when it gave one; otherwise 4 (the middle of 1 to 6). A parent changes the
+      // nickname and age later in the parent area.
       final x = await AccountExtras.load();
-      if (x.age != null) {
-        child = await createDemoChild(
-          nickname: HomeEntry.nicknameFor(x.gender),
-          age: x.age!,
-          avatar: x.gender == 'boy' ? 'b1' : 'g1',
-          gender: x.gender,
-        );
-      }
+      child = await createDemoChild(
+        nickname: HomeEntry.nicknameFor(x.gender),
+        age: x.age ?? 4,
+        avatar: x.gender == 'boy' ? 'b1' : 'g1',
+        gender: x.gender,
+      );
     }
     if (!mounted) return;
     if (child == null) {

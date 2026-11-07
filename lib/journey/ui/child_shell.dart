@@ -335,7 +335,7 @@ class _GamesTabState extends State<_GamesTab> {
         key: const ValueKey('games_choice_page'),
         onBack: widget.onBack,
         onEducational: () => setState(() => _learning = true),
-        onFun: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => CategoryGamesScreen(category: kFunCategory, child: widget.child))),
+        onFun: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const FunGamesScreen())),
       );
     }
     // The learning games hub: ten islands (letters, numbers, shapes...), each opening its own games. It fills the whole area.

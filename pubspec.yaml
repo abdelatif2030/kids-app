@@ -91,6 +91,7 @@ flutter:
     - assets/home/home_scene.jpg
     - assets/games/hub_scene.jpg
     - assets/games/choice_scene.jpg
+    - assets/games/fun_scene.jpg
     - assets/games/game_bg.jpg
     - assets/home/home_main.jpg
     - assets/home/cartoons_stories.jpg
