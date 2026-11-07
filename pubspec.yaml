@@ -96,6 +96,7 @@ flutter:
     - assets/home/home_main.jpg
     - assets/home/cartoons_stories.jpg
     - assets/home/lessons_scene.jpg
+    - assets/home/create_scene.jpg
     - assets/home/scene_bg.jpg
     - assets/audio/voices/approved.json
     - assets/audio/voices/adam/ar/

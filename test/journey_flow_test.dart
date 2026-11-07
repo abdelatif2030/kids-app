@@ -374,8 +374,8 @@ void main() {
 
       await tester.tap(find.text('إبداع').last);
       await tester.pump();
-      expect(find.text('رسم حر'), findsOneWidget);
-      expect(find.text('دروس الرسم'), findsOneWidget);
+      expect(find.byKey(const ValueKey('create_drawing')), findsOneWidget);
+      expect(find.byKey(const ValueKey('create_studio')), findsOneWidget);
 
       await tester.tap(find.text('أنا').last);
       await tester.pump();

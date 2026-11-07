@@ -63,12 +63,12 @@ void main() {
       await t.pump();
       await t.tap(find.text('إبداع').last);
       await t.pump(const Duration(milliseconds: 400));
-      expect(find.text('استوديو الإبداع'), findsOneWidget);
-      expect(find.text('رسم حر'), findsOneWidget);
+      expect(find.byKey(const ValueKey('create_studio')), findsOneWidget);
+      expect(find.byKey(const ValueKey('create_drawing')), findsOneWidget);
       for (final gone in ['دروس الرسم', 'أناشيد']) {
         expect(find.text(gone), findsNothing, reason: gone);
       }
-      expect(find.byKey(const ValueKey('picture_backdrop')), findsWidgets, reason: 'the unified scenery background');
+      expect(find.byKey(const ValueKey('create_picture')), findsOneWidget, reason: 'the owner picture of the create page');
     });
   });
 }
