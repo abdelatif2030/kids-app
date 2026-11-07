@@ -22,8 +22,8 @@ import 'account_extras.dart';
 // (see auth_shell.dart). The form is real and fills the screen, upright or sideways.
 
 const double kAuthAspect = 1536 / 1024;
-const String kLoginPicture = 'assets/auth/login.jpg';
-const String kRegisterPicture = 'assets/auth/register.jpg';
+const String kLoginPicture = 'assets/auth/login.webp';
+const String kRegisterPicture = 'assets/auth/register.webp';
 
 String _networkMessage() => tr2(
   'تعذّر الاتصال بالخدمة. تحقق من الإنترنت وحاول مرة أخرى.',

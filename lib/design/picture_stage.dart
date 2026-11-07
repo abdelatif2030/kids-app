@@ -155,7 +155,7 @@ class PictureBackdrop extends StatelessWidget {
   final Widget Function(Widget child)? fallback;
   const PictureBackdrop({super.key, required this.child, this.fallback});
 
-  static const asset = 'assets/home/scene_bg.jpg';
+  static const asset = 'assets/home/scene_bg.webp';
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +178,7 @@ class PictureBackdrop extends StatelessWidget {
 /// The owner's picture behind every game (treehouse sign, rainbow, castle, podium...). Everything inside gets a see-through
 /// scaffold colour, so a game keeps its own app bar and layout while the picture shows behind it. To change the picture,
 /// replace the one file [kGameBackgroundAsset].
-const String kGameBackgroundAsset = 'assets/games/game_bg.jpg';
+const String kGameBackgroundAsset = 'assets/games/game_bg.webp';
 
 class GameBackdrop extends StatelessWidget {
   final Widget child;
@@ -205,7 +205,7 @@ class GameBackdrop extends StatelessWidget {
 /// The owner's picture behind everything inside «استوديو الإبداع» (2026-11-07): the word builder, the picture story, the
 /// character and scene makers, the gallery, the ordering game and the drawing page. To change it, replace the one file
 /// [kStudioBackgroundAsset].
-const String kStudioBackgroundAsset = 'assets/studio/studio_bg.jpg';
+const String kStudioBackgroundAsset = 'assets/studio/studio_bg.webp';
 
 class StudioBackdrop extends StatelessWidget {
   final Widget child;

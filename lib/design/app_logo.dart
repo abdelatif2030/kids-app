@@ -12,8 +12,8 @@ class AppLogo extends StatelessWidget {
   final bool artOnly;
   const AppLogo({super.key, this.width = 260, this.artOnly = false});
 
-  static const asset = 'assets/branding/logo.png';
-  static const artAsset = 'assets/branding/logo_art.png';
+  static const asset = 'assets/branding/logo.webp';
+  static const artAsset = 'assets/branding/logo_art.webp';
 
   @override
   Widget build(BuildContext context) {

@@ -82,7 +82,7 @@ class IslandSpec {
 /// The owner's own picture of the home scene (cottage, barn, well, pond and bridge) and where each section's sign goes on
 /// it: fractions of the picture's width and height. A home whose sections are all listed here is drawn on the picture
 /// (everything visible at once, no scrolling); any other set of islands (the games page) uses the sea map.
-const String kHomeScenePicture = 'assets/home/home_scene.jpg';
+const String kHomeScenePicture = 'assets/home/home_scene.webp';
 const double kHomeSceneAspect = 1242 / 698;
 const Map<String, Offset> kHomeSceneSpots = {
   'games': Offset(0.29, 0.36), // the cottage

@@ -64,11 +64,11 @@ final GameCategory kFunCategory = GameCategory('fun', () => tr2('ألعاب لل
 /// Every game id the games tab knows about (the ten islands and the fun games), to check that none is lost or listed twice.
 Set<String> allHubGameIds() => {for (final c in kGameCategories) ...c.games, ...kFunCategory.games};
 
-/// The owner's own picture of the games screen (assets/games/hub_scene.jpg, 1672 x 941): Adam and Nour above a wooden
+/// The owner's own picture of the games screen (assets/games/hub_scene.webp, 1672 x 941): Adam and Nour above a wooden
 /// sign and ten floating islands. The picture is shown whole; every island is a large invisible button on top of it,
 /// so what a child sees is exactly the design. The bell and profile picture of the design were painted out (they would
 /// be fake: the bell showed an unread count).
-const String kGamesHubPicture = 'assets/games/hub_scene.jpg';
+const String kGamesHubPicture = 'assets/games/hub_scene.webp';
 const double kGamesHubAspect = 1672 / 941;
 const Offset kHubBackSpot = Offset(0.067, 0.082);
 

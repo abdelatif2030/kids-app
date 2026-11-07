@@ -17,7 +17,7 @@ Direction follows the language (Arabic right-to-left, English left-to-right) for
 | **Stories** (`lib/stories/story_data.dart`, branching stories) | Arabic text, read by the Arabic device voice | content written in Arabic on purpose; English versions need writing and a voice |
 | **Arabic letters** (`letters_data.dart`) | Arabic by nature | not a translation task |
 | **Shape/letter names read aloud** | the spoken/captioned word is Arabic (e.g. «دائرة»), the instruction above it is English | learn-language setting `both`; an English-only voice path is not built |
-| **The picture of the Games Hub** (`assets/games/hub_scene.jpg`) | the wooden sign «يلا نلعب!» is painted in Arabic; the ten island names are real text over it and ARE translated | needs an English version of the picture |
+| **The picture of the Games Hub** (`assets/games/hub_scene.webp`) | the wooden sign «يلا نلعب!» is painted in Arabic; the ten island names are real text over it and ARE translated | needs an English version of the picture |
 | Audio (Adam and Nour recordings) | 1 approved Arabic recording; everything else is device voice | see AUDIO docs |
 | Names of languages in the language pickers | shown in their own language on purpose | n/a |
 | Machine-written Arabic of the new curriculum units, hub labels and demo texts | not reviewed by a native teacher | marked draft |

@@ -13,7 +13,7 @@ Branch `feature/rehlaty`. All work is uncommitted by the owner's instruction. No
 - Age band (1-2, 3-4, 5-6) moved by at most one step by demonstrated ability (first-try rate over the last 30 rounds, at least 8 rounds, else unknown). A challenge offer only for confident 5-6 year olds.
 - `CompanionService.react` speaks through the shared `RehlatyAudioEngine.say` (parent switches, voice, volume, gate, repeat guard all apply); the bubble always shows the words. Reward moments are claimed once per child (`companion_state`): game first finish, world place opened, story completed (never aloud when sleeping), weekly adventure.
 - UI: `CompanionCard` on the Me tab (tap to talk, pick Adam or Nour), `CompanionBubble` on the game finish panel and world screen. Parent switch in Sound settings.
-- Art: the existing `assets/characters/adam.png` / `nour.png`. Voices are the phone's demo text-to-speech; no recordings exist; pitch/pace tuning has not been listened to.
+- Art: the existing `assets/characters/adam.webp` / `nour.png`. Voices are the phone's demo text-to-speech; no recordings exist; pitch/pace tuning has not been listened to.
 - Tests: `test/companion_test.dart`, `test/companion_integration_test.dart`.
 
 ## Feature 3: Weekly Educational Adventures — IMPLEMENTED (tested, not VERIFIED)

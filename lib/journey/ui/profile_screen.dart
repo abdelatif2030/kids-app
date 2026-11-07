@@ -26,7 +26,7 @@ import 'picture_screens.dart' show ComingSoonScreen;
 /// and are drawn live from what the child really did; every island and button opens a real page (the pet is the only one
 /// that is not built yet and says so). Nothing is bought here: the counters are stars and stickers earned by finishing
 /// things, and nothing is ever taken away.
-const String kProfilePicture = 'assets/home/me_scene.jpg';
+const String kProfilePicture = 'assets/home/me_scene.webp';
 const double kProfileAspect = 1672 / 941;
 
 const _ink = Color(0xFF4B2E9B);

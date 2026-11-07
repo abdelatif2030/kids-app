@@ -9,7 +9,7 @@ import '../models.dart';
 
 /// «إبداع»: the owner's picture with two islands (2026-11-07): «رسم حر» opens the drawing pad and «استوديو الإبداع» the
 /// creative studio. The picture is shown whole; the two islands and the round arrow are invisible buttons on it.
-const String kCreatePicture = 'assets/home/create_scene.jpg';
+const String kCreatePicture = 'assets/home/create_scene.webp';
 const double kCreateAspect = 1672 / 941;
 
 class CreateChoiceScreen extends StatelessWidget {

@@ -17,7 +17,7 @@ class AppIntro extends StatefulWidget {
   /// How long the picture stays.
   static const duration = Duration(milliseconds: 2200);
 
-  static const posterAsset = 'assets/branding/intro_poster.jpg';
+  static const posterAsset = 'assets/branding/intro_poster.webp';
 
   /// Tests set this to true to see the intro; otherwise it is skipped under a test binding.
   static bool? forceShow;

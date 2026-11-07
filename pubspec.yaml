@@ -87,27 +87,27 @@ flutter:
     - assets/audio/en/words/
     - assets/audio/comparison/
     - assets/content/
-    - assets/branding/logo.png
-    - assets/home/home_scene.jpg
-    - assets/games/hub_scene.jpg
-    - assets/games/choice_scene.jpg
-    - assets/games/fun_scene.jpg
-    - assets/games/game_bg.jpg
-    - assets/home/home_main.jpg
-    - assets/home/cartoons_stories.jpg
-    - assets/home/lessons_scene.jpg
-    - assets/home/create_scene.jpg
-    - assets/home/studio_scene.jpg
-    - assets/home/me_scene.jpg
-    - assets/studio/studio_bg.jpg
-    - assets/home/scene_bg.jpg
+    - assets/branding/logo.webp
+    - assets/home/home_scene.webp
+    - assets/games/hub_scene.webp
+    - assets/games/choice_scene.webp
+    - assets/games/fun_scene.webp
+    - assets/games/game_bg.webp
+    - assets/home/home_main.webp
+    - assets/home/cartoons_stories.webp
+    - assets/home/lessons_scene.webp
+    - assets/home/create_scene.webp
+    - assets/home/studio_scene.webp
+    - assets/home/me_scene.webp
+    - assets/studio/studio_bg.webp
+    - assets/home/scene_bg.webp
     - assets/audio/voices/approved.json
     - assets/audio/voices/adam/ar/
-    - assets/branding/logo_art.png
+    - assets/branding/logo_art.webp
     - assets/branding/intro.mp4
-    - assets/branding/intro_poster.jpg
-    - assets/auth/login.jpg
-    - assets/auth/register.jpg
+    - assets/branding/intro_poster.webp
+    - assets/auth/login.webp
+    - assets/auth/register.webp
     - assets/characters/
 
   fonts:

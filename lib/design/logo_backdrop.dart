@@ -35,7 +35,7 @@ class LogoLayer extends StatelessWidget {
                 child: Opacity(
                   opacity: opacity,
                   child: Image.asset(
-                    'assets/branding/logo.png',
+                    'assets/branding/logo.webp',
                     key: const ValueKey('bg_logo'),
                     width: w,
                     fit: BoxFit.contain,

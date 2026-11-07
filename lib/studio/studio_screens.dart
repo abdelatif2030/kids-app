@@ -18,7 +18,7 @@ import '../l10n/strings.dart';
 
 /// «استوديو الإبداع»: the owner's picture with seven islands (2026-11-07). Optional, calm making activities. The picture is
 /// shown whole; each island is a large invisible button, so what a child sees is exactly the design.
-const String kStudioPicture = 'assets/home/studio_scene.jpg';
+const String kStudioPicture = 'assets/home/studio_scene.webp';
 const double kStudioAspect = 1672 / 941;
 
 class StudioScreen extends StatelessWidget {

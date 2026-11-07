@@ -6,7 +6,7 @@ import '../l10n/strings.dart';
 
 /// The first page of the Games tab (owner's picture, 2026-11-06): two big cards, «ألعاب تعليمية» (the ten-island hub) and
 /// «ألعاب للتسلية» (the four fun games). The picture is shown whole; the two cards are large invisible buttons on it.
-const String kGamesChoicePicture = 'assets/games/choice_scene.jpg';
+const String kGamesChoicePicture = 'assets/games/choice_scene.webp';
 const double kGamesChoiceAspect = 1672 / 941;
 
 class GamesChoiceScreen extends StatelessWidget {
@@ -91,7 +91,7 @@ class GamesChoiceScreen extends StatelessWidget {
 }
 
 /// The owner's picture behind the (still empty) fun games page. To change it, replace the one file [kFunScenePicture].
-const String kFunScenePicture = 'assets/games/fun_scene.jpg';
+const String kFunScenePicture = 'assets/games/fun_scene.webp';
 
 /// «ألعاب للتسلية»: empty for now (owner decision, 2026-11-07). The owner's picture fills the whole page, with a friendly
 /// line at the bottom and a back arrow; new fun games will be listed here later.

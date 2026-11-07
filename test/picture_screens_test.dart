@@ -57,24 +57,14 @@ void main() {
 
   group('the owner pictures are bundled and sized as the code expects', () {
     test('each picture file exists and is 1672 x 941 (the home, cartoons, games and lessons screens)', () {
-      for (final f in ['assets/home/home_main.jpg', 'assets/home/cartoons_stories.jpg', 'assets/games/hub_scene.jpg', 'assets/home/lessons_scene.jpg']) {
+      for (final f in ['assets/home/home_main.webp', 'assets/home/cartoons_stories.webp', 'assets/games/hub_scene.webp', 'assets/home/lessons_scene.webp']) {
         final bytes = File(f).readAsBytesSync();
         expect(bytes.length, greaterThan(50 * 1024), reason: f);
-        // a JPEG's size sits in its start-of-frame marker
-        var i = 2, w = 0, h = 0;
-        while (i < bytes.length - 9) {
-          if (bytes[i] != 0xFF) {
-            i++;
-            continue;
-          }
-          final m = bytes[i + 1];
-          if (m >= 0xC0 && m <= 0xC3) {
-            h = bytes[i + 5] * 256 + bytes[i + 6];
-            w = bytes[i + 7] * 256 + bytes[i + 8];
-            break;
-          }
-          i += 2 + bytes[i + 2] * 256 + bytes[i + 3];
-        }
+        // a WebP's size sits in its first chunk (lossy 'VP8 ' or extended 'VP8X')
+        final chunk = String.fromCharCodes(bytes.sublist(12, 16));
+        int le(int at, int n) => [for (var k = 0; k < n; k++) bytes[at + k] << (8 * k)].fold(0, (a, b) => a | b);
+        final w = chunk == 'VP8X' ? le(24, 3) + 1 : le(26, 2) & 0x3FFF;
+        final h = chunk == 'VP8X' ? le(27, 3) + 1 : le(28, 2) & 0x3FFF;
         expect((w, h), (1672, 941), reason: f);
       }
       expect(kScreenPictureAspect, closeTo(1672 / 941, 1e-9));
@@ -82,7 +72,7 @@ void main() {
 
     test('the scenery background is declared in pubspec and has its top bar cropped away', () {
       final pub = File('pubspec.yaml').readAsStringSync();
-      for (final f in ['assets/home/home_main.jpg', 'assets/home/cartoons_stories.jpg', 'assets/home/lessons_scene.jpg', 'assets/home/scene_bg.jpg', 'assets/games/hub_scene.jpg']) {
+      for (final f in ['assets/home/home_main.webp', 'assets/home/cartoons_stories.webp', 'assets/home/lessons_scene.webp', 'assets/home/scene_bg.webp', 'assets/games/hub_scene.webp']) {
         expect(pub, contains(f), reason: f);
         expect(File(f).existsSync(), isTrue, reason: f);
       }

@@ -11,7 +11,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test('the logo file is registered as an asset and is a real image with a transparent background', () async {
-    expect(File('pubspec.yaml').readAsStringSync(), contains('assets/branding/logo.png'));
+    expect(File('pubspec.yaml').readAsStringSync(), contains('assets/branding/logo.webp'));
     final data = await rootBundle.load(AppLogo.asset);
     final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
     final frame = await codec.getNextFrame();

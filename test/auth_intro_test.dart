@@ -492,7 +492,7 @@ void main() {
     );
 
     test('the two pictures are bundled with their placeholders erased and the right size', () {
-      for (final f in ['assets/auth/login.jpg', 'assets/auth/register.jpg']) {
+      for (final f in ['assets/auth/login.webp', 'assets/auth/register.webp']) {
         final b = File(f).readAsBytesSync();
         expect(b.length, greaterThan(100 * 1024), reason: f);
         expect(File('pubspec.yaml').readAsStringSync(), contains(f));

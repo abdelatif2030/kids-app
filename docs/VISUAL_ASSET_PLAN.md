@@ -21,7 +21,7 @@ phone and cannot carry the purple 3D Rehlaty look. Nothing in the plan claims a 
 ## What was built without any image tool
 * Shapes (circle, square, triangle, rectangle, star, heart, diamond) and the ball/table/box position scenes are real
   vector art drawn in code, so they look the same on every device and need no files.
-* The games hub uses the owner's own picture (`assets/games/hub_scene.jpg`); in-category islands are code-drawn.
+* The games hub uses the owner's own picture (`assets/games/hub_scene.webp`); in-category islands are code-drawn.
 
 ## How artwork will be added (no new package, no external service)
 1. Artwork is made by the owner or an approved designer in the Rehlaty style (Adam & Nour sheet is the reference).

@@ -57,7 +57,7 @@ class PictureHome extends StatelessWidget {
   final VoidCallback? onExit;
   const PictureHome({super.key, required this.child, this.onTab, this.onExit});
 
-  static const asset = 'assets/home/home_main.jpg';
+  static const asset = 'assets/home/home_main.webp';
   static const gear = Offset(0.054, 0.077);
   static const bell = Offset(0.852, 0.082);
   static const avatar = Offset(0.942, 0.083);
@@ -202,7 +202,7 @@ class CartoonsPictureScreen extends StatelessWidget {
   final ChildProfile child;
   const CartoonsPictureScreen({super.key, required this.child});
 
-  static const asset = 'assets/home/cartoons_stories.jpg';
+  static const asset = 'assets/home/cartoons_stories.webp';
 
   @override
   Widget build(BuildContext context) {
@@ -264,7 +264,7 @@ class LessonsPictureScreen extends StatelessWidget {
   final ChildProfile child;
   const LessonsPictureScreen({super.key, required this.child});
 
-  static const asset = 'assets/home/lessons_scene.jpg';
+  static const asset = 'assets/home/lessons_scene.webp';
 
   @override
   Widget build(BuildContext context) {

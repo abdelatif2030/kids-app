@@ -12,10 +12,10 @@ class CharacterImage extends StatelessWidget {
   const CharacterImage(this.character, {super.key, this.height = 120});
 
   String get _path => switch (character) {
-    BrandCharacter.adam => 'assets/characters/adam.png',
-    BrandCharacter.nour => 'assets/characters/nour.png',
-    BrandCharacter.adamHead => 'assets/characters/adam_head.png',
-    BrandCharacter.nourHead => 'assets/characters/nour_head.png',
+    BrandCharacter.adam => 'assets/characters/adam.webp',
+    BrandCharacter.nour => 'assets/characters/nour.webp',
+    BrandCharacter.adamHead => 'assets/characters/adam_head.webp',
+    BrandCharacter.nourHead => 'assets/characters/nour_head.webp',
   };
 
   @override
