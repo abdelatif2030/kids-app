@@ -30,8 +30,30 @@ class AppIntro extends StatefulWidget {
   static bool? forceShow;
   static bool _shown = false;
 
+  /// True while the intro is on screen. The page that opens after it (the child's home) waits for this to turn false: a page
+  /// pushed on top of the intro would hide it (that is why the intro never showed for a returning child).
+  static final ValueNotifier<bool> running = ValueNotifier<bool>(false);
+
+  /// Completes when the intro is not on screen (at once when it is not shown).
+  static Future<void> whenFinished() {
+    if (!running.value) return Future<void>.value();
+    final done = Completer<void>();
+    void check() {
+      if (!running.value && !done.isCompleted) {
+        running.removeListener(check);
+        done.complete();
+      }
+    }
+
+    running.addListener(check);
+    return done.future;
+  }
+
   /// For tests: forget that the intro was shown in this run.
-  static void resetForTest() => _shown = false;
+  static void resetForTest() {
+    _shown = false;
+    running.value = false;
+  }
 
   @override
   State<AppIntro> createState() => _AppIntroState();
@@ -52,17 +74,22 @@ class _AppIntroState extends State<AppIntro> {
     if (!(AppIntro.forceShow ?? !underTest)) return;
     AppIntro._shown = true;
     _done = false;
+    AppIntro.running.value = true;
   }
 
   @override
   void dispose() {
     _hold?.cancel();
+    AppIntro.running.value = false;
     super.dispose();
   }
 
   void _skip() {
     _hold?.cancel();
-    if (!_done) setState(() => _done = true);
+    if (!_done) {
+      setState(() => _done = true);
+      AppIntro.running.value = false;
+    }
   }
 
   /// The video cannot play: keep the picture for a moment, then open the app.

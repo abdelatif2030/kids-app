@@ -936,10 +936,9 @@ class _HomeEntryState extends State<HomeEntry> {
       );
     }
     if (!mounted) return;
-    if (child == null) {
-      setState(() => _deciding = false);
-      return;
-    }
+    // The intro video plays first: a page pushed now would cover it.
+    await AppIntro.whenFinished();
+    if (!mounted) return;
     await enterChildMode(context, child);
     // Leaving child mode (with the parent's PIN) comes back here: show the normal start page.
     if (mounted) setState(() => _deciding = false);

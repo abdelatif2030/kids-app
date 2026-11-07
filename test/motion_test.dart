@@ -122,6 +122,24 @@ void main() {
       expect(find.byKey(const ValueKey('intro_video')), findsOneWidget);
     });
 
+    testWidgets('while the intro is on screen the page after it waits (a page pushed on top would hide the intro); when it ends the wait is over', (t) async {
+      AppIntro.forceShow = true;
+      AppIntro.resetForTest();
+      expect(AppIntro.running.value, isFalse);
+      var waited = false;
+      await t.pumpWidget(app(AppIntro(key: UniqueKey(), child: const Text('app'))));
+      await t.pump();
+      expect(AppIntro.running.value, isTrue);
+      AppIntro.whenFinished().then((_) => waited = true);
+      await t.pump();
+      expect(waited, isFalse);
+      await t.tap(find.byKey(const ValueKey('intro_skip')));
+      await t.pump();
+      await t.pump();
+      expect(AppIntro.running.value, isFalse);
+      expect(waited, isTrue);
+    });
+
     testWidgets('shows the intro; if the video cannot play the picture stays 2 s and then the app opens; shown once per run', (t) async {
       AppIntro.forceShow = true;
       AppIntro.resetForTest();
