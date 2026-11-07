@@ -19,9 +19,9 @@ D.acS.prototype={
 v(d){var x=$.h().a==="ar",w=x?"\u0623\u0644\u0639\u0627\u0628 \u062a\u0639\u0644\u064a\u0645\u064a\u0629":"Learning games"
 x=x?"\u0623\u0644\u0639\u0627\u0628 \u0644\u0644\u062a\u0633\u0644\u064a\u0629":"Fun games"
 x=A.a([new A.f5("choice_educational",C.bw2,0.325,0.46,w,this.c,36,C.bVH,null),new A.f5("choice_fun",C.bvW,0.335,0.46,x,this.d,36,C.bVI,null)],y.d)
-return new A.oG("assets/games/choice_scene.jpg",1.7768331562167907,x,B.R5,!1,new D.aNv(this),null,C.bWs)}}
+return new A.oG("assets/games/choice_scene.webp",1.7768331562167907,x,B.R5,!1,new D.aNv(this),null,C.bWs)}}
 D.acP.prototype={
-v(d){var x,w,v=null,u=A.q2("assets/games/fun_scene.jpg",B.V,v,new D.aNe(),!1,B.cF,B.dD,v,C.bWn,v),t=$.h().a==="ar",s=t?"\u0631\u062c\u0648\u0639":"Back"
+v(d){var x,w,v=null,u=A.q2("assets/games/fun_scene.webp",B.V,v,new D.aNe(),!1,B.cF,B.dD,v,C.bWn,v),t=$.h().a==="ar",s=t?"\u0631\u062c\u0648\u0639":"Back"
 s=A.ti(v,A.cI(!0,new A.X(B.bl,new A.cn(new D.aNf(d),A.aK(v,C.Kj,B.C,v,v,new A.ay(B.eR,v,A.ch(B.r,3),v,B.AD,v,B.bx),v,56,v,v,v,v,v,56),40,s,!1,!0,C.bWl),v),B.a3,!0),v,v,0,0,v)
 x=A.b5(40)
 w=A.ch(B.r,3)
@@ -60,4 +60,4 @@ C.bWl=new A.N("fun_back",y.a)
 C.bWm=new A.N("fun_empty",y.a)
 C.bWn=new A.N("fun_scene",y.a)
 C.bWs=new A.N("games_choice",y.a)})()};
-(a=>{a["vBd6bhwb4th0eJ/p0G7e3Q3ixlU="]=a.current})($__dart_deferred_initializers__);
+(a=>{a["kCEipSQ0d/p7CpWPoZalmbLqubs="]=a.current})($__dart_deferred_initializers__);

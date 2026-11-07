@@ -989,7 +989,7 @@ else k=m<110?10:11.5
 j=l*1.9
 i=v?Math.max(j,76):Math.min(n*0.96,Math.max(j,76))
 v=A.b5(a2?0:24)
-j=A.a([A.h3(0,new A.dx(!0,A.q2("assets/home/home_scene.jpg",C.V,a1,new B.boX(),!1,C.cF,C.dD,a1,a1,a1),a1))],x.p)
+j=A.a([A.h3(0,new A.dx(!0,A.q2("assets/home/home_scene.webp",C.V,a1,new B.boX(),!1,C.cF,C.dD,a1,a1,a1),a1))],x.p)
 for(h=A.hV(this.a.c,0,x.e),g=J.aq(h.a),h=h.b,f=new A.hC(g,h);f.t();){e=f.c
 e=e>=0?new A.a_(h+e,g.gG()):A.ab(A.cA())
 d=e.a
@@ -2206,7 +2206,7 @@ p=w?17:15
 o=C.n.Y(s*q,12,p)
 n=new B.aNA(a1)
 p=x.p
-q=A.a([A.h3(0,new A.dx(!0,A.q2("assets/games/hub_scene.jpg",C.V,a0,new B.aNx(),!1,C.cF,C.wG,a0,D.bWI,a0),a0))],p)
+q=A.a([A.h3(0,new A.dx(!0,A.q2("assets/games/hub_scene.webp",C.V,a0,new B.aNx(),!1,C.cF,C.wG,a0,D.bWI,a0),a0))],p)
 for(m=$.chW(),l=this.c,k=x.O,j=this.a,i=0;i<10;++i){h=m[i]
 g=h.b
 C.e.O(q,A.a([n.$4(h.d,0.178,0.112,new A.q1(!0,new A.dx(!0,new B.arP(g.$0(),o,l,a0),a0),a0)),n.$4(h.c,0.178,0.29,new A.cn(new B.aNy(j,a4,h),C.hI,24,g.$0(),!1,!0,new A.N("hub_"+h.a,k)))],p))}m=$.h().a==="ar"?"\u0631\u062c\u0648\u0639":"Back"
@@ -2976,4 +2976,4 @@ return A.a([d1,v,d2,t,d3,s,q,r,o,m,u,p,l,j,k,n,i,f,g,d,e,h,a0,a2,a1,a3,a4,a6,a5,
 w($,"cJU","chV",()=>A.a([B.aNd("whack",new B.bUa(),"\ud83d\udc39",2,new B.bUb()),B.aNd("stars",new B.bUc(),"\u2b50",2,new B.bUd()),B.aNd("xo",new B.bUe(),"\u274c",4,new B.bUf()),B.aNd("snake",new B.bUg(),"\ud83d\udc0d",5,new B.bUh())],x.T))
 w($,"cJV","chW",()=>{var v=null,u=x.N
 return A.a([B.v8("brain",new B.bUi(),D.bwt,D.bwy,A.bH(["maze","sort_groups","treasure_hunt","next_in_day","snakes_ladders","connect_four","where_ball","pattern","fun_xo","fun_snake","fun_whack","fun_stars"],u),v),B.v8("letters",new B.bUj(),D.bwK,D.bx1,A.bH(["letters","letter_fishing","trace_letters","word_book","listen_letter","listen_word","review_words"],u),v),B.v8("numbers",new B.bUk(),D.bx5,D.bwV,A.bH(["math","numerals","compare","connect_dots","big_small"],u),v),B.v8("shapes",new B.bUo(),D.bvA,D.bu6,A.bH(["colors","shape_finder","jigsaw"],u),v),B.v8("animals",new B.bUp(),D.bws,D.bwv,A.bH(["animal","animal_habitats","feed_animal","listen_picture","balloons"],u),v),B.v8("observe",new B.bUq(),D.bwE,D.bxd,A.bH(["memory","match_pictures","odd_one_out"],u),v),B.v8("feelings",new B.bUr(),D.bwN,D.bx6,C.dL,new B.bUs()),B.v8("art",new B.bUt(),D.bwG,D.bw5,C.dL,new B.bUu()),B.v8("stories",new B.bUv(),D.bwL,D.bvT,C.dL,new B.bUl()),B.v8("adventures",new B.bUm(),D.bx7,D.bvV,C.dL,new B.bUn())],A.a5("x<acQ>"))})})()};
-(a=>{a["86hkeMBoFDm0yBFen0t0sukLQxc="]=a.current})($__dart_deferred_initializers__);
+(a=>{a["EdznCPEyYTr9Twt3PndgdUOqZJ8="]=a.current})($__dart_deferred_initializers__);
