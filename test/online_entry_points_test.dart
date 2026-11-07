@@ -27,12 +27,16 @@ void main() {
 
   group('static: the doors', () {
     test('only the known entry points open the teacher or family screens', () {
-      expect(users('TeachersEntryScreen('), ['lib/journey/ui/start_screen.dart', 'lib/parent_screens.dart', 'lib/teachers_screens.dart']);
-      expect(users('openFamily('), ['lib/family/family_entry.dart', 'lib/journey/ui/start_screen.dart', 'lib/parent_screens.dart']);
+      // lib/lazy_features.dart opens the teachers section (loaded on first use); start_screen and parent_screens go through it
+      expect(users('TeachersEntryScreen('), ['lib/lazy_features.dart', 'lib/teachers_screens.dart']);
+      expect(users('LazyTeachersEntry('), ['lib/journey/ui/start_screen.dart', 'lib/lazy_features.dart', 'lib/parent_screens.dart']);
+      expect(users('openFamily('), ['lib/family/family_entry.dart', 'lib/journey/ui/start_screen.dart', 'lib/lazy_features.dart', 'lib/parent_screens.dart']);
       expect(users('FamilyEntryScreen('), ['lib/family/family_entry.dart']);
       expect(users('RelativeHomeScreen('), ['lib/family/family_entry.dart', 'lib/family/family_screens.dart']); // family_screens.dart holds its class declaration
       expect(users('FamilyParentScreen('), ['lib/family/family_entry.dart', 'lib/family/family_screens.dart']);
       expect(users('ChildFamilyScreen('), ['lib/family/family_bubble.dart', 'lib/family/family_screens.dart']);
+      // the same libraries are loaded only on first use
+      expect(File('lib/lazy_features.dart').readAsStringSync(), allOf(contains("family_entry.dart' deferred as"), contains("teachers_screens.dart' deferred as"), contains("family_bubble.dart' deferred as")));
       expect(users('ParentTeachersScreen('), ['lib/teachers_parent.dart', 'lib/teachers_screens.dart']); // + its own declaration
       expect(users('TeacherHomeScreen('), ['lib/teachers_screens.dart', 'lib/teachers_teacher.dart']); // + its own declaration
       expect(users('AuthScreen('), ['lib/family/family_entry.dart', 'lib/teachers_screens.dart']);

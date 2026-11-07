@@ -315,7 +315,8 @@ void main() {
     expect(evaluateOnlineGate(firebaseConfigured: false, demoLogin: true).open, isFalse, reason: 'needs real config');
     expect(evaluateOnlineGate(firebaseConfigured: true).open, isFalse);
     final src = File('lib/firebase_config.dart').readAsStringSync();
-    expect(src, contains('if (!kDemoLogin) familyRepository = FirebaseFamilyRepository();'));
+    expect(src, contains('if (!kDemoLogin) {'));
+    expect(src, contains('familyRepository = family_firebase.FirebaseFamilyRepository();'));
     expect(demoNoticeText(login: true), isNot(contains('لا حسابات')));
     expect(demoNoticeText(login: true), contains('اختياري'));
   });

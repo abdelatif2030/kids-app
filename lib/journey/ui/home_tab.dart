@@ -1,5 +1,5 @@
 import '../../adaptive/recommendation_card.dart';
-import '../../family/family_bubble.dart';
+import '../../lazy_features.dart';
 import '../../notifications/notification_store.dart';
 import '../../notifications/notification_ui.dart';
 import 'picture_screens.dart';
@@ -134,7 +134,7 @@ class HomeTab extends StatelessWidget {
                         childId: child.id,
                         onRoute: childRouter(onTab: (i) => onTab?.call(i)),
                       ),
-                      if (more) FamilyBubbleButton(child: child),
+                      if (more) LazyFamilyBubble(child: child),
                       IconButton(
                         tooltip: context.tr('home.parent'),
                         onPressed: () => openParentArea(context),

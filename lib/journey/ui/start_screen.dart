@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart' show kReleaseMode;
 import '../../online_gate.dart';
-import '../../family/family_entry.dart';
+import '../../lazy_features.dart';
 import '../../firebase_config.dart';
 import '../avatars.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +9,6 @@ import '../../parent_screens.dart';
 import '../../parent_settings.dart';
 import '../../rest_screen.dart';
 import '../../session_manager.dart';
-import '../../teachers_screens.dart';
 import '../../l10n/app_locale.dart';
 import '../../l10n/language_screen.dart';
 import '../../l10n/strings.dart';
@@ -253,7 +252,7 @@ Widget _accountsDoor(BuildContext context) {
   return FilledButton.icon(
     key: const ValueKey('accounts_door'),
     style: FilledButton.styleFrom(minimumSize: const Size(260, 52), backgroundColor: Colors.white, foregroundColor: const Color(0xFF2D3A5C)),
-    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TeachersEntryScreen())),
+    onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LazyTeachersEntry())),
     icon: const Icon(Icons.g_mobiledata_rounded, size: 30),
     label: Text(tr2('تسجيل الدخول / حساب جديد (Google أو بريد)', 'Sign in / New account (Google or e-mail)'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
   );

@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('the web intro is the page splash alone: it stays at least a quarter of a second, then fades; no second picture, no Skip', () {
+  test('the web intro is the page splash alone: it stays only while the app loads (no fixed minimum), then fades; no second picture, no Skip', () {
     final js = File('web/splash.js').readAsStringSync();
-    expect(js, contains('MIN_MS = 250'));
+    expect(js, contains('MIN_MS = 0'));
     expect(js, contains('flutter-first-frame'));
     final intro = File('lib/design/app_intro.dart').readAsStringSync();
     expect(intro, contains('if (kIsWeb) return;'), reason: 'the Flutter intro layer is not shown on the web');

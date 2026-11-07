@@ -35,8 +35,7 @@ import 'plan_screen.dart';
 import 'journey/ui/day_settings_screen.dart';
 import 'print/printables_screen.dart';
 import 'summary_screen.dart';
-import 'teachers_screens.dart';
-import 'family/family_entry.dart';
+import 'lazy_features.dart';
 import 'content_flags.dart';
 import 'firebase_config.dart';
 
@@ -707,7 +706,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             subtitle: lastOnlineGate.open
                                 ? tr2('مدرسون يسجّلون بأنفسهم (لم يراجعهم التطبيق) وحجز حصص أونلاين', 'Teachers register themselves (the app has not vetted them); book online lessons')
                                 : tr2('ليس جزءاً من هذا الإصدار — يأتي لاحقاً', 'Not part of this version — planned for later'),
-                            onTap: () => _go(const TeachersEntryScreen()),
+                            onTap: () => _go(const LazyTeachersEntry()),
                           ),
                           if (YoutubeContent.enabled)
                           ParentRow(

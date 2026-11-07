@@ -38,15 +38,19 @@ import 'media/rehlaty_audio_engine.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await lockLandscape();
-  await initFirebase();
   DemoMode.applyPolicies(); // demo only: videos need a parent's approval
-  await JourneyStore.instance.load();
-  await DisplayPrefs.instance.load();
-  await AppLocale.instance.load();
-  await AudioPrefs.instance.load();
-  await EnginePrefs.instance.load();
+  // The start-up reads do not depend on each other, so they run together (the first screen waits for the slowest one
+  // only, not for the sum of all of them).
+  await Future.wait<void>([
+    initFirebase(),
+    JourneyStore.instance.load(),
+    DisplayPrefs.instance.load(),
+    AppLocale.instance.load(),
+    AudioPrefs.instance.load(),
+    EnginePrefs.instance.load(),
+    AppAudio.reloadManifest(),
+  ]);
   RehlatyAudioEngine.instance.attachGameCues();
-  await AppAudio.reloadManifest();
   WidgetsBinding.instance.addObserver(_AudioLifecycle());
   ConnectivityMonitor.instance.start();
   runApp(const KidsApp());

@@ -7,7 +7,7 @@ import 'firebase_options.dart';
 import 'firebase_repository.dart';
 import 'family/family_repository.dart';
 import 'family/memory_family_repository.dart';
-import 'family/firebase_family_repository.dart';
+import 'family/firebase_family_repository.dart' deferred as family_firebase;
 import 'teachers_models.dart';
 
 /// The online features are INTENDED ON for release 1 (owner decision), but they start only when the release gate in
@@ -39,7 +39,10 @@ Future<void> initFirebase() async {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform).timeout(firebaseStartTimeout);
     _repository = FirebaseTeacherRepository();
     // The hosted demo login opens accounts only: family chat, calls and voice messages stay off.
-    if (!kDemoLogin) familyRepository = FirebaseFamilyRepository();
+    if (!kDemoLogin) {
+      await family_firebase.loadLibrary();
+      familyRepository = family_firebase.FirebaseFamilyRepository();
+    }
   } catch (_) {
     _repository = null;
   }
