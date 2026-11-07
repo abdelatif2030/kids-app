@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -122,6 +123,14 @@ class _IntroVideoLayerState extends State<IntroVideoLayer> {
   /// The video is already playing (muted) and only the small sound button is shown.
   bool _mutedPlaying = false;
 
+  /// What happened to the video, shown only when the page address ends with #introdebug (to find out why a video does not start).
+  String _status = 'starting';
+  static bool get _debug => kIsWeb && Uri.base.fragment.contains('introdebug');
+  void _note(String s) {
+    if (!mounted) return;
+    setState(() => _status = '$_status > $s');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -156,16 +165,19 @@ class _IntroVideoLayerState extends State<IntroVideoLayer> {
         videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
       );
       _vc = c;
+      _note('initialising');
       await c.initialize().timeout(const Duration(seconds: 8));
       if (!mounted) return;
+      _note('ready ${c.value.size.width.toInt()}x${c.value.size.height.toInt()}');
       c.addListener(_tick);
       setState(() => _ready = true);
       await c.setLooping(false);
       await c.setVolume(1); // with its sound, always
       try {
         await c.play();
-      } catch (_) {
-        // refused: handled below
+        _note('play with sound ok');
+      } catch (e) {
+        _note('play with sound refused: $e');
       }
       // A browser may refuse sound before a tap (iPhone Safari always does). The video must still MOVE: play it muted
       // at once, and offer a sound button that restarts it with its sound.
@@ -176,7 +188,10 @@ class _IntroVideoLayerState extends State<IntroVideoLayer> {
           await c.setVolume(0);
           await c.play();
           await Future<void>.delayed(const Duration(milliseconds: 600));
-        } catch (_) {}
+          _note('muted play: ${c.value.isPlaying ? 'playing' : 'NOT playing'}');
+        } catch (e) {
+          _note('muted play failed: $e');
+        }
         if (!mounted || _ended || _failed) return;
         if (c.value.isPlaying) {
           _playing();
@@ -195,7 +210,8 @@ class _IntroVideoLayerState extends State<IntroVideoLayer> {
         return;
       }
       _playing();
-    } catch (_) {
+    } catch (e) {
+      _note('error: $e');
       _fail();
     }
   }
@@ -330,6 +346,13 @@ class _IntroVideoLayerState extends State<IntroVideoLayer> {
                     ),
                   ),
                 ),
+              ),
+            if (_debug)
+              PositionedDirectional(
+                top: 8,
+                start: 8,
+                end: 8,
+                child: SafeArea(child: ColoredBox(color: const Color(0xCC000000), child: Padding(padding: const EdgeInsets.all(6), child: Text(_status, style: const TextStyle(color: Colors.white, fontSize: 12))))),
               ),
             PositionedDirectional(
               bottom: 16,
