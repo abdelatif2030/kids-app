@@ -878,6 +878,9 @@ class HomeEntry extends StatefulWidget {
   final bool? autoEnter;
   const HomeEntry({super.key, this.autoEnter});
 
+  /// Tests of the start page itself set this to false (the app passes nothing and follows the demo switch).
+  static bool? autoEnterOverrideForTest;
+
   /// The nickname given to a child made from the sign-up (the parent can change it in the parent area).
   static String nicknameFor(String? gender) => gender == 'girl'
       ? tr2('بطلتنا', 'Our hero')
@@ -899,7 +902,7 @@ class _HomeEntryState extends State<HomeEntry> {
   }
 
   Future<void> _decide() async {
-    if (!(widget.autoEnter ?? DemoMode.enabled)) {
+    if (!(widget.autoEnter ?? HomeEntry.autoEnterOverrideForTest ?? DemoMode.enabled)) {
       _deciding = false;
       return;
     }

@@ -4,13 +4,11 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-import 'motion.dart';
-
 /// The first seconds of the app: the owner's picture (the same one the web page shows while it loads), then the owner's
 /// intro video (assets/branding/intro.mp4, about 5 s, bundled in the app, no download), then the app opens. The old logo
 /// animation made in code was removed (owner decision, 2026-11-06). If the video cannot play, the picture stays for
-/// [duration] and the app opens. A tap or the skip button opens the app at once. Shown once per run, never with reduced
-/// motion, and never under a test binding unless a test asks for it.
+/// [duration] and the app opens. A tap or the skip button opens the app at once. Shown once per run (also with
+/// reduced motion: it is a short video and skipping is one tap), and never under a test binding unless a test asks for it.
 class AppIntro extends StatefulWidget {
   final Widget child;
   const AppIntro({super.key, required this.child});
@@ -50,7 +48,8 @@ class _AppIntroState extends State<AppIntro> {
     final underTest = WidgetsBinding.instance.runtimeType.toString().contains(
       'Test',
     );
-    if (!(AppIntro.forceShow ?? !underTest) || motionReduced(context)) return;
+    // Not skipped for «reduced motion»: the owner's intro is a short video and the skip button is always there.
+    if (!(AppIntro.forceShow ?? !underTest)) return;
     AppIntro._shown = true;
     _done = false;
   }
@@ -123,9 +122,9 @@ class _IntroVideoLayerState extends State<IntroVideoLayer> {
   /// The video is already playing (muted) and only the small sound button is shown.
   bool _mutedPlaying = false;
 
-  /// What happened to the video, shown only when the page address ends with #introdebug (to find out why a video does not start).
+  /// What happened to the video, shown only when the page address has ?introdebug (to find out why a video does not start).
   String _status = 'starting';
-  static bool get _debug => kIsWeb && Uri.base.fragment.contains('introdebug');
+  static bool get _debug => kIsWeb && (Uri.base.queryParameters.containsKey('introdebug') || Uri.base.fragment.contains('introdebug'));
   void _note(String s) {
     if (!mounted) return;
     setState(() => _status = '$_status > $s');

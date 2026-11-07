@@ -5,6 +5,7 @@ import 'video_fixture.dart';
 import 'package:kids_app/data_reset.dart';
 import 'package:kids_app/demo/demo_mode.dart';
 import 'package:kids_app/journey/repository.dart';
+import 'package:kids_app/auth/auth_pictures.dart' show HomeEntry;
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/lessons/lesson_store.dart';
 import 'package:kids_app/main.dart' show KidsApp, Video, loadVideos;
@@ -224,6 +225,9 @@ void main() {
       t.view.physicalSize = const Size(1000, 900);
       t.view.devicePixelRatio = 1;
       addTearDown(t.view.reset);
+      // The start page (with the demo notice) is no longer the first page after sign-in; it still exists, so the test opens it.
+      HomeEntry.autoEnterOverrideForTest = false;
+      addTearDown(() => HomeEntry.autoEnterOverrideForTest = null);
       await t.pumpWidget(const KidsApp());
       await t.pump(const Duration(milliseconds: 600));
       TextDirection dir() => Directionality.of(t.element(find.byKey(const ValueKey('demo_banner'))));

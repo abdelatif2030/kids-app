@@ -110,15 +110,16 @@ void main() {
       expect(src.contains('_IntroSparkles'), isFalse);
     });
 
-    testWidgets('skipped under tests by default and with reduced motion: the app is simply there', (t) async {
+    testWidgets('skipped under tests by default; with reduced motion it is NOT skipped (owner decision: the intro always plays, skip is one tap)', (t) async {
       AppIntro.resetForTest();
       await t.pumpWidget(app(const AppIntro(child: Text('app'))));
       expect(find.text('app'), findsOneWidget);
       expect(find.byKey(const ValueKey('intro_video')), findsNothing);
       AppIntro.forceShow = true;
       AppIntro.resetForTest();
-      await t.pumpWidget(app(const AppIntro(child: Text('app2')), reduce: true));
-      expect(find.byKey(const ValueKey('intro_video')), findsNothing);
+      await t.pumpWidget(app(AppIntro(key: UniqueKey(), child: const Text('app2')), reduce: true));
+      await t.pump();
+      expect(find.byKey(const ValueKey('intro_video')), findsOneWidget);
     });
 
     testWidgets('shows the intro; if the video cannot play the picture stays 2 s and then the app opens; shown once per run', (t) async {
