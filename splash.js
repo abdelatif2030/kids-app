@@ -3,6 +3,21 @@
 // frame, but never earlier than one second after it appeared (or after 20 s at most), so a quick load still shows the logo for
 // a second, then the sign-in or the home page is already underneath.
 (function () {
+  // Start the big downloads at once, in parallel (the app would start them one after another): the app code and the
+  // drawing engine (the Chromium build for Chrome/Edge, the general one for Safari and Firefox).
+  var chromium = !!(window.Intl && Intl.v8BreakIterator);
+  function pre(href, as, cors) {
+    var l = document.createElement('link');
+    l.rel = 'preload';
+    l.href = href;
+    l.as = as;
+    if (cors) l.crossOrigin = 'anonymous';
+    document.head.appendChild(l);
+  }
+  pre('main.dart.js', 'script');
+  pre(chromium ? 'canvaskit/chromium/canvaskit.js' : 'canvaskit/canvaskit.js', 'script', true);
+  pre(chromium ? 'canvaskit/chromium/canvaskit.wasm' : 'canvaskit/canvaskit.wasm', 'fetch', true);
+
   var MIN_MS = 1000;
   var t0 = Date.now();
   function hide() {
