@@ -268,7 +268,8 @@ Future<void> _demoAdd(BuildContext context) async {
 Widget _demoBanner(BuildContext context) => DemoBanner(onReset: () => confirmAndResetDemo(context));
 
 /// Picking a child starts child mode: it checks the daily limit and quiet hours first.
-Future<void> enterChildMode(BuildContext context, ChildProfile child) async {
+/// With [untilLeft] the future completes only when the child's pages are closed again (the parent left child mode).
+Future<void> enterChildMode(BuildContext context, ChildProfile child, {bool untilLeft = false}) async {
   final session = SessionManager.instance;
   final blocked = await session.check();
   if (!context.mounted) return;
@@ -281,5 +282,6 @@ Future<void> enterChildMode(BuildContext context, ChildProfile child) async {
   }
   await session.start(child.age);
   if (!context.mounted) return;
-  Navigator.push(context, MaterialPageRoute(builder: (_) => ChildShell(child: child)));
+  final left = Navigator.push(context, MaterialPageRoute(builder: (_) => ChildShell(child: child)));
+  if (untilLeft) await left;
 }

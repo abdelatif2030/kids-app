@@ -43,67 +43,22 @@ void main() {
     await AppLocale.instance.set('ar');
   });
 
-  group('the intro video', () {
-    test(
-      'the video and its first frame are bundled and small enough for a phone',
-      () {
-        final v = File(AppIntro.videoAsset);
-        final p = File(AppIntro.posterAsset);
-        expect(v.existsSync() && p.existsSync(), isTrue);
-        expect(
-          v.lengthSync(),
-          lessThan(3 * 1024 * 1024),
-          reason: 'compressed: the owner file was 9.4 MB',
-        );
-        final pub = File('pubspec.yaml').readAsStringSync();
-        expect(pub, contains(AppIntro.videoAsset));
-        expect(pub, contains(AppIntro.posterAsset));
-        expect(pub, contains('video_player:'));
-        // an MP4 starts with an "ftyp" box
-        final head = v.openSync().readSync(12);
-        expect(String.fromCharCodes(head.sublist(4, 8)), 'ftyp');
-      },
-    );
+  group('the intro picture', () {
+    test('the picture is bundled and small enough for a phone', () {
+      final p = File(AppIntro.posterAsset);
+      expect(p.existsSync(), isTrue);
+      expect(p.lengthSync(), lessThan(1024 * 1024));
+      expect(File('pubspec.yaml').readAsStringSync(), contains(AppIntro.posterAsset));
+    });
 
-    testWidgets(
-      'if the video cannot play the app is not blocked: the code-made intro takes over and then the app opens',
-      (t) async {
-        AppIntro.forceShow = true;
-        AppIntro.resetForTest();
-        addTearDown(() {
-          AppIntro.forceShow = null;
-          AppIntro.resetForTest();
-        });
-        var failed = false;
-        await t.pumpWidget(
-          MaterialApp(
-            home: IntroVideoLayer(onDone: () {}, onFailed: () => failed = true),
-          ),
-        );
-        await t.runAsync(
-          () => Future<void>.delayed(const Duration(milliseconds: 300)),
-        );
-        await t.pump(const Duration(milliseconds: 300));
-        expect(
-          failed,
-          isTrue,
-          reason: 'there is no video player under the test binding: it must report the failure, not hang',
-        );
-        await t.pumpWidget(const SizedBox());
-      },
-    );
-
-    testWidgets('the skip button and a tap call onDone', (t) async {
+    testWidgets('a tap and the skip button call onDone', (t) async {
       var done = 0;
-      await t.pumpWidget(
-        MaterialApp(
-          home: IntroVideoLayer(onDone: () => done++, onFailed: () {}),
-        ),
-      );
+      await t.pumpWidget(MaterialApp(home: IntroPictureLayer(onDone: () => done++)));
       await t.pump();
       await t.tap(find.byKey(const ValueKey('intro_skip')));
       expect(done, 1);
-      await t.pumpWidget(const SizedBox());
+      await t.tapAt(const Offset(40, 40));
+      expect(done, 2);
     });
   });
 

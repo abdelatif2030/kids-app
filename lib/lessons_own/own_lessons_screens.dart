@@ -310,6 +310,7 @@ class _OwnLessonPlayerState extends State<OwnLessonPlayer> {
   bool _failed = false;
   bool _closing = false;
   bool _rewarded = false;
+  Timer? _next; // the next lesson starts by itself a moment after one ends
   final _played = Stopwatch(); // time the video was really playing (not dragged)
   final _session = SessionManager.instance;
 
@@ -325,6 +326,8 @@ class _OwnLessonPlayerState extends State<OwnLessonPlayer> {
   Future<void> _open() async {
     final old = _c;
     _rewarded = false;
+    _next?.cancel();
+    _next = null;
     _played
       ..stop()
       ..reset();
@@ -365,6 +368,14 @@ class _OwnLessonPlayerState extends State<OwnLessonPlayer> {
       _rewarded = true;
       _earn();
     }
+    final ended = v != null && v.isInitialized && v.duration > Duration.zero && v.position >= v.duration && !v.isPlaying;
+    if (ended && _next == null && _i < widget.playlist.length - 1 && _session.reason.value == null) {
+      // the lesson reached its end: the next one plays by itself (never when the daily time is up)
+      _next = Timer(const Duration(milliseconds: 1500), () {
+        _next = null;
+        if (mounted && _session.reason.value == null && !_closing) _go(1);
+      });
+    }
     if (v != null && v.hasError) setState(() => _failed = true);
     if (_session.reason.value != null && v != null && !v.isPlaying) _timeUp();
   }
@@ -389,6 +400,7 @@ class _OwnLessonPlayerState extends State<OwnLessonPlayer> {
 
   @override
   void dispose() {
+    _next?.cancel();
     _session.reason.removeListener(_timeUp);
     _c?.removeListener(_tick);
     _c?.dispose();

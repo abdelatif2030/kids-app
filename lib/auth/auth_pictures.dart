@@ -9,6 +9,7 @@ import '../journey/models.dart';
 import '../journey/repository.dart';
 
 import '../design/focusable_tap.dart';
+import '../design/picture_stage.dart' show PictureStage;
 import 'auth_shell.dart';
 import '../firebase_config.dart';
 import '../journey/ui/start_screen.dart';
@@ -894,6 +895,7 @@ class HomeEntry extends StatefulWidget {
 
 class _HomeEntryState extends State<HomeEntry> {
   bool _deciding = true;
+  bool _idle = false;
 
   @override
   void initState() {
@@ -939,23 +941,47 @@ class _HomeEntryState extends State<HomeEntry> {
     // The intro video plays first: a page pushed now would cover it.
     await AppIntro.whenFinished();
     if (!mounted) return;
-    await enterChildMode(context, child);
-    // Leaving child mode (with the parent's PIN) comes back here: show the normal start page.
-    if (mounted) setState(() => _deciding = false);
+    final started = DateTime.now();
+    await enterChildMode(context, child, untilLeft: true);
+    if (!mounted) return;
+    // Leaving child mode (with the parent's PIN) comes back here. In the demo the old start page does not exist any more:
+    // the child's home simply opens again. Outside the demo (Release 1) the normal start page is shown.
+    if (widget.autoEnter ?? HomeEntry.autoEnterOverrideForTest ?? DemoMode.enabled) {
+      if (DateTime.now().difference(started) > const Duration(seconds: 1)) {
+        // The child's pages were open and are closed now: open the home again.
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+        if (mounted) unawaited(_decide());
+      } else {
+        // Came back at once (for example the daily limit's rest page): wait for a tap instead of looping.
+        setState(() => _idle = true);
+      }
+    } else {
+      setState(() => _deciding = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     if (_deciding) {
-      // The same picture as the intro, so nothing flashes between the sign-in page and the home page.
+      // Nothing of the old pages shows between the sign-in and the child's home: a calm gradient, then the home fades in.
       return Scaffold(
         key: const ValueKey('home_entry_wait'),
-        body: SizedBox.expand(
-          child: Image.asset(
-            AppIntro.posterAsset,
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) =>
-                const ColoredBox(color: Color(0xFF58A8F2)),
+        body: DecoratedBox(
+          decoration: PictureStage.backdrop,
+          child: SizedBox.expand(
+            child: _idle
+                ? Center(
+                    child: FilledButton.icon(
+                      key: const ValueKey('home_entry_again'),
+                      onPressed: () {
+                        setState(() => _idle = false);
+                        _decide();
+                      },
+                      icon: const Icon(Icons.home_rounded),
+                      label: Text(tr2('الصفحة الرئيسية', 'Home')),
+                    ),
+                  )
+                : null,
           ),
         ),
       );
