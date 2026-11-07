@@ -11,5 +11,7 @@ void main() {
     expect(intro, contains('if (kIsWeb) return;'), reason: 'the Flutter intro layer is not shown on the web');
     final html = File('web/index.html').readAsStringSync();
     expect(html, contains('id="splash"'));
+    expect(html, contains('name="viewport"'), reason: 'without it a phone lays the page out 980 px wide and the picture jumps once when the app adds the tag');
+    expect(js, contains("pre('main.dart.js', 'script')"), reason: 'the big downloads start together');
   });
 }

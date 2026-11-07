@@ -17,6 +17,9 @@
   <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
+  <!-- Without this tag a phone first lays the page out 980 px wide and jumps when the app adds the tag itself after loading (the picture "shook" once). -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <link rel="preload" as="image" href="splash.jpg">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="رحلتي | Rehlaty: تعلّم آمن وممتع للأطفال بالعربية والإنجليزية. A safe, friendly learning journey for children.">
 
