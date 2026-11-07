@@ -12,7 +12,6 @@ import 'package:kids_app/journey/ui/picture_screens.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/lessons_own/own_lessons_screens.dart';
 import 'package:kids_app/main.dart' show VideoListScreen;
-import 'package:kids_app/journey/ui/land_map_screen.dart';
 import 'package:kids_app/stories/story_screens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -172,13 +171,13 @@ void main() {
     });
   });
 
-  group('my lessons (دروسي)', () {
-    testWidgets('ten tiles inside the picture, none overlapping, and every tile opens the right place', (t) async {
+  group('learn and discover (the five-tile picture)', () {
+    testWidgets('five tiles inside the picture, none overlapping; nothing else is on it', (t) async {
       _size(t, const Size(1672, 941));
       await _setup(t);
       await _show(t, const LessonsPictureScreen(child: _kid));
       final box = t.getRect(find.byKey(const ValueKey('picture_stage_box')));
-      const ids = ['stories', 'quran', 'deen', 'math', 'english', 'calm', 'songs', 'art', 'puzzles', 'drawing'];
+      const ids = ['quran', 'speech', 'songs', 'drawing', 'math'];
       final rects = {for (final id in ids) id: t.getRect(find.byKey(ValueKey('lesson_$id')))};
       for (final e in rects.entries) {
         expect(box.contains(e.value.topLeft) && box.contains(e.value.bottomRight), isTrue, reason: e.key);
@@ -188,46 +187,34 @@ void main() {
           if (a.compareTo(b) < 0) expect(_overlap(rects[a]!, rects[b]!), isFalse, reason: '$a vs $b');
         }
       }
+      expect(find.byKey(const ValueKey('lessons_videos')), findsNothing, reason: 'no orange button: only the tiles of the picture');
+      expect(find.byKey(const ValueKey('lessons_more')), findsNothing);
+    });
 
+    testWidgets('quran and drawing are empty pages; speech, songs and maths open the owner\'s lesson videos on their category', (t) async {
+      _size(t, const Size(1672, 941));
+      await _setup(t);
+      await _show(t, const LessonsPictureScreen(child: _kid));
       Future<void> open(String id) async {
         await t.tap(find.byKey(ValueKey('lesson_$id')));
         await _settle(t);
       }
 
-      // Every slot is an EMPTY page for now (educational videos will be added later): nothing else opens from a slot.
-      for (final id in ids) {
+      for (final id in ['quran', 'drawing']) {
         await open(id);
         expect(find.byKey(const ValueKey('coming_soon')), findsOneWidget, reason: id);
-        expect(find.text('هنا ستظهر الفيديوهات التعليمية قريباً.'), findsOneWidget, reason: id);
-        expect(find.byType(VideoListScreen), findsNothing, reason: id);
         expect(find.byType(OwnLessonsScreen), findsNothing, reason: id);
-        expect(find.byType(LandMapScreen), findsNothing, reason: id);
-        expect(find.byType(DrawingScreen), findsNothing, reason: id);
         await t.pageBack();
         await _settle(t);
       }
-    });
-
-    testWidgets('the orange «دروس الفيديو» button opens the owner\'s own lesson videos for this child', (t) async {
-      _size(t, const Size(1672, 941));
-      await _setup(t);
-      await _show(t, const LessonsPictureScreen(child: _kid));
-      final box = t.getRect(find.byKey(const ValueKey('picture_stage_box')));
-      final pill = t.getRect(find.byKey(const ValueKey('lessons_videos')));
-      expect(box.contains(pill.topLeft) && box.contains(pill.bottomRight), isTrue);
-      await t.tap(find.byKey(const ValueKey('lessons_videos')));
-      await _settle(t);
-      expect(t.widget<OwnLessonsScreen>(find.byType(OwnLessonsScreen)).child.id, 'k1');
-    });
-
-    testWidgets('«كل الدروس والمزيد» keeps the other subjects, letters, lands and words reachable', (t) async {
-      _size(t, const Size(1672, 941));
-      await _setup(t);
-      await _show(t, const LessonsPictureScreen(child: _kid));
-      await t.tap(find.byKey(const ValueKey('lessons_more')));
-      await _settle(t);
-      expect(find.byKey(const ValueKey('hub_words')), findsOneWidget, reason: 'the older hub: letters, lands and words');
-      expect(find.byKey(const ValueKey('hub_lessons')), findsNothing, reason: 'its video lessons tile is gone with the YouTube content');
+      for (final (id, cat) in const [('speech', 'words'), ('songs', 'general'), ('math', 'letters_numbers')]) {
+        await open(id);
+        final screen = t.widget<OwnLessonsScreen>(find.byType(OwnLessonsScreen));
+        expect(screen.child.id, 'k1', reason: id);
+        expect(screen.category, cat, reason: id);
+        await t.pageBack();
+        await _settle(t);
+      }
     });
   });
 

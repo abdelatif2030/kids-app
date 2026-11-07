@@ -10,7 +10,6 @@ import '../../parent_screens.dart';
 import '../avatars.dart';
 import '../models.dart';
 import '../../lessons_own/own_lessons_screens.dart';
-import 'home_hubs.dart';
 
 // The owner's own pictures, each used whole with invisible buttons on top (see PictureStage). The numbers below are
 // where things sit on each 1672 x 941 picture, as fractions of its width and height.
@@ -251,20 +250,16 @@ Widget _slot(String title) => ComingSoonScreen(
     );
 
 final List<_LessonTile> _lessonTiles = [
-  _LessonTile('stories', const Offset(0.163, 0.475), const Offset(0.163, 0.553), () => tr2('قصص', 'Stories'), (_, c) => _slot(tr2('قصص', 'Stories'))),
-  _LessonTile('quran', const Offset(0.329, 0.475), const Offset(0.329, 0.553), () => tr2('قرآن', 'Quran'), (_, c) => _slot(tr2('قرآن', 'Quran'))),
-  _LessonTile('deen', const Offset(0.493, 0.475), const Offset(0.493, 0.553), () => tr2('دين', 'Religion'), (_, c) => _slot(tr2('دين', 'Religion'))),
-  _LessonTile('math', const Offset(0.667, 0.475), const Offset(0.667, 0.553), () => tr2('رياضيات', 'Maths'), (_, c) => _slot(tr2('رياضيات', 'Maths'))),
-  _LessonTile('english', const Offset(0.843, 0.475), const Offset(0.843, 0.553), () => tr2('إنجليزي', 'English'), (_, c) => _slot(tr2('إنجليزي', 'English'))),
-  _LessonTile('calm', const Offset(0.164, 0.76), const Offset(0.164, 0.82), () => tr2('هدوء ونوم', 'Calm & sleep'), (_, c) => _slot(tr2('هدوء ونوم', 'Calm & sleep'))),
-  _LessonTile('songs', const Offset(0.332, 0.76), const Offset(0.332, 0.82), () => tr2('أناشيد', 'Songs'), (_, c) => _slot(tr2('أناشيد', 'Songs'))),
-  _LessonTile('art', const Offset(0.505, 0.76), const Offset(0.505, 0.82), () => tr2('فني', 'Art'), (_, c) => _slot(tr2('فني', 'Art'))),
-  _LessonTile('puzzles', const Offset(0.676, 0.76), const Offset(0.676, 0.82), () => tr2('ألغاز', 'Puzzles'), (_, c) => _slot(tr2('ألغاز', 'Puzzles'))),
-  _LessonTile('drawing', const Offset(0.849, 0.76), const Offset(0.849, 0.82), () => tr2('رسم', 'Drawing'), (_, c) => _slot(tr2('رسم', 'Drawing'))),
+  // The five tiles of the owner's picture (2026-11-07). Quran and drawing are empty pages for now; the others open the owner's
+  // own lesson videos on the matching category (the other categories are one tap away on the «الكل» tab).
+  _LessonTile('quran', const Offset(0.114, 0.65), const Offset(0.114, 0.707), () => tr2('القرآن الكريم', 'The Holy Quran'), (_, c) => _slot(tr2('القرآن الكريم', 'The Holy Quran'))),
+  _LessonTile('speech', const Offset(0.311, 0.65), const Offset(0.311, 0.707), () => tr2('تعليم النطق', 'Learning to speak'), (_, c) => OwnLessonsScreen(child: c, category: 'words')),
+  _LessonTile('songs', const Offset(0.502, 0.65), const Offset(0.502, 0.707), () => tr2('أناشيد', 'Songs'), (_, c) => OwnLessonsScreen(child: c, category: 'general')),
+  _LessonTile('drawing', const Offset(0.697, 0.65), const Offset(0.697, 0.707), () => tr2('الرسم', 'Drawing'), (_, c) => _slot(tr2('الرسم', 'Drawing'))),
+  _LessonTile('math', const Offset(0.891, 0.65), const Offset(0.891, 0.707), () => tr2('الرياضيات', 'Maths'), (_, c) => OwnLessonsScreen(child: c, category: 'letters_numbers')),
 ];
 
-/// «دروسي»: the owner's picture with ten tiles. «كل الدروس والمزيد» (a small real button, not in the picture) opens the
-/// older hub with the letters, the learning lands and the words, so nothing becomes unreachable.
+/// «تعلم واكتشف»: the owner's picture with its five tiles and nothing else on it (owner decision, 2026-11-07).
 class LessonsPictureScreen extends StatelessWidget {
   final ChildProfile child;
   const LessonsPictureScreen({super.key, required this.child});
@@ -282,64 +277,12 @@ class LessonsPictureScreen extends StatelessWidget {
           aspect: kScreenPictureAspect,
           portraitHint: _rotateHint(),
           showLabels: !ar,
-          labels: [for (final t in _lessonTiles) PictureNameLabel(t.name, 0.14, 0.075, t.title())],
+          labels: [for (final t in _lessonTiles) PictureNameLabel(t.name, 0.17, 0.07, t.title())],
           spots: [
-            _back(context),
+            // the round arrow painted in the picture
+            PictureSpot('back', const Offset(0.057, 0.09), 0.085, 0.15, tr2('رجوع', 'Back'), () => Navigator.maybePop(context), radius: 44, key: const ValueKey('picture_back')),
             for (final t in _lessonTiles)
-              PictureSpot(t.id, t.center, 0.15, 0.27, t.title(), () => Navigator.push(context, MaterialPageRoute<void>(builder: (c) => t.open(c, child))), key: ValueKey('lesson_${t.id}')),
-          ],
-          overlays: (w, h) => [
-            // The owner's own lesson videos: the main thing to open from «تعلم واكتشف».
-            Positioned(
-              left: 0,
-              right: 0,
-              top: h * 0.075,
-              child: Center(
-                child: FocusableTap(
-                  key: const ValueKey('lessons_videos'),
-                  radius: 34,
-                  semanticLabel: tr2('دروس الفيديو', 'Video lessons'),
-                  onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => OwnLessonsScreen(child: child))),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: w * 0.03, vertical: h * 0.016),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [Color(0xFFFFB347), Color(0xFFFF7A1A)]),
-                      borderRadius: BorderRadius.circular(60),
-                      border: Border.all(color: Colors.white, width: 3),
-                      boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 8, offset: Offset(0, 4))],
-                    ),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(Icons.play_circle_fill_rounded, color: Colors.white, size: (w * 0.03).clamp(22.0, 40.0)),
-                      const SizedBox(width: 8),
-                      Text(tr2('دروس الفيديو', 'Video lessons'), style: TextStyle(fontFamily: 'Tajawal', fontSize: (w * 0.022).clamp(15.0, 28.0), fontWeight: FontWeight.w900, color: Colors.white)),
-                    ]),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: h * 0.012,
-              child: Center(
-                child: FocusableTap(
-                  key: const ValueKey('lessons_more'),
-                  radius: 22,
-                  semanticLabel: tr2('كل الدروس والمزيد', 'All lessons and more'),
-                  onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => LearnHubScreen(child: child))),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: w * 0.02, vertical: h * 0.012),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [Color(0xFF8A52E8), Color(0xFF5B2BB8)]),
-                      borderRadius: BorderRadius.circular(40),
-                      border: Border.all(color: Colors.white, width: 2),
-                      boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 4, offset: Offset(0, 2))],
-                    ),
-                    child: Text(tr2('كل الدروس والمزيد', 'All lessons and more'), style: TextStyle(fontFamily: 'Tajawal', fontSize: (w * 0.019).clamp(12.0, 18.0), fontWeight: FontWeight.w900, color: Colors.white)),
-                  ),
-                ),
-              ),
-            ),
+              PictureSpot(t.id, t.center, 0.19, 0.40, t.title(), () => Navigator.push(context, MaterialPageRoute<void>(builder: (c) => t.open(c, child))), radius: 36, key: ValueKey('lesson_${t.id}')),
           ],
         ),
       ),
