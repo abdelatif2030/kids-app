@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 /// The first seconds of the app: only the app's picture (the children and the "رحلتي Rehlaty" sign, the same one the web page
@@ -59,6 +60,8 @@ class _AppIntroState extends State<AppIntro> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_done || AppIntro._shown) return;
+    // On the web the page's own splash picture (web/splash.js) is the intro: showing a second one made the screen flicker.
+    if (kIsWeb) return;
     final underTest = WidgetsBinding.instance.runtimeType.toString().contains('Test');
     if (!(AppIntro.forceShow ?? !underTest)) return;
     AppIntro._shown = true;
