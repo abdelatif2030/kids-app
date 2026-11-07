@@ -58,9 +58,11 @@ Future<void> openGames(WidgetTester t, Size size, {String lang = 'ar'}) async {
   await t.pump();
   await t.tap(find.byKey(const ValueKey('nav_tab.games')));
   await t.pump();
+  await t.pump(const Duration(milliseconds: 50)); // the games part is loaded when the tab opens
   // The Games tab starts with two cards; the ten-island hub is behind «ألعاب تعليمية».
   await t.tap(find.byKey(const ValueKey('choice_educational')));
   await t.pump();
+  await t.pump(const Duration(milliseconds: 50));
   await t.pump(const Duration(milliseconds: 400));
 }
 

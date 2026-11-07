@@ -622,7 +622,7 @@ void main() {
           isFalse,
         );
         final html = File('web/index.html').readAsStringSync();
-        expect(html, contains('splash.jpg'));
+        expect(html, contains('splash.webp'));
         expect(
           File('web/splash.js').readAsStringSync(),
           contains('flutter-first-frame'),

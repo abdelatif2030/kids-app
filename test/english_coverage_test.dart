@@ -29,6 +29,7 @@ import 'package:kids_app/math_game.dart';
 import 'package:kids_app/memory_game.dart';
 import 'package:kids_app/notes_screen.dart';
 import 'package:kids_app/parent_screens.dart';
+import 'package:kids_app/parent_settings_screen.dart';
 import 'package:kids_app/plan_screen.dart';
 import 'package:kids_app/rest_screen.dart';
 import 'package:kids_app/session_manager.dart';

@@ -176,6 +176,7 @@ void main() {
       expect(reached, isTrue, reason: 'the games tab never got keyboard focus');
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await _settle(tester);
+      await _settle(tester); // the games part is loaded when the tab opens
       expect(find.byKey(const ValueKey('choice_educational')), findsOneWidget); // games tab: the two cards
     });
 

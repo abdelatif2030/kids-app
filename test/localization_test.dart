@@ -5,6 +5,7 @@ import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/l10n/language_screen.dart';
 import 'package:kids_app/l10n/strings.dart';
 import 'package:kids_app/parent_screens.dart';
+import 'package:kids_app/parent_settings_screen.dart';
 import 'package:kids_app/journey/repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

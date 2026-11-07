@@ -370,6 +370,7 @@ void main() {
       await openShell(tester);
       await tester.tap(find.text('ألعاب').last);
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50)); // the games part is loaded when the tab opens
       expect(find.byKey(const ValueKey('choice_educational')), findsOneWidget); // games tab: the two cards
 
       await tester.tap(find.text('إبداع').last);

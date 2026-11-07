@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import '../../design/layout.dart';
 import '../../design/motion_system.dart';
 import '../../design/tokens.dart';
-import '../../games/games_choice.dart';
-import '../../games/games_hub.dart';
+import '../../lazy_features.dart';
 import '../../l10n/strings.dart';
 import '../../offline/offline_ui.dart';
 import '../../parent_screens.dart';
@@ -332,16 +331,14 @@ class _GamesTabState extends State<_GamesTab> {
   @override
   Widget build(BuildContext context) {
     if (!_learning) {
-      return GamesChoiceScreen(
-        key: const ValueKey('games_choice_page'),
+      return LazyGamesChoice(
         onBack: widget.onBack,
         onEducational: () => setState(() => _learning = true),
-        onFun: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const FunGamesScreen())),
+        onFun: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const LazyFunGames())),
       );
     }
     // The learning games hub: ten islands (letters, numbers, shapes...), each opening its own games. It fills the whole area.
-    return GamesHub(
-      key: const ValueKey('games_hub'),
+    return LazyGamesHub(
       child: widget.child,
       onBack: () => setState(() => _learning = false),
     );

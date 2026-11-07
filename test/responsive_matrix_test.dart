@@ -12,6 +12,7 @@ import 'package:kids_app/journey/ui/library_screen.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/main.dart' show AppScrollBehavior;
 import 'package:kids_app/parent_screens.dart';
+import 'package:kids_app/parent_settings_screen.dart';
 import 'package:kids_app/print/printables_screen.dart';
 import 'package:kids_app/teachers_models.dart';
 import 'package:kids_app/teachers_parent.dart';

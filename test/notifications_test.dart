@@ -13,6 +13,7 @@ import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/notifications/notification_store.dart';
 import 'package:kids_app/notifications/notification_ui.dart';
 import 'package:kids_app/parent_screens.dart';
+import 'package:kids_app/parent_settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const _kid = ChildProfile(id: 'k1', nickname: 'Lina', age: 5);
