@@ -50,6 +50,7 @@ Future<void> deleteChildData() async {
         key == 'favorites' ||
         key == 'video_hidden_child' ||
         key == 'game_completions' ||
+        key == 'video_completions' ||
         key == 'wordbook_seen' ||
         key == 'family_prefs' ||
         key == 'family_seen' ||
@@ -104,6 +105,8 @@ Future<void> deleteOneChild(String childId) async {
   await filterList('family_gallery', (e) => e['c'] != childId);
   await dropKey('story_state');
   await dropKey('literacy_state');
+  await dropKey('video_completions');
+  await dropKey('game_completions');
   await ChildPhotoStore.delete(childId);
   await ResumeStore.forget(childId);
   await FeelingStore.forget(childId);

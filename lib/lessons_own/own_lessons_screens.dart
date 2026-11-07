@@ -10,6 +10,7 @@ import '../l10n/strings.dart';
 import '../rest_screen.dart';
 import '../session_manager.dart';
 import 'own_lessons.dart';
+import 'video_rewards.dart';
 
 const _ink = Color(0xFF3A2A6E);
 const _purple = Color(0xFF5B2BB8);
@@ -64,7 +65,7 @@ class _OwnLessonsScreenState extends State<OwnLessonsScreen> {
       });
 
   Future<void> _play(List<OwnLesson> list, int index) async {
-    await Navigator.push<void>(context, MaterialPageRoute<void>(builder: (_) => OwnLessonPlayer(playlist: list, index: index)));
+    await Navigator.push<void>(context, MaterialPageRoute<void>(builder: (_) => OwnLessonPlayer(playlist: list, index: index, childId: widget.child.id)));
     if (mounted) _checkRest();
   }
 
@@ -295,7 +296,9 @@ class _Message extends StatelessWidget {
 class OwnLessonPlayer extends StatefulWidget {
   final List<OwnLesson> playlist;
   final int index;
-  const OwnLessonPlayer({super.key, required this.playlist, required this.index});
+  /// The child watching: a video watched to the end earns one star, once.
+  final String? childId;
+  const OwnLessonPlayer({super.key, required this.playlist, required this.index, this.childId});
 
   @override
   State<OwnLessonPlayer> createState() => _OwnLessonPlayerState();
@@ -306,6 +309,8 @@ class _OwnLessonPlayerState extends State<OwnLessonPlayer> {
   late int _i = widget.index;
   bool _failed = false;
   bool _closing = false;
+  bool _rewarded = false;
+  final _played = Stopwatch(); // time the video was really playing (not dragged)
   final _session = SessionManager.instance;
 
   OwnLesson get _lesson => widget.playlist[_i];
@@ -319,6 +324,10 @@ class _OwnLessonPlayerState extends State<OwnLessonPlayer> {
 
   Future<void> _open() async {
     final old = _c;
+    _rewarded = false;
+    _played
+      ..stop()
+      ..reset();
     setState(() {
       _c = null;
       _failed = false;
@@ -347,8 +356,26 @@ class _OwnLessonPlayerState extends State<OwnLessonPlayer> {
     if (!mounted) return;
     setState(() {});
     final v = _c?.value;
+    if (v != null && v.isPlaying) {
+      if (!_played.isRunning) _played.start();
+    } else if (_played.isRunning) {
+      _played.stop();
+    }
+    if (v != null && !_rewarded && widget.childId != null && v.isInitialized && v.duration > Duration.zero && v.position >= v.duration && videoWatchedEnough(played: _played.elapsed, length: v.duration)) {
+      _rewarded = true;
+      _earn();
+    }
     if (v != null && v.hasError) setState(() => _failed = true);
     if (_session.reason.value != null && v != null && !v.isPlaying) _timeUp();
+  }
+
+  Future<void> _earn() async {
+    final first = await VideoRewards.complete(widget.childId!, _lesson.id);
+    if (first && mounted) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(key: const ValueKey('video_star'), content: Text(tr2('برافو! شاهدت الدرس كاملاً وكسبت نجمة ⭐', 'Well done! You watched the whole lesson and earned a star ⭐'))));
+    }
   }
 
   /// Time is up: a playing video finishes first; once it is paused or has ended the player closes.

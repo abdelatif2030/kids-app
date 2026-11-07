@@ -72,6 +72,26 @@ class NotificationEvents {
     ),
   );
 
+  /// A lesson video was watched to the end for the first time (the star is earned only once).
+  static Future<void> videoStarEarned(
+    String childId,
+    String lessonId, {
+    DateTime? now,
+  }) => NotificationStore.instance.add(
+    AppNotification(
+      id: 'video_${childId}_$lessonId',
+      audience: NotificationAudience.child,
+      childId: childId,
+      kind: NotificationKind.reward,
+      titleAr: 'نجمة جديدة!',
+      titleEn: 'A new star!',
+      bodyAr: 'شاهدت درساً كاملاً وكسبت نجمة.',
+      bodyEn: 'You watched a whole lesson and earned a star.',
+      at: now ?? DateTime.now(),
+      route: 'tab:3',
+    ),
+  );
+
   /// Called when the child's home opens: today's plan is ready (once a day) and, for the parent, the weekly summary
   /// (once a week, only when something was really done in the last 7 days).
   static Future<void> refresh(ChildProfile child, {DateTime? now}) async {
