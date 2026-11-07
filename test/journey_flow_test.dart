@@ -380,10 +380,11 @@ void main() {
       await tester.tap(find.text('أنا').last);
       await tester.pump();
       expect(find.text('سلمى'), findsOneWidget);
-      expect(find.textContaining('المستوى 1'), findsOneWidget);
-      expect(find.text('هدف اليوم'), findsOneWidget);
-      expect(find.text('هدف الأسبوع'), findsOneWidget);
-      expect(find.text('شاراتي'), findsOneWidget);
+      expect(find.byKey(const ValueKey('me_list')), findsOneWidget);
+      // the page is simple now: no level, goals or badges
+      for (final gone in ['هدف اليوم', 'هدف الأسبوع', 'شاراتي', 'أراضيّ', 'شخصيتي']) {
+        expect(find.text(gone), findsNothing, reason: gone);
+      }
 
       await tester.tap(find.text('المزيد').last);
       await tester.pump();
@@ -404,45 +405,6 @@ void main() {
       await tester.pump();
       expect(find.text('كمّل رحلتي'), findsOneWidget);
       expect(find.byKey(const ValueKey('island_games')), findsNothing);
-    });
-
-    testWidgets('accessories unlock with stars and can be worn', (tester) async {
-      // 6 level-completions with 3 stars = 18 stars: hat (5) and glasses (12) are open, the bow (22) is not.
-      await openShell(tester, attempts: [
-        for (final id in ['letters_1', 'letters_2', 'letters_3', 'numbers_1', 'numbers_2', 'colors_1']) _done(id),
-      ]);
-      await tester.tap(find.text('أنا').last);
-      await tester.pump();
-      expect(find.text('قبعة'), findsOneWidget);
-      expect(find.text('نظارة'), findsOneWidget);
-      expect(find.text('22 ⭐'), findsOneWidget); // locked: shows what it needs
-
-      await tester.tap(find.text('قبعة'));
-      await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 200)));
-      await tester.pump();
-      expect(JourneyStore.instance.profileById('kid1')!.accessory, 'hat');
-
-      await tester.tap(find.text('22 ⭐')); // locked: nothing changes
-      await tester.pump();
-      expect(JourneyStore.instance.profileById('kid1')!.accessory, 'hat');
-
-      await tester.tap(find.text('بدون'));
-      await tester.runAsync(() => Future.delayed(const Duration(milliseconds: 200)));
-      await tester.pump();
-      expect(JourneyStore.instance.profileById('kid1')!.accessory, isNull);
-    });
-
-    testWidgets('earned badges, goals and per-land stars are shown', (tester) async {
-      await openShell(tester, attempts: [_done('letters_1'), _done('letters_2'), _done('letters_3')]);
-      await tester.tap(find.text('أنا').last);
-      await tester.pump();
-      expect(find.text('نجم الحروف'), findsOneWidget);
-      expect(find.text('الخطوة الأولى'), findsOneWidget);
-      expect(find.text('3/3'), findsOneWidget); // today's goal: three activities done today
-      expect(find.text('3/10'), findsOneWidget); // this week's goal: 3 of 10
-      expect(find.text('3/5'), findsOneWidget); // letters: three of five levels
-      expect(find.text('9 ⭐'), findsOneWidget); // ... with nine stars
-      expect(find.text('المستوى 2 · 105 نقطة خبرة'), findsOneWidget); // 9 stars * 10 + 3 * 5
     });
 
     testWidgets('leaving needs the parent PIN when one is set', (tester) async {
