@@ -1,0 +1,11 @@
+# Serves the Rehlaty web build from /srv/rehlaty with automatic HTTPS (Caddy gets and renews the certificate itself).
+# DOMAIN comes from the environment (see SETUP.md); the site files are pre-compressed with brotli level 11 by deploy.sh,
+# which is smaller than what a CDN compresses on the fly.
+{$DOMAIN} {
+	root * /srv/rehlaty
+	encode zstd gzip
+	file_server {
+		precompressed br gzip
+	}
+	import /etc/caddy/headers.caddy
+}
