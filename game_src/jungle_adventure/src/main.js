@@ -104,6 +104,12 @@ class Game {
 
   _bind() {
     const root = this.root;
+
+    // Phones only allow sound to start from a finished tap (finger lifted) or a key press — not from the moment a
+    // finger touches the screen. Try on every one of these until the sound is running.
+    for (const ev of ['pointerup', 'touchend', 'click', 'keydown']) {
+      root.addEventListener(ev, () => this.sound.unlock(), { capture: true, passive: true });
+    }
     root.addEventListener('pointerdown', (e) => {
       this.sound.unlock();
       if (e.target.closest('button')) return;

@@ -67,7 +67,23 @@ export class Sound {
       this._startScheduler();
       if (this.mode !== 'off') this.setMode(this.mode, true);
     }
-    if (this.ctx.state === 'suspended') this.ctx.resume();
+    if (this.ctx.state !== 'running') {
+      this._silentTick();
+      this.ctx.resume();
+    }
+  }
+
+  _silentTick() {
+    try {
+      const c = this.ctx;
+      const b = c.createBuffer(1, 1, c.sampleRate);
+      const src = c.createBufferSource();
+      src.buffer = b;
+      src.connect(c.destination);
+      src.start(0);
+    } catch (_) {
+      // nothing to do
+    }
   }
 
   _noise() {
