@@ -49,6 +49,22 @@ class Game {
     this.particles = [];
     this.sprites = new Map();
     this._bind();
+
+    // If the browser still keeps the sound off after a tap, show a clear button to switch it on.
+    this.soundPill = document.createElement('button');
+    this.soundPill.setAttribute('style', 'position:absolute;left:50%;bottom:calc(var(--u)*16);transform:translateX(-50%);z-index:30;font-family:inherit;font-weight:900;font-size:calc(var(--u)*4.6);color:#1f2a24;background:#ffd166;border:calc(var(--u)*.6) solid #fff;border-radius:999px;padding:calc(var(--u)*2) calc(var(--u)*5);box-shadow:0 calc(var(--u)*1) calc(var(--u)*3) rgba(0,0,0,.4);cursor:pointer;display:none;pointer-events:auto');
+    this.soundPill.textContent = getLang() === 'en' ? '🔊 Tap here for sound' : '🔊 دوس هنا عشان الصوت';
+    this.soundPill.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.sound.unlock();
+    });
+    this.root.append(this.soundPill);
+    this._tapped = false;
+    this.root.addEventListener('pointerup', () => { this._tapped = true; }, true);
+    this._pillTimer = setInterval(() => {
+      const show = this._tapped && !this.sound.muted && !this.sound.on && !document.hidden && !this.paused;
+      this.soundPill.style.display = show ? 'block' : 'none';
+    }, 700);
     this._resize();
     this.ro = new ResizeObserver(() => this._resize());
     this.ro.observe(el);
@@ -698,6 +714,7 @@ class Game {
   }
 
   dispose() {
+    clearInterval(this._pillTimer);
     cancelAnimationFrame(this.raf);
     this.sound.dispose();
     this.ro.disconnect();
