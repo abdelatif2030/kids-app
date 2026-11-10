@@ -4,7 +4,7 @@ import '../design/focusable_tap.dart';
 import '../design/picture_stage.dart';
 import '../journey/models.dart';
 import '../l10n/strings.dart';
-import 'carnival_race/carnival_race_screen.dart';
+import 'web_games/web_game_screen.dart';
 
 /// The first page of the Games tab (owner's picture, 2026-11-06): two big cards, «ألعاب تعليمية» (the ten-island hub) and
 /// «ألعاب للتسلية» (the four fun games). The picture is shown whole; the two cards are large invisible buttons on it.
@@ -77,119 +77,74 @@ class GamesChoiceScreen extends StatelessWidget {
   }
 }
 
-/// The owner's picture behind the fun games page. To change it, replace the one file [kFunScenePicture].
-const String kFunScenePicture = 'assets/games/fun_scene.webp';
+/// The owner's picture of the fun games page (2026-11-10, 1672 x 941): a wooden «ألعاب التسلية» sign, a back arrow
+/// and two game cards («سباق ملاهي الأبطال» and «مغامرة الأدغال»). It is shown whole; the arrow and the cards are
+/// large invisible buttons on it, like the Games page. To change it, replace the one file.
+const String kFunGamesPicture = 'assets/games/fun_games_scene.webp';
+const double kFunGamesAspect = 1672 / 941;
 
-/// The youngest age that sees «سباق الملاهي» (owner decision, 2026-11-10: ages 3-6; age 3 plays in easy mode).
-const int kCarnivalRaceMinAge = 3;
-
-/// «ألعاب للتسلية»: the owner's picture fills the whole page, with a back arrow and the fun games on top of it
-/// (owner request 2026-11-10: the 3D carnival race). Children too young for every game here see a friendly line.
+/// «ألعاب للتسلية»: the owner's picture with two cards. A child younger than a game's [WebGame.minAge] gets a friendly
+/// note instead of the game.
 class FunGamesScreen extends StatelessWidget {
-  /// The child playing (tickets and garage are kept per child). Null in old callers and tests.
+  /// The child playing (progress is kept per child). Null in old callers and tests.
   final ChildProfile? child;
   const FunGamesScreen({super.key, this.child});
+
+  void _open(BuildContext context, WebGame game) {
+    final age = child?.age ?? 6;
+    if (age < game.minAge) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr2('اللعبة دي لما تكبر شوية!', 'This game is for a little later!'))));
+      return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => WebGameScreen(game: game, childId: child?.id, age: age),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          const ColoredBox(color: Color(0xFF58A8F2)),
-          ExcludeSemantics(
-            child: Image.asset(kFunScenePicture, key: const ValueKey('fun_scene'), fit: BoxFit.cover, errorBuilder: (_, _, _) => const SizedBox()),
+      backgroundColor: const Color(0xFF8FD3FF),
+      body: PictureStage(
+        key: const ValueKey('fun_games_page'),
+        asset: kFunGamesPicture,
+        aspect: kFunGamesAspect,
+        spots: [
+          PictureSpot(
+            'fun_carnival_race',
+            const Offset(0.272, 0.56),
+            0.43,
+            0.58,
+            kCarnivalRace.title(),
+            () => _open(context, kCarnivalRace),
+            radius: 40,
+            key: const ValueKey('fun_carnival_race'),
           ),
-          PositionedDirectional(
-            top: 0,
-            start: 0,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: FocusableTap(
-                  key: const ValueKey('fun_back'),
-                  onTap: () => Navigator.maybePop(context),
-                  radius: 40,
-                  semanticLabel: tr2('رجوع', 'Back'),
-                  child: Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: const Color(0xFF7A3FE0),
-                      border: Border.all(color: Colors.white, width: 3),
-                      boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 6, offset: Offset(0, 3))],
-                    ),
-                    child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 30),
-                  ),
-                ),
-              ),
-            ),
+          PictureSpot(
+            'fun_jungle_adventure',
+            const Offset(0.732, 0.565),
+            0.43,
+            0.575,
+            kJungleAdventure.title(),
+            () => _open(context, kJungleAdventure),
+            radius: 40,
+            key: const ValueKey('fun_jungle_adventure'),
           ),
-          if ((child?.age ?? 6) >= kCarnivalRaceMinAge)
-            Center(
-              child: SafeArea(
-                child: _RaceCard(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => CarnivalRaceScreen(childId: child?.id, age: child?.age ?? 6),
-                    ),
-                  ),
-                ),
-              ),
-            )
-          else
-            Align(
-              alignment: const Alignment(0, 0.88),
-              child: SafeArea(
-                child: Container(
-                  key: const ValueKey('fun_empty'),
-                  padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF5B2BB8),
-                    borderRadius: BorderRadius.circular(40),
-                    border: Border.all(color: Colors.white, width: 3),
-                    boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 8, offset: Offset(0, 4))],
-                  ),
-                  child: Text(
-                    tr2('ألعاب جديدة جاية قريب', 'New games are coming soon'),
-                    style: const TextStyle(fontFamily: 'Tajawal', fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
+          PictureSpot(
+            'fun_back',
+            const Offset(0.052, 0.088),
+            0.07,
+            0.125,
+            tr2('رجوع', 'Back'),
+            () => Navigator.maybePop(context),
+            radius: 60,
+            key: const ValueKey('fun_back'),
+          ),
         ],
       ),
-    );
-  }
-}
-
-/// The owner's own card picture for «سباق ملاهي الأبطال» (2026-11-10), shown whole, exactly as designed.
-const String kRaceCardPicture = 'assets/games/race_card.webp';
-
-/// The card that opens the race: the owner's square picture, as big as fits (it is a large tap target).
-class _RaceCard extends StatelessWidget {
-  final VoidCallback onTap;
-  const _RaceCard({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, box) {
-        final side = [box.maxWidth * 0.84, box.maxHeight * 0.78, 520.0].reduce((a, b) => a < b ? a : b).clamp(200.0, 520.0);
-        return FocusableTap(
-          key: const ValueKey('fun_carnival_race'),
-          onTap: onTap,
-          radius: side * 0.1,
-          semanticLabel: tr2('سباق ملاهي الأبطال', 'Glowfair Rally'),
-          child: SizedBox(
-            width: side,
-            height: side,
-            child: Image.asset(kRaceCardPicture, key: const ValueKey('race_card_picture'), fit: BoxFit.contain),
-          ),
-        );
-      },
     );
   }
 }

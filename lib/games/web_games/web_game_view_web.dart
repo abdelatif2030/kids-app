@@ -5,24 +5,26 @@ import 'dart:ui_web' as ui_web;
 
 import 'package:flutter/material.dart';
 
-bool get raceViewSupported => true;
+import 'web_game.dart';
 
-const String _bundle = 'assets/games/carnival_race/game.js';
+bool get webGameViewSupported => true;
+
 int _viewCount = 0;
 
-/// On the web the race runs right inside the page: a `<div>` platform view, the game's script loaded once from the
+/// On the web a game runs right inside the page: a `<div>` platform view, the game's script loaded once from the
 /// app's own files (allowed by the site's `script-src 'self'`), and messages back through a Dart callback.
-class RaceView extends StatefulWidget {
+class WebGameView extends StatefulWidget {
+  final WebGame game;
   final Map<String, Object?> config;
   final void Function(String json) onMessage;
-  const RaceView({super.key, required this.config, required this.onMessage});
+  const WebGameView({super.key, required this.game, required this.config, required this.onMessage});
 
   @override
-  State<RaceView> createState() => _RaceViewState();
+  State<WebGameView> createState() => _WebGameViewState();
 }
 
-class _RaceViewState extends State<RaceView> {
-  late final String _viewType = 'carnival-race-${_viewCount++}';
+class _WebGameViewState extends State<WebGameView> {
+  late final String _viewType = 'web-game-${widget.game.id}-${_viewCount++}';
   JSObject? _handle;
   bool _disposed = false;
 
@@ -40,24 +42,24 @@ class _RaceViewState extends State<RaceView> {
   }
 
   void _whenLoaded(void Function() then) {
-    if (globalContext.has('CarnivalRace')) {
+    if (globalContext.has(widget.game.global)) {
       then();
       return;
     }
-    final existing = _doc.callMethod<JSObject?>('getElementById'.toJS, 'carnival-race-js'.toJS);
+    final existing = _doc.callMethod<JSObject?>('getElementById'.toJS, '${widget.game.id}-js'.toJS);
     final script = existing ?? _doc.callMethod<JSObject>('createElement'.toJS, 'script'.toJS);
     script.callMethod<JSAny?>('addEventListener'.toJS, 'load'.toJS, (() => then()).toJS);
     if (existing == null) {
-      script.setProperty('id'.toJS, 'carnival-race-js'.toJS);
-      script.setProperty('src'.toJS, ui_web.assetManager.getAssetUrl(_bundle).toJS);
+      script.setProperty('id'.toJS, '${widget.game.id}-js'.toJS);
+      script.setProperty('src'.toJS, ui_web.assetManager.getAssetUrl(widget.game.bundle).toJS);
       _doc.getProperty<JSObject>('head'.toJS).callMethod<JSAny?>('append'.toJS, script);
     }
   }
 
   void _start(JSObject div) {
     if (_disposed) return;
-    final api = globalContext.getProperty<JSObject>('CarnivalRace'.toJS);
-    final base = ui_web.assetManager.getAssetUrl('assets/games/carnival_race/');
+    final api = globalContext.getProperty<JSObject>(widget.game.global.toJS);
+    final base = ui_web.assetManager.getAssetUrl(widget.game.base);
     final config = {...widget.config, 'base': base}.jsify();
     final post = ((JSAny? msg) {
       final dart = msg.dartify();

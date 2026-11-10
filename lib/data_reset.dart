@@ -1,4 +1,4 @@
-import 'games/carnival_race/carnival_race_store.dart';
+import 'games/web_games/web_game_store.dart';
 import 'adventures/adventure_store.dart';
 import 'everyday/everyday_store.dart';
 import 'family_time/family_time.dart';
@@ -52,6 +52,7 @@ Future<void> deleteChildData() async {
         key == 'video_hidden_child' ||
         key == 'game_completions' ||
         key == 'carnival_race' ||
+        key == 'jungle_adventure' ||
         key == 'video_completions' ||
         key == 'wordbook_seen' ||
         key == 'family_prefs' ||
@@ -103,7 +104,7 @@ Future<void> deleteOneChild(String childId) async {
   await dropKey('literacy_state');
   await dropKey('video_completions');
   await dropKey('game_completions');
-  await CarnivalRaceStore.forget(childId);
+  await WebGameStore.forgetChild(childId);
   await ChildPhotoStore.delete(childId);
   await ResumeStore.forget(childId);
   await FeelingStore.forget(childId);

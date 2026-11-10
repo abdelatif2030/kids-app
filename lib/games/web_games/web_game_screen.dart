@@ -5,36 +5,38 @@ import 'package:flutter/services.dart';
 
 import '../../l10n/app_locale.dart';
 import '../../l10n/strings.dart';
-import 'carnival_race_store.dart';
-import 'race_view.dart';
+import 'web_game.dart';
+import 'web_game_store.dart';
+import 'web_game_view.dart';
 
-export 'carnival_race_store.dart';
+export 'web_game.dart';
+export 'web_game_store.dart';
 
-/// «سباق الملاهي»: the 3D carnival bumper-car race (owner request, 2026-11-10). The game itself is the three.js bundle in
-/// assets/games/carnival_race/ (source in game_src/carnival_race/). On the web it runs inside the page; on Android and
-/// iOS it runs in a built-in browser view that may only show the bundled page (no internet, no links).
-///
-/// Owner decisions: a full garage like the reference video (tickets won by driving buy upgrades and new racers; nothing
-/// is bought with money and nothing earned is ever lost), ages 3-6, age 3 plays in easy mode (the car drives itself).
-/// It is a fun game: no Rehlaty learning stars. The session timer keeps counting like everywhere else.
-class CarnivalRaceScreen extends StatefulWidget {
-  /// The child playing; tickets and garage are kept per child. Without one they are kept for "a guest".
+/// Plays a bundled web game ([WebGame]): «سباق ملاهي الأبطال» (3D race) or «مغامرة الأدغال» (jungle runner). On the
+/// web the game runs inside the page; on Android and iOS in a built-in browser view that may only show the bundled page
+/// (no internet, no links). Progress is kept per child ([WebGameStore]). These are fun games: no Rehlaty learning stars.
+/// The session timer keeps counting like everywhere else.
+class WebGameScreen extends StatefulWidget {
+  final WebGame game;
+
+  /// The child playing; progress is kept per child. Without one it is kept for "a guest".
   final String? childId;
   final int age;
-  const CarnivalRaceScreen({super.key, this.childId, required this.age});
+  const WebGameScreen({super.key, required this.game, this.childId, required this.age});
 
   @override
-  State<CarnivalRaceScreen> createState() => _CarnivalRaceScreenState();
+  State<WebGameScreen> createState() => _WebGameScreenState();
 }
 
-class _CarnivalRaceScreenState extends State<CarnivalRaceScreen> {
+class _WebGameScreenState extends State<WebGameScreen> {
   Map<String, Object?>? _config;
+  late final WebGameStore _store = WebGameStore(widget.game);
 
   @override
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    CarnivalRaceStore.load(widget.childId).then((save) {
+    _store.load(widget.childId).then((save) {
       if (!mounted) return;
       setState(() => _config = {'lang': AppLocale.instance.isArabic ? 'ar' : 'en', 'age': widget.age, 'save': save});
     });
@@ -56,7 +58,7 @@ class _CarnivalRaceScreenState extends State<CarnivalRaceScreen> {
     switch (msg['type']) {
       case 'save':
         final save = msg['save'];
-        if (save is Map<String, dynamic>) CarnivalRaceStore.save(widget.childId, save);
+        if (save is Map<String, dynamic>) _store.save(widget.childId, save);
       case 'exit':
         if (mounted) Navigator.maybePop(context);
     }
@@ -69,8 +71,8 @@ class _CarnivalRaceScreenState extends State<CarnivalRaceScreen> {
       backgroundColor: const Color(0xFF1D1250),
       body: config == null
           ? const Center(child: CircularProgressIndicator(color: Colors.white))
-          : raceViewSupported
-          ? RaceView(key: const ValueKey('carnival_race_view'), config: config, onMessage: _onMessage)
+          : webGameViewSupported
+          ? WebGameView(key: ValueKey('${widget.game.id}_view'), game: widget.game, config: config, onMessage: _onMessage)
           : _Unsupported(onBack: () => Navigator.maybePop(context)),
     );
   }
@@ -99,6 +101,3 @@ class _Unsupported extends StatelessWidget {
     ),
   );
 }
-
-@visibleForTesting
-bool get carnivalRaceSupportedHere => raceViewSupported;

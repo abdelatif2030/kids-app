@@ -91,10 +91,10 @@ flutter:
     - assets/home/home_scene.webp
     - assets/games/hub_scene.webp
     - assets/games/choice_scene.webp
-    - assets/games/fun_scene.webp
+    - assets/games/fun_games_scene.webp
     - assets/games/game_bg.webp
     - assets/games/carnival_race/
-    - assets/games/race_card.webp
+    - assets/games/jungle_adventure/
     - assets/home/home_main.webp
     - assets/home/cartoons_stories.webp
     - assets/home/lessons_scene.webp

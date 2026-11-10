@@ -4,23 +4,24 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import 'web_game.dart';
+
 /// Android and iOS have a built-in browser view; desktop builds show a "phones, tablets and web" note instead.
-bool get raceViewSupported => !kIsWeb && (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS);
+bool get webGameViewSupported => !kIsWeb && (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS);
 
-const String _page = 'assets/games/carnival_race/index.html';
-
-/// Shows the bundled race page. It may only show that page: every other address (internet, links) is refused.
+/// Shows a bundled game page. It may only show that page: every other address (internet, links) is refused.
 /// The page talks back on the `RehlatyRace` channel (save, exit).
-class RaceView extends StatefulWidget {
+class WebGameView extends StatefulWidget {
+  final WebGame game;
   final Map<String, Object?> config;
   final void Function(String json) onMessage;
-  const RaceView({super.key, required this.config, required this.onMessage});
+  const WebGameView({super.key, required this.game, required this.config, required this.onMessage});
 
   @override
-  State<RaceView> createState() => _RaceViewState();
+  State<WebGameView> createState() => _WebGameViewState();
 }
 
-class _RaceViewState extends State<RaceView> with WidgetsBindingObserver {
+class _WebGameViewState extends State<WebGameView> with WidgetsBindingObserver {
   late final WebViewController _c;
   bool _started = false;
 
@@ -38,7 +39,7 @@ class _RaceViewState extends State<RaceView> with WidgetsBindingObserver {
           onNavigationRequest: (req) => _isLocal(req.url) ? NavigationDecision.navigate : NavigationDecision.prevent,
         ),
       )
-      ..loadFlutterAsset(_page);
+      ..loadFlutterAsset(widget.game.page);
   }
 
   static bool _isLocal(String url) => url.startsWith('file:') || url.startsWith('about:blank') || url.startsWith('data:');
@@ -54,7 +55,7 @@ class _RaceViewState extends State<RaceView> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // the app went to the background: pause the race and its sound
+    // the app went to the background: pause the game and its sound
     if (state != AppLifecycleState.resumed) _c.runJavaScript('window.crPause && window.crPause();');
   }
 

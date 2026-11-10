@@ -8,7 +8,7 @@ in the «ألعاب للتسلية» page, working well on phones, tablets and t
 | --- | --- |
 | Game source (JavaScript, three.js 0.170.0) | `game_src/carnival_race/src/` |
 | Built game (bundled with the app) | `assets/games/carnival_race/` (`index.html`, `boot.js`, `game.js`) |
-| Flutter screen | `lib/games/carnival_race/` (`carnival_race_screen.dart`, `race_view_*.dart`, `carnival_race_store.dart`) |
+| Flutter screen (shared with the jungle game) | `lib/games/web_games/` (`web_game.dart`, `web_game_screen.dart`, `web_game_view_*.dart`, `web_game_store.dart`) |
 | Entry | «ألعاب للتسلية» page (`FunGamesScreen` in `lib/games/games_choice.dart`), ages 3-6 |
 
 Rebuild the game after changing its source:
@@ -18,7 +18,7 @@ cd game_src/carnival_race && npm install && npm run build && node --test test/ra
 
 ## How it runs
 * **Web:** the game's script is loaded from the app's own files and runs in a `<div>` inside the page
-  (`race_view_web.dart`). The demo site's `script-src 'self'` already allows it; nothing else is loaded.
+  (`web_game_view_web.dart`). The demo site's `script-src 'self'` already allows it; nothing else is loaded.
 * **Android / iOS:** a built-in browser view (package `webview_flutter`, owner approved "all free packages",
   2026-11-10) shows only the bundled page. Every other address is refused (`NavigationDelegate`), so there is no
   internet and no link out. Messages come back on the `RehlatyRace` channel (`save`, `exit`).

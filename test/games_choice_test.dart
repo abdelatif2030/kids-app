@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/games/games_choice.dart';
 import 'package:kids_app/games/games_hub.dart';
 import 'package:kids_app/games/fun_games.dart';
-import 'package:kids_app/games/carnival_race/carnival_race_screen.dart';
+import 'package:kids_app/games/web_games/web_game_screen.dart';
 import 'package:kids_app/data_reset.dart';
 import 'package:kids_app/journey/models.dart';
 import 'package:flutter/foundation.dart';
@@ -51,90 +51,98 @@ void main() {
     addTearDown(t.view.reset);
   });
 
-  testWidgets('the fun games page: the picture fills it; ages 3-6 get the race card, younger children a friendly line', (t) async {
-    expect(File(kFunScenePicture).existsSync(), isTrue);
-    expect(File('pubspec.yaml').readAsStringSync(), contains(kFunScenePicture));
+  testWidgets('the fun games page is the owner picture with two game cards and a back arrow, inside the window', (t) async {
+    expect(File(kFunGamesPicture).existsSync(), isTrue);
+    expect(File('pubspec.yaml').readAsStringSync(), contains(kFunGamesPicture));
     for (final size in const [Size(1000, 700), Size(390, 760), Size(852, 393), Size(1366, 1024)]) {
       t.view.physicalSize = size;
       t.view.devicePixelRatio = 1;
-      for (final age in [2, 3, 6]) {
-        await t.pumpWidget(
-          MaterialApp(
-            key: UniqueKey(),
-            home: FunGamesScreen(
-              child: ChildProfile(id: 'k1', nickname: 'L', age: age),
-            ),
+      await t.pumpWidget(
+        MaterialApp(
+          key: UniqueKey(),
+          home: const FunGamesScreen(
+            child: ChildProfile(id: 'k1', nickname: 'L', age: 5),
           ),
-        );
-        await t.pump(const Duration(milliseconds: 300));
-        expect(find.byKey(const ValueKey('fun_scene')), findsOneWidget);
-        expect(t.getRect(find.byKey(const ValueKey('fun_scene'))).size, size, reason: 'the picture fills the page');
-        final race = find.byKey(const ValueKey('fun_carnival_race'));
-        if (age >= kCarnivalRaceMinAge) {
-          expect(race, findsOneWidget, reason: 'age $age');
-          final r = t.getRect(race);
-          expect(r.left >= 0 && r.right <= size.width && r.top >= 0 && r.bottom <= size.height, isTrue, reason: 'race card inside $size: $r');
-          expect(r.width, greaterThanOrEqualTo(200));
-          expect(find.byKey(const ValueKey('race_card_picture')), findsOneWidget);
-          expect(find.byKey(const ValueKey('fun_empty')), findsNothing);
-        } else {
-          expect(race, findsNothing, reason: 'age $age');
-          expect(find.byKey(const ValueKey('fun_empty')), findsOneWidget);
-        }
-        expect(t.takeException(), isNull);
+        ),
+      );
+      await t.pump(const Duration(milliseconds: 300));
+      for (final k in ['fun_carnival_race', 'fun_jungle_adventure', 'fun_back']) {
+        final r = t.getRect(find.byKey(ValueKey(k)));
+        expect(r.left >= -1 && r.right <= size.width + 1 && r.top >= -1 && r.bottom <= size.height + 1, isTrue, reason: '$k inside $size: $r');
       }
+      expect(t.getRect(find.byKey(const ValueKey('fun_jungle_adventure'))).width, greaterThan(size.width * 0.2));
+      expect(t.takeException(), isNull);
     }
     addTearDown(t.view.reset);
   });
 
-  testWidgets('tapping the race card opens the race (a desktop build shows the phones/tablets/web note)', (t) async {
+  testWidgets('each card opens its own game (a desktop build shows the phones/tablets/web note); too young gets a note', (t) async {
     SharedPreferences.setMockInitialValues({});
     debugDefaultTargetPlatformOverride = TargetPlatform.windows;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    for (final (key, game) in [('fun_carnival_race', kCarnivalRace), ('fun_jungle_adventure', kJungleAdventure)]) {
+      await t.pumpWidget(
+        MaterialApp(
+          key: UniqueKey(),
+          home: const FunGamesScreen(
+            child: ChildProfile(id: 'k1', nickname: 'L', age: 5),
+          ),
+        ),
+      );
+      await t.pump(const Duration(milliseconds: 300));
+      await t.tap(find.byKey(ValueKey(key)));
+      await t.pumpAndSettle();
+      final screen = t.widget<WebGameScreen>(find.byType(WebGameScreen));
+      expect(screen.game.id, game.id);
+      expect(find.textContaining('الموبايل والتابلت والمتصفح'), findsOneWidget);
+    }
     await t.pumpWidget(
-      const MaterialApp(
-        home: FunGamesScreen(
-          child: ChildProfile(id: 'k1', nickname: 'L', age: 5),
+      MaterialApp(
+        key: UniqueKey(),
+        home: const FunGamesScreen(
+          child: ChildProfile(id: 'k1', nickname: 'L', age: 2),
         ),
       ),
     );
     await t.pump(const Duration(milliseconds: 300));
-    await t.tap(find.byKey(const ValueKey('fun_carnival_race')));
-    await t.pumpAndSettle();
-    expect(find.byType(CarnivalRaceScreen), findsOneWidget);
-    expect(find.textContaining('الموبايل والتابلت والمتصفح'), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('fun_jungle_adventure')));
+    await t.pump();
+    expect(find.byType(WebGameScreen), findsNothing);
+    expect(find.byType(SnackBar), findsOneWidget);
     expect(t.takeException(), isNull);
     debugDefaultTargetPlatformOverride = null;
   });
 
-  test('the race game files and the owner card picture are bundled and listed in pubspec', () {
-    expect(File(kRaceCardPicture).existsSync(), isTrue);
-    expect(File('pubspec.yaml').readAsStringSync(), contains(kRaceCardPicture));
-    for (final f in ['index.html', 'boot.js', 'game.js']) {
-      expect(File('assets/games/carnival_race/$f').existsSync(), isTrue, reason: f);
+  test('both games are bundled and listed in pubspec, and load nothing from the internet', () {
+    final pub = File('pubspec.yaml').readAsStringSync();
+    for (final g in kWebGames) {
+      for (final f in ['index.html', 'boot.js', 'game.js']) {
+        expect(File('assets/games/${g.folder}/$f').existsSync(), isTrue, reason: '${g.folder}/$f');
+      }
+      expect(pub, contains('assets/games/${g.folder}/'));
+      final html = File(g.page).readAsStringSync();
+      expect(RegExp(r'(src|href)="https?:').hasMatch(html), isFalse);
+      expect(File('assets/games/${g.folder}/boot.js').readAsStringSync(), contains('window.${g.global}.start'));
     }
-    expect(File('pubspec.yaml').readAsStringSync(), contains('assets/games/carnival_race/'));
-    // the page only loads its own files: no script or font from the internet
-    final html = File('assets/games/carnival_race/index.html').readAsStringSync();
-    expect(RegExp(r'(src|href)="https?:').hasMatch(html), isFalse);
   });
 
-  test('race progress is kept per child, survives damaged data and is erased with the child', () async {
+  test('game progress is kept per child and per game, survives damaged data and is erased with the child', () async {
     SharedPreferences.setMockInitialValues({});
-    expect(await CarnivalRaceStore.load('k1'), isNull);
-    await CarnivalRaceStore.save('k1', {
-      'tickets': 120,
-      'owned': ['raccoon'],
-    });
-    await CarnivalRaceStore.save('k2', {'tickets': 5});
-    expect((await CarnivalRaceStore.load('k1'))!['tickets'], 120);
-    expect((await CarnivalRaceStore.load('k2'))!['tickets'], 5);
+    final race = WebGameStore(kCarnivalRace);
+    final jungle = WebGameStore(kJungleAdventure);
+    expect(await race.load('k1'), isNull);
+    await race.save('k1', {'tickets': 120});
+    await race.save('k2', {'tickets': 5});
+    await jungle.save('k1', {'coins': 33});
+    expect((await race.load('k1'))!['tickets'], 120);
+    expect((await jungle.load('k1'))!['coins'], 33);
     await deleteOneChild('k1');
-    expect(await CarnivalRaceStore.load('k1'), isNull);
-    expect((await CarnivalRaceStore.load('k2'))!['tickets'], 5, reason: 'the other child keeps theirs');
-    SharedPreferences.setMockInitialValues({'carnival_race': '{not json'});
-    expect(await CarnivalRaceStore.load('k1'), isNull);
-    await CarnivalRaceStore.save('k1', {'tickets': 1});
-    expect((await CarnivalRaceStore.load('k1'))!['tickets'], 1);
+    expect(await race.load('k1'), isNull);
+    expect(await jungle.load('k1'), isNull);
+    expect((await race.load('k2'))!['tickets'], 5, reason: 'the other child keeps theirs');
+    SharedPreferences.setMockInitialValues({'jungle_adventure': '{not json'});
+    expect(await jungle.load('k1'), isNull);
+    await jungle.save('k1', {'coins': 1});
+    expect((await jungle.load('k1'))!['coins'], 1);
   });
 }
