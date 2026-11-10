@@ -1,6 +1,6 @@
 import '../../l10n/strings.dart';
 
-/// A fun game written for the browser (canvas / WebGL) and bundled with the app in assets/games/<folder>/:
+/// A fun game written for the browser (canvas / WebGL) and bundled with the app in `assets/games/<folder>/`:
 /// `index.html` + `boot.js` (the phone/tablet built-in browser view) and `game.js` (the game; on the web it runs right
 /// inside the page). Every game answers the same small contract: `window.<global>.start(div, config, post)` and, in the
 /// built-in view, `crStart(config)`, `crPause()`, `crStop()` and the `RehlatyRace` message channel (save, exit).

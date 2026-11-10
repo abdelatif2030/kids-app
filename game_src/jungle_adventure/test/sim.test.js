@@ -119,3 +119,55 @@ test('every relic can be reached: a wall to kick from, or a floor at most a high
     }
   }
 });
+
+test('landing on a beetle from any jump squashes it and gives a coin; running into it hurts', () => {
+  for (const startAbove of [0.3, 1.0, 2.5]) {
+    const sim = new Sim(LEVELS[0]);
+    const b = sim.beetles[0];
+    sim.p.x = b.x;
+    sim.p.y = b.y - startAbove;
+    sim.p.vy = 4;
+    sim.p.onGround = false;
+    b.vx = 0;
+    const coins = sim.coins;
+    let stomped = false;
+    for (let i = 0; i < 60 && !stomped; i++) {
+      b.x = sim.p.x; // keep the beetle right under her (she keeps running while she falls)
+      sim.step(1 / 60, { down: false, pressed: false });
+      stomped = sim.events.some((e) => e.type === 'stomp');
+    }
+    assert.ok(stomped, `landing from ${startAbove} tiles above squashes it`);
+    assert.ok(sim.coins >= coins + 1, "the beetle gave a coin");
+    assert.equal(sim.hearts, 3);
+  }
+  const sim = new Sim(LEVELS[0]);
+  const b = sim.beetles[0];
+  sim.p.x = b.x - 1.2;
+  sim.p.y = b.y;
+  b.vx = 0;
+  for (let i = 0; i < 30; i++) sim.step(1 / 60, { down: false, pressed: false });
+  assert.equal(sim.hearts, 2, 'running into it costs a heart');
+});
+
+test('shop: coins buy clothes, free outfits are always there, a hero only wears what was bought', async () => {
+  const { buy, wear, lookOf, SHOP, DEFAULT_LOOK } = await import('../src/shop.js');
+  const save = emptySave();
+  assert.deepEqual(lookOf(save, 'boy'), DEFAULT_LOOK.boy);
+  assert.equal(buy(save, 'hat_crown'), 'poor');
+  assert.equal(wear(save, 'boy', 'hat_crown'), false, 'not owned');
+  save.coins = 200;
+  assert.equal(buy(save, 'hat_crown'), 'bought');
+  assert.equal(save.coins, 50);
+  assert.equal(buy(save, 'hat_crown'), 'owned', 'no double charge');
+  assert.equal(save.coins, 50);
+  assert.ok(wear(save, 'boy', 'hat_crown'));
+  assert.ok(wear(save, 'girl', 'hat_helmet'), 'free items need no buying');
+  assert.equal(lookOf(save, 'boy').hat, 'hat_crown');
+  // a tampered save cannot wear what it did not buy
+  const s2 = normalizeSave({ coins: 5, owned: ['nope'], looks: { girl: { top: 'top_hero', hat: 'hat_crown' } }, hero: 'dragon' });
+  assert.equal(s2.looks.girl.top, DEFAULT_LOOK.girl.top);
+  assert.equal(s2.looks.girl.hat, DEFAULT_LOOK.girl.hat);
+  assert.equal(s2.hero, 'girl');
+  assert.deepEqual(s2.owned, []);
+  assert.ok(SHOP.every((i) => i.price >= 0 && i.ar && i.en));
+});

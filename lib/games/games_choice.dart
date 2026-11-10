@@ -99,7 +99,7 @@ class FunGamesScreen extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute<void>(
-        builder: (_) => WebGameScreen(game: game, childId: child?.id, age: age),
+        builder: (_) => WebGameScreen(game: game, childId: child?.id, age: age, gender: child?.gender),
       ),
     );
   }

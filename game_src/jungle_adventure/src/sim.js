@@ -240,12 +240,15 @@ export class Sim {
       if (b.y > ROWS + 2) b.alive = false;
       // meet the explorer
       if (Math.abs(b.x - p.x) < 0.75 && p.y > b.y - 0.75 && p.y - P.H < b.y) {
-        if (p.vy > 0 && p.y < b.y - 0.25) {
+        // any landing from the air squashes it (generous for small hands); only running into it hurts.
+        // A squashed beetle pops out a coin, like in the classic platformers.
+        if (!p.onGround && p.vy > -3 && p.y < b.y + 0.05) {
           b.alive = false;
           b.squash = 0;
           p.vy = -10;
           p.holdT = 0;
-          this.emit('stomp', { x: b.x, y: b.y });
+          this.coins++;
+          this.emit('stomp', { x: b.x, y: b.y, total: this.coins });
         } else this._hurt('beetle');
       }
     }

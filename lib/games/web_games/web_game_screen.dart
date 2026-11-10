@@ -22,7 +22,10 @@ class WebGameScreen extends StatefulWidget {
   /// The child playing; progress is kept per child. Without one it is kept for "a guest".
   final String? childId;
   final int age;
-  const WebGameScreen({super.key, required this.game, this.childId, required this.age});
+
+  /// 'boy' or 'girl' when the parent gave it: the jungle game then starts as Adam or Nour. Never required.
+  final String? gender;
+  const WebGameScreen({super.key, required this.game, this.childId, required this.age, this.gender});
 
   @override
   State<WebGameScreen> createState() => _WebGameScreenState();
@@ -38,7 +41,7 @@ class _WebGameScreenState extends State<WebGameScreen> {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _store.load(widget.childId).then((save) {
       if (!mounted) return;
-      setState(() => _config = {'lang': AppLocale.instance.isArabic ? 'ar' : 'en', 'age': widget.age, 'save': save});
+      setState(() => _config = {'lang': AppLocale.instance.isArabic ? 'ar' : 'en', 'age': widget.age, 'gender': widget.gender, 'save': save});
     });
   }
 

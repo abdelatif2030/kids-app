@@ -1,5 +1,7 @@
 // Cel-shaded cartoon art drawn in code: flat colours, one shade tone, bold dark outlines. Units are tiles
 // (the caller scales the canvas so 1 = one tile). Everything here is original.
+import { ITEM, DEFAULT_LOOK } from './shop.js';
+
 export const INK = '#2a1a10';
 
 export const THEMES = {
@@ -183,6 +185,7 @@ const G = {
   helmet: '#d9b97c', helmetSh: '#b8955a', helmetHi: '#ecd3a0', band: '#2f5fc4',
   pack: '#8f5428', packSh: '#6d3e1c',
 };
+let P = { ...G };
 
 /** A smooth limb through several points: the outline first, then the colour, so knees and elbows show no seams. */
 function limb(ctx, pts, w, color) {
@@ -224,19 +227,19 @@ function leg(ctx, hx, hy, thigh, knee, near) {
   const sa = thigh - knee;
   const fx = kx + Math.sin(sa) * L2;
   const fy = ky + Math.cos(sa) * L2;
-  const skin = near ? G.skin : G.skinSh;
+  const skin = near ? P.skin : P.skinSh;
   limb(ctx, [[hx, hy], [kx, ky], [fx - Math.sin(sa) * 0.08, fy - Math.cos(sa) * 0.08]], 0.13, skin);
   // sock and boot, the toe pointing forward along the ground
-  seg(ctx, fx - Math.sin(sa) * 0.12, fy - Math.cos(sa) * 0.12, fx - Math.sin(sa) * 0.03, fy - Math.cos(sa) * 0.03, 0.125, near ? G.sock : '#9a978f');
+  seg(ctx, fx - Math.sin(sa) * 0.12, fy - Math.cos(sa) * 0.12, fx - Math.sin(sa) * 0.03, fy - Math.cos(sa) * 0.03, 0.125, near ? P.sock : '#9a978f');
   ctx.save();
   ctx.translate(fx, fy);
   ctx.rotate(-sa * 0.6);
   line(ctx, 0.05);
   rrect(ctx, -0.08, -0.09, 0.25, 0.14, 0.05);
-  ctx.fillStyle = near ? G.boot : G.bootSh;
+  ctx.fillStyle = near ? P.boot : P.bootSh;
   ctx.fill();
   ctx.stroke();
-  ctx.fillStyle = G.sole;
+  ctx.fillStyle = P.sole;
   ctx.fillRect(-0.07, 0.025, 0.23, 0.025);
   ctx.restore();
 }
@@ -250,16 +253,141 @@ function arm(ctx, sx, sy, upper, elbow, near) {
   const hx = ex + Math.sin(fa) * L2;
   const hy = ey + Math.cos(fa) * L2;
   // short blue sleeve over the upper arm
-  seg(ctx, sx, sy, sx + Math.sin(upper) * 0.11, sy + Math.cos(upper) * 0.11, 0.15, near ? G.shirt : G.shirtSh);
-  limb(ctx, [[sx + Math.sin(upper) * 0.1, sy + Math.cos(upper) * 0.1], [ex, ey], [hx, hy]], 0.1, near ? G.skin : G.skinSh);
+  seg(ctx, sx, sy, sx + Math.sin(upper) * 0.11, sy + Math.cos(upper) * 0.11, 0.15, near ? P.shirt : P.shirtSh);
+  limb(ctx, [[sx + Math.sin(upper) * 0.1, sy + Math.cos(upper) * 0.1], [ex, ey], [hx, hy]], 0.1, near ? P.skin : P.skinSh);
   line(ctx, 0.045);
-  ell(ctx, hx, hy, 0.065, 0.065, near ? G.skin : G.skinSh);
+  ell(ctx, hx, hy, 0.065, 0.065, near ? P.skin : P.skinSh);
+}
+
+function drawHat(ctx, id, girl) {
+  const it = ITEM[id];
+  if (id === 'hat_helmet') {
+    // pith helmet with a blue band
+    line(ctx, 0.05);
+    ctx.beginPath();
+    ctx.ellipse(0.06, -1.42, 0.4, 0.075, -0.06, 0, Math.PI * 2);
+    ctx.fillStyle = it.shade;
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(0.04, -1.45, 0.26, 0.21, 0, Math.PI, Math.PI * 2);
+    ctx.closePath();
+    ctx.fillStyle = it.color;
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = it.band;
+    ctx.beginPath();
+    ctx.ellipse(0.04, -1.47, 0.255, 0.05, 0, Math.PI, Math.PI * 2);
+    ctx.lineTo(0.295, -1.45);
+    ctx.lineTo(-0.215, -1.45);
+    ctx.closePath();
+    ctx.fill();
+    ctx.lineWidth = 0.03;
+    ctx.stroke();
+    ctx.fillStyle = '#ecd3a0';
+    ell(ctx, -0.02, -1.58, 0.1, 0.04, '#ecd3a0', false);
+    return;
+  }
+  line(ctx, 0.05);
+  if (id === 'hat_cap') {
+    ctx.beginPath();
+    ctx.ellipse(0.05, -1.43, 0.24, 0.17, 0, Math.PI, Math.PI * 2);
+    ctx.closePath();
+    ctx.fillStyle = it.color;
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(0.3, -1.43, 0.16, 0.04, 0, 0, Math.PI * 2);
+    ctx.fillStyle = it.shade;
+    ctx.fill();
+    ctx.stroke();
+    ell(ctx, 0.05, -1.6, 0.03, 0.02, it.shade);
+    return;
+  }
+  if (id === 'hat_crown') {
+    ctx.beginPath();
+    ctx.moveTo(-0.16, -1.42);
+    ctx.lineTo(-0.18, -1.66);
+    ctx.lineTo(-0.08, -1.55);
+    ctx.lineTo(0.03, -1.7);
+    ctx.lineTo(0.14, -1.55);
+    ctx.lineTo(0.24, -1.66);
+    ctx.lineTo(0.22, -1.42);
+    ctx.closePath();
+    ctx.fillStyle = it.color;
+    ctx.fill();
+    ctx.stroke();
+    for (const [cx, col] of [[-0.06, '#e8483f'], [0.04, '#4dabf7'], [0.14, '#69db7c']]) ell(ctx, cx, -1.48, 0.03, 0.03, col);
+    return;
+  }
+  if (id === 'hat_flower') {
+    for (let i = 0; i < 6; i++) {
+      const fx = -0.16 + i * 0.075;
+      const fy = -1.44 - Math.sin((i / 5) * Math.PI) * 0.1;
+      ell(ctx, fx, fy, 0.045, 0.045, ['#ff8fc7', '#ffd43b', '#b197fc'][i % 3]);
+      ell(ctx, fx, fy, 0.015, 0.015, '#ffffff', false);
+    }
+    return;
+  }
+  // no hat: Nour wears her pink bow
+  if (girl) {
+    ctx.strokeStyle = '#ff6fae';
+    ctx.lineWidth = 0.045;
+    ctx.beginPath();
+    ctx.arc(0.04, -1.27, 0.22, Math.PI * 1.05, Math.PI * 1.75);
+    ctx.stroke();
+    line(ctx, 0.04);
+    for (const sx of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(-0.07, -1.47);
+      ctx.lineTo(-0.07 + sx * 0.12, -1.55);
+      ctx.lineTo(-0.07 + sx * 0.12, -1.4);
+      ctx.closePath();
+      ctx.fillStyle = '#ff6fae';
+      ctx.fill();
+      ctx.stroke();
+    }
+    ell(ctx, -0.07, -1.475, 0.035, 0.035, '#ff8fc7');
+  }
+}
+
+/** The old name: Nour in her default outfit. */
+export function drawGirl(ctx, x, y, s) {
+  drawHero(ctx, x, y, s, 'girl', DEFAULT_LOOK.girl);
+}
+
+function star(ctx, cx, cy, r, color) {
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const a = -Math.PI / 2 + (i * Math.PI) / 5;
+    const rr = i % 2 ? r * 0.45 : r;
+    ctx.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr);
+  }
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.lineWidth = 0.025;
+  ctx.strokeStyle = INK;
+  ctx.stroke();
 }
 
 /**
- * The explorer girl with her feet at (x, y). s: { phase, air, vy, wall, dir, blink }
+ * Adam ('boy') or Nour ('girl'), the app's two children, as explorers, with their feet at (x, y).
+ * s: { phase, air, vy, wall, dir, blink }   look: { hat, top, bottom, shoes } (ids from the shop)
  */
-export function drawGirl(ctx, x, y, s) {
+export function drawHero(ctx, x, y, s, kind = 'girl', look = DEFAULT_LOOK[kind]) {
+  const top = ITEM[look.top] ?? ITEM[DEFAULT_LOOK[kind].top];
+  const bot = ITEM[look.bottom] ?? ITEM.bot_khaki;
+  const shoe = ITEM[look.shoes] ?? ITEM.shoe_boots;
+  const hat = look.hat ?? 'hat_none';
+  const girl = kind !== 'boy';
+  P = {
+    ...G,
+    skin: '#f7cba9', skinSh: '#e2a882',
+    shirt: top.color, shirtSh: top.shade, shirtHi: top.color,
+    shorts: bot.color, shortsSh: bot.shade,
+    boot: shoe.color, bootSh: shoe.shade, sole: shoe.sole ?? G.sole,
+  };
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(s.dir < 0 ? -1 : 1, 1);
@@ -293,7 +421,8 @@ export function drawGirl(ctx, x, y, s) {
   const shY = -1.0;
   const hairSway = run ? Math.sin(ph + 1) * 0.06 : s.vy < 0 ? 0.12 : -0.08;
 
-  // long hair flowing behind (drawn first, behind everything)
+  // long hair flowing behind (Nour), drawn first, behind everything
+  if (girl) {
   line(ctx, 0.055);
   ctx.beginPath();
   ctx.moveTo(-0.05, -1.48);
@@ -312,6 +441,12 @@ export function drawGirl(ctx, x, y, s) {
   ctx.moveTo(-0.12, -1.3);
   ctx.quadraticCurveTo(-0.22, -1.12, -0.24 - hairSway * 0.7, -0.98);
   ctx.stroke();
+  }
+  // Adam's hoodie hood hangs behind his neck
+  if (top.hood) {
+    line(ctx, 0.05);
+    ell(ctx, -0.12, -1.06, 0.13, 0.08, P.shirtSh);
+  }
 
   arm(ctx, shX - 0.02, shY + 0.02, armB[0], armB[1], false);
   leg(ctx, hipX - 0.02, hipY, legB[0], legB[1], false);
@@ -319,10 +454,10 @@ export function drawGirl(ctx, x, y, s) {
   // backpack
   line(ctx, 0.055);
   rrect(ctx, -0.33, -1.0, 0.2, 0.36, 0.07);
-  ctx.fillStyle = G.pack;
+  ctx.fillStyle = P.pack;
   ctx.fill();
   ctx.stroke();
-  ctx.fillStyle = G.packSh;
+  ctx.fillStyle = P.packSh;
   ctx.fillRect(-0.31, -0.78, 0.16, 0.05);
 
   leg(ctx, hipX + 0.03, hipY, legF[0], legF[1], true);
@@ -336,10 +471,10 @@ export function drawGirl(ctx, x, y, s) {
   ctx.lineTo(-0.02, -0.55);
   ctx.lineTo(-0.2, -0.5);
   ctx.closePath();
-  ctx.fillStyle = G.shorts;
+  ctx.fillStyle = P.shorts;
   ctx.fill();
   ctx.stroke();
-  ctx.fillStyle = G.shortsSh;
+  ctx.fillStyle = P.shortsSh;
   ctx.fillRect(-0.15, -0.6, 0.12, 0.05);
 
 
@@ -351,34 +486,50 @@ export function drawGirl(ctx, x, y, s) {
   ctx.lineTo(0.2, -0.72);
   ctx.quadraticCurveTo(0.02, -0.66, -0.19, -0.72);
   ctx.closePath();
-  ctx.fillStyle = G.shirt;
+  ctx.fillStyle = P.shirt;
   ctx.fill();
   ctx.stroke();
-  ctx.fillStyle = G.shirtSh;
+  ctx.fillStyle = P.shirtSh;
   ctx.fillRect(-0.17, -0.82, 0.36, 0.08);
-  ctx.fillStyle = G.shirtHi;
-  ctx.fillRect(0.06, -1.0, 0.1, 0.03);
-  rrect(ctx, 0.04, -0.94, 0.1, 0.09, 0.02);
-  ctx.fillStyle = G.shirtSh;
-  ctx.fill();
-  ctx.lineWidth = 0.03;
-  ctx.stroke();
-  // collar
-  line(ctx, 0.04);
-  ctx.fillStyle = G.shirtHi;
-  ctx.beginPath();
-  ctx.moveTo(-0.05, -1.06);
-  ctx.lineTo(0.08, -1.05);
-  ctx.lineTo(0.02, -0.97);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
+  if (top.collar) {
+    rrect(ctx, 0.04, -0.94, 0.1, 0.09, 0.02);
+    ctx.fillStyle = P.shirtSh;
+    ctx.fill();
+    ctx.lineWidth = 0.03;
+    ctx.stroke();
+    line(ctx, 0.04);
+    ctx.fillStyle = '#ffffff';
+    ctx.globalAlpha = 0.85;
+    ctx.beginPath();
+    ctx.moveTo(-0.05, -1.06);
+    ctx.lineTo(0.08, -1.05);
+    ctx.lineTo(0.02, -0.97);
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.stroke();
+  }
+  if (top.star) star(ctx, 0.07, -0.9, 0.075, '#ffd43b');
+  if (top.bolt) {
+    ctx.beginPath();
+    ctx.moveTo(0.1, -1.0);
+    ctx.lineTo(0.02, -0.88);
+    ctx.lineTo(0.08, -0.88);
+    ctx.lineTo(0.0, -0.76);
+    ctx.lineTo(0.14, -0.9);
+    ctx.lineTo(0.08, -0.9);
+    ctx.closePath();
+    ctx.fillStyle = '#ffd43b';
+    ctx.fill();
+    ctx.lineWidth = 0.025;
+    ctx.stroke();
+  }
   // belt with a buckle and the backpack strap
-  ctx.fillStyle = G.belt;
+  ctx.fillStyle = P.belt;
   ctx.fillRect(-0.18, -0.73, 0.38, 0.05);
   ctx.fillStyle = '#e0b84d';
   ctx.fillRect(0.08, -0.735, 0.05, 0.06);
-  ctx.strokeStyle = G.packSh;
+  ctx.strokeStyle = P.packSh;
   ctx.lineWidth = 0.05;
   ctx.beginPath();
   ctx.moveTo(-0.12, -1.04);
@@ -386,18 +537,18 @@ export function drawGirl(ctx, x, y, s) {
   ctx.stroke();
 
   // neck and head (side view)
-  seg(ctx, 0.04, -1.04, 0.05, -1.12, 0.1, G.skinSh);
+  seg(ctx, 0.04, -1.04, 0.05, -1.12, 0.1, P.skinSh);
   line(ctx, 0.055);
   ctx.beginPath();
   ctx.ellipse(0.06, -1.27, 0.22, 0.2, 0, 0, Math.PI * 2);
-  ctx.fillStyle = G.skin;
+  ctx.fillStyle = P.skin;
   ctx.fill();
   ctx.stroke();
   // nose and chin
   ctx.beginPath();
   ctx.moveTo(0.26, -1.3);
   ctx.quadraticCurveTo(0.33, -1.25, 0.27, -1.22);
-  ctx.fillStyle = G.skin;
+  ctx.fillStyle = P.skin;
   ctx.fill();
   ctx.stroke();
   // hair on the head: fringe and the side, a lighter streak
@@ -408,18 +559,24 @@ export function drawGirl(ctx, x, y, s) {
   ctx.quadraticCurveTo(0.12, -1.38, 0.05, -1.33);
   ctx.quadraticCurveTo(0.0, -1.24, -0.04, -1.16);
   ctx.closePath();
-  ctx.fillStyle = G.hair;
+  ctx.fillStyle = P.hair;
   ctx.fill();
   ctx.stroke();
-  ctx.strokeStyle = G.hairHi;
+  ctx.strokeStyle = P.hairHi;
   ctx.lineWidth = 0.025;
   ctx.beginPath();
   ctx.moveTo(-0.08, -1.4);
   ctx.quadraticCurveTo(0.05, -1.45, 0.18, -1.42);
   ctx.stroke();
+  if (!girl) {
+    // Adam's curly brown hair
+    line(ctx, 0.045);
+    for (const [cx, cy, r] of [[-0.12, -1.38, 0.09], [-0.03, -1.46, 0.1], [0.08, -1.48, 0.095], [0.18, -1.44, 0.08], [-0.16, -1.27, 0.075]]) ell(ctx, cx, cy, r, r, P.hair);
+    ell(ctx, 0.2, -1.38, 0.06, 0.05, P.hair);
+  }
   // ear
   line(ctx, 0.04);
-  ell(ctx, -0.01, -1.25, 0.04, 0.055, G.skinSh);
+  ell(ctx, -0.01, -1.25, 0.04, 0.055, P.skinSh);
   // eye, brow, cheek, smile
   if (s.blink) {
     ctx.strokeStyle = INK;
@@ -433,7 +590,7 @@ export function drawGirl(ctx, x, y, s) {
     ell(ctx, 0.19, -1.29, 0.026, 0.034, '#3b2412', false);
     ell(ctx, 0.196, -1.302, 0.009, 0.011, '#ffffff', false);
   }
-  ctx.strokeStyle = G.hairSh;
+  ctx.strokeStyle = P.hairSh;
   ctx.lineWidth = 0.025;
   ctx.beginPath();
   ctx.moveTo(0.13, -1.355);
@@ -447,30 +604,7 @@ export function drawGirl(ctx, x, y, s) {
   ctx.quadraticCurveTo(0.235, -1.165, 0.255, -1.185);
   ctx.stroke();
 
-  // pith helmet with a blue band
-  line(ctx, 0.05);
-  ctx.beginPath();
-  ctx.ellipse(0.06, -1.42, 0.4, 0.075, -0.06, 0, Math.PI * 2);
-  ctx.fillStyle = G.helmetSh;
-  ctx.fill();
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.ellipse(0.04, -1.45, 0.26, 0.21, 0, Math.PI, Math.PI * 2);
-  ctx.closePath();
-  ctx.fillStyle = G.helmet;
-  ctx.fill();
-  ctx.stroke();
-  ctx.fillStyle = G.band;
-  ctx.beginPath();
-  ctx.ellipse(0.04, -1.47, 0.255, 0.05, 0, Math.PI, Math.PI * 2);
-  ctx.lineTo(0.295, -1.45);
-  ctx.lineTo(-0.215, -1.45);
-  ctx.closePath();
-  ctx.fill();
-  ctx.lineWidth = 0.03;
-  ctx.stroke();
-  ctx.fillStyle = G.helmetHi;
-  ell(ctx, -0.02, -1.58, 0.1, 0.04, G.helmetHi, false);
+  drawHat(ctx, hat, girl);
 
   arm(ctx, shX + 0.04, shY + 0.03, armF[0], armF[1], true);
   ctx.restore();

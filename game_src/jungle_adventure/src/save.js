@@ -1,8 +1,9 @@
 // Saved progress: levels opened, best relics and coins per level, total coins, sound on/off. Nothing is ever taken away.
 import { LEVELS } from './levels.js';
+import { DEFAULT_LOOK, HEROES, ITEM, lookOf } from './shop.js';
 
 export function emptySave() {
-  return { v: 1, unlocked: 1, coins: 0, best: {} };
+  return { v: 1, unlocked: 1, coins: 0, best: {}, hero: 'girl', owned: [], looks: { boy: { ...DEFAULT_LOOK.boy }, girl: { ...DEFAULT_LOOK.girl } } };
 }
 
 export function normalizeSave(raw) {
@@ -18,6 +19,13 @@ export function normalizeSave(raw) {
     }
   }
   if (raw.muted === true) s.muted = true;
+  if (raw.hero && HEROES[raw.hero]) s.hero = raw.hero;
+  if (Array.isArray(raw.owned)) s.owned = [...new Set(raw.owned.filter((id) => typeof id === 'string' && ITEM[id]))];
+  if (raw.looks && typeof raw.looks === 'object') {
+    for (const h of Object.keys(HEROES)) s.looks[h] = { ...s.looks[h], ...(raw.looks[h] && typeof raw.looks[h] === 'object' ? raw.looks[h] : {}) };
+  }
+  // anything not owned (or unknown) goes back to the free default
+  for (const h of Object.keys(HEROES)) s.looks[h] = lookOf(s, h);
   return s;
 }
 

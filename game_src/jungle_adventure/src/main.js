@@ -4,11 +4,12 @@
 // 2D canvas, art and sound made in code. No network, no links, no ads, no tracking.
 import { LEVELS, ROWS } from './levels.js';
 import { Sim, P } from './sim.js';
-import { THEMES, drawSolid, drawLedge, drawSpikes, drawGirl, drawBeetle, drawBat, drawCoin, drawRelic, drawPower, drawFlag, drawGoal, drawShield } from './art.js';
+import { THEMES, drawSolid, drawLedge, drawSpikes, drawHero, drawBeetle, drawBat, drawCoin, drawRelic, drawPower, drawFlag, drawGoal, drawShield } from './art.js';
 import { Backdrop } from './backdrop.js';
 import { Sound } from './audio.js';
 import { normalizeSave, applyLevel } from './save.js';
-import { setLang, getLang, t, num, name } from './i18n.js';
+import { HEROES, CATS, SHOP, ITEM, owns, buy, wear, lookOf } from './shop.js';
+import { setLang, getLang, setHero, t, num, name } from './i18n.js';
 import { CSS, h, LEVEL_ICON } from './ui.js';
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -22,6 +23,9 @@ class Game {
     this.age = Number(config.age) || 5;
     this.easy = config.easy ?? this.age <= 3;
     this.save = normalizeSave(config.save);
+    // the first time, play as the child's own gender if the parent gave one
+    if (!config.save && HEROES[config.gender]) this.save.hero = config.gender;
+    setHero(this.save.hero);
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
@@ -79,6 +83,7 @@ class Game {
     this.cw = r.width || window.innerWidth;
     this.ch = r.height || window.innerHeight;
     this.root.style.setProperty('--u', `${Math.min(this.cw, this.ch) / 100}px`);
+    this.root.classList.toggle('ja-land', this.cw > this.ch * 1.15);
     this.canvas.width = Math.round(this.cw * this.dpr);
     this.canvas.height = Math.round(this.ch * this.dpr);
     // one tile: about 10.5 columns across a phone held upright, 9.5 rows on a wide screen
@@ -192,14 +197,78 @@ class Game {
         h('div', { class: 'ja-logo' }, t('title')),
         total,
         h('div', { class: 'ja-sub ja-shadow', style: 'opacity:1' }, t('pick')),
-        h('div', { class: 'ja-cards' }, cards)),
+        h('div', { class: 'ja-cards' }, cards),
+        h('div', { class: 'ja-sub ja-shadow', style: 'opacity:1' }, t('chooseHero')),
+        h('div', { class: 'ja-heroes' }, Object.keys(HEROES).map((hero) => h('button', {
+          class: `ja-hero${hero === this.save.hero ? ' sel' : ''}`,
+          'aria-label': name(HEROES[hero]),
+          onclick: () => { this.save.hero = hero; setHero(hero); this._saveNow(); this.showMenu(); },
+        }, this._heroCanvas(hero, 13, 'ja-hero-pic'), h('span', {}, name(HEROES[hero])))),
+        h('button', { class: 'ja-hero ja-shopbtn', 'aria-label': t('shop'), onclick: () => this.showShop() }, h('span', { class: 'ic' }, '🛍️'), h('span', {}, t('shop'))))),
       back,
       this._muteBtn('bottom:max(calc(var(--u)*3),env(safe-area-inset-bottom));inset-inline-end:calc(var(--u)*3)'),
       this._toastEl(),
     );
   }
 
+  showShop(cat = 'hat') {
+    this.mode = 'shop';
+    this.sim = null;
+    this.sound.setMode('menu');
+    this._clear();
+    const hero = this.save.hero;
+    const look = lookOf(this.save, hero);
+    const coins = h('div', { class: 'ja-shadow', style: 'display:flex;align-items:center;gap:calc(var(--u)*1.5);font-size:calc(var(--u)*5);font-weight:900' }, h('span', { class: 'ja-coin' }), num(this.save.coins));
+    const tabs = h('div', { class: 'ja-tabs' }, CATS.map((c) => h('button', { class: `ja-tab${c.id === cat ? ' sel' : ''}`, onclick: () => this.showShop(c.id) }, c.icon, ' ', name(c))));
+    const items = SHOP.filter((i) => i.cat === cat).map((it) => {
+      const have = owns(this.save, it.id);
+      const on = look[cat] === it.id;
+      const can = have || this.save.coins >= it.price;
+      const swatch = h('div', { class: 'sw' });
+      if (it.color) swatch.style.background = it.color;
+      else swatch.textContent = it.id === 'hat_none' ? '🚫' : it.id === 'hat_flower' ? '🌸' : '';
+      if (it.star) swatch.textContent = '⭐';
+      if (it.bolt) swatch.textContent = '⚡';
+      if (it.id === 'hat_crown') swatch.textContent = '👑';
+      if (it.id === 'hat_helmet') swatch.textContent = '🪖';
+      if (it.id === 'hat_cap') swatch.textContent = '🧢';
+      return h('button', {
+        class: `ja-item${on ? ' on' : ''}${can ? '' : ' poor'}`,
+        'aria-label': name(it),
+        onclick: () => {
+          if (!have) {
+            const r = buy(this.save, it.id);
+            if (r === 'poor') { this.sound.play('bonk'); this.toast('🪙', t('needMore'), 1.8); return; }
+            this.sound.play('relic');
+            this.toast(t('bought'), '', 1);
+          } else this.sound.play('tap');
+          wear(this.save, hero, it.id);
+          this._saveNow();
+          this.showShop(cat);
+        },
+      }, swatch, h('div', { class: 'nm' }, name(it)),
+      h('div', { class: 'pr' }, on ? t('wearing') : have ? (it.price ? t('wear') : t('free')) : h('span', { style: 'display:inline-flex;align-items:center;gap:calc(var(--u)*.8)' }, h('span', { class: 'ja-coin', style: 'width:calc(var(--u)*3.4);height:calc(var(--u)*3.4)' }), num(it.price))));
+    });
+    this.layer.append(
+      h('button', { class: 'ja-round', style: 'top:max(calc(var(--u)*2.5),env(safe-area-inset-top));inset-inline-start:calc(var(--u)*3)', 'aria-label': t('menu'), onclick: () => this.showMenu() }, getLang() === 'en' ? '←' : '→'),
+      h('div', { class: 'ja-shop' },
+        h('div', { class: 'ja-shop-top' },
+          h('div', { class: 'ja-logo', style: 'font-size:calc(var(--u)*8)' }, '🛍️ ', t('shop')),
+          coins),
+        h('div', { class: 'ja-shop-body' },
+          h('div', { class: 'ja-glass ja-preview' },
+            this._heroCanvas(hero, 30, 'ja-hero-big'),
+            h('div', { class: 'ja-heroes' }, Object.keys(HEROES).map((k) => h('button', {
+              class: `ja-tab${k === hero ? ' sel' : ''}`,
+              onclick: () => { this.save.hero = k; setHero(k); this._saveNow(); this.showShop(cat); },
+            }, name(HEROES[k]))))),
+          h('div', { class: 'ja-glass ja-shelf' }, tabs, h('div', { class: 'ja-items' }, items)))),
+      this._toastEl(),
+    );
+  }
+
   startLevel(i) {
+    setHero(this.save.hero); // the words follow whoever is playing
     this.levelIndex = i;
     const lv = LEVELS[i];
     this.sim = new Sim(lv, { easy: this.easy });
@@ -277,13 +346,28 @@ class Game {
     this.layer.append(dim);
   }
 
+  _drawHeroAt(g, x, y, s, hero = this.save.hero) {
+    drawHero(g, x, y, s, hero, lookOf(this.save, hero));
+  }
+
+  /** A small canvas with a hero standing (or running, when `anim`) — for the menu, shop and end card. */
+  _heroCanvas(hero, sizeU, cls = 'ja-portrait') {
+    const c = h('canvas', { class: cls, style: `width:calc(var(--u)*${sizeU});height:calc(var(--u)*${sizeU})` });
+    const px = Math.round((Math.min(this.cw, this.ch) * sizeU * this.dpr) / 100);
+    c.width = c.height = px;
+    const g = c.getContext('2d');
+    g.scale(px / 2.2, px / 2.2);
+    this._drawHeroAt(g, 1.1, 1.95, { phase: 0.4, air: false, vy: 0, wall: 0, dir: 1, blink: false }, hero);
+    return c;
+  }
+
   _portrait() {
     const c = h('canvas', { class: 'ja-portrait' });
     const px = Math.round(Math.min(this.cw, this.ch) * 0.22 * this.dpr);
     c.width = c.height = px;
     const g = c.getContext('2d');
     g.scale(px / 2.2, px / 2.2);
-    drawGirl(g, 1.1, 1.95, { phase: 0.4, air: false, vy: 0, wall: 0, dir: 1, blink: false });
+    this._drawHeroAt(g, 1.1, 1.95, { phase: 0.4, air: false, vy: 0, wall: 0, dir: 1, blink: false });
     return c;
   }
 
@@ -299,7 +383,8 @@ class Game {
     const reward = h('span', {}, num(0));
     const hasNext = won && !last;
     const panel = h('div', { class: 'ja-glass' },
-      h('div', { class: 'ja-title' }, won ? (last ? t('winLast') : t('win')) : t('almost')),
+      h('div', { class: `ja-title${won ? ' ja-win' : ''}` }, won ? t('win') : t('almost')),
+      won && last ? h('div', { class: 'ja-reward' }, t('winLast')) : null,
       this._portrait(),
       h('div', { class: 'ja-sub' }, won ? (allRelics ? t('relicsSub') : t('someRelics')) : t('almostSub')),
       h('div', { class: 'ja-stats' },
@@ -388,7 +473,12 @@ class Game {
         this._sparkle(e.x, e.y, '#7dffb0', 14);
         if (e.all) this.sim.coins += 10;
         break;
-      case 'stomp': S.play('stomp'); this._puff(e.x, e.y, '#ff8fb8', 8); break;
+      case 'stomp':
+        S.play('stomp');
+        setTimeout(() => S.play('coin'), 90);
+        this._puff(e.x, e.y, '#ff8fb8', 8);
+        this.particles.push({ x: e.x, y: e.y - 0.6, vx: 0, vy: -7, life: 0.7, max: 0.7, coin: true, g: 14 });
+        break;
       case 'hurt': S.play('hurt'); this.toast(t('ouch'), '', 0.7); break;
       case 'fall': S.play('fall'); break;
       case 'respawn': S.play('respawn'); this._sparkle(p.x, p.y - 0.7, '#ffffff', 10); break;
@@ -561,10 +651,10 @@ class Game {
     if (!blinkOut) {
       if (p.boots > 0) {
         ctx.globalAlpha = 0.25;
-        drawGirl(ctx, p.x - p.dir * 0.35, p.y, { phase: p.run - 0.3, air: !p.onGround, vy: p.vy, wall: p.wall, dir: p.dir });
+        this._drawHeroAt(ctx, p.x - p.dir * 0.35, p.y, { phase: p.run - 0.3, air: !p.onGround, vy: p.vy, wall: p.wall, dir: p.dir });
         ctx.globalAlpha = 1;
       }
-      drawGirl(ctx, p.x, p.y, { phase: p.run, air: !p.onGround, vy: p.vy, wall: !p.onGround && p.wall !== 0 && p.vy > 0, dir: p.dir, blink: Math.floor(now * 0.7) % 5 === 0 && (now * 0.7) % 1 < 0.12 });
+      this._drawHeroAt(ctx, p.x, p.y, { phase: p.run, air: !p.onGround, vy: p.vy, wall: !p.onGround && p.wall !== 0 && p.vy > 0, dir: p.dir, blink: Math.floor(now * 0.7) % 5 === 0 && (now * 0.7) % 1 < 0.12 });
     }
     if (p.shield > 0) drawShield(ctx, p.x, p.y, now);
     if (p.magnet > 0) {
@@ -575,6 +665,11 @@ class Game {
       ctx.stroke();
     }
     for (const q of this.particles) {
+      if (q.coin) {
+        ctx.globalAlpha = Math.min(1, (q.life / q.max) * 2);
+        drawCoin(ctx, q.x, q.y, now * 3);
+        continue;
+      }
       ctx.globalAlpha = Math.max(0, q.life / q.max);
       ctx.fillStyle = q.color;
       ctx.beginPath();
@@ -614,7 +709,7 @@ const api = {
     return { dispose: () => g.dispose(), pause: () => g.pause() };
   },
 };
-api.drawGirl = drawGirl; // for checking the drawing from the browser console
+api.drawHero = drawHero; // for checking the drawing from the browser console
 window.JungleAdventure = api;
 export default api;
 void P;

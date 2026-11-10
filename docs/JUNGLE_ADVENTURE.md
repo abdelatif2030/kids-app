@@ -33,6 +33,18 @@ cd game_src/jungle_adventure && npm install && npm run build && npm test
 * Results card (frosted dark glass): coins, relics x/3, level x/3, time bonus, reward counting up; next level /
   try again / menu. Coins are always kept, also after a lost try. Nothing is ever taken away.
 
+## Heroes, shop and words (owner request, 2026-11-11)
+* Two heroes, the app's own children drawn as explorers: **آدم** (curly brown hair, purple hoodie with a yellow star)
+  and **نور** (long wavy hair, pink bow, pink top with a yellow star). The menu asks «مين هيلعب؟». The first time,
+  the game starts as the child's gender when the parent gave one (`ChildProfile.gender`), otherwise Nour.
+* «المحل»: coins collected in the levels buy clothes (`src/shop.js`): hats (helmet free, red cap, flower crown, gold
+  crown), tops (the two star tops free, explorer blue/green, orange, super hero), shorts, shoes. Prices 20-150 coins.
+  Bought items are shared by both heroes; each hero wears their own outfit. No money, nothing is ever taken away;
+  a tampered save cannot wear what it did not buy.
+* The words follow the hero: «دوس / دوسي», «انط / انطي», and the level-end title «شطوووووور!» / «شطووووورة!».
+* Stomping: any landing from the air squashes a beetle (only running into it hurts), and each squashed beetle pops
+  out a coin.
+
 ## Checked
 * `npm test` (node): every level is finished by a simple robot player before the clock runs out; every relic is
   within a high jump of a floor or next to a wall; holding jumps clearly higher than tapping; easy mode never loses
@@ -50,7 +62,7 @@ cd game_src/jungle_adventure && npm install && npm run build && npm test
   low-time ticks, win fanfare and a gentle "try again". Mute button, remembered per child.
 
 ## Saved data
-`shared_preferences` key `jungle_adventure`: `{childId: {unlocked, coins, best: {level: {relics, coins, done}}, muted}}`,
+`shared_preferences` key `jungle_adventure`: `{childId: {unlocked, coins, best: {level: {relics, coins, done}}, hero, owned, looks, muted}}`,
 on this device only, erased by `deleteOneChild` and `deleteChildData`.
 
 ## Not verified yet
