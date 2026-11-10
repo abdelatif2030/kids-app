@@ -18,11 +18,12 @@ this.b=e},
 aNo:function aNo(d,e){this.a=d
 this.b=e},
 aNp:function aNp(d){this.a=d},
-G3:function G3(d,e,f,g){var _=this
+G3:function G3(d,e,f,g,h){var _=this
 _.c=d
 _.d=e
 _.e=f
-_.a=g},
+_.f=g
+_.a=h},
 a6r:function a6r(){var _=this
 _.d=null
 _.e=$
@@ -133,7 +134,8 @@ x=$.h().a==="ar"?"\u0631\u062c\u0648\u0639":"Back"
 return A.a([A.jz(w,new A.cq(this.a.e,A.aL(w,C.arV,D.C,w,w,new A.az(D.fk,w,A.cp(D.r,3),w,D.QG,w,D.bB),w,w,w,w,w,w,w,w),40,x,!1,!0,C.bVB),v,w,0.02*d,w,0.03*e,u)],y.u)},
 $S:205}
 B.aNm.prototype={
-$1(d){return new B.G3(this.b,this.a.c.a,this.c,null)},
+$1(d){var x=this.a.c
+return new B.G3(this.b,x.a,this.c,x.Q,null)},
 $S:z+0}
 B.aNn.prototype={
 $0(){return this.a.acs(this.b,$.bYm())},
@@ -150,8 +152,8 @@ if(x.c==null)return
 x.u(new B.bKT(x,d))},
 $S:1174}
 B.bKT.prototype={
-$0(){var x=this.a,w=$.h().a==="ar"?"ar":"en"
-return x.d=A.ad(["lang",w,"age",x.a.e,"save",this.b],y.w,y.x)},
+$0(){var x=this.a,w=$.h().a==="ar"?"ar":"en",v=x.a
+return x.d=A.ad(["lang",w,"age",v.e,"gender",v.f,"save",this.b],y.w,y.x)},
 $S:0}
 B.bKY.prototype={
 $1(d){var x,w=A.e1(A.lD(b.G.document,"createElement","div",null,null,null))
@@ -198,4 +200,4 @@ C.bWh=new A.M("fun_carnival_race",y.q)
 C.bWi=new A.M("fun_games_page",y.q)
 C.bWj=new A.M("fun_jungle_adventure",y.q)
 C.bWo=new A.M("games_choice",y.q)})();(function staticFields(){$.ccN=0})()};
-(a=>{a["eAC2FaNKujb77mOW5S5fptT/1nk="]=a.current})($__dart_deferred_initializers__);
+(a=>{a["7SLe71Uhm+YM781L4C7+JP9cXZU="]=a.current})($__dart_deferred_initializers__);
