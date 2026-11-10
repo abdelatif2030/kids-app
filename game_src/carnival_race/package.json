@@ -1,0 +1,17 @@
+{
+  "name": "carnival-race",
+  "private": true,
+  "description": "Rehlaty carnival bumper-car race (three.js). Built into assets/games/carnival_race/game.js",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/carnival_race/game.js",
+    "watch": "esbuild src/main.js --bundle --format=iife --target=es2019 --outfile=../../assets/games/carnival_race/game.js --watch",
+    "test": "node --test test/race.test.js"
+  },
+  "dependencies": {
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.0"
+  },
+  "type": "module"
+}

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 import '../../design/layout.dart';
 import '../../design/motion_system.dart';
 import '../../design/tokens.dart';
@@ -48,11 +47,7 @@ class _ChildShellState extends State<ChildShell> {
       CompanionStore.noteAge(widget.child.id, widget.child.age);
       FamilyTimeStore.remind(widget.child.id, widget.child.nickname);
       if (EnginePrefs.instance.autoNarration) {
-        CompanionService.react(
-          widget.child.id,
-          CompanionMoment.greet,
-          age: widget.child.age,
-        ).then((r) {
+        CompanionService.react(widget.child.id, CompanionMoment.greet, age: widget.child.age).then((r) {
           if (r == null) RehlatyAudioEngine.instance.say('welcome_back'); // Adam's greeting (an approved recording once listed, else the device voice)
         });
       }
@@ -61,12 +56,9 @@ class _ChildShellState extends State<ChildShell> {
 
   @override
   void dispose() {
-    if (CompanionStore.currentChildId == widget.child.id)
-      CompanionStore.currentChildId = null;
+    if (CompanionStore.currentChildId == widget.child.id) CompanionStore.currentChildId = null;
     // Deferred so listeners are not notified in the middle of tearing down.
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => SessionManager.instance.stop(),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => SessionManager.instance.stop());
     super.dispose();
   }
 
@@ -76,12 +68,7 @@ class _ChildShellState extends State<ChildShell> {
       return;
     }
     if (!mounted) return;
-    final ok = await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const PinEntryScreen(returnResult: true),
-      ),
-    );
+    final ok = await Navigator.push<bool>(context, MaterialPageRoute(builder: (_) => const PinEntryScreen(returnResult: true)));
     if (ok == true && mounted) Navigator.pop(context);
   }
 
@@ -95,29 +82,13 @@ class _ChildShellState extends State<ChildShell> {
       child: ListenableBuilder(
         listenable: JourneyStore.instance,
         builder: (context, _) {
-          final child =
-              JourneyStore.instance.profileById(widget.child.id) ??
-              widget.child;
+          final child = JourneyStore.instance.profileById(widget.child.id) ?? widget.child;
           final tabs = [
-            HomeTab(
-              child: child,
-              onExit: _exit,
-              onTab: (i) => setState(() => _tab = i),
-            ),
+            HomeTab(child: child, onExit: _exit, onTab: (i) => setState(() => _tab = i)),
             _GamesTab(child: child, onBack: () => setState(() => _tab = 0)),
-            CreateChoiceScreen(
-              key: const ValueKey('create_tab'),
-              child: child,
-              onBack: () => setState(() => _tab = 0),
-            ),
+            CreateChoiceScreen(key: const ValueKey('create_tab'), child: child, onBack: () => setState(() => _tab = 0)),
             MeTab(child: child, onBack: () => setState(() => _tab = 0)),
-            HomeTab(
-              key: const ValueKey('more_tab'),
-              more: true,
-              child: child,
-              onExit: _exit,
-              onTab: (i) => setState(() => _tab = i),
-            ),
+            HomeTab(key: const ValueKey('more_tab'), more: true, child: child, onExit: _exit, onTab: (i) => setState(() => _tab = i)),
           ];
           // Upright phone: a bottom bar. A phone held sideways: a slim icon rail at the edge, over a comfortable spot for the
           // thumb, so the picture keeps the whole height. Tablets and desktops: the full rail with names.
@@ -143,10 +114,7 @@ class _ChildShellState extends State<ChildShell> {
               Expanded(
                 child: PastelBackground(
                   child: SafeArea(
-                    child: KeyedSubtree(
-                      key: const ValueKey('tab_body'),
-                      child: tabs[_tab],
-                    ),
+                    child: KeyedSubtree(key: const ValueKey('tab_body'), child: tabs[_tab]),
                   ),
                 ),
               ),
@@ -161,20 +129,12 @@ class _ChildShellState extends State<ChildShell> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       boxShadow: DS.softShadow,
-                      border: const BorderDirectional(
-                        end: BorderSide(color: DS.border, width: 1.5),
-                      ),
+                      border: const BorderDirectional(end: BorderSide(color: DS.border, width: 1.5)),
                     ),
                     child: SafeArea(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          for (final n in items)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: n,
-                            ),
-                        ],
+                        children: [for (final n in items) Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: n)],
                       ),
                     ),
                   ),
@@ -192,20 +152,12 @@ class _ChildShellState extends State<ChildShell> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       boxShadow: DS.softShadow,
-                      border: const BorderDirectional(
-                        end: BorderSide(color: DS.border, width: 1.5),
-                      ),
+                      border: const BorderDirectional(end: BorderSide(color: DS.border, width: 1.5)),
                     ),
                     child: SafeArea(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          for (final n in items)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              child: n,
-                            ),
-                        ],
+                        children: [for (final n in items) Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: n)],
                       ),
                     ),
                   ),
@@ -222,13 +174,9 @@ class _ChildShellState extends State<ChildShell> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: DS.softShadow,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(24),
-                  ),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                 ),
-                child: Row(
-                  children: [for (final n in items) Expanded(child: n)],
-                ),
+                child: Row(children: [for (final n in items) Expanded(child: n)]),
               ),
             ),
           );
@@ -254,14 +202,7 @@ class _NavItem extends StatelessWidget {
 
   /// Icon only (a phone held sideways): the name stays in the accessibility label and a tooltip.
   final bool compact;
-  const _NavItem({
-    super.key,
-    required this.icon,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-    this.compact = false,
-  });
+  const _NavItem({super.key, required this.icon, required this.label, required this.selected, required this.onTap, this.compact = false});
 
   @override
   Widget build(BuildContext context) {
@@ -287,11 +228,7 @@ class _NavItem extends StatelessWidget {
               ),
               child: AnimatedNavigationItem(
                 selected: selected,
-                child: Icon(
-                  icon,
-                  size: compact ? 26 : 30,
-                  color: selected ? Colors.white : DS.primary,
-                ),
+                child: Icon(icon, size: compact ? 26 : 30, color: selected ? Colors.white : DS.primary),
               ),
             ),
             if (!compact) const SizedBox(height: 2),
@@ -301,11 +238,7 @@ class _NavItem extends StatelessWidget {
                 child: Text(
                   label,
                   maxLines: 1,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: selected ? FontWeight.w900 : FontWeight.w600,
-                    color: selected ? DS.primary : RC.ink,
-                  ),
+                  style: TextStyle(fontSize: 13, fontWeight: selected ? FontWeight.w900 : FontWeight.w600, color: selected ? DS.primary : RC.ink),
                 ),
               ),
           ],
@@ -334,14 +267,10 @@ class _GamesTabState extends State<_GamesTab> {
       return LazyGamesChoice(
         onBack: widget.onBack,
         onEducational: () => setState(() => _learning = true),
-        onFun: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => const LazyFunGames())),
+        onFun: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => LazyFunGames(child: widget.child))),
       );
     }
     // The learning games hub: ten islands (letters, numbers, shapes...), each opening its own games. It fills the whole area.
-    return LazyGamesHub(
-      child: widget.child,
-      onBack: () => setState(() => _learning = false),
-    );
+    return LazyGamesHub(child: widget.child, onBack: () => setState(() => _learning = false));
   }
 }
-

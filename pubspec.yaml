@@ -53,7 +53,7 @@ dependencies:
   http: ^1.6.0
   google_sign_in: ^7.2.0
   video_player: ^2.14.1
-
+  webview_flutter: ^4.14.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -93,6 +93,8 @@ flutter:
     - assets/games/choice_scene.webp
     - assets/games/fun_scene.webp
     - assets/games/game_bg.webp
+    - assets/games/carnival_race/
+    - assets/games/race_card.webp
     - assets/home/home_main.webp
     - assets/home/cartoons_stories.webp
     - assets/home/lessons_scene.webp
