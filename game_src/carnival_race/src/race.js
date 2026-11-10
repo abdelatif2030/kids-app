@@ -39,6 +39,7 @@ export class Car {
     this.boost = 0;
     this.boostPower = 0;
     this.spin = 0; // seconds left of a spin-out
+    this.safe = 0; // seconds of protection after a spin, so one ride can't catch a car again and again
     this.spinAngle = 0; // visual yaw from spins and air tricks
     this.airSpin = 0; // radians spun while airborne (tricks)
     this.drift = 0; // seconds drifting
@@ -239,12 +240,15 @@ export class Race {
     const tr = this.track;
     const W = tr.width / 2 - 1.1;
     // spin-out: the car twirls and slows, the child cannot steer for a moment
+    // it keeps rolling forward so it always gets out of a ride, and is safe for a moment afterwards
     if (c.spin > 0) {
       c.spin -= dt;
       c.spinAngle += dt * 14;
-      c.v *= 1 - 1.6 * dt;
+      c.v = Math.max(c.v * (1 - 1.6 * dt), 7);
       ctl = { throttle: 0, steer: 0, item: false, trick: 0 };
+      if (c.spin <= 0) c.safe = 2;
     }
+    if (c.safe > 0) c.safe -= dt;
     if (c.boost > 0) c.boost -= dt;
     if (c.shield > 0) c.shield -= dt;
     if (c.bump > 0) c.bump = Math.max(0, c.bump - dt * 3);
@@ -373,13 +377,16 @@ export class Race {
     }
   }
 
-  _hit(c, why) {
-    if (c.spin > 0) return;
+  _hit(c, why, fromX) {
+    if (c.spin > 0 || c.safe > 0) return;
     if (c.shield > 0) {
       c.shield = 0;
+      c.safe = 1;
       this.emit('shieldPop', { car: c.id });
       return;
     }
+    // pushed away from what hit it, towards open road
+    if (fromX !== undefined) c.vx += (c.x >= fromX ? 1 : -1) * 6;
     c.spin = 0.9;
     c.drift = 0;
     c.boost = 0;
@@ -495,13 +502,13 @@ export class Race {
           for (const cup of this.teacups(h)) {
             let d = tr.wrap(cup.s - c.s);
             if (d > tr.length / 2) d -= tr.length;
-            if (d * d + (cup.x - c.x) ** 2 < 2.4 * 2.4) this._hit(c, 'teacup');
+            if (d * d + (cup.x - c.x) ** 2 < 2.4 * 2.4) this._hit(c, 'teacup', cup.x);
           }
         } else {
           // hammer / boat swing across the road; they only touch the road near the bottom of the swing
           const low = Math.abs(h.angle) < 0.55;
           const reach = h.type === 'boat' ? 3.2 : 1.6;
-          if (low && Math.abs(ds) < reach && Math.abs(this._hazardX(h) - c.x) < 2.6) this._hit(c, h.type);
+          if (low && Math.abs(ds) < reach && Math.abs(this._hazardX(h) - c.x) < 2.6) this._hit(c, h.type, this._hazardX(h));
         }
       }
     }

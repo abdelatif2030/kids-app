@@ -65,3 +65,36 @@ test('save: damaged data loads safely, nothing is lost, prices are enforced', ()
   assert.equal(save.tickets, 7);
   assert.equal(buyRacer(save, 'bunny'), false);
 });
+
+test('a car that drives straight into any ride always gets through it (never stuck spinning)', () => {
+  for (const def of TRACKS) {
+    const track = new TrackPath(def);
+    const race0 = new Race(track, { racerId: 'raccoon', upgrades: {}, seed: 1 });
+    for (const h of race0.hazards) {
+      for (const lane of [-0.3, 0, 0.3]) {
+        const race = new Race(track, { racerId: 'raccoon', upgrades: {}, seed: 2 });
+        race.phase = 'race';
+        // only the player on the road, aimed straight at the ride, at full speed
+        race.cars = [race.player];
+        const p = race.player;
+        p.s = track.wrap(h.s - 18);
+        p.x = lane * track.width;
+        p.v = 20;
+        p.lap = 0;
+        let spins = 0;
+        let t = 0;
+        let passed = false;
+        while (t < 10) {
+          race.step(1 / 60, { throttle: 1, steer: 0, item: false });
+          spins += race.events.filter((e) => e.type === 'spin').length;
+          t += 1 / 60;
+          let ds = track.wrap(p.s - h.s);
+          if (ds > track.length / 2) ds -= track.length;
+          if (ds > 12) { passed = true; break; }
+        }
+        assert.ok(passed, `${def.id} ${h.type} at lane ${lane}: still stuck after ${t.toFixed(1)} s (${spins} spins)`);
+        assert.ok(spins <= 2, `${def.id} ${h.type} lane ${lane}: ${spins} spins in one ride`);
+      }
+    }
+  }
+});
