@@ -102,4 +102,14 @@ final WebGame kMotoRace = WebGame(
   title: () => tr2('سباق الدراجات النارية', 'Motorcycle Racing'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense];
+/// «البقاء على الإيقاع» (Rhythm Survival): plush animals on a giant spinning record (docs/RHYTHM_SURVIVAL.md).
+final WebGame kRhythmSurvival = WebGame(
+  id: 'rhythm',
+  folder: 'rhythm',
+  global: 'RhythmSurvival',
+  storeKey: 'rhythm',
+  minAge: 3,
+  title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
+);
+
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival];

@@ -124,7 +124,7 @@ class FunGamesScreen extends StatelessWidget {
             ('fun_samurai', kSamuraiAction, '', '', 0.892, 0.305, 0.19, 0.25),
             ('fun_ocean_defense', kOceanDefense, '', '', 0.111, 0.562, 0.19, 0.25),
             ('fun_golden_tail', kGoldenTail, '', '', 0.307, 0.562, 0.18, 0.25),
-            ('fun_rhythm', null, 'البقاء على الإيقاع', 'Rhythm Survival', 0.501, 0.562, 0.18, 0.25),
+            ('fun_rhythm', kRhythmSurvival, '', '', 0.501, 0.562, 0.18, 0.25),
             ('fun_moto_race', kMotoRace, '', '', 0.693, 0.562, 0.18, 0.25),
             ('fun_splash_race', null, 'سباق السباحة العجيب', 'Splash Race', 0.892, 0.562, 0.19, 0.25),
             ('fun_space_store', null, 'متجر الفضاء الذكي', 'Space Store Manager', 0.192, 0.830, 0.23, 0.26),
