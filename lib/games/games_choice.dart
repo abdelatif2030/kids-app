@@ -77,12 +77,12 @@ class GamesChoiceScreen extends StatelessWidget {
   }
 }
 
-/// The owner's picture of the fun games page (2026-11-11, 1536 x 1024): the wooden sign, a back arrow and twelve game
-/// cards in three rows (Glowfair rally, jungle, farm, bakery, samurai / ocean defense, golden tail, rhythm survival,
-/// motorcycle racing, splash race / space store manager, fox family rescue). It is shown whole; the arrow and the cards are
+/// The owner's picture of the fun games page (2026-11-11, 1535 x 1024): the wooden sign, a back arrow and thirteen
+/// game cards in three rows (Glowfair rally, jungle, farm, bakery, samurai / ocean defense, golden tail, rhythm
+/// survival, motorcycle racing, splash race / space store manager, fox family rescue, airplane racing). It is shown whole; the arrow and the cards are
 /// large invisible buttons on it, like the Games page. To change it, replace the one file.
 const String kFunGamesPicture = 'assets/games/fun_games_scene.webp';
-const double kFunGamesAspect = 1536 / 1024;
+const double kFunGamesAspect = 1535 / 1024;
 
 /// «ألعاب للتسلية»: the owner's picture with two cards. A child younger than a game's [WebGame.minAge] gets a friendly
 /// note instead of the game.
@@ -114,21 +114,22 @@ class FunGamesScreen extends StatelessWidget {
         asset: kFunGamesPicture,
         aspect: kFunGamesAspect,
         spots: [
-          // the twelve cards of the owner's picture (centre, width, height as fractions of it); a card whose game is
+          // the thirteen cards of the owner's picture (centre, width, height as fractions of it); a card whose game is
           // still being built says so
           for (final (id, game, ar, en, cx, cy, w, hh) in <(String, WebGame?, String, String, double, double, double, double)>[
-            ('fun_carnival_race', kCarnivalRace, '', '', 0.111, 0.305, 0.19, 0.25),
-            ('fun_jungle_adventure', kJungleAdventure, '', '', 0.307, 0.305, 0.18, 0.25),
-            ('fun_happy_farm', kHappyFarm, '', '', 0.501, 0.305, 0.18, 0.25),
-            ('fun_pumpkin_pie', kPumpkinPie, '', '', 0.693, 0.305, 0.18, 0.25),
-            ('fun_samurai', kSamuraiAction, '', '', 0.892, 0.305, 0.19, 0.25),
-            ('fun_ocean_defense', kOceanDefense, '', '', 0.111, 0.562, 0.19, 0.25),
-            ('fun_golden_tail', kGoldenTail, '', '', 0.307, 0.562, 0.18, 0.25),
-            ('fun_rhythm', kRhythmSurvival, '', '', 0.501, 0.562, 0.18, 0.25),
-            ('fun_moto_race', kMotoRace, '', '', 0.693, 0.562, 0.18, 0.25),
-            ('fun_splash_race', null, 'سباق السباحة العجيب', 'Splash Race', 0.892, 0.562, 0.19, 0.25),
-            ('fun_space_store', null, 'متجر الفضاء الذكي', 'Space Store Manager', 0.192, 0.830, 0.23, 0.26),
-            ('fun_fox_family', null, 'أم الثعلب ومغامرات العيور', 'Fox Family Rescue', 0.503, 0.835, 0.36, 0.28),
+            ('fun_carnival_race', kCarnivalRace, '', '', 0.112, 0.298, 0.19, 0.24),
+            ('fun_jungle_adventure', kJungleAdventure, '', '', 0.311, 0.298, 0.18, 0.24),
+            ('fun_happy_farm', kHappyFarm, '', '', 0.502, 0.298, 0.18, 0.24),
+            ('fun_pumpkin_pie', kPumpkinPie, '', '', 0.694, 0.298, 0.18, 0.24),
+            ('fun_samurai', kSamuraiAction, '', '', 0.891, 0.298, 0.19, 0.24),
+            ('fun_ocean_defense', kOceanDefense, '', '', 0.112, 0.552, 0.19, 0.24),
+            ('fun_golden_tail', kGoldenTail, '', '', 0.311, 0.552, 0.18, 0.24),
+            ('fun_rhythm', kRhythmSurvival, '', '', 0.502, 0.552, 0.18, 0.24),
+            ('fun_moto_race', kMotoRace, '', '', 0.694, 0.552, 0.18, 0.24),
+            ('fun_splash_race', null, 'سباق السباحة العجيب', 'Splash Race', 0.891, 0.552, 0.19, 0.24),
+            ('fun_space_store', null, 'متجر الفضاء الذكي', 'Space Store Manager', 0.161, 0.830, 0.28, 0.27),
+            ('fun_fox_family', null, 'أم الثعلب ومغامرات العيور', 'Fox Family Rescue', 0.467, 0.830, 0.28, 0.27),
+            ('fun_airplane', null, 'سباق الطائرات الجوي', 'Airplane Racing', 0.805, 0.830, 0.35, 0.27),
           ])
             PictureSpot(
               id,
@@ -144,7 +145,7 @@ class FunGamesScreen extends StatelessWidget {
             ),
           PictureSpot(
             'fun_back',
-            const Offset(0.068, 0.086),
+            const Offset(0.067, 0.083),
             0.085,
             0.125,
             tr2('رجوع', 'Back'),
