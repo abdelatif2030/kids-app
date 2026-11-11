@@ -56,7 +56,10 @@ const CSS = `
 .lk-layer button,.lk-layer .lk-card,.lk-layer .lk-pe{pointer-events:auto}
 .lk-top{position:absolute;top:max(calc(var(--u)*2.4),env(safe-area-inset-top));left:calc(var(--u)*2.4);right:calc(var(--u)*2.4);display:flex;align-items:center;justify-content:space-between;gap:calc(var(--u)*2)}
 .lk-rbtn{width:calc(var(--u)*12);height:calc(var(--u)*12);min-width:48px;min-height:48px;border-radius:50%;border:calc(var(--u)*.7) solid #fff;background:linear-gradient(180deg,#9a6af0,#6a3ad0);color:#fff;font-size:calc(var(--u)*5.6);font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 calc(var(--u)*.8) 0 #4a2a9a,0 calc(var(--u)*1) calc(var(--u)*2.4) rgba(30,20,70,.35);padding:0;font-family:inherit}
-.lk-rbtn:active{transform:translateY(calc(var(--u)*.5))}
+.lk-rbtn:active,.lk-back:active{transform:translateY(calc(var(--u)*.5))}
+.lk-back{height:max(52px,calc(var(--u)*12));border-radius:999px;border:calc(var(--u)*.8) solid #6a3ad0;background:#fff;color:#4a2a9a;font-family:inherit;font-weight:900;font-size:max(20px,calc(var(--u)*4.8));display:flex;align-items:center;gap:calc(var(--u)*1.2);padding:0 calc(var(--u)*3.4) 0 calc(var(--u)*2.2);cursor:pointer;box-shadow:0 calc(var(--u)*.8) 0 #4a2a9a,0 calc(var(--u)*1) calc(var(--u)*2.4) rgba(30,20,70,.35)}
+.lk-back b{font-size:1.3em;color:#6a3ad0;line-height:1}
+.lk-back:focus-visible{outline:calc(var(--u)*.8) solid #3a8ae8;outline-offset:calc(var(--u)*.6)}
 .lk-rbtn.y{background:linear-gradient(180deg,#ffd45a,#f5a01a);box-shadow:0 calc(var(--u)*.8) 0 #b8700a,0 calc(var(--u)*1) calc(var(--u)*2.4) rgba(30,20,70,.35)}
 .lk-dots{display:flex;gap:calc(var(--u)*1.4);background:rgba(255,255,255,.82);border:calc(var(--u)*.5) solid #fff;border-radius:999px;padding:calc(var(--u)*1.2) calc(var(--u)*2.6);box-shadow:0 calc(var(--u)*.6) calc(var(--u)*1.6) rgba(30,20,70,.25)}
 .lk-dots span{font-size:calc(var(--u)*5);filter:grayscale(1);opacity:.35;transition:all .3s;line-height:1}
@@ -95,6 +98,7 @@ export class Shell {
     this.done = !!this.cfg.done;
     this.save = this.cfg.save && typeof this.cfg.save === 'object' ? { ...this.cfg.save } : {};
     this.sound = new Sound(opts.theme);
+    if (opts.musicOnly) { this.sound.musicOnly = true; this.opts.voice = false; }
     this.sound.muted = !!this.save.muted;
     if (!document.getElementById('lk-style')) document.head.append(h('style', { id: 'lk-style' }, CSS));
     this.root = h('div', { class: 'lk-root', dir: this.T.lang === 'en' ? 'ltr' : 'rtl' });
@@ -136,7 +140,7 @@ export class Shell {
 
   /** Says [text] with the app's own voice (and ducks the music meanwhile). */
   speak(text, secs) {
-    if (!text) return;
+    if (!text || this.opts.voice === false) return; // a game may be music-only (owner: the maze)
     this.sound.duck(secs ?? Math.min(5, 1.2 + text.length * 0.09)); // the slower child-like voice needs a little longer
     this.post({ type: 'speak', text, lang: this.T.lang });
   }
@@ -151,7 +155,8 @@ export class Shell {
   clear() { this.layer.replaceChildren(); this.bubble = null; }
 
   backBtn() {
-    return h('button', { class: 'lk-rbtn', 'aria-label': this.t('back'), onclick: (e) => { e.stopPropagation(); this.exit(); } }, this.T.lang === 'en' ? '←' : '→');
+    // a clear pill with the arrow and the word (owner request: the back button must be obvious)
+    return h('button', { class: 'lk-back', 'aria-label': this.t('back'), onclick: (e) => { e.stopPropagation(); this.exit(); } }, h('b', {}, this.T.lang === 'en' ? '←' : '→'), this.t('back'));
   }
 
   soundBtn() {

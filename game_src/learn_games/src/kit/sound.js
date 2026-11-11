@@ -104,7 +104,8 @@ export class Sound {
     if (!this.ctx) return;
     this.step = 0;
     this.nextTime = this.ctx.currentTime + 0.12;
-    const v = mode === 'calm' ? 0.18 : mode === 'menu' ? 0.28 : 0.34;
+    const base = this.musicOnly ? 1.6 : 1; // the music is the only sound: a little louder and clearer
+    const v = (mode === 'calm' ? 0.18 : mode === 'menu' ? 0.28 : 0.34) * base;
     this.musicBus.gain.setTargetAtTime(v, this.ctx.currentTime, 0.3);
   }
 
@@ -229,7 +230,7 @@ export class Sound {
   // ---- effects ----------------------------------------------------------------------------------------------------
 
   play(name, arg) {
-    if (!this.on) return;
+    if (!this.on || this.musicOnly) return; // music-only games: no effects at all
     const t = this.ctx.currentTime + 0.005;
     switch (name) {
       case 'tap':

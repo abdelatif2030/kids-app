@@ -6,6 +6,10 @@
 // music and effects are made in code. Bumping a wall is a soft boing, never a mistake.
 import * as THREE from 'three';
 import { Shell, h } from '../kit/shell.js';
+import { THEME_GARDEN } from '../kit/sound.js';
+
+// a clear, calm music-box tune for the maze (no shaker, a bell lead, a little slower)
+const THEME_MAZE = { ...THEME_GARDEN, tempo: 100, lead: 'bell', shaker: false };
 import { MazeSet, N, E, S, W, DX, DY } from './sim.js';
 
 const TEXT = {
@@ -27,7 +31,8 @@ const PILLAR_COLORS = [0xff5a5a, 0xffc93a, 0x4aa8ff, 0xff8a3a, 0xb06aff, 0x3ad08
 
 class Game {
   constructor(el, cfg, post) {
-    this.shell = new Shell(el, cfg, post, { text: TEXT });
+    // music only (owner request 2026-11-12: the voice and effects sounded bad here): a clear, gentle tune
+    this.shell = new Shell(el, cfg, post, { text: TEXT, theme: THEME_MAZE, musicOnly: true });
     this.sh = this.shell;
     const sh = this.sh;
     // three.js
@@ -242,17 +247,17 @@ class Game {
   _fit() {
     if (!this.n) return;
     const a = this.camera.aspect;
-    const wide = a > 1.15;
+    const wide = a > 0.9;
     const half = this.n / 2 + 0.9;
     const vf = THREE.MathUtils.degToRad(this.camera.fov / 2);
     // fit height (with room for the top bar) and width (with room for the arrows)
-    const usableW = wide ? 0.66 : 0.94;
-    const dh = (half * 1.42) / Math.tan(vf); // room above for the bubble and the top bar
+    const usableW = wide ? (a > 1.3 ? 0.66 : 0.5) : 0.94;
+    const dh = (half * (wide ? 1.42 : 1.8)) / Math.tan(vf); // room above for the top bar (and below for the arrows when upright)
     const dw = half / (Math.tan(vf) * a * usableW);
     const d = Math.max(dh, dw) * 1.02;
     const tilt = THREE.MathUtils.degToRad(64);
-    const shiftX = wide ? (this.sh.T.lang === 'en' ? 1 : -1) * half * 0.42 : 0; // arrows on one side in landscape
-    const shiftZ = wide ? -half * 0.2 : half * 0.18; // the maze sits lower, under the host's bubble
+    const shiftX = wide ? (this.sh.T.lang === 'en' ? 1 : -1) * half * (a > 1.3 ? 0.42 : 0.85) : 0; // arrows on one side in landscape
+    const shiftZ = wide ? (a > 1.3 ? -half * 0.2 : 0) : half * 0.5; // landscape: lower, under the bubble; upright: higher, above the arrows
     this.camTarget = new THREE.Vector3(shiftX, 0, shiftZ);
     this.camera.position.set(shiftX, Math.sin(tilt) * d, shiftZ + Math.cos(tilt) * d);
     this.camera.lookAt(this.camTarget);
@@ -311,11 +316,13 @@ class Game {
   }
 
   _placePad() {
-    const wide = this.sh.w > this.sh.h * 1.15;
+    const wide = this.sh.w > this.sh.h * 0.9;
     const en = this.sh.T.lang === 'en';
-    this.pad.style.cssText = wide
+    const squareish = wide && this.sh.w < this.sh.h * 1.3;
+    this.pad.style.setProperty('--pad', squareish ? '12' : '15');
+    this.pad.style.cssText = (squareish ? '--pad:12;' : '') + (wide
       ? `${en ? 'right' : 'left'}:calc(var(--u)*4);bottom:calc(var(--u)*6)`
-      : 'left:50%;transform:translateX(-50%);bottom:max(calc(var(--u)*4),env(safe-area-inset-bottom))';
+      : 'left:50%;transform:translateX(-50%);bottom:max(calc(var(--u)*4),env(safe-area-inset-bottom))');
   }
 
   /** Starts a run in direction [d]. */
@@ -681,7 +688,7 @@ function mulberry(seed) {
 }
 
 const PAD_CSS = `
-.lmz-pad{position:absolute;display:grid;grid-template-columns:repeat(3,calc(var(--u)*15));grid-template-rows:repeat(3,calc(var(--u)*15));gap:calc(var(--u)*1);direction:ltr;pointer-events:none}
+.lmz-pad{position:absolute;display:grid;grid-template-columns:repeat(3,calc(var(--u)*var(--pad,15)));grid-template-rows:repeat(3,calc(var(--u)*var(--pad,15)));gap:calc(var(--u)*1);direction:ltr;pointer-events:none}
 .lmz-pad .lk-rbtn{width:100%;height:100%;font-size:calc(var(--u)*6.5)}
 .lmz-pad [data-d="0"]{grid-column:2;grid-row:1}
 .lmz-pad [data-d="3"]{grid-column:1;grid-row:2}
