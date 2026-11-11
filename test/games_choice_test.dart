@@ -80,7 +80,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     debugDefaultTargetPlatformOverride = TargetPlatform.windows;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
-    for (final (key, game) in [('fun_carnival_race', kCarnivalRace), ('fun_jungle_adventure', kJungleAdventure), ('fun_happy_farm', kHappyFarm), ('fun_pumpkin_pie', kPumpkinPie), ('fun_samurai', kSamuraiAction), ('fun_golden_tail', kGoldenTail)]) {
+    for (final (key, game) in [('fun_carnival_race', kCarnivalRace), ('fun_jungle_adventure', kJungleAdventure), ('fun_happy_farm', kHappyFarm), ('fun_pumpkin_pie', kPumpkinPie), ('fun_samurai', kSamuraiAction), ('fun_golden_tail', kGoldenTail), ('fun_ocean_defense', kOceanDefense)]) {
       await t.pumpWidget(
         MaterialApp(
           key: UniqueKey(),

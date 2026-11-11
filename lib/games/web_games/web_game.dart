@@ -82,4 +82,14 @@ final WebGame kGoldenTail = WebGame(
   title: () => tr2('مغامرة الذيل الذهبي', 'Golden Tail Chase'),
 );
 
-final List<WebGame> kWebGames = [kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail];
+/// «دفاع القلعة البحرية» (Ocean Defense): the clownfish guarding the coral fortress (docs/OCEAN_DEFENSE.md).
+final WebGame kOceanDefense = WebGame(
+  id: 'ocean_defense',
+  folder: 'ocean_defense',
+  global: 'OceanDefense',
+  storeKey: 'ocean_defense',
+  minAge: 3,
+  title: () => tr2('دفاع القلعة البحرية', 'Ocean Defense'),
+);
+
+final List<WebGame> kWebGames = [kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense];
