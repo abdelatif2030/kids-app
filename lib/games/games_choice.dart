@@ -121,7 +121,7 @@ class FunGamesScreen extends StatelessWidget {
             ('fun_happy_farm', kHappyFarm, '', '', 0.614, 0.404, 0.22),
             ('fun_pumpkin_pie', kPumpkinPie, '', '', 0.854, 0.404, 0.23),
             ('fun_samurai', kSamuraiAction, 'سيف الساموراي', 'Samurai Action', 0.182, 0.760, 0.28),
-            ('fun_golden_tail', null, 'مغامرة الذيل الذهبي', 'Golden Tail Chase', 0.465, 0.760, 0.26),
+            ('fun_golden_tail', kGoldenTail, 'مغامرة الذيل الذهبي', 'Golden Tail Chase', 0.465, 0.760, 0.26),
             ('fun_ocean_defense', null, 'دفاع القلعة البحرية', 'Ocean Defense', 0.787, 0.760, 0.36),
           ])
             PictureSpot(

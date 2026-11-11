@@ -1,0 +1,16 @@
+{
+  "name": "golden_tail",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty «مغامرة الذيل الذهبي» treetop golden tail chase (three.js). Built into assets/games/golden_tail/game.js",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/golden_tail/game.js",
+    "test": "node --test test/sim.test.js"
+  },
+  "dependencies": {
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.0"
+  }
+}

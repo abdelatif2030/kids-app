@@ -96,7 +96,7 @@ export class Sound {
   suspend() {
     iosPause(); this.held = true; if (this.ctx && this.ctx.state === 'running') this.ctx.suspend(); }
   resume() {
-    if (!(this.held || this._held)) iosKeepAlive(); this.held = false; if (this.ctx && this.ctx.state !== 'running') this.ctx.resume(); }
+    iosKeepAlive(); this.held = false; if (this.ctx && this.ctx.state !== 'running') this.ctx.resume(); }
 
   setMode(mode, force) {
     if (this.mode === mode && !force) return;

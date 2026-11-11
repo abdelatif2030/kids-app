@@ -72,4 +72,14 @@ final WebGame kSamuraiAction = WebGame(
   title: () => tr2('سيف الساموراي', 'Samurai Action'),
 );
 
-final List<WebGame> kWebGames = [kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction];
+/// «مغامرة الذيل الذهبي» (Golden Tail Chase): the treetop chase with the plush dino (docs/GOLDEN_TAIL.md).
+final WebGame kGoldenTail = WebGame(
+  id: 'golden_tail',
+  folder: 'golden_tail',
+  global: 'GoldenTail',
+  storeKey: 'golden_tail',
+  minAge: 3,
+  title: () => tr2('مغامرة الذيل الذهبي', 'Golden Tail Chase'),
+);
+
+final List<WebGame> kWebGames = [kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail];

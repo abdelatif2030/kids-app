@@ -125,7 +125,7 @@ export class Sound {
   }
 
   resume() {
-    if (!(this.held || this._held)) iosKeepAlive();
+    iosKeepAlive();
     this.held = false;
     if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
   }

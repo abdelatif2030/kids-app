@@ -98,6 +98,7 @@ flutter:
     - assets/games/happy_farm/
     - assets/games/pumpkin_pie/
     - assets/games/samurai/
+    - assets/games/golden_tail/
     - assets/home/home_main.webp
     - assets/home/cartoons_stories.webp
     - assets/home/lessons_scene.webp
