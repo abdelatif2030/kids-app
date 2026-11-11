@@ -36,7 +36,7 @@ export function buildLevel(level, rand) {
       row.dir = dir;
       row.speed = (1.6 + rand() * 1.4) * level.speed;
       const n = 2 + Math.floor(rand() * 2);
-      const kinds = level.season === 'summer' ? ['car', 'tractor', 'car'] : level.season === 'autumn' ? ['truck', 'car', 'tractor'] : ['car', 'truck', 'van'];
+      const kinds = level.season === 'summer' ? ['tractor', 'truck', 'tractor', 'car'] : level.season === 'autumn' ? ['truck', 'tractor', 'truck', 'car'] : ['truck', 'tractor', 'truck', 'van']; // green tractors and pickups, like the video
       for (let k = 0; k < n; k++) {
         const kind = kinds[Math.floor(rand() * kinds.length)];
         row.items.push({ x: -8 + (k * 16) / n + rand() * 2, len: kind === 'truck' || kind === 'van' ? 2.2 : 1.5, kind, stop: false, v: row.speed });

@@ -199,13 +199,15 @@ export function laneTexture(type, season) {
   c.height = 32;
   const g = c.getContext('2d');
   if (type === 'road') {
-    g.fillStyle = season === 'winter' ? '#5a5e6a' : '#4a4e58';
+    g.fillStyle = season === 'winter' ? '#4a4e58' : '#3a3d46';
     g.fillRect(0, 0, 256, 32);
     g.fillStyle = '#f4f4f4';
+    g.fillRect(0, 1, 256, 1.5);
+    g.fillRect(0, 29.5, 256, 1.5);
     for (let i = 0; i < 256; i += 32) g.fillRect(i + 4, 15, 16, 3);
     if (season === 'winter') { g.fillStyle = 'rgba(255,255,255,0.6)'; g.fillRect(0, 0, 256, 3); g.fillRect(0, 29, 256, 3); }
   } else if (type === 'river' || type === 'lily') {
-    g.fillStyle = season === 'winter' ? '#5ab0e8' : '#3aa8e0';
+    g.fillStyle = season === 'winter' ? '#5aa8c8' : '#3a9ab0';
     g.fillRect(0, 0, 256, 32);
     g.strokeStyle = 'rgba(255,255,255,0.4)';
     for (let i = 0; i < 12; i++) { g.beginPath(); g.moveTo((i * 41) % 256, (i * 7) % 32); g.lineTo((i * 41) % 256 + 14, (i * 7) % 32); g.stroke(); }
@@ -218,8 +220,8 @@ export function laneTexture(type, season) {
     g.fillRect(0, 8, 256, 3);
     g.fillRect(0, 21, 256, 3);
   } else {
-    const base = season === 'winter' ? '#f2f6fa' : season === 'autumn' ? '#8aa84a' : '#6cc456';
-    const alt = season === 'winter' ? '#e4ecf4' : season === 'autumn' ? '#7a983e' : '#5eb44a';
+    const base = season === 'winter' ? '#f2f6fa' : season === 'autumn' ? '#7aa040' : '#5aaa3a';
+    const alt = season === 'winter' ? '#e4ecf4' : season === 'autumn' ? '#6c9238' : '#4f9c34';
     g.fillStyle = base;
     g.fillRect(0, 0, 256, 32);
     g.fillStyle = alt;

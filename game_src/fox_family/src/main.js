@@ -134,7 +134,7 @@ class Game {
         }
         if (row.r > 1 && row.r < this.trip.den && row.r % 4 === 0) { const tr = makeTree(lv.season, 0.7); tr.position.set(((row.r * 5) % 7 - 3) * C, 0, -row.r * C); tr.userData.deco = true; s.add(tr); }
       }
-      if (row.type === 'road') row.items.forEach((it, k) => { const m = makeVehicle(it.kind, CAR_COLORS[(row.r + k) % CAR_COLORS.length]); m.rotation.y = row.dir > 0 ? 0 : Math.PI; s.add(m); this.vehicleModels.push({ m, it, row }); });
+      if (row.type === 'road') row.items.forEach((it, k) => { const m = makeVehicle(it.kind, it.kind === 'tractor' ? 0x2f9a3a : it.kind === 'truck' ? [0xd83a3a, 0x8ac0e8, 0x3a6ad8][(row.r + k) % 3] : CAR_COLORS[(row.r + k) % CAR_COLORS.length]); m.rotation.y = row.dir > 0 ? 0 : Math.PI; s.add(m); this.vehicleModels.push({ m, it, row }); });
       if (row.type === 'river' || row.type === 'lily') row.items.forEach((it) => { const m = makeLog(it.len * C, it.kind); s.add(m); this.platformModels.push({ m, it, row }); });
       if (row.type === 'rail') {
         const tr = makeTrain();
@@ -464,12 +464,13 @@ class Game {
     s.g.attributes.position.needsUpdate = true;
     // camera follows the fox's row, looking up the board
     const portrait = this.cw < this.ch;
-    const want = new THREE.Vector3(x * 0.35, portrait ? 17 : 11, z + (portrait ? 6.5 : 6.5));
+    // closer and tilted (like the video): big tractors and trucks near the fox, the lanes ahead shrinking away
+    const want = new THREE.Vector3(x * 0.45, portrait ? 10 : 8.5, z + (portrait ? 6 : 6.5));
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 4));
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 2);
     this.camera.position.set(this.cam.x + (Math.random() - 0.5) * this.shake * 0.3, this.cam.y, this.cam.z);
-    this.camera.lookAt(this.cam.x, 0, this.cam.z - 6.5 - (portrait ? 3 : 1.6));
+    this.camera.lookAt(this.cam.x, 0, this.cam.z - (portrait ? 6 : 6.5) - (portrait ? 2.2 : 1.6));
   }
 
   // ---- loop ----------------------------------------------------------------------------------------------------------
