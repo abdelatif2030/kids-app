@@ -7,7 +7,7 @@ import * as THREE from 'three';
 import { Store, PADS, DISPENSER, RACKS, SHELVES, CHECKOUTS, SHUTTLES, BOUNDS, normalizeSave } from './sim.js';
 import {
   mat, makeAstronaut, makeAlien, makeBasket, makeDispenser, makeRack, makeShelf, makeCheckout, makeRobot, makeCoin,
-  makeShuttlePad, makeDeck, makePlanet, makeStars,
+  makeShuttlePad, makeDeck, makePlanet, makeStars, makeHazard,
 } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
@@ -129,19 +129,22 @@ class Game {
   _buildWorld() {
     const s = (this.scene = new THREE.Scene());
     s.background = new THREE.Color(0x1a1440);
-    s.add(new THREE.HemisphereLight(0xf0eaff, 0x3a2a8a, 1.9));
+    s.add(new THREE.HemisphereLight(0xe8e0ff, 0x3a2a8a, 1.5));
     const sun = new THREE.DirectionalLight(0xfff0e0, 1.3);
     sun.position.set(-8, 20, 10);
     s.add(sun);
     s.add(makeStars(this.quality.low ? 300 : 700));
     const planet = makePlanet();
-    planet.position.set(4, -34, 26);
+    planet.position.set(-8, -25, 33); // its top shows beyond the deck's front edge, like the video
     s.add(planet);
     this.planet = planet;
     s.add(makeDeck(BOUNDS));
     const disp = makeDispenser();
     disp.position.set(DISPENSER.x, 0, DISPENSER.z);
     s.add(disp);
+    const hz = makeHazard(3.2, 2.6);
+    hz.position.set(DISPENSER.x, 0.015, DISPENSER.z);
+    s.add(hz);
     this.dispBaskets = new Pool(s, () => makeBasket(0.9), DISPENSER.cap, (b, i) => b.position.set(DISPENSER.x - 0.5 + (i % 2) * 1.0, 0.15 + Math.floor(i / 2) * 0.32, DISPENSER.z));
     this.rackModels = RACKS.map((r) => {
       const g = new THREE.Group();
@@ -461,11 +464,14 @@ class Game {
     const portrait = this.cw < this.ch;
     const px = Math.max(-4, Math.min(4, st.p.x));
     const pz = Math.max(-5, Math.min(5, st.p.z));
-    const want = new THREE.Vector3(px + 1.5, portrait ? 13.5 : 10.5, pz + (portrait ? 10 : 8));
+    // a diagonal, tilted view of the station (like the video), so space and the planet show past the deck edge
+    const ox = portrait ? 5.5 : 6.5;
+    const oz = portrait ? 9.5 : 8;
+    const want = new THREE.Vector3(px + ox, portrait ? 12.5 : 9.5, pz + oz);
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 3));
     this.camera.position.copy(this.cam);
-    this.camera.lookAt(this.cam.x - 1.5, 0, this.cam.z - (portrait ? 10 : 8) - 1);
+    this.camera.lookAt(this.cam.x - ox, 0, this.cam.z - oz - 1);
     this._guide(time);
     this._labels();
   }

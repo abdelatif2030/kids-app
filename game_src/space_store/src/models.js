@@ -298,9 +298,9 @@ export function makeDeck(b) {
   const c = document.createElement('canvas');
   c.width = c.height = 256;
   const x = c.getContext('2d');
-  x.fillStyle = '#c8c4ec';
+  x.fillStyle = '#b4acea';
   x.fillRect(0, 0, 256, 256);
-  x.strokeStyle = '#b4b0dc';
+  x.strokeStyle = '#9c94d8';
   x.lineWidth = 4;
   for (let i = 0; i <= 256; i += 64) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, 256); x.stroke(); x.beginPath(); x.moveTo(0, i); x.lineTo(256, i); x.stroke(); }
   const tex = new THREE.CanvasTexture(c);
@@ -318,6 +318,13 @@ export function makeDeck(b) {
       const pz = lw > ld ? cz : -ld / 2 + (i * ld) / n;
       g.add(cyl(0.04, 0.04, 0.8, mat(0xe8eaf4), lw > ld ? px : cx, 0.4, lw > ld ? cz : pz, 6));
     }
+  }
+  // big dark-navy round pads with a glowing atom (the station logo of the video)
+  for (const [px, pz, r] of [[-5.5, -4.5, 2.2], [5.5, 3.5, 2.4], [-1.5, 5.5, 1.8]]) {
+    const pad = new THREE.Mesh(new THREE.CircleGeometry(r, 40), new THREE.MeshBasicMaterial({ map: atomTexture() }));
+    pad.rotation.x = -Math.PI / 2;
+    pad.position.set(px, 0.012, pz);
+    g.add(pad);
   }
   // the dashed walkway lines
   for (let i = 0; i < 16; i++) g.add(box(0.4, 0.02, 0.1, mat(0xffc83a), -4 + i * 0.6, 0.01, -0.5));
@@ -356,4 +363,40 @@ export function makeStars(n) {
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   return new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffffff, size: 1.6, sizeAttenuation: true, fog: false }));
+}
+
+let _atom;
+function atomTexture() {
+  if (_atom) return _atom;
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const x = c.getContext('2d');
+  x.fillStyle = '#2a2470';
+  x.beginPath(); x.arc(128, 128, 128, 0, Math.PI * 2); x.fill();
+  x.strokeStyle = '#4a44a8'; x.lineWidth = 10;
+  x.beginPath(); x.arc(128, 128, 112, 0, Math.PI * 2); x.stroke();
+  x.strokeStyle = '#8a7aff'; x.lineWidth = 6;
+  for (let i = 0; i < 3; i++) { x.save(); x.translate(128, 128); x.rotate((i * Math.PI) / 3); x.beginPath(); x.ellipse(0, 0, 70, 26, 0, 0, Math.PI * 2); x.stroke(); x.restore(); }
+  x.fillStyle = '#ffd23a'; x.beginPath(); x.arc(128, 128, 14, 0, Math.PI * 2); x.fill();
+  _atom = new THREE.CanvasTexture(c);
+  _atom.colorSpace = THREE.SRGBColorSpace;
+  return _atom;
+}
+
+/** Yellow and black hazard stripes on the floor (under the basket stand, like the video). */
+export function makeHazard(w, d) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const x = c.getContext('2d');
+  x.fillStyle = '#1e1e28';
+  x.fillRect(0, 0, 128, 128);
+  x.fillStyle = '#ffc83a';
+  for (let i = -128; i < 256; i += 32) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i + 16, 0); x.lineTo(i + 16 + 128, 128); x.lineTo(i + 128, 128); x.closePath(); x.fill(); }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(w / 1.2, d / 1.2);
+  t.colorSpace = THREE.SRGBColorSpace;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshBasicMaterial({ map: t }));
+  m.rotation.x = -Math.PI / 2;
+  return m;
 }
