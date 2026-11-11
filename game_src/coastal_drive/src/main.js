@@ -794,7 +794,7 @@ class Game {
       const want = new THREE.Vector3(Math.sin(a) * d, garage ? 2.6 : 2.3, -Math.cos(a) * d);
       this.camPos.lerp(want, Math.min(1, dt * 2));
       this.camera.position.copy(this.camPos);
-      this.camera.lookAt(0, garage && !this.land ? -2.6 : 0.5, 0);
+      this.camera.lookAt(0, garage && !this.land ? -2.6 : this.land && !garage ? -0.6 : 0.5, 0);
       if (Math.abs(this.camera.fov - this.baseFov) > 0.05) { this.camera.fov = this.baseFov; this.camera.updateProjectionMatrix(); }
       this.sunL.position.set(-30, 50, 20);
       this.sunL.target.position.set(0, 0, 0);

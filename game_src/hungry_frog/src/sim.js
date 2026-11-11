@@ -180,7 +180,7 @@ export class Pond {
     if (Math.abs(c.x) > W - 0.5) { c.x = Math.sign(c.x) * (W - 0.5); c.a = -c.a; }
     if (Math.abs(c.z) > D - 0.5) { c.z = Math.sign(c.z) * (D - 0.5); c.a = Math.PI - c.a; }
     // a bigger frog or snake aims (red dotted line) and then lashes its tongue / strikes
-    if (k.danger && bigger && this.state === 'play') this._attack(c, d, dt, c.kind === 'snake' ? 2.6 + c.r : 3.6 + c.r);
+    if (k.danger && bigger && this.state === 'play' && this.t > 8) this._attack(c, d, dt, c.kind === 'snake' ? 2.6 + c.r : 3.6 + c.r);
   }
 
   _attack(c, d, dt, reach) {

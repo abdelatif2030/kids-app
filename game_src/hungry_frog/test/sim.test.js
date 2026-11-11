@@ -62,6 +62,7 @@ test('a bigger frog aims first (a warning) and costs a heart only if the frog st
   p.rand = () => 0.99;
   const big = { id: 950, kind: 'frog', x: p.frog.x + 3, z: p.frog.z, v: 30, a: 0, t: 0, r: 0.8, y: 0, air: 0, aim: 0, lash: 0, cool: 0, hopT: 0 };
   p.critters.push(big);
+  p.t = 20; // bullies wait a few seconds at the start
   const ev = p.step(1 / 30);
   assert.ok(ev.some((e) => e.type === 'aim'));
   assert.equal(p.hearts, 3);
@@ -70,6 +71,7 @@ test('a bigger frog aims first (a warning) and costs a heart only if the frog st
   const q = new Pond({ level: 0, seed: 4 });
   q.critters = [{ ...big, cool: 0 }];
   q.rand = () => 0.99;
+  q.t = 20;
   q.step(1 / 30);
   q.leap();
   for (let i = 0; i < 12; i++) q.step(1 / 30);

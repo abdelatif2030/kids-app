@@ -45,7 +45,7 @@ export const CSS = `
 .ds-info{display:flex;align-items:center;gap:calc(var(--u)*2);font-size:calc(var(--u)*4.4);font-weight:700}
 .ds-info.star{color:#ffd23a}
 .ds-btn{font-family:inherit;font-weight:900;font-size:calc(var(--u)*6);color:#0e2a40;border:none;border-radius:999px;padding:calc(var(--u)*2) calc(var(--u)*6);min-height:calc(var(--u)*14);cursor:pointer;background:linear-gradient(180deg,#6af8d8,#2ad8b0);box-shadow:0 calc(var(--u)*.9) 0 #129a7a}
-.ds-btn.ghost{background:rgba(255,255,255,.08);color:#fff;border:calc(var(--u)*.35) solid rgba(255,255,255,.3);box-shadow:none;font-size:calc(var(--u)*4.6);min-height:calc(var(--u)*11)}
+.ds-btn.ghost{background:rgba(12,30,48,.7);color:#fff;border:calc(var(--u)*.35) solid rgba(255,255,255,.3);box-shadow:none;font-size:calc(var(--u)*4.6);min-height:calc(var(--u)*11)}
 .ds-btn:active{transform:translateY(calc(var(--u)*.5))}
 .ds-btn:focus-visible,.ds-sq:focus-visible,.ds-dash:focus-visible,.ds-lv:focus-visible{outline:calc(var(--u)*.7) solid #ffd23a;outline-offset:calc(var(--u)*.5)}
 .ds-logo{position:absolute;top:calc(var(--u)*20);left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}
