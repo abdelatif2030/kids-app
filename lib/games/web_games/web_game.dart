@@ -112,4 +112,14 @@ final WebGame kRhythmSurvival = WebGame(
   title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival];
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace];
+
+/// «سباق السباحة العجيب» (Splash Race): the goggle-wearing otter's swimming obstacle race (docs/SPLASH_RACE.md).
+final WebGame kSplashRace = WebGame(
+  id: 'splash_race',
+  folder: 'splash_race',
+  global: 'SplashRace',
+  storeKey: 'splash_race',
+  minAge: 3,
+  title: () => tr2('سباق السباحة العجيب', 'Splash Race'),
+);
