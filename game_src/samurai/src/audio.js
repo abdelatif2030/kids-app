@@ -1,3 +1,4 @@
+import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Samurai sound, made live with Web Audio (no files): taiko drums, a koto plucked in the Japanese "miyako-bushi"
 // scale (Karplus-Strong strings) and a breathy bamboo flute; a calm courtyard theme, a driving battle rhythm and a
 // heavier one for the oni. Effects: sword swooshes, the dash "shing", petal poofs, combo chimes that climb, a clang
@@ -20,10 +21,12 @@ export class Sound {
   }
 
   unlock() {
+    iosKeepAlive();
     if (!this.ctx) {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
       const c = (this.ctx = new AC());
+      iosWatch(this.ctx, () => !!(this.held || this._held));
       this.master = c.createGain();
       this.master.gain.value = this.muted ? 0 : 0.9;
       const comp = c.createDynamicsCompressor();
@@ -86,8 +89,10 @@ export class Sound {
     this.muted = m;
     if (this.master) this.master.gain.setTargetAtTime(m ? 0 : 0.9, this.ctx.currentTime, 0.05);
   }
-  suspend() { this.held = true; if (this.ctx && this.ctx.state === 'running') this.ctx.suspend(); }
-  resume() { this.held = false; if (this.ctx && this.ctx.state !== 'running') this.ctx.resume(); }
+  suspend() {
+    iosPause(); this.held = true; if (this.ctx && this.ctx.state === 'running') this.ctx.suspend(); }
+  resume() {
+    if (!(this.held || this._held)) iosKeepAlive(); this.held = false; if (this.ctx && this.ctx.state !== 'running') this.ctx.resume(); }
 
   setMode(mode, force) {
     if (this.mode === mode && !force) return;

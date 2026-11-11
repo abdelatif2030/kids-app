@@ -1,3 +1,4 @@
+import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Jungle adventure sound, made live with Web Audio (no files): an original tune (marimba lead, kalimba, flute,
 // bongos, congas, shaker and a plucked bass) that speeds up a little on each level, soft footsteps, and an effect for
 // every moment. Gentle volumes behind a limiter; one button mutes everything.
@@ -35,10 +36,12 @@ export class Sound {
   }
 
   unlock() {
+    iosKeepAlive();
     if (!this.ctx) {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
       const c = (this.ctx = new AC());
+      iosWatch(this.ctx, () => !!(this.held || this._held));
       this.master = c.createGain();
       this.master.gain.value = this.muted ? 0 : 0.9;
       const comp = c.createDynamicsCompressor();
@@ -116,11 +119,13 @@ export class Sound {
   }
 
   suspend() {
+    iosPause();
     this.held = true;
     if (this.ctx && this.ctx.state === 'running') this.ctx.suspend();
   }
 
   resume() {
+    if (!(this.held || this._held)) iosKeepAlive();
     this.held = false;
     if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
   }

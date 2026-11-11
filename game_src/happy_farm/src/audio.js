@@ -1,3 +1,4 @@
+import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Relaxing farm sound, all made live with Web Audio (no files): a gentle country tune on a plucked acoustic guitar
 // (each string computed with the Karplus-Strong method), soft bass, light shaker and birds; the tractor's putt-putt,
 // a crunchy cutting sound that follows how much is being cut, the "trailer full" horn, grain pouring, coins, a rock
@@ -26,10 +27,12 @@ export class Sound {
   }
 
   unlock() {
+    iosKeepAlive();
     if (!this.ctx) {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
       const c = (this.ctx = new AC());
+      iosWatch(this.ctx, () => !!(this.held || this._held));
       this.master = c.createGain();
       this.master.gain.value = this.muted ? 0 : 0.9;
       const comp = c.createDynamicsCompressor();
@@ -92,8 +95,10 @@ export class Sound {
     this.muted = m;
     if (this.master) this.master.gain.setTargetAtTime(m ? 0 : 0.9, this.ctx.currentTime, 0.05);
   }
-  suspend() { this.held = true; if (this.ctx && this.ctx.state === 'running') this.ctx.suspend(); }
-  resume() { this.held = false; if (this.ctx && this.ctx.state !== 'running') this.ctx.resume(); }
+  suspend() {
+    iosPause(); this.held = true; if (this.ctx && this.ctx.state === 'running') this.ctx.suspend(); }
+  resume() {
+    if (!(this.held || this._held)) iosKeepAlive(); this.held = false; if (this.ctx && this.ctx.state !== 'running') this.ctx.resume(); }
 
   setMode(mode, force) {
     if (this.mode === mode && !force) return;

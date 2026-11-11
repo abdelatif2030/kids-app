@@ -1,3 +1,4 @@
+import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // All the game's sound, made live with Web Audio: an original carnival tune (calliope organ, oom-pah bass, drums),
 // a motor that follows the speed, and an effect for every moment of the race. No sound files, nothing downloaded.
 // Volumes are kept gentle for small ears; one button mutes everything.
@@ -33,10 +34,12 @@ export class Sound {
 
   /** Must be called from a tap or key press (browsers only allow sound after one). */
   unlock() {
+    iosKeepAlive();
     if (!this.ctx) {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
       this.ctx = new AC();
+      iosWatch(this.ctx, () => !!(this.held || this._held));
       const c = this.ctx;
       this.master = c.createGain();
       this.master.gain.value = this.muted ? 0 : 0.9;
@@ -117,8 +120,10 @@ export class Sound {
     if (this.master) this.master.gain.setTargetAtTime(m ? 0 : 0.9, this.ctx.currentTime, 0.05);
   }
 
-  suspend() { if (this.ctx && this.ctx.state === 'running') this.ctx.suspend(); }
-  resume() { if (this.ctx && this.ctx.state === 'suspended' && !this._held) this.ctx.resume(); }
+  suspend() {
+    iosPause(); if (this.ctx && this.ctx.state === 'running') this.ctx.suspend(); }
+  resume() {
+    if (!(this.held || this._held)) iosKeepAlive(); if (this.ctx && this.ctx.state === 'suspended' && !this._held) this.ctx.resume(); }
 
   setMode(mode, force) {
     if (this.mode === mode && !force) return;
