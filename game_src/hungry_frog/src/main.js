@@ -737,7 +737,7 @@ class Game {
     this._ambient(dt, time);
     // camera: high and steep like the video; zooms out as the frog grows
     const zoom = 1 + Math.min(1.6, (R - 0.45) * 1.1);
-    const off = this.land ? new THREE.Vector3(0, 11 * zoom, 7.5 * zoom) : new THREE.Vector3(0, 13 * zoom, 7.5 * zoom);
+    const off = this.land ? new THREE.Vector3(0, 7 * zoom, 5.5 * zoom) : new THREE.Vector3(0, 8 * zoom, 5.5 * zoom); // close on the frog, like the video
     const cx = Math.max(-W + 4, Math.min(W - 4, f.x));
     const cz = Math.max(-D + 4, Math.min(D - 2, f.z));
     this.camLook.lerp(new THREE.Vector3(cx, 0, cz - 1), Math.min(1, dt * 4));

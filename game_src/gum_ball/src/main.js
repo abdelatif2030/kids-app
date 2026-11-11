@@ -544,8 +544,8 @@ class Game {
     this._tooBigT = (this._tooBigT ?? 0) - dt;
     // camera: behind and above, looking up the street; pulls back as the ball grows
     const z = 1 + g.d * 0.9;
-    const off = this.land ? new THREE.Vector3(0, 2.4 + z * 1.6, 3.4 + z * 2.4) : new THREE.Vector3(0, 3 + z * 2.1, 3.6 + z * 2.3);
-    this.camLook.lerp(new THREE.Vector3(b.x, r * 0.8, b.z - 1.5 - g.d * 0.8), Math.min(1, dt * 5));
+    const off = this.land ? new THREE.Vector3(0, 1.6 + z * 1.1, 3.8 + z * 2.4) : new THREE.Vector3(0, 1.9 + z * 1.3, 4.2 + z * 2.6); // low behind the ball, looking up the street (like the video)
+    this.camLook.lerp(new THREE.Vector3(b.x, r * 0.9, b.z - 4 - g.d * 1.6), Math.min(1, dt * 5));
     this.camPos.lerp(new THREE.Vector3(b.x + off.x, off.y, b.z + off.z), Math.min(1, dt * 3));
     this.camera.position.copy(this.camPos);
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 1.6);

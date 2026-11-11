@@ -1044,7 +1044,7 @@ class Game {
     this.pad.arrows.forEach((a, i) => { a.position.y = 0.25 + (padOn ? Math.max(0, Math.sin(time * 6 - i)) * 0.15 : 0); });
     this._ambient(dt, time);
     // camera follows the hero (high and steep, like the video)
-    const far = this.land ? new THREE.Vector3(0, 13.5, 8.5) : new THREE.Vector3(0, 16, 9.5);
+    const far = this.land ? new THREE.Vector3(0, 10, 8.5) : new THREE.Vector3(0, 11.5, 9.5); // closer and lower, like the video
     const tx = Math.max(-Math.max(0, this.W - (this.land ? 6 : 4)), Math.min(Math.max(0, this.W - (this.land ? 6 : 4)), hr.root.position.x));
     const tz = g.state === 'leap' || g.state === 'won' ? hr.root.position.z : Math.max(-this.D + 3, Math.min(this.D - 3, hr.root.position.z));
     const ty = g.state === 'leap' || g.state === 'won' ? hr.root.position.y * 0.5 : 0;
