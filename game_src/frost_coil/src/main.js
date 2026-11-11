@@ -44,6 +44,7 @@ const CSS = `
 .fc-btn:active{transform:translateY(calc(var(--u)*.5))}
 .fc-btn:focus-visible,.fc-round:focus-visible,.fc-lvbtn:focus-visible{outline:calc(var(--u)*.7) solid #3a8ae8;outline-offset:calc(var(--u)*.5)}
 .fc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*2);width:100%}
+@media (orientation:landscape){.fc-grid{grid-template-columns:repeat(6,1fr)}.fc-card{width:calc(var(--u)*120);max-width:94vw}.fc-logo{font-size:calc(var(--u)*9)}}
 .fc-lvbtn{aspect-ratio:1;border-radius:calc(var(--u)*3);border:none;font-family:inherit;font-weight:900;font-size:calc(var(--u)*6);color:#fff;background:linear-gradient(180deg,#7ab8f0,#3a7ad8);box-shadow:0 calc(var(--u)*.7) 0 #2a4a9a;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer}
 .fc-lvbtn small{font-size:calc(var(--u)*2.6)}
 .fc-lvbtn.lock{background:linear-gradient(180deg,#b8b8c8,#8a8a9a);box-shadow:0 calc(var(--u)*.7) 0 #6a6a7a}

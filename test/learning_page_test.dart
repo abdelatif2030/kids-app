@@ -20,7 +20,7 @@ const kSizes = <(String, Size)>[
 
 ChildProfile _kid(int age) => ChildProfile(id: 'kid$age', nickname: 'سلمى', age: age);
 
-Future<void> openLearning(WidgetTester t, Size size, {int age = 5}) async {
+Future<void> openLearning(WidgetTester t, Size size, {int age = 5, bool toGames = true}) async {
   SharedPreferences.setMockInitialValues({});
   FlutterSecureStorage.setMockInitialValues({});
   final kid = _kid(age);
@@ -40,7 +40,8 @@ Future<void> openLearning(WidgetTester t, Size size, {int age = 5}) async {
     home: ChildShell(child: kid),
   ));
   await t.pump();
-  await t.tap(find.byKey(const ValueKey('nav_tab.games')));
+  if (!toGames) return;
+  await t.tap(find.byKey(const ValueKey('island_games'))); // the home picture's games island (there is no bottom bar)
   await t.pump();
   await t.pump(const Duration(milliseconds: 50));
   await t.tap(find.byKey(const ValueKey('choice_educational')));
@@ -84,6 +85,30 @@ void main() {
       }
       expect(ids, containsAll(['drawing', 'stories', 'adventures', 'feelings']));
     }
+  });
+
+  testWidgets('no bottom bar; the child picture opens «أنا», which has «المزيد»', (t) async {
+    await openLearning(t, const Size(1024, 768), toGames: false);
+    expect(find.byType(NavigationBar), findsNothing);
+    expect(find.byKey(const ValueKey('nav_tab.home')), findsNothing);
+    await t.tap(find.byKey(const ValueKey('home_avatar')));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 400));
+    expect(find.byKey(const ValueKey('profile_more')), findsOneWidget);
+  });
+
+  testWidgets('the learning page has no long scroll: pages of cards that fit, chips filter them', (t) async {
+    await openLearning(t, const Size(852, 393));
+    expect(find.byKey(const ValueKey('learn_shelves')), findsOneWidget);
+    final page = t.getRect(find.byKey(const ValueKey('learning_page')));
+    for (final e in find.byType(Image).evaluate()) {
+      final r = t.getRect(find.byWidget(e.widget));
+      if (r.width > 100) expect(r.bottom, lessThanOrEqualTo(page.bottom + 1));
+    }
+    await t.tap(find.byKey(const ValueKey('shelf_numbers')));
+    await t.pump(const Duration(milliseconds: 500));
+    expect(find.byKey(const ValueKey('learn_math')), findsOneWidget);
+    expect(find.byKey(const ValueKey('learn_maze')), findsNothing);
   });
 
   test('every card id has its picture file', () {

@@ -119,4 +119,5 @@ export const CSS3 = `
 @keyframes rhPop{from{transform:translate(-50%,-100%) scale(1.4)}to{transform:translate(-50%,-220%) scale(1);opacity:0}}
 .rh-count{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);font-weight:900;font-size:calc(var(--u)*18);color:#fff;-webkit-text-stroke:calc(var(--u)*.8) #d8343a;paint-order:stroke fill;pointer-events:none}
 .rh-hearts{position:absolute;top:calc(max(calc(var(--u)*2),env(safe-area-inset-top)) + var(--u)*14);inset-inline-end:calc(var(--u)*13);font-size:calc(var(--u)*4.4);pointer-events:none}
+@media (orientation:landscape){.rh-shelf{display:grid !important;grid-template-columns:1fr 1fr;column-gap:calc(var(--u)*3)}.rh-panel{max-width:96vw !important}}
 `;

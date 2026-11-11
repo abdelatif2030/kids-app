@@ -115,11 +115,11 @@ void main() {
       expect(find.byKey(const ValueKey('notification_badge')), findsNothing);
     });
 
-    testWidgets('an upright phone gets the turn-sideways hint and the picture stays whole', (t) async {
+    testWidgets('an upright window shows no turn-sideways message (the app is landscape only) and the picture stays whole', (t) async {
       _size(t, const Size(390, 800));
       await _setup(t);
       await _show(t, Scaffold(body: PictureHome(child: _kid, onTab: (_) {}, onExit: () {})));
-      expect(find.byKey(const ValueKey('picture_rotate_hint')), findsOneWidget);
+      expect(find.textContaining('أدِر الجهاز'), findsNothing);
       final box = t.getRect(find.byKey(const ValueKey('picture_stage_box')));
       expect(box.width, lessThanOrEqualTo(390));
       expect(box.width / box.height, closeTo(1672 / 941, 0.01), reason: 'never stretched');

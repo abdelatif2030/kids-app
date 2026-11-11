@@ -30,20 +30,6 @@ PictureSpot _back(BuildContext context) => PictureSpot(
       key: const ValueKey('picture_back'),
     );
 
-Widget _rotateHint() => Padding(
-      key: const ValueKey('picture_rotate_hint'),
-      padding: const EdgeInsets.only(top: 14, left: 16, right: 16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(color: const Color(0xFF5B2BB8), borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.white, width: 1.5)),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          const Icon(Icons.screen_rotation_rounded, color: Colors.white),
-          const SizedBox(width: 8),
-          Flexible(child: Text(tr2('أدِر الجهاز أفقياً للّعب بشكل أفضل', 'Turn your device sideways for a better game'), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white))),
-        ]),
-      ),
-    );
-
 /// The child's main home: the owner's picture with its four islands (games, cartoons and stories, learn and discover,
 /// draw and create). The gear is the parent's way in (PIN), the sign at the bottom left opens the rewards, and the
 /// bell and the avatar are real: the bell shows the child's own unread count and the avatar is the child's own.
@@ -70,7 +56,6 @@ class PictureHome extends StatelessWidget {
       key: const ValueKey('picture_home'),
       asset: asset,
       aspect: kScreenPictureAspect,
-      portraitHint: _rotateHint(),
       spots: [
         PictureSpot('games', const Offset(0.158, 0.605), 0.22, 0.35, tr2('الألعاب', 'Games'), () => onTab?.call(1), key: const ValueKey('island_games')),
         PictureSpot('stories', const Offset(0.388, 0.61), 0.22, 0.35, tr2('الكرتون والقصص', 'Cartoons & stories'), () => _push(context, CartoonsPictureScreen(child: child)), key: const ValueKey('island_stories')),
@@ -214,7 +199,6 @@ class CartoonsPictureScreen extends StatelessWidget {
           key: const ValueKey('cartoons_picture'),
           asset: asset,
           aspect: kScreenPictureAspect,
-          portraitHint: _rotateHint(),
           showLabels: !ar,
           labels: [
             PictureNameLabel(const Offset(0.299, 0.672), 0.31, 0.155, tr2('الكرتون', 'Cartoons')),
@@ -275,7 +259,6 @@ class LessonsPictureScreen extends StatelessWidget {
           key: const ValueKey('lessons_picture'),
           asset: asset,
           aspect: kScreenPictureAspect,
-          portraitHint: _rotateHint(),
           showLabels: !ar,
           labels: [for (final t in _lessonTiles) PictureNameLabel(t.name, 0.17, 0.07, t.title())],
           spots: [

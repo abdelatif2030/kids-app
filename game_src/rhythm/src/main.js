@@ -307,8 +307,9 @@ class Game {
         h('div', { class: 'rh-panel' },
           h('div', { class: 'rh-logo' }, '🎵 ', t('title')),
           h('div', { class: 'rh-title', style: 'font-size:calc(var(--u)*4.4)' }, '🌍 ', t('tour')),
-          h('div', { class: 'rh-shelf' }, rows),
-          h('button', { class: 'rh-btn2 rh-big', onclick: () => this.startTrack(this.save.unlocked - 1) }, '▶ ', t('play')))),
+          // the play button first, so it is on screen even on a phone held sideways
+          h('button', { class: 'rh-btn2 rh-big', onclick: () => this.startTrack(this.save.unlocked - 1) }, '▶ ', t('play')),
+          h('div', { class: 'rh-shelf' }, rows))),
       this._mute(`bottom:max(calc(var(--u)*3),env(safe-area-inset-bottom));inset-inline-end:calc(var(--u)*3)`),
       this._toastEl(),
     );

@@ -15,7 +15,7 @@ class AppIntro extends StatefulWidget {
   const AppIntro({super.key, required this.child});
 
   /// How long the picture stays.
-  static const duration = Duration(milliseconds: 2200);
+  static const duration = Duration(milliseconds: 800); // short on purpose: the same picture already showed while loading (owner: open fast)
 
   static const posterAsset = 'assets/branding/intro_poster.webp';
 
