@@ -293,7 +293,7 @@ final List<GameInfo> kEducationalGames = [
     Icons.wb_sunny_rounded,
     3,
     6,
-    (id, age, _) => NextInDayGame(childId: id, age: age),
+    (id, age, _) => learnWebGameScreen(kLearnDay, id, age), // rebuilt: clothesline and a sky that follows the day
   ),
   GameInfo(
     ShapeFinderGame.gameId,

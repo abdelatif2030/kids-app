@@ -155,8 +155,8 @@ export class Shell {
   clear() { this.layer.replaceChildren(); this.bubble = null; }
 
   backBtn() {
-    // a clear pill with the arrow and the word (owner request: the back button must be obvious)
-    return h('button', { class: 'lk-back', 'aria-label': this.t('back'), onclick: (e) => { e.stopPropagation(); this.exit(); } }, h('b', {}, this.T.lang === 'en' ? '←' : '→'), this.t('back'));
+    // the round arrow button at the top corner (owner 2026-11-12: no word «رجوع»)
+    return h('button', { class: 'lk-rbtn', 'aria-label': this.t('back'), onclick: (e) => { e.stopPropagation(); this.exit(); } }, this.T.lang === 'en' ? '←' : '→');
   }
 
   soundBtn() {

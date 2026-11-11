@@ -5,10 +5,11 @@
   "description": "Rehlaty rebuilt learning games (docs/LEARNING_GAMES_REBUILD.md). One folder per game in src/, a shared kit in src/kit. Each is built into assets/games/learn_<id>/game.js",
   "scripts": {
     "build:maze": "esbuild src/maze/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/learn_maze/game.js",
-    "build": "npm run build:maze && npm run build:sort && npm run build:treasure",
+    "build": "npm run build:maze && npm run build:sort && npm run build:treasure && npm run build:day",
     "test": "node --test",
     "build:sort": "esbuild src/sort/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/learn_sort/game.js",
-    "build:treasure": "esbuild src/treasure/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/learn_treasure/game.js"
+    "build:treasure": "esbuild src/treasure/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/learn_treasure/game.js",
+    "build:day": "esbuild src/day/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/learn_day/game.js"
   },
   "dependencies": {
     "three": "0.170.0"

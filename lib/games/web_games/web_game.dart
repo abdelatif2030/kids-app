@@ -269,5 +269,16 @@ final WebGame kLearnTreasure = WebGame(
   learnId: 'treasure_hunt',
 );
 
+/// «رتّب يومي» (Arrange My Day): picture cards on a clothesline, the sky follows the day.
+final WebGame kLearnDay = WebGame(
+  id: 'learn_day',
+  folder: 'learn_day',
+  global: 'LearnDay',
+  storeKey: 'learn_day',
+  minAge: 3,
+  title: () => tr2('رتّب يومي', 'Arrange My Day'),
+  learnId: 'next_in_day',
+);
+
 /// Rebuilt learning games, by their old game id.
-final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure]) g.learnId!: g};
+final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay]) g.learnId!: g};

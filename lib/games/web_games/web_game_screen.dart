@@ -117,54 +117,11 @@ class _WebGameScreenState extends State<WebGameScreen> {
       body: Stack(
         children: [
           Positioned.fill(child: view),
-          // A clear way out of every fun game at any moment (owner request 2026-11-11). On the left edge at mid height:
-          // a place none of the games uses for its own buttons. The learning games have their own back button.
-          if (!widget.game.isLearning)
-            Positioned(
-              left: 10,
-              top: 0,
-              bottom: 0,
-              child: Center(child: _BackToGames(onTap: () => Navigator.maybePop(context))),
-            ),
+          // (owner 2026-11-12: no extra «رجوع» button over the games; each game has its own back button at the top)
         ],
       ),
     );
   }
-}
-
-class _BackToGames extends StatelessWidget {
-  final VoidCallback onTap;
-  const _BackToGames({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) => Semantics(
-    button: true,
-    label: tr2('رجوع للألعاب', 'Back to the games'),
-    excludeSemantics: true,
-    child: Material(
-      key: const ValueKey('web_game_back'),
-      color: Colors.white,
-      shape: const StadiumBorder(side: BorderSide(color: Color(0xFF6A3AD0), width: 4)),
-      elevation: 8,
-      shadowColor: Colors.black54,
-      child: InkWell(
-        customBorder: const StadiumBorder(),
-        onTap: onTap,
-        child: Padding(
-          // a big, clear pill: the arrow and the word «رجوع» (owner request: the back button must be obvious)
-          padding: const EdgeInsets.fromLTRB(12, 8, 18, 8),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.arrow_back_rounded, color: Color(0xFF6A3AD0), size: 34),
-              const SizedBox(width: 6),
-              Text(tr2('رجوع', 'Back'), style: const TextStyle(color: Color(0xFF4A2A9A), fontSize: 22, fontWeight: FontWeight.w900)),
-            ],
-          ),
-        ),
-      ),
-    ),
-  );
 }
 
 class _Unsupported extends StatelessWidget {
