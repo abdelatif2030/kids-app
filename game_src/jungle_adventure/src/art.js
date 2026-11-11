@@ -5,7 +5,7 @@ import { ITEM, DEFAULT_LOOK } from './shop.js';
 export const INK = '#2a1a10';
 
 export const THEMES = {
-  jungle: { body: '#8a5530', shade: '#6b3f22', speck: '#5a341b', top: '#5cb43a', topLight: '#8fd94f', topShade: '#3f8a28', edge: '#4a2c16', ledge: '#a8743f', ledgeShade: '#80542a' },
+  jungle: { body: '#4a3020', shade: '#3a2418', speck: '#2e1c12', top: '#3f8a2c', topLight: '#5aa83a', topShade: '#2c6a20', edge: '#24160c', ledge: '#6a4a2a', ledgeShade: '#4a321c' }, // dark soil under a grass strip, like the video
   ruins: { body: '#7f8f7c', shade: '#61715f', speck: '#566554', top: '#5f9a3a', topLight: '#86c04f', topShade: '#43772a', edge: '#3d4a3b', ledge: '#9aa894', ledgeShade: '#73826f', brick: true },
   temple: { body: '#c4a067', shade: '#a07f4b', speck: '#8d6e3f', top: '#7aa64a', topLight: '#a3cc63', topShade: '#58802f', edge: '#6e5530', ledge: '#d8b77a', ledgeShade: '#ad8c55', brick: true, sun: true },
 };

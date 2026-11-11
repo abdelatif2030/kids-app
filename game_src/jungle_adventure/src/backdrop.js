@@ -3,7 +3,8 @@
 // Each layer repeats seamlessly sideways and scrolls at its own speed.
 
 const SKIES = {
-  jungle: { top: '#79c2d6', mid: '#cfe3c8', low: '#f7cf98', sun: '#fff1c4', far: '#8fb7ae', farMist: '#d8e8d6', mid1: '#3f7a52', mid2: '#2f6343', near: '#1f4a2e', vine: '#2c5e36' },
+  // cool, misty teal like the owner's video: blue-grey mountains with waterfalls, dark jungle in front
+  jungle: { top: '#4f9aa6', mid: '#9cc6c0', low: '#c4d8c0', sun: '#f2f4e0', far: '#5f8f94', farMist: '#9cbfbc', mid1: '#2c5440', mid2: '#213f33', near: '#132e22', vine: '#1f4430' },
   ruins: { top: '#6aa79a', mid: '#c9d9b4', low: '#f3c47f', sun: '#ffe7b0', far: '#86a397', farMist: '#d6e2c8', mid1: '#5f7a5c', mid2: '#46604a', near: '#22432c', vine: '#2f5a34' },
   temple: { top: '#e7895a', mid: '#f7b973', low: '#ffd98a', sun: '#fff4cc', far: '#c58a6a', farMist: '#f6caa0', mid1: '#a26a45', mid2: '#7c4f33', near: '#3b4a26', vine: '#4a5a2a' },
 };
@@ -111,7 +112,8 @@ export class Backdrop {
     const cv = canvas(W, h);
     const g = cv.getContext('2d');
     // two ranges of tall, misty mountains
-    for (const [base, amp, col, seed, alpha] of [[0.5, 0.12, c.farMist, 11, 0.8], [0.6, 0.14, c.far, 17, 0.9]]) {
+    const tall = this.theme === 'jungle' ? 1.6 : 1;
+    for (const [base, amp, col, seed, alpha] of [[0.5, 0.12 * tall, c.farMist, 11, 0.8], [0.6, 0.14 * tall, c.far, 17, 0.9]]) {
       g.beginPath();
       g.moveTo(0, h);
       for (let x = 0; x <= W; x += 6) {
@@ -150,8 +152,8 @@ export class Backdrop {
     }
     // mist at the bottom
     const mist = g.createLinearGradient(0, h * 0.45, 0, h * 0.8);
-    mist.addColorStop(0, 'rgba(255,245,225,0)');
-    mist.addColorStop(1, 'rgba(255,245,225,0.6)');
+    mist.addColorStop(0, this.theme === 'jungle' ? 'rgba(200,228,224,0)' : 'rgba(255,245,225,0)');
+    mist.addColorStop(1, this.theme === 'jungle' ? 'rgba(200,228,224,0.6)' : 'rgba(255,245,225,0.6)');
     g.fillStyle = mist;
     g.fillRect(0, h * 0.45, W, h * 0.55);
     return cv;
@@ -167,13 +169,13 @@ export class Backdrop {
       // canopy of round trees and palms
       for (let i = 0; i < 26; i++) {
         const x = (i / 26) * W + r() * 30;
-        const th = h * (0.18 + r() * 0.16);
+        const th = h * (0.07 + r() * 0.11); // lower trees: the misty mountains show above them (like the video)
         g.fillStyle = c.mid2;
         g.fillRect(x - 3, ground - th, 6, th);
         g.fillStyle = i % 2 ? c.mid1 : c.mid2;
         for (let k = 0; k < 4; k++) {
           g.beginPath();
-          g.arc(x + (r() - 0.5) * h * 0.08, ground - th - r() * h * 0.05, h * (0.05 + r() * 0.04), 0, Math.PI * 2);
+          g.arc(x + (r() - 0.5) * h * 0.06, ground - th - r() * h * 0.04, h * (0.03 + r() * 0.03), 0, Math.PI * 2);
           g.fill();
         }
       }
@@ -211,7 +213,7 @@ export class Backdrop {
     g.fillStyle = c.mid2;
     g.fillRect(0, ground, W, h - ground);
     // haze over the mid layer
-    g.fillStyle = 'rgba(255,235,200,0.18)';
+    g.fillStyle = this.theme === 'jungle' ? 'rgba(170,210,205,0.2)' : 'rgba(255,235,200,0.18)';
     g.fillRect(0, 0, W, h);
     return cv;
   }
