@@ -128,7 +128,7 @@ class FunGamesScreen extends StatelessWidget {
             ('fun_moto_race', kMotoRace, '', '', 0.694, 0.552, 0.18, 0.24),
             ('fun_splash_race', kSplashRace, '', '', 0.891, 0.552, 0.19, 0.24),
             ('fun_space_store', kSpaceStore, '', '', 0.161, 0.830, 0.28, 0.27),
-            ('fun_fox_family', null, 'أم الثعلب ومغامرات العيور', 'Fox Family Rescue', 0.467, 0.830, 0.28, 0.27),
+            ('fun_fox_family', kFoxFamily, '', '', 0.467, 0.830, 0.28, 0.27),
             ('fun_airplane', null, 'سباق الطائرات الجوي', 'Airplane Racing', 0.805, 0.830, 0.35, 0.27),
           ])
             PictureSpot(

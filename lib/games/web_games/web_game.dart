@@ -112,7 +112,7 @@ final WebGame kRhythmSurvival = WebGame(
   title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore];
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily];
 
 /// «متجر الفضاء الذكي» (Space Store Manager): a grocery store on a space station (docs/SPACE_STORE.md).
 final WebGame kSpaceStore = WebGame(
@@ -132,4 +132,14 @@ final WebGame kSplashRace = WebGame(
   storeKey: 'splash_race',
   minAge: 3,
   title: () => tr2('سباق السباحة العجيب', 'Splash Race'),
+);
+
+/// «أم الثعلب ومغامرات العيور» (Fox Family Rescue): hop a fox mother and her cubs home (docs/FOX_FAMILY.md).
+final WebGame kFoxFamily = WebGame(
+  id: 'fox_family',
+  folder: 'fox_family',
+  global: 'FoxFamily',
+  storeKey: 'fox_family',
+  minAge: 3,
+  title: () => tr2('أم الثعلب ومغامرات العيور', 'Fox Family Rescue'),
 );

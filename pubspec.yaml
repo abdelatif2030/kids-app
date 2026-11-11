@@ -104,6 +104,7 @@ flutter:
     - assets/games/rhythm/
     - assets/games/splash_race/
     - assets/games/space_store/
+    - assets/games/fox_family/
     - assets/home/home_main.webp
     - assets/home/cartoons_stories.webp
     - assets/home/lessons_scene.webp
