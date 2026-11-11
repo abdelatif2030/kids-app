@@ -42,4 +42,14 @@ final WebGame kJungleAdventure = WebGame(
   title: () => tr2('مغامرة الأدغال', 'Jungle Adventure'),
 );
 
-final List<WebGame> kWebGames = [kCarnivalRace, kJungleAdventure];
+/// «مزرعتي السعيدة» (Happy Farm): the relaxing 3D combine-harvester farm (docs/HAPPY_FARM.md).
+final WebGame kHappyFarm = WebGame(
+  id: 'happy_farm',
+  folder: 'happy_farm',
+  global: 'HappyFarm',
+  storeKey: 'happy_farm',
+  minAge: 3,
+  title: () => tr2('مزرعتي السعيدة', 'Happy Farm'),
+);
+
+final List<WebGame> kWebGames = [kCarnivalRace, kJungleAdventure, kHappyFarm];

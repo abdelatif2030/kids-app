@@ -66,11 +66,11 @@ void main() {
         ),
       );
       await t.pump(const Duration(milliseconds: 300));
-      for (final k in ['fun_carnival_race', 'fun_jungle_adventure', 'fun_back']) {
+      for (final k in ['fun_carnival_race', 'fun_jungle_adventure', 'fun_happy_farm', 'fun_pumpkin_pie', 'fun_samurai', 'fun_back']) {
         final r = t.getRect(find.byKey(ValueKey(k)));
         expect(r.left >= -1 && r.right <= size.width + 1 && r.top >= -1 && r.bottom <= size.height + 1, isTrue, reason: '$k inside $size: $r');
       }
-      expect(t.getRect(find.byKey(const ValueKey('fun_jungle_adventure'))).width, greaterThan(size.width * 0.2));
+      expect(t.getRect(find.byKey(const ValueKey('fun_happy_farm'))).width, greaterThan(size.width * 0.12));
       expect(t.takeException(), isNull);
     }
     addTearDown(t.view.reset);
@@ -80,7 +80,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     debugDefaultTargetPlatformOverride = TargetPlatform.windows;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
-    for (final (key, game) in [('fun_carnival_race', kCarnivalRace), ('fun_jungle_adventure', kJungleAdventure)]) {
+    for (final (key, game) in [('fun_carnival_race', kCarnivalRace), ('fun_jungle_adventure', kJungleAdventure), ('fun_happy_farm', kHappyFarm)]) {
       await t.pumpWidget(
         MaterialApp(
           key: UniqueKey(),

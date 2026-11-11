@@ -77,8 +77,8 @@ class GamesChoiceScreen extends StatelessWidget {
   }
 }
 
-/// The owner's picture of the fun games page (2026-11-10, 1672 x 941): a wooden «ألعاب التسلية» sign, a back arrow
-/// and two game cards («سباق ملاهي الأبطال» and «مغامرة الأدغال»). It is shown whole; the arrow and the cards are
+/// The owner's picture of the fun games page (2026-11-11, 1672 x 941): a wooden «ألعاب التسلية» sign, a back arrow
+/// and five game cards («سباق ملاهي الأبطال», «مغامرة الأدغال», «مزرعتي السعيدة», «مخبز اليقطين», «سيف الساموراي»). It is shown whole; the arrow and the cards are
 /// large invisible buttons on it, like the Games page. To change it, replace the one file.
 const String kFunGamesPicture = 'assets/games/fun_games_scene.webp';
 const double kFunGamesAspect = 1672 / 941;
@@ -113,31 +113,33 @@ class FunGamesScreen extends StatelessWidget {
         asset: kFunGamesPicture,
         aspect: kFunGamesAspect,
         spots: [
-          PictureSpot(
-            'fun_carnival_race',
-            const Offset(0.272, 0.56),
-            0.43,
-            0.58,
-            kCarnivalRace.title(),
-            () => _open(context, kCarnivalRace),
-            radius: 40,
-            key: const ValueKey('fun_carnival_race'),
-          ),
-          PictureSpot(
-            'fun_jungle_adventure',
-            const Offset(0.732, 0.565),
-            0.43,
-            0.575,
-            kJungleAdventure.title(),
-            () => _open(context, kJungleAdventure),
-            radius: 40,
-            key: const ValueKey('fun_jungle_adventure'),
-          ),
+          // the five cards of the owner's picture (centre and size as fractions of it)
+          for (final (id, game, cx) in [
+            ('fun_carnival_race', kCarnivalRace, 0.120),
+            ('fun_jungle_adventure', kJungleAdventure, 0.315),
+            ('fun_happy_farm', kHappyFarm, 0.501),
+          ])
+            PictureSpot(id, Offset(cx, 0.579), 0.185, 0.49, game.title(), () => _open(context, game), radius: 40, key: ValueKey(id)),
+          // «مخبز اليقطين» and «سيف الساموراي» are still being built
+          for (final (id, ar, en, cx, cy) in [
+            ('fun_pumpkin_pie', 'مخبز اليقطين', 'Pumpkin Pie Maker', 0.686, 0.579),
+            ('fun_samurai', 'سيف الساموراي', 'Samurai Action', 0.882, 0.595),
+          ])
+            PictureSpot(
+              id,
+              Offset(cx, cy),
+              0.185,
+              0.49,
+              tr2(ar, en),
+              () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr2('اللعبة دي جاية قريب!', 'This game is coming soon!')))),
+              radius: 40,
+              key: ValueKey(id),
+            ),
           PictureSpot(
             'fun_back',
-            const Offset(0.052, 0.088),
-            0.07,
-            0.125,
+            const Offset(0.063, 0.106),
+            0.085,
+            0.15,
             tr2('رجوع', 'Back'),
             () => Navigator.maybePop(context),
             radius: 60,

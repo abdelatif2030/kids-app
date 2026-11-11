@@ -95,6 +95,7 @@ flutter:
     - assets/games/game_bg.webp
     - assets/games/carnival_race/
     - assets/games/jungle_adventure/
+    - assets/games/happy_farm/
     - assets/home/home_main.webp
     - assets/home/cartoons_stories.webp
     - assets/home/lessons_scene.webp
