@@ -112,7 +112,7 @@ final WebGame kRhythmSurvival = WebGame(
   title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog];
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil];
 
 /// «متجر الفضاء الذكي» (Space Store Manager): a grocery store on a space station (docs/SPACE_STORE.md).
 final WebGame kSpaceStore = WebGame(
@@ -203,4 +203,14 @@ final WebGame kHungryFrog = WebGame(
   storeKey: 'hungry_frog',
   minAge: 3,
   title: () => tr2('لعبة الضفدع الجائع', 'Hungry Frog'),
+);
+
+/// «طريق التنين الجليدي» (Frost Coil): a snowy ice-path puzzle, from the owner's video (docs/FROST_COIL.md).
+final WebGame kFrostCoil = WebGame(
+  id: 'frost_coil',
+  folder: 'frost_coil',
+  global: 'FrostCoil',
+  storeKey: 'frost_coil',
+  minAge: 4,
+  title: () => tr2('طريق التنين الجليدي', 'Frost Coil'),
 );

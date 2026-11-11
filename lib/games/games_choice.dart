@@ -86,7 +86,7 @@ const String kFunGamesPicture = 'assets/games/fun_games_scene.webp';
 const double kFunGamesAspect = 1536 / 1024;
 
 /// The second page: the owner's own coastal drive and hungry frog cards (cut from the owner's pictures of 2026-11-11)
-/// on the softened page background with the same sign and back arrow.
+/// and a frost coil card made in the same style, on the softened page background with the same sign and back arrow.
 const String kFunGamesMorePicture = 'assets/games/fun_games_more.webp';
 
 void _openGame(BuildContext context, ChildProfile? child, WebGame game) {
@@ -187,7 +187,7 @@ class FunGamesScreen extends StatelessWidget {
   }
 }
 
-/// The second page of fun games: Coastal Drive and Hungry Frog.
+/// The second page of fun games: Coastal Drive, Hungry Frog and Frost Coil.
 class FunGamesMoreScreen extends StatelessWidget {
   final ChildProfile? child;
   const FunGamesMoreScreen({super.key, this.child});
@@ -201,8 +201,9 @@ class FunGamesMoreScreen extends StatelessWidget {
         asset: kFunGamesMorePicture,
         aspect: kFunGamesAspect,
         spots: [
-          PictureSpot('fun_coastal_drive', const Offset(0.284, 0.546), 0.38, 0.49, kCoastalDrive.title(), () => _openGame(context, child, kCoastalDrive), radius: 40, key: const ValueKey('fun_coastal_drive')),
-          PictureSpot('fun_hungry_frog', const Offset(0.716, 0.546), 0.38, 0.49, kHungryFrog.title(), () => _openGame(context, child, kHungryFrog), radius: 40, key: const ValueKey('fun_hungry_frog')),
+          PictureSpot('fun_coastal_drive', const Offset(0.181, 0.545), 0.3, 0.387, kCoastalDrive.title(), () => _openGame(context, child, kCoastalDrive), radius: 40, key: const ValueKey('fun_coastal_drive')),
+          PictureSpot('fun_hungry_frog', const Offset(0.5, 0.545), 0.3, 0.387, kHungryFrog.title(), () => _openGame(context, child, kHungryFrog), radius: 40, key: const ValueKey('fun_hungry_frog')),
+          PictureSpot('fun_frost_coil', const Offset(0.819, 0.545), 0.3, 0.387, kFrostCoil.title(), () => _openGame(context, child, kFrostCoil), radius: 40, key: const ValueKey('fun_frost_coil')),
           _backSpot(context, 'fun_more_back'),
         ],
       ),

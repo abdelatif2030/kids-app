@@ -112,6 +112,7 @@ flutter:
     - assets/games/deep_sea/
     - assets/games/coastal_drive/
     - assets/games/hungry_frog/
+    - assets/games/frost_coil/
     - assets/home/home_main.webp
     - assets/home/cartoons_stories.webp
     - assets/home/lessons_scene.webp
