@@ -18,12 +18,12 @@ export const ROUNDS = [
 ];
 
 export const RIDERS = [
-  { kind: 'fox', ar: 'ثعلوب', en: 'Foxy', color: 0xe8342a },
-  { kind: 'bear', ar: 'دبدوب', en: 'Bruno', color: 0x2a7ae8 },
-  { kind: 'bunny', ar: 'أرنوبة', en: 'Bunny', color: 0xff7ab8 },
-  { kind: 'raccoon', ar: 'راكون', en: 'Rocky', color: 0x3ac86a },
-  { kind: 'cat', ar: 'قطقوطة', en: 'Kitty', color: 0xffc21a },
-  { kind: 'panda', ar: 'باندا', en: 'Panda', color: 0x8a4ae8 },
+  { kind: 'kid', ar: 'أنت', en: 'You', color: 0xe8342a, suit: 0xe8342a, helmet: 0xe8342a, num: 7 },
+  { kind: 'rider', ar: 'سليم', en: 'Salim', color: 0x2a6ae8, suit: 0x1a3a8a, helmet: 0x2a6ae8, num: 12 },
+  { kind: 'rider', ar: 'ليلى', en: 'Laila', color: 0xff6aa8, suit: 0xff6aa8, helmet: 0xffffff, num: 21 },
+  { kind: 'rider', ar: 'عمر', en: 'Omar', color: 0x2ab85a, suit: 0x1a5a2a, helmet: 0xffd23a, num: 5 },
+  { kind: 'rider', ar: 'مريم', en: 'Mariam', color: 0xf2b21a, suit: 0x2a2c34, helmet: 0xf2b21a, num: 33 },
+  { kind: 'rider', ar: 'يوسف', en: 'Youssef', color: 0x8a3ae8, suit: 0xf4f4f4, helmet: 0x8a3ae8, num: 46 },
 ];
 
 function rng(seed) {
@@ -62,7 +62,7 @@ export class Race {
       const vmax = k === 0 ? PLAYER_VMAX : this.round.rival * (this.easy ? 0.86 : 1) * (0.97 + this.rand() * 0.05);
       return {
         id: k, ...r, x: p.x, z: p.z, h: p.a, v: 0, i, lat: side, prog: -back, steer: 0, lean: 0, vmax,
-        nitro: k === 0 ? 1 : 0.5, boost: 0, draft: 0, off: false, place: k + 1, done: false, finishT: 0,
+        nitro: k === 0 ? 1 : 0.5, boost: 0, draft: 0, crashT: 0, off: false, place: k + 1, done: false, finishT: 0,
         lane: (this.rand() - 0.5) * 3, wallT: 0, isPlayer: k === 0, grip: k === 0 ? GRIP : GRIP * this.round.skill * (this.easy ? 0.9 : 1),
       };
     });
@@ -158,6 +158,20 @@ export class Race {
 
   _ride(r, ctl, dt) {
     const tr = this.track;
+    if (r.crashT > 0) {
+      r.crashT -= dt;
+      r.v = Math.max(0, r.v - 30 * dt);
+      r.x += Math.sin(r.h) * r.v * dt;
+      r.z += Math.cos(r.h) * r.v * dt;
+      if (r.crashT <= 0) {
+        // back on the bike, on the track, pointing the right way
+        const side = Math.max(-HALF_W + 1.5, Math.min(HALF_W - 1.5, r.lat));
+        const p = pointAt(tr, r.i, side);
+        Object.assign(r, { x: p.x, z: p.z, h: tr.ang[r.i], lat: side, v: 6, steer: 0, off: false, boost: 0 });
+        this.events.push({ type: 'recover', id: r.id });
+      }
+      return;
+    }
     r.boost = Math.max(0, r.boost - dt);
     r.wallT = Math.max(0, r.wallT - dt);
     let vmax = r.vmax * (1 + 0.1 * r.draft) * (r.boost > 0 ? 1.3 : 1) * (r.off ? 0.5 : 1);
@@ -193,7 +207,17 @@ export class Race {
       r.z = p.z;
       r.lat = side * (WALL - 0.6);
       r.h = wrap(tr.ang[r.i] + wrap(r.h - tr.ang[r.i]) * 0.3);
-      if (r.wallT <= 0) { r.v *= 0.5; this.events.push({ type: 'wall', id: r.id, x: r.x, z: r.z }); r.wallT = 0.5; }
+      if (r.wallT <= 0) {
+        if (r.v > 31) {
+          r.crashT = 1.5;
+          r.v *= 0.35;
+          this.events.push({ type: 'crash', id: r.id, x: r.x, z: r.z });
+        } else {
+          r.v *= 0.5;
+          this.events.push({ type: 'wall', id: r.id, x: r.x, z: r.z });
+        }
+        r.wallT = 0.5;
+      }
     }
     // laps
     const lapNow = Math.floor(r.prog / tr.length);

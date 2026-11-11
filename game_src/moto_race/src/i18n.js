@@ -32,6 +32,9 @@ const S = {
   loading: ['بنجهّز الحلبة...', 'Getting the circuit ready...'],
   noWebgl: ['الجهاز ده مش بيشغّل اللعبة ثلاثية الأبعاد.', 'This device cannot run the 3D game.'],
   sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
+  crash: ['حادثة!', 'CRASH!'],
+  morning: ['الصبح', 'Morning'],
+  evening: ['المغرب', 'Evening'],
   kmh: ['كم/س', 'km/h'],
 };
 

@@ -7,7 +7,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Race, ROUNDS, RIDERS, LAPS, normalizeSave } from './sim.js';
 import { pointAt, HALF_W, WALL } from './track.js';
-import { mat, makeBike, makePalm, makeStand, makeGantry, makeChevron, makeMountain, makeLighthouse, roadTexture } from './models.js';
+import { mat, makeBike, makePalm, makeStand, makeGantry, makeChevron, makeMountain, makeLighthouse, roadTexture, makeClouds, meshTexture } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
 import { CSS, CSS2, CSS3, h } from './ui.js';
@@ -21,7 +21,7 @@ const webglOk = () => {
     return false;
   }
 };
-const FACE = { fox: '🦊', bear: '🐻', bunny: '🐰', raccoon: '🦝', cat: '🐱', panda: '🐼' };
+const helmetDot = (c) => `<i style="display:inline-block;width:1em;height:1em;border-radius:50%;background:#${c.toString(16).padStart(6, '0')};border:2px solid #fff;vertical-align:middle"></i>`;
 const COLORS = [0xe8342a, 0x2a7ae8, 0x2ab85a, 0x8a3ae8];
 const GEARS = [0, 13, 23, 32, 41, 50, 99];
 const hex = (c) => `#${c.toString(16).padStart(6, '0')}`;
@@ -258,12 +258,38 @@ class Game {
       m.position.set(cx + Math.cos(a) * (520 + (i % 2) * 90), -0.4, cz + Math.sin(a) * (520 + (i % 2) * 90));
       s.add(m);
     }
+    s.add(makeClouds(14, cx, cz));
+    // see-through catch fences in front of the crowd and the trees
+    const mt = meshTexture();
+    for (const side of [-1, 1]) {
+      const pos = [];
+      const uv = [];
+      for (let i = 0; i <= tr.N; i++) {
+        const p = pointAt(tr, i, side * (WALL + 0.5));
+        pos.push(p.x, 0.9, p.z, p.x, 3.4, p.z);
+        uv.push((i * tr.step) / 2.5, 0, (i * tr.step) / 2.5, 1);
+      }
+      const idx = [];
+      for (let i = 0; i < tr.N; i++) { const k = i * 2; idx.push(k, k + 2, k + 1, k + 1, k + 2, k + 3); }
+      const fg = new THREE.BufferGeometry();
+      fg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      fg.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+      fg.setIndex(idx);
+      mt.repeat.set(1, 2.5);
+      s.add(new THREE.Mesh(fg, new THREE.MeshBasicMaterial({ map: mt, transparent: true, alphaTest: 0.3, side: THREE.DoubleSide })));
+      for (let i = 0; i < tr.N; i += 6) {
+        const p = pointAt(tr, i, side * (WALL + 0.5));
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.6, 5), mat(0x6a6e78));
+        post.position.set(p.x, 2.1, p.z);
+        s.add(post);
+      }
+    }
     const lh = makeLighthouse();
     lh.position.set(cx + 300, -0.2, cz - 220);
     s.add(lh);
     // the riders
     this.bikes = this.race.riders.map((r, k) => {
-      const b = makeBike(r.kind, k === 0 ? COLORS[this.save.color] : r.color);
+      const b = makeBike(k === 0 ? COLORS[this.save.color] : r.color, r.suit, r.helmet, r.num);
       s.add(b.root);
       return b;
     });
@@ -544,6 +570,7 @@ class Game {
       steer: h('div', { class: 'mr-steer' }, h('i')),
       lights: h('div', { class: 'mr-lights' }, [0, 1, 2, 3, 4].map(() => h('i'))),
       tag: h('div', { class: 'mr-tag' }),
+      title: h('div', { class: 'mr-titlecard' }, h('b', {}, name(ROUNDS[this.roundIndex])), h('span', {}, `${t('round')} ${num(ROUNDS[this.roundIndex].id)} · ${ROUNDS[this.roundIndex].sunset ? t('evening') : t('morning')}`), h('i')),
     };
     this.mmCtx = mini.getContext('2d');
     const b = this.hud.brake;
@@ -555,7 +582,7 @@ class Game {
     this.layer.append(
       h('button', { class: 'mr-round', style: this._topLeft(), 'aria-label': t('paused'), onclick: (e) => { e.stopPropagation(); this.pause(); } }, '⏸'),
       this.hud.pos, this.hud.lap, this.hud.board, this.hud.time, this.hud.mini, this.hud.speedo,
-      this.hud.steer, this.hud.brake, this.hud.nitro, this.hud.lights, this.hud.tag,
+      this.hud.steer, this.hud.brake, this.hud.nitro, this.hud.lights, this.hud.tag, this.hud.title,
       this._mute(`top:max(calc(var(--u)*2.4),env(safe-area-inset-top));inset-inline-end:calc(var(--u)*3)`),
       this._toastEl(),
     );
@@ -563,8 +590,9 @@ class Game {
     setTimeout(() => this.mode === 'race' && this.toast(t('how'), 3.5), 300);
   }
 
-  _tag(text, secs = 1.2) {
+  _tag(text, secs = 1.2, red = false) {
     this.hud.tag.textContent = text;
+    this.hud.tag.style.color = red ? '#ff3a2a' : '#fff';
     this.hud.tag.classList.add('show');
     clearTimeout(this._tagT);
     this._tagT = setTimeout(() => this.hud && this.hud.tag.classList.remove('show'), secs * 1000);
@@ -598,7 +626,7 @@ class Game {
     this.sound.play(r.place === 1 ? 'win' : 'finish');
     const top = race.order.slice(0, 3);
     const podium = [top[1], top[0], top[2]].map((rr, k) => rr && h('div', {},
-      h('span', { class: 'f' }, FACE[rr.kind]),
+      (() => { const e = h('span', { class: 'f' }); e.innerHTML = helmetDot(rr.helmet); return e; })(),
       h('span', {}, rr.isPlayer ? t('you') : name(rr)),
       h('div', { class: 'st', style: `height:calc(var(--u)*${[9, 13, 6][k]});background:${['#c0c4cc', '#ffcf3a', '#d08a4a'][k]}` }, num([2, 1, 3][k]))));
     const hasNext = r.place <= 3 && i + 1 < ROUNDS.length;
@@ -638,6 +666,7 @@ class Game {
           this.hud.lights.classList.add('go');
           [...this.hud.lights.children].forEach((l) => l.classList.add('on'));
           setTimeout(() => this.hud && this.hud.lights.remove(), 900);
+          this.hud.title.remove();
           this._tag(t('go'), 0.8);
           break;
         case 'nitro': if (e.id === 0) { this.sound.play('nitro'); this._tag(t('boost'), 0.9); } break;
@@ -645,6 +674,11 @@ class Game {
         case 'bump': this.sound.play('bump'); this.shake = 0.3; break;
         case 'wall': if (e.id === 0) { this.sound.play('wall'); this.shake = 0.45; for (let k = 0; k < 12; k++) this.sparks.emit(e.x, 0.6, e.z, (Math.random() - 0.5) * 6, Math.random() * 4, (Math.random() - 0.5) * 6, 0.5); } break;
         case 'grass': if (e.id === 0) this.sound.play('grass'); break;
+        case 'crash':
+          if (e.id === 0) { this.sound.play('crash'); this.shake = 0.8; this._tag(t('crash'), 1.4, true); }
+          for (let k = 0; k < 18; k++) this.sparks.emit(e.x, 0.5, e.z, (Math.random() - 0.5) * 8, Math.random() * 5, (Math.random() - 0.5) * 8, 0.6);
+          break;
+        case 'recover': if (e.id === 0) this.sound.play('lap'); break;
         case 'lap': if (e.id === 0) { this.sound.play('lap'); this._tag(e.lap === LAPS ? t('lastLap') : `${t('lap')} ${num(e.lap)}`, 1.4); } break;
         case 'cross': if (e.id === 0) this.sound.play('crowd'); break;
         case 'overtake': if (e.place < before) { this.sound.play('overtake'); if (Math.random() < 0.5) this._tag(t('overtake'), 0.8); } break;
@@ -686,8 +720,10 @@ class Game {
       const b = this.bikes[k];
       b.root.position.set(r.x, 0, r.z);
       b.root.rotation.y = r.h;
-      const lean = -r.lean * 0.7;
-      b.lean.rotation.z += (lean - b.lean.rotation.z) * Math.min(1, dt * 8);
+      const lean = r.crashT > 0 ? (k % 2 ? 1.45 : -1.45) : -r.lean * 0.7;
+      b.lean.rotation.z += (lean - b.lean.rotation.z) * Math.min(1, dt * (r.crashT > 0 ? 6 : 8));
+      b.rider.position.y = r.crashT > 0 ? 0.55 : 1.08;
+      b.rider.rotation.z = r.crashT > 0 ? Math.sin(time * 9) * 0.6 : 0;
       const spin = r.v * dt / 0.36;
       b.front.rotation.x += spin;
       b.back.rotation.x += spin;
@@ -760,7 +796,7 @@ class Game {
       const rows = [o[k - 1], p, o[k + 1]].filter(Boolean);
       this.hud.board.replaceChildren(...rows.map((r) => {
         const gap = r === p ? '' : `${r.prog > p.prog ? '-' : '+'}${num((Math.abs(r.prog - p.prog) / Math.max(15, p.v)).toFixed(1))}`;
-        return h('div', { class: r === p ? 'me' : '' }, h('span', {}, num(r.place)), h('i', { style: `background:${hex(r === p ? COLORS[this.save.color] : r.color)}` }), h('span', {}, FACE[r.kind], ' ', r === p ? t('you') : name(r)), h('em', {}, gap));
+        return h('div', { class: r === p ? 'me' : '' }, h('span', {}, num(r.place)), h('i', { style: `background:${hex(r === p ? COLORS[this.save.color] : r.color)}` }), (() => { const e = h('span', {}); e.innerHTML = `${helmetDot(r.helmet)} `; e.append(r === p ? t('you') : name(r)); return e; })(), h('em', {}, gap));
       }));
     }
     // minimap

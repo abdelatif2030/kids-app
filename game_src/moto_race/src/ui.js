@@ -133,6 +133,10 @@ export const CSS3 = `
 .mr-lights.go i{background:#3aff6a;box-shadow:0 0 calc(var(--u)*3) #3aff6a}
 .mr-tag{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-weight:900;font-size:calc(var(--u)*6);color:#fff;-webkit-text-stroke:calc(var(--u)*.4) #1a1a2a;paint-order:stroke fill;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .25s;font-style:italic}
 .mr-tag.show{opacity:1}
+.mr-titlecard{position:absolute;left:0;right:0;top:56%;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.6);pointer-events:none;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.mr-titlecard b{font-size:calc(var(--u)*8);font-weight:900;font-style:italic;letter-spacing:.02em}
+.mr-titlecard span{font-size:calc(var(--u)*3);font-weight:700;opacity:.9}
+.mr-titlecard i{display:block;width:calc(var(--u)*18);height:calc(var(--u)*.8);background:#ff3a2a;border-radius:9px}
 .mr-speedlines{position:absolute;inset:0;pointer-events:none;opacity:0;background:repeating-conic-gradient(from 0deg at 50% 55%,rgba(255,255,255,0) 0deg 6deg,rgba(255,255,255,.22) 6deg 7deg);-webkit-mask:radial-gradient(circle at 50% 55%,transparent 32%,#000 70%);mask:radial-gradient(circle at 50% 55%,transparent 32%,#000 70%);transition:opacity .3s}
 .mr-podium{display:flex;align-items:flex-end;gap:calc(var(--u)*1.6);margin:calc(var(--u)*1) 0}
 .mr-podium div{display:flex;flex-direction:column;align-items:center;font-weight:900;color:#fff;font-size:calc(var(--u)*2.8)}
