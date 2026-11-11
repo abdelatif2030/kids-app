@@ -92,4 +92,14 @@ final WebGame kOceanDefense = WebGame(
   title: () => tr2('دفاع القلعة البحرية', 'Ocean Defense'),
 );
 
-final List<WebGame> kWebGames = [kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense];
+/// «سباق الدراجات النارية» (Motorcycle Racing): the coastal circuit with animal riders (docs/MOTO_RACE.md).
+final WebGame kMotoRace = WebGame(
+  id: 'moto_race',
+  folder: 'moto_race',
+  global: 'MotoRace',
+  storeKey: 'moto_race',
+  minAge: 3,
+  title: () => tr2('سباق الدراجات النارية', 'Motorcycle Racing'),
+);
+
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense];

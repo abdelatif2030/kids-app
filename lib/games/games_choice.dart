@@ -78,7 +78,8 @@ class GamesChoiceScreen extends StatelessWidget {
 }
 
 /// The owner's picture of the fun games page (2026-11-11, 1672 x 941): a wooden «ألعاب التسلية» sign, a back arrow
-/// and five game cards («سباق ملاهي الأبطال», «مغامرة الأدغال», «مزرعتي السعيدة», «مخبز اليقطين», «سيف الساموراي»). It is shown whole; the arrow and the cards are
+/// and eight game cards in two rows (motorcycle racing, Glowfair rally, jungle, farm / bakery, samurai, ocean defense,
+/// golden tail). It is shown whole; the arrow and the cards are
 /// large invisible buttons on it, like the Games page. To change it, replace the one file.
 const String kFunGamesPicture = 'assets/games/fun_games_scene.webp';
 const double kFunGamesAspect = 1672 / 941;
@@ -113,34 +114,23 @@ class FunGamesScreen extends StatelessWidget {
         asset: kFunGamesPicture,
         aspect: kFunGamesAspect,
         spots: [
-          // the seven cards of the owner's picture (centre and size as fractions of it); a card whose game is
-          // still being built says so
-          for (final (id, game, ar, en, cx, cy, w) in <(String, WebGame?, String, String, double, double, double)>[
-            ('fun_carnival_race', kCarnivalRace, '', '', 0.144, 0.404, 0.23),
-            ('fun_jungle_adventure', kJungleAdventure, '', '', 0.381, 0.404, 0.22),
-            ('fun_happy_farm', kHappyFarm, '', '', 0.614, 0.404, 0.22),
-            ('fun_pumpkin_pie', kPumpkinPie, '', '', 0.854, 0.404, 0.23),
-            ('fun_samurai', kSamuraiAction, 'سيف الساموراي', 'Samurai Action', 0.182, 0.760, 0.28),
-            ('fun_golden_tail', kGoldenTail, 'مغامرة الذيل الذهبي', 'Golden Tail Chase', 0.465, 0.760, 0.26),
-            ('fun_ocean_defense', kOceanDefense, 'دفاع القلعة البحرية', 'Ocean Defense', 0.787, 0.760, 0.36),
+          // the eight cards of the owner's picture (centre and size as fractions of it)
+          for (final (id, game, cx, cy, w) in <(String, WebGame, double, double, double)>[
+            ('fun_moto_race', kMotoRace, 0.139, 0.441, 0.23),
+            ('fun_carnival_race', kCarnivalRace, 0.380, 0.441, 0.23),
+            ('fun_jungle_adventure', kJungleAdventure, 0.622, 0.441, 0.23),
+            ('fun_happy_farm', kHappyFarm, 0.862, 0.441, 0.23),
+            ('fun_pumpkin_pie', kPumpkinPie, 0.139, 0.768, 0.25),
+            ('fun_samurai', kSamuraiAction, 0.387, 0.768, 0.22),
+            ('fun_ocean_defense', kOceanDefense, 0.631, 0.768, 0.25),
+            ('fun_golden_tail', kGoldenTail, 0.876, 0.768, 0.22),
           ])
-            PictureSpot(
-              id,
-              Offset(cx, cy),
-              w,
-              0.34,
-              game?.title() ?? tr2(ar, en),
-              game != null
-                  ? () => _open(context, game)
-                  : () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr2('اللعبة دي جاية قريب!', 'This game is coming soon!')))),
-              radius: 40,
-              key: ValueKey(id),
-            ),
+            PictureSpot(id, Offset(cx, cy), w, 0.3, game.title(), () => _open(context, game), radius: 40, key: ValueKey(id)),
           PictureSpot(
             'fun_back',
-            const Offset(0.061, 0.094),
-            0.08,
-            0.14,
+            const Offset(0.066, 0.101),
+            0.078,
+            0.138,
             tr2('رجوع', 'Back'),
             () => Navigator.maybePop(context),
             radius: 60,
