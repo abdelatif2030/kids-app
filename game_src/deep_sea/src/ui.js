@@ -64,6 +64,10 @@ export const CSS = `
 .ds-lv .st{font-size:calc(var(--u)*4);white-space:nowrap}
 .ds-stars{font-size:calc(var(--u)*11);text-align:center;letter-spacing:calc(var(--u)*1)}
 .ds-stars .off{filter:grayscale(1);opacity:.3}
+.ds-boxes{display:flex;gap:calc(var(--u)*2)}
+.ds-boxes div{flex:1;background:rgba(255,255,255,.08);border-radius:calc(var(--u)*2.4);padding:calc(var(--u)*1.6) calc(var(--u)*1);text-align:center}
+.ds-boxes small{display:block;font-size:calc(var(--u)*3.2);font-weight:700;opacity:.8}
+.ds-boxes b{display:block;font-size:calc(var(--u)*6.4);font-weight:900;margin-top:calc(var(--u)*.6)}
 .ds-stats{display:flex;justify-content:space-around;font-weight:900;font-size:calc(var(--u)*4.2)}
 .ds-soundpill{position:absolute;left:50%;bottom:calc(var(--u)*34);transform:translateX(-50%);z-index:30;font-family:inherit;font-weight:900;font-size:calc(var(--u)*4.6);color:#1f2a24;background:#ffd166;border:calc(var(--u)*.6) solid #fff;border-radius:999px;padding:calc(var(--u)*2) calc(var(--u)*5);box-shadow:0 calc(var(--u)*1) calc(var(--u)*3) rgba(0,0,0,.4);cursor:pointer;display:none;pointer-events:auto}
 .ds-land .ds-card{width:calc(var(--u)*110)}

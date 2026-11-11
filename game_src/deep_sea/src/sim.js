@@ -7,6 +7,7 @@
 export const SPECIES = {
   plankton: { cm: [2, 3], speed: 0.4, school: 0, color: 'g', ar: 'بلانكتون', en: 'Plankton' },
   shrimp: { cm: [3, 5], speed: 1.2, ar: 'جمبري', en: 'Shrimp' },
+  jelly: { cm: [8, 16], speed: 0.5, ar: 'قنديل البحر', en: 'Jellyfish' },
   sardine: { cm: [4, 7], speed: 3.0, school: 1, ar: 'سردين', en: 'Sardine' },
   damsel: { cm: [6, 10], speed: 2.2, ar: 'سمكة صغيرة', en: 'Damselfish' },
   butterfly: { cm: [11, 18], speed: 2.0, school: 1, ar: 'سمكة الفراشة', en: 'Butterflyfish' },
@@ -22,11 +23,11 @@ export const SPECIES = {
 };
 
 export const LEVELS = [
-  { id: 1, ar: 'الشعاب المشمسة', en: 'Sunlit Reef', biome: 'reef', start: 10, goal: 45, time: 110, star3: 60, star2: 85, half: 48,
-    mix: [['plankton', 4], ['shrimp', 3], ['damsel', 4], ['butterfly', 3], ['puffer', 2], ['grouper', 1]], bait: 'sardine' },
-  { id: 2, ar: 'غابة الأعشاب البحرية', en: 'Kelp Forest', biome: 'kelp', start: 30, goal: 110, time: 120, star3: 70, star2: 95, half: 75,
+  { id: 1, ar: 'الشعاب المشمسة', en: 'Sunlit Reef', biome: 'reef', start: 10, goal: 45, time: 150, star3: 90, star2: 120, half: 48, halfY: 9,
+    mix: [['plankton', 4], ['shrimp', 3], ['damsel', 4], ['jelly', 2], ['butterfly', 3], ['puffer', 2], ['grouper', 1]], bait: 'sardine' },
+  { id: 2, ar: 'غابة الأعشاب البحرية', en: 'Kelp Forest', biome: 'kelp', start: 30, goal: 110, time: 120, star3: 70, star2: 95, half: 75, halfY: 13,
     mix: [['butterfly', 3], ['puffer', 2], ['mackerel', 4], ['squid', 4], ['barracuda', 1]], bait: 'mackerel', task: { kind: 'squid', n: 3 } },
-  { id: 3, ar: 'أخدود الأعماق', en: 'Deep Trench', biome: 'trench', start: 70, goal: 250, time: 140, star3: 85, star2: 115, half: 120,
+  { id: 3, ar: 'أخدود الأعماق', en: 'Deep Trench', biome: 'trench', start: 70, goal: 250, time: 140, star3: 85, star2: 115, half: 120, halfY: 20,
     mix: [['lantern', 4], ['squid', 3], ['tuna', 3], ['angler', 1], ['barracuda', 1]], bait: 'lantern', boss: 'shark' },
 ];
 
@@ -54,6 +55,8 @@ export class Sea {
     this.easy = !!opts.easy;
     this.rand = rng(opts.seed ?? 5);
     this.half = this.level.half;
+    this.halfY = this.level.halfY;
+    this.seen = new Set();
     this.fish = { x: 0, z: 0, cm: this.level.start, a: Math.PI, vx: 0, vz: 0, dashT: 0, dashCd: 0, invul: 0, y: 0 };
     this.lives = this.easy ? 4 : 3;
     this.maxLives = this.lives;
@@ -70,7 +73,7 @@ export class Sea {
     this.move = { x: 0, z: 0 };
     this.events = [];
     this.pending = [];
-    for (let i = 0; i < 32; i++) this._spawn(true);
+    for (let i = 0; i < 22; i++) this._spawn(true);
   }
 
   get r() { return U(this.fish.cm) * 0.5; }
@@ -105,15 +108,15 @@ export class Sea {
     let x;
     let z;
     for (let i = 0; i < 12; i++) {
-      if (near) { x = near.x + (this.rand() - 0.5) * 6; z = near.z + (this.rand() - 0.5) * 6; break; }
+      if (near) { x = near.x + (this.rand() - 0.5) * 6; z = Math.max(-this.halfY + 1, Math.min(this.halfY - 1, near.z + (this.rand() - 0.5) * 6)); break; }
       x = (this.rand() * 2 - 1) * (this.half - 4);
-      z = (this.rand() * 2 - 1) * (this.half - 4);
+      z = (this.rand() * 2 - 1) * (this.halfY - 2);
       const d = Math.hypot(x - f.x, z - f.z);
-      if (d > (anywhere ? 8 : 16) && d < 45) break;
+      if (d > (anywhere ? 6 : 12) && d < 28) break;
     }
     // sizes follow the fish a little so there is always food and always something to fear
     let cm = cmOverride ?? sp.cm[0] + this.rand() * (sp.cm[1] - sp.cm[0]);
-    if (!sp.predator && !cmOverride && kind !== 'plankton') cm = Math.max(cm, Math.min(cm * 2, f.cm * (0.2 + this.rand() * 0.45)));
+    if (!sp.predator && !cmOverride && kind !== 'plankton') cm = Math.max(cm, Math.min(cm * 2, f.cm * (0.18 + this.rand() * 0.4)));
     const c = { id: this.nextId++, kind, x, z, cm, a: this.rand() * 6.28, t: this.rand() * 10, y: (this.rand() - 0.5) * 2, warn: 0, lunge: 0, cool: 1 + this.rand() * 2, ink: 0 };
     this.creatures.push(c);
     return c;
@@ -152,8 +155,8 @@ export class Sea {
       if (d < 18 && f.invul <= 0 && this.t > 8) c.a = turn(c.a, Math.atan2(dx, dz), 1.8 * dt);
       else c.a += Math.sin(c.t * 0.5) * 0.6 * dt;
       c.cool -= dt;
-      if (c.warn > 0) { c.warn -= dt; speed *= 0.3; if (c.warn <= 0) { c.lunge = 0.7; this.events.push({ type: 'lunge', id: c.id, kind: c.kind }); } } else if (c.lunge > 0) { c.lunge -= dt; speed *= 2.6; } else if (c.cool <= 0 && this.t > 12 && d < 7 + U(c.cm) * 0.3 && f.invul <= 0) {
-        c.warn = this.easy ? 1.0 : 0.7;
+      if (c.warn > 0) { c.warn -= dt; speed *= 0.3; if (c.warn <= 0) { c.lunge = 0.7; this.events.push({ type: 'lunge', id: c.id, kind: c.kind }); } } else if (c.lunge > 0) { c.lunge -= dt; speed *= 2.2; } else if (c.cool <= 0 && this.t > 12 && d < 7 + U(c.cm) * 0.3 && f.invul <= 0) {
+        c.warn = this.easy ? 1.2 : 0.95;
         c.cool = 4 + this.rand() * 2.5;
         this.events.push({ type: 'warn', id: c.id, kind: c.kind });
       } else speed *= d < 18 ? 0.75 : 0.5;
@@ -167,8 +170,11 @@ export class Sea {
     c.x += Math.sin(c.a) * speed * dt;
     c.z += Math.cos(c.a) * speed * dt;
     const lim = this.half - 1;
+    const limY = this.halfY - Math.min(this.halfY * 0.5, U(c.cm) * 0.4) - 0.5;
     if (Math.abs(c.x) > lim) { c.x = Math.sign(c.x) * lim; c.a = -c.a; }
-    if (Math.abs(c.z) > lim) { c.z = Math.sign(c.z) * lim; c.a = Math.PI - c.a; }
+    if (Math.abs(c.z) > limY) { c.z = Math.sign(c.z) * limY; c.a = Math.PI - c.a; }
+    // most fish swim mostly sideways (a side view): steer back towards level swimming
+    if (!c.bait && !(SPECIES[c.kind].predator && c.lunge > 0)) { const side = Math.sin(c.a) >= 0 ? Math.PI / 2 : -Math.PI / 2; c.a = turn(c.a, side, (c.kind === 'jelly' ? 0 : 0.6) * dt); }
     c.y = Math.sin(c.t * 0.8 + c.id) * 0.6;
   }
 
@@ -200,8 +206,9 @@ export class Sea {
     f.z += f.vz * dt;
     if (Math.hypot(f.vx, f.vz) > 0.3) f.a = turn(f.a, Math.atan2(f.vx, f.vz), 8 * dt);
     const lim = this.half - this.r - 1;
+    const limY = this.halfY - Math.min(this.halfY * 0.6, this.r) - 0.3;
     f.x = Math.max(-lim, Math.min(lim, f.x));
-    f.z = Math.max(-lim, Math.min(lim, f.z));
+    f.z = Math.max(-limY, Math.min(limY, f.z));
     for (const c of this.creatures) this._moveCreature(c, dt);
     // eating and being bitten
     const mouthX = f.x + Math.sin(f.a) * this.r * 0.8;
@@ -212,13 +219,18 @@ export class Sea {
         if (Math.hypot(c.x - mouthX, c.z - mouthZ) < cr + this.r * 0.75) this._eat(c);
       } else if (c.cm > f.cm * DANGER && SPECIES[c.kind].predator) {
         const bite = Math.hypot(f.x - (c.x + Math.sin(c.a) * cr * 0.8), f.z - (c.z + Math.cos(c.a) * cr * 0.8));
-        if (bite < this.r + cr * 0.45 && f.invul <= 0 && f.dashT <= 0) this._bitten(c);
+        if (c.lunge > 0 && bite < this.r + cr * 0.45 && f.invul <= 0 && f.dashT <= 0) this._bitten(c);
       }
     }
     if (this.creatures.some((c) => c.gone)) this.creatures = this.creatures.filter((c) => !c.gone);
+    for (const [k] of this.level.mix) {
+      const sp = SPECIES[k];
+      if (sp.predator || this.seen.has(k)) continue;
+      if (sp.cm[0] <= f.cm * EAT) { this.seen.add(k); if (this.t > 1) this.events.push({ type: 'canEat', kind: k }); }
+    }
     // more life in the sea; a bait ball now and then
-    const want = this.state === 'boss' ? 22 : 32;
-    if (this.creatures.length < want && this.rand() < dt * 2.5) this._spawn();
+    const want = this.state === 'boss' ? 14 : 22;
+    if (this.creatures.length < want && this.rand() < dt * 1.2) this._spawn();
     this.creatures = this.creatures.filter((c) => SPECIES[c.kind].predator || c.cm >= f.cm * 0.08 || c.kind === 'plankton');
     this.baitT -= dt;
     if (this.baitT <= 0) { this.baitT = 24 + this.rand() * 10; this._bait(); }
@@ -227,7 +239,7 @@ export class Sea {
     if (this.state === 'play' && f.cm >= this.level.goal && taskDone) {
       if (this.level.boss) {
         this.state = 'boss';
-        const s = this._spawn(false, 'shark', { x: f.x + 20, z: f.z - 20 }, SPECIES.shark.cm[0]);
+        const s = this._spawn(false, 'shark', { x: f.x + (f.x > 0 ? -30 : 30), z: 0 }, SPECIES.shark.cm[0]);
         s.boss = true;
         this.events.push({ type: 'boss' });
       } else this._end(true);
@@ -242,7 +254,7 @@ export class Sea {
     if (SPECIES[c.kind].squid) this.squid++;
     this.combo = this.comboT > 0 ? this.combo + 1 : 1;
     this.comboT = 2;
-    const gain = Math.min(c.cm * 0.2 * (1 + Math.min(4, this.combo - 1) * 0.08), this.level.goal * 1.2 - f.cm > 0 ? 999 : 0.2);
+    const gain = Math.min(c.cm * 0.1 * (1 + Math.min(4, this.combo - 1) * 0.08), this.level.goal * 1.2 - f.cm > 0 ? 999 : 0.2);
     f.cm = Math.round((f.cm + gain) * 10) / 10;
     this.events.push({ type: 'eat', kind: c.kind, cm: c.cm, gain, combo: this.combo, x: c.x, z: c.z, dash: f.dashT > 0 });
     if (c.boss) this._end(true);
@@ -261,7 +273,8 @@ export class Sea {
     f.vz = (dz / l) * 10;
     f.cm = Math.max(this.level.start, Math.round(f.cm * 0.94 * 10) / 10);
     c.lunge = 0;
-    c.cool = 3;
+    c.cool = 5;
+    c.a += Math.PI; // the hunter swims off after a bite
     this.events.push({ type: 'bitten', kind: c.kind, lives: this.lives });
     if (this.lives <= 0) this._end(false, c.kind);
   }

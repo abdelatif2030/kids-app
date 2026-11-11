@@ -64,6 +64,7 @@ export function makeFish(kind) {
   if (kind === 'shrimp') return makeShrimp();
   if (kind === 'plankton') return makePlankton();
   if (kind === 'angler') return makeAngler();
+  if (kind === 'jelly') return makeJelly();
   const L = LOOK[kind] || LOOK.damsel;
   const root = new THREE.Group();
   const long = kind === 'barracuda' ? 1.6 : kind === 'shark' ? 1.3 : 1;
@@ -85,7 +86,7 @@ export function makeFish(kind) {
   tf.position.z = 0;
   root.add(tail);
   tail.rotation.y = 0;
-  tail.children[0].rotation.set(0, -Math.PI / 2, 0);
+  tail.children[0].rotation.set(0, Math.PI / 2, 0);
   // dorsal fin (tall and pointed for the shark), side fins
   const dorsal = new THREE.Mesh(new THREE.ConeGeometry(kind === 'shark' ? 0.12 : 0.06, kind === 'shark' ? 0.35 : 0.18, 4), mat(L.tail));
   dorsal.position.set(0, 0.2 * tall + (kind === 'shark' ? 0.12 : 0.04), kind === 'shark' ? 0.05 : -0.05);
@@ -98,6 +99,20 @@ export function makeFish(kind) {
     for (let i = 0; i < 6; i++) { const _m = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.05, 4), mat(0xffffff)); _m.position.set(-0.08 + i * 0.032, -0.07, 0.56 * long); root.add(_m); }
   }
   return { root, tail };
+}
+
+/** A pink see-through jellyfish with a pulsing bell and trailing tentacles (like the video). */
+function makeJelly() {
+  const root = new THREE.Group();
+  const bell = new THREE.Mesh(new THREE.SphereGeometry(0.5, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshPhongMaterial({ color: 0xff9ac8, emissive: 0x6a1a3a, transparent: true, opacity: 0.6, shininess: 80, side: THREE.DoubleSide, depthWrite: false }));
+  root.add(bell);
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    const tt = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.008, 0.9 + (i % 3) * 0.3, 4), new THREE.MeshBasicMaterial({ color: 0xffc8e0, transparent: true, opacity: 0.55, depthWrite: false }));
+    tt.position.set(Math.cos(a) * 0.3, -0.5, Math.sin(a) * 0.3);
+    root.add(tt);
+  }
+  return { root, bell, tail: null };
 }
 
 function makePuffer() {
@@ -118,7 +133,7 @@ function makePuffer() {
   tail.position.z = -0.5;
   const tf = fin(0.2, 0.25, mat(0xc8b06a));
   tf.material.side = THREE.DoubleSide;
-  tf.rotation.y = -Math.PI / 2;
+  tf.rotation.y = Math.PI / 2;
   tail.add(tf);
   root.add(tail);
   return { root, tail };
@@ -135,7 +150,7 @@ function makeButterfly() {
   tail.position.z = -0.3;
   const tf = fin(0.2, 0.3, mat(0xffd23a));
   tf.material.side = THREE.DoubleSide;
-  tf.rotation.y = -Math.PI / 2;
+  tf.rotation.y = Math.PI / 2;
   tail.add(tf);
   root.add(tail);
   return { root, tail };

@@ -77,8 +77,8 @@ class Glow {
 }
 
 const BIOME = {
-  reef: { bg: 0x1a7ab8, fog: 0x2a8ac0, near: 8, far: 70, sand: ['#d8d0b0', '#c8bf98'], hemi: [0xc8f0ff, 0x3a5a6a, 1.6], sun: 1.2, rock: 0x7a8a8a },
-  kelp: { bg: 0x1a6a7a, fog: 0x1f6a72, near: 8, far: 60, sand: ['#b8b090', '#a8a080'], hemi: [0xb8f0e0, 0x2a4a3a, 1.4], sun: 0.9, rock: 0x5a6a5a },
+  reef: { bg: 0x2a9ac8, fog: 0x3aa8c8, near: 8, far: 70, sand: ['#e8dcc0', '#d8ccaa'], hemi: [0xd8f8ff, 0x4a7a8a, 1.9], sun: 1.3, rock: 0x6a9a9a },
+  kelp: { bg: 0x1f8a8a, fog: 0x2a8a8a, near: 8, far: 60, sand: ['#c8c0a0', '#b8b090'], hemi: [0xc8f8e8, 0x3a5a4a, 1.7], sun: 1.0, rock: 0x5a8a7a },
   trench: { bg: 0x061a30, fog: 0x08203a, near: 6, far: 55, sand: ['#3a4a5a', '#2a3a4a'], hemi: [0x5a7ab8, 0x0a1a2a, 0.9], sun: 0.3, rock: 0x2a3a4a },
 };
 
@@ -193,59 +193,77 @@ class Game {
     const g = (this.sea = new THREE.Group());
     this.scene.add(g);
     this.scene.background = new THREE.Color(B.bg);
-    this.scene.fog = new THREE.Fog(B.fog, B.near, B.far);
+    this.scene.fog = new THREE.Fog(B.fog, 14, 70);
     this.hemi.color.setHex(B.hemi[0]);
     this.hemi.groundColor.setHex(B.hemi[1]);
     this.hemi.intensity = B.hemi[2];
     this.sun.intensity = B.sun;
+    this.sun.position.set(-10, 40, 20);
     const half = lv.half;
-    const sand = sandTexture(B.sand[0], B.sand[1]);
-    sand.repeat.set(half / 6, half / 6);
-    const floorY = -6;
+    const hy = lv.halfY;
+    this.hy = hy;
+    this.half = half;
+    // the sea floor: a sandy slope at the bottom, from the front to far behind
+    const floorY = -hy - 1.2;
     this.floorY = floorY;
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(half * 2 + 80, half * 2 + 80, 40, 40), new THREE.MeshLambertMaterial({ map: sand }));
+    const sand = sandTexture(B.sand[0], B.sand[1]);
+    sand.repeat.set((half * 2 + 80) / 10, 6);
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(half * 2 + 80, 70, 60, 20), new THREE.MeshLambertMaterial({ map: sand }));
     floor.rotation.x = -Math.PI / 2;
     const pos = floor.geometry.attributes.position;
-    for (let i = 0; i < pos.count; i++) pos.setZ(i, Math.sin(pos.getX(i) * 0.07) * 1.2 + Math.cos(pos.getY(i) * 0.05) * 1.4);
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const d = pos.getY(i); // after the rotation this is -z (depth)
+      pos.setZ(i, Math.sin(x * 0.11) * 0.9 + Math.cos(x * 0.05 + d * 0.2) * 0.8 + Math.max(0, d - 6) * 0.25);
+    }
     floor.geometry.computeVertexNormals();
-    floor.position.y = floorY;
+    floor.position.set(0, floorY, -20);
     g.add(floor);
     if (lv.biome !== 'trench') {
       this.caustic = causticTexture();
-      this.caustic.repeat.set(half / 8, half / 8);
-      const ca = new THREE.Mesh(new THREE.PlaneGeometry(half * 2 + 80, half * 2 + 80), new THREE.MeshBasicMaterial({ map: this.caustic, transparent: true, opacity: 0.18, blending: THREE.AdditiveBlending, depthWrite: false }));
+      this.caustic.repeat.set((half * 2 + 80) / 14, 5);
+      const ca = new THREE.Mesh(new THREE.PlaneGeometry(half * 2 + 80, 70), new THREE.MeshBasicMaterial({ map: this.caustic, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, depthWrite: false }));
       ca.rotation.x = -Math.PI / 2;
-      ca.position.y = floorY + 1.5;
+      ca.position.set(0, floorY + 1.2, -20);
       g.add(ca);
     } else this.caustic = null;
     const rand = (k) => ((Math.sin(k * 77.7 + index * 19) * 43758.5453) % 1 + 1) % 1;
-    // rocks and arches, corals (reef), kelp (kelp forest), dark cliffs and glowing bits (trench)
-    for (let i = 0; i < 40; i++) {
-      const r = makeRock(2 + rand(i) * 4, B.rock);
-      r.position.set((rand(i + 1) * 2 - 1) * half, floorY, (rand(i + 2) * 2 - 1) * half);
-      g.add(r);
+    // layered rock walls behind (the misty rocky shelves of the video) and rocks on the floor
+    for (let row = 0; row < 3; row++) {
+      const z = -14 - row * 10;
+      for (let x = -half - 20; x < half + 20; x += 9 + rand(row * 50 + x) * 6) {
+        const r = makeRock(5 + rand(x + row) * 6, B.rock);
+        r.scale.set(1.6, 1.1 + row * 0.5 + rand(x * 3) * 0.6, 1);
+        r.position.set(x, floorY + (row === 0 ? 0 : row * 2), z + rand(x) * 4);
+        g.add(r);
+      }
     }
-    for (let i = 0; i < 6; i++) { const a = makeArch(B.rock); a.position.set((rand(i + 60) * 2 - 1) * half * 0.8, floorY, (rand(i + 70) * 2 - 1) * half * 0.8); a.rotation.y = rand(i + 80) * 3; g.add(a); }
+    for (let i = 0; i < 26; i++) { const r = makeRock(1 + rand(i) * 2.2, B.rock); r.position.set((rand(i + 1) * 2 - 1) * half, floorY, -2 - rand(i + 2) * 8); g.add(r); }
+    for (let i = 0; i < 4; i++) { const a = makeArch(B.rock); a.position.set((rand(i + 60) * 2 - 1) * half * 0.8, floorY, -12); g.add(a); }
     this.kelps = [];
+    const kelp = (x, z, h, sc = 1) => { const k = makeKelp(h); k.root.position.set(x, floorY, z); k.root.scale.setScalar(sc); g.add(k.root); this.kelps.push(k); };
     if (lv.biome === 'reef') {
       const cols = [0xff6a8a, 0xffa83a, 0xb86ae8, 0x3ad8c8, 0xffd23a, 0xff4a4a];
-      for (let i = 0; i < 120; i++) { const c = makeCoral(i % 3, cols[i % cols.length]); c.position.set((rand(i + 100) * 2 - 1) * half, floorY, (rand(i + 200) * 2 - 1) * half); c.rotation.y = rand(i + 300) * 6; c.scale.setScalar(1 + rand(i + 400) * 1.5); g.add(c); }
-      for (let i = 0; i < 20; i++) { const k = makeKelp(4 + rand(i + 500) * 4); k.root.position.set((rand(i + 600) * 2 - 1) * half, floorY, (rand(i + 700) * 2 - 1) * half); g.add(k.root); this.kelps.push(k); }
+      for (let i = 0; i < 70; i++) { const c = makeCoral(i % 3, cols[i % cols.length]); c.position.set((rand(i + 100) * 2 - 1) * half, floorY, -1 - rand(i + 200) * 10); c.rotation.y = rand(i + 300) * 6; c.scale.setScalar(0.8 + rand(i + 400) * 1.2); g.add(c); }
+      for (let i = 0; i < 22; i++) kelp((rand(i + 600) * 2 - 1) * half, -3 - rand(i + 700) * 9, hy * 1.2 + rand(i + 500) * hy, 1.2);
+      for (let i = 0; i < 6; i++) kelp((rand(i + 650) * 2 - 1) * half, -1.5, hy * 1.5, 1.1); // a few tall kelp just behind the fish, like the video
     } else if (lv.biome === 'kelp') {
-      for (let i = 0; i < 110; i++) { const k = makeKelp(8 + rand(i + 500) * 10); k.root.position.set((rand(i + 600) * 2 - 1) * half, floorY, (rand(i + 700) * 2 - 1) * half); k.root.scale.setScalar(1.4); g.add(k.root); this.kelps.push(k); }
+      for (let i = 0; i < 70; i++) kelp((rand(i + 600) * 2 - 1) * half, -2 - rand(i + 700) * 18, hy * 1.6 + rand(i + 500) * hy, 1.5);
+      for (let i = 0; i < 10; i++) kelp((rand(i + 680) * 2 - 1) * half, -1.5, hy * 1.8, 1.3);
     } else {
-      for (let i = 0; i < 30; i++) { const c = makeRock(8 + rand(i + 800) * 10, 0x1a2a3a); c.position.set((rand(i + 900) * 2 - 1) * half, floorY - 2, (rand(i + 950) * 2 - 1) * half); g.add(c); }
-      for (let i = 0; i < 40; i++) { const gl = new THREE.Mesh(new THREE.SphereGeometry(0.15, 6, 4), basic([0x5ae8ff, 0xb85aff, 0x5aff8a][i % 3])); gl.position.set((rand(i + 1000) * 2 - 1) * half, floorY + 0.5 + rand(i) * 6, (rand(i + 1100) * 2 - 1) * half); g.add(gl); }
+      for (let i = 0; i < 40; i++) { const gl = new THREE.Mesh(new THREE.SphereGeometry(0.15, 6, 4), basic([0x5ae8ff, 0xb85aff, 0x5aff8a][i % 3])); gl.position.set((rand(i + 1000) * 2 - 1) * half, floorY + 0.5 + rand(i) * hy * 2, -3 - rand(i + 1100) * 10); g.add(gl); }
     }
-    // light rays from the surface (not in the trench)
+    // light rays slanting down from the surface (not in the trench)
     if (lv.biome !== 'trench') {
-      for (let i = 0; i < 10; i++) {
-        const ray = new THREE.Mesh(new THREE.PlaneGeometry(3, 40), new THREE.MeshBasicMaterial({ color: 0xc8f0ff, transparent: true, opacity: 0.06, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }));
-        ray.position.set((rand(i + 1200) * 2 - 1) * half * 0.6, 12, (rand(i + 1300) * 2 - 1) * half * 0.6);
-        ray.rotation.set(0, rand(i) * 3, 0.3);
+      for (let i = 0; i < 14; i++) {
+        const ray = new THREE.Mesh(new THREE.PlaneGeometry(2.5 + rand(i) * 3, hy * 4), new THREE.MeshBasicMaterial({ color: 0xc8f0ff, transparent: true, opacity: 0.07, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }));
+        ray.position.set((rand(i + 1200) * 2 - 1) * half, hy, -6 - rand(i + 1300) * 10);
+        ray.rotation.set(0, 0, 0.35);
         g.add(ray);
       }
     }
+    // bubble columns rise from the floor (as in the video)
+    this.columns = Array.from({ length: Math.round(half / 5) }, (_, i) => ({ x: (rand(i + 1500) * 2 - 1) * half, z: -1 - rand(i + 1600) * 6, t: rand(i) }));
   }
 
   // ---- input --------------------------------------------------------------------------------------------------------
@@ -462,11 +480,15 @@ class Game {
     this._saveNow();
     const hasNext = r.won && i + 1 < LEVELS.length;
     this.layer.append(h('div', { class: 'ds-dim' }, h('div', { class: 'ds-card ds-glass' },
-      h('h2', { style: 'text-align:center' }, r.won ? t('won') : r.by === 'time' ? t('lostTime') : t('lostBit')),
+      h('h2', { style: `text-align:center;color:${r.won ? '#9affe8' : '#ff9aaa'}` }, r.won ? t('won') : r.by === 'time' ? t('lostTime') : t('eatenTitle')),
+      h('h3', { style: 'text-align:center' }, `${t('level')} ${num(lv.id)} · ${name(lv)}`),
       r.won ? h('div', { class: 'ds-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= r.stars ? '' : 'off' }, '⭐'))) : null,
-      h('div', { class: 'ds-stats' }, h('span', {}, `📏 ${num(Math.round(r.cm))} ${t('cm')}`), h('span', {}, `🐟 ${num(r.eaten)}`), h('span', {}, `⏱ ${num(r.time)}`)),
+      h('div', { class: 'ds-boxes' },
+        h('div', {}, h('small', {}, t('timeLeft')), h('b', {}, `${num(Math.max(0, Math.round(s.left)))} ${getLang() === 'en' ? 's' : 'ث'}`)),
+        h('div', {}, h('small', {}, t('fishEaten')), h('b', {}, num(r.eaten))),
+        h('div', {}, h('small', {}, t('finalSize')), h('b', {}, `${num(Math.round(r.cm))} ${t('cm')}`))),
       r.won ? h('div', { class: 'ds-info star', style: 'justify-content:center' }, t('win')) : null,
-      hasNext ? h('button', { class: 'ds-btn', onclick: () => this.showIntro(i + 1) }, t('next')) : h('button', { class: 'ds-btn', onclick: () => this.startLevel(i) }, t('again')),
+      hasNext ? h('button', { class: 'ds-btn', onclick: () => this.showIntro(i + 1) }, t('next')) : h('button', { class: 'ds-btn', onclick: () => this.startLevel(i) }, r.won ? t('again') : t('retry')),
       h('button', { class: 'ds-btn ghost', onclick: () => this.showLevels() }, t('levels')))));
   }
 
@@ -499,23 +521,24 @@ class Game {
         const big = e.cm > f.cm * 0.4;
         S.play(big ? 'bigGulp' : 'gulp', e.combo);
         if (e.combo >= 3) { this.hud.combo.textContent = `${t('combo')} ×${num(e.combo)}`; this.hud.combo.classList.remove('pop'); void this.hud.combo.offsetWidth; this.hud.combo.classList.add('pop'); if (e.combo % 3 === 0) S.play('combo'); }
-        this.bubbles.burst(e.x, 0, e.z, big ? 18 : 6, 2, 0.8);
-        this.bits.burst(e.x, 0, e.z, 6, 2, 0.4);
-        const q = this._proj(f.x, U(f.cm), f.z);
+        this.bubbles.burst(e.x, -e.z, 0.4, big ? 18 : 6, 2, 0.8);
+        this.bits.burst(e.x, -e.z, 0.4, 6, 2, 0.4);
+        const q = this._proj(f.x, -f.z + U(f.cm) * 0.6, 0);
         const p = h('div', { class: 'ds-plus', style: `left:${q.x}px;top:${q.y}px` }, `+${num(Math.max(1, Math.round(e.gain)))} ${t('cm')}`);
         this.layer.append(p);
         setTimeout(() => p.remove(), 800);
         if (e.kind === 'squid' && s.level.task) this.toast(t('squidLeft', { a: num(Math.min(s.squid, s.level.task.n)), b: num(s.level.task.n) }), 1.4, '🦑');
         break;
       }
-      case 'dash': S.play('dash'); this.bubbles.burst(f.x, 0, f.z, 14, 3, 0.6); break;
+      case 'dash': S.play('dash'); this.bubbles.burst(f.x, -f.z, 0.4, 14, 3, 0.6); break;
       case 'warn': S.play('warn'); if (!this._warned) { this._warned = true; this.toast(t('warn'), 2, '❗', true); } break;
       case 'lunge': S.play('lunge'); break;
       case 'bitten': S.play('bitten'); this.shake = 0.5; this.toast(t('bitten'), 1.4, '💥', true); break;
       case 'bait': S.play('bait'); this.toast(t('bait'), 2.2, '🐟'); break;
-      case 'ink': S.play('ink'); this.ink.burst(e.x, 0, e.z, 16, 1.5, 2); break;
+      case 'ink': S.play('ink'); this.ink.burst(e.x, -e.z, 0, 16, 1.5, 2); break;
+      case 'canEat': S.play('combo'); this.toast(t('canEat', { x: name(SPECIES[e.kind]) }), 2.4, { plankton: '🟢', shrimp: '🦐', jelly: '🪼', sardine: '🐟', damsel: '🐠', butterfly: '🐠', puffer: '🐡', squid: '🦑', mackerel: '🐟', lantern: '🐟', tuna: '🐟' }[e.kind] || '🐟'); break;
       case 'boss': S.play('boss'); S.setMode('boss'); this.toast(t('boss'), 3, '🦈', true); this.shake = 0.6; break;
-      case 'won': S.play('grow'); this.bubbles.burst(f.x, 0, f.z, 60, 5, 1.4); break;
+      case 'won': S.play('grow'); this.bubbles.burst(f.x, -f.z, 0.4, 60, 5, 1.4); break;
       default:
     }
   }
@@ -525,64 +548,80 @@ class Game {
     return { x: (v.x * 0.5 + 0.5) * this.cw, y: (-v.y * 0.5 + 0.5) * this.ch, behind: v.z > 1 };
   }
 
+  /** A swimmer seen from the side: turned left or right, nose tipped up or down. */
+  _orient(root, vx, vy, k) {
+    root.rotation.order = 'YXZ';
+    if (Math.abs(vx) > 0.05) root.userData.side = vx >= 0 ? 1 : -1;
+    const side = root.userData.side ?? 1;
+    const yaw = side * Math.PI / 2;
+    const pitch = Math.max(-0.9, Math.min(0.9, Math.atan2(vy, Math.abs(vx) + 0.001)));
+    let d = yaw - root.rotation.y;
+    d = Math.atan2(Math.sin(d), Math.cos(d));
+    root.rotation.y += d * Math.min(1, k);
+    root.rotation.x += (-pitch - root.rotation.x) * Math.min(1, k);
+  }
+
   _sync(dt, time) {
     const s = this.s;
     const f = s.fish;
     const L = U(f.cm);
-    // the player's fish: swims along, tail wagging faster when dashing, a blink when bitten
     const pl = this.player;
-    pl.root.position.set(f.x, Math.sin(time * 1.6) * 0.15, f.z);
+    pl.root.position.set(f.x, -f.z + Math.sin(time * 1.6) * 0.08, 0);
     pl.root.scale.setScalar(L);
-    let d = f.a - pl.root.rotation.y;
-    d = Math.atan2(Math.sin(d), Math.cos(d));
-    pl.root.rotation.y += d * Math.min(1, dt * 10);
-    pl.root.rotation.z = -d * 0.5;
+    this._orient(pl.root, Math.sin(f.a) * Math.hypot(f.vx, f.vz) + f.vx * 0.001, -f.vz, dt * 8);
     const sp = Math.hypot(f.vx, f.vz);
     pl.tail.rotation.y = Math.sin(time * (8 + sp * 2)) * (0.3 + Math.min(0.4, sp * 0.04));
     pl.root.visible = !(f.invul > 0 && Math.floor(time * 12) % 2 === 0);
-    if (Math.random() < dt * (f.dashT > 0 ? 30 : 3)) this.bubbles.emit(f.x - Math.sin(f.a) * L * 0.5, 0, f.z - Math.cos(f.a) * L * 0.5, 0, 0.8, 0, 1.2);
-    // the creatures
+    if (Math.random() < dt * (f.dashT > 0 ? 30 : 2)) this.bubbles.emit(f.x - Math.sin(f.a) * L * 0.5, -f.z + Math.cos(f.a) * L * 0.5, 0.3, 0, 0.8, 0, 1.2);
     const seen = new Set();
     for (const c of s.creatures) {
       seen.add(c.id);
       let m = this.models.get(c.id);
       if (!m) { m = makeFish(c.kind); this.scene.add(m.root); this.models.set(c.id, m); }
-      m.root.position.set(c.x, c.y, c.z);
-      m.root.scale.setScalar(U(c.cm));
-      m.root.rotation.y = c.a;
+      const big = U(c.cm);
+      // big fish swim a little further back so they never cover the little player
+      m.root.position.set(c.x, -c.z + c.y * 0.2, c.kind === 'jelly' ? -0.5 : -Math.min(3, big * 0.15) + (c.id % 3) * 0.3);
+      m.root.scale.setScalar(big);
+      if (c.kind === 'jelly') { m.root.rotation.set(0, time * 0.3, 0); if (m.bell) m.bell.scale.y = 1 + Math.sin(time * 3 + c.id) * 0.12; } else this._orient(m.root, Math.sin(c.a), -Math.cos(c.a), dt * 6);
       if (m.tail) m.tail.rotation.y = Math.sin(time * 9 + c.id) * 0.4;
       if (c.kind === 'squid') m.tail.scale.z = 1 + Math.sin(time * 4 + c.id) * 0.25;
-      // a red "!" over a predator that is about to lunge
       let tag = this.warnTags.get(c.id);
       if (c.warn > 0) {
         if (!tag) { tag = h('div', { class: 'ds-warn' }, '!'); this.layer.append(tag); this.warnTags.set(c.id, tag); }
-        const q = this._proj(c.x, c.y + U(c.cm) * 0.5 + 0.5, c.z);
+        const q = this._proj(c.x, -c.z + big * 0.5 + 0.4, 0);
         tag.style.left = `${q.x}px`;
         tag.style.top = `${q.y}px`;
       } else if (tag) { tag.remove(); this.warnTags.delete(c.id); }
     }
     for (const [id, m] of this.models) if (!seen.has(id)) { this.scene.remove(m.root); this.models.delete(id); const tg = this.warnTags.get(id); if (tg) { tg.remove(); this.warnTags.delete(id); } }
     this._ambient(dt, time);
-    // camera: behind and above the fish, looking ahead; pulls back as it grows
-    const z = 1 + L * 0.55;
-    const off = this.land ? new THREE.Vector3(0, 3.2 * z, 5.2 * z) : new THREE.Vector3(0, 4.2 * z, 5.6 * z);
-    this.camLook.lerp(new THREE.Vector3(f.x, 0, f.z - 1.5 * z), Math.min(1, dt * 5));
-    this.camPos.lerp(new THREE.Vector3(f.x + off.x, off.y, f.z + off.z), Math.min(1, dt * 3));
+    // camera: straight from the side (like the video), following the fish; it pulls back as the fish grows
+    const dist = (this.land ? 11 : 13) + L * 2.4;
+    const halfH = Math.tan((this.camera.fov * Math.PI) / 360) * dist;
+    const cy = Math.max(this.floorY + halfH * 0.75, Math.min(this.hy + 2 - halfH * 0.6, -f.z));
+    const cx = f.x;
+    this.camLook.lerp(new THREE.Vector3(cx, cy, 0), Math.min(1, dt * 4));
+    this.camPos.lerp(new THREE.Vector3(cx, cy + dist * 0.12, dist), Math.min(1, dt * 4));
     this.camera.position.copy(this.camPos);
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 2);
-    if (this.shake > 0) this.camera.position.add(new THREE.Vector3((Math.random() - 0.5) * this.shake, 0, 0));
+    if (this.shake > 0) this.camera.position.add(new THREE.Vector3((Math.random() - 0.5) * this.shake, (Math.random() - 0.5) * this.shake * 0.5, 0));
     this.camera.lookAt(this.camLook);
-    this.scene.fog.far = BIOME[this.biome].far + L * 4;
+    this.scene.fog.near = dist * 0.9;
+    this.scene.fog.far = dist + 45;
     this._hudSync(s);
   }
 
   _ambient(dt, time) {
     if (this.caustic) this.caustic.offset.set(time * 0.015, time * 0.01);
-    for (const k of this.kelps) k.segs.forEach((sg, i) => { sg.rotation.z = Math.sin(time * 0.9 + i * 0.5 + k.root.position.x) * 0.12; });
+    for (const k of this.kelps) k.segs.forEach((sg, i) => { sg.rotation.z = Math.sin(time * 0.9 + i * 0.5 + k.root.position.x) * 0.1; });
     const c = this.camLook;
-    if (Math.random() < dt * 6) this.bubbles.emit(c.x + (Math.random() - 0.5) * 30, -5, c.z + (Math.random() - 0.5) * 30, 0, 1.4, 0, 6);
-    if (Math.random() < dt * 20) this.motes.emit(c.x + (Math.random() - 0.5) * 30, (Math.random() - 0.5) * 8, c.z + (Math.random() - 0.5) * 30, 0.1, 0.05, 0.1, 5);
-    this.bubbles.update(dt, 0.6);
+    for (const col of this.columns ?? []) {
+      col.t += dt;
+      if (col.t > 0.35 && Math.abs(col.x - c.x) < 30) { col.t = 0; this.bubbles.emit(col.x + (Math.random() - 0.5) * 0.3, this.floorY + 0.5, col.z, (Math.random() - 0.5) * 0.2, 2.2, 0, (this.hy * 2 + 2) / 2.2); }
+    }
+    if (Math.random() < dt * 4) this.bubbles.emit(c.x + (Math.random() - 0.5) * 24, this.floorY ?? -10, -Math.random() * 6, 0, 1.6, 0, 8);
+    if (Math.random() < dt * 20) this.motes.emit(c.x + (Math.random() - 0.5) * 24, c.y + (Math.random() - 0.5) * 16, -Math.random() * 10, 0.1, 0.05, 0, 5);
+    this.bubbles.update(dt, 0.4);
     this.motes.update(dt);
     this.bits.update(dt, -1);
     this.ink.update(dt);
@@ -614,18 +653,19 @@ class Game {
     if (this.mode === 'play' && this.s && !this.paused) this._playFrame(dt, time);
     else if (this.mode === 'results' && this.s) this._ambient(dt, time);
     else if (this.mode !== 'play') {
-      // menus: the little fish swims in a slow circle; the camera drifts
+      // menus: the little fish swims back and forth in front of the reef (a side view)
       this._ambient(dt, time);
       const pl = this.player;
-      const a = time * 0.4;
+      const a = time * 0.35;
       pl.root.visible = true;
-      pl.root.position.set(Math.sin(a) * 2.5, Math.sin(time * 1.5) * 0.3, Math.cos(a) * 2.5);
-      pl.root.rotation.set(0, a + Math.PI / 2, 0);
-      pl.root.scale.setScalar(1.2);
+      pl.root.position.set(Math.sin(a) * 1.8, -2 + Math.sin(time * 1.3) * 0.4, 0);
+      pl.root.scale.setScalar(1.3);
+      this._orient(pl.root, Math.cos(a), Math.cos(time * 1.3) * 0.3, dt * 5);
       pl.tail.rotation.y = Math.sin(time * 9) * 0.4;
-      this.camPos.lerp(new THREE.Vector3(0, 2.5, 9), Math.min(1, dt * 1.5));
+      this.camPos.lerp(new THREE.Vector3(0, -1, 11), Math.min(1, dt * 1.5));
+      this.camLook.lerp(new THREE.Vector3(0, -2, 0), Math.min(1, dt * 1.5));
       this.camera.position.copy(this.camPos);
-      this.camera.lookAt(0, 0, 0);
+      this.camera.lookAt(this.camLook);
     }
     this.renderer.render(this.scene, this.camera);
   }
