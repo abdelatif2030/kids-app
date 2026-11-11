@@ -77,34 +77,49 @@ class GamesChoiceScreen extends StatelessWidget {
   }
 }
 
-/// The owner's picture of the fun games page (2026-11-11, 1535 x 1024): the wooden sign, a back arrow and fourteen
-/// game cards in three rows (Glowfair rally, jungle, farm, bakery, samurai / ocean defense, golden tail, rhythm
-/// survival, motorcycle racing, splash race / space store manager, fox family rescue, airplane racing, zombie rooftop
-/// shooter). It is shown whole; the arrow and the cards are
-/// large invisible buttons on it, like the Games page. To change it, replace the one file.
+/// The owner's picture of the fun games page (2026-11-11, 1536 x 1024): the wooden sign, a back arrow and sixteen game
+/// cards (Glowfair rally, jungle, farm, bakery, samurai / ocean defense, golden tail, rhythm survival, motorcycle racing,
+/// splash race / space store manager, fox family rescue, airplane racing, zombie rooftop shooter, gum ball roll / a wide
+/// deep sea fish card). It is shown whole; the arrow and the cards are large invisible buttons on it. A "more games"
+/// button opens the second page (coastal drive and hungry frog). To change a page, replace its one file.
 const String kFunGamesPicture = 'assets/games/fun_games_scene.webp';
-const double kFunGamesAspect = 1535 / 1024;
+const double kFunGamesAspect = 1536 / 1024;
 
-/// «ألعاب للتسلية»: the owner's picture with two cards. A child younger than a game's [WebGame.minAge] gets a friendly
-/// note instead of the game.
+/// The second page: the owner's own coastal drive and hungry frog cards (cut from the owner's pictures of 2026-11-11)
+/// on the softened page background with the same sign and back arrow.
+const String kFunGamesMorePicture = 'assets/games/fun_games_more.webp';
+
+void _openGame(BuildContext context, ChildProfile? child, WebGame game) {
+  final age = child?.age ?? 6;
+  if (age < game.minAge) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr2('اللعبة دي لما تكبر شوية!', 'This game is for a little later!'))));
+    return;
+  }
+  Navigator.push(
+    context,
+    MaterialPageRoute<void>(
+      builder: (_) => WebGameScreen(game: game, childId: child?.id, age: age, gender: child?.gender),
+    ),
+  );
+}
+
+PictureSpot _backSpot(BuildContext context, String id) => PictureSpot(
+      id,
+      const Offset(0.067, 0.083),
+      0.085,
+      0.125,
+      tr2('رجوع', 'Back'),
+      () => Navigator.maybePop(context),
+      radius: 60,
+      key: ValueKey(id),
+    );
+
+/// «ألعاب للتسلية»: the owner's picture with sixteen cards. A child younger than a game's [WebGame.minAge] gets a
+/// friendly note instead of the game.
 class FunGamesScreen extends StatelessWidget {
   /// The child playing (progress is kept per child). Null in old callers and tests.
   final ChildProfile? child;
   const FunGamesScreen({super.key, this.child});
-
-  void _open(BuildContext context, WebGame game) {
-    final age = child?.age ?? 6;
-    if (age < game.minAge) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr2('اللعبة دي لما تكبر شوية!', 'This game is for a little later!'))));
-      return;
-    }
-    Navigator.push(
-      context,
-      MaterialPageRoute<void>(
-        builder: (_) => WebGameScreen(game: game, childId: child?.id, age: age, gender: child?.gender),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,46 +130,80 @@ class FunGamesScreen extends StatelessWidget {
         asset: kFunGamesPicture,
         aspect: kFunGamesAspect,
         spots: [
-          // the fourteen cards of the owner's picture (centre, width, height as fractions of it); a card whose game is
-          // still being built says so
-          for (final (id, game, ar, en, cx, cy, w, hh) in <(String, WebGame?, String, String, double, double, double, double)>[
-            ('fun_carnival_race', kCarnivalRace, '', '', 0.112, 0.298, 0.19, 0.24),
-            ('fun_jungle_adventure', kJungleAdventure, '', '', 0.311, 0.298, 0.18, 0.24),
-            ('fun_happy_farm', kHappyFarm, '', '', 0.502, 0.298, 0.18, 0.24),
-            ('fun_pumpkin_pie', kPumpkinPie, '', '', 0.694, 0.298, 0.18, 0.24),
-            ('fun_samurai', kSamuraiAction, '', '', 0.891, 0.298, 0.19, 0.24),
-            ('fun_ocean_defense', kOceanDefense, '', '', 0.112, 0.552, 0.19, 0.24),
-            ('fun_golden_tail', kGoldenTail, '', '', 0.311, 0.552, 0.18, 0.24),
-            ('fun_rhythm', kRhythmSurvival, '', '', 0.502, 0.552, 0.18, 0.24),
-            ('fun_moto_race', kMotoRace, '', '', 0.694, 0.552, 0.18, 0.24),
-            ('fun_splash_race', kSplashRace, '', '', 0.891, 0.552, 0.19, 0.24),
-            ('fun_space_store', kSpaceStore, '', '', 0.153, 0.801, 0.27, 0.25),
-            ('fun_fox_family', kFoxFamily, '', '', 0.417, 0.801, 0.235, 0.25),
-            ('fun_airplane', kAirRace, '', '', 0.650, 0.801, 0.215, 0.25),
-            ('fun_zombie_rooftop', kZombieRooftop, '', '', 0.877, 0.801, 0.22, 0.25),
+          // the sixteen cards of the owner's picture (centre, width, height as fractions of it)
+          for (final (id, game, cx, cy, w, hh) in <(String, WebGame, double, double, double, double)>[
+            ('fun_carnival_race', kCarnivalRace, 0.112, 0.289, 0.19, 0.225),
+            ('fun_jungle_adventure', kJungleAdventure, 0.306, 0.289, 0.185, 0.225),
+            ('fun_happy_farm', kHappyFarm, 0.499, 0.289, 0.185, 0.225),
+            ('fun_pumpkin_pie', kPumpkinPie, 0.694, 0.289, 0.185, 0.225),
+            ('fun_samurai', kSamuraiAction, 0.892, 0.289, 0.19, 0.225),
+            ('fun_ocean_defense', kOceanDefense, 0.112, 0.516, 0.19, 0.2),
+            ('fun_golden_tail', kGoldenTail, 0.306, 0.516, 0.185, 0.2),
+            ('fun_rhythm', kRhythmSurvival, 0.499, 0.516, 0.185, 0.2),
+            ('fun_moto_race', kMotoRace, 0.694, 0.516, 0.185, 0.2),
+            ('fun_splash_race', kSplashRace, 0.892, 0.516, 0.19, 0.2),
+            ('fun_space_store', kSpaceStore, 0.112, 0.73, 0.19, 0.2),
+            ('fun_fox_family', kFoxFamily, 0.306, 0.73, 0.185, 0.2),
+            ('fun_airplane', kAirRace, 0.499, 0.73, 0.185, 0.2),
+            ('fun_zombie_rooftop', kZombieRooftop, 0.694, 0.73, 0.185, 0.2),
+            ('fun_gum_ball', kGumBall, 0.892, 0.73, 0.19, 0.2),
+            ('fun_deep_sea', kDeepSea, 0.846, 0.909, 0.29, 0.155),
           ])
-            PictureSpot(
-              id,
-              Offset(cx, cy),
-              w,
-              hh,
-              game?.title() ?? tr2(ar, en),
-              game != null
-                  ? () => _open(context, game)
-                  : () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr2('اللعبة دي جاية قريب!', 'This game is coming soon!')))),
-              radius: 40,
-              key: ValueKey(id),
+            PictureSpot(id, Offset(cx, cy), w, hh, game.title(), () => _openGame(context, child, game), radius: 40, key: ValueKey(id)),
+          _backSpot(context, 'fun_back'),
+        ],
+        overlays: (w, h) => [
+          // "more games": opens the second page (on the flowers at the bottom left, in the page's purple style)
+          Positioned(
+            left: 0.03 * w,
+            top: 0.865 * h,
+            width: 0.25 * w,
+            height: 0.09 * h,
+            child: FocusableTap(
+              key: const ValueKey('fun_more'),
+              onTap: () => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => FunGamesMoreScreen(child: child))),
+              radius: 60,
+              semanticLabel: tr2('ألعاب أكتر', 'More games'),
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(999),
+                  gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF9A5AF0), Color(0xFF6A2AD0)]),
+                  border: Border.all(color: const Color(0xFFFFD23A), width: 3),
+                  boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 8, offset: Offset(0, 4))],
+                ),
+                child: FittedBox(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                    child: Text(tr2('ألعاب أكتر ◀', 'More games ▶'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 26)),
+                  ),
+                ),
+              ),
             ),
-          PictureSpot(
-            'fun_back',
-            const Offset(0.067, 0.083),
-            0.085,
-            0.125,
-            tr2('رجوع', 'Back'),
-            () => Navigator.maybePop(context),
-            radius: 60,
-            key: const ValueKey('fun_back'),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The second page of fun games: Coastal Drive and Hungry Frog.
+class FunGamesMoreScreen extends StatelessWidget {
+  final ChildProfile? child;
+  const FunGamesMoreScreen({super.key, this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF8FD3FF),
+      body: PictureStage(
+        key: const ValueKey('fun_games_more_page'),
+        asset: kFunGamesMorePicture,
+        aspect: kFunGamesAspect,
+        spots: [
+          PictureSpot('fun_coastal_drive', const Offset(0.284, 0.546), 0.38, 0.49, kCoastalDrive.title(), () => _openGame(context, child, kCoastalDrive), radius: 40, key: const ValueKey('fun_coastal_drive')),
+          PictureSpot('fun_hungry_frog', const Offset(0.716, 0.546), 0.38, 0.49, kHungryFrog.title(), () => _openGame(context, child, kHungryFrog), radius: 40, key: const ValueKey('fun_hungry_frog')),
+          _backSpot(context, 'fun_more_back'),
         ],
       ),
     );

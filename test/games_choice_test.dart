@@ -66,7 +66,7 @@ void main() {
         ),
       );
       await t.pump(const Duration(milliseconds: 300));
-      for (final k in ['fun_carnival_race', 'fun_jungle_adventure', 'fun_happy_farm', 'fun_pumpkin_pie', 'fun_samurai', 'fun_golden_tail', 'fun_ocean_defense', 'fun_moto_race', 'fun_rhythm', 'fun_splash_race', 'fun_space_store', 'fun_fox_family', 'fun_airplane', 'fun_zombie_rooftop', 'fun_back']) {
+      for (final k in ['fun_carnival_race', 'fun_jungle_adventure', 'fun_happy_farm', 'fun_pumpkin_pie', 'fun_samurai', 'fun_golden_tail', 'fun_ocean_defense', 'fun_moto_race', 'fun_rhythm', 'fun_splash_race', 'fun_space_store', 'fun_fox_family', 'fun_airplane', 'fun_zombie_rooftop', 'fun_gum_ball', 'fun_deep_sea', 'fun_more', 'fun_back']) {
         final r = t.getRect(find.byKey(ValueKey(k)));
         expect(r.left >= -1 && r.right <= size.width + 1 && r.top >= -1 && r.bottom <= size.height + 1, isTrue, reason: '$k inside $size: $r');
       }
@@ -80,7 +80,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     debugDefaultTargetPlatformOverride = TargetPlatform.windows;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
-    for (final (key, game) in [('fun_carnival_race', kCarnivalRace), ('fun_jungle_adventure', kJungleAdventure), ('fun_happy_farm', kHappyFarm), ('fun_pumpkin_pie', kPumpkinPie), ('fun_samurai', kSamuraiAction), ('fun_golden_tail', kGoldenTail), ('fun_ocean_defense', kOceanDefense), ('fun_moto_race', kMotoRace), ('fun_rhythm', kRhythmSurvival), ('fun_splash_race', kSplashRace), ('fun_space_store', kSpaceStore), ('fun_fox_family', kFoxFamily), ('fun_airplane', kAirRace), ('fun_zombie_rooftop', kZombieRooftop)]) {
+    for (final (key, game) in [('fun_carnival_race', kCarnivalRace), ('fun_jungle_adventure', kJungleAdventure), ('fun_happy_farm', kHappyFarm), ('fun_pumpkin_pie', kPumpkinPie), ('fun_samurai', kSamuraiAction), ('fun_golden_tail', kGoldenTail), ('fun_ocean_defense', kOceanDefense), ('fun_moto_race', kMotoRace), ('fun_rhythm', kRhythmSurvival), ('fun_splash_race', kSplashRace), ('fun_space_store', kSpaceStore), ('fun_fox_family', kFoxFamily), ('fun_airplane', kAirRace), ('fun_zombie_rooftop', kZombieRooftop), ('fun_gum_ball', kGumBall), ('fun_deep_sea', kDeepSea)]) {
       await t.pumpWidget(
         MaterialApp(
           key: UniqueKey(),
@@ -144,5 +144,23 @@ void main() {
     expect(await jungle.load('k1'), isNull);
     await jungle.save('k1', {'coins': 1});
     expect((await jungle.load('k1'))!['coins'], 1);
+  });
+
+  testWidgets('"more games" opens the second page; its two cards open coastal drive and hungry frog', (t) async {
+    SharedPreferences.setMockInitialValues({});
+    debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    for (final (key, game) in [('fun_coastal_drive', kCoastalDrive), ('fun_hungry_frog', kHungryFrog)]) {
+      await t.pumpWidget(MaterialApp(key: UniqueKey(), home: const FunGamesScreen(child: ChildProfile(id: 'k1', nickname: 'L', age: 5))));
+      await t.pump(const Duration(milliseconds: 300));
+      await t.tap(find.byKey(const ValueKey('fun_more')));
+      await t.pumpAndSettle();
+      expect(find.byType(FunGamesMoreScreen), findsOneWidget);
+      await t.tap(find.byKey(ValueKey(key)));
+      await t.pumpAndSettle();
+      expect(t.widget<WebGameScreen>(find.byType(WebGameScreen)).game.id, game.id);
+    }
+    expect(t.takeException(), isNull);
+    debugDefaultTargetPlatformOverride = null;
   });
 }

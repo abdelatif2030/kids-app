@@ -112,7 +112,7 @@ final WebGame kRhythmSurvival = WebGame(
   title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop];
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog];
 
 /// «متجر الفضاء الذكي» (Space Store Manager): a grocery store on a space station (docs/SPACE_STORE.md).
 final WebGame kSpaceStore = WebGame(
@@ -163,4 +163,44 @@ final WebGame kZombieRooftop = WebGame(
   storeKey: 'zombie_rooftop',
   minAge: 4,
   title: () => tr2('البقاء على قيد الحياة', 'Zombie Rooftop Shooter'),
+);
+
+/// «كرة العلكة العملاقة» (Gum Ball Roll): docs/GUM_BALL.md.
+final WebGame kGumBall = WebGame(
+  id: 'gum_ball',
+  folder: 'gum_ball',
+  global: 'GumBall',
+  storeKey: 'gum_ball',
+  minAge: 3,
+  title: () => tr2('كرة العلكة العملاقة', 'Gum Ball Roll'),
+);
+
+/// «أسماك الأعماق» (Deep Sea Fish): docs/DEEP_SEA.md.
+final WebGame kDeepSea = WebGame(
+  id: 'deep_sea',
+  folder: 'deep_sea',
+  global: 'DeepSea',
+  storeKey: 'deep_sea',
+  minAge: 4,
+  title: () => tr2('أسماك الأعماق', 'Deep Sea Fish'),
+);
+
+/// «سباق الطريق الساحلي» (Coastal Drive): docs/COASTAL_DRIVE.md.
+final WebGame kCoastalDrive = WebGame(
+  id: 'coastal_drive',
+  folder: 'coastal_drive',
+  global: 'CoastalDrive',
+  storeKey: 'coastal_drive',
+  minAge: 4,
+  title: () => tr2('سباق الطريق الساحلي', 'Coastal Drive'),
+);
+
+/// «لعبة الضفدع الجائع» (Hungry Frog): docs/HUNGRY_FROG.md.
+final WebGame kHungryFrog = WebGame(
+  id: 'hungry_frog',
+  folder: 'hungry_frog',
+  global: 'HungryFrog',
+  storeKey: 'hungry_frog',
+  minAge: 3,
+  title: () => tr2('لعبة الضفدع الجائع', 'Hungry Frog'),
 );

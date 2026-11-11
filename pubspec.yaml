@@ -92,6 +92,7 @@ flutter:
     - assets/games/hub_scene.webp
     - assets/games/choice_scene.webp
     - assets/games/fun_games_scene.webp
+    - assets/games/fun_games_more.webp
     - assets/games/game_bg.webp
     - assets/games/carnival_race/
     - assets/games/jungle_adventure/
@@ -107,6 +108,10 @@ flutter:
     - assets/games/fox_family/
     - assets/games/air_race/
     - assets/games/zombie_rooftop/
+    - assets/games/gum_ball/
+    - assets/games/deep_sea/
+    - assets/games/coastal_drive/
+    - assets/games/hungry_frog/
     - assets/home/home_main.webp
     - assets/home/cartoons_stories.webp
     - assets/home/lessons_scene.webp
