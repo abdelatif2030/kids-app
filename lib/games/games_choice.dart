@@ -77,12 +77,12 @@ class GamesChoiceScreen extends StatelessWidget {
   }
 }
 
-/// The owner's picture of the fun games page (2026-11-11, 1672 x 941): a wooden «ألعاب التسلية» sign, a back arrow
-/// and eight game cards in two rows (motorcycle racing, Glowfair rally, jungle, farm / bakery, samurai, ocean defense,
-/// golden tail). It is shown whole; the arrow and the cards are
+/// The owner's picture of the fun games page (2026-11-11, 1536 x 1024): a wooden «ألعاب التسلية» sign, a back arrow
+/// and ten game cards in two rows (Glowfair rally, jungle, farm, bakery, samurai / ocean defense, golden tail, rhythm
+/// survival, motorcycle racing, splash race). It is shown whole; the arrow and the cards are
 /// large invisible buttons on it, like the Games page. To change it, replace the one file.
 const String kFunGamesPicture = 'assets/games/fun_games_scene.webp';
-const double kFunGamesAspect = 1672 / 941;
+const double kFunGamesAspect = 1536 / 1024;
 
 /// «ألعاب للتسلية»: the owner's picture with two cards. A child younger than a game's [WebGame.minAge] gets a friendly
 /// note instead of the game.
@@ -114,23 +114,37 @@ class FunGamesScreen extends StatelessWidget {
         asset: kFunGamesPicture,
         aspect: kFunGamesAspect,
         spots: [
-          // the eight cards of the owner's picture (centre and size as fractions of it)
-          for (final (id, game, cx, cy, w) in <(String, WebGame, double, double, double)>[
-            ('fun_moto_race', kMotoRace, 0.139, 0.441, 0.23),
-            ('fun_carnival_race', kCarnivalRace, 0.380, 0.441, 0.23),
-            ('fun_jungle_adventure', kJungleAdventure, 0.622, 0.441, 0.23),
-            ('fun_happy_farm', kHappyFarm, 0.862, 0.441, 0.23),
-            ('fun_pumpkin_pie', kPumpkinPie, 0.139, 0.768, 0.25),
-            ('fun_samurai', kSamuraiAction, 0.387, 0.768, 0.22),
-            ('fun_ocean_defense', kOceanDefense, 0.631, 0.768, 0.25),
-            ('fun_golden_tail', kGoldenTail, 0.876, 0.768, 0.22),
+          // the ten cards of the owner's picture (centre and size as fractions of it); a card whose game is still
+          // being built says so
+          for (final (id, game, ar, en, cx, cy) in <(String, WebGame?, String, String, double, double)>[
+            ('fun_carnival_race', kCarnivalRace, '', '', 0.111, 0.386),
+            ('fun_jungle_adventure', kJungleAdventure, '', '', 0.307, 0.386),
+            ('fun_happy_farm', kHappyFarm, '', '', 0.503, 0.386),
+            ('fun_pumpkin_pie', kPumpkinPie, '', '', 0.695, 0.386),
+            ('fun_samurai', kSamuraiAction, '', '', 0.893, 0.386),
+            ('fun_ocean_defense', kOceanDefense, '', '', 0.111, 0.689),
+            ('fun_golden_tail', kGoldenTail, '', '', 0.307, 0.689),
+            ('fun_rhythm', null, 'البقاء على الإيقاع', 'Rhythm Survival', 0.503, 0.689),
+            ('fun_moto_race', kMotoRace, '', '', 0.697, 0.689),
+            ('fun_splash_race', null, 'سباق السباحة العجيب', 'Splash Race', 0.893, 0.689),
           ])
-            PictureSpot(id, Offset(cx, cy), w, 0.3, game.title(), () => _open(context, game), radius: 40, key: ValueKey(id)),
+            PictureSpot(
+              id,
+              Offset(cx, cy),
+              0.185,
+              0.27,
+              game?.title() ?? tr2(ar, en),
+              game != null
+                  ? () => _open(context, game)
+                  : () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr2('اللعبة دي جاية قريب!', 'This game is coming soon!')))),
+              radius: 40,
+              key: ValueKey(id),
+            ),
           PictureSpot(
             'fun_back',
-            const Offset(0.066, 0.101),
-            0.078,
-            0.138,
+            const Offset(0.072, 0.093),
+            0.085,
+            0.127,
             tr2('رجوع', 'Back'),
             () => Navigator.maybePop(context),
             radius: 60,
