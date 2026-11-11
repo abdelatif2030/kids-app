@@ -114,9 +114,10 @@ test('cubs join the parade and follow; cars stop for them; the train waits for t
   assert.notEqual(rail.train.state, 'pass', 'the train waited');
 });
 
-test('the den ends the level with stars for the den, all cubs and no bumps', () => {
+test('the den ends the level with stars for the den, every berry and no bumps', () => {
   const trip = new Trip({ level: 0, seed: 1 });
   trip.parade = [...trip.cubs];
+  trip.picked = trip.berries.length;
   trip.fox.r = trip.den - 1;
   trip.hop('up');
   let done = false;

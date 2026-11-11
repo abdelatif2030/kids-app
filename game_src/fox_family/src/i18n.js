@@ -16,7 +16,7 @@ const S = {
   welcome: ['أهلاً بالبيت!', 'Welcome home!'],
   complete: ['خلّصت المرحلة!', 'Level complete!'],
   s1: ['وصلت البيت', 'Reach the den'],
-  s2: ['جبت كل العيال', 'Every cub home'],
+  s2: ['لمّيت كل التوت', 'Pick every berry'],
   s3: ['من غير خبطة', 'No bumps'],
   berries: ['توت', 'Berries'],
   next: ['المرحلة الجاية', 'Next'],

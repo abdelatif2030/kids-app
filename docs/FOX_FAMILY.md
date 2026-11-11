@@ -21,7 +21,7 @@ berries; a "play again" card after the final den.
   the mother stepped. Cars slow down and stop for cubs; the train waits while a cub is on the tracks.
 * A car or the water gives a soft «خبطة!» / «طرطشة!» and sends her back to the last safe grass; the cubs come back
   with her. Nothing is lost; there are no lives or timers.
-* Stars: reach the den, bring every cub home, no bumps. Age 3-4 = easier traffic.
+* Stars (as in the video): reach the den, pick every berry, no bumps. Age 3-4 = easier traffic.
 * Progress per child in `fox_family` (unlocked level, stars, berries, mute), erased with the child.
 
 ## Sound

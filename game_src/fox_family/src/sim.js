@@ -270,10 +270,10 @@ export class Trip {
     });
   }
 
-  /** Stars: reached the den, brought every cub home, never bumped. */
+  /** Stars (like the video): reached the den, picked every berry, never bumped. */
   get result() {
     const home = this.state !== 'play';
-    const all = this.parade.length === this.cubs.length;
+    const all = this.picked >= this.berries.length;
     return { stars: (home ? 1 : 0) + (home && all ? 1 : 0) + (home && this.bumps === 0 ? 1 : 0), cubs: this.parade.length, of: this.cubs.length, berries: this.picked, bumps: this.bumps };
   }
 }

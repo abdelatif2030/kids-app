@@ -358,7 +358,7 @@ class Game {
     this.save.berries += r.berries;
     if (i + 2 > this.save.unlocked && i + 1 < LEVELS.length) this.save.unlocked = i + 2;
     this._saveNow();
-    const got = [true, r.cubs === r.of, r.bumps === 0];
+    const got = [true, r.berries >= tr.berries.length, r.bumps === 0];
     got.forEach((g, k) => { if (g) setTimeout(() => this.sound.play('star', k), 300 + k * 250); });
     const last = i + 1 >= LEVELS.length;
     const dim = h('div', { class: 'fx-dim' }, h('div', { class: 'fx-card' },
@@ -464,12 +464,12 @@ class Game {
     s.g.attributes.position.needsUpdate = true;
     // camera follows the fox's row, looking up the board
     const portrait = this.cw < this.ch;
-    const want = new THREE.Vector3(x * 0.35, portrait ? 15 : 11, z + (portrait ? 8 : 6.5));
+    const want = new THREE.Vector3(x * 0.35, portrait ? 17 : 11, z + (portrait ? 6.5 : 6.5));
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 4));
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 2);
     this.camera.position.set(this.cam.x + (Math.random() - 0.5) * this.shake * 0.3, this.cam.y, this.cam.z);
-    this.camera.lookAt(this.cam.x, 0, this.cam.z - (portrait ? 8 : 6.5) - (portrait ? 3 : 1.6));
+    this.camera.lookAt(this.cam.x, 0, this.cam.z - 6.5 - (portrait ? 3 : 1.6));
   }
 
   // ---- loop ----------------------------------------------------------------------------------------------------------

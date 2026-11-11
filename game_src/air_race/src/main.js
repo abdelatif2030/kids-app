@@ -626,8 +626,8 @@ class Game {
     if (this.mode === 'menu') {
       const a = time * 0.25;
       const f = tr.frame(pl.s);
-      want.copy(V(tr.pos(pl.s, Math.sin(a) * 16, 5 + Math.sin(a * 0.7) * 2))).addScaledVector(V(f.t), -Math.cos(a) * 14);
-      look.copy(V(tr.pos(pl.s, 0, 0)));
+      want.copy(V(tr.pos(pl.s, Math.sin(a) * 9 - 6, 9 + Math.sin(a * 0.7) * 2))).addScaledVector(V(f.t), -15 - Math.cos(a) * 4); // behind the start, never inside a parked rival
+      look.copy(V(tr.pos(pl.s + 10, 0, 0)));
     }
     if (!this.cam) { this.cam = want.clone(); this.look = look.clone(); }
     this.cam.lerp(want, Math.min(1, dt * 6));
