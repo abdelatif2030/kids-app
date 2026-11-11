@@ -280,5 +280,16 @@ final WebGame kLearnDay = WebGame(
   learnId: 'next_in_day',
 );
 
+/// «السلالم والزلاجات» (Ladders & Slides): a 3D playground board, a giant die, counting out loud.
+final WebGame kLearnLadders = WebGame(
+  id: 'learn_ladders',
+  folder: 'learn_ladders',
+  global: 'LearnLadders',
+  storeKey: 'learn_ladders',
+  minAge: 3,
+  title: () => tr2('السلالم والزلاجات', 'Ladders & Slides'),
+  learnId: 'snakes_ladders',
+);
+
 /// Rebuilt learning games, by their old game id.
-final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay]) g.learnId!: g};
+final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay, kLearnLadders]) g.learnId!: g};

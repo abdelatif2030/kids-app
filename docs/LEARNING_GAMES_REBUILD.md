@@ -43,7 +43,8 @@ professional look like the fun games, and do everything needed without asking ag
 | 2 | sort_groups «رتّب في مجموعات» | **Built** (3D toy shop: conveyor belt from a curtained hatch, drag or tap into coloured baskets with picture signs, a wrong basket shakes "no" and the thing hops back, glow after two misses, Robi the shop robot, the thing's name said on arrival and "the apple is fruit!" when sorted, 2 baskets ages 3-4 / 3 baskets from round 3 at 5-6, 22 things drawn in code in `src/kit/toys3d.js`). Not tested on a real phone. |
 | 3 | treasure_hunt «كنز الجزيرة» | **Built** (3D island map, Coco the parrot's clue on a wooden sign + the app's voice + a 🔊 hear-again button, tap a square and the pirate walks and digs, a shell or crab on a wrong square, a chest of gold on the right one; 3x3 one direct clue at 3-4, 4x4 with "next to" at 5, any clue at 6; skill 'spatial'). |
 | 4 | next_in_day «رتّب يومي» | **Built** (a cosy room with a window; picture cards of the day hang on a clothesline in order; the sky in the window follows the day from dawn to a starry night and a lamp comes on; 3/4/5 steps by age; skill 'sequence', one event per day strip). |
-| 5-35 | the rest | Not built yet; next in the order below. |
+| 5 | snakes_ladders «السلالم والزلاجات» | **Built** (3D playground board 1-30, wooden ladders and real playground slides (no snakes), giant die (1-3 for ages 3-4), the child races Teddy the bear, the app's voice counts the hops, numbers pop from the squares; no dashboard event: dice luck). |
+| 6-35 | the rest | Not built yet; next in the order below. |
 
 ## The prompts
 

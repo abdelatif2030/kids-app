@@ -88,7 +88,7 @@ final List<GameInfo> kEducationalGames = [
     Icons.stairs_rounded,
     4,
     6,
-    (id, age, _) => SnakesLaddersGame(childId: id, age: age),
+    (id, age, _) => learnWebGameScreen(kLearnLadders, id, age), // rebuilt: 3D playground board with real slides
   ),
   GameInfo(
     JigsawGame.gameId,

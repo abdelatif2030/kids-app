@@ -120,6 +120,7 @@ flutter:
     - assets/games/learn_sort/
     - assets/games/learn_treasure/
     - assets/games/learn_day/
+    - assets/games/learn_ladders/
     - assets/games/summit_rush/
     - assets/home/home_main.webp
     - assets/home/cartoons_stories.webp
