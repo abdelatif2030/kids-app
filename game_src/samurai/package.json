@@ -1,0 +1,16 @@
+{
+  "name": "samurai",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty «سيف الساموراي» cherry-blossom courtyard samurai action (three.js). Built into assets/games/samurai/game.js",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/samurai/game.js",
+    "test": "node --test test/sim.test.js"
+  },
+  "dependencies": {
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.0"
+  }
+}

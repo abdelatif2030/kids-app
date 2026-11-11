@@ -62,4 +62,14 @@ final WebGame kPumpkinPie = WebGame(
   title: () => tr2('مخبز اليقطين', 'Pumpkin Pie Maker'),
 );
 
-final List<WebGame> kWebGames = [kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie];
+/// «سيف الساموراي» (Samurai Action): the cherry-blossom courtyard samurai (docs/SAMURAI_ACTION.md).
+final WebGame kSamuraiAction = WebGame(
+  id: 'samurai',
+  folder: 'samurai',
+  global: 'SamuraiAction',
+  storeKey: 'samurai',
+  minAge: 4,
+  title: () => tr2('سيف الساموراي', 'Samurai Action'),
+);
+
+final List<WebGame> kWebGames = [kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction];
