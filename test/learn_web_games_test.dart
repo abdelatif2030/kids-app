@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/games/game_catalog.dart';
 import 'package:kids_app/games/game_common.dart';
@@ -52,5 +55,30 @@ void main() {
   test('without a child nothing is recorded', () async {
     await LearnBridge(kLearnMaze, null).handle({'type': 'complete'});
     expect(await GameRewards.doneIds('kid'), isEmpty);
+  });
+
+  testWidgets('every fun game has a clear back button that leaves the game; learning games use their own', (t) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.windows; // no built-in browser view in tests
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    for (final g in [...kWebGames, ...kLearnWebGames.values]) {
+      await t.pumpWidget(MaterialApp(
+        key: UniqueKey(),
+        home: Builder(builder: (c) => Scaffold(body: Center(child: TextButton(onPressed: () => Navigator.push(c, MaterialPageRoute<void>(builder: (_) => WebGameScreen(game: g, age: 5))), child: const Text('open'))))),
+      ));
+      await t.tap(find.text('open'));
+      await t.pumpAndSettle();
+      expect(find.byType(WebGameScreen), findsOneWidget);
+      final back = find.byKey(const ValueKey('web_game_back'));
+      if (g.isLearning) {
+        expect(back, findsNothing, reason: g.id);
+        continue;
+      }
+      expect(back, findsOneWidget, reason: g.id);
+      expect(t.getSize(back).width, greaterThanOrEqualTo(48));
+      await t.tap(back);
+      await t.pumpAndSettle();
+      expect(find.byType(WebGameScreen), findsNothing, reason: '${g.id}: back leaves the game');
+    }
+    debugDefaultTargetPlatformOverride = null;
   });
 }

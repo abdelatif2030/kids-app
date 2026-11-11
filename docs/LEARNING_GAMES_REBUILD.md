@@ -23,8 +23,13 @@ professional look like the fun games, and do everything needed without asking ag
   card with the learning star, the app bridge, Arabic/English, boy/girl wording) and `sound.js` (each game's own tune,
   kind effects: tap, step, soft bump, right chime, gentle "try again", pop, sparkle, star, win fanfare, nibble, squeak,
   splash, page, drop, and a cute chirp "voice" for the host; the music ducks while the app's voice says a word).
-- Voice: words go to the app (`{type:'speak'}` → `AppAudio.say`, the same voice and parent voice switch as everywhere).
-  Opened on its own in a browser, `boot.js` uses the browser's voice instead.
+- Voice (owner requests 2026-11-11: clear, Egyptian, child-like): words go to the app (`{type:'speak'}` →
+  `AppAudio.say(lang: 'ar-EG', childVoice: true)`): an **Egyptian Arabic voice** when the device has one (any Arabic
+  voice otherwise; the lessons keep Modern Standard Arabic), spoken a little **higher and slower** than the lesson voice
+  (`kGameVoicePitch` 1.22, `kGameVoiceRate` 0.92 in lib/media/voice_choice.dart) — the phones have no real child voice,
+  and a much higher pitch makes Arabic hard to understand. While a word is said the game's music drops to a whisper and
+  the effects step back, so the word is clear. The parent's voice switch still applies. Opened on its own in a browser,
+  `boot.js` uses the browser's voice instead. Real recordings of a child's voice would be better (none exist yet).
 - App side: `WebGame.learnId` (the old game id), `kLearnWebGames`, `LearnBridge` (round → ProgressStore,
   complete → GameRewards + ResumeStore + adventure check), `learnWebGameScreen()`; the catalog entry of the old game
   now opens the new one everywhere (learning page, «يومي», resume, adventures). The old Flutter game stays in the code.
@@ -35,7 +40,8 @@ professional look like the fun games, and do everything needed without asking ag
 | # | Game | Status |
 | --- | --- | --- |
 | 1 | maze «الفأر والجبنة» | **Built** (3D hedge maze, swipe/tap/arrows, runs to the next crossing, crumbs, glowing paw hint after 8 s, five mazes by age, voice + music + effects). Not tested on a real phone. |
-| 2-35 | the rest | Not built yet; next in the order below. |
+| 2 | sort_groups «رتّب في مجموعات» | **Built** (3D toy shop: conveyor belt from a curtained hatch, drag or tap into coloured baskets with picture signs, a wrong basket shakes "no" and the thing hops back, glow after two misses, Robi the shop robot, the thing's name said on arrival and "the apple is fruit!" when sorted, 2 baskets ages 3-4 / 3 baskets from round 3 at 5-6, 22 things drawn in code in `src/kit/toys3d.js`). Not tested on a real phone. |
+| 3-35 | the rest | Not built yet; next in the order below. |
 
 ## The prompts
 

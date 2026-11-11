@@ -28,6 +28,11 @@ const KIT = {
   doneAgain_f: ['خلصتها تاني! برافو عليكي', 'You finished it again! Well done'],
   great_m: ['شطوووووور!', 'Well done!'],
   great_f: ['شطووووورة!', 'Well done!'],
+  // what the voice says (stretched letters on screen are read badly by a speech voice)
+  greatSay_m: ['شاطر أوي!', 'Well done!'],
+  greatSay_f: ['شاطرة أوي!', 'Well done!'],
+  newStarSay_m: ['خدت نجمة جديدة!', 'You got a new star!'],
+  newStarSay_f: ['خدتي نجمة جديدة!', 'You got a new star!'],
 };
 
 /** Strings: { key: [ar, en] }, with `key_m` / `key_f` for boy/girl wording. */
@@ -132,7 +137,7 @@ export class Shell {
   /** Says [text] with the app's own voice (and ducks the music meanwhile). */
   speak(text, secs) {
     if (!text) return;
-    this.sound.duck(secs ?? Math.min(4, 0.8 + text.length * 0.07));
+    this.sound.duck(secs ?? Math.min(5, 1.2 + text.length * 0.09)); // the slower child-like voice needs a little longer
     this.post({ type: 'speak', text, lang: this.T.lang });
   }
   /** One answer, for the parent dashboard (skill null = nothing recorded). */
@@ -191,7 +196,7 @@ export class Shell {
     this.done = true;
     this.sound.play('win');
     setTimeout(() => this.sound.play('star'), 900);
-    this.speak(first ? `${this.t('great')} ${this.t('newStar').replace('⭐', '')}` : this.t('doneAgain'));
+    this.speak(first ? `${this.t('greatSay')} ${this.t('newStarSay')}` : this.t('doneAgain'));
     const again = h('button', { class: 'lk-btn', onclick: () => { this.sound.play('tap'); onAgain(); } }, '↻ ', this.t('again'));
     this.layer.append(h('div', { class: 'lk-dim' }, h('div', { class: 'lk-card' },
       h('div', { class: 'lk-title', style: 'font-size:calc(var(--u)*8)' }, title),

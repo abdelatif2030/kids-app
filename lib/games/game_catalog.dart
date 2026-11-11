@@ -266,7 +266,7 @@ final List<GameInfo> kEducationalGames = [
     Icons.category_rounded,
     4,
     6,
-    (id, age, _) => SortGame(childId: id, age: age),
+    (id, age, _) => learnWebGameScreen(kLearnSort, id, age), // rebuilt as a 3D toy shop (the old SortGame stays)
   ),
   GameInfo(
     FeedAnimalGame.gameId,

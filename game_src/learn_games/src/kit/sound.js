@@ -114,8 +114,12 @@ export class Sound {
     const t = this.ctx.currentTime;
     const v = this.mode === 'calm' ? 0.18 : 0.34;
     this.musicBus.gain.cancelScheduledValues(t);
-    this.musicBus.gain.setTargetAtTime(0.07, t, 0.08);
+    this.musicBus.gain.setTargetAtTime(0.035, t, 0.06);
     this.musicBus.gain.setTargetAtTime(v, t + secs, 0.4);
+    // effects step back too while the word is said
+    this.sfx.gain.cancelScheduledValues(t);
+    this.sfx.gain.setTargetAtTime(0.45, t + 0.15, 0.08);
+    this.sfx.gain.setTargetAtTime(0.85, t + secs, 0.3);
   }
 
   dispose() {

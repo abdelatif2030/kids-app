@@ -247,5 +247,16 @@ final WebGame kLearnMaze = WebGame(
   learnId: 'maze',
 );
 
+/// «رتّب في مجموعات» (Sort into Groups): a 3D toy shop with a conveyor belt and baskets.
+final WebGame kLearnSort = WebGame(
+  id: 'learn_sort',
+  folder: 'learn_sort',
+  global: 'LearnSort',
+  storeKey: 'learn_sort',
+  minAge: 4,
+  title: () => tr2('رتّب في مجموعات', 'Sort into Groups'),
+  learnId: 'sort_groups',
+);
+
 /// Rebuilt learning games, by their old game id.
-final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze]) g.learnId!: g};
+final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort]) g.learnId!: g};

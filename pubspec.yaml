@@ -117,6 +117,7 @@ flutter:
     - assets/games/hungry_frog/
     - assets/games/frost_coil/
     - assets/games/learn_maze/
+    - assets/games/learn_sort/
     - assets/games/summit_rush/
     - assets/home/home_main.webp
     - assets/home/cartoons_stories.webp

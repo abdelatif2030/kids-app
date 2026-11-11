@@ -32,9 +32,12 @@ class VoiceInfo {
 int scoreVoice(VoiceInfo v, String lang) {
   final loc = v.locale.toLowerCase();
   final n = v.name.toLowerCase();
-  if (!loc.startsWith(lang.toLowerCase())) return -1000;
+  if (!loc.startsWith(baseLang(lang))) return -1000;
   var s = 0;
-  if (lang == 'ar') {
+  if (lang.toLowerCase() == 'ar-eg') {
+    // the learning games talk in Egyptian Arabic: an Egyptian voice first, any Arabic voice after it
+    if (loc == 'ar-eg') s += 8;
+  } else if (lang == 'ar') {
     if (loc == 'ar-sa' || loc == 'ar-xa') s += 3; // Modern Standard Arabic is the language of the lessons
     if (loc == 'ar-eg') s += 1;
   } else if (lang == 'en') {
@@ -54,11 +57,14 @@ int scoreVoice(VoiceInfo v, String lang) {
   return s;
 }
 
+/// 'ar' for 'ar-EG', 'en' for 'en-US'...: voices of the same language can stand in for each other.
+String baseLang(String lang) => lang.toLowerCase().split('-').first;
+
 /// The voices for [lang], best first. Ties keep the engine's order, so the result is stable.
 List<VoiceInfo> rankVoices(Iterable<VoiceInfo> all, String lang) {
   final scored = [
     for (final (i, v) in all.indexed)
-      if (v.name.isNotEmpty && v.locale.toLowerCase().startsWith(lang.toLowerCase())) (v, scoreVoice(v, lang), i),
+      if (v.name.isNotEmpty && v.locale.toLowerCase().startsWith(baseLang(lang))) (v, scoreVoice(v, lang), i),
   ]..sort((a, b) {
       final c = b.$2.compareTo(a.$2);
       return c != 0 ? c : a.$3.compareTo(b.$3);
@@ -82,3 +88,9 @@ VoiceInfo? chooseVoice(Iterable<VoiceInfo> all, String lang, {String? preferredN
 /// [rate] is the parent's speed setting (1.0 = normal for children).
 const double kChildSpeechRate = 0.42; // flutter_tts: 0.5 is adult conversational speed
 const double kChildSpeechPitch = 1.05;
+
+/// The learning games' voice (owner request 2026-11-11: "a child-like voice, very clear"): no real child voice exists in
+/// the phone's speech engines, so the game voice is a little higher and a little slower than the lesson voice. Kept
+/// moderate on purpose: a much higher pitch makes Arabic words harder to understand.
+const double kGameVoicePitch = 1.22;
+const double kGameVoiceRate = 0.92;

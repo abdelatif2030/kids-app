@@ -92,7 +92,9 @@ class _WebGameScreenState extends State<WebGameScreen> {
       case 'speak':
         final text = msg['text'];
         if (text is String && text.isNotEmpty && text.length <= 200) {
-          AppAudio.say(text, lang: msg['lang'] == 'en' ? 'en' : 'ar', slow: msg['slow'] == true);
+          // the games' words are Egyptian Arabic: an Egyptian voice when the device has one (docs/LEARNING_GAMES_REBUILD.md)
+          // and the games' brighter, child-like voice (owner request), kept clear
+          AppAudio.say(text, lang: msg['lang'] == 'en' ? 'en' : 'ar-EG', slow: msg['slow'] == true, childVoice: true);
         }
       case 'round':
       case 'complete':
@@ -105,15 +107,56 @@ class _WebGameScreenState extends State<WebGameScreen> {
   @override
   Widget build(BuildContext context) {
     final config = _config;
+    final view = config == null
+        ? const Center(child: CircularProgressIndicator(color: Colors.white))
+        : webGameViewSupported
+        ? WebGameView(key: ValueKey('${widget.game.id}_view'), game: widget.game, config: config, onMessage: _onMessage)
+        : _Unsupported(onBack: () => Navigator.maybePop(context));
     return Scaffold(
       backgroundColor: const Color(0xFF1D1250),
-      body: config == null
-          ? const Center(child: CircularProgressIndicator(color: Colors.white))
-          : webGameViewSupported
-          ? WebGameView(key: ValueKey('${widget.game.id}_view'), game: widget.game, config: config, onMessage: _onMessage)
-          : _Unsupported(onBack: () => Navigator.maybePop(context)),
+      body: Stack(
+        children: [
+          Positioned.fill(child: view),
+          // A clear way out of every fun game at any moment (owner request 2026-11-11). On the left edge at mid height:
+          // a place none of the games uses for its own buttons. The learning games have their own back button.
+          if (!widget.game.isLearning)
+            Positioned(
+              left: 10,
+              top: 0,
+              bottom: 0,
+              child: Center(child: _BackToGames(onTap: () => Navigator.maybePop(context))),
+            ),
+        ],
+      ),
     );
   }
+}
+
+class _BackToGames extends StatelessWidget {
+  final VoidCallback onTap;
+  const _BackToGames({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    button: true,
+    label: tr2('رجوع للألعاب', 'Back to the games'),
+    child: Material(
+      key: const ValueKey('web_game_back'),
+      color: const Color(0xE66A3AD0),
+      shape: const CircleBorder(side: BorderSide(color: Colors.white, width: 3)),
+      elevation: 6,
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: const SizedBox(
+          width: 56,
+          height: 56,
+          // the arrow points the way back in both Arabic and English (it follows the reading direction)
+          child: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 34),
+        ),
+      ),
+    ),
+  );
 }
 
 class _Unsupported extends StatelessWidget {
