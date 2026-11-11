@@ -49,7 +49,7 @@ class WebGameStore {
 
   /// Erases one child's progress in every web game.
   static Future<void> forgetChild(String childId) async {
-    for (final g in kWebGames) {
+    for (final g in [...kWebGames, ...kLearnWebGames.values]) {
       await WebGameStore(g).forget(childId);
     }
   }

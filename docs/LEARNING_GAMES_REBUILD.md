@@ -17,6 +17,26 @@ professional look like the fun games, and do everything needed without asking ag
   wording, age-based difficulty (the same ages as before), the phone sound safeguards of the fun games.
 - A friendly host character for each island; "play again" or "back" at the end.
 
+## How it is built (shared by every rebuilt game)
+- One package `game_src/learn_games` (three.js + esbuild), one folder per game in `src/<id>`, a shared kit in
+  `src/kit`: `shell.js` (frame, top bar with five round marks, back, sound, the host's speech bubble, title card, end
+  card with the learning star, the app bridge, Arabic/English, boy/girl wording) and `sound.js` (each game's own tune,
+  kind effects: tap, step, soft bump, right chime, gentle "try again", pop, sparkle, star, win fanfare, nibble, squeak,
+  splash, page, drop, and a cute chirp "voice" for the host; the music ducks while the app's voice says a word).
+- Voice: words go to the app (`{type:'speak'}` → `AppAudio.say`, the same voice and parent voice switch as everywhere).
+  Opened on its own in a browser, `boot.js` uses the browser's voice instead.
+- App side: `WebGame.learnId` (the old game id), `kLearnWebGames`, `LearnBridge` (round → ProgressStore,
+  complete → GameRewards + ResumeStore + adventure check), `learnWebGameScreen()`; the catalog entry of the old game
+  now opens the new one everywhere (learning page, «يومي», resume, adventures). The old Flutter game stays in the code.
+- Tests: `npm test` in `game_src/learn_games` (logic + a robot), `test/learn_web_games_test.dart` (bundled files, the
+  catalog opens the new game, star once under the old id, rounds recorded, fun games record nothing).
+
+## Status
+| # | Game | Status |
+| --- | --- | --- |
+| 1 | maze «الفأر والجبنة» | **Built** (3D hedge maze, swipe/tap/arrows, runs to the next crossing, crumbs, glowing paw hint after 8 s, five mazes by age, voice + music + effects). Not tested on a real phone. |
+| 2-35 | the rest | Not built yet; next in the order below. |
+
 ## The prompts
 
 ### Island «ألعاب الذكاء والتفكير» (thinking)

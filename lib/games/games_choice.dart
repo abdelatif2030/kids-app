@@ -201,9 +201,11 @@ class FunGamesMoreScreen extends StatelessWidget {
         asset: kFunGamesMorePicture,
         aspect: kFunGamesAspect,
         spots: [
-          PictureSpot('fun_coastal_drive', const Offset(0.181, 0.545), 0.3, 0.387, kCoastalDrive.title(), () => _openGame(context, child, kCoastalDrive), radius: 40, key: const ValueKey('fun_coastal_drive')),
-          PictureSpot('fun_hungry_frog', const Offset(0.5, 0.545), 0.3, 0.387, kHungryFrog.title(), () => _openGame(context, child, kHungryFrog), radius: 40, key: const ValueKey('fun_hungry_frog')),
-          PictureSpot('fun_frost_coil', const Offset(0.819, 0.545), 0.3, 0.387, kFrostCoil.title(), () => _openGame(context, child, kFrostCoil), radius: 40, key: const ValueKey('fun_frost_coil')),
+          // two rows of two (owner's cards for coastal drive and hungry frog; frost coil and summit rush made in code)
+          PictureSpot('fun_coastal_drive', const Offset(0.344, 0.373), 0.2845, 0.367, kCoastalDrive.title(), () => _openGame(context, child, kCoastalDrive), radius: 36, key: const ValueKey('fun_coastal_drive')),
+          PictureSpot('fun_hungry_frog', const Offset(0.6566, 0.373), 0.2845, 0.367, kHungryFrog.title(), () => _openGame(context, child, kHungryFrog), radius: 36, key: const ValueKey('fun_hungry_frog')),
+          PictureSpot('fun_frost_coil', const Offset(0.344, 0.7695), 0.2845, 0.367, kFrostCoil.title(), () => _openGame(context, child, kFrostCoil), radius: 36, key: const ValueKey('fun_frost_coil')),
+          PictureSpot('fun_summit_rush', const Offset(0.6566, 0.7695), 0.2845, 0.367, kSummitRush.title(), () => _openGame(context, child, kSummitRush), radius: 36, key: const ValueKey('fun_summit_rush')),
           _backSpot(context, 'fun_more_back'),
         ],
       ),

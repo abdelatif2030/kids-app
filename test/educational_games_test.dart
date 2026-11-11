@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/games/web_games/web_game.dart';
 import 'package:kids_app/games/connect_four_game.dart';
 import 'package:kids_app/games/game_catalog.dart';
 import 'package:kids_app/games/game_common.dart';
@@ -446,6 +447,7 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
         for (final g in kEducationalGames) {
+          if (kLearnWebGames.containsKey(g.id)) continue; // rebuilt as a web game (test/learn_web_games_test.dart)
           await tester.pumpWidget(MaterialApp(
             key: UniqueKey(),
             builder: (c, child) => MediaQuery(data: MediaQuery.of(c).copyWith(textScaler: const TextScaler.linear(1.6)), child: child!),

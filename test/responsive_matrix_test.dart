@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/games/web_games/web_game.dart';
 import 'package:kids_app/design/layout.dart';
 import 'package:kids_app/games/choice_games.dart';
 import 'package:kids_app/games/game_catalog.dart';
@@ -110,6 +111,7 @@ void main() {
 
         testWidgets('every learning game fits', (t) async {
           for (final g in kEducationalGames) {
+            if (kLearnWebGames.containsKey(g.id)) continue; // rebuilt as a web game (test/learn_web_games_test.dart)
             await show(t, g.build('k1', 5, lang), height: 800);
             expect(t.takeException(), isNull, reason: g.id);
           }

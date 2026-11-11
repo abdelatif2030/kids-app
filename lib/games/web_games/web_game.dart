@@ -15,7 +15,13 @@ class WebGame {
   final String storeKey;
   final int minAge;
   final String Function() title;
-  const WebGame({required this.id, required this.folder, required this.global, required this.storeKey, required this.minAge, required this.title});
+
+  /// For a rebuilt LEARNING game: the old game id, so its learning star and progress stay the same
+  /// (`GameRewards`, `ProgressStore`). Null for the fun games (no learning stars).
+  final String? learnId;
+  const WebGame({required this.id, required this.folder, required this.global, required this.storeKey, required this.minAge, required this.title, this.learnId});
+
+  bool get isLearning => learnId != null;
 
   String get page => 'assets/games/$folder/index.html';
   String get bundle => 'assets/games/$folder/game.js';
@@ -112,7 +118,7 @@ final WebGame kRhythmSurvival = WebGame(
   title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil];
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush];
 
 /// «متجر الفضاء الذكي» (Space Store Manager): a grocery store on a space station (docs/SPACE_STORE.md).
 final WebGame kSpaceStore = WebGame(
@@ -205,6 +211,17 @@ final WebGame kHungryFrog = WebGame(
   title: () => tr2('لعبة الضفدع الجائع', 'Hungry Frog'),
 );
 
+/// «سباق القمة» (Summit Rush): a 3D race up a snowy mountain against three rivals, from the owner's video
+/// (docs/SUMMIT_RUSH.md).
+final WebGame kSummitRush = WebGame(
+  id: 'summit_rush',
+  folder: 'summit_rush',
+  global: 'SummitRush',
+  storeKey: 'summit_rush',
+  minAge: 4,
+  title: () => tr2('سباق القمة', 'Summit Rush'),
+);
+
 /// «طريق التنين الجليدي» (Frost Coil): a snowy ice-path puzzle, from the owner's video (docs/FROST_COIL.md).
 final WebGame kFrostCoil = WebGame(
   id: 'frost_coil',
@@ -214,3 +231,21 @@ final WebGame kFrostCoil = WebGame(
   minAge: 4,
   title: () => tr2('طريق التنين الجليدي', 'Frost Coil'),
 );
+
+// ---- rebuilt learning games (docs/LEARNING_GAMES_REBUILD.md) ----------------------------------------------------------
+// Same contract as the fun games, plus three messages: 'round' (one answer, for the parent dashboard), 'complete' (the
+// set is finished: the learning star the first time) and 'speak' (a word said by the app's own voice).
+
+/// «الفأر والجبنة» (Mouse and Cheese): a 3D toy-box hedge maze.
+final WebGame kLearnMaze = WebGame(
+  id: 'learn_maze',
+  folder: 'learn_maze',
+  global: 'LearnMaze',
+  storeKey: 'learn_maze',
+  minAge: 4,
+  title: () => tr2('الفأر والجبنة', 'Mouse and Cheese'),
+  learnId: 'maze',
+);
+
+/// Rebuilt learning games, by their old game id.
+final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze]) g.learnId!: g};

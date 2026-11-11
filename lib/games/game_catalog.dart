@@ -12,6 +12,7 @@ import 'numerals_game.dart';
 import 'shape_games.dart';
 import 'trace_game.dart';
 import 'word_book_game.dart';
+import 'web_games/web_game_screen.dart';
 
 /// One of the new educational games: what it is called, who it is for and what it teaches.
 class GameInfo {
@@ -108,7 +109,7 @@ final List<GameInfo> kEducationalGames = [
     Icons.grid_on_rounded,
     4,
     6,
-    (id, age, _) => MazeGame(childId: id, age: age),
+    (id, age, _) => learnWebGameScreen(kLearnMaze, id, age), // rebuilt as a 3D web game (the old MazeGame stays as a fallback)
   ),
   GameInfo(
     TreasureHuntGame.gameId,

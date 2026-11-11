@@ -146,11 +146,11 @@ void main() {
     expect((await jungle.load('k1'))!['coins'], 1);
   });
 
-  testWidgets('"more games" opens the second page; its cards open coastal drive, hungry frog and frost coil', (t) async {
+  testWidgets('"more games" opens the second page; its cards open coastal drive, hungry frog, frost coil and summit rush', (t) async {
     SharedPreferences.setMockInitialValues({});
     debugDefaultTargetPlatformOverride = TargetPlatform.windows;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
-    for (final (key, game) in [('fun_coastal_drive', kCoastalDrive), ('fun_hungry_frog', kHungryFrog), ('fun_frost_coil', kFrostCoil)]) {
+    for (final (key, game) in [('fun_coastal_drive', kCoastalDrive), ('fun_hungry_frog', kHungryFrog), ('fun_frost_coil', kFrostCoil), ('fun_summit_rush', kSummitRush)]) {
       await t.pumpWidget(MaterialApp(key: UniqueKey(), home: const FunGamesScreen(child: ChildProfile(id: 'k1', nickname: 'L', age: 5))));
       await t.pump(const Duration(milliseconds: 300));
       await t.tap(find.byKey(const ValueKey('fun_more')));

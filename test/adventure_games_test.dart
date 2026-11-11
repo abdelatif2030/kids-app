@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/games/web_games/web_game.dart';
 import 'package:kids_app/games/adventure_games.dart';
 import 'package:kids_app/games/adventure_logic.dart';
 import 'package:kids_app/games/game_catalog.dart';
@@ -246,6 +247,7 @@ void main() {
       await AppLocale.instance.set(lang);
       tall(t, const Size(640, 340));
       for (final id in ['snakes_ladders', 'jigsaw', 'maze', 'treasure_hunt', 'connect_dots', 'animal_habitats']) {
+        if (kLearnWebGames.containsKey(id)) continue; // rebuilt as a web game (test/learn_web_games_test.dart)
         final g = kEducationalGames.firstWhere((x) => x.id == id);
         await t.pumpWidget(MaterialApp(
           key: UniqueKey(),

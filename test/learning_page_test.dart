@@ -94,7 +94,7 @@ void main() {
 
   testWidgets('tapping a game card opens that game', (t) async {
     await openLearning(t, const Size(1024, 768));
-    await t.tap(find.byKey(const ValueKey('learn_maze')));
+    await t.tap(find.byKey(const ValueKey('learn_letters')));
     await t.pump();
     await t.pump(const Duration(milliseconds: 600));
     expect(find.byKey(const ValueKey('learning_page')).hitTestable(), findsNothing);
