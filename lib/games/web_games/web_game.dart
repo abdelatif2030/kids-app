@@ -52,4 +52,14 @@ final WebGame kHappyFarm = WebGame(
   title: () => tr2('مزرعتي السعيدة', 'Happy Farm'),
 );
 
-final List<WebGame> kWebGames = [kCarnivalRace, kJungleAdventure, kHappyFarm];
+/// «مخبز اليقطين» (Pumpkin Pie Maker): the cozy 3D pumpkin pie bakery (docs/PUMPKIN_PIE.md).
+final WebGame kPumpkinPie = WebGame(
+  id: 'pumpkin_pie',
+  folder: 'pumpkin_pie',
+  global: 'PumpkinPie',
+  storeKey: 'pumpkin_pie',
+  minAge: 3,
+  title: () => tr2('مخبز اليقطين', 'Pumpkin Pie Maker'),
+);
+
+final List<WebGame> kWebGames = [kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie];

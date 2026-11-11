@@ -54,6 +54,7 @@ Future<void> deleteChildData() async {
         key == 'carnival_race' ||
         key == 'jungle_adventure' ||
         key == 'happy_farm' ||
+        key == 'pumpkin_pie' ||
         key == 'video_completions' ||
         key == 'wordbook_seen' ||
         key == 'family_prefs' ||

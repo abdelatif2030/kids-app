@@ -118,11 +118,11 @@ class FunGamesScreen extends StatelessWidget {
             ('fun_carnival_race', kCarnivalRace, 0.120),
             ('fun_jungle_adventure', kJungleAdventure, 0.315),
             ('fun_happy_farm', kHappyFarm, 0.501),
+            ('fun_pumpkin_pie', kPumpkinPie, 0.686),
           ])
             PictureSpot(id, Offset(cx, 0.579), 0.185, 0.49, game.title(), () => _open(context, game), radius: 40, key: ValueKey(id)),
-          // «مخبز اليقطين» and «سيف الساموراي» are still being built
+          // «سيف الساموراي» is still being built
           for (final (id, ar, en, cx, cy) in [
-            ('fun_pumpkin_pie', 'مخبز اليقطين', 'Pumpkin Pie Maker', 0.686, 0.579),
             ('fun_samurai', 'سيف الساموراي', 'Samurai Action', 0.882, 0.595),
           ])
             PictureSpot(
