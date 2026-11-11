@@ -113,7 +113,7 @@ class LazyGamesHub extends StatelessWidget {
   Widget build(BuildContext context) => FutureBuilder<void>(
     future: games_hub_lib.loadLibrary(),
     builder: (context, snap) => snap.connectionState == ConnectionState.done && !snap.hasError
-        ? games_hub_lib.GamesHub(key: const ValueKey('games_hub'), child: child, onBack: onBack)
+        ? games_hub_lib.LearningGamesScreen(key: const ValueKey('games_hub'), child: child, onBack: onBack) // every learning game on one page (owner request 2026-11-11)
         : _loading(),
   );
 }

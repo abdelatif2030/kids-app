@@ -17,6 +17,8 @@ import '../stories/story_screens.dart';
 import 'game_catalog.dart';
 import 'fun_games.dart';
 
+export 'learning_page.dart';
+
 /// One island of the games hub: where it leads — a list of games, or one existing screen.
 class GameCategory {
   final String id;
