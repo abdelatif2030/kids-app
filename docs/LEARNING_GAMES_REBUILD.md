@@ -39,9 +39,10 @@ professional look like the fun games, and do everything needed without asking ag
 ## Status
 | # | Game | Status |
 | --- | --- | --- |
-| 1 | maze «الفأر والجبنة» | **Built** (3D hedge maze, swipe/tap/arrows, runs to the next crossing, crumbs, glowing paw hint after 8 s, five mazes by age, voice + music + effects). Not tested on a real phone. |
+| 1 | maze «الفأر والجبنة» | **Built** — music only, no voice or effects (owner request 2026-11-12); arrows beside the maze on square screens (3D hedge maze, swipe/tap/arrows, runs to the next crossing, crumbs, glowing paw hint after 8 s, five mazes by age, voice + music + effects). Not tested on a real phone. |
 | 2 | sort_groups «رتّب في مجموعات» | **Built** (3D toy shop: conveyor belt from a curtained hatch, drag or tap into coloured baskets with picture signs, a wrong basket shakes "no" and the thing hops back, glow after two misses, Robi the shop robot, the thing's name said on arrival and "the apple is fruit!" when sorted, 2 baskets ages 3-4 / 3 baskets from round 3 at 5-6, 22 things drawn in code in `src/kit/toys3d.js`). Not tested on a real phone. |
-| 3-35 | the rest | Not built yet; next in the order below. |
+| 3 | treasure_hunt «كنز الجزيرة» | **Built** (3D island map, Coco the parrot's clue on a wooden sign + the app's voice + a 🔊 hear-again button, tap a square and the pirate walks and digs, a shell or crab on a wrong square, a chest of gold on the right one; 3x3 one direct clue at 3-4, 4x4 with "next to" at 5, any clue at 6; skill 'spatial'). |
+| 4-35 | the rest | Not built yet; next in the order below. |
 
 ## The prompts
 

@@ -283,11 +283,12 @@ export class Sound {
         this.slide('sine', 1800, 2600, t, 0.08, 0.05);
         this.slide('sine', 2600, 2000, t + 0.08, 0.07, 0.04);
         break;
-      case 'cheer': // the host's happy chirp-voice ("yay!")
-        this.voice([72, 79, 84], t, 0.09);
+      case 'cheer': // a happy little bell arpeggio (the old chirp "voice" sounded odd: owner feedback)
+        [76, 79, 84, 88].forEach((m, i) => { this.tone('sine', hz(m), t + i * 0.07, 0.35, 0.05); this.tone('sine', hz(m) * 2, t + i * 0.07, 0.12, 0.012); });
         break;
-      case 'hmm': // the host thinking
-        this.voice([67, 65], t, 0.07);
+      case 'hmm': // soft and kind: two low notes
+        this.tone('sine', hz(67), t, 0.25, 0.05);
+        this.tone('sine', hz(64), t + 0.15, 0.3, 0.045);
         break;
       case 'win': // the set is finished: a little fanfare
         [[72, 0], [76, 0.12], [79, 0.24], [84, 0.36], [79, 0.56], [84, 0.68], [88, 0.9]].forEach(([m, d]) => { this.tone('triangle', hz(m), t + d, 0.5, 0.08); this.tone('sine', hz(m) * 2, t + d, 0.2, 0.02); });

@@ -17,6 +17,7 @@ import '../l10n/strings.dart';
 import '../online_gate.dart';
 import '../teachers_models.dart';
 import 'account_extras.dart';
+import 'city_picker.dart';
 
 // The owner's two sign-in pictures (1536 x 1024) give the look: blurred scenery behind and the children + sign as the header
 // (see auth_shell.dart). The form is real and fills the screen, upright or sideways.
@@ -783,6 +784,8 @@ class _RegisterPictureScreenState extends State<RegisterPictureScreen> {
             ltr: false,
             maxLength: RegisterPictureScreen.maxCity,
             action: TextInputAction.done,
+            // every city in a clear list (owner request); typing still works
+            trailing: CityPickButton(controller: _city, maxLength: RegisterPictureScreen.maxCity),
           ),
           const SizedBox(height: 16),
           KeyedSubtree(

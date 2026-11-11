@@ -258,5 +258,16 @@ final WebGame kLearnSort = WebGame(
   learnId: 'sort_groups',
 );
 
+/// «كنز الجزيرة» (Island Treasure): a 3D island map with a parrot's clues.
+final WebGame kLearnTreasure = WebGame(
+  id: 'learn_treasure',
+  folder: 'learn_treasure',
+  global: 'LearnTreasure',
+  storeKey: 'learn_treasure',
+  minAge: 4,
+  title: () => tr2('كنز الجزيرة', 'Island Treasure'),
+  learnId: 'treasure_hunt',
+);
+
 /// Rebuilt learning games, by their old game id.
-final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort]) g.learnId!: g};
+final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure]) g.learnId!: g};

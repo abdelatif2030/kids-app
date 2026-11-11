@@ -77,28 +77,16 @@ void main() {
           await _settle(t);
         }
 
-        testWidgets('the child shell lays out and its navigation fits the width', (t) async {
+        testWidgets('the child shell has no bar: the home picture leads everywhere and fits the width', (t) async {
           await show(t, const ChildShell(child: _kid));
           expect(t.takeException(), isNull);
-          // The four tabs sit in a row on a phone and in a column on wider windows.
-          final tabs = [for (final k in ['home', 'games', 'create', 'me']) k];
-          expect(tabs.length, 4);
-          final faces = [for (final el in find.byIcon(Icons.face_rounded).evaluate()) t.getCenter(find.byWidget(el.widget))];
-          final palettes = [for (final el in find.byIcon(Icons.palette_rounded).evaluate()) t.getCenter(find.byWidget(el.widget))];
-          bool pair(bool Function(Offset a, Offset b) ok) => faces.any((f) => palettes.any((p) => ok(f, p)));
-          if (windowClassOf(e.value) == WindowClass.compact) {
-            expect(pair((f, p) => (f.dy - p.dy).abs() < 2 && f.dy > 700), true, reason: 'a bottom bar: same height, near the bottom');
-          } else {
-            expect(pair((f, p) => (f.dx - p.dx).abs() < 2 && p.dy > f.dy - 400), true, reason: 'a side rail: same column');
-          }
-          // Wide windows show today's world and the lands side by side.
-          if (windowClassOf(e.value) == WindowClass.expanded) {
-            expect(find.byKey(const ValueKey('picture_home')).evaluate(), isNotEmpty); // the owner's home picture fills the area
-          }
-          for (final icon in [Icons.sports_esports_rounded, Icons.palette_rounded, Icons.face_rounded]) {
-            await t.tap(find.byIcon(icon).first);
-            await _settle(t);
-            expect(t.takeException(), isNull);
+          // owner request 2026-11-12: no bottom bar or side rail
+          expect(find.byIcon(Icons.apps_rounded), findsNothing);
+          expect(find.byKey(const ValueKey('picture_home')).evaluate(), isNotEmpty);
+          for (final k in ['island_games', 'island_create', 'home_avatar']) {
+            expect(find.byKey(ValueKey(k)), findsOneWidget, reason: k);
+            final r = t.getRect(find.byKey(ValueKey(k)));
+            expect(r.left >= -1 && r.right <= e.value + 1, isTrue, reason: '$k inside the window');
           }
         });
 

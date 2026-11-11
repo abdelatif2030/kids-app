@@ -121,7 +121,7 @@ final List<GameInfo> kEducationalGames = [
     Icons.diamond_rounded,
     4,
     6,
-    (id, age, _) => TreasureHuntGame(childId: id, age: age),
+    (id, age, _) => learnWebGameScreen(kLearnTreasure, id, age), // rebuilt as a 3D island (the old game stays)
   ),
   GameInfo(
     ConnectDotsGame.gameId,
