@@ -113,33 +113,34 @@ class FunGamesScreen extends StatelessWidget {
         asset: kFunGamesPicture,
         aspect: kFunGamesAspect,
         spots: [
-          // the five cards of the owner's picture (centre and size as fractions of it)
-          for (final (id, game, cx) in [
-            ('fun_carnival_race', kCarnivalRace, 0.120),
-            ('fun_jungle_adventure', kJungleAdventure, 0.315),
-            ('fun_happy_farm', kHappyFarm, 0.501),
-            ('fun_pumpkin_pie', kPumpkinPie, 0.686),
-          ])
-            PictureSpot(id, Offset(cx, 0.579), 0.185, 0.49, game.title(), () => _open(context, game), radius: 40, key: ValueKey(id)),
-          // «سيف الساموراي» is still being built
-          for (final (id, ar, en, cx, cy) in [
-            ('fun_samurai', 'سيف الساموراي', 'Samurai Action', 0.882, 0.595),
+          // the seven cards of the owner's picture (centre and size as fractions of it); a card whose game is
+          // still being built says so
+          for (final (id, game, ar, en, cx, cy, w) in <(String, WebGame?, String, String, double, double, double)>[
+            ('fun_carnival_race', kCarnivalRace, '', '', 0.144, 0.404, 0.23),
+            ('fun_jungle_adventure', kJungleAdventure, '', '', 0.381, 0.404, 0.22),
+            ('fun_happy_farm', kHappyFarm, '', '', 0.614, 0.404, 0.22),
+            ('fun_pumpkin_pie', kPumpkinPie, '', '', 0.854, 0.404, 0.23),
+            ('fun_samurai', null, 'سيف الساموراي', 'Samurai Action', 0.182, 0.760, 0.28),
+            ('fun_golden_tail', null, 'مغامرة الذيل الذهبي', 'Golden Tail Chase', 0.465, 0.760, 0.26),
+            ('fun_ocean_defense', null, 'دفاع القلعة البحرية', 'Ocean Defense', 0.787, 0.760, 0.36),
           ])
             PictureSpot(
               id,
               Offset(cx, cy),
-              0.185,
-              0.49,
-              tr2(ar, en),
-              () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr2('اللعبة دي جاية قريب!', 'This game is coming soon!')))),
+              w,
+              0.34,
+              game?.title() ?? tr2(ar, en),
+              game != null
+                  ? () => _open(context, game)
+                  : () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr2('اللعبة دي جاية قريب!', 'This game is coming soon!')))),
               radius: 40,
               key: ValueKey(id),
             ),
           PictureSpot(
             'fun_back',
-            const Offset(0.063, 0.106),
-            0.085,
-            0.15,
+            const Offset(0.061, 0.094),
+            0.08,
+            0.14,
             tr2('رجوع', 'Back'),
             () => Navigator.maybePop(context),
             radius: 60,

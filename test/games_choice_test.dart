@@ -66,7 +66,7 @@ void main() {
         ),
       );
       await t.pump(const Duration(milliseconds: 300));
-      for (final k in ['fun_carnival_race', 'fun_jungle_adventure', 'fun_happy_farm', 'fun_pumpkin_pie', 'fun_samurai', 'fun_back']) {
+      for (final k in ['fun_carnival_race', 'fun_jungle_adventure', 'fun_happy_farm', 'fun_pumpkin_pie', 'fun_samurai', 'fun_golden_tail', 'fun_ocean_defense', 'fun_back']) {
         final r = t.getRect(find.byKey(ValueKey(k)));
         expect(r.left >= -1 && r.right <= size.width + 1 && r.top >= -1 && r.bottom <= size.height + 1, isTrue, reason: '$k inside $size: $r');
       }
