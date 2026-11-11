@@ -77,9 +77,10 @@ class GamesChoiceScreen extends StatelessWidget {
   }
 }
 
-/// The owner's picture of the fun games page (2026-11-11, 1535 x 1024): the wooden sign, a back arrow and thirteen
+/// The owner's picture of the fun games page (2026-11-11, 1535 x 1024): the wooden sign, a back arrow and fourteen
 /// game cards in three rows (Glowfair rally, jungle, farm, bakery, samurai / ocean defense, golden tail, rhythm
-/// survival, motorcycle racing, splash race / space store manager, fox family rescue, airplane racing). It is shown whole; the arrow and the cards are
+/// survival, motorcycle racing, splash race / space store manager, fox family rescue, airplane racing, zombie rooftop
+/// shooter). It is shown whole; the arrow and the cards are
 /// large invisible buttons on it, like the Games page. To change it, replace the one file.
 const String kFunGamesPicture = 'assets/games/fun_games_scene.webp';
 const double kFunGamesAspect = 1535 / 1024;
@@ -114,7 +115,7 @@ class FunGamesScreen extends StatelessWidget {
         asset: kFunGamesPicture,
         aspect: kFunGamesAspect,
         spots: [
-          // the thirteen cards of the owner's picture (centre, width, height as fractions of it); a card whose game is
+          // the fourteen cards of the owner's picture (centre, width, height as fractions of it); a card whose game is
           // still being built says so
           for (final (id, game, ar, en, cx, cy, w, hh) in <(String, WebGame?, String, String, double, double, double, double)>[
             ('fun_carnival_race', kCarnivalRace, '', '', 0.112, 0.298, 0.19, 0.24),
@@ -127,9 +128,10 @@ class FunGamesScreen extends StatelessWidget {
             ('fun_rhythm', kRhythmSurvival, '', '', 0.502, 0.552, 0.18, 0.24),
             ('fun_moto_race', kMotoRace, '', '', 0.694, 0.552, 0.18, 0.24),
             ('fun_splash_race', kSplashRace, '', '', 0.891, 0.552, 0.19, 0.24),
-            ('fun_space_store', kSpaceStore, '', '', 0.161, 0.830, 0.28, 0.27),
-            ('fun_fox_family', kFoxFamily, '', '', 0.467, 0.830, 0.28, 0.27),
-            ('fun_airplane', kAirRace, '', '', 0.805, 0.830, 0.35, 0.27),
+            ('fun_space_store', kSpaceStore, '', '', 0.153, 0.801, 0.27, 0.25),
+            ('fun_fox_family', kFoxFamily, '', '', 0.417, 0.801, 0.235, 0.25),
+            ('fun_airplane', kAirRace, '', '', 0.650, 0.801, 0.215, 0.25),
+            ('fun_zombie_rooftop', kZombieRooftop, '', '', 0.877, 0.801, 0.22, 0.25),
           ])
             PictureSpot(
               id,

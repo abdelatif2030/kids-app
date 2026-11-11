@@ -106,6 +106,7 @@ flutter:
     - assets/games/space_store/
     - assets/games/fox_family/
     - assets/games/air_race/
+    - assets/games/zombie_rooftop/
     - assets/home/home_main.webp
     - assets/home/cartoons_stories.webp
     - assets/home/lessons_scene.webp

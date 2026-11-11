@@ -112,7 +112,7 @@ final WebGame kRhythmSurvival = WebGame(
   title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace];
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop];
 
 /// «متجر الفضاء الذكي» (Space Store Manager): a grocery store on a space station (docs/SPACE_STORE.md).
 final WebGame kSpaceStore = WebGame(
@@ -152,4 +152,15 @@ final WebGame kAirRace = WebGame(
   storeKey: 'air_race',
   minAge: 3,
   title: () => tr2('سباق الطائرات الجوي', 'Airplane Racing'),
+);
+
+/// «البقاء على قيد الحياة» (Zombie Rooftop Shooter): a cartoon fighter clears city rooftops of goofy zombies and leaps
+/// from building to building (docs/ZOMBIE_ROOFTOP.md). Ages 4+, like the samurai game; nobody is hurt, no blood.
+final WebGame kZombieRooftop = WebGame(
+  id: 'zombie_rooftop',
+  folder: 'zombie_rooftop',
+  global: 'ZombieRooftop',
+  storeKey: 'zombie_rooftop',
+  minAge: 4,
+  title: () => tr2('البقاء على قيد الحياة', 'Zombie Rooftop Shooter'),
 );

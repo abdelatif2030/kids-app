@@ -66,7 +66,7 @@ void main() {
         ),
       );
       await t.pump(const Duration(milliseconds: 300));
-      for (final k in ['fun_carnival_race', 'fun_jungle_adventure', 'fun_happy_farm', 'fun_pumpkin_pie', 'fun_samurai', 'fun_golden_tail', 'fun_ocean_defense', 'fun_moto_race', 'fun_rhythm', 'fun_splash_race', 'fun_space_store', 'fun_fox_family', 'fun_airplane', 'fun_back']) {
+      for (final k in ['fun_carnival_race', 'fun_jungle_adventure', 'fun_happy_farm', 'fun_pumpkin_pie', 'fun_samurai', 'fun_golden_tail', 'fun_ocean_defense', 'fun_moto_race', 'fun_rhythm', 'fun_splash_race', 'fun_space_store', 'fun_fox_family', 'fun_airplane', 'fun_zombie_rooftop', 'fun_back']) {
         final r = t.getRect(find.byKey(ValueKey(k)));
         expect(r.left >= -1 && r.right <= size.width + 1 && r.top >= -1 && r.bottom <= size.height + 1, isTrue, reason: '$k inside $size: $r');
       }
@@ -80,7 +80,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     debugDefaultTargetPlatformOverride = TargetPlatform.windows;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
-    for (final (key, game) in [('fun_carnival_race', kCarnivalRace), ('fun_jungle_adventure', kJungleAdventure), ('fun_happy_farm', kHappyFarm), ('fun_pumpkin_pie', kPumpkinPie), ('fun_samurai', kSamuraiAction), ('fun_golden_tail', kGoldenTail), ('fun_ocean_defense', kOceanDefense), ('fun_moto_race', kMotoRace), ('fun_rhythm', kRhythmSurvival), ('fun_splash_race', kSplashRace), ('fun_space_store', kSpaceStore), ('fun_fox_family', kFoxFamily), ('fun_airplane', kAirRace)]) {
+    for (final (key, game) in [('fun_carnival_race', kCarnivalRace), ('fun_jungle_adventure', kJungleAdventure), ('fun_happy_farm', kHappyFarm), ('fun_pumpkin_pie', kPumpkinPie), ('fun_samurai', kSamuraiAction), ('fun_golden_tail', kGoldenTail), ('fun_ocean_defense', kOceanDefense), ('fun_moto_race', kMotoRace), ('fun_rhythm', kRhythmSurvival), ('fun_splash_race', kSplashRace), ('fun_space_store', kSpaceStore), ('fun_fox_family', kFoxFamily), ('fun_airplane', kAirRace), ('fun_zombie_rooftop', kZombieRooftop)]) {
       await t.pumpWidget(
         MaterialApp(
           key: UniqueKey(),
