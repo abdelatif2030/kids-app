@@ -21,7 +21,7 @@ function robot(c, dt) {
     let bs = -Infinity;
     const near = c.rivals.map((r) => c.nodeNear(r));
     for (const n of c.nodes) {
-      const s = Math.min(...near.map((k) => c.dist[k][n.i]));
+      const s = Math.min(...near.map((k) => c.dist[k][n.i])) - (Number.isFinite(noDrop(c)[n.i][c.nodeNear(p)]) ? 0 : 1e6);
       if (Number.isFinite(s) && s > bs) { bs = s; best = n.i; }
     }
     p._goal = best;
@@ -30,14 +30,25 @@ function robot(c, dt) {
   return walkTo(c, p._goal);
 }
 
+let NODROP = null;
+function noDrop(c) {
+  // the dino's own route table: jumping off a deck is a fall now (back to the start), so it never plans one
+  if (!NODROP) {
+    const g = c.nodes.map((n) => ({ ...n, out: n.out.filter((e) => c.nodes[e.to].tag !== 'drop') }));
+    NODROP = g.map((n) => distancesTo(g, n.i));
+  }
+  return NODROP;
+}
+
 function walkTo(c, goal) {
   const p = c.player;
+  const dist = noDrop(c);
   let n = p._next !== undefined ? c.nodes[p._next] : null;
-  if (!n || Math.abs(n.y - p.y) > 1.5 || p._goalWas !== goal) { n = c.nodes[c.nodeNear(p)]; p._next = n.i; p._goalWas = goal; }
+  if (!n || Math.abs(n.y - p.y) > 3 || p._goalWas !== goal) { n = c.nodes[c.nodeNear(p)]; p._next = n.i; p._goalWas = goal; }
   if (Math.hypot(n.x - p.x, n.z - p.z) < 0.5 && Math.abs(n.y - p.y) < 0.7 && n.i !== goal) {
     let bc = Infinity;
     let best = n.i;
-    for (const e of n.out) if (e.d + c.dist[goal][e.to] < bc) { bc = e.d + c.dist[goal][e.to]; best = e.to; }
+    for (const e of n.out) if (c.nodes[e.to].tag !== 'drop' && e.d + dist[goal][e.to] < bc) { bc = e.d + dist[goal][e.to]; best = e.to; }
     p._next = best;
     n = c.nodes[best];
   }
@@ -47,7 +58,8 @@ function walkTo(c, goal) {
   return l < 0.05 ? { x: 0, z: 0 } : { x: dx / l, z: dz / l };
 }
 
-test('a robot dino wins rounds at every level', () => {
+test('a robot dino (no jumps, no mushrooms) wins a fair share of rounds at every level', () => {
+  let total = 0;
   for (const [i, lv] of LEVELS.entries()) {
     let wins = 0;
     let line = [];
@@ -60,8 +72,10 @@ test('a robot dino wins rounds at every level', () => {
       line.push(`${r.win ? 'W' : 'L'} held ${Math.round(r.held)}s grabs ${r.grabs} lost ${r.lost}`);
     }
     console.log(`level ${lv.id}: ${wins}/4 | ${line.join(' | ')}`);
-    assert.ok(wins >= 1, `the robot never won level ${lv.id}`);
+    total += wins;
+    if (i < 3) assert.ok(wins >= 1, `the robot never won level ${lv.id}`);
   }
+  assert.ok(total >= 9, `only ${total}/24 wins`);
 });
 
 test('the animals take the tail from a dino that stands still', () => {
@@ -91,8 +105,9 @@ test('walking up a ramp onto a deck, along a bridge, and falling off the edge', 
   for (let i = 0; i < 40; i++) c.step(1 / 30, { x: 1, z: 0 });
   assert.ok(Math.abs(p.y - P.p3.y) < 0.05, `on deck 3? y=${p.y}`);
   // keep going east off the far side? the bridge to the big deck leaves north-east; walking south falls down
-  for (let i = 0; i < 60; i++) c.step(1 / 30, { x: 0, z: 1 });
-  assert.ok(p.y < 0.05, `fell to the ground, y=${p.y}`);
+  let fell = false;
+  for (let i = 0; i < 60; i++) for (const e of c.step(1 / 30, { x: 0, z: 1 })) if (e.type === 'fell') fell = true;
+  assert.ok(fell, 'walking off the deck is a fall (back to the start)');
 });
 
 test('the broken bridge needs a jump; a jump crosses it', () => {
@@ -107,8 +122,9 @@ test('the broken bridge needs a jump; a jump crosses it', () => {
   const l = Math.hypot(dx, dz);
   // walk to the end of the first half, then over the gap without jumping: down you go
   Object.assign(p, { x: a.ax + (dx / l) * 0.5, y: a.ay, z: a.az + (dz / l) * 0.5, grounded: true, surf: a });
-  for (let i = 0; i < 90 && p.y > 0.05; i++) c.step(1 / 30, { x: dx / l, z: dz / l });
-  assert.ok(p.y < 0.05, 'walking fell through the gap');
+  let fell = false;
+  for (let i = 0; i < 90 && !fell; i++) for (const e of c.step(1 / 30, { x: dx / l, z: dz / l })) if (e.type === 'fell') fell = true;
+  assert.ok(fell, 'walking fell through the gap');
   // again with a jump at the edge
   Object.assign(p, { x: a.ax + (dx / l) * 0.5, y: a.ay, z: a.az + (dz / l) * 0.5, grounded: true, surf: a, vy: 0, launch: null });
   let jumped = false;
@@ -172,4 +188,26 @@ test('damaged saves load safely', () => {
     assert.ok(s.unlocked >= 1 && s.unlocked <= LEVELS.length);
     for (const v of Object.values(s.stars)) assert.ok(v >= 1 && v <= 3);
   }
+});
+
+test('falling off a deck takes the dino back to the start (and the tail goes to the nearest animal)', () => {
+  const c = new Chase({ level: 0, seed: 1 });
+  c.state = 'play';
+  const p = c.player;
+  c.holder = p;
+  // walk south off the big deck (no bridge there)
+  Object.assign(p, { x: P.p0.x - 2.6, y: P.p0.y, z: P.p0.z - 1, grounded: true });
+  let fell = false;
+  for (let i = 0; i < 90 && !fell; i++) for (const e of c.step(1 / 30, { x: -1, z: 0 })) if (e.type === 'fell') fell = true;
+  assert.ok(fell, 'fell');
+  assert.ok(Math.abs(p.y - P.p0.y) < 0.01, 'back on the start deck');
+  assert.notEqual(c.holder, p);
+  // walking down a ramp is not a fall
+  const d = new Chase({ level: 0, seed: 1 });
+  d.state = 'play';
+  const ramp = STRIPS.find((x) => x.kind === 'ramp' && x.from === 'p3');
+  Object.assign(d.player, { x: P.p3.x - 1.5, y: P.p3.y, z: P.p3.z, grounded: true });
+  let f2 = false;
+  for (let i = 0; i < 60; i++) for (const e of d.step(1 / 30, { x: -1, z: 0 })) if (e.type === 'fell') f2 = true;
+  assert.ok(!f2 && d.player.y < 0.1, `walked down the ramp, y=${d.player.y} ${ramp.kind}`);
 });

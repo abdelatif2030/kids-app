@@ -73,6 +73,21 @@ export class Chase {
 
   // ---- input from the dino --------------------------------------------------------------------------------------------
 
+  /** Back on the big deck in the middle; a tail that was worn goes to the nearest animal. */
+  _respawn(p) {
+    const fx = p.x;
+    const fz = p.z;
+    if (this.holder === p) {
+      let near = this.rivals[0];
+      for (const r of this.rivals) if (Math.hypot(r.x - fx, r.z - fz) < Math.hypot(near.x - fx, near.z - fz)) near = r;
+      this.holder = near;
+      near.immune = 1.2;
+      this.lost++;
+    }
+    Object.assign(p, { x: P.p0.x, y: P.p0.y, z: P.p0.z + 1.5, vy: 0, grounded: true, surf: P.p0, launch: null, stun: 0.6, immune: 1.2, fallFrom: 0 });
+    this.events.push({ type: 'fell', x: fx, z: fz });
+  }
+
   jump() {
     const p = this.player;
     if (this.state !== 'play' || !p.grounded || p.stun > 0) return false;
@@ -99,7 +114,7 @@ export class Chase {
     const from = this.holder;
     from.stun = 0.9;
     from.immune = 0;
-    by.immune = 1.6;
+    by.immune = by.isPlayer ? 2.2 : 1.6;
     by.grabCd = 0.5;
     this.holder = by;
     if (from === this.player) this.lost++;
@@ -217,7 +232,7 @@ export class Chase {
       e.y = f.y;
       e.surf = f.surf;
     } else {
-      if (e.grounded) { e.grounded = false; e.vy = Math.min(e.vy, 0); }
+      if (e.grounded) { e.grounded = false; e.vy = Math.min(e.vy, 0); e.fallFrom = e.y; }
       e.vy -= G * dt;
       e.y += e.vy * dt;
       const f2 = floorAt(e.x, e.z, Math.max(e.y, f.y));
@@ -230,6 +245,8 @@ export class Chase {
         e.launch = null;
         e.next = -1;
         this.events.push({ type: 'land', who: e.id, hard: fell > 9 });
+        // the dino fell off a deck to the forest floor: back to the start, like in the owner's video
+        if (e.isPlayer && e.y < 0.05 && (e.fallFrom ?? 0) > 1 && this.state === 'play') this._respawn(e);
       }
     }
     // mushrooms throw you up onto a deck

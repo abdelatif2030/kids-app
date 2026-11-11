@@ -267,7 +267,7 @@ class Game {
       this.input.pointer = null;
       this.input.x = 0;
       this.input.z = 0;
-      this.joy.style.display = 'none';
+      this._joyHome();
     };
     root.addEventListener('pointerup', up);
     root.addEventListener('pointercancel', up);
@@ -296,6 +296,16 @@ class Game {
     this._pill = setInterval(() => {
       this.soundPill.style.display = this._tapped && !this.sound.muted && !this.sound.on && !document.hidden && !this.paused ? 'block' : 'none';
     }, 700);
+  }
+
+  /** The joystick waits in the bottom corner (as in the video) until a finger moves it. */
+  _joyHome() {
+    if (!this.joy) return;
+    const show = this.mode === 'play';
+    this.joy.style.display = show ? 'block' : 'none';
+    this.joy.style.left = `${getLang() === 'en' ? this.u * 18 : this.cw - this.u * 18}px`;
+    this.joy.style.top = `${this.ch - this.u * 18}px`;
+    this.joy.firstChild.style.transform = 'translate(0,0)';
   }
 
   _readInput() {
@@ -343,6 +353,7 @@ class Game {
     this.mode = 'menu';
     this.paused = false;
     this.chase = null;
+    if (this.joy) this.joy.style.display = 'none';
     this.sound.setMode('menu');
     this._setRivals(5);
     this._clear();
@@ -382,6 +393,7 @@ class Game {
     this.cam = null;
     this._hud();
     this._lastHolder = this.chase.holder;
+    this._joyHome();
   }
 
   _hud() {
@@ -465,6 +477,7 @@ class Game {
         h('button', { class: 'gt-btn2 wood', onclick: () => this.showMenu() }, t('menu')))));
     this.hud.grab.remove();
     this.hud.jump.remove();
+    this.joy.style.display = 'none';
     this.layer.append(dim);
   }
 
@@ -492,6 +505,12 @@ class Game {
           break;
         }
         case 'whiff': this.sound.play('whiff'); break;
+        case 'fell':
+          this.sound.play('stolen');
+          this.toast(t('fell'), 1.8);
+          this.sparkles.burst(c.player.x, c.player.y + 1, c.player.z, 30, 4);
+          this.cam = null;
+          break;
         case 'steal':
           this.sparkles.burst(e.x, e.y + 1, e.z, e.by === 0 ? 40 : 18, e.by === 0 ? 6 : 4);
           if (e.by === 0) { this.sound.play('grab'); this._banner(t('got')); } else if (e.from === 0) { this.sound.play('stolen'); this.toast(t('lost'), 1.6); } else this.sound.play('rivalGrab');
@@ -567,11 +586,11 @@ class Game {
     this.sparkles.update(dt);
     // camera: behind and above the dino
     const portrait = this.cw < this.ch;
-    const want = new THREE.Vector3(p.x, p.y + (portrait ? 10 : 7.5), p.z + (portrait ? 10.5 : 8.5));
+    const want = new THREE.Vector3(p.x, p.y + (portrait ? 7.5 : 5.6), p.z + (portrait ? 8 : 6.6));
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 4));
     this.camera.position.copy(this.cam);
-    this.camera.lookAt(this.cam.x, this.cam.y - (portrait ? 10 : 7.5) + 0.8, this.cam.z - (portrait ? 10.5 : 8.5) - 1);
+    this.camera.lookAt(this.cam.x, this.cam.y - (portrait ? 7.5 : 5.6) + 1.0, this.cam.z - (portrait ? 8 : 6.6) - 1.5);
     // HUD
     const hc = this._hc;
     const secs = Math.ceil(c.timeLeft);

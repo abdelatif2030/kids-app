@@ -17,6 +17,7 @@ const S = {
   jump: ['نط', 'JUMP'],
   got: ['مسكت الذيل! اجري! 🏃', 'Got it! Run! 🏃'],
   lost: ['خدوه منك! امسكه تاني!', 'They took it! Grab it back!'],
+  fell: ['وقعت! ارجع من البداية 🦖', 'You fell! Back to the start 🦖'],
   hint: ['اجري ورا اللي معاه الذيل وادوس «امسك»', 'Chase whoever has the tail and press GRAB'],
   win_m: ['شطوووووور! الذيل معاك! 🎉', 'Well done! The tail is yours! 🎉'],
   win_f: ['شطووووورة! الذيل معاكي! 🎉', 'Well done! The tail is yours! 🎉'],

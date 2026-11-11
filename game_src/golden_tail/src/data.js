@@ -82,8 +82,8 @@ export const LEVELS = [
   { id: 2, ar: 'جسر الحبال', en: 'Rope Bridges', time: 45, rivals: 3, speed: 3.9 },
   { id: 3, ar: 'المشروم النطّاط', en: 'Bouncy Mushrooms', time: 50, rivals: 3, speed: 4.1 },
   { id: 4, ar: 'الزحاليق', en: 'Slide Hill', time: 55, rivals: 4, speed: 4.2 },
-  { id: 5, ar: 'برج المراقبة', en: 'Lookout Tower', time: 60, rivals: 4, speed: 4.4 },
-  { id: 6, ar: 'بطولة الغابة', en: 'Forest Cup', time: 60, rivals: 5, speed: 4.5 },
+  { id: 5, ar: 'برج المراقبة', en: 'Lookout Tower', time: 60, rivals: 4, speed: 4.25 },
+  { id: 6, ar: 'بطولة الغابة', en: 'Forest Cup', time: 60, rivals: 4, speed: 4.3 },
 ];
 
 export const RIVALS = [
