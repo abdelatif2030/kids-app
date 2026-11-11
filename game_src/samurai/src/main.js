@@ -23,7 +23,7 @@ const webglOk = () => {
   }
 };
 const MOODS = [
-  { sky: 0xffd6e6, fog: 0xffe2ee, hemi: [0xfff4f8, 0x8a7a6a, 1.9], sun: [0xfff0e0, 1.5], night: false },
+  { sky: 0xf0c8d8, fog: 0xe8c8d4, hemi: [0xfff0f4, 0x7a6a5a, 1.65], sun: [0xfff0e0, 1.4], night: false },
   { sky: 0xffb48a, fog: 0xffc8a0, hemi: [0xffe0c8, 0x7a5a4a, 1.7], sun: [0xffb070, 1.5], night: false },
   { sky: 0x2a2a5a, fog: 0x3a3a6a, hemi: [0xb8b8ff, 0x3a2a4a, 1.2], sun: [0xc8c8ff, 0.7], night: true },
 ];
@@ -196,14 +196,14 @@ class Game {
     const sun = new THREE.DirectionalLight(mood.sun[0], mood.sun[1]);
     sun.position.set(-8, 20, 10);
     s.add(sun);
-    const grass = new THREE.Mesh(new THREE.PlaneGeometry(90, 90), mat(mood.night ? 0x3a4a3a : 0x9ac46a));
+    const grass = new THREE.Mesh(new THREE.PlaneGeometry(90, 90), mat(mood.night ? 0x3a4a3a : 0x6a8a4a));
     grass.rotation.x = -Math.PI / 2;
     grass.position.y = -0.02;
     s.add(grass);
     const floor = new THREE.Mesh(new THREE.CircleGeometry(ARENA + 0.4, 64), new THREE.MeshLambertMaterial({ map: courtyardTexture(mood.night) }));
     floor.rotation.x = -Math.PI / 2;
     s.add(floor);
-    const rim = new THREE.Mesh(new THREE.RingGeometry(ARENA + 0.4, ARENA + 1.1, 64), mat(mood.night ? 0x5a5060 : 0x9a8a78));
+    const rim = new THREE.Mesh(new THREE.RingGeometry(ARENA + 0.4, ARENA + 1.1, 64), mat(mood.night ? 0x5a5060 : 0x5a5048));
     rim.rotation.x = -Math.PI / 2;
     rim.position.y = 0.01;
     s.add(rim);
@@ -820,13 +820,14 @@ class Game {
     this._airStep(rdt, time);
     // camera follows, with a little shake
     const portrait = this.cw < this.ch;
-    const want = new THREE.Vector3(p.x * 0.6, portrait ? 16 : 11, p.z * 0.6 + (portrait ? 10 : 7.8));
+    // closer and more tilted, following the samurai (like the video)
+    const want = new THREE.Vector3(p.x * 0.85, portrait ? 11 : 8.5, p.z * 0.85 + (portrait ? 9 : 7.5));
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, rdt * 4));
     this.shake = Math.max(0, this.shake - rdt * 2);
     const sh = this.shake * 0.4;
     this.camera.position.set(this.cam.x + (Math.random() - 0.5) * sh, this.cam.y + (Math.random() - 0.5) * sh, this.cam.z);
-    this.camera.lookAt(this.cam.x, 0, this.cam.z - (portrait ? 10 : 7.8) - 1);
+    this.camera.lookAt(this.cam.x, 0.8, this.cam.z - (portrait ? 9 : 7.5) - 1.5);
     // HUD
     const hc = this._hc;
     if (hc.kills !== f.kills) { hc.kills = f.kills; this.hud.kills.textContent = num(f.kills); }

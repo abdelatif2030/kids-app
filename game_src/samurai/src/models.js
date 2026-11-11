@@ -301,19 +301,19 @@ export function courtyardTexture(night) {
   const c = document.createElement('canvas');
   c.width = c.height = 1024;
   const g = c.getContext('2d');
-  g.fillStyle = night ? '#8a8496' : '#d8c8b0';
+  g.fillStyle = night ? '#8a8496' : '#6a6058';
   g.fillRect(0, 0, 1024, 1024);
   // tiles
   for (let y = 0; y < 16; y++) {
     for (let x = 0; x < 16; x++) {
       const off = y % 2 ? 32 : 0;
       const sh = ((x * 7 + y * 13) % 5) * 5;
-      g.fillStyle = night ? `rgb(${130 + sh},${124 + sh},${142 + sh})` : `rgb(${206 + sh},${188 + sh},${160 + sh})`;
+      g.fillStyle = night ? `rgb(${130 + sh},${124 + sh},${142 + sh})` : `rgb(${150 + sh},${138 + sh},${124 + sh})`; // grey-brown stone like the video
       g.fillRect(x * 64 + off + 2, y * 64 + 2, 60, 60);
     }
   }
   // the ring and the blossom
-  g.strokeStyle = night ? '#5a4a6a' : '#8a6a4a';
+  g.strokeStyle = night ? '#5a4a6a' : '#6a4a38';
   g.lineWidth = 26;
   g.beginPath();
   g.arc(512, 512, 250, 0, Math.PI * 2);
