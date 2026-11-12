@@ -81,7 +81,7 @@ async function elevenlabs(text, lang, voice) {
   const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voice}?output_format=mp3_44100_64`, {
     method: 'POST',
     headers: { 'xi-api-key': key, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, model_id: 'eleven_multilingual_v2', voice_settings: { stability: 0.55, similarity_boost: 0.8 } }),
+    body: JSON.stringify({ text, model_id: 'eleven_multilingual_v2', voice_settings: { stability: 0.55, similarity_boost: 0.8, ...(Number(arg('speed', 0)) ? { speed: Number(arg('speed', 0)) } : {}) } }),
   });
   if (!r.ok) throw new Error(`elevenlabs ${r.status} ${await r.text()}`);
   return Buffer.from(await r.arrayBuffer());

@@ -139,10 +139,12 @@ const BUILD = {
     }
     g.add(box(40, 0.05, 3, m(0x3a3a46, 0.9), 0, -0.17, -3.8));
     for (let i = 0; i < 12; i++) g.add(box(1.0, 0.06, 0.2, m(0xffe05a), -12 + i * 2.2, -0.13, -3.8));
-    const bus = makeThing('bus'); bus.scale.setScalar(2.6); bus.position.set(-4, -0.1, -3.8); bus.rotation.y = Math.PI / 2; g.add(bus);
-    const car = makeThing('car'); car.scale.setScalar(2.2); car.position.set(7, -0.1, -3.8); car.rotation.y = -Math.PI / 2; g.add(car);
+    // Traffic: the car and bus pictures are SIDE views facing left, so they stay square to the camera (no turning: a turned
+    // picture is seen edge-on and looks squashed) and drive to the left along the road, then come back in from the right.
+    const traffic = [[makeThing('bus'), 2.5, 1.1, 4], [makeThing('car'), 1.7, 1.7, -7]];
+    for (const [v, sc, , x0] of traffic) { v.scale.setScalar(sc); v.position.set(x0, -0.1, -3.7); g.add(v); }
     scatter(g, [{ t: 'tree', x: -11, z: -2, s: 3.4 }, { t: 'tree', x: 11, z: -1.5, s: 3.2 }], -0.2);
-    return { pad: 'wood', update: (dt, t) => { clouds.userData.drift(dt); bus.position.x = -4 + Math.sin(t * 0.3) * 6; car.position.x = 7 - Math.sin(t * 0.3 + 1) * 6; } };
+    return { pad: 'wood', update: (dt, t) => { clouds.userData.drift(dt); for (const [v, , sp] of traffic) { v.position.x -= sp * dt; if (v.position.x < -17) v.position.x = 17; } } };
   },
   // 7. the snowy mountains and pines
   snow(g) {

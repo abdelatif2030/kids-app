@@ -72,6 +72,7 @@ class Game {
     this.worldId = null;
     this.padStyle = PADS.float;
     this._goWorld(0, true);
+    if (/[?&]debug/.test(location.search)) window.__game = this; // test hook (?debug)
     this.fade = h('div', { class: 'lw-fade' });
     sh.root.append(this.fade);
     this.owl = makeActor('owl');
