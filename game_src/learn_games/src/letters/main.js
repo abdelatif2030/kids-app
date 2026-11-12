@@ -12,9 +12,8 @@ import { Stage, M, canvasTex, labelTex } from '../kit/stage3d.js';
 import { makeThing } from '../kit/things3d.js';
 import { addSky, addClouds, scatter } from '../kit/realism.js';
 import { buildWorld, WORLD_IDS, WORLD_NAMES, PADS } from '../kit/worlds3d.js';
-import { makeOwl } from '../kit/owl.js';
+import { makeActor, setArtBase } from '../kit/actors.js';
 import { makePerson } from '../kit/people.js';
-import { makeKid, HAIR_COLORS, CLOTH_COLORS } from '../kit/kids.js';
 import { shapeGeo } from '../kit/shapes3d.js';
 import { colorById } from '../shapes/sim.js';
 import { NUMBERS } from '../kit/words.js';
@@ -62,6 +61,7 @@ class Game {
   constructor(el, cfg, post) {
     this.sh = new Shell(el, cfg, post, { text: TEXT, theme: THEME_WORLD });
     const sh = this.sh;
+    setArtBase(`${sh.base}../art/`);
     this.girl = sh.T.girl;
     this.st = new Stage(sh, { bg: 0xcfeeff, ground: 0x9ad0a0, fov: 40, box: [7.2, 3.9], dir: [0, 0.5, 1], target: [0, 1.0, 0.8] });
     this.opts = new Map();
@@ -73,9 +73,9 @@ class Game {
     this._goWorld(0, true);
     this.fade = h('div', { class: 'lw-fade' });
     sh.root.append(this.fade);
-    this.owl = makeOwl();
-    this.owl.position.set(-6.3, 0, 3.3);
-    this.owl.scale.setScalar(0.85);
+    this.owl = makeActor('owl');
+    this.owl.position.set(-6.1, 0, 3.4);
+    this.owl.scale.setScalar(0.8);
     this.owl.rotation.y = 0.25;
     this.st.add(this.owl);
     this.persons = { mama: makePerson('mama'), baba: makePerson('baba') };
@@ -317,10 +317,9 @@ class Game {
 
   _makeHero(kind, look) {
     if (this.hero) this.st.scene.remove(this.hero);
-    const k = makeKid(kind);
-    if (look) k.setLook(look);
-    k.position.set(-4.5, 0, 3.4);
-    k.scale.setScalar(0.95);
+    const k = makeActor(kind);
+    k.position.set(-3.9, 0, 3.4);
+    k.scale.setScalar(0.9);
     k.rotation.y = 0.2;
     this.st.add(k);
     this.hero = k;
@@ -337,14 +336,13 @@ class Game {
     sh.sound.setMode('menu');
     sh.layer.append(h('div', { class: 'lk-top' }, sh.backBtn(), h('span'), sh.soundBtn()));
     if (this.hero) { this.st.scene.remove(this.hero); this.hero = null; }
-    const pre = { boy: makeKid('boy'), girl: makeKid('girl') };
+    const pre = { boy: makeActor('boy'), girl: makeActor('girl') };
     pre.boy.position.set(-2.1, 0, 2.2);
     pre.girl.position.set(2.1, 0, 2.2);
-    for (const k of Object.values(pre)) { k.scale.setScalar(1.15); this.st.add(k); k.act('wave'); }
+    for (const k of Object.values(pre)) { k.scale.setScalar(1.25); this.st.add(k); k.act('wave'); }
     this.previews = pre;
-    let look = { hair: HAIR_COLORS[0], cloth: null };
+    const look = {};
     let chosen = null;
-    const swatch = (hex, on) => h('button', { class: 'lw-sw', style: `background:#${hex.toString(16).padStart(6, '0')}`, 'aria-label': 'color', onclick: () => on(hex) });
     const panel = h('div', { class: 'lw-hero' });
     const pick = (kind) => {
       chosen = kind;
@@ -357,11 +355,7 @@ class Game {
       const other = kind === 'boy' ? 'girl' : 'boy';
       this.st.scene.remove(pre[other]);
       pre[kind].position.set(0, 0, 2.2);
-      look = { hair: kind === 'girl' ? 0x6a3a22 : HAIR_COLORS[0], cloth: CLOTH_COLORS[kind][0] };
-      pre[kind].setLook(look);
       panel.replaceChildren(
-        h('div', { class: 'lw-row' }, HAIR_COLORS.map((c) => swatch(c, (hex) => { look.hair = hex; pre[kind].setLook({ hair: hex }); pre[kind].act('wave'); sh.sound.play('tap'); }))),
-        h('div', { class: 'lw-row' }, CLOTH_COLORS[kind].map((c) => swatch(c, (hex) => { look.cloth = hex; pre[kind].setLook({ cloth: hex }); pre[kind].act('clap'); sh.sound.play('tap'); }))),
         h('button', { class: 'lk-btn', onclick: () => {
           sh.sound.play('win');
           this.save.lw.hero = chosen;
@@ -387,6 +381,7 @@ class Game {
     this._clearRound();
     sh.clear();
     this.st.mode = 'menu';
+    sh.sound.setSuspense(false);
     sh.sound.setMode('menu');
     sh.sound.energy = 0;
     sh.layer.append(h('div', { class: 'lk-top' }, sh.backBtn(), h('span'), sh.soundBtn()));
@@ -451,6 +446,7 @@ class Game {
     void this.sign.offsetWidth;
     this.sign.classList.add('pop');
     this.st.mode = 'wait';
+    this.sh.sound.setSuspense(true);
     this.owl.look(0);
     this._say();
   }
@@ -481,6 +477,7 @@ class Game {
     }
     if (ev.first) this.sh.round(this.level.skill, true, r.answer);
     this.st.mode = 'found';
+    this.sh.sound.setSuspense(false);
     this.st.setPicks([], null);
     const done = this.play.round;
     this.lightDots(done);
@@ -488,6 +485,8 @@ class Game {
     this.sh.sound.play('splash');
     this.sh.sound.play('note', PENTA[(done * 2) % PENTA.length]);
     this.sh.sound.play('right');
+    this.sh.sound.play('applause');
+    setTimeout(() => this.sh.sound.play('yay'), 350);
     this.owl.act(done % 2 ? 'cheer' : 'clap');
     if (this.hero) this.hero.act(done % 2 ? 'celebrate' : 'clap');
     this.owl.look(o.g.position.x);
@@ -532,6 +531,7 @@ class Game {
   _levelDone() {
     const sh = this.sh;
     this.st.mode = 'end';
+    this.sh.sound.setSuspense(false);
     this.sign.remove();
     const list = levelsFor(sh.age);
     const idx = list.findIndex((l) => l.id === this.levelId);

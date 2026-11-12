@@ -93,9 +93,8 @@ flutter:
     - assets/games/choice_scene.webp
     - assets/games/fun_games_scene.webp
     - assets/games/fun_games_more.webp
-    - assets/games/learn_top.webp
-    - assets/games/learn_bottom.webp
-    - assets/games/learn_cards/
+    - assets/games/learn_page.webp
+    - assets/games/art/
     - assets/games/game_bg.webp
     - assets/games/carnival_race/
     - assets/games/jungle_adventure/

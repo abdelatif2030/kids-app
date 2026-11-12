@@ -4,6 +4,7 @@
 import * as THREE from 'three';
 import { makeItem } from './toys3d.js';
 import { shapeGeo } from './shapes3d.js';
+import { artThing } from './actors.js';
 
 const m = (c, r = 0.55) => new THREE.MeshStandardMaterial({ color: c, roughness: r });
 const sph = (r, mat, x = 0, y = 0, z = 0, sx = 1, sy = 1, sz = 1) => { const o = new THREE.Mesh(new THREE.SphereGeometry(r, 18, 14), mat); o.position.set(x, y, z); o.scale.set(sx, sy, sz); o.castShadow = true; return o; };
@@ -351,6 +352,8 @@ const BUILD = {
 
 /** A fresh model of [id]: one of the extra things above, else a toy from toys3d. */
 export function makeThing(id) {
+  const art = artThing(id); // the owner's reference art where the sheets have it
+  if (art) return art;
   if (!BUILD[id]) return makeItem(id);
   const outer = new THREE.Group();
   const inner = new THREE.Group();
