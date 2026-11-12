@@ -1,17 +1,17 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
-$__dart_deferred_initializers__.current=function(a,b,c,$){var J,B,D,A={aiv:function aiv(d,e){this.a=d
+$__dart_deferred_initializers__.current=function(a,b,c,$){var J,B,D,A={ahd:function ahd(d,e){this.a=d
 this.b=e},
-cmJ(d){var x,w,v,u,t,s,r=B.ap(d.h(0,"i")),q=B.ap(d.h(0,"f")),p=B.ap(d.h(0,"c")),o=B.ah(d.h(0,"n"))
+chR(d){var x,w,v,u,t,s,r=B.ao(d.h(0,"i")),q=B.ao(d.h(0,"f")),p=B.ao(d.h(0,"c")),o=B.ah(d.h(0,"n"))
 if(o==null)o=""
-x=B.ap(d.h(0,"r"))
-w=J.o(d.h(0,"s"),"c")?C.a0E:C.bF4
-v=B.ap(d.h(0,"k"))
-u=B.ap(d.h(0,"b"))
-t=B.b2(d.h(0,"t"))
-s=B.c2(d.h(0,"a"))
+x=B.ao(d.h(0,"r"))
+w=J.n(d.h(0,"s"),"c")?C.a_z:C.bzz
+v=B.ao(d.h(0,"k"))
+u=B.ao(d.h(0,"b"))
+t=B.aZ(d.h(0,"t"))
+s=B.bZ(d.h(0,"a"))
 if(s==null)s=0
-return new A.t1(r,q,p,o,x,w,v,u,t,s,B.ah(d.h(0,"x")))},
-t1:function t1(d,e,f,g,h,i,j,k,l,m,n){var _=this
+return new A.rB(r,q,p,o,x,w,v,u,t,s,B.ah(d.h(0,"x")))},
+rB:function rB(d,e,f,g,h,i,j,k,l,m,n){var _=this
 _.a=d
 _.b=e
 _.c=f
@@ -23,81 +23,81 @@ _.w=k
 _.x=l
 _.y=m
 _.z=n},
-abD:function abD(d){var _=this
+aan:function aan(d){var _=this
 _.a=null
 _.b=!1
 _.c=0
 _.d=null
 _.B$=0
-_.L$=d
-_.aE$=_.a1$=0},
-aJl:function aJl(d){this.a=d},
-un(d,e,f,g,h){return new A.a9r(d,e,f,g)},
-HE:function HE(d,e){this.a=d
+_.K$=d
+_.aD$=_.a1$=0},
+aHM:function aHM(d){this.a=d},
+tW(d,e,f,g,h){return new A.a8a(d,e,f,g)},
+GU:function GU(d,e){this.a=d
 this.b=e},
-a9r:function a9r(d,e,f,g){var _=this
+a8a:function a8a(d,e,f,g){var _=this
 _.a=d
 _.b=e
 _.c=f
 _.d=g},
-bOW:function bOW(){},
-bOX:function bOX(){},
-bOY:function bOY(){},
-bP7:function bP7(){},
-bP8:function bP8(){},
-bP9:function bP9(){},
-bPa:function bPa(){},
-bPb:function bPb(){},
-bPc:function bPc(){},
-bPd:function bPd(){},
-bPe:function bPe(){},
-bOZ:function bOZ(){},
-bP_:function bP_(){},
-bP0:function bP0(){},
-bP1:function bP1(){},
-bP2:function bP2(){},
-bP3:function bP3(){},
-bP4:function bP4(){},
-bP5:function bP5(){},
-bP6:function bP6(){},
-Hg(d,e){var x=null,w=d.ai(y.q).f
-w.jf()
-w.fX(B.he(x,x,x,x,D.C4,D.S,x,B.c(e,x,x,x,x,x,x,x,x,x),x,D.ce,x,x,x,x,x,x,x,x,x,x))},
-aJm(){var x=0,w=B.m(y.y),v,u
-var $async$aJm=B.i(function(d,e){if(d===1)return B.j(e,w)
+bLd:function bLd(){},
+bLe:function bLe(){},
+bLf:function bLf(){},
+bLp:function bLp(){},
+bLq:function bLq(){},
+bLr:function bLr(){},
+bLs:function bLs(){},
+bLt:function bLt(){},
+bLu:function bLu(){},
+bLv:function bLv(){},
+bLw:function bLw(){},
+bLg:function bLg(){},
+bLh:function bLh(){},
+bLi:function bLi(){},
+bLj:function bLj(){},
+bLk:function bLk(){},
+bLl:function bLl(){},
+bLm:function bLm(){},
+bLn:function bLn(){},
+bLo:function bLo(){},
+Gv(d,e){var x=null,w=d.af(y.q).f
+w.jb()
+w.fW(B.h5(x,x,x,x,D.Bi,D.S,x,B.d(e,x,x,x,x,x,x,x,x,x),x,D.c5,x,x,x,x,x,x,x,x,x,x))},
+aHN(){var x=0,w=B.l(y.y),v,u
+var $async$aHN=B.h(function(d,e){if(d===1)return B.i(e,w)
 for(;;)switch(x){case 0:u=B
 x=3
-return B.d(B.aT(),$async$aJm)
-case 3:v=u.lZ(e,"family_prefs")
+return B.c(B.aR(),$async$aHN)
+case 3:v=u.nD(e,"family_prefs")
 x=1
 break
-case 1:return B.k(v,w)}})
-return B.l($async$aJm,w)},
-aJn(){var x=0,w=B.m(y.y),v,u
-var $async$aJn=B.i(function(d,e){if(d===1)return B.j(e,w)
+case 1:return B.j(v,w)}})
+return B.k($async$aHN,w)},
+aHO(){var x=0,w=B.l(y.y),v,u
+var $async$aHO=B.h(function(d,e){if(d===1)return B.i(e,w)
 for(;;)switch(x){case 0:u=B
 x=3
-return B.d(B.aT(),$async$aJn)
-case 3:v=u.lZ(e,"family_seen")
+return B.c(B.aR(),$async$aHO)
+case 3:v=u.nD(e,"family_seen")
 x=1
 break
-case 1:return B.k(v,w)}})
-return B.l($async$aJn,w)}},C
+case 1:return B.j(v,w)}})
+return B.k($async$aHO,w)}},C
 J=c[1]
 B=c[0]
 D=c[2]
 A=a.updateHolder(c[12],A)
 C=c[20]
-A.aiv.prototype={
+A.ahd.prototype={
 H(){return"Side."+this.b}}
-A.t1.prototype={
-cQ(){var x,w=this,v=B.A(y.w,y.b)
+A.rB.prototype={
+cN(){var x,w=this,v=B.B(y.w,y.b)
 v.l(0,"i",w.a)
 v.l(0,"f",w.b)
 v.l(0,"c",w.c)
 v.l(0,"n",w.d)
 v.l(0,"r",w.e)
-v.l(0,"s",w.f===C.a0E?"c":"r")
+v.l(0,"s",w.f===C.a_z?"c":"r")
 v.l(0,"k",w.r)
 v.l(0,"b",w.w)
 v.l(0,"t",w.x)
@@ -105,133 +105,133 @@ v.l(0,"a",w.y)
 x=w.z
 if(x!=null)v.l(0,"x",x)
 return v}}
-A.abD.prototype={
-NW(){var x=0,w=B.m(y.g),v,u=this,t,s
-var $async$NW=B.i(function(d,e){if(d===1)return B.j(e,w)
+A.aan.prototype={
+Nx(){var x=0,w=B.l(y.g),v,u=this,t,s
+var $async$Nx=B.h(function(d,e){if(d===1)return B.i(e,w)
 for(;;)switch(x){case 0:x=3
-return B.d(B.aT(),$async$NW)
+return B.c(B.aR(),$async$Nx)
 case 3:t=e
 s=u.a
 if(s!=null&&t===u.d){v=s
 x=1
 break}u.d=t
-v=u.a=B.u_(t,"family_outbox",A.czk(),y.r)
+v=u.a=B.tz(t,"family_outbox",A.cuf(),y.r)
 x=1
 break
-case 1:return B.k(v,w)}})
-return B.l($async$NW,w)},
-G0(){var x=0,w=B.m(y.v),v=this,u,t,s,r,q
-var $async$G0=B.i(function(d,e){if(d===1)return B.j(e,w)
+case 1:return B.j(v,w)}})
+return B.k($async$Nx,w)},
+FT(){var x=0,w=B.l(y.v),v=this,u,t,s,r,q
+var $async$FT=B.h(function(d,e){if(d===1)return B.i(e,w)
 for(;;)switch(x){case 0:x=2
-return B.d(B.aT(),$async$G0)
+return B.c(B.aR(),$async$FT)
 case 2:s=e
 r=B.a([],y.k)
 q=v.a
-if(q==null)q=C.bi4
+if(q==null)q=C.beO
 u=q.length
 t=0
-for(;t<q.length;q.length===u||(0,B.w)(q),++t)r.push(q[t].cQ())
+for(;t<q.length;q.length===u||(0,B.y)(q),++t)r.push(q[t].cN())
 x=3
-return B.d(s.bI("String","family_outbox",D.ao.d3(r,null)),$async$G0)
+return B.c(s.bF("String","family_outbox",D.an.d4(r,null)),$async$FT)
 case 3:v.a4()
-return B.k(null,w)}})
-return B.l($async$G0,w)},
-JH(d){return this.bhb(d)},
-bhb(d){var x=0,w=B.m(y.v),v=this,u
-var $async$JH=B.i(function(e,f){if(e===1)return B.j(f,w)
+return B.j(null,w)}})
+return B.k($async$FT,w)},
+Jw(d){return this.bfv(d)},
+bfv(d){var x=0,w=B.l(y.v),v=this,u
+var $async$Jw=B.h(function(e,f){if(e===1)return B.i(f,w)
 for(;;)switch(x){case 0:u=J
 x=2
-return B.d(v.NW(),$async$JH)
-case 2:u.c2_(f,new A.aJl(d))
+return B.c(v.Nx(),$async$Jw)
+case 2:u.bYk(f,new A.aHM(d))
 x=3
-return B.d(v.G0(),$async$JH)
-case 3:return B.k(null,w)}})
-return B.l($async$JH,w)}}
-A.HE.prototype={
+return B.c(v.FT(),$async$Jw)
+case 3:return B.j(null,w)}})
+return B.k($async$Jw,w)}}
+A.GU.prototype={
 H(){return"Availability."+this.b}}
-A.a9r.prototype={}
-var z=a.updateTypes(["E(t1)","t1(aB<n,@>)"])
-A.aJl.prototype={
+A.a8a.prototype={}
+var z=a.updateTypes(["G(rB)","rB(aA<o,@>)"])
+A.aHM.prototype={
 $1(d){return d.c===this.a},
 $S:z+0}
-A.bOW.prototype={
-$0(){return $.h().a==="ar"?"\u0627\u0644\u0623\u0644\u0639\u0627\u0628 \u0627\u0644\u062a\u0639\u0644\u064a\u0645\u064a\u0629":"Learning games"},
+A.bLd.prototype={
+$0(){return $.m().a==="ar"?"\u0627\u0644\u0623\u0644\u0639\u0627\u0628 \u0627\u0644\u062a\u0639\u0644\u064a\u0645\u064a\u0629":"Learning games"},
 $S:1}
-A.bOX.prototype={
-$0(){return $.h().a==="ar"?"\u062a\u0639\u0645\u0644 \u0628\u0644\u0627 \u0625\u0646\u062a\u0631\u0646\u062a: \u0643\u0644 \u0627\u0644\u0645\u062d\u062a\u0648\u0649 \u0648\u0627\u0644\u0635\u0648\u0631 \u062f\u0627\u062e\u0644 \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0648\u0627\u0644\u0646\u062a\u0627\u0626\u062c \u062a\u064f\u062d\u0641\u0638 \u0639\u0644\u0649 \u0627\u0644\u062c\u0647\u0627\u0632.":"Work without internet: all content and pictures are in the app and results are saved on the device."},
+A.bLe.prototype={
+$0(){return $.m().a==="ar"?"\u062a\u0639\u0645\u0644 \u0628\u0644\u0627 \u0625\u0646\u062a\u0631\u0646\u062a: \u0643\u0644 \u0627\u0644\u0645\u062d\u062a\u0648\u0649 \u0648\u0627\u0644\u0635\u0648\u0631 \u062f\u0627\u062e\u0644 \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0648\u0627\u0644\u0646\u062a\u0627\u0626\u062c \u062a\u064f\u062d\u0641\u0638 \u0639\u0644\u0649 \u0627\u0644\u062c\u0647\u0627\u0632.":"Work without internet: all content and pictures are in the app and results are saved on the device."},
 $S:1}
-A.bOY.prototype={
-$0(){return $.h().a==="ar"?"\u0627\u0644\u062d\u0631\u0648\u0641 \u0648\u0627\u0644\u0643\u0644\u0645\u0627\u062a":"Letters and words"},
+A.bLf.prototype={
+$0(){return $.m().a==="ar"?"\u0627\u0644\u062d\u0631\u0648\u0641 \u0648\u0627\u0644\u0643\u0644\u0645\u0627\u062a":"Letters and words"},
 $S:1}
-A.bP7.prototype={
-$0(){return $.h().a==="ar"?"\u0627\u0644\u062f\u0631\u0648\u0633 \u0648\u0627\u0644\u0635\u0648\u0631 \u062a\u0639\u0645\u0644 \u0628\u0644\u0627 \u0625\u0646\u062a\u0631\u0646\u062a. \u0627\u0644\u0635\u0648\u062a \u064a\u0623\u062a\u064a \u0645\u0646 \u0635\u0648\u062a \u0627\u0644\u062c\u0647\u0627\u0632 \u0648\u0642\u062f \u0644\u0627 \u064a\u0639\u0645\u0644 \u0628\u0644\u0627 \u0625\u0646\u062a\u0631\u0646\u062a \u0625\u0646 \u0644\u0645 \u064a\u0643\u0646 \u0635\u0648\u062a \u0627\u0644\u0644\u063a\u0629 \u0645\u062b\u0628\u062a\u0627\u064b \u0639\u0644\u0649 \u0627\u0644\u0647\u0627\u062a\u0641.":"Lessons and pictures work offline. Sound comes from the device voice, which may need the language voice installed on the phone."},
+A.bLp.prototype={
+$0(){return $.m().a==="ar"?"\u0627\u0644\u062f\u0631\u0648\u0633 \u0648\u0627\u0644\u0635\u0648\u0631 \u062a\u0639\u0645\u0644 \u0628\u0644\u0627 \u0625\u0646\u062a\u0631\u0646\u062a. \u0627\u0644\u0635\u0648\u062a \u064a\u0623\u062a\u064a \u0645\u0646 \u0635\u0648\u062a \u0627\u0644\u062c\u0647\u0627\u0632 \u0648\u0642\u062f \u0644\u0627 \u064a\u0639\u0645\u0644 \u0628\u0644\u0627 \u0625\u0646\u062a\u0631\u0646\u062a \u0625\u0646 \u0644\u0645 \u064a\u0643\u0646 \u0635\u0648\u062a \u0627\u0644\u0644\u063a\u0629 \u0645\u062b\u0628\u062a\u0627\u064b \u0639\u0644\u0649 \u0627\u0644\u0647\u0627\u062a\u0641.":"Lessons and pictures work offline. Sound comes from the device voice, which may need the language voice installed on the phone."},
 $S:1}
-A.bP8.prototype={
-$0(){return $.h().a==="ar"?"\u0627\u0644\u0642\u0635\u0635":"Stories"},
+A.bLq.prototype={
+$0(){return $.m().a==="ar"?"\u0627\u0644\u0642\u0635\u0635":"Stories"},
 $S:1}
-A.bP9.prototype={
-$0(){return $.h().a==="ar"?"\u0627\u0644\u0642\u0635\u0635 \u0645\u0643\u062a\u0648\u0628\u0629 \u062f\u0627\u062e\u0644 \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0648\u062a\u064f\u0642\u0631\u0623 \u0628\u0635\u0648\u062a \u0627\u0644\u062c\u0647\u0627\u0632\u061b \u0623\u0635\u0648\u0627\u062a \u0627\u0644\u0637\u0628\u064a\u0639\u0629 \u062f\u0627\u062e\u0644 \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0623\u064a\u0636\u0627\u064b.":"Stories are inside the app and read by the device voice; the nature sounds are bundled too."},
+A.bLr.prototype={
+$0(){return $.m().a==="ar"?"\u0627\u0644\u0642\u0635\u0635 \u0645\u0643\u062a\u0648\u0628\u0629 \u062f\u0627\u062e\u0644 \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0648\u062a\u064f\u0642\u0631\u0623 \u0628\u0635\u0648\u062a \u0627\u0644\u062c\u0647\u0627\u0632\u061b \u0623\u0635\u0648\u0627\u062a \u0627\u0644\u0637\u0628\u064a\u0639\u0629 \u062f\u0627\u062e\u0644 \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0623\u064a\u0636\u0627\u064b.":"Stories are inside the app and read by the device voice; the nature sounds are bundled too."},
 $S:1}
-A.bPa.prototype={
-$0(){return $.h().a==="ar"?"\u0627\u0633\u062a\u0648\u062f\u064a\u0648 \u0627\u0644\u0625\u0628\u062f\u0627\u0639 \u0648\u0627\u0644\u0645\u0639\u0631\u0636":"Creative studio and gallery"},
+A.bLs.prototype={
+$0(){return $.m().a==="ar"?"\u0627\u0633\u062a\u0648\u062f\u064a\u0648 \u0627\u0644\u0625\u0628\u062f\u0627\u0639 \u0648\u0627\u0644\u0645\u0639\u0631\u0636":"Creative studio and gallery"},
 $S:1}
-A.bPb.prototype={
-$0(){return $.h().a==="ar"?"\u0627\u0644\u0631\u0633\u0645 \u0648\u0628\u0646\u0627\u0621 \u0627\u0644\u0643\u0644\u0645\u0627\u062a \u0648\u0627\u0644\u0642\u0635\u0635 \u0628\u0627\u0644\u0635\u0648\u0631 \u062a\u064f\u062d\u0641\u0638 \u0639\u0644\u0649 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632 \u0641\u0642\u0637.":"Drawing, word building and picture stories are saved on this device only."},
+A.bLt.prototype={
+$0(){return $.m().a==="ar"?"\u0627\u0644\u0631\u0633\u0645 \u0648\u0628\u0646\u0627\u0621 \u0627\u0644\u0643\u0644\u0645\u0627\u062a \u0648\u0627\u0644\u0642\u0635\u0635 \u0628\u0627\u0644\u0635\u0648\u0631 \u062a\u064f\u062d\u0641\u0638 \u0639\u0644\u0649 \u0647\u0630\u0627 \u0627\u0644\u062c\u0647\u0627\u0632 \u0641\u0642\u0637.":"Drawing, word building and picture stories are saved on this device only."},
 $S:1}
-A.bPc.prototype={
-$0(){return $.h().a==="ar"?"\u0644\u0648\u062d\u0629 \u0627\u0644\u0623\u0647\u0644 \u0648\u0627\u0644\u062a\u0642\u0627\u0631\u064a\u0631":"Parent area and reports"},
+A.bLu.prototype={
+$0(){return $.m().a==="ar"?"\u0644\u0648\u062d\u0629 \u0627\u0644\u0623\u0647\u0644 \u0648\u0627\u0644\u062a\u0642\u0627\u0631\u064a\u0631":"Parent area and reports"},
 $S:1}
-A.bPd.prototype={
-$0(){return $.h().a==="ar"?"\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0648\u0627\u0644\u062a\u0642\u0627\u0631\u064a\u0631 \u0648\u0627\u0644\u0623\u0648\u0631\u0627\u0642 \u0627\u0644\u0642\u0627\u0628\u0644\u0629 \u0644\u0644\u0637\u0628\u0627\u0639\u0629 \u062a\u0639\u0645\u0644 \u0628\u0644\u0627 \u0625\u0646\u062a\u0631\u0646\u062a (\u0627\u0644\u0637\u0628\u0627\u0639\u0629 \u0646\u0641\u0633\u0647\u0627 \u062a\u0639\u062a\u0645\u062f \u0639\u0644\u0649 \u062c\u0647\u0627\u0632\u0643).":"Settings, reports and printables work offline (printing itself depends on your device)."},
+A.bLv.prototype={
+$0(){return $.m().a==="ar"?"\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0648\u0627\u0644\u062a\u0642\u0627\u0631\u064a\u0631 \u0648\u0627\u0644\u0623\u0648\u0631\u0627\u0642 \u0627\u0644\u0642\u0627\u0628\u0644\u0629 \u0644\u0644\u0637\u0628\u0627\u0639\u0629 \u062a\u0639\u0645\u0644 \u0628\u0644\u0627 \u0625\u0646\u062a\u0631\u0646\u062a (\u0627\u0644\u0637\u0628\u0627\u0639\u0629 \u0646\u0641\u0633\u0647\u0627 \u062a\u0639\u062a\u0645\u062f \u0639\u0644\u0649 \u062c\u0647\u0627\u0632\u0643).":"Settings, reports and printables work offline (printing itself depends on your device)."},
 $S:1}
-A.bPe.prototype={
-$0(){return $.h().a==="ar"?"\u0627\u0644\u0641\u064a\u062f\u064a\u0648\u0647\u0627\u062a":"Videos"},
+A.bLw.prototype={
+$0(){return $.m().a==="ar"?"\u0627\u0644\u0641\u064a\u062f\u064a\u0648\u0647\u0627\u062a":"Videos"},
 $S:1}
-A.bOZ.prototype={
-$0(){return $.h().a==="ar"?"\u0627\u0644\u0641\u064a\u062f\u064a\u0648\u0647\u0627\u062a \u0648\u0627\u0644\u0635\u0648\u0631 \u0627\u0644\u0645\u0635\u063a\u0651\u0631\u0629 \u062a\u0623\u062a\u064a \u0645\u0646 \u064a\u0648\u062a\u064a\u0648\u0628 \u0648\u062a\u062d\u062a\u0627\u062c \u0625\u0646\u062a\u0631\u0646\u062a.":"Videos and thumbnails come from YouTube and need internet."},
+A.bLg.prototype={
+$0(){return $.m().a==="ar"?"\u0627\u0644\u0641\u064a\u062f\u064a\u0648\u0647\u0627\u062a \u0648\u0627\u0644\u0635\u0648\u0631 \u0627\u0644\u0645\u0635\u063a\u0651\u0631\u0629 \u062a\u0623\u062a\u064a \u0645\u0646 \u064a\u0648\u062a\u064a\u0648\u0628 \u0648\u062a\u062d\u062a\u0627\u062c \u0625\u0646\u062a\u0631\u0646\u062a.":"Videos and thumbnails come from YouTube and need internet."},
 $S:1}
-A.bP_.prototype={
-$0(){return $.h().a==="ar"?"\u0645\u062d\u0627\u062f\u062b\u0629 \u0627\u0644\u0639\u0627\u0626\u0644\u0629":"Family chat"},
+A.bLh.prototype={
+$0(){return $.m().a==="ar"?"\u0645\u062d\u0627\u062f\u062b\u0629 \u0627\u0644\u0639\u0627\u0626\u0644\u0629":"Family chat"},
 $S:1}
-A.bP0.prototype={
-$0(){return $.h().a==="ar"?"\u0627\u0644\u0631\u0633\u0627\u0626\u0644 \u0648\u0627\u0644\u0631\u0633\u0627\u0626\u0644 \u0627\u0644\u0635\u0648\u062a\u064a\u0629 \u062a\u062d\u062a\u0627\u062c \u0625\u0646\u062a\u0631\u0646\u062a. \u0644\u0645 \u0646\u062a\u062d\u0642\u0642 \u0645\u0645\u0627 \u064a\u062d\u062f\u062b \u0644\u0631\u0633\u0627\u0644\u0629 \u0623\u064f\u0631\u0633\u0644\u062a \u062f\u0648\u0646 \u0627\u062a\u0635\u0627\u0644\u060c \u0641\u062a\u0623\u0643\u062f \u0623\u0646\u0647\u0627 \u0638\u0647\u0631\u062a \u0642\u0628\u0644 \u0627\u0644\u0627\u0639\u062a\u0645\u0627\u062f \u0639\u0644\u064a\u0647\u0627.":"Messages and voice messages need internet. We have not verified what happens to a message sent while offline, so check that it appears before relying on it."},
+A.bLi.prototype={
+$0(){return $.m().a==="ar"?"\u0627\u0644\u0631\u0633\u0627\u0626\u0644 \u0648\u0627\u0644\u0631\u0633\u0627\u0626\u0644 \u0627\u0644\u0635\u0648\u062a\u064a\u0629 \u062a\u062d\u062a\u0627\u062c \u0625\u0646\u062a\u0631\u0646\u062a. \u0644\u0645 \u0646\u062a\u062d\u0642\u0642 \u0645\u0645\u0627 \u064a\u062d\u062f\u062b \u0644\u0631\u0633\u0627\u0644\u0629 \u0623\u064f\u0631\u0633\u0644\u062a \u062f\u0648\u0646 \u0627\u062a\u0635\u0627\u0644\u060c \u0641\u062a\u0623\u0643\u062f \u0623\u0646\u0647\u0627 \u0638\u0647\u0631\u062a \u0642\u0628\u0644 \u0627\u0644\u0627\u0639\u062a\u0645\u0627\u062f \u0639\u0644\u064a\u0647\u0627.":"Messages and voice messages need internet. We have not verified what happens to a message sent while offline, so check that it appears before relying on it."},
 $S:1}
-A.bP1.prototype={
-$0(){return $.h().a==="ar"?"\u0645\u0643\u0627\u0644\u0645\u0627\u062a \u0627\u0644\u0635\u0648\u062a \u0648\u0627\u0644\u0641\u064a\u062f\u064a\u0648":"Voice and video calls"},
+A.bLj.prototype={
+$0(){return $.m().a==="ar"?"\u0645\u0643\u0627\u0644\u0645\u0627\u062a \u0627\u0644\u0635\u0648\u062a \u0648\u0627\u0644\u0641\u064a\u062f\u064a\u0648":"Voice and video calls"},
 $S:1}
-A.bP2.prototype={
-$0(){return $.h().a==="ar"?"\u0627\u0644\u0645\u0643\u0627\u0644\u0645\u0627\u062a \u062a\u062d\u062a\u0627\u062c \u0625\u0646\u062a\u0631\u0646\u062a \u0639\u0646\u062f \u0627\u0644\u0637\u0631\u0641\u064a\u0646. \u0628\u062f\u0648\u0646 \u0627\u062a\u0635\u0627\u0644 \u0644\u0646 \u062a\u0628\u062f\u0623 \u0645\u0643\u0627\u0644\u0645\u0629.":"Calls need internet on both sides. Without a connection a call will not start."},
+A.bLk.prototype={
+$0(){return $.m().a==="ar"?"\u0627\u0644\u0645\u0643\u0627\u0644\u0645\u0627\u062a \u062a\u062d\u062a\u0627\u062c \u0625\u0646\u062a\u0631\u0646\u062a \u0639\u0646\u062f \u0627\u0644\u0637\u0631\u0641\u064a\u0646. \u0628\u062f\u0648\u0646 \u0627\u062a\u0635\u0627\u0644 \u0644\u0646 \u062a\u0628\u062f\u0623 \u0645\u0643\u0627\u0644\u0645\u0629.":"Calls need internet on both sides. Without a connection a call will not start."},
 $S:1}
-A.bP3.prototype={
-$0(){return $.h().a==="ar"?"\u0627\u0644\u0645\u0639\u0644\u0645\u0648\u0646 \u0648\u0627\u0644\u062d\u062c\u0648\u0632\u0627\u062a":"Teachers and bookings"},
+A.bLl.prototype={
+$0(){return $.m().a==="ar"?"\u0627\u0644\u0645\u0639\u0644\u0645\u0648\u0646 \u0648\u0627\u0644\u062d\u062c\u0648\u0632\u0627\u062a":"Teachers and bookings"},
 $S:1}
-A.bP4.prototype={
-$0(){return $.h().a==="ar"?"\u062a\u062d\u062a\u0627\u062c \u0625\u0646\u062a\u0631\u0646\u062a \u0648\u062d\u0633\u0627\u0628\u0627\u064b.":"Needs internet and an account."},
+A.bLm.prototype={
+$0(){return $.m().a==="ar"?"\u062a\u062d\u062a\u0627\u062c \u0625\u0646\u062a\u0631\u0646\u062a \u0648\u062d\u0633\u0627\u0628\u0627\u064b.":"Needs internet and an account."},
 $S:1}
-A.bP5.prototype={
-$0(){return $.h().a==="ar"?"\u0627\u0644\u0646\u0633\u062e\u0629 \u0639\u0644\u0649 \u0627\u0644\u0645\u062a\u0635\u0641\u062d \u062f\u0648\u0646 \u0627\u062a\u0635\u0627\u0644":"Web version without a connection"},
+A.bLn.prototype={
+$0(){return $.m().a==="ar"?"\u0627\u0644\u0646\u0633\u062e\u0629 \u0639\u0644\u0649 \u0627\u0644\u0645\u062a\u0635\u0641\u062d \u062f\u0648\u0646 \u0627\u062a\u0635\u0627\u0644":"Web version without a connection"},
 $S:1}
-A.bP6.prototype={
-$0(){return $.h().a==="ar"?"\u0644\u0645 \u0646\u062a\u062d\u0642\u0642 \u0645\u0646 \u0639\u0645\u0644 \u0635\u0641\u062d\u0629 \u0627\u0644\u0648\u064a\u0628 \u062f\u0648\u0646 \u0627\u062a\u0635\u0627\u0644 \u0628\u0639\u062f \u062a\u062d\u0645\u064a\u0644\u0647\u0627.":"We have not verified that the web page works offline after loading."},
+A.bLo.prototype={
+$0(){return $.m().a==="ar"?"\u0644\u0645 \u0646\u062a\u062d\u0642\u0642 \u0645\u0646 \u0639\u0645\u0644 \u0635\u0641\u062d\u0629 \u0627\u0644\u0648\u064a\u0628 \u062f\u0648\u0646 \u0627\u062a\u0635\u0627\u0644 \u0628\u0639\u062f \u062a\u062d\u0645\u064a\u0644\u0647\u0627.":"We have not verified that the web page works offline after loading."},
 $S:1};(function installTearOffs(){var x=a._static_1
-x(A,"czk","cmJ",1)})();(function inheritance(){var x=a.inheritMany,w=a.inherit
-x(B.tP,[A.aiv,A.HE])
-x(B.T,[A.t1,A.a9r])
-w(A.abD,B.kf)
-w(A.aJl,B.jI)
-x(B.n6,[A.bOW,A.bOX,A.bOY,A.bP7,A.bP8,A.bP9,A.bPa,A.bPb,A.bPc,A.bPd,A.bPe,A.bOZ,A.bP_,A.bP0,A.bP1,A.bP2,A.bP3,A.bP4,A.bP5,A.bP6])})()
-B.qN(b.typeUniverse,JSON.parse('{"abD":{"aq":[]}}'))
-var y={k:B.a4("x<aB<n,@>>"),g:B.a4("H<t1>"),y:B.a4("aB<n,@>"),r:B.a4("t1"),w:B.a4("n"),q:B.a4("wG"),b:B.a4("@"),v:B.a4("~")};(function constants(){var x=a.makeConstList
-C.w8=new A.HE(0,"offline")
-C.E_=new A.HE(1,"partial")
-C.oU=new A.HE(2,"online")
-C.a6J=new A.HE(3,"unverified")
-C.aky=new B.ae(16,12,16,12)
-C.anA=new B.ac(983339,"MaterialIcons",!1)
-C.bi4=x([],B.a4("x<t1>"))
-C.a0E=new A.aiv(0,"child")
-C.bF4=new A.aiv(1,"relative")
-C.ou=new B.C(!0,null,null,null,null,null,null,D.c_,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)})();(function lazyInitializers(){var x=a.lazyFinal
-x($,"cCn","cdh",()=>new A.abD($.af()))
-x($,"cI8","cgo",()=>B.a([A.un("games",new A.bOW(),C.w8,new A.bOX(),"lib/games, lib/color_game.dart, lib/math_game.dart: no network calls; progress in shared_preferences"),A.un("letters",new A.bOY(),C.E_,new A.bP7(),"lib/literacy, lib/library/vocab.dart; audio via flutter_tts (offline availability depends on installed voices: not verified on a device)"),A.un("stories",new A.bP8(),C.E_,new A.bP9(),"lib/stories/story_data.dart; assets/audio/*.mp3 bundled; no story uses remote media"),A.un("studio",new A.bPa(),C.w8,new A.bPb(),"lib/studio: FamilyGallery in shared_preferences"),A.un("parent",new A.bPc(),C.w8,new A.bPd(),"lib/parent_screens.dart, dashboard_screen.dart, lib/print; local data only"),A.un("videos",new A.bPe(),C.oU,new A.bOZ(),"lib/player_screen.dart (YouTube IFrame), lib/main.dart img.youtube.com thumbnails"),A.un("chat",new A.bP_(),C.oU,new A.bP0(),"lib/family/firebase_family_repository.dart (Firestore)"),A.un("calls",new A.bP1(),C.oU,new A.bP2(),"lib/family/call_*: WebRTC + Firestore signalling"),A.un("teachers",new A.bP3(),C.oU,new A.bP4(),"lib/teachers_*, firebase_repository.dart"),A.un("web",new A.bP5(),C.a6J,new A.bP6(),"No service worker offline test performed")],B.a4("x<a9r>")))})()};
-(a=>{a["HXODuK5B2EfkWt7VYhOHUU8DHQw="]=a.current})($__dart_deferred_initializers__);
+x(A,"cuf","chR",1)})();(function inheritance(){var x=a.inheritMany,w=a.inherit
+x(B.to,[A.ahd,A.GU])
+x(B.R,[A.rB,A.a8a])
+w(A.aan,B.k_)
+w(A.aHM,B.ju)
+x(B.mO,[A.bLd,A.bLe,A.bLf,A.bLp,A.bLq,A.bLr,A.bLs,A.bLt,A.bLu,A.bLv,A.bLw,A.bLg,A.bLh,A.bLi,A.bLj,A.bLk,A.bLl,A.bLm,A.bLn,A.bLo])})()
+B.qr(b.typeUniverse,JSON.parse('{"aan":{"aq":[]}}'))
+var y={k:B.a1("x<aA<o,@>>"),g:B.a1("H<rB>"),y:B.a1("aA<o,@>"),r:B.a1("rB"),w:B.a1("o"),q:B.a1("wd"),b:B.a1("@"),v:B.a1("~")};(function constants(){var x=a.makeConstList
+C.vA=new A.GU(0,"offline")
+C.Df=new A.GU(1,"partial")
+C.ov=new A.GU(2,"online")
+C.a5_=new A.GU(3,"unverified")
+C.ai8=new B.ab(16,12,16,12)
+C.ala=new B.af(983339,"MaterialIcons",!1)
+C.beO=x([],B.a1("x<rB>"))
+C.a_z=new A.ahd(0,"child")
+C.bzz=new A.ahd(1,"relative")
+C.o3=new B.C(!0,null,null,null,null,null,null,D.bY,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)})();(function lazyInitializers(){var x=a.lazyFinal
+x($,"cxh","c8r",()=>new A.aan($.ac()))
+x($,"cD1","cby",()=>B.a([A.tW("games",new A.bLd(),C.vA,new A.bLe(),"lib/games, lib/color_game.dart, lib/math_game.dart: no network calls; progress in shared_preferences"),A.tW("letters",new A.bLf(),C.Df,new A.bLp(),"lib/literacy, lib/library/vocab.dart; audio via flutter_tts (offline availability depends on installed voices: not verified on a device)"),A.tW("stories",new A.bLq(),C.Df,new A.bLr(),"lib/stories/story_data.dart; assets/audio/*.mp3 bundled; no story uses remote media"),A.tW("studio",new A.bLs(),C.vA,new A.bLt(),"lib/studio: FamilyGallery in shared_preferences"),A.tW("parent",new A.bLu(),C.vA,new A.bLv(),"lib/parent_screens.dart, dashboard_screen.dart, lib/print; local data only"),A.tW("videos",new A.bLw(),C.ov,new A.bLg(),"lib/player_screen.dart (YouTube IFrame), lib/main.dart img.youtube.com thumbnails"),A.tW("chat",new A.bLh(),C.ov,new A.bLi(),"lib/family/firebase_family_repository.dart (Firestore)"),A.tW("calls",new A.bLj(),C.ov,new A.bLk(),"lib/family/call_*: WebRTC + Firestore signalling"),A.tW("teachers",new A.bLl(),C.ov,new A.bLm(),"lib/teachers_*, firebase_repository.dart"),A.tW("web",new A.bLn(),C.a5_,new A.bLo(),"No service worker offline test performed")],B.a1("x<a8a>")))})()};
+(a=>{a["+9d0XlRVEiEEGlstIqmFLNIlp9k="]=a.current})($__dart_deferred_initializers__);
