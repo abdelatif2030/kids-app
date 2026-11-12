@@ -24,6 +24,9 @@ const TAKES = {
   C: { stability: 0.38, similarity_boost: 0.75, style: 0.15, speed: 0.95 },
 };
 
+// sentences that need more time (a word was swallowed): slower
+const SLOW = new Set(['اتناشر', 'تسعتاشر', 'تلاتاشر', 'دي قلب', 'دي قلب أحمر', 'دي قلب أصفر', 'دي قلب برتقالي']);
+
 async function tts(text, settings) {
   const key = process.env.ELEVENLABS_API_KEY;
   if (!key) throw new Error('Set ELEVENLABS_API_KEY');
@@ -46,7 +49,7 @@ if (cmd === 'make') {
     for (const [k, s] of Object.entries(TAKES)) {
       const f = path.join(work, 'takes', `${id}_${k}.mp3`);
       if (fs.existsSync(f)) continue;
-      fs.writeFileSync(f, await tts(TASH[text] || text, s)); n++;
+      fs.writeFileSync(f, await tts(TASH[text] || text, SLOW.has(text) ? { ...s, speed: 0.82 } : s)); n++;
       await new Promise((r) => setTimeout(r, 120));
     }
     console.log(`${id}  ${text}`);
