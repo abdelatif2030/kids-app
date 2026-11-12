@@ -112,5 +112,18 @@
   "px": 339,
   "loopSec": 3,
   "ground": 379
+ },
+ "girl_walk": {
+  "file": "girl_walk.webp",
+  "frames": 14,
+  "cols": 14,
+  "rows": 1,
+  "w": 252,
+  "h": 372,
+  "fps": 12,
+  "loop": true,
+  "px": 349,
+  "loopSec": 1.1666666666666667,
+  "ground": 368
  }
 }
