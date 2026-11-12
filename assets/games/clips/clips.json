@@ -73,5 +73,31 @@
   "px": 361,
   "loopSec": 2.8333333333333335,
   "ground": 371
+ },
+ "girl_idle": {
+  "file": "girl_idle.webp",
+  "frames": 1,
+  "cols": 1,
+  "rows": 1,
+  "w": 210,
+  "h": 356,
+  "fps": 12,
+  "loop": true,
+  "px": 346,
+  "loopSec": 0.08333333333333333,
+  "ground": 354
+ },
+ "girl_jump": {
+  "file": "girl_jump.webp",
+  "frames": 34,
+  "cols": 6,
+  "rows": 6,
+  "w": 596,
+  "h": 402,
+  "fps": 12,
+  "loop": false,
+  "px": 346,
+  "loopSec": 2.8333333333333335,
+  "ground": 401
  }
 }

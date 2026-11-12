@@ -34,6 +34,35 @@ function keyGreen(buf) {
   }
 }
 
+// --bg auto | RRGGBB: for a background that is NOT pure green (teal, blue...): the background colour is measured from the corners of
+// the first frame (or given) and every pixel is made transparent by how far it is from that colour; the colour left on soft edges
+// is removed (un-mixing). Use --bgnear / --bgfar (distances, default 38 / 95) to tune.
+const BG = opt('bg', '');
+const NEAR = +opt('bgnear', 38), FAR = +opt('bgfar', 95);
+function keyDistance(buf, w, h) {
+  const fsize = w * h * 4, n = Math.floor(buf.length / fsize);
+  let R, G, B;
+  if (BG && BG !== 'auto') { R = parseInt(BG.slice(0, 2), 16); G = parseInt(BG.slice(2, 4), 16); B = parseInt(BG.slice(4, 6), 16); }
+  else { // median of the four corner patches of the first frame
+    const px = []; for (const [cx, cy] of [[2, 2], [w - 12, 2], [2, h - 12], [w - 12, h - 12]]) for (let y = cy; y < cy + 10; y++) for (let x = cx; x < cx + 10; x++) { const i = (y * w + x) * 4; px.push([buf[i], buf[i + 1], buf[i + 2]]); }
+    const med = (k) => px.map((p) => p[k]).sort((a, b) => a - b)[Math.floor(px.length / 2)]; R = med(0); G = med(1); B = med(2);
+    console.log(`background colour measured: ${[R, G, B].map((v) => v.toString(16).padStart(2, '0')).join('')}`);
+  }
+  for (let f = 0; f < n; f++) for (let i = f * fsize; i < (f + 1) * fsize; i += 4) {
+    const dr = buf[i] - R, dg = buf[i + 1] - G, db = buf[i + 2] - B;
+    const d = Math.sqrt(dr * dr + dg * dg + db * db);
+    if (d >= FAR) continue;
+    const t = d <= NEAR ? 0 : (d - NEAR) / (FAR - NEAR);
+    const a = t * t * (3 - 2 * t);
+    if (a <= 0.004) { buf[i + 3] = 0; continue; }
+    buf[i + 3] = Math.round(255 * a);
+    // un-mix the background from the colour of a soft edge pixel
+    buf[i] = Math.max(0, Math.min(255, Math.round((buf[i] - R * (1 - a)) / a)));
+    buf[i + 1] = Math.max(0, Math.min(255, Math.round((buf[i + 1] - G * (1 - a)) / a)));
+    buf[i + 2] = Math.max(0, Math.min(255, Math.round((buf[i + 2] - B * (1 - a)) / a)));
+  }
+}
+
 function frames(height) {
   const probe = spawnSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x', input]);
   const [sw, sh] = String(probe.stdout).trim().split('x').map(Number);
@@ -48,7 +77,7 @@ function frames(height) {
   const r = spawnSync('ffmpeg', ['-v', 'error', '-y', '-ss', String(START), '-t', String(SECS), '-i', input, '-vf', vf, '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'], { maxBuffer: 1 << 30 });
   if (r.status !== 0) { console.error(String(r.stderr)); process.exit(1); }
   const buf = r.stdout; const size = w * h * 4;
-  keyGreen(buf);
+  if (BG) keyDistance(buf, w, h); else keyGreen(buf);
   return { w, h, n: Math.floor(buf.length / size), buf };
 }
 
