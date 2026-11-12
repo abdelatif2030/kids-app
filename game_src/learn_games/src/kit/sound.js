@@ -286,9 +286,10 @@ export class Sound {
       case 'tap':
         this.tone('sine', 880, t, 0.06, 0.05);
         break;
-      case 'step': // a tiny tip-tap; [arg] alternates the foot
-        this.tone('sine', arg ? 1250 : 1100, t, 0.04, 0.035);
-        this.noise(t, 0.03, 0.02, 'highpass', 5000, 1);
+      case 'step': // a clear soft sneaker step (thump + tap); [arg] alternates the foot
+        this.slide('sine', arg ? 210 : 180, 95, t, 0.11, 0.2);
+        this.noise(t, 0.05, 0.12, 'lowpass', 1800, 1);
+        this.tone('triangle', arg ? 900 : 780, t + 0.005, 0.045, 0.07);
         break;
       case 'bump': // a soft rubbery boing (never a buzzer)
         this.slide('sine', 260, 150, t, 0.18, 0.13);

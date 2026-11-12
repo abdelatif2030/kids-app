@@ -13,6 +13,7 @@ import { makeThing } from '../kit/things3d.js';
 import { addSky, addClouds, scatter } from '../kit/realism.js';
 import { buildWorld, WORLD_IDS, WORLD_NAMES, PADS } from '../kit/worlds3d.js';
 import { makeActor, setArtBase } from '../kit/actors.js';
+import { stepSeconds } from '../kit/clips.js';
 import { makePerson } from '../kit/people.js';
 import { shapeGeo } from '../kit/shapes3d.js';
 import { colorById } from '../shapes/sim.js';
@@ -579,13 +580,17 @@ class Game {
     const sky = to.group.children[0];
     if (sky && sky.material) { sky.material.transparent = true; sky.material.opacity = 0; }
     let foot = 0;
-    const steps = setInterval(() => { sh.sound.play('step', foot++ % 2); }, 330);
+    // footsteps follow the walk clip: one step every half stride, the first just after the first foot lands
+    let stepTimer = null;
+    const stepMs = stepSeconds(this.kind) * 1000;
+    const tick = () => { sh.sound.play('step', foot++ % 2); stepTimer = setTimeout(tick, stepMs); };
+    stepTimer = setTimeout(tick, 80);
     hero.act('walk');
     this.owl.act('wave');
     sh.sound.setMode('calm');
     sh.sound.play('whoosh');
     this.scroll = { from, to, sky, t: 0, dur: 4.2, SHIFT, then: () => {
-      clearInterval(steps);
+      clearTimeout(stepTimer);
       from.group.visible = false;
       from.group.position.x = 0;
       to.group.position.x = 0;
@@ -594,7 +599,7 @@ class Game {
       this.worldId = id;
       this.padStyle = PADS[to.pad];
       hero.act('wave');
-      setTimeout(() => this._begin(nextId), 600);
+      setTimeout(() => this._begin(nextId), 1400);
     } };
   }
 

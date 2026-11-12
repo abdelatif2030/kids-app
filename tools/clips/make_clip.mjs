@@ -13,7 +13,7 @@ let OUT = path.join(HERE, '../../assets/games/clips');
 const [, , input, who, name, ...rest] = process.argv;
 if (!input || !who || !name) { console.error('usage: node make_clip.mjs <video> <boy|girl|owl> <jump|laugh|clap|wave|walk|idle> [--key 00ff00] [--sim 0.30] [--fps 12] [--secs 4] [--start 0] [--height 720]'); process.exit(1); }
 const opt = (k, d) => { const i = rest.indexOf('--' + k); return i >= 0 ? rest[i + 1] : d; };
-const KEY = opt('key', '00ff00'), SIM = opt('sim', '0.30'), FPS = +opt('fps', 12), SECS = +opt('secs', 4), START = +opt('start', 0), HEIGHT = +opt('height', 720), STAND = +opt('stand', 0.70); // STAND = how tall the standing character is, as a fraction of the video height (same for every clip of a character)
+const KEY = opt('key', '00ff00'), SIM = opt('sim', '0.30'), FPS = +opt('fps', 12), SECS = +opt('secs', 4), START = +opt('start', 0), HEIGHT = +opt('height', 720), STAND = opt('stand', '0.70'); // 'auto' = measure it from this clip (use for a clip where the character stands the whole time); // STAND = how tall the standing character is, as a fraction of the video height (same for every clip of a character)
 
 // Green removal by 'how much greener than red and blue' (not by colour distance), so yellow clothes and skin stay solid.
 // Soft edge between LO and HI, and the green glow left on edge pixels is removed (green is capped at the red/blue level).
@@ -94,7 +94,7 @@ for (;;) {
   if (e.status !== 0) { console.error(String(e.stderr)); process.exit(1); }
   const jsonFile = path.join(OUT, 'clips.json');
   const all = fs.existsSync(jsonFile) ? JSON.parse(fs.readFileSync(jsonFile, 'utf8')) : {};
-  all[`${who}_${name}`] = { file: `${who}_${name}.webp`, frames: fr.n, cols, rows, w: cw, h: ch, fps: FPS, loop: name === 'walk' || name === 'idle', px: Math.round(height * STAND), ground: medBottom - y0 + 4 };
+  all[`${who}_${name}`] = { file: `${who}_${name}.webp`, frames: fr.n, cols, rows, w: cw, h: ch, fps: FPS, loop: name === 'walk' || name === 'idle', px: Math.round(height * (STAND === 'auto' ? medH / height : +STAND)), loopSec: fr.n / FPS, ground: medBottom - y0 + 4 };
   fs.writeFileSync(jsonFile, JSON.stringify(all, null, 1));
   console.log(`(measured standing height: ${(medH / height).toFixed(3)} of the video height)`);
   console.log(`${who}_${name}: ${fr.n} frames, ${cw}x${ch} each, atlas ${AW}x${AH}, ${(fs.statSync(file).size / 1024).toFixed(0)} KB`);

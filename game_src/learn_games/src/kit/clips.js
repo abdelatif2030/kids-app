@@ -8,6 +8,12 @@ let MANIFEST = null;
 let loading = null;
 const textures = new Map();
 
+/** Seconds between two footsteps of the hero's walk clip (half a stride), or [fallback] when there is no walk clip. */
+export function stepSeconds(kind, fallback = 0.33) {
+  const e = MANIFEST && MANIFEST[`${kind}_walk`];
+  return e && e.loopSec ? e.loopSec / 2 : fallback;
+}
+
 export function setClipsBase(b) { BASE = b; }
 /** Loads the list of clips once; resolves to {} when there are none. */
 export function loadClips() {
@@ -24,6 +30,9 @@ function sheet(entry) {
   if (textures.has(entry.file)) return textures.get(entry.file);
   const t = new THREE.TextureLoader().load(`${BASE}${entry.file}`);
   t.colorSpace = THREE.SRGBColorSpace;
+  t.generateMipmaps = false; // no mip levels: neighbouring frames of the sheet must not bleed into each other
+  t.minFilter = THREE.LinearFilter;
+  t.magFilter = THREE.LinearFilter;
   t.repeat.set(1 / entry.cols, 1 / entry.rows);
   textures.set(entry.file, t);
   return t;
@@ -65,8 +74,13 @@ export function withClips(kind, actor, height = 3.6) {
     if (cur) cur.mesh.visible = false;
     cur = { entry, mesh: meshFor(entry), t: 0, loop };
     cur.mesh.scale.set(1, 1, 1);
+    showFrame(cur, 0); // first frame is in place before the picture becomes visible (no flash of a wrong frame)
     cur.mesh.visible = true;
     rigRoot.visible = false;
+  };
+  const showFrame = (c, f) => {
+    const e = c.entry;
+    c.mesh.material.map.offset.set((f % e.cols) / e.cols, 1 - (Math.floor(f / e.cols) + 1) / e.rows);
   };
   const baseAct = actor.act;
   const baseUpdate = actor.update;
@@ -84,8 +98,7 @@ export function withClips(kind, actor, height = 3.6) {
     if (e.file === `${kind}_idle.webp`) { const b = Math.sin(time * 1.8); cur.mesh.scale.set(1 - b * 0.006, 1 + b * 0.012, 1); }
     let f = Math.floor(cur.t * e.fps);
     if (f >= e.frames) { if (cur.loop) f %= e.frames; else { stop(); return; } }
-    const col = f % e.cols, row = Math.floor(f / e.cols);
-    cur.mesh.material.map.offset.set(col / e.cols, 1 - (row + 1) / e.rows);
+    showFrame(cur, f);
   };
   // start downloading this hero's clips right away
   loadClips().then((m) => { for (const [k, e] of Object.entries(m || {})) if (k.startsWith(`${kind}_`)) meshFor(e); });
