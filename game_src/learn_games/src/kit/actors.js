@@ -56,8 +56,12 @@ const POSES = {
 };
 const HEIGHT = { boy: 3.6, girl: 3.6, owl: 3.0 };
 
+// The part-by-part rig (rig.js) made the faces look wrong (owner, 2026-11-12), so the heroes use the full pictures again;
+// flip this only after the rig faces are redone. Real animations come from the clips (clips.js).
+const USE_RIG = false;
+
 export function makeActor(kind) {
-  if (hasRig(kind)) return withClips(kind, makeRig(kind), HEIGHT[kind]); // the rigged character from the owner's parts sheet
+  if (USE_RIG && hasRig(kind)) return withClips(kind, makeRig(kind), HEIGHT[kind]);
   const poses = POSES[kind];
   const g = new THREE.Group();
   const holder = new THREE.Group();
@@ -130,7 +134,7 @@ export function makeActor(kind) {
     holder.scale.set(sx, sy, 1);
     shadow.scale.set(1 - by * 0.5, 0.45 - by * 0.2, 1);
   };
-  return g;
+  return kind === 'owl' ? g : withClips(kind, g, HEIGHT[kind]); // a hero plays the owner's clips when they exist
 }
 
 /** Picture of a thing for the ids the reference sheets have; the group is about 1 unit tall, standing on y = 0. */
