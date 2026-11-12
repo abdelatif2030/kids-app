@@ -16,7 +16,6 @@ import { makeActor, setArtBase } from '../kit/actors.js';
 import { stepSeconds } from '../kit/clips.js';
 // where the two worlds meet while they slide past each other (just outside the right edge of the screen at the start)
 const SEAM_X = 14.5;
-import { makePerson } from '../kit/people.js';
 import { shapeGeo } from '../kit/shapes3d.js';
 import { colorById } from '../shapes/sim.js';
 import { NUMBERS } from '../kit/words.js';
@@ -78,12 +77,10 @@ class Game {
     this.fade = h('div', { class: 'lw-fade' });
     sh.root.append(this.fade);
     this.owl = makeActor('owl');
-    this.owl.position.set(-6.3, 0.16, 3.4);
-    this.owl.scale.setScalar(0.72);
+    this.owl.position.set(-5.6, 0.16, 3.4);
+    this.owl.scale.setScalar(0.66);
     this.owl.rotation.y = 0.25;
     this.st.add(this.owl);
-    this.persons = { mama: makePerson('mama'), baba: makePerson('baba') };
-    for (const p of Object.values(this.persons)) { p.position.set(-1.5, 0, 5.2); p.scale.setScalar(0.8); p.visible = false; p.rotation.y = 0.2; this.st.add(p); }
     this.stand = this._makeStand();
     this._makeRack();
     this.save = sh.save;
@@ -262,7 +259,7 @@ class Game {
     hit.userData.id = o.id;
     hit.position.set(0.2, 0.9, 0);
     g.add(glow, hit);
-    const home = new THREE.Vector3(((i + 0.5) / n - 0.5) * 8.6, 0.1, i % 2 ? -0.2 : -1.3); // two rows, kept behind the question picture
+    const home = new THREE.Vector3(((i + 0.5) / n - 0.5) * 7.8 + 0.6, 0.1, i % 2 ? -0.2 : -1.3); // two rows, kept behind the question picture
     g.position.copy(HAND);
     g.scale.setScalar(0.01);
     this.st.add(g);
@@ -272,14 +269,7 @@ class Game {
   _showStand(show) {
     if (this.standItem) { this.st.scene.remove(this.standItem); this.standItem = null; }
     this.stand.visible = false;
-    for (const p of Object.values(this.persons)) p.visible = false;
     if (!show) return;
-    if (show.type === 'person') {
-      const p = this.persons[show.who];
-      p.visible = true;
-      p.act('talk');
-      return;
-    }
     this.stand.visible = true;
     const g = new THREE.Group();
     if (show.type === 'thing') {
@@ -322,7 +312,7 @@ class Game {
   _makeHero(kind, look) {
     if (this.hero) this.st.scene.remove(this.hero);
     const k = makeActor(kind);
-    k.position.set(-4.3, 0.16, 3.4);
+    k.position.set(-3.7, 0.16, 3.4);
     k.scale.setScalar(0.9);
     k.rotation.y = 0.2;
     this.st.add(k);
@@ -468,8 +458,8 @@ class Game {
     const r = this.play.cur;
     if (!r) return;
     this.sh.sound.play('sparkle');
-    this.owl.act(r.who ? 'think' : 'point');
-    if (this.hero) { this.hero.look(0); this.hero.act(r.who ? 'talk' : 'point'); }
+    this.owl.act('point');
+    if (this.hero) { this.hero.look(0); this.hero.act('point'); }
     this.sh.speak(r.prompt);
   }
 
@@ -646,7 +636,6 @@ class Game {
       if (k >= 1) { const then = W.then; this.walk = null; then(); }
     }
     if (this.previews) for (const k of Object.values(this.previews)) if (k.parent) { k.update(dt, time); if (Math.random() < 0.004) k.act('wave'); }
-    for (const p of Object.values(this.persons)) if (p.visible) p.update(dt, time);
     if (this.world) this.world.update(dt, time);
     const hint = this.play && this.st.mode === 'wait' && this.play.cur ? this.play.hint : null;
     const fid = this.st.mode === 'wait' ? this.st.focusedId() : null;

@@ -45,10 +45,9 @@ test('numbers and counting stay inside the age range', () => {
   }
 });
 test('habits: Mama or Baba, one right thing among other things', () => {
-  assert.ok(HABITS.every((h) => ['mama', 'baba'].includes(h.who)));
-  assert.ok(HABITS.some((h) => h.who === 'mama') && HABITS.some((h) => h.who === 'baba'));
+  assert.ok(HABITS.every((h) => h.text && h.answer && !h.who)); // no mama/baba characters any more: our voice asks, the child chooses
   assert.ok(HABIT_ITEMS.length >= 8);
-  for (let s = 1; s < 30; s++) for (const r of new LevelPlay('habits', 6, s).rounds) assert.ok(r.who && r.show.type === 'person');
+  for (let s = 1; s < 30; s++) for (const r of new LevelPlay('habits', 6, s).rounds) assert.ok(!r.who && !r.show);
 });
 test('shapes level asks colour only from age five; animals level pairs an animal with its food', () => {
   for (let s = 1; s < 30; s++) {

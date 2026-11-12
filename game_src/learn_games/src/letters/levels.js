@@ -28,7 +28,7 @@ export const LEVELS = [
   { id: 'colors', mode: 'pick', table: 'colors', ar: 'الألوان', emoji: '🎨', skill: 'colors' },
   { id: 'fruits', mode: 'pick', table: 'fruits', ar: 'فواكه وخضار', emoji: '🍓', skill: 'vocab' },
   { id: 'vehicles', mode: 'pick', table: 'vehicles', ar: 'المواصلات', emoji: '🚌', skill: 'vocab' },
-  { id: 'habits', mode: 'habit', ar: 'كلام ماما وبابا', emoji: '👨‍👩‍👧', skill: 'listening' },
+  { id: 'habits', mode: 'habit', ar: 'عاداتي اليومية', emoji: '🧼', skill: 'listening' },
 ];
 
 /** The "find it" levels with a table of things: colours, fruit and vegetables, vehicles. */
@@ -85,16 +85,16 @@ export const orderPool = (age) => ALPHABET.slice(0, age <= 5 ? 8 : 28);
 
 /** Mama and Baba's small instructions; the right answer is the thing that goes with it. */
 export const HABITS = [
-  { who: 'mama', text: 'يلا نغسل إيدينا', answer: 'soap' },
-  { who: 'mama', text: 'يلا نفطر', answer: 'bowl' },
-  { who: 'mama', text: 'يلا نغسل سناننا', answer: 'toothbrush' },
-  { who: 'mama', text: 'وقت الغدا', answer: 'pot' },
-  { who: 'baba', text: 'يلا نروح الحضانة', answer: 'backpack' },
-  { who: 'baba', text: 'وقت النوم يا بطل', answer: 'bed' },
-  { who: 'baba', text: 'يلا نستحمّى', answer: 'tub' },
-  { who: 'baba', text: 'يلا نتعشى', answer: 'plate' },
-  { who: 'baba', text: 'صاحبك عايز يلعب، نشاركه إيه؟', answer: 'teddy' },
-  { who: 'mama', text: 'نقول لصاحبنا كلمة حلوة ونحبه', answer: 'heart' },
+  { text: 'يلا نغسل إيدينا', answer: 'soap' },
+  { text: 'يلا نفطر', answer: 'bowl' },
+  { text: 'يلا نغسل سناننا', answer: 'toothbrush' },
+  { text: 'وقت الغدا', answer: 'pot' },
+  { text: 'يلا نروح الحضانة', answer: 'backpack' },
+  { text: 'وقت النوم يا بطل', answer: 'bed' },
+  { text: 'يلا نستحمّى', answer: 'tub' },
+  { text: 'يلا نتعشى', answer: 'plate' },
+  { text: 'صاحبك عايز يلعب، نشاركه إيه؟', answer: 'teddy' },
+  { text: 'نقول لصاحبنا كلمة حلوة ونحبه', answer: 'heart' },
 ];
 export const HABIT_ITEMS = [...new Set(HABITS.map((h) => h.answer))];
 
@@ -106,7 +106,7 @@ export const cheer = (girl, i) => (girl ? CHEERS_F : CHEERS_M)[i % CHEERS_M.leng
 const pick = (r, arr, n) => [...arr].sort(() => r() - 0.5).slice(0, n);
 const FOOD_THING = { carrot: 'carrot', fish: 'fish', bone: 'bone', banana: 'banana', grass: 'grass', honey: 'honey', cheese: 'cheese', seeds: 'seeds' };
 
-/** One game of a level: rounds of { prompt, answer, reward, show, who, options: [{id, kind, ...}] }. */
+/** One game of a level: rounds of { prompt, answer, reward, show, options: [{id, kind, ...}] }. */
 export class LevelPlay {
   constructor(levelId, age, seed = Date.now()) {
     this.level = levelOf(levelId);
@@ -182,7 +182,7 @@ export class LevelPlay {
       const chosen = pick(r, HABITS, ROUNDS);
       for (const h of chosen) {
         const others = pick(r, HABIT_ITEMS.filter((x) => x !== h.answer), nOpt - 1);
-        out.push({ prompt: h.text, answer: h.answer, who: h.who, show: { type: 'person', who: h.who }, options: [h.answer, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'thing', thing: x })) });
+        out.push({ prompt: h.text, answer: h.answer, show: null, options: [h.answer, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'thing', thing: x })) });
       }
     } else {
       const next = bag(pool);
