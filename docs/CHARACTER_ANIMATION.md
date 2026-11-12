@@ -45,3 +45,11 @@ a real laugh, blink or looking around. For genuine facial animation we would nee
 
 ## Not verified
 Not run on a real phone or tablet. The Flutter page was tested with widget tests, not looked at in a browser. The sounds were not heard.
+
+## Rigged hero (2026-11-12, from the owner's parts sheet)
+`game_src/learn_games/src/kit/rig.js` builds the boy and girl from separate parts (head, body, arms, legs, eyes, mouths) hinged at
+neck/shoulders/hips: blink, mouth shapes, raised/waving arms, walking legs. Acts: wave, talk, point, clap, cheer/jump, celebrate,
+think, walk, run, sad and `giggle` (the laugh of the owner's reference video: eyes wide open, open smile, fists at the chest, small
+bounces; used on right answers). Eye/mouth placement and size per character: `head.eyeL/eyeR/mouth/eyeK/mouthK` in `SPECS`.
+The owl is still the flat cut-out (`actors.js`): its parts exist in `assets/games/art/rig/owl_*.webp` but no rig is built yet.
+Only looked at in a desktop browser at phone size, never on a device.

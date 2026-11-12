@@ -489,7 +489,7 @@ class Game {
     this.sh.sound.play('applause');
     setTimeout(() => this.sh.sound.play('crowd'), 160);
     this.owl.act(done % 2 ? 'cheer' : 'clap');
-    if (this.hero) this.hero.act(done % 2 ? 'celebrate' : 'clap');
+    if (this.hero) this.hero.act(done % 3 === 0 ? 'celebrate' : done % 3 === 1 ? 'giggle' : 'clap');
     this.owl.look(o.g.position.x);
     for (const [k, x] of this.opts) if (k !== id) x.gone = true;
     // the owl arranges the picture on his rack
