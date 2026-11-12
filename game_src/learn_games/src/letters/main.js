@@ -86,7 +86,7 @@ class Game {
     this.save = sh.save;
     if (!this.save.lw) this.save.lw = { unlocked: 1, done: {} };
     this.st.onFrame((dt, time) => this._frame(dt, time));
-    sh.fonts().then(() => sh.titleCard(sh.t('title'), '', () => this._start(), true));
+    sh.fonts().then(() => this._startScreen());
   }
 
   // ---- the world ---------------------------------------------------------------------------------------------------
@@ -411,10 +411,10 @@ class Game {
     this.owl.look(0);
   }
 
-  /** The levels page as the owner's picture, with invisible buttons on the twelve tiles, home, sound and "next level". */
-  _levelsPicture(img, list) {
+  /** A full-screen picture (the owner's art) fitted whole into the window, with a blurred copy behind it for the sides; returns the
+   *  wrapper and `place(el, cx, cy, w, h)` that puts an element on the picture in fractions of it. */
+  _pictureFrame(img, R) {
     const sh = this.sh;
-    const R = 1226 / 1283; // the picture's width / height
     const wrap = h('div', { class: 'lw-pic' });
     const blur = img.cloneNode();
     blur.className = 'lw-pic-blur';
@@ -426,9 +426,43 @@ class Game {
       box.style.height = `${w / R}px`;
     };
     fit();
-    const ro = new ResizeObserver(fit);
-    ro.observe(sh.root);
+    new ResizeObserver(fit).observe(sh.root);
     const place = (el, cx, cy, w, hh) => { el.style.left = `${(cx - w / 2) * 100}%`; el.style.top = `${(cy - hh / 2) * 100}%`; el.style.width = `${w * 100}%`; el.style.height = `${hh * 100}%`; box.append(el); return el; };
+    wrap.append(blur, box);
+    return { wrap, place };
+  }
+
+  /** The first screen of the learning world (owner's picture, 2026-11-13): the whole picture is the screen; the big green button
+   *  starts, the round buttons are home and sound. Without the picture file: just the green play button over the scene. */
+  _startScreen() {
+    const sh = this.sh;
+    const plain = () => sh.titleCard(sh.t('title'), '', () => this._start(), true);
+    sh.clear();
+    const img = new Image();
+    img.className = 'lw-pic-img';
+    img.alt = '';
+    img.onload = () => {
+      const { wrap, place } = this._pictureFrame(img, 1227 / 1281);
+      const go = h('button', { class: 'lw-hit', 'aria-label': sh.t('play'), onclick: () => { sh.sound.unlock(); sh.sound.play('tap'); this._start(); } });
+      place(go, 0.5, 0.575, 0.88, 0.2);
+      const snd = sh.soundBtn();
+      snd.classList.add('lw-hit');
+      place(snd, 0.096, 0.084, 0.15, 0.14);
+      const back = sh.backBtn();
+      back.classList.add('lw-hit');
+      place(back, 0.903, 0.084, 0.15, 0.14);
+      sh.layer.append(wrap);
+      sh.sound.setMode('menu');
+      setTimeout(() => go.focus({ preventScroll: true }), 50);
+    };
+    img.onerror = plain;
+    img.src = `${sh.base}../art/start_page.webp`;
+  }
+
+  /** The levels page as the owner's picture, with invisible buttons on the twelve tiles, home, sound and "next level". */
+  _levelsPicture(img, list) {
+    const sh = this.sh;
+    const { wrap, place } = this._pictureFrame(img, 1226 / 1283); // the picture's width / height
     const cols = [0.723, 0.532, 0.343]; // right to left, like the picture
     const rows = [0.327, 0.489, 0.647, 0.807];
     const open = new Set(list.map((l) => l.id));
@@ -442,7 +476,7 @@ class Game {
     });
     // "next level": the first level not done yet (the first one when all are done)
     const next = list.find((l) => !this.save.lw.done[l.id]) || list[0];
-    place(h('button', { class: 'lw-hit', 'aria-label': sh.t('next') || 'next', onclick: () => { sh.sound.play('tap'); this._begin(next.id); } }), 0.114, 0.46, 0.22, 0.12);
+    place(h('button', { class: 'lw-hit', 'aria-label': 'next', onclick: () => { sh.sound.play('tap'); this._begin(next.id); } }), 0.114, 0.46, 0.22, 0.12);
     // home and sound: the shell's own buttons, invisible, on the picture's round buttons
     const back = sh.backBtn();
     back.classList.add('lw-hit');
@@ -450,7 +484,6 @@ class Game {
     const snd = sh.soundBtn();
     snd.classList.add('lw-hit');
     place(snd, 0.94, 0.058, 0.1, 0.095);
-    wrap.append(blur, box);
     return wrap;
   }
 
