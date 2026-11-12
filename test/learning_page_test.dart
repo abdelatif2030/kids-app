@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -105,10 +106,9 @@ void main() {
       final r = t.getRect(find.byWidget(e.widget));
       if (r.width > 100) expect(r.bottom, lessThanOrEqualTo(page.bottom + 1));
     }
-    await t.tap(find.byKey(const ValueKey('shelf_numbers')));
-    await t.pump(const Duration(milliseconds: 500));
-    expect(find.byKey(const ValueKey('learn_math')), findsOneWidget);
-    expect(find.byKey(const ValueKey('learn_maze')), findsNothing);
+    // one learning game: its big card is on the first page
+    expect(find.byKey(const ValueKey('card_letter_fishing')), findsOneWidget);
+    expect(find.byKey(const ValueKey('card_math')), findsNothing);
   });
 
   test('every card id has its picture file', () {
@@ -118,10 +118,12 @@ void main() {
   });
 
   testWidgets('tapping a game card opens that game', (t) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.windows; // no built-in browser view in tests
     await openLearning(t, const Size(1024, 768));
-    await t.tap(find.byKey(const ValueKey('learn_letters')));
+    await t.tap(find.byKey(const ValueKey('card_letter_fishing')));
     await t.pump();
     await t.pump(const Duration(milliseconds: 600));
     expect(find.byKey(const ValueKey('learning_page')).hitTestable(), findsNothing);
+    debugDefaultTargetPlatformOverride = null;
   });
 }

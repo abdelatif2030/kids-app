@@ -32,7 +32,16 @@ const arg = (name, def) => { const i = process.argv.indexOf(`--${name}`); return
 const lines = JSON.parse(readFileSync(join(DIR, 'lines.json'), 'utf8'));
 // Diacritized text (made by make_tashkeel.py) is what the voice reads; clip ids still come from the plain text.
 const TASHKEEL = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'tashkeel.json'), 'utf8'));
-const voiced = (l) => (l.lang === 'ar' && TASHKEEL[l.text]) || l.text;
+// MANDATORY (owner 2026-11-12): Arabic is never sent to a voice without full vowel marks. A sentence without a reading in
+// tashkeel.json, or with a word that has no mark at all, stops the generator instead of being spoken wrongly.
+const MARK = /[ً-ْ]/;
+const voiced = (l) => {
+  if (l.lang !== 'ar') return l.text;
+  const v = TASHKEEL[l.text];
+  if (!v) throw new Error(`no diacritized reading for: ${l.text} (add it to tools/game_voice/tashkeel*.py)`);
+  for (const w of v.split(/[^ء-يً-ْٰ]+/).filter(Boolean)) if (!MARK.test(w)) throw new Error(`unvowelled word "${w}" in: ${v}`);
+  return v;
+};
 
 function manifest() {
   const m = { ar: [], en: [] };

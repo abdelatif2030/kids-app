@@ -23,10 +23,12 @@ const KIT = {
   sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
   play: ['يلا نلعب', "Let's play"],
   again: ['العب تاني', 'Play again'],
+  nextLevel: ['المستوى التالي ▶', 'Next level ▶'],
+  levelsBtn: ['المستويات', 'Levels'],
   newStar_m: ['نجمة جديدة ليك! ⭐', 'A new star for you! ⭐'],
   newStar_f: ['نجمة جديدة ليكي! ⭐', 'A new star for you! ⭐'],
-  doneAgain_m: ['خلصتها تاني! برافو عليك', 'You finished it again! Well done'],
-  doneAgain_f: ['خلصتها تاني! برافو عليكي', 'You finished it again! Well done'],
+  doneAgain_m: ['شاطر أوي!', 'Well done!'],
+  doneAgain_f: ['شاطرة أوي!', 'Well done!'],
   great_m: ['شطوووووور!', 'Well done!'],
   great_f: ['شطووووورة!', 'Well done!'],
   // what the voice says (stretched letters on screen are read badly by a speech voice)
@@ -143,10 +145,10 @@ export class Shell {
 
   /** Says [text] with the app's own voice (and ducks the music meanwhile). */
   /** Says [text] (or several sentences in order): a bundled recording when there is one, else the app's device voice. */
-  speak(text) {
-    if (!text || this.opts.voice === false) return; // a game may be music-only (owner: the maze)
+  speak(text, onEach, onDone) {
+    if (!text || this.opts.voice === false) { if (onDone) onDone(); return; } // a game may be music-only (owner: the maze)
     this.voice.muted = this.sound.muted;
-    this.voice.say(text);
+    this.voice.say(text, onEach, onDone);
   }
   /** One answer, for the parent dashboard (skill null = nothing recorded). */
   round(skill, correct, detail) { if (skill) this.post({ type: 'round', skill, correct: !!correct, detail: detail == null ? null : String(detail) }); }
@@ -199,7 +201,7 @@ export class Shell {
   }
 
   /** The end card: tells the app the set is finished (the learning star the first time). */
-  finishCard(title, art, onAgain) {
+  finishCard(title, art, onAgain, onNext, onLevels) {
     this.complete();
     const first = !this.done;
     this.done = true;
@@ -212,8 +214,10 @@ export class Shell {
       h('div', { class: 'lk-starburst' }, first ? '⭐' : art),
       h('div', { class: 'lk-msg' }, this.t('great')),
       h('div', { class: 'lk-small', style: 'font-size:calc(var(--u)*4.6);color:#6a3ad0' }, first ? this.t('newStar') : this.t('doneAgain')),
+      onNext ? h('button', { class: 'lk-btn', onclick: () => { this.sound.play('tap'); onNext(); } }, this.t('nextLevel')) : null,
       again,
-      h('button', { class: 'lk-btn p', onclick: () => this.exit() }, this.t('back')))));
+      onLevels ? h('button', { class: 'lk-btn p', onclick: () => { this.sound.play('tap'); onLevels(); } }, this.t('levelsBtn')) : null,
+      h('button', { class: onLevels ? 'lk-btn p' : 'lk-btn p', onclick: () => this.exit() }, this.t('back')))));
     setTimeout(() => again.focus({ preventScroll: true }), 50);
   }
 

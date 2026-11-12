@@ -5,6 +5,7 @@
 // the right basket glows). Each thing's name is said by the app's voice when it arrives, and "the apple is fruit!"
 // when it is sorted. Robi the shop robot cheers. Five rounds of four; the learning star only the first time.
 import * as THREE from 'three';
+import { polish } from '../kit/realism.js';
 import { Shell, h } from '../kit/shell.js';
 import { THEME_GARDEN } from '../kit/sound.js';
 import { makeItem } from '../kit/toys3d.js';
@@ -16,7 +17,7 @@ const TEXT = {
   intro: ['حط كل حاجة في السلة بتاعتها!', 'Put each thing in its basket!'],
   howTo: ['اسحب الحاجة للسلة، أو دوس على السلة', 'Drag it to a basket, or tap the basket'],
   tryOther: ['مش دي... جرّب سلة تانية', 'Not this one... try another basket'],
-  roundDone: ['الرف خلص! برافو', 'Shelf done! Well done'],
+  roundDone: ['الرف خلص! أحسنت', 'Shelf done! Well done'],
 };
 
 // a playful toy-shop tune (C major, music-box lead)
@@ -46,6 +47,7 @@ class Game {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     sh.root.prepend(this.renderer.domElement);
     this.scene = new THREE.Scene();
+    polish(this.renderer, this.scene);
     this.scene.background = new THREE.Color(0xffe8f0);
     this.camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
     this.scene.add(new THREE.HemisphereLight(0xfff8f0, 0xc8a8a0, 1.7));

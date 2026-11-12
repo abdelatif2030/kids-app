@@ -5,6 +5,7 @@
 // bigger with age; the learning star only the first time the set is finished. Words are said by the app's voice;
 // music and effects are made in code. Bumping a wall is a soft boing, never a mistake.
 import * as THREE from 'three';
+import { polish } from '../kit/realism.js';
 import { Shell, h } from '../kit/shell.js';
 import { THEME_GARDEN } from '../kit/sound.js';
 
@@ -43,6 +44,7 @@ class Game {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     sh.root.prepend(this.renderer.domElement);
     this.scene = new THREE.Scene();
+    polish(this.renderer, this.scene);
     this.scene.background = skyTexture();
     this.scene.fog = new THREE.Fog(0xcdeeff, 30, 70);
     this.camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);

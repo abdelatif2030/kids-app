@@ -291,17 +291,6 @@ final WebGame kLearnLadders = WebGame(
   learnId: 'snakes_ladders',
 );
 
-/// «أربعة ورا بعض» (Four in a Row): a glossy 3D toy frame for two players on one device.
-final WebGame kLearnFour = WebGame(
-  id: 'learn_four',
-  folder: 'learn_four',
-  global: 'LearnFour',
-  storeKey: 'learn_four',
-  minAge: 5,
-  title: () => tr2('أربعة ورا بعض', 'Four in a Row'),
-  learnId: 'connect_four',
-);
-
 /// «فين الكورة؟» (Where Is the Ball?): a 3D playroom, a puppy, on / under / next to / inside.
 final WebGame kLearnBall = WebGame(
   id: 'learn_ball',
@@ -313,5 +302,60 @@ final WebGame kLearnBall = WebGame(
   learnId: 'where_ball',
 );
 
+/// «كمّل النمط» (Complete the Pattern): glossy beads on a string, the voice names each colour and shape.
+final WebGame kLearnPattern = WebGame(
+  id: 'learn_pattern',
+  folder: 'learn_pattern',
+  global: 'LearnPattern',
+  storeKey: 'learn_pattern',
+  minAge: 3,
+  title: () => tr2('كمّل النمط', 'Complete the Pattern'),
+  learnId: 'pattern',
+);
+
+/// «صيد الحروف» (Letter Fishing): things that start with each letter float on rafts holding the letter.
+final WebGame kLearnLetters = WebGame(
+  id: 'learn_letters',
+  folder: 'learn_letters',
+  global: 'LearnLetters',
+  storeKey: 'learn_letters',
+  minAge: 3,
+  title: () => tr2('صيد الحروف', 'Letter Fishing'),
+  learnId: 'letter_fishing',
+);
+
+/// «الحساب والعدّ» (Counting at the Market): get N apples counted aloud, and count what is in the basket.
+final WebGame kLearnCounting = WebGame(
+  id: 'learn_counting',
+  folder: 'learn_counting',
+  global: 'LearnCounting',
+  storeKey: 'learn_counting',
+  minAge: 3,
+  title: () => tr2('الحساب والعدّ', 'Counting at the Market'),
+  learnId: 'math',
+);
+
+/// «أين الشكل؟» (Find the Shape): a shape-sorter board; names and colours of shapes.
+final WebGame kLearnShapes = WebGame(
+  id: 'learn_shapes',
+  folder: 'learn_shapes',
+  global: 'LearnShapes',
+  storeKey: 'learn_shapes',
+  minAge: 3,
+  title: () => tr2('أين الشكل؟', 'Find the Shape'),
+  learnId: 'shape_finder',
+);
+
+/// «أطعم الحيوان» (Feed the Animal): which food each animal eats.
+final WebGame kLearnAnimals = WebGame(
+  id: 'learn_animals',
+  folder: 'learn_animals',
+  global: 'LearnAnimals',
+  storeKey: 'learn_animals',
+  minAge: 3,
+  title: () => tr2('أطعم الحيوان', 'Feed the Animal'),
+  learnId: 'feed_animal',
+);
+
 /// Rebuilt learning games, by their old game id.
-final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay, kLearnLadders, kLearnFour, kLearnBall]) g.learnId!: g};
+final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay, kLearnLadders, kLearnBall, kLearnPattern, kLearnLetters, kLearnCounting, kLearnShapes, kLearnAnimals]) g.learnId!: g};

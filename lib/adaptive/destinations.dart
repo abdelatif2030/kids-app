@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../color_game.dart';
 import '../games/game_catalog.dart';
 import '../journey/lands.dart';
 import '../journey/models.dart';
@@ -8,7 +7,6 @@ import '../journey/ui/land_map_screen.dart';
 import '../l10n/strings.dart';
 import '../library/vocab_screens.dart';
 import '../literacy/screens.dart';
-import '../memory_game.dart';
 import '../stories/story_screens.dart';
 
 /// How a destination teaches: used to offer practice in a DIFFERENT format when a child struggles.
@@ -43,29 +41,18 @@ Destination _land(String landId, Set<String> skills, DestFormat format) {
 List<Destination> buildDestinations() => [
       Destination('letters', () => tr2('تعلّم الحروف', 'Learn the letters'), DestFormat.lesson,
           {'letters_ar', 'phonics', 'letter_position', 'syllables', 'word_building', 'reading'}, 3, 12, (c) => LettersHomeScreen(child: c)),
-      _game('listen_letter', {'letters_ar', 'listening'}, DestFormat.listen),
       _game('letter_fishing', {'letters_ar', 'letters_en'}, DestFormat.game),
-      _game('listen_picture', {'listening', 'vocab'}, DestFormat.listen),
-      _game('listen_word', {'listening', 'reading', 'vocab'}, DestFormat.listen),
-      _game('word_book', {'vocab', 'listening'}, DestFormat.lesson),
       Destination('vocab_library', () => tr2('مكتبة الكلمات', 'Word library'), DestFormat.lesson, {'vocab', 'listening', 'english_vocab'}, 2, 12, (c) => VocabLibraryScreen(child: c)),
-      _game('numerals', {'counting'}, DestFormat.game),
-      _game('connect_dots', {'counting'}, DestFormat.game),
-      _game('animal_habitats', {'nature'}, DestFormat.game),
       _game('feed_animal', {'nature', 'vocab'}, DestFormat.game),
-      _game('jigsaw', {'spatial'}, DestFormat.game),
       _game('treasure_hunt', {'spatial'}, DestFormat.game),
-      _game('big_small', {'shapes'}, DestFormat.game),
       _game('shape_finder', {'shapes', 'colors'}, DestFormat.game),
       _game('where_ball', {'spatial'}, DestFormat.game),
       _game('next_in_day', {'sequence'}, DestFormat.game),
-      _game('compare', {'counting'}, DestFormat.game),
       _land('numbers', {'counting', 'addition', 'subtraction', 'multiplication'}, DestFormat.lesson),
       _game('pattern', {'sequence', 'shapes'}, DestFormat.game),
-      _game('odd_one_out', {'shapes', 'vocab'}, DestFormat.game),
-      _game('match_pictures', {'memory'}, DestFormat.game),
-      Destination('color_game', () => tr2('لعبة الألوان', 'Colour game'), DestFormat.game, {'colors'}, 2, 4, (c) => ColorGame()),
-      Destination('memory_game', () => tr2('لعبة الذاكرة', 'Memory game'), DestFormat.game, {'memory'}, 3, 6, (c) => MemoryGame()),
+      _game('snakes_ladders', {'counting'}, DestFormat.game),
+      _game('sort_groups', {'vocab', 'shapes'}, DestFormat.game),
+      _game('math', {'counting'}, DestFormat.game),
       _land('colors', {'colors', 'shapes'}, DestFormat.lesson),
       _land('english', {'english_vocab', 'letters_en'}, DestFormat.lesson),
       _land('brain', {'memory', 'sequence'}, DestFormat.lesson),

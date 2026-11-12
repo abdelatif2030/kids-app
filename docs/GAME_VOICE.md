@@ -40,3 +40,10 @@ Egyptian male storyteller). With the owner's key in the environment (`ELEVENLABS
 `node tools/game_voice/generate.mjs --provider elevenlabs --voice oOge1k8044i7H9hCreX6 --lang ar`
 The free plan (10,000 credits a month) is enough to test; before the app is published the owner needs the Starter plan (it
 lists the commercial licence) and must check the licence of this voice. The key was NOT created or read by the assistant.
+
+## Final setup (2026-11-12)
+* Voice: ElevenLabs **Fatima** (`I3u6waC588j43py1kDN2`, `eleven_multilingual_v2`) for every clip; Baba's lines (`tools/game_voice/baba_lines.txt`) use Mahmoud Soliman (`oOge1k8044i7H9hCreX6`). The greeting «أهلا بيكم يا أبطال» is Fatima on `eleven_v3`.
+* **Mandatory: full tashkeel.** The text sent to the voice is always the diacritized reading in `tools/game_voice/tashkeel.json` (made by `make_tashkeel.py`, `tashkeel_games.py`, `tashkeel_levels.py`). `generate.mjs` refuses a sentence without a reading or with a bare word; `test/tashkeel.test.js` checks the same. The readings are Egyptian colloquial (not formal case endings) because the voice speaks to children in Egyptian Arabic.
+* Never pass Arabic as a command-line argument on Windows (it is mangled): use `tools/game_voice/say.mjs <text file> <voice id> <out.mp3>`.
+* Review file for the owner: `docs/GAME_TASHKEEL_REVIEW.txt` (screen text ← diacritized text, all 480 sentences).
+* Listening pages: `docs/voice_preview/*.html`.

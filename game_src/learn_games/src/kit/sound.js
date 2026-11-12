@@ -220,7 +220,10 @@ export class Sound {
       const [root, chord] = th.chords[bar];
       if (e === 0 || e === 4) this.tone('triangle', hz(root - (e === 4 ? 5 : 0)), t, eighth * 1.6, 0.14, this.musicBus, 0.01);
       if (e === 2 || e === 6) chord.forEach((m) => this.tone('sine', hz(m - 12), t, eighth * 1.2, 0.022, this.musicBus, 0.004));
-      for (const [bb, ee, m] of th.melody) if (bb === bar && ee === e) this.lead(m, t, play ? 0.075 : 0.06);
+      const en = this.energy || 0; // grows with every right answer: the music opens up
+      for (const [bb, ee, m] of th.melody) if (bb === bar && ee === e) this.lead(m, t, (play ? 0.075 : 0.06) * (0.65 + 0.7 * en));
+      if (en >= 0.4 && e % 2 === 0) this.lead(chord[(e / 2) % chord.length] + 12, t + eighth * 0.5, 0.03 * en);
+      if (en >= 0.8 && (e === 3 || e === 7)) this.lead(chord[2] + 24, t, 0.025);
       if (th.shaker && play && e % 2 === 1) this.noise(t, 0.04, 0.012, 'highpass', 8000, 1, this.musicBus);
       this.step++;
       this.nextTime += eighth;
@@ -233,6 +236,9 @@ export class Sound {
     if (!this.on || this.musicOnly) return; // music-only games: no effects at all
     const t = this.ctx.currentTime + 0.005;
     switch (name) {
+      case 'note': // a pleasant note from the pentatonic scale (each right answer rings one)
+        this.lead(arg || 79, t, 0.09, this.sfx);
+        break;
       case 'tap':
         this.tone('sine', 880, t, 0.06, 0.05);
         break;

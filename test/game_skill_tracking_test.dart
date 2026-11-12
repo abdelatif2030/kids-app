@@ -72,7 +72,7 @@ void main() {
     });
 
     test('games where nothing is right or wrong are exempt and never invent a skill', () {
-      for (final id in ['snakes_ladders', 'maze', 'connect_four', 'trace_letters', 'word_book']) {
+      for (final id in ['snakes_ladders']) {
         expect(ruleFor(id)!.exempt, isTrue, reason: id);
       }
     });
@@ -291,7 +291,6 @@ void main() {
     testWidgets('exempt games write no skill event even when finished', (t) async {
       screen(t);
       await t.pumpWidget(_app(const SizedBox()));
-      expect(ruleFor('connect_four')!.exempt, isTrue);
       expect(await t.runAsync(ProgressStore.load), isEmpty);
     });
   });

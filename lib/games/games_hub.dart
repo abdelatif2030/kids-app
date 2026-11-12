@@ -41,16 +41,16 @@ class GameCategory {
 /// The ten islands, in the order of the owner's design (left to right, top row then bottom row).
 final List<GameCategory> kGameCategories = [
   GameCategory('brain', () => tr2('ألعاب الذكاء والتفكير', 'Thinking games'), const Offset(0.127, 0.478), const Offset(0.127, 0.528),
-      games: {'maze', 'sort_groups', 'treasure_hunt', 'next_in_day', 'snakes_ladders', 'connect_four', 'where_ball', 'pattern', 'fun_xo', 'fun_snake', 'fun_whack', 'fun_stars'}),
+      games: {'sort_groups', 'treasure_hunt', 'next_in_day', 'snakes_ladders', 'where_ball', 'pattern', 'fun_xo', 'fun_snake', 'fun_whack', 'fun_stars'}),
   GameCategory('letters', () => tr2('الحروف والكلمات', 'Letters and words'), const Offset(0.319, 0.478), const Offset(0.319, 0.528),
-      games: {'letters', 'letter_fishing', 'trace_letters', 'word_book', 'listen_letter', 'listen_word', 'review_words'}),
+      games: {'letter_fishing'}),
   GameCategory('numbers', () => tr2('الأرقام والحساب', 'Numbers and maths'), const Offset(0.504, 0.478), const Offset(0.504, 0.528),
-      games: {'math', 'numerals', 'compare', 'connect_dots', 'big_small'}),
-  GameCategory('shapes', () => tr2('الألوان والأشكال', 'Colours and shapes'), const Offset(0.693, 0.478), const Offset(0.693, 0.528), games: {'colors', 'shape_finder', 'jigsaw'}),
+      games: {'math'}),
+  GameCategory('shapes', () => tr2('الألوان والأشكال', 'Colours and shapes'), const Offset(0.693, 0.478), const Offset(0.693, 0.528), games: {'shape_finder'}),
   GameCategory('animals', () => tr2('الحيوانات والطبيعة', 'Animals and nature'), const Offset(0.88, 0.478), const Offset(0.88, 0.528),
-      games: {'animal', 'animal_habitats', 'feed_animal', 'listen_picture', 'balloons'}),
+      games: {'feed_animal'}),
   GameCategory('observe', () => tr2('الذاكرة والملاحظة', 'Memory and observation'), const Offset(0.127, 0.77), const Offset(0.127, 0.8),
-      games: {'memory', 'match_pictures', 'odd_one_out'}),
+      games: {}),
   GameCategory('feelings', () => tr2('المشاعر والاجتماعيات', 'Feelings and friends'), const Offset(0.32, 0.77), const Offset(0.32, 0.8),
       screen: (c) => LandMapScreen(land: landById('feelings'), child: c)),
   GameCategory('art', () => tr2('الإبداع والرسم', 'Creating and drawing'), const Offset(0.505, 0.77), const Offset(0.505, 0.8), screen: (c) => DrawingScreen(child: c)),
@@ -374,8 +374,6 @@ class CategoryGamesScreen extends StatelessWidget {
 
 /// Ids of every game the hub should list for [age], to test that nothing is missing.
 Set<String> gamesInHubForAge(int age) => {
-      for (final (id, a, b) in const [('balloons', 1, 2), ('animal', 1, 2), ('colors', 2, 3), ('letters', 3, 8), ('memory', 3, 6), ('math', 4, 12)])
-        if (age >= a && age <= b) id,
       ...[for (final g in kEducationalGames) if (g.fitsAge(age)) g.id],
       ...[for (final g in funGamesForAge(age)) 'fun_${g.id}'],
     };

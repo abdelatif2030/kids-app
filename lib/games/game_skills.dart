@@ -19,17 +19,8 @@ class GameSkillRule {
 
 const kGameSkillRules = <GameSkillRule>[
   GameSkillRule('snakes_ladders', null, 'dice luck and turn taking: no answer is right or wrong'),
-  GameSkillRule('jigsaw', 'spatial', 'one event per puzzle: fitted every piece without a wrong place'),
-  GameSkillRule('maze', null, 'planning a path: bumping a wall is exploration, not a wrong answer'),
   GameSkillRule('treasure_hunt', 'spatial', 'one event per map: read the clue and found the place without a wrong tap'),
-  GameSkillRule('connect_dots', 'counting', 'one event per picture: tapped the numbers in order without a wrong tap'),
-  GameSkillRule('animal_habitats', 'nature', 'one event per animal: chose its home without a wrong try'),
-  GameSkillRule('match_pictures', 'memory', 'one event per board: found all pairs with at most one wrong flip per pair'),
   GameSkillRule('letter_fishing', 'letters_ar', 'one event per round (letters_en when the game is in English)'),
-  GameSkillRule('connect_four', null, 'two-player strategy: no answer is right or wrong'),
-  GameSkillRule('numerals', 'counting', 'one event per round: chose the numeral that matches'),
-  GameSkillRule('trace_letters', null, 'tracing is not checked (stroke order is not validated), so there is nothing to score'),
-  GameSkillRule('word_book', null, 'exposure only: looking at a word is recorded as exposure, never as skill'),
 ];
 
 GameSkillRule? ruleFor(String gameId) {

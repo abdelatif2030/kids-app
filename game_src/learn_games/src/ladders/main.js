@@ -4,9 +4,11 @@
 // lands, and the pawn hops square by square while the app's voice counts the steps ("واحد، اتنين، تلاتة").
 // First to the flag on 30 wins — either way the race ends happily. The learning star the first time a race is finished.
 import * as THREE from 'three';
+import { polish } from '../kit/realism.js';
 import { Shell, h } from '../kit/shell.js';
 import { THEME_GARDEN } from '../kit/sound.js';
 import { makeItem } from '../kit/toys3d.js';
+import { NUMBERS } from '../kit/words.js';
 import { Race, LADDERS, SLIDES, LAST, cellXY } from './sim.js';
 
 const TEXT = {
@@ -18,7 +20,7 @@ const TEXT = {
   slide: ['زحليقة! وييي', 'A slide! Wheee'],
   youWin_m: ['وصلت للعلم الأول!', 'You reached the flag first!'],
   youWin_f: ['وصلتي للعلم الأول!', 'You reached the flag first!'],
-  bearWin: ['الدبدوب وصل الأول! برافو عليكم', 'Teddy got there first! Well played'],
+  bearWin: ['الدبدوب وصل الأول! أحسنتم', 'Teddy got there first! Well played'],
 };
 const COUNT = { ar: ['واحد', 'اتنين', 'تلاتة', 'أربعة', 'خمسة', 'ستة'], en: ['one', 'two', 'three', 'four', 'five', 'six'] };
 
@@ -46,6 +48,7 @@ class Game {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     sh.root.prepend(this.renderer.domElement);
     this.scene = new THREE.Scene();
+    polish(this.renderer, this.scene);
     this.scene.background = new THREE.Color(0xa8e0ff);
     this.scene.fog = new THREE.Fog(0xa8e0ff, 30, 70);
     this.camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
@@ -309,7 +312,9 @@ class Game {
       setTimeout(() => this.sh.finishCard(this.sh.t('title'), ev.who === 0 ? '🏁' : '🧸', () => this._start()), 1800);
       return;
     }
-    setTimeout(() => this._turn(), 500);
+    // the child hears the number of the square they stand on (a number word to learn, 1-30)
+    if (ev.who === 0) this.sh.speak(NUMBERS[ev.at - 1][this.en ? 1 : 0]);
+    setTimeout(() => this._turn(), ev.who === 0 ? 1700 : 500);
   }
 
   _offset(who) { return who === 0 ? new THREE.Vector3(-0.22, 0, 0.05) : new THREE.Vector3(0.24, 0, -0.08); }

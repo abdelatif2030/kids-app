@@ -23,3 +23,13 @@ export const ITEM_WORDS = {
   plane: ['طيارة', 'plane', 'الطيارة'],
   train: ['قطر', 'train', 'القطر'],
 };
+
+/** The numbers 1-30 in Egyptian Arabic and English (said when a pawn stops on a square). */
+export const NUMBERS = [
+  ['واحد', 'one'], ['اتنين', 'two'], ['تلاتة', 'three'], ['أربعة', 'four'], ['خمسة', 'five'], ['ستة', 'six'], ['سبعة', 'seven'],
+  ['تمانية', 'eight'], ['تسعة', 'nine'], ['عشرة', 'ten'], ['حداشر', 'eleven'], ['اتناشر', 'twelve'], ['تلاتاشر', 'thirteen'],
+  ['أربعتاشر', 'fourteen'], ['خمستاشر', 'fifteen'], ['ستاشر', 'sixteen'], ['سبعتاشر', 'seventeen'], ['تمنتاشر', 'eighteen'],
+  ['تسعتاشر', 'nineteen'], ['عشرين', 'twenty'], ['واحد وعشرين', 'twenty-one'], ['اتنين وعشرين', 'twenty-two'],
+  ['تلاتة وعشرين', 'twenty-three'], ['أربعة وعشرين', 'twenty-four'], ['خمسة وعشرين', 'twenty-five'], ['ستة وعشرين', 'twenty-six'],
+  ['سبعة وعشرين', 'twenty-seven'], ['تمانية وعشرين', 'twenty-eight'], ['تسعة وعشرين', 'twenty-nine'], ['تلاتين', 'thirty'],
+];

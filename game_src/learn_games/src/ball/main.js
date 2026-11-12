@@ -4,6 +4,7 @@
 // among the glowing question marks. Right: the ball pops out there and Bobby runs over, wagging, to fetch it. A wrong
 // place only wobbles. Five rounds; skill 'spatial' (on / under / next to / inside).
 import * as THREE from 'three';
+import { polish } from '../kit/realism.js';
 import { Shell, h } from '../kit/shell.js';
 import { THEME_GARDEN } from '../kit/sound.js';
 import { makeItem } from '../kit/toys3d.js';
@@ -13,8 +14,8 @@ const TEXT = {
   title: ['فين الكورة؟', 'Where Is the Ball?'],
   intro: ['بوبي خبّى الكورة! اسمع وقول هي فين', 'Bobby hid the ball! Listen and find it'],
   no: ['مش هنا... اسمع تاني', 'Not here... listen again'],
-  yes_m: ['برافو! لقيت الكورة', 'Yes! You found the ball'],
-  yes_f: ['برافو! لقيتي الكورة', 'Yes! You found the ball'],
+  yes_m: ['أحسنت! لقيت الكورة', 'Yes! You found the ball'],
+  yes_f: ['أحسنتي! لقيتي الكورة', 'Yes! You found the ball'],
   again: ['اسمع تاني', 'Hear again'],
 };
 
@@ -46,6 +47,7 @@ class Game {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     sh.root.prepend(this.renderer.domElement);
     this.scene = new THREE.Scene();
+    polish(this.renderer, this.scene);
     this.scene.background = new THREE.Color(0xfff0d8);
     this.camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
     this.scene.add(new THREE.HemisphereLight(0xffffff, 0xd8b890, 1.6));

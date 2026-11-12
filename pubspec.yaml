@@ -123,6 +123,10 @@ flutter:
     - assets/games/learn_ladders/
     - assets/games/learn_ball/
     - assets/games/learn_pattern/
+    - assets/games/learn_letters/
+    - assets/games/learn_counting/
+    - assets/games/learn_shapes/
+    - assets/games/learn_animals/
     - assets/games/learn_voice/
     - assets/games/learn_voice/ar/
     - assets/games/learn_voice/en/

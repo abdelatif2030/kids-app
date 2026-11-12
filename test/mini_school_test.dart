@@ -115,21 +115,13 @@ void main() {
       await tester.pump();
     }
 
-    await show(1);
-    expect(find.text('افرقع البالونات'), findsOneWidget);
-    expect(find.text('لعبة الألوان'), findsNothing);
+    // one learning game for ages 3-6 (owner 2026-11-12): the learning world
     await show(2);
-    expect(find.text('لعبة الألوان'), findsOneWidget);
-    await show(3);
-    expect(find.text('لعبة الألوان'), findsOneWidget);
-    expect(find.text('حروف وكلمات'), findsOneWidget);
-    expect(find.text('لعبة الذاكرة'), findsOneWidget);
+    expect(find.text('عالم رحلتي التعليمي'), findsNothing);
     await show(4);
-    expect(find.text('لعبة الألوان'), findsNothing);
-    expect(find.text('رياضيات'), findsOneWidget);
+    expect(find.text('عالم رحلتي التعليمي'), findsOneWidget);
     await show(10);
-    expect(find.text('رياضيات'), findsOneWidget);
-    expect(find.text('لعبة الذاكرة'), findsNothing);
+    expect(find.text('عالم رحلتي التعليمي'), findsNothing);
   });
 
   testWidgets('subjects screen lists all subjects', (tester) async {

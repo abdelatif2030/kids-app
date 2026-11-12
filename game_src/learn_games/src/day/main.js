@@ -1,10 +1,13 @@
-// «رتّب يومي» — Arrange My Day (rebuilt learning game, docs/LEARNING_GAMES_REBUILD.md #4).
-// A cosy room with a big window. Picture cards of the day wait on the shelf below; the child taps them in the order
-// they happen and each one flies up to its wooden peg on the clothesline across the window. The sky in the window
-// follows the day — pink dawn, blue morning, golden afternoon, orange sunset, starry night — and the room's lamp comes
-// on in the evening. Each card's words are said by the app's voice. A wrong card only wiggles. Five rounds.
+// «رتّب يومي» — Arrange My Day (rebuilt in 3D, learning game #4). A cosy room with a big window: the sky in the window
+// follows the day (pink dawn, blue morning, golden afternoon, orange sunset, a starry night with the moon) and a
+// clothesline with wooden pegs stretches across it. Chunky 3D picture cards (a bed, a bowl, a backpack, a pot, a bath...)
+// wait on a wooden shelf; the child taps them in the order they happen and each one swings up and hangs from its peg.
+// Each card's words are said by the voice. A wrong card only wiggles; after two the right one glows. Five rounds.
+import * as THREE from 'three';
 import { Shell, h } from '../kit/shell.js';
 import { THEME_GARDEN } from '../kit/sound.js';
+import { Stage, M, canvasTex } from '../kit/stage3d.js';
+import { makeThing } from '../kit/things3d.js';
 import { DayPlay, stepById } from './sim.js';
 
 const TEXT = {
@@ -26,133 +29,251 @@ const THEME_DAY = {
   melody: [[0, 0, 76], [0, 4, 79], [1, 0, 81], [1, 4, 77], [2, 0, 79], [2, 4, 74], [3, 0, 76], [4, 0, 72], [4, 4, 76], [5, 0, 77], [5, 4, 81], [6, 0, 79], [6, 4, 83], [7, 0, 84]],
 };
 
+// the picture on each card: a 3D model and its board colour
+const PIC = {
+  wake: ['bed', 0x9ad8ff, 1.0], wash: ['soap', 0xffc0dc, 1.3], breakfast: ['bowl', 0xffe08a, 1.3], school: ['backpack', 0xffb0a0, 1.3],
+  lunch: ['pot', 0xc8f0b0, 1.3], play: ['teddy', 0xffd8a0, 1.5], dinner: ['plate', 0xd8c8ff, 1.3], bath: ['tub', 0xa8e8ff, 1.0],
+  teeth: ['toothbrush', 0xb8f0e0, 1.3], sleep: ['crescent', 0xb8b8f0, 1.5],
+};
+const SKY = [[0, '#ffb0c0', '#ffe4c0'], [0.15, '#7ac8ff', '#d8f0ff'], [0.5, '#4ab0ff', '#c0e8ff'], [0.65, '#ffc860', '#ffe8b0'], [0.78, '#ff8a50', '#ffc890'], [0.9, '#1a2a6a', '#3a4a8a'], [1, '#0a1440', '#1a2a5a']];
+const lerpC = (a, b, k) => new THREE.Color(a).lerp(new THREE.Color(b), k);
+function skyAt(t) {
+  let i = 0;
+  while (i < SKY.length - 2 && t > SKY[i + 1][0]) i++;
+  const [t0, a0, b0] = SKY[i], [t1, a1, b1] = SKY[i + 1];
+  const k = Math.max(0, Math.min(1, (t - t0) / (t1 - t0)));
+  return [lerpC(a0, a1, k), lerpC(b0, b1, k)];
+}
+
 class Game {
   constructor(el, cfg, post) {
     this.sh = new Shell(el, cfg, post, { text: TEXT, theme: THEME_DAY });
     const sh = this.sh;
     this.en = sh.T.lang === 'en';
-    this.cv = h('canvas');
-    sh.root.prepend(this.cv);
-    this.g = this.cv.getContext('2d');
-    this.hung = h('div', { class: 'ldy-hung' });
-    this.tray = h('div', { class: 'ldy-tray' });
+    this.st = new Stage(sh, { bg: 0xfff1d6, ground: 0xe8c8a0, fov: 40, box: [6.6, 4.4], dir: [0, 0.18, 1], target: [0, 3.0, 0] });
     this.sky = 0.05;
     this.skyWant = 0.05;
-    sh.onResize = () => this._resize();
-    this._resize();
-    this.t0 = performance.now();
-    this.stars = Array.from({ length: 40 }, () => [Math.random(), Math.random() * 0.8, Math.random() * 6]);
+    this.cards = [];
+    this.hung = [];
+    this.stars = [];
+    this._room();
     sh.fonts().then(() => sh.titleCard(sh.t('title'), '🌅🥣🎒🛁😴', () => this._start()));
-    this._loop();
+    this.st.onFrame((dt, time) => this._frame(dt, time));
   }
 
-  _resize() {
-    const sh = this.sh;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    this.cv.width = Math.round(sh.w * dpr);
-    this.cv.height = Math.round(sh.h * dpr);
-    this.dpr = dpr;
-    // the window takes the upper part; the shelf with the cards the lower part
-    const W = sh.w, H = sh.h;
-    const ww = Math.min(W * 0.84, H * 1.35);
-    this.win = { x: (W - ww) / 2, y: H * 0.15, w: ww, h: H * 0.42 };
-    if (this.play) this._placeHung();
+  _room() {
+    const s = this.st.scene;
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 30), new THREE.MeshStandardMaterial({ map: canvasTex(256, 256, (g) => {
+      for (let i = 0; i < 8; i++) { g.fillStyle = i % 2 ? '#e8b880' : '#f0c48c'; g.fillRect(0, i * 32, 256, 32); g.fillStyle = 'rgba(120,70,30,.22)'; g.fillRect(0, i * 32 + 30, 256, 2); }
+    }, [10, 5]), roughness: 0.8 }));
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    s.add(floor);
+    this.wall = new THREE.Mesh(new THREE.PlaneGeometry(40, 14), new THREE.MeshStandardMaterial({ map: canvasTex(256, 256, (g) => {
+      g.fillStyle = '#fff1d6'; g.fillRect(0, 0, 256, 256);
+      g.fillStyle = 'rgba(255,170,130,.4)';
+      for (let y = 0; y < 256; y += 40) for (let x = (y / 40) % 2 ? 20 : 0; x < 256; x += 40) { g.beginPath(); g.arc(x, y, 5, 0, Math.PI * 2); g.fill(); }
+    }, [8, 3]), roughness: 1 }));
+    this.wall.position.set(0, 7, -3.4);
+    s.add(this.wall);
+    // the window: a frame around a sky plane (its colours follow the time of day)
+    this.skyMat = new THREE.MeshBasicMaterial({ map: this._skyTex(skyAt(0.05)), toneMapped: false });
+    const win = new THREE.Mesh(new THREE.PlaneGeometry(10, 3.9), this.skyMat);
+    win.position.set(0, 4.4, -3.3);
+    s.add(win);
+    const fr = M(0xffffff, { roughness: 0.4 });
+    for (const [w, hh, x, y] of [[10.5, 0.3, 0, 6.5], [10.5, 0.3, 0, 2.3], [0.3, 4.5, -5.1, 4.4], [0.3, 4.5, 5.1, 4.4], [0.14, 4.1, 0, 4.4]]) {
+      const b = new THREE.Mesh(new THREE.BoxGeometry(w, hh, 0.25), fr);
+      b.position.set(x, y, -3.2);
+      b.castShadow = true;
+      s.add(b);
+    }
+    this.sun = new THREE.Mesh(new THREE.SphereGeometry(0.5, 20, 16), new THREE.MeshBasicMaterial({ color: 0xffe05a, toneMapped: false }));
+    this.sun.position.z = -3.28;
+    s.add(this.sun);
+    this.moon = makeThing('crescent');
+    this.moon.scale.setScalar(1.2);
+    this.moon.position.z = -3.2;
+    s.add(this.moon);
+    for (let i = 0; i < 26; i++) {
+      const st = new THREE.Mesh(new THREE.SphereGeometry(0.045, 6, 5), new THREE.MeshBasicMaterial({ color: 0xffffe0, toneMapped: false }));
+      st.position.set((Math.random() - 0.5) * 9.2, 2.6 + Math.random() * 3.5, -3.27);
+      st.userData.ph = Math.random() * 6;
+      st.visible = false;
+      s.add(st);
+      this.stars.push(st);
+    }
+    // the clothesline: a rope with a gentle sag, in front of the window
+    this.rope = null;
+    // the shelf the cards wait on
+    const shelf = new THREE.Mesh(new THREE.BoxGeometry(12, 0.3, 2.6), M(0xd8964a));
+    shelf.position.set(0, 0.95, 0.5);
+    shelf.castShadow = true; shelf.receiveShadow = true;
+    s.add(shelf);
+    const front = new THREE.Mesh(new THREE.BoxGeometry(12, 0.7, 0.15), M(0xb8763a));
+    front.position.set(0, 0.55, 1.7);
+    s.add(front);
+    for (const x of [-5.6, 5.6]) {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.9, 2.4), M(0xb8763a));
+      leg.position.set(x, 0.45, 0.5);
+      s.add(leg);
+    }
+    // a lamp that comes on in the evening
+    this.lamp = new THREE.Group();
+    const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 2.2, 10), M(0xb8763a));
+    stand.position.y = 1.1;
+    const shade = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.65, 0.7, 20, 1, true), new THREE.MeshStandardMaterial({ color: 0xffe08a, emissive: 0xffb83a, emissiveIntensity: 0.1, side: THREE.DoubleSide }));
+    shade.position.y = 2.4;
+    this.lampShade = shade;
+    this.lamp.add(stand, shade);
+    this.lamp.position.set(-6.2, 0, -1.4);
+    s.add(this.lamp);
+    this.lampLight = new THREE.PointLight(0xffc870, 0, 12);
+    this.lampLight.position.set(-6.2, 2.5, -0.8);
+    s.add(this.lampLight);
+  }
+
+  _skyTex([top, bot]) {
+    const c = document.createElement('canvas');
+    c.width = 4; c.height = 64;
+    this._skyCtx = c.getContext('2d');
+    this._skyCv = c;
+    this._paintSky(top, bot);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    this._skyTexture = t;
+    return t;
+  }
+
+  _paintSky(top, bot) {
+    const g = this._skyCtx;
+    const gr = g.createLinearGradient(0, 0, 0, 64);
+    gr.addColorStop(0, '#' + top.getHexString()); gr.addColorStop(1, '#' + bot.getHexString());
+    g.fillStyle = gr; g.fillRect(0, 0, 4, 64);
+    this._skyTexture && (this._skyTexture.needsUpdate = true);
   }
 
   // ---- flow ---------------------------------------------------------------------------------------------------------
 
   _start() {
     this.play = new DayPlay(this.sh.age, Math.floor(Math.random() * 1e9));
-    this.sh.clear();
-    this.lightDots = this.sh.topBar(5, '☀️');
+    const sh = this.sh;
+    sh.clear();
+    this.lightDots = sh.topBar(5, '☀️');
     this.lightDots(0);
-    this.sh.layer.append(this.hung, this.tray);
-    this.sh.sound.setMode('play');
-    this.sh.say(this.sh.t('intro'), true, 3);
+    sh.sound.setMode('play');
+    sh.say(sh.t('intro'), true, 3);
     this._round();
   }
 
+  _slotX(i, n) {
+    const k = (i + 0.5) / n;
+    return this.en ? -4.1 + 8.2 * k : 4.1 - 8.2 * k;
+  }
+
   _round() {
+    for (const c of [...this.cards, ...this.hung]) this.st.scene.remove(c.g);
+    if (this.rope) this.st.scene.remove(this.rope);
+    this.cards = [];
+    this.hung = [];
     const r = this.play.current;
-    this.hung.replaceChildren();
-    this.tray.replaceChildren();
-    this.slots = r.order.length;
+    const n = r.order.length;
+    this.slots = n;
     this.skyWant = Math.max(0, stepById(r.order[0]).t - 0.04);
-    this.cards = new Map();
+    // the rope
+    const pts = [];
+    for (let i = 0; i <= 24; i++) { const k = i / 24; pts.push(new THREE.Vector3(-4.9 + 9.8 * k, 5.85 - Math.sin(k * Math.PI) * 0.18, -2.6)); }
+    this.rope = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 40, 0.035, 6), M(0xb08a5a));
+    this.st.add(this.rope);
+    // the wooden pegs where cards will hang (numbered)
+    this.pegs = Array.from({ length: n }, (_, i) => {
+      const x = this._slotX(i, n);
+      const sag = Math.sin(((x + 4.9) / 9.8) * Math.PI) * 0.18;
+      return new THREE.Vector3(x, 5.85 - sag, -2.5);
+    });
+    const cw = Math.min(1.9, 9.4 / n * 0.92);
+    this.cw = cw;
     r.shuffled.forEach((id, i) => {
-      const s = stepById(id);
-      const c = h('button', { class: 'ldy-card', 'aria-label': this.en ? s.en : s.ar, style: `--d:${i * 70}ms`, onclick: (e) => { e.stopPropagation(); this._tap(id, c); } },
-        h('span', { class: 'ldy-pic' }, s.emoji), h('span', { class: 'ldy-txt' }, this.en ? s.en : s.ar));
-      this.tray.append(c);
-      this.cards.set(id, c);
+      const card = this._makeCard(id, cw);
+      const x = ((i + 0.5) / n - 0.5) * Math.min(11, n * (cw + 0.35));
+      card.g.position.set(x, 1.7 + cw * 0.55, 0.5);
+      card.g.scale.setScalar(0.001);
+      card.born = -i * 0.08;
+      card.base = card.g.position.clone();
+      this.st.add(card.g);
+      this.cards.push(card);
     });
-    // empty pegs to fill
-    this.pegs = Array.from({ length: this.slots }, (_, i) => {
-      const p = h('div', { class: 'ldy-slot' }, h('i', { class: 'ldy-peg' }), h('b', {}, this.sh.T.num(i + 1)));
-      this.hung.append(p);
-      return p;
-    });
-    this._placeHung();
-    this.idle = 0;
+    this.st.setPicks(this.cards, (id) => this._tap(id));
+    this.st.focus = null;
+    this.st.mode = 'wait';
+    this.busy = false;
   }
 
-  /** The pegs sit on the clothesline across the window (right to left in Arabic). */
-  _placeHung() {
-    if (!this.pegs) return;
-    const { x, y, w } = this.win;
-    const n = this.slots;
-    const cw = Math.min(w / (n + 0.6), this.win.h * 0.62);
-    this.pegs.forEach((p, i) => {
-      const k = (i + 0.5) / n;
-      const px = this.en ? x + w * (0.06 + 0.88 * k) : x + w * (0.94 - 0.88 * k);
-      const sag = Math.sin(k * Math.PI) * this.win.h * 0.06;
-      p.style.cssText = `left:${px - cw / 2}px;top:${y + this.win.h * 0.12 + sag}px;width:${cw}px;height:${cw * 1.15}px`;
-    });
+  _makeCard(id, cw) {
+    const s = stepById(id);
+    const [thing, col, sc] = PIC[id];
+    const g = new THREE.Group();
+    const board = new THREE.Mesh(new THREE.BoxGeometry(cw, cw * 1.25, 0.14), M(col, { roughness: 0.4 }));
+    board.castShadow = true;
+    const inner = new THREE.Mesh(new THREE.BoxGeometry(cw * 0.9, cw * 1.15, 0.05), M(0xffffff, { roughness: 0.5 }));
+    inner.position.z = 0.06;
+    const t = makeThing(thing);
+    t.scale.setScalar(sc * cw * 0.4);
+    t.position.set(0, -cw * 0.3, 0.1);
+    t.rotation.y = 0.35;
+    const label = new THREE.Mesh(new THREE.PlaneGeometry(cw * 0.88, cw * 0.3), new THREE.MeshBasicMaterial({ map: canvasTex(512, 160, (c) => {
+      c.fillStyle = '#3a2a5a'; c.font = '900 64px Tajawal, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      let txt = this.en ? s.en : s.ar;
+      while (c.measureText(txt).width > 480 && c.font.indexOf('px') > 0) { const px = parseInt(c.font.match(/(\d+)px/)[1], 10) - 4; c.font = `900 ${px}px Tajawal, sans-serif`; }
+      c.fillText(txt, 256, 84);
+    }), transparent: true, toneMapped: false }));
+    label.position.set(0, -cw * 0.46, 0.1);
+    const glow = new THREE.Mesh(new THREE.BoxGeometry(cw * 1.2, cw * 1.45, 0.05), new THREE.MeshBasicMaterial({ color: 0xfff27a, transparent: true, opacity: 0, depthWrite: false }));
+    glow.position.z = -0.1;
+    const hit = new THREE.Mesh(new THREE.BoxGeometry(cw * 1.05, cw * 1.3, 0.6), new THREE.MeshBasicMaterial({ visible: false }));
+    hit.userData.id = id;
+    g.add(board, inner, t, label, glow, hit);
+    return { g, id, hit, glow, thing: t, wig: 0, born: 0, base: new THREE.Vector3(), used: false };
   }
 
-  _tap(id, card) {
-    if (this.busy || card.classList.contains('used')) return;
+  _tap(id) {
+    if (this.busy || this.st.mode !== 'wait') return;
+    const card = this.cards.find((c) => c.id === id);
+    if (!card || card.used) return;
     const ev = this.play.tap(id);
     if (!ev) return;
     if (!ev.ok) {
-      card.classList.remove('no');
-      void card.offsetWidth;
-      card.classList.add('no');
+      card.wig = 0.6;
       this.sh.sound.play('bump');
       this.sh.say(this.sh.t('notYet'), false, 1.4);
-      const hint = this.play.hint;
-      if (hint) this.cards.get(hint).classList.add('hint');
       return;
     }
     const s = stepById(id);
-    for (const c of this.cards.values()) c.classList.remove('hint');
-    // fly the card from the shelf to its peg
-    const from = card.getBoundingClientRect();
-    const slot = this.pegs[ev.slot];
-    const to = slot.getBoundingClientRect();
-    const root = this.sh.root.getBoundingClientRect();
-    const fly = card.cloneNode(true);
-    fly.className = 'ldy-card ldy-fly';
-    fly.style.cssText = `left:${from.left - root.left}px;top:${from.top - root.top}px;width:${from.width}px;height:${from.height}px`;
-    this.sh.layer.append(fly);
-    card.classList.add('used');
+    card.used = true;
     this.busy = true;
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      fly.style.cssText = `left:${to.left - root.left}px;top:${to.top - root.top}px;width:${to.width}px;height:${to.height}px`;
-    }));
+    this.cards = this.cards.filter((c) => c !== card);
+    this.st.setPicks(this.cards, (cid) => this._tap(cid));
+    const to = this.pegs[ev.slot].clone();
+    to.y -= card.g.children[0].geometry.parameters.height * 0.5 + 0.02;
+    this.fly = { card, from: card.g.position.clone(), to, t: 0, ev, step: s };
     this.sh.sound.play('whoosh');
-    setTimeout(() => {
-      fly.remove();
-      const hungCard = h('div', { class: 'ldy-card ldy-on' }, h('span', { class: 'ldy-pic' }, s.emoji), h('span', { class: 'ldy-txt' }, this.en ? s.en : s.ar));
-      slot.append(hungCard);
-      slot.classList.add('full');
-      this.sh.sound.play('drop');
-      this.sh.sound.play('right');
-      this.sh.speak(this.en ? s.en : s.ar, 1.6);
-      this.skyWant = s.t;
-      this.busy = false;
-      if (ev.roundDone) this._roundDone(ev);
-    }, 520);
+  }
+
+  _landed(F) {
+    const { card, ev, step: s } = F;
+    this.hung.push(card);
+    card.swing = 1;
+    this.sh.sound.play('drop');
+    this.sh.sound.play('right');
+    this.sh.speak(this.en ? s.en : s.ar);
+    this.skyWant = s.t;
+    // a wooden peg on the rope
+    const peg = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.5, 0.18), M(0xc8864a));
+    peg.position.set(F.to.x, this.pegs[ev.slot].y - 0.02, -2.5);
+    this.st.add(peg);
+    card.peg = peg;
+    this.busy = false;
+    if (ev.roundDone) this._roundDone(ev);
   }
 
   _roundDone(ev) {
@@ -162,200 +283,82 @@ class Game {
     setTimeout(() => {
       this.sh.sound.play('roundWin');
       this.sh.sound.play('cheer');
-      for (const p of this.pegs) p.classList.add('dance');
+      for (const c of this.hung) c.dance = 1.6;
+      this.st.sparkle(new THREE.Vector3(0, 5.5, -2));
       this.sh.say(this.sh.t('dayDone'), true, 2.2);
     }, 700);
     setTimeout(() => {
       this.busy = false;
       if (ev.finished) {
+        this.st.mode = 'end';
         this.sh.sound.setMode('calm');
         this.sh.finishCard(this.sh.t('title'), '🌙', () => this._start());
         return;
       }
       this._round();
       this.sh.say(this.sh.t('first'), false, 1.6);
-    }, 3200);
+    }, 3300);
   }
 
-  // ---- drawing ------------------------------------------------------------------------------------------------------
-
-  _loop() {
-    this._raf = requestAnimationFrame(() => this._loop());
-    const time = (performance.now() - this.t0) / 1000;
-    this.sky += (this.skyWant - this.sky) * 0.04;
-    const g = this.g;
-    const { w: W, h: H } = this.sh;
-    g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+  _frame(dt, time) {
+    // the sky follows the day
+    this.sky += (this.skyWant - this.sky) * Math.min(1, dt * 2.2);
     const t = this.sky;
-    const night = smooth(0.7, 0.95, t);
-    // the room: warm wallpaper with little hearts, darker at night (the lamp keeps it cosy)
-    g.fillStyle = mix('#fff1d6', '#c8b8e8', night * 0.6);
-    g.fillRect(0, 0, W, H);
-    g.fillStyle = mix('rgba(255,190,150,.35)', 'rgba(150,130,220,.3)', night);
-    const u = Math.min(W, H) / 100;
-    for (let y = 0; y < H; y += u * 9) for (let x = (y / (u * 9)) % 2 ? u * 4.5 : 0; x < W; x += u * 9) { g.beginPath(); g.arc(x, y, u * 0.8, 0, Math.PI * 2); g.fill(); }
-    // the window: sky by time of day
-    const { x, y, w, h: wh } = this.win;
-    const sk = skyColors(t);
-    const gr = g.createLinearGradient(0, y, 0, y + wh);
-    gr.addColorStop(0, sk[0]);
-    gr.addColorStop(1, sk[1]);
-    g.save();
-    roundRect(g, x, y, w, wh, u * 3);
-    g.clip();
-    g.fillStyle = gr;
-    g.fillRect(x, y, w, wh);
-    // stars at night
-    if (night > 0.05) {
-      g.fillStyle = `rgba(255,255,230,${night})`;
-      for (const [sx, sy, ph] of this.stars) { const r = u * (0.25 + 0.2 * Math.sin(time * 2 + ph)); g.beginPath(); g.arc(x + sx * w, y + sy * wh, r, 0, Math.PI * 2); g.fill(); }
+    const night = Math.max(0, Math.min(1, (t - 0.7) / 0.25));
+    if (this._lastSky == null || Math.abs(this._lastSky - t) > 0.002) {
+      const [a, b] = skyAt(t);
+      this._paintSky(a, b);
+      this._lastSky = t;
     }
-    // the sun by day, the moon at night, along an arc
-    const a = Math.PI * (1 - Math.min(1, t / 0.82));
-    const cx = x + w / 2 + Math.cos(a) * w * 0.42 * (this.en ? 1 : -1);
-    const cy = y + wh * 0.85 - Math.sin(a) * wh * 0.62;
-    if (night < 0.95) {
-      g.fillStyle = `rgba(255,214,90,${1 - night})`;
-      g.shadowColor = 'rgba(255,200,80,.9)';
-      g.shadowBlur = u * 6;
-      g.beginPath(); g.arc(cx, cy, u * 4.2, 0, Math.PI * 2); g.fill();
-      g.shadowBlur = 0;
+    const arc = Math.PI * (1 - Math.min(1, t / 0.82));
+    const dir = this.en ? 1 : -1;
+    const sx = Math.cos(arc) * 4.2 * dir, sy = 2.9 + Math.sin(arc) * 3.0;
+    this.sun.position.set(sx, sy, -3.28);
+    this.sun.visible = night < 0.95;
+    this.sun.material.color.set(t > 0.6 ? 0xffa040 : 0xffe05a);
+    this.moon.position.set(-3 * dir, 5.1, -3.2);
+    this.moon.visible = night > 0.05;
+    this.moon.scale.setScalar(0.9 + night * 0.4);
+    for (const s of this.stars) { s.visible = night > 0.1; s.scale.setScalar(0.8 + Math.sin(time * 2 + s.userData.ph) * 0.4); }
+    this.lampShade.material.emissiveIntensity = 0.1 + night * 1.5;
+    this.lampLight.intensity = night * 14;
+    // shelf cards
+    const hint = this.play && this.st.mode === 'wait' ? this.play.hint : null;
+    const fid = this.st.mode === 'wait' ? this.st.focusedId() : null;
+    for (const c of this.cards) {
+      if (c.born < 1) { c.born += dt * 3; const k = Math.max(0, Math.min(1, c.born)); c.g.scale.setScalar(Math.max(0.001, k < 1 ? 1 - Math.pow(1 - k, 3) + Math.sin(k * Math.PI) * 0.12 : 1)); }
+      const on = c.id === hint || c.id === fid;
+      c.glow.material.opacity = on ? 0.6 + Math.sin(time * 6) * 0.2 : 0;
+      c.g.position.y = c.base.y + (on ? Math.abs(Math.sin(time * 6)) * 0.12 : Math.sin(time * 1.6 + c.base.x) * 0.03);
+      c.thing.rotation.y = 0.35 + Math.sin(time * 1.2 + c.base.x) * 0.25;
+      if (c.wig > 0) { c.wig -= dt; c.g.rotation.z = Math.sin(c.wig * 40) * 0.25 * c.wig; } else c.g.rotation.z = 0;
     }
-    if (night > 0.05) {
-      const mx = x + w * (this.en ? 0.8 : 0.2), my = y + wh * 0.28;
-      g.fillStyle = `rgba(255,250,220,${night})`;
-      g.beginPath(); g.arc(mx, my, u * 3.6, 0, Math.PI * 2); g.fill();
-      g.fillStyle = mix(sk[0], sk[0], 0);
-      g.beginPath(); g.arc(mx + u * 1.6, my - u * 1, u * 3.2, 0, Math.PI * 2); g.fill();
+    if (this.fly) {
+      const F = this.fly;
+      F.t += dt / 0.7;
+      const k = Math.min(1, F.t);
+      const e = k * k * (3 - 2 * k);
+      F.card.g.position.lerpVectors(F.from, F.to, e);
+      F.card.g.position.y += Math.sin(k * Math.PI) * 1.2;
+      F.card.g.rotation.y = Math.sin(k * Math.PI * 2) * 0.3;
+      F.card.g.scale.setScalar(1 - 0.12 * e);
+      if (k >= 1) { const f = F; this.fly = null; this._landed(f); }
     }
-    // drifting clouds by day; far hills and a little house
-    g.fillStyle = `rgba(255,255,255,${0.85 * (1 - night)})`;
-    for (let i = 0; i < 3; i++) {
-      const cxx = x + ((time * 0.012 * (i + 1) + i * 0.37) % 1.2 - 0.1) * w;
-      const cyy = y + wh * (0.2 + i * 0.12);
-      for (const [dx, dy, r] of [[0, 0, 3], [3, -1, 3.6], [6, 0, 2.8]]) { g.beginPath(); g.arc(cxx + dx * u, cyy + dy * u, r * u, 0, Math.PI * 2); g.fill(); }
-    }
-    g.fillStyle = mix('#7ad06a', '#2a4a5a', night);
-    g.beginPath();
-    g.moveTo(x, y + wh);
-    for (let i = 0; i <= 20; i++) g.lineTo(x + (i / 20) * w, y + wh * (0.8 - 0.08 * Math.sin(i * 0.9)));
-    g.lineTo(x + w, y + wh);
-    g.fill();
-    g.restore();
-    // wooden frame and cross bars
-    g.strokeStyle = '#c8864a';
-    g.lineWidth = u * 2.2;
-    roundRect(g, x, y, w, wh, u * 3);
-    g.stroke();
-    g.lineWidth = u * 1;
-    g.beginPath(); g.moveTo(x + w / 2, y); g.lineTo(x + w / 2, y + wh); g.stroke();
-    // curtains
-    for (const side of [0, 1]) {
-      const cx0 = side ? x + w : x;
-      g.fillStyle = '#ff8ab0';
-      g.beginPath();
-      g.moveTo(cx0 - (side ? 0 : u * 6), y - u * 2);
-      g.lineTo(cx0 + (side ? u * 6 : 0), y - u * 2);
-      g.quadraticCurveTo(cx0 + (side ? -u * 3 : u * 3), y + wh * 0.5, cx0 + (side ? u * 4 : -u * 4), y + wh + u * 2);
-      g.lineTo(cx0 + (side ? u * 7 : -u * 7), y + wh + u * 2);
-      g.quadraticCurveTo(cx0 + (side ? u * 3 : -u * 3), y + wh * 0.5, cx0 + (side ? u * 6 : -u * 6), y - u * 2);
-      g.fill();
-    }
-    g.fillStyle = '#a86a3a';
-    g.fillRect(x - u * 8, y - u * 3, w + u * 16, u * 1.4); // the rod
-    // the clothesline
-    g.strokeStyle = '#f4f0e8';
-    g.lineWidth = u * 0.6;
-    g.beginPath();
-    g.moveTo(x + u * 1, y + wh * 0.12);
-    g.quadraticCurveTo(x + w / 2, y + wh * 0.26, x + w - u * 1, y + wh * 0.12);
-    g.stroke();
-    // the shelf the cards wait on
-    const sy = H * 0.66;
-    g.fillStyle = '#d89a5a';
-    g.fillRect(0, sy + (H - sy) * 0.78, W, u * 2);
-    g.fillStyle = 'rgba(0,0,0,.08)';
-    g.fillRect(0, sy + (H - sy) * 0.78 + u * 2, W, u * 1.2);
-    // a little lamp glows in the evening
-    if (night > 0.1) {
-      const lx = this.en ? W * 0.06 : W * 0.94, ly = H * 0.58;
-      const rg = g.createRadialGradient(lx, ly, 0, lx, ly, u * 22);
-      rg.addColorStop(0, `rgba(255,220,140,${0.55 * night})`);
-      rg.addColorStop(1, 'rgba(255,220,140,0)');
-      g.fillStyle = rg;
-      g.fillRect(lx - u * 22, ly - u * 22, u * 44, u * 44);
-      g.fillStyle = '#ffd88a';
-      g.beginPath(); g.moveTo(lx - u * 4, ly); g.lineTo(lx + u * 4, ly); g.lineTo(lx + u * 2.4, ly - u * 5); g.lineTo(lx - u * 2.4, ly - u * 5); g.fill();
+    for (const c of this.hung) {
+      if (c.swing > 0) { c.swing = Math.max(0, c.swing - dt * 0.9); c.g.rotation.z = Math.sin(time * 9) * 0.18 * c.swing; } else if (c.dance > 0) { c.dance -= dt; c.g.rotation.z = Math.sin(time * 12) * 0.12; } else c.g.rotation.z = Math.sin(time * 0.9 + c.g.position.x) * 0.012;
     }
   }
 
   pause() { this.sh.pause(); }
 
   dispose() {
-    cancelAnimationFrame(this._raf);
+    this.st.dispose();
     this.sh.dispose();
   }
 }
 
-function smooth(a, b, x) { const k = Math.max(0, Math.min(1, (x - a) / (b - a))); return k * k * (3 - 2 * k); }
-
-/** Sky top and bottom colours along the day. */
-function skyColors(t) {
-  const keys = [[0, '#ffb8c8', '#ffe2b8'], [0.15, '#8ad0ff', '#d8f2ff'], [0.5, '#6ac0ff', '#c8ecff'], [0.68, '#ffa86a', '#ffd88a'], [0.8, '#8a6ad8', '#ff9a8a'], [0.92, '#1a2a6a', '#3a3a8a'], [1, '#101a4a', '#2a2a6a']];
-  for (let i = 1; i < keys.length; i++) {
-    if (t <= keys[i][0]) {
-      const k = (t - keys[i - 1][0]) / (keys[i][0] - keys[i - 1][0]);
-      return [mix(keys[i - 1][1], keys[i][1], k), mix(keys[i - 1][2], keys[i][2], k)];
-    }
-  }
-  return [keys[keys.length - 1][1], keys[keys.length - 1][2]];
-}
-
-function mix(a, b, k) {
-  if (a.startsWith('rgba')) return k < 0.5 ? a : b;
-  const p = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
-  const A = p(a), B = p(b);
-  return `rgb(${A.map((v, i) => Math.round(v + (B[i] - v) * k)).join(',')})`;
-}
-
-function roundRect(g, x, y, w, hh, r) {
-  g.beginPath();
-  g.moveTo(x + r, y);
-  g.arcTo(x + w, y, x + w, y + hh, r);
-  g.arcTo(x + w, y + hh, x, y + hh, r);
-  g.arcTo(x, y + hh, x, y, r);
-  g.arcTo(x, y, x + w, y, r);
-  g.closePath();
-}
-
-const CSS = `
-.ldy-hung{position:absolute;inset:0;pointer-events:none}
-.ldy-slot{position:absolute;display:flex;align-items:flex-start;justify-content:center;transform-origin:50% 0}
-.ldy-slot>b{position:absolute;top:28%;left:50%;transform:translateX(-50%);font-size:calc(var(--u)*6);font-weight:900;color:rgba(255,255,255,.75);text-shadow:0 1px 3px rgba(0,0,0,.25)}
-.ldy-slot::before{content:'';position:absolute;inset:8% 4% 0;border:calc(var(--u)*.5) dashed rgba(255,255,255,.8);border-radius:calc(var(--u)*2.4)}
-.ldy-slot.full::before,.ldy-slot.full>b{display:none}
-.ldy-peg{position:absolute;top:-2%;left:50%;width:calc(var(--u)*2.2);height:calc(var(--u)*5);margin-left:calc(var(--u)*-1.1);background:linear-gradient(90deg,#c8864a,#e8b07a,#c8864a);border-radius:calc(var(--u)*.6);z-index:3;box-shadow:0 1px 2px rgba(0,0,0,.3)}
-.ldy-slot.dance{animation:ldy-swing 1s ease-in-out 2}
-@keyframes ldy-swing{0%,100%{transform:rotate(0)}25%{transform:rotate(7deg)}75%{transform:rotate(-7deg)}}
-.ldy-tray{position:absolute;left:0;right:0;bottom:max(calc(var(--u)*5),env(safe-area-inset-bottom));top:64%;display:flex;align-items:flex-end;justify-content:center;gap:calc(var(--u)*2.4);padding:0 calc(var(--u)*3);pointer-events:none}
-.ldy-card{pointer-events:auto;position:relative;width:min(calc(var(--u)*22),15vw);aspect-ratio:0.82;background:#fff;border:none;border-radius:calc(var(--u)*2.4);box-shadow:0 calc(var(--u)*.8) 0 #e0c8a8,0 calc(var(--u)*1.2) calc(var(--u)*2.4) rgba(80,50,20,.3);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.6);padding:calc(var(--u)*1);font-family:inherit;cursor:pointer;animation:ldy-in .5s cubic-bezier(.2,1.5,.4,1) both;animation-delay:var(--d,0ms)}
-.ldy-card::before{content:'';position:absolute;top:0;left:0;right:0;height:calc(var(--u)*1.6);border-radius:calc(var(--u)*2.4) calc(var(--u)*2.4) 0 0;background:linear-gradient(90deg,#ff8ab0,#ffd45a,#7ad0ff)}
-@keyframes ldy-in{from{transform:translateY(40%) scale(.6);opacity:0}to{transform:none;opacity:1}}
-.ldy-pic{font-size:calc(var(--u)*9);line-height:1}
-.ldy-txt{font-size:max(14px,calc(var(--u)*3.3));font-weight:900;color:#4a3a2a;text-align:center;line-height:1.15}
-.ldy-card.used{visibility:hidden}
-.ldy-card.no{animation:ldy-no .45s}
-@keyframes ldy-no{0%,100%{transform:none}20%{transform:translateX(-10%) rotate(-6deg)}50%{transform:translateX(9%) rotate(5deg)}80%{transform:translateX(-4%)}}
-.ldy-card.hint{box-shadow:0 0 0 calc(var(--u)*.9) #ffd23a,0 0 calc(var(--u)*4) #ffd23a;animation:ldy-glow 1s infinite alternate}
-@keyframes ldy-glow{to{transform:translateY(-6%)}}
-.ldy-card:focus-visible{outline:calc(var(--u)*.8) solid #3a8ae8;outline-offset:calc(var(--u)*.4)}
-.ldy-fly{position:absolute;z-index:20;transition:all .5s cubic-bezier(.3,1.2,.4,1);animation:none}
-.ldy-on{width:100%;height:100%;animation:none;box-shadow:0 calc(var(--u)*.8) calc(var(--u)*1.6) rgba(40,30,80,.3);transform-origin:50% 0;animation:ldy-swing 1.4s ease-in-out}
-`;
-
 const api = {
   start(el, config, post) {
-    if (!document.getElementById('ldy-style')) document.head.append(h('style', { id: 'ldy-style' }, CSS));
     const g = new Game(el, config || {}, post);
     api.last = g;
     return { dispose: () => g.dispose(), pause: () => g.pause() };

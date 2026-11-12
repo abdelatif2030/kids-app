@@ -45,15 +45,32 @@ export class Voice {
     return !!(m && m[this.lang] && m[this.lang].includes(clipId(text, this.lang)));
   }
 
-  /** Says one sentence or several in order. A new call replaces whatever was being said. */
-  say(texts) {
+  /**
+   * Says one sentence or several in order. A new call replaces whatever was being said.
+   * [onEach](i) is called as sentence i starts (a game lights the matching thing up); [onDone]() when the last one ends.
+   */
+  say(texts, onEach, onDone) {
     this.stop();
     this.queue = (Array.isArray(texts) ? texts : [texts]).map(spoken).filter(Boolean);
-    this._next();
+    this.i = 0;
+    this.onEach = onEach || null;
+    this.onDone = onDone || null;
+    this.run = (this.run || 0) + 1;
+    if (!this.queue.length && this.onDone) this.onDone();
+    else this._next();
   }
 
+  _finish() {
+    const d = this.onDone;
+    this.onDone = null;
+    if (d) d();
+  }
+
+  _start(i) { if (this.onEach) this.onEach(i); }
+
   _next(tries = 0) {
-    if (!this.queue.length || this.muted) return;
+    if (this.muted) { this._finish(); return; }
+    if (!this.queue.length) { this._finish(); return; }
     // the list of clips is still loading: wait a moment (at most a second) before choosing clip or device voice
     if (typeof window !== 'undefined' && !window.__learnVoice && tries < 8) {
       const mine = this.queue;
@@ -63,12 +80,19 @@ export class Voice {
     const text = this.queue.shift();
     if (!this.has(text)) {
       // no recording: the device voice says this one and whatever is left, as one sentence
-      const rest = [text, ...this.queue].join(this.lang === 'en' ? ', ' : '، ');
+      const all = [text, ...this.queue];
+      const rest = all.join(this.lang === 'en' ? ', ' : '، ');
       this.queue = [];
-      this.onTalk(Math.min(6, 1.2 + rest.length * 0.09));
+      this.onTalk(Math.min(8, 1.2 + rest.length * 0.09));
       this.fallback(rest, this.lang);
+      // the device voice speaks it as one sentence: the things light up at an even pace meanwhile, then it is done
+      const per = Math.max(600, Math.min(1100, (rest.length * 90) / all.length));
+      const run = this.run;
+      all.forEach((_, k) => setTimeout(() => { if (run === this.run) this._start(this.i + k); }, k * per));
+      setTimeout(() => { if (run === this.run) this._finish(); }, all.length * per + 300);
       return;
     }
+    this._start(this.i++);
     const a = new Audio(`${this.dir}${this.lang}/${clipId(text, this.lang)}.mp3`);
     this.audio = a;
     a.addEventListener('loadedmetadata', () => this.onTalk((a.duration || 2) + 0.3));
@@ -80,7 +104,9 @@ export class Voice {
   }
 
   stop() {
+    this.run = (this.run || 0) + 1; // anything still waiting from the last call is dropped
     this.queue = [];
+    this.onDone = null;
     if (this.audio) { try { this.audio.pause(); } catch (_) { /* fine */ } this.audio = null; }
   }
 }

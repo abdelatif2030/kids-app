@@ -1,8 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kids_app/games/connect_four_game.dart';
+import 'package:kids_app/games/adventure_games.dart';
+import 'package:kids_app/games/numerals_game.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/parent_screens.dart';
 import 'package:kids_app/teachers_models.dart';
@@ -37,7 +40,7 @@ void main() {
         home: Builder(
           builder: (c) => Scaffold(
             body: TextButton(
-              onPressed: () => Navigator.push(c, MaterialPageRoute(builder: (_) => const ConnectFourGame(childId: 'u1'))),
+              onPressed: () => Navigator.push(c, MaterialPageRoute(builder: (_) => MazeGame(childId: 'u1', age: 4, random: Random(1)))),
               child: const Text('open'),
             ),
           ),
@@ -57,14 +60,15 @@ void main() {
 
     testWidgets('a game in progress asks first; keep playing stays, leave goes back', (t) async {
       await openGame(t);
-      await t.tap(find.byKey(const ValueKey('col0')));
+      await t.tap(find.byKey(const ValueKey('maze_right'))); // a first move (one of right or down is always open from the corner)
+      await t.tap(find.byKey(const ValueKey('maze_down')));
       await t.pump();
       await t.pageBack();
       await t.pumpAndSettle();
       expect(find.byKey(const ValueKey('keep_playing')), findsOneWidget);
       await t.tap(find.byKey(const ValueKey('keep_playing')));
       await t.pumpAndSettle();
-      expect(find.byKey(const ValueKey('turn')), findsOneWidget); // still in the game
+      expect(find.byKey(const ValueKey('maze_board')), findsOneWidget); // still in the game
 
       await t.pageBack();
       await t.pumpAndSettle();
@@ -75,14 +79,15 @@ void main() {
 
     testWidgets('Escape on the dialog keeps the child in the game', (t) async {
       await openGame(t);
-      await t.tap(find.byKey(const ValueKey('col0')));
+      await t.tap(find.byKey(const ValueKey('maze_right'))); // a first move (one of right or down is always open from the corner)
+      await t.tap(find.byKey(const ValueKey('maze_down')));
       await t.pump();
       await t.pageBack();
       await t.pumpAndSettle();
       await t.sendKeyEvent(LogicalKeyboardKey.escape);
       await t.pumpAndSettle();
       expect(find.byKey(const ValueKey('leave_game')), findsNothing);
-      expect(find.byKey(const ValueKey('turn')), findsOneWidget);
+      expect(find.byKey(const ValueKey('maze_board')), findsOneWidget);
     });
   });
 
@@ -166,13 +171,13 @@ void main() {
   group('tablet landscape games', () {
     testWidgets('wide landscape puts the instruction in a side card; a phone keeps it on top', (t) async {
       _size(t, const Size(1280, 800));
-      await t.pumpWidget(_app(const ConnectFourGame(childId: 'u2')));
+      await t.pumpWidget(_app(const NumeralsGame(childId: 'u2', age: 5)));
       await t.pumpAndSettle();
       expect(find.byKey(const ValueKey('game_side_instruction')), findsOneWidget);
       expect(t.takeException(), isNull);
 
       _size(t, const Size(390, 800));
-      await t.pumpWidget(_app(const ConnectFourGame(childId: 'u2')));
+      await t.pumpWidget(_app(const NumeralsGame(childId: 'u2', age: 5)));
       await t.pumpAndSettle();
       expect(find.byKey(const ValueKey('game_side_instruction')), findsNothing);
     });

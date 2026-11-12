@@ -70,6 +70,30 @@ for (const b of pat.BEADS) both(b.ar, b.en);
 const ball = await imp('ball/sim.js');
 for (const s of ball.SPOTS) both(ball.sentence(s.id, false), ball.sentence(s.id, true));
 
+// the four games built last (Arabic only: the owner asked for the games in Arabic)
+const letters = await imp('letters/sim.js');
+for (const l of letters.LETTERS) { add(letters.question(l), 'ar'); add(letters.reward(l), 'ar'); }
+const counting = await imp('counting/sim.js');
+for (let n = 1; n <= 10; n++) add(counting.askText(n), 'ar');
+add(counting.COUNT_Q, 'ar');
+const shapes = await imp('shapes/sim.js');
+for (const sh of shapes.SHAPES) {
+  add(shapes.question(sh, null), 'ar');
+  add(shapes.reward(sh, null), 'ar');
+  for (const c of shapes.COLORS) { add(shapes.question(sh, c), 'ar'); add(shapes.reward(sh, c), 'ar'); }
+}
+const animals = await imp('animals/sim.js');
+for (const a of animals.ANIMALS) { add(animals.question(a), 'ar'); add(animals.reward(a), 'ar'); }
+
+// the learning world's levels: words, first letter, numbers, order of the alphabet, habits (Mama and Baba), encouragements
+const lv = await imp('letters/levels.js');
+for (const l of letters.LETTERS) { add(lv.wordQuestion(l), 'ar'); add(lv.firstQuestion(l), 'ar'); }
+for (const id of lv.ALPHABET.slice(0, -1)) add(lv.nextQuestion(letters.letterById(id)), 'ar');
+for (let n = 1; n <= 20; n++) add(lv.numberQuestion(n), 'ar');
+for (const hb of lv.HABITS) add(hb.text, 'ar');
+for (const tab of Object.values(lv.PICKS)) for (const it of tab.items) add(tab.prompt(it), 'ar');
+for (const c of [...lv.CHEERS_M, ...lv.CHEERS_F]) add(c, 'ar');
+
 const all0 = [...lines.values()];
 const all = all0.sort((a, b) => a.lang.localeCompare(b.lang) || a.text.localeCompare(b.text));
 const out = join(ROOT, 'assets', 'games', 'learn_voice');

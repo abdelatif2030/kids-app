@@ -24,7 +24,7 @@ void main() {
   final known = {
     ...kEducationalGames.map((g) => g.id),
     ...kFunGames.map((g) => 'fun_${g.id}'),
-    'balloons', 'animal', 'colors', 'letters', 'memory', 'math',
+    'animal', 'colors', 'letters', 'memory', 'math',
   };
   final hasArabic = RegExp(r'[؀-ۿ]');
 
@@ -157,9 +157,9 @@ void main() {
     test('Animal World: story, names, where it lives, what it eats, a pet to feed — all existing pieces', () {
       final a = learningAdventureFor('animals')!;
       expect(a.discover.map((r) => r.id), containsAll(['bunny_garden']));
-      expect(a.play, containsAll(['animal_habitats', 'feed_animal', 'listen_picture']));
+      expect(a.play, contains('feed_animal'));
       expect(a.apply.map((r) => r.id), contains('feed_pet'));
-      expect(a.units, containsAll(['sci_animals_home', 'sci_animals_food']));
+      expect(a.units, contains('sci_animals_food'));
     });
 
     test('a discover item that does not fit the age falls back to one that does', () {

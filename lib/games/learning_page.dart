@@ -1,22 +1,15 @@
 import 'package:flutter/material.dart';
 
 import '../adventures/adventure_screen.dart';
-import '../color_game.dart';
 import '../design/focusable_tap.dart';
-import '../design/picture_stage.dart';
 import '../drawing_screen.dart';
-import '../games_screen.dart';
 import '../journey/lands.dart';
 import '../journey/models.dart';
 import '../journey/resume.dart';
 import '../journey/ui/heart_button.dart';
 import '../journey/ui/land_map_screen.dart';
 import '../l10n/strings.dart';
-import '../letters_game.dart';
-import '../math_game.dart';
-import '../memory_game.dart';
 import '../stories/story_screens.dart';
-import '../where_animal_game.dart';
 import 'game_catalog.dart';
 import 'game_common.dart';
 
@@ -46,10 +39,8 @@ class LearnEntry {
 /// The learning games ids that have a card (the casual tic-tac-toe, snake, whack-a-mole and catch-the-stars were taken
 /// off the learning page on the owner's request: the fun-games page has better games for play).
 const Set<String> kLearnCardIds = {
-  'balloons', 'animal', 'colors', 'letters', 'memory', 'math', 'snakes_ladders', 'jigsaw', 'maze', 'treasure_hunt',
-  'connect_dots', 'animal_habitats', 'match_pictures', 'letter_fishing', 'connect_four', 'numerals', 'trace_letters',
-  'word_book', 'listen_picture', 'listen_word', 'listen_letter', 'odd_one_out', 'pattern', 'compare', 'sort_groups',
-  'feed_animal', 'big_small', 'next_in_day', 'shape_finder', 'where_ball', 'drawing', 'stories', 'adventures', 'feelings',
+  'letter_fishing', 'math', 'shape_finder', 'feed_animal', 'sort_groups', 'next_in_day', 'where_ball', 'pattern', 'treasure_hunt',
+  'snakes_ladders', 'drawing', 'stories', 'adventures', 'feelings',
 };
 
 /// Every learning game that suits the child's age, then the four sections, in the order shown.
@@ -57,17 +48,7 @@ List<LearnEntry> learnEntries(ChildProfile child) {
   final age = child.age;
   final id = child.id;
   Future<void> push(BuildContext c, Widget Function() page) => Navigator.push(c, MaterialPageRoute<void>(builder: (_) => page()));
-  final classic = <(String, String Function(), int, int, Widget Function())>[
-    ('balloons', () => loc('افرقع البالونات'), 1, 2, () => const BalloonGame()),
-    ('animal', () => loc('فين الحيوان؟'), 1, 2, () => const WhereAnimalGame()),
-    ('colors', () => loc('لعبة الألوان'), 2, 3, () => const ColorGame()),
-    ('letters', () => loc('حروف وكلمات'), 3, 8, () => const LettersGame()),
-    ('memory', () => loc('لعبة الذاكرة'), 3, 6, () => const MemoryGame()),
-    ('math', () => loc('رياضيات'), 4, 12, () => MathGame(age: age)),
-  ];
   return [
-    for (final g in classic)
-      if (age >= g.$3 && age <= g.$4) LearnEntry(g.$1, g.$2, (c) => push(c, () => GameBackdrop(child: g.$5()))),
     for (final g in gamesForAge(age))
       if (kLearnCardIds.contains(g.id))
         LearnEntry(g.id, g.title, (c) async {
@@ -91,16 +72,27 @@ class LearnShelf {
   const LearnShelf(this.id, this.emoji, this.title, this.ids);
 }
 
+/// The ten learning games (all on the first page, owner request 2026-11-12) and the creative section.
+const Set<String> kTenLearningGames = {'letter_fishing'};
+
 final List<LearnShelf> kLearnShelves = [
-  LearnShelf('all', '✨', () => tr2('الكل', 'All'), const {}),
-  LearnShelf('brain', '🧠', () => tr2('تفكير', 'Thinking'), const {'maze', 'sort_groups', 'treasure_hunt', 'next_in_day', 'snakes_ladders', 'connect_four', 'where_ball', 'pattern'}),
-  LearnShelf('letters', '🔤', () => tr2('حروف', 'Letters'), const {'letters', 'letter_fishing', 'trace_letters', 'word_book', 'listen_letter', 'listen_word'}),
-  LearnShelf('numbers', '🔢', () => tr2('أرقام', 'Numbers'), const {'math', 'numerals', 'compare', 'connect_dots', 'big_small'}),
-  LearnShelf('shapes', '🎨', () => tr2('ألوان وأشكال', 'Colours & shapes'), const {'colors', 'shape_finder', 'jigsaw'}),
-  LearnShelf('animals', '🦁', () => tr2('حيوانات', 'Animals'), const {'animal', 'animal_habitats', 'feed_animal', 'listen_picture', 'balloons'}),
-  LearnShelf('observe', '🧩', () => tr2('ذاكرة', 'Memory'), const {'memory', 'match_pictures', 'odd_one_out'}),
+  LearnShelf('all', '🎓', () => tr2('ألعاب التعلّم', 'Learning games'), kTenLearningGames),
   LearnShelf('create', '🖍️', () => tr2('رسم وقصص', 'Draw & stories'), const {'drawing', 'stories', 'adventures', 'feelings'}),
 ];
+
+/// ALL [count] cards on one page: the biggest cards that fit them in 1-3 rows (the first page of the learning games).
+({int rows, int cols, double cardW}) learnGridFit(double gridW, double gridH, int count, double gap) {
+  var best = (rows: 1, cols: count.clamp(1, 99), cardW: 0.0);
+  for (var rows = 1; rows <= 3; rows++) {
+    final cols = (count / rows).ceil().clamp(1, 99);
+    var cw = (gridW - gap * (cols - 1)) / cols;
+    final maxByH = ((gridH - gap * (rows - 1)) / rows) * kLearnCardAspect;
+    if (cw > maxByH) cw = maxByH;
+    if (cw > 320) cw = 320;
+    if (cw > best.cardW) best = (rows: rows, cols: cols, cardW: cw);
+  }
+  return best;
+}
 
 /// How the cards of one page are laid out: the biggest cards that fit, in 1-3 rows.
 ({int rows, int cols, double cardW}) learnGrid(double gridW, double gridH, int count, double gap) {
@@ -190,7 +182,7 @@ class _LearningGamesScreenState extends State<LearningGamesScreen> {
           final gridW = w - side * 2;
           final gridTop = topH + chipsH + 12;
           final gridH = (h - gridTop - dotsH - 12).clamp(80.0, double.infinity);
-          final g = learnGrid(gridW, gridH, entries.length, gap);
+          final g = entries.length <= 12 ? learnGridFit(gridW, gridH, entries.length, gap) : learnGrid(gridW, gridH, entries.length, gap);
           final perPage = g.rows * g.cols;
           final count = (entries.length / perPage).ceil().clamp(1, 99);
           final cardW = g.cardW;

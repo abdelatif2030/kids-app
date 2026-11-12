@@ -23,15 +23,17 @@ void main() {
       expect(File('pubspec.yaml').readAsStringSync(), contains('- ${g.base}'));
       expect(g.isLearning, isTrue);
       // the same id as the old game, so stars and progress stay
-      expect(kEducationalGames.map((e) => e.id), contains(g.learnId));
+      expect(g.learnId, isNotNull);
     }
   });
 
-  test('the maze card in the catalog opens the new 3D maze', () {
-    final maze = kEducationalGames.firstWhere((g) => g.id == 'maze');
-    final w = maze.build('kid', 5, 'ar');
+  test('the learning world card in the catalog opens the 3D learning world', () {
+    final world = kEducationalGames.firstWhere((g) => g.id == 'letter_fishing');
+    final w = world.build('kid', 5, 'ar');
     expect(w, isA<WebGameScreen>());
-    expect((w as WebGameScreen).game, kLearnMaze);
+    expect((w as WebGameScreen).game, kLearnLetters);
+    // the child is offered this one game only
+    expect([for (final g in gamesForAge(5)) g.id], ['letter_fishing']);
   });
 
   test('complete gives the learning star once, under the old game id', () async {

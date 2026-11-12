@@ -5,6 +5,7 @@
 // up a shell or a crab (no loss); the right one pops up a chest that opens with gold coins. Five maps a set; one
 // dashboard event per map (skill 'spatial', found without a wrong dig). The learning star only the first time.
 import * as THREE from 'three';
+import { polish } from '../kit/realism.js';
 import { Shell, h } from '../kit/shell.js';
 import { THEME_GARDEN } from '../kit/sound.js';
 import { Hunt, clueText } from './sim.js';
@@ -44,6 +45,7 @@ class Game {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     sh.root.prepend(this.renderer.domElement);
     this.scene = new THREE.Scene();
+    polish(this.renderer, this.scene);
     this.scene.background = new THREE.Color(0x8ad8f8);
     this.scene.fog = new THREE.Fog(0x8ad8f8, 40, 90);
     this.camera = new THREE.PerspectiveCamera(40, 1, 0.1, 200);
