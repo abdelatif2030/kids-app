@@ -258,7 +258,7 @@ class Game {
   _sayClue() {
     this.parrotTalk = 1.6;
     this.sh.sound.play('sparkle');
-    this.sh.speak(this._clueWords());
+    this.sh.speak(this.hunt.map.clues.map((c) => clueText(c, this.en)));
   }
 
   _dig(cell) {

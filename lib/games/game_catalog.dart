@@ -311,7 +311,7 @@ final List<GameInfo> kEducationalGames = [
     Icons.sports_soccer_rounded,
     3,
     6,
-    (id, age, _) => WhereIsBallGame(childId: id, age: age),
+    (id, age, _) => learnWebGameScreen(kLearnBall, id, age), // rebuilt: 3D playroom and a puppy
   ),
 ];
 

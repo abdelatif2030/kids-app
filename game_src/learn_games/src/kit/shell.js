@@ -3,6 +3,7 @@
 // star, the "tap here for sound" pill, the app bridge (save / exit / speak / round / complete), Arabic first with
 // English when the app is in English and boy/girl wording. Nothing is downloaded except the app's own fonts.
 import { Sound } from './sound.js';
+import { Voice } from './voice.js';
 
 export function h(tag, attrs = {}, ...kids) {
   const e = document.createElement(tag);
@@ -99,6 +100,8 @@ export class Shell {
     this.save = this.cfg.save && typeof this.cfg.save === 'object' ? { ...this.cfg.save } : {};
     this.sound = new Sound(opts.theme);
     if (opts.musicOnly) { this.sound.musicOnly = true; this.opts.voice = false; }
+    // the recorded voice: its list of clips loads now, while the title card shows
+    this.voice = new Voice(this.base, this.T.lang, (t, lang) => this.post({ type: 'speak', text: t, lang }), (secs) => this.sound.duck(secs));
     this.sound.muted = !!this.save.muted;
     if (!document.getElementById('lk-style')) document.head.append(h('style', { id: 'lk-style' }, CSS));
     this.root = h('div', { class: 'lk-root', dir: this.T.lang === 'en' ? 'ltr' : 'rtl' });
@@ -139,10 +142,11 @@ export class Shell {
   // ---- the app bridge ---------------------------------------------------------------------------------------------
 
   /** Says [text] with the app's own voice (and ducks the music meanwhile). */
-  speak(text, secs) {
+  /** Says [text] (or several sentences in order): a bundled recording when there is one, else the app's device voice. */
+  speak(text) {
     if (!text || this.opts.voice === false) return; // a game may be music-only (owner: the maze)
-    this.sound.duck(secs ?? Math.min(5, 1.2 + text.length * 0.09)); // the slower child-like voice needs a little longer
-    this.post({ type: 'speak', text, lang: this.T.lang });
+    this.voice.muted = this.sound.muted;
+    this.voice.say(text);
   }
   /** One answer, for the parent dashboard (skill null = nothing recorded). */
   round(skill, correct, detail) { if (skill) this.post({ type: 'round', skill, correct: !!correct, detail: detail == null ? null : String(detail) }); }
@@ -213,9 +217,10 @@ export class Shell {
     setTimeout(() => again.focus({ preventScroll: true }), 50);
   }
 
-  pause() { this.sound.suspend(); }
+  pause() { this.sound.suspend(); if (this.voice) this.voice.stop(); }
 
   dispose() {
+    if (this.voice) this.voice.stop();
     clearInterval(this._pill);
     clearTimeout(this._bt);
     this.sound.dispose();

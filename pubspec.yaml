@@ -122,6 +122,10 @@ flutter:
     - assets/games/learn_day/
     - assets/games/learn_ladders/
     - assets/games/learn_four/
+    - assets/games/learn_ball/
+    - assets/games/learn_voice/
+    - assets/games/learn_voice/ar/
+    - assets/games/learn_voice/en/
     - assets/games/summit_rush/
     - assets/home/home_main.webp
     - assets/home/cartoons_stories.webp

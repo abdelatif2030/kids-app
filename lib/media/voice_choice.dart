@@ -92,5 +92,5 @@ const double kChildSpeechPitch = 1.05;
 /// The learning games' voice (owner request 2026-11-11: "a child-like voice, very clear"): no real child voice exists in
 /// the phone's speech engines, so the game voice is a little higher and a little slower than the lesson voice. Kept
 /// moderate on purpose: a much higher pitch makes Arabic words harder to understand.
-const double kGameVoicePitch = 1.22;
-const double kGameVoiceRate = 0.92;
+const double kGameVoicePitch = 1.0; // 2026-11-12: the raised pitch sounded bad on real devices (owner); natural is clearest
+const double kGameVoiceRate = 1.0;

@@ -34,10 +34,9 @@ void main() {
       // the lessons keep Modern Standard Arabic first
       expect(rankVoices([egypt, offlineStd], 'ar').first, offlineStd);
     });
-    test('the game voice is brighter and slower than the lesson voice, but not extreme', () {
-      expect(kGameVoicePitch, greaterThan(1.1));
-      expect(kGameVoicePitch, lessThanOrEqualTo(1.3));
-      expect(kGameVoiceRate, lessThan(1));
+    test('the fallback device voice of the games is natural (a raised pitch sounded bad: owner feedback)', () {
+      expect(kGameVoicePitch, 1.0);
+      expect(kGameVoiceRate, 1.0);
     });
     test('the engine\'s own quality label counts', () {
       final r = rankVoices([const VoiceInfo('a', 'en-US'), const VoiceInfo('b', 'en-US', quality: 'premium')], 'en');

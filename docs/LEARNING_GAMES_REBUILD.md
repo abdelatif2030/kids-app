@@ -45,7 +45,8 @@ professional look like the fun games, and do everything needed without asking ag
 | 4 | next_in_day «رتّب يومي» | **Built** (a cosy room with a window; picture cards of the day hang on a clothesline in order; the sky in the window follows the day from dawn to a starry night and a lamp comes on; 3/4/5 steps by age; skill 'sequence', one event per day strip). |
 | 5 | snakes_ladders «السلالم والزلاجات» | **Built** (3D playground board 1-30, wooden ladders and real playground slides (no snakes), giant die (1-3 for ages 3-4), the child races Teddy the bear, the app's voice counts the hops, numbers pop from the squares; no dashboard event: dice luck). |
 | 6 | connect_four «أربعة ورا بعض» | **Built** (glossy blue 3D frame on a playroom table, two players on one device, discs drop with a bounce and a clack, a turn panel with an arrow, the winning four glow with confetti, a draw is celebrated too; no dashboard event: strategy). |
-| 7-35 | the rest | Not built yet; next in the order below. |
+| 7 | where_ball «فين الكورة؟» | **Built** (3D playroom, table and open toy box, Bobby the puppy; the sentence on a sign + voice + 🔊; tap the right glowing place; 3/4/5 places by age; skill 'spatial'). |
+| 8-35 | the rest | Not built yet; next in the order below. |
 
 ## The prompts
 

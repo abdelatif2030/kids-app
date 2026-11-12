@@ -302,5 +302,16 @@ final WebGame kLearnFour = WebGame(
   learnId: 'connect_four',
 );
 
+/// «فين الكورة؟» (Where Is the Ball?): a 3D playroom, a puppy, on / under / next to / inside.
+final WebGame kLearnBall = WebGame(
+  id: 'learn_ball',
+  folder: 'learn_ball',
+  global: 'LearnBall',
+  storeKey: 'learn_ball',
+  minAge: 3,
+  title: () => tr2('فين الكورة؟', 'Where Is the Ball?'),
+  learnId: 'where_ball',
+);
+
 /// Rebuilt learning games, by their old game id.
-final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay, kLearnLadders, kLearnFour]) g.learnId!: g};
+final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay, kLearnLadders, kLearnFour, kLearnBall]) g.learnId!: g};
