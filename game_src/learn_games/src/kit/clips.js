@@ -38,10 +38,12 @@ export function withClips(kind, actor, height = 3.6) {
   const meshes = new Map();
   const meshFor = (entry) => {
     if (meshes.has(entry.file)) return meshes.get(entry.file);
-    // the character fills ~96 % of the cell height, so the cell is a little taller than the character
-    const ch = height / 0.96;
-    const geo = new THREE.PlaneGeometry((ch * entry.w) / entry.h, ch);
-    geo.translate(0, ch / 2 - (ch - height) * 0.2, 0);
+    // world size per picture pixel: the usual (median) height of the character in the clip = the hero's height;
+    // the ground line (feet) of the clip is placed on y = 0
+    const sc = height / (entry.px || entry.h * 0.9);
+    const cw = entry.w * sc, ch = entry.h * sc, ground = entry.ground != null ? entry.ground : entry.h;
+    const geo = new THREE.PlaneGeometry(cw, ch);
+    geo.translate(0, ch / 2 - (entry.h - ground) * sc, 0);
     const mat = new THREE.MeshBasicMaterial({ map: sheet(entry).clone(), transparent: true, alphaTest: 0.06, toneMapped: false, side: THREE.DoubleSide });
     mat.map.repeat.set(1 / entry.cols, 1 / entry.rows);
     mat.map.needsUpdate = true;

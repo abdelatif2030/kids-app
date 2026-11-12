@@ -11,33 +11,54 @@ import os from 'node:os';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const OUT = path.join(HERE, '../../assets/games/clips');
 const [, , input, who, name, ...rest] = process.argv;
-if (!input || !who || !name) { console.error('usage: node make_clip.mjs <video> <boy|girl|owl> <jump|laugh|clap|wave|walk|idle> [--key 00ff00] [--sim 0.30] [--fps 12] [--secs 4]'); process.exit(1); }
+if (!input || !who || !name) { console.error('usage: node make_clip.mjs <video> <boy|girl|owl> <jump|laugh|clap|wave|walk|idle> [--key 00ff00] [--sim 0.30] [--fps 12] [--secs 4] [--start 0] [--height 720]'); process.exit(1); }
 const opt = (k, d) => { const i = rest.indexOf('--' + k); return i >= 0 ? rest[i + 1] : d; };
-const KEY = opt('key', '00ff00'), SIM = opt('sim', '0.30'), FPS = +opt('fps', 12), SECS = +opt('secs', 4);
+const KEY = opt('key', '00ff00'), SIM = opt('sim', '0.30'), FPS = +opt('fps', 12), SECS = +opt('secs', 4), START = +opt('start', 0), HEIGHT = +opt('height', 720);
+
+// Green removal by 'how much greener than red and blue' (not by colour distance), so yellow clothes and skin stay solid.
+// Soft edge between LO and HI, and the green glow left on edge pixels is removed (green is capped at the red/blue level).
+const LO = +opt('lo', 22), HI = +opt('hi', 70);
+function keyGreen(buf) {
+  for (let i = 0; i < buf.length; i += 4) {
+    const r = buf[i], g = buf[i + 1], b = buf[i + 2];
+    const m = r > b ? r : b;
+    const d = g - m;
+    if (d <= LO) { if (d > 0) buf[i + 1] = m; continue; }
+    const t = d >= HI ? 1 : (d - LO) / (HI - LO);
+    buf[i + 3] = Math.round(255 * (1 - t * t * (3 - 2 * t)));
+    buf[i + 1] = m;
+  }
+}
 
 function frames(height) {
   // key out the green, remove the green glow left on the edges, raw RGBA frames
-  const vf = `fps=${FPS},scale=-2:${height},format=rgba,chromakey=0x${KEY}:${SIM}:0.12,despill=type=green:mix=0.6:expand=0.2,format=rgba`;
-  const r = spawnSync('ffmpeg', ['-v', 'error', '-y', '-t', String(SECS), '-i', input, '-vf', vf, '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'], { maxBuffer: 1 << 30 });
+  const vf = `fps=${FPS},scale=-2:${height},format=rgba`;
+  const r = spawnSync('ffmpeg', ['-v', 'error', '-y', '-ss', String(START), '-t', String(SECS), '-i', input, '-vf', vf, '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'], { maxBuffer: 1 << 30 });
   if (r.status !== 0) { console.error(String(r.stderr)); process.exit(1); }
   const probe = spawnSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x', input]);
   const [sw, sh] = String(probe.stdout).trim().split('x').map(Number);
   const w = Math.round((sw * height) / sh / 2) * 2;
   const buf = r.stdout; const size = w * height * 4;
+  keyGreen(buf);
   return { w, h: height, n: Math.floor(buf.length / size), buf };
 }
 
-let height = 480, fr;
+let height = HEIGHT, fr;
 for (;;) {
   fr = frames(height);
   // bounding box of everything visible in any frame
   let x0 = fr.w, y0 = fr.h, x1 = 0, y1 = 0;
+  const tops = [], bottoms = [];
   for (let f = 0; f < fr.n; f++) {
     const base = f * fr.w * fr.h * 4;
+    let ft = fr.h, fb = 0;
     for (let y = 0; y < fr.h; y++) for (let x = 0; x < fr.w; x++) {
-      if (fr.buf[base + (y * fr.w + x) * 4 + 3] > 24) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+      if (fr.buf[base + (y * fr.w + x) * 4 + 3] > 24) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; if (y < ft) ft = y; if (y > fb) fb = y; }
     }
+    tops.push(ft); bottoms.push(fb);
   }
+  const med = (a) => [...a].sort((p, q) => p - q)[Math.floor(a.length / 2)];
+  const medH = med(bottoms.map((b, i) => b - tops[i])), medBottom = med(bottoms);
   if (x1 <= x0) { console.error('nothing left after removing the green: check the background colour (--key) or similarity (--sim)'); process.exit(1); }
   const m = 4;
   x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(fr.w - 1, x1 + m); y1 = Math.min(fr.h - 1, y1 + m);
@@ -63,7 +84,7 @@ for (;;) {
   if (e.status !== 0) { console.error(String(e.stderr)); process.exit(1); }
   const jsonFile = path.join(OUT, 'clips.json');
   const all = fs.existsSync(jsonFile) ? JSON.parse(fs.readFileSync(jsonFile, 'utf8')) : {};
-  all[`${who}_${name}`] = { file: `${who}_${name}.webp`, frames: fr.n, cols, rows, w: cw, h: ch, fps: FPS, loop: name === 'walk' || name === 'idle', feetY: y1 / fr.h };
+  all[`${who}_${name}`] = { file: `${who}_${name}.webp`, frames: fr.n, cols, rows, w: cw, h: ch, fps: FPS, loop: name === 'walk' || name === 'idle', px: medH, ground: medBottom - y0 + 4 };
   fs.writeFileSync(jsonFile, JSON.stringify(all, null, 1));
   console.log(`${who}_${name}: ${fr.n} frames, ${cw}x${ch} each, atlas ${AW}x${AH}, ${(fs.statSync(file).size / 1024).toFixed(0)} KB`);
   break;
