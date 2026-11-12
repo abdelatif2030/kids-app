@@ -56,7 +56,7 @@ void main() {
   group('the rules table', () {
     test('every learning game either feeds an existing skill or says why it cannot', () {
       final skills = {for (final s in kSkills) s.id};
-      for (final g in kEducationalGames) {
+      for (final g in gamesForAge(5)) {
         final rule = ruleFor(g.id);
         final choice = kChoiceGameSkills[g.id];
         final own = const {'review_words'}.contains(g.id); // review_game records practice only, by design
