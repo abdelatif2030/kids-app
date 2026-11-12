@@ -11,7 +11,7 @@ const T = JSON.parse(readFileSync(join(ROOT, 'tools', 'game_voice', 'tashkeel.js
 const MARK = /[ً-ْ]/;
 const STRIP = /[ً-ْـٰ]/g;
 // the voice may read a slightly different spelling than the screen shows (owner's choices)
-const SPELLING = new Set(['خلصتها تاني! برافو عليكي', 'حداشر', 'فين رقم حداشر؟', 'شاطرة أوي!', 'شاطرة أوي! خدتي نجمة جديدة!', 'لقيتي الكنز! شاطرة']);
+const SPELLING = new Set(['خلصتها تاني! برافو عليكي', 'حداشر', 'فين رقم حداشر؟', 'شاطره أوي!', 'شاطره أوي! خدتي نجمة جديدة!', 'لقيتي الكنز! شاطره']);
 
 test('every spoken Arabic sentence has a diacritized reading', () => {
   const missing = lines.filter((l) => !T[l.text]).map((l) => l.text);
