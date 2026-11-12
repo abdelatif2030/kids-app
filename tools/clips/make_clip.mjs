@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const OUT = path.join(HERE, '../../assets/games/clips');
+let OUT = path.join(HERE, '../../assets/games/clips');
 const [, , input, who, name, ...rest] = process.argv;
 if (!input || !who || !name) { console.error('usage: node make_clip.mjs <video> <boy|girl|owl> <jump|laugh|clap|wave|walk|idle> [--key 00ff00] [--sim 0.30] [--fps 12] [--secs 4] [--start 0] [--height 720]'); process.exit(1); }
 const opt = (k, d) => { const i = rest.indexOf('--' + k); return i >= 0 ? rest[i + 1] : d; };
@@ -18,6 +18,10 @@ const KEY = opt('key', '00ff00'), SIM = opt('sim', '0.30'), FPS = +opt('fps', 12
 // Green removal by 'how much greener than red and blue' (not by colour distance), so yellow clothes and skin stay solid.
 // Soft edge between LO and HI, and the green glow left on edge pixels is removed (green is capped at the red/blue level).
 const LO = +opt('lo', 22), HI = +opt('hi', 70);
+// --roi x,y,w,h (fractions of the frame): only this part of the frame is used (the rest is cut away before processing).
+// Use it when the character stands in the middle of a big green frame and you only want the character.
+const ROI = opt('roi', '').split(',').map(Number);
+if (opt('out', '')) OUT = path.resolve(opt('out', ''));
 function keyGreen(buf) {
   for (let i = 0; i < buf.length; i += 4) {
     const r = buf[i], g = buf[i + 1], b = buf[i + 2];
@@ -31,16 +35,21 @@ function keyGreen(buf) {
 }
 
 function frames(height) {
-  // key out the green, remove the green glow left on the edges, raw RGBA frames
-  const vf = `fps=${FPS},scale=-2:${height},format=rgba`;
-  const r = spawnSync('ffmpeg', ['-v', 'error', '-y', '-ss', String(START), '-t', String(SECS), '-i', input, '-vf', vf, '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'], { maxBuffer: 1 << 30 });
-  if (r.status !== 0) { console.error(String(r.stderr)); process.exit(1); }
   const probe = spawnSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x', input]);
   const [sw, sh] = String(probe.stdout).trim().split('x').map(Number);
-  const w = Math.round((sw * height) / sh / 2) * 2;
-  const buf = r.stdout; const size = w * height * 4;
+  const w0 = Math.round((sw * height) / sh / 2) * 2;
+  // --roi: cut the wanted part of the frame out first (also keeps memory small)
+  let w = w0, h = height, cropF = '';
+  if (ROI.length === 4 && ROI.every(Number.isFinite)) {
+    w = Math.floor((w0 * ROI[2]) / 2) * 2; h = Math.floor((height * ROI[3]) / 2) * 2;
+    cropF = `,crop=${w}:${h}:${Math.floor(w0 * ROI[0])}:${Math.floor(height * ROI[1])}`;
+  }
+  const vf = `fps=${FPS},scale=${w0}:${height}${cropF},format=rgba`;
+  const r = spawnSync('ffmpeg', ['-v', 'error', '-y', '-ss', String(START), '-t', String(SECS), '-i', input, '-vf', vf, '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'], { maxBuffer: 1 << 30 });
+  if (r.status !== 0) { console.error(String(r.stderr)); process.exit(1); }
+  const buf = r.stdout; const size = w * h * 4;
   keyGreen(buf);
-  return { w, h: height, n: Math.floor(buf.length / size), buf };
+  return { w, h, n: Math.floor(buf.length / size), buf };
 }
 
 let height = HEIGHT, fr;
@@ -80,7 +89,7 @@ for (;;) {
   const tmp = path.join(os.tmpdir(), `atlas_${process.pid}.rgba`);
   fs.writeFileSync(tmp, atlas);
   const file = path.join(OUT, `${who}_${name}.webp`);
-  const e = spawnSync('ffmpeg', ['-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-s', `${AW}x${AH}`, '-i', tmp, '-c:v', 'libwebp', '-lossless', '1', '-compression_level', '6', file]);
+  const e = spawnSync('ffmpeg', ['-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-s', `${AW}x${AH}`, '-i', tmp, ...(rest.includes('--lossy') ? ['-c:v', 'libwebp', '-lossless', '0', '-quality', '82', '-compression_level', '2'] : ['-c:v', 'libwebp', '-lossless', '1', '-compression_level', '2']), file]);
   fs.rmSync(tmp, { force: true });
   if (e.status !== 0) { console.error(String(e.stderr)); process.exit(1); }
   const jsonFile = path.join(OUT, 'clips.json');
