@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../design/focusable_tap.dart';
 import '../design/picture_stage.dart';
 import '../journey/models.dart';
+import '../media/page_voice.dart';
 import '../l10n/strings.dart';
 import 'web_games/web_game_screen.dart';
 
@@ -116,10 +117,32 @@ PictureSpot _backSpot(BuildContext context, String id) => PictureSpot(
 
 /// «ألعاب للتسلية»: the owner's picture with sixteen cards. A child younger than a game's [WebGame.minAge] gets a
 /// friendly note instead of the game.
-class FunGamesScreen extends StatelessWidget {
+class FunGamesScreen extends StatefulWidget {
   /// The child playing (progress is kept per child). Null in old callers and tests.
   final ChildProfile? child;
   const FunGamesScreen({super.key, this.child});
+
+  @override
+  State<FunGamesScreen> createState() => _FunGamesScreenState();
+}
+
+class _FunGamesScreenState extends State<FunGamesScreen> {
+  ChildProfile? get child => widget.child;
+
+  @override
+  void initState() {
+    super.initState();
+    // «هنلعب سوا النهارده», once the page is on screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) PageVoice.say(PageVoice.playToday);
+    });
+  }
+
+  @override
+  void dispose() {
+    PageVoice.stop();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

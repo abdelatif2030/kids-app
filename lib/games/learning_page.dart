@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../design/animated_character.dart';
 import '../design/picture_stage.dart';
 import '../journey/models.dart';
+import '../media/page_voice.dart';
 import '../journey/resume.dart';
 import '../l10n/strings.dart';
 import 'game_catalog.dart';
@@ -44,7 +45,10 @@ class _LearningGamesScreenState extends State<LearningGamesScreen> {
     super.initState();
     // the welcome waves once the page is on screen
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _hero.welcome();
+      if (mounted) {
+        _hero.welcome();
+        PageVoice.say(PageVoice.learnToday); // «هنتعلم سوا النهارده»
+      }
     });
     _sub = LearnReactions.stream.listen((e) {
       if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? true)) return; // covered by the game: it celebrates itself
@@ -63,6 +67,7 @@ class _LearningGamesScreenState extends State<LearningGamesScreen> {
   void dispose() {
     _sub?.cancel();
     _hero.dispose();
+    PageVoice.stop();
     super.dispose();
   }
 
