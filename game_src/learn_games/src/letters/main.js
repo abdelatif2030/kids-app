@@ -86,7 +86,7 @@ class Game {
     this.save = sh.save;
     if (!this.save.lw) this.save.lw = { unlocked: 1, done: {} };
     this.st.onFrame((dt, time) => this._frame(dt, time));
-    sh.fonts().then(() => this._startScreen());
+    sh.fonts().then(() => this._start()); // no start screen any more (owner 2026-11-13): straight to the levels page
   }
 
   // ---- the world ---------------------------------------------------------------------------------------------------
@@ -306,6 +306,9 @@ class Game {
   // ---- the hero (boy or girl, chosen once and kept) ---------------------------------------------------------------------
 
   _start() {
+    // the hero is chosen once; when the child's profile already says boy or girl, that is the hero (no chooser)
+    const given = this.sh.cfg && (this.sh.cfg.gender === 'girl' || this.sh.cfg.gender === 'boy') ? this.sh.cfg.gender : null;
+    if (!this.save.lw.hero && given) { this.save.lw.hero = given; this.save.lw.look = {}; this.sh.saveNow(); }
     if (this.save.lw.hero) { this._makeHero(this.save.lw.hero, this.save.lw.look); this._startPage(); } else this._chooseHero();
   }
 
@@ -430,33 +433,6 @@ class Game {
     const place = (el, cx, cy, w, hh) => { el.style.left = `${(cx - w / 2) * 100}%`; el.style.top = `${(cy - hh / 2) * 100}%`; el.style.width = `${w * 100}%`; el.style.height = `${hh * 100}%`; box.append(el); return el; };
     wrap.append(blur, box);
     return { wrap, place };
-  }
-
-  /** The first screen of the learning world (owner's picture, 2026-11-13): the whole picture is the screen; the big green button
-   *  starts, the round buttons are home and sound. Without the picture file: just the green play button over the scene. */
-  _startScreen() {
-    const sh = this.sh;
-    const plain = () => sh.titleCard(sh.t('title'), '', () => this._start(), true);
-    sh.clear();
-    const img = new Image();
-    img.className = 'lw-pic-img';
-    img.alt = '';
-    img.onload = () => {
-      const { wrap, place } = this._pictureFrame(img, 1227 / 1281);
-      const go = h('button', { class: 'lw-hit', 'aria-label': sh.t('play'), onclick: () => { sh.sound.unlock(); sh.sound.play('tap'); this._start(); } });
-      place(go, 0.5, 0.575, 0.88, 0.2);
-      const snd = sh.soundBtn();
-      snd.classList.add('lw-hit');
-      place(snd, 0.096, 0.084, 0.15, 0.14);
-      const back = sh.backBtn();
-      back.classList.add('lw-hit');
-      place(back, 0.903, 0.084, 0.15, 0.14);
-      sh.layer.append(wrap);
-      sh.sound.setMode('menu');
-      setTimeout(() => go.focus({ preventScroll: true }), 50);
-    };
-    img.onerror = plain;
-    img.src = `${sh.base}../art/start_page.webp`;
   }
 
   /** The levels page as the owner's picture, with invisible buttons on the twelve tiles, home, sound and "next level". */
