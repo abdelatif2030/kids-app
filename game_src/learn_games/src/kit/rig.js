@@ -134,7 +134,7 @@ export function makeRig(kind) {
     // ---- what the body does ----
     let by = Math.sin(time * 1.8) * 1.2, headRot = Math.sin(time * 0.9) * 0.025, headX = 0, torsoSy = 1 + Math.sin(time * 1.8) * 0.006;
     let aL = 'down', aR = 'down', rL = 0.05 + Math.sin(time * 1.6) * 0.02, rR = -0.05 - Math.sin(time * 1.6) * 0.02;
-    let mood = 'smile', swing = 0, rootRot = 0, jump = 0, look = 0;
+    let shut = false, mood = 'smile', swing = 0, rootRot = 0, jump = 0, look = 0;
     if (!St.act) {
       St.nextMicro -= dt;
       if (St.nextMicro <= 0) {
@@ -156,7 +156,7 @@ export function makeRig(kind) {
       case 'point': if (k < 1.8) { aR = 'point'; rR = -0.25; mood = 'smile'; headRot = -0.05; } break;
       case 'clap': if (k < 1.8) { aL = aR = 'bend'; const c = Math.abs(Math.sin(k * 11)); rL = 0.6 - c * 0.5; rR = -0.6 + c * 0.5; mood = 'laugh'; jump = Math.abs(Math.sin(k * 5.5)) * 6; } break;
       // the happy laugh of the owner's reference video: eyes wide open, open smile, fists up at the chest, quick small bounces
-      case 'giggle': if (k < 2.2) { aL = aR = 'bend'; rL = 0.9 + Math.sin(k * 12) * 0.12; rR = -0.9 - Math.sin(k * 12) * 0.12; mood = 'laugh'; jump = Math.abs(Math.sin(k * 6)) * 8; headRot = Math.sin(k * 6) * 0.05; } break;
+      case 'giggle': if (k < 2.2) { aL = aR = 'bend'; rL = 0.9 + Math.sin(k * 12) * 0.12; rR = -0.9 - Math.sin(k * 12) * 0.12; mood = 'laugh'; jump = Math.abs(Math.sin(k * 6)) * 8; headRot = Math.sin(k * 6) * 0.05; shut = k > 0.9 && k < 1.5; } break;
       case 'cheer': case 'jump': if (k < 1.3) { aL = aR = 'up'; rL = 0.15; rR = -0.15; mood = 'laugh'; jump = Math.abs(Math.sin(k * 7)) * 34; } break;
       case 'celebrate': if (k < 2.6) { aL = aR = 'up'; rL = 0.1 + Math.sin(k * 14) * 0.18; rR = -0.1 - Math.sin(k * 14) * 0.18; mood = 'laugh'; jump = Math.abs(Math.sin(k * 5)) * 40; headRot = Math.sin(k * 9) * 0.07; } break;
       case 'think': if (k < 2.4) { aR = 'bend'; rR = -0.9; mood = 'o'; headRot = 0.12 + Math.sin(k * 3) * 0.04; } break;
@@ -180,9 +180,9 @@ export function makeRig(kind) {
     mouth.userData.show(mood);
     // blink now and then
     St.blink -= dt;
-    let closed = false;
+    let closed = shut;
     if (St.blink <= 0 && St.blinkT === 0) { St.blinkT = 0.0001; }
-    if (St.blinkT > 0) { St.blinkT += dt; closed = St.blinkT < 0.14; if (St.blinkT >= 0.14) { St.blinkT = 0; St.blink = 2 + Math.random() * 3.5; } }
+    if (St.blinkT > 0) { St.blinkT += dt; closed = closed || St.blinkT < 0.14; if (St.blinkT >= 0.14) { St.blinkT = 0; St.blink = 2 + Math.random() * 3.5; } }
     eyeL.userData.show(closed ? 'shut' : 'open'); eyeR.userData.show(closed ? 'shut' : 'open');
     // turn a little toward what the child looks at
     const ty = Math.max(-0.3, Math.min(0.3, (St.lookX - g.position.x) * 0.035));
