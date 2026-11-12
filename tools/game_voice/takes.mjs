@@ -35,7 +35,11 @@ const VARIANTS = {
 const BR = (x) => ` <break time="${x}s" />`;
 // the heart: a plain قلب came out as 'galb'; three ways to say it (Egyptian hamza / fusha with damma / very slow qaf)
 const H = (rest) => [{ t: `دِي أَلْب${rest}`, s: { speed: 0.88 } }, { t: `دِي قَلْبُ${rest}`, s: { speed: 0.82 } }, { t: `دِي قَـــلْب${rest}`, s: { speed: 0.7, stability: 0.75 } }];
+// the letter ذال was heard as زاي: Egyptian 'zaal', the fusha ذ with the tongue between the teeth, and the fusha slowly
+const DH = (a, b) => [{ t: `${a}الزَّال${b}`, s: { speed: 0.88 } }, { t: `${a}الذَّال${b}`, s: { speed: 0.82 } }, { t: `${a}ذَالْ${b}`, s: { speed: 0.75, stability: 0.75 } }];
 Object.assign(VARIANTS, {
+  'فين حرف الذال؟': [{ t: 'فِين حَرْف الزَّال؟', s: { speed: 0.88 } }, { t: 'فِين حَرْف الذَّال؟', s: { speed: 0.82 } }, { t: 'فِين حَرْف ذَالْ؟', s: { speed: 0.75, stability: 0.75 } }],
+  'الذال زي ذرة': [{ t: 'الزَّال زَي زُرَة', s: { speed: 0.88 } }, { t: 'الذَّال زَي ذُرَة', s: { speed: 0.82 } }, { t: 'ذَالْ زَي ذُرَة', s: { speed: 0.75, stability: 0.75 } }],
   'إيه الحرف اللي بعد الزاي؟': [{ t: 'إِيه الحَرْف اللِّي بَعْد حَرْف الزَّاي؟', s: { speed: 0.88 } }, { t: 'إِيه الحَرْف اللِّي بَعْد الزَّاي؟' + BR(0.4), s: { speed: 0.8 } }, { t: 'إِيه الحَرْف اللِّي بَعْد زَاي؟', s: { speed: 0.88 } }],
   'الكنز فوق العلم': [{ t: 'الكَنْز فُوقَا العَلَم', s: { speed: 0.88 } }, { t: 'الكَنْز فَوْقَ العَلَم', s: { speed: 0.88 } }, { t: 'الكَنْز فُوقَ العَلَم', s: { speed: 0.8, stability: 0.75 } }],
   'تسعتاشر': [{ t: 'تِسَعْ تَاشَر', s: { speed: 0.78 } }, { t: 'تِسْعَتَاشَر' + BR(0.5), s: { speed: 0.85 } }, { t: 'تِسَعْتَاشَر.', s: { speed: 0.85, stability: 0.8 } }],
