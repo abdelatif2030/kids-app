@@ -169,7 +169,7 @@ final List<GameInfo> kEducationalGames = [
     Icons.grid_on_rounded,
     5,
     6,
-    (id, _, _) => ConnectFourGame(childId: id),
+    (id, age, _) => learnWebGameScreen(kLearnFour, id, age), // rebuilt: glossy 3D toy frame
   ),
   GameInfo(
     NumeralsGame.gameId,

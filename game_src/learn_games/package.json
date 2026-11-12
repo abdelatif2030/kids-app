@@ -5,12 +5,13 @@
   "description": "Rehlaty rebuilt learning games (docs/LEARNING_GAMES_REBUILD.md). One folder per game in src/, a shared kit in src/kit. Each is built into assets/games/learn_<id>/game.js",
   "scripts": {
     "build:maze": "esbuild src/maze/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/learn_maze/game.js",
-    "build": "npm run build:maze && npm run build:sort && npm run build:treasure && npm run build:day && npm run build:ladders",
+    "build": "npm run build:maze && npm run build:sort && npm run build:treasure && npm run build:day && npm run build:ladders && npm run build:four",
     "test": "node --test",
     "build:sort": "esbuild src/sort/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/learn_sort/game.js",
     "build:treasure": "esbuild src/treasure/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/learn_treasure/game.js",
     "build:day": "esbuild src/day/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/learn_day/game.js",
-    "build:ladders": "esbuild src/ladders/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/learn_ladders/game.js"
+    "build:ladders": "esbuild src/ladders/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/learn_ladders/game.js",
+    "build:four": "esbuild src/four/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/learn_four/game.js"
   },
   "dependencies": {
     "three": "0.170.0"

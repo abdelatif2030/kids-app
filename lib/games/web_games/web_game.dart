@@ -291,5 +291,16 @@ final WebGame kLearnLadders = WebGame(
   learnId: 'snakes_ladders',
 );
 
+/// «أربعة ورا بعض» (Four in a Row): a glossy 3D toy frame for two players on one device.
+final WebGame kLearnFour = WebGame(
+  id: 'learn_four',
+  folder: 'learn_four',
+  global: 'LearnFour',
+  storeKey: 'learn_four',
+  minAge: 5,
+  title: () => tr2('أربعة ورا بعض', 'Four in a Row'),
+  learnId: 'connect_four',
+);
+
 /// Rebuilt learning games, by their old game id.
-final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay, kLearnLadders]) g.learnId!: g};
+final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay, kLearnLadders, kLearnFour]) g.learnId!: g};
