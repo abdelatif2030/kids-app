@@ -134,6 +134,9 @@ export function makeRig(kind) {
     // ---- what the body does ----
     let by = Math.sin(time * 1.8) * 1.2, headRot = Math.sin(time * 0.9) * 0.025, headX = 0, torsoSy = 1 + Math.sin(time * 1.8) * 0.006;
     let aL = 'down', aR = 'down', rL = 0.05 + Math.sin(time * 1.6) * 0.02, rR = -0.05 - Math.sin(time * 1.6) * 0.02;
+    // a real jump: crouch (anticipation), stretch while rising, soft landing; returns height and squash/stretch
+    const hop = (t, f, h) => { const ph = (t * f) % 1; if (ph < 0.22) { const c = Math.sin((ph / 0.22) * Math.PI); sq = -0.13 * c; kickA = -0.5 * c; return 0; } const a = (ph - 0.22) / 0.78; const up = Math.sin(a * Math.PI); sq = 0.09 * up - (a > 0.9 ? 0.05 : 0); kickA = 0.35 * up; return up * h; };
+    let sq = 0, kickA = 0, lean = 0;
     let shut = false, mood = 'smile', swing = 0, rootRot = 0, jump = 0, look = 0;
     if (!St.act) {
       St.nextMicro -= dt;
@@ -154,11 +157,11 @@ export function makeRig(kind) {
       case 'wave': if (k < 2.4) { aR = 'wave'; rR = -0.2 + Math.sin(k * 11) * 0.22; mood = 'open'; headRot = 0.05; } break;
       case 'talk': if (k < 2.4) { aR = 'wave'; rR = -0.1 + Math.sin(k * 6) * 0.12; mood = Math.sin(k * 14) > 0 ? 'open' : 'smile'; } break;
       case 'point': if (k < 1.8) { aR = 'point'; rR = -0.25; mood = 'smile'; headRot = -0.05; } break;
-      case 'clap': if (k < 1.8) { aL = aR = 'bend'; const c = Math.abs(Math.sin(k * 11)); rL = 0.6 - c * 0.5; rR = -0.6 + c * 0.5; mood = 'laugh'; jump = Math.abs(Math.sin(k * 5.5)) * 6; } break;
+      case 'clap': if (k < 1.8) { aL = aR = 'bend'; const c = Math.abs(Math.sin(k * 11)); rL = 0.6 - c * 0.5; rR = -0.6 + c * 0.5; mood = 'laugh'; jump = hop(k, 2.6, 8); } break;
       // the happy laugh of the owner's reference video: eyes wide open, open smile, fists up at the chest, quick small bounces
-      case 'giggle': if (k < 2.2) { aL = aR = 'bend'; rL = 0.9 + Math.sin(k * 12) * 0.12; rR = -0.9 - Math.sin(k * 12) * 0.12; mood = 'laugh'; jump = Math.abs(Math.sin(k * 6)) * 8; headRot = Math.sin(k * 6) * 0.05; shut = k > 0.9 && k < 1.5; } break;
-      case 'cheer': case 'jump': if (k < 1.3) { aL = aR = 'up'; rL = 0.15; rR = -0.15; mood = 'laugh'; jump = Math.abs(Math.sin(k * 7)) * 34; } break;
-      case 'celebrate': if (k < 2.6) { aL = aR = 'up'; rL = 0.1 + Math.sin(k * 14) * 0.18; rR = -0.1 - Math.sin(k * 14) * 0.18; mood = 'laugh'; jump = Math.abs(Math.sin(k * 5)) * 40; headRot = Math.sin(k * 9) * 0.07; } break;
+      case 'giggle': if (k < 2.2) { aL = aR = 'bend'; rL = 0.9 + Math.sin(k * 12) * 0.12; rR = -0.9 - Math.sin(k * 12) * 0.12; mood = 'laugh'; jump = hop(k, 2.2, 14); lean = Math.sin(k * 4.4) * 0.05; headRot = Math.sin(k * 4.4) * 0.06; shut = k > 0.9 && k < 1.5; } break;
+      case 'cheer': case 'jump': if (k < 1.3) { aL = aR = 'up'; rL = 0.15; rR = -0.15; mood = 'laugh'; jump = hop(k, 1.5, 38); lean = Math.sin(k * 9) * 0.05; } break;
+      case 'celebrate': if (k < 2.6) { aL = aR = 'up'; rL = 0.1 + Math.sin(k * 14) * 0.18; rR = -0.1 - Math.sin(k * 14) * 0.18; mood = 'laugh'; jump = hop(k, 1.4, 44); lean = Math.sin(k * 7) * 0.07; headRot = Math.sin(k * 9) * 0.07; } break;
       case 'think': if (k < 2.4) { aR = 'bend'; rR = -0.9; mood = 'o'; headRot = 0.12 + Math.sin(k * 3) * 0.04; } break;
       case 'walk': swing = Math.sin(k * 7.4); by = Math.abs(swing) * 5; aL = aR = 'down'; rL = 0.15 * swing; rR = -0.15 * swing; mood = 'smile'; break;
       case 'run': if (k < 1.4) { swing = Math.sin(k * 15); by = Math.abs(swing) * 9; rootRot = 0.08; } break;
@@ -169,10 +172,11 @@ export function makeRig(kind) {
     // ---- apply ----
     root.position.y = (jump + by * 0) * U;
     body.position.y = by * U * 0.5;
-    root.rotation.z = rootRot;
+    root.rotation.z = rootRot + lean;
+    root.scale.set(1 - sq * 0.55, 1 + sq, 1);
     torso.scale.y = torsoSy;
-    legL.rotation.z = swing * 0.42;
-    legR.rotation.z = -swing * 0.42;
+    legL.rotation.z = swing * 0.42 + kickA;
+    legR.rotation.z = -swing * 0.42 - kickA * 0.4;
     armL.userData.show(aL); armR.userData.show(aR);
     armL.rotation.z = -rL * -1; armR.rotation.z = rR;
     head.rotation.z = lerp(head.rotation.z, headRot, Math.min(1, dt * 10));
