@@ -138,5 +138,18 @@
   "px": 336,
   "loopSec": 2.5,
   "ground": 364
+ },
+ "girl_wave": {
+  "file": "girl_wave.webp",
+  "frames": 34,
+  "cols": 16,
+  "rows": 3,
+  "w": 248,
+  "h": 354,
+  "fps": 12,
+  "loop": false,
+  "px": 337,
+  "loopSec": 2.8333333333333335,
+  "ground": 353
  }
 }
