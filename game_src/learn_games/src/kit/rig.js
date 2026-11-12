@@ -58,7 +58,7 @@ const SPECS = {
     },
     hipL: [-20, 172], hipR: [24, 172], legLAnchor: [32, 6], legRAnchor: [28, 6],
     body: { at: [0, 166], anchor: [59, 128] },
-    head: { at: [0, 290], anchor: [68, 146], eyeL: [-22, 66], eyeR: [26, 66], mouth: [5, 24], eyeK: 0.8, mouthK: 0.8 },
+    head: { at: [0, 290], anchor: [68, 146], eyeL: [-17, 64], eyeR: [23, 64], mouth: [4, 26], eyeK: 0.62, mouthK: 0.65 },
     shoulderL: [-46, 264], shoulderR: [46, 264],
     arm: { down: [12, 10], wave: [14, 26], bend: [12, 10], up: [12, 62], point: [10, 16] },
   },
@@ -75,7 +75,7 @@ SPECS.girl = {
   },
   hipL: [-16, 150], hipR: [20, 150], legLAnchor: [30, 6], legRAnchor: [28, 6],
   body: { at: [0, 95], anchor: [65, 175] },
-  head: { at: [0, 267], anchor: [74, 155], eyeL: [24, 98], eyeR: [72, 98], mouth: [47, 36], eyeK: 0.68, mouthK: 0.7, eyeAnchor: [30, 26], mouthAnchor: [33, 15] },
+  head: { at: [0, 267], anchor: [74, 155], eyeL: [24, 98], eyeR: [72, 98], mouth: [47, 36], eyeK: 0.55, mouthK: 0.6, eyeAnchor: [30, 26], mouthAnchor: [33, 15] },
   shoulderL: [-51, 234], shoulderR: [51, 234],
   arm: { down: [12, 12], wave: [14, 28], bend: [12, 12], up: [14, 28], point: [10, 18] },
 };
