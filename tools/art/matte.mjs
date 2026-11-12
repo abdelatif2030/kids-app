@@ -10,11 +10,14 @@ const H = Number(process.argv[3]);
 const buf = Buffer.from(readFileSync(0));
 if (buf.length !== W * H * 4) { console.error(`expected ${W * H * 4} bytes, got ${buf.length}`); process.exit(1); }
 
+// optional 3rd and 4th arguments: how bright (default 226) and how colourless (default 26) paper must be; use e.g. 247 and 9 for a white animal
+// (cow, sheep) so white fur next to the paper is not eaten away.
+const PAPER_MIN = Number(process.argv[4] || 226), PAPER_CHROMA = Number(process.argv[5] || 26);
 // "paper": bright and almost colourless (the sheets also have a faint grey shadow under the feet)
 const isPaper = (i) => {
   const r = buf[i], g = buf[i + 1], b = buf[i + 2];
   const mn = Math.min(r, g, b), mx = Math.max(r, g, b);
-  return mn >= 226 && mx - mn <= 26;
+  return mn >= PAPER_MIN && mx - mn <= PAPER_CHROMA;
 };
 const bg = new Uint8Array(W * H);
 const stack = [];
@@ -45,7 +48,9 @@ for (let p0 = 0; p0 < W * H; p0++) {
 let main = 0;
 comps.forEach((c, i) => { if (c.area > comps[main].area) main = i; });
 const M = comps[main];
-const keep = comps.map((c, i) => i === main || (c.area > M.area * 0.02 && c.x0 >= M.x0 - 4 && c.x1 <= M.x1 + 4 && c.y0 >= M.y0 - 4 && c.y1 <= M.y1 + 4));
+// a piece that touches the border of the crop and is not the picture itself is a NEIGHBOUR cut off by the crop box: dropped
+const touches = (c) => c.x0 === 0 || c.y0 === 0 || c.x1 === W - 1 || c.y1 === H - 1;
+const keep = comps.map((c, i) => i === main || (!touches(c) && c.area > M.area * 0.02 && c.x0 >= M.x0 - 4 && c.x1 <= M.x1 + 4 && c.y0 >= M.y0 - 4 && c.y1 <= M.y1 + 4));
 for (let p0 = 0; p0 < W * H; p0++) if (!bg[p0] && comp[p0] >= 0 && !keep[comp[p0]]) bg[p0] = 1;
 const out = Buffer.alloc(W * H * 4);
 for (let y = 0; y < H; y++) {
@@ -67,4 +72,5 @@ for (let y = 0; y < H; y++) {
     out[i] = r; out[i + 1] = g; out[i + 2] = b; out[i + 3] = a;
   }
 }
+if (process.env.MATTE_REPORT) console.error(JSON.stringify({ left: M.x0 === 0, top: M.y0 === 0, right: M.x1 === W - 1, bottom: M.y1 === H - 1 }));
 process.stdout.write(out);

@@ -56,7 +56,7 @@ function fitThing(item, h, w) {
 }
 const SCALE = { camel: 1.15, horse: 1.15, giraffe: 0.8, rocket: 1.1, crescent: 1.4, cow: 1.1, bear: 1.3, bed: 1.05, tub: 1.05, pot: 1.25, plate: 1.25, bowl: 1.25, soap: 1.3, backpack: 1.25, toothbrush: 1.3, heart: 1.4, carrot: 1.5, bone: 1.6, grass: 1.3, honey: 1.5, cheese: 1.4, seeds: 1.6 };
 const HAND = new THREE.Vector3(-5.0, 2.8, 2.0);
-const STAND = new THREE.Vector3(-1.5, 0, 2.9);
+const STAND = new THREE.Vector3(-1.5, 0, 5.4); // the picture of the question stands in FRONT of the choices (nearer the child), not among them
 const RACK = new THREE.Vector3(5.2, 0, 3.0);
 const RACK_S = 0.6;
 
@@ -83,7 +83,7 @@ class Game {
     this.owl.rotation.y = 0.25;
     this.st.add(this.owl);
     this.persons = { mama: makePerson('mama'), baba: makePerson('baba') };
-    for (const p of Object.values(this.persons)) { p.position.set(-1.5, 0, 2.7); p.scale.setScalar(0.9); p.visible = false; p.rotation.y = 0.2; this.st.add(p); }
+    for (const p of Object.values(this.persons)) { p.position.set(-1.5, 0, 5.2); p.scale.setScalar(0.8); p.visible = false; p.rotation.y = 0.2; this.st.add(p); }
     this.stand = this._makeStand();
     this._makeRack();
     this.save = sh.save;
@@ -262,7 +262,7 @@ class Game {
     hit.userData.id = o.id;
     hit.position.set(0.2, 0.9, 0);
     g.add(glow, hit);
-    const home = new THREE.Vector3(((i + 0.5) / n - 0.5) * 8.6, 0.1, i % 2 ? 0.7 : -0.65);
+    const home = new THREE.Vector3(((i + 0.5) / n - 0.5) * 8.6, 0.1, i % 2 ? -0.2 : -1.3); // two rows, kept behind the question picture
     g.position.copy(HAND);
     g.scale.setScalar(0.01);
     this.st.add(g);
