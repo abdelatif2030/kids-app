@@ -1,1 +1,26 @@
-{}
+{
+ "boy_jump": {
+  "file": "boy_jump.webp",
+  "frames": 24,
+  "cols": 8,
+  "rows": 3,
+  "w": 466,
+  "h": 588,
+  "fps": 12,
+  "loop": false,
+  "px": 551,
+  "ground": 585
+ },
+ "boy_laugh": {
+  "file": "boy_laugh.webp",
+  "frames": 36,
+  "cols": 12,
+  "rows": 3,
+  "w": 336,
+  "h": 586,
+  "fps": 12,
+  "loop": false,
+  "px": 507,
+  "ground": 583
+ }
+}
