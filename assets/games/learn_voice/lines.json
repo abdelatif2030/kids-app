@@ -20,9 +20,19 @@
   "text": "أتوبيس"
  },
  {
-  "id": "eb278714",
+  "id": "f4dc849c",
   "lang": "ar",
-  "text": "أربعة ورا بعض"
+  "text": "أربعة"
+ },
+ {
+  "id": "f9af3209",
+  "lang": "ar",
+  "text": "أربعة وعشرين"
+ },
+ {
+  "id": "b9f5a85f",
+  "lang": "ar",
+  "text": "أربعتاشر"
  },
  {
   "id": "6f48ae4b",
@@ -70,6 +80,26 @@
   "text": "إيه أول حاجة؟"
  },
  {
+  "id": "1ef5589c",
+  "lang": "ar",
+  "text": "إيه الخرزة اللي جاية؟"
+ },
+ {
+  "id": "af328cb4",
+  "lang": "ar",
+  "text": "اتناشر"
+ },
+ {
+  "id": "d460cbba",
+  "lang": "ar",
+  "text": "اتنين"
+ },
+ {
+  "id": "876e381b",
+  "lang": "ar",
+  "text": "اتنين وعشرين"
+ },
+ {
   "id": "3aa50fff",
   "lang": "ar",
   "text": "اسحب الحاجة للسلة، أو دوس على السلة"
@@ -90,29 +120,9 @@
   "text": "الأتوبيس عربيات!"
  },
  {
-  "id": "634124c9",
-  "lang": "ar",
-  "text": "الأحمر"
- },
- {
-  "id": "69d46267",
-  "lang": "ar",
-  "text": "الأحمر وصّل أربعة! برافو عليكم"
- },
- {
   "id": "5789f1d0",
   "lang": "ar",
   "text": "الأرنب حيوانات!"
- },
- {
-  "id": "9f418edd",
-  "lang": "ar",
-  "text": "الأصفر"
- },
- {
-  "id": "4b29b6ab",
-  "lang": "ar",
-  "text": "الأصفر وصّل أربعة! برافو عليكم"
  },
  {
   "id": "3f43d836",
@@ -430,6 +440,16 @@
   "text": "اليويو لعب!"
  },
  {
+  "id": "98135423",
+  "lang": "ar",
+  "text": "برافو! كمّلت النمط"
+ },
+ {
+  "id": "76420332",
+  "lang": "ar",
+  "text": "برافو! كمّلتي النمط"
+ },
+ {
   "id": "1e5fdfee",
   "lang": "ar",
   "text": "برافو! لقيت الكورة"
@@ -455,9 +475,19 @@
   "text": "بوبي خبّى الكورة! اسمع وقول هي فين"
  },
  {
-  "id": "00c8a97d",
+  "id": "564636a5",
   "lang": "ar",
-  "text": "تعادل! لعبتوا حلو أوي"
+  "text": "تسعة"
+ },
+ {
+  "id": "e453aef2",
+  "lang": "ar",
+  "text": "تسعة وعشرين"
+ },
+ {
+  "id": "1351d62a",
+  "lang": "ar",
+  "text": "تسعتاشر"
  },
  {
   "id": "8c4bac77",
@@ -465,9 +495,54 @@
   "text": "تفاحة"
  },
  {
+  "id": "cdff372c",
+  "lang": "ar",
+  "text": "تلاتاشر"
+ },
+ {
+  "id": "54eed2cd",
+  "lang": "ar",
+  "text": "تلاتة"
+ },
+ {
+  "id": "d94e5cba",
+  "lang": "ar",
+  "text": "تلاتة وعشرين"
+ },
+ {
+  "id": "6c1caa12",
+  "lang": "ar",
+  "text": "تلاتين"
+ },
+ {
+  "id": "87ec4534",
+  "lang": "ar",
+  "text": "تمانية"
+ },
+ {
+  "id": "6fc188c1",
+  "lang": "ar",
+  "text": "تمانية وعشرين"
+ },
+ {
+  "id": "29711031",
+  "lang": "ar",
+  "text": "تمنتاشر"
+ },
+ {
+  "id": "0a85d7f2",
+  "lang": "ar",
+  "text": "حداشر"
+ },
+ {
   "id": "f751dba0",
   "lang": "ar",
   "text": "حط كل حاجة في السلة بتاعتها!"
+ },
+ {
+  "id": "3f19d6eb",
+  "lang": "ar",
+  "text": "حلقة بنفسجي"
  },
  {
   "id": "23257be9",
@@ -480,6 +555,21 @@
   "text": "خلصتها تاني! برافو عليكي"
  },
  {
+  "id": "fb4bfe84",
+  "lang": "ar",
+  "text": "خمسة"
+ },
+ {
+  "id": "71a8b811",
+  "lang": "ar",
+  "text": "خمسة وعشرين"
+ },
+ {
+  "id": "3d9c81f7",
+  "lang": "ar",
+  "text": "خمستاشر"
+ },
+ {
   "id": "02451203",
   "lang": "ar",
   "text": "دبدوب"
@@ -488,11 +578,6 @@
   "id": "746c98ad",
   "lang": "ar",
   "text": "ده مكان مش للحفر"
- },
- {
-  "id": "f7dec37d",
-  "lang": "ar",
-  "text": "دور"
  },
  {
   "id": "366e0bfa",
@@ -515,11 +600,6 @@
   "text": "دوس على المكان اللي فيه الكنز"
  },
  {
-  "id": "bb9c2c48",
-  "lang": "ar",
-  "text": "دوس على عمود عشان تنزّل القرص"
- },
- {
   "id": "4aa17dab",
   "lang": "ar",
   "text": "رتّب في مجموعات"
@@ -538,6 +618,36 @@
   "id": "6edaed46",
   "lang": "ar",
   "text": "زحليقة! وييي"
+ },
+ {
+  "id": "d7fa9f07",
+  "lang": "ar",
+  "text": "سبعة"
+ },
+ {
+  "id": "560a05c0",
+  "lang": "ar",
+  "text": "سبعة وعشرين"
+ },
+ {
+  "id": "ddc1dbbc",
+  "lang": "ar",
+  "text": "سبعتاشر"
+ },
+ {
+  "id": "cbe8c89f",
+  "lang": "ar",
+  "text": "ستاشر"
+ },
+ {
+  "id": "725f223a",
+  "lang": "ar",
+  "text": "ستة"
+ },
+ {
+  "id": "748ff59b",
+  "lang": "ar",
+  "text": "ستة وعشرين"
  },
  {
   "id": "1e4c2e72",
@@ -580,6 +690,16 @@
   "text": "عربية"
  },
  {
+  "id": "2d241679",
+  "lang": "ar",
+  "text": "عشرة"
+ },
+ {
+  "id": "d21e9f46",
+  "lang": "ar",
+  "text": "عشرين"
+ },
+ {
   "id": "5f9e4766",
   "lang": "ar",
   "text": "عنب"
@@ -605,6 +725,11 @@
   "text": "قطر"
  },
  {
+  "id": "43d30a4a",
+  "lang": "ar",
+  "text": "قلب أخضر"
+ },
+ {
   "id": "81643553",
   "lang": "ar",
   "text": "كتكوت"
@@ -615,6 +740,11 @@
   "text": "كمثرى"
  },
  {
+  "id": "1acbfc31",
+  "lang": "ar",
+  "text": "كمّل النمط"
+ },
+ {
   "id": "e61d2c00",
   "lang": "ar",
   "text": "كنز الجزيرة"
@@ -623,6 +753,11 @@
   "id": "0550f6ef",
   "lang": "ar",
   "text": "كورة"
+ },
+ {
+  "id": "cfd90d22",
+  "lang": "ar",
+  "text": "كورة حمرا"
  },
  {
   "id": "a1582f50",
@@ -645,6 +780,11 @@
   "text": "مركب"
  },
  {
+  "id": "97306602",
+  "lang": "ar",
+  "text": "مش دي... بُص على الترتيب تاني"
+ },
+ {
   "id": "c066f314",
   "lang": "ar",
   "text": "مش دي... جرّب سلة تانية"
@@ -660,6 +800,11 @@
   "text": "مش هنا... اسمع تاني"
  },
  {
+  "id": "5a94f1ea",
+  "lang": "ar",
+  "text": "مكعب أزرق"
+ },
+ {
   "id": "5c64bc70",
   "lang": "ar",
   "text": "مكعبات"
@@ -670,9 +815,24 @@
   "text": "موزة"
  },
  {
+  "id": "5d48bbe3",
+  "lang": "ar",
+  "text": "نجمة صفرا"
+ },
+ {
+  "id": "b28ccd59",
+  "lang": "ar",
+  "text": "نقطة برتقالي"
+ },
+ {
   "id": "3ddd3d4c",
   "lang": "ar",
   "text": "واحد"
+ },
+ {
+  "id": "7f4a5d39",
+  "lang": "ar",
+  "text": "واحد وعشرين"
  },
  {
   "id": "b1b5c46c",
@@ -728,11 +888,6 @@
   "id": "1f49c872",
   "lang": "ar",
   "text": "يويو"
- },
- {
-  "id": "44fd2883",
-  "lang": "en",
-  "text": "A draw! You both played so well"
  },
  {
   "id": "31b87f4a",
@@ -805,6 +960,11 @@
   "text": "blocks: Toys!"
  },
  {
+  "id": "36fb9933",
+  "lang": "en",
+  "text": "blue cube"
+ },
+ {
   "id": "4ae94940",
   "lang": "en",
   "text": "boat"
@@ -875,6 +1035,11 @@
   "text": "chick: Animals!"
  },
  {
+  "id": "21726bb0",
+  "lang": "en",
+  "text": "Complete the Pattern"
+ },
+ {
   "id": "0aa27a3c",
   "lang": "en",
   "text": "Drag it to a basket, or tap the basket"
@@ -905,6 +1070,26 @@
   "text": "Eat lunch"
  },
  {
+  "id": "a98748d5",
+  "lang": "en",
+  "text": "eight"
+ },
+ {
+  "id": "418fc353",
+  "lang": "en",
+  "text": "eighteen"
+ },
+ {
+  "id": "df7ec6d7",
+  "lang": "en",
+  "text": "eleven"
+ },
+ {
+  "id": "321c045b",
+  "lang": "en",
+  "text": "fifteen"
+ },
+ {
   "id": "46f47804",
   "lang": "en",
   "text": "fish"
@@ -915,9 +1100,19 @@
   "text": "fish: Animals!"
  },
  {
-  "id": "a2f2cba6",
+  "id": "4fec376a",
   "lang": "en",
-  "text": "Four in a Row"
+  "text": "five"
+ },
+ {
+  "id": "755902a2",
+  "lang": "en",
+  "text": "four"
+ },
+ {
+  "id": "6443ea4a",
+  "lang": "en",
+  "text": "fourteen"
  },
  {
   "id": "eec2c5b8",
@@ -945,6 +1140,11 @@
   "text": "grapes: Fruit!"
  },
  {
+  "id": "785170d5",
+  "lang": "en",
+  "text": "green heart"
+ },
+ {
   "id": "e90ba2d8",
   "lang": "en",
   "text": "Have a bath"
@@ -970,6 +1170,16 @@
   "text": "Listen to the parrot and find the treasure!"
  },
  {
+  "id": "d50b3bfa",
+  "lang": "en",
+  "text": "nine"
+ },
+ {
+  "id": "b7172012",
+  "lang": "en",
+  "text": "nineteen"
+ },
+ {
   "id": "6a5afa1a",
   "lang": "en",
   "text": "Not here... listen again"
@@ -978,6 +1188,11 @@
   "id": "09dde458",
   "lang": "en",
   "text": "Not here... listen to the parrot again"
+ },
+ {
+  "id": "97de893d",
+  "lang": "en",
+  "text": "Not that one... look at the order again"
  },
  {
   "id": "bd416fff",
@@ -1025,6 +1240,11 @@
   "text": "orange"
  },
  {
+  "id": "e5bb9471",
+  "lang": "en",
+  "text": "orange drop"
+ },
+ {
   "id": "e3c1eef7",
   "lang": "en",
   "text": "orange: Fruit!"
@@ -1055,24 +1275,44 @@
   "text": "Play"
  },
  {
+  "id": "ed70db42",
+  "lang": "en",
+  "text": "purple ring"
+ },
+ {
   "id": "7b6a6660",
   "lang": "en",
   "text": "Put each thing in its basket!"
  },
  {
-  "id": "496cc331",
+  "id": "34a7fc66",
   "lang": "en",
-  "text": "Red"
+  "text": "red ball"
  },
  {
-  "id": "3a0405f9",
+  "id": "27cb393f",
   "lang": "en",
-  "text": "Red made four! Well played both"
+  "text": "seven"
+ },
+ {
+  "id": "ac99708f",
+  "lang": "en",
+  "text": "seventeen"
  },
  {
   "id": "97fd2629",
   "lang": "en",
   "text": "Shelf done! Well done"
+ },
+ {
+  "id": "5d2e5072",
+  "lang": "en",
+  "text": "six"
+ },
+ {
+  "id": "8b0d76ba",
+  "lang": "en",
+  "text": "sixteen"
  },
  {
   "id": "00f9eb65",
@@ -1093,11 +1333,6 @@
   "id": "8509827c",
   "lang": "en",
   "text": "strawberry: Fruit!"
- },
- {
-  "id": "47bdcb38",
-  "lang": "en",
-  "text": "Tap a column to drop a disc"
  },
  {
   "id": "5810765c",
@@ -1123,6 +1358,11 @@
   "id": "3a1e2819",
   "lang": "en",
   "text": "Teddy's turn"
+ },
+ {
+  "id": "6a4a6f11",
+  "lang": "en",
+  "text": "ten"
  },
  {
   "id": "5679f6a4",
@@ -1325,6 +1565,21 @@
   "text": "The treasure is right of the rock"
  },
  {
+  "id": "0e1d1de1",
+  "lang": "en",
+  "text": "thirteen"
+ },
+ {
+  "id": "f2b77f8e",
+  "lang": "en",
+  "text": "thirty"
+ },
+ {
+  "id": "377774a2",
+  "lang": "en",
+  "text": "three"
+ },
+ {
   "id": "af578530",
   "lang": "en",
   "text": "train"
@@ -1335,9 +1590,64 @@
   "text": "train: Vehicles!"
  },
  {
-  "id": "39ffbf11",
+  "id": "99229edf",
   "lang": "en",
-  "text": "Turn:"
+  "text": "twelve"
+ },
+ {
+  "id": "dc0dcf2f",
+  "lang": "en",
+  "text": "twenty"
+ },
+ {
+  "id": "deec0ba9",
+  "lang": "en",
+  "text": "twenty-eight"
+ },
+ {
+  "id": "4f1ad106",
+  "lang": "en",
+  "text": "twenty-five"
+ },
+ {
+  "id": "f3474b5e",
+  "lang": "en",
+  "text": "twenty-four"
+ },
+ {
+  "id": "715f8c16",
+  "lang": "en",
+  "text": "twenty-nine"
+ },
+ {
+  "id": "86c1c04e",
+  "lang": "en",
+  "text": "twenty-one"
+ },
+ {
+  "id": "c12f472b",
+  "lang": "en",
+  "text": "twenty-seven"
+ },
+ {
+  "id": "85294e1e",
+  "lang": "en",
+  "text": "twenty-six"
+ },
+ {
+  "id": "159cdde6",
+  "lang": "en",
+  "text": "twenty-three"
+ },
+ {
+  "id": "52952b54",
+  "lang": "en",
+  "text": "twenty-two"
+ },
+ {
+  "id": "696cffc0",
+  "lang": "en",
+  "text": "two"
  },
  {
   "id": "6142a1fb",
@@ -1375,14 +1685,19 @@
   "text": "Where Is the Ball?"
  },
  {
-  "id": "9c73f9f2",
+  "id": "1fc447aa",
   "lang": "en",
-  "text": "Yellow"
+  "text": "Which bead comes next?"
  },
  {
-  "id": "bb6b1996",
+  "id": "f548d226",
   "lang": "en",
-  "text": "Yellow made four! Well played both"
+  "text": "yellow star"
+ },
+ {
+  "id": "0d354efa",
+  "lang": "en",
+  "text": "Yes! You finished the pattern"
  },
  {
   "id": "38963dd9",

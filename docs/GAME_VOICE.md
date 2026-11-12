@@ -33,3 +33,10 @@ many phones and browsers, it is different on every device, and it is not Egyptia
 Keys are read from the environment only and never written to a file. Only the sentence text is sent to the service.
 The generator has NOT been run against a real service from this repository (no key here). After new games are
 rebuilt, run `node tools/game_voice/lines.mjs` again and generate the new lines.
+
+## Chosen voice (2026-11-12)
+The owner chose the ElevenLabs library voice **Mahmoud Soliman - Egyptian Story** (voice id `oOge1k8044i7H9hCreX6`, an adult
+Egyptian male storyteller). With the owner's key in the environment (`ELEVENLABS_API_KEY`, never in a file):
+`node tools/game_voice/generate.mjs --provider elevenlabs --voice oOge1k8044i7H9hCreX6 --lang ar`
+The free plan (10,000 credits a month) is enough to test; before the app is published the owner needs the Starter plan (it
+lists the commercial licence) and must check the licence of this voice. The key was NOT created or read by the assistant.

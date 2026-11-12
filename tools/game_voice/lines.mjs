@@ -63,11 +63,23 @@ const day = await imp('day/sim.js');
 for (const s of day.STEPS) both(s.ar, s.en);
 const COUNT = { ar: ['واحد', 'اتنين', 'تلاتة', 'أربعة', 'خمسة', 'ستة'], en: ['one', 'two', 'three', 'four', 'five', 'six'] };
 for (let n = 1; n <= 6; n++) both(COUNT.ar.slice(0, n).join('، '), COUNT.en.slice(0, n).join(', '));
+const { NUMBERS } = await imp('kit/words.js');
+for (const [ar, en] of NUMBERS) both(ar, en);
+const pat = await imp('pattern/sim.js');
+for (const b of pat.BEADS) both(b.ar, b.en);
 const ball = await imp('ball/sim.js');
 for (const s of ball.SPOTS) both(ball.sentence(s.id, false), ball.sentence(s.id, true));
 
-const all = [...lines.values()].sort((a, b) => a.lang.localeCompare(b.lang) || a.text.localeCompare(b.text));
+const all0 = [...lines.values()];
+const all = all0.sort((a, b) => a.lang.localeCompare(b.lang) || a.text.localeCompare(b.text));
 const out = join(ROOT, 'assets', 'games', 'learn_voice');
+if (process.argv.includes('--check')) {
+  // is the saved list current? (used by the tests: a new word in a game must be added to the list, then given a voice)
+  const saved = existsSync(join(out, 'lines.json')) ? readFileSync(join(out, 'lines.json'), 'utf8') : '';
+  if (saved !== JSON.stringify(all, null, 1) + String.fromCharCode(10)) { console.error('lines.json is out of date: run node tools/game_voice/lines.mjs'); process.exit(1); }
+  console.log(`lines.json is current (${all.length} sentences)`);
+  process.exit(0);
+}
 mkdirSync(out, { recursive: true });
 writeFileSync(join(out, 'lines.json'), JSON.stringify(all, null, 1) + '\n');
 writeFileSync(join(ROOT, 'docs', 'GAME_VOICE_LINES.csv'), '\ufeffid,language,file,text\n' + all.map((l) => `${l.id},${l.lang},${l.lang}/${l.id}.mp3,"${l.text.replace(/"/g, '""')}"`).join('\n') + '\n');

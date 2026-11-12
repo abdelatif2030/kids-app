@@ -2,6 +2,8 @@
 //
 //   node tools/game_voice/lines.mjs                      (first: the list of sentences)
 //   node tools/game_voice/generate.mjs --provider gemini  [--lang ar] [--voice Leda] [--delay 7] [--force]
+//   node tools/game_voice/generate.mjs --provider gemini --batch 15   (many sentences in ONE request, cut at the pauses:
+//                                                          for the free tier's few requests a day; see split.mjs)
 //   node tools/game_voice/generate.mjs --provider azure   [--lang ar] [--voice ar-EG-SalmaNeural] [--force]
 //   node tools/game_voice/generate.mjs --provider elevenlabs --voice <voice id> [--lang ar]
 //   node tools/game_voice/generate.mjs --manifest         (only rebuild the list from the files that exist,
@@ -20,6 +22,7 @@
 // then run with --manifest. NOT run against a real service from this repository yet.
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { splitBySilence } from './split.mjs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -27,6 +30,9 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DIR = join(ROOT, 'assets', 'games', 'learn_voice');
 const arg = (name, def) => { const i = process.argv.indexOf(`--${name}`); return i < 0 ? def : (process.argv[i + 1] && !process.argv[i + 1].startsWith('--') ? process.argv[i + 1] : true); };
 const lines = JSON.parse(readFileSync(join(DIR, 'lines.json'), 'utf8'));
+// Diacritized text (made by make_tashkeel.py) is what the voice reads; clip ids still come from the plain text.
+const TASHKEEL = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'tashkeel.json'), 'utf8'));
+const voiced = (l) => (l.lang === 'ar' && TASHKEEL[l.text]) || l.text;
 
 function manifest() {
   const m = { ar: [], en: [] };
@@ -93,7 +99,7 @@ export function toWav(buf, rate = 24000) {
   return Buffer.concat([h, buf]);
 }
 
-async function gemini(text, lang, voice) {
+async function gemini(text, lang, voice, batchWav = false) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new Error('Set GEMINI_API_KEY in your environment (free key: https://aistudio.google.com/apikey).');
   const model = process.env.GEMINI_TTS_MODEL || 'gemini-3.8-flash-tts';
@@ -102,7 +108,7 @@ async function gemini(text, lang, voice) {
     : 'بالعربي المصري، بصوت دافي ومبتسم وهادي، بيتكلم ببطء ووضوح شديد مع طفل صغير، زي مُدرّسة حنينة';
   const body = {
     model,
-    input: [{ type: 'user_input', content: [{ type: 'text', text, annotations: [{ type: 'speech_metadata', style }] }] }],
+    input: [{ type: 'user_input', content: [{ type: 'text', text, annotations: [{ type: 'speech_metadata', style: batchWav ? style + (lang === 'en' ? '; say each line on its own, with a clear pause of about one second after every line' : '؛ كل سطر لوحده، وبعد كل سطر وقفة واضحة حوالي ثانية') : style }] }] }],
     response_format: { type: 'audio' },
     generation_config: { speech_config: [{ voice: voice || 'Leda' }] },
   };
@@ -114,7 +120,7 @@ async function gemini(text, lang, voice) {
     if (!r.ok) throw new Error(`gemini ${r.status} ${await r.text()}`);
     const pcm = findAudio(await r.json());
     if (!pcm) throw new Error('gemini: no audio in the answer');
-    return wavToMp3(toWav(pcm));
+    return batchWav ? toWav(pcm) : wavToMp3(toWav(pcm));
   }
   throw new Error('gemini: the free limit is reached; try again later (or use --delay 15)');
 }
@@ -126,22 +132,58 @@ function wavToMp3(wav) {
 }
 
 if (!process.argv[1] || !process.argv[1].endsWith('generate.mjs')) { /* imported for tests */ } else {
+/** Several sentences in one request, each followed by a long pause; cut back into one mp3 per sentence. */
+async function geminiBatch(texts, lang, voice) {
+  const NL = String.fromCharCode(10);
+  const joined = texts.map((t) => t + NL + '<long pause>').join(NL);
+  const wav = await gemini(joined, lang, voice, true);
+  return splitBySilence(wav, texts.length);
+}
+
 if (arg('manifest')) { manifest(); process.exit(0); }
+const batchN = Number(arg('batch', 0));
 const provider = { gemini, azure, elevenlabs }[arg('provider')];
 if (!provider) { console.error('Use --provider gemini | azure | elevenlabs, or --manifest. See the top of this file.'); process.exit(1); }
 const delay = Number(arg('delay', 0)) * 1000;
 const limit = Number(arg('limit', 0)); // e.g. --limit 5 to hear a few first
+const outDir = arg('out', ''); // write here instead of the games' folder (for trying voices)
+const listFile = arg('list', ''); // --list file.txt: only the sentences written in it (one per line); with --force they are redone
+const wanted = listFile && listFile !== true ? new Set(readFileSync(listFile, 'utf8').split(String.fromCharCode(10)).map((x) => x.trim()).filter(Boolean)) : null;
+const match = arg('match', ''); // only sentences containing this text, e.g. --match الكنز
 const only = arg('lang');
 const voice = arg('voice');
 const force = !!arg('force');
 let made = 0;
+if (batchN && arg('provider') === 'gemini') {
+  // many sentences per request (the free tier allows about 10 requests a day): only sentences without a clip yet
+  const todo = lines.filter((l) => (!only || only === true || l.lang === only) && (!match || match === true || l.text.includes(match)) && !(existsSync(join(DIR, l.lang, `${l.id}.mp3`)) && !force));
+  for (const lang of ['ar', 'en']) {
+    const mine = todo.filter((l) => l.lang === lang);
+    for (let i = 0; i < mine.length; i += batchN) {
+      const group = mine.slice(i, i + batchN);
+      try {
+        const clips = await geminiBatch(group.map((l) => l.text), lang, voice === true ? undefined : voice);
+        group.forEach((l, k) => { mkdirSync(join(DIR, lang), { recursive: true }); writeFileSync(join(DIR, lang, `${l.id}.mp3`), clips[k]); console.log(`${lang}/${l.id}  ${l.text}`); made++; });
+      } catch (e) {
+        console.error(`FAILED a batch of ${group.length} (${group[0].text} ...): ${e.message}`);
+        if (/limit|429/.test(e.message)) { console.log(`${made} clips made`); manifest(); process.exit(0); }
+      }
+      if (delay) await new Promise((res) => setTimeout(res, delay));
+    }
+  }
+  console.log(`${made} clips made`);
+  manifest();
+  process.exit(0);
+}
 for (const l of lines) {
   if (only && only !== true && l.lang !== only) continue;
-  const file = join(DIR, l.lang, `${l.id}.mp3`);
+  if (match && match !== true && !l.text.includes(match)) continue;
+  if (wanted && !wanted.has(l.text)) continue;
+  const file = outDir && outDir !== true ? join(outDir, `${l.id}.mp3`) : join(DIR, l.lang, `${l.id}.mp3`);
   if (existsSync(file) && !force) continue;
   mkdirSync(dirname(file), { recursive: true });
   try {
-    writeFileSync(file, await provider(l.text, l.lang, voice === true ? undefined : voice));
+    writeFileSync(file, await provider(voiced(l), l.lang, voice === true ? undefined : voice));
     made++;
     console.log(`${l.lang}/${l.id}  ${l.text}`);
     if (limit && made >= limit) break;
