@@ -17,6 +17,13 @@ many phones and browsers, it is different on every device, and it is not Egyptia
 1. **Record them at home** (best for children: a real warm voice, Egyptian, free). Read each line of
    `docs/GAME_VOICE_LINES.csv` into a phone, save each as its file name, put them in the folders above, then run
    `node tools/game_voice/generate.mjs --manifest`. About 146 short lines.
+1b. **Gemini voices from Google AI Studio (free, no card)**: a free key from https://aistudio.google.com/apikey (a Google
+   account). Gemini text-to-speech speaks Egyptian Arabic and takes a style ("warm, slow, clear, to a small child").
+   `setx GEMINI_API_KEY "<key>"`, then `node tools/game_voice/generate.mjs --provider gemini --limit 5` to hear five
+   first, then without `--limit`. Default voice Leda (youthful); try `--voice Puck` or `Aoede`. Needs ffmpeg. The free tier
+   has rate limits (the tool waits and retries; add `--delay 10`). Free-tier text may be used by Google to improve its
+   products (only game sentences are sent). The terms for commercial use of the audio must be checked by the owner before
+   the app is published (the pricing page does not say). Not run against the real service from this repository.
 2. **A neural voice from Microsoft Azure** (very clear, real Egyptian Arabic voices: `ar-EG-SalmaNeural`,
    `ar-EG-ShakirNeural`; the free tier covers this many times over). Needs the owner's own Azure Speech key:
    set `AZURE_SPEECH_KEY` and `AZURE_SPEECH_REGION`, then `node tools/game_voice/generate.mjs --provider azure`.
