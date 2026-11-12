@@ -1,3 +1,4 @@
+import 'learn_reactions.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -164,6 +165,7 @@ class LearnBridge {
     if (id == null || learnId == null) return;
     switch (msg['type']) {
       case 'round':
+        LearnReactions.emit(msg['correct'] == true ? LearnEvent.correct : LearnEvent.wrong);
         final skill = msg['skill'];
         if (skill is! String || skill.isEmpty) return;
         final detail = msg['detail'];
@@ -171,6 +173,7 @@ class LearnBridge {
       case 'complete':
         if (_completed) return; // once per opening; "play again" inside the game is a replay
         _completed = true;
+        LearnReactions.emit(LearnEvent.complete);
         try {
           await GameRewards.complete(id, learnId);
           await ResumeStore.clear(id, 'game', learnId);

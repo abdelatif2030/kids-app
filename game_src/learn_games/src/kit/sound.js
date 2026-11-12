@@ -249,14 +249,37 @@ export class Sound {
       case 'note': // a pleasant note from the pentatonic scale (each right answer rings one)
         this.lead(arg || 79, t, 0.09, this.sfx);
         break;
-      case 'applause': { // a crowd clapping: many tiny filtered noise claps that thin out
-        const n = 46;
+      case 'applause': { // a crowd clapping: many filtered noise claps, dense at first, then thinning out
+        const n = 130;
         for (let i = 0; i < n; i++) {
-          const at = t + Math.pow(Math.random(), 1.4) * 1.7;
-          this.noise(at, 0.025 + Math.random() * 0.02, 0.05 + Math.random() * 0.05, 'bandpass', 1500 + Math.random() * 2600, 1.2, this.sfx);
+          const at = t + Math.pow(Math.random(), 1.5) * 2.5;
+          this.noise(at, 0.02 + Math.random() * 0.025, 0.09 + Math.random() * 0.08, 'bandpass', 1300 + Math.random() * 3000, 1.3, this.sfx);
+          if (i % 3 === 0) this.noise(at, 0.05, 0.05, 'lowpass', 900, 0.8, this.sfx); // the hollow body of a clap
         }
         break;
       }
+      case 'crowd': { // children cheering "yaaay": five voices gliding up through the vowel "a"
+        const c = this.ctx;
+        for (let i = 0; i < 6; i++) {
+          const st = t + i * 0.045 + Math.random() * 0.08;
+          const o = c.createOscillator();
+          o.type = 'sawtooth';
+          o.frequency.setValueAtTime(250 + i * 28, st);
+          o.frequency.exponentialRampToValueAtTime(430 + i * 36, st + 0.5);
+          const f1 = c.createBiquadFilter(); f1.type = 'bandpass'; f1.frequency.value = 850; f1.Q.value = 4;
+          const f2 = c.createBiquadFilter(); f2.type = 'bandpass'; f2.frequency.value = 1300; f2.Q.value = 5;
+          const gn = c.createGain();
+          gn.gain.setValueAtTime(0.0001, st);
+          gn.gain.exponentialRampToValueAtTime(0.07, st + 0.07);
+          gn.gain.exponentialRampToValueAtTime(0.0001, st + 0.75);
+          o.connect(f1); o.connect(f2); f1.connect(gn); f2.connect(gn); gn.connect(this.sfx);
+          o.start(st); o.stop(st + 0.8);
+        }
+        break;
+      }
+      case 'fanfare': // a bright little trumpet-and-bells arpeggio for every right answer
+        [72, 76, 79, 84, 88].forEach((m, i) => { this.tone('triangle', hz(m), t + i * 0.075, 0.38, 0.085); this.tone('square', hz(m), t + i * 0.075, 0.18, 0.018); this.tone('sine', hz(m) * 2, t + i * 0.075, 0.3, 0.03); });
+        break;
       case 'yay': // a happy rising "hooray" of bells
         [72, 76, 79, 84, 88, 91].forEach((m, i) => { this.tone('triangle', hz(m), t + i * 0.06, 0.4, 0.05); this.tone('sine', hz(m) * 2, t + i * 0.06, 0.2, 0.02); });
         break;

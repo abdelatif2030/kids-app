@@ -69,6 +69,7 @@ export function makeTree(h = 3, leaf = 0x3aa84a) {
     b.castShadow = true;
     g.add(b);
   }
+  g.userData.sway = { amp: 0.018 + Math.random() * 0.012, ph: Math.random() * 6.28, sp: 0.8 + Math.random() * 0.5 };
   return g;
 }
 
@@ -81,6 +82,7 @@ export function makeBush(r = 0.7, c = 0x3a9a48) {
     b.castShadow = true;
     g.add(b);
   }
+  g.userData.sway = { amp: 0.03, ph: Math.random() * 6.28, sp: 1.1 };
   return g;
 }
 
@@ -100,6 +102,7 @@ export function makeFlower(color = 0xff6a9a, h = 0.55) {
   const c = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), new THREE.MeshStandardMaterial({ color: 0xffe05a }));
   c.position.y = h + 0.02;
   g.add(c);
+  g.userData.sway = { amp: 0.14, ph: Math.random() * 6.28, sp: 1.6 + Math.random() * 0.8 };
   return g;
 }
 

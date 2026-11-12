@@ -28,12 +28,12 @@ const KIT = {
   newStar_m: ['نجمة جديدة ليك! ⭐', 'A new star for you! ⭐'],
   newStar_f: ['نجمة جديدة ليكي! ⭐', 'A new star for you! ⭐'],
   doneAgain_m: ['شاطر أوي!', 'Well done!'],
-  doneAgain_f: ['شاطره أوي!', 'Well done!'],
+  doneAgain_f: ['ممتازة!', 'Well done!'],
   great_m: ['شطوووووور!', 'Well done!'],
   great_f: ['شطووووورة!', 'Well done!'],
   // what the voice says (stretched letters on screen are read badly by a speech voice)
   greatSay_m: ['شاطر أوي!', 'Well done!'],
-  greatSay_f: ['شاطره أوي!', 'Well done!'],
+  greatSay_f: ['ممتازة!', 'Well done!'],
   newStarSay_m: ['خدت نجمة جديدة!', 'You got a new star!'],
   newStarSay_f: ['خدتي نجمة جديدة!', 'You got a new star!'],
 };

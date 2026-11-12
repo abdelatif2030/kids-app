@@ -29,6 +29,23 @@ export const PADS = {
   stone: { ring: [0x9a9a9a, 0xaaaaaa, 0x8a8a8a, 0xb0b0b0, 0x9a9a9a], disc: 0xe0e0e0 },
 };
 
+/** A tiling water picture with light ripples; the world scrolls its offset so the water flows. */
+function waterTex(rep = 3) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const g2 = c.getContext('2d');
+  const gr = g2.createLinearGradient(0, 0, 256, 256);
+  gr.addColorStop(0, '#5ac8ff'); gr.addColorStop(0.5, '#2a9ae0'); gr.addColorStop(1, '#4ab8f0');
+  g2.fillStyle = gr; g2.fillRect(0, 0, 256, 256);
+  g2.strokeStyle = 'rgba(255,255,255,.4)'; g2.lineWidth = 3;
+  for (let i = 0; i < 18; i++) { g2.beginPath(); g2.ellipse((i * 83) % 256, (i * 57) % 256, 26 + (i % 3) * 8, 6, 0, 0, Math.PI * 2); g2.stroke(); }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(rep, rep);
+  return t;
+}
+
 // ---- the worlds -----------------------------------------------------------------------------------------------------
 const BUILD = {
   // 1. the sunny pond (the first place)
@@ -42,11 +59,11 @@ const BUILD = {
     ], -0.2);
     ground(g, 0x8ad070, 0x7ac860);
     const bank = new THREE.Mesh(new THREE.CylinderGeometry(6.4, 6.6, 0.3, 48), m(0xc8a070, 1)); bank.scale.z = 0.62; bank.position.y = -0.12; g.add(bank);
-    const water = new THREE.Mesh(new THREE.CylinderGeometry(6.1, 6.1, 0.3, 48), new THREE.MeshStandardMaterial({ color: 0x3aaae8, roughness: 0.2, metalness: 0.1 }));
+    const water = new THREE.Mesh(new THREE.CylinderGeometry(6.1, 6.1, 0.3, 48), new THREE.MeshStandardMaterial({ map: waterTex(), roughness: 0.2, metalness: 0.1 }));
     water.scale.z = 0.58; water.position.y = -0.08; g.add(water);
     for (const [x, z, r] of [[-5.1, -1.7, 0.5], [4.9, -1.9, 0.6], [-4.6, 1.2, 0.45], [5.2, 1.0, 0.5], [-1.6, -2.6, 0.5], [2.4, -2.5, 0.42]]) g.add(cyl(r, r, 0.04, m(0x3aa84a), x, 0.1, z, 20));
     for (let i = 0; i < 14; i++) { const a = (i / 14) * Math.PI * 1.1 + Math.PI * 1.05; g.add(cyl(0.03, 0.05, 1.5, m(0x4a9a3a), Math.cos(a) * 6.5, 0.5, Math.sin(a) * 3.9, 6)); }
-    return { pad: 'float', update: (dt, t) => { clouds.userData.drift(dt); water.rotation.y = Math.sin(t * 0.3) * 0.02; } };
+    return { pad: 'float', water: water.material, update: (dt) => { clouds.userData.drift(dt); } };
   },
   // 2. the farm: red barn, silo, fence, hay, cows
   farm(g) {
@@ -71,7 +88,7 @@ const BUILD = {
     addSky(g, { top: '#3aa0f0', horizon: '#bfeaff' });
     const clouds = addClouds(g, 6, { y: 8, z: -18 });
     ground(g, 0xf0d8a0, 0xe8c888);
-    const sea = new THREE.Mesh(new THREE.PlaneGeometry(80, 18), new THREE.MeshStandardMaterial({ color: 0x2aa0e0, roughness: 0.15, metalness: 0.15 }));
+    const sea = new THREE.Mesh(new THREE.PlaneGeometry(80, 18), new THREE.MeshStandardMaterial({ map: waterTex(8), roughness: 0.15, metalness: 0.15 }));
     sea.rotation.x = -Math.PI / 2; sea.position.set(0, -0.15, -11); g.add(sea);
     for (const x of [-9, -5, 9, 12]) {
       const t = new THREE.Group();
@@ -82,7 +99,7 @@ const BUILD = {
     const um = new THREE.Group(); um.add(cyl(0.05, 0.05, 2.2, m(0xffffff), 0, 1.1, 0, 6)); um.add(cone(1.5, 0.7, m(0xff4a4a), 0, 2.4, 0, 12)); um.position.set(-7, -0.2, 2.2); g.add(um);
     const boat = makeThing('boat'); boat.scale.setScalar(2.2); boat.position.set(4, -0.1, -9); g.add(boat);
     for (let i = 0; i < 10; i++) g.add(sph(0.12, m([0xff9ab8, 0xfff0e0, 0xffb870][i % 3]), -10 + i * 2.2, -0.05, 5.5 + (i % 3) * 0.5));
-    return { pad: 'float', update: (dt, t) => { clouds.userData.drift(dt); boat.position.y = -0.1 + Math.sin(t) * 0.12; boat.rotation.z = Math.sin(t * 0.8) * 0.05; } };
+    return { pad: 'float', water: sea.material, update: (dt, t) => { clouds.userData.drift(dt); boat.position.y = -0.1 + Math.sin(t) * 0.12; boat.rotation.z = Math.sin(t * 0.8) * 0.05; } };
   },
   // 4. space: stars, planets, a rocket
   space(g) {
@@ -159,6 +176,101 @@ const BUILD = {
   },
 };
 
+/** A little flock of birds flying across the sky (two flapping wings each). */
+function makeBirds(n, y, z, spread) {
+  const grp = new THREE.Group();
+  const mat = new THREE.MeshBasicMaterial({ color: 0x2a2a3a, side: THREE.DoubleSide, toneMapped: false });
+  for (let i = 0; i < n; i++) {
+    const b = new THREE.Group();
+    for (const sgn of [-1, 1]) {
+      const w = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.18), mat);
+      w.geometry.translate(sgn * 0.35, 0, 0);
+      w.userData.sgn = sgn;
+      b.add(w);
+    }
+    b.position.set(-spread + (i / n) * spread * 2, y + Math.sin(i * 2.1) * 1.4, z - (i % 3));
+    b.userData = { v: 1.1 + (i % 3) * 0.35, ph: i * 1.3, y0: b.position.y };
+    grp.add(b);
+  }
+  grp.userData.update = (dt, t) => {
+    for (const b of grp.children) {
+      b.position.x += b.userData.v * dt;
+      if (b.position.x > spread + 2) b.position.x = -spread - 2;
+      b.position.y = b.userData.y0 + Math.sin(t * 1.3 + b.userData.ph) * 0.35;
+      for (const w of b.children) w.rotation.z = w.userData.sgn * Math.sin(t * 9 + b.userData.ph) * 0.7;
+    }
+  };
+  return grp;
+}
+
+/** Butterflies fluttering over the flowers. */
+function makeButterflies(n, x0, x1, z) {
+  const grp = new THREE.Group();
+  const cols = [0xff6ab8, 0xffc83a, 0x7ad8ff, 0xb87aff];
+  for (let i = 0; i < n; i++) {
+    const b = new THREE.Group();
+    const mat = new THREE.MeshBasicMaterial({ color: cols[i % 4], side: THREE.DoubleSide, toneMapped: false });
+    for (const sgn of [-1, 1]) { const w = new THREE.Mesh(new THREE.CircleGeometry(0.16, 10), mat); w.position.x = sgn * 0.12; w.userData.sgn = sgn; b.add(w); }
+    b.userData = { cx: x0 + (x1 - x0) * (i / Math.max(1, n - 1)), ph: i * 1.9, r: 1 + (i % 3) * 0.5 };
+    b.position.z = z;
+    grp.add(b);
+  }
+  grp.userData.update = (dt, t) => {
+    for (const b of grp.children) {
+      const u = b.userData;
+      b.position.x = u.cx + Math.sin(t * 0.5 + u.ph) * u.r;
+      b.position.y = 1.4 + Math.sin(t * 0.9 + u.ph * 2) * 0.5 + Math.sin(t * 2.3 + u.ph) * 0.1;
+      for (const w of b.children) w.rotation.y = w.userData.sgn * (0.2 + Math.abs(Math.sin(t * 14 + u.ph)) * 1.1);
+    }
+  };
+  return grp;
+}
+
+/** A fish that leaps out of the pond now and then, with a splash ring. */
+function makeJumper() {
+  const g = new THREE.Group();
+  const fish = new THREE.Mesh(new THREE.SphereGeometry(0.22, 12, 10), m(0xff8a3a, 0.4));
+  fish.scale.set(1.6, 0.8, 0.8);
+  const tail = cone(0.14, 0.3, m(0xff8a3a, 0.4), -0.34, 0, 0, 3); tail.rotation.z = Math.PI / 2;
+  fish.add(tail);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.02, 6, 24), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, toneMapped: false }));
+  ring.rotation.x = Math.PI / 2;
+  g.add(fish, ring);
+  g.userData = { t: 6 * Math.random(), x: 0 };
+  g.userData.update = (dt) => {
+    const u = g.userData;
+    u.t += dt;
+    const cycle = 7, k = u.t % cycle;
+    if (k < 1.2) {
+      if (k < dt) u.x = (Math.random() - 0.5) * 6;
+      const e = k / 1.2;
+      fish.visible = true;
+      fish.position.set(u.x + e * 1.6, Math.sin(e * Math.PI) * 1.5 - 0.1, -0.6);
+      fish.rotation.z = Math.cos(e * Math.PI) * 0.9;
+      ring.position.set(u.x, 0.02, -0.6);
+      ring.scale.setScalar(0.5 + e * 2.2);
+      ring.material.opacity = Math.max(0, 0.7 - e * 0.7);
+    } else { fish.visible = false; ring.material.opacity = 0; }
+  };
+  return g;
+}
+
+/** Life for every world: swaying trees and flowers, and what suits the place (birds, butterflies, a leaping fish, moving water). */
+function decorate(id, g, water) {
+  const ups = [];
+  const sways = [];
+  g.traverse((o) => { if (o.userData && o.userData.sway) sways.push(o); });
+  const add = (obj) => { g.add(obj); ups.push(obj.userData.update); };
+  if (['meadow', 'farm', 'beach', 'rainbow', 'castle', 'city', 'snow'].includes(id)) add(makeBirds(id === 'snow' ? 3 : 5, 6.5, -14, 18));
+  if (['meadow', 'rainbow', 'farm', 'castle'].includes(id)) add(makeButterflies(4, -7, 7, 5.2));
+  if (id === 'meadow') add(makeJumper());
+  return (dt, t) => {
+    for (const o of sways) { const w = o.userData.sway; o.rotation.z = Math.sin(t * w.sp + w.ph) * w.amp; }
+    for (const u of ups) u(dt, t);
+    if (water) { water.map.offset.x = (t * 0.02) % 1; water.map.offset.y = (t * 0.012) % 1; }
+  };
+}
+
 export const WORLD_IDS = ['meadow', 'farm', 'beach', 'space', 'rainbow', 'city', 'snow', 'castle'];
 export const WORLD_NAMES = { meadow: 'البركة', farm: 'المزرعة', beach: 'الشاطئ', space: 'الفضاء', rainbow: 'ملعب قوس قزح', city: 'المدينة', snow: 'جبال الثلج', castle: 'القلعة' };
 
@@ -166,6 +278,7 @@ export function buildWorld(id) {
   const group = new THREE.Group();
   const info = BUILD[id](group);
   group.visible = false;
-  return { id, group, pad: info.pad, update: info.update };
+  const life = decorate(id, group, info.water);
+  return { id, group, pad: info.pad, update: (dt, t) => { info.update(dt, t); life(dt, t); } };
 }
 export { makeTree };

@@ -100,7 +100,7 @@ export const HABIT_ITEMS = [...new Set(HABITS.map((h) => h.answer))];
 
 /** The short, simple sentences said after a right answer (never about time or points). */
 export const CHEERS_M = ['أحسنت!', 'شاطر أوي!', 'ممتاز!', 'جميل أوي!', 'عظيم!', 'يا سلام عليك!', 'أنت بطل!', 'كمّل كده!', 'إجابة صحيحة!'];
-export const CHEERS_F = ['أحسنتي!', 'شاطره أوي!', 'ممتازة!', 'جميلة أوي!', 'عظيمة!', 'يا سلام عليكي!', 'إنتي بطلة!', 'كمّلي كده!', 'إجابة صحيحة!'];
+export const CHEERS_F = ['أحسنتي!', 'حلوة أوي!', 'ممتازة!', 'جميلة أوي!', 'عظيمة!', 'يا سلام عليكي!', 'إنتي بطلة!', 'كمّلي كده!', 'إجابة صحيحة!'];
 export const cheer = (girl, i) => (girl ? CHEERS_F : CHEERS_M)[i % CHEERS_M.length];
 
 const pick = (r, arr, n) => [...arr].sort(() => r() - 0.5).slice(0, n);

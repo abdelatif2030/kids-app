@@ -258,20 +258,37 @@ const BUILD = {
     g.add(cone(0.15, 0.4, new THREE.MeshBasicMaterial({ color: 0xffa81a }), 0, 0.02, 0)).rotation.x = Math.PI;
   },
   envelope(g) {
-    g.add(new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.62, 0.1), m(0xfff8e8))).position.set(0, 0.45, 0);
-    const flap = new THREE.Mesh(new THREE.ConeGeometry(0.56, 0.4, 3), m(0xf0e4c8));
-    flap.rotation.set(0, 0, Math.PI); flap.scale.set(1, 1, 0.2); flap.position.set(0, 0.56, 0.06); g.add(flap);
-    g.add(sph(0.08, m(0xe8302a), 0, 0.42, 0.1, 1, 1, 0.4));
+    // a paper envelope drawn on its front: the V of the flap, the folds and a red heart seal
+    const c = document.createElement('canvas'); c.width = 256; c.height = 168;
+    const x = c.getContext('2d');
+    x.fillStyle = '#fff6e0'; x.fillRect(0, 0, 256, 168);
+    x.strokeStyle = '#d8c8a0'; x.lineWidth = 4;
+    x.beginPath(); x.moveTo(0, 0); x.lineTo(128, 96); x.lineTo(256, 0); x.stroke();
+    x.beginPath(); x.moveTo(0, 168); x.lineTo(96, 80); x.moveTo(256, 168); x.lineTo(160, 80); x.stroke();
+    x.fillStyle = '#e8304a'; x.beginPath(); x.arc(128, 96, 22, 0, Math.PI * 2); x.fill();
+    x.fillStyle = '#ffd0d8'; x.font = '900 28px sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('♥', 128, 97);
+    const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+    const paper = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.7, 0.07), [m(0xf0e4c8), m(0xf0e4c8), m(0xf0e4c8), m(0xf0e4c8), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.7 }), m(0xe8dcc0)]);
+    paper.position.y = 0.5; paper.rotation.x = -0.12; paper.castShadow = true;
+    g.add(paper);
   },
   crow(g) {
-    const blk = m(0x24242e, 0.4);
-    g.add(sph(0.4, blk, 0, 0.55, 0, 0.9, 0.9, 1.25));
-    g.add(sph(0.24, blk, 0, 0.98, 0.3));
-    g.add(cone(0.08, 0.3, m(0xffa21a), 0, 0.95, 0.6)).rotation.x = Math.PI / 2;
-    eyes(g, 1.03, 0.45, 0.1, 0.035);
-    for (const s of [-1, 1]) g.add(sph(0.22, m(0x343444), s * 0.38, 0.55, -0.05, 0.4, 0.9, 1.3));
-    g.add(cone(0.18, 0.5, blk, 0, 0.5, -0.5)).rotation.x = -1.4;
-    legs(g, m(0xffa21a), [-0.1, 0.1], [0.05], 0.2, 0.025);
+    // a proper crow in profile: glossy blue-black body, big head with a thick beak, white-ringed eye, folded wings, a wedge tail
+    const blk = m(0x1c1e2e, 0.25), wing = m(0x2a3050, 0.3), beakM = m(0x4a4a58, 0.4);
+    g.add(sph(0.42, blk, 0, 0.62, 0, 0.85, 0.8, 1.35));
+    g.add(sph(0.3, blk, 0, 1.0, 0.5));
+    g.add(sph(0.13, beakM, 0, 0.93, 0.86, 0.9, 0.8, 1.9));
+    for (const s of [-1, 1]) {
+      g.add(sph(0.075, m(0xffffff, 0.2), s * 0.2, 1.07, 0.66));
+      g.add(sph(0.04, m(0x000000, 0.1), s * 0.22, 1.07, 0.71));
+      const w = sph(0.3, wing, s * 0.34, 0.62, -0.05, 0.38, 0.85, 1.5);
+      w.rotation.z = -s * 0.25;
+      g.add(w);
+    }
+    const tail = cone(0.2, 0.75, wing, 0, 0.5, -0.75, 4);
+    tail.rotation.x = -1.7; tail.scale.set(1, 1, 0.3);
+    g.add(tail);
+    legs(g, m(0x3a3a48), [-0.1, 0.1], [0.05], 0.3, 0.03);
   },
   lemon(g) {
     const y = m(0xffe84a, 0.4);
@@ -357,11 +374,16 @@ export function makeThing(id) {
   if (!BUILD[id]) return makeItem(id);
   const outer = new THREE.Group();
   const inner = new THREE.Group();
+  // many models write `g.add(part).rotation.x = ...` meaning the PART; Group.add returns the group, which turned the whole
+  // model upside down or sideways (the horse, the rocket, the fox...). Here add() returns the part it added.
+  inner.add = function addPart(...objs) { THREE.Group.prototype.add.apply(this, objs); return objs[0]; };
   BUILD[id](inner);
+  if (PROFILE.has(id)) inner.rotation.y = -0.85;
   inner.traverse((o) => { if (o.isMesh) o.castShadow = true; });
   outer.add(inner);
   outer.userData.id = id;
   outer.userData.inner = inner;
   return outer;
 }
+const PROFILE = new Set(['crow', 'fox', 'camel', 'monkey', 'bear', 'mouse', 'dog', 'giraffe', 'sheep', 'hen', 'duck', 'cow', 'dove']);
 export const THING_IDS = Object.keys(BUILD);

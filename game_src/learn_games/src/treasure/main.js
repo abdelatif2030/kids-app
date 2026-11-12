@@ -17,7 +17,7 @@ const TEXT = {
   notHere: ['مش هنا... اسمع الببغاء تاني', 'Not here... listen to the parrot again'],
   mark: ['ده مكان مش للحفر', "You can't dig here"],
   found_m: ['لقيت الكنز! شاطر', 'You found the treasure!'],
-  found_f: ['لقيتي الكنز! شاطره', 'You found the treasure!'],
+  found_f: ['لقيتي الكنز! ممتازة', 'You found the treasure!'],
   again: ['اسمع تاني', 'Hear again'],
 };
 

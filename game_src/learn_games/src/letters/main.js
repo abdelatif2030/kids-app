@@ -53,7 +53,7 @@ function fitThing(item, h, w) {
 }
 const SCALE = { camel: 1.15, horse: 1.15, giraffe: 0.8, rocket: 1.1, crescent: 1.4, cow: 1.1, bear: 1.3, bed: 1.05, tub: 1.05, pot: 1.25, plate: 1.25, bowl: 1.25, soap: 1.3, backpack: 1.25, toothbrush: 1.3, heart: 1.4, carrot: 1.5, bone: 1.6, grass: 1.3, honey: 1.5, cheese: 1.4, seeds: 1.6 };
 const HAND = new THREE.Vector3(-5.0, 2.8, 2.0);
-const STAND = new THREE.Vector3(-2.9, 0, 2.9);
+const STAND = new THREE.Vector3(-1.5, 0, 2.9);
 const RACK = new THREE.Vector3(5.2, 0, 3.0);
 const RACK_S = 0.6;
 
@@ -74,12 +74,12 @@ class Game {
     this.fade = h('div', { class: 'lw-fade' });
     sh.root.append(this.fade);
     this.owl = makeActor('owl');
-    this.owl.position.set(-6.1, 0, 3.4);
-    this.owl.scale.setScalar(0.8);
+    this.owl.position.set(-6.3, 0.16, 3.4);
+    this.owl.scale.setScalar(0.72);
     this.owl.rotation.y = 0.25;
     this.st.add(this.owl);
     this.persons = { mama: makePerson('mama'), baba: makePerson('baba') };
-    for (const p of Object.values(this.persons)) { p.position.set(-2.8, 0, 2.7); p.scale.setScalar(0.9); p.visible = false; p.rotation.y = 0.2; this.st.add(p); }
+    for (const p of Object.values(this.persons)) { p.position.set(-1.5, 0, 2.7); p.scale.setScalar(0.9); p.visible = false; p.rotation.y = 0.2; this.st.add(p); }
     this.stand = this._makeStand();
     this._makeRack();
     this.save = sh.save;
@@ -283,7 +283,7 @@ class Game {
       const fi = fitThing(t, 1.9, 1.7);
       t.position.y = 0.76 - fi.minY;
       g.add(t);
-      g.userData.spin = t;
+      if (!t.userData.art) g.userData.spin = t; // a flat picture must not turn edge-on
     } else if (show.type === 'apples') {
       const n = show.n;
       const cols = n > 10 ? 5 : n > 6 ? 4 : 3;
@@ -318,7 +318,7 @@ class Game {
   _makeHero(kind, look) {
     if (this.hero) this.st.scene.remove(this.hero);
     const k = makeActor(kind);
-    k.position.set(-3.9, 0, 3.4);
+    k.position.set(-4.3, 0.16, 3.4);
     k.scale.setScalar(0.9);
     k.rotation.y = 0.2;
     this.st.add(k);
@@ -485,8 +485,9 @@ class Game {
     this.sh.sound.play('splash');
     this.sh.sound.play('note', PENTA[(done * 2) % PENTA.length]);
     this.sh.sound.play('right');
+    this.sh.sound.play('fanfare');
     this.sh.sound.play('applause');
-    setTimeout(() => this.sh.sound.play('yay'), 350);
+    setTimeout(() => this.sh.sound.play('crowd'), 160);
     this.owl.act(done % 2 ? 'cheer' : 'clap');
     if (this.hero) this.hero.act(done % 2 ? 'celebrate' : 'clap');
     this.owl.look(o.g.position.x);
@@ -531,19 +532,69 @@ class Game {
   _levelDone() {
     const sh = this.sh;
     this.st.mode = 'end';
-    this.sh.sound.setSuspense(false);
+    sh.sound.setSuspense(false);
     this.sign.remove();
     const list = levelsFor(sh.age);
     const idx = list.findIndex((l) => l.id === this.levelId);
     this.save.lw.done[this.levelId] = true;
     this.save.lw.unlocked = Math.max(this.save.lw.unlocked || 1, idx + 2);
     sh.saveNow();
-    sh.sound.setMode('calm');
     this.owl.act('cheer');
     if (this.hero) this.hero.act('celebrate');
     this.st.sparkle(new THREE.Vector3(RACK.x, 2.2, RACK.z), 40);
     const hasNext = idx + 1 < list.length;
-    sh.finishCard(this.level.ar, this.level.emoji, () => this._begin(this.levelId), hasNext ? () => this._begin(list[idx + 1].id) : null, () => this._levels());
+    if (!hasNext) {
+      // the very last level: the end card (the star the first time), then back to the levels
+      sh.sound.setMode('calm');
+      sh.finishCard(this.level.ar, this.level.emoji, () => this._begin(this.levelId), null, () => this._levels());
+      return;
+    }
+    // no stop between levels (owner 2026-11-12): a short celebration, then the hero walks on slowly to the next place
+    const first = !sh.done;
+    sh.done = true;
+    sh.complete();
+    sh.sound.play('win');
+    sh.sound.play('applause');
+    setTimeout(() => sh.sound.play('crowd'), 200);
+    setTimeout(() => { sh.sound.play('yay'); sh.sound.play('star'); }, 900);
+    sh.speak(first ? `${sh.t('greatSay')} ${sh.t('newStarSay')}` : sh.t('greatSay'));
+    const nextId = list[idx + 1].id;
+    setTimeout(() => this._walkOn(nextId, idx + 1), 3000);
+  }
+
+  /** Between levels: the hero WALKS (in place, footsteps) while the world scrolls past and the next place slides in from
+   *  the right and its sky fades in (no flash, no jump), then the next level begins. */
+  _walkOn(nextId, worldIndex) {
+    const sh = this.sh;
+    this._clearRound();
+    const hero = this.hero;
+    const id = WORLD_IDS[worldIndex % WORLD_IDS.length];
+    if (this.worldId === id || !hero) { this._goWorld(worldIndex, true); this._begin(nextId); return; }
+    if (!this.worlds[id]) { this.worlds[id] = buildWorld(id); this.st.add(this.worlds[id].group); }
+    const from = this.world, to = this.worlds[id];
+    const SHIFT = 34;
+    to.group.visible = true;
+    to.group.position.x = SHIFT;
+    const sky = to.group.children[0];
+    if (sky && sky.material) { sky.material.transparent = true; sky.material.opacity = 0; }
+    let foot = 0;
+    const steps = setInterval(() => { sh.sound.play('step', foot++ % 2); }, 330);
+    hero.act('walk');
+    this.owl.act('wave');
+    sh.sound.setMode('calm');
+    sh.sound.play('whoosh');
+    this.scroll = { from, to, sky, t: 0, dur: 4.2, SHIFT, then: () => {
+      clearInterval(steps);
+      from.group.visible = false;
+      from.group.position.x = 0;
+      to.group.position.x = 0;
+      if (sky && sky.material) { sky.material.opacity = 1; sky.material.transparent = false; }
+      this.world = to;
+      this.worldId = id;
+      this.padStyle = PADS[to.pad];
+      hero.act('wave');
+      setTimeout(() => this._begin(nextId), 600);
+    } };
   }
 
   // ---- animation ---------------------------------------------------------------------------------------------------
@@ -551,6 +602,25 @@ class Game {
   _frame(dt, time) {
     this.owl.update(dt, time);
     if (this.hero) this.hero.update(dt, time);
+    if (this.scroll) {
+      const C = this.scroll;
+      C.t += dt / C.dur;
+      const k = Math.min(1, C.t);
+      const e = k * k * (3 - 2 * k);
+      C.from.group.position.x = -C.SHIFT * e;
+      C.to.group.position.x = C.SHIFT * (1 - e);
+      if (C.sky && C.sky.material) C.sky.material.opacity = e;
+      C.to.update(dt, time);
+      if (this.hero) this.hero.userData.state.act = 'walk';
+      if (k >= 1) { const then = C.then; this.scroll = null; then(); }
+    }
+    if (this.walk) {
+      const W = this.walk;
+      W.t += dt / W.dur;
+      const k = Math.min(1, W.t);
+      W.hero.position.x = W.from + (W.to - W.from) * (k * k * (3 - 2 * k));
+      if (k >= 1) { const then = W.then; this.walk = null; then(); }
+    }
     if (this.previews) for (const k of Object.values(this.previews)) if (k.parent) { k.update(dt, time); if (Math.random() < 0.004) k.act('wave'); }
     for (const p of Object.values(this.persons)) if (p.visible) p.update(dt, time);
     if (this.world) this.world.update(dt, time);

@@ -23,7 +23,7 @@ const TEXT = {
   yum1_f: ['برافو! لقيتي الجبنة!', 'Yay! You found the cheese!'],
   yum2: ['هممم! جبنة لذيذة!', 'Yum! Tasty cheese!'],
   yum3_m: ['شاطر! يلا المتاهة الجاية', 'Great! On to the next maze'],
-  yum3_f: ['شاطره! يلا المتاهة الجاية', 'Great! On to the next maze'],
+  yum3_f: ['ممتازة! يلا المتاهة الجاية', 'Great! On to the next maze'],
   next: ['متاهة أكبر شوية!', 'A slightly bigger maze!'],
   end: ['الفأر شبعان! 🧀', 'The mouse is full! 🧀'],
 };
