@@ -99,5 +99,18 @@
   "px": 346,
   "loopSec": 2.8333333333333335,
   "ground": 401
+ },
+ "girl_laugh": {
+  "file": "girl_laugh.webp",
+  "frames": 36,
+  "cols": 18,
+  "rows": 2,
+  "w": 226,
+  "h": 382,
+  "fps": 12,
+  "loop": false,
+  "px": 339,
+  "loopSec": 3,
+  "ground": 379
  }
 }
