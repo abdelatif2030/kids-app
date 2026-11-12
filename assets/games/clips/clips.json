@@ -125,5 +125,18 @@
   "px": 349,
   "loopSec": 1.1666666666666667,
   "ground": 368
+ },
+ "girl_clap": {
+  "file": "girl_clap.webp",
+  "frames": 30,
+  "cols": 18,
+  "rows": 2,
+  "w": 216,
+  "h": 366,
+  "fps": 12,
+  "loop": false,
+  "px": 336,
+  "loopSec": 2.5,
+  "ground": 364
  }
 }
