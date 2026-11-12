@@ -4,7 +4,7 @@
 // teacher Boom the owl stands on the bank: he tosses the pictures onto the water (he "picks"), asks, points, claps, and
 // arranges every right answer on his picture rack. Mama and Baba step up in the habits level. Every right answer gets a
 // short kind phrase; a wrong pick only wobbles (after two the right one glows). The calm music grows with each right
-// answer. Five rounds per level; levels unlock one after another; skills go to the parent dashboard.
+// answer. Five rounds per level; ALL levels are open from the start (owner, 2026-11-12); skills go to the parent dashboard.
 import * as THREE from 'three';
 import { Shell, h } from '../kit/shell.js';
 import { THEME_GARDEN } from '../kit/sound.js';
@@ -388,7 +388,7 @@ class Game {
     sh.sound.setMode('menu');
     sh.sound.energy = 0;
     sh.layer.append(h('div', { class: 'lk-top' }, sh.backBtn(), h('span'), sh.soundBtn()));
-    const unlocked = this.save.lw.unlocked || 1;
+    const unlocked = Infinity; // every level is open: the child chooses any of them
     const list = levelsFor(sh.age);
     const tiles = list.map((lv, i) => {
       const locked = i + 1 > unlocked;
