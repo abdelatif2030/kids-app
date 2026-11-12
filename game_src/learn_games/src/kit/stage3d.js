@@ -38,6 +38,7 @@ export class Stage {
     this.sh = sh;
     this.o = { bg: 0xdff3ff, ground: 0xd8c8a8, fov: 40, box: [5, 3], dir: [0, 0.45, 0.9], target: [0, 0.8, 0], ...o };
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    this.renderer.localClippingEnabled = true; // used by the walk between places (worlds3d seam)
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.shadowMap.enabled = true;

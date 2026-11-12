@@ -14,6 +14,8 @@ import { addSky, addClouds, scatter } from '../kit/realism.js';
 import { buildWorld, WORLD_IDS, WORLD_NAMES, PADS } from '../kit/worlds3d.js';
 import { makeActor, setArtBase } from '../kit/actors.js';
 import { stepSeconds } from '../kit/clips.js';
+// where the two worlds meet while they slide past each other (just outside the right edge of the screen at the start)
+const SEAM_X = 14.5;
 import { makePerson } from '../kit/people.js';
 import { shapeGeo } from '../kit/shapes3d.js';
 import { colorById } from '../shapes/sim.js';
@@ -586,6 +588,8 @@ class Game {
     const SHIFT = 34;
     to.group.visible = true;
     to.group.position.x = SHIFT;
+    from.seam('old', SEAM_X);
+    to.seam('new', SEAM_X);
     const sky = to.group.children[0];
     if (sky && sky.material) { sky.material.transparent = true; sky.material.opacity = 0; }
     let foot = 0;
@@ -600,6 +604,8 @@ class Game {
     sh.sound.play('whoosh');
     this.scroll = { from, to, sky, t: 0, dur: 4.2, SHIFT, then: () => {
       clearTimeout(stepTimer);
+      from.seam('off');
+      to.seam('off');
       from.group.visible = false;
       from.group.position.x = 0;
       to.group.position.x = 0;
@@ -624,6 +630,9 @@ class Game {
       const e = k * k * (3 - 2 * k);
       C.from.group.position.x = -C.SHIFT * e;
       C.to.group.position.x = C.SHIFT * (1 - e);
+      const xb = SEAM_X - C.SHIFT * e; // the seam moves left with the scroll
+      C.from.seam('old', xb);
+      C.to.seam('new', xb);
       if (C.sky && C.sky.material) C.sky.material.opacity = e;
       C.to.update(dt, time);
       if (this.hero) this.hero.userData.state.act = 'walk';

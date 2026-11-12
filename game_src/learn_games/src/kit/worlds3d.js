@@ -15,7 +15,7 @@ const sph = (r, mat, x, y, z) => { const o = new THREE.Mesh(new THREE.SphereGeom
 function ground(g, color, stripColor, y = -0.2) {
   const f = new THREE.Mesh(new THREE.PlaneGeometry(80, 44), m(color, 1));
   f.rotation.x = -Math.PI / 2; f.position.y = y; f.receiveShadow = true; g.add(f);
-  const strip = box(16, 0.4, 3.4, m(stripColor, 1), 0, -0.05, 3.2);
+  const strip = box(70, 0.4, 3.4, m(stripColor, 1), 0, -0.05, 3.2); // as wide as the floor: no visible ends while worlds slide past
   g.add(strip);
 }
 
@@ -281,6 +281,18 @@ export function buildWorld(id) {
   const info = BUILD[id](group);
   group.visible = false;
   const life = decorate(id, group, info.water);
-  return { id, group, pad: info.pad, update: (dt, t) => { info.update(dt, t); life(dt, t); } };
+  // A seam for the walk between places: while two worlds slide past each other, each one is cut by a vertical plane that moves
+  // with the scroll (the old world keeps what is left of it, the new one what is right of it), so the two floors never overlap
+  // (no flicker where both are at the same height, no colour pop at the end). Off = nothing is cut. The sky (first child) is not cut.
+  const clip = new THREE.Plane(new THREE.Vector3(-1, 0, 0), 1e5);
+  group.children.slice(1).forEach((c) => c.traverse((o) => {
+    for (const mat of [].concat(o.material || [])) mat.clippingPlanes = [clip];
+  }));
+  const seam = (mode, x = 0) => {
+    if (mode === 'old') { clip.normal.set(-1, 0, 0); clip.constant = x; } // keeps everything left of x
+    else if (mode === 'new') { clip.normal.set(1, 0, 0); clip.constant = -x; } // keeps everything right of x
+    else { clip.normal.set(-1, 0, 0); clip.constant = 1e5; }
+  };
+  return { id, group, pad: info.pad, seam, update: (dt, t) => { info.update(dt, t); life(dt, t); } };
 }
 export { makeTree };
