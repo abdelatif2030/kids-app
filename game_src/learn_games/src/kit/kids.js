@@ -166,6 +166,7 @@ export function makeKid(kind) {
       case 'think': if (k < 2.6) { zR = 1.0; xR = -2.0; hx = 0.05; hz = 0.18 + Math.sin(k * 3) * 0.05; } break;
       case 'point': if (k < 1.8) { zR = 1.55; xR = -0.3; hz = -0.1; } break;
       case 'talk': if (k < 2.4) { by = Math.sin(k * 8) * 0.02; zR = 0.9 + Math.sin(k * 6) * 0.2; hx = Math.sin(k * 7) * 0.05; } break;
+      case 'run': if (k < 1.4) { by = Math.abs(Math.sin(k * 15)) * 0.14; zL = -0.9 + Math.sin(k * 15) * 0.6; zR = 0.9 - Math.sin(k * 15) * 0.6; xL = Math.sin(k * 15) * 0.7; xR = -Math.sin(k * 15) * 0.7; hx = 0.08; } break;
       case 'sad': if (k < 2.2) { hx = 0.18; zL = -0.15; zR = 0.15; } break;
       default:
     }
@@ -179,7 +180,7 @@ export function makeKid(kind) {
     const ty = Math.max(-0.6, Math.min(0.6, (S.lookX - g.position.x) * 0.07));
     if (S.act !== 'celebrate') u.head.rotation.y += (ty - u.head.rotation.y) * Math.min(1, dt * 6);
     if (u.tail) u.tail.rotation.z = Math.sin(time * 3) * 0.12 + (S.act === 'celebrate' ? Math.sin(time * 14) * 0.3 : 0);
-    for (let i = 0; i < 2; i++) u.legs[i].rotation.x = S.act === 'jump' || S.act === 'celebrate' ? Math.sin(time * 14 + i * Math.PI) * 0.25 : 0;
+    for (let i = 0; i < 2; i++) u.legs[i].rotation.x = S.act === 'jump' || S.act === 'celebrate' ? Math.sin(time * 14 + i * Math.PI) * 0.25 : S.act === 'run' ? Math.sin(time * 15 + i * Math.PI) * 0.8 : 0;
     S.blink -= dt;
     const closed = S.blink < 0.1 && S.blink > 0;
     if (S.blink <= 0) S.blink = 2 + Math.random() * 3;

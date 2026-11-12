@@ -11,6 +11,7 @@ import { THEME_GARDEN } from '../kit/sound.js';
 import { Stage, M, canvasTex, labelTex } from '../kit/stage3d.js';
 import { makeThing } from '../kit/things3d.js';
 import { addSky, addClouds, scatter } from '../kit/realism.js';
+import { buildWorld, WORLD_IDS, WORLD_NAMES, PADS } from '../kit/worlds3d.js';
 import { makeOwl } from '../kit/owl.js';
 import { makePerson } from '../kit/people.js';
 import { makeKid, HAIR_COLORS, CLOTH_COLORS } from '../kit/kids.js';
@@ -41,6 +42,16 @@ const THEME_WORLD = {
 };
 const PENTA = [72, 74, 76, 79, 81, 84, 86, 88]; // C major pentatonic: every tap rings a pleasant note
 const RAFT = [0xff8a3a, 0xff5a8a, 0x4ac8ff, 0xffc93a, 0x7ad86a];
+
+/** Scales a picture so it is always fully visible: about [h] tall and never wider than [w]; returns its height and lowest point. */
+function fitThing(item, h, w) {
+  const b = new THREE.Box3().setFromObject(item);
+  const sz = b.getSize(new THREE.Vector3());
+  const k = Math.min(h / Math.max(sz.y, 0.01), w / Math.max(sz.x, sz.z, 0.01));
+  item.scale.multiplyScalar(k);
+  const b2 = new THREE.Box3().setFromObject(item);
+  return { h: b2.max.y - b2.min.y, minY: b2.min.y };
+}
 const SCALE = { camel: 1.15, horse: 1.15, giraffe: 0.8, rocket: 1.1, crescent: 1.4, cow: 1.1, bear: 1.3, bed: 1.05, tub: 1.05, pot: 1.25, plate: 1.25, bowl: 1.25, soap: 1.3, backpack: 1.25, toothbrush: 1.3, heart: 1.4, carrot: 1.5, bone: 1.6, grass: 1.3, honey: 1.5, cheese: 1.4, seeds: 1.6 };
 const HAND = new THREE.Vector3(-5.0, 2.8, 2.0);
 const STAND = new THREE.Vector3(-2.9, 0, 2.9);
@@ -56,10 +67,15 @@ class Game {
     this.opts = new Map();
     this.rackItems = [];
     this.cheerN = Math.floor(Math.random() * 9);
-    this._pond();
+    this.worlds = {};
+    this.worldId = null;
+    this.padStyle = PADS.float;
+    this._goWorld(0, true);
+    this.fade = h('div', { class: 'lw-fade' });
+    sh.root.append(this.fade);
     this.owl = makeOwl();
-    this.owl.position.set(-6.0, 0, 3.0);
-    this.owl.scale.setScalar(0.62);
+    this.owl.position.set(-6.3, 0, 3.3);
+    this.owl.scale.setScalar(0.85);
     this.owl.rotation.y = 0.25;
     this.st.add(this.owl);
     this.persons = { mama: makePerson('mama'), baba: makePerson('baba') };
@@ -123,6 +139,23 @@ class Game {
     }
   }
 
+  /** Moves to another place (a fade, then the new scenery); the first level starts at the pond, each next level somewhere new. */
+  _goWorld(i, instant) {
+    const id = WORLD_IDS[i % WORLD_IDS.length];
+    if (this.worldId === id) return;
+    const swap = () => {
+      if (!this.worlds[id]) { this.worlds[id] = buildWorld(id); this.st.add(this.worlds[id].group); }
+      for (const w of Object.values(this.worlds)) w.group.visible = w === this.worlds[id];
+      this.world = this.worlds[id];
+      this.worldId = id;
+      this.padStyle = PADS[this.world.pad];
+    };
+    if (instant) { swap(); return; }
+    this.fade.classList.add('on');
+    if (this.hero) this.hero.act('run');
+    setTimeout(() => { swap(); this.fade.classList.remove('on'); this.sh.say(WORLD_NAMES[id], false, 2.2); }, 520);
+  }
+
   _makeStand() {
     const g = new THREE.Group();
     const base = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 1.05, 0.7, 28), M(0xd8964a));
@@ -175,24 +208,27 @@ class Game {
 
   _option(o, i, n) {
     const g = new THREE.Group();
-    const col = RAFT[i % RAFT.length];
+    const col = this.padStyle.ring[i % 5];
     const ring = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.22, 12, 28), M(col, { roughness: 0.4 }));
     ring.rotation.x = Math.PI / 2;
     ring.position.y = 0.05;
-    const raft = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.85, 0.08, 28), M(0xfff4d8));
+    const raft = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.85, 0.08, 28), M(this.padStyle.disc));
     raft.position.y = 0.04;
     g.add(ring, raft);
-    let item = null, plaque = null;
+    let item = null, plaque = null, baseY = 0.06;
     if (o.kind === 'thing') {
       item = makeThing(o.thing);
-      item.scale.setScalar(SCALE[o.thing] || 1.5);
-      item.position.set(0, 0.06, 0);
+      const fi = fitThing(item, 1.9, 1.55);
+      baseY = 0.12 - fi.minY;
+      item.position.set(-0.1, baseY, 0);
       g.add(item);
       if (o.plaque) {
-        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 1.5, 8), M(0xb88848));
-        pole.position.set(0.75, 0.8, 0.1);
+        // the letter sign stands to the right and above, never in front of the picture
+        const top = Math.max(2.0, baseY + fi.h + 0.55);
+        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, top, 8), M(0xb88848));
+        pole.position.set(1.0, top / 2, 0.1);
         plaque = this._plaque(o.plaque);
-        plaque.position.set(0.75, 1.95, 0.1);
+        plaque.position.set(1.0, top + 0.1, 0.1);
         g.add(pole, plaque);
       }
     } else if (o.kind === 'color') {
@@ -226,7 +262,7 @@ class Game {
     g.position.copy(HAND);
     g.scale.setScalar(0.01);
     this.st.add(g);
-    return { g, o, home, item, plaque, ring, glow, hit, ph: i * 1.7, wig: 0, gone: false, arrive: -0.35 - i * 0.28, from: HAND.clone() };
+    return { g, o, home, item, plaque, baseY, ring, glow, hit, ph: i * 1.7, wig: 0, gone: false, arrive: -0.35 - i * 0.28, from: HAND.clone() };
   }
 
   _showStand(show) {
@@ -244,8 +280,8 @@ class Game {
     const g = new THREE.Group();
     if (show.type === 'thing') {
       const t = makeThing(show.thing);
-      t.scale.setScalar((SCALE[show.thing] || 1.5) * 1.15);
-      t.position.y = 0.76;
+      const fi = fitThing(t, 1.9, 1.7);
+      t.position.y = 0.76 - fi.minY;
       g.add(t);
       g.userData.spin = t;
     } else if (show.type === 'apples') {
@@ -283,8 +319,8 @@ class Game {
     if (this.hero) this.st.scene.remove(this.hero);
     const k = makeKid(kind);
     if (look) k.setLook(look);
-    k.position.set(-4.4, 0, 3.4);
-    k.scale.setScalar(0.62);
+    k.position.set(-4.5, 0, 3.4);
+    k.scale.setScalar(0.95);
     k.rotation.y = 0.2;
     this.st.add(k);
     this.hero = k;
@@ -384,6 +420,7 @@ class Game {
     this._clearRound();
     this.levelId = levelId;
     this.level = LEVELS.find((l) => l.id === levelId);
+    this._goWorld(Math.max(0, levelsFor(sh.age).findIndex((l) => l.id === levelId)));
     this.play = new LevelPlay(levelId, sh.age, Math.floor(Math.random() * 1e9));
     sh.clear();
     this.lightDots = sh.topBar(5, '⭐');
@@ -396,7 +433,7 @@ class Game {
     sh.sound.setMode('play');
     sh.sound.energy = 0;
     this.st.mode = 'busy';
-    setTimeout(() => this._ask(), 500);
+    setTimeout(() => this._ask(), this.worldChanged ? 1300 : 700);
   }
 
   _ask() {
@@ -516,7 +553,7 @@ class Game {
     if (this.hero) this.hero.update(dt, time);
     if (this.previews) for (const k of Object.values(this.previews)) if (k.parent) { k.update(dt, time); if (Math.random() < 0.004) k.act('wave'); }
     for (const p of Object.values(this.persons)) if (p.visible) p.update(dt, time);
-    this.water.rotation.y = Math.sin(time * 0.3) * 0.02;
+    if (this.world) this.world.update(dt, time);
     const hint = this.play && this.st.mode === 'wait' && this.play.cur ? this.play.hint : null;
     const fid = this.st.mode === 'wait' ? this.st.focusedId() : null;
     for (const [id, f] of this.opts) {
@@ -538,7 +575,7 @@ class Game {
       f.g.position.set(f.home.x + Math.cos(a) * 0.55, 0.1 + Math.sin(time * 2 + f.ph) * 0.04, f.home.z + Math.sin(a * 1.3) * 0.4);
       f.g.rotation.y = Math.sin(time * 0.8 + f.ph) * 0.35;
       f.ring.rotation.z = Math.sin(time * 2 + f.ph) * 0.06;
-      if (f.o.kind === 'thing' && f.item) f.item.position.y = 0.06 + Math.abs(Math.sin(time * 2.4 + f.ph)) * 0.06;
+      if (f.o.kind === 'thing' && f.item) f.item.position.y = f.baseY + Math.abs(Math.sin(time * 2.4 + f.ph)) * 0.06;
       if (f.o.kind === 'shape') f.item.rotation.y = Math.sin(time * 1.4 + f.ph) * 0.5;
       if (f.o.kind === 'color') f.item.position.y = 0.95 + Math.abs(Math.sin(time * 2.2 + f.ph)) * 0.12;
       const wg = f.item && f.item.userData && f.item.userData.inner && f.item.userData.inner.userData.wings;
@@ -622,6 +659,8 @@ const CSS = `
 .lw-girl{background:linear-gradient(180deg,#ff8ac8,#e8409a)}
 .lw-row{display:flex;gap:calc(var(--u)*1.6)}
 .lw-sw{width:max(40px,calc(var(--u)*8));height:max(40px,calc(var(--u)*8));border-radius:50%;border:calc(var(--u)*.6) solid #fff;cursor:pointer;box-shadow:0 calc(var(--u)*.5) calc(var(--u)*1.2) rgba(0,0,0,.3)}
+.lw-fade{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .5s;z-index:20}
+.lw-fade.on{opacity:1}
 .lw-tile:focus-visible{outline:calc(var(--u)*.8) solid #6a3ad0;outline-offset:calc(var(--u)*.6)}
 @media (max-aspect-ratio:1/1){.lw-grid{grid-template-columns:repeat(3,1fr)}}
 `;
