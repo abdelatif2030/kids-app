@@ -424,13 +424,21 @@ class Game {
     this.lightDots(0);
     this.sign = h('div', { class: 'lw-sign' });
     this.signText = h('span');
-    this.signIcon = h('i', {}, this.level.emoji);
+    this.signIcon = h('i', {}, this._barIcon());
     this.sign.append(this.signIcon, this.signText, h('button', { class: 'lw-again', 'aria-label': sh.t('again'), onclick: (e) => { e.stopPropagation(); this._say(); } }, '🔊'));
     sh.layer.append(this.sign);
     sh.sound.setMode('play');
     sh.sound.energy = 0;
     this.st.mode = 'busy';
     setTimeout(() => this._ask(), this.worldChanged ? 1300 : 700);
+  }
+
+  /** The little picture on the question bar. A level that asks about many different things (fruits, shapes, animals,
+   *  habits) must not show ONE of them (it looked like the answer was a strawberry while the question was an apple), so it
+   *  shows a neutral 'look' icon; levels about letters and numbers keep their own. */
+  _barIcon() {
+    const m = this.level && this.level.mode;
+    return ['pick', 'shape', 'animal', 'habit', 'word'].includes(m) ? '👀' : this.level.emoji;
   }
 
   _ask() {
@@ -525,7 +533,7 @@ class Game {
 
   _advance(ev) {
     setTimeout(() => {
-      this.signIcon.textContent = this.level.emoji;
+      this.signIcon.textContent = this._barIcon();
       if (ev.finished) this._levelDone();
       else this._ask();
     }, 700);

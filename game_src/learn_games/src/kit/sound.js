@@ -250,11 +250,11 @@ export class Sound {
         this.lead(arg || 79, t, 0.09, this.sfx);
         break;
       case 'applause': { // a crowd clapping: many filtered noise claps, dense at first, then thinning out
-        const n = 130;
+        const n = 150;
         for (let i = 0; i < n; i++) {
           const at = t + Math.pow(Math.random(), 1.5) * 2.5;
-          this.noise(at, 0.02 + Math.random() * 0.025, 0.09 + Math.random() * 0.08, 'bandpass', 1300 + Math.random() * 3000, 1.3, this.sfx);
-          if (i % 3 === 0) this.noise(at, 0.05, 0.05, 'lowpass', 900, 0.8, this.sfx); // the hollow body of a clap
+          this.noise(at, 0.02 + Math.random() * 0.025, 0.2 + Math.random() * 0.14, 'bandpass', 1300 + Math.random() * 3000, 1.3, this.sfx);
+          if (i % 3 === 0) this.noise(at, 0.05, 0.12, 'lowpass', 900, 0.8, this.sfx); // the hollow body of a clap
         }
         break;
       }
