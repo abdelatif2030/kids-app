@@ -12,6 +12,7 @@ import '../../companion/companion_service.dart';
 import '../../companion/companion_store.dart';
 import '../../family_time/family_time.dart';
 import '../../media/rehlaty_audio_engine.dart';
+import '../../media/welcome_voice.dart';
 import '../../notifications/notification_events.dart';
 import 'create_choice.dart';
 import 'home_tab.dart';
@@ -39,6 +40,7 @@ class _ChildShellState extends State<ChildShell> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       NotificationEvents.refresh(widget.child);
       // The companion greets by voice only when the parent switched automatic narration on (and never twice in a row).
+      WelcomeVoice.playOnce(); // «أهلاً بيكم يا أبطال», once per app run
       CompanionStore.noteAge(widget.child.id, widget.child.age);
       FamilyTimeStore.remind(widget.child.id, widget.child.nickname);
       if (EnginePrefs.instance.autoNarration) {
