@@ -125,6 +125,12 @@ export class Shell {
 
   t(k) { return this.T.t(k); }
 
+  /** The child's chosen hero decides the wording (boy / girl), whatever the profile says. */
+  setGender(g) {
+    this.cfg.gender = g === 'girl' ? 'girl' : 'boy';
+    this.T = makeText(this.opts.text || {}, this.cfg);
+  }
+
   _resize() {
     const r = this.el.getBoundingClientRect();
     this.w = r.width || window.innerWidth;

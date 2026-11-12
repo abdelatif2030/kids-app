@@ -289,6 +289,8 @@ class Game {
     this.st.add(k);
     this.hero = k;
     this.kind = kind;
+    this.girl = kind === 'girl'; // every phrase now speaks to a girl or to a boy, as the child chose
+    this.sh.setGender(kind);
   }
 
   _chooseHero() {
@@ -312,6 +314,10 @@ class Game {
       chosen = kind;
       sh.sound.play('right');
       pre[kind].act('celebrate');
+      this.girl = kind === 'girl';
+      sh.setGender(kind);
+      this.girl = kind === 'girl';
+      sh.setGender(kind);
       const other = kind === 'boy' ? 'girl' : 'boy';
       this.st.scene.remove(pre[other]);
       pre[kind].position.set(0, 0, 2.2);
