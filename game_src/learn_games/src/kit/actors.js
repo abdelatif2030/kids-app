@@ -6,9 +6,10 @@
 import * as THREE from 'three';
 import DIMS from './art_dims.json';
 import { makeRig, hasRig, setRigBase } from './rig.js';
+import { withClips, setClipsBase } from './clips.js';
 
 let BASE = '../art/';
-export const setArtBase = (b) => { BASE = b; setRigBase(b); };
+export const setArtBase = (b) => { BASE = b; setRigBase(b); setClipsBase(`${b}../clips/`); };
 const cache = new Map();
 
 function tex(name) {
@@ -56,7 +57,7 @@ const POSES = {
 const HEIGHT = { boy: 3.6, girl: 3.6, owl: 3.0 };
 
 export function makeActor(kind) {
-  if (hasRig(kind)) return makeRig(kind); // the rigged character from the owner's parts sheet
+  if (hasRig(kind)) return withClips(kind, makeRig(kind), HEIGHT[kind]); // the rigged character from the owner's parts sheet
   const poses = POSES[kind];
   const g = new THREE.Group();
   const holder = new THREE.Group();

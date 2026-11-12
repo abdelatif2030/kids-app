@@ -96,6 +96,7 @@ flutter:
     - assets/games/learn_page.webp
     - assets/games/art/
     - assets/games/art/rig/
+    - assets/games/clips/
     - assets/games/game_bg.webp
     - assets/games/carnival_race/
     - assets/games/jungle_adventure/

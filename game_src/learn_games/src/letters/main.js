@@ -323,6 +323,7 @@ class Game {
     k.rotation.y = 0.2;
     this.st.add(k);
     this.hero = k;
+    if (/[?&]debug/.test(location.search)) window.__hero = k; // test hook: ?debug lets a tester call __hero.act("celebrate")
     this.kind = kind;
     this.girl = kind === 'girl'; // every phrase now speaks to a girl or to a boy, as the child chose
     this.sh.setGender(kind);
