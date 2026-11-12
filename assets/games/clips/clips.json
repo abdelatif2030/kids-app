@@ -8,7 +8,7 @@
   "h": 588,
   "fps": 12,
   "loop": false,
-  "px": 551,
+  "px": 504,
   "ground": 585
  },
  "boy_laugh": {
@@ -20,7 +20,19 @@
   "h": 586,
   "fps": 12,
   "loop": false,
-  "px": 507,
+  "px": 504,
   "ground": 583
+ },
+ "boy_idle": {
+  "file": "boy_idle.webp",
+  "frames": 1,
+  "cols": 1,
+  "rows": 1,
+  "w": 300,
+  "h": 516,
+  "fps": 12,
+  "loop": true,
+  "px": 504,
+  "ground": 515
  }
 }

@@ -44,9 +44,8 @@ export function withClips(kind, actor, height = 3.6) {
     const cw = entry.w * sc, ch = entry.h * sc, ground = entry.ground != null ? entry.ground : entry.h;
     const geo = new THREE.PlaneGeometry(cw, ch);
     geo.translate(0, ch / 2 - (entry.h - ground) * sc, 0);
-    const mat = new THREE.MeshBasicMaterial({ map: sheet(entry).clone(), transparent: true, alphaTest: 0.06, toneMapped: false, side: THREE.DoubleSide });
+    const mat = new THREE.MeshBasicMaterial({ map: sheet(entry), transparent: true, alphaTest: 0.06, toneMapped: false, side: THREE.DoubleSide });
     mat.map.repeat.set(1 / entry.cols, 1 / entry.rows);
-    mat.map.needsUpdate = true;
     const m = new THREE.Mesh(geo, mat);
     m.visible = false;
     m.position.z = 0.05;
@@ -54,10 +53,18 @@ export function withClips(kind, actor, height = 3.6) {
     meshes.set(entry.file, m);
     return m;
   };
-  const stop = () => { if (cur) { cur.mesh.visible = false; cur = null; } rigRoot.visible = true; };
+  // when no act clip is playing the hero stands in the clip's own pose (`<kind>_idle`) so it always looks the same;
+  // without an idle clip (or until its picture has loaded) the original picture is shown
+  const startIdle = () => {
+    const e = MANIFEST && MANIFEST[`${kind}_idle`];
+    if (e && meshFor(e).material.map.image) { play(e, true); return true; }
+    return false;
+  };
+  const stop = () => { if (cur) { cur.mesh.visible = false; cur = null; } rigRoot.visible = true; startIdle(); };
   const play = (entry, loop) => {
     if (cur) cur.mesh.visible = false;
     cur = { entry, mesh: meshFor(entry), t: 0, loop };
+    cur.mesh.scale.set(1, 1, 1);
     cur.mesh.visible = true;
     rigRoot.visible = false;
   };
@@ -66,18 +73,21 @@ export function withClips(kind, actor, height = 3.6) {
   actor.act = (name) => {
     baseAct(name);
     const entry = MANIFEST && MANIFEST[`${kind}_${CLIP_FOR[name]}`];
-    if (entry) play(entry, !!entry.loop); else stop();
+    // only swap to a clip once its picture is really loaded, otherwise the hero would vanish while it downloads
+    if (entry && meshFor(entry).material.map.image) play(entry, !!entry.loop); else stop();
   };
   actor.update = (dt, time) => {
     baseUpdate(dt, time);
-    if (!cur) return;
+    if (!cur) { startIdle(); if (!cur) return; }
     cur.t += dt;
     const e = cur.entry;
+    if (e.file === `${kind}_idle.webp`) { const b = Math.sin(time * 1.8); cur.mesh.scale.set(1 - b * 0.006, 1 + b * 0.012, 1); }
     let f = Math.floor(cur.t * e.fps);
     if (f >= e.frames) { if (cur.loop) f %= e.frames; else { stop(); return; } }
     const col = f % e.cols, row = Math.floor(f / e.cols);
     cur.mesh.material.map.offset.set(col / e.cols, 1 - (row + 1) / e.rows);
   };
-  loadClips();
+  // start downloading this hero's clips right away
+  loadClips().then((m) => { for (const [k, e] of Object.entries(m || {})) if (k.startsWith(`${kind}_`)) meshFor(e); });
   return actor;
 }
