@@ -59,6 +59,10 @@ void main() {
       expect(find.byKey(const ValueKey('learning_page')), findsOneWidget);
       expect(find.byKey(const ValueKey('learning_play')), findsOneWidget);
       expect(find.byKey(const ValueKey('learning_back')), findsOneWidget);
+      expect(find.byKey(const ValueKey('learning_sound')), findsOneWidget);
+      for (final (level, _, _) in kLearnSigns) {
+        expect(find.byKey(ValueKey('learning_sign_$level')), findsOneWidget, reason: level);
+      }
       // nothing else: no chips, no cards, no sections
       expect(find.byKey(const ValueKey('learn_shelves')), findsNothing);
       expect(find.byKey(const ValueKey('card_letter_fishing')), findsNothing);
@@ -70,7 +74,7 @@ void main() {
     final f = File(kLearnPagePicture);
     expect(f.existsSync(), isTrue);
     expect(f.lengthSync(), greaterThan(10000));
-    expect(kLearnPageAspect, closeTo(1672 / 941, 0.001));
+    expect(kLearnPageAspect, closeTo(1536 / 1024, 0.001));
   });
 
   testWidgets('tapping the card opens the learning world', (t) async {

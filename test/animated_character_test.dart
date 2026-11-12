@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/design/animated_character.dart';
-import 'package:kids_app/games/learning_page.dart';
-import 'package:kids_app/games/web_games/learn_reactions.dart';
-import 'package:kids_app/journey/models.dart';
-import 'package:kids_app/journey/repository.dart';
-import 'package:kids_app/l10n/app_locale.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 Widget _host(CharacterController c, {CharacterKind kind = CharacterKind.boy, bool randomIdle = false, bool reduced = false}) => MaterialApp(
       builder: (ctx, child) => MediaQuery(data: MediaQuery.of(ctx).copyWith(disableAnimations: reduced), child: child!),
@@ -133,60 +126,6 @@ void main() {
       expect(t.takeException(), isNull);
       await t.pumpWidget(const SizedBox());
       c.dispose();
-    });
-  });
-
-  group('on the learning page, from real game events', () {
-    Future<void> open(WidgetTester t, {String gender = 'boy'}) async {
-      SharedPreferences.setMockInitialValues({});
-      FlutterSecureStorage.setMockInitialValues({});
-      await AppLocale.instance.set('ar');
-      final kid = ChildProfile(id: 'k1', nickname: 'سلمى', age: 5, gender: gender);
-      final store = JourneyStore(LocalJourneyRepository());
-      await t.runAsync(() async {
-        await store.load();
-        await store.addProfile(kid);
-      });
-      JourneyStore.instance = store;
-      t.view.physicalSize = const Size(1100, 620);
-      t.view.devicePixelRatio = 1;
-      addTearDown(t.view.reset);
-      await t.pumpWidget(MaterialApp(home: LearningGamesScreen(child: kid)));
-      await t.pump();
-    }
-
-    CharacterController ctrl(WidgetTester t) => t.widget<AnimatedCharacter>(find.byKey(const ValueKey('learning_hero'))).controller;
-
-    testWidgets('it waves when the page opens, then rests; the right character shows for a girl', (t) async {
-      await open(t, gender: 'girl');
-      final w = t.widget<AnimatedCharacter>(find.byKey(const ValueKey('learning_hero')));
-      expect(w.kind, CharacterKind.girl);
-      await t.pump();
-      expect(ctrl(t).mood, CharMood.welcome);
-      await t.pump(const Duration(seconds: 3));
-      expect(ctrl(t).mood, CharMood.idle);
-      await t.pumpWidget(const SizedBox());
-    });
-
-    testWidgets('a real correct answer, a wrong first try and a finished game each get their own reaction', (t) async {
-      await open(t);
-      await t.pump(const Duration(seconds: 3));
-      LearnReactions.emit(LearnEvent.correct);
-      await t.pump(const Duration(milliseconds: 100));
-      expect(ctrl(t).mood, CharMood.correct);
-      await t.pump(const Duration(seconds: 2));
-      expect(ctrl(t).mood, CharMood.idle);
-      LearnReactions.emit(LearnEvent.wrong);
-      await t.pump(const Duration(milliseconds: 100));
-      expect(ctrl(t).mood, CharMood.wrong);
-      await t.pump(const Duration(seconds: 2));
-      LearnReactions.emit(LearnEvent.complete);
-      await t.pump(const Duration(milliseconds: 100));
-      expect(ctrl(t).mood, CharMood.complete);
-      await t.pump(const Duration(seconds: 5));
-      expect(ctrl(t).mood, CharMood.idle);
-      LearnReactions.takePendingComplete();
-      await t.pumpWidget(const SizedBox());
     });
   });
 }

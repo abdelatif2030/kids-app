@@ -86,7 +86,7 @@ class Game {
     this.save = sh.save;
     if (!this.save.lw) this.save.lw = { unlocked: 1, done: {} };
     this.st.onFrame((dt, time) => this._frame(dt, time));
-    sh.fonts().then(() => sh.titleCard(sh.t('title'), '🦉🔤🔢🔷🐰', () => this._start()));
+    sh.fonts().then(() => sh.titleCard(sh.t('title'), '', () => this._start(), true));
   }
 
   // ---- the world ---------------------------------------------------------------------------------------------------
@@ -306,7 +306,7 @@ class Game {
   // ---- the hero (boy or girl, chosen once and kept) ---------------------------------------------------------------------
 
   _start() {
-    if (this.save.lw.hero) { this._makeHero(this.save.lw.hero, this.save.lw.look); this._levels(); } else this._chooseHero();
+    if (this.save.lw.hero) { this._makeHero(this.save.lw.hero, this.save.lw.look); this._startPage(); } else this._chooseHero();
   }
 
   _makeHero(kind, look) {
@@ -361,7 +361,7 @@ class Game {
           this._makeHero(chosen, look);
           this.hero.act('celebrate');
           sh.speak(sh.t('letsGo'));
-          setTimeout(() => this._levels(), 1600);
+          setTimeout(() => this._startPage(), 1600);
         } }, '▶ ' + sh.t('play')));
     };
     panel.append(h('div', { class: 'lw-who' }, h('button', { class: 'lw-boy', onclick: () => pick('boy') }, '👦  ولد'), h('button', { class: 'lw-girl', onclick: () => pick('girl') }, '👧  بنت')));
@@ -370,6 +370,14 @@ class Game {
   }
 
   // ---- flow ---------------------------------------------------------------------------------------------------------
+
+  /** After the hero is known: straight into the level the child tapped on the app's page (a sign of the picture), else the list. */
+  _startPage() {
+    const want = this.sh.cfg && this.sh.cfg.level;
+    if (this.sh.cfg) this.sh.cfg.level = null; // only the first time: back to the list afterwards
+    if (want && levelsFor(this.sh.age).some((l) => l.id === want)) this._begin(want);
+    else this._levels();
+  }
 
   _levels() {
     const sh = this.sh;
@@ -390,9 +398,60 @@ class Game {
         onclick: () => { sh.sound.play('tap'); this._begin(lv.id); },
       }, h('i', {}, locked ? '🔒' : lv.emoji), h('b', {}, sh.T.num(i + 1)), h('span', {}, lv.ar), done ? h('u', {}, '⭐') : null);
     });
-    sh.layer.append(h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.18)' }, h('div', { class: 'lw-card' }, h('div', { class: 'lw-title' }, sh.t('pick')), h('div', { class: 'lw-grid' }, tiles))));
+    const oldCard = h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.18)' }, h('div', { class: 'lw-card' }, h('div', { class: 'lw-title' }, sh.t('pick')), h('div', { class: 'lw-grid' }, tiles)));
+    // the owner's picture of the levels page (2026-11-13): shown when its file is there, otherwise the card above
+    const topBar = sh.layer.querySelector('.lk-top');
+    const img = new Image();
+    img.className = 'lw-pic-img';
+    img.alt = '';
+    img.onload = () => { if (this.st.mode === 'menu') { if (topBar) topBar.remove(); sh.layer.append(this._levelsPicture(img, list)); } };
+    img.onerror = () => { if (this.st.mode === 'menu') sh.layer.append(oldCard); };
+    img.src = `${sh.base}../art/levels_page.webp`;
     this.owl.act('cheer');
     this.owl.look(0);
+  }
+
+  /** The levels page as the owner's picture, with invisible buttons on the twelve tiles, home, sound and "next level". */
+  _levelsPicture(img, list) {
+    const sh = this.sh;
+    const R = 1226 / 1283; // the picture's width / height
+    const wrap = h('div', { class: 'lw-pic' });
+    const blur = img.cloneNode();
+    blur.className = 'lw-pic-blur';
+    const box = h('div', { class: 'lw-pic-box' }, img);
+    const fit = () => {
+      const W = sh.root.clientWidth || 800, H = sh.root.clientHeight || 450;
+      const w = Math.min(W, H * R);
+      box.style.width = `${w}px`;
+      box.style.height = `${w / R}px`;
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(sh.root);
+    const place = (el, cx, cy, w, hh) => { el.style.left = `${(cx - w / 2) * 100}%`; el.style.top = `${(cy - hh / 2) * 100}%`; el.style.width = `${w * 100}%`; el.style.height = `${hh * 100}%`; box.append(el); return el; };
+    const cols = [0.723, 0.532, 0.343]; // right to left, like the picture
+    const rows = [0.327, 0.489, 0.647, 0.807];
+    const open = new Set(list.map((l) => l.id));
+    LEVELS.forEach((lv, i) => {
+      const cx = cols[i % 3], cy = rows[Math.floor(i / 3)];
+      const can = open.has(lv.id);
+      const b = h('button', { class: 'lw-hit', 'aria-label': lv.ar, disabled: !can || null, onclick: () => { sh.sound.play('tap'); this._begin(lv.id); } });
+      place(b, cx, cy, 0.17, 0.148);
+      if (!can) b.classList.add('off');
+      if (this.save.lw.done[lv.id]) place(h('i', { class: 'lw-star' }, '⭐'), cx + 0.066, cy - 0.07, 0.05, 0.045);
+    });
+    // "next level": the first level not done yet (the first one when all are done)
+    const next = list.find((l) => !this.save.lw.done[l.id]) || list[0];
+    place(h('button', { class: 'lw-hit', 'aria-label': sh.t('next') || 'next', onclick: () => { sh.sound.play('tap'); this._begin(next.id); } }), 0.114, 0.46, 0.22, 0.12);
+    // home and sound: the shell's own buttons, invisible, on the picture's round buttons
+    const back = sh.backBtn();
+    back.classList.add('lw-hit');
+    place(back, 0.069, 0.058, 0.1, 0.095);
+    const snd = sh.soundBtn();
+    snd.classList.add('lw-hit');
+    place(snd, 0.94, 0.058, 0.1, 0.095);
+    wrap.append(blur, box);
+    return wrap;
   }
 
   _clearRound() {
@@ -733,6 +792,14 @@ const CSS = `
 .lw-tile span{font-size:calc(var(--u)*3.3);line-height:1.15;text-align:center}
 .lw-tile u{position:absolute;bottom:calc(var(--u)*.4);right:calc(var(--u)*.8);text-decoration:none;font-size:calc(var(--u)*3.6)}
 .lw-tile.done{background:linear-gradient(180deg,#8aeaa0,#2fb85a);box-shadow:0 calc(var(--u)*.8) 0 #1a7a3a,0 calc(var(--u)*1) calc(var(--u)*2) rgba(20,40,80,.3)}
+.lw-pic{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#6cc0f0}
+.lw-pic-blur{position:absolute;inset:-5%;width:110%;height:110%;object-fit:cover;filter:blur(18px) brightness(.9);transform:scale(1.05)}
+.lw-pic-box{position:relative}
+.lw-pic-img{display:block;width:100%;height:100%;user-select:none;-webkit-user-drag:none}
+.lw-hit{position:absolute;border:none;background:transparent;padding:0;margin:0;cursor:pointer;opacity:0;border-radius:18%}
+.lw-hit:focus-visible{opacity:1;outline:calc(var(--u)*.8) solid #fff200;background:rgba(255,242,0,.18)}
+.lw-hit.off{pointer-events:none}
+.lw-star{position:absolute;font-style:normal;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*5);pointer-events:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
 .lw-tile.lock{background:linear-gradient(180deg,#d8d8e4,#a8a8b8);box-shadow:0 calc(var(--u)*.8) 0 #7a7a8a;cursor:default;opacity:.85}
 .lw-herobar{position:absolute;left:50%;bottom:calc(var(--u)*3);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*1.6);pointer-events:none;width:94%}
 .lw-hero{display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*1.4);pointer-events:auto}

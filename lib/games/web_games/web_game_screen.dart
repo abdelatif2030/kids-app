@@ -21,14 +21,14 @@ export 'web_game.dart';
 export 'web_game_store.dart';
 
 /// Opens a rebuilt learning game for a child (boy/girl wording from the child's profile when the parent gave it).
-Widget learnWebGameScreen(WebGame game, String childId, int age) {
+Widget learnWebGameScreen(WebGame game, String childId, int age, {String? level}) {
   String? gender;
   try {
     gender = JourneyStore.instance.profileById(childId)?.gender;
   } catch (_) {
     gender = null; // no store yet (tests): the default wording
   }
-  return WebGameScreen(key: ValueKey('web_${game.id}'), game: game, childId: childId, age: age, gender: gender);
+  return WebGameScreen(key: ValueKey('web_${game.id}'), game: game, childId: childId, age: age, gender: gender, level: level);
 }
 
 /// Plays a bundled web game ([WebGame]): «سباق ملاهي الأبطال» (3D race) or «مغامرة الأدغال» (jungle runner). On the
@@ -44,7 +44,10 @@ class WebGameScreen extends StatefulWidget {
 
   /// 'boy' or 'girl' when the parent gave it: the jungle game then starts as Adam or Nour. Never required.
   final String? gender;
-  const WebGameScreen({super.key, required this.game, this.childId, required this.age, this.gender});
+
+  /// The learning world only: the level to start in (a sign of the learning page); null shows the level list.
+  final String? level;
+  const WebGameScreen({super.key, required this.game, this.childId, required this.age, this.gender, this.level});
 
   @override
   State<WebGameScreen> createState() => _WebGameScreenState();
@@ -67,7 +70,7 @@ class _WebGameScreenState extends State<WebGameScreen> {
     // a learning game is told whether its star was already earned (it shows "new star!" only the first time)
     final done = widget.game.isLearning && id != null && (await GameRewards.doneIds(id)).contains(widget.game.learnId);
     if (!mounted) return;
-    setState(() => _config = {'lang': AppLocale.instance.isArabic ? 'ar' : 'en', 'age': widget.age, 'gender': widget.gender, 'save': save, 'done': done});
+    setState(() => _config = {'lang': AppLocale.instance.isArabic ? 'ar' : 'en', 'age': widget.age, 'gender': widget.gender, 'save': save, 'done': done, 'level': widget.level});
   }
 
   @override

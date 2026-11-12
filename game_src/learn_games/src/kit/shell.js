@@ -197,12 +197,14 @@ export class Shell {
   }
 
   /** The title card. [art] is an emoji row. */
-  titleCard(title, art, onPlay) {
+  titleCard(title, art, onPlay, buttonOnly = false) {
     this.clear();
     this.sound.setMode('menu');
     this.layer.append(h('div', { class: 'lk-top' }, this.backBtn(), h('span'), this.soundBtn()));
     const go = h('button', { class: 'lk-btn', onclick: () => { this.sound.unlock(); this.sound.play('tap'); onPlay(); } }, '▶ ', this.t('play'));
-    this.layer.append(h('div', { class: 'lk-dim', style: 'background:none' }, h('div', { class: 'lk-card' }, h('div', { class: 'lk-title' }, title), h('div', { class: 'lk-big' }, art), go)));
+    // [buttonOnly] (owner 2026-11-13): just the big green play button over the scene, no card, no title, no pictures
+    if (buttonOnly) this.layer.append(h('div', { class: 'lk-dim', style: 'background:none' }, go));
+    else this.layer.append(h('div', { class: 'lk-dim', style: 'background:none' }, h('div', { class: 'lk-card' }, h('div', { class: 'lk-title' }, title), h('div', { class: 'lk-big' }, art), go)));
     setTimeout(() => go.focus({ preventScroll: true }), 50);
   }
 
