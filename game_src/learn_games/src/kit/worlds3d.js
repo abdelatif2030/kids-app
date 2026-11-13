@@ -279,7 +279,7 @@ const BUILD = {
       { w: prop('f_hen', 1.5, 6.4, 3.0), x: 6.4, r: 0.7, sp: 0.4, b: 0.05 }, { w: prop('f_rooster', 1.9, -7.4, 2.4), x: -7.4, r: 0.4, sp: 0.3, b: 0.04 },
       { w: prop('f_goat', 2.2, -4.8, -4.8), x: -4.8, r: 0.4, sp: 0.2, b: 0.03 }, { w: prop('f_donkey', 2.4, 5.4, -5.0, 0, true), x: 5.4, r: 0.4, sp: 0.16, b: 0.03 },
     ];
-    return { pad: 'wood', update: (dt, t) => {
+    return { pad: 'wood', padPics: ['f_pad_stump', 'f_pad_hay', 'f_pad_nest', 'f_pad_plank'], update: (dt, t) => {
       pump.rotation.z = Math.sin(t * 0.6) * 0.01;
       animals.forEach((a, i) => { a.w.position.x = a.x + Math.sin(t * a.sp + i) * a.r; a.w.position.y = -0.2 + Math.abs(Math.sin(t * 2 + i * 1.7)) * a.b; a.w.rotation.z = Math.sin(t * 1.5 + i) * 0.02; });
     } };
@@ -546,6 +546,6 @@ export function buildWorld(id) {
     else if (mode === 'new') { clip.normal.set(1, 0, 0); clip.constant = -x; } // keeps everything right of x
     else { clip.normal.set(-1, 0, 0); clip.constant = 1e5; }
   };
-  return { id, group, pad: info.pad, seam, update: (dt, t) => { info.update(dt, t); life(dt, t); } };
+  return { id, group, pad: info.pad, padPics: info.padPics, seam, update: (dt, t) => { info.update(dt, t); life(dt, t); } };
 }
 export { makeTree };

@@ -12,7 +12,7 @@ import { Stage, M, canvasTex, labelTex } from '../kit/stage3d.js';
 import { makeThing } from '../kit/things3d.js';
 import { addSky, addClouds, scatter } from '../kit/realism.js';
 import { buildWorld, WORLD_IDS, WORLD_NAMES, PADS } from '../kit/worlds3d.js';
-import { makeActor, setArtBase } from '../kit/actors.js';
+import { makeActor, setArtBase, artProp } from '../kit/actors.js';
 import { stepSeconds } from '../kit/clips.js';
 // where the two worlds meet while they slide past each other (just outside the right edge of the screen at the start)
 const SEAM_X = 14.5;
@@ -247,12 +247,22 @@ class Game {
     ring.position.y = 0.05;
     const raft = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.08, 28), M(this.padStyle.disc));
     raft.position.y = 0.04;
-    g.add(ring, raft);
+    // a world can bring its own pad pictures (the farm: stump, hay, nest, planks): they replace the ring and the raft, and what stands
+    // on them is lifted onto the top surface of the picture
+    const padPics = this.world && this.world.padPics;
+    let lift = 0;
+    if (padPics) {
+      const pp = artProp(padPics[i % padPics.length], 1.75);
+      pp.position.z = -0.04;
+      g.add(pp);
+      ring.visible = false;
+      lift = 0.62;
+    } else g.add(ring, raft);
     let item = null, plaque = null, baseY = 0.06;
     if (o.kind === 'thing') {
       item = makeThing(o.thing);
       const fi = fitThing(item, 2.15, 1.8);
-      baseY = 0.12 - fi.minY;
+      baseY = 0.12 + lift - fi.minY;
       item.position.set(-0.1, baseY, 0);
       g.add(item);
       if (o.plaque) {
@@ -267,21 +277,21 @@ class Game {
       }
     } else if (o.kind === 'color') {
       item = new THREE.Mesh(new THREE.SphereGeometry(0.62, 28, 20), new THREE.MeshStandardMaterial({ color: o.hex, roughness: 0.18, metalness: 0.05 }));
-      item.position.set(0, 0.95, 0);
+      item.position.set(0, 0.95 + lift, 0);
       item.castShadow = true;
       g.add(item);
     } else if (o.kind === 'shape') {
       item = new THREE.Mesh(shapeGeo(o.shape), new THREE.MeshStandardMaterial({ color: colorById(o.color).hex, roughness: 0.25, metalness: 0.05 }));
-      item.position.set(0, 1.05, 0);
+      item.position.set(0, 1.05 + lift, 0);
       item.scale.setScalar(0.95);
       item.castShadow = true;
       g.add(item);
     } else {
       const text = o.kind === 'number' ? this.sh.T.num(o.n) : o.ch;
       const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.7, 8), M(0xb88848));
-      pole.position.set(0, 0.45, 0);
+      pole.position.set(0, 0.45 + lift, 0);
       plaque = this._plaque(text, true);
-      plaque.position.set(0, 1.5, 0);
+      plaque.position.set(0, 1.5 + lift, 0);
       plaque.scale.setScalar(1.6);
       g.add(pole, plaque);
       item = plaque;
