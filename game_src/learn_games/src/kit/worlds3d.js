@@ -12,8 +12,44 @@ const cyl = (rt, rb, h, mat, x, y, z, seg = 16) => { const o = new THREE.Mesh(ne
 const cone = (r, h, mat, x, y, z, seg = 16) => { const o = new THREE.Mesh(new THREE.ConeGeometry(r, h, seg), mat); o.position.set(x, y, z); o.castShadow = true; return o; };
 const sph = (r, mat, x, y, z) => { const o = new THREE.Mesh(new THREE.SphereGeometry(r, 18, 14), mat); o.position.set(x, y, z); o.castShadow = true; return o; };
 
-function ground(g, color, stripColor, y = -0.2) {
-  const f = new THREE.Mesh(new THREE.PlaneGeometry(80, 44), m(color, 1));
+// ---- painted textures (made on a canvas, nothing downloaded): brick, planks, roof tiles, grass --------------------------------------
+function canvasTex(w, h, draw, rep = [1, 1]) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(rep[0], rep[1]);
+  t.anisotropy = 4;
+  return t;
+}
+const brickTex = (rep) => canvasTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#e6d8bb'; g.fillRect(0, 0, w, h);
+  for (let y = 0; y < 8; y++) for (let x = 0; x < 5; x++) { g.fillStyle = ['#e0cfab', '#eee0c4', '#d8c59e', '#e8d9b8'][(x * 3 + y * 5) % 4]; g.fillRect(x * 64 - ((y % 2) * 32) + 2, y * 32 + 2, 60, 28); }
+  g.strokeStyle = '#a8946a'; g.lineWidth = 3;
+  for (let y = 0; y <= 8; y++) { g.beginPath(); g.moveTo(0, y * 32); g.lineTo(w, y * 32); g.stroke(); }
+}, rep);
+const plankTex = (rep) => canvasTex(256, 256, (g, w, h) => {
+  for (let x = 0; x < 8; x++) { g.fillStyle = ['#d6a468', '#cd9a5c', '#dcae74', '#c8945a'][x % 4]; g.fillRect(x * 32, 0, 32, h); g.fillStyle = 'rgba(90,50,20,.45)'; g.fillRect(x * 32, 0, 3, h); }
+  g.fillStyle = 'rgba(90,50,20,.18)'; for (let i = 0; i < 40; i++) g.fillRect(Math.random() * w, Math.random() * h, 2, 10 + Math.random() * 24);
+}, rep);
+const tileTex = (rep) => canvasTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#b02a24'; g.fillRect(0, 0, w, h);
+  for (let y = 0; y < 8; y++) for (let x = 0; x < 9; x++) {
+    g.fillStyle = ['#d8382c', '#e04a38', '#cc3026'][(x + y) % 3];
+    g.beginPath(); g.arc(x * 32 - ((y % 2) * 16) + 16, y * 32 + 8, 17, 0, Math.PI); g.fill();
+    g.strokeStyle = '#8a1e1a'; g.lineWidth = 2; g.beginPath(); g.arc(x * 32 - ((y % 2) * 16) + 16, y * 32 + 8, 17, 0, Math.PI); g.stroke();
+  }
+}, rep);
+const grassTex = (rep) => canvasTex(512, 512, (g, w, h) => {
+  g.fillStyle = '#84d268'; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 90; i++) { g.fillStyle = Math.random() < 0.5 ? 'rgba(160,230,110,.35)' : 'rgba(80,170,70,.28)'; g.beginPath(); g.ellipse(Math.random() * w, Math.random() * h, 30 + Math.random() * 60, 14 + Math.random() * 26, Math.random() * 3, 0, 7); g.fill(); }
+  for (let i = 0; i < 1100; i++) { g.strokeStyle = Math.random() < 0.5 ? 'rgba(60,150,50,.55)' : 'rgba(170,236,120,.6)'; g.lineWidth = 2; const x = Math.random() * w, y = Math.random() * h; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (Math.random() - 0.5) * 6, y - 6 - Math.random() * 8); g.stroke(); }
+}, rep);
+
+function ground(g, color, stripColor, y = -0.2, tex = null) {
+  const f = new THREE.Mesh(new THREE.PlaneGeometry(80, 44), tex ? new THREE.MeshStandardMaterial({ map: tex, roughness: 1 }) : m(color, 1));
   f.rotation.x = -Math.PI / 2; f.position.y = y; f.receiveShadow = true; g.add(f);
   const strip = box(70, 0.4, 3.4, m(stripColor, 1), 0, -0.05, 3.2); // as wide as the floor: no visible ends while worlds slide past
   g.add(strip);
@@ -68,32 +104,53 @@ const BUILD = {
       ...Array.from({ length: 8 }, (_, i) => ({ t: 'flower', x: -12 + i * 0.9, z: 1.5 + Math.sin(i * 1.7) * 0.8 })),
       ...Array.from({ length: 8 }, (_, i) => ({ t: 'flower', x: 8.2 + i * 0.7, z: 2 + Math.cos(i * 1.3) * 0.8 })),
     ], -0.2);
-    ground(g, 0x86d46a, 0x76c85c);
-    // the windmill (left, behind): a stone tower with a red cone roof, a door and four lattice blades that turn
+    ground(g, 0x86d46a, 0x76c85c, -0.2, grassTex([10, 6]));
+    // the windmill (left, behind), after the owner's picture: a tall round tower of cream stone bricks with a red tiled cone roof, an
+    // arched wooden door with steps, a window, and four big wooden lattice blades that turn
     const wm = new THREE.Group();
-    const stone = m(0xeadfc4, 0.9), red = m(0xd8382a, 0.7), wood = m(0x9a6232, 0.9);
-    wm.add(cyl(1.0, 1.55, 4.4, stone, 0, 2.2, 0, 20), cone(1.3, 1.5, red, 0, 5.15, 0, 20));
-    wm.add(box(0.7, 1.2, 0.12, wood, 0, 0.6, 1.5), box(0.4, 0.5, 0.1, m(0x7ac0f0, 0.3), 0, 3.0, 1.1));
+    const wood = m(0x9a6232, 0.9);
+    const tower = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.7, 5.0, 28), new THREE.MeshStandardMaterial({ map: brickTex([4, 3]), roughness: 0.95 }));
+    tower.position.y = 2.5; tower.castShadow = true; wm.add(tower);
+    const cap = new THREE.Mesh(new THREE.ConeGeometry(1.35, 1.7, 28), new THREE.MeshStandardMaterial({ map: tileTex([5, 2]), roughness: 0.7 }));
+    cap.position.y = 5.8; cap.castShadow = true; wm.add(cap);
+    wm.add(cyl(1.05, 1.05, 0.14, m(0xb02a24, 0.7), 0, 4.98, 0, 28));
+    const arch = cyl(0.36, 0.36, 0.12, wood, 0, 1.2, 1.6, 20); arch.rotation.x = Math.PI / 2; wm.add(arch, box(0.72, 1.2, 0.12, wood, 0, 0.6, 1.6));
+    wm.add(box(0.62, 0.7, 0.1, m(0x8ac8f0, 0.25), 0, 3.1, 1.28), box(0.78, 0.1, 0.12, wood, 0, 2.72, 1.3), box(0.78, 0.1, 0.12, wood, 0, 3.48, 1.3));
+    for (let k = 0; k < 4; k++) wm.add(box(1.5 - k * 0.1, 0.16, 0.7, m(0xb7a98c, 0.95), 0, 0.08 + k * 0.16, 2.0 - k * 0.06));
     const blades = new THREE.Group();
     for (let k = 0; k < 4; k++) {
       const arm = new THREE.Group();
-      arm.add(box(0.14, 3.9, 0.06, wood, 0, 2.1, 0), box(0.8, 3.0, 0.03, m(0xf0e4c8, 0.9), 0.45, 2.3, 0));
-      for (let j = 0; j < 5; j++) arm.add(box(0.8, 0.05, 0.05, wood, 0.4, 0.8 + j * 0.62, 0));
-      arm.rotation.z = (k * Math.PI) / 2;
+      arm.add(box(0.18, 4.8, 0.08, wood, 0, 2.5, 0));
+      arm.add(box(1.0, 3.6, 0.04, m(0xf2e6cc, 0.9, { transparent: true, opacity: 0.55 }), 0.6, 2.7, 0));
+      for (let j = 0; j < 8; j++) arm.add(box(1.05, 0.07, 0.07, wood, 0.55, 0.9 + j * 0.52, 0));
+      for (let j = 0; j < 4; j++) arm.add(box(0.07, 3.6, 0.07, wood, 0.3 + j * 0.28, 2.7, 0));
+      arm.rotation.z = (k * Math.PI) / 2 + 0.3;
       blades.add(arm);
     }
-    blades.position.set(0, 4.1, 1.35);
-    wm.add(blades, sph(0.22, wood, 0, 4.1, 1.38));
+    blades.position.set(0, 4.5, 1.55);
+    wm.add(blades, sph(0.3, wood, 0, 4.5, 1.6));
     wm.position.set(-7.0, 0, -9.5);
-    wm.scale.setScalar(1.0);
+    wm.scale.setScalar(1.15);
     g.add(wm);
-    // the barn (right, behind): wooden walls, a red roof, big doors and hay bales
+    // the house (right, behind): plank walls, a real gable roof of red tiles with an overhang, big barn doors with cross braces, a
+    // shuttered window, a lantern, and stacked golden hay bales
     const barn = new THREE.Group();
-    barn.add(box(5.2, 3.0, 3.6, m(0xc98a4e, 0.85), 0, 1.5, 0));
-    const roof = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 3.2, 1.9, 4, 1), red); roof.rotation.y = Math.PI / 4; roof.scale.set(1.3, 1, 0.82); roof.position.y = 3.9; roof.castShadow = true; barn.add(roof);
-    barn.add(box(1.7, 2.1, 0.12, m(0x8a5428, 0.9), 0, 1.05, 1.85), box(0.12, 2.1, 0.14, m(0xe8c888, 0.9), 0, 1.05, 1.9), box(0.9, 0.8, 0.1, m(0xffe8a8, 0.3, { emissive: 0xffc860, emissiveIntensity: 0.5 }), -1.8, 1.9, 1.85));
-    for (const [x, z] of [[3.4, 0.9], [3.9, -0.6], [3.0, -1.6]]) { const b = cyl(0.62, 0.62, 0.95, m(0xf0c850, 0.95), x, 0.48, z, 18); b.rotation.z = Math.PI / 2; barn.add(b); }
-    barn.position.set(8.2, 0, -9.2);
+    const walls = new THREE.MeshStandardMaterial({ map: plankTex([3, 1.2]), roughness: 0.9 });
+    const roofM = new THREE.MeshStandardMaterial({ map: tileTex([6, 2]), roughness: 0.7 });
+    const stoneBase = new THREE.MeshStandardMaterial({ map: brickTex([6, 0.6]), roughness: 0.95 });
+    barn.add(box(5.8, 2.7, 3.6, walls, 0, 1.55, 0), box(5.9, 0.5, 3.7, stoneBase, 0, 0.25, 0));
+    const tri = new THREE.Shape(); tri.moveTo(-1.8, 0); tri.lineTo(1.8, 0); tri.lineTo(0, 1.55); tri.closePath();
+    for (const sx of [-1, 1]) { const gable = new THREE.Mesh(new THREE.ExtrudeGeometry(tri, { depth: 0.14, bevelEnabled: false }), walls); gable.rotation.y = Math.PI / 2; gable.position.set(sx * 2.9 + (sx > 0 ? 0.0 : -0.14), 2.9, 0); gable.castShadow = true; barn.add(gable); }
+    const run = 2.35, rise = 1.7, ang = Math.atan2(rise, run), len = Math.hypot(run, rise);
+    for (const sz of [1, -1]) { const slope = box(6.5, 0.16, len, roofM, 0, 2.9 + rise / 2 + 0.02, sz * run / 2); slope.rotation.x = sz * ang; barn.add(slope); }
+    barn.add(box(6.5, 0.2, 0.3, m(0xa8241e, 0.7), 0, 2.9 + rise + 0.06, 0));
+    const doorM = m(0x9a5c2c, 0.9), braceM = m(0xe8c888, 0.9);
+    for (const sx of [-1, 1]) { barn.add(box(0.9, 2.1, 0.12, doorM, sx * 0.47, 1.35, 1.82)); const b1 = box(0.08, 2.3, 0.14, braceM, sx * 0.47, 1.35, 1.88); b1.rotation.z = 0.5 * sx; barn.add(b1); }
+    barn.add(box(2.1, 0.12, 0.16, braceM, 0, 2.45, 1.86), box(0.1, 2.2, 0.16, braceM, -0.98, 1.35, 1.86), box(0.1, 2.2, 0.16, braceM, 0.98, 1.35, 1.86));
+    barn.add(box(0.9, 0.9, 0.1, m(0xffe8a8, 0.3, { emissive: 0xffc860, emissiveIntensity: 0.6 }), -2.0, 1.9, 1.84), box(0.34, 0.9, 0.1, m(0x4a9a6a, 0.8), -2.62, 1.9, 1.86), box(0.34, 0.9, 0.1, m(0x4a9a6a, 0.8), -1.38, 1.9, 1.86));
+    barn.add(sph(0.14, m(0xfff0b0, 0.3, { emissive: 0xffd060, emissiveIntensity: 0.9 }), 1.5, 2.0, 1.9));
+    for (const [x, y, z] of [[3.5, 0.5, 0.6], [4.2, 0.5, -0.4], [3.6, 1.4, 0.1], [4.3, 1.4, 0.7], [3.9, 0.5, -1.4], [3.5, 2.2, 0.3]]) { const b = cyl(0.62, 0.62, 0.95, m(0xf0c24a, 0.95), x, y, z, 18); b.rotation.z = Math.PI / 2; b.rotation.y = 0.2; barn.add(b); }
+    barn.position.set(8.4, 0, -9.0);
     g.add(barn);
     // a wooden fence behind the pond
     const fw = m(0xb07a3e, 0.9);
