@@ -47,6 +47,13 @@ cut 22 225 115 955 890 trex; cut 22 200 140 1130 875 brachio; cut 22 230 115 129
 # sizes of every cut for the game, then WebP (with transparency) into the game's folder
 # sheet 36 (owner's ChatGPT sheet 1 for level 1, 3 x 2): fox, camel, sun / rose, pomegranate, rocket
 cutw 36 520 510 0 0 fox; cutw 36 520 510 520 0 camel; cutw 36 496 510 1040 0 sun; cutw 36 520 514 0 510 rose; cutw 36 520 514 520 510 pomegranate; cutw 36 496 514 1040 510 rocket
+# sheets 37-39 (owner's ChatGPT sheets 2-4 for level 1, 3 x 2 each) and 40 (scenery props)
+cutw 37 520 510 0 0 ball; cutw 37 520 510 520 0 crow; cutw 37 496 510 1040 0 envelope; cutw 37 520 514 0 510 lemon; cutw 37 520 514 520 510 crescent; cutw 37 496 514 1040 510 corn
+cutw 38 520 510 0 0 rabbit_n; cutw 38 520 510 520 0 duck_n; cutw 38 496 510 1040 0 banana_n; cutw 38 520 514 0 510 apple_n; cutw 38 520 514 520 510 clownfish_n; cutw 38 496 514 1040 510 butterfly_n
+cutw 39 520 510 0 0 cat_n; cutw 39 520 510 520 0 horse_n; cutw 39 496 510 1040 0 sheep_n; cutw 39 520 514 0 510 hen_n; cutw 39 520 514 520 510 bee_n; cutw 39 496 514 1040 510 giraffe_n
+cutw 40 400 440 10 5 windmill_p; cutw 40 540 380 400 70 house_p; cutw 40 445 440 905 5 tree_oak; cutw 40 332 390 1340 55 tree_apple
+cutw 40 215 175 10 465 tuft_1; cutw 40 225 175 225 465 tuft_2; cutw 40 225 175 450 465 tuft_3; cutw 40 370 200 700 465 lotus_p; cutw 40 560 185 1100 470 fence_p
+cutw 40 510 290 10 645 hay_p; cutw 40 550 125 560 735 stones_p; cutw 40 520 255 1140 665 flowers_p
 node -e "
 const fs=require('fs'),path=require('path');const dir=process.argv[1];const dst=process.argv[2];const out={};
 for(const f of fs.readdirSync(dir)){if(!f.endsWith('.png'))continue;const b=fs.readFileSync(path.join(dir,f));out[f.slice(0,-4)]=[b.readUInt32BE(16),b.readUInt32BE(20)];}

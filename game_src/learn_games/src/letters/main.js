@@ -586,7 +586,7 @@ class Game {
     setTimeout(() => {
       if (r.countAloud && this.standItem && this.standItem.userData.apples) {
         // count the apples out loud, each one hopping as its number is said
-        const words = NUMBERS.slice(0, Math.min(r.countAloud, 10)).map((x) => x[0]);
+        const words = NUMBERS.slice(0, r.countAloud).map((x) => x[0]); // every number up to the count (no cap)
         this.sh.speak([phrase, ...words], (i) => {
           const a = this.standItem && this.standItem.userData.apples[i - 1];
           if (a) a.userData.jump = 0.4;
@@ -594,7 +594,8 @@ class Game {
         }, next);
       } else this.sh.speak(seq, null, next);
     }, 600);
-    this._advT = setTimeout(next, 9000);
+    // the next question waits for the whole counting to finish: a long count (eleven apples...) takes its time; only a safety net
+    this._advT = setTimeout(next, 9000 + (r.countAloud || 0) * 1700);
   }
 
   _advance(ev) {

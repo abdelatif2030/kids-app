@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { addSky, addClouds, scatter, makeTree, makeFlower, makeRock } from './realism.js';
 import { makeThing } from './things3d.js';
+import { artProp } from './actors.js';
 
 const m = (c, r = 0.8, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: r, ...o });
 const box = (w, h, d, mat, x, y, z) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); o.position.set(x, y, z); o.castShadow = true; o.receiveShadow = true; return o; };
@@ -143,19 +144,28 @@ const BUILD = {
       ...Array.from({ length: 8 }, (_, i) => ({ t: 'flower', x: 8.2 + i * 0.7, z: 2 + Math.cos(i * 1.3) * 0.8 })),
     ], -0.2);
     ground(g, 0x86d46a, 0x76c85c, -0.2, grassTex([10, 6]));
-    // the trees: big puffy cartoon trees (some with fruit) in two rows behind, and a big one at each side
-    for (const [x, z, hh, fr] of [[-11.5, -3.2, 6.2, 8], [11.8, -2.8, 5.8, 7], [-4.6, -11.5, 4.6, 0], [4.4, -12, 4.8, 6], [-14.5, -9, 5.6, 0], [15, -9.5, 5.4, 5], [0.5, -14, 5.0, 0]]) {
-      const t = cartoonTree(hh, fr); t.position.set(x, -0.2, z); t.rotation.y = x * 0.3; g.add(t);
-    }
-    // chunky cartoon grass tufts in front, around the pond and along the sides (they sway)
-    for (let i = 0; i < 90; i++) {
-      const tf = grassTuft(0.9 + Math.random() * 0.8);
+    // a scenery picture standing on the ground that sways a little (the owner's props sheet)
+    const prop = (file, h, x, z, sway = 0.012, flip = false) => {
+      const w = new THREE.Group();
+      const pc = artProp(file, h);
+      if (flip) pc.scale.x = -1;
+      w.add(pc);
+      w.position.set(x, -0.2, z);
+      if (sway) w.userData.sway = { amp: sway, ph: Math.random() * 6.28, sp: 0.7 + Math.random() * 0.6 };
+      g.add(w);
+      return w;
+    };
+    // the trees: the owner's big oak and apple trees, in two rows behind and at the sides
+    for (const [f, h, x, z, fl] of [['tree_oak', 7.0, -11.6, -3.4, false], ['tree_apple', 5.6, 11.8, -3.0, false], ['tree_apple', 5.0, -4.4, -11.5, true], ['tree_oak', 5.4, 4.2, -12.0, true], ['tree_oak', 6.2, -14.6, -9.0, true], ['tree_apple', 5.6, 15.2, -9.5, true], ['tree_oak', 5.0, 0.6, -14.0, false]]) prop(f, h, x, z, 0.01, fl);
+    // tufts of grass, clumps of flowers and hay (pictures), swaying
+    for (let i = 0; i < 46; i++) {
       const side = i % 3;
-      const x = side === 0 ? -13 + Math.random() * 26 : side === 1 ? (Math.random() < 0.5 ? -1 : 1) * (7.5 + Math.random() * 6) : -12 + Math.random() * 24;
-      const z = side === 0 ? 4.2 + Math.random() * 4 : side === 1 ? -3 + Math.random() * 6 : -5.8 + Math.random() * 1.2;
-      tf.position.set(x, -0.2, z); tf.rotation.y = Math.random() * 6;
-      g.add(tf);
+      const x = side === 0 ? -13 + Math.random() * 26 : side === 1 ? (Math.random() < 0.5 ? -1 : 1) * (7.8 + Math.random() * 5.5) : -12 + Math.random() * 24;
+      const z = side === 0 ? 4.4 + Math.random() * 4 : side === 1 ? -3 + Math.random() * 6 : -5.9 + Math.random() * 1.0;
+      prop(`tuft_${1 + (i % 3)}`, 0.9 + Math.random() * 0.7, x, z, 0.05, Math.random() < 0.5);
     }
+    for (const [x, z, h] of [[-12, 4.8, 1.4], [-9.2, 6.8, 1.2], [-5.8, 7.4, 1.3], [-1.5, 7.6, 1.2], [3.2, 7.4, 1.4], [7.4, 6.9, 1.3], [11.5, 5.2, 1.4], [12.5, 0.8, 1.2], [-12.8, 0.4, 1.2]]) prop('flowers_p', h, x, z, 0.04, x > 0);
+    prop('hay_p', 1.7, 12.4, -3.8, 0, false);
     // the windmill (left, behind), after the owner's picture: a tall round tower of cream stone bricks with a red tiled cone roof, an
     // arched wooden door with steps, a window, and four big wooden lattice blades that turn
     const wm = new THREE.Group();
@@ -183,30 +193,10 @@ const BUILD = {
     wm.position.set(-7.0, 0, -9.5);
     wm.scale.setScalar(1.15);
     g.add(wm);
-    // the house (right, behind): plank walls, a real gable roof of red tiles with an overhang, big barn doors with cross braces, a
-    // shuttered window, a lantern, and stacked golden hay bales
-    const barn = new THREE.Group();
-    const walls = new THREE.MeshStandardMaterial({ map: plankTex([3, 1.2]), roughness: 0.9 });
-    const roofM = new THREE.MeshStandardMaterial({ map: tileTex([6, 2]), roughness: 0.7 });
-    const stoneBase = new THREE.MeshStandardMaterial({ map: brickTex([6, 0.6]), roughness: 0.95 });
-    barn.add(box(5.8, 2.7, 3.6, walls, 0, 1.55, 0), box(5.9, 0.5, 3.7, stoneBase, 0, 0.25, 0));
-    const tri = new THREE.Shape(); tri.moveTo(-1.8, 0); tri.lineTo(1.8, 0); tri.lineTo(0, 1.55); tri.closePath();
-    for (const sx of [-1, 1]) { const gable = new THREE.Mesh(new THREE.ExtrudeGeometry(tri, { depth: 0.14, bevelEnabled: false }), walls); gable.rotation.y = Math.PI / 2; gable.position.set(sx * 2.9 + (sx > 0 ? 0.0 : -0.14), 2.9, 0); gable.castShadow = true; barn.add(gable); }
-    const run = 2.35, rise = 1.7, ang = Math.atan2(rise, run), len = Math.hypot(run, rise);
-    for (const sz of [1, -1]) { const slope = box(6.5, 0.16, len, roofM, 0, 2.9 + rise / 2 + 0.02, sz * run / 2); slope.rotation.x = sz * ang; barn.add(slope); }
-    barn.add(box(6.5, 0.2, 0.3, m(0xa8241e, 0.7), 0, 2.9 + rise + 0.06, 0));
-    const doorM = m(0x9a5c2c, 0.9), braceM = m(0xe8c888, 0.9);
-    for (const sx of [-1, 1]) { barn.add(box(0.9, 2.1, 0.12, doorM, sx * 0.47, 1.35, 1.82)); const b1 = box(0.08, 2.3, 0.14, braceM, sx * 0.47, 1.35, 1.88); b1.rotation.z = 0.5 * sx; barn.add(b1); }
-    barn.add(box(2.1, 0.12, 0.16, braceM, 0, 2.45, 1.86), box(0.1, 2.2, 0.16, braceM, -0.98, 1.35, 1.86), box(0.1, 2.2, 0.16, braceM, 0.98, 1.35, 1.86));
-    barn.add(box(0.9, 0.9, 0.1, m(0xffe8a8, 0.3, { emissive: 0xffc860, emissiveIntensity: 0.6 }), -2.0, 1.9, 1.84), box(0.34, 0.9, 0.1, m(0x4a9a6a, 0.8), -2.62, 1.9, 1.86), box(0.34, 0.9, 0.1, m(0x4a9a6a, 0.8), -1.38, 1.9, 1.86));
-    barn.add(sph(0.14, m(0xfff0b0, 0.3, { emissive: 0xffd060, emissiveIntensity: 0.9 }), 1.5, 2.0, 1.9));
-    for (const [x, y, z] of [[3.5, 0.5, 0.6], [4.2, 0.5, -0.4], [3.6, 1.4, 0.1], [4.3, 1.4, 0.7], [3.9, 0.5, -1.4], [3.5, 2.2, 0.3]]) { const b = cyl(0.62, 0.62, 0.95, m(0xf0c24a, 0.95), x, y, z, 18); b.rotation.z = Math.PI / 2; b.rotation.y = 0.2; barn.add(b); }
-    barn.position.set(8.4, 0, -9.0);
-    g.add(barn);
-    // a wooden fence behind the pond
-    const fw = m(0xb07a3e, 0.9);
-    for (let i = -11; i <= 11; i++) g.add(box(0.2, 1.15, 0.2, fw, i * 1.05, 0.5, -4.9));
-    g.add(box(24, 0.12, 0.1, fw, 0, 0.35, -4.9), box(24, 0.12, 0.1, fw, 0, 0.85, -4.9));
+    // the house (right, behind): the owner's own picture of the wooden house with the red tiled roof
+    prop('house_p', 4.6, 8.6, -9.0, 0, false);
+    // the wooden fence behind the pond (the owner's pictures side by side)
+    for (let i = 0; i < 6; i++) prop('fence_p', 1.5, -11.2 + i * 4.4, -4.9, 0, false);
     // the pond with a stone rim, lily pads and pink lotus flowers
     const bank = new THREE.Mesh(new THREE.CylinderGeometry(6.5, 6.7, 0.3, 48), m(0xb89a64, 1)); bank.scale.z = 0.62; bank.position.y = -0.12; g.add(bank);
     const water = new THREE.Mesh(new THREE.CylinderGeometry(6.1, 6.1, 0.3, 48), new THREE.MeshStandardMaterial({ map: waterTex(), roughness: 0.2, metalness: 0.1 }));
@@ -218,7 +208,7 @@ const BUILD = {
     const lotus = [];
     for (const [x, z, r] of [[-5.1, -1.7, 0.5], [4.9, -1.9, 0.6], [-4.6, 1.2, 0.45], [5.2, 1.0, 0.5], [-1.6, -2.6, 0.5], [2.4, -2.5, 0.42], [-3.2, 2.5, 0.4], [3.4, 2.6, 0.45]]) {
       g.add(cyl(r, r, 0.04, m(0x3aa84a), x, 0.1, z, 20));
-      if (r >= 0.45) { const f = makeFlower(0xff7ab8, 0.1); f.position.set(x + r * 0.2, 0.12, z); f.scale.setScalar(1.7); g.add(f); lotus.push(f); }
+      if (r >= 0.45) { const lp = artProp('lotus_p', 0.9); const w = new THREE.Group(); w.add(lp); w.position.set(x, 0.1, z); g.add(w); lotus.push(w); }
     }
     for (let i = 0; i < 14; i++) { const a = (i / 14) * Math.PI * 1.1 + Math.PI * 1.05; g.add(cyl(0.03, 0.05, 1.5, m(0x4a9a3a), Math.cos(a) * 6.5, 0.5, Math.sin(a) * 3.9, 6)); }
     // stepping stones in the front left
@@ -229,7 +219,7 @@ const BUILD = {
       update: (dt, t) => {
         clouds.userData.drift(dt);
         blades.rotation.z -= dt * 0.7; // the windmill turns
-        lotus.forEach((f, i) => { f.rotation.z = Math.sin(t * 1.1 + i) * 0.06; f.position.y = 0.12 + Math.sin(t * 1.3 + i * 1.7) * 0.015; });
+        lotus.forEach((f, i) => { f.rotation.z = Math.sin(t * 1.1 + i) * 0.05; f.position.y = 0.1 + Math.sin(t * 1.3 + i * 1.7) * 0.02; });
       },
     };
   },
