@@ -45,6 +45,8 @@ cut 22 190 110 940 785 caterpillar; cut 22 210 120 1130 790 dragonfly; cut 22 15
 cut 22 220 130 10 885 croc2; cut 22 170 115 250 890 snake; cut 22 200 100 420 900 iguana; cut 22 185 105 620 905 tortoise; cut 22 185 125 800 885 triceratops
 cut 22 225 115 955 890 trex; cut 22 200 140 1130 875 brachio; cut 22 230 115 1295 890 stego
 # sizes of every cut for the game, then WebP (with transparency) into the game's folder
+# sheet 36 (owner's ChatGPT sheet 1 for level 1, 3 x 2): fox, camel, sun / rose, pomegranate, rocket
+cutw 36 520 510 0 0 fox; cutw 36 520 510 520 0 camel; cutw 36 496 510 1040 0 sun; cutw 36 520 514 0 510 rose; cutw 36 520 514 520 510 pomegranate; cutw 36 496 514 1040 510 rocket
 node -e "
 const fs=require('fs'),path=require('path');const dir=process.argv[1];const dst=process.argv[2];const out={};
 for(const f of fs.readdirSync(dir)){if(!f.endsWith('.png'))continue;const b=fs.readFileSync(path.join(dir,f));out[f.slice(0,-4)]=[b.readUInt32BE(16),b.readUInt32BE(20)];}

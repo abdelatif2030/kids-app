@@ -144,9 +144,10 @@ const ART_FILE = {
   cow: 'cow', sheep: 'sheep', dog: 'dog', cat: 'cat', giraffe: 'giraffe', lion: 'lion', elephant: 'elephant2', // the first elephant cut was missing its back legs croc: 'croc',
   horse: 'horse', pig: 'pig', bunny: 'rabbit', rabbit: 'rabbit', duck: 'mallard', hen: 'hen', chick: 'chick', bee: 'bee', butterfly: 'butterfly', monkey: 'monkey',
   fish: 'clownfish', dove: 'pigeon', frog: 'frog', panda: 'panda', tiger: 'tiger', zebra: 'zebra', penguin: 'penguin', parrot: 'parrot',
+  fox: 'fox', camel: 'camel', sun: 'sun', rose: 'rose', pomegranate: 'pomegranate', rocket: 'rocket', // the owner's ChatGPT sheet 1 (level 1)
   car: 'car', bus: 'bus', train: 'train', plane: 'plane', boat: 'boat', firetruck: 'firetruck', ambulance: 'ambulance', police: 'police', helicopter: 'helicopter',
 };
-const BIG = new Set(['cow', 'sheep', 'dog', 'cat', 'giraffe', 'lion', 'elephant', 'elephant2', 'croc', 'horse', 'pig', 'rabbit', 'mallard', 'hen', 'chick', 'bee', 'butterfly', 'monkey', 'clownfish', 'pigeon', 'frog', 'panda', 'tiger', 'zebra', 'penguin', 'parrot']);
+const BIG = new Set(['cow', 'sheep', 'dog', 'cat', 'giraffe', 'lion', 'elephant', 'elephant2', 'fox', 'camel', 'croc', 'horse', 'pig', 'rabbit', 'mallard', 'hen', 'chick', 'bee', 'butterfly', 'monkey', 'clownfish', 'pigeon', 'frog', 'panda', 'tiger', 'zebra', 'penguin', 'parrot']);
 export const hasArt = (id) => !!ART_FILE[id] && !!DIMS[ART_FILE[id]];
 export function artThing(id) {
   if (!hasArt(id)) return null;
