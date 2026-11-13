@@ -78,9 +78,13 @@ export class Stage {
     c.aspect = w / hh;
     c.updateProjectionMatrix();
     const t = Math.tan(THREE.MathUtils.degToRad(c.fov / 2));
-    const d = Math.max(this.o.box[1] / t, this.o.box[0] / (t * c.aspect));
+    // [wide] (owner 2026-11-13): on a wide screen (a phone held sideways) the camera pulls back so the WHOLE scenery shows (windmill,
+    // house, trees, pond, everything); on a narrow screen it keeps the tighter frame around the play area
+    const wide = this.o.wide && c.aspect >= (this.o.wide.minAspect || 1.45) ? this.o.wide : null;
+    const box = wide ? wide.box : this.o.box;
+    const d = Math.max(box[1] / t, box[0] / (t * c.aspect));
     const dir = new THREE.Vector3(...this.o.dir).normalize();
-    const target = new THREE.Vector3(...this.o.target);
+    const target = new THREE.Vector3(...(wide ? wide.target : this.o.target));
     c.position.copy(target).addScaledVector(dir, d);
     c.lookAt(target);
   }

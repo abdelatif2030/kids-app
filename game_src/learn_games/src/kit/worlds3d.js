@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { addSky, addClouds, scatter, makeTree, makeFlower, makeRock } from './realism.js';
 import { makeThing } from './things3d.js';
-import { artProp } from './actors.js';
+import { artProp, artTexture } from './actors.js';
 
 const m = (c, r = 0.8, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: r, ...o });
 const box = (w, h, d, mat, x, y, z) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); o.position.set(x, y, z); o.castShadow = true; o.receiveShadow = true; return o; };
@@ -57,7 +57,7 @@ const grassTex = (rep) => canvasTex(512, 512, (g, w, h) => {
 function ground(g, color, stripColor, y = -0.2, tex = null) {
   const f = new THREE.Mesh(new THREE.PlaneGeometry(80, 44), tex ? new THREE.MeshStandardMaterial({ map: tex, roughness: 1 }) : m(color, 1));
   f.rotation.x = -Math.PI / 2; f.position.y = y; f.receiveShadow = true; g.add(f);
-  const strip = box(70, 0.4, 3.4, m(stripColor, 1), 0, -0.05, 3.2); // as wide as the floor: no visible ends while worlds slide past
+  const strip = box(70, 0.4, 3.4, tex && tex.userData && tex.userData.strip ? new THREE.MeshStandardMaterial({ map: tex.userData.strip, roughness: 1 }) : m(stripColor, 1), 0, -0.05, 3.2); // as wide as the floor: no visible ends while worlds slide past
   g.add(strip);
 }
 
@@ -143,7 +143,13 @@ const BUILD = {
       ...Array.from({ length: 8 }, (_, i) => ({ t: 'flower', x: -12 + i * 0.9, z: 1.5 + Math.sin(i * 1.7) * 0.8 })),
       ...Array.from({ length: 8 }, (_, i) => ({ t: 'flower', x: 8.2 + i * 0.7, z: 2 + Math.cos(i * 1.3) * 0.8 })),
     ], -0.2);
-    ground(g, 0x86d46a, 0x76c85c, -0.2, grassTex([10, 6]));
+    // the lawn is the owner's grass texture (assets/games/art/ground_grass.webp), and a dirt path with grass edges leads to the house
+    const lawn = artTexture('ground_grass', 12, 7);
+    lawn.userData.strip = artTexture('ground_grass', 11, 0.55);
+    ground(g, 0x86d46a, 0x76c85c, -0.2, lawn);
+    const pathMat = new THREE.MeshStandardMaterial({ map: artTexture('ground_path', 1, 4.2), roughness: 1, transparent: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    const path = new THREE.Mesh(new THREE.PlaneGeometry(3.7, 15.5), pathMat);
+    path.rotation.x = -Math.PI / 2; path.rotation.z = 0.1; path.position.set(7.6, -0.18, -0.4); path.receiveShadow = true; g.add(path);
     // a scenery picture standing on the ground that sways a little (the owner's props sheet)
     const prop = (file, h, x, z, sway = 0.012, flip = false) => {
       const w = new THREE.Group();
@@ -191,7 +197,7 @@ const BUILD = {
     blades.position.set(0, 4.5, 1.55);
     wm.add(blades, sph(0.3, wood, 0, 4.5, 1.6));
     wm.position.set(-7.0, 0, -9.5);
-    wm.scale.setScalar(1.15);
+    wm.scale.setScalar(0.9);
     g.add(wm);
     // the house (right, behind): the owner's own picture of the wooden house with the red tiled roof
     prop('house_p', 4.6, 8.6, -9.0, 0, false);

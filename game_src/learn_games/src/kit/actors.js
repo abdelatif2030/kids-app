@@ -165,3 +165,13 @@ export function artThing(id) {
 export function artProp(file, h) {
   return pic(file, h, 1);
 }
+
+/** A repeating ground picture (the owner's grass and dirt-path textures): [rx] x [ry] copies over the surface it covers. */
+export function artTexture(name, rx = 1, ry = 1) {
+  const t = new THREE.TextureLoader().load(`${BASE}${name}.webp`);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(rx, ry);
+  t.anisotropy = 8;
+  return t;
+}
