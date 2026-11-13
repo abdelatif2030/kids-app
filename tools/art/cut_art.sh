@@ -98,3 +98,10 @@ cutw 74 470 374 372 650 w_pond; cutw 74 440 374 840 650 w_sign; cutw 74 440 374 
 cutw 73 410 480 830 15 w_fox; cutw 73 490 450 740 560 w_seal
 cutw 83 420 350 392 85 r_butterfly; cutw 83 450 330 825 120 r_ladybug; cutw 84 440 340 0 40 r_rainbow; cutw 84 300 400 100 640 r_icecream
 cutw 77 780 544 745 470 c_pad_cone
+
+# sheets 88-93 (underwater, jungle; 2026-11-13)
+cutw 88 414 371 0 0 u_pinktube; cutw 88 414 371 369 0 u_orangecoral; cutw 88 414 371 753 0 u_brain; cutw 88 399 371 1137 0 u_weed; cutw 88 414 371 0 326 u_rocks; cutw 88 414 371 369 326 u_chest; cutw 88 414 371 753 326 u_wreck; cutw 88 399 371 1137 326 u_anchor; cutw 88 414 357 0 667 u_arch; cutw 88 414 357 369 667 u_clam; cutw 88 414 357 753 667 u_anemone; cutw 88 399 357 1137 667 u_barrel
+cutw 89 414 371 0 0 u_clown; cutw 89 414 371 369 0 u_tang; cutw 89 414 371 753 0 u_yellowfish; cutw 89 399 371 1137 0 u_octopus; cutw 89 414 371 0 326 u_turtle; cutw 89 414 371 369 326 u_dolphin; cutw 89 414 371 753 326 u_seahorse; cutw 89 399 371 1137 326 u_crab; cutw 89 414 357 0 667 u_star; cutw 89 414 357 369 667 u_jelly; cutw 89 414 357 753 667 u_whale; cutw 89 399 357 1137 667 u_puffer
+cutw 90 798 542 0 0 u_pad_sand; cutw 90 783 542 753 0 u_pad_shell; cutw 90 798 527 0 497 u_pad_coral; cutw 90 783 527 753 497 u_pad_pearl
+cutw 93 414 371 0 0 j_tree; cutw 93 414 371 369 0 j_palm; cutw 93 414 371 753 0 j_leaf; cutw 93 399 371 1137 0 j_banana; cutw 93 414 371 0 326 j_mango; cutw 93 414 371 369 326 j_hut; cutw 93 414 371 753 326 j_bridge; cutw 93 399 371 1137 326 j_rocks; cutw 93 414 357 0 667 j_vine; cutw 93 414 357 369 667 j_flower; cutw 93 414 357 753 667 j_mushroom; cutw 93 399 357 1137 667 j_totem
+cutw 89 400 359 790 665 u_whale

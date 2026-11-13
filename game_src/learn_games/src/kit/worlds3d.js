@@ -156,6 +156,20 @@ function tickScenery(list, t, dt) {
   }
 }
 /** Falling snow: small white flakes that drift down and start again at the top. */
+/** Bubbles that rise and wobble, then start again at the bottom (under water). */
+function makeBubbles(g, n = 40) {
+  const bs = [];
+  const geo = new THREE.SphereGeometry(0.12, 10, 8), mat = new THREE.MeshBasicMaterial({ color: 0xdff6ff, transparent: true, opacity: 0.55, depthWrite: false, toneMapped: false });
+  for (let i = 0; i < n; i++) { const b = new THREE.Mesh(geo, mat); b.position.set(-13 + Math.random() * 26, Math.random() * 9, -9 + Math.random() * 14); b.userData.v = 0.4 + Math.random() * 0.6; b.userData.ph = Math.random() * 6; b.scale.setScalar(0.5 + Math.random() * 1.2); g.add(b); bs.push(b); }
+  return (dt, t) => { for (const b of bs) { b.position.y += dt * b.userData.v; b.position.x += Math.sin(t * 1.5 + b.userData.ph) * dt * 0.3; if (b.position.y > 9.5) { b.position.y = -0.1; b.position.x = -13 + Math.random() * 26; } } };
+}
+/** Leaves that drift down slowly (the jungle). */
+function makeLeaves(g, n = 28) {
+  const ls = [];
+  const geo = new THREE.PlaneGeometry(0.34, 0.2), mat = new THREE.MeshBasicMaterial({ color: 0x6ad84a, side: THREE.DoubleSide, toneMapped: false });
+  for (let i = 0; i < n; i++) { const l = new THREE.Mesh(geo, mat); l.position.set(-14 + Math.random() * 28, Math.random() * 9, -8 + Math.random() * 14); l.userData.v = 0.25 + Math.random() * 0.3; l.userData.ph = Math.random() * 6; g.add(l); ls.push(l); }
+  return (dt, t) => { for (const l of ls) { l.position.y -= dt * l.userData.v; l.position.x += Math.sin(t * 0.9 + l.userData.ph) * dt * 0.5; l.rotation.z += dt * 1.2; l.rotation.y += dt * 0.8; if (l.position.y < -0.1) { l.position.y = 9.5; l.position.x = -14 + Math.random() * 28; } } };
+}
 function makeSnowfall(g, n = 110) {
   const flakes = [];
   const geo = new THREE.SphereGeometry(0.06, 6, 5), mat = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false });
@@ -512,6 +526,37 @@ const BUILD = {
     P('k_dragon', 3.0, 11.6, 3.4, { flip: true, anim: { bob: 0.08, sp: 2, tilt: 0.04 } }); P('k_horse', 3.0, -12, 2.2, { anim: { bob: 0.04, sp: 1.8, r: 0.5, wsp: 0.2 } }); P('k_jester', 2.6, 9.8, 5.0, { anim: { bob: 0.35, sp: 3.2 } }); P('k_wizard', 3.0, -9.8, 4.6, { anim: { tilt: 0.04, sp: 1.4 } });
     return { pad: 'stone', padPics: ['k_pad_stone', 'k_pad_velvet', 'k_pad_shield', 'k_pad_gold'], update: (dt, t) => { clouds.userData.drift(dt); tickScenery(live, t, dt); } };
   },
+  // 9. under the sea, all from the owner's pictures: fish, a dolphin and a whale swim past, bubbles rise, weeds sway
+  underwater(g) {
+    addSky(g, { top: '#1a8ae0', horizon: '#7fd8ff' });
+    pictureGround(g, 'ground_sand', 11, 6, 0xf2c14a, 0xe8b440);
+    panoPlane(g, 'under_pano', -7.4);
+    const live = []; const P = scenery(g, live);
+    P('u_arch', 4.8, -11.2, -8.2); P('u_wreck', 3.8, 10.4, -9.4); P('u_rocks', 3.2, -6.0, -10.6); P('u_pinktube', 2.7, -12.6, -3.4, { sway: 0.01 }); P('u_orangecoral', 2.9, 11.8, -4.0, { sway: 0.01 }); P('u_brain', 1.9, -9.2, -5.4);
+    P('u_weed', 3.6, -7.6, -6.4, { sway: 0.06 }); P('u_weed', 3.2, 7.2, -7.2, { sway: 0.06, flip: true }); P('u_weed', 2.6, 12.6, 0.6, { sway: 0.07 }); P('u_anchor', 2.3, -10.6, -1.4); P('u_chest', 1.7, 9.6, -1.6); P('u_clam', 1.6, -11.8, 2.8); P('u_anemone', 1.5, 10.8, 3.2, { sway: 0.05 }); P('u_barrel', 1.6, -5.2, -5.6); P('u_wreck', 2.2, 2.0, -12.4, { flip: true });
+    P('u_clown', 1.1, -15, 0, { y: 1.8, anim: { drive: 1.0, bob: 0.25, sp: 1.6, smooth: true, tilt: 0.04 } }); P('u_clown', 0.9, 16, 0, { y: 2.8, flip: true, anim: { drive: -0.7, bob: 0.3, sp: 1.9, smooth: true } });
+    P('u_tang', 1.2, 8, 0, { y: 3.1, flip: true, anim: { drive: -1.3, bob: 0.3, sp: 1.4, smooth: true } }); P('u_yellowfish', 1.1, -6, 0, { y: 4.2, anim: { drive: 0.8, bob: 0.3, sp: 1.2, smooth: true } });
+    P('u_dolphin', 2.2, -14, -3, { y: 5.4, anim: { drive: 1.9, bob: 0.7, sp: 1.2, smooth: true, tilt: 0.12 } }); P('u_whale', 3.4, 14, -6, { y: 7.2, flip: true, anim: { drive: -0.5, bob: 0.3, sp: 0.6, smooth: true } });
+    P('u_turtle', 1.7, -4, 1, { y: 2.2, anim: { drive: 0.6, bob: 0.3, sp: 1.0, smooth: true, tilt: 0.05 } }); P('u_puffer', 1.2, 4, 0, { y: 3.6, anim: { drive: -0.9, bob: 0.25, sp: 1.5, smooth: true } });
+    P('u_jelly', 1.4, 6.4, -2.4, { y: 1.8, anim: { bob: 0.7, sp: 1.1, r: 0.6, wsp: 0.3 } }); P('u_jelly', 1.1, -3.6, -4.6, { y: 2.6, anim: { bob: 0.6, sp: 1.3 } });
+    P('u_octopus', 1.7, -8.4, -1.0, { anim: { tilt: 0.05, sp: 1.2, bob: 0.06 } }); P('u_seahorse', 1.5, 7.8, 0.6, { y: 1.0, anim: { bob: 0.5, sp: 1.3, smooth: true, tilt: 0.08 } }); P('u_crab', 1.0, 6.2, 4.6, { anim: { r: 1.6, wsp: 0.5, bob: 0.03, sp: 7 } }); P('u_star', 0.9, -8.4, 6.0);
+    const bubbles = makeBubbles(g);
+    return { pad: 'float', padPics: ['u_pad_sand', 'u_pad_shell', 'u_pad_coral', 'u_pad_pearl'], update: (dt, t) => { tickScenery(live, t, dt); bubbles(dt, t); } };
+  },
+  // 10. the jungle, from the owner's pictures: trees and leaves sway, leaves drift down, butterflies and birds fly
+  jungle(g) {
+    addSky(g, { top: '#5ac8a0', horizon: '#e6ffd0' });
+    pictureGround(g, 'ground_jungle', 11, 6, 0x6ac848, 0x5ab838);
+    panoPlane(g, 'jungle_pano', -7.4);
+    const live = []; const P = scenery(g, live);
+    P('j_tree', 6.2, -11.6, -7.2, { sway: 0.008 }); P('j_tree', 5.8, 11.4, -8.2, { sway: 0.008, flip: true }); P('j_palm', 5.4, -7.4, -10.4, { sway: 0.02 }); P('j_palm', 5.0, 7.6, -11.2, { sway: 0.02, flip: true });
+    P('j_hut', 3.4, 4.6, -11.6); P('j_banana', 4.2, -3.6, -11.8, { sway: 0.02 }); P('j_mango', 4.0, 13, -3.8, { sway: 0.012 }); P('j_bridge', 2.2, 0.6, -8.6); P('j_rocks', 2.2, -10.2, -3.2); P('j_totem', 3.4, 10.2, -3.0);
+    P('j_leaf', 2.0, -13, -0.6, { sway: 0.05 }); P('j_leaf', 1.8, 12.8, 1.8, { sway: 0.05, flip: true }); P('j_leaf', 1.5, -9.6, 4.4, { sway: 0.06 }); P('j_leaf', 1.4, 9.4, 5.6, { sway: 0.06, flip: true });
+    P('j_flower', 1.2, -12, 3, { sway: 0.04 }); P('j_flower', 1.0, 11.2, 4.2, { sway: 0.04 }); P('j_mushroom', 1.3, -6.4, 5.6); P('j_mushroom', 1.1, 7.2, 6.2, { flip: true });
+    P('j_vine', 2.4, -6.2, -6.2, { y: 3.4, anim: { tilt: 0.05, sp: 0.9 } }); P('j_vine', 2.4, 6.8, -6.8, { y: 3.4, anim: { tilt: 0.05, sp: 0.8 } });
+    const leaves = makeLeaves(g);
+    return { pad: 'wood', update: (dt, t) => { tickScenery(live, t, dt); leaves(dt, t); } };
+  },
 };
 
 /** A little flock of birds flying across the sky (two flapping wings each). */
@@ -599,8 +644,8 @@ function decorate(id, g, water) {
   const sways = [];
   g.traverse((o) => { if (o.userData && o.userData.sway) sways.push(o); });
   const add = (obj) => { g.add(obj); ups.push(obj.userData.update); };
-  if (['meadow', 'farm', 'rainbow', 'castle', 'city', 'snow'].includes(id)) add(makeBirds(id === 'snow' ? 3 : 5, 6.5, -14, 18));
-  if (['meadow', 'rainbow', 'farm', 'castle'].includes(id)) add(makeButterflies(4, -7, 7, 5.2));
+  if (['meadow', 'farm', 'rainbow', 'castle', 'city', 'snow', 'jungle'].includes(id)) add(makeBirds(id === 'snow' ? 3 : 5, 6.5, -14, 18));
+  if (['meadow', 'rainbow', 'farm', 'castle', 'jungle'].includes(id)) add(makeButterflies(4, -7, 7, 5.2));
   if (id === 'meadow') add(makeJumper());
   return (dt, t) => {
     for (const o of sways) { const w = o.userData.sway; o.rotation.z = Math.sin(t * w.sp + w.ph) * w.amp; }
@@ -609,8 +654,8 @@ function decorate(id, g, water) {
   };
 }
 
-export const WORLD_IDS = ['meadow', 'farm', 'beach', 'space', 'rainbow', 'city', 'snow', 'castle'];
-export const WORLD_NAMES = { meadow: 'البركة', farm: 'المزرعة', beach: 'الشاطئ', space: 'الفضاء', rainbow: 'ملعب قوس قزح', city: 'المدينة', snow: 'جبال الثلج', castle: 'القلعة' };
+export const WORLD_IDS = ['meadow', 'farm', 'beach', 'space', 'rainbow', 'city', 'snow', 'castle', 'underwater', 'jungle'];
+export const WORLD_NAMES = { meadow: 'البركة', farm: 'المزرعة', beach: 'الشاطئ', space: 'الفضاء', rainbow: 'ملعب قوس قزح', city: 'المدينة', snow: 'جبال الثلج', castle: 'القلعة', underwater: 'تحت الماء', jungle: 'الغابة' };
 
 export function buildWorld(id) {
   const group = new THREE.Group();
