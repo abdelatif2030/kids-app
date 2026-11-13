@@ -55,6 +55,8 @@ function fitThing(item, h, w) {
 }
 const SCALE = { camel: 1.15, horse: 1.15, giraffe: 0.8, rocket: 1.1, crescent: 1.4, cow: 1.1, bear: 1.3, bed: 1.05, tub: 1.05, pot: 1.25, plate: 1.25, bowl: 1.25, soap: 1.3, backpack: 1.25, toothbrush: 1.3, heart: 1.4, carrot: 1.5, bone: 1.6, grass: 1.3, honey: 1.5, cheese: 1.4, seeds: 1.6 };
 const HAND = new THREE.Vector3(-5.0, 2.8, 2.0);
+const LANDSCAPE = { portrait: false, span: 9.2, off: 0.9, zs: [-1.3, -0.2], hero: [-4.4, 4.6, 1.3], owl: [-6.7, 4.0, 0.85], stand: [-1.5, 5.4], cam: { box: [9.0, 5.1], target: [0, 2.5, 0.3], minAspect: 0 } };
+const PORTRAIT = { portrait: true, span: 6.6, off: 0, zs: [-4.4, -2.5], hero: [-3.0, 5.8, 1.25], owl: [3.1, 5.0, 0.8], stand: [0.3, 3.4], cam: { box: [5.6, 4.4], target: [0, 2.6, 1.8], minAspect: 0 } };
 const STAND = new THREE.Vector3(-1.5, 0, 5.4); // the picture of the question stands in FRONT of the choices (nearer the child), not among them
 const RACK = new THREE.Vector3(5.2, 0, 3.0);
 const RACK_S = 0.6;
@@ -66,6 +68,12 @@ class Game {
     setArtBase(`${sh.base}../art/`);
     this.girl = sh.T.girl;
     this.st = new Stage(sh, { bg: 0xcfeeff, ground: 0x9ad0a0, fov: 40, box: [7.2, 3.9], dir: [0, 0.5, 1], target: [0, 1.0, 0.8], wide: { box: [9.0, 5.1], target: [0, 2.5, 0.3], minAspect: 0 } });
+    // Two layouts (owner 2026-11-13): sideways (wide) keeps the full scenery; upright (portrait) comes much closer: the choices in a
+    // tighter row, the hero and the owl standing in front of them, bigger.
+    this.layout = LANDSCAPE;
+    this._portrait = false;
+    const stageResize = sh.onResize;
+    sh.onResize = (w, hh) => { this._applyLayout(w / hh); stageResize(w, hh); };
     this.opts = new Map();
     this.rackItems = [];
     this.cheerN = Math.floor(Math.random() * 9);
@@ -77,11 +85,14 @@ class Game {
     this.fade = h('div', { class: 'lw-fade' });
     sh.root.append(this.fade);
     this.owl = makeActor('owl');
-    this.owl.position.set(-6.7, 0.16, 4.0);
-    this.owl.scale.setScalar(0.85); // the owl companion: bigger and clearer (owner 2026-11-13)
+    this.owl.position.set(this.layout.owl[0], 0.16, this.layout.owl[1]);
+    this.owl.scale.setScalar(this.layout.owl[2]); // the owl companion: bigger and clearer (owner 2026-11-13)
     this.owl.rotation.y = 0.25;
     this.st.add(this.owl);
     this.stand = this._makeStand();
+    this._laidOut = undefined;
+    this._applyLayout(sh.w / sh.h); // the right layout from the first frame
+    this.st.resize(sh.w, sh.h);
     this._makeRack();
     this.save = sh.save;
     if (!this.save.lw) this.save.lw = { unlocked: 1, done: {} };
@@ -155,6 +166,22 @@ class Game {
     this.fade.classList.add('on');
     if (this.hero) this.hero.act('run');
     setTimeout(() => { swap(); this.fade.classList.remove('on'); this.sh.say(WORLD_NAMES[id], false, 2.2); }, 520);
+  }
+
+  /** Puts the camera, the hero, the owl, the question picture and the choices where the current screen shape wants them. */
+  _applyLayout(aspect) {
+    const portrait = aspect < 1.0;
+    if (this._laidOut === portrait) return;
+    this._laidOut = portrait;
+    this._portrait = portrait;
+    const L = (this.layout = portrait ? PORTRAIT : LANDSCAPE);
+    this.st.o.wide = L.cam;
+    STAND.set(L.stand[0], 0, L.stand[1]);
+    if (this.stand) this.stand.position.copy(STAND);
+    if (this.standItem) this.standItem.position.copy(STAND);
+    if (this.hero) { this.hero.position.set(L.hero[0], 0.16, L.hero[1]); this.hero.scale.setScalar(L.hero[2]); }
+    if (this.owl) { this.owl.position.set(L.owl[0], 0.16, L.owl[1]); this.owl.scale.setScalar(L.owl[2]); }
+    for (const o of this.opts.values()) { if (o.home) { const i = [...this.opts.values()].indexOf(o), n = this.opts.size; o.home.set(((i + 0.5) / n - 0.5) * L.span + L.off, 0.1, i % 2 ? L.zs[1] : L.zs[0]); } }
   }
 
   _makeStand() {
@@ -265,7 +292,7 @@ class Game {
     hit.userData.id = o.id;
     hit.position.set(0.2, 0.9, 0);
     g.add(glow, hit);
-    const home = new THREE.Vector3(((i + 0.5) / n - 0.5) * 9.2 + 0.9, 0.1, i % 2 ? -0.2 : -1.3); // two rows, kept behind the question picture
+    const home = new THREE.Vector3(((i + 0.5) / n - 0.5) * this.layout.span + this.layout.off, 0.1, i % 2 ? this.layout.zs[1] : this.layout.zs[0]); // two rows, kept behind the question picture
     g.position.copy(HAND);
     g.scale.setScalar(0.01);
     this.st.add(g);
@@ -321,8 +348,8 @@ class Game {
   _makeHero(kind, look) {
     if (this.hero) this.st.scene.remove(this.hero);
     const k = makeActor(kind);
-    k.position.set(-4.4, 0.16, 4.6);
-    k.scale.setScalar(1.3); // the hero is the star of the screen: big and close
+    k.position.set(this.layout.hero[0], 0.16, this.layout.hero[1]);
+    k.scale.setScalar(this.layout.hero[2]); // the hero is the star of the screen: big and close
     k.rotation.y = 0.2;
     this.st.add(k);
     this.hero = k;
