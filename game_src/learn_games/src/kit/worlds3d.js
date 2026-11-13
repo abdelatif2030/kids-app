@@ -43,9 +43,14 @@ const tileTex = (rep) => canvasTex(256, 256, (g, w, h) => {
   }
 }, rep);
 const grassTex = (rep) => canvasTex(512, 512, (g, w, h) => {
-  g.fillStyle = '#84d268'; g.fillRect(0, 0, w, h);
-  for (let i = 0; i < 90; i++) { g.fillStyle = Math.random() < 0.5 ? 'rgba(160,230,110,.35)' : 'rgba(80,170,70,.28)'; g.beginPath(); g.ellipse(Math.random() * w, Math.random() * h, 30 + Math.random() * 60, 14 + Math.random() * 26, Math.random() * 3, 0, 7); g.fill(); }
-  for (let i = 0; i < 1100; i++) { g.strokeStyle = Math.random() < 0.5 ? 'rgba(60,150,50,.55)' : 'rgba(170,236,120,.6)'; g.lineWidth = 2; const x = Math.random() * w, y = Math.random() * h; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (Math.random() - 0.5) * 6, y - 6 - Math.random() * 8); g.stroke(); }
+  // a cartoon lawn: bright green with soft wide mowing stripes and small darker "v" grass marks
+  g.fillStyle = '#7fdc58'; g.fillRect(0, 0, w, h);
+  for (let i = -4; i < 12; i++) { g.fillStyle = i % 2 ? 'rgba(255,255,160,.16)' : 'rgba(40,150,60,.12)'; g.beginPath(); g.moveTo(i * 64, 0); g.lineTo(i * 64 + 64, 0); g.lineTo(i * 64 + 64 - 200, h); g.lineTo(i * 64 - 200, h); g.closePath(); g.fill(); }
+  for (let i = 0; i < 160; i++) {
+    const x = Math.random() * w, y = Math.random() * h, k = 6 + Math.random() * 6;
+    g.strokeStyle = Math.random() < 0.6 ? 'rgba(50,160,60,.7)' : 'rgba(190,255,130,.8)'; g.lineWidth = 3; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(x - k * 0.6, y); g.lineTo(x, y - k); g.lineTo(x + k * 0.6, y); g.stroke();
+  }
 }, rep);
 
 function ground(g, color, stripColor, y = -0.2, tex = null) {
@@ -83,6 +88,41 @@ function waterTex(rep = 3) {
 }
 
 // ---- the worlds -----------------------------------------------------------------------------------------------------
+// ---- cartoon trees and grass tufts (puffy two-tone crowns with a bright highlight, thick trunks with roots; chunky blades) --------------
+function cartoonTree(h = 4.6, fruit = 0) {
+  const g = new THREE.Group();
+  const k = h / 4.6;
+  const bark = m(0x8a5428, 0.95), bark2 = m(0xa87238, 0.95);
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3 * k, 0.5 * k, h * 0.55, 12), bark); trunk.position.y = h * 0.27; trunk.castShadow = true; g.add(trunk);
+  for (let r = 0; r < 4; r++) { const a = (r / 4) * Math.PI * 2 + 0.4; const root = new THREE.Mesh(new THREE.ConeGeometry(0.2 * k, 0.5 * k, 6), bark2); root.position.set(Math.cos(a) * 0.42 * k, 0.12, Math.sin(a) * 0.42 * k); root.rotation.set(Math.sin(a) * 0.9, 0, -Math.cos(a) * 0.9); g.add(root); }
+  const crown = new THREE.Group(); crown.position.y = h * 0.5;
+  const greens = [0x2c9a46, 0x3cb552, 0x56cf68, 0x86e87c].map((c) => m(c, 0.85));
+  for (const [x, y, z, r, c] of [[0, 0.7, 0, 1.35, 0], [-1.0, 0.3, 0.1, 1.0, 1], [1.0, 0.35, -0.1, 1.05, 1], [0, 1.45, 0, 1.0, 2], [-0.55, 1.1, 0.6, 0.75, 2], [0.6, 1.15, 0.55, 0.7, 3], [0.0, 0.1, 0.9, 0.75, 1], [-0.2, 1.9, 0.1, 0.55, 3]]) {
+    const b = new THREE.Mesh(new THREE.SphereGeometry(r * k * 1.05, 18, 14), greens[c]); b.position.set(x * k, y * k, z * k); b.castShadow = true; crown.add(b);
+  }
+  // soft highlights on the sunny side
+  for (const [x, y, z, r] of [[-0.5, 1.7, 0.7, 0.42], [-1.1, 0.9, 0.9, 0.34], [0.5, 1.9, 0.5, 0.3]]) { const hl = new THREE.Mesh(new THREE.SphereGeometry(r * k, 12, 10), m(0xb8f59a, 0.7, { emissive: 0x4a9a4a, emissiveIntensity: 0.25 })); hl.position.set(x * k, y * k, z * k); crown.add(hl); }
+  for (let f = 0; f < fruit; f++) { const a = f * 2.4, fr = new THREE.Mesh(new THREE.SphereGeometry(0.14 * k, 10, 8), m(f % 3 ? 0xe83a30 : 0xffd23a, 0.4)); fr.position.set(Math.cos(a) * 1.25 * k, (0.5 + (f % 4) * 0.35) * k, Math.sin(a) * 1.0 * k + 0.5 * k); crown.add(fr); }
+  crown.userData.sway = { amp: 0.014, ph: Math.random() * 6.28, sp: 0.7 + Math.random() * 0.4 };
+  g.add(crown);
+  return g;
+}
+
+function grassTuft(scale = 1) {
+  const g = new THREE.Group();
+  const cols = [0x2fa046, 0x45c05a, 0x6ede6a, 0x9af088];
+  for (let i = 0; i < 7; i++) {
+    const hh = (0.45 + Math.random() * 0.4) * scale;
+    const blade = new THREE.Mesh(new THREE.ConeGeometry(0.07 * scale, hh, 4), m(cols[i % 4], 0.8));
+    const a = (i / 7) * Math.PI * 2;
+    blade.position.set(Math.cos(a) * 0.09 * scale, hh / 2, Math.sin(a) * 0.09 * scale);
+    blade.rotation.set(Math.sin(a) * 0.3, 0, -Math.cos(a) * 0.3);
+    g.add(blade);
+  }
+  g.userData.sway = { amp: 0.1 + Math.random() * 0.06, ph: Math.random() * 6.28, sp: 1.2 + Math.random() * 0.8 };
+  return g;
+}
+
 const BUILD = {
   // 1. the sunny pond (the first place)
   meadow(g) {
@@ -97,14 +137,25 @@ const BUILD = {
     }
     for (const [x, z, h, c] of [[-18, -30, 9, 0x9ab8e8], [-2, -32, 11, 0xa8c4ee], [14, -30, 8, 0x9ab8e8]]) g.add(cone(h * 0.85, h, m(c, 1), x, h / 2 - 1.5, z, 5));
     scatter(g, [
-      { t: 'tree', x: -9.5, z: -5, s: 5.2 }, { t: 'tree', x: 9.8, z: -4.5, s: 4.6 }, { t: 'tree', x: -13, z: -2, s: 4.2 }, { t: 'tree', x: 13.5, z: -2.5, s: 5 },
-      { t: 'tree', x: -5.8, z: -9.5, s: 3.6 }, { t: 'tree', x: 5.5, z: -10, s: 3.8 },
-      { t: 'bush', x: -8, z: 3.8, s: 0.9 }, { t: 'bush', x: 8.6, z: 3.5, s: 0.8 }, { t: 'bush', x: -10.5, z: 0.5, s: 0.9 }, { t: 'bush', x: 11, z: 1, s: 0.85 }, { t: 'rock', x: -7.4, z: 4.8, s: 0.55 }, { t: 'rock', x: 7.2, z: 5.2, s: 0.5 },
+            { t: 'bush', x: -8, z: 3.8, s: 0.9 }, { t: 'bush', x: 8.6, z: 3.5, s: 0.8 }, { t: 'bush', x: -10.5, z: 0.5, s: 0.9 }, { t: 'bush', x: 11, z: 1, s: 0.85 }, { t: 'rock', x: -7.4, z: 4.8, s: 0.55 }, { t: 'rock', x: 7.2, z: 5.2, s: 0.5 },
       ...Array.from({ length: 30 }, (_, i) => ({ t: 'flower', x: -12.5 + i * 0.86 + Math.sin(i) * 0.4, z: 6 + (i % 4) * 0.6 + Math.cos(i * 2) * 0.5 })),
       ...Array.from({ length: 8 }, (_, i) => ({ t: 'flower', x: -12 + i * 0.9, z: 1.5 + Math.sin(i * 1.7) * 0.8 })),
       ...Array.from({ length: 8 }, (_, i) => ({ t: 'flower', x: 8.2 + i * 0.7, z: 2 + Math.cos(i * 1.3) * 0.8 })),
     ], -0.2);
     ground(g, 0x86d46a, 0x76c85c, -0.2, grassTex([10, 6]));
+    // the trees: big puffy cartoon trees (some with fruit) in two rows behind, and a big one at each side
+    for (const [x, z, hh, fr] of [[-11.5, -3.2, 6.2, 8], [11.8, -2.8, 5.8, 7], [-4.6, -11.5, 4.6, 0], [4.4, -12, 4.8, 6], [-14.5, -9, 5.6, 0], [15, -9.5, 5.4, 5], [0.5, -14, 5.0, 0]]) {
+      const t = cartoonTree(hh, fr); t.position.set(x, -0.2, z); t.rotation.y = x * 0.3; g.add(t);
+    }
+    // chunky cartoon grass tufts in front, around the pond and along the sides (they sway)
+    for (let i = 0; i < 90; i++) {
+      const tf = grassTuft(0.9 + Math.random() * 0.8);
+      const side = i % 3;
+      const x = side === 0 ? -13 + Math.random() * 26 : side === 1 ? (Math.random() < 0.5 ? -1 : 1) * (7.5 + Math.random() * 6) : -12 + Math.random() * 24;
+      const z = side === 0 ? 4.2 + Math.random() * 4 : side === 1 ? -3 + Math.random() * 6 : -5.8 + Math.random() * 1.2;
+      tf.position.set(x, -0.2, z); tf.rotation.y = Math.random() * 6;
+      g.add(tf);
+    }
     // the windmill (left, behind), after the owner's picture: a tall round tower of cream stone bricks with a red tiled cone roof, an
     // arched wooden door with steps, a window, and four big wooden lattice blades that turn
     const wm = new THREE.Group();
