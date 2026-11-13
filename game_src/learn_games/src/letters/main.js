@@ -292,7 +292,7 @@ class Game {
       pole.position.set(0, 0.45 + lift, 0);
       plaque = this._plaque(text, true);
       plaque.position.set(0, 1.5 + lift, 0);
-      plaque.scale.setScalar(1.6);
+      plaque.scale.setScalar(this.layout.portrait ? 1.2 : 1.6);
       g.add(pole, plaque);
       item = plaque;
     }

@@ -74,3 +74,8 @@ cutw 48 414 371 0 0 b_palm1; cutw 48 414 371 369 0 b_palm2; cutw 48 414 371 753 
 cutw 52 798 542 0 0 f_pad_stump; cutw 52 798 542 753 0 f_pad_hay; cutw 52 798 542 0 497 f_pad_nest; cutw 52 798 542 753 497 f_pad_plank
 cutw 53 414 371 0 0 f_coop; cutw 53 414 371 369 0 f_eggs; cutw 53 414 371 753 0 f_milk; cutw 53 414 371 1137 0 f_barrow; cutw 53 414 371 0 326 f_water_can; cutw 53 414 371 369 326 f_sign; cutw 53 414 371 753 326 f_bucket; cutw 53 414 371 1137 326 f_stool; cutw 53 414 371 0 667 f_barrels; cutw 53 414 371 369 667 f_post; cutw 53 414 371 753 667 f_haypile; cutw 53 414 371 1137 667 f_birdhouse
 cutw 54 458 470 0 0 f_cow; cutw 54 300 380 458 90 f_pig; cutw 54 430 490 770 0 f_horse; cutw 54 346 420 1190 70 f_sheep; cutw 54 340 530 20 480 f_goat; cutw 54 360 540 365 470 f_donkey; cutw 54 340 520 765 500 f_rooster; cutw 54 370 480 1150 530 f_hen
+
+# sheets 58-60 (space, 2026-11-13)
+cutw 58 798 542 0 0 s_pad_moon; cutw 58 783 542 753 0 s_pad_energy; cutw 58 798 527 0 497 s_pad_metal; cutw 58 783 527 753 497 s_pad_crystal
+cutw 59 414 542 0 0 s_alien; cutw 59 414 542 369 0 s_robot; cutw 59 414 542 753 0 s_cat; cutw 59 399 542 1137 0 s_dog; cutw 59 414 527 0 497 s_shoot; cutw 59 414 527 369 497 s_rocket; cutw 59 414 527 753 497 s_helmet; cutw 59 399 527 1137 497 s_comet
+cutw 60 414 371 0 0 s_launch; cutw 60 414 371 369 0 s_ufo; cutw 60 414 371 753 0 s_station; cutw 60 399 371 1137 0 s_rock; cutw 60 414 371 0 326 s_crystal; cutw 60 414 371 369 326 s_dish; cutw 60 414 371 753 326 s_rover; cutw 60 399 371 1137 326 s_ringplanet; cutw 60 414 357 0 667 s_blueplanet; cutw 60 414 357 369 667 s_pinkplanet; cutw 60 414 357 753 667 s_star; cutw 60 399 357 1137 667 s_moon

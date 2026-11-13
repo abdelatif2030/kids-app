@@ -241,7 +241,7 @@ const BUILD = {
     ground(g, 0x86d46a, 0x76c85c, -0.2, lawn);
     // the panorama: the horizon of the picture (fence, barn, hills) sits just beyond the far edge of the lawn
     const pano = new THREE.Mesh(new THREE.PlaneGeometry(52, 26), new THREE.MeshBasicMaterial({ map: artTexture('farm_pano'), toneMapped: false, depthWrite: false }));
-    pano.position.set(0, -11.2, -14.5); pano.renderOrder = -1; g.add(pano);
+    pano.position.set(0, -8.6, -14.5); pano.renderOrder = -1; g.add(pano);
     // ploughed field patches (the owner's field texture) behind, left and right
     for (const x of [-12.5, 13]) {
       const f = new THREE.Mesh(new THREE.PlaneGeometry(9, 5), new THREE.MeshStandardMaterial({ map: artTexture('ground_farm', 2.2, 1.2), roughness: 1, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
@@ -354,30 +354,76 @@ const BUILD = {
       },
     };
   },
-  // 4. space: stars, planets, a rocket
+  // 4. space, from the owner's pictures (2026-11-13): moon ground, panorama of planets and nebula, and things that move: twinkling stars,
+  // a shooting star and a comet crossing, a hovering UFO, a floating robot and astronaut pets, a turning satellite station and dish
   space(g) {
-    addSky(g, { top: '#07072a', horizon: '#2a1a5a' });
-    ground(g, 0x6a6a86, 0x5a5a76);
+    addSky(g, { top: '#0b0a3a', horizon: '#2b1a6a' });
+    const moon = artTexture('ground_moon', 11, 6);
+    moon.userData.strip = artTexture('ground_moon', 10, 0.5);
+    ground(g, 0x9a90c8, 0x8a80b8, -0.2, moon);
+    const pano = new THREE.Mesh(new THREE.PlaneGeometry(52, 26), new THREE.MeshBasicMaterial({ map: artTexture('space_pano'), toneMapped: false, depthWrite: false }));
+    pano.position.set(0, -4.4, -15); pano.renderOrder = -1; g.add(pano);
     const stars = new THREE.Group();
-    for (let i = 0; i < 90; i++) { const s = sph(0.05 + (i % 3) * 0.03, new THREE.MeshBasicMaterial({ color: 0xffffe0, toneMapped: false }), (Math.random() - 0.5) * 60, 3 + Math.random() * 18, -20 - Math.random() * 10); s.userData.ph = Math.random() * 6; stars.add(s); }
+    for (let i = 0; i < 70; i++) { const st = sph(0.05 + (i % 3) * 0.03, new THREE.MeshBasicMaterial({ color: 0xffffe0, toneMapped: false }), (Math.random() - 0.5) * 44, 4 + Math.random() * 12, -14.6); st.userData.ph = Math.random() * 6; stars.add(st); }
     g.add(stars);
-    const planet = (r, c, x, y, z, ring) => { const p = new THREE.Group(); p.add(sph(r, m(c, 0.5), 0, 0, 0)); if (ring) { const rg = new THREE.Mesh(new THREE.TorusGeometry(r * 1.6, r * 0.12, 6, 40), m(0xe8d0a0, 0.6)); rg.rotation.x = 1.2; p.add(rg); } p.position.set(x, y, z); g.add(p); return p; };
-    const p1 = planet(2.2, 0xe8a05a, -9, 8, -16, true), p2 = planet(1.4, 0x5aa8e8, 8, 11, -18), p3 = planet(0.9, 0xe85a8a, 3, 6, -14);
-    const rocket = makeThing('rocket'); rocket.scale.setScalar(3.2); rocket.position.set(9, -0.2, -3.5); g.add(rocket);
-    for (const [x, z, r] of [[-8, -3, 1.2], [-5, -5, 0.8], [6, 4.4, 0.6]]) { const c = cyl(r, r * 1.1, 0.25, m(0x555570, 1), x, -0.1, z, 20); g.add(c); }
-    return { pad: 'rock', update: (dt, t) => { for (const s of stars.children) s.scale.setScalar(0.7 + Math.sin(t * 2 + s.userData.ph) * 0.4); p1.rotation.y = t * 0.1; p2.position.y = 11 + Math.sin(t * 0.5) * 0.3; p3.position.y = 6 + Math.sin(t * 0.7) * 0.2; rocket.position.y = -0.2 + Math.sin(t * 1.5) * 0.04; } };
+    const prop = (file, h, x, z, y = -0.2, flip = false, sway = 0) => {
+      const w = new THREE.Group();
+      const pc = artProp(file, h);
+      if (flip) pc.scale.x = -1;
+      w.add(pc);
+      w.position.set(x, y, z);
+      if (sway) w.userData.sway = { amp: sway, ph: Math.random() * 6.28, sp: 0.7 + Math.random() * 0.6 };
+      g.add(w);
+      return w;
+    };
+    prop('s_launch', 5.2, -8.2, -9.5); prop('s_rock', 2.4, 9.8, -8); prop('s_crystal', 2.2, -12.2, -4.4); prop('s_crystal', 1.6, 12.4, -3.6, -0.2, true);
+    prop('s_rock', 1.5, -5.4, -9.2, -0.2, true);     const dish = prop('s_dish', 3.0, 7.4, -9.8); const rover = prop('s_rover', 2.0, 11.4, -1.0, -0.2, true);
+    const ufo = prop('s_ufo', 2.4, -8.0, 3.2, 3.6); const station = prop('s_station', 3.0, 3.2, -11, 5.2);
+    const robot = prop('s_robot', 2.0, 8.6, 0.8, 0.6); const alien = prop('s_alien', 2.6, -9.6, -2.0); const cat = prop('s_cat', 2.0, -12.0, 1.4, 1.0); const dog = prop('s_dog', 2.0, 12.6, 3.0, 1.2, true);
+    const ring = prop('s_ringplanet', 2.6, -11.8, 8.2, 3.0); const blue = prop('s_blueplanet', 1.9, 6.4, -12.5, 6.8); const pink = prop('s_pinkplanet', 1.6, 9.6, 6.6, 5.6);
+    const rocket = prop('s_rocket', 2.4, -1.0, -12.4, 2.2);
+    const shoot = prop('s_shoot', 1.4, 0, -14, 8.6); const comet = prop('s_comet', 1.8, 0, -14, 9.4);
+    prop('s_moon', 1.3, -3.6, -13, 8.4, false, 0.03); prop('s_star', 0.9, 4.2, -13.6, 9.6, false, 0.06); prop('s_helmet', 1.2, 10.6, -4.8);
+    return {
+      pad: 'rock', padPics: ['s_pad_moon', 's_pad_energy', 's_pad_metal', 's_pad_crystal'],
+      update: (dt, t) => {
+        for (const st of stars.children) st.scale.setScalar(0.7 + Math.sin(t * 2 + st.userData.ph) * 0.45);
+        ufo.position.y = 3.6 + Math.sin(t * 1.1) * 0.35; ufo.position.x = -8 + Math.sin(t * 0.3) * 2.4; ufo.rotation.z = Math.sin(t * 0.9) * 0.08;
+        station.rotation.z = Math.sin(t * 0.35) * 0.12; station.position.y = 5.2 + Math.sin(t * 0.5) * 0.2;
+        dish.rotation.z = Math.sin(t * 0.8) * 0.06;
+        rover.position.x = 11.4 + Math.sin(t * 0.4) * 0.6; rover.position.y = -0.2 + Math.abs(Math.sin(t * 6)) * 0.03;
+        robot.position.y = 0.6 + Math.sin(t * 1.6) * 0.25; alien.rotation.z = Math.sin(t * 2.4) * 0.05;
+        cat.position.y = 1.0 + Math.sin(t * 1.2 + 1) * 0.3; cat.rotation.z = Math.sin(t * 0.9) * 0.1; dog.position.y = 1.2 + Math.sin(t * 1.3 + 2) * 0.3; dog.rotation.z = Math.sin(t * 1.0 + 1) * -0.1;
+        ring.rotation.z = Math.sin(t * 0.3) * 0.08; ring.position.y = 3.0 + Math.sin(t * 0.5) * 0.25; blue.position.y = 6.8 + Math.sin(t * 0.4 + 1) * 0.2; pink.position.y = 5.6 + Math.sin(t * 0.6 + 2) * 0.22;
+        rocket.position.y = 2.2 + Math.sin(t * 1.5) * 0.18; rocket.rotation.z = Math.sin(t * 0.7) * 0.04;
+        // the shooting star and the comet cross the sky now and then
+        const k1 = (t % 9) / 3.2; shoot.visible = k1 < 1; if (k1 < 1) { shoot.position.x = 12 - k1 * 26; shoot.position.y = 9.4 - k1 * 3.5; }
+        const k2 = ((t + 4.5) % 14) / 4.5; comet.visible = k2 < 1; if (k2 < 1) { comet.position.x = -13 + k2 * 26; comet.position.y = 10 - k2 * 3; }
+      },
+    };
   },
-  // 5. the rainbow playground
+  // 5. the rainbow playground: the owner's panorama and flower-meadow texture, drifting balloons and clouds (more pictures to come)
   rainbow(g) {
     addSky(g, { top: '#8ad0ff', horizon: '#ffe0f0' });
-    const clouds = addClouds(g, 9, { y: 7, z: -14 });
-    ground(g, 0xb8e890, 0xa8d880);
-    const cols = [0xe8302a, 0xff8a1a, 0xffd21a, 0x2aa84a, 0x2a8ae8, 0x9a4ad8];
-    cols.forEach((c, i) => { const arc = new THREE.Mesh(new THREE.TorusGeometry(7.5 - i * 0.55, 0.28, 10, 48, Math.PI), m(c, 0.5)); arc.position.set(0, -0.2, -8); g.add(arc); });
-    for (let i = 0; i < 8; i++) { const s = cone(0.4, 0.8, m([0xffd21a, 0xff7ab8, 0x7ad8ff][i % 3], 0.4), -11 + i * 3.2, 1 + (i % 3) * 0.6, -5.5, 5); s.rotation.z = Math.PI; g.add(s); }
-    scatter(g, Array.from({ length: 26 }, (_, i) => ({ t: 'flower', x: -12 + i * 0.95, z: 5.6 + (i % 4) * 0.5 })), -0.2);
-    scatter(g, [{ t: 'tree', x: -10, z: -4, s: 4.4 }, { t: 'tree', x: 10, z: -4.5, s: 4.8, c: 0xff8ab8 }], -0.2);
-    return { pad: 'cloud', update: (dt) => clouds.userData.drift(dt) };
+    const clouds = addClouds(g, 6, { y: 9, z: -18 });
+    const meadow = artTexture('ground_rainbow', 11, 6);
+    meadow.userData.strip = artTexture('ground_rainbow', 10, 0.5);
+    ground(g, 0x9ae05a, 0x8ad04a, -0.2, meadow);
+    const pano = new THREE.Mesh(new THREE.PlaneGeometry(52, 26), new THREE.MeshBasicMaterial({ map: artTexture('rainbow_pano'), toneMapped: false, depthWrite: false }));
+    pano.position.set(0, -6.4, -14.5); pano.renderOrder = -1; g.add(pano);
+    // balloons that float up and down (code-made, glossy)
+    const balloons = [];
+    [[-9, 4.2, 0xff5a9a], [-7.4, 5.2, 0x4ac8ff], [-5.6, 3.8, 0xffd23a], [8.8, 4.6, 0xa86aff], [10.4, 3.6, 0x5ad86a], [6.8, 5.4, 0xff8a3a]].forEach(([x, y, c], i) => {
+      const b = new THREE.Group();
+      const body = new THREE.Mesh(new THREE.SphereGeometry(0.7, 20, 16), new THREE.MeshStandardMaterial({ color: c, roughness: 0.2, metalness: 0.05 })); body.scale.y = 1.2; b.add(body);
+      const str = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 1.6, 4), m(0xffffff, 1)); str.position.y = -1.5; b.add(str);
+      b.position.set(x, y, -6 - (i % 3)); b.userData.ph = i * 1.3; g.add(b); balloons.push(b);
+    });
+    scatter(g, Array.from({ length: 22 }, (_, i) => ({ t: 'flower', x: -12 + i * 1.1, z: 6 + (i % 4) * 0.5 })), -0.2);
+    return { pad: 'cloud', update: (dt, t) => {
+      clouds.userData.drift(dt);
+      balloons.forEach((b) => { b.position.y += Math.sin(t * 0.9 + b.userData.ph) * dt * 0.5; b.rotation.z = Math.sin(t * 0.7 + b.userData.ph) * 0.12; });
+    } };
   },
   // 6. the city street with a school bus
   city(g) {
