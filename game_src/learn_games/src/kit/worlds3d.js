@@ -66,8 +66,8 @@ const BUILD = {
     return { pad: 'float', water: water.material, update: (dt) => { clouds.userData.drift(dt); } };
   },
   // 2. the farm: red barn, silo, fence, hay, cows
-  // 2. the farm: the owner's own video of a farm at sunset is the whole background (sky, ground, barn, animals moving); nothing is
-  // drawn here except an empty first child (every world keeps its sky there). The video itself is shown by the game (main.js).
+  // 2. the farm: the owner's own picture of a farm at sunset is the whole background (sky, ground, barn, animals); nothing is
+  // drawn here except an empty first child (every world keeps its sky there). The picture itself is shown by the game (main.js).
   farm(g) {
     g.add(new THREE.Object3D());
     return { pad: 'wood', video: true, update: () => {} };

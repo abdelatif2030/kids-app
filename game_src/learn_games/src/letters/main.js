@@ -142,30 +142,19 @@ class Game {
   }
 
   /** Moves to another place (a fade, then the new scenery); the first level starts at the pond, each next level somewhere new. */
-  /** The owner's video of the farm (assets/games/art/farm_loop.mp4), behind the transparent canvas; played only while the farm is shown. */
+  /** The owner's picture of the farm at sunset (assets/games/art/farm_bg.webp): the whole background of the farm level, standing
+   *  still, behind the transparent canvas. Shown only while the farm world is shown. */
   _makeVideo() {
     const sh = this.sh;
     const wrap = h('div', { class: 'lw-video' });
-    wrap.style.backgroundImage = `url(${sh.base}../art/farm_poster.webp)`;
-    const v = document.createElement('video');
-    v.src = `${sh.base}../art/farm_loop.mp4`;
-    v.loop = true;
-    v.muted = true;
-    v.defaultMuted = true;
-    v.playsInline = true;
-    v.setAttribute('playsinline', '');
-    v.preload = 'auto';
-    v.disablePictureInPicture = true;
-    wrap.append(v);
+    wrap.style.backgroundImage = `url(${sh.base}../art/farm_bg.webp)`;
     wrap.style.display = 'none';
     sh.root.prepend(wrap);
-    this.video = { wrap, v };
+    this.video = { wrap };
   }
 
   _showVideo(on) {
-    const { wrap, v } = this.video;
-    wrap.style.display = on ? 'block' : 'none';
-    if (on) { const p = v.play(); if (p && p.catch) p.catch(() => {}); } else v.pause();
+    this.video.wrap.style.display = on ? 'block' : 'none';
   }
 
   _goWorld(i, instant) {
@@ -833,7 +822,6 @@ const CSS = `
 .lw-tile u{position:absolute;bottom:calc(var(--u)*.4);right:calc(var(--u)*.8);text-decoration:none;font-size:calc(var(--u)*3.6)}
 .lw-tile.done{background:linear-gradient(180deg,#8aeaa0,#2fb85a);box-shadow:0 calc(var(--u)*.8) 0 #1a7a3a,0 calc(var(--u)*1) calc(var(--u)*2) rgba(20,40,80,.3)}
 .lw-video{position:absolute;inset:0;background:#2a4a8a center/cover no-repeat}
-.lw-video video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 .lw-pic{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#6cc0f0}
 .lw-pic-blur{position:absolute;inset:-5%;width:110%;height:110%;object-fit:cover;filter:blur(18px) brightness(.9);transform:scale(1.05)}
 .lw-pic-box{position:relative}
