@@ -66,22 +66,11 @@ const BUILD = {
     return { pad: 'float', water: water.material, update: (dt) => { clouds.userData.drift(dt); } };
   },
   // 2. the farm: red barn, silo, fence, hay, cows
+  // 2. the farm: the owner's own video of a farm at sunset is the whole background (sky, ground, barn, animals moving); nothing is
+  // drawn here except an empty first child (every world keeps its sky there). The video itself is shown by the game (main.js).
   farm(g) {
-    addSky(g, { top: '#4aa8f0', horizon: '#ffeec8' });
-    const clouds = addClouds(g, 6, { y: 9, z: -18 });
-    ground(g, 0x9ad060, 0x8ac050);
-    const red = m(0xd8302a, 0.7), wh = m(0xffffff, 0.6);
-    g.add(box(5, 3.2, 3.6, red, -7.5, 1.6, -6));
-    const roof = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 2.9, 1.6, 4, 1), m(0x6a3a2a, 0.8)); roof.rotation.y = Math.PI / 4; roof.scale.set(1.25, 1, 0.9); roof.position.set(-7.5, 4.0, -6); roof.castShadow = true; g.add(roof);
-    g.add(box(1.6, 2.2, 0.1, wh, -7.5, 1.1, -4.15)); g.add(box(0.12, 2.2, 0.12, red, -7.5, 1.1, -4.1));
-    g.add(cyl(1.0, 1.0, 5, m(0xc8c8d0, 0.5), -3.2, 2.5, -7.5)); g.add(sph(1.0, m(0xb8b8c0, 0.5), -3.2, 5.0, -7.5));
-    for (let i = -8; i <= 8; i++) { g.add(box(0.2, 1.2, 0.15, wh, i * 1.1, 0.6, -3.4)); }
-    g.add(box(19, 0.14, 0.1, wh, 0, 0.5, -3.4), box(19, 0.14, 0.1, wh, 0, 1.0, -3.4));
-    for (const [x, z] of [[8, -4], [10, -6], [6, -7]]) { const b = cyl(0.8, 0.8, 1.0, m(0xe8c050, 0.9), x, 0.5, z, 20); b.rotation.z = Math.PI / 2; g.add(b); }
-    const cow = makeThing('cow'); cow.scale.setScalar(1.8); cow.position.set(7.5, -0.2, -2.2); cow.rotation.y = -0.5; g.add(cow);
-    const sheep = makeThing('sheep'); sheep.scale.setScalar(1.6); sheep.position.set(-3.5, -0.2, -2.6); sheep.rotation.y = 0.4; g.add(sheep);
-    scatter(g, [{ t: 'tree', x: 11, z: -9, s: 5 }, { t: 'tree', x: -12, z: -9, s: 4.6 }, ...Array.from({ length: 16 }, (_, i) => ({ t: 'flower', x: -11 + i * 1.4, z: 6 + (i % 3) * 0.6 }))], -0.2);
-    return { pad: 'wood', update: (dt, t) => { clouds.userData.drift(dt); cow.position.y = -0.2 + Math.abs(Math.sin(t * 1.2)) * 0.03; } };
+    g.add(new THREE.Object3D());
+    return { pad: 'wood', video: true, update: () => {} };
   },
   // 3. the beach and the sea
   beach(g) {
@@ -280,7 +269,7 @@ export function buildWorld(id) {
   const group = new THREE.Group();
   const info = BUILD[id](group);
   group.visible = false;
-  const life = decorate(id, group, info.water);
+  const life = info.video ? () => {} : decorate(id, group, info.water);
   // A seam for the walk between places: while two worlds slide past each other, each one is cut by a vertical plane that moves
   // with the scroll (the old world keeps what is left of it, the new one what is right of it), so the two floors never overlap
   // (no flicker where both are at the same height, no colour pop at the end). Off = nothing is cut. The sky (first child) is not cut.
@@ -293,6 +282,13 @@ export function buildWorld(id) {
     else if (mode === 'new') { clip.normal.set(1, 0, 0); clip.constant = -x; } // keeps everything right of x
     else { clip.normal.set(-1, 0, 0); clip.constant = 1e5; }
   };
-  return { id, group, pad: info.pad, seam, update: (dt, t) => { info.update(dt, t); life(dt, t); } };
+  // while this world slides away to a world with a video behind it, its sky is cut by the seam too (so the video shows where it left)
+  const skyClip = (on) => {
+    const sky = group.children[0];
+    if (!sky || !sky.material) return;
+    sky.material.clippingPlanes = on ? [clip] : null;
+    sky.material.needsUpdate = true;
+  };
+  return { id, group, pad: info.pad, video: !!info.video, seam, skyClip, update: (dt, t) => { info.update(dt, t); life(dt, t); } };
 }
 export { makeTree };

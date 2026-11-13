@@ -37,7 +37,7 @@ export class Stage {
   constructor(sh, o = {}) {
     this.sh = sh;
     this.o = { bg: 0xdff3ff, ground: 0xd8c8a8, fov: 40, box: [5, 3], dir: [0, 0.45, 0.9], target: [0, 0.8, 0], ...o };
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance', alpha: !!this.o.transparent });
     this.renderer.localClippingEnabled = true; // used by the walk between places (worlds3d seam)
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -46,7 +46,9 @@ export class Stage {
     sh.root.prepend(this.renderer.domElement);
     this.scene = new THREE.Scene();
     polish(this.renderer, this.scene);
-    this.scene.background = new THREE.Color(this.o.bg);
+    // [transparent]: nothing is painted behind the worlds, so a picture or video behind the canvas can show through (the worlds' own skies cover it)
+    this.scene.background = this.o.transparent ? null : new THREE.Color(this.o.bg);
+    if (this.o.transparent) this.renderer.setClearColor(0x000000, 0);
     this.camera = new THREE.PerspectiveCamera(this.o.fov, 1, 0.1, 120);
     this.scene.add(new THREE.HemisphereLight(0xffffff, this.o.ground, 1.6));
     const sun = new THREE.DirectionalLight(0xfff4e0, 2);
