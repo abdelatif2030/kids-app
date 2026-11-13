@@ -49,7 +49,7 @@ for (const q of specs) {
   for (let k = 0; k < 8; k++) {
     res = once(q, box);
     const r = res.rep;
-    if (FIXED.has(q.name) || !(r.left || r.top || r.right || r.bottom)) break;
+    if (FIXED.has(q.name) || q.name.startsWith('b_') || q.name.startsWith('f_') || !(r.left || r.top || r.right || r.bottom)) break;
     let moved = false;
     if (r.left && box.x > 0) { const d = Math.min(GROW, box.x); box.x -= d; box.w += d; moved = true; grown.push('L'); }
     if (r.top && box.y > 0) { const d = Math.min(GROW, box.y); box.y -= d; box.h += d; moved = true; grown.push('T'); }

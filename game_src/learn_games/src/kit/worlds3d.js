@@ -265,31 +265,94 @@ const BUILD = {
     for (const x of [-11.6, -6.8, -2, 2.8, 7.6, 12.4]) prop('gate_f', 1.9, x, -6.2);
     // hay, tractor, trough, scarecrow: at the sides, outside the choices
     prop('haystack_f', 2.0, -9.6, -5, 0); prop('hayroll_f', 1.5, -11.8, -3.4, 0);
-    prop('tractor_f', 2.8, 11.4, -3.6, 0, true); prop('trough_f', 1.5, -13, -1);
+    prop('tractor_f', 2.8, 12.6, -2.2, 0, true); prop('trough_f', 1.5, -13, -1);
     prop('scarecrow_f', 3.6, 9.2, -4.6, 0.03);
     // crates and sunflowers in front (low, at the edges)
     prop('crate_apple', 1.1, -10.8, 5.4); prop('crate_carrot', 1.1, 10.6, 5.6, 0, true); prop('crate_corn', 1.1, 12.2, 4.4);
     for (const [f, h, x, z] of [['sunflower_1', 2.6, -12.4, 3.4], ['sunflower_2', 2.4, -8.4, 6.2], ['sunflower_1', 2.2, 8.2, 6.4], ['sunflower_2', 2.8, 13.6, 1.6], ['sunflower_2', 2.4, -13.8, 6]]) prop(f, h, x, z, 0.04);
     for (let i = 0; i < 30; i++) prop(`tuft_${1 + (i % 3)}`, 0.8 + Math.random() * 0.6, -13 + Math.random() * 26, 4.6 + Math.random() * 3.8, 0.05, Math.random() < 0.5);
-    return { pad: 'wood', update: (dt, t) => { pump.rotation.z = Math.sin(t * 0.6) * 0.01; } };
+    // the animals live here: they breathe, wander a little and peck
+    prop('f_coop', 2.4, -6.2, -7.6); prop('f_milk', 1.1, -6.8, 0.6); prop('f_barrow', 1.3, 7.4, 4.6, 0, true);
+    const animals = [
+      { w: prop('f_cow', 3.4, -8.0, -2.6), x: -8.0, r: 0.5, sp: 0.18, b: 0.03 }, { w: prop('f_sheep', 2.0, -6.2, -4.3, 0, true), x: -6.2, r: 0.4, sp: 0.22, b: 0.03 },
+      { w: prop('f_pig', 2.1, 7.4, -1.6, 0, true), x: 7.4, r: 0.4, sp: 0.25, b: 0.03 }, { w: prop('f_horse', 3.5, 9.4, -3.4, 0, true), x: 9.4, r: 0.3, sp: 0.12, b: 0.02 },
+      { w: prop('f_hen', 1.5, 6.4, 3.0), x: 6.4, r: 0.7, sp: 0.4, b: 0.05 }, { w: prop('f_rooster', 1.9, -7.4, 2.4), x: -7.4, r: 0.4, sp: 0.3, b: 0.04 },
+      { w: prop('f_goat', 2.2, -4.8, -4.8), x: -4.8, r: 0.4, sp: 0.2, b: 0.03 }, { w: prop('f_donkey', 2.4, 5.4, -5.0, 0, true), x: 5.4, r: 0.4, sp: 0.16, b: 0.03 },
+    ];
+    return { pad: 'wood', update: (dt, t) => {
+      pump.rotation.z = Math.sin(t * 0.6) * 0.01;
+      animals.forEach((a, i) => { a.w.position.x = a.x + Math.sin(t * a.sp + i) * a.r; a.w.position.y = -0.2 + Math.abs(Math.sin(t * 2 + i * 1.7)) * a.b; a.w.rotation.z = Math.sin(t * 1.5 + i) * 0.02; });
+    } };
   },
-  // 3. the beach and the sea
+  // 3. the beach and the sea, built from the owner's pictures (2026-11-13), with moving water, flying gulls, a jumping dolphin,
+  // a walking crab, a bobbing boat and a flashing lighthouse
   beach(g) {
-    addSky(g, { top: '#3aa0f0', horizon: '#bfeaff' });
-    const clouds = addClouds(g, 6, { y: 8, z: -18 });
-    ground(g, 0xf0d8a0, 0xe8c888);
-    const sea = new THREE.Mesh(new THREE.PlaneGeometry(80, 18), new THREE.MeshStandardMaterial({ map: waterTex(8), roughness: 0.15, metalness: 0.15 }));
-    sea.rotation.x = -Math.PI / 2; sea.position.set(0, -0.15, -11); g.add(sea);
-    for (const x of [-9, -5, 9, 12]) {
-      const t = new THREE.Group();
-      const trunk = cyl(0.18, 0.28, 4.2, m(0x8a5a2a), 0, 2.1, 0, 8); trunk.rotation.z = x > 0 ? -0.15 : 0.15; t.add(trunk);
-      for (let i = 0; i < 7; i++) { const a = (i / 7) * Math.PI * 2; const leaf = cone(0.35, 2.4, m(0x2aa84a), Math.cos(a) * 1.0, 4.3, Math.sin(a) * 1.0, 6); leaf.rotation.z = Math.cos(a) * 1.2; leaf.rotation.x = -Math.sin(a) * 1.2; t.add(leaf); }
-      t.position.set(x, -0.2, -5); g.add(t);
-    }
-    const um = new THREE.Group(); um.add(cyl(0.05, 0.05, 2.2, m(0xffffff), 0, 1.1, 0, 6)); um.add(cone(1.5, 0.7, m(0xff4a4a), 0, 2.4, 0, 12)); um.position.set(-7, -0.2, 2.2); g.add(um);
-    const boat = makeThing('boat'); boat.scale.setScalar(2.2); boat.position.set(4, -0.1, -9); g.add(boat);
-    for (let i = 0; i < 10; i++) g.add(sph(0.12, m([0xff9ab8, 0xfff0e0, 0xffb870][i % 3]), -10 + i * 2.2, -0.05, 5.5 + (i % 3) * 0.5));
-    return { pad: 'float', water: sea.material, update: (dt, t) => { clouds.userData.drift(dt); boat.position.y = -0.1 + Math.sin(t) * 0.12; boat.rotation.z = Math.sin(t * 0.8) * 0.05; } };
+    addSky(g, { top: '#2a9cf2', horizon: '#c8f0ff' });
+    const clouds = addClouds(g, 7, { y: 9.5, z: -18 });
+    // the far sea (the top of the owner's water picture, flowing) and the sand in front
+    const seaTex = artTexture('ground_water', 5, 0.38); seaTex.offset.y = 0.6;
+    const sea = new THREE.Mesh(new THREE.PlaneGeometry(80, 26), new THREE.MeshBasicMaterial({ map: seaTex, toneMapped: false }));
+    sea.rotation.x = -Math.PI / 2; sea.position.set(0, -0.14, -18); g.add(sea);
+    const sand = artTexture('ground_sand', 11, 6);
+    sand.userData.strip = artTexture('ground_sand', 10, 0.5);
+    ground(g, 0xf2c14a, 0xe8b440, -0.2, sand);
+    // the shore: water -> foam -> sand (the whole picture), lapping in and out
+    const shoreTex = artTexture('ground_water', 5, 1);
+    const shore = new THREE.Mesh(new THREE.PlaneGeometry(80, 7), new THREE.MeshBasicMaterial({ map: shoreTex, toneMapped: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+    shore.rotation.x = -Math.PI / 2; shore.position.set(0, -0.11, -8.6); g.add(shore);
+    const things = [];
+    const prop = (file, h, x, z, opt = {}) => {
+      const w = new THREE.Group();
+      const pc = artProp(file, h);
+      if (opt.flip) pc.scale.x = -1;
+      w.add(pc);
+      w.position.set(x, opt.y ?? -0.2, z);
+      if (opt.sway) w.userData.sway = { amp: opt.sway, ph: Math.random() * 6.28, sp: 0.7 + Math.random() * 0.6 };
+      g.add(w);
+      return w;
+    };
+    // far: lighthouse on its rocks, palms at the sides, the boat on the water
+    const lighthouse = prop('b_lighthouse', 7.5, 13.4, -12.5, { y: -0.4 });
+    const beam = new THREE.Mesh(new THREE.CircleGeometry(1.1, 24), new THREE.MeshBasicMaterial({ color: 0xfff2a0, transparent: true, opacity: 0.0, depthWrite: false, toneMapped: false }));
+    beam.position.set(13.4, 6.6, -12.3); g.add(beam);
+    prop('b_palm1', 6.4, -12.6, -7.5, { sway: 0.018 }); prop('b_palm2', 5.4, 11.4, -7.2, { sway: 0.02, flip: true });
+    prop('b_palm2', 4.6, -7.8, -11.5, { sway: 0.02 }); prop('b_palm1', 5.0, 8.2, -12, { sway: 0.016, flip: true });
+    const boat = prop('b_boat', 2.2, 2.4, -12.8, { y: -0.4 });
+    prop('b_dock', 1.8, -3.6, -8.4, { y: -0.15 });
+    // behind the choices there is nothing tall; at the sides: umbrella, chair, castle, rocks, surfboards
+    prop('b_umbrella', 3.6, -11.2, -2.6, { sway: 0.01 }); prop('b_chair', 1.9, -12.6, -0.4);
+    prop('b_castle', 2.4, 11.6, -2.8); prop('b_rocks', 1.7, 12.8, -5);
+    prop('b_surf', 2.8, 9.6, -4.6, { sway: 0.01 }); prop('b_weed', 1.3, -8.8, -6.2, { sway: 0.05 });
+    prop('b_bucket', 1.0, 10.6, 4.8); prop('b_shell', 0.8, -11, 5.6); prop('b_starfish', 0.8, 11.8, 6.2); prop('b_spiral', 0.7, -9.4, 7); prop('b_shell', 0.7, 8.6, 7.4, { flip: true });
+    prop('b_palm2', 4.4, -14, 4.2, { sway: 0.02 });
+    // living things: the crab walks along the sand, the dolphin leaps, fish and a jellyfish swim, gulls fly across
+    const crab = prop('b_crab_walk', 0.95, -9, 3.6);
+    const turtle = prop('b_turtle', 1.0, 6.2, -6.9, { y: -0.12 });
+    const dolphin = prop('b_dolphin', 2.2, -6, -10, { y: -0.4 });
+    const fish = [prop('b_clown', 0.8, 5, -9.4, { y: -0.1 }), prop('b_tang', 0.8, -9.4, -9.6, { y: -0.1 }), prop('b_yellowfish', 0.7, 0, -10.8, { y: -0.1 })];
+    const jelly = prop('b_jelly', 1.1, 8.8, -9.8, { y: -0.1 });
+    const gulls = [0, 1, 2].map((i) => { const w = new THREE.Group(); w.add(artProp(i % 2 ? 'b_gull_fly2' : 'b_gull_fly', 1.0 + i * 0.12)); w.position.set(-14 + i * 11, 6.2 + i * 0.9, -9 - i); g.add(w); return w; });
+    const standGull = prop('b_gull', 1.1, -3.6, -8.1, { y: -0.12 });
+    return {
+      pad: 'float',
+      update: (dt, t) => {
+        clouds.userData.drift(dt);
+        seaTex.offset.x = (t * 0.012) % 1; seaTex.offset.y = 0.6 + Math.sin(t * 0.5) * 0.02;
+        shoreTex.offset.x = (-t * 0.01) % 1;
+        shore.position.z = -8.6 + Math.sin(t * 0.7) * 0.35; // the waves come in and go out
+        boat.position.y = -0.4 + Math.sin(t * 1.1) * 0.12; boat.rotation.z = Math.sin(t * 0.9) * 0.05; boat.position.x = 2.4 + Math.sin(t * 0.12) * 1.4;
+        lighthouse.rotation.z = Math.sin(t * 0.4) * 0.002; beam.material.opacity = Math.max(0, Math.sin(t * 1.6)) * 0.85;
+        crab.position.x = -9 + Math.sin(t * 0.5) * 2.0; crab.rotation.z = Math.sin(t * 8) * 0.06;
+        // the dolphin leaps out of the sea in an arc every few seconds
+        const k = (t % 7) / 1.6; dolphin.visible = k < 1;
+        if (k < 1) { dolphin.position.x = -8 + k * 5; dolphin.position.y = -0.4 + Math.sin(k * Math.PI) * 2.4; dolphin.rotation.z = (0.5 - k) * 1.2; }
+        fish.forEach((f, i) => { f.position.y = -0.1 + Math.sin(t * 1.3 + i * 2) * 0.12; f.position.x += Math.sin(t * 0.6 + i) * dt * 0.6; });
+        jelly.position.y = -0.1 + Math.abs(Math.sin(t * 1.2)) * 0.35;
+        turtle.position.x = 6.2 + Math.sin(t * 0.25) * 1.2; turtle.position.y = -0.12 + Math.sin(t * 1.4) * 0.05;
+        gulls.forEach((w, i) => { w.position.x += dt * (0.9 + i * 0.25); if (w.position.x > 16) w.position.x = -16; w.children[0].scale.y = 1 + Math.sin(t * 6 + i) * 0.14; w.position.y = 6.2 + i * 0.9 + Math.sin(t * 0.8 + i) * 0.25; });
+        standGull.position.y = -0.12 + Math.max(0, Math.sin(t * 2.2)) * 0.04;
+      },
+    };
   },
   // 4. space: stars, planets, a rocket
   space(g) {
@@ -453,7 +516,7 @@ function decorate(id, g, water) {
   const sways = [];
   g.traverse((o) => { if (o.userData && o.userData.sway) sways.push(o); });
   const add = (obj) => { g.add(obj); ups.push(obj.userData.update); };
-  if (['meadow', 'farm', 'beach', 'rainbow', 'castle', 'city', 'snow'].includes(id)) add(makeBirds(id === 'snow' ? 3 : 5, 6.5, -14, 18));
+  if (['meadow', 'farm', 'rainbow', 'castle', 'city', 'snow'].includes(id)) add(makeBirds(id === 'snow' ? 3 : 5, 6.5, -14, 18));
   if (['meadow', 'rainbow', 'farm', 'castle'].includes(id)) add(makeButterflies(4, -7, 7, 5.2));
   if (id === 'meadow') add(makeJumper());
   return (dt, t) => {

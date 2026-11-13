@@ -66,3 +66,11 @@ fs.writeFileSync(path.join(dst,'..','..','..','game_src','learn_games','src','ki
 rm -f "$OUT"/*.png "$OUT"/*.webp
 for f in "$TMP"/*.png; do ffmpeg -v error -y -i "$f" -c:v libwebp -lossless 1 -compression_level 6 "$OUT/$(basename "${f%.png}").webp"; done
 rm -rf "$TMP"
+
+# sheets 46-54 (beach and farm animals, 2026-11-13)
+cutw 46 542 542 0 0 b_clown; cutw 46 542 542 497 0 b_tang; cutw 46 542 542 1009 0 b_yellowfish; cutw 46 542 542 0 497 b_octopus; cutw 46 542 542 497 497 b_crab_walk; cutw 46 542 542 1009 497 b_gull_fly
+cutw 47 414 371 0 0 b_shell; cutw 47 414 371 369 0 b_spiral; cutw 47 414 371 753 0 b_starfish; cutw 47 414 371 1137 0 b_crab; cutw 47 414 371 0 326 b_jelly; cutw 47 414 371 369 326 b_turtle; cutw 47 414 371 753 326 b_dolphin; cutw 47 414 371 1137 326 b_gull; cutw 47 414 371 0 667 b_gull_fly2; cutw 47 414 371 369 667 b_coral; cutw 47 414 371 753 667 b_ball; cutw 47 414 371 1137 667 b_ring
+cutw 48 414 371 0 0 b_palm1; cutw 48 414 371 369 0 b_palm2; cutw 48 414 371 753 0 b_umbrella; cutw 48 414 371 1137 0 b_castle; cutw 48 414 371 0 326 b_lighthouse; cutw 48 414 371 369 326 b_boat; cutw 48 414 371 753 326 b_dock; cutw 48 414 371 1137 326 b_chair; cutw 48 414 371 0 667 b_rocks; cutw 48 414 371 369 667 b_weed; cutw 48 414 371 753 667 b_surf; cutw 48 414 371 1137 667 b_bucket
+cutw 52 798 542 0 0 f_pad_stump; cutw 52 798 542 753 0 f_pad_hay; cutw 52 798 542 0 497 f_pad_nest; cutw 52 798 542 753 497 f_pad_plank
+cutw 53 414 371 0 0 f_coop; cutw 53 414 371 369 0 f_eggs; cutw 53 414 371 753 0 f_milk; cutw 53 414 371 1137 0 f_barrow; cutw 53 414 371 0 326 f_water_can; cutw 53 414 371 369 326 f_sign; cutw 53 414 371 753 326 f_bucket; cutw 53 414 371 1137 326 f_stool; cutw 53 414 371 0 667 f_barrels; cutw 53 414 371 369 667 f_post; cutw 53 414 371 753 667 f_haypile; cutw 53 414 371 1137 667 f_birdhouse
+cutw 54 458 470 0 0 f_cow; cutw 54 300 380 458 90 f_pig; cutw 54 430 490 770 0 f_horse; cutw 54 346 420 1190 70 f_sheep; cutw 54 340 530 20 480 f_goat; cutw 54 360 540 365 470 f_donkey; cutw 54 340 520 765 500 f_rooster; cutw 54 370 480 1150 530 f_hen
