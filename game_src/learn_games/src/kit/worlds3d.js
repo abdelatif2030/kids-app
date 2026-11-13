@@ -124,6 +124,54 @@ function grassTuft(scale = 1) {
   return g;
 }
 
+
+// ---- worlds made of the owner's pictures (2026-11-13) ---------------------------------------------------------------
+/** A picture standing on the ground. opt: y, flip, center (pivot at the middle, for spinning), anim = {bob, sp, r, wsp, tilt, spin, drive, smooth}. */
+function scenery(g, list) {
+  const prop = (file, h, x, z, opt = {}) => {
+    const w = new THREE.Group();
+    const pc = artProp(file, h);
+    if (opt.flip) pc.scale.x = -1;
+    if (opt.center) pc.position.y = -h / 2;
+    w.add(pc);
+    const y = (opt.y ?? -0.2) + (opt.center ? h / 2 : 0);
+    w.position.set(x, y, z);
+    w.userData.base = { x, y };
+    w.userData.ph = Math.random() * 6.28;
+    if (opt.anim) { w.userData.anim = opt.anim; list.push(w); }
+    if (opt.sway) w.userData.sway = { amp: opt.sway, ph: Math.random() * 6.28, sp: 0.7 + Math.random() * 0.6 };
+    g.add(w);
+    return w;
+  };
+  return prop;
+}
+function tickScenery(list, t, dt) {
+  for (const w of list) {
+    const a = w.userData.anim, b = w.userData.base, ph = w.userData.ph;
+    if (a.drive) { w.position.x += dt * a.drive; if (a.drive > 0 && w.position.x > 17) w.position.x = -17; if (a.drive < 0 && w.position.x < -17) w.position.x = 17; }
+    else if (a.r) w.position.x = b.x + Math.sin(t * (a.wsp || 0.3) + ph) * a.r;
+    if (a.bob) w.position.y = b.y + (a.smooth ? Math.sin(t * (a.sp || 2) + ph) : Math.abs(Math.sin(t * (a.sp || 2) + ph))) * a.bob;
+    if (a.tilt) w.rotation.z = Math.sin(t * (a.tsp || a.sp || 2) + ph) * a.tilt;
+    if (a.spin) w.rotation.z += dt * a.spin;
+  }
+}
+/** Falling snow: small white flakes that drift down and start again at the top. */
+function makeSnowfall(g, n = 110) {
+  const flakes = [];
+  const geo = new THREE.SphereGeometry(0.06, 6, 5), mat = new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false });
+  for (let i = 0; i < n; i++) { const f = new THREE.Mesh(geo, mat); f.position.set(-15 + Math.random() * 30, Math.random() * 11, -10 + Math.random() * 18); f.userData.v = 0.5 + Math.random() * 0.7; f.userData.ph = Math.random() * 6; f.scale.setScalar(0.7 + Math.random() * 1.1); g.add(f); flakes.push(f); }
+  return (dt, t) => { for (const f of flakes) { f.position.y -= dt * f.userData.v; f.position.x += Math.sin(t + f.userData.ph) * dt * 0.25; if (f.position.y < -0.1) { f.position.y = 11; f.position.x = -15 + Math.random() * 30; } } };
+}
+function panoPlane(g, name, bottom) {
+  const pano = new THREE.Mesh(new THREE.PlaneGeometry(52, 26), new THREE.MeshBasicMaterial({ map: artTexture(name), toneMapped: false, depthWrite: false }));
+  pano.position.set(0, bottom, -14.5); pano.renderOrder = -1; g.add(pano);
+}
+function pictureGround(g, tex, rx, ry, c1, c2) {
+  const t = artTexture(tex, rx, ry);
+  t.userData.strip = artTexture(tex, rx - 1, 0.5);
+  ground(g, c1, c2, -0.2, t);
+}
+
 const BUILD = {
   // 1. the sunny pond (the first place)
   meadow(g) {
@@ -402,78 +450,67 @@ const BUILD = {
       },
     };
   },
-  // 5. the rainbow playground: the owner's panorama and flower-meadow texture, drifting balloons and clouds (more pictures to come)
+  // 5. the rainbow playground, all from the owner's pictures
   rainbow(g) {
     addSky(g, { top: '#8ad0ff', horizon: '#ffe0f0' });
-    const clouds = addClouds(g, 6, { y: 9, z: -18 });
-    const meadow = artTexture('ground_rainbow', 11, 6);
-    meadow.userData.strip = artTexture('ground_rainbow', 10, 0.5);
-    ground(g, 0x9ae05a, 0x8ad04a, -0.2, meadow);
-    const pano = new THREE.Mesh(new THREE.PlaneGeometry(52, 26), new THREE.MeshBasicMaterial({ map: artTexture('rainbow_pano'), toneMapped: false, depthWrite: false }));
-    pano.position.set(0, -6.4, -14.5); pano.renderOrder = -1; g.add(pano);
-    // balloons that float up and down (code-made, glossy)
-    const balloons = [];
-    [[-9, 4.2, 0xff5a9a], [-7.4, 5.2, 0x4ac8ff], [-5.6, 3.8, 0xffd23a], [8.8, 4.6, 0xa86aff], [10.4, 3.6, 0x5ad86a], [6.8, 5.4, 0xff8a3a]].forEach(([x, y, c], i) => {
-      const b = new THREE.Group();
-      const body = new THREE.Mesh(new THREE.SphereGeometry(0.7, 20, 16), new THREE.MeshStandardMaterial({ color: c, roughness: 0.2, metalness: 0.05 })); body.scale.y = 1.2; b.add(body);
-      const str = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 1.6, 4), m(0xffffff, 1)); str.position.y = -1.5; b.add(str);
-      b.position.set(x, y, -6 - (i % 3)); b.userData.ph = i * 1.3; g.add(b); balloons.push(b);
-    });
-    scatter(g, Array.from({ length: 22 }, (_, i) => ({ t: 'flower', x: -12 + i * 1.1, z: 6 + (i % 4) * 0.5 })), -0.2);
-    return { pad: 'cloud', update: (dt, t) => {
-      clouds.userData.drift(dt);
-      balloons.forEach((b) => { b.position.y += Math.sin(t * 0.9 + b.userData.ph) * dt * 0.5; b.rotation.z = Math.sin(t * 0.7 + b.userData.ph) * 0.12; });
-    } };
+    const clouds = addClouds(g, 5, { y: 9, z: -18 });
+    pictureGround(g, 'ground_rainbow', 11, 6, 0x9ae05a, 0x8ad04a);
+    panoPlane(g, 'rainbow_pano', -6.4);
+    const live = []; const P = scenery(g, live);
+    P('r_lolli', 5.0, -11.4, -6.4, { sway: 0.012 }); P('r_lolli', 4.4, 10.8, -7.4, { sway: 0.012, flip: true }); P('r_cotton', 4.4, -7.6, -9.6, { sway: 0.012 });
+    P('r_carousel', 3.6, 9.2, -9.4, { sway: 0.006 }); P('r_gingerhouse', 2.8, 4.4, -11.4); P('r_slide', 2.4, -9.6, -3.2); P('r_swing', 2.8, 8.8, -4.2); P('r_seesaw', 1.3, -6.2, -5.6, { anim: { tilt: 0.05, sp: 1.2 } });
+    P('r_balloons', 3.2, -5.2, -7.2, { y: 0.4, anim: { bob: 0.5, sp: 0.9, tilt: 0.06, smooth: true } }); P('r_balloons', 3.0, 6.6, -6.6, { y: 0.6, anim: { bob: 0.45, sp: 0.8, tilt: 0.06, smooth: true } }); P('r_balloons', 2.6, -11.8, -1.4, { y: 0.8, anim: { bob: 0.4, sp: 1.0, tilt: 0.07, smooth: true } });
+    P('r_icecream', 1.6, 11.6, 0.8); P('r_candy', 0.8, -8.4, 6.0); P('r_cupcake', 1.4, -12.2, 1.4);
+    P('r_unicorn', 2.6, -8.4, -1.2, { anim: { bob: 0.12, sp: 3, r: 0.8, wsp: 0.25, tilt: 0.03 } });
+    P('r_butterfly', 1.0, -3, 6, { y: 2.4, anim: { bob: 0.9, sp: 1.3, r: 5, wsp: 0.35, smooth: true, tilt: 0.1 } }); P('r_butterfly', 0.9, 4, 5, { y: 3, anim: { bob: 0.8, sp: 1.5, r: 4, wsp: 0.4, smooth: true, tilt: 0.12 } });
+    P('r_ladybug', 0.7, 7.8, 5.6, { anim: { r: 1.6, wsp: 0.4, bob: 0.03, sp: 6 } });
+    P('r_kite', 2.4, -10.6, 3.0, { y: 3.6, anim: { bob: 0.7, sp: 0.9, r: 0.8, wsp: 0.5, smooth: true, tilt: 0.12 } }); P('r_pinwheel', 1.6, 10.2, -1.6, { center: true, y: 0.1, anim: { spin: 3 } });
+    P('r_sun', 2.4, 10.4, 7.6, { center: true, y: 3.2, anim: { spin: 0.4 } }); P('r_cloud', 1.8, -14, -8, { y: 6.8, anim: { drive: 0.5 } }); P('r_cloud', 1.4, 3, -9, { y: 7.8, anim: { drive: 0.35 } });
+    return { pad: 'cloud', padPics: ['r_pad_candy', 'r_pad_cloud', 'r_pad_rainbow', 'r_pad_cookie'], update: (dt, t) => { clouds.userData.drift(dt); tickScenery(live, t, dt); } };
   },
-  // 6. the city street with a school bus
+  // 6. the city, all from the owner's pictures; vehicles drive past, a helicopter and a plane fly over
   city(g) {
-    addSky(g, { top: '#6ab8f0', horizon: '#e0f0ff' });
-    const clouds = addClouds(g, 5, { y: 10, z: -18 });
-    ground(g, 0x7a7a86, 0x6a6a76);
-    const cols = [0xe86a5a, 0xf0b84a, 0x5ab0e8, 0xa86ad8, 0x6ad8a0, 0xf08ab8];
-    for (let i = 0; i < 9; i++) {
-      const h = 4 + (i * 7) % 5, x = -13 + i * 3.3;
-      g.add(box(2.8, h, 2.4, m(cols[i % 6], 0.7), x, h / 2 - 0.2, -8));
-      for (let r = 0; r < Math.floor(h / 1.2); r++) for (let c = -1; c <= 1; c++) g.add(box(0.5, 0.6, 0.05, m(0xcfe8ff, 0.2), x + c * 0.8, 0.7 + r * 1.2, -6.78));
-    }
-    g.add(box(40, 0.05, 3, m(0x3a3a46, 0.9), 0, -0.17, -3.8));
-    for (let i = 0; i < 12; i++) g.add(box(1.0, 0.06, 0.2, m(0xffe05a), -12 + i * 2.2, -0.13, -3.8));
-    // Traffic: the car and bus pictures are SIDE views facing left, so they stay square to the camera (no turning: a turned
-    // picture is seen edge-on and looks squashed) and drive to the left along the road, then come back in from the right.
-    const traffic = [[makeThing('bus'), 2.5, 1.1, 4], [makeThing('car'), 1.7, 1.7, -7]];
-    for (const [v, sc, , x0] of traffic) { v.scale.setScalar(sc); v.position.set(x0, -0.1, -3.7); g.add(v); }
-    scatter(g, [{ t: 'tree', x: -11, z: -2, s: 3.4 }, { t: 'tree', x: 11, z: -1.5, s: 3.2 }], -0.2);
-    return { pad: 'wood', update: (dt, t) => { clouds.userData.drift(dt); for (const [v, , sp] of traffic) { v.position.x -= sp * dt; if (v.position.x < -17) v.position.x = 17; } } };
+    addSky(g, { top: '#4aa8f0', horizon: '#d8f0ff' });
+    pictureGround(g, 'ground_city', 11, 6, 0x9a9aa8, 0x8a8a98);
+    panoPlane(g, 'city_pano', -7.6);
+    const live = []; const P = scenery(g, live);
+    P('c_skyscraper', 6.4, -11.2, -9.6); P('c_skyscraper', 6.0, 10.6, -10.4, { flip: true }); P('c_school', 4.2, -6.2, -11.4); P('c_hospital', 4.6, 5.8, -11.8); P('c_firestation', 3.6, -1.4, -12.6); P('c_house', 3.2, 12.6, -4.8);
+    P('c_fountain', 2.0, 0.6, -8.2); P('c_lamp', 3.4, -7.8, -5.8); P('c_lamp', 3.4, 7.6, -5.8); P('c_light', 3.2, 11.2, -2.2); P('c_busstop', 2.6, -10.2, -3.4); P('c_bench', 1.2, -12.4, -0.2);
+    P('c_mailbox', 1.5, 9.8, 1.6); P('c_tree', 2.8, -12.8, -6.4, { sway: 0.01 }); P('c_tree', 2.6, 13.2, -7.2, { sway: 0.01 }); P('c_tree', 2.2, 8.6, -6.2, { sway: 0.01 });
+    P('c_citybus', 1.7, -16, -7.6, { anim: { drive: 1.5, bob: 0.03, sp: 7 } }); P('c_taxi', 1.3, 6, -8.6, { flip: true, anim: { drive: -1.9, bob: 0.03, sp: 8 } }); P('c_police', 1.3, -4, -9, { anim: { drive: 2.2, bob: 0.03, sp: 9 } });
+    P('c_firetruck', 1.7, 12, -7.4, { flip: true, anim: { drive: -1.2, bob: 0.03, sp: 6 } }); P('c_schoolbus', 1.8, 2, -7.0, { anim: { drive: 1.0, bob: 0.03, sp: 5 } }); P('c_ambulance', 1.5, -10, -8.4, { flip: true, anim: { drive: -1.6, bob: 0.03, sp: 7 } }); P('c_tram', 1.6, 14, -9.6, { flip: true, anim: { drive: -0.8 } });
+    P('c_bike', 1.4, -15, 6.4, { anim: { drive: 1.3, bob: 0.05, sp: 6 } });
+    P('c_heli', 1.8, -14, -8, { y: 7.2, anim: { drive: 1.6, bob: 0.25, sp: 2, smooth: true } }); P('c_plane', 1.5, 10, -9, { y: 9.2, flip: true, anim: { drive: -2.4 } });
+    return { pad: 'stone', padPics: ['c_pad_manhole', 'c_pad_tire', 'c_pad_round', 'c_pad_cone'], update: (dt, t) => { tickScenery(live, t, dt); } };
   },
-  // 7. the snowy mountains and pines
+  // 7. the snowy mountains, all from the owner's pictures, with falling snow and moving animals
   snow(g) {
-    addSky(g, { top: '#8ac0e8', horizon: '#f0f8ff' });
-    const clouds = addClouds(g, 5, { y: 11, z: -18 });
-    ground(g, 0xf4f8ff, 0xe8f0fa);
-    for (const [x, s] of [[-9, 6], [-2, 7.5], [7, 6.5], [13, 5]]) { g.add(cone(s * 0.7, s, m(0x7a8ab0, 0.9), x, s / 2 - 0.2, -12, 6)); g.add(cone(s * 0.3, s * 0.38, m(0xffffff, 0.6), x, s * 0.82 - 0.2, -12, 6)); }
-    for (const [x, z, s] of [[-8, -4, 3.6], [-6, -5, 3], [8, -4.5, 3.8], [10, -3.6, 3], [-11, -2, 3.2]]) {
-      const t = new THREE.Group(); for (let i = 0; i < 3; i++) t.add(cone(1.1 - i * 0.25, 1.6, m(0x2a8a4a, 0.85), 0, 1.4 + i * 0.9, 0)); t.add(cyl(0.18, 0.2, 1, m(0x6a4a2a), 0, 0.5, 0)); t.scale.setScalar(s / 3.2); t.position.set(x, -0.2, z); g.add(t);
-    }
-    const snowman = new THREE.Group(); snowman.add(sph(0.7, m(0xffffff, 0.5), 0, 0.7, 0), sph(0.5, m(0xffffff, 0.5), 0, 1.6, 0), sph(0.35, m(0xffffff, 0.5), 0, 2.25, 0), cone(0.07, 0.4, m(0xff7a1a), 0, 2.25, 0.35, 8)); snowman.children[3].rotation.x = Math.PI / 2; snowman.position.set(7, -0.2, 2.6); g.add(snowman);
-    const flakes = new THREE.Group();
-    for (let i = 0; i < 80; i++) { const f = sph(0.06, new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false }), (Math.random() - 0.5) * 30, Math.random() * 12, -6 + Math.random() * 12); f.userData.v = 0.5 + Math.random(); flakes.add(f); }
-    g.add(flakes);
-    return { pad: 'ice', update: (dt, t) => { clouds.userData.drift(dt); for (const f of flakes.children) { f.position.y -= f.userData.v * dt; f.position.x += Math.sin(t + f.userData.v * 7) * dt * 0.3; if (f.position.y < 0) f.position.y = 12; } } };
+    addSky(g, { top: '#4a9cf0', horizon: '#f0e0ff' });
+    pictureGround(g, 'ground_snow', 11, 6, 0xeef4ff, 0xe0ecff);
+    panoPlane(g, 'snow_pano', -8.4);
+    const live = []; const P = scenery(g, live);
+    P('w_pine1', 5.6, -11.6, -6.6, { sway: 0.008 }); P('w_pine1', 5.2, 11, -7.4, { sway: 0.008, flip: true }); P('w_pine2', 4.2, -7.8, -9.8, { sway: 0.008 }); P('w_pine2', 4.0, 8.4, -10.2, { sway: 0.008, flip: true });
+    P('w_cabin', 4.4, 5.2, -11.8); P('w_igloo', 2.8, -4.4, -11.6); P('w_snowman', 3.2, -8.8, -2.6, { anim: { tilt: 0.03, sp: 1.2 } }); P('w_sled', 1.3, 10.2, -1.4); P('w_snowballs', 1.0, -6.2, -5.2); P('w_iceblock', 1.5, 12.6, 0.8);
+    P('w_crystal', 2.1, -12.6, -1.2); P('w_pond', 1.4, 8.4, -5.8, { y: -0.17 }); P('w_sign', 2.2, -10.6, 2.4); P('w_skis', 2.2, 11.6, 3.2);
+    P('w_penguin', 1.9, -7.2, 0.6, { anim: { r: 0.9, wsp: 0.35, tilt: 0.1, sp: 5, bob: 0.03 } }); P('w_bear', 2.5, 7.8, -2.4, { anim: { bob: 0.04, sp: 1.6, r: 0.4, wsp: 0.2 } }); P('w_fox', 1.7, -11, 3.6, { anim: { r: 0.8, wsp: 0.4, bob: 0.04, sp: 3 } });
+    P('w_rabbit', 1.3, 9.8, 4.6, { anim: { bob: 0.55, sp: 3.4, r: 1.2, wsp: 0.5 } }); P('w_owl', 1.7, -5.6, -6.4, { anim: { tilt: 0.05, sp: 0.8 } }); P('w_reindeer', 3.1, 4.6, -6.6, { anim: { bob: 0.04, sp: 1.2, r: 0.5, wsp: 0.15, tilt: 0.02 } });
+    P('w_seal', 1.5, 6.4, 3.8, { anim: { bob: 0.1, sp: 1.4, tilt: 0.05, smooth: true } }); P('w_chick', 1.1, -9, 5.2, { anim: { r: 1.0, wsp: 0.6, bob: 0.1, sp: 6 } });
+    const snowfall = makeSnowfall(g);
+    return { pad: 'ice', padPics: ['w_pad_ice', 'w_pad_snow', 'w_pad_log', 'w_pad_crystal'], update: (dt, t) => { tickScenery(live, t, dt); snowfall(dt, t); } };
   },
-  // 8. the castle at sunset
+  // 8. the castle, all from the owner's pictures; flags wave and the people and animals move about
   castle(g) {
-    addSky(g, { top: '#ff9a6a', horizon: '#ffe8a0' });
-    const clouds = addClouds(g, 6, { y: 9, z: -18 });
-    ground(g, 0x7ac860, 0x6ab850);
-    const stone = m(0xe8dcc8, 0.8), roofM = m(0xd8302a, 0.6);
-    g.add(box(7, 4.2, 3, stone, 0, 2.1 - 0.2, -9));
-    for (const x of [-4.2, 4.2]) { g.add(cyl(1.2, 1.2, 5.6, stone, x, 2.6, -9, 20)); g.add(cone(1.5, 2.2, roofM, x, 6.5, -9, 20)); }
-    g.add(cyl(1.0, 1.0, 6.8, stone, 0, 3.2, -10, 20)); g.add(cone(1.3, 2.4, roofM, 0, 7.8, -10, 20));
-    g.add(box(1.6, 2.4, 0.1, m(0x6a3a2a, 0.8), 0, 1.0, -7.45)); g.add(cyl(0.8, 0.8, 0.1, m(0x6a3a2a, 0.8), 0, 2.2, -7.45, 16));
-    for (const x of [-4.2, 0, 4.2]) { const f = box(0.05, 0.9, 0.05, m(0x6a4a2a), x, 9.4, -9); g.add(f); g.add(box(0.7, 0.4, 0.04, m(0xff4a7a), x + 0.35, 9.6, -9)); }
-    for (let i = 0; i < 6; i++) g.add(box(0.3, 0.9, 0.3, stone, -8 + i * 3.2, 0.3, -5.2));
-    scatter(g, [{ t: 'tree', x: -10, z: -5, s: 4.6 }, { t: 'tree', x: 10.5, z: -5, s: 4.4 }, ...Array.from({ length: 18 }, (_, i) => ({ t: 'flower', x: -12 + i * 1.4, z: 6 + (i % 3) * 0.6 }))], -0.2);
-    return { pad: 'stone', update: (dt) => clouds.userData.drift(dt) };
+    addSky(g, { top: '#3a9cf2', horizon: '#c8ecff' });
+    const clouds = addClouds(g, 4, { y: 10, z: -18 });
+    pictureGround(g, 'ground_castle', 10, 5.5, 0xb8aa88, 0xa89a78);
+    panoPlane(g, 'castle_pano', -7.8);
+    const live = []; const P = scenery(g, live);
+    P('k_tower', 5.8, -11.8, -8.2); P('k_tower', 5.4, 11.4, -8.6, { flip: true }); P('k_gate', 4.6, -1.2, -12.4); P('k_wall', 2.8, -6.2, -9.8); P('k_wall', 2.8, 6.4, -10.2);
+    P('k_stall', 3.0, 10.4, -4.2); P('k_well', 2.3, -9.8, -3.6); P('k_chest', 1.3, 11.8, 1.8); P('k_catapult', 2.5, -12.8, -0.8); P('k_cannon', 1.8, 12.8, -1.8); P('k_shield', 1.9, -8.2, 3.6); P('k_cottage', 3.2, -14, -5.8);
+    P('k_banner', 3.6, -5.2, -6.6, { sway: 0.05 }); P('k_banner', 3.6, 5.6, -6.8, { sway: 0.05 }); P('k_torch', 2.4, -7.2, -7.0, { anim: { tilt: 0.03, sp: 6 } }); P('k_torch', 2.4, 8.2, -7.0, { anim: { tilt: 0.03, sp: 7 } });
+    P('k_knight', 3.1, -8.8, -1.0, { anim: { bob: 0.05, sp: 2, tilt: 0.03 } }); P('k_princess', 3.0, 8.6, -1.6, { anim: { bob: 0.05, sp: 1.6, tilt: 0.03 } }); P('k_king', 3.3, -6.6, -4.4, { anim: { tilt: 0.03, sp: 1.2 } }); P('k_queen', 3.0, 6.8, -4.8, { anim: { tilt: 0.03, sp: 1.1 } });
+    P('k_dragon', 3.0, 11.6, 3.4, { flip: true, anim: { bob: 0.08, sp: 2, tilt: 0.04 } }); P('k_horse', 3.0, -12, 2.2, { anim: { bob: 0.04, sp: 1.8, r: 0.5, wsp: 0.2 } }); P('k_jester', 2.6, 9.8, 5.0, { anim: { bob: 0.35, sp: 3.2 } }); P('k_wizard', 3.0, -9.8, 4.6, { anim: { tilt: 0.04, sp: 1.4 } });
+    return { pad: 'stone', padPics: ['k_pad_stone', 'k_pad_velvet', 'k_pad_shield', 'k_pad_gold'], update: (dt, t) => { clouds.userData.drift(dt); tickScenery(live, t, dt); } };
   },
 };
 
