@@ -56,7 +56,7 @@ function fitThing(item, h, w) {
 const SCALE = { camel: 1.15, horse: 1.15, giraffe: 0.8, rocket: 1.1, crescent: 1.4, cow: 1.1, bear: 1.3, bed: 1.05, tub: 1.05, pot: 1.25, plate: 1.25, bowl: 1.25, soap: 1.3, backpack: 1.25, toothbrush: 1.3, heart: 1.4, carrot: 1.5, bone: 1.6, grass: 1.3, honey: 1.5, cheese: 1.4, seeds: 1.6 };
 const HAND = new THREE.Vector3(-5.0, 2.8, 2.0);
 const LANDSCAPE = { portrait: false, span: 9.2, off: 0.9, zs: [-1.3, -0.2], hero: [-4.4, 4.6, 1.3], owl: [-6.7, 4.0, 0.85], stand: [-1.5, 5.4], cam: { box: [9.0, 5.1], target: [0, 2.5, 0.3], minAspect: 0 } };
-const PORTRAIT = { portrait: true, span: 6.6, off: 0, zs: [-4.4, -2.5], hero: [-2.2, 5.8, 1.25], owl: [0.2, 5.4, 0.85], stand: [2.6, 3.4], cam: { box: [5.6, 4.4], target: [0, 2.6, 1.8], minAspect: 0 } };
+const PORTRAIT = { portrait: true, span: 8.0, off: 0, zs: [-4.4, -2.5], hero: [-2.2, 5.8, 1.25], owl: [0.2, 5.4, 0.85], stand: [2.6, 3.4], cam: { box: [6.6, 4.4], target: [0, 2.6, 1.8], minAspect: 0 } };
 const STAND = new THREE.Vector3(-1.5, 0, 5.4); // the picture of the question stands in FRONT of the choices (nearer the child), not among them
 const RACK = new THREE.Vector3(5.2, 0, 3.0);
 const RACK_S = 0.6;

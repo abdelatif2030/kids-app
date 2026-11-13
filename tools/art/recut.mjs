@@ -29,7 +29,7 @@ const dims = JSON.parse(fs.readFileSync(DIMS, 'utf8'));
 const GROW = 10;
 // pictures that touch a neighbour on the sheet: growing the box would swallow the neighbour, so they keep their box (the neighbour's
 // pieces are dropped by matte.mjs) - checked by eye
-const FIXED = new Set(['elephant', 'lion', 'boy_idle']);
+const FIXED = new Set(['elephant', 'lion', 'boy_idle', 'pump_f', 'scarecrow_f', 'crate_apple', 'crate_carrot', 'crate_corn']);
 
 function once(q, box) {
   const filt = `format=rgba,crop=${box.w}:${box.h}:${box.x}:${box.y}` + (q.erase ? `,drawbox=x=${q.erase[0] + q.x - box.x}:y=${q.erase[1] + q.y - box.y}:w=${q.erase[2]}:h=${q.erase[3]}:color=white:t=fill` : '');

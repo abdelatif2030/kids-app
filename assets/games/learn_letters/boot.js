@@ -21,7 +21,7 @@
   window.crStop = function () { if (game) game.dispose(); game = null; };
   if (!window.RehlatyRace) {
     var q = new URLSearchParams(location.search);
-    window.crStart({ lang: q.get('lang') || 'ar', age: Number(q.get('age') || 5), gender: q.get("g") || "boy" });
+    window.crStart({ lang: q.get('lang') || 'ar', age: Number(q.get('age') || 5), gender: q.get("g") || "boy", level: q.get('level') || undefined });
   } else {
     post({ type: 'loaded' });
   }

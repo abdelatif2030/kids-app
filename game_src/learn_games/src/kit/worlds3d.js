@@ -231,21 +231,47 @@ const BUILD = {
   },
   // 2. the farm: red barn, silo, fence, hay, cows
   farm(g) {
-    addSky(g, { top: '#4aa8f0', horizon: '#ffeec8' });
-    const clouds = addClouds(g, 6, { y: 9, z: -18 });
-    ground(g, 0x9ad060, 0x8ac050);
-    const red = m(0xd8302a, 0.7), wh = m(0xffffff, 0.6);
-    g.add(box(5, 3.2, 3.6, red, -7.5, 1.6, -6));
-    const roof = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 2.9, 1.6, 4, 1), m(0x6a3a2a, 0.8)); roof.rotation.y = Math.PI / 4; roof.scale.set(1.25, 1, 0.9); roof.position.set(-7.5, 4.0, -6); roof.castShadow = true; g.add(roof);
-    g.add(box(1.6, 2.2, 0.1, wh, -7.5, 1.1, -4.15)); g.add(box(0.12, 2.2, 0.12, red, -7.5, 1.1, -4.1));
-    g.add(cyl(1.0, 1.0, 5, m(0xc8c8d0, 0.5), -3.2, 2.5, -7.5)); g.add(sph(1.0, m(0xb8b8c0, 0.5), -3.2, 5.0, -7.5));
-    for (let i = -8; i <= 8; i++) { g.add(box(0.2, 1.2, 0.15, wh, i * 1.1, 0.6, -3.4)); }
-    g.add(box(19, 0.14, 0.1, wh, 0, 0.5, -3.4), box(19, 0.14, 0.1, wh, 0, 1.0, -3.4));
-    for (const [x, z] of [[8, -4], [10, -6], [6, -7]]) { const b = cyl(0.8, 0.8, 1.0, m(0xe8c050, 0.9), x, 0.5, z, 20); b.rotation.z = Math.PI / 2; g.add(b); }
-    const cow = makeThing('cow'); cow.scale.setScalar(1.8); cow.position.set(7.5, -0.2, -2.2); cow.rotation.y = -0.5; g.add(cow);
-    const sheep = makeThing('sheep'); sheep.scale.setScalar(1.6); sheep.position.set(-3.5, -0.2, -2.6); sheep.rotation.y = 0.4; g.add(sheep);
-    scatter(g, [{ t: 'tree', x: 11, z: -9, s: 5 }, { t: 'tree', x: -12, z: -9, s: 4.6 }, ...Array.from({ length: 16 }, (_, i) => ({ t: 'flower', x: -11 + i * 1.4, z: 6 + (i % 3) * 0.6 }))], -0.2);
-    return { pad: 'wood', update: (dt, t) => { clouds.userData.drift(dt); cow.position.y = -0.2 + Math.abs(Math.sin(t * 1.2)) * 0.03; } };
+    // The farm, built from the owner's own pictures (2026-11-13): his farm panorama stands far behind, the lawn is his grass texture,
+    // two ploughed field patches use his field texture, and the barn, silo, windmill pump, gate fence, hay, tractor, crates, scarecrow
+    // and sunflowers are his props. Everything stands BEHIND the rows of choices (z <= -5.4) or far to the sides / in front, so a
+    // choice is never hidden by a prop.
+    addSky(g, { top: '#4aa8f0', horizon: '#bfe6ff' });
+    const lawn = artTexture('ground_grass', 12, 7);
+    lawn.userData.strip = artTexture('ground_grass', 11, 0.55);
+    ground(g, 0x86d46a, 0x76c85c, -0.2, lawn);
+    // the panorama: the horizon of the picture (fence, barn, hills) sits just beyond the far edge of the lawn
+    const pano = new THREE.Mesh(new THREE.PlaneGeometry(52, 26), new THREE.MeshBasicMaterial({ map: artTexture('farm_pano'), toneMapped: false, depthWrite: false }));
+    pano.position.set(0, -11.2, -14.5); pano.renderOrder = -1; g.add(pano);
+    // ploughed field patches (the owner's field texture) behind, left and right
+    for (const x of [-12.5, 13]) {
+      const f = new THREE.Mesh(new THREE.PlaneGeometry(9, 5), new THREE.MeshStandardMaterial({ map: artTexture('ground_farm', 2.2, 1.2), roughness: 1, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+      f.rotation.x = -Math.PI / 2; f.position.set(x, -0.17, -10.5); f.receiveShadow = true; g.add(f);
+    }
+    const prop = (file, h, x, z, sway = 0, flip = false) => {
+      const w = new THREE.Group();
+      const pc = artProp(file, h);
+      if (flip) pc.scale.x = -1;
+      w.add(pc);
+      w.position.set(x, -0.2, z);
+      if (sway) w.userData.sway = { amp: sway, ph: Math.random() * 6.28, sp: 0.7 + Math.random() * 0.6 };
+      g.add(w);
+      return w;
+    };
+    // far row (z -9 .. -12): barn, silo, the windmill pump, trees
+    prop('barn_f', 5.2, -3.2, -11.5); prop('silo_f', 6.4, -7.4, -12);
+    const pump = prop('pump_f', 6.2, 4.6, -11);
+    prop('tree_oak', 6.4, -13.8, -9.5, 0.01, true); prop('tree_apple', 5.6, 14.2, -9.8, 0.01);
+    // the gate fence runs across behind the choices
+    for (const x of [-11.6, -6.8, -2, 2.8, 7.6, 12.4]) prop('gate_f', 1.9, x, -6.2);
+    // hay, tractor, trough, scarecrow: at the sides, outside the choices
+    prop('haystack_f', 2.0, -9.6, -5, 0); prop('hayroll_f', 1.5, -11.8, -3.4, 0);
+    prop('tractor_f', 2.8, 11.4, -3.6, 0, true); prop('trough_f', 1.5, -13, -1);
+    prop('scarecrow_f', 3.6, 9.2, -4.6, 0.03);
+    // crates and sunflowers in front (low, at the edges)
+    prop('crate_apple', 1.1, -10.8, 5.4); prop('crate_carrot', 1.1, 10.6, 5.6, 0, true); prop('crate_corn', 1.1, 12.2, 4.4);
+    for (const [f, h, x, z] of [['sunflower_1', 2.6, -12.4, 3.4], ['sunflower_2', 2.4, -8.4, 6.2], ['sunflower_1', 2.2, 8.2, 6.4], ['sunflower_2', 2.8, 13.6, 1.6], ['sunflower_2', 2.4, -13.8, 6]]) prop(f, h, x, z, 0.04);
+    for (let i = 0; i < 30; i++) prop(`tuft_${1 + (i % 3)}`, 0.8 + Math.random() * 0.6, -13 + Math.random() * 26, 4.6 + Math.random() * 3.8, 0.05, Math.random() < 0.5);
+    return { pad: 'wood', update: (dt, t) => { pump.rotation.z = Math.sin(t * 0.6) * 0.01; } };
   },
   // 3. the beach and the sea
   beach(g) {

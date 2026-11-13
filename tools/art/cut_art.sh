@@ -54,6 +54,11 @@ cutw 39 520 510 0 0 cat_n; cutw 39 520 510 520 0 horse_n; cutw 39 496 510 1040 0
 cutw 40 400 440 10 5 windmill_p; cutw 40 540 380 400 70 house_p; cutw 40 445 440 905 5 tree_oak; cutw 40 332 390 1340 55 tree_apple
 cutw 40 215 175 10 465 tuft_1; cutw 40 225 175 225 465 tuft_2; cutw 40 225 175 450 465 tuft_3; cutw 40 370 200 700 465 lotus_p; cutw 40 560 185 1100 470 fence_p
 cutw 40 510 290 10 645 hay_p; cutw 40 550 125 560 735 stones_p; cutw 40 520 255 1140 665 flowers_p
+# sheets 41-44 (owner's ChatGPT: last level-1 things, living things, farm props)
+cutw 41 768 512 0 0 frog_n; cutw 41 768 512 768 0 plane_n; cutw 41 768 512 0 512 grapes_n; cutw 41 768 512 768 512 dove_n
+cutw 42 240 190 40 25 butterfly_1; cutw 42 230 220 320 50 butterfly_2; cutw 42 215 180 135 190 butterfly_3; cutw 42 410 335 600 15 bird_blue; cutw 42 450 355 1060 15 bird_yellow; cutw 42 505 320 205 670 dragonfly; cutw 42 500 305 880 690 ladybug_leaf
+cutw 44 520 385 10 10 barn_f; cutw 44 205 385 565 20 silo_f; cutw 44 245 390 815 8 pump_f; cutw 44 465 190 1060 160 gate_f; cutw 44 260 235 5 440 hayroll_f; cutw 44 250 235 265 430 haystack_f; cutw 44 300 175 525 490 trough_f
+cutw 44 275 340 825 392 scarecrow_f; cutw 44 430 320 1105 395 tractor_f; cutw 44 275 245 40 725 crate_apple; cutw 44 265 255 320 715 crate_carrot; cutw 44 270 245 588 725 crate_corn; cutw 44 185 285 1005 705 sunflower_1; cutw 44 210 255 1230 735 sunflower_2
 node -e "
 const fs=require('fs'),path=require('path');const dir=process.argv[1];const dst=process.argv[2];const out={};
 for(const f of fs.readdirSync(dir)){if(!f.endsWith('.png'))continue;const b=fs.readFileSync(path.join(dir,f));out[f.slice(0,-4)]=[b.readUInt32BE(16),b.readUInt32BE(20)];}
