@@ -34678,7 +34678,7 @@ this.b=b},
 um(a,b,c,d,e,f,g){return new A.Bv(a,b,d,e,f,g)},
 bVo(a){var s,r,q,p=A.a([],t.OJ)
 for(s=$.OR(),r=0;r<10;++r){q=s[r]
-if(q.a==="letter_fishing"&&a>=q.e&&a<=q.f)p.push(q)}return p},
+if(q.a==="letter_fishing")p.push(q)}return p},
 axy(a){var s=a.x
 return s},
 Bv:function Bv(a,b,c,d,e,f){var _=this
