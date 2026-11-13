@@ -65,8 +65,7 @@ class Game {
     const sh = this.sh;
     setArtBase(`${sh.base}../art/`);
     this.girl = sh.T.girl;
-    this.st = new Stage(sh, { transparent: true, bg: 0xcfeeff, ground: 0x9ad0a0, fov: 40, box: [7.2, 3.9], dir: [0, 0.5, 1], target: [0, 1.0, 0.8] });
-    this._makeVideo();
+    this.st = new Stage(sh, { bg: 0xcfeeff, ground: 0x9ad0a0, fov: 40, box: [7.2, 3.9], dir: [0, 0.5, 1], target: [0, 1.0, 0.8] });
     this.opts = new Map();
     this.rackItems = [];
     this.cheerN = Math.floor(Math.random() * 9);
@@ -142,32 +141,6 @@ class Game {
   }
 
   /** Moves to another place (a fade, then the new scenery); the first level starts at the pond, each next level somewhere new. */
-  /** The owner's video of the farm (assets/games/art/farm_loop.mp4), behind the transparent canvas; played only while the farm is shown. */
-  _makeVideo() {
-    const sh = this.sh;
-    const wrap = h('div', { class: 'lw-video' });
-    wrap.style.backgroundImage = `url(${sh.base}../art/farm_poster.webp)`;
-    const v = document.createElement('video');
-    v.src = `${sh.base}../art/farm_loop.mp4`;
-    v.loop = true;
-    v.muted = true;
-    v.defaultMuted = true;
-    v.playsInline = true;
-    v.setAttribute('playsinline', '');
-    v.preload = 'auto';
-    v.disablePictureInPicture = true;
-    wrap.append(v);
-    wrap.style.display = 'none';
-    sh.root.prepend(wrap);
-    this.video = { wrap, v };
-  }
-
-  _showVideo(on) {
-    const { wrap, v } = this.video;
-    wrap.style.display = on ? 'block' : 'none';
-    if (on) { const p = v.play(); if (p && p.catch) p.catch(() => {}); } else v.pause();
-  }
-
   _goWorld(i, instant) {
     const id = WORLD_IDS[i % WORLD_IDS.length];
     if (this.worldId === id) return;
@@ -177,7 +150,6 @@ class Game {
       this.world = this.worlds[id];
       this.worldId = id;
       this.padStyle = PADS[this.world.pad];
-      this._showVideo(!!this.world.video);
     };
     if (instant) { swap(); return; }
     this.fade.classList.add('on');
@@ -676,7 +648,6 @@ class Game {
     to.group.position.x = SHIFT;
     from.seam('old', SEAM_X);
     to.seam('new', SEAM_X);
-    if (to.video) { this._showVideo(true); from.skyClip(true); } // the video shows where the old world has slid away
     const sky = to.group.children[0];
     if (sky && sky.material) { sky.material.transparent = true; sky.material.opacity = 0; }
     let foot = 0;
@@ -693,8 +664,6 @@ class Game {
       clearTimeout(stepTimer);
       from.seam('off');
       to.seam('off');
-      from.skyClip(false);
-      this._showVideo(!!to.video);
       from.group.visible = false;
       from.group.position.x = 0;
       to.group.position.x = 0;
@@ -832,8 +801,6 @@ const CSS = `
 .lw-tile span{font-size:calc(var(--u)*3.3);line-height:1.15;text-align:center}
 .lw-tile u{position:absolute;bottom:calc(var(--u)*.4);right:calc(var(--u)*.8);text-decoration:none;font-size:calc(var(--u)*3.6)}
 .lw-tile.done{background:linear-gradient(180deg,#8aeaa0,#2fb85a);box-shadow:0 calc(var(--u)*.8) 0 #1a7a3a,0 calc(var(--u)*1) calc(var(--u)*2) rgba(20,40,80,.3)}
-.lw-video{position:absolute;inset:0;background:#2a4a8a center/cover no-repeat}
-.lw-video video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
 .lw-pic{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#6cc0f0}
 .lw-pic-blur{position:absolute;inset:-5%;width:110%;height:110%;object-fit:cover;filter:blur(18px) brightness(.9);transform:scale(1.05)}
 .lw-pic-box{position:relative}
