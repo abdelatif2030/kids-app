@@ -3,7 +3,7 @@
 // code: sky, ground, scenery and the look of the floating pads the pictures stand on. `buildWorld(id)` returns
 // { group, pad, update(dt, time) }. Nothing is downloaded.
 import * as THREE from 'three';
-import { addSky, addClouds, scatter, makeTree } from './realism.js';
+import { addSky, addClouds, scatter, makeTree, makeFlower, makeRock } from './realism.js';
 import { makeThing } from './things3d.js';
 
 const m = (c, r = 0.8, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: r, ...o });
@@ -50,20 +50,80 @@ function waterTex(rep = 3) {
 const BUILD = {
   // 1. the sunny pond (the first place)
   meadow(g) {
-    addSky(g);
-    const clouds = addClouds(g, 7, { y: 9, z: -18 });
+    // The first place, developed after the owner's own design picture (2026-11-13): a windmill whose blades turn, a red-roofed barn
+    // with hay, a wooden fence, rolling hills, a pond with a stone rim, lily pads with pink lotus flowers, stepping stones and
+    // bright flowers. Everything is made of shapes in code.
+    addSky(g, { top: '#3a9cf2', horizon: '#c4ecff' });
+    const clouds = addClouds(g, 8, { y: 9.5, z: -18 });
+    // rolling hills and far mountains behind everything (only their tops show)
+    for (const [x, z, r, c, y] of [[-14, -17, 9, 0x6cc860, -5.5], [2, -20, 12, 0x7ad06a, -8], [16, -16, 9, 0x62c05a, -5.2], [-4, -24, 14, 0x9ad89a, -9.5]]) {
+      const h = sph(r, m(c, 1), x, y, z); h.scale.y = 0.55; h.castShadow = false; g.add(h);
+    }
+    for (const [x, z, h, c] of [[-18, -30, 9, 0x9ab8e8], [-2, -32, 11, 0xa8c4ee], [14, -30, 8, 0x9ab8e8]]) g.add(cone(h * 0.85, h, m(c, 1), x, h / 2 - 1.5, z, 5));
     scatter(g, [
       { t: 'tree', x: -9.5, z: -5, s: 5.2 }, { t: 'tree', x: 9.8, z: -4.5, s: 4.6 }, { t: 'tree', x: -13, z: -2, s: 4.2 }, { t: 'tree', x: 13.5, z: -2.5, s: 5 },
-      { t: 'bush', x: -8, z: 3.8, s: 0.9 }, { t: 'bush', x: 8.6, z: 3.5, s: 0.8 }, { t: 'rock', x: -7.4, z: 4.8, s: 0.55 },
-      ...Array.from({ length: 22 }, (_, i) => ({ t: 'flower', x: -12 + i * 1.12 + Math.sin(i) * 0.4, z: 6 + (i % 4) * 0.6 + Math.cos(i * 2) * 0.5 })),
+      { t: 'tree', x: -5.8, z: -9.5, s: 3.6 }, { t: 'tree', x: 5.5, z: -10, s: 3.8 },
+      { t: 'bush', x: -8, z: 3.8, s: 0.9 }, { t: 'bush', x: 8.6, z: 3.5, s: 0.8 }, { t: 'bush', x: -10.5, z: 0.5, s: 0.9 }, { t: 'bush', x: 11, z: 1, s: 0.85 }, { t: 'rock', x: -7.4, z: 4.8, s: 0.55 }, { t: 'rock', x: 7.2, z: 5.2, s: 0.5 },
+      ...Array.from({ length: 30 }, (_, i) => ({ t: 'flower', x: -12.5 + i * 0.86 + Math.sin(i) * 0.4, z: 6 + (i % 4) * 0.6 + Math.cos(i * 2) * 0.5 })),
+      ...Array.from({ length: 8 }, (_, i) => ({ t: 'flower', x: -12 + i * 0.9, z: 1.5 + Math.sin(i * 1.7) * 0.8 })),
+      ...Array.from({ length: 8 }, (_, i) => ({ t: 'flower', x: 8.2 + i * 0.7, z: 2 + Math.cos(i * 1.3) * 0.8 })),
     ], -0.2);
-    ground(g, 0x8ad070, 0x7ac860);
-    const bank = new THREE.Mesh(new THREE.CylinderGeometry(6.4, 6.6, 0.3, 48), m(0xc8a070, 1)); bank.scale.z = 0.62; bank.position.y = -0.12; g.add(bank);
+    ground(g, 0x86d46a, 0x76c85c);
+    // the windmill (left, behind): a stone tower with a red cone roof, a door and four lattice blades that turn
+    const wm = new THREE.Group();
+    const stone = m(0xeadfc4, 0.9), red = m(0xd8382a, 0.7), wood = m(0x9a6232, 0.9);
+    wm.add(cyl(1.0, 1.55, 4.4, stone, 0, 2.2, 0, 20), cone(1.3, 1.5, red, 0, 5.15, 0, 20));
+    wm.add(box(0.7, 1.2, 0.12, wood, 0, 0.6, 1.5), box(0.4, 0.5, 0.1, m(0x7ac0f0, 0.3), 0, 3.0, 1.1));
+    const blades = new THREE.Group();
+    for (let k = 0; k < 4; k++) {
+      const arm = new THREE.Group();
+      arm.add(box(0.14, 3.9, 0.06, wood, 0, 2.1, 0), box(0.8, 3.0, 0.03, m(0xf0e4c8, 0.9), 0.45, 2.3, 0));
+      for (let j = 0; j < 5; j++) arm.add(box(0.8, 0.05, 0.05, wood, 0.4, 0.8 + j * 0.62, 0));
+      arm.rotation.z = (k * Math.PI) / 2;
+      blades.add(arm);
+    }
+    blades.position.set(0, 4.1, 1.35);
+    wm.add(blades, sph(0.22, wood, 0, 4.1, 1.38));
+    wm.position.set(-7.0, 0, -9.5);
+    wm.scale.setScalar(1.0);
+    g.add(wm);
+    // the barn (right, behind): wooden walls, a red roof, big doors and hay bales
+    const barn = new THREE.Group();
+    barn.add(box(5.2, 3.0, 3.6, m(0xc98a4e, 0.85), 0, 1.5, 0));
+    const roof = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 3.2, 1.9, 4, 1), red); roof.rotation.y = Math.PI / 4; roof.scale.set(1.3, 1, 0.82); roof.position.y = 3.9; roof.castShadow = true; barn.add(roof);
+    barn.add(box(1.7, 2.1, 0.12, m(0x8a5428, 0.9), 0, 1.05, 1.85), box(0.12, 2.1, 0.14, m(0xe8c888, 0.9), 0, 1.05, 1.9), box(0.9, 0.8, 0.1, m(0xffe8a8, 0.3, { emissive: 0xffc860, emissiveIntensity: 0.5 }), -1.8, 1.9, 1.85));
+    for (const [x, z] of [[3.4, 0.9], [3.9, -0.6], [3.0, -1.6]]) { const b = cyl(0.62, 0.62, 0.95, m(0xf0c850, 0.95), x, 0.48, z, 18); b.rotation.z = Math.PI / 2; barn.add(b); }
+    barn.position.set(8.2, 0, -9.2);
+    g.add(barn);
+    // a wooden fence behind the pond
+    const fw = m(0xb07a3e, 0.9);
+    for (let i = -11; i <= 11; i++) g.add(box(0.2, 1.15, 0.2, fw, i * 1.05, 0.5, -4.9));
+    g.add(box(24, 0.12, 0.1, fw, 0, 0.35, -4.9), box(24, 0.12, 0.1, fw, 0, 0.85, -4.9));
+    // the pond with a stone rim, lily pads and pink lotus flowers
+    const bank = new THREE.Mesh(new THREE.CylinderGeometry(6.5, 6.7, 0.3, 48), m(0xb89a64, 1)); bank.scale.z = 0.62; bank.position.y = -0.12; g.add(bank);
     const water = new THREE.Mesh(new THREE.CylinderGeometry(6.1, 6.1, 0.3, 48), new THREE.MeshStandardMaterial({ map: waterTex(), roughness: 0.2, metalness: 0.1 }));
     water.scale.z = 0.58; water.position.y = -0.08; g.add(water);
-    for (const [x, z, r] of [[-5.1, -1.7, 0.5], [4.9, -1.9, 0.6], [-4.6, 1.2, 0.45], [5.2, 1.0, 0.5], [-1.6, -2.6, 0.5], [2.4, -2.5, 0.42]]) g.add(cyl(r, r, 0.04, m(0x3aa84a), x, 0.1, z, 20));
+    for (let i = 0; i < 26; i++) {
+      const a = (i / 26) * Math.PI * 2;
+      const rk = makeRock(0.3 + ((i * 7) % 5) * 0.05); rk.position.set(Math.cos(a) * 6.45, 0.02, Math.sin(a) * 3.95); rk.rotation.y = a; g.add(rk);
+    }
+    const lotus = [];
+    for (const [x, z, r] of [[-5.1, -1.7, 0.5], [4.9, -1.9, 0.6], [-4.6, 1.2, 0.45], [5.2, 1.0, 0.5], [-1.6, -2.6, 0.5], [2.4, -2.5, 0.42], [-3.2, 2.5, 0.4], [3.4, 2.6, 0.45]]) {
+      g.add(cyl(r, r, 0.04, m(0x3aa84a), x, 0.1, z, 20));
+      if (r >= 0.45) { const f = makeFlower(0xff7ab8, 0.1); f.position.set(x + r * 0.2, 0.12, z); f.scale.setScalar(1.7); g.add(f); lotus.push(f); }
+    }
     for (let i = 0; i < 14; i++) { const a = (i / 14) * Math.PI * 1.1 + Math.PI * 1.05; g.add(cyl(0.03, 0.05, 1.5, m(0x4a9a3a), Math.cos(a) * 6.5, 0.5, Math.sin(a) * 3.9, 6)); }
-    return { pad: 'float', water: water.material, update: (dt) => { clouds.userData.drift(dt); } };
+    // stepping stones in the front left
+    for (const [x, z, r] of [[-9, 5.6, 0.5], [-7.7, 5.1, 0.45], [-6.4, 4.8, 0.5], [-5.2, 4.9, 0.42], [-9.8, 6.4, 0.4]]) { const st = cyl(r, r * 1.05, 0.1, m(0xc8c0b0, 0.95), x, -0.15, z, 14); st.scale.z = 0.8; g.add(st); }
+    return {
+      pad: 'float',
+      water: water.material,
+      update: (dt, t) => {
+        clouds.userData.drift(dt);
+        blades.rotation.z -= dt * 0.7; // the windmill turns
+        lotus.forEach((f, i) => { f.rotation.z = Math.sin(t * 1.1 + i) * 0.06; f.position.y = 0.12 + Math.sin(t * 1.3 + i * 1.7) * 0.015; });
+      },
+    };
   },
   // 2. the farm: red barn, silo, fence, hay, cows
   farm(g) {

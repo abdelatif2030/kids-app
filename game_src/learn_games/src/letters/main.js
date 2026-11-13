@@ -203,7 +203,12 @@ class Game {
     const rim = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.05, 10, 32), M(0xffc83a, { roughness: 0.3 }));
     const face = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.1), new THREE.MeshBasicMaterial({ map: labelTex(text, { size: big ? 200 : 180 }), transparent: true, toneMapped: false }));
     face.position.z = 0.075;
-    g.add(disc, rim, face);
+    // the golden glow rings of the owner's design picture
+    const glow = new THREE.MeshBasicMaterial({ color: 0xffd84a, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false });
+    const glow2 = new THREE.MeshBasicMaterial({ color: 0xffe890, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false });
+    const halo1 = new THREE.Mesh(new THREE.TorusGeometry(0.76, 0.03, 8, 48), glow);
+    const halo2 = new THREE.Mesh(new THREE.TorusGeometry(0.86, 0.022, 8, 48), glow2);
+    g.add(disc, rim, face, halo1, halo2);
     return g;
   }
 
@@ -227,9 +232,9 @@ class Game {
         // the letter sign stands to the right and above, never in front of the picture
         const top = Math.max(2.0, baseY + fi.h + 0.55);
         const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, top, 8), M(0xb88848));
-        pole.position.set(1.0, top / 2, 0.1);
+        pole.position.set(-0.1, top / 2, -0.25); // behind the picture, centred above it (like the owner's design)
         plaque = this._plaque(o.plaque);
-        plaque.position.set(1.0, top + 0.1, 0.1);
+        plaque.position.set(-0.1, top + 0.1, 0.1);
         g.add(pole, plaque);
       }
     } else if (o.kind === 'color') {
@@ -259,7 +264,7 @@ class Game {
     hit.userData.id = o.id;
     hit.position.set(0.2, 0.9, 0);
     g.add(glow, hit);
-    const home = new THREE.Vector3(((i + 0.5) / n - 0.5) * 7.8 + 0.6, 0.1, i % 2 ? -0.2 : -1.3); // two rows, kept behind the question picture
+    const home = new THREE.Vector3(((i + 0.5) / n - 0.5) * 8.7 + 0.35, 0.1, i % 2 ? -0.2 : -1.3); // two rows, kept behind the question picture
     g.position.copy(HAND);
     g.scale.setScalar(0.01);
     this.st.add(g);
