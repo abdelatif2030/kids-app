@@ -77,8 +77,8 @@ class Game {
     this.fade = h('div', { class: 'lw-fade' });
     sh.root.append(this.fade);
     this.owl = makeActor('owl');
-    this.owl.position.set(-5.6, 0.16, 3.4);
-    this.owl.scale.setScalar(0.66);
+    this.owl.position.set(-6.7, 0.16, 4.0);
+    this.owl.scale.setScalar(0.85); // the owl companion: bigger and clearer (owner 2026-11-13)
     this.owl.rotation.y = 0.25;
     this.st.add(this.owl);
     this.stand = this._makeStand();
@@ -215,16 +215,16 @@ class Game {
   _option(o, i, n) {
     const g = new THREE.Group();
     const col = this.padStyle.ring[i % 5];
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.85, 0.22, 12, 28), M(col, { roughness: 0.4 }));
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.95, 0.24, 12, 28), M(col, { roughness: 0.4 }));
     ring.rotation.x = Math.PI / 2;
     ring.position.y = 0.05;
-    const raft = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.85, 0.08, 28), M(this.padStyle.disc));
+    const raft = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.08, 28), M(this.padStyle.disc));
     raft.position.y = 0.04;
     g.add(ring, raft);
     let item = null, plaque = null, baseY = 0.06;
     if (o.kind === 'thing') {
       item = makeThing(o.thing);
-      const fi = fitThing(item, 1.9, 1.55);
+      const fi = fitThing(item, 2.15, 1.8);
       baseY = 0.12 - fi.minY;
       item.position.set(-0.1, baseY, 0);
       g.add(item);
@@ -234,7 +234,8 @@ class Game {
         const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, top, 8), M(0xb88848));
         pole.position.set(-0.1, top / 2, -0.25); // behind the picture, centred above it (like the owner's design)
         plaque = this._plaque(o.plaque);
-        plaque.position.set(-0.1, top + 0.1, 0.1);
+        plaque.scale.setScalar(1.3); // big, clear letters
+        plaque.position.set(-0.1, top + 0.25, 0.1);
         g.add(pole, plaque);
       }
     } else if (o.kind === 'color') {
@@ -254,17 +255,17 @@ class Game {
       pole.position.set(0, 0.45, 0);
       plaque = this._plaque(text, true);
       plaque.position.set(0, 1.5, 0);
-      plaque.scale.setScalar(1.45);
+      plaque.scale.setScalar(1.6);
       g.add(pole, plaque);
       item = plaque;
     }
     const glow = new THREE.Mesh(new THREE.CylinderGeometry(1.25, 1.25, 0.06, 28), new THREE.MeshBasicMaterial({ color: 0xfff27a, transparent: true, opacity: 0, depthWrite: false }));
     glow.position.y = 0.02;
-    const hit = new THREE.Mesh(new THREE.SphereGeometry(1.35, 10, 8), new THREE.MeshBasicMaterial({ visible: false }));
+    const hit = new THREE.Mesh(new THREE.SphereGeometry(1.5, 10, 8), new THREE.MeshBasicMaterial({ visible: false }));
     hit.userData.id = o.id;
     hit.position.set(0.2, 0.9, 0);
     g.add(glow, hit);
-    const home = new THREE.Vector3(((i + 0.5) / n - 0.5) * 8.7 + 0.35, 0.1, i % 2 ? -0.2 : -1.3); // two rows, kept behind the question picture
+    const home = new THREE.Vector3(((i + 0.5) / n - 0.5) * 9.2 + 0.9, 0.1, i % 2 ? -0.2 : -1.3); // two rows, kept behind the question picture
     g.position.copy(HAND);
     g.scale.setScalar(0.01);
     this.st.add(g);
@@ -320,8 +321,8 @@ class Game {
   _makeHero(kind, look) {
     if (this.hero) this.st.scene.remove(this.hero);
     const k = makeActor(kind);
-    k.position.set(-3.7, 0.16, 3.4);
-    k.scale.setScalar(0.9);
+    k.position.set(-4.4, 0.16, 4.6);
+    k.scale.setScalar(1.3); // the hero is the star of the screen: big and close
     k.rotation.y = 0.2;
     this.st.add(k);
     this.hero = k;

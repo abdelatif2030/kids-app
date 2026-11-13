@@ -174,7 +174,7 @@ final List<GameInfo> kEducationalGames = [
 /// that old ids (curriculum units, adventures, saved progress) still resolve; they are no longer offered.
 List<GameInfo> gamesForAge(int age) => [
   for (final g in kEducationalGames)
-    if (g.id == LetterFishingGame.gameId && g.fitsAge(age)) g,
+    if (g.id == LetterFishingGame.gameId) g, // the learning world opens for any age (owner 2026-11-13); the game itself picks the content
 ];
 
 String learnLangOf(ChildProfile? c) => c?.learnLang ?? 'both';

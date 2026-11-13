@@ -96,7 +96,9 @@ export class Shell {
     this.post = post || (() => {});
     this.opts = opts;
     this.T = makeText(opts.text || {}, this.cfg);
-    this.age = Number(this.cfg.age) || 5;
+    // any child may open the game (owner 2026-11-13): the content is built for 3 to 6, so a younger child gets the 3-year-old's
+    // easiest levels and an older one the 6-year-old's
+    this.age = Math.min(6, Math.max(3, Number(this.cfg.age) || 5));
     this.base = this.cfg.base || './';
     this.done = !!this.cfg.done;
     this.save = this.cfg.save && typeof this.cfg.save === 'object' ? { ...this.cfg.save } : {};

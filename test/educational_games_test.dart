@@ -59,10 +59,10 @@ void main() {
       for (final age in [3, 4, 5, 6]) {
         expect(ids(age), {'letter_fishing'}, reason: 'age $age');
       }
-      expect(gamesForAge(2), isEmpty);
-      expect(gamesForAge(7), isEmpty);
-      expect(gamesForAge(9), isEmpty);
-      expect(gamesForAge(1), isEmpty);
+      // the learning world opens for any age (owner 2026-11-13)
+      for (final age in [1, 2, 7, 9, 12]) {
+        expect(ids(age), {'letter_fishing'}, reason: 'age $age');
+      }
       for (final g in kEducationalGames) {
         expect(g.minAge <= g.maxAge, true);
         expect(g.title(), isNotEmpty);
