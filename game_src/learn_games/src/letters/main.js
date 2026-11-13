@@ -65,7 +65,7 @@ class Game {
     const sh = this.sh;
     setArtBase(`${sh.base}../art/`);
     this.girl = sh.T.girl;
-    this.st = new Stage(sh, { bg: 0xcfeeff, ground: 0x9ad0a0, fov: 40, box: [7.2, 3.9], dir: [0, 0.5, 1], target: [0, 1.0, 0.8], wide: { box: [10.8, 6.3], target: [0, 2.4, 0.2], minAspect: 1.45 } });
+    this.st = new Stage(sh, { bg: 0xcfeeff, ground: 0x9ad0a0, fov: 40, box: [7.2, 3.9], dir: [0, 0.5, 1], target: [0, 1.0, 0.8], wide: { box: [10.8, 6.3], target: [0, 2.4, 0.2], minAspect: 0 } });
     this.opts = new Map();
     this.rackItems = [];
     this.cheerN = Math.floor(Math.random() * 9);
