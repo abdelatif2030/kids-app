@@ -94,6 +94,7 @@ class TtsSpeech implements SpeechBackend, VoiceTunable {
     if (cached != null) return cached;
     final candidates = switch (lang) {
       'ar' => ['ar-SA', 'ar'],
+      'ar-EG' => ['ar-EG', 'ar-SA', 'ar'], // the learning games speak Egyptian Arabic
       'en' => ['en-US', 'en'],
       _ => [lang],
     };
@@ -289,8 +290,8 @@ class AppAudio {
   /// Reads [text] aloud when the parent has the voice switched on. Never
   /// throws: when no voice exists the screen simply stays silent (the text is
   /// always on screen too).
-  static Future<void> say(String text, {String lang = 'ar', bool slow = false}) =>
-      service.playText(text, lang: lang, slow: slow);
+  static Future<void> say(String text, {String lang = 'ar', bool slow = false, bool childVoice = false}) =>
+      service.playText(text, lang: lang, slow: slow, childVoice: childVoice);
 
   static Future<void> stopSaying() => service.stop();
 }

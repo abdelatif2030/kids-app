@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'audio.dart';
 import 'audio_gate.dart';
 import 'audio_manifest.dart';
+import 'voice_choice.dart';
 
 enum AudioStatus { idle, loading, playing, paused, completed, error }
 
@@ -130,7 +131,9 @@ class AudioService {
   /// Plays a text. If the content has an asset for it, that asset is used (so a
   /// recording takes over automatically); otherwise it is an instruction or
   /// sentence read by the device voice.
-  Future<void> playText(String text, {String lang = 'ar', bool slow = false}) async {
+  /// [childVoice]: the learning games' brighter, slower voice (kGameVoicePitch / kGameVoiceRate) when the engine can tune.
+  Future<void> playText(String text, {String lang = 'ar', bool slow = false, bool childVoice = false}) async {
+    _childVoice = childVoice;
     final asset = _manifest().forText(lang, text) ??
         AudioAsset(
           id: 'adhoc.$lang.${text.hashCode}',
@@ -251,8 +254,12 @@ class AudioService {
     }
   }
 
+  bool _childVoice = false;
+
   Future<void> _playDeviceVoice(AudioAsset asset, AudioState base, bool slow, int my) async {
     final speech = _speech();
+    final tuned = _childVoice && speech is VoiceTunable;
+    if (tuned) (speech as VoiceTunable).tune(pitchScale: kGameVoicePitch, rateScale: kGameVoiceRate);
     var ok = _voiceOk[asset.lang];
     if (ok == null) {
       try {
@@ -269,7 +276,11 @@ class AudioService {
     }
     _set(AudioState(assetId: asset.id, text: asset.text, slow: slow, status: AudioStatus.playing, heard: AudioSource.deviceVoice));
     try {
-      await speech.speak(asset.text, lang: asset.lang, rate: _prefs.speechRate * (slow ? 0.7 : 1.0));
+      try {
+        await speech.speak(asset.text, lang: asset.lang, rate: _prefs.speechRate * (slow ? 0.7 : 1.0));
+      } finally {
+        if (tuned) (speech as VoiceTunable).tune(); // back to the normal voice for everything else
+      }
       if (my == _token) {
         _set(AudioState(assetId: asset.id, text: asset.text, slow: slow, status: AudioStatus.completed, heard: AudioSource.deviceVoice));
       }

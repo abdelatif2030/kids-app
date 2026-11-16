@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kids_app/games/connect_four_game.dart';
+import 'package:kids_app/games/web_games/web_game.dart';
 import 'package:kids_app/games/game_catalog.dart';
 import 'package:kids_app/games/game_common.dart';
 import 'package:kids_app/games/letter_fishing_game.dart';
@@ -53,17 +53,16 @@ void main() {
 
   group('catalog', () {
     test('every game has an age range and the age filter is respected', () {
-      expect(kEducationalGames.length, 24);
-      expect({for (final g in kEducationalGames) g.id}.length, 24);
+      // the older entries stay only so that old ids resolve; a child is offered ONE learning game (owner 2026-11-12)
+      expect({for (final g in kEducationalGames) g.id}.length, kEducationalGames.length);
       Set<String> ids(int age) => {for (final g in gamesForAge(age)) g.id};
-      expect(ids(2), {WordBookGame.gameId, 'feed_animal', 'big_small', 'shape_finder'});
-      expect(ids(3), {MatchPicturesGame.gameId, WordBookGame.gameId, 'odd_one_out', 'compare', 'listen_picture', 'jigsaw', 'connect_dots', 'animal_habitats', 'feed_animal', 'big_small', 'next_in_day', 'shape_finder', 'where_ball'});
-      expect(ids(4).length, 22);
-      expect(ids(5).length, 24);
-      expect(ids(6).length, 24);
-      expect(ids(7), {'listen_word'}); // reading practice goes on to age 8
-      expect(gamesForAge(9), isEmpty);
-      expect(gamesForAge(1), isEmpty);
+      for (final age in [3, 4, 5, 6]) {
+        expect(ids(age), {'letter_fishing'}, reason: 'age $age');
+      }
+      // the learning world opens for any age (owner 2026-11-13)
+      for (final age in [1, 2, 7, 9, 12]) {
+        expect(ids(age), {'letter_fishing'}, reason: 'age $age');
+      }
       for (final g in kEducationalGames) {
         expect(g.minAge <= g.maxAge, true);
         expect(g.title(), isNotEmpty);
@@ -146,81 +145,6 @@ void main() {
     });
   });
 
-  group('connect four logic', () {
-    ConnectFourBoard play(List<int> cols) {
-      final b = ConnectFourBoard();
-      for (final c in cols) {
-        b.drop(c);
-      }
-      return b;
-    }
-
-    test('players alternate', () {
-      final b = ConnectFourBoard();
-      expect(b.current, 1);
-      expect(b.drop(0), DropResult.placed);
-      expect(b.current, 2);
-      b.drop(1);
-      expect(b.current, 1);
-    });
-
-    test('vertical win', () {
-      final b = play([0, 1, 0, 1, 0, 1, 0]);
-      expect(b.winner, 1);
-      expect(b.finished, true);
-      expect(b.winLine.length, greaterThanOrEqualTo(4));
-    });
-
-    test('horizontal win', () {
-      final b = play([0, 0, 1, 1, 2, 2, 3]);
-      expect(b.winner, 1);
-    });
-
-    test('diagonal wins in both directions', () {
-      // rising to the right: player 1 on (4,0),(3,1),(2,2),(1,3)
-      final up = play([0, 1, 1, 2, 3, 2, 2, 3, 3, 4, 3]);
-      expect(up.winner, 1);
-      // rising to the left, the mirror image
-      final left = play([4, 3, 3, 2, 1, 2, 2, 1, 1, 0, 1]);
-      expect(left.winner, 1);
-    });
-
-    test('invalid moves and a full column', () {
-      final b = ConnectFourBoard();
-      expect(b.drop(-1), DropResult.invalid);
-      expect(b.drop(5), DropResult.invalid);
-      for (var i = 0; i < ConnectFourBoard.rows; i++) {
-        b.drop(0); // alternate players fill column 0; nobody connects four vertically
-        if (b.finished) break;
-      }
-      if (!b.finished) {
-        final before = b.current;
-        expect(b.drop(0), DropResult.invalid);
-        expect(b.current, before); // an invalid move does not change the turn
-      }
-    });
-
-    test('a draw is detected and no more moves are accepted', () {
-      final b = ConnectFourBoard();
-      for (var r = 0; r < ConnectFourBoard.rows; r++) {
-        for (var c = 0; c < ConnectFourBoard.cols; c++) {
-          b.grid[r][c] = ((c ~/ 2) + r) % 2 + 1;
-        }
-      }
-      b.grid[0][0] = 0;
-      b.current = 1;
-      expect(b.finished, false);
-      expect(b.drop(0), DropResult.draw);
-      expect(b.draw, true);
-      expect(b.winner, isNull);
-      expect(b.drop(1), DropResult.invalid);
-    });
-
-    test('no moves after a win', () {
-      final b = play([0, 1, 0, 1, 0, 1, 0]);
-      expect(b.drop(2), DropResult.invalid);
-    });
-  });
 
   group('numerals logic', () {
     test('all ten mappings are right', () {
@@ -337,20 +261,6 @@ void main() {
       expect(_hasStar(tester), true);
     });
 
-    testWidgets('connect four: two players, a win ends the round and earns the star once', (tester) async {
-      _bigScreen(tester);
-      await tester.pumpWidget(_app(const ConnectFourGame(childId: 'c3')));
-      expect(find.textContaining('لاعبين'), findsOneWidget);
-      for (final c in [0, 1, 0, 1, 0, 1, 0]) {
-        await tester.tap(find.byKey(ValueKey('col$c')));
-        await tester.pump();
-      }
-      await _settle(tester);
-      expect(find.text('أحسنت!'), findsOneWidget);
-      expect(find.textContaining('جمع أربعة'), findsOneWidget);
-      expect(_hasStar(tester), true);
-    });
-
     testWidgets('numerals: wrong choices fade and the set earns the star', (tester) async {
       _bigScreen(tester);
       final rounds = makeNumeralRounds(5, Random(3));
@@ -446,6 +356,7 @@ void main() {
         tester.view.devicePixelRatio = 1;
         addTearDown(tester.view.reset);
         for (final g in kEducationalGames) {
+          if (kLearnWebGames.containsKey(g.id)) continue; // rebuilt as a web game (test/learn_web_games_test.dart)
           await tester.pumpWidget(MaterialApp(
             key: UniqueKey(),
             builder: (c, child) => MediaQuery(data: MediaQuery.of(c).copyWith(textScaler: const TextScaler.linear(1.6)), child: child!),
@@ -465,10 +376,6 @@ void main() {
         expect(find.text(g.title()), findsOneWidget);
       }
       expect(find.text(gamesForAge(5).first.title()), findsOneWidget);
-      await tester.pumpWidget(_app(const Scaffold(body: SingleChildScrollView(child: GamesGrid(age: 2)))));
-      await _settle(tester);
-      expect(find.text(kEducationalGames.firstWhere((g) => g.id == ConnectFourGame.gameId).title()), findsNothing); // connect four is 5-6
-      expect(find.text(kEducationalGames.firstWhere((g) => g.id == WordBookGame.gameId).title()), findsOneWidget); // the word book is 2-6
     });
   });
 }

@@ -30,8 +30,8 @@ void main() {
       expect(weekIdOf(DateTime(2026, 11, 1)), '2026-10-26'); // Sunday
       expect(weekIdOf(DateTime(2026, 11, 2)), '2026-11-02'); // next Monday
       expect(themeOfWeek(DateTime(2026, 10, 26)).id, themeOfWeek(DateTime(2026, 11, 1)).id);
-      final ids = [for (var w = 0; w < 6; w++) themeOfWeek(wed.add(Duration(days: 7 * w))).id];
-      expect(ids.toSet().length, 6);
+      final ids = [for (var w = 0; w < kAdventureThemes.length; w++) themeOfWeek(wed.add(Duration(days: 7 * w))).id];
+      expect(ids.toSet().length, kAdventureThemes.length);
     });
 
     test('every theme game id exists in the catalogue', () {

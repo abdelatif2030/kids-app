@@ -1,11 +1,8 @@
-import 'design/focusable_tap.dart';
 
 import 'package:flutter/material.dart';
 import 'design/picture_stage.dart';
 
-import 'design/layout.dart';
 
-import 'color_game.dart';
 import 'drawing_screen.dart';
 import 'games/fun_games.dart';
 import 'games/game_catalog.dart';
@@ -14,11 +11,7 @@ import 'journey/models.dart';
 import 'journey/resume.dart';
 import 'journey/ui/heart_button.dart';
 import 'journey/ui/island_home.dart';
-import 'letters_game.dart';
-import 'math_game.dart';
-import 'memory_game.dart';
 import 'ui.dart';
-import 'where_animal_game.dart';
 import 'l10n/strings.dart';
 
 /// The games that suit [age], each on its own floating island with its own picture and name, laid out sideways on the
@@ -59,14 +52,7 @@ class _GamesGridState extends State<GamesGrid> {
   Widget build(BuildContext context) {
     final age = widget.age;
     // (id, label, min age, max age, screen). Order = order on screen.
-    final classic = <(String, String, int, int, Widget Function())>[
-      ('balloons', loc('افرقع البالونات'), 1, 2, () => const BalloonGame()),
-      ('animal', loc('فين الحيوان؟'), 1, 2, () => const WhereAnimalGame()),
-      ('colors', loc('لعبة الألوان'), 2, 3, () => const ColorGame()),
-      ('letters', loc('حروف وكلمات'), 3, 8, () => const LettersGame()),
-      ('memory', loc('لعبة الذاكرة'), 3, 6, () => const MemoryGame()),
-      ('math', loc('رياضيات'), 4, 12, () => MathGame(age: age)),
-    ];
+    final classic = <(String, String, int, int, Widget Function())>[]; // all learning games now come from the catalog
     final learn = gamesForAge(age);
     final learnLang = learnLangOf(widget.child);
     return FutureBuilder<Set<String>>(
@@ -187,92 +173,6 @@ class GamesScreen extends StatelessWidget {
           child: GamesGrid(age: age),
         ),
       ),
-    );
-  }
-}
-
-/// افرقع 6 بالونات. مفيش غلط ومفيش خسارة. النجمة بتظهر لما يخلّص.
-class BalloonGame extends StatefulWidget {
-  const BalloonGame({super.key});
-
-  @override
-  State<BalloonGame> createState() => _BalloonGameState();
-}
-
-class _BalloonGameState extends State<BalloonGame> {
-  static const _count = 6;
-  late List<bool> _popped;
-
-  @override
-  void initState() {
-    super.initState();
-    _popped = List.filled(_count, false);
-  }
-
-  void _pop(int i) {
-    if (_popped[i]) return;
-    setState(() => _popped[i] = true);
-  }
-
-  void _restart() => setState(() => _popped = List.filled(_count, false));
-
-  @override
-  Widget build(BuildContext context) {
-    final done = _popped.every((p) => p);
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Text(loc('افرقع البالونات'), style: TextStyle(fontSize: 26)),
-      ),
-      body: FitHeight(child: Center(
-        child: done
-            ? Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.star_rounded,
-                    size: 120,
-                    color: Colors.amber,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    loc('أحسنت!'),
-                    style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 24),
-                  FilledButton(
-                    onPressed: _restart,
-                    child: Text(
-                      loc('العب تاني'),
-                      style: TextStyle(fontSize: 24),
-                    ),
-                  ),
-                ],
-              )
-            : Wrap(
-                spacing: 24,
-                runSpacing: 24,
-                alignment: WrapAlignment.center,
-                children: [
-                  for (var i = 0; i < _count; i++)
-                    FocusableTap(
-                      onTap: () => _pop(i),
-                      child: AnimatedOpacity(
-                        duration: const Duration(milliseconds: 300),
-                        opacity: _popped[i] ? 0 : 1,
-                        child: Container(
-                          width: 110,
-                          height: 130,
-                          decoration: BoxDecoration(
-                            color: kBright[i % kBright.length],
-                            borderRadius: BorderRadius.circular(55),
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-      )),
     );
   }
 }

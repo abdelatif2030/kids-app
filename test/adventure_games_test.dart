@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/games/web_games/web_game.dart';
 import 'package:kids_app/games/adventure_games.dart';
 import 'package:kids_app/games/adventure_logic.dart';
 import 'package:kids_app/games/game_catalog.dart';
@@ -54,14 +55,14 @@ void main() {
   }
 
   testWidgets('catalog: all six are listed with the right ages and open from the games list', (t) async {
-    for (final id in ['snakes_ladders', 'jigsaw', 'maze', 'treasure_hunt', 'connect_dots', 'animal_habitats']) {
+    // the older games stay in the catalogue only so that old ids resolve; the child is offered the learning world
+    for (final id in ['snakes_ladders', 'treasure_hunt']) {
       final g = kEducationalGames.firstWhere((g) => g.id == id);
       expect(g.minAge, inInclusiveRange(3, 4));
       expect(g.maxAge, 6);
       expect(g.title(), isNotEmpty);
       expect(g.objective(), isNotEmpty);
-      expect(gamesForAge(2).any((x) => x.id == id), isFalse);
-      expect(gamesForAge(6).any((x) => x.id == id), isTrue);
+      expect(gamesForAge(6).any((x) => x.id == id), isFalse);
     }
   });
 
@@ -245,7 +246,8 @@ void main() {
     testWidgets('every new game opens in $lang at a small landscape size without errors', (t) async {
       await AppLocale.instance.set(lang);
       tall(t, const Size(640, 340));
-      for (final id in ['snakes_ladders', 'jigsaw', 'maze', 'treasure_hunt', 'connect_dots', 'animal_habitats']) {
+      for (final id in ['snakes_ladders', 'treasure_hunt']) {
+        if (kLearnWebGames.containsKey(id)) continue; // rebuilt as a web game (test/learn_web_games_test.dart)
         final g = kEducationalGames.firstWhere((x) => x.id == id);
         await t.pumpWidget(MaterialApp(
           key: UniqueKey(),

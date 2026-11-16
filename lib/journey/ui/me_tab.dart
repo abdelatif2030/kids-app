@@ -7,8 +7,9 @@ import 'profile_screen.dart';
 class MeTab extends StatelessWidget {
   final ChildProfile child;
   final VoidCallback? onBack;
-  const MeTab({super.key, required this.child, this.onBack});
+  final VoidCallback? onMore;
+  const MeTab({super.key, required this.child, this.onBack, this.onMore});
 
   @override
-  Widget build(BuildContext context) => ProfileScreen(child: child, onBack: onBack);
+  Widget build(BuildContext context) => ProfileScreen(child: child, onBack: onBack, onMore: onMore);
 }

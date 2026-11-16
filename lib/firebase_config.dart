@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show ValueNotifier, kReleaseMode;
 
@@ -47,6 +48,11 @@ Future<void> initFirebase() async {
     // If the Firebase script cannot be downloaded (blocked network, ad blocker) this call can wait forever; the app must
     // still start, with the online features simply unavailable.
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform).timeout(firebaseStartTimeout);
+    // The saved sign-in is restored asynchronously (on the web from IndexedDB): wait for the first auth-state event, otherwise
+    // currentUser is still null and every page load looks signed out.
+    try {
+      await FirebaseAuth.instance.authStateChanges().first.timeout(const Duration(seconds: 4));
+    } catch (_) {/* no saved sign-in or slow storage: carry on */}
     _repository = FirebaseTeacherRepository();
     // The hosted demo login opens accounts only: family chat, calls and voice messages stay off.
     if (!kDemoLogin) {

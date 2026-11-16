@@ -91,13 +91,6 @@ void main() {
   });
 
   group('catalog', () {
-    test('the three listening games are listed with sensible ages', () {
-      final ids = {for (final g in kEducationalGames) g.id: g};
-      expect(ids[ListenPictureGame.gameId]!.fitsAge(4), true);
-      expect(ids[ListenWordGame.gameId]!.fitsAge(7), true);
-      expect(ids[ListenWordGame.gameId]!.fitsAge(3), false);
-      expect(ids[ListenLetterGame.gameId]!.fitsAge(5), true);
-    });
   });
 
   group('screens', () {

@@ -15,28 +15,25 @@ class AdventureTheme {
 }
 
 final List<AdventureTheme> kAdventureThemes = [
-  AdventureTheme('letters', () => tr2('مغامرة الحروف والكلمات', 'Letters and words adventure'), () => tr2('نصطاد الحروف ونكتشف كلمات', 'We catch letters and find words'),
-      ['letter_fishing', 'trace_letters', 'word_book', 'listen_letter', 'match_pictures']),
-  AdventureTheme('numbers', () => tr2('مغامرة الأرقام', 'Numbers adventure'), () => tr2('نعدّ ونقارن ونلعب بالأرقام', 'We count, compare and play with numbers'),
-      ['numerals', 'compare', 'connect_four', 'snakes_ladders', 'pattern']),
-  AdventureTheme('animals', () => tr2('مغامرة الحيوانات', 'Animals adventure'), () => tr2('نعرف بيوت الحيوانات ونرتبها', 'We learn where animals live and sort them'),
-      ['animal_habitats', 'feed_animal', 'odd_one_out', 'sort_groups', 'listen_picture', 'jigsaw']),
-  AdventureTheme('thinking', () => tr2('مغامرة التفكير', 'Thinking adventure'), () => tr2('ألغاز بسيطة وكنوز مخبأة', 'Simple puzzles and hidden treasure'),
-      ['maze', 'treasure_hunt', 'pattern', 'next_in_day', 'where_ball', 'jigsaw', 'connect_dots']),
-  AdventureTheme('listening', () => tr2('مغامرة الاستماع', 'Listening adventure'), () => tr2('نسمع ونختار الصح', 'We listen and choose'),
-      ['listen_picture', 'listen_word', 'listen_letter', 'word_book', 'match_pictures']),
-  AdventureTheme('shapes', () => tr2('مغامرة الأشكال والألوان', 'Shapes and colours adventure'), () => tr2('نوصّل النقاط ونركّب الصور', 'We join dots and build pictures'),
-      ['connect_dots', 'jigsaw', 'shape_finder', 'big_small', 'sort_groups', 'match_pictures', 'odd_one_out']),
+  AdventureTheme('letters', () => tr2('مغامرة الحروف والأرقام', 'Letters and numbers adventure'), () => tr2('نصطاد الحروف ونعدّ ونلعب بالأرقام', 'We catch letters, count and play with numbers'),
+      ['letter_fishing', 'math', 'snakes_ladders']),
+  AdventureTheme('animals', () => tr2('مغامرة الحيوانات والأشكال', 'Animals and shapes adventure'), () => tr2('نطعم الحيوانات ونتعرف على الأشكال', 'We feed animals and learn shapes'),
+      ['feed_animal', 'shape_finder', 'sort_groups']),
+  AdventureTheme('thinking', () => tr2('مغامرة التفكير', 'Thinking adventure'), () => tr2('أنماط وكنوز مخبأة', 'Patterns and hidden treasure'),
+      ['treasure_hunt', 'pattern', 'next_in_day', 'where_ball']),
 ];
 
 /// The Monday of [d]'s week at midnight; weeks always run Monday to Sunday.
 DateTime weekStartOf(DateTime d) {
   final day = DateTime(d.year, d.month, d.day);
-  return day.subtract(Duration(days: day.weekday - DateTime.monday));
+  return DateTime(day.year, day.month, day.day - (day.weekday - DateTime.monday)); // calendar arithmetic: a Duration breaks across a clock change
 }
 
 String weekIdOf(DateTime d) => dayOf(weekStartOf(d));
-String weekEndIdOf(DateTime d) => dayOf(weekStartOf(d).add(const Duration(days: 6)));
+String weekEndIdOf(DateTime d) {
+  final s = weekStartOf(d);
+  return dayOf(DateTime(s.year, s.month, s.day + 6));
+}
 
 /// The theme of the week: the same for every child and device, changing each Monday.
 AdventureTheme themeOfWeek(DateTime d) {

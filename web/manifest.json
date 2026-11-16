@@ -6,7 +6,7 @@
     "background_color": "#E3F0FF",
     "theme_color": "#4B3FA0",
     "description": "تعلّم آمن وممتع للأطفال. A safe, friendly learning journey for children.",
-    "orientation": "any",
+    "orientation": "landscape",
     "prefer_related_applications": false,
     "icons": [
         {

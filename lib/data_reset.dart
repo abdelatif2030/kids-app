@@ -1,3 +1,4 @@
+import 'games/web_games/web_game_store.dart';
 import 'adventures/adventure_store.dart';
 import 'everyday/everyday_store.dart';
 import 'family_time/family_time.dart';
@@ -50,6 +51,25 @@ Future<void> deleteChildData() async {
         key == 'favorites' ||
         key == 'video_hidden_child' ||
         key == 'game_completions' ||
+        key == 'carnival_race' ||
+        key == 'jungle_adventure' ||
+        key == 'happy_farm' ||
+        key == 'pumpkin_pie' ||
+        key == 'samurai' ||
+        key == 'golden_tail' ||
+        key == 'ocean_defense' ||
+        key == 'moto_race' ||
+        key == 'rhythm' ||
+        key == 'splash_race' ||
+        key == 'space_store' ||
+        key == 'fox_family' ||
+        key == 'air_race' ||
+        key == 'zombie_rooftop' ||
+        key == 'gum_ball' ||
+        key == 'deep_sea' ||
+        key == 'coastal_drive' ||
+        key == 'hungry_frog' ||
+        key == 'frost_coil' ||
         key == 'video_completions' ||
         key == 'wordbook_seen' ||
         key == 'family_prefs' ||
@@ -73,16 +93,10 @@ Future<void> deleteChildData() async {
 Future<void> deleteOneChild(String childId) async {
   final prefs = await SharedPreferences.getInstance();
 
-  Future<void> filterList(
-    String key,
-    bool Function(Map<String, dynamic>) keep,
-  ) async {
+  Future<void> filterList(String key, bool Function(Map<String, dynamic>) keep) async {
     final raw = prefs.getString(key);
     if (raw == null) return;
-    final list = [
-      for (final e in jsonDecode(raw) as List<dynamic>)
-        e as Map<String, dynamic>,
-    ];
+    final list = [for (final e in jsonDecode(raw) as List<dynamic>) e as Map<String, dynamic>];
     await prefs.setString(
       key,
       jsonEncode([
@@ -107,6 +121,7 @@ Future<void> deleteOneChild(String childId) async {
   await dropKey('literacy_state');
   await dropKey('video_completions');
   await dropKey('game_completions');
+  await WebGameStore.forgetChild(childId);
   await ChildPhotoStore.delete(childId);
   await ResumeStore.forget(childId);
   await FeelingStore.forget(childId);
@@ -148,9 +163,7 @@ Future<Map<String, dynamic>> exportChildData(String childId) async {
 
   return {
     'exportedAt': DateTime.now().toIso8601String(),
-    'note': loc(
-      'هذه البيانات محفوظة على هذا الجهاز فقط. لم تُرسل إلى أي مكان.',
-    ),
+    'note': loc('هذه البيانات محفوظة على هذا الجهاز فقط. لم تُرسل إلى أي مكان.'),
     'profile': store.profileById(childId)?.toJson(),
     'hasPhotoOnDevice': store.profileById(childId)?.hasPhoto ?? false,
     'activities': [for (final a in store.attemptsOf(childId)) a.toJson()],

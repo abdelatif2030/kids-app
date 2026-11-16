@@ -23,6 +23,21 @@ void main() {
       expect(r.indexOf(offlineStd) < r.indexOf(compact), isTrue);
       expect(r.last == onlineNeural || r.indexOf(onlineNeural) > r.indexOf(offlineStd), isTrue);
     });
+    test('the learning games ask for Egyptian Arabic: an Egyptian voice first, other Arabic voices after it', () {
+      const egypt = VoiceInfo('ar-eg-x-std-local', 'ar-EG');
+      final r = rankVoices([english, offlineGood, egypt, offlineStd], 'ar-EG');
+      expect(r.first, egypt);
+      expect(r, containsAll([offlineGood, offlineStd]));
+      expect(r.contains(english), isFalse);
+      // no Egyptian voice on the phone: still an Arabic one
+      expect(chooseVoice([english, offlineStd], 'ar-EG'), offlineStd);
+      // the lessons keep Modern Standard Arabic first
+      expect(rankVoices([egypt, offlineStd], 'ar').first, offlineStd);
+    });
+    test('the fallback device voice of the games is natural (a raised pitch sounded bad: owner feedback)', () {
+      expect(kGameVoicePitch, 1.0);
+      expect(kGameVoiceRate, 1.0);
+    });
     test('the engine\'s own quality label counts', () {
       final r = rankVoices([const VoiceInfo('a', 'en-US'), const VoiceInfo('b', 'en-US', quality: 'premium')], 'en');
       expect(r.first.name, 'b');

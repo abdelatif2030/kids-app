@@ -53,7 +53,7 @@ dependencies:
   http: ^1.6.0
   google_sign_in: ^7.2.0
   video_player: ^2.14.1
-
+  webview_flutter: ^4.14.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -91,8 +91,47 @@ flutter:
     - assets/home/home_scene.webp
     - assets/games/hub_scene.webp
     - assets/games/choice_scene.webp
-    - assets/games/fun_scene.webp
+    - assets/games/fun_games_scene.webp
+    - assets/games/fun_games_more.webp
+    - assets/games/learn_page.webp
+    - assets/games/art/
+    - assets/games/art/rig/
+    - assets/games/clips/
     - assets/games/game_bg.webp
+    - assets/games/carnival_race/
+    - assets/games/jungle_adventure/
+    - assets/games/happy_farm/
+    - assets/games/pumpkin_pie/
+    - assets/games/samurai/
+    - assets/games/golden_tail/
+    - assets/games/ocean_defense/
+    - assets/games/moto_race/
+    - assets/games/rhythm/
+    - assets/games/splash_race/
+    - assets/games/space_store/
+    - assets/games/fox_family/
+    - assets/games/air_race/
+    - assets/games/zombie_rooftop/
+    - assets/games/gum_ball/
+    - assets/games/deep_sea/
+    - assets/games/coastal_drive/
+    - assets/games/hungry_frog/
+    - assets/games/frost_coil/
+    - assets/games/learn_maze/
+    - assets/games/learn_sort/
+    - assets/games/learn_treasure/
+    - assets/games/learn_day/
+    - assets/games/learn_ladders/
+    - assets/games/learn_ball/
+    - assets/games/learn_pattern/
+    - assets/games/learn_letters/
+    - assets/games/learn_counting/
+    - assets/games/learn_shapes/
+    - assets/games/learn_animals/
+    - assets/games/learn_voice/
+    - assets/games/learn_voice/ar/
+    - assets/games/learn_voice/en/
+    - assets/games/summit_rush/
     - assets/home/home_main.webp
     - assets/home/cartoons_stories.webp
     - assets/home/lessons_scene.webp
@@ -103,6 +142,7 @@ flutter:
     - assets/home/scene_bg.webp
     - assets/audio/voices/approved.json
     - assets/audio/voices/adam/ar/
+    - assets/audio/voices/fatima/ar/
     - assets/branding/logo_art.webp
     - assets/branding/intro.mp4
     - assets/branding/intro_poster.webp

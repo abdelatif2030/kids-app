@@ -345,6 +345,31 @@ void main() {
       },
     );
 
+    testWidgets('the city: a clear list of every city to scroll and pick, a search, and a typed city kept as typed', (t) async {
+      await _show(t, RegisterPictureScreen(repo: FakeTeacherRepository()));
+      await t.ensureVisible(find.byKey(const ValueKey('register_city_pick')));
+      await t.tap(find.byKey(const ValueKey('register_city_pick')));
+      await t.pumpAndSettle();
+      expect(find.byKey(const ValueKey('city_list')), findsOneWidget);
+      expect(find.byKey(const ValueKey('city_Cairo')), findsOneWidget);
+      // search filters the list
+      await t.enterText(find.byKey(const ValueKey('city_search')), 'اسكندر');
+      await t.pump();
+      expect(find.byKey(const ValueKey('city_Alexandria')), findsOneWidget);
+      expect(find.byKey(const ValueKey('city_Cairo')), findsNothing);
+      await t.tap(find.byKey(const ValueKey('city_Alexandria')));
+      await t.pumpAndSettle();
+      expect(t.widget<TextField>(find.byKey(const ValueKey('register_city'))).controller!.text, 'الإسكندرية');
+      // a city that is not listed
+      await t.tap(find.byKey(const ValueKey('register_city_pick')));
+      await t.pumpAndSettle();
+      await t.enterText(find.byKey(const ValueKey('city_search')), 'قرية الأمل');
+      await t.pump();
+      await t.tap(find.byKey(const ValueKey('city_use_typed')));
+      await t.pumpAndSettle();
+      expect(t.widget<TextField>(find.byKey(const ValueKey('register_city'))).controller!.text, 'قرية الأمل');
+    });
+
     testWidgets(
       'creating an account by e-mail needs a name, a valid e-mail and a password; extras stay on the device',
       (t) async {

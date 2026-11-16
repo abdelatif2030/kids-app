@@ -1,0 +1,16 @@
+{
+  "name": "happy-farm",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty «مزرعتي السعيدة» relaxing combine-harvester farm (three.js). Built into assets/games/happy_farm/game.js",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/happy_farm/game.js",
+    "test": "node --test test/sim.test.js"
+  },
+  "dependencies": {
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.0"
+  }
+}

@@ -68,7 +68,7 @@ void main() {
   });
 
   test('catalogue: ages, emoji and skill mapping exist for the new games; adventures reference them', () {
-    for (final id in ['feed_animal', 'big_small', 'next_in_day']) {
+    for (final id in ['feed_animal', 'next_in_day']) {
       final g = kEducationalGames.firstWhere((x) => x.id == id);
       expect(g.minAge, inInclusiveRange(2, 3));
       expect(g.maxAge, 6);
@@ -76,7 +76,7 @@ void main() {
       expect(kChoiceGameSkills, contains(id));
     }
     final used = {for (final t in kAdventureThemes) ...t.games};
-    expect(used, containsAll(['feed_animal', 'big_small', 'next_in_day']));
+    expect(used, containsAll(['feed_animal', 'next_in_day']));
   });
 
   testWidgets('feed the animal plays through: a wrong tap only fades, a star comes after the last round, once', (t) async {

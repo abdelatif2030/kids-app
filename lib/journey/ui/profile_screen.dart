@@ -48,7 +48,10 @@ class _Data {
 class ProfileScreen extends StatefulWidget {
   final ChildProfile child;
   final VoidCallback? onBack;
-  const ProfileScreen({super.key, required this.child, this.onBack});
+
+  /// «المزيد» (library, words, family activities): reached from here since the bottom bar is gone (owner request).
+  final VoidCallback? onMore;
+  const ProfileScreen({super.key, required this.child, this.onBack, this.onMore});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -176,6 +179,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     );
                 final frac = tp.target == 0 ? 0.0 : math.min(tp.n / tp.target, 1.0);
                 return [
+                  if (widget.onMore != null)
+                    at(
+                      300,
+                      82,
+                      250,
+                      84,
+                      Material(
+                        key: const ValueKey('profile_more'),
+                        color: const Color(0xFF6A3AD0),
+                        shape: StadiumBorder(side: BorderSide(color: Colors.white, width: 4 * k)),
+                        elevation: 4,
+                        child: InkWell(
+                          customBorder: const StadiumBorder(),
+                          onTap: widget.onMore,
+                          child: Center(child: txt('▦  ${tr2('المزيد', 'More')}', 40, Colors.white)),
+                        ),
+                      ),
+                    ),
                   // the child's own picture inside the painted ring
                   at(725, 232, 206, 206, IgnorePointer(child: ClipOval(child: ChildAvatar(child: p, size: 206 * k)))),
                   at(945, 205, 150, 66, IgnorePointer(child: txt(p.nickname, 54, _ink))),

@@ -194,7 +194,6 @@ void main() {
     'math game': () => const MathGame(age: 6),
     'letters game': () => const LettersGame(),
     'animal game': () => const WhereAnimalGame(),
-    'balloons': () => const BalloonGame(),
     'drawing': () => const DrawingScreen(),
     'rest': () => const RestScreen(reason: RestReason.quiet),
     'rest (limit)': () => const RestScreen(reason: RestReason.limit),
