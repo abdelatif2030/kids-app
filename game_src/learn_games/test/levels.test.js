@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { LETTERS, ROUNDS, fishCount, letterById } from '../src/letters/sim.js';
-import { LEVELS, LevelPlay, ALPHABET, WORD_THE, HABITS, HABIT_ITEMS, CHEERS_M, CHEERS_F, levelsFor, numberPool, orderPool, wordQuestion, numberQuestion, nextQuestion, firstQuestion } from '../src/letters/levels.js';
+import { LEVELS, LevelPlay, ALPHABET, WORD_THE, HABITS, HABIT_ITEMS, CHEERS_M, CHEERS_F, levelsFor, orderPool, wordQuestion, numberQuestion, nextQuestion, firstQuestion } from '../src/letters/levels.js';
 
 test('every letter has a word with "the" and the alphabet lists all 28 once', () => {
   assert.equal(ALPHABET.length, 28);
@@ -16,7 +16,6 @@ test('twelve levels; the youngest skip the two alphabet levels', () => {
   assert.equal(LEVELS.length, 12);
   assert.equal(levelsFor(4).length, 10);
   assert.equal(levelsFor(5).length, 12);
-  assert.equal(numberPool(4), 5); assert.equal(numberPool(5), 10); assert.equal(numberPool(6), 20);
   assert.equal(orderPool(5).length, 8); assert.equal(orderPool(6).length, 28);
 });
 test('every level, every age: five rounds, exactly one right option, no duplicate options', () => {
@@ -36,13 +35,6 @@ test('letters, words and first levels keep the old option counts', () => {
 });
 test('order level: the answer is the real next letter of the alphabet', () => {
   for (let s = 1; s < 60; s++) for (const r of new LevelPlay('order', 6, s).rounds) assert.equal(ALPHABET[ALPHABET.indexOf(r.from) + 1], r.answer);
-});
-test('numbers and counting stay inside the age range', () => {
-  for (let s = 1; s < 40; s++) {
-    for (const r of new LevelPlay('numbers', 4, s).rounds) assert.ok(r.n >= 1 && r.n <= 5);
-    for (const r of new LevelPlay('counting', 6, s).rounds) assert.ok(r.n >= 1 && r.n <= 20);
-    for (const r of new LevelPlay('counting', 5, s).rounds) assert.ok(r.n >= 1 && r.n <= 6);
-  }
 });
 test('habits: Mama or Baba, one right thing among other things', () => {
   assert.ok(HABITS.every((h) => h.text && h.answer && !h.who)); // no mama/baba characters any more: our voice asks, the child chooses

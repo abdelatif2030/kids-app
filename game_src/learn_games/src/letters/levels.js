@@ -14,7 +14,9 @@ import { rng } from '../maze/sim.js';
 import { ROUNDS, poolFor, fishCount, letterById, question, LETTERS } from './sim.js';
 import { tilesOf, makeRounds as shapeRounds, withColour, shapeById, colorById, question as shapeQuestion, reward as shapeReward } from '../shapes/sim.js';
 import { ANIMALS, platesOf, animalById, question as animalQuestion, reward as animalReward, poolFor as animalPool, FOODS } from '../animals/sim.js';
-import { optionsFor, maxCountFor, COUNT_Q } from '../counting/sim.js';
+import { optionsFor, COUNT_Q } from '../counting/sim.js';
+import { TIERS, COUNT_TIERS, numberPlan, countPlan, numberWord, findQ, afterQ, beforeQ, BIGGER_Q, SMALLER_Q } from './numbers.js';
+const range0 = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
 import MORE_WORDS from './more_words.json' with { type: 'json' };
 // (FreshMemory, in fresh.js, is passed in by the game: it remembers what each child already met)
 
@@ -93,10 +95,9 @@ export const WORD_THE = {
 };
 export const wordQuestion = (l) => `فين ${WORD_THE[l.id]}؟`;
 export const firstQuestion = (l) => `إيه الحرف الأول في كلمة ${l.word}؟`;
-export const NUM_WORDS = ['', 'واحد', 'اتنين', 'تلاتة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'تمانية', 'تسعة', 'عشرة', 'حداشر', 'اتناشر', 'تلاتاشر', 'أربعتاشر', 'خمستاشر', 'ستاشر', 'سبعتاشر', 'تمنتاشر', 'تسعتاشر', 'عشرين'];
-export const numberQuestion = (n) => `فين رقم ${NUM_WORDS[n]}؟`;
+export const NUM_WORDS = Array.from({ length: 21 }, (_, i) => (i ? numberWord(i) : ''));
+export const numberQuestion = findQ;
 export const nextQuestion = (l) => `إيه الحرف اللي بعد ${l.the}؟`;
-export const numberPool = (age) => (age <= 4 ? 5 : age === 5 ? 10 : 20);
 /** Letters used by the order level: the first eight of the alphabet at five, all at six. */
 export const orderPool = (age) => ALPHABET.slice(0, age <= 5 ? 8 : 28);
 
@@ -165,19 +166,47 @@ export class LevelPlay {
       return take;
     };
     if (mode === 'number' || mode === 'count') {
-      const max = mode === 'count' ? maxCountFor(this.age) : numberPool(this.age);
-      const nums = Array.from({ length: max }, (_, i) => i + 1);
-      const next = bag(nums, (n) => `n:${n}`);
+      // every number 0-100 is possible at every age; the age only picks how many easy and how many harder ones (numbers.js)
+      const plan = mode === 'count' ? countPlan(this.age, ROUNDS, r) : numberPlan(this.age, ROUNDS, r);
+      const pools = mode === 'count' ? COUNT_TIERS : TIERS;
+      const queues = {};
+      const draw = (tier, not) => {
+        if (!queues[tier] || !queues[tier].length) queues[tier] = mem ? mem.order(pools[tier], (n) => `n:${n}`, r) : [...pools[tier]].sort(() => r() - 0.5);
+        let k = queues[tier].findIndex((n) => !not.includes(n));
+        if (k < 0) k = 0;
+        return queues[tier].splice(k, 1)[0];
+      };
+      const asOpts = (list) => list.map((x) => ({ id: `n${x}`, kind: 'number', n: x }));
+      const shuffled = (list) => [...list].sort(() => r() - 0.5);
+      const lastN = () => out.map((x) => x.n);
       for (let i = 0; i < ROUNDS; i++) {
-        let n = next();
-        if (i && out[i - 1].n === n) n = next();
-        mark(n);
-        const opts = mode === 'count' ? optionsFor(this.age, n, this.seed + i * 31) : [n, ...pickLow(nums.filter((x) => x !== n), nOpt - 1)].sort(() => r() - 0.5);
-        out.push({
-          prompt: mode === 'count' ? COUNT_Q : numberQuestion(n), answer: `n${n}`, n, key: `n:${n}`,
-          show: mode === 'count' || this.age <= 4 ? { type: 'apples', n } : null, countAloud: n,
-          options: opts.map((x) => ({ id: `n${x}`, kind: 'number', n: x })),
-        });
+        const { kind, tier } = plan[i];
+        if (kind === 'count') {
+          const n = draw(tier, lastN());
+          mark(n);
+          out.push({ prompt: COUNT_Q, answer: `n${n}`, n, key: `n:${n}`, show: { type: 'apples', n }, countAloud: n, options: asOpts(optionsFor(this.age, n, this.seed + i * 31, 20)) });
+        } else if (kind === 'find') {
+          const n = draw(tier, lastN());
+          mark(n);
+          const others = pickLow(pools[tier].filter((x) => x !== n), nOpt - 1);
+          const small = this.age <= 4 && n >= 1 && n <= 10; // the youngest also SEE that many apples (they are counted aloud after the answer)
+          out.push({ prompt: findQ(n), answer: `n${n}`, n, key: `n:${n}`, show: small ? { type: 'apples', n } : null, countAloud: small ? n : 0, options: asOpts(shuffled([n, ...others])) });
+        } else if (kind === 'after' || kind === 'before') {
+          // "which number comes after / before ..." inside 0-20 (after: 0-19, before: 1-20)
+          const from = kind === 'after' ? draw('A', lastN()) - (r() < 0.2 ? 1 : 0) : 1 + draw('A', lastN()) + (r() < 0.2 ? 10 : 0) - 1;
+          const base = kind === 'after' ? Math.max(0, Math.min(19, from)) : Math.max(1, Math.min(20, from));
+          const ans = kind === 'after' ? base + 1 : base - 1;
+          mark(ans);
+          const near = range0(0, 20).filter((x) => x !== ans && x !== base);
+          const others = pickLow(near, nOpt - 1);
+          out.push({ prompt: kind === 'after' ? afterQ(base) : beforeQ(base), answer: `n${ans}`, n: ans, key: `n:${ans}`, show: null, countAloud: 0, options: asOpts(shuffled([ans, ...others])) });
+        } else {
+          // bigger / smaller: three or four different numbers, from the easy tiers (and the tens for the older)
+          const src = [...TIERS.A, ...TIERS.B, ...(this.age >= 5 ? TIERS.C : [])];
+          const set = pickLow(src, nOpt);
+          const ans = kind === 'bigger' ? Math.max(...set) : Math.min(...set);
+          out.push({ prompt: kind === 'bigger' ? BIGGER_Q : SMALLER_Q, answer: `n${ans}`, n: ans, key: `n:${ans}`, show: null, countAloud: 0, options: asOpts(shuffled(set)) });
+        }
       }
     } else if (mode === 'next') {
       const ab = orderPool(this.age);

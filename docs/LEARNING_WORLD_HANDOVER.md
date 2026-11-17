@@ -157,3 +157,10 @@ New foods use art pictures: meat (`o_chicken`), leaves (`j_leaf`), lettuce, berr
 Motion (letters/main.js `_petLife`): the picture on the stand breathes and bounces, wobbles when hungry, shakes its head at a wrong answer,
 hops for joy at a right one, and in the animals level the food first hops to its mouth, it chews, then the food goes to the rack.
 Voice: 42 new sentences recorded with Fatima (1210/1210). Tashkeel in `tools/game_voice/tashkeel_more.py` ANIMALS.
+
+## Numbers 0-100 (2026-11-17)
+`letters/numbers.js` (pure): `numberWord(n)` for 0-100 in Egyptian Arabic, four tiers (A 1-10, B 0 and 11-20, C tens 30-100, D the rest of 21-99),
+`tierCounts(age)` (how many of the 8 questions come from each tier: age only picks the start, nothing is closed; ages 2-3 are handled), question kinds
+find / after / before / bigger / smaller (`allNumberSentences()` = 143 sentences) and counting tiers 1-5 / 6-10 / 11-20. Freshness memory orders each tier.
+`LevelPlay` numbers/counting use them (old `numberPool` removed). Voice: 123 new Fatima clips, readings in `tools/game_voice/tashkeel_numbers.py`
+(1-20 keep the older readings; 11 stays «أَحَدَ عَشَر»). Not done: ordinals (الأول..), more/less pictures, number words in English.

@@ -35,9 +35,9 @@ export function makeRounds(age, seed) {
   return out;
 }
 
-export function optionsFor(age, n, seed) {
+export function optionsFor(age, n, seed, cap = maxCountFor(age)) {
   const r = rng(seed);
-  const max = maxCountFor(age);
+  const max = cap;
   const pool = [];
   for (let d = -2; d <= 2; d++) if (d && n + d >= 1 && n + d <= Math.max(max, n + 1)) pool.push(n + d);
   pool.sort(() => r() - 0.5);
