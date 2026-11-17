@@ -140,3 +140,9 @@ cutw 103 414 371 0 0 a_mama; cutw 103 414 371 369 0 a_baba; cutw 103 414 371 753
 
 # home pads (sheet 104)
 cutw 104 798 542 0 0 h_pad_rug; cutw 104 783 542 753 0 h_pad_wood; cutw 104 798 527 0 497 h_pad_stone; cutw 104 783 527 753 497 h_pad_bath
+
+# pack weather (sheet 105)
+cutw 105 414 371 0 0 t_rain; cutw 105 414 371 369 0 t_snow; cutw 105 414 371 753 0 t_wind; cutw 105 399 371 1137 0 t_thunder; cutw 105 414 371 0 326 t_lightning; cutw 105 414 371 369 326 t_umbrella; cutw 105 414 371 753 326 t_flake; cutw 105 399 371 1137 326 t_flower; cutw 105 414 357 0 667 t_leaves; cutw 105 414 357 369 667 t_hot; cutw 105 414 357 753 667 t_cold; cutw 105 399 357 1137 667 t_mountain
+
+# pack jobs (sheet 106)
+cutw 106 414 371 0 0 z_doctor; cutw 106 414 371 369 0 z_teacher; cutw 106 414 371 753 0 z_police; cutw 106 399 371 1137 0 z_firefighter; cutw 106 414 371 0 326 z_farmer; cutw 106 414 371 369 326 z_cook; cutw 106 414 371 753 326 z_driver; cutw 106 399 371 1137 326 z_pilot; cutw 106 414 357 0 667 z_nurse; cutw 106 414 357 369 667 z_builder; cutw 106 414 357 753 667 z_singer; cutw 106 399 357 1137 667 z_painter
