@@ -155,3 +155,6 @@ cutw 109 414 371 0 0 o_bread; cutw 109 414 371 369 0 o_cheese; cutw 109 414 371 
 
 # overrides: items that crossed their cell (insects sheet 108, food sheet 109)
 cutw 108 399 400 0 298 i_eagle; cutw 108 414 400 369 298 i_peacock; cutw 108 414 400 753 298 i_flamingo; cutw 108 399 376 0 648 i_ostrich; cutw 108 457 357 753 667 i_bat; cutw 109 414 386 369 638 o_honey
+
+# pack music (sheet 105)
+cutw 105 414 371 0 0 m_drum; cutw 105 414 371 369 0 m_guitar; cutw 105 414 371 753 0 m_piano; cutw 105 399 371 1137 0 m_violin; cutw 105 414 371 0 326 m_flute; cutw 105 414 371 369 326 m_trumpet; cutw 105 414 371 753 326 m_tambourine; cutw 105 399 371 1137 326 m_oud; cutw 105 414 357 0 667 m_mic; cutw 105 414 357 369 667 m_headphones; cutw 105 414 357 753 667 m_note; cutw 105 399 357 1137 667 m_bell
