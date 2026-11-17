@@ -78,6 +78,11 @@ Object.assign(VARIANTS, {
   'القاف زي قرد': ['القَاف زَي قُرْد', 'القَاف زَي قَرْد', 'القَاف زَي قِرْد.'],
   'يلا نشوف الساعة كام': ['يَالَّا نِشُوف السَّاعَه كَام', 'يَلَا نِشُوف السَّاعَه كَام', 'يَلَّا نِشُوفْ السَّاعَه كَام'],
 });
+// round 3 for the one sentence still wrong (2026-11-17): the qaf of قرد was heard as a g/j. Slow and steady with a long qaf, the Egyptian
+// hamza qaf, and a plain slow reading.
+Object.assign(VARIANTS, {
+  'القاف زي قرد': [{ t: 'القَاف زَي قِـــرْد', s: { speed: 0.72, stability: 0.78 } }, { t: 'القَاف زَي أِرْد', s: { speed: 0.8, stability: 0.7 } }, { t: 'القَاف زَي قِرْدْ.', s: { speed: 0.75, stability: 0.85 } }],
+});
 // sentences that need more time (a word was swallowed): slower
 const SLOW = new Set(['اتناشر', 'تسعتاشر', 'تلاتاشر', 'دي قلب', 'دي قلب أحمر', 'دي قلب أصفر', 'دي قلب برتقالي']);
 
