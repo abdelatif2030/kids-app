@@ -15,7 +15,7 @@ git clone https://github.com/abdelatif2030/kids-app.git rehlaty && cd rehlaty &&
 
 **First message to paste in the new Claude chat:**
 > Read `docs/README_FULL_HANDOVER.md` (Part A, Part C, Appendix 1) and run `bash tools/sync_and_status.sh`. Then continue from Part C: I will send you picture sheets one by one
-> (4 columns × 3 rows, packs in Appendix 1, or the 4 home pads). For each sheet: cut it with `tools/art/cut_pack.py`, turn the pack on, rebuild the voice lines and readings,
+> (4 columns × 3 rows, packs in Appendix 1). For each sheet: cut it with `tools/art/cut_pack.py`, turn the pack on, rebuild the voice lines and readings,
 > record the new voices (I will give you the ElevenLabs key in the environment, never in a file), build, run the tests, show me the result, then commit, push and deploy the demo.
 > Talk to me in Egyptian Arabic, short and concrete.
 
@@ -23,7 +23,7 @@ git clone https://github.com/abdelatif2030/kids-app.git rehlaty && cd rehlaty &&
 appear automatically in the «فين الصورة؟» and «أول حرف» levels (and in new levels if asked), the new scenes use the new values (pictures, words, pads), then voices + deploy.
 
 **Status right now (2026-11-17):** 12 worlds ✔, 8 questions per level ✔, 103 picture-words ✔, all 737 voice sentences recorded ✔ (voice review closed by the owner), demo deployed ✔
-(`Demo: Final state…`). Waiting for: the 12 picture sheets (144 words), the 4 home pads, a real-device test.
+(`Demo: Final state…`). Waiting for: a real-device test (the 12 picture packs and the 4 home pads are installed since).
 
 ---
 
@@ -114,8 +114,7 @@ appear automatically in the «فين الصورة؟» and «أول حرف» leve
    — only missing clips are made), then `node tools/game_voice/listening_page.mjs --new` for the owner to review, `cd game_src/learn_games && npm run build:letters && npm test`, commit, deploy.
    The 144 words and their diacritics are already written in `tools/game_voice/packs/*.json` (a pack turns on only when ALL its 12 pictures exist). A dry run with fake pictures
    passed the diacritics check for the first 132 (the new shapes pack was added after it and not dry-run yet).
-4. **Home pads (H5)** — the picture sheet with 4 pads for the home world was never sent; the home world uses the plain wooden raft. When received: cut as `h_pad_*`
-   (2×2 grid 768×512 cells) and add `padPics` to the `home` world in `worlds3d.js`.
+4. ~~Home pads (H5)~~ — DONE: `h_pad_rug/wood/stone/bath` exist in `assets/games/art/` and are wired in the `home` world (`padPics`, `worlds3d.js`).
 5. **Real device test** (phones sideways/upright, iPad, sound, touch, performance) — never done. Check the 8-slot rack and the stars row on small phones.
 6. **Shapes level**: only 5 shapes × 5 colours; a rectangle/oval/diamond/hexagon/… need geometry in `kit/shapes3d.js` + names in `shapes/sim.js` + readings in `tashkeel_games.py`.
    The numbers level stops at 20; the counting level uses apples only; there are no English words yet.
@@ -317,8 +316,7 @@ Levels beyond 12 do not exist (`LEVELS` has 12 entries); `WORLD_IDS[i % length]`
    panoramas `scale=1600:-1` → `<world>_pano.webp`.
 4. Prefix map: `b_` beach, `f_` farm (new) / `_f` (old farm props), `s_` space, `r_` rainbow, `c_` city, `w_` snow, `k_` castle, `u_` underwater,
    `j_` jungle, `d_` desert, `h_` home. Pad pictures: `<prefix>_pad_*`.
-5. Not yet installed: **home pads (H5)** — the home world falls back to the plain wooden raft pad. When the owner sends H5, cut it as
-   `h_pad_*` (2×2, 768×512 cells) and add `padPics` to the `home` world.
+5. Home pads (H5) are installed: `h_pad_rug/wood/stone/bath`, wired as `padPics` in the `home` world.
 6. Prompts given to the owner for every sheet are in the chat history; the style block was: glossy 3D-rendered cartoon, soft studio lighting,
    thick clean edges, white (#FFF) background, items centered in invisible grid cells with ≥50 px margin, no shadows/glow/particles; white items
    with a soft grey-blue edge; panoramas 2:1 with horizon at ~58% and an empty bottom 40%; textures seamless top-down.
@@ -343,7 +341,7 @@ Levels beyond 12 do not exist (`LEVELS` has 12 entries); `WORLD_IDS[i % length]`
   `lib/firebase_config.dart` now waits for the first `authStateChanges()` (4 s cap). Not verified by the owner yet.
 
 ## 6. Still open
-- Home pads (H5); optional unused cuts: `s_*`/`r_*`/… extras that no world uses yet.
+- Optional unused cuts: `s_*`/`r_*`/… extras that no world uses yet.
 - Voice: hearts sentences #27–#30 («دي قلب …», the qaf must not sound like «جلب»); owner chose take C only for «دي قلب برتقالي».
   Tools in `tools/game_voice/` (takes.mjs, fix_readings.mjs, check_ends.mjs, listening_page.mjs, orange.mjs). ElevenLabs voice Fatima; key only in env.
 - Replace the code-made butterflies/birds in the pond with the owner's pictures (`butterfly_1..3`, `bird_blue`, `bird_yellow`, `dragonfly`,

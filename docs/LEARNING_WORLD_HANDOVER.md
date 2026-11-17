@@ -54,8 +54,7 @@ Levels beyond 12 do not exist (`LEVELS` has 12 entries); `WORLD_IDS[i % length]`
    panoramas `scale=1600:-1` → `<world>_pano.webp`.
 4. Prefix map: `b_` beach, `f_` farm (new) / `_f` (old farm props), `s_` space, `r_` rainbow, `c_` city, `w_` snow, `k_` castle, `u_` underwater,
    `j_` jungle, `d_` desert, `h_` home. Pad pictures: `<prefix>_pad_*`.
-5. Not yet installed: **home pads (H5)** — the home world falls back to the plain wooden raft pad. When the owner sends H5, cut it as
-   `h_pad_*` (2×2, 768×512 cells) and add `padPics` to the `home` world.
+5. Home pads (H5) are installed: `h_pad_rug/wood/stone/bath`, wired as `padPics` in the `home` world.
 6. Prompts given to the owner for every sheet are in the chat history; the style block was: glossy 3D-rendered cartoon, soft studio lighting,
    thick clean edges, white (#FFF) background, items centered in invisible grid cells with ≥50 px margin, no shadows/glow/particles; white items
    with a soft grey-blue edge; panoramas 2:1 with horizon at ~58% and an empty bottom 40%; textures seamless top-down.
@@ -80,7 +79,7 @@ Levels beyond 12 do not exist (`LEVELS` has 12 entries); `WORLD_IDS[i % length]`
   `lib/firebase_config.dart` now waits for the first `authStateChanges()` (4 s cap). Not verified by the owner yet.
 
 ## 6. Still open
-- Home pads (H5); optional unused cuts: `s_*`/`r_*`/… extras that no world uses yet.
+- Optional unused cuts: `s_*`/`r_*`/… extras that no world uses yet.
 - Voice: hearts sentences #27–#30 («دي قلب …», the qaf must not sound like «جلب»); owner chose take C only for «دي قلب برتقالي».
   Tools in `tools/game_voice/` (takes.mjs, fix_readings.mjs, check_ends.mjs, listening_page.mjs, orange.mjs). ElevenLabs voice Fatima; key only in env.
 - Replace the code-made butterflies/birds in the pond with the owner's pictures (`butterfly_1..3`, `bird_blue`, `bird_yellow`, `dragonfly`,

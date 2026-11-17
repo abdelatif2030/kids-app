@@ -54,7 +54,7 @@ branch `demo-site`: https://demo-site-e3g.pages.dev (publishing lags 1–3 minut
 
 ## 6. What is left (ideas the owner mentioned)
 - Real phone/tablet test (touch, sound, 8-star bar, owl's rack of 8 dishes).
-- Jungle/space etc. already have pads; only home pads came late (installed by the other account).
+- All 12 worlds have their pad pictures, including home (`h_pad_rug/wood/stone/bath`, wired in `worlds3d.js` `padPics`).
 - New worlds or levels per topic (clothes, body, jobs, weather, food, school, family, music…): each needs a `PICKS` table + `LEVELS` entry
   (`letters/levels.js`), prompts in `tools/game_voice/tashkeel_more.py`, and a world in `WORLD_IDS` (levels wrap onto worlds).
 - Shapes level only has 5 shapes (rectangle/oval/diamond need geometry in `kit/shapes3d.js`).

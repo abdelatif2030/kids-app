@@ -38,7 +38,20 @@ for f in sorted(glob.glob('tools/game_voice/packs/*.json')):
     p = json.load(open(f, encoding='utf-8'))
     have = sum(os.path.exists(os.path.join(art, i['thing'] + '.webp')) for i in p['items'])
     print(f"  {p['pack']:9s} {have}/{len(p['items'])} pictures  {'ON' if have == len(p['items']) else 'waiting for the sheet'}  (prefix {p['prefix']}_)")
-print('  home pads (h_pad_*):', 'present' if os.path.exists(os.path.join(art, 'h_pad_1.webp')) else 'MISSING - the home world uses the plain raft')
+pads = sorted(glob.glob(os.path.join(art, 'h_pad_*.webp')))
+src = open('game_src/learn_games/src/kit/worlds3d.js', encoding='utf-8').read()
+import re
+m = re.search(r"padPics:\s*\[([^\]]*h_pad_[^\]]*)\]", src)
+wired = re.findall(r"'(h_pad_\w+)'", m.group(1)) if m else []
+missing = [w for w in wired if not os.path.exists(os.path.join(art, w + '.webp'))]
+if pads and wired and not missing:
+    print(f"  home pads (h_pad_*): {len(pads)} pictures, wired in worlds3d.js padPics ({', '.join(wired)})")
+elif pads and not wired:
+    print(f"  home pads (h_pad_*): {len(pads)} pictures exist but padPics in worlds3d.js does not use them")
+elif missing:
+    print('  home pads (h_pad_*): padPics names files that do not exist: ' + ', '.join(missing))
+else:
+    print('  home pads (h_pad_*): MISSING - the home world uses the plain raft')
 EOF
 
 echo
