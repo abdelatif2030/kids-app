@@ -61,6 +61,13 @@ export const PICKS = {
     ],
   },
 };
+// The fruit and vegetable level also asks every fruit and vegetable picture of the picture-words (their sentences «فين ...؟» are already recorded).
+for (const w of MORE_WORDS) if (/^(q|v)_/.test(w.thing)) PICKS.fruits.items.push({ id: w.thing, the: w.the, thing: w.thing });
+// More ways to travel, from pictures the app already has.
+PICKS.vehicles.items.push(
+  { id: 'tractor', the: 'الجرار', thing: 'tractor_f' }, { id: 'sled', the: 'الزحافة', thing: 'w_sled' },
+  { id: 'rover', the: 'مركبة الفضاء', thing: 's_rover' }, { id: 'ufo', the: 'الطبق الطائر', thing: 's_ufo' },
+);
 export const levelOf = (id) => LEVELS.find((l) => l.id === id);
 /** The youngest (four) skip the two alphabet levels that need reading order. */
 export const levelsFor = (age) => (age <= 4 ? LEVELS.filter((l) => l.id !== 'first' && l.id !== 'order') : LEVELS);
@@ -116,6 +123,40 @@ export const HABITS = [
   { text: 'يلا نلعب بالكورة', answer: 'h_ball' },
   { text: 'يلا نقعد ونرسم على الترابيزة', answer: 'h_table' },
 ];
+// More everyday habits, each with a picture the app already has (2026-11-17).
+HABITS.push(
+  { text: 'يلا نكتب بالقلم', answer: 'e_pencil' },
+  { text: 'يلا نقص بالمقص', answer: 'e_scissors' },
+  { text: 'يلا نرسم بالألوان', answer: 'e_crayons' },
+  { text: 'يلا نقرا كتاب', answer: 'e_book' },
+  { text: 'يلا نمسح بالأستيكة', answer: 'e_eraser' },
+  { text: 'يلا نقيس بالمسطرة', answer: 'e_ruler' },
+  { text: 'يلا نلزق الورقة', answer: 'e_glue' },
+  { text: 'يلا نشرب لبن', answer: 'o_milk' },
+  { text: 'يلا نشرب مية', answer: 'o_water' },
+  { text: 'يلا ناكل عيش', answer: 'o_bread' },
+  { text: 'يلا نشرب عصير', answer: 'o_juice' },
+  { text: 'يلا ناكل شوربة', answer: 'o_soup' },
+  { text: 'يلا ناكل رز', answer: 'o_rice' },
+  { text: 'يلا ناكل بيضة', answer: 'o_egg' },
+  { text: 'يلا نلبس الجاكت عشان الجو برد', answer: 'l_jacket' },
+  { text: 'يلا نلبس الكاب عشان الشمس حامية', answer: 'l_cap' },
+  { text: 'يلا نلبس المعطف عشان بتمطر', answer: 'l_raincoat' },
+  { text: 'يلا نلبس الشراب', answer: 'l_socks' },
+  { text: 'يلا نلبس البيجامة عشان ننام', answer: 'l_pajamas' },
+  { text: 'يلا نلبس الجوانتي عشان إيدينا متبردش', answer: 'l_gloves' },
+  { text: 'يلا نلف الإيشارب حوالين رقبتنا', answer: 'l_scarf' },
+  { text: 'يلا نشم الوردة', answer: 'rose' },
+  { text: 'يلا نبعت جواب', answer: 'h_mailbox' },
+  { text: 'يلا نسمع موسيقى', answer: 'm_headphones' },
+  { text: 'يلا نعزف على الجيتار', answer: 'm_guitar' },
+  { text: 'يلا نستنى الإشارة قبل ما نعدي الشارع', answer: 'c_light' },
+  { text: 'يلا نركب العجلة', answer: 'h_bike' },
+  { text: 'يلا نرجع الكلب بيته', answer: 'h_doghouse' },
+  { text: 'يلا نلعب في المرجيحة', answer: 'h_swing' },
+  { text: 'يلا نغسل وشنا في الحوض', answer: 'h_sink' },
+  { text: 'يلا نروح للدكتور لما نتعب', answer: 'z_doctor' },
+);
 export const HABIT_ITEMS = [...new Set(HABITS.map((h) => h.answer))];
 
 /** The short, simple sentences said after a right answer (never about time or points). */

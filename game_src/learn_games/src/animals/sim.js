@@ -45,6 +45,21 @@ export const ANIMALS = [
   { id: 'turtle', thing: 'u_turtle', the: 'السلحفاة', fem: true, food: 'lettuce', also: ['leaves', 'berries'], age: 5, groups: ['underwater', 'meadow'] },
   { id: 'bee', thing: 'bee', the: 'النحلة', fem: true, food: 'flower', also: ['honey'], age: 5, groups: ['meadow'] },
   { id: 'butterfly', thing: 'butterfly', the: 'الفراشة', fem: true, food: 'flower', also: [], age: 5, groups: ['meadow'] },
+  // more, from pictures the app already had but no level used (2026-11-17)
+  { id: 'goose', thing: 'goose', the: 'الوزة', fem: true, food: 'grass', also: ['seeds', 'corn', 'lettuce'], age: 4, groups: ['farm'] },
+  { id: 'duck', thing: 'mallard', the: 'البطة', fem: true, food: 'seeds', also: ['corn', 'worm', 'lettuce'], age: 4, groups: ['farm', 'meadow'] },
+  { id: 'pigeon', thing: 'pigeon', the: 'الحمامة', fem: true, food: 'seeds', also: ['corn'], age: 4, groups: ['meadow'] },
+  { id: 'peacock', thing: 'peacock', the: 'الطاووس', fem: false, food: 'seeds', also: ['corn', 'berries', 'worm'], age: 5, groups: ['farm', 'jungle'] },
+  { id: 'shark', thing: 'shark', the: 'القرش', fem: false, food: 'fish', also: ['meat'], age: 5, groups: ['underwater'] },
+  { id: 'cheetah', thing: 'cheetah', the: 'الفهد', fem: false, food: 'meat', also: [], age: 5, groups: ['jungle'] },
+  { id: 'croc', thing: 'croc', the: 'التمساح', fem: false, food: 'fish', also: ['meat'], age: 5, groups: ['jungle'] },
+  { id: 'iguana', thing: 'iguana', the: 'الإغوانا', fem: true, food: 'leaves', also: ['insect', 'lettuce', 'berries'], age: 6, groups: ['jungle', 'desert'] },
+  { id: 'mantis', thing: 'mantis', the: 'فرس النبي', fem: false, food: 'insect', also: ['worm'], age: 6, groups: ['meadow'] },
+  { id: 'caterpillar', thing: 'caterpillar', the: 'اليرقة', fem: true, food: 'leaves', also: ['lettuce'], age: 5, groups: ['meadow'] },
+  { id: 'trex', thing: 'trex', the: 'التيرانوصور', fem: false, food: 'meat', also: [], age: 5, groups: ['dino'] },
+  { id: 'triceratops', thing: 'triceratops', the: 'ثلاثي القرون', fem: false, food: 'leaves', also: ['grass'], age: 5, groups: ['dino'] },
+  { id: 'stego', thing: 'stego', the: 'الستيجوصور', fem: false, food: 'leaves', also: ['grass'], age: 6, groups: ['dino'] },
+  { id: 'brachio', thing: 'brachio', the: 'الديناصور الطويل', fem: false, food: 'leaves', also: ['grass'], age: 6, groups: ['dino'] },
 ];
 // `thing` is the picture a plate shows (an art name, or one of the things the 3D kit draws itself).
 export const FOODS = {

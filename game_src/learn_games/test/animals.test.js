@@ -61,7 +61,7 @@ test('a world shows its own animals, or everyone of the age when it has too few'
   assert.ok(poolFor(6, 'farm').every((a) => a.groups.includes('farm')));
   assert.ok(poolFor(6, 'jungle').length >= MIN_GROUP);
   assert.equal(poolFor(4, 'space').length, poolFor(4).length);
-  assert.equal(poolFor(4, 'meadow').length, poolFor(4).length); // too few meadow animals at four
+  assert.equal(poolFor(4, 'snow').length, poolFor(4).length); // too few snow animals at four
   for (const a of poolFor(4)) assert.ok(a.age <= 4);
 });
 test('the animals level follows the world it is in', async () => {
