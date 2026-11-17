@@ -148,3 +148,12 @@ what the PREVIOUS level just showed last (keys are `t:<picture>`, `n:<n>`, `l:<l
 "spotlight" (1 key in 12, by calendar week) goes first when not met yet. The scene also turns: entering a level from the map adds 5 to
 `save.lw.spin`, so the same level is in another world next time (walking on to the next level keeps the same spin). Shape rounds have no
 key yet (still random). Tests: `test/fresh.test.js`. No new pictures or voices were needed.
+
+## Animals everywhere (2026-11-17)
+`animals/sim.js`: 34 animals (was 13), all from pictures the app already had (no pig on purpose), each with `age`, `groups` (worlds) and `also`
+(foods it ALSO eats: never offered as a wrong plate). `poolFor(age, world)` shows a world's own animals (farm, jungle, snow, desert, meadow,
+underwater) when it has at least 5 for the age, else every animal of the age. `LevelPlay(..., world)` gets the world the level is in.
+New foods use art pictures: meat (`o_chicken`), leaves (`j_leaf`), lettuce, berries, worm, insect (`grasshopper`), flower (`t_flower`).
+Motion (letters/main.js `_petLife`): the picture on the stand breathes and bounces, wobbles when hungry, shakes its head at a wrong answer,
+hops for joy at a right one, and in the animals level the food first hops to its mouth, it chews, then the food goes to the rack.
+Voice: 42 new sentences recorded with Fatima (1210/1210). Tashkeel in `tools/game_voice/tashkeel_more.py` ANIMALS.

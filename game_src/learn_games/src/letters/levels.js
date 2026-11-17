@@ -131,13 +131,13 @@ export const CHEERS_F = ['أحسنتي!', 'حلوة أوي!', 'ممتازة!', '
 export const cheer = (girl, i) => (girl ? CHEERS_F : CHEERS_M)[i % CHEERS_M.length];
 
 const pick = (r, arr, n) => [...arr].sort(() => r() - 0.5).slice(0, n);
-const FOOD_THING = { carrot: 'carrot', fish: 'fish', bone: 'bone', banana: 'banana', grass: 'grass', honey: 'honey', cheese: 'cheese', seeds: 'seeds', f_haypile: 'f_haypile', corn: 'corn' };
 
 /** One game of a level: rounds of { prompt, answer, reward, show, options: [{id, kind, ...}] }. */
 export class LevelPlay {
   /** @param mem optional FreshMemory: new things first, and nothing the previous level just showed */
-  constructor(levelId, age, seed = Date.now(), mem = null) {
+  constructor(levelId, age, seed = Date.now(), mem = null, world = null) {
     this.mem = mem;
+    this.world = world; // the place the level is in: «أطعم الحيوان» then shows that place's own animals
     this.level = levelOf(levelId);
     this.age = age;
     this.seed = seed;
@@ -190,13 +190,13 @@ export class LevelPlay {
         out.push({ prompt: shapeQuestion(s, c), answer: ans.id, reward: shapeReward(s, c), options: tiles.map((x) => ({ id: x.id, kind: 'shape', shape: x.shape, color: x.color })) });
       });
     } else if (mode === 'animal') {
-      const next = bag(animalPool(this.age).map((a) => a.id), (id) => `t:${animalById(id).thing}`);
+      const next = bag(animalPool(this.age, this.world).map((a) => a.id), (id) => `t:${animalById(id).thing}`);
       for (let i = 0; i < ROUNDS; i++) {
         let id = next();
         if (i && out[i - 1].animal === id) id = next();
         const a = animalById(id);
-        const plates = platesOf(this.age, id, this.seed + i * 41);
-        out.push({ prompt: animalQuestion(a), answer: a.food, animal: id, key: `t:${a.thing}`, show: { type: 'thing', thing: a.thing }, reward: animalReward(a), options: plates.map((f) => ({ id: f, kind: 'thing', thing: FOOD_THING[f] })) });
+        const plates = platesOf(this.age, id, this.seed + i * 41, this.world);
+        out.push({ prompt: animalQuestion(a), answer: a.food, animal: id, key: `t:${a.thing}`, show: { type: 'thing', thing: a.thing }, reward: animalReward(a), options: plates.map((f) => ({ id: f, kind: 'thing', thing: FOODS[f].thing })) });
       }
     } else if (mode === 'pick') {
       const tab = PICKS[this.level.table];

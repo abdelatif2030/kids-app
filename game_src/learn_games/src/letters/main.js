@@ -324,6 +324,7 @@ class Game {
       t.position.y = 0.76 - fi.minY;
       g.add(t);
       if (!t.userData.art) g.userData.spin = t; // a flat picture must not turn edge-on
+      g.userData.pet = { inner: t, base: t.position.y, s0: t.scale.clone(), t0: Math.random() * 6, hop: 0, hopDur: 1.2, shake: 0, chew: 0, hungry: !!(this.level && this.level.mode === 'animal') };
     } else if (show.type === 'apples') {
       const n = show.n;
       const cols = n > 10 ? 5 : n > 6 ? 4 : 3;
@@ -532,9 +533,10 @@ class Game {
     this.levelId = levelId;
     this.level = LEVELS.find((l) => l.id === levelId);
     if (!keepSpin) this._spin = this.save.lw.spin || 0;
-    this._goWorld(Math.max(0, levelsFor(sh.age).findIndex((l) => l.id === levelId)) + this._spin);
+    const worldIdx = Math.max(0, levelsFor(sh.age).findIndex((l) => l.id === levelId)) + this._spin;
+    this._goWorld(worldIdx);
     this.mem.begin(levelId);
-    this.play = new LevelPlay(levelId, sh.age, Math.floor(Math.random() * 1e9), this.mem);
+    this.play = new LevelPlay(levelId, sh.age, Math.floor(Math.random() * 1e9), this.mem, WORLD_IDS[worldIdx % WORLD_IDS.length]);
     sh.clear();
     this.lightDots = sh.topBar(ROUNDS, '⭐');
     this.lightDots(0);
@@ -572,6 +574,7 @@ class Game {
     void this.sign.offsetWidth;
     this.sign.classList.add('pop');
     this.st.mode = 'wait';
+    this._pet((p) => { p.hungry = this.level.mode === 'animal'; });
     this.sh.sound.setSuspense(true);
     this.owl.look(0);
     this._say();
@@ -596,6 +599,7 @@ class Game {
       this.sh.sound.play('bump');
       this.owl.act('think');
       if (this.hero) this.hero.act('think');
+      this._pet((p) => { p.shake = 0.7; });
       this.sh.say(this.sh.t('no'), false, 1.6);
       if (ev.firstMiss) this.sh.round(this.level.skill, false, r.answer);
       setTimeout(() => this.st.mode === 'wait' && this._say(), 900);
@@ -621,7 +625,8 @@ class Game {
     this.owl.look(o.g.position.x);
     for (const [k, x] of this.opts) if (k !== id) x.gone = true;
     // the owl arranges the picture on his rack
-    this.leap = { o, t: 0, from: o.g.position.clone(), slot: this.slots[done - 1] };
+    this._pet((p) => { p.hop = p.hopDur = 1.3; p.hungry = false; });
+    this.leap = { o, t: 0, from: o.g.position.clone(), slot: this.slots[done - 1], via: this.level.mode === 'animal' && this.standItem ? STAND.clone().add(new THREE.Vector3(0, 1.1, 0.4)) : null };
     const phrase = cheer(this.girl, this.cheerN++);
     const seq = [phrase];
     if (r.reward) seq.push(r.reward);
@@ -736,6 +741,31 @@ class Game {
 
   // ---- animation ---------------------------------------------------------------------------------------------------
 
+  /** Runs `fn` on the little pet standing on the question stand (a picture of an animal, a thing...), when there is one. */
+  _pet(fn) {
+    const p = this.standItem && this.standItem.userData.pet;
+    if (p) fn(p);
+  }
+
+  /** The picture on the stand is alive: it breathes and bounces gently, wobbles when hungry, shakes its head at a wrong
+   *  answer, hops for joy at a right one and chews when it eats. Pure motion, no sound, nothing is ever lost. */
+  _petLife(p, dt, time) {
+    const t = p.inner, a = time * 1.6 + p.t0;
+    let y = p.base + Math.abs(Math.sin(a)) * 0.05;
+    let sx = 1 + Math.sin(a * 2) * 0.012, sy = 1 - Math.sin(a * 2) * 0.012, rz = Math.sin(time * 1.1 + p.t0) * 0.03;
+    if (p.hungry) { rz += Math.sin(time * 6.5) * 0.04; sx += Math.sin(time * 9) * 0.012; }
+    if (p.shake > 0) { p.shake -= dt; rz += Math.sin(p.shake * 30) * 0.28 * Math.max(0, p.shake / 0.7); }
+    if (p.hop > 0) {
+      p.hop -= dt;
+      const k = 1 - Math.max(0, p.hop) / p.hopDur, w = Math.abs(Math.sin(k * Math.PI * 3)), fade = 1 - k * 0.45;
+      y += w * 0.62 * fade; sy += (1 - w) * 0.1 * (1 - k); sx -= (1 - w) * 0.07 * (1 - k); rz += Math.sin(k * Math.PI * 6) * 0.1 * (1 - k);
+    }
+    if (p.chew > 0) { p.chew -= dt; y += Math.abs(Math.sin(time * 17)) * 0.08; sy += Math.sin(time * 34) * 0.035; rz += Math.sin(time * 11) * 0.05; }
+    t.position.y = y;
+    t.scale.set(p.s0.x * sx, p.s0.y * sy, p.s0.z);
+    t.rotation.z = rz;
+  }
+
   _frame(dt, time) {
     this.owl.update(dt, time);
     if (this.hero) this.hero.update(dt, time);
@@ -797,13 +827,33 @@ class Game {
     // the chosen picture hops to the owl's rack
     if (this.leap) {
       const L = this.leap;
-      L.t += dt / 1.1;
+      L.t += dt / (L.via ? 1.7 : 1.1);
       const k = Math.min(1, L.t);
-      const e = k * k * (3 - 2 * k);
-      L.o.g.position.lerpVectors(L.from, new THREE.Vector3(L.slot.x, L.slot.y - 0.2, L.slot.z), e);
-      L.o.g.position.y += Math.sin(k * Math.PI) * 2.4;
-      L.o.g.scale.setScalar(Math.max(0.01, 1 - 0.58 * e));
-      L.o.g.rotation.y = e * Math.PI * 2;
+      const slotPos = new THREE.Vector3(L.slot.x, L.slot.y - 0.2, L.slot.z);
+      if (L.via) {
+        // the food first hops to the animal's mouth, who munches, and only then goes on to the rack
+        const SPLIT = 0.42;
+        if (k < SPLIT) {
+          const kk = k / SPLIT, ee = kk * kk * (3 - 2 * kk);
+          L.o.g.position.lerpVectors(L.from, L.via, ee);
+          L.o.g.position.y += Math.sin(kk * Math.PI) * 1.6;
+          L.o.g.scale.setScalar(Math.max(0.01, 1 - 0.5 * ee));
+          L.o.g.rotation.y = ee * Math.PI;
+        } else {
+          if (!L.ate) { L.ate = true; this.sh.sound.play('pop'); this._pet((p) => { p.chew = 1.1; }); this.st.sparkle(L.via.clone(), 10); }
+          const kk = (k - SPLIT) / (1 - SPLIT), ee = kk * kk * (3 - 2 * kk);
+          L.o.g.position.lerpVectors(L.via, slotPos, ee);
+          L.o.g.position.y += Math.sin(kk * Math.PI) * 2.0;
+          L.o.g.scale.setScalar(Math.max(0.01, 0.5 - 0.08 * ee));
+          L.o.g.rotation.y = Math.PI + ee * Math.PI;
+        }
+      } else {
+        const e = k * k * (3 - 2 * k);
+        L.o.g.position.lerpVectors(L.from, slotPos, e);
+        L.o.g.position.y += Math.sin(k * Math.PI) * 2.4;
+        L.o.g.scale.setScalar(Math.max(0.01, 1 - 0.58 * e));
+        L.o.g.rotation.y = e * Math.PI * 2;
+      }
       if (k >= 1) {
         // keep only the picture on the rack: the raft stays behind and sinks away
         const keep = L.o.item;
@@ -831,6 +881,7 @@ class Game {
       }
     }
     if (this.standItem && this.standItem.userData.spin) this.standItem.userData.spin.rotation.y = time * 0.8;
+    if (this.standItem && this.standItem.userData.pet) this._petLife(this.standItem.userData.pet, dt, time);
   }
 
   pause() { this.sh.pause(); }
