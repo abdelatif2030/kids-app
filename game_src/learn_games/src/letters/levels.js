@@ -16,6 +16,7 @@ import { tilesOf, makeRounds as shapeRounds, withColour, shapeById, colorById, q
 import { ANIMALS, platesOf, animalById, question as animalQuestion, reward as animalReward, poolFor as animalPool, FOODS } from '../animals/sim.js';
 import { optionsFor, maxCountFor, COUNT_Q } from '../counting/sim.js';
 import MORE_WORDS from './more_words.json' with { type: 'json' };
+// (FreshMemory, in fresh.js, is passed in by the game: it remembers what each child already met)
 
 export const LEVELS = [
   { id: 'letters', mode: 'letter', ar: 'اصطاد الحرف', emoji: '🔤', skill: 'letters_ar' },
@@ -134,7 +135,9 @@ const FOOD_THING = { carrot: 'carrot', fish: 'fish', bone: 'bone', banana: 'bana
 
 /** One game of a level: rounds of { prompt, answer, reward, show, options: [{id, kind, ...}] }. */
 export class LevelPlay {
-  constructor(levelId, age, seed = Date.now()) {
+  /** @param mem optional FreshMemory: new things first, and nothing the previous level just showed */
+  constructor(levelId, age, seed = Date.now(), mem = null) {
+    this.mem = mem;
     this.level = levelOf(levelId);
     this.age = age;
     this.seed = seed;
@@ -149,31 +152,32 @@ export class LevelPlay {
     const mode = this.level.mode;
     const pool = poolFor(this.age).map((l) => l.id);
     const nOpt = fishCount(this.age);
-    const bag = (arr) => { let b = []; return () => { if (!b.length) b = [...arr].sort(() => r() - 0.5); return b.shift(); }; };
+    const mem = this.mem;
+    const bag = (arr, keyOf = (x) => String(x)) => { let b = []; return () => { if (!b.length) b = mem ? mem.order(arr, keyOf, r) : [...arr].sort(() => r() - 0.5); return b.shift(); }; };
     const rew = (l) => `${l.the} زي ${l.word}`;
     if (mode === 'number' || mode === 'count') {
       const max = mode === 'count' ? maxCountFor(this.age) : numberPool(this.age);
       const nums = Array.from({ length: max }, (_, i) => i + 1);
-      const next = bag(nums);
+      const next = bag(nums, (n) => `n:${n}`);
       for (let i = 0; i < ROUNDS; i++) {
         let n = next();
         if (i && out[i - 1].n === n) n = next();
         const opts = mode === 'count' ? optionsFor(this.age, n, this.seed + i * 31) : [n, ...pick(r, nums.filter((x) => x !== n), nOpt - 1)].sort(() => r() - 0.5);
         out.push({
-          prompt: mode === 'count' ? COUNT_Q : numberQuestion(n), answer: `n${n}`, n,
+          prompt: mode === 'count' ? COUNT_Q : numberQuestion(n), answer: `n${n}`, n, key: `n:${n}`,
           show: mode === 'count' || this.age <= 4 ? { type: 'apples', n } : null, countAloud: n,
           options: opts.map((x) => ({ id: `n${x}`, kind: 'number', n: x })),
         });
       }
     } else if (mode === 'next') {
       const ab = orderPool(this.age);
-      const next = bag(Array.from({ length: ab.length - 1 }, (_, i) => i));
+      const next = bag(Array.from({ length: ab.length - 1 }, (_, i) => i), (k) => `l:${ab[k + 1]}`);
       for (let i = 0; i < ROUNDS; i++) {
         const k = next();
         const cur = letterById(ab[k]);
         const ans = ab[k + 1];
         const others = pick(r, ab.filter((x) => x !== ans && x !== ab[k]), nOpt - 1);
-        out.push({ prompt: nextQuestion(cur), answer: ans, from: ab[k], show: { type: 'letter', ch: cur.ch }, reward: rew(letterById(ans)), options: [ans, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'letter', ch: letterById(x).ch })) });
+        out.push({ prompt: nextQuestion(cur), answer: ans, key: `l:${ans}`, from: ab[k], show: { type: 'letter', ch: cur.ch }, reward: rew(letterById(ans)), options: [ans, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'letter', ch: letterById(x).ch })) });
       }
     } else if (mode === 'shape') {
       const targets = shapeRounds(this.age, this.seed);
@@ -186,33 +190,37 @@ export class LevelPlay {
         out.push({ prompt: shapeQuestion(s, c), answer: ans.id, reward: shapeReward(s, c), options: tiles.map((x) => ({ id: x.id, kind: 'shape', shape: x.shape, color: x.color })) });
       });
     } else if (mode === 'animal') {
-      const next = bag(animalPool(this.age).map((a) => a.id));
+      const next = bag(animalPool(this.age).map((a) => a.id), (id) => `t:${animalById(id).thing}`);
       for (let i = 0; i < ROUNDS; i++) {
         let id = next();
         if (i && out[i - 1].animal === id) id = next();
         const a = animalById(id);
         const plates = platesOf(this.age, id, this.seed + i * 41);
-        out.push({ prompt: animalQuestion(a), answer: a.food, animal: id, show: { type: 'thing', thing: a.thing }, reward: animalReward(a), options: plates.map((f) => ({ id: f, kind: 'thing', thing: FOOD_THING[f] })) });
+        out.push({ prompt: animalQuestion(a), answer: a.food, animal: id, key: `t:${a.thing}`, show: { type: 'thing', thing: a.thing }, reward: animalReward(a), options: plates.map((f) => ({ id: f, kind: 'thing', thing: FOOD_THING[f] })) });
       }
     } else if (mode === 'pick') {
       const tab = PICKS[this.level.table];
-      const next = bag(tab.items.map((x) => x.id));
+      const keyOfItem = (it) => (it.thing ? `t:${it.thing}` : `c:${it.id}`);
+      const next = bag(tab.items.map((x) => x.id), (id) => keyOfItem(tab.items.find((x) => x.id === id)));
       for (let i = 0; i < ROUNDS; i++) {
         let id = next();
         if (i && out[i - 1].answer === id) id = next();
         const it = tab.items.find((x) => x.id === id);
         const others = pick(r, tab.items.filter((x) => x.id !== id), nOpt - 1);
-        out.push({ prompt: tab.prompt(it), answer: id, options: [it, ...others].sort(() => r() - 0.5).map((x) => (x.hex != null ? { id: x.id, kind: 'color', hex: x.hex } : { id: x.id, kind: 'thing', thing: x.thing })) });
+        out.push({ prompt: tab.prompt(it), answer: id, key: keyOfItem(it), options: [it, ...others].sort(() => r() - 0.5).map((x) => (x.hex != null ? { id: x.id, kind: 'color', hex: x.hex } : { id: x.id, kind: 'thing', thing: x.thing })) });
       }
     } else if (mode === 'habit') {
-      const chosen = pick(r, HABITS, ROUNDS);
+      const nextH = bag(HABITS, (h) => `t:${h.answer}`);
+      const chosen = [];
+      for (let tries = 0; chosen.length < ROUNDS && tries < 200; tries++) { const h = nextH(); if (!chosen.some((c) => c.answer === h.answer)) chosen.push(h); }
       for (const h of chosen) {
         const others = pick(r, HABIT_ITEMS.filter((x) => x !== h.answer), nOpt - 1);
-        out.push({ prompt: h.text, answer: h.answer, show: null, options: [h.answer, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'thing', thing: x })) });
+        out.push({ prompt: h.text, answer: h.answer, key: `t:${h.answer}`, show: null, options: [h.answer, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'thing', thing: x })) });
       }
     } else if (mode === 'word' || mode === 'first') {
       const items = wordItems(this.age);
-      const next = bag(items.map((x) => x.id));
+      const thingOf = new Map(items.map((x) => [x.id, x.thing]));
+      const next = bag(items.map((x) => x.id), (id) => `t:${thingOf.get(id)}`);
       let last = null;
       for (let i = 0; i < ROUNDS; i++) {
         let id = next();
@@ -221,22 +229,22 @@ export class LevelPlay {
         const w = items.find((x) => x.id === id);
         if (mode === 'word') {
           const others = pick(r, items.filter((x) => x.id !== id && x.thing !== w.thing), nOpt - 1);
-          out.push({ prompt: wordQ(w), answer: id, reward: wordReward(w), options: [w, ...others].sort(() => r() - 0.5).map((x) => ({ id: x.id, kind: 'thing', thing: x.thing })) });
+          out.push({ prompt: wordQ(w), answer: id, key: `t:${w.thing}`, reward: wordReward(w), options: [w, ...others].sort(() => r() - 0.5).map((x) => ({ id: x.id, kind: 'thing', thing: x.thing })) });
         } else {
           const letters = [...new Set(items.map((x) => x.letter))].filter((x) => x !== w.letter);
           const others = pick(r, letters, nOpt - 1);
-          out.push({ prompt: firstQ(w), answer: w.letter, reward: wordReward(w), show: { type: 'thing', thing: w.thing }, options: [w.letter, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'letter', ch: letterById(x).ch })) });
+          out.push({ prompt: firstQ(w), answer: w.letter, key: `t:${w.thing}`, reward: wordReward(w), show: { type: 'thing', thing: w.thing }, options: [w.letter, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'letter', ch: letterById(x).ch })) });
         }
       }
     } else {
-      const next = bag(pool);
+      const next = bag(pool, (id) => `t:${letterById(id).thing}`);
       for (let i = 0; i < ROUNDS; i++) {
         let t = next();
         if (i && out[i - 1].answer === t) t = next();
         const l = letterById(t);
         const others = pick(r, pool.filter((x) => x !== t), nOpt - 1);
         const ids = [t, ...others].sort(() => r() - 0.5);
-        if (mode === 'letter') out.push({ prompt: question(l), answer: t, reward: rew(l), options: ids.map((x) => ({ id: x, kind: 'thing', thing: letterById(x).thing, plaque: letterById(x).ch })) });
+        if (mode === 'letter') out.push({ prompt: question(l), answer: t, key: `t:${l.thing}`, reward: rew(l), options: ids.map((x) => ({ id: x, kind: 'thing', thing: letterById(x).thing, plaque: letterById(x).ch })) });
         else if (mode === 'word') out.push({ prompt: wordQuestion(l), answer: t, reward: rew(l), options: ids.map((x) => ({ id: x, kind: 'thing', thing: letterById(x).thing })) });
         else out.push({ prompt: firstQuestion(l), answer: t, reward: rew(l), show: { type: 'thing', thing: l.thing }, options: ids.map((x) => ({ id: x, kind: 'letter', ch: letterById(x).ch })) });
       }

@@ -20,6 +20,7 @@ import { shapeGeo } from '../kit/shapes3d.js';
 import { colorById } from '../shapes/sim.js';
 import { NUMBERS } from '../kit/words.js';
 import { LEVELS, LevelPlay, levelsFor, cheer } from './levels.js';
+import { FreshMemory } from './fresh.js';
 import { ROUNDS } from './sim.js';
 
 const TEXT = {
@@ -97,6 +98,7 @@ class Game {
     this._makeRack();
     this.save = sh.save;
     if (!this.save.lw) this.save.lw = { unlocked: 1, done: {} };
+    this.mem = new FreshMemory(this.save.lw.fresh); // what this child already met (new things come first)
     this.st.onFrame((dt, time) => this._frame(dt, time));
     sh.fonts().then(() => this._start()); // no start screen any more (owner 2026-11-13): straight to the levels page
   }
@@ -422,7 +424,7 @@ class Game {
   _startPage() {
     const want = this.sh.cfg && this.sh.cfg.level;
     if (this.sh.cfg) this.sh.cfg.level = null; // only the first time: back to the list afterwards
-    if (want && levelsFor(this.sh.age).some((l) => l.id === want)) this._begin(want);
+    if (want && levelsFor(this.sh.age).some((l) => l.id === want)) this._enter(want);
     else this._levels();
   }
 
@@ -442,7 +444,7 @@ class Game {
       const done = !!this.save.lw.done[lv.id];
       return h('button', {
         class: `lw-tile${locked ? ' lock' : ''}${done ? ' done' : ''}`, 'aria-label': lv.ar, disabled: locked || null,
-        onclick: () => { sh.sound.play('tap'); this._begin(lv.id); },
+        onclick: () => { sh.sound.play('tap'); this._enter(lv.id); },
       }, h('i', {}, locked ? '🔒' : lv.emoji), h('b', {}, sh.T.num(i + 1)), h('span', {}, lv.ar), done ? h('u', {}, '⭐') : null);
     });
     const oldCard = h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.18)' }, h('div', { class: 'lw-card' }, h('div', { class: 'lw-title' }, sh.t('pick')), h('div', { class: 'lw-grid' }, tiles)));
@@ -489,14 +491,14 @@ class Game {
     LEVELS.forEach((lv, i) => {
       const cx = cols[i % 3], cy = rows[Math.floor(i / 3)];
       const can = open.has(lv.id);
-      const b = h('button', { class: 'lw-hit', 'aria-label': lv.ar, disabled: !can || null, onclick: () => { sh.sound.play('tap'); this._begin(lv.id); } });
+      const b = h('button', { class: 'lw-hit', 'aria-label': lv.ar, disabled: !can || null, onclick: () => { sh.sound.play('tap'); this._enter(lv.id); } });
       place(b, cx, cy, 0.17, 0.148);
       if (!can) b.classList.add('off');
       if (this.save.lw.done[lv.id]) place(h('i', { class: 'lw-star' }, '⭐'), cx + 0.066, cy - 0.07, 0.05, 0.045);
     });
     // "next level": the first level not done yet (the first one when all are done)
     const next = list.find((l) => !this.save.lw.done[l.id]) || list[0];
-    place(h('button', { class: 'lw-hit', 'aria-label': 'next', onclick: () => { sh.sound.play('tap'); this._begin(next.id); } }), 0.114, 0.46, 0.22, 0.12);
+    place(h('button', { class: 'lw-hit', 'aria-label': 'next', onclick: () => { sh.sound.play('tap'); this._enter(next.id); } }), 0.114, 0.46, 0.22, 0.12);
     // home and sound: the shell's own buttons, invisible, on the picture's round buttons
     const back = sh.backBtn();
     back.classList.add('lw-hit');
@@ -517,13 +519,22 @@ class Game {
     this.st.setPicks([], null);
   }
 
-  _begin(levelId) {
+  /** Entering a level from the map: the places turn by five each visit, so the same level is somewhere else next time. */
+  _enter(levelId) {
+    const lw = this.save.lw;
+    this._begin(levelId);
+    lw.spin = ((lw.spin || 0) + 5) % WORLD_IDS.length;
+  }
+
+  _begin(levelId, keepSpin = false) {
     const sh = this.sh;
     this._clearRound();
     this.levelId = levelId;
     this.level = LEVELS.find((l) => l.id === levelId);
-    this._goWorld(Math.max(0, levelsFor(sh.age).findIndex((l) => l.id === levelId)));
-    this.play = new LevelPlay(levelId, sh.age, Math.floor(Math.random() * 1e9));
+    if (!keepSpin) this._spin = this.save.lw.spin || 0;
+    this._goWorld(Math.max(0, levelsFor(sh.age).findIndex((l) => l.id === levelId)) + this._spin);
+    this.mem.begin(levelId);
+    this.play = new LevelPlay(levelId, sh.age, Math.floor(Math.random() * 1e9), this.mem);
     sh.clear();
     this.lightDots = sh.topBar(ROUNDS, '⭐');
     this.lightDots(0);
@@ -591,6 +602,8 @@ class Game {
       return;
     }
     if (ev.first) this.sh.round(this.level.skill, true, r.answer);
+    this.mem.note(r.key);
+    this.save.lw.fresh = this.mem.toJSON();
     this.st.mode = 'found';
     this.sh.sound.setSuspense(false);
     this.st.setPicks([], null);
@@ -662,7 +675,7 @@ class Game {
     if (!hasNext) {
       // the very last level: the end card (the star the first time), then back to the levels
       sh.sound.setMode('calm');
-      sh.finishCard(this.level.ar, this.level.emoji, () => this._begin(this.levelId), null, () => this._levels());
+      sh.finishCard(this.level.ar, this.level.emoji, () => this._begin(this.levelId, true), null, () => this._levels());
       return;
     }
     // no stop between levels (owner 2026-11-12): a short celebration, then the hero walks on slowly to the next place
@@ -675,7 +688,7 @@ class Game {
     setTimeout(() => { sh.sound.play('yay'); sh.sound.play('star'); }, 900);
     sh.speak(first ? `${sh.t('greatSay')} ${sh.t('newStarSay')}` : sh.t('greatSay'));
     const nextId = list[idx + 1].id;
-    setTimeout(() => this._walkOn(nextId, idx + 1), 3000);
+    setTimeout(() => this._walkOn(nextId, idx + 1 + (this._spin || 0)), 3000);
   }
 
   /** Between levels: the hero WALKS (in place, footsteps) while the world scrolls past and the next place slides in from
@@ -685,7 +698,7 @@ class Game {
     this._clearRound();
     const hero = this.hero;
     const id = WORLD_IDS[worldIndex % WORLD_IDS.length];
-    if (this.worldId === id || !hero) { this._goWorld(worldIndex, true); this._begin(nextId); return; }
+    if (this.worldId === id || !hero) { this._goWorld(worldIndex, true); this._begin(nextId, true); return; }
     if (!this.worlds[id]) { this.worlds[id] = buildWorld(id); this.st.add(this.worlds[id].group); }
     const from = this.world, to = this.worlds[id];
     const SHIFT = 34;
@@ -717,7 +730,7 @@ class Game {
       this.worldId = id;
       this.padStyle = PADS[to.pad];
       hero.act('wave');
-      setTimeout(() => this._begin(nextId), 1400);
+      setTimeout(() => this._begin(nextId, true), 1400);
     } };
   }
 

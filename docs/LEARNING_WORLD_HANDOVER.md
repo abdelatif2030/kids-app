@@ -140,3 +140,11 @@ To make a whole new level from a pack (e.g. «الملابس»), add a `PICKS` t
   the counting level uses apples only; no English words yet (English lines exist only for the older games).
 - Optional: separate levels for the packs (clothes, body, jobs, weather, food, school, family, music, creatures) with their own worlds.
 - Hearts sentences #27–#30 and pond butterflies/birds from the owner's pictures (see section 6).
+
+## Freshness (2026-11-17)
+`game_src/learn_games/src/letters/fresh.js` (`FreshMemory`, pure) remembers per child which pictures/numbers/letters were already asked
+(`save.lw.fresh`, on the device, max 500 keys). `LevelPlay(levelId, age, seed, mem)` draws new things first, then the oldest seen, and puts
+what the PREVIOUS level just showed last (keys are `t:<picture>`, `n:<n>`, `l:<letter>`, `c:<colour>`, shared across levels). A weekly
+"spotlight" (1 key in 12, by calendar week) goes first when not met yet. The scene also turns: entering a level from the map adds 5 to
+`save.lw.spin`, so the same level is in another world next time (walking on to the next level keeps the same spin). Shape rounds have no
+key yet (still random). Tests: `test/fresh.test.js`. No new pictures or voices were needed.
