@@ -384,3 +384,429 @@ To make a whole new level from a pack (e.g. «الملابس»), add a `PICKS` t
 - Optional: separate levels for the packs (clothes, body, jobs, weather, food, school, family, music, creatures) with their own worlds.
 - Hearts sentences #27–#30 and pond butterflies/birds from the owner's pictures (see section 6).
 
+## APPENDIX 3 — WORLD-BY-WORLD INVENTORY (generated from `worlds3d.js` on 2026-11-17)
+
+Each world: level id it belongs to (index = level order), floor texture, panorama, pads, and every picture with its height (h), position (x, z) and motion.
+Motion keys: `drive` (crosses the screen, units/s, wraps at ±17), `bob`/`sp` (bounce height/speed), `r`/`wsp` (wanders ±r), `tilt` (swings), `spin` (turns), `sway` (swaying), `smooth` (sine instead of hops).
+
+### 1 pond (البركة) — level `letters`
+- floor: ground_grass, ground_grass, ground_path; panorama: ; pads: plain raft (no pad pictures)
+- built with the older prop() helper (meadow, farm, beach): see the function in the file.
+
+### 2 farm (المزرعة) — level `words`
+- floor: ground_grass, ground_grass, farm_pano, ground_farm; panorama: farm_pano, see code; pads: f_pad_stump, f_pad_hay, f_pad_nest, f_pad_plank
+- built with the older prop() helper (meadow, farm, beach): see the function in the file.
+
+### 3 beach (الشاطئ) — level `first`
+- floor: ground_water, ground_sand, ground_sand, ground_water; panorama: ; pads: plain raft (no pad pictures)
+- built with the older prop() helper (meadow, farm, beach): see the function in the file.
+
+### 4 space (الفضاء) — level `numbers`
+- floor: ground_moon, ground_moon, space_pano; panorama: space_pano, see code; pads: s_pad_moon, s_pad_energy, s_pad_metal, s_pad_crystal
+- built with the older prop() helper (meadow, farm, beach): see the function in the file.
+
+### 5 rainbow (ملعب قوس قزح) — level `counting`
+- floor: ground_rainbow; panorama: rainbow_pano, -6.4; pads: r_pad_candy, r_pad_cloud, r_pad_rainbow, r_pad_cookie
+- built with the older prop() helper (meadow, farm, beach): see the function in the file.
+
+### 6 city (المدينة) — level `order`
+- floor: ground_city; panorama: city_pano, -7.6; pads: c_pad_manhole, c_pad_tire, c_pad_round, c_pad_cone
+- built with the older prop() helper (meadow, farm, beach): see the function in the file.
+
+### 7 snow (جبال الثلج) — level `shapes`
+- floor: ground_snow; panorama: snow_pano, -8.4; pads: w_pad_ice, w_pad_snow, w_pad_log, w_pad_crystal
+- built with the older prop() helper (meadow, farm, beach): see the function in the file.
+
+### 8 castle (القلعة) — level `animals`
+- floor: ground_castle; panorama: castle_pano, -7.8; pads: k_pad_stone, k_pad_velvet, k_pad_shield, k_pad_gold
+- built with the older prop() helper (meadow, farm, beach): see the function in the file.
+
+### 9 underwater (تحت الماء) — level `colors`
+- floor: ground_sand; panorama: under_pano, -7.4; pads: u_pad_sand, u_pad_shell, u_pad_coral, u_pad_pearl
+- built with the older prop() helper (meadow, farm, beach): see the function in the file.
+
+### 10 jungle (الغابة) — level `fruits`
+- floor: ground_jungle; panorama: jungle_pano, -7.4; pads: j_pad_stump, j_pad_lily, j_pad_stone, j_pad_bamboo
+- built with the older prop() helper (meadow, farm, beach): see the function in the file.
+
+### 11 desert (الصحراء) — level `vehicles`
+- floor: ground_desert; panorama: desert_pano, -6.9; pads: d_pad_stone, d_pad_carpet, d_pad_clay, d_pad_wood
+- built with the older prop() helper (meadow, farm, beach): see the function in the file.
+
+### 12 home+garden (بيتي والحديقة) — level `habits`
+- floor: ground_home; panorama: home_pano, -8.5; pads: plain raft (no pad pictures)
+- built with the older prop() helper (meadow, farm, beach): see the function in the file.
+
+## APPENDIX 4 — THE 75 EXTRA WORDS NOW IN THE GAME (`letters/more_words.json`)
+
+Format: picture file · word · reading · first letter id · youngest age.
+
+| picture | word | reading | letter | age |
+|---|---|---|---|---|
+| `j_monkey` | قرد | قِرْد | qaaf | 3 |
+| `j_lion` | أسد | أَسَد | alef | 3 |
+| `j_elephant` | فيل | فِيل | faa | 3 |
+| `j_zebra` | حمار وحشي | حِمَار وَحْشِي | haa | 5 |
+| `j_parrot` | ببغاء | بَبَّغَاء | baa | 4 |
+| `j_tiger` | نمر | نِمِر | noon | 4 |
+| `j_toucan` | طوقان | طُوقَان | tah | 6 |
+| `j_gorilla` | غوريلا | غُورِيلَّا | ghayn | 5 |
+| `j_chameleon` | حرباء | حِرْبَاء | haa | 6 |
+| `j_snake` | ثعبان | ثُعْبَان | thaa | 5 |
+| `f_cow` | بقرة | بَقَرَة | baa | 3 |
+| `f_pig` | خنزير | خِنْزِير | khaa | 4 |
+| `f_goat` | ماعز | مَاعِز | meem | 5 |
+| `f_donkey` | حمار | حِمَار | haa | 4 |
+| `f_rooster` | ديك | دِيك | dal | 3 |
+| `u_octopus` | أخطبوط | أُخْطُبُوط | alef | 5 |
+| `u_turtle` | سلحفاة | سُلَحْفَاة | seen | 4 |
+| `u_dolphin` | دولفين | دُولْفِين | dal | 5 |
+| `u_whale` | حوت | حُوت | haa | 4 |
+| `u_crab` | سرطان | سَرَطَان | seen | 5 |
+| `u_star` | نجمة بحر | نَجْمَة بَحْر | noon | 5 |
+| `u_jelly` | قنديل بحر | قِنْدِيل بَحْر | qaaf | 6 |
+| `u_seahorse` | حصان بحر | حِصَان بَحْر | haa | 6 |
+| `w_penguin` | بطريق | بِطْرِيق | baa | 4 |
+| `w_bear` | دب | دُبّ | dal | 3 |
+| `w_owl` | بومة | بُومَة | baa | 4 |
+| `w_reindeer` | رنة | رَنَّة | raa | 6 |
+| `w_seal` | فقمة | فُقْمَة | faa | 5 |
+| `w_snowman` | رجل ثلج | رَجُل ثَلْج | raa | 5 |
+| `d_pyramid` | هرم | هَرَم | haa2 | 4 |
+| `d_tent` | خيمة | خَيْمَة | khaa | 4 |
+| `d_palm` | نخلة | نَخْلَة | noon | 4 |
+| `d_cactus` | صبار | صَبَّار | sad | 6 |
+| `d_scorpion` | عقرب | عَقْرَب | ayn | 5 |
+| `d_lizard` | سحلية | سِحْلِيَّة | seen | 6 |
+| `d_hawk` | صقر | صَقْر | sad | 5 |
+| `d_balloon` | منطاد | مِنْطَاد | meem | 5 |
+| `d_jeep` | جيب | جِيب | jeem | 4 |
+| `b_umbrella` | مظلة | مِظَلَّة | meem | 4 |
+| `b_castle` | قلعة | قَلْعَة | qaaf | 4 |
+| `b_shell` | صدفة | صَدَفَة | sad | 4 |
+| `b_lighthouse` | فنار | فَنَار | faa | 6 |
+| `h_bed` | سرير | سَرِير | seen | 3 |
+| `h_toothbrush` | فرشاة | فُرْشَاة | faa | 5 |
+| `h_sink` | حوض | حَوْض | haa | 5 |
+| `h_towel` | منشفة | مِنْشَفَة | meem | 5 |
+| `h_backpack` | شنطة | شَنْطَة | sheen | 3 |
+| `h_shoes` | جزمة | جَزْمَة | jeem | 3 |
+| `h_wardrobe` | دولاب | دُولَاب | dal | 5 |
+| `h_table` | ترابيزة | تَرَابِيزَة | taa | 5 |
+| `h_broom` | مكنسة | مِكْنِسَة | meem | 5 |
+| `h_clock` | ساعة | سَاعَة | seen | 4 |
+| `h_swing` | أرجوحة | أُرْجُوحَة | alef | 4 |
+| `h_bike` | عجلة | عَجَلَة | ayn | 4 |
+| `h_tree` | شجرة | شَجَرَة | sheen | 3 |
+| `c_school` | مدرسة | مَدْرَسَة | meem | 4 |
+| `c_hospital` | مستشفى | مُسْتَشْفَى | meem | 5 |
+| `c_light` | إشارة | إِشَارَة | alef | 5 |
+| `c_fountain` | نافورة | نَافُورَة | noon | 5 |
+| `c_skyscraper` | عمارة | عِمَارَة | ayn | 4 |
+| `k_king` | ملك | مَلِك | meem | 4 |
+| `k_queen` | ملكة | مَلِكَة | meem | 5 |
+| `k_dragon` | تنين | تِنِّين | taa | 4 |
+| `k_knight` | فارس | فَارِس | faa | 4 |
+| `k_wizard` | ساحر | سَاحِر | seen | 5 |
+| `k_chest` | كنز | كَنْز | kaaf | 4 |
+| `s_alien` | فضائي | فَضَائِي | faa | 5 |
+| `s_robot` | روبوت | رُوبُوت | raa | 4 |
+| `s_moon` | قمر | قَمَر | qaaf | 3 |
+| `s_star` | نجمة | نَجْمَة | noon | 3 |
+| `s_ringplanet` | كوكب | كَوْكَب | kaaf | 5 |
+| `r_balloons` | بالون | بَالُون | baa | 3 |
+| `r_cloud` | سحابة | سَحَابَة | seen | 4 |
+| `r_candy` | حلوى | حَلْوَى | haa | 4 |
+| `r_cupcake` | كعكة | كَعْكَة | kaaf | 4 |
+
+## APPENDIX 5 — THE 12 PICTURE PACKS NOT DRAWN YET (`tools/game_voice/packs/*.json`)
+
+Grid order = left to right, top to bottom. Art file = `<prefix>_<name>.webp`.
+
+### body — Body parts (cute, friendly, not realistic) (prefix `y_`)
+
+| # | art | word | reading | letter | age |
+|---|---|---|---|---|---|
+| 1 | `y_eye` | عين | عَيْن | ayn | 3 |
+| 2 | `y_ear` | ودن | وِدْن | waaw | 3 |
+| 3 | `y_nose` | أنف | أَنْف | alef | 3 |
+| 4 | `y_mouth` | فم | فَم | faa | 3 |
+| 5 | `y_hand` | إيد | إِيد | alef | 3 |
+| 6 | `y_foot` | رجل | رِجْل | raa | 3 |
+| 7 | `y_hair` | شعر | شَعْر | sheen | 4 |
+| 8 | `y_tooth` | سنة | سِنَّة | seen | 4 |
+| 9 | `y_head` | راس | رَاس | raa | 3 |
+| 10 | `y_finger` | صباع | صُبَّاع | sad | 4 |
+| 11 | `y_knee` | ركبة | رُكْبَة | raa | 5 |
+| 12 | `y_belly` | بطن | بَطْن | baa | 5 |
+
+### clothes — Clothes (prefix `l_`)
+
+| # | art | word | reading | letter | age |
+|---|---|---|---|---|---|
+| 1 | `l_shirt` | قميص | قَمِيص | qaaf | 4 |
+| 2 | `l_trousers` | بنطلون | بَنْطَلُون | baa | 4 |
+| 3 | `l_dress` | فستان | فُسْتَان | faa | 4 |
+| 4 | `l_hat` | قبعة | قُبَّعَة | qaaf | 4 |
+| 5 | `l_socks` | شراب | شُرَّاب | sheen | 3 |
+| 6 | `l_jacket` | جاكت | جَاكِت | jeem | 5 |
+| 7 | `l_scarf` | وشاح | وِشَاح | waaw | 6 |
+| 8 | `l_gloves` | قفاز | قُفَّاز | qaaf | 6 |
+| 9 | `l_glasses` | نضارة | نَضَّارَة | noon | 5 |
+| 10 | `l_cap` | كاب | كَاب | kaaf | 4 |
+| 11 | `l_pajamas` | بيجامة | بِيجَامَة | baa | 4 |
+| 12 | `l_raincoat` | معطف | مِعْطَف | meem | 6 |
+
+### family — Family (friendly cartoon people, standing, different ages) (prefix `a_`)
+
+| # | art | word | reading | letter | age |
+|---|---|---|---|---|---|
+| 1 | `a_mama` | ماما | مَامَا | meem | 3 |
+| 2 | `a_baba` | بابا | بَابَا | baa | 3 |
+| 3 | `a_grandma` | تيتة | تِيتَة | taa | 3 |
+| 4 | `a_grandpa` | جدو | جَدُّو | jeem | 3 |
+| 5 | `a_baby` | طفل | طِفْل | tah | 3 |
+| 6 | `a_brother` | أخ | أَخ | alef | 4 |
+| 7 | `a_sister` | أخت | أُخْت | alef | 4 |
+| 8 | `a_boy` | ولد | وَلَد | waaw | 3 |
+| 9 | `a_girl` | بنت | بِنْت | baa | 3 |
+| 10 | `a_friends` | صحاب | صُحَاب | sad | 5 |
+| 11 | `a_family` | عيلة | عِيلَة | ayn | 5 |
+| 12 | `a_uncle` | عمو | عَمُّو | ayn | 5 |
+
+### food — Food and drinks (prefix `o_`)
+
+| # | art | word | reading | letter | age |
+|---|---|---|---|---|---|
+| 1 | `o_bread` | عيش | عَيْش | ayn | 3 |
+| 2 | `o_cheese` | جبنة | جُبْنَة | jeem | 4 |
+| 3 | `o_egg` | بيضة | بَيْضَة | baa | 3 |
+| 4 | `o_milk` | لبن | لَبَن | laam | 3 |
+| 5 | `o_rice` | رز | رُزّ | raa | 4 |
+| 6 | `o_chicken` | فراخ | فِرَاخ | faa | 5 |
+| 7 | `o_juice` | عصير | عَصِير | ayn | 4 |
+| 8 | `o_water` | مية | مَيَّة | meem | 3 |
+| 9 | `o_cookie` | بسكوت | بِسْكُوت | baa | 4 |
+| 10 | `o_honey` | عسل | عَسَل | ayn | 5 |
+| 11 | `o_soup` | شوربة | شُورْبَة | sheen | 5 |
+| 12 | `o_pizza` | بيتزا | بِيتْزَا | baa | 4 |
+
+### fruit2 — More fruit (prefix `q_`)
+
+| # | art | word | reading | letter | age |
+|---|---|---|---|---|---|
+| 1 | `q_kiwi` | كيوي | كِيوِي | kaaf | 5 |
+| 2 | `q_melon` | شمام | شَمَّام | sheen | 5 |
+| 3 | `q_dates` | بلح | بَلَح | baa | 5 |
+| 4 | `q_fig` | تين | تِين | taa | 5 |
+| 5 | `q_apricot` | مشمش | مِشْمِش | meem | 5 |
+| 6 | `q_berries` | توت | تُوت | taa | 4 |
+| 7 | `q_plum` | برقوق | بَرْقُوق | baa | 6 |
+| 8 | `q_avocado` | أفوكادو | أَفُوكَادُو | alef | 6 |
+| 9 | `q_peach` | خوخ | خُوخ | khaa | 5 |
+| 10 | `q_cherry` | كرز | كَرَز | kaaf | 4 |
+| 11 | `q_olives` | زيتون | زَيْتُون | zayn | 5 |
+| 12 | `q_coconut` | نارجيل | نَارْجِيل | noon | 6 |
+
+### insects — Small creatures and birds (prefix `i_`)
+
+| # | art | word | reading | letter | age |
+|---|---|---|---|---|---|
+| 1 | `i_ant` | نملة | نَمْلَة | noon | 4 |
+| 2 | `i_fly` | ذبابة | ذُبَابَة | dhal | 6 |
+| 3 | `i_spider` | عنكبوت | عَنْكَبُوت | ayn | 6 |
+| 4 | `i_worm` | دودة | دُودَة | dal | 4 |
+| 5 | `i_eagle` | نسر | نِسْر | noon | 6 |
+| 6 | `i_peacock` | طاووس | طَاوُوس | tah | 6 |
+| 7 | `i_flamingo` | فلامنجو | فِلَامِنْجُو | faa | 6 |
+| 8 | `i_swan` | بجعة | بَجَعَة | baa | 6 |
+| 9 | `i_ostrich` | نعامة | نَعَامَة | noon | 6 |
+| 10 | `i_sparrow` | عصفورة | عُصْفُورَة | ayn | 4 |
+| 11 | `i_bat` | خفاش | خُفَّاش | khaa | 6 |
+| 12 | `i_snail` | حلزونة | حَلَزُونَة | haa | 5 |
+
+### jobs — People who help us (friendly cartoon adults, standing) (prefix `z_`)
+
+| # | art | word | reading | letter | age |
+|---|---|---|---|---|---|
+| 1 | `z_doctor` | دكتور | دُكْتُور | dal | 3 |
+| 2 | `z_teacher` | مدرس | مُدَرِّس | meem | 4 |
+| 3 | `z_police` | شرطي | شُرْطِي | sheen | 4 |
+| 4 | `z_firefighter` | إطفائي | إِطْفَائِي | alef | 5 |
+| 5 | `z_farmer` | فلاح | فَلَّاح | faa | 5 |
+| 6 | `z_cook` | طباخ | طَبَّاخ | tah | 5 |
+| 7 | `z_driver` | سواق | سَوَّاق | seen | 5 |
+| 8 | `z_pilot` | طيار | طَيَّار | tah | 5 |
+| 9 | `z_nurse` | ممرضة | مُمَرِّضَة | meem | 6 |
+| 10 | `z_builder` | بناء | بَنَّاء | baa | 6 |
+| 11 | `z_singer` | مطرب | مُطْرِب | meem | 6 |
+| 12 | `z_painter` | رسام | رَسَّام | raa | 5 |
+
+### music — Music (prefix `m_`)
+
+| # | art | word | reading | letter | age |
+|---|---|---|---|---|---|
+| 1 | `m_drum` | طبلة | طَبْلَة | tah | 4 |
+| 2 | `m_guitar` | جيتار | جِيتَار | jeem | 5 |
+| 3 | `m_piano` | بيانو | بِيَانُو | baa | 5 |
+| 4 | `m_violin` | كمان | كَمَان | kaaf | 5 |
+| 5 | `m_flute` | ناي | نَاي | noon | 6 |
+| 6 | `m_trumpet` | بوق | بُوق | baa | 5 |
+| 7 | `m_tambourine` | دف | دُفّ | dal | 5 |
+| 8 | `m_oud` | عود | عُود | ayn | 6 |
+| 9 | `m_mic` | ميكروفون | مِيكْرُوفُون | meem | 5 |
+| 10 | `m_headphones` | سماعة | سَمَّاعَة | seen | 5 |
+| 11 | `m_note` | نوتة | نُوتَة | noon | 6 |
+| 12 | `m_bell` | جرس | جَرَس | jeem | 4 |
+
+### school — School (prefix `e_`)
+
+| # | art | word | reading | letter | age |
+|---|---|---|---|---|---|
+| 1 | `e_pencil` | قلم | قَلَم | qaaf | 3 |
+| 2 | `e_book` | كتاب | كِتَاب | kaaf | 3 |
+| 3 | `e_notebook` | كراسة | كُرَّاسَة | kaaf | 4 |
+| 4 | `e_scissors` | مقص | مَقَص | meem | 5 |
+| 5 | `e_ruler` | مسطرة | مِسْطَرَة | meem | 5 |
+| 6 | `e_eraser` | أستيكة | أُسْتِيكَة | alef | 5 |
+| 7 | `e_crayons` | ألوان | أَلْوَان | alef | 4 |
+| 8 | `e_board` | سبورة | سَبُّورَة | seen | 5 |
+| 9 | `e_map` | خريطة | خَرِيطَة | khaa | 6 |
+| 10 | `e_glue` | صمغ | صَمْغ | sad | 6 |
+| 11 | `e_desk` | مكتب | مَكْتَب | meem | 5 |
+| 12 | `e_paper` | ورقة | وَرَقَة | waaw | 4 |
+
+### shapes — Glossy geometric shapes (each ONE solid color, centered, 3D look) (prefix `g_`)
+
+| # | art | word | reading | letter | age |
+|---|---|---|---|---|---|
+| 1 | `g_rectangle` | مستطيل | مُسْتَطِيل | meem | 4 |
+| 2 | `g_oval` | بيضاوي | بَيْضَاوِي | baa | 5 |
+| 3 | `g_diamond` | معين | مُعَيَّن | meem | 5 |
+| 4 | `g_hexagon` | سداسي | سُدَاسِي | seen | 6 |
+| 5 | `g_pentagon` | خماسي | خُمَاسِي | khaa | 6 |
+| 6 | `g_arrow` | سهم | سَهْم | seen | 4 |
+| 7 | `g_cube` | مكعب | مُكَعَّب | meem | 5 |
+| 8 | `g_sphere` | كرة | كُرَة | kaaf | 4 |
+| 9 | `g_cone` | مخروط | مَخْرُوط | meem | 6 |
+| 10 | `g_cylinder` | أسطوانة | أُسْطُوَانَة | alef | 6 |
+| 11 | `g_ring` | حلقة | حَلْقَة | haa | 5 |
+| 12 | `g_heart` | قلب | قَلْب | qaaf | 3 |
+
+### veg — Vegetables (prefix `v_`)
+
+| # | art | word | reading | letter | age |
+|---|---|---|---|---|---|
+| 1 | `v_tomato` | طماطم | طَمَاطِم | tah | 4 |
+| 2 | `v_cucumber` | خيار | خِيَار | khaa | 4 |
+| 3 | `v_potato` | بطاطس | بَطَاطِس | baa | 4 |
+| 4 | `v_onion` | بصل | بَصَل | baa | 5 |
+| 5 | `v_eggplant` | باذنجان | بَاذِنْجَان | baa | 5 |
+| 6 | `v_pepper` | فلفل | فِلْفِل | faa | 5 |
+| 7 | `v_lettuce` | خس | خَس | khaa | 5 |
+| 8 | `v_broccoli` | بروكلي | بُرُوكْلِي | baa | 5 |
+| 9 | `v_peas` | بسلة | بِسِلَّة | baa | 6 |
+| 10 | `v_pumpkin` | قرع | قَرْع | qaaf | 5 |
+| 11 | `v_garlic` | ثوم | ثُوم | thaa | 6 |
+| 12 | `v_mushroom` | فطر | فُطْر | faa | 6 |
+
+### weather — Weather and nature (prefix `t_`)
+
+| # | art | word | reading | letter | age |
+|---|---|---|---|---|---|
+| 1 | `t_rain` | مطر | مَطَر | meem | 4 |
+| 2 | `t_snow` | ثلج | ثَلْج | thaa | 4 |
+| 3 | `t_wind` | هوا | هَوَا | haa2 | 5 |
+| 4 | `t_thunder` | رعد | رَعْد | raa | 6 |
+| 5 | `t_lightning` | برق | بَرْق | baa | 6 |
+| 6 | `t_umbrella` | شمسية | شَمْسِيَّة | sheen | 4 |
+| 7 | `t_flake` | ندفة | نُدْفَة | noon | 6 |
+| 8 | `t_flower` | زهرة | زَهْرَة | zayn | 3 |
+| 9 | `t_leaves` | أوراق | أَوْرَاق | alef | 5 |
+| 10 | `t_hot` | حر | حَرّ | haa | 5 |
+| 11 | `t_cold` | برد | بَرْد | baa | 5 |
+| 12 | `t_mountain` | جبل | جَبَل | jeem | 5 |
+
+## APPENDIX 6 — COMMIT LOG SINCE 2026-11-13 (what was built, in order)
+
+| commit | date | message |
+|---|---|---|
+| `13ebe07` | 2026-11-16 | Add UI UX Pro Max, taste skill and HyperFrames skills (reviewed); usage rules in dev-tools.md and docs/DESIGN_SKILLS.md |
+| `2166eb8` | 2026-11-16 | Merge remote-tracking branch 'origin/feature/rehlaty' into feature/rehlaty |
+| `9498721` | 2026-11-16 | Add LinkedIn agent skills (11 skills, MIT; reviewed: local Python only, no hooks, no network) |
+| `1cf5087` | 2026-11-16 | Remove LinkedIn skills from the project (owner wants them in his Claude chats instead) |
+| `72ca1b6` | 2026-11-17 | Jungle animals and pads; desert and home worlds from the owner's pictures (levels 11 and 12); worlds 11 and 12 |
+| `fd35010` | 2026-11-17 | Merge remote-tracking branch 'origin/feature/rehlaty' into feature/rehlaty |
+| `663b521` | 2026-11-17 | Add handover README for the learning-world work (worlds, art pipeline, layout rules, deploy, open items) |
+| `5bb4db9` | 2026-11-17 | Eight rounds per level; 75 more words with the owner's pictures (animals, home, city, castle, sea, desert), more vehicles, fruits and habits; wider letter pools; voice lines and diacritics for all of it; picture packs (11 sheets, 132 words) ready to switch on |
+| `c5f0236` | 2026-11-17 | More animals to feed (13); handover: content expansion, packs, voices, what is missing |
+| `8fc9b92` | 2026-11-17 | Voice clips (Fatima) for all new sentences, listening page of the new clips, shapes pack prompts |
+| `04282eb` | 2026-11-17 | Apply the owner's voice picks (22 clips), second round of takes for 6 sentences |
+| `3723622` | 2026-11-17 | Apply take B (hamza qaf) for 'القاف زي قرد'; takes pages for the last round |
+| `17b4d01` | 2026-11-17 | Full handover README (sync guide, finished, remaining, scripts, appendices) |
+
+## APPENDIX 7 — DETAILS OF EVERYTHING DECIDED AND LEARNT (hand-written log)
+
+### 7.1 The owner's requests, in the order they came (summary)
+1. Voices: pick the best take for each marked sentence (hearts «دي قلب …», qaf must not sound like «جلب»; chosen: take C for «دي قلب برتقالي»); letters ز / ذ — decided to KEEP
+   ز = الزاي (giraffe) and ذ = الذال (corn); pictures of the girl hero (clips: laugh, walk, clap, wave) from his free-tier videos (demo only).
+2. Levels page and learning page: his own pictures; straight from the game card to the levels page (the old start page removed); all levels open from the start;
+   no Mama/Baba characters in the habits level (title «عاداتي اليومية»); the blue penguin/owl bigger and complete; «هنلعب سوا النهارده» (fun) and «هنتعلم سوا النهارده» (learning) said when a page opens.
+3. Level 1 scenery from his designs (house, windmill, fields, trees, grass), everything that moves keeps moving; frames while walking between levels must line up (seam planes).
+4. Camera: zoom a little closer so it looks like a game and not a video; ideal size for phones in landscape (most important) and portrait; bigger hero; hero + owl beside him;
+   big clear letter signs and animals; any age can open the game (not only 3–6).
+5. Farm level: first video/picture backgrounds were rejected and the earlier code-built farm restored; later rebuilt from his farm sheets; the four choices must be in the right place
+   (not behind the fence/barn), nothing may overlap.
+6. Each level needs life in the background (windmill turning etc.): beach water, gulls, dolphin, crab, boat, lighthouse beam; space stars, UFO, robot; city vehicles; snowfall; …
+7. Complete all level-1 pictures (frog, plane, grapes, dove, butterflies, birds), then the next worlds; he generated every sheet with ChatGPT from prompts written here.
+8. Question picture (monkey, rabbit …) must be clear, big and just above the question sign (not under it, not far away).
+9. Fix sign-out on every visit of the demo.
+10. More learning: 8–10 questions per level, many more words/letters/things per level, new voices in the same Fatima voice, scripts for new pictures, README for another account.
+11. Voice review loop: he marked the mispronounced sentences (23 + a few), picked takes, then only «القاف زي قرد» remained → take B chosen.
+
+### 7.2 Layout and camera numbers (landscape / portrait)
+- `LANDSCAPE = { span 9.2, off 0.9, zs [-1.3,-0.2], hero [-4.4,4.6,1.3], owl [-6.7,4.0,0.85], stand [-0.2,3.3], cam {box [9.0,5.1], target [0,2.5,0.3], minAspect 0} }`
+- `PORTRAIT = { span 8.0, off 0, zs [-4.4,-2.5], hero [-2.2,5.8,1.25], owl [0.2,5.4,0.85], stand [2.2,2.6], cam {box [6.6,4.4], target [0,2.6,1.8], minAspect 0} }`
+- Number plaques scale 1.6 landscape / 1.2 portrait; the picture the child is asked about is fitted into 2.5 × 2.3 units; pads (owner pictures) are 1.75 high and lift the standing item by 0.62.
+- Choice rows alternate between the two z values; hit radius 1.5; plaque pole centred above the picture; golden halo rings around plaques.
+- Nothing tall in the choice area; panoramas are planes 52×26 at z −14.5 whose `bottom` y is chosen so the picture's horizon is ≈ y 2 (values in each world); the sky dome is the FIRST child
+  of every world (the walk between levels clips it), `renderOrder` sky −10, panorama −1.
+- Rack of the owl: 8 slots (spacing 0.56, dish radius 0.25), kept pictures scaled ×0.8×0.62.
+- Rounds: `ROUNDS = 8`; HUD stars = `ROUNDS`; the counting wait is `9000 + n*1700` ms; footsteps timed from the walk clip.
+
+### 7.3 Art pipeline lessons
+- Cut boxes with 15 px margin per grid cell; items that cross their cell need an override line (later lines in `cut_art.sh` win). Prefixed names (`b_ f_ s_ r_ c_ w_ k_ u_ j_ d_ h_`) are never "grown"
+  (growing swallowed neighbours the first time: a silo appeared where the pump should be). "STILL CUT" on a prefixed picture usually = a neighbour's crumb touching the box;
+  check with a contact sheet (ffmpeg hstack/vstack over a coloured background).
+- Textures are scaled to 1024², panoramas to 1600 wide, webp quality 85; cuts are lossless 2×.
+- White animals on a white sheet need a soft grey-blue edge in the prompt, otherwise the matte eats them.
+- Files in `assets/games/art/` + sizes in `game_src/learn_games/src/kit/art_dims.json` (written by `recut.mjs`).
+
+### 7.4 Voice pipeline details
+- The clip id of a sentence = FNV-1a over "ar|<spoken text>" (emoji/symbols stripped). The game plays `learn_voice/ar/<id>.mp3` if listed in `manifest.js`, else the device voice.
+- Arabic is never sent without full vowel marks (`tashkeel.json`); a spelling difference between screen text and reading is allowed only for the `SPELLING` set in `make_tashkeel.py`.
+- Takes: A = steady (stability .75, speed .92), B = natural (.55, .92), C = lively (.38, speed .95); sentences with their own VARIANTS use spellings/speeds listed in `takes.mjs`.
+- Sentences redone in this session (round 1, 28): first-letter questions for إشارة, بالون, بقرة, بطريق, حرباء, سحابة, صدفة, فارس, فرشاة, كنز, مدرسة, مكنسة, منشفة, نمر; rewards الباء زي بالون,
+  الحاء زي حمار وحشي, الدال زي دولاب, الدال زي دولفين, السين زي سلحفاة, الفاء زي فارس, الفاء زي فرشاة, القاف زي قرد, القاف زي قنديل بحر, الكاف زي كنز, الكاف زي كوكب, الميم زي مكنسة;
+  فين قنديل البحر؟; يلا نشوف الساعة كام. The owner's picks (22 applied): إشارة A, بقرة A, بطريق A, حرباء C, سحابة C, صدفة C, فارس A, فرشاة B, كنز A, مدرسة C, مكنسة B, منشفة B, نمر B,
+  الباء زي بالون B, الحاء زي حمار وحشي C, الدال زي دولاب C, السين زي سلحفاة A, القاف زي قنديل بحر A, الكاف زي كنز A, الكاف زي كوكب A, الميم زي مكنسة B, فين قنديل البحر؟ A.
+  Not liked (round 2 made, page 29): بالون (first letter), الدال زي دولفين, الفاء زي فارس, الفاء زي فرشاة, القاف زي قرد (→ round 3, page 30, chosen B), يلا نشوف الساعة كام.
+- Cost: the 251 new clips ≈ 4.6k characters of ElevenLabs text.
+
+### 7.5 Environment gotchas (Windows, this machine)
+- Arabic text on a command line or in a bash heredoc gets mangled: write files with the editor tool, then run them; always `PYTHONUTF8=1` for python.
+- The C: drive filled up once (flutter test/build crashed "not enough space"): delete `%TEMP%\flutter_tools.*`; the web build needs several GB of free RAM (dart2js "Could not start thread" = low memory, retry after closing Chrome).
+- The local preview server (`python -m http.server`) dies when a session ends: restart it. The preview browser caches `game.js`: fetch it with `{cache:'reload'}` before reloading.
+- Cloudflare Pages needs 1–3 minutes after a push; an empty extra commit to `demo-site` helped once. Compare md5 of a live file with the build output, not only `main.dart.js`.
+- A `git push` can be rejected because another Claude session pushed (design skills): `git fetch`, `git merge origin/feature/rehlaty`, push.
+- `minAspect: 0` must be read with `??` (not `||`); a method named `_frame` collided with the per-frame update (renamed `_pictureFrame`).
+
+### 7.6 Tests and checks run
+- `npm test` in `game_src/learn_games`: 71 tests (levels, letters, animals, shapes, counting, more words, maze, ladders, …). `flutter analyze`: 0 errors, 25 infos/warnings (old).
+- Flutter tests of the learning page, educational games, page voice and animated characters passed (35).
+- Browser checks at 932×430 and ~390×844 (and 780×850) for: farm, beach, space, rainbow, city, snow, castle, underwater, jungle, desert, home, the words level (8 stars) and the animals level.
+- Not run: the full Flutter test suite, any real device, screen readers, the Android build.
+
+### 7.7 Safety and project rules that still apply
+No ads, no tracking, no external links for the child; no YouTube; the only videos are the owner's own lessons; child mode is started by the parent and left with a PIN; stars only for finishing
+an activity (never for time or streaks). Never invent credentials, bundle ids, Firebase config or approvals; never commit keys. Publishing Firebase rules or anything outward-facing needs the owner's say.
