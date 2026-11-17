@@ -1110,6 +1110,126 @@
   "age": 5
  },
  {
+  "id": "o_bread",
+  "thing": "o_bread",
+  "letter": "ayn",
+  "word": "عيش",
+  "wd": "عَيْش",
+  "the": "العيش",
+  "thed": "العَيْش",
+  "age": 3
+ },
+ {
+  "id": "o_cheese",
+  "thing": "o_cheese",
+  "letter": "jeem",
+  "word": "جبنة",
+  "wd": "جُبْنَة",
+  "the": "الجبنة",
+  "thed": "الجُبْنَة",
+  "age": 4
+ },
+ {
+  "id": "o_egg",
+  "thing": "o_egg",
+  "letter": "baa",
+  "word": "بيضة",
+  "wd": "بَيْضَة",
+  "the": "البيضة",
+  "thed": "البَيْضَة",
+  "age": 3
+ },
+ {
+  "id": "o_milk",
+  "thing": "o_milk",
+  "letter": "laam",
+  "word": "لبن",
+  "wd": "لَبَن",
+  "the": "اللبن",
+  "thed": "اللَّبَن",
+  "age": 3
+ },
+ {
+  "id": "o_rice",
+  "thing": "o_rice",
+  "letter": "raa",
+  "word": "رز",
+  "wd": "رُزّ",
+  "the": "الرز",
+  "thed": "الرُّزّ",
+  "age": 4
+ },
+ {
+  "id": "o_chicken",
+  "thing": "o_chicken",
+  "letter": "faa",
+  "word": "فراخ",
+  "wd": "فِرَاخ",
+  "the": "الفراخ",
+  "thed": "الفِرَاخ",
+  "age": 5
+ },
+ {
+  "id": "o_juice",
+  "thing": "o_juice",
+  "letter": "ayn",
+  "word": "عصير",
+  "wd": "عَصِير",
+  "the": "العصير",
+  "thed": "العَصِير",
+  "age": 4
+ },
+ {
+  "id": "o_water",
+  "thing": "o_water",
+  "letter": "meem",
+  "word": "مية",
+  "wd": "مَيَّة",
+  "the": "المية",
+  "thed": "المَيَّة",
+  "age": 3
+ },
+ {
+  "id": "o_cookie",
+  "thing": "o_cookie",
+  "letter": "baa",
+  "word": "بسكوت",
+  "wd": "بِسْكُوت",
+  "the": "البسكوت",
+  "thed": "البِسْكُوت",
+  "age": 4
+ },
+ {
+  "id": "o_honey",
+  "thing": "o_honey",
+  "letter": "ayn",
+  "word": "عسل",
+  "wd": "عَسَل",
+  "the": "العسل",
+  "thed": "العَسَل",
+  "age": 5
+ },
+ {
+  "id": "o_soup",
+  "thing": "o_soup",
+  "letter": "sheen",
+  "word": "شوربة",
+  "wd": "شُورْبَة",
+  "the": "الشوربة",
+  "thed": "الشُّورْبَة",
+  "age": 5
+ },
+ {
+  "id": "o_pizza",
+  "thing": "o_pizza",
+  "letter": "baa",
+  "word": "بيتزا",
+  "wd": "بِيتْزَا",
+  "the": "البيتزا",
+  "thed": "البِيتْزَا",
+  "age": 4
+ },
+ {
   "id": "q_kiwi",
   "thing": "q_kiwi",
   "letter": "kaaf",
@@ -1228,6 +1348,126 @@
   "the": "النارجيل",
   "thed": "النَّارْجِيل",
   "age": 6
+ },
+ {
+  "id": "i_ant",
+  "thing": "i_ant",
+  "letter": "noon",
+  "word": "نملة",
+  "wd": "نَمْلَة",
+  "the": "النملة",
+  "thed": "النَّمْلَة",
+  "age": 4
+ },
+ {
+  "id": "i_fly",
+  "thing": "i_fly",
+  "letter": "dhal",
+  "word": "ذبابة",
+  "wd": "ذُبَابَة",
+  "the": "الذبابة",
+  "thed": "الذُّبَابَة",
+  "age": 6
+ },
+ {
+  "id": "i_spider",
+  "thing": "i_spider",
+  "letter": "ayn",
+  "word": "عنكبوت",
+  "wd": "عَنْكَبُوت",
+  "the": "العنكبوت",
+  "thed": "العَنْكَبُوت",
+  "age": 6
+ },
+ {
+  "id": "i_worm",
+  "thing": "i_worm",
+  "letter": "dal",
+  "word": "دودة",
+  "wd": "دُودَة",
+  "the": "الدودة",
+  "thed": "الدُّودَة",
+  "age": 4
+ },
+ {
+  "id": "i_eagle",
+  "thing": "i_eagle",
+  "letter": "noon",
+  "word": "نسر",
+  "wd": "نِسْر",
+  "the": "النسر",
+  "thed": "النِّسْر",
+  "age": 6
+ },
+ {
+  "id": "i_peacock",
+  "thing": "i_peacock",
+  "letter": "tah",
+  "word": "طاووس",
+  "wd": "طَاوُوس",
+  "the": "الطاووس",
+  "thed": "الطَّاوُوس",
+  "age": 6
+ },
+ {
+  "id": "i_flamingo",
+  "thing": "i_flamingo",
+  "letter": "faa",
+  "word": "فلامنجو",
+  "wd": "فِلَامِنْجُو",
+  "the": "الفلامنجو",
+  "thed": "الفِلَامِنْجُو",
+  "age": 6
+ },
+ {
+  "id": "i_swan",
+  "thing": "i_swan",
+  "letter": "baa",
+  "word": "بجعة",
+  "wd": "بَجَعَة",
+  "the": "البجعة",
+  "thed": "البَجَعَة",
+  "age": 6
+ },
+ {
+  "id": "i_ostrich",
+  "thing": "i_ostrich",
+  "letter": "noon",
+  "word": "نعامة",
+  "wd": "نَعَامَة",
+  "the": "النعامة",
+  "thed": "النَّعَامَة",
+  "age": 6
+ },
+ {
+  "id": "i_sparrow",
+  "thing": "i_sparrow",
+  "letter": "ayn",
+  "word": "عصفورة",
+  "wd": "عُصْفُورَة",
+  "the": "العصفورة",
+  "thed": "العُصْفُورَة",
+  "age": 4
+ },
+ {
+  "id": "i_bat",
+  "thing": "i_bat",
+  "letter": "khaa",
+  "word": "خفاش",
+  "wd": "خُفَّاش",
+  "the": "الخفاش",
+  "thed": "الخُفَّاش",
+  "age": 6
+ },
+ {
+  "id": "i_snail",
+  "thing": "i_snail",
+  "letter": "haa",
+  "word": "حلزونة",
+  "wd": "حَلَزُونَة",
+  "the": "الحلزونة",
+  "thed": "الحَلَزُونَة",
+  "age": 5
  },
  {
   "id": "z_doctor",

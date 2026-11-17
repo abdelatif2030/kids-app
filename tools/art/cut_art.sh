@@ -146,3 +146,12 @@ cutw 105 414 371 0 0 t_rain; cutw 105 414 371 369 0 t_snow; cutw 105 414 371 753
 
 # pack jobs (sheet 106)
 cutw 106 414 371 0 0 z_doctor; cutw 106 414 371 369 0 z_teacher; cutw 106 414 371 753 0 z_police; cutw 106 399 371 1137 0 z_firefighter; cutw 106 414 371 0 326 z_farmer; cutw 106 414 371 369 326 z_cook; cutw 106 414 371 753 326 z_driver; cutw 106 399 371 1137 326 z_pilot; cutw 106 414 357 0 667 z_nurse; cutw 106 414 357 369 667 z_builder; cutw 106 414 357 753 667 z_singer; cutw 106 399 357 1137 667 z_painter
+
+# pack insects (sheet 108)
+cutw 108 414 371 0 0 i_ant; cutw 108 414 371 369 0 i_fly; cutw 108 414 371 753 0 i_spider; cutw 108 399 371 1137 0 i_worm; cutw 108 414 371 0 326 i_eagle; cutw 108 414 371 369 326 i_peacock; cutw 108 414 371 753 326 i_flamingo; cutw 108 399 371 1137 326 i_swan; cutw 108 414 357 0 667 i_ostrich; cutw 108 414 357 369 667 i_sparrow; cutw 108 414 357 753 667 i_bat; cutw 108 399 357 1137 667 i_snail
+
+# pack food (sheet 109)
+cutw 109 414 371 0 0 o_bread; cutw 109 414 371 369 0 o_cheese; cutw 109 414 371 753 0 o_egg; cutw 109 399 371 1137 0 o_milk; cutw 109 414 371 0 326 o_rice; cutw 109 414 371 369 326 o_chicken; cutw 109 414 371 753 326 o_juice; cutw 109 399 371 1137 326 o_water; cutw 109 414 357 0 667 o_cookie; cutw 109 414 357 369 667 o_honey; cutw 109 414 357 753 667 o_soup; cutw 109 399 357 1137 667 o_pizza
+
+# overrides: items that crossed their cell (insects sheet 108, food sheet 109)
+cutw 108 399 400 0 298 i_eagle; cutw 108 414 400 369 298 i_peacock; cutw 108 414 400 753 298 i_flamingo; cutw 108 399 376 0 648 i_ostrich; cutw 108 457 357 753 667 i_bat; cutw 109 414 386 369 638 o_honey
