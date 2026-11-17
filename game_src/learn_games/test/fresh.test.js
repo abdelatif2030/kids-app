@@ -23,13 +23,14 @@ test('a second visit to the same level shows new things first (large pool: no ov
   for (const k of c) assert.ok(!a.includes(k) && !b.includes(k), `repeat ${k}`);
 });
 
-test('a small pool shows what is left first, then the oldest (colours: 11 things, 8 rounds)', () => {
+test('a small pool shows what is left first, then the oldest (fruits: 13 things, 8 rounds)', async () => {
+  const { PICKS } = await import('../src/letters/levels.js');
   const mem = new FreshMemory(null, 2900);
-  const a = playOut(mem, 'colors', 5, 1);
+  const a = playOut(mem, 'fruits', 5, 1);
   assert.equal(new Set(a).size, ROUNDS);
-  const unseen = ['c:red', 'c:blue', 'c:yellow', 'c:green', 'c:orange', 'c:purple', 'c:pink', 'c:black', 'c:white', 'c:brown', 'c:gray'].filter((k) => !a.includes(k));
-  assert.equal(unseen.length, 3);
-  const b = playOut(mem, 'colors', 5, 2);
+  const unseen = PICKS.fruits.items.map((it) => `t:${it.thing}`).filter((k) => !a.includes(k));
+  assert.equal(unseen.length, PICKS.fruits.items.length - ROUNDS);
+  const b = playOut(mem, 'fruits', 5, 2);
   for (const k of unseen) assert.ok(b.includes(k), `${k} should come first`);
 });
 

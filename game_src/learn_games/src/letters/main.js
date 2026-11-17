@@ -279,7 +279,7 @@ class Game {
         g.add(pole, plaque);
       }
     } else if (o.kind === 'color') {
-      item = new THREE.Mesh(new THREE.SphereGeometry(0.62, 28, 20), new THREE.MeshStandardMaterial({ color: o.hex, roughness: 0.18, metalness: 0.05 }));
+      item = new THREE.Mesh(new THREE.SphereGeometry(0.62, 28, 20), new THREE.MeshStandardMaterial({ color: o.hex, roughness: o.metal ? 0.28 : 0.18, metalness: o.metal || 0.05 }));
       item.position.set(0, 0.95 + lift, 0);
       item.castShadow = true;
       g.add(item);
@@ -556,7 +556,7 @@ class Game {
    *  shows a neutral 'look' icon; levels about letters and numbers keep their own. */
   _barIcon() {
     const m = this.level && this.level.mode;
-    return ['pick', 'shape', 'animal', 'habit', 'word'].includes(m) ? '👀' : this.level.emoji;
+    return ['pick', 'color', 'shape', 'animal', 'habit', 'word'].includes(m) ? '👀' : this.level.emoji;
   }
 
   _ask() {

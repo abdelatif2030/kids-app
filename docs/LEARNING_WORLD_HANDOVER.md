@@ -164,3 +164,9 @@ Voice: 42 new sentences recorded with Fatima (1210/1210). Tashkeel in `tools/gam
 find / after / before / bigger / smaller (`allNumberSentences()` = 143 sentences) and counting tiers 1-5 / 6-10 / 11-20. Freshness memory orders each tier.
 `LevelPlay` numbers/counting use them (old `numberPool` removed). Voice: 123 new Fatima clips, readings in `tools/game_voice/tashkeel_numbers.py`
 (1-20 keep the older readings; 11 stays «أَحَدَ عَشَر»). Not done: ordinals (الأول..), more/less pictures, number words in English.
+
+## Colours 25 (2026-11-17)
+`letters/colors.js` (pure): 25 colours (A 6 basic, B 5, C 14 more: sky blue, navy, light/dark green, turquoise, gold, silver (metal spheres), beige, maroon, lemon,
+peach, lilac, olive, mustard), families (a round never shows two shades of one family), `COLOR_THINGS` (10 colours with 2-5 art pictures each, looked at one by one),
+`colorTierCounts(age)` (age picks the start), question kinds «فين اللون X؟» (ball) and «فين الحاجة اللي لونها X؟» (pictures, from age 3). LEVELS.colors is mode 'color'.
+Voice: 24 new clips (`tashkeel_colors.py`; «الذهبي» is read «الدَّهَبِي»: listen to it). Black has one picture only, so it is asked as a ball only.

@@ -94,6 +94,8 @@ for (const q of numbersMod.allNumberSentences()) add(q, 'ar'); // finds 0-100, a
 for (const w of lv.WORD_ITEMS) { add(lv.wordQ(w), 'ar'); add(lv.firstQ(w), 'ar'); add(lv.wordReward(w), 'ar'); }
 for (const hb of lv.HABITS) add(hb.text, 'ar');
 for (const tab of Object.values(lv.PICKS)) for (const it of tab.items) add(tab.prompt(it), 'ar');
+const colorsMod = await imp('letters/colors.js');
+for (const q of colorsMod.allColorSentences()) add(q, 'ar'); // 25 colours + the things of a colour
 for (const c of [...lv.CHEERS_M, ...lv.CHEERS_F]) add(c, 'ar');
 
 const all0 = [...lines.values()];

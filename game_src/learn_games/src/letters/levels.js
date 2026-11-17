@@ -15,6 +15,7 @@ import { ROUNDS, poolFor, fishCount, letterById, question, LETTERS } from './sim
 import { tilesOf, makeRounds as shapeRounds, withColour, shapeById, colorById, question as shapeQuestion, reward as shapeReward } from '../shapes/sim.js';
 import { ANIMALS, platesOf, animalById, question as animalQuestion, reward as animalReward, poolFor as animalPool, FOODS } from '../animals/sim.js';
 import { optionsFor, COUNT_Q } from '../counting/sim.js';
+import { COLORS, COLOR_TIERS, COLOR_THINGS, colorPlan, colorChoices, findColorQ, findThingQ, colorOf } from './colors.js';
 import { TIERS, COUNT_TIERS, numberPlan, countPlan, numberWord, findQ, afterQ, beforeQ, BIGGER_Q, SMALLER_Q } from './numbers.js';
 const range0 = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
 import MORE_WORDS from './more_words.json' with { type: 'json' };
@@ -29,7 +30,7 @@ export const LEVELS = [
   { id: 'order', mode: 'next', ar: 'ترتيب الحروف', emoji: '🔠', skill: 'letters_ar' },
   { id: 'shapes', mode: 'shape', ar: 'الأشكال والألوان', emoji: '🔷', skill: 'shapes' },
   { id: 'animals', mode: 'animal', ar: 'أطعم الحيوان', emoji: '🐰', skill: 'nature' },
-  { id: 'colors', mode: 'pick', table: 'colors', ar: 'الألوان', emoji: '🎨', skill: 'colors' },
+  { id: 'colors', mode: 'color', ar: 'الألوان', emoji: '🎨', skill: 'colors' },
   { id: 'fruits', mode: 'pick', table: 'fruits', ar: 'فواكه وخضار', emoji: '🍓', skill: 'vocab' },
   { id: 'vehicles', mode: 'pick', table: 'vehicles', ar: 'المواصلات', emoji: '🚌', skill: 'vocab' },
   { id: 'habits', mode: 'habit', ar: 'عاداتي اليومية', emoji: '🧼', skill: 'listening' },
@@ -37,15 +38,6 @@ export const LEVELS = [
 
 /** The "find it" levels with a table of things: colours, fruit and vegetables, vehicles. */
 export const PICKS = {
-  colors: {
-    prompt: (it) => `فين اللون ${it.the}؟`,
-    items: [
-      { id: 'red', the: 'الأحمر', hex: 0xe8302a }, { id: 'blue', the: 'الأزرق', hex: 0x2a8ae8 }, { id: 'yellow', the: 'الأصفر', hex: 0xffd21a },
-      { id: 'green', the: 'الأخضر', hex: 0x2aa84a }, { id: 'orange', the: 'البرتقالي', hex: 0xff8a1a }, { id: 'purple', the: 'البنفسجي', hex: 0x9a4ad8 },
-      { id: 'pink', the: 'الوردي', hex: 0xff7ab8 }, { id: 'black', the: 'الأسود', hex: 0x24242c }, { id: 'white', the: 'الأبيض', hex: 0xfafafa },
-      { id: 'brown', the: 'البني', hex: 0x8a5a32 }, { id: 'gray', the: 'الرمادي', hex: 0x9a9aa8 },
-    ],
-  },
   fruits: {
     prompt: (it) => `فين ${it.the}؟`,
     items: [
@@ -244,6 +236,39 @@ export class LevelPlay {
         const a = animalById(id);
         const plates = platesOf(this.age, id, this.seed + i * 41, this.world, used);
         out.push({ prompt: animalQuestion(a), answer: a.food, animal: id, key: `t:${a.thing}`, show: { type: 'thing', thing: a.thing }, reward: animalReward(a), options: plates.map((f) => ({ id: f, kind: 'thing', thing: FOODS[f].thing })) });
+      }
+    } else if (mode === 'color') {
+      // 25 colours at every age (age picks the start); some rounds ask for a THING of the colour (pictures), never two shades of one family together
+      const plan = colorPlan(this.age, ROUNDS, r);
+      const queues = {};
+      const draw = (tier, not) => {
+        if (!queues[tier] || !queues[tier].length) queues[tier] = mem ? mem.order(COLOR_TIERS[tier], (c) => `c:${c.id}`, r) : [...COLOR_TIERS[tier]].sort(() => r() - 0.5);
+        let k = queues[tier].findIndex((c) => !not.includes(c.id));
+        if (k < 0) k = 0;
+        return queues[tier].splice(k, 1)[0];
+      };
+      const usedColor = new Map();
+      for (let i = 0; i < ROUNDS; i++) {
+        const { kind, tier } = plan[i];
+        const lastIds = out.map((x) => x.colorId);
+        if (kind === 'thing') {
+          // a colour that has pictures: the right picture among pictures of other colours
+          const cs = Object.keys(COLOR_THINGS).filter((id) => !lastIds.includes(id));
+          const pickable = (mem ? mem.order(cs, (id) => `c:${id}`, r) : [...cs].sort(() => r() - 0.5));
+          const cid = (pickable.find((id) => colorOf(id).tier === tier) || pickable[0]);
+          const c = colorOf(cid);
+          const right = COLOR_THINGS[cid][Math.floor(r() * COLOR_THINGS[cid].length)];
+          const otherColors = pickLow(Object.keys(COLOR_THINGS).filter((id) => id !== cid && colorOf(id).family !== c.family), nOpt - 1);
+          const others = otherColors.map((id) => COLOR_THINGS[id][Math.floor(r() * COLOR_THINGS[id].length)]);
+          mark(`c:${cid}`);
+          out.push({ prompt: findThingQ(c), answer: right, colorId: cid, key: `c:${cid}`, options: [right, ...others].sort(() => r() - 0.5).map((t) => ({ id: t, kind: 'thing', thing: t })) });
+        } else {
+          const c = draw(tier, lastIds);
+          mark(`c:${c.id}`);
+          const opts = colorChoices(c, COLORS, nOpt, r, usedColor);
+          opts.forEach((x) => usedColor.set(x.id, (usedColor.get(x.id) || 0) + 1));
+          out.push({ prompt: findColorQ(c), answer: c.id, colorId: c.id, key: `c:${c.id}`, options: opts.sort(() => r() - 0.5).map((x) => ({ id: x.id, kind: 'color', hex: x.hex, metal: x.metal || 0 })) });
+        }
       }
     } else if (mode === 'pick') {
       const tab = PICKS[this.level.table];
