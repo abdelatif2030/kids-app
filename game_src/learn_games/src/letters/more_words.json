@@ -748,5 +748,605 @@
   "the": "الكعكة",
   "thed": "الكَعْكَة",
   "age": 4
+ },
+ {
+  "id": "y_eye",
+  "thing": "y_eye",
+  "letter": "ayn",
+  "word": "عين",
+  "wd": "عَيْن",
+  "the": "العين",
+  "thed": "العَيْن",
+  "age": 3
+ },
+ {
+  "id": "y_ear",
+  "thing": "y_ear",
+  "letter": "waaw",
+  "word": "ودن",
+  "wd": "وِدْن",
+  "the": "الودن",
+  "thed": "الوِدْن",
+  "age": 3
+ },
+ {
+  "id": "y_nose",
+  "thing": "y_nose",
+  "letter": "alef",
+  "word": "أنف",
+  "wd": "أَنْف",
+  "the": "الأنف",
+  "thed": "الأَنْف",
+  "age": 3
+ },
+ {
+  "id": "y_mouth",
+  "thing": "y_mouth",
+  "letter": "faa",
+  "word": "فم",
+  "wd": "فَم",
+  "the": "الفم",
+  "thed": "الفَم",
+  "age": 3
+ },
+ {
+  "id": "y_hand",
+  "thing": "y_hand",
+  "letter": "alef",
+  "word": "إيد",
+  "wd": "إِيد",
+  "the": "الإيد",
+  "thed": "الإِيد",
+  "age": 3
+ },
+ {
+  "id": "y_foot",
+  "thing": "y_foot",
+  "letter": "raa",
+  "word": "رجل",
+  "wd": "رِجْل",
+  "the": "الرجل",
+  "thed": "الرِّجْل",
+  "age": 3
+ },
+ {
+  "id": "y_hair",
+  "thing": "y_hair",
+  "letter": "sheen",
+  "word": "شعر",
+  "wd": "شَعْر",
+  "the": "الشعر",
+  "thed": "الشَّعْر",
+  "age": 4
+ },
+ {
+  "id": "y_tooth",
+  "thing": "y_tooth",
+  "letter": "seen",
+  "word": "سنة",
+  "wd": "سِنَّة",
+  "the": "السنة",
+  "thed": "السِّنَّة",
+  "age": 4
+ },
+ {
+  "id": "y_head",
+  "thing": "y_head",
+  "letter": "raa",
+  "word": "راس",
+  "wd": "رَاس",
+  "the": "الراس",
+  "thed": "الرَّاس",
+  "age": 3
+ },
+ {
+  "id": "y_finger",
+  "thing": "y_finger",
+  "letter": "sad",
+  "word": "صباع",
+  "wd": "صُبَّاع",
+  "the": "الصباع",
+  "thed": "الصُّبَّاع",
+  "age": 4
+ },
+ {
+  "id": "y_knee",
+  "thing": "y_knee",
+  "letter": "raa",
+  "word": "ركبة",
+  "wd": "رُكْبَة",
+  "the": "الركبة",
+  "thed": "الرُّكْبَة",
+  "age": 5
+ },
+ {
+  "id": "y_belly",
+  "thing": "y_belly",
+  "letter": "baa",
+  "word": "بطن",
+  "wd": "بَطْن",
+  "the": "البطن",
+  "thed": "البَطْن",
+  "age": 5
+ },
+ {
+  "id": "l_shirt",
+  "thing": "l_shirt",
+  "letter": "qaaf",
+  "word": "قميص",
+  "wd": "قَمِيص",
+  "the": "القميص",
+  "thed": "القَمِيص",
+  "age": 4
+ },
+ {
+  "id": "l_trousers",
+  "thing": "l_trousers",
+  "letter": "baa",
+  "word": "بنطلون",
+  "wd": "بَنْطَلُون",
+  "the": "البنطلون",
+  "thed": "البَنْطَلُون",
+  "age": 4
+ },
+ {
+  "id": "l_dress",
+  "thing": "l_dress",
+  "letter": "faa",
+  "word": "فستان",
+  "wd": "فُسْتَان",
+  "the": "الفستان",
+  "thed": "الفُسْتَان",
+  "age": 4
+ },
+ {
+  "id": "l_hat",
+  "thing": "l_hat",
+  "letter": "qaaf",
+  "word": "قبعة",
+  "wd": "قُبَّعَة",
+  "the": "القبعة",
+  "thed": "القُبَّعَة",
+  "age": 4
+ },
+ {
+  "id": "l_socks",
+  "thing": "l_socks",
+  "letter": "sheen",
+  "word": "شراب",
+  "wd": "شُرَّاب",
+  "the": "الشراب",
+  "thed": "الشُّرَّاب",
+  "age": 3
+ },
+ {
+  "id": "l_jacket",
+  "thing": "l_jacket",
+  "letter": "jeem",
+  "word": "جاكت",
+  "wd": "جَاكِت",
+  "the": "الجاكت",
+  "thed": "الجَاكِت",
+  "age": 5
+ },
+ {
+  "id": "l_scarf",
+  "thing": "l_scarf",
+  "letter": "waaw",
+  "word": "وشاح",
+  "wd": "وِشَاح",
+  "the": "الوشاح",
+  "thed": "الوِشَاح",
+  "age": 6
+ },
+ {
+  "id": "l_gloves",
+  "thing": "l_gloves",
+  "letter": "qaaf",
+  "word": "قفاز",
+  "wd": "قُفَّاز",
+  "the": "القفاز",
+  "thed": "القُفَّاز",
+  "age": 6
+ },
+ {
+  "id": "l_glasses",
+  "thing": "l_glasses",
+  "letter": "noon",
+  "word": "نضارة",
+  "wd": "نَضَّارَة",
+  "the": "النضارة",
+  "thed": "النَّضَّارَة",
+  "age": 5
+ },
+ {
+  "id": "l_cap",
+  "thing": "l_cap",
+  "letter": "kaaf",
+  "word": "كاب",
+  "wd": "كَاب",
+  "the": "الكاب",
+  "thed": "الكَاب",
+  "age": 4
+ },
+ {
+  "id": "l_pajamas",
+  "thing": "l_pajamas",
+  "letter": "baa",
+  "word": "بيجامة",
+  "wd": "بِيجَامَة",
+  "the": "البيجامة",
+  "thed": "البِيجَامَة",
+  "age": 4
+ },
+ {
+  "id": "l_raincoat",
+  "thing": "l_raincoat",
+  "letter": "meem",
+  "word": "معطف",
+  "wd": "مِعْطَف",
+  "the": "المعطف",
+  "thed": "المِعْطَف",
+  "age": 6
+ },
+ {
+  "id": "q_kiwi",
+  "thing": "q_kiwi",
+  "letter": "kaaf",
+  "word": "كيوي",
+  "wd": "كِيوِي",
+  "the": "الكيوي",
+  "thed": "الكِيوِي",
+  "age": 5
+ },
+ {
+  "id": "q_melon",
+  "thing": "q_melon",
+  "letter": "sheen",
+  "word": "شمام",
+  "wd": "شَمَّام",
+  "the": "الشمام",
+  "thed": "الشَّمَّام",
+  "age": 5
+ },
+ {
+  "id": "q_dates",
+  "thing": "q_dates",
+  "letter": "baa",
+  "word": "بلح",
+  "wd": "بَلَح",
+  "the": "البلح",
+  "thed": "البَلَح",
+  "age": 5
+ },
+ {
+  "id": "q_fig",
+  "thing": "q_fig",
+  "letter": "taa",
+  "word": "تين",
+  "wd": "تِين",
+  "the": "التين",
+  "thed": "التِّين",
+  "age": 5
+ },
+ {
+  "id": "q_apricot",
+  "thing": "q_apricot",
+  "letter": "meem",
+  "word": "مشمش",
+  "wd": "مِشْمِش",
+  "the": "المشمش",
+  "thed": "المِشْمِش",
+  "age": 5
+ },
+ {
+  "id": "q_berries",
+  "thing": "q_berries",
+  "letter": "taa",
+  "word": "توت",
+  "wd": "تُوت",
+  "the": "التوت",
+  "thed": "التُّوت",
+  "age": 4
+ },
+ {
+  "id": "q_plum",
+  "thing": "q_plum",
+  "letter": "baa",
+  "word": "برقوق",
+  "wd": "بَرْقُوق",
+  "the": "البرقوق",
+  "thed": "البَرْقُوق",
+  "age": 6
+ },
+ {
+  "id": "q_avocado",
+  "thing": "q_avocado",
+  "letter": "alef",
+  "word": "أفوكادو",
+  "wd": "أَفُوكَادُو",
+  "the": "الأفوكادو",
+  "thed": "الأَفُوكَادُو",
+  "age": 6
+ },
+ {
+  "id": "q_peach",
+  "thing": "q_peach",
+  "letter": "khaa",
+  "word": "خوخ",
+  "wd": "خُوخ",
+  "the": "الخوخ",
+  "thed": "الخُوخ",
+  "age": 5
+ },
+ {
+  "id": "q_cherry",
+  "thing": "q_cherry",
+  "letter": "kaaf",
+  "word": "كرز",
+  "wd": "كَرَز",
+  "the": "الكرز",
+  "thed": "الكَرَز",
+  "age": 4
+ },
+ {
+  "id": "q_olives",
+  "thing": "q_olives",
+  "letter": "zayn",
+  "word": "زيتون",
+  "wd": "زَيْتُون",
+  "the": "الزيتون",
+  "thed": "الزَّيْتُون",
+  "age": 5
+ },
+ {
+  "id": "q_coconut",
+  "thing": "q_coconut",
+  "letter": "noon",
+  "word": "نارجيل",
+  "wd": "نَارْجِيل",
+  "the": "النارجيل",
+  "thed": "النَّارْجِيل",
+  "age": 6
+ },
+ {
+  "id": "e_pencil",
+  "thing": "e_pencil",
+  "letter": "qaaf",
+  "word": "قلم",
+  "wd": "قَلَم",
+  "the": "القلم",
+  "thed": "القَلَم",
+  "age": 3
+ },
+ {
+  "id": "e_book",
+  "thing": "e_book",
+  "letter": "kaaf",
+  "word": "كتاب",
+  "wd": "كِتَاب",
+  "the": "الكتاب",
+  "thed": "الكِتَاب",
+  "age": 3
+ },
+ {
+  "id": "e_notebook",
+  "thing": "e_notebook",
+  "letter": "kaaf",
+  "word": "كراسة",
+  "wd": "كُرَّاسَة",
+  "the": "الكراسة",
+  "thed": "الكُرَّاسَة",
+  "age": 4
+ },
+ {
+  "id": "e_scissors",
+  "thing": "e_scissors",
+  "letter": "meem",
+  "word": "مقص",
+  "wd": "مَقَص",
+  "the": "المقص",
+  "thed": "المَقَص",
+  "age": 5
+ },
+ {
+  "id": "e_ruler",
+  "thing": "e_ruler",
+  "letter": "meem",
+  "word": "مسطرة",
+  "wd": "مِسْطَرَة",
+  "the": "المسطرة",
+  "thed": "المِسْطَرَة",
+  "age": 5
+ },
+ {
+  "id": "e_eraser",
+  "thing": "e_eraser",
+  "letter": "alef",
+  "word": "أستيكة",
+  "wd": "أُسْتِيكَة",
+  "the": "الأستيكة",
+  "thed": "الأُسْتِيكَة",
+  "age": 5
+ },
+ {
+  "id": "e_crayons",
+  "thing": "e_crayons",
+  "letter": "alef",
+  "word": "ألوان",
+  "wd": "أَلْوَان",
+  "the": "الألوان",
+  "thed": "الأَلْوَان",
+  "age": 4
+ },
+ {
+  "id": "e_board",
+  "thing": "e_board",
+  "letter": "seen",
+  "word": "سبورة",
+  "wd": "سَبُّورَة",
+  "the": "السبورة",
+  "thed": "السَّبُّورَة",
+  "age": 5
+ },
+ {
+  "id": "e_map",
+  "thing": "e_map",
+  "letter": "khaa",
+  "word": "خريطة",
+  "wd": "خَرِيطَة",
+  "the": "الخريطة",
+  "thed": "الخَرِيطَة",
+  "age": 6
+ },
+ {
+  "id": "e_glue",
+  "thing": "e_glue",
+  "letter": "sad",
+  "word": "صمغ",
+  "wd": "صَمْغ",
+  "the": "الصمغ",
+  "thed": "الصَّمْغ",
+  "age": 6
+ },
+ {
+  "id": "e_desk",
+  "thing": "e_desk",
+  "letter": "meem",
+  "word": "مكتب",
+  "wd": "مَكْتَب",
+  "the": "المكتب",
+  "thed": "المَكْتَب",
+  "age": 5
+ },
+ {
+  "id": "e_paper",
+  "thing": "e_paper",
+  "letter": "waaw",
+  "word": "ورقة",
+  "wd": "وَرَقَة",
+  "the": "الورقة",
+  "thed": "الوَرَقَة",
+  "age": 4
+ },
+ {
+  "id": "v_tomato",
+  "thing": "v_tomato",
+  "letter": "tah",
+  "word": "طماطم",
+  "wd": "طَمَاطِم",
+  "the": "الطماطم",
+  "thed": "الطَّمَاطِم",
+  "age": 4
+ },
+ {
+  "id": "v_cucumber",
+  "thing": "v_cucumber",
+  "letter": "khaa",
+  "word": "خيار",
+  "wd": "خِيَار",
+  "the": "الخيار",
+  "thed": "الخِيَار",
+  "age": 4
+ },
+ {
+  "id": "v_potato",
+  "thing": "v_potato",
+  "letter": "baa",
+  "word": "بطاطس",
+  "wd": "بَطَاطِس",
+  "the": "البطاطس",
+  "thed": "البَطَاطِس",
+  "age": 4
+ },
+ {
+  "id": "v_onion",
+  "thing": "v_onion",
+  "letter": "baa",
+  "word": "بصل",
+  "wd": "بَصَل",
+  "the": "البصل",
+  "thed": "البَصَل",
+  "age": 5
+ },
+ {
+  "id": "v_eggplant",
+  "thing": "v_eggplant",
+  "letter": "baa",
+  "word": "باذنجان",
+  "wd": "بَاذِنْجَان",
+  "the": "الباذنجان",
+  "thed": "البَاذِنْجَان",
+  "age": 5
+ },
+ {
+  "id": "v_pepper",
+  "thing": "v_pepper",
+  "letter": "faa",
+  "word": "فلفل",
+  "wd": "فِلْفِل",
+  "the": "الفلفل",
+  "thed": "الفِلْفِل",
+  "age": 5
+ },
+ {
+  "id": "v_lettuce",
+  "thing": "v_lettuce",
+  "letter": "khaa",
+  "word": "خس",
+  "wd": "خَس",
+  "the": "الخس",
+  "thed": "الخَس",
+  "age": 5
+ },
+ {
+  "id": "v_broccoli",
+  "thing": "v_broccoli",
+  "letter": "baa",
+  "word": "بروكلي",
+  "wd": "بُرُوكْلِي",
+  "the": "البروكلي",
+  "thed": "البُرُوكْلِي",
+  "age": 5
+ },
+ {
+  "id": "v_peas",
+  "thing": "v_peas",
+  "letter": "baa",
+  "word": "بسلة",
+  "wd": "بِسِلَّة",
+  "the": "البسلة",
+  "thed": "البِسِلَّة",
+  "age": 6
+ },
+ {
+  "id": "v_pumpkin",
+  "thing": "v_pumpkin",
+  "letter": "qaaf",
+  "word": "قرع",
+  "wd": "قَرْع",
+  "the": "القرع",
+  "thed": "القَرْع",
+  "age": 5
+ },
+ {
+  "id": "v_garlic",
+  "thing": "v_garlic",
+  "letter": "thaa",
+  "word": "ثوم",
+  "wd": "ثُوم",
+  "the": "الثوم",
+  "thed": "الثُّوم",
+  "age": 6
+ },
+ {
+  "id": "v_mushroom",
+  "thing": "v_mushroom",
+  "letter": "faa",
+  "word": "فطر",
+  "wd": "فُطْر",
+  "the": "الفطر",
+  "thed": "الفُطْر",
+  "age": 6
  }
 ]

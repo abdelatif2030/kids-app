@@ -116,3 +116,18 @@ cutw 102 414 371 0 0 h_bed; cutw 102 414 371 369 0 h_toothbrush; cutw 102 414 37
 cutw 103 414 371 0 0 h_fence; cutw 103 414 371 369 0 h_tulips; cutw 103 414 371 753 0 h_wateringcan; cutw 103 399 371 1137 0 h_swing; cutw 103 414 371 0 326 h_tree; cutw 103 414 371 369 326 h_birdbath; cutw 103 414 371 753 326 h_gnome; cutw 103 399 371 1137 326 h_mailbox; cutw 103 414 357 0 667 h_doghouse; cutw 103 414 357 369 667 h_bike; cutw 103 414 357 753 667 h_ball; cutw 103 399 357 1137 667 h_plant
 # overrides
 cutw 97 425 290 5 30 d_pyramid; cutw 97 440 290 775 360 d_tent; cutw 103 360 380 20 300 h_tree; cutw 103 250 360 820 305 h_gnome; cutw 103 395 320 400 690 h_bike
+
+# pack veg (sheet 97)
+cutw 97 414 371 0 0 v_tomato; cutw 97 414 371 369 0 v_cucumber; cutw 97 414 371 753 0 v_potato; cutw 97 399 371 1137 0 v_onion; cutw 97 414 371 0 326 v_eggplant; cutw 97 414 371 369 326 v_pepper; cutw 97 414 371 753 326 v_lettuce; cutw 97 399 371 1137 326 v_broccoli; cutw 97 414 357 0 667 v_peas; cutw 97 414 357 369 667 v_pumpkin; cutw 97 414 357 753 667 v_garlic; cutw 97 399 357 1137 667 v_mushroom
+
+# pack fruit2 (sheet 98)
+cutw 98 414 371 0 0 q_kiwi; cutw 98 414 371 369 0 q_melon; cutw 98 414 371 753 0 q_dates; cutw 98 399 371 1137 0 q_fig; cutw 98 414 371 0 326 q_apricot; cutw 98 414 371 369 326 q_berries; cutw 98 414 371 753 326 q_plum; cutw 98 399 371 1137 326 q_avocado; cutw 98 414 357 0 667 q_peach; cutw 98 414 357 369 667 q_cherry; cutw 98 414 357 753 667 q_olives; cutw 98 399 357 1137 667 q_coconut
+
+# pack school (sheet 99)
+cutw 99 414 371 0 0 e_pencil; cutw 99 414 371 369 0 e_book; cutw 99 414 371 753 0 e_notebook; cutw 99 399 371 1137 0 e_scissors; cutw 99 414 371 0 326 e_ruler; cutw 99 414 371 369 326 e_eraser; cutw 99 414 371 753 326 e_crayons; cutw 99 399 371 1137 326 e_board; cutw 99 414 357 0 667 e_map; cutw 99 414 357 369 667 e_glue; cutw 99 414 357 753 667 e_desk; cutw 99 399 357 1137 667 e_paper
+
+# pack clothes (sheet 100)
+cutw 100 414 371 0 0 l_shirt; cutw 100 414 371 369 0 l_trousers; cutw 100 414 371 753 0 l_dress; cutw 100 399 371 1137 0 l_hat; cutw 100 414 371 0 326 l_socks; cutw 100 414 371 369 326 l_jacket; cutw 100 414 371 753 326 l_scarf; cutw 100 399 371 1137 326 l_gloves; cutw 100 414 357 0 667 l_glasses; cutw 100 414 357 369 667 l_cap; cutw 100 414 357 753 667 l_pajamas; cutw 100 399 357 1137 667 l_raincoat
+
+# pack body (sheet 101)
+cutw 101 414 371 0 0 y_eye; cutw 101 414 371 369 0 y_ear; cutw 101 414 371 753 0 y_nose; cutw 101 399 371 1137 0 y_mouth; cutw 101 414 371 0 326 y_hand; cutw 101 414 371 369 326 y_foot; cutw 101 414 371 753 326 y_hair; cutw 101 399 371 1137 326 y_tooth; cutw 101 414 357 0 667 y_head; cutw 101 414 357 369 667 y_finger; cutw 101 414 357 753 667 y_knee; cutw 101 399 357 1137 667 y_belly
