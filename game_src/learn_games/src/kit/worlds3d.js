@@ -587,7 +587,7 @@ const BUILD = {
     P('h_wateringcan', 1.1, 9.6, 3.4); P('h_bike', 1.9, -10.4, -2.8); P('h_ball', 0.9, 6.2, 4.4, { anim: { bob: 1.1, sp: 4 } }); P('h_plant', 1.5, 11.4, 3.8, { sway: 0.03 });
     P('h_bed', 2.0, -11.6, -4.0); P('h_wardrobe', 3.0, -13.6, -8.4); P('h_clock', 1.7, 4.4, -8.8, { anim: { tilt: 0.06, sp: 2 } }); P('h_toybox', 1.3, -6.4, 4.8); P('h_backpack', 1.4, 8.4, 5.0); P('h_shoes', 0.8, 6.4, 6.2);
     P('h_table', 1.7, 12.8, -3.6); P('h_broom', 2.3, -13.4, 2.6, { anim: { tilt: 0.05, sp: 1.6 } }); P('h_bin', 1.5, 13.2, 0.4); P('h_sink', 1.4, -4.2, -8.2); P('h_towel', 1.9, 1.8, -9.0, { sway: 0.05 }); P('h_toothbrush', 1.2, 9.2, -1.0);
-    return { pad: 'wood', update: (dt, t) => { tickScenery(live, t, dt); } };
+    return { pad: 'wood', padPics: ['h_pad_rug', 'h_pad_wood', 'h_pad_stone', 'h_pad_bath'], update: (dt, t) => { tickScenery(live, t, dt); } };
   },
 };
 

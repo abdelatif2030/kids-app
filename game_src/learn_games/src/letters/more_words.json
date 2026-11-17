@@ -990,6 +990,126 @@
   "age": 6
  },
  {
+  "id": "a_mama",
+  "thing": "a_mama",
+  "letter": "meem",
+  "word": "ماما",
+  "wd": "مَامَا",
+  "the": "الماما",
+  "thed": "المَامَا",
+  "age": 3
+ },
+ {
+  "id": "a_baba",
+  "thing": "a_baba",
+  "letter": "baa",
+  "word": "بابا",
+  "wd": "بَابَا",
+  "the": "البابا",
+  "thed": "البَابَا",
+  "age": 3
+ },
+ {
+  "id": "a_grandma",
+  "thing": "a_grandma",
+  "letter": "taa",
+  "word": "تيتة",
+  "wd": "تِيتَة",
+  "the": "التيتة",
+  "thed": "التِّيتَة",
+  "age": 3
+ },
+ {
+  "id": "a_grandpa",
+  "thing": "a_grandpa",
+  "letter": "jeem",
+  "word": "جدو",
+  "wd": "جَدُّو",
+  "the": "الجدو",
+  "thed": "الجَدُّو",
+  "age": 3
+ },
+ {
+  "id": "a_baby",
+  "thing": "a_baby",
+  "letter": "tah",
+  "word": "طفل",
+  "wd": "طِفْل",
+  "the": "الطفل",
+  "thed": "الطِّفْل",
+  "age": 3
+ },
+ {
+  "id": "a_brother",
+  "thing": "a_brother",
+  "letter": "alef",
+  "word": "أخ",
+  "wd": "أَخ",
+  "the": "الأخ",
+  "thed": "الأَخ",
+  "age": 4
+ },
+ {
+  "id": "a_sister",
+  "thing": "a_sister",
+  "letter": "alef",
+  "word": "أخت",
+  "wd": "أُخْت",
+  "the": "الأخت",
+  "thed": "الأُخْت",
+  "age": 4
+ },
+ {
+  "id": "a_boy",
+  "thing": "a_boy",
+  "letter": "waaw",
+  "word": "ولد",
+  "wd": "وَلَد",
+  "the": "الولد",
+  "thed": "الوَلَد",
+  "age": 3
+ },
+ {
+  "id": "a_girl",
+  "thing": "a_girl",
+  "letter": "baa",
+  "word": "بنت",
+  "wd": "بِنْت",
+  "the": "البنت",
+  "thed": "البِنْت",
+  "age": 3
+ },
+ {
+  "id": "a_friends",
+  "thing": "a_friends",
+  "letter": "sad",
+  "word": "صحاب",
+  "wd": "صُحَاب",
+  "the": "الصحاب",
+  "thed": "الصُّحَاب",
+  "age": 5
+ },
+ {
+  "id": "a_family",
+  "thing": "a_family",
+  "letter": "ayn",
+  "word": "عيلة",
+  "wd": "عِيلَة",
+  "the": "العيلة",
+  "thed": "العِيلَة",
+  "age": 5
+ },
+ {
+  "id": "a_uncle",
+  "thing": "a_uncle",
+  "letter": "ayn",
+  "word": "عمو",
+  "wd": "عَمُّو",
+  "the": "العمو",
+  "thed": "العَمُّو",
+  "age": 5
+ },
+ {
   "id": "q_kiwi",
   "thing": "q_kiwi",
   "letter": "kaaf",
@@ -1228,6 +1348,126 @@
   "the": "الورقة",
   "thed": "الوَرَقَة",
   "age": 4
+ },
+ {
+  "id": "g_rectangle",
+  "thing": "g_rectangle",
+  "letter": "meem",
+  "word": "مستطيل",
+  "wd": "مُسْتَطِيل",
+  "the": "المستطيل",
+  "thed": "المُسْتَطِيل",
+  "age": 4
+ },
+ {
+  "id": "g_oval",
+  "thing": "g_oval",
+  "letter": "baa",
+  "word": "بيضاوي",
+  "wd": "بَيْضَاوِي",
+  "the": "البيضاوي",
+  "thed": "البَيْضَاوِي",
+  "age": 5
+ },
+ {
+  "id": "g_diamond",
+  "thing": "g_diamond",
+  "letter": "meem",
+  "word": "معين",
+  "wd": "مُعَيَّن",
+  "the": "المعين",
+  "thed": "المُعَيَّن",
+  "age": 5
+ },
+ {
+  "id": "g_hexagon",
+  "thing": "g_hexagon",
+  "letter": "seen",
+  "word": "سداسي",
+  "wd": "سُدَاسِي",
+  "the": "السداسي",
+  "thed": "السُّدَاسِي",
+  "age": 6
+ },
+ {
+  "id": "g_pentagon",
+  "thing": "g_pentagon",
+  "letter": "khaa",
+  "word": "خماسي",
+  "wd": "خُمَاسِي",
+  "the": "الخماسي",
+  "thed": "الخُمَاسِي",
+  "age": 6
+ },
+ {
+  "id": "g_arrow",
+  "thing": "g_arrow",
+  "letter": "seen",
+  "word": "سهم",
+  "wd": "سَهْم",
+  "the": "السهم",
+  "thed": "السَّهْم",
+  "age": 4
+ },
+ {
+  "id": "g_cube",
+  "thing": "g_cube",
+  "letter": "meem",
+  "word": "مكعب",
+  "wd": "مُكَعَّب",
+  "the": "المكعب",
+  "thed": "المُكَعَّب",
+  "age": 5
+ },
+ {
+  "id": "g_sphere",
+  "thing": "g_sphere",
+  "letter": "kaaf",
+  "word": "كرة",
+  "wd": "كُرَة",
+  "the": "الكرة",
+  "thed": "الكُرَة",
+  "age": 4
+ },
+ {
+  "id": "g_cone",
+  "thing": "g_cone",
+  "letter": "meem",
+  "word": "مخروط",
+  "wd": "مَخْرُوط",
+  "the": "المخروط",
+  "thed": "المَخْرُوط",
+  "age": 6
+ },
+ {
+  "id": "g_cylinder",
+  "thing": "g_cylinder",
+  "letter": "alef",
+  "word": "أسطوانة",
+  "wd": "أُسْطُوَانَة",
+  "the": "الأسطوانة",
+  "thed": "الأُسْطُوَانَة",
+  "age": 6
+ },
+ {
+  "id": "g_ring",
+  "thing": "g_ring",
+  "letter": "haa",
+  "word": "حلقة",
+  "wd": "حَلْقَة",
+  "the": "الحلقة",
+  "thed": "الحَلْقَة",
+  "age": 5
+ },
+ {
+  "id": "g_heart",
+  "thing": "g_heart",
+  "letter": "qaaf",
+  "word": "قلب",
+  "wd": "قَلْب",
+  "the": "القلب",
+  "thed": "القَلْب",
+  "age": 3
  },
  {
   "id": "v_tomato",

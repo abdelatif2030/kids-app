@@ -131,3 +131,12 @@ cutw 100 414 371 0 0 l_shirt; cutw 100 414 371 369 0 l_trousers; cutw 100 414 37
 
 # pack body (sheet 101)
 cutw 101 414 371 0 0 y_eye; cutw 101 414 371 369 0 y_ear; cutw 101 414 371 753 0 y_nose; cutw 101 399 371 1137 0 y_mouth; cutw 101 414 371 0 326 y_hand; cutw 101 414 371 369 326 y_foot; cutw 101 414 371 753 326 y_hair; cutw 101 399 371 1137 326 y_tooth; cutw 101 414 357 0 667 y_head; cutw 101 414 357 369 667 y_finger; cutw 101 414 357 753 667 y_knee; cutw 101 399 357 1137 667 y_belly
+
+# pack shapes (sheet 102)
+cutw 102 414 371 0 0 g_rectangle; cutw 102 414 371 369 0 g_oval; cutw 102 414 371 753 0 g_diamond; cutw 102 399 371 1137 0 g_hexagon; cutw 102 414 371 0 326 g_pentagon; cutw 102 414 371 369 326 g_arrow; cutw 102 414 371 753 326 g_cube; cutw 102 399 371 1137 326 g_sphere; cutw 102 414 357 0 667 g_cone; cutw 102 414 357 369 667 g_cylinder; cutw 102 414 357 753 667 g_ring; cutw 102 399 357 1137 667 g_heart
+
+# pack family (sheet 103)
+cutw 103 414 371 0 0 a_mama; cutw 103 414 371 369 0 a_baba; cutw 103 414 371 753 0 a_grandma; cutw 103 399 371 1137 0 a_grandpa; cutw 103 414 371 0 326 a_baby; cutw 103 414 371 369 326 a_brother; cutw 103 414 371 753 326 a_sister; cutw 103 399 371 1137 326 a_boy; cutw 103 414 357 0 667 a_girl; cutw 103 414 357 369 667 a_friends; cutw 103 414 357 753 667 a_family; cutw 103 399 357 1137 667 a_uncle
+
+# home pads (sheet 104)
+cutw 104 798 542 0 0 h_pad_rug; cutw 104 783 542 753 0 h_pad_wood; cutw 104 798 527 0 497 h_pad_stone; cutw 104 783 527 753 497 h_pad_bath
