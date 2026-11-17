@@ -554,8 +554,40 @@ const BUILD = {
     P('j_leaf', 2.0, -13, -0.6, { sway: 0.05 }); P('j_leaf', 1.8, 12.8, 1.8, { sway: 0.05, flip: true }); P('j_leaf', 1.5, -9.6, 4.4, { sway: 0.06 }); P('j_leaf', 1.4, 9.4, 5.6, { sway: 0.06, flip: true });
     P('j_flower', 1.2, -12, 3, { sway: 0.04 }); P('j_flower', 1.0, 11.2, 4.2, { sway: 0.04 }); P('j_mushroom', 1.3, -6.4, 5.6); P('j_mushroom', 1.1, 7.2, 6.2, { flip: true });
     P('j_vine', 2.4, -6.2, -6.2, { y: 3.4, anim: { tilt: 0.05, sp: 0.9 } }); P('j_vine', 2.4, 6.8, -6.8, { y: 3.4, anim: { tilt: 0.05, sp: 0.8 } });
+    P('j_monkey', 2.3, -8.8, -1.2, { anim: { bob: 0.08, sp: 2, tilt: 0.04 } }); P('j_lion', 2.4, 8.8, -2.2, { flip: true, anim: { bob: 0.04, sp: 1.4, r: 0.4, wsp: 0.2 } }); P('j_elephant', 3.2, 11.8, -0.2, { flip: true, anim: { bob: 0.03, sp: 1.0, tilt: 0.02 } });
+    P('j_giraffe', 4.2, -12.8, -4.6, { anim: { tilt: 0.02, sp: 0.8 } }); P('j_zebra', 2.1, 7.2, -4.6, { anim: { bob: 0.04, sp: 1.6, r: 0.5, wsp: 0.2 } }); P('j_parrot', 1.5, -5.8, -3.8, { y: 2.2, anim: { bob: 0.15, sp: 2, tilt: 0.1 } });
+    P('j_frog', 1.1, -7.0, 3.8, { anim: { bob: 0.5, sp: 2.4, r: 0.8, wsp: 0.5 } }); P('j_tiger', 2.2, 8.6, 3.2, { flip: true, anim: { bob: 0.04, sp: 1.6, tilt: 0.03 } }); P('j_toucan', 1.7, 5.6, -5.2, { y: 1.4, anim: { tilt: 0.06, sp: 1.2 } });
+    P('j_gorilla', 2.6, -9.6, 2.4, { anim: { bob: 0.05, sp: 1.2, tilt: 0.03 } }); P('j_chameleon', 1.2, 10.0, 5.6, { flip: true, anim: { r: 0.8, wsp: 0.4, bob: 0.03, sp: 2 } }); P('j_snake', 1.5, -11.2, 4.8, { anim: { tilt: 0.06, sp: 1.6 } });
     const leaves = makeLeaves(g);
-    return { pad: 'wood', update: (dt, t) => { tickScenery(live, t, dt); leaves(dt, t); } };
+    return { pad: 'wood', padPics: ['j_pad_stump', 'j_pad_lily', 'j_pad_stone', 'j_pad_bamboo'], update: (dt, t) => { tickScenery(live, t, dt); leaves(dt, t); } };
+  },
+  // 11. the desert and oasis, from the owner's pictures: a camel walks, a hawk and a balloon fly, a jeep and a cart drive past
+  desert(g) {
+    addSky(g, { top: '#3a9cf2', horizon: '#c8ecff' });
+    pictureGround(g, 'ground_desert', 11, 6, 0xf2c14a, 0xe8b440);
+    panoPlane(g, 'desert_pano', -6.9);
+    const live = []; const P = scenery(g, live);
+    P('d_pyramid', 5.2, -4.8, -11.6); P('d_pyramid2', 4.0, 4.4, -12.4); P('d_palm', 5.6, -12.4, -6.4, { sway: 0.02 }); P('d_palm', 5.2, 11.6, -7.4, { sway: 0.02, flip: true }); P('d_dune', 2.4, 8.2, -10.6); P('d_dune', 2.0, -9.6, -10.2, { flip: true });
+    P('d_oasis', 2.4, 6.8, -6.2, { y: -0.17 }); P('d_boat', 2.0, 6.6, -5.8, { y: -0.1, anim: { bob: 0.08, sp: 1.1, tilt: 0.05, smooth: true } }); P('d_tent', 3.0, -8.6, -7.6); P('d_well', 2.3, -6.0, -5.8); P('d_lantern', 3.2, -2.2, -8.0, { anim: { tilt: 0.02, sp: 1.4 } });
+    P('d_cactus', 2.4, 12.2, -2.4); P('d_cactus', 2.0, -12.4, 0.8); P('d_jar', 1.6, -10.6, -1.8); P('d_cart', 2.2, 10.6, -3.4); P('d_flower', 1.4, 9.8, 2.6, { sway: 0.04 }); P('d_flower', 1.2, -9.2, 4.6, { sway: 0.04 });
+    P('d_camel', 3.1, 14, -7.6, { anim: { drive: -0.5, bob: 0.06, sp: 2, tilt: 0.02 } }); P('d_babycamel', 1.9, 16.4, -7.0, { anim: { drive: -0.5, bob: 0.05, sp: 2.4 } });
+    P('d_fox', 1.6, -7.6, -0.6, { anim: { r: 0.8, wsp: 0.4, bob: 0.04, sp: 3 } }); P('d_scorpion', 1.0, 6.8, 5.2, { anim: { r: 1.2, wsp: 0.5, bob: 0.02, sp: 6 } }); P('d_lizard', 0.9, -6.2, 5.6, { anim: { r: 1.0, wsp: 0.6, bob: 0.02, sp: 5 } });
+    P('d_snake', 1.3, 11.4, 4.2, { anim: { tilt: 0.06, sp: 1.6 } }); P('d_hawk', 1.4, -14, -6, { y: 7.4, anim: { drive: 1.6, bob: 0.4, sp: 1.6, smooth: true, tilt: 0.06 } }); P('d_horse', 2.7, 8.8, -0.4, { anim: { bob: 0.04, sp: 1.6, tilt: 0.02 } });
+    P('d_donkeycart', 2.0, -15, -8.8, { flip: true, anim: { drive: 0.7, bob: 0.03, sp: 5 } }); P('d_jeep', 1.8, 15, -9.4, { anim: { drive: -1.4, bob: 0.03, sp: 8 } }); P('d_balloon', 3.0, -10, -9, { y: 5.8, anim: { drive: 0.35, bob: 0.5, sp: 0.7, smooth: true, tilt: 0.04 } });
+    return { pad: 'stone', padPics: ['d_pad_stone', 'd_pad_carpet', 'd_pad_clay', 'd_pad_wood'], update: (dt, t) => { tickScenery(live, t, dt); } };
+  },
+  // 12. home and garden, from the owner's pictures: the daily-habit things around a garden; the ball bounces, the clock ticks over
+  home(g) {
+    addSky(g, { top: '#3a9cf2', horizon: '#c8ecff' });
+    pictureGround(g, 'ground_home', 11, 6, 0x7ad83a, 0x6ac82a);
+    panoPlane(g, 'home_pano', -8.5);
+    const live = []; const P = scenery(g, live);
+    P('h_tree', 5.2, -11.2, -6.4, { sway: 0.01 }); P('h_swing', 3.2, 10, -4.4); for (let i = 0; i < 7; i++) P('h_fence', 1.6, -12 + i * 4.0, -6.8);
+    P('h_tulips', 1.3, -6.4, -5.4, { sway: 0.03 }); P('h_doghouse', 1.9, 11.8, -1.0); P('h_mailbox', 2.1, -12.6, -1.0); P('h_birdbath', 2.0, 6.6, -6.0, { anim: { tilt: 0.02, sp: 1.4 } }); P('h_gnome', 1.5, -9.4, 2.8, { anim: { tilt: 0.03, sp: 1.2 } });
+    P('h_wateringcan', 1.1, 9.6, 3.4); P('h_bike', 1.9, -10.4, -2.8); P('h_ball', 0.9, 6.2, 4.4, { anim: { bob: 1.1, sp: 4 } }); P('h_plant', 1.5, 11.4, 3.8, { sway: 0.03 });
+    P('h_bed', 2.0, -11.6, -4.0); P('h_wardrobe', 3.0, -13.6, -8.4); P('h_clock', 1.7, 4.4, -8.8, { anim: { tilt: 0.06, sp: 2 } }); P('h_toybox', 1.3, -6.4, 4.8); P('h_backpack', 1.4, 8.4, 5.0); P('h_shoes', 0.8, 6.4, 6.2);
+    P('h_table', 1.7, 12.8, -3.6); P('h_broom', 2.3, -13.4, 2.6, { anim: { tilt: 0.05, sp: 1.6 } }); P('h_bin', 1.5, 13.2, 0.4); P('h_sink', 1.4, -4.2, -8.2); P('h_towel', 1.9, 1.8, -9.0, { sway: 0.05 }); P('h_toothbrush', 1.2, 9.2, -1.0);
+    return { pad: 'wood', update: (dt, t) => { tickScenery(live, t, dt); } };
   },
 };
 
@@ -644,8 +676,8 @@ function decorate(id, g, water) {
   const sways = [];
   g.traverse((o) => { if (o.userData && o.userData.sway) sways.push(o); });
   const add = (obj) => { g.add(obj); ups.push(obj.userData.update); };
-  if (['meadow', 'farm', 'rainbow', 'castle', 'city', 'snow', 'jungle'].includes(id)) add(makeBirds(id === 'snow' ? 3 : 5, 6.5, -14, 18));
-  if (['meadow', 'rainbow', 'farm', 'castle', 'jungle'].includes(id)) add(makeButterflies(4, -7, 7, 5.2));
+  if (['meadow', 'farm', 'rainbow', 'castle', 'city', 'snow', 'jungle', 'home'].includes(id)) add(makeBirds(id === 'snow' ? 3 : 5, 6.5, -14, 18));
+  if (['meadow', 'rainbow', 'farm', 'castle', 'jungle', 'home'].includes(id)) add(makeButterflies(4, -7, 7, 5.2));
   if (id === 'meadow') add(makeJumper());
   return (dt, t) => {
     for (const o of sways) { const w = o.userData.sway; o.rotation.z = Math.sin(t * w.sp + w.ph) * w.amp; }
@@ -654,8 +686,8 @@ function decorate(id, g, water) {
   };
 }
 
-export const WORLD_IDS = ['meadow', 'farm', 'beach', 'space', 'rainbow', 'city', 'snow', 'castle', 'underwater', 'jungle'];
-export const WORLD_NAMES = { meadow: 'البركة', farm: 'المزرعة', beach: 'الشاطئ', space: 'الفضاء', rainbow: 'ملعب قوس قزح', city: 'المدينة', snow: 'جبال الثلج', castle: 'القلعة', underwater: 'تحت الماء', jungle: 'الغابة' };
+export const WORLD_IDS = ['meadow', 'farm', 'beach', 'space', 'rainbow', 'city', 'snow', 'castle', 'underwater', 'jungle', 'desert', 'home'];
+export const WORLD_NAMES = { meadow: 'البركة', farm: 'المزرعة', beach: 'الشاطئ', space: 'الفضاء', rainbow: 'ملعب قوس قزح', city: 'المدينة', snow: 'جبال الثلج', castle: 'القلعة', underwater: 'تحت الماء', jungle: 'الغابة', desert: 'الصحراء', home: 'بيتي والحديقة' };
 
 export function buildWorld(id) {
   const group = new THREE.Group();
