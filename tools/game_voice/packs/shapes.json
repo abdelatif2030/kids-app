@@ -1,0 +1,129 @@
+{
+ "pack": "shapes",
+ "prefix": "g",
+ "title": "Glossy geometric shapes (each ONE solid color, centered, 3D look)",
+ "cols": 4,
+ "rows": 3,
+ "items": [
+  {
+   "id": "g_rectangle",
+   "thing": "g_rectangle",
+   "letter": "meem",
+   "word": "مستطيل",
+   "wd": "مُسْتَطِيل",
+   "the": "المستطيل",
+   "thed": "المُسْتَطِيل",
+   "age": 4
+  },
+  {
+   "id": "g_oval",
+   "thing": "g_oval",
+   "letter": "baa",
+   "word": "بيضاوي",
+   "wd": "بَيْضَاوِي",
+   "the": "البيضاوي",
+   "thed": "البَيْضَاوِي",
+   "age": 5
+  },
+  {
+   "id": "g_diamond",
+   "thing": "g_diamond",
+   "letter": "meem",
+   "word": "معين",
+   "wd": "مُعَيَّن",
+   "the": "المعين",
+   "thed": "المُعَيَّن",
+   "age": 5
+  },
+  {
+   "id": "g_hexagon",
+   "thing": "g_hexagon",
+   "letter": "seen",
+   "word": "سداسي",
+   "wd": "سُدَاسِي",
+   "the": "السداسي",
+   "thed": "السُّدَاسِي",
+   "age": 6
+  },
+  {
+   "id": "g_pentagon",
+   "thing": "g_pentagon",
+   "letter": "khaa",
+   "word": "خماسي",
+   "wd": "خُمَاسِي",
+   "the": "الخماسي",
+   "thed": "الخُمَاسِي",
+   "age": 6
+  },
+  {
+   "id": "g_arrow",
+   "thing": "g_arrow",
+   "letter": "seen",
+   "word": "سهم",
+   "wd": "سَهْم",
+   "the": "السهم",
+   "thed": "السَّهْم",
+   "age": 4
+  },
+  {
+   "id": "g_cube",
+   "thing": "g_cube",
+   "letter": "meem",
+   "word": "مكعب",
+   "wd": "مُكَعَّب",
+   "the": "المكعب",
+   "thed": "المُكَعَّب",
+   "age": 5
+  },
+  {
+   "id": "g_sphere",
+   "thing": "g_sphere",
+   "letter": "kaaf",
+   "word": "كرة",
+   "wd": "كُرَة",
+   "the": "الكرة",
+   "thed": "الكُرَة",
+   "age": 4
+  },
+  {
+   "id": "g_cone",
+   "thing": "g_cone",
+   "letter": "meem",
+   "word": "مخروط",
+   "wd": "مَخْرُوط",
+   "the": "المخروط",
+   "thed": "المَخْرُوط",
+   "age": 6
+  },
+  {
+   "id": "g_cylinder",
+   "thing": "g_cylinder",
+   "letter": "alef",
+   "word": "أسطوانة",
+   "wd": "أُسْطُوَانَة",
+   "the": "الأسطوانة",
+   "thed": "الأُسْطُوَانَة",
+   "age": 6
+  },
+  {
+   "id": "g_ring",
+   "thing": "g_ring",
+   "letter": "haa",
+   "word": "حلقة",
+   "wd": "حَلْقَة",
+   "the": "الحلقة",
+   "thed": "الحَلْقَة",
+   "age": 5
+  },
+  {
+   "id": "g_heart",
+   "thing": "g_heart",
+   "letter": "qaaf",
+   "word": "قلب",
+   "wd": "قَلْب",
+   "the": "القلب",
+   "thed": "القَلْب",
+   "age": 3
+  }
+ ]
+}

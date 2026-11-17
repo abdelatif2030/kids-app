@@ -66,6 +66,11 @@ PACKS = {
   ('worm', 'green caterpillar', 'دودة', 'دُودَة', 'dal', 4), ('eagle', 'eagle', 'نسر', 'نِسْر', 'noon', 6), ('peacock', 'peacock with open tail', 'طاووس', 'طَاوُوس', 'tah', 6),
   ('flamingo', 'pink flamingo', 'فلامنجو', 'فِلَامِنْجُو', 'faa', 6), ('swan', 'white swan', 'بجعة', 'بَجَعَة', 'baa', 6), ('ostrich', 'ostrich', 'نعامة', 'نَعَامَة', 'noon', 6),
   ('sparrow', 'small sparrow', 'عصفورة', 'عُصْفُورَة', 'ayn', 4), ('bat', 'cute bat', 'خفاش', 'خُفَّاش', 'khaa', 6), ('snail', 'snail', 'حلزونة', 'حَلَزُونَة', 'haa', 5)]),
+ 'shapes': ('g', 'Glossy geometric shapes (each ONE solid color, centered, 3D look)', [
+  ('rectangle', 'blue rectangle', 'مستطيل', 'مُسْتَطِيل', 'meem', 4), ('oval', 'green oval', 'بيضاوي', 'بَيْضَاوِي', 'baa', 5), ('diamond', 'orange diamond (rhombus)', 'معين', 'مُعَيَّن', 'meem', 5),
+  ('hexagon', 'purple hexagon', 'سداسي', 'سُدَاسِي', 'seen', 6), ('pentagon', 'yellow pentagon', 'خماسي', 'خُمَاسِي', 'khaa', 6), ('arrow', 'red arrow pointing right', 'سهم', 'سَهْم', 'seen', 4),
+  ('cube', 'cube', 'مكعب', 'مُكَعَّب', 'meem', 5), ('sphere', 'glossy sphere', 'كرة', 'كُرَة', 'kaaf', 4), ('cone', 'cone', 'مخروط', 'مَخْرُوط', 'meem', 6),
+  ('cylinder', 'cylinder', 'أسطوانة', 'أُسْطُوَانَة', 'alef', 6), ('ring', 'golden ring', 'حلقة', 'حَلْقَة', 'haa', 5), ('heart', 'red heart', 'قلب', 'قَلْب', 'qaaf', 3)]),
  'family': ('a', 'Family (friendly cartoon people, standing, different ages)', [
   ('mama', 'mother', 'ماما', 'مَامَا', 'meem', 3), ('baba', 'father', 'بابا', 'بَابَا', 'baa', 3), ('grandma', 'grandmother', 'تيتة', 'تِيتَة', 'taa', 3),
   ('grandpa', 'grandfather', 'جدو', 'جَدُّو', 'jeem', 3), ('baby', 'baby', 'طفل', 'طِفْل', 'tah', 3), ('brother', 'older brother', 'أخ', 'أَخ', 'alef', 4),

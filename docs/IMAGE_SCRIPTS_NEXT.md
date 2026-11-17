@@ -64,6 +64,11 @@ Music sheet. The 12 items, left to right, top to bottom: drum with sticks; guita
 Small creatures and birds sheet. The 12 items, left to right, top to bottom: friendly ant; fly; cute spider; green caterpillar; eagle; peacock with open tail; pink flamingo; white swan; ostrich; small sparrow; cute bat; snail.
 ```
 
+## Pack `shapes` — Glossy geometric shapes (each ONE solid color, centered, 3D look) (art prefix `g_`)
+```
+Glossy geometric shapes (each ONE solid color, centered, 3D look) sheet. The 12 items, left to right, top to bottom: blue rectangle; green oval; orange diamond (rhombus); purple hexagon; yellow pentagon; red arrow pointing right; cube; glossy sphere; cone; cylinder; golden ring; red heart.
+```
+
 ## Pack `family` — Family (friendly cartoon people, standing, different ages) (art prefix `a_`)
 ```
 Family (friendly cartoon people, standing, different ages) sheet. The 12 items, left to right, top to bottom: mother; father; grandmother; grandfather; baby; older brother; older sister; boy; girl; two friends holding hands; family of four together; uncle.

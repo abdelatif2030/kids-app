@@ -16,6 +16,8 @@ for (const l of lines) {
 }
 const newest = Math.max(...rows.map((r) => r.m));
 const data = rows.map((r) => ({ t: r.t, a: r.a, fresh: newest - r.m < 6 * 3600 * 1000 }));
+const ONLY_NEW = process.argv.includes('--new'); // only the clips made in the last session (for choosing which to redo)
+if (ONLY_NEW) { for (let i = data.length - 1; i >= 0; i--) if (!data[i].fresh) data.splice(i, 1); }
 const html = `<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>كل أصوات اللعبة</title>
 <style>body{font-family:system-ui,Tahoma,sans-serif;background:#f4f0fc;margin:0;color:#3a2a5a}header{position:sticky;top:0;background:#fff;box-shadow:0 2px 8px rgba(60,40,100,.15);padding:12px 16px;z-index:5}h1{font-size:20px;margin:0 0 8px}.row{display:flex;gap:8px;flex-wrap:wrap}input[type=search]{flex:1;min-width:140px;padding:9px 14px;border-radius:20px;border:2px solid #d8ccf0;font:inherit}.t{border:none;background:#6a3ad0;color:#fff;border-radius:20px;padding:9px 16px;font:inherit;font-weight:700;cursor:pointer}.t.alt{background:#fff;color:#6a3ad0;border:2px solid #6a3ad0}.list{padding:12px 16px 60px}.r{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:9px 14px;margin-bottom:8px;box-shadow:0 2px 6px rgba(60,40,100,.1)}.r.on{background:#fff3e0}.r.bad{background:#ffe8ec}.r.fresh{border-right:6px solid #2aa86a}.n{width:34px;color:#9a8aba;font-size:13px;text-align:center}.p{flex:none;width:46px;height:46px;border-radius:50%;border:none;background:#6a3ad0;color:#fff;font-size:20px;cursor:pointer}.tx{flex:1;font-size:22px;font-weight:700}.f{font-size:12px;color:#2aa86a;white-space:nowrap}.bd{border:2px solid #c0a0a8;background:#fff;color:#9a5a6a;border-radius:14px;padding:6px 10px;font:inherit;cursor:pointer}.hide{display:none}</style>
 <header><h1>🔊 كل أصوات اللعبة (<span id="cnt"></span>)</h1><div class="row"><input type="search" id="q" placeholder="دوّر..."><button class="t" id="all">▶ شغّل الكل ورا بعض</button><button class="t alt" id="stop">⏹ وقّف</button><button class="t alt" id="onlyfresh">الجديدة بس 🟢</button><button class="t alt" id="onlybad">اللي علّمتها 🚩</button><button class="t alt" id="copy">انسخ اللي علّمتها</button></div></header>
@@ -37,6 +39,6 @@ document.getElementById('onlyfresh').onclick=()=>{[...list.children].forEach((r,
 document.getElementById('onlybad').onclick=()=>{[...list.children].forEach(r=>r.classList.toggle('hide',!r.classList.contains('bad')))};
 document.getElementById('copy').onclick=()=>{const t=[...list.children].filter(r=>r.classList.contains('bad')).map(r=>D[r.dataset.i].t).join(String.fromCharCode(10));navigator.clipboard.writeText(t).then(()=>alert('اتنسخت '+t.split(String.fromCharCode(10)).filter(Boolean).length+' جملة. ابعتهالي.'))};
 </script></html>`;
-const out = path.join(ROOT, 'docs/voice_preview/26_all_voices_now.html');
+const out = path.join(ROOT, ONLY_NEW ? 'docs/voice_preview/27_new_voices.html' : 'docs/voice_preview/26_all_voices_now.html');
 fs.writeFileSync(out, html);
 console.log(`${data.length} clips, ${data.filter((d) => d.fresh).length} new, ${(fs.statSync(out).size / 1048576).toFixed(1)} MB -> ${out}`);
