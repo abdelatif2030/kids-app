@@ -130,7 +130,7 @@ export const CHEERS_F = ['أحسنتي!', 'حلوة أوي!', 'ممتازة!', '
 export const cheer = (girl, i) => (girl ? CHEERS_F : CHEERS_M)[i % CHEERS_M.length];
 
 const pick = (r, arr, n) => [...arr].sort(() => r() - 0.5).slice(0, n);
-const FOOD_THING = { carrot: 'carrot', fish: 'fish', bone: 'bone', banana: 'banana', grass: 'grass', honey: 'honey', cheese: 'cheese', seeds: 'seeds' };
+const FOOD_THING = { carrot: 'carrot', fish: 'fish', bone: 'bone', banana: 'banana', grass: 'grass', honey: 'honey', cheese: 'cheese', seeds: 'seeds', f_haypile: 'f_haypile', corn: 'corn' };
 
 /** One game of a level: rounds of { prompt, answer, reward, show, options: [{id, kind, ...}] }. */
 export class LevelPlay {

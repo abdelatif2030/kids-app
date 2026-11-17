@@ -14,6 +14,11 @@ export const ANIMALS = [
   { id: 'bear', thing: 'bear', the: 'الدب', fem: false, food: 'honey' },
   { id: 'mouse', thing: 'mouse', the: 'الفار', fem: false, food: 'cheese' },
   { id: 'chick', thing: 'chick', the: 'الكتكوت', fem: false, food: 'seeds' },
+  { id: 'horse', thing: 'horse', the: 'الحصان', fem: false, food: 'f_haypile' },
+  { id: 'hen', thing: 'hen', the: 'الفرخة', fem: true, food: 'corn' },
+  { id: 'donkey', thing: 'f_donkey', the: 'الحمار', fem: false, food: 'carrot' },
+  { id: 'goat', thing: 'f_goat', the: 'الماعز', fem: false, food: 'grass' },
+  { id: 'parrot', thing: 'j_parrot', the: 'الببغاء', fem: false, food: 'seeds' },
 ];
 export const FOODS = {
   carrot: { the: 'الجزر' },
@@ -24,9 +29,11 @@ export const FOODS = {
   honey: { the: 'العسل' },
   cheese: { the: 'الجبنة' },
   seeds: { the: 'الحَب' },
+  f_haypile: { the: 'التبن' },
+  corn: { the: 'الدرة' },
 };
 export const ROUNDS = 8;
-export const poolFor = (age) => ANIMALS.slice(0, age <= 4 ? 3 : age === 5 ? 5 : 8);
+export const poolFor = (age) => ANIMALS.slice(0, age <= 4 ? 3 : age === 5 ? 6 : ANIMALS.length);
 export const platesFor = (age) => (age <= 5 ? 3 : 4);
 export const animalById = (id) => ANIMALS.find((a) => a.id === id);
 export const question = (a) => `${a.the} ${a.fem ? 'جعانة' : 'جعان'}! ${a.fem ? 'هتاكل' : 'هياكل'} إيه؟`;

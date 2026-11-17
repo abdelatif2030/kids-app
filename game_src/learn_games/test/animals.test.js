@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { poolFor, platesFor, makeRounds, platesOf, AnimalsPlay, question, reward, animalById, ROUNDS, ANIMALS } from '../src/animals/sim.js';
 
 test('more animals for older children, never the same animal twice in a row', () => {
-  assert.equal(poolFor(4).length, 3); assert.equal(poolFor(5).length, 5); assert.equal(poolFor(6).length, 8);
+  assert.equal(poolFor(4).length, 3); assert.equal(poolFor(5).length, 6); assert.equal(poolFor(6).length, 13);
   for (const age of [4, 5, 6]) for (let s = 1; s < 60; s++) {
     const t = makeRounds(age, s);
     assert.equal(t.length, ROUNDS);
@@ -23,7 +23,7 @@ test('Egyptian Arabic with the right gender', () => {
   assert.equal(question(animalById('cat')), 'القطة جعانة! هتاكل إيه؟');
   assert.equal(reward(animalById('cow')), 'البقرة بتحب الحشيش');
   assert.equal(reward(animalById('dog')), 'الكلب بيحب العضمة');
-  assert.equal(ANIMALS.length, 8);
+  assert.equal(ANIMALS.length, 13);
 });
 test('miss, hint and first-try reporting; a whole game finishes', () => {
   const p = new AnimalsPlay(6, 5);

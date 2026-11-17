@@ -94,3 +94,50 @@ Levels beyond 12 do not exist (`LEVELS` has 12 entries); `WORLD_IDS[i % length]`
 No ads/tracking/YouTube; no invented credentials/IDs; commit+push of source to `feature/rehlaty` is pre-approved, publishing Firebase rules and
 anything outward-facing is not; keep secrets out of files (API keys only in env). Another Claude session added design skills under
 `.claude/skills/` (merged on 2026-11-17); they are optional and not part of the game.
+
+## 8. Content expansion (2026-11-17): eight rounds, many more words, picture packs, voices
+
+### What changed
+- **Eight rounds per level** (was five): `ROUNDS = 8` in `letters/sim.js`, `counting/sim.js`, `shapes/sim.js`, `animals/sim.js`; the HUD stars (`sh.topBar(ROUNDS)`)
+  and the owl's rack (8 slots, smaller dishes) follow it. Pools are wider: letters 8 / 16 / 28 for ages ≤4 / 5 / 6 (`poolFor`).
+- **Words level and first-letter level** now draw from `WORD_ITEMS` (`letters/levels.js`): the 28 letter words plus **75 extra words**
+  (`letters/more_words.json`, written by `tools/game_voice/make_more_words.py`), every one with a picture the owner already gave
+  (jungle/farm/sea/snow/desert/beach/home/city/castle/space/rainbow). Each has a youngest age (3 = easy). Questions: «فين القرد؟»,
+  «إيه الحرف الأول في كلمة قرد؟», reward «القاف زي قرد».
+- More **vehicles** (10 new: school bus, city bus, taxi, tram, bulldozer, bike, jeep, hot-air balloon, felucca, donkey cart),
+  **fruits** (lemon, pomegranate), **habits** (10 new, with home pictures), **animals to feed** (13 now: horse+hay, hen+corn, donkey+carrot,
+  goat+grass, parrot+seeds were added; foods `f_haypile` and `corn`).
+- `kit/actors.js` maps every new thing id to the art file of the same name (`EXTRA_ART`, `BIG`).
+- Tests: `game_src/learn_games/test/more_words.test.js` (pictures exist, 8 rounds at every age, no duplicate options). 71 node tests pass.
+
+### Picture packs (11 sheets × 12 = 132 more words, NOT drawn yet)
+`docs/IMAGE_SCRIPTS_NEXT.md` has the prompts (STYLE + SHEET + one items line per pack): vegetables `v_`, more fruit `q_`, school `e_`, clothes `l_`,
+body `y_`, people who help `z_`, weather/nature `t_`, food and drinks `o_`, music `m_`, small creatures and birds `i_`, family `a_`.
+The words, diacritics and first letters of every pack are already written (`tools/game_voice/packs/*.json`, made by `make_packs.py`).
+When the owner returns a sheet (4 × 3 grid, white background):
+1. save it as `images/<n>.webp`, then `PYTHONUTF8=1 python tools/art/cut_pack.py <pack> <n> "<images folder>"` (cuts 12 pictures, fixed boxes);
+   look at a contact sheet; widen a box with an override line in `tools/art/cut_art.sh` if an item crosses its cell;
+2. `PYTHONUTF8=1 python tools/game_voice/make_more_words.py` (a pack switches on only when ALL its 12 pictures exist),
+   `node tools/game_voice/lines.mjs`, `PYTHONUTF8=1 python tools/game_voice/make_tashkeel.py` (fails loudly if a reading is missing or its spelling differs);
+3. `cd game_src/learn_games && npm run build:letters && npm test`, then deploy. The new words appear in the words and first-letter levels automatically.
+A pack was dry-run with fake pictures: all 132 words pass the diacritics check.
+To make a whole new level from a pack (e.g. «الملابس»), add a `PICKS` table + a `LEVELS` entry in `letters/levels.js`, the prompts
+(«فين القميص؟») to `tools/game_voice/tashkeel_more.py` PICKS, and extend `LEVELS`/worlds (`WORLD_IDS`) — levels wrap onto worlds with `%`.
+
+### Voices (IMPORTANT: not generated yet)
+- No ElevenLabs key was available in this session (`ELEVENLABS_API_KEY` not set; never store it in a file). The game plays a recorded clip when
+  `assets/games/learn_voice/ar/<id>.mp3` exists and the device voice otherwise, so everything works now but new sentences use the device voice.
+- `assets/games/learn_voice/lines.json` / `docs/GAME_VOICE_LINES.csv` list every sentence (737 Arabic); **423 clips are missing**
+  (list: `docs/VOICE_CLIPS_MISSING.csv`, ~7.7k characters, includes English lines that the Arabic-only games never use).
+  Diacritics for all Arabic lines are in `tools/game_voice/tashkeel.json` (built from the python files; mandatory for the voice).
+- Generate (only missing clips are made; voice «Fatima» id `I3u6waC588j43py1kDN2`, model `eleven_multilingual_v2`):
+  `ELEVENLABS_API_KEY=… node tools/game_voice/generate.mjs --provider elevenlabs --voice I3u6waC588j43py1kDN2 --lang ar`
+  then `node tools/game_voice/generate.mjs --manifest`, rebuild, deploy. Listen to a sample page with `tools/game_voice/listening_page.mjs`.
+  Azure (`ar-EG-SalmaNeural`) and Gemini are also supported by `generate.mjs`.
+
+### Still missing / ideas
+- The 132 pack pictures; voices for the 423 new sentences; real-device test of 8 rounds (rack size, stars row on small phones).
+- Shapes level only has 5 shapes × 5 colours (a rectangle/oval/diamond need `kit/shapes3d.js` geometry); the numbers level stops at 20;
+  the counting level uses apples only; no English words yet (English lines exist only for the older games).
+- Optional: separate levels for the packs (clothes, body, jobs, weather, food, school, family, music, creatures) with their own worlds.
+- Hearts sentences #27–#30 and pond butterflies/birds from the owner's pictures (see section 6).
