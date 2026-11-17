@@ -5,6 +5,28 @@ Arabic, short and concrete, and show him the result (screenshots / the demo) bef
 
 ---------------------------------------------------------------------------------------------------------------------------------------------
 
+## ⚡ QUICK START FOR THE NEW CLAUDE ACCOUNT (copy this)
+
+**One command — pulls the latest of everything, checks the tools, builds + tests the game and prints what is left:**
+```bash
+git clone https://github.com/abdelatif2030/kids-app.git rehlaty && cd rehlaty && git checkout feature/rehlaty && bash tools/sync_and_status.sh
+```
+(already cloned? just `cd rehlaty && bash tools/sync_and_status.sh`). Deploy the demo with `tools/deploy_demo.sh` (needs the Firebase web values + `LESSONS_BASE_URL` from the owner in the environment).
+
+**First message to paste in the new Claude chat:**
+> Read `docs/README_FULL_HANDOVER.md` (Part A, Part C, Appendix 1) and run `bash tools/sync_and_status.sh`. Then continue from Part C: I will send you picture sheets one by one
+> (4 columns × 3 rows, packs in Appendix 1, or the 4 home pads). For each sheet: cut it with `tools/art/cut_pack.py`, turn the pack on, rebuild the voice lines and readings,
+> record the new voices (I will give you the ElevenLabs key in the environment, never in a file), build, run the tests, show me the result, then commit, push and deploy the demo.
+> Talk to me in Egyptian Arabic, short and concrete.
+
+**What the new account does with the scripts and the new values:** I (the owner) generate the sheets in ChatGPT with the prompts of Appendix 1 and send them; Claude cuts them, the new words/pictures
+appear automatically in the «فين الصورة؟» and «أول حرف» levels (and in new levels if asked), the new scenes use the new values (pictures, words, pads), then voices + deploy.
+
+**Status right now (2026-11-17):** 12 worlds ✔, 8 questions per level ✔, 103 picture-words ✔, all 737 voice sentences recorded ✔ (voice review closed by the owner), demo deployed ✔
+(`Demo: Final state…`). Waiting for: the 12 picture sheets (144 words), the 4 home pads, a real-device test.
+
+---
+
 ## PART A — HOW TO SYNC THE NEW CLAUDE ACCOUNT (do this first)
 
 1. **Code:** the whole project is in git (`https://github.com/abdelatif2030/kids-app.git`, branch `feature/rehlaty`). On the new machine/account:
@@ -23,7 +45,7 @@ Arabic, short and concrete, and show him the result (screenshots / the demo) bef
    - Firebase web config for the demo (`FIREBASE_API_KEY`, `FIREBASE_APP_ID`, `FIREBASE_SENDER_ID`, `FIREBASE_PROJECT_ID`, `FIREBASE_AUTH_DOMAIN`) and
      `LESSONS_BASE_URL` (owner's lesson-video storage) are passed to `tool/build_demo_login.sh` by the deploy script. Ask the owner for the same values
      (they are in the Firebase console, project `kids-app-2361e`, web app) — do not invent them.
-5. **Deploy script (lost between sessions, recreate it):** a bash script that (a) runs `tool/build_demo_login.sh build/demo_login` with the five
+5. **Deploy script (now in the repo: `tools/deploy_demo.sh`; the old one lived in a temp folder):** a bash script that (a) runs `tool/build_demo_login.sh build/demo_login` with the five
    FIREBASE_* variables and `LESSONS_BASE_URL`, (b) `git fetch origin demo-site`, adds a worktree of `origin/demo-site`, deletes its files (keeps `.git`),
    copies `build/demo_login/.` into it, commits "Demo: <message>" and pushes `HEAD:demo-site`, (c) removes the worktree. The demo is Cloudflare Pages on branch
    `demo-site`: **https://demo-site-e3g.pages.dev** (publishing lags 1–3 minutes; verify with md5 of `game.js` or of a clip, with a cache-busting query).
