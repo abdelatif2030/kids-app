@@ -136,3 +136,22 @@ Things with one clear colour sheet. The 12 items, left to right, top to bottom: 
 2. Approve the order in section 4, and say which topics from section 3 you want or do not want (opposites, feelings, money, safety).
 3. Make the picture packs in section 5 (the wording is final; some item names carry the Arabic word in brackets so the picture matches the word), or tell me to draw some in code instead (shapes, colours, number forms are drawn in code anyway).
 4. The ElevenLabs key as an environment variable when each step is ready (about 200+ new voice lines in total).
+
+## 7. The new levels page: 20 levels (owner agreed on 2026-11-17 to go from 12 to 20)
+Today's page `assets/games/art/levels_page.webp` (1226 x 1283) has 12 tiles (3 columns x 4 rows). A grid of 20 is 4 columns x 5 rows.
+Arabic text inside generated pictures is unreliable, so the new picture has NO text on the tiles: I draw the level names and numbers in the app (so they can also be English later).
+
+### Levels 1-12 (stay as they are)
+1 اصطاد الحرف, 2 فين الصورة؟, 3 أول حرف, 4 الأرقام, 5 عدّ معايا, 6 ترتيب الحروف, 7 الأشكال والألوان, 8 أطعم الحيوان, 9 الألوان, 10 فواكه وخضار, 11 المواصلات, 12 عاداتي اليومية.
+
+### Levels 13-20: eight new ones (the owner picks; my recommendation first)
+Candidates (all have pictures already, see section 3): حياة البحر, الفضاء, المدينة وأماكنها, جسمي, الملابس, المهن (ناس بتساعدنا), الطقس والفصول, الديناصورات,
+ألعاب وحلويات, الشتا, الصحرا والتراث, العيلة, المدرسة, الموسيقى, الحشرات, الأكل والشرب.
+Recommended eight: 13 حياة البحر, 14 الفضاء, 15 المدينة وأماكنها, 16 جسمي, 17 الملابس, 18 المهن, 19 الطقس والفصول, 20 الديناصورات.
+The others stay as picture-words inside «فين الصورة؟» (they already are).
+
+### Prompt for the page (paste after the STYLE block of `IMAGE_SCRIPTS_NEXT.md`; upload the current `levels_page.webp` as the style reference)
+```
+Portrait image 1226x1283, same art style, colours and scene as the reference picture: a sunny enchanted garden with a fairy-tale castle on a hill in the background, a cute cartoon girl (pink jacket, ponytail with a pink bow) on the top left and a cute cartoon boy (yellow hoodie with a star, brown curly hair) on the top right, a wooden title sign at the top centre with a purple ribbon under it, a wooden arrow sign on the left with a blue owl wearing a graduation cap and a red bow tie sitting on a tree stump, round purple home button in the top-left corner and round purple speaker button in the top-right corner. In the centre a big cream rounded board holds a grid of 4 columns x 5 rows = 20 glossy blue rounded tiles of equal size, evenly spaced, each with a small flower decoration at the bottom and a round yellow badge in its top-left corner. IMPORTANT: no text, no letters, no numbers anywhere in the picture: the title sign, the ribbon, the arrow sign, the badges and all tiles are left EMPTY. Each tile shows one clear glossy 3D icon in the middle, left to right, top to bottom: 1 a red block with a letter-shaped pattern but no real letter (use a star on it); 2 a picture frame with a landscape; 3 a red block with an arrow; 4 a number block with dots (no digits); 5 a red apple; 6 colourful alphabet blocks without letters (use shapes); 7 a blue diamond and a circle; 8 a white bunny; 9 a painter palette with paint; 10 a strawberry; 11 a yellow school bus; 12 a pink watering can; 13 a friendly orange fish with a seashell; 14 a small rocket with a star; 15 a tall city building with windows; 16 a smiling child body-parts icon: a cute hand and an eye together; 17 a blue t-shirt on a hanger; 18 a friendly doctor with a stethoscope; 19 a sun behind a cloud with a raindrop; 20 a friendly green dinosaur. Keep the icons large, simple and readable, every tile clear of overlap with its neighbours.
+```
+After you send the picture I will cut the grid, place the invisible tap areas for the 4 x 5 tiles, draw the names and numbers in code, and add levels 13-20 (words and voice).
