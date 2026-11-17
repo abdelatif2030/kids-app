@@ -20,6 +20,9 @@ export function clipId(text, lang) {
   return h.toString(16).padStart(8, '0');
 }
 
+// A tiny silent clip: played once inside a tap so that phones let this page start sounds later without a tap.
+const SILENT = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+
 export class Voice {
   /** [base] is the game's folder URL; [fallback](text, lang) speaks with the device voice; [onTalk](secs) ducks the music. */
   constructor(base, lang, fallback, onTalk) {
@@ -30,6 +33,17 @@ export class Voice {
     this.queue = [];
     this.audio = null;
     this.muted = false;
+    // ONE audio element for every clip (not a new one each time): phones only let a page start sound without a tap on an
+    // element that a tap already "unlocked", so a sentence said between two levels (no tap for several seconds) used to be
+    // refused and the first question of the next level stayed silent. A refused clip waits and is said at the next tap.
+    this.el = null;
+    this.tok = 0;
+    this.pending = null;
+    this.unlocked = false;
+    if (typeof document !== 'undefined' && document.addEventListener) {
+      const go = () => this._gesture();
+      for (const ev of ['pointerdown', 'touchend', 'click', 'keydown']) document.addEventListener(ev, go, { capture: true, passive: true });
+    }
     // the list of bundled clips, as a script (works from a bundled page too)
     if (typeof document !== 'undefined' && !window.__learnVoice && !document.getElementById('learn-voice-manifest')) {
       const sc = document.createElement('script');
@@ -38,6 +52,22 @@ export class Voice {
       sc.onerror = () => { window.__learnVoice = window.__learnVoice || { ar: [], en: [] }; };
       document.head.append(sc);
     }
+  }
+
+  _element() {
+    if (!this.el) { this.el = new Audio(); this.el.preload = 'auto'; }
+    return this.el;
+  }
+
+  /** Called inside a tap or key press: unlocks the shared element and says what the phone refused a moment ago. */
+  _gesture() {
+    const el = this._element();
+    if (!this.unlocked && !this.audio) {
+      this.unlocked = true;
+      try { el.src = SILENT; const p = el.play(); if (p && p.catch) p.catch(() => { this.unlocked = false; }); } catch (_) { this.unlocked = false; }
+    }
+    const pend = this.pending;
+    if (pend && pend.run === this.run && !this.audio) { this.pending = null; this._play(pend.text); }
   }
 
   has(text) {
@@ -93,20 +123,38 @@ export class Voice {
       return;
     }
     this._start(this.i++);
-    const a = new Audio(`${this.dir}${this.lang}/${clipId(text, this.lang)}.mp3`);
+    this._play(text);
+  }
+
+  /** Plays the recording of one sentence on the shared element; when the phone refuses it, it waits for the next tap. */
+  _play(text) {
+    const a = this._element();
+    const token = ++this.tok;
+    this.pending = null;
     this.audio = a;
-    a.addEventListener('loadedmetadata', () => this.onTalk((a.duration || 2) + 0.3));
-    a.addEventListener('ended', () => { if (this.audio === a) { this.audio = null; this._next(); } });
-    a.addEventListener('error', () => { if (this.audio === a) { this.audio = null; this.onTalk(Math.min(6, 1.2 + text.length * 0.09)); this.fallback(text, this.lang); this._next(); } });
+    a.onloadedmetadata = () => { if (this.tok === token) this.onTalk((a.duration || 2) + 0.3); };
+    a.onended = () => { if (this.tok === token && this.audio === a) { this.audio = null; this._next(); } };
+    a.onerror = () => { if (this.tok === token && this.audio === a) { this.audio = null; this.onTalk(Math.min(6, 1.2 + text.length * 0.09)); this.fallback(text, this.lang); this._next(); } };
     this.onTalk(2.5);
+    try { a.src = `${this.dir}${this.lang}/${clipId(text, this.lang)}.mp3`; } catch (_) { /* fine */ }
+    const run = this.run;
     const p = a.play();
-    if (p && p.catch) p.catch(() => { /* not allowed yet: the text is on screen anyway */ });
+    if (p && p.catch) {
+      p.catch((e) => {
+        if (this.tok !== token || (e && e.name === 'AbortError')) return; // replaced or stopped on purpose
+        // refused (no tap for a while): keep the sentence and say it at the next tap; the text is on screen meanwhile
+        this.audio = null;
+        this.pending = { text, run };
+      });
+    }
   }
 
   stop() {
     this.run = (this.run || 0) + 1; // anything still waiting from the last call is dropped
     this.queue = [];
     this.onDone = null;
+    this.tok++;
+    this.pending = null;
     if (this.audio) { try { this.audio.pause(); } catch (_) { /* fine */ } this.audio = null; }
   }
 }

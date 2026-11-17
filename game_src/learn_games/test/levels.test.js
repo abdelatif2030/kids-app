@@ -70,3 +70,16 @@ test('miss, hint, first try and finishing', () => {
   while (!p.finished) { p.tap(p.cur.answer); n++; }
   assert.equal(n, ROUNDS);
 });
+
+test('inside one game no picture floods the level: every wrong choice comes from the least shown things', () => {
+  for (const [id, age, bound] of [['fruits', 5, 4], ['colors', 5, 4], ['vehicles', 5, 3], ['habits', 5, 3], ['words', 6, 2], ['animals', 6, 3]]) {
+    let worst = 0;
+    for (let s = 1; s <= 300; s++) {
+      const p = new LevelPlay(id, age, s * 104729);
+      const count = new Map();
+      for (const r of p.rounds) for (const o of r.options) { const k = o.thing || o.hex || o.id; count.set(k, (count.get(k) || 0) + 1); }
+      worst = Math.max(worst, ...count.values());
+    }
+    assert.ok(worst <= bound, `${id}: one picture showed ${worst} times in one game (limit ${bound})`);
+  }
+});

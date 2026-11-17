@@ -15,7 +15,9 @@ for (const l of lines) {
   rows.push({ t: l.text, a: fs.readFileSync(f).toString('base64'), m: fs.statSync(f).mtimeMs });
 }
 const newest = Math.max(...rows.map((r) => r.m));
-const data = rows.map((r) => ({ t: r.t, a: r.a, fresh: newest - r.m < 6 * 3600 * 1000 }));
+const hArg = process.argv.indexOf('--hours'); // --hours 1 : only the clips made in the last hour before the newest one
+const HOURS = hArg > 0 ? Number(process.argv[hArg + 1]) || 6 : 6;
+const data = rows.map((r) => ({ t: r.t, a: r.a, fresh: newest - r.m < HOURS * 3600 * 1000 }));
 const ONLY_NEW = process.argv.includes('--new'); // only the clips made in the last session (for choosing which to redo)
 if (ONLY_NEW) { for (let i = data.length - 1; i >= 0; i--) if (!data[i].fresh) data.splice(i, 1); }
 const html = `<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>كل أصوات اللعبة</title>
@@ -39,6 +41,6 @@ document.getElementById('onlyfresh').onclick=()=>{[...list.children].forEach((r,
 document.getElementById('onlybad').onclick=()=>{[...list.children].forEach(r=>r.classList.toggle('hide',!r.classList.contains('bad')))};
 document.getElementById('copy').onclick=()=>{const t=[...list.children].filter(r=>r.classList.contains('bad')).map(r=>D[r.dataset.i].t).join(String.fromCharCode(10));navigator.clipboard.writeText(t).then(()=>alert('اتنسخت '+t.split(String.fromCharCode(10)).filter(Boolean).length+' جملة. ابعتهالي.'))};
 </script></html>`;
-const out = path.join(ROOT, ONLY_NEW ? 'docs/voice_preview/27_new_voices.html' : 'docs/voice_preview/26_all_voices_now.html');
+const out = path.join(ROOT, ONLY_NEW ? (hArg > 0 ? 'docs/voice_preview/28_new_animal_voices.html' : 'docs/voice_preview/27_new_voices.html') : 'docs/voice_preview/26_all_voices_now.html');
 fs.writeFileSync(out, html);
 console.log(`${data.length} clips, ${data.filter((d) => d.fresh).length} new, ${(fs.statSync(out).size / 1048576).toFixed(1)} MB -> ${out}`);

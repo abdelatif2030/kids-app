@@ -97,7 +97,8 @@ export function makeRounds(age, seed, world = null) {
 }
 
 /** The plates of one round: the right food and other animals' foods (never one this animal also eats), shuffled. */
-export function platesOf(age, animalId, seed, world = null) {
+/** [used] (optional Map food -> times shown in this game): the wrong plates are the least shown foods, and the shown ones are counted. */
+export function platesOf(age, animalId, seed, world = null, used = null) {
   const r = rng(seed);
   const a = animalById(animalId);
   const right = a.food;
@@ -105,7 +106,10 @@ export function platesOf(age, animalId, seed, world = null) {
   const others = poolFor(age, world).map((x) => x.food).filter((f) => !bad.has(f));
   // foods of animals outside the pool may fill in when the pool is small
   for (const x of ANIMALS) if (!bad.has(x.food) && !others.includes(x.food)) others.push(x.food);
-  const take = [...new Set(others)].sort(() => r() - 0.5).slice(0, platesFor(age) - 1);
+  let list = [...new Set(others)].sort(() => r() - 0.5);
+  if (used) list = list.sort((x, y) => (used.get(x) || 0) - (used.get(y) || 0));
+  const take = list.slice(0, platesFor(age) - 1);
+  if (used) for (const f of [right, ...take]) used.set(f, (used.get(f) || 0) + 1);
   return [right, ...take].sort(() => r() - 0.5);
 }
 
