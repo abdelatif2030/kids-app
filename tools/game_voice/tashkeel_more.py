@@ -92,6 +92,10 @@ HABITS2 = [
 
 
 def add(M):
+    HK = [('فتحة', 'فَتْحَة'), ('ضمة', 'ضَمَّة'), ('كسرة', 'كَسْرَة')]
+    for the, thed in LETTER_THE.values():
+        for w, d in HK:
+            M.setdefault('فين حرف %s اللي عليه %s؟' % (the, w), 'فِين حَرْف %s اللِّي عَلَيْه %s؟' % (thed, d))
     for k, v in HABITS2:
         M.setdefault(k, v)
     for the, thed in VEHICLES2:

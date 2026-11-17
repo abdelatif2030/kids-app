@@ -13,7 +13,7 @@
 import { rng } from '../maze/sim.js';
 import { ROUNDS, poolFor, fishCount, letterById, question, LETTERS } from './sim.js';
 import { SHAPES_ALL, SHAPE_TIERS, SHAPE_COLORS, SIDES_ASKED, shapePlan, findShapeQ, shapeSay, sidesQ, shapeWithSides } from './shapes_all.js';
-import { ANIMALS, platesOf, animalById, question as animalQuestion, reward as animalReward, poolFor as animalPool, FOODS } from '../animals/sim.js';
+import { ANIMALS, platesOf, animalById, question as animalQuestion, reward as animalReward, bankFor as animalBank, poolFor as animalPool, FOODS } from '../animals/sim.js';
 import { optionsFor, COUNT_Q } from '../counting/sim.js';
 import { COLORS, COLOR_TIERS, COLOR_THINGS, colorPlan, colorChoices, findColorQ, findThingQ, colorOf } from './colors.js';
 import { TIERS, COUNT_TIERS, numberPlan, countPlan, numberWord, findQ, afterQ, beforeQ, BIGGER_Q, SMALLER_Q } from './numbers.js';
@@ -68,9 +68,15 @@ PICKS.vehicles.items.push(
   { id: 'tractor', the: 'الجرار', thing: 'tractor_f' }, { id: 'sled', the: 'الزحافة', thing: 'w_sled' },
   { id: 'rover', the: 'مركبة الفضاء', thing: 's_rover' }, { id: 'ufo', the: 'الطبق الطائر', thing: 's_ufo' },
 );
+/** The vowel marks asked in the letters level («فين حرف الباء اللي عليه فتحة؟»); the fourth (sukun) is only a distractor. */
+export const HARAKAT = [
+  { id: 'fatha', word: 'فتحة', mark: 'َ' }, { id: 'damma', word: 'ضمة', mark: 'ُ' }, { id: 'kasra', word: 'كسرة', mark: 'ِ' }, { id: 'sukun', word: 'سكون', mark: 'ْ' },
+];
+export const harakaQ = (l, h) => `فين حرف ${l.the} اللي عليه ${h.word}؟`;
+export const allHarakaSentences = () => LETTERS.flatMap((l) => HARAKAT.slice(0, 3).map((h) => harakaQ(l, h)));
 export const levelOf = (id) => LEVELS.find((l) => l.id === id);
 /** The youngest (four) skip the two alphabet levels that need reading order. */
-export const levelsFor = (age) => (age <= 4 ? LEVELS.filter((l) => l.id !== 'first' && l.id !== 'order') : LEVELS);
+export const levelsFor = (_age) => LEVELS; // every level is open at every age: the age only picks what comes first (tiers)
 
 /** The alphabet in its real order (the list in sim.js is ordered by how easy a letter is to hear). */
 export const ALPHABET = ['alef', 'baa', 'taa', 'thaa', 'jeem', 'haa', 'khaa', 'dal', 'dhal', 'raa', 'zayn', 'seen', 'sheen', 'sad', 'dad', 'tah', 'zah', 'ayn', 'ghayn', 'faa', 'qaaf', 'kaaf', 'laam', 'meem', 'noon', 'haa2', 'waaw', 'yaa'];
@@ -198,17 +204,57 @@ export class LevelPlay {
       take.forEach((x) => mark(keyOf(x)));
       return take;
     };
+    // Tiers: a question is taken from the tier the age asks for; when that tier has nothing NEW left for this child (not seen before, not yet asked in this
+    // game), the next tier supplies it (harder first), so a replay never shows the same things again while anything new is left in the level.
+    const drawn = new Set();
+    const pickTiered = (order, t0, poolOf, keyOf, qs, not = () => false) => {
+      const undrawn = (x) => !drawn.has(keyOf(x));
+      const fresh = (u) => poolOf(u).some((x) => undrawn(x) && (!mem || mem.score(keyOf(x)) <= 0));
+      const unasked = (u) => poolOf(u).some(undrawn);
+      const i = Math.max(0, order.indexOf(t0));
+      const rot = (f) => { for (let d = 0; d < order.length; d++) { const u = order[(i + d) % order.length]; if (f(u)) return u; } return null; };
+      let t = (mem ? rot(fresh) : null);
+      if (mem && t === null) {
+        // everything in the level has been seen once: a new cycle, the OLDEST first whatever its tier
+        const all = order.flatMap((u) => poolOf(u));
+        const ordered = mem.order(all, keyOf, r).filter(undrawn);
+        const item = ordered.find((x) => !not(x)) || ordered[0];
+        if (item !== undefined) {
+          drawn.add(keyOf(item));
+          return { item, tier: order.find((u) => poolOf(u).includes(item)) };
+        }
+      }
+      if (t === null) t = rot(unasked);
+      if (t === null) t = t0;
+      if (!qs[t] || !qs[t].some(undrawn)) qs[t] = mem ? mem.order(poolOf(t), keyOf, r) : [...poolOf(t)].sort(() => r() - 0.5);
+      let k = qs[t].findIndex((x) => undrawn(x) && !not(x));
+      if (k < 0) k = qs[t].findIndex(undrawn);
+      if (k < 0) k = 0;
+      const item = qs[t].splice(k, 1)[0];
+      drawn.add(keyOf(item));
+      return { item, tier: t };
+    };
+    // three tiers (easy, middle, hard): the age picks how many questions come from each
+    const TRI = this.age <= 3 ? [7, 1, 0] : this.age === 4 ? [5, 3, 0] : this.age === 5 ? [3, 3, 2] : [2, 2, 4];
+    const tiered = (pools, keyOf) => {
+      const plan = [];
+      TRI.forEach((n, t) => { for (let k = 0; k < n; k++) plan.push(t); });
+      for (let k = plan.length - 1; k > 0; k--) { const j = Math.floor(r() * (k + 1)); [plan[k], plan[j]] = [plan[j], plan[k]]; }
+      const qs = [];
+      let at = 0, last = null;
+      return () => {
+        const res = pickTiered([0, 1, 2], plan[at++ % plan.length], (u) => pools[u], keyOf, qs, (x) => x === last);
+        last = res.item;
+        return res;
+      };
+    };
     if (mode === 'number' || mode === 'count') {
       // every number 0-100 is possible at every age; the age only picks how many easy and how many harder ones (numbers.js)
       const plan = mode === 'count' ? countPlan(this.age, ROUNDS, r) : numberPlan(this.age, ROUNDS, r);
       const pools = mode === 'count' ? COUNT_TIERS : TIERS;
       const queues = {};
-      const draw = (tier, not) => {
-        if (!queues[tier] || !queues[tier].length) queues[tier] = mem ? mem.order(pools[tier], (n) => `n:${n}`, r) : [...pools[tier]].sort(() => r() - 0.5);
-        let k = queues[tier].findIndex((n) => !not.includes(n));
-        if (k < 0) k = 0;
-        return queues[tier].splice(k, 1)[0];
-      };
+      const draw = (tier0, not) => pickTiered(Object.keys(pools), tier0, (u) => pools[u], (n) => `n:${n}`, queues, (n) => not.includes(n)).item;
+      const tierOfNumber = (n) => Object.keys(pools).find((u) => pools[u].includes(n));
       const asOpts = (list) => list.map((x) => ({ id: `n${x}`, kind: 'number', n: x }));
       const shuffled = (list) => [...list].sort(() => r() - 0.5);
       const lastN = () => out.map((x) => x.n);
@@ -224,32 +270,46 @@ export class LevelPlay {
           const others = pickLow(pools[tier].filter((x) => x !== n), nOpt - 1);
           const small = this.age <= 4 && n >= 1 && n <= 10; // the youngest also SEE that many apples (they are counted aloud after the answer)
           out.push({ prompt: findQ(n), answer: `n${n}`, n, key: `n:${n}`, show: small ? { type: 'apples', n } : null, countAloud: small ? n : 0, options: asOpts(shuffled([n, ...others])) });
+        } else if ((kind === 'after' || kind === 'before' || kind === 'bigger' || kind === 'smaller') && mem && !['A', 'B'].some((u) => pools[u].some((n) => !(`n:${n}` in mem.seen) && !drawn.has(`n:${n}`)))) {
+          // nothing new is left among 0-20: ask a plain «فين رقم ...؟» from the next tier with new numbers instead
+          const n = draw('C', lastN());
+          mark(n);
+          const others = pickLow(pools[tierOfNumber(n)].filter((x) => x !== n), nOpt - 1);
+          out.push({ prompt: findQ(n), answer: `n${n}`, n, key: `n:${n}`, show: null, countAloud: 0, options: asOpts(shuffled([n, ...others])) });
         } else if (kind === 'after' || kind === 'before') {
-          // "which number comes after / before ..." inside 0-20 (after: 0-19, before: 1-20)
-          const from = kind === 'after' ? draw('A', lastN()) - (r() < 0.2 ? 1 : 0) : 1 + draw('A', lastN()) + (r() < 0.2 ? 10 : 0) - 1;
-          const base = kind === 'after' ? Math.max(0, Math.min(19, from)) : Math.max(1, Math.min(20, from));
-          const ans = kind === 'after' ? base + 1 : base - 1;
+          // "which number comes after / before ...": the ANSWER is the fresh number (0-20), the sentence is made from it
+          const bad = kind === 'after' ? [0] : [20];
+          const ans = pickTiered(['A', 'B'], tier === 'A' || tier === 'B' ? tier : 'A', (u) => pools[u], (n) => `n:${n}`, queues, (n) => lastN().includes(n) || bad.includes(n)).item;
           mark(ans);
+          const base = kind === 'after' ? ans - 1 : ans + 1;
           const near = range0(0, 20).filter((x) => x !== ans && x !== base);
           const others = pickLow(near, nOpt - 1);
           out.push({ prompt: kind === 'after' ? afterQ(base) : beforeQ(base), answer: `n${ans}`, n: ans, key: `n:${ans}`, show: null, countAloud: 0, options: asOpts(shuffled([ans, ...others])) });
         } else {
-          // bigger / smaller: three or four different numbers, from the easy tiers (and the tens for the older)
-          const src = [...TIERS.A, ...TIERS.B, ...(this.age >= 5 ? TIERS.C : [])];
-          const set = pickLow(src, nOpt);
-          const ans = kind === 'bigger' ? Math.max(...set) : Math.min(...set);
-          out.push({ prompt: kind === 'bigger' ? BIGGER_Q : SMALLER_Q, answer: `n${ans}`, n: ans, key: `n:${ans}`, show: null, countAloud: 0, options: asOpts(shuffled(set)) });
+          // bigger / smaller: the ANSWER is the fresh number; the others are smaller (bigger) numbers of the easy tiers (and the tens for the older)
+          const order = this.age >= 5 ? ['A', 'B', 'C'] : ['A', 'B'];
+          const src = order.flatMap((u) => pools[u]);
+          const enough = (n) => (kind === 'bigger' ? src.filter((x) => x < n).length : src.filter((x) => x > n).length) >= nOpt - 1;
+          const first = pickTiered(order, order.includes(tier) ? tier : 'A', (u) => pools[u], (n) => `n:${n}`, queues, (n) => lastN().includes(n) || !enough(n));
+          const ans = first.item;
+          mark(ans);
+          const cands = src.filter((x) => (kind === 'bigger' ? x < ans : x > ans));
+          const others = pickLow(cands, nOpt - 1);
+          out.push({ prompt: kind === 'bigger' ? BIGGER_Q : SMALLER_Q, answer: `n${ans}`, n: ans, key: `n:${ans}`, show: null, countAloud: 0, options: asOpts(shuffled([ans, ...others])) });
         }
       }
     } else if (mode === 'next') {
-      const ab = orderPool(this.age);
-      const next = bag(Array.from({ length: ab.length - 1 }, (_, i) => i), (k) => `l:${ab[k + 1]}`);
+      // «إيه الحرف اللي بعد ...؟» over the whole alphabet; the first eight letters are the easy tier
+      const ab = ALPHABET;
+      const idx = Array.from({ length: ab.length - 1 }, (_, i) => i);
+      const nextK = tiered([idx.filter((k) => k < 8), idx.filter((k) => k >= 8 && k < 16), idx.filter((k) => k >= 16)], (k) => `l:${ab[k + 1]}`);
       for (let i = 0; i < ROUNDS; i++) {
-        const k = next();
+        const { item: k, tier } = nextK();
         const cur = letterById(ab[k]);
         const ans = ab[k + 1];
         mark(ans);
-        const others = pickLow(ab.filter((x) => x !== ans && x !== ab[k]), nOpt - 1);
+        const reach = [8, 16, 28][tier];
+        const others = pickLow(ab.slice(0, Math.max(reach, k + 2)).filter((x) => x !== ans && x !== ab[k]), nOpt - 1);
         out.push({ prompt: nextQuestion(cur), answer: ans, key: `l:${ans}`, from: ab[k], show: { type: 'letter', ch: cur.ch }, reward: rew(letterById(ans)), options: [ans, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'letter', ch: letterById(x).ch })) });
       }
     } else if (mode === 'shape') {
@@ -257,12 +317,8 @@ export class LevelPlay {
       const plan = shapePlan(this.age, ROUNDS, r);
       const queues = {};
       const code = (x) => x.render === 'code';
-      const draw = (tier, not, pred) => {
-        if (!queues[tier] || !queues[tier].some(pred)) queues[tier] = mem ? mem.order(SHAPE_TIERS[tier], (x) => `s:${x.id}`, r) : [...SHAPE_TIERS[tier]].sort(() => r() - 0.5);
-        let k = queues[tier].findIndex((x) => pred(x) && !not.includes(x.id));
-        if (k < 0) k = queues[tier].findIndex(pred);
-        return queues[tier].splice(k, 1)[0];
-      };
+      const queuesCode = {};
+      const draw = (tier0, not, pred) => pickTiered(Object.keys(SHAPE_TIERS), tier0, (u) => SHAPE_TIERS[u].filter(pred), (x) => `s:${x.id}`, pred === code ? queuesCode : queues, (x) => not.includes(x.id)).item; // a queue of colourable shapes only must not be reused for a plain question
       const shuffledColors = () => [...SHAPE_COLORS].sort(() => r() - 0.5);
       /** One option for a shape: a coloured 3D shape (drawn in code) or the owner's own picture. */
       const optionOf = (sh, color) => (code(sh) ? { id: sh.id, kind: 'shape', shape: sh.id, color } : { id: sh.id, kind: 'thing', thing: sh.art });
@@ -272,8 +328,12 @@ export class LevelPlay {
         return [right, ...others].map((x, k) => optionOf(x, cols[k].id)).sort(() => r() - 0.5);
       };
       for (let i = 0; i < ROUNDS; i++) {
-        const { kind, tier } = plan[i];
+        let { kind, tier } = plan[i];
         const lastIds = out.map((x) => x.shapeId);
+        const newShape = (x) => !drawn.has(`s:${x.id}`) && mem.score(`s:${x.id}`) <= 0;
+        // a colour or sides question needs a (colourable / counted) shape the child has not met yet; otherwise this round is a plain «فين ...؟»
+        if (mem && kind === 'colour' && !SHAPES_ALL.some((x) => code(x) && newShape(x))) kind = 'name';
+        if (mem && kind === 'sides' && !SIDES_ASKED.some((n) => newShape(shapeWithSides(n)))) kind = 'name';
         if (kind === 'sides') {
           const cands = SIDES_ASKED.filter((n) => !lastIds.includes(shapeWithSides(n).id));
           const n = (mem ? mem.order(cands, (x) => `s:${shapeWithSides(x).id}`, r) : [...cands].sort(() => r() - 0.5))[0];
@@ -305,16 +365,33 @@ export class LevelPlay {
         }
       }
     } else if (mode === 'animal') {
-      const ids = animalPool(this.age, this.world).map((x) => x.id);
+      // every animal at every age: new ones first, the easy ones (age field) before the harder ones for the younger children
+      let ids = animalBank(this.world).map((x) => x.id);
       const animalKey = (id) => `t:${animalById(id).thing}`;
-      const ordered = () => (mem ? mem.order(ids, animalKey, r) : [...ids].sort(() => r() - 0.5));
+      if (mem && ids.filter((id) => mem.score(animalKey(id)) <= 0).length < ROUNDS) {
+        // the world's own animals are nearly all known: animals of other places that are still new join in (before any known one repeats)
+        ids = [...ids, ...ANIMALS.map((x) => x.id).filter((id) => !ids.includes(id) && mem.score(animalKey(id)) <= 0)];
+      }
+      // a new cycle (everything seen once): the oldest animals of ALL places, whatever the world
+      if (mem && ids.filter((id) => mem.score(animalKey(id)) <= 0).length === 0) ids = ANIMALS.map((x) => x.id);
+      const easyFor = (id) => animalById(id).age <= Math.max(4, this.age);
+      const rank = (id) => ((!mem || mem.score(animalKey(id)) <= 0) ? (easyFor(id) ? 0 : 1) : 2);
+      const ordered = () => (mem ? mem.order(ids, animalKey, r) : [...ids].sort(() => r() - 0.5)).map((id, i) => [rank(id), i, id]).sort((x, y) => x[0] - y[0] || x[1] - y[1]).map((x) => x[2]);
       // new animals first, and a food is the right answer only once per game (many animals eat grass or seeds)
       let queue = ordered();
       const rightFoods = new Set();
+      const chosen = new Set(); // animals already asked in THIS game
       for (let i = 0; i < ROUNDS; i++) {
-        let k = queue.findIndex((id) => !rightFoods.has(animalById(id).food) && !(i && out[i - 1].animal === id));
-        if (k < 0) { queue = ordered(); rightFoods.clear(); k = Math.max(0, queue.findIndex((id) => !(i && out[i - 1].animal === id))); }
+        const notLast = (id) => !(i && out[i - 1].animal === id);
+        const isNew = (id) => !mem || mem.score(animalKey(id)) <= 0;
+        // new animals first (even when their food was already asked), then a food that was not asked yet, then anything
+        let k = queue.findIndex((id) => notLast(id) && isNew(id) && !rightFoods.has(animalById(id).food));
+        if (k < 0) k = queue.findIndex((id) => notLast(id) && isNew(id));
+        if (k < 0) k = queue.findIndex((id) => notLast(id) && !rightFoods.has(animalById(id).food));
+        if (k < 0) k = queue.findIndex(notLast); // an animal whose food was already asked, but not asked itself yet
+        if (k < 0) { queue = ordered().filter((x) => !chosen.has(x)); if (!queue.length) queue = ordered(); rightFoods.clear(); k = Math.max(0, queue.findIndex(notLast)); }
         const id = queue.splice(k, 1)[0];
+        chosen.add(id);
         rightFoods.add(animalById(id).food);
         const a = animalById(id);
         const plates = platesOf(this.age, id, this.seed + i * 41, this.world, used);
@@ -324,21 +401,19 @@ export class LevelPlay {
       // 25 colours at every age (age picks the start); some rounds ask for a THING of the colour (pictures), never two shades of one family together
       const plan = colorPlan(this.age, ROUNDS, r);
       const queues = {};
-      const draw = (tier, not) => {
-        if (!queues[tier] || !queues[tier].length) queues[tier] = mem ? mem.order(COLOR_TIERS[tier], (c) => `c:${c.id}`, r) : [...COLOR_TIERS[tier]].sort(() => r() - 0.5);
-        let k = queues[tier].findIndex((c) => !not.includes(c.id));
-        if (k < 0) k = 0;
-        return queues[tier].splice(k, 1)[0];
-      };
+      const draw = (tier0, not) => pickTiered(Object.keys(COLOR_TIERS), tier0, (u) => COLOR_TIERS[u], (c) => `c:${c.id}`, queues, (c) => not.includes(c.id)).item;
       const usedColor = new Map();
       for (let i = 0; i < ROUNDS; i++) {
         const { kind, tier } = plan[i];
         const lastIds = out.map((x) => x.colorId);
-        if (kind === 'thing') {
+        const thingFresh = mem && Object.keys(COLOR_THINGS).some((id) => !lastIds.includes(id) && mem.score(`c:${id}`) <= 0 && !drawn.has(`c:${id}`));
+        // a picture question needs a colour (of the ten that have pictures) the child has not met yet; otherwise this round asks a coloured ball instead
+        if (kind === 'thing' && (!mem || thingFresh)) {
           // a colour that has pictures: the right picture among pictures of other colours
           const cs = Object.keys(COLOR_THINGS).filter((id) => !lastIds.includes(id));
           const pickable = (mem ? mem.order(cs, (id) => `c:${id}`, r) : [...cs].sort(() => r() - 0.5));
-          const cid = (pickable.find((id) => colorOf(id).tier === tier) || pickable[0]);
+          const cid = ((mem ? pickable.find((id) => mem.score(`c:${id}`) <= 0 && !drawn.has(`c:${id}`)) : null) || pickable.find((id) => colorOf(id).tier === tier && !drawn.has(`c:${id}`)) || pickable.find((id) => !drawn.has(`c:${id}`)) || pickable[0]);
+          drawn.add(`c:${cid}`);
           const c = colorOf(cid);
           const right = COLOR_THINGS[cid][Math.floor(r() * COLOR_THINGS[cid].length)];
           const otherColors = pickLow(Object.keys(COLOR_THINGS).filter((id) => id !== cid && colorOf(id).family !== c.family), nOpt - 1);
@@ -375,37 +450,48 @@ export class LevelPlay {
         out.push({ prompt: h.text, answer: h.answer, key: `t:${h.answer}`, show: null, options: [h.answer, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'thing', thing: x })) });
       }
     } else if (mode === 'word' || mode === 'first') {
-      const items = wordItems(this.age);
+      // every picture-word at every age; the easy ones (age 3) come first for the youngest, the hardest (age 6) for the oldest
+      const items = WORD_ITEMS;
+      const tierW = (w) => (w.age <= 3 ? 0 : w.age <= 5 ? 1 : 2);
       const thingOf = new Map(items.map((x) => [x.id, x.thing]));
-      const next = bag(items.map((x) => x.id), (id) => `t:${thingOf.get(id)}`);
-      let last = null;
+      const nextW = tiered([0, 1, 2].map((t) => items.filter((x) => tierW(x) === t).map((x) => x.id)), (id) => `t:${thingOf.get(id)}`);
       for (let i = 0; i < ROUNDS; i++) {
-        let id = next();
-        if (id === last) id = next();
-        last = id;
+        const { item: id } = nextW();
         const w = items.find((x) => x.id === id);
+        const t = tierW(w);
+        const near = items.filter((x) => tierW(x) <= t); // wrong choices are never harder than the right one
         mark(mode === 'word' ? id : w.letter);
         if (mode === 'word') {
-          const others = pickLow(items.filter((x) => x.id !== id && x.thing !== w.thing), nOpt - 1);
+          const others = pickLow(near.filter((x) => x.id !== id && x.thing !== w.thing), nOpt - 1);
           out.push({ prompt: wordQ(w), answer: id, key: `t:${w.thing}`, reward: wordReward(w), options: [w, ...others].sort(() => r() - 0.5).map((x) => ({ id: x.id, kind: 'thing', thing: x.thing })) });
         } else {
-          const letters = [...new Set(items.map((x) => x.letter))].filter((x) => x !== w.letter);
+          const letters = [...new Set(near.map((x) => x.letter))].filter((x) => x !== w.letter);
           const others = pickLow(letters, nOpt - 1);
           out.push({ prompt: firstQ(w), answer: w.letter, key: `t:${w.thing}`, reward: wordReward(w), show: { type: 'thing', thing: w.thing }, options: [w.letter, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'letter', ch: letterById(x).ch })) });
         }
       }
     } else {
-      const next = bag(pool, (id) => `t:${letterById(id).thing}`);
+      // «اصطاد الحرف»: all 28 letters at every age (easy ones first); one or two rounds ask a letter WITH a vowel mark (فتحة، ضمة، كسرة)
+      const ids = LETTERS.map((l) => l.id);
+      const tiers = [ids.slice(0, 8), ids.slice(8, 16), ids.slice(16)];
+      const nextL = tiered(tiers, (id) => `t:${letterById(id).thing}`);
+      const harakaAt = new Set();
+      const nH = this.age < 4 ? 0 : this.age < 6 ? 1 : 2;
+      while (harakaAt.size < nH) harakaAt.add(2 + Math.floor(r() * (ROUNDS - 2)));
       for (let i = 0; i < ROUNDS; i++) {
-        let t = next();
-        if (i && out[i - 1].answer === t) t = next();
+        const { item: t, tier } = nextL();
         const l = letterById(t);
         mark(t);
-        const others = pickLow(pool.filter((x) => x !== t), nOpt - 1);
-        const ids = [t, ...others].sort(() => r() - 0.5);
-        if (mode === 'letter') out.push({ prompt: question(l), answer: t, key: `t:${l.thing}`, reward: rew(l), options: ids.map((x) => ({ id: x, kind: 'thing', thing: letterById(x).thing, plaque: letterById(x).ch })) });
-        else if (mode === 'word') out.push({ prompt: wordQuestion(l), answer: t, reward: rew(l), options: ids.map((x) => ({ id: x, kind: 'thing', thing: letterById(x).thing })) });
-        else out.push({ prompt: firstQuestion(l), answer: t, reward: rew(l), show: { type: 'thing', thing: l.thing }, options: ids.map((x) => ({ id: x, kind: 'letter', ch: letterById(x).ch })) });
+        const reachIds = tiers.slice(0, tier + 1).flat();
+        if (harakaAt.has(i)) {
+          const marks = nOpt >= 4 ? HARAKAT : HARAKAT.slice(0, 3);
+          const right = marks[Math.floor(r() * 3)];
+          out.push({ prompt: harakaQ(l, right), answer: `h${right.id}`, key: `t:${l.thing}`, options: marks.map((m) => ({ id: `h${m.id}`, kind: 'letter', ch: l.ch + m.mark })).sort(() => r() - 0.5) });
+          continue;
+        }
+        const others = pickLow(reachIds.filter((x) => x !== t), nOpt - 1);
+        const opts = [t, ...others].sort(() => r() - 0.5);
+        out.push({ prompt: question(l), answer: t, key: `t:${l.thing}`, reward: rew(l), options: opts.map((x) => ({ id: x, kind: 'thing', thing: letterById(x).thing, plaque: letterById(x).ch })) });
       }
     }
     return out;

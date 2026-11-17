@@ -12,11 +12,9 @@ test('every letter has a word with "the" and the alphabet lists all 28 once', ()
   assert.equal(nextQuestion(letterById('baa')), 'إيه الحرف اللي بعد الباء؟');
   assert.equal(firstQuestion(letterById('baa')), 'إيه الحرف الأول في كلمة بطة؟');
 });
-test('twelve levels; the youngest skip the two alphabet levels', () => {
+test('twelve levels, every one open at every age', () => {
   assert.equal(LEVELS.length, 12);
-  assert.equal(levelsFor(4).length, 10);
-  assert.equal(levelsFor(5).length, 12);
-  assert.equal(orderPool(5).length, 8); assert.equal(orderPool(6).length, 28);
+  for (const age of [2, 3, 4, 5, 6]) assert.equal(levelsFor(age).length, 12);
 });
 test('every level, every age: five rounds, exactly one right option, no duplicate options', () => {
   for (const lv of LEVELS) for (const age of [4, 5, 6]) for (let s = 1; s < 40; s++) {

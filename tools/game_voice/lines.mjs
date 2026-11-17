@@ -96,6 +96,7 @@ for (const hb of lv.HABITS) add(hb.text, 'ar');
 for (const tab of Object.values(lv.PICKS)) for (const it of tab.items) add(tab.prompt(it), 'ar');
 const colorsMod = await imp('letters/colors.js');
 for (const q of colorsMod.allColorSentences()) add(q, 'ar'); // 25 colours + the things of a colour
+for (const q of lv.allHarakaSentences()) add(q, 'ar'); // letters with a vowel mark (28 x 3)
 const shapesAll = await imp('letters/shapes_all.js');
 for (const q of shapesAll.allShapeSentences()) add(q, 'ar'); // 20 shapes: names, colours, sides
 for (const c of [...lv.CHEERS_M, ...lv.CHEERS_F]) add(c, 'ar');

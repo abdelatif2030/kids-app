@@ -176,3 +176,14 @@ Voice: 24 new clips (`tashkeel_colors.py`; «الذهبي» is read «الدَّ
 `code` shapes are 3D meshes (kit/shapes3d.js: octagon, plus, crescent, pyramid added) and take 7 colours; `art` shapes are the owner's g_*.webp pictures (name only).
 Question kinds: name, name + colour (age 4+, colour round always has a same-shape and a same-colour distractor), number of sides (age 5+: 3, 5, 6, 8 only, those belong to one shape).
 Sentences gender-correct («ده مربع», «دي دايرة حمرا»). Voice: 115 new clips (`tashkeel_shapes.py`).
+
+## Cycle of things, every level, every age (2026-11-17)
+All 12 levels are open at every age; the age only picks the start (tiers). `levels.js` `pickTiered`: a question comes from the tier the age asks for; when that tier
+has nothing NEW for the child (not in `FreshMemory.seen`, not yet asked in this game) the next tier supplies it; when the whole level was seen once, a new cycle starts
+with the OLDEST things whatever their tier. A round kind that needs special things (colour pictures, colourable shapes, sides, after/before) turns into a plain question
+when no fresh thing fits. Animals: all 48 for every age (world group when it has 8+, new animals of other places join when the group is known), a food is the right answer
+once per game. Letters level: all 28 letters (easy first) + «فين حرف الباء اللي عليه فتحة؟» rounds (28 x 3 sentences). Words / first letter: all 247 picture words by difficulty tier.
+Fruits and vegetables: 37 pictures (every q_* and v_* word), vehicles +4, habits +31 (pictures the app already had).
+Test: `test/cycle.test.js` plays level 1 to 12 for ages 2-6 (visits, app restarts through JSON, new cycles) and checks nothing repeats inside a game, replays show new things first,
+and a new cycle does not start with what was just shown. `SHOW_CYCLE=1 node --test test/cycle.test.js` prints the table (things per level, first repeat, cycle done).
+Memory keeps 1500 keys. NOT built yet: the 20-level page (needs the owner's picture), ordinals, forms of letters, hamza.

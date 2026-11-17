@@ -58,9 +58,9 @@ test('the spotlight is deterministic per week, changes with the week, and goes f
 test('memory survives a save and a load, ignores damaged data and stays bounded', () => {
   const mem = new FreshMemory(null, 1);
   mem.begin('words');
-  for (let i = 0; i < 700; i++) mem.note(`t:x${i}`);
-  assert.ok(Object.keys(mem.seen).length <= 500);
-  assert.ok(mem.seen['t:x699'] && !mem.seen['t:x0']);
+  for (let i = 0; i < 2000; i++) mem.note(`t:x${i}`);
+  assert.ok(Object.keys(mem.seen).length <= 1500);
+  assert.ok(mem.seen["t:x1999"] && !mem.seen["t:x0"]);
   const copy = new FreshMemory(JSON.parse(JSON.stringify(mem.toJSON())), 1);
   assert.deepEqual(copy.toJSON(), mem.toJSON());
   for (const bad of [null, undefined, 5, 'x', [], { seen: 3, tick: 'a', cur: 7, prev: 'z' }]) {

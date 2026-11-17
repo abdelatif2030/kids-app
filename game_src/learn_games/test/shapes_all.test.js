@@ -47,6 +47,7 @@ test('the shapes level: one right option, unique options, answers match the ques
   const known = new Set(allShapeSentences());
   const kinds = new Set();
   for (const age of [2, 3, 4, 5, 6]) for (let s = 1; s <= 150; s++) {
+    let hardForYoungest = 0;
     const p = new LevelPlay('shapes', age, s * 7919);
     assert.equal(p.rounds.length, ROUNDS);
     for (const r of p.rounds) {
@@ -72,9 +73,10 @@ test('the shapes level: one right option, unique options, answers match the ques
       } else {
         kinds.add('name');
         assert.equal(r.prompt, findShapeQ(SHAPES_ALL.find((x) => x.id === r.answer)));
-        if (age <= 3) assert.ok(['A', 'B'].includes(SHAPES_ALL.find((x) => x.id === r.answer).tier));
+        if (age <= 3 && !['A', 'B'].includes(SHAPES_ALL.find((x) => x.id === r.answer).tier)) hardForYoungest++;
       }
     }
+    assert.ok(hardForYoungest <= 1, 'a toddler gets at most one shape from the harder tiers (there are only seven easy ones)');
   }
   assert.deepEqual([...kinds].sort(), ['colour', 'name', 'sides']);
 });

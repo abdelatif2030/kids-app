@@ -9,7 +9,7 @@
 //   3. things met before, the oldest first,
 //   4. things the PREVIOUS level just showed (last, so two levels in a row differ).
 
-const MAX_SEEN = 500; // keys remembered (about two full vocabularies)
+const MAX_SEEN = 1500; // keys remembered (the whole bank of things plus a cycle or two)
 const SPOT = 12;      // one thing in twelve is "this week's spotlight"
 
 /** The calendar week number (7-day blocks since 1970); the spotlight changes when it changes. */

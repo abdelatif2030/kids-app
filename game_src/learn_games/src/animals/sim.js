@@ -82,13 +82,19 @@ export const FOODS = {
   flower: { the: 'الزهرة', thing: 't_flower' },
 };
 export const ROUNDS = 8;
-export const MIN_GROUP = 5;
+export const MIN_GROUP = 8; // a world shows only its own animals when it has at least a full game (eight) of them for the age
 /** The animals of this age; with a world, that world's own animals (when it has enough of them for the age). */
 export function poolFor(age, world = null) {
   const ofAge = ANIMALS.filter((a) => a.age <= Math.max(4, age));
   if (!world) return ofAge;
   const own = ofAge.filter((a) => a.groups.includes(world));
   return own.length >= MIN_GROUP ? own : ofAge;
+}
+/** Age-free bank of the animals level: every animal, or the world's own animals when it has at least a full game (eight) of them. */
+export function bankFor(world = null) {
+  if (!world) return ANIMALS;
+  const own = ANIMALS.filter((a) => a.groups.includes(world));
+  return own.length >= MIN_GROUP ? own : ANIMALS;
 }
 /** Every food the animal may eat (the asked one first): a wrong plate is never one of them. */
 export const edibleBy = (a) => [a.food, ...(a.also || [])];
