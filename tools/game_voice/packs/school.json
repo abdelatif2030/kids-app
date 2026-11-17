@@ -1,0 +1,129 @@
+{
+ "pack": "school",
+ "prefix": "e",
+ "title": "School",
+ "cols": 4,
+ "rows": 3,
+ "items": [
+  {
+   "id": "e_pencil",
+   "thing": "e_pencil",
+   "letter": "qaaf",
+   "word": "قلم",
+   "wd": "قَلَم",
+   "the": "القلم",
+   "thed": "القَلَم",
+   "age": 3
+  },
+  {
+   "id": "e_book",
+   "thing": "e_book",
+   "letter": "kaaf",
+   "word": "كتاب",
+   "wd": "كِتَاب",
+   "the": "الكتاب",
+   "thed": "الكِتَاب",
+   "age": 3
+  },
+  {
+   "id": "e_notebook",
+   "thing": "e_notebook",
+   "letter": "kaaf",
+   "word": "كراسة",
+   "wd": "كُرَّاسَة",
+   "the": "الكراسة",
+   "thed": "الكُرَّاسَة",
+   "age": 4
+  },
+  {
+   "id": "e_scissors",
+   "thing": "e_scissors",
+   "letter": "meem",
+   "word": "مقص",
+   "wd": "مَقَص",
+   "the": "المقص",
+   "thed": "المَقَص",
+   "age": 5
+  },
+  {
+   "id": "e_ruler",
+   "thing": "e_ruler",
+   "letter": "meem",
+   "word": "مسطرة",
+   "wd": "مِسْطَرَة",
+   "the": "المسطرة",
+   "thed": "المِسْطَرَة",
+   "age": 5
+  },
+  {
+   "id": "e_eraser",
+   "thing": "e_eraser",
+   "letter": "alef",
+   "word": "أستيكة",
+   "wd": "أُسْتِيكَة",
+   "the": "الأستيكة",
+   "thed": "الأُسْتِيكَة",
+   "age": 5
+  },
+  {
+   "id": "e_crayons",
+   "thing": "e_crayons",
+   "letter": "alef",
+   "word": "ألوان",
+   "wd": "أَلْوَان",
+   "the": "الألوان",
+   "thed": "الأَلْوَان",
+   "age": 4
+  },
+  {
+   "id": "e_board",
+   "thing": "e_board",
+   "letter": "seen",
+   "word": "سبورة",
+   "wd": "سَبُّورَة",
+   "the": "السبورة",
+   "thed": "السَّبُّورَة",
+   "age": 5
+  },
+  {
+   "id": "e_map",
+   "thing": "e_map",
+   "letter": "khaa",
+   "word": "خريطة",
+   "wd": "خَرِيطَة",
+   "the": "الخريطة",
+   "thed": "الخَرِيطَة",
+   "age": 6
+  },
+  {
+   "id": "e_glue",
+   "thing": "e_glue",
+   "letter": "sad",
+   "word": "صمغ",
+   "wd": "صَمْغ",
+   "the": "الصمغ",
+   "thed": "الصَّمْغ",
+   "age": 6
+  },
+  {
+   "id": "e_desk",
+   "thing": "e_desk",
+   "letter": "meem",
+   "word": "مكتب",
+   "wd": "مَكْتَب",
+   "the": "المكتب",
+   "thed": "المَكْتَب",
+   "age": 5
+  },
+  {
+   "id": "e_paper",
+   "thing": "e_paper",
+   "letter": "waaw",
+   "word": "ورقة",
+   "wd": "وَرَقَة",
+   "the": "الورقة",
+   "thed": "الوَرَقَة",
+   "age": 4
+  }
+ ]
+}

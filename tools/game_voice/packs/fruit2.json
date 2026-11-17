@@ -1,0 +1,129 @@
+{
+ "pack": "fruit2",
+ "prefix": "q",
+ "title": "More fruit",
+ "cols": 4,
+ "rows": 3,
+ "items": [
+  {
+   "id": "q_kiwi",
+   "thing": "q_kiwi",
+   "letter": "kaaf",
+   "word": "كيوي",
+   "wd": "كِيوِي",
+   "the": "الكيوي",
+   "thed": "الكِيوِي",
+   "age": 5
+  },
+  {
+   "id": "q_melon",
+   "thing": "q_melon",
+   "letter": "sheen",
+   "word": "شمام",
+   "wd": "شَمَّام",
+   "the": "الشمام",
+   "thed": "الشَّمَّام",
+   "age": 5
+  },
+  {
+   "id": "q_dates",
+   "thing": "q_dates",
+   "letter": "baa",
+   "word": "بلح",
+   "wd": "بَلَح",
+   "the": "البلح",
+   "thed": "البَلَح",
+   "age": 5
+  },
+  {
+   "id": "q_fig",
+   "thing": "q_fig",
+   "letter": "taa",
+   "word": "تين",
+   "wd": "تِين",
+   "the": "التين",
+   "thed": "التِّين",
+   "age": 5
+  },
+  {
+   "id": "q_apricot",
+   "thing": "q_apricot",
+   "letter": "meem",
+   "word": "مشمش",
+   "wd": "مِشْمِش",
+   "the": "المشمش",
+   "thed": "المِشْمِش",
+   "age": 5
+  },
+  {
+   "id": "q_berries",
+   "thing": "q_berries",
+   "letter": "taa",
+   "word": "توت",
+   "wd": "تُوت",
+   "the": "التوت",
+   "thed": "التُّوت",
+   "age": 4
+  },
+  {
+   "id": "q_plum",
+   "thing": "q_plum",
+   "letter": "baa",
+   "word": "برقوق",
+   "wd": "بَرْقُوق",
+   "the": "البرقوق",
+   "thed": "البَرْقُوق",
+   "age": 6
+  },
+  {
+   "id": "q_avocado",
+   "thing": "q_avocado",
+   "letter": "alef",
+   "word": "أفوكادو",
+   "wd": "أَفُوكَادُو",
+   "the": "الأفوكادو",
+   "thed": "الأَفُوكَادُو",
+   "age": 6
+  },
+  {
+   "id": "q_peach",
+   "thing": "q_peach",
+   "letter": "khaa",
+   "word": "خوخ",
+   "wd": "خُوخ",
+   "the": "الخوخ",
+   "thed": "الخُوخ",
+   "age": 5
+  },
+  {
+   "id": "q_cherry",
+   "thing": "q_cherry",
+   "letter": "kaaf",
+   "word": "كرز",
+   "wd": "كَرَز",
+   "the": "الكرز",
+   "thed": "الكَرَز",
+   "age": 4
+  },
+  {
+   "id": "q_olives",
+   "thing": "q_olives",
+   "letter": "zayn",
+   "word": "زيتون",
+   "wd": "زَيْتُون",
+   "the": "الزيتون",
+   "thed": "الزَّيْتُون",
+   "age": 5
+  },
+  {
+   "id": "q_coconut",
+   "thing": "q_coconut",
+   "letter": "noon",
+   "word": "نارجيل",
+   "wd": "نَارْجِيل",
+   "the": "النارجيل",
+   "thed": "النَّارْجِيل",
+   "age": 6
+  }
+ ]
+}

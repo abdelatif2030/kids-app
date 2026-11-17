@@ -52,6 +52,8 @@ import tashkeel_games
 tashkeel_games.add(M)
 import tashkeel_levels
 tashkeel_levels.add(M)
+import tashkeel_more
+tashkeel_more.add(M)
 strip = lambda s: re.sub('[ً-ْـٰ]', '', s)
 lines = [l['text'] for l in json.load(open('assets/games/learn_voice/lines.json', encoding='utf8')) if l['lang'] == 'ar']
 miss = [t for t in lines if t not in M]

@@ -25,7 +25,7 @@ export const FOODS = {
   cheese: { the: 'الجبنة' },
   seeds: { the: 'الحَب' },
 };
-export const ROUNDS = 5;
+export const ROUNDS = 8;
 export const poolFor = (age) => ANIMALS.slice(0, age <= 4 ? 3 : age === 5 ? 5 : 8);
 export const platesFor = (age) => (age <= 5 ? 3 : 4);
 export const animalById = (id) => ANIMALS.find((a) => a.id === id);

@@ -1,0 +1,129 @@
+{
+ "pack": "clothes",
+ "prefix": "l",
+ "title": "Clothes",
+ "cols": 4,
+ "rows": 3,
+ "items": [
+  {
+   "id": "l_shirt",
+   "thing": "l_shirt",
+   "letter": "qaaf",
+   "word": "قميص",
+   "wd": "قَمِيص",
+   "the": "القميص",
+   "thed": "القَمِيص",
+   "age": 4
+  },
+  {
+   "id": "l_trousers",
+   "thing": "l_trousers",
+   "letter": "baa",
+   "word": "بنطلون",
+   "wd": "بَنْطَلُون",
+   "the": "البنطلون",
+   "thed": "البَنْطَلُون",
+   "age": 4
+  },
+  {
+   "id": "l_dress",
+   "thing": "l_dress",
+   "letter": "faa",
+   "word": "فستان",
+   "wd": "فُسْتَان",
+   "the": "الفستان",
+   "thed": "الفُسْتَان",
+   "age": 4
+  },
+  {
+   "id": "l_hat",
+   "thing": "l_hat",
+   "letter": "qaaf",
+   "word": "قبعة",
+   "wd": "قُبَّعَة",
+   "the": "القبعة",
+   "thed": "القُبَّعَة",
+   "age": 4
+  },
+  {
+   "id": "l_socks",
+   "thing": "l_socks",
+   "letter": "sheen",
+   "word": "شراب",
+   "wd": "شُرَّاب",
+   "the": "الشراب",
+   "thed": "الشُّرَّاب",
+   "age": 3
+  },
+  {
+   "id": "l_jacket",
+   "thing": "l_jacket",
+   "letter": "jeem",
+   "word": "جاكت",
+   "wd": "جَاكِت",
+   "the": "الجاكت",
+   "thed": "الجَاكِت",
+   "age": 5
+  },
+  {
+   "id": "l_scarf",
+   "thing": "l_scarf",
+   "letter": "waaw",
+   "word": "وشاح",
+   "wd": "وِشَاح",
+   "the": "الوشاح",
+   "thed": "الوِشَاح",
+   "age": 6
+  },
+  {
+   "id": "l_gloves",
+   "thing": "l_gloves",
+   "letter": "qaaf",
+   "word": "قفاز",
+   "wd": "قُفَّاز",
+   "the": "القفاز",
+   "thed": "القُفَّاز",
+   "age": 6
+  },
+  {
+   "id": "l_glasses",
+   "thing": "l_glasses",
+   "letter": "noon",
+   "word": "نضارة",
+   "wd": "نَضَّارَة",
+   "the": "النضارة",
+   "thed": "النَّضَّارَة",
+   "age": 5
+  },
+  {
+   "id": "l_cap",
+   "thing": "l_cap",
+   "letter": "kaaf",
+   "word": "كاب",
+   "wd": "كَاب",
+   "the": "الكاب",
+   "thed": "الكَاب",
+   "age": 4
+  },
+  {
+   "id": "l_pajamas",
+   "thing": "l_pajamas",
+   "letter": "baa",
+   "word": "بيجامة",
+   "wd": "بِيجَامَة",
+   "the": "البيجامة",
+   "thed": "البِيجَامَة",
+   "age": 4
+  },
+  {
+   "id": "l_raincoat",
+   "thing": "l_raincoat",
+   "letter": "meem",
+   "word": "معطف",
+   "wd": "مِعْطَف",
+   "the": "المعطف",
+   "thed": "المِعْطَف",
+   "age": 6
+  }
+ ]
+}

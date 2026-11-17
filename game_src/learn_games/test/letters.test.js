@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { poolFor, makeRounds, fishFor, LettersPlay, question, reward, letterById, ROUNDS, LETTERS } from '../src/letters/sim.js';
 
 test('more letters for older children; targets come from the pool and never repeat in a row', () => {
-  assert.equal(poolFor(4).length, 4);
-  assert.equal(poolFor(5).length, 8);
+  assert.equal(poolFor(4).length, 8);
+  assert.equal(poolFor(5).length, 16);
   assert.equal(poolFor(6).length, 28);
   assert.equal(LETTERS.length, 28);
   for (const age of [4, 5, 6]) for (let s = 1; s < 50; s++) {

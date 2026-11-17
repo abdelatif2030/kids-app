@@ -1,0 +1,752 @@
+[
+ {
+  "id": "monkey",
+  "thing": "j_monkey",
+  "letter": "qaaf",
+  "word": "قرد",
+  "wd": "قِرْد",
+  "the": "القرد",
+  "thed": "القِرْد",
+  "age": 3
+ },
+ {
+  "id": "lion",
+  "thing": "j_lion",
+  "letter": "alef",
+  "word": "أسد",
+  "wd": "أَسَد",
+  "the": "الأسد",
+  "thed": "الأَسَد",
+  "age": 3
+ },
+ {
+  "id": "elephant",
+  "thing": "j_elephant",
+  "letter": "faa",
+  "word": "فيل",
+  "wd": "فِيل",
+  "the": "الفيل",
+  "thed": "الفِيل",
+  "age": 3
+ },
+ {
+  "id": "zebra",
+  "thing": "j_zebra",
+  "letter": "haa",
+  "word": "حمار وحشي",
+  "wd": "حِمَار وَحْشِي",
+  "the": "الحمار الوحشي",
+  "thed": "الحِمَار الوَحْشِي",
+  "age": 5
+ },
+ {
+  "id": "parrot",
+  "thing": "j_parrot",
+  "letter": "baa",
+  "word": "ببغاء",
+  "wd": "بَبَّغَاء",
+  "the": "الببغاء",
+  "thed": "البَبَّغَاء",
+  "age": 4
+ },
+ {
+  "id": "tiger",
+  "thing": "j_tiger",
+  "letter": "noon",
+  "word": "نمر",
+  "wd": "نِمِر",
+  "the": "النمر",
+  "thed": "النِّمِر",
+  "age": 4
+ },
+ {
+  "id": "toucan",
+  "thing": "j_toucan",
+  "letter": "tah",
+  "word": "طوقان",
+  "wd": "طُوقَان",
+  "the": "الطوقان",
+  "thed": "الطُّوقَان",
+  "age": 6
+ },
+ {
+  "id": "gorilla",
+  "thing": "j_gorilla",
+  "letter": "ghayn",
+  "word": "غوريلا",
+  "wd": "غُورِيلَّا",
+  "the": "الغوريلا",
+  "thed": "الغُورِيلَّا",
+  "age": 5
+ },
+ {
+  "id": "chameleon",
+  "thing": "j_chameleon",
+  "letter": "haa",
+  "word": "حرباء",
+  "wd": "حِرْبَاء",
+  "the": "الحرباء",
+  "thed": "الحِرْبَاء",
+  "age": 6
+ },
+ {
+  "id": "snake",
+  "thing": "j_snake",
+  "letter": "thaa",
+  "word": "ثعبان",
+  "wd": "ثُعْبَان",
+  "the": "الثعبان",
+  "thed": "الثُّعْبَان",
+  "age": 5
+ },
+ {
+  "id": "cow",
+  "thing": "f_cow",
+  "letter": "baa",
+  "word": "بقرة",
+  "wd": "بَقَرَة",
+  "the": "البقرة",
+  "thed": "البَقَرَة",
+  "age": 3
+ },
+ {
+  "id": "pig",
+  "thing": "f_pig",
+  "letter": "khaa",
+  "word": "خنزير",
+  "wd": "خِنْزِير",
+  "the": "الخنزير",
+  "thed": "الخِنْزِير",
+  "age": 4
+ },
+ {
+  "id": "goat",
+  "thing": "f_goat",
+  "letter": "meem",
+  "word": "ماعز",
+  "wd": "مَاعِز",
+  "the": "الماعز",
+  "thed": "المَاعِز",
+  "age": 5
+ },
+ {
+  "id": "donkey",
+  "thing": "f_donkey",
+  "letter": "haa",
+  "word": "حمار",
+  "wd": "حِمَار",
+  "the": "الحمار",
+  "thed": "الحِمَار",
+  "age": 4
+ },
+ {
+  "id": "rooster",
+  "thing": "f_rooster",
+  "letter": "dal",
+  "word": "ديك",
+  "wd": "دِيك",
+  "the": "الديك",
+  "thed": "الدِّيك",
+  "age": 3
+ },
+ {
+  "id": "octopus",
+  "thing": "u_octopus",
+  "letter": "alef",
+  "word": "أخطبوط",
+  "wd": "أُخْطُبُوط",
+  "the": "الأخطبوط",
+  "thed": "الأُخْطُبُوط",
+  "age": 5
+ },
+ {
+  "id": "turtle",
+  "thing": "u_turtle",
+  "letter": "seen",
+  "word": "سلحفاة",
+  "wd": "سُلَحْفَاة",
+  "the": "السلحفاة",
+  "thed": "السُّلَحْفَاة",
+  "age": 4
+ },
+ {
+  "id": "dolphin",
+  "thing": "u_dolphin",
+  "letter": "dal",
+  "word": "دولفين",
+  "wd": "دُولْفِين",
+  "the": "الدولفين",
+  "thed": "الدُّولْفِين",
+  "age": 5
+ },
+ {
+  "id": "whale",
+  "thing": "u_whale",
+  "letter": "haa",
+  "word": "حوت",
+  "wd": "حُوت",
+  "the": "الحوت",
+  "thed": "الحُوت",
+  "age": 4
+ },
+ {
+  "id": "crab",
+  "thing": "u_crab",
+  "letter": "seen",
+  "word": "سرطان",
+  "wd": "سَرَطَان",
+  "the": "السرطان",
+  "thed": "السَّرَطَان",
+  "age": 5
+ },
+ {
+  "id": "starfish",
+  "thing": "u_star",
+  "letter": "noon",
+  "word": "نجمة بحر",
+  "wd": "نَجْمَة بَحْر",
+  "the": "نجمة البحر",
+  "thed": "نَجْمَةْ البَحْر",
+  "age": 5
+ },
+ {
+  "id": "jellyfish",
+  "thing": "u_jelly",
+  "letter": "qaaf",
+  "word": "قنديل بحر",
+  "wd": "قِنْدِيل بَحْر",
+  "the": "قنديل البحر",
+  "thed": "قِنْدِيل البَحْر",
+  "age": 6
+ },
+ {
+  "id": "seahorse",
+  "thing": "u_seahorse",
+  "letter": "haa",
+  "word": "حصان بحر",
+  "wd": "حِصَان بَحْر",
+  "the": "حصان البحر",
+  "thed": "حِصَان البَحْر",
+  "age": 6
+ },
+ {
+  "id": "penguin",
+  "thing": "w_penguin",
+  "letter": "baa",
+  "word": "بطريق",
+  "wd": "بِطْرِيق",
+  "the": "البطريق",
+  "thed": "البِطْرِيق",
+  "age": 4
+ },
+ {
+  "id": "bear",
+  "thing": "w_bear",
+  "letter": "dal",
+  "word": "دب",
+  "wd": "دُبّ",
+  "the": "الدب",
+  "thed": "الدُّبّ",
+  "age": 3
+ },
+ {
+  "id": "owl",
+  "thing": "w_owl",
+  "letter": "baa",
+  "word": "بومة",
+  "wd": "بُومَة",
+  "the": "البومة",
+  "thed": "البُومَة",
+  "age": 4
+ },
+ {
+  "id": "reindeer",
+  "thing": "w_reindeer",
+  "letter": "raa",
+  "word": "رنة",
+  "wd": "رَنَّة",
+  "the": "الرنة",
+  "thed": "الرَّنَّة",
+  "age": 6
+ },
+ {
+  "id": "seal",
+  "thing": "w_seal",
+  "letter": "faa",
+  "word": "فقمة",
+  "wd": "فُقْمَة",
+  "the": "الفقمة",
+  "thed": "الفُقْمَة",
+  "age": 5
+ },
+ {
+  "id": "snowman",
+  "thing": "w_snowman",
+  "letter": "raa",
+  "word": "رجل ثلج",
+  "wd": "رَجُل ثَلْج",
+  "the": "رجل الثلج",
+  "thed": "رَجُل الثَّلْج",
+  "age": 5
+ },
+ {
+  "id": "pyramid",
+  "thing": "d_pyramid",
+  "letter": "haa2",
+  "word": "هرم",
+  "wd": "هَرَم",
+  "the": "الهرم",
+  "thed": "الهَرَم",
+  "age": 4
+ },
+ {
+  "id": "tent",
+  "thing": "d_tent",
+  "letter": "khaa",
+  "word": "خيمة",
+  "wd": "خَيْمَة",
+  "the": "الخيمة",
+  "thed": "الخَيْمَة",
+  "age": 4
+ },
+ {
+  "id": "palm",
+  "thing": "d_palm",
+  "letter": "noon",
+  "word": "نخلة",
+  "wd": "نَخْلَة",
+  "the": "النخلة",
+  "thed": "النَّخْلَة",
+  "age": 4
+ },
+ {
+  "id": "cactus",
+  "thing": "d_cactus",
+  "letter": "sad",
+  "word": "صبار",
+  "wd": "صَبَّار",
+  "the": "الصبار",
+  "thed": "الصَّبَّار",
+  "age": 6
+ },
+ {
+  "id": "scorpion",
+  "thing": "d_scorpion",
+  "letter": "ayn",
+  "word": "عقرب",
+  "wd": "عَقْرَب",
+  "the": "العقرب",
+  "thed": "العَقْرَب",
+  "age": 5
+ },
+ {
+  "id": "lizard",
+  "thing": "d_lizard",
+  "letter": "seen",
+  "word": "سحلية",
+  "wd": "سِحْلِيَّة",
+  "the": "السحلية",
+  "thed": "السِّحْلِيَّة",
+  "age": 6
+ },
+ {
+  "id": "hawk",
+  "thing": "d_hawk",
+  "letter": "sad",
+  "word": "صقر",
+  "wd": "صَقْر",
+  "the": "الصقر",
+  "thed": "الصَّقْر",
+  "age": 5
+ },
+ {
+  "id": "hotballoon",
+  "thing": "d_balloon",
+  "letter": "meem",
+  "word": "منطاد",
+  "wd": "مِنْطَاد",
+  "the": "المنطاد",
+  "thed": "المِنْطَاد",
+  "age": 5
+ },
+ {
+  "id": "jeep",
+  "thing": "d_jeep",
+  "letter": "jeem",
+  "word": "جيب",
+  "wd": "جِيب",
+  "the": "الجيب",
+  "thed": "الجِيب",
+  "age": 4
+ },
+ {
+  "id": "umbrella",
+  "thing": "b_umbrella",
+  "letter": "meem",
+  "word": "مظلة",
+  "wd": "مِظَلَّة",
+  "the": "المظلة",
+  "thed": "المِظَلَّة",
+  "age": 4
+ },
+ {
+  "id": "sandcastle",
+  "thing": "b_castle",
+  "letter": "qaaf",
+  "word": "قلعة",
+  "wd": "قَلْعَة",
+  "the": "القلعة",
+  "thed": "القَلْعَة",
+  "age": 4
+ },
+ {
+  "id": "shell",
+  "thing": "b_shell",
+  "letter": "sad",
+  "word": "صدفة",
+  "wd": "صَدَفَة",
+  "the": "الصدفة",
+  "thed": "الصَّدَفَة",
+  "age": 4
+ },
+ {
+  "id": "lighthouse",
+  "thing": "b_lighthouse",
+  "letter": "faa",
+  "word": "فنار",
+  "wd": "فَنَار",
+  "the": "الفنار",
+  "thed": "الفَنَار",
+  "age": 6
+ },
+ {
+  "id": "bed",
+  "thing": "h_bed",
+  "letter": "seen",
+  "word": "سرير",
+  "wd": "سَرِير",
+  "the": "السرير",
+  "thed": "السَّرِير",
+  "age": 3
+ },
+ {
+  "id": "toothbrush",
+  "thing": "h_toothbrush",
+  "letter": "faa",
+  "word": "فرشاة",
+  "wd": "فُرْشَاة",
+  "the": "الفرشاة",
+  "thed": "الفُرْشَاة",
+  "age": 5
+ },
+ {
+  "id": "sink",
+  "thing": "h_sink",
+  "letter": "haa",
+  "word": "حوض",
+  "wd": "حَوْض",
+  "the": "الحوض",
+  "thed": "الحَوْض",
+  "age": 5
+ },
+ {
+  "id": "towel",
+  "thing": "h_towel",
+  "letter": "meem",
+  "word": "منشفة",
+  "wd": "مِنْشَفَة",
+  "the": "المنشفة",
+  "thed": "المِنْشَفَة",
+  "age": 5
+ },
+ {
+  "id": "backpack",
+  "thing": "h_backpack",
+  "letter": "sheen",
+  "word": "شنطة",
+  "wd": "شَنْطَة",
+  "the": "الشنطة",
+  "thed": "الشَّنْطَة",
+  "age": 3
+ },
+ {
+  "id": "shoes",
+  "thing": "h_shoes",
+  "letter": "jeem",
+  "word": "جزمة",
+  "wd": "جَزْمَة",
+  "the": "الجزمة",
+  "thed": "الجَزْمَة",
+  "age": 3
+ },
+ {
+  "id": "wardrobe",
+  "thing": "h_wardrobe",
+  "letter": "dal",
+  "word": "دولاب",
+  "wd": "دُولَاب",
+  "the": "الدولاب",
+  "thed": "الدُّولَاب",
+  "age": 5
+ },
+ {
+  "id": "table",
+  "thing": "h_table",
+  "letter": "taa",
+  "word": "ترابيزة",
+  "wd": "تَرَابِيزَة",
+  "the": "الترابيزة",
+  "thed": "التَّرَابِيزَة",
+  "age": 5
+ },
+ {
+  "id": "broom",
+  "thing": "h_broom",
+  "letter": "meem",
+  "word": "مكنسة",
+  "wd": "مِكْنِسَة",
+  "the": "المكنسة",
+  "thed": "المِكْنِسَة",
+  "age": 5
+ },
+ {
+  "id": "clock",
+  "thing": "h_clock",
+  "letter": "seen",
+  "word": "ساعة",
+  "wd": "سَاعَة",
+  "the": "الساعة",
+  "thed": "السَّاعَة",
+  "age": 4
+ },
+ {
+  "id": "swing",
+  "thing": "h_swing",
+  "letter": "alef",
+  "word": "أرجوحة",
+  "wd": "أُرْجُوحَة",
+  "the": "الأرجوحة",
+  "thed": "الأُرْجُوحَة",
+  "age": 4
+ },
+ {
+  "id": "bike",
+  "thing": "h_bike",
+  "letter": "ayn",
+  "word": "عجلة",
+  "wd": "عَجَلَة",
+  "the": "العجلة",
+  "thed": "العَجَلَة",
+  "age": 4
+ },
+ {
+  "id": "tree",
+  "thing": "h_tree",
+  "letter": "sheen",
+  "word": "شجرة",
+  "wd": "شَجَرَة",
+  "the": "الشجرة",
+  "thed": "الشَّجَرَة",
+  "age": 3
+ },
+ {
+  "id": "school",
+  "thing": "c_school",
+  "letter": "meem",
+  "word": "مدرسة",
+  "wd": "مَدْرَسَة",
+  "the": "المدرسة",
+  "thed": "المَدْرَسَة",
+  "age": 4
+ },
+ {
+  "id": "hospital",
+  "thing": "c_hospital",
+  "letter": "meem",
+  "word": "مستشفى",
+  "wd": "مُسْتَشْفَى",
+  "the": "المستشفى",
+  "thed": "المُسْتَشْفَى",
+  "age": 5
+ },
+ {
+  "id": "trafficlight",
+  "thing": "c_light",
+  "letter": "alef",
+  "word": "إشارة",
+  "wd": "إِشَارَة",
+  "the": "الإشارة",
+  "thed": "الإِشَارَة",
+  "age": 5
+ },
+ {
+  "id": "fountain",
+  "thing": "c_fountain",
+  "letter": "noon",
+  "word": "نافورة",
+  "wd": "نَافُورَة",
+  "the": "النافورة",
+  "thed": "النَّافُورَة",
+  "age": 5
+ },
+ {
+  "id": "building",
+  "thing": "c_skyscraper",
+  "letter": "ayn",
+  "word": "عمارة",
+  "wd": "عِمَارَة",
+  "the": "العمارة",
+  "thed": "العِمَارَة",
+  "age": 4
+ },
+ {
+  "id": "king",
+  "thing": "k_king",
+  "letter": "meem",
+  "word": "ملك",
+  "wd": "مَلِك",
+  "the": "الملك",
+  "thed": "المَلِك",
+  "age": 4
+ },
+ {
+  "id": "queen",
+  "thing": "k_queen",
+  "letter": "meem",
+  "word": "ملكة",
+  "wd": "مَلِكَة",
+  "the": "الملكة",
+  "thed": "المَلِكَة",
+  "age": 5
+ },
+ {
+  "id": "dragon",
+  "thing": "k_dragon",
+  "letter": "taa",
+  "word": "تنين",
+  "wd": "تِنِّين",
+  "the": "التنين",
+  "thed": "التِّنِّين",
+  "age": 4
+ },
+ {
+  "id": "knight",
+  "thing": "k_knight",
+  "letter": "faa",
+  "word": "فارس",
+  "wd": "فَارِس",
+  "the": "الفارس",
+  "thed": "الفَارِس",
+  "age": 4
+ },
+ {
+  "id": "wizard",
+  "thing": "k_wizard",
+  "letter": "seen",
+  "word": "ساحر",
+  "wd": "سَاحِر",
+  "the": "الساحر",
+  "thed": "السَّاحِر",
+  "age": 5
+ },
+ {
+  "id": "treasure",
+  "thing": "k_chest",
+  "letter": "kaaf",
+  "word": "كنز",
+  "wd": "كَنْز",
+  "the": "الكنز",
+  "thed": "الكَنْز",
+  "age": 4
+ },
+ {
+  "id": "alien",
+  "thing": "s_alien",
+  "letter": "faa",
+  "word": "فضائي",
+  "wd": "فَضَائِي",
+  "the": "الفضائي",
+  "thed": "الفَضَائِي",
+  "age": 5
+ },
+ {
+  "id": "robot",
+  "thing": "s_robot",
+  "letter": "raa",
+  "word": "روبوت",
+  "wd": "رُوبُوت",
+  "the": "الروبوت",
+  "thed": "الرُّوبُوت",
+  "age": 4
+ },
+ {
+  "id": "moon",
+  "thing": "s_moon",
+  "letter": "qaaf",
+  "word": "قمر",
+  "wd": "قَمَر",
+  "the": "القمر",
+  "thed": "القَمَر",
+  "age": 3
+ },
+ {
+  "id": "star",
+  "thing": "s_star",
+  "letter": "noon",
+  "word": "نجمة",
+  "wd": "نَجْمَة",
+  "the": "النجمة",
+  "thed": "النَّجْمَة",
+  "age": 3
+ },
+ {
+  "id": "planet",
+  "thing": "s_ringplanet",
+  "letter": "kaaf",
+  "word": "كوكب",
+  "wd": "كَوْكَب",
+  "the": "الكوكب",
+  "thed": "الكَوْكَب",
+  "age": 5
+ },
+ {
+  "id": "balloon",
+  "thing": "r_balloons",
+  "letter": "baa",
+  "word": "بالون",
+  "wd": "بَالُون",
+  "the": "البالون",
+  "thed": "البَالُون",
+  "age": 3
+ },
+ {
+  "id": "cloud",
+  "thing": "r_cloud",
+  "letter": "seen",
+  "word": "سحابة",
+  "wd": "سَحَابَة",
+  "the": "السحابة",
+  "thed": "السَّحَابَة",
+  "age": 4
+ },
+ {
+  "id": "sweet",
+  "thing": "r_candy",
+  "letter": "haa",
+  "word": "حلوى",
+  "wd": "حَلْوَى",
+  "the": "الحلوى",
+  "thed": "الحَلْوَى",
+  "age": 4
+ },
+ {
+  "id": "cake",
+  "thing": "r_cupcake",
+  "letter": "kaaf",
+  "word": "كعكة",
+  "wd": "كَعْكَة",
+  "the": "الكعكة",
+  "thed": "الكَعْكَة",
+  "age": 4
+ }
+]

@@ -34,8 +34,8 @@ export const LETTERS = [
   { id: 'haa2', thing: 'crescent', ch: 'ه', the: 'الهاء', word: 'هلال', pic: '🌙' },
   { id: 'yaa', thing: 'dove', ch: 'ي', the: 'الياء', word: 'يمامة', pic: '🕊️' },
 ];
-export const ROUNDS = 5;
-export const poolFor = (age) => LETTERS.slice(0, age <= 4 ? 4 : age === 5 ? 8 : LETTERS.length);
+export const ROUNDS = 8; // eight questions per level (owner 2026-11-17)
+export const poolFor = (age) => LETTERS.slice(0, age <= 4 ? 8 : age === 5 ? 16 : LETTERS.length);
 export const fishCount = (age) => (age <= 4 ? 3 : 4);
 export const letterById = (id) => LETTERS.find((l) => l.id === id);
 export const question = (l) => `فين حرف ${l.the}؟`;

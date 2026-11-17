@@ -1,0 +1,129 @@
+{
+ "pack": "family",
+ "prefix": "a",
+ "title": "Family (friendly cartoon people, standing, different ages)",
+ "cols": 4,
+ "rows": 3,
+ "items": [
+  {
+   "id": "a_mama",
+   "thing": "a_mama",
+   "letter": "meem",
+   "word": "ماما",
+   "wd": "مَامَا",
+   "the": "الماما",
+   "thed": "المَامَا",
+   "age": 3
+  },
+  {
+   "id": "a_baba",
+   "thing": "a_baba",
+   "letter": "baa",
+   "word": "بابا",
+   "wd": "بَابَا",
+   "the": "البابا",
+   "thed": "البَابَا",
+   "age": 3
+  },
+  {
+   "id": "a_grandma",
+   "thing": "a_grandma",
+   "letter": "taa",
+   "word": "تيتة",
+   "wd": "تِيتَة",
+   "the": "التيتة",
+   "thed": "التِّيتَة",
+   "age": 3
+  },
+  {
+   "id": "a_grandpa",
+   "thing": "a_grandpa",
+   "letter": "jeem",
+   "word": "جدو",
+   "wd": "جَدُّو",
+   "the": "الجدو",
+   "thed": "الجَدُّو",
+   "age": 3
+  },
+  {
+   "id": "a_baby",
+   "thing": "a_baby",
+   "letter": "tah",
+   "word": "طفل",
+   "wd": "طِفْل",
+   "the": "الطفل",
+   "thed": "الطِّفْل",
+   "age": 3
+  },
+  {
+   "id": "a_brother",
+   "thing": "a_brother",
+   "letter": "alef",
+   "word": "أخ",
+   "wd": "أَخ",
+   "the": "الأخ",
+   "thed": "الأَخ",
+   "age": 4
+  },
+  {
+   "id": "a_sister",
+   "thing": "a_sister",
+   "letter": "alef",
+   "word": "أخت",
+   "wd": "أُخْت",
+   "the": "الأخت",
+   "thed": "الأُخْت",
+   "age": 4
+  },
+  {
+   "id": "a_boy",
+   "thing": "a_boy",
+   "letter": "waaw",
+   "word": "ولد",
+   "wd": "وَلَد",
+   "the": "الولد",
+   "thed": "الوَلَد",
+   "age": 3
+  },
+  {
+   "id": "a_girl",
+   "thing": "a_girl",
+   "letter": "baa",
+   "word": "بنت",
+   "wd": "بِنْت",
+   "the": "البنت",
+   "thed": "البِنْت",
+   "age": 3
+  },
+  {
+   "id": "a_friends",
+   "thing": "a_friends",
+   "letter": "sad",
+   "word": "صحاب",
+   "wd": "صُحَاب",
+   "the": "الصحاب",
+   "thed": "الصُّحَاب",
+   "age": 5
+  },
+  {
+   "id": "a_family",
+   "thing": "a_family",
+   "letter": "ayn",
+   "word": "عيلة",
+   "wd": "عِيلَة",
+   "the": "العيلة",
+   "thed": "العِيلَة",
+   "age": 5
+  },
+  {
+   "id": "a_uncle",
+   "thing": "a_uncle",
+   "letter": "ayn",
+   "word": "عمو",
+   "wd": "عَمُّو",
+   "the": "العمو",
+   "thed": "العَمُّو",
+   "age": 5
+  }
+ ]
+}

@@ -15,6 +15,7 @@ import { ROUNDS, poolFor, fishCount, letterById, question, LETTERS } from './sim
 import { tilesOf, makeRounds as shapeRounds, withColour, shapeById, colorById, question as shapeQuestion, reward as shapeReward } from '../shapes/sim.js';
 import { ANIMALS, platesOf, animalById, question as animalQuestion, reward as animalReward, poolFor as animalPool, FOODS } from '../animals/sim.js';
 import { optionsFor, maxCountFor, COUNT_Q } from '../counting/sim.js';
+import MORE_WORDS from './more_words.json' with { type: 'json' };
 
 export const LEVELS = [
   { id: 'letters', mode: 'letter', ar: 'اصطاد الحرف', emoji: '🔤', skill: 'letters_ar' },
@@ -49,6 +50,7 @@ export const PICKS = {
       { id: 'strawberry', the: 'الفراولة', thing: 'strawberry' }, { id: 'pear', the: 'الكمثرى', thing: 'pear' }, { id: 'grapes', the: 'العنب', thing: 'grapes' },
       { id: 'watermelon', the: 'البطيخ', thing: 'watermelon' }, { id: 'carrot', the: 'الجزرة', thing: 'carrot' }, { id: 'corn', the: 'الذرة', thing: 'corn' },
       { id: 'pineapple', the: 'الأناناس', thing: 'pineapple' }, { id: 'mango', the: 'المانجا', thing: 'mango' },
+      { id: 'lemon', the: 'الليمونة', thing: 'lemon' }, { id: 'pomegranate', the: 'الرمانة', thing: 'pomegranate' },
     ],
   },
   vehicles: {
@@ -58,6 +60,9 @@ export const PICKS = {
       { id: 'plane', the: 'الطيارة', thing: 'plane' }, { id: 'train', the: 'القطر', thing: 'train' }, { id: 'rocket', the: 'الصاروخ', thing: 'rocket' },
       { id: 'firetruck', the: 'عربية المطافي', thing: 'firetruck' }, { id: 'ambulance', the: 'عربية الإسعاف', thing: 'ambulance' },
       { id: 'police', the: 'عربية الشرطة', thing: 'police' }, { id: 'helicopter', the: 'الهليكوبتر', thing: 'helicopter' },
+      { id: 'schoolbus', the: 'الأتوبيس المدرسي', thing: 'c_schoolbus' }, { id: 'citybus', the: 'أتوبيس المدينة', thing: 'c_citybus' }, { id: 'taxi', the: 'التاكسي', thing: 'c_taxi' },
+      { id: 'tram', the: 'الترام', thing: 'c_tram' }, { id: 'bulldozer', the: 'الجرافة', thing: 'c_bulldozer' }, { id: 'bike', the: 'العجلة', thing: 'h_bike' },
+      { id: 'jeep', the: 'الجيب', thing: 'd_jeep' }, { id: 'hotballoon', the: 'المنطاد', thing: 'd_balloon' }, { id: 'felucca', the: 'الفلوكة', thing: 'd_boat' }, { id: 'donkeycart', the: 'عربة الحمار', thing: 'd_donkeycart' },
     ],
   },
 };
@@ -67,6 +72,17 @@ export const levelsFor = (age) => (age <= 4 ? LEVELS.filter((l) => l.id !== 'fir
 
 /** The alphabet in its real order (the list in sim.js is ordered by how easy a letter is to hear). */
 export const ALPHABET = ['alef', 'baa', 'taa', 'thaa', 'jeem', 'haa', 'khaa', 'dal', 'dhal', 'raa', 'zayn', 'seen', 'sheen', 'sad', 'dad', 'tah', 'zah', 'ayn', 'ghayn', 'faa', 'qaaf', 'kaaf', 'laam', 'meem', 'noon', 'haa2', 'waaw', 'yaa'];
+
+/** Every picture-with-a-word of the "words" and "first letter" levels: the 28 letter words, then the extra words (more_words.json). */
+export const WORD_ITEMS = [
+  ...LETTERS.map((l, i) => ({ id: l.id, letter: l.id, thing: l.thing, word: l.word, the: null, age: i < 8 ? 3 : i < 16 ? 5 : 6 })),
+  ...MORE_WORDS.map((w) => ({ id: `w_${w.id}`, letter: w.letter, thing: w.thing, word: w.word, the: w.the, age: w.age })),
+];
+export const wordItems = (age) => WORD_ITEMS.filter((w) => w.age <= age);
+export const wordThe = (w) => w.the || WORD_THE[w.id];
+export const wordQ = (w) => `فين ${wordThe(w)}؟`;
+export const firstQ = (w) => `إيه الحرف الأول في كلمة ${w.word}؟`;
+export const wordReward = (w) => `${letterById(w.letter).the} زي ${w.word}`;
 
 /** The thing's name with "the" (for "where is the rabbit?"). */
 export const WORD_THE = {
@@ -95,6 +111,16 @@ export const HABITS = [
   { text: 'يلا نتعشى', answer: 'plate' },
   { text: 'صاحبك عايز يلعب، نشاركه إيه؟', answer: 'teddy' },
   { text: 'نقول لصاحبنا كلمة حلوة ونحبه', answer: 'heart' },
+  { text: 'يلا ننشف إيدينا', answer: 'h_towel' },
+  { text: 'يلا نلبس الجزمة', answer: 'h_shoes' },
+  { text: 'يلا نرتب لعبنا', answer: 'h_toybox' },
+  { text: 'يلا نكنس الأوضة', answer: 'h_broom' },
+  { text: 'يلا نرمي الزبالة في الصندوق', answer: 'h_bin' },
+  { text: 'يلا نلبس هدومنا', answer: 'h_wardrobe' },
+  { text: 'يلا نشوف الساعة كام', answer: 'h_clock' },
+  { text: 'يلا نسقي الزرع', answer: 'h_wateringcan' },
+  { text: 'يلا نلعب بالكورة', answer: 'h_ball' },
+  { text: 'يلا نقعد ونرسم على الترابيزة', answer: 'h_table' },
 ];
 export const HABIT_ITEMS = [...new Set(HABITS.map((h) => h.answer))];
 
@@ -183,6 +209,24 @@ export class LevelPlay {
       for (const h of chosen) {
         const others = pick(r, HABIT_ITEMS.filter((x) => x !== h.answer), nOpt - 1);
         out.push({ prompt: h.text, answer: h.answer, show: null, options: [h.answer, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'thing', thing: x })) });
+      }
+    } else if (mode === 'word' || mode === 'first') {
+      const items = wordItems(this.age);
+      const next = bag(items.map((x) => x.id));
+      let last = null;
+      for (let i = 0; i < ROUNDS; i++) {
+        let id = next();
+        if (id === last) id = next();
+        last = id;
+        const w = items.find((x) => x.id === id);
+        if (mode === 'word') {
+          const others = pick(r, items.filter((x) => x.id !== id && x.thing !== w.thing), nOpt - 1);
+          out.push({ prompt: wordQ(w), answer: id, reward: wordReward(w), options: [w, ...others].sort(() => r() - 0.5).map((x) => ({ id: x.id, kind: 'thing', thing: x.thing })) });
+        } else {
+          const letters = [...new Set(items.map((x) => x.letter))].filter((x) => x !== w.letter);
+          const others = pick(r, letters, nOpt - 1);
+          out.push({ prompt: firstQ(w), answer: w.letter, reward: wordReward(w), show: { type: 'thing', thing: w.thing }, options: [w.letter, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'letter', ch: letterById(x).ch })) });
+        }
       }
     } else {
       const next = bag(pool);

@@ -1,0 +1,129 @@
+{
+ "pack": "jobs",
+ "prefix": "z",
+ "title": "People who help us (friendly cartoon adults, standing)",
+ "cols": 4,
+ "rows": 3,
+ "items": [
+  {
+   "id": "z_doctor",
+   "thing": "z_doctor",
+   "letter": "dal",
+   "word": "دكتور",
+   "wd": "دُكْتُور",
+   "the": "الدكتور",
+   "thed": "الدُّكْتُور",
+   "age": 3
+  },
+  {
+   "id": "z_teacher",
+   "thing": "z_teacher",
+   "letter": "meem",
+   "word": "مدرس",
+   "wd": "مُدَرِّس",
+   "the": "المدرس",
+   "thed": "المُدَرِّس",
+   "age": 4
+  },
+  {
+   "id": "z_police",
+   "thing": "z_police",
+   "letter": "sheen",
+   "word": "شرطي",
+   "wd": "شُرْطِي",
+   "the": "الشرطي",
+   "thed": "الشُّرْطِي",
+   "age": 4
+  },
+  {
+   "id": "z_firefighter",
+   "thing": "z_firefighter",
+   "letter": "alef",
+   "word": "إطفائي",
+   "wd": "إِطْفَائِي",
+   "the": "الإطفائي",
+   "thed": "الإِطْفَائِي",
+   "age": 5
+  },
+  {
+   "id": "z_farmer",
+   "thing": "z_farmer",
+   "letter": "faa",
+   "word": "فلاح",
+   "wd": "فَلَّاح",
+   "the": "الفلاح",
+   "thed": "الفَلَّاح",
+   "age": 5
+  },
+  {
+   "id": "z_cook",
+   "thing": "z_cook",
+   "letter": "tah",
+   "word": "طباخ",
+   "wd": "طَبَّاخ",
+   "the": "الطباخ",
+   "thed": "الطَّبَّاخ",
+   "age": 5
+  },
+  {
+   "id": "z_driver",
+   "thing": "z_driver",
+   "letter": "seen",
+   "word": "سواق",
+   "wd": "سَوَّاق",
+   "the": "السواق",
+   "thed": "السَّوَّاق",
+   "age": 5
+  },
+  {
+   "id": "z_pilot",
+   "thing": "z_pilot",
+   "letter": "tah",
+   "word": "طيار",
+   "wd": "طَيَّار",
+   "the": "الطيار",
+   "thed": "الطَّيَّار",
+   "age": 5
+  },
+  {
+   "id": "z_nurse",
+   "thing": "z_nurse",
+   "letter": "meem",
+   "word": "ممرضة",
+   "wd": "مُمَرِّضَة",
+   "the": "الممرضة",
+   "thed": "المُمَرِّضَة",
+   "age": 6
+  },
+  {
+   "id": "z_builder",
+   "thing": "z_builder",
+   "letter": "baa",
+   "word": "بناء",
+   "wd": "بَنَّاء",
+   "the": "البناء",
+   "thed": "البَنَّاء",
+   "age": 6
+  },
+  {
+   "id": "z_singer",
+   "thing": "z_singer",
+   "letter": "meem",
+   "word": "مطرب",
+   "wd": "مُطْرِب",
+   "the": "المطرب",
+   "thed": "المُطْرِب",
+   "age": 6
+  },
+  {
+   "id": "z_painter",
+   "thing": "z_painter",
+   "letter": "raa",
+   "word": "رسام",
+   "wd": "رَسَّام",
+   "the": "الرسام",
+   "thed": "الرَّسَّام",
+   "age": 5
+  }
+ ]
+}

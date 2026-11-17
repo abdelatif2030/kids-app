@@ -21,7 +21,7 @@ export const COLORS = [
   { id: 'green', hex: 0x2aa84a, m: 'أخضر', f: 'خضرا' },
   { id: 'orange', hex: 0xff8a1a, m: 'برتقالي', f: 'برتقالي' },
 ];
-export const ROUNDS = 5;
+export const ROUNDS = 8;
 export const tilesFor = (age) => (age <= 4 ? 3 : age === 5 ? 4 : 5);
 export const withColour = (age) => age >= 5;
 export const shapeById = (id) => SHAPES.find((s) => s.id === id);

@@ -1,0 +1,129 @@
+{
+ "pack": "weather",
+ "prefix": "t",
+ "title": "Weather and nature",
+ "cols": 4,
+ "rows": 3,
+ "items": [
+  {
+   "id": "t_rain",
+   "thing": "t_rain",
+   "letter": "meem",
+   "word": "مطر",
+   "wd": "مَطَر",
+   "the": "المطر",
+   "thed": "المَطَر",
+   "age": 4
+  },
+  {
+   "id": "t_snow",
+   "thing": "t_snow",
+   "letter": "thaa",
+   "word": "ثلج",
+   "wd": "ثَلْج",
+   "the": "الثلج",
+   "thed": "الثَّلْج",
+   "age": 4
+  },
+  {
+   "id": "t_wind",
+   "thing": "t_wind",
+   "letter": "haa2",
+   "word": "هوا",
+   "wd": "هَوَا",
+   "the": "الهوا",
+   "thed": "الهَوَا",
+   "age": 5
+  },
+  {
+   "id": "t_thunder",
+   "thing": "t_thunder",
+   "letter": "raa",
+   "word": "رعد",
+   "wd": "رَعْد",
+   "the": "الرعد",
+   "thed": "الرَّعْد",
+   "age": 6
+  },
+  {
+   "id": "t_lightning",
+   "thing": "t_lightning",
+   "letter": "baa",
+   "word": "برق",
+   "wd": "بَرْق",
+   "the": "البرق",
+   "thed": "البَرْق",
+   "age": 6
+  },
+  {
+   "id": "t_umbrella",
+   "thing": "t_umbrella",
+   "letter": "sheen",
+   "word": "شمسية",
+   "wd": "شَمْسِيَّة",
+   "the": "الشمسية",
+   "thed": "الشَّمْسِيَّة",
+   "age": 4
+  },
+  {
+   "id": "t_flake",
+   "thing": "t_flake",
+   "letter": "noon",
+   "word": "ندفة",
+   "wd": "نُدْفَة",
+   "the": "الندفة",
+   "thed": "النُّدْفَة",
+   "age": 6
+  },
+  {
+   "id": "t_flower",
+   "thing": "t_flower",
+   "letter": "zayn",
+   "word": "زهرة",
+   "wd": "زَهْرَة",
+   "the": "الزهرة",
+   "thed": "الزَّهْرَة",
+   "age": 3
+  },
+  {
+   "id": "t_leaves",
+   "thing": "t_leaves",
+   "letter": "alef",
+   "word": "أوراق",
+   "wd": "أَوْرَاق",
+   "the": "الأوراق",
+   "thed": "الأَوْرَاق",
+   "age": 5
+  },
+  {
+   "id": "t_hot",
+   "thing": "t_hot",
+   "letter": "haa",
+   "word": "حر",
+   "wd": "حَرّ",
+   "the": "الحر",
+   "thed": "الحَرّ",
+   "age": 5
+  },
+  {
+   "id": "t_cold",
+   "thing": "t_cold",
+   "letter": "baa",
+   "word": "برد",
+   "wd": "بَرْد",
+   "the": "البرد",
+   "thed": "البَرْد",
+   "age": 5
+  },
+  {
+   "id": "t_mountain",
+   "thing": "t_mountain",
+   "letter": "jeem",
+   "word": "جبل",
+   "wd": "جَبَل",
+   "the": "الجبل",
+   "thed": "الجَبَل",
+   "age": 5
+  }
+ ]
+}

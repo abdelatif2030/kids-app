@@ -20,6 +20,7 @@ import { shapeGeo } from '../kit/shapes3d.js';
 import { colorById } from '../shapes/sim.js';
 import { NUMBERS } from '../kit/words.js';
 import { LEVELS, LevelPlay, levelsFor, cheer } from './levels.js';
+import { ROUNDS } from './sim.js';
 
 const TEXT = {
   title: ['عالم رحلتي التعليمي', 'Rehlaty Learning World'],
@@ -201,18 +202,18 @@ class Game {
 
   _makeRack() {
     const g = new THREE.Group();
-    const board = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.25, 1.0), M(0xd8964a));
+    const board = new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.25, 0.8), M(0xd8964a));
     board.position.y = 0.75;
     board.castShadow = true;
     const back = new THREE.Mesh(new THREE.BoxGeometry(4.6, 1.3, 0.12), M(0xb8763a));
     back.position.set(0, 1.35, -0.45);
     g.add(board, back);
     for (const x of [-2.1, 2.1]) { const leg = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.75, 0.8), M(0xa86a3a)); leg.position.set(x, 0.37, 0); g.add(leg); }
-    this.slots = Array.from({ length: 5 }, (_, i) => {
-      const dish = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.05, 20), M(0xfff4d8));
-      dish.position.set(-1.75 + i * 0.88, 0.9, 0.1);
+    this.slots = Array.from({ length: ROUNDS }, (_, i) => {
+      const dish = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 0.05, 20), M(0xfff4d8));
+      dish.position.set(-1.96 + i * 0.56, 0.9, 0.1);
       g.add(dish);
-      return new THREE.Vector3(RACK.x + (-1.75 + i * 0.88) * RACK_S, 0.9 * RACK_S + 0.35, RACK.z + 0.1);
+      return new THREE.Vector3(RACK.x + (-1.96 + i * 0.56) * RACK_S, 0.9 * RACK_S + 0.35, RACK.z + 0.1);
     });
     g.position.copy(RACK);
     g.scale.setScalar(RACK_S);
@@ -524,7 +525,7 @@ class Game {
     this._goWorld(Math.max(0, levelsFor(sh.age).findIndex((l) => l.id === levelId)));
     this.play = new LevelPlay(levelId, sh.age, Math.floor(Math.random() * 1e9));
     sh.clear();
-    this.lightDots = sh.topBar(5, '⭐');
+    this.lightDots = sh.topBar(ROUNDS, '⭐');
     this.lightDots(0);
     this.sign = h('div', { class: 'lw-sign' });
     this.signText = h('span');
@@ -799,7 +800,7 @@ class Game {
         keep.getWorldScale(ws);
         L.o.g.remove(keep);
         keep.position.copy(wp);
-        keep.scale.copy(ws).multiplyScalar(0.8);
+        keep.scale.copy(ws).multiplyScalar(0.8 * 0.62);
         keep.rotation.set(0, 0, 0);
         this.st.add(keep);
         this.rackItems.push(keep);

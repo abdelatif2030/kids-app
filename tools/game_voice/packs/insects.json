@@ -1,0 +1,129 @@
+{
+ "pack": "insects",
+ "prefix": "i",
+ "title": "Small creatures and birds",
+ "cols": 4,
+ "rows": 3,
+ "items": [
+  {
+   "id": "i_ant",
+   "thing": "i_ant",
+   "letter": "noon",
+   "word": "نملة",
+   "wd": "نَمْلَة",
+   "the": "النملة",
+   "thed": "النَّمْلَة",
+   "age": 4
+  },
+  {
+   "id": "i_fly",
+   "thing": "i_fly",
+   "letter": "dhal",
+   "word": "ذبابة",
+   "wd": "ذُبَابَة",
+   "the": "الذبابة",
+   "thed": "الذُّبَابَة",
+   "age": 6
+  },
+  {
+   "id": "i_spider",
+   "thing": "i_spider",
+   "letter": "ayn",
+   "word": "عنكبوت",
+   "wd": "عَنْكَبُوت",
+   "the": "العنكبوت",
+   "thed": "العَنْكَبُوت",
+   "age": 6
+  },
+  {
+   "id": "i_worm",
+   "thing": "i_worm",
+   "letter": "dal",
+   "word": "دودة",
+   "wd": "دُودَة",
+   "the": "الدودة",
+   "thed": "الدُّودَة",
+   "age": 4
+  },
+  {
+   "id": "i_eagle",
+   "thing": "i_eagle",
+   "letter": "noon",
+   "word": "نسر",
+   "wd": "نِسْر",
+   "the": "النسر",
+   "thed": "النِّسْر",
+   "age": 6
+  },
+  {
+   "id": "i_peacock",
+   "thing": "i_peacock",
+   "letter": "tah",
+   "word": "طاووس",
+   "wd": "طَاوُوس",
+   "the": "الطاووس",
+   "thed": "الطَّاوُوس",
+   "age": 6
+  },
+  {
+   "id": "i_flamingo",
+   "thing": "i_flamingo",
+   "letter": "faa",
+   "word": "فلامنجو",
+   "wd": "فِلَامِنْجُو",
+   "the": "الفلامنجو",
+   "thed": "الفِلَامِنْجُو",
+   "age": 6
+  },
+  {
+   "id": "i_swan",
+   "thing": "i_swan",
+   "letter": "baa",
+   "word": "بجعة",
+   "wd": "بَجَعَة",
+   "the": "البجعة",
+   "thed": "البَجَعَة",
+   "age": 6
+  },
+  {
+   "id": "i_ostrich",
+   "thing": "i_ostrich",
+   "letter": "noon",
+   "word": "نعامة",
+   "wd": "نَعَامَة",
+   "the": "النعامة",
+   "thed": "النَّعَامَة",
+   "age": 6
+  },
+  {
+   "id": "i_sparrow",
+   "thing": "i_sparrow",
+   "letter": "ayn",
+   "word": "عصفورة",
+   "wd": "عُصْفُورَة",
+   "the": "العصفورة",
+   "thed": "العُصْفُورَة",
+   "age": 4
+  },
+  {
+   "id": "i_bat",
+   "thing": "i_bat",
+   "letter": "khaa",
+   "word": "خفاش",
+   "wd": "خُفَّاش",
+   "the": "الخفاش",
+   "thed": "الخُفَّاش",
+   "age": 6
+  },
+  {
+   "id": "i_snail",
+   "thing": "i_snail",
+   "letter": "haa",
+   "word": "حلزونة",
+   "wd": "حَلَزُونَة",
+   "the": "الحلزونة",
+   "thed": "الحَلَزُونَة",
+   "age": 5
+  }
+ ]
+}

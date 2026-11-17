@@ -90,6 +90,7 @@ const lv = await imp('letters/levels.js');
 for (const l of letters.LETTERS) { add(lv.wordQuestion(l), 'ar'); add(lv.firstQuestion(l), 'ar'); }
 for (const id of lv.ALPHABET.slice(0, -1)) add(lv.nextQuestion(letters.letterById(id)), 'ar');
 for (let n = 1; n <= 20; n++) add(lv.numberQuestion(n), 'ar');
+for (const w of lv.WORD_ITEMS) { add(lv.wordQ(w), 'ar'); add(lv.firstQ(w), 'ar'); add(lv.wordReward(w), 'ar'); }
 for (const hb of lv.HABITS) add(hb.text, 'ar');
 for (const tab of Object.values(lv.PICKS)) for (const it of tab.items) add(tab.prompt(it), 'ar');
 for (const c of [...lv.CHEERS_M, ...lv.CHEERS_F]) add(c, 'ar');

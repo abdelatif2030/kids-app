@@ -7,7 +7,7 @@
 // Ages: 4 → numbers 1-3 (all give), 5 → up to 6, 6 → up to 10. Five rounds; skill 'counting'; one event per round.
 import { rng } from '../maze/sim.js';
 
-export const ROUNDS = 5;
+export const ROUNDS = 8;
 export const maxFor = (age) => (age <= 4 ? 3 : age === 5 ? 6 : 10);
 /** Counting what is in the basket goes higher: up to twenty for the oldest. */
 export const maxCountFor = (age) => (age <= 4 ? 3 : age === 5 ? 6 : 20);

@@ -1,0 +1,129 @@
+{
+ "pack": "veg",
+ "prefix": "v",
+ "title": "Vegetables",
+ "cols": 4,
+ "rows": 3,
+ "items": [
+  {
+   "id": "v_tomato",
+   "thing": "v_tomato",
+   "letter": "tah",
+   "word": "طماطم",
+   "wd": "طَمَاطِم",
+   "the": "الطماطم",
+   "thed": "الطَّمَاطِم",
+   "age": 4
+  },
+  {
+   "id": "v_cucumber",
+   "thing": "v_cucumber",
+   "letter": "khaa",
+   "word": "خيار",
+   "wd": "خِيَار",
+   "the": "الخيار",
+   "thed": "الخِيَار",
+   "age": 4
+  },
+  {
+   "id": "v_potato",
+   "thing": "v_potato",
+   "letter": "baa",
+   "word": "بطاطس",
+   "wd": "بَطَاطِس",
+   "the": "البطاطس",
+   "thed": "البَطَاطِس",
+   "age": 4
+  },
+  {
+   "id": "v_onion",
+   "thing": "v_onion",
+   "letter": "baa",
+   "word": "بصل",
+   "wd": "بَصَل",
+   "the": "البصل",
+   "thed": "البَصَل",
+   "age": 5
+  },
+  {
+   "id": "v_eggplant",
+   "thing": "v_eggplant",
+   "letter": "baa",
+   "word": "باذنجان",
+   "wd": "بَاذِنْجَان",
+   "the": "الباذنجان",
+   "thed": "البَاذِنْجَان",
+   "age": 5
+  },
+  {
+   "id": "v_pepper",
+   "thing": "v_pepper",
+   "letter": "faa",
+   "word": "فلفل",
+   "wd": "فِلْفِل",
+   "the": "الفلفل",
+   "thed": "الفِلْفِل",
+   "age": 5
+  },
+  {
+   "id": "v_lettuce",
+   "thing": "v_lettuce",
+   "letter": "khaa",
+   "word": "خس",
+   "wd": "خَس",
+   "the": "الخس",
+   "thed": "الخَس",
+   "age": 5
+  },
+  {
+   "id": "v_broccoli",
+   "thing": "v_broccoli",
+   "letter": "baa",
+   "word": "بروكلي",
+   "wd": "بُرُوكْلِي",
+   "the": "البروكلي",
+   "thed": "البُرُوكْلِي",
+   "age": 5
+  },
+  {
+   "id": "v_peas",
+   "thing": "v_peas",
+   "letter": "baa",
+   "word": "بسلة",
+   "wd": "بِسِلَّة",
+   "the": "البسلة",
+   "thed": "البِسِلَّة",
+   "age": 6
+  },
+  {
+   "id": "v_pumpkin",
+   "thing": "v_pumpkin",
+   "letter": "qaaf",
+   "word": "قرع",
+   "wd": "قَرْع",
+   "the": "القرع",
+   "thed": "القَرْع",
+   "age": 5
+  },
+  {
+   "id": "v_garlic",
+   "thing": "v_garlic",
+   "letter": "thaa",
+   "word": "ثوم",
+   "wd": "ثُوم",
+   "the": "الثوم",
+   "thed": "الثُّوم",
+   "age": 6
+  },
+  {
+   "id": "v_mushroom",
+   "thing": "v_mushroom",
+   "letter": "faa",
+   "word": "فطر",
+   "wd": "فُطْر",
+   "the": "الفطر",
+   "thed": "الفُطْر",
+   "age": 6
+  }
+ ]
+}

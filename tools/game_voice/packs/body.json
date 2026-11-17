@@ -1,0 +1,129 @@
+{
+ "pack": "body",
+ "prefix": "y",
+ "title": "Body parts (cute, friendly, not realistic)",
+ "cols": 4,
+ "rows": 3,
+ "items": [
+  {
+   "id": "y_eye",
+   "thing": "y_eye",
+   "letter": "ayn",
+   "word": "عين",
+   "wd": "عَيْن",
+   "the": "العين",
+   "thed": "العَيْن",
+   "age": 3
+  },
+  {
+   "id": "y_ear",
+   "thing": "y_ear",
+   "letter": "waaw",
+   "word": "ودن",
+   "wd": "وِدْن",
+   "the": "الودن",
+   "thed": "الوِدْن",
+   "age": 3
+  },
+  {
+   "id": "y_nose",
+   "thing": "y_nose",
+   "letter": "alef",
+   "word": "أنف",
+   "wd": "أَنْف",
+   "the": "الأنف",
+   "thed": "الأَنْف",
+   "age": 3
+  },
+  {
+   "id": "y_mouth",
+   "thing": "y_mouth",
+   "letter": "faa",
+   "word": "فم",
+   "wd": "فَم",
+   "the": "الفم",
+   "thed": "الفَم",
+   "age": 3
+  },
+  {
+   "id": "y_hand",
+   "thing": "y_hand",
+   "letter": "alef",
+   "word": "إيد",
+   "wd": "إِيد",
+   "the": "الإيد",
+   "thed": "الإِيد",
+   "age": 3
+  },
+  {
+   "id": "y_foot",
+   "thing": "y_foot",
+   "letter": "raa",
+   "word": "رجل",
+   "wd": "رِجْل",
+   "the": "الرجل",
+   "thed": "الرِّجْل",
+   "age": 3
+  },
+  {
+   "id": "y_hair",
+   "thing": "y_hair",
+   "letter": "sheen",
+   "word": "شعر",
+   "wd": "شَعْر",
+   "the": "الشعر",
+   "thed": "الشَّعْر",
+   "age": 4
+  },
+  {
+   "id": "y_tooth",
+   "thing": "y_tooth",
+   "letter": "seen",
+   "word": "سنة",
+   "wd": "سِنَّة",
+   "the": "السنة",
+   "thed": "السِّنَّة",
+   "age": 4
+  },
+  {
+   "id": "y_head",
+   "thing": "y_head",
+   "letter": "raa",
+   "word": "راس",
+   "wd": "رَاس",
+   "the": "الراس",
+   "thed": "الرَّاس",
+   "age": 3
+  },
+  {
+   "id": "y_finger",
+   "thing": "y_finger",
+   "letter": "sad",
+   "word": "صباع",
+   "wd": "صُبَّاع",
+   "the": "الصباع",
+   "thed": "الصُّبَّاع",
+   "age": 4
+  },
+  {
+   "id": "y_knee",
+   "thing": "y_knee",
+   "letter": "raa",
+   "word": "ركبة",
+   "wd": "رُكْبَة",
+   "the": "الركبة",
+   "thed": "الرُّكْبَة",
+   "age": 5
+  },
+  {
+   "id": "y_belly",
+   "thing": "y_belly",
+   "letter": "baa",
+   "word": "بطن",
+   "wd": "بَطْن",
+   "the": "البطن",
+   "thed": "البَطْن",
+   "age": 5
+  }
+ ]
+}

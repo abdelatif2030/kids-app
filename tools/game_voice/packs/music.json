@@ -1,0 +1,129 @@
+{
+ "pack": "music",
+ "prefix": "m",
+ "title": "Music",
+ "cols": 4,
+ "rows": 3,
+ "items": [
+  {
+   "id": "m_drum",
+   "thing": "m_drum",
+   "letter": "tah",
+   "word": "طبلة",
+   "wd": "طَبْلَة",
+   "the": "الطبلة",
+   "thed": "الطَّبْلَة",
+   "age": 4
+  },
+  {
+   "id": "m_guitar",
+   "thing": "m_guitar",
+   "letter": "jeem",
+   "word": "جيتار",
+   "wd": "جِيتَار",
+   "the": "الجيتار",
+   "thed": "الجِيتَار",
+   "age": 5
+  },
+  {
+   "id": "m_piano",
+   "thing": "m_piano",
+   "letter": "baa",
+   "word": "بيانو",
+   "wd": "بِيَانُو",
+   "the": "البيانو",
+   "thed": "البِيَانُو",
+   "age": 5
+  },
+  {
+   "id": "m_violin",
+   "thing": "m_violin",
+   "letter": "kaaf",
+   "word": "كمان",
+   "wd": "كَمَان",
+   "the": "الكمان",
+   "thed": "الكَمَان",
+   "age": 5
+  },
+  {
+   "id": "m_flute",
+   "thing": "m_flute",
+   "letter": "noon",
+   "word": "ناي",
+   "wd": "نَاي",
+   "the": "الناي",
+   "thed": "النَّاي",
+   "age": 6
+  },
+  {
+   "id": "m_trumpet",
+   "thing": "m_trumpet",
+   "letter": "baa",
+   "word": "بوق",
+   "wd": "بُوق",
+   "the": "البوق",
+   "thed": "البُوق",
+   "age": 5
+  },
+  {
+   "id": "m_tambourine",
+   "thing": "m_tambourine",
+   "letter": "dal",
+   "word": "دف",
+   "wd": "دُفّ",
+   "the": "الدف",
+   "thed": "الدُّفّ",
+   "age": 5
+  },
+  {
+   "id": "m_oud",
+   "thing": "m_oud",
+   "letter": "ayn",
+   "word": "عود",
+   "wd": "عُود",
+   "the": "العود",
+   "thed": "العُود",
+   "age": 6
+  },
+  {
+   "id": "m_mic",
+   "thing": "m_mic",
+   "letter": "meem",
+   "word": "ميكروفون",
+   "wd": "مِيكْرُوفُون",
+   "the": "الميكروفون",
+   "thed": "المِيكْرُوفُون",
+   "age": 5
+  },
+  {
+   "id": "m_headphones",
+   "thing": "m_headphones",
+   "letter": "seen",
+   "word": "سماعة",
+   "wd": "سَمَّاعَة",
+   "the": "السماعة",
+   "thed": "السَّمَّاعَة",
+   "age": 5
+  },
+  {
+   "id": "m_note",
+   "thing": "m_note",
+   "letter": "noon",
+   "word": "نوتة",
+   "wd": "نُوتَة",
+   "the": "النوتة",
+   "thed": "النُّوتَة",
+   "age": 6
+  },
+  {
+   "id": "m_bell",
+   "thing": "m_bell",
+   "letter": "jeem",
+   "word": "جرس",
+   "wd": "جَرَس",
+   "the": "الجرس",
+   "thed": "الجَرَس",
+   "age": 4
+  }
+ ]
+}
