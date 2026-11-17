@@ -1,22 +1,22 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
 $__dart_deferred_initializers__.current=function(a,b,c,$){var A,B={
-ctN(d,e,f,g){var x=A.bE(new B.bOM(e,f,g),null,y.b)
+ctL(d,e,f,g){var x=A.bE(new B.bOL(e,f,g),null,y.b)
 A.an(d,!1).bj(x)},
-S_:function S_(d,e,f,g){var _=this
+RZ:function RZ(d,e,f,g){var _=this
 _.c=d
 _.d=e
 _.e=f
 _.a=g},
-an5:function an5(){this.c=this.a=this.d=null},
-bOM:function bOM(d,e,f){this.a=d
+an4:function an4(){this.c=this.a=this.d=null},
+bOL:function bOL(d,e,f){this.a=d
 this.b=e
 this.c=f}},C
 A=c[0]
 B=a.updateHolder(c[7],B)
 C=c[8]
-B.S_.prototype={
-U(){return new B.an5()}}
-B.an5.prototype={
+B.RZ.prototype={
+U(){return new B.an4()}}
+B.an4.prototype={
 aj(){this.aA()
 this.aJg()},
 aJg(){var x=this,w=x.a.d
@@ -40,14 +40,14 @@ u(d){var x,w,v,u=null
 if(this.a.c){x=$.m()
 w=x.a==="ar"?"\u0623\u0646\u0627 \u0645\u0646 \u0627\u0644\u0639\u0627\u0626\u0644\u0629":"I am family"}else{x=$.m()
 w=x.a==="ar"?"\u0639\u0627\u0626\u0644\u062a\u064a: \u0627\u0644\u0645\u062d\u0627\u062f\u062b\u0627\u062a":"Family chat"}v=A.bI(u,!0,u,u,u,u,u,u,A.d(w,u,u,u,u,u,u,u,u,u),u)
-return A.bs(v,u,new C.V_(x.a==="ar"?"\u0627\u0644\u0645\u062d\u0627\u062f\u062b\u0627\u062a \u0648\u0627\u0644\u0645\u0643\u0627\u0644\u0645\u0627\u062a \u0627\u0644\u0639\u0627\u0626\u0644\u064a\u0629.":"Family chat and calls.",u),u,!1,u,u)}}
+return A.bs(v,u,new C.UZ(x.a==="ar"?"\u0627\u0644\u0645\u062d\u0627\u062f\u062b\u0627\u062a \u0648\u0627\u0644\u0645\u0643\u0627\u0644\u0645\u0627\u062a \u0627\u0644\u0639\u0627\u0626\u0644\u064a\u0629.":"Family chat and calls.",u),u,!1,u,u)}}
 var z=a.updateTypes([])
-B.bOM.prototype={
-$1(d){return new B.S_(this.a,this.b,this.c,null)},
+B.bOL.prototype={
+$1(d){return new B.RZ(this.a,this.b,this.c,null)},
 $S:346};(function inheritance(){var x=a.inherit
-x(B.S_,A.T)
-x(B.an5,A.V)
-x(B.bOM,A.jw)})()
-A.ts(b.typeUniverse,JSON.parse('{"S_":{"T":[],"f":[]},"an5":{"V":["S_"]}}'))
+x(B.RZ,A.T)
+x(B.an4,A.V)
+x(B.bOL,A.jw)})()
+A.tr(b.typeUniverse,JSON.parse('{"RZ":{"T":[],"f":[]},"an4":{"V":["RZ"]}}'))
 var y={f:A.a_("+(jn?,p)"),b:A.a_("@")}};
-(a=>{a["usBJ5+qZCfjOoBsFsKjp96st2x0="]=a.current})($__dart_deferred_initializers__);
+(a=>{a["GoHLard+tZiouwJrYz4Jf9JVnbY="]=a.current})($__dart_deferred_initializers__);
