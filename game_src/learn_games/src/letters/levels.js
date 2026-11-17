@@ -12,7 +12,7 @@
 //   9 habits   Mama and Baba: "let's brush our teeth" pick the right thing  skill listening
 import { rng } from '../maze/sim.js';
 import { ROUNDS, poolFor, fishCount, letterById, question, LETTERS } from './sim.js';
-import { tilesOf, makeRounds as shapeRounds, withColour, shapeById, colorById, question as shapeQuestion, reward as shapeReward } from '../shapes/sim.js';
+import { SHAPES_ALL, SHAPE_TIERS, SHAPE_COLORS, SIDES_ASKED, shapePlan, findShapeQ, shapeSay, sidesQ, shapeWithSides } from './shapes_all.js';
 import { ANIMALS, platesOf, animalById, question as animalQuestion, reward as animalReward, poolFor as animalPool, FOODS } from '../animals/sim.js';
 import { optionsFor, COUNT_Q } from '../counting/sim.js';
 import { COLORS, COLOR_TIERS, COLOR_THINGS, colorPlan, colorChoices, findColorQ, findThingQ, colorOf } from './colors.js';
@@ -212,15 +212,57 @@ export class LevelPlay {
         out.push({ prompt: nextQuestion(cur), answer: ans, key: `l:${ans}`, from: ab[k], show: { type: 'letter', ch: cur.ch }, reward: rew(letterById(ans)), options: [ans, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'letter', ch: letterById(x).ch })) });
       }
     } else if (mode === 'shape') {
-      const targets = shapeRounds(this.age, this.seed);
-      targets.forEach((t, i) => {
-        const tiles = tilesOf(this.age, t, this.seed + i * 53);
-        const ask = withColour(this.age);
-        const ans = tiles.find((x) => x.shape === t.shape && (!ask || x.color === t.color));
-        const s = shapeById(t.shape);
-        const c = ask ? colorById(t.color) : null;
-        out.push({ prompt: shapeQuestion(s, c), answer: ans.id, reward: shapeReward(s, c), options: tiles.map((x) => ({ id: x.id, kind: 'shape', shape: x.shape, color: x.color })) });
-      });
+      // 20 shapes at every age (age picks the start): by name, by name and colour (shapes drawn in code), by number of sides (shapes.js)
+      const plan = shapePlan(this.age, ROUNDS, r);
+      const queues = {};
+      const code = (x) => x.render === 'code';
+      const draw = (tier, not, pred) => {
+        if (!queues[tier] || !queues[tier].some(pred)) queues[tier] = mem ? mem.order(SHAPE_TIERS[tier], (x) => `s:${x.id}`, r) : [...SHAPE_TIERS[tier]].sort(() => r() - 0.5);
+        let k = queues[tier].findIndex((x) => pred(x) && !not.includes(x.id));
+        if (k < 0) k = queues[tier].findIndex(pred);
+        return queues[tier].splice(k, 1)[0];
+      };
+      const shuffledColors = () => [...SHAPE_COLORS].sort(() => r() - 0.5);
+      /** One option for a shape: a coloured 3D shape (drawn in code) or the owner's own picture. */
+      const optionOf = (sh, color) => (code(sh) ? { id: sh.id, kind: 'shape', shape: sh.id, color } : { id: sh.id, kind: 'thing', thing: sh.art });
+      const nameOptions = (right, exclude = null) => {
+        const others = pickLow(SHAPES_ALL.filter((x) => x.id !== right.id && (!exclude || exclude(x))), nOpt - 1);
+        const cols = shuffledColors();
+        return [right, ...others].map((x, k) => optionOf(x, cols[k].id)).sort(() => r() - 0.5);
+      };
+      for (let i = 0; i < ROUNDS; i++) {
+        const { kind, tier } = plan[i];
+        const lastIds = out.map((x) => x.shapeId);
+        if (kind === 'sides') {
+          const cands = SIDES_ASKED.filter((n) => !lastIds.includes(shapeWithSides(n).id));
+          const n = (mem ? mem.order(cands, (x) => `s:${shapeWithSides(x).id}`, r) : [...cands].sort(() => r() - 0.5))[0];
+          const sh = shapeWithSides(n);
+          mark(sh.id);
+          out.push({ prompt: sidesQ(n), answer: sh.id, shapeId: sh.id, key: `s:${sh.id}`, reward: shapeSay(sh), options: nameOptions(sh, (x) => x.sides !== n) });
+        } else if (kind === 'colour') {
+          const sh = draw(tier, lastIds, code);
+          const col = shuffledColors()[0];
+          mark(sh.id);
+          const pickColor = (not) => shuffledColors().find((c) => !not.includes(c.id)).id;
+          const tiles = [{ shape: sh, color: col.id }];
+          const has = (a, b) => tiles.some((t) => t.shape.id === a && t.color === b);
+          const sameShape = pickColor([col.id]);
+          tiles.push({ shape: sh, color: sameShape });
+          const sameColour = pickLow(SHAPES_ALL.filter((x) => code(x) && x.id !== sh.id), 1)[0];
+          tiles.push({ shape: sameColour, color: col.id });
+          while (tiles.length < nOpt) {
+            const x = pickLow(SHAPES_ALL.filter((y) => code(y) && y.id !== sh.id && y.id !== sameColour.id), 1)[0];
+            const c = pickColor([col.id, sameShape]);
+            if (!has(x.id, c)) tiles.push({ shape: x, color: c });
+          }
+          out.push({ prompt: findShapeQ(sh, col), answer: `${sh.id}-${col.id}`, shapeId: sh.id, key: `s:${sh.id}`, reward: shapeSay(sh, col),
+            options: tiles.sort(() => r() - 0.5).map((t) => ({ id: `${t.shape.id}-${t.color}`, kind: 'shape', shape: t.shape.id, color: t.color })) });
+        } else {
+          const sh = draw(tier, lastIds, () => true);
+          mark(sh.id);
+          out.push({ prompt: findShapeQ(sh), answer: sh.id, shapeId: sh.id, key: `s:${sh.id}`, reward: shapeSay(sh), options: nameOptions(sh) });
+        }
+      }
     } else if (mode === 'animal') {
       const ids = animalPool(this.age, this.world).map((x) => x.id);
       const animalKey = (id) => `t:${animalById(id).thing}`;

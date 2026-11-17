@@ -41,9 +41,9 @@ test('habits: Mama or Baba, one right thing among other things', () => {
   assert.ok(HABIT_ITEMS.length >= 8);
   for (let s = 1; s < 30; s++) for (const r of new LevelPlay('habits', 6, s).rounds) assert.ok(!r.who && !r.show);
 });
-test('shapes level asks colour only from age five; animals level pairs an animal with its food', () => {
+test('shapes level asks colour only from age four; animals level pairs an animal with its food', () => {
   for (let s = 1; s < 30; s++) {
-    assert.ok(!new LevelPlay('shapes', 4, s).rounds.some((r) => /الأحمر|الحمرا|الأزرق|الزرقا|الأصفر|الصفرا|الأخضر|الخضرا|البرتقالي/.test(r.prompt)));
+    assert.ok(!new LevelPlay('shapes', 3, s).rounds.some((r) => /الأحمر|الحمرا|الأزرق|الزرقا|الأصفر|الصفرا|الأخضر|الخضرا|البرتقالي|البنفسجي|الوردي/.test(r.prompt)));
     for (const r of new LevelPlay('animals', 6, s).rounds) { assert.ok(r.show.thing); assert.ok(r.reward); }
   }
 });

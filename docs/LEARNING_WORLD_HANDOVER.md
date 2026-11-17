@@ -170,3 +170,9 @@ find / after / before / bigger / smaller (`allNumberSentences()` = 143 sentences
 peach, lilac, olive, mustard), families (a round never shows two shades of one family), `COLOR_THINGS` (10 colours with 2-5 art pictures each, looked at one by one),
 `colorTierCounts(age)` (age picks the start), question kinds «فين اللون X؟» (ball) and «فين الحاجة اللي لونها X؟» (pictures, from age 3). LEVELS.colors is mode 'color'.
 Voice: 24 new clips (`tashkeel_colors.py`; «الذهبي» is read «الدَّهَبِي»: listen to it). Black has one picture only, so it is asked as a ball only.
+
+## Shapes 20 (2026-11-17)
+`letters/shapes_all.js` (pure): 20 shapes in tiers (A circle/square/triangle, B star/heart/rectangle/oval, C diamond/pentagon/hexagon/octagon/crescent/plus/arrow/ring, D cube/ball/cone/cylinder/pyramid).
+`code` shapes are 3D meshes (kit/shapes3d.js: octagon, plus, crescent, pyramid added) and take 7 colours; `art` shapes are the owner's g_*.webp pictures (name only).
+Question kinds: name, name + colour (age 4+, colour round always has a same-shape and a same-colour distractor), number of sides (age 5+: 3, 5, 6, 8 only, those belong to one shape).
+Sentences gender-correct («ده مربع», «دي دايرة حمرا»). Voice: 115 new clips (`tashkeel_shapes.py`).

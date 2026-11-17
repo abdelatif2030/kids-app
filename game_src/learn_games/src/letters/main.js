@@ -17,7 +17,7 @@ import { stepSeconds } from '../kit/clips.js';
 // where the two worlds meet while they slide past each other (just outside the right edge of the screen at the start)
 const SEAM_X = 14.5;
 import { shapeGeo } from '../kit/shapes3d.js';
-import { colorById } from '../shapes/sim.js';
+import { colorOf } from './colors.js';
 import { NUMBERS } from '../kit/words.js';
 import { LEVELS, LevelPlay, levelsFor, cheer } from './levels.js';
 import { FreshMemory } from './fresh.js';
@@ -284,7 +284,7 @@ class Game {
       item.castShadow = true;
       g.add(item);
     } else if (o.kind === 'shape') {
-      item = new THREE.Mesh(shapeGeo(o.shape), new THREE.MeshStandardMaterial({ color: colorById(o.color).hex, roughness: 0.25, metalness: 0.05 }));
+      item = new THREE.Mesh(shapeGeo(o.shape), new THREE.MeshStandardMaterial({ color: colorOf(o.color).hex, roughness: 0.25, metalness: 0.05 }));
       item.position.set(0, 1.05 + lift, 0);
       item.scale.setScalar(0.95);
       item.castShadow = true;

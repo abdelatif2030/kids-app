@@ -58,6 +58,8 @@ import tashkeel_numbers
 tashkeel_numbers.add(M)
 import tashkeel_colors
 tashkeel_colors.add(M)
+import tashkeel_shapes
+tashkeel_shapes.add(M)
 strip = lambda s: re.sub('[ً-ْـٰ]', '', s)
 lines = [l['text'] for l in json.load(open('assets/games/learn_voice/lines.json', encoding='utf8')) if l['lang'] == 'ar']
 miss = [t for t in lines if t not in M]
