@@ -61,10 +61,9 @@ Arabic, short and concrete, and show him the result (screenshots / the demo) bef
   picks → `… apply picks.json …` copies the chosen takes. Pages are in `docs/voice_preview/` (27 = all new clips, 28 = first round of 28 sentences, 29 = second round
   of 6, 30 = qaf of قرد). **Applied so far:** 22 picks of round 1 (commit `04282eb`) and take **B** (hamza qaf) of «القاف زي قرد» (commit after `8fc9b92`).
   The 22 applied clips were compared byte-for-byte with the chosen takes.
-- **Still to apply (round 2, page `29_pick_takes_1117b.html`):** the owner has NOT yet told which take (A/B/C) he chose for: «إيه الحرف الأول في كلمة بالون؟»،
-  «الدال زي دولفين»، «الفاء زي فارس»، «الفاء زي فرشاة»، «يلا نشوف الساعة كام» (only «القاف زي قرد» was said to be the one to redo, then he chose B).
-  Ask him for A/B/C of those five, then apply with `takes.mjs apply` (see the script header) or copy the chosen take file over `assets/games/learn_voice/ar/<id>.mp3`,
-  ids: بالون 3515efc1, دولفين d930a9ff, فارس b9021808, فرشاة 1eb4113a, الساعة 8c703f50. Do not forget to deploy afterwards.
+- **Round 2 closed (2026-11-17):** the owner confirmed the voices are finished. The five sentences of round 2 (بالون, دولفين, فارس, فرشاة, الساعة) stay as they are in the game; his picks
+  of take C-version for «القاف زي قرد» (B) were applied. Nothing is pending in the voices review. (If he complains later: ids بالون 3515efc1, دولفين d930a9ff, فارس b9021808, فرشاة 1eb4113a,
+  الساعة 8c703f50; takes pages `docs/voice_preview/29_pick_takes_1117b.html`.)
 - Earlier hearts sentences («دي قلب …», qaf must not sound like «جلب») were redone with takes and the orange one applied (see git log `feefdc0`); #27–#30 were reported pending
   in the previous handover — re-check with the owner.
 
@@ -83,7 +82,7 @@ Arabic, short and concrete, and show him the result (screenshots / the demo) bef
 
 ## PART C — WHAT REMAINS (in order of value)
 
-1. **Apply the owner's picks for the 5 round-2 voice sentences** (see B2), deploy.
+1. ~~Apply the picks for the 5 round-2 voice sentences~~ — DONE/closed: the owner said the voices are finished (see B2).
 2. **Verify on the live demo** that new clips play (the live file lagged a few minutes after the last deploy: compare md5 of
    `https://demo-site-e3g.pages.dev/assets/assets/games/learn_voice/ar/f681e410.mp3` with the repo file `cd5107c2…`).
 3. **The 12 picture packs (144 more words)** — prompts in Appendix 1. The owner generates the sheets with a ChatGPT account and sends them one by one.
