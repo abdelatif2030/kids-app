@@ -19,7 +19,7 @@ done
 command -v flutter >/dev/null 2>&1 && echo "ok   flutter" || echo "note: flutter is only needed to build/deploy the demo"
 
 echo "== 3. learning game: build + tests =="
-( cd game_src/learn_games && { [ -d node_modules ] || npm install --silent; } && npm run build:letters 2>&1 | tail -1 && npm test 2>&1 | grep -E "^ℹ (pass|fail)" )
+( cd game_src/learn_games && { [ -d node_modules ] || npm install --silent; } && npm run build:letters 2>&1 | tail -1 && npm test 2>&1 | grep -E "^(ℹ|#) (pass|fail)" || true )
 
 echo "== 4. voices =="
 node -e "
