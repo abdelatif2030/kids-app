@@ -204,3 +204,45 @@ game(44, 'شاحنة الكور', 'Ball Scoop',
       ('road_scene', 'scene', 'A wooden plank road with red and blue rails over green meadow, curves and a ramp, no characters.'),
       ('ui_hud', 'ui', 'Level badge, ball counter with a ball icon, progress bar with truck and bank icons, upgrade buttons (start balls, wider shovel, coin value).'),
       ('card_ball_scoop', 'scene', CARD)])
+
+game(45, 'الأكول (متاهة الأشباح)', 'Chomp Maze',
+     "Neon arcade maze game art, glossy 3D-rendered cartoon, deep blue background with glowing wall blocks, cute round yellow chomper hero and four friendly colored ghost blobs, kid friendly, original characters.",
+     [('chomper_poses', 'sprite', 'A cute round yellow chomper character "Sunny" with big eyes: mouth closed, half open, wide open, happy win, dizzy; five files.'),
+      ('ghosts_four', 'sprite', 'Four friendly ghost blobs (pink, blue, green, orange) with big eyes: normal, scared blue, flashing white, eyes only; sixteen files.'),
+      ('fruit_dots', 'sprite', 'A glowing cream dot, a power cherry, a strawberry and a banana bonus; four files.'),
+      ('maze_walls_four', 'scene', 'Four neon maze wall styles (blue, red, purple, teal) as seamless wall tile sheets.'),
+      ('ui_hud', 'ui', 'Score badge, life icons, level badge, swipe hint hand icon.'),
+      ('card_chomp_maze', 'scene', CARD)])
+
+game(46, 'استوديو الأميرات', 'Princess Studio (dress-up)',
+     "Glamorous girly 3D-rendered cartoon dress-up game art, pastel pink and gold, sparkles, soft light, a cute big-eyed princess character, kid friendly, no real brands.",
+     [('doll_base_skins', 'sprite', 'A cute full-body princess doll base in front view, arms slightly out, five skin tones; five files.'),
+      ('gowns_ten', 'sprite', 'Ten gowns on transparent background matching the doll: white wedding gown, pink princess gown, royal blue gown, mermaid dress, yellow summer dress, red dress, purple dress, school outfit, golden gown, mint gown; ten files.'),
+      ('hairstyles_nine', 'sprite', 'Nine hairstyles (long brown, long blonde, red, elegant bun, ponytail, braid, pink curls, black curls, bob), front and back layers; eighteen files.'),
+      ('makeup_sets', 'sprite', 'Six lipstick colors on the lips, six eyeshadow colors on the eyes, four blush colors on the cheeks; sixteen files.'),
+      ('accessories_ten', 'sprite', 'A veil, crown, tiara, flower crown, pearl necklace, earrings, bouquet, bow, sun hat, bag; ten files.'),
+      ('shoes_six', 'sprite', 'White heels, pink heels, flats, sandals, boots, crystal shoes; six files.'),
+      ('scenes_six', 'scene', 'Six backgrounds: wedding hall, castle, beach, school, party, picnic garden; no characters, 1080x1920.'),
+      ('ui_tabs_buttons', 'ui', 'Round glossy pink category icons (dress, hair, lips, eyes, blush, extras, shoes, scene, skin), a dice surprise button, a heart save button, star rating.'),
+      ('card_princess_studio', 'scene', CARD)])
+
+game(47, 'ماريو (لعبة منصات كلاسيكية) (لسه ما اتبنتش)', 'Classic Platformer (Mario-style, original hero)',
+     "Bright cheerful 2D side-scrolling platformer art, rich saturated colors, bold outlines, original cartoon hero (NOT Mario), kid friendly, no real brands or characters.",
+     [('hero_poses', 'sprite', 'An original little adventurer hero with a red cap-less helmet and blue overalls: idle, run (3 frames), jump, fall, big (power-up), win; eight files.'),
+      ('enemies', 'sprite', 'Three friendly-looking enemies: a walking mushroom-bug, a shell turtle, a flying bee; two frames each, plus squashed; nine files.'),
+      ('blocks_pipes', 'sprite', 'Question blocks (and used), brick blocks, a green pipe, ground tiles, a floating cloud platform, a spring; ten files.'),
+      ('items', 'sprite', 'A spinning coin, a power-up mushroom, a star, a fire flower, a heart; five files.'),
+      ('worlds_backdrops', 'scene', 'Four parallax worlds: sunny hills, underground cave, desert pyramids, snowy castle; four layers each.'),
+      ('goal_flag_castle', 'sprite', 'A goal flag pole and a small castle.'),
+      ('ui_hud', 'ui', 'Coin counter, lives, timer, world badge, left/right/jump touch buttons.'),
+      ('card_platformer', 'scene', CARD)])
+
+game(48, 'النطاط (Doodle-style) (لسه ما اتبنتش)', 'Sky Jumper (Doodle-style)',
+     "Cute hand-drawn style endless jumper game art, notebook-paper background, rounded doodle creatures, bright pastel platforms, kid friendly.",
+     [('jumper_poses', 'sprite', 'A cute four-legged doodle creature with a long nose: idle, jump up, falling, shooting, win; five files.'),
+      ('platforms', 'sprite', 'Green normal platforms, blue moving platforms, brown crumbling platform, a spring platform; six files.'),
+      ('powerups', 'sprite', 'A propeller hat, a jetpack, a spring shoes, a shield bubble; four files.'),
+      ('enemies', 'sprite', 'Three silly monsters: a green blob, a purple two-eyed monster, a UFO; three files.'),
+      ('paper_backdrops', 'scene', 'Four graph-paper backgrounds with different pastel margin colors and doodles, 1080x1920.'),
+      ('ui_hud', 'ui', 'Height score badge, pause button, game-over screen frame.'),
+      ('card_sky_jumper', 'scene', CARD)])

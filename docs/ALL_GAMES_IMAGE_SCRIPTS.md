@@ -50,7 +50,11 @@
 | 42 | تنظيف السجاد (لسه ما اتبنتش) (Rug Cleaning) | 5 |
 | 43 | مقلاع الفايكنج (لسه ما اتبنتش) (Viking Slingshot) | 6 |
 | 44 | شاحنة الكور (Ball Scoop) | 8 |
-| | **المجموع** | **378** |
+| 45 | الأكول (متاهة الأشباح) (Chomp Maze) | 6 |
+| 46 | استوديو الأميرات (Princess Studio (dress-up)) | 9 |
+| 47 | ماريو (لعبة منصات كلاسيكية) (لسه ما اتبنتش) (Classic Platformer (Mario-style, original hero)) | 8 |
+| 48 | النطاط (Doodle-style) (لسه ما اتبنتش) (Sky Jumper (Doodle-style)) | 7 |
+| | **المجموع** | **408** |
 
 قواعد عامة: خلفية **شفافة** للشخصيات والعناصر (PNG)، من غير كلام على الصورة إلا لو مكتوب، ممنوع دم أو شيء مخيف (أطفال 1-6 سنين)، الاسم المكتوب هو اسم الملف. لو الاسم فيه `1..5` يبقى ملف لكل رقم.
 
@@ -915,4 +919,78 @@ Colorful 3D-rendered hyper-casual runner art, glossy candy balls, warm wooden ro
 6. `road_scene.png` — A wooden plank road with red and blue rails over green meadow, curves and a ramp, no characters. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
 7. `ui_hud.png` — Level badge, ball counter with a ball icon, progress bar with truck and bank icons, upgrade buttons (start balls, wider shovel, coin value). Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
 8. `card_ball_scoop.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 45. الأكول (متاهة الأشباح) — Chomp Maze (6 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Neon arcade maze game art, glossy 3D-rendered cartoon, deep blue background with glowing wall blocks, cute round yellow chomper hero and four friendly colored ghost blobs, kid friendly, original characters.
+```
+
+1. `chomper_poses.png` — A cute round yellow chomper character "Sunny" with big eyes: mouth closed, half open, wide open, happy win, dizzy; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `ghosts_four.png` — Four friendly ghost blobs (pink, blue, green, orange) with big eyes: normal, scared blue, flashing white, eyes only; sixteen files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `fruit_dots.png` — A glowing cream dot, a power cherry, a strawberry and a banana bonus; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `maze_walls_four.png` — Four neon maze wall styles (blue, red, purple, teal) as seamless wall tile sheets. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+5. `ui_hud.png` — Score badge, life icons, level badge, swipe hint hand icon. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+6. `card_chomp_maze.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 46. استوديو الأميرات — Princess Studio (dress-up) (9 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Glamorous girly 3D-rendered cartoon dress-up game art, pastel pink and gold, sparkles, soft light, a cute big-eyed princess character, kid friendly, no real brands.
+```
+
+1. `doll_base_skins.png` — A cute full-body princess doll base in front view, arms slightly out, five skin tones; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `gowns_ten.png` — Ten gowns on transparent background matching the doll: white wedding gown, pink princess gown, royal blue gown, mermaid dress, yellow summer dress, red dress, purple dress, school outfit, golden gown, mint gown; ten files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `hairstyles_nine.png` — Nine hairstyles (long brown, long blonde, red, elegant bun, ponytail, braid, pink curls, black curls, bob), front and back layers; eighteen files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `makeup_sets.png` — Six lipstick colors on the lips, six eyeshadow colors on the eyes, four blush colors on the cheeks; sixteen files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `accessories_ten.png` — A veil, crown, tiara, flower crown, pearl necklace, earrings, bouquet, bow, sun hat, bag; ten files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+6. `shoes_six.png` — White heels, pink heels, flats, sandals, boots, crystal shoes; six files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+7. `scenes_six.png` — Six backgrounds: wedding hall, castle, beach, school, party, picnic garden; no characters, 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+8. `ui_tabs_buttons.png` — Round glossy pink category icons (dress, hair, lips, eyes, blush, extras, shoes, scene, skin), a dice surprise button, a heart save button, star rating. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+9. `card_princess_studio.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 47. ماريو (لعبة منصات كلاسيكية) (لسه ما اتبنتش) — Classic Platformer (Mario-style, original hero) (8 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Bright cheerful 2D side-scrolling platformer art, rich saturated colors, bold outlines, original cartoon hero (NOT Mario), kid friendly, no real brands or characters.
+```
+
+1. `hero_poses.png` — An original little adventurer hero with a red cap-less helmet and blue overalls: idle, run (3 frames), jump, fall, big (power-up), win; eight files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `enemies.png` — Three friendly-looking enemies: a walking mushroom-bug, a shell turtle, a flying bee; two frames each, plus squashed; nine files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `blocks_pipes.png` — Question blocks (and used), brick blocks, a green pipe, ground tiles, a floating cloud platform, a spring; ten files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `items.png` — A spinning coin, a power-up mushroom, a star, a fire flower, a heart; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `worlds_backdrops.png` — Four parallax worlds: sunny hills, underground cave, desert pyramids, snowy castle; four layers each. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `goal_flag_castle.png` — A goal flag pole and a small castle. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+7. `ui_hud.png` — Coin counter, lives, timer, world badge, left/right/jump touch buttons. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+8. `card_platformer.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 48. النطاط (Doodle-style) (لسه ما اتبنتش) — Sky Jumper (Doodle-style) (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Cute hand-drawn style endless jumper game art, notebook-paper background, rounded doodle creatures, bright pastel platforms, kid friendly.
+```
+
+1. `jumper_poses.png` — A cute four-legged doodle creature with a long nose: idle, jump up, falling, shooting, win; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `platforms.png` — Green normal platforms, blue moving platforms, brown crumbling platform, a spring platform; six files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `powerups.png` — A propeller hat, a jetpack, a spring shoes, a shield bubble; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `enemies.png` — Three silly monsters: a green blob, a purple two-eyed monster, a UFO; three files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `paper_backdrops.png` — Four graph-paper backgrounds with different pastel margin colors and doodles, 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `ui_hud.png` — Height score badge, pause button, game-over screen frame. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+7. `card_sky_jumper.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
 

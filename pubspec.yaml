@@ -145,6 +145,7 @@ flutter:
     - assets/games/alien_sky/
     - assets/games/rhino_summit/
     - assets/games/sunset_highway/
+    - assets/games/dress_studio/
     - assets/games/chomp_maze/
     - assets/games/hamster_warrior/
     - assets/games/ball_scoop/
