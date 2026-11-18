@@ -5,13 +5,13 @@
   function post(msg) {
     var s = JSON.stringify(msg);
     if (window.RehlatyRace && window.RehlatyRace.postMessage) window.RehlatyRace.postMessage(s);
-    else if (window.console) console.log('[dress]', s);
+    else if (window.console) console.log('[fizz]', s);
   }
   window.crStart = function (config) {
     if (game) game.dispose();
     config = config || {};
     config.base = config.base || './';
-    game = window.DressStudio.start(document.getElementById('game'), config, post);
+    game = window.FizzRunner.start(document.getElementById('game'), config, post);
   };
   window.crPause = function () { if (game) game.pause(); };
   window.crStop = function () { if (game) game.dispose(); game = null; };

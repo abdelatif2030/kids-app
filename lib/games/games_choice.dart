@@ -90,6 +90,8 @@ const double kFunGamesAspect = 1536 / 1024;
 /// and a frost coil card made in the same style, on the softened page background with the same sign and back arrow.
 const String kFunGamesMorePicture = 'assets/games/fun_games_more.webp';
 
+void openFunGame(BuildContext context, ChildProfile? child, WebGame game) => _openGame(context, child, game);
+
 void _openGame(BuildContext context, ChildProfile? child, WebGame game) {
   final age = child?.age ?? 6;
   if (age < game.minAge) {
@@ -360,7 +362,7 @@ class FunGamesMore2Screen extends StatelessWidget {
               _card(context, 'fun_ball_scoop', kBallScoop, 'assets/games/ball_scoop/card.webp', 'Ball Scoop', const Color(0xFFFFA82A), const Color(0xFFFFE4A8)),
               _card(context, 'fun_hamster_warrior', kHamsterWarrior, 'assets/games/hamster_warrior/card.webp', 'Hamster Warrior', const Color(0xFF5AA83A), const Color(0xFFFFE04A)),
               _card(context, 'fun_chomp_maze', kChompMaze, 'assets/games/chomp_maze/card.webp', 'Chomp Maze', const Color(0xFF3A6AE8), const Color(0xFFFFE04A)),
-              _card(context, 'fun_dress_studio', kDressStudio, 'assets/games/dress_studio/card.webp', 'Princess Studio', const Color(0xFFFF6AA8), const Color(0xFFFFD8EC)),
+              _card(context, 'fun_fizz_runner', kFizzRunner, 'assets/games/fizz_runner/card.webp', 'Fizz Man', const Color(0xFF2A6AE8), const Color(0xFFFFE04A)),
             ];
             return Stack(children: [
               Center(

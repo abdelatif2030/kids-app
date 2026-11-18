@@ -12,6 +12,7 @@ import 'family/family_bubble.dart' deferred as bubble_lib;
 import 'family/family_entry.dart' deferred as family_lib;
 import 'teachers_screens.dart' deferred as teachers_lib;
 import 'parent_settings_screen.dart' deferred as settings_lib;
+import 'games/fun_sections.dart' deferred as fun_sections_lib;
 import 'games/games_choice.dart' deferred as games_choice_lib;
 import 'games/games_hub.dart' deferred as games_hub_lib;
 
@@ -97,9 +98,9 @@ class LazyFunGames extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => FutureBuilder<void>(
-    future: games_choice_lib.loadLibrary(),
+    future: fun_sections_lib.loadLibrary(),
     builder: (context, snap) =>
-        snap.connectionState == ConnectionState.done && !snap.hasError ? games_choice_lib.FunGamesScreen(child: child) : Scaffold(body: _loading()),
+        snap.connectionState == ConnectionState.done && !snap.hasError ? fun_sections_lib.FunSectionsScreen(child: child) : Scaffold(body: _loading()),
   );
 }
 
