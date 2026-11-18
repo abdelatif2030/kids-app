@@ -118,7 +118,7 @@ final WebGame kRhythmSurvival = WebGame(
   title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash, kSkyCapy, kMarbleDozer, kDuneTitans, kCastawayRaft];
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash, kSkyCapy, kMarbleDozer, kDuneTitans, kCastawayRaft, kWinterCamp];
 
 /// «متجر الفضاء الذكي» (Space Store Manager): a grocery store on a space station (docs/SPACE_STORE.md).
 final WebGame kSpaceStore = WebGame(
@@ -290,6 +290,16 @@ final WebGame kCastawayRaft = WebGame(
   storeKey: 'castaway_raft',
   minAge: 4,
   title: () => tr2('طوف الناجي', 'Castaway Raft'),
+);
+
+/// «معسكر الشتاء» (Winter Camp): cozy idle-tycoon in a snowy forest (docs/WINTER_CAMP.md).
+final WebGame kWinterCamp = WebGame(
+  id: 'winter_camp',
+  folder: 'winter_camp',
+  global: 'WinterCamp',
+  storeKey: 'winter_camp',
+  minAge: 4,
+  title: () => tr2('معسكر الشتاء', 'Winter Camp'),
 );
 
 // ---- rebuilt learning games (docs/LEARNING_GAMES_REBUILD.md) ----------------------------------------------------------

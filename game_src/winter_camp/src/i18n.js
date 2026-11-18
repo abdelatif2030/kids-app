@@ -1,0 +1,35 @@
+import { makeI18n } from '../../cozy_kit/ui.js';
+
+const S = {
+  title: ['معسكر الشتاء', 'Winter Camp'],
+  play: ['يلا نبدأ', 'Start'],
+  how: ['اسحب إصبعك عشان تمشي — الأشجار بتتقطع لوحدها', 'Drag to walk: trees get chopped by themselves'],
+  exit: ['خروج', 'Exit'],
+  menu: ['القائمة', 'Menu'],
+  paused: ['استراحة', 'Paused'],
+  resume: ['كمّل', 'Continue'],
+  again: ['العب تاني', 'Play again'],
+  bring: ['وصّل الخشب للمكان المضيء!', 'Bring logs to the glowing spot!'],
+  chopHint: ['قرّب من الشجرة وهتتقطع', 'Walk up to a tree to chop it'],
+  warm: ['قرّب من النار عشان تدفى 🔥', 'Stand by the fire to warm up 🔥'],
+  storm: ['عاصفة ثلجية! ارجع جنب النار ❄️', 'Blizzard! Stay near the fire ❄️'],
+  stormEnd: ['العاصفة خلصت ☀️', 'The blizzard has passed ☀️'],
+  hire: ['مساعد', 'Helper'],
+  bag: ['شنطة أكبر', 'Bigger bag'],
+  built: ['اتبنى', 'Built'],
+  gate: ['البوابة المتجمدة اتفتحت!', 'The frozen gate opens!'],
+  done: ['أراضي جديدة!', 'New lands!'],
+  doneText: ['بنيت المعسكر وفتحت البوابة. رحلة سعيدة!', 'You built the camp and opened the gate. Happy travels!'],
+  logs: ['خشب اتوصّل', 'Logs delivered'],
+  helpers: ['مساعدين', 'Helpers'],
+  win_m: ['شطوووووور! ❄️', 'Well done! ❄️'],
+  win_f: ['شطووووورة! ❄️', 'Well done! ❄️'],
+  sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
+  need: ['محتاج عملات أكتر', 'Need more coins'],
+  cabin: ['الكوخ الخشبي', 'Log cabin'],
+  workshop: ['الورشة', 'Workshop'],
+  sawmill: ['المنشرة', 'Sawmill'],
+  sled: ['زلاجة المؤن', 'Supply sled'],
+};
+
+export const { setLang, setGirl, getLang, t, num } = makeI18n(S);
