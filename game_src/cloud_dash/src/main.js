@@ -77,7 +77,8 @@ const ROW = 4;
 const ROWS_AHEAD = 40;
 const ROWS_BEHIND = 4;
 const WALL_X = LANE_W * 1.5 + 0.55;
-const laneX = (l) => (Math.abs(l) === 2 ? Math.sign(l) * (WALL_X - 0.2) : l * LANE_W);
+// the camera looks along +z, so screen-RIGHT is world -x: a lane to the right (lane +1) has a negative x (swipe right must go right)
+const laneX = (l) => -(Math.abs(l) === 2 ? Math.sign(l) * (WALL_X - 0.2) : l * LANE_W);
 
 function stripeTex(c1, c2, w = 128, h2 = 64, n = 6) {
   const c = document.createElement('canvas');
@@ -116,6 +117,46 @@ function puffTex() {
   gr.addColorStop(0, 'rgba(255,255,255,0.95)'); gr.addColorStop(0.6, 'rgba(255,235,250,0.55)'); gr.addColorStop(1, 'rgba(255,230,250,0)');
   g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
   return new THREE.CanvasTexture(c);
+}
+
+/** The collectables are SPRITES (flat pictures that always face the camera), drawn once in code: a shiny coin with a star, a shield bubble, a candy-cane magnet and an hourglass. */
+function iconTex(kind) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const g = c.getContext('2d');
+  g.translate(128, 128);
+  const glow = (col) => { const gr = g.createRadialGradient(0, 0, 40, 0, 0, 124); gr.addColorStop(0, col); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 124, 0, Math.PI * 2); g.fill(); };
+  if (kind === 'coin') {
+    glow('rgba(255,220,90,0.55)');
+    const gr = g.createRadialGradient(-30, -30, 8, 0, 0, 86); gr.addColorStop(0, '#fff4a8'); gr.addColorStop(0.55, '#ffc82a'); gr.addColorStop(1, '#e8960a');
+    g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 84, 0, Math.PI * 2); g.fill();
+    g.lineWidth = 10; g.strokeStyle = '#c87a08'; g.stroke();
+    g.lineWidth = 6; g.strokeStyle = 'rgba(255,255,255,0.55)'; g.beginPath(); g.arc(0, 0, 66, 0, Math.PI * 2); g.stroke();
+    g.fillStyle = '#fff2a0'; g.strokeStyle = '#c87a08'; g.lineWidth = 6; g.beginPath();
+    for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + (i * Math.PI) / 5; const r = i % 2 ? 22 : 46; g.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
+    g.closePath(); g.fill(); g.stroke();
+  } else if (kind === 'shield') {
+    glow('rgba(90,208,255,0.6)');
+    const gr = g.createRadialGradient(-20, -30, 10, 0, 0, 90); gr.addColorStop(0, '#d8f4ff'); gr.addColorStop(1, '#3a9aff');
+    g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 88, 0, Math.PI * 2); g.fill(); g.lineWidth = 8; g.strokeStyle = '#fff'; g.stroke();
+    g.fillStyle = '#fff'; g.beginPath(); g.moveTo(0, -48); g.lineTo(40, -30); g.lineTo(34, 18); g.quadraticCurveTo(20, 44, 0, 56); g.quadraticCurveTo(-20, 44, -34, 18); g.lineTo(-40, -30); g.closePath(); g.fill();
+    g.fillStyle = '#3a9aff'; g.beginPath(); g.moveTo(0, -34); g.lineTo(26, -22); g.lineTo(22, 12); g.quadraticCurveTo(12, 30, 0, 38); g.quadraticCurveTo(-12, 30, -22, 12); g.lineTo(-26, -22); g.closePath(); g.fill();
+  } else if (kind === 'magnet') {
+    glow('rgba(255,120,160,0.5)');
+    g.lineCap = 'butt'; g.lineWidth = 46; g.strokeStyle = '#e83a4a'; g.beginPath(); g.arc(0, 8, 54, Math.PI, 0); g.lineTo(54, 60); g.moveTo(-54, 8); g.lineTo(-54, 60); g.stroke();
+    g.lineWidth = 46; g.strokeStyle = '#fff'; g.setLineDash([22, 22]); g.beginPath(); g.arc(0, 8, 54, Math.PI, 0); g.lineTo(54, 60); g.moveTo(-54, 8); g.lineTo(-54, 60); g.stroke(); g.setLineDash([]);
+    g.fillStyle = '#d8dde8'; g.fillRect(31, 44, 46, 26); g.fillRect(-77, 44, 46, 26);
+    g.strokeStyle = '#7a1a3a'; g.lineWidth = 6; g.beginPath(); g.arc(0, 8, 77, Math.PI, 0); g.stroke(); g.beginPath(); g.arc(0, 8, 31, Math.PI, 0); g.stroke();
+  } else { // slow motion: an hourglass
+    glow('rgba(176,138,255,0.55)');
+    g.fillStyle = '#d8c0ff'; g.strokeStyle = '#6a3ac8'; g.lineWidth = 8;
+    g.beginPath(); g.moveTo(-44, -66); g.lineTo(44, -66); g.lineTo(6, 0); g.lineTo(44, 66); g.lineTo(-44, 66); g.lineTo(-6, 0); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = '#ffd23a'; g.beginPath(); g.moveTo(-30, -52); g.lineTo(30, -52); g.lineTo(4, -8); g.lineTo(-4, -8); g.closePath(); g.fill(); g.beginPath(); g.moveTo(-34, 60); g.lineTo(34, 60); g.lineTo(14, 30); g.lineTo(-14, 30); g.closePath(); g.fill();
+    g.fillStyle = '#8a5ae8'; g.fillRect(-52, -78, 104, 14); g.fillRect(-52, 64, 104, 14);
+  }
+  const tx = new THREE.CanvasTexture(c);
+  tx.colorSpace = THREE.SRGBColorSpace;
+  return tx;
 }
 
 class Game {
@@ -193,6 +234,9 @@ class Game {
       red: M(0xe83a4a), blue: M(0x4a8aff), skin: M(0xffd0a8), hair: M(0x6a3a22), orange: M(0xff8a2a), cloth: M(0x3a78e8), shoe: M(0xfff0d8),
       wind: new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55, depthWrite: false }),
     };
+    this.spriteMat = {};
+    for (const k of ['coin', 'shield', 'magnet', 'slow']) this.spriteMat[k] = new THREE.SpriteMaterial({ map: iconTex(k), transparent: true, depthWrite: false, fog: false });
+    this.pops = []; // collected sprites flying up and fading
     // the finished track in rows
     this.rows = [];
     this.trackGroup = new THREE.Group();
@@ -279,17 +323,16 @@ class Game {
     const x = laneX(it.lane);
     g.position.set(x, 0, it.z);
     if (it.type === 'coin') {
-      const c = new THREE.Mesh(this.geo.coin, m.coin);
-      c.rotation.x = Math.PI / 2;
-      const piv = new THREE.Group();
-      piv.add(c); g.add(piv); g.userData.spin = piv;
+      const sp = new THREE.Sprite(this.spriteMat.coin);
+      sp.scale.set(0.95, 0.95, 1);
+      g.add(sp); g.userData.sprite = sp;
       g.position.y = (it.y ?? 0.8) + (Math.abs(it.lane) === 2 ? 0.7 : 0);
     } else if (it.type === 'barrier') {
       const b = new THREE.Mesh(this.geo.box, m.stripe); b.scale.set(1.85, 0.8, 0.55); b.position.y = 0.4; g.add(b);
       for (const sx of [-1, 1]) { const f = new THREE.Mesh(this.geo.box, m.white); f.scale.set(0.12, 0.8, 0.5); f.position.set(sx * 0.8, 0.4, 0); g.add(f); }
     } else if (it.type === 'slime') {
       const b = new THREE.Mesh(this.geo.sphere, m.slime); b.scale.set(0.62, 0.8, 0.55); b.position.y = 0.7; g.add(b); g.userData.blob = b;
-      for (const sx of [-1, 1]) { const e = new THREE.Mesh(this.geo.sphere, m.white); e.scale.setScalar(0.16); e.position.set(sx * 0.2, 0.95, 0.42); g.add(e); const p = new THREE.Mesh(this.geo.sphere, m.black); p.scale.setScalar(0.08); p.position.set(sx * 0.2, 0.95, 0.55); g.add(p); }
+      for (const sx of [-1, 1]) { const e = new THREE.Mesh(this.geo.sphere, m.white); e.scale.setScalar(0.16); e.position.set(sx * 0.2, 0.95, -0.42); g.add(e); const p = new THREE.Mesh(this.geo.sphere, m.black); p.scale.setScalar(0.08); p.position.set(sx * 0.2, 0.95, -0.55); g.add(p); }
     } else if (it.type === 'spike') {
       for (let k = -2; k <= 2; k++) { const c = new THREE.Mesh(this.geo.cone, k % 2 ? m.spike : m.white); c.position.set(k * 0.34, 0.3, (k % 2) * 0.2); g.add(c); }
     } else if (it.type === 'bar') {
@@ -300,16 +343,13 @@ class Game {
       const cr = new THREE.Mesh(this.geo.box, m.black); cr.scale.set(0.05, 0.02, it.len * 0.8); cr.position.set(0.3, 0.04, it.len / 2); g.add(cr);
     } else if (it.type === 'wind') {
       for (let k = 0; k < 3; k++) { const r = new THREE.Mesh(new THREE.TorusGeometry(0.55 + k * 0.3, 0.05, 6, 24), m.wind); r.rotation.x = Math.PI / 2; r.position.set(0, 0.5 + k * 0.45, it.len / 2); g.add(r); }
-      const ar = new THREE.Mesh(this.geo.cone, m.wind); ar.scale.set(1.4, 1, 1.4); ar.rotation.z = -it.dir * Math.PI / 2; ar.position.set(0, 0.15, it.len / 2); g.add(ar); g.userData.wind = g;
+      const ar = new THREE.Mesh(this.geo.cone, m.wind); ar.scale.set(1.4, 1, 1.4); ar.rotation.z = it.dir * Math.PI / 2; ar.position.set(0, 0.15, it.len / 2); g.add(ar); g.userData.wind = g;
     } else if (it.type === 'shield') {
-      const s = new THREE.Mesh(this.geo.sphere, new THREE.MeshLambertMaterial({ color: 0x5ad0ff, emissive: 0x1a6a9a })); s.scale.setScalar(0.45); s.position.y = 1.1; g.add(s);
-      const r = new THREE.Mesh(this.geo.torus, m.white); r.position.y = 1.1; g.add(r); g.userData.spin = g;
+      const sp = new THREE.Sprite(this.spriteMat.shield); sp.scale.set(1.5, 1.5, 1); sp.position.y = 1.2; g.add(sp); g.userData.sprite = sp;
     } else if (it.type === 'magnet') {
-      const mg = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.12, 10, 24, Math.PI), new THREE.MeshLambertMaterial({ map: stripeTex('#ffffff', '#e83a4a', 64, 64, 4) })); mg.rotation.z = Math.PI; mg.position.y = 1.2; g.add(mg); g.userData.spin = g;
-      for (const sx of [-1, 1]) { const tip = new THREE.Mesh(this.geo.cyl, m.white); tip.scale.set(0.13, 0.12, 0.13); tip.position.set(sx * 0.34, 0.98, 0); g.add(tip); }
+      const sp = new THREE.Sprite(this.spriteMat.magnet); sp.scale.set(1.5, 1.5, 1); sp.position.y = 1.2; g.add(sp); g.userData.sprite = sp;
     } else if (it.type === 'slow') {
-      const a = new THREE.Mesh(this.geo.cone, new THREE.MeshLambertMaterial({ color: 0xb08aff, emissive: 0x3a1a8a })); a.scale.set(0.5, 0.5, 0.5); a.position.y = 1.35; a.rotation.x = Math.PI; g.add(a);
-      const b = new THREE.Mesh(this.geo.cone, new THREE.MeshLambertMaterial({ color: 0xb08aff, emissive: 0x3a1a8a })); b.scale.set(0.5, 0.5, 0.5); b.position.y = 0.9; g.add(b); g.userData.spin = g;
+      const sp = new THREE.Sprite(this.spriteMat.slow); sp.scale.set(1.5, 1.5, 1); sp.position.y = 1.2; g.add(sp); g.userData.sprite = sp;
     }
     return g;
   }
@@ -341,8 +381,8 @@ class Game {
     this.renderer.setSize(this.cw, this.ch, false);
     this.renderer.domElement.style.width = '100%';
     this.renderer.domElement.style.height = '100%';
-    this.cam.aspect = this.cw / this.ch;
-    this.cam.fov = this.cw / this.ch < 1 ? 70 : 58;
+    this.cam.aspect = this.cw / (this.ch || 1);
+    this.cam.fov = this.cw / (this.ch || 1) < 1 ? 70 : 58;
     this.cam.updateProjectionMatrix();
     this.u = Math.min(this.cw, this.ch) / 100;
     this.root.style.setProperty('--u', `${this.u}px`);
@@ -585,8 +625,8 @@ class Game {
     const r = this.run;
     void time;
     switch (e.type) {
-      case 'coin': this.combo = Math.min(8, this.combo + 1); this.comboT = 0.6; this.sound.play('coin', this.combo); break;
-      case 'power': this.sound.play(e.kind === 'shield' ? 'shield' : 'power'); this._say(t(e.kind), 1.8, true); break;
+      case 'coin': this.combo = Math.min(8, this.combo + 1); this.comboT = 0.6; this.sound.play('coin', this.combo); this._pop(e.i); break;
+      case 'power': this.sound.play(e.kind === 'shield' ? 'shield' : 'power'); this._say(t(e.kind), 1.8, true); this._pop(e.i); break;
       case 'hit': this.sound.play('hit'); this.flash = 1; this.shake = 0.35; this._say(t('ouch'), 1); break;
       case 'fall': this.sound.play('fall'); this.flash = 1; this.shake = 0.5; this._say(t('fell'), 1.3); break;
       case 'shieldpop': this.sound.play('shield'); this._say(t('shieldPop'), 1.4, true); break;
@@ -603,6 +643,17 @@ class Game {
       }
       default:
     }
+  }
+
+  /** A collected sprite flies up, grows and fades (the kid "takes" it). */
+  _pop(i) {
+    const o = this.objs.get(i);
+    if (!o) return;
+    this.objs.delete(i);
+    const sp = o.userData.sprite;
+    const mat = sp ? sp.material.clone() : null;
+    if (sp) sp.material = mat;
+    this.pops.push({ o, t: 0, mat });
   }
 
   // ---- drawing ------------------------------------------------------------------------------------------------------
@@ -625,7 +676,7 @@ class Game {
         let vis = true;
         if (r) {
           const z0 = row.idx * ROW, z1 = z0 + ROW;
-          const lane = l - 1;
+          const lane = 1 - l; // mesh l sits at world x (l-1)*LANE_W = game lane (1-l)
           for (const it of r.level.items) {
             if (it.z > z1) break;
             if ((it.type === 'gap' || (it.type === 'crumble' && r.opened.has(r.level.items.indexOf(it)))) && it.lane === lane && it.z + it.len > z0 && it.z < z1) { vis = false; break; }
@@ -638,6 +689,13 @@ class Game {
     // scenery follows the runner
     for (const p of this.puffs) { const d = p.userData; p.position.set(d.x, d.y, z - 20 + ((d.k + z * 0.5) % 220)); }
     for (const g of this.deco) { const d = g.userData; g.position.set(d.side * d.off, d.y + Math.sin(time + d.k) * 0.4, z - 10 + ((d.k * 1.7 + z) % 170)); }
+    for (const p of this.pops) {
+      p.t += dt;
+      const sp = p.o.userData.sprite;
+      if (sp) { sp.position.y += dt * 3.2; sp.scale.multiplyScalar(1 + dt * 3); if (p.mat) p.mat.opacity = Math.max(0, 1 - p.t / 0.35); }
+      if (p.t >= 0.35) { this.itemsGroup.remove(p.o); if (p.mat) p.mat.dispose(); }
+    }
+    this.pops = this.pops.filter((p) => p.t < 0.35);
     if (r) {
       this._items(r, time);
       const x = laneX(r.lane);
@@ -660,7 +718,7 @@ class Game {
       k.body.position.y = air ? 0 : run ? Math.abs(Math.sin(ph)) * 0.06 : 0;
       k.body.rotation.x = sl ? -1.1 : 0.12;
       k.body.position.y += sl ? -0.35 : 0;
-      k.root.rotation.z = wall ? Math.sign(r.lane) * (Math.PI / 2.3) * -1 : -this.laneTilt * 0.25;
+      k.root.rotation.z = wall ? Math.sign(r.lane) * (Math.PI / 2.3) * -1 : this.laneTilt * 0.25;
       k.root.rotation.y = this.mode === 'finishing' ? time * 4 : 0;
       this.laneTilt *= 0.9;
       k.shadow.position.y = wall ? -1.3 : 0.02 - yy + 0.02;
@@ -718,8 +776,11 @@ class Game {
     for (const [i, o] of this.objs) {
       const it = items[i];
       const ud = o.userData;
-      if (ud.spin && it.type === 'coin') ud.spin.rotation.y = time * 4;
-      else if (ud.spin) ud.spin.rotation.y = time * 2.5;
+      if (ud.sprite) {
+        // a coin "spins" (its width breathes) and every sprite bobs; power-ups pulse
+        if (it.type === 'coin') { const w = 0.62 + 0.38 * Math.abs(Math.cos(time * 3.5 + i)); ud.sprite.scale.set(0.95 * w, 0.95, 1); ud.sprite.position.y = Math.sin(time * 3 + i) * 0.06; }
+        else { const k = 1.5 + Math.sin(time * 4) * 0.12; ud.sprite.scale.set(k, k, 1); ud.sprite.position.y = 1.2 + Math.sin(time * 3 + i) * 0.1; }
+      }
       if (it.type === 'slime') { const k = 1 + Math.sin(time * 5 + i) * 0.07; ud.blob.scale.set(0.62 * (2 - k), 0.8 * k, 0.55 * (2 - k)); }
       if (it.type === 'wind') o.children.forEach((c, k) => { if (c.geometry && c.geometry.type === 'TorusGeometry') c.rotation.z = time * (2 + k); });
       if (it.type === 'crumble') {

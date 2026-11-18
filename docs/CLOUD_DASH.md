@@ -11,3 +11,8 @@ A 3D pastel runner in «ألعاب للتسلية» (third page). three.js, all 
 - Save per child: unlocked levels, stars, coins. Erased with the child (`cloud_dash`).
 - Code: game_src/cloud_dash (sim.js rules + level generator, main.js scene, audio.js); `npm run build`; `npm test` (7 tests incl. a robot that finishes every level with its hearts).
 - NOT tested on a real phone; sound not listened to by a person; swipe feel needs a real touch screen.
+
+## تصحيحات (2026-11-18 مساءً، من تجربة الأيفون)
+- **اليمين/الشمال كانوا معكوسين**: الكاميرا بتبص ناحية +z فاليمين على الشاشة هو -x. اتعكس موضع المسارات (laneX) وكل اللي بيعتمد عليه (إخفاء البلاط في الفجوات، سهم الريح، ميل الطفل، الجري على الحيطان). اتأكدت: سحبة يمين بتودّي الطفل لليمين على الشاشة.
+- **المراحل أطول**: بدل 20-30 ثانية بقت حوالي دقيقة لدقيقة ونص (طول 520 + 90 لكل مرحلة)، وفي اختبار بيتأكد إن المرحلة الأولى أكتر من 55 ثانية.
+- **العملات والـ power-ups بقت سبرايتات زي الفيديو**: عملة ذهبية لامعة بنجمة، درع أزرق، مغناطيس عصاية حلوى، ساعة رملية. بتتحرك (بتتأرجح وبتدور) ولما الطفل ياخدها بتطلع لفوق وتكبر وتختفي. عيون السلايم بقت ناحية الطفل.

@@ -18,7 +18,7 @@ export function levelSpec(n, easy = false) {
   const f = (k) => n >= k;
   return {
     n,
-    length: 200 + 45 * (n - 1),
+    length: 520 + 90 * (n - 1), // about a minute to a minute and a half of running
     speed: (8.5 + 0.75 * (n - 1)) * (easy ? 0.8 : 1),
     density: Math.min(0.85, 0.34 + 0.055 * n) * (easy ? 0.7 : 1),
     barrier: true, slime: f(2), bar: f(2), gap: f(3), spike: f(4), wind: f(5), wall: f(6),
@@ -119,6 +119,7 @@ export class Run {
     this.airUntil = 0;
     this.hitsTaken = 0;
     this.time = 0;
+    this.i0 = 0; // items behind the kid are skipped
   }
 
   get speed() { return this.spec.speed * (this.slow > 0 ? 0.55 : 1); }
@@ -154,8 +155,10 @@ export class Run {
     // off a side wall when the segment ends
     if (this.onWall && !this.onWallSegment) this.lane = Math.sign(this.lane);
     // items
-    for (let i = 0; i < this.level.items.length; i++) {
-      const it = this.level.items[i];
+    const all = this.level.items;
+    while (this.i0 < all.length && all[this.i0].z + (all[this.i0].len || 0) < this.z - 4) this.i0++;
+    for (let i = this.i0; i < all.length; i++) {
+      const it = all[i];
       if (it.z > this.z + 3) break;
       const key = i;
       if (this.got.has(key)) continue;
@@ -166,7 +169,7 @@ export class Run {
         const same = lane === this.lane;
         const pulled = this.magnet > 0 && Math.abs(it.z - this.z) < 5 && Math.abs(lane - this.lane) <= 2 && Math.abs(lane) < 2;
         if ((near && same && Math.abs(iy - (this.y + 0.8)) < 1.2) || (pulled && near) || (this.magnet > 0 && Math.abs(it.z - this.z) < 3 && Math.abs(lane - this.lane) <= 1 && Math.abs(lane) < 2 && Math.abs(this.lane) < 2)) {
-          this.got.add(key); this.coins++; ev.push({ type: 'coin', it });
+          this.got.add(key); this.coins++; ev.push({ type: 'coin', it, i });
         }
         continue;
       }
@@ -174,7 +177,7 @@ export class Run {
         if (Math.abs(it.z - this.z) < 1 && lane === this.lane) {
           this.got.add(key);
           if (it.type === 'shield') this.shield = true; else if (it.type === 'magnet') this.magnet = 7; else this.slow = 5;
-          ev.push({ type: 'power', kind: it.type });
+          ev.push({ type: 'power', kind: it.type, i });
         }
         continue;
       }

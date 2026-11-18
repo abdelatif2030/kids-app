@@ -31,6 +31,7 @@ test('levels: ten, a calm start, a finish gate, hazards only from the levels tha
   for (const k of ['slime', 'bar', 'spike']) assert.ok(l10.items.some((i) => i.type === k), k);
   assert.ok(l10.walls.length >= 1);
   assert.ok(l10.finishZ > l1.finishZ);
+  assert.ok(l1.finishZ >= 500 && l1.spec.length / l1.spec.speed > 55, 'level 1 lasts about a minute');
   assert.ok(l1.items.every((i) => i.z >= 30), 'nothing in the first 30 m');
   assert.equal(JSON.stringify(generateLevel(3, 9)), JSON.stringify(generateLevel(3, 9)));
 });
