@@ -168,7 +168,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     debugDefaultTargetPlatformOverride = TargetPlatform.windows;
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
-    for (final (key, game) in [('fun_hero_tower', kHeroTower), ('fun_cloud_dash', kCloudDash), ('fun_sky_capy', kSkyCapy), ('fun_marble_dozer', kMarbleDozer), ('fun_dune_titans', kDuneTitans), ('fun_castaway_raft', kCastawayRaft), ('fun_winter_camp', kWinterCamp), ('fun_rain_circuit', kRainCircuit)]) {
+    for (final (key, game) in [('fun_hero_tower', kHeroTower), ('fun_cloud_dash', kCloudDash), ('fun_sky_capy', kSkyCapy), ('fun_marble_dozer', kMarbleDozer), ('fun_dune_titans', kDuneTitans), ('fun_castaway_raft', kCastawayRaft), ('fun_winter_camp', kWinterCamp), ('fun_rain_circuit', kRainCircuit), ('fun_squad_shooter', kSquadShooter), ('fun_archer_bridge', kArcherBridge), ('fun_alien_sky', kAlienSky), ('fun_rhino_summit', kRhinoSummit), ('fun_sunset_highway', kSunsetHighway)]) {
       await t.pumpWidget(MaterialApp(key: UniqueKey(), home: const FunGamesScreen(child: ChildProfile(id: 'k1', nickname: 'L', age: 5))));
       await t.pump(const Duration(milliseconds: 300));
       await t.tap(find.byKey(const ValueKey('fun_more')));

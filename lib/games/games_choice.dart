@@ -348,6 +348,11 @@ class FunGamesMore2Screen extends StatelessWidget {
               _card(context, 'fun_castaway_raft', kCastawayRaft, 'assets/games/castaway_raft/card.webp', 'Castaway Raft', const Color(0xFF2A9AD8), const Color(0xFFBFE8FF)),
               _card(context, 'fun_winter_camp', kWinterCamp, 'assets/games/winter_camp/card.webp', 'Winter Camp', const Color(0xFF5AA8E0), const Color(0xFFE8F2FB)),
               _card(context, 'fun_rain_circuit', kRainCircuit, 'assets/games/rain_circuit/card.webp', 'Rain Circuit', const Color(0xFF4A6A88), const Color(0xFFCFE0F4)),
+              _card(context, 'fun_squad_shooter', kSquadShooter, 'assets/games/squad_shooter/card.webp', 'Squad Shooter', const Color(0xFF1A2A78), const Color(0xFF7AFFC8)),
+              _card(context, 'fun_archer_bridge', kArcherBridge, 'assets/games/archer_bridge/card.webp', 'Archer Bridge', const Color(0xFFD8742A), const Color(0xFFFFD23A)),
+              _card(context, 'fun_alien_sky', kAlienSky, 'assets/games/alien_sky/card.webp', 'Alien Sky Race', const Color(0xFF7A3AD8), const Color(0xFF7AFFC8)),
+              _card(context, 'fun_rhino_summit', kRhinoSummit, 'assets/games/rhino_summit/card.webp', 'Summit Race', const Color(0xFF4A9AD8), const Color(0xFFFFD23A)),
+              _card(context, 'fun_sunset_highway', kSunsetHighway, 'assets/games/sunset_highway/card.webp', 'Sunset Highway', const Color(0xFFE8742A), const Color(0xFFFFD23A)),
             ];
             return Stack(children: [
               Center(

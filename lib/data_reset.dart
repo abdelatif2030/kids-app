@@ -79,6 +79,11 @@ Future<void> deleteChildData() async {
         key == 'castaway_raft' ||
         key == 'winter_camp' ||
         key == 'rain_circuit' ||
+        key == 'squad_shooter' ||
+        key == 'archer_bridge' ||
+        key == 'alien_sky' ||
+        key == 'rhino_summit' ||
+        key == 'sunset_highway' ||
         key == 'video_completions' ||
         key == 'wordbook_seen' ||
         key == 'family_prefs' ||

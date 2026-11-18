@@ -118,7 +118,7 @@ final WebGame kRhythmSurvival = WebGame(
   title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash, kSkyCapy, kMarbleDozer, kDuneTitans, kCastawayRaft, kWinterCamp, kRainCircuit];
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash, kSkyCapy, kMarbleDozer, kDuneTitans, kCastawayRaft, kWinterCamp, kRainCircuit, kSquadShooter, kArcherBridge, kAlienSky, kRhinoSummit, kSunsetHighway];
 
 /// «متجر الفضاء الذكي» (Space Store Manager): a grocery store on a space station (docs/SPACE_STORE.md).
 final WebGame kSpaceStore = WebGame(
@@ -310,6 +310,56 @@ final WebGame kRainCircuit = WebGame(
   storeKey: 'rain_circuit',
   minAge: 4,
   title: () => tr2('سباق حلبة المطر', 'Rain Circuit'),
+);
+
+/// «فرقة الجنود» (Squad Shooter): 3D night-road lane shooter (docs/LANE_SHOOTERS.md).
+final WebGame kSquadShooter = WebGame(
+  id: 'squad_shooter',
+  folder: 'squad_shooter',
+  global: 'SquadShooter',
+  storeKey: 'squad_shooter',
+  minAge: 4,
+  title: () => tr2('فرقة الجنود', 'Squad Shooter'),
+);
+
+/// «رماة الجسر» (Archer Bridge): 3D lane shooter over lava, same engine as the squad shooter.
+final WebGame kArcherBridge = WebGame(
+  id: 'archer_bridge',
+  folder: 'archer_bridge',
+  global: 'ArcherBridge',
+  storeKey: 'archer_bridge',
+  minAge: 4,
+  title: () => tr2('رماة الجسر', 'Archer Bridge'),
+);
+
+/// «سباق السماء الغريبة» (Alien Sky Race): 3D obstacle race with a jetpack (docs/COURSE_RACES.md).
+final WebGame kAlienSky = WebGame(
+  id: 'alien_sky',
+  folder: 'alien_sky',
+  global: 'AlienSky',
+  storeKey: 'alien_sky',
+  minAge: 4,
+  title: () => tr2('سباق السماء الغريبة', 'Alien Sky Race'),
+);
+
+/// «سباق القمة» (Summit Race): 3D obstacle race for a helmeted rhino, same engine as the alien race.
+final WebGame kRhinoSummit = WebGame(
+  id: 'rhino_summit',
+  folder: 'rhino_summit',
+  global: 'RhinoSummit',
+  storeKey: 'rhino_summit',
+  minAge: 4,
+  title: () => tr2('سباق القمة', 'Summit Race'),
+);
+
+/// «طريق الغروب» (Sunset Highway): 3D coastal highway traffic race (docs/SUNSET_HIGHWAY.md).
+final WebGame kSunsetHighway = WebGame(
+  id: 'sunset_highway',
+  folder: 'sunset_highway',
+  global: 'SunsetHighway',
+  storeKey: 'sunset_highway',
+  minAge: 4,
+  title: () => tr2('طريق الغروب', 'Sunset Highway'),
 );
 
 // ---- rebuilt learning games (docs/LEARNING_GAMES_REBUILD.md) ----------------------------------------------------------

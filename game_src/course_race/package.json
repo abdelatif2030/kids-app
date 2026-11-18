@@ -1,0 +1,12 @@
+{
+  "name": "course_race",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty alien sky race + rhino summit race (three.js, shared sim). Built into assets/games/alien_sky and rhino_summit",
+  "scripts": {
+    "build": "esbuild src/alien.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/alien_sky/game.js && esbuild src/rhino.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/rhino_summit/game.js",
+    "test": "node --test test/sim.test.js"
+  },
+  "dependencies": { "three": "0.170.0" },
+  "devDependencies": { "esbuild": "0.24.0" }
+}

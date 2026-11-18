@@ -140,6 +140,11 @@ flutter:
     - assets/games/castaway_raft/
     - assets/games/winter_camp/
     - assets/games/rain_circuit/
+    - assets/games/squad_shooter/
+    - assets/games/archer_bridge/
+    - assets/games/alien_sky/
+    - assets/games/rhino_summit/
+    - assets/games/sunset_highway/
     - assets/home/home_main.webp
     - assets/home/cartoons_stories.webp
     - assets/home/lessons_scene.webp
