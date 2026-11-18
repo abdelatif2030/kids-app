@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { LEVELS, LevelPlay } from '../src/letters/levels.js';
+import { ALL_LEVELS as LEVELS, LevelPlay, PICKS } from '../src/letters/levels.js';
 import { FreshMemory } from '../src/letters/fresh.js';
 import { ROUNDS } from '../src/letters/sim.js';
 
@@ -24,7 +24,8 @@ for (const lv of LEVELS) {
       assert.equal(b.length, ROUNDS);
       const same = b.filter((k) => a.includes(k));
       // levels whose whole bank is small (counting 1-20, shapes 20, colours 25...) can share a few things; the others share none
-      const limit = ['counting', 'shapes', 'colors', 'letters', 'order'].includes(lv.id) ? 3 : 1;
+      // topic levels hold 11-21 pictures: a replay (8 of them) can only share what does not fit
+      const limit = lv.topic ? Math.max(1, 2 * ROUNDS - PICKS[lv.table].items.length) : ['counting', 'shapes', 'colors', 'letters', 'order'].includes(lv.id) ? 3 : 1;
       assert.ok(same.length <= limit, `${lv.id} age ${age}: the replay repeats ${same.length} things (${same.join(' ')})`);
     }
   });

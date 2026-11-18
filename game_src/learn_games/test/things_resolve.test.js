@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import MORE_WORDS from '../src/letters/more_words.json' with { type: 'json' };
-import { LEVELS, LevelPlay } from '../src/letters/levels.js';
+import { ALL_LEVELS as LEVELS, LevelPlay } from '../src/letters/levels.js';
 import { FreshMemory } from '../src/letters/fresh.js';
 import { FOODS, PLACES, ANIMALS } from '../src/animals/sim.js';
 import { SHAPES_ALL } from '../src/letters/shapes_all.js';

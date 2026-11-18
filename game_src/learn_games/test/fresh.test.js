@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { FreshMemory, isSpotlight, weekOf } from '../src/letters/fresh.js';
-import { LEVELS, LevelPlay, levelsFor } from '../src/letters/levels.js';
+import { LEVELS, ALL_LEVELS, LevelPlay, levelsFor } from '../src/letters/levels.js';
 import { ROUNDS } from '../src/letters/sim.js';
 
 /** Plays a whole level right away (as the game does) and returns the keys it asked about. */
@@ -73,7 +73,7 @@ test('memory survives a save and a load, ignores damaged data and stays bounded'
 test('with memory every level still has exactly one right option and eight rounds, for many visits', () => {
   for (const age of [3, 4, 5, 6]) {
     const mem = new FreshMemory(null, 2900);
-    for (let visit = 0; visit < 6; visit++) for (const lv of levelsFor(age)) {
+    for (let visit = 0; visit < 6; visit++) for (const lv of ALL_LEVELS) {
       mem.begin(lv.id);
       const p = new LevelPlay(lv.id, age, visit * 100 + 7, mem);
       assert.equal(p.rounds.length, ROUNDS, lv.id);

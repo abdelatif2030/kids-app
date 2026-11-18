@@ -82,7 +82,30 @@ export const FORMS = [
 ];
 export const formQ = (l, f) => `فين ${l.the} اللي في ${f.word} الكلمة؟`;
 export const allFormSentences = () => LETTERS.filter((l) => CONNECTING.has(l.id)).flatMap((l) => FORMS.map((f) => formQ(l, f)));
-export const levelOf = (id) => LEVELS.find((l) => l.id === id);
+/** More levels, one per everyday topic, made of the picture-words (more_words.json) grouped by their art prefix. Every sentence «فين ...؟» is already recorded. */
+export const TOPICS = [
+  { id: 't_body', ar: 'جسمي', emoji: '🧍', prefixes: ['y'] },
+  { id: 't_clothes', ar: 'ملابسي', emoji: '👕', prefixes: ['l'] },
+  { id: 't_jobs', ar: 'المهن', emoji: '👩‍⚕️', prefixes: ['z'] },
+  { id: 't_food', ar: 'أكل وحلويات', emoji: '🍞', prefixes: ['o', 'r'] },
+  { id: 't_school', ar: 'مدرستي', emoji: '✏️', prefixes: ['e'] },
+  { id: 't_music', ar: 'الموسيقى', emoji: '🥁', prefixes: ['m'] },
+  { id: 't_family', ar: 'عيلتي', emoji: '👨‍👩‍👧', prefixes: ['a'] },
+  { id: 't_bugs', ar: 'حشرات وطيور', emoji: '🐜', prefixes: ['i'] },
+  { id: 't_weather', ar: 'الجو والفصول', emoji: '🌦️', prefixes: ['t'] },
+  { id: 't_sea', ar: 'البحر', emoji: '🐚', prefixes: ['u', 'b'] },
+  { id: 't_space', ar: 'فضا وخيال', emoji: '🚀', prefixes: ['s', 'k'] },
+  { id: 't_home', ar: 'بيتي', emoji: '🏠', prefixes: ['h'] },
+  { id: 't_wild', ar: 'حيوانات الغابة والمزرعة', emoji: '🦁', prefixes: ['j', 'f', 'w'] },
+  { id: 't_places', ar: 'الصحرا والمدينة', emoji: '🏜️', prefixes: ['d', 'c'] },
+];
+for (const t of TOPICS) {
+  PICKS[t.id] = { prompt: (it) => `فين ${it.the}؟`, items: MORE_WORDS.filter((w) => t.prefixes.some((p) => w.thing.startsWith(`${p}_`))).map((w) => ({ id: w.thing, the: w.the, thing: w.thing })) };
+}
+export const TOPIC_LEVELS = TOPICS.map((t) => ({ id: t.id, mode: 'pick', table: t.id, ar: t.ar, emoji: t.emoji, skill: 'vocab', topic: true }));
+/** The twelve map levels, then the topic levels (reached from «مستويات أكتر»). */
+export const ALL_LEVELS = [...LEVELS, ...TOPIC_LEVELS];
+export const levelOf = (id) => ALL_LEVELS.find((l) => l.id === id);
 /** The youngest (four) skip the two alphabet levels that need reading order. */
 export const levelsFor = (_age) => LEVELS; // every level is open at every age: the age only picks what comes first (tiers)
 

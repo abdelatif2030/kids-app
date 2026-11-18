@@ -19,7 +19,7 @@ const SEAM_X = 14.5;
 import { shapeGeo } from '../kit/shapes3d.js';
 import { colorOf } from './colors.js';
 import { NUMBERS } from '../kit/words.js';
-import { LEVELS, LevelPlay, levelsFor, cheer } from './levels.js';
+import { LEVELS, ALL_LEVELS, TOPIC_LEVELS, LevelPlay, levelsFor, cheer } from './levels.js';
 import { FreshMemory } from './fresh.js';
 import { themeForWorld } from '../kit/themes.js';
 import { ROUNDS } from './sim.js';
@@ -496,7 +496,7 @@ class Game {
     if (!this._ageKnown()) { this._chooseAge(() => this._startPage()); return; }
     const want = this.sh.cfg && this.sh.cfg.level;
     if (this.sh.cfg) this.sh.cfg.level = null; // only the first time: back to the list afterwards
-    if (want && levelsFor(this.sh.age).some((l) => l.id === want)) this._enter(want);
+    if (want && ALL_LEVELS.some((l) => l.id === want)) this._enter(want);
     else this._levels();
   }
 
@@ -570,6 +570,8 @@ class Game {
       const best = (this.save.lw.best || {})[lv.id];
       if (best) place(h('i', { class: 'lw-best' }, '★'.repeat(best)), cx, cy + 0.068, 0.15, 0.035);
     });
+    // «مستويات أكتر»: the topic levels (body, clothes, jobs...), drawn in code under the picture's tiles
+    place(h('button', { class: 'lw-more', onclick: () => { sh.sound.play('tap'); this._moreLevels(); } }, sh.T.lang === 'en' ? '➕ More levels' : '➕ مستويات أكتر'), 0.5, 0.945, 0.3, 0.06);
     // "next level": the first level not done yet (the first one when all are done)
     const next = list.find((l) => !this.save.lw.done[l.id]) || list[0];
     place(h('button', { class: 'lw-hit', 'aria-label': 'next', onclick: () => { sh.sound.play('tap'); this._enter(next.id); } }), 0.114, 0.46, 0.22, 0.12);
@@ -585,6 +587,23 @@ class Game {
     place(ageB, 0.069, 0.17, 0.115, 0.055);
     if (this.save.lw.points) place(h('div', { class: 'lw-ptstag' }, `⭐ ${sh.T.num(this.save.lw.points)}`), 0.069, 0.235, 0.115, 0.05);
     return wrap;
+  }
+
+  /** The topic levels as a small page of tiles (opened from «مستويات أكتر»). */
+  _moreLevels() {
+    const sh = this.sh;
+    const done = this.save.lw.done || {};
+    const en = sh.T.lang === 'en';
+    const tiles = TOPIC_LEVELS.map((lv, i) => h('button', {
+      class: `lw-tile${done[lv.id] ? ' done' : ''}`, 'aria-label': lv.ar,
+      onclick: () => { sh.sound.play('tap'); box.remove(); this._enter(lv.id); },
+    }, h('i', {}, lv.emoji), h('b', {}, sh.T.num(LEVELS.length + i + 1)), h('span', {}, lv.ar), done[lv.id] ? h('u', {}, '⭐') : null));
+    const box = h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.45);z-index:30' },
+      h('div', { class: 'lw-card' },
+        h('div', { class: 'lw-title' }, en ? 'More levels' : 'مستويات أكتر'),
+        h('div', { class: 'lw-grid' }, tiles),
+        h('button', { class: 'lw-moreclose', onclick: () => box.remove() }, en ? 'Close' : 'اقفل')));
+    sh.layer.append(box);
   }
 
   _clearRound() {
@@ -608,9 +627,9 @@ class Game {
     const sh = this.sh;
     this._clearRound();
     this.levelId = levelId;
-    this.level = LEVELS.find((l) => l.id === levelId);
+    this.level = ALL_LEVELS.find((l) => l.id === levelId);
     if (!keepSpin) this._spin = this.save.lw.spin || 0;
-    const worldIdx = Math.max(0, levelsFor(sh.age).findIndex((l) => l.id === levelId)) + this._spin;
+    const worldIdx = Math.max(0, ALL_LEVELS.findIndex((l) => l.id === levelId)) + this._spin;
     this._goWorld(worldIdx);
     this.mem.begin(levelId);
     this.firstTry = 0; // answers right at the first try in this game (the rating)
@@ -748,7 +767,7 @@ class Game {
     this.st.mode = 'end';
     sh.sound.setSuspense(false);
     this.sign.remove();
-    const list = levelsFor(sh.age);
+    const list = ALL_LEVELS; // the twelve map levels, then the topic levels
     const idx = list.findIndex((l) => l.id === this.levelId);
     this.save.lw.done[this.levelId] = true;
     this.save.lw.unlocked = Math.max(this.save.lw.unlocked || 1, idx + 2);
@@ -806,7 +825,7 @@ class Game {
     const en = sh.T.lang === 'en';
     const done = this.save.lw.done || {};
     const best = this.save.lw.best || {};
-    const tiles = levelsFor(sh.age).map((lv, i) => h('button', {
+    const tiles = ALL_LEVELS.map((lv, i) => h('button', {
       class: `lw-jt${lv.id === this.levelId ? ' here' : ''}${done[lv.id] ? ' done' : ''}`, title: lv.ar, 'aria-label': lv.ar,
       onclick: () => { sh.sound.play('tap'); this._closeJump(); clearTimeout(this._endT); if (sh.voice && sh.voice.stop) sh.voice.stop(); this._enter(lv.id); },
     }, h('i', {}, lv.emoji), h('b', {}, sh.T.num(i + 1)), best[lv.id] ? h('u', {}, '★'.repeat(best[lv.id])) : null));
@@ -1095,6 +1114,9 @@ const CSS = `
 .lw-pic-blur{position:absolute;inset:-5%;width:110%;height:110%;object-fit:cover;filter:blur(18px) brightness(.9);transform:scale(1.05)}
 .lw-pic-box{position:relative}
 .lw-pic-img{display:block;width:100%;height:100%;user-select:none;-webkit-user-drag:none}
+.lw-more{position:absolute;border:calc(var(--u)*.5) solid #fff;border-radius:999px;background:linear-gradient(180deg,#ffb84a,#f08a1a);color:#fff;font-family:inherit;font-weight:900;font-size:calc(var(--u)*2.6);cursor:pointer;box-shadow:0 calc(var(--u)*.5) 0 #b8600a}
+.lw-moreclose{margin-top:calc(var(--u)*1.5);padding:calc(var(--u)*1) calc(var(--u)*4);border:none;border-radius:999px;background:#fff;color:#5a3a9a;font-family:inherit;font-weight:900;font-size:calc(var(--u)*3);cursor:pointer}
+.lw-card .lw-grid{max-height:70vh;overflow:auto}
 .lw-hit{position:absolute;border:none;background:transparent;padding:0;margin:0;cursor:pointer;opacity:0;border-radius:18%}
 .lw-hit:focus-visible{opacity:1;outline:calc(var(--u)*.8) solid #fff200;background:rgba(255,242,0,.18)}
 .lw-hit.off{pointer-events:none}

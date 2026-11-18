@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { LEVELS, LevelPlay } from '../src/letters/levels.js';
+import { ALL_LEVELS as LEVELS, LevelPlay } from '../src/letters/levels.js';
 import { FreshMemory } from '../src/letters/fresh.js';
 import { ROUNDS } from '../src/letters/sim.js';
 
@@ -22,7 +22,7 @@ const keysOf = (p) => p.rounds.map((r) => r.key || r.answer);
 const reopen = (mem) => new FreshMemory(JSON.parse(JSON.stringify(mem.toJSON())), mem.week); // the app was closed and opened again
 
 for (const age of [2, 3, 4, 5, 6]) {
-  test(`age ${age}: all 12 levels, repeated plays and app restarts show new things and never repeat inside a game`, () => {
+  test(`age ${age}: all levels, repeated plays and app restarts show new things and never repeat inside a game`, () => {
     let mem = new FreshMemory(null, 2900);
     const report = [];
     for (const lv of LEVELS) {

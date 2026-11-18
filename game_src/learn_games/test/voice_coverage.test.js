@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
-import { LEVELS, LevelPlay } from '../src/letters/levels.js';
+import { ALL_LEVELS as LEVELS, LevelPlay } from '../src/letters/levels.js';
 import { FreshMemory } from '../src/letters/fresh.js';
 
 // "nothing is silent": every sentence a question or a right answer can say has a recorded clip (the narrator's voice, not the device voice)
