@@ -1,11 +1,13 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
     <!-- Needed by release builds for the YouTube player, video thumbnails and the optional teachers service. -->
     <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- Microphone: parent dictation (on-device speech recognition). Requested only when the parent presses the dictation button.
-         Release 1 (offline) declares no camera and no network-state-change permission: video calls are off.
-         Re-add them (see docs/FIREBASE_AND_ACCOUNTS.md) when calls are enabled in the online phase. -->
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
+    <!-- Release 1 (offline, owner decision 2026-11-18): NO microphone, NO camera. Parent dictation shows "type the note instead" and the
+         online family calls are off. The plugins (speech_to_text, record, flutter_webrtc) declare these permissions themselves, so they are
+         removed from the merged manifest here. Re-add RECORD_AUDIO / CAMERA / MODIFY_AUDIO_SETTINGS (delete these three lines) when calls or
+         dictation are enabled in the online phase, and update docs/PRIVACY_POLICY_DRAFT.md first. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" tools:node="remove"/>
+    <uses-permission android:name="android.permission.CAMERA" tools:node="remove"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" tools:node="remove"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <application
         android:allowBackup="false"

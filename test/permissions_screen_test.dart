@@ -17,7 +17,7 @@ void main() {
     for (final lang in ['ar', 'en']) {
       test('every entry has all four explanations in $lang', () async {
         await AppLocale.instance.set(lang);
-        expect(appPermissions.map((p) => p.id), ['microphone', 'storage']);
+        expect(appPermissions.map((p) => p.id), ['storage']);
         for (final p in appPermissions) {
           for (final text in [p.name(), p.usedFor(), p.whenAsked(), p.ifRefused(), p.never()]) {
             expect(text.trim(), isNotEmpty, reason: p.id);
@@ -38,9 +38,10 @@ void main() {
 
   group('matches what the Android manifest really declares', () {
     final manifest = File('android/app/src/main/AndroidManifest.xml').readAsStringSync();
-    test('the microphone is declared and listed; the camera is neither declared nor listed in the offline Release 1', () {
-      expect(manifest, contains('android.permission.RECORD_AUDIO'));
-      expect(manifest, isNot(contains('android.permission.CAMERA')));
+    test('the microphone and the camera are stripped from the merged manifest and not listed in the offline Release 1', () {
+      expect(manifest, contains('android.permission.RECORD_AUDIO" tools:node="remove"'));
+      expect(manifest, contains('android.permission.CAMERA" tools:node="remove"'));
+      expect(appPermissions.map((p) => p.id), isNot(contains('microphone')));
       expect(manifest, isNot(contains('android.hardware.camera')));
       expect(manifest, isNot(contains('CHANGE_NETWORK_STATE')));
       expect(appPermissions.map((p) => p.id), isNot(contains('camera')));
@@ -79,7 +80,6 @@ void main() {
           ));
           await t.pump();
           expect(t.takeException(), isNull);
-          expect(find.byKey(const ValueKey('permission_microphone')), findsOneWidget);
           await t.scrollUntilVisible(find.byKey(const ValueKey('permission_storage')), 300);
           expect(find.byKey(const ValueKey('permission_storage')), findsOneWidget);
           expect(t.takeException(), isNull);
@@ -94,10 +94,10 @@ void main() {
       addTearDown(t.view.reset);
       await t.pumpWidget(app(const PermissionsScreen()));
       await t.pump();
-      expect(find.textContaining('Why: '), findsNWidgets(2));
-      expect(find.textContaining('When it is asked: '), findsNWidgets(2));
-      expect(find.textContaining('If you refuse: '), findsNWidgets(2));
-      expect(find.textContaining('What we never do: '), findsNWidgets(2));
+      expect(find.textContaining('Why: '), findsNWidgets(1));
+      expect(find.textContaining('When it is asked: '), findsNWidgets(1));
+      expect(find.textContaining('If you refuse: '), findsNWidgets(1));
+      expect(find.textContaining('What we never do: '), findsNWidgets(1));
     });
   });
 

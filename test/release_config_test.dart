@@ -22,8 +22,11 @@ void main() {
 
     test('backup is off (child data stays on the device) and only the expected permissions are declared', () {
       expect(manifest, contains('android:allowBackup="false"'));
-      final perms = RegExp(r'uses-permission android:name="android\.permission\.([A-Z_]+)"').allMatches(manifest).map((m) => m.group(1)).toSet();
-      expect(perms, {'INTERNET', 'RECORD_AUDIO', 'MODIFY_AUDIO_SETTINGS', 'ACCESS_NETWORK_STATE'});
+      final perms = RegExp(r'uses-permission android:name="android\.permission\.([A-Z_]+)"(?! tools:node="remove")').allMatches(manifest).map((m) => m.group(1)).toSet();
+      expect(perms, {'INTERNET', 'ACCESS_NETWORK_STATE'}); // no microphone, no camera in the offline Release 1
+      for (final removed in ['RECORD_AUDIO', 'CAMERA', 'MODIFY_AUDIO_SETTINGS']) {
+        expect(manifest, contains('android.permission.$removed" tools:node="remove"')); // plugin-declared permissions are stripped from the merged manifest
+      }
       for (final forbidden in ['ACCESS_FINE_LOCATION', 'ACCESS_COARSE_LOCATION', 'READ_CONTACTS', 'READ_PHONE_STATE', 'WRITE_EXTERNAL_STORAGE', 'READ_EXTERNAL_STORAGE', 'SYSTEM_ALERT_WINDOW', 'RECEIVE_BOOT_COMPLETED']) {
         expect(manifest.contains(forbidden), isFalse, reason: forbidden);
       }

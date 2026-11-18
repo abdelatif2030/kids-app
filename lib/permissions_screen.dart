@@ -31,30 +31,9 @@ class PermissionInfo {
   });
 }
 
-/// The permissions listed in the Android manifest that a parent can see or refuse: microphone and
-/// files/photos (which the app reaches through the phone's own picker, so there is no storage permission).
+/// The permissions listed in the Android manifest that a parent can see or refuse. Release 1 (offline) asks for no microphone and no camera;
+/// only files/photos (which the app reaches through the phone's own picker, so there is no storage permission).
 final List<PermissionInfo> appPermissions = [
-  PermissionInfo(
-    id: 'microphone',
-    icon: Icons.mic_rounded,
-    name: () => tr2('الميكروفون', 'Microphone'),
-    usedFor: () => tr2(
-      'إملاء الصوت للأهل فقط (مثل كتابة ملاحظة بصوتك)، والتعرّف على الكلام يتم على الجهاز نفسه.',
-      'Parent dictation only (for example saying a note instead of typing it). Speech is recognised on the phone itself.',
-    ),
-    whenAsked: () => tr2(
-      'عند الضغط على زر الإملاء لأول مرة، وليس عند فتح التطبيق.',
-      'The first time you press the dictation button, not when the app opens.',
-    ),
-    ifRefused: () => tr2(
-      'يبقى كل شيء آخر يعمل، ويمكنك الكتابة بدل الإملاء.',
-      'Everything else keeps working, and you can type instead of speaking.',
-    ),
-    never: () => tr2(
-      'لا يسمع التطبيق في الخلفية ولا يحفظ أي تسجيل ولا يرسله. الصوت يُستعمل فقط أثناء الإملاء الذي تبدؤه.',
-      'The app never listens in the background and never stores or sends a recording. Sound is used only during a dictation that you start.',
-    ),
-  ),
   PermissionInfo(
     id: 'storage',
     icon: Icons.folder_rounded,
