@@ -99,8 +99,10 @@ for (const q of colorsMod.allColorSentences()) add(q, 'ar'); // 25 colours + the
 for (const q of lv.allHarakaSentences()) add(q, 'ar'); // letters with a vowel mark (28 x 3)
 for (const q of animals.allAnimalExtraSentences()) add(q, 'ar'); // who says it, where it lives
 for (const q of lv.allFormSentences()) add(q, 'ar'); // the forms of a letter
+for (const q of ['كام موزة؟', 'كام برتقالة؟', 'كام فراولة؟', 'كام كمثرى؟']) add(q, 'ar'); // counting with other fruits
 const timeMod = await imp('letters/time_level.js');
 for (const q of timeMod.allTimeSentences()) add(q, 'ar'); // days and seasons level
+await imp('letters/topic_use_more.js');
 const topicUseMod = await imp('letters/topic_use.js');
 for (const q of topicUseMod.allTopicUseSentences()) add(q, 'ar'); // topic levels: what a thing is for
 const extrasMod = await imp('letters/extras.js');

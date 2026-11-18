@@ -355,7 +355,7 @@ class Game {
       const size = n > 15 ? 0.78 : n > 10 ? 0.9 : n > 6 ? 1.0 : 1.15;
       const apples = [];
       for (let k = 0; k < n; k++) {
-        const a = makeThing('apple');
+        const a = makeThing(show.thing || 'apple');
         a.scale.setScalar(size);
         const r = Math.floor(k / cols), c = k % cols;
         a.position.set((c - (cols - 1) / 2) * 0.62 * size + (r % 2) * 0.12, 0.76, (r - (rows - 1) / 2) * 0.52 * size);
@@ -570,6 +570,9 @@ class Game {
       const best = (this.save.lw.best || {})[lv.id];
       if (best) place(h('i', { class: 'lw-best' }, '★'.repeat(best)), cx, cy + 0.068, 0.15, 0.035);
     });
+    // «تقريري»: what was played and learned (the history), and the choice to continue after the last level played
+    place(h('button', { class: 'lw-more lw-rep', onclick: () => { sh.sound.play('tap'); this._report(); } }, sh.T.lang === 'en' ? '📒 My report' : '📒 تقريري'), 0.86, 0.945, 0.22, 0.06);
+    if (!this._askedResume && (this.save.lw.history || []).length && this.save.lw.last) { this._askedResume = true; setTimeout(() => this._resumeChoice(), 600); }
     // «مستويات أكتر»: the topic levels (body, clothes, jobs...), drawn in code under the picture's tiles
     place(h('button', { class: 'lw-more', onclick: () => { sh.sound.play('tap'); this._moreLevels(); } }, sh.T.lang === 'en' ? '➕ More levels' : '➕ مستويات أكتر'), 0.5, 0.945, 0.3, 0.06);
     // "next level": the first level not done yet (the first one when all are done)
@@ -587,6 +590,52 @@ class Game {
     place(ageB, 0.069, 0.17, 0.115, 0.055);
     if (this.save.lw.points) place(h('div', { class: 'lw-ptstag' }, `⭐ ${sh.T.num(this.save.lw.points)}`), 0.069, 0.235, 0.115, 0.05);
     return wrap;
+  }
+
+  /** On opening: continue after the last level played, or start again from the first one. */
+  _resumeChoice() {
+    const sh = this.sh;
+    if (this.st.mode !== 'menu') return;
+    const en = sh.T.lang === 'en';
+    const idx = ALL_LEVELS.findIndex((l) => l.id === this.save.lw.last);
+    const next = ALL_LEVELS[(idx + 1) % ALL_LEVELS.length];
+    const last = ALL_LEVELS[idx];
+    if (!last) return;
+    const box = h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.45);z-index:30' },
+      h('div', { class: 'lw-card' },
+        h('div', { class: 'lw-title' }, en ? 'Welcome back!' : 'أهلاً بيك تاني!'),
+        h('div', { class: 'lw-sub' }, en ? `Last time: ${last.ar}` : `آخر مرة لعبت: ${last.ar}`),
+        h('button', { class: 'lw-choice', onclick: () => { box.remove(); sh.sound.play('tap'); this._enter(next.id); } }, en ? `▶ Continue: ${next.ar}` : `▶ كمّل: ${next.ar}`),
+        h('button', { class: 'lw-choice alt', onclick: () => { box.remove(); sh.sound.play('tap'); this._enter(ALL_LEVELS[0].id); } }, en ? '↺ Start from the beginning' : '↺ ابدأ من الأول'),
+        h('button', { class: 'lw-moreclose', onclick: () => box.remove() }, en ? 'Choose a level' : 'هاختار مستوى')));
+    sh.layer.append(box);
+  }
+
+  /** «تقريري»: games played, stars, and what was learned in each game (kept on the device). */
+  _report() {
+    const sh = this.sh;
+    const en = sh.T.lang === 'en';
+    const lw = this.save.lw;
+    const hist = lw.history || [];
+    const done = ALL_LEVELS.filter((l) => lw.done[l.id]).length;
+    const stars = hist.reduce((a, x) => a + (x.s || 0), 0);
+    const rows = [...hist].reverse().slice(0, 30).map((x) => {
+      const lv = ALL_LEVELS.find((l) => l.id === x.l);
+      const d = new Date(x.t);
+      return h('div', { class: 'lw-hrow' },
+        h('b', {}, `${lv ? lv.emoji : ''} ${lv ? lv.ar : x.l}  ${'⭐'.repeat(x.s || 1)}`),
+        h('small', {}, `${d.getDate()}/${d.getMonth() + 1}`),
+        h('span', {}, (x.q || []).join('  •  ')));
+    });
+    const box = h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.5);z-index:40' },
+      h('div', { class: 'lw-card lw-report' },
+        h('div', { class: 'lw-title' }, en ? 'My report' : 'تقريري'),
+        h('div', { class: 'lw-sub' }, en
+          ? `${hist.length} games • ${done} of ${ALL_LEVELS.length} levels • ${stars} stars`
+          : `لعبت ${sh.T.num(hist.length)} لعبة • خلصت ${sh.T.num(done)} من ${sh.T.num(ALL_LEVELS.length)} مستوى • ${sh.T.num(stars)} نجمة`),
+        rows.length ? h('div', { class: 'lw-hlist' }, rows) : h('div', { class: 'lw-sub' }, en ? 'Play a level and it will show here.' : 'العب مستوى وهيظهر هنا.'),
+        h('button', { class: 'lw-moreclose', onclick: () => box.remove() }, en ? 'Close' : 'اقفل')));
+    sh.layer.append(box);
   }
 
   /** The topic levels as a small page of tiles (opened from «مستويات أكتر»). */
@@ -633,6 +682,7 @@ class Game {
     this._goWorld(worldIdx);
     this.mem.begin(levelId);
     this.firstTry = 0; // answers right at the first try in this game (the rating)
+    this.learnedNow = []; // what was answered right at the first try (kept in the history)
     clearTimeout(this._endT);
     this.play = new LevelPlay(levelId, sh.age, Math.floor(Math.random() * 1e9), this.mem, WORLD_IDS[worldIdx % WORLD_IDS.length]);
     sh.clear();
@@ -705,7 +755,7 @@ class Game {
       setTimeout(() => this.st.mode === 'wait' && this._say(), 900);
       return;
     }
-    if (ev.first) { this.sh.round(this.level.skill, true, r.answer); this.firstTry = (this.firstTry || 0) + 1; }
+    if (ev.first) { this.sh.round(this.level.skill, true, r.answer); this.firstTry = (this.firstTry || 0) + 1; (this.learnedNow = this.learnedNow || []).push(r.prompt); }
     this.mem.note(r.key);
     this.save.lw.fresh = this.mem.toJSON();
     this.st.mode = 'found';
@@ -781,6 +831,11 @@ class Game {
     lw.plays = (lw.plays || 0) + 1;
     lw.best = lw.best || {};
     lw.best[this.levelId] = Math.max(lw.best[this.levelId] || 0, stars);
+    // the history: what the child learned in this game, kept on the device (last 200 games)
+    lw.history = lw.history || [];
+    lw.history.push({ t: Date.now(), l: this.levelId, s: stars, ft, q: (this.learnedNow || []).slice(0, 8) });
+    if (lw.history.length > 200) lw.history.splice(0, lw.history.length - 200);
+    lw.last = this.levelId;
     sh.post({ type: 'points', points: pts, total: lw.points, stars, level: this.levelId, plays: lw.plays });
     sh.saveNow();
     this._rewardPanel(stars);
@@ -793,6 +848,7 @@ class Game {
       // the very last level: the end card (the star the first time), then back to the levels
       sh.sound.setMode('calm');
       sh.finishCard(this.level.ar, this.level.emoji, () => this._begin(this.levelId, true), null, () => this._levels());
+      setTimeout(() => this._report(), 1500); // the whole journey is done: the child's report
       return;
     }
     // no stop between levels (owner 2026-11-12): a short celebration, then the hero walks on slowly to the next place
@@ -1117,6 +1173,13 @@ const CSS = `
 .lw-more{position:absolute;border:calc(var(--u)*.5) solid #fff;border-radius:999px;background:linear-gradient(180deg,#ffb84a,#f08a1a);color:#fff;font-family:inherit;font-weight:900;font-size:calc(var(--u)*2.6);cursor:pointer;box-shadow:0 calc(var(--u)*.5) 0 #b8600a}
 .lw-moreclose{margin-top:calc(var(--u)*1.5);padding:calc(var(--u)*1) calc(var(--u)*4);border:none;border-radius:999px;background:#fff;color:#5a3a9a;font-family:inherit;font-weight:900;font-size:calc(var(--u)*3);cursor:pointer}
 .lw-card .lw-grid{max-height:70vh;overflow:auto}
+.lw-sub{font-weight:800;color:#5a3a9a;text-align:center;font-size:calc(var(--u)*2.6);margin:calc(var(--u)*.6) 0}
+.lw-choice{display:block;width:100%;margin-top:calc(var(--u)*1.2);padding:calc(var(--u)*1.4);border:none;border-radius:999px;background:linear-gradient(180deg,#7ad86a,#2fb85a);color:#fff;font-family:inherit;font-weight:900;font-size:calc(var(--u)*3);cursor:pointer;box-shadow:0 calc(var(--u)*.5) 0 #1a7a3a}
+.lw-choice.alt{background:linear-gradient(180deg,#8ad8ff,#3aa0f0);box-shadow:0 calc(var(--u)*.5) 0 #1a6ab8}
+.lw-hlist{max-height:52vh;overflow:auto;margin-top:calc(var(--u)*1)}
+.lw-hrow{background:#fff;border-radius:calc(var(--u)*1.6);padding:calc(var(--u)*1) calc(var(--u)*1.6);margin:calc(var(--u)*.6) 0;font-size:calc(var(--u)*2.3);color:#3a2a5a;text-align:right}
+.lw-hrow b{display:block}.lw-hrow small{color:#8a7aaa}.lw-hrow span{display:block;font-size:calc(var(--u)*2);color:#5a4a7a}
+.lw-report{max-width:min(92vw,calc(var(--u)*60))}
 .lw-hit{position:absolute;border:none;background:transparent;padding:0;margin:0;cursor:pointer;opacity:0;border-radius:18%}
 .lw-hit:focus-visible{opacity:1;outline:calc(var(--u)*.8) solid #fff200;background:rgba(255,242,0,.18)}
 .lw-hit.off{pointer-events:none}

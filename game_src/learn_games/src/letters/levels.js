@@ -20,8 +20,11 @@ import { COLORS, COLOR_TIERS, COLOR_THINGS, colorPlan, colorChoices, findColorQ,
 import { TIERS, COUNT_TIERS, numberPlan, countPlan, numberWord, findQ, afterQ, beforeQ, BIGGER_Q, SMALLER_Q } from './numbers.js';
 const range0 = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
 import MORE_WORDS from './more_words.json' with { type: 'json' };
-import { TOPIC_USE } from './topic_use.js';
+import { TOPIC_USE, TOPIC_EXTRA_ITEMS } from './topic_use.js';
+import './topic_use_more.js';
 import { timeQuestions } from './time_level.js';
+import VOICED from './voiced.json' with { type: 'json' };
+const VOICED_SET = new Set(VOICED);
 // (FreshMemory, in fresh.js, is passed in by the game: it remembers what each child already met)
 
 export const LEVELS = [
@@ -34,8 +37,8 @@ export const LEVELS = [
   { id: 'shapes', mode: 'shape', ar: 'الأشكال الهندسية', emoji: '🔷', skill: 'shapes' },
   { id: 'animals', mode: 'animal', ar: 'الحيوانات وأصواتها', emoji: '🐰', skill: 'nature' },
   { id: 'colors', mode: 'color', ar: 'أتعلم الألوان', emoji: '🎨', skill: 'colors' },
-  { id: 'fruits', mode: 'pick', table: 'fruits', ar: 'فواكه وخضار صحية', emoji: '🍓', skill: 'vocab' },
-  { id: 'vehicles', mode: 'pick', table: 'vehicles', ar: 'وسائل المواصلات', emoji: '🚌', skill: 'vocab' },
+  { id: 'fruits', mode: 'pick', table: 'fruits', topic: true, ar: 'فواكه وخضار صحية', emoji: '🍓', skill: 'vocab' },
+  { id: 'vehicles', mode: 'pick', table: 'vehicles', topic: true, ar: 'وسائل المواصلات', emoji: '🚌', skill: 'vocab' },
   { id: 'habits', mode: 'habit', ar: 'عادات صحية ومهذبة', emoji: '🧼', skill: 'listening' },
 ];
 
@@ -86,28 +89,29 @@ export const formQ = (l, f) => `فين ${l.the} اللي في ${f.word} الكل
 export const allFormSentences = () => LETTERS.filter((l) => CONNECTING.has(l.id)).flatMap((l) => FORMS.map((f) => formQ(l, f)));
 /** More levels, one per everyday topic, made of the picture-words (more_words.json) grouped by their art prefix. Every sentence «فين ...؟» is already recorded. */
 export const TOPICS = [
-  { id: 't_body', ar: 'أجزاء جسمي', emoji: '🧍', prefixes: ['y'] },
-  { id: 't_clothes', ar: 'ملابسي', emoji: '👕', prefixes: ['l'] },
+  { id: 't_me', ar: 'جسمي وعيلتي', emoji: '🧍', prefixes: ['y', 'a'] },
+  { id: 't_house', ar: 'ملابسي وبيتي', emoji: '👕', prefixes: ['l', 'h'] },
   { id: 't_jobs', ar: 'مهن حولي', emoji: '👩‍⚕️', prefixes: ['z'] },
   { id: 't_food', ar: 'أكل وحلويات', emoji: '🍞', prefixes: ['o', 'r'] },
-  { id: 't_school', ar: 'أدوات مدرستي', emoji: '✏️', prefixes: ['e'] },
-  { id: 't_music', ar: 'آلات موسيقية', emoji: '🥁', prefixes: ['m'] },
-  { id: 't_family', ar: 'عيلتي', emoji: '👨‍👩‍👧', prefixes: ['a'] },
+  { id: 't_school', ar: 'مدرستي وموسيقاي', emoji: '✏️', prefixes: ['e', 'm'] },
   { id: 't_bugs', ar: 'حشرات وطيور', emoji: '🐜', prefixes: ['i'] },
   { id: 't_weather', ar: 'الجو والفصول', emoji: '🌦️', prefixes: ['t'] },
   { id: 't_sea', ar: 'عالم البحر', emoji: '🐚', prefixes: ['u', 'b'] },
   { id: 't_space', ar: 'فضاء وخيال', emoji: '🚀', prefixes: ['s', 'k'] },
-  { id: 't_home', ar: 'أشياء بيتي', emoji: '🏠', prefixes: ['h'] },
   { id: 't_wild', ar: 'حيوانات الغابة والمزرعة', emoji: '🦁', prefixes: ['j', 'f', 'w'] },
   { id: 't_places', ar: 'مصر والمدينة', emoji: '🏜️', prefixes: ['d', 'c'] },
 ];
 for (const t of TOPICS) {
-  PICKS[t.id] = { prompt: (it) => `فين ${it.the}؟`, items: MORE_WORDS.filter((w) => t.prefixes.some((p) => w.thing.startsWith(`${p}_`))).map((w) => ({ id: w.thing, the: w.the, thing: w.thing })) };
+  PICKS[t.id] = { prompt: (it) => `فين ${it.the}؟`, items: [...MORE_WORDS.filter((w) => t.prefixes.some((p) => w.thing.startsWith(`${p}_`))).map((w) => ({ id: w.thing, the: w.the, thing: w.thing })), ...(TOPIC_EXTRA_ITEMS[t.id] || []).filter(([, the]) => VOICED_SET.has(`فين ${the}؟`)).map(([th, the]) => ({ id: th, the, thing: th }))] };
 }
+// a fact whose sentence has no recording yet is not asked (never silent)
+const FACTS = {};
+for (const k of Object.keys(TOPIC_USE)) FACTS[k] = [...new Map(TOPIC_USE[k].map((f) => [f[0], f])).values()].filter(([q, th]) => VOICED_SET.has(q) && PICKS[k] && PICKS[k].items.some((x) => x.thing === th));
 export const TOPIC_LEVELS = TOPICS.map((t) => ({ id: t.id, mode: 'pick', table: t.id, ar: t.ar, emoji: t.emoji, skill: 'vocab', topic: true }));
 /** The twelve map levels, then the topic levels (reached from «مستويات أكتر»). */
 TOPIC_LEVELS.push({ id: 't_time', mode: 'time', ar: 'الأيام والفصول', emoji: '📅', skill: 'vocab', topic: true });
 export const ALL_LEVELS = [...LEVELS, ...TOPIC_LEVELS];
+export const COUNT_FRUITS = [['apple', null], ['banana', 'موزة'], ['orange', 'برتقالة'], ['strawberry', 'فراولة'], ['pear', 'كمثرى']].filter(([, w]) => !w || VOICED_SET.has(`كام ${w}؟`));
 export const levelOf = (id) => ALL_LEVELS.find((l) => l.id === id);
 /** The youngest (four) skip the two alphabet levels that need reading order. */
 export const levelsFor = (_age) => LEVELS; // every level is open at every age: the age only picks what comes first (tiers)
@@ -305,7 +309,9 @@ export class LevelPlay {
         } else if (kind === 'count') {
           const n = draw(tier, lastN());
           mark(n);
-          out.push({ prompt: COUNT_Q, answer: `n${n}`, n, key: `n:${n}`, show: { type: 'apples', n }, countAloud: n, options: asOpts(optionsFor(this.age, n, this.seed + i * 31, 20)) });
+          // another fruit each time the same number comes back (apple, banana, orange, strawberry, pear)
+          const fr = COUNT_FRUITS[((mem && mem.seen[`n:${n}`]) || Math.floor(r() * 5)) % COUNT_FRUITS.length];
+          out.push({ prompt: fr[1] ? `كام ${fr[1]}؟` : COUNT_Q, answer: `n${n}`, n, key: `n:${n}`, show: { type: 'apples', n, thing: fr[0] }, countAloud: n, options: asOpts(optionsFor(this.age, n, this.seed + i * 31, 20)) });
         } else if (kind === 'find') {
           const n = draw(tier, lastN());
           mark(n);
@@ -529,14 +535,43 @@ export class LevelPlay {
       }
     } else if (mode === 'pick') {
       const tab = PICKS[this.level.table];
-      const keyOfItem = (it) => (it.thing ? `t:${it.thing}` : `c:${it.id}`);
+      const keyOfItem = (it) => (FACTS[this.level.table] ? `tp:${this.level.table}:${it.id}` : it.thing ? `t:${it.thing}` : `c:${it.id}`); // a topic level remembers its own pictures
       const next = bag(tab.items.map((x) => x.id), (id) => keyOfItem(tab.items.find((x) => x.id === id)));
       // one round asks for a GROUP: «فين الفاكهة؟» / «فين الخضار؟» (from age 4) or «فين اللي بيطير؟» (from age 3)
       const tbl = this.level.table;
-      let grpSlot = (tbl === 'fruits' && this.age >= 4) || (tbl === 'vehicles' && this.age >= 3) || TOPIC_USE[tbl] ? 1 + Math.floor(r() * (ROUNDS - 1)) : -1;
+      let grpSlot = (tbl === 'fruits' && this.age >= 4) || (tbl === 'vehicles' && this.age >= 3) ? 1 + Math.floor(r() * (ROUNDS - 1)) : -1;
       const usedIds = new Set();
       const isNew = (it) => !mem || mem.score(keyOfItem(it)) <= 0;
+      // topic levels: three rounds ask a FACT (what a thing is for), each fact is its own «thing to learn» (key u:<question>)
+      const useSlots = new Set();
+      if (FACTS[tbl]) {
+        // the more pictures the child already met, the more rounds ask a fresh fact instead (the facts are many)
+        const freshFinds = tab.items.filter(isNew).length;
+        const nUse = Math.max(this.age <= 2 ? 2 : 3, Math.min(this.age <= 2 ? 4 : 6, ROUNDS - Math.min(5, freshFinds)));
+        while (useSlots.size < nUse) useSlots.add(1 + Math.floor(r() * (ROUNDS - 1)));
+      }
+      // the facts of this game are chosen first (new ones, each about a different picture), so the plain rounds never use their pictures
+      const planned = [];
+      const reserved = new Set();
+      if (FACTS[tbl]) {
+        const pool = (mem ? mem.order(FACTS[tbl], (f) => `u:${f[0]}`, r) : [...FACTS[tbl]].sort(() => r() - 0.5));
+        for (const f of pool) { if (planned.length >= useSlots.size) break; if (!reserved.has(f[1]) && (!mem || mem.score(`u:${f[0]}`) <= 0 || planned.length < 1 && false)) { planned.push(f); reserved.add(f[1]); } }
+        for (const f of pool) { if (planned.length >= useSlots.size) break; if (!reserved.has(f[1]) && !planned.includes(f)) { planned.push(f); reserved.add(f[1]); } } // nothing new left: the oldest
+      }
       for (let i = 0; i < ROUNDS; i++) {
+        if (useSlots.has(i) && planned.length) {
+          const facts = [planned.shift()];
+          if (facts.length) {
+            const [uq, uth] = facts[Math.floor(r() * facts.length)];
+            const ans = tab.items.find((x) => x.thing === uth);
+            drawn.add(`u:${uq}`);
+            usedIds.add(ans.id);
+            mark(ans.id);
+            const others = pickLow(tab.items.filter((x) => x.thing !== uth), nOpt - 1);
+            out.push({ prompt: uq, answer: ans.id, key: `u:${uq}`, options: [ans, ...others].sort(() => r() - 0.5).map((x) => ({ id: x.id, kind: 'thing', thing: x.thing })) });
+            continue;
+          }
+        }
         if (i === grpSlot) {
           let q = null, inGroup = [], outside = [];
           if (tbl === 'fruits') {
@@ -546,9 +581,9 @@ export class LevelPlay {
             q = veg ? VEG_Q : FRUIT_Q;
             inGroup = tab.items.filter((x) => isVegetable(x) === veg);
             outside = tab.items.filter((x) => isVegetable(x) !== veg);
-          } else if (TOPIC_USE[tbl]) {
+          } else if (false) {
             // «بنستخدمه في إيه؟»: a use question whose right picture the child has not met yet
-            const uses = TOPIC_USE[tbl].filter(([, th]) => { const it = tab.items.find((x) => x.thing === th); return it && !usedIds.has(it.id) && isNew(it); });
+            const uses = FACTS[tbl].filter(([, th]) => { const it = tab.items.find((x) => x.thing === th); return it && !usedIds.has(it.id) && isNew(it); });
             const [uq, uth] = uses.length ? uses[Math.floor(r() * uses.length)] : [null, null];
             q = uq;
             inGroup = uq ? tab.items.filter((x) => x.thing === uth) : [];
@@ -571,7 +606,7 @@ export class LevelPlay {
           continue;
         }
         let id = next();
-        for (let tries = 0; tries < 60 && (usedIds.has(id) || (i && out[i - 1].answer === id)); tries++) id = next();
+        for (let tries = 0; tries < 60 && (usedIds.has(id) || reserved.has(tab.items.find((x) => x.id === id).thing) || (i && out[i - 1].answer === id)); tries++) id = next();
         usedIds.add(id);
         const it = tab.items.find((x) => x.id === id);
         mark(id);

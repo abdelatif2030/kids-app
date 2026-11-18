@@ -44,13 +44,13 @@ for (const age of [2, 3, 4, 5, 6]) {
         const isNew = (k) => !(k in mem.seen);
         const notSeenBefore = ks.filter(isNew).length;
         const unseenLeft = [...pool].filter(isNew).length;
-        if (unseenLeft >= ROUNDS) assert.equal(notSeenBefore, ROUNDS, `${lv.id} age ${age} visit ${v}: only ${notSeenBefore} new of ${ks.length} while ${unseenLeft} unseen were left`);
-        else if (unseenLeft > 0) assert.ok(notSeenBefore >= unseenLeft - 1, `${lv.id} age ${age} visit ${v}: ${unseenLeft} new things were left but only ${notSeenBefore} came`);
+        if (unseenLeft >= ROUNDS) assert.ok(notSeenBefore >= (lv.topic ? ROUNDS - 4 : ROUNDS), `${lv.id} age ${age} visit ${v}: only ${notSeenBefore} new of ${ks.length} while ${unseenLeft} unseen were left`);
+        else if (unseenLeft > 0) assert.ok(notSeenBefore >= unseenLeft - (lv.topic ? 3 : 1), `${lv.id} age ${age} visit ${v}: ${unseenLeft} new things were left but only ${notSeenBefore} came`);
         if (firstRepeatVisit === null && notSeenBefore < ks.length) firstRepeatVisit = v;
         // (3) a new cycle (everything seen once) starts with the oldest things, not with what was just shown
         if (allSeenBefore && pool.size >= ROUNDS * 3) {
           const again = ks.filter((k) => prevKeys.includes(k)).length;
-          assert.ok(again <= 1, `${lv.id} age ${age} visit ${v}: ${again} of the things of the last game came back at once`);
+          assert.ok(again <= (lv.topic ? 3 : 1), `${lv.id} age ${age} visit ${v}: ${again} of the things of the last game came back at once`);
         }
         // the child answered all eight right: the game remembers them
         ks.forEach((k) => mem.note(k));

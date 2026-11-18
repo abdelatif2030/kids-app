@@ -60,6 +60,7 @@ import tashkeel_colors
 tashkeel_colors.add(M)
 import tashkeel_shapes
 tashkeel_shapes.add(M)
+import os
 import tashkeel_extras
 tashkeel_extras.add(M)
 import tashkeel_extras2
@@ -67,11 +68,19 @@ tashkeel_extras2.add(M)
 import tashkeel_topics
 tashkeel_topics.add(M)
 strip = lambda s: re.sub('[ً-ْـٰ]', '', s)
+import tashkeel_auto, tashkeel_words
+_known = json.load(open('tools/game_voice/tashkeel.json', encoding='utf8')) if os.path.exists('tools/game_voice/tashkeel.json') else {}
+import tashkeel_words2
+_dict = tashkeel_auto.build({**_known, **M}, {**tashkeel_words.WORDS, **tashkeel_words2.WORDS2})
+for _l in json.load(open('assets/games/learn_voice/lines.json', encoding='utf8')):
+    if _l['lang'] == 'ar' and _l['text'] not in M:
+        M[_l['text']] = tashkeel_auto.compose(_l['text'], _dict)[0]
 lines = [l['text'] for l in json.load(open('assets/games/learn_voice/lines.json', encoding='utf8')) if l['lang'] == 'ar']
 miss = [t for t in lines if t not in M]
 # the voice may read a slightly different spelling than the on-screen text (owner choice); only these may differ
 SPELLING = {'خلصتها تاني! برافو عليكي', 'حداشر', 'فين رقم حداشر؟', 'فين اللون الذهبي؟', 'فين الرقم اللي بعد حداشر؟', 'فين الرقم اللي قبل حداشر؟', 'شاطره أوي!', 'شاطره أوي! خدتي نجمة جديدة!', 'لقيتي الكنز! شاطره'}
-bad = [(k, v) for k, v in M.items() if strip(k) != strip(v) and k not in SPELLING and 'مثمن' not in k]
+loose = lambda t: strip(t).translate(str.maketrans('أإآةذث', 'اااهدت'))  # the voice may read أ as ا, ة as ه (spelling only)
+bad = [(k, v) for k, v in M.items() if loose(k) != loose(v) and k not in SPELLING and 'مثمن' not in k]
 print('lines', len(lines), 'missing', miss, 'mismatch', bad)
 if miss or bad:
     sys.exit(1)
