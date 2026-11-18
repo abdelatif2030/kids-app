@@ -1,0 +1,3 @@
+# Rain Circuit / سباق حلبة المطر (2026-11-18)
+Owner request from a video: rain-soaked race winding through green hills and palms. Forked from Dune Titans (game_src/rain_circuit): sports cars (code-drawn), 3 laps, 6 cars (5 rivals), brake before corners, nitro, slipstream, rain particles, wet grey road, palms and green hills, glowing blue pickups that refill nitro (respawn after 25 s). `npm test` 7 tests (a robot finishes every round).
+- Not done: real elevation changes (the track is flat), collisions with cars (soft overtaking as in the base race). NOT tested on a real phone; sound not heard by a person.

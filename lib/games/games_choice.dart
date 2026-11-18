@@ -347,6 +347,7 @@ class FunGamesMore2Screen extends StatelessWidget {
               _card(context, 'fun_dune_titans', kDuneTitans, 'assets/games/dune_titans/card.webp', 'Dune Titans', const Color(0xFFE08A3A), const Color(0xFFF6D8A0)),
               _card(context, 'fun_castaway_raft', kCastawayRaft, 'assets/games/castaway_raft/card.webp', 'Castaway Raft', const Color(0xFF2A9AD8), const Color(0xFFBFE8FF)),
               _card(context, 'fun_winter_camp', kWinterCamp, 'assets/games/winter_camp/card.webp', 'Winter Camp', const Color(0xFF5AA8E0), const Color(0xFFE8F2FB)),
+              _card(context, 'fun_rain_circuit', kRainCircuit, 'assets/games/rain_circuit/card.webp', 'Rain Circuit', const Color(0xFF4A6A88), const Color(0xFFCFE0F4)),
             ];
             return Stack(children: [
               Center(

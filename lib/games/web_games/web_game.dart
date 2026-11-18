@@ -118,7 +118,7 @@ final WebGame kRhythmSurvival = WebGame(
   title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash, kSkyCapy, kMarbleDozer, kDuneTitans, kCastawayRaft, kWinterCamp];
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash, kSkyCapy, kMarbleDozer, kDuneTitans, kCastawayRaft, kWinterCamp, kRainCircuit];
 
 /// «متجر الفضاء الذكي» (Space Store Manager): a grocery store on a space station (docs/SPACE_STORE.md).
 final WebGame kSpaceStore = WebGame(
@@ -300,6 +300,16 @@ final WebGame kWinterCamp = WebGame(
   storeKey: 'winter_camp',
   minAge: 4,
   title: () => tr2('معسكر الشتاء', 'Winter Camp'),
+);
+
+/// «سباق حلبة المطر» (Rain Circuit): 3-lap wet-road car race with five rivals (docs/RAIN_CIRCUIT.md).
+final WebGame kRainCircuit = WebGame(
+  id: 'rain_circuit',
+  folder: 'rain_circuit',
+  global: 'RainCircuit',
+  storeKey: 'rain_circuit',
+  minAge: 4,
+  title: () => tr2('سباق حلبة المطر', 'Rain Circuit'),
 );
 
 // ---- rebuilt learning games (docs/LEARNING_GAMES_REBUILD.md) ----------------------------------------------------------
