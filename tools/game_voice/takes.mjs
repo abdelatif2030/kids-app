@@ -87,6 +87,9 @@ Object.assign(VARIANTS, {
 Object.assign(VARIANTS, {
   'الكتكوت بيعيش فين؟': ['الكُتْكُوتْ بِيعِيش فِين؟', 'الكُتْكُوووت بِيعِيش فِين؟', 'الكُتْكُوت، بِيعِيش فِين؟'],
 });
+// 2026-11-18 round 2 (the owner did not like these 20): the variants live in a JSON file next to this script
+const EXTRA = path.join(HERE, 'variants_1118b.json');
+if (fs.existsSync(EXTRA)) Object.assign(VARIANTS, JSON.parse(fs.readFileSync(EXTRA, 'utf8')));
 // sentences that need more time (a word was swallowed): slower
 const SLOW = new Set(['اتناشر', 'تسعتاشر', 'تلاتاشر', 'دي قلب', 'دي قلب أحمر', 'دي قلب أصفر', 'دي قلب برتقالي']);
 
