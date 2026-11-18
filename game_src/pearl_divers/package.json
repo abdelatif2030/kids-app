@@ -1,0 +1,12 @@
+{
+  "name": "pearl_divers",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty pearl diving idle (canvas). Built into assets/games/pearl_divers/game.js",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/pearl_divers/game.js",
+    "test": "node --test test/sim.test.js"
+  },
+  "dependencies": { "three": "0.170.0" },
+  "devDependencies": { "esbuild": "0.24.0" }
+}
