@@ -118,7 +118,7 @@ final WebGame kRhythmSurvival = WebGame(
   title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush];
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash];
 
 /// «متجر الفضاء الذكي» (Space Store Manager): a grocery store on a space station (docs/SPACE_STORE.md).
 final WebGame kSpaceStore = WebGame(
@@ -230,6 +230,26 @@ final WebGame kFrostCoil = WebGame(
   storeKey: 'frost_coil',
   minAge: 4,
   title: () => tr2('طريق التنين الجليدي', 'Frost Coil'),
+);
+
+/// «برج الأبطال» (Hero Tower): a tower-climbing power puzzle, from the owner's video (docs/HERO_TOWER.md).
+final WebGame kHeroTower = WebGame(
+  id: 'hero_tower',
+  folder: 'hero_tower',
+  global: 'HeroTower',
+  storeKey: 'hero_tower',
+  minAge: 4,
+  title: () => tr2('برج الأبطال', 'Hero Tower'),
+);
+
+/// «ركضة السحاب» (Cloud Dash): a 3D pastel cloud runner, from the owner's video (docs/CLOUD_DASH.md).
+final WebGame kCloudDash = WebGame(
+  id: 'cloud_dash',
+  folder: 'cloud_dash',
+  global: 'CloudDash',
+  storeKey: 'cloud_dash',
+  minAge: 3,
+  title: () => tr2('ركضة السحاب', 'Cloud Dash'),
 );
 
 // ---- rebuilt learning games (docs/LEARNING_GAMES_REBUILD.md) ----------------------------------------------------------

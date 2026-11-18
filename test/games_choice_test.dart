@@ -163,4 +163,24 @@ void main() {
     expect(t.takeException(), isNull);
     debugDefaultTargetPlatformOverride = null;
   });
+
+  testWidgets('"more games" on the second page opens the third page; its cards open hero tower and cloud dash', (t) async {
+    SharedPreferences.setMockInitialValues({});
+    debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    for (final (key, game) in [('fun_hero_tower', kHeroTower), ('fun_cloud_dash', kCloudDash)]) {
+      await t.pumpWidget(MaterialApp(key: UniqueKey(), home: const FunGamesScreen(child: ChildProfile(id: 'k1', nickname: 'L', age: 5))));
+      await t.pump(const Duration(milliseconds: 300));
+      await t.tap(find.byKey(const ValueKey('fun_more')));
+      await t.pumpAndSettle();
+      await t.tap(find.byKey(const ValueKey('fun_more2')));
+      await t.pumpAndSettle();
+      expect(find.byType(FunGamesMore2Screen), findsOneWidget);
+      await t.tap(find.byKey(ValueKey(key)));
+      await t.pumpAndSettle();
+      expect(t.widget<WebGameScreen>(find.byType(WebGameScreen)).game.id, game.id);
+    }
+    expect(t.takeException(), isNull);
+    debugDefaultTargetPlatformOverride = null;
+  });
 }
