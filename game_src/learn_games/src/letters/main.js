@@ -364,6 +364,24 @@ class Game {
       }
       g.userData.apples = apples;
       g.userData.off = new THREE.Vector3(0, 0, this._portrait ? -1.0 : -1.6);
+    } else if (show.type === 'mixed') {
+      // adding: a group of apples and a group of oranges side by side: «كام فاكهة بالكل؟»
+      const fruits = [];
+      const size = show.a + show.b > 6 ? 0.9 : 1.1;
+      const place = (kind, count, x0) => {
+        for (let k = 0; k < count; k++) {
+          const a = makeThing(kind);
+          a.scale.setScalar(size);
+          const c = k % 3, r = Math.floor(k / 3);
+          a.position.set(x0 + (c - 1) * 0.62 * size, 0.76, (r - 0.5) * 0.55 * size);
+          g.add(a);
+          fruits.push(a);
+        }
+      };
+      place('apple', show.a, -1.15);
+      place('orange', show.b, 1.15);
+      g.userData.apples = fruits; // counted aloud one by one, like the apples
+      g.userData.off = new THREE.Vector3(0, 0, this._portrait ? -1.0 : -1.6);
     } else if (show.type === 'letter') {
       const p = this._plaque(show.ch, true);
       p.position.set(0, 1.7, 0);
@@ -602,6 +620,7 @@ class Game {
     this.lightDots = sh.topBar(ROUNDS, '⭐');
     this.lightDots(0);
     this._scoreBadge();
+    this._jumpBtn();
     this.sign = h('div', { class: 'lw-sign' });
     this.signText = h('span');
     this.signIcon = h('i', {}, this._barIcon());
@@ -769,6 +788,32 @@ class Game {
     const nextId = list[idx + 1].id;
     // a few seconds to see the stars, and the child can tap «العب معانا تاني» to play the same level again (new things come first)
     this._endT = setTimeout(() => this._walkOn(nextId, idx + 1 + (this._spin || 0)), 6500);
+  }
+
+  /** «🗺️ مستويات»: a small button at the top of every game screen; it opens the list of ALL the levels, so the child can go to another one at any moment. */
+  _jumpBtn() {
+    const sh = this.sh;
+    const en = sh.T.lang === 'en';
+    sh.layer.append(h('button', { class: 'lw-jumpbtn', 'aria-label': en ? 'Other levels' : 'مستويات تانية', onclick: (e) => { e.stopPropagation(); sh.sound.play('tap'); this._jumpMenu(); } }, `🗺️ ${en ? 'Levels' : 'المستويات'}`));
+  }
+
+  _jumpMenu() {
+    const sh = this.sh;
+    if (this._jump && this._jump.isConnected) return;
+    const en = sh.T.lang === 'en';
+    const done = this.save.lw.done || {};
+    const best = this.save.lw.best || {};
+    const close = () => { if (this._jump) this._jump.remove(); };
+    const tiles = levelsFor(sh.age).map((lv, i) => h('button', {
+      class: `lw-jt${lv.id === this.levelId ? ' here' : ''}${done[lv.id] ? ' done' : ''}`,
+      onclick: () => { sh.sound.play('tap'); close(); clearTimeout(this._endT); if (sh.voice && sh.voice.stop) sh.voice.stop(); this._enter(lv.id); },
+    }, h('i', {}, lv.emoji), h('b', {}, sh.T.num(i + 1)), h('span', {}, lv.ar), best[lv.id] ? h('u', {}, '⭐'.repeat(best[lv.id])) : null));
+    this._jump = h('div', { class: 'lw-jump', onclick: (e) => { if (e.target === this._jump) close(); } },
+      h('div', { class: 'lw-jumpcard' },
+        h('div', { class: 'lw-jtitle' }, en ? 'Go to a level' : 'روح أي مستوى'),
+        h('div', { class: 'lw-jgrid' }, tiles),
+        h('button', { class: 'lw-jclose', 'aria-label': en ? 'Close' : 'اقفل', onclick: close }, '✕')));
+    sh.layer.append(this._jump);
   }
 
   /** The points at the top right of the screen: the total (⭐ N) and, for a few seconds after a finished level, the number just added (+N) above it. */
@@ -1048,6 +1093,20 @@ const CSS = `
 .lw-herobar{position:absolute;left:50%;bottom:calc(var(--u)*3);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*1.6);pointer-events:none;width:94%}
 .lw-hero{display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*1.4);pointer-events:auto}
 .lw-who{display:flex;gap:calc(var(--u)*3)}
+.lw-jumpbtn{position:absolute;left:calc(var(--u)*2);top:calc(var(--u)*15.5);font-family:inherit;font-weight:900;font-size:calc(var(--u)*3.8);color:#fff;background:linear-gradient(180deg,#8a6aff,#5a3ad0);border:calc(var(--u)*.5) solid #fff;border-radius:999px;padding:calc(var(--u)*.6) calc(var(--u)*2.4);cursor:pointer;box-shadow:0 calc(var(--u)*.6) 0 #3a2290;z-index:4;white-space:nowrap}
+.lw-jump{position:absolute;inset:0;background:rgba(30,20,70,.55);display:flex;align-items:center;justify-content:center;z-index:30;pointer-events:auto}
+.lw-jumpcard{position:relative;background:#fffaf0;border:calc(var(--u)*.8) solid #ffd45a;border-radius:calc(var(--u)*5);padding:calc(var(--u)*3) calc(var(--u)*3.4);max-width:94%;max-height:92%;overflow:auto;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*2)}
+.lw-jtitle{font-size:calc(var(--u)*5.2);font-weight:900;color:#5a2fb0}
+.lw-jgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*1.6)}
+@media (max-aspect-ratio:1/1){.lw-jgrid{grid-template-columns:repeat(3,1fr)}}
+.lw-jt{position:relative;font-family:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.3);min-width:max(78px,calc(var(--u)*15));min-height:max(76px,calc(var(--u)*15));background:linear-gradient(180deg,#8ad0ff,#3a9ae8);border:calc(var(--u)*.6) solid #fff;border-radius:calc(var(--u)*3);padding:calc(var(--u)*1);cursor:pointer;color:#fff;box-shadow:0 calc(var(--u)*.7) 0 #1f6fb8}
+.lw-jt i{font-style:normal;font-size:calc(var(--u)*6.2);line-height:1}
+.lw-jt span{font-size:calc(var(--u)*3);font-weight:900;text-align:center;line-height:1.1}
+.lw-jt b{position:absolute;top:calc(var(--u)*.4);left:calc(var(--u)*.8);font-size:calc(var(--u)*2.8);background:#ffd23a;color:#5a3a00;border-radius:999px;min-width:calc(var(--u)*4.2);text-align:center}
+.lw-jt u{text-decoration:none;font-size:calc(var(--u)*2.6)}
+.lw-jt.done{background:linear-gradient(180deg,#8aeaa0,#2fb85a);box-shadow:0 calc(var(--u)*.7) 0 #1a7a3a}
+.lw-jt.here{outline:calc(var(--u)*.8) solid #ff8a1a}
+.lw-jclose{position:absolute;top:calc(var(--u)*1);right:calc(var(--u)*1.4);width:calc(var(--u)*7);height:calc(var(--u)*7);min-width:40px;min-height:40px;border-radius:50%;border:none;background:#ff6a6a;color:#fff;font-size:calc(var(--u)*3.6);font-weight:900;cursor:pointer}
 .lw-reward{position:absolute;left:50%;top:17%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.6);pointer-events:none;animation:lw-reward-pop .7s cubic-bezier(.2,1.6,.4,1)}
 .lw-stars{display:flex;gap:calc(var(--u)*1.2);font-size:calc(var(--u)*11)}
 .lw-stars i{font-style:normal;filter:grayscale(1) brightness(1.6);opacity:.45;transform:scale(.8)}

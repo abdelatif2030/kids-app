@@ -32,7 +32,10 @@ test('letters, words and first levels keep the old option counts', () => {
   for (const id of ['letters', 'words', 'first']) for (const age of [4, 5, 6]) for (const r of new LevelPlay(id, age, 3).rounds) assert.equal(r.options.length, fishCount(age));
 });
 test('order level: the answer is the real next letter of the alphabet', () => {
-  for (let s = 1; s < 60; s++) for (const r of new LevelPlay('order', 6, s).rounds) assert.equal(ALPHABET[ALPHABET.indexOf(r.from) + 1], r.answer);
+  for (let s = 1; s < 60; s++) for (const r of new LevelPlay('order', 6, s).rounds) {
+    if (r.prompt.startsWith('إيه الحرف اللي قبل')) assert.equal(ALPHABET[ALPHABET.indexOf(r.from) - 1], r.answer); // the letter BEFORE
+    else assert.equal(ALPHABET[ALPHABET.indexOf(r.from) + 1], r.answer);
+  }
 });
 test('habits: Mama or Baba, one right thing among other things', () => {
   assert.ok(HABITS.every((h) => h.text && h.answer && !h.who)); // no mama/baba characters any more: our voice asks, the child chooses

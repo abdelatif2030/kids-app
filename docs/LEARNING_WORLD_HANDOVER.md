@@ -205,3 +205,7 @@ Memory keeps 1500 keys. NOT built yet: the 20-level page (needs the owner's pict
 - Voice QA tool: `tools/game_voice/verify_voice.mjs` (ElevenLabs speech-to-text compares each clip with its sentence; `--rescore` re-scores stored answers; the report is
   `docs/voice_preview/QA_REPORT.md`). 1317 clips checked, the suspects were regenerated (best of up to 3 takes), 0 below 0.72 now. It cannot judge how Egyptian or natural a voice
   sounds: only a person can.
+- Level jump: a «🗺️ المستويات» button on every game screen opens the list of all 12 levels (current one marked, best stars shown); any tap goes there at once.
+- More ways to ask inside the SAME 12 levels (`letters/extras.js`, one round at most, from age 4-5, never penalised, hint after two misses): counting «كام فاكهة بالكل؟»
+  (apples + oranges, sums to 5 at four, to 10 later), order «إيه الحرف اللي قبل ...؟», colours «لو خلطنا الأحمر والأصفر، نطلع إيه؟», fruits «فين الفاكهة / الخضار؟»,
+  vehicles «فين اللي بيطير / في البحر / في الشارع / على القضبان؟». Owner rule 2026-11-18: the game must stay EASY and fun; the harder kinds are rare and late.

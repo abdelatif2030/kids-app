@@ -15,6 +15,7 @@ import { ROUNDS, poolFor, fishCount, letterById, question, LETTERS } from './sim
 import { SHAPES_ALL, SHAPE_TIERS, SHAPE_COLORS, SIDES_ASKED, shapePlan, findShapeQ, shapeSay, sidesQ, shapeWithSides, BIG_Q, SMALL_Q } from './shapes_all.js';
 import { ANIMALS, platesOf, animalById, question as animalQuestion, reward as animalReward, bankFor as animalBank, poolFor as animalPool, SOUNDS, PLACES, hasSound, homeOf, soundQ, soundSay, homeQ, homeSay, FOODS } from '../animals/sim.js';
 import { optionsFor, COUNT_Q } from '../counting/sim.js';
+import { TOTAL_Q, prevQ, MIXES, mixQ, mixSay, FRUIT_Q, VEG_Q, isVegetable, VEHICLE_GROUPS } from './extras.js';
 import { COLORS, COLOR_TIERS, COLOR_THINGS, colorPlan, colorChoices, findColorQ, findThingQ, colorOf } from './colors.js';
 import { TIERS, COUNT_TIERS, numberPlan, countPlan, numberWord, findQ, afterQ, beforeQ, BIGGER_Q, SMALLER_Q } from './numbers.js';
 const range0 = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
@@ -265,9 +266,17 @@ export class LevelPlay {
       const asOpts = (list) => list.map((x) => ({ id: `n${x}`, kind: 'number', n: x }));
       const shuffled = (list) => [...list].sort(() => r() - 0.5);
       const lastN = () => out.map((x) => x.n);
+      const totalAt = mode === 'count' && this.age >= 4 ? 1 + Math.floor(r() * (ROUNDS - 1)) : -1;
       for (let i = 0; i < ROUNDS; i++) {
         const { kind, tier } = plan[i];
-        if (kind === 'count') {
+        if (kind === 'count' && i === totalAt) {
+          // adding: apples and oranges together, «كام فاكهة بالكل؟» (never above ten)
+          let n = draw(this.age === 4 ? 'a' : tier === 'c' ? 'b' : tier, lastN());
+          if (n < 2) n = draw('b', lastN());
+          const a = 1 + Math.floor(r() * (n - 1));
+          mark(n);
+          out.push({ prompt: TOTAL_Q, answer: `n${n}`, n, key: `n:${n}`, show: { type: 'mixed', a, b: n - a }, countAloud: n, options: asOpts(optionsFor(this.age, n, this.seed + i * 31, 20)) });
+        } else if (kind === 'count') {
           const n = draw(tier, lastN());
           mark(n);
           out.push({ prompt: COUNT_Q, answer: `n${n}`, n, key: `n:${n}`, show: { type: 'apples', n }, countAloud: n, options: asOpts(optionsFor(this.age, n, this.seed + i * 31, 20)) });
@@ -310,8 +319,17 @@ export class LevelPlay {
       const ab = ALPHABET;
       const idx = Array.from({ length: ab.length - 1 }, (_, i) => i);
       const nextK = tiered([idx.filter((k) => k < 8), idx.filter((k) => k >= 8 && k < 16), idx.filter((k) => k >= 16)], (k) => `l:${ab[k + 1]}`);
+      const prevAt = new Set();
+      while (this.age >= 5 && prevAt.size < 1) prevAt.add(Math.floor(r() * ROUNDS)); // ONE round asks for the letter BEFORE (never hard: the first letters first)
       for (let i = 0; i < ROUNDS; i++) {
         const { item: k, tier } = nextK();
+        if (prevAt.has(i)) {
+          const given = letterById(ab[k + 1]), ans = ab[k];
+          mark(ans);
+          const others = pickLow(ab.slice(0, Math.max([8, 16, 28][tier], k + 2)).filter((x) => x !== ans && x !== ab[k + 1]), nOpt - 1);
+          out.push({ prompt: prevQ(given), answer: ans, key: `l:${ab[k + 1]}`, from: ab[k + 1], show: { type: 'letter', ch: given.ch }, reward: rew(letterById(ans)), options: [ans, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'letter', ch: letterById(x).ch })) });
+          continue;
+        }
         const cur = letterById(ab[k]);
         const ans = ab[k + 1];
         mark(ans);
@@ -445,12 +463,25 @@ export class LevelPlay {
       const queues = {};
       const draw = (tier0, not) => pickTiered(Object.keys(COLOR_TIERS), tier0, (u) => COLOR_TIERS[u], (c) => `c:${c.id}`, queues, (c) => not.includes(c.id)).item;
       const usedColor = new Map();
+      const mixAt = this.age >= 5 ? Math.floor(r() * ROUNDS) : -1;
+      const mixesUsed = new Set();
       for (let i = 0; i < ROUNDS; i++) {
-        const { kind, tier } = plan[i];
+        let { kind, tier } = plan[i];
+        if (i === mixAt && kind === 'color' && MIXES.some((m) => !mixesUsed.has(m[2]) && (!mem || mem.score(`c:${m[2]}`) <= 0))) kind = 'mix'; // only a mix whose colour is new to the child
         const lastIds = out.map((x) => x.colorId);
         const thingFresh = mem && Object.keys(COLOR_THINGS).some((id) => !lastIds.includes(id) && mem.score(`c:${id}`) <= 0 && !drawn.has(`c:${id}`));
         // a picture question needs a colour (of the ten that have pictures) the child has not met yet; otherwise this round asks a coloured ball instead
-        if (kind === 'thing' && (!mem || thingFresh)) {
+        if (kind === 'mix') {
+          // mixing: the answer is the colour that comes out; the new colour is preferred
+          const free = MIXES.filter((m) => !mixesUsed.has(m[2]));
+          const m = free.find((x) => !mem || mem.score(`c:${x[2]}`) <= 0) || free[0] || MIXES[0];
+          mixesUsed.add(m[2]);
+          const [ca, cb, cc] = [colorOf(m[0]), colorOf(m[1]), colorOf(m[2])];
+          mark(`c:${cc.id}`);
+          drawn.add(`c:${cc.id}`);
+          const opts = colorChoices(cc, COLORS, nOpt, r, usedColor);
+          out.push({ prompt: mixQ(ca, cb), answer: cc.id, colorId: cc.id, key: `c:${cc.id}`, reward: mixSay(ca, cb, cc), options: opts.sort(() => r() - 0.5).map((x) => ({ id: x.id, kind: 'color', hex: x.hex, metal: x.metal || 0 })) });
+        } else if (kind === 'thing' && (!mem || thingFresh)) {
           // a colour that has pictures: the right picture among pictures of other colours
           const cs = Object.keys(COLOR_THINGS).filter((id) => !lastIds.includes(id));
           const pickable = (mem ? mem.order(cs, (id) => `c:${id}`, r) : [...cs].sort(() => r() - 0.5));
@@ -474,9 +505,41 @@ export class LevelPlay {
       const tab = PICKS[this.level.table];
       const keyOfItem = (it) => (it.thing ? `t:${it.thing}` : `c:${it.id}`);
       const next = bag(tab.items.map((x) => x.id), (id) => keyOfItem(tab.items.find((x) => x.id === id)));
+      // one round asks for a GROUP: «فين الفاكهة؟» / «فين الخضار؟» (from age 4) or «فين اللي بيطير؟» (from age 3)
+      const tbl = this.level.table;
+      let grpSlot = (tbl === 'fruits' && this.age >= 4) || (tbl === 'vehicles' && this.age >= 3) ? 1 + Math.floor(r() * (ROUNDS - 1)) : -1;
+      const usedIds = new Set();
+      const isNew = (it) => !mem || mem.score(keyOfItem(it)) <= 0;
       for (let i = 0; i < ROUNDS; i++) {
+        if (i === grpSlot) {
+          let q = null, inGroup = [], outside = [];
+          if (tbl === 'fruits') {
+            let veg = r() < 0.5;
+            const freshIn = (v) => tab.items.some((x) => isVegetable(x) === v && !usedIds.has(x.id) && isNew(x));
+            if (!freshIn(veg)) veg = !veg;
+            q = veg ? VEG_Q : FRUIT_Q;
+            inGroup = tab.items.filter((x) => isVegetable(x) === veg);
+            outside = tab.items.filter((x) => isVegetable(x) !== veg);
+          } else {
+            // a group that still has a picture not asked in this game
+            const open = Object.keys(VEHICLE_GROUPS).filter((k) => tab.items.some((x) => VEHICLE_GROUPS[k].ids.includes(x.id) && !usedIds.has(x.id) && isNew(x)));
+            const key = open[Math.floor(r() * open.length)] || 'road';
+            q = VEHICLE_GROUPS[key].q;
+            inGroup = tab.items.filter((x) => VEHICLE_GROUPS[key].ids.includes(x.id));
+            outside = tab.items.filter((x) => !VEHICLE_GROUPS[key].ids.includes(x.id));
+          }
+          const cands = inGroup.filter((x) => !usedIds.has(x.id));
+          const ans = cands.find(isNew); // only a picture the child has not met yet
+          if (!ans) { grpSlot = -1; i--; continue; } // nothing left in that group: this round is a plain one
+          usedIds.add(ans.id);
+          mark(ans.id);
+          const others = pickLow(outside.filter((x) => x.id !== ans.id), nOpt - 1);
+          out.push({ prompt: q, answer: ans.id, key: keyOfItem(ans), options: [ans, ...others].sort(() => r() - 0.5).map((x) => ({ id: x.id, kind: 'thing', thing: x.thing })) });
+          continue;
+        }
         let id = next();
-        if (i && out[i - 1].answer === id) id = next();
+        for (let tries = 0; tries < 60 && (usedIds.has(id) || (i && out[i - 1].answer === id)); tries++) id = next();
+        usedIds.add(id);
         const it = tab.items.find((x) => x.id === id);
         mark(id);
         const others = pickLow(tab.items.filter((x) => x.id !== id), nOpt - 1);
@@ -518,7 +581,7 @@ export class LevelPlay {
       const tiers = [ids.slice(0, 8), ids.slice(8, 16), ids.slice(16)];
       const nextL = tiered(tiers, (id) => `t:${letterById(id).thing}`);
       const harakaAt = new Set();
-      const nH = this.age < 4 ? 0 : this.age < 6 ? 1 : 2;
+      const nH = this.age < 5 ? 0 : 1; // one round with a vowel mark, from age five
       while (harakaAt.size < nH) harakaAt.add(2 + Math.floor(r() * (ROUNDS - 2)));
       const formAt = new Set();
       while (this.age >= 5 && formAt.size < 1) { const k = 2 + Math.floor(r() * (ROUNDS - 2)); if (!harakaAt.has(k)) formAt.add(k); }

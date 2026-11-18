@@ -5,6 +5,7 @@ import { LevelPlay } from '../src/letters/levels.js';
 import { rng } from '../src/maze/sim.js';
 import { ROUNDS } from '../src/letters/sim.js';
 import { readFileSync, existsSync } from 'node:fs';
+import { MIXES, allExtraSentences } from '../src/letters/extras.js';
 
 test('25 colours, each with a name, a hex, a tier and a family; tiers are 6 + 5 + 14', () => {
   assert.equal(COLORS.length, 25);
@@ -50,8 +51,8 @@ test('colour choices never put two shades of one family together', () => {
 });
 
 test('the colours level: eight rounds, one right option, questions match, sentences are in the voice list', () => {
-  const all = new Set(allColorSentences());
-  assert.equal(all.size, 25 + THING_COLORS.length);
+  const all = new Set([...allColorSentences(), ...allExtraSentences(colorOf)]);
+  assert.ok(all.size >= 25 + THING_COLORS.length);
   const byThingQ = new Map(THING_COLORS.map((id) => [findThingQ(colorOf(id)), id]));
   const byColorQ = new Map(COLORS.map((c) => [findColorQ(c), c.id]));
   const kinds = new Set();
@@ -63,7 +64,12 @@ test('the colours level: eight rounds, one right option, questions match, senten
       assert.ok(all.has(r.prompt), `unknown sentence ${r.prompt}`);
       assert.equal(r.options.filter((o) => o.id === r.answer).length, 1);
       assert.equal(new Set(r.options.map((o) => o.id)).size, r.options.length);
-      if (byColorQ.has(r.prompt)) {
+      if (r.prompt.startsWith('لو خلطنا')) {
+        kinds.add('mix');
+        assert.ok(age >= 5, 'mixing from age five');
+        assert.ok(MIXES.some((m) => m[2] === r.answer), 'the answer is what the mix makes');
+        assert.ok(r.reward && all.has(r.reward));
+      } else if (byColorQ.has(r.prompt)) {
         kinds.add('color');
         assert.equal(r.answer, byColorQ.get(r.prompt));
         assert.ok(r.options.every((o) => o.kind === 'color' && Number.isInteger(o.hex)));
@@ -80,7 +86,7 @@ test('the colours level: eight rounds, one right option, questions match, senten
       }
     }
   }
-  assert.deepEqual([...kinds].sort(), ['color', 'thing']);
+  assert.deepEqual([...kinds].filter((k) => k !== 'mix').sort(), ['color', 'thing']);
   assert.ok(c6 > 100, 'age six meets the new colours often');
 });
 
