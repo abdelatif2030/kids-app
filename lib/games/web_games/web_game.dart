@@ -118,7 +118,7 @@ final WebGame kRhythmSurvival = WebGame(
   title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash];
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash, kSkyCapy, kMarbleDozer, kDuneTitans, kCastawayRaft];
 
 /// «متجر الفضاء الذكي» (Space Store Manager): a grocery store on a space station (docs/SPACE_STORE.md).
 final WebGame kSpaceStore = WebGame(
@@ -250,6 +250,46 @@ final WebGame kCloudDash = WebGame(
   storeKey: 'cloud_dash',
   minAge: 3,
   title: () => tr2('ركضة السحاب', 'Cloud Dash'),
+);
+
+/// «سكاي كابي» (SKY CAPY): a top-down bubble shoot-'em-up with a capybara pilot, from the owner's video (docs/SKY_CAPY.md).
+final WebGame kSkyCapy = WebGame(
+  id: 'sky_capy',
+  folder: 'sky_capy',
+  global: 'SkyCapy',
+  storeKey: 'sky_capy',
+  minAge: 4,
+  title: () => tr2('سكاي كابي', 'SKY CAPY'),
+);
+
+/// «جرّافة الكرات» (Marble Dozer): a physics puzzle, from the owner's video (docs/MARBLE_DOZER.md).
+final WebGame kMarbleDozer = WebGame(
+  id: 'marble_dozer',
+  folder: 'marble_dozer',
+  global: 'MarbleDozer',
+  storeKey: 'marble_dozer',
+  minAge: 4,
+  title: () => tr2('جرّافة الكرات', 'Marble Dozer'),
+);
+
+/// «تيتان الكثبان» (Dune Titans): 3D desert truck race, from the owner's video (docs/DUNE_TITANS.md).
+final WebGame kDuneTitans = WebGame(
+  id: 'dune_titans',
+  folder: 'dune_titans',
+  global: 'DuneTitans',
+  storeKey: 'dune_titans',
+  minAge: 4,
+  title: () => tr2('تيتان الكثبان', 'Dune Titans'),
+);
+
+/// «طوف الناجي» (Castaway Raft): ocean survival with a hook, from the owner's video (docs/CASTAWAY_RAFT.md).
+final WebGame kCastawayRaft = WebGame(
+  id: 'castaway_raft',
+  folder: 'castaway_raft',
+  global: 'CastawayRaft',
+  storeKey: 'castaway_raft',
+  minAge: 4,
+  title: () => tr2('طوف الناجي', 'Castaway Raft'),
 );
 
 // ---- rebuilt learning games (docs/LEARNING_GAMES_REBUILD.md) ----------------------------------------------------------

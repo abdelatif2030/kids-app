@@ -134,6 +134,10 @@ flutter:
     - assets/games/summit_rush/
     - assets/games/hero_tower/
     - assets/games/cloud_dash/
+    - assets/games/sky_capy/
+    - assets/games/marble_dozer/
+    - assets/games/dune_titans/
+    - assets/games/castaway_raft/
     - assets/home/home_main.webp
     - assets/home/cartoons_stories.webp
     - assets/home/lessons_scene.webp

@@ -297,7 +297,7 @@ class FunGamesMore2Screen extends StatelessWidget {
                 bottom: 10,
                 height: 64,
                 child: Container(
-                  padding: const EdgeInsetsDirectional.only(start: 16, end: 8),
+                  padding: const EdgeInsetsDirectional.only(start: 10, end: 6),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(40),
                     gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF9A5AF0), Color(0xFF6A2AD0)]),
@@ -307,10 +307,10 @@ class FunGamesMore2Screen extends StatelessWidget {
                     Expanded(
                       child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
                         FittedBox(fit: BoxFit.scaleDown, child: Text(game.title(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 22))),
-                        Text(english, style: const TextStyle(color: Color(0xFFE9D8FF), fontWeight: FontWeight.w800, fontSize: 13)),
+                        FittedBox(fit: BoxFit.scaleDown, alignment: AlignmentDirectional.centerStart, child: Text(english, style: const TextStyle(color: Color(0xFFE9D8FF), fontWeight: FontWeight.w800, fontSize: 13))),
                       ]),
                     ),
-                    const CircleAvatar(radius: 24, backgroundColor: Colors.white, child: Icon(Icons.play_arrow_rounded, color: Color(0xFF6A2AD0), size: 34)),
+                    const CircleAvatar(radius: 18, backgroundColor: Colors.white, child: Icon(Icons.play_arrow_rounded, color: Color(0xFF6A2AD0), size: 34)),
                   ]),
                 ),
               ),
@@ -342,13 +342,17 @@ class FunGamesMore2Screen extends StatelessWidget {
             final cards = [
               _card(context, 'fun_hero_tower', kHeroTower, 'assets/games/hero_tower/card.webp', 'Hero Tower', const Color(0xFF6A3AB0), const Color(0xFFC070A0)),
               _card(context, 'fun_cloud_dash', kCloudDash, 'assets/games/cloud_dash/card.webp', 'Cloud Dash', const Color(0xFF8A98F0), const Color(0xFFF0B8E8)),
+              _card(context, 'fun_sky_capy', kSkyCapy, 'assets/games/sky_capy/card.webp', 'SKY CAPY', const Color(0xFF6AB8FF), const Color(0xFFEAF6FF)),
+              _card(context, 'fun_marble_dozer', kMarbleDozer, 'assets/games/marble_dozer/card.webp', 'Marble Dozer', const Color(0xFFFFB84A), const Color(0xFFF6E6FF)),
+              _card(context, 'fun_dune_titans', kDuneTitans, 'assets/games/dune_titans/card.webp', 'Dune Titans', const Color(0xFFE08A3A), const Color(0xFFF6D8A0)),
+              _card(context, 'fun_castaway_raft', kCastawayRaft, 'assets/games/castaway_raft/card.webp', 'Castaway Raft', const Color(0xFF2A9AD8), const Color(0xFFBFE8FF)),
             ];
             return Stack(children: [
               Center(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.fromLTRB(wide ? 90 : 20, 70, wide ? 90 : 20, 20),
                   child: wide
-                      ? Row(children: [for (final c in cards) Expanded(child: Padding(padding: const EdgeInsets.all(12), child: c))])
+                      ? Wrap(alignment: WrapAlignment.center, children: [for (final c in cards) SizedBox(width: ((box.maxWidth - 180) / 4).floorToDouble() - 24, child: Padding(padding: const EdgeInsets.all(12), child: c))])
                       : Column(children: [for (final c in cards) Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: c)]),
                 ),
               ),

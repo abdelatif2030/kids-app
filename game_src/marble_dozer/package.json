@@ -1,0 +1,16 @@
+{
+  "name": "marble_dozer",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty «جرّافة الكرات» marble-pushing physics puzzle (2D canvas). Built into assets/games/marble_dozer/game.js",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/marble_dozer/game.js",
+    "test": "node --test test/sim.test.js"
+  },
+  "dependencies": {
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.0"
+  }
+}
