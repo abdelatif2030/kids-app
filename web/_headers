@@ -13,3 +13,13 @@
 
 /index.html
   Cache-Control: no-cache
+
+# Speed (2026-11-18): pictures, character clips and recorded voices change rarely; a day of cache makes the second visit fast.
+/assets/assets/games/art/*
+  Cache-Control: public, max-age=86400
+/assets/assets/games/clips/*
+  Cache-Control: public, max-age=86400
+/assets/assets/games/learn_voice/*
+  Cache-Control: public, max-age=86400
+/assets/assets/audio/*
+  Cache-Control: public, max-age=86400
