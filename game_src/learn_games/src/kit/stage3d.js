@@ -25,6 +25,8 @@ export function labelTex(text, { size = 160, color = '#3a2a5a', bg = null, font 
     g.font = `${font} ${size}px Tajawal, sans-serif`;
     g.textAlign = 'center';
     g.textBaseline = 'middle';
+    const w = g.measureText(text).width; // long words shrink to fit the disc
+    if (w > 220) g.font = `${font} ${Math.floor((size * 220) / w)}px Tajawal, sans-serif`;
     g.fillText(text, 128, 138);
   });
 }

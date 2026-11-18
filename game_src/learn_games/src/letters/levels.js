@@ -20,21 +20,23 @@ import { COLORS, COLOR_TIERS, COLOR_THINGS, colorPlan, colorChoices, findColorQ,
 import { TIERS, COUNT_TIERS, numberPlan, countPlan, numberWord, findQ, afterQ, beforeQ, BIGGER_Q, SMALLER_Q } from './numbers.js';
 const range0 = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
 import MORE_WORDS from './more_words.json' with { type: 'json' };
+import { TOPIC_USE } from './topic_use.js';
+import { timeQuestions } from './time_level.js';
 // (FreshMemory, in fresh.js, is passed in by the game: it remembers what each child already met)
 
 export const LEVELS = [
-  { id: 'letters', mode: 'letter', ar: 'اصطاد الحرف', emoji: '🔤', skill: 'letters_ar' },
-  { id: 'words', mode: 'word', ar: 'فين الصورة؟', emoji: '🖼️', skill: 'vocab' },
-  { id: 'first', mode: 'first', ar: 'أول حرف', emoji: '🅰️', skill: 'letters_ar' },
-  { id: 'numbers', mode: 'number', ar: 'الأرقام', emoji: '🔢', skill: 'counting' },
-  { id: 'counting', mode: 'count', ar: 'عدّ معايا', emoji: '🍎', skill: 'counting' },
-  { id: 'order', mode: 'next', ar: 'ترتيب الحروف', emoji: '🔠', skill: 'letters_ar' },
-  { id: 'shapes', mode: 'shape', ar: 'الأشكال والألوان', emoji: '🔷', skill: 'shapes' },
-  { id: 'animals', mode: 'animal', ar: 'أطعم الحيوان', emoji: '🐰', skill: 'nature' },
-  { id: 'colors', mode: 'color', ar: 'الألوان', emoji: '🎨', skill: 'colors' },
-  { id: 'fruits', mode: 'pick', table: 'fruits', ar: 'فواكه وخضار', emoji: '🍓', skill: 'vocab' },
-  { id: 'vehicles', mode: 'pick', table: 'vehicles', ar: 'المواصلات', emoji: '🚌', skill: 'vocab' },
-  { id: 'habits', mode: 'habit', ar: 'عاداتي اليومية', emoji: '🧼', skill: 'listening' },
+  { id: 'letters', mode: 'letter', ar: 'أتعلم الحروف', emoji: '🔤', skill: 'letters_ar' },
+  { id: 'words', mode: 'word', ar: 'كلماتي الأولى', emoji: '🖼️', skill: 'vocab' },
+  { id: 'first', mode: 'first', ar: 'أول حرف في الكلمة', emoji: '🅰️', skill: 'letters_ar' },
+  { id: 'numbers', mode: 'number', ar: 'أتعرف على الأرقام', emoji: '🔢', skill: 'counting' },
+  { id: 'counting', mode: 'count', ar: 'أعدّ وأجمع', emoji: '🍎', skill: 'counting' },
+  { id: 'order', mode: 'next', ar: 'الأبجدية بالترتيب', emoji: '🔠', skill: 'letters_ar' },
+  { id: 'shapes', mode: 'shape', ar: 'الأشكال الهندسية', emoji: '🔷', skill: 'shapes' },
+  { id: 'animals', mode: 'animal', ar: 'الحيوانات وأصواتها', emoji: '🐰', skill: 'nature' },
+  { id: 'colors', mode: 'color', ar: 'أتعلم الألوان', emoji: '🎨', skill: 'colors' },
+  { id: 'fruits', mode: 'pick', table: 'fruits', ar: 'فواكه وخضار صحية', emoji: '🍓', skill: 'vocab' },
+  { id: 'vehicles', mode: 'pick', table: 'vehicles', ar: 'وسائل المواصلات', emoji: '🚌', skill: 'vocab' },
+  { id: 'habits', mode: 'habit', ar: 'عادات صحية ومهذبة', emoji: '🧼', skill: 'listening' },
 ];
 
 /** The "find it" levels with a table of things: colours, fruit and vegetables, vehicles. */
@@ -84,26 +86,27 @@ export const formQ = (l, f) => `فين ${l.the} اللي في ${f.word} الكل
 export const allFormSentences = () => LETTERS.filter((l) => CONNECTING.has(l.id)).flatMap((l) => FORMS.map((f) => formQ(l, f)));
 /** More levels, one per everyday topic, made of the picture-words (more_words.json) grouped by their art prefix. Every sentence «فين ...؟» is already recorded. */
 export const TOPICS = [
-  { id: 't_body', ar: 'جسمي', emoji: '🧍', prefixes: ['y'] },
+  { id: 't_body', ar: 'أجزاء جسمي', emoji: '🧍', prefixes: ['y'] },
   { id: 't_clothes', ar: 'ملابسي', emoji: '👕', prefixes: ['l'] },
-  { id: 't_jobs', ar: 'المهن', emoji: '👩‍⚕️', prefixes: ['z'] },
+  { id: 't_jobs', ar: 'مهن حولي', emoji: '👩‍⚕️', prefixes: ['z'] },
   { id: 't_food', ar: 'أكل وحلويات', emoji: '🍞', prefixes: ['o', 'r'] },
-  { id: 't_school', ar: 'مدرستي', emoji: '✏️', prefixes: ['e'] },
-  { id: 't_music', ar: 'الموسيقى', emoji: '🥁', prefixes: ['m'] },
+  { id: 't_school', ar: 'أدوات مدرستي', emoji: '✏️', prefixes: ['e'] },
+  { id: 't_music', ar: 'آلات موسيقية', emoji: '🥁', prefixes: ['m'] },
   { id: 't_family', ar: 'عيلتي', emoji: '👨‍👩‍👧', prefixes: ['a'] },
   { id: 't_bugs', ar: 'حشرات وطيور', emoji: '🐜', prefixes: ['i'] },
   { id: 't_weather', ar: 'الجو والفصول', emoji: '🌦️', prefixes: ['t'] },
-  { id: 't_sea', ar: 'البحر', emoji: '🐚', prefixes: ['u', 'b'] },
-  { id: 't_space', ar: 'فضا وخيال', emoji: '🚀', prefixes: ['s', 'k'] },
-  { id: 't_home', ar: 'بيتي', emoji: '🏠', prefixes: ['h'] },
+  { id: 't_sea', ar: 'عالم البحر', emoji: '🐚', prefixes: ['u', 'b'] },
+  { id: 't_space', ar: 'فضاء وخيال', emoji: '🚀', prefixes: ['s', 'k'] },
+  { id: 't_home', ar: 'أشياء بيتي', emoji: '🏠', prefixes: ['h'] },
   { id: 't_wild', ar: 'حيوانات الغابة والمزرعة', emoji: '🦁', prefixes: ['j', 'f', 'w'] },
-  { id: 't_places', ar: 'الصحرا والمدينة', emoji: '🏜️', prefixes: ['d', 'c'] },
+  { id: 't_places', ar: 'مصر والمدينة', emoji: '🏜️', prefixes: ['d', 'c'] },
 ];
 for (const t of TOPICS) {
   PICKS[t.id] = { prompt: (it) => `فين ${it.the}؟`, items: MORE_WORDS.filter((w) => t.prefixes.some((p) => w.thing.startsWith(`${p}_`))).map((w) => ({ id: w.thing, the: w.the, thing: w.thing })) };
 }
 export const TOPIC_LEVELS = TOPICS.map((t) => ({ id: t.id, mode: 'pick', table: t.id, ar: t.ar, emoji: t.emoji, skill: 'vocab', topic: true }));
 /** The twelve map levels, then the topic levels (reached from «مستويات أكتر»). */
+TOPIC_LEVELS.push({ id: 't_time', mode: 'time', ar: 'الأيام والفصول', emoji: '📅', skill: 'vocab', topic: true });
 export const ALL_LEVELS = [...LEVELS, ...TOPIC_LEVELS];
 export const levelOf = (id) => ALL_LEVELS.find((l) => l.id === id);
 /** The youngest (four) skip the two alphabet levels that need reading order. */
@@ -530,7 +533,7 @@ export class LevelPlay {
       const next = bag(tab.items.map((x) => x.id), (id) => keyOfItem(tab.items.find((x) => x.id === id)));
       // one round asks for a GROUP: «فين الفاكهة؟» / «فين الخضار؟» (from age 4) or «فين اللي بيطير؟» (from age 3)
       const tbl = this.level.table;
-      let grpSlot = (tbl === 'fruits' && this.age >= 4) || (tbl === 'vehicles' && this.age >= 3) ? 1 + Math.floor(r() * (ROUNDS - 1)) : -1;
+      let grpSlot = (tbl === 'fruits' && this.age >= 4) || (tbl === 'vehicles' && this.age >= 3) || TOPIC_USE[tbl] ? 1 + Math.floor(r() * (ROUNDS - 1)) : -1;
       const usedIds = new Set();
       const isNew = (it) => !mem || mem.score(keyOfItem(it)) <= 0;
       for (let i = 0; i < ROUNDS; i++) {
@@ -543,6 +546,13 @@ export class LevelPlay {
             q = veg ? VEG_Q : FRUIT_Q;
             inGroup = tab.items.filter((x) => isVegetable(x) === veg);
             outside = tab.items.filter((x) => isVegetable(x) !== veg);
+          } else if (TOPIC_USE[tbl]) {
+            // «بنستخدمه في إيه؟»: a use question whose right picture the child has not met yet
+            const uses = TOPIC_USE[tbl].filter(([, th]) => { const it = tab.items.find((x) => x.thing === th); return it && !usedIds.has(it.id) && isNew(it); });
+            const [uq, uth] = uses.length ? uses[Math.floor(r() * uses.length)] : [null, null];
+            q = uq;
+            inGroup = uq ? tab.items.filter((x) => x.thing === uth) : [];
+            outside = tab.items.filter((x) => x.thing !== uth);
           } else {
             // a group that still has a picture not asked in this game
             const open = Object.keys(VEHICLE_GROUPS).filter((k) => tab.items.some((x) => VEHICLE_GROUPS[k].ids.includes(x.id) && !usedIds.has(x.id) && isNew(x)));
@@ -567,6 +577,19 @@ export class LevelPlay {
         mark(id);
         const others = pickLow(tab.items.filter((x) => x.id !== id), nOpt - 1);
         out.push({ prompt: tab.prompt(it), answer: id, key: keyOfItem(it), options: [it, ...others].sort(() => r() - 0.5).map((x) => (x.hex != null ? { id: x.id, kind: 'color', hex: x.hex } : { id: x.id, kind: 'thing', thing: x.thing })) });
+      }
+    } else if (mode === 'time') {
+      const qs = timeQuestions();
+      const byKey = new Map(qs.map((q) => [q.key, q]));
+      // the easy ones (seasons, first day, counting days) first for the youngest; the before/after questions from age four
+      const tierQ = (q) => q.tier;
+      const nextT = tiered([0, 1, 2].map((t) => qs.filter((q) => tierQ(q) === t).map((q) => q.key)), (k) => k);
+      for (let i = 0; i < ROUNDS; i++) {
+        const { item: k } = nextT();
+        const q = byKey.get(k);
+        mark(k);
+        const others = pickLow(q.pool.filter((x) => x.id !== q.right.id), nOpt - 1);
+        out.push({ prompt: q.prompt, answer: q.right.id, key: k, options: [q.right, ...others].sort(() => r() - 0.5) });
       }
     } else if (mode === 'habit') {
       const nextH = bag(HABITS, (h) => `t:${h.answer}`);
