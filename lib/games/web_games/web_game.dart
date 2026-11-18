@@ -118,7 +118,7 @@ final WebGame kRhythmSurvival = WebGame(
   title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash, kSkyCapy, kMarbleDozer, kDuneTitans, kCastawayRaft, kWinterCamp, kRainCircuit, kSquadShooter, kArcherBridge, kAlienSky, kRhinoSummit, kSunsetHighway, kCreatorTycoon, kPearlDivers, kHoneyFarm, kIceDragon];
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash, kSkyCapy, kMarbleDozer, kDuneTitans, kCastawayRaft, kWinterCamp, kRainCircuit, kSquadShooter, kArcherBridge, kAlienSky, kRhinoSummit, kSunsetHighway, kCreatorTycoon, kPearlDivers, kHoneyFarm, kIceDragon, kBallScoop];
 
 /// «متجر الفضاء الذكي» (Space Store Manager): a grocery store on a space station (docs/SPACE_STORE.md).
 final WebGame kSpaceStore = WebGame(
@@ -400,6 +400,16 @@ final WebGame kIceDragon = WebGame(
   storeKey: 'ice_dragon',
   minAge: 4,
   title: () => tr2('تنين الجليد', 'Ice Dragon'),
+);
+
+/// «شاحنة الكور» (Ball Scoop).
+final WebGame kBallScoop = WebGame(
+  id: 'ball_scoop',
+  folder: 'ball_scoop',
+  global: 'BallScoop',
+  storeKey: 'ball_scoop',
+  minAge: 4,
+  title: () => tr2('شاحنة الكور', 'Ball Scoop'),
 );
 
 // ---- rebuilt learning games (docs/LEARNING_GAMES_REBUILD.md) ----------------------------------------------------------

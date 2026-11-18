@@ -193,3 +193,14 @@ game(43, 'مقلاع الفايكنج (لسه ما اتبنتش)', 'Viking Sling
       ('blocks', 'sprite', 'Wood planks, stone blocks, ice blocks; three files.'),
       ('boss_fortress', 'sprite', 'A big boss fortress.'),
       ('card_viking_slingshot', 'scene', CARD)])
+
+game(44, 'شاحنة الكور', 'Ball Scoop',
+     "Colorful 3D-rendered hyper-casual runner art, glossy candy balls, warm wooden road, bright yellow bulldozer truck, soft shadows, kid friendly.",
+     [('truck_poses', 'sprite', 'A chunky yellow bulldozer truck with a huge front shovel, 3/4 rear view; plus tilted left, tilted right and full-of-balls; four files.'),
+      ('balls_sheet', 'sprite', 'Glossy balls in six candy colors (red, blue, yellow, green, purple, orange) with highlights; six files.'),
+      ('gates', 'sprite', 'Translucent blue gates with posts for +10, +50, x2, x3 and red gates for -20; five files.'),
+      ('walls_obstacles', 'sprite', 'A red brick wall block, a striped barrier and a rotating bar; three files.'),
+      ('giant_bank', 'sprite', 'A giant golden bank building with columns and a coin slot, and a coin burst; two files.'),
+      ('road_scene', 'scene', 'A wooden plank road with red and blue rails over green meadow, curves and a ramp, no characters.'),
+      ('ui_hud', 'ui', 'Level badge, ball counter with a ball icon, progress bar with truck and bank icons, upgrade buttons (start balls, wider shovel, coin value).'),
+      ('card_ball_scoop', 'scene', CARD)])

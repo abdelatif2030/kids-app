@@ -49,7 +49,8 @@
 | 41 | الهامستر المحارب (لسه ما اتبنتش) (Hamster Warrior) | 6 |
 | 42 | تنظيف السجاد (لسه ما اتبنتش) (Rug Cleaning) | 5 |
 | 43 | مقلاع الفايكنج (لسه ما اتبنتش) (Viking Slingshot) | 6 |
-| | **المجموع** | **370** |
+| 44 | شاحنة الكور (Ball Scoop) | 8 |
+| | **المجموع** | **378** |
 
 قواعد عامة: خلفية **شفافة** للشخصيات والعناصر (PNG)، من غير كلام على الصورة إلا لو مكتوب، ممنوع دم أو شيء مخيف (أطفال 1-6 سنين)، الاسم المكتوب هو اسم الملف. لو الاسم فيه `1..5` يبقى ملف لكل رقم.
 
@@ -895,4 +896,23 @@ Chunky 3D cartoon physics-game art, wooden goblin forts, stone and ice blocks, c
 4. `blocks.png` — Wood planks, stone blocks, ice blocks; three files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
 5. `boss_fortress.png` — A big boss fortress. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
 6. `card_viking_slingshot.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 44. شاحنة الكور — Ball Scoop (8 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Colorful 3D-rendered hyper-casual runner art, glossy candy balls, warm wooden road, bright yellow bulldozer truck, soft shadows, kid friendly.
+```
+
+1. `truck_poses.png` — A chunky yellow bulldozer truck with a huge front shovel, 3/4 rear view; plus tilted left, tilted right and full-of-balls; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `balls_sheet.png` — Glossy balls in six candy colors (red, blue, yellow, green, purple, orange) with highlights; six files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `gates.png` — Translucent blue gates with posts for +10, +50, x2, x3 and red gates for -20; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `walls_obstacles.png` — A red brick wall block, a striped barrier and a rotating bar; three files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `giant_bank.png` — A giant golden bank building with columns and a coin slot, and a coin burst; two files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+6. `road_scene.png` — A wooden plank road with red and blue rails over green meadow, curves and a ramp, no characters. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+7. `ui_hud.png` — Level badge, ball counter with a ball icon, progress bar with truck and bank icons, upgrade buttons (start balls, wider shovel, coin value). Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+8. `card_ball_scoop.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
 
