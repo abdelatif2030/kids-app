@@ -46,7 +46,7 @@
 | 38 | تنين الجليد (لسه ما اتبنتش) (Ice Dragon Maze) | 5 |
 | 39 | ينابيع القرية (لسه ما اتبنتش) (Hot Spring Village) | 5 |
 | 40 | مزرعة المريخ (لسه ما اتبنتش) (Mars Farm Colony) | 7 |
-| 41 | الهامستر المحارب (لسه ما اتبنتش) (Hamster Warrior) | 6 |
+| 41 | الهامستر المحارب (Hamster Warrior) | 6 |
 | 42 | تنظيف السجاد (لسه ما اتبنتش) (Rug Cleaning) | 5 |
 | 43 | مقلاع الفايكنج (لسه ما اتبنتش) (Viking Slingshot) | 6 |
 | 44 | شاحنة الكور (Ball Scoop) | 8 |
@@ -849,7 +849,7 @@ Colorful isometric cartoon art on Mars, red terrain, futuristic farm buildings, 
 
 ---
 
-## 41. الهامستر المحارب (لسه ما اتبنتش) — Hamster Warrior (6 سكريبت)
+## 41. الهامستر المحارب — Hamster Warrior (6 سكريبت)
 
 **سطر الأسلوب (حطه في أول كل برومت):**
 

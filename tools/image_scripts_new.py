@@ -168,7 +168,7 @@ game(40, 'مزرعة المريخ (لسه ما اتبنتش)', 'Mars Farm Colony
       ('mars_ground', 'scene', 'Isometric red Mars ground tiles; one sheet.'),
       ('card_mars_farm', 'scene', CARD)])
 
-game(41, 'الهامستر المحارب (لسه ما اتبنتش)', 'Hamster Warrior',
+game(41, 'الهامستر المحارب', 'Hamster Warrior',
      "Cute 3D cartoon adventure art, forest path, glossy shapes, big readable numbers, kid friendly.",
      [('hamster_poses', 'sprite', 'A little hamster warrior with a sword and shield: run, attack, absorb power, cheer; four files.'),
       ('monsters_power', 'sprite', 'Five friendly-ugly monsters of increasing size with empty number plates; five files.'),
