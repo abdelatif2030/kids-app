@@ -1,4 +1,4 @@
-# كل سكريبتات الصور لكل الألعاب (2026-11-18)
+# كل سكريبتات الصور لكل الألعاب (2026-11-19)
 
 الملف ده بيتولّد بـ `python tools/make_image_scripts.py`. كل سكريبت = برومت واحد (ممكن يطلع منه أكتر من ملف لو مكتوب «ملفات» فيه). اكتب **سطر الأسلوب** في أول كل برومت لنفس اللعبة عشان الشخصيات تبقى من نفس العيلة.
 
@@ -29,7 +29,27 @@
 | 21 | برج الأبطال (Hero Tower) | 13 |
 | 22 | ركضة السحاب (Cloud Dash) | 10 |
 | 23 | اللعبة التعليمية (المستويات الجديدة) (Learning game: new levels) | 34 |
-| | **المجموع** | **239** |
+| 24 | سكاي كابي (SKY CAPY) | 6 |
+| 25 | جرّافة الكرات (Marble Dozer) | 7 |
+| 26 | تيتان الكثبان (Dune Titans) | 8 |
+| 27 | طوف الناجي (Castaway Raft) | 8 |
+| 28 | معسكر الشتاء (Winter Camp) | 9 |
+| 29 | سباق حلبة المطر (Rain Circuit) | 7 |
+| 30 | فرقة الجنود (Squad Shooter) | 7 |
+| 31 | رماة الجسر (Archer Bridge) | 6 |
+| 32 | سباق السماء الغريبة (Alien Sky Race) | 7 |
+| 33 | سباق القمة (وحيد القرن) (Summit Race (Rhino)) | 6 |
+| 34 | طريق الغروب (Sunset Highway) | 6 |
+| 35 | مبدع الذكاء (AI Creator) | 7 |
+| 36 | غوّاصو اللؤلؤ (Pearl Divers) | 6 |
+| 37 | مزرعة العسل (Honey Farm) | 7 |
+| 38 | تنين الجليد (لسه ما اتبنتش) (Ice Dragon Maze) | 5 |
+| 39 | ينابيع القرية (لسه ما اتبنتش) (Hot Spring Village) | 5 |
+| 40 | مزرعة المريخ (لسه ما اتبنتش) (Mars Farm Colony) | 7 |
+| 41 | الهامستر المحارب (لسه ما اتبنتش) (Hamster Warrior) | 6 |
+| 42 | تنظيف السجاد (لسه ما اتبنتش) (Rug Cleaning) | 5 |
+| 43 | مقلاع الفايكنج (لسه ما اتبنتش) (Viking Slingshot) | 6 |
+| | **المجموع** | **370** |
 
 قواعد عامة: خلفية **شفافة** للشخصيات والعناصر (PNG)، من غير كلام على الصورة إلا لو مكتوب، ممنوع دم أو شيء مخيف (أطفال 1-6 سنين)، الاسم المكتوب هو اسم الملف. لو الاسم فيه `1..5` يبقى ملف لكل رقم.
 
@@ -524,4 +544,355 @@ Friendly 3D-rendered children's learning-game art, bright saturated colors, soft
 32. `opposites_10.png` — Ten opposite pairs as simple pictures (a big elephant and a tiny mouse, a tall giraffe and a short bunny, a fast rabbit and a slow turtle, hot sun and cold snow, up and down arrows with a kid on a slide, inside and outside a house, open and closed door, full and empty glass, day and night, heavy and light); twenty files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
 33. `senses_5.png` — The five senses: an eye, an ear, a nose smelling a flower, a tongue tasting a lollipop, a hand touching a soft bunny; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
 34. `positions_6.png` — Position words with a ball and a box: on, under, inside, next to, in front, behind; six files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+
+---
+
+## 24. سكاي كابي — SKY CAPY (6 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Casual mobile game art, cute 3D-rendered cartoon look, soft sky-blue and cream colors, rounded shapes, big friendly eyes, soft shadows, kid friendly.
+```
+
+1. `capy_poses.png` — A chubby cute capybara with a tiny backpack: idle, jump, glide with a leaf umbrella, bounce, win; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `platforms_sheet.png` — Six floating sky islands/clouds platforms of different sizes, top-side view, 1536x512. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `collectibles.png` — Star coin, orange slice, shield bubble, spring boots; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `sky_backdrop.png` — A tall pastel sky with clouds and floating islands, 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+5. `ui_buttons_logo.png` — Round glossy pause/sound buttons and the logo «سكاي كابي». Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+6. `card_sky_capy.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 25. جرّافة الكرات — Marble Dozer (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Colorful 3D-rendered arcade physics game art, glossy toy-like look, candy colors, soft light, kid friendly.
+```
+
+1. `dozer_blade.png` — A chunky toy bulldozer with a wide blade and two side wings, orange, top 3/4 view. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `marbles_six.png` — Six glossy marbles in different bright colors with highlights; six files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `hole_funnel.png` — A round hole with a funnel rim and a glow, top view. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `arena_floor.png` — A rounded play arena floor with bright borders, top view, seamless. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+5. `walls_bumpers.png` — Rubber bumpers and wooden walls pieces; one sheet. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+6. `ui_stars_timer.png` — Three gold stars, a clock and a pause button. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+7. `card_marble_dozer.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 26. تيتان الكثبان — Dune Titans (8 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+3D-rendered off-road desert racing game art, warm orange sand, dramatic sunset light, glossy cartoon trucks, kid friendly, no logos.
+```
+
+1. `truck_player.png` — A chunky 6-wheel orange-and-black desert truck with roof lights, big tires, 3/4 rear view. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `truck_rivals_5.png` — Five rival 6-wheel trucks (blue, green, pink, yellow, purple), one file each. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `truck_drift_nitro.png` — The orange truck drifting sideways with dust, and with a blue nitro flame; two files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `dunes_scene.png` — A desert race track between sand dunes with rocks, flags, a tent camp, an oasis pool and a helicopter, no characters. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+5. `props_rocks_cacti_tent.png` — Rocks, cacti, a striped tent with flags, a start/finish gantry; one sheet. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+6. `road_texture.png` — Packed dirt road texture with tyre ruts, seamless top view. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+7. `ui_speedo_buttons.png` — Speedometer with boost bar, round DRIFT, NITRO, left and right arrow buttons (no numbers). Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+8. `card_dune_titans.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 27. طوف الناجي — Castaway Raft (8 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Casual mobile survival game art, cute 3D-rendered cartoon, bright tropical blue water, warm wood, soft foam, kid friendly.
+```
+
+1. `castaway_poses.png` — A cute castaway with a straw hat and striped shirt: idle, throwing the hook, pulling, happy, building; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `raft_tiles.png` — Log raft tiles tied with rope, top view, plus a sail mast, a fishing rod spot and a small hut; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `floating_items.png` — A plank, a barrel, a crate and a glowing golden bottle floating with foam rings; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `shark_fin.png` — A cartoon shark fin and wake, a "!" warning bubble; two files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `island_five.png` — Five small islands seen from above (palm, sand, rock, coral, golden treasure) with an X mark; five files. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `sea_backdrop.png` — Blue sea texture with soft waves, seamless, top view. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+7. `ui_build_buttons.png` — Four build buttons: raft tile, sail, fishing, hut; and wood, crate, bottle counters. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+8. `card_castaway_raft.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 28. معسكر الشتاء — Winter Camp (9 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Cozy low-poly 3D cartoon winter art, chunky shapes, soft snow, snow-covered pines, warm firelight, frosty-blue glass UI, top-down view, kid friendly.
+```
+
+1. `survivor_poses.png` — A cute lone survivor in a red coat and white hat carrying logs on the back: idle, walking, chopping, carrying, cheering; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `pines_stumps.png` — Snow-covered pine trees in three sizes and a stump, top 3/4 view; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `campfire.png` — A warm campfire with logs and a glow. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `buildings_four.png` — A log cabin, a workshop, a sawmill and a supply sled, snow roofs; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `frozen_gate.png` — A big frozen ice gate that opens, two frames. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+6. `helper_workers.png` — Small orange-coat helper workers chopping and carrying; three files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+7. `snow_ground.png` — A seamless soft snow ground texture with blue drifts, top view. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+8. `ui_glass_buttons.png` — Frosty glass round buttons: helper, bigger bag, pause, menu; and coin and log icons. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+9. `card_winter_camp.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 29. سباق حلبة المطر — Rain Circuit (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+3D-rendered racing game art, rainy wet asphalt reflections, green hills and palm trees, glossy sports cars, moody soft light, kid friendly, no logos.
+```
+
+1. `car_player.png` — A red high-performance race car with a rear wing, 3/4 rear view, wet shine. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `car_rivals_5.png` — Five rival race cars (blue, yellow, green, white, purple), one file each. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `nitro_pickup.png` — A glowing blue diamond pickup, and a blue nitro flame; two files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `track_scene.png` — A wet circuit winding through green hills and palm trees, rain, mist, grandstands, no cars. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+5. `rain_overlay.png` — A transparent rain streak overlay, 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `ui_hud.png` — Position badge, lap counter, speedometer, round NITRO and BRAKE buttons. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+7. `card_rain_circuit.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 30. فرقة الجنود — Squad Shooter (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Chunky 3D cartoon shooter art at night, industrial road, bright rim light, saturated colors, cute soldiers, no blood, kid friendly.
+```
+
+1. `soldier_poses.png` — A cute cartoon soldier with a green helmet and small rifle: idle, run, shoot, hurt, cheer; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `enemy_thugs.png` — Three purple cartoon enemy thugs of different sizes plus a giant boss; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `gates_numbers.png` — A glowing blue plus gate and a red minus gate, translucent panels with posts; two files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `cage_crate.png` — A metal cage with captive soldiers, and a weapon crate; two files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `road_night.png` — A night industrial road with lamp posts, containers, barrels and pipes, no characters. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `ui_numbers_shop.png` — Squad counter badge, coin, rifle and rank upgrade buttons. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+7. `card_squad_shooter.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 31. رماة الجسر — Archer Bridge (6 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Chunky 3D cartoon fantasy art, stone bridge over glowing lava, warm orange light, cute archers and funny skeletons, no gore, kid friendly.
+```
+
+1. `archer_poses.png` — A cute archer with a red hood and wooden bow: idle, run, shoot, cheer; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `skeletons.png` — Three cartoon skeleton warriors of different sizes (sword, shield) and a giant skeleton boss; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `gates_cages.png` — Numbered upgrade gates (blue plus, red minus), a cage with captive archers, a bow crate; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `bridge_scene.png` — A three-lane stone bridge over a lava chasm with torches and embers, no characters. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+5. `arrow_volley.png` — A volley of glowing arrows, and a rank badge; two files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+6. `card_archer_bridge.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 32. سباق السماء الغريبة — Alien Sky Race (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Colorful 3D cartoon sci-fi art, floating islands in an alien purple sky, glossy toy-like shapes, bright neon accents, kid friendly.
+```
+
+1. `creature_poses.png` — A cute round green space creature with antennae and a small jetpack: run, jump, jetpack burst, bumped, win; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `rival_creatures_5.png` — Five rival space creatures in different colors, one file each. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `course_pieces.png` — A floating island platform, a spinning ring, an opening door, a meteor with a shadow, a green tube shortcut; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `rocket_finish.png` — A big red-and-white cartoon rocket at the finish. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `sky_backdrop.png` — An alien sky with colorful planets, 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `ui_jump_jet.png` — Round JUMP and JET buttons, jetpack charge icons. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+7. `card_alien_sky.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 33. سباق القمة (وحيد القرن) — Summit Race (Rhino) (6 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Colorful 3D cartoon obstacle-race art above the clouds, soft pastel sky, glossy shapes, kid friendly.
+```
+
+1. `rhino_poses.png` — A cute chubby rhino with a red helmet: run, jump, dive, bumped, win; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `rival_runners_5.png` — Five rival animal runners with helmets, one file each. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `obstacles.png` — A spinning sweeper bar, a swinging hammer, a breakaway gate, a bounce pad, a power-up orb; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `golden_gate.png` — A big golden gate at the summit, two frames (closed, burst). Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `course_scene.png` — Floating colorful courses above fluffy clouds, no characters. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `card_summit_race.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 34. طريق الغروب — Sunset Highway (6 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+3D-rendered arcade racing art, warm orange sunset, palm-lined coastal highway, glossy cartoon cars, kid friendly, no logos.
+```
+
+1. `car_player.png` — A red sports car, 3/4 rear view, sunset reflections. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `rival_car.png` — A blue sports rival car. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `traffic_set.png` — Five different traffic cars and three trucks; eight files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `highway_scene.png` — A coastal highway at sunset with palms, sea, sun disc and bends, no cars. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+5. `ui_hud.png` — Timer badge, position badge, speed readout, NITRO button. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+6. `card_sunset_highway.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 35. مبدع الذكاء — AI Creator (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Clean minimal glassy casual idle-game art, soft purple and blue gradients, rounded shapes, friendly modern office, no real brands or characters, kid friendly.
+```
+
+1. `creator_poses.png` — A young cartoon creator at a desk with a laptop: tapping, thinking, happy, promoted; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `office_six.png` — Six office levels from a small desk to a boardroom with a glass skyline; six files. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+3. `create_buttons.png` — Three big buttons: PHOTO, VIDEO, GAME with icons. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+4. `quality_bar.png` — A horizontal quality bar with a green zone and a needle. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+5. `results_icons.png` — A masterpiece star badge and a funny broken "AI slop" trash can; two files. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+6. `shop_icons.png` — Four upgrade icons: GPU, wider zone, slower needle, richer clients. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+7. `card_ai_creator.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 36. غوّاصو اللؤلؤ — Pearl Divers (6 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Tropical cartoon underwater idle-game art, turquoise lagoon, glossy shapes, bright coral, kid friendly.
+```
+
+1. `diver_poses.png` — A cute diver with a snorkel: swimming down, opening a clam, carrying a pearl, swimming up; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `clams_pearls.png` — Open and closed clams with a glowing pearl; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `boats.png` — The player boat with a crane and a luxury rival yacht; two files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `diving_bell_basket.png` — A brass diving bell and a woven pearl basket; two files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `depth_backdrops.png` — Four underwater layers: sunny shallows, coral reef, pearl cave, the deep; four files. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `card_pearl_divers.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 37. مزرعة العسل — Honey Farm (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Casual 3D cartoon farm art, sunny meadow, flowers, glossy honey, chunky shapes, kid friendly.
+```
+
+1. `farmer_poses.png` — A cute farmer with a straw hat carrying a stack of honey jars: idle, walk, carry, cheer; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `beehive_stages.png` — A wooden beehive with bees, empty and full of jars; two files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `packing_machine_crate.png` — A packing machine and a wooden crate of honey jars; two files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `shop_counter_customers.png` — A roadside shop counter with a striped awning and five different customers waiting; six files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `conveyor_belt.png` — A conveyor belt moving honey jars. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+6. `farm_ground.png` — A sunny flower meadow farm ground, top view, seamless. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+7. `card_honey_farm.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 38. تنين الجليد (لسه ما اتبنتش) — Ice Dragon Maze (5 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Cute 3D fantasy art, icy maze above turquoise water, frosty blue and white, glowing runes, giant armored segmented dragon, no gore, kid friendly.
+```
+
+1. `hero_poses.png` — A small cartoon hero with a staff: idle, run, shoot, cheer; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `dragon_head_segment.png` — A giant ice dragon head and an armored body segment (intact and cracked); three files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `shrine_barrel.png` — A numbered stone shrine, an explosive barrel and an ally spirit; three files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `ice_maze_scene.png` — An ice-block maze platform surrounded by turquoise water channels, top 3/4 view. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+5. `card_ice_dragon.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 39. ينابيع القرية (لسه ما اتبنتش) — Hot Spring Village (5 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Cozy 3D cartoon art, snowy mountain village hot spring, warm steam, lanterns, soft light, kid friendly.
+```
+
+1. `caretaker_poses.png` — A cute caretaker with a scarf carrying ginger slices: idle, walk, carry, cheer; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `visitors_frozen.png` — Frozen blue visitors shivering and then warm happy ones; six files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `spring_mill_teahouse.png` — A hot spring pool, a ginger slicing mill, a tea house; three files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `lanterns.png` — Unlit and lit paper lanterns; two files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `card_hot_spring.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 40. مزرعة المريخ (لسه ما اتبنتش) — Mars Farm Colony (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Colorful isometric cartoon art on Mars, red terrain, futuristic farm buildings, cute drones, kid friendly.
+```
+
+1. `crops_three.png` — Wheat, corn, carrots at three growth stages; nine files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `goat_pen.png` — A cute goat and a futuristic pen; two files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `factories_three.png` — A bakery, a dairy and a juice factory, isometric; three files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `homes_spaceport.png` — Dome homes, a spaceport and a shuttle; three files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `drone_order.png` — A delivery drone with a crate; one file. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+6. `mars_ground.png` — Isometric red Mars ground tiles; one sheet. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+7. `card_mars_farm.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 41. الهامستر المحارب (لسه ما اتبنتش) — Hamster Warrior (6 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Cute 3D cartoon adventure art, forest path, glossy shapes, big readable numbers, kid friendly.
+```
+
+1. `hamster_poses.png` — A little hamster warrior with a sword and shield: run, attack, absorb power, cheer; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `monsters_power.png` — Five friendly-ugly monsters of increasing size with empty number plates; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `cards_gates.png` — Sword, shield, magic and multiply (x2, x3) power cards and gates; six files. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+4. `boss_three.png` — Three chapter bosses: a giant mushroom, a stone golem, a dragon; three files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `forest_path.png` — A bright forest path, no characters. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `card_hamster.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 42. تنظيف السجاد (لسه ما اتبنتش) — Rug Cleaning (5 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Cozy 3D ASMR-style art, sunny Mediterranean courtyard, whitewashed walls, limestone tiles, geraniums, glassy minimal UI, no real brands or characters.
+```
+
+1. `courtyard_scene.png` — A sunny whitewashed courtyard with limestone tiles, potted geraniums and an edge drain. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+2. `rugs_dirty_clean.png` — Four hand-knotted rug patterns, each dirty (dust, coffee stain, muddy boot prints) and clean; eight files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `tools_five.png` — A carpet beater, a foam sprayer, a rotary brush, a surface jet, a squeegee; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `ui_slider_stars.png` — A before/after slider handle, star rating, coin. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+5. `card_rug_cleaning.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 43. مقلاع الفايكنج (لسه ما اتبنتش) — Viking Slingshot (6 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Chunky 3D cartoon physics-game art, wooden goblin forts, stone and ice blocks, chubby vikings, no gore, kid friendly.
+```
+
+1. `vikings_four.png` — A chubby viking, a bomb thrower, a shield bouncer and a giant viking; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `slingshot.png` — A giant wooden slingshot, two frames. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `goblins.png` — Three cute goblins and a goblin king; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `blocks.png` — Wood planks, stone blocks, ice blocks; three files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `boss_fortress.png` — A big boss fortress. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+6. `card_viking_slingshot.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
 

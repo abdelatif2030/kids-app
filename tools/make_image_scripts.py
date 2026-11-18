@@ -321,8 +321,10 @@ LEARN += [
 ]
 game(23, 'اللعبة التعليمية (المستويات الجديدة)', 'Learning game: new levels', LEARN_STYLE, LEARN)
 
+exec(open(__file__.replace('make_image_scripts.py', 'image_scripts_new.py'), encoding='utf8').read())
+
 out = io.StringIO()
-out.write('# كل سكريبتات الصور لكل الألعاب (%s)\n\n' % '2026-11-18')
+out.write('# كل سكريبتات الصور لكل الألعاب (%s)\n\n' % '2026-11-19')
 out.write('الملف ده بيتولّد بـ `python tools/make_image_scripts.py`. كل سكريبت = برومت واحد (ممكن يطلع منه أكتر من ملف لو مكتوب «ملفات» فيه). اكتب **سطر الأسلوب** في أول كل برومت لنفس اللعبة عشان الشخصيات تبقى من نفس العيلة.\n\n')
 total = 0
 rows = []

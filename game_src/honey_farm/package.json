@@ -1,0 +1,12 @@
+{
+  "name": "honey_farm",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty honey farm management (canvas). Built into assets/games/honey_farm/game.js",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/honey_farm/game.js",
+    "test": "node --test test/sim.test.js"
+  },
+  "dependencies": { "three": "0.170.0" },
+  "devDependencies": { "esbuild": "0.24.0" }
+}
