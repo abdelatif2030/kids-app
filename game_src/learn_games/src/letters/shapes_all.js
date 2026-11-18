@@ -50,6 +50,9 @@ export const SIDES_ASKED = [3, 5, 6, 8]; // only counts that belong to ONE shape
 export const findShapeQ = (s, c = null) => (c ? `فين ${s.the} ${adjThe(s, c)}؟` : `فين ${s.the}؟`);
 /** The sentence said after a right answer: «ده مثلث» / «دي دايرة حمرا». */
 export const shapeSay = (s, c = null) => `${s.fem ? 'دي' : 'ده'} ${s.ar}${c ? ` ${adj(s, c)}` : ''}`;
+export const BIG_Q = 'فين الشكل الكبير؟';
+export const SMALL_Q = 'فين الشكل الصغير؟';
+export const sizeRounds = (age) => (age <= 2 ? 0 : 1);
 export const sidesQ = (n) => `فين الشكل اللي له ${SIDE_WORDS[n]} أضلاع؟`;
 export const shapeWithSides = (n) => SHAPES_ALL.find((s) => s.sides === n && SIDES_ASKED.includes(n));
 
@@ -59,6 +62,7 @@ export function allShapeSentences() {
   for (const s of SHAPES_ALL) out.push(findShapeQ(s), shapeSay(s));
   for (const s of COLORABLE) for (const c of SHAPE_COLORS) out.push(findShapeQ(s, c), shapeSay(s, c));
   for (const n of SIDES_ASKED) out.push(sidesQ(n));
+  out.push(BIG_Q, SMALL_Q);
   return [...new Set(out)];
 }
 
@@ -84,5 +88,6 @@ export function shapePlan(age, rounds, r) {
   const turn = (kind, count, ok) => { for (let i = 0; i < list.length && count > 0; i++) if (list[i].kind === 'name' && ok(list[i])) { list[i] = { kind, tier: list[i].tier }; count--; } };
   turn('sides', sidesRounds(age), (x) => x.tier === 'C' || x.tier === 'A'); // sides: triangle (A), pentagon / hexagon / octagon (C)
   turn('colour', colourRounds(age), () => true);
+  turn('size', sizeRounds(age), () => true); // the same shape in three sizes: «فين الشكل الكبير؟»
   return list;
 }

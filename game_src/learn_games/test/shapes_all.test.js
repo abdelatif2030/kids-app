@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
-import { SHAPES_ALL, SHAPE_TIERS, COLORABLE, SHAPE_COLORS, shapeTierCounts, shapePlan, findShapeQ, shapeSay, sidesQ, shapeWithSides, SIDES_ASKED, allShapeSentences, colourRounds, sidesRounds } from '../src/letters/shapes_all.js';
+import { BIG_Q, SMALL_Q, SHAPES_ALL, SHAPE_TIERS, COLORABLE, SHAPE_COLORS, shapeTierCounts, shapePlan, findShapeQ, shapeSay, sidesQ, shapeWithSides, SIDES_ASKED, allShapeSentences, colourRounds, sidesRounds } from '../src/letters/shapes_all.js';
 import { LevelPlay } from '../src/letters/levels.js';
 import { FreshMemory } from '../src/letters/fresh.js';
 import { rng } from '../src/maze/sim.js';
@@ -56,7 +56,15 @@ test('the shapes level: one right option, unique options, answers match the ques
       assert.equal(r.options.filter((o) => o.id === r.answer).length, 1);
       assert.equal(new Set(r.options.map((o) => o.id)).size, r.options.length);
       for (const o of r.options) assert.ok(o.kind === 'shape' ? COLORABLE.some((c) => c.id === o.shape) && SHAPE_COLORS.some((c) => c.id === o.color) : o.kind === 'thing' && o.thing.startsWith('g_'));
-      if (/أضلاع/.test(r.prompt)) {
+      if (r.prompt === BIG_Q || r.prompt === SMALL_Q) {
+        kinds.add('size');
+        assert.ok(age >= 3, 'no size question at two');
+        const sc = r.options.map((o) => o.scale);
+        assert.ok(sc.every((z) => z > 0 && z <= 1) && new Set(sc).size === sc.length);
+        const right = r.options.find((o) => o.id === r.answer);
+        assert.equal(right.scale, r.prompt === BIG_Q ? Math.max(...sc) : Math.min(...sc));
+        assert.equal(new Set(r.options.map((o) => `${o.shape}-${o.color}`)).size, 1, 'one shape, one colour, only the size differs');
+      } else if (/أضلاع/.test(r.prompt)) {
         kinds.add('sides');
         const n = SIDES_ASKED.find((x) => r.prompt === sidesQ(x));
         assert.equal(r.answer, shapeWithSides(n).id);
@@ -78,7 +86,7 @@ test('the shapes level: one right option, unique options, answers match the ques
     }
     assert.ok(hardForYoungest <= 1, 'a toddler gets at most one shape from the harder tiers (there are only seven easy ones)');
   }
-  assert.deepEqual([...kinds].sort(), ['colour', 'name', 'sides']);
+  assert.deepEqual([...kinds].sort(), ['colour', 'name', 'sides', 'size']);
 });
 
 test('all 20 shapes can come up, and a second visit shows other shapes first', () => {

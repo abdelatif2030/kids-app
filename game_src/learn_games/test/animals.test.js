@@ -67,7 +67,7 @@ test('a world shows its own animals, or everyone of the age when it has too few'
 test('the animals level follows the world it is in', async () => {
   const { LevelPlay } = await import('../src/letters/levels.js');
   const p = new LevelPlay('animals', 6, 3, null, 'jungle');
-  for (const r of p.rounds) assert.ok(poolFor(6, 'jungle').some((a) => a.thing === r.show.thing));
+  for (const r of p.rounds) if (r.show) assert.ok(poolFor(6, 'jungle').some((a) => a.thing === r.show.thing));
   const f = new LevelPlay('animals', 6, 3, null, 'farm');
-  for (const r of f.rounds) assert.ok(poolFor(6, 'farm').some((a) => a.thing === r.show.thing));
+  for (const r of f.rounds) if (r.show) assert.ok(poolFor(6, 'farm').some((a) => a.thing === r.show.thing));
 });

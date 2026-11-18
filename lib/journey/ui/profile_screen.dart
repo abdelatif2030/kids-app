@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../design/focusable_tap.dart';
+import '../learn_points.dart';
 import '../../design/picture_stage.dart';
 import '../../family_time/family_time_screen.dart';
 import '../../games/game_catalog.dart';
@@ -315,6 +316,19 @@ class StatsScreen extends StatelessWidget {
           LinearProgressIndicator(value: totals.xpIntoLevel / 100, minHeight: 10, borderRadius: BorderRadius.circular(8), color: const Color(0xFF7A3FE0), backgroundColor: const Color(0xFFE5D9F8)),
           const Divider(),
           row(tr2('النجوم', 'Stars'), '${totals.stars}'),
+          // the learning world: points and stars of the levels the child finished (never for time spent)
+          FutureBuilder<({int points, int plays, int stars})>(
+            future: LearnPoints.of(child.id),
+            builder: (context, snap) {
+              final d = snap.data;
+              if (d == null || d.plays == 0) return const SizedBox.shrink();
+              return Column(children: [
+                row(tr2('نقاط عالم التعلم', 'Learning world points'), '${d.points}'),
+                row(tr2('نجوم عالم التعلم', 'Learning world stars'), '${d.stars}'),
+                row(tr2('مستويات أنهيتها', 'Levels finished'), '${d.plays}'),
+              ]);
+            },
+          ),
           row(tr2('أنشطة أنهيتها', 'Activities finished'), '${progress.completedTotal}'),
           row(tr2('ألعاب أنهيتها', 'Games finished'), '${totals.games}'),
           row(tr2('دروس شاهدتها', 'Lessons watched'), '${totals.videos}'),

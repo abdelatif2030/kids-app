@@ -187,3 +187,21 @@ Fruits and vegetables: 37 pictures (every q_* and v_* word), vehicles +4, habits
 Test: `test/cycle.test.js` plays level 1 to 12 for ages 2-6 (visits, app restarts through JSON, new cycles) and checks nothing repeats inside a game, replays show new things first,
 and a new cycle does not start with what was just shown. `SHOW_CYCLE=1 node --test test/cycle.test.js` prints the table (things per level, first repeat, cycle done).
 Memory keeps 1500 keys. NOT built yet: the 20-level page (needs the owner's picture), ordinals, forms of letters, hamza.
+
+## Round of 2026-11-18 (owner reports and requests)
+- Numbers did not spin any more: plaques with a number or letter face the child, no turning, tiny drift (`main.js` _frame). Apples to count are big and stand further back
+  (`_placeStand`, the stand has an offset), no longer hidden behind the question sign.
+- Beach-ball bug: pictures that were not listed in actors.js ART_FILE (dinosaurs, places, new foods and habits) fell back to a ball. Rule now: every name in art_dims.json can
+  be shown by its own name. `test/things_resolve.test.js` checks every picture of every question; `test/voice_coverage.test.js` checks every sentence has a clip and diacritics.
+- Animal names a child knows: dinosaurs are «الديناصور المفترس / أبو قرون / أبو شوك / الطويل», the iguana is «السحلية الكبيرة».
+- New question kinds: animals «مين بيقول ...؟» (17 sounds) and «... بيعيش فين؟» (35 animals, 6 places); letters: forms (start / middle / end) of the 22 joining letters;
+  shapes: biggest / smallest. Age picker «عندك كام سنة؟» (2-6, kept in the save, a 🎂 button on the levels page); the game now knows age 2.
+- Points: a finished level gives 1-3 stars (first-try answers) and points; the badge at the top right shows the total and «+N» for a few seconds; the levels page shows the total
+  and the best stars of each level; the app keeps them (`LearnPoints`, key `learn_points`, shown in «إحصائياتي», erased with the child). Never for time spent.
+- «العب معانا تاني» button after each level (6.5 s before the walk to the next place); a replay shows other things (`test/replay.test.js`).
+- Each world has its own tune (`kit/themes.js`, built by rule + fixed seed; no person has listened to them yet). Background: flying birds are the owner's bird pictures,
+  trees sway, the sun breathes, clouds drift, balloons and kites bob (`decorate` in worlds3d.js).
+- The cheer shows once (bottom sign only, no top caption).
+- Voice QA tool: `tools/game_voice/verify_voice.mjs` (ElevenLabs speech-to-text compares each clip with its sentence; `--rescore` re-scores stored answers; the report is
+  `docs/voice_preview/QA_REPORT.md`). 1317 clips checked, the suspects were regenerated (best of up to 3 takes), 0 below 0.72 now. It cannot judge how Egyptian or natural a voice
+  sounds: only a person can.

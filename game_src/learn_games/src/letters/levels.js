@@ -12,8 +12,8 @@
 //   9 habits   Mama and Baba: "let's brush our teeth" pick the right thing  skill listening
 import { rng } from '../maze/sim.js';
 import { ROUNDS, poolFor, fishCount, letterById, question, LETTERS } from './sim.js';
-import { SHAPES_ALL, SHAPE_TIERS, SHAPE_COLORS, SIDES_ASKED, shapePlan, findShapeQ, shapeSay, sidesQ, shapeWithSides } from './shapes_all.js';
-import { ANIMALS, platesOf, animalById, question as animalQuestion, reward as animalReward, bankFor as animalBank, poolFor as animalPool, FOODS } from '../animals/sim.js';
+import { SHAPES_ALL, SHAPE_TIERS, SHAPE_COLORS, SIDES_ASKED, shapePlan, findShapeQ, shapeSay, sidesQ, shapeWithSides, BIG_Q, SMALL_Q } from './shapes_all.js';
+import { ANIMALS, platesOf, animalById, question as animalQuestion, reward as animalReward, bankFor as animalBank, poolFor as animalPool, SOUNDS, PLACES, hasSound, homeOf, soundQ, soundSay, homeQ, homeSay, FOODS } from '../animals/sim.js';
 import { optionsFor, COUNT_Q } from '../counting/sim.js';
 import { COLORS, COLOR_TIERS, COLOR_THINGS, colorPlan, colorChoices, findColorQ, findThingQ, colorOf } from './colors.js';
 import { TIERS, COUNT_TIERS, numberPlan, countPlan, numberWord, findQ, afterQ, beforeQ, BIGGER_Q, SMALLER_Q } from './numbers.js';
@@ -74,6 +74,13 @@ export const HARAKAT = [
 ];
 export const harakaQ = (l, h) => `فين حرف ${l.the} اللي عليه ${h.word}؟`;
 export const allHarakaSentences = () => LETTERS.flatMap((l) => HARAKAT.slice(0, 3).map((h) => harakaQ(l, h)));
+/** Letters that join on BOTH sides, so they have a start / middle / end form (alef, dal, dhal, raa, zayn, waaw join only to the right). */
+export const CONNECTING = new Set(['baa', 'taa', 'thaa', 'jeem', 'haa', 'khaa', 'seen', 'sheen', 'sad', 'dad', 'tah', 'zah', 'ayn', 'ghayn', 'faa', 'qaaf', 'kaaf', 'laam', 'meem', 'noon', 'haa2', 'yaa']);
+export const FORMS = [
+  { id: 'fi', word: 'أول', make: (ch) => `${ch}ـ` }, { id: 'fm', word: 'نص', make: (ch) => `ـ${ch}ـ` }, { id: 'ff', word: 'آخر', make: (ch) => `ـ${ch}` },
+];
+export const formQ = (l, f) => `فين ${l.the} اللي في ${f.word} الكلمة؟`;
+export const allFormSentences = () => LETTERS.filter((l) => CONNECTING.has(l.id)).flatMap((l) => FORMS.map((f) => formQ(l, f)));
 export const levelOf = (id) => LEVELS.find((l) => l.id === id);
 /** The youngest (four) skip the two alphabet levels that need reading order. */
 export const levelsFor = (_age) => LEVELS; // every level is open at every age: the age only picks what comes first (tiers)
@@ -332,7 +339,7 @@ export class LevelPlay {
         const lastIds = out.map((x) => x.shapeId);
         const newShape = (x) => !drawn.has(`s:${x.id}`) && mem.score(`s:${x.id}`) <= 0;
         // a colour or sides question needs a (colourable / counted) shape the child has not met yet; otherwise this round is a plain «فين ...؟»
-        if (mem && kind === 'colour' && !SHAPES_ALL.some((x) => code(x) && newShape(x))) kind = 'name';
+        if (mem && (kind === 'colour' || kind === 'size') && !SHAPES_ALL.some((x) => code(x) && newShape(x))) kind = 'name';
         if (mem && kind === 'sides' && !SIDES_ASKED.some((n) => newShape(shapeWithSides(n)))) kind = 'name';
         if (kind === 'sides') {
           const cands = SIDES_ASKED.filter((n) => !lastIds.includes(shapeWithSides(n).id));
@@ -340,6 +347,16 @@ export class LevelPlay {
           const sh = shapeWithSides(n);
           mark(sh.id);
           out.push({ prompt: sidesQ(n), answer: sh.id, shapeId: sh.id, key: `s:${sh.id}`, reward: shapeSay(sh), options: nameOptions(sh, (x) => x.sides !== n) });
+        } else if (kind === 'size') {
+          // the same shape, same colour, in three or four sizes: which is the biggest / the smallest?
+          const sh = draw(tier, lastIds, code);
+          const col = shuffledColors()[0];
+          mark(sh.id);
+          const sizes = nOpt >= 4 ? [1, 0.78, 0.56, 0.36] : [1, 0.7, 0.42];
+          const big = r() < 0.5;
+          const ans = big ? 0 : sizes.length - 1;
+          out.push({ prompt: big ? BIG_Q : SMALL_Q, answer: `sz${ans}`, shapeId: sh.id, key: `s:${sh.id}`, reward: shapeSay(sh, col),
+            options: sizes.map((z, k) => ({ id: `sz${k}`, kind: 'shape', shape: sh.id, color: col.id, scale: z })).sort(() => r() - 0.5) });
         } else if (kind === 'colour') {
           const sh = draw(tier, lastIds, code);
           const col = shuffledColors()[0];
@@ -381,21 +398,46 @@ export class LevelPlay {
       let queue = ordered();
       const rightFoods = new Set();
       const chosen = new Set(); // animals already asked in THIS game
+      // most rounds ask what the animal eats; one asks «مين بيقول ...؟» (from age 3) and one «... بيعيش فين؟» (from age 4)
+      const kinds = Array(ROUNDS).fill('food');
+      const slots = [1, 2, 3, 4, 5, 6, 7].sort(() => r() - 0.5);
+      if (this.age >= 3) kinds[slots[0]] = 'sound';
+      if (this.age >= 4) kinds[slots[1]] = 'home';
       for (let i = 0; i < ROUNDS; i++) {
+        let kind = kinds[i];
         const notLast = (id) => !(i && out[i - 1].animal === id);
         const isNew = (id) => !mem || mem.score(animalKey(id)) <= 0;
+        const ok = (id) => (kind === 'sound' ? hasSound(id) : kind === 'home' ? !!homeOf(id) : true);
         // new animals first (even when their food was already asked), then a food that was not asked yet, then anything
-        let k = queue.findIndex((id) => notLast(id) && isNew(id) && !rightFoods.has(animalById(id).food));
-        if (k < 0) k = queue.findIndex((id) => notLast(id) && isNew(id));
-        if (k < 0) k = queue.findIndex((id) => notLast(id) && !rightFoods.has(animalById(id).food));
-        if (k < 0) k = queue.findIndex(notLast); // an animal whose food was already asked, but not asked itself yet
-        if (k < 0) { queue = ordered().filter((x) => !chosen.has(x)); if (!queue.length) queue = ordered(); rightFoods.clear(); k = Math.max(0, queue.findIndex(notLast)); }
+        const pick = () => {
+          let k = queue.findIndex((id) => notLast(id) && ok(id) && isNew(id) && !rightFoods.has(animalById(id).food));
+          if (k < 0) k = queue.findIndex((id) => notLast(id) && ok(id) && isNew(id));
+          if (k < 0) k = queue.findIndex((id) => notLast(id) && ok(id) && !rightFoods.has(animalById(id).food));
+          if (k < 0) k = queue.findIndex((id) => notLast(id) && ok(id)); // an animal whose food was already asked, but not asked itself yet
+          return k;
+        };
+        let k = pick();
+        // a «who says» / «where does it live» round needs an animal that can; when no NEW animal can, this round feeds a new animal instead of repeating a known one
+        if (kind !== 'food' && k >= 0 && !isNew(queue[k]) && queue.some((id) => notLast(id) && isNew(id))) { kind = 'food'; k = pick(); }
+        if (k < 0) { queue = ordered().filter((x) => !chosen.has(x)); if (!queue.length) queue = ordered(); rightFoods.clear(); k = pick(); }
+        if (k < 0) { kind = 'food'; k = Math.max(0, queue.findIndex(notLast)); } // nobody left who can say or live: a plain feeding round
         const id = queue.splice(k, 1)[0];
         chosen.add(id);
         rightFoods.add(animalById(id).food);
         const a = animalById(id);
-        const plates = platesOf(this.age, id, this.seed + i * 41, this.world, used);
-        out.push({ prompt: animalQuestion(a), answer: a.food, animal: id, key: `t:${a.thing}`, show: { type: 'thing', thing: a.thing }, reward: animalReward(a), options: plates.map((f) => ({ id: f, kind: 'thing', thing: FOODS[f].thing })) });
+        if (kind === 'sound') {
+          // listen: the narrator says the sound, the child picks the animal (animals with another sound as wrong choices)
+          const snd = SOUNDS[id];
+          const others = pickLow(ANIMALS.filter((x) => x.id !== id && SOUNDS[x.id] && SOUNDS[x.id].id !== snd.id).map((x) => x.id), nOpt - 1);
+          out.push({ prompt: soundQ(snd), answer: id, animal: id, key: `t:${a.thing}`, show: null, reward: soundSay(a), options: [id, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'thing', thing: animalById(x).thing })) });
+        } else if (kind === 'home') {
+          const home = homeOf(id);
+          const others = pickLow(Object.keys(PLACES).filter((x) => x !== home), nOpt - 1);
+          out.push({ prompt: homeQ(a), answer: home, animal: id, key: `t:${a.thing}`, show: { type: 'thing', thing: a.thing }, reward: homeSay(a), options: [home, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'thing', thing: PLACES[x].thing })) });
+        } else {
+          const plates = platesOf(this.age, id, this.seed + i * 41, this.world, used);
+          out.push({ prompt: animalQuestion(a), answer: a.food, animal: id, key: `t:${a.thing}`, show: { type: 'thing', thing: a.thing }, reward: animalReward(a), options: plates.map((f) => ({ id: f, kind: 'thing', thing: FOODS[f].thing })) });
+        }
       }
     } else if (mode === 'color') {
       // 25 colours at every age (age picks the start); some rounds ask for a THING of the colour (pictures), never two shades of one family together
@@ -478,11 +520,21 @@ export class LevelPlay {
       const harakaAt = new Set();
       const nH = this.age < 4 ? 0 : this.age < 6 ? 1 : 2;
       while (harakaAt.size < nH) harakaAt.add(2 + Math.floor(r() * (ROUNDS - 2)));
+      const formAt = new Set();
+      while (this.age >= 5 && formAt.size < 1) { const k = 2 + Math.floor(r() * (ROUNDS - 2)); if (!harakaAt.has(k)) formAt.add(k); }
       for (let i = 0; i < ROUNDS; i++) {
-        const { item: t, tier } = nextL();
+        let { item: t, tier } = nextL();
+        if (formAt.has(i)) for (let tries = 0; tries < 40 && !CONNECTING.has(t); tries++) ({ item: t, tier } = nextL()); // a form question needs a letter that joins on both sides
         const l = letterById(t);
         mark(t);
         const reachIds = tiers.slice(0, tier + 1).flat();
+        if (formAt.has(i) && CONNECTING.has(t)) {
+          const right = FORMS[Math.floor(r() * 3)];
+          const opts = FORMS.map((f) => ({ id: f.id, kind: 'letter', ch: f.make(l.ch) }));
+          if (nOpt >= 4) opts.push({ id: 'fa', kind: 'letter', ch: l.ch }); // the letter alone is a wrong choice for the oldest
+          out.push({ prompt: formQ(l, right), answer: right.id, key: `t:${l.thing}`, options: opts.sort(() => r() - 0.5) });
+          continue;
+        }
         if (harakaAt.has(i)) {
           const marks = nOpt >= 4 ? HARAKAT : HARAKAT.slice(0, 3);
           const right = marks[Math.floor(r() * 3)];

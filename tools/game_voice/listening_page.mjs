@@ -12,23 +12,25 @@ const rows = [];
 for (const l of lines) {
   const f = path.join(DIR, `${l.id}.mp3`);
   if (!fs.existsSync(f)) continue;
-  rows.push({ t: l.text, a: fs.readFileSync(f).toString('base64'), m: fs.statSync(f).mtimeMs });
+  rows.push({ t: l.text, a: fs.readFileSync(f).toString('base64'), m: fs.statSync(f).mtimeMs, id: l.id });
 }
 const newest = Math.max(...rows.map((r) => r.m));
 const hArg = process.argv.indexOf('--hours'); // --hours 1 : only the clips made in the last hour before the newest one
 const HOURS = hArg > 0 ? Number(process.argv[hArg + 1]) || 6 : 6;
-const data = rows.map((r) => ({ t: r.t, a: r.a, fresh: newest - r.m < HOURS * 3600 * 1000 }));
+// what the automatic check (verify_voice.mjs, speech-to-text) heard in each clip, when it was checked
+const QA = fs.existsSync(path.join(ROOT, 'docs/voice_preview/qa_results.json')) ? JSON.parse(fs.readFileSync(path.join(ROOT, 'docs/voice_preview/qa_results.json'), 'utf8')) : {};
+const data = rows.map((r) => ({ t: r.t, a: r.a, fresh: newest - r.m < HOURS * 3600 * 1000, q: QA[r.id] && QA[r.id].heard !== null && QA[r.id].heard !== undefined ? { h: QA[r.id].heard, s: QA[r.id].score } : null }));
 const ONLY_NEW = process.argv.includes('--new'); // only the clips made in the last session (for choosing which to redo)
 if (ONLY_NEW) { for (let i = data.length - 1; i >= 0; i--) if (!data[i].fresh) data.splice(i, 1); }
 const html = `<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>كل أصوات اللعبة</title>
-<style>body{font-family:system-ui,Tahoma,sans-serif;background:#f4f0fc;margin:0;color:#3a2a5a}header{position:sticky;top:0;background:#fff;box-shadow:0 2px 8px rgba(60,40,100,.15);padding:12px 16px;z-index:5}h1{font-size:20px;margin:0 0 8px}.row{display:flex;gap:8px;flex-wrap:wrap}input[type=search]{flex:1;min-width:140px;padding:9px 14px;border-radius:20px;border:2px solid #d8ccf0;font:inherit}.t{border:none;background:#6a3ad0;color:#fff;border-radius:20px;padding:9px 16px;font:inherit;font-weight:700;cursor:pointer}.t.alt{background:#fff;color:#6a3ad0;border:2px solid #6a3ad0}.list{padding:12px 16px 60px}.r{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:9px 14px;margin-bottom:8px;box-shadow:0 2px 6px rgba(60,40,100,.1)}.r.on{background:#fff3e0}.r.bad{background:#ffe8ec}.r.fresh{border-right:6px solid #2aa86a}.n{width:34px;color:#9a8aba;font-size:13px;text-align:center}.p{flex:none;width:46px;height:46px;border-radius:50%;border:none;background:#6a3ad0;color:#fff;font-size:20px;cursor:pointer}.tx{flex:1;font-size:22px;font-weight:700}.f{font-size:12px;color:#2aa86a;white-space:nowrap}.bd{border:2px solid #c0a0a8;background:#fff;color:#9a5a6a;border-radius:14px;padding:6px 10px;font:inherit;cursor:pointer}.hide{display:none}</style>
+<style>.qa{font-size:11px;color:#8a7aa8;margin-top:2px}.qa.qb{color:#d03a3a;font-weight:700}body{font-family:system-ui,Tahoma,sans-serif;background:#f4f0fc;margin:0;color:#3a2a5a}header{position:sticky;top:0;background:#fff;box-shadow:0 2px 8px rgba(60,40,100,.15);padding:12px 16px;z-index:5}h1{font-size:20px;margin:0 0 8px}.row{display:flex;gap:8px;flex-wrap:wrap}input[type=search]{flex:1;min-width:140px;padding:9px 14px;border-radius:20px;border:2px solid #d8ccf0;font:inherit}.t{border:none;background:#6a3ad0;color:#fff;border-radius:20px;padding:9px 16px;font:inherit;font-weight:700;cursor:pointer}.t.alt{background:#fff;color:#6a3ad0;border:2px solid #6a3ad0}.list{padding:12px 16px 60px}.r{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:9px 14px;margin-bottom:8px;box-shadow:0 2px 6px rgba(60,40,100,.1)}.r.on{background:#fff3e0}.r.bad{background:#ffe8ec}.r.fresh{border-right:6px solid #2aa86a}.n{width:34px;color:#9a8aba;font-size:13px;text-align:center}.p{flex:none;width:46px;height:46px;border-radius:50%;border:none;background:#6a3ad0;color:#fff;font-size:20px;cursor:pointer}.tx{flex:1;font-size:22px;font-weight:700}.f{font-size:12px;color:#2aa86a;white-space:nowrap}.bd{border:2px solid #c0a0a8;background:#fff;color:#9a5a6a;border-radius:14px;padding:6px 10px;font:inherit;cursor:pointer}.hide{display:none}</style>
 <header><h1>🔊 كل أصوات اللعبة (<span id="cnt"></span>)</h1><div class="row"><input type="search" id="q" placeholder="دوّر..."><button class="t" id="all">▶ شغّل الكل ورا بعض</button><button class="t alt" id="stop">⏹ وقّف</button><button class="t alt" id="onlyfresh">الجديدة بس 🟢</button><button class="t alt" id="onlybad">اللي علّمتها 🚩</button><button class="t alt" id="copy">انسخ اللي علّمتها</button></div></header>
 <div class="list" id="list"></div>
 <script>
 const D=${JSON.stringify(data)};
 const list=document.getElementById('list');let cur=null,queue=null;
 const audio=new Audio();
-function row(i,d){const r=document.createElement('div');r.className='r'+(d.fresh?' fresh':'');r.dataset.i=i;r.innerHTML='<span class="n">'+(i+1)+'</span><button class="p">▶</button><span class="tx"></span>'+(d.fresh?'<span class="f">جديد</span>':'')+'<button class="bd">🚩</button>';r.querySelector('.tx').textContent=d.t;
+function row(i,d){const r=document.createElement('div');r.className='r'+(d.fresh?' fresh':'');r.dataset.i=i;r.innerHTML='<span class="n">'+(i+1)+'</span><button class="p">▶</button><span class="tx"></span>'+(d.fresh?'<span class="f">جديد</span>':'')+'<button class="bd">🚩</button>';r.querySelector('.tx').textContent=d.t;if(d.q){const q=document.createElement('div');q.className='qa'+(d.q.s<0.8?' qb':'');q.textContent='سمعها الفاحص: '+d.q.h+'  ('+d.q.s+')';r.querySelector('.tx').append(q)}
  r.querySelector('.p').onclick=()=>play(i);r.querySelector('.bd').onclick=()=>{r.classList.toggle('bad')};return r}
 D.forEach((d,i)=>list.append(row(i,d)));
 document.getElementById('cnt').textContent=D.length;

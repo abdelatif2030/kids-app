@@ -53,12 +53,12 @@ export const ANIMALS = [
   { id: 'shark', thing: 'shark', the: 'القرش', fem: false, food: 'fish', also: ['meat'], age: 5, groups: ['underwater'] },
   { id: 'cheetah', thing: 'cheetah', the: 'الفهد', fem: false, food: 'meat', also: [], age: 5, groups: ['jungle'] },
   { id: 'croc', thing: 'croc', the: 'التمساح', fem: false, food: 'fish', also: ['meat'], age: 5, groups: ['jungle'] },
-  { id: 'iguana', thing: 'iguana', the: 'الإغوانا', fem: true, food: 'leaves', also: ['insect', 'lettuce', 'berries'], age: 6, groups: ['jungle', 'desert'] },
+  { id: 'iguana', thing: 'iguana', the: 'السحلية الكبيرة', fem: true, food: 'leaves', also: ['insect', 'lettuce', 'berries'], age: 6, groups: ['jungle', 'desert'] },
   { id: 'mantis', thing: 'mantis', the: 'فرس النبي', fem: false, food: 'insect', also: ['worm'], age: 6, groups: ['meadow'] },
   { id: 'caterpillar', thing: 'caterpillar', the: 'اليرقة', fem: true, food: 'leaves', also: ['lettuce'], age: 5, groups: ['meadow'] },
-  { id: 'trex', thing: 'trex', the: 'التيرانوصور', fem: false, food: 'meat', also: [], age: 5, groups: ['dino'] },
-  { id: 'triceratops', thing: 'triceratops', the: 'ثلاثي القرون', fem: false, food: 'leaves', also: ['grass'], age: 5, groups: ['dino'] },
-  { id: 'stego', thing: 'stego', the: 'الستيجوصور', fem: false, food: 'leaves', also: ['grass'], age: 6, groups: ['dino'] },
+  { id: 'trex', thing: 'trex', the: 'الديناصور المفترس', fem: false, food: 'meat', also: [], age: 5, groups: ['dino'] },
+  { id: 'triceratops', thing: 'triceratops', the: 'الديناصور أبو قرون', fem: false, food: 'leaves', also: ['grass'], age: 5, groups: ['dino'] },
+  { id: 'stego', thing: 'stego', the: 'الديناصور أبو شوك', fem: false, food: 'leaves', also: ['grass'], age: 6, groups: ['dino'] },
   { id: 'brachio', thing: 'brachio', the: 'الديناصور الطويل', fem: false, food: 'leaves', also: ['grass'], age: 6, groups: ['dino'] },
 ];
 // `thing` is the picture a plate shows (an art name, or one of the things the 3D kit draws itself).
@@ -81,6 +81,43 @@ export const FOODS = {
   insect: { the: 'الجندب', thing: 'grasshopper' },
   flower: { the: 'الزهرة', thing: 't_flower' },
 };
+
+// «مين بيقول ...؟» and «بيعيش فين؟»: what an animal says (the sentence is said by the narrator, not a recording of the animal) and where it lives.
+// Animals that share a sound (sheep and goat) or have no clear home are left out of that question.
+export const SOUNDS = {
+  cow: { id: 'moo', say: 'موووو' }, cat: { id: 'meow', say: 'مياو' }, dog: { id: 'woof', say: 'هو هو' }, sheep: { id: 'baa', say: 'ماااع' },
+  rooster: { id: 'crow', say: 'كوكو كوكوكو' }, hen: { id: 'cluck', say: 'كاك كاك' }, chick: { id: 'peep', say: 'بيو بيو' }, duck: { id: 'quack', say: 'واك واك' },
+  donkey: { id: 'hee', say: 'هيييه' }, horse: { id: 'neigh', say: 'هيهيهيهي' }, lion: { id: 'roar', say: 'رووور' }, frog: { id: 'croak', say: 'نق نق' },
+  bee: { id: 'buzz', say: 'زززز' }, mouse: { id: 'squeak', say: 'إيك إيك' }, elephant: { id: 'trumpet', say: 'بوووو' }, pigeon: { id: 'coo', say: 'غوغو' }, monkey: { id: 'ooh', say: 'أوو أوو' },
+};
+export const PLACES = {
+  farm: { thing: 'barn_f', say: 'في المزرعة' }, jungle: { thing: 'j_tree', say: 'في الغابة' }, sea: { thing: 'u_arch', say: 'في البحر' },
+  snow: { thing: 'w_igloo', say: 'في الثلج' }, desert: { thing: 'd_tent', say: 'في الصحرا' }, house: { thing: 'c_house', say: 'في البيت' },
+};
+export const HOMES = {
+  cow: 'farm', chick: 'farm', horse: 'farm', hen: 'farm', donkey: 'farm', goat: 'farm', sheep: 'farm', rooster: 'farm', goose: 'farm', duck: 'farm',
+  monkey: 'jungle', lion: 'jungle', tiger: 'jungle', elephant: 'jungle', giraffe: 'jungle', zebra: 'jungle', gorilla: 'jungle', chameleon: 'jungle', parrot: 'jungle',
+  toucan: 'jungle', cheetah: 'jungle', iguana: 'jungle', frog: 'jungle', croc: 'jungle', bear: 'snow', penguin: 'snow', seal: 'snow', reindeer: 'snow', fox: 'snow',
+  camel: 'desert', dolphin: 'sea', shark: 'sea', turtle: 'sea', cat: 'house', dog: 'house', rabbit: 'house', mouse: 'house',
+};
+const verb = (a) => (a.fem ? 'بتقول' : 'بيقول');
+const liveVerb = (a) => (a.fem ? 'بتعيش' : 'بيعيش');
+export const soundQ = (snd) => `مين بيقول ${snd.say}؟`;
+export const soundSay = (a) => `${a.the} ${verb(a)} ${SOUNDS[a.id].say}`;
+export const homeQ = (a) => `${a.the} ${liveVerb(a)} فين؟`;
+export const homeSay = (a) => `${a.the} ${liveVerb(a)} ${PLACES[HOMES[a.id]].say}`;
+export const hasSound = (id) => !!SOUNDS[id];
+export const homeOf = (id) => HOMES[id] || null;
+/** Every sentence of the two extra animal questions (for the voice list). */
+export function allAnimalExtraSentences() {
+  const out = [];
+  for (const a of ANIMALS) {
+    if (SOUNDS[a.id]) { out.push(soundQ(SOUNDS[a.id]), soundSay(a)); }
+    if (HOMES[a.id]) { out.push(homeQ(a), homeSay(a)); }
+  }
+  return [...new Set(out)];
+}
+
 export const ROUNDS = 8;
 export const MIN_GROUP = 8; // a world shows only its own animals when it has at least a full game (eight) of them for the age
 /** The animals of this age; with a world, that world's own animals (when it has enough of them for the age). */

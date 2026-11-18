@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import '../../adventures/adventure_service.dart';
 import '../../companion/companion_store.dart';
 import '../../journey/repository.dart';
+import '../../journey/learn_points.dart';
 import '../../journey/resume.dart';
 import '../../l10n/app_locale.dart';
 import '../../media/audio.dart';
@@ -173,6 +174,11 @@ class LearnBridge {
         if (skill is! String || skill.isEmpty) return;
         final detail = msg['detail'];
         await ProgressStore.record(skill, msg['correct'] == true, detail: detail is String ? detail : null, childId: id);
+      case 'points':
+        // a finished level of the learning world: stars and points for the child's profile (never for time spent)
+        final pts = msg['points'], st = msg['stars'], lv = msg['level'];
+        if (pts is! num || st is! num) return;
+        await LearnPoints.add(id, points: pts.toInt(), stars: st.toInt(), level: lv is String ? lv : null);
       case 'complete':
         if (_completed) return; // once per opening; "play again" inside the game is a replay
         _completed = true;

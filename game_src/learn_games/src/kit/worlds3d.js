@@ -591,28 +591,31 @@ const BUILD = {
   },
 };
 
-/** A little flock of birds flying across the sky (two flapping wings each). */
-function makeBirds(n, y, z, spread) {
+/** A little flock of birds flying across the sky, from the owner's pictures of flying birds (they used to be black strokes): they flap, tilt and bob. */
+const FLYERS = { meadow: ['bird_blue', 'bird_yellow'], farm: ['bird_blue', 'bird_yellow'], home: ['bird_yellow', 'bird_blue'], rainbow: ['bird_yellow', 'bird_blue'], city: ['bird_blue', 'bird_yellow'],
+  castle: ['bird_blue', 'b_gull_fly2'], snow: ['b_gull_fly', 'b_gull_fly2'], jungle: ['j_parrot', 'bird_yellow'] };
+function makeBirds(n, y, z, spread, files = ['bird_blue', 'bird_yellow']) {
   const grp = new THREE.Group();
-  const mat = new THREE.MeshBasicMaterial({ color: 0x2a2a3a, side: THREE.DoubleSide, toneMapped: false });
   for (let i = 0; i < n; i++) {
     const b = new THREE.Group();
-    for (const sgn of [-1, 1]) {
-      const w = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.18), mat);
-      w.geometry.translate(sgn * 0.35, 0, 0);
-      w.userData.sgn = sgn;
-      b.add(w);
-    }
+    const size = 0.95 + (i % 3) * 0.18;
+    const pic = artProp(files[i % files.length], size);
+    pic.position.y = -size / 2; // the flapping turns around the bird's middle
+    b.add(pic);
     b.position.set(-spread + (i / n) * spread * 2, y + Math.sin(i * 2.1) * 1.4, z - (i % 3));
-    b.userData = { v: 1.1 + (i % 3) * 0.35, ph: i * 1.3, y0: b.position.y };
+    b.userData = { v: 1.1 + (i % 3) * 0.35, ph: i * 1.3, y0: b.position.y, pic };
     grp.add(b);
   }
   grp.userData.update = (dt, t) => {
     for (const b of grp.children) {
-      b.position.x += b.userData.v * dt;
+      const u = b.userData;
+      b.position.x += u.v * dt;
       if (b.position.x > spread + 2) b.position.x = -spread - 2;
-      b.position.y = b.userData.y0 + Math.sin(t * 1.3 + b.userData.ph) * 0.35;
-      for (const w of b.children) w.rotation.z = w.userData.sgn * Math.sin(t * 9 + b.userData.ph) * 0.7;
+      b.position.y = u.y0 + Math.sin(t * 1.3 + u.ph) * 0.35;
+      const flap = Math.sin(t * 8 + u.ph);
+      u.pic.scale.y = 1 + flap * 0.16; // the wings go up and down
+      u.pic.scale.x = 1 - Math.abs(flap) * 0.06;
+      b.rotation.z = Math.cos(t * 1.3 + u.ph) * 0.12 - 0.04; // it climbs and dives a little
     }
   };
   return grp;
@@ -675,12 +678,32 @@ function decorate(id, g, water) {
   const ups = [];
   const sways = [];
   g.traverse((o) => { if (o.userData && o.userData.sway) sways.push(o); });
+  // the owner's scenery pictures that did not move before now move too (owner 2026-11-18): trees and plants sway from their roots, the sun
+  // breathes and turns slowly, clouds drift across, balloons and kites bob. Pictures that already have their own motion are left alone.
+  const TREE = /tree|palm|pine|bush|flower|tulip|cactus|vine|weed|coral|plant|grass|tuft|lotus|mushroom|banana|mango/i;
+  const own = (o) => { for (let q = o; q; q = q.parent) { if (q.userData && (q.userData.sway || q.userData.anim)) return true; } return false; };
+  const lively = [];
+  g.traverse((o) => {
+    const name = o.userData && o.userData.name;
+    if (!name || !o.isMesh || own(o) || /pad|pano|ground|sky/.test(name)) return;
+    if (/^(r_sun|sun)$/.test(name)) lively.push({ o, kind: 'sun', ph: Math.random() * 6 });
+    else if (/cloud/.test(name)) lively.push({ o, kind: 'cloud', v: 0.18 + Math.random() * 0.15, x0: o.parent ? o.parent.position.x : 0 });
+    else if (/balloon|kite|pinwheel/.test(name)) lively.push({ o, kind: 'bob', ph: Math.random() * 6 });
+    else if (TREE.test(name)) lively.push({ o, kind: 'sway', amp: 0.012 + Math.random() * 0.018, sp: 0.6 + Math.random() * 0.7, ph: o.position.x * 0.7 + Math.random() * 6 });
+  });
   const add = (obj) => { g.add(obj); ups.push(obj.userData.update); };
-  if (['meadow', 'farm', 'rainbow', 'castle', 'city', 'snow', 'jungle', 'home'].includes(id)) add(makeBirds(id === 'snow' ? 3 : 5, 6.5, -14, 18));
+  if (['meadow', 'farm', 'rainbow', 'castle', 'city', 'snow', 'jungle', 'home'].includes(id)) add(makeBirds(id === 'snow' ? 3 : 5, 6.5, -14, 18, FLYERS[id]));
   if (['meadow', 'rainbow', 'farm', 'castle', 'jungle', 'home'].includes(id)) add(makeButterflies(4, -7, 7, 5.2));
   if (id === 'meadow') add(makeJumper());
   return (dt, t) => {
     for (const o of sways) { const w = o.userData.sway; o.rotation.z = Math.sin(t * w.sp + w.ph) * w.amp; }
+    for (const l of lively) {
+      const o = l.o;
+      if (l.kind === 'sway') o.rotation.z = Math.sin(t * l.sp + l.ph) * l.amp + Math.sin(t * l.sp * 2.3 + l.ph) * l.amp * 0.35;
+      else if (l.kind === 'sun') { o.rotation.z = Math.sin(t * 0.3 + l.ph) * 0.07; o.scale.setScalar(1 + Math.sin(t * 0.9 + l.ph) * 0.045); }
+      else if (l.kind === 'bob') { o.position.y = (l.y0 === undefined ? (l.y0 = o.position.y) : l.y0) + Math.sin(t * 1.4 + l.ph) * 0.12; o.rotation.z = Math.sin(t * 1.1 + l.ph) * 0.05; }
+      else if (l.kind === 'cloud') { const host = o.parent && o.parent !== g ? o.parent : o; host.position.x += l.v * dt; if (host.position.x > 19) host.position.x = -19; }
+    }
     for (const u of ups) u(dt, t);
     if (water) { water.map.offset.x = (t * 0.02) % 1; water.map.offset.y = (t * 0.012) % 1; }
   };

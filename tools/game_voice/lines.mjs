@@ -97,6 +97,8 @@ for (const tab of Object.values(lv.PICKS)) for (const it of tab.items) add(tab.p
 const colorsMod = await imp('letters/colors.js');
 for (const q of colorsMod.allColorSentences()) add(q, 'ar'); // 25 colours + the things of a colour
 for (const q of lv.allHarakaSentences()) add(q, 'ar'); // letters with a vowel mark (28 x 3)
+for (const q of animals.allAnimalExtraSentences()) add(q, 'ar'); // who says it, where it lives
+for (const q of lv.allFormSentences()) add(q, 'ar'); // the forms of a letter
 const shapesAll = await imp('letters/shapes_all.js');
 for (const q of shapesAll.allShapeSentences()) add(q, 'ar'); // 20 shapes: names, colours, sides
 for (const c of [...lv.CHEERS_M, ...lv.CHEERS_F]) add(c, 'ar');

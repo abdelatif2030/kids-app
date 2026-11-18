@@ -51,6 +51,7 @@ Future<void> deleteChildData() async {
         key == 'favorites' ||
         key == 'video_hidden_child' ||
         key == 'game_completions' ||
+        key == 'learn_points' ||
         key == 'carnival_race' ||
         key == 'jungle_adventure' ||
         key == 'happy_farm' ||
@@ -121,6 +122,7 @@ Future<void> deleteOneChild(String childId) async {
   await dropKey('literacy_state');
   await dropKey('video_completions');
   await dropKey('game_completions');
+  await dropKey('learn_points');
   await WebGameStore.forgetChild(childId);
   await ChildPhotoStore.delete(childId);
   await ResumeStore.forget(childId);

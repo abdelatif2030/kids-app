@@ -21,6 +21,7 @@ import { colorOf } from './colors.js';
 import { NUMBERS } from '../kit/words.js';
 import { LEVELS, LevelPlay, levelsFor, cheer } from './levels.js';
 import { FreshMemory } from './fresh.js';
+import { themeForWorld } from '../kit/themes.js';
 import { ROUNDS } from './sim.js';
 
 const TEXT = {
@@ -32,6 +33,10 @@ const TEXT = {
   levelsBtn: ['المستويات', 'Levels'],
   chooseHero: ['اختار شخصيتك!', 'Choose your hero!'],
   letsGo: ['يلا نبدأ المغامرة!', "Let's start the adventure!"],
+  ageQ: ['عندك كام سنة؟', 'How old are you?'],
+  replay: ['العب معانا تاني', 'Play with us again'], replaySay: ['يلا نلعب تاني!', "Let's play again!"],
+  age2: ['عندك سنتين', 'You are two'], age3: ['عندك تلات سنين', 'You are three'], age4: ['عندك أربع سنين', 'You are four'],
+  age5: ['عندك خمس سنين', 'You are five'], age6: ['عندك ست سنين', 'You are six'],
 };
 
 // calm, gentle music (slow, soft bells and a rocking bass); it opens up as the child answers
@@ -99,6 +104,7 @@ class Game {
     this.save = sh.save;
     if (!this.save.lw) this.save.lw = { unlocked: 1, done: {} };
     this.mem = new FreshMemory(this.save.lw.fresh); // what this child already met (new things come first)
+    if (this.save.lw.age >= 2 && this.save.lw.age <= 6) sh.age = this.save.lw.age; // the age the child chose in the game wins over the app's
     this.st.onFrame((dt, time) => this._frame(dt, time));
     sh.fonts().then(() => this._start()); // no start screen any more (owner 2026-11-13): straight to the levels page
   }
@@ -154,6 +160,12 @@ class Game {
     }
   }
 
+  /** Every place has its own tune (kit/themes.js): the child hears where he is. */
+  _tune(id) {
+    const th = themeForWorld(id);
+    if (th && this.sh && this.sh.sound) this.sh.sound.theme = th;
+  }
+
   /** Moves to another place (a fade, then the new scenery); the first level starts at the pond, each next level somewhere new. */
   _goWorld(i, instant) {
     const id = WORLD_IDS[i % WORLD_IDS.length];
@@ -164,6 +176,7 @@ class Game {
       this.world = this.worlds[id];
       this.worldId = id;
       this.padStyle = PADS[this.world.pad];
+      this._tune(id);
     };
     if (instant) { swap(); return; }
     this.fade.classList.add('on');
@@ -180,11 +193,19 @@ class Game {
     const L = (this.layout = portrait ? PORTRAIT : LANDSCAPE);
     this.st.o.wide = L.cam;
     STAND.set(L.stand[0], 0, L.stand[1]);
-    if (this.stand) this.stand.position.copy(STAND);
-    if (this.standItem) this.standItem.position.copy(STAND);
+    this._placeStand();
     if (this.hero) { this.hero.position.set(L.hero[0], 0.16, L.hero[1]); this.hero.scale.setScalar(L.hero[2]); }
     if (this.owl) { this.owl.position.set(L.owl[0], 0.16, L.owl[1]); this.owl.scale.setScalar(L.owl[2]); }
     for (const o of this.opts.values()) { if (o.home) { const i = [...this.opts.values()].indexOf(o), n = this.opts.size; o.home.set(((i + 0.5) / n - 0.5) * L.span + L.off, 0.1, i % 2 ? L.zs[1] : L.zs[0]); } }
+  }
+
+  /** The stand (the round table) and what stands on it: at STAND, moved by the item's own offset (the apples stand further back). */
+  _placeStand() {
+    const p = STAND.clone();
+    const off = this.standItem && this.standItem.userData && this.standItem.userData.off;
+    if (off) p.add(off);
+    if (this.stand) this.stand.position.copy(p);
+    if (this.standItem) this.standItem.position.copy(p);
   }
 
   _makeStand() {
@@ -286,7 +307,7 @@ class Game {
     } else if (o.kind === 'shape') {
       item = new THREE.Mesh(shapeGeo(o.shape), new THREE.MeshStandardMaterial({ color: colorOf(o.color).hex, roughness: 0.25, metalness: 0.05 }));
       item.position.set(0, 1.05 + lift, 0);
-      item.scale.setScalar(0.95);
+      item.scale.setScalar(0.95 * (o.scale || 1));
       item.castShadow = true;
       g.add(item);
     } else {
@@ -326,28 +347,32 @@ class Game {
       if (!t.userData.art) g.userData.spin = t; // a flat picture must not turn edge-on
       g.userData.pet = { inner: t, base: t.position.y, s0: t.scale.clone(), t0: Math.random() * 6, hop: 0, hopDur: 1.2, shake: 0, chew: 0, hungry: !!(this.level && this.level.mode === 'animal') };
     } else if (show.type === 'apples') {
+      // the apples to count are BIG and stand further back, in the free space between the choices and the question sign (they used to be small and hidden
+      // behind the sign at the bottom of the screen; owner 2026-11-18)
       const n = show.n;
-      const cols = n > 10 ? 5 : n > 6 ? 4 : 3;
+      const cols = n > 15 ? 7 : n > 10 ? 6 : n > 6 ? 5 : 4;
       const rows = Math.ceil(n / cols);
+      const size = n > 15 ? 0.78 : n > 10 ? 0.9 : n > 6 ? 1.0 : 1.15;
       const apples = [];
       for (let k = 0; k < n; k++) {
         const a = makeThing('apple');
-        a.scale.setScalar(n > 10 ? 0.5 : 0.62);
+        a.scale.setScalar(size);
         const r = Math.floor(k / cols), c = k % cols;
-        a.position.set((c - (cols - 1) / 2) * 0.42 + (r % 2) * 0.1, 0.76, (r - (rows - 1) / 2) * 0.4);
+        a.position.set((c - (cols - 1) / 2) * 0.62 * size + (r % 2) * 0.12, 0.76, (r - (rows - 1) / 2) * 0.52 * size);
         g.add(a);
         apples.push(a);
       }
       g.userData.apples = apples;
+      g.userData.off = new THREE.Vector3(0, 0, this._portrait ? -1.0 : -1.6);
     } else if (show.type === 'letter') {
       const p = this._plaque(show.ch, true);
       p.position.set(0, 1.7, 0);
       p.scale.setScalar(1.5);
       g.add(p);
     }
-    g.position.copy(STAND);
     this.st.add(g);
     this.standItem = g;
+    this._placeStand();
   }
 
   // ---- the hero (boy or girl, chosen once and kept) ---------------------------------------------------------------------
@@ -422,7 +447,35 @@ class Game {
   // ---- flow ---------------------------------------------------------------------------------------------------------
 
   /** After the hero is known: straight into the level the child tapped on the app's page (a sign of the picture), else the list. */
+  /** The age is known when the app told us or the child chose it in the game (2 to 6). */
+  _ageKnown() { return !!(this.save.lw.age >= 2) || Number(this.sh.cfg && this.sh.cfg.age) >= 2; }
+
+  /** «عندك كام سنة؟»: five big buttons 2-6, each with its balloons; the choice is kept and decides what comes first. */
+  _chooseAge(then) {
+    const sh = this.sh;
+    this._clearRound();
+    sh.clear();
+    this.st.mode = 'age';
+    sh.sound.setMode('menu');
+    sh.layer.append(h('div', { class: 'lk-top' }, sh.backBtn(), h('span'), sh.soundBtn()));
+    const row = h('div', { class: 'lw-agerow' }, [2, 3, 4, 5, 6].map((n) => h('button', {
+      class: `lw-agebtn2${sh.age === n && this._ageKnown() ? ' on' : ''}`, 'aria-label': sh.t(`age${n}`),
+      onclick: () => {
+        sh.sound.unlock();
+        sh.sound.play('right');
+        this.save.lw.age = n;
+        sh.age = n;
+        sh.saveNow();
+        sh.speak(sh.t(`age${n}`));
+        setTimeout(then, 1500);
+      },
+    }, h('b', {}, sh.T.num(n)), h('i', {}, '🎈'.repeat(n)))));
+    sh.layer.append(h('div', { class: 'lw-agebar' }, h('div', { class: 'lw-title', style: 'font-size:calc(var(--u)*7)' }, sh.t('ageQ')), row));
+    sh.speak(sh.t('ageQ'));
+  }
+
   _startPage() {
+    if (!this._ageKnown()) { this._chooseAge(() => this._startPage()); return; }
     const want = this.sh.cfg && this.sh.cfg.level;
     if (this.sh.cfg) this.sh.cfg.level = null; // only the first time: back to the list afterwards
     if (want && levelsFor(this.sh.age).some((l) => l.id === want)) this._enter(want);
@@ -496,6 +549,8 @@ class Game {
       place(b, cx, cy, 0.17, 0.148);
       if (!can) b.classList.add('off');
       if (this.save.lw.done[lv.id]) place(h('i', { class: 'lw-star' }, '⭐'), cx + 0.066, cy - 0.07, 0.05, 0.045);
+      const best = (this.save.lw.best || {})[lv.id];
+      if (best) place(h('i', { class: 'lw-best' }, '★'.repeat(best)), cx, cy + 0.068, 0.15, 0.035);
     });
     // "next level": the first level not done yet (the first one when all are done)
     const next = list.find((l) => !this.save.lw.done[l.id]) || list[0];
@@ -507,6 +562,10 @@ class Game {
     const snd = sh.soundBtn();
     snd.classList.add('lw-hit');
     place(snd, 0.94, 0.058, 0.1, 0.095);
+    // the child's age (a cake with the number): a tap opens «عندك كام سنة؟» again
+    const ageB = h('button', { class: 'lw-agetag', 'aria-label': sh.t('ageQ'), onclick: (e) => { e.stopPropagation(); sh.sound.play('tap'); this._chooseAge(() => this._levels()); } }, `🎂 ${sh.T.num(sh.age)}`);
+    place(ageB, 0.069, 0.17, 0.115, 0.055);
+    if (this.save.lw.points) place(h('div', { class: 'lw-ptstag' }, `⭐ ${sh.T.num(this.save.lw.points)}`), 0.069, 0.235, 0.115, 0.05);
     return wrap;
   }
 
@@ -536,10 +595,13 @@ class Game {
     const worldIdx = Math.max(0, levelsFor(sh.age).findIndex((l) => l.id === levelId)) + this._spin;
     this._goWorld(worldIdx);
     this.mem.begin(levelId);
+    this.firstTry = 0; // answers right at the first try in this game (the rating)
+    clearTimeout(this._endT);
     this.play = new LevelPlay(levelId, sh.age, Math.floor(Math.random() * 1e9), this.mem, WORLD_IDS[worldIdx % WORLD_IDS.length]);
     sh.clear();
     this.lightDots = sh.topBar(ROUNDS, '⭐');
     this.lightDots(0);
+    this._scoreBadge();
     this.sign = h('div', { class: 'lw-sign' });
     this.signText = h('span');
     this.signIcon = h('i', {}, this._barIcon());
@@ -605,7 +667,7 @@ class Game {
       setTimeout(() => this.st.mode === 'wait' && this._say(), 900);
       return;
     }
-    if (ev.first) this.sh.round(this.level.skill, true, r.answer);
+    if (ev.first) { this.sh.round(this.level.skill, true, r.answer); this.firstTry = (this.firstTry || 0) + 1; }
     this.mem.note(r.key);
     this.save.lw.fresh = this.mem.toJSON();
     this.st.mode = 'found';
@@ -632,7 +694,6 @@ class Game {
     if (r.reward) seq.push(r.reward);
     this.signText.textContent = r.reward || phrase;
     this.signIcon.textContent = '⭐';
-    this.sh.say(phrase, false, 1.6);
     this._advDone = false;
     const next = () => {
       clearTimeout(this._advT);
@@ -672,7 +733,20 @@ class Game {
     const idx = list.findIndex((l) => l.id === this.levelId);
     this.save.lw.done[this.levelId] = true;
     this.save.lw.unlocked = Math.max(this.save.lw.unlocked || 1, idx + 2);
+    // the rating of this game: finishing earns at least one star (never for time spent); right at the first try earns more.
+    // The points are kept in the save (per child, on this device) and sent to the app for the child's profile.
+    const ft = this.firstTry || 0;
+    const stars = ft >= 7 ? 3 : ft >= 4 ? 2 : 1;
+    const pts = stars * 10 + ft;
+    const lw = this.save.lw;
+    lw.points = (lw.points || 0) + pts;
+    lw.plays = (lw.plays || 0) + 1;
+    lw.best = lw.best || {};
+    lw.best[this.levelId] = Math.max(lw.best[this.levelId] || 0, stars);
+    sh.post({ type: 'points', points: pts, total: lw.points, stars, level: this.levelId, plays: lw.plays });
     sh.saveNow();
+    this._rewardPanel(stars);
+    this._showScore(pts, lw.points - pts, lw.points);
     this.owl.act('cheer');
     if (this.hero) this.hero.act('celebrate');
     this.st.sparkle(new THREE.Vector3(RACK.x, 2.2, RACK.z), 40);
@@ -693,7 +767,53 @@ class Game {
     setTimeout(() => { sh.sound.play('yay'); sh.sound.play('star'); }, 900);
     sh.speak(first ? `${sh.t('greatSay')} ${sh.t('newStarSay')}` : sh.t('greatSay'));
     const nextId = list[idx + 1].id;
-    setTimeout(() => this._walkOn(nextId, idx + 1 + (this._spin || 0)), 3000);
+    // a few seconds to see the stars, and the child can tap «العب معانا تاني» to play the same level again (new things come first)
+    this._endT = setTimeout(() => this._walkOn(nextId, idx + 1 + (this._spin || 0)), 6500);
+  }
+
+  /** The points at the top right of the screen: the total (⭐ N) and, for a few seconds after a finished level, the number just added (+N) above it. */
+  _scoreBadge() {
+    const sh = this.sh;
+    const total = (this.save.lw.points || 0);
+    this.deltaEl = h('b', { class: 'lw-delta' });
+    this.sumEl = h('span', { class: 'lw-sum' }, `⭐ ${sh.T.num(total)}`);
+    this.scoreEl = h('div', { class: 'lw-score' + (total > 0 ? '' : ' hide'), 'aria-live': 'polite' }, this.deltaEl, this.sumEl);
+    sh.layer.append(this.scoreEl);
+  }
+
+  /** «+23» appears, then the total counts up to its new value. */
+  _showScore(add, from, to) {
+    const sh = this.sh;
+    if (!this.scoreEl || !this.scoreEl.isConnected) this._scoreBadge();
+    this.scoreEl.classList.remove('hide');
+    this.sumEl.textContent = `⭐ ${sh.T.num(from)}`;
+    this.deltaEl.textContent = `+${sh.T.num(add)}`;
+    this.deltaEl.classList.remove('go');
+    void this.deltaEl.offsetWidth;
+    this.deltaEl.classList.add('go');
+    const steps = Math.min(add, 24) || 1;
+    let k = 0;
+    clearInterval(this._countT);
+    this._countT = setInterval(() => {
+      k++;
+      this.sumEl.textContent = `⭐ ${sh.T.num(k >= steps ? to : Math.round(from + (add * k) / steps))}`;
+      if (k >= steps) clearInterval(this._countT);
+    }, 60);
+    sh.sound.play('note', 88);
+  }
+
+  /** The stars of the game just finished, and the button to play it again. */
+  _rewardPanel(stars) {
+    const sh = this.sh;
+    const panel = h('div', { class: 'lw-reward' },
+      h('div', { class: 'lw-stars' }, [1, 2, 3].map((k) => h('i', { class: k <= stars ? 'on' : '' }, '⭐'))));
+    const again = h('button', { class: 'lw-replay', onclick: () => {
+      clearTimeout(this._endT);
+      sh.sound.play('tap');
+      sh.speak(sh.t('replaySay'));
+      setTimeout(() => this._begin(this.levelId, true), 700);
+    } }, `🔁 ${sh.t('replay')}`);
+    sh.layer.append(panel, again);
   }
 
   /** Between levels: the hero WALKS (in place, footsteps) while the world scrolls past and the next place slides in from
@@ -734,6 +854,7 @@ class Game {
       this.world = to;
       this.worldId = id;
       this.padStyle = PADS[to.pad];
+      this._tune(id);
       hero.act('wave');
       setTimeout(() => this._begin(nextId, true), 1400);
     } };
@@ -811,8 +932,13 @@ class Game {
         continue;
       }
       const a = time * 0.55 + f.ph;
-      f.g.position.set(f.home.x + Math.cos(a) * 0.55, 0.1 + Math.sin(time * 2 + f.ph) * 0.04, f.home.z + Math.sin(a * 1.3) * 0.4);
-      f.g.rotation.y = Math.sin(time * 0.8 + f.ph) * 0.35;
+      // numbers, letters and anything carrying a sign must stay READABLE: they face the child, hardly drift and never turn (owner 2026-11-18:
+      // the numbers were spinning while the child chose and could not be read); pictures keep their gentle swing
+      const still = f.o.kind === 'number' || f.o.kind === 'letter';
+      const sway = still ? 0 : f.o.plaque ? 0.06 : 0.35;
+      const drift = still ? 0.1 : f.o.plaque ? 0.3 : 0.55;
+      f.g.position.set(f.home.x + Math.cos(a) * drift, 0.1 + Math.sin(time * 2 + f.ph) * 0.04, f.home.z + Math.sin(a * 1.3) * (still ? 0.06 : 0.4));
+      f.g.rotation.y = Math.sin(time * 0.8 + f.ph) * sway;
       f.ring.rotation.z = Math.sin(time * 2 + f.ph) * 0.06;
       if (f.o.kind === 'thing' && f.item) f.item.position.y = f.baseY + Math.abs(Math.sin(time * 2.4 + f.ph)) * 0.06;
       if (f.o.kind === 'shape') f.item.rotation.y = Math.sin(time * 1.4 + f.ph) * 0.5;
@@ -922,6 +1048,33 @@ const CSS = `
 .lw-herobar{position:absolute;left:50%;bottom:calc(var(--u)*3);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*1.6);pointer-events:none;width:94%}
 .lw-hero{display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*1.4);pointer-events:auto}
 .lw-who{display:flex;gap:calc(var(--u)*3)}
+.lw-reward{position:absolute;left:50%;top:17%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.6);pointer-events:none;animation:lw-reward-pop .7s cubic-bezier(.2,1.6,.4,1)}
+.lw-stars{display:flex;gap:calc(var(--u)*1.2);font-size:calc(var(--u)*11)}
+.lw-stars i{font-style:normal;filter:grayscale(1) brightness(1.6);opacity:.45;transform:scale(.8)}
+.lw-stars i.on{filter:none;opacity:1;transform:scale(1);animation:lw-star-in .6s cubic-bezier(.2,1.8,.4,1) both}
+.lw-stars i.on:nth-child(2){animation-delay:.25s}.lw-stars i.on:nth-child(3){animation-delay:.5s}
+.lw-score{position:absolute;right:calc(var(--u)*2);top:calc(var(--u)*15.5);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.4);pointer-events:none;z-index:4}
+.lw-score.hide{display:none}
+.lw-sum{font-weight:900;font-size:calc(var(--u)*4.4);color:#5a2fb0;background:#fff7d6;border:calc(var(--u)*.5) solid #ffd45a;border-radius:999px;padding:calc(var(--u)*.3) calc(var(--u)*2.2);box-shadow:0 calc(var(--u)*.5) 0 #c88a10;white-space:nowrap}
+.lw-delta{font-weight:900;font-size:calc(var(--u)*7);color:#fff;-webkit-text-stroke:calc(var(--u)*.6) #2a9a4a;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.7) 0 #1a6a30;opacity:0;order:-1}
+.lw-delta.go{animation:lw-delta-in 4.5s ease-out both}
+@keyframes lw-delta-in{0%{opacity:0;transform:translateY(calc(var(--u)*3)) scale(.4)}12%{opacity:1;transform:translateY(0) scale(1.15)}20%{transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(calc(var(--u)*-1))}}
+.lw-replay{position:absolute;left:50%;top:calc(var(--u)*13);transform:translateX(-50%);font-family:inherit;font-weight:900;font-size:calc(var(--u)*4.4);color:#fff;background:linear-gradient(180deg,#8a6aff,#5a3ad0);border:calc(var(--u)*.7) solid #fff;border-radius:999px;padding:calc(var(--u)*1.2) calc(var(--u)*4);cursor:pointer;box-shadow:0 calc(var(--u)*.9) 0 #3a2290,0 calc(var(--u)*1.4) calc(var(--u)*2.6) rgba(40,30,90,.35);animation:lw-replay-bob 1.6s ease-in-out infinite;z-index:5;white-space:nowrap}
+.lw-ptstag{font-weight:900;font-size:calc(var(--u)*3.8);color:#5a2fb0;background:#fff7d6;border:calc(var(--u)*.5) solid #ffd45a;border-radius:999px;display:flex;align-items:center;justify-content:center;white-space:nowrap}
+.lw-best{font-style:normal;color:#ffb81a;font-size:calc(var(--u)*3);text-shadow:0 1px 0 #a06a00;display:flex;align-items:center;justify-content:center;pointer-events:none}
+@keyframes lw-reward-pop{from{transform:translateX(-50%) scale(.4);opacity:0}to{transform:translateX(-50%) scale(1);opacity:1}}
+@keyframes lw-star-in{from{transform:scale(0) rotate(-120deg)}to{transform:scale(1) rotate(0)}}
+@keyframes lw-replay-bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(calc(var(--u)*-.9))}}
+.lw-agebar{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*3);pointer-events:none;width:96%}
+.lw-agerow{display:flex;gap:calc(var(--u)*2.2);pointer-events:auto;flex-wrap:wrap;justify-content:center}
+.lw-agebtn2{font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.6);background:linear-gradient(180deg,#fff7d6,#ffd45a);border:calc(var(--u)*.8) solid #fff;border-radius:calc(var(--u)*5);padding:calc(var(--u)*1.8) calc(var(--u)*2.6);cursor:pointer;box-shadow:0 calc(var(--u)*1) 0 #c88a10,0 calc(var(--u)*1.6) calc(var(--u)*3) rgba(40,30,90,.35);min-width:max(64px,calc(var(--u)*13));animation:lw-agebob 2.4s ease-in-out infinite}
+.lw-agebtn2:nth-child(2){animation-delay:.2s}.lw-agebtn2:nth-child(3){animation-delay:.4s}.lw-agebtn2:nth-child(4){animation-delay:.6s}.lw-agebtn2:nth-child(5){animation-delay:.8s}
+.lw-agebtn2.on{background:linear-gradient(180deg,#d8f8c8,#6ad070)}
+.lw-agebtn2 b{font-size:calc(var(--u)*9);line-height:1;color:#5a2fb0}
+.lw-agebtn2 i{font-style:normal;font-size:calc(var(--u)*3.2);line-height:1.1;max-width:calc(var(--u)*13);word-break:break-all;text-align:center}
+.lw-agebtn2:active{transform:translateY(calc(var(--u)*.5))}
+@keyframes lw-agebob{0%,100%{transform:translateY(0)}50%{transform:translateY(calc(var(--u)*-1))}}
+.lw-agetag{font-family:inherit;font-weight:900;font-size:calc(var(--u)*3.6);color:#5a2fb0;background:#fff;border:calc(var(--u)*.5) solid #ffd45a;border-radius:999px;padding:0 calc(var(--u)*1);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 calc(var(--u)*.5) 0 #c88a10;white-space:nowrap}
 .lw-who button{font-family:inherit;font-weight:900;font-size:calc(var(--u)*5.6);color:#fff;border:calc(var(--u)*.7) solid #fff;border-radius:999px;padding:calc(var(--u)*1.4) calc(var(--u)*5);cursor:pointer;min-height:max(52px,calc(var(--u)*12));box-shadow:0 calc(var(--u)*.8) 0 rgba(0,0,0,.25)}
 .lw-boy{background:linear-gradient(180deg,#ffd84a,#f5a01a)}
 .lw-girl{background:linear-gradient(180deg,#ff8ac8,#e8409a)}

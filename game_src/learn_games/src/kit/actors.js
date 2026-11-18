@@ -151,6 +151,9 @@ const ART_FILE = {
 import MORE_WORDS from '../letters/more_words.json' with { type: 'json' };
 const EXTRA_ART = [...MORE_WORDS.map((w) => w.thing), 'c_schoolbus', 'c_citybus', 'c_taxi', 'c_tram', 'c_bulldozer', 'h_bike', 'd_jeep', 'd_balloon', 'd_boat', 'd_donkeycart', 'h_towel', 'h_shoes', 'h_toybox', 'h_broom', 'h_bin', 'h_wardrobe', 'h_clock', 'h_wateringcan', 'h_ball', 'h_table', 'h_sink', 'h_bed', 'h_backpack', 'h_toothbrush', 'f_haypile', 'f_eggs'];
 for (const n of EXTRA_ART) ART_FILE[n] = n;
+// every other picture the app has (animals, foods, places, habits...) can be shown by its own name too; without this a thing that was not listed
+// above fell back to a beach ball (owner 2026-11-18: the crocodile's home and the dinosaur were beach balls)
+for (const n of Object.keys(DIMS)) if (!ART_FILE[n]) ART_FILE[n] = n;
 const BIG = new Set(['cow', 'sheep', 'dog', 'cat', 'giraffe', 'lion', 'elephant', 'elephant2', 'fox', 'camel', 'crow', 'sheep_n', 'cat_n', 'giraffe_n', 'horse_n', 'rabbit_n', 'duck_n', 'hen_n', 'bee_n', 'butterfly_n', 'clownfish_n', 'croc', 'horse', 'pig', 'rabbit', 'mallard', 'hen', 'chick', 'bee', 'butterfly', 'frog_n', 'dove_n', 'grapes_n', 'plane_n', 'monkey', 'clownfish', 'pigeon', 'frog', 'panda', 'tiger', 'zebra', 'penguin', 'parrot']);
 for (const n of EXTRA_ART) BIG.add(n);
 export const hasArt = (id) => !!ART_FILE[id] && !!DIMS[ART_FILE[id]];
