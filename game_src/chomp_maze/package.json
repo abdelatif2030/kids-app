@@ -1,0 +1,12 @@
+{
+  "name": "chomp_maze",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty maze chase (canvas). Built into assets/games/chomp_maze/game.js",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/chomp_maze/game.js",
+    "test": "node --test test/sim.test.js"
+  },
+  "dependencies": { "three": "0.170.0" },
+  "devDependencies": { "esbuild": "0.24.0" }
+}

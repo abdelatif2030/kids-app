@@ -359,6 +359,7 @@ class FunGamesMore2Screen extends StatelessWidget {
               _card(context, 'fun_ice_dragon', kIceDragon, 'assets/games/ice_dragon/card.webp', 'Ice Dragon', const Color(0xFF4AB8E8), const Color(0xFFBFFFFF)),
               _card(context, 'fun_ball_scoop', kBallScoop, 'assets/games/ball_scoop/card.webp', 'Ball Scoop', const Color(0xFFFFA82A), const Color(0xFFFFE4A8)),
               _card(context, 'fun_hamster_warrior', kHamsterWarrior, 'assets/games/hamster_warrior/card.webp', 'Hamster Warrior', const Color(0xFF5AA83A), const Color(0xFFFFE04A)),
+              _card(context, 'fun_chomp_maze', kChompMaze, 'assets/games/chomp_maze/card.webp', 'Chomp Maze', const Color(0xFF3A6AE8), const Color(0xFFFFE04A)),
             ];
             return Stack(children: [
               Center(
