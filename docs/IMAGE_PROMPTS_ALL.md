@@ -90,3 +90,12 @@ More vehicles sheet. The 12 items, left to right, top to bottom: three-wheeled t
 - Every sheet needs a plain white background and 50 px of empty margin around each item (it is in the SHEET block).
 - Nothing here is needed for the game to work today: all 12 levels run with the pictures that already exist.
 - Ideas for further levels (after the 12): see the end of the report in the chat (sea life, space, city, my body, clothes, jobs, weather and seasons, dinosaurs, opposites, positions, days and months, feelings, manners, safety, my family, my house, Egypt).
+
+## 16. صفحة المستويات الجديدة (27 مستوى بأسمائها الجديدة)
+Prompt: "Kids learning game level-select page, bright cartoon style, rounded wooden sign on top reading «عالم رحلتي التعليمي», a grid of 27 colourful round-corner tiles (9 columns x 3 rows or 6x5 scroll), each with a big simple icon and a short Arabic label: أتعلم الحروف، كلماتي الأولى، أول حرف في الكلمة، أتعرف على الأرقام، أعدّ وأجمع، الأبجدية بالترتيب، الأشكال الهندسية، الحيوانات وأصواتها، أتعلم الألوان، فواكه وخضار صحية، وسائل المواصلات، عادات صحية ومهذبة، أجزاء جسمي، ملابسي، مهن حولي، أكل وحلويات، أدوات مدرستي، آلات موسيقية، عيلتي، حشرات وطيور، الجو والفصول، عالم البحر، فضاء وخيال، أشياء بيتي، حيوانات الغابة والمزرعة، مصر والمدينة، الأيام والفصول. Friendly owl and two kids at the sides. Landscape 16:9."
+
+## 17. مشاعر (6 وجوه كرتونية، شفافة): سعيد، حزين، غضبان، خايف، متفاجئ، تعبان (512x512 لكل واحد)
+"Cute cartoon child face showing <feeling>, big eyes, simple, flat bright colours, transparent background, no text."
+
+## 18. آداب وأمان (8 صور شفافة): طفل يقول شكراً، طفل يقول لو سمحت، طفل يشارك لعبته، طفل ينتظر دوره، إشارة المرور الأحمر والأخضر، ممر المشاة، فيشة كهرباء ممنوع اللمس، موقد ساخن ممنوع
+"Flat cartoon illustration for toddlers: <scene>, friendly, bright, transparent background, no text, 512x512."
