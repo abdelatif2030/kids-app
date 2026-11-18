@@ -83,6 +83,10 @@ Object.assign(VARIANTS, {
 Object.assign(VARIANTS, {
   'القاف زي قرد': [{ t: 'القَاف زَي قِـــرْد', s: { speed: 0.72, stability: 0.78 } }, { t: 'القَاف زَي أِرْد', s: { speed: 0.8, stability: 0.7 } }, { t: 'القَاف زَي قِرْدْ.', s: { speed: 0.75, stability: 0.85 } }],
 });
+// 2026-11-18: «الكتكوت» was heard as «القطط»: three readings (plain, with a long vowel, with a pause after the name)
+Object.assign(VARIANTS, {
+  'الكتكوت بيعيش فين؟': ['الكُتْكُوتْ بِيعِيش فِين؟', 'الكُتْكُوووت بِيعِيش فِين؟', 'الكُتْكُوت، بِيعِيش فِين؟'],
+});
 // sentences that need more time (a word was swallowed): slower
 const SLOW = new Set(['اتناشر', 'تسعتاشر', 'تلاتاشر', 'دي قلب', 'دي قلب أحمر', 'دي قلب أصفر', 'دي قلب برتقالي']);
 
@@ -119,10 +123,14 @@ if (cmd === 'make') {
 } else if (cmd === 'page') {
   const work = path.resolve(a2);
   const items = [];
+  // what the automatic check (verify_voice.mjs idea: speech-to-text) heard in each take, when take_scores.json exists next to the takes
+  const scoresFile = path.join(work, 'take_scores.json');
+  const QA = fs.existsSync(scoresFile) ? JSON.parse(fs.readFileSync(scoresFile, 'utf8')) : {};
+  const hint = (id) => { const parts = ['A', 'B', 'C'].filter((k) => QA[`${id}_${k}.mp3`]).map((k) => `${{ A: 'أ', B: 'ب', C: 'ج' }[k]} ${QA[`${id}_${k}.mp3`].score}`); return parts.length ? `   —   الفاحص الآلي (١ = مطابق تماماً): ${parts.join('   ')}` : ''; };
   for (const text of readList(a1)) {
     const id = idOf.get(text); if (!id) continue;
     const b = (f) => (fs.existsSync(f) ? fs.readFileSync(f).toString('base64') : null);
-    items.push({ id, n: NUM.get(text) || 0, text, read: TASH[text] || '', old: b(path.join(work, 'old', `${id}.mp3`)), A: b(path.join(work, 'takes', `${id}_A.mp3`)), B: b(path.join(work, 'takes', `${id}_B.mp3`)), C: b(path.join(work, 'takes', `${id}_C.mp3`)) });
+    items.push({ id, n: NUM.get(text) || 0, text, read: (TASH[text] || '') + hint(id), old: b(path.join(work, 'old', `${id}.mp3`)), A: b(path.join(work, 'takes', `${id}_A.mp3`)), B: b(path.join(work, 'takes', `${id}_B.mp3`)), C: b(path.join(work, 'takes', `${id}_C.mp3`)) });
   }
   const html = `<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>اختار أحسن نسخة</title>
 <style>body{font-family:system-ui,Tahoma,sans-serif;background:#f4f0fc;margin:0;color:#3a2a5a}header{position:sticky;top:0;background:#fff;box-shadow:0 2px 8px rgba(60,40,100,.15);padding:12px 16px;z-index:5}h1{font-size:19px;margin:0 0 6px}p{margin:0;color:#7a6a9a;font-size:14px}.t{border:none;background:#6a3ad0;color:#fff;border-radius:20px;padding:9px 16px;font:inherit;font-weight:700;cursor:pointer;margin-top:8px}.c{background:#fff;border-radius:16px;margin:10px 14px;padding:12px 14px;box-shadow:0 2px 6px rgba(60,40,100,.1);border-right:8px solid #d8ccf0}.c.done{border-right-color:#2aa86a}.c.no{border-right-color:#d8344a}.hd{display:flex;gap:10px;align-items:baseline}.nm{background:#6a3ad0;color:#fff;border-radius:12px;padding:2px 10px;font-weight:800}.tx{font-size:22px;font-weight:800}.rd{font-size:14px;color:#8a7aaa;margin:2px 0 8px}.o{display:flex;gap:8px;flex-wrap:wrap}.o label{display:flex;align-items:center;gap:6px;border:2px solid #d8ccf0;border-radius:16px;padding:4px 10px;cursor:pointer;font-weight:700}.o label.sel{background:#e8f8ee;border-color:#2aa86a}.o label.bad{border-color:#e8a0aa}.o label.bad.sel{background:#ffe8ec;border-color:#d8344a}.o button{border:none;background:#6a3ad0;color:#fff;border-radius:50%;width:34px;height:34px;cursor:pointer}</style>
