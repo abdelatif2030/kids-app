@@ -68,6 +68,24 @@ No text on the picture: the names and numbers are drawn by the app. Recommended 
 Portrait image 1226x1283, same art style, colours and scene as the reference picture: a sunny enchanted garden with a fairy-tale castle on a hill in the background, a cute cartoon girl (pink jacket, ponytail with a pink bow) on the top left and a cute cartoon boy (yellow hoodie with a star, brown curly hair) on the top right, a wooden title sign at the top centre with a purple ribbon under it, a wooden arrow sign on the left with a blue owl wearing a graduation cap and a red bow tie sitting on a tree stump, round purple home button in the top-left corner and round purple speaker button in the top-right corner. In the centre a big cream rounded board holds a grid of 4 columns x 5 rows = 20 glossy blue rounded tiles of equal size, evenly spaced, each with a small flower decoration at the bottom and a round yellow badge in its top-left corner. IMPORTANT: no text, no letters, no numbers anywhere in the picture: the title sign, the ribbon, the arrow sign, the badges and all tiles are left EMPTY. Each tile shows one clear glossy 3D icon in the middle, left to right, top to bottom: 1 a red block with a letter-shaped pattern but no real letter (use a star on it); 2 a picture frame with a landscape; 3 a red block with an arrow; 4 a number block with dots (no digits); 5 a red apple; 6 colourful alphabet blocks without letters (use shapes); 7 a blue diamond and a circle; 8 a white bunny; 9 a painter palette with paint; 10 a strawberry; 11 a yellow school bus; 12 a pink watering can; 13 a friendly orange fish with a seashell; 14 a small rocket with a star; 15 a tall city building with windows; 16 a smiling child body-parts icon: a cute hand and an eye together; 17 a blue t-shirt on a hanger; 18 a friendly doctor with a stethoscope; 19 a sun behind a cloud with a raindrop; 20 a friendly green dinosaur. Keep the icons large, simple and readable, every tile clear of overlap with its neighbours.
 ```
 
+## 12. Pack `fruit3` — More fruit (new, for «فواكه وخضار») (art prefix `q2_`)
+Words I will add: جوافة، يوسفي، جريب فروت، بابايا، كمثرى، فاكهة التنين، فاكهة العاطفة، ليتشي، توت أسود، توت أحمر، تين شوكي، قصب السكر.
+```
+More fruit sheet. The 12 items, left to right, top to bottom: guava cut in half; tangerine with a peeled segment; grapefruit half; papaya half with seeds; green pear; dragon fruit cut in half with a pink skin; passion fruit cut in half; lychee with a peeled one; blackberries; raspberries; prickly pear with its spines removed; sugarcane stalks.
+```
+
+## 13. Pack `veg2` — More vegetables (new, Egyptian kitchen) (art prefix `v2_`)
+Words I will add: كرنب، قرنبيط، سبانخ، فجل، بنجر، كوسة، بامية، فاصوليا، خرشوف، ملوخية، فول، كرفس.
+```
+More vegetables sheet. The 12 items, left to right, top to bottom: green cabbage; white cauliflower; bunch of spinach leaves; red radishes with leaves; beetroots with leaves; zucchini; okra pods; green beans; artichoke; bunch of molokhia (jute mallow) leaves; open fava bean pod with beans; celery stalks with leaves.
+```
+
+## 14. Pack `vehicles2` — More vehicles (new, includes the Egyptian ones) (art prefix `vh_`)
+Words I will add: التوك توك، الميكروباص، المترو، الموتوسيكل، اللوري، عربية الزبالة، الونش، الحفار، السفينة، الغواصة، اللنش، السكوتر.
+```
+More vehicles sheet. The 12 items, left to right, top to bottom: three-wheeled tuk-tuk (Egyptian style, colourful); white minibus (microbus); modern metro train front view; motorcycle; big orange lorry truck; green garbage truck; yellow tower crane; yellow excavator; big passenger ship; yellow submarine; speedboat; kick scooter.
+```
+
 ## Notes
 - Every sheet needs a plain white background and 50 px of empty margin around each item (it is in the SHEET block).
 - Nothing here is needed for the game to work today: all 12 levels run with the pictures that already exist.

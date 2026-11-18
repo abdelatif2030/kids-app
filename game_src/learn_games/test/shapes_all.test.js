@@ -7,10 +7,10 @@ import { FreshMemory } from '../src/letters/fresh.js';
 import { rng } from '../src/maze/sim.js';
 import { ROUNDS } from '../src/letters/sim.js';
 
-test('20 shapes: tiers 3 + 4 + 8 + 5, unique ids, art pictures exist, sides only where they are certain', () => {
-  assert.equal(SHAPES_ALL.length, 20);
-  assert.equal(new Set(SHAPES_ALL.map((s) => s.id)).size, 20);
-  assert.deepEqual(['A', 'B', 'C', 'D'].map((t) => SHAPE_TIERS[t].length), [3, 4, 8, 5]);
+test('25 shapes: tiers 3 + 4 + 13 + 5, unique ids, art pictures exist, sides only where they are certain', () => {
+  assert.equal(SHAPES_ALL.length, 25);
+  assert.equal(new Set(SHAPES_ALL.map((s) => s.id)).size, 25);
+  assert.deepEqual(['A', 'B', 'C', 'D'].map((t) => SHAPE_TIERS[t].length), [3, 4, 13, 5]);
   for (const s of SHAPES_ALL) {
     assert.ok(s.the && s.ar && ['code', 'art'].includes(s.render));
     if (s.render === 'art') assert.ok(existsSync(new URL(`../../../assets/games/art/${s.art}.webp`, import.meta.url)), s.art);
@@ -64,7 +64,7 @@ test('the shapes level: one right option, unique options, answers match the ques
         const right = r.options.find((o) => o.id === r.answer);
         assert.equal(right.scale, r.prompt === BIG_Q ? Math.max(...sc) : Math.min(...sc));
         assert.equal(new Set(r.options.map((o) => `${o.shape}-${o.color}`)).size, 1, 'one shape, one colour, only the size differs');
-      } else if (/أضلاع/.test(r.prompt)) {
+      } else if (/اللي له .* أضلاع/.test(r.prompt)) {
         kinds.add('sides');
         const n = SIDES_ASKED.find((x) => r.prompt === sidesQ(x));
         assert.equal(r.answer, shapeWithSides(n).id);
@@ -89,10 +89,10 @@ test('the shapes level: one right option, unique options, answers match the ques
   assert.deepEqual([...kinds].sort(), ['colour', 'name', 'sides', 'size']);
 });
 
-test('all 20 shapes can come up, and a second visit shows other shapes first', () => {
+test('all 25 shapes can come up, and a second visit shows other shapes first', () => {
   const seen = new Set();
   for (let s = 1; s <= 400; s++) for (const r of new LevelPlay('shapes', 6, s * 31).rounds) seen.add(r.key);
-  assert.equal(seen.size, 20);
+  assert.equal(seen.size, 25);
   const mem = new FreshMemory(null, 2900);
   const run = (seed) => { mem.begin('shapes'); const ks = new LevelPlay('shapes', 6, seed, mem).rounds.map((r) => r.key); ks.forEach((k) => mem.note(k)); return ks; };
   const a = run(1), b = run(2);

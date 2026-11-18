@@ -30,6 +30,15 @@ export const COLORS = [
   { id: 'lilac', the: 'الليلكي', name: 'ليلكي', hex: 0xc8a0f0, tier: 'C', family: 'purple' },
   { id: 'olive', the: 'الزيتي', name: 'زيتي', hex: 0x808020, tier: 'C', family: 'green' },
   { id: 'mustard', the: 'الخردلي', name: 'خردلي', hex: 0xd8a820, tier: 'C', family: 'yellow' },
+  { id: 'magenta', the: 'الفوشيا', name: 'فوشيا', hex: 0xd81b8a, tier: 'C', family: 'pink' },
+  { id: 'indigo', the: 'النيلي', name: 'نيلي', hex: 0x3a2a9a, tier: 'C', family: 'blue' },
+  { id: 'crimson', the: 'القرمزي', name: 'قرمزي', hex: 0xb01030, tier: 'C', family: 'red' },
+  { id: 'bronze', the: 'البرونزي', name: 'برونزي', hex: 0xb07a3a, tier: 'C', family: 'brown', metal: 0.7 },
+  { id: 'caramel', the: 'الكراميل', name: 'كراميل', hex: 0xc88a3a, tier: 'C', family: 'brown' },
+  { id: 'charcoal', the: 'الرصاصي', name: 'رصاصي', hex: 0x4a4a54, tier: 'C', family: 'gray' },
+  { id: 'mint', the: 'النعناعي', name: 'نعناعي', hex: 0x90e8b0, tier: 'C', family: 'green' },
+  { id: 'coral', the: 'المرجاني', name: 'مرجاني', hex: 0xff7060, tier: 'C', family: 'orange' },
+  { id: 'sand', the: 'الرملي', name: 'رملي', hex: 0xe0c890, tier: 'C', family: 'white' },
 ];
 export const colorOf = (id) => COLORS.find((c) => c.id === id);
 export const COLOR_TIERS = { A: COLORS.filter((c) => c.tier === 'A'), B: COLORS.filter((c) => c.tier === 'B'), C: COLORS.filter((c) => c.tier === 'C') };

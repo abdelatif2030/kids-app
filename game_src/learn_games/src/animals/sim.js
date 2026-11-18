@@ -60,6 +60,22 @@ export const ANIMALS = [
   { id: 'triceratops', thing: 'triceratops', the: 'الديناصور أبو قرون', fem: false, food: 'leaves', also: ['grass'], age: 5, groups: ['dino'] },
   { id: 'stego', thing: 'stego', the: 'الديناصور أبو شوك', fem: false, food: 'leaves', also: ['grass'], age: 6, groups: ['dino'] },
   { id: 'brachio', thing: 'brachio', the: 'الديناصور الطويل', fem: false, food: 'leaves', also: ['grass'], age: 6, groups: ['dino'] },
+  // 15 more (2026-11-18), from pictures the app has; the owl eats a mouse (a picture of the 3D kit)
+  { id: 'owl', thing: 'owl', the: 'البومة', fem: true, food: 'mouse', also: ['meat', 'insect'], age: 5, groups: ['jungle'] },
+  { id: 'panda', thing: 'panda', the: 'الباندا', fem: false, food: 'leaves', also: ['grass'], age: 4, groups: ['jungle'] },
+  { id: 'octopus', thing: 'u_octopus', the: 'الأخطبوط', fem: false, food: 'fish', also: ['meat'], age: 5, groups: ['underwater'] },
+  { id: 'crab', thing: 'u_crab', the: 'السرطان', fem: false, food: 'fish', also: ['worm'], age: 5, groups: ['underwater'] },
+  { id: 'whale', thing: 'u_whale', the: 'الحوت', fem: false, food: 'fish', also: [], age: 4, groups: ['underwater'] },
+  { id: 'bat', thing: 'i_bat', the: 'الخفاش', fem: false, food: 'banana', also: ['berries', 'insect'], age: 6, groups: ['jungle'] },
+  { id: 'eagle', thing: 'i_eagle', the: 'النسر', fem: false, food: 'meat', also: ['fish', 'mouse'], age: 5, groups: ['desert'] },
+  { id: 'ostrich', thing: 'i_ostrich', the: 'النعامة', fem: true, food: 'seeds', also: ['leaves', 'grass', 'corn'], age: 5, groups: ['desert'] },
+  { id: 'swan', thing: 'i_swan', the: 'البجعة', fem: true, food: 'grass', also: ['lettuce', 'seeds', 'leaves'], age: 5, groups: ['meadow', 'underwater'] },
+  { id: 'sparrow', thing: 'i_sparrow', the: 'العصفورة', fem: true, food: 'seeds', also: ['corn', 'worm', 'berries'], age: 4, groups: ['meadow'] },
+  { id: 'snail', thing: 'i_snail', the: 'الحلزونة', fem: true, food: 'lettuce', also: ['leaves'], age: 5, groups: ['meadow'] },
+  { id: 'spider', thing: 'i_spider', the: 'العنكبوت', fem: false, food: 'insect', also: ['worm'], age: 6, groups: ['meadow'] },
+  { id: 'crow', thing: 'crow', the: 'الغراب', fem: false, food: 'seeds', also: ['corn', 'meat', 'worm'], age: 5, groups: ['meadow'] },
+  { id: 'ladybug', thing: 'ladybug', the: 'الدعسوقة', fem: true, food: 'insect', also: [], age: 5, groups: ['meadow'] },
+  { id: 'dragonfly', thing: 'dragonfly', the: 'اليعسوب', fem: false, food: 'insect', also: [], age: 6, groups: ['meadow'] },
 ];
 // `thing` is the picture a plate shows (an art name, or one of the things the 3D kit draws itself).
 export const FOODS = {
@@ -80,6 +96,7 @@ export const FOODS = {
   worm: { the: 'الدودة', thing: 'i_worm' },
   insect: { the: 'الجندب', thing: 'grasshopper' },
   flower: { the: 'الزهرة', thing: 't_flower' },
+  mouse: { the: 'الفار', thing: 'mouse' },
 };
 
 // «مين بيقول ...؟» and «بيعيش فين؟»: what an animal says (the sentence is said by the narrator, not a recording of the animal) and where it lives.
@@ -99,6 +116,7 @@ export const HOMES = {
   monkey: 'jungle', lion: 'jungle', tiger: 'jungle', elephant: 'jungle', giraffe: 'jungle', zebra: 'jungle', gorilla: 'jungle', chameleon: 'jungle', parrot: 'jungle',
   toucan: 'jungle', cheetah: 'jungle', iguana: 'jungle', frog: 'jungle', croc: 'jungle', bear: 'snow', penguin: 'snow', seal: 'snow', reindeer: 'snow', fox: 'snow',
   camel: 'desert', dolphin: 'sea', shark: 'sea', turtle: 'sea', cat: 'house', dog: 'house', rabbit: 'house', mouse: 'house',
+  panda: 'jungle', owl: 'jungle', octopus: 'sea', crab: 'sea', whale: 'sea', ostrich: 'desert',
 };
 const verb = (a) => (a.fem ? 'بتقول' : 'بيقول');
 const liveVerb = (a) => (a.fem ? 'بتعيش' : 'بيعيش');

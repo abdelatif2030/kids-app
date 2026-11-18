@@ -7,11 +7,11 @@ import { ROUNDS } from '../src/letters/sim.js';
 import { readFileSync, existsSync } from 'node:fs';
 import { MIXES, allExtraSentences } from '../src/letters/extras.js';
 
-test('25 colours, each with a name, a hex, a tier and a family; tiers are 6 + 5 + 14', () => {
-  assert.equal(COLORS.length, 25);
-  assert.equal(new Set(COLORS.map((c) => c.id)).size, 25);
-  assert.equal(new Set(COLORS.map((c) => c.hex)).size, 25);
-  assert.deepEqual([COLOR_TIERS.A.length, COLOR_TIERS.B.length, COLOR_TIERS.C.length], [6, 5, 14]);
+test('34 colours, each with a name, a hex, a tier and a family; tiers are 6 + 5 + 23', () => {
+  assert.equal(COLORS.length, 34);
+  assert.equal(new Set(COLORS.map((c) => c.id)).size, 34);
+  assert.equal(new Set(COLORS.map((c) => c.hex)).size, 34);
+  assert.deepEqual([COLOR_TIERS.A.length, COLOR_TIERS.B.length, COLOR_TIERS.C.length], [6, 5, 23]);
   for (const c of COLORS) assert.ok(c.the.startsWith('ال') && c.name && c.family && c.hex >= 0 && c.hex <= 0xffffff, c.id);
   assert.ok(colorOf('gold').metal && colorOf('silver').metal);
 });
@@ -52,7 +52,7 @@ test('colour choices never put two shades of one family together', () => {
 
 test('the colours level: eight rounds, one right option, questions match, sentences are in the voice list', () => {
   const all = new Set([...allColorSentences(), ...allExtraSentences(colorOf)]);
-  assert.ok(all.size >= 25 + THING_COLORS.length);
+  assert.ok(all.size >= 34 + THING_COLORS.length);
   const byThingQ = new Map(THING_COLORS.map((id) => [findThingQ(colorOf(id)), id]));
   const byColorQ = new Map(COLORS.map((c) => [findColorQ(c), c.id]));
   const kinds = new Set();
