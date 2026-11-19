@@ -24,7 +24,11 @@ import { TOPIC_USE, TOPIC_EXTRA_ITEMS } from './topic_use.js';
 import './topic_use_more.js';
 import { timeQuestions } from './time_level.js';
 import VOICED from './voiced.json' with { type: 'json' };
+import { buildBanks, allBankSentences as bankSentences, COUNT_OBJECTS } from './extra_bank.js';
+import { HABITS_MORE, familyOf } from './habits_more.js';
 const VOICED_SET = new Set(VOICED);
+/** True when the sentence has a recorded clip. Tools may set globalThis.__LEARN_ASSUME_VOICED to count what the levels could offer once every new sentence is recorded. */
+const isVoiced = (q) => !!globalThis.__LEARN_ASSUME_VOICED || VOICED_SET.has(q);
 // (FreshMemory, in fresh.js, is passed in by the game: it remembers what each child already met)
 
 export const LEVELS = [
@@ -102,16 +106,16 @@ export const TOPICS = [
   { id: 't_places', ar: 'مصر والمدينة', emoji: '🏜️', prefixes: ['d', 'c'] },
 ];
 for (const t of TOPICS) {
-  PICKS[t.id] = { prompt: (it) => `فين ${it.the}؟`, items: [...MORE_WORDS.filter((w) => t.prefixes.some((p) => w.thing.startsWith(`${p}_`))).map((w) => ({ id: w.thing, the: w.the, thing: w.thing })), ...(TOPIC_EXTRA_ITEMS[t.id] || []).filter(([, the]) => VOICED_SET.has(`فين ${the}؟`)).map(([th, the]) => ({ id: th, the, thing: th }))] };
+  PICKS[t.id] = { prompt: (it) => `فين ${it.the}؟`, items: [...MORE_WORDS.filter((w) => t.prefixes.some((p) => w.thing.startsWith(`${p}_`))).map((w) => ({ id: w.thing, the: w.the, thing: w.thing })), ...(TOPIC_EXTRA_ITEMS[t.id] || []).filter(([, the]) => isVoiced(`فين ${the}؟`)).map(([th, the]) => ({ id: th, the, thing: th }))] };
 }
 // a fact whose sentence has no recording yet is not asked (never silent)
 const FACTS = {};
-for (const k of Object.keys(TOPIC_USE)) FACTS[k] = [...new Map(TOPIC_USE[k].map((f) => [f[0], f])).values()].filter(([q, th]) => VOICED_SET.has(q) && PICKS[k] && PICKS[k].items.some((x) => x.thing === th));
+for (const k of Object.keys(TOPIC_USE)) FACTS[k] = [...new Map(TOPIC_USE[k].map((f) => [f[0], f])).values()].filter(([q, th]) => isVoiced(q) && PICKS[k] && PICKS[k].items.some((x) => x.thing === th));
 export const TOPIC_LEVELS = TOPICS.map((t) => ({ id: t.id, mode: 'pick', table: t.id, ar: t.ar, emoji: t.emoji, skill: 'vocab', topic: true }));
 /** The twelve map levels, then the topic levels (reached from «مستويات أكتر»). */
 TOPIC_LEVELS.push({ id: 't_time', mode: 'time', ar: 'الأيام والفصول', emoji: '📅', skill: 'vocab', topic: true });
 export const ALL_LEVELS = [...LEVELS, ...TOPIC_LEVELS];
-export const COUNT_FRUITS = [['apple', null], ['banana', 'موزة'], ['orange', 'برتقالة'], ['strawberry', 'فراولة'], ['pear', 'كمثرى']].filter(([, w]) => !w || VOICED_SET.has(`كام ${w}؟`));
+export const COUNT_FRUITS = [['apple', null], ['banana', 'موزة'], ['orange', 'برتقالة'], ['strawberry', 'فراولة'], ['pear', 'كمثرى']].filter(([, w]) => !w || isVoiced(`كام ${w}؟`));
 export const levelOf = (id) => ALL_LEVELS.find((l) => l.id === id);
 /** The youngest (four) skip the two alphabet levels that need reading order. */
 export const levelsFor = (_age) => LEVELS; // every level is open at every age: the age only picks what comes first (tiers)
@@ -201,6 +205,8 @@ HABITS.push(
   { text: 'يلا نغسل وشنا في الحوض', answer: 'h_sink' },
   { text: 'يلا نروح للدكتور لما نتعب', answer: 'z_doctor' },
 );
+// 2026-11-19: more habits (habits_more.js), asked once their sentence has a recorded clip
+HABITS.push(...HABITS_MORE.filter((h) => isVoiced(h.text)));
 export const HABIT_ITEMS = [...new Set(HABITS.map((h) => h.answer))];
 
 /** The short, simple sentences said after a right answer (never about time or points). */
@@ -208,6 +214,13 @@ export const CHEERS_M = ['أحسنت!', 'شاطر أوي!', 'ممتاز!', 'جم
 export const CHEERS_F = ['أحسنتي!', 'حلوة أوي!', 'ممتازة!', 'جميلة أوي!', 'عظيمة!', 'يا سلام عليكي!', 'إنتي بطلة!', 'كمّلي كده!', 'إجابة صحيحة!'];
 export const cheer = (girl, i) => (girl ? CHEERS_F : CHEERS_M)[i % CHEERS_M.length];
 
+
+/** The extra questions of every level (extra_bank.js), built from the tables above. */
+export const TOPIC_TABLES = ['fruits', 'vehicles', ...TOPICS.map((t) => t.id)];
+export const BANKS = buildBanks({ PICKS, WORD_ITEMS, firstQ, wordReward, ALPHABET, HARAKAT, FORMS, CONNECTING, harakaQ, formQ, TOPIC_TABLES });
+/** Every sentence of the extra questions, for the voice list. */
+export const allBankSentences = () => bankSentences(BANKS);
+export { COUNT_OBJECTS };
 
 /** One game of a level: rounds of { prompt, answer, reward, show, options: [{id, kind, ...}] }. */
 export class LevelPlay {
@@ -499,13 +512,13 @@ export class LevelPlay {
       const mixesUsed = new Set();
       for (let i = 0; i < ROUNDS; i++) {
         let { kind, tier } = plan[i];
-        if (i === mixAt && kind === 'color' && MIXES.some((m) => !mixesUsed.has(m[2]) && (!mem || mem.score(`c:${m[2]}`) <= 0))) kind = 'mix'; // only a mix whose colour is new to the child
+        if (i === mixAt && kind === 'color' && MIXES.some((m) => !mixesUsed.has(m[2]) && !drawn.has(`c:${m[2]}`) && (!mem || mem.score(`c:${m[2]}`) <= 0))) kind = 'mix'; // only a mix whose colour is new to the child
         const lastIds = out.map((x) => x.colorId);
         const thingFresh = mem && Object.keys(COLOR_THINGS).some((id) => !lastIds.includes(id) && mem.score(`c:${id}`) <= 0 && !drawn.has(`c:${id}`));
         // a picture question needs a colour (of the ten that have pictures) the child has not met yet; otherwise this round asks a coloured ball instead
         if (kind === 'mix') {
           // mixing: the answer is the colour that comes out; the new colour is preferred
-          const free = MIXES.filter((m) => !mixesUsed.has(m[2]));
+          const free = MIXES.filter((m) => !mixesUsed.has(m[2]) && !drawn.has(`c:${m[2]}`));
           const m = free.find((x) => !mem || mem.score(`c:${x[2]}`) <= 0) || free[0] || MIXES[0];
           mixesUsed.add(m[2]);
           const [ca, cb, cc] = [colorOf(m[0]), colorOf(m[1]), colorOf(m[2])];
@@ -614,7 +627,7 @@ export class LevelPlay {
         out.push({ prompt: tab.prompt(it), answer: id, key: keyOfItem(it), options: [it, ...others].sort(() => r() - 0.5).map((x) => (x.hex != null ? { id: x.id, kind: 'color', hex: x.hex } : { id: x.id, kind: 'thing', thing: x.thing })) });
       }
     } else if (mode === 'time') {
-      const qs = timeQuestions();
+      const qs = timeQuestions().filter((q) => isVoiced(q.prompt)); // a question is asked only once its sentence is recorded
       const byKey = new Map(qs.map((q) => [q.key, q]));
       // the easy ones (seasons, first day, counting days) first for the youngest; the before/after questions from age four
       const tierQ = (q) => q.tier;
@@ -627,13 +640,15 @@ export class LevelPlay {
         out.push({ prompt: q.prompt, answer: q.right.id, key: k, options: [q.right, ...others].sort(() => r() - 0.5) });
       }
     } else if (mode === 'habit') {
-      const nextH = bag(HABITS, (h) => `t:${h.answer}`);
+      const nextH = bag(HABITS, (h) => `hb:${h.text}`); // one thing to learn per sentence (a picture can be the answer of several sentences)
       const chosen = [];
       for (let tries = 0; chosen.length < ROUNDS && tries < 200; tries++) { const h = nextH(); if (!chosen.some((c) => c.answer === h.answer)) chosen.push(h); }
       for (const h of chosen) {
         mark(h.answer);
-        const others = pickLow(HABIT_ITEMS.filter((x) => x !== h.answer), nOpt - 1);
-        out.push({ prompt: h.text, answer: h.answer, key: `t:${h.answer}`, show: null, options: [h.answer, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'thing', thing: x })) });
+        // a wrong choice is never of the same family as the right one (another food for a food...) nor one the sentence also fits
+        const fam = familyOf(h.answer);
+        const others = pickLow(HABIT_ITEMS.filter((x) => x !== h.answer && !(h.not || []).includes(x) && !(fam && familyOf(x) === fam)), nOpt - 1);
+        out.push({ prompt: h.text, answer: h.answer, key: `hb:${h.text}`, show: null, options: [h.answer, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'thing', thing: x })) });
       }
     } else if (mode === 'word' || mode === 'first') {
       // every picture-word at every age; the easy ones (age 3) come first for the youngest, the hardest (age 6) for the oldest
@@ -690,7 +705,39 @@ export class LevelPlay {
         out.push({ prompt: question(l), answer: t, key: `t:${l.thing}`, reward: rew(l), options: opts.map((x) => ({ id: x, kind: 'thing', thing: letterById(x).thing, plaque: letterById(x).ch })) });
       }
     }
-    return out;
+    return this._withExtras(out, { r, nOpt, pickLow, drawn });
+  }
+
+  /** Extra questions of the level (extra_bank.js): a round whose thing the child has already met is replaced by a question about something NEW, as long as one is left.
+   *  The easy ones come first for the youngest (tier 0), the harder ones for the older, but nothing is closed. Only questions whose sentences are all recorded are asked. */
+  _withExtras(out, c) {
+    const mem = this.mem;
+    const bank = mem && BANKS[this.level.id];
+    if (!bank || !bank.length) return out;
+    const keyOfRound = (x) => x.key || x.answer;
+    const stale = out.map((x, i) => i).filter((i) => mem.score(keyOfRound(out[i])) > 0);
+    if (!stale.length) return out;
+    const maxTier = this.age <= 3 ? 0 : this.age === 4 ? 1 : 2;
+    const taken = new Set(out.map(keyOfRound));
+    const aboutTaken = new Set();
+    const okItem = (x) => !taken.has(x.key) && !(x.about && (taken.has(x.about) || aboutTaken.has(x.about))) && x.say.every(isVoiced);
+    let pool = bank.filter(okItem);
+    // new things first; among them the tiers the age asks for first; a random order inside that
+    const fresh = mem.order(pool.filter((x) => mem.score(x.key) <= 0), (x) => x.key, c.r);
+    const ranked = [...fresh.filter((x) => x.tier <= maxTier), ...fresh.filter((x) => x.tier > maxTier)];
+    const ctx = { r: c.r, nOpt: c.nOpt, age: this.age, seed: this.seed, pickLow: c.pickLow };
+    let at = 0;
+    const res = [...out];
+    for (const i of stale) {
+      let x = null;
+      while (at < ranked.length) { const cand = ranked[at++]; if (okItem(cand)) { x = cand; break; } }
+      if (!x) break; // nothing new is left: the base rules' oldest-first cycle stays
+      const round = x.make(ctx);
+      taken.add(x.key);
+      if (x.about) aboutTaken.add(x.about);
+      res[i] = { ...round, key: x.key };
+    }
+    return res;
   }
 
   get finished() { return this.round >= this.rounds.length; }

@@ -45,15 +45,15 @@ export const COLOR_TIERS = { A: COLORS.filter((c) => c.tier === 'A'), B: COLORS.
 
 /** Pictures with ONE clear colour (the app's own art, looked at one by one). Black has a single picture, so it is only asked as a coloured ball. */
 export const COLOR_THINGS = {
-  red: ['apple', 'v_tomato', 'strawberry', 'q_cherry', 'firetruck'],
-  yellow: ['banana', 'lemon', 'chick'],
+  red: ['apple', 'v_tomato', 'strawberry', 'q_cherry', 'firetruck', 'ladybug'],
+  yellow: ['banana', 'lemon', 'chick', 'r_sun', 'sunflower_1'],
   orange: ['orange', 'carrot', 'v_pumpkin'],
-  green: ['j_leaf', 'v_lettuce', 'v_broccoli', 'v_cucumber'],
-  blue: ['u_tang', 'q_berries'],
+  green: ['j_leaf', 'v_lettuce', 'v_broccoli', 'v_cucumber', 'frog', 'd_cactus', 'q_avocado', 'v_peas'],
+  blue: ['u_tang', 'q_berries', 'bird_blue', 's_blueplanet'],
   purple: ['v_eggplant', 'q_plum', 'grapes'],
-  pink: ['i_flamingo', 'r_cotton', 'r_candy'],
+  pink: ['i_flamingo', 'r_cotton', 'r_candy', 'u_pinktube', 's_pinkplanet'],
   brown: ['v_potato', 'o_cookie'],
-  white: ['w_bear', 'r_cloud', 'o_milk'],
+  white: ['w_bear', 'r_cloud', 'o_milk', 'w_snowman'],
   gray: ['j_elephant', 'w_seal'],
 };
 export const THING_COLORS = Object.keys(COLOR_THINGS);

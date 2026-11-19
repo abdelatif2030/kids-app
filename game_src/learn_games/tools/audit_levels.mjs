@@ -1,9 +1,11 @@
 // Audit of «عالم رحلتي التعليمي»: for every level, how many DIFFERENT things (pictures / prompts) a child can meet, found by playing
 // many games with a fresh memory per child until nothing new appears. Also checks that no game repeats a thing inside itself.
 // Run: node tools/audit_levels.mjs
-import { ALL_LEVELS, LevelPlay, PICKS } from '../src/letters/levels.js';
-import { FreshMemory } from '../src/letters/fresh.js';
-import { ROUNDS } from '../src/letters/sim.js';
+// node tools/audit_levels.mjs --assume-voiced   counts what the levels could offer once EVERY sentence of the extra questions has a recorded clip
+if (process.argv.includes('--assume-voiced')) globalThis.__LEARN_ASSUME_VOICED = true;
+const { ALL_LEVELS, LevelPlay, PICKS } = await import('../src/letters/levels.js');
+const { FreshMemory } = await import('../src/letters/fresh.js');
+const { ROUNDS } = await import('../src/letters/sim.js');
 
 const WORLDS = ['meadow', 'farm', 'beach', 'space', 'rainbow', 'city', 'snow', 'castle', 'underwater', 'jungle', 'desert', 'home'];
 const rows = [];
