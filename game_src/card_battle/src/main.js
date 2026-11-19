@@ -16,7 +16,8 @@ const S = {
   win: ['انتصرت! 🏆', 'Victory! 🏆'], lose: ['خسرنا المعركة', 'Defeat'], draw: ['تعادل', 'Draw'],
   winText: ['دمّرت الكائن الفضائي!', 'You beat the Alien Overlord!'], timeWin: ['القاعدة بتاعتك أقوى!', 'Your base was stronger!'], loseText: ['جرّب تاني بكروت مختلفة', 'Try again with different cards'], drawText: ['الاتنين متساويين!', 'Both bases were equal!'],
   baseLeft: ['صحة القاعدة', 'Base health'], time: ['الوقت', 'Time'], kills: ['أعداء دمّرتهم', 'Enemies destroyed'],
-  double: ['الطاقة ×٢ !', 'Energy ×2 !'], go: ['ابدأ!', 'Go!'], sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
+  double: ['الطاقة ×٢ !', 'Energy ×2 !'], go: ['قتال!', 'FIGHT!'], restart: ['من الأول', 'Restart'], soundOn: ['الصوت شغّال', 'Sound on'], soundOff: ['الصوت مقفول', 'Sound off'], tUnit: ['وحدة', 'UNIT'], tSpell: ['سحر', 'SPELL'], tBuild: ['مبنى', 'BUILDING'],
+  d_spark: ['روبوت سريع بيضرب من قريب.', 'Fast little robot. Hits up close.'], d_blaster: ['رامي ليزر بيضرب من بعيد.', 'Laser shooter. Hits from afar.'], d_smash: ['مدرّع تقيل وقوي جدًا.', 'Heavy and very strong.'], d_swarm: ['٣ روبوتات صغيرة سريعة.', 'Three small fast robots.'], d_turret: ['برج بلازما بيضرب ويختفي بعد شوية.', 'Plasma turret. Fires, then fades away.'], d_plasma: ['موجة تضرب كل اللي في الدايرة.', 'A wave that hits everything in the circle.'], d_blackhole: ['ثقب بيشدّ الأعداء ويأذيهم.', 'Pulls enemies in and hurts them.'], d_repair: ['مجال بيعالج روبوتاتك.', 'A field that heals your robots.'], sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
   how1: ['١) اسحب كارت من إيدك على نصفك من الساحة', '1) Drag a card onto your half of the arena'], how2: ['٢) الروبوتات بتقاتل لوحدها', '2) Robots fight by themselves'],
   how3: ['٣) الطاقة بتتشحن مع الوقت — الكروت بتكلّف طاقة', '3) Energy refills over time — cards cost energy'], how4: ['٤) الموجة والثقب والإصلاح تنزل في أي مكان', '4) Spells can go anywhere on the field'],
   how5: ['٥) في آخر دقيقة الطاقة بتتشحن ضعف السرعة!', '5) In the last minute energy flows twice as fast!'], how6: ['دمّر الطبق الطائر أو خلّي قاعدتك أقوى لما الوقت يخلص', 'Destroy the UFO, or keep a stronger base when time is up'],
@@ -179,6 +180,15 @@ class Game {
     el.setPointerCapture(e.pointerId);
     this.drag = { slot, id: this.battle.deck.hand[slot], sx: e.clientX, sy: e.clientY, x: e.clientX, y: e.clientY, moved: false, touch: e.pointerType !== 'mouse' };
     this.sound.play('pick');
+    this._info(this.drag.id);
+  }
+  _info(id) {
+    if (!this.infoEl) return;
+    if (!id) { this.infoEl.classList.remove('show'); return; }
+    const c = CARDS[id]; const ty = c.type === 'spell' ? 'tSpell' : id === 'turret' ? 'tBuild' : 'tUnit';
+    this.infoEl.replaceChildren(h('b', {}, I.t(id)), h('i', {}, I.t(ty)), h('span', {}, I.t('d_' + id)));
+    this.infoEl.style.bottom = `${this.botEl.offsetHeight + 8}px`;
+    this.infoEl.classList.add('show');
   }
   _cardMove(e) {
     const d = this.drag; if (!d) return;
@@ -188,7 +198,7 @@ class Game {
   }
   _cardUp(e, cancel) {
     const d = this.drag; if (!d) return;
-    this.drag = null; this.ghostEl.style.display = 'none';
+    this.drag = null; this.ghostEl.style.display = 'none'; this._info(null);
     if (cancel || this.mode !== 'play') return;
     if (!d.moved) { this.sel = this.sel === d.slot ? -1 : d.slot; return; }
     const r = this.cv.getBoundingClientRect();
@@ -255,13 +265,15 @@ class Game {
     const b = this.battle;
     this.timerEl = h('span', {}, '2:30'); this.x2El = h('span', { class: 'cb-x2' }, '×2');
     this.eHp = h('b', {}); this.eTx = h('span', {}); this.pHp = h('b', {}); this.pTx = h('span', {});
-    this.soundBtn = h('button', { class: 'cb-round', 'aria-label': 'sound', onclick: () => this._toggleSound() }, this.sound.muted ? '🔇' : '🔊');
+    this.infoEl = h('div', { class: 'cb-info' });
+    this.pauseBtn = h('button', { class: 'cb-round cb-pausebtn', 'aria-label': I.t('paused'), onclick: () => this.pauseGame() }, '⏸');
+    // top bar like the original: robot avatar + its vertical health bar, timer in the middle, alien avatar + its bar
     this.topEl = h('div', { class: 'cb-topw' },
-      h('div', { class: 'cb-toprow' }, h('button', { class: 'cb-round', 'aria-label': I.t('paused'), onclick: () => this.pauseGame() }, '⏸'),
-        h('div', { class: 'cb-pill cb-timer' }, '⏱ ', this.timerEl, this.x2El), this.soundBtn),
-      h('div', { class: 'cb-hprow' },
-        h('div', { class: 'cb-hpb alien' }, this.eHp, h('span', {}, '👾', h('i', {style:'font-style:normal'}, this.eTx))),
-        h('div', { class: 'cb-hpb robot' }, this.pHp, h('span', {}, '🤖', h('i', {style:'font-style:normal'}, this.pTx)))));
+      h('div', { class: 'cb-toprow' },
+        h('div', { class: 'cb-av robot' }, '🤖'), h('div', { class: 'cb-vb robot' }, this.pHp),
+        h('div', { class: 'cb-pill cb-timer' }, this.timerEl, this.x2El),
+        h('div', { class: 'cb-vb alien' }, this.eHp), h('div', { class: 'cb-av alien' }, '👾')),
+      h('div', { class: 'cb-hpnums' }, h('span', { class: 'robot' }, this.pTx), h('span', { class: 'alien' }, this.eTx)));
     this.cardEls = [0, 1, 2, 3].map((slot) => {
       const cv = h('canvas', { width: 128, height: 128 }); const cost = h('div', { class: 'cost' }); const nm = h('div', { class: 'nm' });
       const el = h('div', { class: 'cb-c', tabindex: 0, role: 'button', onpointerdown: (e) => this._cardDown(e, slot), onpointermove: (e) => this._cardMove(e), onpointerup: (e) => this._cardUp(e, false), onpointercancel: (e) => this._cardUp(e, true) }, cv, cost, nm);
@@ -276,7 +288,7 @@ class Game {
     this.ghostEl = h('div', { class: 'cb-ghost' }, h('canvas', { width: 128, height: 128 }));
     this.hintEl = h('div', { class: 'cb-hint show' }, h('span', { class: 'cb-finger' }, '👆'), h('span', {}, I.t('hint')));
     this.banner = h('div', { class: 'cb-banner' });
-    this.layer.append(this.topEl, this.botEl, this.hintEl, this.banner);
+    this.layer.append(this.topEl, this.pauseBtn, this.botEl, this.infoEl, this.hintEl, this.banner);
     this.root.append(this.ghostEl);
     this._proj();
     this._say(I.t('go'));
@@ -285,7 +297,7 @@ class Game {
   }
 
   _say(text) { this.banner.textContent = text; this.banner.classList.remove('go'); void this.banner.offsetWidth; this.banner.classList.add('go'); }
-  _toggleSound() { this.sound.setMuted(!this.sound.muted); this.save.muted = this.sound.muted; this.soundBtn.textContent = this.sound.muted ? '🔇' : '🔊'; this.post({ type: 'save', save: this.save }); }
+  _toggleSound() { this.sound.setMuted(!this.sound.muted); this.save.muted = this.sound.muted; if (this.soundBtn) this.soundBtn.textContent = this.sound.muted ? '🔇 ' + I.t('soundOff') : '🔊 ' + I.t('soundOn'); this.post({ type: 'save', save: this.save }); }
 
   pauseGame() { if (this.mode !== 'play') return; this.mode = 'pause'; this.drag = null; if (this.ghostEl) this.ghostEl.style.display = 'none'; this.sound.suspend(); this.showPause(); }
   showPause() {
@@ -293,7 +305,9 @@ class Game {
     this.pauseEl = h('div', { class: 'cb-dim' }, h('div', { class: 'cb-card' },
       h('div', { class: 'cb-title' }, I.t('paused')),
       h('button', { class: 'cb-btn', onclick: () => this.resumeGame() }, I.t('resume')),
+      h('button', { class: 'cb-btn dark', onclick: () => { this.pauseEl.remove(); this.start(); } }, I.t('restart')),
       h('button', { class: 'cb-btn dark', onclick: () => this.showHow() }, I.t('howBtn')),
+      (this.soundBtn = h('button', { class: 'cb-btn dark', onclick: () => this._toggleSound() }, this.sound.muted ? '🔇 ' + I.t('soundOff') : '🔊 ' + I.t('soundOn'))),
       h('button', { class: 'cb-btn dark', onclick: () => { this.pauseEl.remove(); this.showMenu(); } }, I.t('menu'))));
     this.layer.append(this.pauseEl);
   }
@@ -354,8 +368,8 @@ class Game {
     const tx = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
     if (tx !== this.lastTx || force) { this.timerEl.textContent = I.num(tx); this.lastTx = tx; this.timerEl.parentNode.classList.toggle('hurry', left <= 10); }
     this.x2El.style.display = b.doubled ? 'inline' : 'none';
-    this.eHp.style.width = `${Math.max(0, (b.base[1].hp / b.base[1].max) * 100)}%`; this.eTx.textContent = I.num(Math.ceil(b.base[1].hp));
-    this.pHp.style.width = `${Math.max(0, (b.base[0].hp / b.base[0].max) * 100)}%`; this.pTx.textContent = I.num(Math.ceil(b.base[0].hp));
+    this.eHp.style.height = `${Math.max(0, (b.base[1].hp / b.base[1].max) * 100)}%`; this.eTx.textContent = I.num(Math.ceil(b.base[1].hp));
+    this.pHp.style.height = `${Math.max(0, (b.base[0].hp / b.base[0].max) * 100)}%`; this.pTx.textContent = I.num(Math.ceil(b.base[0].hp));
     const e = b.energy;
     this.eFill.style.width = `${(e / ENERGY_MAX) * 100}%`; this.eNum.textContent = I.num(Math.floor(e));
     this.engEl.classList.toggle('x2', b.doubled); this.eNum.classList.toggle('x2', b.doubled); this.engEl.classList.toggle('full', e >= ENERGY_MAX - 0.01);
@@ -594,9 +608,20 @@ class Game {
 const CSS = `
 .cb-root{background:#07041a;font-weight:700}
 .cb-topw{position:absolute;top:0;left:0;right:0;padding:max(env(safe-area-inset-top),calc(var(--u)*2)) calc(var(--u)*2.5) 0;display:flex;flex-direction:column;gap:calc(var(--u)*1.4);direction:ltr}
-.cb-toprow{display:flex;align-items:center;justify-content:space-between}
-.cb-topw .cb-round{pointer-events:auto;width:calc(var(--u)*9);height:calc(var(--u)*9);font-size:calc(var(--u)*4.2)}
-.cb-timer{font-size:calc(var(--u)*5.2);padding:calc(var(--u)*.4) calc(var(--u)*4);min-width:calc(var(--u)*24);justify-content:center}
+.cb-toprow{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*1.2)}
+.cb-av{width:calc(var(--u)*13);height:calc(var(--u)*13);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*7.5);background:radial-gradient(circle,#1a2a6a,#07041a);border:calc(var(--u)*.6) solid;box-shadow:0 0 14px currentColor}
+.cb-av.robot{border-color:#35e0ff;color:#35e0ff}.cb-av.alien{border-color:#ff3fd0;color:#ff3fd0}
+.cb-vb{width:calc(var(--u)*3.4);height:calc(var(--u)*11);border-radius:99px;background:rgba(0,0,0,.6);border:calc(var(--u)*.45) solid;display:flex;align-items:flex-end;overflow:hidden}
+.cb-vb.robot{border-color:#35e0ff}.cb-vb.alien{border-color:#ff3fd0}
+.cb-vb b{display:block;width:100%;transition:height .15s}
+.cb-vb.robot b{background:linear-gradient(90deg,#8af4ff,#1a8ad8)}.cb-vb.alien b{background:linear-gradient(90deg,#ff8ae8,#c0189a)}
+.cb-hpnums{display:flex;justify-content:space-between;font-size:calc(var(--u)*3);font-weight:900;color:#fff;text-shadow:0 1px 3px #000;margin-top:calc(var(--u)*-1);padding:0 calc(var(--u)*3)}
+.cb-hpnums .robot{color:#9af4ff}.cb-hpnums .alien{color:#ff9ae8}
+.cb-pausebtn{position:absolute;right:calc(var(--u)*3);top:calc(var(--u)*24);pointer-events:auto;width:calc(var(--u)*10);height:calc(var(--u)*10);font-size:calc(var(--u)*4.4);z-index:3}
+.cb-topw .cb-round{pointer-events:auto}
+.cb-timer{font-size:calc(var(--u)*7);padding:calc(var(--u)*.6) calc(var(--u)*4);min-width:calc(var(--u)*26);justify-content:center;border-radius:calc(var(--u)*3.5)}
+.cb-info{position:absolute;left:calc(var(--u)*3);right:calc(var(--u)*3);display:none;flex-wrap:wrap;gap:.3em .6em;align-items:baseline;background:rgba(10,24,60,.92);border:calc(var(--u)*.5) solid #35f0ff;border-radius:calc(var(--u)*3);padding:calc(var(--u)*2) calc(var(--u)*3);color:#fff;pointer-events:none;box-shadow:0 0 16px #35f0ff88;z-index:4}
+.cb-info.show{display:flex}.cb-info b{font-size:calc(var(--u)*4.4);font-weight:900}.cb-info i{font-style:normal;font-size:calc(var(--u)*2.8);color:#8ab4ff;letter-spacing:.05em}.cb-info span{flex-basis:100%;font-size:calc(var(--u)*3.2)}
 .cb-timer.hurry{animation:cbhurry .5s infinite;background:linear-gradient(180deg,#ff6a8a,#a01a3a)}
 .cb-x2{display:none;color:#ffe04a;font-size:.8em;margin-inline-start:.3em;text-shadow:0 0 8px #ff9a2a}
 .cb-hprow{display:flex;gap:calc(var(--u)*2)}
@@ -631,7 +656,7 @@ const CSS = `
 .cb-hint{position:absolute;top:auto;right:auto;left:50%;transform:translateX(-50%);background:rgba(20,10,70,.85);border:calc(var(--u)*.4) solid #35f0ff;border-radius:999px;color:#fff;font-weight:900;font-size:calc(var(--u)*3.6);padding:calc(var(--u)*1) calc(var(--u)*4);white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none;display:flex;gap:.5em;align-items:center;max-width:96%;direction:ltr;box-shadow:0 0 14px #35f0ff}
 .cb-hint.show{opacity:1}
 .cb-finger{display:inline-block;animation:cbfinger 1.3s infinite}
-.cb-banner{position:absolute;left:0;right:0;top:38%;text-align:center;font-size:calc(var(--u)*13);font-weight:900;color:#ffe04a;-webkit-text-stroke:calc(var(--u)*.7) #3a0a6a;paint-order:stroke fill;opacity:0;pointer-events:none;text-shadow:0 0 20px #ff3fd0}
+.cb-banner{position:absolute;left:0;right:0;top:38%;text-align:center;font-size:calc(var(--u)*14);font-weight:900;font-style:italic;color:#fff;-webkit-text-stroke:calc(var(--u)*.7) #1a2a8a;paint-order:stroke fill;opacity:0;pointer-events:none;text-shadow:0 0 20px #ff3fd0}
 .cb-banner.go{animation:cbbanner 1.3s}
 .cb-diffs{display:flex;gap:calc(var(--u)*1.6);width:100%}
 .cb-diff{flex:1;font-family:inherit;color:#fff;border:calc(var(--u)*.5) solid #5a6ac8;border-radius:calc(var(--u)*3);background:linear-gradient(180deg,#2a2080,#140a48);padding:calc(var(--u)*1.2) 0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.4);font-size:calc(var(--u)*4.4)}

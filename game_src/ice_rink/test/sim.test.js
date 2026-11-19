@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createState, fire, step, cloneState, heroes, foes, LEVELS, HERO_ORDER, previewPath, teamHp, normalizeSave, W, H } from '../src/sim.js';
+import { HEROES, createState, fire, step, cloneState, heroes, foes, LEVELS, HERO_ORDER, previewPath, teamHp, normalizeSave, W, H } from '../src/sim.js';
 
 function runShot(s, cap = 4000) { let n = 0; while (s.phase === 'shot' && n++ < cap) step(s); return n; }
 function runAll(s, cap = 8000) { let n = 0; while ((s.phase === 'shot' || s.phase === 'enemy') && n++ < cap) step(s); }
@@ -9,7 +9,7 @@ function runAll(s, cap = 8000) { let n = 0; while ((s.phase === 'shot' || s.phas
 function robotTurn(s) {
   const cands = [];
   for (const h of heroes(s)) {
-    for (const sp of h.meter >= 100 ? [true, false] : [false]) {
+    for (const sp of s.gala >= 100 ? [true, false] : [false]) {
       for (let a = 0; a < 40; a++) {
         for (const p of [0.6, 1]) {
           const ang = (a / 40) * Math.PI * 2;
@@ -119,25 +119,25 @@ test('turn flow: aim -> shot -> enemy -> aim, turn counter increments', () => {
 test('special meter fills from damage and special fires once', () => {
   const s = createState(1);
   const fox = s.bodies.find((b) => b.type === 'fox');
-  fox.meter = 100;
+  s.gala = 100;
   fire(s, 'fox', -1.5, 1, true);
-  assert.equal(fox.meter, 0);
+  assert.equal(s.gala, 0);
   assert.equal(fox.pierce, true);
   runAll(s);
   assert.equal(fox.pierce, false);
   // meter gained from dealing damage
   const s2 = createState(1);
   const pen = s2.bodies.find((b) => b.type === 'penguin'); const g = foes(s2)[0];
-  pen.x = 20; pen.y = 70; g.x = 20; g.y = 40; pen.meter = 0;
+  pen.x = 20; pen.y = 70; g.x = 20; g.y = 40; s2.gala = 0;
   fire(s2, 'penguin', -Math.PI / 2, 1, false);
   for (let i = 0; i < 3000 && s2.phase === 'shot'; i++) step(s2);
-  assert.ok(pen.meter > 5);
+  assert.ok(s2.gala > 5);
 });
 
 test('flame dash pierces: passes through two goblins in a line', () => {
   const s = createState(1);
   const fox = s.bodies.find((b) => b.type === 'fox'); const [a, b] = foes(s);
-  fox.meter = 100; fox.x = 30; fox.y = 80; a.x = 30; a.y = 55; b.x = 30; b.y = 35;
+  s.gala = 100; fox.x = 30; fox.y = 80; a.x = 30; a.y = 55; b.x = 30; b.y = 35;
   fire(s, 'fox', -Math.PI / 2, 1, true);
   for (let i = 0; i < 400; i++) step(s);
   assert.ok(a.hp < a.maxHp || !a.alive);
@@ -167,4 +167,39 @@ test('a bounded-search robot wins at least 11 of 12 levels', { timeout: 900000 }
   }
   console.log(rows.join('\n'));
   assert.ok(won >= 11, `won ${won}/12`);
+});
+
+test('team Gala Spirit meter is shared and any hero can use it', () => {
+  const s = createState(1);
+  assert.equal(typeof s.gala, 'number');
+  s.gala = 100;
+  assert.equal(fire(s, 'bear', 0, 0.2, true), true);
+  assert.equal(s.gala, 0);
+});
+
+test('Shield Wall: the penguin takes 30% less damage than a plain hero', () => {
+  assert.ok(Math.abs(HEROES.penguin.def - 0.7) < 1e-9);
+});
+
+test('Ricochet: the fox hits harder after wall bounces', () => {
+  const dmg = (bounces) => {
+    const s = createState(1);
+    const fox = s.bodies.find((b) => b.type === 'fox'); const g = foes(s)[0];
+    for (const o of foes(s)) if (o !== g) o.alive = false;
+    fox.x = 30; fox.y = 70; g.x = 30; g.y = 40; g.hp = g.maxHp = 500; g.armor = 0;
+    fire(s, 'fox', -Math.PI / 2, 0.7, false);
+    fox.bn = bounces;
+    for (let i = 0; i < 600 && g.hp === 500; i++) step(s);
+    return 500 - g.hp;
+  };
+  assert.ok(dmg(2) > dmg(0) * 1.5);
+});
+
+test('Mending Glow: the bear heals an ally she touches', () => {
+  const s = createState(1);
+  const bear = s.bodies.find((b) => b.type === 'bear'); const pen = s.bodies.find((b) => b.type === 'penguin');
+  pen.hp = 30; bear.x = 30; bear.y = 70; pen.x = 30; pen.y = 50;
+  fire(s, 'bear', -Math.PI / 2, 1, false);
+  for (let i = 0; i < 800 && s.phase === 'shot'; i++) step(s);
+  assert.ok(pen.hp > 30);
 });

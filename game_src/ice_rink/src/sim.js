@@ -9,10 +9,13 @@ const BODY_E = 0.93;
 const STOP = 1.3;
 
 export const HEROES = {
-  penguin: { hp: 80, atk: 11, m: 1.0, r: 3.0, vmax: 72, def: 1.0, aggro: 1.0, special: 'spin' },
-  fox: { hp: 64, atk: 12, m: 0.8, r: 2.8, vmax: 80, def: 1.15, aggro: 0.85, special: 'flame' },
-  bear: { hp: 120, atk: 13, m: 1.9, r: 3.7, vmax: 62, def: 0.8, aggro: 1.6, special: 'slam' },
+  penguin: { hp: 80, atk: 11, m: 1.0, r: 3.0, vmax: 72, def: 0.7, aggro: 1.0, special: 'spin', passive: 'shield' }, // Shield Wall: takes 30% less damage
+  fox: { hp: 64, atk: 12, m: 0.8, r: 2.8, vmax: 80, def: 1.15, aggro: 0.85, special: 'flame', passive: 'ricochet' }, // Ricochet: every wall bounce before a hit adds +40% damage
+  bear: { hp: 120, atk: 13, m: 1.9, r: 3.7, vmax: 62, def: 0.8, aggro: 1.6, special: 'slam', passive: 'mend' }, // Mending Glow: heals every ally she touches
 };
+export const RICOCHET = 0.4;
+export const RICOCHET_MAX = 4;
+export const MEND = 10;
 export const HERO_ORDER = ['penguin', 'fox', 'bear'];
 const START = { penguin: [14, 84], fox: [30, 87], bear: [46, 84] };
 
@@ -56,14 +59,14 @@ export function createState(level = 1, { seed = 1, up = {} } = {}) {
   const lv = LEVELS[level - 1];
   const s = {
     level, seed: (seed * 2654435761) >>> 0 || 1, t: 0, pt: 0, phase: 'aim', turn: 1, bodies: [], proj: [], pools: [], blocks: [],
-    nextId: 1, cd: {}, ev: [], shot: null, eq: [], eTimer: 0, kills: 0, dealt: 0, taken: 0, coins: 0, boss: lv.boss, stars: 0,
+    nextId: 1, cd: {}, ev: [], shot: null, eq: [], eTimer: 0, kills: 0, dealt: 0, taken: 0, coins: 0, boss: lv.boss, stars: 0, gala: 20,
   };
   for (const id of HERO_ORDER) {
     const d = HEROES[id]; const u = up[id] || {};
     const hp = Math.round(d.hp * (1 + 0.12 * (u.hp || 0)));
     s.bodies.push({
       id: s.nextId++, kind: 'hero', type: id, x: START[id][0], y: START[id][1], vx: 0, vy: 0, r: d.r, m: d.m, im: 1 / d.m,
-      hp, maxHp: hp, atk: d.atk * (1 + 0.1 * (u.atk || 0)), def: d.def, aggro: d.aggro, vmax: d.vmax, meter: 20, alive: true, pierce: false, muMul: 1, sp: null,
+      hp, maxHp: hp, atk: d.atk * (1 + 0.1 * (u.atk || 0)), def: d.def, aggro: d.aggro, vmax: d.vmax, bn: 0, alive: true, pierce: false, muMul: 1, sp: null,
     });
   }
   const sc = level - 1;
@@ -102,7 +105,8 @@ export function fire(s, type, ang, power, useSpecial = true) {
   const sp = h.vmax * power;
   h.vx = Math.cos(ang) * sp; h.vy = Math.sin(ang) * sp;
   let special = null;
-  if (useSpecial && h.meter >= 100) { special = HEROES[type].special; h.meter = 0; s.ev.push({ t: 'special', x: h.x, y: h.y, id: h.id, kind: special }); }
+  h.bn = 0;
+  if (useSpecial && s.gala >= 100) { special = HEROES[type].special; s.gala = 0; s.ev.push({ t: 'special', x: h.x, y: h.y, id: h.id, kind: special }); }
   if (special === 'flame') { h.pierce = true; h.muMul = 0.6; }
   if (special === 'spin') h.muMul = 0.85;
   h.sp = special;
@@ -119,7 +123,7 @@ function hurtFoe(s, f, dmg, src) {
   f.hp -= dmg;
   s.dealt += dmg;
   s.ev.push({ t: 'dmg', x: f.x, y: f.y - f.r, v: dmg, side: 'foe', id: f.id });
-  if (src && src.kind === 'hero') src.meter = Math.min(100, src.meter + dmg * 1.3);
+  if (src && src.kind === 'hero') s.gala = Math.min(100, s.gala + dmg * 0.7);
   if (f.hp <= 0) {
     f.alive = false; f.vx = f.vy = 0; s.kills++; s.coins += f.coins;
     s.ev.push({ t: 'puff', x: f.x, y: f.y, r: f.r, type: f.type, boss: f.ai === 'boss' });
@@ -130,7 +134,7 @@ function hurtHero(s, h, dmg) {
   if (!h.alive) return;
   dmg = Math.max(1, Math.round(dmg * h.def));
   h.hp -= dmg; s.taken += dmg;
-  h.meter = Math.min(100, h.meter + dmg * 0.4);
+  s.gala = Math.min(100, s.gala + dmg * 0.25);
   s.ev.push({ t: 'dmg', x: h.x, y: h.y - h.r, v: dmg, side: 'hero', id: h.id });
   if (h.hp <= 0) { h.hp = 0; h.alive = false; h.vx = h.vy = 0; s.ev.push({ t: 'heroKO', x: h.x, y: h.y, id: h.id }); }
 }
@@ -162,7 +166,8 @@ function impact(s, a, b, vn, sa, sb, pierce) {
   }
   if (a.kind === 'hero' && b.kind === 'hero') {
     s.ev.push({ t: 'chain', x: mx, y: my, v: vn });
-    a.meter = Math.min(100, a.meter + 3); b.meter = Math.min(100, b.meter + 3);
+    s.gala = Math.min(100, s.gala + 3);
+    for (const [m, o] of [[a, b], [b, a]]) if (HEROES[m.type].passive === 'mend' && o.alive && o.hp < o.maxHp) { o.hp = Math.min(o.maxHp, o.hp + MEND); s.ev.push({ t: 'heal', x: o.x, y: o.y }); }
     return;
   }
   if (a.kind === 'foe' && b.kind === 'foe') {
@@ -179,6 +184,7 @@ function impact(s, a, b, vn, sa, sb, pierce) {
   if (s.phase !== 'enemy' || hs > 12) {
     let d = hero.atk * dmgScale(vn);
     if (hero.sp === 'spin') d *= 1.3;
+    if (HEROES[hero.type].passive === 'ricochet') d *= 1 + RICOCHET * Math.min(RICOCHET_MAX, hero.bn || 0);
     hurtFoe(s, foe, d, hero);
     if (hero.sp === 'flame' && foe.alive) foe.burn = 2;
     if (hero.sp === 'spin' && s.shot && !s.shot.done) { s.shot.done = true; aoe(s, hero.x, hero.y, 18, 8, 34, false, hero); }
@@ -228,7 +234,7 @@ function collideBlock(s, b, blk) {
   const vn = b.vx * nx + b.vy * ny;
   if (vn < 0) {
     b.vx -= (1 + WALL_E) * vn * nx; b.vy -= (1 + WALL_E) * vn * ny;
-    if (-vn > 6) s.ev.push({ t: 'wall', x: b.x - nx * b.r, y: b.y - ny * b.r, v: -vn, block: true });
+    if (-vn > 6) { s.ev.push({ t: 'wall', x: b.x - nx * b.r, y: b.y - ny * b.r, v: -vn, block: true }); if (b.kind === 'hero') b.bn++; }
   }
 }
 
@@ -244,10 +250,10 @@ function physics(s) {
     if (b.vx * b.vx + b.vy * b.vy < STOP * STOP) { b.vx = 0; b.vy = 0; }
     b.x += b.vx * DT; b.y += b.vy * DT;
     // walls
-    if (b.x < b.r) { b.x = b.r; if (b.vx < 0) { if (-b.vx > 6) s.ev.push({ t: 'wall', x: 0, y: b.y, v: -b.vx }); b.vx = -b.vx * WALL_E; } }
-    if (b.x > W - b.r) { b.x = W - b.r; if (b.vx > 0) { if (b.vx > 6) s.ev.push({ t: 'wall', x: W, y: b.y, v: b.vx }); b.vx = -b.vx * WALL_E; } }
-    if (b.y < b.r) { b.y = b.r; if (b.vy < 0) { if (-b.vy > 6) s.ev.push({ t: 'wall', x: b.x, y: 0, v: -b.vy }); b.vy = -b.vy * WALL_E; } }
-    if (b.y > H - b.r) { b.y = H - b.r; if (b.vy > 0) { if (b.vy > 6) s.ev.push({ t: 'wall', x: b.x, y: H, v: b.vy }); b.vy = -b.vy * WALL_E; } }
+    if (b.x < b.r) { b.x = b.r; if (b.vx < 0) { if (-b.vx > 6) { s.ev.push({ t: 'wall', x: 0, y: b.y, v: -b.vx }); if (b.kind === 'hero') b.bn++; } b.vx = -b.vx * WALL_E; } }
+    if (b.x > W - b.r) { b.x = W - b.r; if (b.vx > 0) { if (b.vx > 6) { s.ev.push({ t: 'wall', x: W, y: b.y, v: b.vx }); if (b.kind === 'hero') b.bn++; } b.vx = -b.vx * WALL_E; } }
+    if (b.y < b.r) { b.y = b.r; if (b.vy < 0) { if (-b.vy > 6) { s.ev.push({ t: 'wall', x: b.x, y: 0, v: -b.vy }); if (b.kind === 'hero') b.bn++; } b.vy = -b.vy * WALL_E; } }
+    if (b.y > H - b.r) { b.y = H - b.r; if (b.vy > 0) { if (b.vy > 6) { s.ev.push({ t: 'wall', x: b.x, y: H, v: b.vy }); if (b.kind === 'hero') b.bn++; } b.vy = -b.vy * WALL_E; } }
     for (const blk of s.blocks) collideBlock(s, b, blk);
     if (b.attacking && s.t > b.attackUntil) b.attacking = false;
   }
@@ -369,7 +375,7 @@ function foeAct(s, f) {
 function endEnemy(s) {
   if (!heroes(s).length) { s.phase = 'lost'; s.ev.push({ t: 'lost' }); return; }
   s.turn++;
-  for (const h of heroes(s)) h.meter = Math.min(100, h.meter + 6);
+  s.gala = Math.min(100, s.gala + 6);
   s.phase = 'aim'; s.pt = 0;
   s.ev.push({ t: 'phase', phase: 'aim' });
 }

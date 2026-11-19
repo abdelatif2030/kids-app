@@ -17,7 +17,8 @@ const S = {
   penguin: ['بنجو', 'Pengo'], fox: ['لهب', 'Ember'], bear: ['دبدوب', 'Bruno'],
   spin: ['دوّامة الجليد', 'Icy Spin'], flame: ['اندفاعة اللهب', 'Flame Dash'], slam: ['ضربة الدب', 'Bear Slam'],
   spin_d: ['موجة تدفع الغيلان بعيد', 'A wave that knocks goblins back'], flame_d: ['تخترق الغيلان وتحرقهم', 'Pierces and burns goblins'], slam_d: ['ضربة تشلّ الغيلان اللي حواليه', 'Stuns goblins around it'],
-  hp: ['صحة', 'Health'], pow: ['قوة', 'Power'], max: ['أقصى', 'Max'], ready: ['جاهز!', 'Ready!'], team: ['الفريق', 'Team'], ko: ['نايم', 'KO'],
+  hp: ['صحة', 'Health'], pow: ['قوة', 'Power'], max: ['أقصى', 'Max'], ready: ['جاهز!', 'Ready!'], gala: ['روح المهرجان', 'Gala Spirit'], turnw: ['الدور', 'Turn'],
+  p_shield: ['حائط الدرع', 'Shield Wall'], p_shield_d: ['بياخد ضرر أقل بنسبة ٣٠٪.', 'Takes 30% less damage.'], p_ricochet: ['الارتداد', 'Ricochet'], p_ricochet_d: ['كل ارتداد من الحيطة قبل الضربة بيزوّد الضرر ٤٠٪.', 'Every wall bounce before a hit adds +40% damage.'], p_mend: ['وهج الشفاء', 'Mending Glow'], p_mend_d: ['بتعالج كل صاحب بتلمسه.', 'Heals every ally she touches.'], team: ['الفريق', 'Team'], ko: ['نايم', 'KO'],
   ff: ['اضغط للتسريع', 'Tap to speed up'], pause: ['وقفة', 'Paused'], continue: ['كمّل اللعب', 'Continue'], upgrades: ['تقوية الأبطال', 'Upgrade heroes'],
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'], boss: ['زعيم!', 'Boss!'], special: ['قدرة خاصة', 'Special'],
 };
@@ -136,7 +137,12 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
     if (!document.getElementById('ir-style')) document.head.append(h('style', { id: 'ir-style' }, css('ir', '#4a8ad8', '#1f3e7a', '#ffe27a') + `
-.ir-root{background:#16294f}
+.ir-root{background:#d4e6f4}
+.ir-gala{position:absolute;left:calc(var(--u)*2);right:calc(var(--u)*2);display:flex;align-items:center;gap:calc(var(--u)*1.6);background:rgba(255,255,255,.92);border-radius:99px;padding:calc(var(--u)*1.2) calc(var(--u)*2.4);pointer-events:auto;box-shadow:0 calc(var(--u)*.5) calc(var(--u)*1.4) rgba(30,60,110,.3);color:#1f3e7a;font-weight:900;font-size:calc(var(--u)*3.2);direction:ltr}
+.ir-gala .bar{flex:1;height:calc(var(--u)*2.4);border-radius:99px;background:#dbe6ef;overflow:hidden}.ir-gala .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8ae8ff,#3aa8f0)}
+.ir-gala.rdy .bar i{background:linear-gradient(90deg,#ffe27a,#f0a020);animation:irpulse .8s infinite}.ir-gala.off{opacity:.6}
+.ir-tip{position:absolute;left:calc(var(--u)*6);right:calc(var(--u)*6);background:#fff;color:#1f3e7a;border-radius:calc(var(--u)*3);padding:calc(var(--u)*1.8) calc(var(--u)*2.6);font-size:calc(var(--u)*3.2);box-shadow:0 calc(var(--u)*.6) calc(var(--u)*2) rgba(30,60,110,.35);display:none;pointer-events:none;text-align:center}.ir-tip.show{display:block}.ir-tip b{display:block;font-size:calc(var(--u)*3.6);color:#2a78c8}
+.ir-hpn{font-size:calc(var(--u)*2.2);font-weight:900;text-align:center;direction:ltr;opacity:.9}
 .ir-cards{position:absolute;left:0;right:0;bottom:0;display:flex;gap:calc(var(--u)*1.4);padding:calc(var(--u)*1.4) calc(var(--u)*1.6) max(calc(var(--u)*1.6),env(safe-area-inset-bottom));box-sizing:border-box;justify-content:center;pointer-events:none;direction:ltr}
 .ir-hc{pointer-events:auto;flex:1;max-width:calc(var(--u)*34);background:linear-gradient(180deg,#4a8ad8,#1f3e7a);border:calc(var(--u)*.45) solid #fff;border-radius:calc(var(--u)*3);padding:calc(var(--u)*1) calc(var(--u)*1.2);display:flex;gap:calc(var(--u)*1.2);align-items:center;cursor:pointer;font-family:inherit;color:#fff;box-shadow:0 calc(var(--u)*.6) calc(var(--u)*1.4) rgba(0,10,30,.45);position:relative}
 .ir-hc.sel{border-color:#ffe27a;box-shadow:0 0 0 calc(var(--u)*.5) rgba(255,226,122,.55),0 calc(var(--u)*.6) calc(var(--u)*1.4) rgba(0,10,30,.45)}
@@ -202,9 +208,9 @@ class Game {
     const g = bg.getContext('2d'); g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     const cw = this.cw; const ch = this.ch; const sc = this.sc; const ox = this.ox; const oy = this.oy;
     let sd = 7; const R = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
-    const sky = g.createLinearGradient(0, 0, 0, ch); sky.addColorStop(0, '#0f1f45'); sky.addColorStop(0.5, '#25437f'); sky.addColorStop(1, '#3a62a0');
+    const sky = g.createLinearGradient(0, 0, 0, ch); sky.addColorStop(0, '#cfe2f3'); sky.addColorStop(0.5, '#e6f1fa'); sky.addColorStop(1, '#d4e6f4');
     g.fillStyle = sky; g.fillRect(0, 0, cw, ch);
-    g.fillStyle = 'rgba(255,255,255,.8)'; for (let i = 0; i < 60; i++) { g.beginPath(); g.arc(R() * cw, R() * ch * 0.5, R() * 1.2 + 0.3, 0, TAU); g.fill(); }
+    for (let i = 0; i < 60; i++) R();
     // snowy hills + trees in the margins
     g.fillStyle = '#e8f1fb'; g.beginPath(); g.moveTo(0, ch); for (let x = 0; x <= cw; x += 12) g.lineTo(x, ch - 12 - Math.sin(x * 0.02) * 8 - 8); g.lineTo(cw, ch); g.fill();
     for (const side of [-1, 1]) for (let k = 0; k < 3; k++) {
@@ -303,9 +309,15 @@ class Game {
     document.addEventListener('visibilitychange', this._onVis);
   }
 
+  _tip(id) {
+    const k = { penguin: 'shield', fox: 'ricochet', bear: 'mend' }[id];
+    this.tipEl.replaceChildren(h('b', {}, I.t('p_' + k)), h('span', {}, I.t('p_' + k + '_d')));
+    this.tipEl.classList.add('show'); clearTimeout(this._tipT); this._tipT = setTimeout(() => this.tipEl && this.tipEl.classList.remove('show'), 3200);
+  }
+
   fireHero(type, ang, power) {
     const hero = this.sim.bodies.find((b) => b.type === type && b.alive);
-    const useSp = hero && hero.meter >= 100 && this.armed[type] !== false;
+    const useSp = hero && this.sim.gala >= 100 && !this.galaOff;
     if (fire(this.sim, type, ang, power, useSp)) { this.hintEl && this.hintEl.classList.remove('show'); this.ff = false; }
   }
 
@@ -361,22 +373,25 @@ class Game {
 
   startLevel(n) {
     this.level = n; this.sim = createState(n, { seed: (Date.now() & 0xffff) + n, up: this.save.up });
-    this.mode = 'play'; this.parts = []; this.texts = []; this.trails = []; this.glow = {}; this.hop = {}; this.ff = false; this.aim = null; this.armed = {}; this.acc = 0; this.endTimer = 0; this.ended = false;
+    this.mode = 'play'; this.parts = []; this.texts = []; this.trails = []; this.glow = {}; this.hop = {}; this.ff = false; this.aim = null; this.armed = {}; this.galaOff = false; this.acc = 0; this.endTimer = 0; this.ended = false;
     this.sel = 'penguin'; this._buildBg(); this._levelBg = null;
     this.layer.replaceChildren(); this.sound.setMode(LEVELS[n - 1].boss ? 'boss' : 'player');
-    this.turnEl = h('div', { class: 'ir-pill ir-turn' }, ''); this.coinEl = h('div', { class: 'ir-pill ir-turn' }, '');
+    this.coinEl = h('div', { class: 'ir-pill ir-turn' }, '');
     const pause = h('button', { class: 'ir-round', 'aria-label': I.t('pause'), onclick: () => this.showPause() }, '☰');
     this.hintEl = h('div', { class: 'ir-hint' }, I.t('howTo'));
     this.banner = h('div', { class: 'ir-banner' }, '');
     this.cards = {};
-    const row = h('div', { class: 'ir-cards' });
+    const row = h('div', { class: 'ir-cards' }); this.rowEl = row;
     for (const id of HERO_ORDER) {
-      const hp = h('i', {}); const sp = h('i', {}); const rdy = h('span', { class: 'ir-rdy' }, `⚡ ${I.t('ready')}`);
-      const el = h('button', { class: 'ir-hc', onclick: () => { const hero = this.sim.bodies.find((b) => b.type === id); if (!hero || !hero.alive) return; if (this.sel === id && hero.meter >= 100) { this.armed[id] = this.armed[id] === false; this.sound.play('tap'); } else this.sound.play('select'); this.sel = id; } },
-        rdy, this._portrait(id, 72), h('div', { class: 'c' }, h('b', {}, I.t(id)), h('div', { class: 'ir-mini hp' }, hp), h('div', { class: 'ir-mini sp' }, sp)));
-      this.cards[id] = { el, hp, sp }; row.append(el);
+      const hp = h('i', {}); const hpn = h('div', { class: 'ir-hpn' }, '');
+      const el = h('button', { class: 'ir-hc', onclick: () => { const hero = this.sim.bodies.find((b) => b.type === id); if (!hero || !hero.alive) return; this.sound.play('select'); this.sel = id; this._tip(id); } },
+        this._portrait(id, 72), h('div', { class: 'c' }, h('b', {}, I.t(id)), h('div', { class: 'ir-mini hp' }, hp), hpn));
+      this.cards[id] = { el, hp, hpn }; row.append(el);
     }
-    this.layer.append(h('div', { class: 'ir-top' }, pause, h('div', { class: 'ir-pill ir-turn' }, `${LEVELS[n - 1].boss ? '👑 ' : ''}${this.lvName(n)}`), this.turnEl, this.coinEl), this.hintEl, this.banner, row);
+    this.tipEl = h('div', { class: 'ir-tip' });
+    this.galaFill = h('i', {}); this.galaEl = h('div', { class: 'ir-gala', onclick: () => { if (this.sim.gala >= 100) { this.galaOff = !this.galaOff; this.sound.play('tap'); } } }, h('span', {}, '❄'), h('span', {}, I.t('gala')), h('div', { class: 'bar' }, this.galaFill));
+    this.turnEl = h('div', { class: 'ir-pill ir-turn', style: 'flex-direction:column;line-height:1.15' }, '');
+    this.layer.append(h('div', { class: 'ir-top' }, pause, this.turnEl, this.coinEl), this.hintEl, this.banner, this.tipEl, this.galaEl, row);
     if (n === 1) this.hintEl.classList.add('show');
     this.ffEl = h('div', { class: 'ir-ff' }, I.t('ff')); this.ffEl.style.display = 'none'; this.layer.append(this.ffEl);
     this._soundPill();
@@ -501,20 +516,19 @@ class Game {
       const dx = a.x - a.x0; const dy = a.y - a.y0; const len = Math.hypot(dx, dy);
       if (len >= 2.5 && this.clock - a.tp > 0.04) {
         a.tp = this.clock; const hero = s.bodies.find((b) => b.type === a.hero && b.alive);
-        if (hero) a.path = previewPath(s, a.hero, Math.atan2(-dy, -dx), clamp(len / MAXPULL, 0, 1), hero.meter >= 100 && this.armed[a.hero] !== false);
+        if (hero) a.path = previewPath(s, a.hero, Math.atan2(-dy, -dx), clamp(len / MAXPULL, 0, 1), s.gala >= 100 && !this.galaOff);
       } else if (len < 2.5) a.path = null;
     }
     // HUD
-    this.turnEl.textContent = s.phase === 'enemy' ? `👺 ${I.t('foeTurn')}` : `⛸️ ${I.t('yourTurn')}`;
-    this.coinEl.textContent = `🪙 ${I.num(s.coins)}`;
+    this.turnEl.replaceChildren(h('small', { style: 'font-size:.62em;opacity:.8;font-weight:700' }, `${I.t('level')} ${I.num(this.level)} · ${I.t('turnw')} ${I.num(s.turn)}`), h('span', {}, s.phase === 'enemy' ? `👺 ${I.t('foeTurn')}` : `⛸️ ${I.t('yourTurn')}`));
+    this.coinEl.textContent = `👺 × ${I.num(foes(s).length)}`;
+    { const rb = (this.rowEl ? this.rowEl.offsetHeight : 90) + 8; this.galaEl.style.bottom = `${rb}px`; this.tipEl.style.bottom = `${rb + this.galaEl.offsetHeight + 8}px`; }
+    { const rdy = s.gala >= 100; if (rdy && !this._galaWas) this.sound.play('ready'); this._galaWas = rdy; this.galaFill.style.width = `${Math.min(100, s.gala)}%`; this.galaEl.classList.toggle('rdy', rdy); this.galaEl.classList.toggle('off', rdy && this.galaOff); }
     this.ffEl.style.display = s.phase === 'shot' || s.phase === 'enemy' ? 'block' : 'none';
     for (const id of HERO_ORDER) {
       const c = this.cards[id]; const b = s.bodies.find((q) => q.type === id);
-      c.hp.style.width = `${Math.max(0, (b.hp / b.maxHp) * 100)}%`; c.sp.style.width = `${Math.min(100, b.meter)}%`;
-      const rdy = b.alive && b.meter >= 100;
-      if (rdy && !c.was) this.sound.play('ready');
-      c.was = rdy;
-      c.el.classList.toggle('sel', this.sel === id && b.alive); c.el.classList.toggle('ko', !b.alive); c.el.classList.toggle('rdy', rdy); c.el.classList.toggle('off', rdy && this.armed[id] === false);
+      c.hp.style.width = `${Math.max(0, (b.hp / b.maxHp) * 100)}%`; c.hpn.textContent = `${I.num(Math.max(0, Math.ceil(b.hp)))} / ${I.num(b.maxHp)}`;
+      c.el.classList.toggle('sel', this.sel === id && b.alive); c.el.classList.toggle('ko', !b.alive);
     }
   }
 
@@ -549,7 +563,7 @@ class Game {
       if (b.kind === 'hero') drawHero(g, b.type, R, { lx, ly, t: this.clock, ko: false });
       else drawFoe(g, b, R, { lx, ly, t: this.clock });
       g.restore();
-      if (b.kind === 'hero' && this.sel === b.type && s.phase === 'aim') { g.strokeStyle = 'rgba(255,226,122,.9)'; g.lineWidth = 2.5; g.setLineDash([5, 4]); g.lineDashOffset = -this.clock * 12; ell(g, x, y + R * 0.1, R * 1.25, R * 1.15); g.stroke(); g.setLineDash([]); if (b.meter >= 100 && this.armed[b.type] !== false) { g.fillStyle = '#ffe27a'; star(g, x, y - R * 1.5 - Math.sin(this.clock * 5) * 2, R * 0.38, this.clock); } }
+      if (b.kind === 'hero' && this.sel === b.type && s.phase === 'aim') { g.strokeStyle = 'rgba(255,226,122,.9)'; g.lineWidth = 2.5; g.setLineDash([5, 4]); g.lineDashOffset = -this.clock * 12; ell(g, x, y + R * 0.1, R * 1.25, R * 1.15); g.stroke(); g.setLineDash([]); if (s.gala >= 100 && !this.galaOff) { g.fillStyle = '#ffe27a'; star(g, x, y - R * 1.5 - Math.sin(this.clock * 5) * 2, R * 0.38, this.clock); } }
       if (b.kind === 'foe') {
         const bw = Math.max(R * 1.8, sc * 4); const by = y - R * 1.6 - hop; const k = clamp(b.hp / b.maxHp, 0, 1);
         g.fillStyle = 'rgba(0,0,0,.5)'; g.beginPath(); g.roundRect(x - bw / 2 - 1, by - 1, bw + 2, sc * 1.1 + 2, 4); g.fill();
