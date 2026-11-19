@@ -1,0 +1,11 @@
+{
+  "name": "sweet_tray",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty Sweet Tray triple-match puzzle (canvas). Built into assets/games/sweet_tray/game.js",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/sweet_tray/game.js",
+    "test": "node --test test/sim.test.js"
+  },
+  "devDependencies": { "esbuild": "0.24.0" }
+}

@@ -84,6 +84,25 @@ Future<void> deleteChildData() async {
         key == 'alien_sky' ||
         key == 'rhino_summit' ||
         key == 'sunset_highway' ||
+        key == 'temple_army' ||
+        key == 'rug_cleaning' ||
+        key == 'fashion_queen' ||
+        key == 'gummy_squad' ||
+        key == 'barrel_knights' ||
+        key == 'sweet_tray' ||
+        key == 'tomb_puzzle' ||
+        key == 'ice_rink' ||
+        key == 'dino_grow' ||
+        key == 'card_battle' ||
+        key == 'viking_sling' ||
+        key == 'trick_or_treat' ||
+        key == 'nutmeg_rush' ||
+        key == 'sky_ace' ||
+        key == 'gem_quarry' ||
+        key == 'pin_puzzle' ||
+        key == 'mars_farm' ||
+        key == 'hop_world' ||
+        key == 'hot_spring' ||
         key == 'fizz_runner' ||
         key == 'chomp_maze' ||
         key == 'hamster_warrior' ||

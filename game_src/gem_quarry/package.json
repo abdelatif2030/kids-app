@@ -1,0 +1,12 @@
+{
+  "name": "gem_quarry",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty gem quarry idle logistics (canvas). Built into assets/games/gem_quarry/game.js",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/gem_quarry/game.js",
+    "test": "node --test test/sim.test.js"
+  },
+  "dependencies": { "three": "0.170.0" },
+  "devDependencies": { "esbuild": "0.24.0" }
+}

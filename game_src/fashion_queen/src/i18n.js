@@ -1,0 +1,34 @@
+import { makeI18n } from '../../cozy_kit/ui.js';
+
+export const S = {
+  title: ['ملكة الموضة', 'FASHION QUEEN'], subtitle: ['عالم البنات الأجمل', 'Ultimate Girls World'], play: ['يلا نلعب', 'PLAY'],
+  m_studio: ['استوديو الأزياء', 'Fashion Studio'], m_salon: ['صالون الجمال', 'Beauty Salon'], m_pets: ['عالم الحيوانات', 'Pet World'], m_house: ['بيت الأحلام', 'Dream House'],
+  m_runway: ['المنصة', 'Runway'], m_shop: ['المتجر', 'Shop'], m_missions: ['المهام', 'Missions'], m_settings: ['الإعدادات', 'Settings'], m_exit: ['خروج', 'Exit'],
+  back: ['رجوع', 'Back'], sound: ['الصوت', 'Sound'], tapSound: ['🔊 دوسي هنا عشان الصوت', '🔊 Tap here for sound'],
+  yes: ['أيوه', 'Yes'], no: ['لأ', 'No'], buy: ['اشتري', 'Buy'], buyAsk: ['تشتري القطعة دي؟', 'Buy this?'], bought: ['اشتريتي! 🎉', 'Bought! 🎉'], poor: ['مفيش عملات كفاية', 'Not enough coins'], oops: ['حاولي تاني', 'Try again'],
+  missionReady: ['مهمة جاهزة! 🎯', 'A mission is ready! 🎯'], close: ['إغلاق', 'Close'], delete: ['مسح', 'Delete'], none: ['بدون', 'None'],
+  turn: ['لفّي', 'Turn'], spin: ['لفة كاملة', 'Spin'], clearSlot: ['شيلي القطعة', 'Take off'], saveLook: ['احفظي الإطلالة', 'Save look'], myLooks: ['إطلالاتي', 'My looks'], noLooks: ['لسه مفيش إطلالات محفوظة', 'No saved looks yet'],
+  wear: ['البسي', 'Wear'], lookSaved: ['اتحفظت الإطلالة 💖', 'Look saved 💖'], looksFull: ['القائمة مليانة، امسحي واحدة', 'The list is full, delete one'], go: ['يلا', 'Go'],
+  act_wash: ['غسيل الشعر', 'Hair wash'], act_dry: ['تجفيف الشعر', 'Hair dry'], act_style: ['قصّة وتسريحة', 'Cut & style'], act_color: ['لون الشعر', 'Hair colour'], act_makeup: ['ميك أب', 'Makeup'], act_jewel: ['مجوهرات', 'Jewelry'],
+  hint_wash: ['افركي الشعر بصباعك لحد ما يطلع رغاوي', 'Rub the hair with your finger until it is foamy'], hint_dry: ['افركي الشعر عشان ينشف', 'Rub the hair to dry it'], allDone: ['خلصتي! عظيمة', 'All done! Great'],
+  mk_shadow: ['ظلال', 'Shadow'], mk_lips: ['روج', 'Lips'], mk_blush: ['بلاشر', 'Blush'], mk_skin: ['كريم أساس', 'Foundation'], mk_lash: ['رموش', 'Lashes'], mk_nails: ['أظافر', 'Nails'],
+  lash_natural: ['طبيعي', 'Natural'], lash_long: ['طويل', 'Long'], lash_wing: ['جناح', 'Wing'], lash_glam: ['مبهر', 'Glam'],
+  pact_feed: ['أكل', 'Feed'], pact_wash: ['استحمام', 'Wash'], pact_brush: ['تسريح', 'Brush'], pact_play: ['لعب', 'Play'], pact_outfit: ['ملابس', 'Outfits'], pact_bed: ['سرير', 'Bed'],
+  hint_feed: ['اختاري أكلة للحيوان', 'Pick a food for your pet'], petFull: ['شبعان خالص!', 'Full already!'],
+  act_pet_wash: ['استحمام', 'Bath time'], hint_pet_wash: ['افركي الحيوان بالصابون', 'Rub your pet with soap'], act_pet_brush: ['تسريح الفرو', 'Brush time'], hint_pet_brush: ['سرّحي الفرو بصباعك', 'Brush the fur with your finger'],
+  hint_play: ['دوسي على اللعبة ٥ مرات', 'Tap the toy 5 times'], startPlay: ['ابدأي اللعب', 'Start playing'], petOwned: ['عندك الحيوان ده', 'You have this pet'],
+  hint_house: ['اختاري قطعة أثاث وبعدين دوسي على مربع', 'Pick furniture, then tap a square'], hint_place: ['دوسي على مربع فاضي عشان تحطيها', 'Tap an empty square to place it'], hint_picked: ['دوسي على مربع فاضي عشان تنقليها', 'Tap an empty square to move it'],
+  flip: ['اقلبي', 'Flip'], recolor: ['لوّني', 'Recolour'], remove: ['شيلي', 'Remove'], saveRoom: ['احفظي الغرفة', 'Save room'], roomSaved: ['اتحفظت الغرفة 🏠', 'Room saved 🏠'], roomSame: ['لسه مفيش تغيير جديد', 'No new changes'], wallpaper: ['ورق الحيطة', 'Wallpaper'], floor: ['الأرضية', 'Floor'], furniture: ['أثاث', 'Furniture'],
+  runwayTitle: ['المنصة الملكية', 'Royal Runway'], runwayPick: ['اختاري موضوع العرض', 'Pick a show theme'],
+  tag_casual: ['كاجوال', 'casual'], tag_school: ['مدرسة', 'school'], tag_party: ['حفلة', 'party'], tag_royal: ['ملكي', 'royal'], tag_princess: ['أميرة', 'princess'], tag_wedding: ['فرح', 'wedding'], tag_beach: ['شاطئ', 'beach'], tag_summer: ['صيف', 'summer'], tag_winter: ['شتا', 'winter'], tag_fantasy: ['خيال', 'fantasy'],
+  judge1: ['حلو! ممكن أحلى', 'Nice! Even better next time'], judge2: ['جميل جداً!', 'Very pretty!'], judge3: ['ملكة الموضة! 👑', 'Fashion Queen! 👑'],
+  tipStyle: ['جرّبي قطع فيها كلمات الموضوع', 'Try pieces that match the theme words'], tipBasics: ['البسي فستان (أو بلوزة وتنورة) وحذاء', 'Wear a dress (or top and skirt) and shoes'], tipMakeup: ['الميك أب بيزوّد النقط', 'Makeup adds points'], tipGreat: ['إطلالة رائعة!', 'A wonderful look!'],
+  themes: ['المواضيع', 'Themes'], again: ['تاني', 'Again'], menu: ['القائمة', 'Menu'],
+  worlds: ['عوالم الموضة', 'Fashion Worlds'], needStars: ['محتاجة نجوم', 'Needs stars'], worldDone: ['العالم خلص!', 'World complete!'], level: ['المستوى', 'Level'], collect: ['استلمي', 'Collect'], goDo: ['يلا', 'Go'], chest: ['صندوق الجوايز', 'Reward chest'],
+  tab_daily: ['يومية', 'Daily'], tab_ach: ['إنجازات', 'Achievements'], dailyChest: ['صندوق اليوم', 'Daily chest'], open: ['افتحي', 'Open'],
+  shop_clothes: ['ملابس', 'Clothes'], shop_hair: ['تسريحات', 'Hair'], shop_pets: ['حيوانات', 'Pets'], shop_decor: ['ديكور', 'Decor'], have: ['عندك ده', 'You have this'],
+  music: ['الموسيقى', 'Music'], sfx: ['المؤثرات', 'Effects'], soundOn: ['الصوت شغّال', 'Sound on'], soundOff: ['الصوت مقفول', 'Sound off'], language: ['اللغة', 'Language'],
+  privacy: ['اللعبة بتشتغل على جهازك بس، مفيش إعلانات ولا روابط.', 'This game runs on your device only: no ads, no links.'],
+};
+export const I = makeI18n(S);
+export const t = (k) => { const g = I.t(k); return g; };

@@ -1,0 +1,12 @@
+{
+  "name": "sky_ace",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty Sky Ace vertical sky shooter (canvas). Built into assets/games/sky_ace/game.js",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/sky_ace/game.js",
+    "test": "node --test test/sim.test.js"
+  },
+  "dependencies": { "three": "0.170.0" },
+  "devDependencies": { "esbuild": "0.24.0" }
+}

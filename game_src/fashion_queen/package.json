@@ -1,0 +1,8 @@
+{
+  "name": "fashion_queen",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty Fashion Queen girls world (canvas + DOM). Built into assets/games/fashion_queen/game.js",
+  "scripts": { "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/fashion_queen/game.js", "test": "node --test test/sim.test.js" },
+  "devDependencies": { "esbuild": "0.24.0" }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "trick_or_treat",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty «حلاوة ولا مقلب» Halloween crowd runner (2D canvas). Built into assets/games/trick_or_treat/game.js",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/trick_or_treat/game.js",
+    "test": "node --test test/sim.test.js"
+  },
+  "devDependencies": { "esbuild": "0.24.0" }
+}

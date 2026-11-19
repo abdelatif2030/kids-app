@@ -1,0 +1,8 @@
+{
+  "name": "nutmeg_rush",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty Nutmeg Rush (three.js). Built into assets/games/nutmeg_rush/game.js",
+  "scripts": { "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/nutmeg_rush/game.js", "test": "node --test test/sim.test.js" },
+  "dependencies": { "three": "0.170.0" }, "devDependencies": { "esbuild": "0.24.0" }
+}

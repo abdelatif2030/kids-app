@@ -1,0 +1,1 @@
+cd /c/dev/rehlaty/game_src/temple_army && node node_modules/esbuild/bin/esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/temple_army/game.js 2>&1 | grep -iE "error|warn" 

@@ -145,7 +145,26 @@ flutter:
     - assets/games/alien_sky/
     - assets/games/rhino_summit/
     - assets/games/sunset_highway/
-    - assets/games/dress_studio/
+    - assets/games/temple_army/
+    - assets/games/rug_cleaning/
+    - assets/games/fashion_queen/
+    - assets/games/gummy_squad/
+    - assets/games/barrel_knights/
+    - assets/games/sweet_tray/
+    - assets/games/tomb_puzzle/
+    - assets/games/ice_rink/
+    - assets/games/dino_grow/
+    - assets/games/card_battle/
+    - assets/games/viking_sling/
+    - assets/games/trick_or_treat/
+    - assets/games/nutmeg_rush/
+    - assets/games/sky_ace/
+    - assets/games/gem_quarry/
+    - assets/games/pin_puzzle/
+    - assets/games/mars_farm/
+    - assets/games/hop_world/
+    - assets/games/hot_spring/
+    - assets/games/fizz_runner/
     - assets/games/chomp_maze/
     - assets/games/hamster_warrior/
     - assets/games/ball_scoop/

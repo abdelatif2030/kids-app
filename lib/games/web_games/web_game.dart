@@ -118,7 +118,7 @@ final WebGame kRhythmSurvival = WebGame(
   title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash, kSkyCapy, kMarbleDozer, kDuneTitans, kCastawayRaft, kWinterCamp, kRainCircuit, kSquadShooter, kArcherBridge, kAlienSky, kRhinoSummit, kSunsetHighway, kCreatorTycoon, kPearlDivers, kHoneyFarm, kIceDragon, kBallScoop, kHamsterWarrior, kChompMaze, kFizzRunner];
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash, kSkyCapy, kMarbleDozer, kDuneTitans, kCastawayRaft, kWinterCamp, kRainCircuit, kSquadShooter, kArcherBridge, kAlienSky, kRhinoSummit, kSunsetHighway, kCreatorTycoon, kPearlDivers, kHoneyFarm, kIceDragon, kBallScoop, kHamsterWarrior, kChompMaze, kFizzRunner, kHotSpring, kHopWorld, kMarsFarm, kPinPuzzle, kGemQuarry, kSkyAce, kNutmegRush, kTrickOrTreat, kVikingSling, kCardBattle, kDinoGrow, kIceRink, kTombPuzzle, kSweetTray, kBarrelKnights, kGummySquad, kFashionQueen, kRugCleaning, kTempleArmy];
 
 /// «متجر الفضاء الذكي» (Space Store Manager): a grocery store on a space station (docs/SPACE_STORE.md).
 final WebGame kSpaceStore = WebGame(
@@ -440,6 +440,196 @@ final WebGame kFizzRunner = WebGame(
   storeKey: 'fizz_runner',
   minAge: 4,
   title: () => tr2('فيزمان', 'Fizz Man'),
+);
+
+/// «ينابيع القرية» (Hot Spring Village).
+final WebGame kHotSpring = WebGame(
+  id: 'hot_spring',
+  folder: 'hot_spring',
+  global: 'HotSpring',
+  storeKey: 'hot_spring',
+  minAge: 4,
+  title: () => tr2('ينابيع القرية', 'Hot Spring Village'),
+);
+
+/// «عالم القفز» (Hop World).
+final WebGame kHopWorld = WebGame(
+  id: 'hop_world',
+  folder: 'hop_world',
+  global: 'HopWorld',
+  storeKey: 'hop_world',
+  minAge: 4,
+  title: () => tr2('عالم القفز', 'Hop World'),
+);
+
+/// «مزرعة المريخ» (Mars Farm Colony).
+final WebGame kMarsFarm = WebGame(
+  id: 'mars_farm',
+  folder: 'mars_farm',
+  global: 'MarsFarm',
+  storeKey: 'mars_farm',
+  minAge: 4,
+  title: () => tr2('مزرعة المريخ', 'Mars Farm Colony'),
+);
+
+/// «اسحب الدبوس» (Pull the Pin).
+final WebGame kPinPuzzle = WebGame(
+  id: 'pin_puzzle',
+  folder: 'pin_puzzle',
+  global: 'PinPuzzle',
+  storeKey: 'pin_puzzle',
+  minAge: 4,
+  title: () => tr2('اسحب الدبوس', 'Pull the Pin'),
+);
+
+/// «محجر الجواهر» (Gemlode Quarry).
+final WebGame kGemQuarry = WebGame(
+  id: 'gem_quarry',
+  folder: 'gem_quarry',
+  global: 'GemQuarry',
+  storeKey: 'gem_quarry',
+  minAge: 4,
+  title: () => tr2('محجر الجواهر', 'Gemlode Quarry'),
+);
+
+/// «طيار السحاب» (Sky Ace).
+final WebGame kSkyAce = WebGame(
+  id: 'sky_ace',
+  folder: 'sky_ace',
+  global: 'SkyAce',
+  storeKey: 'sky_ace',
+  minAge: 4,
+  title: () => tr2('طيار السحاب', 'Sky Ace'),
+);
+
+/// «سكة الكورة» (Nutmeg Rush).
+final WebGame kNutmegRush = WebGame(
+  id: 'nutmeg_rush',
+  folder: 'nutmeg_rush',
+  global: 'NutmegRush',
+  storeKey: 'nutmeg_rush',
+  minAge: 4,
+  title: () => tr2('سكة الكورة', 'Nutmeg Rush'),
+);
+
+/// «حلاوة ولا مقلب» (Trick or Treat Crowd).
+final WebGame kTrickOrTreat = WebGame(
+  id: 'trick_or_treat',
+  folder: 'trick_or_treat',
+  global: 'TrickOrTreat',
+  storeKey: 'trick_or_treat',
+  minAge: 4,
+  title: () => tr2('حلاوة ولا مقلب', 'Trick or Treat Crowd'),
+);
+
+/// «مقلاع الفايكنج» (Viking Slingshot).
+final WebGame kVikingSling = WebGame(
+  id: 'viking_sling',
+  folder: 'viking_sling',
+  global: 'VikingSling',
+  storeKey: 'viking_sling',
+  minAge: 4,
+  title: () => tr2('مقلاع الفايكنج', 'Viking Slingshot'),
+);
+
+/// «معركة الكروت النيون» (Neon Card Battle).
+final WebGame kCardBattle = WebGame(
+  id: 'card_battle',
+  folder: 'card_battle',
+  global: 'CardBattle',
+  storeKey: 'card_battle',
+  minAge: 4,
+  title: () => tr2('معركة الكروت النيون', 'Neon Card Battle'),
+);
+
+/// «ديناصور صغير يكبر» (Dino Grow).
+final WebGame kDinoGrow = WebGame(
+  id: 'dino_grow',
+  folder: 'dino_grow',
+  global: 'DinoGrow',
+  storeKey: 'dino_grow',
+  minAge: 4,
+  title: () => tr2('ديناصور صغير يكبر', 'Dino Grow'),
+);
+
+/// «معركة حلبة الجليد» (Ice Rink Brawl).
+final WebGame kIceRink = WebGame(
+  id: 'ice_rink',
+  folder: 'ice_rink',
+  global: 'IceRink',
+  storeKey: 'ice_rink',
+  minAge: 4,
+  title: () => tr2('معركة حلبة الجليد', 'Ice Rink Brawl'),
+);
+
+/// «لغز المقبرة» (Tomb Puzzle).
+final WebGame kTombPuzzle = WebGame(
+  id: 'tomb_puzzle',
+  folder: 'tomb_puzzle',
+  global: 'TombPuzzle',
+  storeKey: 'tomb_puzzle',
+  minAge: 4,
+  title: () => tr2('لغز المقبرة', 'Tomb Puzzle'),
+);
+
+/// «طبق الحلويات» (Sweet Tray).
+final WebGame kSweetTray = WebGame(
+  id: 'sweet_tray',
+  folder: 'sweet_tray',
+  global: 'SweetTray',
+  storeKey: 'sweet_tray',
+  minAge: 4,
+  title: () => tr2('طبق الحلويات', 'Sweet Tray'),
+);
+
+/// «فرسان البرميل» (Barrel Knights).
+final WebGame kBarrelKnights = WebGame(
+  id: 'barrel_knights',
+  folder: 'barrel_knights',
+  global: 'BarrelKnights',
+  storeKey: 'barrel_knights',
+  minAge: 4,
+  title: () => tr2('فرسان البرميل', 'Barrel Knights'),
+);
+
+/// «فرقة الدببة الجيلي» (Gummy Squad).
+final WebGame kGummySquad = WebGame(
+  id: 'gummy_squad',
+  folder: 'gummy_squad',
+  global: 'GummySquad',
+  storeKey: 'gummy_squad',
+  minAge: 4,
+  title: () => tr2('فرقة الدببة الجيلي', 'Gummy Squad'),
+);
+
+/// «ملكة الموضة» (Fashion Queen).
+final WebGame kFashionQueen = WebGame(
+  id: 'fashion_queen',
+  folder: 'fashion_queen',
+  global: 'FashionQueen',
+  storeKey: 'fashion_queen',
+  minAge: 4,
+  title: () => tr2('ملكة الموضة', 'Fashion Queen'),
+);
+
+/// «تنظيف السجاد» (Rug Cleaning).
+final WebGame kRugCleaning = WebGame(
+  id: 'rug_cleaning',
+  folder: 'rug_cleaning',
+  global: 'RugCleaning',
+  storeKey: 'rug_cleaning',
+  minAge: 4,
+  title: () => tr2('تنظيف السجاد', 'Rug Cleaning'),
+);
+
+/// «جيش المعبد» (Temple Army).
+final WebGame kTempleArmy = WebGame(
+  id: 'temple_army',
+  folder: 'temple_army',
+  global: 'TempleArmy',
+  storeKey: 'temple_army',
+  minAge: 4,
+  title: () => tr2('جيش المعبد', 'Temple Army'),
 );
 
 // ---- rebuilt learning games (docs/LEARNING_GAMES_REBUILD.md) ----------------------------------------------------------

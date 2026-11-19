@@ -1,0 +1,8 @@
+{
+  "name": "sky_jumper",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty sky jumper endless climber (canvas). Built into assets/games/sky_jumper/game.js",
+  "scripts": { "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/sky_jumper/game.js", "test": "node --test test/sim.test.js" },
+  "devDependencies": { "esbuild": "0.24.0" }
+}

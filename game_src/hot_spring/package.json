@@ -1,0 +1,13 @@
+{
+  "name": "hot_spring",
+  "private": true,
+  "type": "module",
+  "description": "Rehlaty Hot Spring Village cozy management game (2D canvas). Built into assets/games/hot_spring/game.js",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/hot_spring/game.js",
+    "test": "node --test test/sim.test.js"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.0"
+  }
+}
