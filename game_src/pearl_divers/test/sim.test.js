@@ -1,52 +1,57 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Lagoon, DEPTHS, UPGRADES, RIVAL_GOAL, normalizeSave } from '../src/sim.js';
+import { Lagoon, LEDGES, RIVAL_GOAL, MAX_HIRE, normalizeSave } from '../src/sim.js';
 
+/** A robot owner: taps all the time and buys the cheapest useful thing. */
 function tick(l, t) {
-  if (Math.floor(t * 30) % 20 === 0) l.tap();
-  for (const d of DEPTHS) { l.buy('area', d.id); l.buy('manager', d.id); }
-  for (const u of UPGRADES) l.buy('up', u.id);
-  l.step(1 / 30);
+  if (Math.floor(t * 30) % 10 === 0) l.tap();
+  const next = l.nextLedge;
+  if (next) l.buy('area', next.id);
+  for (const a of l.areas) { l.buy('hire', a.id); l.buy('up', a.id); }
+  l.step(1 / 30); l.drain();
 }
 
-test('four depths with growing pearl value and three upgrades', () => {
-  assert.equal(DEPTHS.length, 4);
-  assert.ok(DEPTHS[3].pearl > DEPTHS[0].pearl);
-  assert.equal(UPGRADES.length, 3);
+test('four ledges with growing pearl value and the rival goal of $1.5M', () => {
+  assert.equal(LEDGES.length, 4);
+  assert.ok(LEDGES[3].pearl > LEDGES[0].pearl);
+  assert.equal(RIVAL_GOAL, 1500000);
 });
 
-test('a robot owner overtakes the rival yacht', () => {
+test('a robot owner reaches the rival fortune in a few minutes', () => {
   const l = new Lagoon({ seed: 4 });
   let t = 0;
   while (l.state === 'play' && t < 4000) { tick(l, t); t += 1 / 30; }
-  console.log(`won in ${t.toFixed(0)}s, earned ${l.earned}, rival ${Math.round(l.rival)}`);
+  console.log(`won in ${t.toFixed(0)}s, earned ${l.earned}`);
   assert.equal(l.state, 'won');
-  assert.ok(t < 1800);
+  assert.ok(t > 60 && t < 900);
 });
 
-test('tapping sends divers, pearls reach the basket, the bell lifts them and the boat sells them', () => {
+test('nothing happens without a tap; a tap sends the diver, pearls reach the basket, the bell lifts, the boat sells', () => {
   const l = new Lagoon({ seed: 2 });
+  for (let i = 0; i < 30 * 10; i++) l.step(1 / 30);
+  assert.equal(l.cash, 0);
   assert.ok(l.tap());
   let sold = 0;
-  for (let i = 0; i < 30 * 30; i++) { l.tap(); for (const e of l.step(1 / 30)) if (e.type === 'sold') sold += e.cash; }
+  for (let i = 0; i < 30 * 30; i++) { l.tap(); l.step(1 / 30); for (const e of l.drain()) if (e.type === 'sold') sold += e.cash; }
   assert.ok(sold > 0);
-  assert.ok(l.cash > 0);
+  assert.equal(l.cash, sold);
 });
 
-test('managers automate; deeper areas must be bought; upgrades add divers', () => {
+test('HIRE makes a diver work by himself; UPGRADE triples pearls; NEW LEDGE opens a deeper one', () => {
   const l = new Lagoon();
   assert.equal(l.buy('area', 'reef'), false);
-  l.cash = 10000;
+  assert.equal(l.buy('hire', 'shallows'), false);
+  l.cash = 1e6;
   assert.ok(l.buy('area', 'reef'));
-  assert.ok(l.buy('manager', 'shallows'));
-  assert.equal(l.buy('manager', 'shallows'), false);
-  const n = l.areas[0].divers.length;
-  assert.ok(l.buy('up', 'divers'));
-  assert.equal(l.areas[0].divers.length, n + 1);
+  assert.equal(l.nextLedge.id, 'cave');
+  assert.ok(l.buy('hire', 'shallows'));
+  assert.equal(l.areas[0].divers.length, 2);
+  assert.equal(l.mult(l.areas[0]), 1); assert.ok(l.buy('up', 'shallows')); assert.equal(l.mult(l.areas[0]), 3);
+  for (let i = 0; i < 10; i++) l.buy('hire', 'shallows');
+  assert.equal(l.areas[0].hired, MAX_HIRE);
   let sold = false;
-  for (let i = 0; i < 30 * 30; i++) for (const e of l.step(1 / 30)) if (e.type === 'sold') sold = true;
-  assert.ok(sold, 'the manager works without taps');
-  assert.ok(RIVAL_GOAL > 1000);
+  for (let i = 0; i < 30 * 30; i++) { l.step(1 / 30); if (l.drain().some((e) => e.type === 'sold')) sold = true; }
+  assert.ok(sold, 'the hired diver works without taps');
 });
 
 test('damaged saves load safely', () => { assert.equal(normalizeSave(null).wins, 0); });

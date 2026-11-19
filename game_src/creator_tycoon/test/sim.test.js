@@ -2,60 +2,90 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Studio, RANKS, KINDS, SHOP, normalizeSave } from '../src/sim.js';
 
-/** A robot creator: starts a creation and stops the needle when it is in the zone. */
+/** A robot creator: waits until the needle is in the green zone, then taps the best unlocked button. */
 function tick(s) {
-  if (!s.cur) { s.make(['photo', 'video', 'game'][Math.floor(s.cash / 50) % 3]); }
-  else if (Math.abs(s.cur.pos - s.zone.c) < 0.03) s.stop();
+  if (s.promo) s.next();
+  const d = Math.abs(s.needle.pos - s.zone.c);
+  if (d < 0.04) { const k = s.unlocked('game') ? 'game' : s.unlocked('video') ? 'video' : 'photo'; s.tap(k); s.drain(); }
   for (const sh of SHOP) s.buy(sh.id);
-  s.step(1 / 30);
+  s.step(1 / 60);
 }
 
-test('six ranks from intern to the board', () => {
+test('six ranks from intern to the board, goals 5/10/16/22', () => {
   assert.equal(RANKS.length, 6);
   assert.equal(RANKS[0].id, 'intern');
   assert.equal(RANKS[5].id, 'board');
+  assert.deepEqual(RANKS.slice(0, 4).map((r) => r.goal), [5, 10, 16, 22]);
 });
 
 test('a robot creator reaches the board of directors', () => {
   const s = new Studio({ seed: 4 });
   let t = 0;
-  while (s.state === 'play' && t < 3000) { tick(s); t += 1 / 30; }
+  while (s.state === 'play' && t < 3000) { tick(s); t += 1 / 60; }
   console.log(`board in ${t.toFixed(0)}s, masterpieces ${s.masterpieces}, slop ${s.slop}, cash ${s.total}`);
   assert.equal(s.state, 'won');
   assert.ok(t < 1500);
 });
 
-test('green zone = masterpiece with cash and stars; far = slop and streak resets; near = a little cash', () => {
+test('the needle always swings; a tap is judged where it is: green master, yellow ok, red slop', () => {
   const s = new Studio({ seed: 2 });
-  s.make('photo'); s.cur.pos = s.zone.c;
-  assert.equal(s.stop(), 'master');
+  const p0 = s.needle.pos; s.step(0.2); assert.notEqual(s.needle.pos, p0);
+  s.needle.pos = s.zone.c;
+  assert.ok(['master', 'perfect'].includes(s.tap('photo')));
   assert.ok(s.cash > 0 && s.stars === 1 && s.streak === 1);
-  s.make('video'); s.cur.pos = Math.min(1, s.zone.c + s.zone.w * 0.75);
-  assert.equal(s.stop(), 'ok');
-  s.make('photo'); s.cur.pos = s.zone.c > 0.5 ? 0 : 1;
-  assert.equal(s.stop(), 'slop');
+  s.needle.pos = Math.min(1, s.zone.c + s.zone.w * 0.75);
+  assert.equal(s.tap('photo'), 'ok');
+  s.needle.pos = s.zone.c > 0.5 ? 0 : 1;
+  assert.equal(s.tap('photo'), 'slop');
   assert.equal(s.streak, 0);
   assert.equal(s.slop, 1);
+});
+
+test('a masterpiece moves the green zone', () => {
+  const s = new Studio({ seed: 9 });
+  const c = s.zone.c; s.needle.pos = c; s.tap('photo');
+  assert.notEqual(s.zone.c, c);
+});
+
+test('VIDEO unlocks at level 2 and GAME at level 3', () => {
+  const s = new Studio({ seed: 1 });
+  assert.equal(s.unlocked('video'), false);
+  assert.equal(s.tap('video'), null);
+  s.rank = 1; assert.equal(s.unlocked('video'), true); assert.equal(s.unlocked('game'), false);
+  s.rank = 2; assert.equal(s.unlocked('game'), true);
+});
+
+test('promotion waits for "next level"; slop never costs stars or cash', () => {
+  const s = new Studio({ seed: 1 });
+  s.stars = 4; s.needle.pos = s.zone.c; s.tap('photo');
+  assert.equal(s.rank, 1); assert.equal(s.stars, 0); assert.equal(s.promo, true);
+  s.needle.pos = 0.5; assert.equal(s.tap('photo'), null);
+  s.next(); assert.equal(s.promo, false);
+  s.stars = 3; const cash = s.cash; s.needle.pos = s.zone.c > 0.5 ? 0 : 1; s.tap('photo');
+  assert.equal(s.stars, 3); assert.equal(s.cash, cash);
 });
 
 test('shop upgrades cost cash and make things easier', () => {
   const s = new Studio();
   assert.equal(s.buy('zone'), false);
   s.cash = 1000;
-  const w0 = s.zoneW;
-  assert.ok(s.buy('zone'));
-  assert.ok(s.zoneW > w0);
-  assert.ok(s.buy('needle'));
-  assert.ok(s.needleSpeed < 1.5);
+  const w0 = s.zoneW; const v0 = s.needleSpeed;
+  assert.ok(s.buy('zone')); assert.ok(s.zoneW > w0);
+  assert.ok(s.buy('needle')); assert.ok(s.needleSpeed < v0);
 });
 
-test('orders give bonus stars and events come and go', () => {
+test('client orders from level 2 give bonus stars; hot streak at level 3; trend at level 4', () => {
   const s = new Studio({ seed: 1 });
-  s.order = { kind: 'photo', left: 1, total: 1, bonus: 3, time: 40 };
-  s.make('photo'); s.cur.pos = s.zone.c; s.stop();
-  assert.ok(s.stars >= 4);
-  let ev = false;
-  for (let i = 0; i < 30 * 40; i++) for (const e of s.step(1 / 30)) if (e.type === 'event') ev = true;
+  for (let i = 0; i < 30 * 30; i++) s.step(1 / 30);
+  assert.equal(s.order, null); // none at level 1
+  s.rank = 1; s.orderT = 0; s.step(0.1);
+  assert.ok(s.order && s.order.kind === 'video');
+  s.order = { kind: 'video', left: 1, total: 1, bonus: 3, time: 20, max: 20 };
+  s.needle.pos = s.zone.c; s.tap('video');
+  assert.ok(s.stars >= 5 || s.rank === 2);
+  const h = new Studio(); h.rank = 2; h.streak = 3; assert.equal(h.hot, true); assert.equal(h.mult, 2);
+  const t = new Studio({ seed: 3 }); t.rank = 3; let ev = false;
+  for (let i = 0; i < 30 * 60; i++) { t.step(1 / 30); if (t.drain().some((e) => e.type === 'event')) ev = true; }
   assert.ok(ev);
   assert.ok(KINDS.game.cash > KINDS.photo.cash);
 });
