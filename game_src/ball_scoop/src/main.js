@@ -32,7 +32,7 @@ const THEME = {
   space: { sky: 0x140a38, ground: 0x1c1a4a, road: 0x3a3a78, stripe: 0x4c4c9c, ra: 0x3affff, rb: 0xff4aff, icon: '🚀', prop: 'crystal', c1: 0x6a4aff, c2: 0x4affd0 },
 };
 
-const geo = { sphere: new THREE.SphereGeometry(1, 9, 7), cyl: new THREE.CylinderGeometry(0.5, 0.5, 1, 12), box: new THREE.BoxGeometry(1, 1, 1), cone: new THREE.ConeGeometry(0.5, 1, 8) };
+const geo = { sphere: new THREE.SphereGeometry(1, 8, 6), low: new THREE.SphereGeometry(1, 6, 4), cyl: new THREE.CylinderGeometry(0.5, 0.5, 1, 12), box: new THREE.BoxGeometry(1, 1, 1), cone: new THREE.ConeGeometry(0.5, 1, 8) };
 const mats = new Map();
 const M = (c, em = 0) => { const k = `${c}|${em}`; if (!mats.has(k)) mats.set(k, new THREE.MeshLambertMaterial({ color: c, emissive: em })); return mats.get(k); };
 function mesh(g, m, x, y, z, sx = 1, sy = 1, sz = 1) { const o = new THREE.Mesh(g, m); o.position.set(x, y, z); o.scale.set(sx, sy, sz); return o; }
@@ -43,7 +43,7 @@ function labelTex(text, bg, fg = '#fff') {
   const c = document.createElement('canvas'); c.width = 256; c.height = 128;
   const g = c.getContext('2d');
   if (bg) { g.fillStyle = bg; g.beginPath(); if (g.roundRect) g.roundRect(6, 6, 244, 116, 28); else g.rect(6, 6, 244, 116); g.fill(); g.strokeStyle = '#fff'; g.lineWidth = 7; g.stroke(); }
-  g.fillStyle = fg; g.font = '900 78px Tajawal, system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.strokeStyle = 'rgba(0,0,0,.6)'; g.lineWidth = 9; g.strokeText(text, 128, 68); g.fillText(text, 128, 68);
+  g.fillStyle = fg; g.font = '900 78px Tajawal, system-ui, sans-serif'; const mw = g.measureText(text).width; if (mw > 220) g.font = `900 ${Math.floor(78 * 220 / mw)}px Tajawal, system-ui, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.strokeStyle = 'rgba(0,0,0,.6)'; g.lineWidth = 9; g.strokeText(text, 128, 68); g.fillText(text, 128, 68);
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; texCache.set(k, t); return t;
 }
 function sprite(text, bg, sx, sy) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: labelTex(text, bg), transparent: true, depthTest: false })); sp.scale.set(sx, sy, 1); sp.renderOrder = 10; return sp; }
@@ -192,7 +192,7 @@ class Game {
     // decor ball piles (static instanced spheres; vanish when scooped)
     let total = 0; const sizes = [];
     for (const t of run.things) if (t.kind === 'pile') { const n = Math.min(t.n, DECOR_MAX); sizes.push(n); total += n; }
-    this.decor = new THREE.InstancedMesh(geo.sphere, new THREE.MeshPhongMaterial({ color: 0xffffff, shininess: 60, specular: 0x444444 }), Math.max(1, total));
+    this.decor = new THREE.InstancedMesh(geo.low, new THREE.MeshPhongMaterial({ color: 0xffffff, shininess: 60, specular: 0x444444 }), Math.max(1, total));
     this.decor.frustumCulled = false; this.world.add(this.decor);
     let n = 0; const col = new THREE.Color();
     for (const t of run.things) if (t.kind === 'pile') {
@@ -318,7 +318,7 @@ class Game {
         const lv = this.save.up[u.id]; const c = upgradeCost(u.id, lv); const can = c !== null && this.save.coins >= c;
         const pips = h('div', { class: 'bs-pips' }, Array.from({ length: u.max }, (_, k) => h('b', { class: k < lv ? 'on' : '' })));
         return h('div', { class: `bs-shopc${can ? ' can' : ''}` }, h('i', {}, u.icon), h('div', { class: 'bs-sn' }, ar ? u.ar : u.en), pips,
-          h('div', { class: 'bs-tiny' }, c === null ? eff(u, lv) : `${eff(u, lv)} → ${eff(u, lv + 1)}`),
+          h('div', { class: 'bs-tiny', style: 'direction:ltr' }, c === null ? eff(u, lv) : `${eff(u, lv)} → ${eff(u, lv + 1)}`),
           h('button', { class: `bs-buy${can ? ' go' : ''}`, onclick: () => { if (!can) return; this.save.coins -= c; this.save.up[u.id] += 1; this.post({ type: 'save', save: this.save }); this.sound.play('bank'); this.showMenu('shop'); } }, c === null ? I.t('max') : `🪙 ${I.num(c)}`));
       });
       card = h('div', { class: 'bs-card' }, h('div', { class: 'bs-title' }, `🛒 ${I.t('shop')}`), coins, h('div', { class: 'bs-shop' }, cards), h('button', { class: 'bs-btn dark', onclick: () => this.showMenu() }, I.t('back')));
@@ -356,7 +356,7 @@ class Game {
     const st = h('div', { class: 'bs-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= stars ? 'on' : 'off', style: `animation-delay:${k * 0.25}s` }, '★')));
     this.layer.append(h('div', { class: 'bs-dim' }, h('div', { class: 'bs-card' }, h('div', { class: 'bs-title' }, I.t('win')), st,
       h('div', { class: 'bs-pill' }, `🏦 ${I.num(r.balls)} / 🎯 ${I.num(r.goal)}`), h('div', { class: 'bs-pill' }, `🪙 +${I.num(r.coins)}`),
-      this.levelIdx < LEVELS - 1 ? h('button', { class: 'bs-btn', onclick: () => this.start(this.levelIdx + 1) }, I.t('next')) : null, h('button', { class: 'bs-btn alt', onclick: () => this.start(this.levelIdx) }, I.t('again')), h('button', { class: 'bs-btn dark', onclick: () => { this._needDemo = true; this.showMenu('levels'); } }, I.t('menu')))));
+      this.levelIdx < LEVELS - 1 ? h('button', { class: 'bs-btn', onclick: () => this.start(this.levelIdx + 1) }, I.t('next')) : null, h('div', { class: 'bs-row' }, h('button', { class: 'bs-btn alt', onclick: () => this.start(this.levelIdx) }, I.t('again')), h('button', { class: 'bs-btn dark', onclick: () => { this._needDemo = true; this.showMenu('levels'); } }, I.t('menu'))))));
   }
 
   // ---------------------------------------------------------------- loop
@@ -440,7 +440,7 @@ class Game {
     const port = this.cw < this.ch;
     let zc = T.z, tx = T.x * 0.6;
     this.camX = (this.camX ?? tx) + (tx - (this.camX ?? tx)) * Math.min(1, dt * 5);
-    let cy = port ? 9.2 : 7.4, cz = port ? 10.2 : 8.6, ly = 1.2, lz = zc + 16;
+    let cy = port ? 10.6 : 8.0, cz = port ? 9.6 : 8.2, ly = 1.2, lz = zc + 16;
     if (!play) { this.camAng += dt * 0.3; const a = Math.sin(this.camAng) * 0.5; this.camera.position.set(Math.sin(a) * 12, 5.5, -11 + Math.cos(a) * 0); this.camera.lookAt(0, 1.4, 2); }
     else {
       let k = 0;
@@ -484,6 +484,7 @@ class Game {
 }
 
 const EXTRA_CSS = `
+.bs-row{display:flex;gap:calc(var(--u)*1.6);width:100%}.bs-row .bs-btn{flex:1;padding-left:calc(var(--u)*2);padding-right:calc(var(--u)*2)}
 .bs-lvs6{grid-template-columns:repeat(3,1fr)!important}
 .bs-lvs6 .bs-lv{min-height:calc(var(--u)*22)!important}
 .bs-st{color:#ffe36a;letter-spacing:.1em;font-size:calc(var(--u)*3.2)}
@@ -505,7 +506,7 @@ const EXTRA_CSS = `
 .bs-banner small{display:block;font-size:calc(var(--u)*7);color:#fff}
 .bs-car{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:calc(var(--u)*4.5)}
 .bs-coinbig{position:absolute;left:50%;top:26%;transform:translateX(-50%);font-weight:900;font-size:calc(var(--u)*11);color:#ffe36a;-webkit-text-stroke:calc(var(--u)*.8) rgba(60,30,0,.9);paint-order:stroke fill;pointer-events:none}
-.bs-stars{font-size:calc(var(--u)*13);display:flex;gap:calc(var(--u)*1)}.bs-stars span{display:inline-block;animation:bspop .5s both}.bs-stars .on{color:#ffd23a;text-shadow:0 0 calc(var(--u)*2) #ff9a00}.bs-stars .off{color:rgba(255,255,255,.3)}
+.bs-stars{font-size:calc(var(--u)*13);display:flex;gap:calc(var(--u)*1)}.bs-stars span{display:inline-block;animation:bspop .5s backwards}.bs-stars .on{color:#ffd23a;text-shadow:0 0 calc(var(--u)*2) #ff9a00}.bs-stars .off{color:rgba(255,255,255,.3)}
 @keyframes bspop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
 `;
 S.win = ['خلصت!', 'Level complete!'];
