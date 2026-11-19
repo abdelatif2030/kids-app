@@ -52,7 +52,7 @@ function labelTex(text, bg) {
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; texCache.set(k, t); return t;
 }
 function sprite(text, bg, sx, sy) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: labelTex(text, bg), transparent: true, depthTest: false })); sp.scale.set(sx, sy, 1); sp.renderOrder = 10; return sp; }
-const ART_NAMES = ['hero', 'monster_1', 'monster_2', 'monster_3', 'boss_1', 'boss_2', 'boss_3', 'sky_1', 'sky_2', 'sky_3'];
+const ART_NAMES = ['hero_back', 'monster_1', 'monster_2', 'monster_3', 'boss_1', 'boss_2', 'boss_3', 'sky_1', 'sky_2', 'sky_3'];
 const artTex = new Map();
 function tex(img) { if (!artTex.has(img)) { const t = new THREE.Texture(img); t.colorSpace = THREE.SRGBColorSpace; t.needsUpdate = true; artTex.set(img, t); } return artTex.get(img); }
 /** A picture standing in the world (always faces the camera), `height` units tall, feet on the ground. */
@@ -60,16 +60,34 @@ function pictureSprite(img, height) { const sp = new THREE.Sprite(new THREE.Spri
 const fmt = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e4 ? `${(n / 1e3).toFixed(1)}K` : String(Math.round(n)));
 
 function makeHamster() {
+  // A hamster warrior seen from BEHIND (the camera follows him): round fluffy body, ears, puffy cheeks, a red bandana knot, a tiny
+  // tail, a sword in the right paw and a blue shield on the left arm. Legs swing while he runs (userData.legs).
   const g = new THREE.Group();
   const body = new THREE.Group();
-  body.add(mesh(geo.sphere, M(0xf0b060), 0, 0.85, 0, 1.5, 1.4, 1.5));
-  body.add(mesh(geo.sphere, M(0xfff0d8), 0, 0.7, 0.45, 1.0, 0.9, 0.7));
-  body.add(mesh(geo.sphere, M(0xf0b060), -0.5, 1.6, 0.1, 0.45, 0.5, 0.2), mesh(geo.sphere, M(0xf0b060), 0.5, 1.6, 0.1, 0.45, 0.5, 0.2));
-  body.add(mesh(geo.sphere, M(0x111111), -0.25, 1.0, 0.7, 0.16, 0.2, 0.1), mesh(geo.sphere, M(0x111111), 0.25, 1.0, 0.7, 0.16, 0.2, 0.1), mesh(geo.sphere, M(0xff8aa0), 0, 0.82, 0.78, 0.18, 0.14, 0.1));
-  body.add(mesh(geo.sphere, M(0xc8ccd4), 0, 1.5, 0.15, 1.1, 0.5, 1.1));
-  body.add(mesh(geo.box, M(0xd8dce8), 0.85, 0.9, 0.3, 0.15, 1.4, 0.15), mesh(geo.box, M(0x8a5a2a), 0.85, 0.2, 0.3, 0.3, 0.3, 0.3));
-  body.add(mesh(geo.cyl, M(0x3a6ae8), -0.85, 0.85, 0.3, 0.12, 0.9, 0.9).rotateZ(Math.PI / 2));
-  g.add(body); g.userData.body = body;
+  const orange = 0xf2a24a, dark = 0xd9822b, cream = 0xfff0d8, pink = 0xff9fb0;
+  body.add(mesh(geo.sphere, M(orange), 0, 0.95, 0, 1.7, 1.55, 1.6));            // body
+  body.add(mesh(geo.sphere, M(dark), 0, 1.15, -0.45, 1.0, 0.9, 0.5));            // darker back patch
+  body.add(mesh(geo.sphere, M(orange), 0, 1.85, 0.05, 1.35, 1.2, 1.25));         // head (seen from behind)
+  body.add(mesh(geo.sphere, M(cream), -0.78, 1.7, 0.25, 0.5, 0.5, 0.55), mesh(geo.sphere, M(cream), 0.78, 1.7, 0.25, 0.5, 0.5, 0.55)); // puffy cheeks
+  body.add(mesh(geo.sphere, M(orange), -0.55, 2.55, -0.05, 0.5, 0.55, 0.22), mesh(geo.sphere, M(orange), 0.55, 2.55, -0.05, 0.5, 0.55, 0.22)); // ears
+  body.add(mesh(geo.sphere, M(pink), -0.55, 2.55, 0.03, 0.3, 0.34, 0.12), mesh(geo.sphere, M(pink), 0.55, 2.55, 0.03, 0.3, 0.34, 0.12));
+  body.add(mesh(geo.sphere, M(pink), 0, 0.6, -0.82, 0.22, 0.22, 0.2));           // tiny tail
+  // red bandana: a band around the head with the knot behind
+  body.add(mesh(geo.cyl, M(0xe0343a), 0, 2.05, 0.02, 1.38, 0.2, 1.28), mesh(geo.sphere, M(0xe0343a), 0, 1.98, -0.72, 0.3, 0.3, 0.22), mesh(geo.sphere, M(0xc02a30), -0.25, 1.78, -0.8, 0.18, 0.4, 0.14), mesh(geo.sphere, M(0xc02a30), 0.25, 1.78, -0.8, 0.18, 0.4, 0.14));
+  // left arm + shield (seen from behind as a rounded blue dome with a gold rim)
+  body.add(mesh(geo.sphere, M(orange), -0.95, 1.05, 0.05, 0.4, 0.45, 0.4));
+  const shield = new THREE.Group();
+  shield.add(mesh(geo.cyl, M(0xffd23a), 0, 0, 0, 1.25, 0.14, 1.25), mesh(geo.sphere, M(0x3a6ae8), 0, 0.02, 0, 1.0, 0.45, 1.0));
+  shield.rotation.z = Math.PI / 2; shield.rotation.x = 0.5; shield.position.set(-1.3, 1.15, -0.1); body.add(shield);
+  // right arm raised with the sword
+  body.add(mesh(geo.sphere, M(orange), 0.95, 1.2, 0.05, 0.4, 0.45, 0.4));
+  const sword = new THREE.Group();
+  sword.add(mesh(geo.box, M(0xdfe6f2), 0, 0.85, 0, 0.16, 1.5, 0.06), mesh(geo.box, M(0xffd23a), 0, 0.12, 0, 0.55, 0.12, 0.12), mesh(geo.cyl, M(0x8a5a2a), 0, -0.1, 0, 0.12, 0.4, 0.12));
+  sword.position.set(1.15, 1.35, 0.15); sword.rotation.z = -0.35; body.add(sword);
+  // feet that swing
+  const feet = [mesh(geo.sphere, M(cream), -0.4, 0.2, 0, 0.55, 0.35, 0.75), mesh(geo.sphere, M(cream), 0.4, 0.2, 0, 0.55, 0.35, 0.75)];
+  for (const f of feet) body.add(f);
+  g.add(body); g.userData.body = body; g.userData.legs = feet; g.userData.sword = sword;
   return g;
 }
 function makeMonster(kind, boss, art, ch) {
@@ -113,7 +131,7 @@ class Game {
   _useArt(a) {
     if (this.disposed) return;
     this.art = a;
-    if (a.hero) { this.scene.remove(this.hero); this.hero = makeHamsterArt(a.hero); this.scene.add(this.hero); }
+    if (a.hero_back) { this.scene.remove(this.hero); this.hero = makeHamsterArt(a.hero_back); this.scene.add(this.hero); }
     if (ART_NAMES.some((n) => n.startsWith('sky') && a[n])) {
       this.sky = new THREE.Mesh(new THREE.PlaneGeometry(420, 210), new THREE.MeshBasicMaterial({ transparent: true, fog: false, depthWrite: false, side: THREE.DoubleSide }));
       this.sky.renderOrder = -5; this.scene.add(this.sky); this._skyFor(0);
@@ -247,6 +265,8 @@ class Game {
     const zr = play ? r.z : 0; const xr = play ? r.x : 0;
     this.hero.position.set(-xr, Math.abs(Math.sin(this.clock * 12)) * 0.15, zr);
     this.hero.userData.body.rotation.z = Math.sin(this.clock * 12) * 0.06;
+    const legs = this.hero.userData.legs; if (legs) { const k = play ? 14 : 3; legs[0].position.z = Math.sin(this.clock * k) * 0.45; legs[1].position.z = -Math.sin(this.clock * k) * 0.45; legs[0].position.y = 0.2 + Math.max(0, Math.sin(this.clock * k)) * 0.25; legs[1].position.y = 0.2 + Math.max(0, -Math.sin(this.clock * k)) * 0.25; }
+    if (this.hero.userData.sword) this.hero.userData.sword.rotation.z = -0.35 + Math.sin(this.clock * 7) * 0.12;
     this.hero.scale.setScalar(Math.min(2.4, 1 + Math.log10(Math.max(1, play ? r.power : 10)) * 0.25));
     this.hero.visible = true;
     const key = play ? fmt(r.power) : '10';

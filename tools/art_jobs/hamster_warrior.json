@@ -3,9 +3,9 @@
  "kind_sprite": "Single subject centered, full body visible, front 3/4 view, plain white background, no shadow on the ground, no text.",
  "jobs": [
   {
-   "name": "hero",
+   "name": "hero_back",
    "kind": "sprite",
-   "prompt": "A tiny brave hamster warrior with a small silver sword and a round blue shield, big shiny eyes, orange and cream fur, standing proudly, seen from behind-front 3/4."
+   "prompt": "A tiny brave hamster warrior seen strictly from BEHIND, back view, running away from the camera, a red bandana knot behind the head, a small silver sword in the right paw and a round blue shield on the left arm, orange and cream fur, round fluffy body."
   },
   {
    "name": "monster_1",
