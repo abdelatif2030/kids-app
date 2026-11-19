@@ -8,6 +8,7 @@ export const HERO = { w: 0.5, h: 1.3, cy: 0.65 };
 export const JUMP = { v0: 11.2, g: 38, holdG: 0.4, cutG: 1.8, holdMax: 0.27, coyote: 0.09, buffer: 0.12 };
 export const BELL = { y: 3.0, r: 1.2 };
 export const START_KIDS = 2;
+export const HIGH_BONUS = 2;
 export const MAX_KIDS = 40;
 export const TRIG = 12.5;
 export const ARENA = 6; // hero stops this far before the end x
@@ -54,7 +55,7 @@ export function buildLevel(n, easy = false) {
   n = Math.max(1, Math.min(NUM_LEVELS, n | 0));
   const cfg = LEVELS[n - 1];
   const r = rng(n * 7919 + 13);
-  const L = { n, len: cfg.len, speed: cfg.speed * (easy ? 0.88 : 1), boss: cfg.boss, theme: n - 1, porches: [], hazards: [], hedges: [], candies: [], potential: START_KIDS, par: { two: 0, three: 0 } };
+  const L = { n, len: cfg.len, speed: cfg.speed * (easy ? 0.88 : 1), boss: cfg.boss, theme: n - 1, porches: [], hazards: [], hedges: [], candies: [], floats: [], potential: START_KIDS, par: { two: 0, three: 0 } };
   let id = 0;
   const ri = (a, b) => a + Math.floor(r() * (b - a + 1));
   const rf = (a, b) => a + r() * (b - a);
@@ -86,7 +87,7 @@ export function buildLevel(n, easy = false) {
     if (kind === 'friendly' && last === 'friendly' && r() < 0.4) kind = 'rest';
     const px = x + 5;
     if (kind === 'friendly') {
-      const kids = ri(2, 3);
+      const kids = ri(3, 5);
       let bx = px;
       if (r() < cfg.combo) { hz({ type: 'pit', x: px - 6.5, w: 1.2 }); arc(px - 7.2, px - 5.3, 0.9, 3); }
       L.porches.push({ id: id++, x: bx, kind: 'friendly', kids, style: style++ % 4, rung: false });
@@ -95,7 +96,7 @@ export function buildLevel(n, easy = false) {
       x = bx + 4 + rf(cfg.gap[0], cfg.gap[1]);
     } else if (kind === 'grumpy') {
       L.porches.push({ id: id++, x: px, kind: 'grumpy', kids: 0, style: style++ % 4, rung: false });
-      if (r() < cfg.combo) { hz({ type: 'pit', x: px - 0.6, w: 1.2 }); arc(px - 1.6, px + 1.0, 0.8, 3); } else line(px - 2, px + 2, 0.5, 5);
+      arc(px - 1.8, px + 1.8, 1.9, 5); // candy over the grumpy door: jump it
       x = px + 4 + rf(cfg.gap[0], cfg.gap[1]);
     } else if (kind === 'pit') {
       const big = n >= 2 && r() < 0.5;
@@ -119,6 +120,7 @@ export function buildLevel(n, easy = false) {
       x = x0 + 1 + rf(cfg.gap[0], cfg.gap[1]);
     } else {
       line(px - 2, px + 4, 0.5, 6);
+      if (r() < 0.55) { const fk = ri(4, 6); L.floats.push({ id: id++, x: +(px + 1.5).toFixed(2), y: 3.2, kids: fk, got: false }); arc(px - 1.2, px + 1.5, 2.6, 4); }
       x = px + 6 + rf(cfg.gap[0] * 0.5, cfg.gap[1] * 0.5);
     }
     last = kind;
@@ -188,7 +190,7 @@ export class Sim {
     this.blocked = null;
     this.pushT = 0;
     this.boss = null;
-    this.stats = { rings: 0, scares: 0, hits: 0, recollected: 0, hedges: 0, dodged: 0 };
+    this.stats = { rings: 0, scares: 0, hits: 0, recollected: 0, hedges: 0, dodged: 0, floats: 0, perfect: 0 };
     this.trail = new Float32Array(TRAIL);
     this.result = null;
   }
@@ -276,21 +278,42 @@ export class Sim {
         if (h.x + HERO.w / 2 > b.x0 && h.x - HERO.w / 2 < b.x1 && h.y < b.top) { this._hit(hz, ev); break; }
       }
     }
-    // ---- porches
+    // ---- porches. Video rule: run past a friendly door on the ground and its bell rings (kids join); jumping through the
+    // warm bell high up rings it for a bonus. A grumpy door must be jumped over: running past it on the ground scares kids off.
     for (const p of L.porches) {
       if (p.rung || Math.abs(p.x - h.x) > 2.5) continue;
       const dx = p.x - h.x; const dy = BELL.y - (h.y + HERO.cy);
-      if (dx * dx + dy * dy < BELL.r * BELL.r) {
-        p.rung = true; this.stats.rings++;
-        if (p.kind === 'friendly') {
-          const add = Math.min(p.kids, MAX_KIDS - this.kids.length);
+      if (p.kind === 'friendly') {
+        const high = dx * dx + dy * dy < BELL.r * BELL.r;
+        if (high || (Math.abs(dx) < 0.6 && h.y < 1.4)) {
+          p.rung = true; this.stats.rings++;
+          const add = Math.min(p.kids + (high ? HIGH_BONUS : 0), MAX_KIDS - this.kids.length);
           for (let i = 0; i < add; i++) this.kids.push({ c: this.serial++, born: this.t, from: p.x });
-          ev.push({ type: 'ring', kind: 'friendly', n: add, x: p.x, id: p.id });
-        } else {
-          const { lost } = this._lose(3);
-          this.stats.scares++;
-          ev.push({ type: 'ring', kind: 'grumpy', lost, x: p.x, id: p.id });
+          ev.push({ type: 'ring', kind: 'friendly', n: add, x: p.x, id: p.id, high });
         }
+      } else if (Math.abs(dx) < 0.6 && h.y < 0.6) {
+        p.rung = true; this.stats.scares++;
+        const { lost } = this._lose(3);
+        ev.push({ type: 'ring', kind: 'grumpy', lost, x: p.x, id: p.id });
+      } else if (dx < -0.9) { p.rung = true; this.stats.dodged++; ev.push({ type: 'skip', x: p.x, id: p.id }); }
+    }
+    // ---- floating doors (hold the jump to fly through): bonus kids, never a penalty
+    for (const f of L.floats || []) {
+      if (f.got || Math.abs(f.x - h.x) > 2) continue;
+      const dx = f.x - h.x; const dy = f.y - (h.y + HERO.cy);
+      if (dx * dx + dy * dy < 1.3 * 1.3) {
+        f.got = true; this.stats.floats++;
+        const add = Math.min(f.kids, MAX_KIDS - this.kids.length);
+        for (let i = 0; i < add; i++) this.kids.push({ c: this.serial++, born: this.t, from: f.x });
+        ev.push({ type: 'float', n: add, x: f.x, y: f.y });
+      }
+    }
+    // ---- a "Perfect!" jump: airborne near the top of the arc right over the middle of a pit
+    for (const hz of L.hazards) {
+      if (hz.type !== 'pit' || hz.perfect || hz.w < 1) continue;
+      if (h.x >= hz.x + hz.w / 2 && h.x < hz.x + hz.w / 2 + 0.3) {
+        hz.perfect = true;
+        if (h.y > 1.1 && !hz.hit) { this.candy += 5; this.stats.perfect++; ev.push({ type: 'perfect', x: hz.x + hz.w / 2, y: h.y }); }
       }
     }
     // ---- candy

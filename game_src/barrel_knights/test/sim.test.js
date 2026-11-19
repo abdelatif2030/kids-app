@@ -91,8 +91,8 @@ test('the match ends by time (a lead wins, a draw goes to overtime then ends)', 
   run(lead, 2); assert.equal(lead.phase, 'over'); assert.ok(lead.result().win);
 });
 
-test('first to five goals ends the match', () => {
-  const m = new Match({ seed: 5 }); run(m, 4); m.score = [4, 0];
+test('first to two goals ends the match', () => {
+  const m = new Match({ seed: 5 }); run(m, 4); m.score = [1, 0];
   m.barrel.x = 0; m.barrel.z = -PITCH.hl + 2; m.barrel.vz = -16;
   run(m, 6);
   assert.equal(m.phase, 'over'); assert.equal(m.result().stars, 3);

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Sim, buildLevel, normalizeSave, applyResult, buyCostume, kidSlot, hazardBox, BELL, NUM_LEVELS, DT, JUMP, COSTUMES } from '../src/sim.js';
+import { Sim, buildLevel, normalizeSave, applyResult, buyCostume, kidSlot, hazardBox, BELL, HIGH_BONUS, NUM_LEVELS, DT, JUMP, COSTUMES } from '../src/sim.js';
 
 /** Peak height of one jump held for `hold` seconds. */
 function peak(hold) {
@@ -41,29 +41,47 @@ test('variable jump: height grows with hold time', () => {
   assert.ok(hs[4] <= 3.5, `cap ${hs[4]}`);
 });
 
-test('friendly porch: jumping to the bell adds kids; passing on the ground does not', () => {
+test('friendly porch: running past on the ground rings it, jumping through the bell gives a bonus', () => {
   const data = flat({ porches: [{ id: 1, x: 20, kind: 'friendly', kids: 3, style: 0, rung: false }] });
+  const b = new Sim({ data }); const before = b.kids.length;
+  const evb = []; for (let i = 0; i < 60 * 6; i++) evb.push(...b.step(DT, {}));
+  assert.ok(evb.some((e) => e.type === 'ring' && e.kind === 'friendly' && !e.high));
+  assert.equal(b.kids.length, before + 3);
   const a = new Sim({ data });
-  const before = a.kids.length;
   const ev = runWithJump(a, 20 - 3.0, 0.2);
-  assert.ok(ev.some((e) => e.type === 'ring' && e.kind === 'friendly'));
-  assert.equal(a.kids.length, before + 3);
-  const b = new Sim({ data });
-  for (let i = 0; i < 60 * 6; i++) b.step(DT, {});
-  assert.equal(b.kids.length, before);
+  assert.ok(ev.some((e) => e.type === 'ring' && e.kind === 'friendly' && e.high));
+  assert.equal(a.kids.length, before + 3 + HIGH_BONUS);
 });
 
-test('grumpy porch: ringing scares kids away, staying low is safe', () => {
+test('grumpy porch: running past on the ground scares kids away, jumping over is safe', () => {
   const data = flat({ porches: [{ id: 1, x: 20, kind: 'grumpy', kids: 0, style: 0, rung: false }] });
   const a = new Sim({ data, startKids: 6 });
-  const ev = runWithJump(a, 20 - 3.0, 0.2);
-  assert.ok(ev.some((e) => e.type === 'ring' && e.kind === 'grumpy'));
+  const evs = []; for (let i = 0; i < 60 * 6; i++) evs.push(...a.step(DT, {}));
+  assert.ok(evs.some((e) => e.type === 'ring' && e.kind === 'grumpy'));
   assert.equal(a.kids.length, 3);
   const b = new Sim({ data, startKids: 6 });
-  runWithJump(b, 20 - 3.0, 0.0); // a tap jump stays below the bell
+  runWithJump(b, 20 - 2.2, 0.1); // a short held jump clears the door
   assert.equal(b.kids.length, 6);
 });
 
+test('floating door: a held jump through it adds kids; underneath nothing happens', () => {
+  const data = flat({ floats: [{ id: 1, x: 20, y: 3.2, kids: 5, got: false }] });
+  const a = new Sim({ data }); const before = a.kids.length;
+  const ev = runWithJump(a, 20 - 3.0, 0.27);
+  assert.ok(ev.some((e) => e.type === 'float'));
+  assert.equal(a.kids.length, before + 5);
+  const b = new Sim({ data }); for (let i = 0; i < 60 * 6; i++) b.step(DT, {});
+  assert.equal(b.kids.length, before);
+});
+
+test('Perfect: jumping in the middle of a pit pays candy; a late jump does not', () => {
+  const data = flat({ hazards: [{ id: 1, type: 'pit', x: 20, w: 1.4, hit: false, passed: false, on: false, gone: 0, v: 0, phase: 0, loss: 1 }] });
+  let best = 0;
+  for (let at = 15; at < 19.5; at += 0.1) { const s = new Sim({ data }); runWithJump(s, at, 0.1); best = Math.max(best, s.stats.perfect); }
+  assert.equal(best, 1);
+  const idle = new Sim({ data }); for (let i = 0; i < 60 * 6; i++) idle.step(DT, {});
+  assert.equal(idle.stats.perfect, 0);
+});
 test('hedge needs enough kids', () => {
   const data = flat({ hedges: [{ id: 1, x: 15, need: 6, push: 0, broken: false }] });
   const few = new Sim({ data, startKids: 2 });
@@ -195,11 +213,11 @@ test('a robot also finishes the easy mode (age 3)', () => {
   assert.equal(s.state, 'won');
 });
 
-test('a player who never jumps rings nothing and ends with fewer kids than the robot', () => {
+test('a player who never jumps gets scared off and ends with fewer kids than the robot', () => {
   const idle = new Sim({ level: 2, seed: 5 });
   for (let i = 0; i < 60 * 400 && idle.state !== 'won'; i++) idle.step(DT, {});
   const { s } = robotRun(2);
-  assert.equal(idle.stats.rings, 0);
+  assert.ok(idle.stats.scares > 0);
   assert.ok(idle.kids.length < s.kids.length, `${idle.kids.length} vs ${s.kids.length}`);
 });
 

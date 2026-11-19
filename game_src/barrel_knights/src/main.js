@@ -18,7 +18,7 @@ const S = {
   how: ['اسحب بإصبعك للحركة، واضغط اندفاع لدفع البرميل وإبعاد الخصوم', 'Drag to move, press DASH to shove the barrel and bump rivals'],
   how2: ['ادفع البرميل العملاق داخل بوابة الخصم! الأبواب المخفية والصخور والطين بتتنبّه قبل ما تشتغل.', 'Push the giant barrel through the rival gate! Trapdoors, boulders and mud always warn you first.'],
   colors: ['ألوان الدرع', 'Armour'], helmets: ['الخوذات', 'Helmets'], equipped: ['لابسه', 'On'], notEnough: ['العملات مش كفاية', 'Not enough coins'], tapSound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
-  final: ['النهائي', 'FINAL'], yourTeam: ['فريقك', 'You'], rivals: ['الخصوم', 'Rivals'],
+  final: ['النهائي', 'FINAL'], match: ['مباراة', 'MATCH'], first: ['الأول لهدفين', 'FIRST TO 2'], ready: ['استعد؟', 'READY?'], tip: ['ادفع البرميل داخل بوابتهم!', 'SHOVE IT THROUGH THEIR GATE!'], yourTeam: ['فريقك', 'You'], rivals: ['الخصوم', 'Rivals'],
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'],
 };
 const I = makeI18n(S);
@@ -67,7 +67,7 @@ function netTex() { return canvasTex(128, 128, (g, w, hh) => { g.clearRect(0, 0,
 function makeBarrel() {
   const g = new THREE.Group(); const yaw = new THREE.Group(); const roll = new THREE.Group(); g.add(yaw); yaw.add(roll);
   const tex = woodTexture(); const body = new THREE.Group(); body.rotation.z = Math.PI / 2; roll.add(body);
-  const pts = []; const hh = 0.95;
+  const pts = []; const hh = 0.95 * BARREL_R / 1.15;
   for (let i = 0; i <= 10; i++) { const y = -hh + (2 * hh * i) / 10; const t = y / hh; pts.push(new THREE.Vector2(BARREL_R * (1 - 0.16 * t * t), y)); }
   const wood = new THREE.MeshLambertMaterial({ map: tex });
   body.add(new THREE.Mesh(new THREE.LatheGeometry(pts, 28), wood));
@@ -201,9 +201,13 @@ class Game {
     for (const s of [-1, 1]) {
       const col = s > 0 ? 0x2a6ae8 : RIVAL_COLOR;
       const gp = new THREE.Group(); gp.position.z = s * hl; A.add(gp);
-      for (const x of [-gate, gate]) { gp.add(mesh(geo.cyl, M(0xf4f0e0), x, 1.9, 0, 0.7, 3.8, 0.7), mesh(geo.sphere, M(col), x, 3.9, 0, 0.9, 0.9, 0.9)); }
-      gp.add(mesh(geo.box, M(0xf4f0e0), 0, 3.6, 0, gate * 2, 0.5, 0.5));
-      const ban = mesh(geo.box, M(col, 0x111111), 0, 4.6, 0, gate * 2 - 0.4, 1.1, 0.12); gp.add(ban);
+      const brick = M(0xb27a52), brickD = M(0x8a5a3a), dark = new THREE.MeshBasicMaterial({ color: 0x120c0a });
+      for (const x of [-gate, gate]) { gp.add(mesh(geo.box, brick, x, 2.6, 0, 1.5, 5.2, 1.5), mesh(geo.box, brickD, x, 5.35, 0, 1.9, 0.35, 1.9)); }
+      gp.add(mesh(geo.box, brick, 0, 5.4, 0, gate * 2 + 1.5, 1.3, 1.5)); for (let i = -3; i <= 3; i++) gp.add(mesh(geo.box, brickD, i * (gate * 2 / 6), 6.2, 0, 1.1, 0.5, 1.7));
+      const ban = mesh(geo.box, M(col, 0x111111), 0, 4.55, s * 0.9, gate * 2 - 0.4, 0.7, 0.12); gp.add(ban);
+      // the stone end wall with the dark opening behind the gate (the video's arena has a castle wall at each end)
+      gp.add(mesh(geo.box, brick, 0, 4, s * (pocket + 0.9), hw * 2 + 8, 8, 1.6), mesh(geo.box, dark, 0, 2.2, s * (pocket + 0.05), gate * 2 - 0.5, 4.4, 0.1));
+      for (const x of [-hw - 3, hw + 3]) gp.add(mesh(geo.cyl, brickD, x, 5, s * (pocket + 0.9), 3.2, 10, 3.2));
       const back = mesh(new THREE.PlaneGeometry(gate * 2, 3.4), new THREE.MeshBasicMaterial({ map: nt, transparent: true, side: THREE.DoubleSide, depthWrite: false }), 0, 1.7, s * pocket); gp.add(back);
       for (const x of [-gate, gate]) { const side = mesh(new THREE.PlaneGeometry(pocket, 3.4), new THREE.MeshBasicMaterial({ map: nt, transparent: true, side: THREE.DoubleSide, depthWrite: false }), x, 1.7, s * pocket / 2); side.rotation.y = Math.PI / 2; gp.add(side); }
       const floor = mesh(geo.box, M(col, 0x000000), 0, 0.02, s * pocket / 2, gate * 2, 0.02, pocket); floor.material = new THREE.MeshLambertMaterial({ color: col, transparent: true, opacity: 0.4 }); gp.add(floor);
@@ -223,7 +227,7 @@ class Game {
     const place = (x, z, rowsAlong, rows, along, face) => crowdN.push({ x, z, rowsAlong, rows, along, face });
     // side stands (x), far end (-z), near end (+z)
     place(-hw - 3.5, 0, 'z', 4, hl * 2, 1); place(hw + 3.5, 0, 'z', 4, hl * 2, -1);
-    place(0, -hl - 3.5, 'x', 3, hw * 2 + 6, 1); place(0, hl + 3.5, 'x', 3, hw * 2 + 6, -1);
+    
     const heads = []; const cols = [0xe84a4a, 0x4a8ae8, 0xf0c030, 0x4ac870, 0xe86ab8, 0xf2f2f2, 0x9a5ae8, 0xff8a2a];
     for (const st of crowdN) {
       for (let r = 0; r < st.rows; r++) {
@@ -307,7 +311,7 @@ class Game {
     this.playerColor = pc;
     for (const k of m.knights) {
       const g = makeKnight(k.team === 0 ? pc : RIVAL_COLOR, k.human ? this.save.helmet : k.team === 0 ? 'bucket' : (k.slot === 0 ? 'horns' : k.slot === 1 ? 'crest' : 'bucket'), k.human && this.real);
-      this.dyn.add(g); this.kMesh.push(g);
+      g.userData.inner.scale.setScalar(1.1); this.dyn.add(g); this.kMesh.push(g);
     }
     this.barrelMesh = makeBarrel(); this.dyn.add(this.barrelMesh);
     const shadow = mesh(new THREE.CircleGeometry(1.5, 20), new THREE.MeshBasicMaterial({ color: 0, transparent: true, opacity: 0.3, depthWrite: false }), 0, 0.03, 0); shadow.rotation.x = -Math.PI / 2; this.dyn.add(shadow); this.barrelShadow = shadow;
@@ -362,7 +366,10 @@ class Game {
     for (const ev of ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown']) this.root.addEventListener(ev, unlock, { capture: true, passive: true });
     this.root.addEventListener('pointerdown', (e) => {
       if (e.target.closest('button') || this.mode !== 'play' || this.paused || this.stick) return;
-      this.stick = { id: e.pointerId, ox: e.clientX, oy: e.clientY, x: 0, z: 0 }; this._stickUi(true, e);
+      this.stick = { id: e.pointerId, ox: e.clientX, oy: e.clientY, x: 0, z: 0, fixed: false };
+      // the video has a fixed joystick at the bottom-left: a touch that starts on it uses its centre; anywhere else floats
+      if (this.baseEl) { const r = this.baseEl.getBoundingClientRect(); const cx = r.left + r.width / 2, cy = r.top + r.height / 2; if (Math.hypot(e.clientX - cx, e.clientY - cy) < r.width * 0.75) { this.stick.ox = cx; this.stick.oy = cy; this.stick.fixed = true; } }
+      this._stickUi(true, e);
     });
     this.root.addEventListener('pointermove', (e) => {
       const s = this.stick; if (!s || s.id !== e.pointerId) return;
@@ -389,8 +396,9 @@ class Game {
 
   _stickUi(on, e) {
     if (!this.stickEl) return;
-    if (!on) { this.stickEl.style.display = 'none'; return; }
+    if (!on) { this.stickEl.style.display = 'none'; if (this.baseKnob) this.baseKnob.style.transform = ''; return; }
     const r = this.root.getBoundingClientRect(); const s = this.stick;
+    if (s.fixed && this.baseKnob) { this.stickEl.style.display = 'none'; const R = this.u * 9; this.baseKnob.style.transform = `translate(${s.x * R}px,${s.z * R}px)`; return; }
     this.stickEl.style.display = 'block'; this.stickEl.style.left = `${s.ox - r.left}px`; this.stickEl.style.top = `${s.oy - r.top}px`;
     const R = this.u * 9; this.knobEl.style.transform = `translate(${s.x * R}px,${s.z * R}px)`;
     void e;
@@ -489,23 +497,30 @@ class Game {
     this._hud();
     this.camSnap = true;
     const ar = I.getLang() !== 'en'; const r = this.m.cfg;
-    this._banner(`${I.t('round')} ${I.num(i + 1)}`, ar ? r.ar : r.en, 2400);
+    // the video opens with a plaque: MATCH n, the match name, FIRST TO 2; the clock starts after it
+    this.introT = 1.9;
+    this.introEl = h('div', { class: 'bk-intro' }, h('div', { class: 'bk-plaque' },
+      h('div', { class: 'bk-ribbon' }, `${I.t('match')} ${I.num(i + 1)}`), h('div', { class: 'bk-mname' }, ar ? r.ar : r.en), h('div', { class: 'bk-first' }, I.t('first'))));
+    this.layer.append(this.introEl);
   }
 
   _hud() {
     const pause = h('button', { class: 'bk-round', 'aria-label': I.t('paused'), onclick: () => this.togglePause() }, '⏸');
     this.scoreA = h('b', {}, '0'); this.scoreB = h('b', {}, '0'); this.timeEl = h('span', { class: 'bk-time' }, '2:00');
-    const board = h('div', { class: 'bk-board' }, h('div', { class: 'bk-score' }, h('i', { class: 'bk-dot', style: `background:#${this.playerColor.toString(16).padStart(6, '0')}` }), this.scoreA, h('em', {}, '-'), this.scoreB, h('i', { class: 'bk-dot', style: `background:#${RIVAL_COLOR.toString(16).padStart(6, '0')}` })), this.timeEl);
+    const shield = (c, ico) => h('i', { class: 'bk-shield', style: `--c:#${c.toString(16).padStart(6, '0')}` }, ico);
+    const board = h('div', { class: 'bk-board' }, h('div', { class: 'bk-score' }, shield(this.playerColor, '🏰'), this.scoreA, h('em', {}, '-'), this.scoreB, shield(RIVAL_COLOR, '☀')), this.timeEl);
+    this.matchBadge = h('div', { class: 'bk-mbadge' }, h('small', {}, I.t('match')), h('b', {}, I.num(this.round + 1)));
+    this.baseKnob = h('div', { class: 'bk-bknob' }); this.baseEl = h('div', { class: 'bk-base' }, this.baseKnob);
     this.dashFill = h('div', { class: 'bk-dashfill' });
     this.dashBtn = h('button', { class: 'bk-dash', 'aria-label': I.t('dash'), onpointerdown: (e) => { e.preventDefault(); if (this.m && !this.paused) this.m.pressDash(); } }, this.dashFill, h('span', {}, '🛡️'), h('small', {}, I.t('dash')));
     this.knobEl = h('div', { class: 'bk-knob' }); this.stickEl = h('div', { class: 'bk-stick' }, this.knobEl);
     this.bannerEl = h('div', { class: 'bk-banner' }); this.hintEl = h('div', { class: 'bk-hint', style: 'top:calc(var(--u)*22)' });
-    this.layer.append(h('div', { class: 'bk-top' }, pause, board, h('div', { style: 'width:calc(var(--u)*10.5)' })), this.stickEl, this.dashBtn, this.bannerEl, this.hintEl);
-    this._soundPill(); this.hint(I.t('how'), 4200);
+    this.layer.append(h('div', { class: 'bk-top', style: 'direction:ltr' }, this.matchBadge, board, pause), this.baseEl, this.stickEl, this.dashBtn, this.bannerEl, this.hintEl);
+    this._soundPill();
   }
 
-  _banner(big, small, ms = 1800, color = '#ffd23a') {
-    const b = this.bannerEl; if (!b) return; b.replaceChildren(...[h('div', { class: 'bk-bigtxt', style: `color:${color}` }, big), small ? h('div', { class: 'bk-subtxt' }, small) : null].filter(Boolean));
+  _banner(big, small, ms = 1800, color = '#ffd23a', ribbon = false) {
+    const b = this.bannerEl; if (!b) return; b.replaceChildren(...[h('div', { class: ribbon ? 'bk-goalrib' : 'bk-bigtxt', style: ribbon ? '' : `color:${color}` }, big), small ? h('div', { class: 'bk-subtxt' }, small) : null].filter(Boolean));
     b.classList.remove('show'); void b.offsetWidth; b.classList.add('show'); clearTimeout(this._bt); this._bt = setTimeout(() => b.classList.remove('show'), ms);
   }
 
@@ -544,8 +559,8 @@ class Game {
     for (const e of evs) {
       const k = e.id !== undefined && m.knights[e.id];
       switch (e.type) {
-        case 'count': if (live) { this.sound.play('count'); this._banner(I.num(e.n), '', 900, '#fff'); } break;
-        case 'go': if (live) { this.sound.play('go'); this.sound.play('whistle'); this._banner(I.t('go'), '', 900, '#7af07a'); } break;
+        case 'count': if (live) { this.sound.play('count'); this._banner(I.num(e.n), I.t('ready'), 900, '#fff'); } break;
+        case 'go': if (live) { this.sound.play('go'); this.sound.play('whistle'); this._banner(I.t('go'), '', 900, '#7af07a'); if (m.kickoffs === 1) this.hint(I.t('tip'), 3600); } break;
         case 'dash': if (k) { this.puff(k.x, 0.3, k.z, 8, 0xe8d8b0, 2.5); if (live) this.sound.play('dash'); } break;
         case 'barrelHit': { const b = m.barrel; this.puff(b.x, 0.8, b.z, 5 + Math.round(e.power * 10), e.dash ? 0xffe9a0 : 0xe8d8b0, 3 + e.power * 4); if (live) { this.sound.play('thud', e.power); if (e.dash) this.sound.play('clang'); } if (e.power > 0.5) this.shakeT = Math.max(this.shakeT, 0.25 + e.power * 0.2); break; }
         case 'fence': if (live) this.sound.play('fence', e.power); break;
@@ -559,7 +574,7 @@ class Game {
         case 'boulderGo': if (live) this.sound.play('rumble'); break;
         case 'goal': {
           this.cheer = 3; this.goalTeam = e.team; this.shakeT = 0.5;
-          if (live) { this.sound.play(e.team === 0 ? 'goal' : 'conceded'); if (e.team !== 0) this.sound.swell(0.07, 1.6); this._banner(I.t('goal'), `${I.num(e.score[0])} - ${I.num(e.score[1])}`, 2300, e.team === 0 ? '#ffd23a' : '#ff8a8a'); }
+          if (live) { this.sound.play(e.team === 0 ? 'goal' : 'conceded'); if (e.team !== 0) this.sound.swell(0.07, 1.6); this._banner(I.t('goal'), '', 2300, e.team === 0 ? '#ffd23a' : '#ff8a8a', true); }
           const gz = e.team === 0 ? -PITCH.hl : PITCH.hl; for (let i = 0; i < 70; i++) this.puff((Math.random() - 0.5) * 10, 1 + Math.random() * 3, gz + (e.team === 0 ? 1 : -1) * Math.random() * 3, 1, [0xffd23a, 0xff5a8a, 0x5ae8ff, 0x7af07a, 0xffffff][i % 5], 5, -4, 3);
           break;
         }
@@ -574,7 +589,8 @@ class Game {
     const now = performance.now(); const dt = Math.min(0.05, (now - this.last) / 1000); this.last = now; this.clock += dt;
     const m = this.m;
     if (m && this.dyn.visible) {
-      if (this.mode === 'play' && !this.paused) { if (!this.over || this.overT > 0) { this._readInput(); this._events(m.step(dt)); } }
+      if (this.mode === 'play' && !this.paused && this.introT > 0) { this.introT -= dt; if (this.introT <= 0 && this.introEl) { this.introEl.remove(); this.introEl = null; } }
+      else if (this.mode === 'play' && !this.paused) { if (!this.over || this.overT > 0) { this._readInput(); this._events(m.step(dt)); } }
       else if (this.mode === 'menu') { this._events(m.step(dt)); if (m.phase === 'over') this._demo(); }
       if (this.mode === 'play' && this.over && this.resEv && !this.resShown) { this.overT -= dt; if (this.overT <= 0) { this.resShown = true; this._results(this.resEv); } }
       if (this.mode === 'play' && !this.over) this.resShown = false;
@@ -659,12 +675,12 @@ class Game {
     }
     const m = this.m; if (!m) return;
     const vf = (cam.fov * Math.PI) / 180; const hf = 2 * Math.atan(Math.tan(vf / 2) * asp);
-    const needW = portrait ? 20 : 34; const needD = portrait ? 27 : 32;
+    const needW = portrait ? 17 : 30; const needD = portrait ? 21 : 28;
     const L = Math.max(needW / 2 / Math.tan(hf / 2), needD / 2 / Math.tan(vf / 2) * 0.95);
     const pitch = 0.95; // radians above the horizon
     const b = m.barrel; const p = m.knights[0];
     let tx = lerp(b.x, p.x, this.real ? 0.35 : 0), tz = lerp(b.z, p.z, this.real ? 0.35 : 0);
-    const lim = Math.max(0, PITCH.hl - (portrait ? 14 : 8)); tz = clamp(tz, -lim, lim);
+    const lim = Math.max(0, PITCH.hl - 8); tz = clamp(tz, -lim, lim);
     const lx = Math.max(0, PITCH.hw - (portrait ? 3 : 5)); const slack = portrait ? 1 : 0.4; tx = clamp(tx * slack, -lx, lx);
     if (this.mode === 'menu') { tx = Math.sin(this.clock * 0.1) * 3; tz = Math.sin(this.clock * 0.15) * 8; }
     const k = this.camSnap ? 1 : Math.min(1, dt * 3.5); this.camSnap = false;
@@ -714,6 +730,26 @@ const EXTRA_CSS = `
 @keyframes bkpulse{50%{transform:scale(1.07)}}
 .bk-card.res{gap:calc(var(--u)*1.2)}.bk-stars{direction:ltr}
 @media (orientation:landscape){.bk-card.res{display:grid;grid-template-columns:1fr 1fr;width:calc(var(--u)*130);align-items:center}.bk-card.res>.bk-logo,.bk-card.res>.bk-bigscore,.bk-card.res>.bk-stars,.bk-card.res>.bk-small{grid-column:1/3}.bk-card.res .bk-btn{min-height:calc(var(--u)*9);font-size:calc(var(--u)*4)}.bk-card.res .bk-bigscore{font-size:calc(var(--u)*8)}.bk-card.res .bk-stars{font-size:calc(var(--u)*7)}.bk-card.res .bk-logo{font-size:calc(var(--u)*6)!important}}
+.bk-top{align-items:flex-start}
+.bk-mbadge{width:calc(var(--u)*10);height:calc(var(--u)*11);background:linear-gradient(180deg,#6a6a70,#34343a);border:calc(var(--u)*.5) solid #d8b45a;border-radius:calc(var(--u)*1.6) calc(var(--u)*1.6) calc(var(--u)*5) calc(var(--u)*5);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-weight:900;line-height:1}.bk-mbadge small{font-size:calc(var(--u)*2.1)}.bk-mbadge b{font-size:calc(var(--u)*5)}
+.bk-shield{width:calc(var(--u)*7);height:calc(var(--u)*8);margin:calc(var(--u)*-1.6) 0;background:linear-gradient(180deg,var(--c),#0006);border:calc(var(--u)*.5) solid #e8c860;border-radius:calc(var(--u)*1.2) calc(var(--u)*1.2) calc(var(--u)*4) calc(var(--u)*4);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:calc(var(--u)*4.2);color:#fff}
+.bk-score{border-color:#2a8a6a;background:linear-gradient(180deg,#1f6a52,#0f3a2c);padding:calc(var(--u)*.5) calc(var(--u)*2)}
+.bk-score b{font-size:calc(var(--u)*6.4)}
+.bk-time{font-size:calc(var(--u)*3.4);padding:0 calc(var(--u)*2.6);background:linear-gradient(180deg,#5a5a60,#2e2e34);border-color:#d8b45a}
+.bk-intro{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;background:rgba(10,6,4,.35);animation:bkfade 1.9s linear forwards}
+@keyframes bkfade{0%{opacity:0}8%{opacity:1}86%{opacity:1}100%{opacity:0}}
+.bk-plaque{background:linear-gradient(180deg,#3a3a40,#1c1c22);border:calc(var(--u)*.9) solid #d8a840;border-radius:calc(var(--u)*3);padding:calc(var(--u)*5) calc(var(--u)*8);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*2.6);min-width:calc(var(--u)*60);box-shadow:0 0 calc(var(--u)*3) #000a}
+.bk-ribbon{background:linear-gradient(180deg,#2aa86a,#127a48);color:#fff;font-weight:900;font-size:calc(var(--u)*5.6);padding:calc(var(--u)*.8) calc(var(--u)*6);border-radius:calc(var(--u)*1);border:calc(var(--u)*.4) solid #e8c860;margin-top:calc(var(--u)*-9)}
+.bk-mname{color:#fff;font-weight:900;font-size:calc(var(--u)*7.4);text-align:center;line-height:1.15;text-shadow:0 calc(var(--u)*.6) 0 #000}
+.bk-first{background:linear-gradient(180deg,#fff,#d9d3c4);color:#2a2a2a;font-weight:900;font-size:calc(var(--u)*3.8);padding:calc(var(--u)*.7) calc(var(--u)*6);border-radius:999px;border:calc(var(--u)*.4) solid #b89040}
+.bk-goalrib{background:linear-gradient(180deg,#2aa86a,#127a48);color:#fff;font-weight:900;font-size:calc(var(--u)*13);padding:calc(var(--u)*1) calc(var(--u)*10);border:calc(var(--u)*.8) solid #e8c860;border-radius:calc(var(--u)*1.6);text-shadow:0 calc(var(--u)*.8) 0 #0a4a2a;box-shadow:0 calc(var(--u)*1) calc(var(--u)*2) #0008;line-height:1.1}
+.bk-hint{background:linear-gradient(180deg,#f2eee0,#d8d2bc)!important;color:#2a2418!important;border:calc(var(--u)*.4) solid #7a6a40;font-weight:900;border-radius:calc(var(--u)*3)!important}
+.bk-base{position:absolute;left:max(calc(var(--u)*4),env(safe-area-inset-left));bottom:max(calc(var(--u)*5),env(safe-area-inset-bottom));width:calc(var(--u)*24);height:calc(var(--u)*24);border-radius:50%;border:calc(var(--u)*1.1) solid #d8b45a;background:radial-gradient(circle,#5a7a62,#2f4a3a);opacity:.9;pointer-events:none;box-shadow:0 calc(var(--u)*.8) calc(var(--u)*2) #0007}
+.bk-bknob{position:absolute;left:50%;top:50%;width:calc(var(--u)*10);height:calc(var(--u)*10);margin:calc(var(--u)*-5) 0 0 calc(var(--u)*-5);border-radius:50%;background:radial-gradient(circle at 35% 30%,#8af0b0,#1f9a64);border:calc(var(--u)*.6) solid #e8c860}
+.bk-dash{background:radial-gradient(circle,#ff8a2a,#d03a08)!important;border-color:#e8c060!important}
+.bk-dash:not(.ready){background:radial-gradient(circle,#6a7078,#383c42)!important}
+.bk-dash .bk-dashfill{background:conic-gradient(#35e0b0 var(--f),rgba(0,0,0,.25) 0);-webkit-mask:radial-gradient(circle,transparent 66%,#000 68%);mask:radial-gradient(circle,transparent 66%,#000 68%)}
+.bk-dash span{display:none}.bk-dash small{font-size:calc(var(--u)*5.4)!important;text-shadow:0 calc(var(--u)*.4) 0 #0007}
 .bk-bigscore{font-size:calc(var(--u)*12);font-weight:900;color:#fff;direction:ltr}
 .bk-stars{font-size:calc(var(--u)*11)}.bk-stars span{display:inline-block;animation:bkpop2 .5s both}.bk-stars .off{filter:grayscale(1);opacity:.3}
 @keyframes bkpop2{from{transform:scale(0) rotate(-90deg)}to{transform:scale(1)}}

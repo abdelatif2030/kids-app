@@ -1,11 +1,11 @@
 // Barrel Knights: pure deterministic match logic (no DOM, no three.js). Team 0 = the player's team (defends the +z gate,
 // attacks the gate at -z); team 1 = rivals. A giant barrel is pushed through the opposing gate. Knights dash (shove the
 // barrel, stun rivals briefly), hazards are always telegraphed (trapdoors, mud, boulders on warned lanes). Nobody is hurt.
-export const PITCH = { hw: 15, hl: 26, gate: 5, pocket: 3.5 };
-export const BARREL_R = 1.15;
-export const KNIGHT_R = 0.8;
-export const MATCH_TIME = 120;
-export const GOAL_LIMIT = 5;
+export const PITCH = { hw: 15, hl: 20, gate: 5, pocket: 3.5 };
+export const BARREL_R = 1.6; // the video's barrel is about three knights wide
+export const KNIGHT_R = 0.7;
+export const MATCH_TIME = 60; // the video: one minute, first to two
+export const GOAL_LIMIT = 2;
 export const OVERTIME = 30;
 export const DIFFS = ['easy', 'normal', 'hard'];
 const KNIGHT_SPEED = 7.2, DASH_SPEED = 17.5, DASH_TIME = 0.28, ACCEL = 40;
@@ -24,9 +24,9 @@ export const ROUNDS = [
   { id: 'dragon', ar: 'كأس التنين', en: 'Dragon Cup', skill: 0.28, mud: 4, doors: 6, boulderEvery: 6, look: 'night' },
   { id: 'royal', ar: 'الكأس الملكي', en: 'Royal Final', skill: 0.32, mud: 4, doors: 6, boulderEvery: 5.5, look: 'royal', final: true },
 ];
-export const DOOR_SPOTS = [[-8, -6], [8, 6], [8, -6], [-8, 6], [0, -14], [0, 14], [-9, -16], [9, 16]];
-export const MUD_SPOTS = [[-7, 0], [7, 0], [0, -10], [0, 10], [-9, -13], [9, 13]];
-export const LANES = [-18, -12, -6, 6, 12, 18];
+export const DOOR_SPOTS = [[-8, -6], [8, 6], [8, -6], [-8, 6], [0, -12], [0, 12], [-9, -15], [9, 15]];
+export const MUD_SPOTS = [[-7, 0], [7, 0], [0, -9], [0, 9], [-9, -12], [9, 12]];
+export const LANES = [-15, -10, -5, 5, 10, 15];
 
 export const COLORS = [
   { id: 'blue', hex: 0x2a6ae8, price: 0, ar: 'أزرق', en: 'Blue' },
@@ -128,7 +128,7 @@ export class Match {
     this.phase = 'kickoff'; this.phaseT = len; this.lastCount = 99; this.kickoffs++;
     for (const k of this.knights) {
       const s = k.team === 0 ? 1 : -1;
-      const f = [[0, 6], [-7, 9], [7, 9], [0, 17]][k.slot];
+      const f = [[0, 5], [-6, 7], [6, 7], [0, 13]][k.slot];
       k.x = f[0]; k.z = s * f[1]; k.vx = k.vz = 0; k.fx = 0; k.fz = -s; k.stun = 0; k.immune = 0; k.dash = 0; k.cd = 0.5; k.fall = null; k.cmd = { x: 0, z: 0, dash: false };
     }
     const b = this.barrel; b.x = 0; b.z = 0; b.vx = b.vz = 0; b.idle = 0;
@@ -208,7 +208,7 @@ export class Match {
 
   result() {
     const [a, b] = this.score; const win = a > b; const draw = a === b; const d = a - b;
-    const stars = win ? (d >= 3 ? 3 : d >= 2 ? 2 : 1) : 0;
+    const stars = win ? (b === 0 ? 3 : d >= 2 ? 3 : b === 1 ? 2 : 1) : 0;
     const coins = a * 3 + (win ? 12 + stars * 4 : draw ? 5 : 3);
     return { win, draw, goals: [a, b], stars, coins };
   }
