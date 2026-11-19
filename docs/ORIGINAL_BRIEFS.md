@@ -1,0 +1,280 @@
+# الطلبات الأصلية للألعاب (الفيديو + البرومت اللي كتبه المالك)
+
+متولّد بـ `python tools/extract_briefs.py` من سجل المحادثات. كل رقم = فيديو واحد وبرومته.
+
+## 1. 2026-11-10
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261110-1911-09.8336210.mp4`  (الملف مش موجود على الجهاز)
+
+Create a 3D racing game where cute animals drive glowing bumper cars through a carnival at sunset. Your goal is to beat five rivals, collect tickets and finish first. You hold to accelerate, release to slow down and drag to steer, drifting around corners for boosts and performing spins during jumps. Race through loops and tubes while dodging swinging boats, giant hammers and spinning teacups. Collect rocket boosts, shields and bumper blasts to gain an advantage, and use tickets to upgrade your car and unlock new racers as you progress through increasingly challenging tracks.
+
+---
+
+## 2. 2026-11-10
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261110-2037-37.8615991.mp4`  (الملف مش موجود على الجهاز)
+
+Create me a jungle adventure auto-runner platformer where a young explorer girl runs forward on her own through ancient ruins, and you just tap to jump (hold to jump higher), stomp beetles and dodge bats, leap over pits and spikes, and wall-jump up stone shafts. Across three short levels (Jungle Trail, Sunken Ruins and Sun Temple) you collect gold coins and three hidden jade relics, grab power-ups like a shield, a coin magnet, speed boots and a time-bonus hourglass, and race the clock to reach the totem and finally the sun altar. It has a bright, cel-shaded 2D cartoon look with bold outlines, painted parallax jungle backdrops, mossy grey-green temple stone blocks, warm sunset light and a minimal panel-less HUD with a frosted dark glass-style victory screen. and make sure that sounds working well as professional game and suited very much and put this والصوره اللي حاططها خليها هي صورت الكارتين بعد ماللعبه تشتغل
+
+---
+
+## 3. 2026-11-10
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261110-2346-22.0637511.mp4`  (الملف مش موجود على الجهاز)
+
+I want a relaxing farming simulator where I drive a little combine harvester through golden wheat, corn and sunflower fields, and the crops get cut row by row in a really satisfying way. The harvest fills my trailer, which I unload into the barn to make hay bales and flour. Each level is a new farm with bigger fields, rocks to avoid and animals to herd, and I spend coins on a bigger cutter and faster tractor. Give me at least eight levels and smooth, juicy harvesting effects. and put this image for the three games replaced for old one
+
+---
+
+## 4. 2026-11-11
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261111-0406-58.7738071.mp4`  (الملف مش موجود على الجهاز)
+
+لعبت الموتسكلات انا عاوز يكون نفس التصميم اللي فالفيديو بالظبط ويكون دا المنظر مطابق لكدا وشكل الموتسكلات والحلقه اللي بيجحروا فيها وكل خاحه بالظبط
+
+---
+
+## 5. 2026-11-11
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261111-0410-58.4050771.mp4`  (الملف مش موجود على الجهاز)
+
+gold fluff برضو عاوز شكل الشخصيات يكو ننفس الفيديو بالظبط وانه لما يقع يبتدي من الاول زي الفيديو
+
+---
+
+## 6. 2026-11-11
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261111-0413-54.9862287.mp4`  (الملف مش موجود على الجهاز)
+
+Create a 3D rhythm survival game on a giant spinning record player. Guide a plush animal around the vinyl, jumping over low bars and ducking beneath high ones in time with the music. Avoid opening gaps, sudden changes of direction, and the sweeping tonearm. Bump rivals without losing your footing and stay on the record until the track ends.and make sure the sound suits the game well and updated the new design for 9 games
+
+---
+
+## 7. 2026-11-11
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261111-0420-04.6793946.mp4`  (الملف مش موجود على الجهاز)
+
+Create a 3D swimming game set on a tropical obstacle course. Race as a goggle-wearing otter, timing your strokes to build speed and overtake other swimmers. Dive under obstacles, leap over barriers, and ride waves and take slide shortcuts while managing your breath. Avoid bumpers and sweeping pool noodles, qualify through each round, and finish first in the final race. and make sure the sound fits the game and update the new design for 10 games and make sure the game charcters same as on the video and updated the new design for 10 games
+
+---
+
+## 8. 2026-11-11
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261111-0751-53.5747047.mp4`  (الملف مش موجود على الجهاز)
+
+Create a 3D survival shooter where a cartoon fighter battles waves of zombies on city rooftops. Your goal is to clear each rooftop and jump to the next building as larger crowds close in. Move around the roof while firing automatically, keeping your distance so enemies cannot surround you. Pick up a bomb launcher to blast groups of zombies, collect coins from defeated enemies, and find stronger explosive weapons on later rooftops. Once you defeat enough enemies, use a launch pad to leap across the gap and continue the fight. make this game same as prompt and everthing same as the video and update the games desgin to be same as the photo i have attached to be 14 games and after finish verify the characters and everthing same like the video and the background adn views and roofs and all different stages and level on the roof
+
+---
+
+## 9. 2026-11-11
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261111-1035-15.2940368.mp4`  (الملف مش موجود على الجهاز)
+
+Create a 3D arcade driving game where you speed along a busy coastal highway lined with palm trees, beaches, and green hills. Your goal is to complete near-miss challenges by passing close to traffic without crashing. Steer left and right between lanes to weave around cars, vans, and trucks, collect coins scattered across the road, and chain close overtakes to build a growing combo multiplier. Use nitro for a temporary burst of speed and time each maneuver carefully as slower vehicles block your path.make sure the sound works and suits the game with all effects during the race and the start of the game all same as the video and shape of cars and all detials as video and update the design of games like the new design
+
+---
+
+## 10. 2026-11-11
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261111-1511-55.1934698.mp4`  (الملف مش موجود على الجهاز)
+
+check this game and make it similar like the video as the already existed now not match most of this also check all other games aganist the video i have sent original for thosse all
+
+---
+
+## 11. 2026-11-12
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261112-1530-42.2371104.mp4`  (الملف مش موجود على الجهاز)
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261112-1531-38.5878096.mp4`  (الملف مش موجود على الجهاز)
+
+في صور زي  حرف الص الحرف او الصوره مبتبقاش ظاهره كويس بتبقي تحت الدايره ودا حصل فاشكال كتير فراجع كل حاجه والفيديوهات اللي رافعها حاول تخلي الشخصيات بتاعتنا اللي فاللعبه حقيقسع
+
+---
+
+## 12. 2026-11-12
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261112-1534-59.4338193.mp4`  (الملف مش موجود على الجهاز)
+
+وحاول تستغل الخلفيات والصور اللي فالفيديو واعمل زيها انا عاوز البدايه تكون فمكان وبعد كل ليفل يتحرك لمكان تاني مختلف واعمل الشخصيات والصور كل حاجه زي اللي انا رافعهالك كمرجع والتزم بيها
+ 
+واستغل كل الصور والفيديوهات دي كلها كمرجع ليك وتخلي الابلكيشن احنترافي والمنظر يشد الاطفال ويبقي في حركه من الشخصيه المتواجده
+ واهلا بيكم يا ابطال بسمعها وانا بفتح الابلكيشن من الويب لكن من الموبايل لا مبسمعهاش شوف ليه المشكله انا بفتحه من الhome screen
+
+---
+
+## 13. 2026-11-12
+
+- الفيديو: `C:\Users\lenovo\Downloads\Cartoon_boy_jumping_happily_2ae980f9.mp4`  (الملف مش موجود على الجهاز)
+- الفيديو: `C:\Users\lenovo\Downloads\Cartoon_boy_jumping_happily_1354ebf6.mp4`  (الملف مش موجود على الجهاز)
+- الفيديو: `C:\Users\lenovo\Downloads\Cartoon_boy_jumping_happily_4dcd311f.mp4`  (الملف مش موجود على الجهاز)
+
+i have made these three videos existed on download and credit finished so lets test for tis charchter first if working we can subscribe
+
+---
+
+## 14. 2026-11-12
+
+- الفيديو: `C:\Users\lenovo\Downloads\tsk_a5306bebaeb7f1771894a26eae641f74.mp4`  (الملف مش موجود على الجهاز)
+
+سيب القديمه وخلاص انا اقصد بتتكب فالشاشه تحت ازاي مش الزال بتاع زرافه
+
+---
+
+## 15. 2026-11-12
+
+- الفيديو: `C:\Users\lenovo\Downloads\tsk_5384c9e8b6f2b6de1a8bb544763594aa.mp4`  (الملف مش موجود على الجهاز)
+
+فالمستوي التاني بتاع فين الصوره عاوز الباك جراوند والخلفيه كامله تكون زي الصوره والفيديو دا ويكون الحاجات بتتحرك زي الفيديو كمنظر  للعبه ودول من تصميمي
+
+---
+
+## 16. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-1756-33.2358567.mp4`
+
+A casual mobile tower-climbing game where a knight starts at the bottom of a tall stone tower and fights his way up floor by floor. Each floor has enemies and items with power numbers: the player taps an enemy weaker than the hero (it glows green) to defeat it and add its power to his own, while tapping a stronger enemy (red) means losing. Items like swords, crystals, potions, keys and chests boost the hero's power or multiply it, so the player has to pick the right order of targets before climbing the ladder to the next floor. Halfway up the hero faces a giant troll, at the top he battles a dark sorcerer boss, and a dragon waits on the roof as the final payoff before the "Chapter complete" screen with a Replay button. do this game on entertainment part and we will continue for the educational after renew the voice
+
+---
+
+## 17. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-2007-51.5485840.mp4`
+
+<pasted_content id="cacb">
+Make a top-down arcade shoot ’em up for phones and desktop called SKY CAPY, where a calm capybara pilot in a teal seaplane flies over floating islands above the clouds and pops sky-pirate rats in balloons, gyrocopters and gliders with streams of bubbles. Rescued songbirds join the plane as a wing and shoot the nearest pirate on their own, each with its own power, while weapon capsules, pearls and a screen-clearing Bubble Storm spice up the fight. A run flies three stages back to back (a cloud village, a laundry-line ambush and a giant nest tree where the pirate captain’s airship is the boss) and then loops harder until you are shot down, with an HP bar, combo multipliers, S to C stage ranks and a top 10 table with arcade initials. Use a bright cel-shaded toy look with ink outlines, glossy chunky buttons, and a hangar where collected feathers buy upgrades and paint jobs
+</pasted_content id="cacb">
+
+ make this game
+
+---
+
+## 18. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-2118-34.7699322.mp4`
+
+<pasted_content id="cacb">
+A casual idle-clicker game where you play a young creator at a company that makes content with AI: tap the PHOTO, VIDEO and GAME buttons to generate pictures, short clips and mini-games. A quality bar with a moving needle decides each result: tap while it's in the green zone to get a MASTERPIECE (big cash and goal stars), but miss and you get funny, broken AI SLOP that goes straight in the trash. Fill the star goal to get promoted by the CEO, from intern to junior, lead, art director and VP, each with a bigger office and a better desk, until you reach the board of directors. Along the way, hot streaks multiply your earnings, timed client orders give bonus stars, random events like trends and server lag shake things up, and a shop lets you spend cash on upgrades such as a faster GPU, a wider green zone and a slower needle.
+</pasted_content id="cacb">
+
+---
+
+## 19. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-2121-04.6754116.mp4`
+
+Create a 3D idle management game where you build a pearl-diving business in a tropical lagoon and compete with a wealthy rival on a yacht. Your goal is to earn enough money to overtake your rival. Tap to send divers to open clams and carry pearls to collection baskets, then a diving bell lifts the pearls to your boat to be sold. Keep tapping to boost production, and spend your earnings on managers who automate the work, upgrades that add divers and increase pearl value, and deeper areas with more valuable pearls.
+
+---
+
+## 20. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-2122-57.8626250.mp4`
+
+Create me a cozy 3D rug-cleaning simulator game set in a sunny Mediterranean courtyard with whitewashed walls, limestone tiles, potted geraniums and a drain along the edge, where clients drop off dirty hand-knotted rugs with dust, coffee stains and muddy boot prints. The player cleans each rug with five tools in order: beat out the dust, spray foam, scrub in circles with a rotary brush, rinse the suds into water with a surface jet, and push the dirty water off the rug with a squeegee, which reveals the bright original pattern and leaves neat stripes in the pile. After each job a before/after slider shows the result and the client pays based on cleanliness, speed and water used, and the money buys tool upgrades, all in a warm, satisfying ASMR style with a clean, minimal glassy UI and no real brands or characters.
+
+---
+
+## 21. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-2124-57.0186474.mp4`
+
+I want a cute adventure where a little hamster warrior walks along a forest path and fights monsters that each show a power number. Before each fight I pass through cards and gates that add or multiply my power - swords, shields, magic - and I can only beat enemies weaker than me, then I absorb their power. Every chapter ends with a big boss, and between levels I can upgrade my hero with the coins I collect. Make it a 3D game with nice hit effects and a clean UI with the numbers easy to read.
+
+---
+
+## 22. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-2126-34.4350689.mp4`
+
+Make a physics action game where I pull back a giant slingshot and launch chubby viking warriors at goblin forts built from wooden planks, stone blocks and ice. The forts should crumble and topple with real physics, and every goblin I knock out drops gold. Each level gives me a few special vikings like a bomb thrower, a shield bouncer and a giant who smashes through walls. I want at least eight levels with bigger forts and a boss fortress at the end.
+
+---
+
+## 23. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-2129-29.8442959.mp4`
+
+Create a casual 3D mobile card battle game set on a neon space platform, in portrait mode. You defend your robot base against the Alien Overlord and try to destroy his UFO across a single glowing arena. Drag cards from a hand of four onto your half of the field to deploy robot units, a turret or spells like Plasma Wave, Black Hole and Repair Field, spending energy that refills over time. Your units walk and fight on their own, and the Overlord's AI answers with alien slimes, bugs and brutes. Matches last 2:30, energy flows twice as fast in the final minute, and you can choose Easy, Normal or Hard. Destroy the UFO to win, or have more base health when time runs out, and earn up to three stars.
+
+---
+
+## 24. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-2131-15.1772907.mp4`
+
+Create a turn-based physics battle game on a snowy ice rink at a winter festival, where a team of cute arctic animal heroes faces off against a group of goblins and their bigger leader. Your goal is to knock out every goblin on the board before your team's health runs out, with tougher fights in each new level. On your turn you pull back and release one of your heroes to send them sliding across the ice into enemies, bouncing off ice crystals and teammates for chain hits, then the goblins take their turn, and a special meter fills during the fight to unlock powered-up attacks.
+
+---
+
+## 25. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-2133-36.1231974.mp4`
+
+Make a 3D mobile football game where you control the ball itself, not a player: drag it across a floodlit night stadium toward the rival goal. Defenders in red kits chase you and slide-tackle along lanes that flash red on the grass, so you dodge them, roll the ball between their legs (nutmeg) and play one-twos with a teammate in light blue. Every trick heats the ball up until it turns into a flaming comet. At the box a target slides across the goal and you tap when it is outside the diving keeper's reach; 5 levels with stars, coins and ball skins
+
+---
+
+## 26. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-2136-28.7504658.mp4`
+
+I want a dinosaur eat-and-grow game where I start as a tiny baby raptor in a prehistoric jungle and eat bugs, eggs and smaller dinos to grow. Each creature shows its power number, so I have to avoid the big ones until I am strong enough, and I evolve into bigger dinosaurs as I level up. The adventure goes from the jungle through a swamp to a volcano valley with a giant boss. Give me three really polished levels with stomping animations, chomp effects and a camera that zooms out as I grow.
+
+---
+
+## 27. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-2139-32.9600020.mp4`
+
+Create a 3D team game set in a medieval tournament. Play as a knight in a team of four and push a giant wooden barrel through the opposing team's gate to score. Charge into the barrel, knock rivals aside, and defend your own goal. Avoid trapdoors, mud, and rolling boulders while working with your teammates to outscore the other team.
+
+---
+
+## 28. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-2140-45.2968061.mp4`
+
+Create me a cozy Halloween side-scrolling crowd runner where you lead a growing pack of trick-or-treating kids in homemade costumes (sheet ghosts, witches, cardboard robots, pumpkin suits) down a neighborhood street at night. Tap to jump and hold to jump higher: ring doorbells at friendly porches to add kids, jump past grumpy ones, hop over leaf pits and sprinklers, dodge a dog and rolling jack-o'-lanterns, collect candy, and grow the crowd big enough to push through hedges and beat a giant inflatable spider lawn decoration at the end of the street. Hand-painted, toy-like 3D look with warm porch lights, pumpkins, falling leaves and a cut-paper UI; all characters and designs are original, with no existing brands or franchises.
+
+---
+
+## 29. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-2143-28.2633531.mp4`
+
+Create a 3D maze battle game where you lead a growing army of tiny warriors through an ancient jungle temple. You steer your captain, and the whole crowd follows him through stone corridors. At each fork you pick a glowing gate that multiplies your army, turning a small squad into hundreds of soldiers. Along the way you dodge spike traps, pull a lever that destroys a spinning saw, free prisoners from cages and clash with red enemy hordes. A huge brute guards the first temple, and the final arena holds a giant stone golem. Overwhelm him with numbers to topple him and claim victory.
+
+---
+
+## 30. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-2145-13.5743077.mp4`
+
+Create a triple-match puzzle game set in a pastel bakery, where a plate is piled high with stacked sweets like donuts, cupcakes, macarons and cookies. Your goal is to clear the whole plate, with bigger piles and more kinds of sweets in each new level. You tap uncovered sweets to move them into a 7-slot tray where three of the same kind disappear, and quick matches in a row build combos and fill a bonus meter that clears sweets automatically, but if the tray fills up with no match, you lose.
+
+---
+
+## 31. 2026-11-18
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261118-2156-59.8488504.mp4`
+
+I want a runner where my truck drives forward down a road and scoops up piles of colorful balls with its big front shovel. I steer left and right through gates like +50 and x3 to multiply the balls, and avoid walls that knock balls out. At the end of each level I dump everything into a giant bank and get coins for upgrades. The balls should pile up and spill with real physics, and there should be many levels with longer and crazier roads.
+
+---
+
+## 32. 2026-11-19
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261119-1807-24.6658193.mp4`
+
+أللعبه فيها حاجه غلط راجعها وخليها زي الاسكريبت والفيديو الاصلي بالظبط وكمل شغل بعد
+
+---
+
+## 33. 2026-11-19
+
+- الفيديو: `C:\Users\lenovo\AppData\Local\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\TempState\Recordings\20261119-1819-12.3301516.mp4`
+
+في حاجات كتير فيها عاوزه تتصلح والبطل اللي بيلعب باصصلي  اللعبه وحشه اوووي
+
+---
+
