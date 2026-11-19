@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, visibleForTesting;
 import 'package:flutter/gestures.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -21,6 +21,10 @@ class WelcomeVoice {
   static bool _heard = false;
   static AudioPlayer? _p;
   static PointerRoute? _route;
+
+  /// Widget tests have no audio plugin: they mark the greeting as already said.
+  @visibleForTesting
+  static void skipForTests() => _played = true;
 
   /// Plays the greeting the first time it is asked for in this run of the app.
   static Future<void> playOnce() async {

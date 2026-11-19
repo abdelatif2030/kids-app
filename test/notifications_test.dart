@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/media/welcome_voice.dart';
 import 'package:kids_app/dashboard_screen.dart';
 import 'package:kids_app/data_reset.dart';
 import 'package:kids_app/journey/avatars.dart' show ChildAvatar;
@@ -12,7 +13,6 @@ import 'package:kids_app/journey/ui/me_tab.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/notifications/notification_store.dart';
 import 'package:kids_app/notifications/notification_ui.dart';
-import 'package:kids_app/parent_screens.dart';
 import 'package:kids_app/parent_settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -45,6 +45,7 @@ Future<void> _setup() async {
 }
 
 void main() {
+  setUpAll(WelcomeVoice.skipForTests); // no audio plugin in widget tests
   setUp(() async {
     await AppLocale.instance.set('en');
     await _setup();

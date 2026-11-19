@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/media/welcome_voice.dart';
 import 'package:kids_app/demo/demo_mode.dart';
 import 'package:kids_app/games/game_common.dart';
 import 'package:kids_app/journey/models.dart';
@@ -39,6 +40,7 @@ Widget app() => MaterialApp(
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(WelcomeVoice.skipForTests); // no audio plugin in widget tests
   setUp(() async {
     await AppLocale.instance.set('ar');
     DemoMode.overrideForTest(true);

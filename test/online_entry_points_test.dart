@@ -9,7 +9,6 @@ import 'package:kids_app/journey/ui/start_screen.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/online_unavailable.dart';
 import 'package:kids_app/parent/parent_widgets.dart' show ParentRow;
-import 'package:kids_app/parent_screens.dart';
 import 'package:kids_app/parent_settings_screen.dart';
 import 'package:kids_app/teachers_screens.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,7 +16,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Every way into an online feature, checked while the online release gate is closed: each one must end on the honest
 /// "not available" page (never a sign-in form that cannot work), and the code paths must stay inside the known entry points.
 Iterable<File> dartFiles(String dir) => Directory(dir).listSync(recursive: true).whereType<File>().where((f) => f.path.endsWith('.dart'));
-List<String> users(Pattern p, {Set<String> except = const {}}) => [for (final f in dartFiles('lib')) if (!except.contains(f.path) && f.readAsStringSync().contains(p)) f.path]..sort();
+String _slash(String path) => path.replaceAll(r'\', '/'); // Windows lists files with backslashes
+List<String> users(Pattern p, {Set<String> except = const {}}) => [for (final f in dartFiles('lib')) if (!except.contains(_slash(f.path)) && f.readAsStringSync().contains(p)) _slash(f.path)]..sort();
 
 void main() {
   setUp(() async {
@@ -47,7 +47,8 @@ void main() {
     test('Firebase is initialised in exactly one place, after the gate check, and the in-memory family demo cannot run in a release build', () {
       expect(users('Firebase.initializeApp'), ['lib/firebase_config.dart']);
       expect(users('FirebaseFirestore.instance'), ['lib/family/firebase_family_repository.dart', 'lib/firebase_repository.dart']);
-      expect(users('FirebaseAuth.instance'), ['lib/family/firebase_family_repository.dart', 'lib/firebase_repository.dart']);
+      // lib/firebase_config.dart only waits (max 4 s) for the saved session to be restored right after initialising Firebase
+      expect(users('FirebaseAuth.instance'), ['lib/family/firebase_family_repository.dart', 'lib/firebase_config.dart', 'lib/firebase_repository.dart']);
       expect(users('FirebaseTeacherRepository('), ['lib/firebase_config.dart']);
       expect(users('FirebaseFamilyRepository('), ['lib/firebase_config.dart']);
       expect(File('lib/family/memory_family_repository.dart').readAsStringSync(), contains("!bool.fromEnvironment('dart.vm.product')"));
@@ -67,7 +68,7 @@ void main() {
       // The video player package is used only for the owner's lesson videos (the intro video was taken out on 2026-11-07).
       expect(users('package:video_player'), ['lib/lessons_own/own_lessons_screens.dart']);
       expect(users('package:cloud_firestore'), ['lib/family/firebase_family_repository.dart', 'lib/firebase_repository.dart']);
-      expect(users('package:firebase_auth'), ['lib/family/firebase_family_repository.dart', 'lib/firebase_repository.dart']);
+      expect(users('package:firebase_auth'), ['lib/family/firebase_family_repository.dart', 'lib/firebase_config.dart', 'lib/firebase_repository.dart']); // firebase_config: session restore only
       expect(users('package:flutter_webrtc'), ['lib/family/call_engine.dart']);
     });
   });

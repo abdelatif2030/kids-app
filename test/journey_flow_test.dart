@@ -12,6 +12,7 @@ import 'package:kids_app/journey/ui/child_shell.dart';
 import 'package:kids_app/journey/ui/onboarding.dart';
 import 'package:kids_app/journey/ui/profile_forms.dart';
 import 'package:kids_app/journey/ui/start_screen.dart';
+import 'package:kids_app/media/welcome_voice.dart';
 import 'package:kids_app/parent_settings.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -69,7 +70,16 @@ Future<void> _answerQuiz(WidgetTester tester, int questions) async {
 
 Finder _field(String label) => find.widgetWithText(TextField, label);
 
+/// «المزيد» is reached from the child's picture («أنا») since the bottom bar was removed (owner, 2026-11-12).
+Future<void> _openMore(WidgetTester tester) async {
+  await tester.tap(find.byKey(const ValueKey('home_avatar')));
+  await tester.pump();
+  await tester.tap(find.byKey(const ValueKey('profile_more')));
+  await tester.pump();
+}
+
 void main() {
+  setUpAll(WelcomeVoice.skipForTests); // no audio plugin in widget tests
   setUp(useArchivedVideos);
   tearDown(resetVideos);
   testWidgets('the sign-in door (Google or e-mail) is on the first screen only when the online gate is open', (tester) async {
@@ -292,8 +302,7 @@ void main() {
     testWidgets('home: greeting, ONE big "continue my journey" action, today\'s path, shortcuts and the lands',
         (tester) async {
       await openShell(tester);
-      await tester.tap(find.text('المزيد').last);
-      await tester.pump();
+      await _openMore(tester);
       expect(find.textContaining('يا بطل'), findsOneWidget); // the greeting follows the time of day
       expect(find.text('سلمى'), findsWidgets);
       expect(find.text('كمّل رحلتي'), findsOneWidget);
@@ -326,12 +335,13 @@ void main() {
     testWidgets('the shortcuts for games and achievements switch the tab; the big button opens the next activity',
         (tester) async {
       await openShell(tester);
-      await tester.tap(find.text('ألعاب').first);
+      await _openMore(tester);
+      await tester.tap(find.text('ألعاب').first); // the shortcut under «المزيد»
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
       expect(find.byKey(const ValueKey('choice_educational')), findsOneWidget); // the games tab opens on the two cards
-      await tester.tap(find.text('المزيد').last);
-      await tester.pump();
+      await openShell(tester);
+      await _openMore(tester);
       await tester.tap(find.text('كمّل رحلتي'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
@@ -342,14 +352,12 @@ void main() {
       await tester.runAsync(() => AppLocale.instance.set('en'));
       addTearDown(() => AppLocale.instance.set('ar'));
       await openShell(tester);
-      await tester.tap(find.text('More').last);
-      await tester.pump();
+      await _openMore(tester);
       expect(find.textContaining('champion'), findsOneWidget);
       expect(find.text('سلمى'), findsWidgets);
       expect(find.text('Today\'s path'), findsOneWidget);
       expect(find.text('Continue My Journey'), findsOneWidget);
       expect(find.text('Games'), findsWidgets); // the tab and the shortcut
-      expect(find.text('Home'), findsOneWidget);
       expect(find.text('0 of 3 activities · about 4 minutes each'), findsOneWidget);
       expect(find.textContaining(' · Level '), findsWidgets); // "Next: Land · Level n"
     });
@@ -358,27 +366,28 @@ void main() {
       await openShell(tester);
       final planned = JourneyStore.instance.todayPlan('kid1');
       expect(planned.length, 3);
-      await tester.tap(find.text('المزيد').last);
-      await tester.pump();
+      await _openMore(tester);
       await tester.runAsync(() => JourneyStore.instance.recordAttempt(_done(planned.first.activity.id)));
       await tester.pump();
       expect(find.text('1 من 3 أنشطة · نحو 4 دقائق لكل نشاط'), findsOneWidget);
       expect(find.byIcon(Icons.check_rounded), findsOneWidget);
     });
 
-    testWidgets('all four tabs work', (tester) async {
+    testWidgets('all four places work (reached from the home picture, no bottom bar)', (tester) async {
       await openShell(tester);
-      await tester.tap(find.text('ألعاب').last);
+      await tester.tap(find.byKey(const ValueKey('island_games')));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 50)); // the games part is loaded when the tab opens
       expect(find.byKey(const ValueKey('choice_educational')), findsOneWidget); // games tab: the two cards
 
-      await tester.tap(find.text('إبداع').last);
+      await openShell(tester);
+      await tester.tap(find.byKey(const ValueKey('island_create')));
       await tester.pump();
       expect(find.byKey(const ValueKey('create_drawing')), findsOneWidget);
       expect(find.byKey(const ValueKey('create_studio')), findsOneWidget);
 
-      await tester.tap(find.text('أنا').last);
+      await openShell(tester);
+      await tester.tap(find.byKey(const ValueKey('home_avatar')));
       await tester.pump();
       expect(find.text('سلمى'), findsOneWidget);
       expect(find.byKey(const ValueKey('profile_picture')), findsOneWidget);
@@ -387,7 +396,7 @@ void main() {
         expect(find.text(gone), findsNothing, reason: gone);
       }
 
-      await tester.tap(find.text('المزيد').last);
+      await tester.tap(find.byKey(const ValueKey('profile_more')));
       await tester.pump();
       expect(find.textContaining('يا بطل'), findsOneWidget); // the greeting follows the time of day
       expect(find.text('سلمى'), findsWidgets);
@@ -402,8 +411,7 @@ void main() {
         expect(find.byKey(ValueKey('island_$id')), findsNothing, reason: id);
       }
       expect(find.text('كمّل رحلتي'), findsNothing);
-      await tester.tap(find.text('المزيد').last);
-      await tester.pump();
+      await _openMore(tester);
       expect(find.text('كمّل رحلتي'), findsOneWidget);
       expect(find.byKey(const ValueKey('island_games')), findsNothing);
     });

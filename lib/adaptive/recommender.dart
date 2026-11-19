@@ -61,7 +61,8 @@ List<Recommendation> recommend({
   final fit = [for (final d in destinations) if (d.fitsAge(age)) d];
   final out = <Recommendation>[];
   final usedDest = <String>{};
-  final dayIndex = DateTime(now.year, now.month, now.day).difference(DateTime(now.year, 1, 1)).inDays;
+  // UTC calendar days: a local Duration is off by an hour across a clock change and then skips or repeats a day.
+  final dayIndex = DateTime.utc(now.year, now.month, now.day).difference(DateTime.utc(now.year, 1, 1)).inDays;
 
   List<Destination> forSkill(String skill) => [for (final d in fit) if (d.skills.contains(skill)) d];
 

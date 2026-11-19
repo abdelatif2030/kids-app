@@ -1,11 +1,9 @@
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kids_app/journey/ui/kit.dart' show RCard;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/data_reset.dart';
-import 'package:kids_app/games/numerals_game.dart';
 import 'package:kids_app/games/game_catalog.dart';
 import 'package:kids_app/games_screen.dart';
 import 'package:kids_app/journey/models.dart';

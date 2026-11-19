@@ -257,7 +257,7 @@ void main() {
       for (final e in allowed.entries) {
         final hits = [
           for (final f in files)
-            if (f.readAsStringSync().contains(e.key)) f.path,
+            if (f.readAsStringSync().contains(e.key)) f.path.replaceAll(r'\', '/'), // Windows lists backslashes
         ];
         expect(hits, [e.value], reason: e.key);
       }
@@ -298,7 +298,7 @@ void main() {
       for (final k in ['usedFor', 'whenAsked', 'ifRefused', 'never']) {
         expect(s, contains(k));
       }
-      expect(s, contains('not when the app opens'));
+      expect(s, contains('asks for nothing when it opens')); // nothing is requested at start-up
     });
   });
 }

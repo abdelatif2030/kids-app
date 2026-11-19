@@ -207,7 +207,7 @@ class FamilySuggestion {
 /// may help, then (with no such area) general ideas. Deterministic: rotates by the day, so a parent sees variety, not randomness.
 List<FamilySuggestion> suggestFamilyActivities(InsightsReport report, {required int age, required DateTime now, int max = 3}) {
   final fit = [for (final a in kRealActivities) if (age >= a.minAge && age <= a.maxAge) a];
-  final day = DateTime(now.year, now.month, now.day).difference(DateTime(2026, 1, 1)).inDays;
+  final day = DateTime.utc(now.year, now.month, now.day).difference(DateTime.utc(2026, 1, 1)).inDays; // UTC: a clock change must not skip a day
   final out = <FamilySuggestion>[];
   final used = <String>{};
   void add(RealActivity a, Domain? d, String why, bool records) {

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/dashboard_screen.dart';
+import 'package:kids_app/design/focusable_tap.dart';
 import 'package:kids_app/journey/lands.dart';
 import 'package:kids_app/journey/models.dart';
 import 'package:kids_app/journey/repository.dart';
@@ -19,6 +20,7 @@ import 'package:kids_app/library/activity_screens.dart';
 import 'package:kids_app/library/vocab_screens.dart';
 import 'package:kids_app/literacy/letters_data.dart';
 import 'package:kids_app/literacy/screens.dart';
+import 'package:kids_app/media/welcome_voice.dart';
 import 'package:kids_app/stories/story_data.dart';
 import 'package:kids_app/stories/story_screens.dart';
 import 'package:kids_app/studio/character_creator.dart';
@@ -75,6 +77,7 @@ ActivityContent _longQuiz() => QuizContent([
     ]);
 
 void main() {
+  setUpAll(WelcomeVoice.skipForTests); // no audio plugin in widget tests
   // Every screen must lay out without overflow on a small phone and with large
   // text (a Flutter overflow is an exception, so pumping is the check).
   final screens = <String, Widget Function()>{
@@ -138,22 +141,23 @@ void main() {
     }
   }
 
-  testWidgets('shell tabs at large text on a small phone', (tester) async {
+  // The child shell has no bottom bar any more (owner request 2026-11-12): the home picture's islands lead everywhere.
+  testWidgets('shell places at large text on a small phone', (tester) async {
     tester.view.physicalSize = const Size(320, 640);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.runAsync(_setup);
-    await tester.pumpWidget(_app(const ChildShell(child: _kid), 1.6));
-    await _settle(tester);
-    for (final tab in ['ألعاب', 'إبداع', 'أنا', 'الرئيسية']) {
-      await tester.tap(find.text(tab).last);
+    for (final spot in ['island_games', 'island_create', 'home_avatar']) {
+      await tester.pumpWidget(_app(const ChildShell(child: _kid), 1.6));
       await _settle(tester);
-      expect(tester.takeException(), isNull, reason: tab);
+      await tester.tap(find.byKey(ValueKey(spot)));
+      await _settle(tester);
+      expect(tester.takeException(), isNull, reason: spot);
     }
   });
 
   group('keyboard and screen readers', () {
-    testWidgets('the bottom tabs and the map levels can be reached with the keyboard', (tester) async {
+    testWidgets('the home islands and the map levels can be reached with the keyboard', (tester) async {
       tester.view.physicalSize = const Size(412, 915);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -161,19 +165,17 @@ void main() {
       await tester.pumpWidget(_app(const ChildShell(child: _kid), 1.0));
       await _settle(tester);
 
-      // Tab until the "games" tab has focus, then Enter activates it.
+      // Tab until the "games" island has focus, then Enter activates it.
       var reached = false;
       for (var i = 0; i < 60 && !reached; i++) {
         await tester.sendKeyEvent(LogicalKeyboardKey.tab);
         await tester.pump();
-        final focused = FocusManager.instance.primaryFocus;
-        final ctx = focused?.context;
+        final ctx = FocusManager.instance.primaryFocus?.context;
         if (ctx != null) {
-          final hit = find.descendant(of: find.byWidget(ctx.widget), matching: find.text('ألعاب'));
-          reached = hit.evaluate().isNotEmpty;
+          reached = ctx.findAncestorWidgetOfExactType<FocusableTap>()?.key == const ValueKey('island_games');
         }
       }
-      expect(reached, isTrue, reason: 'the games tab never got keyboard focus');
+      expect(reached, isTrue, reason: 'the games island never got keyboard focus');
       await tester.sendKeyEvent(LogicalKeyboardKey.enter);
       await _settle(tester);
       await _settle(tester); // the games part is loaded when the tab opens
@@ -188,20 +190,11 @@ void main() {
       await tester.runAsync(_setup);
       await tester.pumpWidget(_app(const ChildShell(child: _kid), 1.0));
       await _settle(tester);
-      for (final label in ['الرئيسية', 'ألعاب', 'إبداع', 'أنا', 'المزيد']) {
+      for (final label in ['الألعاب', 'الكرتون والقصص', 'التعلم والاكتشاف', 'الرسم والإبداع', 'مكافآتي']) {
         expect(find.bySemanticsLabel(label), findsWidgets, reason: label);
       }
       expect(find.byTooltip('خروج (للأهل)'), findsOneWidget);
       expect(find.byTooltip('إعدادات الوالدين'), findsOneWidget);
-      await tester.tap(find.text('المزيد').last);
-      await tester.pump();
-      final toggle = find.byKey(const ValueKey('lands_toggle'));
-      expect(find.bySemanticsLabel(RegExp('أراضيّ.*اضغط للعرض|أراضي.*اضغط للعرض')), findsOneWidget);
-      await tester.scrollUntilVisible(toggle, 300, scrollable: find.byType(Scrollable).first);
-      await tester.ensureVisible(toggle);
-      await tester.tap(toggle);
-      await tester.pumpAndSettle();
-      expect(find.bySemanticsLabel(RegExp('أرض الحروف.*أنهيت')), findsOneWidget);
       handle.dispose();
     });
   });

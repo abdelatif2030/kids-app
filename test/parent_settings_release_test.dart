@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'video_fixture.dart';
 import 'package:kids_app/app_info.dart';
 import 'package:kids_app/l10n/app_locale.dart';
-import 'package:kids_app/parent_screens.dart';
 import 'package:kids_app/parent_settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

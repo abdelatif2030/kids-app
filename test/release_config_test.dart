@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// Reads the real project files and checks the release configuration that can be checked without credentials or a device.
 /// It does NOT prove a release is ready: signing, the iOS bundle id and real-device behaviour are separate (see
 /// docs/RELEASE_READINESS.md).
-String read(String p) => File(p).readAsStringSync();
+String read(String p) => File(p).readAsStringSync().replaceAll('\r\n', '\n'); // checked-out files may have Windows line ends
 
 void main() {
   final manifest = read('android/app/src/main/AndroidManifest.xml');
@@ -217,11 +217,19 @@ void main() {
         RegExp(r'xox[baprs]-[A-Za-z0-9-]{10,}'),
       ];
       final roots = ['lib', 'android/app/src', 'android/key.properties.example', 'ios/Runner', 'web', 'docs', 'tool', 'pubspec.yaml', 'README.md', 'CLAUDE.md'];
+      // Git-ignored files (local listening pages with base64 audio, scratch output) are never committed, so they are not
+      // scanned: only tracked files and untracked files that are not ignored are. Without git, everything is scanned.
+      Set<String>? committable;
+      try {
+        final r = Process.runSync('git', ['ls-files', '--cached', '--others', '--exclude-standard']);
+        if (r.exitCode == 0) committable = {for (final l in (r.stdout as String).split(String.fromCharCode(10))) l.trim()};
+      } catch (_) {}
       var scanned = 0;
       for (final r in roots) {
         final t = FileSystemEntity.typeSync(r);
         final files = t == FileSystemEntityType.directory ? Directory(r).listSync(recursive: true).whereType<File>() : (t == FileSystemEntityType.file ? [File(r)] : <File>[]);
         for (final f in files) {
+          if (committable != null && !committable.contains(f.path.replaceAll(r'\', '/'))) continue;
           final n = f.path.toLowerCase();
           if (!(n.endsWith('.dart') || n.endsWith('.md') || n.endsWith('.xml') || n.endsWith('.kts') || n.endsWith('.plist') || n.endsWith('.json') || n.endsWith('.yaml') || n.endsWith('.sh') || n.endsWith('.html') || n.endsWith('.example') || n.endsWith('.csv') || n.endsWith('.xcprivacy') || n.endsWith('.storyboard'))) continue;
           String text;

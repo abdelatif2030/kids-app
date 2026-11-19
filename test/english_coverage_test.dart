@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/media/welcome_voice.dart';
 import 'package:kids_app/color_game.dart';
 import 'package:kids_app/dashboard_screen.dart';
 import 'package:kids_app/drawing_screen.dart';
@@ -144,6 +145,7 @@ class _Teachers {
 }
 
 void main() {
+  setUpAll(WelcomeVoice.skipForTests); // no audio plugin in widget tests
   setUp(() async {
     await AppLocale.instance.set('en');
   });
@@ -252,21 +254,22 @@ void main() {
     });
   }
 
-  for (final tab in ['Games', 'Create', 'Me']) {
-    testWidgets('English: child shell tab $tab', (tester) async {
+  // No bottom bar any more: the tabs are reached from the home picture (island_games, island_create, the avatar).
+  for (final tab in {'Games': 'island_games', 'Create': 'island_create', 'Me': 'home_avatar'}.entries) {
+    testWidgets('English: child shell tab ${tab.key}', (tester) async {
       tester.view.physicalSize = const Size(900, 2600);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       await tester.runAsync(_setup);
       await tester.pumpWidget(_app(const ChildShell(child: _kid)));
       await _settle(tester);
-      await tester.tap(find.text(tab).last);
+      await tester.tap(find.byKey(ValueKey(tab.value)));
       await _settle(tester);
       await tester.pump(const Duration(seconds: 2));
       final left = arabicOnScreen(tester);
       // ignore: avoid_print
-      if (left.isNotEmpty) print('ARABIC LEFT in tab $tab:\n  ${left.join('\n  ')}');
-      expect(left, isEmpty, reason: tab);
+      if (left.isNotEmpty) print('ARABIC LEFT in tab ${tab.key}:\n  ${left.join('\n  ')}');
+      expect(left, isEmpty, reason: tab.key);
     });
   }
 }

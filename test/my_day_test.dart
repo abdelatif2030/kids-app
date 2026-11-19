@@ -61,8 +61,9 @@ void main() {
       final s = storyOfDay(_at(8), 5)!;
       expect(s.fitsAge(5), true);
       expect(storyOfDay(_at(8), 5, heard: {s.id})?.id, isNot(s.id)); // prefers a story not heard yet
-      expect(gameOfDay(_at(8), 2)!.fitsAge(2), true); // a learning game that suits age 2
-      expect(gameOfDay(_at(8), 9), isNull);
+      // the learning world opens for any age (owner 2026-11-13): it is offered at 2 and at 9 alike
+      expect(gameOfDay(_at(8), 2), isNotNull);
+      expect(gameOfDay(_at(8), 9), isNotNull);
     });
   });
 

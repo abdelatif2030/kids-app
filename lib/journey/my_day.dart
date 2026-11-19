@@ -53,7 +53,7 @@ String stationSubtitle(Station s) => switch (s) {
       Station.tell => tr2('قصة قصيرة', 'A short story'),
     };
 
-int dayOfYear(DateTime d) => d.difference(DateTime(d.year)).inDays;
+int dayOfYear(DateTime d) => DateTime.utc(d.year, d.month, d.day).difference(DateTime.utc(d.year)).inDays; // UTC: a clock change must not skip a day
 
 /// The same word all day, a new one tomorrow, from the picture-book words of the child's age.
 Vocab? wordOfDay(DateTime now, int age) {

@@ -137,6 +137,8 @@ void main() {
         for (final size in [const Size(320, 568), const Size(844, 390)]) {
           await open(t, lang: lang, size: size, text: 1.6);
           expect(find.byKey(const ValueKey('adventure_theme')), findsOneWidget);
+          // A ListView builds lazily: on a short landscape screen the first step is below the theme card.
+          await t.scrollUntilVisible(find.byKey(const ValueKey('adventure_step_0')), 100, scrollable: find.byType(Scrollable).first);
           expect(find.byKey(const ValueKey('adventure_step_0')), findsOneWidget);
           expect(find.byIcon(Icons.check_circle_rounded), findsNothing);
           expect(t.takeException(), isNull);

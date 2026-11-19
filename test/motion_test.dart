@@ -103,7 +103,7 @@ void main() {
     });
 
     test('the intro is only the app picture for a moment: no code-made logo, no video', () {
-      expect(AppIntro.duration, const Duration(milliseconds: 2200));
+      expect(AppIntro.duration, const Duration(milliseconds: 800));
       final src = File('lib/design/app_intro.dart').readAsStringSync();
       expect(src.contains('AppLogo'), isFalse);
       expect(src.contains('VideoPlayer'), isFalse, reason: 'the intro video was taken out until its problem is found');
@@ -140,15 +140,15 @@ void main() {
       expect(waited, isTrue);
     });
 
-    testWidgets('shows the picture 2.2 s and then the app opens; shown once per run; a tap skips at once', (t) async {
+    testWidgets('shows the picture 0.8 s and then the app opens; shown once per run; a tap skips at once', (t) async {
       AppIntro.forceShow = true;
       AppIntro.resetForTest();
       await t.pumpWidget(app(const AppIntro(child: Text('app'))));
       await t.pump();
       expect(find.byKey(const ValueKey('intro_picture')), findsOneWidget);
       expect(find.byKey(const ValueKey('intro_poster')), findsOneWidget);
-      await t.pump(const Duration(milliseconds: 2000));
-      expect(find.byKey(const ValueKey('intro_picture')), findsOneWidget, reason: 'still showing before 2.2 s');
+      await t.pump(const Duration(milliseconds: 600));
+      expect(find.byKey(const ValueKey('intro_picture')), findsOneWidget, reason: 'still showing before 0.8 s');
       await t.pump(const Duration(milliseconds: 300));
       expect(find.byKey(const ValueKey('intro_picture')), findsNothing);
       // a second AppIntro in the same run does not play again

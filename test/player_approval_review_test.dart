@@ -8,7 +8,7 @@ import 'video_fixture.dart';
 /// workflow is tested in lessons_test.dart / video_controls_test.dart, the navigation rules in safe_player_test.dart.
 List<String> usesOf(Pattern p) => [
       for (final f in Directory('lib').listSync(recursive: true).whereType<File>())
-        if (f.path.endsWith('.dart') && f.readAsStringSync().contains(p)) f.path,
+        if (f.path.endsWith('.dart') && f.readAsStringSync().contains(p)) f.path.replaceAll(r'\', '/'),
     ]..sort();
 
 void main() {

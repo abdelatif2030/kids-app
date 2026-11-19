@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kids_app/games/choice_games.dart';
-import 'package:kids_app/games/game_catalog.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/library/vocab.dart';
 import 'package:kids_app/literacy/letters_data.dart';

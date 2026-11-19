@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/media/welcome_voice.dart';
 import 'package:kids_app/games/web_games/web_game.dart';
 import 'package:kids_app/design/layout.dart';
 import 'package:kids_app/games/choice_games.dart';
@@ -12,7 +13,6 @@ import 'package:kids_app/journey/ui/day_settings_screen.dart';
 import 'package:kids_app/journey/ui/library_screen.dart';
 import 'package:kids_app/l10n/app_locale.dart';
 import 'package:kids_app/main.dart' show AppScrollBehavior;
-import 'package:kids_app/parent_screens.dart';
 import 'package:kids_app/parent_settings_screen.dart';
 import 'package:kids_app/print/printables_screen.dart';
 import 'package:kids_app/teachers_models.dart';
@@ -59,6 +59,7 @@ Future<FakeTeacherRepository> _teacherRepo() async {
 }
 
 void main() {
+  setUpAll(WelcomeVoice.skipForTests); // no audio plugin in widget tests
   for (final lang in ['ar', 'en']) {
     for (final e in _widths.entries) {
       final label = '${e.key} (${e.value.toInt()} px) $lang';

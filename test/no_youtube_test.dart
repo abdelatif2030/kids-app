@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/media/welcome_voice.dart';
 import 'package:kids_app/content_flags.dart';
 import 'package:kids_app/journey/models.dart';
 import 'package:kids_app/journey/repository.dart';
@@ -17,6 +18,7 @@ import 'video_fixture.dart';
 const _kid = ChildProfile(id: 'k1', nickname: 'سلمى', age: 5);
 
 void main() {
+  setUpAll(WelcomeVoice.skipForTests); // no audio plugin in widget tests
   tearDown(resetVideos);
 
   group('the app has no YouTube content (owner decision, 2026-11-06)', () {
@@ -61,7 +63,7 @@ void main() {
         home: const ChildShell(child: _kid),
       ));
       await t.pump();
-      await t.tap(find.text('إبداع').last);
+      await t.tap(find.byKey(const ValueKey('island_create'))); // no bottom bar: the home picture's island
       await t.pump(const Duration(milliseconds: 400));
       expect(find.byKey(const ValueKey('create_studio')), findsOneWidget);
       expect(find.byKey(const ValueKey('create_drawing')), findsOneWidget);

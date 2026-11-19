@@ -29,26 +29,26 @@ void main() {
   });
 
   test('exhibits come only from real records and are isolated per child', () async {
-    await GameRewards.complete('a', 'jigsaw', now: DateTime(2026, 10, 30));
-    await GameRewards.complete('a', 'maze', now: DateTime(2026, 10, 30));
-    await GameRewards.complete('a', 'jigsaw', now: DateTime(2026, 10, 31));
+    await GameRewards.complete('a', 'pattern', now: DateTime(2026, 10, 30));
+    await GameRewards.complete('a', 'letter_fishing', now: DateTime(2026, 10, 30));
+    await GameRewards.complete('a', 'pattern', now: DateTime(2026, 10, 31));
     await StoryStore.addListening('a', kStories.first.id, 60, completed: true, now: DateTime(2026, 10, 30));
     await StoryStore.addListening('a', kStories.last.id, 60, now: DateTime(2026, 10, 30)); // not completed
     await AdventureStore.record('a', '2026-10-26', 'letters');
     await EverydayStore.confirm('a', 'wash_hands', now: DateTime(2026, 10, 30));
     await FamilyTimeStore.confirm('a', 'x', now: DateTime(2026, 10, 30));
-    await GameRewards.complete('b', 'jigsaw', now: DateTime(2026, 10, 30));
+    await GameRewards.complete('b', 'pattern', now: DateTime(2026, 10, 30));
 
     final a = buildMuseum(await loadMuseumData('a'));
-    expect(room(a, 'games').exhibits.map((e) => e.id).toSet(), {'game_jigsaw', 'game_maze'});
-    expect(room(a, 'games').exhibits.firstWhere((e) => e.id == 'game_jigsaw').note, contains('2026-10-31')); // last time
+    expect(room(a, 'games').exhibits.map((e) => e.id).toSet(), {'game_pattern', 'game_letter_fishing'});
+    expect(room(a, 'games').exhibits.firstWhere((e) => e.id == 'game_pattern').note, contains('2026-10-31')); // last time
     expect(room(a, 'stories').exhibits.map((e) => e.id), ['story_${kStories.first.id}']);
     expect(room(a, 'adventures').exhibits, hasLength(1));
     expect(room(a, 'together').exhibits.map((e) => e.id), containsAll(['day_wash_hands', 'family_times']));
     expect(room(a, 'stickers').exhibits, hasLength(3)); // 2 finished games + 1 completed story (the garden count)
 
     final b = buildMuseum(await loadMuseumData('b'));
-    expect(room(b, 'games').exhibits.map((e) => e.id), ['game_jigsaw']);
+    expect(room(b, 'games').exhibits.map((e) => e.id), ['game_pattern']);
     expect(room(b, 'stories').exhibits, isEmpty);
     expect(room(b, 'adventures').exhibits, isEmpty);
     expect(room(b, 'together').exhibits, isEmpty);

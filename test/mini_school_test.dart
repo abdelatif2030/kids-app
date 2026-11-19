@@ -115,13 +115,11 @@ void main() {
       await tester.pump();
     }
 
-    // one learning game for ages 3-6 (owner 2026-11-12): the learning world
-    await show(2);
-    expect(find.text('عالم رحلتي التعليمي'), findsNothing);
-    await show(4);
-    expect(find.text('عالم رحلتي التعليمي'), findsOneWidget);
-    await show(10);
-    expect(find.text('عالم رحلتي التعليمي'), findsNothing);
+    // one learning game, the learning world, opens for any age (owner 2026-11-13); the game picks its own content
+    for (final age in [2, 4, 10]) {
+      await show(age);
+      expect(find.text('عالم رحلتي التعليمي'), findsOneWidget, reason: 'age $age');
+    }
   });
 
   testWidgets('subjects screen lists all subjects', (tester) async {
