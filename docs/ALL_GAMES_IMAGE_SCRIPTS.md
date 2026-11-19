@@ -43,16 +43,16 @@
 | 35 | مبدع الذكاء (AI Creator) | 7 |
 | 36 | غوّاصو اللؤلؤ (Pearl Divers) | 6 |
 | 37 | مزرعة العسل (Honey Farm) | 7 |
-| 38 | تنين الجليد (لسه ما اتبنتش) (Ice Dragon Maze) | 5 |
-| 39 | ينابيع القرية (لسه ما اتبنتش) (Hot Spring Village) | 5 |
-| 40 | مزرعة المريخ (لسه ما اتبنتش) (Mars Farm Colony) | 7 |
+| 38 | تنين الجليد (Ice Dragon Maze) | 5 |
+| 39 | ينابيع القرية (Hot Spring Village) | 5 |
+| 40 | مزرعة المريخ (Mars Farm Colony) | 7 |
 | 41 | الهامستر المحارب (Hamster Warrior) | 6 |
-| 42 | تنظيف السجاد (لسه ما اتبنتش) (Rug Cleaning) | 5 |
-| 43 | مقلاع الفايكنج (لسه ما اتبنتش) (Viking Slingshot) | 6 |
+| 42 | تنظيف السجاد (Rug Cleaning) | 5 |
+| 43 | مقلاع الفايكنج (Viking Slingshot) | 6 |
 | 44 | شاحنة الكور (Ball Scoop) | 8 |
 | 45 | الأكول (متاهة الأشباح) (Chomp Maze) | 6 |
-| 47 | ماريو (لعبة منصات كلاسيكية) (لسه ما اتبنتش) (Classic Platformer (Mario-style, original hero)) | 8 |
-| 48 | النطاط (Doodle-style) (لسه ما اتبنتش) (Sky Jumper (Doodle-style)) | 7 |
+| 47 | عالم القفز (منصات كلاسيكية) (Classic Platformer (Mario-style, original hero)) | 8 |
+| 48 | النطاط (قفز لا نهائي) (Sky Jumper (Doodle-style)) | 7 |
 | 46 | ملكة الموضة (Fashion Queen) (Fashion Queen - Ultimate Girls World) | 18 |
 | 49 | فيزمان (Fizz Man) - بديل أصلي (Fizz Man (original soda-hero runner)) | 12 |
 | 50 | أقسام ألعاب التسلية (واجهة التقسيم الجديد) (Fun Games Sections (new menu art)) | 9 |
@@ -66,7 +66,10 @@
 | 58 | جيش المعبد (Temple Army) | 6 |
 | 59 | طبق الحلويات (Sweet Tray) | 5 |
 | 60 | اسحب الدبوس (Pull the Pin (puzzle)) | 5 |
-| | **المجموع** | **501** |
+| 61 | محجر الجواهر (Gemlode Quarry) | 7 |
+| 62 | طيار السحاب (Sky Ace) | 7 |
+| 63 | لغز المقبرة (Tomb Puzzle) | 5 |
+| | **المجموع** | **520** |
 
 قواعد عامة: خلفية **شفافة** للشخصيات والعناصر (PNG)، من غير كلام على الصورة إلا لو مكتوب، ممنوع دم أو شيء مخيف (أطفال 1-6 سنين)، الاسم المكتوب هو اسم الملف. لو الاسم فيه `1..5` يبقى ملف لكل رقم.
 
@@ -815,7 +818,7 @@ Casual 3D cartoon farm art, sunny meadow, flowers, glossy honey, chunky shapes, 
 
 ---
 
-## 38. تنين الجليد (لسه ما اتبنتش) — Ice Dragon Maze (5 سكريبت)
+## 38. تنين الجليد — Ice Dragon Maze (5 سكريبت)
 
 **سطر الأسلوب (حطه في أول كل برومت):**
 
@@ -831,7 +834,7 @@ Cute 3D fantasy art, icy maze above turquoise water, frosty blue and white, glow
 
 ---
 
-## 39. ينابيع القرية (لسه ما اتبنتش) — Hot Spring Village (5 سكريبت)
+## 39. ينابيع القرية — Hot Spring Village (5 سكريبت)
 
 **سطر الأسلوب (حطه في أول كل برومت):**
 
@@ -847,7 +850,7 @@ Cozy 3D cartoon art, snowy mountain village hot spring, warm steam, lanterns, so
 
 ---
 
-## 40. مزرعة المريخ (لسه ما اتبنتش) — Mars Farm Colony (7 سكريبت)
+## 40. مزرعة المريخ — Mars Farm Colony (7 سكريبت)
 
 **سطر الأسلوب (حطه في أول كل برومت):**
 
@@ -882,7 +885,7 @@ Cute 3D cartoon adventure art, forest path, glossy shapes, big readable numbers,
 
 ---
 
-## 42. تنظيف السجاد (لسه ما اتبنتش) — Rug Cleaning (5 سكريبت)
+## 42. تنظيف السجاد — Rug Cleaning (5 سكريبت)
 
 **سطر الأسلوب (حطه في أول كل برومت):**
 
@@ -898,7 +901,7 @@ Cozy 3D ASMR-style art, sunny Mediterranean courtyard, whitewashed walls, limest
 
 ---
 
-## 43. مقلاع الفايكنج (لسه ما اتبنتش) — Viking Slingshot (6 سكريبت)
+## 43. مقلاع الفايكنج — Viking Slingshot (6 سكريبت)
 
 **سطر الأسلوب (حطه في أول كل برومت):**
 
@@ -951,7 +954,7 @@ Neon arcade maze game art, glossy 3D-rendered cartoon, deep blue background with
 
 ---
 
-## 47. ماريو (لعبة منصات كلاسيكية) (لسه ما اتبنتش) — Classic Platformer (Mario-style, original hero) (8 سكريبت)
+## 47. عالم القفز (منصات كلاسيكية) — Classic Platformer (Mario-style, original hero) (8 سكريبت)
 
 **سطر الأسلوب (حطه في أول كل برومت):**
 
@@ -970,7 +973,7 @@ Bright cheerful 2D side-scrolling platformer art, rich saturated colors, bold ou
 
 ---
 
-## 48. النطاط (Doodle-style) (لسه ما اتبنتش) — Sky Jumper (Doodle-style) (7 سكريبت)
+## 48. النطاط (قفز لا نهائي) — Sky Jumper (Doodle-style) (7 سكريبت)
 
 **سطر الأسلوب (حطه في أول كل برومت):**
 
@@ -1230,4 +1233,56 @@ Glossy candy-colored 3D-rendered physics puzzle art, pastel mint background, gum
 3. `puzzle_bg.png` — A mint-and-pink striped background with candy sprinkles, portrait 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
 4. `ui_buttons.png` — Undo, restart and hint (lightbulb) round buttons, level badge, coin pill, tutorial hand pointer. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
 5. `card_pull_pin.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 61. محجر الجواهر — Gemlode Quarry (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Casual 3D-rendered isometric idle-logistics art, sandy hill quarry with glowing purple crystals, wooden crates, chunky yellow trucks, warm sunny colors, kid friendly.
+```
+
+1. `crystal_mine.png` — A sandy mine entrance with glowing purple gem crystals and little diggers; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `crates_tower.png` — Wooden crates of purple gems: single, stacked tower, overflowing pile with a red warning mark; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `trucks_road.png` — A chunky yellow truck loaded with crates (3 angles), a winding sandy road piece and a depot with a loading pad; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `upgrade_pads.png` — Glowing upgrade pads with price tags (diggers, trucks, bigger pile, polish shop, second mine); transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `quarry_scene.png` — An isometric sandy hill quarry landscape, empty, portrait 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `ui_overflow.png` — OVERFLOW banner, crates shipped counter 60/100, coin pill, level map cards with stars. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+7. `card_gem_quarry.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 62. طيار السحاب — Sky Ace (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Casual 2.5D vertical shooter art, pastel cloud sky with floating islands, glossy cartoon propeller planes with goggled pilots, kid friendly, no gore.
+```
+
+1. `player_plane.png` — A cute propeller plane with a goggled pilot: straight, banking left, banking right, shield bubble, five color skins; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `enemy_planes.png` — Red and black cartoon enemy planes, UFO drones and bombers, plus puff-and-parachute defeat frames; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `bosses_three.png` — A giant blimp boss, a UFO boss and a flying fortress boss with damage states; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `powerups.png` — Double shot, shield, magnet, bomb, X2 multiplier, health pack, coin; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `sky_stages.png` — Eight pastel sky backgrounds with parallax clouds and floating islands, portrait 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `ui_hud.png` — Health bar with percentage, score, bomb button with cooldown ring, hangar upgrade cards, tutorial hand. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+7. `card_sky_ace.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 63. لغز المقبرة — Tomb Puzzle (5 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Warm torch-lit Egyptian tomb 3D-rendered puzzle art, hieroglyph walls, red lotus carpet, golden sun-disc plates, a small explorer with a hat, kid friendly, not scary.
+```
+
+1. `explorer_poses.png` — A small explorer with a hat holding a torch: idle, walking in four directions, pushing, falling, cheering; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `tomb_objects.png` — Pushable stone block, golden sun-disc pressure plate (up and pressed), doors A-D, golden ankh key, braziers (lit and unlit), crumbling tile; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `tomb_tiles.png` — Three tomb tile sets (sand, golden, moonlit) with hieroglyph walls and a red lotus carpet, top 3/4 view. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+4. `ui_hints.png` — Ankh counter n/8, hint banner, undo, reset, lightbulb hint buttons, level cards with keys and stars. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+5. `card_tomb_puzzle.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
 

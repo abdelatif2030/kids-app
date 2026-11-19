@@ -142,7 +142,7 @@ game(37, 'مزرعة العسل', 'Honey Farm',
       ('card_honey_farm', 'scene', CARD)])
 
 # ---- requested, not built yet (scripts ready in advance) ----
-game(38, 'تنين الجليد (لسه ما اتبنتش)', 'Ice Dragon Maze',
+game(38, 'تنين الجليد', 'Ice Dragon Maze',
      "Cute 3D fantasy art, icy maze above turquoise water, frosty blue and white, glowing runes, giant armored segmented dragon, no gore, kid friendly.",
      [('hero_poses', 'sprite', 'A small cartoon hero with a staff: idle, run, shoot, cheer; four files.'),
       ('dragon_head_segment', 'sprite', 'A giant ice dragon head and an armored body segment (intact and cracked); three files.'),
@@ -150,7 +150,7 @@ game(38, 'تنين الجليد (لسه ما اتبنتش)', 'Ice Dragon Maze',
       ('ice_maze_scene', 'scene', 'An ice-block maze platform surrounded by turquoise water channels, top 3/4 view.'),
       ('card_ice_dragon', 'scene', CARD)])
 
-game(39, 'ينابيع القرية (لسه ما اتبنتش)', 'Hot Spring Village',
+game(39, 'ينابيع القرية', 'Hot Spring Village',
      "Cozy 3D cartoon art, snowy mountain village hot spring, warm steam, lanterns, soft light, kid friendly.",
      [('caretaker_poses', 'sprite', 'A cute caretaker with a scarf carrying ginger slices: idle, walk, carry, cheer; four files.'),
       ('visitors_frozen', 'sprite', 'Frozen blue visitors shivering and then warm happy ones; six files.'),
@@ -158,7 +158,7 @@ game(39, 'ينابيع القرية (لسه ما اتبنتش)', 'Hot Spring Vil
       ('lanterns', 'sprite', 'Unlit and lit paper lanterns; two files.'),
       ('card_hot_spring', 'scene', CARD)])
 
-game(40, 'مزرعة المريخ (لسه ما اتبنتش)', 'Mars Farm Colony',
+game(40, 'مزرعة المريخ', 'Mars Farm Colony',
      "Colorful isometric cartoon art on Mars, red terrain, futuristic farm buildings, cute drones, kid friendly.",
      [('crops_three', 'sprite', 'Wheat, corn, carrots at three growth stages; nine files.'),
       ('goat_pen', 'sprite', 'A cute goat and a futuristic pen; two files.'),
@@ -177,7 +177,7 @@ game(41, 'الهامستر المحارب', 'Hamster Warrior',
       ('forest_path', 'scene', 'A bright forest path, no characters.'),
       ('card_hamster', 'scene', CARD)])
 
-game(42, 'تنظيف السجاد (لسه ما اتبنتش)', 'Rug Cleaning',
+game(42, 'تنظيف السجاد', 'Rug Cleaning',
      "Cozy 3D ASMR-style art, sunny Mediterranean courtyard, whitewashed walls, limestone tiles, geraniums, glassy minimal UI, no real brands or characters.",
      [('courtyard_scene', 'scene', 'A sunny whitewashed courtyard with limestone tiles, potted geraniums and an edge drain.'),
       ('rugs_dirty_clean', 'sprite', 'Four hand-knotted rug patterns, each dirty (dust, coffee stain, muddy boot prints) and clean; eight files.'),
@@ -185,7 +185,7 @@ game(42, 'تنظيف السجاد (لسه ما اتبنتش)', 'Rug Cleaning',
       ('ui_slider_stars', 'ui', 'A before/after slider handle, star rating, coin.'),
       ('card_rug_cleaning', 'scene', CARD)])
 
-game(43, 'مقلاع الفايكنج (لسه ما اتبنتش)', 'Viking Slingshot',
+game(43, 'مقلاع الفايكنج', 'Viking Slingshot',
      "Chunky 3D cartoon physics-game art, wooden goblin forts, stone and ice blocks, chubby vikings, no gore, kid friendly.",
      [('vikings_four', 'sprite', 'A chubby viking, a bomb thrower, a shield bouncer and a giant viking; four files.'),
       ('slingshot', 'sprite', 'A giant wooden slingshot, two frames.'),
@@ -214,7 +214,7 @@ game(45, 'الأكول (متاهة الأشباح)', 'Chomp Maze',
       ('ui_hud', 'ui', 'Score badge, life icons, level badge, swipe hint hand icon.'),
       ('card_chomp_maze', 'scene', CARD)])
 
-game(47, 'ماريو (لعبة منصات كلاسيكية) (لسه ما اتبنتش)', 'Classic Platformer (Mario-style, original hero)',
+game(47, 'عالم القفز (منصات كلاسيكية)', 'Classic Platformer (Mario-style, original hero)',
      "Bright cheerful 2D side-scrolling platformer art, rich saturated colors, bold outlines, original cartoon hero (NOT Mario), kid friendly, no real brands or characters.",
      [('hero_poses', 'sprite', 'An original little adventurer hero with a red cap-less helmet and blue overalls: idle, run (3 frames), jump, fall, big (power-up), win; eight files.'),
       ('enemies', 'sprite', 'Three friendly-looking enemies: a walking mushroom-bug, a shell turtle, a flying bee; two frames each, plus squashed; nine files.'),
@@ -225,7 +225,7 @@ game(47, 'ماريو (لعبة منصات كلاسيكية) (لسه ما اتب�
       ('ui_hud', 'ui', 'Coin counter, lives, timer, world badge, left/right/jump touch buttons.'),
       ('card_platformer', 'scene', CARD)])
 
-game(48, 'النطاط (Doodle-style) (لسه ما اتبنتش)', 'Sky Jumper (Doodle-style)',
+game(48, 'النطاط (قفز لا نهائي)', 'Sky Jumper (Doodle-style)',
      "Cute hand-drawn style endless jumper game art, notebook-paper background, rounded doodle creatures, bright pastel platforms, kid friendly.",
      [('jumper_poses', 'sprite', 'A cute four-legged doodle creature with a long nose: idle, jump up, falling, shooting, win; five files.'),
       ('platforms', 'sprite', 'Green normal platforms, blue moving platforms, brown crumbling platform, a spring platform; six files.'),
@@ -377,3 +377,32 @@ game(60, 'اسحب الدبوس', 'Pull the Pin (puzzle)',
       ('puzzle_bg', 'scene', 'A mint-and-pink striped background with candy sprinkles, portrait 1080x1920.'),
       ('ui_buttons', 'ui', 'Undo, restart and hint (lightbulb) round buttons, level badge, coin pill, tutorial hand pointer.'),
       ('card_pull_pin', 'scene', CARD)])
+
+
+game(61, 'محجر الجواهر', 'Gemlode Quarry',
+     "Casual 3D-rendered isometric idle-logistics art, sandy hill quarry with glowing purple crystals, wooden crates, chunky yellow trucks, warm sunny colors, kid friendly.",
+     [('crystal_mine', 'sprite', 'A sandy mine entrance with glowing purple gem crystals and little diggers; transparent.'),
+      ('crates_tower', 'sprite', 'Wooden crates of purple gems: single, stacked tower, overflowing pile with a red warning mark; transparent.'),
+      ('trucks_road', 'sprite', 'A chunky yellow truck loaded with crates (3 angles), a winding sandy road piece and a depot with a loading pad; transparent.'),
+      ('upgrade_pads', 'sprite', 'Glowing upgrade pads with price tags (diggers, trucks, bigger pile, polish shop, second mine); transparent.'),
+      ('quarry_scene', 'scene', 'An isometric sandy hill quarry landscape, empty, portrait 1080x1920.'),
+      ('ui_overflow', 'ui', 'OVERFLOW banner, crates shipped counter 60/100, coin pill, level map cards with stars.'),
+      ('card_gem_quarry', 'scene', CARD)])
+
+game(62, 'طيار السحاب', 'Sky Ace',
+     "Casual 2.5D vertical shooter art, pastel cloud sky with floating islands, glossy cartoon propeller planes with goggled pilots, kid friendly, no gore.",
+     [('player_plane', 'sprite', 'A cute propeller plane with a goggled pilot: straight, banking left, banking right, shield bubble, five color skins; transparent.'),
+      ('enemy_planes', 'sprite', 'Red and black cartoon enemy planes, UFO drones and bombers, plus puff-and-parachute defeat frames; transparent.'),
+      ('bosses_three', 'sprite', 'A giant blimp boss, a UFO boss and a flying fortress boss with damage states; transparent.'),
+      ('powerups', 'sprite', 'Double shot, shield, magnet, bomb, X2 multiplier, health pack, coin; transparent.'),
+      ('sky_stages', 'scene', 'Eight pastel sky backgrounds with parallax clouds and floating islands, portrait 1080x1920.'),
+      ('ui_hud', 'ui', 'Health bar with percentage, score, bomb button with cooldown ring, hangar upgrade cards, tutorial hand.'),
+      ('card_sky_ace', 'scene', CARD)])
+
+game(63, 'لغز المقبرة', 'Tomb Puzzle',
+     "Warm torch-lit Egyptian tomb 3D-rendered puzzle art, hieroglyph walls, red lotus carpet, golden sun-disc plates, a small explorer with a hat, kid friendly, not scary.",
+     [('explorer_poses', 'sprite', 'A small explorer with a hat holding a torch: idle, walking in four directions, pushing, falling, cheering; transparent.'),
+      ('tomb_objects', 'sprite', 'Pushable stone block, golden sun-disc pressure plate (up and pressed), doors A-D, golden ankh key, braziers (lit and unlit), crumbling tile; transparent.'),
+      ('tomb_tiles', 'scene', 'Three tomb tile sets (sand, golden, moonlit) with hieroglyph walls and a red lotus carpet, top 3/4 view.'),
+      ('ui_hints', 'ui', 'Ankh counter n/8, hint banner, undo, reset, lightbulb hint buttons, level cards with keys and stars.'),
+      ('card_tomb_puzzle', 'scene', CARD)])

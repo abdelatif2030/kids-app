@@ -1,41 +1,27 @@
-# التقرير الشامل + سكريبتات التحسين لكل الألعاب (2026-11-19)
+# التقرير الشامل + سكريبتات الصور لكل ألعاب التطبيق (2026-11-20)
 
-## 1) كل الألعاب اللي طلبتها في الشات: الحالة
-| # | اللعبة | الحالة | ملاحظات |
-|---|---|---|---|
-| 1 | برج الأبطال (Hero Tower) | مبنية ومسجّلة | 2D canvas، 3 فصول |
-| 2 | ركضة السحاب (Cloud Dash) | مبنية ومسجّلة | اتصلّح اتجاه اليمين/الشمال |
-| 3 | سكاي كابي (SKY CAPY) | مبنية ومسجّلة | |
-| 4 | جرّافة الكرات (Marble Dozer) | مبنية ومسجّلة | الروبوت مش بيثبت إنها قابلة للفوز، الأوقات واسعة |
-| 5 | تيتان الكثبان (Dune Titans) | مبنية ومسجّلة | ناقص تأثير عبور المية والانزلاق الحقيقي |
-| 6 | طوف الناجي (Castaway Raft) | مبنية ومسجّلة | 8 مراحل |
-| 7 | معسكر الشتاء (Winter Camp) | مبنية ومسجّلة | منظور علوي 2D مش 3D |
-| 8 | فرقة الجنود (Squad Shooter) | مبنية ومسجّلة | 8 مراحل، محرك مشترك مع رماة الجسر |
-| 9 | رماة الجسر (Archer Bridge) | مبنية ومسجّلة | 8 مراحل |
-| 10 | سباق السماء الغريبة (Alien Sky) | مبنية ومسجّلة | 3 جولات + جيت باك |
-| 11 | سباق القمة / وحيد القرن (Summit Race) | مبنية ومسجّلة | 3 جولات |
-| 12 | طريق الغروب (Sunset Highway) | مبنية ومسجّلة | 3 مراحل |
-| 13 | سباق حلبة المطر (Rain Circuit) | مبنية ومسجّلة | الحلبة مسطّحة (مفيش ارتفاعات) |
-| 14 | مبدع الذكاء (AI Creator) | مبنية ومسجّلة | |
-| 15 | غوّاصو اللؤلؤ (Pearl Divers) | مبنية ومسجّلة | 2D مش 3D |
-| 16 | مزرعة العسل (Honey Farm) | مبنية ومسجّلة | 2D علوي |
-| 17 | تنين الجليد (Ice Dragon) | **ناقصة**: المحاكاة والاختبارات بس | مفيش شاشة 3D ولا تسجيل |
-| 18 | ينابيع القرية (Hot Spring) | **ماتبنتش** | |
-| 19 | مزرعة المريخ (Mars Farm، 12 مرحلة) | **ماتبنتش** | |
-| 20 | الهامستر المحارب (Hamster Warrior) | **ماتبنتش** | |
-| 21 | تنظيف السجاد (Rug Cleaning) | **ماتبنتش** | |
-| 22 | مقلاع الفايكنج (Viking Slingshot) | **ماتبنتش** | محتاجة محرك فيزيا |
+## 1) كل الألعاب في التطبيق وحالتها
+الألعاب الجديدة اتبنت بالكود (رسم وصوت من الكود، من غير ملفات)، وكل لعبة ليها محاكاة نقية (sim.js) واختبارات node بروبوت بيلعبها، وكلها نجحت. اتسجّلت كلها في «ألعاب للتسلية» مقسّمة لأقسام: سباقات، أكشن ومعارك، جري وقفز، مزارع ومشاريع، ألغاز وتفكير، عالم البنات.
 
-النتيجة: 16 لعبة مبنية ومسجّلة (صفحة «ألعاب التسلية» الثالثة)، لعبة نصها (تنين الجليد)، و5 ماتبنتش. ماقارنتش أي لعبة بالفيديو لقطة بلقطة، فكل لعبة «مبنية على وصف الفيديو والبرومت» مش «نسخة طبق الأصل».
+| اللعبة | القسم | اختبارات الروبوت |
+|---|---|---|
+| تيتان الكثبان، سباق حلبة المطر، طريق الغروب | سباقات | نجحت |
+| فرقة الجنود، رماة الجسر، تنين الجليد، الهامستر المحارب، جيش المعبد | أكشن | نجحت |
+| طيار السحاب، سكة الكورة، مقلاع الفايكنج، معركة الكروت، حلبة الجليد، فرسان البرميل، فرقة الدببة، الديناصور | أكشن | نجحت |
+| السماء الغريبة، سباق القمة، فيزمان، شاحنة الكور (30 مرحلة بفيزياء حقيقية)، سكاي كابي، حلاوة ولا مقلب، عالم القفز، النطاط | جري وقفز | نجحت |
+| طوف الناجي، معسكر الشتاء، مزرعة العسل، مبدع الذكاء، غوّاصو اللؤلؤ، ينابيع القرية، مزرعة المريخ، محجر الجواهر، تنظيف السجاد | مزارع ومشاريع | نجحت |
+| جرّافة الكرات، الأكول، اسحب الدبوس، لغز المقبرة، طبق الحلويات | ألغاز | نجحت |
+| ملكة الموضة (استوديو، صالون، حيوانات، بيت، منصة، خريطة، اقتصاد، حفظ) | عالم البنات | 16 اختبار |
+
+مهم: «فيزمان» نسخة أصلية بدل لعبة بيبسي مان (من غير شعار ولا اسم تجاري). «الأكول» نسخة أصلية بدل باك مان. «عالم القفز» بدل ماريو. «النطاط» بدل دودل جامب. كل الشخصيات أصلية.
 
 ## 2) الاختبارات
-- محاكاة كل لعبة جديدة ليها اختبار node بروبوت بيلعب: كلها ناجحة (dune_titans 7، rain_circuit 7، castaway_raft 6، winter_camp 5، lane_shooter 6، course_race 4، highway_race 5، creator_tycoon 6، pearl_divers 5، honey_farm 4، ice_dragon 4، sky_capy 8، marble_dozer 9، اللعبة التعليمية 145).
-- اختبار فلاتر لصفحات الألعاب لوحده: 8/8 ناجح. الاختبار الكامل للتطبيق (flutter test) شغّال لما كتبت التقرير؛ النتيجة في docs/FULL_TEST_RESULT.md لو خلص.
-- لسه ماحصلش: موبايل حقيقي، سماع الصوت، قياس الأداء على جهاز ضعيف.
+- محاكاة كل لعبة جديدة: اختبارات node ناجحة (من 4 لـ 23 اختبار لكل لعبة).
+- فحص تحميل: 52 لعبة ويب قديمة اتفحصت (تحميل وعرض وبدون أخطاء) 52/52 (انظر tools/smoke_games.md). الألعاب الجديدة اتفتحت وشافها كل أجينت في المتصفح.
+- Flutter: اختبار الأقسام (3/3) واختبار صفحة الألعاب ناجحين. الاختبار الكامل للتطبيق (flutter test) كان فيه 36 اختبار فاشل قبل شغل اليوم، أغلبها قديمة (قشرة الطفل، فحوصات ثابتة، release_config) ولسه ما اتصلّحتش.
+- ما اتجرّبش: موبايل حقيقي، سماع الصوت بأذن، قياس الأداء على جهاز ضعيف، مقارنة كل لعبة بالفيديو لقطة بلقطة (كل لعبة مبنية على وصف الفيديو والبرومت وليست نسخة طبق الأصل).
 
 ## 3) اللعبة التعليمية: 100 عنصر في كل مستوى
-تدقيق بالأداة `game_src/learn_games/tools/audit_levels.mjs` (بتلعب مئات الألعاب بذاكرة طفل جديدة وبتعدّ العناصر المختلفة اللي بتظهر):
-
 ```
 level | distinct things | distinct answers | picture bank | games played
 counting         أعدّ وأجمع                 20   20    -   43   <100
@@ -64,19 +50,16 @@ words            كلماتي الأولى             247  247    -   71
 first            أول حرف في الكلمة         247   28    -   71
 below 100: 20 of 24; repeats inside one game: 1
 ```
+20 مستوى من 24 تحت 100 عنصر. توسيعها محتاج أسوات جديدة (فاطمة) وصور، ولسه ما اتعملش.
 
-الخلاصة: **20 مستوى من 24 تحت 100 عنصر**. الفوق 100: الأرقام 101، مدرستي وموسيقاي 104، كلماتي الأولى 247، أول حرف 247. تكرار جوه لعبة واحدة: حالة واحدة في التدقيق (لازم نحدد المستوى).
-ليه ماكملتش: كل سؤال جديد لازم له تسجيل صوت بنفس صوت فاطمة + مراجعة تشكيل + فحص بأداة التفريغ، وكل صورة جديدة لازم تتعمل. ده مئات الجمل والصور ووقفت عند حد الاستخدام.
-الخطة (الأقل أولاً): أعدّ وأجمع (20)، الأيام والفصول (21)، الأشكال (25)، الأبجدية بالترتيب (27)، الحروف (28)، الألوان (34)، عالم البحر (39)، فضاء وخيال (44)، عادات (51)، مصر والمدينة (62)، الحيوانات (63)... كل مستوى يوصل 100+ عنصر مختلف بدون تكرار وكل سؤال جديد له صوت.
+## 4) اللي لسه ناقص
+1. صور كروت الألعاب الجديدة وأقسام «ألعاب للتسلية» (سكريبتاتها تحت). لحد ما تتحط، الشاشة بتعرض إيموجي.
+2. توسيع مستويات اللعبة التعليمية.
+3. إصلاح اختبارات التطبيق القديمة الفاشلة (36).
+4. اختبار على موبايل حقيقي وسماع الصوت وضبط الصعوبة مع أطفال.
+5. نشر الديمو على الويب (محتاج apiKey وappId لتطبيق الويب من فيربيز + رابط تخزين الفيديوهات).
 
-## 4) اللي لسه ناقص (بالترتيب المقترح)
-1. شاشة تنين الجليد ثم الخمس ألعاب الباقية.
-2. توسيع المستويات التعليمية لـ100+ مع الأصوات.
-3. مقارنة كل لعبة بالفيديو بتاعها (ابعتلي إطارات أو الفروق).
-4. اختبار على جهاز حقيقي وسماع الصوت وقياس الأداء.
-5. نشر الديمو على الويب (محتاج قيم Firebase و LESSONS_BASE_URL).
-
-## 5) سكريبتات الصور لكل الألعاب (370 سكريبت، 43 لعبة)
+## 5) سكريبتات الصور لكل ألعاب التطبيق
 
 الملف ده بيتولّد بـ `python tools/make_image_scripts.py`. كل سكريبت = برومت واحد (ممكن يطلع منه أكتر من ملف لو مكتوب «ملفات» فيه). اكتب **سطر الأسلوب** في أول كل برومت لنفس اللعبة عشان الشخصيات تبقى من نفس العيلة.
 
@@ -121,13 +104,33 @@ below 100: 20 of 24; repeats inside one game: 1
 | 35 | مبدع الذكاء (AI Creator) | 7 |
 | 36 | غوّاصو اللؤلؤ (Pearl Divers) | 6 |
 | 37 | مزرعة العسل (Honey Farm) | 7 |
-| 38 | تنين الجليد (لسه ما اتبنتش) (Ice Dragon Maze) | 5 |
-| 39 | ينابيع القرية (لسه ما اتبنتش) (Hot Spring Village) | 5 |
-| 40 | مزرعة المريخ (لسه ما اتبنتش) (Mars Farm Colony) | 7 |
-| 41 | الهامستر المحارب (لسه ما اتبنتش) (Hamster Warrior) | 6 |
-| 42 | تنظيف السجاد (لسه ما اتبنتش) (Rug Cleaning) | 5 |
-| 43 | مقلاع الفايكنج (لسه ما اتبنتش) (Viking Slingshot) | 6 |
-| | **المجموع** | **370** |
+| 38 | تنين الجليد (Ice Dragon Maze) | 5 |
+| 39 | ينابيع القرية (Hot Spring Village) | 5 |
+| 40 | مزرعة المريخ (Mars Farm Colony) | 7 |
+| 41 | الهامستر المحارب (Hamster Warrior) | 6 |
+| 42 | تنظيف السجاد (Rug Cleaning) | 5 |
+| 43 | مقلاع الفايكنج (Viking Slingshot) | 6 |
+| 44 | شاحنة الكور (Ball Scoop) | 8 |
+| 45 | الأكول (متاهة الأشباح) (Chomp Maze) | 6 |
+| 47 | عالم القفز (منصات كلاسيكية) (Classic Platformer (Mario-style, original hero)) | 8 |
+| 48 | النطاط (قفز لا نهائي) (Sky Jumper (Doodle-style)) | 7 |
+| 46 | ملكة الموضة (Fashion Queen) (Fashion Queen - Ultimate Girls World) | 18 |
+| 49 | فيزمان (Fizz Man) - بديل أصلي (Fizz Man (original soda-hero runner)) | 12 |
+| 50 | أقسام ألعاب التسلية (واجهة التقسيم الجديد) (Fun Games Sections (new menu art)) | 9 |
+| 51 | معركة الكروت النيون (Neon Card Battle) | 8 |
+| 52 | معركة حلبة الجليد (Ice Rink Brawl) | 6 |
+| 53 | سكة الكورة (Nutmeg Rush) (Nutmeg Rush) | 7 |
+| 54 | فرقة الدببة الجيلي (Gummy Squad) | 7 |
+| 55 | ديناصور صغير يكبر (Dino Grow) | 6 |
+| 56 | فرسان البرميل (Barrel Knights) | 6 |
+| 57 | حلاوة ولا مقلب (Trick or Treat Crowd) | 7 |
+| 58 | جيش المعبد (Temple Army) | 6 |
+| 59 | طبق الحلويات (Sweet Tray) | 5 |
+| 60 | اسحب الدبوس (Pull the Pin (puzzle)) | 5 |
+| 61 | محجر الجواهر (Gemlode Quarry) | 7 |
+| 62 | طيار السحاب (Sky Ace) | 7 |
+| 63 | لغز المقبرة (Tomb Puzzle) | 5 |
+| | **المجموع** | **520** |
 
 قواعد عامة: خلفية **شفافة** للشخصيات والعناصر (PNG)، من غير كلام على الصورة إلا لو مكتوب، ممنوع دم أو شيء مخيف (أطفال 1-6 سنين)، الاسم المكتوب هو اسم الملف. لو الاسم فيه `1..5` يبقى ملف لكل رقم.
 
@@ -876,7 +879,7 @@ Casual 3D cartoon farm art, sunny meadow, flowers, glossy honey, chunky shapes, 
 
 ---
 
-## 38. تنين الجليد (لسه ما اتبنتش) — Ice Dragon Maze (5 سكريبت)
+## 38. تنين الجليد — Ice Dragon Maze (5 سكريبت)
 
 **سطر الأسلوب (حطه في أول كل برومت):**
 
@@ -892,7 +895,7 @@ Cute 3D fantasy art, icy maze above turquoise water, frosty blue and white, glow
 
 ---
 
-## 39. ينابيع القرية (لسه ما اتبنتش) — Hot Spring Village (5 سكريبت)
+## 39. ينابيع القرية — Hot Spring Village (5 سكريبت)
 
 **سطر الأسلوب (حطه في أول كل برومت):**
 
@@ -908,7 +911,7 @@ Cozy 3D cartoon art, snowy mountain village hot spring, warm steam, lanterns, so
 
 ---
 
-## 40. مزرعة المريخ (لسه ما اتبنتش) — Mars Farm Colony (7 سكريبت)
+## 40. مزرعة المريخ — Mars Farm Colony (7 سكريبت)
 
 **سطر الأسلوب (حطه في أول كل برومت):**
 
@@ -926,7 +929,7 @@ Colorful isometric cartoon art on Mars, red terrain, futuristic farm buildings, 
 
 ---
 
-## 41. الهامستر المحارب (لسه ما اتبنتش) — Hamster Warrior (6 سكريبت)
+## 41. الهامستر المحارب — Hamster Warrior (6 سكريبت)
 
 **سطر الأسلوب (حطه في أول كل برومت):**
 
@@ -943,7 +946,7 @@ Cute 3D cartoon adventure art, forest path, glossy shapes, big readable numbers,
 
 ---
 
-## 42. تنظيف السجاد (لسه ما اتبنتش) — Rug Cleaning (5 سكريبت)
+## 42. تنظيف السجاد — Rug Cleaning (5 سكريبت)
 
 **سطر الأسلوب (حطه في أول كل برومت):**
 
@@ -959,7 +962,7 @@ Cozy 3D ASMR-style art, sunny Mediterranean courtyard, whitewashed walls, limest
 
 ---
 
-## 43. مقلاع الفايكنج (لسه ما اتبنتش) — Viking Slingshot (6 سكريبت)
+## 43. مقلاع الفايكنج — Viking Slingshot (6 سكريبت)
 
 **سطر الأسلوب (حطه في أول كل برومت):**
 
@@ -973,4 +976,374 @@ Chunky 3D cartoon physics-game art, wooden goblin forts, stone and ice blocks, c
 4. `blocks.png` — Wood planks, stone blocks, ice blocks; three files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
 5. `boss_fortress.png` — A big boss fortress. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
 6. `card_viking_slingshot.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 44. شاحنة الكور — Ball Scoop (8 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Colorful 3D-rendered hyper-casual runner art, glossy candy balls, warm wooden road, bright yellow bulldozer truck, soft shadows, kid friendly.
+```
+
+1. `truck_poses.png` — A chunky yellow bulldozer truck with a huge front shovel, 3/4 rear view; plus tilted left, tilted right and full-of-balls; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `balls_sheet.png` — Glossy balls in six candy colors (red, blue, yellow, green, purple, orange) with highlights; six files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `gates.png` — Translucent blue gates with posts for +10, +50, x2, x3 and red gates for -20; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `walls_obstacles.png` — A red brick wall block, a striped barrier and a rotating bar; three files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `giant_bank.png` — A giant golden bank building with columns and a coin slot, and a coin burst; two files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+6. `road_scene.png` — A wooden plank road with red and blue rails over green meadow, curves and a ramp, no characters. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+7. `ui_hud.png` — Level badge, ball counter with a ball icon, progress bar with truck and bank icons, upgrade buttons (start balls, wider shovel, coin value). Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+8. `card_ball_scoop.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 45. الأكول (متاهة الأشباح) — Chomp Maze (6 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Neon arcade maze game art, glossy 3D-rendered cartoon, deep blue background with glowing wall blocks, cute round yellow chomper hero and four friendly colored ghost blobs, kid friendly, original characters.
+```
+
+1. `chomper_poses.png` — A cute round yellow chomper character "Sunny" with big eyes: mouth closed, half open, wide open, happy win, dizzy; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `ghosts_four.png` — Four friendly ghost blobs (pink, blue, green, orange) with big eyes: normal, scared blue, flashing white, eyes only; sixteen files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `fruit_dots.png` — A glowing cream dot, a power cherry, a strawberry and a banana bonus; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `maze_walls_four.png` — Four neon maze wall styles (blue, red, purple, teal) as seamless wall tile sheets. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+5. `ui_hud.png` — Score badge, life icons, level badge, swipe hint hand icon. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+6. `card_chomp_maze.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 47. عالم القفز (منصات كلاسيكية) — Classic Platformer (Mario-style, original hero) (8 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Bright cheerful 2D side-scrolling platformer art, rich saturated colors, bold outlines, original cartoon hero (NOT Mario), kid friendly, no real brands or characters.
+```
+
+1. `hero_poses.png` — An original little adventurer hero with a red cap-less helmet and blue overalls: idle, run (3 frames), jump, fall, big (power-up), win; eight files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `enemies.png` — Three friendly-looking enemies: a walking mushroom-bug, a shell turtle, a flying bee; two frames each, plus squashed; nine files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `blocks_pipes.png` — Question blocks (and used), brick blocks, a green pipe, ground tiles, a floating cloud platform, a spring; ten files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `items.png` — A spinning coin, a power-up mushroom, a star, a fire flower, a heart; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `worlds_backdrops.png` — Four parallax worlds: sunny hills, underground cave, desert pyramids, snowy castle; four layers each. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `goal_flag_castle.png` — A goal flag pole and a small castle. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+7. `ui_hud.png` — Coin counter, lives, timer, world badge, left/right/jump touch buttons. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+8. `card_platformer.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 48. النطاط (قفز لا نهائي) — Sky Jumper (Doodle-style) (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Cute hand-drawn style endless jumper game art, notebook-paper background, rounded doodle creatures, bright pastel platforms, kid friendly.
+```
+
+1. `jumper_poses.png` — A cute four-legged doodle creature with a long nose: idle, jump up, falling, shooting, win; five files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `platforms.png` — Green normal platforms, blue moving platforms, brown crumbling platform, a spring platform; six files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `powerups.png` — A propeller hat, a jetpack, a spring shoes, a shield bubble; four files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `enemies.png` — Three silly monsters: a green blob, a purple two-eyed monster, a UFO; three files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `paper_backdrops.png` — Four graph-paper backgrounds with different pastel margin colors and doodles, 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `ui_hud.png` — Height score badge, pause button, game-over screen frame. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+7. `card_sky_jumper.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 46. ملكة الموضة (Fashion Queen) — Fashion Queen - Ultimate Girls World (18 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Premium glossy 3D-rendered cartoon girls mobile game art, pink purple white and gold palette, sparkles, soft studio lighting, big expressive eyes, adorable characters, rounded glossy UI, kid friendly, no real brands.
+```
+
+1. `hero_girl_poses.png` — A beautiful young cartoon fashion designer with long wavy brown hair, big sparkling eyes and a tiara: idle, wave, thinking, walking, runway pose, victory, dancing, spinning; eight files, transparent background. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `doll_base_layers.png` — The same girl as a clean dress-up base in front view, arms slightly out, five skin tones, separate layers for body, face, eyes with six colors, eyelashes (natural, long, wing, glam); transparent background. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `hairstyles_eight.png` — Eight hairstyles as front and back layers (long, curly, bun, ponytail, braid, bob, wavy, pigtails), each in a neutral grey so it can be tinted; sixteen files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `dresses_thirty.png` — Thirty dresses as separate transparent pieces fitting the doll: six styles (gown, mermaid, mini, A-line, ball gown, wrap) in five colors (rose, white, purple, blue, red) with soft glossy fabric shading. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `tops_bottoms.png` — Fifteen tops (tee, blouse, hoodie, sweater, crop in white, pink, sky) and eighteen bottoms (skirt, long skirt, pleated skirt, jeans, leggings, shorts in black, denim, cream); transparent pieces. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+6. `shoes_bags.png` — Eighteen shoes (heels, flats, boots, sandals, sneakers, crystal in white, rose, gold) and ten bags (clutch, tote, mini, backpack, crossbody in rose and gold); transparent pieces. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+7. `jewelry_crowns.png` — Necklaces (pearls, heart, star, choker), earrings (studs, hoops, drops), bracelets (bracelet, watch, bangles), crowns (crown, tiara, bow, sun hat, flower crown, veil, beanie), glasses (sunglasses, heart glasses); transparent pieces in gold, silver and rose. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+8. `salon_tools.png` — Beauty salon tools and icons: shampoo and water spray, hair dryer, scissors and comb, hair dye brush, eyeshadow palette, lipsticks in eight colors, blush brush, mascara, nail polish bottles in eight colors; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+9. `pets_seven.png` — Seven adorable 3D cartoon pets with big eyes in four moods each (happy, hungry, sleepy, playing): puppy, kitten, rabbit, panda, pony, fluffy kitten, baby dog; plus six pet outfits and six pet beds; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+10. `pet_care_icons.png` — Pet care icons: food bowl, bone, carrot, fish, apple, shampoo bubbles, brush, ball toy, bed, heart reaction bubble. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+11. `rooms_six.png` — Six luxurious dollhouse rooms seen from the front: princess bedroom, living room, kitchen, bathroom, dressing room, garden; empty of furniture, 1080x1920 portrait each. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+12. `furniture_sets.png` — Furniture and decoration pieces for each room (beds, sofas, TVs, plants, lamps, mirrors, bathtubs, wardrobes, garden fountains, swings) in pastel colors; transparent pieces. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+13. `runway_scene.png` — A glamorous fashion runway with spotlights, pink carpet, cheering audience silhouettes, a big glowing backdrop; no characters, 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+14. `runway_ui.png` — Competition cards for eight themes (Princess Night, Summer Beach, Wedding Party, Winter Fashion, School Style, Royal Ball, Casual Day, Fantasy Fashion), a golden trophy, star ratings, confetti burst. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+15. `world_map.png` — A colorful fantasy world map with six themed islands (Fashion City, Beauty Palace, Pet Paradise, Dream House, Royal Runway, Magical Fashion Island), winding path with numbered level dots, treasure chests; 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+16. `menu_palace_bg.png` — A magical pink fashion palace exterior at golden hour with sparkling towers and a garden, no characters, 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+17. `ui_kit.png` — Glossy rounded pink, purple and gold UI kit: PLAY button, round icon buttons (studio, salon, pets, house, runway, shop, settings, missions), coin, pink diamond, star, locked padlock, tabs, sliders, panels. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+18. `card_fashion_queen.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 49. فيزمان (Fizz Man) - بديل أصلي — Fizz Man (original soda-hero runner) (12 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Premium 3D-rendered arcade endless-runner art, bright saturated colors, glossy cartoon superhero in a blue-and-silver suit with a chest bubble emblem (ORIGINAL, no real brand logos), dynamic action poses, sunny city.
+```
+
+1. `hero_turnaround.png` — The muscular friendly blue-and-silver superhero with a smooth silver helmet and chest emblem, T-pose front, side and back views, plus thumbs-up; four files, transparent background. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `hero_action_poses.png` — The hero in action: running (4 frames), jumping, sliding under a bar, dodging left, dodging right, stunt spin, crash reaction, victory; twelve files. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `cans_powerups.png` — Shiny blue-and-silver generic fizzy soda cans (standing, tilted), a magnet, a shield bubble, a gold star; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `obstacles_vehicles.png` — Red-white barrier, traffic cones, an overhead gantry bar, a stunt ramp, a taxi, a yellow car, a delivery truck, a blue truck; transparent pieces. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `env_city.png` — Modern city street at noon with trees, towers and billboards (generic), 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `env_downtown.png` — Busy downtown avenue with skyscrapers and traffic, 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+7. `env_shops.png` — Colorful shopping district with awnings and shop windows, 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+8. `env_industry.png` — Industrial area with chimneys, pipes and containers at dusk, 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+9. `env_highway.png` — Elevated highway at sunset with moving traffic and guardrails, 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+10. `env_bonus.png` — A magical fizzy bonus world with giant floating cans, bubbles and a rainbow road, 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+11. `menu_ui.png` — Main menu art: the hero in a low dash pose over a city skyline with the title FIZZ MAN, glossy PLAY, LEVELS, HIGH SCORE, SETTINGS, QUIT buttons, level select cards with stars and a locked padlock, game over panel with RESTART and HOME. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+12. `card_fizz_man.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 50. أقسام ألعاب التسلية (واجهة التقسيم الجديد) — Fun Games Sections (new menu art) (9 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Premium 3D-rendered mobile game menu art, wide cinematic panels, rich saturated colors, glowing edges, rounded glossy golden frames, kid friendly, no text on the pictures (the app writes the names).
+```
+
+1. `section_racing.png` — A wide 1.7:1 panel for RACING: a sports car, a desert truck and a motorbike racing together on a sunset coastal road with speed lines and checkered flags, dynamic angle. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+2. `section_action.png` — A wide 1.7:1 panel for ACTION AND BATTLES: a samurai, an archer squad, an ice dragon and a brave knight in an epic cartoon fantasy clash, no gore, magical effects. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+3. `section_runners.png` — A wide 1.7:1 panel for RUNNERS AND JUMPERS: a cartoon runner leaping over gaps on floating islands among clouds, with a jungle explorer, a space creature and a rhino racer. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+4. `section_build.png` — A wide 1.7:1 panel for FARMS AND BUSINESSES: a sunny cozy farm with a honey stand, a bakery, a pearl-diving boat and a snowy camp, tiny happy workers, coins sparkling. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+5. `section_puzzle.png` — A wide 1.7:1 panel for PUZZLES AND BRAIN GAMES: colorful balls pouring into a funnel, a maze with a friendly yellow chomper and ghosts, an ice path puzzle, glowing question marks. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `section_girls.png` — A wide 1.7:1 panel for GIRLS WORLD: a glamorous pink fashion palace, a cute girl with a tiara and a kitten, sparkles and dresses. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+7. `sections_page_bg.png` — The page background for the sections screen, 1920x1080: deep purple night sky with soft glowing stars and floating game icons, no characters, empty center. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+8. `sections_title_banner.png` — A golden ribbon banner frame for the title (empty center), 1536x400. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+9. `section_back_button.png` — A round glossy purple back-arrow button with white border, 256x256. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+
+---
+
+## 51. معركة الكروت النيون — Neon Card Battle (8 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Premium 3D-rendered neon sci-fi mobile card-battle art, glowing hex arena in space, magenta cyan and violet neon, glossy chunky robots versus friendly alien slimes, no gore, kid friendly.
+```
+
+1. `robot_units.png` — Four cute chunky robot units (small scout, shield tank, blaster, hero mech) front 3/4 view with neon accents; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `alien_units.png` — Alien Overlord army: green slime, buzzing bug, big purple brute, plus the Alien Overlord inside a glowing UFO; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `turret_base_ufo.png` — A robot defense turret, the player robot base and the alien UFO base with damaged states; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `spell_effects.png` — Spell effect sheets: Plasma Wave, Black Hole, Repair Field (cyan healing ring), laser bolts, explosion sparks. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `card_frames.png` — Eight glowing card frames with energy cost gems and rarity glows, plus a NEXT slot and an energy bar of 10 pips. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+6. `arena_floor.png` — A glowing hexagon-tiled neon space platform seen in perspective, portrait 1080x1920, empty. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+7. `ui_hud_results.png` — Timer pill, health bars, difficulty buttons (Easy, Normal, Hard), victory and defeat panels with three stars. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+8. `card_neon_battle.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 52. معركة حلبة الجليد — Ice Rink Brawl (6 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Charming 3D-rendered winter festival game art, snowy ice rink with a festive wooden border, soft blue and warm string-light colors, cute arctic animal heroes, no gore, kid friendly.
+```
+
+1. `heroes_three.png` — Three cute arctic heroes (penguin, fox, polar bear cub) in idle, sliding and special-attack poses; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `goblins_leader.png` — Four small goblins (club, thrower, shield, scout) and a bigger goblin leader; idle, hurt, defeated star-puff; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `ice_props.png` — Ice crystals of three sizes, snow piles, a frozen pool, wooden fence pieces, lantern strings; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `rink_scene.png` — A snowy ice rink seen from above at a winter festival with a cheering snowy crowd, empty, portrait 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+5. `ui_turn_special.png` — Hero cards with HP bars, a special meter, YOUR TURN and GOBLIN MOVE banners, aiming arrow, victory panel with stars. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+6. `card_ice_rink.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 53. سكة الكورة (Nutmeg Rush) — Nutmeg Rush (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Premium 3D-rendered mobile football game art at night, floodlit stadium, vivid green striped grass, chunky cartoon players (no real clubs or players), flaming comet ball, kid friendly.
+```
+
+1. `ball_skins.png` — Six ball skins (classic, flame comet, galaxy, gold, neon, rainbow) with glow; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `defenders_red.png` — Chunky cartoon defenders in red kits: idle, chasing, slide-tackle, tumbled; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `teammate_blue.png` — The light-blue teammate for one-two passes: idle, pass, celebrate; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `keeper_goal.png` — A cartoon goalkeeper diving left, right and center; a goal with a net ripple; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `stadium_scene.png` — A floodlit night stadium with crowd stands, light beams and striped pitch viewed from behind the ball, portrait 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `ui_hud_shoot.png` — Heat meter, sliding shoot target bar, level badge, TRICK text popups (THROUGH THE LEGS, ONE-TWO), stars and coins panels, ball shop cards. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+7. `card_nutmeg_rush.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 54. فرقة الدببة الجيلي — Gummy Squad (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Cosy plasticine candy-land 3D art, soft clay-like materials with fingerprints, soft night palette, adorable gummy bears and sweets, kid friendly.
+```
+
+1. `bears_three.png` — Three gummy bears in plasticine style: Strawberry with a candy-cane sword, Lime with a magic lollipop staff, Blueberry with a gumball blaster; idle, attack, melted-and-revived; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `gumdrop_enemies.png` — Sour gumdrop enemies of four kinds (round, spiky, shooter, sneaky) in angry-cute faces; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `king_donut.png` — King Donut boss with a glaze crown: idle, rolling charge, glaze rain, crumbs; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `pickups_super.png` — Candies, healing mints, a giant jawbreaker super drop and the SUPER button; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `candyland_night.png` — A soft night candy-land arena with lollipop trees and gumdrop hills in plasticine style, no characters, 1920x1080 and 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `ui_hud.png` — Three bear portraits with HP, a charging SUPER button, candy counter, win panel with three stars. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+7. `card_gummy_squad.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 55. ديناصور صغير يكبر — Dino Grow (6 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Polished 3D-rendered prehistoric adventure art, lush jungle, bubbling swamp, glowing volcano valley, chunky cartoon dinosaurs, bright saturated colors, kid friendly, no gore.
+```
+
+1. `dino_evolutions.png` — Four evolution stages of one dinosaur (baby raptor, raptor, big predator, giant) in idle, walking, stomping and chomping poses; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `prey_small.png` — Bugs, eggs, small lizards and mid-size herbivores with simple cute faces; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `boss_giant.png` — A giant volcano boss dinosaur with fire breath and stomp poses; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `env_jungle_swamp_volcano.png` — Three top-down 3/4 environment tiles sets: jungle, swamp, volcano valley, plus foliage and rocks props. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+5. `ui_power_numbers.png` — Green and red power-number badges, evolution progress bar, LEVEL COMPLETE panel with three stars, pounce button. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+6. `card_dino_grow.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 56. فرسان البرميل — Barrel Knights (6 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Cheerful 3D-rendered medieval tournament game art, sand arena with wooden fences and banners, chunky cartoon knights in two team colors, a giant wooden barrel, kid friendly, no gore.
+```
+
+1. `knights_teams.png` — Chunky knights in blue and red teams: idle, running, dash, stunned with stars; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `giant_barrel.png` — A giant wooden barrel with iron bands rolling, three frames; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `hazards.png` — Trapdoors (closed and open), mud patches, a rolling boulder with a warning lane; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `arena_scene.png` — A medieval tournament arena with gates at both ends, crowd, banners and a castle backdrop, high angle, 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+5. `ui_scoreboard.png` — Scoreboard 0-0 with timer, DASH button, goal celebration banner, rounds map. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+6. `card_barrel_knights.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 57. حلاوة ولا مقلب — Trick or Treat Crowd (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Hand-painted toy-like cosy Halloween neighborhood art at night, warm porch lights, pumpkins, falling leaves, friendly cut-paper UI, all characters original and friendly (not scary), kid friendly.
+```
+
+1. `kids_costumes.png` — A pack of trick-or-treating kids in homemade costumes: sheet ghost, witch, cardboard robot, pumpkin suit; running, jumping; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `porches.png` — A friendly porch with a doorbell and glowing lamp, and a grumpy porch with a frowning pumpkin; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `hazards_street.png` — Leaf pit, sprinkler, a dog, a rolling jack-o-lantern, a hedge; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `giant_spider.png` — A giant inflatable spider lawn decoration boss (silly, friendly); transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `street_parallax.png` — A night neighborhood street in parallax layers: sky with moon, far houses, porches, fence, ground with leaves; landscape 1920x1080. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `ui_cutpaper.png` — Cut-paper buttons and panels, candy counter, crowd counter, level cards. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+7. `card_trick_or_treat.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 58. جيش المعبد — Temple Army (6 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Epic-but-cute 3D-rendered ancient jungle temple art, mossy stone corridors, torches, glowing gates, tiny cartoon warriors in large crowds, no gore, kid friendly.
+```
+
+1. `captain_warriors.png` — A tiny warrior captain with a plume and a crowd of tiny warriors in blue; running; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `enemies_red.png` — Red enemy horde warriors, a huge brute guard and a giant stone golem (idle, stomp, crumble); transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `gates_traps.png` — Glowing multiplier gates (x2, x3, +20, negative), spike traps, a lever, a spinning saw, a prisoner cage; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `temple_corridors.png` — A mossy stone temple maze with torches and vines viewed from a high angle, tiles sets for corridors, forks and the arena, 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+5. `ui_hud.png` — Army counter, level badge, minimap frame, victory panel with stars, shop cards. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+6. `card_temple_army.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 59. طبق الحلويات — Sweet Tray (5 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Pastel bakery triple-match puzzle art, glossy cute sweets, cream pink and mint palette, lace doilies, wooden table, kid friendly.
+```
+
+1. `sweets_twelve.png` — Twelve glossy cute sweets (donut, cupcake, macaron, cookie, cake slice, candy, cherry tart, ice cream, lollipop, pretzel, muffin, strawberry); transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `plate_tray.png` — A big doily plate and a seven-slot wooden tray, empty and nearly full; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `bakery_scene.png` — A pastel bakery counter background with shelves and string lights, portrait 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+4. `ui_combo_bonus.png` — LEVEL header, star score pill, COMBO x2/x3 text, bonus wand meter, helper buttons (undo, shuffle, extra slot), OUT OF SPACE panel, level map. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+5. `card_sweet_tray.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 60. اسحب الدبوس — Pull the Pin (puzzle) (5 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Glossy candy-colored 3D-rendered physics puzzle art, pastel mint background, gumballs, golden pins, kid friendly.
+```
+
+1. `balls_pins.png` — Glossy candy balls in six colors and grey gumballs, golden pins with handles; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `jars_shelves.png` — A glass jar with fill markers, wooden shelves, a lava chute and a trash chute; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `puzzle_bg.png` — A mint-and-pink striped background with candy sprinkles, portrait 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+4. `ui_buttons.png` — Undo, restart and hint (lightbulb) round buttons, level badge, coin pill, tutorial hand pointer. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+5. `card_pull_pin.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 61. محجر الجواهر — Gemlode Quarry (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Casual 3D-rendered isometric idle-logistics art, sandy hill quarry with glowing purple crystals, wooden crates, chunky yellow trucks, warm sunny colors, kid friendly.
+```
+
+1. `crystal_mine.png` — A sandy mine entrance with glowing purple gem crystals and little diggers; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `crates_tower.png` — Wooden crates of purple gems: single, stacked tower, overflowing pile with a red warning mark; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `trucks_road.png` — A chunky yellow truck loaded with crates (3 angles), a winding sandy road piece and a depot with a loading pad; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `upgrade_pads.png` — Glowing upgrade pads with price tags (diggers, trucks, bigger pile, polish shop, second mine); transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `quarry_scene.png` — An isometric sandy hill quarry landscape, empty, portrait 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `ui_overflow.png` — OVERFLOW banner, crates shipped counter 60/100, coin pill, level map cards with stars. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+7. `card_gem_quarry.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 62. طيار السحاب — Sky Ace (7 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Casual 2.5D vertical shooter art, pastel cloud sky with floating islands, glossy cartoon propeller planes with goggled pilots, kid friendly, no gore.
+```
+
+1. `player_plane.png` — A cute propeller plane with a goggled pilot: straight, banking left, banking right, shield bubble, five color skins; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `enemy_planes.png` — Red and black cartoon enemy planes, UFO drones and bombers, plus puff-and-parachute defeat frames; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `bosses_three.png` — A giant blimp boss, a UFO boss and a flying fortress boss with damage states; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+4. `powerups.png` — Double shot, shield, magnet, bomb, X2 multiplier, health pack, coin; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+5. `sky_stages.png` — Eight pastel sky backgrounds with parallax clouds and floating islands, portrait 1080x1920. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+6. `ui_hud.png` — Health bar with percentage, score, bomb button with cooldown ring, hangar upgrade cards, tutorial hand. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+7. `card_sky_ace.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
+
+---
+
+## 63. لغز المقبرة — Tomb Puzzle (5 سكريبت)
+
+**سطر الأسلوب (حطه في أول كل برومت):**
+
+```
+Warm torch-lit Egyptian tomb 3D-rendered puzzle art, hieroglyph walls, red lotus carpet, golden sun-disc plates, a small explorer with a hat, kid friendly, not scary.
+```
+
+1. `explorer_poses.png` — A small explorer with a hat holding a torch: idle, walking in four directions, pushing, falling, cheering; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+2. `tomb_objects.png` — Pushable stone block, golden sun-disc pressure plate (up and pressed), doors A-D, golden ankh key, braziers (lit and unlit), crumbling tile; transparent. Single subject, centered, full object visible, transparent background, no text, 1024x1024.
+3. `tomb_tiles.png` — Three tomb tile sets (sand, golden, moonlit) with hieroglyph walls and a red lotus carpet, top 3/4 view. Wide scene, no characters, no text, no UI, 1920x1080 landscape, soft depth of field in the far background.
+4. `ui_hints.png` — Ankh counter n/8, hint banner, undo, reset, lightbulb hint buttons, level cards with keys and stars. Clean game UI element, glossy, rounded, transparent background, no text unless the label is quoted, 512x512.
+5. `card_tomb_puzzle.png` — Game card picture for a menu: eye-catching key art of the game's hero in action over its main setting, rich colors, 1536x1229 (4:5 ratio), no text. 
 
