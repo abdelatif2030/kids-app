@@ -19,17 +19,20 @@ const STYLE = css('rc', '#d99a3a', '#9a5a1a', '#ffe29a') + `
 .rc-toast{position:absolute;left:50%;top:calc(var(--u)*24);transform:translateX(-50%);background:#ffd166;color:#3a2a08;font-weight:900;font-size:calc(var(--u)*4.4);padding:calc(var(--u)*1) calc(var(--u)*4);border-radius:999px;border:calc(var(--u)*.5) solid #fff;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
 .rc-toast.show{opacity:1}
 .rc-tools{position:absolute;left:calc(var(--u)*1.5);right:calc(var(--u)*1.5);bottom:max(calc(var(--u)*1.5),env(safe-area-inset-bottom));display:flex;gap:calc(var(--u)*1.2);direction:ltr;align-items:stretch;justify-content:center}
-.rc-chip{flex:1;max-width:calc(var(--u)*17);height:calc(var(--u)*17.5);border-radius:calc(var(--u)*3);background:linear-gradient(180deg,#f3e6c4,#d8c08a);border:calc(var(--u)*.45) solid #fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.3);color:#4a3412;font-weight:900;font-size:calc(var(--u)*2.7);position:relative;opacity:.55;box-shadow:0 calc(var(--u)*.5) calc(var(--u)*1.2) rgba(40,20,0,.3)}
-.rc-chip svg{width:calc(var(--u)*8.6);height:calc(var(--u)*8.6)}
+.rc-chip{flex:none;width:calc(var(--u)*15);height:calc(var(--u)*15);border-radius:50%;background:radial-gradient(circle,#fbf1d6 58%,transparent 60%),conic-gradient(var(--rc,#3aa0e8) calc(var(--p,0)*1%),rgba(255,255,255,.55) 0);border:calc(var(--u)*.3) solid #fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.3);color:#4a3412;font-weight:900;font-size:calc(var(--u)*2.7);position:relative;opacity:.8;cursor:pointer;box-shadow:0 calc(var(--u)*.5) calc(var(--u)*1.2) rgba(40,20,0,.3)}
+.rc-chip svg{width:calc(var(--u)*8);height:calc(var(--u)*8)}.rc-chip span.lbl{display:none}
+.rc-peek{position:absolute;right:calc(var(--u)*2);bottom:calc(var(--u)*21);width:calc(var(--u)*9);height:calc(var(--u)*9);border-radius:50%;border:calc(var(--u)*.3) solid #fff;background:rgba(40,28,10,.55);color:#fff;font-size:calc(var(--u)*4.4);touch-action:none;cursor:pointer}
+.rc-pct{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--u)*19.4);width:min(92%,calc(var(--u)*92));height:calc(var(--u)*5.6);border-radius:99px;background:rgba(255,255,255,.55);border:calc(var(--u)*.3) solid #fff;display:flex;align-items:center;gap:calc(var(--u)*2);padding:0 calc(var(--u)*2);box-sizing:border-box;direction:ltr;pointer-events:none}.rc-pct strong{font-size:calc(var(--u)*4.4);color:#27434f;min-width:calc(var(--u)*11)}.rc-pct i{flex:1;height:calc(var(--u)*1.2);border-radius:99px;background:rgba(80,120,140,.25);overflow:hidden;display:block}.rc-pct i b{display:block;height:100%;width:0;background:#3aa0e8}
+.rc-tk{display:flex;flex-direction:column;gap:calc(var(--u)*1.2);width:100%;text-align:start;font-size:calc(var(--u)*3)}.rc-tk .who{display:flex;align-items:center;gap:calc(var(--u)*2);font-weight:900;font-size:calc(var(--u)*4)}.rc-tk .av{width:calc(var(--u)*10);height:calc(var(--u)*10);border-radius:50%;background:#ffd9a0;border:calc(var(--u)*.3) solid #fff;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*6)}.rc-tk .quote{background:rgba(255,255,255,.2);border-radius:calc(var(--u)*1.6);padding:calc(var(--u)*1) calc(var(--u)*2)}.rc-tk h4{margin:0;font-size:calc(var(--u)*2.4);opacity:.85;letter-spacing:.06em}.rc-tk .tags{display:flex;flex-wrap:wrap;gap:calc(var(--u)*1)}.rc-tk .tags span{background:#3aa0e8;color:#fff;border-radius:99px;padding:calc(var(--u)*.3) calc(var(--u)*1.8);font-size:calc(var(--u)*2.7)}.rc-tk .gl{display:flex;gap:calc(var(--u)*1.2);align-items:center}.rc-tk .pay{font-size:calc(var(--u)*6);font-weight:900;color:#ffe29a}
 .rc-chip.cur{opacity:1;background:linear-gradient(180deg,#fff3c4,#ffd166);transform:translateY(calc(var(--u)*-.8));box-shadow:0 calc(var(--u)*1) calc(var(--u)*1.8) rgba(40,20,0,.4)}
 .rc-chip.done{opacity:.9}.rc-chip.done::after{content:'✓';position:absolute;top:calc(var(--u)*.2);right:calc(var(--u)*1);color:#2a9a58;font-size:calc(var(--u)*3.6)}
 .rc-next{pointer-events:auto;flex:1.15;max-width:calc(var(--u)*19);height:calc(var(--u)*17.5);border-radius:calc(var(--u)*3);font-family:inherit;font-weight:900;font-size:calc(var(--u)*3.4);color:#fff;border:calc(var(--u)*.45) solid #fff;cursor:pointer;background:linear-gradient(180deg,#9aa4a8,#6a7478);box-shadow:0 calc(var(--u)*.6) 0 #3a4448}
 .rc-next.ready{background:linear-gradient(180deg,#6ae08a,#2fa85a);box-shadow:0 calc(var(--u)*.6) 0 #1a6a3a;animation:rcpulse 1s infinite}
 @keyframes rcpulse{50%{transform:scale(1.06)}}
 .rc-land .rc-tools{left:auto;right:calc(var(--u)*1.5);top:calc(var(--u)*20);bottom:calc(var(--u)*1.5);width:calc(var(--u)*17);flex-direction:column;justify-content:flex-start;gap:calc(var(--u)*1)}
-.rc-land .rc-chip,.rc-land .rc-next{max-width:none;width:100%;height:auto;flex:1;min-height:0;flex-direction:row;gap:calc(var(--u)*.8);font-size:calc(var(--u)*2.4)}
-.rc-land .rc-chip svg{width:calc(var(--u)*6.2);height:calc(var(--u)*6.2)}
-.rc-land .rc-chip.cur{transform:translateX(calc(var(--u)*-1))}
+.rc-land .rc-chip{width:calc(var(--u)*11.5);height:calc(var(--u)*11.5);align-self:center}.rc-land .rc-next{max-width:none;width:100%;height:auto;flex:1;min-height:0;font-size:calc(var(--u)*2.4)}
+.rc-land .rc-chip svg{width:calc(var(--u)*6);height:calc(var(--u)*6)}
+
 .rc-land .rc-top{right:calc(var(--u)*3)}
 .rc-card{width:calc(var(--u)*92);max-height:94%}
 @media (orientation:landscape){.rc-card{width:calc(var(--u)*130)}}
@@ -243,7 +246,7 @@ class Game {
     const grid = h('div', { class: 'rc-lvs' });
     for (const def of LEVELS) {
       const open = def.id <= this.save.unlocked; const st = this.save.stars[def.id] || 0;
-      grid.append(h('button', { class: `rc-lv${open ? '' : ' lock'}`, onclick: () => { if (open) { this.sound.play('tap'); this.start(def.id); } else this.sound.play('no'); } },
+      grid.append(h('button', { class: `rc-lv${open ? '' : ' lock'}`, onclick: () => { if (open) { this.sound.play('tap'); this._ticket(def); } else this.sound.play('no'); } },
         this._thumb(def), h('span', {}, `${I.num(def.id)}. ${def.name[I.getLang() === 'en' ? 1 : 0]}`),
         h('small', {}, open ? `${'★'.repeat(st)}${'☆'.repeat(3 - st)}  💰${I.num(def.reward)}` : `🔒 ${I.t('locked')}`)));
     }
@@ -268,7 +271,25 @@ class Game {
   }
 
   // ---------- play ----------
-  start(levelId) {
+  _ticket(def) {
+    const en = I.getLang() === 'en'; const T = (k) => I.t(k); const nm = def.client[en ? 1 : 0];
+    const tags = [def.dust > 0.6 ? T('tg_dust') : null, def.coffee ? `${T('tg_coffee')} x${I.num(def.coffee)}` : null, def.mud ? `${T('tg_mud')}${def.mud > 1 ? ` x${I.num(def.mud)}` : ''}` : null].filter(Boolean);
+    const tip = Math.round(def.reward * 0.45);
+    this.mode = 'menu'; this.layer.replaceChildren();
+    const goal = (t) => h('div', { class: 'gl' }, '\u2610 ', t);
+    this.layer.append(h('div', { class: 'rc-top' }, h('button', { class: 'rc-round', onclick: () => this.showLevels() }, '\u2630'), this._coinPill()),
+      h('div', { class: 'rc-dim', style: 'background:rgba(40,25,5,.3);align-items:flex-end;padding-bottom:calc(var(--u)*3)' }, h('div', { class: 'rc-card' }, h('div', { class: 'rc-tk' },
+        h('div', { class: 'who' }, h('div', { class: 'av' }, def.id % 2 ? '\u{1F469}' : '\u{1F468}'), h('div', {}, h('div', { style: 'font-size:calc(var(--u)*2.4);opacity:.8' }, `${T('ticket')} #${I.num(def.id)} \u00b7 ${T('newJob')}`), nm)),
+        h('div', { class: 'quote' }, `\u201c${def.note[en ? 1 : 0]}\u201d`),
+        h('h4', {}, T('whatsOn')), h('div', { class: 'tags' }, ...tags.map((t) => h('span', {}, t))),
+        h('h4', {}, T('goals')), goal(T('g_clean')), goal(`${T('g_time')} ${mmss(def.parTime)}`), goal(`${T('g_water')} ${I.num(def.parWater)} ${I.t('litres')}`),
+        h('div', {}, h('h4', {}, T('pay')), h('div', { class: 'pay' }, `\u{1F4B0} ${I.num(def.reward)}`), h('small', {}, `${T('tipsUp')} ${I.num(tip)}`)),
+        h('div', { class: 'rc-btns' }, this._btn('', T('accept'), () => this.start(def.id, true)), this._btn('alt', `\u{1F527} ${T('shop')}`, () => this.showShop()))))));
+    this._soundPill();
+  }
+
+  start(levelId, accepted) {
+    if (!accepted) { this._ticket(LEVELS[levelId - 1]); return; }
     const def = LEVELS[levelId - 1]; const a = this._avail();
     const portrait = a.w < a.h;
     const cols = portrait ? ROWS : COLS; const rows = portrait ? COLS : ROWS;
@@ -284,7 +305,7 @@ class Game {
     this.bubblePat = this.fmCtx.createPattern(bt, 'repeat');
     this.curDef = def; this.stage = 0; this.parts = []; this.ptr = null; this.sh = 0; this.chimed = false; this.endT = 0;
     this._buildFrame(); this._compose(); this.before = this._snap();
-    this.job.beginStage(0);
+    this.ringPeak = [0, 0, 0, 0, 0]; this.job.beginStage(0); this.c0 = this.job.cleanliness();
     this.mode = 'play'; this.paused = false; this.sound.setMode(true);
     this._playUi();
   }
@@ -293,11 +314,17 @@ class Game {
     this.layer.replaceChildren();
     this.coinEl = h('span', {}, ''); this.timeEl = h('span', {}, ''); this.waterEl = h('span', {}, '');
     this.hintEl = h('div', { class: 'rc-hint2' }, ''); this.progEl = h('b'); this.toastEl = h('div', { class: 'rc-toast' }, '');
-    this.chips = TOOL.map((k, i) => h('div', { class: 'rc-chip' }, ic(k), h('span', {}, I.t(`t_${k}`))));
+    this.pctEl = h('strong', {}, '0%'); this.pctBar = h('b');
+    this.chips = TOOL.map((k, i) => h('div', { class: 'rc-chip', role: 'button', tabindex: '0', 'aria-label': I.t(`t_${k}`), onclick: () => this._pick(i) }, ic(k), h('span', { class: 'lbl' }, I.t(`t_${k}`))));
+    this.chips.forEach((c, i) => c.style.setProperty('--rc', i < 2 ? '#3fc060' : '#3aa0e8'));
     this.nextBtn = h('button', { class: 'rc-next', onclick: () => this._next() }, '');
+    const peek = h('button', { class: 'rc-peek', 'aria-label': I.t('peek') }, '\u{1F441}');
+    const pk = (v) => () => { this.peek = v; };
+    peek.addEventListener('pointerdown', pk(true)); peek.addEventListener('pointerup', pk(false)); peek.addEventListener('pointerleave', pk(false)); peek.addEventListener('pointercancel', pk(false));
+    this.peek = false;
     this.layer.append(
       h('div', { class: 'rc-top' }, h('button', { class: 'rc-round', 'aria-label': I.t('paused'), onclick: () => this._pause() }, '⏸'), h('div', { class: 'rc-pill' }, '💰 ', this.coinEl), h('div', { class: 'rc-pill' }, '⏱ ', this.timeEl), h('div', { class: 'rc-pill' }, '💧 ', this.waterEl)),
-      this.hintEl, h('div', { class: 'rc-prog' }, this.progEl), this.toastEl, h('div', { class: 'rc-tools' }, ...this.chips, this.nextBtn));
+      this.hintEl, h('div', { class: 'rc-pct' }, this.pctEl, h('i', {}, this.pctBar)), this.toastEl, peek, h('div', { class: 'rc-tools' }, ...this.chips, this.nextBtn));
     this._soundPill();
     this._stageUi();
   }
@@ -306,15 +333,21 @@ class Game {
     const st = this.stage;
     this.hintEl.textContent = I.t(`h_${TOOL[st]}`);
     this.chips.forEach((c, i) => { c.className = `rc-chip${i === st ? ' cur' : ''}${i < st ? ' done' : ''}`; });
-    this.nextBtn.textContent = st === 4 ? I.t('done') : `${I.t('next')} ▶`;
+    this.nextBtn.textContent = I.t('done');
     this.chimed = false;
   }
 
   _next() {
     if (this.mode !== 'play' || this.paused) return;
     this.sound.play('tap'); this.ptr = null; this.sound.silence();
-    if (this.stage >= 4) { this._finish(); return; }
-    this.stage++; this.job.beginStage(this.stage); this.sound.play('stage'); this._stageUi();
+    this._finish();
+  }
+
+  /** the five tools can be picked in any order (like the original game); the rings show each tool's progress */
+  _pick(i) {
+    if (this.mode !== 'play' || this.paused || i === this.stage) return;
+    this.sound.play('tap'); this.ptr = null; this.sound.silence();
+    this.stage = i; this.job.beginStage(i); this._stageUi();
   }
 
   _toast(t) { if (!this.toastEl) return; this.toastEl.textContent = t; this.toastEl.classList.add('show'); clearTimeout(this._tt); this._tt = setTimeout(() => this.toastEl && this.toastEl.classList.remove('show'), 1400); }
@@ -417,7 +450,10 @@ class Game {
     this.hitAnim = Math.max(0, (this.hitAnim || 0) - dt * 6); this.shk = Math.max(0, this.shk - dt * 8);
     if (this.frame % 6 === 0) {
       this.progV = j.progress(); this.progEl.style.width = `${Math.round(this.progV * 100)}%`;
-      const rd = this.progV >= READY; this.nextBtn.classList.toggle('ready', rd);
+      const rp = this.ringPeak || (this.ringPeak = [0, 0, 0, 0, 0]); // rinse/squeegee rings stay empty until there is foam/water to deal with\n      for (let i = 0; i < 5; i++) { const v = (i === 3 && j.foamStart <= 1) || (i === 4 && j.wetStart <= 1) ? 0 : j.progress(i); rp[i] = i === 3 || i === 4 ? v : Math.max(rp[i], v); }\n      this.chips.forEach((c, i) => c.style.setProperty('--p', Math.round(rp[i] * 100)));
+      const clean = j.cleanliness(); const pc = Math.round(100 * Math.max(0, Math.min(1, (clean - this.c0) / Math.max(0.05, 0.97 - this.c0))));
+      this.pctEl.textContent = `${I.num(pc)}%`; this.pctBar.style.width = `${pc}%`;
+      const rd = j.progress(4) >= READY && j.progress(0) >= READY; this.nextBtn.classList.toggle('ready', rd);
       if (rd && !this.chimed) { this.chimed = true; snd.play('coin'); }
       this.coinEl.textContent = I.num(this.save.coins); this.timeEl.textContent = mmss(j.time); this.waterEl.textContent = `${I.num(j.water.toFixed(1))}`;
     }
@@ -440,8 +476,7 @@ class Game {
     const R = this.rect; const sh = this.shk * Math.sin(this.clock * 70) * this.u * 0.35;
     g.save(); g.translate(0, sh);
     g.drawImage(this.rugC, R.x, R.y, R.w, R.h);
-    g.drawImage(this.ovC, R.x, R.y, R.w, R.h);
-    if (this.anyFoam) g.drawImage(this.fm, R.x, R.y, R.w, R.h);
+    if (!this.peek) { g.drawImage(this.ovC, R.x, R.y, R.w, R.h); if (this.anyFoam) g.drawImage(this.fm, R.x, R.y, R.w, R.h); }
     g.restore();
     // particles
     const ps = this.parts;

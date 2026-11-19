@@ -19,6 +19,10 @@ export const S = {
   total: ['المجموع', 'Total'], nextRug: ['السجادة اللي بعدها', 'Next rug'], again: ['نظّفها تاني', 'Clean again'],
   great_m: ['شطوووووور!', 'Well done!'], great_f: ['شطووووورة!', 'Well done!'], tryAgain: ['حاول تاني، تقدر تنضّف أحسن', 'Try again, you can get it cleaner'],
   u_beat: ['منفضة أكبر', 'Bigger beater'], u_foam: ['رشاش أوسع', 'Wider sprayer'], u_brush: ['فرشاة أكبر', 'Bigger brush'], u_jet: ['خرطوم أوسع', 'Wider jet'], u_squeegee: ['مسّاحة أعرض', 'Wider squeegee'], u_nozzle: ['فوهة توفّر المية', 'Water-saving nozzle'],
+  ticket: ['تذكرة', 'Ticket'], newJob: ['سجادة جديدة', 'NEW DROP-OFF'], whatsOn: ['اللي عليها', "WHAT'S ON IT"], goals: ['أهداف الشغلة', 'JOB GOALS'], pay: ['الأجرة', 'PAY'], tipsUp: ['وبقشيش لحد', 'tips up to'],
+  accept: ['ابدأ الشغل', 'Accept job'], shed: ['الورشة', 'Tool shed'], peek: ['شوف شكلها بعد النضافة', 'Peek at the clean rug'],
+  g_clean: ['نضافة ٩٥٪ أو أكتر', 'Clean 95% or more'], g_time: ['خلّصها في أقل من', 'Done under'], g_water: ['مية أقل من', 'Water under'],
+  tg_dust: ['تراب كتير', 'Dust-heavy'], tg_coffee: ['بقع قهوة', 'Coffee'], tg_mud: ['آثار جزم طين', 'Mud boots'],
   buy: ['اشتري', 'Buy'], maxed: ['أقصى مستوى', 'Max'], need: ['فلوس مش كفاية', 'Not enough coins'],
 };
 export const I = makeI18n(S);

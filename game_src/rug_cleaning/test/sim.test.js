@@ -127,3 +127,12 @@ test('circularity and straightness', () => {
   assert.ok(circularity(circle) > 0.8); assert.ok(circularity(line) < 0.1); assert.ok(circularity(zig) < 0.4);
   assert.ok(straightness(line) > 0.99); assert.ok(straightness(circle) < 0.5); assert.ok(straightness(zig) < 0.5);
 });
+
+test('tools can be picked in any order and a baseline never shrinks (rings do not jump back)', () => {
+  const j = new Job(LEVELS[0], 60, 92, { beat: 0, foam: 0, brush: 0, jet: 0, squeegee: 0, nozzle: 0 });
+  j.beginStage(3); assert.ok(j.progress(3) >= 0); // rinse first, nothing to rinse
+  j.beginStage(1); sweep(j, (a, b, c, d) => j.spray(a, b, c, d), j.radius('foam'));
+  j.beginStage(3); const p0 = j.progress(3);
+  j.beginStage(2); j.beginStage(3);
+  assert.ok(j.progress(3) <= p0 + 1e-9 && j.progress(3) >= 0 && j.progress(3) <= 1);
+});

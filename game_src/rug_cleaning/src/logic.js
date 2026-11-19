@@ -26,12 +26,14 @@ const PALETTE = [0, 1, 2, 3, 4, 5, 6, 0, 7, 3, 7, 6];
 const COFFEE = [1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5];
 const MUD = [0, 1, 0, 1, 2, 2, 2, 3, 3, 3, 4, 4];
 
+const CLIENTS = [['روزا مارينو', 'Rosa Marino'], ['عم صالح', 'Mr. Saleh'], ['ست سلمى', 'Mrs. Salma'], ['ماريو', 'Mario'], ['ليلى', 'Layla'], ['يوسف', 'Youssef']];
+const NOTES = [["دي سجادة ماما. من فضلك بالراحة على الأحمر.", "It was my mother's. Please be gentle with the reds."], ["الضيوف جايين بالليل، عايزها تلمع!", "Guests are coming tonight, make it shine!"], ["القطة شربت عليها قهوتي!", "The cat knocked my coffee onto it!"], ["لعب الأولاد بالطين عليها.", "The kids tracked mud all over it."]];
 export const LEVELS = NAMES.map((n, i) => {
   const t = i / 11;
   return {
     id: i + 1, name: n, pattern: PATTERNS[i], palette: PALETTE[i], seed: 1000 + i * 97,
     dust: 0.45 + 0.4 * t, coffee: COFFEE[i], mud: MUD[i], strength: 0.72 + 0.28 * t,
-    parTime: 110 + i * 8, parWater: 30 + i * 2, reward: Math.round(40 + 15 * i + i * i * 0.6),
+    client: CLIENTS[i % CLIENTS.length], note: NOTES[i % NOTES.length], parTime: 110 + i * 8, parWater: 30 + i * 2, reward: Math.round(40 + 15 * i + i * i * 0.6),
   };
 });
 
@@ -330,9 +332,10 @@ export class Job {
 
   beginStage(i) {
     this.stage = i;
-    if (i === 2) { this.foamCells0 = Math.max(1, this._count(this.foam, 0.3)); }
-    if (i === 3) this.foamStart = Math.max(1, sum(this.foam));
-    if (i === 4) this.wetStart = Math.max(1, sum(this.wet));
+    // tools can be picked in any order: a baseline only ever grows, so a tool's ring never jumps backwards
+    if (i === 2) { this.foamCells0 = Math.max(this.foamCells0 || 1, this._count(this.foam, 0.3)); }
+    if (i === 3) this.foamStart = Math.max(this.foamStart || 1, sum(this.foam));
+    if (i === 4) this.wetStart = Math.max(this.wetStart || 1, sum(this.wet));
   }
 
   _count(a, th) { let c = 0; for (let i = 0; i < a.length; i++) if (a[i] >= th) c++; return c; }

@@ -15,6 +15,7 @@ const S = {
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'], tapHint: ['اضغط للقدرة!', 'Tap for the special move!'], aimHint: ['اسحب الفايكنج لورا', 'Drag the viking back'],
   power: ['قوة أكبر', 'More power'], extra: ['فايكنج زيادة', 'Extra viking'], max: ['أقصى حد', 'Maxed'], sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
   boss: ['حصن الزعيم', 'Boss fortress'], bonus: ['مكافأة الفايكنج الباقيين', 'Bonus for spare vikings'], lvl: ['مرحلة', 'Level'], restart: ['إعادة', 'Restart'],
+  kb_axe: ['', ''], kb_bomb: ['قنبلة', 'BOMB'], kb_shield: ['ارتداد', 'BOUNCE'], kb_giant: ['عملاق', 'GIANT'], goblins: ['الغيلان', 'Goblins'], plunder: ['الغنيمة', 'Plunder'], unused: ['فايكنج باقي', 'Unused vikings'], first: ['أول غارة', 'First raid'], lvlName: ['المرحلة', 'LEVEL'],
   kind_axe: ['اضغط: ينطّ بسرعة', 'Tap: speed burst'], kind_bomb: ['اضغط: ينفجر', 'Tap: explode'], kind_shield: ['يرتد بقوة، اضغط: دفعة', 'Bounces, tap: dash'], kind_giant: ['يكسّر الحيطان، اضغط: ضربة للأرض', 'Smashes walls, tap: slam'],
 };
 const I = makeI18n(S);
@@ -32,6 +33,12 @@ class Game {
     if (!document.getElementById('vs-style')) document.head.append(h('style', { id: 'vs-style' }, css('vs', '#4a8ac8', '#244a80', '#ffd23a') + `
 .vs-root{background:#79c6ee}
 .vs-queue{position:absolute;left:calc(var(--u)*2);bottom:max(calc(var(--u)*2),env(safe-area-inset-bottom));display:flex;gap:calc(var(--u)*1);direction:ltr;pointer-events:none}
+.vs-gob{background:linear-gradient(180deg,#9a52e0,#5a2aa0)!important;border:calc(var(--u)*.5) solid #fff!important;font-size:calc(var(--u)*7)!important;padding:calc(var(--u)*.4) calc(var(--u)*4)!important;border-radius:999px!important;color:#fff;font-weight:900}
+.vs-lvl{position:absolute;left:calc(var(--u)*2);top:calc(var(--u)*14);background:rgba(20,100,120,.85);color:#fff;font-weight:900;font-size:calc(var(--u)*2.8);padding:calc(var(--u)*.5) calc(var(--u)*2.4);border-radius:999px;border:calc(var(--u)*.3) solid #fff;pointer-events:none}
+.vs-queue{left:50%!important;transform:translateX(-50%);gap:calc(var(--u)*1.4)!important;align-items:flex-end}
+.vs-qw{position:relative;display:flex;flex-direction:column;align-items:center}
+.vs-qb{font-size:calc(var(--u)*2);font-weight:900;color:#fff;border-radius:calc(var(--u)*.8);padding:0 calc(var(--u)*1);margin-bottom:calc(var(--u)*.3);border:calc(var(--u)*.25) solid #fff;letter-spacing:.04em}
+.vs-rows{display:flex;flex-direction:column;gap:calc(var(--u)*1);width:100%}.vs-rw{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.18);border-radius:calc(var(--u)*1.8);padding:calc(var(--u)*1) calc(var(--u)*2.4);font-weight:900;font-size:calc(var(--u)*3.4)}
 .vs-q{width:calc(var(--u)*8);height:calc(var(--u)*8);border-radius:50%;background:rgba(10,30,60,.55);border:calc(var(--u)*.4) solid #fff;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*4.6);opacity:.75}
 .vs-q.cur{background:#ffd23a;opacity:1;transform:scale(1.15)}
 .vs-q.used{opacity:.25;filter:grayscale(1)}
@@ -68,8 +75,9 @@ class Game {
     this.cv.width = Math.round(this.cw * this.dpr); this.cv.height = Math.round(this.ch * this.dpr);
     this.u = Math.min(this.cw, this.ch) / 100;
     this.root.style.setProperty('--u', `${Math.min(this.u, 6.2)}px`);
-    this.s = Math.max(8, Math.min(this.ch / 15, this.cw / 25));
-    this.gy = this.ch - Math.min(this.ch * 0.1, 70);
+    const portrait = this.ch > this.cw * 1.1;
+    this.s = portrait ? Math.max(8, this.cw / 17) : Math.max(8, Math.min(this.ch / 15, this.cw / 25));
+    this.gy = portrait ? this.ch * 0.8 : this.ch - Math.min(this.ch * 0.1, 70);
     this.W = this.cw / this.s;
     this.sky = null;
   }
@@ -160,11 +168,12 @@ class Game {
     this.mode = 'play'; this.parts = []; this.floats = []; this.shown = false; this.drag = null; this.pan = null; this.manualCam = false;
     this.camX = this._maxCam(); this.holdT = 0.9; this.paused = false;
     this.layer.replaceChildren(); this.sound.setMode(true);
-    this.goalEl = h('div', { class: 'vs-pill' }, ''); this.goldEl = h('div', { class: 'vs-pill' }, '');
+    this.goalEl = h('div', { class: 'vs-pill vs-gob' }, ''); this.goldEl = h('div', { class: 'vs-pill' }, '');
     this.queueEl = h('div', { class: 'vs-queue' });
     this.hintEl = h('div', { class: 'vs-hint' }, '');
     const back = h('button', { class: 'vs-round', 'aria-label': I.t('menu'), onclick: () => this.showPause() }, '☰');
-    this.layer.append(h('div', { class: 'vs-top' }, back, h('div', { class: 'vs-pill' }, `${i === LEVELS.length - 1 ? '👑 ' : ''}${I.num(i + 1)}`), this.goalEl, this.goldEl), this.hintEl, this.queueEl);
+    this.layer.append(h('div', { class: 'vs-top' }, back, this.goalEl, this.goldEl), h('div', { class: 'vs-lvl' }, `${i === LEVELS.length - 1 ? '\u{1F451} ' : ''}${I.t('lvlName')} ${I.num(i + 1)}`), this.hintEl, this.queueEl);
+    this.firstRaid = !this.save.stars[i + 1];
     this._soundPill();
     this.lastQ = '';
   }
@@ -184,12 +193,17 @@ class Game {
     this.shown = true;
     const b = this.b; const lv = LEVELS[this.li];
     const res = b.result();
-    recordResult(this.save, this.li, res); this._persist();
+    recordResult(this.save, this.li, res); if (won && this.firstRaid) this.save.gold += 45; // one-time bonus for the first win of a level
+    this._persist();
     this.sound.play(won ? 'win' : 'lose');
     const hasNext = won && this.li + 1 < LEVELS.length;
     const kids = [h('div', { class: 'vs-title' }, won ? I.t('win') : I.t('lose'))];
     if (won) kids.push(h('div', { class: 'vs-small' }, I.t('win_m')), h('div', { class: 'vs-stars' }, ...[1, 2, 3].map((n) => h('span', { class: n <= b.stars ? '' : 'off' }, '⭐'))),
-      h('div', { class: 'vs-pill' }, `🪙 +${I.num(b.gold)}`), b.bonus ? h('div', { class: 'vs-small' }, `${I.t('bonus')}: ${I.num(b.bonus)}`) : null);
+      h('div', { class: 'vs-rows' },
+        h('div', { class: 'vs-rw' }, h('span', {}, `\u{1F47A} ${I.t('goblins')}`), h('span', {}, `${I.num(b.goblinsTotal)}/${I.num(b.goblinsTotal)}`)),
+        h('div', { class: 'vs-rw' }, h('span', {}, `\u{1FA99} ${I.t('plunder')}`), h('span', {}, `+${I.num(b.gold - (b.bonus || 0))}`)),
+        h('div', { class: 'vs-rw' }, h('span', {}, `\u{1FA93} ${I.t('unused')}`), h('span', {}, `${I.num((b.bonus || 0) / 15)} \u00d7 ${I.num(15)}`)),
+        this.firstRaid ? h('div', { class: 'vs-rw' }, h('span', {}, `\u{1F6A9} ${I.t('first')}`), h('span', {}, `+${I.num(45)}`)) : null));
     else kids.push(h('div', { class: 'vs-small' }, `${I.getLang() === 'en' ? lv.en : lv.ar}`), h('div', { class: 'vs-pill' }, `🪙 +${I.num(b.gold)}`));
     if (hasNext) kids.push(h('button', { class: 'vs-btn', onclick: () => this.startLevel(this.li + 1) }, I.t('next')));
     kids.push(h('div', { class: 'vs-row' }, h('button', { class: `vs-btn ${hasNext ? 'alt' : ''}`, onclick: () => this.startLevel(this.li) }, I.t('again')), h('button', { class: 'vs-btn dark', onclick: () => this.showLevels() }, I.t('levels'))));
@@ -215,12 +229,13 @@ class Game {
     for (const e of b.update(dt)) this._event(e);
     this._camera(dt);
     this._fx(dt);
-    this.goalEl.textContent = `👺 ${I.num(Math.max(0, b.goblinsLeft))}`;
+    this.goalEl.textContent = `\u{1F47A} \u00d7 ${I.num(Math.max(0, b.goblinsLeft))}`;
     this.goldEl.textContent = `🪙 ${I.num(b.gold)}`;
     const q = `${b.cur}|${b.queue.join()}|${b.state}`;
     if (q !== this.lastQ) {
       this.lastQ = q;
-      this.queueEl.replaceChildren(...b.queue.map((t, i) => h('div', { class: `vs-q${i === b.cur && (b.state === 'aim') ? ' cur' : ''}${i < b.cur ? ' used' : ''}` }, VIKINGS[t].icon)));
+      const BADGE = { bomb: '#d8402a', shield: '#2a78d8', giant: '#7a4a2a' };
+      this.queueEl.replaceChildren(...b.queue.map((t, i) => h('div', { class: 'vs-qw' }, BADGE[t] && i >= b.cur ? h('div', { class: 'vs-qb', style: `background:${BADGE[t]}` }, I.t('kb_' + t)) : null, h('div', { class: `vs-q${i === b.cur && (b.state === 'aim') ? ' cur' : ''}${i < b.cur ? ' used' : ''}` }, VIKINGS[t].icon))));
       let hint = '';
       if (b.state === 'aim') hint = b.cur === 0 && b.shots === 0 ? I.t('aimHint') : I.t('kind_' + b.currentType);
       else if (b.state === 'fly') hint = I.t('tapHint');
