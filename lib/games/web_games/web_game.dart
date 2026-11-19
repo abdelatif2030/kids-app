@@ -118,7 +118,7 @@ final WebGame kRhythmSurvival = WebGame(
   title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash, kSkyCapy, kMarbleDozer, kDuneTitans, kCastawayRaft, kWinterCamp, kRainCircuit, kSquadShooter, kArcherBridge, kAlienSky, kRhinoSummit, kSunsetHighway, kCreatorTycoon, kPearlDivers, kHoneyFarm, kIceDragon, kBallScoop, kHamsterWarrior, kChompMaze, kFizzRunner, kHotSpring, kHopWorld, kMarsFarm, kPinPuzzle, kGemQuarry, kSkyAce, kNutmegRush, kTrickOrTreat, kVikingSling, kCardBattle, kDinoGrow, kIceRink, kTombPuzzle, kSweetTray, kBarrelKnights, kGummySquad, kFashionQueen, kRugCleaning, kTempleArmy];
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash, kSkyCapy, kMarbleDozer, kDuneTitans, kCastawayRaft, kWinterCamp, kRainCircuit, kSquadShooter, kArcherBridge, kAlienSky, kRhinoSummit, kSunsetHighway, kCreatorTycoon, kPearlDivers, kHoneyFarm, kIceDragon, kBallScoop, kHamsterWarrior, kChompMaze, kFizzRunner, kHotSpring, kHopWorld, kMarsFarm, kPinPuzzle, kGemQuarry, kSkyAce, kNutmegRush, kTrickOrTreat, kVikingSling, kCardBattle, kDinoGrow, kIceRink, kTombPuzzle, kSweetTray, kBarrelKnights, kGummySquad, kFashionQueen, kRugCleaning, kTempleArmy, kSkyJumper];
 
 /// «متجر الفضاء الذكي» (Space Store Manager): a grocery store on a space station (docs/SPACE_STORE.md).
 final WebGame kSpaceStore = WebGame(
@@ -630,6 +630,16 @@ final WebGame kTempleArmy = WebGame(
   storeKey: 'temple_army',
   minAge: 4,
   title: () => tr2('جيش المعبد', 'Temple Army'),
+);
+
+/// «النطاط» (Sky Jumper).
+final WebGame kSkyJumper = WebGame(
+  id: 'sky_jumper',
+  folder: 'sky_jumper',
+  global: 'SkyJumper',
+  storeKey: 'sky_jumper',
+  minAge: 4,
+  title: () => tr2('النطاط', 'Sky Jumper'),
 );
 
 // ---- rebuilt learning games (docs/LEARNING_GAMES_REBUILD.md) ----------------------------------------------------------

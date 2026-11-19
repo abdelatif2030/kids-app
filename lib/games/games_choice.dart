@@ -382,6 +382,7 @@ class FunGamesMore2Screen extends StatelessWidget {
               _card(context, 'fun_fashion_queen', kFashionQueen, 'assets/games/fashion_queen/card.webp', 'Fashion Queen', const Color(0xFFFF6AA8), const Color(0xFFFFD8EC)),
               _card(context, 'fun_rug_cleaning', kRugCleaning, 'assets/games/rug_cleaning/card.webp', 'Rug Cleaning', const Color(0xFF5AB8E8), const Color(0xFFFFF0D8)),
               _card(context, 'fun_temple_army', kTempleArmy, 'assets/games/temple_army/card.webp', 'Temple Army', const Color(0xFF3A8A4A), const Color(0xFFE8C84A)),
+              _card(context, 'fun_sky_jumper', kSkyJumper, 'assets/games/sky_jumper/card.webp', 'Sky Jumper', const Color(0xFF3AB8E8), const Color(0xFFB8F0A8)),
             ];
             return Stack(children: [
               Center(

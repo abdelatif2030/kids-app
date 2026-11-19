@@ -22,7 +22,7 @@ class FunSection {
 final List<FunSection> kFunSections = [
   FunSection('racing', '🏎️', () => tr2('سباقات', 'Racing'), const Color(0xFFE8742A), const Color(0xFFFFD23A), ['moto_race', 'carnival_race', 'dune_titans', 'rain_circuit', 'sunset_highway', 'coastal_drive', 'air_race', 'splash_race', 'summit_rush']),
   FunSection('action', '⚔️', () => tr2('أكشن ومعارك', 'Action & Battles'), const Color(0xFF6A3AB0), const Color(0xFFE85A8A), ['samurai', 'squad_shooter', 'archer_bridge', 'zombie_rooftop', 'ice_dragon', 'hero_tower', 'hamster_warrior', 'ocean_defense', 'sky_ace', 'nutmeg_rush', 'viking_sling', 'card_battle', 'dino_grow', 'ice_rink', 'barrel_knights', 'gummy_squad', 'temple_army']),
-  FunSection('runners', '🏃', () => tr2('جري وقفز', 'Runners & Jumpers'), const Color(0xFF2AB8D8), const Color(0xFF7AF0C8), ['jungle_adventure', 'cloud_dash', 'alien_sky', 'rhino_summit', 'fizz_runner', 'ball_scoop', 'sky_capy', 'golden_tail', 'rhythm', 'fox_family', 'hop_world', 'trick_or_treat']),
+  FunSection('runners', '🏃', () => tr2('جري وقفز', 'Runners & Jumpers'), const Color(0xFF2AB8D8), const Color(0xFF7AF0C8), ['jungle_adventure', 'cloud_dash', 'alien_sky', 'rhino_summit', 'fizz_runner', 'ball_scoop', 'sky_capy', 'golden_tail', 'rhythm', 'fox_family', 'hop_world', 'trick_or_treat', 'sky_jumper']),
   FunSection('build', '🏡', () => tr2('مزارع ومشاريع', 'Farms & Businesses'), const Color(0xFF5AA83A), const Color(0xFFFFE04A), ['happy_farm', 'pumpkin_pie', 'space_store', 'honey_farm', 'pearl_divers', 'winter_camp', 'castaway_raft', 'creator_tycoon', 'hot_spring', 'mars_farm', 'gem_quarry', 'rug_cleaning']),
   FunSection('puzzle', '🧩', () => tr2('ألغاز وتفكير', 'Puzzles & Brain'), const Color(0xFF3A6AE8), const Color(0xFFB8A8FF), ['marble_dozer', 'frost_coil', 'chomp_maze', 'gum_ball', 'hungry_frog', 'deep_sea', 'pin_puzzle', 'tomb_puzzle', 'sweet_tray']),
   FunSection('girls', '🎀', () => tr2('عالم البنات', 'Girls World'), const Color(0xFFFF6AA8), const Color(0xFFFFD8EC), ['fashion_queen']),
@@ -90,6 +90,7 @@ const Map<String, String> kFunGameEmoji = {
   'tomb_puzzle': '🏺',
   'sweet_tray': '🍰',
   'fashion_queen': '👗',
+  'sky_jumper': '🐸',
 };
 
 WebGame? _byId(String id) {
