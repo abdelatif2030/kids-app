@@ -1,0 +1,61 @@
+{
+ "style": "Cute 3D cartoon adventure game art, glossy toy-like shapes, bright saturated colors, soft lighting, kid friendly, no text.",
+ "kind_sprite": "Single subject centered, full body visible, front 3/4 view, plain white background, no shadow on the ground, no text.",
+ "jobs": [
+  {
+   "name": "hero",
+   "kind": "sprite",
+   "prompt": "A tiny brave hamster warrior with a small silver sword and a round blue shield, big shiny eyes, orange and cream fur, standing proudly, seen from behind-front 3/4."
+  },
+  {
+   "name": "monster_1",
+   "kind": "sprite",
+   "prompt": "A friendly-ugly round green slime monster with two big white eyes and a goofy smile, small."
+  },
+  {
+   "name": "monster_2",
+   "kind": "sprite",
+   "prompt": "A friendly-ugly red mushroom monster with a spotted cap, cream stem and two big white eyes, medium size."
+  },
+  {
+   "name": "monster_3",
+   "kind": "sprite",
+   "prompt": "A friendly-ugly purple horned imp monster with a round head, two little horns and glowing yellow eyes, big."
+  },
+  {
+   "name": "boss_1",
+   "kind": "sprite",
+   "prompt": "A giant grumpy mushroom boss with a huge red spotted cap, thick arms and angry-cute eyes, towering."
+  },
+  {
+   "name": "boss_2",
+   "kind": "sprite",
+   "prompt": "A giant stone golem boss made of mossy grey boulders with glowing orange cracks and angry-cute eyes, towering."
+  },
+  {
+   "name": "boss_3",
+   "kind": "sprite",
+   "prompt": "A giant cute-fierce red dragon boss with small wings, big teeth and shiny golden belly, towering."
+  },
+  {
+   "name": "sky_1",
+   "kind": "scene",
+   "prompt": "A bright sunny forest horizon backdrop: layered green hills, round trees, blue sky with soft clouds, a light mist, a faint path in the middle, no characters, wide panoramic."
+  },
+  {
+   "name": "sky_2",
+   "kind": "scene",
+   "prompt": "A pink cherry-blossom forest horizon backdrop: layered pastel hills, pink trees, lilac sky with soft clouds, no characters, wide panoramic."
+  },
+  {
+   "name": "sky_3",
+   "kind": "scene",
+   "prompt": "A rocky mountain valley horizon backdrop: layered grey-blue mountains, a stormy-pink sunset sky, no characters, wide panoramic."
+  },
+  {
+   "name": "card",
+   "kind": "scene",
+   "prompt": "A cheerful illustration: a tiny brave hamster warrior with a silver sword and blue shield running along a sunny forest path toward a big friendly green monster, rich colors, wide shot. IMPORTANT: absolutely no letters, no numbers, no words, no logos anywhere in the picture."
+  }
+ ]
+}

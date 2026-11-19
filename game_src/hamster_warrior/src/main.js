@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { Run, LEVELS, CHAPTERS, UPG, HALF, upgradeCost, bossPower, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { loadArt } from '../../cozy_kit/art.js';
 
 const S = {
   title: ['الهامستر المحارب', 'Hamster Warrior'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
@@ -51,6 +52,11 @@ function labelTex(text, bg) {
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; texCache.set(k, t); return t;
 }
 function sprite(text, bg, sx, sy) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: labelTex(text, bg), transparent: true, depthTest: false })); sp.scale.set(sx, sy, 1); sp.renderOrder = 10; return sp; }
+const ART_NAMES = ['hero', 'monster_1', 'monster_2', 'monster_3', 'boss_1', 'boss_2', 'boss_3', 'sky_1', 'sky_2', 'sky_3'];
+const artTex = new Map();
+function tex(img) { if (!artTex.has(img)) { const t = new THREE.Texture(img); t.colorSpace = THREE.SRGBColorSpace; t.needsUpdate = true; artTex.set(img, t); } return artTex.get(img); }
+/** A picture standing in the world (always faces the camera), `height` units tall, feet on the ground. */
+function pictureSprite(img, height) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex(img), transparent: true })); sp.scale.set(height * (img.naturalWidth / img.naturalHeight), height, 1); sp.center.set(0.5, 0.04); return sp; }
 const fmt = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e4 ? `${(n / 1e3).toFixed(1)}K` : String(Math.round(n)));
 
 function makeHamster() {
@@ -66,14 +72,18 @@ function makeHamster() {
   g.add(body); g.userData.body = body;
   return g;
 }
-function makeMonster(kind, boss) {
+function makeMonster(kind, boss, art, ch) {
   const g = new THREE.Group();
+  const img = art && (boss ? art[`boss_${ch + 1}`] : art[`monster_${(kind % 3) + 1}`]);
+  if (img) { g.add(pictureSprite(img, boss ? 8.5 : 2.7)); return g; }
   if (kind === 0) { g.add(mesh(geo.sphere, M(0x5ad85a), 0, 0.6, 0, 1.6, 1.1, 1.6), mesh(geo.sphere, M(0xffffff), -0.3, 0.9, 0.6, 0.3, 0.3, 0.2), mesh(geo.sphere, M(0xffffff), 0.3, 0.9, 0.6, 0.3, 0.3, 0.2)); }
   else if (kind === 1) { g.add(mesh(geo.cyl, M(0xf4e8d0), 0, 0.6, 0, 0.7, 1.2, 0.7), mesh(geo.sphere, M(0xe8453a), 0, 1.4, 0, 1.8, 1.0, 1.8), mesh(geo.sphere, M(0xffffff), -0.4, 1.7, 0.5, 0.3, 0.3, 0.2), mesh(geo.sphere, M(0xffffff), 0.4, 1.7, 0.5, 0.3, 0.3, 0.2)); }
   else { g.add(mesh(geo.cyl, M(0x8a4ab8), 0, 0.8, 0, 1.0, 1.3, 0.8), mesh(geo.sphere, M(0x9a6ad8), 0, 1.8, 0, 0.9, 0.9, 0.9), mesh(geo.cone, M(0x9a6ad8), -0.4, 2.4, 0, 0.3, 0.6, 0.3), mesh(geo.cone, M(0x9a6ad8), 0.4, 2.4, 0, 0.3, 0.6, 0.3), mesh(geo.sphere, M(0xffe04a, 0xaa8800), -0.2, 1.9, 0.4, 0.2, 0.2, 0.1), mesh(geo.sphere, M(0xffe04a, 0xaa8800), 0.2, 1.9, 0.4, 0.2, 0.2, 0.1)); }
   g.scale.setScalar(boss ? 3.2 : 1);
   return g;
 }
+
+function makeHamsterArt(img) { const g = new THREE.Group(); const body = new THREE.Group(); body.add(pictureSprite(img, 2.6)); g.add(body); g.userData.body = body; return g; }
 
 class Game {
   constructor(el, config, post) {
@@ -88,14 +98,30 @@ class Game {
     el.append(this.root);
     this.layer = h('div', { class: 'hw-layer' });
     this.mode = 'menu'; this.clock = 0; this.fx = [];
+    this.art = {};
     this._three();
     this.root.append(this.layer);
     this._resize();
     this.ro = new ResizeObserver(() => this._resize()); this.ro.observe(el);
     this._bind();
     this.last = performance.now();
+    loadArt(this.base, ART_NAMES).then((a) => this._useArt(a));
     this._fonts().then(() => { this.showMenu(); this.renderer.setAnimationLoop(() => this._frame()); });
   }
+
+  /** Pictures arrived: swap the code-drawn hero for the picture, add the horizon backdrop, rebuild the menu scene. */
+  _useArt(a) {
+    if (this.disposed) return;
+    this.art = a;
+    if (a.hero) { this.scene.remove(this.hero); this.hero = makeHamsterArt(a.hero); this.scene.add(this.hero); }
+    if (ART_NAMES.some((n) => n.startsWith('sky') && a[n])) {
+      this.sky = new THREE.Mesh(new THREE.PlaneGeometry(420, 210), new THREE.MeshBasicMaterial({ transparent: true, fog: false, depthWrite: false, side: THREE.DoubleSide }));
+      this.sky.renderOrder = -5; this.scene.add(this.sky); this._skyFor(0);
+    }
+    if (this.mode === 'menu' && this.demo) this._buildWorld(this.demo);
+  }
+
+  _skyFor(ch) { const img = this.art[`sky_${ch + 1}`] || this.art.sky_1; if (!this.sky || !img) return; this.sky.material.map = tex(img); this.sky.material.needsUpdate = true; }
 
   async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 2500))]); } catch (_) { /* system font */ } }
 
@@ -137,7 +163,7 @@ class Game {
   _buildWorld(run) {
     for (const c of [...this.world.children]) this.world.remove(c);
     this.objs = new Map();
-    const L = run.L; const ch = Math.floor(run.level / 4);
+    const L = run.L; const ch = Math.floor(run.level / 4); this._skyFor(ch);
     const grass = [0x7ad858, 0x9ac858, 0xa8a8a0][ch];
     this.world.add(mesh(geo.box, M(grass), 0, -0.6, L / 2, 120, 0.2, L + 100), mesh(geo.box, M(0xe8d098), 0, -0.1, L / 2, HALF * 2 + 0.6, 0.2, L + 80));
     for (const s of [-1, 1]) for (let z = 4; z < L + 40; z += 7) {
@@ -153,7 +179,7 @@ class Game {
         g.add(mesh(geo.box, new THREE.MeshBasicMaterial({ color: pos ? 0x3a8aff : 0xff3a4a, transparent: true, opacity: 0.45 }), 0, 1.8, 0, t.w, 3.4, 0.2), mesh(geo.box, M(pos ? 0x2a5ac8 : 0xc82a3a), -t.w / 2, 1.8, 0, 0.3, 3.6, 0.3), mesh(geo.box, M(pos ? 0x2a5ac8 : 0xc82a3a), t.w / 2, 1.8, 0, 0.3, 3.6, 0.3));
         const s = sprite(`${t.icon} ${t.op === 'mul' ? `x${t.v}` : t.v >= 0 ? `+${t.v}` : t.v}`, pos ? '#2a6ae0' : '#e02a3a', 3.2, 1.6); s.position.y = 4.4; g.add(s);
       } else if (t.kind === 'monster' || t.kind === 'boss') {
-        g.add(makeMonster(t.kindId || 0, t.boss));
+        g.add(makeMonster(t.kindId || 0, t.boss, this.art, ch));
         const s = sprite(fmt(t.power), t.boss ? '#8a1a6a' : '#8a1a1a', t.boss ? 4.4 : 2.4, t.boss ? 2.2 : 1.2); s.position.y = t.boss ? 9 : 3; g.add(s);
         g.userData.mon = g.children[0];
       } else if (t.kind === 'coin') { g.add(mesh(geo.cyl, M(0xffd23a, 0x886600), 0, 1, 0, 0.9, 0.15, 0.9).rotateX(Math.PI / 2)); }
@@ -231,6 +257,7 @@ class Game {
     const zc = play ? Math.min(zr, r.L + 2) : 0;
     this.camera.position.set(this.camera.position.x, this.cw < this.ch ? 8.2 : 6.6, zc - (this.cw < this.ch ? 10 : 8.5));
     this.camera.lookAt(this.camera.position.x * 0.5, 1.4, zc + 16);
+    if (this.sky) this.sky.position.set(this.camera.position.x, 52, zc + 120);
     this.renderer.render(this.scene, this.camera);
     this._floaters();
   }
@@ -246,7 +273,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play' && !this.paused) this.togglePause(); }
-  dispose() { this.renderer.setAnimationLoop(null); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
+  dispose() { this.disposed = true; this.renderer.setAnimationLoop(null); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
 }
 
 void bossPower;
