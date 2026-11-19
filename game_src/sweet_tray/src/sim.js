@@ -23,11 +23,11 @@ export function levelParams(n) {
   return {
     n: lv,
     seed: lv * 7919 + 13,
-    triples: Math.min(34, 5 + lv),
+    triples: Math.min(34, 4 + lv),
     kinds: Math.min(KIND_COUNT, 3 + Math.floor(lv / 3)),
     window: lv < 5 ? 1 : lv < 12 ? 2 : 3,
     layers: Math.min(6, 2 + Math.floor(lv / 5)),
-    size: Math.max(12.5, Math.min(20, 20 - lv * 0.22)),
+    size: Math.max(11, Math.min(15, 15 - lv * 0.12)),
   };
 }
 

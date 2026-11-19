@@ -90,7 +90,7 @@ class UI {
     if (!land) {
       const hud = 15 * u; const meter = 5 * u; const help = 17.5 * u;
       const slot = Math.min((cw * 0.95 - 3 * u) / cap, 15 * u); const tray = slot + 3.2 * u;
-      const B = Math.min(cw * 0.9, ch - hud - meter - tray - help - 5 * u);
+      const B = Math.min(cw * 0.76, ch - hud - meter - tray - help - 5 * u);
       const gap = Math.max(0.6 * u, (ch - hud - meter - B - tray - help) / 5);
       let y = hud + gap * 0.6;
       L.meterY = y; y += meter + gap; L.meterH = meter;

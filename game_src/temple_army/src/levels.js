@@ -93,7 +93,7 @@ const L6 = build(17, 23, ({ f, s, gateH }) => {
 });
 
 export const LEVELS = [
-  { id: 1, name: ['بوابة الطحالب', 'Mossy Gate'], theme: { sky: 0x1d3a2a, fog: 0x2c5a3e, wall: 0x58704a, floor: 0x8a8a6a, accent: 0x7af09a }, map: L1,
+  { id: 1, name: ['بوابة الطحالب', 'Mossy Gate'], theme: { sky: 0x6a9a58, fog: 0xa8c08a, wall: 0xd9b672, floor: 0xe8cf94, accent: 0xffd23a }, map: L1,
     start: 5, gates: { 1: ['x', 2], 2: ['+', 4], 3: ['-', 3], 4: ['/', 2], 5: ['x', 2], 6: ['+', 12] }, hordes: { f: 40 }, par: [30, 60] },
   { id: 2, name: ['قاعة الأشواك', 'Spike Hall'], theme: { sky: 0x1a3a40, fog: 0x2a5a60, wall: 0x4a6a6a, floor: 0x8a8870, accent: 0x6ae0e8 }, map: L2,
     start: 6, gates: { 1: ['x', 2], 2: ['+', 8], 3: ['/', 2], 4: ['-', 6], 5: ['x', 3], 6: ['+', 10] }, hordes: { f: 70 }, par: [70, 140] },
@@ -106,3 +106,4 @@ export const LEVELS = [
   { id: 6, name: ['عرين العملاق', 'Golem Arena'], theme: { sky: 0x3a2a14, fog: 0x6a5020, wall: 0x7a6a4a, floor: 0xa09070, accent: 0xffd23a }, map: L6,
     start: 6, gates: { 1: ['x', 2], 2: ['+', 12], 3: ['/', 2], 4: ['x', 3], 5: ['x', 2], 6: ['-', 15] }, hordes: { e: 12, f: 60 }, boss: { kind: 'golem', hp: 560, atk: 12 }, par: [40, 100] },
 ];
+

@@ -19,6 +19,7 @@ const S = {
   how: ['اسحب إصبعك لتحريك القائد. اختر أحسن بوابة، حرّر الأسرى، وانتبه من الأشواك!', 'Drag to steer the captain. Pick the best gate, free prisoners, watch the spikes!'],
   boss: ['الوحش', 'BOSS'], survivors: ['الناجون', 'Survivors'], gained: ['عملات جديدة', 'Coins earned'], tip: ['جرّب بوابات أحسن وحرّر الأسرى!', 'Try better gates and free the prisoners!'],
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'], freed: ['تحرّروا!', 'freed!'],
+  g_gate: ['اختر البوابة الأقوى', 'Pick the stronger gate'], g_boss: ['حطّم الوحش', 'Smash the Brute'],
   h1: ['اسحب لتحريك القائد · اختر البوابة الأحسن!', 'Drag to move · pick the best gate!'], h2: ['انتظر حتى تنزل الأشواك الحمراء ثم اعبر', 'Wait for the red glowing spikes to sink, then cross'],
   h3: ['اهرب من الدائرة الحمراء ثم اضرب الوحش بجيشك!', 'Run out of the red circle, then hit the brute with your army!'], h4: ['ادخل الذراع لتحطيم المنشار!', 'Walk into the lever to break the saw!'],
   h5: ['حرّر الأسرى قبل البوابات لتكبر أكثر', 'Free prisoners before the gates to grow bigger'], h6: ['تغلّب على العملاق بالأعداد الكبيرة!', 'Overwhelm the golem with numbers!'],
@@ -269,12 +270,12 @@ class Game {
     this.armyEl = h('span', {}, ''); this.coinEl = h('span', {}, '');
     const pause = h('button', { class: 'ta-round', 'aria-label': I.t('paused'), onclick: () => this.togglePause() }, '⏸');
     this.bossBar = h('div', { class: 'ta-boss' }, h('span', {}, '👹 ', I.t('boss')), h('div', { class: 'ta-hp' }, this.bossFill = h('b')), this.bossNum = h('span', {}, ''));
-    this.mini = h('canvas', { class: 'ta-mini', width: 160, height: 160 });
-    this.layer.append(h('div', { class: 'ta-top' }, pause, h('div', { class: 'ta-pill small' }, I.getLang() === 'en' ? LEVELS[i].name[1] : LEVELS[i].name[0]), h('div', { style: 'display:flex;gap:calc(var(--u)*1.2)' }, h('div', { class: 'ta-pill' }, this.coinEl), h('div', { class: 'ta-pill army' }, '⚔️ ', this.armyEl))), this.bossBar, this.mini);
+    this.mini = null; // the original video has no minimap
+    this.layer.append(h('div', { class: 'ta-top' }, pause, h('div', { class: 'ta-pill small' }, this.goalEl = h('span', {}, I.t('g_gate'))), h('div', { style: 'display:flex;gap:calc(var(--u)*1.2)' }, h('div', { class: 'ta-pill' }, this.coinEl), h('span', { style: 'display:none' }, this.armyEl))), this.bossBar);
     this.hintEl = h('div', { class: 'ta-hint', style: 'top:calc(var(--u)*24)' }); this.layer.append(this.hintEl); this._soundPill();
     this.hideBoss(); this.hint(I.t(`h${Math.min(6, i + 1)}`), 5000);
     for (const e of this.labels.values()) this.layer.append(e);
-    this.capLab = h('div', { class: 'ta-lab me' }); this.layer.append(this.capLab);
+    this.capLab = h('div', { class: 'ta-lab me plain' }); this.layer.append(this.capLab);
   }
 
   hideBoss() { if (this.bossBar) this.bossBar.style.display = 'none'; }
@@ -327,7 +328,7 @@ class Game {
     const run = this.run; if (this.mode !== 'play' || !this.armyEl) return;
     this.armyEl.textContent = I.num(run.n); this.coinEl.textContent = `🪙 ${I.num(this.save.coins + run.coins)}`;
     const b = run.lv.boss; const bs = run.bossState;
-    if (b && bs.phase === 'fight') { this.bossBar.style.display = 'flex'; this.bossFill.style.width = `${Math.max(0, (b.hp / b.hpMax) * 100)}%`; this.bossNum.textContent = I.num(Math.ceil(b.hp)); } else if (!b || bs.phase === 'dead') this.hideBoss();
+    if (b && bs.phase === 'fight') { this.bossBar.style.display = 'flex'; this.bossFill.style.width = `${Math.max(0, (b.hp / b.hpMax) * 100)}%`; this.bossNum.textContent = I.num(Math.ceil(b.hp)); this.goalEl.textContent = I.t('g_boss'); } else if (!b || bs.phase === 'dead') this.hideBoss();
     if (this.mini && this.clock - (this.miniAt || 0) > 0.12) { this.miniAt = this.clock; this._drawMini(); }
   }
 
@@ -554,7 +555,7 @@ const TA_CSS = `
 .ta-boss{position:absolute;left:calc(var(--u)*6);right:calc(var(--u)*6);top:calc(var(--u)*15);display:none;align-items:center;gap:calc(var(--u)*1.5);direction:ltr;font-weight:900;font-size:calc(var(--u)*3.6);text-shadow:0 0 4px #000}
 .ta-hp{flex:1;height:calc(var(--u)*3);background:rgba(0,0,0,.5);border:calc(var(--u)*.4) solid #fff;border-radius:99px;overflow:hidden}.ta-hp b{display:block;height:100%;background:linear-gradient(180deg,#ff6a5a,#c8302a)}
 .ta-lab{position:absolute;left:0;top:0;pointer-events:none;font-weight:900;font-size:calc(var(--u)*4.2);padding:calc(var(--u)*.2) calc(var(--u)*2.2);border-radius:99px;border:calc(var(--u)*.4) solid #fff;color:#fff;white-space:nowrap;display:none;text-shadow:0 1px 2px #000}
-.ta-lab.me{background:linear-gradient(180deg,#3a8af0,#12409a)}.ta-lab.foe{background:linear-gradient(180deg,#e8483a,#8a1a12)}
+.ta-lab.me{background:linear-gradient(180deg,#3a8af0,#12409a)}.ta-lab.me.plain{background:none;border:0;font-size:calc(var(--u)*6.4);-webkit-text-stroke:calc(var(--u)*.5) #0d2a55;paint-order:stroke fill;text-shadow:0 2px 3px rgba(0,0,0,.5)}.ta-lab.foe{background:linear-gradient(180deg,#e8483a,#8a1a12)}
 .ta-float{position:absolute;pointer-events:none;font-weight:900;font-size:calc(var(--u)*6);text-shadow:0 0 6px #000,0 0 3px #000;animation:taup 1.2s ease-out forwards;transform:translate(-50%,-50%)}
 @keyframes taup{to{transform:translate(-50%,-260%);opacity:0}}
 .ta-stick{position:absolute;width:calc(var(--u)*18);height:calc(var(--u)*18);margin:calc(var(--u)*-9) 0 0 calc(var(--u)*-9);border-radius:50%;border:calc(var(--u)*.6) solid rgba(255,255,255,.7);background:rgba(255,255,255,.12);display:none;pointer-events:none}
@@ -571,3 +572,4 @@ const TA_CSS = `
 const api = { start(el, config, post) { const g = new Game(el, config || {}, post); api.last = g; return { dispose: () => g.dispose(), pause: () => g.pause() }; } };
 window.TempleArmy = api;
 export default api;
+

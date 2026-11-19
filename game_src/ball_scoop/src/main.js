@@ -25,7 +25,7 @@ const S = {
 const I = makeI18n(S);
 const COLORS = [0xff4a6a, 0x4ab8ff, 0xffd23a, 0x5af08a, 0xb86aff, 0xff8a2a];
 const THEME = {
-  meadow: { sky: 0x9fe0ff, ground: 0x7ad858, road: 0xd8b078, stripe: 0xe6c690, ra: 0xff5a6a, rb: 0xfff0f0, icon: '🌿', prop: 'tree', c1: 0x7a4a2a, c2: 0x3ab04a },
+  meadow: { sky: 0x6fd8c8, ground: 0x4fc8bc, road: 0xe0a05c, stripe: 0xc88a48, ra: 0xff4a4a, rb: 0xfff0f0, icon: '🌊', prop: 'tree', c1: 0xeaf8f6, c2: 0xffffff },
   desert: { sky: 0xffd9a0, ground: 0xe8c070, road: 0xb8895a, stripe: 0xc89a68, ra: 0xff8a2a, rb: 0xfff0c0, icon: '🌵', prop: 'cactus', c1: 0x3a9a4a, c2: 0x4ab85a },
   snow: { sky: 0xd8ecff, ground: 0xf4faff, road: 0x9ab0c8, stripe: 0xaec2d8, ra: 0x4ab8ff, rb: 0xffffff, icon: '❄️', prop: 'pine', c1: 0x6a4a2a, c2: 0x2a8a5a },
   candy: { sky: 0xffc8e8, ground: 0xff9ad0, road: 0xc890ff, stripe: 0xd8a8ff, ra: 0xff4a9a, rb: 0x7affd0, icon: '🍭', prop: 'lolli', c1: 0xffffff, c2: 0xff4a8a },
@@ -499,7 +499,7 @@ const EXTRA_CSS = `
 .bs-pips{display:flex;gap:calc(var(--u)*.5);flex-wrap:wrap;justify-content:center}.bs-pips b{width:calc(var(--u)*1.7);height:calc(var(--u)*1.7);border-radius:50%;background:rgba(255,255,255,.3)}.bs-pips b.on{background:#ffe36a}
 .bs-buy{font-family:inherit;font-weight:900;border:none;border-radius:999px;padding:calc(var(--u)*1) calc(var(--u)*3);font-size:calc(var(--u)*3.4);background:#7a8896;color:#fff;cursor:pointer;width:100%}
 .bs-buy.go{background:linear-gradient(180deg,#6ae08a,#2fa85a);box-shadow:0 calc(var(--u)*.6) 0 #1a6a3a}
-.bs-bubble{position:absolute;left:0;top:0;pointer-events:none;background:linear-gradient(180deg,#ff7a6a,#e0302a);border:calc(var(--u)*.6) solid #fff;border-radius:999px;color:#fff;font-weight:900;font-size:calc(var(--u)*6);padding:calc(var(--u)*.4) calc(var(--u)*3.5);box-shadow:0 calc(var(--u)*.8) calc(var(--u)*1.6) rgba(0,0,0,.4);white-space:nowrap}
+.bs-bubble{position:absolute;left:0;top:0;pointer-events:none;background:#fff;border:calc(var(--u)*.6) solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);border-radius:999px;color:#222;font-weight:900;font-size:calc(var(--u)*6);padding:calc(var(--u)*.4) calc(var(--u)*3.5);box-shadow:0 calc(var(--u)*.8) calc(var(--u)*1.6) rgba(0,0,0,.4);white-space:nowrap}
 .bs-bubble.gold{background:linear-gradient(180deg,#ffe36a,#e0a010)}
 .bs-float{position:absolute;left:0;top:0;font-weight:900;color:#fff;text-shadow:0 0 8px #000,0 0 3px #000;pointer-events:none;display:none;white-space:nowrap}
 .bs-banner{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);text-align:center;font-weight:900;font-size:calc(var(--u)*11);color:#ffe36a;-webkit-text-stroke:calc(var(--u)*.8) rgba(0,30,50,.9);paint-order:stroke fill;pointer-events:none;line-height:1.1}
