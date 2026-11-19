@@ -28,7 +28,15 @@ export const CSS = `
 @keyframes jaPop{from{transform:translate(-50%,-50%) scale(.5)}to{transform:translate(-50%,-50%) scale(1)}}
 .ja-hint{position:absolute;left:50%;top:22%;transform:translateX(-50%);font-size:calc(var(--u)*4.4);font-weight:900;white-space:nowrap;opacity:0;transition:opacity .3s;pointer-events:none}
 .ja-hint.show{opacity:1}
-.ja-dim{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,14,12,.25)}
+.ja-dim{position:absolute;inset:0;display:flex;background:rgba(10,14,12,.25);overflow:auto;pointer-events:auto}
+.ja-dim>.ja-glass{margin:auto}
+.ja-land .ja-dim .ja-portrait{display:none}
+.ja-land .ja-dim .ja-glass{gap:calc(var(--u)*1.2);padding:calc(var(--u)*2.4) calc(var(--u)*5)}
+.ja-land .ja-dim .ja-btn{min-height:calc(var(--u)*8.5);padding:calc(var(--u)*1) calc(var(--u)*6);font-size:calc(var(--u)*3.8)}
+.ja-land .ja-dim .ja-title{font-size:calc(var(--u)*6)}
+.ja-land .ja-dim .ja-win{font-size:calc(var(--u)*7)}
+.ja-land .ja-dim .ja-stat{padding:calc(var(--u)*1) calc(var(--u)*2.6)}
+.ja-land .ja-dim .ja-stat b{font-size:calc(var(--u)*5)}
 .ja-glass{background:rgba(22,26,30,.62);backdrop-filter:blur(16px) saturate(1.2);-webkit-backdrop-filter:blur(16px) saturate(1.2);border:1px solid rgba(255,255,255,.16);border-radius:calc(var(--u)*5);box-shadow:0 calc(var(--u)*2) calc(var(--u)*6) rgba(0,0,0,.45);padding:calc(var(--u)*4) calc(var(--u)*5);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*2.4);max-width:calc(100% - var(--u)*6);box-sizing:border-box}
 .ja-title{font-size:calc(var(--u)*7);font-weight:900;text-align:center;line-height:1.1}
 .ja-sub{font-size:calc(var(--u)*3.6);opacity:.85;text-align:center}
