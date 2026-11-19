@@ -70,12 +70,42 @@ const CSS = `
 .sc-table{width:100%;border-collapse:collapse;font-weight:800;font-size:calc(var(--u)*3.6)}
 .sc-table td{padding:calc(var(--u)*.7) calc(var(--u)*1.4);border-bottom:calc(var(--u)*.3) dashed #d8c8a0}
 .sc-table td:first-child{color:#e8503a;width:calc(var(--u)*7)}
-.sc-table td:last-child{text-align:right}
+.sc-table td:nth-child(3){text-align:right}
 .sc-init{display:flex;gap:calc(var(--u)*2);direction:ltr}
 .sc-init div{display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.6)}
 .sc-init button{font-family:inherit;font-weight:900;border:calc(var(--u)*.5) solid #1d2a4a;background:#fff;border-radius:calc(var(--u)*1.6);width:calc(var(--u)*10);height:calc(var(--u)*7);font-size:calc(var(--u)*3.4);cursor:pointer}
 .sc-init span{font-weight:900;font-size:calc(var(--u)*10);color:#e8503a;-webkit-text-stroke:calc(var(--u)*.5) #1d2a4a;paint-order:stroke fill}
 .sc-soundpill{position:absolute;left:50%;bottom:calc(var(--u)*26);transform:translateX(-50%);z-index:30;font-family:inherit;font-weight:900;font-size:calc(var(--u)*4.6);color:#1f2a24;background:#ffd166;border:calc(var(--u)*.6) solid #fff;border-radius:999px;padding:calc(var(--u)*2) calc(var(--u)*5);box-shadow:0 calc(var(--u)*1) calc(var(--u)*3) rgba(0,0,0,.4);cursor:pointer;display:none;pointer-events:auto}
+.sc-toast{display:flex;align-items:center;gap:calc(var(--u)*2)}
+.sc-toast .pip{flex:none;width:calc(var(--u)*8.5);height:calc(var(--u)*8.5);border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8a7a,#c8222a);border:calc(var(--u)*.5) solid #1d2a4a;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*4.6)}
+.sc-ach{position:absolute;left:50%;top:calc(max(calc(var(--u)*1.5),env(safe-area-inset-top)) + var(--u)*13);transform:translateX(-50%) translateY(calc(var(--u)*-2));background:linear-gradient(180deg,#3a4a7a,#1d2a4a);border:calc(var(--u)*.5) solid #fff;border-radius:calc(var(--u)*3);padding:calc(var(--u)*.8) calc(var(--u)*3.4);color:#ffd23a;font-weight:900;font-size:calc(var(--u)*3);text-align:center;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;box-shadow:0 calc(var(--u)*.6) 0 rgba(0,0,0,.35)}
+.sc-ach small{display:block;color:#fff;font-size:calc(var(--u)*3.4)}
+.sc-ach.show{opacity:1;transform:translateX(-50%)}
+.sc-prog b{position:relative}
+.sc-prog b::after{content:'';position:absolute;right:calc(var(--u)*-1.3);top:50%;transform:translateY(-50%);width:calc(var(--u)*2.8);height:calc(var(--u)*2.8);border-radius:50%;background:#ff5a4a;border:calc(var(--u)*.4) solid #fff}
+.sc-thief{position:absolute;left:50%;top:calc(max(calc(var(--u)*1.5),env(safe-area-inset-top)) + var(--u)*12.6);transform:translateX(-50%);width:calc(var(--u)*46);display:none;pointer-events:none}
+.sc-thief.show{display:block}
+.sc-thief span{display:block;text-align:center;font-weight:900;font-size:calc(var(--u)*3.2);color:#fff;-webkit-text-stroke:calc(var(--u)*.4) #1d2a4a;paint-order:stroke fill}
+.sc-thief i{display:block;height:calc(var(--u)*2);border-radius:9px;background:rgba(29,42,74,.55);border:calc(var(--u)*.3) solid #fff;overflow:hidden}
+.sc-thief b{display:block;height:100%;background:linear-gradient(180deg,#6af0d0,#1aa890)}
+.sc-toast.low{top:calc(max(calc(var(--u)*1.5),env(safe-area-inset-top)) + var(--u)*19.5)}
+.sc-fire.empty{background:radial-gradient(circle at 35% 30%,#b8c0cc,#7a8494);opacity:.85}
+.sc-menu{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*2.4);pointer-events:none;padding-bottom:calc(var(--u)*14)}
+.sc-menu>*{pointer-events:auto}
+.sc-biglogo{font-size:calc(var(--u)*17);font-weight:900;line-height:.95;color:#ffd23a;-webkit-text-stroke:calc(var(--u)*1.3) #1d2a4a;paint-order:stroke fill;text-shadow:0 calc(var(--u)*1.4) 0 #1d2a4a,0 calc(var(--u)*2.4) calc(var(--u)*1.2) rgba(0,0,0,.25);text-align:center}
+.sc-bestpill{background:linear-gradient(180deg,#e8323a,#b8222a);border:calc(var(--u)*.5) solid #fff;color:#fff;font-weight:900;font-size:calc(var(--u)*3.4);border-radius:99px;padding:calc(var(--u)*.6) calc(var(--u)*4);box-shadow:0 calc(var(--u)*.5) 0 #1d2a4a}
+.sc-playbtn{font-family:inherit;font-weight:900;font-size:calc(var(--u)*9);color:#fff;border:calc(var(--u)*.9) solid #1d2a4a;border-radius:calc(var(--u)*3.4);padding:calc(var(--u)*1.6) calc(var(--u)*16);cursor:pointer;background:linear-gradient(180deg,#ff8a7a,#e8323a);box-shadow:0 calc(var(--u)*1.1) 0 #1d2a4a;text-shadow:0 calc(var(--u)*.5) 0 #1d2a4a}
+.sc-playbtn:active{transform:translateY(calc(var(--u)*.6))}
+.sc-icons{display:flex;gap:calc(var(--u)*4)}
+.sc-icon{display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.8);background:none;border:none;font-family:inherit;font-weight:900;font-size:calc(var(--u)*3);color:#fff;text-shadow:0 1px 3px #1d2a4a;cursor:pointer;padding:0}
+.sc-icon i{font-style:normal;width:calc(var(--u)*12);height:calc(var(--u)*12);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*6);background:linear-gradient(180deg,#6ac8ff,#2a7ae8);border:calc(var(--u)*.6) solid #fff;box-shadow:0 calc(var(--u)*.6) 0 #1d2a4a}
+.sc-icon:focus-visible i{outline:calc(var(--u)*.7) solid #ffd23a}
+.sc-dots{display:flex;gap:calc(var(--u)*1.4);justify-content:center}
+.sc-dots i{width:calc(var(--u)*2);height:calc(var(--u)*2);border-radius:50%;background:#d8c8a0}.sc-dots i.on{background:#e8503a}
+.sc-row{display:flex;gap:calc(var(--u)*2);width:100%}.sc-row .sc-btn{flex:1;padding-left:calc(var(--u)*1);padding-right:calc(var(--u)*1);font-size:calc(var(--u)*4)}
+.sc-bigscore{font-size:calc(var(--u)*14);font-weight:900;color:#e8503a;-webkit-text-stroke:calc(var(--u)*.7) #1d2a4a;paint-order:stroke fill;line-height:1}
+.sc-pill{background:#1d2a4a;color:#ffd23a;font-weight:900;font-size:calc(var(--u)*3.4);border-radius:99px;padding:calc(var(--u)*.6) calc(var(--u)*3)}
+.sc-table td:nth-child(3){text-align:right;color:#6a5a3a;font-size:calc(var(--u)*3)}
 @media (orientation:landscape){.sc-card{width:calc(var(--u)*110);max-width:94vw}.sc-list{max-height:calc(var(--u)*38)}.sc-logo{font-size:calc(var(--u)*9)}}
 `;
 
@@ -220,12 +250,13 @@ class Game {
     this.sound.setMode('menu');
     this._clear();
     this.layer.append(this._topRow(),
-      h('div', { class: 'sc-dim', style: 'background:none' }, h('div', { class: 'sc-card' },
-        h('div', { class: 'sc-logo' }, t('title')),
-        h('div', { class: 'sc-small' }, '🦫 ✈️ 🫧'),
-        h('button', { class: 'sc-btn green', onclick: () => this.startRun() }, '▶ ', t('play')),
-        h('button', { class: 'sc-btn blue', onclick: () => this.showHangar() }, '🔧 ', t('hangar')),
-        h('button', { class: 'sc-btn', style: 'background:linear-gradient(180deg,#ffd86a,#f0a020)', onclick: () => this.showTop() }, '🏆 ', t('top10')))));
+      h('div', { class: 'sc-menu' },
+        h('div', { class: 'sc-biglogo' }, t('title')),
+        h('div', { class: 'sc-bestpill' }, `🏆 ${t('best')} ${num(this.save.best)}`),
+        h('button', { class: 'sc-playbtn', onclick: () => this.startRun() }, t('play')),
+        h('div', { class: 'sc-icons' },
+          h('button', { class: 'sc-icon', onclick: () => this.showHangar() }, h('i', {}, '🔧'), t('hangar')),
+          h('button', { class: 'sc-icon', onclick: () => this.showTop() }, h('i', {}, '🏆'), t('top10')))));
   }
 
   showTop() {
@@ -233,8 +264,8 @@ class Game {
     const top = this.save.top;
     this.layer.append(this._topRow(), h('div', { class: 'sc-dim', style: 'background:none' }, h('div', { class: 'sc-card' },
       h('div', { class: 'sc-ribbon' }, t('top10')),
-      top.length ? h('table', { class: 'sc-table' }, top.map((e, i) => h('tr', {}, h('td', {}, num(i + 1)), h('td', {}, e.name), h('td', {}, num(e.score))))) : h('div', { class: 'sc-small' }, t('empty')),
-      h('button', { class: 'sc-btn blue', onclick: () => this.showMenu() }, t('back')))));
+      top.length ? h('table', { class: 'sc-table' }, top.map((e, i) => h('tr', {}, h('td', {}, num(i + 1)), h('td', {}, e.name), h('td', {}, num(e.score)), h('td', {}, `${t('stageWord')} ${num(e.stage || 1)}`)))) : h('div', { class: 'sc-small' }, t('empty')),
+      h('div', { class: 'sc-row' }, h('button', { class: 'sc-btn blue', onclick: () => this.showMenu() }, t('back')), h('button', { class: 'sc-btn', onclick: () => this.showHangar() }, t('hangar')), h('button', { class: 'sc-btn green', onclick: () => this.startRun() }, t('again'))))));
   }
 
   showHangar(tab = 'up') {
@@ -268,15 +299,38 @@ class Game {
     this.input = { tx: W / 2, ty: H - 30, fire: false };
     this.shown = new Set();
     this._buildHud();
-    this._stageIntro();
     this.sound.setMode('play');
     this.tilt = 0;
+    this._story(() => { this.mode = 'play'; this.last = performance.now(); this._stageIntro(); });
+  }
+
+  /** The little story cards before stage 1 (SKIP / NEXT, like the video). */
+  _story(done) {
+    const slides = [['stage1', 'story1'], ['pirates', 'story2'], ['meetPip', 'story3']];
+    let i = 0;
+    this.mode = 'story';
+    const card = h('div', { class: 'sc-dim', style: 'background:rgba(20,40,90,.55)' });
+    const show = () => {
+      const [ti, tx] = slides[i];
+      const last = i === slides.length - 1;
+      card.replaceChildren(h('div', { class: 'sc-card' },
+        h('div', { class: 'sc-ribbon' }, t(ti)),
+        h('div', { class: 'sc-small' }, t(tx)),
+        h('div', { class: 'sc-dots' }, slides.map((_, k) => h('i', { class: k === i ? 'on' : '' }))),
+        h('div', { class: 'sc-row' },
+          h('button', { class: 'sc-btn blue', onclick: () => { card.remove(); done(); } }, t('skip')),
+          h('button', { class: 'sc-btn', onclick: () => { if (last) { card.remove(); done(); } else { i++; show(); } } }, last ? t('go') : t('next')))));
+    };
+    show();
+    this.layer.append(card);
   }
 
   _buildHud() {
     this._clear();
-    this.hud = { hp: h('b'), hpT: h('span'), score: h('div', { class: 'sc-score' }, '0'), mult: h('div', { class: 'sc-mult' }), prog: h('b'), ring: h('i', { class: 'sc-ring' }), storm: h('button', { class: 'sc-storm' }), toast: h('div', { class: 'sc-toast' }), banner: h('div', { class: 'sc-banner' }) };
+    this.hud = { hp: h('b'), hpT: h('span'), score: h('div', { class: 'sc-score' }, '0'), mult: h('div', { class: 'sc-mult' }), prog: h('b'), ring: h('i', { class: 'sc-ring' }), storm: h('button', { class: 'sc-storm' }), toast: h('div', { class: 'sc-toast' }), ach: h('div', { class: 'sc-ach' }), banner: h('div', { class: 'sc-banner' }), thiefBar: h('b'), thiefBox: h('div', { class: 'sc-thief' }), fire: null };
     const fire = h('button', { class: 'sc-fire', 'aria-label': t('fire') }, this.hud.ring, t('fire'));
+    this.hud.fire = fire;
+    this.hud.thiefBox.append(h('span', {}, t('thief')), h('i', {}, this.hud.thiefBar));
     const down = (e) => { e.preventDefault(); this.input.fire = true; fire.setPointerCapture?.(e.pointerId); };
     const up = () => { this.input.fire = false; };
     fire.addEventListener('pointerdown', down); fire.addEventListener('pointerup', up); fire.addEventListener('pointercancel', up); fire.addEventListener('pointerleave', up);
@@ -285,7 +339,7 @@ class Game {
       h('div', { class: 'sc-hud' },
         h('div', { class: 'sc-hp' }, h('i', {}, '❤️'), h('div', { class: 'sc-bar' }, this.hud.hp, this.hud.hpT)),
         this.hud.score, h('button', { class: 'sc-round', 'aria-label': t('pause'), onclick: () => this._pause() }, '⏸')),
-      h('div', { class: 'sc-prog' }, this.hud.prog), this.hud.mult, this.hud.toast, this.hud.banner, fire, this.hud.storm);
+      h('div', { class: 'sc-prog' }, this.hud.prog), this.hud.mult, this.hud.thiefBox, this.hud.toast, this.hud.ach, this.hud.banner, fire, this.hud.storm);
     this._hudUpdate();
   }
 
@@ -301,16 +355,28 @@ class Game {
     this.hud.mult.textContent = `X${r.mult}`;
     this.hud.mult.classList.toggle('show', r.mult > 1);
     this.hud.ring.style.setProperty('--fill', String(r.tank));
+    this.hud.fire.classList.toggle('empty', r.tank < 0.05);
+    const th = r.thief;
+    this.hud.thiefBox.classList.toggle('show', !!th);
+    this.hud.toast.classList.toggle('low', !!th);
+    if (th) this.hud.thiefBar.style.width = `${(1 - th.k) * 100}%`;
     this.hud.storm.className = `sc-storm${r.storms > 0 ? '' : ' off'}`;
     this.hud.storm.replaceChildren(h('span', {}, '🌪️'), h('small', {}, `${t('storm')} ${num(r.storms)}`));
   }
 
   _toast(text, secs = 2.8) {
     if (!this.hud) return;
-    this.hud.toast.textContent = text;
+    this.hud.toast.replaceChildren(h('span', { class: 'pip' }, '🐦'), h('span', {}, text)); // Pip, the red songbird, talks (like the video)
     this.hud.toast.classList.add('show');
     clearTimeout(this._tt);
     this._tt = setTimeout(() => this.hud && this.hud.toast.classList.remove('show'), secs * 1000);
+  }
+  _ach(title, secs = 2.8) {
+    if (!this.hud) return;
+    this.hud.ach.replaceChildren(t('ach'), h('small', {}, title));
+    this.hud.ach.classList.add('show');
+    clearTimeout(this._at);
+    this._at = setTimeout(() => this.hud && this.hud.ach.classList.remove('show'), secs * 1000);
   }
   _hideHint() { if (this.hud && this._dragHint) { this.hud.toast.classList.remove('show'); this._dragHint = false; } }
   _banner(text, sub = '', secs = 2.2) {
@@ -369,12 +435,16 @@ class Game {
     const finish = (name) => {
       if (name) { this.save.top = addScore(this.save.top, { name, score: r.score, stage: r.stage + r.loop * 3 }); this._saveNow(); }
       this.layer.append(h('div', { class: 'sc-dim' }, h('div', { class: 'sc-card' },
-        h('div', { class: 'sc-title' }, t('shot')),
-        h('div', { class: 'sc-small' }, `${t('score')}: ${num(r.score)}`),
-        h('div', { class: 'sc-small' }, `${t('rank')}: ${ranks}   ·   🪶 +${num(r.feathers)}`),
-        h('button', { class: 'sc-btn green', onclick: () => this.startRun() }, '↻ ', t('again')),
-        h('button', { class: 'sc-btn blue', onclick: () => this.showHangar() }, '🔧 ', t('hangar')),
-        h('button', { class: 'sc-btn', onclick: () => this.showMenu() }, t('back')))));
+        h('div', { class: 'sc-ribbon' }, t('gameOver')),
+        h('div', { class: 'sc-small' }, `${t('stageWord')} ${num(r.stage + r.loop * 3)}`),
+        h('div', { class: 'sc-bigscore' }, num(r.score)),
+        h('div', { class: 'sc-small' }, `${t('hiScore')} ${num(this.save.best)}`),
+        h('div', { class: 'sc-pill' }, `🪶 +${num(r.feathers)}`),
+        h('div', { class: 'sc-small' }, `${t('rank')}: ${ranks}`),
+        h('div', { class: 'sc-row' },
+          h('button', { class: 'sc-btn blue', onclick: () => this.showMenu() }, t('back')),
+          h('button', { class: 'sc-btn', style: 'background:linear-gradient(180deg,#ffd86a,#f0a020)', onclick: () => this.showHangar() }, t('hangar')),
+          h('button', { class: 'sc-btn green', onclick: () => this.startRun() }, t('again'))))));
     };
     if (qualifies(this.save.top, r.score)) {
       const letters = ['A', 'A', 'A'];
@@ -427,7 +497,7 @@ class Game {
         this.sound.play('pop', r.combo);
         this.fx.push({ k: 0, kind: 'pop', x: e.x, y: e.y, s: ENEMY[e.kind].r * 2, e: e.kind });
         this.texts.push({ x: e.x, y: e.y - 6, text: `+${num(e.pts)}`, c: '#ffd23a', k: 0 });
-        if (!this.save.badges.includes('firstpop')) { this.save.badges.push('firstpop'); this._saveNow(); this._toast(`🏅 ${t('ach')}: ${t('firstPop')}`, 2.6); }
+        if (!this.save.badges.includes('firstpop')) { this.save.badges.push('firstpop'); this._saveNow(); this._ach(t('firstPop')); }
         break;
       case 'pearl': this.sound.play('pearl', Math.min(8, r.pearls % 9)); break;
       case 'feather': this.sound.play('feather'); break;
@@ -438,6 +508,8 @@ class Game {
       case 'hurt': this.sound.play('hurt'); this.shake = 0.35; this.texts.push({ x: e.x, y: e.y - 6, text: `-${e.dmg}`, c: '#ff6a6a', k: 0 }); break;
       case 'storm': this.sound.play('storm'); break;
       case 'combo': if (e.mult > 1) this.sound.play('combo', e.mult); break;
+      case 'thief': this._banner(t('thief'), t('thiefSub'), 2.4); this.sound.play('boss'); break;
+      case 'loot': this.texts.push({ x: e.x, y: e.y - 8, text: '🪶 +6', c: '#ffd23a', k: 0 }); this.sound.play('feather'); break;
       case 'boss': this.sound.play('boss'); this._banner('⚓', t('hintBoss'), 2.4); break;
       case 'bossdown': this.sound.play('rank'); this.shake = 0.6; break;
       default:
@@ -446,6 +518,7 @@ class Game {
     const first = (k, text) => { if (!this.shown.has(k)) { this.shown.add(k); this._toast(text, 3); } };
     for (const en of r.enemies) { if (en.type === 'umbrella' && en.y > 4) first('umb', t('hintUmb')); if (en.type === 'cage' && en.y > 4) first('cage', t('hintCage')); }
     if (r.pickups.some((p) => p.kind === 'capsule' && p.y > 2)) first('cap', t('hintCap'));
+    if (r.tank < 0.03 && this.input.fire) first('tank', t('hintTank'));
   }
 
   // ---- drawing ------------------------------------------------------------------------------------------------------
@@ -488,6 +561,8 @@ class Game {
         g.strokeStyle = '#fff'; g.lineWidth = 2; g.strokeRect(bx, by, bw, S * 2.2);
       }
     }
+    for (const en of r.enemies) if (en.type === 'cage' && en.y > 4 && !this.run.pickups.some((p) => p.kind === 'cage')) this._tag(g, t('hintFree'), this.X(en.x), this.Y(en.y) + S * 14);
+    for (const p of r.pickups) if (p.kind === 'cage') this._tag(g, t('hintCage'), this.X(p.x), this.Y(p.y) - S * 9, true, time);
     for (const b of r.eb) drawEnemyBullet(g, this.X(b.x), this.Y(b.y), S * b.r);
     // wings
     for (const w of r.wings) drawBird(g, w.type, this.X(w.x), this.Y(w.y), S * 5.2, time);
@@ -504,7 +579,28 @@ class Game {
     g.globalAlpha = 1;
     this.texts = this.texts.filter((x) => x.k < 1);
     g.restore();
+    // the lower the plane's health, the redder the edges of the screen (like the video)
+    const hpF = r.hp / r.stats.maxHp;
+    if (hpF < 0.8 && r.state === 'play') {
+      const a = Math.min(0.6, (0.8 - hpF) * 1.5) * (hpF < 0.35 ? 0.8 + 0.2 * Math.sin(time * 6) : 1);
+      const gr = g.createRadialGradient(this.cw / 2, this.ch / 2, Math.min(this.cw, this.ch) * 0.3, this.cw / 2, this.ch / 2, Math.max(this.cw, this.ch) * 0.72);
+      gr.addColorStop(0, 'rgba(255,80,120,0)'); gr.addColorStop(1, `rgba(255,70,110,${a})`);
+      g.fillStyle = gr; g.fillRect(0, 0, this.cw, this.ch);
+    }
     if (this.stormFx > 0) { this.stormFx = Math.max(0, this.stormFx - dt * 1.4); g.fillStyle = `rgba(190,235,255,${this.stormFx * 0.7})`; g.fillRect(0, 0, this.cw, this.ch); for (let i = 0; i < 18; i++) { const a = i * 0.7 + time * 3; drawBubble(g, this.cw * ((i * 0.137 + this.stormFx) % 1), this.ch * (1 - ((this.stormFx * 1.5 + i * 0.09) % 1)), S * (2 + (i % 4)), 'bubble'); } }
+  }
+
+  /** A little pill sign (like "FREE THE BIRD!" in the video). [arrow] adds a bouncing red arrow below. */
+  _tag(g, text, x, y, arrow = false, time = 0) {
+    const fs = Math.max(11, this.sc * 3.6);
+    g.save(); g.font = `900 ${fs}px Tajawal, system-ui, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+    const w = g.measureText(text).width + fs * 1.4, h2 = fs * 1.9;
+    const cx = Math.max(w / 2 + 4, Math.min(this.cw - w / 2 - 4, x));
+    g.fillStyle = '#fdf6e4'; g.strokeStyle = '#1d2a4a'; g.lineWidth = Math.max(2, fs * 0.14);
+    g.beginPath(); g.roundRect(cx - w / 2, y - h2 / 2, w, h2, h2 / 2); g.fill(); g.stroke();
+    g.fillStyle = '#1d2a4a'; g.fillText(text, cx, y + fs * 0.05);
+    if (arrow) { const ay = y + h2 / 2 + fs * 0.6 + Math.sin(time * 8) * fs * 0.25; g.fillStyle = '#e8323a'; g.beginPath(); g.moveTo(x, ay + fs * 0.7); g.lineTo(x - fs * 0.6, ay - fs * 0.2); g.lineTo(x + fs * 0.6, ay - fs * 0.2); g.closePath(); g.fill(); g.stroke(); }
+    g.restore();
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play') this._pause(); }

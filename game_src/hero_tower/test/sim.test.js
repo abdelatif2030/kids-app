@@ -11,10 +11,11 @@ test('fmt writes big numbers compactly', () => {
   assert.equal(fmt(1305000), '1.3M');
 });
 
-test('absorbing: a weaker foe adds its power, a stronger one wins the round, a crystal multiplies, a chest needs the key', () => {
+test('absorbing: a weaker foe adds its power, a stronger one wins the round, a gold coin multiplies, a crystal adds, a chest needs the key', () => {
   assert.deepEqual(apply(10, false, { type: 'enemy', power: 4 }), { win: true, p: 14, key: false });
   assert.equal(apply(10, false, { type: 'enemy', power: 10 }).win, false);
-  assert.equal(apply(10, false, { type: 'crystal', mul: 2 }).p, 20);
+  assert.equal(apply(10, false, { type: 'mult', mul: 2 }).p, 20);
+  assert.equal(apply(10, false, { type: 'crystal', add: 5 }).p, 15);
   assert.equal(apply(10, false, { type: 'chest', add: 5 }), null);
   assert.deepEqual(apply(10, true, { type: 'chest', add: 5 }), { win: true, p: 15, key: false });
 });
@@ -85,4 +86,11 @@ test('save normalising is safe', () => {
   assert.equal(s.unlocked, CHAPTERS.length);
   assert.deepEqual(s.stars, { 1: 3 });
   assert.equal(s.plays, 0);
+});
+
+test('treasures like the video: purple crystals ADD, gold coins MULTIPLY, both appear in a chapter', () => {
+  const seen = new Set();
+  for (let seed = 1; seed <= 30; seed++) for (const f of buildChapter(CHAPTERS[0], seed, false)) for (const t of f.things) seen.add(t.type);
+  assert.ok(seen.has('crystal') && seen.has('mult') && seen.has('sword') && seen.has('potion') && seen.has('key') && seen.has('chest'));
+  assert.equal(apply(7, false, { type: 'mult', mul: 3 }).p, 21);
 });

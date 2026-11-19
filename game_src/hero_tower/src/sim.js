@@ -2,10 +2,10 @@
 // floor by floor. Every floor has foes and treasures with POWER numbers:
 //   - a foe weaker than the hero (its number is green) is defeated when tapped, and the hero ABSORBS its power (hero += foe);
 //   - a foe stronger (red) wins the round: nothing is lost for good, the floor is simply tried again (gently);
-//   - a sword (+), a potion (+) and a chest (+, needs the key) add power; a crystal MULTIPLIES it (best taken late).
+//   - a sword (+), a potion (+), a purple crystal (+) and a chest (+, needs the key) add power; a gold coin (×2, ×3) MULTIPLIES it (best taken late).
 // When the foes of a floor are gone the hero climbs the ladder. A troll waits halfway, a dark sorcerer at the top and a
 // dragon on the roof. Every floor is built backwards from a winning order, so it always has a solution, and the order
-// matters (a crystal early is worth less than a crystal late; a strong foe needs the small ones first).
+// matters (a coin early is worth less than a coin late; a strong foe needs the small ones first).
 
 export function rng(seed) {
   let s = (seed >>> 0) || 1;
@@ -35,8 +35,8 @@ export function fmt(n) {
 export function apply(p, hasKey, th) {
   switch (th.type) {
     case 'enemy': case 'boss': return p > th.power ? { win: true, p: p + th.power, key: hasKey } : { win: false, p, key: hasKey };
-    case 'sword': case 'potion': return { win: true, p: p + th.add, key: hasKey };
-    case 'crystal': return { win: true, p: p * th.mul, key: hasKey };
+    case 'sword': case 'potion': case 'crystal': return { win: true, p: p + th.add, key: hasKey };
+    case 'mult': return { win: true, p: p * th.mul, key: hasKey };
     case 'key': return { win: true, p, key: true };
     case 'chest': return hasKey ? { win: true, p: p + th.add, key: false } : null;
     default: return null;
@@ -91,20 +91,21 @@ export function buildChapter(ch, seed, easy = false) {
       for (let i = 0; i < nSmall; i++) foe(0.35, ratioHi * 0.8);
       // treasure: from floor 2 on
       const picks = [];
-      if (n >= 2) picks.push(r() < 0.5 ? 'sword' : 'potion');
-      if (n >= 4 && r() < 0.65) picks.push('crystal');
+      if (n >= 2) picks.push(r() < 0.5 ? 'sword' : r() < 0.5 ? 'crystal' : 'potion');
+      if (n >= 4 && r() < 0.65) picks.push('mult');
       if (n >= 5 && r() < 0.5) picks.push('keychest');
-      if (n >= 3 && r() < 0.35) picks.push(r() < 0.5 ? 'potion' : 'sword');
+      if (n >= 3 && r() < 0.35) picks.push(r() < 0.5 ? 'potion' : r() < 0.5 ? 'crystal' : 'sword');
       for (const k of picks) {
         if (k === 'sword') { const a = Math.max(3, Math.round(c * 0.3)); add({ type: 'sword', add: a }); c += a; }
         else if (k === 'potion') { const a = Math.max(2, Math.round(c * 0.2)); add({ type: 'potion', add: a }); c += a; }
-        else if (k === 'crystal') { const m = ch.mulMax >= 3 && n >= 8 && r() < 0.4 ? 3 : 2; add({ type: 'crystal', mul: m }); c *= m; }
+        else if (k === 'crystal') { const a = Math.max(3, Math.round(c * 0.25)); add({ type: 'crystal', add: a }); c += a; }
+        else if (k === 'mult') { const m = ch.mulMax >= 3 && n >= 8 && r() < 0.4 ? 3 : 2; add({ type: 'mult', mul: m }); c *= m; }
         else if (k === 'keychest') { add({ type: 'key' }); const a = Math.max(4, Math.round(c * 0.45)); add({ type: 'chest', add: a }); c += a; }
       }
       if (kind === 'normal') { foe(0.45, ratioHi); if (n >= 7 && !easy && r() < 0.5) foe(0.5, ratioHi); }
     } else {
-      // the roof: one crystal and the dragon
-      add({ type: 'crystal', mul: 2 }); c *= 2;
+      // the roof: one gold coin and the dragon
+      add({ type: 'mult', mul: 2 }); c *= 2;
     }
     // bosses: a big foe that needs the order to be right
     if (kind !== 'normal') {

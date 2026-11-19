@@ -13,7 +13,7 @@ function rr(g, x, y, w, h, r, fill, lw = 0) {
   if (fill) { g.fillStyle = fill; g.fill(); }
   if (lw) { g.lineWidth = lw; g.strokeStyle = OL; g.stroke(); }
 }
-function poly(g, pts, fill, lw = 0) {
+export function poly(g, pts, fill, lw = 0) {
   g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath();
   if (fill) { g.fillStyle = fill; g.fill(); }
   if (lw) { g.lineWidth = lw; g.strokeStyle = OL; g.lineJoin = 'round'; g.stroke(); }
@@ -57,8 +57,9 @@ export function drawCloud(g, x, y, s) {
 
 // ---- the tower -------------------------------------------------------------------------------------------------------
 
-/** One room: x,y = top-left, w,h. [ladderUp] = a ladder on the right up to the next floor; [n] the floor number (for variety). */
-export function drawRoom(g, x, y, w, h, theme, n, time, ladderUp) {
+/** One room: x,y = top-left, w,h. [exitSide] 'L' | 'R' | null = where the ladder up to the next floor stands; [entrySide] = where the hatch
+ *  the hero climbs through is (the ladders zig-zag from floor to floor, like the owner's video); [n] the floor number (for variety). */
+export function drawRoom(g, x, y, w, h, theme, n, time, exitSide, entrySide) {
   const T = THEMES[theme] || THEMES.castle;
   // wall
   g.fillStyle = T.brick; g.fillRect(x, y, w, h);
@@ -94,13 +95,31 @@ export function drawRoom(g, x, y, w, h, theme, n, time, ladderUp) {
   for (let bx = x; bx < x + w; bx += h * 0.5) { g.beginPath(); g.moveTo(bx, y + h * 0.9); g.lineTo(bx, y + h); g.stroke(); }
   // the stone sides of the tower
   g.fillStyle = T.brick2; g.fillRect(x - h * 0.06, y, h * 0.06, h); g.fillRect(x + w, y, h * 0.06, h);
-  // a ladder on the right (up to the floor above)
-  if (ladderUp) {
-    const lx = x + w * 0.93;
+  const ladder = (lx, top, bottom) => {
     g.strokeStyle = '#d8a060'; g.lineWidth = h * 0.025;
-    g.beginPath(); g.moveTo(lx - h * 0.05, y - h * 0.1); g.lineTo(lx - h * 0.05, y + h * 0.9); g.moveTo(lx + h * 0.05, y - h * 0.1); g.lineTo(lx + h * 0.05, y + h * 0.9); g.stroke();
-    for (let k = 0; k < 7; k++) { g.beginPath(); g.moveTo(lx - h * 0.05, y + h * (0.05 + k * 0.13)); g.lineTo(lx + h * 0.05, y + h * (0.05 + k * 0.13)); g.stroke(); }
+    g.beginPath(); g.moveTo(lx - h * 0.06, top); g.lineTo(lx - h * 0.06, bottom); g.moveTo(lx + h * 0.06, top); g.lineTo(lx + h * 0.06, bottom); g.stroke();
+    for (let yy = bottom - h * 0.05; yy > top; yy -= h * 0.13) { g.beginPath(); g.moveTo(lx - h * 0.06, yy); g.lineTo(lx + h * 0.06, yy); g.stroke(); }
+  };
+  // the hatch in the floor (where the hero came up) and the ladder to the floor above
+  if (entrySide) {
+    const hx = x + w * (entrySide === 'R' ? 0.93 : 0.07);
+    g.fillStyle = '#2a1a22'; g.fillRect(hx - h * 0.1, y + h * 0.9, h * 0.2, h * 0.1);
+    ladder(hx, y + h * 0.9, y + h);
   }
+  if (exitSide) ladder(x + w * (exitSide === 'R' ? 0.93 : 0.07), y + h * 0.02, y + h * 0.9);
+}
+
+/** The stone base of the tower under floor 1: the castle gate, then the grass. [y] top of the base, [h] its height. */
+export function drawBase(g, x, y, w, h, theme) {
+  const T = THEMES[theme] || THEMES.castle;
+  g.fillStyle = T.brick2; g.fillRect(x - h * 0.2, y, w + h * 0.4, h);
+  g.fillStyle = 'rgba(255,255,255,0.12)'; g.fillRect(x - h * 0.2, y, w + h * 0.4, h * 0.08);
+  g.strokeStyle = 'rgba(0,0,0,0.22)'; g.lineWidth = 1;
+  for (let bx = x - h * 0.2; bx < x + w + h * 0.2; bx += h * 0.7) { g.beginPath(); g.moveTo(bx, y); g.lineTo(bx, y + h); g.stroke(); }
+  const dx = x + w * 0.5, dw = h * 0.55;
+  g.fillStyle = '#6a3a22'; g.beginPath(); g.moveTo(dx - dw / 2, y + h); g.lineTo(dx - dw / 2, y + h * 0.4); g.arc(dx, y + h * 0.4, dw / 2, Math.PI, 0); g.lineTo(dx + dw / 2, y + h); g.closePath(); g.fill();
+  g.lineWidth = h * 0.06; g.strokeStyle = '#3a2418'; g.stroke();
+  g.strokeStyle = '#3a2418'; g.lineWidth = h * 0.04; g.beginPath(); g.moveTo(dx, y + h * 0.1); g.lineTo(dx, y + h); g.stroke();
 }
 
 // ---- the little knight -----------------------------------------------------------------------------------------------
@@ -234,7 +253,7 @@ export function drawBoss(g, kind, x, y, s, time, hit = 0) {
 
 // ---- the treasures ---------------------------------------------------------------------------------------------------
 
-export function drawItem(g, type, x, y, s, time, open = false) {
+export function drawItem(g, type, x, y, s, time, open = false, label = '') {
   const lw = Math.max(1.5, s * 0.035);
   const bob = Math.sin(time * 3 + x) * s * 0.04;
   g.save(); g.translate(x, y + bob);
@@ -248,6 +267,13 @@ export function drawItem(g, type, x, y, s, time, open = false) {
     poly(g, [[0, -s * 0.85], [s * 0.3, -s * 0.55], [s * 0.22, -s * 0.12], [0, 0], [-s * 0.22, -s * 0.12], [-s * 0.3, -s * 0.55]], '#b86aff', lw);
     poly(g, [[0, -s * 0.85], [s * 0.1, -s * 0.5], [0, 0], [-s * 0.1, -s * 0.5]], '#e0b0ff');
     ell(g, -s * 0.12, -s * 0.55, s * 0.04, s * 0.08, 'rgba(255,255,255,0.7)');
+  } else if (type === 'mult') { // a gold coin with ×N inside
+    const sq = Math.abs(Math.cos(time * 2.2 + x * 0.1));
+    g.save(); g.translate(0, -s * 0.38); g.scale(0.55 + 0.45 * sq, 1);
+    ell(g, 0, 0, s * 0.3, s * 0.3, '#ffc83a', lw); ell(g, 0, 0, s * 0.22, s * 0.22, '#ffe27a', lw * 0.6);
+    g.restore();
+    g.fillStyle = '#7a4a00'; g.font = `900 ${s * 0.26}px Tajawal, system-ui, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+    if (sq > 0.5) g.fillText(label, 0, -s * 0.36);
   } else if (type === 'potion') {
     rr(g, -s * 0.07, -s * 0.78, s * 0.14, s * 0.18, s * 0.03, '#d8d8e8', lw); rr(g, -s * 0.09, -s * 0.84, s * 0.18, s * 0.08, s * 0.03, '#a8683a', lw);
     ell(g, 0, -s * 0.33, s * 0.28, s * 0.3, '#e8506a', lw); ell(g, 0, -s * 0.3, s * 0.2, s * 0.2, '#ff98a8');

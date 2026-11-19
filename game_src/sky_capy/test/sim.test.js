@@ -126,3 +126,17 @@ test('every enemy type has stats; younger children get softer pirates and more h
   assert.ok(planeStats({}, true).maxHp > planeStats({}, false).maxHp);
   assert.ok(PAINTS.length >= 7);
 });
+
+test('the thief carries the village feathers: popping him drops a bundle of feathers and says so', () => {
+  const run = new Run(normalizeSave(null), 7, false);
+  run.t = 0; run.events = [{ t: 0, type: 'thief', x: 50 }]; run.ei = 0;
+  const ev = run.step(0.05, { tx: 50, ty: 140, fire: false });
+  assert.ok(ev.some((e) => e.type === 'thief'));
+  assert.ok(run.thief && run.thief.k >= 0 && run.thief.k <= 1);
+  const th = run.enemies.find((e) => e.type === 'thief');
+  const before = run.pickups.filter((p) => p.kind === 'feather').length;
+  const ev2 = [];
+  run._pop(th, ev2);
+  assert.ok(ev2.some((e) => e.type === 'loot'));
+  assert.ok(run.pickups.filter((p) => p.kind === 'feather').length >= before + 6);
+});

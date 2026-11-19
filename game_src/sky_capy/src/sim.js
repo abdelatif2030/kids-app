@@ -147,6 +147,8 @@ export class Run {
 
   get stageCount() { return 3; }
   get progress() { return Math.min(1, this.t / this.stageLen); }
+  /** The thief that grabbed the village feathers (the video's THIEF! bar): how far he has flown (0 = just arrived, 1 = got away), or null. */
+  get thief() { const th = this.enemies.find((e) => e.type === 'thief' && !e.gone); return th ? { k: Math.max(0, Math.min(1, (th.y + 8) / (H + 18))), x: th.x, y: th.y } : null; }
   _id() { return ++this.id; }
 
   /** Spawn an enemy: hp grows with the loop. */
@@ -181,7 +183,7 @@ export class Run {
     while (this.ei < this.events.length && this.events[this.ei].t <= this.t) {
       const e = this.events[this.ei++];
       if (e.type === 'capsule') this.pickups.push({ id: this._id(), kind: 'capsule', cap: e.kind, x: e.x, y: -6, vy: 14 });
-      else { this._spawn(e); if (e.type === 'boss') { this.bossAlive = true; ev.push({ type: 'boss' }); } }
+      else { this._spawn(e); if (e.type === 'boss') { this.bossAlive = true; ev.push({ type: 'boss' }); } else if (e.type === 'thief') ev.push({ type: 'thief' }); }
     }
     // firing: a baseline stream, faster while FIRE is held (and the tank has bubbles)
     const hold = !!input.fire && this.tank > 0.02;
@@ -299,7 +301,8 @@ export class Run {
     const n = en.type === 'boss' ? 12 : 1 + (this.r() < 0.4 ? 1 : 0);
     for (let i = 0; i < n; i++) this.pickups.push({ id: this._id(), kind: 'pearl', x: en.x + (this.r() - 0.5) * 8, y: en.y + (this.r() - 0.5) * 4, vy: 16 });
     if (this.r() < (en.type === 'boss' ? 1 : 0.3)) for (let i = 0; i < (en.type === 'boss' ? 20 : 1); i++) this.pickups.push({ id: this._id(), kind: 'feather', x: en.x + (this.r() - 0.5) * 12, y: en.y + (this.r() - 0.5) * 6, vy: 12 });
-    if (en.type === 'cage' && !rammed) this.pickups.push({ id: this._id(), kind: 'cage', bird: en.bird || 'robin', x: en.x, y: en.y, vy: 14 });
+    if (en.type === 'thief') { for (let i = 0; i < 6; i++) this.pickups.push({ id: this._id(), kind: 'feather', x: en.x + (this.r() - 0.5) * 14, y: en.y + (this.r() - 0.5) * 6, vy: 12 }); ev.push({ type: 'loot', x: en.x, y: en.y }); } // popping the thief gives the village feathers back
+        if (en.type === 'cage' && !rammed) this.pickups.push({ id: this._id(), kind: 'cage', bird: en.bird || 'robin', x: en.x, y: en.y, vy: 14 });
     if (en.type === 'boss') { this.bossAlive = false; ev.push({ type: 'bossdown' }); }
   }
 
