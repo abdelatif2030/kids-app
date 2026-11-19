@@ -1,7 +1,8 @@
 // Dino Grow — pure game logic (no DOM, no three.js). Deterministic for a given seed and input sequence.
 // You are a baby dinosaur. Everything shows a POWER number. You may eat only what is weaker than you (power < yours).
 // Touching something stronger only pushes you back and costs a little power (never a hard fail). Eating grows your power, and at
-// thresholds you EVOLVE. Three levels: Jungle, Swamp, Volcano Valley (a giant boss that telegraphs stomps and fire).
+// thresholds you EVOLVE. Three levels: Jungle, Swamp, Volcano Valley. Levels 1 and 2 end when you outgrow and eat their ALPHA (a big red
+// hunter whose power is shown: 'BEAT THE ALPHA 36'); the Volcano Valley boss telegraphs stomps and fire.
 
 export const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 export function rng(seed) {
@@ -13,7 +14,7 @@ export function rng(seed) {
 export const STAGES = [
   { id: 'baby', at: 0, ar: 'ديناصور صغير', en: 'Baby Raptor' },
   { id: 'raptor', at: 10, ar: 'رابتور', en: 'Raptor' },
-  { id: 'hunter', at: 32, ar: 'صيّاد كبير', en: 'Big Hunter' },
+  { id: 'hunter', at: 32, ar: 'صيّاد التاج', en: 'Crest Hunter' },
   { id: 'giant', at: 70, ar: 'عملاق', en: 'Giant' },
 ];
 export function stageOf(P) { let s = 0; for (let i = 1; i < STAGES.length; i++) if (P >= STAGES[i].at) s = i; return s; }
@@ -21,7 +22,7 @@ export function stageOf(P) { let s = 0; for (let i = 1; i < STAGES.length; i++) 
 export const radiusOf = (P) => 0.55 + 0.2 * Math.sqrt(Math.max(0, P));
 export const speedOf = (P) => 7.5 + 0.02 * Math.min(P, 150);
 /** Camera distance: a smooth, strictly increasing (monotonic) zoom-out as power grows. */
-export const zoomFor = (P) => 11 + 8 * Math.log(1 + Math.max(0, P) / 10);
+export const zoomFor = (P) => 20 + 9 * Math.log(1 + Math.max(0, P) / 10);
 /** Number colour: red = stronger or equal (run!), green = easy meal, white = a fair meal. */
 export const toneOf = (cp, P) => (cp >= P ? 'red' : cp <= P * 0.6 ? 'green' : 'white');
 /** Power gained by eating something of this power. */
@@ -58,17 +59,19 @@ const SP = {
   ankyloRed: { power: 32, f: 0.95, ai: 'wander', fleeK: 0.45, ws: 1.4, respawn: 12, look: 'ankyloRed', ar: 'أنكيلو الحمم', en: 'Lava Ankylo' },
   trikeRed: { power: 48, f: 0.95, ai: 'wander', fleeK: 0.45, ws: 1.6, respawn: 14, look: 'trikeRed', ar: 'ترايسيرا الحمم', en: 'Lava Trike' },
   spino: { power: 72, f: 0.95, ai: 'hunter', fleeK: 0.55, ws: 1.8, respawn: 22, look: 'spino', ar: 'سبينو', en: 'Spino' },
+  alphaRaptor: { power: 36, f: 1.5, ai: 'hunter', fleeK: 0.8, ws: 2.2, respawn: 0, look: 'raptorRed', alpha: true, ar: 'زعيم الأنياب', en: 'Snapjaw Alpha' },
+  alphaGator: { power: 80, f: 1.35, ai: 'hunter', fleeK: 0.75, ws: 1.8, respawn: 0, look: 'swampRex', alpha: true, ar: 'زعيم المستنقع', en: 'Marsh Fang Alpha' },
   rex: { power: 88, f: 0.95, ai: 'hunter', fleeK: 0.5, ws: 1.8, respawn: 26, look: 'rex', ar: 'ريكس', en: 'Rex' },
 };
 export const SPECIES = SP;
 for (const [k, s] of Object.entries(SP)) { s.key = k; s.r = (0.55 + 0.2 * Math.sqrt(s.power)) * s.f; s.gain = gainOf(s.power); }
 
 export const LEVELS = [
-  { id: 'jungle', ar: 'الغابة', en: 'Jungle', half: 28, start: 2, goal: 32, par: 100, obst: { kinds: ['tree', 'tree', 'rock'], n: 14 },
+  { id: 'jungle', ar: 'الغابة', en: 'Fern Hollow', sub: ['كُل الأخضر، اجري من الأحمر!', 'Eat green, run from red!'], half: 28, start: 3, goal: 37, alpha: { kind: 'alphaRaptor', summon: 20 }, par: 100, obst: { kinds: ['tree', 'tree', 'rock'], n: 14 },
     species: [['beetle', 10], ['egg', 6], ['compy', 6], ['dodo', 5], ['stegoBaby', 4], ['trike', 3], ['raptorRed', 3], ['rexJr', 2]] },
-  { id: 'swamp', ar: 'المستنقع', en: 'Swamp', half: 32, start: 14, goal: 70, par: 140, obst: { kinds: ['stump', 'rock', 'stump'], n: 13 },
+  { id: 'swamp', ar: 'المستنقع', en: 'Mirefen Swamp', sub: ['اسحب الصيّادين إلى الطين!', 'Lure the divers into the mud!'], half: 32, start: 40, goal: 81, alpha: { kind: 'alphaGator', summon: 55 }, par: 140, obst: { kinds: ['stump', 'rock', 'stump'], n: 13 },
     species: [['mudbug', 10], ['frog', 8], ['swampEgg', 6], ['gator', 4], ['ankylo', 4], ['calf', 3], ['swampRex', 2]] },
-  { id: 'volcano', ar: 'وادي البركان', en: 'Volcano Valley', half: 36, start: 56, goal: 100, par: 220, obst: { kinds: ['rock', 'pillar', 'rock'], n: 14 },
+  { id: 'volcano', ar: 'وادي البركان', en: 'Volcano Valley', sub: ['اهرب من الدوس والنار!', 'Dodge the stomps and the fire!'], half: 36, start: 56, goal: 100, par: 220, obst: { kinds: ['rock', 'pillar', 'rock'], n: 14 },
     boss: { power: 100, hp: 3, r: 4 },
     species: [['emberbug', 8], ['lavaEgg', 6], ['lizard', 6], ['ankyloRed', 3], ['trikeRed', 4], ['spino', 3], ['rex', 2]] },
 ];
@@ -95,7 +98,7 @@ export class Dino {
     this.floor = L.start;
     this.player = { x: 0, z: 0, vx: 0, vz: 0, P: L.start, stage: stageOf(L.start), r: radiusOf(L.start), face: 0, pdx: 0, pdz: 1, pounceT: 0, pounceCd: 0, inv: 0, kx: 0, kz: 0, speedNow: 0, px: 0, pz: 1, bite: 0 };
     this.stats = { eaten: 0, hits: 0 };
-    this.nextId = 1; this.creatures = []; this.pending = []; this.obstacles = []; this.projectiles = []; this.boss = null;
+    this.nextId = 1; this.creatures = []; this.pending = []; this.obstacles = []; this.projectiles = []; this.boss = null; this.alpha = null; this.alphaDown = false;
     this._genObstacles();
     for (const [k, n] of L.species) for (let i = 0; i < n; i++) this._spawn(k, true);
     if (L.boss) this.boss = { x: 0, z: -L.half + 8, power: L.boss.power, r: L.boss.r, hp: easy ? 2 : L.boss.hp, maxHp: easy ? 2 : L.boss.hp, face: 0, tele: null, timer: 4, stagger: 0, hitCd: 0, speedNow: 0, down: false };
@@ -178,9 +181,10 @@ export class Dino {
     if (this.boss) this._boss(dt, ev);
     this._projectiles(dt, ev);
     this._respawn(dt);
+    this._alphaCheck(ev);
     this._collide(ev);
     if (this.winT > 0) { this.winT -= dt; if (this.winT <= 0) this._finish(ev); }
-    else if (!this.boss && this.player.P >= this.L.goal) this._finish(ev);
+    else if (!this.boss && !this.L.alpha && this.player.P >= this.L.goal) this._finish(ev);
     return ev;
   }
 
@@ -239,6 +243,19 @@ export class Dino {
     if (c.walk) c.walkV = [Math.sin(c.wa) * sp.ws, Math.cos(c.wa) * sp.ws];
   }
 
+  /** Levels 1 and 2: when you are strong enough to be a fair fight the alpha walks in from the far side. */
+  _alphaCheck(ev) {
+    const A = this.L.alpha; if (!A || this.alpha || this.alphaDown || this.player.P < A.summon) return;
+    const sp = SP[A.kind], H = this.L.half - 2.5; let spot = null;
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+      const x = sx * H * 0.8, z = sz * H * 0.8; if (this.obstacles.some((o) => Math.hypot(o.x - x, o.z - z) < o.r + sp.r + 1)) continue;
+      if (!spot || Math.hypot(x - this.player.x, z - this.player.z) > Math.hypot(spot.x - this.player.x, spot.z - this.player.z)) spot = { x, z };
+    }
+    if (!spot) spot = { x: H * 0.8, z: H * 0.8 };
+    const c = { id: this.nextId++, kind: A.kind, power: sp.power, r: sp.r, ai: sp.ai, x: spot.x, z: spot.z, face: 0, vx: 0, vz: 0, speed: 0, wa: 0, wt: 3, walk: false, stun: 0, chase: false, born: this.time, alpha: true };
+    this.creatures.push(c); this.alpha = c; ev.push({ type: 'alpha', id: c.id, kind: A.kind, power: c.power, x: c.x, z: c.z });
+  }
+
   _respawn(dt) {
     for (const pd of this.pending) pd.t -= dt;
     const due = this.pending.filter((pd) => pd.t <= 0);
@@ -280,9 +297,10 @@ export class Dino {
     this.creatures.splice(i, 1);
     const gain = sp.gain; const Pbefore = p.P;
     this.stats.eaten++; p.bite = 0.3;
-    this.pending.push({ kind: c.kind, t: sp.respawn });
+    if (!sp.alpha) this.pending.push({ kind: c.kind, t: sp.respawn });
     ev.push({ type: 'eat', id: c.id, kind: c.kind, x: c.x, z: c.z, power: c.power, gain, P: Pbefore });
     this._gain(gain, ev);
+    if (sp.alpha) { this.alphaDown = true; this.alpha = null; this.winT = 1.8; ev.push({ type: 'alphaDown', kind: c.kind, x: c.x, z: c.z }); }
   }
 
   _bite(ev) {

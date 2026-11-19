@@ -5,7 +5,11 @@
 // teammate is a one-two. Tricks heat the ball; a full meter makes it a flaming comet. In the box a target slides over the goal
 // mouth and the keeper's reach is shown: tap when the target is outside his reach.
 
-export const PITCH = { W: 34, L: 100, BOX_Z: 78, GOAL_W: 14, GOAL_H: 3.6, GOAL_D: 3.2 };
+export const PITCH = { W: 34, L: 78, BOX_Z: 58, SHOOT_Z: 63, GOAL_W: 14, GOAL_H: 3.6, GOAL_D: 3.2 };
+export const LIVES = 3; // the balls in the corner: a steal takes one; with none left it is full time
+export const BALL_SPEED = 9.5; // top speed with the stick fully out; it stops when you let go (the ball only moves while you drag)
+export const DUMMY_R = 0.75;
+export const COIN_R = 1.35;
 export const HALF_W = 16.2;
 export const BALL_R = 0.3;
 export const LEG_OFF = 1.15; // a defender's legs stand this far to each side of his middle
@@ -20,20 +24,17 @@ export const TRIGGER_DIST = 8.5;
 export const TRICKS = { nutmeg: { heat: 34, score: 200 }, onetwo: { heat: 28, score: 150 }, dodge: { heat: 16, score: 60 }, burn: { heat: 0, score: 100 } };
 
 export const LEVELS = [
-  { id: 1, ar: 'ملعب الحارة', en: 'Street Pitch', defenders: 2, mates: 1, chase: 3.6, windup: 1.1, cooldown: 3.4, aggro: 13, reach: 2.3, sway: 2.0, tspeed: 1.3, trickGoal: 2, par: 24 },
-  { id: 2, ar: 'ملعب المدرسة', en: 'School Field', defenders: 3, mates: 2, chase: 4.2, windup: 0.95, cooldown: 3.0, aggro: 15, reach: 2.6, sway: 2.4, tspeed: 1.6, trickGoal: 3, par: 28 },
-  { id: 3, ar: 'ليلة الكأس', en: 'Cup Night', defenders: 4, mates: 2, chase: 4.8, windup: 0.85, cooldown: 2.6, aggro: 17, reach: 2.9, sway: 2.8, tspeed: 1.9, trickGoal: 4, par: 34 },
-  { id: 4, ar: 'المدرج الكبير', en: 'Big Stand', defenders: 5, mates: 2, chase: 5.3, windup: 0.75, cooldown: 2.2, aggro: 18, reach: 3.2, sway: 3.2, tspeed: 2.3, trickGoal: 5, par: 40 },
-  { id: 5, ar: 'نهائي الأبطال', en: 'Champions Final', defenders: 6, mates: 3, chase: 5.8, windup: 0.68, cooldown: 1.9, aggro: 20, reach: 3.5, sway: 3.6, tspeed: 2.8, trickGoal: 6, par: 46 },
+  { id: 1, ar: 'تسخين', en: 'Warm Up', defenders: 2, mates: 0, chase: 3.6, windup: 1.1, cooldown: 3.4, aggro: 13, reach: 2.3, sway: 2.0, tspeed: 1.3, trickGoal: 2, par: 22 },
+  { id: 2, ar: 'تمريرة وراجعة', en: 'One-Two', defenders: 3, mates: 1, chase: 4.2, windup: 0.95, cooldown: 3.0, aggro: 15, reach: 2.6, sway: 2.4, tspeed: 1.6, trickGoal: 3, par: 26 },
+  { id: 3, ar: 'ليلة الكأس', en: 'Cup Night', defenders: 4, mates: 2, chase: 4.8, windup: 0.85, cooldown: 2.6, aggro: 17, reach: 2.9, sway: 2.8, tspeed: 1.9, trickGoal: 4, par: 30 },
+  { id: 4, ar: 'المدرج الكبير', en: 'Big Stand', defenders: 5, mates: 2, chase: 5.3, windup: 0.75, cooldown: 2.2, aggro: 18, reach: 3.2, sway: 3.2, tspeed: 2.3, trickGoal: 5, par: 34 },
+  { id: 5, ar: 'نهائي الأبطال', en: 'Champions Final', defenders: 6, mates: 3, chase: 5.8, windup: 0.68, cooldown: 1.9, aggro: 20, reach: 3.5, sway: 3.6, tspeed: 2.8, trickGoal: 6, par: 38 },
 ];
 
 export const SKINS = [
   { id: 'classic', price: 0, ar: 'كلاسيك', en: 'Classic', base: 0xffffff, patch: 0x1e2230, emissive: 0x000000, trail: 0xffffff },
-  { id: 'neon', price: 40, ar: 'أخضر نيون', en: 'Neon', base: 0xb8ff3a, patch: 0x0a5a1a, emissive: 0x2a5a00, trail: 0xb8ff3a },
-  { id: 'ice', price: 80, ar: 'جليد', en: 'Ice', base: 0xd8f6ff, patch: 0x3a8ae8, emissive: 0x103a5a, trail: 0x9ae0ff },
-  { id: 'candy', price: 120, ar: 'حلوى', en: 'Candy', base: 0xff8ac8, patch: 0xffffff, emissive: 0x501a3a, trail: 0xff8ac8 },
-  { id: 'flame', price: 160, ar: 'لهب', en: 'Flame', base: 0xff7a1a, patch: 0xffd23a, emissive: 0x802a00, trail: 0xff7a1a },
-  { id: 'galaxy', price: 240, ar: 'مجرة', en: 'Galaxy', base: 0x3a2a9a, patch: 0xff6aff, emissive: 0x2a1a6a, trail: 0xb86aff },
+  { id: 'flame', price: 120, ar: 'جمر', en: 'Ember', base: 0xff7a1a, patch: 0xffd23a, emissive: 0x802a00, trail: 0xff7a1a },
+  { id: 'ice', price: 200, ar: 'جليد', en: 'Frost', base: 0xd8f6ff, patch: 0x3a8ae8, emissive: 0x103a5a, trail: 0x9ae0ff },
   { id: 'gold', price: 320, ar: 'ذهب', en: 'Gold', base: 0xffd23a, patch: 0xb87a00, emissive: 0x7a5a00, trail: 0xffe88a },
 ];
 
@@ -80,10 +81,12 @@ export class Match {
     this.mode = 'play'; this.modeT = 0; this.time = 0; this.clock = 0;
     this.input = { jx: 0, jy: 0 };
     this.ball = { x: 0, z: 4, vx: 0, vz: 0, inv: 1.0 };
+    this.lives = LIVES; this.coins = 0; this.reason = null; this.hintMate = false;
+    this.dummies = []; this.coinList = []; this.blockT = 0;
     this.pass = null; this.shot = null;
     this.heat = 0; this.cometT = 0; this.lastTrick = -9;
     this.score = 0; this.goals = 0;
-    this.stats = { nutmegs: 0, onetwos: 0, dodges: 0, burns: 0, stolen: 0, saves: 0, tackles: 0 };
+    this.stats = { nutmegs: 0, onetwos: 0, dodges: 0, burns: 0, stolen: 0, saves: 0, tackles: 0, blocked: 0, coins: 0 };
     this.keeper = { x: 0, dir: 0, diveTo: null };
     this.target = { x: 0, p: 0 };
     this.defenders = []; this.mates = [];
@@ -93,24 +96,45 @@ export class Match {
 
   get tricks() { const s = this.stats; return s.nutmegs + s.onetwos + s.dodges + s.burns; }
   get comet() { return this.cometT > 0; }
+  /** 0..1 along the way from the kick-off to the box (the red bar at the top). */
+  get progress() { return this.mode === 'shoot' || this.mode === 'shot' || this.mode === 'goal' || this.mode === 'done' ? 1 : clamp(this.ball.z / PITCH.BOX_Z, 0, 1); }
   reachNow() { return this.def.reach * (this.comet ? 0.55 : 1); }
 
   _build() {
     const d = this.def, r = this.rand;
-    const n = d.defenders;
+    const n = d.defenders, Z0 = 16, Z1 = PITCH.BOX_Z - 7;
     for (let i = 0; i < n; i++) {
-      const z = 20 + (i + 0.5) * (46 / n);
-      const x = (i % 2 ? 1 : -1) * (1.5 + r() * 8);
+      const z = Z0 + (i + 0.5) * ((Z1 - Z0) / n);
+      const x = (i % 2 ? 1 : -1) * (1.5 + r() * 7);
       this.defenders.push({ id: i + 1, x, z, x0: x, hx: 0, hz: -1, state: 'idle', t: 0, cd: 0.8, lx: 0, lz: -1, near: 99, hit: false, nutmegged: false, pa: 0, pb: 0, wt: 0, warned: false, from: 'idle' });
     }
     for (let i = 0; i < d.mates; i++) {
-      const z = 28 + (i + 0.5) * (44 / d.mates);
+      const z = 24 + (i + 0.5) * ((PITCH.BOX_Z - 30) / d.mates);
       let best = 0, bd = -1;
       for (const cx of [-10, -6, 6, 10, 0]) {
         const md = Math.min(...this.defenders.map((o) => Math.hypot(o.x - cx, o.z - z)));
         if (md > bd) { bd = md; best = cx; }
       }
       this.mates.push({ id: i + 1, x: best, z, state: 'wait', t: 0 });
+    }
+    // yellow training dummies: the ball bounces off them (BLOCKED!); they never move
+    const nd = 2 + this.level;
+    for (let i = 0; i < nd; i++) {
+      for (let tries = 0; tries < 30; tries++) {
+        const z = 11 + (i + r()) * ((PITCH.BOX_Z - 18) / nd), x = (r() * 2 - 1) * 12.5;
+        if (this.defenders.some((o) => Math.hypot(o.x - x, o.z - z) < 4.5) || this.mates.some((o) => Math.hypot(o.x - x, o.z - z) < 4.5)) continue;
+        this.dummies.push({ x, z }); break;
+      }
+    }
+    // lines of gold coins: a gentle curve; the first line leads the way from the kick-off
+    const lines = 3 + Math.min(2, this.level);
+    for (let i = 0; i < lines; i++) {
+      const z0 = i === 0 ? 8 : 14 + i * ((PITCH.BOX_Z - 24) / lines) + r() * 4, x0 = i === 0 ? 0 : (r() * 2 - 1) * 9, bend = (r() - 0.5) * 0.5;
+      for (let k = 0; k < 6; k++) {
+        const c = { x: clamp(x0 + bend * k * k * 0.3, -14, 14), z: z0 + k * 1.7, got: false };
+        if (this.dummies.some((o) => Math.hypot(o.x - c.x, o.z - c.z) < 1.6)) continue;
+        this.coinList.push(c);
+      }
     }
   }
 
@@ -129,10 +153,11 @@ export class Match {
   _sub(dt) {
     this.clock += dt; this.modeT += dt;
     switch (this.mode) {
-      case 'play': this.time += dt; this._ball(dt); this._defenders(dt); this._mates(dt); this._heatTick(dt); this._boxCheck(); break;
+      case 'play': this.time += dt; this._ball(dt); this._dummies(dt); this._coins(); this._defenders(dt); this._mates(dt); this._heatTick(dt); this._boxCheck(); break;
       case 'shoot': this.time += dt; this._ball(dt); this._shootTick(dt); this._heatPause(); break;
       case 'shot': this._shotTick(dt); break;
       case 'goal': if (this.modeT >= 2.6) { this.mode = 'done'; this.modeT = 0; this.emit('end', { result: this.result() }); } break;
+      case 'lost': if (this.modeT >= (this.reason === 'saved' ? 2.2 : 1.6)) { this.mode = 'done'; this.modeT = 0; this.emit('end', { result: this.result() }); } break;
       default: break;
     }
   }
@@ -148,18 +173,39 @@ export class Match {
       if (k >= 1) { this.pass = null; b.vz = 8; b.vx = 0; b.inv = 0.35; }
       return;
     }
-    const sp = this.comet ? 1.35 : 1;
+    const sp = this.comet ? 1.3 : 1;
     const shoot = this.mode === 'shoot';
-    let dx = this.input.jx * 13 * sp, dz = (5 + this.input.jy * 7.5) * sp;
-    if (dz < -2) dz = -2;
-    if (shoot) { dx *= 0.35; dz = b.z < PITCH.L - 13 ? 6 : 0; }
-    const ax = dx - b.vx, az = dz - b.vz, al = Math.hypot(ax, az), maxd = (shoot ? 40 : 26) * dt;
+    // the ball only moves while the stick is out: the further you drag, the faster it rolls; let go and it rolls to a stop
+    let ix = this.input.jx, iz = this.input.jy; const mag = Math.hypot(ix, iz); if (mag > 1) { ix /= mag; iz /= mag; }
+    let dx = ix * BALL_SPEED * sp, dz = iz * BALL_SPEED * sp * (iz < 0 ? 0.6 : 1);
+    if (shoot) { dx = 0; dz = b.z < PITCH.SHOOT_Z ? 6 : 0; }
+    const ax = dx - b.vx, az = dz - b.vz, al = Math.hypot(ax, az), still = Math.abs(dx) + Math.abs(dz) < 0.01, maxd = (still ? 34 : 30) * dt;
     if (al > maxd) { b.vx += (ax / al) * maxd; b.vz += (az / al) * maxd; } else { b.vx = dx; b.vz = dz; }
     b.x += b.vx * dt; b.z += b.vz * dt;
     if (b.x > HALF_W) { b.x = HALF_W; if (b.vx > 0) b.vx = 0; }
     if (b.x < -HALF_W) { b.x = -HALF_W; if (b.vx < 0) b.vx = 0; }
     if (b.z < 1.5) { b.z = 1.5; if (b.vz < 0) b.vz = 0; }
-    if (shoot && b.z > PITCH.L - 13) { b.z = PITCH.L - 13; b.vz = 0; }
+    if (shoot && b.z > PITCH.SHOOT_Z) { b.z = PITCH.SHOOT_Z; b.vz = 0; }
+  }
+
+  _dummies(dt) {
+    const b = this.ball; this.blockT = Math.max(0, this.blockT - dt);
+    if (this.pass) return;
+    for (const o of this.dummies) {
+      const dx = b.x - o.x, dz = b.z - o.z, d = Math.hypot(dx, dz), m = DUMMY_R + BALL_R;
+      if (d >= m || d < 1e-6) continue;
+      const nx = dx / d, nz = dz / d; b.x = o.x + nx * m; b.z = o.z + nz * m;
+      const vn = b.vx * nx + b.vz * nz; if (vn < 0) { b.vx -= 1.6 * vn * nx; b.vz -= 1.6 * vn * nz; }
+      if (this.blockT <= 0) { this.blockT = 0.9; this.stats.blocked++; this.emit('blocked', { x: o.x, z: o.z }); }
+    }
+  }
+
+  _coins() {
+    const b = this.ball;
+    for (const c of this.coinList) {
+      if (c.got) continue;
+      if (Math.hypot(b.x - c.x, b.z - c.z) < COIN_R) { c.got = true; this.coins++; this.stats.coins++; this.score += 5; this.emit('coin', { x: c.x, z: c.z, n: this.coins }); }
+    }
   }
 
   _boxCheck() {
@@ -265,7 +311,9 @@ export class Match {
       if (md > bd) { bd = md; best = c; }
     }
     b.x = best.x; b.z = best.z; b.vx = 0; b.vz = 0; b.inv = 1.8;
-    this.emit('stolen', { id: d.id });
+    this.lives = Math.max(0, this.lives - 1);
+    this.emit('stolen', { id: d.id, lives: this.lives });
+    if (this.lives <= 0) { this.reason = 'lives'; this.mode = 'lost'; this.modeT = 0; this.emit('lost', { reason: 'lives' }); }
   }
 
   // ---------- teammates, one-two ----------
@@ -274,6 +322,7 @@ export class Match {
     for (const m of this.mates) {
       m.t += dt;
       if (m.state === 'pass' && m.t > 0.6) { m.state = 'done'; m.t = 0; }
+      if (m.state === 'wait' && !this.hintMate && Math.hypot(b.x - m.x, b.z - m.z) < 15 && b.z < m.z) { this.hintMate = true; this.emit('mateHint', { id: m.id }); }
       if (m.state !== 'wait' || b.inv > 0 || this.pass) continue;
       if (Math.hypot(b.x - m.x, b.z - m.z) < 1.8) {
         let bx = clamp(m.x, -10, 10), bd = -1;
@@ -337,9 +386,7 @@ export class Match {
     if (s.saved) {
       this.stats.saves++; this.emit('save');
       this.shot = null; k.diveTo = null; k.dir = 0;
-      b.x = clamp(s.x0, -10, 10); b.z = PITCH.BOX_Z - 5; b.vx = 0; b.vz = 0; b.inv = 1.6;
-      this.mode = 'play'; this.modeT = 0;
-      for (const d of this.defenders) { d.state = 'chase'; d.t = 0; d.cd = this.def.cooldown; d.nutmegged = false; }
+      this.reason = 'saved'; this.mode = 'lost'; this.modeT = 0; this.emit('lost', { reason: 'saved' });
     } else {
       this.goals++; this.score += 500 + (s.comet ? 250 : 0);
       b.x = s.tx; b.z = PITCH.L + 1; this.mode = 'goal'; this.modeT = 0;
@@ -348,9 +395,10 @@ export class Match {
   }
 
   result() {
-    const tricks = this.tricks;
-    const stars = this.goals > 0 ? 1 + (tricks >= this.def.trickGoal ? 1 : 0) + (this.time <= this.def.par ? 1 : 0) : 0;
-    const coins = this.goals > 0 ? 10 + tricks * 4 + stars * 8 : 0;
-    return { goal: this.goals > 0, stars, coins, tricks, time: this.time, score: Math.round(this.score), stats: { ...this.stats } };
+    const tricks = this.tricks, got = this.coins;
+    if (this.goals === 0) return { goal: false, reason: this.reason || 'time', stars: 0, coins: got, tricks, time: this.time, score: Math.round(this.score), stats: { ...this.stats } };
+    const stars = 1 + (tricks >= this.def.trickGoal ? 1 : 0) + (this.time <= this.def.par ? 1 : 0);
+    const coins = got + 10 + tricks * 4 + stars * 8;
+    return { goal: true, reason: null, stars, coins, tricks, time: this.time, score: Math.round(this.score), stats: { ...this.stats } };
   }
 }

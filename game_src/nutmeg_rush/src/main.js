@@ -5,7 +5,7 @@
 // comet. In the box a target slides over the goal: tap when it is outside the keeper's (shown) reach. All characters are original
 // cartoon figures built from shapes in code; no clubs, brands or real players. Nothing leaves the device.
 import * as THREE from 'three';
-import { Match, LEVELS, PITCH, SKINS, LEG_OFF, LANE_LEN, LANE_W, normalizeSave, buySkin, selectSkin } from './sim.js';
+import { Match, LEVELS, PITCH, SKINS, LEG_OFF, LANE_LEN, LANE_W, LIVES, DUMMY_R, normalizeSave, buySkin, selectSkin } from './sim.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 
@@ -17,13 +17,17 @@ const S = {
   tip3: ['اخبط في صاحبك الأزرق لتمريرة وراجعة', 'Run into your BLUE friend for a one-two'], tip4: ['كل حركة تسخّن الكورة... وتتحول لكرة نار!', 'Tricks heat the ball... until it is a FLAMING COMET!'],
   tip5: ['في الشباك دوس لما الدايرة تبقى خضرا', 'At the goal, TAP when the ring is GREEN'],
   how: ['اسحب صباعك عشان تحرّك الكورة', 'Drag your finger to roll the ball'],
-  nutmeg: ['بين الرجلين! 😎', 'THROUGH THE LEGS! 😎'], onetwo: ['تمريرة وراجعة!', 'ONE-TWO!'], stolen: ['اتسرقت!', 'STOLEN!'], dodge: ['فلتّ منه!', 'DODGED!'],
+  nutmeg: ['بين الرجلين!', 'NUTMEG!'], onetwo: ['تمريرة وراجعة!', 'ONE-TWO!'], stolen: ['اتسرقت!', 'STOLEN!'], dodge: ['فلتّ منه!', 'DODGE!'],
   comet: ['🔥 كرة نار!! 🔥', '🔥 FLAMING COMET! 🔥'], burn: ['حرقتو!', 'BURNED THROUGH!'], goal: ['جووووول!', 'GOOOAL!'], save: ['الحارس صدّها! جرّب تاني', 'SAVED! Try again'],
   shootHint: ['دوس لما الدايرة تبقى خضرا!', 'TAP when the ring is GREEN!'], shootGo: ['اضرب!', 'SHOOT!'], shootWait: ['استنى...', 'WAIT...'],
   tricks: ['حركات', 'Tricks'], time: ['الوقت', 'Time'], coins: ['العملات', 'Coins'], score: ['النقاط', 'Score'], won: ['جووووول! 🏆', 'GOAL! 🏆'],
   nut: ['بين الرجلين', 'Nutmegs'], one: ['تمريرة وراجعة', 'One-twos'], dod: ['فلتّ', 'Dodges'], buy: ['اشترِ', 'Buy'], owned: ['عندك', 'Owned'], on: ['مختارة ✓', 'Selected ✓'],
   poor: ['محتاج عملات أكتر', 'Need more coins'], tapSound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'], s: ['ث', 's'],
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'],
+  lv: ['م', 'LV'], youAre: ['إنت الكورة', 'YOU ARE THE BALL'], blocked: ['صدّ!', 'BLOCKED!'], tapShoot: ['دوس واضرب!', 'TAP TO SHOOT!'], mate: ['مرّر لصاحبك!', 'PASS TO YOUR MATE!'],
+  fullTime: ['انتهى الوقت', 'FULL TIME'], fullTimeSub: ['خدوا كل الكور. نجرّب تاني؟', 'They took every ball. Again?'], savedT: ['صدّها!', 'SAVED!'], savedSub: ['الحارس صدّ الكورة. العب المرحلة تاني!', 'The keeper stopped it. Play the level again!'],
+  tryAgain: ['حاول تاني', 'TRY AGAIN'], menu: ['القائمة', 'MENU'], dragMove: ['اسحب عشان تحرّك الكورة', 'DRAG TO MOVE'], through: ['مرّرها بين الرجلين!', 'THROUGH THE LEGS!'], levelN: ['المرحلة', 'LEVEL'],
+  nutmegT: ['بين الرجلين!', 'NUTMEG!'],
 };
 const I = makeI18n(S);
 const tx = (k) => I.t(k);
@@ -41,6 +45,12 @@ function glowTexture(inner = 'rgba(255,255,255,1)', outer = 'rgba(255,255,255,0)
   const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
   const g = x.createRadialGradient(32, 32, 0, 32, 32, 32); g.addColorStop(0, inner); g.addColorStop(0.4, 'rgba(255,255,255,0.55)'); g.addColorStop(1, outer);
   x.fillStyle = g; x.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c);
+}
+function chevronTexture() {
+  const c = document.createElement('canvas'); c.width = 64; c.height = 128; const x = c.getContext('2d');
+  x.strokeStyle = '#fff'; x.lineWidth = 9; x.lineCap = 'round'; x.lineJoin = 'round';
+  for (let i = 0; i < 3; i++) { const y = 20 + i * 38; x.beginPath(); x.moveTo(14, y + 22); x.lineTo(32, y); x.lineTo(50, y + 22); x.stroke(); }
+  return new THREE.CanvasTexture(c);
 }
 function markTexture() {
   const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
@@ -87,7 +97,22 @@ class Game {
 .nm-shoot{position:absolute;left:50%;transform:translateX(-50%);bottom:max(${U(6)},env(safe-area-inset-bottom));font-family:inherit;font-weight:900;font-size:${U(8)};color:#fff;border:${U(.8)} solid #fff;border-radius:999px;padding:${U(2.4)} ${U(10)};pointer-events:auto;cursor:pointer;box-shadow:0 ${U(1)} 0 rgba(0,0,0,.4)}
 .nm-shoot.go{background:linear-gradient(180deg,#5ae88a,#17a847)}.nm-shoot.wait{background:linear-gradient(180deg,#ff6a5a,#c8281a)}
 .nm-joy{position:absolute;width:${U(24)};height:${U(24)};margin:${U(-12)} 0 0 ${U(-12)};border-radius:50%;border:${U(.7)} solid rgba(255,255,255,.7);background:rgba(255,255,255,.12);pointer-events:none;display:none}.nm-joy b{position:absolute;left:50%;top:50%;width:${U(10)};height:${U(10)};margin:${U(-5)} 0 0 ${U(-5)};border-radius:50%;background:rgba(255,255,255,.85)}
-.nm-big{font-size:${U(5.5)};font-weight:900;text-align:center}`));
+.nm-big{font-size:${U(5.5)};font-weight:900;text-align:center}
+.nm-lives{gap:${U(.8)};padding:${U(1)} ${U(2.4)}}.nm-lives i{font-style:normal;width:${U(5)};height:${U(5)};border-radius:50%;background:radial-gradient(circle at 50% 50%,#1e2230 0 22%,transparent 24%),#fff;display:block;box-shadow:inset 0 0 0 ${U(.3)} #1e2230}.nm-lives i.off{opacity:.25}
+.nm-prog{position:absolute;left:${U(5)};right:${U(5)};top:${U(17)};height:${U(1.6)};border-radius:99px;background:rgba(0,0,0,.45);direction:ltr;pointer-events:none}.nm-prog b{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:99px;background:linear-gradient(90deg,#ff2a3a,#ff9a2a)}.nm-prog i{position:absolute;top:50%;width:${U(3.6)};height:${U(3.6)};margin:${U(-1.8)} 0 0 ${U(-1.8)};left:0;border-radius:50%;background:#fff;border:${U(.6)} solid #e8242a;box-shadow:0 0 ${U(1)} rgba(0,0,0,.5)}.nm-prog span{position:absolute;right:${U(-1.5)};top:50%;transform:translate(100%,-50%);font-size:${U(4.2)};line-height:1}
+.nm-heat{top:${U(21.5)};height:${U(1.8)};border-width:${U(.3)};opacity:.0;transition:opacity .3s}.nm-heat.on{opacity:1}
+.nm-banner.red{color:#ff3a4a;-webkit-text-stroke:${U(.8)} #fff}.nm-banner.cyan{color:#5ad8ff;-webkit-text-stroke:${U(.8)} #0a2a50}.nm-banner.white{color:#fff;-webkit-text-stroke:${U(.8)} #0a1a40}.nm-banner{font-size:${U(8.4)};transform:rotate(-4deg)}
+.nm-tip{position:absolute;left:0;right:0;bottom:${U(30)};text-align:center;font-weight:900;font-size:${U(5.4)};color:#fff;-webkit-text-stroke:${U(.7)} #0a1a40;paint-order:stroke fill;pointer-events:none;opacity:0;transition:opacity .35s}.nm-tip.show{opacity:1}.nm-tip em{display:block;font-style:normal;font-size:${U(11)};animation:nmhand .7s infinite alternate}@keyframes nmhand{to{transform:translateY(${U(-2)})}}
+.nm-menu2{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:${U(2.2)};padding:${U(4)};box-sizing:border-box;pointer-events:none;background:linear-gradient(180deg,rgba(5,8,25,.55),rgba(5,8,25,.2) 40%,rgba(5,8,25,.65))}
+.nm-title2{font-weight:900;text-align:center;line-height:.95;font-size:${U(15)};color:#fff;-webkit-text-stroke:${U(1.4)} #0a1230;paint-order:stroke fill;text-shadow:0 ${U(1.2)} 0 #0a1230;letter-spacing:.02em}.nm-title2 b{display:block;color:#ffb21a;font-size:${U(19)}}
+.nm-ribbon{background:linear-gradient(180deg,#ff3a5a,#c8102e);color:#fff;font-weight:900;font-size:${U(3.6)};padding:${U(.8)} ${U(4)};border-radius:${U(2)};transform:rotate(-3deg);box-shadow:0 ${U(.6)} 0 #6a0a1a;border:${U(.4)} solid #fff;margin-top:${U(-1)}}
+.nm-lvname{font-weight:900;font-size:${U(4)};text-align:center;line-height:1.2;text-shadow:0 ${U(.4)} 0 #000}.nm-lvname small{display:block;font-size:${U(2.8)};color:#7ad8ff}
+.nm-play{pointer-events:auto;font-family:inherit;font-weight:900;font-size:${U(8)};color:#fff;border:none;border-radius:${U(2.6)};padding:${U(2.2)} ${U(10)};min-width:${U(62)};background:linear-gradient(180deg,#ff3a52,#d0102c);box-shadow:0 ${U(1.2)} 0 #7a0a1a,inset 0 ${U(.6)} 0 rgba(255,255,255,.3);cursor:pointer}.nm-play:active{transform:translateY(${U(.6)})}
+.nm-tiles{display:flex;gap:${U(2)};pointer-events:auto;width:100%;max-width:${U(94)};justify-content:center;margin-top:${U(1)}}.nm-tile{flex:1;font-family:inherit;font-weight:900;color:#fff;border:${U(.4)} solid rgba(255,255,255,.25);border-radius:${U(2.4)};padding:${U(2)} ${U(1)};background:linear-gradient(180deg,#1e2a5a,#0e1638);display:flex;flex-direction:column;align-items:center;gap:${U(.6)};font-size:${U(3)};cursor:pointer;box-shadow:0 ${U(.8)} 0 #060a1e}.nm-tile i{font-style:normal;font-size:${U(7)}}
+.nm-coinpill{position:absolute;top:max(${U(2.5)},env(safe-area-inset-top));right:${U(3)};background:rgba(8,12,34,.8);border-radius:999px;padding:${U(1)} ${U(3)};font-weight:900;font-size:${U(4)};display:flex;gap:${U(1.2)};align-items:center;border:${U(.3)} solid rgba(255,255,255,.25);pointer-events:none;direction:ltr}
+.nm-white{background:#fff;color:#1a2040;border-radius:${U(2.4)};padding:${U(4)} ${U(5)};width:${U(78)};max-width:100%;display:flex;flex-direction:column;gap:${U(2.2)};align-items:stretch;text-align:center;box-shadow:0 ${U(2)} ${U(6)} rgba(0,0,0,.5);pointer-events:auto}.nm-white h2{margin:0;font-size:${U(10)};color:#e8102e;-webkit-text-stroke:${U(.5)} #7a0a1a;text-shadow:0 ${U(.5)} 0 #7a0a1a;line-height:1}.nm-white p{margin:0;font-weight:900;font-size:${U(3.8)};color:#3a4060;line-height:1.35}
+.nm-red{font-family:inherit;font-weight:900;font-size:${U(5)};color:#fff;border:none;border-radius:${U(1.8)};padding:${U(2.2)};background:linear-gradient(180deg,#ff3a52,#d0102c);box-shadow:0 ${U(.9)} 0 #7a0a1a;cursor:pointer}.nm-navy{font-family:inherit;font-weight:900;font-size:${U(4.6)};color:#fff;border:none;border-radius:${U(1.8)};padding:${U(2.2)};background:linear-gradient(180deg,#1e2a5a,#0e1638);box-shadow:0 ${U(.9)} 0 #060a1e;cursor:pointer}
+.nm-white .nm-row{color:#1a2040;justify-content:space-between}`));
     this.root = h('div', { class: 'nm-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
     this.layer = h('div', { class: 'nm-layer' });
@@ -118,7 +143,7 @@ class Game {
     this.ballLight = new THREE.PointLight(0xffffff, 0, 28, 1.6); sc.add(this.ballLight);
     // grass: dark surround + 17 stripes
     sc.add(mesh(geo.box, M(0x14341c), 0, -0.3, L / 2, 220, 0.2, 260));
-    for (let i = 0; i < 17; i++) sc.add(mesh(geo.box, M(i % 2 ? 0x2c8a3c : 0x35a048), 0, -0.05, -3 + i * 6.4 + 3.2, PITCH.W + 4, 0.1, 6.4));
+    for (let i = 0; i < Math.ceil((L + 8) / 6.4); i++) sc.add(mesh(geo.box, M(i % 2 ? 0x2c8a3c : 0x35a048), 0, -0.05, -3 + i * 6.4 + 3.2, PITCH.W + 4, 0.1, 6.4));
     // white lines
     const line = (x, z, w, d) => sc.add(mesh(geo.box, BM(0xffffff, 0.9), x, 0.03, z, w, 0.02, d));
     line(-HW, L / 2, 0.3, L); line(HW, L / 2, 0.3, L); line(0, 0, PITCH.W, 0.3); line(0, L, PITCH.W, 0.3); line(0, L / 2, PITCH.W, 0.3);
@@ -141,10 +166,11 @@ class Game {
     this.partI = 0;
     // players
     this.keeperG = makePlayer(0xffd23a, 0x1a1a2a, 0xf0b890, 0x3a2a1a, true); this.keeperG.position.set(0, 0, L - 0.9); this.keeperG.rotation.y = Math.PI; sc.add(this.keeperG); this.keeperG.scale.setScalar(0.8);
-    this.defMeshes = []; this.mateMeshes = [];
-    this.markTex = markTexture();
+    this.defMeshes = []; this.mateMeshes = []; this.dummyMeshes = []; this.coinMeshes = [];
+    this.markTex = markTexture(); this.chevTex = chevronTexture();
     // goal-mouth aiming helpers: keeper's reach (red wall) and the target ring
     this.reachWall = mesh(geo.plane, BM(0xff2a2a, 0.32), 0, 1.8, L - 0.35, 1, PITCH.GOAL_H, 1); this.reachWall.visible = false; sc.add(this.reachWall);
+    this.safeWall = mesh(geo.plane, BM(0x30e070, 0.2), 0, 1.8, L - 0.3, PITCH.GOAL_W, PITCH.GOAL_H, 1); this.safeWall.visible = false; sc.add(this.safeWall);
     this.reachFloor = mesh(geo.box, BM(0xff2a2a, 0.55), 0, 0.06, L - 1, 1, 0.04, 2); this.reachFloor.visible = false; sc.add(this.reachFloor);
     this.targetRing = new THREE.Group(); this.targetRing.add(mesh(geo.ring, BM(0xffffff, 1), 0, 0, 0, 1.6, 1.6, 1.6), mesh(geo.circle, BM(0xffffff, 0.9), 0, 0, 0.01, 0.6, 0.6, 1)); this.targetRing.position.set(0, 1.8, L - 0.4); this.targetRing.visible = false; sc.add(this.targetRing);
     this.confetti = [];
@@ -185,7 +211,7 @@ class Game {
     this.crowd.instanceColor.needsUpdate = true; sc.add(this.crowd); this._crowdMat(0);
     // ad boards (plain colour panels, no brands)
     const pan = [0xe83a5a, 0x3a8ae8, 0xffd23a, 0x3ae8a8];
-    for (let i = 0; i < 20; i++) for (const s of [-1, 1]) sc.add(mesh(geo.box, M(pan[i % 4], pan[i % 4] & 0x555555), s * (HW + 1.4), 0.6, i * 5.5 - 3, 0.4, 1.2, 5.2));
+    for (let i = 0; i < Math.ceil((L + 6) / 5.5); i++) for (const s of [-1, 1]) sc.add(mesh(geo.box, M(pan[i % 4], pan[i % 4] & 0x555555), s * (HW + 1.4), 0.6, i * 5.5 - 3, 0.4, 1.2, 5.2));
     for (let i = 0; i < 7; i++) sc.add(mesh(geo.box, M(pan[i % 4], pan[i % 4] & 0x555555), -HW + 2.5 + i * 5, 0.6, L + 7.5, 5.2, 1.2, 0.4));
   }
   _crowdMat(t, amp = 0) {
@@ -216,7 +242,7 @@ class Game {
     const r = this.el.getBoundingClientRect(); this.cw = r.width || window.innerWidth; this.ch = r.height || window.innerHeight;
     this.u = Math.min(this.cw, this.ch) / 100; this.root.style.setProperty('--u', `${this.u}px`);
     this.renderer.setSize(this.cw, this.ch, false); this.camera.aspect = this.cw / this.ch;
-    this.portrait = this.cw < this.ch; this.camera.fov = this.portrait ? 82 : 60; this.camera.updateProjectionMatrix();
+    this.portrait = this.cw < this.ch; this.camera.fov = this.portrait ? 62 : 50; this.camera.updateProjectionMatrix();
   }
 
   // ---------- input ----------
@@ -263,7 +289,7 @@ class Game {
     if (k.arrowleft || k.a) jx += 1; if (k.arrowright || k.d) jx -= 1; if (k.arrowup || k.w) jy += 1; if (k.arrowdown || k.s) jy -= 1;
     this.m.setInput(jx, jy);
   }
-  _tap() { if (this.m && this.m.tap()) { this.sound.play('shot'); if (this.shootBtn) { this.shootBtn.remove(); this.shootBtn = null; } } }
+  _tap() { if (this.m && this.m.tap()) { this.sound.play('shot'); this.hideTip(); if (this.shootBtn) { this.shootBtn.remove(); this.shootBtn = null; } } }
 
   // ---------- screens ----------
   _clear() { this.layer.replaceChildren(); this.hintEl = null; }
@@ -274,12 +300,16 @@ class Game {
 
   showMenu() {
     this.mode = 'menu'; this.m = null; this._clear(); this.sound.crowd(true); this.sound.excite(0.2); this.menuT = 0;
-    this._card(h('div', { class: 'nm-logo' }, '⚽ ', tx('title')), h('div', { class: 'nm-menu' },
-      h('button', { class: 'nm-btn', onclick: () => { this.sound.play('tap'); this.showBrief(Math.min(this.save.unlocked - 1, 4)); } }, '▶ ', tx('play')),
-      h('button', { class: 'nm-btn dark', onclick: () => { this.sound.play('tap'); this.showLevels(); } }, '⭐ ', tx('levels')),
-      h('button', { class: 'nm-btn dark', onclick: () => { this.sound.play('tap'); this.showShop(); } }, '⚽ ', tx('balls')),
-      h('button', { class: 'nm-btn dark', onclick: () => { this.sound.play('tap'); this.showSettings(); } }, '⚙️ ', tx('settings')),
-      h('button', { class: 'nm-btn alt', onclick: () => this.post({ type: 'exit' }) }, tx('quit'))), this._coinsPill());
+    const ar = I.getLang() !== 'en', i = Math.min(this.save.unlocked - 1, 4), d = LEVELS[i];
+    const lv = h('div', { class: 'nm-lvname' }, `${tx('levelN')} ${I.num(i + 1)} - ${ar ? d.ar : d.en}`.toUpperCase());
+    this.layer.append(h('div', { class: 'nm-coinpill' }, '🪙', h('span', {}, I.num(this.save.coins))));
+    this.layer.append(h('div', { class: 'nm-menu2' },
+      h('div', { class: 'nm-title2' }, ar ? h('b', {}, tx('title')) : [document.createTextNode('NUTMEG'), h('b', {}, 'RUSH')]), h('div', { class: 'nm-ribbon' }, tx('youAre')), lv,
+      h('button', { class: 'nm-play', onclick: () => { this.sound.play('whistle'); this.showBrief(i); } }, '▶ ', tx('play')),
+      h('div', { class: 'nm-tiles' },
+        h('button', { class: 'nm-tile', onclick: () => { this.sound.play('tap'); this.showLevels(); } }, h('i', {}, '▦'), tx('levels')),
+        h('button', { class: 'nm-tile', onclick: () => { this.sound.play('tap'); this.showShop(); } }, h('i', {}, '⚽'), tx('balls')),
+        h('button', { class: 'nm-tile', onclick: () => { this.sound.play('tap'); this.showSettings(); } }, h('i', {}, '⚙'), tx('settings')))));
     this._soundPill();
   }
 
@@ -314,12 +344,8 @@ class Game {
     this._soundPill();
   }
 
-  showBrief(i) {
-    this.mode = 'brief'; this.levelIdx = i; this._clear(); const ar = I.getLang() !== 'en', d = LEVELS[i];
-    this._newMatch(i);
-    const tips = ['tip1', 'tip2', 'tip3', i >= 1 ? 'tip4' : null, 'tip5'].filter(Boolean).map((k, n) => h('div', { class: 'nm-row', style: `font-size:${U(3.4)};gap:${U(2)};justify-content:flex-start;text-align:start` }, h('span', {}, ['🟥', '🦵', '🔵', '🔥', '🎯'][['tip1', 'tip2', 'tip3', 'tip4', 'tip5'].indexOf(k)]), h('span', {}, tx(k))));
-    this._card(h('div', { class: 'nm-small' }, `${tx('level')} ${I.num(i + 1)}`), h('div', { class: 'nm-title' }, ar ? d.ar : d.en), ...tips, h('div', { class: 'nm-small' }, `⭐ ${tx('goal') === 'goal' ? '' : ''}${I.num(d.trickGoal)} ${tx('tricks')} · ${I.num(d.par)}${tx('s')}`), h('button', { class: 'nm-btn', onclick: () => { this.sound.play('whistle'); this.startLevel(); } }, '⚽ ', tx('start')), h('button', { class: 'nm-btn dark', onclick: () => this.showMenu() }, tx('back')));
-    this._soundPill();
+  showBrief(i) { // no tips screen: the level starts at once, like the original (the first coins lead the way)
+    this.levelIdx = i; this._newMatch(i); this.startLevel();
   }
 
   _newMatch(i) {
@@ -329,16 +355,20 @@ class Game {
 
   startLevel() {
     this._clear(); this.mode = 'play'; this.paused = false; this.sound.crowd(true); this.sound.excite(0.3);
-    this.hudScore = h('span'); this.hudCoins = h('span'); this.hudLevel = h('span');
+    this.hudCoins = h('span', {}, '0'); this.hudLevel = h('span'); this.livesEl = h('div', { class: 'nm-pill nm-lives' }, ...[0, 1, 2].map(() => h('i'))); this.lastLives = -1; this.lastCoins = -1;
     const pause = h('button', { class: 'nm-round', 'aria-label': tx('paused'), onclick: () => this.togglePause() }, '⏸');
-    this.layer.append(h('div', { class: 'nm-top' }, pause, h('div', { class: 'nm-pill' }, this.hudLevel), h('div', { class: 'nm-pill' }, this.hudScore)));
+    this.layer.append(h('div', { class: 'nm-top' }, pause, h('div', { class: 'nm-pill', style: `font-size:${U(3.3)}` }, this.hudLevel), this.livesEl, h('div', { class: 'nm-pill', style: `font-size:${U(3.6)};padding:${U(1)} ${U(2.2)}` }, '🪙', this.hudCoins)));
+    this.progEl = h('div', { class: 'nm-prog' }, h('b'), h('i'), h('span', {}, '🥅')); this.layer.append(this.progEl);
     this.heatEl = h('div', { class: 'nm-heat' }, h('b')); this.layer.append(this.heatEl);
+    this.tipEl = h('div', { class: 'nm-tip' }); this.layer.append(this.tipEl); this.shownTips = {};
     this.banner = h('div', { class: 'nm-banner' }); this.layer.append(this.banner);
-    this.hintEl = h('div', { class: 'nm-hint', style: `top:${U(21)}` }); this.layer.append(this.hintEl);
-    this.shootBtn = null; this._soundPill(); this.hint(tx('how'), 3200);
+    this.hintEl = h('div', { class: 'nm-hint', style: `top:${U(25)}` }); this.layer.append(this.hintEl);
+    this.shootBtn = null; this._soundPill(); this.say('levelN', 'yellow', `${tx('levelN')} ${I.num(this.levelIdx + 1)}`); this.tip('dragMove', 4200, '👆');
   }
 
-  say(key) { if (!this.banner) return; this.banner.textContent = tx(key); this.banner.classList.remove('show'); void this.banner.offsetWidth; this.banner.classList.add('show'); }
+  say(key, color = 'yellow', text = null) { if (!this.banner) return; this.banner.textContent = text || tx(key); this.banner.className = `nm-banner ${color}`; void this.banner.offsetWidth; this.banner.classList.add('show'); }
+  tip(key, ms = 3000, hand = '') { if (!this.tipEl) return; this.tipEl.replaceChildren(...(hand ? [h('em', {}, hand)] : []), document.createTextNode(tx(key))); this.tipEl.classList.add('show'); clearTimeout(this._tt); this._tt = setTimeout(() => this.tipEl && this.tipEl.classList.remove('show'), ms); }
+  hideTip() { if (this.tipEl) this.tipEl.classList.remove('show'); clearTimeout(this._tt); }
 
   togglePause() {
     if (this.mode !== 'play') return;
@@ -354,23 +384,44 @@ class Game {
     if (this.shootBtn) { this.shootBtn.remove(); this.shootBtn = null; }
     const row = (a, b) => h('div', { class: 'nm-row' }, h('span', {}, a), h('span', {}, b));
     const stars = h('div', { class: 'nm-stars' }, ...[1, 2, 3].map((n) => h('span', { class: n <= r.stars ? '' : 'off' }, '⭐')));
-    this.layer.append(h('div', { class: 'nm-dim' }, h('div', { class: 'nm-card' }, h('div', { class: 'nm-logo' }, tx('won')), stars, h('div', { class: 'nm-title', style: `font-size:${U(5.5)}` }, tx('win')),
-      row(tx('score'), I.num(r.score)), row(`🦵 ${tx('nut')}`, I.num(r.stats.nutmegs)), row(`🔵 ${tx('one')}`, I.num(r.stats.onetwos)), row(`💨 ${tx('dod')}`, I.num(r.stats.dodges)), row(`⏱ ${tx('time')}`, `${I.num(Math.round(r.time))}${tx('s')}`), row(`🪙 ${tx('coins')}`, `+${I.num(r.coins)}`),
-      h('button', { class: 'nm-btn alt', onclick: () => this.showBrief(i) }, '🔄 ', tx('restart')), i < 4 ? h('button', { class: 'nm-btn', onclick: () => this.showBrief(i + 1) }, '▶ ', tx('next')) : null, h('button', { class: 'nm-btn dark', onclick: () => this.showMenu() }, '🏠 ', tx('home')))));
+    this.layer.append(h('div', { class: 'nm-dim', style: 'background:rgba(5,8,25,.45)' }, h('div', { class: 'nm-white' }, h('h2', {}, tx('goal')), stars, h('p', {}, tx('win')),
+      row(tx('score'), I.num(r.score)), row(`🦵 ${tx('nut')}`, I.num(r.stats.nutmegs)), row(`🔵 ${tx('one')}`, I.num(r.stats.onetwos)), row(`💨 ${tx('dod')}`, I.num(r.stats.dodges)), row(`🪙 ${tx('coins')}`, `+${I.num(r.coins)}`),
+      i < 4 ? h('button', { class: 'nm-red', onclick: () => this.showBrief(i + 1) }, '▶ ', tx('next')) : h('button', { class: 'nm-red', onclick: () => this.showBrief(i) }, '↻ ', tx('tryAgain')),
+      h('button', { class: 'nm-navy', onclick: () => this.showMenu() }, '⌂ ', tx('menu')))));
+  }
+
+  _fail(r) {
+    const i = this.levelIdx, sv = this.save; sv.coins += r.coins; this.post({ type: 'save', save: sv });
+    this.mode = 'result'; if (this.shootBtn) { this.shootBtn.remove(); this.shootBtn = null; } this.hideTip();
+    const saved = r.reason === 'saved';
+    this.layer.append(h('div', { class: 'nm-dim', style: 'background:rgba(5,8,25,.45)' }, h('div', { class: 'nm-white' }, h('h2', {}, tx(saved ? 'savedT' : 'fullTime')), h('p', {}, tx(saved ? 'savedSub' : 'fullTimeSub')),
+      r.coins ? h('div', { class: 'nm-row' }, h('span', {}, '🪙'), h('span', {}, `+${I.num(r.coins)}`)) : null,
+      h('button', { class: 'nm-red', onclick: () => { this.sound.play('tap'); this.showBrief(i); } }, '↻ ', tx('tryAgain')), h('button', { class: 'nm-navy', onclick: () => this.showMenu() }, '⌂ ', tx('menu')))));
   }
 
   // ---------- actors ----------
-  _clearActors() { for (const g of [...this.defMeshes, ...this.mateMeshes]) { this.scene.remove(g.g); if (g.lane) this.scene.remove(g.lane); if (g.lane2) this.scene.remove(g.lane2); } this.defMeshes = []; this.mateMeshes = []; }
+  _clearActors() { for (const g of [...this.defMeshes, ...this.mateMeshes]) { this.scene.remove(g.g); if (g.lane) this.scene.remove(g.lane); if (g.lane2) this.scene.remove(g.lane2); } for (const g of this.dummyMeshes || []) this.scene.remove(g); for (const o of this.coinMeshes || []) this.scene.remove(o.g); this.defMeshes = []; this.mateMeshes = []; this.dummyMeshes = []; this.coinMeshes = []; }
   _buildActors() {
     const kits = [[0xe0242a, 0x7a0a10, 0xf0b890, 0x2a1a10], [0xd01a3a, 0x5a0a20, 0xc88a60, 0x111111], [0xe8481a, 0x6a1a0a, 0xe8a880, 0x6a3a1a], [0xc81a5a, 0x4a0a2a, 0x8a5a3a, 0x1a1a1a]];
     for (const d of this.m.defenders) {
       const k = kits[d.id % kits.length], g = makePlayer(k[0], k[1], k[2], k[3]); g.scale.setScalar(0.85); this.scene.add(g);
       const lane = mesh(geo.plane, BM(0xff1a1a, 0.4), 0, 0.09, 0, LANE_W, LANE_LEN, 1); lane.rotation.x = -Math.PI / 2; lane.visible = false; this.scene.add(lane);
-      const lane2 = mesh(geo.plane, BM(0xffffff, 0.5), 0, 0.1, 0, LANE_W * 0.18, LANE_LEN, 1); lane2.rotation.x = -Math.PI / 2; lane2.visible = false; this.scene.add(lane2);
+      const lane2 = mesh(geo.plane, new THREE.MeshBasicMaterial({ map: this.chevTex, transparent: true, opacity: 0.8, depthWrite: false, side: THREE.DoubleSide }), 0, 0.1, 0, LANE_W * 0.8, LANE_LEN, 1); lane2.rotation.x = -Math.PI / 2; lane2.visible = false; this.scene.add(lane2);
       const mark = new THREE.Sprite(new THREE.SpriteMaterial({ map: this.markTex, transparent: true, depthTest: false })); mark.scale.set(2.2, 2.2, 1); mark.position.y = 8; mark.visible = false; g.add(mark);
-      this.defMeshes.push({ g, lane, lane2, mark, d, ph: d.id * 1.7 });
+      const gap = mesh(geo.circle, BM(0xffd21a, 0.85), 0, 0.06, 0.6, 1.5, 1.5, 1.5); gap.rotation.x = -Math.PI / 2; g.add(gap);
+      this.defMeshes.push({ g, lane, lane2, mark, gap, d, ph: d.id * 1.7 });
     }
     for (const mt of this.m.mates) { const g = makePlayer(0x5ac8ff, 0x1a5a9a, 0xf0b890, 0x2a3a5a); g.scale.setScalar(0.85); this.scene.add(g); const ring = mesh(geo.ring, BM(0x5ac8ff, 0.7), 0, 0.1, 0, 3.2, 3.2, 3.2); ring.rotation.x = -Math.PI / 2; g.add(ring); this.mateMeshes.push({ g, mt, ring }); }
+    for (const d of this.m.dummies) {
+      const g = new THREE.Group(), yel = M(0xffc61a, 0x4a3600);
+      g.add(mesh(geo.cyl, M(0x3a3f4a), 0, 0.15, 0, 1.5, 0.3, 1.5), mesh(geo.cyl, yel, 0, 1.9, 0, 0.55, 3.2, 0.55), mesh(geo.sphere, yel, 0, 1.95, 0, 1.45, 1.9, 0.75), mesh(geo.sphere, yel, 0, 3.55, 0, 0.8, 0.8, 0.8));
+      g.position.set(WX(d.x), 0, d.z); this.scene.add(g); this.dummyMeshes.push(g);
+    }
+    const coinMat = new THREE.MeshBasicMaterial({ color: 0xffc21a }), coinRim = new THREE.MeshBasicMaterial({ color: 0xffe880 });
+    for (const c of this.m.coinList) {
+      const g = new THREE.Group(); const disc = mesh(geo.cyl, coinMat, 0, 0, 0, 0.9, 0.16, 0.9); disc.rotation.x = Math.PI / 2; const star = mesh(geo.cyl, coinRim, 0, 0, 0.09, 0.5, 0.05, 0.5); star.rotation.x = Math.PI / 2; g.add(disc, star);
+      g.position.set(WX(c.x), 0.95, c.z); this.scene.add(g); this.coinMeshes.push({ g, c });
+    }
   }
 
   // ---------- loop ----------
@@ -386,30 +437,38 @@ class Game {
       switch (e.type) {
         case 'tackleWarn': this.sound.play('warn'); break;
         case 'slide': this.sound.play('slide'); break;
-        case 'nutmeg': this.sound.play('nutmeg'); this.say('nutmeg'); this._burst(this.ball.position, 0xffe04a, 14); this.sound.excite(0.6); break;
-        case 'onetwo': this.sound.play('onetwo'); this.sound.play('kick'); this.say('onetwo'); this._burst(this.ball.position, 0x5ac8ff, 14); break;
-        case 'dodge': this.sound.play('dodge'); this.say('dodge'); break;
-        case 'stolen': this.sound.play('stolen'); this.say('stolen'); this.shake = 0.7; this.sound.excite(0.15); break;
-        case 'burn': this.sound.play('burn'); this.say('burn'); this._burst(this.ball.position, 0xff6a1a, 24); break;
+        case 'nutmeg': this.sound.play('nutmeg'); this.say('nutmeg', 'yellow'); this._burst(this.ball.position, 0xffe04a, 14); this.sound.excite(0.6); break;
+        case 'onetwo': this.sound.play('onetwo'); this.sound.play('kick'); this.say('onetwo', 'cyan'); this._burst(this.ball.position, 0x5ac8ff, 14); this.hideTip(); break;
+        case 'dodge': this.sound.play('dodge'); this.say('dodge', 'cyan'); break;
+        case 'stolen': this.sound.play('stolen'); this.say('stolen', 'red'); this.shake = 0.7; this.sound.excite(0.15); break;
+        case 'burn': this.sound.play('burn'); this.say('burn', 'yellow'); this._burst(this.ball.position, 0xff6a1a, 24); break;
         case 'cometOn': this.sound.play('comet'); this.say('comet'); this.sound.excite(0.9); break;
         case 'cometOff': this.sound.excite(0.3); break;
         case 'shootStart': this._shootUI(); this.sound.play('whistle'); break;
-        case 'shoot': this.sound.play('shot'); if (this.shootBtn) { this.shootBtn.remove(); this.shootBtn = null; } break;
-        case 'save': this.sound.play('save'); this.say('save'); this.shake = 0.6; break;
+        case 'coin': this.sound.play('coin'); this._burst(this.ball.position, 0xffd23a, 5); break;
+        case 'blocked': this.sound.play('tap'); this.say('blocked', 'red'); this.shake = 0.3; break;
+        case 'mateHint': this.tip('mate', 3600); break;
+        case 'lost': this.sound.play('stolen'); break;
+        case 'shoot': this.sound.play('shot'); this.hideTip(); if (this.shootBtn) { this.shootBtn.remove(); this.shootBtn = null; } break;
+        case 'save': this.sound.play('save'); this.say('savedT', 'cyan'); this.shake = 0.6; break;
         case 'goal': this.sound.play('goal'); this.say('goal'); this.celebrate = 3; this.netT = 0; this.netX = e.x; this._confettiBurst(); break;
-        case 'end': this._finish(e.result); break;
+        case 'end': if (e.result.goal) this._finish(e.result); else this._fail(e.result); break;
         default: break;
       }
     }
     if (this.mode === 'play') {
-      this.hudLevel.textContent = `${tx('level')} ${I.num(this.levelIdx + 1)}`; this.hudScore.textContent = `⭐ ${I.num(Math.round(m.score))}`;
-      this.heatEl.firstChild.style.width = `${m.heat}%`; this.heatEl.classList.toggle('comet', m.comet);
+      const ar = I.getLang() !== 'en'; this.hudLevel.textContent = `${tx('lv')} ${I.num(this.levelIdx + 1)}  ${ar ? LEVELS[this.levelIdx].ar : LEVELS[this.levelIdx].en}`.toUpperCase();
+      if (this.lastLives !== m.lives) { this.lastLives = m.lives; [...this.livesEl.children].forEach((el, i) => el.classList.toggle('off', i >= m.lives)); }
+      if (this.lastCoins !== m.coins + this.save.coins) { this.lastCoins = m.coins + this.save.coins; this.hudCoins.textContent = I.num(this.save.coins + m.coins); }
+      const pr = m.progress * 100; this.progEl.firstChild.style.width = `${pr}%`; this.progEl.children[1].style.left = `${pr}%`;
+      this.heatEl.firstChild.style.width = `${m.heat}%`; this.heatEl.classList.toggle('comet', m.comet); this.heatEl.classList.toggle('on', m.heat > 1);
+      if (!this.shownTips.through && this.levelIdx === 0 && m.defenders.some((d) => d.state === 'chase' && Math.hypot(d.x - m.ball.x, d.z - m.ball.z) < 10)) { this.shownTips.through = true; this.tip('through', 3200); }
       if (this.shootBtn) { const ok = m.targetSafe(); if (ok !== this._ok) { this._ok = ok; this.shootBtn.className = `nm-shoot ${ok ? 'go' : 'wait'}`; this.shootBtn.textContent = ok ? tx('shootGo') : tx('shootWait'); } }
     }
   }
 
   _shootUI() {
-    this.shootBtn = h('button', { class: 'nm-shoot wait', onclick: () => this._tap() }, tx('shootWait')); this._ok = null; this.layer.append(this.shootBtn); this.hint(tx('shootHint'), 3500);
+    this.shootBtn = h('button', { class: 'nm-shoot wait', onclick: () => this._tap() }, tx('shootWait')); this._ok = null; this.layer.append(this.shootBtn); this.tip('tapShoot', 60000, '👆');
   }
 
   _spawn(pos, vx, vy, vz, life, s0, s1, color, a = 1) {
@@ -475,12 +534,14 @@ class Game {
           o.lane.material.opacity = (0.2 + 0.4 * Math.abs(Math.sin(t * (10 + ramp * 22)))) * (d.state === 'slide' ? 0.6 : 1);
           o.lane2.material.opacity = 0.25 + 0.5 * ramp * Math.abs(Math.sin(t * 20));
         }
+        o.gap.visible = d.state !== 'slide' && d.state !== 'stun' && !d.nutmegged; o.gap.material.opacity = 0.55 + 0.3 * Math.sin(t * 5 + o.ph);
         o.mark.visible = d.state === 'windup'; o.mark.position.y = 8 + Math.abs(Math.sin(t * 14)) * 0.6;
         if (d.state === 'slide') { g.rotation.y = Math.atan2(-d.lx, d.lz); g.position.y = 0.3; }
         const moving = d.state === 'chase';
         this._anim(g, d.state, t, moving, o.ph);
         g.userData.shadow.visible = d.state !== 'slide';
       }
+      for (const o of this.coinMeshes) { o.g.visible = !o.c.got; o.g.rotation.y = t * 3 + o.c.z; o.g.position.y = 0.95 + Math.sin(t * 4 + o.c.z) * 0.12; }
       for (const o of this.mateMeshes) { const q = o.mt; o.g.position.set(WX(q.x), 0, q.z); o.g.rotation.y = Math.atan2(WX(b.x) - WX(q.x), b.z - q.z); this._anim(o.g, q.state, t, false, 0); o.ring.visible = q.state === 'wait'; o.ring.scale.setScalar(3.2 + Math.sin(t * 5) * 0.3); }
       // keeper, target, reach
       const shootish = m.mode === 'shoot' || m.mode === 'shot';
@@ -490,7 +551,7 @@ class Game {
       this._anim(this.keeperG, m.mode === 'goal' ? 'wait' : 'watch', t, false, 0);
       this.keeperG.userData.armL.rotation.x = this.keeperG.userData.armR.rotation.x = -1.2 + Math.sin(t * 6) * 0.2; this.keeperG.userData.armL.rotation.z = -0.8; this.keeperG.userData.armR.rotation.z = 0.8;
       const show = m.mode === 'shoot';
-      this.reachWall.visible = this.reachFloor.visible = this.targetRing.visible = show;
+      this.reachWall.visible = this.reachFloor.visible = this.targetRing.visible = this.safeWall.visible = show;
       if (show) {
         const r = m.reachNow(); this.reachWall.scale.x = r * 2; this.reachWall.position.x = WX(m.keeper.x); this.reachFloor.scale.x = r * 2; this.reachFloor.position.x = WX(m.keeper.x);
         this.reachWall.material.opacity = 0.22 + 0.12 * Math.sin(t * 8);
@@ -524,7 +585,7 @@ class Game {
     let px, py, pz, lx, ly, lz;
     if (m.mode === 'goal') { const k = clamp(this.celebrate, 0, 3); px = b.x * 0.3 + Math.sin(this.clock * 0.9) * 8; py = 6 + (3 - k) * 0.8; pz = L - 15; lx = b.x * 0.4; ly = 2; lz = L; }
     else if (m.mode === 'shoot' || m.mode === 'shot') { px = b.x * 0.3; py = pt ? 10 : 7; pz = L - (pt ? 23 : 17); lx = 0; ly = 1.2; lz = L; }
-    else { px = b.x * 0.8; py = pt ? 12.5 : 9; pz = b.z - (pt ? 14.5 : 12); lx = b.x * 0.85; ly = 0.3; lz = b.z + (pt ? 9 : 10); }
+    else { px = b.x * 0.75; py = pt ? 17 : 14; pz = b.z - (pt ? 10.5 : 10); lx = b.x * 0.8; ly = 0; lz = b.z + (pt ? 9 : 8); }
     if (!this.camInit) { this.cp = new THREE.Vector3(px, py, pz); this.cl = new THREE.Vector3(lx, ly, lz); this.camInit = true; }
     const k = 1 - Math.exp(-dt * (m.mode === 'play' ? 7 : 3.5));
     this.cp.x += (px - this.cp.x) * k; this.cp.y += (py - this.cp.y) * k; this.cp.z += (pz - this.cp.z) * k;

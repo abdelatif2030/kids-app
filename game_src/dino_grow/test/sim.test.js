@@ -26,11 +26,14 @@ function robot(g) {
   if (tx !== null) { const dx = tx - p.x; const dz = tz - p.z; const m = Math.hypot(dx, dz) || 1; ix += dx / m; iz += dz / m; if (td < 4.5) pounce = true; }
   else { ix += Math.sin(g.time * 0.7); iz += Math.cos(g.time * 0.5); }
   // keep away from stronger hunters
+  let threat = false;
   for (const c of g.creatures) {
-    if (c.power < p.P) continue;
+    if (c.power < p.P || (c.ai !== 'hunter' && c.power < p.P * 1.5)) continue; // small red ones are harmless: only hunters and much bigger things are avoided
     const d = Math.hypot(c.x - p.x, c.z - p.z);
-    if (d < 9) { const [ax, az] = away(g, c.x, c.z); ix += ax * (9 - d) * 0.5; iz += az * (9 - d) * 0.5; }
+    if (d < 9) { const [ax, az] = away(g, c.x, c.z); ix += ax * (9 - d) * 0.5; iz += az * (9 - d) * 0.5; threat = true; }
   }
+  const H = g.L.half; // do not get cornered against the edge by hunters
+  if (threat && Math.abs(p.x) > H - 7) ix -= Math.sign(p.x) * 2.5; if (threat && Math.abs(p.z) > H - 7) iz -= Math.sign(p.z) * 2.5;
   return { x: ix, z: iz, pounce };
 }
 
@@ -71,7 +74,7 @@ test('stronger creature only bumps: costs a little power, never below the start'
   const g = new Dino({ level: 0, seed: 1 }); const p = g.player; p.P = 20;
   g.creatures = [{ id: 99, kind: 'rexJr', power: 40, r: 2, ai: 'hunter', x: 0.5, z: 0, face: 0, vx: 0, vz: 0, speed: 0, wa: 0, wt: 5, walk: false, stun: 0, chase: false }];
   const ev = g.step(0.02, {});
-  assert.ok(ev.some((e) => e.type === 'bump')); assert.ok(p.P < 20 && p.P >= 18); assert.ok(g.creatures.length === 1);
+  assert.ok(ev.some((e) => e.type === 'bump')); assert.ok(p.P < 20 && p.P >= 18); assert.ok(g.creatures.filter((c) => !c.alpha).length === 1);
   for (let i = 0; i < 400; i++) g.step(0.05, { x: 0, z: 0 });
   assert.ok(p.P >= g.L.start);
 });
@@ -109,4 +112,21 @@ test('deterministic and save normalisation', () => {
   const a = play(0, 7).g; const b = play(0, 7).g; assert.equal(a.time, b.time); assert.equal(a.player.P, b.player.P);
   const s = normalizeSave({ unlocked: 99, stars: [5, -1, 'x'], best: [10.4, null], muted: 1 });
   assert.deepEqual(s.stars, [3, 0, 0]); assert.equal(s.unlocked, 3); assert.equal(s.best[0], 10); assert.equal(normalizeSave(null).unlocked, 1);
+});
+
+test('levels 1 and 2 end only when you eat the alpha (BEAT THE ALPHA 36), not by reaching a power', () => {
+  const g = new Dino({ level: 0, seed: 1 }); g.creatures = []; assert.equal(g.L.start, 3); assert.equal(g.L.goal, 37);
+  g.player.P = 19; g.step(0.02, {}); assert.ok(!g.alpha);
+  g.player.P = 20; const ev = g.step(0.02, {}); assert.ok(ev.some((e) => e.type === 'alpha') && g.alpha && g.alpha.power === 36);
+  g.player.P = 200; for (let i = 0; i < 100; i++) g.step(0.05, {}); assert.ok(!g.done, 'power alone does not finish');
+  const a = g.alpha; g.creatures = [a]; g.player.x = a.x; g.player.z = a.z;
+  const ev2 = g.step(0.02, {}); assert.ok(ev2.some((e) => e.type === 'alphaDown'));
+  let done = false; for (let i = 0; i < 60; i++) for (const e of g.step(0.05, {})) if (e.type === 'complete') done = true;
+  assert.ok(done && g.won);
+});
+
+test('a weaker player cannot eat the alpha: it only bumps', () => {
+  const g = new Dino({ level: 1, seed: 1 }); g.creatures = []; g.player.P = 60; g.step(0.02, {}); assert.ok(g.alpha && g.alpha.power === 80);
+  const a = g.alpha; g.creatures = [a]; g.player.x = a.x; g.player.z = a.z; g.player.inv = 0;
+  const ev = g.step(0.02, {}); assert.ok(ev.some((e) => e.type === 'bump') && !ev.some((e) => e.type === 'alphaDown') && g.creatures.includes(a));
 });
