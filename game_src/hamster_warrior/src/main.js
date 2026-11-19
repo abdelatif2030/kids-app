@@ -56,7 +56,7 @@ const ART_NAMES = ['hero', 'monster_1', 'monster_2', 'monster_3', 'boss_1', 'bos
 const artTex = new Map();
 function tex(img) { if (!artTex.has(img)) { const t = new THREE.Texture(img); t.colorSpace = THREE.SRGBColorSpace; t.needsUpdate = true; artTex.set(img, t); } return artTex.get(img); }
 /** A picture standing in the world (always faces the camera), `height` units tall, feet on the ground. */
-function pictureSprite(img, height) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex(img), transparent: true })); sp.scale.set(height * (img.naturalWidth / img.naturalHeight), height, 1); sp.center.set(0.5, 0.04); return sp; }
+function pictureSprite(img, height) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex(img), transparent: true })); sp.scale.set(height * (img.naturalWidth / img.naturalHeight), height, 1); sp.center.set(0.5, 0.04); sp.position.y = height * 0.16; /* lift so the flat ground never cuts the feet of the picture */ return sp; }
 const fmt = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e4 ? `${(n / 1e3).toFixed(1)}K` : String(Math.round(n)));
 
 function makeHamster() {
@@ -75,7 +75,7 @@ function makeHamster() {
 function makeMonster(kind, boss, art, ch) {
   const g = new THREE.Group();
   const img = art && (boss ? art[`boss_${ch + 1}`] : art[`monster_${(kind % 3) + 1}`]);
-  if (img) { g.add(pictureSprite(img, boss ? 8.5 : 2.7)); return g; }
+  if (img) { g.add(pictureSprite(img, boss ? 6 : 2.7)); return g; }
   if (kind === 0) { g.add(mesh(geo.sphere, M(0x5ad85a), 0, 0.6, 0, 1.6, 1.1, 1.6), mesh(geo.sphere, M(0xffffff), -0.3, 0.9, 0.6, 0.3, 0.3, 0.2), mesh(geo.sphere, M(0xffffff), 0.3, 0.9, 0.6, 0.3, 0.3, 0.2)); }
   else if (kind === 1) { g.add(mesh(geo.cyl, M(0xf4e8d0), 0, 0.6, 0, 0.7, 1.2, 0.7), mesh(geo.sphere, M(0xe8453a), 0, 1.4, 0, 1.8, 1.0, 1.8), mesh(geo.sphere, M(0xffffff), -0.4, 1.7, 0.5, 0.3, 0.3, 0.2), mesh(geo.sphere, M(0xffffff), 0.4, 1.7, 0.5, 0.3, 0.3, 0.2)); }
   else { g.add(mesh(geo.cyl, M(0x8a4ab8), 0, 0.8, 0, 1.0, 1.3, 0.8), mesh(geo.sphere, M(0x9a6ad8), 0, 1.8, 0, 0.9, 0.9, 0.9), mesh(geo.cone, M(0x9a6ad8), -0.4, 2.4, 0, 0.3, 0.6, 0.3), mesh(geo.cone, M(0x9a6ad8), 0.4, 2.4, 0, 0.3, 0.6, 0.3), mesh(geo.sphere, M(0xffe04a, 0xaa8800), -0.2, 1.9, 0.4, 0.2, 0.2, 0.1), mesh(geo.sphere, M(0xffe04a, 0xaa8800), 0.2, 1.9, 0.4, 0.2, 0.2, 0.1)); }
@@ -180,7 +180,7 @@ class Game {
         const s = sprite(`${t.icon} ${t.op === 'mul' ? `x${t.v}` : t.v >= 0 ? `+${t.v}` : t.v}`, pos ? '#2a6ae0' : '#e02a3a', 3.2, 1.6); s.position.y = 4.4; g.add(s);
       } else if (t.kind === 'monster' || t.kind === 'boss') {
         g.add(makeMonster(t.kindId || 0, t.boss, this.art, ch));
-        const s = sprite(fmt(t.power), t.boss ? '#8a1a6a' : '#8a1a1a', t.boss ? 4.4 : 2.4, t.boss ? 2.2 : 1.2); s.position.y = t.boss ? 9 : 3; g.add(s);
+        const s = sprite(fmt(t.power), t.boss ? '#8a1a6a' : '#8a1a1a', t.boss ? 4.4 : 2.4, t.boss ? 2.2 : 1.2); s.position.y = t.boss ? 6.8 : 3.1; g.add(s);
         g.userData.mon = g.children[0];
       } else if (t.kind === 'coin') { g.add(mesh(geo.cyl, M(0xffd23a, 0x886600), 0, 1, 0, 0.9, 0.15, 0.9).rotateX(Math.PI / 2)); }
       g.position.set(-t.x, 0, t.z); this.world.add(g); this.objs.set(t.id, g);
@@ -217,7 +217,7 @@ class Game {
     const r = this.run; const lv = this.levelIdx + 1;
     this.save.coins += r.reward; this.save.stars[lv] = Math.max(this.save.stars[lv] || 0, r.stars);
     this.save.unlocked = Math.max(this.save.unlocked, Math.min(LEVELS, lv + 1));
-    this.post({ type: 'save', save: this.save }); this.sound.play('win');
+    this.fx = []; this.post({ type: 'save', save: this.save }); this.sound.play('win');
     this.layer.append(h('div', { class: 'hw-dim' }, h('div', { class: 'hw-card' }, h('div', { class: 'hw-title' }, I.t('won')), h('div', { class: 'hw-stars' }, [1, 2, 3].map((s) => h('span', { class: s <= r.stars ? '' : 'off' }, '⭐'))), h('div', { class: 'hw-pill' }, `${I.t('power')} ${fmt(r.power)} · 🪙 +${I.num(r.reward)}`),
       this.levelIdx < LEVELS - 1 ? h('button', { class: 'hw-btn', onclick: () => this.start(this.levelIdx + 1) }, I.t('next')) : null, h('button', { class: 'hw-btn alt', onclick: () => this.start(this.levelIdx) }, I.t('again')), h('button', { class: 'hw-btn dark', onclick: () => this.showMenu() }, I.t('menu')))));
   }
@@ -266,7 +266,7 @@ class Game {
     if (!this.fxEls) this.fxEls = [];
     this.fx.forEach((f, i) => {
       let el = this.fxEls[i];
-      if (!el) { el = h('div', { style: 'position:absolute;left:50%;top:45%;font-weight:900;color:#fff;text-shadow:0 0 8px #000,0 0 3px #000;pointer-events:none;font-size:calc(var(--u)*8)' }); this.layer.append(el); this.fxEls[i] = el; }
+      if (!el) { el = h('div', { dir: 'ltr', style: 'position:absolute;left:50%;top:45%;font-weight:900;color:#fff;text-shadow:0 0 8px #000,0 0 3px #000;pointer-events:none;font-size:calc(var(--u)*8)' }); this.layer.append(el); this.fxEls[i] = el; }
       el.style.display = 'block'; el.style.opacity = String(1 - f.t / f.life); el.style.transform = `translate(-50%,${-f.t * 90}px)`; el.textContent = f.text;
     });
     for (let i = this.fx.length; i < this.fxEls.length; i++) this.fxEls[i].style.display = 'none';

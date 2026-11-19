@@ -55,7 +55,7 @@ if (JOBS) {
   const spec = JSON.parse(fs.readFileSync(JOBS, 'utf8'));
   const game = path.basename(JOBS, '.json');
   jobs.length = 0;
-  for (const j of spec.jobs) jobs.push({ game, num: '0', name: j.name, prompt: `${spec.style} ${j.prompt} ${j.kind === 'sprite' ? spec.kind_sprite : 'No characters unless described, no text, no UI.'}` });
+  for (const j of spec.jobs) jobs.push({ game, num: '0', name: j.name, prompt: `${spec.style} ${j.prompt} ${j.kind === 'sprite' ? spec.kind_sprite : (spec.suffix || 'No characters unless described, no text, no UI.')}` });
 }
 let done = 0, skipped = 0;
 for (const j of jobs) {

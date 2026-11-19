@@ -10,7 +10,7 @@ game = sys.argv[1]
 spec = json.load(open(f'tools/art_jobs/{game}.json', encoding='utf8'))
 src = f'game_src/_generated_images/{game}'
 out = f'assets/games/{game}/art'
-os.makedirs(out, exist_ok=True)
+if game != 'cards': os.makedirs(out, exist_ok=True)
 
 
 def cut_white(im, tol=34):
@@ -52,6 +52,13 @@ for j in spec['jobs']:
     if not os.path.exists(f): print('missing', f); continue
     im = Image.open(f)
     k = j['kind']
+    if k in ('card', 'section'):   # menu pictures: crop to the tile's shape and save where the sections screen looks for them
+        ratio, size, dest = (1.247, (480, 385), f'assets/games/{j["name"]}/card.webp') if k == 'card' else (1.7, (640, 376), f'assets/games/sections/{j["name"]}.webp')
+        im = im.convert('RGB'); w, h = im.size; ch = int(w / ratio); top = int((h - ch) * 0.45)
+        im = im.crop((0, top, w, top + ch)).resize(size, Image.LANCZOS)
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        if k == 'card' and os.path.exists(dest) and '--keep' in sys.argv: print('keep', j['name']); continue
+        im.save(dest, 'WEBP', quality=84); print('ok', k, j['name'], os.path.getsize(dest) // 1024, 'KB'); continue
     if k == 'sprite':
         im = cut_white(im); im.thumbnail((512, 512), Image.LANCZOS)
     elif j['name'].startswith('sky'):

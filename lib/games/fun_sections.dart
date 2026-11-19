@@ -28,6 +28,70 @@ final List<FunSection> kFunSections = [
   FunSection('girls', '🎀', () => tr2('عالم البنات', 'Girls World'), const Color(0xFFFF6AA8), const Color(0xFFFFD8EC), ['fashion_queen']),
 ];
 
+/// One emoji per fun game: the fallback picture of a card until the game's own picture exists.
+const Map<String, String> kFunGameEmoji = {
+  'moto_race': '🏍️',
+  'carnival_race': '🎡',
+  'dune_titans': '🏜️',
+  'rain_circuit': '🌧️',
+  'sunset_highway': '🌅',
+  'coastal_drive': '🚗',
+  'air_race': '🛩️',
+  'summit_rush': '⛷️',
+  'rhino_summit': '🦏',
+  'alien_sky': '👽',
+  'samurai': '🥷',
+  'squad_shooter': '🔫',
+  'archer_bridge': '🏹',
+  'zombie_rooftop': '🧟',
+  'ice_dragon': '🐲',
+  'hero_tower': '🏰',
+  'hamster_warrior': '🐹',
+  'card_battle': '🃏',
+  'ice_rink': '🏒',
+  'viking_sling': '🪨',
+  'barrel_knights': '🛡️',
+  'gummy_squad': '🧸',
+  'temple_army': '🏛️',
+  'dino_grow': '🦖',
+  'nutmeg_rush': '⚽',
+  'ocean_defense': '🐠',
+  'jungle_adventure': '🌴',
+  'cloud_dash': '☁️',
+  'fizz_runner': '🥤',
+  'ball_scoop': '🚚',
+  'sky_capy': '🦫',
+  'hop_world': '🍄',
+  'sky_ace': '✈️',
+  'trick_or_treat': '🎃',
+  'golden_tail': '🦕',
+  'fox_family': '🦊',
+  'splash_race': '🏊',
+  'rhythm': '🎵',
+  'happy_farm': '🚜',
+  'pumpkin_pie': '🥧',
+  'space_store': '🛒',
+  'honey_farm': '🍯',
+  'pearl_divers': '🦪',
+  'winter_camp': '⛺',
+  'castaway_raft': '🛶',
+  'creator_tycoon': '🤖',
+  'hot_spring': '♨️',
+  'mars_farm': '🪐',
+  'gem_quarry': '💎',
+  'rug_cleaning': '🧼',
+  'marble_dozer': '🔮',
+  'frost_coil': '❄️',
+  'chomp_maze': '😋',
+  'gum_ball': '🍬',
+  'hungry_frog': '🐸',
+  'deep_sea': '🐟',
+  'pin_puzzle': '📍',
+  'tomb_puzzle': '🏺',
+  'sweet_tray': '🍰',
+  'fashion_queen': '👗',
+};
+
 WebGame? _byId(String id) {
   for (final g in kWebGames) {
     if (g.id == id) return g;
@@ -183,7 +247,7 @@ class _GameCard extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: Stack(fit: StackFit.expand, children: [
-            Image.asset('assets/games/${game.folder}/card.webp', fit: BoxFit.cover, errorBuilder: (_, _, _) => Center(child: Text(section.emoji, style: const TextStyle(fontSize: 64)))),
+            Image.asset('assets/games/${game.folder}/card.webp', fit: BoxFit.cover, errorBuilder: (_, _, _) => _CardFallback(emoji: kFunGameEmoji[game.id] ?? section.emoji)),
             Positioned(
               left: 8,
               right: 8,
@@ -197,6 +261,20 @@ class _GameCard extends StatelessWidget {
           ]),
         ),
       ),
+    );
+  }
+}
+
+/// Used while a game has no picture of its own: a soft glow with one big emoji, so the card still looks like a game and not an empty box.
+class _CardFallback extends StatelessWidget {
+  final String emoji;
+  const _CardFallback({required this.emoji});
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(gradient: RadialGradient(center: Alignment(0, -0.2), radius: 0.9, colors: [Color(0x55FFFFFF), Color(0x00FFFFFF)])),
+      child: Center(child: Padding(padding: const EdgeInsets.only(bottom: 26), child: FittedBox(fit: BoxFit.scaleDown, child: Text(emoji, style: const TextStyle(fontSize: 84))))),
     );
   }
 }
