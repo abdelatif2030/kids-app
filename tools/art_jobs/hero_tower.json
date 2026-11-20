@@ -1,0 +1,67 @@
+{
+ "style": "2D hand-painted fantasy mobile game character art, bold dark outlines, cel shaded, rich saturated colors, kid friendly, no text.",
+ "kind_sprite": "Single subject centered, plain white background, no ground shadow, no text.",
+ "suffix": "",
+ "jobs": [
+  {
+   "name": "hero",
+   "kind": "sprite",
+   "prompt": "A little armored knight with a blue steel helmet with a white plume, blue cape, round shield, holding a long golden sword. Seen in strict side profile facing RIGHT, full body."
+  },
+  {
+   "name": "foe_slime",
+   "kind": "sprite",
+   "prompt": "A cute green slime blob with two big eyes and a small smile, glossy, small. Seen in strict side profile facing LEFT, full body."
+  },
+  {
+   "name": "foe_goblin",
+   "kind": "sprite",
+   "prompt": "A small cute green goblin with pointy ears, leather vest and a wooden club. Seen in strict side profile facing LEFT, full body."
+  },
+  {
+   "name": "foe_skeleton",
+   "kind": "sprite",
+   "prompt": "A small cute skeleton warrior with a red helmet, a round wooden shield and a short sword. Seen in strict side profile facing LEFT, full body."
+  },
+  {
+   "name": "foe_imp",
+   "kind": "sprite",
+   "prompt": "A small cute red imp with tiny yellow horns, little bat wings and a mischievous grin. Seen in strict side profile facing LEFT, full body."
+  },
+  {
+   "name": "foe_orc",
+   "kind": "sprite",
+   "prompt": "A strong cute green orc warrior in dark red armor with white tusks and a big axe. Seen in strict side profile facing LEFT, full body."
+  },
+  {
+   "name": "boss_troll",
+   "kind": "sprite",
+   "prompt": "A giant gray-green stone troll with white tusks, mossy rocky skin, huge arms, holding a big wooden club. Grumpy but cute, not scary. Seen in strict side profile facing LEFT, full body."
+  },
+  {
+   "name": "boss_sorcerer",
+   "kind": "sprite",
+   "prompt": "A dark sorcerer in purple robes and a tall pointed hat, long white beard, holding a staff with a glowing pink orb. Mysterious but kid friendly. Seen in strict side profile facing LEFT, full body."
+  },
+  {
+   "name": "boss_dragon",
+   "kind": "sprite",
+   "prompt": "A big red dragon with spread wings, golden belly, white horns, breathing a small flame. Cute-fierce, kid friendly. Seen in strict side profile facing LEFT, full body."
+  },
+  {
+   "name": "sky_castle",
+   "kind": "scene",
+   "prompt": "A magical fantasy sunset sky behind a distant castle: purple and pink clouds, glowing orange horizon, distant misty hills, no characters, wide panoramic."
+  },
+  {
+   "name": "sky_ice",
+   "kind": "scene",
+   "prompt": "A frozen snowy mountain landscape at dawn, icy blue peaks and glaciers, pale pink clouds, an empty wide scenery with absolutely no people, no characters and no creatures."
+  },
+  {
+   "name": "sky_fire",
+   "kind": "scene",
+   "prompt": "A dramatic fiery fantasy sky: deep purple and orange clouds, glowing red horizon, distant dark volcano mountains, no characters, wide panoramic."
+  }
+ ]
+}

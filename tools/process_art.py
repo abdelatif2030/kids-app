@@ -20,9 +20,13 @@ def cut_white(im, tol=34):
     bg = [[False] * w for _ in range(h)]
     dq = deque()
 
+    # the background colour = the average of the four corners (white for most pictures, dark for some)
+    cs = [px[0, 0], px[w - 1, 0], px[0, h - 1], px[w - 1, h - 1]]
+    bgc = tuple(sum(c[i] for c in cs) // 4 for i in range(3))
+
     def near(x, y):
         r, g, b = px[x, y]
-        return r > 255 - tol and g > 255 - tol and b > 255 - tol
+        return abs(r - bgc[0]) < tol and abs(g - bgc[1]) < tol and abs(b - bgc[2]) < tol
 
     for x in range(w):
         for y in (0, h - 1):

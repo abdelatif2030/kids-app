@@ -6,7 +6,8 @@
 // order matters. A troll waits halfway, a dark sorcerer at the top and a dragon on the roof. 2D canvas, all art and sound made in
 // code. Three chapters. No network, no links, no scores to lose.
 import { CHAPTERS, Tower, fmt, normalizeSave, TROLL_FLOOR, SORCERER_FLOOR } from './sim.js';
-import { paintSky, drawCloud, drawRoom, drawBase, poly, drawHero, drawFoe, drawBoss, drawItem, drawBubble, drawPoof, drawFire, THEMES } from './art.js';
+import { loadArt } from '../../cozy_kit/art.js';
+import { setArt, paintSky, drawCloud, drawRoom, drawBase, poly, drawHero, drawFoe, drawBoss, drawItem, drawBubble, drawPoof, drawFire, THEMES } from './art.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num } from './i18n.js';
 
@@ -82,6 +83,7 @@ class Game {
     this.easy = this.age <= 4;
     this.save = normalizeSave(config.save);
     this.base = config.base || './';
+    loadArt(this.base, ['hero', 'foe_slime', 'foe_goblin', 'foe_skeleton', 'foe_imp', 'foe_orc', 'boss_troll', 'boss_sorcerer', 'boss_dragon', 'sky_castle', 'sky_ice', 'sky_fire']).then((a) => { setArt(a); this.skyKey = ''; });
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
     if (!document.getElementById('ht-style')) document.head.append(h('style', { id: 'ht-style' }, CSS));

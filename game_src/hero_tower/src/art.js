@@ -3,6 +3,17 @@
 const OL = '#2b1b3d';
 const TAU = Math.PI * 2;
 
+// Optional generated pictures (assets/games/hero_tower/art/*.webp). Every picture is optional: with none loaded
+// everything below is drawn in code exactly as before.
+let ART = {};
+export function setArt(a) { ART = a || {}; }
+const FIT = { hero: 1.3, slime: 0.8, goblin: 0.95, skeleton: 1.0, imp: 0.95, orc: 1.1, troll: 1.4, sorcerer: 1.5, dragon: 1.45 }; // picture height / s
+function drawPic(g, img, x, y, h, maxW) {
+  let w = h * img.naturalWidth / img.naturalHeight;
+  if (w > maxW) { h *= maxW / w; w = maxW; }
+  g.drawImage(img, x - w / 2, y - h, w, h);
+}
+
 function ell(g, x, y, rx, ry, fill, lw = 0, rot = 0) {
   g.beginPath(); g.ellipse(x, y, Math.max(0.01, rx), Math.max(0.01, ry), rot, 0, TAU);
   if (fill) { g.fillStyle = fill; g.fill(); }
@@ -41,6 +52,8 @@ export function paintSky(w, h, theme) {
   const gr = g.createLinearGradient(0, 0, 0, h);
   gr.addColorStop(0, T.sky[0]); gr.addColorStop(0.55, T.sky[1]); gr.addColorStop(1, T.sky[2]);
   g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  const pic = ART['sky_' + theme];
+  if (pic) { const k = Math.max(w / pic.naturalWidth, h / pic.naturalHeight); const pw = pic.naturalWidth * k, ph = pic.naturalHeight * k; g.drawImage(pic, (w - pw) / 2, (h - ph) / 2, pw, ph); }
   // a big soft sun / moon and far hills
   g.fillStyle = 'rgba(255,255,255,0.18)'; g.beginPath(); g.arc(w * 0.78, h * 0.3, h * 0.13, 0, TAU); g.fill();
   g.fillStyle = T.far;
@@ -129,6 +142,12 @@ export function drawHero(g, x, y, s, time, pose = {}) {
   const bob = Math.sin(time * 3.2) * s * 0.015;
   const fl = pose.flip ? -1 : 1;
   g.save(); g.translate(x, y + bob); g.scale(fl, 1);
+  const pic = ART.hero;
+  if (pic) { // generated knight: faces right; lunges a little on the swing
+    const lunge = (pose.swing ?? 0) * s * 0.1;
+    g.translate(lunge, 0); if (pose.sad) g.rotate(-0.08);
+    drawPic(g, pic, 0, 0, s * FIT.hero, s * 1.3); g.restore(); return;
+  }
   const lw = Math.max(1.5, s * 0.03);
   // legs
   rr(g, -s * 0.15, -s * 0.2, s * 0.13, s * 0.2, s * 0.04, '#3a5ab8', lw); rr(g, s * 0.02, -s * 0.2, s * 0.13, s * 0.2, s * 0.04, '#3a5ab8', lw);
@@ -166,6 +185,8 @@ export function drawFoe(g, kind, x, y, s, time, face = 1, hit = 0) {
   if (hit >= 1) return;
   const bob = Math.sin(time * 3 + x * 0.05) * s * 0.02;
   g.save(); g.translate(x, y + bob); g.scale(face * (1 - hit * 0.5), 1 - hit * 0.5); g.rotate(hit * 0.6);
+  const pic = ART['foe_' + kind];
+  if (pic) { drawPic(g, pic, 0, 0, s * (FIT[kind] || 1), s * 1.1); g.restore(); return; }
   const lw = Math.max(1.5, s * 0.03);
   if (kind === 'slime') {
     const sq = 1 + Math.sin(time * 4 + x) * 0.06;
@@ -214,6 +235,8 @@ export function drawBoss(g, kind, x, y, s, time, hit = 0) {
   if (hit >= 1) return;
   const lw = Math.max(2, s * 0.025);
   g.save(); g.translate(x, y + Math.sin(time * 2) * s * 0.012); g.scale(1 - hit * 0.4, 1 - hit * 0.4); g.rotate(hit * 0.4);
+  const pic = ART['boss_' + kind];
+  if (pic) { drawPic(g, pic, 0, 0, s * (FIT[kind] || 1.4), s * 1.5); g.restore(); return; }
   if (kind === 'troll') {
     rr(g, -s * 0.3, -s * 0.3, s * 0.22, s * 0.3, s * 0.06, '#5a6a5a', lw); rr(g, s * 0.08, -s * 0.3, s * 0.22, s * 0.3, s * 0.06, '#5a6a5a', lw);
     ell(g, 0, -s * 0.52, s * 0.42, s * 0.34, '#7a8a78', lw);
