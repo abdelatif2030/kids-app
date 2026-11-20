@@ -1,0 +1,122 @@
+{
+ "style": "Vibrant mobile game store key art, glossy 3D cartoon, saturated colors, warm dramatic lighting, kid friendly, one clear hero character in the foreground over the game's main setting, centered composition.",
+ "kind_sprite": "",
+ "suffix": "IMPORTANT: absolutely no letters, no numbers, no words, no logos, no UI anywhere in the picture.",
+ "jobs": [
+  {
+   "name": "build",
+   "kind": "section",
+   "prompt": "A happy sunny cartoon farm village with fields of wheat, a red barn, windmill, beehives and baskets of fruit, a friendly farmer in the foreground. No signs, no shop boards, no writing on any object."
+  },
+  {
+   "name": "alien_sky",
+   "kind": "card",
+   "prompt": "A small colorful racer craft zooming through a neon alien sky among floating crystal islands and glowing rings, pink and green nebula."
+  },
+  {
+   "name": "archer_bridge",
+   "kind": "card",
+   "prompt": "A cute hero archer with a glowing bow on a fiery stone bridge over lava, facing friendly goblins, sparks and embers."
+  },
+  {
+   "name": "ball_scoop",
+   "kind": "card",
+   "prompt": "A chunky yellow truck scooping a huge pile of colorful balls on a plank bridge over a teal sea with white clouds."
+  },
+  {
+   "name": "castaway_raft",
+   "kind": "card",
+   "prompt": "A castaway kid on a wooden raft with a hook collecting floating barrels and planks on a tropical sea, palm island, sunset."
+  },
+  {
+   "name": "chomp_maze",
+   "kind": "card",
+   "prompt": "A round yellow hungry hero chomping glowing dots in a neon blue maze with friendly colorful ghosts chasing."
+  },
+  {
+   "name": "cloud_dash",
+   "kind": "card",
+   "prompt": "A cute runner dashing on a pastel cloud path through the sky with sparkles and a rainbow, three lanes."
+  },
+  {
+   "name": "creator_tycoon",
+   "kind": "card",
+   "prompt": "A young creator at a futuristic desk with glowing screens making videos, golden stars and hearts popping, cozy studio."
+  },
+  {
+   "name": "dune_titans",
+   "kind": "card",
+   "prompt": "A giant monster truck racing through golden desert dunes with a dust cloud, canyon and sunset, other trucks behind."
+  },
+  {
+   "name": "fizz_runner",
+   "kind": "card",
+   "prompt": "A cheerful original hero in a blue and white suit running through a bright city street with bubbly soda fizz splashes and bottle caps."
+  },
+  {
+   "name": "hamster_warrior",
+   "kind": "card",
+   "prompt": "A tiny brave hamster warrior with a brown nut-shell helmet and a wooden stick running along a dirt forest path toward a friendly green sprout monster, floating power numbers shown as glowing orbs."
+  },
+  {
+   "name": "hero_tower",
+   "kind": "card",
+   "prompt": "A knight standing at the foot of a tall stone tower with glowing ladders going up, a dragon on the roof, magic crystals and coins."
+  },
+  {
+   "name": "honey_farm",
+   "kind": "card",
+   "prompt": "A cute beekeeper bear among colorful beehives and flower fields collecting golden honey jars, bees buzzing, warm sun."
+  },
+  {
+   "name": "ice_dragon",
+   "kind": "card",
+   "prompt": "A friendly ice dragon curled around a frozen tunnel path with glowing blue crystals in a snowy mountain valley, northern lights."
+  },
+  {
+   "name": "marble_dozer",
+   "kind": "card",
+   "prompt": "A little yellow bulldozer pushing a pile of shiny colorful marbles toward a big funnel in a playful toy arena."
+  },
+  {
+   "name": "pearl_divers",
+   "kind": "card",
+   "prompt": "Cute divers in a tropical lagoon opening glowing clams with pearls, a little boat and a pink yacht above the water, bubbles."
+  },
+  {
+   "name": "rain_circuit",
+   "kind": "card",
+   "prompt": "A rally car splashing through puddles on a rainy racing circuit with wet reflections, storm clouds, spectators with umbrellas."
+  },
+  {
+   "name": "rhino_summit",
+   "kind": "card",
+   "prompt": "A strong cute rhino racing up a snowy mountain trail with boulders and flags, determined, bright sunrise."
+  },
+  {
+   "name": "sky_capy",
+   "kind": "card",
+   "prompt": "A cute capybara pilot in goggles flying a little propeller plane through golden clouds and shooting stars, a friendly bird beside."
+  },
+  {
+   "name": "squad_shooter",
+   "kind": "card",
+   "prompt": "A squad of cute heroes in colorful armor with bubble blasters on a neon night road facing funny green blobs, glowing barrels."
+  },
+  {
+   "name": "sunset_highway",
+   "kind": "card",
+   "prompt": "A bright convertible weaving through traffic on a sunset highway with an orange sky, palm trees and long shadows."
+  },
+  {
+   "name": "winter_camp",
+   "kind": "card",
+   "prompt": "A cozy snowy camp with a campfire, tents, penguins and kids in warm clothes building a snowman, pine trees, northern lights."
+  },
+  {
+   "name": "sky_jumper",
+   "kind": "card",
+   "prompt": "A bouncy little frog hero jumping up on cloud platforms high above colorful hills with stars and a rainbow."
+  }
+ ]
+}

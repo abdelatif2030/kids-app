@@ -34,37 +34,37 @@
    "prompt": "A sparkly pink boutique with a stylish cartoon girl in a dress, a crown, shoes and ribbons, hearts and glitter."
   },
   {
-   "name": "hub",
+   "name": "bg_hub",
    "kind": "bg",
    "prompt": "A magical kids' amusement park at golden hour seen from a wide hill: a giant Ferris wheel, a roller coaster loop, colorful tents, a racing track, a small castle and floating balloons in the distance, soft glowing sky, no characters in the foreground, plenty of empty space in the middle for menu buttons."
   },
   {
-   "name": "racing",
+   "name": "bg_racing",
    "kind": "bg",
    "prompt": "A sunny racing circuit panorama: curved asphalt road with red-white curbs, grandstands with cheering crowd, palm trees and the sea, speed banners, no vehicles, empty space in the middle."
   },
   {
-   "name": "action",
+   "name": "bg_action",
    "kind": "bg",
    "prompt": "An epic cartoon battle arena panorama with stone towers, glowing crystals, banners and light beams in a purple and orange sky, no characters, empty space in the middle."
   },
   {
-   "name": "runners",
+   "name": "bg_runners",
    "kind": "bg",
    "prompt": "A colorful floating-islands platformer world panorama with jungle vines, golden coins, clouds and rainbow, bright cyan sky, no characters, empty space in the middle."
   },
   {
-   "name": "build",
+   "name": "bg_build",
    "kind": "bg",
    "prompt": "A cozy sunny village panorama with wheat fields, a red barn, windmill, beehives, small shops and orchards, warm morning light, no characters, empty space in the middle."
   },
   {
-   "name": "puzzle",
+   "name": "bg_puzzle",
    "kind": "bg",
    "prompt": "A playful dreamy puzzle world panorama with floating colorful blocks, glowing marbles, soft pastel gradients, stars and sparkles in a blue-violet sky, no characters, empty space in the middle."
   },
   {
-   "name": "girls",
+   "name": "bg_girls",
    "kind": "bg",
    "prompt": "A sparkly pink princess boutique panorama with a glittering runway, curtains, hearts, ribbons, mannequins with dresses and soft bokeh lights, no characters, empty space in the middle."
   },

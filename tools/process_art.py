@@ -10,7 +10,7 @@ game = sys.argv[1]
 spec = json.load(open(f'tools/art_jobs/{game}.json', encoding='utf8'))
 src = f'game_src/_generated_images/{game}'
 out = f'assets/games/{game}/art'
-if game != 'cards': os.makedirs(out, exist_ok=True)
+if not game.startswith('cards'): os.makedirs(out, exist_ok=True)
 
 
 def cut_white(im, tol=34):
@@ -55,7 +55,7 @@ for j in spec['jobs']:
     if k == 'bg':   # page backgrounds for the fun-games hub and each section: 16:9
         im = im.convert('RGB'); w, h = im.size; ch = int(w / 1.78); top = int((h - ch) * 0.5)
         im = im.crop((0, top, w, top + ch)).resize((1024, 576), Image.LANCZOS)
-        dest = f'assets/games/sections/bg_{j["name"]}.webp'; os.makedirs(os.path.dirname(dest), exist_ok=True)
+        dest = f'assets/games/sections/{j["name"]}.webp'; os.makedirs(os.path.dirname(dest), exist_ok=True)
         im.save(dest, 'WEBP', quality=80); print('ok bg', j['name'], os.path.getsize(dest) // 1024, 'KB'); continue
     if k in ('card', 'section'):   # menu pictures: crop to the tile's shape and save where the sections screen looks for them
         ratio, size, dest = (1.247, (480, 385), f'assets/games/{j["name"]}/card.webp') if k == 'card' else (1.7, (640, 376), f'assets/games/sections/{j["name"]}.webp')
