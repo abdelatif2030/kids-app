@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>جمل عامة 1 (تشجيع وألعاب أخرى وأرقام)</title>
+<style>
+  :root{--bg:#1d1250;--card:#2b1f78;--gold:#ffd23a;--ok:#2fbf5a;--rec:#e8384a;--ink:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,"Segoe UI",system-ui,sans-serif;direction:rtl}
+  header{position:sticky;top:0;z-index:5;background:#140b3a;border-bottom:3px solid var(--gold);padding:10px 14px}
+  h1{margin:0 0 6px;font-size:20px;color:var(--gold)}
+  .bar{height:12px;border-radius:8px;background:#3b2e90;overflow:hidden}.bar b{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+  .top{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+  button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:9px 14px;cursor:pointer;color:#fff;background:#3b6fd8;min-height:42px}
+  button.rec{background:var(--rec)}button.ok{background:var(--ok)}button.ghost{background:#4a3aa8}button.del{background:#6a2a50}
+  button:disabled{opacity:.4;cursor:default}
+  main{padding:10px 12px 90px;max-width:900px;margin:auto}
+  .row{background:var(--card);border:2px solid #4a3aa8;border-radius:16px;padding:12px;margin:10px 0}
+  .row.done{border-color:var(--ok)}.row.live{border-color:var(--rec);box-shadow:0 0 0 3px #e8384a55}
+  .t{font-size:26px;font-weight:900;line-height:1.5}.r{font-size:15px;opacity:.8;margin-top:2px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.st{font-size:14px;opacity:.9}
+  .note{background:#3b2e90;border-radius:12px;padding:10px;font-size:15px;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ __TITLE__</h1>
+  <div class="bar"><b id="prog"></b></div>
+  <div class="top"><span id="count"></span>
+    <span><button class="ok" id="zip">⬇️ تنزيل تسجيلاتي (ملف واحد)</button> <button class="del" id="wipe">🗑️ مسح الكل</button></span></div>
+</header>
+<main>
+  <div class="note">اضغط <b>● سجّل</b>، اقرا الجملة بصوتك بهدوء وبصوت طفل مرح، واضغط <b>■ وقّف</b>. تسمع تسجيلك بـ <b>▶ تسجيلي</b> وتقارنه بالصوت الحالي بـ <b>▶ الحالي</b>. التسجيلات بتتحفظ في المتصفح لوحدها، تقدر تقفل وتكمل بعدين. لما تخلص اضغط «تنزيل تسجيلاتي» وابعتلي الملف.</div>
+  <div id="list"></div>
+</main>
+<script>
+const GROUP = "g01_general";
+const ITEMS = [{"id":"32103970","text":"آخد دُش","reading":"آخُد دُشّ"},{"id":"390a3dca","text":"أتعشّى","reading":"أَتْعَشَّى"},{"id":"aba1761a","text":"أتغدّى","reading":"أَتْغَدَّى"},{"id":"af328cb4","text":"اتناشر","reading":"اِتْنَاشَرْ"},{"id":"d460cbba","text":"اتنين","reading":"اتْنِينْ"},{"id":"876e381b","text":"اتنين وعشرين","reading":"اتْنِينْ وَعِشْرِين"},{"id":"8c4be6ea","text":"أتوبيس","reading":"أُتُوبِيس"},{"id":"dae3cb99","text":"إجابة صحيحة!","reading":"إِجَابَة صَحِيحَة!"},{"id":"257708cf","text":"أحسنت!","reading":"أَحْسَنْت!"},{"id":"8c94fd1e","text":"أحسنت! كمّلت النمط","reading":"أَحْسَنْت! كَمَّلْت النَّمَط"},{"id":"f81fa417","text":"أحسنت! لقيت الكورة","reading":"أَحْسَنْت! لْقِيت الكُورَة"},{"id":"473cc3b2","text":"أحسنتي!","reading":"أَحْسَنْتِي!"},{"id":"73994e2a","text":"أحسنتي! كمّلتي النمط","reading":"أَحْسَنْتِي! كَمَّلْتِي النَّمَط"},{"id":"aeb521a7","text":"أحسنتي! لقيتي الكورة","reading":"أَحْسَنْتِي! لْقِيتِي الكُورَة"},{"id":"9bcc7ff5","text":"اختار المستوى","reading":"اِخْتَار المُسْتَوَى"},{"id":"223ebc52","text":"اختار شخصيتك!","reading":"اِخْتَار شَخْصِيِّتَك!"},{"id":"f4dc849c","text":"أربعة","reading":"أَرْبَعَة"},{"id":"f9af3209","text":"أربعة وعشرين","reading":"أَرْبَعَة وَعِشْرِين"},{"id":"b9f5a85f","text":"أربعتاشر","reading":"أَرْبَعْتَاشَر"},{"id":"6f48ae4b","text":"أرنب","reading":"أَرْنَب"},{"id":"20f68c6a","text":"أروح الحضانة","reading":"أَرُوح الحَضَانَة"},{"id":"3aa50fff","text":"اسحب الحاجة للسلة، أو دوس على السلة","reading":"اسْحَب الحَاجَة لِلسَّلَّة، أَو دُوس عَلَى السَّلَّة"},{"id":"7a1811c4","text":"اسمع الببغاء وادور على الكنز!","reading":"اسْمَع البَبَّغَاء وَادَوَّر عَلَى الكَنْز!"},{"id":"57e00702","text":"اسمع تاني","reading":"اسْمَع تَانِي"},{"id":"f23148ce","text":"أصحى من النوم","reading":"أَصْحَى مِن النَّوْم"},{"id":"ea16f8e2","text":"أطعم الحيوان","reading":"أَطْعِم الحَيَوَان"},{"id":"f523c96c","text":"أغسل سناني","reading":"أَغْسِل سِنَانِي"},{"id":"24dc516f","text":"أغسل وشّي","reading":"أَغْسِل وِشِّي"},{"id":"f62cabdf","text":"أفطر","reading":"أَفْطَر"},{"id":"bd67e099","text":"الأتوبيس عربيات!","reading":"الأُتُوبِيس عَرَبِيَّات!"},{"id":"1623ce68","text":"الأحمر والأبيض بيعملوا اللون الوردي","reading":"الأَحْمَر وَالأَبْيَض بِيعْمِلُوا اللَّوْن الوَرْدِي"},{"id":"c3bc24ca","text":"الأحمر والأزرق بيعملوا اللون البنفسجي","reading":"الأَحْمَر وَالأَزْرَق بِيعْمِلُوا اللَّوْن البَنَفْسَجِي"},{"id":"5789f1d0","text":"الأرنب حيوانات!","reading":"الأَرْنَب حَيَوَانَات!"},{"id":"a1b28f8f","text":"الأزرق والأصفر بيعملوا اللون الأخضر","reading":"الأَزْرَق وَالأَصْفَر بِيعْمِلُوا اللَّوْن الأَخْضَر"},{"id":"3f43d836","text":"البرتقانة فاكهة!","reading":"البُرْتُقَانَة فَاكْهَة!"},{"id":"d0bd7e81","text":"البطيخ فاكهة!","reading":"البِطِّيخ فَاكْهَة!"},{"id":"f0713278","text":"التفاحة فاكهة!","reading":"التُّفَّاحَة فَاكْهَة!"},{"id":"2aeba12a","text":"الحساب والعدّ","reading":"الحِسَاب وَالعَدّ"},{"id":"c86d5e5e","text":"الدبدوب لعب!","reading":"الدُّبْدُوب لُعَبْ!"},{"id":"3d30e0ba","text":"الدبدوب وصل الأول! أحسنتم","reading":"الدُّبْدُوب وِصِل الأَوَّل! أَحْسَنْتُم"},{"id":"4c1b514a","text":"الرف خلص! أحسنت","reading":"الرَّفّ خِلِص! أَحْسَنْت"},{"id":"2721b9a8","text":"السلالم والزلاجات","reading":"السَّلَالِم وَالزَّلَّاجَات"},{"id":"c68e7a71","text":"السمكة حيوانات!","reading":"السَّمَكَة حَيَوَانَات!"},{"id":"1ff1f0af","text":"الضفدع حيوانات!","reading":"الضِّفْدَع حَيَوَانَات!"},{"id":"ffbdccd4","text":"الطبلة لعب!","reading":"الطَّبْلَة لُعَب!"},{"id":"90ecaa62","text":"الطيارة عربيات!","reading":"الطَّيَّارَة عَرَبِيَّات!"},{"id":"a871afe5","text":"ألعب","reading":"أَلْعَب"},{"id":"26a85094","text":"العب معانا تاني","reading":"اِلْعَب مَعَانَا تَانِي"},{"id":"8fd27b0d","text":"العربية عربيات!","reading":"العَرَبِيَّة عَرَبِيَّات!"},{"id":"402d9b61","text":"العنب فاكهة!","reading":"العِنَب فَاكْهَة!"},{"id":"da5eb636","text":"الفراولة فاكهة!","reading":"الفَرَاوْلَة فَاكْهَة!"},{"id":"0b4e6584","text":"القطة حيوانات!","reading":"القِطَّة حَيَوَانَات!"},{"id":"e28a17ac","text":"القطر عربيات!","reading":"القَطْر عَرَبِيَّات!"},{"id":"e747cb90","text":"الكتكوت حيوانات!","reading":"الكَتْكُوت حَيَوَانَات!"},{"id":"13396b03","text":"الكمثرى فاكهة!","reading":"الكُمَّثْرَى فَاكْهَة!"},{"id":"93be4946","text":"الكنز تحت البركة","reading":"الكَنْز تَحْت البِرْكَة"},{"id":"e02b11c3","text":"الكنز تحت الصخرة","reading":"الكَنْز تَحْت الصَّخْرَة"},{"id":"924ae31e","text":"الكنز تحت العلم","reading":"الكَنْز تَحْت العَلَم"},{"id":"e0859c8d","text":"الكنز تحت الكوخ","reading":"الكَنْز تَحْت الكُوخ"},{"id":"a9e1fc05","text":"الكنز تحت النخلة","reading":"الكَنْز تَحْت النَّخْلَة"},{"id":"f65140e2","text":"الكنز جنب البركة","reading":"الكَنْز جَنْب البِرْكَة"},{"id":"0b593a2f","text":"الكنز جنب الصخرة","reading":"الكَنْز جَنْب الصَّخْرَة"},{"id":"9a59847a","text":"الكنز جنب العلم","reading":"الكَنْز جَنْب العَلَم"},{"id":"670aa591","text":"الكنز جنب الكوخ","reading":"الكَنْز جَنْب الكُوخ"},{"id":"b9d884b9","text":"الكنز جنب النخلة","reading":"الكَنْز جَنْب النَّخْلَة"},{"id":"b44ec5f5","text":"الكنز شمال البركة","reading":"الكَنْز شِمَال البِرْكَة"},{"id":"6304f620","text":"الكنز شمال الصخرة","reading":"الكَنْز شِمَال الصَّخْرَة"},{"id":"de8a1fa1","text":"الكنز شمال العلم","reading":"الكَنْز شِمَال العَلَم"},{"id":"0dbcf50a","text":"الكنز شمال الكوخ","reading":"الكَنْز شِمَال الكُوخ"},{"id":"a3db2b22","text":"الكنز شمال النخلة","reading":"الكَنْز شِمَال النَّخْلَة"},{"id":"25de5b6b","text":"الكنز فوق البركة","reading":"الكَنْز فُوق البِرْكَة"},{"id":"2cb686de","text":"الكنز فوق الصخرة","reading":"الكَنْز فُوق الصَّخْرَة"},{"id":"2a0be73b","text":"الكنز فوق العلم","reading":"الكَنْز فُوق العَلَم"},{"id":"74be7804","text":"الكنز فوق الكوخ","reading":"الكَنْز فُوق الكُوخ"},{"id":"3b3ff5b4","text":"الكنز فوق النخلة","reading":"الكَنْز فُوق النَّخْلَة"},{"id":"221e2c4f","text":"الكنز في نفس صف البركة","reading":"الكَنْز فِي نَفْس صَفّ البِرْكَة"},{"id":"2c583632","text":"الكنز في نفس صف الصخرة","reading":"الكَنْز فِي نَفْس صَفّ الصَّخْرَة"},{"id":"979b1faf","text":"الكنز في نفس صف العلم","reading":"الكَنْز فِي نَفْس صَفّ العَلَم"},{"id":"0bce0430","text":"الكنز في نفس صف الكوخ","reading":"الكَنْز فِي نَفْس صَفّ الكُوخ"},{"id":"02079a80","text":"الكنز في نفس صف النخلة","reading":"الكَنْز فِي نَفْس صَفّ النَّخْلَة"},{"id":"d062e3cb","text":"الكنز في نفس عمود البركة","reading":"الكَنْز فِي نَفْس عَمُود البِرْكَة"},{"id":"916b2f7e","text":"الكنز في نفس عمود الصخرة","reading":"الكَنْز فِي نَفْس عَمُود الصَّخْرَة"},{"id":"0866ac9b","text":"الكنز في نفس عمود العلم","reading":"الكَنْز فِي نَفْس عَمُود العَلَم"},{"id":"930b8fe4","text":"الكنز في نفس عمود الكوخ","reading":"الكَنْز فِي نَفْس عَمُود الكُوخ"},{"id":"151c5cd4","text":"الكنز في نفس عمود النخلة","reading":"الكَنْز فِي نَفْس عَمُود النَّخْلَة"},{"id":"11a00928","text":"الكنز يمين البركة","reading":"الكَنْز يِمِين البِرْكَة"},{"id":"68fc869d","text":"الكنز يمين الصخرة","reading":"الكَنْز يِمِين الصَّخْرَة"},{"id":"e43c6184","text":"الكنز يمين العلم","reading":"الكَنْز يِمِين العَلَم"},{"id":"8cda82cb","text":"الكنز يمين الكوخ","reading":"الكَنْز يِمِين الكُوخ"},{"id":"35a4ce7b","text":"الكنز يمين النخلة","reading":"الكَنْز يِمِين النَّخْلَة"},{"id":"02dcbe64","text":"الكورة تحت الترابيزة","reading":"الكُورَة تَحْت التَّرَابِيزَة"},{"id":"e759c7c0","text":"الكورة جنب الترابيزة","reading":"الكُورَة جَنْب التَّرَابِيزَة"},{"id":"32127f55","text":"الكورة جنب الصندوق","reading":"الكُورَة جَنْب الصُّنْدُوق"},{"id":"3588ee8b","text":"الكورة جوه الصندوق","reading":"الكُورَة جُوَّه الصُّنْدُوق"},{"id":"cfeb85ad","text":"الكورة فوق الترابيزة","reading":"الكُورَة فُوق التَّرَابِيزَة"},{"id":"91be9652","text":"الكورة لعب!","reading":"الكُورَة لُعَب!"},{"id":"6719af70","text":"المركب عربيات!","reading":"المَرْكَب عَرَبِيَّات!"},{"id":"0bc5e6b1","text":"المستوى التالي","reading":"المُسْتَوَى التَّالِي"},{"id":"9c0da602","text":"المستويات","reading":"المُسْتَوَيَات"},{"id":"fc7823c5","text":"المكعبات لعب!","reading":"المُكَعَّبَات لُعَب!"},{"id":"1b837d33","text":"الموزة فاكهة!","reading":"المَوْزَة فَاكْهَة!"},{"id":"4737d07f","text":"اليويو لعب!","reading":"اليُويُو لُعَب!"},{"id":"94aaef1f","text":"أنام","reading":"أَنَام"},{"id":"98a77809","text":"أنت بطل!","reading":"أَنْت بَطَل!"},{"id":"05217221","text":"إنتي بطلة!","reading":"إِنْتِي بَطَلَة!"},{"id":"9fc5cf51","text":"أين الشكل؟","reading":"أَيْن الشَّكْل؟"},{"id":"46529b4b","text":"إيه الحرف اللي قبل الألف؟","reading":"إِيه الحَرْف اللِّي قَبْل الأَلِف؟"},{"id":"1ef5589c","text":"إيه الخرزة اللي جاية؟","reading":"إِيه الخَرَزَة اللِّي جَايَة؟"},{"id":"cc891a39","text":"إيه أول حاجة؟","reading":"إِيه أَوِّل حَاجَة؟"},{"id":"56a47511","text":"برتقانة","reading":"بُرْتُقَانَة"},{"id":"a247894e","text":"بطيخ","reading":"بِطِّيخ"},{"id":"d0afec0c","text":"بوبي خبّى الكورة! اسمع وقول هي فين","reading":"بُوبِي خَبَّى الكُورَة! اسْمَع وَقُول هِيَّ فِينْ"},{"id":"564636a5","text":"تسعة","reading":"تِسْعَة"},{"id":"e453aef2","text":"تسعة وعشرين","reading":"تِسْعَة وَعِشْرِين"},{"id":"1351d62a","text":"تسعتاشر","reading":"تِسَعْتَاشَر"},{"id":"8c4bac77","text":"تفاحة","reading":"تُفَّاحَة"},{"id":"cdff372c","text":"تلاتاشر","reading":"تَلَاتَاشَرْ"},{"id":"54eed2cd","text":"تلاتة","reading":"تَلَاتَة"},{"id":"d94e5cba","text":"تلاتة وعشرين","reading":"تَلَاتَة وَعِشْرِين"},{"id":"6c1caa12","text":"تلاتين","reading":"تَلَاتِين"}];
+const CURRENT = (id) => `../assets/assets/games/learn_voice/ar/${id}.mp3`;  // the voice that is in the app now (works on the demo site)
+let db, mediaRec, stream, chunks = [], curId = null, audio = new Audio();
+
+function openDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('rehlaty_voice', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('rec');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+const tx = (mode) => db.transaction('rec', mode).objectStore('rec');
+const key = (id) => GROUP + '|' + id;
+const get = (id) => new Promise((res) => { const q = tx('readonly').get(key(id)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); });
+const put = (id, v) => new Promise((res) => { const q = tx('readwrite').put(v, key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const del = (id) => new Promise((res) => { const q = tx('readwrite').delete(key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const done = new Set();
+
+function ext(type) { return /webm/.test(type) ? 'webm' : /ogg/.test(type) ? 'ogg' : /mp4|aac|m4a/.test(type) ? 'm4a' : /wav/.test(type) ? 'wav' : 'bin'; }
+function refresh() {
+  document.getElementById('count').textContent = `سجّلت ${done.size} من ${ITEMS.length}`;
+  document.getElementById('prog').style.width = (100 * done.size / ITEMS.length) + '%';
+}
+function build() {
+  const list = document.getElementById('list');
+  ITEMS.forEach((it, i) => {
+    const d = document.createElement('div'); d.className = 'row'; d.id = 'r_' + it.id;
+    d.innerHTML = `<div class="t">${i + 1}. ${it.text.replace(/</g, '&lt;')}</div>${it.reading && it.reading !== it.text ? `<div class="r">تُقرأ: ${it.reading.replace(/</g, '&lt;')}</div>` : ''}
+      <div class="btns"><button class="rec" data-a="rec">● سجّل</button><button class="ghost" data-a="mine" disabled>▶ تسجيلي</button><button class="ghost" data-a="cur">▶ الحالي</button><button class="del" data-a="del" disabled>🗑️</button><span class="st"></span></div>`;
+    d.addEventListener('click', (e) => { const a = e.target.dataset && e.target.dataset.a; if (a) act(it, d, e.target, a); });
+    list.appendChild(d);
+  });
+}
+function mark(d, on) {
+  d.classList.toggle('done', on);
+  d.querySelector('[data-a=mine]').disabled = !on; d.querySelector('[data-a=del]').disabled = !on;
+  d.querySelector('.st').textContent = on ? '✓ اتسجلت' : '';
+}
+async function act(it, d, btn, a) {
+  if (a === 'cur') { audio.pause(); audio = new Audio(CURRENT(it.id)); audio.play().catch(() => { d.querySelector('.st').textContent = 'الصوت الحالي مش متاح هنا'; }); return; }
+  if (a === 'mine') { const v = await get(it.id); if (v) { audio.pause(); audio = new Audio(URL.createObjectURL(v.blob)); audio.play(); } return; }
+  if (a === 'del') { await del(it.id); done.delete(it.id); mark(d, false); refresh(); return; }
+  if (a === 'rec') {
+    if (mediaRec && mediaRec.state === 'recording') { mediaRec.stop(); return; }
+    try { stream = stream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { alert('محتاج إذن الميكروفون. اسمح للمتصفح باستخدام الميكروفون وجرّب تاني.'); return; }
+    audio.pause(); chunks = []; curId = it.id;
+    const opts = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? { mimeType: 'audio/webm;codecs=opus' } : {};
+    mediaRec = new MediaRecorder(stream, opts);
+    mediaRec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mediaRec.onstop = async () => {
+      d.classList.remove('live'); btn.textContent = '● سجّل'; btn.classList.add('rec');
+      const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+      if (blob.size < 1500) { d.querySelector('.st').textContent = 'التسجيل قصير أوي، جرّب تاني'; return; }
+      await put(it.id, { blob, type: blob.type, text: it.text, at: Date.now() });
+      done.add(it.id); mark(d, true); refresh();
+      const nx = d.nextElementSibling; if (nx) nx.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    d.classList.add('live'); btn.textContent = '■ وقّف'; d.querySelector('.st').textContent = 'بيسجّل...';
+    mediaRec.start();
+  }
+}
+// a tiny zip writer (stored, no compression) so no library is needed
+function crc32(buf) { let c, crc = -1; for (let i = 0; i < buf.length; i++) { c = (crc ^ buf[i]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ -1) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(); const parts = []; const central = []; let off = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name); const crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30)); lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46)); ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), name); off += 30 + name.length + f.data.length;
+  }
+  let csize = 0; central.forEach((p) => csize += p.length);
+  const end = new DataView(new ArrayBuffer(22)); end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/zip' });
+}
+document.getElementById('zip').onclick = async () => {
+  const files = [], manifest = [];
+  for (const it of ITEMS) { const v = await get(it.id); if (!v) continue; const name = `${it.id}.${ext(v.type)}`; files.push({ name, data: new Uint8Array(await v.blob.arrayBuffer()) }); manifest.push({ id: it.id, text: it.text, file: name }); }
+  if (!files.length) { alert('لسه ما سجلتش حاجة'); return; }
+  files.push({ name: 'manifest.json', data: new TextEncoder().encode(JSON.stringify({ group: GROUP, items: manifest }, null, 1)) });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(files)); a.download = `rehlaty_voice_${GROUP}.zip`; a.click();
+};
+document.getElementById('wipe').onclick = async () => { if (!confirm('تمسح كل تسجيلات الصفحة دي؟')) return; for (const it of ITEMS) { await del(it.id); done.delete(it.id); mark(document.getElementById('r_' + it.id), false); } refresh(); };
+(async () => { db = await openDb(); build(); for (const it of ITEMS) { const v = await get(it.id); if (v) { done.add(it.id); mark(document.getElementById('r_' + it.id), true); } } refresh(); })();
+</script>
+</body>
+</html>

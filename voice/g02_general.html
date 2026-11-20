@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>جمل عامة 2 (تشجيع وألعاب أخرى وأرقام)</title>
+<style>
+  :root{--bg:#1d1250;--card:#2b1f78;--gold:#ffd23a;--ok:#2fbf5a;--rec:#e8384a;--ink:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,"Segoe UI",system-ui,sans-serif;direction:rtl}
+  header{position:sticky;top:0;z-index:5;background:#140b3a;border-bottom:3px solid var(--gold);padding:10px 14px}
+  h1{margin:0 0 6px;font-size:20px;color:var(--gold)}
+  .bar{height:12px;border-radius:8px;background:#3b2e90;overflow:hidden}.bar b{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+  .top{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+  button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:9px 14px;cursor:pointer;color:#fff;background:#3b6fd8;min-height:42px}
+  button.rec{background:var(--rec)}button.ok{background:var(--ok)}button.ghost{background:#4a3aa8}button.del{background:#6a2a50}
+  button:disabled{opacity:.4;cursor:default}
+  main{padding:10px 12px 90px;max-width:900px;margin:auto}
+  .row{background:var(--card);border:2px solid #4a3aa8;border-radius:16px;padding:12px;margin:10px 0}
+  .row.done{border-color:var(--ok)}.row.live{border-color:var(--rec);box-shadow:0 0 0 3px #e8384a55}
+  .t{font-size:26px;font-weight:900;line-height:1.5}.r{font-size:15px;opacity:.8;margin-top:2px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.st{font-size:14px;opacity:.9}
+  .note{background:#3b2e90;border-radius:12px;padding:10px;font-size:15px;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ __TITLE__</h1>
+  <div class="bar"><b id="prog"></b></div>
+  <div class="top"><span id="count"></span>
+    <span><button class="ok" id="zip">⬇️ تنزيل تسجيلاتي (ملف واحد)</button> <button class="del" id="wipe">🗑️ مسح الكل</button></span></div>
+</header>
+<main>
+  <div class="note">اضغط <b>● سجّل</b>، اقرا الجملة بصوتك بهدوء وبصوت طفل مرح، واضغط <b>■ وقّف</b>. تسمع تسجيلك بـ <b>▶ تسجيلي</b> وتقارنه بالصوت الحالي بـ <b>▶ الحالي</b>. التسجيلات بتتحفظ في المتصفح لوحدها، تقدر تقفل وتكمل بعدين. لما تخلص اضغط «تنزيل تسجيلاتي» وابعتلي الملف.</div>
+  <div id="list"></div>
+</main>
+<script>
+const GROUP = "g02_general";
+const ITEMS = [{"id":"87ec4534","text":"تمانية","reading":"تَمَانْيَة"},{"id":"6fc188c1","text":"تمانية وعشرين","reading":"تَمَانْيَة وَعِشْرِين"},{"id":"29711031","text":"تمنتاشر","reading":"تَمَنْتَاشَر"},{"id":"fcc304ec","text":"جميل أوي!","reading":"جَمِيل أَوِي!"},{"id":"e6463763","text":"جميلة أوي!","reading":"جَمِيلَة أَوِي!"},{"id":"0a85d7f2","text":"حداشر","reading":"أَحَدَ عَشَرَ"},{"id":"f751dba0","text":"حط كل حاجة في السلة بتاعتها!","reading":"حُطّ كُلّ حَاجَة فِي السَّلَّة بِتَاعْتَهَا!"},{"id":"3f19d6eb","text":"حلقة بنفسجي","reading":"حَلَقَة بَنَفْسَجِي"},{"id":"f7921f90","text":"حلوة أوي!","reading":"حِلْوَة أَوِي!"},{"id":"fb4bfe84","text":"خمسة","reading":"خَمْسَة"},{"id":"71a8b811","text":"خمسة وعشرين","reading":"خَمْسَة وَعِشْرِين"},{"id":"3d9c81f7","text":"خمستاشر","reading":"خَمَسْتَاشَر"},{"id":"02451203","text":"دبدوب","reading":"دُبْدُوب"},{"id":"746c98ad","text":"ده مكان مش للحفر","reading":"دَه مَكَان مِش لِلْحَفْر"},{"id":"366e0bfa","text":"دور الدبدوب","reading":"دَوْر الدُّبْدُوب"},{"id":"d8fc5b8c","text":"دورك! دوس على الزهر","reading":"دَوْرَك! دُوس عَلَى الزَّهْر"},{"id":"72dcc26f","text":"دورك! دوسي على الزهر","reading":"دَوْرِك! دُوسِي عَلَى الزَّهْر"},{"id":"b5d4b835","text":"دوس على المكان اللي فيه الكنز","reading":"دُوس عَلَى المَكَان اللِّي فِيه الكَنْز"},{"id":"b2a8d812","text":"دي قلب","reading":"دِي قَلْب"},{"id":"bcc14bb9","text":"دي قلب أحمر","reading":"دِي قَلْب أَحْمَر"},{"id":"affb2b30","text":"دي قلب أخضر","reading":"دِي قَلْب أَخْضَر"},{"id":"20502965","text":"دي قلب أزرق","reading":"دِي قَلْب أَزْرَق"},{"id":"92229eed","text":"دي قلب أصفر","reading":"دِي قَلْب أَصْفَر"},{"id":"47fd6f3f","text":"دي قلب برتقالي","reading":"دِي قَلْب بُرْتُقَالِي"},{"id":"5aab621b","text":"دي مثلث","reading":"دِي مُثَلَّث"},{"id":"6de6bb5a","text":"دي مثلث أحمر","reading":"دِي مُثَلَّث أَحْمَر"},{"id":"4ed5888b","text":"دي مثلث أخضر","reading":"دِي مُثَلَّث أَخْضَر"},{"id":"434b6e0e","text":"دي مثلث أزرق","reading":"دِي مُثَلَّث أَزْرَق"},{"id":"b6add436","text":"دي مثلث أصفر","reading":"دِي مُثَلَّث أَصْفَر"},{"id":"4ea61250","text":"دي مثلث برتقالي","reading":"دِي مُثَلَّث بُرْتُقَالِي"},{"id":"e9f2773e","text":"دي مربع","reading":"دِي مُرَبَّع"},{"id":"db72bdad","text":"دي مربع أحمر","reading":"دِي مُرَبَّع أَحْمَر"},{"id":"0a092114","text":"دي مربع أخضر","reading":"دِي مُرَبَّع أَخْضَر"},{"id":"f0c620e9","text":"دي مربع أزرق","reading":"دِي مُرَبَّع أَزْرَق"},{"id":"eccbbe99","text":"دي مربع أصفر","reading":"دِي مُرَبَّع أَصْفَر"},{"id":"ecd49593","text":"دي مربع برتقالي","reading":"دِي مُرَبَّع بُرْتُقَالِي"},{"id":"4aa17dab","text":"رتّب في مجموعات","reading":"رَتِّب فِي مَجْمُوعَاتْ"},{"id":"fb421e1e","text":"رتّب يومك! إيه اللي بيحصل الأول؟","reading":"رَتِّب يَوْمَك! إِيه اللِّي بِيْحْصَل الأَوَّل؟"},{"id":"d6887b4c","text":"رتّب يومي","reading":"رَتِّب يَوْمِي"},{"id":"6edaed46","text":"زحليقة! وييي","reading":"زَحْلِيقَة! وِييِي"},{"id":"d7fa9f07","text":"سبعة","reading":"سَبْعَة"},{"id":"560a05c0","text":"سبعة وعشرين","reading":"سَبْعَة وَعِشْرِين"},{"id":"ddc1dbbc","text":"سبعتاشر","reading":"سَبَعْتَاشَر"},{"id":"cbe8c89f","text":"ستاشر","reading":"سِتَّاشَرْ"},{"id":"725f223a","text":"ستة","reading":"سِتَّة"},{"id":"748ff59b","text":"ستة وعشرين","reading":"سِتَّة وَعِشْرِين"},{"id":"1e4c2e72","text":"سلّم! اطلع لفوق","reading":"سُلَّم! اطْلَع لِفُوق"},{"id":"81d2f882","text":"سمكة","reading":"سَمَكَة"},{"id":"3e370f6b","text":"شاطر أوي!","reading":"شَاطِر أَوِي!"},{"id":"3c69fff1","text":"شاطر أوي! خدت نجمة جديدة!","reading":"شَاطِر أَوِي! خَدْت نَجْمَة جْدِيدَة!"},{"id":"379582b4","text":"ضفدع","reading":"ضِفْدَع"},{"id":"fb5d6011","text":"طبلة","reading":"طَبْلَة"},{"id":"5cd47989","text":"طيارة","reading":"طَيَّارَة"},{"id":"4f234905","text":"عالم رحلتي التعليمي","reading":"عَالَم رِحْلَتِي التَّعْلِيمِي"},{"id":"0cd989d6","text":"عربية","reading":"عَرَبِيَّة"},{"id":"2d241679","text":"عشرة","reading":"عَشَرَة"},{"id":"d21e9f46","text":"عشرين","reading":"عِشْرِين"},{"id":"9675e6f7","text":"عظيم!","reading":"عَظِيم!"},{"id":"cdd47aca","text":"عظيمة!","reading":"عَظِيمَة!"},{"id":"5f9e4766","text":"عنب","reading":"عِنَب"},{"id":"4f1070ea","text":"عندك أربع سنين","reading":"عِنْدَك أَرْبَع سِنِين"},{"id":"dc7b6ead","text":"عندك تلات سنين","reading":"عِنْدَك تَلَات سِنِين"},{"id":"9e533cae","text":"عندك خمس سنين","reading":"عِنْدَك خَمْس سِنِين"},{"id":"e5a055a4","text":"عندك ست سنين","reading":"عِنْدَك سِتّ سِنِين"},{"id":"b3b4088d","text":"عندك سنتين","reading":"عِنْدَك سَنَتِين"},{"id":"d2f3d42e","text":"عندك كام سنة؟","reading":"عِنْدَك كَام سَنَة؟"},{"id":"43da4371","text":"فراولة","reading":"فَرَاوْلَة"},{"id":"8e98a5d0","text":"فين الرقم الأصغر؟","reading":"فِين الرَّقَم الأَصْغَر؟"},{"id":"c7ecdc11","text":"فين الرقم اللي بعد اتناشر؟","reading":"فِين الرَّقَم اللِّي بَعْد اتْنَاشَر؟"},{"id":"7f713b0b","text":"فين الرقم اللي بعد اتنين؟","reading":"فِين الرَّقَم اللِّي بَعْد اتْنِين؟"},{"id":"9d76bb3e","text":"فين الرقم اللي بعد أربعتاشر؟","reading":"فِين الرَّقَم اللِّي بَعْد أَرْبَعْتَاشَر؟"},{"id":"1ffa5418","text":"فين الرقم اللي بعد تسعة؟","reading":"فِين الرَّقَم اللِّي بَعْد تِسْعَة؟"},{"id":"9d31b07b","text":"فين الرقم اللي بعد تسعتاشر؟","reading":"فِين الرَّقَم اللِّي بَعْد تِسَعْتَاشَر؟"},{"id":"fec92569","text":"فين الرقم اللي بعد تلاتاشر؟","reading":"فِين الرَّقَم اللِّي بَعْد تَلَاتَاشَر؟"},{"id":"21df7891","text":"فين الرقم اللي بعد تمانية؟","reading":"فِين الرَّقَم اللِّي بَعْد تَمَانْيَة؟"},{"id":"a8e88a2c","text":"فين الرقم اللي بعد تمنتاشر؟","reading":"فِين الرَّقَم اللِّي بَعْد تَمَنْتَاشَر؟"},{"id":"04d7c343","text":"فين الرقم اللي بعد حداشر؟","reading":"فِين الرَّقَم اللِّي بَعْد أَحَدَ عَشَر؟"},{"id":"e5f3b856","text":"فين الرقم اللي بعد خمستاشر؟","reading":"فِين الرَّقَم اللِّي بَعْد خَمَسْتَاشَر؟"},{"id":"c99945e6","text":"فين الرقم اللي بعد سبعة؟","reading":"فِين الرَّقَم اللِّي بَعْد سَبْعَة؟"},{"id":"5b39eef9","text":"فين الرقم اللي بعد سبعتاشر؟","reading":"فِين الرَّقَم اللِّي بَعْد سَبَعْتَاشَر؟"},{"id":"73fde33e","text":"فين الرقم اللي بعد ستاشر؟","reading":"فِين الرَّقَم اللِّي بَعْد سِتَّاشَر؟"},{"id":"ecc6626b","text":"فين الرقم اللي بعد ستة؟","reading":"فِين الرَّقَم اللِّي بَعْد سِتَّة؟"},{"id":"9686d59d","text":"فين الرقم اللي بعد صفر؟","reading":"فِين الرَّقَم اللِّي بَعْد صِفْر؟"},{"id":"02cf4c34","text":"فين الرقم اللي بعد عشرة؟","reading":"فِين الرَّقَم اللِّي بَعْد عَشَرَة؟"},{"id":"6a8eee29","text":"فين الرقم اللي بعد واحد؟","reading":"فِين الرَّقَم اللِّي بَعْد وَاحِد؟"},{"id":"b9d79515","text":"فين الرقم اللي قبل اتناشر؟","reading":"فِين الرَّقَم اللِّي قَبْل اتْنَاشَر؟"},{"id":"900fdf77","text":"فين الرقم اللي قبل اتنين؟","reading":"فِين الرَّقَم اللِّي قَبْل اتْنِين؟"},{"id":"b8755fcd","text":"فين الرقم اللي قبل أربعة؟","reading":"فِين الرَّقَم اللِّي قَبْل أَرْبَعَة؟"},{"id":"945d27b2","text":"فين الرقم اللي قبل أربعتاشر؟","reading":"فِين الرَّقَم اللِّي قَبْل أَرْبَعْتَاشَر؟"},{"id":"f4aaa01c","text":"فين الرقم اللي قبل تسعة؟","reading":"فِين الرَّقَم اللِّي قَبْل تِسْعَة؟"},{"id":"29a21baf","text":"فين الرقم اللي قبل تسعتاشر؟","reading":"فِين الرَّقَم اللِّي قَبْل تِسَعْتَاشَر؟"},{"id":"c489bbdd","text":"فين الرقم اللي قبل تلاتاشر؟","reading":"فِين الرَّقَم اللِّي قَبْل تَلَاتَاشَر؟"},{"id":"d735e184","text":"فين الرقم اللي قبل تلاتة؟","reading":"فِين الرَّقَم اللِّي قَبْل تَلَاتَة؟"},{"id":"dfbe5f9d","text":"فين الرقم اللي قبل تمانية؟","reading":"فِين الرَّقَم اللِّي قَبْل تَمَانْيَة؟"},{"id":"bba20190","text":"فين الرقم اللي قبل تمنتاشر؟","reading":"فِين الرَّقَم اللِّي قَبْل تَمَنْتَاشَر؟"},{"id":"725f55d7","text":"فين الرقم اللي قبل حداشر؟","reading":"فِين الرَّقَم اللِّي قَبْل أَحَدَ عَشَر؟"},{"id":"ef9d4335","text":"فين الرقم اللي قبل خمسة؟","reading":"فِين الرَّقَم اللِّي قَبْل خَمْسَة؟"},{"id":"ce1f320a","text":"فين الرقم اللي قبل خمستاشر؟","reading":"فِين الرَّقَم اللِّي قَبْل خَمَسْتَاشَر؟"},{"id":"bc2dbbfa","text":"فين الرقم اللي قبل سبعة؟","reading":"فِين الرَّقَم اللِّي قَبْل سَبْعَة؟"},{"id":"91e302bd","text":"فين الرقم اللي قبل سبعتاشر؟","reading":"فِين الرَّقَم اللِّي قَبْل سَبَعْتَاشَر؟"},{"id":"4dcde0d2","text":"فين الرقم اللي قبل ستاشر؟","reading":"فِين الرَّقَم اللِّي قَبْل سِتَّاشَر؟"},{"id":"e5b77a7f","text":"فين الرقم اللي قبل ستة؟","reading":"فِين الرَّقَم اللِّي قَبْل سِتَّة؟"},{"id":"0ca98693","text":"فين الرقم اللي قبل عشرين؟","reading":"فِين الرَّقَم اللِّي قَبْل عِشْرِين؟"},{"id":"4c6a9855","text":"فين الرقم اللي قبل واحد؟","reading":"فِين الرَّقَم اللِّي قَبْل وَاحِد؟"},{"id":"3a0e6b33","text":"فين الشكل الصغير؟","reading":"فِين الشَّكْل الصَّغِير؟"},{"id":"88008321","text":"فين الشكل اللي له تمان أضلاع؟","reading":"فِين الشَّكْل اللِّي لُه تَمَان أَضْلَاع؟"},{"id":"23a0be85","text":"فين الفاكهة؟","reading":"فِين الفَاكْهَة؟"},{"id":"50749352","text":"فين اللي بيمشي على القضبان؟","reading":"فِين اللِّي بِيمْشِي عَلَى القُضْبَان؟"},{"id":"ac45673f","text":"قطة","reading":"قِطَّة"},{"id":"c4458d07","text":"قطر","reading":"قَطْر"},{"id":"43d30a4a","text":"قلب أخضر","reading":"قَلْب أَخْضَر"},{"id":"81643553","text":"كتكوت","reading":"كَتْكُوت"},{"id":"49826a84","text":"كمثرى","reading":"كُمَّثْرَى"},{"id":"1acbfc31","text":"كمّل النمط","reading":"كَمِّل النَّمَط"},{"id":"e04d3bfb","text":"كمّل كده!","reading":"كَمِّل كِدَه!"},{"id":"abe81ff4","text":"كمّلي كده!","reading":"كَمِّلِي كِدَه!"},{"id":"e61d2c00","text":"كنز الجزيرة","reading":"كَنْز الجَزِيرَة"},{"id":"0550f6ef","text":"كورة","reading":"كُورَة"},{"id":"cfd90d22","text":"كورة حمرا","reading":"كُورَة حَمْرَا"},{"id":"a1582f50","text":"لسه بدري عليها!","reading":"لِسَّه بَدْرِي عَلَيْهَا!"}];
+const CURRENT = (id) => `../assets/assets/games/learn_voice/ar/${id}.mp3`;  // the voice that is in the app now (works on the demo site)
+let db, mediaRec, stream, chunks = [], curId = null, audio = new Audio();
+
+function openDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('rehlaty_voice', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('rec');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+const tx = (mode) => db.transaction('rec', mode).objectStore('rec');
+const key = (id) => GROUP + '|' + id;
+const get = (id) => new Promise((res) => { const q = tx('readonly').get(key(id)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); });
+const put = (id, v) => new Promise((res) => { const q = tx('readwrite').put(v, key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const del = (id) => new Promise((res) => { const q = tx('readwrite').delete(key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const done = new Set();
+
+function ext(type) { return /webm/.test(type) ? 'webm' : /ogg/.test(type) ? 'ogg' : /mp4|aac|m4a/.test(type) ? 'm4a' : /wav/.test(type) ? 'wav' : 'bin'; }
+function refresh() {
+  document.getElementById('count').textContent = `سجّلت ${done.size} من ${ITEMS.length}`;
+  document.getElementById('prog').style.width = (100 * done.size / ITEMS.length) + '%';
+}
+function build() {
+  const list = document.getElementById('list');
+  ITEMS.forEach((it, i) => {
+    const d = document.createElement('div'); d.className = 'row'; d.id = 'r_' + it.id;
+    d.innerHTML = `<div class="t">${i + 1}. ${it.text.replace(/</g, '&lt;')}</div>${it.reading && it.reading !== it.text ? `<div class="r">تُقرأ: ${it.reading.replace(/</g, '&lt;')}</div>` : ''}
+      <div class="btns"><button class="rec" data-a="rec">● سجّل</button><button class="ghost" data-a="mine" disabled>▶ تسجيلي</button><button class="ghost" data-a="cur">▶ الحالي</button><button class="del" data-a="del" disabled>🗑️</button><span class="st"></span></div>`;
+    d.addEventListener('click', (e) => { const a = e.target.dataset && e.target.dataset.a; if (a) act(it, d, e.target, a); });
+    list.appendChild(d);
+  });
+}
+function mark(d, on) {
+  d.classList.toggle('done', on);
+  d.querySelector('[data-a=mine]').disabled = !on; d.querySelector('[data-a=del]').disabled = !on;
+  d.querySelector('.st').textContent = on ? '✓ اتسجلت' : '';
+}
+async function act(it, d, btn, a) {
+  if (a === 'cur') { audio.pause(); audio = new Audio(CURRENT(it.id)); audio.play().catch(() => { d.querySelector('.st').textContent = 'الصوت الحالي مش متاح هنا'; }); return; }
+  if (a === 'mine') { const v = await get(it.id); if (v) { audio.pause(); audio = new Audio(URL.createObjectURL(v.blob)); audio.play(); } return; }
+  if (a === 'del') { await del(it.id); done.delete(it.id); mark(d, false); refresh(); return; }
+  if (a === 'rec') {
+    if (mediaRec && mediaRec.state === 'recording') { mediaRec.stop(); return; }
+    try { stream = stream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { alert('محتاج إذن الميكروفون. اسمح للمتصفح باستخدام الميكروفون وجرّب تاني.'); return; }
+    audio.pause(); chunks = []; curId = it.id;
+    const opts = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? { mimeType: 'audio/webm;codecs=opus' } : {};
+    mediaRec = new MediaRecorder(stream, opts);
+    mediaRec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mediaRec.onstop = async () => {
+      d.classList.remove('live'); btn.textContent = '● سجّل'; btn.classList.add('rec');
+      const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+      if (blob.size < 1500) { d.querySelector('.st').textContent = 'التسجيل قصير أوي، جرّب تاني'; return; }
+      await put(it.id, { blob, type: blob.type, text: it.text, at: Date.now() });
+      done.add(it.id); mark(d, true); refresh();
+      const nx = d.nextElementSibling; if (nx) nx.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    d.classList.add('live'); btn.textContent = '■ وقّف'; d.querySelector('.st').textContent = 'بيسجّل...';
+    mediaRec.start();
+  }
+}
+// a tiny zip writer (stored, no compression) so no library is needed
+function crc32(buf) { let c, crc = -1; for (let i = 0; i < buf.length; i++) { c = (crc ^ buf[i]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ -1) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(); const parts = []; const central = []; let off = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name); const crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30)); lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46)); ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), name); off += 30 + name.length + f.data.length;
+  }
+  let csize = 0; central.forEach((p) => csize += p.length);
+  const end = new DataView(new ArrayBuffer(22)); end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/zip' });
+}
+document.getElementById('zip').onclick = async () => {
+  const files = [], manifest = [];
+  for (const it of ITEMS) { const v = await get(it.id); if (!v) continue; const name = `${it.id}.${ext(v.type)}`; files.push({ name, data: new Uint8Array(await v.blob.arrayBuffer()) }); manifest.push({ id: it.id, text: it.text, file: name }); }
+  if (!files.length) { alert('لسه ما سجلتش حاجة'); return; }
+  files.push({ name: 'manifest.json', data: new TextEncoder().encode(JSON.stringify({ group: GROUP, items: manifest }, null, 1)) });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(files)); a.download = `rehlaty_voice_${GROUP}.zip`; a.click();
+};
+document.getElementById('wipe').onclick = async () => { if (!confirm('تمسح كل تسجيلات الصفحة دي؟')) return; for (const it of ITEMS) { await del(it.id); done.delete(it.id); mark(document.getElementById('r_' + it.id), false); } refresh(); };
+(async () => { db = await openDb(); build(); for (const it of ITEMS) { const v = await get(it.id); if (v) { done.add(it.id); mark(document.getElementById('r_' + it.id), true); } } refresh(); })();
+</script>
+</body>
+</html>

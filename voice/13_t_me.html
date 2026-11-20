@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المستوى 13: جسمي وعيلتي</title>
+<style>
+  :root{--bg:#1d1250;--card:#2b1f78;--gold:#ffd23a;--ok:#2fbf5a;--rec:#e8384a;--ink:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,"Segoe UI",system-ui,sans-serif;direction:rtl}
+  header{position:sticky;top:0;z-index:5;background:#140b3a;border-bottom:3px solid var(--gold);padding:10px 14px}
+  h1{margin:0 0 6px;font-size:20px;color:var(--gold)}
+  .bar{height:12px;border-radius:8px;background:#3b2e90;overflow:hidden}.bar b{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+  .top{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+  button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:9px 14px;cursor:pointer;color:#fff;background:#3b6fd8;min-height:42px}
+  button.rec{background:var(--rec)}button.ok{background:var(--ok)}button.ghost{background:#4a3aa8}button.del{background:#6a2a50}
+  button:disabled{opacity:.4;cursor:default}
+  main{padding:10px 12px 90px;max-width:900px;margin:auto}
+  .row{background:var(--card);border:2px solid #4a3aa8;border-radius:16px;padding:12px;margin:10px 0}
+  .row.done{border-color:var(--ok)}.row.live{border-color:var(--rec);box-shadow:0 0 0 3px #e8384a55}
+  .t{font-size:26px;font-weight:900;line-height:1.5}.r{font-size:15px;opacity:.8;margin-top:2px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.st{font-size:14px;opacity:.9}
+  .note{background:#3b2e90;border-radius:12px;padding:10px;font-size:15px;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ __TITLE__</h1>
+  <div class="bar"><b id="prog"></b></div>
+  <div class="top"><span id="count"></span>
+    <span><button class="ok" id="zip">⬇️ تنزيل تسجيلاتي (ملف واحد)</button> <button class="del" id="wipe">🗑️ مسح الكل</button></span></div>
+</header>
+<main>
+  <div class="note">اضغط <b>● سجّل</b>، اقرا الجملة بصوتك بهدوء وبصوت طفل مرح، واضغط <b>■ وقّف</b>. تسمع تسجيلك بـ <b>▶ تسجيلي</b> وتقارنه بالصوت الحالي بـ <b>▶ الحالي</b>. التسجيلات بتتحفظ في المتصفح لوحدها، تقدر تقفل وتكمل بعدين. لما تخلص اضغط «تنزيل تسجيلاتي» وابعتلي الملف.</div>
+  <div id="list"></div>
+</main>
+<script>
+const GROUP = "13_t_me";
+const ITEMS = [{"id":"8e341d1c","text":"مين بنت صغيرة؟","reading":"مِين بِنْت صُغَيَّرَة؟"},{"id":"5bede73d","text":"بنضحك بإيه؟","reading":"بِنِضْحَك بِإِيه؟"},{"id":"a4c854ff","text":"إحنا بنحس بالجوع في إيه؟","reading":"إِحْنَا بِنِحِسّ بِالجُوع فِي إِيه؟"},{"id":"c6cfe04e","text":"إيه اللي بنقف عليه؟","reading":"إِيه اللِّي بِنِقَف عَلَيْه؟"},{"id":"ba4d3bc1","text":"بنسرح إيه؟","reading":"بِنِسَرَّح إِيه؟"},{"id":"ef98e696","text":"بنسمع بإيه؟","reading":"بِنِسْمَع بِإِيه؟"},{"id":"423f3ad1","text":"مين بيربينا ويعمل لنا الأكل؟","reading":"مِين بِيْرَبِّينَا وَيِعْمِل لِنَا الأَكْل؟"},{"id":"fd553405","text":"مين بيحكي لنا عن زمان؟","reading":"مِين بِيْحْكِي لِنَا عَنْ زَمَان؟"},{"id":"e63ad2e1","text":"إيه اللي بنحس بيه بطعم الأكل؟","reading":"إِيه اللِّي بِنِحِسّ بِيه بِطَعْم الأَكْل؟"},{"id":"6e2b4d4c","text":"إيه اللي ليه خمس صوابع؟","reading":"إِيه اللِّي لِيه خَمْس صَوَابِع؟"},{"id":"d802ae30","text":"إيه اللي بنلاقيه في بقنا ونغسله مرتين في اليوم؟","reading":"إِيه اللِّي بِنِلَاقِيه فِي بُقِّنَا وَنِغْسِلُه مَرَّتِين فِي اليُوم؟"},{"id":"0f78e500","text":"بنحط الخاتم في إيه؟","reading":"بِنِحُطّ الخَاتِم فِي إِيه؟"},{"id":"ad3be989","text":"مين البنت في العيلة؟","reading":"مِين البِنْت فِي العِيلَة؟"},{"id":"a686cfa4","text":"مين أصغر واحد في البيت؟","reading":"مِين أَصْغَر وَاحِد فِي البَيْت؟"},{"id":"8d927405","text":"مين الولد في العيلة؟","reading":"مِين الوَلَد فِي العِيلَة؟"},{"id":"449a813a","text":"بنسمع صوت العصفور بإيه؟","reading":"بِنِسْمَع صَوْت العُصْفُور بِإِيه؟"},{"id":"ce57ca84","text":"بنصفق بإيه؟","reading":"بِنِصَفَّق بِإِيه؟"},{"id":"b0a4a5b6","text":"مين ابن بابا وماما؟","reading":"مِين اِبْن بَابَا وَمَامَا؟"},{"id":"306cedb4","text":"مين بتعمل لنا كحك العيد؟","reading":"مِين بِتْعْمِل لِنَا كَحْك العِيد؟"},{"id":"88d7fe13","text":"إيه اللي بنقفله لما ننام؟","reading":"إِيه اللِّي بِنِقْفِلُه لَمَّا نِنَام؟"},{"id":"1308c51a","text":"بناكل بإيه؟","reading":"بِنَاكُل بِإِيه؟"},{"id":"eebb8de9","text":"إيه اللي بنلعب معاهم في المدرسة؟","reading":"إِيه اللِّي بِنِلْعَب مَعَاهُم فِي المَدْرَسَة؟"},{"id":"7216f66e","text":"عندنا عشرة من إيه؟","reading":"عِنْدِنَا عَشَرَة مِن إِيه؟"},{"id":"db33a299","text":"بنتنفس من إيه؟","reading":"بِنِتْنَفِّس مِن إِيه؟"},{"id":"20b5400d","text":"مين بنقول لها ماما؟","reading":"مِين بِنِقُول لَهَا مَامَا؟"},{"id":"56ec41f8","text":"مين أم ماما؟","reading":"مِين أُمّ مَامَا؟"},{"id":"25cd23ea","text":"بنملا إيه بالأكل؟","reading":"بِنِمْلَا إِيه بِالأَكْل؟"},{"id":"48c92c33","text":"مين صغير ولسه بيبكي؟","reading":"مِين صُغَيَّر وَلِسَّه بِيِبْكِي؟"},{"id":"baccc720","text":"إيه اللي بيعمل غرغرة لما نجوع؟","reading":"إِيه اللِّي بِيعْمِل غَرْغَرَة لَمَّا نِجُوع؟"},{"id":"96489428","text":"بنمسك الحاجة بإيه؟","reading":"بِنِمْسِك الحَاجَة بِإِيه؟"},{"id":"9f83fea1","text":"بنفكر بإيه؟","reading":"بِنِفَكَّر بِإِيه؟"},{"id":"b8cbd9fd","text":"مين بياخدنا للملاهي في الإجازة؟","reading":"مِين بِيَاخْدِنَا لِلْمَلَاهِي فِي الإِجَازَة؟"},{"id":"d33c0fc9","text":"بنثني إيه لما نقعد؟","reading":"بِنِثْنِي إِيه لَمَّا نِقْعُد؟"},{"id":"c3a97cfd","text":"بنغسل إيه بالفرشاة؟","reading":"بِنِغْسِل إِيه بِالفُرْشَاة؟"},{"id":"7c8377f3","text":"بنلبس الكاب على إيه؟","reading":"بِنِلْبِس الكَاب عَلَى إِيه؟"},{"id":"6ea4d109","text":"بنمشي بإيه؟","reading":"بِنِمْشِي بِإِيه؟"},{"id":"d36151e7","text":"بنشوف بإيه؟","reading":"بِنِشُوف بِإِيه؟"},{"id":"99f59348","text":"بنغسل إيه بالشامبو؟","reading":"بِنِغْسِل إِيه بِالشَّامْبُو؟"},{"id":"6d161e6b","text":"مين ولد صغير؟","reading":"مِين وَلَد صُغَيَّر؟"},{"id":"b2ab4c2f","text":"بنمسك القلم بإيه؟","reading":"بِنِمْسِك القَلَم بِإِيه؟"},{"id":"3d73c734","text":"بنكتب بإيه؟","reading":"بِنِكْتِب بِإِيه؟"},{"id":"2a2fac58","text":"مين اللي بنقول له عمو؟","reading":"مِين اللِّي بِنِقُول لُه عَمُّو؟"},{"id":"335d24c3","text":"مين بنلعب معاهم في الحضانة؟","reading":"مِين بِنِلْعَب مَعَاهُم فِي الحَضَانَة؟"},{"id":"7596ef86","text":"مين بنقول له جدو؟","reading":"مِين بِنِقُول لُه جَدُّو؟"},{"id":"bfc489fe","text":"إيه اللي بنثنيه لما نركع؟","reading":"إِيه اللِّي بِنِثْنِيه لَمَّا نِرْكَع؟"},{"id":"848c2816","text":"بنحط الحلق في إيه؟","reading":"بِنِحُطّ الحَلَق فِي إِيه؟"},{"id":"3722e295","text":"مين بنقول لها تيتة؟","reading":"مِين بِنِقُول لَهَا تِيتَة؟"},{"id":"c533d807","text":"بنقفل إيه لما ننام؟","reading":"بِنِقْفِل إِيه لَمَّا نِنَام؟"},{"id":"1324d952","text":"بنجري بإيه؟","reading":"بِنِجْرِي بِإِيه؟"},{"id":"c139c0b1","text":"مين أبو بابا؟","reading":"مِين أَبُو بَابَا؟"},{"id":"18bafd76","text":"إيه اللي بنحط عليه الكاب؟","reading":"إِيه اللِّي بِنِحُطّ عَلَيْه الكَاب؟"},{"id":"148a6f23","text":"بنشاور بإيه؟","reading":"بِنِشَاوِر بِإِيه؟"},{"id":"4bd60fc3","text":"مين أصغر واحد في العيلة وبيحبو؟","reading":"مِين أَصْغَر وَاحِد فِي العِيلَة وَبِيِحْبُو؟"},{"id":"90f14e0e","text":"بنلبس الجزمة في إيه؟","reading":"بِنِلْبِس الجَزْمَة فِي إِيه؟"},{"id":"d16f518d","text":"بنتكلم ونغني بإيه؟","reading":"بِنِتْكَلِّم وَنِغَنِّي بِإِيه؟"},{"id":"acc5c4cf","text":"إيه اللي بنحرك بيه الصوابع؟","reading":"إِيه اللِّي بِنِحَرَّك بِيه الصَّوَابِع؟"},{"id":"2d5215c9","text":"مين بنت بابا وماما؟","reading":"مِين بِنْت بَابَا وَمَامَا؟"},{"id":"c10e75a4","text":"مين بيلعب معانا وبنتخانق معاه شوية؟","reading":"مِين بِيْلْعَب مَعَانَا وَبِنِتْخَانِق مَعَاه شُوَيَّة؟"},{"id":"8745318b","text":"مين بتحكيلنا أسرارها وبتلعب معانا؟","reading":"مِين بِتْحَكِيلْنَا أَسْرَارْهَا وَبِتِلْعَب مَعَانَا؟"},{"id":"1dc3ac97","text":"بنمشط إيه؟","reading":"بِنِمَشَّط إِيه؟"},{"id":"494ce65f","text":"مين أخو بابا أو ماما؟","reading":"مِين أَخُو بَابَا أَو مَامَا؟"},{"id":"38deb0b9","text":"بنسلم على صحابنا بإيه؟","reading":"بِنِسَلِّم عَلَى صُحَابْنَا بِإِيه؟"},{"id":"7d23e5ab","text":"بنقع على إيه لما نلعب؟","reading":"بِنِقَع عَلَى إِيه لَمَّا نِلْعَب؟"},{"id":"e2853866","text":"بنشوف الألوان بإيه؟","reading":"بِنِشُوف الأَلْوَان بِإِيه؟"},{"id":"83e78624","text":"بنشم بإيه؟","reading":"بِنِشِمّ بِإِيه؟"},{"id":"d5a29333","text":"بنرقص بإيه؟","reading":"بِنِرْقُص بِإِيه؟"},{"id":"a9c43dfd","text":"إيه اللي بنبقى فيه كلنا مع بعض؟","reading":"إِيه اللِّي بِنِبْقَى فِيه كُلِّنَا مَعَ بَعْض؟"},{"id":"53417c9d","text":"بنلبس القبعة على إيه؟","reading":"بِنِلْبِس القُبَّعَة عَلَى إِيه؟"},{"id":"60a69713","text":"بنبكي بإيه؟","reading":"بِنِبْكِي بِإِيه؟"},{"id":"061b5c0d","text":"إيه اللي بينمو عليه الشعر؟","reading":"إِيه اللِّي بِيِنْمُو عَلَيْه الشَّعَر؟"},{"id":"b5a5681f","text":"بنشم الورد بإيه؟","reading":"بِنِشِمّ الوَرْد بِإِيه؟"}];
+const CURRENT = (id) => `../assets/assets/games/learn_voice/ar/${id}.mp3`;  // the voice that is in the app now (works on the demo site)
+let db, mediaRec, stream, chunks = [], curId = null, audio = new Audio();
+
+function openDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('rehlaty_voice', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('rec');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+const tx = (mode) => db.transaction('rec', mode).objectStore('rec');
+const key = (id) => GROUP + '|' + id;
+const get = (id) => new Promise((res) => { const q = tx('readonly').get(key(id)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); });
+const put = (id, v) => new Promise((res) => { const q = tx('readwrite').put(v, key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const del = (id) => new Promise((res) => { const q = tx('readwrite').delete(key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const done = new Set();
+
+function ext(type) { return /webm/.test(type) ? 'webm' : /ogg/.test(type) ? 'ogg' : /mp4|aac|m4a/.test(type) ? 'm4a' : /wav/.test(type) ? 'wav' : 'bin'; }
+function refresh() {
+  document.getElementById('count').textContent = `سجّلت ${done.size} من ${ITEMS.length}`;
+  document.getElementById('prog').style.width = (100 * done.size / ITEMS.length) + '%';
+}
+function build() {
+  const list = document.getElementById('list');
+  ITEMS.forEach((it, i) => {
+    const d = document.createElement('div'); d.className = 'row'; d.id = 'r_' + it.id;
+    d.innerHTML = `<div class="t">${i + 1}. ${it.text.replace(/</g, '&lt;')}</div>${it.reading && it.reading !== it.text ? `<div class="r">تُقرأ: ${it.reading.replace(/</g, '&lt;')}</div>` : ''}
+      <div class="btns"><button class="rec" data-a="rec">● سجّل</button><button class="ghost" data-a="mine" disabled>▶ تسجيلي</button><button class="ghost" data-a="cur">▶ الحالي</button><button class="del" data-a="del" disabled>🗑️</button><span class="st"></span></div>`;
+    d.addEventListener('click', (e) => { const a = e.target.dataset && e.target.dataset.a; if (a) act(it, d, e.target, a); });
+    list.appendChild(d);
+  });
+}
+function mark(d, on) {
+  d.classList.toggle('done', on);
+  d.querySelector('[data-a=mine]').disabled = !on; d.querySelector('[data-a=del]').disabled = !on;
+  d.querySelector('.st').textContent = on ? '✓ اتسجلت' : '';
+}
+async function act(it, d, btn, a) {
+  if (a === 'cur') { audio.pause(); audio = new Audio(CURRENT(it.id)); audio.play().catch(() => { d.querySelector('.st').textContent = 'الصوت الحالي مش متاح هنا'; }); return; }
+  if (a === 'mine') { const v = await get(it.id); if (v) { audio.pause(); audio = new Audio(URL.createObjectURL(v.blob)); audio.play(); } return; }
+  if (a === 'del') { await del(it.id); done.delete(it.id); mark(d, false); refresh(); return; }
+  if (a === 'rec') {
+    if (mediaRec && mediaRec.state === 'recording') { mediaRec.stop(); return; }
+    try { stream = stream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { alert('محتاج إذن الميكروفون. اسمح للمتصفح باستخدام الميكروفون وجرّب تاني.'); return; }
+    audio.pause(); chunks = []; curId = it.id;
+    const opts = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? { mimeType: 'audio/webm;codecs=opus' } : {};
+    mediaRec = new MediaRecorder(stream, opts);
+    mediaRec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mediaRec.onstop = async () => {
+      d.classList.remove('live'); btn.textContent = '● سجّل'; btn.classList.add('rec');
+      const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+      if (blob.size < 1500) { d.querySelector('.st').textContent = 'التسجيل قصير أوي، جرّب تاني'; return; }
+      await put(it.id, { blob, type: blob.type, text: it.text, at: Date.now() });
+      done.add(it.id); mark(d, true); refresh();
+      const nx = d.nextElementSibling; if (nx) nx.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    d.classList.add('live'); btn.textContent = '■ وقّف'; d.querySelector('.st').textContent = 'بيسجّل...';
+    mediaRec.start();
+  }
+}
+// a tiny zip writer (stored, no compression) so no library is needed
+function crc32(buf) { let c, crc = -1; for (let i = 0; i < buf.length; i++) { c = (crc ^ buf[i]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ -1) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(); const parts = []; const central = []; let off = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name); const crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30)); lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46)); ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), name); off += 30 + name.length + f.data.length;
+  }
+  let csize = 0; central.forEach((p) => csize += p.length);
+  const end = new DataView(new ArrayBuffer(22)); end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/zip' });
+}
+document.getElementById('zip').onclick = async () => {
+  const files = [], manifest = [];
+  for (const it of ITEMS) { const v = await get(it.id); if (!v) continue; const name = `${it.id}.${ext(v.type)}`; files.push({ name, data: new Uint8Array(await v.blob.arrayBuffer()) }); manifest.push({ id: it.id, text: it.text, file: name }); }
+  if (!files.length) { alert('لسه ما سجلتش حاجة'); return; }
+  files.push({ name: 'manifest.json', data: new TextEncoder().encode(JSON.stringify({ group: GROUP, items: manifest }, null, 1)) });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(files)); a.download = `rehlaty_voice_${GROUP}.zip`; a.click();
+};
+document.getElementById('wipe').onclick = async () => { if (!confirm('تمسح كل تسجيلات الصفحة دي؟')) return; for (const it of ITEMS) { await del(it.id); done.delete(it.id); mark(document.getElementById('r_' + it.id), false); } refresh(); };
+(async () => { db = await openDb(); build(); for (const it of ITEMS) { const v = await get(it.id); if (v) { done.add(it.id); mark(document.getElementById('r_' + it.id), true); } } refresh(); })();
+</script>
+</body>
+</html>

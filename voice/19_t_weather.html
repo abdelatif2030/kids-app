@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المستوى 19: الجو والفصول</title>
+<style>
+  :root{--bg:#1d1250;--card:#2b1f78;--gold:#ffd23a;--ok:#2fbf5a;--rec:#e8384a;--ink:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,"Segoe UI",system-ui,sans-serif;direction:rtl}
+  header{position:sticky;top:0;z-index:5;background:#140b3a;border-bottom:3px solid var(--gold);padding:10px 14px}
+  h1{margin:0 0 6px;font-size:20px;color:var(--gold)}
+  .bar{height:12px;border-radius:8px;background:#3b2e90;overflow:hidden}.bar b{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+  .top{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+  button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:9px 14px;cursor:pointer;color:#fff;background:#3b6fd8;min-height:42px}
+  button.rec{background:var(--rec)}button.ok{background:var(--ok)}button.ghost{background:#4a3aa8}button.del{background:#6a2a50}
+  button:disabled{opacity:.4;cursor:default}
+  main{padding:10px 12px 90px;max-width:900px;margin:auto}
+  .row{background:var(--card);border:2px solid #4a3aa8;border-radius:16px;padding:12px;margin:10px 0}
+  .row.done{border-color:var(--ok)}.row.live{border-color:var(--rec);box-shadow:0 0 0 3px #e8384a55}
+  .t{font-size:26px;font-weight:900;line-height:1.5}.r{font-size:15px;opacity:.8;margin-top:2px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.st{font-size:14px;opacity:.9}
+  .note{background:#3b2e90;border-radius:12px;padding:10px;font-size:15px;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ __TITLE__</h1>
+  <div class="bar"><b id="prog"></b></div>
+  <div class="top"><span id="count"></span>
+    <span><button class="ok" id="zip">⬇️ تنزيل تسجيلاتي (ملف واحد)</button> <button class="del" id="wipe">🗑️ مسح الكل</button></span></div>
+</header>
+<main>
+  <div class="note">اضغط <b>● سجّل</b>، اقرا الجملة بصوتك بهدوء وبصوت طفل مرح، واضغط <b>■ وقّف</b>. تسمع تسجيلك بـ <b>▶ تسجيلي</b> وتقارنه بالصوت الحالي بـ <b>▶ الحالي</b>. التسجيلات بتتحفظ في المتصفح لوحدها، تقدر تقفل وتكمل بعدين. لما تخلص اضغط «تنزيل تسجيلاتي» وابعتلي الملف.</div>
+  <div id="list"></div>
+</main>
+<script>
+const GROUP = "19_t_weather";
+const ITEMS = [{"id":"c8c365a9","text":"إيه اللي بنسمعه في العاصفة؟","reading":"إِيه اللِّي بِنِسْمَعُه فِي العَاصِفَة؟"},{"id":"66467674","text":"إيه اللي صغير وبيتلاقى في الثلج؟","reading":"إِيه اللِّي صُغَيَّر وَبِيِتْلَاقَى فِي الثَّلْج؟"},{"id":"3b235b96","text":"إيه اللي بيتعلق في السما بخيط؟","reading":"إِيه اللِّي بِيِتْعَلَّق فِي السَّمَا بِخَيْط؟"},{"id":"5286dc77","text":"فين المروحة الملونة؟","reading":"فِين المِرْوَحَة المُلَوَّنَة؟"},{"id":"4c7be394","text":"إيه اللي بيتجمع على شكل نجمة؟","reading":"إِيه اللِّي بِيِتْجَمَّع عَلَى شَكْل نَجْمَة؟"},{"id":"867de2d1","text":"فين الطيارة الورق؟","reading":"فِين الطَّيَّارَة الوَرَق؟"},{"id":"a6d85f02","text":"إيه اللي بيعمل بركة في الشارع؟","reading":"إِيه اللِّي بِيعْمِل بِرْكَة فِي الشَّارِع؟"},{"id":"304ed568","text":"إيه اللي بيكون عالي ومغطى بالثلج؟","reading":"إِيه اللِّي بِيْكُون عَالِي وَمُغَطَّى بِالتَّلْج؟"},{"id":"b54162bc","text":"إيه اللي بتحتمي منه تحت الشمسية؟","reading":"إِيه اللِّي بِتِحْتِمِي مِنُّه تَحْت الشَّمْسِيَّة؟"},{"id":"c1bf91ec","text":"إيه اللي ليه ذيل طويل وبيطير؟","reading":"إِيه اللِّي لِيه دِيل طَوِيل وَبِيِطِير؟"},{"id":"bd6d84a7","text":"إيه اللي ليه سبعة ألوان؟","reading":"إِيه اللِّي لِيه سَبْعَة أَلْوَان؟"},{"id":"866a6612","text":"فين قوس قزح؟","reading":"فِين قَوْس قُزَح؟"},{"id":"18cb159d","text":"إيه اللي بتصفر وتقع في الخريف؟","reading":"إِيه اللِّي بِتْصَفَّر وَتِقَع فِي الخَرِيف؟"},{"id":"b1258094","text":"إيه اللي بيخلينا نلبس جاكت وقفازات؟","reading":"إِيه اللِّي بِيْخَلِّينَا نِلْبِس جَاكِت وَقُفَّازَات؟"},{"id":"80cc62a8","text":"إيه اللي بيشع علينا ضوء؟","reading":"إِيه اللِّي بِيْشِعّ عَلِينَا ضَوْء؟"},{"id":"59cf238c","text":"كام ورقة؟","reading":"كَام وَرَقَة؟"},{"id":"4ee86b80","text":"إيه اللي بنحس فيه بالعرق؟","reading":"إِيه اللِّي بِنِحِسّ فِيه بِالعَرَق؟"},{"id":"99b7ef62","text":"إيه اللي بينزل من السحاب؟","reading":"إِيه اللِّي بِينَزِّل مِن السَّحَاب؟"},{"id":"f962dbdc","text":"إيه اللي بنسمعه بعد البرق؟","reading":"إِيه اللِّي بِنِسْمَعُه بَعْد البَرْق؟"},{"id":"2c2f36ec","text":"إيه اللي بنقول له صيف؟","reading":"إِيه اللِّي بِنِقُول لُه صَيْف؟"},{"id":"4e404877","text":"إيه اللي بنعمل منه رجل؟","reading":"إِيه اللِّي بِنِعْمِل مِنُّه رَجُل؟"},{"id":"b6306422","text":"إيه اللي مش بنشوفه بس بنحس بيه؟","reading":"إِيه اللِّي مِش بِنِشُوفُه بَسّ بِنِحِسّ بِيه؟"},{"id":"fe5b5c85","text":"إيه اللي بنمسكه من الخيط في الهوا؟","reading":"إِيه اللِّي بِنِمْسِكُه مِن الخَيْط فِي الهَوَا؟"},{"id":"1399fdac","text":"إيه اللي بيزمجر في السما؟","reading":"إِيه اللِّي بِيْزَمْجِر فِي السَّمَا؟"},{"id":"bf16f635","text":"إيه اللي بنقول له شتا؟","reading":"إِيه اللِّي بِنِقُول لُه شِتَا؟"},{"id":"b28ab39f","text":"إيه اللي بيلف لما نفخ عليه؟","reading":"إِيه اللِّي بِيْلِفّ لَمَّا نِفِخ عَلَيْه؟"},{"id":"8e56d71f","text":"إيه اللي بنقطفها ونحطها في فازة؟","reading":"إِيه اللِّي بِنِقْطِفْهَا وَنِحُطُّهَا فِي فَازَة؟"},{"id":"23be0e8d","text":"إيه اللي بيحصل بعد البرق؟","reading":"إِيه اللِّي بِيْحْصَل بَعْد البَرْق؟"},{"id":"c1f51e30","text":"إيه اللي بيشيل الطيارة الورق؟","reading":"إِيه اللِّي بِيْشِيل الطَّيَّارَة الوَرَق؟"},{"id":"f1130f2c","text":"كام زهرة؟","reading":"كَام زَهْرَة؟"},{"id":"8ebc0628","text":"إيه اللي بيضوي السما فجأة؟","reading":"إِيه اللِّي بِيْضَوِّي السَّمَا فَجْأَة؟"},{"id":"405f9059","text":"إيه اللي أبيض وبارد وناعم؟","reading":"إِيه اللِّي أَبْيَض وَبَارِد وَنَاعِم؟"},{"id":"d8bdd2ec","text":"إيه اللي بيغطي الجبال في الشتا؟","reading":"إِيه اللِّي بِيْغَطِّي الجِبَال فِي الشِّتَا؟"},{"id":"c4872832","text":"إيه اللي بتتفتح في الربيع؟","reading":"إِيه اللِّي بِتِتْفَتَّح فِي الرَّبِيع؟"},{"id":"94b61499","text":"إيه اللي بيحرك الأوراق؟","reading":"إِيه اللِّي بِيْحَرَّك الأَوْرَاق؟"},{"id":"c301f7e7","text":"إيه اللي بيلمع في السما؟","reading":"إِيه اللِّي بِيْلْمَع فِي السَّمَا؟"},{"id":"c8ab4822","text":"إيه اللي بيلف مع الهوا؟","reading":"إِيه اللِّي بِيْلِفّ مَعَ الهَوَا؟"},{"id":"d69a14ac","text":"إيه اللي بنطيره في الهوا؟","reading":"إِيه اللِّي بِنِطَيَّرُه فِي الهَوَا؟"},{"id":"ccb74f0d","text":"كام شمسية؟","reading":"كَام شَمْسِيَّة؟"},{"id":"a7a781b3","text":"إيه اللي بيعمل نفسنا يظهر زي بخار؟","reading":"إِيه اللِّي بِيعْمِل نَفَسْنَا يِظْهَر زَي بُخَار؟"},{"id":"fac48cb1","text":"إيه اللي صوته عالي ومخيف؟","reading":"إِيه اللِّي صَوْتُه عَالِي وَمُخِيف؟"},{"id":"6be4ebe8","text":"إيه اللي بيطلع بألوان كتير بعد المطر؟","reading":"إِيه اللِّي بِيْطْلَع بِأَلْوَان كَتِير بَعْد المَطَر؟"},{"id":"90e420bf","text":"إيه اللي بتنوّر النهار؟","reading":"إِيه اللِّي بتنوّر النَّهَار؟"},{"id":"295e147a","text":"إيه اللي بينزل من السما ويبل الأرض؟","reading":"إِيه اللِّي بِينَزِّل مِن السَّمَا وَيِبِلّ الأَرْض؟"},{"id":"d66b8ec0","text":"إيه اللي بينزل أبيض في الشتا؟","reading":"إِيه اللِّي بِينَزِّل أَبْيَض فِي الشِّتَا؟"},{"id":"53f9e6a5","text":"كام ندفة؟","reading":"كَام نُدْفَة؟"},{"id":"30a3d948","text":"إيه اللي بيعمل رجل ثلج؟","reading":"إِيه اللِّي بِيعْمِل رَجُل ثَلْج؟"},{"id":"16201877","text":"إيه اللي بيحمينا من الميه ومن الشمس؟","reading":"إِيه اللِّي بِيْحْمِينَا مِن المَيَّه وَمِن الشَّمْس؟"},{"id":"63195ec7","text":"إيه اللي بتقع من الشجر؟","reading":"إِيه اللِّي بِتْقَع مِن الشَّجَر؟"},{"id":"79f4cb58","text":"إيه اللي بيطير بيه الطيارة الورق؟","reading":"إِيه اللِّي بِيطِير بِيه الطَّيَّارَة الوَرَق؟"},{"id":"57633c18","text":"إيه اللي بيظهر بعد المطر بألوان كتير؟","reading":"إِيه اللِّي بِيْظْهَر بَعْد المَطَر بِأَلْوَان كَتِير؟"},{"id":"876e0257","text":"إيه اللي بتغرب بالليل؟","reading":"إِيه اللِّي بِتِغْرَب بِاللَّيْل؟"},{"id":"1137ff70","text":"إيه اللي بيحرك الشجر والستاير؟","reading":"إِيه اللِّي بِيْحَرَّك الشَّجَر وَالسَّتَايِر؟"},{"id":"4046e23d","text":"إيه اللي أخضر ويبقى تحت الشجرة؟","reading":"إِيه اللِّي أَخْضَر وَيِبْقَى تَحْت الشَّجَرَة؟"},{"id":"fe1b06c9","text":"إيه اللي بنحس بيه في الشتا؟","reading":"إِيه اللِّي بِنِحِسّ بِيه فِي الشِّتَا؟"},{"id":"1865b2ec","text":"إيه اللي بنفتحه فوق راسنا لما تمطر؟","reading":"إِيه اللِّي بِنِفْتَحُه فُوق رَاسْنَا لَمَّا تُمْطِر؟"},{"id":"de8010f4","text":"إيه اللي بنحس بيه لما الشمس قوية؟","reading":"إِيه اللِّي بِنِحِسّ بِيه لَمَّا الشَّمْس قَوِيَّة؟"},{"id":"4c0c10d7","text":"إيه اللي بتفتح في الربيع وريحتها حلوة؟","reading":"إِيه اللِّي بِتْفَتَّح فِي الرَّبِيع وَرِيحْتَهَا حِلْوَة؟"},{"id":"0eb6a901","text":"إيه اللي بتدفينا نهارا؟","reading":"إِيه اللِّي بِتْدَفِّينَا نَهَارًا؟"},{"id":"8be58505","text":"إيه اللي بنقول له ربيع؟","reading":"إِيه اللِّي بِنِقُول لُه رَبِيع؟"},{"id":"84bffa3a","text":"إيه اللي بيبقى في الصيف والشمس قوية؟","reading":"إِيه اللِّي بِيبْقَى فِي الصَّيْف وَالشَّمْس قَوِيَّة؟"},{"id":"3824dc6a","text":"إيه اللي بيبقى شكله نجمة صغيرة؟","reading":"إِيه اللِّي بِيبْقَى شَكْلُه نَجْمَة صُغَيَّرَة؟"},{"id":"59c71acf","text":"إيه اللي بيطلع بعد المطر والشمس مع بعض؟","reading":"إِيه اللِّي بِيْطْلَع بَعْد المَطَر وَالشَّمْس مَعَ بَعْض؟"},{"id":"cef489cd","text":"إيه اللي بنفتح له الشمسية؟","reading":"إِيه اللِّي بِنِفْتَح لُه الشَّمْسِيَّة؟"},{"id":"9f02b9d2","text":"إيه اللي بنلبس له جاكت؟","reading":"إِيه اللِّي بِنِلْبِس لُه جَاكِت؟"},{"id":"401067f2","text":"إيه اللي بنقول له خريف؟","reading":"إِيه اللِّي بِنِقُول لُه خَرِيف؟"},{"id":"36004ac1","text":"إيه اللي لونها أصفر وعالية في السما؟","reading":"إِيه اللِّي لَوْنْهَا أَصْفَر وَعَالْيَة فِي السَّمَا؟"},{"id":"d50635ef","text":"إيه اللي عالي وقمته فيها ثلج؟","reading":"إِيه اللِّي عَالِي وَقِمَّتُه فِيهَا ثَلْج؟"},{"id":"56eb985c","text":"إيه اللي بنشوفه قبل ما نسمع الرعد؟","reading":"إِيه اللِّي بِنِشُوفُه قَبْل مَا نِسْمَع الرَّعْد؟"},{"id":"ea82b6eb","text":"لما تمطر بنفتح إيه؟","reading":"لَمَّا تُمْطِر بِنِفْتَح إِيه؟"},{"id":"bc3352f4","text":"إيه اللي بنجمعه من تحت الشجرة في الخريف؟","reading":"إِيه اللِّي بِنِجْمَعُه مِن تَحْت الشَّجَرَة فِي الخَرِيف؟"},{"id":"6f750251","text":"إيه اللي بنقول له ندفة؟","reading":"إِيه اللِّي بِنِقُول لُه نُدْفَة؟"},{"id":"e2c5a5cb","text":"إيه اللي بيحرك الستائر؟","reading":"إِيه اللِّي بِيْحَرَّك السَّتَائِر؟"}];
+const CURRENT = (id) => `../assets/assets/games/learn_voice/ar/${id}.mp3`;  // the voice that is in the app now (works on the demo site)
+let db, mediaRec, stream, chunks = [], curId = null, audio = new Audio();
+
+function openDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('rehlaty_voice', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('rec');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+const tx = (mode) => db.transaction('rec', mode).objectStore('rec');
+const key = (id) => GROUP + '|' + id;
+const get = (id) => new Promise((res) => { const q = tx('readonly').get(key(id)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); });
+const put = (id, v) => new Promise((res) => { const q = tx('readwrite').put(v, key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const del = (id) => new Promise((res) => { const q = tx('readwrite').delete(key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const done = new Set();
+
+function ext(type) { return /webm/.test(type) ? 'webm' : /ogg/.test(type) ? 'ogg' : /mp4|aac|m4a/.test(type) ? 'm4a' : /wav/.test(type) ? 'wav' : 'bin'; }
+function refresh() {
+  document.getElementById('count').textContent = `سجّلت ${done.size} من ${ITEMS.length}`;
+  document.getElementById('prog').style.width = (100 * done.size / ITEMS.length) + '%';
+}
+function build() {
+  const list = document.getElementById('list');
+  ITEMS.forEach((it, i) => {
+    const d = document.createElement('div'); d.className = 'row'; d.id = 'r_' + it.id;
+    d.innerHTML = `<div class="t">${i + 1}. ${it.text.replace(/</g, '&lt;')}</div>${it.reading && it.reading !== it.text ? `<div class="r">تُقرأ: ${it.reading.replace(/</g, '&lt;')}</div>` : ''}
+      <div class="btns"><button class="rec" data-a="rec">● سجّل</button><button class="ghost" data-a="mine" disabled>▶ تسجيلي</button><button class="ghost" data-a="cur">▶ الحالي</button><button class="del" data-a="del" disabled>🗑️</button><span class="st"></span></div>`;
+    d.addEventListener('click', (e) => { const a = e.target.dataset && e.target.dataset.a; if (a) act(it, d, e.target, a); });
+    list.appendChild(d);
+  });
+}
+function mark(d, on) {
+  d.classList.toggle('done', on);
+  d.querySelector('[data-a=mine]').disabled = !on; d.querySelector('[data-a=del]').disabled = !on;
+  d.querySelector('.st').textContent = on ? '✓ اتسجلت' : '';
+}
+async function act(it, d, btn, a) {
+  if (a === 'cur') { audio.pause(); audio = new Audio(CURRENT(it.id)); audio.play().catch(() => { d.querySelector('.st').textContent = 'الصوت الحالي مش متاح هنا'; }); return; }
+  if (a === 'mine') { const v = await get(it.id); if (v) { audio.pause(); audio = new Audio(URL.createObjectURL(v.blob)); audio.play(); } return; }
+  if (a === 'del') { await del(it.id); done.delete(it.id); mark(d, false); refresh(); return; }
+  if (a === 'rec') {
+    if (mediaRec && mediaRec.state === 'recording') { mediaRec.stop(); return; }
+    try { stream = stream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { alert('محتاج إذن الميكروفون. اسمح للمتصفح باستخدام الميكروفون وجرّب تاني.'); return; }
+    audio.pause(); chunks = []; curId = it.id;
+    const opts = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? { mimeType: 'audio/webm;codecs=opus' } : {};
+    mediaRec = new MediaRecorder(stream, opts);
+    mediaRec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mediaRec.onstop = async () => {
+      d.classList.remove('live'); btn.textContent = '● سجّل'; btn.classList.add('rec');
+      const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+      if (blob.size < 1500) { d.querySelector('.st').textContent = 'التسجيل قصير أوي، جرّب تاني'; return; }
+      await put(it.id, { blob, type: blob.type, text: it.text, at: Date.now() });
+      done.add(it.id); mark(d, true); refresh();
+      const nx = d.nextElementSibling; if (nx) nx.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    d.classList.add('live'); btn.textContent = '■ وقّف'; d.querySelector('.st').textContent = 'بيسجّل...';
+    mediaRec.start();
+  }
+}
+// a tiny zip writer (stored, no compression) so no library is needed
+function crc32(buf) { let c, crc = -1; for (let i = 0; i < buf.length; i++) { c = (crc ^ buf[i]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ -1) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(); const parts = []; const central = []; let off = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name); const crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30)); lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46)); ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), name); off += 30 + name.length + f.data.length;
+  }
+  let csize = 0; central.forEach((p) => csize += p.length);
+  const end = new DataView(new ArrayBuffer(22)); end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/zip' });
+}
+document.getElementById('zip').onclick = async () => {
+  const files = [], manifest = [];
+  for (const it of ITEMS) { const v = await get(it.id); if (!v) continue; const name = `${it.id}.${ext(v.type)}`; files.push({ name, data: new Uint8Array(await v.blob.arrayBuffer()) }); manifest.push({ id: it.id, text: it.text, file: name }); }
+  if (!files.length) { alert('لسه ما سجلتش حاجة'); return; }
+  files.push({ name: 'manifest.json', data: new TextEncoder().encode(JSON.stringify({ group: GROUP, items: manifest }, null, 1)) });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(files)); a.download = `rehlaty_voice_${GROUP}.zip`; a.click();
+};
+document.getElementById('wipe').onclick = async () => { if (!confirm('تمسح كل تسجيلات الصفحة دي؟')) return; for (const it of ITEMS) { await del(it.id); done.delete(it.id); mark(document.getElementById('r_' + it.id), false); } refresh(); };
+(async () => { db = await openDb(); build(); for (const it of ITEMS) { const v = await get(it.id); if (v) { done.add(it.id); mark(document.getElementById('r_' + it.id), true); } } refresh(); })();
+</script>
+</body>
+</html>

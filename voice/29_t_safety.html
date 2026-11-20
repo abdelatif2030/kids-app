@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المستوى 29: الأمان</title>
+<style>
+  :root{--bg:#1d1250;--card:#2b1f78;--gold:#ffd23a;--ok:#2fbf5a;--rec:#e8384a;--ink:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,"Segoe UI",system-ui,sans-serif;direction:rtl}
+  header{position:sticky;top:0;z-index:5;background:#140b3a;border-bottom:3px solid var(--gold);padding:10px 14px}
+  h1{margin:0 0 6px;font-size:20px;color:var(--gold)}
+  .bar{height:12px;border-radius:8px;background:#3b2e90;overflow:hidden}.bar b{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+  .top{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+  button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:9px 14px;cursor:pointer;color:#fff;background:#3b6fd8;min-height:42px}
+  button.rec{background:var(--rec)}button.ok{background:var(--ok)}button.ghost{background:#4a3aa8}button.del{background:#6a2a50}
+  button:disabled{opacity:.4;cursor:default}
+  main{padding:10px 12px 90px;max-width:900px;margin:auto}
+  .row{background:var(--card);border:2px solid #4a3aa8;border-radius:16px;padding:12px;margin:10px 0}
+  .row.done{border-color:var(--ok)}.row.live{border-color:var(--rec);box-shadow:0 0 0 3px #e8384a55}
+  .t{font-size:26px;font-weight:900;line-height:1.5}.r{font-size:15px;opacity:.8;margin-top:2px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.st{font-size:14px;opacity:.9}
+  .note{background:#3b2e90;border-radius:12px;padding:10px;font-size:15px;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ __TITLE__</h1>
+  <div class="bar"><b id="prog"></b></div>
+  <div class="top"><span id="count"></span>
+    <span><button class="ok" id="zip">⬇️ تنزيل تسجيلاتي (ملف واحد)</button> <button class="del" id="wipe">🗑️ مسح الكل</button></span></div>
+</header>
+<main>
+  <div class="note">اضغط <b>● سجّل</b>، اقرا الجملة بصوتك بهدوء وبصوت طفل مرح، واضغط <b>■ وقّف</b>. تسمع تسجيلك بـ <b>▶ تسجيلي</b> وتقارنه بالصوت الحالي بـ <b>▶ الحالي</b>. التسجيلات بتتحفظ في المتصفح لوحدها، تقدر تقفل وتكمل بعدين. لما تخلص اضغط «تنزيل تسجيلاتي» وابعتلي الملف.</div>
+  <div id="list"></div>
+</main>
+<script>
+const GROUP = "29_t_safety";
+const ITEMS = [{"id":"0a576db3","text":"جسمي ملكي، لو حد لمسني ومش حابب، أعمل إيه؟","reading":"جِسْمِي مِلْكِي، لَو حَدّ لَمَسْنِي وَمِش حَابِب، أَعْمِل إِيه؟"},{"id":"975b98d9","text":"أخبي الموضوع","reading":"أَخَبِّي المَوْضُوع"},{"id":"f761c6d8","text":"أسكت","reading":"أَسْكُت"},{"id":"de5969bc","text":"أقول لأ وأقول لماما","reading":"أَقُول لَأ وَأَقُول لِمَامَا"},{"id":"63e45288","text":"قبل ما أعدي الشارع أعمل إيه؟","reading":"قَبْل مَا أَعَدِّي الشَّارِع أَعْمِل إِيه؟"},{"id":"a3ef24f8","text":"أبص يمين وشمال","reading":"أَبُصّ يِمِين وَشِمَال"},{"id":"b49d8aa7","text":"أغمض عيني","reading":"أَغَمَّض عِينِي"},{"id":"5c6388e8","text":"لقيت حاجة مش عارف هي إيه، أعمل إيه؟","reading":"لْقِيت حَاجَة مِش عَارِف هِيَّ إِيه، أَعْمِل إِيه؟"},{"id":"eea22b36","text":"أسأل كبير","reading":"أَسْأَل كَبِير"},{"id":"4b755bdc","text":"ألمسها","reading":"أَلْمِسْهَا"},{"id":"d75696c9","text":"أدوقها","reading":"أَدُوقْهَا"},{"id":"0f4d1b38","text":"ينفع أحكي لماما وبابا أي حاجة؟","reading":"يِنْفَع أَحْكِي لِمَامَا وَبَابَا أَيّ حَاجَة؟"},{"id":"b698d98b","text":"أيوه، دايماً","reading":"أَيْوَه، دَايْمًا"},{"id":"53b6f682","text":"لأ","reading":"لَأ"},{"id":"32213fb5","text":"مرة بس","reading":"مَرَّة بَسّ"},{"id":"381065be","text":"الكبريت والولاعة لمين؟","reading":"الكِبْرِيت وَالوَلَّاعَة لِمِين؟"},{"id":"e81287dd","text":"للكبار بس","reading":"لِلْكُبَار بَسّ"},{"id":"f4e17dfd","text":"للعب","reading":"لِلَّعِب"},{"id":"607ab426","text":"للأكل","reading":"لِلْأَكْل"},{"id":"ec1118c5","text":"لو حد غريب ضايقنا نقول لمين؟","reading":"لَو حَدّ غَرِيب ضَايِقْنَا نِقُول لِمِين؟"},{"id":"dc575d82","text":"فيه فيشة كهربا، ألمسها؟","reading":"فِيه فِيشَة كَهْرَبَا، أَلْمِسْهَا؟"},{"id":"ebbafb45","text":"أيوه","reading":"أَيْوَه"},{"id":"e69ebc79","text":"ألعب بيها","reading":"أَلْعَب بِيهَا"},{"id":"b7239031","text":"لأ، أبعد","reading":"لَأ، أَبْعِد"},{"id":"b349b480","text":"فين اللي آمن نلعب بيه؟","reading":"فِين اللِّي آمِن نِلْعَب بِيه؟"},{"id":"6ab24870","text":"فين اللي خطر نبعد عنه؟","reading":"فِين اللِّي خَطَر نِبْعِد عَنُّه؟"},{"id":"825da6fd","text":"ألعب بالكورة فين؟","reading":"أَلْعَب بِالكُورَة فِين؟"},{"id":"7e889128","text":"على السلم","reading":"عَلَى السُّلَّم"},{"id":"af882249","text":"في الجنينة","reading":"فِي الجِنِينَة"},{"id":"60ba5368","text":"في الشارع","reading":"فِي الشَّارِع"},{"id":"657c1484","text":"سائل التنضيف شكله حلو، أشربه؟","reading":"سَائِل التَنْضِيف شَكْلُه حِلْو، أَشْرَبُه؟"},{"id":"376f6452","text":"لأ، ده مش للشرب","reading":"لَأ، دَه مِش لِلشُّرْب"},{"id":"900d51c4","text":"أدوقه","reading":"أَدُوقُه"},{"id":"0134b42f","text":"واحد غريب عرض عليا حلوى، أعمل إيه؟","reading":"وَاحِد غَرِيب عَرَض عَلَيَّا حَلْوَى، أَعْمِل إِيه؟"},{"id":"1d12f8ae","text":"أروح معاه","reading":"أَرُوح مَعَاه"},{"id":"120ac0fe","text":"آخدها","reading":"آخِدْهَا"},{"id":"ddf9094c","text":"واحد غريب قال تعالى معايا، أعمل إيه؟","reading":"وَاحِد غَرِيب قَال تَعَالَى مَعَايَا، أَعْمِل إِيه؟"},{"id":"590f1c51","text":"أقول لأ وأجري لماما","reading":"أَقُول لَأ وَأَجْرِي لِمَامَا"},{"id":"c70353db","text":"ضعت في السوق، أعمل إيه؟","reading":"ضِعْت فِي السُّوق، أَعْمِل إِيه؟"},{"id":"d3c6c1f6","text":"أخرج برة","reading":"أَخْرُج بَرَّه"},{"id":"8bbfa87b","text":"أمشي بعيد","reading":"أَمْشِي بَعِيد"},{"id":"d84f1052","text":"أقف وأنادي شرطي أو موظف","reading":"أَقِف وَأُنَادِي شُرْطِي أَو مُوَظَّف"},{"id":"a92a7974","text":"لو ضعنا نسأل مين؟","reading":"لَو ضِعْنَا نِسْأَل مِين؟"},{"id":"608e216f","text":"غريب بيخبط على الباب، أعمل إيه؟","reading":"غَرِيب بِيْخَبَّط عَلَى البَاب، أَعْمِل إِيه؟"},{"id":"53eef07d","text":"أنادي ماما أو بابا","reading":"أُنَادِي مَامَا أَو بَابَا"},{"id":"4f3766ad","text":"أفتح له","reading":"أَفْتَح لُه"},{"id":"eada3709","text":"فين اللي بيحمينا من البرد؟","reading":"فِين اللِّي بِيْحْمِينَا مِن البَرْد؟"},{"id":"ee780412","text":"إحنا في رحلة، أمشي فين؟","reading":"إِحْنَا فِي رِحْلَة، أَمْشِي فِين؟"},{"id":"a20ee0c3","text":"لوحدي","reading":"لِوَحْدِي"},{"id":"d90cf57b","text":"بعيد عنهم","reading":"بَعِيد عَنُّهُم"},{"id":"0266d011","text":"جنب المدرسة","reading":"جَنْب المَدْرَسَة"},{"id":"bb9a2733","text":"حد غريب بيسأل عن عنواننا، أعمل إيه؟","reading":"حَدّ غَرِيب بِيْسَأَل عَنْ عُنْوَانِنَا، أَعْمِل إِيه؟"},{"id":"0f4f9e4a","text":"أكتبه له","reading":"أَكْتِبُه لُه"},{"id":"56ea79f0","text":"أقوله","reading":"أَقُولُه"},{"id":"bb19e801","text":"ما أقولش وأنادي كبير","reading":"مَا أَقُولْش وَأُنَادِي كَبِير"},{"id":"c1e31182","text":"ده ممكن يعورني، أعمل إيه؟","reading":"دَه مُمْكِن يِعَوَّرْنِي، أَعْمِل إِيه؟"},{"id":"b2be53ad","text":"أبعد وأنادي كبير","reading":"أَبْعِد وَأُنَادِي كَبِير"},{"id":"4f02dfd9","text":"ألمسه","reading":"أَلْمِسُه"},{"id":"5f1075d4","text":"ألعب بيه","reading":"أَلْعَب بِيه"},{"id":"0f9cf583","text":"البوتاجاز سخن، أعمل إيه؟","reading":"البُوتَاجَاز سُخْن، أَعْمِل إِيه؟"},{"id":"9d5f4d2f","text":"أبعد عنه","reading":"أَبْعِد عَنُّه"},{"id":"0290ab1d","text":"الإشارة حمرا، أعمل إيه؟","reading":"الإِشَارَة حَمْرَا، أَعْمِل إِيه؟"},{"id":"754aacbe","text":"أعدي","reading":"أَعَدِّي"},{"id":"4e950e06","text":"أقف","reading":"أَقِف"},{"id":"ca719d57","text":"السكينة والمقص الحاد، ألعب بيهم؟","reading":"السِّكِّينَة وَالمَقَصّ الحَادّ، أَلْعَب بِيهُم؟"},{"id":"25e6a553","text":"لأ، دول للكبار","reading":"لَأ، دُول لِلْكُبَار"},{"id":"b8e99393","text":"شوية","reading":"شُوَيَّة"},{"id":"38e9cc0d","text":"شفت نار، أعمل إيه؟","reading":"شُفْت نَار، أَعْمِل إِيه؟"},{"id":"0b837b48","text":"أطفيها بإيدي","reading":"أَطَفِّيهَا بِإِيدِي"},{"id":"00b254d3","text":"فين اللي بيحمينا من المطر؟","reading":"فِين اللِّي بِيْحْمِينَا مِن المَطَر؟"},{"id":"40358e6c","text":"المكواة سخنة، أعمل إيه؟","reading":"المَكْوَاة سُخْنَة، أَعْمِل إِيه؟"},{"id":"da2c1476","text":"أبعد عنها","reading":"أَبْعِد عَنْهَا"},{"id":"f435aed0","text":"عايز أعدي الشارع، أعدي مع مين؟","reading":"عَايِز أَعَدِّي الشَّارِع، أَعَدِّي مَعَ مِين؟"},{"id":"ea5bd4c5","text":"مع ماما أو بابا","reading":"مَعَ مَامَا أَو بَابَا"},{"id":"4cd2f14c","text":"وأنا بجري","reading":"وَأَنَا بَجْرِي"},{"id":"13a478b1","text":"اتجرحت، أعمل إيه؟","reading":"اتْجَرَحْت، أَعْمِل إِيه؟"},{"id":"cc694c59","text":"أقول لكبير","reading":"أَقُول لِكَبِير"},{"id":"2c7b3d7a","text":"لو وقعنا وتعبنا جامد نكلم مين؟","reading":"لَو وِقِعْنَا وَتِعِبْنَا جَامِد نِكَلِّم مِين؟"},{"id":"a887f688","text":"الشوربة سخنة، أعمل إيه؟","reading":"الشُّورْبَة سُخْنَة، أَعْمِل إِيه؟"},{"id":"a0a58c7e","text":"آكلها بسرعة","reading":"آكُلْهَا بِسُرْعَة"},{"id":"1c8a29d1","text":"أستنى لحد ما تبرد","reading":"أَسْتَنَّى لِحَدّ مَا تَبْرَد"},{"id":"d154a672","text":"ماشي على السلم، أعمل إيه؟","reading":"مَاشِي عَلَى السُّلَّم، أَعْمِل إِيه؟"},{"id":"7db3d317","text":"أنزل بالراحة","reading":"أَنْزِل بِالرَّاحَة"},{"id":"f7bc1049","text":"أنط","reading":"أَنُطّ"},{"id":"0c58561b","text":"لو شفنا حد وقع وبيعيط نكلم مين؟","reading":"لَو شُفْنَا حَدّ وِقِع وَبِيعَيَّط نِكَلِّم مِين؟"},{"id":"61f6a80f","text":"هنزل البحر، أنزل مع مين؟","reading":"هَنْزِل البَحْر، أَنْزِل مَعَ مِين؟"},{"id":"80d18c7c","text":"مع صاحبي الصغير","reading":"مَعَ صَاحْبِي الصُّغَيَّر"},{"id":"18b99285","text":"مع كبير","reading":"مَعَ كَبِير"},{"id":"f3bfbf26","text":"هستحمى في البانيو، هبقى مع مين؟","reading":"هَسْتَحَمَّى فِي البَانْيُو، هَبْقَى مَعَ مِين؟"},{"id":"6b8e9e56","text":"مع لعبتي","reading":"مَعَ لُعْبِتِي"},{"id":"b5f4fbdd","text":"لقيت علبة دوا، أعمل إيه؟","reading":"لْقِيت عُلْبَة دَوَا، أَعْمِل إِيه؟"},{"id":"f42169bb","text":"آخد حباية","reading":"آخُد حَبَّايَة"},{"id":"2cd955a8","text":"هركب العجلة، ألبس إيه؟","reading":"هَرْكَب العَجَلَة، أَلْبَس إِيه؟"},{"id":"53b59dd9","text":"البيجامة","reading":"البِيجَامَة"},{"id":"777e81f0","text":"ولا حاجة","reading":"وِلَّا حَاجَة"},{"id":"a55592aa","text":"الخوذة","reading":"الخُوذَة"},{"id":"e15456d9","text":"عايز أستحمى بالمية السخنة، أعمل إيه؟","reading":"عَايِز أَسْتَحَمَّى بِالمَيَّة السُّخْنَة، أَعْمِل إِيه؟"},{"id":"5909ec7a","text":"أجرب بإيدي","reading":"أَجَرَّب بِإِيدِي"},{"id":"eb3fa226","text":"أفتحها لوحدي","reading":"أَفْتَحْهَا لِوَحْدِي"},{"id":"dce2c5b5","text":"كبير يظبطها لي","reading":"كَبِير يِظَبَّطْهَا لِي"},{"id":"d38cee60","text":"هنزل من العربية، أنزل من أنهي ناحية؟","reading":"هَنْزِل مِن العَرَبِيَّة، أَنْزِل مِن أَنْهِي نَاحْيَة؟"},{"id":"e561cf30","text":"ناحية الرصيف","reading":"نَاحْيَة الرَّصِيف"},{"id":"a246c610","text":"من الشباك","reading":"مِن الشُّبَّاك"},{"id":"bba64960","text":"ناحية الشارع","reading":"نَاحْيَة الشَّارِع"},{"id":"77685472","text":"لو شمينا ريحة دخان نقول لمين؟","reading":"لَو شَمِّينَا رِيحَة دُخَّان نِقُول لِمِين؟"},{"id":"3af4bbc9","text":"الجو حر جداً، ألعب فين؟","reading":"الجَوّ حَرّ جِدًّا، أَلْعَب فِين؟"},{"id":"93d6e97a","text":"في الضل","reading":"فِي الضِّلّ"},{"id":"2f90c468","text":"تحت الشمس","reading":"تَحْت الشَّمْس"},{"id":"289500d4","text":"الدوا مين يدّيهولي؟","reading":"الدَّوَا مِين يِدِّيهُولِي؟"},{"id":"fdcb3312","text":"أنا لوحدي","reading":"أَنَا لِوَحْدِي"},{"id":"ec96aacc","text":"صاحبي","reading":"صَاحْبِي"},{"id":"89bb9afa","text":"ماما أو بابا","reading":"مَامَا أَو بَابَا"},{"id":"4fe42188","text":"فين اللي بيحمينا من الشمس؟","reading":"فِين اللِّي بِيْحْمِينَا مِن الشَّمْس؟"},{"id":"54d1bec9","text":"في الزحمة أمسك إيد مين؟","reading":"فِي الزَّحْمَة أَمْسِك إِيد مِين؟"},{"id":"051a99a5","text":"إيد ماما أو بابا","reading":"إِيد مَامَا أَو بَابَا"},{"id":"5952db86","text":"ولا إيد حد","reading":"وِلَّا إِيد حَدّ"},{"id":"2f03e167","text":"إيد غريب","reading":"إِيد غَرِيب"},{"id":"875f993e","text":"لو في حريق نكلم مين؟","reading":"لَو فِي حَرِيق نِكَلِّم مِين؟"},{"id":"4d63bb29","text":"سمعت رعد وبرق، أقعد فين؟","reading":"سِمِعْت رَعْد وَبَرْق، أَقْعُد فِين؟"},{"id":"b6b91c47","text":"تحت الشجرة","reading":"تَحْت الشَّجَرَة"},{"id":"eaaaec2c","text":"جوه البيت","reading":"جُوَّه البَيْت"},{"id":"57b77b4f","text":"الشباك عالي، أطلع عليه؟","reading":"الشُّبَّاك عَالِي، أَطْلَع عَلَيْه؟"},{"id":"14712f4f","text":"لأ، أبعد عنه","reading":"لَأ، أَبْعِد عَنُّه"},{"id":"944db60d","text":"أطلع كرسي","reading":"أَطْلَع كُرْسِي"},{"id":"b3927e42","text":"ركبت العربية، أعمل إيه الأول؟","reading":"رِكِبْت العَرَبِيَّة، أَعْمِل إِيه الأَوَّل؟"},{"id":"a958eef5","text":"أربط الحزام","reading":"أَرْبُط الحِزَام"},{"id":"2b6f6caf","text":"أقف على الكرسي","reading":"أَقِف عَلَى الكُرْسِي"},{"id":"a34eafb0","text":"أطلع راسي برة","reading":"أَطْلَع رَاسِي بَرَّه"},{"id":"eeaabc59","text":"شفت حيوان في الشارع، أعمل إيه؟","reading":"شُفْت حَيَوَان فِي الشَّارِع، أَعْمِل إِيه؟"},{"id":"f3e18385","text":"ما ألمسوش وأبعد","reading":"مَا أَلْمِسُوش وَأَبْعِد"},{"id":"d5e71cc2","text":"أجري وراه","reading":"أَجْرِي وَرَاه"}];
+const CURRENT = (id) => `../assets/assets/games/learn_voice/ar/${id}.mp3`;  // the voice that is in the app now (works on the demo site)
+let db, mediaRec, stream, chunks = [], curId = null, audio = new Audio();
+
+function openDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('rehlaty_voice', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('rec');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+const tx = (mode) => db.transaction('rec', mode).objectStore('rec');
+const key = (id) => GROUP + '|' + id;
+const get = (id) => new Promise((res) => { const q = tx('readonly').get(key(id)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); });
+const put = (id, v) => new Promise((res) => { const q = tx('readwrite').put(v, key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const del = (id) => new Promise((res) => { const q = tx('readwrite').delete(key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const done = new Set();
+
+function ext(type) { return /webm/.test(type) ? 'webm' : /ogg/.test(type) ? 'ogg' : /mp4|aac|m4a/.test(type) ? 'm4a' : /wav/.test(type) ? 'wav' : 'bin'; }
+function refresh() {
+  document.getElementById('count').textContent = `سجّلت ${done.size} من ${ITEMS.length}`;
+  document.getElementById('prog').style.width = (100 * done.size / ITEMS.length) + '%';
+}
+function build() {
+  const list = document.getElementById('list');
+  ITEMS.forEach((it, i) => {
+    const d = document.createElement('div'); d.className = 'row'; d.id = 'r_' + it.id;
+    d.innerHTML = `<div class="t">${i + 1}. ${it.text.replace(/</g, '&lt;')}</div>${it.reading && it.reading !== it.text ? `<div class="r">تُقرأ: ${it.reading.replace(/</g, '&lt;')}</div>` : ''}
+      <div class="btns"><button class="rec" data-a="rec">● سجّل</button><button class="ghost" data-a="mine" disabled>▶ تسجيلي</button><button class="ghost" data-a="cur">▶ الحالي</button><button class="del" data-a="del" disabled>🗑️</button><span class="st"></span></div>`;
+    d.addEventListener('click', (e) => { const a = e.target.dataset && e.target.dataset.a; if (a) act(it, d, e.target, a); });
+    list.appendChild(d);
+  });
+}
+function mark(d, on) {
+  d.classList.toggle('done', on);
+  d.querySelector('[data-a=mine]').disabled = !on; d.querySelector('[data-a=del]').disabled = !on;
+  d.querySelector('.st').textContent = on ? '✓ اتسجلت' : '';
+}
+async function act(it, d, btn, a) {
+  if (a === 'cur') { audio.pause(); audio = new Audio(CURRENT(it.id)); audio.play().catch(() => { d.querySelector('.st').textContent = 'الصوت الحالي مش متاح هنا'; }); return; }
+  if (a === 'mine') { const v = await get(it.id); if (v) { audio.pause(); audio = new Audio(URL.createObjectURL(v.blob)); audio.play(); } return; }
+  if (a === 'del') { await del(it.id); done.delete(it.id); mark(d, false); refresh(); return; }
+  if (a === 'rec') {
+    if (mediaRec && mediaRec.state === 'recording') { mediaRec.stop(); return; }
+    try { stream = stream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { alert('محتاج إذن الميكروفون. اسمح للمتصفح باستخدام الميكروفون وجرّب تاني.'); return; }
+    audio.pause(); chunks = []; curId = it.id;
+    const opts = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? { mimeType: 'audio/webm;codecs=opus' } : {};
+    mediaRec = new MediaRecorder(stream, opts);
+    mediaRec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mediaRec.onstop = async () => {
+      d.classList.remove('live'); btn.textContent = '● سجّل'; btn.classList.add('rec');
+      const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+      if (blob.size < 1500) { d.querySelector('.st').textContent = 'التسجيل قصير أوي، جرّب تاني'; return; }
+      await put(it.id, { blob, type: blob.type, text: it.text, at: Date.now() });
+      done.add(it.id); mark(d, true); refresh();
+      const nx = d.nextElementSibling; if (nx) nx.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    d.classList.add('live'); btn.textContent = '■ وقّف'; d.querySelector('.st').textContent = 'بيسجّل...';
+    mediaRec.start();
+  }
+}
+// a tiny zip writer (stored, no compression) so no library is needed
+function crc32(buf) { let c, crc = -1; for (let i = 0; i < buf.length; i++) { c = (crc ^ buf[i]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ -1) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(); const parts = []; const central = []; let off = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name); const crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30)); lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46)); ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), name); off += 30 + name.length + f.data.length;
+  }
+  let csize = 0; central.forEach((p) => csize += p.length);
+  const end = new DataView(new ArrayBuffer(22)); end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/zip' });
+}
+document.getElementById('zip').onclick = async () => {
+  const files = [], manifest = [];
+  for (const it of ITEMS) { const v = await get(it.id); if (!v) continue; const name = `${it.id}.${ext(v.type)}`; files.push({ name, data: new Uint8Array(await v.blob.arrayBuffer()) }); manifest.push({ id: it.id, text: it.text, file: name }); }
+  if (!files.length) { alert('لسه ما سجلتش حاجة'); return; }
+  files.push({ name: 'manifest.json', data: new TextEncoder().encode(JSON.stringify({ group: GROUP, items: manifest }, null, 1)) });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(files)); a.download = `rehlaty_voice_${GROUP}.zip`; a.click();
+};
+document.getElementById('wipe').onclick = async () => { if (!confirm('تمسح كل تسجيلات الصفحة دي؟')) return; for (const it of ITEMS) { await del(it.id); done.delete(it.id); mark(document.getElementById('r_' + it.id), false); } refresh(); };
+(async () => { db = await openDb(); build(); for (const it of ITEMS) { const v = await get(it.id); if (v) { done.add(it.id); mark(document.getElementById('r_' + it.id), true); } } refresh(); })();
+</script>
+</body>
+</html>

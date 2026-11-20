@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المستوى 17: مدرستي وموسيقاي</title>
+<style>
+  :root{--bg:#1d1250;--card:#2b1f78;--gold:#ffd23a;--ok:#2fbf5a;--rec:#e8384a;--ink:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,"Segoe UI",system-ui,sans-serif;direction:rtl}
+  header{position:sticky;top:0;z-index:5;background:#140b3a;border-bottom:3px solid var(--gold);padding:10px 14px}
+  h1{margin:0 0 6px;font-size:20px;color:var(--gold)}
+  .bar{height:12px;border-radius:8px;background:#3b2e90;overflow:hidden}.bar b{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+  .top{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+  button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:9px 14px;cursor:pointer;color:#fff;background:#3b6fd8;min-height:42px}
+  button.rec{background:var(--rec)}button.ok{background:var(--ok)}button.ghost{background:#4a3aa8}button.del{background:#6a2a50}
+  button:disabled{opacity:.4;cursor:default}
+  main{padding:10px 12px 90px;max-width:900px;margin:auto}
+  .row{background:var(--card);border:2px solid #4a3aa8;border-radius:16px;padding:12px;margin:10px 0}
+  .row.done{border-color:var(--ok)}.row.live{border-color:var(--rec);box-shadow:0 0 0 3px #e8384a55}
+  .t{font-size:26px;font-weight:900;line-height:1.5}.r{font-size:15px;opacity:.8;margin-top:2px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.st{font-size:14px;opacity:.9}
+  .note{background:#3b2e90;border-radius:12px;padding:10px;font-size:15px;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ __TITLE__</h1>
+  <div class="bar"><b id="prog"></b></div>
+  <div class="top"><span id="count"></span>
+    <span><button class="ok" id="zip">⬇️ تنزيل تسجيلاتي (ملف واحد)</button> <button class="del" id="wipe">🗑️ مسح الكل</button></span></div>
+</header>
+<main>
+  <div class="note">اضغط <b>● سجّل</b>، اقرا الجملة بصوتك بهدوء وبصوت طفل مرح، واضغط <b>■ وقّف</b>. تسمع تسجيلك بـ <b>▶ تسجيلي</b> وتقارنه بالصوت الحالي بـ <b>▶ الحالي</b>. التسجيلات بتتحفظ في المتصفح لوحدها، تقدر تقفل وتكمل بعدين. لما تخلص اضغط «تنزيل تسجيلاتي» وابعتلي الملف.</div>
+  <div id="list"></div>
+</main>
+<script>
+const GROUP = "17_t_school";
+const ITEMS = [{"id":"4653f6b1","text":"إيه اللي بنلبسه على ودانا؟","reading":"إِيه اللِّي بِنِلْبِسُه عَلَى وِدَانَا؟"},{"id":"37ee9241","text":"إيه اللي بيشيل الخطأ من الورقة؟","reading":"إِيه اللِّي بِيْشِيل الخَطَأ مِن الوَرَقَة؟"},{"id":"4ae64e57","text":"إيه اللي مفاتيحه بيضا وسودا؟","reading":"إِيه اللِّي مَفَاتِيحُه بَيْضَا وَسُودَا؟"},{"id":"46a9bfd0","text":"إيه اللي بنلبسه على ودانا وبنسمع بيه؟","reading":"إِيه اللِّي بِنِلْبِسُه عَلَى وِدَانَا وَبِنِسْمَع بِيه؟"},{"id":"3d9f7b0c","text":"إيه اللي ليه بوق عريض؟","reading":"إِيه اللِّي لِيه بُوق عَرِيض؟"},{"id":"c26be96c","text":"إيه اللي بنقعد عليه ونكتب؟","reading":"إِيه اللِّي بِنِقْعُد عَلَيْه وَنِكْتِب؟"},{"id":"bd0ca2aa","text":"إيه اللي بنهزه ونسمع رنة معدن صغيرة؟","reading":"إِيه اللِّي بِنِهِزُّه وَنِسْمَع رَنَّة مَعْدِن صُغَيَّرَة؟"},{"id":"b2074e9d","text":"إيه اللي ليه أوتار بنشدها بالقوس؟","reading":"إِيه اللِّي لِيه أَوْتَار بِنِشِدْهَا بِالقَوْس؟"},{"id":"cb3785a6","text":"إيه اللي بيوريلنا البحر والبر؟","reading":"إِيه اللِّي بِيْوَرِّيلْنَا البَحْر وَالبَرّ؟"},{"id":"03d6170a","text":"إيه اللي بيبقى فيه رصاص وبنبريه؟","reading":"إِيه اللِّي بِيبْقَى فِيه رَصَاص وَبِنِبْرِيه؟"},{"id":"b0dfceef","text":"إيه اللي بنلزق بيه صورة على الورقة؟","reading":"إِيه اللِّي بِنِلْزِق بِيه صُورَة عَلَى الوَرَقَة؟"},{"id":"994d9aee","text":"إيه اللي بنقص بيه الأشكال؟","reading":"إِيه اللِّي بِنِقُصّ بِيه الأَشْكَال؟"},{"id":"d7b1a4d7","text":"إيه اللي نمسكه في إيدينا ونهزه بإيقاع؟","reading":"إِيه اللِّي نِمْسِكُه فِي إِيدِينَا وَنِهِزُّه بِإِيقَاع؟"},{"id":"abdfdff3","text":"بنعزف على إيه بالأصابع؟","reading":"بِنِعْزِف عَلَى إِيه بِالأَصَابِع؟"},{"id":"46dea958","text":"إيه اللي بنفخ فيه أنبوبة طويلة نحيفة؟","reading":"إِيه اللِّي بِنْفُخ فِيه أُنْبُوبَة طَوِيلَة نَحِيفَة؟"},{"id":"5eb80741","text":"إيه اللي بنرسم بيه خط مستقيم؟","reading":"إِيه اللِّي بِنِرْسِم بِيه خَطّ مُسْتَقِيم؟"},{"id":"fb0ef3ca","text":"إيه اللي مكتوب فيه أسماء الدول؟","reading":"إِيه اللِّي مَكْتُوب فِيه أَسْمَاء الدُّوَل؟"},{"id":"2d79464b","text":"إيه اللي صوته قوي وفرحان؟","reading":"إِيه اللِّي صَوْتُه قَوِي وَفَرْحَان؟"},{"id":"260734b3","text":"بنلون بإيه؟","reading":"بِنِلَوِّن بِإِيه؟"},{"id":"9e2f8ac9","text":"بنقرا إيه؟","reading":"بِنِقْرَا إِيه؟"},{"id":"3446867e","text":"بنقص الورقة بإيه؟","reading":"بِنِقُصّ الوَرَقَة بِإِيه؟"},{"id":"61910103","text":"إيه اللي بنكتب بيه ونمسحه؟","reading":"إِيه اللِّي بِنِكْتِب بِيه وَنِمْسَحُه؟"},{"id":"71b0f3c3","text":"إيه اللي بنلون بيه الرسمة؟","reading":"إِيه اللِّي بِنِلَوِّن بِيه الرَّسْمَة؟"},{"id":"51abdd49","text":"بنغني في إيه؟","reading":"بِنِغَنِّي فِي إِيه؟"},{"id":"4d0e6e63","text":"إيه اللي بنضربه بعصايتين؟","reading":"إِيه اللِّي بِنِضْرَبُه بِعَصَايْتِين؟"},{"id":"2096992f","text":"إيه اللي بنرسم عليه ونقصه؟","reading":"إِيه اللِّي بِنِرْسِم عَلَيْه وَنِقُصُّه؟"},{"id":"db5d9a30","text":"إيه اللي بنمسكه بالكتف ونعزف عليه بقوس؟","reading":"إِيه اللِّي بِنِمْسِكُه بِالكَتِف وَنِعْزِف عَلَيْه بِقَوْس؟"},{"id":"8b015ee4","text":"إيه اللي بنسمعه في الباب؟","reading":"إِيه اللِّي بِنِسْمَعُه فِي البَاب؟"},{"id":"1f7f40c6","text":"إيه اللي بنلزق بيه الورق؟","reading":"إِيه اللِّي بِنِلْزِق بِيه الوَرَق؟"},{"id":"854c6485","text":"بنضرب على إيه؟","reading":"بِنِضْرَب عَلَى إِيه؟"},{"id":"068547cb","text":"إيه اللي بنقلب صفحاته؟","reading":"إِيه اللِّي بِنِقَلِّب صَفَحَاتُه؟"},{"id":"ac845b6a","text":"إيه اللي ليه حدّين وبنقص بيه؟","reading":"إِيه اللِّي لِيه حدّين وَبِنِقُصّ بِيه؟"},{"id":"551739f0","text":"إيه اللي ألوانه في علبة؟","reading":"إِيه اللِّي أَلْوَانُه فِي عُلْبَة؟"},{"id":"d058ea14","text":"إيه اللي بنفخ فيه ويطلع صوت عالي ومعدن؟","reading":"إِيه اللِّي بِنْفُخ فِيه وَيِطْلَع صَوْت عَالِي وَمَعْدِن؟"},{"id":"ff500000","text":"إيه اللي بنفتحه ونكتب فيه؟","reading":"إِيه اللِّي بِنِفْتَحُه وَنِكْتِب فِيه؟"},{"id":"f83dcee5","text":"إيه اللي بنفخ فيه بصوت عالي؟","reading":"إِيه اللِّي بِنْفُخ فِيه بِصَوْت عَالِي؟"},{"id":"5650e269","text":"إيه اللي بنعزف عليه بالقوس؟","reading":"إِيه اللِّي بِنِعْزِف عَلَيْه بِالقَوْس؟"},{"id":"7e39706b","text":"إيه اللي بنذاكر عليه؟","reading":"إِيه اللِّي بِنِذَاكِر عَلَيْه؟"},{"id":"581362f1","text":"إيه اللي صوته رفيع جدا وبنفخ فيه؟","reading":"إِيه اللِّي صَوْتُه رَفِيع جِدًّا وَبِنْفُخ فِيه؟"},{"id":"55f8ff5a","text":"بنمسح بإيه؟","reading":"بِنِمْسَح بِإِيه؟"},{"id":"3279e2bf","text":"إيه اللي بنغني قدامه؟","reading":"إِيه اللِّي بِنِغَنِّي قُدَّامُه؟"},{"id":"52888602","text":"بنعرف البلاد من إيه؟","reading":"بِنِعْرَف البِلَاد مِن إِيه؟"},{"id":"fc58afb7","text":"إيه اللي ليه ستة أوتار؟","reading":"إِيه اللِّي لِيه سِتَّة أَوْتَار؟"},{"id":"28234c95","text":"إيه اللي بنعزف عليه بالأصابع وبنقول له عود؟","reading":"إِيه اللِّي بِنِعْزِف عَلَيْه بِالأَصَابِع وَبِنِقُول لُه عُود؟"},{"id":"168ac955","text":"إيه اللي بنهزه ونسمع رنة؟","reading":"إِيه اللِّي بِنِهِزُّه وَنِسْمَع رَنَّة؟"},{"id":"33a830e2","text":"بنقعد على إيه في الفصل؟","reading":"بِنِقْعُد عَلَى إِيه فِي الفَصْل؟"},{"id":"c420581a","text":"إيه اللي المدرس بيكتب عليه؟","reading":"إِيه اللِّي المُدَرِّس بِيْكْتِب عَلَيْه؟"},{"id":"14079470","text":"إيه اللي بيتعمل منه الطائرة الورق؟","reading":"إِيه اللِّي بِيِتْعَمِل مِنُّه الطَّائِرَة الوَرَق؟"},{"id":"e942d524","text":"إيه اللي بنضرب عليه ويعمل دم دم؟","reading":"إِيه اللِّي بِنِضْرَب عَلَيْه وَيِعْمِل دُم دُم؟"},{"id":"2abdcfee","text":"إيه اللي بنمسح بيه الغلطة؟","reading":"إِيه اللِّي بِنِمْسَح بِيه الغَلْطَة؟"},{"id":"a92b7e63","text":"إيه اللي بنغني قدامه في الحفلة؟","reading":"إِيه اللِّي بِنِغَنِّي قُدَّامُه فِي الحَفْلَة؟"},{"id":"ac4683c4","text":"إيه اللي بنقراه عشان نعزف؟","reading":"إِيه اللِّي بِنِقْرَاه عَشَان نِعْزِف؟"},{"id":"5bf53c2d","text":"إيه اللي بيتحرك بالأصابع على مفاتيح؟","reading":"إِيه اللِّي بِيِتْحَرَّك بِالأَصَابِع عَلَى مَفَاتِيح؟"},{"id":"dd1d9b31","text":"إيه اللي فيه خطوط ونكتب عليها؟","reading":"إِيه اللِّي فِيه خُطُوط وَنِكْتِب عَلَيْهَا؟"},{"id":"1177c79d","text":"إيه اللي أخضر أو أسود والمدرس بيكتب عليه؟","reading":"إِيه اللِّي أَخْضَر أَو أَسْوَد وَالمُدَرِّس بِيْكْتِب عَلَيْه؟"},{"id":"c13ee4a3","text":"إيه اللي مكتوب فيه الموسيقى؟","reading":"إِيه اللِّي مَكْتُوب فِيه المُوسِيقَى؟"},{"id":"79ded701","text":"إيه اللي حجمه صغير وبيتحط تحت الدقن؟","reading":"إِيه اللِّي حَجْمُه صُغَيَّر وَبِيِتْحَطّ تَحْت الدَّقَن؟"},{"id":"7869cf98","text":"إيه اللي فيه صور وحكايات؟","reading":"إِيه اللِّي فِيه صُوَر وَحِكَايَات؟"},{"id":"6e3e5148","text":"بنسمع الموسيقى بإيه؟","reading":"بِنِسْمَع المُوسِيقَى بِإِيه؟"},{"id":"edee6b3f","text":"إيه اللي بيتعمل منه الطيارة الورق؟","reading":"إِيه اللِّي بِيِتْعَمِل مِنُّه الطَّيَّارَة الوَرَق؟"},{"id":"fe2ea63b","text":"إيه اللي بنلون به ورقة بيضا؟","reading":"إِيه اللِّي بِنِلَوِّن بِه وَرَقَة بَيْضَا؟"},{"id":"33fa66c1","text":"بنكتب عليه الدرس في الفصل؟","reading":"بِنِكْتِب عَلَيْه الدَّرْس فِي الفَصْل؟"},{"id":"99d03489","text":"إيه اللي بنفخ فيه ويطلع صوت رفيع؟","reading":"إِيه اللِّي بِنْفُخ فِيه وَيِطْلَع صَوْت رَفِيع؟"},{"id":"ab5fe553","text":"بنلزق الورق بإيه؟","reading":"بِنِلْزِق الوَرَق بِإِيه؟"},{"id":"5d7c69e0","text":"إيه اللي بنقول عليه أرقام وسنتيمترات؟","reading":"إِيه اللِّي بِنِقُول عَلَيْه أَرْقَام وَسَنْتِيمِتْرَات؟"},{"id":"9aabeb09","text":"إيه اللي بنقراه في الحصة الموسيقية؟","reading":"إِيه اللِّي بِنِقْرَاه فِي الحِصَّة المُوسِيقِيَّة؟"},{"id":"1c218e79","text":"إيه اللي بنسمع منه نغمات حلوة شرقية؟","reading":"إِيه اللِّي بِنِسْمَع مِنُّه نَغَمَات حِلْوَة شَرْقِيَّة؟"},{"id":"f6925a6e","text":"إيه اللي فيه القارات والبلاد؟","reading":"إِيه اللِّي فِيه القَارَّات وَالبِلَاد؟"},{"id":"193072db","text":"بنكتب بإيه في الكراسة؟","reading":"بِنِكْتِب بِإِيه فِي الكُرَّاسَة؟"},{"id":"6da69f8f","text":"إيه اللي بيرن لما نحركه؟","reading":"إِيه اللِّي بِيْرِنّ لَمَّا نِحَرَّكُه؟"},{"id":"8918f843","text":"إيه اللي بنقيس بيه طول القلم؟","reading":"إِيه اللِّي بِنِقِيس بِيه طُول القَلَم؟"},{"id":"da86a27d","text":"إيه اللي بيتحط على الودن عشان نسمع لوحدنا؟","reading":"إِيه اللِّي بِيِتْحَطّ عَلَى الوِدْن عَشَان نِسْمَع لِوَحْدِنَا؟"},{"id":"6e84c7fc","text":"إيه اللي بنقلب صفحاته ونقرا؟","reading":"إِيه اللِّي بِنِقَلِّب صَفَحَاتُه وَنِقْرَا؟"},{"id":"66afa45e","text":"إيه اللي بيعلي صوتنا لما نغني؟","reading":"إِيه اللِّي بِيْعَلِّي صَوْتِنَا لَمَّا نِغَنِّي؟"},{"id":"c3a8c6ed","text":"إيه اللي ليه مفاتيح أبيض وأسود؟","reading":"إِيه اللِّي لِيه مَفَاتِيح أَبْيَض وَأَسْوَد؟"},{"id":"c30457d1","text":"إيه اللي بنمسك بيه لما نكتب؟","reading":"إِيه اللِّي بِنِمْسِك بِيه لَمَّا نِكْتِب؟"},{"id":"55a19601","text":"إيه اللي بنقص بيه الورق الملون؟","reading":"إِيه اللِّي بِنِقُصّ بِيه الوَرَق المُلَوَّن؟"},{"id":"e0747cb0","text":"إيه اللي بنرسم بيه خط مظبوط؟","reading":"إِيه اللِّي بِنِرْسِم بِيه خَطّ مَظْبُوط؟"},{"id":"217b6edf","text":"إيه اللي فيه ألوان كتير؟","reading":"إِيه اللِّي فِيه أَلْوَان كَتِير؟"},{"id":"0bc7ec79","text":"بنقيس بإيه؟","reading":"بِنِقِيس بِإِيه؟"}];
+const CURRENT = (id) => `../assets/assets/games/learn_voice/ar/${id}.mp3`;  // the voice that is in the app now (works on the demo site)
+let db, mediaRec, stream, chunks = [], curId = null, audio = new Audio();
+
+function openDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('rehlaty_voice', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('rec');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+const tx = (mode) => db.transaction('rec', mode).objectStore('rec');
+const key = (id) => GROUP + '|' + id;
+const get = (id) => new Promise((res) => { const q = tx('readonly').get(key(id)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); });
+const put = (id, v) => new Promise((res) => { const q = tx('readwrite').put(v, key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const del = (id) => new Promise((res) => { const q = tx('readwrite').delete(key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const done = new Set();
+
+function ext(type) { return /webm/.test(type) ? 'webm' : /ogg/.test(type) ? 'ogg' : /mp4|aac|m4a/.test(type) ? 'm4a' : /wav/.test(type) ? 'wav' : 'bin'; }
+function refresh() {
+  document.getElementById('count').textContent = `سجّلت ${done.size} من ${ITEMS.length}`;
+  document.getElementById('prog').style.width = (100 * done.size / ITEMS.length) + '%';
+}
+function build() {
+  const list = document.getElementById('list');
+  ITEMS.forEach((it, i) => {
+    const d = document.createElement('div'); d.className = 'row'; d.id = 'r_' + it.id;
+    d.innerHTML = `<div class="t">${i + 1}. ${it.text.replace(/</g, '&lt;')}</div>${it.reading && it.reading !== it.text ? `<div class="r">تُقرأ: ${it.reading.replace(/</g, '&lt;')}</div>` : ''}
+      <div class="btns"><button class="rec" data-a="rec">● سجّل</button><button class="ghost" data-a="mine" disabled>▶ تسجيلي</button><button class="ghost" data-a="cur">▶ الحالي</button><button class="del" data-a="del" disabled>🗑️</button><span class="st"></span></div>`;
+    d.addEventListener('click', (e) => { const a = e.target.dataset && e.target.dataset.a; if (a) act(it, d, e.target, a); });
+    list.appendChild(d);
+  });
+}
+function mark(d, on) {
+  d.classList.toggle('done', on);
+  d.querySelector('[data-a=mine]').disabled = !on; d.querySelector('[data-a=del]').disabled = !on;
+  d.querySelector('.st').textContent = on ? '✓ اتسجلت' : '';
+}
+async function act(it, d, btn, a) {
+  if (a === 'cur') { audio.pause(); audio = new Audio(CURRENT(it.id)); audio.play().catch(() => { d.querySelector('.st').textContent = 'الصوت الحالي مش متاح هنا'; }); return; }
+  if (a === 'mine') { const v = await get(it.id); if (v) { audio.pause(); audio = new Audio(URL.createObjectURL(v.blob)); audio.play(); } return; }
+  if (a === 'del') { await del(it.id); done.delete(it.id); mark(d, false); refresh(); return; }
+  if (a === 'rec') {
+    if (mediaRec && mediaRec.state === 'recording') { mediaRec.stop(); return; }
+    try { stream = stream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { alert('محتاج إذن الميكروفون. اسمح للمتصفح باستخدام الميكروفون وجرّب تاني.'); return; }
+    audio.pause(); chunks = []; curId = it.id;
+    const opts = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? { mimeType: 'audio/webm;codecs=opus' } : {};
+    mediaRec = new MediaRecorder(stream, opts);
+    mediaRec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mediaRec.onstop = async () => {
+      d.classList.remove('live'); btn.textContent = '● سجّل'; btn.classList.add('rec');
+      const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+      if (blob.size < 1500) { d.querySelector('.st').textContent = 'التسجيل قصير أوي، جرّب تاني'; return; }
+      await put(it.id, { blob, type: blob.type, text: it.text, at: Date.now() });
+      done.add(it.id); mark(d, true); refresh();
+      const nx = d.nextElementSibling; if (nx) nx.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    d.classList.add('live'); btn.textContent = '■ وقّف'; d.querySelector('.st').textContent = 'بيسجّل...';
+    mediaRec.start();
+  }
+}
+// a tiny zip writer (stored, no compression) so no library is needed
+function crc32(buf) { let c, crc = -1; for (let i = 0; i < buf.length; i++) { c = (crc ^ buf[i]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ -1) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(); const parts = []; const central = []; let off = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name); const crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30)); lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46)); ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), name); off += 30 + name.length + f.data.length;
+  }
+  let csize = 0; central.forEach((p) => csize += p.length);
+  const end = new DataView(new ArrayBuffer(22)); end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/zip' });
+}
+document.getElementById('zip').onclick = async () => {
+  const files = [], manifest = [];
+  for (const it of ITEMS) { const v = await get(it.id); if (!v) continue; const name = `${it.id}.${ext(v.type)}`; files.push({ name, data: new Uint8Array(await v.blob.arrayBuffer()) }); manifest.push({ id: it.id, text: it.text, file: name }); }
+  if (!files.length) { alert('لسه ما سجلتش حاجة'); return; }
+  files.push({ name: 'manifest.json', data: new TextEncoder().encode(JSON.stringify({ group: GROUP, items: manifest }, null, 1)) });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(files)); a.download = `rehlaty_voice_${GROUP}.zip`; a.click();
+};
+document.getElementById('wipe').onclick = async () => { if (!confirm('تمسح كل تسجيلات الصفحة دي؟')) return; for (const it of ITEMS) { await del(it.id); done.delete(it.id); mark(document.getElementById('r_' + it.id), false); } refresh(); };
+(async () => { db = await openDb(); build(); for (const it of ITEMS) { const v = await get(it.id); if (v) { done.add(it.id); mark(document.getElementById('r_' + it.id), true); } } refresh(); })();
+</script>
+</body>
+</html>
