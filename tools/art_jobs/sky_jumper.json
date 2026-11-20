@@ -1,0 +1,14 @@
+{
+ "style": "Cute colorful cartoon game sprite, glossy, bright saturated colors, smooth shading, kid friendly, no text, no letters.",
+ "kind_sprite": "Single subject centered, whole object visible, plain white background, no shadow, no text.",
+ "suffix": "No text, no letters.",
+ "jobs": [
+  {"name":"hero","kind":"sprite","prompt":"A funny lime-green four-legged cartoon creature with a long snout, big round white eyes with black pupils, small antenna and stubby legs, side view facing right, standing, smiling."},
+  {"name":"monster","kind":"sprite","prompt":"A silly purple round blob monster with one big googly eye, tiny bat wings and a goofy toothy grin, front view, not scary."},
+  {"name":"platform_grass","kind":"sprite","prompt":"A long thin horizontal green grassy floating platform, a flat green bar with a lighter top edge, side view, wide and short, very simple."},
+  {"name":"spring","kind":"sprite","prompt":"A metal coil spring with a red round cap on top, side view, simple cartoon."},
+  {"name":"jetpack","kind":"sprite","prompt":"A cartoon rocket jetpack with two orange tanks and small flames, front view."},
+  {"name":"propeller","kind":"sprite","prompt":"A cartoon propeller beanie cap, red with a blue and yellow spinning propeller on top, side view."}
+ ]
+}
+

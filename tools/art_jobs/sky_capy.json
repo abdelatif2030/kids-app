@@ -1,0 +1,15 @@
+{
+ "style": "Cute colorful cartoon game sprite, glossy toy-like, bright saturated colors, smooth shading, kid friendly, no text, no letters.",
+ "kind_sprite": "Single subject centered, whole object visible, seen from directly ABOVE (top-down bird's-eye view), plain white background, no shadow, no text.",
+ "suffix": "No text, no letters, no UI.",
+ "jobs": [
+  {"name":"clouds","kind":"bg","prompt":"A sea of fluffy white and pale blue clouds seen from directly above, bird's-eye view, soft shading, tiny gaps showing deep blue sky, seamless soft pattern, nothing else."},
+  {"name":"plane","kind":"sprite","prompt":"A small teal seaplane with red-orange wing tips and two pontoon floats, with a brown capybara pilot in goggles and a white scarf in the open cockpit, propeller at the front, wings spread wide."},
+  {"name":"island_village","kind":"sprite","prompt":"A small floating sky island with dark green grass top and rocky brown rim, with tiny colorful cottages and a little windmill on it."},
+  {"name":"island_laundry","kind":"sprite","prompt":"A small floating sky island with green grass top and rocky rim, with two wooden poles and a clothesline with colorful laundry."},
+  {"name":"island_tree","kind":"sprite","prompt":"A small floating sky island with a giant round green tree crown with a bird nest in the middle, rocky brown rim."},
+  {"name":"balloon","kind":"sprite","prompt":"A red and cream striped hot air balloon with a wicker basket and a grey cartoon rat pirate with a dark tricorn hat peeking out of the basket. Seen from slightly above."},
+  {"name":"boss","kind":"sprite","prompt":"A big dark-blue pirate airship with a round balloon envelope, a wooden hull with golden portholes, a black skull flag, and propellers on both sides, seen from above."}
+ ]
+}
+

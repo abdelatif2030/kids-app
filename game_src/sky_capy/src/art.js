@@ -35,6 +35,13 @@ export function drawCloud(g, x, y, s, a = 1) {
   g.restore();
 }
 
+/** Optional generated pictures (set by main.js; any missing one is null and the code-drawn version is used). */
+export const ART = {};
+function pic(g, im, x, y, w, rot = 0) {
+  const h = w * im.naturalHeight / im.naturalWidth;
+  g.save(); g.translate(x, y); if (rot) g.rotate(rot); g.drawImage(im, -w / 2, -h / 2, w, h); g.restore();
+}
+
 export function paintSky(w, h, stage) {
   const c = document.createElement('canvas');
   c.width = w; c.height = h;
@@ -48,6 +55,8 @@ export function paintSky(w, h, stage) {
 
 /** A floating island seen from above: grass top with a rocky rim, and a little scene on it. */
 export function drawIsland(g, x, y, s, kind, time) {
+  const im = ART['island_' + ['village', 'laundry', 'tree'][kind]];
+  if (im) { g.fillStyle = 'rgba(60,90,140,0.18)'; g.beginPath(); g.ellipse(x + s * 0.1, y + s * 0.3, s * 1.0, s * 0.5, 0, 0, TAU); g.fill(); pic(g, im, x, y, s * 2.1); return; }
   g.save(); g.translate(x, y);
   g.fillStyle = 'rgba(60,90,140,0.18)'; g.beginPath(); g.ellipse(s * 0.1, s * 0.22, s * 1.05, s * 0.55, 0, 0, TAU); g.fill(); // shadow on the clouds
   ell(g, 0, 0, s, s * 0.62, '#7a6a5a', s * 0.04);
@@ -75,6 +84,12 @@ export function drawIsland(g, x, y, s, kind, time) {
 /** The teal seaplane with the capybara pilot, seen from above. (x, y) = centre; s = wingspan/2. */
 export function drawPlane(g, x, y, s, time, paint = 'lagoon', tilt = 0, hurt = false) {
   const [c1, c2, c3] = PAINT_COLORS[paint] || PAINT_COLORS.lagoon;
+  if (ART.plane && (paint === 'lagoon' || !paint)) {
+    g.save(); if (hurt) g.globalAlpha = 0.6 + 0.4 * Math.sin(time * 40);
+    g.fillStyle = 'rgba(40,70,120,0.2)'; g.beginPath(); g.ellipse(x + s * 0.25, y + s * 0.55, s * 1.1, s * 0.35, 0, 0, TAU); g.fill();
+    pic(g, ART.plane, x, y, s * 2.3, tilt * 0.25);
+    g.translate(x, y - s * 0.62); g.rotate(time * 30); ell(g, 0, 0, s * 0.5, s * 0.06, 'rgba(255,255,255,0.45)'); g.restore(); return;
+  }
   g.save(); g.translate(x, y); g.rotate(tilt * 0.25);
   if (hurt) g.globalAlpha = 0.6 + 0.4 * Math.sin(time * 40);
   const lw = Math.max(1.5, s * 0.07);
@@ -118,6 +133,7 @@ export function drawEnemy(g, type, x, y, s, time, hpRatio = 1, pop = 0) {
   g.save(); g.translate(x, y);
   if (pop) { g.scale(1 - pop * 0.6, 1 - pop * 0.6); g.rotate(pop * 0.8); g.globalAlpha = 1 - pop; }
   const lw = Math.max(1.5, s * 0.05);
+  if (type === 'balloon' && ART.balloon) { pic(g, ART.balloon, 0, 0, s * 0.95); rat(g, 0, s * 0.56, s * 0.85, true, false); g.restore(); return; }
   if (type === 'balloon' || type === 'umbrella' || type === 'cage') {
     const col = type === 'cage' ? '#ffd23a' : type === 'umbrella' ? '#e8504a' : '#ff8a6a';
     g.save(); g.translate(0, -s * 0.15);
@@ -162,6 +178,7 @@ export function drawBoss(g, x, y, s, time, hpRatio = 1, pop = 0) {
   g.save(); g.translate(x, y);
   if (pop) { g.scale(1 - pop * 0.4, 1 - pop * 0.4); g.rotate(pop * 0.3); g.globalAlpha = 1 - pop; }
   const lw = Math.max(2, s * 0.03);
+  if (ART.boss) { pic(g, ART.boss, 0, -s * 0.05, s * 2.2); for (const sx of [-1, 1]) { g.save(); g.translate(sx * s * 0.82, s * 0.2); g.rotate(time * 26); rr(g, -s * 0.2, -s * 0.03, s * 0.4, s * 0.06, s * 0.03, 'rgba(255,255,255,0.35)'); g.restore(); } g.restore(); return; }
   // the balloon envelope
   ell(g, 0, -s * 0.3, s * 0.95, s * 0.5, '#3a5ab8', lw);
   for (const k of [-0.6, -0.3, 0, 0.3, 0.6]) { g.save(); g.beginPath(); g.ellipse(0, -s * 0.3, s * 0.95, s * 0.5, 0, 0, TAU); g.clip(); ell(g, s * k, -s * 0.3, s * 0.1, s * 0.52, 'rgba(255,255,255,0.35)'); g.restore(); }
@@ -242,3 +259,4 @@ export function drawPopBurst(g, x, y, s, k, kind) {
   for (let i = 0; i < 12; i++) { const a = (i / 12) * TAU + k; const d = s * (0.2 + 0.9 * k); g.fillStyle = cols[i % cols.length]; g.globalAlpha = 1 - k; g.beginPath(); g.arc(x + Math.cos(a) * d, y + Math.sin(a) * d, s * 0.12 * (1 - k * 0.5), 0, TAU); g.fill(); }
   g.globalAlpha = 1;
 }
+

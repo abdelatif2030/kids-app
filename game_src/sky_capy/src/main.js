@@ -5,7 +5,8 @@
 // on their own; capsules, pearls and a screen-clearing Bubble Storm; three stages then a harder loop; HP bar, combo multipliers, stage
 // ranks, a top-10 table with initials, and a hangar where feathers buy upgrades and paint. 2D canvas, all art and sound made in code.
 import { Run, W, H, UPGRADES, PAINTS, ENEMY, normalizeSave, upgradeLevel, buyUpgrade, buyPaint, qualifies, addScore } from './sim.js';
-import { paintSky, drawCloud, drawIsland, drawPlane, drawEnemy, drawBoss, drawBird, drawCageItem, drawPickup, drawBubble, drawEnemyBullet, drawPopBurst, PAINT_COLORS } from './art.js';
+import { paintSky, drawCloud, drawIsland, drawPlane, drawEnemy, drawBoss, drawBird, drawCageItem, drawPickup, drawBubble, drawEnemyBullet, drawPopBurst, PAINT_COLORS, ART } from './art.js';
+import { loadArt } from '../../cozy_kit/art.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num } from './i18n.js';
 
@@ -158,7 +159,7 @@ class Game {
     this._bind();
     this.t0 = performance.now();
     this.last = this.t0;
-    this._fonts().then(() => { this.showMenu(); this._loop(); });
+    Promise.all([this._fonts(), loadArt(this.base, ['clouds', 'balloon']).then((a) => Object.assign(ART, a))]).then(() => { this.showMenu(); this._loop(); });
   }
 
   async _fonts() {
@@ -528,6 +529,12 @@ class Game {
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.drawImage(this._sky(), 0, 0);
     g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    if (ART.clouds) { // mirrored tiles scroll down so the seam never shows
+      const im = ART.clouds; const cw = this.cw, ch = this.ch; const k = Math.max(cw / im.naturalWidth, ch / im.naturalHeight) * 1.1; const iw = im.naturalWidth * k, ih = im.naturalHeight * k;
+      const off = (time * this.sc * 6) % (2 * ih); g.globalAlpha = 0.5;
+      for (let n = -1; n * ih - ih + off < ch; n++) { const y0 = n * ih + off - ih; g.save(); if (((n % 2) + 2) % 2) { g.translate(0, y0 + ih); g.scale(1, -1); g.drawImage(im, (cw - iw) / 2, 0, iw, ih); } else g.drawImage(im, (cw - iw) / 2, y0, iw, ih); g.restore(); }
+      g.globalAlpha = 1;
+    }
     // islands and clouds scroll down (the plane flies up)
     const stage = this.run ? this.run.stage : 1;
     for (const c of this.clouds) { c.y += c.v * dt * 0.06; if (c.y > 1.1) { c.y = -0.1; c.x = Math.random(); } drawCloud(g, c.x * this.cw, c.y * this.ch, this.sc * 10 * c.s, 0.55); }

@@ -41,3 +41,11 @@ Gameplay was already close (drag to fly, auto-fire + FIRE for a faster stream, S
 - No Trophies or Settings buttons on the title (the app already has its own settings); the capybara pilot is not drawn on the logo.
 - Dialogue lines are fewer than the video's and not tied to events one by one ("BLUE JAY JOINS!" uses the existing rescue toast).
 - Not tested on a real phone; sound not heard by a person. Landscape phones still show the portrait field in the middle.
+
+
+## 2026-11-20: generated pictures (AI Horde)
+- Added `assets/games/sky_capy/art/`: `clouds.webp` (cartoon cloud sea, drawn mirrored and scrolling at 50% over the code-drawn sky) and `balloon.webp` (red/cream striped balloon, cut out; the code-drawn pirate rat is still drawn in the basket). About 22 KB in total. `art.js` has `ART` + `pic()`; `main.js` loads them with `cozy_kit/art.js` `loadArt`. Hooks also exist (not loaded because no good picture) for `plane`, `island_village/laundry/tree` and `boss`: they only switch on if a file with that name is put in `art/`.
+- Not added: plane, islands, boss. The free generator (SDXL queue was hours long; fast SD 1.5 models used instead) cannot make a true top-down view; the pictures came out as side/perspective views with scenery backgrounds, which would look wrong in this top-down game, so the code-drawn versions stay.
+- Every picture is optional (missing file = code drawing). Gameplay, hitboxes and sim are unchanged.
+- Checked in headless Chrome (430x800): menu and real play (islands, balloons, bubbles, plane) look right, balloons are clear and not covering HUD or buttons, no console errors (only a 404 for the font path because the test server root differs), 61 fps in the headless renderer (same as before). `npm test` 9 pass.
+- Looks off / to do: the cloud layer is subtle; the original video's painted islands and plane are not matched (need a stronger generator or the owner's pictures; prompts are in tools/art_jobs/sky_capy.json).

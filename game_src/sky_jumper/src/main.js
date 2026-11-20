@@ -6,6 +6,10 @@
 import { Climb, W, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { loadArt } from '../../cozy_kit/art.js';
+// Optional generated pictures; a missing one stays null and the code-drawn version is used.
+const ART = {};
+const pic = (g, im, x, y, w) => { const hh = w * im.naturalHeight / im.naturalWidth; g.drawImage(im, x - w / 2, y - hh / 2, w, hh); };
 
 const S = {
   title: ['النطاط', 'Sky Jumper'], play: ['يلا نطّ', 'Jump!'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], again: ['تاني', 'Again'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'],
@@ -62,7 +66,7 @@ class Game {
     this._onVis = () => { if (document.hidden) this.sound.suspend(); else this.sound.resume(); };
     document.addEventListener('visibilitychange', this._onVis);
     this.last = performance.now();
-    this._fonts().then(() => { this.showMenu(); this._loop(); });
+    Promise.all([this._fonts(), loadArt(this.base, ['hero', 'monster']).then((a) => Object.assign(ART, a))]).then(() => { this.showMenu(); this._loop(); });
   }
 
   async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 2500))]); } catch (_) { /* system font */ } }
@@ -126,13 +130,14 @@ class Game {
       const x = pl.x * sx; const y = Y(pl.y); const w = pl.w * sx;
       if (y < -30 || y > H + 30) continue;
       const col = { normal: '#5ac850', move: '#4a9ae8', crumble: '#b8844a', spring: '#5ac850' }[pl.kind];
-      g.fillStyle = col; g.strokeStyle = '#2a4a2a'; g.lineWidth = 2; g.beginPath(); g.roundRect(x - w / 2, y - 5, w, 12, 6); g.fill(); g.stroke();
-      g.fillStyle = 'rgba(255,255,255,.4)'; g.fillRect(x - w / 2 + 6, y - 3, w - 12, 3);
+      if (ART.platform_grass && (pl.kind === 'normal' || pl.kind === 'spring')) { g.drawImage(ART.platform_grass, x - w / 2 - 3, y - 11, w + 6, 26); }
+      else { g.fillStyle = col; g.strokeStyle = '#2a4a2a'; g.lineWidth = 2; g.beginPath(); g.roundRect(x - w / 2, y - 5, w, 12, 6); g.fill(); g.stroke();
+      g.fillStyle = 'rgba(255,255,255,.4)'; g.fillRect(x - w / 2 + 6, y - 3, w - 12, 3); }
       if (pl.kind === 'crumble') { g.strokeStyle = '#5a3a1a'; g.beginPath(); g.moveTo(x - 4, y - 5); g.lineTo(x, y + 7); g.moveTo(x + 8, y - 5); g.lineTo(x + 4, y + 7); g.stroke(); }
       if (pl.kind === 'spring') { g.strokeStyle = '#888'; g.lineWidth = 3; g.beginPath(); for (let k = 0; k < 5; k++) { g.lineTo(x + (k % 2 ? 6 : -6), y - 6 - k * 3); } g.stroke(); g.fillStyle = '#e8564a'; g.fillRect(x - 9, y - 24, 18, 5); }
     }
-    for (const it of c.items) { const x = it.x * sx; const y = Y(it.y); g.font = `${sx * 1.1}px system-ui`; g.textAlign = 'center'; g.fillText(it.kind === 'jetpack' ? '🚀' : '🚁', x, y); }
-    for (const m of c.mons) { if (m.dead) continue; const x = m.x * sx; const y = Y(m.y); g.fillStyle = '#9a5ad8'; g.strokeStyle = '#3a1a5a'; g.lineWidth = 2; g.beginPath(); g.ellipse(x, y, sx * 0.55, sx * 0.5, 0, 0, 6.3); g.fill(); g.stroke(); g.fillStyle = '#fff'; g.beginPath(); g.arc(x - sx * 0.2, y - sx * 0.1, sx * 0.17, 0, 6.3); g.arc(x + sx * 0.2, y - sx * 0.1, sx * 0.17, 0, 6.3); g.fill(); g.fillStyle = '#111'; g.beginPath(); g.arc(x - sx * 0.2, y - sx * 0.1, sx * 0.07, 0, 6.3); g.arc(x + sx * 0.2, y - sx * 0.1, sx * 0.07, 0, 6.3); g.fill(); g.beginPath(); g.moveTo(x - sx * 0.3, y + sx * 0.18); g.lineTo(x + sx * 0.3, y + sx * 0.18); g.stroke(); }
+    for (const it of c.items) { const x = it.x * sx; const y = Y(it.y); const im = it.kind === 'jetpack' ? ART.jetpack : ART.propeller; if (im) { pic(g, im, x, y - sx * 0.35, sx * 1.0); continue; } g.font = `${sx * 1.1}px system-ui`; g.textAlign = 'center'; g.fillText(it.kind === 'jetpack' ? '🚀' : '🚁', x, y); }
+    for (const m of c.mons) { if (m.dead) continue; const x = m.x * sx; const y = Y(m.y); if (ART.monster) { pic(g, ART.monster, x, y, sx * 1.35); continue; } g.fillStyle = '#9a5ad8'; g.strokeStyle = '#3a1a5a'; g.lineWidth = 2; g.beginPath(); g.ellipse(x, y, sx * 0.55, sx * 0.5, 0, 0, 6.3); g.fill(); g.stroke(); g.fillStyle = '#fff'; g.beginPath(); g.arc(x - sx * 0.2, y - sx * 0.1, sx * 0.17, 0, 6.3); g.arc(x + sx * 0.2, y - sx * 0.1, sx * 0.17, 0, 6.3); g.fill(); g.fillStyle = '#111'; g.beginPath(); g.arc(x - sx * 0.2, y - sx * 0.1, sx * 0.07, 0, 6.3); g.arc(x + sx * 0.2, y - sx * 0.1, sx * 0.07, 0, 6.3); g.fill(); g.beginPath(); g.moveTo(x - sx * 0.3, y + sx * 0.18); g.lineTo(x + sx * 0.3, y + sx * 0.18); g.stroke(); }
     for (const s of c.shots) { g.fillStyle = '#ff8a2a'; g.beginPath(); g.arc(s.x * sx, Y(s.y), 6, 0, 6.3); g.fill(); }
     // the creature (drawn wrapped at both edges)
     for (const dx of [0, -W, W]) this._creature(g, (c.p.x + dx) * sx, Y(c.p.y), sx, c.p);
@@ -142,6 +147,8 @@ class Game {
     if (x < -sx || x > this.cw + sx) return;
     const s = sx * 0.55; const squash = p.vy > 6 ? 1.12 : p.vy < -6 ? 0.92 : 1;
     g.save(); g.translate(x, y); g.scale(p.face >= 0 ? 1 : -1, 1);
+    if (ART.hero) { pic(g, ART.hero, s * 0.15, -s * 1.1 * (p.vy > 6 ? 0.98 : 1), s * 3.0 * (squash > 1 ? 0.97 : 1)); }
+    else {
     g.fillStyle = '#b8e84a'; g.strokeStyle = '#3a5a1a'; g.lineWidth = 2.5;
     g.beginPath(); g.ellipse(0, -s * 1.1, s * 0.95, s * 1.05 * squash, 0, 0, 6.3); g.fill(); g.stroke();
     g.fillStyle = '#fff'; g.beginPath(); g.arc(s * 0.15, -s * 1.45, s * 0.3, 0, 6.3); g.arc(s * 0.6, -s * 1.4, s * 0.26, 0, 6.3); g.fill(); g.stroke();
@@ -149,6 +156,7 @@ class Game {
     g.fillStyle = '#7ac82a'; g.beginPath(); g.ellipse(s * 1.05, -s * 1.15, s * 0.55, s * 0.28, 0, 0, 6.3); g.fill(); g.stroke(); // long snout
     g.fillStyle = '#5a9a1a'; for (const fx of [-0.55, 0.45]) { g.beginPath(); g.ellipse(fx * s, -s * 0.1 + (p.vy > 0 ? -s * 0.2 : 0), s * 0.32, s * 0.22, 0, 0, 6.3); g.fill(); g.stroke(); }
     g.strokeStyle = '#3a5a1a'; g.lineWidth = 3; g.beginPath(); g.moveTo(-s * 0.9, -s * 1.5); g.lineTo(-s * 1.3, -s * 1.9); g.stroke();
+    }
     if (p.fly > 0) { g.font = `${s * 1.8}px system-ui`; g.textAlign = 'center'; g.fillText(p.flyKind === 'jetpack' ? '🔥' : '🚁', 0, p.flyKind === 'jetpack' ? s * 0.6 : -s * 2.6); }
     if (p.shield > 0 && Math.floor(this.clock * 10) % 2) { g.globalAlpha = 0.4; g.fillStyle = '#fff'; g.beginPath(); g.arc(0, -s, s * 1.6, 0, 6.3); g.fill(); g.globalAlpha = 1; }
     g.restore();
@@ -161,3 +169,4 @@ class Game {
 const api = { start(el, config, post) { const g = new Game(el, config || {}, post); api.last = g; return { dispose: () => g.dispose(), pause: () => g.pause() }; } };
 window.SkyJumper = api;
 export default api;
+
