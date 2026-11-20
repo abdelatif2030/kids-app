@@ -75,4 +75,8 @@ const idx = ['<!doctype html><meta charset="utf-8"><meta name="viewport" content
 groups.forEach((g, i) => idx.push(`<a class="${i === 0 ? 'first' : ''}" href="${g.key}.html"><span>${i === 0 ? '⭐ ' : ''}${g.title}</span><span class="n">${g.ids.length}</span></a>`));
 fs.writeFileSync(path.join(outDir, 'index.html'), idx.join('\n'));
 fs.writeFileSync(path.join(ROOT, 'docs/VOICE_LIST.md'), md.join('\n') + '\n');
+// the full list: every sentence with the page (level) that records it, and the clip the app plays now
+const csv = ['\ufeffpage,id,text,current_clip'];
+for (const g of groups) for (const id of g.ids) csv.push(`${g.key},${id},"${byId.get(id).text.replace(/"/g, '""')}",assets/games/learn_voice/ar/${id}.mp3`);
+fs.writeFileSync(path.join(ROOT, 'docs/VOICE_LIST_FULL.csv'), csv.join('\n') + '\n');
 console.log(`${groups.length} pages, ${lines.length} sentences, ${used.size} in levels, ${rest.length} general`);
