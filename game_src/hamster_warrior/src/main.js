@@ -102,8 +102,14 @@ function makeHero() {
   const glow = mesh(new THREE.CircleGeometry(1.2, 28), new THREE.MeshBasicMaterial({ color: 0xffe680, transparent: true, opacity: 0.35, depthWrite: false }), 0, 0.03, 0, 1, 1, 1); glow.rotation.x = -Math.PI / 2; g.add(glow);
   return g;
 }
-function makeCreature(type, seed) {
+const _artTex = new Map();
+function artTex(img) { let t = _artTex.get(img); if (!t) { t = new THREE.Texture(img); t.colorSpace = THREE.SRGBColorSpace; t.needsUpdate = true; _artTex.set(img, t); } return t; }
+function makeCreature(type, seed, img) {
   const g = new THREE.Group(); const b = new THREE.Group();
+  if (img) { // generated picture (optional); same size and place as the code-drawn creature, which stays as the fallback
+    const h = 2.3, sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: artTex(img), transparent: true })); sp.scale.set(h * (img.naturalWidth / img.naturalHeight), h, 1); sp.center.set(0.5, 0.04); sp.position.y = 0.05; b.add(sp);
+    g.add(b); g.userData.body = b; g.userData.seed = seed; return g;
+  }
   const eye = (x, y, z) => { b.add(mesh(geo.sphere, M(0xffffff), x, y, z, 0.3, 0.32, 0.2), mesh(geo.sphere, M(0x1a1a2a), x * 1.05, y - 0.02, z + 0.1, 0.14, 0.18, 0.1)); };
   if (type === 0) { // sprout creature: green bulb with a leaf, as in the video
     b.add(mesh(geo.sphere, M(0x7ad04a), 0, 0.55, 0, 1.3, 1.0, 1.2), mesh(geo.sphere, M(0x9ae06a), 0, 0.45, 0.15, 0.9, 0.6, 0.8));
@@ -142,7 +148,7 @@ class Game {
     this.ro = new ResizeObserver(() => this._resize()); this.ro.observe(el);
     this._bind();
     this.last = performance.now();
-    loadArt(this.base, ['sky_1', 'sky_2', 'sky_3', 'boss_1', 'boss_2', 'boss_3']).then((a) => { this.art = a; if (this.mode === 'menu' && this.demo) this._buildWorld(this.demo); });
+    loadArt(this.base, ['sky_1', 'sky_2', 'sky_3', 'boss_1', 'boss_2', 'boss_3', 'monster_1', 'monster_2', 'monster_3']).then((a) => { this.art = a; if (this.mode === 'menu' && this.demo) this._buildWorld(this.demo); });
     this._fonts().then(() => { this.showMenu(); this.renderer.setAnimationLoop(() => this._frame()); });
   }
 
@@ -245,7 +251,7 @@ class Game {
     for (const t of run.things) {
       const g = new THREE.Group();
       if (t.kind === 'enemy') {
-        g.add(makeCreature(t.type, t.seed));
+        g.add(makeCreature(t.type, t.seed, this.art['monster_' + (((t.type | 0) % 3) + 1)]));
         const p = sprite(pillTex('weak', fmt(t.power)), 2.2, 0.96); p.position.y = 2.5; g.add(p); this.pills.push({ t, sp: p, state: 'weak' });
       } else if (t.kind === 'boss') {
         if (bossArt) { const tx = new THREE.Texture(bossArt); tx.colorSpace = THREE.SRGBColorSpace; tx.needsUpdate = true; const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tx, transparent: true })); sp.scale.set(7 * (bossArt.naturalWidth / bossArt.naturalHeight), 7, 1); sp.center.set(0.5, 0.04); sp.position.y = 0.9; g.add(sp); }
