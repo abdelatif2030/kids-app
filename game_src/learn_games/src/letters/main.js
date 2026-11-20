@@ -1126,6 +1126,8 @@ ead) also reads every choice aloud, one after the other, and the choice being re
       L.t += dt / (L.via ? 1.7 : 1.1);
       const k = Math.min(1, L.t);
       const slotPos = new THREE.Vector3(L.slot.x, L.slot.y - 0.2, L.slot.z);
+      // numbers, letters and plaques must never spin while they hop (owner 2026-11-20: the number turned edge-on and could not be read)
+      const noSpin = L.o.o && (L.o.o.kind === 'number' || L.o.o.kind === 'letter' || L.o.o.plaque);
       if (L.via) {
         // the food first hops to the animal's mouth, who munches, and only then goes on to the rack
         const SPLIT = 0.42;
@@ -1134,21 +1136,21 @@ ead) also reads every choice aloud, one after the other, and the choice being re
           L.o.g.position.lerpVectors(L.from, L.via, ee);
           L.o.g.position.y += Math.sin(kk * Math.PI) * 1.6;
           L.o.g.scale.setScalar(Math.max(0.01, 1 - 0.5 * ee));
-          L.o.g.rotation.y = ee * Math.PI;
+          L.o.g.rotation.y = noSpin ? 0 : ee * Math.PI;
         } else {
           if (!L.ate) { L.ate = true; this.sh.sound.play('pop'); this._pet((p) => { p.chew = 1.1; }); this.st.sparkle(L.via.clone(), 10); }
           const kk = (k - SPLIT) / (1 - SPLIT), ee = kk * kk * (3 - 2 * kk);
           L.o.g.position.lerpVectors(L.via, slotPos, ee);
           L.o.g.position.y += Math.sin(kk * Math.PI) * 2.0;
           L.o.g.scale.setScalar(Math.max(0.01, 0.5 - 0.08 * ee));
-          L.o.g.rotation.y = Math.PI + ee * Math.PI;
+          L.o.g.rotation.y = noSpin ? 0 : Math.PI + ee * Math.PI;
         }
       } else {
         const e = k * k * (3 - 2 * k);
         L.o.g.position.lerpVectors(L.from, slotPos, e);
         L.o.g.position.y += Math.sin(k * Math.PI) * 2.4;
         L.o.g.scale.setScalar(Math.max(0.01, 1 - 0.58 * e));
-        L.o.g.rotation.y = e * Math.PI * 2;
+        L.o.g.rotation.y = noSpin ? 0 : e * Math.PI * 2;
       }
       if (k >= 1) {
         // keep only the picture on the rack: the raft stays behind and sinks away

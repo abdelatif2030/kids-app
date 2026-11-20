@@ -1,0 +1,87 @@
+{
+  "suffix": "No text, no letters, no people.",
+  "kind_sprite": "Single object centered, plain white background, no ground shadow, no text.",
+  "style": "Cute cozy 3D cartoon game art, soft warm sunlight, clean glossy toy-like look, bright but natural colors, kid friendly, no text, no letters.",
+  "jobs": [
+    {
+      "kind": "scene",
+      "prompt": "Flat top-down orthographic view of a hand-knotted oriental rug filling the entire image edge to edge: deep red field, large ornate central medallion in navy and cream, patterned navy border, no floor, no fringe visible, no shadows.",
+      "name": "rug_1",
+      "wide": true
+    },
+    {
+      "kind": "scene",
+      "prompt": "Flat top-down orthographic view of a hand-knotted rug filling the entire image edge to edge: teal field with repeating gold geometric diamonds, cream and rust border, no floor, no fringe visible, no shadows.",
+      "name": "rug_2",
+      "wide": true
+    },
+    {
+      "kind": "scene",
+      "prompt": "Flat top-down orthographic view of a hand-knotted rug filling the entire image edge to edge: royal blue field with floral vine pattern in gold and pink, ornate border, no floor, no fringe visible, no shadows.",
+      "name": "rug_3",
+      "wide": true
+    },
+    {
+      "kind": "scene",
+      "prompt": "Flat top-down orthographic view of a hand-knotted tribal rug filling the entire image edge to edge: warm orange and cream field with rows of green octagon motifs, brown border, no floor, no fringe visible, no shadows.",
+      "name": "rug_4",
+      "wide": true
+    },
+    {
+      "kind": "scene",
+      "prompt": "Flat top-down orthographic view of sun-warmed cream limestone courtyard floor tiles with thin grout lines and subtle dappled leaf shadows, Mediterranean, nothing else on the floor, seamless texture.",
+      "name": "floor",
+      "wide": true
+    },
+    {
+      "kind": "sprite",
+      "name": "pot",
+      "prompt": "A terracotta flower pot full of red geraniums with green leaves."
+    },
+    {
+      "kind": "sprite",
+      "name": "tool_beat",
+      "prompt": "A wicker rug beater with a round woven head and a wooden handle, icon style."
+    },
+    {
+      "kind": "sprite",
+      "name": "tool_foam",
+      "prompt": "A white and blue spray bottle of rug cleaning foam with an orange trigger, icon style."
+    },
+    {
+      "kind": "sprite",
+      "name": "tool_brush",
+      "prompt": "A round blue rotary scrubbing brush with cream bristles on a short grey handle, icon style."
+    },
+    {
+      "kind": "sprite",
+      "name": "tool_jet",
+      "prompt": "A grey pressure washer spray gun with a red grip and a blue water jet coming out, icon style."
+    },
+    {
+      "kind": "sprite",
+      "name": "tool_squeegee",
+      "prompt": "A floor squeegee with a light blue rubber blade and a long wooden handle, icon style."
+    },
+    {
+      "kind": "sprite",
+      "name": "client_1",
+      "prompt": "Friendly smiling woman with dark curly hair and a yellow scarf, head and shoulders portrait, front view."
+    },
+    {
+      "kind": "sprite",
+      "name": "client_2",
+      "prompt": "Friendly smiling middle-aged man with a mustache and a green cap, head and shoulders portrait, front view."
+    },
+    {
+      "kind": "sprite",
+      "name": "client_3",
+      "prompt": "Friendly smiling grandmother with grey hair in a bun and round glasses, head and shoulders portrait, front view."
+    },
+    {
+      "kind": "sprite",
+      "name": "client_4",
+      "prompt": "Friendly smiling young man with short black hair and a blue shirt, head and shoulders portrait, front view."
+    }
+  ]
+}

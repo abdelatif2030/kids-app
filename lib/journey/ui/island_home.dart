@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../../lazy_features.dart' show prefetchGames;
+import '../../media/hub_music.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../design/focusable_tap.dart';
@@ -233,6 +235,19 @@ class IslandHome extends StatefulWidget {
 class _IslandHomeState extends State<IslandHome>
     with SingleTickerProviderStateMixin {
   AnimationController? _c;
+
+  @override
+  void initState() {
+    super.initState();
+    // warm up the fun games in the background a few seconds after the home appears (see prefetchGames)
+    if (!isTestBinding()) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future<void>.delayed(const Duration(seconds: 3), () {
+          if (mounted) prefetchGames(context);
+        });
+      });
+    }
+  }
 
   bool get _motionAllowed =>
       IslandHome.forceMotion ??
@@ -548,7 +563,9 @@ class _IslandHomeState extends State<IslandHome>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => HubMusicScope(track: 'home', child: _buildScreen(context));
+
+  Widget _buildScreen(BuildContext context) {
     final rtl = Directionality.of(context) == TextDirection.rtl;
     return LayoutBuilder(
       builder: (context, box) {

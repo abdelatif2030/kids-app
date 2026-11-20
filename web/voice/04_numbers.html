@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المستوى 4: أتعرف على الأرقام</title>
+<style>
+  :root{--bg:#1d1250;--card:#2b1f78;--gold:#ffd23a;--ok:#2fbf5a;--rec:#e8384a;--ink:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,"Segoe UI",system-ui,sans-serif;direction:rtl}
+  header{position:sticky;top:0;z-index:5;background:#140b3a;border-bottom:3px solid var(--gold);padding:10px 14px}
+  h1{margin:0 0 6px;font-size:20px;color:var(--gold)}
+  .bar{height:12px;border-radius:8px;background:#3b2e90;overflow:hidden}.bar b{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+  .top{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+  button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:9px 14px;cursor:pointer;color:#fff;background:#3b6fd8;min-height:42px}
+  button.rec{background:var(--rec)}button.ok{background:var(--ok)}button.ghost{background:#4a3aa8}button.del{background:#6a2a50}
+  button:disabled{opacity:.4;cursor:default}
+  main{padding:10px 12px 90px;max-width:900px;margin:auto}
+  .row{background:var(--card);border:2px solid #4a3aa8;border-radius:16px;padding:12px;margin:10px 0}
+  .row.done{border-color:var(--ok)}.row.live{border-color:var(--rec);box-shadow:0 0 0 3px #e8384a55}
+  .t{font-size:26px;font-weight:900;line-height:1.5}.r{font-size:15px;opacity:.8;margin-top:2px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.st{font-size:14px;opacity:.9}
+  .note{background:#3b2e90;border-radius:12px;padding:10px;font-size:15px;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ __TITLE__</h1>
+  <div class="bar"><b id="prog"></b></div>
+  <div class="top"><span id="count"></span>
+    <span><button class="ok" id="zip">⬇️ تنزيل تسجيلاتي (ملف واحد)</button> <button class="del" id="wipe">🗑️ مسح الكل</button></span></div>
+</header>
+<main>
+  <div class="note">اضغط <b>● سجّل</b>، اقرا الجملة بصوتك بهدوء وبصوت طفل مرح، واضغط <b>■ وقّف</b>. تسمع تسجيلك بـ <b>▶ تسجيلي</b> وتقارنه بالصوت الحالي بـ <b>▶ الحالي</b>. التسجيلات بتتحفظ في المتصفح لوحدها، تقدر تقفل وتكمل بعدين. لما تخلص اضغط «تنزيل تسجيلاتي» وابعتلي الملف.</div>
+  <div id="list"></div>
+</main>
+<script>
+const GROUP = "04_numbers";
+const ITEMS = [{"id":"14ddda21","text":"فين رقم تمانية؟","reading":"فِين رَقَم تَمَانْيَة؟"},{"id":"3649c53e","text":"فين رقم تمانية وتمانين؟","reading":"فِين رَقَم تَمَانْيَة وْتَمَانِين؟"},{"id":"3f346399","text":"فين الرقم الأكبر؟","reading":"فِين الرَّقَم الأَكْبَر؟"},{"id":"67c6e5d9","text":"فين الرقم اللي بعد أربعة؟","reading":"فِين الرَّقَم اللِّي بَعْد أَرْبَعَة؟"},{"id":"3afce433","text":"فين رقم حداشر؟","reading":"فِين رَقَم أَحَدَ عَشَر؟"},{"id":"cbd2084e","text":"فين رقم ستاشر؟","reading":"فِين رَقَم سِتَّاشَر؟"},{"id":"75463796","text":"فين رقم أربعين؟","reading":"فِين رَقَم أَرْبَعِين؟"},{"id":"11e24a5c","text":"فين رقم تمنتاشر؟","reading":"فِين رَقَم تَمَنْتَاشَر؟"},{"id":"afda0dce","text":"فين رقم أربعتاشر؟","reading":"فِين رَقَم أَرْبَعْتَاشَر؟"},{"id":"b07a93f9","text":"فين رقم تمانين؟","reading":"فِين رَقَم تَمَانِين؟"},{"id":"87fe8ffb","text":"فين رقم اتنين؟","reading":"فِين رَقَم اتْنِين؟"},{"id":"7a815ed0","text":"فين الرقم اللي قبل عشرة؟","reading":"فِين الرَّقَم اللِّي قَبْل عَشَرَة؟"},{"id":"c0c024d1","text":"فين رقم اتنين وستين؟","reading":"فِين رَقَم اتْنِين وْسِتِّين؟"},{"id":"0f9427a1","text":"فين رقم اتناشر؟","reading":"فِين رَقَم اتْنَاشَر؟"},{"id":"38ac8feb","text":"فين رقم تسعتاشر؟","reading":"فِين رَقَم تِسَعْتَاشَر؟"},{"id":"0fd55641","text":"فين الرقم اللي بعد خمسة؟","reading":"فِين الرَّقَم اللِّي بَعْد خَمْسَة؟"},{"id":"a8b11a99","text":"فين رقم تلاتاشر؟","reading":"فِين رَقَم تَلَاتَاشَر؟"},{"id":"ceb42b29","text":"فين رقم سبعتاشر؟","reading":"فِين رَقَم سَبَعْتَاشَر؟"},{"id":"cb9ad3ce","text":"فين رقم خمسة وسبعين؟","reading":"فِين رَقَم خَمْسَة وْسَبْعِين؟"},{"id":"aa57a1f9","text":"فين رقم واحد؟","reading":"فِين رَقَم وَاحِد؟"},{"id":"0010b55f","text":"فين رقم عشرين؟","reading":"فِين رَقَم عِشْرِين؟"},{"id":"32f7db20","text":"فين رقم ستين؟","reading":"فِين رَقَم سِتِّين؟"},{"id":"c5bcfdd4","text":"فين رقم واحد وتلاتين؟","reading":"فِين رَقَم وَاحِد وْتَلَاتِين؟"},{"id":"bbc1b2a6","text":"فين رقم خمستاشر؟","reading":"فِين رَقَم خَمَسْتَاشَر؟"},{"id":"e9b9b68d","text":"فين رقم صفر؟","reading":"فِين رَقَم صِفْر؟"},{"id":"92664511","text":"فين رقم سبعين؟","reading":"فِين رَقَم سَبْعِين؟"},{"id":"9d7d51a0","text":"فين الرقم اللي بعد تلاتة؟","reading":"فِين الرَّقَم اللِّي بَعْد تَلَاتَة؟"},{"id":"8970c6ee","text":"فين رقم خمسين؟","reading":"فِين رَقَم خَمْسِين؟"},{"id":"7bf5d15b","text":"فين رقم تسعين؟","reading":"فِين رَقَم تِسْعِين؟"},{"id":"7ad57553","text":"فين رقم تلاتين؟","reading":"فِين رَقَم تَلَاتِين؟"},{"id":"40286981","text":"فين رقم مية؟","reading":"فِين رَقَم مِيَّة؟"},{"id":"1ea46696","text":"فين رقم أربعة وتمانين؟","reading":"فِين رَقَم أَرْبَعَة وْتَمَانِين؟"},{"id":"775bd1dc","text":"فين رقم تمانية وتلاتين؟","reading":"فِين رَقَم تَمَانْيَة وْتَلَاتِين؟"},{"id":"be924cbd","text":"فين رقم تسعة وسبعين؟","reading":"فِين رَقَم تِسْعَة وْسَبْعِين؟"},{"id":"9425c5a7","text":"فين رقم تلاتة وتلاتين؟","reading":"فِين رَقَم تَلَاتَة وْتَلَاتِين؟"},{"id":"d341427c","text":"فين رقم خمسة وعشرين؟","reading":"فِين رَقَم خَمْسَة وِعِشْرِين؟"},{"id":"38d4f355","text":"فين رقم سبعة وتلاتين؟","reading":"فِين رَقَم سَبْعَة وْتَلَاتِين؟"},{"id":"c7cdcaa6","text":"فين رقم سبعة وستين؟","reading":"فِين رَقَم سَبْعَة وْسِتِّين؟"},{"id":"2443e66b","text":"فين رقم ستة وأربعين؟","reading":"فِين رَقَم سِتَّة وِأَرْبَعِين؟"},{"id":"4b09f5cb","text":"فين رقم خمسة وستين؟","reading":"فِين رَقَم خَمْسَة وْسِتِّين؟"},{"id":"d112dd15","text":"فين رقم أربعة وخمسين؟","reading":"فِين رَقَم أَرْبَعَة وْخَمْسِين؟"},{"id":"4436dd5e","text":"فين رقم تمانية وسبعين؟","reading":"فِين رَقَم تَمَانْيَة وْسَبْعِين؟"},{"id":"abe39681","text":"فين رقم سبعة وتسعين؟","reading":"فِين رَقَم سَبْعَة وْتِسْعِين؟"},{"id":"6141ac5b","text":"فين رقم سبعة وتمانين؟","reading":"فِين رَقَم سَبْعَة وْتَمَانِين؟"},{"id":"f312295e","text":"فين رقم اتنين وتسعين؟","reading":"فِين رَقَم اتْنِين وْتِسْعِين؟"},{"id":"f0a7336d","text":"فين رقم تمانية وخمسين؟","reading":"فِين رَقَم تَمَانْيَة وْخَمْسِين؟"},{"id":"7def27fd","text":"فين رقم خمسة وخمسين؟","reading":"فِين رَقَم خَمْسَة وْخَمْسِين؟"},{"id":"ca9d43d8","text":"فين رقم خمسة وتسعين؟","reading":"فِين رَقَم خَمْسَة وْتِسْعِين؟"},{"id":"3c71101e","text":"فين رقم ستة وتسعين؟","reading":"فِين رَقَم سِتَّة وْتِسْعِين؟"},{"id":"7093094e","text":"فين رقم اتنين وتلاتين؟","reading":"فِين رَقَم اتْنِين وْتَلَاتِين؟"},{"id":"37bea653","text":"فين رقم أربعة وستين؟","reading":"فِين رَقَم أَرْبَعَة وْسِتِّين؟"},{"id":"aa59c142","text":"فين رقم تسعة وأربعين؟","reading":"فِين رَقَم تِسْعَة وِأَرْبَعِين؟"},{"id":"18b977a8","text":"فين رقم تمانية وتسعين؟","reading":"فِين رَقَم تَمَانْيَة وْتِسْعِين؟"},{"id":"21427d23","text":"فين رقم واحد وستين؟","reading":"فِين رَقَم وَاحِد وْسِتِّين؟"},{"id":"33b7c08e","text":"فين رقم خمسة وتمانين؟","reading":"فِين رَقَم خَمْسَة وْتَمَانِين؟"},{"id":"9caa589b","text":"فين رقم اتنين وخمسين؟","reading":"فِين رَقَم اتْنِين وْخَمْسِين؟"},{"id":"6552dd72","text":"فين رقم ستة وعشرين؟","reading":"فِين رَقَم سِتَّة وِعِشْرِين؟"},{"id":"5d4f852b","text":"فين رقم اتنين وأربعين؟","reading":"فِين رَقَم اتْنِين وِأَرْبَعِين؟"},{"id":"9207aed8","text":"فين رقم ستة وسبعين؟","reading":"فِين رَقَم سِتَّة وْسَبْعِين؟"},{"id":"c72a5691","text":"فين رقم خمسة وأربعين؟","reading":"فِين رَقَم خَمْسَة وِأَرْبَعِين؟"},{"id":"d37c2adf","text":"فين رقم تسعة وتلاتين؟","reading":"فِين رَقَم تِسْعَة وْتَلَاتِين؟"},{"id":"bc403095","text":"فين رقم سبعة وعشرين؟","reading":"فِين رَقَم سَبْعَة وِعِشْرِين؟"},{"id":"0146a4f0","text":"فين رقم واحد وتسعين؟","reading":"فِين رَقَم وَاحِد وْتِسْعِين؟"},{"id":"a51e3f5b","text":"فين رقم ستة وخمسين؟","reading":"فِين رَقَم سِتَّة وْخَمْسِين؟"},{"id":"cb5ed9f4","text":"فين رقم أربعة وعشرين؟","reading":"فِين رَقَم أَرْبَعَة وِعِشْرِين؟"},{"id":"f4af7ca4","text":"فين رقم أربعة وتلاتين؟","reading":"فِين رَقَم أَرْبَعَة وْتَلَاتِين؟"},{"id":"0781fbb2","text":"فين رقم اتنين وعشرين؟","reading":"فِين رَقَم اتْنِين وِعِشْرِين؟"},{"id":"0cdc7c3b","text":"فين رقم تلاتة وعشرين؟","reading":"فِين رَقَم تَلَاتَة وِعِشْرِين؟"},{"id":"0cd75460","text":"فين رقم أربعة وتسعين؟","reading":"فِين رَقَم أَرْبَعَة وْتِسْعِين؟"},{"id":"38d8ee8e","text":"فين رقم ستة وتلاتين؟","reading":"فِين رَقَم سِتَّة وْتَلَاتِين؟"},{"id":"6b84dafa","text":"فين رقم تسعة وخمسين؟","reading":"فِين رَقَم تِسْعَة وْخَمْسِين؟"},{"id":"2a1e3f42","text":"فين رقم تلاتة وخمسين؟","reading":"فِين رَقَم تَلَاتَة وْخَمْسِين؟"},{"id":"c31ab387","text":"فين رقم تسعة وتسعين؟","reading":"فِين رَقَم تِسْعَة وْتِسْعِين؟"},{"id":"bf97d13d","text":"فين رقم تسعة وتمانين؟","reading":"فِين رَقَم تِسْعَة وْتَمَانِين؟"},{"id":"4687ba55","text":"فين رقم تلاتة وسبعين؟","reading":"فِين رَقَم تَلَاتَة وْسَبْعِين؟"},{"id":"f9635c18","text":"فين رقم اتنين وسبعين؟","reading":"فِين رَقَم اتْنِين وْسَبْعِين؟"},{"id":"5b733e1f","text":"فين رقم تلاتة وتسعين؟","reading":"فِين رَقَم تَلَاتَة وْتِسْعِين؟"},{"id":"4b29807c","text":"فين رقم سبعة وخمسين؟","reading":"فِين رَقَم سَبْعَة وْخَمْسِين؟"},{"id":"a1659fdb","text":"فين رقم تمانية وستين؟","reading":"فِين رَقَم تَمَانْيَة وْسِتِّين؟"},{"id":"785fbe09","text":"فين رقم أربعة وأربعين؟","reading":"فِين رَقَم أَرْبَعَة وِأَرْبَعِين؟"},{"id":"0338b600","text":"فين رقم اتنين وتمانين؟","reading":"فِين رَقَم اتْنِين وْتَمَانِين؟"},{"id":"606154a6","text":"فين رقم واحد وسبعين؟","reading":"فِين رَقَم وَاحِد وْسَبْعِين؟"},{"id":"7b81b56a","text":"فين رقم تلاتة وأربعين؟","reading":"فِين رَقَم تَلَاتَة وِأَرْبَعِين؟"},{"id":"83336fac","text":"فين رقم خمسة وتلاتين؟","reading":"فِين رَقَم خَمْسَة وْتَلَاتِين؟"},{"id":"c4d14b46","text":"فين رقم واحد وتمانين؟","reading":"فِين رَقَم وَاحِد وْتَمَانِين؟"},{"id":"b4bc69ec","text":"فين رقم تمانية وعشرين؟","reading":"فِين رَقَم تَمَانْيَة وِعِشْرِين؟"},{"id":"18d875b3","text":"فين رقم تسعة وعشرين؟","reading":"فِين رَقَم تِسْعَة وِعِشْرِين؟"},{"id":"19a1a239","text":"فين رقم واحد وأربعين؟","reading":"فِين رَقَم وَاحِد وِأَرْبَعِين؟"},{"id":"2894ec05","text":"فين رقم واحد وخمسين؟","reading":"فِين رَقَم وَاحِد وْخَمْسِين؟"},{"id":"c3e7fccc","text":"فين رقم تسعة وستين؟","reading":"فِين رَقَم تِسْعَة وْسِتِّين؟"},{"id":"e1aac895","text":"فين رقم تلاتة وتمانين؟","reading":"فِين رَقَم تَلَاتَة وْتَمَانِين؟"},{"id":"d63d74f0","text":"فين رقم سبعة وأربعين؟","reading":"فِين رَقَم سَبْعَة وِأَرْبَعِين؟"},{"id":"059207c1","text":"فين رقم تمانية وأربعين؟","reading":"فِين رَقَم تَمَانْيَة وِأَرْبَعِين؟"},{"id":"b7a37456","text":"فين رقم أربعة وسبعين؟","reading":"فِين رَقَم أَرْبَعَة وْسَبْعِين؟"},{"id":"32557f40","text":"فين رقم ستة وتمانين؟","reading":"فِين رَقَم سِتَّة وْتَمَانِين؟"},{"id":"3dc10f11","text":"فين رقم ستة وستين؟","reading":"فِين رَقَم سِتَّة وْسِتِّين؟"},{"id":"37577c7b","text":"فين رقم سبعة وسبعين؟","reading":"فِين رَقَم سَبْعَة وْسَبْعِين؟"},{"id":"47296824","text":"فين رقم واحد وعشرين؟","reading":"فِين رَقَم وَاحِد وِعِشْرِين؟"},{"id":"a35047e4","text":"فين رقم تلاتة وستين؟","reading":"فِين رَقَم تَلَاتَة وْسِتِّين؟"},{"id":"7e718310","text":"فين رقم تلاتة؟","reading":"فِين رَقَم تَلَاتَة؟"},{"id":"948f8231","text":"فين رقم خمسة؟","reading":"فِين رَقَم خَمْسَة؟"},{"id":"4272c168","text":"فين رقم تسعة؟","reading":"فِين رَقَم تِسْعَة؟"},{"id":"35138536","text":"فين رقم سبعة؟","reading":"فِين رَقَم سَبْعَة؟"},{"id":"3306b43b","text":"فين رقم ستة؟","reading":"فِين رَقَم سِتَّة؟"},{"id":"de573264","text":"فين رقم عشرة؟","reading":"فِين رَقَم عَشَرَة؟"},{"id":"4f873509","text":"فين رقم أربعة؟","reading":"فِين رَقَم أَرْبَعَة؟"}];
+const CURRENT = (id) => `../assets/assets/games/learn_voice/ar/${id}.mp3`;  // the voice that is in the app now (works on the demo site)
+let db, mediaRec, stream, chunks = [], curId = null, audio = new Audio();
+
+function openDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('rehlaty_voice', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('rec');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+const tx = (mode) => db.transaction('rec', mode).objectStore('rec');
+const key = (id) => GROUP + '|' + id;
+const get = (id) => new Promise((res) => { const q = tx('readonly').get(key(id)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); });
+const put = (id, v) => new Promise((res) => { const q = tx('readwrite').put(v, key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const del = (id) => new Promise((res) => { const q = tx('readwrite').delete(key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const done = new Set();
+
+function ext(type) { return /webm/.test(type) ? 'webm' : /ogg/.test(type) ? 'ogg' : /mp4|aac|m4a/.test(type) ? 'm4a' : /wav/.test(type) ? 'wav' : 'bin'; }
+function refresh() {
+  document.getElementById('count').textContent = `سجّلت ${done.size} من ${ITEMS.length}`;
+  document.getElementById('prog').style.width = (100 * done.size / ITEMS.length) + '%';
+}
+function build() {
+  const list = document.getElementById('list');
+  ITEMS.forEach((it, i) => {
+    const d = document.createElement('div'); d.className = 'row'; d.id = 'r_' + it.id;
+    d.innerHTML = `<div class="t">${i + 1}. ${it.text.replace(/</g, '&lt;')}</div>${it.reading && it.reading !== it.text ? `<div class="r">تُقرأ: ${it.reading.replace(/</g, '&lt;')}</div>` : ''}
+      <div class="btns"><button class="rec" data-a="rec">● سجّل</button><button class="ghost" data-a="mine" disabled>▶ تسجيلي</button><button class="ghost" data-a="cur">▶ الحالي</button><button class="del" data-a="del" disabled>🗑️</button><span class="st"></span></div>`;
+    d.addEventListener('click', (e) => { const a = e.target.dataset && e.target.dataset.a; if (a) act(it, d, e.target, a); });
+    list.appendChild(d);
+  });
+}
+function mark(d, on) {
+  d.classList.toggle('done', on);
+  d.querySelector('[data-a=mine]').disabled = !on; d.querySelector('[data-a=del]').disabled = !on;
+  d.querySelector('.st').textContent = on ? '✓ اتسجلت' : '';
+}
+async function act(it, d, btn, a) {
+  if (a === 'cur') { audio.pause(); audio = new Audio(CURRENT(it.id)); audio.play().catch(() => { d.querySelector('.st').textContent = 'الصوت الحالي مش متاح هنا'; }); return; }
+  if (a === 'mine') { const v = await get(it.id); if (v) { audio.pause(); audio = new Audio(URL.createObjectURL(v.blob)); audio.play(); } return; }
+  if (a === 'del') { await del(it.id); done.delete(it.id); mark(d, false); refresh(); return; }
+  if (a === 'rec') {
+    if (mediaRec && mediaRec.state === 'recording') { mediaRec.stop(); return; }
+    try { stream = stream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { alert('محتاج إذن الميكروفون. اسمح للمتصفح باستخدام الميكروفون وجرّب تاني.'); return; }
+    audio.pause(); chunks = []; curId = it.id;
+    const opts = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? { mimeType: 'audio/webm;codecs=opus' } : {};
+    mediaRec = new MediaRecorder(stream, opts);
+    mediaRec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mediaRec.onstop = async () => {
+      d.classList.remove('live'); btn.textContent = '● سجّل'; btn.classList.add('rec');
+      const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+      if (blob.size < 1500) { d.querySelector('.st').textContent = 'التسجيل قصير أوي، جرّب تاني'; return; }
+      await put(it.id, { blob, type: blob.type, text: it.text, at: Date.now() });
+      done.add(it.id); mark(d, true); refresh();
+      const nx = d.nextElementSibling; if (nx) nx.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    d.classList.add('live'); btn.textContent = '■ وقّف'; d.querySelector('.st').textContent = 'بيسجّل...';
+    mediaRec.start();
+  }
+}
+// a tiny zip writer (stored, no compression) so no library is needed
+function crc32(buf) { let c, crc = -1; for (let i = 0; i < buf.length; i++) { c = (crc ^ buf[i]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ -1) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(); const parts = []; const central = []; let off = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name); const crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30)); lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46)); ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), name); off += 30 + name.length + f.data.length;
+  }
+  let csize = 0; central.forEach((p) => csize += p.length);
+  const end = new DataView(new ArrayBuffer(22)); end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/zip' });
+}
+document.getElementById('zip').onclick = async () => {
+  const files = [], manifest = [];
+  for (const it of ITEMS) { const v = await get(it.id); if (!v) continue; const name = `${it.id}.${ext(v.type)}`; files.push({ name, data: new Uint8Array(await v.blob.arrayBuffer()) }); manifest.push({ id: it.id, text: it.text, file: name }); }
+  if (!files.length) { alert('لسه ما سجلتش حاجة'); return; }
+  files.push({ name: 'manifest.json', data: new TextEncoder().encode(JSON.stringify({ group: GROUP, items: manifest }, null, 1)) });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(files)); a.download = `rehlaty_voice_${GROUP}.zip`; a.click();
+};
+document.getElementById('wipe').onclick = async () => { if (!confirm('تمسح كل تسجيلات الصفحة دي؟')) return; for (const it of ITEMS) { await del(it.id); done.delete(it.id); mark(document.getElementById('r_' + it.id), false); } refresh(); };
+(async () => { db = await openDb(); build(); for (const it of ITEMS) { const v = await get(it.id); if (v) { done.add(it.id); mark(document.getElementById('r_' + it.id), true); } } refresh(); })();
+</script>
+</body>
+</html>

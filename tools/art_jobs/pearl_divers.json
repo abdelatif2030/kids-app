@@ -1,0 +1,73 @@
+{
+  "style": "Cheerful stylized 3D cartoon mobile game art, glossy toy look, vivid saturated colors, no text, no letters, no words.",
+  "kind_sprite": "Single subject centered, plain flat white background, no ground shadow, no text.",
+  "suffix": "No people, no text, no letters, no words, no logos.",
+  "jobs": [
+    {
+      "prompt": "A bright tropical sky with soft white fluffy clouds and a faint turquoise sea at the very bottom, wide, empty, no objects.",
+      "name": "sky_lagoon",
+      "kind": "scene"
+    },
+    {
+      "prompt": "A small sandy tropical island with three palm trees and a few green bushes, side view, tiny.",
+      "name": "island",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A small red wooden fishing boat with a market stall on deck: striped green and white awning, string lights with colorful bulbs, a small crane at the left, pearls on display. Side view, empty deck.",
+      "name": "stall_boat",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A luxury pink and white motor yacht with a small cabin with blue windows, a red light on the bow. Side view, empty deck, no people.",
+      "name": "yacht",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "Portrait of a rich arrogant cartoon man with a black beard wearing a white captain hat with gold trim, smug smile, head and shoulders, front view.",
+      "name": "rival",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A cartoon pearl diver in an orange wetsuit with a round glass helmet and a small air tank, swimming, side view facing right, full body.",
+      "name": "diver",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A big purple clam shell wide open showing a large shiny white pearl inside, front view.",
+      "name": "clam_open",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A big purple clam shell tightly closed, ribbed, front view.",
+      "name": "clam_closed",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "An old brass diving bell with a round glass porthole, rivets, a ring on top for a rope, side view.",
+      "name": "bell",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "An empty woven wicker basket with an open top, side view, nothing inside.",
+      "name": "basket",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A colorful coral cluster with pink and orange coral branches and a small green sea plant, side view.",
+      "name": "coral",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "Underwater view of a sunny turquoise tropical lagoon with sun rays from above, soft sand and small corals far away, bright and clear, empty, no fish.",
+      "name": "water_a",
+      "kind": "scene"
+    },
+    {
+      "prompt": "Underwater view of a deep blue and purple ocean cave with glowing light rays and dark rocks, mysterious but friendly, empty, no fish.",
+      "name": "water_b",
+      "kind": "scene"
+    }
+  ]
+}
+

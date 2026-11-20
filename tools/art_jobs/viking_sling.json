@@ -1,0 +1,68 @@
+{
+  "suffix": "No text, no letters, no people in the distance.",
+  "kind_sprite": "Single subject centered, plain white background, no ground shadow, no text.",
+  "style": "Cute 3D cartoon mobile game art, bright saturated colors, bold clean shapes, glossy toy-like, kid friendly, no text, no letters.",
+  "jobs": [
+    {
+      "kind": "sprite",
+      "name": "vik_axe",
+      "prompt": "A chubby round-faced viking head with a red beard, a silver horned helmet and a big smile, front view, head only, round shape."
+    },
+    {
+      "kind": "sprite",
+      "name": "vik_bomb",
+      "prompt": "A chubby round-faced viking head with a black beard and a black iron horned helmet with a small lit fuse on top, grinning, front view, head only, round shape."
+    },
+    {
+      "kind": "sprite",
+      "name": "vik_shield",
+      "prompt": "A chubby round-faced viking head with a golden blond beard and a silver horned helmet, determined smile, front view, head only, round shape."
+    },
+    {
+      "kind": "sprite",
+      "name": "vik_giant",
+      "prompt": "A huge chubby viking head with a fiery orange beard, blue war paint stripes and a steel horned helmet, fierce grin, front view, head only, round shape."
+    },
+    {
+      "kind": "sprite",
+      "name": "gob",
+      "prompt": "A cute round green goblin head with big pointy ears, big white eyes and a goofy toothy grin, front view, head only."
+    },
+    {
+      "kind": "sprite",
+      "name": "gob_helm",
+      "prompt": "A cute round green goblin head with big pointy ears wearing a dented grey iron bucket helmet, big white eyes, front view, head only."
+    },
+    {
+      "kind": "sprite",
+      "name": "gob_boss",
+      "prompt": "A big grumpy green goblin king head with a golden crown with a red gem, big pointy ears and tusks, front view, head only."
+    },
+    {
+      "kind": "scene",
+      "name": "tex_wood",
+      "prompt": "Flat front view close-up of light brown wooden planks texture with visible grain and dark nails, cartoon style, filling the whole image."
+    },
+    {
+      "kind": "scene",
+      "name": "tex_stone",
+      "prompt": "Flat front view close-up of grey stone blocks wall texture with cracks and mortar lines, cartoon style, filling the whole image."
+    },
+    {
+      "kind": "scene",
+      "name": "tex_ice",
+      "prompt": "Flat front view close-up of translucent light blue ice block texture with white frost streaks and sparkles, cartoon style, filling the whole image."
+    },
+    {
+      "kind": "scene",
+      "prompt": "Sunny cartoon landscape: bright blue sky with fluffy white clouds, a calm blue lake and forested green hills in the distance, no characters, no buildings.",
+      "name": "sky_meadow",
+      "wide": true
+    },
+    {
+      "kind": "sprite",
+      "name": "tree_pine",
+      "prompt": "A round cartoon green pine tree with a brown trunk, low-poly style, side view."
+    }
+  ]
+}

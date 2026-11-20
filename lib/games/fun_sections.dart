@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../design/focusable_tap.dart';
 import '../journey/models.dart';
 import '../l10n/strings.dart';
+import '../media/hub_music.dart';
 import 'games_choice.dart' show openFunGame;
 import 'web_games/web_game.dart';
 
@@ -162,7 +163,9 @@ class FunSectionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return HubMusicScope(
+      track: 'fun',
+      child: Scaffold(
       key: const ValueKey('fun_sections_page'),
       backgroundColor: const Color(0xFF2A1A5A),
       body: Stack(fit: StackFit.expand, children: [
@@ -185,7 +188,7 @@ class FunSectionsScreen extends StatelessWidget {
           ]),
         ),
       ]),
-    );
+    ));
   }
 }
 
@@ -253,7 +256,9 @@ class FunSectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final games = [for (final id in section.games) if (_byId(id) != null) _byId(id)!];
-    return Scaffold(
+    return HubMusicScope(
+      track: 'fun',
+      child: Scaffold(
       key: ValueKey('fun_section_page_${section.id}'),
       backgroundColor: section.a,
       body: Stack(fit: StackFit.expand, children: [
@@ -276,7 +281,7 @@ class FunSectionScreen extends StatelessWidget {
           ]),
         ),
       ]),
-    );
+    ));
   }
 }
 

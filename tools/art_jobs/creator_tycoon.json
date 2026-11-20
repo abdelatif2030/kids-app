@@ -1,0 +1,93 @@
+{
+  "style": "Stylized 3D cartoon render, soft clay toy look, smooth shading, bright friendly colors, no text, no letters, no words.",
+  "kind_sprite": "Single subject centered, plain flat white background, no ground shadow, no text.",
+  "suffix": "No people, no text, no letters, no words, no logos.",
+  "jobs": [
+    {
+      "prompt": "Empty cozy startup office room at night, dark navy walls with colorful sticky notes, a floor, large empty space in the middle, no desk, no furniture, no people.",
+      "name": "office_dark",
+      "kind": "scene"
+    },
+    {
+      "prompt": "Empty bright modern office room, big window showing a blue city skyline, potted plants on both sides, wooden floor, large empty space in the middle, no desk, no furniture, no people.",
+      "name": "office_bright",
+      "kind": "scene"
+    },
+    {
+      "prompt": "Empty luxury corner office at golden sunset, huge window with warm orange sky and city skyline, plants, wooden floor, large empty space in the middle, no desk, no furniture, no people.",
+      "name": "office_sunset",
+      "kind": "scene"
+    },
+    {
+      "prompt": "A friendly man creator with curly brown hair, teal green hoodie, beige cargo pants, headphones around neck, standing relaxed. Seen from slight side angle, full body.",
+      "name": "creator",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A confident woman CEO with a black bob haircut, round glasses, burgundy suit, standing, full body, front view.",
+      "name": "ceo",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A simple gray metal trash can with a slightly open top, cartoon style.",
+      "name": "bin",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A small wooden office desk with one computer monitor, keyboard and a coffee mug. Front view.",
+      "name": "desk_1",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A modern standing desk with two computer monitors, keyboard with colorful lights and a ring light. Front view.",
+      "name": "desk_2",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A big executive desk with three computer monitors, glowing keyboard, a microphone and a ring light. Front view.",
+      "name": "desk_3",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A beautiful photograph of a cute orange fox sitting in a green meadow with flowers, sunny day.",
+      "name": "photo_a",
+      "kind": "scene"
+    },
+    {
+      "prompt": "A beautiful photograph of a colorful hot air balloon over green hills at sunrise.",
+      "name": "photo_b",
+      "kind": "scene"
+    },
+    {
+      "prompt": "A cinematic movie still of a rocket launching into a blue sky with white smoke.",
+      "name": "video_a",
+      "kind": "scene"
+    },
+    {
+      "prompt": "A cinematic movie still of a surfer riding a big sunny turquoise wave.",
+      "name": "video_b",
+      "kind": "scene"
+    },
+    {
+      "prompt": "A colorful fantasy video game scene: a little knight hero in front of a fairytale castle with a friendly dragon, glowing magic.",
+      "name": "game_a",
+      "kind": "scene"
+    },
+    {
+      "prompt": "A colorful space racing video game scene: a toy rocket car racing past planets and stars, neon glow.",
+      "name": "game_b",
+      "kind": "scene"
+    },
+    {
+      "prompt": "A funny melted distorted cartoon cat with too many legs and wobbly eyes, glitchy blurry colors, silly surreal.",
+      "name": "slop_a",
+      "kind": "scene"
+    },
+    {
+      "prompt": "A silly mixed-up cartoon creature that is half pizza half dog, melted wobbly shapes, glitchy colors, funny and surreal.",
+      "name": "slop_b",
+      "kind": "scene"
+    }
+  ]
+}
+

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المستوى 24: الأيام والفصول</title>
+<style>
+  :root{--bg:#1d1250;--card:#2b1f78;--gold:#ffd23a;--ok:#2fbf5a;--rec:#e8384a;--ink:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,"Segoe UI",system-ui,sans-serif;direction:rtl}
+  header{position:sticky;top:0;z-index:5;background:#140b3a;border-bottom:3px solid var(--gold);padding:10px 14px}
+  h1{margin:0 0 6px;font-size:20px;color:var(--gold)}
+  .bar{height:12px;border-radius:8px;background:#3b2e90;overflow:hidden}.bar b{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+  .top{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+  button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:9px 14px;cursor:pointer;color:#fff;background:#3b6fd8;min-height:42px}
+  button.rec{background:var(--rec)}button.ok{background:var(--ok)}button.ghost{background:#4a3aa8}button.del{background:#6a2a50}
+  button:disabled{opacity:.4;cursor:default}
+  main{padding:10px 12px 90px;max-width:900px;margin:auto}
+  .row{background:var(--card);border:2px solid #4a3aa8;border-radius:16px;padding:12px;margin:10px 0}
+  .row.done{border-color:var(--ok)}.row.live{border-color:var(--rec);box-shadow:0 0 0 3px #e8384a55}
+  .t{font-size:26px;font-weight:900;line-height:1.5}.r{font-size:15px;opacity:.8;margin-top:2px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.st{font-size:14px;opacity:.9}
+  .note{background:#3b2e90;border-radius:12px;padding:10px;font-size:15px;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ __TITLE__</h1>
+  <div class="bar"><b id="prog"></b></div>
+  <div class="top"><span id="count"></span>
+    <span><button class="ok" id="zip">⬇️ تنزيل تسجيلاتي (ملف واحد)</button> <button class="del" id="wipe">🗑️ مسح الكل</button></span></div>
+</header>
+<main>
+  <div class="note">اضغط <b>● سجّل</b>، اقرا الجملة بصوتك بهدوء وبصوت طفل مرح، واضغط <b>■ وقّف</b>. تسمع تسجيلك بـ <b>▶ تسجيلي</b> وتقارنه بالصوت الحالي بـ <b>▶ الحالي</b>. التسجيلات بتتحفظ في المتصفح لوحدها، تقدر تقفل وتكمل بعدين. لما تخلص اضغط «تنزيل تسجيلاتي» وابعتلي الملف.</div>
+  <div id="list"></div>
+</main>
+<script>
+const GROUP = "24_t_time";
+const ITEMS = [{"id":"d39a1feb","text":"إيه الشهر اللي قبل نوفمبر؟","reading":"إِيه الشَّهْر اللِّي قَبْل نُوفَمْبَر؟"},{"id":"7112aa54","text":"بنصحى من النوم إمتى؟","reading":"بِنِصْحَى مِن النَّوْم إِمْتَى؟"},{"id":"c0f6552c","text":"الفراشات بتطير بين الزهور في فصل إيه؟","reading":"الفَرَاشَات بِتِطِير بَيْن الزُّهُور فِي فَصْل إِيه؟"},{"id":"143feab3","text":"إيه الشهر اللي بعد يوليو؟","reading":"إِيه الشَّهْر اللِّي بَعْد يُولْيُو؟"},{"id":"c9bd9cc1","text":"إيه اليوم التاني في الأسبوع؟","reading":"إِيه اليُوم التَّانِي فِي الأُسْبُوع؟"},{"id":"e32a91fc","text":"إيه اليوم اللي بعد السبت؟","reading":"إِيه اليُوم اللِّي بَعْد السَّبْت؟"},{"id":"faadc3d8","text":"بنلبس البيجامة إمتى؟","reading":"بِنِلْبِس البِيجَامَة إِمْتَى؟"},{"id":"c73125de","text":"بنلبس الكاب عشان الشمس حامية في فصل إيه؟","reading":"بِنِلْبِس الكَاب عَشَان الشَّمْس حَامْيَة فِي فَصْل إِيه؟"},{"id":"adde7d57","text":"النهارده الخميس، إمبارح كان إيه؟","reading":"النَّهَارْدَه الخَمِيس، إِمْبَارِح كَان إِيه؟"},{"id":"d68d1f6f","text":"الشمس بتبقى فوق راسنا إمتى؟","reading":"الشَّمْس بِتِبْقَى فُوق رَاسْنَا إِمْتَى؟"},{"id":"d5f7a2d3","text":"بننام إمتى؟","reading":"بِنِنَام إِمْتَى؟"},{"id":"c4495687","text":"النهارده الأربع، بكره إيه؟","reading":"النَّهَارْدَه الأَرْبَع، بُكْرَه إِيه؟"},{"id":"47342536","text":"إيه اليوم اللي قبل الأربع؟","reading":"إِيه اليُوم اللِّي قَبْل الأَرْبَع؟"},{"id":"84f266f7","text":"إيه اليوم الرابع في الأسبوع؟","reading":"إِيه اليُوم الرَّابِع فِي الأُسْبُوع؟"},{"id":"6a10e85e","text":"بنتعشى إمتى؟","reading":"بِنِتْعَشَّى إِمْتَى؟"},{"id":"5075a9de","text":"إيه الشهر اللي بعد فبراير؟","reading":"إِيه الشَّهْر اللِّي بَعْد فِبْرَايِر؟"},{"id":"420242df","text":"إيه الفصل اللي بتطلع فيه الزهور؟","reading":"إِيه الفَصْل اللِّي بِتْطْلَع فِيه الزُّهُور؟"},{"id":"3217b037","text":"بنفطر إمتى؟","reading":"بِنِفْطَر إِمْتَى؟"},{"id":"97ccebcf","text":"إيه الشهر اللي بعد يناير؟","reading":"إِيه الشَّهْر اللِّي بَعْد يَنَايِر؟"},{"id":"a9a0b369","text":"الدنيا بتبدأ تضلم إمتى؟","reading":"الدُّنْيَا بِتِبْدَأ تِضْلِم إِمْتَى؟"},{"id":"982b7831","text":"إيه اليوم اللي بعد الخميس؟","reading":"إِيه اليُوم اللِّي بَعْد الخَمِيس؟"},{"id":"aa82b793","text":"الورق الأصفر بيقع على الأرض في فصل إيه؟","reading":"الوَرَق الأَصْفَر بِيقَع عَلَى الأَرْض فِي فَصْل إِيه؟"},{"id":"ecb900e5","text":"إيه اليوم اللي قبل الخميس؟","reading":"إِيه اليُوم اللِّي قَبْل الخَمِيس؟"},{"id":"eff802d1","text":"النهارده التلات، إمبارح كان إيه؟","reading":"النَّهَارْدَه التَّلَات، إِمْبَارِح كَان إِيه؟"},{"id":"704f8a5e","text":"إيه اليوم الخامس في الأسبوع؟","reading":"إِيه اليُوم الخَامِس فِي الأُسْبُوع؟"},{"id":"0dfe46e8","text":"إيه الفصل اللي بيبقى فيه حر؟","reading":"إِيه الفَصْل اللِّي بِيبْقَى فِيه حَرّ؟"},{"id":"85cff0c8","text":"إيه الشهر اللي بعد سبتمبر؟","reading":"إِيه الشَّهْر اللِّي بَعْد سِبْتَمْبَر؟"},{"id":"adebb117","text":"النهارده الجمعة، إمبارح كان إيه؟","reading":"النَّهَارْدَه الجُمْعَة، إِمْبَارِح كَان إِيه؟"},{"id":"acd92966","text":"إيه الفصل اللي بتقع فيه ورق الشجر؟","reading":"إِيه الفَصْل اللِّي بِتْقَع فِيه وَرَق الشَّجَر؟"},{"id":"a5e460e3","text":"إيه آخر يوم في الأسبوع؟","reading":"إِيه آخِر يُوم فِي الأُسْبُوع؟"},{"id":"ef315018","text":"النهارده السبت، وبعد بكره إيه؟","reading":"النَّهَارْدَه السَّبْت، وَبَعْد بُكْرَه إِيه؟"},{"id":"5be24177","text":"كام يوم في الأسبوع؟","reading":"كَام يُوم فِي الأُسْبُوع؟"},{"id":"9daadfe6","text":"الشجر بيغير لونه والجو بيبقى معتدل في فصل إيه؟","reading":"الشَّجَر بِيغَيَّر لَوْنُه وَالجَوّ بِيبْقَى مُعْتَدِل فِي فَصْل إِيه؟"},{"id":"6312aa7e","text":"إيه الفصل اللي بتمطر فيه كتير؟","reading":"إِيه الفَصْل اللِّي بِتْمَطَّر فِيه كَتِير؟"},{"id":"f80af5a1","text":"إيه اليوم اللي قبل الحد؟","reading":"إِيه اليُوم اللِّي قَبْل الحَدّ؟"},{"id":"1b140c24","text":"إيه الشهر اللي قبل أغسطس؟","reading":"إِيه الشَّهْر اللِّي قَبْل أُغُسْطُس؟"},{"id":"e7ab9e5d","text":"بنلبس الجاكت التقيل والوشاح في فصل إيه؟","reading":"بِنِلْبِس الجَاكِت التَّقِيل وَالوِشَاح فِي فَصْل إِيه؟"},{"id":"e5f9ff01","text":"النهارده السبت، بكره إيه؟","reading":"النَّهَارْدَه السَّبْت، بُكْرَه إِيه؟"},{"id":"4ac4cf0d","text":"بنروح البحر ونلعب في الرمل في فصل إيه؟","reading":"بِنِرُوح البَحْر وَنِلْعَب فِي الرَّمْل فِي فَصْل إِيه؟"},{"id":"fa7cac0f","text":"كام شهر في السنة؟","reading":"كَام شَهْر فِي السَّنَة؟"},{"id":"be1486b1","text":"المطر بينزل كتير والجو برد في فصل إيه؟","reading":"المَطَر بِينَزِّل كَتِير وَالجَوّ بَرْد فِي فَصْل إِيه؟"},{"id":"28341050","text":"النهارده الحد، بكره إيه؟","reading":"النَّهَارْدَه الحَدّ، بُكْرَه إِيه؟"},{"id":"47c9d201","text":"إيه اليوم اللي بين الخميس والسبت؟","reading":"إِيه اليُوم اللِّي بَيْن الخَمِيس وَالسَّبْت؟"},{"id":"3d70c814","text":"إيه الشهر اللي قبل سبتمبر؟","reading":"إِيه الشَّهْر اللِّي قَبْل سِبْتَمْبَر؟"},{"id":"cc6fead2","text":"الشمس بتطلع إمتى؟","reading":"الشَّمْس بِتْطْلَع إِمْتَى؟"},{"id":"e7d35f0d","text":"إيه اليوم اللي بعد الحد؟","reading":"إِيه اليُوم اللِّي بَعْد الحَدّ؟"},{"id":"76027f06","text":"الزهور بتفتح والجو لطيف في فصل إيه؟","reading":"الزُّهُور بِتْفَتَّح وَالجَوّ لَطِيف فِي فَصْل إِيه؟"},{"id":"11cf29b2","text":"الدنيا بتبقى ضلمة خالص إمتى؟","reading":"الدُّنْيَا بِتِبْقَى ضَلْمَة خَالِص إِمْتَى؟"},{"id":"ab9d9ea5","text":"إيه اليوم اللي قبل الجمعة؟","reading":"إِيه اليُوم اللِّي قَبْل الجُمْعَة؟"},{"id":"f98581dc","text":"الشمس بتغيب إمتى؟","reading":"الشَّمْس بِتِغِيب إِمْتَى؟"},{"id":"1969b5e4","text":"الديك بيصيح إمتى؟","reading":"الدِّيك بِيْصِيح إِمْتَى؟"},{"id":"242342ea","text":"إيه اليوم التالت في الأسبوع؟","reading":"إِيه اليُوم التَّالِت فِي الأُسْبُوع؟"},{"id":"b417f8ef","text":"إيه الشهر اللي بعد مايو؟","reading":"إِيه الشَّهْر اللِّي بَعْد مَايُو؟"},{"id":"cd30d0dd","text":"النجوم بتظهر إمتى؟","reading":"النُّجُوم بِتِظْهَر إِمْتَى؟"},{"id":"37800ec1","text":"إيه اليوم اللي بعد الجمعة؟","reading":"إِيه اليُوم اللِّي بَعْد الجُمْعَة؟"},{"id":"67c4b2d3","text":"النهارده الحد، إمبارح كان إيه؟","reading":"النَّهَارْدَه الحَدّ، إِمْبَارِح كَان إِيه؟"},{"id":"0ce4614d","text":"إيه الشهر اللي قبل يونيو؟","reading":"إِيه الشَّهْر اللِّي قَبْل يُونْيُو؟"},{"id":"46ba345e","text":"بنتغدى إمتى؟","reading":"بِنِتْغَدَّى إِمْتَى؟"},{"id":"c39b7f80","text":"كام فصل في السنة؟","reading":"كَام فَصْل فِي السَّنَة؟"},{"id":"a833e3f8","text":"بنروح الحضانة إمتى؟","reading":"بِنِرُوح الحَضَانَة إِمْتَى؟"},{"id":"48a1a642","text":"إيه اليوم اللي بعد الأربع؟","reading":"إِيه اليُوم اللِّي بَعْد الأَرْبَع؟"},{"id":"7460c992","text":"النهارده التلات، بكره إيه؟","reading":"النَّهَارْدَه التَّلَات، بُكْرَه إِيه؟"},{"id":"78e28a33","text":"إيه الشهر اللي قبل مايو؟","reading":"إِيه الشَّهْر اللِّي قَبْل مَايُو؟"},{"id":"e13f3594","text":"النهارده الجمعة، بكره إيه؟","reading":"النَّهَارْدَه الجُمْعَة، بُكْرَه إِيه؟"},{"id":"8949dfe9","text":"إيه أول يوم في الأسبوع؟","reading":"إِيه أَوَّل يُوم فِي الأُسْبُوع؟"},{"id":"19caf881","text":"إيه اليوم السابع في الأسبوع؟","reading":"إِيه اليُوم السَّابِع فِي الأُسْبُوع؟"},{"id":"15d4a918","text":"القمر بيطلع إمتى؟","reading":"القَمَر بِيْطْلَع إِمْتَى؟"},{"id":"ef8cfe4a","text":"الدنيا بتبقى حر أوي إمتى؟","reading":"الدُّنْيَا بِتِبْقَى حَرّ أَوِي إِمْتَى؟"},{"id":"eaa112d6","text":"النهارده الأربع، وبعد بكره إيه؟","reading":"النَّهَارْدَه الأَرْبَع، وَبَعْد بُكْرَه إِيه؟"},{"id":"e4e190f7","text":"إيه اليوم اللي بعد التلات؟","reading":"إِيه اليُوم اللِّي بَعْد التَّلَات؟"},{"id":"a229f85e","text":"إيه الشهر اللي قبل أبريل؟","reading":"إِيه الشَّهْر اللِّي قَبْل أَبْرِيل؟"},{"id":"7f146ec1","text":"النهارده الاتنين، إمبارح كان إيه؟","reading":"النَّهَارْدَه الاتْنِين، إِمْبَارِح كَان إِيه؟"},{"id":"68b41017","text":"إيه الشهر اللي بعد نوفمبر؟","reading":"إِيه الشَّهْر اللِّي بَعْد نُوفَمْبَر؟"},{"id":"721e36d4","text":"النهارده الخميس، بكره إيه؟","reading":"النَّهَارْدَه الخَمِيس، بُكْرَه إِيه؟"},{"id":"5b989eaa","text":"إيه اليوم السادس في الأسبوع؟","reading":"إِيه اليُوم السَّادِس فِي الأُسْبُوع؟"},{"id":"b62947ba","text":"النهارده الأربع، إمبارح كان إيه؟","reading":"النَّهَارْدَه الأَرْبَع، إِمْبَارِح كَان إِيه؟"},{"id":"503cc0e6","text":"إيه اليوم اللي بين التلات والخميس؟","reading":"إِيه اليُوم اللِّي بَيْن التَّلَات وَالخَمِيس؟"},{"id":"7fc422c2","text":"النهارده الاتنين، بكره إيه؟","reading":"النَّهَارْدَه الاتْنِين، بُكْرَه إِيه؟"},{"id":"0f534421","text":"إيه أول شهر في السنة؟","reading":"إِيه أَوِّل شَهْر فِي السَّنَة؟"},{"id":"c633ed30","text":"النهارده السبت، إمبارح كان إيه؟","reading":"النَّهَارْدَه السَّبْت، إِمْبَارِح كَان إِيه؟"},{"id":"9a59c26f","text":"إيه اليوم اللي بعد الاتنين؟","reading":"إِيه اليُوم اللِّي بَعْد الاِتْنِين؟"},{"id":"006ed11b","text":"إيه اليوم اللي قبل التلات؟","reading":"إِيه اليُوم اللِّي قَبْل التَّلَات؟"},{"id":"bd99dcbc","text":"إيه الشهر اللي قبل ديسمبر؟","reading":"إِيه الشَّهْر اللِّي قَبْل دِيسَمْبَر؟"},{"id":"7b3ca82b","text":"إيه آخر شهر في السنة؟","reading":"إِيه آخِر شَهْر فِي السَّنَة؟"},{"id":"5ccd0dd3","text":"إيه الشهر اللي بعد أكتوبر؟","reading":"إِيه الشَّهْر اللِّي بَعْد أُكْتُوبَر؟"},{"id":"e2228bd5","text":"إيه اليوم اللي بين الأربع والجمعة؟","reading":"إِيه اليُوم اللِّي بَيْن الأَرْبَع وَالجُمْعَة؟"},{"id":"7659bbfa","text":"إيه الشهر اللي قبل فبراير؟","reading":"إِيه الشَّهْر اللِّي قَبْل فِبْرَايِر؟"},{"id":"622eb66c","text":"إيه اليوم اللي بين الجمعة والحد؟","reading":"إِيه اليُوم اللِّي بَيْن الجُمْعَة وَالحَدّ؟"},{"id":"50f4378b","text":"إيه اليوم اللي قبل الاتنين؟","reading":"إِيه اليُوم اللِّي قَبْل الاِتْنِين؟"},{"id":"8e3b1f13","text":"إيه الشهر اللي بعد مارس؟","reading":"إِيه الشَّهْر اللِّي بَعْد مَارِس؟"},{"id":"82c9659a","text":"إيه اليوم اللي بين الحد والتلات؟","reading":"إِيه اليُوم اللِّي بَيْن الحَدّ وَالتَّلَات؟"},{"id":"b4728372","text":"إيه الشهر اللي بعد أبريل؟","reading":"إِيه الشَّهْر اللِّي بَعْد أَبْرِيل؟"},{"id":"40da9041","text":"إيه الشهر اللي بعد يونيو؟","reading":"إِيه الشَّهْر اللِّي بَعْد يُونْيُو؟"},{"id":"18e41ffd","text":"النهارده الاتنين، وبعد بكره إيه؟","reading":"النَّهَارْدَه الاتْنِين، وَبَعْد بُكْرَه إِيه؟"},{"id":"2339303d","text":"إيه اليوم اللي بين الاتنين والأربع؟","reading":"إِيه اليُوم اللِّي بَيْن الاتْنِين وَالأَرْبَع؟"},{"id":"5cbe387b","text":"النهارده الحد، وبعد بكره إيه؟","reading":"النَّهَارْدَه الحَدّ، وَبَعْد بُكْرَه إِيه؟"},{"id":"77678af8","text":"إيه الشهر اللي بعد ديسمبر؟","reading":"إِيه الشَّهْر اللِّي بَعْد دِيسَمْبَر؟"},{"id":"a2ab8c18","text":"إيه الشهر اللي بعد أغسطس؟","reading":"إِيه الشَّهْر اللِّي بَعْد أُغُسْطُس؟"},{"id":"98c93e5d","text":"إيه اليوم اللي بين السبت والاتنين؟","reading":"إِيه اليُوم اللِّي بَيْن السَّبْت وَالاتْنِين؟"},{"id":"814926e0","text":"إيه اليوم اللي قبل السبت؟","reading":"إِيه اليُوم اللِّي قَبْل السَّبْت؟"},{"id":"0b6bd66f","text":"النهارده الجمعة، وبعد بكره إيه؟","reading":"النَّهَارْدَه الجُمْعَة، وَبَعْد بُكْرَه إِيه؟"},{"id":"0ef4808d","text":"النهارده التلات، وبعد بكره إيه؟","reading":"النَّهَارْدَه التَّلَات، وَبَعْد بُكْرَه إِيه؟"},{"id":"4c3d7133","text":"إيه الشهر اللي قبل يناير؟","reading":"إِيه الشَّهْر اللِّي قَبْل يَنَايِر؟"},{"id":"562c12b7","text":"إيه الشهر اللي قبل أكتوبر؟","reading":"إِيه الشَّهْر اللِّي قَبْل أُكْتُوبَر؟"},{"id":"fed8b42f","text":"النهارده الخميس، وبعد بكره إيه؟","reading":"النَّهَارْدَه الخَمِيس، وَبَعْد بُكْرَه إِيه؟"},{"id":"eae1e13f","text":"إيه الشهر اللي قبل يوليو؟","reading":"إِيه الشَّهْر اللِّي قَبْل يُولْيُو؟"},{"id":"baefd297","text":"إيه الشهر اللي قبل مارس؟","reading":"إِيه الشَّهْر اللِّي قَبْل مَارِس؟"}];
+const CURRENT = (id) => `../assets/assets/games/learn_voice/ar/${id}.mp3`;  // the voice that is in the app now (works on the demo site)
+let db, mediaRec, stream, chunks = [], curId = null, audio = new Audio();
+
+function openDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('rehlaty_voice', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('rec');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+const tx = (mode) => db.transaction('rec', mode).objectStore('rec');
+const key = (id) => GROUP + '|' + id;
+const get = (id) => new Promise((res) => { const q = tx('readonly').get(key(id)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); });
+const put = (id, v) => new Promise((res) => { const q = tx('readwrite').put(v, key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const del = (id) => new Promise((res) => { const q = tx('readwrite').delete(key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const done = new Set();
+
+function ext(type) { return /webm/.test(type) ? 'webm' : /ogg/.test(type) ? 'ogg' : /mp4|aac|m4a/.test(type) ? 'm4a' : /wav/.test(type) ? 'wav' : 'bin'; }
+function refresh() {
+  document.getElementById('count').textContent = `سجّلت ${done.size} من ${ITEMS.length}`;
+  document.getElementById('prog').style.width = (100 * done.size / ITEMS.length) + '%';
+}
+function build() {
+  const list = document.getElementById('list');
+  ITEMS.forEach((it, i) => {
+    const d = document.createElement('div'); d.className = 'row'; d.id = 'r_' + it.id;
+    d.innerHTML = `<div class="t">${i + 1}. ${it.text.replace(/</g, '&lt;')}</div>${it.reading && it.reading !== it.text ? `<div class="r">تُقرأ: ${it.reading.replace(/</g, '&lt;')}</div>` : ''}
+      <div class="btns"><button class="rec" data-a="rec">● سجّل</button><button class="ghost" data-a="mine" disabled>▶ تسجيلي</button><button class="ghost" data-a="cur">▶ الحالي</button><button class="del" data-a="del" disabled>🗑️</button><span class="st"></span></div>`;
+    d.addEventListener('click', (e) => { const a = e.target.dataset && e.target.dataset.a; if (a) act(it, d, e.target, a); });
+    list.appendChild(d);
+  });
+}
+function mark(d, on) {
+  d.classList.toggle('done', on);
+  d.querySelector('[data-a=mine]').disabled = !on; d.querySelector('[data-a=del]').disabled = !on;
+  d.querySelector('.st').textContent = on ? '✓ اتسجلت' : '';
+}
+async function act(it, d, btn, a) {
+  if (a === 'cur') { audio.pause(); audio = new Audio(CURRENT(it.id)); audio.play().catch(() => { d.querySelector('.st').textContent = 'الصوت الحالي مش متاح هنا'; }); return; }
+  if (a === 'mine') { const v = await get(it.id); if (v) { audio.pause(); audio = new Audio(URL.createObjectURL(v.blob)); audio.play(); } return; }
+  if (a === 'del') { await del(it.id); done.delete(it.id); mark(d, false); refresh(); return; }
+  if (a === 'rec') {
+    if (mediaRec && mediaRec.state === 'recording') { mediaRec.stop(); return; }
+    try { stream = stream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { alert('محتاج إذن الميكروفون. اسمح للمتصفح باستخدام الميكروفون وجرّب تاني.'); return; }
+    audio.pause(); chunks = []; curId = it.id;
+    const opts = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? { mimeType: 'audio/webm;codecs=opus' } : {};
+    mediaRec = new MediaRecorder(stream, opts);
+    mediaRec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mediaRec.onstop = async () => {
+      d.classList.remove('live'); btn.textContent = '● سجّل'; btn.classList.add('rec');
+      const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+      if (blob.size < 1500) { d.querySelector('.st').textContent = 'التسجيل قصير أوي، جرّب تاني'; return; }
+      await put(it.id, { blob, type: blob.type, text: it.text, at: Date.now() });
+      done.add(it.id); mark(d, true); refresh();
+      const nx = d.nextElementSibling; if (nx) nx.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    d.classList.add('live'); btn.textContent = '■ وقّف'; d.querySelector('.st').textContent = 'بيسجّل...';
+    mediaRec.start();
+  }
+}
+// a tiny zip writer (stored, no compression) so no library is needed
+function crc32(buf) { let c, crc = -1; for (let i = 0; i < buf.length; i++) { c = (crc ^ buf[i]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ -1) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(); const parts = []; const central = []; let off = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name); const crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30)); lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46)); ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), name); off += 30 + name.length + f.data.length;
+  }
+  let csize = 0; central.forEach((p) => csize += p.length);
+  const end = new DataView(new ArrayBuffer(22)); end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/zip' });
+}
+document.getElementById('zip').onclick = async () => {
+  const files = [], manifest = [];
+  for (const it of ITEMS) { const v = await get(it.id); if (!v) continue; const name = `${it.id}.${ext(v.type)}`; files.push({ name, data: new Uint8Array(await v.blob.arrayBuffer()) }); manifest.push({ id: it.id, text: it.text, file: name }); }
+  if (!files.length) { alert('لسه ما سجلتش حاجة'); return; }
+  files.push({ name: 'manifest.json', data: new TextEncoder().encode(JSON.stringify({ group: GROUP, items: manifest }, null, 1)) });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(files)); a.download = `rehlaty_voice_${GROUP}.zip`; a.click();
+};
+document.getElementById('wipe').onclick = async () => { if (!confirm('تمسح كل تسجيلات الصفحة دي؟')) return; for (const it of ITEMS) { await del(it.id); done.delete(it.id); mark(document.getElementById('r_' + it.id), false); } refresh(); };
+(async () => { db = await openDb(); build(); for (const it of ITEMS) { const v = await get(it.id); if (v) { done.add(it.id); mark(document.getElementById('r_' + it.id), true); } } refresh(); })();
+</script>
+</body>
+</html>

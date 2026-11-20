@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../media/hub_music.dart';
 
 import '../design/picture_stage.dart';
 import '../journey/models.dart';
@@ -87,7 +88,9 @@ class _LearningGamesScreenState extends State<LearningGamesScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => HubMusicScope(track: 'learn', child: _buildScreen(context));
+
+  Widget _buildScreen(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF3AA8F0),
       body: PictureStage(

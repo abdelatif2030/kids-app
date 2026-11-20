@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
+import 'media/hub_music.dart';
 import 'auth/auth_pictures.dart';
 import 'content_flags.dart';
 import 'design/picture_stage.dart';
@@ -77,6 +78,7 @@ class KidsApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: tr2('رحلتي', 'Rehlaty'),
       scrollBehavior: const AppScrollBehavior(),
+      navigatorObservers: [kHubRouteObserver],
       theme: ThemeData(
         colorSchemeSeed: DS.primary,
         useMaterial3: true,

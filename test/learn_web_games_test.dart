@@ -59,13 +59,13 @@ void main() {
     expect(await GameRewards.doneIds('kid'), isEmpty);
   });
 
-  testWidgets('no extra «رجوع» button over the games (each game has its own back button at the top)', (t) async {
+  testWidgets('fun games have ONE small back button (top left); learning games keep their own and get none (owner 2026-11-20)', (t) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.windows; // no built-in browser view in tests
     addTearDown(() => debugDefaultTargetPlatformOverride = null);
     for (final g in [...kWebGames, ...kLearnWebGames.values]) {
       await t.pumpWidget(MaterialApp(key: UniqueKey(), home: WebGameScreen(game: g, age: 5)));
       await t.pumpAndSettle();
-      expect(find.byKey(const ValueKey('web_game_back')), findsNothing, reason: g.id);
+      expect(find.byKey(const ValueKey('web_game_back')), g.isLearning ? findsNothing : findsOneWidget, reason: g.id);
     }
     debugDefaultTargetPlatformOverride = null;
   });

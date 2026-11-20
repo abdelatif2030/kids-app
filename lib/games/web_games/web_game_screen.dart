@@ -2,6 +2,7 @@ import 'learn_reactions.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import '../../media/hub_music.dart';
 import 'package:flutter/services.dart';
 
 import '../../adventures/adventure_service.dart';
@@ -110,7 +111,9 @@ class _WebGameScreenState extends State<WebGameScreen> {
   late final LearnBridge _learn = LearnBridge(widget.game, widget.childId);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => HubMusicScope(track: null, child: _buildScreen(context));
+
+  Widget _buildScreen(BuildContext context) {
     final config = _config;
     final view = config == null
         ? const Center(child: CircularProgressIndicator(color: Colors.white))

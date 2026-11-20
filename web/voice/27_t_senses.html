@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المستوى 27: الحواس والمشاعر</title>
+<style>
+  :root{--bg:#1d1250;--card:#2b1f78;--gold:#ffd23a;--ok:#2fbf5a;--rec:#e8384a;--ink:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,"Segoe UI",system-ui,sans-serif;direction:rtl}
+  header{position:sticky;top:0;z-index:5;background:#140b3a;border-bottom:3px solid var(--gold);padding:10px 14px}
+  h1{margin:0 0 6px;font-size:20px;color:var(--gold)}
+  .bar{height:12px;border-radius:8px;background:#3b2e90;overflow:hidden}.bar b{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+  .top{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+  button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:9px 14px;cursor:pointer;color:#fff;background:#3b6fd8;min-height:42px}
+  button.rec{background:var(--rec)}button.ok{background:var(--ok)}button.ghost{background:#4a3aa8}button.del{background:#6a2a50}
+  button:disabled{opacity:.4;cursor:default}
+  main{padding:10px 12px 90px;max-width:900px;margin:auto}
+  .row{background:var(--card);border:2px solid #4a3aa8;border-radius:16px;padding:12px;margin:10px 0}
+  .row.done{border-color:var(--ok)}.row.live{border-color:var(--rec);box-shadow:0 0 0 3px #e8384a55}
+  .t{font-size:26px;font-weight:900;line-height:1.5}.r{font-size:15px;opacity:.8;margin-top:2px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.st{font-size:14px;opacity:.9}
+  .note{background:#3b2e90;border-radius:12px;padding:10px;font-size:15px;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ __TITLE__</h1>
+  <div class="bar"><b id="prog"></b></div>
+  <div class="top"><span id="count"></span>
+    <span><button class="ok" id="zip">⬇️ تنزيل تسجيلاتي (ملف واحد)</button> <button class="del" id="wipe">🗑️ مسح الكل</button></span></div>
+</header>
+<main>
+  <div class="note">اضغط <b>● سجّل</b>، اقرا الجملة بصوتك بهدوء وبصوت طفل مرح، واضغط <b>■ وقّف</b>. تسمع تسجيلك بـ <b>▶ تسجيلي</b> وتقارنه بالصوت الحالي بـ <b>▶ الحالي</b>. التسجيلات بتتحفظ في المتصفح لوحدها، تقدر تقفل وتكمل بعدين. لما تخلص اضغط «تنزيل تسجيلاتي» وابعتلي الملف.</div>
+  <div id="list"></div>
+</main>
+<script>
+const GROUP = "27_t_senses";
+const ITEMS = [{"id":"d028a3f6","text":"لعبنا يوم طويل، بنحس بإيه؟","reading":"لُعَبْنَا يُوم طَوِيل، بِنِحِسّ بِإِيه؟"},{"id":"9ebca850","text":"بنشوف ده بإيه؟","reading":"بِنِشُوف دَه بِإِيه؟"},{"id":"2be65d56","text":"بطننا بتوجعنا، بنحس بإيه؟","reading":"بَطْنِنَا بِتْوَجَّعْنَا، بِنِحِسّ بِإِيه؟"},{"id":"397bb6b3","text":"رسمنا رسمة حلوة، بنحس بإيه؟","reading":"رَسَمْنَا رَسْمَة حِلْوَة، بِنِحِسّ بِإِيه؟"},{"id":"19614b25","text":"بنشم ده بإيه؟","reading":"بِنِشِمّ دَه بِإِيه؟"},{"id":"d11e00a4","text":"فين الوش الغضبان؟","reading":"فِين الوِشّ الغَضْبَان؟"},{"id":"78d498e1","text":"فين الوش النعسان؟","reading":"فِين الوِشّ النَّعْسَان؟"},{"id":"1adf17ff","text":"بنحس بطعم ده بإيه؟","reading":"بِنِحِسّ بِطَعْم دَه بِإِيه؟"},{"id":"32d72ba2","text":"فين الوش الفرحان؟","reading":"فِين الوِشّ الفَرْحَان؟"},{"id":"1111cfe9","text":"فين الوش التعبان؟","reading":"فِين الوِشّ التَعْبَان؟"},{"id":"38405922","text":"شفنا حشرة كبيرة، بنحس بإيه؟","reading":"شُفْنَا حَشَرَة كَبِيرَة، بِنِحِسّ بِإِيه؟"},{"id":"3f18e4d6","text":"شفنا ألعاب نارية في السما، بنحس بإيه؟","reading":"شُفْنَا أَلْعَاب نَارِيَّة فِي السَّمَا، بِنِحِسّ بِإِيه؟"},{"id":"62e661bc","text":"بنحس بطعم الأكل بإيه؟","reading":"بِنِحِسّ بِطَعْم الأَكْل بِإِيه؟"},{"id":"5d71be72","text":"وحشنا حد بنحبه، بنحس بإيه؟","reading":"وِحْشِنَا حَدّ بِنْحِبُّه، بِنِحِسّ بِإِيه؟"},{"id":"8e470fe0","text":"فين الوش الخايف؟","reading":"فِين الوِشّ الخَايِف؟"},{"id":"e7a0dad5","text":"بنلمس ده بإيه؟","reading":"بِنِلْمِس دَه بِإِيه؟"},{"id":"83dbc248","text":"لقينا هدية من غير ما نتوقع، بنحس بإيه؟","reading":"لِقِينَا هَدِيَّة مِن غَيْر مَا نِتَوَقَّع، بِنِحِسّ بِإِيه؟"},{"id":"479e6095","text":"كلب كبير جري ناحيتنا، بنحس بإيه؟","reading":"كَلْب كَبِير جَرِي نَاحِيتْنَا، بِنِحِسّ بِإِيه؟"},{"id":"e21a1640","text":"فين الوش الزعلان؟","reading":"فِين الوِشّ الزَّعْلَان؟"},{"id":"decac480","text":"عندنا سخونية، بنحس بإيه؟","reading":"عِنْدِنَا سُخُونِيَّة، بِنِحِسّ بِإِيه؟"},{"id":"478d5cb9","text":"لو تعبنا، نروح لمين؟","reading":"لَو تِعِبْنَا، نَرُوح لِمِين؟"},{"id":"72167f74","text":"بنلمس بإيه؟","reading":"بِنِلْمِس بِإِيه؟"},{"id":"879dfe0e","text":"لو حد ضايقنا، نحكي لمين؟","reading":"لَو حَدّ ضَايِقْنَا، نِحْكِي لِمِين؟"},{"id":"bc0bc63d","text":"حد شخبط على رسمتنا، بنحس بإيه؟","reading":"حَدّ شَخْبَط عَلَى رَسْمِتْنَا، بِنِحِسّ بِإِيه؟"},{"id":"2f09ef37","text":"فين الوش المتفاجئ؟","reading":"فِين الوِشّ المُتْفَاجِئ؟"},{"id":"e498d317","text":"سهرنا لوقت متأخر، بنحس بإيه؟","reading":"سِهِرْنَا لِوَقْت مُتَأَخِّر، بِنِحِسّ بِإِيه؟"},{"id":"5717141f","text":"ضعنا في السوق، بنحس بإيه؟","reading":"ضِعْنَا فِي السُّوق، بِنِحِسّ بِإِيه؟"},{"id":"cc43b0cb","text":"بنسمع ده بإيه؟","reading":"بِنِسْمَع دَه بِإِيه؟"},{"id":"ac952bcd","text":"لعبتنا اتكسرت، بنحس بإيه؟","reading":"لُعْبِتْنَا اتْكَسَرِتْ، بِنِحِسّ بِإِيه؟"},{"id":"0fabbbcc","text":"لو زعلنا، نروح لمين؟","reading":"لَو زِعِلْنَا، نَرُوح لِمِين؟"},{"id":"358845f9","text":"صاحبنا سافر بعيد، بنحس بإيه؟","reading":"صَاحِبْنَا سَافِر بَعِيد، بِنِحِسّ بِإِيه؟"},{"id":"83faafa9","text":"حد قال علينا كلمة وحشة، بنحس بإيه؟","reading":"حَدّ قَال عَلِينَا كَلِمَة وِحْشَة، بِنِحِسّ بِإِيه؟"},{"id":"926b40d8","text":"لو خفنا، نروح لمين؟","reading":"لَو خِفْنَا، نَرُوح لِمِين؟"},{"id":"2c2c087d","text":"حد زقنا وإحنا بنلعب، بنحس بإيه؟","reading":"حَدّ زَقِّنَا وَإِحْنَا بِنِلْعَب، بِنِحِسّ بِإِيه؟"},{"id":"c948a3ff","text":"الآيس كريم وقع على الأرض، بنحس بإيه؟","reading":"الآيْس كْرِيم وِقِع عَلَى الأَرْض، بِنِحِسّ بِإِيه؟"},{"id":"8c07d5f1","text":"فتحنا الصندوق ولقينا مفاجأة، بنحس بإيه؟","reading":"فَتَحْنَا الصُّنْدُوق وَلِقِينَا مُفَاجْأَة، بِنِحِسّ بِإِيه؟"},{"id":"0d390ace","text":"جه ميعاد النوم، بنحس بإيه؟","reading":"جَه مِيعَاد النَّوْم، بِنِحِسّ بِإِيه؟"},{"id":"86bfb7d1","text":"بابا رجع من السفر فجأة، بنحس بإيه؟","reading":"بَابَا رِجِع مِن السَّفَر فَجْأَة، بِنِحِسّ بِإِيه؟"},{"id":"9276f535","text":"قطتنا الصغيرة تاهت، بنحس بإيه؟","reading":"قُطَّتِنَا الصُّغَيَّرَة تَاهِت، بِنِحِسّ بِإِيه؟"},{"id":"7ca870ef","text":"لقينا لعبتنا اللي ضاعت، بنحس بإيه؟","reading":"لِقِينَا لُعْبِتْنَا اللِّي ضَاعِت، بِنِحِسّ بِإِيه؟"},{"id":"cec84e24","text":"أكلنا آيس كريم، بنحس بإيه؟","reading":"أَكَلْنَا آيْس كْرِيم، بِنِحِسّ بِإِيه؟"},{"id":"1b36dafc","text":"عندنا برد وكحة، بنحس بإيه؟","reading":"عِنْدِنَا بَرْد وَكُحَّة، بِنِحِسّ بِإِيه؟"},{"id":"39ae70db","text":"لعبنا مع صحابنا في الجنينة، بنحس بإيه؟","reading":"لُعَبْنَا مَعَ صُحَابْنَا فِي الجِنِينَة، بِنِحِسّ بِإِيه؟"},{"id":"2241ac1e","text":"حد هد البرج اللي بنيناه، بنحس بإيه؟","reading":"حَدّ هَدّ البُرْج اللِّي بَنِينَاه، بِنِحِسّ بِإِيه؟"},{"id":"139d26a3","text":"البالونة طارت في السما، بنحس بإيه؟","reading":"البَالُونَة طَارِت فِي السَّمَا، بِنِحِسّ بِإِيه؟"},{"id":"0d8202cf","text":"سمعنا رعد جامد، بنحس بإيه؟","reading":"سِمِعْنَا رَعْد جَامِد، بِنِحِسّ بِإِيه؟"},{"id":"4a12921b","text":"النور راح والدنيا ضلمة، بنحس بإيه؟","reading":"النُّور رَاح وَالدُّنْيَا ضَلْمَة، بِنِحِسّ بِإِيه؟"},{"id":"4a514768","text":"روحنا الملاهي، بنحس بإيه؟","reading":"رُوحْنَا المَلَاهِي، بِنِحِسّ بِإِيه؟"},{"id":"283ee377","text":"ماما جابت لنا هدية، بنحس بإيه؟","reading":"مَامَا جَابِت لِنَا هَدِيَّة، بِنِحِسّ بِإِيه؟"},{"id":"fb131f6f","text":"حد خد لعبتنا بالعافية، بنحس بإيه؟","reading":"حَدّ خَد لُعْبِتْنَا بِالعَافْيَة، بِنِحِسّ بِإِيه؟"},{"id":"a30578c0","text":"جدو وتيتة زارونا، بنحس بإيه؟","reading":"جَدُّو وَتِيتَة زَارُونَا، بِنِحِسّ بِإِيه؟"}];
+const CURRENT = (id) => `../assets/assets/games/learn_voice/ar/${id}.mp3`;  // the voice that is in the app now (works on the demo site)
+let db, mediaRec, stream, chunks = [], curId = null, audio = new Audio();
+
+function openDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('rehlaty_voice', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('rec');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+const tx = (mode) => db.transaction('rec', mode).objectStore('rec');
+const key = (id) => GROUP + '|' + id;
+const get = (id) => new Promise((res) => { const q = tx('readonly').get(key(id)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); });
+const put = (id, v) => new Promise((res) => { const q = tx('readwrite').put(v, key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const del = (id) => new Promise((res) => { const q = tx('readwrite').delete(key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const done = new Set();
+
+function ext(type) { return /webm/.test(type) ? 'webm' : /ogg/.test(type) ? 'ogg' : /mp4|aac|m4a/.test(type) ? 'm4a' : /wav/.test(type) ? 'wav' : 'bin'; }
+function refresh() {
+  document.getElementById('count').textContent = `سجّلت ${done.size} من ${ITEMS.length}`;
+  document.getElementById('prog').style.width = (100 * done.size / ITEMS.length) + '%';
+}
+function build() {
+  const list = document.getElementById('list');
+  ITEMS.forEach((it, i) => {
+    const d = document.createElement('div'); d.className = 'row'; d.id = 'r_' + it.id;
+    d.innerHTML = `<div class="t">${i + 1}. ${it.text.replace(/</g, '&lt;')}</div>${it.reading && it.reading !== it.text ? `<div class="r">تُقرأ: ${it.reading.replace(/</g, '&lt;')}</div>` : ''}
+      <div class="btns"><button class="rec" data-a="rec">● سجّل</button><button class="ghost" data-a="mine" disabled>▶ تسجيلي</button><button class="ghost" data-a="cur">▶ الحالي</button><button class="del" data-a="del" disabled>🗑️</button><span class="st"></span></div>`;
+    d.addEventListener('click', (e) => { const a = e.target.dataset && e.target.dataset.a; if (a) act(it, d, e.target, a); });
+    list.appendChild(d);
+  });
+}
+function mark(d, on) {
+  d.classList.toggle('done', on);
+  d.querySelector('[data-a=mine]').disabled = !on; d.querySelector('[data-a=del]').disabled = !on;
+  d.querySelector('.st').textContent = on ? '✓ اتسجلت' : '';
+}
+async function act(it, d, btn, a) {
+  if (a === 'cur') { audio.pause(); audio = new Audio(CURRENT(it.id)); audio.play().catch(() => { d.querySelector('.st').textContent = 'الصوت الحالي مش متاح هنا'; }); return; }
+  if (a === 'mine') { const v = await get(it.id); if (v) { audio.pause(); audio = new Audio(URL.createObjectURL(v.blob)); audio.play(); } return; }
+  if (a === 'del') { await del(it.id); done.delete(it.id); mark(d, false); refresh(); return; }
+  if (a === 'rec') {
+    if (mediaRec && mediaRec.state === 'recording') { mediaRec.stop(); return; }
+    try { stream = stream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { alert('محتاج إذن الميكروفون. اسمح للمتصفح باستخدام الميكروفون وجرّب تاني.'); return; }
+    audio.pause(); chunks = []; curId = it.id;
+    const opts = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? { mimeType: 'audio/webm;codecs=opus' } : {};
+    mediaRec = new MediaRecorder(stream, opts);
+    mediaRec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mediaRec.onstop = async () => {
+      d.classList.remove('live'); btn.textContent = '● سجّل'; btn.classList.add('rec');
+      const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+      if (blob.size < 1500) { d.querySelector('.st').textContent = 'التسجيل قصير أوي، جرّب تاني'; return; }
+      await put(it.id, { blob, type: blob.type, text: it.text, at: Date.now() });
+      done.add(it.id); mark(d, true); refresh();
+      const nx = d.nextElementSibling; if (nx) nx.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    d.classList.add('live'); btn.textContent = '■ وقّف'; d.querySelector('.st').textContent = 'بيسجّل...';
+    mediaRec.start();
+  }
+}
+// a tiny zip writer (stored, no compression) so no library is needed
+function crc32(buf) { let c, crc = -1; for (let i = 0; i < buf.length; i++) { c = (crc ^ buf[i]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ -1) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(); const parts = []; const central = []; let off = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name); const crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30)); lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46)); ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), name); off += 30 + name.length + f.data.length;
+  }
+  let csize = 0; central.forEach((p) => csize += p.length);
+  const end = new DataView(new ArrayBuffer(22)); end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/zip' });
+}
+document.getElementById('zip').onclick = async () => {
+  const files = [], manifest = [];
+  for (const it of ITEMS) { const v = await get(it.id); if (!v) continue; const name = `${it.id}.${ext(v.type)}`; files.push({ name, data: new Uint8Array(await v.blob.arrayBuffer()) }); manifest.push({ id: it.id, text: it.text, file: name }); }
+  if (!files.length) { alert('لسه ما سجلتش حاجة'); return; }
+  files.push({ name: 'manifest.json', data: new TextEncoder().encode(JSON.stringify({ group: GROUP, items: manifest }, null, 1)) });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(files)); a.download = `rehlaty_voice_${GROUP}.zip`; a.click();
+};
+document.getElementById('wipe').onclick = async () => { if (!confirm('تمسح كل تسجيلات الصفحة دي؟')) return; for (const it of ITEMS) { await del(it.id); done.delete(it.id); mark(document.getElementById('r_' + it.id), false); } refresh(); };
+(async () => { db = await openDb(); build(); for (const it of ITEMS) { const v = await get(it.id); if (v) { done.add(it.id); mark(document.getElementById('r_' + it.id), true); } } refresh(); })();
+</script>
+</body>
+</html>

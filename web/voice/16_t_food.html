@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المستوى 16: أكل وحلويات</title>
+<style>
+  :root{--bg:#1d1250;--card:#2b1f78;--gold:#ffd23a;--ok:#2fbf5a;--rec:#e8384a;--ink:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,"Segoe UI",system-ui,sans-serif;direction:rtl}
+  header{position:sticky;top:0;z-index:5;background:#140b3a;border-bottom:3px solid var(--gold);padding:10px 14px}
+  h1{margin:0 0 6px;font-size:20px;color:var(--gold)}
+  .bar{height:12px;border-radius:8px;background:#3b2e90;overflow:hidden}.bar b{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+  .top{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+  button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:9px 14px;cursor:pointer;color:#fff;background:#3b6fd8;min-height:42px}
+  button.rec{background:var(--rec)}button.ok{background:var(--ok)}button.ghost{background:#4a3aa8}button.del{background:#6a2a50}
+  button:disabled{opacity:.4;cursor:default}
+  main{padding:10px 12px 90px;max-width:900px;margin:auto}
+  .row{background:var(--card);border:2px solid #4a3aa8;border-radius:16px;padding:12px;margin:10px 0}
+  .row.done{border-color:var(--ok)}.row.live{border-color:var(--rec);box-shadow:0 0 0 3px #e8384a55}
+  .t{font-size:26px;font-weight:900;line-height:1.5}.r{font-size:15px;opacity:.8;margin-top:2px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.st{font-size:14px;opacity:.9}
+  .note{background:#3b2e90;border-radius:12px;padding:10px;font-size:15px;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ __TITLE__</h1>
+  <div class="bar"><b id="prog"></b></div>
+  <div class="top"><span id="count"></span>
+    <span><button class="ok" id="zip">⬇️ تنزيل تسجيلاتي (ملف واحد)</button> <button class="del" id="wipe">🗑️ مسح الكل</button></span></div>
+</header>
+<main>
+  <div class="note">اضغط <b>● سجّل</b>، اقرا الجملة بصوتك بهدوء وبصوت طفل مرح، واضغط <b>■ وقّف</b>. تسمع تسجيلك بـ <b>▶ تسجيلي</b> وتقارنه بالصوت الحالي بـ <b>▶ الحالي</b>. التسجيلات بتتحفظ في المتصفح لوحدها، تقدر تقفل وتكمل بعدين. لما تخلص اضغط «تنزيل تسجيلاتي» وابعتلي الملف.</div>
+  <div id="list"></div>
+</main>
+<script>
+const GROUP = "16_t_food";
+const ITEMS = [{"id":"b6d6252a","text":"إيه اللي بيتقطع شرايح من اللبن؟","reading":"إِيه اللِّي بِيِتْقَطَّع شَرَايِح مِن اللَّبَن؟"},{"id":"e7a89434","text":"إيه اللي بنأكله مقلي مع البطاطس؟","reading":"إِيه اللِّي بِنَاكُلُه مَقْلِي مَعَ البَطَاطِس؟"},{"id":"2a5e9681","text":"إيه اللي بنشربه الصبح قبل المدرسة؟","reading":"إِيه اللِّي بِنِشْرَبُه الصُّبْح قَبْل المَدْرَسَة؟"},{"id":"61a0b303","text":"فين الآيس كريم؟","reading":"فِين الآيْس كْرِيم؟"},{"id":"34b415c5","text":"فين المصاصة؟","reading":"فِين المَصَّاصَة؟"},{"id":"ac7eb554","text":"إيه اللي بيتاكل مع الفول والطعمية؟","reading":"إِيه اللِّي بِيِتَاكِل مَعَ الفُول وَالطَّعْمِيَّة؟"},{"id":"e8d50af2","text":"إيه اللي بنحطه فيه الخضار ونشربه بالمعلقة؟","reading":"إِيه اللِّي بِنِحُطُّه فِيه الخُضَار وَنِشْرَبُه بِالمِعْلَقَة؟"},{"id":"7519e90e","text":"إيه اللي بيتعمل منه الزبادي؟","reading":"إِيه اللِّي بِيِتْعَمِل مِنُّه الزِّبَادِي؟"},{"id":"dfb92719","text":"فين بيت الزنجبيل؟","reading":"فِين بَيْت الزَّنْجَبِيل؟"},{"id":"f841d7b1","text":"إيه اللي بيتحط عليه الجبنة والزيتون؟","reading":"إِيه اللِّي بِيِتْحَطّ عَلَيْه الجُبْنَة وَالزَّيْتُون؟"},{"id":"5f9e2c83","text":"إيه اللي بنقليه ونأكله في الفطار؟","reading":"إِيه اللِّي بِنِقْلِيه وَنَاكُلُه فِي الفُطَار؟"},{"id":"f2b0076e","text":"إيه اللي حبوبه بيضا وصغيرة وبنطبخها؟","reading":"إِيه اللِّي حُبُوبُه بَيْضَا وَصُغَيَّرَة وَبِنِطْبُخْهَا؟"},{"id":"7fb1bac0","text":"إيه اللي بنسلقه ونأكله وله صفار؟","reading":"إِيه اللِّي بِنِسْلِقُه وَنَاكُلُه وَلَه صَفَار؟"},{"id":"f363223d","text":"إيه اللي أصله من إيطاليا وبنحبه؟","reading":"إِيه اللِّي أَصْلُه مِن إِيطَالْيَا وَبِنِحِبُّه؟"},{"id":"9db7b263","text":"كام بسكوتة؟","reading":"كَام بِسْكُوتَة؟"},{"id":"fe864063","text":"إيه اللي مقرمش وبنغمسه في اللبن؟","reading":"إِيه اللِّي مُقَرْمِش وَبِنِغْمِسُه فِي اللَّبَن؟"},{"id":"f6057d1e","text":"إيه اللي أبيض ومن البقرة؟","reading":"إِيه اللِّي أَبْيَض وَمِن البَقَرَة؟"},{"id":"f551b592","text":"كام كعكة؟","reading":"كَام كَعْكَة؟"},{"id":"1535697c","text":"إيه اللي حلو ومصنوع على عصاية ملونة؟","reading":"إِيه اللِّي حِلْو وَمَصْنُوع عَلَى عَصَايَة مُلَوَّنَة؟"},{"id":"25fde25e","text":"إيه اللي لازم نشربه كتير في الصيف؟","reading":"إِيه اللِّي لَازِم نِشْرَبُه كَتِير فِي الصَّيْف؟"},{"id":"137ea9c9","text":"إيه اللي بيعمله النحل في الخلية؟","reading":"إِيه اللِّي بِيْعْمِلُه النَّحْل فِي الخَلِيَّة؟"},{"id":"8c946629","text":"إيه اللي بيتعمل من اللبن؟","reading":"إِيه اللِّي بِيِتْعَمِل مِن اللَّبَن؟"},{"id":"4e316e0e","text":"إيه اللي بتبيضه الفراخ؟","reading":"إِيه اللِّي بِتْبَيَّضُه الفِرَاخ؟"},{"id":"8ace2e26","text":"إيه اللي بيزرعوه في الماء؟","reading":"إِيه اللِّي بِيْزْرَعُوه فِي المَاء؟"},{"id":"ec03f4b5","text":"إيه اللي بيبقى فيه جناح وصدر؟","reading":"إِيه اللِّي بِيبْقَى فِيه جَنَاح وَصَدْر؟"},{"id":"39f01680","text":"إيه اللي ريحته قوية وبيتاكل بالعيش؟","reading":"إِيه اللِّي رِيحْتُه قَوِيَّة وَبِيِتَاكِل بِالعِيش؟"},{"id":"c76e3e6f","text":"إيه اللي بيتعمل من القمح المطحون؟","reading":"إِيه اللِّي بِيِتْعَمِل مِن القَمْح المَطْحُون؟"},{"id":"e3005229","text":"إيه اللي بنتغدى بيه في الشتا ساخن؟","reading":"إِيه اللِّي بِنِتْغَدَّى بِيه فِي الشِّتَا سَاخِن؟"},{"id":"b5d84670","text":"كام بيتزا؟","reading":"كَام بِيتْزَا؟"},{"id":"59ef6389","text":"إيه اللي بنفخه ويكبر؟","reading":"إِيه اللِّي بِنْفُخُه وَيِكْبَر؟"},{"id":"c78f552c","text":"إيه اللي بيتعصر من الفاكهة؟","reading":"إِيه اللِّي بِيِتْعِصِر مِن الفَاكْهَة؟"},{"id":"3e64cdab","text":"إيه اللي بيتطبخ مع الخضار والصلصة؟","reading":"إِيه اللِّي بِيِتْطِبِخ مَعَ الخُضَار وَالصَّلْصَة؟"},{"id":"bb56f65a","text":"إيه اللي ليه عصاية وحلو؟","reading":"إِيه اللِّي لِيه عَصَايَة وَحِلْو؟"},{"id":"ead340f2","text":"إيه اللي بيتعمل منه بيت صغير حلو؟","reading":"إِيه اللِّي بِيِتْعَمِل مِنُّه بَيْت صُغَيَّر حِلْو؟"},{"id":"a05d1253","text":"إيه اللي بيتلحس وبارد وحلو؟","reading":"إِيه اللِّي بِيِتْلِحِس وَبَارِد وَحِلْو؟"},{"id":"8b5df048","text":"إيه اللي بنشربه من البرتقال؟","reading":"إِيه اللِّي بِنِشْرَبُه مِن البُرْتُقَال؟"},{"id":"a8cde242","text":"إيه اللي شكله دايرة وعليه صلصة وجبنة؟","reading":"إِيه اللِّي شَكْلُه دَايْرَة وَعَلِيه صَلْصَة وَجُبْنَة؟"},{"id":"cdade781","text":"إيه اللي حلو وبيعمله النحل؟","reading":"إِيه اللِّي حِلْو وَبِيْعْمِلُه النَّحْل؟"},{"id":"150d9f2d","text":"إيه اللي بيبقى عليه رقائق شيكولاتة؟","reading":"إِيه اللِّي بِيبْقَى عَلَيْه رَقَائِق شِيكُولَاتَة؟"},{"id":"584489ee","text":"إيه اللي بنشربه من الفاكهة؟","reading":"إِيه اللِّي بِنِشْرَبُه مِن الفَاكْهَة؟"},{"id":"44155183","text":"إيه اللي ليه صفار وبياض؟","reading":"إِيه اللِّي لِيه صَفَار وَبَيَاض؟"},{"id":"7b8a16d8","text":"إيه اللي بيتاكل بارد في الصيف؟","reading":"إِيه اللِّي بِيِتَاكِل بَارِد فِي الصَّيْف؟"},{"id":"75c1e28a","text":"إيه اللي مصنوع من البسكويت وسكر في الأعياد؟","reading":"إِيه اللِّي مَصْنُوع مِن البِسْكُويت وَسُكَّر فِي الأَعْيَاد؟"},{"id":"b30fea58","text":"كام بيضة؟","reading":"كَام بَيْضَة؟"},{"id":"14706692","text":"البقرة بتدينا إيه؟","reading":"البَقَرَة بِتْدِينَا إِيه؟"},{"id":"20efeb52","text":"إيه اللي حلو وملفوف في ورقة ملونة؟","reading":"إِيه اللِّي حِلْو وَمَلْفُوف فِي وَرَقَة مُلَوَّنَة؟"},{"id":"11e216b4","text":"إيه اللي النحل بيجمعه؟","reading":"إِيه اللِّي النَّحْل بِيْجَمَّعُه؟"},{"id":"ecc1bcf1","text":"إيه اللي بنطيره ويبقى عالي في الهوا؟","reading":"إِيه اللِّي بِنِطَيَّرُه وَيِبْقَى عَالِي فِي الهَوَا؟"},{"id":"cf27f753","text":"الفرخة بتجيب لنا إيه؟","reading":"الفَرْخَة بِتْجِيب لِنَا إِيه؟"},{"id":"9f271b61","text":"إيه اللي بنشربه بالشاليمو؟","reading":"إِيه اللِّي بِنِشْرَبُه بِالشَّالِيمُو؟"},{"id":"e10da86b","text":"إيه اللي مالوش لون ولا طعم ولا ريحة؟","reading":"إِيه اللِّي مَالُوش لَوْن وِلَّا طَعْم وِلَّا رِيحَة؟"},{"id":"b39a3816","text":"إيه اللي قشرته بيضا وبنكسرها؟","reading":"إِيه اللِّي قِشْرِتُه بَيْضَا وَبِنِكْسِرْهَا؟"},{"id":"0fab2936","text":"إيه اللي بنشربه في كوباية ملونة؟","reading":"إِيه اللِّي بِنِشْرَبُه فِي كُوبَايَة مُلَوَّنَة؟"},{"id":"cb0c2a33","text":"إيه اللي بيتاكل في كوب أو بسكوتة؟","reading":"إِيه اللِّي بِيِتَاكِل فِي كُوب أَو بِسْكُوتَة؟"},{"id":"4aa73670","text":"إيه اللي حلو جدا وبيبقى في برطمان؟","reading":"إِيه اللِّي حِلْو جِدًّا وَبِيِبْقَى فِي بُرْطُمَان؟"},{"id":"559428a4","text":"إيه اللي بيتعمل على شكل بيت وحلو؟","reading":"إِيه اللِّي بِيِتْعَمِل عَلَى شَكْل بَيْت وَحِلْو؟"},{"id":"90ee60ba","text":"إيه اللي بارد وحلو وبيذوب في الصيف؟","reading":"إِيه اللِّي بَارِد وَحِلْو وَبِيِدُوب فِي الصَّيْف؟"},{"id":"034f1cf5","text":"إيه اللي بينفخ في الحفلات؟","reading":"إِيه اللِّي بِيْنْفُخ فِي الحَفَلَات؟"},{"id":"5673c453","text":"إيه اللي بنخبزه ونحط عليه جبنة؟","reading":"إِيه اللِّي بِنِخْبِزُه وَنِحُطّ عَلَيْه جُبْنَة؟"},{"id":"5c643f46","text":"إيه اللي بنأكله بالمعلقة سخن؟","reading":"إِيه اللِّي بِنَاكُلُه بِالمِعْلَقَة سُخْن؟"},{"id":"20cbc18f","text":"النحلة بتعمل إيه؟","reading":"النَّحْلَة بِتْعْمِل إِيه؟"},{"id":"0a107388","text":"إيه اللي بنقليه في الزيت وبيبقى دهبي؟","reading":"إِيه اللِّي بِنِقْلِيه فِي الزِّيت وَبِيِبْقَى دَهَبِي؟"},{"id":"21072a5e","text":"إيه اللي ذهبي ولزج وبيتحط على العيش؟","reading":"إِيه اللِّي دَهَبِي وَلِزِج وَبِيِتْحَطّ عَلَى العِيش؟"},{"id":"9626ef98","text":"إيه اللي شفاف وبنشربه كل يوم؟","reading":"إِيه اللِّي شَفَّاف وَبِنِشْرَبُه كُلّ يُوم؟"},{"id":"15c62cd3","text":"إيه اللي بنشويه ونأكله مع الأرز؟","reading":"إِيه اللِّي بِنِشْوِيه وَنَاكُلُه مَعَ الأَرُزّ؟"},{"id":"d088d0fd","text":"إيه اللي حلو ومدور وبنمصه؟","reading":"إِيه اللِّي حِلْو وَمُدَوَّر وَبِنِمُصُّه؟"},{"id":"27551653","text":"إيه اللي بنعمله من القمح؟","reading":"إِيه اللِّي بِنِعْمِلُه مِن القَمْح؟"},{"id":"9074af9f","text":"إيه اللي بنأكله مع الشاي حلو ومقرمش؟","reading":"إِيه اللِّي بِنَاكُلُه مَعَ الشَّاي حِلْو وَمُقَرْمِش؟"},{"id":"187c3951","text":"إيه اللي بنأكله مع الملوخية؟","reading":"إِيه اللِّي بِنَاكُلُه مَعَ المُلُوخِيَّة؟"},{"id":"5644ef46","text":"إيه اللي حجمه صغير وعليه كريمة؟","reading":"إِيه اللِّي حَجْمُه صُغَيَّر وَعَلِيه كْرِيمَة؟"},{"id":"add60be3","text":"إيه اللي بيتعمل فيه الجبنة والصلصة وبيتقطع مثلثات؟","reading":"إِيه اللِّي بِيِتْعَمِل فِيه الجُبْنَة وَالصَّلْصَة وَبِيِتْقَطَّع مُثَلَّثَات؟"},{"id":"07bb8a81","text":"إيه اللي بيطلع من البقرة؟","reading":"إِيه اللِّي بِيْطْلَع مِن البَقَرَة؟"},{"id":"dee3b1b8","text":"إيه اللي بنخبزه في الفرن ونأكله مع الفول؟","reading":"إِيه اللِّي بِنِخْبِزُه فِي الفُرْن وَنَاكُلُه مَعَ الفُول؟"},{"id":"bfa97cd0","text":"إيه اللي ليه عود طويل وحلو؟","reading":"إِيه اللِّي لِيه عُود طَوِيل وَحِلْو؟"},{"id":"790d46ec","text":"إيه اللي عليه شمعة في عيد الميلاد؟","reading":"إِيه اللِّي عَلَيْه شَمْعَة فِي عِيد المِيلَاد؟"}];
+const CURRENT = (id) => `../assets/assets/games/learn_voice/ar/${id}.mp3`;  // the voice that is in the app now (works on the demo site)
+let db, mediaRec, stream, chunks = [], curId = null, audio = new Audio();
+
+function openDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('rehlaty_voice', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('rec');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+const tx = (mode) => db.transaction('rec', mode).objectStore('rec');
+const key = (id) => GROUP + '|' + id;
+const get = (id) => new Promise((res) => { const q = tx('readonly').get(key(id)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); });
+const put = (id, v) => new Promise((res) => { const q = tx('readwrite').put(v, key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const del = (id) => new Promise((res) => { const q = tx('readwrite').delete(key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const done = new Set();
+
+function ext(type) { return /webm/.test(type) ? 'webm' : /ogg/.test(type) ? 'ogg' : /mp4|aac|m4a/.test(type) ? 'm4a' : /wav/.test(type) ? 'wav' : 'bin'; }
+function refresh() {
+  document.getElementById('count').textContent = `سجّلت ${done.size} من ${ITEMS.length}`;
+  document.getElementById('prog').style.width = (100 * done.size / ITEMS.length) + '%';
+}
+function build() {
+  const list = document.getElementById('list');
+  ITEMS.forEach((it, i) => {
+    const d = document.createElement('div'); d.className = 'row'; d.id = 'r_' + it.id;
+    d.innerHTML = `<div class="t">${i + 1}. ${it.text.replace(/</g, '&lt;')}</div>${it.reading && it.reading !== it.text ? `<div class="r">تُقرأ: ${it.reading.replace(/</g, '&lt;')}</div>` : ''}
+      <div class="btns"><button class="rec" data-a="rec">● سجّل</button><button class="ghost" data-a="mine" disabled>▶ تسجيلي</button><button class="ghost" data-a="cur">▶ الحالي</button><button class="del" data-a="del" disabled>🗑️</button><span class="st"></span></div>`;
+    d.addEventListener('click', (e) => { const a = e.target.dataset && e.target.dataset.a; if (a) act(it, d, e.target, a); });
+    list.appendChild(d);
+  });
+}
+function mark(d, on) {
+  d.classList.toggle('done', on);
+  d.querySelector('[data-a=mine]').disabled = !on; d.querySelector('[data-a=del]').disabled = !on;
+  d.querySelector('.st').textContent = on ? '✓ اتسجلت' : '';
+}
+async function act(it, d, btn, a) {
+  if (a === 'cur') { audio.pause(); audio = new Audio(CURRENT(it.id)); audio.play().catch(() => { d.querySelector('.st').textContent = 'الصوت الحالي مش متاح هنا'; }); return; }
+  if (a === 'mine') { const v = await get(it.id); if (v) { audio.pause(); audio = new Audio(URL.createObjectURL(v.blob)); audio.play(); } return; }
+  if (a === 'del') { await del(it.id); done.delete(it.id); mark(d, false); refresh(); return; }
+  if (a === 'rec') {
+    if (mediaRec && mediaRec.state === 'recording') { mediaRec.stop(); return; }
+    try { stream = stream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { alert('محتاج إذن الميكروفون. اسمح للمتصفح باستخدام الميكروفون وجرّب تاني.'); return; }
+    audio.pause(); chunks = []; curId = it.id;
+    const opts = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? { mimeType: 'audio/webm;codecs=opus' } : {};
+    mediaRec = new MediaRecorder(stream, opts);
+    mediaRec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mediaRec.onstop = async () => {
+      d.classList.remove('live'); btn.textContent = '● سجّل'; btn.classList.add('rec');
+      const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+      if (blob.size < 1500) { d.querySelector('.st').textContent = 'التسجيل قصير أوي، جرّب تاني'; return; }
+      await put(it.id, { blob, type: blob.type, text: it.text, at: Date.now() });
+      done.add(it.id); mark(d, true); refresh();
+      const nx = d.nextElementSibling; if (nx) nx.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    d.classList.add('live'); btn.textContent = '■ وقّف'; d.querySelector('.st').textContent = 'بيسجّل...';
+    mediaRec.start();
+  }
+}
+// a tiny zip writer (stored, no compression) so no library is needed
+function crc32(buf) { let c, crc = -1; for (let i = 0; i < buf.length; i++) { c = (crc ^ buf[i]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ -1) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(); const parts = []; const central = []; let off = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name); const crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30)); lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46)); ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), name); off += 30 + name.length + f.data.length;
+  }
+  let csize = 0; central.forEach((p) => csize += p.length);
+  const end = new DataView(new ArrayBuffer(22)); end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/zip' });
+}
+document.getElementById('zip').onclick = async () => {
+  const files = [], manifest = [];
+  for (const it of ITEMS) { const v = await get(it.id); if (!v) continue; const name = `${it.id}.${ext(v.type)}`; files.push({ name, data: new Uint8Array(await v.blob.arrayBuffer()) }); manifest.push({ id: it.id, text: it.text, file: name }); }
+  if (!files.length) { alert('لسه ما سجلتش حاجة'); return; }
+  files.push({ name: 'manifest.json', data: new TextEncoder().encode(JSON.stringify({ group: GROUP, items: manifest }, null, 1)) });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(files)); a.download = `rehlaty_voice_${GROUP}.zip`; a.click();
+};
+document.getElementById('wipe').onclick = async () => { if (!confirm('تمسح كل تسجيلات الصفحة دي؟')) return; for (const it of ITEMS) { await del(it.id); done.delete(it.id); mark(document.getElementById('r_' + it.id), false); } refresh(); };
+(async () => { db = await openDb(); build(); for (const it of ITEMS) { const v = await get(it.id); if (v) { done.add(it.id); mark(document.getElementById('r_' + it.id), true); } } refresh(); })();
+</script>
+</body>
+</html>

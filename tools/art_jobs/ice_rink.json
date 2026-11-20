@@ -1,0 +1,62 @@
+{
+  "kind_sprite": "Single subject centered, full body front view, plain pure white background, no ground, no shadow, no text.",
+  "style": "Cute 3D cartoon mobile game art, soft pastel winter colors, glossy, bold clean shapes, kid friendly, bright daylight, no text, no letters.",
+  "suffix": "No text, no letters, no people.",
+  "jobs": [
+    {
+      "prompt": "A cute chubby little penguin hero wearing a red scarf and a tiny brown knit hat, big friendly eyes, orange feet.",
+      "name": "hero_penguin",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A cute little white and gray arctic husky fox hero wearing a teal scarf, pointy ears, big friendly eyes, fluffy.",
+      "name": "hero_fox",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A cute chubby little polar bear hero wearing a blue scarf and round ear muffs, big friendly eyes, fluffy white fur.",
+      "name": "hero_bear",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A small cute green goblin with pointy ears and a brown leather cap, yellow eyes, small grin, holding nothing.",
+      "name": "goblin_grunt",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A tiny cute green imp goblin with orange-red tunic, small horns, long pointy ears, mischievous grin.",
+      "name": "goblin_imp",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A small cute green goblin with a blue pointy wizard hat holding a snowball, yellow eyes.",
+      "name": "goblin_thrower",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A big chunky cute green goblin brute wearing a gray metal helmet with bone horns, brown tunic, grumpy but not scary.",
+      "name": "goblin_brute",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A cute green goblin shaman in a purple hood holding a wooden staff with a glowing green orb.",
+      "name": "goblin_shaman",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A big cute green goblin chief wearing a small golden crown and a white fur collar, red tunic, grumpy but not scary.",
+      "name": "goblin_chief",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A very big cute green goblin king with a large golden crown with a red jewel, purple royal robe and a white fur collar, grumpy but not scary.",
+      "name": "goblin_king",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "Top-down overhead view of a snowy winter festival market around an empty central space, wooden stalls with red and green striped roofs, pine trees with string lights, small snowmen, snow covered ground, bright daytime, empty snowy center.",
+      "name": "bg_market",
+      "kind": "scene"
+    }
+  ]
+}

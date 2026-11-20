@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المستوى 23: مصر والمدينة</title>
+<style>
+  :root{--bg:#1d1250;--card:#2b1f78;--gold:#ffd23a;--ok:#2fbf5a;--rec:#e8384a;--ink:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,"Segoe UI",system-ui,sans-serif;direction:rtl}
+  header{position:sticky;top:0;z-index:5;background:#140b3a;border-bottom:3px solid var(--gold);padding:10px 14px}
+  h1{margin:0 0 6px;font-size:20px;color:var(--gold)}
+  .bar{height:12px;border-radius:8px;background:#3b2e90;overflow:hidden}.bar b{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+  .top{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+  button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:9px 14px;cursor:pointer;color:#fff;background:#3b6fd8;min-height:42px}
+  button.rec{background:var(--rec)}button.ok{background:var(--ok)}button.ghost{background:#4a3aa8}button.del{background:#6a2a50}
+  button:disabled{opacity:.4;cursor:default}
+  main{padding:10px 12px 90px;max-width:900px;margin:auto}
+  .row{background:var(--card);border:2px solid #4a3aa8;border-radius:16px;padding:12px;margin:10px 0}
+  .row.done{border-color:var(--ok)}.row.live{border-color:var(--rec);box-shadow:0 0 0 3px #e8384a55}
+  .t{font-size:26px;font-weight:900;line-height:1.5}.r{font-size:15px;opacity:.8;margin-top:2px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.st{font-size:14px;opacity:.9}
+  .note{background:#3b2e90;border-radius:12px;padding:10px;font-size:15px;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ __TITLE__</h1>
+  <div class="bar"><b id="prog"></b></div>
+  <div class="top"><span id="count"></span>
+    <span><button class="ok" id="zip">⬇️ تنزيل تسجيلاتي (ملف واحد)</button> <button class="del" id="wipe">🗑️ مسح الكل</button></span></div>
+</header>
+<main>
+  <div class="note">اضغط <b>● سجّل</b>، اقرا الجملة بصوتك بهدوء وبصوت طفل مرح، واضغط <b>■ وقّف</b>. تسمع تسجيلك بـ <b>▶ تسجيلي</b> وتقارنه بالصوت الحالي بـ <b>▶ الحالي</b>. التسجيلات بتتحفظ في المتصفح لوحدها، تقدر تقفل وتكمل بعدين. لما تخلص اضغط «تنزيل تسجيلاتي» وابعتلي الملف.</div>
+  <div id="list"></div>
+</main>
+<script>
+const GROUP = "23_t_places";
+const ITEMS = [{"id":"5b971f80","text":"فين الكثبان الرملية؟","reading":"فِين الكُثْبَان الرَّمْلِيَّة؟"},{"id":"0f306ce6","text":"فين العربة الخشبية؟","reading":"فِين العَرَبَة الخَشَبِيَّة؟"},{"id":"2e1aaa76","text":"إيه اللي بيكون عليه رقم الخط؟","reading":"إِيه اللِّي بِيْكُون عَلَيْه رَقَم الخَطّ؟"},{"id":"126ccbaf","text":"فين بنلبس الزي المدرسي؟","reading":"فِين بِنِلْبِس الزِّي المَدْرَسِي؟"},{"id":"532187f2","text":"إيه اللي من أقدم العجائب في مصر؟","reading":"إِيه اللِّي مِن أَقْدَم العَجَائِب فِي مِصْر؟"},{"id":"39a2a0a7","text":"فين عمود النور؟","reading":"فِين عَمُود النُّور؟"},{"id":"1b4c904b","text":"فين محطة المطافي؟","reading":"فِين مَحَطَّة المَطَافِي؟"},{"id":"869f94d1","text":"فين الجمل الصغير؟","reading":"فِين الجَمَل الصُّغَيَّر؟"},{"id":"cdd61c99","text":"فين الجرة؟","reading":"فِين الجَرَّة؟"},{"id":"e1650a50","text":"إيه اللي بنقول له إشارة؟","reading":"إِيه اللِّي بِنِقُول لُه إِشَارَة؟"},{"id":"2dddc9c9","text":"فين الفانوس؟","reading":"فِين الفَانُوس؟"},{"id":"867ba499","text":"إيه اللي بنسافر بيه في الصحرا؟","reading":"إِيه اللِّي بِنِسَافِر بِيه فِي الصَّحْرَا؟"},{"id":"8ea3322d","text":"فين صندوق البريد؟","reading":"فِين صُنْدُوق البَرِيد؟"},{"id":"6e1ad192","text":"إيه اللي بينور في الشارع بالليل؟","reading":"إِيه اللِّي بِيْنَوِّر فِي الشَّارِع بِاللَّيْل؟"},{"id":"141ac2a5","text":"فين بنقعد في الحديقة؟","reading":"فِين بِنِقْعُد فِي الحَدِيقَة؟"},{"id":"16757525","text":"إيه اللي في الجيزة وبنسافر نشوفه؟","reading":"إِيه اللِّي فِي الجِيزَة وَبِنِسَافِر نِشُوفُه؟"},{"id":"a5737606","text":"مين لونه بني فاتح وودنه كبيرة بتبرد جسمه؟","reading":"مِين لَوْنُه بُنِّي فَاتِح وَوِدْنُه كَبِيرَة بِتْبَرَّد جِسْمُه؟"},{"id":"c1d1c86b","text":"فين الدكة؟","reading":"فِين الدِّكَّة؟"},{"id":"399ba0af","text":"إيه اللي في مصر وشكله مثلث كبير؟","reading":"إِيه اللِّي فِي مِصْر وَشَكْلُه مُثَلَّث كَبِير؟"},{"id":"8b41849b","text":"فين موقف الأتوبيس؟","reading":"فِين مَوْقِف الأُتُوبِيس؟"},{"id":"df3a43f0","text":"فين بئر الصحرا؟","reading":"فِين بِئْر الصَّحْرَا؟"},{"id":"2e67ab89","text":"إيه اللي بتجره الخيل أو الحمار؟","reading":"إِيه اللِّي بِتْجُرُّه الخَيْل أَو الحِمَار؟"},{"id":"6e19ee0a","text":"إيه اللي فيه شقق وأدوار كتير؟","reading":"إِيه اللِّي فِيه شُقَق وَأَدْوَار كَتِير؟"},{"id":"1537e9ce","text":"فين في الصحرا فيه ميه وشجر؟","reading":"فِين فِي الصَّحْرَا فِيه مَيَّه وَشَجَر؟"},{"id":"16261fe6","text":"إيه اللي مياهه بتنط في الهوا؟","reading":"إِيه اللِّي مَيَّاهُه بِتِنُطّ فِي الهَوَا؟"},{"id":"7130b7b1","text":"فين بنحط الجواب عشان يتبعت؟","reading":"فِين بِنِحُطّ الجَوَاب عَشَان يِتْبِعِت؟"},{"id":"3da80c9d","text":"فين الواحة؟","reading":"فِين الوَاحَة؟"},{"id":"b65192b0","text":"إيه اللي ليه أشواك وبيخزن ميه؟","reading":"إِيه اللِّي لِيه أَشْوَاك وَبِيْخَزَّن مَيَّه؟"},{"id":"5c8982d6","text":"إيه اللي ليه سلة كبيرة وبيطير؟","reading":"إِيه اللِّي لِيه سَلَّة كَبِيرَة وَبِيِطِير؟"},{"id":"b7c3017d","text":"إيه اللي ليه ديل طويل ولونه بيتغير؟","reading":"إِيه اللِّي لِيه دِيل طَوِيل وَلَوْنُه بِيِتْغَيَّر؟"},{"id":"21a262b2","text":"إيه اللي بنلاقيه في ميدان كبير ومياهه بتتنط؟","reading":"إِيه اللِّي بِنِلَاقِيه فِي مَيْدَان كَبِير وَمَيَّاهُه بِتِتْنَطّ؟"},{"id":"15467817","text":"فين بيسكن البدو في الصحرا؟","reading":"فِين بِيِسْكُن البَدْو فِي الصَّحْرَا؟"},{"id":"78334167","text":"إيه اللي عالي جدا ومبني بزجاج؟","reading":"إِيه اللِّي عَالِي جِدًّا وَمَبْنِي بِزُجَاج؟"},{"id":"569579f6","text":"إيه اللي بيرش ميه ويشرب فيه الحمام؟","reading":"إِيه اللِّي بِيْرُشّ مَيَّه وَيِشْرَب فِيه الحَمَام؟"},{"id":"e14cfa86","text":"إيه اللي بنشعله في رمضان؟","reading":"إِيه اللِّي بِنِشْعِلُه فِي رَمَضَان؟"},{"id":"b4cbb679","text":"إيه اللي بيجري على الرمل الساخن؟","reading":"إِيه اللِّي بِيْجْرِي عَلَى الرَّمْل السَّاخِن؟"},{"id":"916dcf51","text":"إيه اللي ليه ديل مرفوع وسم؟","reading":"إِيه اللِّي لِيه دِيل مَرْفُوع وَسَمّ؟"},{"id":"dbc9fea3","text":"إيه اللي بنتزلج عليه في الصحرا؟","reading":"إِيه اللِّي بِنِتْزَلَّج عَلَيْه فِي الصَّحْرَا؟"},{"id":"aa54d983","text":"إيه اللي بيطير عالي وبيصطاد؟","reading":"إِيه اللِّي بِيطِير عَالِي وَبِيْصْطَاد؟"},{"id":"5da07a12","text":"إيه اللي بيستحمل العطش في الصحرا؟","reading":"إِيه اللِّي بِيْسْتَحَمِّل العَطَش فِي الصَّحْرَا؟"},{"id":"b51d64a3","text":"فين بنروح لما نتعب؟","reading":"فِين بِنِرُوح لَمَّا نِتْعَب؟"},{"id":"9e1203ef","text":"مين لونه رملي وودنه كبيرة وبيعيش في الصحرا؟","reading":"مِين لَوْنُه رَمْلِي وَوِدْنُه كَبِيرَة وَبِيِعِيش فِي الصَّحْرَا؟"},{"id":"65eeb25a","text":"إيه اللي طويل ومورق في الواحة؟","reading":"إِيه اللِّي طَوِيل وَمُوَرِّق فِي الوَاحَة؟"},{"id":"f6b9b892","text":"فين بنستنى الأتوبيس؟","reading":"فِين بِنِسْتَنَّى الأُتُوبِيس؟"},{"id":"96a00a48","text":"فين ساكنين البدو؟","reading":"فِين سَاكْنِين البَدْو؟"},{"id":"97366491","text":"فين بنروح الصبح عشان نتعلم؟","reading":"فِين بِنِرُوح الصُّبْح عَشَان نِتْعَلِّم؟"},{"id":"e5821678","text":"إيه اللي رمل عالي في الصحرا؟","reading":"إِيه اللِّي رَمْل عَالِي فِي الصَّحْرَا؟"},{"id":"151d0e91","text":"إيه اللي لونه أحمر وبيوقف العربيات؟","reading":"إِيه اللِّي لَوْنُه أَحْمَر وَبِيوَقَّف العَرَبِيَّات؟"},{"id":"9ae13a8b","text":"فين بنبص على الكل من فوق؟","reading":"فِين بِنِبُصّ عَلَى الكُلّ مِن فُوق؟"},{"id":"a8924316","text":"إيه اللي مغطى ببلح؟","reading":"إِيه اللِّي مُغَطَّى بِبَلَح؟"},{"id":"e16a8db0","text":"مين لسه صغير وسنامه ماكبرش؟","reading":"مِين لِسَّه صُغَيَّر وَسَنَامُه مَاكِبِرْش؟"},{"id":"885aa3a5","text":"إيه اللي بنستريح عليه؟","reading":"إِيه اللِّي بِنِسْتَرِيح عَلَيْه؟"},{"id":"10ea8f52","text":"إيه اللي بنسافر بيه في الرمال؟","reading":"إِيه اللِّي بِنِسَافِر بِيه فِي الرِّمَال؟"},{"id":"d3c50750","text":"إيه اللي بنحط فيه الميه وهو فخار؟","reading":"إِيه اللِّي بِنِحُطّ فِيه المَيَّه وَهُوَّ فَخَّار؟"},{"id":"258b9273","text":"فين مدفونين الفراعنة؟","reading":"فِين مَدْفُونِين الفَرَاعْنَة؟"},{"id":"89c43aeb","text":"إيه اللي بيتفك وبيتحمل على الجمل؟","reading":"إِيه اللِّي بِيِتْفَكّ وَبِيِتْحَمِّل عَلَى الجَمَل؟"},{"id":"ca45d2d2","text":"إيه اللي ألوانه أحمر وأصفر وأخضر؟","reading":"إِيه اللِّي أَلْوَانُه أَحْمَر وَأَصْفَر وَأَخْضَر؟"},{"id":"180ae877","text":"إيه اللي لونه أحمر وفيه فتحة؟","reading":"إِيه اللِّي لَوْنُه أَحْمَر وَفِيه فَتْحَة؟"},{"id":"5c3ff808","text":"إيه اللي رمل عالي بتحركه الريح؟","reading":"إِيه اللِّي رَمْل عَالِي بِتْحَرَّكُه الرِّيح؟"},{"id":"ed0f1ee9","text":"فين بيشتغلوا رجال المطافي؟","reading":"فِين بِيِشْتَغَلُوا رِجَال المَطَافِي؟"},{"id":"cf3125c9","text":"فين بنتعالج لما نمرض؟","reading":"فِين بِنِتْعَالِج لَمَّا نِمْرَض؟"},{"id":"010d6e0a","text":"فين بنقف عشان نركب الأتوبيس؟","reading":"فِين بِنِقَف عَشَان نِرْكَب الأُتُوبِيس؟"},{"id":"9ea4078a","text":"إيه اللي بنشيل فيه الميه؟","reading":"إِيه اللِّي بِنِشِيل فِيه المَيَّه؟"},{"id":"115317e7","text":"إيه اللي بنعلقه في رمضان وبيضوي؟","reading":"إِيه اللِّي بِنِعَلَّقُه فِي رَمَضَان وَبِيْضَوِّي؟"},{"id":"e0968e01","text":"فين بنسحب الميه بالحبل؟","reading":"فِين بِنِسْحَب المَيَّه بِالحَبْل؟"},{"id":"1c169b68","text":"إيه اللي طويل وليه ورق على قمته؟","reading":"إِيه اللِّي طَوِيل وَلِيه وَرَق عَلَى قِمَّتُه؟"},{"id":"da41d3c0","text":"فين بيطفوا النار؟","reading":"فِين بِيْطَفُّوا النَّار؟"},{"id":"3177b5ab","text":"إيه اللي بيطير بنار ويحمل ناس؟","reading":"إِيه اللِّي بِيطِير بِنَار وَيِحْمِل نَاس؟"},{"id":"71a278e5","text":"إيه اللي ذيله مسموم؟","reading":"إِيه اللِّي دِيلُه مَسْمُوم؟"},{"id":"5c6c7dda","text":"فين بنلاقي ميه ونخيل وسط الصحرا؟","reading":"فِين بِنِلَاقِي مَيَّه وَنَخِيل وَسَط الصَّحْرَا؟"},{"id":"c03c2c98","text":"مين ابن الجمل؟","reading":"مِين اِبْن الجَمَل؟"},{"id":"36bd14c9","text":"إيه اللي فيه طوب ضخم وعمره آلاف السنين؟","reading":"إِيه اللِّي فِيه طُوب ضَخْم وَعُمْرُه آلَاف السِّنِين؟"},{"id":"2d7ba9e3","text":"فين بنقابل أصحابنا وبنتعلم؟","reading":"فِين بِنِقَابِل أَصْحَابْنَا وَبِنِتْعَلِّم؟"},{"id":"4eadd8fc","text":"إيه اللي بيطير ويصطاد الفريسة من فوق؟","reading":"إِيه اللِّي بِيطِير وَيِصْطَاد الفَرِيسَة مِن فُوق؟"},{"id":"1ddc5849","text":"إيه اللي بيجري على الرمل ويغير لونه؟","reading":"إِيه اللِّي بِيْجْرِي عَلَى الرَّمْل وَيِغَيَّر لَوْنُه؟"},{"id":"897315ab","text":"إيه اللي ليه شوك وبيعيش في الصحرا؟","reading":"إِيه اللِّي لِيه شُوك وَبِيِعِيش فِي الصَّحْرَا؟"},{"id":"4cfeb413","text":"فين بنتعالج؟","reading":"فِين بِنِتْعَالِج؟"},{"id":"2b1da5e6","text":"إيه اللي بينور الشارع في الليل؟","reading":"إِيه اللِّي بِيْنَوِّر الشَّارِع فِي اللَّيْل؟"},{"id":"bcbc63f0","text":"إيه اللي بيقولنا نقف ولا نعدي؟","reading":"إِيه اللِّي بِيْقُولْنَا نِقَف وِلَّا نِعَدِّي؟"},{"id":"dc82a6f4","text":"إيه اللي بيطلع عليه البلح؟","reading":"إِيه اللِّي بِيْطْلَع عَلَيْه البَلَح؟"},{"id":"82d6268d","text":"فين بنجيب الميه في الصحرا؟","reading":"فِين بِنِجِيب المَيَّه فِي الصَّحْرَا؟"},{"id":"b751a966","text":"فين بنحط الجواب؟","reading":"فِين بِنِحُطّ الجَوَاب؟"},{"id":"eb457041","text":"إيه اللي بيتحمل عليه الحاجات في القرية؟","reading":"إِيه اللِّي بِيِتْحَمِّل عَلَيْه الحَاجَات فِي القَرْيَة؟"},{"id":"8a72a538","text":"فين بنتعلم؟","reading":"فِين بِنِتْعَلِّم؟"},{"id":"4e8e7a0f","text":"فين بنلاقي دكاترة وممرضات؟","reading":"فِين بِنِلَاقِي دَكَاتْرَة وَمُمَرِّضَات؟"},{"id":"30f5eaa2","text":"إيه اللي بنشوفه فوق العمارات العالية؟","reading":"إِيه اللِّي بِنِشُوفُه فُوق العِمَارَات العَالْيَة؟"},{"id":"14520d9c","text":"إيه اللي بنقعد عليه في الحديقة؟","reading":"إِيه اللِّي بِنِقْعُد عَلَيْه فِي الحَدِيقَة؟"}];
+const CURRENT = (id) => `../assets/assets/games/learn_voice/ar/${id}.mp3`;  // the voice that is in the app now (works on the demo site)
+let db, mediaRec, stream, chunks = [], curId = null, audio = new Audio();
+
+function openDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('rehlaty_voice', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('rec');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+const tx = (mode) => db.transaction('rec', mode).objectStore('rec');
+const key = (id) => GROUP + '|' + id;
+const get = (id) => new Promise((res) => { const q = tx('readonly').get(key(id)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); });
+const put = (id, v) => new Promise((res) => { const q = tx('readwrite').put(v, key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const del = (id) => new Promise((res) => { const q = tx('readwrite').delete(key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const done = new Set();
+
+function ext(type) { return /webm/.test(type) ? 'webm' : /ogg/.test(type) ? 'ogg' : /mp4|aac|m4a/.test(type) ? 'm4a' : /wav/.test(type) ? 'wav' : 'bin'; }
+function refresh() {
+  document.getElementById('count').textContent = `سجّلت ${done.size} من ${ITEMS.length}`;
+  document.getElementById('prog').style.width = (100 * done.size / ITEMS.length) + '%';
+}
+function build() {
+  const list = document.getElementById('list');
+  ITEMS.forEach((it, i) => {
+    const d = document.createElement('div'); d.className = 'row'; d.id = 'r_' + it.id;
+    d.innerHTML = `<div class="t">${i + 1}. ${it.text.replace(/</g, '&lt;')}</div>${it.reading && it.reading !== it.text ? `<div class="r">تُقرأ: ${it.reading.replace(/</g, '&lt;')}</div>` : ''}
+      <div class="btns"><button class="rec" data-a="rec">● سجّل</button><button class="ghost" data-a="mine" disabled>▶ تسجيلي</button><button class="ghost" data-a="cur">▶ الحالي</button><button class="del" data-a="del" disabled>🗑️</button><span class="st"></span></div>`;
+    d.addEventListener('click', (e) => { const a = e.target.dataset && e.target.dataset.a; if (a) act(it, d, e.target, a); });
+    list.appendChild(d);
+  });
+}
+function mark(d, on) {
+  d.classList.toggle('done', on);
+  d.querySelector('[data-a=mine]').disabled = !on; d.querySelector('[data-a=del]').disabled = !on;
+  d.querySelector('.st').textContent = on ? '✓ اتسجلت' : '';
+}
+async function act(it, d, btn, a) {
+  if (a === 'cur') { audio.pause(); audio = new Audio(CURRENT(it.id)); audio.play().catch(() => { d.querySelector('.st').textContent = 'الصوت الحالي مش متاح هنا'; }); return; }
+  if (a === 'mine') { const v = await get(it.id); if (v) { audio.pause(); audio = new Audio(URL.createObjectURL(v.blob)); audio.play(); } return; }
+  if (a === 'del') { await del(it.id); done.delete(it.id); mark(d, false); refresh(); return; }
+  if (a === 'rec') {
+    if (mediaRec && mediaRec.state === 'recording') { mediaRec.stop(); return; }
+    try { stream = stream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { alert('محتاج إذن الميكروفون. اسمح للمتصفح باستخدام الميكروفون وجرّب تاني.'); return; }
+    audio.pause(); chunks = []; curId = it.id;
+    const opts = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? { mimeType: 'audio/webm;codecs=opus' } : {};
+    mediaRec = new MediaRecorder(stream, opts);
+    mediaRec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mediaRec.onstop = async () => {
+      d.classList.remove('live'); btn.textContent = '● سجّل'; btn.classList.add('rec');
+      const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+      if (blob.size < 1500) { d.querySelector('.st').textContent = 'التسجيل قصير أوي، جرّب تاني'; return; }
+      await put(it.id, { blob, type: blob.type, text: it.text, at: Date.now() });
+      done.add(it.id); mark(d, true); refresh();
+      const nx = d.nextElementSibling; if (nx) nx.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    d.classList.add('live'); btn.textContent = '■ وقّف'; d.querySelector('.st').textContent = 'بيسجّل...';
+    mediaRec.start();
+  }
+}
+// a tiny zip writer (stored, no compression) so no library is needed
+function crc32(buf) { let c, crc = -1; for (let i = 0; i < buf.length; i++) { c = (crc ^ buf[i]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ -1) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(); const parts = []; const central = []; let off = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name); const crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30)); lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46)); ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), name); off += 30 + name.length + f.data.length;
+  }
+  let csize = 0; central.forEach((p) => csize += p.length);
+  const end = new DataView(new ArrayBuffer(22)); end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/zip' });
+}
+document.getElementById('zip').onclick = async () => {
+  const files = [], manifest = [];
+  for (const it of ITEMS) { const v = await get(it.id); if (!v) continue; const name = `${it.id}.${ext(v.type)}`; files.push({ name, data: new Uint8Array(await v.blob.arrayBuffer()) }); manifest.push({ id: it.id, text: it.text, file: name }); }
+  if (!files.length) { alert('لسه ما سجلتش حاجة'); return; }
+  files.push({ name: 'manifest.json', data: new TextEncoder().encode(JSON.stringify({ group: GROUP, items: manifest }, null, 1)) });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(files)); a.download = `rehlaty_voice_${GROUP}.zip`; a.click();
+};
+document.getElementById('wipe').onclick = async () => { if (!confirm('تمسح كل تسجيلات الصفحة دي؟')) return; for (const it of ITEMS) { await del(it.id); done.delete(it.id); mark(document.getElementById('r_' + it.id), false); } refresh(); };
+(async () => { db = await openDb(); build(); for (const it of ITEMS) { const v = await get(it.id); if (v) { done.add(it.id); mark(document.getElementById('r_' + it.id), true); } } refresh(); })();
+</script>
+</body>
+</html>

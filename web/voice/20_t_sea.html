@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المستوى 20: عالم البحر</title>
+<style>
+  :root{--bg:#1d1250;--card:#2b1f78;--gold:#ffd23a;--ok:#2fbf5a;--rec:#e8384a;--ink:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,"Segoe UI",system-ui,sans-serif;direction:rtl}
+  header{position:sticky;top:0;z-index:5;background:#140b3a;border-bottom:3px solid var(--gold);padding:10px 14px}
+  h1{margin:0 0 6px;font-size:20px;color:var(--gold)}
+  .bar{height:12px;border-radius:8px;background:#3b2e90;overflow:hidden}.bar b{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+  .top{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+  button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:9px 14px;cursor:pointer;color:#fff;background:#3b6fd8;min-height:42px}
+  button.rec{background:var(--rec)}button.ok{background:var(--ok)}button.ghost{background:#4a3aa8}button.del{background:#6a2a50}
+  button:disabled{opacity:.4;cursor:default}
+  main{padding:10px 12px 90px;max-width:900px;margin:auto}
+  .row{background:var(--card);border:2px solid #4a3aa8;border-radius:16px;padding:12px;margin:10px 0}
+  .row.done{border-color:var(--ok)}.row.live{border-color:var(--rec);box-shadow:0 0 0 3px #e8384a55}
+  .t{font-size:26px;font-weight:900;line-height:1.5}.r{font-size:15px;opacity:.8;margin-top:2px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.st{font-size:14px;opacity:.9}
+  .note{background:#3b2e90;border-radius:12px;padding:10px;font-size:15px;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ __TITLE__</h1>
+  <div class="bar"><b id="prog"></b></div>
+  <div class="top"><span id="count"></span>
+    <span><button class="ok" id="zip">⬇️ تنزيل تسجيلاتي (ملف واحد)</button> <button class="del" id="wipe">🗑️ مسح الكل</button></span></div>
+</header>
+<main>
+  <div class="note">اضغط <b>● سجّل</b>، اقرا الجملة بصوتك بهدوء وبصوت طفل مرح، واضغط <b>■ وقّف</b>. تسمع تسجيلك بـ <b>▶ تسجيلي</b> وتقارنه بالصوت الحالي بـ <b>▶ الحالي</b>. التسجيلات بتتحفظ في المتصفح لوحدها، تقدر تقفل وتكمل بعدين. لما تخلص اضغط «تنزيل تسجيلاتي» وابعتلي الملف.</div>
+  <div id="list"></div>
+</main>
+<script>
+const GROUP = "20_t_sea";
+const ITEMS = [{"id":"8923791c","text":"فين سمكة المهرج؟","reading":"فِين سَمَكَة المُهَرِّج؟"},{"id":"ae1cdba7","text":"إيه اللي بنلاقيه على الشاطئ ونسمع فيه البحر؟","reading":"إِيه اللِّي بِنِلَاقِيه عَلَى الشَّاطِئ وَنِسْمَع فِيه البَحْر؟"},{"id":"2119ff15","text":"إيه اللي بنبني بيه قلعة رمل؟","reading":"إِيه اللِّي بِنِبْنِي بِيه قَلْعَة رَمْل؟"},{"id":"942b20c4","text":"إيه اللي حديد تقيل وبيتحط في الميه؟","reading":"إِيه اللِّي حَدِيد تَقِيل وَبِيِتْحَطّ فِي المَيَّه؟"},{"id":"4e268ecc","text":"فين الرصيف؟","reading":"فِين الرَّصِيف؟"},{"id":"21169a87","text":"فين المركب الصغير؟","reading":"فِين المَرْكَب الصُّغَيَّر؟"},{"id":"6d1a6f68","text":"فين الأعشاب البحرية؟","reading":"فِين الأَعْشَاب البَحْرِيَّة؟"},{"id":"aca20a5a","text":"إيه اللي فيه شريطين أبيض على برتقالي؟","reading":"إِيه اللِّي فِيه شَرِيطِين أَبْيَض عَلَى بُرْتُقَالِي؟"},{"id":"69c748ca","text":"فين الصخور؟","reading":"فِين الصُّخُور؟"},{"id":"ad4d72ed","text":"إيه اللي بنركبه ونتزلج على الموج؟","reading":"إِيه اللِّي بِنِرْكَبُه وَنِتْزَلَّج عَلَى المَوْج؟"},{"id":"2a62e161","text":"فين السمكة المنتفخة؟","reading":"فِين السَّمَكَة المُنْتَفِخَة؟"},{"id":"5f5bf76c","text":"إيه اللي بنفتحه لما الشمس تحمي على الشاطئ؟","reading":"إِيه اللِّي بِنِفْتَحُه لَمَّا الشَّمْس تِحْمِي عَلَى الشَّاطِئ؟"},{"id":"e587f3bf","text":"فين المرساة؟","reading":"فِين المِرْسَاة؟"},{"id":"1a50312d","text":"مين زرقاء ولها ذيل أصفر؟","reading":"مِين زَرْقَاء وَلَهَا دِيل أَصْفَر؟"},{"id":"15e358a4","text":"فين شقائق البحر؟","reading":"فِين شَقَائِق البَحْر؟"},{"id":"128d4cb1","text":"مين بيمشي بالجنب وعنده كلاّبات؟","reading":"مِين بِيمْشِي بِالجَنْب وَعِنْدُه كلاّبات؟"},{"id":"64c489db","text":"مين أكبر من الفيل وبيعيش في البحر؟","reading":"مِين أَكْبَر مِن الفِيل وَبِيِعِيش فِي البَحْر؟"},{"id":"c013bc02","text":"فين الجردل؟","reading":"فِين الجَرْدَل؟"},{"id":"412e24d7","text":"مين بيصطاد السمك من الجو؟","reading":"مِين بِيْصْطَاد السَّمَك مِن الجَوّ؟"},{"id":"389dcd61","text":"فين السفينة الغارقة؟","reading":"فِين السَّفِينَة الغَارِقَة؟"},{"id":"7c3dcb7f","text":"فين كرة الشاطئ؟","reading":"فِين كُرَة الشَّاطِئ؟"},{"id":"fa73d261","text":"فين المحارة؟","reading":"فِين المَحَارَة؟"},{"id":"8ea11d29","text":"إيه اللي ليه أرجل وبيتحرك في الرمل؟","reading":"إِيه اللِّي لِيه أَرْجُل وَبِيِتْحَرَّك فِي الرَّمْل؟"},{"id":"4b378c4e","text":"مين بيبقى شفاف وليه خيوط؟","reading":"مِين بِيبْقَى شَفَّاف وَلِيه خُيُوط؟"},{"id":"6090843c","text":"فين كرسي الشاطئ؟","reading":"فِين كُرْسِي الشَّاطِئ؟"},{"id":"df0a3c41","text":"إيه اللي مليان ذهب وجواهر تحت الميه؟","reading":"إِيه اللِّي مَلْيَان دَهَب وَجَوَاهِر تَحْت المَيَّه؟"},{"id":"0285625d","text":"فين لوح التزلج؟","reading":"فِين لَوْح التَّزَلُّج؟"},{"id":"1d45c7e7","text":"مين بيتنفخ لما يخاف؟","reading":"مِين بِيِتْنَفِخ لَمَّا يِخَاف؟"},{"id":"801e5aea","text":"فين المرجان؟","reading":"فِين المَرْجَان؟"},{"id":"347bd2eb","text":"مين بيحمل بيته على ضهره في البحر؟","reading":"مِين بِيْحْمِل بَيْتُه عَلَى ضَهْرُه فِي البَحْر؟"},{"id":"7d427ed9","text":"فين السمكة الزرقاء؟","reading":"فِين السَّمَكَة الزَّرْقَاء؟"},{"id":"be3bfb84","text":"إيه اللي بنلاقيه تحت الميه أخضر ويتحرك؟","reading":"إِيه اللِّي بِنِلَاقِيه تَحْت المَيَّه أَخْضَر وَيِتْحَرَّك؟"},{"id":"dabf3c81","text":"فين السمكة الصفراء؟","reading":"فِين السَّمَكَة الصَّفْرَاء؟"},{"id":"b7c9b5b9","text":"فين صندوق الكنز؟","reading":"فِين صُنْدُوق الكَنْز؟"},{"id":"70a2bb0d","text":"إيه اللي بنتمدد عليه في الشمس؟","reading":"إِيه اللِّي بِنِتْمَدَّد عَلَيْه فِي الشَّمْس؟"},{"id":"448e3ebd","text":"فين النورس؟","reading":"فِين النَّوْرَس؟"},{"id":"f24fd0dc","text":"إيه اللي بنقف تحته من الشمس؟","reading":"إِيه اللِّي بِنِقَف تَحْتُه مِن الشَّمْس؟"},{"id":"3386d88e","text":"فين نخلة الشاطئ؟","reading":"فِين نَخْلَة الشَّاطِئ؟"},{"id":"3e984227","text":"إيه اللي فيه كنز؟","reading":"إِيه اللِّي فِيه كَنْز؟"},{"id":"1911ac17","text":"فين العوامة؟","reading":"فِين العَوَّامَة؟"},{"id":"f0e89aa0","text":"إيه اللي بنقف عليه عشان نركب المركب؟","reading":"إِيه اللِّي بِنِقَف عَلَيْه عَشَان نِرْكَب المَرْكَب؟"},{"id":"5ebb7be1","text":"مين لونه أصفر وبيعوم؟","reading":"مِين لَوْنُه أَصْفَر وَبِيْعُوم؟"},{"id":"3d648afa","text":"مين شفاف ويطفو؟","reading":"مِين شَفَّاف وَيِطْفُو؟"},{"id":"bb4faa9b","text":"إيه اللي بيمنع المركب تتحرك؟","reading":"إِيه اللِّي بِيْمْنَع المَرْكَب تِتْحَرَّك؟"},{"id":"b948b082","text":"كام نجمة بحر؟","reading":"كَام نَجْمَة بَحْر؟"},{"id":"d07957b9","text":"كام صدفة؟","reading":"كَام صَدَفَة؟"},{"id":"4c3ed78d","text":"مين بيغني ويطلع من الميه ويلعب؟","reading":"مِين بِيْغَنِّي وَيِطْلَع مِن المَيَّه وَيِلْعَب؟"},{"id":"42cc3b9f","text":"إيه اللي طاير وأبيض وبيصطاد السمك؟","reading":"إِيه اللِّي طَاير وَأَبْيَض وَبِيْصْطَاد السَّمَك؟"},{"id":"d6529471","text":"مين بيلسع وبيطفو؟","reading":"مِين بِيْلْسَع وَبِيْطْفُو؟"},{"id":"1dfcad2f","text":"مين عنده ثمان دراعات وبيغير لونه؟","reading":"مِين عِنْدُه تَمَان دِرَاعَات وَبِيْغَيَّر لَوْنُه؟"},{"id":"95bdfa43","text":"مين أكبر حيوان في البحر؟","reading":"مِين أَكْبَر حَيَوَان فِي البَحْر؟"},{"id":"4e45e505","text":"إيه اللي بيعيش عليه السمك الملون؟","reading":"إِيه اللِّي بِيعِيش عَلَيْه السَّمَك المُلَوَّن؟"},{"id":"e4b30db5","text":"إيه اللي مفتوح ومعاه لؤلؤة؟","reading":"إِيه اللِّي مَفْتُوح وَمَعَاه لُؤْلُؤَة؟"},{"id":"35b48054","text":"إيه اللي بنقعد عليه تحت الشمسية؟","reading":"إِيه اللِّي بِنِقْعُد عَلَيْه تَحْت الشَّمْسِيَّة؟"},{"id":"31fc544d","text":"مين له تمان دراعات؟","reading":"مِين لُه تَمَان دِرَاعَات؟"},{"id":"fbe680f8","text":"مين بيمشي على جنبه؟","reading":"مِين بِيمْشِي عَلَى جَنْبُه؟"},{"id":"0ddfa068","text":"إيه اللي طويل وفيه نور بيلف؟","reading":"إِيه اللِّي طَوِيل وَفِيه نُور بِيْلِفّ؟"},{"id":"246c43c9","text":"مين عمره طويل وبطيء؟","reading":"مِين عُمْرُه طَوِيل وَبَطِيء؟"},{"id":"71b0c4b1","text":"كام سلحفاة؟","reading":"كَام سُلَحْفَاة؟"},{"id":"49aeffd7","text":"كام سرطان؟","reading":"كَام سَرَطَان؟"},{"id":"cdac6448","text":"مين بيزحف على الرمل وبيحط بيضه؟","reading":"مِين بِيْزْحَف عَلَى الرَّمْل وَبِيْحُطّ بَيْضُه؟"},{"id":"aae85a58","text":"إيه اللي بيطلع من شجرة على الشاطئ؟","reading":"إِيه اللِّي بِيْطْلَع مِن شَجَرَة عَلَى الشَّاطِئ؟"},{"id":"968a3e87","text":"إيه اللي بتقف عليه الطيور وسط الميه؟","reading":"إِيه اللِّي بِتْقَف عَلَيْه الطُّيُور وَسَط المَيَّه؟"},{"id":"cf0cdec4","text":"مين على شكل نجمة؟","reading":"مِين عَلَى شَكْل نَجْمَة؟"},{"id":"3166b5d9","text":"إيه اللي بنقعد عليه ونحمي ضهرنا؟","reading":"إِيه اللِّي بِنِقْعُد عَلَيْه وَنِحْمِي ضَهْرِنَا؟"},{"id":"4784d614","text":"إيه اللي بيدل المراكب؟","reading":"إِيه اللِّي بِيدِلّ المَرَاكِب؟"},{"id":"532a4c02","text":"مين رأسه زي الحصان وبيسبح واقف؟","reading":"مِين رَاسُه زَي الحِصَان وَبِيْسَبَّح وَاقِف؟"},{"id":"fa4f6cf1","text":"إيه اللي بيكون في قاع البحر أخضر وطويل؟","reading":"إِيه اللِّي بِيْكُون فِي قَاع البَحْر أَخْضَر وَطَوِيل؟"},{"id":"eaf501b8","text":"إيه اللي بتقف عليه المركب؟","reading":"إِيه اللِّي بِتْقَف عَلَيْه المَرْكَب؟"},{"id":"5f8bad10","text":"مين بنلاقيه مع شقائق البحر؟","reading":"مِين بِنِلَاقِيه مَعَ شَقَائِق البَحْر؟"},{"id":"8c297e80","text":"مين بيطلع ميه من فوق راسه؟","reading":"مِين بِيْطْلَع مَيَّه مِن فُوق رَاسُه؟"},{"id":"b5ab9a11","text":"إيه اللي غرق في قاع البحر؟","reading":"إِيه اللِّي غِرِق فِي قَاع البَحْر؟"},{"id":"65b98752","text":"إيه اللي بنملاه رمل ونعمل قلعة؟","reading":"إِيه اللِّي بِنِمْلَاه رَمْل وَنِعْمِل قَلْعَة؟"},{"id":"4ef640d0","text":"مين نجمة خمس أطراف؟","reading":"مِين نَجْمَة خَمْس أَطْرَاف؟"},{"id":"c8c67cba","text":"إيه اللي بيحمينا من الغرق وبنحطه حوالين وسطنا؟","reading":"إِيه اللِّي بِيْحْمِينَا مِن الغَرَق وَبِنِحُطُّه حَوَالِين وَسَطِنَا؟"},{"id":"a1202307","text":"مين اسمه حصان وبيعوم؟","reading":"مِين اِسْمُه حِصَان وَبِيْعُوم؟"},{"id":"6a51da98","text":"إيه اللي بيعيشوا عليه السمك الصغير ملون؟","reading":"إِيه اللِّي بِيعِيشُوا عَلَيْه السَّمَك الصُّغَيَّر مُلَوَّن؟"},{"id":"6d00d13a","text":"مين برتقالي وبيعيش في شقائق البحر؟","reading":"مِين بُرْتُقَالِي وَبِيِعِيش فِي شَقَائِق البَحْر؟"},{"id":"6c946d4d","text":"مين بيطلع حبر أسود؟","reading":"مِين بِيْطْلَع حِبْر أَسْوَد؟"},{"id":"e042484f","text":"إيه اللي بنلعب بيه في الميه؟","reading":"إِيه اللِّي بِنِلْعَب بِيه فِي المَيَّه؟"},{"id":"4f0fcb71","text":"إيه اللي بنسمع فيه صوت البحر؟","reading":"إِيه اللِّي بِنِسْمَع فِيه صَوْت البَحْر؟"},{"id":"0723372d","text":"مين لونه أزرق وليه ديل؟","reading":"مِين لَوْنُه أَزْرَق وَلِيه دِيل؟"},{"id":"29a7ab0f","text":"إيه اللي بنركبه ونتزلج به على الموج؟","reading":"إِيه اللِّي بِنِرْكَبُه وَنِتْزَلَّج بِه عَلَى المَوْج؟"},{"id":"01267ab1","text":"إيه اللي بينفخ نفسه لما يخاف؟","reading":"إِيه اللِّي بِيْنْفُخ نَفْسُه لَمَّا يِخَاف؟"},{"id":"d44b6705","text":"إيه اللي بنرميه ونلعب بيه في الميه؟","reading":"إِيه اللِّي بِنِرْمِيه وَنِلْعَب بِيه فِي المَيَّه؟"},{"id":"2731ab79","text":"إيه اللي بيمشي على الميه وبيجدف؟","reading":"إِيه اللِّي بِيمْشِي عَلَى المَيَّه وَبِيْجَدَّف؟"},{"id":"d3e7a41f","text":"مين بيسبح بسرعة وبيقفز في الموج؟","reading":"مِين بِيْسَبَّح بِسُرْعَة وَبِيْقَفَّز فِي المَوْج؟"},{"id":"fefef5a5","text":"إيه اللي بيتقفل ويتفتح ومعاه لؤلؤة؟","reading":"إِيه اللِّي بِيِتْقِفِل وَيِتْفِتِح وَمَعَاه لُؤْلُؤَة؟"},{"id":"3251c222","text":"إيه اللي بيخلينا نطفو على الميه؟","reading":"إِيه اللِّي بِيْخَلِّينَا نِطْفُو عَلَى المَيَّه؟"},{"id":"199f85e2","text":"إيه اللي بيصرخ فوق الشاطئ؟","reading":"إِيه اللِّي بِيْصْرَخ فُوق الشَّاطِئ؟"},{"id":"a784abe9","text":"إيه اللي فيه لؤلؤة؟","reading":"إِيه اللِّي فِيه لُؤْلُؤَة؟"}];
+const CURRENT = (id) => `../assets/assets/games/learn_voice/ar/${id}.mp3`;  // the voice that is in the app now (works on the demo site)
+let db, mediaRec, stream, chunks = [], curId = null, audio = new Audio();
+
+function openDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('rehlaty_voice', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('rec');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+const tx = (mode) => db.transaction('rec', mode).objectStore('rec');
+const key = (id) => GROUP + '|' + id;
+const get = (id) => new Promise((res) => { const q = tx('readonly').get(key(id)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); });
+const put = (id, v) => new Promise((res) => { const q = tx('readwrite').put(v, key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const del = (id) => new Promise((res) => { const q = tx('readwrite').delete(key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const done = new Set();
+
+function ext(type) { return /webm/.test(type) ? 'webm' : /ogg/.test(type) ? 'ogg' : /mp4|aac|m4a/.test(type) ? 'm4a' : /wav/.test(type) ? 'wav' : 'bin'; }
+function refresh() {
+  document.getElementById('count').textContent = `سجّلت ${done.size} من ${ITEMS.length}`;
+  document.getElementById('prog').style.width = (100 * done.size / ITEMS.length) + '%';
+}
+function build() {
+  const list = document.getElementById('list');
+  ITEMS.forEach((it, i) => {
+    const d = document.createElement('div'); d.className = 'row'; d.id = 'r_' + it.id;
+    d.innerHTML = `<div class="t">${i + 1}. ${it.text.replace(/</g, '&lt;')}</div>${it.reading && it.reading !== it.text ? `<div class="r">تُقرأ: ${it.reading.replace(/</g, '&lt;')}</div>` : ''}
+      <div class="btns"><button class="rec" data-a="rec">● سجّل</button><button class="ghost" data-a="mine" disabled>▶ تسجيلي</button><button class="ghost" data-a="cur">▶ الحالي</button><button class="del" data-a="del" disabled>🗑️</button><span class="st"></span></div>`;
+    d.addEventListener('click', (e) => { const a = e.target.dataset && e.target.dataset.a; if (a) act(it, d, e.target, a); });
+    list.appendChild(d);
+  });
+}
+function mark(d, on) {
+  d.classList.toggle('done', on);
+  d.querySelector('[data-a=mine]').disabled = !on; d.querySelector('[data-a=del]').disabled = !on;
+  d.querySelector('.st').textContent = on ? '✓ اتسجلت' : '';
+}
+async function act(it, d, btn, a) {
+  if (a === 'cur') { audio.pause(); audio = new Audio(CURRENT(it.id)); audio.play().catch(() => { d.querySelector('.st').textContent = 'الصوت الحالي مش متاح هنا'; }); return; }
+  if (a === 'mine') { const v = await get(it.id); if (v) { audio.pause(); audio = new Audio(URL.createObjectURL(v.blob)); audio.play(); } return; }
+  if (a === 'del') { await del(it.id); done.delete(it.id); mark(d, false); refresh(); return; }
+  if (a === 'rec') {
+    if (mediaRec && mediaRec.state === 'recording') { mediaRec.stop(); return; }
+    try { stream = stream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { alert('محتاج إذن الميكروفون. اسمح للمتصفح باستخدام الميكروفون وجرّب تاني.'); return; }
+    audio.pause(); chunks = []; curId = it.id;
+    const opts = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? { mimeType: 'audio/webm;codecs=opus' } : {};
+    mediaRec = new MediaRecorder(stream, opts);
+    mediaRec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mediaRec.onstop = async () => {
+      d.classList.remove('live'); btn.textContent = '● سجّل'; btn.classList.add('rec');
+      const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+      if (blob.size < 1500) { d.querySelector('.st').textContent = 'التسجيل قصير أوي، جرّب تاني'; return; }
+      await put(it.id, { blob, type: blob.type, text: it.text, at: Date.now() });
+      done.add(it.id); mark(d, true); refresh();
+      const nx = d.nextElementSibling; if (nx) nx.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    d.classList.add('live'); btn.textContent = '■ وقّف'; d.querySelector('.st').textContent = 'بيسجّل...';
+    mediaRec.start();
+  }
+}
+// a tiny zip writer (stored, no compression) so no library is needed
+function crc32(buf) { let c, crc = -1; for (let i = 0; i < buf.length; i++) { c = (crc ^ buf[i]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ -1) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(); const parts = []; const central = []; let off = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name); const crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30)); lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46)); ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), name); off += 30 + name.length + f.data.length;
+  }
+  let csize = 0; central.forEach((p) => csize += p.length);
+  const end = new DataView(new ArrayBuffer(22)); end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/zip' });
+}
+document.getElementById('zip').onclick = async () => {
+  const files = [], manifest = [];
+  for (const it of ITEMS) { const v = await get(it.id); if (!v) continue; const name = `${it.id}.${ext(v.type)}`; files.push({ name, data: new Uint8Array(await v.blob.arrayBuffer()) }); manifest.push({ id: it.id, text: it.text, file: name }); }
+  if (!files.length) { alert('لسه ما سجلتش حاجة'); return; }
+  files.push({ name: 'manifest.json', data: new TextEncoder().encode(JSON.stringify({ group: GROUP, items: manifest }, null, 1)) });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(files)); a.download = `rehlaty_voice_${GROUP}.zip`; a.click();
+};
+document.getElementById('wipe').onclick = async () => { if (!confirm('تمسح كل تسجيلات الصفحة دي؟')) return; for (const it of ITEMS) { await del(it.id); done.delete(it.id); mark(document.getElementById('r_' + it.id), false); } refresh(); };
+(async () => { db = await openDb(); build(); for (const it of ITEMS) { const v = await get(it.id); if (v) { done.add(it.id); mark(document.getElementById('r_' + it.id), true); } } refresh(); })();
+</script>
+</body>
+</html>

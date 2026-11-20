@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المستوى 18: حشرات وطيور</title>
+<style>
+  :root{--bg:#1d1250;--card:#2b1f78;--gold:#ffd23a;--ok:#2fbf5a;--rec:#e8384a;--ink:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,"Segoe UI",system-ui,sans-serif;direction:rtl}
+  header{position:sticky;top:0;z-index:5;background:#140b3a;border-bottom:3px solid var(--gold);padding:10px 14px}
+  h1{margin:0 0 6px;font-size:20px;color:var(--gold)}
+  .bar{height:12px;border-radius:8px;background:#3b2e90;overflow:hidden}.bar b{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+  .top{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+  button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:9px 14px;cursor:pointer;color:#fff;background:#3b6fd8;min-height:42px}
+  button.rec{background:var(--rec)}button.ok{background:var(--ok)}button.ghost{background:#4a3aa8}button.del{background:#6a2a50}
+  button:disabled{opacity:.4;cursor:default}
+  main{padding:10px 12px 90px;max-width:900px;margin:auto}
+  .row{background:var(--card);border:2px solid #4a3aa8;border-radius:16px;padding:12px;margin:10px 0}
+  .row.done{border-color:var(--ok)}.row.live{border-color:var(--rec);box-shadow:0 0 0 3px #e8384a55}
+  .t{font-size:26px;font-weight:900;line-height:1.5}.r{font-size:15px;opacity:.8;margin-top:2px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.st{font-size:14px;opacity:.9}
+  .note{background:#3b2e90;border-radius:12px;padding:10px;font-size:15px;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ __TITLE__</h1>
+  <div class="bar"><b id="prog"></b></div>
+  <div class="top"><span id="count"></span>
+    <span><button class="ok" id="zip">⬇️ تنزيل تسجيلاتي (ملف واحد)</button> <button class="del" id="wipe">🗑️ مسح الكل</button></span></div>
+</header>
+<main>
+  <div class="note">اضغط <b>● سجّل</b>، اقرا الجملة بصوتك بهدوء وبصوت طفل مرح، واضغط <b>■ وقّف</b>. تسمع تسجيلك بـ <b>▶ تسجيلي</b> وتقارنه بالصوت الحالي بـ <b>▶ الحالي</b>. التسجيلات بتتحفظ في المتصفح لوحدها، تقدر تقفل وتكمل بعدين. لما تخلص اضغط «تنزيل تسجيلاتي» وابعتلي الملف.</div>
+  <div id="list"></div>
+</main>
+<script>
+const GROUP = "18_t_bugs";
+const ITEMS = [{"id":"ff7738d1","text":"مين بياخد رحيق الزهور ويعمل عسل؟","reading":"مِين بِيَاخُد رَحِيق الزُّهُور وَيِعْمِل عَسَل؟"},{"id":"a9ea899a","text":"مين بيغرد على الشجرة؟","reading":"مِين بِيْغَرِّد عَلَى الشَّجَرَة؟"},{"id":"da76c9b8","text":"مين بيطير بالليل؟","reading":"مِين بِيطِير بِاللِّيل؟"},{"id":"9ccaf1f2","text":"فين العصفور الأزرق؟","reading":"فِين العُصْفُور الأَزْرَق؟"},{"id":"be6a8080","text":"فين الحمامة؟","reading":"فِين الحَمَامَة؟"},{"id":"9976b602","text":"فين العصفور الأصفر؟","reading":"فِين العُصْفُور الأَصْفَر؟"},{"id":"136273c0","text":"مين لونه أحمر وعليه نقط سودا؟","reading":"مِين لَوْنُه أَحْمَر وَعَلِيه نُقَط سُودَا؟"},{"id":"b754e99e","text":"مين بيعيش في خلية؟","reading":"مِين بِيعِيش فِي خَلِيَّة؟"},{"id":"6dd2e857","text":"مين بيعمل عش من القش؟","reading":"مِين بِيعْمِل عِشّ مِن القَشّ؟"},{"id":"9bb1d15b","text":"فين الدعسوقة؟","reading":"فِين الدُّعْسُوقَة؟"},{"id":"6b1310f2","text":"مين مالوش جناح وبيعمل نسيج؟","reading":"مِين مَالُوش جَنَاح وَبِيْعْمِل نَسِيج؟"},{"id":"952b4170","text":"مين ملك الطيور؟","reading":"مِين مَلِك الطُّيُور؟"},{"id":"8ac45e86","text":"مين بينام بالنهار ويصحى بالليل؟","reading":"مِين بِيْنَام بِالنَّهَار وَيِصْحَى بِاللَّيْل؟"},{"id":"d872e1b5","text":"مين بيحط بيضة كبيرة جدا؟","reading":"مِين بِيْحُطّ بَيْضَة كَبِيرَة جِدًّا؟"},{"id":"b9eb1e6f","text":"مين بيحمل أكل أكبر منه؟","reading":"مِين بِيْحْمِل أَكْل أَكْبَر مِنُّه؟"},{"id":"c00292e6","text":"مين بيعمل بيت من شبك؟","reading":"مِين بِيعْمِل بَيْت مِن شَبَك؟"},{"id":"34ee782c","text":"كام دودة؟","reading":"كَام دُودَة؟"},{"id":"3e11360e","text":"مين بيتعلق بالمقلوب وبيطير بالليل؟","reading":"مِين بِيِتْعَلَّق بِالمَقْلُوب وَبِيِطِير بِاللَّيْل؟"},{"id":"30faaf7f","text":"مين بيطير فوق الجبال وعنده مخالب؟","reading":"مِين بِيطِير فُوق الجِبَال وَعِنْدُه مَخَالِب؟"},{"id":"16831029","text":"مين أكبر طير ومش بيطير؟","reading":"مِين أَكْبَر طَيْر وَمِش بِيطِير؟"},{"id":"c8b38ba6","text":"مين لونه أزرق وأخضر ولامع؟","reading":"مِين لَوْنُه أَزْرَق وَأَخْضَر وَلَامِع؟"},{"id":"bbf6eef3","text":"مين بيبقى دودة الأول وبعدين بيطير؟","reading":"مِين بِيبْقَى دُودَة الأَوَّل وَبَعْدِين بِيطِير؟"},{"id":"097fd97a","text":"مين بيتعلق من رجليه بالمقلوب؟","reading":"مِين بِيِتْعَلَّق مِن رِجْلِيه بِالمَقْلُوب؟"},{"id":"2033f8dc","text":"مين لونه أبيض ورقبته على شكل حرف إس؟","reading":"مِين لَوْنُه أَبْيَض وَرَقَبْتُه عَلَى شَكْل حَرْف إِس؟"},{"id":"80eb97d3","text":"مين بيحب الأكل المكشوف وينقل الجراثيم؟","reading":"مِين بِيحِبّ الأَكْل المَكْشُوف وَيِنْقِل الجَرَاثِيم؟"},{"id":"d9d5ffc5","text":"كام نملة؟","reading":"كَام نَمْلَة؟"},{"id":"a4e7bdda","text":"مين رقبته طويلة وجميلة وبيعوم؟","reading":"مِين رَقَبْتُه طَوِيلَة وَجَمِيلَة وَبِيْعُوم؟"},{"id":"ad79cda4","text":"مين بيعمل بيت تحت الأرض؟","reading":"مِين بِيعْمِل بَيْت تَحْت الأَرْض؟"},{"id":"59a372a5","text":"مين بيزور الزهور ويجمع الرحيق؟","reading":"مِين بِيْزُور الزُّهُور وَيِجْمَع الرَّحِيق؟"},{"id":"9eaacdf5","text":"مين بيسمع بالصدى في الظلام؟","reading":"مِين بِيْسْمَع بِالصَّدَى فِي الظَّلَام؟"},{"id":"514dd30f","text":"كام حلزونة؟","reading":"كَام حَلَزُونَة؟"},{"id":"659b6599","text":"مين بيعمل زنّ وبيحوم؟","reading":"مِين بِيعْمِل زنّ وَبِيْحُوم؟"},{"id":"1f6df048","text":"مين ريشه أصفر وصغير؟","reading":"مِين رِيشُه أَصْفَر وَصُغَيَّر؟"},{"id":"56db6b28","text":"مين لونه أزرق وبيطير؟","reading":"مِين لَوْنُه أَزْرَق وَبِيِطِير؟"},{"id":"5e5baeed","text":"مين ليه صدفة على ضهره؟","reading":"مِين لِيه صَدَفَة عَلَى ضَهْرُه؟"},{"id":"5b1e3b26","text":"مين طويل رقبته وواقف على رجل واحدة؟","reading":"مِين طَوِيل رَقَبْتُه وَوَاقِف عَلَى رَجُل وَاحْدَة؟"},{"id":"19458214","text":"مين صغير وأسود وعايش في مستعمرة؟","reading":"مِين صُغَيَّر وَأَسْوَد وَعَايِش فِي مُسْتَعْمَرَة؟"},{"id":"9d055c93","text":"مين عنده كتير من العيون الصغيرة؟","reading":"مِين عِنْدُه كَتِير مِن العُيُون الصُّغَيَّرَة؟"},{"id":"e7299c99","text":"مين جناحاته رقيقة وملونة؟","reading":"مِين جَنَاحَاتُه رَقِيقَة وَمُلَوَّنَة؟"},{"id":"0c2d4447","text":"مين صغير وبيشيل الأكل على ظهره؟","reading":"مِين صُغَيَّر وَبِيْشِيل الأَكْل عَلَى ظَهْرُه؟"},{"id":"50f314df","text":"مين بيخبي نفسه في الصدفة؟","reading":"مِين بِيْخَبِّي نَفْسُه فِي الصَّدَفَة؟"},{"id":"ccab3452","text":"مين ريشه حلو وبيفرده؟","reading":"مِين رِيشُه حِلْو وَبِيفْرِده؟"},{"id":"ad1f9a8b","text":"مين بيعيش في التراب الرطب؟","reading":"مِين بِيعِيش فِي التُّرَاب الرُّطَب؟"},{"id":"9f9a9d99","text":"مين بيحمل غصن زيتون؟","reading":"مِين بِيْحْمِل غُصْن زَيْتُون؟"},{"id":"c065eeab","text":"مين نظره حاد وبيشوف من بعيد؟","reading":"مِين نَظَرُه حَاد وَبِيْشُوف مِن بَعِيد؟"},{"id":"17d2d5ef","text":"مين بيمشي على تمان رجلين؟","reading":"مِين بِيمْشِي عَلَى تَمَان رِجْلِين؟"},{"id":"e0f90f70","text":"مين بيحب التراب والمطر؟","reading":"مِين بِيحِبّ التُّرَاب وَالمَطَر؟"},{"id":"b7f0ab32","text":"مين بيطلع قرنين لما يخرج؟","reading":"مِين بِيْطْلَع قَرْنِين لَمَّا يِخْرَج؟"},{"id":"194e0557","text":"مين بيعيش في الكهف؟","reading":"مِين بِيعِيش فِي الكَهْف؟"},{"id":"dda7587e","text":"مين بيقف على رجل واحدة في الميه؟","reading":"مِين بِيْقَف عَلَى رَجُل وَاحْدَة فِي المَيَّه؟"},{"id":"abed8cda","text":"مين بيحب يتمشى على أوراق الشجر؟","reading":"مِين بِيحِبّ يِتْمَشَّى عَلَى أَوْرَاق الشَّجَر؟"},{"id":"d4b7b1af","text":"مين بيحب السكر؟","reading":"مِين بِيحِبّ السُّكَّر؟"},{"id":"92ce8244","text":"مين بيصطاد الذباب في الشبك؟","reading":"مِين بِيْصْطَاد الدُّبَاب فِي الشَّبَك؟"},{"id":"2da23c24","text":"مين بيعوم بهدوء في البحيرة؟","reading":"مِين بِيْعُوم بِهُدُوء فِي البُحَيْرَة؟"},{"id":"38f6e511","text":"مين ديله فيه عيون ملونة؟","reading":"مِين دِيلُه فِيه عُيُون مُلَوَّنَة؟"},{"id":"9cb3aa89","text":"مين بيحوم حوالين الأكل ويزن؟","reading":"مِين بِيْحُوم حَوَالِين الأَكْل وَيِزِنّ؟"},{"id":"fd1fdccf","text":"مين بيعمل الشمع والعسل؟","reading":"مِين بِيعْمِل الشَّمْع وَالعَسَل؟"},{"id":"efc7be01","text":"كام عصفورة؟","reading":"كَام عُصْفُورَة؟"},{"id":"94b62893","text":"مين بيكبر في الشرنقة ويطير؟","reading":"مِين بِيْكْبَر فِي الشَّرْنَقَة وَيِطِير؟"},{"id":"89b913d7","text":"مين لونه أصفر وبيغني؟","reading":"مِين لَوْنُه أَصْفَر وَبِيْغَنِّي؟"},{"id":"db1ebdbf","text":"مين بيمشي ببطء ومعاه بيته؟","reading":"مِين بِيمْشِي بِبُطْء وَمَعَاه بِيتُه؟"},{"id":"0ecdf8d6","text":"مين صغير وبيغرد في الصباح؟","reading":"مِين صُغَيَّر وَبِيْغَرِّد فِي الصَّبَاح؟"},{"id":"4b8464bd","text":"مين بيعوم على البحيرة وبيضه كبير وأبيض؟","reading":"مِين بِيْعُوم عَلَى البُحَيْرَة وَبَيْضُه كَبِير وَأَبْيَض؟"},{"id":"0c55dad2","text":"مين ريشه ملون وبيعمل دايرة كبيرة؟","reading":"مِين رِيشُه مُلَوَّن وَبِيْعْمِل دَايْرَة كَبِيرَة؟"},{"id":"1f719adb","text":"مين له جناحين ملونين حلوين؟","reading":"مِين لُه جَنَاحِين مُلَوَّنِين حِلْوِين؟"},{"id":"93ae0a2d","text":"مين نقاطه سودا على ضهره الأحمر؟","reading":"مِين نُقَاطُه سُودَا عَلَى ضَهْرُه الأَحْمَر؟"},{"id":"4d181e9f","text":"مين بيتحرك في التربة وبيتلوى؟","reading":"مِين بِيِتْحَرَّك فِي التُّرْبَة وَبِيِتْلَوَّى؟"},{"id":"f14d00a5","text":"مين لونه وردي ورجله طويلة ورفيعة؟","reading":"مِين لَوْنُه وَرْدِي وَرِجْلُه طَوِيلَة وَرَفِيعَة؟"},{"id":"025d753f","text":"مين رمز السلام؟","reading":"مِين رَمْز السَّلَام؟"},{"id":"12a745e0","text":"مين بيجري في صف طويل؟","reading":"مِين بِيْجْرِي فِي صَفّ طَوِيل؟"},{"id":"1032cce3","text":"مين بيسيب أثر لزج وراه؟","reading":"مِين بِيْسِيب أَثَر لِزِج وَرَاه؟"},{"id":"545f96ff","text":"مين لونه وردي وبيقف على رجل؟","reading":"مِين لَوْنُه وَرْدِي وَبِيْقَف عَلَى رَجُل؟"},{"id":"de5f9956","text":"مين بيطير عالي جدا وهو قوي؟","reading":"مِين بِيطِير عَالِي جِدًّا وَهُوَّ قَوِي؟"},{"id":"f6c10d79","text":"مين بيعمل خيوط؟","reading":"مِين بِيعْمِل خُيُوط؟"},{"id":"eb6a5bcf","text":"مين بيطلع من البيضة ويتغير شكله؟","reading":"مِين بِيْطْلَع مِن البَيْضَة وَيِتْغَيَّر شَكْلُه؟"},{"id":"1d95614f","text":"مين بيتحرك على الأرض ويتلوى زي الخيط؟","reading":"مِين بِيِتْحَرَّك عَلَى الأَرْض وَيِتْلَوَّى زَي الخَيْط؟"},{"id":"2b553852","text":"مين ريشه أزرق فاتح؟","reading":"مِين رِيشُه أَزْرَق فَاتِح؟"}];
+const CURRENT = (id) => `../assets/assets/games/learn_voice/ar/${id}.mp3`;  // the voice that is in the app now (works on the demo site)
+let db, mediaRec, stream, chunks = [], curId = null, audio = new Audio();
+
+function openDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('rehlaty_voice', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('rec');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+const tx = (mode) => db.transaction('rec', mode).objectStore('rec');
+const key = (id) => GROUP + '|' + id;
+const get = (id) => new Promise((res) => { const q = tx('readonly').get(key(id)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); });
+const put = (id, v) => new Promise((res) => { const q = tx('readwrite').put(v, key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const del = (id) => new Promise((res) => { const q = tx('readwrite').delete(key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const done = new Set();
+
+function ext(type) { return /webm/.test(type) ? 'webm' : /ogg/.test(type) ? 'ogg' : /mp4|aac|m4a/.test(type) ? 'm4a' : /wav/.test(type) ? 'wav' : 'bin'; }
+function refresh() {
+  document.getElementById('count').textContent = `سجّلت ${done.size} من ${ITEMS.length}`;
+  document.getElementById('prog').style.width = (100 * done.size / ITEMS.length) + '%';
+}
+function build() {
+  const list = document.getElementById('list');
+  ITEMS.forEach((it, i) => {
+    const d = document.createElement('div'); d.className = 'row'; d.id = 'r_' + it.id;
+    d.innerHTML = `<div class="t">${i + 1}. ${it.text.replace(/</g, '&lt;')}</div>${it.reading && it.reading !== it.text ? `<div class="r">تُقرأ: ${it.reading.replace(/</g, '&lt;')}</div>` : ''}
+      <div class="btns"><button class="rec" data-a="rec">● سجّل</button><button class="ghost" data-a="mine" disabled>▶ تسجيلي</button><button class="ghost" data-a="cur">▶ الحالي</button><button class="del" data-a="del" disabled>🗑️</button><span class="st"></span></div>`;
+    d.addEventListener('click', (e) => { const a = e.target.dataset && e.target.dataset.a; if (a) act(it, d, e.target, a); });
+    list.appendChild(d);
+  });
+}
+function mark(d, on) {
+  d.classList.toggle('done', on);
+  d.querySelector('[data-a=mine]').disabled = !on; d.querySelector('[data-a=del]').disabled = !on;
+  d.querySelector('.st').textContent = on ? '✓ اتسجلت' : '';
+}
+async function act(it, d, btn, a) {
+  if (a === 'cur') { audio.pause(); audio = new Audio(CURRENT(it.id)); audio.play().catch(() => { d.querySelector('.st').textContent = 'الصوت الحالي مش متاح هنا'; }); return; }
+  if (a === 'mine') { const v = await get(it.id); if (v) { audio.pause(); audio = new Audio(URL.createObjectURL(v.blob)); audio.play(); } return; }
+  if (a === 'del') { await del(it.id); done.delete(it.id); mark(d, false); refresh(); return; }
+  if (a === 'rec') {
+    if (mediaRec && mediaRec.state === 'recording') { mediaRec.stop(); return; }
+    try { stream = stream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { alert('محتاج إذن الميكروفون. اسمح للمتصفح باستخدام الميكروفون وجرّب تاني.'); return; }
+    audio.pause(); chunks = []; curId = it.id;
+    const opts = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? { mimeType: 'audio/webm;codecs=opus' } : {};
+    mediaRec = new MediaRecorder(stream, opts);
+    mediaRec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mediaRec.onstop = async () => {
+      d.classList.remove('live'); btn.textContent = '● سجّل'; btn.classList.add('rec');
+      const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+      if (blob.size < 1500) { d.querySelector('.st').textContent = 'التسجيل قصير أوي، جرّب تاني'; return; }
+      await put(it.id, { blob, type: blob.type, text: it.text, at: Date.now() });
+      done.add(it.id); mark(d, true); refresh();
+      const nx = d.nextElementSibling; if (nx) nx.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    d.classList.add('live'); btn.textContent = '■ وقّف'; d.querySelector('.st').textContent = 'بيسجّل...';
+    mediaRec.start();
+  }
+}
+// a tiny zip writer (stored, no compression) so no library is needed
+function crc32(buf) { let c, crc = -1; for (let i = 0; i < buf.length; i++) { c = (crc ^ buf[i]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ -1) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(); const parts = []; const central = []; let off = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name); const crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30)); lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46)); ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), name); off += 30 + name.length + f.data.length;
+  }
+  let csize = 0; central.forEach((p) => csize += p.length);
+  const end = new DataView(new ArrayBuffer(22)); end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/zip' });
+}
+document.getElementById('zip').onclick = async () => {
+  const files = [], manifest = [];
+  for (const it of ITEMS) { const v = await get(it.id); if (!v) continue; const name = `${it.id}.${ext(v.type)}`; files.push({ name, data: new Uint8Array(await v.blob.arrayBuffer()) }); manifest.push({ id: it.id, text: it.text, file: name }); }
+  if (!files.length) { alert('لسه ما سجلتش حاجة'); return; }
+  files.push({ name: 'manifest.json', data: new TextEncoder().encode(JSON.stringify({ group: GROUP, items: manifest }, null, 1)) });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(files)); a.download = `rehlaty_voice_${GROUP}.zip`; a.click();
+};
+document.getElementById('wipe').onclick = async () => { if (!confirm('تمسح كل تسجيلات الصفحة دي؟')) return; for (const it of ITEMS) { await del(it.id); done.delete(it.id); mark(document.getElementById('r_' + it.id), false); } refresh(); };
+(async () => { db = await openDb(); build(); for (const it of ITEMS) { const v = await get(it.id); if (v) { done.add(it.id); mark(document.getElementById('r_' + it.id), true); } } refresh(); })();
+</script>
+</body>
+</html>

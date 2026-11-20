@@ -16,6 +16,23 @@ import 'games/fun_sections.dart' deferred as fun_sections_lib;
 import 'games/games_choice.dart' deferred as games_choice_lib;
 import 'games/games_hub.dart' deferred as games_hub_lib;
 
+/// Warms up the fun-games pages in the background a few seconds after the child's home appears (owner 2026-11-20: entering the fun games
+/// felt slow because the part of the app that holds them was only downloaded when they were opened). It downloads the deferred parts of
+/// the app and decodes the pictures of the hub, so that tapping «ألعاب للتسلية» opens at once. Never throws and does nothing in tests.
+Future<void> prefetchGames(BuildContext context) async {
+  if (WidgetsBinding.instance.runtimeType.toString().contains('Test')) return;
+  try {
+    await Future.wait([fun_sections_lib.loadLibrary(), games_choice_lib.loadLibrary(), games_hub_lib.loadLibrary()]);
+    for (final a in ['bg_hub', 'racing', 'action', 'runners', 'build', 'puzzle', 'girls']) {
+      if (!context.mounted) return;
+      await precacheImage(AssetImage('assets/games/sections/$a.webp'), context, onError: (_, _) {});
+      await Future<void>.delayed(const Duration(milliseconds: 40)); // one picture per beat: never a hitch on the map
+    }
+  } catch (_) {
+    // offline or a missing part: it will simply load when it is opened
+  }
+}
+
 /// Opens the family chat (loads it first when needed).
 Future<void> openFamily(BuildContext context, {required bool asRelative, required TeacherRepository? auth, required FamilyRepository? family}) async {
   await family_lib.loadLibrary();

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المستوى 21: فضاء وخيال</title>
+<style>
+  :root{--bg:#1d1250;--card:#2b1f78;--gold:#ffd23a;--ok:#2fbf5a;--rec:#e8384a;--ink:#fff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,"Segoe UI",system-ui,sans-serif;direction:rtl}
+  header{position:sticky;top:0;z-index:5;background:#140b3a;border-bottom:3px solid var(--gold);padding:10px 14px}
+  h1{margin:0 0 6px;font-size:20px;color:var(--gold)}
+  .bar{height:12px;border-radius:8px;background:#3b2e90;overflow:hidden}.bar b{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+  .top{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+  button{font:inherit;font-weight:800;border:0;border-radius:12px;padding:9px 14px;cursor:pointer;color:#fff;background:#3b6fd8;min-height:42px}
+  button.rec{background:var(--rec)}button.ok{background:var(--ok)}button.ghost{background:#4a3aa8}button.del{background:#6a2a50}
+  button:disabled{opacity:.4;cursor:default}
+  main{padding:10px 12px 90px;max-width:900px;margin:auto}
+  .row{background:var(--card);border:2px solid #4a3aa8;border-radius:16px;padding:12px;margin:10px 0}
+  .row.done{border-color:var(--ok)}.row.live{border-color:var(--rec);box-shadow:0 0 0 3px #e8384a55}
+  .t{font-size:26px;font-weight:900;line-height:1.5}.r{font-size:15px;opacity:.8;margin-top:2px}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}.st{font-size:14px;opacity:.9}
+  .note{background:#3b2e90;border-radius:12px;padding:10px;font-size:15px;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ __TITLE__</h1>
+  <div class="bar"><b id="prog"></b></div>
+  <div class="top"><span id="count"></span>
+    <span><button class="ok" id="zip">⬇️ تنزيل تسجيلاتي (ملف واحد)</button> <button class="del" id="wipe">🗑️ مسح الكل</button></span></div>
+</header>
+<main>
+  <div class="note">اضغط <b>● سجّل</b>، اقرا الجملة بصوتك بهدوء وبصوت طفل مرح، واضغط <b>■ وقّف</b>. تسمع تسجيلك بـ <b>▶ تسجيلي</b> وتقارنه بالصوت الحالي بـ <b>▶ الحالي</b>. التسجيلات بتتحفظ في المتصفح لوحدها، تقدر تقفل وتكمل بعدين. لما تخلص اضغط «تنزيل تسجيلاتي» وابعتلي الملف.</div>
+  <div id="list"></div>
+</main>
+<script>
+const GROUP = "21_t_space";
+const ITEMS = [{"id":"16d80052","text":"فين المهرج الملكي؟","reading":"فِين المُهَرِّج المَلَكِي؟"},{"id":"621ac3c7","text":"فين خوذة الفضاء؟","reading":"فِين خُوذَة الفَضَاء؟"},{"id":"ed541768","text":"إيه اللي حواليه حلقات؟","reading":"إِيه اللِّي حَوَالِيه حَلَقَات؟"},{"id":"e782db86","text":"إيه اللي لونه أزرق وفيه ميه؟","reading":"إِيه اللِّي لَوْنُه أَزْرَق وَفِيه مَيَّه؟"},{"id":"efe82d4b","text":"إيه اللي بيطير بسرعة ويطلع نار من ورا؟","reading":"إِيه اللِّي بِيطِير بِسُرْعَة وَيِطْلَع نَار مِن وَرَا؟"},{"id":"0b737be7","text":"فين الراية؟","reading":"فِين الرَّايَة؟"},{"id":"a7074842","text":"فين حصان الفارس؟","reading":"فِين حِصَان الفَارِس؟"},{"id":"ee964bbe","text":"فين الكوخ؟","reading":"فِين الكُوخ؟"},{"id":"369eba8d","text":"فين الكوكب الأزرق؟","reading":"فِين الكَوْكَب الأَزْرَق؟"},{"id":"323884be","text":"مين بيحرس الكنز؟","reading":"مِين بِيْحْرِس الكَنْز؟"},{"id":"39c80708","text":"مين بيقول كلمات سحرية؟","reading":"مِين بِيقُول كَلِمَات سِحْرِيَّة؟"},{"id":"66045b56","text":"مين اللي بتحكم المملكة معاه؟","reading":"مِين اللِّي بِتْحْكُم المَمْلَكَة مَعَاه؟"},{"id":"31721606","text":"فين محطة الفضاء؟","reading":"فِين مَحَطَّة الفَضَاء؟"},{"id":"68b86fa5","text":"فين الأميرة؟","reading":"فِين الأَمِيرَة؟"},{"id":"94e5d140","text":"مين لابسة تاج وفستان؟","reading":"مِين لَابْسَة تَاج وَفُسْتَان؟"},{"id":"74d76838","text":"فين البئر؟","reading":"فِين البِئْر؟"},{"id":"087eecc4","text":"مين لابس درع وراكب حصان؟","reading":"مِين لَابِس دِرْع وَرَاكِب حِصَان؟"},{"id":"93827048","text":"إيه اللي لونه أزرق زي الأرض؟","reading":"إِيه اللِّي لَوْنُه أَزْرَق زَي الأَرْض؟"},{"id":"51e47b36","text":"فين الصاروخ الصغير؟","reading":"فِين الصَّارُوخ الصُّغَيَّر؟"},{"id":"534d2cdc","text":"إيه اللي بنتمنى عليه أمنية؟","reading":"إِيه اللِّي بِنِتْمَنَّى عَلَيْه أُمْنِيَّة؟"},{"id":"a640923e","text":"فين الكوكب الوردي؟","reading":"فِين الكَوْكَب الوَرْدِي؟"},{"id":"4acf78ce","text":"فين البرج؟","reading":"فِين البُرْج؟"},{"id":"a0aec868","text":"فين الدرع؟","reading":"فِين الدِّرْع؟"},{"id":"cb93ee79","text":"مين بيتحرك زي الآلة وبيساعدنا؟","reading":"مِين بِيِتْحَرَّك زَي الآلَة وَبِيْسَاعِدْنَا؟"},{"id":"779e4ea2","text":"مين لابس درع وبيركب حصان؟","reading":"مِين لَابِس دِرْع وَبِيْرْكَب حِصَان؟"},{"id":"8ef7d14c","text":"مين مرات الملك؟","reading":"مِين مِرَات المَلِك؟"},{"id":"1c883790","text":"فين المذنب؟","reading":"فِين المُذَنَّب؟"},{"id":"14f0a853","text":"إيه اللي بينور بالليل ويتغير شكله؟","reading":"إِيه اللِّي بِيْنَوِّر بِاللَّيْل وَيِتْغَيَّر شَكْلُه؟"},{"id":"28c73939","text":"فين المشعل؟","reading":"فِين المِشْعَل؟"},{"id":"d7ada3b9","text":"إيه اللي بيركبه الفارس وبيجري بيه؟","reading":"إِيه اللِّي بِيْرْكَبُه الفَارِس وَبِيْجْرِي بِيه؟"},{"id":"e21cca13","text":"مين ليه أجنحة وبيطلع نار؟","reading":"مِين لِيه أَجْنِحَة وَبِيْطْلَع نَار؟"},{"id":"f574e37f","text":"إيه اللي بيتعلق فوق القلعة؟","reading":"إِيه اللِّي بِيِتْعَلَّق فُوق القَلْعَة؟"},{"id":"191cdd22","text":"مين شجاع وبيدافع عن المملكة؟","reading":"مِين شُجَاع وَبِيْدَافِع عَنْ المَمْلَكَة؟"},{"id":"57e5eb8d","text":"مين بنت الملك؟","reading":"مِين بِنْت المَلِك؟"},{"id":"bce0df2b","text":"كام روبوت؟","reading":"كَام رُوبُوت؟"},{"id":"fa88ad09","text":"إيه اللي فيه نار صغيرة؟","reading":"إِيه اللِّي فِيه نَار صُغَيَّرَة؟"},{"id":"740f8d27","text":"مين اللي بيحكم المملكة؟","reading":"مِين اللِّي بِيْحْكُم المَمْلَكَة؟"},{"id":"1bcdd52e","text":"كام فضائي؟","reading":"كَام فَضَائِي؟"},{"id":"0a3ceffb","text":"إيه اللي بيدور حوالين الأرض كل شهر؟","reading":"إِيه اللِّي بِيْدُور حَوَالِين الأَرْض كُلّ شَهْر؟"},{"id":"5b8aef7c","text":"إيه اللي ليه حلقة حواليه؟","reading":"إِيه اللِّي لِيه حَلْقَة حَوَالِيه؟"},{"id":"d729f69a","text":"إيه اللي فيه ذهب وجواهر؟","reading":"إِيه اللِّي فِيه دَهَب وَجَوَاهِر؟"},{"id":"29f44199","text":"مين أخضر وجاي من كوكب بعيد؟","reading":"مِين أَخْضَر وَجَاي مِن كَوْكَب بَعِيد؟"},{"id":"14d07959","text":"مين لابس لبس ملون وبيلعب؟","reading":"مِين لَابِس لِبْس مُلَوَّن وَبِيْلْعَب؟"},{"id":"f9cd7405","text":"إيه اللي بيرفرف ومرسوم عليه علامة المملكة؟","reading":"إِيه اللِّي بِيْرَفْرَف وَمَرْسُوم عَلَيْه عَلَامِة المَمْلَكَة؟"},{"id":"c4ec3648","text":"كام نجمة؟","reading":"كَام نَجْمَة؟"},{"id":"17c095b3","text":"فين بيعيش الملك؟","reading":"فِين بِيعِيش المَلِك؟"},{"id":"3891c533","text":"مين بيحارب الأشرار؟","reading":"مِين بِيْحَارِب الأَشْرَار؟"},{"id":"6bf411e4","text":"مين بينفخ نار؟","reading":"مِين بِيْنْفُخ نَار؟"},{"id":"d64f1c39","text":"مين ماسك عصاية سحرية؟","reading":"مِين مَاسِك عَصَايَة سِحْرِيَّة؟"},{"id":"461e2641","text":"إيه اللي بنسحب منه ميه بدلو؟","reading":"إِيه اللِّي بِنِسْحَب مِنُّه مَيَّه بِدَلْو؟"},{"id":"33411c00","text":"مين بيضحك الملك بالتهريج؟","reading":"مِين بِيْضَحَّك المَلِك بِالتَّهْرِيج؟"},{"id":"c9243b3e","text":"إيه اللي لونه وردي في الفضا؟","reading":"إِيه اللِّي لَوْنُه وَرْدِي فِي الفَضَا؟"},{"id":"66cdda8d","text":"إيه اللي بيعيش فيه رواد الفضاء؟","reading":"إِيه اللِّي بِيعِيش فِيه رُوَّاد الفَضَاء؟"},{"id":"e32f3ed0","text":"مين كبير ومخيف في الحكايات؟","reading":"مِين كَبِير وَمُخِيف فِي الحِكَايَات؟"},{"id":"f77d4b5c","text":"إيه اللي بيلمع في السما بالليل؟","reading":"إِيه اللِّي بِيْلْمَع فِي السَّمَا بِاللَّيْل؟"},{"id":"efa6cee2","text":"إيه اللي بينور في الليل وشكله هلال؟","reading":"إِيه اللِّي بِيْنَوِّر فِي اللَّيْل وَشَكْلُه هِلَال؟"},{"id":"250b23a3","text":"إيه اللي بيحمي الفارس؟","reading":"إِيه اللِّي بِيْحْمِي الفَارِس؟"},{"id":"c632e160","text":"كام قمر؟","reading":"كَام قَمَر؟"},{"id":"edcd608b","text":"إيه اللي بيدور حوالين الأرض؟","reading":"إِيه اللِّي بِيْدُور حَوَالِين الأَرْض؟"},{"id":"e51f3490","text":"إيه اللي بيركبه الفارس؟","reading":"إِيه اللِّي بِيْرْكَبُه الفَارِس؟"},{"id":"0da93b15","text":"مين لابسة فستان جميل وتاج صغير؟","reading":"مِين لَابْسَة فُسْتَان جَمِيل وَتَاج صُغَيَّر؟"},{"id":"eb645c4b","text":"إيه اللي بنجيب منه الميه؟","reading":"إِيه اللِّي بِنِجِيب مِنُّه المَيَّه؟"},{"id":"3a105162","text":"مين لابس قبعة طويلة مدببة؟","reading":"مِين لَابِس قُبَّعَة طَوِيلَة مُدَبَّبَة؟"},{"id":"220f5cb0","text":"إيه اللي بيلبسه رائد الفضاء على راسه؟","reading":"إِيه اللِّي بِيْلْبِسُه رَائِد الفَضَاء عَلَى رَاسُه؟"},{"id":"4d743d54","text":"إيه اللي فيه ذهب وأحجار كريمة؟","reading":"إِيه اللِّي فِيه دَهَب وَأَحْجَار كْرِيمَة؟"},{"id":"d69b0525","text":"إيه اللي بيعيش فيه الفلاح في الحكايات؟","reading":"إِيه اللِّي بِيعِيش فِيه الفَلَّاح فِي الحِكَايَات؟"},{"id":"ad73161e","text":"إيه اللي بنشعله ونمسكه في الظلام؟","reading":"إِيه اللِّي بِنِشْعِلُه وَنِمْسِكُه فِي الظَّلَام؟"},{"id":"43827d68","text":"مين بيضحك الملك؟","reading":"مِين بِيْضَحَّك المَلِك؟"},{"id":"121bd90f","text":"مين راسه كبيرة وعينيه كبيرة؟","reading":"مِين رَاسُه كَبِيرَة وَعِينِيه كَبِيرَة؟"},{"id":"4e6ab559","text":"مين جسمه حديد وبيتحرك بالكهرباء؟","reading":"مِين جِسْمُه حَدِيد وَبِيِتْحَرَّك بِالكَهْرَبَاء؟"},{"id":"dd51c2ee","text":"إيه اللي لونه وردي وبعيد؟","reading":"إِيه اللِّي لَوْنُه وَرْدِي وَبَعِيد؟"},{"id":"da86bdff","text":"إيه اللي بنلبسه على راسنا عشان نتنفس في الفضا؟","reading":"إِيه اللِّي بِنِلْبِسُه عَلَى رَاسْنَا عَشَان نِتْنَفِّس فِي الفَضَا؟"},{"id":"8a768ea9","text":"مين بيعمل سحر؟","reading":"مِين بِيعْمِل سِحْر؟"},{"id":"f645b04f","text":"إيه اللي بيطير ويوصلنا الفضا؟","reading":"إِيه اللِّي بِيطِير وَيِوَصَّلْنَا الفَضَا؟"},{"id":"42edbe1f","text":"مين بيحكم البلد؟","reading":"مِين بِيْحْكُم البَلَد؟"},{"id":"01ba61af","text":"إيه اللي بيجري في الفضا وليه ذيل؟","reading":"إِيه اللِّي بِيْجْرِي فِي الفَضَا وَلِيه دِيل؟"},{"id":"000cd31c","text":"إيه اللي ليه ذيل منور وبيجري في الفضا؟","reading":"إِيه اللِّي لِيه دِيل مِنَوِّر وَبِيْجْرِي فِي الفَضَا؟"},{"id":"5de830ac","text":"إيه اللي بيتحط عليه رائد الفضاء؟","reading":"إِيه اللِّي بِيِتْحَطّ عَلَيْه رَائِد الفَضَاء؟"},{"id":"f00884c6","text":"إيه اللي عالي ومبني بالحجارة؟","reading":"إِيه اللِّي عَالِي وَمَبْنِي بِالحِجَارَة؟"},{"id":"195d13b9","text":"إيه اللي بنشعله في الظلام؟","reading":"إِيه اللِّي بِنِشْعِلُه فِي الظَّلَام؟"},{"id":"7c91fe2a","text":"إيه اللي رواد الفضاء بينامو فيه؟","reading":"إِيه اللِّي رُوَّاد الفَضَاء بِيِنَامُو فِيه؟"},{"id":"0797c1c4","text":"مين بيعيش في الفضا ولونه أخضر؟","reading":"مِين بِيعِيش فِي الفَضَا وَلَوْنُه أَخْضَر؟"},{"id":"a8cc7481","text":"إيه اللي بيحمي الفارس في المعركة؟","reading":"إِيه اللِّي بِيْحْمِي الفَارِس فِي المَعْرَكَة؟"},{"id":"17d5c453","text":"مين لابس تاج وجالس على كرسي الحكم؟","reading":"مِين لَابِس تَاج وَجَالِس عَلَى كُرْسِي الحُكْم؟"},{"id":"0316ae66","text":"إيه اللي بيطوف حوالين الأرض؟","reading":"إِيه اللِّي بِيْطُوف حَوَالِين الأَرْض؟"},{"id":"867ea3a3","text":"فين بتعيش الأميرة؟","reading":"فِين بِتْعِيش الأَمِيرَة؟"}];
+const CURRENT = (id) => `../assets/assets/games/learn_voice/ar/${id}.mp3`;  // the voice that is in the app now (works on the demo site)
+let db, mediaRec, stream, chunks = [], curId = null, audio = new Audio();
+
+function openDb() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('rehlaty_voice', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('rec');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+const tx = (mode) => db.transaction('rec', mode).objectStore('rec');
+const key = (id) => GROUP + '|' + id;
+const get = (id) => new Promise((res) => { const q = tx('readonly').get(key(id)); q.onsuccess = () => res(q.result); q.onerror = () => res(null); });
+const put = (id, v) => new Promise((res) => { const q = tx('readwrite').put(v, key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const del = (id) => new Promise((res) => { const q = tx('readwrite').delete(key(id)); q.onsuccess = () => res(); q.onerror = () => res(); });
+const done = new Set();
+
+function ext(type) { return /webm/.test(type) ? 'webm' : /ogg/.test(type) ? 'ogg' : /mp4|aac|m4a/.test(type) ? 'm4a' : /wav/.test(type) ? 'wav' : 'bin'; }
+function refresh() {
+  document.getElementById('count').textContent = `سجّلت ${done.size} من ${ITEMS.length}`;
+  document.getElementById('prog').style.width = (100 * done.size / ITEMS.length) + '%';
+}
+function build() {
+  const list = document.getElementById('list');
+  ITEMS.forEach((it, i) => {
+    const d = document.createElement('div'); d.className = 'row'; d.id = 'r_' + it.id;
+    d.innerHTML = `<div class="t">${i + 1}. ${it.text.replace(/</g, '&lt;')}</div>${it.reading && it.reading !== it.text ? `<div class="r">تُقرأ: ${it.reading.replace(/</g, '&lt;')}</div>` : ''}
+      <div class="btns"><button class="rec" data-a="rec">● سجّل</button><button class="ghost" data-a="mine" disabled>▶ تسجيلي</button><button class="ghost" data-a="cur">▶ الحالي</button><button class="del" data-a="del" disabled>🗑️</button><span class="st"></span></div>`;
+    d.addEventListener('click', (e) => { const a = e.target.dataset && e.target.dataset.a; if (a) act(it, d, e.target, a); });
+    list.appendChild(d);
+  });
+}
+function mark(d, on) {
+  d.classList.toggle('done', on);
+  d.querySelector('[data-a=mine]').disabled = !on; d.querySelector('[data-a=del]').disabled = !on;
+  d.querySelector('.st').textContent = on ? '✓ اتسجلت' : '';
+}
+async function act(it, d, btn, a) {
+  if (a === 'cur') { audio.pause(); audio = new Audio(CURRENT(it.id)); audio.play().catch(() => { d.querySelector('.st').textContent = 'الصوت الحالي مش متاح هنا'; }); return; }
+  if (a === 'mine') { const v = await get(it.id); if (v) { audio.pause(); audio = new Audio(URL.createObjectURL(v.blob)); audio.play(); } return; }
+  if (a === 'del') { await del(it.id); done.delete(it.id); mark(d, false); refresh(); return; }
+  if (a === 'rec') {
+    if (mediaRec && mediaRec.state === 'recording') { mediaRec.stop(); return; }
+    try { stream = stream || await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); }
+    catch (e) { alert('محتاج إذن الميكروفون. اسمح للمتصفح باستخدام الميكروفون وجرّب تاني.'); return; }
+    audio.pause(); chunks = []; curId = it.id;
+    const opts = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? { mimeType: 'audio/webm;codecs=opus' } : {};
+    mediaRec = new MediaRecorder(stream, opts);
+    mediaRec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mediaRec.onstop = async () => {
+      d.classList.remove('live'); btn.textContent = '● سجّل'; btn.classList.add('rec');
+      const blob = new Blob(chunks, { type: mediaRec.mimeType || 'audio/webm' });
+      if (blob.size < 1500) { d.querySelector('.st').textContent = 'التسجيل قصير أوي، جرّب تاني'; return; }
+      await put(it.id, { blob, type: blob.type, text: it.text, at: Date.now() });
+      done.add(it.id); mark(d, true); refresh();
+      const nx = d.nextElementSibling; if (nx) nx.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+    d.classList.add('live'); btn.textContent = '■ وقّف'; d.querySelector('.st').textContent = 'بيسجّل...';
+    mediaRec.start();
+  }
+}
+// a tiny zip writer (stored, no compression) so no library is needed
+function crc32(buf) { let c, crc = -1; for (let i = 0; i < buf.length; i++) { c = (crc ^ buf[i]) & 255; for (let k = 0; k < 8; k++) c = c & 1 ? (c >>> 1) ^ 0xEDB88320 : c >>> 1; crc = (crc >>> 8) ^ c; } return (crc ^ -1) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(); const parts = []; const central = []; let off = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name); const crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30)); lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, name.length, true);
+    parts.push(new Uint8Array(lh.buffer), name, f.data);
+    const ch = new DataView(new ArrayBuffer(46)); ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true); ch.setUint16(28, name.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), name); off += 30 + name.length + f.data.length;
+  }
+  let csize = 0; central.forEach((p) => csize += p.length);
+  const end = new DataView(new ArrayBuffer(22)); end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, csize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/zip' });
+}
+document.getElementById('zip').onclick = async () => {
+  const files = [], manifest = [];
+  for (const it of ITEMS) { const v = await get(it.id); if (!v) continue; const name = `${it.id}.${ext(v.type)}`; files.push({ name, data: new Uint8Array(await v.blob.arrayBuffer()) }); manifest.push({ id: it.id, text: it.text, file: name }); }
+  if (!files.length) { alert('لسه ما سجلتش حاجة'); return; }
+  files.push({ name: 'manifest.json', data: new TextEncoder().encode(JSON.stringify({ group: GROUP, items: manifest }, null, 1)) });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(makeZip(files)); a.download = `rehlaty_voice_${GROUP}.zip`; a.click();
+};
+document.getElementById('wipe').onclick = async () => { if (!confirm('تمسح كل تسجيلات الصفحة دي؟')) return; for (const it of ITEMS) { await del(it.id); done.delete(it.id); mark(document.getElementById('r_' + it.id), false); } refresh(); };
+(async () => { db = await openDb(); build(); for (const it of ITEMS) { const v = await get(it.id); if (v) { done.add(it.id); mark(document.getElementById('r_' + it.id), true); } } refresh(); })();
+</script>
+</body>
+</html>

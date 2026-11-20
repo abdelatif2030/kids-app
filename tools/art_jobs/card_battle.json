@@ -1,0 +1,72 @@
+{
+  "kind_sprite": "Single subject centered, full view, plain pure white background, no ground, no shadow, no text.",
+  "style": "Glossy 3D cartoon mobile game art, cute neon sci-fi, bold clean shapes, vivid saturated colors, soft studio lighting, kid friendly, no text, no letters.",
+  "suffix": "No text, no letters, no people.",
+  "jobs": [
+    {
+      "prompt": "Round portrait of a cute little blue and white robot head with glowing cyan visor eyes and a tiny antenna, friendly face, front view.",
+      "name": "avatar_robot",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "Cute green alien overlord with big black eyes and two antennae inside a glass dome of a purple flying saucer, pink glowing lights, front view.",
+      "name": "avatar_alien",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A purple and pink flying saucer UFO with a glass dome and a small green alien captain inside, glowing magenta lights around the rim, three quarter front view, hovering.",
+      "name": "ufo",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A small futuristic robot defense tower base, blue and white round dome with a cyan glowing core and a small cannon on top, sitting on a round glowing cyan pad, front three quarter view.",
+      "name": "base",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A tiny round cute blue and white robot soldier with a dark visor with two glowing cyan eyes, a little yellow antenna light, stubby arms, front view.",
+      "name": "unit_spark",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A small cute blue robot gunner holding a big cyan laser blaster, round helmet with glowing visor, front three quarter view.",
+      "name": "unit_blaster",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A big chunky cute blue and white hammer mech robot with huge round fists and a giant hammer, heavy tank body, glowing cyan chest, front view.",
+      "name": "unit_smash",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A cute blue and white sci-fi laser turret on a round base, twin cyan barrels, glowing core, front three quarter view.",
+      "name": "unit_turret",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A cute pink and purple alien slime blob monster with two big eyes and a goofy smile, glossy and glowing magenta, front view.",
+      "name": "unit_slime",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A small cute pink and magenta alien space bug beetle with big eyes, little wings and six tiny legs, glossy, front three quarter view.",
+      "name": "unit_bug",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A big chunky cute purple and magenta alien brute monster with huge arms, small angry eyes and one horn, grumpy but not scary, front view.",
+      "name": "unit_brute",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "A cute green and pink alien spitter creature with a wide round mouth holding green goo, big eyes, tentacle legs, front view.",
+      "name": "unit_spitter",
+      "kind": "sprite"
+    },
+    {
+      "prompt": "Deep space background, dark blue and purple nebula with small stars and a distant ringed planet, glowing pink and cyan clouds, no objects in the center, empty, vertical composition.",
+      "name": "bg_space",
+      "kind": "scene"
+    }
+  ]
+}
