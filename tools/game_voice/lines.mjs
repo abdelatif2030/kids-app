@@ -105,6 +105,10 @@ for (const q of timeMod.allTimeSentences()) add(q, 'ar'); // days and seasons le
 await imp('letters/topic_use_more.js');
 const topicUseMod = await imp('letters/topic_use.js');
 for (const q of topicUseMod.allTopicUseSentences()) add(q, 'ar'); // topic levels: what a thing is for
+for (const q of topicUseMod.allTopicExtraWords()) add(q, 'ar'); // topic levels: «فين ...؟» of the extra pictures (their facts need them)
+for (const q of lv.allBankSentences()) add(q, 'ar'); // extra questions of every level (counting, colours, letters with marks, the rainbow...)
+const habitsMore = await imp('letters/habits_more.js');
+for (const h of habitsMore.HABITS_MORE) add(h.text, 'ar'); // more habits
 const extrasMod = await imp('letters/extras.js');
 for (const q of extrasMod.allExtraSentences(colorsMod.colorOf)) add(q, 'ar'); // total fruit, the letter before, mixing colours, fruit or vegetable, where a vehicle goes
 const shapesAll = await imp('letters/shapes_all.js');

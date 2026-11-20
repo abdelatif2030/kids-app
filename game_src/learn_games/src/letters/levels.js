@@ -26,6 +26,7 @@ import { timeQuestions } from './time_level.js';
 import VOICED from './voiced.json' with { type: 'json' };
 import { buildBanks, allBankSentences as bankSentences, COUNT_OBJECTS } from './extra_bank.js';
 import { HABITS_MORE, familyOf } from './habits_more.js';
+import { NEW_LEVELS, NEW_ITEMS, allNewLevelSentences } from './new_levels.js';
 const VOICED_SET = new Set(VOICED);
 /** True when the sentence has a recorded clip. Tools may set globalThis.__LEARN_ASSUME_VOICED to count what the levels could offer once every new sentence is recorded. */
 const isVoiced = (q) => !!globalThis.__LEARN_ASSUME_VOICED || VOICED_SET.has(q);
@@ -114,6 +115,7 @@ for (const k of Object.keys(TOPIC_USE)) FACTS[k] = [...new Map(TOPIC_USE[k].map(
 export const TOPIC_LEVELS = TOPICS.map((t) => ({ id: t.id, mode: 'pick', table: t.id, ar: t.ar, emoji: t.emoji, skill: 'vocab', topic: true }));
 /** The twelve map levels, then the topic levels (reached from «مستويات أكتر»). */
 TOPIC_LEVELS.push({ id: 't_time', mode: 'time', ar: 'الأيام والفصول', emoji: '📅', skill: 'vocab', topic: true });
+TOPIC_LEVELS.push(...NEW_LEVELS); // 2026-11-20: opposites, patterns, senses and feelings, manners, safety (new_levels.js)
 export const ALL_LEVELS = [...LEVELS, ...TOPIC_LEVELS];
 export const COUNT_FRUITS = [['apple', null], ['banana', 'موزة'], ['orange', 'برتقالة'], ['strawberry', 'فراولة'], ['pear', 'كمثرى']].filter(([, w]) => !w || isVoiced(`كام ${w}؟`));
 export const levelOf = (id) => ALL_LEVELS.find((l) => l.id === id);
@@ -219,7 +221,7 @@ export const cheer = (girl, i) => (girl ? CHEERS_F : CHEERS_M)[i % CHEERS_M.leng
 export const TOPIC_TABLES = ['fruits', 'vehicles', ...TOPICS.map((t) => t.id)];
 export const BANKS = buildBanks({ PICKS, WORD_ITEMS, firstQ, wordReward, ALPHABET, HARAKAT, FORMS, CONNECTING, harakaQ, formQ, TOPIC_TABLES });
 /** Every sentence of the extra questions, for the voice list. */
-export const allBankSentences = () => bankSentences(BANKS);
+export const allBankSentences = () => [...bankSentences(BANKS), ...allNewLevelSentences()];
 export { COUNT_OBJECTS };
 
 /** One game of a level: rounds of { prompt, answer, reward, show, options: [{id, kind, ...}] }. */
@@ -638,6 +640,20 @@ export class LevelPlay {
         mark(k);
         const others = pickLow(q.pool.filter((x) => x.id !== q.right.id), nOpt - 1);
         out.push({ prompt: q.prompt, answer: q.right.id, key: k, options: [q.right, ...others].sort(() => r() - 0.5) });
+      }
+    } else if (mode === 'items') {
+      // the five levels of new_levels.js: every round is one item (a question with its own pictures or spoken choices); an item is asked only once ALL of its sentences are recorded
+      let items = NEW_ITEMS[this.level.id] || [];
+      const voiced = items.filter((x) => x.say.every(isVoiced));
+      if (voiced.length >= ROUNDS * 2) items = voiced; // (before any clip exists the device voice reads them rather than crashing)
+      const byKey = new Map(items.map((x) => [x.key, x]));
+      const nextI = tiered([0, 1, 2].map((t) => items.filter((x) => x.tier === t).map((x) => x.key)), (k) => k);
+      const ctx = { r, nOpt, age: this.age, seed: this.seed, pickLow };
+      for (let i = 0; i < ROUNDS; i++) {
+        const { item: k } = nextI();
+        const x = byKey.get(k);
+        mark(k);
+        out.push({ ...x.make(ctx), key: k });
       }
     } else if (mode === 'habit') {
       const nextH = bag(HABITS, (h) => `hb:${h.text}`); // one thing to learn per sentence (a picture can be the answer of several sentences)

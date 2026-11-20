@@ -22,7 +22,7 @@ test('every question and every sentence said after a right answer has a clip and
       mem.begin(lv.id);
       const p = new LevelPlay(lv.id, age, 4099 * v + age * 31 + lv.id.length, mem, WORLDS[(v * 5) % 12]);
       for (const r of p.rounds) {
-        for (const t of [r.prompt, r.reward]) {
+        for (const t of [r.prompt, r.reward, ...(r.read || [])]) {
           if (!t) continue;
           if (!byText.has(t)) { missing.add(t); continue; }
           if (!existsSync(new URL(`${byText.get(t)}.mp3`, CLIPS))) noClip.add(t);

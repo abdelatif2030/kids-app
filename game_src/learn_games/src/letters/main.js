@@ -285,7 +285,8 @@ class Game {
     let item = null, plaque = null, baseY = 0.06;
     if (o.kind === 'thing') {
       item = makeThing(o.thing);
-      const fi = fitThing(item, 2.15, 1.8);
+      const sz = o.scale || 1; // the same picture drawn big or small (opposites)
+      const fi = fitThing(item, 2.15 * sz, 1.8 * sz);
       baseY = 0.12 + lift - fi.minY;
       item.position.set(-0.1, baseY, 0);
       g.add(item);
@@ -337,7 +338,7 @@ class Game {
     if (this.standItem) { this.st.scene.remove(this.standItem); this.standItem = null; }
     this.stand.visible = false;
     if (!show) return;
-    this.stand.visible = true;
+    this.stand.visible = show.type !== 'row'; // a row of pictures (patterns) is wider than the table
     const g = new THREE.Group();
     if (show.type === 'thing') {
       const t = makeThing(show.thing);
@@ -382,7 +383,38 @@ class Game {
       place('orange', show.b, 1.15);
       g.userData.apples = fruits; // counted aloud one by one, like the apples
       g.userData.off = new THREE.Vector3(0, 0, this._portrait ? -1.0 : -1.6);
-    } else if (show.type === 'letter') {
+    } else if (show.type === 'row') {
+      // patterns: a row of colours, shapes or pictures; the empty place is a plaque with «؟»
+      const n = show.items.length;
+      const sp = Math.min(1.0, 4.0 / n);
+      const sz = sp * 0.88;
+      show.items.forEach((s, k) => {
+        let m;
+        if (s.kind === 'gap') {
+          m = this._plaque('؟', true);
+          m.scale.setScalar(sz * 0.8);
+          m.position.set(0, 0.76 + sz * 0.5, 0);
+        } else if (s.kind === 'color') {
+          m = new THREE.Mesh(new THREE.SphereGeometry(sz * 0.46, 22, 16), new THREE.MeshStandardMaterial({ color: s.hex, roughness: 0.18, metalness: 0.05 }));
+          m.position.set(0, 0.76 + sz * 0.46, 0);
+          m.castShadow = true;
+        } else if (s.kind === 'shape') {
+          m = new THREE.Mesh(shapeGeo(s.shape), new THREE.MeshStandardMaterial({ color: colorOf(s.color).hex, roughness: 0.25, metalness: 0.05 }));
+          m.scale.setScalar(sz * 0.5);
+          m.position.set(0, 0.76 + sz * 0.5, 0);
+          m.castShadow = true;
+        } else {
+          m = makeThing(s.thing);
+          const fi = fitThing(m, sz, sz);
+          m.position.y = 0.76 - fi.minY;
+        }
+        const holder = new THREE.Group();
+        holder.add(m);
+        holder.position.x = (k - (n - 1) / 2) * sp;
+        g.add(holder);
+      });
+      g.scale.setScalar(this._portrait ? 1.1 : 1.45); // it stands further back (clear of the question bar), so it is drawn bigger
+      g.userData.off = new THREE.Vector3(this._portrait ? 0 : 0.5, 0, this._portrait ? -1.0 : -1.9);    } else if (show.type === 'letter') {
       const p = this._plaque(show.ch, true);
       p.position.set(0, 1.7, 0);
       p.scale.setScalar(1.5);
@@ -678,9 +710,12 @@ class Game {
     this.levelId = levelId;
     this.level = ALL_LEVELS.find((l) => l.id === levelId);
     if (!keepSpin) this._spin = this.save.lw.spin || 0;
-    const worldIdx = Math.max(0, ALL_LEVELS.findIndex((l) => l.id === levelId)) + this._spin;
+    // a level may name the place that fits it (the new levels: a farm for opposites, a home for manners, a city for safety...); the others turn through the places
+    const fixedWorld = this.level.world ? WORLD_IDS.indexOf(this.level.world) : -1;
+    const worldIdx = fixedWorld >= 0 ? fixedWorld : Math.max(0, ALL_LEVELS.findIndex((l) => l.id === levelId)) + this._spin;
     this._goWorld(worldIdx);
     this.mem.begin(levelId);
+    if (/[?&]debug/.test(location.search)) window.__lw = this; // test hook: ?debug lets a tester put a round on screen (see docs/LEVELS_REPORT.md)
     this.firstTry = 0; // answers right at the first try in this game (the rating)
     this.learnedNow = []; // what was answered right at the first try (kept in the history)
     clearTimeout(this._endT);
@@ -730,13 +765,18 @@ class Game {
     this._say();
   }
 
-  _say() {
+  /** Says the question. With [full], a round whose choices are WORDS (manners, safety: 
+ead) also reads every choice aloud, one after the other, and the choice being read hops. */
+  _say(full = true) {
     const r = this.play.cur;
     if (!r) return;
     this.sh.sound.play('sparkle');
     this.owl.act('point');
     if (this.hero) { this.hero.look(0); this.hero.act('point'); }
-    this.sh.speak(r.prompt);
+    if (full && r.read && r.read.length) {
+      const ids = r.options.map((o) => o.id);
+      this.sh.speak([r.prompt, ...r.read], (i) => { const o = i > 0 ? this.opts.get(ids[i - 1]) : null; if (o) o.wig = 0.6; });
+    } else this.sh.speak(r.prompt);
   }
 
   _tap(id) {
@@ -752,7 +792,7 @@ class Game {
       this._pet((p) => { p.shake = 0.7; });
       this.sh.say(this.sh.t('no'), false, 1.6);
       if (ev.firstMiss) this.sh.round(this.level.skill, false, r.answer);
-      setTimeout(() => this.st.mode === 'wait' && this._say(), 900);
+      setTimeout(() => this.st.mode === 'wait' && this._say(false), 900);
       return;
     }
     if (ev.first) { this.sh.round(this.level.skill, true, r.answer); this.firstTry = (this.firstTry || 0) + 1; (this.learnedNow = this.learnedNow || []).push(r.prompt); }

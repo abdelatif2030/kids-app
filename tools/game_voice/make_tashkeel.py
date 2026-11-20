@@ -70,11 +70,17 @@ tashkeel_topics.add(M)
 strip = lambda s: re.sub('[ً-ْـٰ]', '', s)
 import tashkeel_auto, tashkeel_words
 _known = json.load(open('tools/game_voice/tashkeel.json', encoding='utf8')) if os.path.exists('tools/game_voice/tashkeel.json') else {}
-import tashkeel_words2
-_dict = tashkeel_auto.build({**_known, **M}, {**tashkeel_words.WORDS, **tashkeel_words2.WORDS2})
+import tashkeel_words2, tashkeel_words3, tashkeel_words4
+M.update(tashkeel_words4.SENT4)
+_dict = tashkeel_auto.build({**_known, **M}, {**tashkeel_words.WORDS, **tashkeel_words2.WORDS2, **tashkeel_words3.WORDS3, **tashkeel_words4.WORDS4})
+_unknown = set()
 for _l in json.load(open('assets/games/learn_voice/lines.json', encoding='utf8')):
     if _l['lang'] == 'ar' and _l['text'] not in M:
-        M[_l['text']] = tashkeel_auto.compose(_l['text'], _dict)[0]
+        _r, _u = tashkeel_auto.compose(_l['text'], _dict)
+        M[_l['text']] = _r
+        _unknown.update(_u)
+if _unknown:
+    print('words with no reading yet:', ' '.join(sorted(_unknown)))
 lines = [l['text'] for l in json.load(open('assets/games/learn_voice/lines.json', encoding='utf8')) if l['lang'] == 'ar']
 miss = [t for t in lines if t not in M]
 # the voice may read a slightly different spelling than the on-screen text (owner choice); only these may differ

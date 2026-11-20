@@ -7,6 +7,7 @@ import { FreshMemory } from '../src/letters/fresh.js';
 import { FOODS, PLACES, ANIMALS } from '../src/animals/sim.js';
 import { SHAPES_ALL } from '../src/letters/shapes_all.js';
 import { COLOR_THINGS } from '../src/letters/colors.js';
+import { CONCEPT_IDS } from '../src/kit/concepts3d.js';
 
 // "nothing is hidden": every picture a question can show must be a real picture (the owner's art, or a thing the 3D kit draws),
 // never the beach-ball placeholder that an unknown name falls back to.
@@ -17,7 +18,7 @@ const ACTORS = readFileSync(new URL('../src/kit/actors.js', import.meta.url), 'u
 const mapped = new Set([...ACTORS.matchAll(/(?:^|[\s{,])([a-z_0-9]+):\s*'([a-z_0-9]+)'/g)].map((m) => m[1]));
 const CODE = new Set(['../src/kit/things3d.js', '../src/kit/toys3d.js'].flatMap((f) => [...readFileSync(new URL(f, import.meta.url), 'utf8').matchAll(/^  ([a-z_0-9]+)\s*[:(]/gm)].map((m) => m[1])));
 const ruleAllPictures = /Object\.keys\(DIMS\)\)\s*if \(!ART_FILE\[n\]\)/.test(ACTORS);
-const known = (id) => (ruleAllPictures && !!DIMS[id]) || mapped.has(id) || MORE_WORDS.some((w) => w.thing === id) || CODE.has(id);
+const known = (id) => (ruleAllPictures && !!DIMS[id]) || mapped.has(id) || MORE_WORDS.some((w) => w.thing === id) || CODE.has(id) || CONCEPT_IDS.includes(id);
 const WORLDS = ['meadow', 'farm', 'beach', 'space', 'rainbow', 'city', 'snow', 'castle', 'underwater', 'jungle', 'desert', 'home'];
 
 test('every picture of every question of every level and age is a real picture', () => {

@@ -25,7 +25,7 @@ for (const lv of LEVELS) {
       const same = b.filter((k) => a.includes(k));
       // levels whose whole bank is small (counting 1-20, shapes 20, colours 25...) can share a few things; the others share none
       // topic levels hold 11-21 pictures: a replay (8 of them) can only share what does not fit
-      const limit = lv.mode === 'time' ? 3 : lv.topic ? Math.max(2, 2 * ROUNDS - PICKS[lv.table].items.length) : ['counting', 'shapes', 'colors', 'letters', 'order'].includes(lv.id) ? 3 : 1;
+      const limit = lv.mode === 'time' || lv.mode === 'items' ? 3 : lv.topic ? Math.max(2, 2 * ROUNDS - PICKS[lv.table].items.length) : ['counting', 'shapes', 'colors', 'letters', 'order'].includes(lv.id) ? 3 : 1;
       assert.ok(same.length <= limit, `${lv.id} age ${age}: the replay repeats ${same.length} things (${same.join(' ')})`);
     }
   });
