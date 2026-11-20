@@ -125,8 +125,8 @@ class _WebGameScreenState extends State<WebGameScreen> {
           // (owner 2026-11-20: a SMALL round back button on both the left and the right edge of every FUN game, so the child can
           // always get out; learning games keep their own top bar)
           if (!widget.game.isLearning) ...[
-            Align(alignment: Alignment.centerLeft, child: _EdgeBack(key: const ValueKey('web_game_back_left'), onTap: () => Navigator.maybePop(context))),
-            Align(alignment: Alignment.centerRight, child: _EdgeBack(key: const ValueKey('web_game_back_right'), onTap: () => Navigator.maybePop(context))),
+            // owner 2026-11-20: ONE small back button, top left, in every fun game
+            Align(alignment: Alignment.topLeft, child: SafeArea(child: _EdgeBack(key: const ValueKey('web_game_back'), onTap: () => Navigator.maybePop(context)))),
           ],
         ],
       ),
@@ -208,7 +208,7 @@ class _EdgeBack extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.fromLTRB(6, 6, 0, 0),
       child: Semantics(
         button: true,
         label: tr2('رجوع', 'Back'),
