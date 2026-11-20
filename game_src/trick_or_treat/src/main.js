@@ -3,7 +3,8 @@
 // A cosy Halloween side-scrolling runner: tap = jump, hold = higher. Ring friendly doorbells to add kids, skip grumpy ones,
 // hop hazards, push through hedges with a big crowd, beat the giant inflatable spider. Art and sound are made in code.
 import { Sim, buildLevel, normalizeSave, applyResult, buyCostume, kidSlot, hazardBox, sprinklerPhase, easyFor, COSTUMES, NUM_LEVELS, MAX_KIDS } from './sim.js';
-import { THEMES, sprite, drawKid, drawPorch, drawPit, drawSprinkler, drawDog, drawJack, drawHedge, drawSpider, buildTile, buildSky, drawMoon, drawLeaf, drawHero } from './art.js';
+import { loadArt } from '../../cozy_kit/art.js';
+import { setPics, THEMES, sprite, drawKid, drawPorch, drawPit, drawSprinkler, drawDog, drawJack, drawHedge, drawSpider, buildTile, buildSky, drawMoon, drawLeaf, drawHero } from './art.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n, rng } from '../../cozy_kit/ui.js';
 
@@ -44,6 +45,7 @@ class Game {
     this.leaves = Array.from({ length: 22 }, (_, i) => ({ x: (i * 0.137) % 1, y: (i * 0.291) % 1, s: 0.5 + (i % 5) * 0.2, r: i, v: 0.05 + (i % 4) * 0.03 }));
     this.kidStamp = new Map();
     this._resize(); this.ro = new ResizeObserver(() => this._resize()); this.ro.observe(el);
+    this.pics = {}; loadArt(this.base, [...THEMES.map((t) => 'houses_' + t.id), 'dog']).then((a) => { this.pics = a; setPics(a); });
     this._bind(); this.last = performance.now();
     this._fonts().then(() => { this.showMenu(); this._loop(); });
   }
@@ -270,8 +272,23 @@ class Game {
     g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0); g.direction = 'ltr';
     g.drawImage(this.sky, 0, 0, W, H);
     const hxw = hero.x; const X = (wx) => this.hx + (wx - hxw) * u;
-    drawMoon(g, W * 0.78 - hxw * u * 0.01 % W, gy - 7.4 * u, u * 0.9, th);
-    this._tile(g, this.tiles.far, 0.12, hxw, gy - 12 * u); this._tile(g, this.tiles.mid, 0.38, hxw, gy - 12 * u);
+    const bgp = this.pics && this.pics['houses_' + th.id];
+    if (bgp) {
+      // painted street picture (moon, houses, trees), bottom edge hidden behind the fence; its top fades into the sky.
+      // Drawn mirrored side by side so it repeats without a seam. The faded copy is built once per picture and screen size.
+      const ph = Math.round(gy * 0.68 + 0.6 * u); const sh = bgp.naturalHeight * 0.8; const pw = Math.round(ph * bgp.naturalWidth / sh);
+      const bk = `${th.id}|${pw}|${ph}`;
+      if (this.bgKey !== bk) {
+        const c = document.createElement('canvas'); c.width = pw; c.height = ph; const q = c.getContext('2d');
+        q.drawImage(bgp, 0, 0, bgp.naturalWidth, sh, 0, 0, pw, ph);
+        q.globalCompositeOperation = 'destination-out'; const fg = q.createLinearGradient(0, 0, 0, ph * 0.38); fg.addColorStop(0, 'rgba(0,0,0,1)'); fg.addColorStop(1, 'rgba(0,0,0,0)'); q.fillStyle = fg; q.fillRect(0, 0, pw, ph * 0.38);
+        this.bgCv = c; this.bgKey = bk;
+      }
+      const top = gy + 0.6 * u - ph; const sc = ((hxw * u * 0.2) % (pw * 2) + pw * 2) % (pw * 2);
+      for (let k = 0; k * pw - sc < W; k++) { const x = k * pw - sc; if (x + pw < 0) continue; if (k % 2) { g.save(); g.translate(x + pw, top); g.scale(-1, 1); g.drawImage(this.bgCv, 0, 0); g.restore(); } else g.drawImage(this.bgCv, x, top); }    } else {
+      drawMoon(g, W * 0.78 - hxw * u * 0.01 % W, gy - 7.4 * u, u * 0.9, th);
+      this._tile(g, this.tiles.far, 0.12, hxw, gy - 12 * u); this._tile(g, this.tiles.mid, 0.38, hxw, gy - 12 * u);
+    }
     // ground under everything
     g.fillStyle = th.ground; g.fillRect(0, gy - 1.2 * u, W, H - gy + 1.2 * u);
     this._tile(g, this.tiles.lane, 1.0, hxw, gy - 12 * u);

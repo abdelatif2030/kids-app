@@ -45,6 +45,8 @@ export class Backdrop {
     this.c = SKIES[theme] ?? SKIES.jungle;
   }
 
+  setPics(p) { this.pic = p?.['sky_' + this.theme] || null; }
+
   /** (Re)paints the layers for a screen of w x h device pixels. */
   build(w, h) {
     this.w = w;
@@ -96,6 +98,13 @@ export class Backdrop {
         g.ellipse(cx + (k - 1.5) * h * 0.035, cy + (k % 2) * h * 0.01, h * 0.05, h * 0.025, 0, 0, Math.PI * 2);
         g.fill();
       }
+    }
+    if (this.pic) {
+      // painted sky picture, covering the screen (the code-drawn mountains and trees still scroll in front)
+      const pw = this.pic.naturalWidth; const ph = this.pic.naturalHeight; const k = Math.max(w / pw, h / ph);
+      g.drawImage(this.pic, (w - pw * k) / 2, (h - ph * k) / 2, pw * k, ph * k);
+      // a soft dark band at the top keeps the HUD readable over bright painted clouds
+      const tg = g.createLinearGradient(0, 0, 0, h * 0.25); tg.addColorStop(0, 'rgba(10,20,20,0.32)'); tg.addColorStop(1, 'rgba(10,20,20,0)'); g.fillStyle = tg; g.fillRect(0, 0, w, h * 0.25);
     }
     this.sky = sky;
 

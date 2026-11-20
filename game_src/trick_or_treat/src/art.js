@@ -12,6 +12,9 @@ export const THEMES = [
 ];
 
 const OUT = '#2a1a3a';
+// Optional painted pictures (set once by main.js); each drawing falls back to the code version when its picture is missing.
+let PIC = {};
+export function setPics(p) { PIC = p || {}; }
 function rr(g, x, y, w, h, r) { g.beginPath(); g.roundRect(x, y, w, h, r); }
 function ell(g, x, y, rx, ry, fill, stroke) { g.beginPath(); g.ellipse(x, y, rx, ry, 0, 0, 6.2832); if (fill) { g.fillStyle = fill; g.fill(); } if (stroke) { g.strokeStyle = stroke; g.lineWidth = 3; g.stroke(); } }
 function fs(g, fill, w = 3) { g.fillStyle = fill; g.fill(); g.strokeStyle = OUT; g.lineWidth = w; g.lineJoin = 'round'; g.stroke(); }
@@ -243,6 +246,7 @@ export function drawDog(g, x, gy, u, time, awake) {
   const run = awake ? Math.sin(time * 18) : 0;
   const k = u;
   g.save(); g.translate(x + 0.5 * k, gy); g.scale(-1, 1); // faces left, running toward the hero
+  if (PIC.dog) { const dw = 1.9 * k; const dh = dw * PIC.dog.naturalHeight / PIC.dog.naturalWidth; g.scale(-1, 1); g.translate(0.3 * k, -Math.abs(run) * 0.06 * k); g.drawImage(PIC.dog, -dw / 2, -dh, dw, dh); g.restore(); if (awake) { g.fillStyle = '#ffe04a'; g.font = `900 ${u * 0.9}px system-ui`; g.textAlign = 'center'; g.fillText('!', x + 0.4 * u, gy - 1.6 * u); } return; }
   g.strokeStyle = OUT; g.lineWidth = k * 0.08; g.lineJoin = 'round';
   rr(g, -0.5 * k, -0.9 * k + Math.abs(run) * 0.05 * k, 1.2 * k, 0.6 * k, 0.3 * k); g.fillStyle = '#c8905a'; g.fill(); g.stroke();
   for (const [lx, s] of [[-0.35, 1], [-0.05, -1], [0.3, 1], [0.55, -1]]) { rr(g, lx * k + s * run * 0.12 * k, -0.4 * k, 0.16 * k, 0.4 * k, 0.07 * k); g.fillStyle = '#a8703a'; g.fill(); g.stroke(); }
@@ -257,6 +261,7 @@ export function drawJack(g, x, gy, u, time, w = 1.1, face = true) {
   const r = w * u * 0.5 + 0.05 * u;
   g.save(); g.translate(x + w * u / 2, gy - r);
   g.rotate(-time * 5);
+  if (PIC.jack) { g.drawImage(PIC.jack, -r * 1.05, -r * 1.05, r * 2.1, r * 2.1); g.restore(); return; }
   ell(g, 0, 0, r, r * 0.95, '#ff8a20', OUT);
   g.strokeStyle = '#c85a10'; g.lineWidth = u * 0.08; for (const k of [-0.5, 0, 0.5]) { g.beginPath(); g.ellipse(0, 0, Math.abs(k) * r + r * 0.15, r * 0.93, 0, -1.3, 1.3); g.stroke(); }
   g.fillStyle = '#ffe04a'; g.beginPath(); g.moveTo(-r * 0.5, -r * 0.1); g.lineTo(-r * 0.15, -r * 0.1); g.lineTo(-r * 0.32, -r * 0.45); g.fill(); g.beginPath(); g.moveTo(r * 0.5, -r * 0.1); g.lineTo(r * 0.15, -r * 0.1); g.lineTo(r * 0.32, -r * 0.45); g.fill();

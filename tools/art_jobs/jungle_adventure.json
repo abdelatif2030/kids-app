@@ -1,0 +1,37 @@
+{
+ "style": "Bright cel-shaded 2D cartoon game art with bold dark outlines, painted, warm saturated colors, kid friendly, no text.",
+ "kind_sprite": "Single subject centered, full body visible, side view, plain white background, no shadow on the ground, no text.",
+ "suffix": "Wide painted game backdrop, no characters, no people, no text, no frame.",
+ "jobs": [
+  {
+   "name": "sky_jungle",
+   "kind": "scene",
+   "prompt": "Painted jungle valley backdrop: misty teal-blue mountains with thin waterfalls, soft clouds, low light, large green jungle canopy silhouettes at the very bottom. Calm horizontal landscape, empty sky area in the upper half."
+  },
+  {
+   "name": "sky_ruins",
+   "kind": "scene",
+   "prompt": "Painted backdrop of ancient overgrown stone ruins and mossy towers far away in a green jungle valley, soft golden haze, pale green sky with clouds, empty sky area in the upper half. Horizontal landscape."
+  },
+  {
+   "name": "sky_temple",
+   "kind": "scene",
+   "prompt": "Painted backdrop of a sunset sky over distant stepped stone temple pyramids and orange cliffs, glowing sun low on the horizon, warm orange and pink clouds, empty sky area in the upper half. Horizontal landscape."
+  },
+  {
+   "name": "beetle",
+   "kind": "sprite",
+   "prompt": "A grumpy-cute round pink-red beetle with a shiny shell with yellow spots, a purple head and little legs, walking, strictly side view facing left."
+  },
+  {
+   "name": "bat",
+   "kind": "sprite",
+   "prompt": "A cute purple cartoon bat with wings spread wide, yellow eyes, small pointy ears, flat sticker illustration of one single bat, isolated on a pure white background, nothing else in the picture."
+  },
+  {
+   "name": "relic",
+   "kind": "sprite",
+   "prompt": "A small green jade gemstone idol shaped like a shield with a simple carved smiling face, shiny, flat sticker illustration of one single object, isolated on a pure white background, nothing else in the picture."
+  }
+ ]
+}

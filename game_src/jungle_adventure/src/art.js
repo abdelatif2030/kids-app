@@ -612,6 +612,14 @@ export function drawHero(ctx, x, y, s, kind = 'girl', look = DEFAULT_LOOK[kind])
 
 // ---- creatures --------------------------------------------------------------------------------------------------
 
+// Optional painted pictures (set once by main.js); each drawing below falls back to the code drawing when its picture is missing.
+let PIC = {};
+export function setPics(p) { PIC = p || {}; }
+function pic(ctx, img, cx, bottom, w) {
+  const h = w * img.naturalHeight / img.naturalWidth;
+  ctx.drawImage(img, cx - w / 2, bottom - h, w, h);
+}
+
 export function drawBeetle(ctx, b, t) {
   ctx.save();
   ctx.translate(b.x, b.y);
@@ -620,6 +628,12 @@ export function drawBeetle(ctx, b, t) {
     ctx.globalAlpha = Math.max(0, 1 - b.squash * 1.5);
   }
   ctx.scale(b.vx > 0 ? -1 : 1, 1);
+  if (PIC.beetle) {
+    ctx.rotate(Math.sin(t * 14 + b.x) * 0.05);
+    pic(ctx, PIC.beetle, -0.05, 0.02, 1.1);
+    ctx.restore();
+    return;
+  }
   line(ctx, 0.055);
   // legs
   const w = Math.sin(t * 16 + b.x) * 0.06;
@@ -659,6 +673,14 @@ export function drawBeetle(ctx, b, t) {
 export function drawBat(ctx, bat, t) {
   ctx.save();
   ctx.translate(bat.x, bat.y);
+  if (PIC.bat) {
+    const f2 = Math.sin(t * 18 + bat.phase);
+    ctx.scale(1 + f2 * 0.06, 1 - f2 * 0.08);
+    const bh = 1.15 * PIC.bat.naturalHeight / PIC.bat.naturalWidth;
+    ctx.drawImage(PIC.bat, -0.575, -bh / 2, 1.15, bh);
+    ctx.restore();
+    return;
+  }
   line(ctx, 0.05);
   const f = Math.sin(t * 18 + bat.phase);
   for (const sx of [-1, 1]) {
@@ -725,6 +747,12 @@ export function drawRelic(ctx, x, y, t) {
   g.addColorStop(1, 'rgba(120,255,170,0)');
   ctx.fillStyle = g;
   ctx.fillRect(-0.9, -0.9, 1.8, 1.8);
+  if (PIC.relic) {
+    const rh = 0.95 * PIC.relic.naturalHeight / PIC.relic.naturalWidth;
+    ctx.drawImage(PIC.relic, -0.475, -rh * 0.55, 0.95, rh);
+    ctx.restore();
+    return;
+  }
   line(ctx, 0.055);
   ctx.beginPath();
   ctx.moveTo(0, -0.42);

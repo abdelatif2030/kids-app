@@ -4,8 +4,9 @@
 // 2D canvas, art and sound made in code. No network, no links, no ads, no tracking.
 import { LEVELS, ROWS } from './levels.js';
 import { Sim, P } from './sim.js';
-import { THEMES, drawSolid, drawLedge, drawSpikes, drawHero, drawBeetle, drawBat, drawCoin, drawRelic, drawPower, drawFlag, drawGoal, drawShield } from './art.js';
+import { setPics, THEMES, drawSolid, drawLedge, drawSpikes, drawHero, drawBeetle, drawBat, drawCoin, drawRelic, drawPower, drawFlag, drawGoal, drawShield } from './art.js';
 import { Backdrop } from './backdrop.js';
+import { loadArt } from '../../cozy_kit/art.js';
 import { Sound } from './audio.js';
 import { normalizeSave, applyLevel } from './save.js';
 import { HEROES, CATS, SHOP, ITEM, owns, buy, wear, lookOf } from './shop.js';
@@ -69,6 +70,12 @@ class Game {
     this.ro = new ResizeObserver(() => this._resize());
     this.ro.observe(el);
     this.last = performance.now();
+    // optional painted pictures (assets/games/jungle_adventure/art/*.webp); every one falls back to the code drawing
+    this.pics = {};
+    loadArt(this.base, ['sky_jungle', 'sky_ruins', 'sky_temple', 'beetle', 'relic']).then((a) => {
+      this.pics = a; setPics(a);
+      if (this.backdrop) { this.backdrop.setPics(a); this.backdrop.build(this.canvas.width, this.canvas.height); }
+    });
     this._fonts().then(() => {
       this.loading.remove();
       this.showMenu();
@@ -112,6 +119,7 @@ class Game {
     if (this.theme === theme && this.backdrop) return;
     this.theme = theme;
     this.backdrop = new Backdrop(theme);
+    this.backdrop.setPics(this.pics);
     this.backdrop.build(this.canvas.width, this.canvas.height);
     this.sprites.clear();
   }

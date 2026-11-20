@@ -1,0 +1,52 @@
+{
+ "style": "Hand-painted toy-like 3D cartoon Halloween game art, warm glowing porch lights, cozy suburban neighborhood at night, rich purple and orange colors, kid friendly, no text.",
+ "kind_sprite": "Single subject centered, full body visible, side view, plain white background, no shadow on the ground, no text.",
+ "suffix": "Wide background, no characters, no people, no text, no frame.",
+ "jobs": [
+  {
+   "name": "houses_lane",
+   "kind": "scene",
+   "prompt": "A row of cozy two-storey suburban houses with glowing yellow windows and porches, orange autumn trees and a street lamp, deep purple twilight sky with stars and a big pale moon, soft purple fog at the bottom. Eye-level street view."
+  },
+  {
+   "name": "houses_park",
+   "kind": "scene",
+   "prompt": "A quiet neighborhood park edge with blue-grey houses with lit windows behind trees, teal night sky with a bright moon, soft mist, a lamp post. Eye-level view."
+  },
+  {
+   "name": "houses_mansion",
+   "kind": "scene",
+   "prompt": "A spooky-cute purple mansion with towers and glowing windows on a hill with crooked trees, violet night sky with stars and big moon, bats far away, friendly not scary. Eye-level view."
+  },
+  {
+   "name": "houses_farm",
+   "kind": "scene",
+   "prompt": "A countryside farm at Halloween dusk: red barn with lit windows, hay bales, scarecrow silhouette far away, orange and dark red sunset sky, orange autumn trees. Eye-level view."
+  },
+  {
+   "name": "houses_hill",
+   "kind": "scene",
+   "prompt": "A wide view of a gentle grassy hill with a few small cozy houses with glowing windows far away, big pink and golden sunset sky with clouds and a low sun taking the upper half of the picture, orange autumn trees, a picket fence at the bottom. Eye-level view."
+  },
+  {
+   "name": "houses_bridge",
+   "kind": "scene",
+   "prompt": "A neighborhood by a small canal with a stone bridge, teal and aqua night sky with a bright moon, houses with lit windows reflecting in the water, lanterns. Eye-level view."
+  },
+  {
+   "name": "houses_parade",
+   "kind": "scene",
+   "prompt": "A festive Halloween parade street at night with houses decorated with string lights, paper lanterns and bunting, deep blue and magenta sky, warm glowing windows. Eye-level view."
+  },
+  {
+   "name": "jack",
+   "kind": "sprite",
+   "prompt": "A round carved orange jack-o'-lantern pumpkin with a friendly glowing grin and triangle eyes, green stem, front view."
+  },
+  {
+   "name": "dog",
+   "kind": "sprite",
+   "prompt": "A grumpy-cute brown dog barking, standing on all four legs, floppy ears, strictly side view facing left."
+  }
+ ]
+}
