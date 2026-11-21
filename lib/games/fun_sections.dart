@@ -26,7 +26,7 @@ final List<FunSection> kFunSections = [
   FunSection('runners', '🏃', () => tr2('جري وقفز', 'Runners & Jumpers'), const Color(0xFF2AB8D8), const Color(0xFF7AF0C8), ['jungle_adventure', 'cloud_dash', 'alien_sky', 'rhino_summit', 'fizz_runner', 'ball_scoop', 'sky_capy', 'golden_tail', 'rhythm', 'fox_family', 'hop_world', 'trick_or_treat', 'sky_jumper']),
   FunSection('build', '🏡', () => tr2('مزارع ومشاريع', 'Farms & Businesses'), const Color(0xFF5AA83A), const Color(0xFFFFE04A), ['happy_farm', 'pumpkin_pie', 'space_store', 'honey_farm', 'pearl_divers', 'winter_camp', 'castaway_raft', 'creator_tycoon', 'hot_spring', 'mars_farm', 'gem_quarry', 'rug_cleaning']),
   FunSection('puzzle', '🧩', () => tr2('ألغاز وتفكير', 'Puzzles & Brain'), const Color(0xFF3A6AE8), const Color(0xFFB8A8FF), ['marble_dozer', 'frost_coil', 'chomp_maze', 'gum_ball', 'hungry_frog', 'deep_sea', 'pin_puzzle', 'tomb_puzzle', 'sweet_tray']),
-  FunSection('girls', '🎀', () => tr2('عالم البنات', 'Girls World'), const Color(0xFFFF6AA8), const Color(0xFFFFD8EC), ['fashion_queen', 'little_princess_dress', 'baby_and_pet', 'little_salon', 'cupcake_shop', 'butterfly_garden']),
+  FunSection('girls', '🎀', () => tr2('عالم البنات', 'Girls World'), const Color(0xFFFF6AA8), const Color(0xFFFFD8EC), ['fashion_queen', 'girls_world']),
 ];
 
 /// One emoji per fun game: the fallback picture of a card until the game's own picture exists.
@@ -91,11 +91,7 @@ const Map<String, String> kFunGameEmoji = {
   'tomb_puzzle': '🏺',
   'sweet_tray': '🍰',
   'fashion_queen': '👗',
-  'butterfly_garden': '🦋',
-  'cupcake_shop': '🧁',
-  'little_salon': '💇‍♀️',
-  'baby_and_pet': '🍼',
-  'little_princess_dress': '👸',
+  'girls_world': '👸',
   'sky_jumper': '🐸',
 };
 

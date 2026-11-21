@@ -1,10 +1,85 @@
-# برومتات توليد الصور من ChatGPT — جاهزة للنسخ (74 برومت)
+# برومتات توليد الصور من ChatGPT — جاهزة للنسخ (81 برومت)
 
 **الطريقة:** كل برومت تحت **كتلة واحدة كاملة** (فيها الأسلوب وقواعد الشيت والعناصر) — انسخها كلها كما هي في ChatGPT. ابعتيلي الصورة الناتجة وأنا أقصّها (`python tools/cut_sprite.py شيت.png 4x3 الأسماء مجلد_اللعبة/art`) وأركّبها في اللعبة.
 
 **الترتيب المقترح (الأهم أولًا):** A1 ← A2 ← A3 ← … (عربيات) ثم C1..C6 (ألبسي الأميرة) ثم باقي ألعاب البنات ثم B (الشخصيات) ثم E (الخلفيات).
 
 **نصايح لـ ChatGPT:** (1) ولّد الصورة بنسبة 3:2 (1536×1024). (2) لو الخلفية طلعت مش بيضا صافية قول: «Make the background pure flat white #FFFFFF, remove the shadows». (3) لو العناصر لزقت في بعض قول: «Increase the margin between items, no overlaps». (4) اطلب نفس الشخصية في كل الخانات: «Keep the exact same character design in every cell». (5) في الخلفيات: اطلب 16:9 (1920×1080) صورة واحدة.
+
+
+---
+
+## F — مخلوقات بإطارات حركة (ضفدع، ديناصور، أسماك، بطل الأسطح)
+
+### F1 — الضفدع الجائع: الضفدع بإطارات الحركة (١٢)
+- **الملفات:** `frog_idle, frog_blink, frog_crouch, frog_jump_up, frog_jump_air, frog_land, frog_tongue_out, frog_tongue_full, frog_eat, frog_hurt, frog_big, frog_king`
+- **بتفتح:** hungry_frog
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): A cute round green frog seen from the FRONT-SIDE (3/4 view looking to the right), same character in every cell, 12 frames: 1 idle sitting, 2 blinking, 3 crouching to jump, 4 jumping up, 5 in the air with legs stretched, 6 landing, 7 mouth open with the tongue starting to come out (tongue pointing right), 8 tongue fully out and straight to the right (long pink tongue), 9 eating with puffed cheeks, 10 hurt with dizzy stars, 11 the same frog but twice bigger with a gold belly, 12 the frog wearing a tiny gold crown.
+```
+
+### F2 — الضفدع الجائع: الأعداء والأكل (١٢)
+- **الملفات:** `frog_bully, frog_bully_big, snake, heron, fly, beetle, dragonfly, snail, lily_pad, reed, mud_splash, bubble`
+- **بتفتح:** hungry_frog
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for a frog game, each seen from the side facing LEFT: a big grumpy bully frog, an even bigger bully frog, a friendly cartoon snake, a tall heron bird, a fly, a beetle, a dragonfly, a snail, a round lily pad with a flower, a bunch of reeds, a mud splash, a water bubble.
+```
+
+### F3 — ديناصور صغير يكبر: الراپتور بإطارات (١٢)
+- **الملفات:** `raptor_idle, raptor_run1, raptor_run2, raptor_run3, raptor_bite, raptor_hurt, raptor_eat, raptor_big1, raptor_big2, rex_small, rex_mid, rex_big`
+- **بتفتح:** dino_grow
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): A cute baby raptor dinosaur seen from the SIDE facing RIGHT, same character in every cell, 12 frames: idle, run 1, run 2, run 3, biting, hurt, happily eating, then it grows: bigger teen raptor (2 frames), then a small T-rex, a medium T-rex and a big T-rex, all cute and friendly, no blood.
+```
+
+### F4 — ديناصور صغير يكبر: فرائس وأعداء (١٢)
+- **الملفات:** `bug, egg, lizard, frog_small, dodo, stego, trike, ankylo, croc, spino, volcano_rock, fern`
+- **بتفتح:** dino_grow
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 prehistoric critters for a dinosaur game, seen from the side facing LEFT, cute and friendly: a bug, a dinosaur egg, a lizard, a small frog, a dodo, a baby stegosaurus, a triceratops, an ankylosaurus, a crocodile, a spinosaurus, a volcano rock, a big fern.
+```
+
+### F5 — أسماك الأعماق: السمكة اللاعبة بأحجام (١٢)
+- **الملفات:** `fish_s1, fish_s2, fish_m1, fish_m2, fish_l1, fish_l2, fish_eat, fish_hurt, fish_dash, fish_boss1, fish_boss2, fish_boss3`
+- **بتفتح:** deep_sea
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): A cute orange-and-white clownfish seen from the SIDE facing RIGHT, same character in every cell, growing: 2 tiny frames, 2 small, 2 medium, 2 large (each pair: tail left and tail right), then eating with a wide mouth, hurt, dashing with speed lines, and three giant glowing boss versions with golden fins.
+```
+
+### F6 — أسماك الأعماق: الفرائس والمفترسات (١٢)
+- **الملفات:** `prey_plankton, prey_shrimp, prey_small_fish, prey_crab, prey_jelly, prey_squid, pred_shark, pred_barracuda, pred_angler, pred_octopus, pred_turtle, pred_whale`
+- **بتفتح:** deep_sea
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 sea creatures seen from the SIDE facing LEFT, cute and friendly: plankton glow, shrimp, small blue fish, crab, jellyfish, squid, shark, barracuda, angler fish with a glowing lure, pink octopus, sea turtle, small whale.
+```
+
+### F7 — بطل زومبي الأسطح بالأسلحة (١٢)
+- **الملفات:** `survivor_idle, survivor_run, survivor_shoot, survivor_bomb, survivor_rocket, survivor_hurt, survivor_win, gun_blaster, gun_bomb_launcher, gun_rocket, gun_fireworks, gun_pistol`
+- **بتفتح:** zombie_rooftop
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): A cartoon city fighter in a red jacket seen from a 3/4 TOP view facing right, 7 frames (idle, running, shooting, holding a bomb launcher, holding a rocket launcher, hurt, victory) followed by 5 weapons laid flat: blaster, bomb launcher, rocket launcher, fireworks launcher, pistol. No blood.
+```
 
 
 ---

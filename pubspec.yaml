@@ -161,6 +161,8 @@ flutter:
     - assets/games/alien_sky/
     - assets/games/rhino_summit/
     - assets/games/sunset_highway/
+    - assets/games/girls_world/
+    - assets/games/girls_world/art/
     - assets/games/butterfly_garden/
     - assets/games/butterfly_garden/art/
     - assets/games/cupcake_shop/

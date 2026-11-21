@@ -112,6 +112,23 @@ for i, (nm, d) in enumerate([("card_princess", "a happy princess girl in a pink 
     P.append((f"D{i+1}", f"كارت اللعبة: {nm}", nm, nm.replace("card_", ""), GIRL + "\n" + CARD + d + "."))
 P.append(("D6", "غلاف قسم البنات (١٦:٩)", "bg_girls_world", "القسم", GIRL + "\n" + BG + " A magical pastel pink castle on a hill with a rainbow, floating hearts and butterflies, five colorful glowing doors on the ground for five games (a dress, a mirror, a baby bottle, a cupcake, a flower)."))
 
+
+# ---- F. animated creatures (frames for the 3D-style games: frog, dino, deep sea) -----------------------------------------------
+P.append(("F1", "الضفدع الجائع: الضفدع بإطارات الحركة (١٢)", "frog_idle, frog_blink, frog_crouch, frog_jump_up, frog_jump_air, frog_land, frog_tongue_out, frog_tongue_full, frog_eat, frog_hurt, frog_big, frog_king", "hungry_frog",
+          sheet(STYLE, "A cute round green frog seen from the FRONT-SIDE (3/4 view looking to the right), same character in every cell, 12 frames: 1 idle sitting, 2 blinking, 3 crouching to jump, 4 jumping up, 5 in the air with legs stretched, 6 landing, 7 mouth open with the tongue starting to come out (tongue pointing right), 8 tongue fully out and straight to the right (long pink tongue), 9 eating with puffed cheeks, 10 hurt with dizzy stars, 11 the same frog but twice bigger with a gold belly, 12 the frog wearing a tiny gold crown.")))
+P.append(("F2", "الضفدع الجائع: الأعداء والأكل (١٢)", "frog_bully, frog_bully_big, snake, heron, fly, beetle, dragonfly, snail, lily_pad, reed, mud_splash, bubble", "hungry_frog",
+          sheet(STYLE, "12 items for a frog game, each seen from the side facing LEFT: a big grumpy bully frog, an even bigger bully frog, a friendly cartoon snake, a tall heron bird, a fly, a beetle, a dragonfly, a snail, a round lily pad with a flower, a bunch of reeds, a mud splash, a water bubble.")))
+P.append(("F3", "ديناصور صغير يكبر: الراپتور بإطارات (١٢)", "raptor_idle, raptor_run1, raptor_run2, raptor_run3, raptor_bite, raptor_hurt, raptor_eat, raptor_big1, raptor_big2, rex_small, rex_mid, rex_big", "dino_grow",
+          sheet(STYLE, "A cute baby raptor dinosaur seen from the SIDE facing RIGHT, same character in every cell, 12 frames: idle, run 1, run 2, run 3, biting, hurt, happily eating, then it grows: bigger teen raptor (2 frames), then a small T-rex, a medium T-rex and a big T-rex, all cute and friendly, no blood.")))
+P.append(("F4", "ديناصور صغير يكبر: فرائس وأعداء (١٢)", "bug, egg, lizard, frog_small, dodo, stego, trike, ankylo, croc, spino, volcano_rock, fern", "dino_grow",
+          sheet(STYLE, "12 prehistoric critters for a dinosaur game, seen from the side facing LEFT, cute and friendly: a bug, a dinosaur egg, a lizard, a small frog, a dodo, a baby stegosaurus, a triceratops, an ankylosaurus, a crocodile, a spinosaurus, a volcano rock, a big fern.")))
+P.append(("F5", "أسماك الأعماق: السمكة اللاعبة بأحجام (١٢)", "fish_s1, fish_s2, fish_m1, fish_m2, fish_l1, fish_l2, fish_eat, fish_hurt, fish_dash, fish_boss1, fish_boss2, fish_boss3", "deep_sea",
+          sheet(STYLE, "A cute orange-and-white clownfish seen from the SIDE facing RIGHT, same character in every cell, growing: 2 tiny frames, 2 small, 2 medium, 2 large (each pair: tail left and tail right), then eating with a wide mouth, hurt, dashing with speed lines, and three giant glowing boss versions with golden fins.")))
+P.append(("F6", "أسماك الأعماق: الفرائس والمفترسات (١٢)", "prey_plankton, prey_shrimp, prey_small_fish, prey_crab, prey_jelly, prey_squid, pred_shark, pred_barracuda, pred_angler, pred_octopus, pred_turtle, pred_whale", "deep_sea",
+          sheet(STYLE, "12 sea creatures seen from the SIDE facing LEFT, cute and friendly: plankton glow, shrimp, small blue fish, crab, jellyfish, squid, shark, barracuda, angler fish with a glowing lure, pink octopus, sea turtle, small whale.")))
+P.append(("F7", "بطل زومبي الأسطح بالأسلحة (١٢)", "survivor_idle, survivor_run, survivor_shoot, survivor_bomb, survivor_rocket, survivor_hurt, survivor_win, gun_blaster, gun_bomb_launcher, gun_rocket, gun_fireworks, gun_pistol", "zombie_rooftop",
+          sheet(STYLE, "A cartoon city fighter in a red jacket seen from a 3/4 TOP view facing right, 7 frames (idle, running, shooting, holding a bomb launcher, holding a rocket launcher, hurt, victory) followed by 5 weapons laid flat: blaster, bomb launcher, rocket launcher, fireworks launcher, pistol. No blood.")))
+
 # ---- E. backgrounds ---------------------------------------------------------------------------------------------------------
 bgs = {
     "E1": ("خلفيات ألبسي الأميرة (٦)", "little_princess_dress", ["a pastel castle bedroom with a big window and a canopy bed", "a garden tea party with a gazebo and flowers", "a snowy ice castle with crystal pillars", "a sunny beach party with palm trees and a pastel tent", "a magic forest with glowing mushrooms and fairy lights", "a rainbow ballroom with chandeliers and a shiny floor"]),
@@ -133,7 +150,7 @@ w("**الترتيب المقترح (الأهم أولًا):** A1 ← A2 ← A3 �
 w("**نصايح لـ ChatGPT:** (1) ولّد الصورة بنسبة 3:2 (1536×1024). (2) لو الخلفية طلعت مش بيضا صافية قول: «Make the background pure flat white #FFFFFF, remove the shadows». "
   "(3) لو العناصر لزقت في بعض قول: «Increase the margin between items, no overlaps». (4) اطلب نفس الشخصية في كل الخانات: «Keep the exact same character design in every cell». "
   "(5) في الخلفيات: اطلب 16:9 (1920×1080) صورة واحدة.\n\n")
-groups = [("A", "عربيات وطيارات (منظر خلفي بالظبط)"), ("B", "شخصيات الألعاب (وضعيات)"), ("C", "قسم البنات ٢–٤ سنين (شخصيات وأغراض)"), ("D", "كروت قسم البنات وغلافه"), ("E", "خلفيات قسم البنات (٣٠)")]
+groups = [("F", "مخلوقات بإطارات حركة (ضفدع، ديناصور، أسماك، بطل الأسطح)"), ("A", "عربيات وطيارات (منظر خلفي بالظبط)"), ("B", "شخصيات الألعاب (وضعيات)"), ("C", "قسم البنات ٢–٤ سنين (شخصيات وأغراض)"), ("D", "كروت قسم البنات وغلافه"), ("E", "خلفيات قسم البنات (٣٠)")]
 for g, title in groups:
     w("\n---\n\n## %s — %s\n\n" % (g, title))
     for pid, ttl, files, unlocks, body in P:

@@ -88,11 +88,7 @@ Future<void> deleteChildData() async {
         key == 'temple_army' ||
         key == 'rug_cleaning' ||
         key == 'fashion_queen' ||
-        key == 'butterfly_garden' ||
-        key == 'cupcake_shop' ||
-        key == 'little_salon' ||
-        key == 'baby_and_pet' ||
-        key == 'little_princess_dress' ||
+        key == 'girls_world' ||
         key == 'gummy_squad' ||
         key == 'barrel_knights' ||
         key == 'sweet_tray' ||

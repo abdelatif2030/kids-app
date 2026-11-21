@@ -2,7 +2,7 @@
 // a voice helper (the app says the words), a finish panel with ONE star (never for time) and a gentle "again". No timers, no scores,
 // no locks, no coins, no failing. Pictures are optional: every picture has a fallback so a missing file never breaks a game.
 import { h } from '../../../cozy_kit/ui.js';
-import { Voice } from '../../../learn_games/src/kit/voice.js';
+import { music } from './music.js';
 
 export const loadImg = (base, name) => new Promise((resolve) => {
   const img = new Image();
@@ -83,8 +83,6 @@ export function makeStage(el, opts) {
     else { const [a, b] = STAGE_FALLBACK[i % STAGE_FALLBACK.length]; bg.style.background = `linear-gradient(180deg,${a},${b})`; }
   };
   setBg(0);
-  // Fatima's recordings (the learning games' voice, assets/games/learn_voice) first; the app's device voice only when a sentence has no recording
-  const voice = new Voice(opts.base || './', en ? 'en' : 'ar', (text, lg) => post({ type: 'speak', text, lang: lg, slow: true }), () => {});
   let fairyN = 0;
   const fairy = () => { // the guide fairy pops up for a moment each time something is said (small, never in the way)
     const names = [2, 4, 5, 6, 8, 12, 1, 3];
@@ -94,8 +92,10 @@ export function makeStage(el, opts) {
     root.append(e);
     setTimeout(() => e.remove(), 2500);
   };
-  const say = (t) => { if (t) { voice.say(t); fairy(); } };
+  // no spoken voice (owner 2026-11-22): every reward is a note of an interactive melody, plus the little fairy
+  const say = (t) => { if (t) { music.tap(); fairy(); } };
   const sparkle = (x, y, n = 8) => {
+    music.pop();
     const r = root.getBoundingClientRect();
     for (let i = 0; i < n; i++) {
       const s = h('div', { class: 'gk-spark', style: `left:${x - r.left}px;top:${y - r.top}px;--dx:${(Math.random() - 0.5) * 160}px;--dy:${-30 - Math.random() * 120}px` }, ['✨', '💖', '⭐', '🌸', '🦋'][i % 5]);
@@ -124,11 +124,12 @@ export function makeStage(el, opts) {
       h('div', { class: 'gk-title', style: 'color:#b83a90;text-shadow:none;margin:calc(var(--u)*2) 0' }, line || (en ? 'Well done!' : 'برافو!')),
       h('button', { class: 'gk-btn go', onclick: () => { dim.remove(); onAgain(); } }, en ? 'Again!' : 'تاني!')));
     root.append(dim);
-    say(line || (en ? 'Well done!' : 'برافو!'));
+    music.success(); fairy();
+    post({ type: 'star' });
   };
   root.append(h('div', { class: 'gk-top' },
     h('button', { class: 'gk-rb', 'aria-label': en ? 'Back' : 'رجوع', onclick: () => post({ type: 'exit' }) }, en ? '←' : '→'),
     h('div', { class: 'gk-title' }, title),
     h('button', { class: 'gk-rb p', 'aria-label': en ? 'Places' : 'الأماكن', onclick: openPlaces }, '🗺️')));
-  return { root, layer, setBg, say, sparkle, finish, openPlaces, get place() { return place; }, dispose() { try { voice.stop(); } catch (_) { /* fine */ } ro.disconnect(); root.remove(); } };
+  return { root, layer, setBg, say, sparkle, finish, openPlaces, get place() { return place; }, dispose() { ro.disconnect(); root.remove(); } };
 }

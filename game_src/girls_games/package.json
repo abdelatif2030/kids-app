@@ -4,13 +4,14 @@
   "type": "module",
   "description": "Rehlaty girls world, ages 2-4 (DOM + pictures). Five games sharing src/kit. Each builds into assets/games/<id>/game.js",
   "scripts": {
-    "build": "npm run build:dress && npm run build:pet && npm run build:salon && npm run build:cupcake && npm run build:garden",
+    "build": "npm run build:world",
     "build:dress": "esbuild src/dress/main.js --bundle --minify --format=iife --global-name=LittlePrincessDress --target=es2019 --outfile=../../assets/games/little_princess_dress/game.js",
-    "test": "node --test test/dress.test.js test/pet.test.js test/salon.test.js test/cupcake.test.js test/garden.test.js",
+    "test": "node --test test/dress.test.js test/pet.test.js test/salon.test.js test/cupcake.test.js test/garden.test.js test/world.test.js test/music.test.js",
     "build:pet": "esbuild src/pet/main.js --bundle --minify --format=iife --global-name=BabyAndPet --target=es2019 --outfile=../../assets/games/baby_and_pet/game.js",
     "build:salon": "esbuild src/salon/main.js --bundle --minify --format=iife --global-name=LittleSalon --target=es2019 --outfile=../../assets/games/little_salon/game.js",
     "build:cupcake": "esbuild src/cupcake/main.js --bundle --minify --format=iife --global-name=CupcakeShop --target=es2019 --outfile=../../assets/games/cupcake_shop/game.js",
-    "build:garden": "esbuild src/garden/main.js --bundle --minify --format=iife --global-name=ButterflyGarden --target=es2019 --outfile=../../assets/games/butterfly_garden/game.js"
+    "build:garden": "esbuild src/garden/main.js --bundle --minify --format=iife --global-name=ButterflyGarden --target=es2019 --outfile=../../assets/games/butterfly_garden/game.js",
+    "build:world": "esbuild src/world/main.js --bundle --minify --format=iife --global-name=PrincessWorld --target=es2019 --outfile=../../assets/games/girls_world/game.js"
   },
   "devDependencies": {
     "esbuild": "^0.24.0"
