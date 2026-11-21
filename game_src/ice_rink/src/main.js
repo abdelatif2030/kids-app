@@ -153,6 +153,9 @@ class Game {
 .ir-tip{position:absolute;left:calc(var(--u)*6);right:calc(var(--u)*6);background:#fff;color:#1f3e7a;border-radius:calc(var(--u)*3);padding:calc(var(--u)*1.8) calc(var(--u)*2.6);font-size:calc(var(--u)*3.2);box-shadow:0 calc(var(--u)*.6) calc(var(--u)*2) rgba(30,60,110,.35);display:none;pointer-events:none;text-align:center}.ir-tip.show{display:block}.ir-tip b{display:block;font-size:calc(var(--u)*3.6);color:#2a78c8}
 .ir-hpn{font-size:calc(var(--u)*2.2);font-weight:900;text-align:center;direction:ltr;opacity:.9}
 .ir-cards{position:absolute;left:0;right:0;bottom:0;display:flex;gap:calc(var(--u)*1.4);padding:calc(var(--u)*1.4) calc(var(--u)*1.6) max(calc(var(--u)*1.6),env(safe-area-inset-bottom));box-sizing:border-box;justify-content:center;pointer-events:none;direction:ltr}
+.ir-land .ir-cards{left:auto;right:0;top:calc(var(--u)*13);bottom:0;width:calc(var(--u)*36);flex-direction:column;justify-content:center;padding:calc(var(--u)*1) calc(var(--u)*1.6)}
+.ir-land .ir-hc{flex:none;max-width:none;width:100%}
+.ir-land .ir-gala{right:calc(var(--u)*40)}
 .ir-hc{pointer-events:auto;flex:1;max-width:calc(var(--u)*34);background:linear-gradient(180deg,#4a8ad8,#1f3e7a);border:calc(var(--u)*.45) solid #fff;border-radius:calc(var(--u)*3);padding:calc(var(--u)*1) calc(var(--u)*1.2);display:flex;gap:calc(var(--u)*1.2);align-items:center;cursor:pointer;font-family:inherit;color:#fff;box-shadow:0 calc(var(--u)*.6) calc(var(--u)*1.4) rgba(0,10,30,.45);position:relative}
 .ir-hc.sel{border-color:#ffe27a;box-shadow:0 0 0 calc(var(--u)*.5) rgba(255,226,122,.55),0 calc(var(--u)*.6) calc(var(--u)*1.4) rgba(0,10,30,.45)}
 .ir-hc.ko{filter:grayscale(1);opacity:.55}
@@ -203,9 +206,12 @@ class Game {
     this.cv.width = Math.round(this.cw * this.dpr); this.cv.height = Math.round(this.ch * this.dpr);
     this.u = Math.min(this.cw, this.ch) / 100;
     this.root.style.setProperty('--u', `${Math.min(this.u, 6.2)}px`);
-    const topR = Math.min(this.u, 6.2) * 15; const botR = Math.min(this.u, 6.2) * 26;
-    this.sc = Math.max(2, Math.min(this.cw / (W + 9), (this.ch - topR - botR) / (H + 9)));
-    this.ox = (this.cw - W * this.sc) / 2; this.oy = topR + (this.ch - topR - botR - H * this.sc) / 2;
+    // wide screen (landscape phone): the three hero cards stand in a column on the right and the rink uses the full height
+    this.land = this.cw > this.ch * 1.35; this.root.classList.toggle('ir-land', this.land);
+    const uu = Math.min(this.u, 6.2);
+    const topR = uu * 15; const botR = this.land ? uu * 9 : uu * 26; const colW = this.land ? uu * 36 : 0;
+    this.sc = Math.max(2, Math.min((this.cw - colW) / (W + 9), (this.ch - topR - botR) / (H + 9)));
+    this.ox = (this.cw - colW - W * this.sc) / 2; this.oy = topR + (this.ch - topR - botR - H * this.sc) / 2;
     this._buildBg();
   }
   X(x) { return this.ox + x * this.sc; }
@@ -531,7 +537,7 @@ class Game {
     // HUD
     this.turnEl.replaceChildren(h('small', { style: 'font-size:.62em;opacity:.8;font-weight:700' }, `${I.t('level')} ${I.num(this.level)} · ${I.t('turnw')} ${I.num(s.turn)}`), h('span', {}, s.phase === 'enemy' ? `👺 ${I.t('foeTurn')}` : `⛸️ ${I.t('yourTurn')}`));
     this.coinEl.textContent = `👺 × ${I.num(foes(s).length)}`;
-    { const rb = (this.rowEl ? this.rowEl.offsetHeight : 90) + 8; this.galaEl.style.bottom = `${rb}px`; this.tipEl.style.bottom = `${rb + this.galaEl.offsetHeight + 8}px`; }
+    { const rb = this.land ? 10 : (this.rowEl ? this.rowEl.offsetHeight : 90) + 8; this.galaEl.style.bottom = `${rb}px`; this.tipEl.style.bottom = `${rb + this.galaEl.offsetHeight + 8}px`; }
     { const rdy = s.gala >= 100; if (rdy && !this._galaWas) this.sound.play('ready'); this._galaWas = rdy; this.galaFill.style.width = `${Math.min(100, s.gala)}%`; this.galaEl.classList.toggle('rdy', rdy); this.galaEl.classList.toggle('off', rdy && this.galaOff); }
     this.ffEl.style.display = s.phase === 'shot' || s.phase === 'enemy' ? 'block' : 'none';
     for (const id of HERO_ORDER) {

@@ -79,6 +79,8 @@ class Game {
     if (!document.getElementById('ct-style')) document.head.append(h('style', { id: 'ct-style' }, css('ct', '#2a3a9a', '#141c5a', '#ffe04a') + `
 .ct-root{background:#0a1030;touch-action:manipulation}
 .ct-app{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,calc(var(--u)*66));display:flex;flex-direction:column;gap:calc(var(--u)*1);padding:calc(var(--u)*1.4);box-sizing:border-box}
+.ct-land .ct-app{width:min(100%,calc(var(--u)*150));display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);grid-template-rows:auto minmax(0,1fr)}
+.ct-land .ct-app>:nth-child(1){grid-column:1;grid-row:1}.ct-land .ct-app>:nth-child(2){grid-column:2;grid-row:1/3}.ct-land .ct-app>:nth-child(3){grid-column:1;grid-row:2;overflow:auto}
 .ct-win{background:#d8dce8;border:calc(var(--u)*.45) solid #fff;border-radius:calc(var(--u)*1.2);box-shadow:0 0 0 calc(var(--u)*.3) #1a2a80,0 calc(var(--u)*.8) calc(var(--u)*2) rgba(0,0,0,.4);overflow:hidden;color:#101850;flex:0 0 auto}
 .ct-wt{background:linear-gradient(180deg,#2a3cc8,#14208a);color:#fff;font-weight:900;font-size:calc(var(--u)*2.4);padding:calc(var(--u)*.6) calc(var(--u)*1.4);display:flex;justify-content:space-between;align-items:center;letter-spacing:.06em}
 .ct-wt button{font-family:inherit;font-weight:900;font-size:calc(var(--u)*2.2);background:#e8ecff;color:#14208a;border:calc(var(--u)*.3) solid #fff;border-radius:calc(var(--u)*.6);padding:0 calc(var(--u)*1.2);cursor:pointer;margin-inline-start:calc(var(--u)*.6)}
@@ -149,7 +151,7 @@ class Game {
 
   async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 2500))]); } catch (_) { /* system font */ } }
 
-  _resize() { const r = this.el.getBoundingClientRect(); this.cw = r.width || window.innerWidth; this.ch = r.height || window.innerHeight; this.u = Math.min(this.cw, this.ch) / 100; this.root.style.setProperty('--u', `${Math.min(this.u, 6.2)}px`); }
+  _resize() { const r = this.el.getBoundingClientRect(); this.cw = r.width || window.innerWidth; this.ch = r.height || window.innerHeight; this.u = Math.min(this.cw, this.ch) / 100; this.root.classList.toggle('ct-land', this.cw > this.ch * 1.3); this.root.style.setProperty('--u', `${Math.min(this.u, 6.2)}px`); }
 
   _bind() {
     const unlock = () => this.sound.unlock();
