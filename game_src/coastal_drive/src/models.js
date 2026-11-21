@@ -342,7 +342,7 @@ export function makeHill(r, color) {
 }
 
 /** Sun, clouds and far blue mountains painted on a big plane that follows the camera (so they never come closer). */
-export function makeBackdrop(world) {
+export function makeBackdrop(world, fogHex = 0xcfe2ee) {
   const W = 2048, H = 512;
   const c = document.createElement('canvas');
   c.width = W;
@@ -389,6 +389,14 @@ export function makeBackdrop(world) {
     g.fill();
   };
   if (night) { layer(H * 0.95, 90, 'rgba(46,24,84,.95)', 1.3); layer(H * 1.0, 60, 'rgba(30,14,60,1)', 4.1); } else if (sunset) { layer(H * 0.93, 100, 'rgba(214,132,104,.9)', 2.2); layer(H * 1.0, 62, 'rgba(176,96,72,1)', 5.3); } else { layer(H * 0.93, 105, 'rgba(120,160,206,.85)', 2.2); layer(H * 1.0, 66, 'rgba(84,134,170,1)', 5.3); }
+  const fc = new THREE.Color(fogHex);
+  const fr = Math.round(fc.r * 255), fg = Math.round(fc.g * 255), fb = Math.round(fc.b * 255);
+  const fade = g.createLinearGradient(0, H * 0.72, 0, H);
+  fade.addColorStop(0, `rgba(${fr},${fg},${fb},0)`);
+  fade.addColorStop(0.7, `rgba(${fr},${fg},${fb},0.85)`);
+  fade.addColorStop(1, `rgba(${fr},${fg},${fb},1)`);
+  g.fillStyle = fade;
+  g.fillRect(0, H * 0.72, W, H * 0.28);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   const m = new THREE.Mesh(new THREE.PlaneGeometry(1500, 250), new THREE.MeshBasicMaterial({ map: t, transparent: true, fog: false, depthWrite: false, depthTest: false }));

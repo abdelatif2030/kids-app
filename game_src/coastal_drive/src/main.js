@@ -9,7 +9,7 @@ import {
   mat, basic, box, makeSportsCar, makeTrafficCar, roadTexture, makePalm, makeLamp, makeRailSegment, makeHill, makeBackdrop, makeBush, makeMesa,
   makeCactus, makeTower, skyTexture, coinMesh,
 } from './models.js';
-import { loadSprites, makeSpriteVehicle } from '../../cozy_kit/art.js';
+import { loadSprites, makeSpriteVehicle, recolorSprite } from '../../cozy_kit/art.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
 import { CSS, h, arc } from './ui.js';
@@ -80,8 +80,8 @@ class Glow {
 }
 
 const LOOK = {
-  azure: { sky: ['#6aaee8', '#e8f2f8'], fog: 0xcfe2ee, fogNear: 60, fogFar: 300, hemi: [0xf4f8ff, 0x7a8a6a, 1.6], sun: [0xfff4e0, 1.7], left: 0xe8d4a0, right: 0x5aa04a, sea: 0x2a9ad8 },
-  canyon: { sky: ['#ff8a4a', '#ffd8a0'], fog: 0xf0b888, fogNear: 50, fogFar: 260, hemi: [0xffe8d0, 0x8a5a3a, 1.5], sun: [0xffd8a8, 1.6], left: 0xd89a5a, right: 0xd08a50, sea: null },
+  azure: { sky: ['#6aaee8', '#e8f2f8'], fog: 0xcfe2ee, fogNear: 25, fogFar: 190, hemi: [0xf4f8ff, 0x7a8a6a, 1.6], sun: [0xfff4e0, 1.7], left: 0xe8d4a0, right: 0x5aa04a, sea: 0x2a9ad8 },
+  canyon: { sky: ['#ff8a4a', '#ffd8a0'], fog: 0xf0b888, fogNear: 25, fogFar: 180, hemi: [0xffe8d0, 0x8a5a3a, 1.5], sun: [0xffd8a8, 1.6], left: 0xd89a5a, right: 0xd08a50, sea: null },
   neon: { sky: ['#1a0e3a', '#6a2a8a'], fog: 0x3a1a5a, fogNear: 40, fogFar: 220, hemi: [0x9a8ae8, 0x2a1a4a, 1.2], sun: [0xc8b8ff, 0.7], left: 0x24242c, right: 0x24242c, sea: null },
 };
 
@@ -251,7 +251,7 @@ class Game {
       add(() => makeLamp(1), edge + 0.7, 45, 8);
       add(() => makeRailSegment(12), edge + 0.4, 12, 34);
       add(() => makeRailSegment(12), -(edge + 0.4), 12, 34);
-      add((i) => makeHill(26 + (i % 3) * 10, [0x3a7a2a, 0x4a8a3a, 0x2f6a24][i % 3]), (i) => edge + 34 + (i % 2) * 18, 70, 8);
+      add((i) => makeHill(15 + (i % 3) * 5, [0x3a7a2a, 0x4a8a3a, 0x2f6a24][i % 3]), (i) => edge + 48 + (i % 2) * 22, 90, 8);
       add((i) => makeBush([0x3a8a3a, 0x4a9a3a][i % 2]), (i) => edge + 3 + (i % 4) * 2, 11, 30);
       add((i) => makePalm(6 + (i % 3)), (i) => edge + 6 + (i % 3) * 3, 37, 10);
     } else if (world === 'canyon') {
@@ -272,7 +272,7 @@ class Game {
       // glowing lines on the shoulders
       for (const sx of [-1, 1]) this.strips.add(box(0.12, 0.05, 600, basic(sx > 0 ? 0xff4ab8 : 0x4ae8ff), sx * (LANE_W * 2 + 0.75), 0.06, 0));
     }
-    this.backdrop = makeBackdrop(world);
+    this.backdrop = makeBackdrop(world, L.fog);
     g.add(this.backdrop);
     this._placeRoad(0);
   }
@@ -683,12 +683,14 @@ class Game {
     car.body.visible = !blink;
     // the painted car stands in for the 3D one while racing (the 3D one is still shown in the garage, where it turns around)
     const pic = this.sprites && this.sprites.car_player;
+    if (this.menuCars) for (const v of Object.values(this.menuCars)) v.root.visible = false;
     if (pic) {
       if (!this.playerSprite) { this.playerSprite = makeSpriteVehicle(THREE, pic, 2.15); this.scene.add(this.playerSprite.root); }
       const ps = this.playerSprite;
       ps.root.visible = true;
       ps.root.position.copy(car.root.position);
-      ps.root.rotation.z = steer * 0.04;
+      ps.root.rotation.z = steer * 0.03;
+      ps.root.rotation.y = 0;
       ps.body.visible = !blink;
       car.root.visible = false;
     }
@@ -710,7 +712,8 @@ class Game {
         this.scene.add(m.root); this.trafficModels.set(c.id, m);
       }
       m.root.position.set(c.x, 0, -c.s);
-      m.root.rotation.y = c.hit > 0 ? Math.sin(c.hit * 9) * 0.25 : (c.x - LANES[c.lane]) * -0.05;
+      if (m.sprite) m.root.rotation.z = c.hit > 0 ? Math.sin(c.hit * 9) * 0.12 : 0; // a picture car never turns sideways (it would look skewed)
+      else m.root.rotation.y = c.hit > 0 ? Math.sin(c.hit * 9) * 0.25 : (c.x - LANES[c.lane]) * -0.05;
       const on = c.blink > 0 && Math.floor(time * 4) % 2 === 0;
       const dir = c.toLane > c.lane ? 1 : 0;
       m.blinkers.forEach((b, i) => { b.visible = on && i === dir; });
@@ -816,13 +819,30 @@ class Game {
       car.root.position.set(0, 0, 0);
       car.root.rotation.set(0, 0, 0);
       car.body.visible = true;
-      car.root.visible = true;
+      const pic0 = this.sprites && this.sprites.car_player;
+      if (pic0) {
+        // the painted car stands on the road, turned toward the camera; the garage gives each car its own colour
+        const key = this.carId;
+        if (!this.menuCars) this.menuCars = {};
+        if (!this.menuCars[key]) {
+          const MIX = { striker: null, arrow: (r, g, b) => [g, b, r], nightfall: (r, g, b) => [r * 0.7 + b * 0.2, g * 0.35, r * 0.9 + b * 0.1] };
+          const spr = MIX[key] ? recolorSprite(THREE, pic0, MIX[key]) : pic0;
+          const v = makeSpriteVehicle(THREE, spr, 3.1); v.root.visible = false; this.scene.add(v.root); this.menuCars[key] = v;
+        }
+        for (const [k, v] of Object.entries(this.menuCars)) v.root.visible = k === key;
+        const mc = this.menuCars[key];
+        mc.root.position.set(0, 0, 0);
+        mc.root.rotation.set(0, Math.atan2(this.camera.position.x, this.camera.position.z), 0);
+        car.root.visible = false;
+      } else car.root.visible = true;
       if (this.playerSprite) this.playerSprite.root.visible = false;
       car.flames.forEach((f) => { f.visible = false; });
       this._placeRoad(0);
       const garage = this.mode === 'garage';
-      const a = garage ? time * 0.35 : -0.75 + Math.sin(time * 0.25) * 0.35;
-      const d = garage ? 12 : 9.5;
+      const paint = !!(this.sprites && this.sprites.car_player);
+      // a painted car is seen from behind (the way it was drawn) with only a gentle sway; the 3D car circles around
+      const a = paint ? Math.PI + Math.sin(time * 0.4) * 0.3 : garage ? time * 0.35 : -0.75 + Math.sin(time * 0.25) * 0.35;
+      const d = paint ? (garage ? 12.5 : 8) : garage ? 12 : 9.5;
       const want = new THREE.Vector3(Math.sin(a) * d, garage ? 2.6 : 2.3, -Math.cos(a) * d);
       this.camPos.lerp(want, Math.min(1, dt * 2));
       this.camera.position.copy(this.camPos);

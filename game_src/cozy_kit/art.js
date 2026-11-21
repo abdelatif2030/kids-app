@@ -77,3 +77,26 @@ export function makeSpriteVehicle(THREE, sprite, width) {
   const blinkers = [-1, 1].map((s) => { const b = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 0.12), blinkMat); b.position.set(s * (width / 2 - 0.12), h * 0.38, 0.02); b.visible = false; body.add(b); return b; });
   return { root, body, wheels: [], blinkers, tail: { emissiveIntensity: 0 }, flames: [], len: width * 2.2, sprite: true };
 }
+
+/** A recoloured copy of a picture vehicle (same pixels, channels mixed): { tex, aspect }. [mix] maps (r, g, b) to a new [r, g, b].
+ *  If the browser will not let the pixels be read, the original is returned, so a car is never missing. */
+export function recolorSprite(THREE, sprite, mix) {
+  try {
+    const im = sprite.tex.image;
+    const c = document.createElement('canvas');
+    c.width = im.width; c.height = im.height;
+    const x = c.getContext('2d');
+    x.drawImage(im, 0, 0);
+    const d = x.getImageData(0, 0, c.width, c.height);
+    const px = d.data;
+    for (let i = 0; i < px.length; i += 4) {
+      const m = mix(px[i], px[i + 1], px[i + 2]);
+      px[i] = Math.max(0, Math.min(255, m[0])); px[i + 1] = Math.max(0, Math.min(255, m[1])); px[i + 2] = Math.max(0, Math.min(255, m[2]));
+    }
+    x.putImageData(d, 0, 0);
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.anisotropy = 4;
+    return { tex, aspect: sprite.aspect };
+  } catch (_) { return sprite; }
+}
