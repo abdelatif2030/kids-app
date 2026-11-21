@@ -478,12 +478,16 @@ class Game {
     this.fx = this.fx.filter((f) => f.k < 1);
     // the hero's action machine
     const hr = this.hero;
+    if (hr.phase === 'idle' && this.mode === 'play' && !this.busy) { // standing and waiting: look at the nearest foe or treasure, never turn the back to them
+      let best = null; for (const sp of this._spots()) if (!best || Math.abs(sp.x - hr.x) < Math.abs(best.x - hr.x)) best = sp;
+      if (best && Math.abs(best.x - hr.x) > 4) hr.flip = best.x < hr.x;
+    }
     if (hr.phase === 'dash') {
       hr.k += dt * 5;
       hr.x = hr.from + (hr.to - hr.from) * ease(Math.min(1, hr.k));
       if (hr.k >= 1) { hr.phase = 'strike'; hr.k = 0; hr.out = this._resolve(hr); }
     } else if (hr.phase === 'strike') {
-      hr.k += dt * 5;
+      hr.k += dt * 2.6; // slow enough to SEE the sword swing
       hr.swing = Math.sin(Math.min(1, hr.k) * Math.PI);
       if (hr.k >= 1) {
         hr.swing = 0; hr.k = 0;
@@ -575,7 +579,7 @@ class Game {
     const sh = this.shakeHero ? Math.sin(this.shakeHero * 60) * hs * 0.05 : 0;
     const puffS = 1 + (this.puff ? 0.12 * Math.sin((this.puff / 0.35) * Math.PI) : 0);
     g.save(); g.translate(hr.x + sh, hy); g.scale(puffS, puffS); g.translate(-(hr.x + sh), -hy);
-    drawHero(g, hr.x + sh, hy, hs, time, { swing: hr.swing, sad: this.shakeHero > 0, flip: !!hr.flip });
+    drawHero(g, hr.x + sh, hy, hs, time, { swing: hr.swing, k: hr.phase === 'strike' ? hr.k : -1, sad: this.shakeHero > 0, flip: !!hr.flip });
     g.restore();
     // the slash: a bright crescent where the hero strikes
     if (hr.phase === 'strike' && hr.sp) {
