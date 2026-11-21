@@ -44,9 +44,31 @@ export function ground(g, x, y, R, side, pulse = 1) {
 }
 
 /** o: { t, side, moving, atk (0..0.22), flash, ang, spawn (0..1 done) } */
+// Pictures made for the game (assets/games/card_battle/art/): when one is loaded it replaces the code-drawn version of that thing.
+let ART = {};
+export const setArt = (a) => { ART = a || {}; };
+function spriteH(g, img, x, y, h, o = {}) {
+  const w = (h * img.naturalWidth) / img.naturalHeight;
+  g.save();
+  if (o.alpha !== undefined) g.globalAlpha = o.alpha;
+  g.translate(x, y);
+  if (o.sx) g.scale(o.sx, o.sy ?? o.sx);
+  g.drawImage(img, -w / 2, -h, w, h);
+  if (o.flash > 0) { g.globalCompositeOperation = 'lighter'; g.globalAlpha = Math.min(1, o.flash * 6) * 0.55; g.drawImage(img, -w / 2, -h, w, h); }
+  g.restore();
+}
+
 export function drawUnit(g, kind, x, y, s, r, o) {
   const R = r * s;
   const t = o.t || 0;
+  const pic = ART['unit_' + kind];
+  if (pic) {
+    const sp0 = o.spawn === undefined ? 1 : o.spawn;
+    const bob0 = o.moving ? Math.abs(Math.sin(t * 13)) * R * 0.28 : Math.sin(t * 3) * R * 0.05;
+    const lunge0 = o.atk > 0 ? Math.sin((o.atk / 0.22) * Math.PI) : 0;
+    spriteH(g, pic, x, y - bob0 - (1 - sp0) * R * 5, R * 2.7, { alpha: sp0 < 1 ? 0.3 + 0.7 * sp0 : 1, sx: 1 + lunge0 * 0.12, sy: 1 - lunge0 * 0.1, flash: o.flash });
+    return;
+  }
   const sp = o.spawn === undefined ? 1 : o.spawn;
   g.save();
   if (sp < 1) { g.globalAlpha = 0.3 + 0.7 * sp; y -= (1 - sp) * R * 5; }
@@ -165,6 +187,7 @@ export function drawUnit(g, kind, x, y, s, r, o) {
 /** The robot base: glowing dome on a round platform. */
 export function drawPlayerBase(g, x, y, s, o) {
   const R = 1.25 * s; const t = o.t || 0;
+  if (ART.base) { spriteH(g, ART.base, x, y + R * 0.2, R * 3.1, { flash: o.flash }); return; }
   blob(g, x, y + R * 0.05, R * 1.35, R * 0.62, '#4a6ab8', '#141c4a', '#35e0ff');
   g.save(); g.globalAlpha = 0.5 + 0.3 * Math.sin(t * 3); g.strokeStyle = '#35e0ff'; g.lineWidth = R * 0.07; g.beginPath(); g.ellipse(x, y + R * 0.05, R * 1.1, R * 0.5, 0, 0, TAU); g.stroke(); g.restore();
   rrect(g, x - R * 0.85, y - R * 1.15, R * 1.7, R * 1.1, R * 0.3, '#9ad8ff', '#2a68c8', '#0a3a8a');
@@ -182,6 +205,7 @@ export function drawPlayerBase(g, x, y, s, o) {
 export function drawUFO(g, x, y, s, o) {
   const R = 1.25 * s; const t = o.t || 0;
   const hy = y - R * 1.5 + Math.sin(t * 2) * R * 0.08;
+  if (ART.ufo) { g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(x, y + R * 0.1, R * 1.2, R * 0.45, 0, 0, TAU); g.fill(); spriteH(g, ART.ufo, x, hy + R * 0.9, R * 2.4, { flash: o.flash }); return hy; }
   g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(x, y + R * 0.1, R * 1.2, R * 0.45, 0, 0, TAU); g.fill();
   g.save(); g.globalAlpha = 0.5 + 0.2 * Math.sin(t * 5); g.strokeStyle = '#ff3fd0'; g.lineWidth = R * 0.08; g.beginPath(); g.ellipse(x, y + R * 0.1, R * 1.25, R * 0.5, 0, 0, TAU); g.stroke(); g.restore();
   glow(g, x, hy + R * 0.5, R * 1.4, '#ff3fd0', 0.45);

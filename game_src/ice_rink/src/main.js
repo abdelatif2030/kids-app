@@ -7,6 +7,13 @@ import {
 } from './sim.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { loadArt } from '../../cozy_kit/art.js';
+// Pictures made for the game (assets/games/ice_rink/art/): when one is loaded it replaces the code-drawn hero or goblin.
+let ART = {};
+function pic(g, img, R) {
+  const hh = R * 2.7, w = (hh * img.naturalWidth) / img.naturalHeight;
+  g.drawImage(img, -w / 2, R * 1.0 - hh, w, hh);
+}
 
 const S = {
   title: ['معركة حلبة الجليد', 'Ice Rink Brawl'], play: ['يلا نلعب', 'Play'], levels: ['المراحل', 'Levels'], heroes: ['الأبطال', 'Heroes'],
@@ -45,6 +52,7 @@ function drawHero(g, type, R, o) {
   g.save();
   g.fillStyle = 'rgba(20,50,90,.28)'; ell(g, 0, R * 0.9, R * 0.95, R * 0.3); g.fill();
   if (ko) { g.rotate(0.35); g.globalAlpha = 0.75; }
+  if (ART['hero_' + type]) { pic(g, ART['hero_' + type], R); g.restore(); return; }
   if (type === 'penguin') {
     g.fillStyle = '#ff9a2a'; ell(g, -R * 0.42, R * 0.82, R * 0.32, R * 0.16); g.fill(); ell(g, R * 0.42, R * 0.82, R * 0.32, R * 0.16); g.fill();
     g.fillStyle = '#22385e'; ell(g, -R * 0.98, R * 0.15, R * 0.22, R * 0.5, 0.3); g.fill(); ell(g, R * 0.98, R * 0.15, R * 0.22, R * 0.5, -0.3); g.fill();
@@ -90,6 +98,7 @@ function drawFoe(g, f, R, o) {
   const L = FOE_LOOK[f.type]; const { lx, ly, t } = o;
   g.save();
   g.fillStyle = 'rgba(20,50,90,.28)'; ell(g, 0, R * 0.9, R * 0.95, R * 0.3); g.fill();
+  if (ART['goblin_' + f.type]) { pic(g, ART['goblin_' + f.type], R); g.restore(); return; }
   // body
   g.fillStyle = L.tunic; ell(g, 0, R * 0.5, R * 0.7, R * 0.52); g.fill();
   if (f.type === 'brute' || f.type === 'king' || f.type === 'chief') { g.fillStyle = '#3a2a1a'; g.fillRect(-R * 0.7, R * 0.45, R * 1.4, R * 0.16); g.fillStyle = '#ffd23a'; g.fillRect(-R * 0.1, R * 0.43, R * 0.2, R * 0.2); }
@@ -183,7 +192,7 @@ class Game {
     this.ro = new ResizeObserver(() => this._resize()); this.ro.observe(el);
     this._bind();
     this.last = performance.now();
-    this._fonts().then(() => { this.showMenu(); this._loop(); });
+    Promise.all([this._fonts(), loadArt(this.base, ['hero_penguin', 'hero_fox', 'hero_bear', 'goblin_grunt', 'goblin_imp', 'goblin_thrower', 'goblin_brute', 'goblin_shaman', 'goblin_chief', 'goblin_king']).then((a) => { ART = a; })]).then(() => { this.showMenu(); this._loop(); });
   }
 
   async _fonts() { try { const ff = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([ff.load().then((x) => document.fonts.add(x)), new Promise((r) => setTimeout(r, 2500))]); } catch (_) { /* system font */ } }

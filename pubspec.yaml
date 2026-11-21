@@ -161,8 +161,10 @@ flutter:
     - assets/games/sweet_tray/
     - assets/games/tomb_puzzle/
     - assets/games/ice_rink/
+    - assets/games/ice_rink/art/
     - assets/games/dino_grow/
     - assets/games/card_battle/
+    - assets/games/card_battle/art/
     - assets/games/viking_sling/
     - assets/games/viking_sling/art/
     - assets/games/trick_or_treat/

@@ -9,19 +9,19 @@
 | archer_bridge | 0 | نعم | لا | 0 | thin | بدون كود مصدر في المستودع |
 | ball_scoop | 0 | نعم | نعم | 1256 | medium | ينتظر التطوير |
 | barrel_knights | 0 | نعم | نعم | 1280 | medium | ينتظر التطوير |
-| card_battle | 0 | نعم | نعم | 1534 | big | ينتظر التطوير |
+| card_battle | 10 | نعم | نعم | 1559 | big | ينتظر التطوير |
 | carnival_race | 0 | نعم | نعم | 3558 | big | ينتظر التطوير |
 | castaway_raft | 0 | نعم | لا | 889 | medium | ينتظر التطوير |
 | chomp_maze | 0 | نعم | لا | 340 | thin | ينتظر التطوير |
 | cloud_dash | 0 | نعم | لا | 1388 | medium | ينتظر التطوير |
 | coastal_drive | 0 | نعم | لا | 2372 | big | ينتظر التطوير |
 | creator_tycoon | 15 | نعم | نعم | 547 | thin | ينتظر التطوير |
-| deep_sea | 0 | نعم | لا | 1824 | big | ينتظر التطوير |
+| deep_sea | 0 | نعم | لا | 1834 | big | ينتظر التطوير |
 | dino_grow | 0 | نعم | نعم | 1103 | medium | ينتظر التطوير |
 | dune_titans | 0 | نعم | لا | 2408 | big | ينتظر التطوير |
 | fashion_queen | 0 | نعم | لا | 1971 | big | ينتظر التطوير |
 | fizz_runner | 0 | نعم | لا | 445 | thin | ينتظر التطوير |
-| fox_family | 0 | نعم | لا | 1548 | big | ينتظر التطوير |
+| fox_family | 0 | نعم | لا | 1552 | big | ينتظر التطوير |
 | frost_coil | 0 | نعم | لا | 1244 | medium | ينتظر التطوير |
 | gem_quarry | 0 | نعم | لا | 765 | medium | ينتظر التطوير |
 | golden_tail | 0 | نعم | لا | 2206 | big | ينتظر التطوير |
@@ -33,9 +33,9 @@
 | honey_farm | 0 | نعم | لا | 370 | thin | ينتظر التطوير |
 | hop_world | 0 | نعم | لا | 785 | medium | ينتظر التطوير |
 | hot_spring | 0 | نعم | لا | 1266 | medium | ينتظر التطوير |
-| hungry_frog | 0 | نعم | لا | 2165 | big | ينتظر التطوير |
-| ice_dragon | 0 | نعم | لا | 513 | thin | ينتظر التطوير |
-| ice_rink | 0 | نعم | نعم | 1146 | medium | ينتظر التطوير |
+| hungry_frog | 0 | نعم | لا | 2181 | big | ينتظر التطوير |
+| ice_dragon | 0 | نعم | لا | 517 | thin | ينتظر التطوير |
+| ice_rink | 10 | نعم | نعم | 1155 | medium | ينتظر التطوير |
 | jungle_adventure | 5 | نعم | نعم | 3283 | big | ينتظر التطوير |
 | marble_dozer | 0 | نعم | لا | 1097 | medium | ينتظر التطوير |
 | mars_farm | 0 | نعم | لا | 1444 | medium | ينتظر التطوير |

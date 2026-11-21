@@ -4,7 +4,8 @@
 // Overlord answers with slimes, bugs and brutes. Destroy his UFO, or have more base health when 2:30 is up. Canvas 2D, art and
 // sound made in code. All the rules live in sim.js (pure, tested); this file only draws and listens.
 import { Battle, CARDS, UNITS, SPELLS, DIFFS, DT, L, HALF, CX, MATCH_TIME, ENERGY_MAX, BASE_R, arenaHalfW, normalizeSave, recordResult } from './sim.js';
-import { drawUnit, drawPlayerBase, drawUFO, drawCardIcon, ground, bar, glow, blob } from './art.js';
+import { drawUnit, drawPlayerBase, drawUFO, drawCardIcon, ground, bar, glow, blob, setArt } from './art.js';
+import { loadArt } from '../../cozy_kit/art.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 
@@ -56,7 +57,7 @@ class Game {
     this.ro.observe(el);
     this._bind();
     this.last = performance.now();
-    this._fonts().then(() => { this.showMenu(); this._loop(); });
+    Promise.all([this._fonts(), loadArt(this.base || config.base, ['unit_spark', 'unit_blaster', 'unit_brute', 'unit_bug', 'unit_slime', 'unit_smash', 'unit_spitter', 'unit_turret', 'base', 'ufo']).then(setArt)]).then(() => { this.showMenu(); this._loop(); });
   }
 
   async _fonts() { try { const ff = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([ff.load().then((x) => document.fonts.add(x)), new Promise((r) => setTimeout(r, 2500))]); } catch (_) { /* system font */ } }
@@ -643,8 +644,8 @@ const CSS = `
 .cb-energy.full b{animation:cbfull .6s infinite alternate}
 .cb-energy.flash{animation:cbflash .4s}
 .cb-energy .seg{position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(10% - 2px),rgba(0,0,0,.65) calc(10% - 2px),rgba(0,0,0,.65) 10%)}
-.cb-hand{display:flex;gap:calc(var(--u)*1.6)}
-.cb-c{flex:1;position:relative;aspect-ratio:.82;min-width:0;border-radius:calc(var(--u)*2.6);background:linear-gradient(180deg,#3d2c92,#170c4c);border:calc(var(--u)*.55) solid #6a8aff;box-shadow:0 0 calc(var(--u)*2) rgba(80,120,255,.45);touch-action:none;cursor:grab;overflow:hidden;-webkit-user-select:none;user-select:none}
+.cb-hand{display:flex;justify-content:center;gap:calc(var(--u)*1.6)}
+.cb-c{flex:0 1 min(24%,calc(var(--u)*30));position:relative;aspect-ratio:.82;min-width:0;border-radius:calc(var(--u)*2.6);background:linear-gradient(180deg,#3d2c92,#170c4c);border:calc(var(--u)*.55) solid #6a8aff;box-shadow:0 0 calc(var(--u)*2) rgba(80,120,255,.45);touch-action:none;cursor:grab;overflow:hidden;-webkit-user-select:none;user-select:none}
 .cb-c canvas{position:absolute;left:6%;top:4%;width:88%;height:auto;pointer-events:none}
 .cb-c .cost{position:absolute;top:calc(var(--u)*.5);left:calc(var(--u)*.5);width:calc(var(--u)*6.4);height:calc(var(--u)*6.4);border-radius:50%;background:radial-gradient(#e08aff,#8a2ad8);border:calc(var(--u)*.4) solid #fff;font-weight:900;font-size:calc(var(--u)*3.8);display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none}
 .cb-c .nm{position:absolute;bottom:0;left:0;right:0;font-size:calc(var(--u)*2.7);font-weight:900;padding:calc(var(--u)*.5) 0;text-align:center;background:rgba(0,0,0,.55);z-index:2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
