@@ -23,3 +23,7 @@
   Cache-Control: public, max-age=86400
 /assets/assets/audio/*
   Cache-Control: public, max-age=86400
+
+# Speed (2026-11-21): game scripts and pictures are re-checked at most every 10 minutes.
+/assets/assets/games/*
+  Cache-Control: public, max-age=600
