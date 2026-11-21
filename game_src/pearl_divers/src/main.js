@@ -8,6 +8,7 @@
 import { Lagoon, LEDGES, RIVAL_GOAL, MAX_HIRE, MAX_UP, BELL_TIME, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { loadArt } from '../../cozy_kit/art.js';
 
 const S = {
   title: ['غوّاصو اللؤلؤ', 'Pearl Divers'], play: ['يلا نغوص', 'Dive in'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], again: ['من الأول', 'Play again'],
@@ -36,6 +37,8 @@ class Sound extends SynthBase {
 }
 
 const f = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e4 ? `${(n / 1e3).toFixed(1)}K` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : String(Math.round(n)));
+// Optional generated pictures (assets/games/pearl_divers/art/*.webp). Each one is optional: a missing picture is drawn in code as before.
+const ART_NAMES = ['sky_lagoon', 'island', 'stall_boat', 'yacht', 'rival', 'diver', 'clam_open', 'clam_closed', 'bell', 'basket', 'coral', 'water_a', 'water_b'];
 const ROCK = ['#e6c9a0', '#d8a0b8', '#a898c8', '#6a5a98'];
 const WATER = [['#5ae0ee', '#2aa8d0'], ['#3ab8dc', '#1a80b8'], ['#2a88c0', '#14589a'], ['#1a60a0', '#0a3a78']];
 
@@ -45,6 +48,8 @@ class Game {
     I.setLang(config.lang); I.setGirl(config.gender === 'girl');
     this.save = normalizeSave(config.save);
     this.base = config.base || './';
+    this.art = {};
+    loadArt(this.base, ART_NAMES).then((a) => { this.art = a; this._rivalFace(); });
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
     if (!document.getElementById('pd-style')) document.head.append(h('style', { id: 'pd-style' }, css('pd', '#2ab8d8', '#1a5a98', '#ffe04a') + `
@@ -60,6 +65,7 @@ class Game {
 .pd-track b{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:linear-gradient(180deg,#7af8e8,#1ac8c0)}
 .pd-track span{position:absolute;right:calc(var(--u)*5.4);top:50%;transform:translateY(-50%);font-weight:900;font-size:calc(var(--u)*2.4);color:#fff}
 .pd-track em{position:absolute;right:calc(var(--u)*-1.4);top:50%;transform:translateY(-50%);font-style:normal;font-size:calc(var(--u)*5);background:#2a3a5a;border:calc(var(--u)*.4) solid #fff;border-radius:50%;width:calc(var(--u)*7);height:calc(var(--u)*7);display:flex;align-items:center;justify-content:center}
+.pd-track em img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:50% 20%;display:block}
 .pd-track u{position:absolute;top:50%;transform:translate(-50%,-50%);text-decoration:none;font-size:calc(var(--u)*4.4)}
 .pd-btns{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .pd-shopb{position:absolute;pointer-events:auto;font-family:inherit;font-weight:900;border:calc(var(--u)*.5) solid #fff;border-radius:999px;color:#fff;cursor:pointer;display:flex;align-items:center;gap:calc(var(--u)*1.2);padding:calc(var(--u)*.5) calc(var(--u)*2) calc(var(--u)*.5) calc(var(--u)*1.2);font-size:calc(var(--u)*3.2);box-shadow:0 calc(var(--u)*.7) calc(var(--u)*1.4) rgba(0,20,40,.45);-webkit-text-stroke:calc(var(--u)*.15) rgba(0,0,0,.5);white-space:nowrap;min-height:calc(var(--u)*7.4)}
@@ -147,7 +153,8 @@ class Game {
     this.fill = h('b', {}); this.goalTxt = h('span', {}, `$${f(RIVAL_GOAL)}`); this.coinMark = h('u', {}, '🪙');
     const menu = h('button', { class: 'pd-menu', 'aria-label': I.t('menu'), onclick: () => this.showMenu() }, '☰');
     this.layer.append(h('div', { class: 'pd-hud' }, h('div', { class: 'pd-cashrow' }, this.cashBox, menu),
-      h('div', { class: 'pd-race' }, h('div', { class: 'pd-you' }, I.t('you')), h('div', { class: 'pd-track' }, this.fill, this.goalTxt, this.coinMark, h('em', {}, '🧔')))));
+      h('div', { class: 'pd-race' }, h('div', { class: 'pd-you' }, I.t('you')), h('div', { class: 'pd-track' }, this.fill, this.goalTxt, this.coinMark, this.rivalEm = h('em', {}, '🧔')))));
+    this._rivalFace();
     this.btnLayer = h('div', { class: 'pd-btns' });
     this.layer.append(this.btnLayer);
     this.shopEls = [];
@@ -173,6 +180,29 @@ class Game {
       this.raf = requestAnimationFrame(frame);
     };
     this.raf = requestAnimationFrame(frame);
+  }
+
+  _rivalFace() { if (this.rivalEm && this.art.rival) this.rivalEm.replaceChildren(h('img', { src: this.art.rival.src, alt: '', draggable: 'false' })); }
+
+  /** Draws picture [n] with its bottom-centre at (x, y), [w] wide. Returns false when the picture is not there (the caller draws it in code). */
+  _pic(g, n, x, y, w, flip) {
+    const im = this.art[n];
+    if (!im) return false;
+    const hh = w * im.naturalHeight / im.naturalWidth;
+    if (flip) { g.save(); g.translate(x, 0); g.scale(-1, 1); g.drawImage(im, -w / 2, y - hh, w, hh); g.restore(); } else g.drawImage(im, x - w / 2, y - hh, w, hh);
+    return true;
+  }
+
+  /** Fills the rectangle with picture [n], cropped to cover it. */
+  _cover(g, n, x, y, w, hh, alpha) {
+    const im = this.art[n];
+    if (!im || hh <= 0) return false;
+    const k = Math.max(w / im.naturalWidth, hh / im.naturalHeight);
+    const sw = w / k; const sh = hh / k;
+    g.save(); g.beginPath(); g.rect(x, y, w, hh); g.clip(); g.globalAlpha = alpha;
+    g.drawImage(im, (im.naturalWidth - sw) / 2, (im.naturalHeight - sh) / 2, sw, sh, x, y, w, hh);
+    g.restore();
+    return true;
   }
 
   _boatPos() { const L = this._lay(); return { x: L.x0 + L.Wc * 0.27, y: L.surf - L.u * 7 - this.cam }; }
@@ -258,11 +288,14 @@ class Game {
     // sky
     const sky = g.createLinearGradient(0, 0, 0, Math.max(40, surf)); sky.addColorStop(0, '#78c8ff'); sky.addColorStop(1, '#e8f6ff');
     g.fillStyle = sky; g.fillRect(0, 0, W, H);
+    const skyArt = this._cover(g, 'sky_lagoon', 0, 0, W, Math.max(1, sy + u), 1);
     g.fillStyle = 'rgba(255,255,255,.92)';
-    for (const [cx, cy, s2] of [[0.15, 0.1, 1], [0.65, 0.07, 1.3], [0.9, 0.2, 0.8]]) { const x = x0 + ((cx * Wc + this.clock * 3 * s2) % (Wc + 80)) - 20; const y = cy * surf - cam * 0.3; g.beginPath(); g.ellipse(x, y, u * 6 * s2, u * 1.8 * s2, 0, 0, 6.3); g.ellipse(x + u * 3, y - u, u * 3.4 * s2, u * 2 * s2, 0, 0, 6.3); g.fill(); }
+    if (!skyArt) for (const [cx, cy, s2] of [[0.15, 0.1, 1], [0.65, 0.07, 1.3], [0.9, 0.2, 0.8]]) { const x = x0 + ((cx * Wc + this.clock * 3 * s2) % (Wc + 80)) - 20; const y = cy * surf - cam * 0.3; g.beginPath(); g.ellipse(x, y, u * 6 * s2, u * 1.8 * s2, 0, 0, 6.3); g.ellipse(x + u * 3, y - u, u * 3.4 * s2, u * 2 * s2, 0, 0, 6.3); g.fill(); }
     // far island with palms
-    g.fillStyle = '#f2dca0'; g.beginPath(); g.ellipse(x0 + Wc * 0.55, sy - u * 0.4, Wc * 0.4, u * 2.6, 0, Math.PI, 0); g.fill();
-    for (const px of [0.45, 0.6, 0.72]) this._palm(g, x0 + Wc * px, sy - u * 2.2, u * (px === 0.6 ? 1.1 : 0.85));
+    if (!this._pic(g, 'island', x0 + Wc * 0.55, sy + u * 0.4, Wc * 0.62)) {
+      g.fillStyle = '#f2dca0'; g.beginPath(); g.ellipse(x0 + Wc * 0.55, sy - u * 0.4, Wc * 0.4, u * 2.6, 0, Math.PI, 0); g.fill();
+      for (const px of [0.45, 0.6, 0.72]) this._palm(g, x0 + Wc * px, sy - u * 2.2, u * (px === 0.6 ? 1.1 : 0.85));
+    }
     // boats
     const bob = Math.sin(this.clock * 2) * u * 0.35;
     this._stall(g, x0 + Wc * 0.27, sy + bob, u);
@@ -278,6 +311,7 @@ class Game {
       const top = i === 0 ? sy : y0;
       const wg = g.createLinearGradient(0, top, 0, y1); wg.addColorStop(0, WATER[i][0]); wg.addColorStop(1, WATER[i][1]);
       g.fillStyle = wg; g.fillRect(0, top, W, y1 - top);
+      this._cover(g, i < 2 ? 'water_a' : 'water_b', 0, top, W, y1 - top, a.isOpen ? 0.7 : 0.55);
       if (!a.isOpen) { g.fillStyle = 'rgba(10,0,40,.62)'; g.fillRect(0, top, W, y1 - top); this._rock(g, 0, y1 - rowH * 0.2, W, rowH * 0.2, i, u); continue; }
       // light rays
       g.fillStyle = 'rgba(255,255,255,.07)';
@@ -342,6 +376,7 @@ class Game {
     const cols = ['#ff6a8a', '#ffa03a', '#b86aff', '#ff4a6a'];
     for (let k = 0; k < 7; k++) {
       const x = x0 + Wc * (0.3 + k * 0.08 + ((k * 37 + i * 11) % 5) * 0.004); const sw = Math.sin(this.clock * 1.5 + k) * u * 0.6;
+      if (!(k % 2) && k % 4 === 0 && this._pic(g, 'coral', x, floor + u * 0.4, u * 5.6)) continue;
       if (k % 2) { g.strokeStyle = '#2ac85a'; g.lineWidth = u * 0.7; g.lineCap = 'round'; g.beginPath(); g.moveTo(x, floor); g.quadraticCurveTo(x + sw, floor - u * 3, x + sw * 1.5, floor - u * 5.5 - (k % 3) * u); g.stroke(); } else { g.fillStyle = cols[(k + i) % 4]; g.beginPath(); g.arc(x, floor - u * 0.6, u * 1.3, Math.PI, 0); g.arc(x + u * 1.1, floor - u * 0.6, u * 0.9, Math.PI, 0); g.fill(); }
     }
   }
@@ -352,6 +387,7 @@ class Game {
   }
 
   _stall(g, x, y, u) {
+    if (this._pic(g, 'stall_boat', x, y + u * 1.8, u * 24)) return;
     g.fillStyle = '#c8352a'; g.beginPath(); g.moveTo(x - u * 10, y - u * 3.4); g.lineTo(x + u * 10, y - u * 3.4); g.lineTo(x + u * 7, y + u * 1.6); g.lineTo(x - u * 7, y + u * 1.6); g.closePath(); g.fill();
     g.fillStyle = '#8a2218'; g.fillRect(x - u * 10, y - u * 3.4, u * 20, u * 0.9);
     g.fillStyle = '#7a4a2a'; g.fillRect(x - u * 4.4, y - u * 8, u * 8.8, u * 4.6);
@@ -363,6 +399,7 @@ class Game {
   }
 
   _yacht(g, x, y, u) {
+    if (this._pic(g, 'yacht', x, y + u * 2, u * 25)) return;
     g.fillStyle = '#f8d8d8'; g.beginPath(); g.moveTo(x - u * 11, y - u * 2.4); g.lineTo(x + u * 11, y - u * 2.4); g.lineTo(x + u * 8, y + u * 1.8); g.lineTo(x - u * 9, y + u * 1.8); g.closePath(); g.fill();
     g.fillStyle = '#e8708a'; g.fillRect(x - u * 11, y - u * 2.4, u * 22, u * 1);
     g.fillStyle = '#fff0f0'; g.fillRect(x - u * 5, y - u * 5.6, u * 9, u * 3.2);
@@ -383,17 +420,20 @@ class Game {
 
   _bell(g, x, y, u, load) {
     g.strokeStyle = '#d8b050'; g.lineWidth = u * 0.3; g.beginPath(); g.moveTo(x, y - u * 5); g.lineTo(x, y - u * 1.7); g.stroke();
-    g.fillStyle = '#e8a830'; g.strokeStyle = '#7a4a0a'; g.lineWidth = u * 0.35; g.beginPath(); g.arc(x, y, u * 2.1, Math.PI, 0); g.lineTo(x + u * 2.1, y + u * 1.4); g.lineTo(x - u * 2.1, y + u * 1.4); g.closePath(); g.fill(); g.stroke();
-    g.fillStyle = '#8ad8ff'; g.beginPath(); g.arc(x, y - u * 0.4, u * 0.8, 0, 6.3); g.fill(); g.stroke();
+    if (!this._pic(g, 'bell', x, y + u * 1.8, u * 5.2)) {
+      g.fillStyle = '#e8a830'; g.strokeStyle = '#7a4a0a'; g.lineWidth = u * 0.35; g.beginPath(); g.arc(x, y, u * 2.1, Math.PI, 0); g.lineTo(x + u * 2.1, y + u * 1.4); g.lineTo(x - u * 2.1, y + u * 1.4); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = '#8ad8ff'; g.beginPath(); g.arc(x, y - u * 0.4, u * 0.8, 0, 6.3); g.fill(); g.stroke();
+    }
     if (load) { g.fillStyle = '#fff'; for (let k = 0; k < 3; k++) { g.beginPath(); g.arc(x - u * 0.9 + k * u * 0.9, y + u * 0.9, u * 0.42, 0, 6.3); g.fill(); } }
   }
 
   _basket(g, x, floor, u, n) {
-    g.fillStyle = '#b8803a'; g.strokeStyle = '#6a4210'; g.lineWidth = u * 0.3; g.beginPath(); g.moveTo(x - u * 2.4, floor - u * 3); g.lineTo(x + u * 2.4, floor - u * 3); g.lineTo(x + u * 1.8, floor); g.lineTo(x - u * 1.8, floor); g.closePath(); g.fill(); g.stroke();
+    if (!this._pic(g, 'basket', x, floor, u * 5.4)) { g.fillStyle = '#b8803a'; g.strokeStyle = '#6a4210'; g.lineWidth = u * 0.3; g.beginPath(); g.moveTo(x - u * 2.4, floor - u * 3); g.lineTo(x + u * 2.4, floor - u * 3); g.lineTo(x + u * 1.8, floor); g.lineTo(x - u * 1.8, floor); g.closePath(); g.fill(); g.stroke(); }
     g.fillStyle = '#fff'; for (let k = 0; k < Math.min(n, 6); k++) { g.beginPath(); g.arc(x - u * 1.5 + (k % 3) * u * 1.5, floor - u * 3.2 - Math.floor(k / 3) * u * 0.8, u * 0.62, 0, 6.3); g.fill(); g.strokeStyle = '#b8c0d0'; g.lineWidth = u * 0.15; g.stroke(); }
   }
 
   _clam(g, x, floor, u, open, i) {
+    if (this._pic(g, open ? 'clam_open' : 'clam_closed', x, floor + u * 0.3, u * 8)) return;
     const col = ['#b87ad8', '#d86a9a', '#8a6ad8', '#6a8ad8'][i];
     g.fillStyle = col; g.strokeStyle = 'rgba(40,0,60,.6)'; g.lineWidth = u * 0.3;
     g.beginPath(); g.ellipse(x, floor - u * 1, u * 3.4, u * 1.4, 0, 0, Math.PI); g.fill(); g.stroke();
@@ -404,6 +444,13 @@ class Game {
 
   _diver(g, x, y, s, has, k, dir) {
     const sw = Math.sin(this.clock * 8 + k) * s * 0.4;
+    if (this.art.diver) {
+      const bob = Math.sin(this.clock * 6 + k) * s * 0.25;
+      this._pic(g, 'diver', x, y + s * 3.4 + bob, s * 8.6, dir < 0);
+      if (has) { g.fillStyle = '#fff'; g.strokeStyle = '#b8c0d0'; g.lineWidth = s * 0.2; g.beginPath(); g.arc(x + dir * s * 2.4, y + s * 0.6, s * 0.7, 0, 6.3); g.fill(); g.stroke(); }
+      g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.arc(x + s, y - s * 3.8 - ((this.clock * 3 + k) % 1) * s * 2.4, s * 0.3, 0, 6.3); g.fill();
+      return;
+    }
     g.fillStyle = k % 2 ? '#e86a2a' : '#f0a020'; g.beginPath(); g.ellipse(x, y, s * 1.2, s * 1.7, 0, 0, 6.3); g.fill();
     g.fillStyle = '#6ad0ff'; g.strokeStyle = '#2a4a6a'; g.lineWidth = s * 0.25; g.beginPath(); g.arc(x, y - s * 2.1, s * 1.15, 0, 6.3); g.fill(); g.stroke();
     g.fillStyle = '#f2c9a0'; g.beginPath(); g.arc(x + dir * s * 0.1, y - s * 2.1, s * 0.6, 0, 6.3); g.fill();

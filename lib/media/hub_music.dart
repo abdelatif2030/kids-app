@@ -36,6 +36,12 @@ class HubMusic {
   void claim(Object owner, String? track) {
     _owner = owner;
     _want = track;
+    if (track == null && !disabled && !_isTest) {
+      // a game opened: silence right now, do not wait behind a track that is still loading
+      try {
+        _player?.pause();
+      } catch (_) {}
+    }
     _schedule();
   }
 
@@ -69,11 +75,16 @@ class HubMusic {
       }
       final p = _player ??= JustAudioFilePlayer();
       if (_loaded != want) {
-        await p.load(AssetAudio(_paths[want]!));
+        // never let the old track keep playing while the new one loads (or when it fails to load)
+        await p.pause();
+        _loaded = null;
+        final len = await p.load(AssetAudio(_paths[want]!));
+        if (len == null) return; // could not load: stay silent
         await p.setLoop(true);
         await p.setVolume(_volume);
         _loaded = want;
       }
+      if (_want != want) return; // the page changed while loading: the next _apply decides
       await p.play();
     } catch (_) {
       // no audio device, blocked autoplay, a missing file: stay silent

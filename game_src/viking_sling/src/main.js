@@ -5,6 +5,7 @@
 import { Battle, ANCHOR, MAX_PULL, VIKINGS, GOBLINS, normalizeSave, recordResult, buyUpgrade, upgradeCost } from './sim.js';
 import { LEVELS } from './levels.js';
 import { Sound } from './audio.js';
+import { loadArt } from '../../cozy_kit/art.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 
 const S = {
@@ -19,6 +20,7 @@ const S = {
   kind_axe: ['اضغط: ينطّ بسرعة', 'Tap: speed burst'], kind_bomb: ['اضغط: ينفجر', 'Tap: explode'], kind_shield: ['يرتد بقوة، اضغط: دفعة', 'Bounces, tap: dash'], kind_giant: ['يكسّر الحيطان، اضغط: ضربة للأرض', 'Smashes walls, tap: slam'],
 };
 const I = makeI18n(S);
+let ART = {}; // optional generated pictures (assets/games/viking_sling/art/*.webp); a missing one stays null and that thing is drawn in code
 const FARX = 38; // right edge of the playfield for the camera
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 
@@ -63,7 +65,7 @@ class Game {
     this.ro.observe(el);
     this._bind();
     this.last = performance.now();
-    this._fonts().then(() => { this.showMenu(); this._loop(); });
+    Promise.all([this._fonts(), loadArt(this.base, ['vik_axe', 'vik_bomb', 'vik_shield', 'vik_giant', 'gob', 'gob_helm', 'gob_boss', 'tex_wood', 'tex_stone', 'tex_ice', 'sky_meadow', 'tree_pine']).then((a) => { ART = a; })]).then(() => { this.showMenu(); this._loop(); });
   }
 
   async _fonts() { try { const ff = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([ff.load().then((x) => document.fonts.add(x)), new Promise((r) => setTimeout(r, 2500))]); } catch (_) { /* system font */ } }
@@ -304,15 +306,18 @@ class Game {
     if (!this.sky) { const k = g.createLinearGradient(0, 0, 0, this.gy); k.addColorStop(0, '#5aaee8'); k.addColorStop(0.7, '#a8dcf6'); k.addColorStop(1, '#e8f6e0'); this.sky = k; }
     g.fillStyle = this.sky; g.fillRect(0, 0, W, H);
     const cam = this.camX;
+    const skyP = ART.sky_meadow;
+    if (skyP) { const k = Math.max(W * 1.12 / skyP.naturalWidth, this.gy / skyP.naturalHeight); const dw = skyP.naturalWidth * k; const dh = skyP.naturalHeight * k; const off = Math.min(W * 0.06, Math.max(0, cam * 0.04 * s)); g.drawImage(skyP, -(dw - W) / 2 - off, this.gy - dh, dw, dh); }
     // sun
-    g.fillStyle = '#fff6b0'; g.beginPath(); g.arc(W * 0.8, H * 0.14, Math.min(W, H) * 0.07, 0, 6.3); g.fill();
+    if (!skyP) { g.fillStyle = '#fff6b0'; g.beginPath(); g.arc(W * 0.8, H * 0.14, Math.min(W, H) * 0.07, 0, 6.3); g.fill(); }
     // clouds
     g.fillStyle = 'rgba(255,255,255,.85)';
-    for (let i = 0; i < 6; i++) { const x = ((i * 9.3 - cam * 0.12 + this.clock * 0.15) % 60 + 60) % 60 - 6; const y = 2.8 + (i % 3) * 2.2; this._cloud(g, x * s, this.gy - (6 + y * 1.5) * s, s * (1.4 + (i % 2) * 0.5)); }
+    for (let i = 0; i < (skyP ? 0 : 6); i++) { const x = ((i * 9.3 - cam * 0.12 + this.clock * 0.15) % 60 + 60) % 60 - 6; const y = 2.8 + (i % 3) * 2.2; this._cloud(g, x * s, this.gy - (6 + y * 1.5) * s, s * (1.4 + (i % 2) * 0.5)); }
     // mountains and hills (parallax)
-    this._ridge(g, cam * 0.2, '#8aa8c8', 7, 5.5, 0.35, 3.1);
-    this._ridge(g, cam * 0.4, '#6c9a78', 5, 3.2, 0.55, 1.7);
+    if (!skyP) { this._ridge(g, cam * 0.2, '#8aa8c8', 7, 5.5, 0.35, 3.1); this._ridge(g, cam * 0.4, '#6c9a78', 5, 3.2, 0.55, 1.7); }
     this._ridge(g, cam * 0.7, '#58a050', 3, 1.6, 0.9, 0.9);
+    const tp = ART.tree_pine;
+    if (tp) for (let i = 0; i < 14; i++) { const wx = i * 5.3 + (i % 3) * 0.7; const px = (((wx - cam * 0.7) % 74) + 74) % 74 - 6; const th = (2.6 + (i % 4) * 0.5) * s; const tw = th * tp.naturalWidth / tp.naturalHeight; g.drawImage(tp, px * s - tw / 2, this.gy - th * 0.92, tw, th); }
     const sh = this.shake > 0 ? (Math.random() - 0.5) * this.shake * 10 : 0;
     g.save(); g.translate(sh, sh * 0.6);
     // ground
@@ -397,6 +402,13 @@ class Game {
       g.fillStyle = 'rgba(150,224,250,.88)'; g.strokeStyle = '#4a9cc8'; g.lineWidth = Math.max(1.5, s * 0.07); g.beginPath(); g.roundRect(-w / 2, -hh / 2, w, hh, s * 0.1); g.fill(); g.stroke();
       g.fillStyle = 'rgba(255,255,255,.65)'; g.beginPath(); g.moveTo(-w / 2 + s * 0.12, -hh / 2 + s * 0.12); g.lineTo(-w / 2 + Math.min(w * 0.5, s * 0.7), -hh / 2 + s * 0.12); g.lineTo(-w / 2 + s * 0.12, -hh / 2 + Math.min(hh * 0.6, s * 0.7)); g.fill();
     }
+    const tx = ART[o.mat === 'wood' ? 'tex_wood' : o.mat === 'stone' ? 'tex_stone' : 'tex_ice'];
+    if (tx) {
+      const tw = tx.naturalWidth; const th = tx.naturalHeight; const asp = w / hh; let cw = tw; let ch = cw / asp; if (ch > th) { ch = th; cw = ch * asp; }
+      const ox = ((o.id || 0) * 97) % Math.max(1, tw - cw); const oy = ((o.id || 0) * 53) % Math.max(1, th - ch);
+      g.save(); g.beginPath(); g.roundRect(-w / 2, -hh / 2, w, hh, s * 0.08); g.clip(); g.globalAlpha = o.mat === 'ice' ? 0.8 : 0.92; g.drawImage(tx, ox, oy, cw, ch, -w / 2, -hh / 2, w, hh); g.globalAlpha = 1; g.restore();
+      g.strokeStyle = o.mat === 'wood' ? '#5a2e0e' : o.mat === 'stone' ? '#3e444e' : '#3a86b0'; g.lineWidth = Math.max(1.5, s * 0.07); g.beginPath(); g.roundRect(-w / 2, -hh / 2, w, hh, s * 0.08); g.stroke();
+    }
     if (hurt > 0.25) {
       g.strokeStyle = 'rgba(30,20,10,.65)'; g.lineWidth = Math.max(1, s * 0.05); g.beginPath();
       const cr = hurt > 0.6 ? 3 : 2;
@@ -410,6 +422,14 @@ class Game {
     const s = this.s; const x = this._sx(o.x); const y = this._sy(o.y); const r = o.r * s; const k = o.tag || 'g';
     const hurt = this.b.world.time - o.lastHit < 0.5;
     g.save(); g.translate(x, y); g.rotate(-o.a * 0.6);
+    const gp = k === 'boss' ? ART.gob_boss : k === 'h' ? ART.gob_helm : ART.gob;
+    if (gp) {
+      const w = r * (k === 'boss' ? 3.1 : 3.3); const hh = w * gp.naturalHeight / gp.naturalWidth;
+      if (hurt) g.filter = 'brightness(1.45) saturate(.8)';
+      g.drawImage(gp, -w / 2, -hh / 2, w, hh); g.filter = 'none';
+      if (k === 'boss') { const hp = Math.max(0, o.hp) / o.maxHp; g.restore(); g.save(); g.translate(x, y - r * 1.9); g.fillStyle = 'rgba(0,0,0,.5)'; g.fillRect(-r * 0.9, 0, r * 1.8, s * 0.22); g.fillStyle = hp > 0.5 ? '#5af08a' : '#f0a02a'; g.fillRect(-r * 0.9, 0, r * 1.8 * hp, s * 0.22); }
+      g.restore(); return;
+    }
     // ears
     g.fillStyle = '#6cb83a'; g.strokeStyle = '#2a5a14'; g.lineWidth = Math.max(1.5, s * 0.07);
     for (const sx of [-1, 1]) { g.beginPath(); g.moveTo(sx * r * 0.7, -r * 0.2); g.lineTo(sx * r * 1.55, -r * 0.75); g.lineTo(sx * r * 0.95, r * 0.25); g.closePath(); g.fill(); g.stroke(); }
@@ -439,6 +459,8 @@ class Game {
     const s = this.s; const x = this._sx(wx); const y = this._sy(wy); const r = wr * s * sc;
     g.save(); g.translate(x, y); g.rotate(-ang * 0.35);
     const giant = type === 'giant';
+    const vp = ART['vik_' + type] || (type === 'axe' ? null : ART.vik_axe);
+    if (vp) { const w = r * 2.9; const hh = w * vp.naturalHeight / vp.naturalWidth; g.drawImage(vp, -w / 2, -hh / 2 - r * 0.1, w, hh); g.restore(); return; }
     g.lineWidth = Math.max(1.5, s * 0.07); g.strokeStyle = '#4a2a10';
     // face
     g.fillStyle = giant ? '#e8a878' : '#f6c898'; g.beginPath(); g.arc(0, 0, r, 0, 6.3); g.fill(); g.stroke();
@@ -479,3 +501,4 @@ void GOBLINS;
 const api = { start(el, config, post) { const g = new Game(el, config || {}, post); api.last = g; return { dispose: () => g.dispose(), pause: () => g.pause() }; } };
 window.VikingSling = api;
 export default api;
+

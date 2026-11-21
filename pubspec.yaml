@@ -101,6 +101,7 @@ flutter:
     - assets/games/game_bg.webp
     - assets/games/carnival_race/
     - assets/games/jungle_adventure/
+    - assets/games/jungle_adventure/art/
     - assets/games/happy_farm/
     - assets/games/pumpkin_pie/
     - assets/games/samurai/
@@ -134,8 +135,10 @@ flutter:
     - assets/games/learn_voice/en/
     - assets/games/summit_rush/
     - assets/games/hero_tower/
+    - assets/games/hero_tower/art/
     - assets/games/cloud_dash/
     - assets/games/sky_capy/
+    - assets/games/sky_capy/art/
     - assets/games/marble_dozer/
     - assets/games/dune_titans/
     - assets/games/castaway_raft/
@@ -148,8 +151,10 @@ flutter:
     - assets/games/sunset_highway/
     - assets/games/sections/
     - assets/games/sky_jumper/
+    - assets/games/sky_jumper/art/
     - assets/games/temple_army/
     - assets/games/rug_cleaning/
+    - assets/games/rug_cleaning/art/
     - assets/games/fashion_queen/
     - assets/games/gummy_squad/
     - assets/games/barrel_knights/
@@ -159,7 +164,9 @@ flutter:
     - assets/games/dino_grow/
     - assets/games/card_battle/
     - assets/games/viking_sling/
+    - assets/games/viking_sling/art/
     - assets/games/trick_or_treat/
+    - assets/games/trick_or_treat/art/
     - assets/games/nutmeg_rush/
     - assets/games/sky_ace/
     - assets/games/gem_quarry/
@@ -170,11 +177,14 @@ flutter:
     - assets/games/fizz_runner/
     - assets/games/chomp_maze/
     - assets/games/hamster_warrior/
+    - assets/games/hamster_warrior/art/
     - assets/games/ball_scoop/
     - assets/games/ice_dragon/
     - assets/games/honey_farm/
     - assets/games/pearl_divers/
+    - assets/games/pearl_divers/art/
     - assets/games/creator_tycoon/
+    - assets/games/creator_tycoon/art/
     - assets/home/home_main.webp
     - assets/home/cartoons_stories.webp
     - assets/home/lessons_scene.webp

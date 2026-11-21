@@ -8,6 +8,7 @@
 import { Studio, RANKS, KINDS, SHOP, UNLOCKS, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { loadArt } from '../../cozy_kit/art.js';
 
 const S = {
   title: ['مبدع الذكاء', 'AI Creator'], play: ['يلا نبدأ', 'Start'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], again: ['من الأول', 'Play again'],
@@ -37,6 +38,10 @@ const SCENE = [
   'linear-gradient(180deg,#7ab8ff 0,#c8e4ff 55%,#d49a5e 55%,#9a6a36 100%)',
   'linear-gradient(180deg,#ffb86a 0,#ffe0a8 55%,#b8864e 55%,#7a5028 100%)',
 ];
+// Optional generated pictures (assets/games/creator_tycoon/art/*.webp). Each one is optional: a missing picture keeps the emoji/gradient look.
+const ART_NAMES = ['office_dark', 'office_bright', 'office_sunset', 'creator', 'ceo', 'bin', 'desk_1', 'desk_2', 'desk_3', 'photo_a', 'photo_b', 'video_a', 'video_b', 'game_a', 'game_b', 'slop_a', 'slop_b'];
+const ART_CARDS = { photo: ['photo_a', 'photo_b'], video: ['video_a', 'video_b'], game: ['game_a', 'game_b'], slop: ['slop_a', 'slop_b'] };
+const DESK_ART = ['desk_1', 'desk_1', 'desk_1', 'desk_2', 'desk_3'];
 const DESK = ['🖥️', '🖥️', '💻', '🖥️🖥️', '🖥️🖥️🖥️'];
 
 class Sound extends SynthBase {
@@ -67,6 +72,8 @@ class Game {
     I.setLang(config.lang); I.setGirl(config.gender === 'girl');
     this.save = normalizeSave(config.save);
     this.base = config.base || './';
+    this.art = {}; this.artKey = '';
+    loadArt(this.base, ART_NAMES).then((a) => { this.art = a; this.artKey = ''; });
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
     if (!document.getElementById('ct-style')) document.head.append(h('style', { id: 'ct-style' }, css('ct', '#2a3a9a', '#141c5a', '#ffe04a') + `
@@ -85,6 +92,11 @@ class Game {
 .ct-desk{position:absolute;left:12%;bottom:30%;font-size:calc(var(--u)*13);line-height:1;white-space:nowrap}
 .ct-me{position:absolute;right:6%;bottom:6%;font-size:calc(var(--u)*24);line-height:1}
 .ct-bin{position:absolute;left:4%;bottom:5%;font-size:calc(var(--u)*11);line-height:1}
+.ct-desk.art{font-size:0;height:38%;left:9%;bottom:21%}.ct-me.art{font-size:0;height:64%;right:3%;bottom:2%}.ct-bin.art{font-size:0;height:27%;left:3%;bottom:3%}.ct-boss.art{font-size:0;height:62%;left:1%;bottom:2%}
+.ct-desk img,.ct-me img,.ct-bin img,.ct-boss img{height:100%;width:auto;display:block;pointer-events:none;-webkit-user-drag:none}
+.ct-scene.arted .ct-note{display:none}
+.ct-gc.art .pic{position:absolute;inset:0;font-size:0}.ct-gc.art .pic img{width:100%;height:100%;object-fit:cover;display:block}
+.ct-gc.art .tag{background:rgba(255,255,255,.88);border-radius:calc(var(--u)*1);padding:0 calc(var(--u)*1.4)}
 .ct-boss{position:absolute;left:2%;bottom:4%;font-size:calc(var(--u)*22);line-height:1;opacity:0;transition:opacity .4s}.ct-boss.show{opacity:1}
 .ct-note{position:absolute;width:calc(var(--u)*3);height:calc(var(--u)*3);transform:rotate(8deg);opacity:.85}
 .ct-gc{position:absolute;left:50%;top:6%;transform:translateX(-50%);width:42%;aspect-ratio:3/4;background:#f4f4f8;border:calc(var(--u)*.6) solid #fff;border-radius:calc(var(--u)*1.6);box-shadow:0 calc(var(--u)*1) calc(var(--u)*2.4) rgba(0,0,0,.5);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#2a2a50;font-weight:900;overflow:hidden;box-sizing:border-box;padding:0}
@@ -180,7 +192,7 @@ class Game {
     this.e.starsRow = E('ct-f');
     this.e.meter = E('ct-meter', ...[0, 1, 2].map(() => { const x = E('ct-seg'); this.e.zone.push(x); return x; }), this.e.needle);
     const desk = E('ct-desk'); const me = E('ct-me', '🧑‍💻'); const boss = E('ct-boss', '👩‍💼'); const bin = E('ct-bin', '🗑️');
-    this.e.desk = desk; this.e.boss = boss;
+    this.e.desk = desk; this.e.boss = boss; this.e.me = me; this.e.bin = bin; this.artKey = '';
     for (let i = 0; i < 7; i++) { const n = E('ct-note'); n.style.cssText = `left:${8 + i * 13}%;top:${10 + (i * 37) % 30}%;background:${['#ffb0d0', '#ffe88a', '#8ad8ff', '#a8f0a0'][i % 4]}`; this.e.scene.append(n); }
     this.e.scene.append(desk, me, bin, boss);
     this.btns = Object.keys(KINDS).map((k) => {
@@ -240,7 +252,9 @@ class Game {
     const pic = slop ? SLOP[Math.floor(Math.random() * SLOP.length)] : PIC[k][Math.floor(Math.random() * PIC[k].length)];
     const e0 = ev.find((e) => e.stars !== undefined);
     const tag = h('div', { class: 'tag' }, I.t('generating'));
-    const card = h('div', { class: 'ct-gc' }, h('div', { class: 'pic' }, pic), tag);
+    const names = ART_CARDS[slop ? 'slop' : k].filter((n) => this.art[n]);
+    const picName = names.length ? names[Math.floor(Math.random() * names.length)] : null;
+    const card = h('div', { class: picName ? 'ct-gc art' : 'ct-gc' }, h('div', { class: 'pic' }, picName ? h('img', { src: this.art[picName].src, alt: '', draggable: 'false' }) : pic), tag);
     this.e.scene.append(card);
     this.sound.play('tap');
     setTimeout(() => {
@@ -350,9 +364,20 @@ class Game {
     const lag = s.event && s.event.id === 'lag';
     if (this.hintT > 0) this.hintT -= dt;
     if (this.bossT > 0) { this.bossT -= dt; if (this.bossT <= 0) this.e.boss.classList.remove('show'); }
-    el.desk.textContent = DESK[Math.min(s.rank, DESK.length - 1)];
-    el.scene.style.background = SCENE[Math.min(s.rank, SCENE.length - 1)];
+    const ri = Math.min(s.rank, SCENE.length - 1);
+    const key = `${ri}|${Object.values(this.art).filter(Boolean).length}`;
+    if (key !== this.artKey) { this.artKey = key; this._dressScene(ri); }
     if (s.goal) el.hint.textContent = lag ? I.t('lag') : s.stars > 0 ? `${I.num(s.goal - s.stars)} ${I.t('more')}` : I.t('tapGreen');
+  }
+
+  /** Office look for a level: generated pictures when they loaded, otherwise the emoji and gradients. */
+  _dressScene(ri) {
+    const A = this.art; const el = this.e;
+    const bg = ri <= 1 ? 'office_dark' : ri <= 3 ? 'office_bright' : 'office_sunset';
+    el.scene.style.background = A[bg] ? `#0a1030 url(${A[bg].src}) center/cover no-repeat` : SCENE[ri];
+    el.scene.classList.toggle('arted', !!A[bg]);
+    const put = (node, name, emoji) => { if (A[name]) { node.classList.add('art'); node.replaceChildren(h('img', { src: A[name].src, alt: '', draggable: 'false' })); } else { node.classList.remove('art'); node.textContent = emoji; } };
+    put(el.desk, DESK_ART[ri], DESK[ri]); put(el.me, 'creator', '🧑‍💻'); put(el.bin, 'bin', '🗑️'); put(el.boss, 'ceo', '👩‍💼');
   }
 
   _banner2(a, b) { const x = h('div', { class: 'ct-banner' }, a, h('small', {}, b)); this.e.scene.append(x); setTimeout(() => x.remove(), 2300); }

@@ -63,7 +63,7 @@ function fitThing(item, h, w) {
 const SCALE = { camel: 1.15, horse: 1.15, giraffe: 0.8, rocket: 1.1, crescent: 1.4, cow: 1.1, bear: 1.3, bed: 1.05, tub: 1.05, pot: 1.25, plate: 1.25, bowl: 1.25, soap: 1.3, backpack: 1.25, toothbrush: 1.3, heart: 1.4, carrot: 1.5, bone: 1.6, grass: 1.3, honey: 1.5, cheese: 1.4, seeds: 1.6 };
 const HAND = new THREE.Vector3(-5.0, 2.8, 2.0);
 const LANDSCAPE = { portrait: false, span: 9.2, off: 0.9, zs: [-1.3, -0.2], hero: [-4.4, 4.6, 1.3], owl: [-6.7, 4.0, 0.85], stand: [-0.2, 3.3], cam: { box: [9.0, 5.1], target: [0, 2.5, 0.3], minAspect: 0 } };
-const PORTRAIT = { portrait: true, span: 8.0, off: 0, zs: [-4.4, -2.5], hero: [-2.2, 5.8, 1.25], owl: [0.2, 5.4, 0.85], stand: [2.2, 2.6], cam: { box: [6.6, 4.4], target: [0, 2.6, 1.8], minAspect: 0 } };
+const PORTRAIT = { portrait: true, span: 8.8, off: 0, zs: [-4.4, -2.5], hero: [-2.2, 5.8, 1.25], owl: [0.2, 5.4, 0.85], stand: [2.2, 2.6], cam: { box: [6.6, 4.4], target: [0, 2.6, 1.8], minAspect: 0 } };
 const STAND = new THREE.Vector3(-1.5, 0, 5.4); // the picture of the question stands in FRONT of the choices (nearer the child), not among them
 const RACK = new THREE.Vector3(5.2, 0, 3.0);
 const RACK_S = 0.6;
@@ -317,7 +317,8 @@ class Game {
       pole.position.set(0, 0.45 + lift, 0);
       plaque = this._plaque(text, true);
       plaque.position.set(0, 1.5 + lift, 0);
-      plaque.scale.setScalar(this.layout.portrait ? 1.2 : 1.6);
+      // upright phone: neighbouring signs must never cover each other's number (owner 2026-11-21), so four signs are a bit smaller
+      plaque.scale.setScalar(this.layout.portrait ? (n >= 4 ? 0.98 : 1.2) : 1.6);
       g.add(pole, plaque);
       item = plaque;
     }
@@ -671,7 +672,57 @@ class Game {
   }
 
   /** The topic levels as a small page of tiles (opened from «مستويات أكتر»). */
-  _moreLevels() {
+  _moreLevels(page = 0) {
+    const sh = this.sh;
+    // owner 2026-11-21: the new levels get a page as good as the first twelve: the same picture, the same 3 x 4 tiles, pages of twelve
+    const img = new Image();
+    img.className = 'lw-pic-img';
+    img.alt = '';
+    img.onload = () => {
+      if (this.st.mode !== 'menu') return;
+      this._clearPicPages();
+      sh.layer.append(this._moreLevelsPicture(img, page));
+    };
+    img.onerror = () => this._moreLevelsCard();
+    img.src = `${sh.base}../art/levels_page.webp`;
+  }
+
+  _clearPicPages() { for (const el of this.sh.layer.querySelectorAll('.lw-pic')) el.remove(); }
+
+  _moreLevelsPicture(img, page) {
+    const sh = this.sh;
+    const en = sh.T.lang === 'en';
+    const done = this.save.lw.done || {};
+    const { wrap, place } = this._pictureFrame(img, 1226 / 1283);
+    const PER = 12, pages = Math.ceil(TOPIC_LEVELS.length / PER);
+    const cols = [0.723, 0.532, 0.343], rows = [0.327, 0.489, 0.647, 0.807];
+    const slice = TOPIC_LEVELS.slice(page * PER, page * PER + PER);
+    slice.forEach((lv, k) => {
+      const n = LEVELS.length + page * PER + k + 1;
+      const cx = cols[k % 3], cy = rows[Math.floor(k / 3)];
+      const b = h('button', { class: `lw-ptile${done[lv.id] ? ' done' : ''}`, 'aria-label': lv.ar, onclick: () => { sh.sound.play('tap'); this._enter(lv.id); } },
+        h('i', {}, lv.emoji), h('b', {}, sh.T.num(n)), h('span', {}, lv.ar), done[lv.id] ? h('u', {}, '⭐') : null);
+      place(b, cx, cy, 0.178, 0.157);
+    });
+    // empty places on a short last page are covered too, so no picture of a first-page tile shows through
+    for (let k = slice.length; k < PER; k++) place(h('div', { class: 'lw-ptile empty' }), cols[k % 3], rows[Math.floor(k / 3)], 0.178, 0.157);
+    const go = (p) => { sh.sound.play('tap'); this._moreLevels(p); };
+    const first = h('button', { class: 'lw-more', onclick: () => { sh.sound.play('tap'); this._clearPicPages(); this._levels(); } }, en ? `↩ First levels (${page + 1}/${pages})` : `↩ المستويات الأولى (${sh.T.num(page + 1)}/${sh.T.num(pages)})`);
+    place(first, 0.5, 0.945, 0.34, 0.06);
+    if (page + 1 < pages) place(h('button', { class: 'lw-more lw-navb', onclick: () => go(page + 1) }, en ? 'Next ▶' : '◀ التالي'), 0.2, 0.945, 0.2, 0.06);
+    if (page > 0) place(h('button', { class: 'lw-more lw-navb', onclick: () => go(page - 1) }, en ? '◀ Back' : 'السابق ▶'), 0.8, 0.945, 0.2, 0.06);
+    const next = TOPIC_LEVELS.find((l) => !done[l.id]) || TOPIC_LEVELS[0];
+    place(h('button', { class: 'lw-hit', 'aria-label': 'next', onclick: () => { sh.sound.play('tap'); this._enter(next.id); } }), 0.114, 0.46, 0.22, 0.12);
+    const back = sh.backBtn();
+    back.classList.add('lw-hit');
+    place(back, 0.069, 0.058, 0.1, 0.095);
+    const snd = sh.soundBtn();
+    snd.classList.add('lw-hit');
+    place(snd, 0.94, 0.058, 0.1, 0.095);
+    return wrap;
+  }
+
+  _moreLevelsCard() {
     const sh = this.sh;
     const done = this.save.lw.done || {};
     const en = sh.T.lang === 'en';
@@ -1222,6 +1273,15 @@ const CSS = `
 .lw-hrow{background:#fff;border-radius:calc(var(--u)*1.6);padding:calc(var(--u)*1) calc(var(--u)*1.6);margin:calc(var(--u)*.6) 0;font-size:calc(var(--u)*2.3);color:#3a2a5a;text-align:right}
 .lw-hrow b{display:block}.lw-hrow small{color:#8a7aaa}.lw-hrow span{display:block;font-size:calc(var(--u)*2);color:#5a4a7a}
 .lw-report{max-width:min(92vw,calc(var(--u)*60))}
+.lw-ptile{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;border:calc(var(--u)*.55) solid #ffd45a;border-radius:18%;background:linear-gradient(180deg,#fffdf4,#ffeec2);box-shadow:0 calc(var(--u)*.6) 0 #c88a10,inset 0 0 0 calc(var(--u)*.3) #fff;font-family:inherit;cursor:pointer;padding:0;overflow:hidden}
+.lw-ptile.empty{pointer-events:none;background:linear-gradient(180deg,#fff6d6,#ffe9a8);box-shadow:inset 0 0 0 calc(var(--u)*.3) #fff}
+.lw-ptile i{font-style:normal;font-size:calc(var(--u)*7);line-height:1.1}
+.lw-ptile b{position:absolute;top:4%;right:7%;min-width:22%;border-radius:999px;background:#7a3fd0;color:#fff;font-size:calc(var(--u)*2.6);line-height:1.35;text-align:center}
+.lw-ptile span{font-size:calc(var(--u)*2.7);font-weight:900;color:#4a2a8a;line-height:1.1;text-align:center;padding:0 4%;max-width:96%}
+.lw-ptile u{position:absolute;bottom:3%;left:6%;text-decoration:none;font-size:calc(var(--u)*3.4)}
+.lw-ptile.done{border-color:#7ad060}
+.lw-ptitle{position:absolute;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:calc(var(--u)*3.6);text-shadow:0 calc(var(--u)*.3) 0 #5a2fb0,0 0 calc(var(--u)*1) #5a2fb0;pointer-events:none}
+.lw-navb{font-size:calc(var(--u)*2.3)}
 .lw-hit{position:absolute;border:none;background:transparent;padding:0;margin:0;cursor:pointer;opacity:0;border-radius:18%}
 .lw-hit:focus-visible{opacity:1;outline:calc(var(--u)*.8) solid #fff200;background:rgba(255,242,0,.18)}
 .lw-hit.off{pointer-events:none}

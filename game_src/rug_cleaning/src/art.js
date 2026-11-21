@@ -1,6 +1,15 @@
 // All art of «تنظيف السجاد» is drawn in code: hand-knotted rug patterns, the courtyard, fringe and the five tools.
 import { mulberry } from './logic.js';
 
+// Optional generated pictures (assets/games/rug_cleaning/art/*.webp). Anything missing stays null and is drawn in code, as before.
+let ART = {};
+export function setArt(a) {
+  ART = a || {};
+  for (const k of ['beat', 'foam', 'scrub', 'jet', 'squeegee']) { const im = ART['tool_' + (k === 'scrub' ? 'brush' : k)]; if (im) ICONS[k] = '<img alt="" src="' + im.src + '">'; }
+}
+export const hasArt = (n) => !!ART[n];
+export function clientArt(id) { return ART['client_' + (((id - 1) % 4) + 1)] || null; }
+
 export const PALETTES = [
   { field: '#a63a2d', border: '#2f3f6b', a: '#e8c27a', b: '#f4e8d0', dark: '#5a1a14' },
   { field: '#1f6f78', border: '#d9a441', a: '#f2e3c0', b: '#c2553a', dark: '#0f3b42' },
@@ -24,6 +33,8 @@ export function drawRug(g, W, H, def) {
   g.save();
   let w = W; let h = H;
   if (H > W) { g.translate(W, 0); g.rotate(Math.PI / 2); w = H; h = W; }
+  const pic = ART['rug_' + (((def.id || 1) - 1) % 4 + 1)];
+  if (pic) { const m = 0.025; g.drawImage(pic, pic.naturalWidth * m, pic.naturalHeight * m, pic.naturalWidth * (1 - 2 * m), pic.naturalHeight * (1 - 2 * m), 0, 0, w, h); g.restore(); weave(g, W, H, rnd); return; }
   // field
   g.fillStyle = pal.field; g.fillRect(0, 0, w, h);
   // border
@@ -82,6 +93,10 @@ export function drawRug(g, W, H, def) {
   // abrash: slightly different dye lots in horizontal bands, like real hand-knotted rugs
   for (let i = 0; i < 6; i++) { g.fillStyle = rnd() < 0.5 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'; g.fillRect(0, rnd() * h, w, h * (0.04 + rnd() * 0.12)); }
   g.restore();
+  weave(g, W, H, rnd);
+}
+
+function weave(g, W, H, rnd) {
   // woven texture: fine ridges and knot noise
   g.save(); g.globalAlpha = 0.16; g.fillStyle = '#000';
   for (let y = 0; y < H; y += 3) g.fillRect(0, y, W, 1);
@@ -97,7 +112,9 @@ export function drawCourtyard(g, W, H, u, drainY) {
   const grad = g.createLinearGradient(0, 0, W, H); grad.addColorStop(0, '#efe3c8'); grad.addColorStop(1, '#dac7a0');
   g.fillStyle = grad; g.fillRect(0, 0, W, H);
   const ts = Math.max(30, u * 13);
-  for (let y = 0, r = 0; y < H; y += ts * 0.62, r++) for (let x = -(r % 2) * ts * 0.5; x < W; x += ts) {
+  const floorPic = ART.floor;
+  if (floorPic) { const k = Math.max(W / floorPic.naturalWidth, H / floorPic.naturalHeight); const dw = floorPic.naturalWidth * k; const dh = floorPic.naturalHeight * k; g.drawImage(floorPic, (W - dw) / 2, (H - dh) / 2, dw, dh); }
+  else for (let y = 0, r = 0; y < H; y += ts * 0.62, r++) for (let x = -(r % 2) * ts * 0.5; x < W; x += ts) {
     g.fillStyle = `rgba(${rnd() < 0.5 ? '255,250,235' : '120,90,50'},${0.03 + rnd() * 0.06})`; g.fillRect(x + 1, y + 1, ts - 2, ts * 0.62 - 2);
     g.strokeStyle = 'rgba(150,120,70,0.35)'; g.lineWidth = 1.5; g.strokeRect(x, y, ts, ts * 0.62);
   }
@@ -112,6 +129,7 @@ export function drawCourtyard(g, W, H, u, drainY) {
   g.fillStyle = '#e9b44c'; g.beginPath(); g.arc(W / 2 + u * 3.6, u * 13, u * 0.6, 0, 6.3); g.fill();
   // geranium pots
   const pot = (x, y, s) => {
+    if (ART.pot) { g.fillStyle = 'rgba(0,0,0,.14)'; g.beginPath(); g.ellipse(x, y + s * 0.15, s * 0.9, s * 0.3, 0, 0, 6.3); g.fill(); const ph = s * 2.6; const pw = ph * ART.pot.naturalWidth / ART.pot.naturalHeight; g.drawImage(ART.pot, x - pw / 2, y + s * 0.2 - ph, pw, ph); for (let i = 0; i < 7; i++) rnd(); return; }
     g.fillStyle = 'rgba(0,0,0,.14)'; g.beginPath(); g.ellipse(x, y + s * 0.15, s * 0.9, s * 0.3, 0, 0, 6.3); g.fill();
     g.fillStyle = '#c9683a'; g.beginPath(); g.moveTo(x - s * 0.7, y - s * 0.7); g.lineTo(x + s * 0.7, y - s * 0.7); g.lineTo(x + s * 0.5, y + s * 0.1); g.lineTo(x - s * 0.5, y + s * 0.1); g.fill();
     g.fillStyle = '#a8502a'; g.fillRect(x - s * 0.78, y - s * 0.82, s * 1.56, s * 0.2);
@@ -195,3 +213,5 @@ export const ICONS = {
   jet: '<svg viewBox="0 0 48 48"><rect x="8" y="8" width="13" height="26" rx="4" transform="rotate(-25 14 21)" fill="#7a8494" stroke="#3a4252" stroke-width="2.5"/><path d="M26 28q8 4 12 14M30 24q10 2 15 10M24 33q4 6 5 12" stroke="#4aa8e8" stroke-width="3" fill="none" stroke-linecap="round"/></svg>',
   squeegee: '<svg viewBox="0 0 48 48"><rect x="6" y="24" width="36" height="9" rx="3" fill="#7ad0e8" stroke="#1e5a78" stroke-width="2.5"/><rect x="6" y="31" width="36" height="4" fill="#2f3440"/><rect x="21" y="3" width="6" height="22" rx="2" fill="#9a6a38" stroke="#5a3a18" stroke-width="2"/></svg>',
 };
+
+

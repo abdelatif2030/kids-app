@@ -3,7 +3,8 @@
 // A cozy rug-cleaning job in a sunny courtyard: beat the dust out, spray foam, scrub in circles, rinse with a jet, push the
 // water off with a squeegee. Dirt, foam and water are masks on a grid (see logic.js); the rug pattern is drawn in code.
 import { Job, LEVELS, STAGES, UPGRADES, READY, COLS, ROWS, MAX_LEVEL, normalizeSave, payout, upgradeCost, circularity, straightness } from './logic.js';
-import { drawRug, drawCourtyard, drawFrame, drawTool, ICONS } from './art.js';
+import { drawRug, drawCourtyard, drawFrame, drawTool, ICONS, setArt, clientArt } from './art.js';
+import { loadArt } from '../../cozy_kit/art.js';
 import { Sound } from './audio.js';
 import { I } from './i18n.js';
 import { h, css } from '../../cozy_kit/ui.js';
@@ -20,10 +21,10 @@ const STYLE = css('rc', '#d99a3a', '#9a5a1a', '#ffe29a') + `
 .rc-toast.show{opacity:1}
 .rc-tools{position:absolute;left:calc(var(--u)*1.5);right:calc(var(--u)*1.5);bottom:max(calc(var(--u)*1.5),env(safe-area-inset-bottom));display:flex;gap:calc(var(--u)*1.2);direction:ltr;align-items:stretch;justify-content:center}
 .rc-chip{flex:none;width:calc(var(--u)*15);height:calc(var(--u)*15);border-radius:50%;background:radial-gradient(circle,#fbf1d6 58%,transparent 60%),conic-gradient(var(--rc,#3aa0e8) calc(var(--p,0)*1%),rgba(255,255,255,.55) 0);border:calc(var(--u)*.3) solid #fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.3);color:#4a3412;font-weight:900;font-size:calc(var(--u)*2.7);position:relative;opacity:.8;cursor:pointer;box-shadow:0 calc(var(--u)*.5) calc(var(--u)*1.2) rgba(40,20,0,.3)}
-.rc-chip svg{width:calc(var(--u)*8);height:calc(var(--u)*8)}.rc-chip span.lbl{display:none}
+.rc-chip svg,.rc-chip img{width:calc(var(--u)*8);height:calc(var(--u)*8);object-fit:contain}.rc-chip span.lbl{display:none}
 .rc-peek{position:absolute;right:calc(var(--u)*2);bottom:calc(var(--u)*21);width:calc(var(--u)*9);height:calc(var(--u)*9);border-radius:50%;border:calc(var(--u)*.3) solid #fff;background:rgba(40,28,10,.55);color:#fff;font-size:calc(var(--u)*4.4);touch-action:none;cursor:pointer}
 .rc-pct{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--u)*19.4);width:min(92%,calc(var(--u)*92));height:calc(var(--u)*5.6);border-radius:99px;background:rgba(255,255,255,.55);border:calc(var(--u)*.3) solid #fff;display:flex;align-items:center;gap:calc(var(--u)*2);padding:0 calc(var(--u)*2);box-sizing:border-box;direction:ltr;pointer-events:none}.rc-pct strong{font-size:calc(var(--u)*4.4);color:#27434f;min-width:calc(var(--u)*11)}.rc-pct i{flex:1;height:calc(var(--u)*1.2);border-radius:99px;background:rgba(80,120,140,.25);overflow:hidden;display:block}.rc-pct i b{display:block;height:100%;width:0;background:#3aa0e8}
-.rc-tk{display:flex;flex-direction:column;gap:calc(var(--u)*1.2);width:100%;text-align:start;font-size:calc(var(--u)*3)}.rc-tk .who{display:flex;align-items:center;gap:calc(var(--u)*2);font-weight:900;font-size:calc(var(--u)*4)}.rc-tk .av{width:calc(var(--u)*10);height:calc(var(--u)*10);border-radius:50%;background:#ffd9a0;border:calc(var(--u)*.3) solid #fff;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*6)}.rc-tk .quote{background:rgba(255,255,255,.2);border-radius:calc(var(--u)*1.6);padding:calc(var(--u)*1) calc(var(--u)*2)}.rc-tk h4{margin:0;font-size:calc(var(--u)*2.4);opacity:.85;letter-spacing:.06em}.rc-tk .tags{display:flex;flex-wrap:wrap;gap:calc(var(--u)*1)}.rc-tk .tags span{background:#3aa0e8;color:#fff;border-radius:99px;padding:calc(var(--u)*.3) calc(var(--u)*1.8);font-size:calc(var(--u)*2.7)}.rc-tk .gl{display:flex;gap:calc(var(--u)*1.2);align-items:center}.rc-tk .pay{font-size:calc(var(--u)*6);font-weight:900;color:#ffe29a}
+.rc-tk{display:flex;flex-direction:column;gap:calc(var(--u)*1.2);width:100%;text-align:start;font-size:calc(var(--u)*3)}.rc-tk .who{display:flex;align-items:center;gap:calc(var(--u)*2);font-weight:900;font-size:calc(var(--u)*4)}.rc-tk .av{overflow:hidden;width:calc(var(--u)*10);height:calc(var(--u)*10);border-radius:50%;background:#ffd9a0;border:calc(var(--u)*.3) solid #fff;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*6)}.rc-tk .quote{background:rgba(255,255,255,.2);border-radius:calc(var(--u)*1.6);padding:calc(var(--u)*1) calc(var(--u)*2)}.rc-tk h4{margin:0;font-size:calc(var(--u)*2.4);opacity:.85;letter-spacing:.06em}.rc-tk .tags{display:flex;flex-wrap:wrap;gap:calc(var(--u)*1)}.rc-tk .tags span{background:#3aa0e8;color:#fff;border-radius:99px;padding:calc(var(--u)*.3) calc(var(--u)*1.8);font-size:calc(var(--u)*2.7)}.rc-tk .gl{display:flex;gap:calc(var(--u)*1.2);align-items:center}.rc-tk .pay{font-size:calc(var(--u)*6);font-weight:900;color:#ffe29a}
 .rc-chip.cur{opacity:1;background:linear-gradient(180deg,#fff3c4,#ffd166);transform:translateY(calc(var(--u)*-.8));box-shadow:0 calc(var(--u)*1) calc(var(--u)*1.8) rgba(40,20,0,.4)}
 .rc-chip.done{opacity:.9}.rc-chip.done::after{content:'✓';position:absolute;top:calc(var(--u)*.2);right:calc(var(--u)*1);color:#2a9a58;font-size:calc(var(--u)*3.6)}
 .rc-next{pointer-events:auto;flex:1.15;max-width:calc(var(--u)*19);height:calc(var(--u)*17.5);border-radius:calc(var(--u)*3);font-family:inherit;font-weight:900;font-size:calc(var(--u)*3.4);color:#fff;border:calc(var(--u)*.45) solid #fff;cursor:pointer;background:linear-gradient(180deg,#9aa4a8,#6a7478);box-shadow:0 calc(var(--u)*.6) 0 #3a4448}
@@ -31,7 +32,7 @@ const STYLE = css('rc', '#d99a3a', '#9a5a1a', '#ffe29a') + `
 @keyframes rcpulse{50%{transform:scale(1.06)}}
 .rc-land .rc-tools{left:auto;right:calc(var(--u)*1.5);top:calc(var(--u)*20);bottom:calc(var(--u)*1.5);width:calc(var(--u)*17);flex-direction:column;justify-content:flex-start;gap:calc(var(--u)*1)}
 .rc-land .rc-chip{width:calc(var(--u)*11.5);height:calc(var(--u)*11.5);align-self:center}.rc-land .rc-next{max-width:none;width:100%;height:auto;flex:1;min-height:0;font-size:calc(var(--u)*2.4)}
-.rc-land .rc-chip svg{width:calc(var(--u)*6);height:calc(var(--u)*6)}
+.rc-land .rc-chip svg,.rc-land .rc-chip img{width:calc(var(--u)*6);height:calc(var(--u)*6)}
 
 .rc-land .rc-top{right:calc(var(--u)*3)}
 .rc-card{width:calc(var(--u)*92);max-height:94%}
@@ -43,7 +44,7 @@ const STYLE = css('rc', '#d99a3a', '#9a5a1a', '#ffe29a') + `
 .rc-lv.lock{filter:grayscale(1);opacity:.6}
 .rc-lv small{font-size:calc(var(--u)*2.6);opacity:.95}
 .rc-row{display:flex;align-items:center;gap:calc(var(--u)*2);width:100%;background:rgba(255,255,255,.14);border-radius:calc(var(--u)*3);padding:calc(var(--u)*1.2) calc(var(--u)*2);box-sizing:border-box;font-weight:900;font-size:calc(var(--u)*3.6)}
-.rc-row svg{width:calc(var(--u)*8);height:calc(var(--u)*8);flex:none}.rc-row .nm{flex:1;text-align:start}.rc-row .pips{letter-spacing:.2em;color:#ffe29a}
+.rc-row svg,.rc-row img{width:calc(var(--u)*8);height:calc(var(--u)*8);flex:none;object-fit:contain}.rc-row .nm{flex:1;text-align:start}.rc-row .pips{letter-spacing:.2em;color:#ffe29a}
 .rc-buy{font-family:inherit;font-weight:900;font-size:calc(var(--u)*3.4);color:#fff;border:none;border-radius:999px;padding:calc(var(--u)*1.2) calc(var(--u)*3);cursor:pointer;background:linear-gradient(180deg,#6ae08a,#2fa85a);box-shadow:0 calc(var(--u)*.6) 0 #1a6a3a;min-width:calc(var(--u)*17)}
 .rc-buy.no{background:linear-gradient(180deg,#aab,#778);box-shadow:0 calc(var(--u)*.6) 0 #445}
 .rc-cmp{position:relative;width:100%;aspect-ratio:var(--ar);max-height:calc(var(--u)*50);margin:0 auto;border-radius:calc(var(--u)*2);overflow:hidden;border:calc(var(--u)*.5) solid #fff;direction:ltr;touch-action:none;cursor:ew-resize;background:#000}
@@ -80,7 +81,7 @@ class Game {
     this.ro = new ResizeObserver(() => this._resize()); this.ro.observe(el);
     this._bind();
     this.last = performance.now();
-    this._fonts().then(() => { this.showMenu(); this._loop(); });
+    Promise.all([this._fonts(), loadArt(this.base, ['rug_1', 'rug_2', 'rug_3', 'rug_4', 'floor', 'pot', 'tool_beat', 'tool_foam', 'tool_brush', 'tool_jet', 'tool_squeegee', 'client_1', 'client_2', 'client_3', 'client_4']).then((a) => { setArt(a); this._buildBg(); })]).then(() => { this.thumbs = {}; this.showMenu(); this._loop(); });
   }
 
   async _fonts() { try { const ff = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([ff.load().then((x) => document.fonts.add(x)), new Promise((r) => setTimeout(r, 2500))]); } catch (_) { /* system font */ } }
@@ -279,7 +280,7 @@ class Game {
     const goal = (t) => h('div', { class: 'gl' }, '\u2610 ', t);
     this.layer.append(h('div', { class: 'rc-top' }, h('button', { class: 'rc-round', onclick: () => this.showLevels() }, '\u2630'), this._coinPill()),
       h('div', { class: 'rc-dim', style: 'background:rgba(40,25,5,.3);align-items:flex-end;padding-bottom:calc(var(--u)*3)' }, h('div', { class: 'rc-card' }, h('div', { class: 'rc-tk' },
-        h('div', { class: 'who' }, h('div', { class: 'av' }, def.id % 2 ? '\u{1F469}' : '\u{1F468}'), h('div', {}, h('div', { style: 'font-size:calc(var(--u)*2.4);opacity:.8' }, `${T('ticket')} #${I.num(def.id)} \u00b7 ${T('newJob')}`), nm)),
+        h('div', { class: 'who' }, h('div', { class: 'av' }, (() => { const c = clientArt(def.id); if (!c) return def.id % 2 ? '\u{1F469}' : '\u{1F468}'; const im = document.createElement('img'); im.src = c.src; im.alt = ''; im.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%'; return im; })()), h('div', {}, h('div', { style: 'font-size:calc(var(--u)*2.4);opacity:.8' }, `${T('ticket')} #${I.num(def.id)} \u00b7 ${T('newJob')}`), nm)),
         h('div', { class: 'quote' }, `\u201c${def.note[en ? 1 : 0]}\u201d`),
         h('h4', {}, T('whatsOn')), h('div', { class: 'tags' }, ...tags.map((t) => h('span', {}, t))),
         h('h4', {}, T('goals')), goal(T('g_clean')), goal(`${T('g_time')} ${mmss(def.parTime)}`), goal(`${T('g_water')} ${I.num(def.parWater)} ${I.t('litres')}`),
@@ -510,3 +511,5 @@ void STAGES;
 const api = { start(el, config, post) { const g = new Game(el, config || {}, post); api.last = g; return { dispose: () => g.dispose(), pause: () => g.pause() }; } };
 window.RugCleaning = api;
 export default api;
+
+
