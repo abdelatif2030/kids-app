@@ -143,34 +143,18 @@ export function drawHero(g, x, y, s, time, pose = {}) {
   const bob = Math.sin(time * 3.2) * s * 0.015;
   const fl = pose.flip ? -1 : 1;
   g.save(); g.translate(x, y + bob); g.scale(fl, 1);
-  const pic = ART.hero;
-  if (pic) { // generated knight: faces right; lunges and leans into the swing, and his sword really swings (owner 2026-11-21)
-    const lunge = (pose.swing ?? 0) * s * 0.1;
-    g.translate(lunge, 0); if (pose.sad) g.rotate(-0.08);
-    const k = pose.k ?? -1;
-    if (k >= 0) g.rotate(Math.sin(Math.min(1, k) * Math.PI) * 0.1); // lean toward the foe
-    let hh = s * FIT.hero; let w = (hh * pic.naturalWidth) / pic.naturalHeight; if (w > s * 1.3) { hh *= (s * 1.3) / w; w = s * 1.3; }
-    const u = hh / pic.naturalHeight; const nw = pic.naturalWidth; const nh = pic.naturalHeight;
-    const ox = -w / 2; const oy = -hh;
-    // draw the knight WITHOUT his painted sword (a clip that leaves out the blade's corner), then draw a sword that moves
-    g.save(); g.beginPath(); g.rect(ox, oy, w, hh); g.rect(ox, oy + 0.54 * nh * u, 0.19 * nw * u, 0.5 * nh * u); g.clip('evenodd');
-    g.drawImage(pic, ox, oy, w, hh); g.restore();
-    const px = ox + 0.14 * nw * u; const py = oy + 0.53 * nh * u; const L = 0.42 * nh * u;
-    const A = (d) => (d * Math.PI) / 180;
-    let th = A(13);
-    if (k >= 0) th = k < 0.3 ? A(13) + (A(215) - A(13)) * easeIO(k / 0.3) : k < 0.6 ? A(215) + (A(305) - A(215)) * easeIO((k - 0.3) / 0.3) : A(305) + (A(373) - A(305)) * easeIO((k - 0.6) / 0.4);
-    if (k >= 0.3 && k < 0.62) { // a bright trail where the blade passes
-      g.save(); g.translate(px, py); g.strokeStyle = 'rgba(190,235,255,.75)'; g.lineWidth = Math.max(2, L * 0.07); g.lineCap = 'round';
-      g.beginPath(); g.arc(0, 0, L * 0.92, Math.PI / 2 + A(205) , Math.PI / 2 + th, false); g.stroke(); g.restore();
+  const k = pose.k ?? -1;
+  const pic = (pose.sad && ART.hero_hurt) || (k >= 0.12 && k <= 0.85 && ART.hero_attack) || (pose.win && ART.hero_win) || ART.hero;
+  if (pic) { // the painted knight (owner's sheet): one picture per pose (idle, attack, hurt, victory); he lunges toward the foe on a strike
+    const lunge = (pose.swing ?? 0) * s * 0.1 + (k >= 0 ? Math.sin(Math.min(1, k) * Math.PI) * s * 0.08 : 0);
+    g.translate(lunge, 0); if (pose.sad) g.rotate(-0.04);
+    if (k >= 0) g.rotate(Math.sin(Math.min(1, k) * Math.PI) * 0.08);
+    let hh = s * FIT.hero; let w = (hh * pic.naturalWidth) / pic.naturalHeight; if (w > s * 1.45) { hh *= (s * 1.45) / w; w = s * 1.45; }
+    g.drawImage(pic, -w / 2, -hh, w, hh);
+    if (k >= 0.2 && k < 0.7) { // a bright slash trail in front of him
+      g.save(); g.strokeStyle = 'rgba(190,235,255,.8)'; g.lineWidth = Math.max(2, s * 0.03); g.lineCap = 'round';
+      g.beginPath(); g.arc(w * 0.12, -hh * 0.55, hh * 0.42, -1.1, 0.9 * Math.min(1, (k - 0.2) / 0.3)); g.stroke(); g.restore();
     }
-    g.save(); g.translate(px, py); g.rotate(th);
-    const bw = Math.max(2, L * 0.055);
-    g.fillStyle = '#e4efff'; g.strokeStyle = '#6a7a9a'; g.lineWidth = Math.max(1, L * 0.012);
-    g.beginPath(); g.moveTo(-bw, L * 0.09); g.lineTo(bw, L * 0.09); g.lineTo(bw * 0.85, L * 0.93); g.lineTo(0, L); g.lineTo(-bw * 0.85, L * 0.93); g.closePath(); g.fill(); g.stroke();
-    g.strokeStyle = 'rgba(255,255,255,.9)'; g.beginPath(); g.moveTo(0, L * 0.12); g.lineTo(0, L * 0.9); g.stroke();
-    g.fillStyle = '#e8b830'; g.strokeStyle = '#7a5a10'; g.beginPath(); g.roundRect(-bw * 3.2, L * 0.05, bw * 6.4, L * 0.055, 2); g.fill(); g.stroke();
-    g.fillStyle = '#6a4a2a'; g.fillRect(-bw * 0.7, -L * 0.1, bw * 1.4, L * 0.15);
-    g.restore();
     g.restore(); return;
   }
   const lw = Math.max(1.5, s * 0.03);

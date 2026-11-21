@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import { Run, LEVELS, UPG, HALF, LANES, upgradeCost, normalizeSave, isBossLevel } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n, rng } from '../../cozy_kit/ui.js';
-import { loadArt } from '../../cozy_kit/art.js';
+import { loadArt, loadSprites } from '../../cozy_kit/art.js';
 
 const S = {
   title: ['الهامستر المحارب', 'Hamster Warrior'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
@@ -148,6 +148,8 @@ class Game {
     this.ro = new ResizeObserver(() => this._resize()); this.ro.observe(el);
     this._bind();
     this.last = performance.now();
+    this.heroPics = null;
+    loadSprites(THREE, this.base, ['hero_run1', 'hero_run2', 'hero_run3', 'hero_swing', 'hero_hit', 'hero_win', 'hero_jump']).then((sp) => { this.heroPics = sp; if (sp.hero_run1) this._paintHero(); });
     loadArt(this.base, ['sky_1', 'sky_2', 'sky_3', 'boss_1', 'boss_2', 'boss_3', 'monster_1', 'monster_2', 'monster_3']).then((a) => { this.art = a; if (this.mode === 'menu' && this.demo) this._buildWorld(this.demo); });
     this._fonts().then(() => { this.showMenu(); this.renderer.setAnimationLoop(() => this._frame()); });
   }
@@ -349,6 +351,25 @@ class Game {
 
   _updateHearts() { const sp = this.heartsEl ? [...this.heartsEl.children] : []; sp.forEach((s, i) => s.classList.toggle('gone', i >= this.run.hearts)); }
 
+  /** The painted hamster (owner's sheet, seen from behind): a camera-facing picture replaces the 3D body, the golden ring stays. */
+  _paintHero() {
+    const P = this.heroPics; if (!P || !P.hero_run1 || this.hero.userData.pic) return;
+    const mat = new THREE.SpriteMaterial({ map: P.hero_run1.tex, transparent: true, alphaTest: 0.05, toneMapped: false, fog: false, depthWrite: false });
+    const sp = new THREE.Sprite(mat); sp.center.set(0.5, 0.04); sp.renderOrder = 3;
+    this.hero.add(sp); this.hero.userData.pic = sp; this.hero.userData.body.visible = false;
+  }
+
+  _heroPic(play, r) {
+    const P = this.heroPics, sp = this.hero.userData.pic; if (!P || !sp) return;
+    let key;
+    if (this.run && this.run.hit > 0.2) key = 'hero_hit';
+    else if (this.pop > 0.08) key = 'hero_swing';
+    else key = ['hero_run1', 'hero_run2', 'hero_run3', 'hero_run2'][Math.floor(this.clock * (play ? 9 : 3)) % 4];
+    const pic = P[key] || P.hero_run1;
+    if (sp.material.map !== pic.tex) { sp.material.map = pic.tex; sp.material.needsUpdate = true; }
+    sp.scale.set(2.7 * pic.aspect, 2.7, 1);
+  }
+
   _render(dt) {
     const r = this.run || this.demo; const play = !!this.run;
     const zr = play ? r.z : 0; const xr = play ? r.x : 0;
@@ -359,6 +380,7 @@ class Game {
     this.pop = Math.max(0, (this.pop || 0) - dt); this.hero.scale.setScalar(1 + this.pop * 0.5);
     this.hero.visible = !(this.run && this.run.hit > 0.2 && Math.floor(this.clock * 14) % 2 === 1);
     const ringS = 1 + Math.sin(this.clock * 4) * 0.08; this.hero.userData.ring.scale.set(ringS, ringS, 1);
+    this._heroPic(play, r);
     const key = play ? fmt(r.power) : '5'; if (this._pk !== key) { this._pk = key; this.heroPill.material.map = pillTex('power', key); this.heroPill.material.needsUpdate = true; }
     this.heroPill.position.set(-xr, 3.5, zr);
     if (play) {

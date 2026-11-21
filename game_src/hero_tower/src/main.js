@@ -83,7 +83,7 @@ class Game {
     this.easy = this.age <= 4;
     this.save = normalizeSave(config.save);
     this.base = config.base || './';
-    loadArt(this.base, ['hero', 'foe_slime', 'foe_goblin', 'foe_skeleton', 'foe_imp', 'foe_orc', 'boss_troll', 'boss_sorcerer', 'boss_dragon', 'sky_castle', 'sky_ice', 'sky_fire']).then((a) => { setArt(a); this.skyKey = ''; });
+    loadArt(this.base, ['hero', 'hero_attack', 'hero_hurt', 'hero_win', 'foe_slime', 'foe_goblin', 'foe_skeleton', 'foe_imp', 'foe_orc', 'boss_troll', 'boss_sorcerer', 'boss_dragon', 'sky_castle', 'sky_ice', 'sky_fire']).then((a) => { setArt(a); this.skyKey = ''; });
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
     if (!document.getElementById('ht-style')) document.head.append(h('style', { id: 'ht-style' }, CSS));

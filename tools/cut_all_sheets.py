@@ -11,6 +11,12 @@ SHEETS = {
     'A5_dune_trucks': ('dune', 4, 3, ['truck_%02d' % i for i in range(1, 13)], True),
     'A6_bumper': ('bumper', 4, 3, ['bumper_bear', 'bumper_bunny', 'bumper_cat', 'bumper_dog', 'bumper_fox', 'bumper_monkey', 'bumper_panda', 'bumper_tiger', 'bumper_pig', 'bumper_mouse', 'bumper_lion', 'bumper_penguin'], True),
     'A7_planes': ('planes', 4, 3, ['plane_%02d' % i for i in range(1, 13)], True),
+    'B1_adam': ('adam', 4, 3, ['idle', 'run1', 'run2', 'run3', 'jump', 'peak', 'fall', 'land', 'hurt', 'cheer', 'slide', 'win'], False),
+    'B3_hamster': ('hamster', 4, 3, ['run1', 'run2', 'run3', 'swing', 'hit', 'shield', 'jump', 'win', 'tired', 'power', 'sleep', 'throw'], False),
+    'B4_tower': ('tower', 4, 3, ['hero', 'hero_attack', 'hero_hurt', 'hero_win', 'foe_slime', 'foe_goblin', 'foe_skeleton', 'foe_imp', 'foe_orc', 'boss_troll', 'boss_sorcerer', 'boss_dragon'], False),
+    'B5_zombie': ('zombie', 4, 3, ['hero_shoot', 'hero_run', 'hero_win', 'z_normal', 'z_fat', 'z_cone', 'z_bucket', 'z_small', 'z_bandage', 'z_tutu', 'z_flower', 'z_yellow'], False),
+    'B6_samurai': ('samurai', 4, 3, ['hero', 'ninja_blue', 'ninja_green', 'ninja_purple', 'oni', 'petals', 'star', 'x1', 'slash', 'dash', 'win', 'idle2'], False),
+    'B7_animals': ('animals', 4, 3, ['fox', 'cubs', 'frog', 'frog_big', 'raptor', 'trex', 'fish', 'shark', 'octopus', 'turtle', 'x2', 'x3'], False),
 }
 only = sys.argv[1:] or list(SHEETS)
 for sid in only:

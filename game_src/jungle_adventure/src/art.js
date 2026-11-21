@@ -388,6 +388,20 @@ export function drawHero(ctx, x, y, s, kind = 'girl', look = DEFAULT_LOOK[kind])
     shorts: bot.color, shortsSh: bot.shade,
     boot: shoe.color, bootSh: shoe.shade, sole: shoe.sole ?? G.sole,
   };
+  // the painted Adam (owner's sheet) while he wears his normal clothes; a different outfit from the shop is still drawn in code
+  if (kind === 'boy' && PIC.adam_run1) {
+    const dl = DEFAULT_LOOK.boy;
+    if ((look.top ?? dl.top) === dl.top && (look.bottom ?? dl.bottom) === dl.bottom && (look.shoes ?? dl.shoes) === dl.shoes && (look.hat ?? 'hat_none') === (dl.hat ?? 'hat_none')) {
+      const run = !s.air;
+      const key = s.wall ? 'adam_slide' : s.air ? (s.vy < 0 ? 'adam_jump' : 'adam_peak') : s.phase === 0.4 ? 'adam_idle' : ['adam_run1', 'adam_run2', 'adam_run3', 'adam_run2'][Math.floor(((s.phase * 2.1) / Math.PI) * 2) % 4 < 0 ? 0 : Math.floor(((s.phase * 2.1) / Math.PI) * 2) % 4];
+      const img = PIC[key] || PIC.adam_run1;
+      const hh = 1.62, ww = (hh * img.naturalWidth) / img.naturalHeight;
+      ctx.save(); ctx.translate(x, y); ctx.scale(s.dir < 0 ? -1 : 1, 1);
+      ctx.drawImage(img, -ww / 2, -hh + (run ? 0 : 0.0), ww, hh);
+      ctx.restore();
+      return;
+    }
+  }
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(s.dir < 0 ? -1 : 1, 1);
