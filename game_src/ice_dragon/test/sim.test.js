@@ -21,16 +21,16 @@ function play(level, seed = 3) {
   return { h, t };
 }
 
-test('three levels, longer dragons, a ring of channel around an ice maze', () => {
-  assert.equal(LEVELS.length, 3);
-  assert.ok(LEVELS[2].seg > LEVELS[0].seg);
+test('six levels, longer dragons, a ring of channel around an ice maze', () => {
+  assert.equal(LEVELS.length, 6);
+  assert.ok(LEVELS[5].seg > LEVELS[0].seg);
   const p = ringPoint(0);
   assert.equal(Math.abs(p.x), LOOP);
   assert.ok(WALLS.length >= 5);
 });
 
 test('a robot hero breaks every segment of the dragon on every level', () => {
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < LEVELS.length; i++) {
     const { h, t } = play(i);
     console.log(`level ${i + 1}: ${h.state} in ${t.toFixed(0)}s, allies ${h.allies}, weapon ${h.weapon}, barrels left ${h.barrels.filter((b) => !b.dead).length}`);
     assert.equal(h.state, 'won');
@@ -62,5 +62,5 @@ test('shrines give allies or the triple shot; a blast hits several segments; bar
 
 test('damaged saves load safely', () => {
   assert.equal(normalizeSave(null).unlocked, 1);
-  assert.equal(normalizeSave({ unlocked: 99 }).unlocked, 3);
+  assert.equal(normalizeSave({ unlocked: 99 }).unlocked, 6);
 });

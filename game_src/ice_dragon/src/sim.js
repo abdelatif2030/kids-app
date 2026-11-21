@@ -14,6 +14,10 @@ export const LEVELS = [
   { id: 1, ar: 'كهف الصقيع', en: 'Frost Cave', seg: 11, hp: 6, speed: 2.0, shrines: 3, barrels: 3 },
   { id: 2, ar: 'قناة الفيروز', en: 'Turquoise Channel', seg: 15, hp: 9, speed: 2.3, shrines: 4, barrels: 3 },
   { id: 3, ar: 'عرين التنين', en: 'Dragon Lair', seg: 20, hp: 13, speed: 2.6, shrines: 4, barrels: 4 },
+  // 2026-11-21: three more hunts, a longer dragon each time
+  { id: 4, ar: 'جسر الجليد', en: 'Ice Bridge', seg: 23, hp: 15, speed: 2.8, shrines: 5, barrels: 4 },
+  { id: 5, ar: 'بحيرة الأشباح', en: 'Ghost Lake', seg: 26, hp: 17, speed: 2.9, shrines: 5, barrels: 5 },
+  { id: 6, ar: 'قلب الجبل', en: 'Mountain Heart', seg: 29, hp: 20, speed: 3.1, shrines: 6, barrels: 5 },
 ];
 
 /** Point on the square ring for arc length s (clockwise from the top-left corner). */
@@ -45,9 +49,9 @@ function blocked(x, z, r = 0.45) {
 }
 
 export class Hunt {
-  /** opts: { level (0..2), easy, seed } */
+  /** opts: { level (0..5), easy, seed } */
   constructor(opts = {}) {
-    this.level = clamp(opts.level ?? 0, 0, 2);
+    this.level = clamp(opts.level ?? 0, 0, LEVELS.length - 1);
     this.cfg = LEVELS[this.level];
     this.easy = !!opts.easy;
     this.rand = rng((opts.seed ?? 3) + 41);
@@ -65,7 +69,7 @@ export class Hunt {
     const kinds = ['ally', 'triple', 'ally', 'ally'];
     for (let i = 0; i < this.cfg.shrines; i++) this.shrines.push({ id: i + 1, x: spots[i][0], z: spots[i][1], hp: 8 + i * 5 + this.level * 4, kind: kinds[i % 4], dead: false });
     this.barrels = [];
-    const bs = [[-2, 2], [2, -2], [-5, 5.5], [5.2, 1.6]];
+    const bs = [[-2, 2], [2, -2], [-5, 5.5], [5.2, 1.6], [-5.4, -2.2]];
     for (let i = 0; i < this.cfg.barrels; i++) this.barrels.push({ id: i + 1, x: bs[i][0], z: bs[i][1], dead: false });
     this.blasts = [];
     this.time = 0;
@@ -213,5 +217,5 @@ export function normalizeSave(s) {
   const o = s && typeof s === 'object' ? s : {};
   const stars = {};
   for (let i = 1; i <= 3; i++) { const v = o.stars && Number(o.stars[i]); if (v >= 1 && v <= 3) stars[i] = Math.floor(v); }
-  return { unlocked: Math.max(1, Math.min(3, Math.floor(Number(o.unlocked)) || 1)), stars, muted: !!o.muted };
+  return { unlocked: Math.max(1, Math.min(LEVELS.length, Math.max(Math.floor(Number(o.unlocked)) || 1, ...Object.keys(stars).map((k) => Number(k) + 1)))), stars, muted: !!o.muted };
 }

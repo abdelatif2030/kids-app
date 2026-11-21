@@ -13,6 +13,10 @@ export const LEVELS = [
   { id: 1, ar: 'مرج الصيف', en: 'Summer Meadow', season: 'summer', lanes: 'ggrrgwggrrgtglggrgd', speed: 1 },
   { id: 2, ar: 'غابة الخريف', en: 'Autumn Woods', season: 'autumn', lanes: 'ggrrrgwwgtgrrgtglwgrrgd', speed: 1.15 },
   { id: 3, ar: 'تلال الشتا', en: 'Winter Hills', season: 'winter', lanes: 'ggrrgwwgttgrrrglwgtgrrwgd', speed: 1.25 },
+  // 2026-11-21: three longer journeys
+  { id: 4, ar: 'سباق الحقول', en: 'Field Dash', season: 'summer', lanes: 'ggrrgwwgtgrrrgwlgttgrrgwgtgrrgd', speed: 1.35 },
+  { id: 5, ar: 'غابة الأوراق الحمرا', en: 'Red Leaf Forest', season: 'autumn', lanes: 'ggrrrgwwgttgrrgtlwwgrrrgtgwgrrgtgrrgd', speed: 1.45 },
+  { id: 6, ar: 'قمة الثلج', en: 'Snow Summit', season: 'winter', lanes: 'ggrrgwwgttgrrrgwwlgtgrrwgttgrrrgwgtgrrwwgd', speed: 1.5 },
 ];
 
 function rng(seed) {
@@ -285,5 +289,5 @@ export function normalizeSave(raw) {
   if (s.stars && typeof s.stars === 'object') for (const lv of LEVELS) { const v = Math.floor(Number(s.stars[lv.id])); if (v >= 1 && v <= 3) stars[lv.id] = v; }
   const u = Math.floor(Number(s.unlocked));
   const b = Math.floor(Number(s.berries));
-  return { unlocked: Number.isFinite(u) ? Math.max(1, Math.min(LEVELS.length, u)) : 1, stars, berries: Number.isFinite(b) && b > 0 ? b : 0, muted: s.muted === true };
+  return { unlocked: Math.min(LEVELS.length, Math.max(Number.isFinite(u) ? Math.max(1, u) : 1, ...Object.keys(stars).map((k) => Number(k) + 1))), stars, berries: Number.isFinite(b) && b > 0 ? b : 0, muted: s.muted === true };
 }

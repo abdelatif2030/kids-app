@@ -206,7 +206,7 @@ class Game {
     this.save.unlocked = Math.max(this.save.unlocked, Math.min(3, lv + 1));
     this.post({ type: 'save', save: this.save });
     this.sound.play('win');
-    const last = this.levelIdx >= 2;
+    const last = this.levelIdx >= LEVELS.length - 1;
     this.layer.append(h('div', { class: 'id-dim' }, h('div', { class: 'id-card' }, h('div', { class: 'id-title' }, I.t('won')),
       h('div', { class: 'id-stars' }, [1, 2, 3].map((s) => h('span', { class: s <= r.stars ? '' : 'off' }, '⭐'))),
       h('div', { class: 'id-pill' }, `${I.t('time')} ${I.num(Math.round(r.time))}s`),
