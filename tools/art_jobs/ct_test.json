@@ -1,0 +1,17 @@
+{
+ "style": "Glossy 3D-rendered cartoon vehicle for a children's racing game, smooth rounded toy-like shapes, bright saturated colors, soft studio lighting, kid friendly.",
+ "kind_sprite": "Seen exactly from directly BEHIND: rear view, perfectly symmetrical, the back of the vehicle facing the camera, both rear wheels and both tail lights visible. Single vehicle centered, plain pure white background, no shadow, no text, no letters.",
+ "suffix": "No text.",
+ "jobs": [
+  {
+   "name": "t_truck_box",
+   "kind": "sprite",
+   "prompt": "The back of a white box delivery truck with a big rear door, rear view."
+  },
+  {
+   "name": "t_van",
+   "kind": "sprite",
+   "prompt": "The back of a white delivery van with two rear doors, rear view."
+  }
+ ]
+}

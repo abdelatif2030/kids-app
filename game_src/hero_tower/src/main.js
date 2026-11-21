@@ -544,8 +544,15 @@ class Game {
     const top0 = this._roomTop(G, 0);
     const baseH = G.fh * 0.5;
     if (top0 + G.fh < this.ch) {
-      g.fillStyle = theme === 'ice' ? '#e8f4ff' : theme === 'fire' ? '#5a2a20' : '#58b848';
-      g.fillRect(0, top0 + G.fh + baseH * 0.9, this.cw, this.ch - (top0 + G.fh));
+      // the ground fades from a warm hill top into a dusk shade that belongs to the painted sky (no flat bright strip)
+      const gy = top0 + G.fh + baseH * 0.9;
+      const gg = g.createLinearGradient(0, gy, 0, this.ch);
+      const [c1, c2] = theme === 'ice' ? ['#f2f8ff', '#a8c4e0'] : theme === 'fire' ? ['#7a3a28', '#3a1a1a'] : ['#7ca04a', '#3a5a3c'];
+      gg.addColorStop(0, c1); gg.addColorStop(1, c2);
+      g.fillStyle = gg;
+      g.beginPath(); g.moveTo(0, gy + this.u * 1.2);
+      for (let x = 0; x <= this.cw; x += this.cw / 12) g.lineTo(x, gy - Math.sin(x * 0.011 + 1) * this.u * 1.1 - Math.sin(x * 0.027) * this.u * 0.5);
+      g.lineTo(this.cw, this.ch); g.lineTo(0, this.ch); g.closePath(); g.fill();
       g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(0, top0 + G.fh + baseH * 0.9, this.cw, this.u * 0.8);
       drawBase(g, G.x, top0 + G.fh, G.W, baseH, theme);
     }

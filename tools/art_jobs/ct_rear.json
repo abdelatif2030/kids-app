@@ -1,0 +1,57 @@
+{
+ "style": "Glossy 3D-rendered cartoon vehicle for a children's racing game, smooth rounded toy-like shapes, bright saturated colors, soft studio lighting.",
+ "kind_sprite": "BACK VIEW ONLY. The camera is directly behind the vehicle, looking at its rear end: we see the back of the vehicle, its rear window, tail lights, bumper and exhaust, perfectly symmetrical, centered. We do NOT see the front or the sides. Plain pure white background, no text, no letters, no license plate letters.",
+ "suffix": "No text.",
+ "jobs": [
+  {
+   "name": "van",
+   "kind": "sprite",
+   "prompt": "A cartoon white delivery van with two rear doors and square tail lights, viewed from directly behind, back view, rear end facing the camera."
+  },
+  {
+   "name": "truck_box",
+   "kind": "sprite",
+   "prompt": "A cartoon white box delivery truck with a big rear door and tail lights, viewed from directly behind, back view, rear end facing the camera."
+  },
+  {
+   "name": "bus",
+   "kind": "sprite",
+   "prompt": "A cartoon white city bus with a blue stripe, big rear window and tail lights, viewed from directly behind, back view, rear end facing the camera."
+  },
+  {
+   "name": "sedan_green",
+   "kind": "sprite",
+   "prompt": "A cartoon green four-door sedan with a trunk lid and two tail lights, viewed from directly behind, back view, rear end facing the camera."
+  },
+  {
+   "name": "sedan_white",
+   "kind": "sprite",
+   "prompt": "A cartoon white four-door sedan with a trunk lid and two tail lights, viewed from directly behind, back view, rear end facing the camera."
+  },
+  {
+   "name": "suv_black",
+   "kind": "sprite",
+   "prompt": "A cartoon black SUV with a rear hatch and tail lights, viewed from directly behind, back view, rear end facing the camera."
+  },
+  {
+   "name": "pickup_red",
+   "kind": "sprite",
+   "prompt": "A cartoon red pickup truck with tailgate and tail lights, viewed from directly behind, back view, rear end facing the camera."
+  },
+  {
+   "name": "hatch_orange",
+   "kind": "sprite",
+   "prompt": "A cartoon orange hatchback with a rear window and tail lights, viewed from directly behind, back view, rear end facing the camera."
+  },
+  {
+   "name": "sedan_silver",
+   "kind": "sprite",
+   "prompt": "A cartoon silver sedan with a trunk lid and two tail lights, viewed from directly behind, back view, rear end facing the camera."
+  },
+  {
+   "name": "coupe_purple",
+   "kind": "sprite",
+   "prompt": "A cartoon purple sports coupe with a rear spoiler and glowing tail lights, viewed from directly behind, back view, rear end facing the camera."
+  }
+ ]
+}

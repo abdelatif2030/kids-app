@@ -1,0 +1,17 @@
+{
+ "style": "Glossy 3D-rendered cartoon scenery for a children's game: soft studio lighting, smooth rounded shapes, bright pastel saturated colors, cute friendly look.",
+ "kind_sprite": "",
+ "suffix": "Wide landscape scene, empty center for gameplay, no characters, no text, no letters, no UI.",
+ "jobs": [
+  {
+   "name": "bg_festival",
+   "kind": "bg",
+   "prompt": "A snowy winter festival at dusk seen from the side: pine trees with string lights, wooden stalls, gentle snow falling, pale blue and pink sky, snowy ground in the lower third."
+  },
+  {
+   "name": "bg_festival_day",
+   "kind": "bg",
+   "prompt": "A sunny snowy winter village festival in daylight: pine trees decorated with colored lights, cute wooden cabins, blue sky with soft clouds, smooth snow ground."
+  }
+ ]
+}

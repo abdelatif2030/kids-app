@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:js_interop';
 import 'dart:js_interop_unsafe';
@@ -66,6 +67,19 @@ class _WebGameViewState extends State<WebGameView> {
       if (!_disposed) widget.onMessage(jsonEncode(dart));
     }).toJS;
     _handle = api.callMethod<JSObject>('start'.toJS, div, config, post);
+    // tell the screen as soon as the game has put its first button (its menu) on the page, so the loading poster goes away at once
+    var ticks = 0;
+    Timer.periodic(const Duration(milliseconds: 60), (t) {
+      if (_disposed || ++ticks > 50) {
+        t.cancel();
+        return;
+      }
+      final b = div.callMethod<JSObject?>('querySelector'.toJS, 'button'.toJS);
+      if (b != null) {
+        t.cancel();
+        widget.onMessage('{"type":"ready"}');
+      }
+    });
   }
 
   @override

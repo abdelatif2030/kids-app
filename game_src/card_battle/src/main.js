@@ -57,7 +57,7 @@ class Game {
     this.ro.observe(el);
     this._bind();
     this.last = performance.now();
-    Promise.all([this._fonts(), loadArt(this.base || config.base, ['unit_spark', 'unit_blaster', 'unit_brute', 'unit_bug', 'unit_slime', 'unit_smash', 'unit_spitter', 'unit_turret', 'base', 'ufo']).then(setArt)]).then(() => { this.showMenu(); this._loop(); });
+    Promise.all([this._fonts(), loadArt(this.base || config.base, ['unit_spark', 'unit_blaster', 'unit_brute', 'unit_bug', 'unit_slime', 'unit_smash', 'unit_spitter', 'unit_turret', 'base', 'ufo']).then(setArt), loadArt(this.base || config.base, ['avatar_robot', 'avatar_alien', 'bg_menu']).then((p) => { this.pics = p; })]).then(() => { this.showMenu(); this._loop(); });
   }
 
   async _fonts() { try { const ff = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([ff.load().then((x) => document.fonts.add(x)), new Promise((r) => setTimeout(r, 2500))]); } catch (_) { /* system font */ } }
@@ -237,8 +237,20 @@ class Game {
 
   _stars(n, big) { return h('div', { class: 'cb-stars' }, [0, 1, 2].map((i) => h('span', { class: i < n ? '' : 'off', style: big ? `animation:cbstar .5s ${0.3 + i * 0.35}s both` : '' }, '⭐'))); }
 
+  _menuPic(on) {
+    const pic = this.pics && this.pics.bg_menu;
+    this.root.style.background = on && pic ? `#07041a url(${pic.src}) center/cover no-repeat` : '';
+    this.cv.style.visibility = on && pic ? 'hidden' : '';
+  }
+
+  _av(who, emoji) {
+    const pic = this.pics && this.pics['avatar_' + who];
+    return h('div', { class: `cb-av ${who}`, style: pic ? `background:url(${pic.src}) center/cover no-repeat;font-size:0` : '' }, pic ? '' : emoji);
+  }
+
   showMenu() {
     this.mode = 'menu'; this.layer.replaceChildren(); this.topEl = this.botEl = null; this._proj();
+    this._menuPic(true);
     this.sound.setMode(false); this.drag = null; this.sel = -1;
     this.battle = new Battle({ seed: 1, difficulty: this.diff }); this.parts = []; this.texts = []; this.beams = []; this.fxs = [];
     const btns = ['easy', 'normal', 'hard', 'expert', 'legend'].map((d) => h('button', { class: `cb-diff${d === this.diff ? ' on' : ''}`, onclick: () => { this.diff = d; this.sound.play('tap'); this.showMenu(); } }, h('b', {}, I.t(d)), this._stars(this.save.stars[d])));
@@ -260,6 +272,7 @@ class Game {
   }
 
   start() {
+    this._menuPic(false);
     this.mode = 'play'; this.layer.replaceChildren(); this.parts = []; this.texts = []; this.beams = []; this.fxs = []; this.sel = -1; this.endT = 0; this.shake = 0;
     this.battle = new Battle({ seed: (Date.now() & 0xffffff) + 1, difficulty: this.diff });
     this.sound.setMode(true); this.hintOn = !this.save.tutorial;
@@ -271,9 +284,9 @@ class Game {
     // top bar like the original: robot avatar + its vertical health bar, timer in the middle, alien avatar + its bar
     this.topEl = h('div', { class: 'cb-topw' },
       h('div', { class: 'cb-toprow' },
-        h('div', { class: 'cb-av robot' }, '🤖'), h('div', { class: 'cb-vb robot' }, this.pHp),
+        this._av('robot', '🤖'), h('div', { class: 'cb-vb robot' }, this.pHp),
         h('div', { class: 'cb-pill cb-timer' }, this.timerEl, this.x2El),
-        h('div', { class: 'cb-vb alien' }, this.eHp), h('div', { class: 'cb-av alien' }, '👾')),
+        h('div', { class: 'cb-vb alien' }, this.eHp), this._av('alien', '👾')),
       h('div', { class: 'cb-hpnums' }, h('span', { class: 'robot' }, this.pTx), h('span', { class: 'alien' }, this.eTx)));
     this.cardEls = [0, 1, 2, 3].map((slot) => {
       const cv = h('canvas', { width: 128, height: 128 }); const cost = h('div', { class: 'cost' }); const nm = h('div', { class: 'nm' });

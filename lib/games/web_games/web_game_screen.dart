@@ -71,7 +71,7 @@ class _WebGameScreenState extends State<WebGameScreen> {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     if (!widget.game.isLearning && !isTestBinding()) {
       _poster = true;
-      _posterTimer = Timer(const Duration(milliseconds: 2500), _hidePoster);
+      _posterTimer = Timer(const Duration(milliseconds: 1800), _hidePoster);
     }
     _start();
   }
@@ -106,7 +106,7 @@ class _WebGameScreenState extends State<WebGameScreen> {
       return;
     }
     if (_poster && msg['type'] != 'loaded') _hidePoster(); // any sign of life from the game: it is ready
-    if (msg['type'] == 'loaded') Timer(const Duration(milliseconds: 700), _hidePoster); // let the game build its first frame
+    if (msg['type'] == 'loaded') Timer(const Duration(milliseconds: 500), _hidePoster); // let the game build its first frame
     switch (msg['type']) {
       case 'save':
         final save = msg['save'];
