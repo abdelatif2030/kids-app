@@ -181,7 +181,7 @@ class Game {
     this.trafficModels = new Map();
     this.sprites = {}; // painted rear-view cars (art/car_*.webp); a missing picture = the code-built 3D car
     this.playerSprite = null;
-    loadSprites(THREE, this.base, ['car_player', 'car_hatch', 'car_taxi']).then((sp) => { this.sprites = sp; });
+    loadSprites(THREE, this.base, ['car_player', 'car_hatch', 'car_taxi', 'car_police']).then((sp) => { this.sprites = sp; });
     this.coins = coinMesh(80);
     s.add(this.coins);
     this.sparks = new Glow(s, 240, 0.3, 0xffd27a);
@@ -704,7 +704,8 @@ class Game {
       seen.add(c.id);
       let m = this.trafficModels.get(c.id);
       if (!m) {
-        const sp = c.kind !== 'truck' && this.sprites && (c.color % 2 === 0 ? this.sprites.car_hatch : this.sprites.car_taxi);
+        const pool = this.sprites ? [this.sprites.car_hatch, this.sprites.car_taxi, this.sprites.car_police].filter(Boolean) : [];
+        const sp = c.kind !== 'truck' && pool.length ? pool[(c.color + c.id) % pool.length] : null;
         m = sp ? makeSpriteVehicle(THREE, sp, c.kind === 'van' ? 2.3 : c.kind === 'pickup' ? 2.15 : 1.95) : makeTrafficCar(c.kind, c.color);
         this.scene.add(m.root); this.trafficModels.set(c.id, m);
       }

@@ -87,3 +87,47 @@ def cut_poly(src, poly, out, height=512, scale=1.0, feather=1.2):
     os.makedirs(os.path.dirname(out), exist_ok=True)
     rgba.save(out, 'WEBP', quality=88, method=6)
     return rgba.size
+
+
+def cut_white(im, white=238, height=512):
+    """For pictures made on a PURE white background with no ground shadow (the sheet prompts ask for that): the white connected to the
+    border becomes transparent, enclosed white (windows, teeth, plates) stays. Returns an RGBA image cropped to the object."""
+    im = im.convert('RGB')
+    w, h = im.size
+    mask = im.convert('L').point(lambda v: 0 if v >= white else 255)
+    pad = Image.new('L', (w + 2, h + 2), 0)
+    pad.paste(mask, (1, 1))
+    ImageDraw.floodfill(pad, (0, 0), 128, thresh=0)
+    filled = pad.crop((1, 1, w + 1, h + 1))
+    alpha = filled.point(lambda v: 0 if v == 128 else 255).filter(ImageFilter.GaussianBlur(0.7))
+    rgba = im.convert('RGBA')
+    rgba.putalpha(alpha)
+    box = alpha.point(lambda v: 255 if v > 24 else 0).getbbox()
+    if box: rgba = rgba.crop(box)
+    r = height / rgba.size[1]
+    return rgba.resize((max(1, int(rgba.size[0] * r)), height), Image.LANCZOS)
+
+
+def cut_sheet(src, cols, rows, names, out_dir, height=512):
+    """A sheet of cols x rows items, each in its own invisible cell on pure white (docs/INGAME_SPRITE_SHEETS.md). names go left to right,
+    top to bottom; an empty name skips the cell. Writes <out_dir>/<name>.webp (transparent)."""
+    sheet = Image.open(src).convert('RGB')
+    W, H = sheet.size
+    cw, ch = W / cols, H / rows
+    done = []
+    for i, n in enumerate(names):
+        if not n: continue
+        c, r = i % cols, i // cols
+        cell = sheet.crop((int(c * cw), int(r * ch), int((c + 1) * cw), int((r + 1) * ch)))
+        os.makedirs(out_dir, exist_ok=True)
+        cut_white(cell, height=height).save(os.path.join(out_dir, n + '.webp'), 'WEBP', quality=88, method=6)
+        done.append(n)
+    return done
+
+
+if __name__ == '__main__':
+    import sys
+    # python tools/cut_sprite.py sheet.png COLSxROWS name1,name2,... out_dir
+    src, grid, names, out_dir = sys.argv[1:5]
+    cols, rows = [int(x) for x in grid.lower().split('x')]
+    print(cut_sheet(src, cols, rows, names.split(','), out_dir))
