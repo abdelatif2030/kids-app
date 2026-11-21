@@ -383,8 +383,8 @@ class Game {
   }
 
   showLevels() {
-    this._clear(); const ar = I.getLang() !== 'en'; const ic = ['🌴', '🐊', '🌋'];
-    const bg = ['#5ac84a,#2a8a3a', '#6a9a70,#2e5a46', '#e0602a,#5a1e1e'];
+    this._clear(); const ar = I.getLang() !== 'en'; const ic = ['🌴', '🐊', '🌋', '🌴', '🐊', '🌋'];
+    const bg = ['#5ac84a,#2a8a3a', '#6a9a70,#2e5a46', '#e0602a,#5a1e1e', '#3f9a38,#1f6a2c', '#56806a,#26463a', '#c8441c,#4a1414'];
     const cards = LEVELS.map((l, i) => { const lock = i + 1 > this.save.unlocked; const st = this.save.stars[i] || 0; return h('button', { class: `dg-env${lock ? ' lock' : ''}`, style: `background:linear-gradient(180deg,${bg[i].split(',')[0]},${bg[i].split(',')[1]})`, onclick: () => { if (lock) { this.plainHint(I.t('locked')); return; } this.sound.play('tap'); this.start(i); } }, h('i', {}, ic[i]), h('span', {}, `${I.num(i + 1)}. ${ar ? l.ar : l.en}`), h('span', {}, lock ? '🔒' : '⭐'.repeat(st) + '☆'.repeat(3 - st))); });
     this.layer.append(h('div', { class: 'dg-dim', style: 'background:rgba(5,25,10,.25)' }, h('div', { class: 'dg-card' }, h('div', { class: 'dg-title' }, I.t('select')), h('div', { class: 'dg-grid' }, cards), h('button', { class: 'dg-btn dark', onclick: () => this.showMenu() }, I.t('back')))));
     this.hintEl = h('div', { class: 'dg-hint' }); this.layer.append(this.hintEl); this._soundPill();

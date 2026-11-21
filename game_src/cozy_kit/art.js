@@ -15,3 +15,17 @@ export function loadArt(base, names) {
     img.src = `${root}art/${n}.webp`;
   }))).then((pairs) => Object.fromEntries(pairs));
 }
+
+/** A 3D game's backdrop picture: loads <base>art/<name>.webp and, if it is there, makes it the scene background.
+ *  [stillWanted] is asked once the picture is ready (a level may have changed meanwhile); missing picture = the colour stays. */
+export function applyBackdrop(THREE, scene, base, name, stillWanted) {
+  if (!name) return;
+  const root = (base || './').replace(/\/?$/, '/');
+  try {
+    new THREE.TextureLoader().load(`${root}art/${name}.webp`, (tex) => {
+      if (stillWanted && !stillWanted()) { tex.dispose(); return; }
+      tex.colorSpace = THREE.SRGBColorSpace;
+      scene.background = tex;
+    }, undefined, () => {});
+  } catch (_) { /* keep the colour */ }
+}

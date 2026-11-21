@@ -107,6 +107,7 @@ flutter:
     - assets/games/samurai/
     - assets/games/golden_tail/
     - assets/games/ocean_defense/
+    - assets/games/ocean_defense/art/
     - assets/games/moto_race/
     - assets/games/rhythm/
     - assets/games/splash_race/
@@ -116,6 +117,7 @@ flutter:
     - assets/games/zombie_rooftop/
     - assets/games/gum_ball/
     - assets/games/deep_sea/
+    - assets/games/deep_sea/art/
     - assets/games/coastal_drive/
     - assets/games/hungry_frog/
     - assets/games/frost_coil/
@@ -137,6 +139,7 @@ flutter:
     - assets/games/hero_tower/
     - assets/games/hero_tower/art/
     - assets/games/cloud_dash/
+    - assets/games/cloud_dash/art/
     - assets/games/sky_capy/
     - assets/games/sky_capy/art/
     - assets/games/marble_dozer/

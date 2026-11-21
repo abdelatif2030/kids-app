@@ -282,7 +282,7 @@ class Game {
     this.sound.setMode('menu');
     this._build(Math.min(this.save.unlocked, LEVELS.length) - 1);
     this._clear();
-    const icons = ['☀️', '🍂', '❄️'];
+    const icons = ['☀️', '🍂', '❄️', '🌾', '🍁', '🏔️'];
     const nodes = LEVELS.map((lv, i) => {
       const locked = i + 1 > this.save.unlocked;
       const stars = this.save.stars[lv.id] ?? 0;

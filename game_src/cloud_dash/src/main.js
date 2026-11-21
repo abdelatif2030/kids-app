@@ -8,6 +8,7 @@
 import * as THREE from 'three';
 import { Run, LEVELS, LANE_W, levelSpec, normalizeSave } from './sim.js';
 import { Sound } from './audio.js';
+import { applyBackdrop } from '../../cozy_kit/art.js';
 import { setLang, setGirl, getLang, isGirl, t, num } from './i18n.js';
 
 const CSS = `
@@ -206,6 +207,7 @@ class Game {
     const sc = this.scene = new THREE.Scene();
     sc.background = skyTex();
     sc.fog = new THREE.Fog(0xf6c8ea, 55, 175);
+    applyBackdrop(THREE, sc, this.base, 'bg_sky');
     this.cam = new THREE.PerspectiveCamera(62, 1, 0.1, 260);
     sc.add(new THREE.HemisphereLight(0xfff4ff, 0xc8a8f0, 1.25));
     const sun = new THREE.DirectionalLight(0xffffff, 1.2);

@@ -10,6 +10,7 @@ import {
   makeCoral, makeSeaweed, sandTexture, causticTexture,
 } from './models.js';
 import { Sound } from './audio.js';
+import { applyBackdrop } from '../../cozy_kit/art.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
 import { CSS, CSS2, CSS3, h } from './ui.js';
 
@@ -444,6 +445,7 @@ class Game {
   startLevel(i) {
     this._endLevel();
     this.levelIndex = i;
+    applyBackdrop(THREE, this.scene, this.base, `bg_reef${(i % 5) + 1}`, () => this.levelIndex === i);
     this.d = new Defense({ level: i, easy: this.age <= 4, up: this.save.up, seed: (Date.now() & 0xffff) + 1 });
     this.mode = 'play';
     this.paused = false;
