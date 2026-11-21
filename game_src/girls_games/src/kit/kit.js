@@ -43,6 +43,8 @@ export const CSS = `
 .gk-spark{position:absolute;pointer-events:none;font-size:calc(var(--u)*5);animation:gkspark 1s ease-out forwards;z-index:9}
 @keyframes gkspark{0%{transform:translate(0,0) scale(.4);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(1.3) rotate(120deg);opacity:0}}
 .gk-bounce{animation:gkb .5s ease-out}
+.gk-fairy{position:absolute;left:calc(var(--u)*1.5);top:calc(var(--u)*14);height:calc(var(--u)*24);z-index:4;pointer-events:none;animation:gkfairy 2.4s ease-in-out forwards;filter:drop-shadow(0 3px 4px rgba(120,20,100,.35))}
+@keyframes gkfairy{0%{opacity:0;transform:translateY(8px) scale(.7)}15%{opacity:1;transform:translateY(0) scale(1)}80%{opacity:1;transform:translateY(-6px)}100%{opacity:0;transform:translateY(-14px)}}
 @keyframes gkb{0%{transform:scale(1)}35%{transform:scale(1.14)}70%{transform:scale(.96)}100%{transform:scale(1)}}
 @media (prefers-reduced-motion:reduce){.gk-stars,.gk-spark,.gk-bounce{animation:none}}
 `;
@@ -83,7 +85,16 @@ export function makeStage(el, opts) {
   setBg(0);
   // Fatima's recordings (the learning games' voice, assets/games/learn_voice) first; the app's device voice only when a sentence has no recording
   const voice = new Voice(opts.base || './', en ? 'en' : 'ar', (text, lg) => post({ type: 'speak', text, lang: lg, slow: true }), () => {});
-  const say = (t) => { if (t) voice.say(t); };
+  let fairyN = 0;
+  const fairy = () => { // the guide fairy pops up for a moment each time something is said (small, never in the way)
+    const names = [2, 4, 5, 6, 8, 12, 1, 3];
+    const im = opts.fairy ? opts.fairy[names[fairyN++ % names.length]] : null;
+    if (!im) return;
+    const e = h('img', { class: 'gk-fairy', src: im.src, alt: '', draggable: 'false' });
+    root.append(e);
+    setTimeout(() => e.remove(), 2500);
+  };
+  const say = (t) => { if (t) { voice.say(t); fairy(); } };
   const sparkle = (x, y, n = 8) => {
     const r = root.getBoundingClientRect();
     for (let i = 0; i < n; i++) {

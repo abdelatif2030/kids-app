@@ -5,6 +5,7 @@
 // no links, no ads, no tracking. Everything drawn and played from code.
 import * as THREE from 'three';
 import { Trip, LEVELS, COLS, normalizeSave } from './sim.js';
+import { loadSprites, makePaintedFigure } from '../../cozy_kit/art.js';
 import { mat, makeFox, makeVehicle, makeTrain, makeLog, makeTree, makeBerry, makeDen, laneTexture } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
@@ -65,7 +66,8 @@ class Game {
     this.frames = [];
     this.goodWin = 0;
     this.clock = new THREE.Clock();
-    this._fonts().then(() => {
+    this.pics = null;
+    Promise.all([this._fonts(), loadSprites(THREE, this.base, ['fox']).then((sp) => { this.pics = sp; })]).then(() => {
       this.loading.remove();
       this.showMenu();
       this.renderer.setAnimationLoop(() => this._frame());
@@ -166,8 +168,8 @@ class Game {
     den.position.set(0, 0, -this.trip.den * C - 0.4);
     s.add(den);
     this.berryModels = this.trip.berries.map((b) => { const m = makeBerry(); m.position.set(b.x * C, 0, -b.r * C); s.add(m); return m; });
-    this.cubModels = this.trip.cubs.map((c) => { const m = makeFox(true); m.root.position.set(c.x * C, 0, -c.r * C); s.add(m.root); m.call = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 6), mat(0xffd23a, 0xffaa00, 0.6)); m.call.position.y = 1.2; m.root.add(m.call); return m; });
-    this.fox = makeFox(false);
+    this.cubModels = this.trip.cubs.map((c) => { const m = this._fox(true); m.root.position.set(c.x * C, 0, -c.r * C); s.add(m.root); m.call = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 6), mat(0xffd23a, 0xffaa00, 0.6)); m.call.position.y = 1.2; m.root.add(m.call); return m; });
+    this.fox = this._fox(false);
     s.add(this.fox.root);
     this.shadow = new THREE.Mesh(new THREE.CircleGeometry(0.4, 16), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.25, depthWrite: false }));
     this.shadow.rotation.x = -Math.PI / 2;
@@ -474,6 +476,16 @@ class Game {
   }
 
   // ---- loop ----------------------------------------------------------------------------------------------------------
+
+  /** The painted fox (or the cubs together... one cub each): a camera-facing picture with the same fields as the 3D one. */
+  _fox(cub) {
+    const P = this.pics;
+    const pic = P && P.fox;
+    if (!pic) return makeFox(cub);
+    const f = makePaintedFigure(THREE, { idle: pic }, cub ? 0.95 : 1.9);
+    f.tail = { rotation: { x: 0, y: 0, z: 0 } };
+    return f;
+  }
 
   _frame() {
     const dt = Math.min(this.clock.getDelta(), 0.1);

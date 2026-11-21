@@ -35,7 +35,7 @@ const CSS = `
 .ga-pot{position:relative;width:calc(var(--u)*14);height:calc(var(--u)*34);cursor:pointer;border:0;background:none;padding:0;display:flex;align-items:flex-end;justify-content:center}
 .ga-pot .clay{position:absolute;bottom:0;left:10%;width:80%;height:30%;border-radius:10% 10% 30% 30%;background:linear-gradient(180deg,#e8845a,#b8582e);border:calc(var(--u)*.4) solid #fff;box-shadow:0 calc(var(--u)*.5) 0 rgba(120,50,20,.4)}
 .ga-pot .clay:before{content:'';position:absolute;top:-14%;left:-6%;width:112%;height:30%;border-radius:40%;background:#f0a070;border:calc(var(--u)*.4) solid #fff}
-.ga-pot img.fl{position:absolute;bottom:17%;left:50%;transform:translateX(-50%);max-width:130%;object-fit:contain;transition:height .5s;pointer-events:none}
+.ga-pot img.fl{position:absolute;bottom:30%;left:50%;transform:translateX(-50%);max-width:130%;object-fit:contain;transition:height .5s;pointer-events:none}
 .ga-pot .wig{animation:gawig .5s}
 @keyframes gawig{0%,100%{transform:translateX(-50%) rotate(0)}30%{transform:translateX(-50%) rotate(-8deg)}70%{transform:translateX(-50%) rotate(8deg)}}
 .ga-bar{position:absolute;left:calc(var(--u)*2);right:calc(var(--u)*2);bottom:calc(var(--u)*1.6);display:flex;gap:calc(var(--u)*2);justify-content:center;align-items:center;z-index:6;direction:ltr}
@@ -56,8 +56,8 @@ class Game {
     this.el = el; this.post = post || (() => {}); this.en = config.lang === 'en'; this.base = config.base || './'; this.disposed = false;
     if (!document.getElementById('ga-style')) document.head.append(h('style', { id: 'ga-style' }, CSS));
     this.g = new Garden(); this.seed = 0; this.can = false; this.busy = false; this.bfEls = [];
-    const names = [...Array.from({ length: 12 }, (_, i) => `fl1_${String(i + 1).padStart(2, '0')}`), ...Array.from({ length: 6 }, (_, i) => `fl2_${String(i + 1).padStart(2, '0')}`), ...Array.from({ length: 12 }, (_, i) => `bf_${String(i + 1).padStart(2, '0')}`), 'bg_garden1', 'bg_garden2', 'bg_garden3'];
-    loadAll(this.base, names).then((art) => { this.art = art; if (!this.disposed) this._build(); });
+    const names = [...Array.from({ length: 12 }, (_, i) => `fl1_${String(i + 1).padStart(2, '0')}`), ...Array.from({ length: 6 }, (_, i) => `fl2_${String(i + 1).padStart(2, '0')}`), ...Array.from({ length: 12 }, (_, i) => `bf_${String(i + 1).padStart(2, '0')}`), 'bg_garden1', 'bg_garden2', 'bg_garden3', 'gi_01', 'gi_02', 'gi_03', 'gi_04', 'gi_05', 'gi_06', 'gi_09', 'gi_12'];
+    loadAll(this.base, [...names, ...Array.from({ length: 12 }, (_, i) => `fairy_${String(i + 1).padStart(2, '0')}`)]).then((art) => { this.art = art; if (!this.disposed) this._build(); });
   }
 
   _t(p) { return this.en ? p[1] : p[0]; }
@@ -65,12 +65,18 @@ class Game {
   _build() {
     const A = this.art;
     const bgs = [A.bg_garden1, A.bg_garden2, A.bg_garden3, A.bg_garden1, A.bg_garden2, A.bg_garden3];
-    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, title: this.en ? 'Butterfly garden' : 'حديقة الفراشات', places: PLACES, bgs, onPlace: () => this._reset() });
-    this.potsEl = h('div', { class: 'ga-pots' }, Array.from({ length: POTS }, (_, i) => h('button', { class: 'ga-pot', 'data-pot': String(i), 'aria-label': `pot ${i + 1}`, onclick: (e) => this._tapPot(i, e) }, h('div', { class: 'clay' }))));
-    this.seedsEl = COLORS.map((c, i) => h('button', { class: `ga-seed${i === 0 ? ' on' : ''}`, 'data-seed': String(i), 'aria-label': `seed ${c.en}`, style: `background:${c.css}`, onclick: () => this._pickSeed(i) }, '🌱'));
-    this.canEl = h('button', { class: 'ga-can', 'aria-label': 'water', onclick: () => { this.stage.say(this.en ? 'Tap a planted pot to water it!' : 'دوسي على الأصيص المزروع عشان تسقيه!'); } }, '🚿');
+    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, fairy: Object.fromEntries([1,2,3,4,5,6,7,8,9,10,11,12].map((n) => [n, this.art[`fairy_${String(n).padStart(2, '0')}`]])), title: this.en ? 'Butterfly garden' : 'حديقة الفراشات', places: PLACES, bgs, onPlace: () => this._reset() });
+    this.potsEl = h('div', { class: 'ga-pots' }, Array.from({ length: POTS }, (_, i) => h('button', { class: 'ga-pot', 'data-pot': String(i), 'aria-label': `pot ${i + 1}`, onclick: (e) => this._tapPot(i, e) }, this._potPic())));
+    const PACK = { 0: 'gi_02', 1: 'gi_03', 2: 'gi_04', 3: 'gi_06', 4: 'gi_05' }; // the painted seed packets (orange has none: a coloured square)
+    this.seedsEl = COLORS.map((c, i) => { const pk = this.art[PACK[i]]; return h('button', { class: `ga-seed${i === 0 ? ' on' : ''}`, 'data-seed': String(i), 'aria-label': `seed ${c.en}`, style: pk ? `background:rgba(255,255,255,.85) url(${pk.src}) center/contain no-repeat` : `background:${c.css}`, onclick: () => this._pickSeed(i) }, pk ? '' : '🌱'); });
+    this.canEl = h('button', { class: 'ga-can', 'aria-label': 'water', style: this.art.gi_01 ? `background:rgba(255,255,255,.9) url(${this.art.gi_01.src}) center/70% no-repeat;font-size:0` : '', onclick: () => { this.stage.say(this.en ? 'Tap a planted pot to water it!' : 'دوسي على الأصيص المزروع عشان تسقيه!'); } }, '🚿');
     this.stage.layer.append(this.potsEl, h('div', { class: 'ga-bar' }, this.seedsEl, this.canEl));
     this.stage.say(this.en ? 'Pick a seed and plant it in a pot!' : 'اختاري بذرة وازرعيها في أصيص!');
+  }
+
+  _potPic() {
+    const im = this.art.gi_12;
+    return im ? h('img', { class: 'potimg', src: im.src, alt: '', draggable: 'false', style: 'position:absolute;bottom:0;left:0;width:100%;height:40%;object-fit:contain;pointer-events:none' }) : h('div', { class: 'clay' });
   }
 
   _reset() { this.g = new Garden(); this._paint(); this.bfEls.forEach((b) => b.remove()); this.bfEls = []; this.busy = false; }

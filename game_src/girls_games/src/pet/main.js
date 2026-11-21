@@ -55,14 +55,14 @@ class Game {
     this.round = new Round(); this.char = null; this.pose = 'happy'; this.busy = false;
     const poses = ['happy', 'hungry', 'eating', 'bottle', 'muddy', 'bath', 'towel', 'brush', 'dressed', 'yawn', 'sleep', 'hug'];
     const names = [...CHARS.flatMap((c) => poses.map((p) => `${c.id}_${p}`)), 'bg_nursery', 'bg_garden'];
-    loadAll(this.base, names).then((art) => { this.art = art; if (!this.disposed) this._build(); });
+    loadAll(this.base, [...names, ...Array.from({ length: 12 }, (_, i) => `fairy_${String(i + 1).padStart(2, '0')}`)]).then((art) => { this.art = art; if (!this.disposed) this._build(); });
   }
 
   _t(pair) { return this.en ? pair[1] : pair[0]; }
 
   _build() {
     const bgs = [this.art.bg_nursery, this.art.bg_garden, this.art.bg_nursery, this.art.bg_garden, null, null];
-    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, title: this.en ? 'Baby & pet' : 'بيبي وصاحبها', places: PLACES, bgs, onPlace: () => {} });
+    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, fairy: Object.fromEntries([1,2,3,4,5,6,7,8,9,10,11,12].map((n) => [n, this.art[`fairy_${String(n).padStart(2, '0')}`]])), title: this.en ? 'Baby & pet' : 'بيبي وصاحبها', places: PLACES, bgs, onPlace: () => {} });
     this._pick();
   }
 
