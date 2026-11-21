@@ -36,8 +36,8 @@ class HubMusic {
   void claim(Object owner, String? track) {
     _owner = owner;
     _want = track;
-    if (track == null && !disabled && !_isTest) {
-      // a game opened: silence right now, do not wait behind a track that is still loading
+    if ((track == null || track != _loaded) && !disabled && !_isTest) {
+      // a game opened, or another kind of page (fun -> learning): the old track stops right now, never waits behind a load
       try {
         _player?.pause();
       } catch (_) {}
