@@ -1,0 +1,37 @@
+{
+ "style": "Glossy 3D-rendered cartoon vehicle for a children's racing game, smooth rounded toy-like shapes, bright saturated colors, soft studio lighting, thick clean edges, cute friendly look, same style as a toy car render.",
+ "kind_sprite": "Seen exactly from DIRECTLY BEHIND: rear view, perfectly symmetrical, the back of the vehicle facing the camera, both rear wheels and both tail lights visible, centered, whole vehicle visible, no road, no shadow, no text, no letters, no license plate letters.",
+ "suffix": "",
+ "jobs": [
+  {
+   "name": "truck_box",
+   "kind": "sprite",
+   "prompt": "A cartoon a white box delivery truck with a big rear door, two round tail lights and a chrome bumper."
+  },
+  {
+   "name": "van",
+   "kind": "sprite",
+   "prompt": "A cartoon a white delivery van with two rear doors and two tail lights."
+  },
+  {
+   "name": "bus",
+   "kind": "sprite",
+   "prompt": "A cartoon a city bus, white with a blue stripe, big rear window."
+  },
+  {
+   "name": "sedan_blue",
+   "kind": "sprite",
+   "prompt": "A cartoon a blue four-door sedan with a trunk lid and two tail lights."
+  },
+  {
+   "name": "taxi_yellow",
+   "kind": "sprite",
+   "prompt": "A cartoon a yellow taxi with a roof sign (no letters)."
+  },
+  {
+   "name": "hatch_green",
+   "kind": "sprite",
+   "prompt": "A cartoon a green hatchback with a rear window and two tail lights."
+  }
+ ]
+}

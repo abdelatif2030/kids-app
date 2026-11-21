@@ -131,3 +131,13 @@ if __name__ == '__main__':
     src, grid, names, out_dir = sys.argv[1:5]
     cols, rows = [int(x) for x in grid.lower().split('x')]
     print(cut_sheet(src, cols, rows, names.split(','), out_dir))
+
+
+def trim_ground(rgba, dark=95):
+    """Cuts the soft floor shadow below a vehicle: everything under the lowest dark pixel (the tyres) goes."""
+    px = rgba.load(); w, h = rgba.size
+    last = None
+    for y in range(h - 1, -1, -1):
+        row = [px[x, y] for x in range(0, w, 2)]
+        if any(p[3] > 200 and max(p[0], p[1], p[2]) < dark for p in row): last = y; break
+    return rgba.crop((0, 0, w, min(h, last + 3))) if last else rgba

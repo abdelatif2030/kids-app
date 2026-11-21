@@ -99,13 +99,13 @@ class Game {
     this._fonts().then(() => { this.showMenu(); this.renderer.setAnimationLoop(() => this._frame()); });
   }
 
-  async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 2500))]); } catch (_) { /* system font */ } }
+  async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 900))]); } catch (_) { /* system font */ } }
   get dir() { return I.getLang() === 'en' ? 'ltr' : 'rtl'; }
 
   // ------------------------------------------------------------ the 3D world
   _three() {
     const r = (this.renderer = new THREE.WebGLRenderer({ antialias: true }));
-    r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.6));
+    r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     r.outputColorSpace = THREE.SRGBColorSpace; r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.25;
     this.root.prepend(r.domElement);
     const sc = (this.scene = new THREE.Scene());

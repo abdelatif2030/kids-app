@@ -101,7 +101,7 @@ class Game {
     this._fonts().then(() => { this.page = Math.min(4, Math.floor((this.save.unlocked - 1) / 6)); this.showMenu(); this.renderer.setAnimationLoop(() => this._frame()); });
   }
 
-  async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 2500))]); } catch (_) { /* system font */ } }
+  async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 900))]); } catch (_) { /* system font */ } }
 
   _three() {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });

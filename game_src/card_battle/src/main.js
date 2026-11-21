@@ -60,7 +60,7 @@ class Game {
     Promise.all([this._fonts(), loadArt(this.base || config.base, ['unit_spark', 'unit_blaster', 'unit_brute', 'unit_bug', 'unit_slime', 'unit_smash', 'unit_spitter', 'unit_turret', 'base', 'ufo']).then(setArt), loadArt(this.base || config.base, ['avatar_robot', 'avatar_alien', 'bg_menu']).then((p) => { this.pics = p; })]).then(() => { this.showMenu(); this._loop(); });
   }
 
-  async _fonts() { try { const ff = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([ff.load().then((x) => document.fonts.add(x)), new Promise((r) => setTimeout(r, 2500))]); } catch (_) { /* system font */ } }
+  async _fonts() { try { const ff = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([ff.load().then((x) => document.fonts.add(x)), new Promise((r) => setTimeout(r, 900))]); } catch (_) { /* system font */ } }
 
   // ---- layout and projection --------------------------------------------------------------------------------------------
   _resize() {

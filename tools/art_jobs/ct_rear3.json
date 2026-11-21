@@ -1,0 +1,47 @@
+{
+ "style": "Glossy 3D-rendered cartoon vehicle for a children's racing game: smooth rounded toy-like shapes, bright saturated colors, soft studio lighting, thick clean edges, cute friendly look.",
+ "kind_sprite": "Seen exactly from DIRECTLY BEHIND: rear view, perfectly symmetrical, the back of the vehicle facing the camera, both rear wheels visible, centered, whole vehicle visible, plain pure white background, no road, no shadow, no text, no letters.",
+ "suffix": "",
+ "jobs": [
+  {
+   "name": "truck_box",
+   "kind": "sprite",
+   "prompt": "A cartoon a white box delivery truck with a big rear door, two round red tail lights and a chrome bumper."
+  },
+  {
+   "name": "bus",
+   "kind": "sprite",
+   "prompt": "A cartoon a city bus, white with a blue stripe, big rear window and two tail lights."
+  },
+  {
+   "name": "sedan_blue",
+   "kind": "sprite",
+   "prompt": "A cartoon a shiny blue four-door sedan with a trunk lid and two red tail lights."
+  },
+  {
+   "name": "taxi_yellow",
+   "kind": "sprite",
+   "prompt": "A cartoon a yellow taxi with a roof sign without letters and two tail lights."
+  },
+  {
+   "name": "hatch_green",
+   "kind": "sprite",
+   "prompt": "A cartoon a green hatchback with a big rear window and two tail lights."
+  },
+  {
+   "name": "suv_red",
+   "kind": "sprite",
+   "prompt": "A cartoon a red SUV with a rear hatch and two tail lights."
+  },
+  {
+   "name": "pickup_yellow",
+   "kind": "sprite",
+   "prompt": "A cartoon a yellow pickup truck with an open bed seen from behind and two tail lights."
+  },
+  {
+   "name": "sports_orange",
+   "kind": "sprite",
+   "prompt": "A cartoon an orange sports car with a rear wing and two round tail lights."
+  }
+ ]
+}

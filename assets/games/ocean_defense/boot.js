@@ -22,3 +22,15 @@
     post({ type: 'loaded' });
   }
 })();
+
+// Tell the app as soon as the game's first button (its menu) is on the page, so the loading poster goes away at once (app only).
+(function () {
+  var n = 0;
+  var iv = setInterval(function () {
+    if (++n > 150) { clearInterval(iv); return; }
+    if (window.RehlatyRace && document.querySelector('button')) {
+      clearInterval(iv);
+      try { window.RehlatyRace.postMessage(JSON.stringify({ type: 'ready' })); } catch (e) {}
+    }
+  }, 60);
+})();

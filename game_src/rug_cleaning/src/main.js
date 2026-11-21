@@ -84,7 +84,7 @@ class Game {
     Promise.all([this._fonts(), loadArt(this.base, ['rug_1', 'rug_2', 'rug_3', 'rug_4', 'floor', 'pot', 'tool_beat', 'tool_foam', 'tool_brush', 'tool_jet', 'tool_squeegee', 'client_1', 'client_2', 'client_3', 'client_4']).then((a) => { setArt(a); this._buildBg(); })]).then(() => { this.thumbs = {}; this.showMenu(); this._loop(); });
   }
 
-  async _fonts() { try { const ff = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([ff.load().then((x) => document.fonts.add(x)), new Promise((r) => setTimeout(r, 2500))]); } catch (_) { /* system font */ } }
+  async _fonts() { try { const ff = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([ff.load().then((x) => document.fonts.add(x)), new Promise((r) => setTimeout(r, 900))]); } catch (_) { /* system font */ } }
 
   // ---------- layout ----------
   _resize() {
