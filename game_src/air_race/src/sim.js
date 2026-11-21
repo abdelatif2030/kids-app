@@ -31,6 +31,11 @@ export const COURSES = [
     bridges: [19], pillars: [4, 10, 15, 23, 26], arches: [7, 13, 21], canyon: [0.62, 0.74] },
   { id: 3, ar: 'منحدرات المرجان', en: 'Coral Cliffs', world: 'sunset', rx: 400, rz: 340, wob: [0.3, 4, 2.2], hy: [38, 12], rings: 30, golden: 5,
     bridges: [4, 11, 18, 26], pillars: [2, 8, 15, 22, 28], arches: [6, 20] },
+  // 2026-11-21: two longer courses
+  { id: 4, ar: 'اللاجون الكبير', en: 'Grand Lagoon', world: 'lagoon', rx: 440, rz: 340, wob: [0.3, 4, 1.5], hy: [40, 12], rings: 30, golden: 5,
+    bridges: [3, 9, 15, 22, 27], pillars: [2, 7, 12, 18, 25], arches: [5, 13, 20] },
+  { id: 5, ar: 'عاصفة الجليد', en: 'Ice Storm', world: 'glacier', rx: 460, rz: 360, wob: [0.3, 3, 2.6], hy: [48, 14], rings: 32, golden: 5,
+    bridges: [10, 24], pillars: [3, 8, 14, 19, 27, 30], arches: [6, 12, 17, 23, 29], canyon: [0.5, 0.64] },
 ];
 
 // ---- the course as a closed Catmull-Rom spline with an arc-length table --------------------------------------------
@@ -398,5 +403,5 @@ export function normalizeSave(raw) {
     if (Number.isFinite(b) && b > 5 && b < 3600) best[c.id] = Math.round(b * 100) / 100;
   }
   const u = Math.floor(Number(s.unlocked));
-  return { unlocked: u >= 1 && u <= COURSES.length ? u : 1, stars, best, muted: s.muted === true };
+  return { unlocked: Math.min(COURSES.length, Math.max(u >= 1 ? u : 1, ...Object.keys(stars).map((k) => Number(k) + 1))), stars, best, muted: s.muted === true };
 }

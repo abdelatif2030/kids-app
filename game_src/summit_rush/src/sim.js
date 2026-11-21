@@ -12,6 +12,9 @@ export const COURSES = [
   { id: 1, len: 520, time: 60, gap: [34, 46], speed: [4.5, 6], logs: 0.15, orbs: 3, pads: 5, rival: 0.92 },
   { id: 2, len: 555, time: 60, gap: [28, 40], speed: [5, 7], logs: 0.3, orbs: 3, pads: 5, rival: 0.97 },
   { id: 3, len: 585, time: 60, gap: [24, 34], speed: [6, 8], logs: 0.4, orbs: 4, pads: 6, rival: 1.02 },
+  // 2026-11-21: two longer, busier slopes
+  { id: 4, len: 615, time: 62, gap: [22, 31], speed: [6.5, 8.5], logs: 0.45, orbs: 4, pads: 6, rival: 1.04 },
+  { id: 5, len: 645, time: 64, gap: [20, 29], speed: [7, 9], logs: 0.5, orbs: 4, pads: 7, rival: 1.06 },
 ];
 
 export const RUN = 10.4; // m/s
@@ -243,7 +246,7 @@ export function normalizeSave(s) {
   const best = {};
   if (o.best && typeof o.best === 'object') for (const [k, v] of Object.entries(o.best)) if (Number(v) >= 1 && Number(v) <= 4) best[k] = Math.round(Number(v));
   return {
-    unlocked: Math.max(1, Math.min(COURSES.length, Math.round(Number(o.unlocked) || 1))),
+    unlocked: Math.max(1, Math.min(COURSES.length, Math.max(Math.round(Number(o.unlocked) || 1), ...Object.keys(best).map((k) => Number(k) + 1)))), // a course won opens the next one
     best,
     crystals: Math.max(0, Math.min(999999, Math.round(Number(o.crystals) || 0))),
     muted: !!o.muted,

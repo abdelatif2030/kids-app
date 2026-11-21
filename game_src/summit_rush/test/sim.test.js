@@ -118,5 +118,5 @@ test('the course: crystals inside the run, orbs of both kinds, pads', () => {
 
 test('progress is cleaned when loaded', () => {
   assert.deepEqual(normalizeSave(null), { unlocked: 1, best: {}, crystals: 0, muted: false });
-  assert.deepEqual(normalizeSave({ unlocked: 9, best: { 1: 2, 2: 7 }, crystals: -3, muted: 1 }), { unlocked: 3, best: { 1: 2 }, crystals: 0, muted: true });
+  assert.deepEqual(normalizeSave({ unlocked: 9, best: { 1: 2, 2: 7 }, crystals: -3, muted: 1 }), { unlocked: 5, best: { 1: 2 }, crystals: 0, muted: true });
 });

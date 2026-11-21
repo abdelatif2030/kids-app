@@ -1,3 +1,4 @@
+import 'memory_guard.dart';
 import 'lessons/lesson_store.dart';
 import 'video_controls.dart';
 import 'dart:convert';
@@ -38,6 +39,7 @@ import 'media/rehlaty_audio_engine.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MemoryGuard.instance.install();
   await lockLandscape();
   DemoMode.applyPolicies(); // demo only: videos need a parent's approval
   // The start-up reads do not depend on each other, so they run together (the first screen waits for the slowest one

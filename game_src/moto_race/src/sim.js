@@ -15,6 +15,8 @@ export const ROUNDS = [
   { id: 2, ar: 'طريق النخيل', en: 'Palm Road', reverse: true, rival: 55, sunset: false, skill: 0.97 },
   { id: 3, ar: 'غروب الخليج', en: 'Bay Sunset', reverse: false, rival: 57.5, sunset: true, skill: 1.03 },
   { id: 4, ar: 'الجائزة الكبرى', en: 'Grand Prix', reverse: true, rival: 59.5, sunset: true, skill: 1.08 },
+  { id: 5, ar: 'شاطئ الليل', en: 'Night Beach', reverse: false, rival: 60.5, sunset: true, skill: 1.1 },
+  { id: 6, ar: 'بطولة الأبطال', en: 'Champions Cup', reverse: true, rival: 61, sunset: true, skill: 1.12 },
 ];
 
 export const RIDERS = [
@@ -317,5 +319,5 @@ export function normalizeSave(raw) {
   }
   const u = Math.floor(Number(s.unlocked));
   const c = Math.floor(Number(s.color));
-  return { unlocked: Number.isFinite(u) ? clamp(u, 1, ROUNDS.length) : 1, stars, best, color: c >= 0 && c < 4 ? c : 0, muted: s.muted === true };
+  return { unlocked: clamp(Math.max(Number.isFinite(u) ? u : 1, ...Object.keys(stars).map((k) => Number(k) + 1)), 1, ROUNDS.length), stars, best, color: c >= 0 && c < 4 ? c : 0, muted: s.muted === true };
 }
