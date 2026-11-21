@@ -102,5 +102,5 @@ test('flying into a bridge deck is a soft bump, never the end', () => {
 
 test('damaged saves load safely', () => {
   assert.deepEqual(normalizeSave(null), { unlocked: 1, stars: {}, best: {}, muted: false });
-  assert.deepEqual(normalizeSave({ unlocked: 9, stars: { 1: 7, 2: 2 }, best: { 1: 'x', 2: 61.234 }, muted: 'yes' }), { unlocked: 1, stars: { 2: 2 }, best: { 2: 61.23 }, muted: false });
+  assert.deepEqual(normalizeSave({ unlocked: 9, stars: { 1: 7, 2: 2 }, best: { 1: 'x', 2: 61.234 }, muted: 'yes' }), { unlocked: 3, stars: { 2: 2 }, best: { 2: 61.23 }, muted: false });
 });

@@ -403,5 +403,5 @@ export function normalizeSave(raw) {
     if (Number.isFinite(b) && b > 5 && b < 3600) best[c.id] = Math.round(b * 100) / 100;
   }
   const u = Math.floor(Number(s.unlocked));
-  return { unlocked: Math.min(COURSES.length, Math.max(u >= 1 ? u : 1, ...Object.keys(stars).map((k) => Number(k) + 1))), stars, best, muted: s.muted === true };
+  return { unlocked: Math.min(COURSES.length, Math.max(u >= 1 && u <= COURSES.length ? u : 1, ...Object.keys(stars).map((k) => Number(k) + 1))), stars, best, muted: s.muted === true };
 }
