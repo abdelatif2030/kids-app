@@ -83,8 +83,8 @@ export class Voice {
     this.stop();
     this.queue = (Array.isArray(texts) ? texts : [texts]).map(spoken).filter(Boolean);
     this.i = 0;
-    this.onEach = onEach || null;
-    this.onDone = onDone || null;
+    this.onEach = typeof onEach === 'function' ? onEach : null; // a game passing anything else (a number) must never break the voice
+    this.onDone = typeof onDone === 'function' ? onDone : null;
     this.run = (this.run || 0) + 1;
     if (!this.queue.length && this.onDone) this.onDone();
     else this._next();

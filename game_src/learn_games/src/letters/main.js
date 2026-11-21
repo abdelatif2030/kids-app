@@ -979,8 +979,8 @@ ead) also reads every choice aloud, one after the other, and the choice being re
     this._jump = h('div', { class: 'lw-jump' }, h('div', { class: 'lw-jtitle' }, en ? 'Go to a level' : 'روح مستوى تاني'), h('div', { class: 'lw-jgrid' }, tiles));
     sh.layer.append(this._jump);
     // a tap anywhere else closes the little list
-    this._jumpOff = (e) => { if (!this._jump.contains(e.target) && !(e.target.closest && e.target.closest('.lw-jumpbtn'))) this._closeJump(); };
-    setTimeout(() => document.addEventListener('pointerdown', this._jumpOff, true), 0);
+    this._jumpOff = (e) => { if (!this._jump) { document.removeEventListener('pointerdown', this._jumpOff, true); return; } if (!this._jump.contains(e.target) && !(e.target.closest && e.target.closest('.lw-jumpbtn'))) this._closeJump(); };
+    setTimeout(() => { if (this._jump) document.addEventListener('pointerdown', this._jumpOff, true); }, 0);
   }
 
   _closeJump() {

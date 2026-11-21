@@ -26,6 +26,9 @@ const MOODS = [
   { sky: 0xf0c8d8, fog: 0xe8c8d4, hemi: [0xfff0f4, 0x7a6a5a, 1.65], sun: [0xfff0e0, 1.4], night: false },
   { sky: 0xffb48a, fog: 0xffc8a0, hemi: [0xffe0c8, 0x7a5a4a, 1.7], sun: [0xffb070, 1.5], night: false },
   { sky: 0x2a2a5a, fog: 0x3a3a6a, hemi: [0xb8b8ff, 0x3a2a4a, 1.2], sun: [0xc8c8ff, 0.7], night: true },
+  { sky: 0x1c3a3a, fog: 0x2a4a4a, hemi: [0xa8ffe0, 0x2a3a3a, 1.2], sun: [0xc8fff0, 0.7], night: true }, // 4: bamboo night
+  { sky: 0xdce8f4, fog: 0xe4eef8, hemi: [0xf4f8ff, 0x7a8a9a, 1.75], sun: [0xffffff, 1.3], night: false }, // 5: snowy dojo
+  { sky: 0xffd890, fog: 0xffdca8, hemi: [0xfff0d0, 0x7a6a4a, 1.7], sun: [0xffd070, 1.6], night: false }, // 6: castle gate at sunrise
 ];
 
 let _dot;
@@ -187,7 +190,7 @@ class Game {
 
   _buildScene(stageIndex) {
     if (this.scene) this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
-    const mood = MOODS[stageIndex];
+    const mood = MOODS[stageIndex % MOODS.length];
     this.stageIndex = stageIndex;
     const s = (this.scene = new THREE.Scene());
     s.background = new THREE.Color(mood.sky);
