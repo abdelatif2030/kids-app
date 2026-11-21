@@ -22,6 +22,9 @@ export const DIFFS = {
   easy: { ufoHp: 800, ufoDmg: 16, aiRegen: 0.62, aiStart: 3, think: 3.6, pushAt: 8, miss: 0.35, smart: false },
   normal: { ufoHp: 1000, ufoDmg: 24, aiRegen: 0.9, aiStart: 5, think: 2.2, pushAt: 7, miss: 0.1, smart: true },
   hard: { ufoHp: 1150, ufoDmg: 30, aiRegen: 1.12, aiStart: 6, think: 1.1, pushAt: 5, miss: 0, smart: true },
+  // 2026-11-21: two more levels above Hard
+  expert: { ufoHp: 1300, ufoDmg: 34, aiRegen: 1.25, aiStart: 6, think: 0.9, pushAt: 4.5, miss: 0, smart: true },
+  legend: { ufoHp: 1450, ufoDmg: 38, aiRegen: 1.38, aiStart: 7, think: 0.75, pushAt: 4, miss: 0, smart: true },
 };
 
 /** Unit stats. proj: the unit fires a homing bolt; building: never moves and expires. */
@@ -531,7 +534,7 @@ export function normalizeSave(s) {
   const st = o.stars && typeof o.stars === 'object' ? o.stars : {};
   const n = (v, max) => (Number.isFinite(+v) ? Math.max(0, Math.min(max, Math.floor(+v))) : 0);
   return {
-    stars: { easy: n(st.easy, 3), normal: n(st.normal, 3), hard: n(st.hard, 3) },
+    stars: { easy: n(st.easy, 3), normal: n(st.normal, 3), hard: n(st.hard, 3), expert: n(st.expert, 3), legend: n(st.legend, 3) },
     wins: n(o.wins, 1e6),
     plays: n(o.plays, 1e6),
     muted: !!o.muted,

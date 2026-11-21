@@ -12,7 +12,7 @@ import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 const S = {
   title: ['معركة الكروت النيون', 'Neon Card Battle'], play: ['يلا نقاتل!', 'Battle!'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'],
   again: ['مرة تانية', 'Play again'], resume: ['كمّل', 'Resume'], paused: ['إيقاف مؤقت', 'Paused'], howBtn: ['إزاي ألعب؟', 'How to play'],
-  diff: ['اختار الصعوبة', 'Choose difficulty'], easy: ['سهل', 'Easy'], normal: ['عادي', 'Normal'], hard: ['صعب', 'Hard'],
+  diff: ['اختار الصعوبة', 'Choose difficulty'], easy: ['سهل', 'Easy'], normal: ['عادي', 'Normal'], hard: ['صعب', 'Hard'], expert: ['خبير', 'Expert'], legend: ['أسطورة', 'Legend'],
   next: ['التالي', 'NEXT'], hint: ['اسحب كارت على الساحة', 'DRAG A CARD ONTO THE FIELD'], hintTap: ['دوس على الساحة عشان تنزّله', 'Tap the field to drop it'],
   win: ['انتصرت! 🏆', 'Victory! 🏆'], lose: ['خسرنا المعركة', 'Defeat'], draw: ['تعادل', 'Draw'],
   winText: ['دمّرت الكائن الفضائي!', 'You beat the Alien Overlord!'], timeWin: ['القاعدة بتاعتك أقوى!', 'Your base was stronger!'], loseText: ['جرّب تاني بكروت مختلفة', 'Try again with different cards'], drawText: ['الاتنين متساويين!', 'Both bases were equal!'],
@@ -241,7 +241,7 @@ class Game {
     this.mode = 'menu'; this.layer.replaceChildren(); this.topEl = this.botEl = null; this._proj();
     this.sound.setMode(false); this.drag = null; this.sel = -1;
     this.battle = new Battle({ seed: 1, difficulty: this.diff }); this.parts = []; this.texts = []; this.beams = []; this.fxs = [];
-    const btns = ['easy', 'normal', 'hard'].map((d) => h('button', { class: `cb-diff${d === this.diff ? ' on' : ''}`, onclick: () => { this.diff = d; this.sound.play('tap'); this.showMenu(); } }, h('b', {}, I.t(d)), this._stars(this.save.stars[d])));
+    const btns = ['easy', 'normal', 'hard', 'expert', 'legend'].map((d) => h('button', { class: `cb-diff${d === this.diff ? ' on' : ''}`, onclick: () => { this.diff = d; this.sound.play('tap'); this.showMenu(); } }, h('b', {}, I.t(d)), this._stars(this.save.stars[d])));
     this.layer.append(h('div', { class: 'cb-dim' }, h('div', { class: 'cb-card' },
       h('div', { class: 'cb-logo' }, '⚡ ', I.t('title')),
       h('div', { class: 'cb-small' }, I.t('diff')), h('div', { class: 'cb-diffs' }, btns),
