@@ -809,6 +809,7 @@ class Game {
     document.removeEventListener('visibilitychange', this._onVis);
     window.removeEventListener('keydown', this._onKey);
     this.renderer.dispose();
+    try { this.renderer.forceContextLoss(); } catch (_) { /* already gone */ } // free the GL context now (phones allow only a few)
     this.root.remove();
   }
 }

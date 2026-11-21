@@ -158,5 +158,6 @@ export class Stage {
     window.removeEventListener('keydown', this._key);
     this.sh.root.removeEventListener('pointerup', this._up);
     this.renderer.dispose();
+    try { this.renderer.forceContextLoss(); } catch (_) { /* already gone */ } // free the GL context now (phones allow only a few)
   }
 }

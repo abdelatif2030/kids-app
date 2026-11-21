@@ -653,6 +653,7 @@ class Game {
     this.sound.dispose();
     if (this.ro) this.ro.disconnect();
     this.renderer.dispose();
+    try { this.renderer.forceContextLoss(); } catch (_) { /* already gone */ } // free the GL context now (phones allow only a few)
     this.root.remove();
   }
 }

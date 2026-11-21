@@ -63,6 +63,12 @@ class _WebGameViewState extends State<WebGameView> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _c.runJavaScript('window.crStop && window.crStop();');
+    // leave an empty page behind so the game's memory and GL context are freed at once, not when the system gets round to it
+    Future<void>.delayed(const Duration(milliseconds: 200), () {
+      try {
+        _c.loadRequest(Uri.parse('about:blank'));
+      } catch (_) {}
+    });
     super.dispose();
   }
 
