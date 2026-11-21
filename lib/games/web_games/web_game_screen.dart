@@ -1,4 +1,5 @@
 import 'learn_reactions.dart';
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -57,12 +58,21 @@ class WebGameScreen extends StatefulWidget {
 
 class _WebGameScreenState extends State<WebGameScreen> {
   Map<String, Object?>? _config;
+
+  /// The poster (`assets/games/<folder>/poster.webp`) covers the screen while the game loads, so a child never stares at a black page.
+  /// Gone as soon as the game says it is ready, at the latest after 2.5 s. Not in tests (no timers there), not for learning games.
+  bool _poster = false;
+  Timer? _posterTimer;
   late final WebGameStore _store = WebGameStore(widget.game);
 
   @override
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    if (!widget.game.isLearning && !isTestBinding()) {
+      _poster = true;
+      _posterTimer = Timer(const Duration(milliseconds: 2500), _hidePoster);
+    }
     _start();
   }
 
@@ -75,8 +85,14 @@ class _WebGameScreenState extends State<WebGameScreen> {
     setState(() => _config = {'lang': AppLocale.instance.isArabic ? 'ar' : 'en', 'age': widget.age, 'gender': widget.gender, 'save': save, 'done': done, 'level': widget.level});
   }
 
+  void _hidePoster() {
+    _posterTimer?.cancel();
+    if (mounted && _poster) setState(() => _poster = false);
+  }
+
   @override
   void dispose() {
+    _posterTimer?.cancel();
     AppAudio.stopSaying();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
@@ -89,6 +105,8 @@ class _WebGameScreenState extends State<WebGameScreen> {
     } catch (_) {
       return;
     }
+    if (_poster && msg['type'] != 'loaded') _hidePoster(); // any sign of life from the game: it is ready
+    if (msg['type'] == 'loaded') Timer(const Duration(milliseconds: 700), _hidePoster); // let the game build its first frame
     switch (msg['type']) {
       case 'save':
         final save = msg['save'];
@@ -125,6 +143,7 @@ class _WebGameScreenState extends State<WebGameScreen> {
       body: Stack(
         children: [
           Positioned.fill(child: view),
+          if (_poster) Positioned.fill(child: IgnorePointer(key: const ValueKey('web_game_poster'), child: _Poster(game: widget.game))),
           // (owner 2026-11-20: a SMALL round back button on both the left and the right edge of every FUN game, so the child can
           // always get out; learning games keep their own top bar)
           if (!widget.game.isLearning) ...[
@@ -135,6 +154,42 @@ class _WebGameScreenState extends State<WebGameScreen> {
       ),
     );
   }
+}
+
+/// The game's poster picture with its name, a spinner and nothing else. A game with no poster file shows a plain dark page.
+class _Poster extends StatelessWidget {
+  final WebGame game;
+  const _Poster({required this.game});
+
+  @override
+  Widget build(BuildContext context) => Stack(
+    fit: StackFit.expand,
+    children: [
+      const ColoredBox(color: Color(0xFF1D1250)),
+      Image.asset('assets/games/${game.folder}/poster.webp', fit: BoxFit.cover, errorBuilder: (_, _, _) => const SizedBox.shrink()),
+      const DecoratedBox(
+        decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00000000), Color(0x99000000)])),
+      ),
+      Align(
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                game.title(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, shadows: [Shadow(blurRadius: 8, color: Colors.black87)]),
+              ),
+              const SizedBox(height: 8),
+              const SizedBox(width: 26, height: 26, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3)),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
 }
 
 class _Unsupported extends StatelessWidget {
