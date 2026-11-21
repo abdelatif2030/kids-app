@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Race, ROUNDS, RIDERS, LAPS, normalizeSave } from './sim.js';
 import { pointAt, HALF_W, WALL } from './track.js';
+import { loadSprites, makeBillboardVehicle } from '../../cozy_kit/art.js';
 import { mat, makeCar, makePalm, makeStand, makeGantry, makeChevron, makeMountain, roadTexture, makeClouds, meshTexture } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
@@ -115,7 +116,8 @@ class Game {
     this.frames = [];
     this.goodWin = 0;
     this.clock = new THREE.Clock();
-    this._fonts().then(() => {
+    this.pics = null;
+    Promise.all([this._fonts(), loadSprites(THREE, this.base, ['car_01','car_02','car_03','car_04','car_05','car_06','car_07','car_08','car_09','car_10','car_11','car_12']).then((sp) => { this.pics = sp; })]).then(() => {
       this.loading.remove();
       this.showMenu();
       this.renderer.setAnimationLoop(() => this._frame());
@@ -286,7 +288,15 @@ class Game {
     }
     // the riders
     this.bikes = this.race.riders.map((r, k) => {
-      const b = makeCar(k === 0 ? COLORS[this.save.color] : r.color, r.suit, r.num);
+      const P = this.pics;
+      let b;
+      if (P && P.car_01) {
+        const names = ['car_01', 'car_02', 'car_03', 'car_04'];
+        const mine = P[names[this.save.color]] || P.car_01;
+        const rivalKey = ['car_05', 'car_06', 'car_07', 'car_08', 'car_09', 'car_10', 'car_11', 'car_12'][(k - 1 + 8) % 8];
+        const set = k === 0 ? { c: mine, crash: mine } : { c: P[rivalKey] || P.car_05, crash: P[rivalKey] || P.car_05 };
+        b = makeBillboardVehicle(THREE, set, 1.9);
+      } else b = makeCar(k === 0 ? COLORS[this.save.color] : r.color, r.suit, r.num);
       s.add(b.root);
       return b;
     });
@@ -731,6 +741,7 @@ class Game {
       b.back.rotation.x += spin;
       b.flames.visible = r.boost > 0;
       if (r.boost > 0) b.flames.scale.setScalar(0.8 + Math.random() * 0.5);
+      if (b.pic) b.setState(r.crashT > 0 ? 'crash' : 'c');
       if (r.off && r.v > 8 && Math.random() < 0.6) this.dust.emit(r.x - Math.sin(r.h) * 1, 0.4, r.z - Math.cos(r.h) * 1, (Math.random() - 0.5) * 2, 1.5, (Math.random() - 0.5) * 2, 0.6);
     });
     if (this.rain) {

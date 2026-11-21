@@ -100,3 +100,26 @@ export function recolorSprite(THREE, sprite, mix) {
     return { tex, aspect: sprite.aspect };
   } catch (_) { return sprite; }
 }
+
+/** A picture vehicle that always faces the camera (a THREE.Sprite standing on the ground): for races whose cars drive around bends, where a
+ *  flat plane would be seen from the side. [pics] = { c, l, r, crash, nitro } textures (only c is needed). It returns the same fields the
+ *  games' 3D bikes/cars have (root, lean, rider, front, back, flames) so the game's own update code runs unchanged; [setState] swaps the picture. */
+export function makeBillboardVehicle(THREE, pics, height) {
+  const root = new THREE.Group();
+  const first = pics.c;
+  const mat = new THREE.SpriteMaterial({ map: first.tex, transparent: true, alphaTest: 0.05, toneMapped: false, fog: false, depthWrite: false });
+  const sprite = new THREE.Sprite(mat);
+  sprite.center.set(0.5, 0.03);
+  const sizeFor = (p) => { const w = height * p.aspect; return [w, height]; };
+  const apply = (p) => { if (mat.map !== p.tex) { mat.map = p.tex; mat.needsUpdate = true; } const [w, h] = sizeFor(p); sprite.scale.set(w, h, 1); };
+  apply(first);
+  sprite.renderOrder = 3;
+  root.add(sprite);
+  const dummy = { rotation: { x: 0, y: 0, z: 0 }, position: { x: 0, y: 0, z: 0 }, scale: { setScalar() {}, set() {} }, visible: false };
+  return {
+    root, sprite, lean: { rotation: { x: 0, y: 0, z: 0 } }, rider: { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } },
+    front: { rotation: { x: 0 } }, back: { rotation: { x: 0 } }, flames: dummy, wheels: [], pic: true,
+    /** state: 'c' | 'l' | 'r' | 'crash' | 'nitro' */
+    setState(state) { apply(pics[state] || pics.c); },
+  };
+}

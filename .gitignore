@@ -54,3 +54,9 @@ game_src/*/node_modules/
 # big generated listening pages (made by tools/game_voice/listening_page.mjs; sent to the owner, not kept in git)
 docs/voice_preview/3*_*.html
 docs/voice_preview/28_*.html
+
+# raw generated sheets (local only, large)
+game_src/_chatgpt/
+game_src/_generated_images/
+game_src/_sheets/
+build/

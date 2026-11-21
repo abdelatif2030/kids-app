@@ -7,6 +7,7 @@ import { RACERS, TRAITS, UPGRADES, TRACKS, MAX_LEVEL, upgradeCost, normalizeSave
 import { TrackPath } from './track.js';
 import { Race } from './race.js';
 import { World, makeSky, mergeByMaterial } from './world.js';
+import { loadSprites, makeBillboardVehicle } from '../../cozy_kit/art.js';
 import { makeBumperCar, makeShieldBubble, glowSprite, makePodium, glow } from './models.js';
 import { setLang, getLang, t, num, name, ordinal } from './i18n.js';
 import { CSS, h, ANIMAL_EMOJI, ITEM_EMOJI, TRACK_EMOJI, TRACK_BG } from './ui.js';
@@ -100,7 +101,8 @@ class Game {
     this.frameTimes = [];
     this.goodWindows = 0;
     this.clock = new THREE.Clock();
-    this._loadFonts().then(() => {
+    this.pics = null;
+    Promise.all([this._loadFonts(), loadSprites(THREE, this.base, ['bumper_mouse', 'bumper_bunny', 'bumper_cat', 'bumper_bear', 'bumper_fox', 'bumper_panda']).then((sp) => { this.pics = sp; })]).then(() => {
       this._buildShowcase();
       this.loading.remove();
       this.showMenu();
@@ -182,6 +184,10 @@ class Game {
 
   _carModel(racerId) {
     const r = RACERS.find((x) => x.id === racerId) ?? RACERS[0];
+    // the painted bumper car (animal driver seen from behind) when its picture is there; it always faces the camera
+    const key = { raccoon: 'bumper_mouse', bunny: 'bumper_bunny', cat: 'bumper_cat', bear: 'bumper_bear', fox: 'bumper_fox', panda: 'bumper_panda' }[r.id];
+    const pic = this.pics && this.pics[key];
+    if (pic) { const v = makeBillboardVehicle(THREE, { c: pic }, 2.5); return v.root; }
     return mergeByMaterial(makeBumperCar(r));
   }
 

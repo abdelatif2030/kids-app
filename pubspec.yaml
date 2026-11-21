@@ -100,6 +100,7 @@ flutter:
     - assets/games/clips/
     - assets/games/game_bg.webp
     - assets/games/carnival_race/
+    - assets/games/carnival_race/art/
     - assets/games/jungle_adventure/
     - assets/games/jungle_adventure/art/
     - assets/games/happy_farm/
@@ -109,11 +110,13 @@ flutter:
     - assets/games/ocean_defense/
     - assets/games/ocean_defense/art/
     - assets/games/moto_race/
+    - assets/games/moto_race/art/
     - assets/games/rhythm/
     - assets/games/splash_race/
     - assets/games/space_store/
     - assets/games/fox_family/
     - assets/games/air_race/
+    - assets/games/air_race/art/
     - assets/games/zombie_rooftop/
     - assets/games/gum_ball/
     - assets/games/deep_sea/
@@ -145,14 +148,17 @@ flutter:
     - assets/games/sky_capy/art/
     - assets/games/marble_dozer/
     - assets/games/dune_titans/
+    - assets/games/dune_titans/art/
     - assets/games/castaway_raft/
     - assets/games/winter_camp/
     - assets/games/rain_circuit/
+    - assets/games/rain_circuit/art/
     - assets/games/squad_shooter/
     - assets/games/archer_bridge/
     - assets/games/alien_sky/
     - assets/games/rhino_summit/
     - assets/games/sunset_highway/
+    - assets/games/sunset_highway/art/
     - assets/games/sections/
     - assets/games/sky_jumper/
     - assets/games/sky_jumper/art/

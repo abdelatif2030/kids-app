@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Race, ROUNDS, RIDERS, LAPS, normalizeSave } from './sim.js';
 import { pointAt, HALF_W, WALL } from './track.js';
+import { loadSprites, makeBillboardVehicle } from '../../cozy_kit/art.js';
 import { mat, makeBike, makePalm, makeStand, makeGantry, makeChevron, makeMountain, makeLighthouse, roadTexture, makeClouds, meshTexture } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
@@ -115,7 +116,8 @@ class Game {
     this.frames = [];
     this.goodWin = 0;
     this.clock = new THREE.Clock();
-    this._fonts().then(() => {
+    this.bikePics = null;
+    Promise.all([this._fonts(), loadSprites(THREE, this.base, ['bike_c', 'bike_l', 'bike_r', 'bike_crash', 'bike_rival1', 'bike_rival2', 'bike_rival3', 'bike_rival4', 'bike_rival5', 'bike_nitro']).then((sp) => { this.bikePics = sp; })]).then(() => {
       this.loading.remove();
       this.showMenu();
       this.renderer.setAnimationLoop(() => this._frame());
@@ -289,7 +291,16 @@ class Game {
     s.add(lh);
     // the riders
     this.bikes = this.race.riders.map((r, k) => {
-      const b = makeBike(k === 0 ? COLORS[this.save.color] : r.color, r.suit, r.helmet, r.num);
+      const P = this.bikePics;
+      let b;
+      if (P && P.bike_c) {
+        // painted riders (seen from behind): the player is the red one, the rivals take the other colours
+        const rivalKey = ['bike_rival1', 'bike_rival2', 'bike_rival3', 'bike_rival4', 'bike_rival5'][(k - 1 + 5) % 5];
+        const mine = [P.bike_c, P.bike_rival1, P.bike_rival2, P.bike_rival4][this.save.color] || P.bike_c;
+        const set = k === 0 ? { c: mine, l: this.save.color === 0 ? P.bike_l : mine, r: this.save.color === 0 ? P.bike_r : mine, crash: P.bike_crash || mine, nitro: this.save.color === 0 ? P.bike_nitro || mine : mine }
+          : { c: P[rivalKey] || P.bike_c, crash: P.bike_crash || P.bike_c };
+        b = makeBillboardVehicle(THREE, set, 2.7);
+      } else b = makeBike(k === 0 ? COLORS[this.save.color] : r.color, r.suit, r.helmet, r.num);
       s.add(b.root);
       return b;
     });
@@ -729,6 +740,7 @@ class Game {
       b.back.rotation.x += spin;
       b.flames.visible = r.boost > 0;
       if (r.boost > 0) b.flames.scale.setScalar(0.8 + Math.random() * 0.5);
+      if (b.pic) b.setState(r.crashT > 0 ? 'crash' : r.boost > 0 ? 'nitro' : r.lean > 0.25 ? 'r' : r.lean < -0.25 ? 'l' : 'c');
       if (r.off && r.v > 8 && Math.random() < 0.6) this.dust.emit(r.x - Math.sin(r.h) * 1, 0.4, r.z - Math.cos(r.h) * 1, (Math.random() - 0.5) * 2, 1.5, (Math.random() - 0.5) * 2, 0.6);
     });
     this.dust.update(dt);

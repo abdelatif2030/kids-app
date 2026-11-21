@@ -181,7 +181,7 @@ class Game {
     this.trafficModels = new Map();
     this.sprites = {}; // painted rear-view cars (art/car_*.webp); a missing picture = the code-built 3D car
     this.playerSprite = null;
-    loadSprites(THREE, this.base, ['car_player', 'car_coupe', 'car_sedan', 'car_suv', 'car_pickup', 'car_police', 'car_truck', 'car_bus']).then((sp) => { this.sprites = sp; });
+    loadSprites(THREE, this.base, ['car_player', 'car_arrow', 'car_nightfall', 'car_sedan_white', 'car_sedan_silver', 'car_suv_black', 'car_pickup', 'car_taxi', 'car_hatch', 'car_truck', 'car_van', 'car_bus']).then((sp) => { this.sprites = sp; });
     this.coins = coinMesh(80);
     s.add(this.coins);
     this.sparks = new Glow(s, 240, 0.3, 0xffd27a);
@@ -709,9 +709,9 @@ class Game {
         // only pictures drawn exactly from behind are used (a 3/4 picture looked like a car driving sideways)
         const sp0 = this.sprites || {};
         const heavy = c.kind === 'truck' || c.kind === 'van';
-        const pool = (heavy ? [sp0.car_truck, sp0.car_bus] : [sp0.car_coupe, sp0.car_sedan, sp0.car_suv, sp0.car_pickup, sp0.car_police, sp0.car_player]).filter(Boolean);
+        const pool = (heavy ? [sp0.car_truck, sp0.car_van, sp0.car_bus] : [sp0.car_sedan_white, sp0.car_sedan_silver, sp0.car_suv_black, sp0.car_pickup, sp0.car_taxi, sp0.car_hatch, sp0.car_arrow, sp0.car_nightfall]).filter(Boolean);
         const sp = pool.length ? pool[(c.color + c.id) % pool.length] : null;
-        m = sp ? makeSpriteVehicle(THREE, sp, heavy ? 2.7 : sp === sp0.car_pickup || sp === sp0.car_suv ? 2.2 : 1.95) : makeTrafficCar(c.kind, c.color);
+        m = sp ? makeSpriteVehicle(THREE, sp, heavy ? 2.7 : sp === sp0.car_pickup || sp === sp0.car_suv_black ? 2.2 : 2.0) : makeTrafficCar(c.kind, c.color);
         this.scene.add(m.root); this.trafficModels.set(c.id, m);
       }
       m.root.position.set(c.x, 0, -c.s);
@@ -828,8 +828,7 @@ class Game {
         const key = this.carId;
         if (!this.menuCars) this.menuCars = {};
         if (!this.menuCars[key]) {
-          const MIX = { striker: null, arrow: (r, g, b) => [g, b, r], nightfall: (r, g, b) => [r * 0.7 + b * 0.2, g * 0.35, r * 0.9 + b * 0.1] };
-          const spr = MIX[key] ? recolorSprite(THREE, pic0, MIX[key]) : pic0;
+          const spr = (key === 'arrow' && this.sprites.car_arrow) || (key === 'nightfall' && this.sprites.car_nightfall) || pic0;
           const v = makeSpriteVehicle(THREE, spr, 3.1); v.root.visible = false; this.scene.add(v.root); this.menuCars[key] = v;
         }
         for (const [k, v] of Object.entries(this.menuCars)) v.root.visible = k === key;

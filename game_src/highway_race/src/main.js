@@ -7,6 +7,12 @@ import * as THREE from 'three';
 import { Race, STAGES, LANES, HALF, bend, bendSlope, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { loadSprites, makeSpriteVehicle } from '../../cozy_kit/art.js';
+
+const CAR_PICS = ['car_blue', 'car_red', 'car_pink', 'car_orange', 'car_black', 'car_taxi', 'car_sedan_blue', 'car_sedan_green', 'car_police'];
+const HEAVY_PICS = ['car_truck', 'car_van', 'car_bus'];
+/** A painted car (drawn from behind) standing on the road; this game's cars face +z, so the picture is turned to face the camera behind them. */
+function paintedCar(sp, width) { const v = makeSpriteVehicle(THREE, sp, width); v.body.rotation.y = Math.PI; const g = new THREE.Group(); g.add(v.root); return g; }
 
 const S = {
   title: ['طريق الغروب', 'Sunset Highway'], stage: ['المرحلة', 'Stage'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'],
@@ -112,7 +118,8 @@ class Game {
     this.ro.observe(el);
     this._bind();
     this.last = performance.now();
-    this._fonts().then(() => { this.showMenu(); this.renderer.setAnimationLoop(() => this._frame()); });
+    this.sprites = {};
+    Promise.all([this._fonts(), loadSprites(THREE, this.base, [...CAR_PICS, ...HEAVY_PICS]).then((sp) => { this.sprites = sp; })]).then(() => { this.showMenu(); this.renderer.setAnimationLoop(() => this._frame()); });
   }
 
   async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 900))]); } catch (_) { /* system font */ } }
@@ -244,8 +251,9 @@ class Game {
     this.race = new Race({ stage: i, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1 });
     this._look(i);
     this._clearCars();
-    this.me = makeCar(0xe8342a, true);
-    this.rival = makeCar(0x2a6ae8, true);
+    const sp = this.sprites;
+    this.me = sp.car_red ? paintedCar(sp.car_red, 2.3) : makeCar(0xe8342a, true);
+    this.rival = sp.car_blue ? paintedCar(sp.car_blue, 2.3) : makeCar(0x2a6ae8, true);
     this.cars.add(this.me, this.rival);
     this.mode = 'play'; this.paused = false; this.lastCount = 4;
     this._clear();
@@ -333,7 +341,10 @@ class Game {
   _carMesh(c) {
     let m = this.carMeshes.get(c.id);
     if (!m) {
-      m = c.truck ? makeTruck([0xe8e8f0, 0xe8a82a, 0x3a8ae8][c.id % 3]) : makeCar([0xe8d83a, 0x3ae8a8, 0xe83ab8, 0xf4f4f4, 0x8a5ae8][c.id % 5], false);
+      const sp = this.sprites;
+      const heavy = HEAVY_PICS.map((n) => sp[n]).filter(Boolean), light = ['car_pink', 'car_orange', 'car_black', 'car_taxi', 'car_sedan_blue', 'car_sedan_green', 'car_police'].map((n) => sp[n]).filter(Boolean);
+      const pool = c.truck ? heavy : light;
+      m = pool.length ? paintedCar(pool[c.id % pool.length], c.truck ? 3.0 : 2.3) : c.truck ? makeTruck([0xe8e8f0, 0xe8a82a, 0x3a8ae8][c.id % 3]) : makeCar([0xe8d83a, 0x3ae8a8, 0xe83ab8, 0xf4f4f4, 0x8a5ae8][c.id % 5], false);
       this.cars.add(m);
       this.carMeshes.set(c.id, m);
     }

@@ -5,6 +5,7 @@
 // boost. No network, no links, no ads, no tracking. Everything drawn and played from code.
 import * as THREE from 'three';
 import { Race, COURSES, LAPS, KMH, TUBE_X, normalizeSave } from './sim.js';
+import { loadSprites, makeBillboardVehicle } from '../../cozy_kit/art.js';
 import { makePlane, makeRing, ringGeometry, Instancer, palm, pine, island, cliff, mountain, cloud, makeBridge, makePillar, makeArch, makeSky, makeSun } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name, clock } from './i18n.js';
@@ -68,7 +69,8 @@ class Game {
     this.frames = [];
     this.goodWin = 0;
     this.clock = new THREE.Clock();
-    this._fonts().then(() => {
+    this.planePics = null;
+    Promise.all([this._fonts(), loadSprites(THREE, this.base, ['plane_01', 'plane_02', 'plane_03', 'plane_04', 'plane_09']).then((sp) => { this.planePics = sp; })]).then(() => {
       this.loading.remove();
       this.showMenu();
       this.renderer.setAnimationLoop(() => this._frame());
@@ -254,7 +256,14 @@ class Game {
     for (let k = 0; k < 14; k++) { const d = new THREE.Mesh(dashG, dashM); s.add(d); this.guide.push(d); }
     // planes
     this.planeModels = race.planes.map((p) => {
-      const m = makePlane(p.id);
+      const P = this.planePics;
+      const key = { player: 'plane_01', racer: 'plane_02', jet: 'plane_09', biplane: 'plane_03' }[p.id] || 'plane_04';
+      let m;
+      if (P && P[key]) {
+        // the painted plane (seen from behind), always facing the camera
+        m = makeBillboardVehicle(THREE, { c: P[key] }, 3.6);
+        m.body = { rotation: { set() {} } }; m.prop = null; m.flame = { visible: false, scale: { set() {}, setScalar() {} } };
+      } else m = makePlane(p.id);
       s.add(m.root);
       return m;
     });

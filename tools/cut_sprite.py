@@ -108,7 +108,7 @@ def cut_white(im, white=238, height=512):
     return rgba.resize((max(1, int(rgba.size[0] * r)), height), Image.LANCZOS)
 
 
-def cut_sheet(src, cols, rows, names, out_dir, height=512):
+def cut_sheet(src, cols, rows, names, out_dir, height=512, white=240, ground=False):
     """A sheet of cols x rows items, each in its own invisible cell on pure white (docs/INGAME_SPRITE_SHEETS.md). names go left to right,
     top to bottom; an empty name skips the cell. Writes <out_dir>/<name>.webp (transparent)."""
     sheet = Image.open(src).convert('RGB')
@@ -120,7 +120,9 @@ def cut_sheet(src, cols, rows, names, out_dir, height=512):
         c, r = i % cols, i // cols
         cell = sheet.crop((int(c * cw), int(r * ch), int((c + 1) * cw), int((r + 1) * ch)))
         os.makedirs(out_dir, exist_ok=True)
-        cut_white(cell, height=height).save(os.path.join(out_dir, n + '.webp'), 'WEBP', quality=88, method=6)
+        r = cut_white(cell, white=white, height=height)
+        if ground: r = trim_ground(r)
+        r.save(os.path.join(out_dir, n + '.webp'), 'WEBP', quality=88, method=6)
         done.append(n)
     return done
 
@@ -141,3 +143,22 @@ def trim_ground(rgba, dark=95):
         row = [px[x, y] for x in range(0, w, 2)]
         if any(p[3] > 200 and max(p[0], p[1], p[2]) < dark for p in row): last = y; break
     return rgba.crop((0, 0, w, min(h, last + 3))) if last else rgba
+
+
+def keep_main_rows(rgba, gap=6):
+    """Drops anything separated from the main body by an empty band of at least [gap] rows (a stray line from the next cell)."""
+    a = rgba.split()[3].point(lambda v: 255 if v > 40 else 0)
+    w, h = rgba.size
+    rows = [a.crop((0, y, w, y + 1)).getbbox() is not None for y in range(h)]
+    best = (0, 0); y = 0
+    while y < h:
+        if rows[y]:
+            y0 = y
+            empty = 0
+            while y < h and (rows[y] or empty < gap):
+                empty = 0 if rows[y] else empty + 1
+                y += 1
+            y1 = y - empty
+            if y1 - y0 > best[1] - best[0]: best = (y0, y1)
+        else: y += 1
+    return rgba.crop((0, best[0], w, best[1]))
