@@ -226,7 +226,7 @@ function tree(b, x, z, s, look) {
 function rockAt(b, x, z, r, col) { b.add(geo.sphere, col, x, r * 0.5, z, r * 2.2, r * 1.3, r * 1.9, 0, x); b.add(geo.sphere, tint(col, 1.15), x + r * 0.4, r * 0.8, z - r * 0.2, r * 1.2, r * 0.9, r * 1.1); }
 
 function buildScenery(level, sim) {
-  const id = LEVELS[level].id; const half = LEVELS[level].half; const R = rng(level * 977 + 5); const L = LOOK[id];
+  const id = LEVELS[level].id; const half = LEVELS[level].half; const R = rng(level * 977 + 5); const L = LOOK[LEVELS[level].look || id];
   const g = new THREE.Group(); const sol = new Batch(); const glow = new Batch();
   for (let i = 0; i < 26; i++) { const x = (R() * 2 - 1) * half; const z = (R() * 2 - 1) * half; const r = 2 + R() * 3.5; sol.add(geo.cyl, id === 'swamp' && i % 2 ? 0x2f7a78 : L.patch, x, 0.02 + i * 0.0006, z, r * 2, 0.04, r * 2); }
   for (const o of sim.obstacles) {
@@ -444,7 +444,7 @@ class Game {
     for (const r of this.recs.values()) this.things.remove(r.W, r.spr); this.recs.clear();
     for (const v of this.vanish) this.things.remove(v.W); this.vanish = [];
     for (const m of this.projMeshes.values()) this.things.remove(m); this.projMeshes.clear();
-    this.stage.clear(); const id = LEVELS[i].id; const L = LOOK[id];
+    this.stage.clear(); const id = LEVELS[i].look || LEVELS[i].id; const L = LOOK[id];
     this.stage.add(buildScenery(i, this.sim));
     this.scene.background = new THREE.Color(L.sky); this.scene.fog = new THREE.Fog(L.fog, 38, id === 'volcano' ? 120 : 150);
     this.hemi.color.set(L.hemi[0]); this.hemi.groundColor.set(L.hemi[1]); this.sun.color.set(L.sun);
@@ -635,7 +635,7 @@ class Game {
     // shock ring
     if (this.shockT > 0) { this.shockT -= dt; const k = 1 - this.shockT / 0.55; this.shock.visible = true; this.shock.scale.setScalar(Math.max(0.1, this.shockR * k)); this.shock.material.opacity = 0.8 * (1 - k); } else this.shock.visible = false;
     // ambience particles
-    this._amb = (this._amb || 0) - dt; if (this._amb <= 0) { this._amb = 0.12; const id = sim.L.id; const x = p.x + (Math.random() - 0.5) * this.camDist * 1.8; const z = p.z + (Math.random() - 0.5) * this.camDist * 1.4;
+    this._amb = (this._amb || 0) - dt; if (this._amb <= 0) { this._amb = 0.12; const id = sim.L.look || sim.L.id; const x = p.x + (Math.random() - 0.5) * this.camDist * 1.8; const z = p.z + (Math.random() - 0.5) * this.camDist * 1.4;
       if (id === 'volcano') this.emit('dot', x, 14, z, -0.8, -3, 0.4, 4, 0.5, Math.random() < 0.5 ? 0xff9a3a : 0x6a5a5a, 0);
       else if (id === 'swamp') this.emit('dot', x, 0.2, z, 0, 1.2, 0, 2.2, 0.6, 0xcfe8d0, 0, 0.5);
       else this.emit('leaf', x, 12, z, 0.6, -2.2, 0.3, 5, 0.6, 0x6adb5a, 0); }

@@ -184,4 +184,20 @@ export const TRACKS = [
     arches: [0.25],
   },
 ];
+
+// 2026-11-21: three more tracks, each one an existing track MIRRORED left-to-right with extra hazards (a new feel for the same family of places).
+function mirrorTrack(src, id, ar, en, difficulty, extraHazards) {
+  const flip = (v) => [-v[0], v[1], v[2]];
+  return {
+    ...src, id, ar, en, difficulty,
+    points: src.points.map((q) => { const o = { ...q, p: flip(q.p) }; if (q.up) o.up = flip(q.up); return o; }),
+    tickets: src.tickets.map(([a, b]) => [a, -b]),
+    hazards: [...src.hazards, ...extraHazards],
+  };
+}
+TRACKS.push(
+  mirrorTrack(TRACKS[0], 'pier2', 'رصيف الغروب المعكوس', 'Mirror Pier', 1, [{ type: 'hammer', at: 0.18 }]),
+  mirrorTrack(TRACKS[1], 'lanterns2', 'طريق الفوانيس المعكوس', 'Mirror Lantern Lane', 2, [{ type: 'teacups', at: 0.4 }]),
+  mirrorTrack(TRACKS[2], 'stars2', 'قمة النجوم المعكوسة', 'Mirror Starry Summit', 3, [{ type: 'hammer', at: 0.18 }]),
+);
 export const TRACK_COUNT = TRACKS.length;

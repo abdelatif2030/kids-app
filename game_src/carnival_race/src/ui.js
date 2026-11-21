@@ -95,9 +95,12 @@ export function h(tag, attrs = {}, ...kids) {
 
 export const ANIMAL_EMOJI = { raccoon: '🦝', bunny: '🐰', cat: '🐱', bear: '🐻', fox: '🦊', panda: '🐼' };
 export const ITEM_EMOJI = { rocket: '🚀', shield: '🛡️', blast: '💥' };
-export const TRACK_EMOJI = { pier: '🎡', lanterns: '🏮', stars: '🎢' };
+export const TRACK_EMOJI = { pier: '🎡', lanterns: '🏮', stars: '🎢', pier2: '🎠', lanterns2: '🎪', stars2: '🚀' };
 export const TRACK_BG = {
   pier: 'linear-gradient(160deg,#ff922b,#c2255c)',
   lanterns: 'linear-gradient(160deg,#be4bdb,#5f3dc4)',
   stars: 'linear-gradient(160deg,#4dabf7,#364fc7)',
+  pier2: 'linear-gradient(160deg,#ffa94d,#e8590c)',
+  lanterns2: 'linear-gradient(160deg,#f06595,#a61e4d)',
+  stars2: 'linear-gradient(160deg,#63e6be,#087f5b)',
 };

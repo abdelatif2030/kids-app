@@ -111,7 +111,7 @@ test('stars', () => {
 test('deterministic and save normalisation', () => {
   const a = play(0, 7).g; const b = play(0, 7).g; assert.equal(a.time, b.time); assert.equal(a.player.P, b.player.P);
   const s = normalizeSave({ unlocked: 99, stars: [5, -1, 'x'], best: [10.4, null], muted: 1 });
-  assert.deepEqual(s.stars, [3, 0, 0]); assert.equal(s.unlocked, 3); assert.equal(s.best[0], 10); assert.equal(normalizeSave(null).unlocked, 1);
+  assert.deepEqual(s.stars, [3, 0, 0, 0, 0, 0]); assert.equal(s.unlocked, 6); assert.equal(s.best[0], 10); assert.equal(normalizeSave(null).unlocked, 1);
 });
 
 test('levels 1 and 2 end only when you eat the alpha (BEAT THE ALPHA 36), not by reaching a power', () => {

@@ -74,16 +74,25 @@ export const LEVELS = [
   { id: 'volcano', ar: 'وادي البركان', en: 'Volcano Valley', sub: ['اهرب من الدوس والنار!', 'Dodge the stomps and the fire!'], half: 36, start: 56, goal: 100, par: 220, obst: { kinds: ['rock', 'pillar', 'rock'], n: 14 },
     boss: { power: 100, hp: 3, r: 4 },
     species: [['emberbug', 8], ['lavaEgg', 6], ['lizard', 6], ['ankyloRed', 3], ['trikeRed', 4], ['spino', 3], ['rex', 2]] },
+  // 2026-11-21: three harder visits of the same valleys (same look, bigger world, stronger rivals)
+  { id: 'jungle2', look: 'jungle', ar: 'الغابة العميقة', en: 'Deep Fern Hollow', sub: ['الغابة بقت أخطر!', 'The hollow got wilder!'], half: 32, start: 6, goal: 55, alpha: { kind: 'alphaRaptor', summon: 30 }, par: 130, obst: { kinds: ['tree', 'tree', 'rock'], n: 14 },
+    species: [['beetle', 8], ['egg', 6], ['compy', 6], ['dodo', 5], ['stegoBaby', 5], ['trike', 4], ['raptorRed', 4], ['rexJr', 3]] },
+  { id: 'swamp2', look: 'swamp', ar: 'المستنقع الأسود', en: 'Black Mire', sub: ['الطين أعمق والصيّادين أكتر!', 'Deeper mud, more divers!'], half: 36, start: 50, goal: 105, alpha: { kind: 'alphaGator', summon: 70 }, par: 170, obst: { kinds: ['stump', 'stump', 'rock'], n: 14 },
+    species: [['mudbug', 9], ['frog', 8], ['swampEgg', 6], ['gator', 5], ['ankylo', 5], ['calf', 4], ['swampRex', 3]] },
+  { id: 'volcano2', look: 'volcano', ar: 'قمة البركان', en: 'Volcano Peak', sub: ['البركان بيزمجر!', 'The volcano roars!'], half: 40, start: 70, goal: 130, par: 260, obst: { kinds: ['rock', 'pillar', 'rock'], n: 16 },
+    boss: { power: 140, hp: 4, r: 4.4 },
+    species: [['emberbug', 8], ['lavaEgg', 6], ['lizard', 6], ['ankyloRed', 4], ['trikeRed', 5], ['spino', 4], ['rex', 3]] },
 ];
 
 export function normalizeSave(s) {
-  const o = { unlocked: 1, stars: [0, 0, 0], best: [0, 0, 0], muted: false, eaten: 0 };
+  const o = { unlocked: 1, stars: LEVELS.map(() => 0), best: LEVELS.map(() => 0), muted: false, eaten: 0 };
   if (s && typeof s === 'object') {
     o.unlocked = clamp(Math.floor(Number(s.unlocked)) || 1, 1, LEVELS.length);
     for (let i = 0; i < LEVELS.length; i++) {
       const st = s.stars && s.stars[i]; o.stars[i] = clamp(Math.floor(Number(st)) || 0, 0, 3);
       const b = s.best && Number(s.best[i]); o.best[i] = b > 0 && Number.isFinite(b) ? Math.round(b) : 0;
     }
+    for (let i = 0; i < LEVELS.length - 1; i++) if (o.stars[i] > 0 && o.unlocked < i + 2) o.unlocked = i + 2; // a finished level opens the next
     o.muted = !!s.muted;
     o.eaten = Math.max(0, Math.floor(Number(s.eaten)) || 0);
   }
