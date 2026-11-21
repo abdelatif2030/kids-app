@@ -1,6 +1,6 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
 $__dart_deferred_initializers__.current=function(a,b,c,$){var B,D,A={
-civ(d,e,f){return new A.TZ(d,f,e)},
+cin(d,e,f){return new A.TZ(d,f,e)},
 TZ:function TZ(d,e,f){this.c=d
 this.d=e
 this.a=f},
@@ -17,24 +17,24 @@ blC:function blC(d,e){this.a=d
 this.b=e},
 aUI(d){var x=0,w=B.l(y.v),v,u,t
 var $async$aUI=B.h(function(e,f){if(e===1)return B.i(f,w)
-for(;;)switch(x){case 0:A.bU3()
+for(;;)switch(x){case 0:A.bU_()
 if($.hm().a){u=$.l6()
 u=u.a>0||u.b}else u=!0
 if(u){x=1
 break}x=3
 return B.c(A.JV(d),$async$aUI)
 case 3:t=f
-if(!t)A.cjF(d)
+if(!t)A.cjx(d)
 case 1:return B.j(v,w)}})
 return B.k($async$aUI,w)},
-JV(d){return A.cjG(d)},
-cjG(d){var x=0,w=B.l(y.e),v,u=2,t=[],s,r,q,p,o,n,m,l,k,j
+JV(d){return A.cjy(d)},
+cjy(d){var x=0,w=B.l(y.e),v,u=2,t=[],s,r,q,p,o,n,m,l,k,j
 var $async$JV=B.h(function(e,f){if(e===1){t.push(f)
 x=u}for(;;)switch(x){case 0:u=4
-o=$.bU1
+o=$.bTY
 if(o!=null)o.m()
-n=B.bSu()
-$.bU1=n
+n=B.bSq()
+$.bTY=n
 s=n
 x=7
 return B.c(s.Uf(d),$async$JV)
@@ -68,16 +68,16 @@ break
 case 6:case 1:return B.j(v,w)
 case 2:return B.i(t.at(-1),w)}})
 return B.k($async$JV,w)},
-cjF(d){var x
-A.bU0()
+cjx(d){var x
+A.bTX()
 x=new A.aUA(d)
-$.bU2=x
+$.bTZ=x
 $.hX.aO$.b.l(0,x,null)},
-bU0(){var x=$.bU2
+bTX(){var x=$.bTZ
 if(x!=null)$.hX.aO$.b.M(0,x)
-$.bU2=null},
-bU3(){A.bU0()
-var x=$.bU1
+$.bTZ=null},
+bU_(){A.bTX()
+var x=$.bTY
 if(x!=null)x.bl()},
 aUB:function aUB(){},
 aUC:function aUC(){},
@@ -96,13 +96,13 @@ U(){return new A.a1c()}}
 A.a1c.prototype={
 aj(){this.aA()
 $.aq.V$.push(new A.blE(this))},
-m(){A.bU3()
+m(){A.bU_()
 this.ag()},
 AN(d,e){return this.aTg(d,e)},
 aQI(d){return this.AN(d,null)},
 aTg(d,e){var x=0,w=B.l(y.v),v,u=this,t
 var $async$AN=B.h(function(f,g){if(f===1)return B.i(g,w)
-for(;;)switch(x){case 0:if(B.bWP(u.a.c.c).length===0){t=d.af(y.r).f
+for(;;)switch(x){case 0:if(B.bWL(u.a.c.c).length===0){t=d.af(y.r).f
 t.ft(B.fB(null,null,null,null,null,D.O,null,B.d($.m().a==="ar"?"\u0647\u0630\u0647 \u0627\u0644\u0644\u0639\u0628\u0629 \u0644\u0623\u0639\u0645\u0627\u0631 \u0663 \u0625\u0644\u0649 \u0666 \u0633\u0646\u0648\u0627\u062a":"This game is for ages 3 to 6",null,null,null,null,null,null,null,null,null),null,D.bT,null,null,null,null,null,null,null,null,null,null))
 x=1
 break}x=3
@@ -111,12 +111,12 @@ case 3:if(d.e==null){x=1
 break}t=B.bE(new A.blD(u,e),null,y.v)
 x=4
 return B.c(B.an(d,!1).bj(t),$async$AN)
-case 4:$.bTJ=0
+case 4:$.bTF=0
 case 1:return B.j(v,w)}})
 return B.k($async$AN,w)},
 b0A(){var x=null,w=$.hm(),v=w.a,u=!v
 w.a=u
-if(v){A.bU3()
+if(v){A.bU_()
 $.eg().bl()}w=this.c.af(y.r).f
 w.iV()
 if(u)v=$.m().a==="ar"?"\u0627\u0644\u0635\u0648\u062a \u0634\u063a\u0651\u0627\u0644":"Sound on"
@@ -140,7 +140,7 @@ A.blE.prototype={
 $1(d){if(this.a.c!=null)A.aUI("assets/audio/voices/fatima/ar/learn_today.mp3")},
 $S:7}
 A.blD.prototype={
-$1(d){var x=$.bS8(),w=this.a.a.c
+$1(d){var x=$.bS4(),w=this.a.a.c
 return B.tz(x,w.a,w.c,this.b)},
 $S:10}
 A.blA.prototype={
@@ -177,7 +177,7 @@ $S:37}
 A.aUA.prototype={
 $1(d){var x
 if(!y.s.b(d))return
-A.bU0()
+A.bTX()
 if($.hm().a){x=$.l6()
 x=x.a>0||x.b}else x=!0
 if(x)return
@@ -205,6 +205,6 @@ C.bpt=new B.p(0.545,0.6)
 C.bOf=new B.U("learning_back",y.q)
 C.bOg=new B.U("learning_page",y.q)
 C.bOh=new B.U("learning_play",y.q)
-C.bOi=new B.U("learning_sound",y.q)})();(function staticFields(){$.bU1=null
-$.bU2=null})()};
-(a=>{a["vPsSUGMqMdxmYejXjAor9zZfQqw="]=a.current})($__dart_deferred_initializers__);
+C.bOi=new B.U("learning_sound",y.q)})();(function staticFields(){$.bTY=null
+$.bTZ=null})()};
+(a=>{a["pzenyHu8D8mRIXKx+xCqUiEcsew="]=a.current})($__dart_deferred_initializers__);

@@ -1,6 +1,6 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
 $__dart_deferred_initializers__.current=function(a,b,c,$){var A,B={
-cvQ(d,e,f,g){var x=A.bE(new B.bQ_(e,f,g),null,y.b)
+cvI(d,e,f,g){var x=A.bE(new B.bPW(e,f,g),null,y.b)
 A.an(d,!1).bj(x)},
 S1:function S1(d,e,f,g){var _=this
 _.c=d
@@ -8,7 +8,7 @@ _.d=e
 _.e=f
 _.a=g},
 ane:function ane(){this.c=this.a=this.d=null},
-bQ_:function bQ_(d,e,f){this.a=d
+bPW:function bPW(d,e,f){this.a=d
 this.b=e
 this.c=f}},C
 A=c[0]
@@ -42,12 +42,12 @@ w=x.a==="ar"?"\u0623\u0646\u0627 \u0645\u0646 \u0627\u0644\u0639\u0627\u0626\u06
 w=x.a==="ar"?"\u0639\u0627\u0626\u0644\u062a\u064a: \u0627\u0644\u0645\u062d\u0627\u062f\u062b\u0627\u062a":"Family chat"}v=A.bJ(u,!0,u,u,u,u,u,u,A.d(w,u,u,u,u,u,u,u,u,u),u)
 return A.bs(v,u,new C.V1(x.a==="ar"?"\u0627\u0644\u0645\u062d\u0627\u062f\u062b\u0627\u062a \u0648\u0627\u0644\u0645\u0643\u0627\u0644\u0645\u0627\u062a \u0627\u0644\u0639\u0627\u0626\u0644\u064a\u0629.":"Family chat and calls.",u),u,!1,u,u)}}
 var z=a.updateTypes([])
-B.bQ_.prototype={
+B.bPW.prototype={
 $1(d){return new B.S1(this.a,this.b,this.c,null)},
 $S:347};(function inheritance(){var x=a.inherit
 x(B.S1,A.T)
 x(B.ane,A.X)
-x(B.bQ_,A.k4)})()
+x(B.bPW,A.k4)})()
 A.qr(b.typeUniverse,JSON.parse('{"S1":{"T":[],"f":[]},"ane":{"X":["S1"]}}'))
 var y={f:A.a_("+(jp?,o)"),b:A.a_("@")}};
-(a=>{a["yDfUYMQ+h/45jmWEKwWSyQSA30w="]=a.current})($__dart_deferred_initializers__);
+(a=>{a["NNIiGy6PKuQuqrRT2OXt9/phKRw="]=a.current})($__dart_deferred_initializers__);
