@@ -779,3 +779,9 @@ final WebGame kLearnAnimals = WebGame(
 
 /// Rebuilt learning games, by their old game id.
 final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay, kLearnLadders, kLearnBall, kLearnPattern, kLearnLetters, kLearnCounting, kLearnShapes, kLearnAnimals]) g.learnId!: g};
+
+/// Lets the screen ask the running game page to step back INSIDE the game first (owner 2026-11-22): the view sets [tryBack] while it is alive.
+/// It answers true when the page handled it (paused, returned to the game's menu or level list) and false when the game is at its main menu.
+class WebGameBridge {
+  static Future<bool> Function()? tryBack;
+}

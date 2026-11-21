@@ -52,11 +52,14 @@ class World {
   constructor(el, config, post) {
     this.el = el; this.post = post || (() => {}); this.en = config.lang === 'en'; this.base = (config.base || './').replace(/\/?$/, '/'); this.config = config;
     this.save = normalizeSave(config.save); music.setMuted(this.save.muted);
+    music.setBase(this.base);
     if (!document.getElementById('gw-style')) document.head.append(h('style', { id: 'gw-style' }, KIT_CSS + CSS));
     this.root = h('div', { class: 'gk-root gw-root', dir: this.en ? 'ltr' : 'rtl', style: 'background:none' });
     el.append(this.root);
     this.ro = new ResizeObserver(() => this._fit()); this.ro.observe(el); this._fit();
     this.disposed = false; this.game = null;
+    // the app's back (system back / the game's own arrow handled by the app) steps back INSIDE the world first: level -> map -> out
+    window.__gameBack = () => { if (this.game) { this._close(); return true; } return false; };
     // the first tap anywhere starts the sound (phones need a tap) and the background tune
     this._gest = () => { music.unlock(); music.ambient(this.game ? 'play' : 'hub'); };
     document.addEventListener('pointerdown', this._gest, true);
@@ -116,6 +119,7 @@ class World {
   dispose() {
     this.disposed = true;
     document.removeEventListener('pointerdown', this._gest, true);
+    window.__gameBack = null;
     if (this.game) { try { this.game.api.dispose(); } catch (_) { /* fine */ } }
     music.stopAmbient(); this.ro.disconnect(); this.root.remove();
   }

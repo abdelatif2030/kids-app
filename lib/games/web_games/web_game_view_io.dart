@@ -29,6 +29,14 @@ class _WebGameViewState extends State<WebGameView> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    WebGameBridge.tryBack = () async {
+      try {
+        final r = await _c.runJavaScriptReturningResult('window.crBack ? window.crBack() : false');
+        return r.toString() == 'true';
+      } catch (_) {
+        return false;
+      }
+    };
     _c = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0xFF1D1250))
@@ -61,6 +69,7 @@ class _WebGameViewState extends State<WebGameView> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    WebGameBridge.tryBack = null;
     WidgetsBinding.instance.removeObserver(this);
     _c.runJavaScript('window.crStop && window.crStop();');
     // leave an empty page behind so the game's memory and GL context are freed at once, not when the system gets round to it

@@ -34,6 +34,15 @@ class _WebGameViewState extends State<WebGameView> {
   @override
   void initState() {
     super.initState();
+    WebGameBridge.tryBack = () async {
+      try {
+        if (!globalContext.has('crBack')) return false;
+        final r = globalContext.callMethod<JSAny?>('crBack'.toJS);
+        return r.dartify() == true;
+      } catch (_) {
+        return false;
+      }
+    };
     ui_web.platformViewRegistry.registerViewFactory(_viewType, (int id) {
       final div = _doc.callMethod<JSObject>('createElement'.toJS, 'div'.toJS);
       div.getProperty<JSObject>('style'.toJS).setProperty('cssText'.toJS, 'position:relative;width:100%;height:100%;overflow:hidden'.toJS);
@@ -85,6 +94,7 @@ class _WebGameViewState extends State<WebGameView> {
   @override
   void dispose() {
     _disposed = true;
+    WebGameBridge.tryBack = null;
     _handle?.callMethod<JSAny?>('dispose'.toJS);
     super.dispose();
   }

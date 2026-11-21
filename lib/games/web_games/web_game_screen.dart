@@ -112,7 +112,7 @@ class _WebGameScreenState extends State<WebGameScreen> {
         final save = msg['save'];
         if (save is Map<String, dynamic>) _store.save(widget.childId, save);
       case 'exit':
-        if (mounted) Navigator.maybePop(context);
+        _leave();
       case 'speak':
         final text = msg['text'];
         if (text is String && text.isNotEmpty && text.length <= 200) {
@@ -129,7 +129,31 @@ class _WebGameScreenState extends State<WebGameScreen> {
   late final LearnBridge _learn = LearnBridge(widget.game, widget.childId);
 
   @override
-  Widget build(BuildContext context) => HubMusicScope(track: null, child: _buildScreen(context));
+  Widget build(BuildContext context) => HubMusicScope(
+    track: null,
+    child: PopScope(
+      canPop: false, // the system back button and the game's own back arrow both go through _leave: first back INSIDE the game, then out
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _leave();
+      },
+      child: _buildScreen(context),
+    ),
+  );
+
+  /// One step back: the game page first (a level goes back to the game's menu, a running game pauses), the screen only when the game is at its main menu.
+  /// Learning games keep their own flow (their arrow leaves at once).
+  bool _leaving = false;
+  Future<void> _leave() async {
+    if (_leaving) return;
+    _leaving = true;
+    try {
+      var handled = false;
+      if (!widget.game.isLearning && WebGameBridge.tryBack != null) handled = await WebGameBridge.tryBack!();
+      if (!handled && mounted) Navigator.of(context).pop();
+    } finally {
+      _leaving = false;
+    }
+  }
 
   Widget _buildScreen(BuildContext context) {
     final config = _config;
@@ -144,12 +168,6 @@ class _WebGameScreenState extends State<WebGameScreen> {
         children: [
           Positioned.fill(child: view),
           if (_poster) Positioned.fill(child: IgnorePointer(key: const ValueKey('web_game_poster'), child: _Poster(game: widget.game))),
-          // (owner 2026-11-20: a SMALL round back button on both the left and the right edge of every FUN game, so the child can
-          // always get out; learning games keep their own top bar)
-          if (!widget.game.isLearning) ...[
-            // owner 2026-11-20: ONE small back button, top left, in every fun game
-            Align(alignment: Alignment.topLeft, child: SafeArea(child: _EdgeBack(key: const ValueKey('web_game_back'), onTap: () => Navigator.maybePop(context)))),
-          ],
         ],
       ),
     );
@@ -259,28 +277,3 @@ class LearnBridge {
 }
 
 /// The small translucent round back button on the screen edges of a fun game.
-class _EdgeBack extends StatelessWidget {
-  final VoidCallback onTap;
-  const _EdgeBack({super.key, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(6, 6, 0, 0),
-      child: Semantics(
-        button: true,
-        label: tr2('رجوع', 'Back'),
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: onTap,
-          child: Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0x887A4AD8), border: Border.all(color: const Color(0xCCFFFFFF), width: 2)),
-            child: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 22),
-          ),
-        ),
-      ),
-    );
-  }
-}

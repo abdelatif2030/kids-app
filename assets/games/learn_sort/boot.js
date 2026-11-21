@@ -38,3 +38,24 @@
     }
   }, 60);
 })();
+
+// In-game "back" (owner 2026-11-22): the app asks the page first. Returns true when the page stepped back INSIDE the game (closed a level into its
+// menu, paused a running game, left the level list); false when the game is at its main menu so the app may leave it.
+window.crBack = function () {
+  try {
+    if (window.__gameBack && window.__gameBack()) return true; // a game that has its own levels/menus (the girls world) handles back itself first
+    var vis = function (e) { return e.offsetParent !== null && !e.disabled; };
+    var bs = [].slice.call(document.querySelectorAll('button')).filter(vis);
+    var txt = function (b) { return ((b.textContent || '') + ' ' + (b.getAttribute('aria-label') || '')).replace(/\s+/g, ' '); };
+    var arrow = function (b) { return /^[\s←→↩⬅➡‹›<>]*$/.test(b.textContent || ''); };
+    if (bs.some(function (b) { return !arrow(b) && /(خروج|اخرج|exit|quit)/i.test(txt(b)); })) return false; // the main menu offers Exit: leave
+    var menuRe = /(القائمة|المنيو|menu|المراحل|مراحل|levels|الخريطة|خريطة|map|المستويات|الرئيسية|home)/i;
+    var resume = bs.find(function (b) { return !arrow(b) && /(كمّل|كمل|متابعة|resume|continue|استمر)/i.test(txt(b)); });
+    if (resume) { var m = bs.find(function (b) { return !arrow(b) && menuRe.test(txt(b)); }); if (m) { m.click(); return true; } }
+    var pause = bs.find(function (b) { return /^\s*(⏸|❚❚|II)\s*$/.test(b.textContent || '') || /(pause|إيقاف|توقف)/i.test(b.getAttribute('aria-label') || ''); });
+    if (pause) { pause.click(); return true; }
+    var back = bs.find(function (b) { return !arrow(b) && !/(sound|صوت|🔊|🔇)/i.test(txt(b)) && /(القائمة|المنيو|menu|رجوع|back|الرئيسية|home|إغلاق|close)/i.test(txt(b)); });
+    if (back) { back.click(); return true; }
+  } catch (e) { /* leave */ }
+  return false;
+};
