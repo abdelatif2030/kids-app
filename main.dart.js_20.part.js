@@ -37,14 +37,14 @@ n=B.bSi()
 $.bTQ=n
 s=n
 x=7
-return B.c(s.Ug(d),$async$JU)
+return B.c(s.Uf(d),$async$JU)
 case 7:o=y.v
 s.d7().dK(new A.aUw(),new A.aUx(),o)
 r=new B.aY(new B.ao($.at,y.h),y.n)
 m=s.S
 q=new B.dd(m,m.$ti.i("dd<1>")).dV(new A.aUy(r))
 x=8
-return B.c(r.a.Te(D.wX,new A.aUz()),$async$JU)
+return B.c(r.a.Td(D.wX,new A.aUz()),$async$JU)
 case 8:p=f
 x=9
 return B.c(q.aG(),$async$JU)
@@ -98,9 +98,9 @@ aj(){this.aA()
 $.aq.V$.push(new A.blz(this))},
 m(){A.bTS()
 this.ag()},
-AN(d,e){return this.aTb(d,e)},
-aQD(d){return this.AN(d,null)},
-aTb(d,e){var x=0,w=B.l(y.v),v,u=this,t
+AN(d,e){return this.aTc(d,e)},
+aQE(d){return this.AN(d,null)},
+aTc(d,e){var x=0,w=B.l(y.v),v,u=this,t
 var $async$AN=B.h(function(f,g){if(f===1)return B.i(g,w)
 for(;;)switch(x){case 0:if(B.bWD(u.a.c.c).length===0){t=d.af(y.r).f
 t.ft(B.fA(null,null,null,null,null,D.P,null,B.d($.m().a==="ar"?"\u0647\u0630\u0647 \u0627\u0644\u0644\u0639\u0628\u0629 \u0644\u0623\u0639\u0645\u0627\u0631 \u0663 \u0625\u0644\u0649 \u0666 \u0633\u0646\u0648\u0627\u062a":"This game is for ages 3 to 6",null,null,null,null,null,null,null,null,null),null,D.bT,null,null,null,null,null,null,null,null,null,null))
@@ -114,7 +114,7 @@ return B.c(B.an(d,!1).bj(t),$async$AN)
 case 4:$.bTx=0
 case 1:return B.j(v,w)}})
 return B.k($async$AN,w)},
-b0v(){var x=null,w=$.hm(),v=w.a,u=!v
+b0w(){var x=null,w=$.hm(),v=w.a,u=!v
 w.a=u
 if(v){A.bTS()
 $.eg().bl()}w=this.c.af(y.r).f
@@ -122,10 +122,10 @@ w.iV()
 if(u)v=$.m().a==="ar"?"\u0627\u0644\u0635\u0648\u062a \u0634\u063a\u0651\u0627\u0644":"Sound on"
 else v=$.m().a==="ar"?"\u0627\u0644\u0635\u0648\u062a \u0645\u0642\u0641\u0648\u0644":"Sound off"
 w.ft(B.fA(x,x,x,x,x,D.P,x,B.d(v,x,x,x,x,x,x,x,x,x),x,D.f3,x,x,x,x,x,x,x,x,x,x))},
-u(d){return new B.xv("learn",this.aQC(d),null)},
-aQC(d){var x,w,v,u,t,s=this,r=null,q=$.m(),p=q.a==="ar",o=p?"\u0631\u062c\u0648\u0639":"Back"
+u(d){return new B.xv("learn",this.aQD(d),null)},
+aQD(d){var x,w,v,u,t,s=this,r=null,q=$.m(),p=q.a==="ar",o=p?"\u0631\u062c\u0648\u0639":"Back"
 p=p?"\u0627\u0644\u0635\u0648\u062a":"Sound"
-p=B.a([new B.ea("learning_back",C.boG,0.1,0.15,o,new A.blv(s,d),60,C.bO3,r),new B.ea("learning_sound",C.boP,0.1,0.15,p,s.gb0u(),60,C.bO6,r)],y.t)
+p=B.a([new B.ea("learning_back",C.boG,0.1,0.15,o,new A.blv(s,d),60,C.bO3,r),new B.ea("learning_sound",C.boP,0.1,0.15,p,s.gb0v(),60,C.bO6,r)],y.t)
 for(o=y.q,x=0;x<7;++x){w={}
 v=C.bfF[x]
 w.a=null
@@ -151,7 +151,7 @@ A.blw.prototype={
 $0(){return this.b.AN(this.c,this.a.a)},
 $S:0}
 A.blx.prototype={
-$0(){return this.a.aQD(this.b)},
+$0(){return this.a.aQE(this.b)},
 $S:0}
 A.aUw.prototype={
 $1(d){},
@@ -183,7 +183,7 @@ x=x.a>0||x.b}else x=!0
 if(x)return
 A.JU(this.a)},
 $S:31};(function installTearOffs(){var x=a._instance_0u
-x(A.a1c.prototype,"gb0u","b0v",0)})();(function inheritance(){var x=a.inherit,w=a.inheritMany
+x(A.a1c.prototype,"gb0v","b0w",0)})();(function inheritance(){var x=a.inherit,w=a.inheritMany
 x(A.TZ,B.T)
 x(A.a1c,B.W)
 w(B.k4,[A.blz,A.bly,A.aUw,A.aUx,A.aUy,A.aUA,A.aUB,A.aUC,A.aUv])
@@ -207,4 +207,4 @@ C.bO4=new B.U("learning_page",y.q)
 C.bO5=new B.U("learning_play",y.q)
 C.bO6=new B.U("learning_sound",y.q)})();(function staticFields(){$.bTQ=null
 $.bTR=null})()};
-(a=>{a["JjDlzuZXdJx3en+RrjyYBndcPmk="]=a.current})($__dart_deferred_initializers__);
+(a=>{a["F/xwp1+VZYKMuA0sp2n6Vd9gXCo="]=a.current})($__dart_deferred_initializers__);

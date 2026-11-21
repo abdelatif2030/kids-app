@@ -136,8 +136,8 @@ return B.c(s.bF("String","family_outbox",D.al.d0(r,null)),$async$G_)
 case 3:v.a4()
 return B.j(null,w)}})
 return B.k($async$G_,w)},
-JF(d){return this.bfS(d)},
-bfS(d){var x=0,w=B.l(y.v),v=this,u
+JF(d){return this.bfT(d)},
+bfT(d){var x=0,w=B.l(y.v),v=this,u
 var $async$JF=B.h(function(e,f){if(e===1)return B.i(f,w)
 for(;;)switch(x){case 0:u=J
 x=2
@@ -234,4 +234,4 @@ C.bzE=new A.ahd(1,"relative")
 C.o1=new B.C(!0,null,null,null,null,null,null,D.bY,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)})();(function lazyInitializers(){var x=a.lazyFinal
 x($,"cyz","c8R",()=>new A.aal($.ac()))
 x($,"cEo","cc4",()=>B.a([A.tU("games",new A.bLp(),C.vu,new A.bLq(),"lib/games, lib/color_game.dart, lib/math_game.dart: no network calls; progress in shared_preferences"),A.tU("letters",new A.bLr(),C.D9,new A.bLB(),"lib/literacy, lib/library/vocab.dart; audio via flutter_tts (offline availability depends on installed voices: not verified on a device)"),A.tU("stories",new A.bLC(),C.D9,new A.bLD(),"lib/stories/story_data.dart; assets/audio/*.mp3 bundled; no story uses remote media"),A.tU("studio",new A.bLE(),C.vu,new A.bLF(),"lib/studio: FamilyGallery in shared_preferences"),A.tU("parent",new A.bLG(),C.vu,new A.bLH(),"lib/parent_screens.dart, dashboard_screen.dart, lib/print; local data only"),A.tU("videos",new A.bLI(),C.ot,new A.bLs(),"lib/player_screen.dart (YouTube IFrame), lib/main.dart img.youtube.com thumbnails"),A.tU("chat",new A.bLt(),C.ot,new A.bLu(),"lib/family/firebase_family_repository.dart (Firestore)"),A.tU("calls",new A.bLv(),C.ot,new A.bLw(),"lib/family/call_*: WebRTC + Firestore signalling"),A.tU("teachers",new A.bLx(),C.ot,new A.bLy(),"lib/teachers_*, firebase_repository.dart"),A.tU("web",new A.bLz(),C.a4U,new A.bLA(),"No service worker offline test performed")],B.a_("y<a88>")))})()};
-(a=>{a["t4eVN9dEaTGZfAPixtfCd/wjg6o="]=a.current})($__dart_deferred_initializers__);
+(a=>{a["Wl397CZL2S4tgcEQEKLrRwIJnXw="]=a.current})($__dart_deferred_initializers__);
