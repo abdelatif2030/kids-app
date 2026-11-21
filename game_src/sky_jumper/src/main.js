@@ -113,16 +113,23 @@ class Game {
   _draw() {
     const g = this.g; g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     const Wd = this.cw; const H = this.ch; const c = this.c;
-    g.fillStyle = '#fdf8e8'; g.fillRect(0, 0, Wd, H);
+    // a bright cartoon sky that gets deeper blue the higher the climb (the old notebook paper did not match the painted creature)
+    const sky = g.createLinearGradient(0, 0, 0, H);
+    const hgt = Math.min(1, (this.mode === 'play' ? this.camY : 0) / 400);
+    const top = [Math.round(120 - 70 * hgt), Math.round(200 - 80 * hgt), Math.round(255 - 40 * hgt)];
+    sky.addColorStop(0, `rgb(${top[0]},${top[1]},${top[2]})`); sky.addColorStop(1, '#e4f6ff');
+    g.fillStyle = sky; g.fillRect(0, 0, Wd, H);
     const sx = Wd / W; const sy = H / 16;
     const cam = this.mode === 'play' ? Math.max(this.camY - 4, 0) : 0;
     const Y = (y) => H - (y - cam) * sy - H * 0.1;
-    // notebook grid and margin
-    g.strokeStyle = 'rgba(100,170,230,.28)'; g.lineWidth = 1;
-    const off = (cam * sy) % (sy * 0.8);
-    for (let y = -off; y < H; y += sy * 0.8) { g.beginPath(); g.moveTo(0, y); g.lineTo(Wd, y); g.stroke(); }
-    for (let x = 0; x < Wd; x += sx * 0.8) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
-    g.strokeStyle = 'rgba(230,90,110,.5)'; g.lineWidth = 2; g.beginPath(); g.moveTo(Wd * 0.08, 0); g.lineTo(Wd * 0.08, H); g.stroke();
+    // soft clouds drifting down slowly (parallax)
+    g.fillStyle = 'rgba(255,255,255,.85)';
+    for (let i = 0; i < 7; i++) {
+      const cx = ((i * 211 + 60) % 1000) / 1000 * Wd, cyBase = (i * 137) % 600;
+      const cy = ((cyBase + cam * sy * 0.25) % (H + 160)) - 80;
+      const r = Math.min(Wd, H) * 0.045 * (1 + (i % 3) * 0.4);
+      g.beginPath(); g.arc(cx, cy, r, 0, 6.3); g.arc(cx + r * 0.9, cy + r * 0.2, r * 0.75, 0, 6.3); g.arc(cx - r * 0.9, cy + r * 0.25, r * 0.7, 0, 6.3); g.arc(cx + r * 0.2, cy - r * 0.45, r * 0.7, 0, 6.3); g.fill();
+    }
     if (!c) return;
     // platforms
     for (const pl of c.plats) {
@@ -131,8 +138,14 @@ class Game {
       if (y < -30 || y > H + 30) continue;
       const col = { normal: '#5ac850', move: '#4a9ae8', crumble: '#b8844a', spring: '#5ac850' }[pl.kind];
       if (ART.platform_grass && (pl.kind === 'normal' || pl.kind === 'spring')) { g.drawImage(ART.platform_grass, x - w / 2 - 3, y - 11, w + 6, 26); }
-      else { g.fillStyle = col; g.strokeStyle = '#2a4a2a'; g.lineWidth = 2; g.beginPath(); g.roundRect(x - w / 2, y - 5, w, 12, 6); g.fill(); g.stroke();
-      g.fillStyle = 'rgba(255,255,255,.4)'; g.fillRect(x - w / 2 + 6, y - 3, w - 12, 3); }
+      else {
+        // a cartoon slab: earth body, bright grass top with a lighter rim, dark outline
+        const earth = pl.kind === 'crumble' ? '#a07848' : pl.kind === 'move' ? '#5a78b8' : '#8a5a32';
+        g.strokeStyle = '#3a2a18'; g.lineWidth = 2;
+        g.fillStyle = earth; g.beginPath(); g.roundRect(x - w / 2, y - 3, w, 11, 5); g.fill(); g.stroke();
+        g.fillStyle = col; g.beginPath(); g.roundRect(x - w / 2 - 1, y - 8, w + 2, 8, 5); g.fill(); g.stroke();
+        g.fillStyle = 'rgba(255,255,255,.45)'; g.fillRect(x - w / 2 + 7, y - 6, w - 14, 2);
+      }
       if (pl.kind === 'crumble') { g.strokeStyle = '#5a3a1a'; g.beginPath(); g.moveTo(x - 4, y - 5); g.lineTo(x, y + 7); g.moveTo(x + 8, y - 5); g.lineTo(x + 4, y + 7); g.stroke(); }
       if (pl.kind === 'spring') { g.strokeStyle = '#888'; g.lineWidth = 3; g.beginPath(); for (let k = 0; k < 5; k++) { g.lineTo(x + (k % 2 ? 6 : -6), y - 6 - k * 3); } g.stroke(); g.fillStyle = '#e8564a'; g.fillRect(x - 9, y - 24, 18, 5); }
     }
