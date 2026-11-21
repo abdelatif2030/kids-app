@@ -5,6 +5,7 @@
 // of petals. No network, no links, no ads, no tracking. Everything drawn and played from code.
 import * as THREE from 'three';
 import { Fight, STAGES, ARENA, normalizeSave } from './sim.js';
+import { loadSprites, makePaintedFigure } from '../../cozy_kit/art.js';
 import {
   mat, makeSamurai, makeNinja, makeOni, makeShuriken, makeTorii, makeLantern, makeCherryTree, makeTemple,
   courtyardTexture, petalGeometry,
@@ -151,7 +152,15 @@ class Game {
     this.goodWin = 0;
     this.clock = new THREE.Clock();
     this._buildScene(0);
-    this._fonts().then(() => {
+    this.pics = null;
+    Promise.all([this._fonts(), loadSprites(THREE, this.base, ['hero', 'slash', 'dash', 'win', 'ninja_blue', 'ninja_green', 'ninja_purple', 'oni']).then((sp) => {
+      this.pics = sp;
+      if (sp.hero && this.hero && !this.hero.painted) { // the scene was built before the pictures arrived: swap in the painted samurai
+        const old = this.hero; const par = old.root.parent;
+        this.hero = makePaintedFigure(THREE, { idle: sp.hero, slash: sp.slash || sp.hero, dash: sp.dash || sp.hero, win: sp.win || sp.hero }, 2.6);
+        if (par) { par.remove(old.root); par.add(this.hero.root); }
+      }
+    })]).then(() => {
       this.loading.remove();
       this.showMenu();
       this.renderer.setAnimationLoop(() => this._frame());
@@ -239,7 +248,7 @@ class Game {
       }
     }
     // the samurai
-    this.hero = makeSamurai(this.save.hero);
+    this.hero = this.pics && this.pics.hero ? makePaintedFigure(THREE, { idle: this.pics.hero, slash: this.pics.slash || this.pics.hero, dash: this.pics.dash || this.pics.hero, win: this.pics.win || this.pics.hero }, 2.6) : makeSamurai(this.save.hero);
     s.add(this.hero.root);
     this.ring = new THREE.Mesh(new THREE.RingGeometry(0.55, 0.72, 32), new THREE.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0.85 }));
     this.ring.rotation.x = -Math.PI / 2;
@@ -679,7 +688,7 @@ class Game {
         this.sound.setMode('boss');
         this._banner(t('boss'), 2.2);
         this.hud.bossbar.style.display = 'block';
-        this.oni = makeOni();
+        this.oni = this.pics && this.pics.oni ? makePaintedFigure(THREE, { idle: this.pics.oni }, 4.4) : makeOni();
         this.oni.root.scale.setScalar(1.25);
         this.scene.add(this.oni.root);
         break;
@@ -730,6 +739,7 @@ class Game {
     this.hero.arms[1].rotation.z = p.slash > 0 ? -0.6 + sw * 1.4 : 0;
     this.hero.arms[0].rotation.x = Math.sin(time * 13) * -0.5 * p.moving;
     this.hero.root.visible = p.inv <= 0 || Math.floor(time * 16) % 2 === 0;
+    if (this.hero.painted) this.hero.setPose(p.slash > 0 ? 'slash' : p.dash > 0 ? 'dash' : 'idle');
     this.hero.body.rotation.x = p.dash > 0 ? 0.35 : 0;
     this.ring.position.set(p.x, 0.04, p.z);
     this.ring.scale.setScalar(1 + Math.sin(time * 6) * 0.06);
@@ -750,7 +760,7 @@ class Game {
     for (const e of f.enemies) {
       let m = this.ninjaModels.get(e.id);
       if (!m) {
-        m = makeNinja(e.kind);
+        { const key = { ninja: 'ninja_blue', big: 'ninja_green', thrower: 'ninja_purple' }[e.kind] || 'ninja_blue'; m = this.pics && this.pics[key] ? makePaintedFigure(THREE, { idle: this.pics[key] }, e.kind === 'big' ? 3.4 : 2.3) : makeNinja(e.kind); }
         m.warn = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.42, 4), mat(0xff3a3a, 0xff0000, 0.6));
         m.warn.rotation.x = Math.PI;
         m.warn.position.y = e.kind === 'big' ? 2.5 : 1.85;

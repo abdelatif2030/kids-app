@@ -123,3 +123,17 @@ export function makeBillboardVehicle(THREE, pics, height) {
     setState(state) { apply(pics[state] || pics.c); },
   };
 }
+
+/** A painted fighter for games whose own 3D figures have legs/arms/body/head groups that the game animates: a camera-facing picture with the SAME
+ *  fields (root, body, legs[2], arms[2], head, sword, club) as inert dummies, so the game's animation code runs unchanged. [poses] = { name: sprite };
+ *  setPose(name) swaps the picture (falls back to 'idle'). */
+export function makePaintedFigure(THREE, poses, height) {
+  const root = new THREE.Group(); const body = new THREE.Group(); root.add(body);
+  const first = poses.idle;
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: first.tex, transparent: true, alphaTest: 0.05, toneMapped: false, fog: false, depthWrite: false }));
+  sp.center.set(0.5, 0.02); sp.renderOrder = 3; body.add(sp);
+  const apply = (p) => { if (sp.material.map !== p.tex) { sp.material.map = p.tex; sp.material.needsUpdate = true; } sp.scale.set(height * p.aspect, height, 1); };
+  apply(first);
+  const d = () => ({ rotation: { x: 0, y: 0, z: 0 }, position: { x: 0, y: 0, z: 0 }, scale: { setScalar() {}, set() {} }, visible: true });
+  return { root, body, sprite: sp, legs: [d(), d()], arms: [d(), d()], head: d(), sword: d(), club: d(), painted: true, setPose(n) { apply(poses[n] || poses.idle); } };
+}

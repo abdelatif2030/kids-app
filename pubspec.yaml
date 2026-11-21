@@ -106,6 +106,7 @@ flutter:
     - assets/games/happy_farm/
     - assets/games/pumpkin_pie/
     - assets/games/samurai/
+    - assets/games/samurai/art/
     - assets/games/golden_tail/
     - assets/games/ocean_defense/
     - assets/games/ocean_defense/art/
