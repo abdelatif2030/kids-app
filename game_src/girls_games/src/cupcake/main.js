@@ -50,7 +50,7 @@ const CSS = `
 .cu-opt{width:calc(var(--u)*15);height:calc(var(--u)*15);min-width:60px;min-height:60px;border-radius:calc(var(--u)*3);border:calc(var(--u)*.6) solid #fff;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:calc(var(--u)*.8);box-shadow:0 calc(var(--u)*.7) 0 rgba(160,40,120,.45);font-size:calc(var(--u)*7)}
 .cu-opt img{max-width:100%;max-height:100%;object-fit:contain;pointer-events:none}
 .cu-dot{width:70%;height:70%;border-radius:50%;border:2px solid #fff;pointer-events:none}
-@media (max-aspect-ratio:1/1){.cu-baker{left:22%;height:calc(var(--u)*40);bottom:calc(var(--u)*34)}.cu-table{left:60%;bottom:calc(var(--u)*34)}.cu-guests{left:calc(var(--u)*2);top:calc(var(--u)*14)}.cu-ribbon{flex-wrap:wrap}}
+@media (max-aspect-ratio:1/1){.cu-baker{left:20%;height:calc(var(--u)*38);bottom:calc(var(--u)*48)}.cu-table{left:62%;bottom:calc(var(--u)*50);width:calc(var(--u)*36);height:calc(var(--u)*36)}.cu-guests{left:calc(var(--u)*2);right:calc(var(--u)*2);top:calc(var(--u)*14)}.cu-ribbon{flex-wrap:wrap;gap:calc(var(--u)*1.4)}.cu-step{height:calc(var(--u)*11);font-size:calc(var(--u)*3.6);padding:0 calc(var(--u)*2.4)}.cu-opts{bottom:calc(var(--u)*27)}.cu-opt{width:calc(var(--u)*19);height:calc(var(--u)*19)}}
 `;
 
 class Game {

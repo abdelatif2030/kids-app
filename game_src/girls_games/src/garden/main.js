@@ -47,7 +47,7 @@ const CSS = `
 .ga-bf img{height:calc(var(--u)*9);object-fit:contain}
 @keyframes gabf{0%{transform:translate(0,0)}50%{transform:translate(calc(var(--u)*8),calc(var(--u)*-6)) rotate(8deg)}100%{transform:translate(calc(var(--u)*-6),calc(var(--u)*-3)) rotate(-6deg)}}
 .ga-rain{position:absolute;pointer-events:none;font-size:calc(var(--u)*4);animation:gkspark .9s ease-in forwards;z-index:9}
-@media (max-aspect-ratio:1/1){.ga-pots{flex-wrap:wrap;gap:calc(var(--u)*4);bottom:calc(var(--u)*22);align-items:flex-end}.ga-pot{width:calc(var(--u)*26)}}
+@media (max-aspect-ratio:1/1){.ga-bar{flex-wrap:wrap;gap:calc(var(--u)*1.6)}.ga-pots{bottom:calc(var(--u)*30)!important;flex-wrap:wrap;gap:calc(var(--u)*4);bottom:calc(var(--u)*22);align-items:flex-end}.ga-pot{width:calc(var(--u)*26)}}
 @media (prefers-reduced-motion:reduce){.ga-bf,.ga-pot .wig{animation:none}}
 `;
 
