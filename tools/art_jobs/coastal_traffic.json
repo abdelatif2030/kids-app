@@ -1,0 +1,52 @@
+{
+ "style": "Glossy 3D-rendered cartoon vehicle for a children's racing game, smooth rounded toy-like shapes, bright saturated colors, soft studio lighting, kid friendly.",
+ "kind_sprite": "Single vehicle centered, seen exactly from directly BEHIND (rear view, symmetrical), whole vehicle visible with both rear wheels, plain white background, no shadow, no text, no letters, no license plate text.",
+ "suffix": "No text, no letters.",
+ "jobs": [
+  {
+   "name": "van",
+   "kind": "sprite",
+   "prompt": "Rear view of a white delivery van."
+  },
+  {
+   "name": "bus",
+   "kind": "sprite",
+   "prompt": "Rear view of a city bus, white with a blue stripe."
+  },
+  {
+   "name": "truck",
+   "kind": "sprite",
+   "prompt": "Rear view of a yellow box truck."
+  },
+  {
+   "name": "sedan_green",
+   "kind": "sprite",
+   "prompt": "Rear view of a green sedan."
+  },
+  {
+   "name": "sedan_white",
+   "kind": "sprite",
+   "prompt": "Rear view of a white sedan."
+  },
+  {
+   "name": "pickup",
+   "kind": "sprite",
+   "prompt": "Rear view of a red pickup truck."
+  },
+  {
+   "name": "suv_black",
+   "kind": "sprite",
+   "prompt": "Rear view of a black SUV."
+  },
+  {
+   "name": "hatch_orange",
+   "kind": "sprite",
+   "prompt": "Rear view of an orange hatchback."
+  },
+  {
+   "name": "police",
+   "kind": "sprite",
+   "prompt": "Rear view of a police car, blue and white, no text."
+  }
+ ]
+}

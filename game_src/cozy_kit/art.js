@@ -29,3 +29,51 @@ export function applyBackdrop(THREE, scene, base, name, stillWanted) {
     }, undefined, () => {});
   } catch (_) { /* keep the colour */ }
 }
+
+// ---- picture vehicles for the 3D games ---------------------------------------------------------------------------------------
+// A cut-out picture of a vehicle seen from behind (transparent WebP made by tools/cut_sprite.py) becomes a camera-facing upright
+// plane standing on the road. The camera of a chase game always looks along the road, so a rear-view picture is always right.
+
+/** Loads <base>art/<name>.webp as textures: { name: { tex, aspect } } (a missing picture is simply absent). */
+export function loadSprites(THREE, base, names) {
+  const root = (base || './').replace(/\/?$/, '/');
+  const loader = new THREE.TextureLoader();
+  return Promise.all(names.map((n) => new Promise((resolve) => {
+    let done = false;
+    const fin = (v) => { if (!done) { done = true; resolve([n, v]); } };
+    setTimeout(() => fin(null), 6000);
+    try {
+      loader.load(`${root}art/${n}.webp`, (tex) => {
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.anisotropy = 4;
+        const im = tex.image;
+        fin({ tex, aspect: im && im.height ? im.width / im.height : 1.3 });
+      }, undefined, () => fin(null));
+    } catch (_) { fin(null); }
+  }))).then((pairs) => Object.fromEntries(pairs.filter(([, v]) => v)));
+}
+
+/** An upright picture plane [width] metres wide whose bottom edge is on the ground, with a soft shadow. Same fields the games'
+ *  3D vehicles have (body, wheels, blinkers, tail, flames) so the game code does not care which one it holds. */
+export function makeSpriteVehicle(THREE, sprite, width) {
+  const root = new THREE.Group();
+  const body = new THREE.Group();
+  root.add(body);
+  const h = width / sprite.aspect;
+  const mat = new THREE.MeshBasicMaterial({ map: sprite.tex, transparent: true, alphaTest: 0.06, toneMapped: false, fog: false });
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(width, h), mat);
+  plane.position.y = h / 2;
+  plane.renderOrder = 2;
+  body.add(plane);
+  const sc = document.createElement('canvas'); sc.width = sc.height = 64;
+  const sx = sc.getContext('2d'); const sg = sx.createRadialGradient(32, 32, 2, 32, 32, 31);
+  sg.addColorStop(0, 'rgba(0,0,0,0.55)'); sg.addColorStop(0.6, 'rgba(0,0,0,0.3)'); sg.addColorStop(1, 'rgba(0,0,0,0)');
+  sx.fillStyle = sg; sx.fillRect(0, 0, 64, 64); // a soft round shadow, not a dark box
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(width * 1.2, width * 0.7), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false }));
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.set(0, 0.03, -width * 0.12);
+  root.add(shadow);
+  const blinkMat = new THREE.MeshBasicMaterial({ color: 0xffb21a });
+  const blinkers = [-1, 1].map((s) => { const b = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 0.12), blinkMat); b.position.set(s * (width / 2 - 0.12), h * 0.38, 0.02); b.visible = false; body.add(b); return b; });
+  return { root, body, wheels: [], blinkers, tail: { emissiveIntensity: 0 }, flames: [], len: width * 2.2, sprite: true };
+}

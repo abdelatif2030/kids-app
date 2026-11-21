@@ -9,6 +9,7 @@ import {
   mat, basic, box, makeSportsCar, makeTrafficCar, roadTexture, makePalm, makeLamp, makeRailSegment, makeHill, makeBackdrop, makeBush, makeMesa,
   makeCactus, makeTower, skyTexture, coinMesh,
 } from './models.js';
+import { loadSprites, makeSpriteVehicle } from '../../cozy_kit/art.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
 import { CSS, h, arc } from './ui.js';
@@ -178,6 +179,9 @@ class Game {
     s.add(this.sunL);
     s.add(this.sunL.target);
     this.trafficModels = new Map();
+    this.sprites = {}; // painted rear-view cars (art/car_*.webp); a missing picture = the code-built 3D car
+    this.playerSprite = null;
+    loadSprites(THREE, this.base, ['car_player', 'car_hatch', 'car_taxi']).then((sp) => { this.sprites = sp; });
     this.coins = coinMesh(80);
     s.add(this.coins);
     this.sparks = new Glow(s, 240, 0.3, 0xffd27a);
@@ -677,6 +681,17 @@ class Game {
     car.body.rotation.z = steer * 0.05;
     const blink = r.invul > 0 && Math.floor(time * 14) % 2 === 0;
     car.body.visible = !blink;
+    // the painted car stands in for the 3D one while racing (the 3D one is still shown in the garage, where it turns around)
+    const pic = this.sprites && this.sprites.car_player;
+    if (pic) {
+      if (!this.playerSprite) { this.playerSprite = makeSpriteVehicle(THREE, pic, 2.15); this.scene.add(this.playerSprite.root); }
+      const ps = this.playerSprite;
+      ps.root.visible = true;
+      ps.root.position.copy(car.root.position);
+      ps.root.rotation.z = steer * 0.04;
+      ps.body.visible = !blink;
+      car.root.visible = false;
+    }
     const spin = (p.speed * dt) / 0.36;
     car.wheels.forEach((w, i) => { w.rotation.x -= spin; if (i < 2) w.rotation.y = -steer * 0.4; });
     const boost = r.nitroOn > 0;
@@ -688,7 +703,11 @@ class Game {
       if (c.s - p.s > 320) continue;
       seen.add(c.id);
       let m = this.trafficModels.get(c.id);
-      if (!m) { m = makeTrafficCar(c.kind, c.color); this.scene.add(m.root); this.trafficModels.set(c.id, m); }
+      if (!m) {
+        const sp = c.kind !== 'truck' && this.sprites && (c.color % 2 === 0 ? this.sprites.car_hatch : this.sprites.car_taxi);
+        m = sp ? makeSpriteVehicle(THREE, sp, c.kind === 'van' ? 2.3 : c.kind === 'pickup' ? 2.15 : 1.95) : makeTrafficCar(c.kind, c.color);
+        this.scene.add(m.root); this.trafficModels.set(c.id, m);
+      }
       m.root.position.set(c.x, 0, -c.s);
       m.root.rotation.y = c.hit > 0 ? Math.sin(c.hit * 9) * 0.25 : (c.x - LANES[c.lane]) * -0.05;
       const on = c.blink > 0 && Math.floor(time * 4) % 2 === 0;
@@ -796,6 +815,8 @@ class Game {
       car.root.position.set(0, 0, 0);
       car.root.rotation.set(0, 0, 0);
       car.body.visible = true;
+      car.root.visible = true;
+      if (this.playerSprite) this.playerSprite.root.visible = false;
       car.flames.forEach((f) => { f.visible = false; });
       this._placeRoad(0);
       const garage = this.mode === 'garage';

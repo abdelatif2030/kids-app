@@ -119,6 +119,7 @@ flutter:
     - assets/games/deep_sea/
     - assets/games/deep_sea/art/
     - assets/games/coastal_drive/
+    - assets/games/coastal_drive/art/
     - assets/games/hungry_frog/
     - assets/games/frost_coil/
     - assets/games/learn_maze/
