@@ -25,6 +25,8 @@ export const LEVELS = [
   { id: 3, ar: 'كهف اللؤلؤ', en: 'Pearl Cave', boss: 80 },
   { id: 4, ar: 'حديقة قناديل البحر', en: 'Jelly Garden', boss: 100 },
   { id: 5, ar: 'عرين الأخطبوط', en: "Octopus's Lair", boss: 130 },
+  { id: 6, ar: 'قلعة اللؤلؤ', en: 'Pearl Fortress', boss: 160 },
+  { id: 7, ar: 'قاع المحيط', en: 'Ocean Floor', boss: 200 },
 ];
 
 export const POWERS = [
@@ -407,5 +409,5 @@ export function normalizeSave(raw) {
   const up = {};
   for (const g of UPGRADES) { const v = Math.floor(Number(s.up && s.up[g.id])); up[g.id] = v >= 0 && v <= MAX_UP ? v : 0; }
   const c = Math.floor(Number(s.coins));
-  return { unlocked: Number.isFinite(u) ? Math.max(1, Math.min(LEVELS.length, u)) : 1, stars, coins: Number.isFinite(c) && c > 0 ? Math.min(c, 99999) : 0, up, muted: s.muted === true };
+  return { unlocked: Math.max(1, Math.min(LEVELS.length, Math.max(Number.isFinite(u) ? u : 1, ...Object.keys(stars).map((k) => Number(k) + 1)))), stars, coins: Number.isFinite(c) && c > 0 ? Math.min(c, 99999) : 0, up, muted: s.muted === true };
 }

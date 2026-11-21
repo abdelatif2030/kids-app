@@ -29,6 +29,8 @@ export const LEVELS = [
   { id: 3, ar: 'ليلة الكأس', en: 'Cup Night', defenders: 4, mates: 2, chase: 4.8, windup: 0.85, cooldown: 2.6, aggro: 17, reach: 2.9, sway: 2.8, tspeed: 1.9, trickGoal: 4, par: 30 },
   { id: 4, ar: 'المدرج الكبير', en: 'Big Stand', defenders: 5, mates: 2, chase: 5.3, windup: 0.75, cooldown: 2.2, aggro: 18, reach: 3.2, sway: 3.2, tspeed: 2.3, trickGoal: 5, par: 34 },
   { id: 5, ar: 'نهائي الأبطال', en: 'Champions Final', defenders: 6, mates: 3, chase: 5.8, windup: 0.68, cooldown: 1.9, aggro: 20, reach: 3.5, sway: 3.6, tspeed: 2.8, trickGoal: 6, par: 38 },
+  { id: 6, ar: 'كأس الأساطير', en: 'Legends Cup', defenders: 7, mates: 3, chase: 6.1, windup: 0.64, cooldown: 1.7, aggro: 21, reach: 3.7, sway: 3.9, tspeed: 3.1, trickGoal: 7, par: 42 },
+  { id: 7, ar: 'بطولة العالم', en: 'World Final', defenders: 8, mates: 4, chase: 6.4, windup: 0.6, cooldown: 1.55, aggro: 22, reach: 3.9, sway: 4.2, tspeed: 3.4, trickGoal: 8, par: 46 },
 ];
 
 export const SKINS = [
@@ -49,12 +51,12 @@ export function normalizeSave(s) {
   const num = (v, d = 0) => (Number.isFinite(Number(v)) ? Number(v) : d);
   const owned = Array.isArray(o.owned) ? o.owned.filter((id) => SKINS.some((k) => k.id === id)) : [];
   if (!owned.includes('classic')) owned.unshift('classic');
-  const stars = Array.isArray(o.stars) ? o.stars.slice(0, 5).map((v) => clamp(Math.round(num(v)), 0, 3)) : [];
-  while (stars.length < 5) stars.push(0);
+  const stars = Array.isArray(o.stars) ? o.stars.slice(0, LEVELS.length).map((v) => clamp(Math.round(num(v)), 0, 3)) : [];
+  while (stars.length < LEVELS.length) stars.push(0);
   const best = Array.isArray(o.best) ? o.best.slice(0, 5).map((v) => Math.max(0, Math.round(num(v)))) : [];
   while (best.length < 5) best.push(0);
   return {
-    unlocked: clamp(Math.round(num(o.unlocked, 1)), 1, 5), stars, best,
+    unlocked: clamp(Math.max(Math.round(num(o.unlocked, 1)), ...stars.map((v, i) => (v > 0 ? i + 2 : 1))), 1, LEVELS.length), stars, best,
     coins: Math.max(0, Math.round(num(o.coins))), owned,
     skin: owned.includes(o.skin) ? o.skin : 'classic',
     muted: !!o.muted, goals: Math.max(0, Math.round(num(o.goals))), tricks: Math.max(0, Math.round(num(o.tricks))),
@@ -72,7 +74,7 @@ export function selectSkin(save, id) { if (save.owned.includes(id)) { save.skin 
 
 export class Match {
   constructor({ level = 0, seed = 1, easy = false } = {}) {
-    this.level = clamp(Math.floor(level) || 0, 0, 4);
+    this.level = clamp(Math.floor(level) || 0, 0, LEVELS.length - 1);
     const d = LEVELS[this.level];
     const e = easy ? { chase: 0.8, windup: 1.35, cooldown: 1.4, reach: 0.85, tspeed: 0.75 } : { chase: 1, windup: 1, cooldown: 1, reach: 1, tspeed: 1 };
     this.def = { ...d, chase: d.chase * e.chase, windup: d.windup * e.windup, cooldown: d.cooldown * e.cooldown, reach: d.reach * e.reach, tspeed: d.tspeed * e.tspeed };

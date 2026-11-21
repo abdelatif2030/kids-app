@@ -17,7 +17,9 @@ export const ROUNDS = [
   { id: 1, ar: 'العوّامات', en: 'Floatstacles', swimmers: 12, qualify: 8, len: 250, bpm: 100, bumpers: 10, noodles: 1, walls: 1, waves: 1, slides: 1 },
   { id: 2, ar: 'المكرونة الدوّارة', en: 'Noodle Spin', swimmers: 10, qualify: 6, len: 280, bpm: 104, bumpers: 10, noodles: 3, walls: 2, waves: 1, slides: 1 },
   { id: 3, ar: 'جدار الموج', en: 'Wave Wall', swimmers: 8, qualify: 4, len: 300, bpm: 108, bumpers: 12, noodles: 3, walls: 3, waves: 2, slides: 2 },
-  { id: 4, ar: 'النهائي', en: 'The Final', swimmers: 6, qualify: 1, len: 330, bpm: 112, bumpers: 14, noodles: 4, walls: 3, waves: 2, slides: 2 },
+  { id: 4, ar: 'القنطرة العائمة', en: 'Floating Bridge', swimmers: 8, qualify: 4, len: 310, bpm: 110, bumpers: 12, noodles: 3, walls: 3, waves: 2, slides: 2 },
+  { id: 5, ar: 'دوامة الحلزون', en: 'Spiral Whirl', swimmers: 7, qualify: 3, len: 320, bpm: 112, bumpers: 14, noodles: 4, walls: 3, waves: 2, slides: 2 },
+  { id: 6, ar: 'النهائي', en: 'The Final', swimmers: 6, qualify: 1, len: 340, bpm: 114, bumpers: 14, noodles: 4, walls: 3, waves: 3, slides: 2 },
 ];
 
 export const SWIMMERS = [
@@ -318,5 +320,5 @@ export function normalizeSave(raw) {
   const stars = {};
   if (s.stars && typeof s.stars === 'object') for (const r of ROUNDS) { const v = Math.floor(Number(s.stars[r.id])); if (v >= 1 && v <= 3) stars[r.id] = v; }
   const u = Math.floor(Number(s.unlocked));
-  return { unlocked: Number.isFinite(u) ? clamp(u, 1, ROUNDS.length) : 1, stars, muted: s.muted === true };
+  return { unlocked: clamp(Math.max(Number.isFinite(u) ? u : 1, ...Object.keys(stars).map((k) => Number(k) + 1)), 1, ROUNDS.length), stars, muted: s.muted === true };
 }

@@ -9,6 +9,9 @@ export const STAGES = [
   { id: 1, ar: 'غروب الشاطئ', en: 'Beach Sunset', dist: 2200, time: 105, traffic: 1.0, rival: 30.5 },
   { id: 2, ar: 'كورنيش المغرب', en: 'Dusk Corniche', dist: 2600, time: 112, traffic: 1.25, rival: 32 },
   { id: 3, ar: 'ليل الميناء', en: 'Harbour Night', dist: 3000, time: 118, traffic: 1.5, rival: 32.5 },
+  { id: 4, ar: 'فجر الجبل', en: 'Mountain Dawn', dist: 3200, time: 126, traffic: 1.6, rival: 31 },
+  { id: 5, ar: 'طريق الأمطار', en: 'Rainy Road', dist: 3400, time: 130, traffic: 1.7, rival: 31.5 },
+  { id: 6, ar: 'سباق المدينة الأخير', en: 'Last City Run', dist: 3600, time: 134, traffic: 1.8, rival: 32 },
 ];
 
 /** The road bends: lateral offset (m) of the road centre at distance z. */
@@ -18,7 +21,7 @@ export function bendSlope(z) { return Math.cos(z * 0.006) * 26 * 0.006 + Math.co
 export class Race {
   /** opts: { stage (0..2), easy, seed } */
   constructor(opts = {}) {
-    this.stage = clamp(opts.stage ?? 0, 0, 2);
+    this.stage = clamp(opts.stage ?? 0, 0, STAGES.length - 1);
     this.cfg = STAGES[this.stage];
     this.easy = !!opts.easy;
     this.rand = rng((opts.seed ?? 5) + 99);
@@ -114,5 +117,5 @@ export function normalizeSave(s) {
   const o = s && typeof s === 'object' ? s : {};
   const stars = {};
   for (let i = 1; i <= 3; i++) { const v = o.stars && Number(o.stars[i]); if (v >= 1 && v <= 3) stars[i] = Math.floor(v); }
-  return { unlocked: Math.max(1, Math.min(3, Math.floor(Number(o.unlocked)) || 1)), stars, muted: !!o.muted };
+  return { unlocked: Math.max(1, Math.min(STAGES.length, Math.max(Math.floor(Number(o.unlocked)) || 1, ...Object.keys(stars).map((k) => Number(k) + 1)))), stars, muted: !!o.muted };
 }

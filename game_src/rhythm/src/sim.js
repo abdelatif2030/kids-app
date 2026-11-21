@@ -18,6 +18,8 @@ export const TRACKS = [
   { id: 3, ar: 'علّية الأحد', en: 'Sunday Loft', bpm: 120, len: 50, arms: [['low', 8], ['high', 10]], gaps: true, flip: false, tonearm: false },
   { id: 4, ar: 'صالة المخمل', en: 'Velvet Lounge', bpm: 124, len: 55, arms: [['low', 6], ['high', 10]], gaps: true, flip: true, tonearm: false },
   { id: 5, ar: 'صندوق الموسيقى', en: 'Music Box', bpm: 128, len: 60, arms: [['low', 6], ['high', 8], ['low', 12]], gaps: true, flip: true, tonearm: true },
+  { id: 6, ar: 'قاعة الحفلات', en: 'Concert Hall', bpm: 132, len: 64, arms: [['low', 6], ['high', 7], ['low', 9]], gaps: true, flip: true, tonearm: true },
+  { id: 7, ar: 'الأوركسترا الكبرى', en: 'Grand Orchestra', bpm: 136, len: 70, arms: [['high', 6], ['low', 6], ['high', 8], ['low', 10]], gaps: true, flip: true, tonearm: true },
 ];
 
 export const ANIMALS = ['bear', 'bunny', 'fox', 'cat', 'raccoon', 'panda', 'sheep', 'chick', 'frog', 'mouse', 'pig', 'koala'];
@@ -373,5 +375,5 @@ export function normalizeSave(raw) {
   const stars = {};
   if (s.stars && typeof s.stars === 'object') for (const tk of TRACKS) { const v = Math.floor(Number(s.stars[tk.id])); if (v >= 1 && v <= 3) stars[tk.id] = v; }
   const u = Math.floor(Number(s.unlocked));
-  return { unlocked: Number.isFinite(u) ? Math.max(1, Math.min(TRACKS.length, u)) : 1, stars, muted: s.muted === true };
+  return { unlocked: Math.max(1, Math.min(TRACKS.length, Math.max(Number.isFinite(u) ? u : 1, ...Object.keys(stars).map((k) => Number(k) + 1)))), stars, muted: s.muted === true };
 }

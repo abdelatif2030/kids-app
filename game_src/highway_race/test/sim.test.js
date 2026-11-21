@@ -26,13 +26,13 @@ function run(stage, easy = false, seed = 5) {
 }
 
 test('three stages, longer and busier', () => {
-  assert.equal(STAGES.length, 3);
+  assert.equal(STAGES.length, 6);
   assert.ok(STAGES[2].dist > STAGES[0].dist && STAGES[2].traffic > STAGES[0].traffic);
   assert.ok(Math.abs(bend(500)) < 40);
 });
 
 test('a robot driver beats the clock and the rival on every stage, with a few bumps', () => {
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < STAGES.length; i++) {
     const { r, t } = run(i);
     console.log(`stage ${i + 1}: ${r.won ? 'won' : r.state} in ${t.toFixed(0)}s of ${r.cfg.time}, bumps ${r.p.bumps}, lead ${r.p.lead.toFixed(0)} m`);
     assert.equal(r.state, 'done');
@@ -71,5 +71,5 @@ test('a bump slows the car for a moment and never repeats while protected; nitro
 
 test('damaged saves load safely', () => {
   assert.equal(normalizeSave(null).unlocked, 1);
-  assert.equal(normalizeSave({ unlocked: 99 }).unlocked, 3);
+  assert.equal(normalizeSave({ unlocked: 99 }).unlocked, 6);
 });

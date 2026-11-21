@@ -11,6 +11,9 @@ export const ROUNDS = [
   { id: 1, len: 220, rivals: 5, qualify: 4 },
   { id: 2, len: 280, rivals: 5, qualify: 3 },
   { id: 3, len: 340, rivals: 5, qualify: 1 },
+  { id: 4, len: 380, rivals: 5, qualify: 1 },
+  { id: 5, len: 420, rivals: 5, qualify: 1 },
+  { id: 6, len: 460, rivals: 5, qualify: 1 },
 ];
 const G = 28;
 const JUMP = 11;
@@ -55,7 +58,7 @@ export class Race {
   /** opts: { theme: 'alien'|'rhino', round (0..2), easy, seed } */
   constructor(opts = {}) {
     this.theme = opts.theme || 'alien';
-    this.round = clamp(opts.round ?? 0, 0, 2);
+    this.round = clamp(opts.round ?? 0, 0, ROUNDS.length - 1);
     this.cfg = ROUNDS[this.round];
     this.easy = !!opts.easy;
     this.rand = rng((opts.seed ?? 3) + 77);
@@ -199,5 +202,5 @@ export function normalizeSave(s) {
   const o = s && typeof s === 'object' ? s : {};
   const stars = {};
   for (let i = 1; i <= 3; i++) { const v = o.stars && Number(o.stars[i]); if (v >= 1 && v <= 3) stars[i] = Math.floor(v); }
-  return { unlocked: Math.max(1, Math.min(3, Math.floor(Number(o.unlocked)) || 1)), stars, wins: Math.max(0, Math.floor(Number(o.wins)) || 0), muted: !!o.muted };
+  return { unlocked: Math.max(1, Math.min(ROUNDS.length, Math.max(Math.floor(Number(o.unlocked)) || 1, ...Object.keys(stars).map((k) => Number(k) + 1)))), stars, wins: Math.max(0, Math.floor(Number(o.wins)) || 0), muted: !!o.muted };
 }

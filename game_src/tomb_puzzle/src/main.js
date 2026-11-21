@@ -17,7 +17,7 @@ const S = {
   moves: ['حركات', 'Moves'], par: ['الأفضل', 'Par'], keysWord: ['المفاتيح', 'Keys'], next: ['المرحلة التالية', 'NEXT ROOM'], replay: ['العب تاني', 'PLAY AGAIN'],
   won: ['وصلت للمخرج! 🏆', 'You found the exit! 🏆'], select: ['اختار الغرفة', 'CHOOSE A ROOM'], locked: ['خلّص الغرفة اللي قبلها', 'Finish the room before'], room: ['غرفة', 'Room'],
   st1: ['وصلت للمخرج', 'Reached the exit'], st2: ['جمعت المفتاحين', 'Found both keys'], st3: ['بأقل حركات', 'Within the par moves'],
-  fall: ['انهارت الأرض! نبدأ الغرفة من جديد', 'The floor gave way! Back to the start'], stuck: ['اضغط ↩ للرجوع خطوة', 'Tap ↩ to step back'], thatWay: ['جرّب هذا الاتجاه!', 'Try this way!'],
+  fall: ['انهارت الأرض! نبدأ الغرفة من جديد', 'The floor gave way! Back to the start'], stuck: ['اضغط ↩ للرجوع خطوة', 'Tap ↩ to step back'], deadRoom: ['الغرفة اتعقدت! دوس ↩ ترجع خطوة أو 🔄 تبدأ من الأول', 'This room is jammed! Tap ↩ to step back or 🔄 to restart'], thatWay: ['جرّب هذا الاتجاه!', 'Try this way!'],
   bLock: ['الباب يحتاج مفتاحاً', 'This door needs a key'], bDoor: ['الباب مغلق: اضغط القرص الذهبي', 'Door closed: press the golden plate'], bGate: ['أشعل كل المشاعل لتفتح البوابة', 'Light every torch to open the gate'],
   bPit: ['حفرة! ادفع حجراً فيها', 'A pit! Push a block into it'], bBlock: ['الحجر لا يتحرك هناك', 'The block can\'t move there'], bBraz: ['المشعل مضاء', 'Already lit'],
   doorOpened: ['انفتح الباب!', 'A door opened!'], gateOpened: ['انفتحت البوابة!', 'The gate opened!'], keyFound: ['وجدت مفتاح عنخ!', 'Found an ankh key!'], fin: ['أنت بطل المقابر! 🌟', 'You are the tomb hero! 🌟'],
@@ -289,6 +289,19 @@ class Game {
     this.cd = MOVE_CD;
     if (!r.changed) { this.auto = null; this._events(r.ev, before); return; }
     this._events(r.ev, before, r);
+    this._watch();
+  }
+
+  /** After a move: tell the child when the room cannot be finished any more (so nobody is left stuck without knowing why), and
+   *  show the hint by itself when nothing happened for a while. */
+  _watch() {
+    clearTimeout(this._deadT); clearTimeout(this._idleT);
+    if (this.P.s.won) return;
+    this._deadT = setTimeout(() => {
+      if (this.mode !== 'play' || this.paused || this.P.s.won) return;
+      if (!hintMove(this.L, this.P.s)) { this.sound.play('hint'); this.banner(I.t('deadRoom'), 6000); }
+    }, 450);
+    this._idleT = setTimeout(() => { if (this.mode === 'play' && !this.paused && !this.P.s.won) this.showHint(); }, 22000);
   }
 
   _events(ev, before, r) {
@@ -347,8 +360,8 @@ class Game {
   }
   _popcount(n) { let c = 0; while (n) { c += n & 1; n >>= 1; } return c; }
 
-  undo() { if (this.mode !== 'play' || this.paused || this.locked) return; if (this.P.undo()) { this.sound.play('undo'); this._resync(); this.auto = null; } else this.sound.play('bump'); }
-  resetRoom() { if (this.mode !== 'play' || this.paused || this.locked) return; if (this.P.reset()) { this.sound.play('undo'); this._resync(); this.auto = null; } }
+  undo() { if (this.mode !== 'play' || this.paused || this.locked) return; if (this.P.undo()) { this.sound.play('undo'); this._resync(); this.auto = null; this._watch(); } else this.sound.play('bump'); }
+  resetRoom() { if (this.mode !== 'play' || this.paused || this.locked) return; if (this.P.reset()) { this.sound.play('undo'); this._resync(); this.auto = null; this._watch(); } }
   _resync() { this.vs = null; this._syncBlocks(true); this._snapExplorer(); this.hintArrow.visible = false; this._hud(); }
 
   showHint() {
@@ -534,6 +547,7 @@ class Game {
 
   pause() { this.sound.suspend(); if (this.mode === 'play' && !this.paused) this.togglePause(); }
   dispose() {
+    clearTimeout(this._deadT); clearTimeout(this._idleT);
     this.renderer.setAnimationLoop(null); this.sound.dispose(); if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey);
     this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove();

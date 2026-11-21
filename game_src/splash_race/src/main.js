@@ -383,7 +383,7 @@ class Game {
         class: `sp-isle${locked ? ' lock' : ''}`, style: `left:${spots[i][0]}%;top:${spots[i][1]}%`,
         'aria-label': `${t('round')} ${rd.id} ${name(rd)}`,
         onclick: () => { if (locked) { this.sound.play('no'); this.toast(t('locked')); return; } this.startRound(i); },
-      }, locked ? '🔒' : i === 3 ? '🏆' : num(rd.id), h('small', {}, name(rd)), h('span', { class: 'stars' }, locked ? '' : '⭐'.repeat(stars) + '☆'.repeat(3 - stars)));
+      }, locked ? '🔒' : i === ROUNDS.length - 1 ? '🏆' : num(rd.id), h('small', {}, name(rd)), h('span', { class: 'stars' }, locked ? '' : '⭐'.repeat(stars) + '☆'.repeat(3 - stars)));
     });
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('class', 'sp-dots');

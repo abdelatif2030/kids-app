@@ -18,6 +18,9 @@ export const STAGES = [
   { id: 1, waves: [[['ninja', 3]], [['ninja', 5]], [['ninja', 4], ['thrower', 1]], [['ninja', 5], ['big', 1]]], boss: 40 },
   { id: 2, waves: [[['ninja', 5]], [['ninja', 4], ['thrower', 2]], [['ninja', 5], ['big', 2]], [['ninja', 6], ['big', 1], ['thrower', 2]]], boss: 52 },
   { id: 3, waves: [[['ninja', 6], ['thrower', 1]], [['ninja', 5], ['big', 2], ['thrower', 1]], [['ninja', 7], ['thrower', 3]], [['ninja', 6], ['big', 3], ['thrower', 2]]], boss: 64 },
+  { id: 4, waves: [[['ninja', 7], ['thrower', 2]], [['ninja', 6], ['big', 3]], [['ninja', 8], ['thrower', 3]], [['ninja', 7], ['big', 3], ['thrower', 3]]], boss: 76 },
+  { id: 5, waves: [[['ninja', 8], ['thrower', 3]], [['ninja', 7], ['big', 3], ['thrower', 2]], [['ninja', 9], ['thrower', 4]], [['ninja', 8], ['big', 4], ['thrower', 3]]], boss: 88 },
+  { id: 6, waves: [[['ninja', 9], ['thrower', 3]], [['ninja', 8], ['big', 4], ['thrower', 3]], [['ninja', 10], ['thrower', 4]], [['ninja', 9], ['big', 5], ['thrower', 4]]], boss: 100 },
 ];
 
 const KIND = {
@@ -409,7 +412,7 @@ export function normalizeSave(raw) {
   if (s.stars && typeof s.stars === 'object') for (const st of STAGES) { const v = Math.floor(Number(s.stars[st.id])); if (v >= 1 && v <= 3) stars[st.id] = v; }
   const u = Math.floor(Number(s.unlocked));
   return {
-    unlocked: Number.isFinite(u) ? Math.max(1, Math.min(STAGES.length, u)) : 1,
+    unlocked: Math.max(1, Math.min(STAGES.length, Math.max(Number.isFinite(u) ? u : 1, ...Object.keys(stars).map((k) => Number(k) + 1)))),
     stars,
     best: Number.isFinite(Number(s.best)) && Number(s.best) > 0 ? Math.floor(Number(s.best)) : 0,
     muted: s.muted === true,

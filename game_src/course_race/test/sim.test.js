@@ -27,7 +27,7 @@ function run(theme, round, seed = 4, easy = false) {
 }
 
 test('three rounds, longer each, with the course elements of the theme', () => {
-  assert.equal(ROUNDS.length, 3);
+  assert.equal(ROUNDS.length, 6);
   const alien = buildCourse('alien', 2, 4).els.map((e) => e.kind);
   for (const k of ['gap', 'door', 'meteor']) assert.ok(alien.includes(k), k);
   const rhino = buildCourse('rhino', 2, 4).els.map((e) => e.kind);
@@ -37,7 +37,7 @@ test('three rounds, longer each, with the course elements of the theme', () => {
 
 test('a robot runner finishes every round of both games', () => {
   for (const theme of ['alien', 'rhino']) {
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < ROUNDS.length; i++) {
       const { r, t } = run(theme, i);
       assert.equal(r.state, 'done');
       console.log(`${theme} round ${i + 1}: place ${r.p.place} in ${t.toFixed(0)}s, hits ${r.p.hits}, falls ${r.p.falls}, qualified ${r.qualified}`);
@@ -65,5 +65,5 @@ test('the countdown first, then go; the jetpack has three bursts; a fall puts th
 
 test('damaged saves load safely', () => {
   assert.equal(normalizeSave(null).unlocked, 1);
-  assert.equal(normalizeSave({ unlocked: 99 }).unlocked, 3);
+  assert.equal(normalizeSave({ unlocked: 99 }).unlocked, 6);
 });

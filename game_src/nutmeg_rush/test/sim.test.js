@@ -44,15 +44,15 @@ function play(level, seed, cap = 240) {
   return { m, evs };
 }
 
-test('five levels with growing defenders and a keeper that gets wider', () => {
-  assert.equal(LEVELS.length, 5);
-  for (let i = 1; i < 5; i++) { assert.ok(LEVELS[i].defenders > LEVELS[i - 1].defenders); assert.ok(LEVELS[i].reach > LEVELS[i - 1].reach); assert.ok(LEVELS[i].windup < LEVELS[i - 1].windup); }
+test('seven levels with growing defenders and a keeper that gets wider', () => {
+  assert.equal(LEVELS.length, 7);
+  for (let i = 1; i < 7; i++) { assert.ok(LEVELS[i].defenders > LEVELS[i - 1].defenders); assert.ok(LEVELS[i].reach > LEVELS[i - 1].reach); assert.ok(LEVELS[i].windup < LEVELS[i - 1].windup); }
   assert.deepEqual(SKINS.map((s) => [s.id, s.price]), [['classic', 0], ['flame', 120], ['ice', 200], ['gold', 320]]);
 });
 
 test('a robot completes all 5 levels: dodge, nutmeg, shoot', () => {
   let won = 0, nut = 0, one = 0, dodge = 0, goals = 0, warns = 0, slides = 0;
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < LEVELS.length; i++) {
     const { m, evs } = play(i, 3);
     const r = m.result();
     console.log(`level ${i + 1}: mode ${m.mode} goal ${r.goal} stars ${r.stars} tricks ${r.tricks} (nutmeg ${m.stats.nutmegs}, one-two ${m.stats.onetwos}, dodge ${m.stats.dodges}) stolen ${m.stats.stolen} saves ${m.stats.saves} time ${m.time.toFixed(0)}s`);
@@ -176,9 +176,9 @@ test('easy mode (small children) is gentler', () => {
 });
 
 test('save is normalised, balls are bought once with coins and nothing is taken for failing', () => {
-  assert.equal(normalizeSave(null).unlocked, 1); assert.equal(normalizeSave({ unlocked: 99 }).unlocked, 5);
+  assert.equal(normalizeSave(null).unlocked, 1); assert.equal(normalizeSave({ unlocked: 99 }).unlocked, 7);
   const s = normalizeSave({ coins: 100, owned: ['gold', 'bogus'], skin: 'bogus', stars: [9, -1] });
-  assert.deepEqual(s.owned, ['classic', 'gold']); assert.equal(s.skin, 'classic'); assert.deepEqual(s.stars.slice(0, 2), [3, 0]); assert.equal(s.stars.length, 5);
+  assert.deepEqual(s.owned, ['classic', 'gold']); assert.equal(s.skin, 'classic'); assert.deepEqual(s.stars.slice(0, 2), [3, 0]); assert.equal(s.stars.length, 7);
   assert.equal(buySkin(s, 'ice'), false); assert.equal(s.coins, 100);
   const t = normalizeSave({ coins: 200 }); assert.ok(buySkin(t, 'flame')); assert.equal(t.coins, 80); assert.equal(buySkin(t, 'flame'), false); assert.equal(buySkin(t, 'gold'), false);
   assert.ok(selectSkin(t, 'classic') && t.skin === 'classic' && !selectSkin(t, 'gold'));
