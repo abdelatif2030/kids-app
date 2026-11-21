@@ -4,13 +4,13 @@
 // by themselves), dodge the telegraphed glaze rain and King Donut's rolling charge, tap SUPER for a giant jawbreaker. Candies buy
 // upgrades between runs. Portrait and landscape. three.js, art and sound made in code. No network, no ads, no tracking.
 import * as THREE from 'three';
-import { Run, ARENA, BEARS, KINDS, UPGRADES, normalizeSave, buyUpgrade, upgradeCost, applyResult } from './sim.js';
+import { Run, ARENA, BEARS, KINDS, UPGRADES, normalizeSave, buyUpgrade, upgradeCost, applyResult, STAGES } from './sim.js';
 import { Sound } from './audio.js';
 import { G, mesh, basic, clay, makeBear, makeEnemy, makeBoss, makeCandy, makeMint, makeJaw, shadowDisc, softDot, stripeTex, swirlTex } from './models.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 
 const S = {
-  title: ['فرقة الدببة الجيلي', 'GUMMY SQUAD'], play: ['العب', 'PLAY'], upgrades: ['التطويرات', 'UPGRADES'], settings: ['الإعدادات', 'SETTINGS'], back: ['رجوع', 'Back'],
+  title: ['فرقة الدببة الجيلي', 'GUMMY SQUAD'], play: ['العب', 'PLAY'], stage: ['المرحلة', 'Stage'], nextStage: ['المرحلة الجاية', 'Next stage'], upgrades: ['التطويرات', 'UPGRADES'], settings: ['الإعدادات', 'SETTINGS'], back: ['رجوع', 'Back'],
   sound: ['الصوت', 'Sound'], on: ['شغّال', 'On'], off: ['مقفول', 'Off'], language: ['اللغة', 'Language'], quit: ['خروج', 'Quit'],
   paused: ['استراحة', 'PAUSED'], resume: ['كمّل', 'RESUME'], restart: ['من الأول', 'RESTART'], home: ['الرئيسية', 'HOME'],
   wave: ['الموجة', 'WAVE'], boss: ['الملك دونات', 'KING DONUT'], bossIntro: ['الملك دونات وصل!', 'King Donut is here!'], super: ['سوبر', 'SUPER'],
@@ -31,6 +31,7 @@ const STYLE = css('gs', '#6a4ad0', '#2a1a78', '#ffd0f0') + `
 .gs-menu{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:calc(var(--u)*5) calc(var(--u)*4) calc(var(--u)*6);box-sizing:border-box;pointer-events:none}
 .gs-menu>*{pointer-events:auto}
 .gs-menu .gs-logo{font-size:calc(var(--u)*11);margin-top:calc(var(--u)*3);filter:drop-shadow(0 calc(var(--u)*.8) 0 rgba(60,10,90,.8))}
+.gs-stagebar{white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*3);color:#fff;font-weight:900;font-size:calc(var(--u)*4.2);text-shadow:0 2px 0 rgba(0,0,0,.35)}
 .gs-btns{display:flex;flex-direction:column;gap:calc(var(--u)*2);width:min(calc(var(--u)*70),90%)}
 @media (orientation:landscape){.gs-btns{flex-direction:row;width:min(calc(var(--u)*150),94%)}.gs-menu .gs-logo{font-size:calc(var(--u)*8);margin-top:0}}
 .gs-btn{background:linear-gradient(180deg,#ff9ad8,#e8509a);box-shadow:0 calc(var(--u)*.9) 0 #902a62,inset 0 calc(var(--u)*.5) 0 rgba(255,255,255,.4)}
@@ -287,12 +288,17 @@ class Game {
   _tap(fn) { return () => { this.sound.unlock(); this.sound.play('tap'); fn(); }; }
 
   showMenu() {
+    this.selStage = Math.min(this.selStage ?? this.save.stage, this.save.stage);
     this.mode = 'menu'; this._clear(); this._endRunVisuals(); this.root.setAttribute('dir', this.dir);
     this.sound.mode('calm');
     const best = this.save.bestStars;
     this.layer.append(h('div', { class: 'gs-menu' },
       h('div', { style: 'display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*1)' }, h('div', { class: 'gs-logo' }, I.t('title')), h('div', { class: 'gs-pill' }, '🍬 ', I.num(this.save.candies), best ? ` · ${'⭐'.repeat(best)}` : '')),
       h('div', { class: 'gs-btns' },
+        h('div', { class: 'gs-stagebar' },
+          h('button', { class: 'gs-round', 'aria-label': '-', onclick: this._tap(() => { this.selStage = Math.max(0, this.selStage - 1); this.showMenu(); }) }, '◀'),
+          h('b', {}, I.t('stage'), ' ', I.num(this.selStage + 1), ' / ', I.num(STAGES)),
+          h('button', { class: 'gs-round', 'aria-label': '+', onclick: this._tap(() => { this.selStage = Math.min(this.save.stage, this.selStage + 1); this.showMenu(); }) }, '▶')),
         h('button', { class: 'gs-btn go', onclick: this._tap(() => this.startRun()) }, '▶ ', I.t('play')),
         h('button', { class: 'gs-btn', onclick: this._tap(() => this.showUpgrades()) }, '🍭 ', I.t('upgrades')),
         h('button', { class: 'gs-btn dark', onclick: this._tap(() => this.showSettings()) }, '⚙ ', I.t('settings'))),
@@ -320,7 +326,7 @@ class Game {
 
   startRun() {
     this._endRunVisuals();
-    this.run = new Run({ seed: (Date.now() & 0xffffff) | 1, upgrades: this.save.upgrades, easy: this.age <= 3 });
+    this.run = new Run({ seed: (Date.now() & 0xffffff) | 1, upgrades: this.save.upgrades, easy: this.age <= 3, stage: this.selStage ?? 0 });
     this.mode = 'play'; this.paused = false; this.shake = 0; this.endT = 0; this.bossDeadAt = null; this.camInit = false; this.hintShown = 0;
     this.sound.mode('calm');
     this._clear(); this._buildHud();
@@ -382,6 +388,7 @@ class Game {
     this.layer.append(h('div', { class: 'gs-dim' }, h('div', { class: 'gs-card' }, h('div', { class: 'gs-title', style: 'font-size:calc(var(--u)*6.5)' }, I.t(res.win ? 'won' : 'lost')), res.win ? stars : null,
       h('div', { class: 'gs-row' }, h('span', {}, I.t('earned')), h('span', {}, '🍬 ', I.num(res.candies))), res.win ? h('div', { class: 'gs-row' }, h('span', {}, I.t('bonus')), h('span', {}, '🍬 ', I.num(res.bonus))) : null,
       h('div', { class: 'gs-row' }, h('span', {}, I.t('total')), h('span', {}, '🍬 ', I.num(this.save.candies))),
+      res.win && this.selStage < this.save.stage ? h('button', { class: 'gs-btn go', onclick: this._tap(() => { this.endShown = false; this.selStage += 1; this.startRun(); }) }, '▶ ', I.t('nextStage')) : null,
       h('button', { class: 'gs-btn go', onclick: this._tap(() => { this.endShown = false; this.startRun(); }) }, '▶ ', I.t('again')),
       h('button', { class: 'gs-btn', onclick: this._tap(() => { this.endShown = false; this.showUpgrades(); }) }, '🍭 ', I.t('upgrades')),
       h('button', { class: 'gs-btn dark', onclick: this._tap(() => { this.endShown = false; this.showMenu(); }) }, '🏠 ', I.t('home')))));

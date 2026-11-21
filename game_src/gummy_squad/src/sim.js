@@ -35,6 +35,10 @@ export const WAVES = [
   [[0.5, 'gummy', 3], [3, 'sour', 3], [7, 'gummy', 3], [10, 'sour', 2]],
   [[0.5, 'gummy', 3], [2.5, 'spitter', 2], [5, 'sour', 3], [8, 'tank', 1], [10, 'bomber', 2], [13, 'spitter', 2], [15, 'gummy', 3]],
 ];
+/** 2026-11-21: six stages. Each stage makes the sweets tougher and the boss stronger; from stage 3 a third wave comes first. */
+export const STAGES = 6;
+const THIRD_WAVE = [[0.5, 'gummy', 4], [2.5, 'sour', 4], [5, 'spitter', 2], [7.5, 'bomber', 2], [10, 'sour', 3]];
+export const stageMul = (stage) => ({ hp: 1 + 0.25 * stage, boss: 1 + 0.35 * stage, spd: 1 + 0.04 * stage });
 export const BOSS = { hp: 1100, r: 1.9, speed: 2.0, touch: 10 };
 const RAIN = { warn: [1.5, 1.3, 1.1], r: [1.9, 2.0, 2.2], dmg: 14 };
 const CHARGE = { warn: [1.35, 1.2, 1.05], speed: [14, 16, 18], dmg: 22, stun: [1.9, 1.7, 1.4] };
@@ -56,6 +60,7 @@ export function normalizeSave(raw) {
     candies: num(r.candies, 0, 999999),
     upgrades: { damage: num(u.damage, 0, UPGRADES.damage.max), health: num(u.health, 0, UPGRADES.health.max), charge: num(u.charge, 0, UPGRADES.charge.max) },
     bestStars: num(r.bestStars, 0, 3),
+    stage: num(r.stage, 0, 5), // the highest stage opened (0 = only the first)
     runs: num(r.runs, 0, 999999),
     wins: num(r.wins, 0, 999999),
     muted: !!r.muted,
@@ -80,7 +85,7 @@ export function applyResult(save, res) {
   const s = normalizeSave(save);
   s.candies = Math.min(999999, s.candies + res.candies + (res.bonus || 0));
   s.runs += 1;
-  if (res.win) { s.wins += 1; s.bestStars = Math.max(s.bestStars, res.stars); }
+  if (res.win) { s.wins += 1; s.bestStars = Math.max(s.bestStars, res.stars); if (res.stage === s.stage && s.stage < STAGES - 1) s.stage += 1; }
   return s;
 }
 
@@ -94,6 +99,9 @@ export class Run {
     this.hpMul = 1 + UPGRADES.health.per * up.health;
     this.chargeMul = 1 + UPGRADES.charge.per * up.charge;
     this.easy = !!opts.easy;
+    this.stage = Math.max(0, Math.min(STAGES - 1, opts.stage | 0));
+    this.mul = stageMul(this.stage);
+    this.waves = this.stage >= 2 ? [THIRD_WAVE, ...WAVES] : WAVES;
     this.t = 0; this.state = 'wave'; this.wave = 0; this.waveT = 0; this.spawnIdx = 0; this.gapT = 0;
     this.squad = { x: 0, y: 7, face: -Math.PI / 2, moving: false };
     this.bears = BEARS.map((b, i) => ({ id: b.id, idx: i, def: b, x: SLOTS[i][1] * 0 + this.squad.x, y: this.squad.y + 1, hp: Math.round(b.hp * this.hpMul), maxHp: Math.round(b.hp * this.hpMul), alive: true, inv: 0, cd: 0.3 + i * 0.1, aim: -Math.PI / 2, flash: 0, swing: 0, hasTarget: false }));
@@ -166,7 +174,7 @@ export class Run {
   _waves(dt) {
     if (this.state === 'wave') {
       this.waveT += dt;
-      const w = WAVES[this.wave];
+      const w = this.waves[this.wave];
       while (this.spawnIdx < w.length && w[this.spawnIdx][0] <= this.waveT) {
         const [, kind, n] = w[this.spawnIdx++];
         for (let i = 0; i < n; i++) this.spawn(kind);
@@ -175,7 +183,7 @@ export class Run {
     } else if (this.state === 'gap') {
       this.gapT -= dt;
       if (this.gapT <= 0) {
-        if (this.wave + 1 < WAVES.length) { this.wave++; this.state = 'wave'; this.waveT = 0; this.spawnIdx = 0; this.ev({ type: 'wave', n: this.wave + 1 }); }
+        if (this.wave + 1 < this.waves.length) { this.wave++; this.state = 'wave'; this.waveT = 0; this.spawnIdx = 0; this.ev({ type: 'wave', n: this.wave + 1 }); }
         else { this.state = 'boss'; this._spawnBoss(); }
       }
     }
@@ -191,14 +199,14 @@ export class Run {
         if (Math.hypot(x - this.squad.x, y - this.squad.y) > 7) break;
       }
     }
-    const e = { id: this.nextId++, kind, x, y, r: d.r, hp: d.hp, maxHp: d.hp, speed: d.speed * (this.easy ? 0.85 : 1), flash: 0, touchCd: 0.6, shotCd: 1 + this.rng() * 1.5, wind: 0, fuse: 0, age: 0, aim: 0 };
+    const e = { id: this.nextId++, kind, x, y, r: d.r, hp: d.hp * this.mul.hp, maxHp: d.hp * this.mul.hp, speed: d.speed * this.mul.spd * (this.easy ? 0.85 : 1), flash: 0, touchCd: 0.6, shotCd: 1 + this.rng() * 1.5, wind: 0, fuse: 0, age: 0, aim: 0 };
     this.enemies.push(e);
     this.ev({ type: 'spawn', kind, x, y });
     return e;
   }
 
   _spawnBoss() {
-    this.boss = { x: 0, y: -5, r: BOSS.r, hp: BOSS.hp * (this.easy ? 0.8 : 1), maxHp: BOSS.hp * (this.easy ? 0.8 : 1), state: 'intro', t: 0, phase: 1, atk: 0, dir: Math.PI / 2, hazard: null, hit: new Set(), flash: 0, touchCd: 0, volley: 0, face: Math.PI / 2, kind: 'boss' };
+    this.boss = { x: 0, y: -5, r: BOSS.r, hp: BOSS.hp * this.mul.boss * (this.easy ? 0.8 : 1), maxHp: BOSS.hp * this.mul.boss * (this.easy ? 0.8 : 1), state: 'intro', t: 0, phase: 1, atk: 0, dir: Math.PI / 2, hazard: null, hit: new Set(), flash: 0, touchCd: 0, volley: 0, face: Math.PI / 2, kind: 'boss' };
     this.ev({ type: 'bossIntro' });
   }
 
@@ -532,11 +540,11 @@ export class Run {
     if (this.boss && this.boss.state === 'dead') {
       this.over = true; this.state = 'won';
       const stars = this.stars;
-      this.result = { win: true, stars, candies: this.candies, bonus: 20 + 10 * stars };
+      this.result = { win: true, stars, candies: this.candies, bonus: 20 + 10 * stars + 6 * this.stage, stage: this.stage };
       this.ev({ type: 'won', stars });
     } else if (!this.aliveBears.length) {
       this.over = true; this.state = 'lost';
-      this.result = { win: false, stars: 0, candies: this.candies, bonus: 0 };
+      this.result = { win: false, stars: 0, candies: this.candies, bonus: 0, stage: this.stage };
       this.ev({ type: 'lost' });
     }
   }

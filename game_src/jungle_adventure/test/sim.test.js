@@ -86,7 +86,7 @@ test('holding jumps higher than tapping', () => {
 test('save: damaged data loads safely; levels open one by one; best results are kept', () => {
   assert.deepEqual(normalizeSave('junk'), emptySave());
   const s = normalizeSave({ unlocked: 99, coins: -4, best: { trail: { relics: 9, coins: 'x' } } });
-  assert.equal(s.unlocked, 3);
+  assert.equal(s.unlocked, 6);
   assert.equal(s.coins, 0);
   assert.equal(s.best.trail.relics, 3);
   const save = emptySave();

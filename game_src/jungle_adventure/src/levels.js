@@ -84,4 +84,38 @@ function temple() {
   return b.done({ id: 'temple', theme: 'temple', time: 70, ar: 'معبد الشمس', en: 'Sun Temple' });
 }
 
+/** 2026-11-21: a second, busier visit of a level: the same map with extra beetles on the flat ground and a little less time. */
+function remix(def, id, ar, en, gap, skip, bats = 0) {
+  const g = def.rows.map((r) => r.split(''));
+  const w = def.width;
+  let placed = 0;
+  for (let x = 24 + skip; x < w - 26; x += gap) {
+    for (let y = 2; y < ROWS - 2; y++) {
+      if (g[y][x] === ' ' && g[y + 1][x] === '#' && g[y + 1][x - 1] === '#' && g[y + 1][x + 1] === '#' && g[y][x - 1] === ' ' && g[y][x + 1] === ' ' && g[y - 1][x] === ' ') {
+        let free = true;
+        for (let dx = -3; dx <= 3; dx++) for (let dy = -3; dy <= 0; dy++) { const c = (g[y + dy] || [])[x + dx]; if (c && 'CTASMFHRbv^'.includes(c)) free = false; }
+        if (free) { g[y][x] = 'b'; placed++; }
+        break;
+      }
+    }
+  }
+  if (bats) {
+    for (let x = 30 + skip; x < w - 28; x += bats) {
+      let top = -1;
+      for (let y = 0; y < ROWS; y++) if (g[y][x] === '#') { top = y; break; }
+      const y = top - 3;
+      if (top < 0 || y < 1 || g[y][x] !== ' ') continue;
+      let free = true;
+      for (let dx = -3; dx <= 3; dx++) for (let dy = -2; dy <= 2; dy++) { const c = (g[y + dy] || [])[x + dx]; if (c && 'CTASMFHRbv^#='.includes(c)) free = false; }
+      if (free) { g[y][x] = 'v'; placed++; }
+    }
+  }
+  return { ...def, id, ar, en, time: Math.round(def.time * 0.94), rows: g.map((r) => r.join('')), extraBeetles: placed };
+}
+
 export const LEVELS = [trail(), ruins(), temple()];
+LEVELS.push(
+  remix(LEVELS[0], 'trail2', 'درب الأدغال الليلي', 'Jungle Trail by Night', 9, 0),
+  remix(LEVELS[1], 'ruins2', 'الخرائب المنسية', 'Forgotten Ruins', 6, 1, 13),
+  remix(LEVELS[2], 'temple2', 'معبد الشمس الكبير', 'Great Sun Temple', 6, 2, 12),
+);

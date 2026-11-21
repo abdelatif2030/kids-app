@@ -29,7 +29,8 @@
 ### مستويات إضافية (2026-11-21 لاحقًا)
 - nutmeg_rush 7، ocean_defense 7، rhythm 7، highway_race 6، samurai 6، alien_sky وrhino_summit 6 جولات، splash_race 6، dino_grow 6 (نفس الأشكال بعالم أكبر)، carnival_race 6 مسارات (3 مسارات معكوسة يمين/شمال بمخاطر زيادة). كلها اتجربت بالروبوت (اللي كان بيقص المستوى على 3/5 اتصلّح).
 - tomb_puzzle: 12 غرفة، أضفت تنبيه «الغرفة اتعقدت» تلقائي وتلميح بعد 22 ثانية من غير حركة.
-- لسه تحت 6 أو مفتوحة المحتوى: jungle_adventure (3)، gummy_squad (موجتين + بوس)، hero_tower (3 فصول)، fizz_runner، gum_ball، winter_camp، hot_spring، card_battle، sky_capy، مبدع الذكاء… دي محتاجة تصميم مستويات يدوي.
+- jungle_adventure: 6 مستويات (3 جديدة = نفس الخرائط بوحوش أكتر ووقت أقل). gummy_squad: 6 مراحل (وحوش وبوس أقوى، موجة تالتة من المرحلة 3، تفتح واحدة واحدة).
+- لسه تحت 6 أو مفتوحة المحتوى: hero_tower (3 فصول)، fizz_runner، gum_ball، winter_camp، hot_spring، card_battle، sky_capy، مبدع الذكاء… دي محتاجة تصميم مستويات يدوي.
 ### نتيجة فحص التشغيل الآلي (2026-11-21)
 - شغّلت 61 لعبة في Chrome headless بعرض 844×390 (`game_src/_play_all.mjs`)، ضغطت لحد اللعب ولعبت بالسحب والمفاتيح: **صفر أخطاء JavaScript**.
 - ألعاب لوحتها طولية وبتظهر ضيقة في الشاشة العرضية (لعبها شغال بس الاستفادة من الشاشة ضعيفة): creator_tycoon, ice_rink, marble_dozer, pin_puzzle, card_battle (الساحة). محتاجة تصميم عرضي لو عاوزها أحسن.

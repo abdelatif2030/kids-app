@@ -197,3 +197,21 @@ test('bears stay inside the arena', () => {
   for (const b of run.bears) { assert.ok(Math.abs(b.x) <= ARENA.hx && Math.abs(b.y) <= ARENA.hy); }
   assert.ok(BEAR_R > 0);
 });
+
+test('six stages: every stage is winnable by the robot with upgrades that grow, later stages are tougher', () => {
+  const ups = [{ damage: 2, health: 2, charge: 2 }, { damage: 2, health: 2, charge: 2 }, { damage: 3, health: 3, charge: 3 }, { damage: 3, health: 3, charge: 3 }, { damage: 4, health: 4, charge: 4 }, { damage: 5, health: 5, charge: 5 }];
+  let prevBoss = 0;
+  for (let st = 0; st < 6; st++) {
+    let won = 0;
+    for (let seed = 1; seed <= 6; seed++) { const r = new Run({ seed, upgrades: ups[st], stage: st }); while (!r.over && r.t < 400) r.step(1 / 60, robot(r)); if (r.state === 'won') won++; }
+    console.log(`stage ${st + 1}: won ${won}/6`);
+    assert.ok(won >= 3, `stage ${st + 1} won ${won}/6`);
+    const b = new Run({ seed: 1, stage: st }); b._spawnBoss(); assert.ok(b.boss.maxHp > prevBoss); prevBoss = b.boss.maxHp;
+  }
+});
+test('stages open one by one', () => {
+  let s = normalizeSave(null); assert.equal(s.stage, 0);
+  s = applyResult(s, { win: true, stars: 2, candies: 5, bonus: 0, stage: 0 }); assert.equal(s.stage, 1);
+  s = applyResult(s, { win: true, stars: 2, candies: 5, bonus: 0, stage: 0 }); assert.equal(s.stage, 1, 'replaying an old stage opens nothing new');
+  assert.equal(normalizeSave({ stage: 99 }).stage, 5);
+});
