@@ -16,6 +16,10 @@ export const CHAPTERS = [
   { id: 1, theme: 'castle', floors: 12, start: 8, ratio: 0.72, mulMax: 2 },
   { id: 2, theme: 'ice', floors: 12, start: 12, ratio: 0.78, mulMax: 2 },
   { id: 3, theme: 'fire', floors: 12, start: 20, ratio: 0.84, mulMax: 3 },
+  // 2026-11-21: three harder visits (same looks, bigger numbers)
+  { id: 4, theme: 'castle', floors: 12, start: 30, ratio: 0.86, mulMax: 3 },
+  { id: 5, theme: 'ice', floors: 12, start: 44, ratio: 0.88, mulMax: 3 },
+  { id: 6, theme: 'fire', floors: 12, start: 60, ratio: 0.9, mulMax: 4 },
 ];
 
 export const FOE_KINDS = ['slime', 'goblin', 'skeleton', 'imp', 'orc'];
@@ -185,6 +189,6 @@ export function normalizeSave(s) {
   const o = s && typeof s === 'object' ? s : {};
   const stars = {};
   for (const ch of CHAPTERS) { const v = o.stars && Number(o.stars[ch.id]); if (v >= 1 && v <= 3) stars[ch.id] = Math.floor(v); }
-  const unlocked = Math.max(1, Math.min(CHAPTERS.length, Math.floor(Number(o.unlocked)) || 1));
+  const unlocked = Math.max(1, Math.min(CHAPTERS.length, Math.max(Math.floor(Number(o.unlocked)) || 1, ...Object.keys(stars).map((k) => Number(k) + 1)))); // a won chapter opens the next
   return { unlocked, stars, muted: !!o.muted, plays: Math.max(0, Math.floor(Number(o.plays)) || 0) };
 }
