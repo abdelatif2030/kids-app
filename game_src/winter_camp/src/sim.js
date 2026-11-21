@@ -13,7 +13,9 @@ export const BUILDS = [
   { id: 'cabin', ar: 'الكوخ الخشبي', en: 'Log cabin', logs: 8 },
   { id: 'workshop', ar: 'الورشة', en: 'Workshop', logs: 14 },
   { id: 'sawmill', ar: 'المنشرة', en: 'Sawmill', logs: 20 },
-  { id: 'sled', ar: 'زلاجة المؤن', en: 'Supply sled', logs: 28 },
+  { id: 'greenhouse', ar: 'الصوبة الزجاجية', en: 'Glass greenhouse', logs: 34 },
+  { id: 'tower', ar: 'برج المراقبة', en: 'Watch tower', logs: 42 },
+  { id: 'sled', ar: 'زلاجة المؤن', en: 'Supply sled', logs: 52 },
 ];
 export const HELPER_COST = [10, 25, 45, 70];
 export const BAG_UPGRADE = [15, 35];

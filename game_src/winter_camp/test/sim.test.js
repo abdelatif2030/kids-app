@@ -17,7 +17,7 @@ function robot(c) {
   return d < 1.2 ? { dx: 0, dy: 0 } : { dx: (tx - me.x) / d, dy: (ty - me.y) / d };
 }
 
-test('a lone survivor with helpers builds cabin, workshop, sawmill and sled and opens the gate', () => {
+test('a lone survivor with helpers builds all six buildings (cabin to sled) and opens the gate', () => {
   const c = new Camp({ seed: 4 });
   let t = 0;
   while (c.state !== 'done' && t < 1500) {

@@ -399,7 +399,7 @@ class Game {
     const y = this._sy(SITE.y);
     const pm = this.pm;
     // finished builds stand in a row behind the site
-    const spots = [[-5.5, -2.2], [5.5, -2.2], [-5.5, 3.5], [5.5, 3.5]];
+    const spots = [[-5.5, -2.2], [5.5, -2.2], [-5.5, 3.5], [5.5, 3.5], [-10, 0.6], [10, 0.6]];
     for (let i = 0; i < c.stage; i++) this._structure(g, BUILDS[i].id, x + spots[i][0] * pm, y + spots[i][1] * pm, pm, 1);
     if (c.build) {
       const b = c.build;
@@ -436,6 +436,17 @@ class Game {
       g.fillStyle = '#d8dce4'; g.beginPath(); g.arc(0, -pm * 0.5, pm * 0.9, 0, 6.3); g.fill(); g.stroke();
       g.strokeStyle = '#8a8e96'; for (let i = 0; i < 8; i++) { const a = this.clock * 4 + (i * Math.PI) / 4; g.beginPath(); g.moveTo(0, -pm * 0.5); g.lineTo(Math.cos(a) * pm * 0.9, -pm * 0.5 + Math.sin(a) * pm * 0.9); g.stroke(); }
       g.fillStyle = '#e8c27a'; g.fillRect(-pm * 2.4, pm * 0.7, pm * 1.4, pm * 0.35); g.fillRect(-pm * 2.4, pm * 1.1, pm * 1.4, pm * 0.35);
+    } else if (id === 'greenhouse') {
+      g.fillStyle = 'rgba(190,235,255,.75)'; g.strokeStyle = '#4a8aa8'; g.lineWidth = pm * 0.12;
+      g.beginPath(); g.moveTo(-pm * 2, pm * 0.9); g.lineTo(-pm * 2, -pm * 0.5); g.lineTo(0, -pm * 1.9); g.lineTo(pm * 2, -pm * 0.5); g.lineTo(pm * 2, pm * 0.9); g.closePath(); g.fill(); g.stroke();
+      g.beginPath(); g.moveTo(0, -pm * 1.9); g.lineTo(0, pm * 0.9); g.moveTo(-pm * 1, -pm * 1.2); g.lineTo(-pm * 1, pm * 0.9); g.moveTo(pm * 1, -pm * 1.2); g.lineTo(pm * 1, pm * 0.9); g.stroke();
+      g.fillStyle = '#4ac05a'; for (let i = -1; i <= 1; i++) { g.beginPath(); g.arc(i * pm * 0.9, pm * 0.55, pm * 0.28, 0, 6.3); g.fill(); }
+    } else if (id === 'tower') {
+      g.fillStyle = '#9a7a4a'; g.strokeStyle = '#5a3e14'; g.lineWidth = pm * 0.12;
+      g.fillRect(-pm * 0.9, -pm * 2.2, pm * 1.8, pm * 3.2); g.strokeRect(-pm * 0.9, -pm * 2.2, pm * 1.8, pm * 3.2);
+      g.fillStyle = '#c8453a'; g.beginPath(); g.moveTo(-pm * 1.4, -pm * 2.2); g.lineTo(0, -pm * 3.5); g.lineTo(pm * 1.4, -pm * 2.2); g.closePath(); g.fill(); g.stroke();
+      g.fillStyle = '#ffd23a'; g.fillRect(-pm * 0.35, -pm * 1.7, pm * 0.7, pm * 0.7);
+      g.fillStyle = '#fff'; g.fillRect(-pm * 0.9, -pm * 2.4, pm * 1.8, pm * 0.25);
     } else {
       g.fillStyle = '#8a5a2a'; g.strokeStyle = '#4a2a0a'; g.lineWidth = pm * 0.12;
       g.beginPath(); g.roundRect(-pm * 1.8, -pm * 0.7, pm * 3.6, pm * 1.4, pm * 0.3); g.fill(); g.stroke();
