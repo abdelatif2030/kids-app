@@ -375,7 +375,7 @@ class Game {
     this.otter.rotation.y = 0;
     this.scene.add(this.otter);
     this._clear();
-    const spots = [[50, 82], [26, 56], [70, 38], [44, 14]];
+    const spots = [[50, 86], [24, 70], [72, 58], [28, 44], [70, 30], [46, 12]];
     const isles = ROUNDS.map((rd, i) => {
       const locked = i + 1 > this.save.unlocked;
       const stars = this.save.stars[rd.id] ?? 0;
