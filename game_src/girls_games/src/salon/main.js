@@ -7,11 +7,11 @@ import { loadAll, makeStage } from '../kit/kit.js';
 
 export const GIRLS = ['doll_light', 'doll_dark', 'doll_straight', 'doll_red'];
 export const TOOLS = [
-  { id: 'brush', ar: 'مشط', en: 'Brush', emoji: '🪮' },
-  { id: 'dress', ar: 'فستان', en: 'Dress', emoji: '👗' },
-  { id: 'bow', ar: 'فيونكة', en: 'Bows', emoji: '🎀' },
-  { id: 'style', ar: 'تسريحة', en: 'Style', emoji: '💇‍♀️' },
-  { id: 'polish', ar: 'أظافر', en: 'Nails', emoji: '💅' },
+  { id: 'brush', ar: 'مشط', en: 'Brush', emoji: '🪮', pic: 'tool_brush' },
+  { id: 'dress', ar: 'فستان', en: 'Dress', emoji: '👗', pic: 'dress_01' },
+  { id: 'bow', ar: 'فيونكة', en: 'Bows', emoji: '🎀', pic: 'bow_02' },
+  { id: 'style', ar: 'تسريحة', en: 'Style', emoji: '💇‍♀️', pic: 'tool_dryer' },
+  { id: 'polish', ar: 'أظافر', en: 'Nails', emoji: '💅', pic: 'tool_polish' },
 ];
 export const DRESSES = [1, 5, 9, 14]; // the dresses of the dress-up game that fit a sitting girl
 export const STYLES = 4; // the four girls are the four hair styles: wavy, curly, straight, bun
@@ -56,7 +56,7 @@ class Game {
     this.el = el; this.post = post || (() => {}); this.en = config.lang === 'en'; this.base = config.base || './'; this.disposed = false;
     if (!document.getElementById('sl-style')) document.head.append(h('style', { id: 'sl-style' }, CSS));
     this.m = new Makeover(); this.girl = 0; this.tool = 'style'; this.busy = false;
-    const names = [...GIRLS, ...DRESSES.map((n) => `dress_${String(n).padStart(2, '0')}`), ...Array.from({ length: BOWS }, (_, i) => `bow_${String(i + 1).padStart(2, '0')}`), 'bg_salon1', 'bg_salon2', 'bg_salon3'];
+    const names = [...GIRLS, ...DRESSES.map((n) => `dress_${String(n).padStart(2, '0')}`), 'tool_brush', 'tool_dryer', 'tool_polish', 'tool_mirror', 'tool_wand_pink', 'tool_comb', 'dress_01', 'bow_02', ...Array.from({ length: BOWS }, (_, i) => `bow_${String(i + 1).padStart(2, '0')}`), 'bg_salon1', 'bg_salon2', 'bg_salon3'];
     loadAll(this.base, [...names, ...Array.from({ length: 12 }, (_, i) => `fairy_${String(i + 1).padStart(2, '0')}`)]).then((art) => { this.art = art; if (!this.disposed) this._build(); });
   }
 
@@ -65,12 +65,14 @@ class Game {
     const bgs = [A.bg_salon1, A.bg_salon2, A.bg_salon3, A.bg_salon1, A.bg_salon2, A.bg_salon3];
     this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, fairy: Object.fromEntries([1,2,3,4,5,6,7,8,9,10,11,12].map((n) => [n, this.art[`fairy_${String(n).padStart(2, '0')}`]])), title: this.en ? 'Hair salon' : 'صالون الشعر', places: PLACES, bgs, onPlace: () => {} });
     this.girlEl = h('div', { class: 'sl-girl', onclick: () => { this.girl = (this.girl + 1) % GIRLS.length; this._girl(); this.stage.say(this.en ? 'A new friend!' : 'صاحبة جديدة!'); } });
-    this.tools = h('div', { class: 'sl-tools' }, TOOLS.map((t) => h('button', { class: 'sl-tool', 'data-tool': t.id, 'aria-label': this.en ? t.en : t.ar, onclick: () => this._pickTool(t) }, t.emoji)));
+    this.tools = h('div', { class: 'sl-tools' }, TOOLS.map((t) => h('button', { class: 'sl-tool', 'data-tool': t.id, 'aria-label': this.en ? t.en : t.ar, onclick: () => this._pickTool(t) }, this._icon(t))));
     this.opts = h('div', { class: 'sl-opts' });
     this.stage.layer.append(this.girlEl, h('div', { class: 'sl-panel' }, this.tools, this.opts));
     this._girl(); this._pickTool(TOOLS[3], true);
     this.stage.say(this.en ? 'Make her hair beautiful!' : 'خلينا نعمل شعرها حلو!');
   }
+
+  _icon(t) { const im = this.art[t.pic]; return im ? h('img', { src: im.src, alt: '', draggable: 'false', style: 'max-width:80%;max-height:80%;object-fit:contain;pointer-events:none' }) : t.emoji; }
 
   _girl() {
     const A = this.art; const im = A[GIRLS[this.m.style ? this.m.style - 1 : this.girl]];
@@ -82,12 +84,14 @@ class Game {
     if (this.m.polish) for (const x of [24, 36, 64, 76]) this.girlEl.append(h('div', { class: 'sl-nail', style: `left:${x}%;background:${POLISH[(this.m.polish - 1) % 4]}` }));
   }
 
+  _pic(n, fb) { const im = this.art[n]; return im ? h('img', { src: im.src, alt: '', draggable: 'false' }) : fb; }
+
   _pickTool(t, silent) {
     this.tool = t.id;
     this.tools.querySelectorAll('.sl-tool').forEach((b) => b.classList.toggle('on', b.dataset.tool === t.id));
     this.opts.replaceChildren();
     const mk = (content, fn, label) => h('button', { class: 'sl-opt', 'aria-label': label, onclick: (e) => fn(e) }, content);
-    if (t.id === 'brush') this.opts.append(mk('🪮', (e) => this._apply('brush', 0, e), 'brush'));
+    if (t.id === 'brush') [['tool_brush', '🪮'], ['tool_comb', '🪮'], ['tool_wand_pink', '🪄']].forEach(([n, fb], k) => this.opts.append(mk(this._pic(n, fb), (e) => this._apply('brush', k, e), `brush ${k}`)));
     if (t.id === 'dress') DRESSES.forEach((n, i) => { const im = this.art[`dress_${String(n).padStart(2, '0')}`]; this.opts.append(mk(im ? h('img', { src: im.src, alt: '', draggable: 'false' }) : '👗', (e) => this._apply('dress', n, e), `dress ${i}`)); });
     if (t.id === 'bow') [1, 3, 6, 9].forEach((n, k) => { const im = this.art[`bow_${String(n).padStart(2, '0')}`]; this.opts.append(mk(im ? h('img', { src: im.src, alt: '', draggable: 'false' }) : '🎀', (e) => this._apply('bow', n, e), `bow ${k}`)); });
     if (t.id === 'style') GIRLS.forEach((g, i) => { const im = this.art[g]; this.opts.append(mk(im ? h('img', { src: im.src, alt: '', draggable: 'false' }) : '💇‍♀️', (e) => this._apply('style', i + 1, e), `style ${i + 1}`)); });

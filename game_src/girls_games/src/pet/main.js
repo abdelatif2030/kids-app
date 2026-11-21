@@ -12,10 +12,10 @@ export const CHARS = [
   { id: 'puppy', ar: 'الكلب الصغير', en: 'Puppy', emoji: '🐶' },
 ];
 export const STEPS = [
-  { id: 'feed', ar: 'أكل', en: 'Feed', emoji: '🍼', need: 'hungry', doing: 'eating', ask: ['جعانة! نأكلها؟', 'Hungry! Shall we feed?'], done: ['ممممم حلو!', 'Yummy!'] },
-  { id: 'bath', ar: 'حمّام', en: 'Bath', emoji: '🛁', need: 'muddy', doing: 'bath', ask: ['اتوسخت! نحممها؟', 'Muddy! Bath time?'], done: ['نضيفة وبتضحك!', 'Clean and giggling!'] },
-  { id: 'brush', ar: 'تسريح', en: 'Brush', emoji: '🪮', need: 'towel', doing: 'brush', ask: ['نسرّحها؟', 'Brush time?'], done: ['شكلها جميل!', 'So pretty!'] },
-  { id: 'sleep', ar: 'نوم', en: 'Sleep', emoji: '🌙', need: 'yawn', doing: 'sleep', ask: ['نعسانة! تنام؟', 'Sleepy! Time for bed?'], done: ['نامت. نوم هنيّ!', 'Sweet dreams!'] },
+  { id: 'feed', ar: 'أكل', en: 'Feed', emoji: '🍼', pic: 'care_01', need: 'hungry', doing: 'eating', ask: ['جعانة! نأكلها؟', 'Hungry! Shall we feed?'], done: ['ممممم حلو!', 'Yummy!'] },
+  { id: 'bath', ar: 'حمّام', en: 'Bath', emoji: '🛁', pic: 'care_05', need: 'muddy', doing: 'bath', ask: ['اتوسخت! نحممها؟', 'Muddy! Bath time?'], done: ['نضيفة وبتضحك!', 'Clean and giggling!'] },
+  { id: 'brush', ar: 'تسريح', en: 'Brush', emoji: '🪮', pic: 'care_08', need: 'towel', doing: 'brush', ask: ['نسرّحها؟', 'Brush time?'], done: ['شكلها جميل!', 'So pretty!'] },
+  { id: 'sleep', ar: 'نوم', en: 'Sleep', emoji: '🌙', pic: 'care_11', need: 'yawn', doing: 'sleep', ask: ['نعسانة! تنام؟', 'Sleepy! Time for bed?'], done: ['نامت. نوم هنيّ!', 'Sweet dreams!'] },
 ];
 export const PLACES = [
   { ar: 'غرفة البيبي', en: 'Nursery', emoji: '🍼' }, { ar: 'الجنينة', en: 'Garden', emoji: '🌳' }, { ar: 'الحمّام', en: 'Bathroom', emoji: '🛁' },
@@ -54,7 +54,7 @@ class Game {
     if (!document.getElementById('pt-style')) document.head.append(h('style', { id: 'pt-style' }, CSS));
     this.round = new Round(); this.char = null; this.pose = 'happy'; this.busy = false;
     const poses = ['happy', 'hungry', 'eating', 'bottle', 'muddy', 'bath', 'towel', 'brush', 'dressed', 'yawn', 'sleep', 'hug'];
-    const names = [...CHARS.flatMap((c) => poses.map((p) => `${c.id}_${p}`)), 'bg_nursery', 'bg_garden'];
+    const names = [...CHARS.flatMap((c) => poses.map((p) => `${c.id}_${p}`)), 'care_01', 'care_05', 'care_08', 'care_11', 'bg_nursery', 'bg_garden'];
     loadAll(this.base, [...names, ...Array.from({ length: 12 }, (_, i) => `fairy_${String(i + 1).padStart(2, '0')}`)]).then((art) => { this.art = art; if (!this.disposed) this._build(); });
   }
 
@@ -85,10 +85,12 @@ class Game {
     this._clear();
     this.petEl = h('div', { class: 'pt-pet' });
     this.hintEl = h('div', { class: 'pt-hint' });
-    this.stepsEl = h('div', { class: 'pt-steps' }, STEPS.map((s) => h('button', { class: 'pt-step', 'data-step': s.id, 'aria-label': this.en ? s.en : s.ar, onclick: (e) => this._doStep(s, e) }, h('i', {}, s.emoji), this.en ? s.en : s.ar)));
+    this.stepsEl = h('div', { class: 'pt-steps' }, STEPS.map((s) => h('button', { class: 'pt-step', 'data-step': s.id, 'aria-label': this.en ? s.en : s.ar, onclick: (e) => this._doStep(s, e) }, this._stepIcon(s), this.en ? s.en : s.ar)));
     this.stage.layer.append(this.petEl, this.hintEl, this.stepsEl);
     this._refresh();
   }
+
+  _stepIcon(s) { const im = this.art[s.pic]; return im ? h('img', { src: im.src, alt: '', draggable: 'false', style: 'height:calc(var(--u)*8);width:calc(var(--u)*8);object-fit:contain;pointer-events:none' }) : h('i', {}, s.emoji); }
 
   _show(pose) {
     this.pose = pose;
