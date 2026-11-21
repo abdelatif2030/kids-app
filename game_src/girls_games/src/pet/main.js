@@ -62,7 +62,7 @@ class Game {
 
   _build() {
     const bgs = [this.art.bg_nursery, this.art.bg_garden, this.art.bg_nursery, this.art.bg_garden, null, null];
-    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', title: this.en ? 'Baby & pet' : 'بيبي وصاحبها', places: PLACES, bgs, onPlace: () => {} });
+    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, title: this.en ? 'Baby & pet' : 'بيبي وصاحبها', places: PLACES, bgs, onPlace: () => {} });
     this._pick();
   }
 

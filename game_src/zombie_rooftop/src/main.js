@@ -7,6 +7,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { Rooftop, ROOFS, PERKS, UPGRADES, WEAPONS, MAX_UP, upCost, weaponOf, normalizeSave } from './sim.js';
+import { loadSprites } from '../../cozy_kit/art.js';
 import {
   mat, basic, box, LOOKS, makeHero, makeWeapon, makeZombie, makeVent, makeWaterTower, makeTanks, makePlanter, makeChimney,
   makePad, makeCrate, makeHeart, coinGeometry, makeRoof, makeBuilding, makeNeonSign, makeCrane, makeClockTower, skyTexture,
@@ -111,7 +112,24 @@ function bakeInto(group, skip = []) {
 }
 
 const zombieTemplates = new Map();
+let ZPICS = {};
+/** The painted zombie (owner's sheet): a camera-facing picture standing on the roof; it keeps the same fields as the 3D one. */
+function paintedZombie(kind, variant) {
+  const names = kind === 'brute' ? ['z_fat'] : kind === 'king' ? ['z_bucket'] : kind === 'sprinter' ? ['z_small'] : ['z_normal', 'z_cone', 'z_bandage', 'z_flower', 'z_yellow', 'z_tutu'];
+  const pic = ZPICS[names[variant % names.length]] || ZPICS[names[0]];
+  if (!pic) return null;
+  const s = kind === 'king' ? 2.1 : kind === 'brute' ? 1.45 : kind === 'sprinter' ? 0.92 : 1;
+  const root = new THREE.Group(); const body = new THREE.Group(); root.add(body);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: pic.tex, transparent: true, alphaTest: 0.05, toneMapped: false, fog: false, depthWrite: false }));
+  sp.center.set(0.5, 0.02); sp.scale.set(1.9 * pic.aspect, 1.9, 1); sp.renderOrder = 3;
+  body.add(sp);
+  const dummy = () => ({ rotation: { x: 0, y: 0, z: 0 } });
+  return { root, body, legs: [dummy(), dummy()], arms: [dummy(), dummy()], s };
+}
+
 function zombieModel(kind, variant) {
+  const painted = paintedZombie(kind, variant);
+  if (painted) return painted;
   const key = `${kind}${variant}`;
   if (!zombieTemplates.has(key)) {
     const z = makeZombie(kind, variant);
@@ -173,7 +191,7 @@ class Game {
     this.goodWin = 0;
     this.clock = new THREE.Clock();
     this._buildScene();
-    this._fonts().then(() => {
+    Promise.all([this._fonts(), loadSprites(THREE, this.base, ['z_normal', 'z_cone', 'z_bandage', 'z_flower', 'z_yellow', 'z_tutu', 'z_fat', 'z_bucket', 'z_small']).then((sp) => { ZPICS = sp; })]).then(() => {
       this.loading.remove();
       this._buildWorld(Math.min(this.save.unlocked, ROOFS.length) - 1);
       this.showMenu();

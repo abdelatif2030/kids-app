@@ -132,3 +132,8 @@ Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 r
 - UX Mag — Designing experiences for young kids: https://uxmag.com/articles/designing-experiences-for-young-kids
 - Common Sense Media — guide to a 2–4 year old's digital world: https://www.commonsensemedia.org/articles/parents-ultimate-guide-to-your-2-to-4-year-olds-digital-world
 - أمثلة على السوق (وصف المطورين، مش تقييمات مستقلة): Budge World https://apps.apple.com/us/app/-/id1051902027 ، Little Girl Games https://apps.apple.com/app/id6744453771 ، Kids Games for 2,3,4 Year Olds https://apps.apple.com/app/id1052704329
+
+## ٩) الأصوات (اتنفّذت 2026-11-22)
+- كل جمل ألعاب البنات (105 جملة، عربي مصري) اتسجّلت بصوت **فاطمة** (ElevenLabs I3u6waC588j43py1kDN2، نفس إعدادات اللعبة التعليمية، نص مُشكَّل بالكامل): `tools/girls_voice/lines.mjs` (الجمل وتشكيلها) و`node tools/girls_voice/make.mjs` (التوليد؛ المفتاح من متغير البيئة فقط).
+- الألعاب بتشغّل التسجيلات من `assets/games/learn_voice/ar` (نفس مكتبة اللعبة التعليمية) وصوت الجهاز فقط لو جملة مالهاش تسجيل. الإنجليزي لسه بصوت الجهاز.
+- فحص بالـ speech-to-text: متوسط 0.92؛ 6 مشتبه فيهم كلهم كلمات قصيرة (بيبي، مشط، التاج، صاحبة جديدة، ممممم حلو، رشّ حلو): استمعي ليهم الأول في الاستماع النهائي.

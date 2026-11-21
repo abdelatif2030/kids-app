@@ -63,7 +63,7 @@ class Game {
   _build() {
     const A = this.art;
     const bgs = [A.bg_salon1, A.bg_salon2, A.bg_salon3, A.bg_salon1, A.bg_salon2, A.bg_salon3];
-    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', title: this.en ? 'Hair salon' : 'صالون الشعر', places: PLACES, bgs, onPlace: () => {} });
+    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, title: this.en ? 'Hair salon' : 'صالون الشعر', places: PLACES, bgs, onPlace: () => {} });
     this.girlEl = h('div', { class: 'sl-girl', onclick: () => { this.girl = (this.girl + 1) % GIRLS.length; this._girl(); this.stage.say(this.en ? 'A new friend!' : 'صاحبة جديدة!'); } });
     this.tools = h('div', { class: 'sl-tools' }, TOOLS.map((t) => h('button', { class: 'sl-tool', 'data-tool': t.id, 'aria-label': this.en ? t.en : t.ar, onclick: () => this._pickTool(t) }, t.emoji)));
     this.opts = h('div', { class: 'sl-opts' });

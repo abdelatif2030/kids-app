@@ -22,6 +22,8 @@ for (const t of seq.split('|').filter(Boolean)) {
   await sleep(1800);
 }
 await sleep(Number(wait));
+const rr = await S('Runtime.evaluate', { expression: `JSON.stringify([...document.querySelectorAll('.sl-girl,.sl-girl img.base')].map(e=>{const r=e.getBoundingClientRect();return [e.className,Math.round(r.left),Math.round(r.top),Math.round(r.width),Math.round(r.height)]}))`, returnByValue: true }); if (process.env.DBG) console.log(rr.result && rr.result.result && rr.result.result.value);
+if (process.env.NET) { const nn = await S('Runtime.evaluate', { expression: `JSON.stringify(performance.getEntriesByType('resource').map(e=>e.name).filter(n=>/learn_voice/.test(n)).map(n=>n.split('/').slice(-2).join('/')))`, returnByValue: true }); console.log('voice files:', nn.result && nn.result.result && nn.result.result.value); }
 const r = await S('Page.captureScreenshot', { format: 'png' });
 if (r.result) fs.writeFileSync(out, Buffer.from(r.result.data, 'base64'));
 chrome.kill(); process.exit(0);

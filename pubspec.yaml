@@ -118,6 +118,7 @@ flutter:
     - assets/games/air_race/
     - assets/games/air_race/art/
     - assets/games/zombie_rooftop/
+    - assets/games/zombie_rooftop/art/
     - assets/games/gum_ball/
     - assets/games/deep_sea/
     - assets/games/deep_sea/art/

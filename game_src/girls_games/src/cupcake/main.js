@@ -68,7 +68,7 @@ class Game {
   _build() {
     const A = this.art;
     const bgs = [A.bg_bakery1, A.bg_bakery2, A.bg_bakery3, A.bg_bakery1, A.bg_bakery2, A.bg_bakery3];
-    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', title: this.en ? 'Cupcake shop' : 'محل الكب كيك', places: PLACES, bgs, onPlace: (i) => { this._newOrder(i); } });
+    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, title: this.en ? 'Cupcake shop' : 'محل الكب كيك', places: PLACES, bgs, onPlace: (i) => { this._newOrder(i); } });
     this.bakerEl = h('div', { class: 'cu-baker' });
     const b = A.baker_01; if (b) { this.bakerEl.style.setProperty('--ar', String(b.naturalWidth / b.naturalHeight)); this.bakerEl.append(h('img', { src: b.src, alt: '', draggable: 'false' })); } else this.bakerEl.append(h('div', { style: 'font-size:calc(var(--u)*24)' }, '👩‍🍳'));
     this.tableEl = h('div', { class: 'cu-table' });
@@ -85,7 +85,7 @@ class Game {
     this.guestsEl.replaceChildren();
     for (let i = 0; i < this.order.guests; i++) this.guestsEl.append(h('button', { class: 'cu-guest', 'data-g': String(i), 'aria-label': `guest ${i + 1}`, onclick: () => this._serve(i) }, this._guestImg(i, 'wait')));
     this._refresh();
-    this.stage.say(this.en ? `${this.order.guests} friends are waiting for cupcakes!` : this.order.guests === 1 ? 'صاحبتك مستنية كب كيك!' : `${this.order.guests} أصحاب مستنيين كب كيك!`);
+    this.stage.say(this.en ? `${this.order.guests} friends are waiting for cupcakes!` : this.order.guests === 1 ? 'صاحبتك مستنية كب كيك!' : `${['', '', 'اتنين', 'تلاتة', 'أربعة', 'خمسة', 'ستة'][this.order.guests]} أصحاب مستنيين كب كيك!`);
   }
 
   _guestImg(i, mood) {

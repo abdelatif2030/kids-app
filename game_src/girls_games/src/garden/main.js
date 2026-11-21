@@ -13,6 +13,7 @@ export const COLORS = [
   { id: 'purple', ar: 'بنفسجي', en: 'purple', css: '#b06aff', sprout: 'fl1_10', small: 'fl1_10', big: 'fl2_05' },
   { id: 'orange', ar: 'برتقالي', en: 'orange', css: '#ff9a3a', sprout: 'fl1_12', small: 'fl1_12', big: 'fl2_06' },
 ];
+export const FEM = ['حمرا', 'صفرا', 'وردي', 'زرقا', 'بنفسجي', 'برتقالي']; // the colour word for «زهرة ...» (feminine)
 export const POTS = 6;
 export const PLACES = [
   { ar: 'مرج الربيع', en: 'Spring meadow', emoji: '🌼' }, { ar: 'حقل التوليب', en: 'Tulip field', emoji: '🌷' }, { ar: 'مزرعة دوّار الشمس', en: 'Sunflower farm', emoji: '🌻' },
@@ -64,7 +65,7 @@ class Game {
   _build() {
     const A = this.art;
     const bgs = [A.bg_garden1, A.bg_garden2, A.bg_garden3, A.bg_garden1, A.bg_garden2, A.bg_garden3];
-    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', title: this.en ? 'Butterfly garden' : 'حديقة الفراشات', places: PLACES, bgs, onPlace: () => this._reset() });
+    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, title: this.en ? 'Butterfly garden' : 'حديقة الفراشات', places: PLACES, bgs, onPlace: () => this._reset() });
     this.potsEl = h('div', { class: 'ga-pots' }, Array.from({ length: POTS }, (_, i) => h('button', { class: 'ga-pot', 'data-pot': String(i), 'aria-label': `pot ${i + 1}`, onclick: (e) => this._tapPot(i, e) }, h('div', { class: 'clay' }))));
     this.seedsEl = COLORS.map((c, i) => h('button', { class: `ga-seed${i === 0 ? ' on' : ''}`, 'data-seed': String(i), 'aria-label': `seed ${c.en}`, style: `background:${c.css}`, onclick: () => this._pickSeed(i) }, '🌱'));
     this.canEl = h('button', { class: 'ga-can', 'aria-label': 'water', onclick: () => { this.stage.say(this.en ? 'Tap a planted pot to water it!' : 'دوسي على الأصيص المزروع عشان تسقيه!'); } }, '🚿');
@@ -108,7 +109,7 @@ class Game {
       if (!st) { this._wiggle(pot); return; }
       for (let k = 0; k < 4; k++) { const d = h('div', { class: 'ga-rain', style: `left:${e.clientX - this.stage.root.getBoundingClientRect().left + (k - 2) * 12}px;top:${e.clientY - this.stage.root.getBoundingClientRect().top - 30}px` }, '💧'); this.stage.root.append(d); setTimeout(() => d.remove(), 900); }
       this._paint();
-      this.stage.say(st === 2 ? (this.en ? 'It is sprouting!' : 'بتطلع!') : st === 3 ? (this.en ? `A ${COLORS[this.g.pots[i].color].en} flower! A butterfly!` : `زهرة ${COLORS[this.g.pots[i].color].ar}! وفراشة!`) : (this.en ? 'A big flower!' : 'زهرة كبيرة!'));
+      this.stage.say(st === 2 ? (this.en ? 'It is sprouting!' : 'بتطلع!') : st === 3 ? (this.en ? `A ${COLORS[this.g.pots[i].color].en} flower! A butterfly!` : `زهرة ${FEM[this.g.pots[i].color]}! وفراشة!`) : (this.en ? 'A big flower!' : 'زهرة كبيرة!'));
       this.stage.sparkle(e.clientX, e.clientY, 6);
       if (st === 3) this._butterfly(pot);
       this._checkDone();

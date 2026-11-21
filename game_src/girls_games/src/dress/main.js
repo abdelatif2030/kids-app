@@ -77,7 +77,7 @@ class Game {
   _build() {
     const A = this.art;
     const bgs = ['bg_bedroom', 'bg_garden_tea', 'bg_ice', 'bg_beach', 'bg_forest', 'bg_ballroom'].map((n) => A[n]);
-    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', title: this.en ? 'Little princess' : 'ألبسي الأميرة', places: PLACES, bgs, onPlace: () => { this._tray(); } });
+    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, title: this.en ? 'Little princess' : 'ألبسي الأميرة', places: PLACES, bgs, onPlace: () => { this._tray(); } });
     this.layer = this.stage.layer;
     this.dollEl = h('div', { class: 'dr-doll', onclick: () => { this.doll = (this.doll + 1) % DOLLS.length; this._doll(); this.stage.say(this.en ? 'A new princess!' : 'أميرة جديدة!'); } });
     this.layer.append(this.dollEl);

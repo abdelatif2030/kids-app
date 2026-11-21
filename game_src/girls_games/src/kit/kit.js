@@ -2,6 +2,7 @@
 // a voice helper (the app says the words), a finish panel with ONE star (never for time) and a gentle "again". No timers, no scores,
 // no locks, no coins, no failing. Pictures are optional: every picture has a fallback so a missing file never breaks a game.
 import { h } from '../../../cozy_kit/ui.js';
+import { Voice } from '../../../learn_games/src/kit/voice.js';
 
 export const loadImg = (base, name) => new Promise((resolve) => {
   const img = new Image();
@@ -80,7 +81,9 @@ export function makeStage(el, opts) {
     else { const [a, b] = STAGE_FALLBACK[i % STAGE_FALLBACK.length]; bg.style.background = `linear-gradient(180deg,${a},${b})`; }
   };
   setBg(0);
-  const say = (t) => { if (t) post({ type: 'speak', text: t, lang: en ? 'en' : 'ar', slow: true }); };
+  // Fatima's recordings (the learning games' voice, assets/games/learn_voice) first; the app's device voice only when a sentence has no recording
+  const voice = new Voice(opts.base || './', en ? 'en' : 'ar', (text, lg) => post({ type: 'speak', text, lang: lg, slow: true }), () => {});
+  const say = (t) => { if (t) voice.say(t); };
   const sparkle = (x, y, n = 8) => {
     const r = root.getBoundingClientRect();
     for (let i = 0; i < n; i++) {
@@ -116,5 +119,5 @@ export function makeStage(el, opts) {
     h('button', { class: 'gk-rb', 'aria-label': en ? 'Back' : 'رجوع', onclick: () => post({ type: 'exit' }) }, en ? '←' : '→'),
     h('div', { class: 'gk-title' }, title),
     h('button', { class: 'gk-rb p', 'aria-label': en ? 'Places' : 'الأماكن', onclick: openPlaces }, '🗺️')));
-  return { root, layer, setBg, say, sparkle, finish, openPlaces, get place() { return place; }, dispose() { ro.disconnect(); root.remove(); } };
+  return { root, layer, setBg, say, sparkle, finish, openPlaces, get place() { return place; }, dispose() { try { voice.stop(); } catch (_) { /* fine */ } ro.disconnect(); root.remove(); } };
 }
