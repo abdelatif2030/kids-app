@@ -1,10 +1,75 @@
-# برومتات توليد الصور من ChatGPT — جاهزة للنسخ (81 برومت)
+# برومتات توليد الصور من ChatGPT — جاهزة للنسخ (87 برومت)
 
 **الطريقة:** كل برومت تحت **كتلة واحدة كاملة** (فيها الأسلوب وقواعد الشيت والعناصر) — انسخها كلها كما هي في ChatGPT. ابعتيلي الصورة الناتجة وأنا أقصّها (`python tools/cut_sprite.py شيت.png 4x3 الأسماء مجلد_اللعبة/art`) وأركّبها في اللعبة.
 
 **الترتيب المقترح (الأهم أولًا):** A1 ← A2 ← A3 ← … (عربيات) ثم C1..C6 (ألبسي الأميرة) ثم باقي ألعاب البنات ثم B (الشخصيات) ثم E (الخلفيات).
 
 **نصايح لـ ChatGPT:** (1) ولّد الصورة بنسبة 3:2 (1536×1024). (2) لو الخلفية طلعت مش بيضا صافية قول: «Make the background pure flat white #FFFFFF, remove the shadows». (3) لو العناصر لزقت في بعض قول: «Increase the margin between items, no overlaps». (4) اطلب نفس الشخصية في كل الخانات: «Keep the exact same character design in every cell». (5) في الخلفيات: اطلب 16:9 (1920×1080) صورة واحدة.
+
+
+---
+
+## G — إضافات لزيادة محتوى مستويات عالم الأميرة
+
+### G1 — عالم الأميرة: ٨ بنات إضافيين للصالون وألبسي الأميرة (وقفة)
+- **الملفات:** `doll_5..doll_12`
+- **بتفتح:** little_salon / little_princess_dress
+
+```
+Premium glossy 3D-rendered cartoon art for a toddler girls' game: soft studio lighting, smooth rounded shapes, big expressive sparkling eyes, adorable characters, pink / lilac / white / gold pastel palette, sparkles, kid friendly. No text, no letters, no numbers, no logos, no real brands, nothing scary.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 8 more cute toddler-style girl dolls in the same front standing pose with hands on hips, each in a white slip and a pink hair bow, same style as the first four dolls, with different skin tones and hairstyles: black braids, blonde pigtails, auburn bun, curly afro puffs, long wavy dark-brown, short bob, red curly, side ponytail. 4 columns x 2 rows, fill 8 cells.
+```
+
+### G2 — عالم الأميرة: ٦ حقائب وعقود وأغراض زينة (١٢)
+- **الملفات:** `acc_01..acc_12`
+- **بتفتح:** little_princess_dress
+
+```
+Premium glossy 3D-rendered cartoon art for a toddler girls' game: soft studio lighting, smooth rounded shapes, big expressive sparkling eyes, adorable characters, pink / lilac / white / gold pastel palette, sparkles, kid friendly. No text, no letters, no numbers, no logos, no real brands, nothing scary.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 princess accessories for a dress-up game: pink handbag, heart purse, star backpack, pearl necklace, heart necklace, flower necklace, magic wand with a star, fairy wings, pink gloves, butterfly bracelet, sunglasses with heart frames, tiny umbrella.
+```
+
+### G3 — بيبي وصاحبها: ٤ أصدقاء إضافيين بوضعيات الرعاية (بطة صغيرة)
+- **الملفات:** `duck_*`
+- **بتفتح:** baby_and_pet
+
+```
+Premium glossy 3D-rendered cartoon art for a toddler girls' game: soft studio lighting, smooth rounded shapes, big expressive sparkling eyes, adorable characters, pink / lilac / white / gold pastel palette, sparkles, kid friendly. No text, no letters, no numbers, no logos, no real brands, nothing scary.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): A cute cartoon baby duckling, FRONT view, 12 poses: happy, hungry, eating, drinking, dirty with mud, bathing in bubbles, wrapped in a towel, getting brushed, wearing a bow, yawning, sleeping under a blanket, hugging a toy.
+```
+
+### G4 — بيبي وصاحبها: خروف صغير بوضعيات الرعاية
+- **الملفات:** `lamb_*`
+- **بتفتح:** baby_and_pet
+
+```
+Premium glossy 3D-rendered cartoon art for a toddler girls' game: soft studio lighting, smooth rounded shapes, big expressive sparkling eyes, adorable characters, pink / lilac / white / gold pastel palette, sparkles, kid friendly. No text, no letters, no numbers, no logos, no real brands, nothing scary.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): A cute cartoon baby lamb, FRONT view, 12 poses: happy, hungry, eating, drinking, dirty with mud, bathing in bubbles, wrapped in a towel, getting brushed, wearing a bow, yawning, sleeping under a blanket, hugging a toy.
+```
+
+### G5 — محل الكب كيك: ٦ أكواب إضافية وزينة وطلبات (١٢)
+- **الملفات:** `cup_13..cup_24`
+- **بتفتح:** cupcake_shop
+
+```
+Premium glossy 3D-rendered cartoon art for a toddler girls' game: soft studio lighting, smooth rounded shapes, big expressive sparkling eyes, adorable characters, pink / lilac / white / gold pastel palette, sparkles, kid friendly. No text, no letters, no numbers, no logos, no real brands, nothing scary.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 6 more empty paper cupcake liners in new colors and patterns (mint with stars, peach with dots, lilac with hearts, coral with flowers, sky blue with stripes, lemon with stars) followed by their 6 finished cupcakes with swirled cream, sprinkles and a cherry, matching colors.
+```
+
+### G6 — حديقة الفراشات: ٦ أنواع زهور إضافية بثلاث مراحل
+- **الملفات:** `fl3_*`
+- **بتفتح:** butterfly_garden
+
+```
+Premium glossy 3D-rendered cartoon art for a toddler girls' game: soft studio lighting, smooth rounded shapes, big expressive sparkling eyes, adorable characters, pink / lilac / white / gold pastel palette, sparkles, kid friendly. No text, no letters, no numbers, no logos, no real brands, nothing scary.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 6 more flower types, each in two growth stages side by side in one cell pair (sprout then full bloom), cartoon: tulip, daisy, sunflower, lavender, lily, rose. 4 columns x 3 rows: row 1 sprout/bloom of tulip and daisy, row 2 sunflower and lavender, row 3 lily and rose.
+```
 
 
 ---

@@ -13,7 +13,8 @@ export const TOOLS = [
   { id: 'style', ar: 'تسريحة', en: 'Style', emoji: '💇‍♀️', pic: 'tool_dryer' },
   { id: 'polish', ar: 'أظافر', en: 'Nails', emoji: '💅', pic: 'tool_polish' },
 ];
-export const DRESSES = [1, 5, 9, 14]; // the dresses of the dress-up game that fit a sitting girl
+export const DRESSES = Array.from({ length: 24 }, (_, i) => i + 1); // all the dresses of the dress-up game
+export const CLIENTS = 3; // a salon day: THREE girls get a makeover for ONE star // the dresses of the dress-up game that fit a sitting girl
 export const STYLES = 4; // the four girls are the four hair styles: wavy, curly, straight, bun
 export const BOWS = 12;
 export const PLACES = [
@@ -23,32 +24,38 @@ export const PLACES = [
 
 /** The rules (no browser): she can look in the mirror after three DIFFERENT tools were used; one star per finished makeover. */
 export class Makeover {
-  constructor() { this.used = new Set(); this.style = 0; this.dress = 0; this.bow = 0; this.polish = 0; this.brushed = 0; this.stars = 0; }
+  constructor() { this.used = new Set(); this.style = 0; this.dress = 0; this.bow = 0; this.polish = 0; this.brushed = 0; this.stars = 0; this.clients = 0; }
   use(tool) { this.used.add(tool); }
   get ready() { return this.used.size >= 3; }
-  mirror() { if (!this.ready) return false; this.stars += 1; return true; }
+  /** The mirror: 'no' (not ready), 'next' (this girl is done, the next one sits down) or 'star' (the third girl: the salon day is over). */
+  mirror() {
+    if (!this.ready) return 'no';
+    this.clients += 1;
+    if (this.clients >= CLIENTS) { this.stars += 1; this.clients = 0; return 'star'; }
+    return 'next';
+  }
   reset() { this.used.clear(); this.style = 0; this.dress = 0; this.bow = 0; this.polish = 0; this.brushed = 0; }
 }
 
-const POLISH = ['#ff6ab0', '#6ab8ff', '#b06aff', '#ffd23a'];
+const POLISH = ['#ff6ab0', '#6ab8ff', '#b06aff', '#ffd23a', '#ff4a4a', '#4ae8a0', '#ff9a3a', '#ffffff'];
 const CSS = `
 .sl-girl{position:absolute;left:32%;bottom:calc(var(--u)*2);height:calc(var(--u)*50);width:calc(var(--u)*50*var(--ar,.6));transform:translateX(-50%);z-index:2;cursor:pointer}
 .sl-girl .base{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .sl-girl .dr{position:absolute;left:50%;top:40%;transform:translateX(-50%);width:72%;height:45%;object-fit:contain;pointer-events:none}
 .sl-girl .bow{position:absolute;left:58%;top:-2%;width:30%;height:13%;object-fit:contain;pointer-events:none}
 .sl-nail{position:absolute;bottom:34%;width:7%;aspect-ratio:1;border-radius:50%;pointer-events:none;box-shadow:0 0 6px rgba(255,255,255,.8)}
-.sl-panel{position:absolute;right:calc(var(--u)*2);top:calc(var(--u)*14);width:calc(var(--u)*40);z-index:6;display:flex;flex-direction:column;gap:calc(var(--u)*2.2);align-items:center;background:rgba(255,255,255,.55);border-radius:calc(var(--u)*4);padding:calc(var(--u)*2);border:calc(var(--u)*.6) solid #fff;direction:ltr}
+.sl-panel{position:absolute;right:calc(var(--u)*2);top:calc(var(--u)*17);bottom:calc(var(--u)*2);width:calc(var(--u)*44);z-index:6;display:flex;flex-direction:column;gap:calc(var(--u)*1.8);align-items:center;padding:calc(var(--u)*2);direction:ltr}
 .sl-tools{display:flex;gap:calc(var(--u)*1.6);justify-content:center;flex-wrap:wrap}
-.sl-tool{width:calc(var(--u)*10);min-width:52px;height:calc(var(--u)*10);min-height:52px;border-radius:calc(var(--u)*3);border:calc(var(--u)*.6) solid #fff;background:linear-gradient(180deg,#fff0fa,#ffc8e8);font-size:calc(var(--u)*5.2);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 calc(var(--u)*.7) 0 rgba(160,40,120,.5);padding:0;font-family:inherit}
+.sl-tool{width:calc(var(--u)*8);min-width:48px;height:calc(var(--u)*8);min-height:48px;border-radius:calc(var(--u)*3);border:calc(var(--u)*.6) solid #fff;background:linear-gradient(180deg,#fff0fa,#ffc8e8);font-size:calc(var(--u)*5.2);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 calc(var(--u)*.7) 0 rgba(160,40,120,.5);padding:0;font-family:inherit}
 .sl-tool.on{background:linear-gradient(180deg,#ffe88a,#ffb030);outline:calc(var(--u)*.7) solid #fff}
-.sl-opts{display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*2)}
-.sl-opt{width:calc(var(--u)*16);height:calc(var(--u)*16);min-width:64px;min-height:64px;border-radius:calc(var(--u)*3);border:calc(var(--u)*.6) solid #fff;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:calc(var(--u)*.8);box-shadow:0 calc(var(--u)*.7) 0 rgba(160,40,120,.45);font-family:inherit;font-weight:900;font-size:calc(var(--u)*3.6);color:#a82a78}
+.sl-opts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:calc(var(--u)*1.6);flex:1;min-height:0;width:100%;overflow-y:auto;padding:calc(var(--u)*.6);scrollbar-width:thin;touch-action:pan-y}
+.sl-opt{width:100%;aspect-ratio:1;min-height:60px;border-radius:calc(var(--u)*3);border:calc(var(--u)*.6) solid #fff;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:calc(var(--u)*.8);box-shadow:0 calc(var(--u)*.7) 0 rgba(160,40,120,.45);font-family:inherit;font-weight:900;font-size:calc(var(--u)*3.6);color:#a82a78}
 .sl-opt img{max-width:100%;max-height:100%;object-fit:contain;pointer-events:none}
 .sl-dot{width:70%;height:70%;border-radius:50%;border:2px solid #fff;pointer-events:none}
 .sl-mirror{position:absolute;left:calc(var(--u)*3);bottom:calc(var(--u)*3);z-index:7;animation:gkb 1.2s infinite}
 .sl-twirl{animation:sltw 1s ease-in-out 2}
 @keyframes sltw{0%{transform:translateX(-50%) rotate(0)}50%{transform:translateX(-50%) rotate(7deg) scale(1.06)}100%{transform:translateX(-50%) rotate(0)}}
-@media (max-aspect-ratio:1/1){.sl-girl{left:50%;height:calc(var(--u)*52);bottom:calc(var(--u)*52)}.sl-panel{left:50%;right:auto;transform:translateX(-50%);top:auto;bottom:calc(var(--u)*2);width:calc(var(--u)*92)}}
+@media (max-aspect-ratio:1/1){.sl-girl{left:50%;height:calc(var(--u)*52);bottom:calc(var(--u)*52)}.sl-panel{left:50%;right:auto;transform:translateX(-50%);top:auto;bottom:calc(var(--u)*2);width:calc(var(--u)*94);height:calc(var(--u)*44)}.sl-opts{grid-template-columns:repeat(4,1fr)}}
 `;
 
 class Game {
@@ -64,11 +71,11 @@ class Game {
     const A = this.art;
     const bgs = [A.bg_salon1, A.bg_salon2, A.bg_salon3, A.bg_salon1, A.bg_salon2, A.bg_salon3];
     this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, fairy: Object.fromEntries([1,2,3,4,5,6,7,8,9,10,11,12].map((n) => [n, this.art[`fairy_${String(n).padStart(2, '0')}`]])), title: this.en ? 'Hair salon' : 'صالون الشعر', places: PLACES, bgs, onPlace: () => {} });
-    this.girlEl = h('div', { class: 'sl-girl', onclick: () => { this.girl = (this.girl + 1) % GIRLS.length; this._girl(); this.stage.say(this.en ? 'A new friend!' : 'صاحبة جديدة!'); } });
+    this.girlEl = h('div', { class: 'sl-girl gk-idle', onclick: () => { this.girl = (this.girl + 1) % GIRLS.length; this._girl(); this.stage.say(this.en ? 'A new friend!' : 'صاحبة جديدة!'); } });
     this.tools = h('div', { class: 'sl-tools' }, TOOLS.map((t) => h('button', { class: 'sl-tool', 'data-tool': t.id, 'aria-label': this.en ? t.en : t.ar, onclick: () => this._pickTool(t) }, this._icon(t))));
     this.opts = h('div', { class: 'sl-opts' });
-    this.stage.layer.append(this.girlEl, h('div', { class: 'sl-panel' }, this.tools, this.opts));
-    this._girl(); this._pickTool(TOOLS[3], true);
+    this.stage.layer.append(this.girlEl, h('div', { class: 'sl-panel gk-panel' }, this.tools, this.opts));
+    this._girl(); this._pickTool(TOOLS[3], true); this.stage.progress(0, CLIENTS);
     this.stage.say(this.en ? 'Make her hair beautiful!' : 'خلينا نعمل شعرها حلو!');
   }
 
@@ -76,7 +83,7 @@ class Game {
 
   _girl() {
     const A = this.art; const im = A[GIRLS[this.m.style ? this.m.style - 1 : this.girl]];
-    this.girlEl.replaceChildren();
+    this.girlEl.replaceChildren(h('div', { class: 'gk-shadow' }));
     if (im) { this.girlEl.style.setProperty('--ar', String(im.naturalWidth / im.naturalHeight)); this.girlEl.append(h('img', { class: 'base', src: im.src, draggable: 'false', alt: '' })); }
     else this.girlEl.append(h('div', { style: 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*28)' }, '👧'));
     if (this.m.dress) { const di = A[`dress_${String(this.m.dress).padStart(2, '0')}`]; if (di) this.girlEl.append(h('img', { class: 'dr', src: di.src, draggable: 'false', alt: '' })); }
@@ -93,7 +100,7 @@ class Game {
     const mk = (content, fn, label) => h('button', { class: 'sl-opt', 'aria-label': label, onclick: (e) => fn(e) }, content);
     if (t.id === 'brush') [['tool_brush', '🪮'], ['tool_comb', '🪮'], ['tool_wand_pink', '🪄']].forEach(([n, fb], k) => this.opts.append(mk(this._pic(n, fb), (e) => this._apply('brush', k, e), `brush ${k}`)));
     if (t.id === 'dress') DRESSES.forEach((n, i) => { const im = this.art[`dress_${String(n).padStart(2, '0')}`]; this.opts.append(mk(im ? h('img', { src: im.src, alt: '', draggable: 'false' }) : '👗', (e) => this._apply('dress', n, e), `dress ${i}`)); });
-    if (t.id === 'bow') [1, 3, 6, 9].forEach((n, k) => { const im = this.art[`bow_${String(n).padStart(2, '0')}`]; this.opts.append(mk(im ? h('img', { src: im.src, alt: '', draggable: 'false' }) : '🎀', (e) => this._apply('bow', n, e), `bow ${k}`)); });
+    if (t.id === 'bow') Array.from({ length: BOWS }, (_, i) => i + 1).forEach((n, k) => { const im = this.art[`bow_${String(n).padStart(2, '0')}`]; this.opts.append(mk(im ? h('img', { src: im.src, alt: '', draggable: 'false' }) : '🎀', (e) => this._apply('bow', n, e), `bow ${k}`)); });
     if (t.id === 'style') GIRLS.forEach((g, i) => { const im = this.art[g]; this.opts.append(mk(im ? h('img', { src: im.src, alt: '', draggable: 'false' }) : '💇‍♀️', (e) => this._apply('style', i + 1, e), `style ${i + 1}`)); });
     if (t.id === 'polish') POLISH.forEach((c, i) => this.opts.append(mk(h('div', { class: 'sl-dot', style: `background:${c}` }), (e) => this._apply('polish', i + 1, e), `polish ${i}`)));
     if (!silent) this.stage.say(this.en ? t.en : t.ar);
@@ -115,7 +122,9 @@ class Game {
   }
 
   _mirror() {
-    if (!this.m.mirror()) return;
+    const res = this.m.mirror();
+    if (res === 'no') return;
+    this.post({ type: 'item', kind: 'hairdo', girl: this.m.style ? this.m.style - 1 : this.girl, dress: this.m.dress, bow: this.m.bow });
     this.busy = true;
     if (this.mirrorBtn) { this.mirrorBtn.remove(); this.mirrorBtn = null; }
     this.girlEl.classList.add('sl-twirl');
@@ -125,7 +134,9 @@ class Game {
     setTimeout(() => {
       if (this.disposed) return;
       this.girlEl.classList.remove('sl-twirl');
-      this.stage.finish(() => { this.m.reset(); this.busy = false; this._girl(); this._pickTool(TOOLS[3], true); this.stage.say(this.en ? 'Another makeover!' : 'نعمل تسريحة جديدة!'); });
+      this.stage.progress(res === 'star' ? CLIENTS : this.m.clients, CLIENTS);
+      const nextGirl = () => { this.m.reset(); this.busy = false; this.girl = (this.girl + 1) % GIRLS.length; this._girl(); this._pickTool(TOOLS[3], true); this.stage.progress(this.m.clients, CLIENTS); this.stage.say(this.en ? 'The next girl is here!' : 'جات صاحبة جديدة!'); };
+      if (res === 'star') this.stage.finish(nextGirl); else nextGirl();
     }, 2400);
   }
 

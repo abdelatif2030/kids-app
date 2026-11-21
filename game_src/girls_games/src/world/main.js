@@ -9,6 +9,7 @@ import { start as startSalon } from '../salon/main.js';
 import { start as startPet } from '../pet/main.js';
 import { start as startCupcake } from '../cupcake/main.js';
 import { start as startGarden } from '../garden/main.js';
+import { start as startParty, normalizeBag, addItem } from '../party/main.js';
 
 export const LEVELS = [
   { id: 'dress', folder: 'little_princess_dress', ar: 'ألبسي الأميرة', en: 'Dress up', emoji: '👗', start: startDress },
@@ -16,11 +17,12 @@ export const LEVELS = [
   { id: 'pet', folder: 'baby_and_pet', ar: 'بيبي وصاحبها', en: 'Baby & pet', emoji: '🍼', start: startPet },
   { id: 'cupcake', folder: 'cupcake_shop', ar: 'محل الكب كيك', en: 'Cupcake shop', emoji: '🧁', start: startCupcake },
   { id: 'garden', folder: 'butterfly_garden', ar: 'حديقة الفراشات', en: 'Butterfly garden', emoji: '🦋', start: startGarden },
+  { id: 'party', folder: 'girls_world', ar: 'الحفلة الكبيرة', en: 'The big party', emoji: '🎉', start: startParty },
 ];
 
 /** The saved progress: stars per level (never negative, capped), and the sound switch. Damaged data becomes a clean start. */
 export function normalizeSave(s) {
-  const o = { stars: {}, muted: false };
+  const o = { stars: {}, muted: false, bag: normalizeBag(s && s.bag) };
   for (const l of LEVELS) { const v = s && s.stars ? Number(s.stars[l.id]) : 0; o.stars[l.id] = Number.isFinite(v) && v > 0 ? Math.min(999, Math.floor(v)) : 0; }
   o.muted = !!(s && s.muted);
   return o;
@@ -44,6 +46,8 @@ const CSS = `
 .gw-snd{position:absolute;top:calc(var(--u)*2);left:calc(var(--u)*2);z-index:6}
 .gw-back{position:absolute;top:calc(var(--u)*2);right:calc(var(--u)*2);z-index:6}
 .gw-game{position:absolute;inset:0;z-index:10}
+.gw-bagnote{position:absolute;bottom:calc(var(--u)*2);right:calc(var(--u)*3);background:rgba(255,255,255,.9);border:calc(var(--u)*.5) solid #ffd86a;border-radius:99px;padding:calc(var(--u)*.8) calc(var(--u)*3);font-weight:900;font-size:calc(var(--u)*3.6);color:#a82a78;box-shadow:0 calc(var(--u)*.6) 0 rgba(160,40,120,.4)}
+.gw-door.party{flex:1.35 1 0;max-width:calc(var(--u)*30);border-color:#ffd23a;box-shadow:0 calc(var(--u)*1.2) 0 #c07a10,0 0 calc(var(--u)*4) rgba(255,210,60,.8)}
 @media (max-aspect-ratio:1/1){.gw-path{flex-wrap:wrap;top:calc(var(--u)*14);gap:calc(var(--u)*3)}.gw-door{flex:0 0 calc(var(--u)*28);max-width:none}}
 @media (prefers-reduced-motion:reduce){.gw-fairy{animation:none}}
 `;
@@ -76,7 +80,7 @@ class World {
     hub.append(h('div', { class: 'gw-title' }, this.en ? "Princess world" : 'عالم الأميرة'));
     hub.append(h('div', { class: 'gw-path' }, LEVELS.map((l, i) => {
       const card = `${this.base}../${l.folder}/card.webp`;
-      return h('button', { class: 'gw-door', 'data-level': l.id, 'aria-label': this.en ? l.en : l.ar, style: `background-image:url(${card})`, onclick: () => this._open(l) },
+      return h('button', { class: `gw-door${l.id === 'party' ? ' party' : ''}`, 'data-level': l.id, 'aria-label': this.en ? l.en : l.ar, style: `background-image:url(${card})`, onclick: () => this._open(l) },
         h('div', { class: 'num' }, String(i + 1)), h('div', { class: 'nm' }, `${l.emoji} ${this.en ? l.en : l.ar}`), h('div', { class: 'st' }, starRow(this.save.stars[l.id])));
     })));
     const fairy = new Image(); fairy.src = `${this.base}../little_princess_dress/art/fairy_02.webp`;
@@ -87,6 +91,8 @@ class World {
     hub.append(snd);
     this.root.append(hub);
     this.hub = hub;
+    const bg = this.save.bag; const have = bg.flowers.reduce((a, b) => a + b, 0) + bg.cupcakes + bg.looks + bg.hairdos + Object.values(bg.friends).reduce((a, b) => a + b, 0);
+    if (have > 0) hub.append(h('div', { class: 'gw-bagnote' }, this.en ? `🎒 ${have} things for the party` : `🎒 ${have} حاجة للحفلة`));
     if (music.ctx) music.ambient('hub');
   }
 
@@ -96,11 +102,14 @@ class World {
     music.unlock(); music.tap(); music.ambient('play'); music.mode = 'play';
     const box = h('div', { class: 'gw-game' });
     this.root.append(box);
-    const cfg = { ...this.config, base: `${this.base}../${level.folder}/` };
+    const cfg = { ...this.config, base: `${this.base}../${level.folder}/`, bag: this.save.bag };
     const post = (msg) => {
       if (!msg) return;
       if (msg.type === 'exit') { this._close(); return; }
       if (msg.type === 'star') { this.save.stars[level.id] = Math.min(999, (this.save.stars[level.id] || 0) + 1); this._save(); return; }
+      if (msg.type === 'item') { addItem(this.save.bag, msg); this._save(); return; }
+      if (msg.type === 'bag') { this.save.bag = normalizeBag(msg.bag); if (level.id === 'party' && msg.bag && msg.bag.parties > (this._parties || 0)) { this._parties = msg.bag.parties; this.save.stars.party = (this.save.stars.party || 0) + 1; } this._save(); return; }
+      if (msg.type === 'goto') { const to = LEVELS[Number(msg.level)]; if (to) { this._close(); this._open(to); } return; }
       if (msg.type === 'speak') return; // no voice in this world
     };
     this.game = { level, box, api: level.start(box, cfg, post) };

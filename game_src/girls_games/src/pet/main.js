@@ -22,6 +22,20 @@ export const PLACES = [
   { ar: 'الحظيرة', en: 'Barn', emoji: '🐄' }, { ar: 'الكوخ الدافي', en: 'Cozy cabin', emoji: '🏔️' }, { ar: 'غرفة قوس قزح', en: 'Rainbow room', emoji: '🌈' },
 ];
 
+/** A day of care: ALL FOUR friends in turn (the one the child picked first), each with the four steps; ONE star at the end (owner 2026-11-22: levels were too short). */
+export class Journey {
+  constructor(first = 0) { this.order = [first, ...[0, 1, 2, 3].filter((i) => i !== first)]; this.idx = 0; this.round = new Round(); this.stars = 0; this.friendsDone = 0; }
+  get char() { return CHARS[this.order[this.idx]].id; }
+  /** One step for the current friend. Returns 'no', 'step', 'friend' (this friend is done, the next arrives) or 'star' (the fourth friend is done). */
+  step(id) {
+    if (!this.round.do(id)) return 'no';
+    if (!this.round.complete) return 'step';
+    this.round.finish(); this.friendsDone += 1;
+    if (this.friendsDone >= CHARS.length) { this.stars += 1; this.friendsDone = 0; this.idx = 0; return 'star'; }
+    this.idx += 1; return 'friend';
+  }
+}
+
 /** The rules (no browser needed): the steps can be done in any order, each once; a round is complete when all four are done; one star per round. */
 export class Round {
   constructor() { this.done = new Set(); this.stars = 0; }
@@ -39,20 +53,20 @@ const CSS = `
 .pt-pet{position:absolute;left:34%;bottom:calc(var(--u)*2);height:calc(var(--u)*50);transform:translateX(-50%);z-index:2;display:flex;align-items:flex-end}
 .pt-pet img{height:100%;max-width:calc(var(--u)*60);object-fit:contain;pointer-events:none}
 .pt-pet .emo{font-size:calc(var(--u)*24)}
-.pt-steps{position:absolute;right:calc(var(--u)*2);top:calc(var(--u)*15);display:flex;flex-direction:column;gap:calc(var(--u)*2.4);z-index:6}
-.pt-step{width:calc(var(--u)*30);min-width:96px;height:calc(var(--u)*12.5);min-height:56px;border-radius:calc(var(--u)*4);border:calc(var(--u)*.7) solid #fff;background:linear-gradient(180deg,#fff0fa,#ffc8e8);font-size:calc(var(--u)*4.4);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*1.6);box-shadow:0 calc(var(--u)*.8) 0 rgba(160,40,120,.5);font-family:inherit;padding:0 calc(var(--u)*2);color:#a82a78;font-weight:900;direction:ltr}
+.pt-steps{position:absolute;right:calc(var(--u)*2);top:calc(var(--u)*19);display:grid;grid-template-columns:1fr 1fr;gap:calc(var(--u)*2);z-index:6;padding:calc(var(--u)*2.2)}
+.pt-step{width:calc(var(--u)*19);min-width:84px;height:calc(var(--u)*17);min-height:64px;flex-direction:column;border-radius:calc(var(--u)*4);border:calc(var(--u)*.7) solid #fff;background:linear-gradient(180deg,#fff0fa,#ffc8e8);font-size:calc(var(--u)*4.4);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*1.6);box-shadow:0 calc(var(--u)*.8) 0 rgba(160,40,120,.5);font-family:inherit;padding:0 calc(var(--u)*2);color:#a82a78;font-weight:900;direction:ltr}
 .pt-step i{font-style:normal;font-size:calc(var(--u)*7)}
 .pt-step.next{animation:gkb 1.2s infinite;background:linear-gradient(180deg,#ffe88a,#ffb030)}
 .pt-step.done{background:linear-gradient(180deg,#bff5c8,#7ad88a);opacity:.85}
 .pt-hint{position:absolute;left:34%;top:calc(var(--u)*15);transform:translateX(-50%);z-index:4;background:rgba(255,255,255,.92);border:calc(var(--u)*.6) solid #fff;border-radius:calc(var(--u)*4);padding:calc(var(--u)*1.4) calc(var(--u)*3);font-weight:900;font-size:calc(var(--u)*4.2);color:#a82a78;max-width:45%;text-align:center}
-@media (max-aspect-ratio:1/1){.pt-pet{left:50%;height:calc(var(--u)*55);bottom:calc(var(--u)*40)}.pt-steps{left:50%;right:auto;transform:translateX(-50%);top:auto;bottom:calc(var(--u)*2);flex-direction:row}.pt-step{width:calc(var(--u)*22)}.pt-hint{left:50%}}
+@media (max-aspect-ratio:1/1){.pt-pet{left:50%;height:calc(var(--u)*55);bottom:calc(var(--u)*40)}.pt-steps{left:50%;right:auto;transform:translateX(-50%);top:auto;bottom:calc(var(--u)*2);display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;width:calc(var(--u)*94)}.pt-step{width:calc(var(--u)*22)}.pt-hint{left:50%}}
 `;
 
 class Game {
   constructor(el, config, post) {
     this.el = el; this.post = post || (() => {}); this.en = config.lang === 'en'; this.base = config.base || './'; this.disposed = false;
     if (!document.getElementById('pt-style')) document.head.append(h('style', { id: 'pt-style' }, CSS));
-    this.round = new Round(); this.char = null; this.pose = 'happy'; this.busy = false;
+    this.round = new Round(); this.char = null; this.pose = 'happy'; this.busy = false; this.journey = null;
     const poses = ['happy', 'hungry', 'eating', 'bottle', 'muddy', 'bath', 'towel', 'brush', 'dressed', 'yawn', 'sleep', 'hug'];
     const names = [...CHARS.flatMap((c) => poses.map((p) => `${c.id}_${p}`)), 'care_01', 'care_05', 'care_08', 'care_11', 'bg_nursery', 'bg_garden'];
     loadAll(this.base, [...names, ...Array.from({ length: 12 }, (_, i) => `fairy_${String(i + 1).padStart(2, '0')}`)]).then((art) => { this.art = art; if (!this.disposed) this._build(); });
@@ -70,7 +84,7 @@ class Game {
     this._clear();
     this.pickEl = h('div', { class: 'pt-pick' }, CHARS.map((c) => {
       const im = this.art[`${c.id}_happy`];
-      return h('button', { class: 'pt-card', 'aria-label': this.en ? c.en : c.ar, onclick: () => { this.char = c.id; this.round = new Round(); this._play(); } },
+      return h('button', { class: 'pt-card', 'aria-label': this.en ? c.en : c.ar, onclick: () => { this.journey = new Journey(CHARS.indexOf(c)); this.char = this.journey.char; this.round = this.journey.round; this._play(); } },
         im ? h('img', { src: im.src, alt: '', draggable: 'false' }) : h('div', { style: 'font-size:calc(var(--u)*16)' }, c.emoji), this.en ? c.en : c.ar);
     }));
     this.stage.layer.append(this.pickEl);
@@ -83,10 +97,11 @@ class Game {
 
   _play() {
     this._clear();
-    this.petEl = h('div', { class: 'pt-pet' });
+    this.petEl = h('div', { class: 'pt-pet gk-idle' });
     this.hintEl = h('div', { class: 'pt-hint' });
-    this.stepsEl = h('div', { class: 'pt-steps' }, STEPS.map((s) => h('button', { class: 'pt-step', 'data-step': s.id, 'aria-label': this.en ? s.en : s.ar, onclick: (e) => this._doStep(s, e) }, this._stepIcon(s), this.en ? s.en : s.ar)));
+    this.stepsEl = h('div', { class: 'pt-steps gk-panel' }, STEPS.map((s) => h('button', { class: 'pt-step', 'data-step': s.id, 'aria-label': this.en ? s.en : s.ar, onclick: (e) => this._doStep(s, e) }, this._stepIcon(s), this.en ? s.en : s.ar)));
     this.stage.layer.append(this.petEl, this.hintEl, this.stepsEl);
+    this.stage.progress(0, CHARS.length);
     this._refresh();
   }
 
@@ -95,7 +110,7 @@ class Game {
   _show(pose) {
     this.pose = pose;
     const src = this._img(pose);
-    this.petEl.replaceChildren(src ? h('img', { src, alt: '', draggable: 'false' }) : h('div', { class: 'emo' }, CHARS.find((c) => c.id === this.char).emoji));
+    this.petEl.replaceChildren(h('div', { class: 'gk-shadow' }), src ? h('img', { src, alt: '', draggable: 'false' }) : h('div', { class: 'emo' }, CHARS.find((c) => c.id === this.char).emoji));
   }
 
   _refresh() {
@@ -110,27 +125,32 @@ class Game {
   _doStep(step, e) {
     if (this.busy || this.round.done.has(step.id)) return;
     this.busy = true;
-    this.round.do(step.id);
+    const res = this.journey.step(step.id);
+    if (res === 'no') { this.busy = false; return; }
+    if (res === 'friend' || res === 'star') this.post({ type: 'item', kind: 'friend', char: this.char });
     this._show(step.id === 'feed' && this.char === 'baby' ? 'bottle' : step.doing);
     this.stage.sparkle(e.clientX, e.clientY, 8);
     this.stage.say(this._t(step.done));
     setTimeout(() => {
       if (this.disposed) return;
       this.busy = false;
-      if (this.round.complete) this._hug(); else this._refresh();
+      if (res === 'friend' || res === 'star') this._hug(res); else this._refresh();
     }, 2000);
   }
 
-  _hug() {
+  _hug(res) {
     this._show('hug');
     this.hintEl.style.display = 'none';
     const r = this.petEl.getBoundingClientRect();
     for (let i = 0; i < 5; i++) setTimeout(() => this.stage.sparkle(r.left + r.width / 2, r.top + r.height / 3, 8), i * 300);
     this.stage.say(this.en ? 'A big hug! Thank you!' : 'حضن كبير! شكراً!');
+    this.stage.progress(res === 'star' ? CHARS.length : this.journey.friendsDone, CHARS.length);
     setTimeout(() => {
       if (this.disposed) return;
-      this.round.finish();
-      this.stage.finish(() => this._pick());
+      if (res === 'star') { this.stage.finish(() => this._pick()); return; }
+      // the next friend arrives with a fresh round of care
+      this.char = this.journey.char; this.round = this.journey.round; this.busy = false; this._show(this.round.next.need); this._refresh();
+      this.stage.say(this.en ? 'A new friend!' : 'صاحب جديد!');
     }, 2300);
   }
 

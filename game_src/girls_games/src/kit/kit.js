@@ -29,6 +29,13 @@ export const CSS = `
 .gk-rb.p{background:linear-gradient(180deg,#c8a0ff,#8a5ae0);box-shadow:0 calc(var(--u)*.8) 0 #5a3aa8}
 .gk-rb:active{transform:translateY(2px) scale(.96)}
 .gk-title{font-weight:900;font-size:calc(var(--u)*5);color:#fff;text-shadow:0 2px 0 #b83a90,0 0 12px rgba(255,255,255,.6);text-align:center}
+.gk-top .gk-title{background:linear-gradient(180deg,#ff9ad0,#e0509e);border:calc(var(--u)*.6) solid #fff;border-radius:calc(var(--u)*4);padding:calc(var(--u)*.8) calc(var(--u)*6);box-shadow:0 calc(var(--u)*.8) 0 #a82a78,0 calc(var(--u)*1.4) calc(var(--u)*3) rgba(120,20,100,.35);letter-spacing:.02em}
+/* the panel every level puts its choices in: glossy, rounded, a gold rim, a soft glow */
+.gk-panel{background:linear-gradient(180deg,rgba(255,246,252,.94),rgba(255,224,242,.92));border:calc(var(--u)*.8) solid #fff;border-radius:calc(var(--u)*5);box-shadow:0 0 0 calc(var(--u)*.5) #ffd86a,0 calc(var(--u)*1.4) calc(var(--u)*4) rgba(140,30,110,.4),inset 0 0 calc(var(--u)*3) rgba(255,160,210,.35)}
+.gk-shadow{position:absolute;left:50%;bottom:calc(var(--u)*-.8);width:80%;height:calc(var(--u)*4);transform:translateX(-50%);background:radial-gradient(ellipse at center,rgba(120,30,100,.38),rgba(120,30,100,0) 70%);pointer-events:none}
+@keyframes gkidle{0%,100%{transform:translateY(0)}50%{transform:translateY(calc(var(--u)*-.7))}}
+.gk-idle{animation:gkidle 3.2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.gk-idle{animation:none}}
 .gk-btn{min-height:max(56px,calc(var(--u)*13));padding:0 calc(var(--u)*6);border-radius:999px;border:calc(var(--u)*.7) solid #fff;background:linear-gradient(180deg,#ff8ac8,#d84aa0);color:#fff;font-weight:900;font-size:calc(var(--u)*5.4);box-shadow:0 calc(var(--u)*.9) 0 #a82a78;cursor:pointer;font-family:inherit}
 .gk-btn.go{background:linear-gradient(180deg,#7ae88a,#2ab85a);box-shadow:0 calc(var(--u)*.9) 0 #1a8a3a}
 .gk-btn:active{transform:translateY(2px) scale(.97)}
@@ -42,6 +49,10 @@ export const CSS = `
 @keyframes gkpop{0%{transform:scale(.2) rotate(-30deg);opacity:0}70%{transform:scale(1.25) rotate(8deg)}100%{transform:scale(1) rotate(0);opacity:1}}
 .gk-spark{position:absolute;pointer-events:none;font-size:calc(var(--u)*5);animation:gkspark 1s ease-out forwards;z-index:9}
 @keyframes gkspark{0%{transform:translate(0,0) scale(.4);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(1.3) rotate(120deg);opacity:0}}
+.gk-dots{position:absolute;top:calc(var(--u)*12.5);left:50%;transform:translateX(-50%);display:flex;gap:calc(var(--u)*1.2);z-index:5;pointer-events:none}
+.gk-dot{width:calc(var(--u)*5);height:calc(var(--u)*5);display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*5);line-height:1;color:rgba(255,255,255,.75);text-shadow:0 2px 0 rgba(150,40,120,.55),0 0 6px rgba(255,255,255,.5)}
+.gk-dot:before{content:'★'}
+.gk-dot.on{color:#ffd23a;text-shadow:0 2px 0 #c07a10,0 0 10px rgba(255,220,100,.9);animation:gkpop .5s ease-out}
 .gk-bounce{animation:gkb .5s ease-out}
 .gk-fairy{position:absolute;left:calc(var(--u)*1.5);top:calc(var(--u)*14);height:calc(var(--u)*24);z-index:4;pointer-events:none;animation:gkfairy 2.4s ease-in-out forwards;filter:drop-shadow(0 3px 4px rgba(120,20,100,.35))}
 @keyframes gkfairy{0%{opacity:0;transform:translateY(8px) scale(.7)}15%{opacity:1;transform:translateY(0) scale(1)}80%{opacity:1;transform:translateY(-6px)}100%{opacity:0;transform:translateY(-14px)}}
@@ -127,9 +138,13 @@ export function makeStage(el, opts) {
     music.success(); fairy();
     post({ type: 'star' });
   };
+  // progress dots under the title: how many looks / girls / friends / orders of this level are done (a level now takes several rounds)
+  const dotsEl = h('div', { class: 'gk-dots' });
+  root.append(dotsEl);
+  const progress = (done, total) => { dotsEl.replaceChildren(...Array.from({ length: total }, (_, i) => h('div', { class: `gk-dot${i < done ? ' on' : ''}` }))); };
   root.append(h('div', { class: 'gk-top' },
     h('button', { class: 'gk-rb', 'aria-label': en ? 'Back' : 'رجوع', onclick: () => post({ type: 'exit' }) }, en ? '←' : '→'),
     h('div', { class: 'gk-title' }, title),
     h('button', { class: 'gk-rb p', 'aria-label': en ? 'Places' : 'الأماكن', onclick: openPlaces }, '🗺️')));
-  return { root, layer, setBg, say, sparkle, finish, openPlaces, get place() { return place; }, dispose() { ro.disconnect(); root.remove(); } };
+  return { root, layer, setBg, say, sparkle, progress, finish, openPlaces, get place() { return place; }, dispose() { ro.disconnect(); root.remove(); } };
 }

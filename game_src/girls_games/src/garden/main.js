@@ -23,11 +23,15 @@ export const PLACES = [
 /** The rules (no browser): a pot goes empty -> planted -> sprout (watered once) -> bloom (watered twice, a butterfly comes out) -> big (watered three times).
  *  The garden is complete when every pot has bloomed; one star per finished garden. */
 export class Garden {
-  constructor() { this.pots = Array.from({ length: POTS }, () => ({ color: -1, stage: 0 })); this.butterflies = 0; this.stars = 0; }
+  constructor() { this.pots = Array.from({ length: POTS }, () => ({ color: -1, stage: 0 })); this.butterflies = 0; this.caught = 0; this.stars = 0; }
   plant(i, color) { const p = this.pots[i]; if (!p || p.stage !== 0) return false; p.color = color; p.stage = 1; return true; }
   water(i) { const p = this.pots[i]; if (!p || p.stage === 0 || p.stage >= 4) return null; p.stage += 1; if (p.stage === 3) this.butterflies += 1; return p.stage; }
-  get bloomed() { return this.pots.every((p) => p.stage >= 3); }
-  finish() { if (!this.bloomed) return false; this.stars += 1; this.pots.forEach((p) => { p.color = -1; p.stage = 0; }); this.butterflies = 0; return true; }
+  /** every flower is BIG (watered three times each) ... */
+  get bloomed() { return this.pots.every((p) => p.stage >= 4); }
+  /** ... and every baby butterfly that flew out was caught with a tap (owner 2026-11-22: the level was too short). */
+  catchOne() { if (this.caught >= this.butterflies) return false; this.caught += 1; return true; }
+  get complete() { return this.bloomed && this.caught >= POTS; }
+  finish() { if (!this.complete) return false; this.stars += 1; this.pots.forEach((p) => { p.color = -1; p.stage = 0; }); this.butterflies = 0; this.caught = 0; return true; }
 }
 
 const CSS = `
@@ -38,12 +42,13 @@ const CSS = `
 .ga-pot img.fl{position:absolute;bottom:30%;left:50%;transform:translateX(-50%);max-width:130%;object-fit:contain;transition:height .5s;pointer-events:none}
 .ga-pot .wig{animation:gawig .5s}
 @keyframes gawig{0%,100%{transform:translateX(-50%) rotate(0)}30%{transform:translateX(-50%) rotate(-8deg)}70%{transform:translateX(-50%) rotate(8deg)}}
-.ga-bar{position:absolute;left:calc(var(--u)*2);right:calc(var(--u)*2);bottom:calc(var(--u)*1.6);display:flex;gap:calc(var(--u)*2);justify-content:center;align-items:center;z-index:6;direction:ltr}
+.ga-bar{position:absolute;left:calc(var(--u)*6);right:calc(var(--u)*6);bottom:calc(var(--u)*1.6);display:flex;gap:calc(var(--u)*2);justify-content:center;align-items:center;z-index:6;direction:ltr;padding:calc(var(--u)*1.4)}
 .ga-seed{width:calc(var(--u)*12);height:calc(var(--u)*12);min-width:56px;min-height:56px;border-radius:calc(var(--u)*3);border:calc(var(--u)*.6) solid #fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 calc(var(--u)*.7) 0 rgba(120,40,100,.45);font-size:calc(var(--u)*6);padding:0}
 .ga-seed.on{outline:calc(var(--u)*.8) solid #ffe06a}
 .ga-can{width:calc(var(--u)*13);height:calc(var(--u)*13);min-width:60px;min-height:60px;border-radius:50%;border:calc(var(--u)*.7) solid #fff;background:linear-gradient(180deg,#9ad8ff,#4aa8f0);font-size:calc(var(--u)*7.4);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 calc(var(--u)*.8) 0 #2a78b8;padding:0}
 .ga-can.on{outline:calc(var(--u)*.8) solid #ffe06a;animation:gkb 1.2s infinite}
-.ga-bf{position:absolute;z-index:8;font-size:calc(var(--u)*7);pointer-events:none;animation:gabf 6s ease-in-out infinite alternate}
+
+.ga-bf{position:absolute;z-index:8;font-size:calc(var(--u)*7);pointer-events:auto;cursor:pointer;padding:calc(var(--u)*2);animation:gabf 6s ease-in-out infinite alternate}
 .ga-bf img{height:calc(var(--u)*9);object-fit:contain}
 @keyframes gabf{0%{transform:translate(0,0)}50%{transform:translate(calc(var(--u)*8),calc(var(--u)*-6)) rotate(8deg)}100%{transform:translate(calc(var(--u)*-6),calc(var(--u)*-3)) rotate(-6deg)}}
 .ga-rain{position:absolute;pointer-events:none;font-size:calc(var(--u)*4);animation:gkspark .9s ease-in forwards;z-index:9}
@@ -70,7 +75,8 @@ class Game {
     const PACK = { 0: 'gi_02', 1: 'gi_03', 2: 'gi_04', 3: 'gi_06', 4: 'gi_05' }; // the painted seed packets (orange has none: a coloured square)
     this.seedsEl = COLORS.map((c, i) => { const pk = this.art[PACK[i]]; return h('button', { class: `ga-seed${i === 0 ? ' on' : ''}`, 'data-seed': String(i), 'aria-label': `seed ${c.en}`, style: pk ? `background:rgba(255,255,255,.85) url(${pk.src}) center/contain no-repeat` : `background:${c.css}`, onclick: () => this._pickSeed(i) }, pk ? '' : '🌱'); });
     this.canEl = h('button', { class: 'ga-can', 'aria-label': 'water', style: this.art.gi_01 ? `background:rgba(255,255,255,.9) url(${this.art.gi_01.src}) center/70% no-repeat;font-size:0` : '', onclick: () => { this.stage.say(this.en ? 'Tap a planted pot to water it!' : 'دوسي على الأصيص المزروع عشان تسقيه!'); } }, '🚿');
-    this.stage.layer.append(this.potsEl, h('div', { class: 'ga-bar' }, this.seedsEl, this.canEl));
+    this.stage.layer.append(this.potsEl, h('div', { class: 'ga-bar gk-panel' }, this.seedsEl, this.canEl));
+    this.stage.progress(0, POTS);
     this.stage.say(this.en ? 'Pick a seed and plant it in a pot!' : 'اختاري بذرة وازرعيها في أصيص!');
   }
 
@@ -79,7 +85,7 @@ class Game {
     return im ? h('img', { class: 'potimg', src: im.src, alt: '', draggable: 'false', style: 'position:absolute;bottom:0;left:0;width:100%;height:40%;object-fit:contain;pointer-events:none' }) : h('div', { class: 'clay' });
   }
 
-  _reset() { this.g = new Garden(); this._paint(); this.bfEls.forEach((b) => b.remove()); this.bfEls = []; this.busy = false; }
+  _reset() { this.g = new Garden(); this.stage.progress(0, POTS); this._paint(); this.bfEls.forEach((b) => b.remove()); this.bfEls = []; this.busy = false; }
 
   _pickSeed(i) {
     this.seed = i;
@@ -117,7 +123,7 @@ class Game {
       this._paint();
       this.stage.say(st === 2 ? (this.en ? 'It is sprouting!' : 'بتطلع!') : st === 3 ? (this.en ? `A ${COLORS[this.g.pots[i].color].en} flower! A butterfly!` : `زهرة ${FEM[this.g.pots[i].color]}! وفراشة!`) : (this.en ? 'A big flower!' : 'زهرة كبيرة!'));
       this.stage.sparkle(e.clientX, e.clientY, 6);
-      if (st === 3) this._butterfly(pot);
+      if (st === 3) { this._butterfly(pot); this.post({ type: 'item', kind: 'flower', color: this.g.pots[i].color }); }
       this._checkDone();
     } else {
       if (!this.g.plant(i, this.seed)) { this._wiggle(pot); return; }
@@ -134,12 +140,14 @@ class Game {
     const r = pot.getBoundingClientRect(); const rr = this.stage.root.getBoundingClientRect();
     const n = 1 + (this.g.butterflies % 4) * 3; const im = this.art[`bf_${String(n).padStart(2, '0')}`];
     const b = h('div', { class: 'ga-bf', style: `left:${r.left - rr.left}px;top:${r.top - rr.top - 40}px;animation-delay:${-this.g.butterflies}s` }, im ? h('img', { src: im.src, alt: '', draggable: 'false' }) : '🦋');
+    b.addEventListener('pointerdown', (e) => { if (b.dataset.caught) return; b.dataset.caught = '1'; if (!this.g.catchOne()) return; this.stage.sparkle(e.clientX, e.clientY, 8); b.remove(); this.stage.say(this.en ? 'Caught a butterfly!' : 'مسكتي فراشة!'); this.stage.progress(this.g.caught, POTS); this._checkDone(); });
     this.stage.layer.append(b); this.bfEls.push(b);
   }
 
   _checkDone() {
-    if (!this.g.bloomed || this.busy) return;
+    if (!this.g.complete || this.busy) return;
     this.busy = true;
+    this.stage.progress(POTS, POTS);
     this.stage.say(this.en ? 'All the flowers bloomed! A rainbow!' : 'كل الزهور فتحت! وقوس قزح!');
     const rr = this.stage.root.getBoundingClientRect();
     for (let i = 0; i < 6; i++) setTimeout(() => this.stage.sparkle(rr.left + rr.width * (0.2 + 0.12 * i), rr.top + rr.height * 0.35, 8), i * 300);

@@ -129,6 +129,20 @@ P.append(("F6", "أسماك الأعماق: الفرائس والمفترسات 
 P.append(("F7", "بطل زومبي الأسطح بالأسلحة (١٢)", "survivor_idle, survivor_run, survivor_shoot, survivor_bomb, survivor_rocket, survivor_hurt, survivor_win, gun_blaster, gun_bomb_launcher, gun_rocket, gun_fireworks, gun_pistol", "zombie_rooftop",
           sheet(STYLE, "A cartoon city fighter in a red jacket seen from a 3/4 TOP view facing right, 7 frames (idle, running, shooting, holding a bomb launcher, holding a rocket launcher, hurt, victory) followed by 5 weapons laid flat: blaster, bomb launcher, rocket launcher, fireworks launcher, pistol. No blood.")))
 
+# ---- G. more content for the five girls levels (owner 2026-11-22: levels were too short) --------------------------------------
+P.append(("G1", "عالم الأميرة: ٨ بنات إضافيين للصالون وألبسي الأميرة (وقفة)", "doll_5..doll_12", "little_salon / little_princess_dress",
+          sheet(GIRL, "8 more cute toddler-style girl dolls in the same front standing pose with hands on hips, each in a white slip and a pink hair bow, same style as the first four dolls, with different skin tones and hairstyles: black braids, blonde pigtails, auburn bun, curly afro puffs, long wavy dark-brown, short bob, red curly, side ponytail. 4 columns x 2 rows, fill 8 cells.")))
+P.append(("G2", "عالم الأميرة: ٦ حقائب وعقود وأغراض زينة (١٢)", "acc_01..acc_12", "little_princess_dress",
+          sheet(GIRL, "12 princess accessories for a dress-up game: pink handbag, heart purse, star backpack, pearl necklace, heart necklace, flower necklace, magic wand with a star, fairy wings, pink gloves, butterfly bracelet, sunglasses with heart frames, tiny umbrella.")))
+P.append(("G3", "بيبي وصاحبها: ٤ أصدقاء إضافيين بوضعيات الرعاية (بطة صغيرة)", "duck_*", "baby_and_pet",
+          sheet(GIRL, "A cute cartoon baby duckling, FRONT view, 12 poses: happy, hungry, eating, drinking, dirty with mud, bathing in bubbles, wrapped in a towel, getting brushed, wearing a bow, yawning, sleeping under a blanket, hugging a toy.")))
+P.append(("G4", "بيبي وصاحبها: خروف صغير بوضعيات الرعاية", "lamb_*", "baby_and_pet",
+          sheet(GIRL, "A cute cartoon baby lamb, FRONT view, 12 poses: happy, hungry, eating, drinking, dirty with mud, bathing in bubbles, wrapped in a towel, getting brushed, wearing a bow, yawning, sleeping under a blanket, hugging a toy.")))
+P.append(("G5", "محل الكب كيك: ٦ أكواب إضافية وزينة وطلبات (١٢)", "cup_13..cup_24", "cupcake_shop",
+          sheet(GIRL, "6 more empty paper cupcake liners in new colors and patterns (mint with stars, peach with dots, lilac with hearts, coral with flowers, sky blue with stripes, lemon with stars) followed by their 6 finished cupcakes with swirled cream, sprinkles and a cherry, matching colors.")))
+P.append(("G6", "حديقة الفراشات: ٦ أنواع زهور إضافية بثلاث مراحل", "fl3_*", "butterfly_garden",
+          sheet(GIRL, "6 more flower types, each in two growth stages side by side in one cell pair (sprout then full bloom), cartoon: tulip, daisy, sunflower, lavender, lily, rose. 4 columns x 3 rows: row 1 sprout/bloom of tulip and daisy, row 2 sunflower and lavender, row 3 lily and rose.")))
+
 # ---- E. backgrounds ---------------------------------------------------------------------------------------------------------
 bgs = {
     "E1": ("خلفيات ألبسي الأميرة (٦)", "little_princess_dress", ["a pastel castle bedroom with a big window and a canopy bed", "a garden tea party with a gazebo and flowers", "a snowy ice castle with crystal pillars", "a sunny beach party with palm trees and a pastel tent", "a magic forest with glowing mushrooms and fairy lights", "a rainbow ballroom with chandeliers and a shiny floor"]),
@@ -150,7 +164,7 @@ w("**الترتيب المقترح (الأهم أولًا):** A1 ← A2 ← A3 �
 w("**نصايح لـ ChatGPT:** (1) ولّد الصورة بنسبة 3:2 (1536×1024). (2) لو الخلفية طلعت مش بيضا صافية قول: «Make the background pure flat white #FFFFFF, remove the shadows». "
   "(3) لو العناصر لزقت في بعض قول: «Increase the margin between items, no overlaps». (4) اطلب نفس الشخصية في كل الخانات: «Keep the exact same character design in every cell». "
   "(5) في الخلفيات: اطلب 16:9 (1920×1080) صورة واحدة.\n\n")
-groups = [("F", "مخلوقات بإطارات حركة (ضفدع، ديناصور، أسماك، بطل الأسطح)"), ("A", "عربيات وطيارات (منظر خلفي بالظبط)"), ("B", "شخصيات الألعاب (وضعيات)"), ("C", "قسم البنات ٢–٤ سنين (شخصيات وأغراض)"), ("D", "كروت قسم البنات وغلافه"), ("E", "خلفيات قسم البنات (٣٠)")]
+groups = [("G", "إضافات لزيادة محتوى مستويات عالم الأميرة"), ("F", "مخلوقات بإطارات حركة (ضفدع، ديناصور، أسماك، بطل الأسطح)"), ("A", "عربيات وطيارات (منظر خلفي بالظبط)"), ("B", "شخصيات الألعاب (وضعيات)"), ("C", "قسم البنات ٢–٤ سنين (شخصيات وأغراض)"), ("D", "كروت قسم البنات وغلافه"), ("E", "خلفيات قسم البنات (٣٠)")]
 for g, title in groups:
     w("\n---\n\n## %s — %s\n\n" % (g, title))
     for pid, ttl, files, unlocks, body in P:

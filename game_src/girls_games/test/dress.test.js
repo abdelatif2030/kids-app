@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Outfit, itemsFor, nameOf, PLACES, CATS } from '../src/dress/main.js';
+import { Outfit, itemsFor, nameOf, PLACES, CATS, SHOW } from '../src/dress/main.js';
 
 test('six places, four items per category per place, always the same four', () => {
   assert.equal(PLACES.length, 6);
@@ -18,15 +18,19 @@ test('the 24 dresses are all reachable across the six places', () => {
   assert.equal(nameOf('dress', 3), 'dress_03');
 });
 
-test('a robot dresses her in every place: the star is given once per finished outfit, never before', () => {
-  const o = new Outfit();
+test('a robot walks a fashion show in every place: a star only after THREE finished looks, never before', () => {
   for (let p = 0; p < 6; p++) {
-    assert.equal(o.party(), false);
-    o.wear('dress', itemsFor('dress', p)[0]); assert.equal(o.complete, false);
-    o.wear('shoes', itemsFor('shoes', p)[1]); assert.equal(o.party(), false);
-    o.wear('crown', itemsFor('crown', p)[2]); assert.equal(o.complete, true);
-    assert.equal(o.party(), true); assert.equal(o.stars, p + 1);
-    o.reset(); assert.equal(o.complete, false);
+    const o = new Outfit();
+    for (let look = 1; look <= SHOW; look++) {
+      assert.equal(o.party(), 'no');
+      o.wear('dress', itemsFor('dress', p)[0] + look); assert.equal(o.complete, false);
+      o.wear('shoes', itemsFor('shoes', p)[1]); assert.equal(o.party(), 'no');
+      o.wear('crown', itemsFor('crown', p)[2]); assert.equal(o.complete, true);
+      o.wear('bow', 3); // the bow is optional
+      assert.equal(o.party(), look < SHOW ? 'look' : 'star');
+      o.reset(); assert.equal(o.complete, false);
+    }
+    assert.equal(o.stars, 1); assert.equal(o.looks, 0);
   }
 });
 
