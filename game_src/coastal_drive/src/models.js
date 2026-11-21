@@ -306,8 +306,94 @@ export function makeRailSegment(len) {
 }
 
 export function makeHill(r, color) {
-  const m = new THREE.Mesh(new THREE.SphereGeometry(r, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2), mat(color));
+  // a low-poly hill: flat-shaded facets with a lighter top, darker foot and patches, and a few pines on the slope (owner 2026-11-21)
+  const geo = new THREE.SphereGeometry(r, 12, 7, 0, Math.PI * 2, 0, Math.PI / 2);
+  const base = new THREE.Color(color), top = base.clone().lerp(new THREE.Color(0xa8d860), 0.45), foot = base.clone().multiplyScalar(0.62);
+  const pos = geo.attributes.position, cols = [];
+  for (let i = 0; i < pos.count; i++) {
+    const y = pos.getY(i) / r;
+    const n = Math.sin(pos.getX(i) * 0.9 + pos.getZ(i) * 1.3) * 0.5 + 0.5;
+    const c = foot.clone().lerp(top, Math.min(1, y * 1.15 + n * 0.18));
+    cols.push(c.r, c.g, c.b);
+    if (y > 0.02) pos.setXYZ(i, pos.getX(i) * (1 + (n - 0.5) * 0.08), pos.getY(i) + (n - 0.5) * r * 0.05, pos.getZ(i));
+  }
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+  geo.computeVertexNormals();
+  const g = new THREE.Group();
+  const m = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true }));
   m.scale.set(1, 0.55, 1.3);
+  g.add(m);
+  const pine = mat(0x1f5a22), pine2 = mat(0x2a7a2c), trunk = mat(0x6a4a2a);
+  for (let i = 0; i < 9; i++) {
+    const a = (i * 2.399) % (Math.PI * 2), rr = r * (0.25 + ((i * 37) % 10) / 10 * 0.55);
+    const x = Math.cos(a) * rr, z = Math.sin(a) * rr * 1.3, y = Math.sqrt(Math.max(0, 1 - (rr / r) ** 2)) * r * 0.55;
+    const t = new THREE.Group();
+    t.add(cyl(0.18, 0.22, 0.9, trunk, 0, 0.45, 0, 5));
+    t.add(new THREE.Mesh(new THREE.ConeGeometry(1.0, 2.2, 6), i % 2 ? pine : pine2));
+    t.children[1].position.y = 1.9;
+    t.add(new THREE.Mesh(new THREE.ConeGeometry(0.75, 1.7, 6), i % 2 ? pine2 : pine));
+    t.children[2].position.y = 3.0;
+    const k = 1.1 + (i % 3) * 0.35;
+    t.scale.setScalar(k);
+    t.position.set(x, y - 0.2, z);
+    g.add(t);
+  }
+  return g;
+}
+
+/** Sun, clouds and far blue mountains painted on a big plane that follows the camera (so they never come closer). */
+export function makeBackdrop(world) {
+  const W = 2048, H = 512;
+  const c = document.createElement('canvas');
+  c.width = W;
+  c.height = H;
+  const g = c.getContext('2d');
+  const sunset = world === 'canyon', night = world === 'neon';
+  if (!night) {
+    const sx = W * 0.72, sy = H * 0.34;
+    const gl = g.createRadialGradient(sx, sy, 10, sx, sy, 230);
+    gl.addColorStop(0, sunset ? 'rgba(255,240,200,1)' : 'rgba(255,255,235,1)');
+    gl.addColorStop(0.18, sunset ? 'rgba(255,214,140,.85)' : 'rgba(255,248,205,.7)');
+    gl.addColorStop(1, 'rgba(255,230,170,0)');
+    g.fillStyle = gl;
+    g.fillRect(0, 0, W, H);
+    // clouds: soft overlapping puffs
+    for (let i = 0; i < 9; i++) {
+      const cx = (i * 263 + 90) % W, cy = 70 + ((i * 97) % 150), n = 5 + (i % 3);
+      for (let k = 0; k < n; k++) {
+        const rx = 46 + ((k * 31 + i * 7) % 40), x = cx + (k - n / 2) * 46, y = cy + Math.sin(k * 1.7 + i) * 12;
+        const gr = g.createRadialGradient(x, y - 8, 4, x, y, rx);
+        gr.addColorStop(0, 'rgba(255,255,255,.95)');
+        gr.addColorStop(1, 'rgba(255,255,255,0)');
+        g.fillStyle = gr;
+        g.beginPath();
+        g.ellipse(x, y, rx, rx * 0.55, 0, 0, Math.PI * 2);
+        g.fill();
+      }
+    }
+  } else {
+    const gl = g.createRadialGradient(W * 0.3, H * 0.4, 6, W * 0.3, H * 0.4, 200);
+    gl.addColorStop(0, 'rgba(255,255,255,.95)');
+    gl.addColorStop(0.2, 'rgba(210,190,255,.5)');
+    gl.addColorStop(1, 'rgba(160,120,255,0)');
+    g.fillStyle = gl;
+    g.fillRect(0, 0, W, H);
+  }
+  // two layers of far mountains on the horizon
+  const layer = (base, amp, col, seed) => {
+    g.fillStyle = col;
+    g.beginPath();
+    g.moveTo(0, H);
+    for (let x = 0; x <= W; x += 16) g.lineTo(x, base - amp * (0.55 + 0.45 * Math.sin(x * 0.006 + seed) * Math.sin(x * 0.017 + seed * 2.1)) - amp * 0.25 * Math.sin(x * 0.04 + seed));
+    g.lineTo(W, H);
+    g.fill();
+  };
+  if (night) { layer(H * 0.95, 90, 'rgba(46,24,84,.95)', 1.3); layer(H * 1.0, 60, 'rgba(30,14,60,1)', 4.1); } else if (sunset) { layer(H * 0.93, 100, 'rgba(214,132,104,.9)', 2.2); layer(H * 1.0, 62, 'rgba(176,96,72,1)', 5.3); } else { layer(H * 0.93, 105, 'rgba(120,160,206,.85)', 2.2); layer(H * 1.0, 66, 'rgba(84,134,170,1)', 5.3); }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(1500, 250), new THREE.MeshBasicMaterial({ map: t, transparent: true, fog: false, depthWrite: false, depthTest: false }));
+  m.renderOrder = -5;
+  m.frustumCulled = false;
   return m;
 }
 

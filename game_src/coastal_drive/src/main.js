@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 import { Race, LEVELS, WORLDS, CARS, UPGRADES, MAX_UP, upCost, carOf, LANES, LANE_W, X_MAX, COUNTDOWN, normalizeSave } from './sim.js';
 import {
-  mat, basic, box, makeSportsCar, makeTrafficCar, roadTexture, makePalm, makeLamp, makeRailSegment, makeHill, makeBush, makeMesa,
+  mat, basic, box, makeSportsCar, makeTrafficCar, roadTexture, makePalm, makeLamp, makeRailSegment, makeHill, makeBackdrop, makeBush, makeMesa,
   makeCactus, makeTower, skyTexture, coinMesh,
 } from './models.js';
 import { Sound } from './audio.js';
@@ -268,7 +268,16 @@ class Game {
       // glowing lines on the shoulders
       for (const sx of [-1, 1]) this.strips.add(box(0.12, 0.05, 600, basic(sx > 0 ? 0xff4ab8 : 0x4ae8ff), sx * (LANE_W * 2 + 0.75), 0.06, 0));
     }
+    this.backdrop = makeBackdrop(world);
+    g.add(this.backdrop);
     this._placeRoad(0);
+  }
+
+  _backdropFollow() {
+    const b = this.backdrop;
+    if (!b) return;
+    const d = 480;
+    b.position.set(this.camera.position.x, 112, this.camera.position.z - d);
   }
 
   _placeRoad(s) {
@@ -729,7 +738,8 @@ class Game {
     this.camera.position.copy(this.camPos);
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 1.6);
     if (this.shake > 0) this.camera.position.add(new THREE.Vector3((Math.random() - 0.5) * this.shake * 0.5, (Math.random() - 0.5) * this.shake * 0.3, 0));
-    this.camera.lookAt(p.x * 0.85, 0.9, -p.s - 14);
+    if (this.land) this.camera.lookAt(p.x * 0.85, 0.9, -p.s - 14); else this.camera.lookAt(p.x * 0.85, -0.6, -p.s - 10); // upright phone: tilt down so the road fills the screen
+    this._backdropFollow();
     const fov = this.baseFov + (boost ? 10 : 0) + Math.max(0, p.speed - 30) * 0.12;
     if (Math.abs(this.camera.fov - fov) > 0.05) { this.camera.fov += (fov - this.camera.fov) * Math.min(1, dt * 4); this.camera.updateProjectionMatrix(); }
     this.sunL.position.set(p.x - 30, 50, -p.s + 20);
