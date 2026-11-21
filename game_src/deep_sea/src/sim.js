@@ -29,6 +29,13 @@ export const LEVELS = [
     mix: [['butterfly', 3], ['puffer', 2], ['mackerel', 4], ['squid', 4], ['barracuda', 1]], bait: 'mackerel', task: { kind: 'squid', n: 3 } },
   { id: 3, ar: 'أخدود الأعماق', en: 'Deep Trench', biome: 'trench', start: 70, goal: 250, time: 140, star3: 85, star2: 115, half: 120, halfY: 20,
     mix: [['lantern', 4], ['squid', 3], ['tuna', 3], ['angler', 1], ['barracuda', 1]], bait: 'lantern', boss: 'shark' },
+  // 2026-11-21: three more dives (a night reef, a sunken ship, the abyss fortress); `look` picks the colours, `biome` the scenery
+  { id: 4, ar: 'شعاب الليل', en: 'Night Reef', biome: 'reef', look: 'night', start: 60, goal: 180, time: 130, star3: 80, star2: 105, half: 60, halfY: 11,
+    mix: [['butterfly', 3], ['jelly', 3], ['mackerel', 3], ['squid', 3], ['barracuda', 2], ['grouper', 1]], bait: 'mackerel' },
+  { id: 5, ar: 'حطام السفينة', en: 'Sunken Ship', biome: 'kelp', look: 'wreck', start: 90, goal: 300, time: 125, star3: 75, star2: 100, half: 85, halfY: 15,
+    mix: [['mackerel', 3], ['squid', 4], ['tuna', 3], ['barracuda', 2]], bait: 'mackerel', task: { kind: 'squid', n: 5 } },
+  { id: 6, ar: 'قلعة الأعماق', en: 'Abyss Fortress', biome: 'trench', look: 'abyss', start: 130, goal: 450, time: 150, star3: 95, star2: 125, half: 130, halfY: 22,
+    mix: [['lantern', 3], ['tuna', 3], ['squid', 3], ['angler', 2], ['barracuda', 2]], bait: 'tuna', boss: 'shark' },
 ];
 
 export const EAT = 0.9; // you can eat anything up to 90% of your size
@@ -329,5 +336,5 @@ export function normalizeSave(raw) {
   const u = Math.floor(Number(s.unlocked));
   const b = {};
   if (s.best && typeof s.best === 'object') for (const lv of LEVELS) { const v = Number(s.best[lv.id]); if (v > 0) b[lv.id] = Math.min(Math.round(v), 9999); }
-  return { unlocked: Number.isFinite(u) ? Math.max(1, Math.min(LEVELS.length, u)) : 1, stars, best: b, muted: s.muted === true };
+  return { unlocked: Math.min(LEVELS.length, Math.max(Number.isFinite(u) ? Math.max(1, u) : 1, ...Object.keys(stars).map((k) => Number(k) + 1))), stars, best: b, muted: s.muted === true };
 }

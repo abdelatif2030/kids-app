@@ -79,6 +79,9 @@ class Glow {
 const BIOME = {
   reef: { bg: 0x2a9ac8, fog: 0x3aa8c8, near: 8, far: 70, sand: ['#e8dcc0', '#d8ccaa'], hemi: [0xd8f8ff, 0x4a7a8a, 1.9], sun: 1.3, rock: 0x6a9a9a },
   kelp: { bg: 0x1f8a8a, fog: 0x2a8a8a, near: 8, far: 60, sand: ['#c8c0a0', '#b8b090'], hemi: [0xc8f8e8, 0x3a5a4a, 1.7], sun: 1.0, rock: 0x5a8a7a },
+  night: { bg: 0x0a1a48, fog: 0x0c2058, near: 7, far: 56, sand: ['#4a5a7a', '#3a4a6a'], hemi: [0x7a9aff, 0x1a2a4a, 1.2], sun: 0.5, rock: 0x3a4a7a },
+  wreck: { bg: 0x2a6a5a, fog: 0x2a6a5a, near: 7, far: 52, sand: ['#8a8060', '#7a7050'], hemi: [0xa8d8c8, 0x2a3a2a, 1.4], sun: 0.8, rock: 0x6a5a3a },
+  abyss: { bg: 0x120830, fog: 0x1a0a40, near: 5, far: 48, sand: ['#3a2a5a', '#2a1a4a'], hemi: [0x8a5ae8, 0x0a0a2a, 0.8], sun: 0.25, rock: 0x3a2a5a },
   trench: { bg: 0x061a30, fog: 0x08203a, near: 6, far: 55, sand: ['#3a4a5a', '#2a3a4a'], hemi: [0x5a7ab8, 0x0a1a2a, 0.9], sun: 0.3, rock: 0x2a3a4a },
 };
 
@@ -187,7 +190,7 @@ class Game {
     if (this.sea) { this.scene.remove(this.sea); this.sea.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); }
     this.seaIndex = index;
     const lv = LEVELS[index];
-    const B = BIOME[lv.biome];
+    const B = BIOME[lv.look || lv.biome];
     this.biome = lv.biome;
     this.sound.setWorld(lv.biome);
     const g = (this.sea = new THREE.Group());

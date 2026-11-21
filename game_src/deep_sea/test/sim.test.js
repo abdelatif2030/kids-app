@@ -17,7 +17,7 @@ function swim(opts, mode = 'robot') {
   return { s, seen };
 }
 
-test('the robot clears all three timed levels (reef, kelp squid hunt, the shark)', () => {
+test('the robot clears all six timed levels (reef, kelp squid hunt, the shark)', () => {
   for (let i = 0; i < LEVELS.length; i++) {
     let run;
     for (let k = 0; k < 3; k++) { run = swim({ level: i, seed: 3 + i + k * 40 }); if (run.s.state === 'won') break; }
@@ -74,7 +74,8 @@ test('a predator warns before it lunges; dashing helps; easy mode is gentler', (
 
 test('saves are cleaned', () => {
   const v = normalizeSave({ unlocked: 7, stars: { 1: 3, 2: 9 }, best: { 1: 44.6 } });
-  assert.equal(v.unlocked, 3);
+  assert.equal(v.unlocked, 6);
+  assert.equal(normalizeSave({ unlocked: 3, stars: { 3: 1 } }).unlocked, 4);
   assert.deepEqual(v.stars, { 1: 3 });
   assert.deepEqual(v.best, { 1: 45 });
 });

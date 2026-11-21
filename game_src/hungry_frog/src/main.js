@@ -2,10 +2,10 @@
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
 // A funny little frog on a lily pond: drag to hop, tap the pink button to LEAP. The sticky tongue snaps by itself at
 // critters whose number is not bigger; eating makes the frog grow. Red numbers are bigger: big frogs and snakes aim
-// (a red dotted line) and herons swoop (a shadow) — hop away. Three levels from misty dawn to the sunset swamp, each
+// (a red dotted line) and herons swoop (a shadow) — hop away. Six levels from misty dawn to the legend lake, each
 // with a boss. No network, no links, no ads.
 import * as THREE from 'three';
-import { Pond, LEVELS, BOSS, KINDS, W, D, sizeOf, normalizeSave } from './sim.js';
+import { Pond, LEVELS, BOSS, KINDS, W, D, sizeOf, baseKind, normalizeSave } from './sim.js';
 import { mat, basic, makeFrog, makeBully, makeSnake, makeHeron, makeFly, makePad, makeLotus, makeCattail, waterTexture } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
@@ -80,6 +80,9 @@ const LOOKS = [
   { bg: 0xb8bcd8, fog: 0xc8c8e0, near: 18, far: 70, water: ['#8a96b0', '#c8d0e8'], hemi: [0xf0f0ff, 0x6a7a8a, 1.6], sun: [0xffe8f0, 1.0], pad: [0x6ac84a, 0x5ab83a, 0x7ad85a], sound: 'dawn' },
   { bg: 0x9ad8f0, fog: 0xbfe8e8, near: 26, far: 90, water: ['#5aa8b8', '#a8e0e8'], hemi: [0xffffff, 0x6a8a5a, 1.7], sun: [0xfff8e0, 1.4], pad: [0x5ac83a, 0x4ab82a, 0x8ae05a], sound: 'day' },
   { bg: 0xf0a07a, fog: 0xe8a088, near: 20, far: 75, water: ['#8a6a7a', '#f0b890'], hemi: [0xffe0c8, 0x5a3a4a, 1.5], sun: [0xffb07a, 1.3], pad: [0x7ab83a, 0x6aa82a, 0x9ac84a], sound: 'sunset' },
+  { bg: 0x1c2450, fog: 0x2a3670, near: 16, far: 66, water: ['#1c2a58', '#5a6ab0'], hemi: [0xa8b4ff, 0x1a2040, 1.35], sun: [0xd0dcff, 0.95], pad: [0x3a9a5a, 0x2a8a4a, 0x4aaa6a], sound: 'dawn' },
+  { bg: 0xa8d8b0, fog: 0xb8e0c0, near: 14, far: 58, water: ['#3a7a5a', '#9ad8b0'], hemi: [0xf0fff0, 0x4a6a4a, 1.6], sun: [0xf8ffe0, 1.2], pad: [0x3ab84a, 0x2aa83a, 0x6ad86a], sound: 'day' },
+  { bg: 0xf8d878, fog: 0xf8e0a0, near: 22, far: 80, water: ['#c89a4a', '#fff0a8'], hemi: [0xfff4d0, 0x8a6a2a, 1.6], sun: [0xffe890, 1.5], pad: [0x9ac83a, 0x8ab82a, 0xc0e060], sound: 'sunset' },
 ];
 
 class Game {
@@ -234,7 +237,7 @@ class Game {
     water.rotation.x = -Math.PI / 2;
     g.add(water);
     // muddy banks with reeds and cattails all around
-    const bank = mat(index === 2 ? 0x7a5a3a : 0x6a7a3a);
+    const bank = mat(index === 2 || index === 5 ? 0x7a5a3a : index === 3 ? 0x3a4a3a : 0x6a7a3a);
     for (const [x, z, w, d] of [[0, -D - 4, W * 2 + 16, 8], [0, D + 4, W * 2 + 16, 8], [-W - 4, 0, 8, D * 2], [W + 4, 0, 8, D * 2]]) {
       const b = new THREE.Mesh(new THREE.BoxGeometry(w, 0.6, d), bank);
       b.position.set(x, 0.05, z);
@@ -497,7 +500,7 @@ class Game {
       : h('div', { class: 'hf-card' },
         h('div', { class: 'hf-ribbon' }, t('gulped')),
         h('div', { class: 'hf-face' }, r.by === 'heron' ? '🦩' : r.by === 'snake' ? '🐍' : '🐸'),
-        h('div', { class: 'hf-note' }, t(`gotYou_${r.by === 'bigbo' || r.by === 'heron' || r.by === 'snake' ? r.by : 'frog'}`), h('br'), t('power', { n: num(r.power) })),
+        h('div', { class: 'hf-note' }, t(`gotYou_${/^(bigbo|heron|snake)\d?$/.test(r.by) ? baseKind(r.by) : 'frog'}`), h('br'), t('power', { n: num(r.power) })),
         h('div', { class: 'hf-small' }, t('tipLine')),
         h('button', { class: 'hf-btn', onclick: () => this.startLevel(i) }, t('retry')),
         h('button', { class: 'hf-btn brown', onclick: () => this.showMap() }, t('map')));
@@ -531,7 +534,7 @@ class Game {
       case 'stick': S.play('stick'); this.tongueWob.v = 6; break;
       case 'miss': S.play('miss'); break;
       case 'eat': {
-        S.play('gulp', e.kind);
+        S.play('gulp', baseKind(e.kind));
         setTimeout(() => S.play('grow', e.combo), 160);
         this.gulpT = 0.35;
         const q = this._proj(f.x, sizeOf(f.power) * 2.2, f.z);
@@ -561,11 +564,11 @@ class Game {
         this._big(t('evolved'), t('growTo2', { n: num(p.level.boss) }), 2.2);
         break;
       case 'boss': {
-        S.play('boss', e.kind);
+        S.play('boss', baseKind(e.kind));
         S.setMode('boss');
         const b = p.boss;
-        this.bossModel = e.kind === 'heron' ? makeHeron() : e.kind === 'snake' ? makeSnake(0x6aa82a) : makeBully(true);
-        this.bossModel.root.scale.setScalar(e.kind === 'heron' ? 1.6 : e.kind === 'snake' ? 3.2 : sizeOf(b.v) * 2);
+        this.bossModel = baseKind(e.kind) === 'heron' ? makeHeron() : baseKind(e.kind) === 'snake' ? makeSnake(e.kind === 'snake2' ? 0xc84aa8 : 0x6aa82a) : makeBully(true);
+        this.bossModel.root.scale.setScalar(baseKind(e.kind) === 'heron' ? (e.kind === 'heron2' ? 2.0 : 1.6) : baseKind(e.kind) === 'snake' ? (e.kind === 'snake2' ? 3.8 : 3.2) : sizeOf(b.v) * 2);
         this.scene.add(this.bossModel.root);
         this.hud.boss.style.display = 'flex';
         this.hud.boss.querySelector('span').textContent = name(BOSS[e.kind]);
@@ -717,7 +720,7 @@ class Game {
     if (b && this.bossModel) {
       const bm = this.bossModel;
       if (b.hp > 0) {
-        const hopY = b.kind === 'bigbo' && Math.sin(b.t * 4) > 0.2 ? Math.abs(Math.sin(b.t * 8)) * 0.6 : 0;
+        const hopY = baseKind(b.kind) === 'bigbo' && Math.sin(b.t * 4) > 0.2 ? Math.abs(Math.sin(b.t * 8)) * 0.6 : 0;
         bm.root.position.set(b.x, hopY, b.z);
         bm.root.rotation.y = b.a;
         if (bm.segs) bm.segs.forEach((sg, i) => { sg.position.x = Math.sin(b.t * 4 - i * 0.7) * 0.2; });
@@ -799,7 +802,7 @@ class Game {
       const big = c.v > f.power;
       tag(c.id, c.x, (c.y || 0) + (c.kind === 'frog' ? sizeOf(c.v) * 2.4 : 0.8), c.z, num(c.v), big ? 'red' : '');
     }
-    if (p.boss && p.boss.hp > 0) tag('boss', p.boss.x, p.boss.kind === 'heron' ? 6 : 3.4, p.boss.z, `👑 ${num(p.boss.v)}`, 'red boss');
+    if (p.boss && p.boss.hp > 0) tag('boss', p.boss.x, baseKind(p.boss.kind) === 'heron' ? 6 : 3.4, p.boss.z, `👑 ${num(p.boss.v)}`, 'red boss');
     for (const [k, e] of this.tags) if (!used.has(k)) { e.remove(); this.tags.delete(k); }
   }
 

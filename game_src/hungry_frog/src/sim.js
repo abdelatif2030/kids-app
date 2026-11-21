@@ -3,7 +3,7 @@
 // than the frog's; eating it adds its number, and the frog grows. Critters with a bigger number cannot be eaten;
 // big frogs, snakes and herons with a bigger number try to eat the frog (a red dotted line or a shadow warns first).
 // Being caught costs a heart (nothing else). Each level: grow to evolve, grow more, then beat the boss.
-// Three levels: Misty Dawn (Big Bo the bully frog), Lily Marsh (Sly the snake), Sunset Swamp (the Grand Heron).
+// Six levels (the first three: Misty Dawn (Big Bo the bully frog), Lily Marsh (Sly the snake), Sunset Swamp (the Grand Heron).
 // Deterministic with a seed for the robot tests.
 
 export const W = 15; // the pond: x from -W to W
@@ -24,13 +24,22 @@ export const LEVELS = [
   { id: 1, ar: 'فجر ضبابي', en: 'Misty Dawn', start: 4, evolve: 15, boss: 26, kinds: ['fly', 'fly', 'mosquito', 'beetle', 'dragonfly', 'frog'], heron: false, bossKind: 'bigbo', bossPower: 40, bossHp: 40 },
   { id: 2, ar: 'مستنقع الزنابق', en: 'Lily Marsh', start: 8, evolve: 30, boss: 50, kinds: ['fly', 'mosquito', 'beetle', 'dragonfly', 'dragonfly', 'fish', 'frog', 'snake'], heron: true, bossKind: 'snake', bossPower: 70, bossHp: 60 },
   { id: 3, ar: 'مستنقع الغروب', en: 'Sunset Swamp', start: 15, evolve: 60, boss: 90, kinds: ['mosquito', 'dragonfly', 'dragonfly', 'fish', 'fish', 'frog', 'snake', 'snake'], heron: true, bossKind: 'heron', bossPower: 130, bossHp: 90 },
+  // 2026-11-21: three more ponds after the first three (the boss comes back bigger, with a new name)
+  { id: 4, ar: 'بركة القمر', en: 'Moonlit Pond', start: 20, evolve: 80, boss: 130, kinds: ['mosquito', 'dragonfly', 'dragonfly', 'fish', 'fish', 'frog', 'snake', 'frog'], heron: true, bossKind: 'bigbo2', bossPower: 190, bossHp: 110 },
+  { id: 5, ar: 'مستنقع الزمرد', en: 'Emerald Fen', start: 30, evolve: 110, boss: 180, kinds: ['dragonfly', 'fish', 'fish', 'fish', 'frog', 'snake', 'snake', 'snake'], heron: true, bossKind: 'snake2', bossPower: 260, bossHp: 130 },
+  { id: 6, ar: 'بحيرة الأساطير', en: 'Legend Lake', start: 40, evolve: 150, boss: 250, kinds: ['dragonfly', 'fish', 'fish', 'frog', 'frog', 'snake', 'snake', 'beetle'], heron: true, bossKind: 'heron2', bossPower: 360, bossHp: 160 },
 ];
 
 export const BOSS = {
   bigbo: { ar: 'بيج بو', en: 'Big Bo', r: 1.6 },
   snake: { ar: 'الثعبان سلاي', en: 'Sly the Snake', r: 1.4 },
   heron: { ar: 'مالك الحزين العملاق', en: 'The Grand Heron', r: 2.0 },
+  bigbo2: { ar: 'الجد بو', en: 'Grandpa Bo', r: 1.9 },
+  snake2: { ar: 'الملكة سلاي', en: 'Queen Sly', r: 1.6 },
+  heron2: { ar: 'ملك مالك الحزين', en: 'The Heron King', r: 2.3 },
 };
+/** The model/behaviour family of a boss: bigbo2 behaves like bigbo, and so on. */
+export const baseKind = (k) => String(k).replace(/\d$/, '');
 
 const LEAP_CD = 3;
 const LEAP_T = 0.55;
@@ -327,7 +336,7 @@ export class Pond {
     const d = Math.hypot(dx, dz) || 1;
     const reach = b.r + 4.2;
     // the heron flies over; the snake slithers; Big Bo hops
-    const sp = b.aim > 0 || b.lash > 0 ? 0 : b.kind === 'heron' ? 2.4 : b.kind === 'snake' ? 2.0 : (Math.sin(b.t * 4) > 0.2 ? 3.2 : 0);
+    const sp = b.aim > 0 || b.lash > 0 ? 0 : baseKind(b.kind) === 'heron' ? 2.4 : baseKind(b.kind) === 'snake' ? 2.0 : (Math.sin(b.t * 4) > 0.2 ? 3.2 : 0);
     if (d > reach * 0.7) { b.x += (dx / d) * sp * dt; b.z += (dz / d) * sp * dt; }
     b.a = Math.atan2(dx, dz);
     b.cool -= dt;
@@ -494,6 +503,7 @@ export function robotPlay(p) {
   return { x: ax, z: az, leap: danger };
 }
 
+/** A finished level opens the next one (also for saves from when level 3 was the last). */
 export function normalizeSave(raw) {
   const s = raw && typeof raw === 'object' ? raw : {};
   const stars = {};
@@ -502,5 +512,5 @@ export function normalizeSave(raw) {
   const d = Math.floor(Number(s.drops));
   const b = {};
   if (s.best && typeof s.best === 'object') for (const lv of LEVELS) { const v = Math.floor(Number(s.best[lv.id])); if (v > 0) b[lv.id] = Math.min(v, 99999); }
-  return { unlocked: Number.isFinite(u) ? Math.max(1, Math.min(LEVELS.length, u)) : 1, stars, drops: Number.isFinite(d) && d > 0 ? Math.min(d, 999999) : 0, best: b, muted: s.muted === true };
+  return { unlocked: Math.min(LEVELS.length, Math.max(Number.isFinite(u) ? Math.max(1, u) : 1, ...Object.keys(stars).map((k) => Number(k) + 1))), stars, drops: Number.isFinite(d) && d > 0 ? Math.min(d, 999999) : 0, best: b, muted: s.muted === true };
 }

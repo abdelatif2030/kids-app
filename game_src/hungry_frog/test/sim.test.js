@@ -21,7 +21,7 @@ function play(opts, mode = 'robot', maxT = 400) {
   return { p, seen };
 }
 
-test('the robot clears all three levels: evolve, grow, beat the boss', () => {
+test('the robot clears all six levels: evolve, grow, beat the boss', () => {
   for (let i = 0; i < LEVELS.length; i++) {
     let run;
     for (let k = 0; k < 3; k++) { run = play({ level: i, seed: 7 + i + k * 50 }); if (run.p.state === 'won') break; }
@@ -88,7 +88,8 @@ test('gulped after the last heart; easy mode has an extra heart and slower warni
 
 test('saves are cleaned', () => {
   const s = normalizeSave({ unlocked: 9, drops: -3, stars: { 1: 3, 2: 0 }, best: { 1: 50 } });
-  assert.equal(s.unlocked, 3);
+  assert.equal(s.unlocked, 6);
+  assert.equal(normalizeSave({ unlocked: 3, stars: { 3: 2 } }).unlocked, 4); // an old save that finished level 3 now gets level 4
   assert.equal(s.drops, 0);
   assert.deepEqual(s.stars, { 1: 3 });
   assert.deepEqual(s.best, { 1: 50 });
