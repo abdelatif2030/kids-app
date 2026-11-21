@@ -73,7 +73,7 @@ class Game {
     this.save = normalizeSave(config.save);
     this.base = config.base || './';
     this.art = {}; this.artKey = '';
-    loadArt(this.base, ART_NAMES).then((a) => { this.art = a; this.artKey = ''; });
+    this.artP = loadArt(this.base, ART_NAMES).then((a) => { this.art = a; this.artKey = ''; });
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
     if (!document.getElementById('ct-style')) document.head.append(h('style', { id: 'ct-style' }, css('ct', '#2a3a9a', '#141c5a', '#ffe04a') + `
@@ -146,7 +146,7 @@ class Game {
     this.ro.observe(el);
     this._bind();
     this.last = performance.now();
-    this._fonts().then(() => { this.showMenu(); this._loop(); });
+    Promise.all([this._fonts(), this.artP]).then(() => { this.showMenu(); this._loop(); });
   }
 
   async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 2500))]); } catch (_) { /* system font */ } }
@@ -172,7 +172,8 @@ class Game {
     this.mode = 'menu'; this.modal = null;
     this.layer.replaceChildren();
     this.sound.setMode(false);
-    this.layer.append(h('div', { class: 'ct-dim' }, h('div', { class: 'ct-card2 ct-card' },
+    const bgp = this.art && this.art.office_sunset;
+    this.layer.append(h('div', { class: 'ct-dim', style: bgp ? `background:linear-gradient(rgba(5,10,40,.45),rgba(5,10,40,.65)),url(${bgp.src}) center/cover no-repeat` : '' }, h('div', { class: 'ct-card2 ct-card' },
       h('div', { class: 'ct-logo' }, '💼 ', I.t('title')), h('div', { class: 'ct-small' }, I.t('tapGreen')),
       h('div', { class: 'ct-small' }, `🏆 ${I.t('masters')}: ${I.num(this.save.best)}`),
       h('button', { class: 'ct-btn', onclick: () => { this.sound.play('tap'); this.start(); } }, I.t('play')),

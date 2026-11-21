@@ -195,7 +195,10 @@ class Game {
     this.ro = new ResizeObserver(() => this._resize()); this.ro.observe(el);
     this._bind();
     this.last = performance.now();
-    Promise.all([this._fonts(), loadArt(this.base, ['hero_penguin', 'hero_fox', 'hero_bear', 'goblin_grunt', 'goblin_imp', 'goblin_thrower', 'goblin_brute', 'goblin_shaman', 'goblin_chief', 'goblin_king']).then((a) => { ART = a; })]).then(() => { this.showMenu(); this._loop(); });
+    Promise.all([this._fonts(), loadArt(this.base, ['hero_penguin', 'hero_fox', 'hero_bear', 'goblin_grunt', 'goblin_imp', 'goblin_thrower', 'goblin_brute', 'goblin_shaman', 'goblin_chief', 'goblin_king', 'bg_festival']).then((a) => { ART = a; })]).then(() => {
+      if (ART.bg_festival) this.root.style.background = `#d4e6f4 url(${ART.bg_festival.src}) center/cover no-repeat`; // the painted winter festival behind every screen
+      this.showMenu(); this._loop();
+    });
   }
 
   async _fonts() { try { const ff = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([ff.load().then((x) => document.fonts.add(x)), new Promise((r) => setTimeout(r, 2500))]); } catch (_) { /* system font */ } }
@@ -224,7 +227,8 @@ class Game {
     const cw = this.cw; const ch = this.ch; const sc = this.sc; const ox = this.ox; const oy = this.oy;
     let sd = 7; const R = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
     const sky = g.createLinearGradient(0, 0, 0, ch); sky.addColorStop(0, '#cfe2f3'); sky.addColorStop(0.5, '#e6f1fa'); sky.addColorStop(1, '#d4e6f4');
-    g.fillStyle = sky; g.fillRect(0, 0, cw, ch);
+    if (ART.bg_festival) g.clearRect(0, 0, cw, ch); // the painted festival (root background) shows through
+    else { g.fillStyle = sky; g.fillRect(0, 0, cw, ch); }
     for (let i = 0; i < 60; i++) R();
     // snowy hills + trees in the margins
     g.fillStyle = '#e8f1fb'; g.beginPath(); g.moveTo(0, ch); for (let x = 0; x <= cw; x += 12) g.lineTo(x, ch - 12 - Math.sin(x * 0.02) * 8 - 8); g.lineTo(cw, ch); g.fill();

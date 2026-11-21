@@ -1,0 +1,37 @@
+{
+ "style": "Glossy 3D-rendered cartoon game asset for children, soft studio lighting, smooth rounded shapes, bright saturated colors, cute friendly look.",
+ "kind_sprite": "Single object centered, seen from the SIDE, plain pure white background, no shadow, no text, no letters.",
+ "suffix": "No text, no letters, no UI.",
+ "jobs": [
+  {
+   "name": "platform_grass",
+   "kind": "sprite",
+   "prompt": "A small flat floating island platform: a thick rounded slab of brown earth with a bright green grass top, wide and short, side view."
+  },
+  {
+   "name": "platform_cloud",
+   "kind": "sprite",
+   "prompt": "A flat fluffy white cloud platform, wide and short, thick rounded bottom, side view."
+  },
+  {
+   "name": "spring",
+   "kind": "sprite",
+   "prompt": "A red coil spring with a yellow round pad on top, side view."
+  },
+  {
+   "name": "propeller_cap",
+   "kind": "sprite",
+   "prompt": "A small colorful beanie hat with a propeller on top, side view."
+  },
+  {
+   "name": "jetpack",
+   "kind": "sprite",
+   "prompt": "A small cute rocket jetpack backpack with two red thrusters and a little flame, side view."
+  },
+  {
+   "name": "bg_sky",
+   "kind": "bg",
+   "prompt": "A bright blue sky with big soft white clouds, a few tiny floating islands far away and a rainbow, no characters, vertical-friendly composition."
+  }
+ ]
+}
