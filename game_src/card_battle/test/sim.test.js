@@ -182,7 +182,7 @@ test('save normalisation and recording', () => {
   const s = normalizeSave({ stars: { easy: 9, hard: -2 }, wins: 'x', muted: 1, diff: 'zzz', junk: 1 });
   assert.deepEqual(s.stars, { easy: 3, normal: 0, hard: 0 });
   assert.equal(s.wins, 0); assert.equal(s.diff, 'easy'); assert.equal(s.muted, true);
-  assert.deepEqual(normalizeSave(null).stars, { easy: 0, normal: 0, hard: 0 });
+  assert.deepEqual(normalizeSave(null).stars, { easy: 0, normal: 0, hard: 0, expert: 0, legend: 0 });
   const r = recordResult(s, 'normal', { state: 'won', stars: 2 });
   assert.equal(r.stars.normal, 2); assert.equal(r.wins, 1); assert.equal(r.plays, 1);
   assert.equal(recordResult(r, 'normal', { state: 'won', stars: 1 }).stars.normal, 2);
