@@ -158,6 +158,16 @@ flutter:
     - assets/games/alien_sky/
     - assets/games/rhino_summit/
     - assets/games/sunset_highway/
+    - assets/games/butterfly_garden/
+    - assets/games/butterfly_garden/art/
+    - assets/games/cupcake_shop/
+    - assets/games/cupcake_shop/art/
+    - assets/games/little_salon/
+    - assets/games/little_salon/art/
+    - assets/games/baby_and_pet/
+    - assets/games/baby_and_pet/art/
+    - assets/games/little_princess_dress/
+    - assets/games/little_princess_dress/art/
     - assets/games/sunset_highway/art/
     - assets/games/sections/
     - assets/games/sky_jumper/

@@ -118,7 +118,7 @@ final WebGame kRhythmSurvival = WebGame(
   title: () => tr2('البقاء على الإيقاع', 'Rhythm Survival'),
 );
 
-final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash, kSkyCapy, kMarbleDozer, kDuneTitans, kCastawayRaft, kWinterCamp, kRainCircuit, kSquadShooter, kArcherBridge, kAlienSky, kRhinoSummit, kSunsetHighway, kCreatorTycoon, kPearlDivers, kHoneyFarm, kIceDragon, kBallScoop, kHamsterWarrior, kChompMaze, kFizzRunner, kHotSpring, kHopWorld, kMarsFarm, kPinPuzzle, kGemQuarry, kSkyAce, kNutmegRush, kTrickOrTreat, kVikingSling, kCardBattle, kDinoGrow, kIceRink, kTombPuzzle, kSweetTray, kBarrelKnights, kGummySquad, kFashionQueen, kRugCleaning, kTempleArmy, kSkyJumper];
+final List<WebGame> kWebGames = [kMotoRace, kCarnivalRace, kJungleAdventure, kHappyFarm, kPumpkinPie, kSamuraiAction, kGoldenTail, kOceanDefense, kRhythmSurvival, kSplashRace, kSpaceStore, kFoxFamily, kAirRace, kZombieRooftop, kGumBall, kDeepSea, kCoastalDrive, kHungryFrog, kFrostCoil, kSummitRush, kHeroTower, kCloudDash, kSkyCapy, kMarbleDozer, kDuneTitans, kCastawayRaft, kWinterCamp, kRainCircuit, kSquadShooter, kArcherBridge, kAlienSky, kRhinoSummit, kSunsetHighway, kCreatorTycoon, kPearlDivers, kHoneyFarm, kIceDragon, kBallScoop, kHamsterWarrior, kChompMaze, kFizzRunner, kHotSpring, kHopWorld, kMarsFarm, kPinPuzzle, kGemQuarry, kSkyAce, kNutmegRush, kTrickOrTreat, kVikingSling, kCardBattle, kDinoGrow, kIceRink, kTombPuzzle, kSweetTray, kBarrelKnights, kGummySquad, kFashionQueen, kRugCleaning, kTempleArmy, kSkyJumper, kLittlePrincessDress, kBabyAndPet, kLittleSalon, kCupcakeShop, kButterflyGarden];
 
 /// «متجر الفضاء الذكي» (Space Store Manager): a grocery store on a space station (docs/SPACE_STORE.md).
 final WebGame kSpaceStore = WebGame(
@@ -640,6 +640,56 @@ final WebGame kSkyJumper = WebGame(
   storeKey: 'sky_jumper',
   minAge: 4,
   title: () => tr2('النطاط', 'Sky Jumper'),
+);
+
+/// «ألبسي الأميرة الصغيرة» (Little Princess Dress-Up): girls world, ages 2-4 (docs/GIRLS_SECTION_PLAN.md).
+final WebGame kLittlePrincessDress = WebGame(
+  id: 'little_princess_dress',
+  folder: 'little_princess_dress',
+  global: 'LittlePrincessDress',
+  storeKey: 'little_princess_dress',
+  minAge: 2,
+  title: () => tr2('ألبسي الأميرة الصغيرة', 'Little Princess Dress-Up'),
+);
+
+/// «بيبي وصاحبها الصغير» (Baby & Pet Care): girls world, ages 2-4 (docs/GIRLS_SECTION_PLAN.md).
+final WebGame kBabyAndPet = WebGame(
+  id: 'baby_and_pet',
+  folder: 'baby_and_pet',
+  global: 'BabyAndPet',
+  storeKey: 'baby_and_pet',
+  minAge: 2,
+  title: () => tr2('بيبي وصاحبها الصغير', 'Baby & Pet Care'),
+);
+
+/// «صالون الشعر والفيونكات» (Little Hair Salon): girls world, ages 2-4 (docs/GIRLS_SECTION_PLAN.md).
+final WebGame kLittleSalon = WebGame(
+  id: 'little_salon',
+  folder: 'little_salon',
+  global: 'LittleSalon',
+  storeKey: 'little_salon',
+  minAge: 2,
+  title: () => tr2('صالون الشعر والفيونكات', 'Little Hair Salon'),
+);
+
+/// «محل الكب كيك» (Cupcake Shop): girls world, ages 2-4 (docs/GIRLS_SECTION_PLAN.md).
+final WebGame kCupcakeShop = WebGame(
+  id: 'cupcake_shop',
+  folder: 'cupcake_shop',
+  global: 'CupcakeShop',
+  storeKey: 'cupcake_shop',
+  minAge: 2,
+  title: () => tr2('محل الكب كيك', 'Cupcake Shop'),
+);
+
+/// «حديقة الفراشات والزهور» (Butterfly Garden): girls world, ages 2-4 (docs/GIRLS_SECTION_PLAN.md).
+final WebGame kButterflyGarden = WebGame(
+  id: 'butterfly_garden',
+  folder: 'butterfly_garden',
+  global: 'ButterflyGarden',
+  storeKey: 'butterfly_garden',
+  minAge: 2,
+  title: () => tr2('حديقة الفراشات والزهور', 'Butterfly Garden'),
 );
 
 // ---- rebuilt learning games (docs/LEARNING_GAMES_REBUILD.md) ----------------------------------------------------------

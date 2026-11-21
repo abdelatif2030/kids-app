@@ -17,6 +17,29 @@ SHEETS = {
     'B5_zombie': ('zombie', 4, 3, ['hero_shoot', 'hero_run', 'hero_win', 'z_normal', 'z_fat', 'z_cone', 'z_bucket', 'z_small', 'z_bandage', 'z_tutu', 'z_flower', 'z_yellow'], False),
     'B6_samurai': ('samurai', 4, 3, ['hero', 'ninja_blue', 'ninja_green', 'ninja_purple', 'oni', 'petals', 'star', 'x1', 'slash', 'dash', 'win', 'idle2'], False),
     'B7_animals': ('animals', 4, 3, ['fox', 'cubs', 'frog', 'frog_big', 'raptor', 'trex', 'fish', 'shark', 'octopus', 'turtle', 'x2', 'x3'], False),
+    'C1_princess_poses': ('princess', 4, 3, ['pose_stand', 'pose_wave', 'pose_twirl', 'pose_curtsy', 'pose_clap', 'pose_jump', 'pose_surprise', 'pose_kiss', 'pose_sit', 'pose_hug', 'pose_sleep', 'pose_dance'], False),
+    'C2_girls4': ('girls4', 4, 3, ['doll_light', 'doll_dark', 'doll_straight', 'doll_red', None, None, None, None, None, None, None, None], False),
+    'C3_dresses1': ('dress1', 4, 3, ['dress_%02d' % i for i in range(1, 13)], False),
+    'C4_dresses2': ('dress2', 4, 3, ['dress_%02d' % i for i in range(13, 25)], False),
+    'C5_shoes': ('shoes', 4, 3, ['shoes_%02d' % i for i in range(1, 13)], False),
+    'C6_crowns': ('crowns', 4, 3, ['crown_%02d' % i for i in range(1, 13)], False),
+    'C11_baby': ('baby', 4, 3, ['happy', 'hungry', 'eating', 'bottle', 'muddy', 'bath', 'towel', 'brush', 'dressed', 'yawn', 'sleep', 'hug'], False),
+    'C12_kitten': ('kitten', 4, 3, ['happy', 'hungry', 'eating', 'bottle', 'muddy', 'bath', 'towel', 'brush', 'dressed', 'yawn', 'sleep', 'hug'], False),
+    'C13_bunny': ('bunny', 4, 3, ['happy', 'hungry', 'eating', 'bottle', 'muddy', 'bath', 'towel', 'brush', 'dressed', 'yawn', 'sleep', 'hug'], False),
+    'C14_puppy': ('puppy', 4, 3, ['happy', 'hungry', 'eating', 'bottle', 'muddy', 'bath', 'towel', 'brush', 'dressed', 'yawn', 'sleep', 'hug'], False),
+    'C15_care_items': ('care', 4, 3, ['item_%02d' % i for i in range(1, 13)], False),
+    'C8_hair': ('hair', 4, 2, ['hair_%02d' % i for i in range(1, 9)], False),
+    'C9_tools': ('tools', 4, 3, ['brush', 'comb', 'wand_pink', 'wand_blue', 'wand_yellow', 'wand_green', 'dryer', 'scissors', 'polish', 'mirror', 'spray', 'sponge'], False),
+    'C10_bows': ('bows', 4, 3, ['bow_%02d' % i for i in range(1, 13)], False),
+    'C16_baker': ('baker', 4, 3, ['baker_%02d' % i for i in range(1, 13)], False),
+    'C17_cupcakes': ('cupcakes', 4, 3, ['cup_%02d' % i for i in range(1, 13)], False),
+    'C18_toppings': ('toppings', 4, 3, ['top_%02d' % i for i in range(1, 13)], False),
+    'C19_guests': ('guests', 4, 3, ['guest_%02d' % i for i in range(1, 13)], False),
+    'C20_flowers1': ('flowers1', 4, 3, ['fl1_%02d' % i for i in range(1, 13)], False),
+    'C21_flowers2': ('flowers2', 4, 3, ['fl2_%02d' % i for i in range(1, 13)], False),
+    'C22_butterflies': ('butterflies', 4, 3, ['bf_%02d' % i for i in range(1, 13)], False),
+    'C23_garden_items': ('gitems', 4, 3, ['gi_%02d' % i for i in range(1, 13)], False),
+    'C24_fairy': ('fairy', 4, 3, ['fairy_%02d' % i for i in range(1, 13)], False),
 }
 only = sys.argv[1:] or list(SHEETS)
 for sid in only:
@@ -25,6 +48,7 @@ for sid in only:
     W, H = sheet.size; cw, ch = W / cols, H / rows
     out = f'build/cut/{tag}'; os.makedirs(out, exist_ok=True)
     for i, n in enumerate(names):
+        if not n: continue
         c, r = i % cols, i // cols
         cell = sheet.crop((int(c * cw), int(r * ch), int((c + 1) * cw), int((r + 1) * ch)))
         im = cut_white(cell, white=238, height=400)
