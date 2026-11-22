@@ -8,7 +8,8 @@ import * as L from './logic.js';
 import { Sound } from './audio.js';
 import { FQ_CSS } from './style.js';
 import { I, t } from './i18n.js';
-import { drawDoll, drawStage } from './art.js';
+import { drawDoll, drawStage, BG_PICS } from './art.js';
+import { loadArt } from '../../cozy_kit/art.js';
 import { makeThumbs } from './thumbs.js';
 import { STYLE_NAME, COLOR_NAME, HAIR_NAME } from './data.js';
 import { menuView, mapView, missionsView, shopView, settingsView } from './screens_main.js';
@@ -59,7 +60,7 @@ class Game {
     this.ro.observe(el);
     this._bind();
     this.last = performance.now();
-    this._fonts().then(() => { this.go('menu'); this._loop(); });
+    Promise.all([this._fonts(), loadArt(this.base, ['bg_palace', 'bg_studio', 'bg_salon', 'bg_pets', 'bg_house', 'bg_runway']).then((a) => { for (const k of ['palace', 'studio', 'salon', 'pets', 'house', 'runway']) if (a['bg_' + k]) BG_PICS[k] = a['bg_' + k]; })]).then(() => { this.go('menu'); this._loop(); });
   }
 
   async _fonts() {

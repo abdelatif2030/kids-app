@@ -1,0 +1,37 @@
+{
+ "style": "Premium glossy 3D-rendered cartoon scenery for a girls fashion game: soft studio lighting, smooth rounded shapes, pink / lilac / white / gold palette, sparkles, kid friendly, a wide empty floor area in the lower third, no characters, no text, no letters.",
+ "kind_sprite": "",
+ "suffix": "Wide landscape scene.",
+ "jobs": [
+  {
+   "name": "fq_palace",
+   "kind": "bg",
+   "prompt": "a magical pink fashion palace hall with tall arched windows, golden pillars and a sparkling chandelier."
+  },
+  {
+   "name": "fq_studio",
+   "kind": "bg",
+   "prompt": "a luxury fashion boutique with racks of colorful dresses, a big mirror and soft pink lights."
+  },
+  {
+   "name": "fq_salon",
+   "kind": "bg",
+   "prompt": "a glamorous beauty salon with vanity mirrors with round lights, perfume bottles and pink chairs."
+  },
+  {
+   "name": "fq_pets",
+   "kind": "bg",
+   "prompt": "a sunny pastel pet park with a little pink house, flowers, a fence and a pond."
+  },
+  {
+   "name": "fq_house",
+   "kind": "bg",
+   "prompt": "a dream pink bedroom with a canopy bed, a big window with a castle view and cute furniture."
+  },
+  {
+   "name": "fq_runway",
+   "kind": "bg",
+   "prompt": "a grand fashion show runway stage with a long glossy catwalk, spotlights, curtains and sparkling lights."
+  }
+ ]
+}

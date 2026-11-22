@@ -139,7 +139,21 @@ export function drawPet(c, cx, cy, s, pet, t, st = {}) {
   c.restore();
 }
 
+/** The painted backdrops (assets/games/fashion_queen/art/bg_<name>.webp), set once by the game after they load; a missing one keeps the code-drawn gradient. */
+export const BG_PICS = {};
+const BG_NAME = { palace: 'palace', map: 'palace', shop: 'studio', studio: 'studio', salon: 'salon', pets: 'pets', house: 'house', runway: 'runway' };
+
 export function drawStage(c, W, H, kind, t) {
+  const pic = BG_PICS[BG_NAME[kind]];
+  if (pic) {
+    // cover the whole stage with the picture, then a soft veil so the dolls and the panels stay readable
+    const k = Math.max(W / pic.naturalWidth, H / pic.naturalHeight); const w = pic.naturalWidth * k; const h = pic.naturalHeight * k;
+    c.drawImage(pic, (W - w) / 2, (H - h) / 2, w, h);
+    c.fillStyle = 'rgba(255,240,250,.14)'; c.fillRect(0, 0, W, H);
+    c.font = '26px system-ui'; c.textAlign = 'center';
+    for (let i = 0; i < 6; i++) { c.globalAlpha = 0.55; c.fillText(['✨', '💖', '⭐'][i % 3], W * (0.12 + i * 0.15), H * (0.08 + 0.03 * Math.sin(t * 2 + i))); } c.globalAlpha = 1;
+    return;
+  }
   const g = c.createLinearGradient(0, 0, 0, H);
   const pal = { palace: ['#ffd8f0', '#d8a8f0'], studio: ['#ffe4f2', '#f8b8d8'], salon: ['#e8d8ff', '#ffb8d8'], pets: ['#c8f0ff', '#a8e8a0'], house: ['#fff0f8', '#ffd0e8'], runway: ['#2a1a5a', '#6a2a9a'], map: ['#a8e8ff', '#a8f0a8'], shop: ['#fff0c8', '#ffc8e8'] }[kind] || ['#ffd8f0', '#d8a8f0'];
   g.addColorStop(0, pal[0]); g.addColorStop(1, pal[1]); c.fillStyle = g; c.fillRect(0, 0, W, H);
