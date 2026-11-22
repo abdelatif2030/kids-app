@@ -64,12 +64,12 @@ class Game {
     if (!document.getElementById('sl-style')) document.head.append(h('style', { id: 'sl-style' }, CSS));
     this.m = new Makeover(); this.girl = 0; this.tool = 'style'; this.busy = false;
     const names = [...GIRLS, ...DRESSES.map((n) => `dress_${String(n).padStart(2, '0')}`), 'tool_brush', 'tool_dryer', 'tool_polish', 'tool_mirror', 'tool_wand_pink', 'tool_comb', 'dress_01', 'bow_02', ...Array.from({ length: BOWS }, (_, i) => `bow_${String(i + 1).padStart(2, '0')}`), 'bg_salon1', 'bg_salon2', 'bg_salon3'];
-    loadAll(this.base, [...names, ...Array.from({ length: 12 }, (_, i) => `fairy_${String(i + 1).padStart(2, '0')}`)]).then((art) => { this.art = art; if (!this.disposed) this._build(); });
+    loadAll(this.base, ['bgp_1', 'bgp_2', 'bgp_3', 'bgp_4', 'bgp_5', 'bgp_6', ...names, ...Array.from({ length: 12 }, (_, i) => `fairy_${String(i + 1).padStart(2, '0')}`)]).then((art) => { this.art = art; if (!this.disposed) this._build(); });
   }
 
   _build() {
     const A = this.art;
-    const bgs = [A.bg_salon1, A.bg_salon2, A.bg_salon3, A.bg_salon1, A.bg_salon2, A.bg_salon3];
+    const bgs = [1, 2, 3, 4, 5, 6].map((i) => A[`bgp_${i}`] || null);
     this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, fairy: Object.fromEntries([1,2,3,4,5,6,7,8,9,10,11,12].map((n) => [n, this.art[`fairy_${String(n).padStart(2, '0')}`]])), title: this.en ? 'Hair salon' : 'صالون الشعر', places: PLACES, bgs, onPlace: () => {} });
     this.girlEl = h('div', { class: 'sl-girl gk-idle', onclick: () => { this.girl = (this.girl + 1) % GIRLS.length; this._girl(); this.stage.say(this.en ? 'A new friend!' : 'صاحبة جديدة!'); } });
     this.tools = h('div', { class: 'sl-tools' }, TOOLS.map((t) => h('button', { class: 'sl-tool', 'data-tool': t.id, 'aria-label': this.en ? t.en : t.ar, onclick: () => this._pickTool(t) }, this._icon(t))));

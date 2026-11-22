@@ -14,8 +14,7 @@ export function menuView(g) {
   const play = h('button', { class: 'fq-btn gold big', style: 'position:relative', onclick: () => { g.sound.play('ok'); g.go('map'); } }, '▶ ', g.t('play'), badge(L.levelsReady(g.save)));
   const grid = h('div', { class: 'fq-menu' },
     mb('', '👗', g.t('m_studio'), () => g.go('studio')), mb('p2', '💄', g.t('m_salon'), () => g.go('salon')), mb('p4', '🐶', g.t('m_pets'), () => g.go('pets')),
-    mb('p3', '🏠', g.t('m_house'), () => g.go('house')), mb('', '🌟', g.t('m_runway'), () => g.go('runway')), mb('p2', '🛍️', g.t('m_shop'), () => g.go('shop')),
-    mb('p4', '🎯', g.t('m_missions'), () => g.go('missions'), L.claimableCount(g.save)), mb('p3', '⚙️', g.t('m_settings'), () => g.go('settings')), mb('', '🚪', g.t('m_exit'), () => { g.flush(); g.post({ type: 'exit' }); }));
+    mb('p3', '🏠', g.t('m_house'), () => g.go('house')), mb('', '🌟', g.t('m_runway'), () => g.go('runway')), mb('p4', '🎯', g.t('m_missions'), () => g.go('missions'), L.claimableCount(g.save)));
   const panel = h('div', { class: 'fq-wrap', style: 'justify-content:center' }, play, grid);
   const overlay = h('div', { class: 'fq-title-big', style: 'top:calc(var(--u)*13.5)' }, h('div', { class: 'a' }, '👑 ', g.t('title')), h('div', { class: 'b' }, g.t('subtitle')));
   return {

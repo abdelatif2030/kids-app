@@ -47,6 +47,8 @@ const CSS = `
 .gw-back{position:absolute;top:calc(var(--u)*2);right:calc(var(--u)*2);z-index:6}
 .gw-game{position:absolute;inset:0;z-index:10}
 .gw-bagnote{position:absolute;bottom:calc(var(--u)*2);right:calc(var(--u)*3);background:rgba(255,255,255,.9);border:calc(var(--u)*.5) solid #ffd86a;border-radius:99px;padding:calc(var(--u)*.8) calc(var(--u)*3);font-weight:900;font-size:calc(var(--u)*3.6);color:#a82a78;box-shadow:0 calc(var(--u)*.6) 0 rgba(160,40,120,.4)}
+.gw-grow{position:absolute;left:calc(var(--u)*3);bottom:calc(var(--u)*2);z-index:6;display:flex;align-items:center;gap:calc(var(--u)*1.4);background:linear-gradient(180deg,#c8a0ff,#8a5ae0);border:calc(var(--u)*.6) solid #fff;border-radius:99px;padding:calc(var(--u)*1) calc(var(--u)*3);color:#fff;font-family:inherit;font-weight:900;font-size:calc(var(--u)*3.4);cursor:pointer;box-shadow:0 calc(var(--u)*.8) 0 #5a3aa8;min-height:48px}
+.gw-grow i{font-style:normal;font-size:calc(var(--u)*5)}.gw-grow em{font-style:normal;background:#ffd23a;color:#6a3a00;border-radius:99px;padding:0 calc(var(--u)*1.6);font-size:calc(var(--u)*3)}
 .gw-door.party{flex:1.35 1 0;max-width:calc(var(--u)*30);border-color:#ffd23a;box-shadow:0 calc(var(--u)*1.2) 0 #c07a10,0 0 calc(var(--u)*4) rgba(255,210,60,.8)}
 @media (max-aspect-ratio:1/1){.gw-path{flex-wrap:wrap;top:calc(var(--u)*14);gap:calc(var(--u)*3)}.gw-door{flex:0 0 calc(var(--u)*28);max-width:none}}
 @media (prefers-reduced-motion:reduce){.gw-fairy{animation:none}}
@@ -86,6 +88,8 @@ class World {
     const fairy = new Image(); fairy.src = `${this.base}../little_princess_dress/art/fairy_02.webp`;
     fairy.className = 'gw-fairy'; fairy.draggable = false; fairy.alt = '';
     fairy.onload = () => hub.append(fairy);
+    // the gate for the older girls (owner 2026-11-22): "when you grow up: Fashion Queen" (ages 4+)
+    hub.append(h('button', { class: 'gw-grow', 'aria-label': this.en ? 'When you grow up: Fashion Queen' : 'لما تكبري: ملكة الموضة', onclick: () => { music.tap(); this.post({ type: 'open_game', id: 'fashion_queen' }); } }, h('i', {}, '👑'), h('span', {}, this.en ? 'When you grow up: Fashion Queen' : 'لما تكبري: ملكة الموضة'), h('em', {}, this.en ? 'ages 4+' : '٤+ سنين')));
     hub.append(h('button', { class: 'gk-rb gw-back', 'aria-label': this.en ? 'Back' : 'رجوع', onclick: () => { music.stopAmbient(); this.post({ type: 'exit' }); } }, this.en ? '←' : '→'));
     const snd = h('button', { class: 'gk-rb p gw-snd', 'aria-label': 'sound', onclick: () => { this.save.muted = !this.save.muted; music.setMuted(this.save.muted); snd.textContent = this.save.muted ? '🔇' : '🔊'; this._save(); } }, this.save.muted ? '🔇' : '🔊');
     hub.append(snd);

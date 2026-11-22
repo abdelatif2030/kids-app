@@ -73,7 +73,7 @@ class Game {
     if (!document.getElementById('cu-style')) document.head.append(h('style', { id: 'cu-style' }, CSS));
     this.order = new Order(1); this.busy = false;
     const names = ['baker_01', 'baker_08', 'baker_12', ...Array.from({ length: 12 }, (_, i) => `cup_${String(i + 1).padStart(2, '0')}`), ...Array.from({ length: 12 }, (_, i) => `top_${String(i + 1).padStart(2, '0')}`), ...Array.from({ length: 12 }, (_, i) => `guest_${String(i + 1).padStart(2, '0')}`), 'bg_bakery1', 'bg_bakery2', 'bg_bakery3'];
-    loadAll(this.base, [...names, ...Array.from({ length: 12 }, (_, i) => `fairy_${String(i + 1).padStart(2, '0')}`)]).then((art) => { this.art = art; if (!this.disposed) this._build(); });
+    loadAll(this.base, ['bgp_1', 'bgp_2', 'bgp_3', 'bgp_4', 'bgp_5', 'bgp_6', ...names, ...Array.from({ length: 12 }, (_, i) => `fairy_${String(i + 1).padStart(2, '0')}`)]).then((art) => { this.art = art; if (!this.disposed) this._build(); });
   }
 
   _t(p) { return this.en ? p[1] : p[0]; }
@@ -81,7 +81,7 @@ class Game {
 
   _build() {
     const A = this.art;
-    const bgs = [A.bg_bakery1, A.bg_bakery2, A.bg_bakery3, A.bg_bakery1, A.bg_bakery2, A.bg_bakery3];
+    const bgs = [1, 2, 3, 4, 5, 6].map((i) => A[`bgp_${i}`] || null);
     this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, fairy: Object.fromEntries([1,2,3,4,5,6,7,8,9,10,11,12].map((n) => [n, this.art[`fairy_${String(n).padStart(2, '0')}`]])), title: this.en ? 'Cupcake shop' : 'محل الكب كيك', places: PLACES, bgs, onPlace: (i) => { this._newOrder(i); } });
     this.bakerEl = h('div', { class: 'cu-baker' });
     const b = A.baker_01; if (b) { this.bakerEl.style.setProperty('--ar', String(b.naturalWidth / b.naturalHeight)); this.bakerEl.append(h('img', { src: b.src, alt: '', draggable: 'false' })); } else this.bakerEl.append(h('div', { style: 'font-size:calc(var(--u)*24)' }, '👩‍🍳'));

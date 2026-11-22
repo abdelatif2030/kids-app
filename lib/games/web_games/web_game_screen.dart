@@ -113,6 +113,15 @@ class _WebGameScreenState extends State<WebGameScreen> {
         if (save is Map<String, dynamic>) _store.save(widget.childId, save);
       case 'exit':
         _leave();
+      case 'open_game':
+        // a game offers another one (Princess World -> Fashion Queen "when you grow up"): it replaces this one, so back goes to the games page
+        final id = msg['id'];
+        for (final g in kWebGames) {
+          if (g.id == id && mounted) {
+            Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => WebGameScreen(game: g, childId: widget.childId, age: widget.age, gender: widget.gender)));
+            break;
+          }
+        }
       case 'speak':
         final text = msg['text'];
         if (text is String && text.isNotEmpty && text.length <= 200) {

@@ -27,20 +27,11 @@ test('save normalisation survives garbage and keeps valid data', () => {
   assert.equal(b.rooms.kitchen.items.length, 0); assert.deepEqual(b.look.outfit, {});
 });
 
-test('economy: buying needs money, deducts, counts, cannot repeat', () => {
-  const s = fresh(); const paid = ITEMS.find((i) => i.price > 0 && !i.diamonds);
-  assert.equal(L.isOwned(s, 'item', paid.id), false);
-  s.coins = paid.price - 1;
-  assert.deepEqual(L.buy(s, 'item', paid.id), { ok: false, reason: 'poor' });
-  s.coins = paid.price + 10;
-  assert.ok(L.buy(s, 'item', paid.id).ok);
-  assert.equal(s.coins, 10); assert.equal(s.events.buy, 1); assert.ok(L.isOwned(s, 'item', paid.id));
-  assert.equal(L.buy(s, 'item', paid.id).reason, 'owned');
-  const dia = ITEMS.find((i) => i.diamonds > 0);
-  s.dia = 0; assert.equal(L.buy(s, 'item', dia.id).reason, 'poor'); s.dia = dia.diamonds; assert.ok(L.buy(s, 'item', dia.id).ok); assert.equal(s.dia, 0);
-  s.coins = 1000; assert.ok(L.buy(s, 'pet', 'rabbit').ok); assert.equal(s.events.petunlock, 1);
-  assert.ok(L.buy(s, 'hair', 'bob').ok); assert.ok(L.buy(s, 'deco', 'w:3').ok);
-  assert.equal(L.buy(s, 'item', 'nothing').ok, false);
+test('nothing is locked: every item, hair, pet and decoration is owned from the start and costs nothing', () => {
+  const s = fresh();
+  for (const it of ITEMS) { assert.ok(L.isOwned(s, 'item', it.id), it.id); assert.deepEqual(L.priceOf('item', it.id), { coins: 0, dia: 0 }); }
+  assert.equal(L.priceOf('item', 'nope'), null); // unknown ids are still unknown
+  assert.equal(L.buy(s, 'item', ITEMS[0].id).reason, 'owned'); // nothing to buy
 });
 
 test('earn counts coins earned; events count; runwayStars is the best single show', () => {
@@ -64,7 +55,7 @@ test('favourite looks: save (counts), limit, load only owned items, delete', () 
   assert.ok(L.saveFav(s, s.look)); assert.equal(s.events.fav, 1);
   const paid = ITEMS.find((i) => i.slot === 'top' && i.price > 0);
   s.favs[0].outfit.top = paid.id; delete s.favs[0].outfit.dress;
-  assert.ok(L.loadFav(s, 0)); assert.ok(!s.look.outfit.top);
+  assert.ok(L.loadFav(s, 0)); assert.equal(s.look.outfit.top, paid.id); // everything is owned now, so a saved look loads fully
   for (let i = 0; i < 20; i++) L.saveFav(s, s.look);
   assert.equal(s.favs.length, L.MAX_FAVS);
   assert.ok(L.deleteFav(s, 0)); assert.equal(s.favs.length, L.MAX_FAVS - 1);

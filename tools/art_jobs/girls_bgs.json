@@ -1,0 +1,157 @@
+{
+ "style": "Premium glossy 3D-rendered cartoon scenery for a toddler girls' game: soft studio lighting, smooth rounded shapes, pink / lilac / white / gold pastel palette, sparkles, kid friendly, a wide empty floor area in the lower third, no characters, no text, no letters.",
+ "kind_sprite": "",
+ "suffix": "Wide landscape scene.",
+ "jobs": [
+  {
+   "name": "bg_dress_1",
+   "kind": "bg",
+   "prompt": "a pastel castle bedroom with a big window and a canopy bed."
+  },
+  {
+   "name": "bg_dress_2",
+   "kind": "bg",
+   "prompt": "a garden tea party with a pink gazebo and flowers."
+  },
+  {
+   "name": "bg_dress_3",
+   "kind": "bg",
+   "prompt": "a snowy ice castle with crystal pillars and soft blue light."
+  },
+  {
+   "name": "bg_dress_4",
+   "kind": "bg",
+   "prompt": "a sunny beach party with palm trees and a pastel tent."
+  },
+  {
+   "name": "bg_dress_5",
+   "kind": "bg",
+   "prompt": "a magic forest with glowing mushrooms and fairy lights."
+  },
+  {
+   "name": "bg_dress_6",
+   "kind": "bg",
+   "prompt": "a rainbow ballroom with chandeliers and a shiny floor."
+  },
+  {
+   "name": "bg_salon_1",
+   "kind": "bg",
+   "prompt": "a pink hair salon with a giant mirror in the middle and shelves of tools."
+  },
+  {
+   "name": "bg_salon_2",
+   "kind": "bg",
+   "prompt": "a princess salon with gold frames and velvet chairs."
+  },
+  {
+   "name": "bg_salon_3",
+   "kind": "bg",
+   "prompt": "a garden salon with flowers and trellis walls."
+  },
+  {
+   "name": "bg_salon_4",
+   "kind": "bg",
+   "prompt": "a rainbow salon with colorful walls and star lamps."
+  },
+  {
+   "name": "bg_salon_5",
+   "kind": "bg",
+   "prompt": "an ice-themed salon with snowflake decorations."
+  },
+  {
+   "name": "bg_salon_6",
+   "kind": "bg",
+   "prompt": "a starry night salon with moon lamps and a purple sky window."
+  },
+  {
+   "name": "bg_pet_1",
+   "kind": "bg",
+   "prompt": "a pastel nursery with a crib, toys and a big window."
+  },
+  {
+   "name": "bg_pet_2",
+   "kind": "bg",
+   "prompt": "a garden yard with a swing, flowers and a picket fence."
+  },
+  {
+   "name": "bg_pet_3",
+   "kind": "bg",
+   "prompt": "a cozy pink bathroom with a bathtub, rubber ducks and bubbles."
+  },
+  {
+   "name": "bg_pet_4",
+   "kind": "bg",
+   "prompt": "a cute red farm barn with hay bales and a fence."
+  },
+  {
+   "name": "bg_pet_5",
+   "kind": "bg",
+   "prompt": "a snowy wooden cabin with a fireplace and warm lights."
+  },
+  {
+   "name": "bg_pet_6",
+   "kind": "bg",
+   "prompt": "a rainbow playroom with cushions and toy blocks."
+  },
+  {
+   "name": "bg_bakery_1",
+   "kind": "bg",
+   "prompt": "a garden bakery counter with flower pots and a striped awning."
+  },
+  {
+   "name": "bg_bakery_2",
+   "kind": "bg",
+   "prompt": "a rainbow bakery with colorful shelves of cakes."
+  },
+  {
+   "name": "bg_bakery_3",
+   "kind": "bg",
+   "prompt": "a snowy bakery with a frosted window and snowflakes."
+  },
+  {
+   "name": "bg_bakery_4",
+   "kind": "bg",
+   "prompt": "a beach bakery with a striped awning and the sea behind."
+  },
+  {
+   "name": "bg_bakery_5",
+   "kind": "bg",
+   "prompt": "a castle bakery with golden arches and tall windows."
+  },
+  {
+   "name": "bg_bakery_6",
+   "kind": "bg",
+   "prompt": "a starry night bakery with lanterns and a purple sky."
+  },
+  {
+   "name": "bg_garden_1",
+   "kind": "bg",
+   "prompt": "a spring meadow with soft green grass and wildflowers."
+  },
+  {
+   "name": "bg_garden_2",
+   "kind": "bg",
+   "prompt": "a tulip field with a windmill far away."
+  },
+  {
+   "name": "bg_garden_3",
+   "kind": "bg",
+   "prompt": "a sunflower farm with a barn far away."
+  },
+  {
+   "name": "bg_garden_4",
+   "kind": "bg",
+   "prompt": "a rose garden with a stone arch."
+  },
+  {
+   "name": "bg_garden_5",
+   "kind": "bg",
+   "prompt": "a snowy winter garden with ice crystals and pine trees."
+  },
+  {
+   "name": "bg_garden_6",
+   "kind": "bg",
+   "prompt": "a magic night garden with glowing fireflies and a big moon."
+  }
+ ]
+}

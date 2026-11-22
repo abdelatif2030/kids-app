@@ -80,12 +80,12 @@ class Game {
     if (!document.getElementById('dr-style')) document.head.append(h('style', { id: 'dr-style' }, CSS));
     this.outfit = new Outfit(); this.cat = 'dress'; this.doll = 0; this.party = false; this.disposed = false;
     const names = [...DOLLS, ...POSES, ...CATS.flatMap((c) => Array.from({ length: c.count }, (_, i) => nameOf(c.id, i + 1))), 'bg_bedroom', 'bg_garden_tea', 'bg_ice', 'bg_beach', 'bg_forest', 'bg_ballroom'];
-    loadAll(this.base, [...names, ...Array.from({ length: 12 }, (_, i) => `fairy_${String(i + 1).padStart(2, '0')}`)]).then((art) => { this.art = art; if (!this.disposed) this._build(); });
+    loadAll(this.base, ['bgp_1', 'bgp_2', 'bgp_3', 'bgp_4', 'bgp_5', 'bgp_6', ...names, ...Array.from({ length: 12 }, (_, i) => `fairy_${String(i + 1).padStart(2, '0')}`)]).then((art) => { this.art = art; if (!this.disposed) this._build(); });
   }
 
   _build() {
     const A = this.art;
-    const bgs = ['bg_bedroom', 'bg_garden_tea', 'bg_ice', 'bg_beach', 'bg_forest', 'bg_ballroom'].map((n) => A[n]);
+    const bgs = [1, 2, 3, 4, 5, 6].map((i) => A[`bgp_${i}`] || null);
     this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, fairy: Object.fromEntries([1,2,3,4,5,6,7,8,9,10,11,12].map((n) => [n, this.art[`fairy_${String(n).padStart(2, '0')}`]])), title: this.en ? 'Little princess' : 'ألبسي الأميرة', places: PLACES, bgs, onPlace: () => { this._tray(); } });
     this.layer = this.stage.layer;
     this.dollEl = h('div', { class: 'dr-doll gk-idle', onclick: () => { this.doll = (this.doll + 1) % DOLLS.length; this._doll(); this.stage.say(this.en ? 'A new princess!' : 'أميرة جديدة!'); } });

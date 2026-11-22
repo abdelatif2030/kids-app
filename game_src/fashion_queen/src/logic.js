@@ -98,7 +98,10 @@ export const decoIds = () => {
   return out;
 };
 
-export function priceOf(kind, id) {
+/** Everything is FREE now (owner 2026-11-22: nothing locked, no shopping). The old prices stay in priceOfRaw only to say whether an id exists. */
+export function priceOf(kind, id) { return priceOfRaw(kind, id) ? { coins: 0, dia: 0 } : null; }
+
+function priceOfRaw(kind, id) {
   if (kind === 'item') { const it = byId.get(id); return it ? { coins: it.price, dia: it.diamonds } : null; }
   if (kind === 'hair') { const i = HAIRS.indexOf(id); if (i < 0) return null; return { coins: i < FREE_HAIRS ? 0 : 60 + (i - FREE_HAIRS) * 20, dia: 0 }; }
   if (kind === 'pet') { const p = PETS.find((q) => q.id === id); return p ? { coins: p.cost, dia: p.dia } : null; }

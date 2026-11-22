@@ -62,14 +62,14 @@ class Game {
     if (!document.getElementById('ga-style')) document.head.append(h('style', { id: 'ga-style' }, CSS));
     this.g = new Garden(); this.seed = 0; this.can = false; this.busy = false; this.bfEls = [];
     const names = [...Array.from({ length: 12 }, (_, i) => `fl1_${String(i + 1).padStart(2, '0')}`), ...Array.from({ length: 6 }, (_, i) => `fl2_${String(i + 1).padStart(2, '0')}`), ...Array.from({ length: 12 }, (_, i) => `bf_${String(i + 1).padStart(2, '0')}`), 'bg_garden1', 'bg_garden2', 'bg_garden3', 'gi_01', 'gi_02', 'gi_03', 'gi_04', 'gi_05', 'gi_06', 'gi_09', 'gi_12'];
-    loadAll(this.base, [...names, ...Array.from({ length: 12 }, (_, i) => `fairy_${String(i + 1).padStart(2, '0')}`)]).then((art) => { this.art = art; if (!this.disposed) this._build(); });
+    loadAll(this.base, ['bgp_1', 'bgp_2', 'bgp_3', 'bgp_4', 'bgp_5', 'bgp_6', ...names, ...Array.from({ length: 12 }, (_, i) => `fairy_${String(i + 1).padStart(2, '0')}`)]).then((art) => { this.art = art; if (!this.disposed) this._build(); });
   }
 
   _t(p) { return this.en ? p[1] : p[0]; }
 
   _build() {
     const A = this.art;
-    const bgs = [A.bg_garden1, A.bg_garden2, A.bg_garden3, A.bg_garden1, A.bg_garden2, A.bg_garden3];
+    const bgs = [1, 2, 3, 4, 5, 6].map((i) => A[`bgp_${i}`] || null);
     this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, fairy: Object.fromEntries([1,2,3,4,5,6,7,8,9,10,11,12].map((n) => [n, this.art[`fairy_${String(n).padStart(2, '0')}`]])), title: this.en ? 'Butterfly garden' : 'حديقة الفراشات', places: PLACES, bgs, onPlace: () => this._reset() });
     this.potsEl = h('div', { class: 'ga-pots' }, Array.from({ length: POTS }, (_, i) => h('button', { class: 'ga-pot', 'data-pot': String(i), 'aria-label': `pot ${i + 1}`, onclick: (e) => this._tapPot(i, e) }, this._potPic())));
     const PACK = { 0: 'gi_02', 1: 'gi_03', 2: 'gi_04', 3: 'gi_06', 4: 'gi_05' }; // the painted seed packets (orange has none: a coloured square)
