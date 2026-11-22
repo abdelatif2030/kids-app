@@ -7,7 +7,9 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { Rooftop, ROOFS, PERKS, UPGRADES, WEAPONS, MAX_UP, upCost, weaponOf, normalizeSave } from './sim.js';
-import { loadSprites } from '../../cozy_kit/art.js';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
+import { loadSprites, loadObjModels, fitModel } from '../../cozy_kit/art.js';
 import {
   mat, basic, box, LOOKS, makeHero, makeWeapon, makeZombie, makeVent, makeWaterTower, makeTanks, makePlanter, makeChimney,
   makePad, makeCrate, makeHeart, coinGeometry, makeRoof, makeBuilding, makeNeonSign, makeCrane, makeClockTower, skyTexture,
@@ -113,6 +115,16 @@ function bakeInto(group, skip = []) {
 
 const zombieTemplates = new Map();
 let ZPICS = {};
+let ZOBJ = {}; // real low-poly zombies (Quaternius, CC0)
+/** The real 3D zombie: same fields as the others (legs/arms are dummies; the body bobs). */
+function realZombie(kind, variant) {
+  const src = variant % 2 ? ZOBJ.zf : ZOBJ.zm; if (!src) return null;
+  const s = kind === 'king' ? 2.1 : kind === 'brute' ? 1.45 : kind === 'sprinter' ? 0.92 : 1;
+  const root = new THREE.Group(); const body = new THREE.Group(); root.add(body);
+  body.add(fitModel(THREE, src, { height: 1.75 * s, yaw: 0 })); // the model's face looks to +z, the way the game turns zombies toward the hero
+  const dummy = () => ({ rotation: { x: 0, y: 0, z: 0 } });
+  return { root, body, legs: [dummy(), dummy()], arms: [dummy(), dummy()], s };
+}
 /** The painted zombie (owner's sheet): a camera-facing picture standing on the roof; it keeps the same fields as the 3D one. */
 function paintedZombie(kind, variant) {
   const names = kind === 'brute' ? ['z_fat'] : kind === 'king' ? ['z_bucket'] : kind === 'sprinter' ? ['z_small'] : ['z_normal', 'z_cone', 'z_bandage', 'z_flower', 'z_yellow', 'z_tutu'];
@@ -128,6 +140,8 @@ function paintedZombie(kind, variant) {
 }
 
 function zombieModel(kind, variant) {
+  const real = realZombie(kind, variant);
+  if (real) return real;
   const painted = paintedZombie(kind, variant);
   if (painted) return painted;
   const key = `${kind}${variant}`;
@@ -191,7 +205,7 @@ class Game {
     this.goodWin = 0;
     this.clock = new THREE.Clock();
     this._buildScene();
-    Promise.all([this._fonts(), loadSprites(THREE, this.base, ['z_normal', 'z_cone', 'z_bandage', 'z_flower', 'z_yellow', 'z_tutu', 'z_fat', 'z_bucket', 'z_small']).then((sp) => { ZPICS = sp; })]).then(() => {
+    Promise.all([this._fonts(), loadObjModels(OBJLoader, MTLLoader, this.base, [['zm', 'Zombie_Male'], ['zf', 'Zombie_Female']], { bright: 2.2, colors: { skin: 0x86c85a, face: 0xcfeaa0, clothes: 0x6a5acd, darkclothes: 0x4a3a7a, pants: 0xb89a62, bones: 0xf0e6c8, brain: 0xe88aa6, guts: 0xd8503a, hair: 0x4a2f1a } }).then((m) => { ZOBJ = m; }), loadSprites(THREE, this.base, ['z_normal', 'z_cone', 'z_bandage', 'z_flower', 'z_yellow', 'z_tutu', 'z_fat', 'z_bucket', 'z_small']).then((sp) => { ZPICS = sp; })]).then(() => {
       this.loading.remove();
       this._buildWorld(Math.min(this.save.unlocked, ROOFS.length) - 1);
       this.showMenu();

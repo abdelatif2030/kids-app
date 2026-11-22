@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 import { Store, PADS, DISPENSER, RACKS, SHELVES, CHECKOUTS, SHUTTLES, BOUNDS, normalizeSave } from './sim.js';
 import {
-  mat, makeAstronaut, makeAlien, makeBasket, makeDispenser, makeRack, makeShelf, makeCheckout, makeRobot, makeCoin,
+  mat, makeAstronaut, makeAlien, makeBasket, makeDispenser, makeRack, makeShelf, makeCheckout, makeRobot, loadRealRobot, makeCoin,
   makeShuttlePad, makeDeck, makePlanet, makeStars, makeHazard,
 } from './models.js';
 import { Sound } from './audio.js';
@@ -90,7 +90,7 @@ class Game {
     this.clock = new THREE.Clock();
     this.store = new Store(this.save, (Date.now() & 0xffff) + 1);
     this._buildWorld();
-    this._fonts().then(() => {
+    Promise.all([this._fonts(), loadRealRobot(this.base)]).then(() => {
       this.loading.remove();
       this.showMenu();
       this.renderer.setAnimationLoop(() => this._frame());

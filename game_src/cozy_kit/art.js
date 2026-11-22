@@ -167,3 +167,24 @@ export function makeModelVehicle(THREE, scene, { length = 4, yaw = 0, tint = nul
   const dummy = { rotation: { x: 0, y: 0, z: 0 }, position: { x: 0, y: 0, z: 0 } };
   return { root, lean, rider: { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } }, front: dummy, back: { rotation: { x: 0 } }, flames: { visible: false, scale: { setScalar() {}, set() {} } }, model: true };
 }
+
+// ---- OBJ + MTL models (Quaternius CC0 packs) ------------------------------------------------------------------------------
+/** Loads <base>models/<file>.obj/.mtl for each [key, file]; the game passes its own three.js loader classes. A missing file is just absent. */
+export async function loadObjModels(OBJLoader, MTLLoader, base, pairs, { bright = 1, colors = null } = {}) {
+  const root = (base || './').replace(/\/?$/, '/') + 'models/'; const out = {};
+  await Promise.all(pairs.map(async ([key, file]) => {
+    try {
+      const mtl = await new Promise((ok, no) => new MTLLoader().setPath(root).load(`${file}.mtl`, ok, undefined, no)); mtl.preload();
+      const obj = await new Promise((ok, no) => new OBJLoader().setMaterials(mtl).setPath(root).load(`${file}.obj`, ok, undefined, no));
+      obj.traverse((o) => { if (o.isMesh) { const fix = (m) => { const c = m.clone(); c.flatShading = false; if (c.shininess !== undefined) c.shininess = 8; if (c.specular) c.specular.setScalar(0.05); if (colors && colors[(c.name || '').toLowerCase()] !== undefined) c.color.set(colors[(c.name || '').toLowerCase()]); else if (bright !== 1) c.color.multiplyScalar(bright); return c; }; o.material = Array.isArray(o.material) ? o.material.map(fix) : fix(o.material); } });
+      out[key] = obj;
+    } catch (_) { /* the code-built version stays */ }
+  }));
+  return out;
+}
+/** Clones a loaded model, scales it to [height] and stands it on y = 0, turned by [yaw]. Returns a Group. */
+export function fitModel(THREE, obj, { height = 1, yaw = 0 } = {}) {
+  const inner = obj.clone(true); const b = new THREE.Box3().setFromObject(inner); const k = height / Math.max(1e-6, b.max.y - b.min.y);
+  inner.scale.setScalar(k); inner.rotation.y = yaw; inner.position.y = -b.min.y * k;
+  const g = new THREE.Group(); g.add(inner); return g;
+}

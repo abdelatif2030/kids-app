@@ -3,6 +3,12 @@
 // shelf pods with fruit, checkout counters with screens, robot cashiers, star coins, shuttle pads with a little
 // shuttle, the hyper checkout, the lavender station deck with teal rails, a big orange planet and stars.
 import * as THREE from 'three';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
+import { loadObjModels, fitModel } from '../../cozy_kit/art.js';
+
+let REAL_ROBOT = null; // the Quaternius robot (CC0): a real low-poly model for the cashiers
+export async function loadRealRobot(base) { const m = await loadObjModels(OBJLoader, MTLLoader, base, [['robot', 'Robot']], { bright: 1.5 }); REAL_ROBOT = m.robot || null; }
 
 const cache = new Map();
 export function mat(color, emissive = 0, ei = 1) {
@@ -231,6 +237,11 @@ export function makeCheckout(hyper = false) {
 }
 
 export function makeRobot() {
+  if (REAL_ROBOT) {
+    const g = fitModel(THREE, REAL_ROBOT, { height: 1.25, yaw: 0 });
+    const light = ball(0.07, mat(0xff5a5a, 0xff2020, 1), 0, 1.38, 0, 1, 1, 1, 8); g.add(light); g.userData.light = light;
+    return g;
+  }
   const g = new THREE.Group();
   const white = mat(0xf2f6fa);
   g.add(cyl(0.3, 0.38, 0.6, white, 0, 0.4, 0, 16));
