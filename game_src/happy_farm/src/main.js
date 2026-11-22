@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { LEVELS, UPGRADES, MAX_LEVEL, CROPS, upgradeCost, statOf, normalizeSave, buyUpgrade, finishLevel } from './data.js';
 import { Farm } from './sim.js';
 import { FarmWorld } from './world.js';
-import { makeCombine, makeTrailer, makeTree, makeBarn, makeHayBale, makeSack, mat } from './models.js';
+import { makeCombine, makeTrailer, makeTree, makeBarn, makeHayBale, makeSack, mat, loadRealAnimals } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, getLang, t, num, name } from './i18n.js';
 import { CSS, h } from './ui.js';
@@ -114,7 +114,7 @@ class Game {
     this.frames = [];
     this.goodWin = 0;
     this.clock = new THREE.Clock();
-    this._fonts().then(() => {
+    Promise.all([this._fonts(), loadRealAnimals(this.base)]).then(() => {
       this.loading.remove();
       this._buildShowcase();
       this.showMap();

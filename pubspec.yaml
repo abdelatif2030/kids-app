@@ -106,6 +106,7 @@ flutter:
     - assets/games/jungle_adventure/
     - assets/games/jungle_adventure/art/
     - assets/games/happy_farm/
+    - assets/games/happy_farm/models/
     - assets/games/pumpkin_pie/
     - assets/games/samurai/
     - assets/games/samurai/art/

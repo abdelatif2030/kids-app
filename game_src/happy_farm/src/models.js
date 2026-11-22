@@ -1,5 +1,7 @@
 // Every model is built here from simple shapes: the combine harvester, trailer, barn, grate, crops, rocks, animals,
 // fences, trees, house, pond and windmill. Original, cute, bright; Lambert materials keep phones fast.
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
@@ -344,7 +346,28 @@ export function makeTree(s = 1) {
   return g;
 }
 
+/** Real low-poly animals (Quaternius Farm Animals, CC0): cow and sheep. Loaded once at start; a missing file keeps the code-built animal. */
+const REAL = {};
+export async function loadRealAnimals(base) {
+  const root = (base || './').replace(/\/?$/, '/') + 'models/';
+  await Promise.all([['cow', 'Cow'], ['sheep', 'Sheep']].map(async ([kind, file]) => {
+    try {
+      const mtl = await new Promise((ok, no) => new MTLLoader().setPath(root).load(`${file}.mtl`, ok, undefined, no));
+      mtl.preload();
+      const obj = await new Promise((ok, no) => new OBJLoader().setMaterials(mtl).setPath(root).load(`${file}.obj`, ok, undefined, no));
+      obj.traverse((o) => { if (o.isMesh) { o.material = Array.isArray(o.material) ? o.material.map((m) => { const c = m.clone(); c.flatShading = false; c.shininess = 8; c.specular.setScalar(0.05);
+        // the pack's default 0.64 grey looks dull under this game's lighting: brighter, kinder colours
+        const nm = (c.name || '').toLowerCase(); c.color.set(nm === 'white' ? 0xfffaf2 : nm === 'black' ? 0x3a3a46 : nm === 'pink' ? 0xff9fb4 : c.color.getHex()); return c; }) : o.material; } });
+      REAL[kind] = obj;
+    } catch (_) { /* the code-built animal stays */ }
+  }));
+}
+
 export function makeAnimal(kind) {
+  if (REAL[kind]) { // the model's head points to +z; the game's animals face +x
+    const inner = REAL[kind].clone(true); inner.scale.setScalar(0.18); inner.rotation.y = Math.PI / 2;
+    const out = new THREE.Group(); out.add(inner); return out;
+  }
   const g = new THREE.Group();
   if (kind === 'sheep') {
     const wool = mat(0xfaf8f2);
