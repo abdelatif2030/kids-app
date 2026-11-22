@@ -430,205 +430,239 @@
   "game": "ice_rink",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: ice rink fantasy battle, skating, frost. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "Gemini_Generated_Image_kelwubkelwubkelw.jpg"
  },
  {
   "game": "ice_rink",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about ice rink fantasy battle, skating, frost. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: graceful ice skating waltz with piano and strings plus sparkly bells. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "d971ca9e-24b5-4f02-8ef6-592544c20210.tmp"
  },
  {
   "game": "marble_dozer",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: marble bulldozer physics, glass marbles. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "Gemini_Generated_Image_lgvb81lgvb81lgvb.jpg"
  },
  {
   "game": "marble_dozer",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about marble bulldozer physics, glass marbles. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: satisfying playful xylophone and glass marimba, light industrial groove. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "a8dfb3c5-83cc-422a-b7bc-8a53d6e8af9a.tmp"
  },
  {
   "game": "mars_farm",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: mars colony farm, sci-fi, robots, beeps. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "30f01f35-ce27-4b1d-bdb8-7454cc429f0d.tmp"
  },
  {
   "game": "mars_farm",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about mars colony farm, sci-fi, robots, beeps. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: friendly sci-fi ambient with warm synth arpeggios and soft beats, space colony. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "6dfc3a08-d6eb-4a15-9188-48cc31eccd44.tmp"
  },
  {
   "game": "nutmeg_rush",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: cartoon football (soccer) game, stadium. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "0e28aae9-16fa-4e3a-975d-f15bdaa29b5a.tmp"
  },
  {
   "game": "nutmeg_rush",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about cartoon football (soccer) game, stadium. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: stadium football chant style with brass band and drums, energetic. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "66580332-8a31-46c7-8806-1fddc5db8ef0.tmp"
  },
  {
   "game": "pin_puzzle",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: pull-the-pin puzzle, metal pins and lava. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "3295105b-038e-445a-8dec-204e1d28061b.tmp"
  },
  {
   "game": "pin_puzzle",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about pull-the-pin puzzle, metal pins and lava. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: clever light puzzle music with plucky pizzicato and soft beat. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "feae0bb1-9a2b-4d78-9055-8f66331e2ffd.tmp"
  },
  {
   "game": "pumpkin_pie",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: cozy bakery with animals customers, warm. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "006fa888-ad0b-4e8c-bd4f-d3d9ddb66773.tmp"
  },
  {
   "game": "pumpkin_pie",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about cozy bakery with animals customers, warm. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: cozy warm bakery waltz with accordion, guitar and music box. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "cb9a1597-404e-4ffd-9b73-981f09507cd4.tmp"
  },
  {
   "game": "rhythm",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: animals on a spinning record, funky rhythm. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "074b95f5-0cda-4efb-83ca-95e9c8eff584.tmp"
  },
  {
   "game": "rhythm",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about animals on a spinning record, funky rhythm. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: funky disco groove with brass stabs and slap bass, dance party for kids. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "68e6cc91-43e9-4f2c-8440-1e7dc6162dc2.tmp"
  },
  {
   "game": "rug_cleaning",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: satisfying rug cleaning, washing, bubbles. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "2848f867-924e-4799-a8d9-35ea18f075e7.tmp"
  },
  {
   "game": "rug_cleaning",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about satisfying rug cleaning, washing, bubbles. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: calm satisfying lo-fi with soft marimba and shaker, relaxing cleaning. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "611236f1-26d6-43b1-8ff7-980928ae9df8.tmp"
  },
  {
   "game": "sky_ace",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: arcade sky plane shooter, retro. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "999fb4ab-2516-431d-9c36-eb9b1786ede4.tmp"
  },
  {
   "game": "sky_ace",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about arcade sky plane shooter, retro. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: retro arcade shoot-em-up chiptune with fast arpeggios and bass. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "542bf113-79a9-429b-a8d4-faa6b50566f6.tmp"
  },
  {
   "game": "sky_capy",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: capybara sky adventure shooter, bubbly. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "cc215d3f-221e-4f3e-91ec-f1956465d900.tmp"
  },
  {
   "game": "sky_capy",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about capybara sky adventure shooter, bubbly. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: bubbly sky adventure with ukulele, whistle and bright synth, joyful. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "9bc66938-c1b3-480e-9c10-da6096adbaf8.tmp"
  },
  {
   "game": "space_store",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: space station grocery store, robots, sci-fi beeps. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "d13529eb-3f09-47a5-ad41-f65ace57fa5b.tmp"
  },
  {
   "game": "space_store",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about space station grocery store, robots, sci-fi beeps. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: futuristic cute supermarket muzak with bossa nova beat and bleeps. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "0c9cbb47-5e2b-4fee-a437-00549c19064a.tmp"
  },
  {
   "game": "sweet_tray",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: candy match puzzle, sugary. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "42cf183c-ae85-4890-8f30-9a4c4f545e8f.tmp"
  },
  {
   "game": "sweet_tray",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about candy match puzzle, sugary. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: sugary candy shop music box and celesta, sweet bouncy waltz. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "af277975-3a8c-4840-bca0-cab3ede4a4c3.tmp"
  },
  {
   "game": "temple_army",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: ancient temple army trap game, stone. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "f8132a2a-8f34-4272-a651-3b4e2a33ee82.tmp"
  },
  {
   "game": "temple_army",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about ancient temple army trap game, stone. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: ancient egyptian-style march with oud and tabla, comic adventure. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "2e478ae4-ea41-4897-9ac0-150d18fd6b78.tmp"
  },
  {
   "game": "tomb_puzzle",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: egyptian tomb puzzle, sand and stone. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "1fd7d550-cb5a-4b7c-82d2-8b07ad88face.tmp"
  },
  {
   "game": "tomb_puzzle",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about egyptian tomb puzzle, sand and stone. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: mysterious egyptian puzzle with oud, soft percussion and ney flute. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "a730cae8-57a5-4297-9c34-394805aa4032.tmp"
  },
  {
   "game": "trick_or_treat",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: halloween trick or treat, spooky but cute. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "7f8541fb-2b6b-46ba-9058-a76103650958.tmp"
  },
  {
   "game": "trick_or_treat",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about halloween trick or treat, spooky but cute. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: spooky-cute halloween with pipe organ, pizzicato strings and theremin, playful. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "da7f2363-c901-44bc-a381-5e6f6acd9138.tmp"
  },
  {
   "game": "viking_sling",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: viking catapult sling, rocks, wood. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "152093b8-ee26-46a7-85e3-cc2a0d97ae21.tmp"
  },
  {
   "game": "viking_sling",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about viking catapult sling, rocks, wood. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: viking folk with hand drums, horns and tin whistle, comic and bold. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "2ac705b9-5fec-476f-954a-018b085a5941.tmp"
  },
  {
   "game": "winter_camp",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: winter camp, snow, axes, fire. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "Gemini_Generated_Image_x3xnlcx3xnlcx3xn.jpg"
  },
  {
   "game": "winter_camp",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about winter camp, snow, axes, fire. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: cozy winter campfire folk with acoustic guitar, bells and soft percussion. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "1b3d9094-bf07-4a23-a7bd-e6679b3f774d.tmp"
  },
  {
   "game": "moto_race",
