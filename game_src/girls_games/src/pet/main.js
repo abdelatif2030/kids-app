@@ -75,7 +75,7 @@ class Game {
   _t(pair) { return this.en ? pair[1] : pair[0]; }
 
   _build() {
-    const bgs = [1, 2, 3, 4, 5, 6].map((i) => A[`bgp_${i}`] || null);
+    const A = this.art; const bgs = [1, 2, 3, 4, 5, 6].map((i) => A[`bgp_${i}`] || null);
     this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, fairy: Object.fromEntries([1,2,3,4,5,6,7,8,9,10,11,12].map((n) => [n, this.art[`fairy_${String(n).padStart(2, '0')}`]])), title: this.en ? 'Baby & pet' : 'بيبي وصاحبها', places: PLACES, bgs, onPlace: () => {} });
     this._pick();
   }
