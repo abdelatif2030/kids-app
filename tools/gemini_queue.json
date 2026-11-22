@@ -290,121 +290,141 @@
   "game": "ball_scoop",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: cute toy ball puzzle, bouncy plastic. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "ef3d3282-b713-4949-8641-7c1659276348.tmp"
  },
  {
   "game": "ball_scoop",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about cute toy ball puzzle, bouncy plastic. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: playful quirky pizzicato strings and xylophone, bouncy puzzle game. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "6bb5daf5-3c9a-490d-8a7f-d7c87fbed8eb.tmp"
  },
  {
   "game": "barrel_knights",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: cartoon medieval knights with wooden barrels, castle. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "0f8d5ec3-4a86-4b15-90c0-aac2a7a72ae7.tmp"
  },
  {
   "game": "barrel_knights",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about cartoon medieval knights with wooden barrels, castle. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: jolly medieval tavern tune with lute, flute and hand drum, comedic knights. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "Gemini_Generated_Image_iddwuhiddwuhiddw.jpg"
  },
  {
   "game": "card_battle",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: fantasy card battle game, magical. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "3277ce28-d549-4e0a-912b-1f13175e0b16.tmp"
  },
  {
   "game": "card_battle",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about fantasy card battle game, magical. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: epic but cute fantasy battle theme, orchestral strings and drums, kids. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "b5d45027-719a-4238-8197-d58a2846fcf1.tmp"
  },
  {
   "game": "castaway_raft",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: castaway raft on the sea, ocean, wooden. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "9d5315a0-55a1-45ba-aef8-32f32246d135.tmp"
  },
  {
   "game": "castaway_raft",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about castaway raft on the sea, ocean, wooden. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: relaxed tropical steel drum and ukulele island adventure. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "6f0b780d-3c8b-40aa-b21a-22a94d09383a.tmp"
  },
  {
   "game": "fashion_queen",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: glamorous fashion game, sparkles, soft. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "19485274-6c22-46a0-b51c-d6c71c97e0e4.tmp"
  },
  {
   "game": "fashion_queen",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about glamorous fashion game, sparkles, soft. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: glamorous cute pop instrumental with sparkly synths and snappy beat, fashion runway. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "0ffe5232-ce6b-461c-a293-3aff61b84fc0.tmp"
  },
  {
   "game": "frost_coil",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: ice dragon snowy puzzle, crystal, magical frost. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "fbd98aac-c715-4674-bbe0-0b13d0edda17.tmp"
  },
  {
   "game": "frost_coil",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about ice dragon snowy puzzle, crystal, magical frost. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: magical frosty winter celesta and bells with soft strings, calm puzzle. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "2d9b0cb5-ece9-47e6-8b58-a13cb41ab11a.tmp"
  },
  {
   "game": "gem_quarry",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: gem mine digging truck game, rocks. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "e48dd05d-b87a-4ed1-accd-0d5c1e5bace6.tmp"
  },
  {
   "game": "gem_quarry",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about gem mine digging truck game, rocks. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: rhythmic mining work song with banjo and clapping, upbeat. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "410fff39-4c58-49a3-bd6e-f8a2f0efb654.tmp"
  },
  {
   "game": "gummy_squad",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: gummy candy soldiers shooting game, sweets. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "be888555-05ed-4361-ab5f-b4e1455db38d.tmp"
  },
  {
   "game": "gummy_squad",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about gummy candy soldiers shooting game, sweets. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: cute military candy march with snare, tuba and kazoo, comic action. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "6c2ec9fc-5868-4b01-bfa6-f2a5365cb356.tmp"
  },
  {
   "game": "hop_world",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: retro-cartoon platformer, bouncy coins. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "8098bc09-8cf5-4fc5-b21e-ae402ec9e843.tmp"
  },
  {
   "game": "hop_world",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about retro-cartoon platformer, bouncy coins. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: classic cheerful 8-bit platformer tune, bouncy chiptune melody. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "bc3280e7-9650-4101-966f-f70bee794d3c.tmp"
  },
  {
   "game": "hot_spring",
   "kind": "bg_wide",
   "prompt": "Create an image: Wide panoramic game background for a kids' mobile game: japanese hot spring village, calm steam. Rich layered depth (foreground, midground, far background), warm cinematic lighting, soft atmospheric haze, bright saturated colours, polished 3D-cartoon look like a premium children's game (Pixar-like softness), no characters, absolutely no text, no letters, no labels, no captions, no UI, empty central area so gameplay stays readable. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "7cd5f034-6521-4be8-a8a3-916239795002.tmp"
  },
  {
   "game": "hot_spring",
   "kind": "hero_sheet",
   "prompt": "Create an image: Character sheet, original cute hero and 3 rival/helper characters for a kids' game about japanese hot spring village, calm steam. Each in 3 poses (idle, action, celebrate), front 3/4 view, big expressive eyes, chunky rounded shapes, thick soft outlines, glossy 3D-cartoon rendering, consistent style, plain transparent/green background for easy cut-out, absolutely no text, no letters, no labels, no captions. Mood reference: calm japanese koto and shakuhachi with gentle chimes, relaxing village. 16:9 aspect ratio.",
-  "done": false
+  "done": true,
+  "src": "b9e827e8-fa74-4ad1-b909-b19fbcb08f30.tmp"
  },
  {
   "game": "ice_rink",

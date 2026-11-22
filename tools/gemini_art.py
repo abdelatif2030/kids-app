@@ -28,6 +28,10 @@ def take(n):
     f=fs[-1]; out=f"assets/games/{it['game']}/art/{it['kind']}_gemini.jpg"; os.makedirs(os.path.dirname(out),exist_ok=True); from PIL import Image
     im=Image.open(f); r=im.size[0]/im.size[1]
     if it['kind']!='ground_tile' and abs(r-1.79)>0.12: print('WRONG FILE (not 16:9)',os.path.basename(f),im.size); items[n]['src_bad']=os.path.basename(f); json.dump(items,open(Q,'w'),ensure_ascii=False,indent=1); return
+    import hashlib
+    md=lambda x:hashlib.md5(open(x,'rb').read()).hexdigest()
+    seen={md(x) for x in glob.glob('assets/games/*/art/*_gemini.jpg')+glob.glob('build/gemini_art/*.jpg')}
+    if md(f) in seen: print('DUPLICATE of an image already saved: not taken',os.path.basename(f)); return
     shutil.copy(f,out)
     it['done']=True; it['src']=os.path.basename(f); json.dump(items,open(Q,'w'),ensure_ascii=False,indent=1); print('saved',out,os.path.getsize(out)//1024,'KB')
 def status(): it=load(); print(sum(1 for x in it if x['done']),'/',len(it),'next',next((i for i,x in enumerate(it) if not x['done']),None))

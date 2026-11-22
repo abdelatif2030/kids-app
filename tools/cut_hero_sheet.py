@@ -3,13 +3,13 @@
 import sys, os
 from collections import deque
 from PIL import Image, ImageChops, ImageFilter
-def cut(path, outdir, min_area=0.004, max_n=16):
+def cut(path, outdir, min_area=0.004, max_n=16, thr=44, dil=9):
     im = Image.open(path).convert('RGB'); W, H = im.size
     px = im.load(); pts = [(4, 4), (W - 5, 4), (4, H - 5), (W - 5, H - 5), (W // 2, 4), (W // 2, H - 5)]
     bg = tuple(sorted(px[x, y][c] for x, y in pts)[len(pts) // 2] for c in range(3))
     d = ImageChops.difference(im, Image.new('RGB', im.size, bg)); r, g, b = d.split()
     diff = ImageChops.lighter(ImageChops.lighter(r, g), b)
-    mask = diff.point(lambda v: 255 if v > 44 else 0).filter(ImageFilter.MaxFilter(9))
+    mask = diff.point(lambda v: 255 if v > thr else 0).filter(ImageFilter.MaxFilter(dil))
     s = 4; sm = mask.resize((W // s, H // s), Image.NEAREST); w, h = sm.size; sp = sm.load()
     seen = [[False] * w for _ in range(h)]; blobs = []
     for y in range(h):
