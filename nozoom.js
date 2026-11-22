@@ -1,0 +1,1 @@
+(function(){var o={passive:false};document.addEventListener("gesturestart",function(e){e.preventDefault()},o);document.addEventListener("gesturechange",function(e){e.preventDefault()},o);document.addEventListener("touchmove",function(e){if(e.touches&&e.touches.length>1)e.preventDefault()},o);document.addEventListener("dblclick",function(e){e.preventDefault()},o)})();
