@@ -350,14 +350,15 @@ export function makeTree(s = 1) {
 const REAL = {};
 export async function loadRealAnimals(base) {
   const root = (base || './').replace(/\/?$/, '/') + 'models/';
-  await Promise.all([['cow', 'Cow'], ['sheep', 'Sheep']].map(async ([kind, file]) => {
+  const PAINT = { chicken: { 'material.001': 0xffd23a, 'material.002': 0xff8a1a } }; // the chick comes in plain grey: yellow body, orange beak and feet
+  await Promise.all([['cow', 'Cow'], ['sheep', 'Sheep'], ['chicken', 'Chick']].map(async ([kind, file]) => {
     try {
       const mtl = await new Promise((ok, no) => new MTLLoader().setPath(root).load(`${file}.mtl`, ok, undefined, no));
       mtl.preload();
       const obj = await new Promise((ok, no) => new OBJLoader().setMaterials(mtl).setPath(root).load(`${file}.obj`, ok, undefined, no));
       obj.traverse((o) => { if (o.isMesh) { o.material = Array.isArray(o.material) ? o.material.map((m) => { const c = m.clone(); c.flatShading = false; c.shininess = 8; c.specular.setScalar(0.05);
         // the pack's default 0.64 grey looks dull under this game's lighting: brighter, kinder colours
-        const nm = (c.name || '').toLowerCase(); c.color.set(nm === 'white' ? 0xfffaf2 : nm === 'black' ? 0x3a3a46 : nm === 'pink' ? 0xff9fb4 : c.color.getHex()); return c; }) : o.material; } });
+        const nm = (c.name || '').toLowerCase(); if (PAINT[kind] && PAINT[kind][nm] !== undefined) { c.color.set(PAINT[kind][nm]); return c; } c.color.set(nm === 'white' ? 0xfffaf2 : nm === 'black' ? 0x3a3a46 : nm === 'pink' ? 0xff9fb4 : c.color.getHex()); return c; }) : o.material; } });
       REAL[kind] = obj;
     } catch (_) { /* the code-built animal stays */ }
   }));
@@ -365,7 +366,7 @@ export async function loadRealAnimals(base) {
 
 export function makeAnimal(kind) {
   if (REAL[kind]) { // the model's head points to +z; the game's animals face +x
-    const inner = REAL[kind].clone(true); inner.scale.setScalar(0.18); inner.rotation.y = Math.PI / 2;
+    const inner = REAL[kind].clone(true); inner.scale.setScalar(kind === 'chicken' ? 0.11 : 0.18); inner.rotation.y = Math.PI / 2;
     const out = new THREE.Group(); out.add(inner); return out;
   }
   const g = new THREE.Group();
