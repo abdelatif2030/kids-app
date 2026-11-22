@@ -137,3 +137,33 @@ export function makePaintedFigure(THREE, poses, height) {
   const d = () => ({ rotation: { x: 0, y: 0, z: 0 }, position: { x: 0, y: 0, z: 0 }, scale: { setScalar() {}, set() {} }, visible: true });
   return { root, body, sprite: sp, legs: [d(), d()], arms: [d(), d()], head: d(), sword: d(), club: d(), painted: true, setPose(n) { apply(poses[n] || poses.idle); } };
 }
+
+// ---- real 3D models (CC0 glTF: Kenney) ----------------------------------------------------------------------------------------
+/** Loads <base>models/<name>.glb with the game's own GLTFLoader class (so the game's three.js is used). Missing file = absent. */
+export function loadGLBs(GLTFLoader, base, names) {
+  const root = (base || './').replace(/\/?$/, '/');
+  const loader = new GLTFLoader();
+  return Promise.all(names.map((n) => new Promise((resolve) => {
+    let done = false; const fin = (v) => { if (!done) { done = true; resolve([n, v]); } };
+    setTimeout(() => fin(null), 8000);
+    try { loader.load(`${root}models/${n}.glb`, (g) => fin(g.scene), undefined, () => fin(null)); } catch (_) { fin(null); }
+  }))).then((pairs) => Object.fromEntries(pairs.filter(([, v]) => v)));
+}
+
+/** A glTF vehicle as a game vehicle: scaled to [length] metres along z, wheels on the ground, nose toward +z after [yaw] (model facing is a per-pack fact).
+ *  Returns the same fields the games' own bikes/trucks have (root, lean, rider, front, back, flames) so the race code runs unchanged. */
+export function makeModelVehicle(THREE, scene, { length = 4, yaw = 0, tint = null } = {}) {
+  const root = new THREE.Group(); const lean = new THREE.Group(); root.add(lean);
+  const m = scene.clone(true);
+  m.traverse((o) => { if (o.isMesh && tint != null) { o.material = o.material.clone(); o.material.color.multiply(new THREE.Color(tint)); } });
+  const box0 = new THREE.Box3().setFromObject(m); const size = box0.getSize(new THREE.Vector3());
+  const k = length / Math.max(size.z, size.x);
+  m.scale.setScalar(k); m.rotation.y = yaw;
+  const box = new THREE.Box3().setFromObject(m); m.position.y -= box.min.y; // wheels on the ground
+  const c = box.getCenter(new THREE.Vector3()); m.position.x -= c.x; m.position.z -= c.z;
+  lean.add(m);
+  const shadow = new THREE.Mesh(new THREE.CircleGeometry(length * 0.55, 20), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.28, depthWrite: false }));
+  shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.04; shadow.scale.set(0.75, 1.15, 1); root.add(shadow);
+  const dummy = { rotation: { x: 0, y: 0, z: 0 }, position: { x: 0, y: 0, z: 0 } };
+  return { root, lean, rider: { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } }, front: dummy, back: { rotation: { x: 0 } }, flames: { visible: false, scale: { setScalar() {}, set() {} } }, model: true };
+}

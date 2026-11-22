@@ -7,7 +7,8 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Race, ROUNDS, RIDERS, LAPS, normalizeSave } from './sim.js';
 import { pointAt, HALF_W, WALL } from './track.js';
-import { loadSprites, makeBillboardVehicle } from '../../cozy_kit/art.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { loadSprites, makeBillboardVehicle, loadGLBs, makeModelVehicle } from '../../cozy_kit/art.js';
 import { mat, makeTruck, makeRock, makeCactus, makeTent, makeHelicopter, makeStand, makeGantry, makeChevron, makeMountain, roadTexture, makeClouds, meshTexture } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
@@ -116,8 +117,8 @@ class Game {
     this.frames = [];
     this.goodWin = 0;
     this.clock = new THREE.Clock();
-    this.pics = null;
-    Promise.all([this._fonts(), loadSprites(THREE, this.base, ['truck_01','truck_02','truck_03','truck_04','truck_05','truck_06','truck_07','truck_08','truck_09','truck_10','truck_11','truck_12']).then((sp) => { this.pics = sp; })]).then(() => {
+    this.pics = null; this.glbs = null;
+    Promise.all([this._fonts(), loadGLBs(GLTFLoader, this.base, ['vehicle-truck-red', 'vehicle-truck-yellow', 'vehicle-truck-green', 'vehicle-truck-purple']).then((g) => { this.glbs = g; }), loadSprites(THREE, this.base, ['truck_01','truck_02','truck_03','truck_04','truck_05','truck_06','truck_07','truck_08','truck_09','truck_10','truck_11','truck_12']).then((sp) => { this.pics = sp; })]).then(() => {
       this.loading.remove();
       this.showMenu();
       this.renderer.setAnimationLoop(() => this._frame());
@@ -290,7 +291,12 @@ class Game {
     this.bikes = this.race.riders.map((r, k) => {
       const P = this.pics;
       let b;
-      if (P && P.truck_01) {
+      const G = this.glbs; const kn = ['vehicle-truck-red', 'vehicle-truck-yellow', 'vehicle-truck-green', 'vehicle-truck-purple'];
+      if (G && G[kn[0]]) {
+        // real 3D trucks (Kenney, CC0): they turn with the track like real cars. The player's colour picks the model, the rivals take the others.
+        const key = k === 0 ? kn[this.save.color % 4] : kn[(k + 1) % 4];
+        b = makeModelVehicle(THREE, G[key] || G[kn[0]], { length: 4.6, yaw: 0, tint: k === 0 ? null : [0xffffff, 0xffe8c8, 0xc8e8ff, 0xf0d0ff, 0xd8ffd8][k % 5] });
+      } else if (P && P.truck_01) {
         const names = ['truck_01', 'truck_02', 'truck_03', 'truck_04'];
         const mine = P[names[this.save.color]] || P.truck_01;
         const rivalKey = ['truck_05', 'truck_06', 'truck_07', 'truck_08', 'truck_09', 'truck_10', 'truck_11', 'truck_12'][(k - 1 + 8) % 8];

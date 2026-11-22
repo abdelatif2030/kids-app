@@ -152,6 +152,8 @@ flutter:
     - assets/games/marble_dozer/
     - assets/games/dune_titans/
     - assets/games/dune_titans/art/
+    - assets/games/dune_titans/models/
+    - assets/games/dune_titans/models/Textures/
     - assets/games/castaway_raft/
     - assets/games/winter_camp/
     - assets/games/rain_circuit/
