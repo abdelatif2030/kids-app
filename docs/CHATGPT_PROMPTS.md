@@ -1,10 +1,175 @@
-# برومتات توليد الصور من ChatGPT — جاهزة للنسخ (87 برومت)
+# برومتات توليد الصور من ChatGPT — جاهزة للنسخ (103 برومت)
 
 **الطريقة:** كل برومت تحت **كتلة واحدة كاملة** (فيها الأسلوب وقواعد الشيت والعناصر) — انسخها كلها كما هي في ChatGPT. ابعتيلي الصورة الناتجة وأنا أقصّها (`python tools/cut_sprite.py شيت.png 4x3 الأسماء مجلد_اللعبة/art`) وأركّبها في اللعبة.
 
 **الترتيب المقترح (الأهم أولًا):** A1 ← A2 ← A3 ← … (عربيات) ثم C1..C6 (ألبسي الأميرة) ثم باقي ألعاب البنات ثم B (الشخصيات) ثم E (الخلفيات).
 
 **نصايح لـ ChatGPT:** (1) ولّد الصورة بنسبة 3:2 (1536×1024). (2) لو الخلفية طلعت مش بيضا صافية قول: «Make the background pure flat white #FFFFFF, remove the shadows». (3) لو العناصر لزقت في بعض قول: «Increase the margin between items, no overlaps». (4) اطلب نفس الشخصية في كل الخانات: «Keep the exact same character design in every cell». (5) في الخلفيات: اطلب 16:9 (1920×1080) صورة واحدة.
+
+
+---
+
+## H — ملكة الموضة (٤+): عروسة احترافية وكل القطع كصور شفافة
+
+### H1 — ملكة الموضة: العروسة الأساسية بأوضاع (١٢)
+- **الملفات:** `fq_doll_*`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): A stylish cartoon fashion doll girl, about 5 heads tall, slim, long legs and feet, FRONT view, arms slightly away from the body so clothes can be drawn over her, wearing only a plain white tank top and white shorts (like underwear layers) and barefoot, big friendly eyes, light-brown skin, long brown hair. 12 cells: 4 columns x 3 rows: row 1 = the SAME doll standing neutral, smiling wide, winking, surprised; row 2 = turning left (3/4 view), turning right (3/4 view), back view, side view; row 3 = hand on hip, twirling, waving, blowing a kiss. Same character in every cell.
+```
+
+### H2 — ملكة الموضة: ٤ عرايس بألوان بشرة وشعر مختلفة (وقفة)
+- **الملفات:** `fq_doll_light/dark/tan/red`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 4 stylish cartoon fashion doll girls with the exact same body, size and standing pose as the first doll (arms slightly away, tank top and shorts, barefoot): fair skin with blonde hair, dark skin with black curly hair, tan skin with straight dark hair, light skin with red hair. Fill the top row only (4 cells), leave the rest empty.
+```
+
+### H3 — ملكة الموضة: ٦ فساتين — ستايلات مختلفة (لون وردي)
+- **الملفات:** `dress_gown_rose, dress_mermaid_rose, dress_mini_rose, dress_aline_rose, dress_ball_rose, dress_wrap_rose`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup. All garments are laid FLAT, seen straight from the FRONT, symmetrical, shaped to fit a slim cartoon fashion doll (about 5 heads tall), each one a similar size, no mannequin, no hanger, no body inside.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 6 DRESSES, all in rose pink, one style each, in 2 rows of 3 (fill 6 cells, leave the rest empty): an elegant long gown, a mermaid dress that flares at the knees, a short mini party dress, an A-line knee-length dress, a big princess ball gown, a wrap dress with a bow.
+```
+
+### H4 — ملكة الموضة: نفس الـ٦ فساتين باللون أبيض
+- **الملفات:** `dress_*_white`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup. All garments are laid FLAT, seen straight from the FRONT, symmetrical, shaped to fit a slim cartoon fashion doll (about 5 heads tall), each one a similar size, no mannequin, no hanger, no body inside.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): The SAME 6 dress styles as the rose sheet (long gown, mermaid, mini party dress, A-line, ball gown, wrap dress) with identical shapes and proportions, all in white, 2 rows of 3, fill 6 cells.
+```
+
+### H5 — ملكة الموضة: نفس الـ٦ فساتين باللون بنفسجي
+- **الملفات:** `dress_*_purple`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup. All garments are laid FLAT, seen straight from the FRONT, symmetrical, shaped to fit a slim cartoon fashion doll (about 5 heads tall), each one a similar size, no mannequin, no hanger, no body inside.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): The SAME 6 dress styles as the rose sheet (long gown, mermaid, mini party dress, A-line, ball gown, wrap dress) with identical shapes and proportions, all in purple, 2 rows of 3, fill 6 cells.
+```
+
+### H6 — ملكة الموضة: نفس الـ٦ فساتين باللون أزرق
+- **الملفات:** `dress_*_blue`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup. All garments are laid FLAT, seen straight from the FRONT, symmetrical, shaped to fit a slim cartoon fashion doll (about 5 heads tall), each one a similar size, no mannequin, no hanger, no body inside.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): The SAME 6 dress styles as the rose sheet (long gown, mermaid, mini party dress, A-line, ball gown, wrap dress) with identical shapes and proportions, all in blue, 2 rows of 3, fill 6 cells.
+```
+
+### H7 — ملكة الموضة: نفس الـ٦ فساتين باللون أحمر
+- **الملفات:** `dress_*_red`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup. All garments are laid FLAT, seen straight from the FRONT, symmetrical, shaped to fit a slim cartoon fashion doll (about 5 heads tall), each one a similar size, no mannequin, no hanger, no body inside.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): The SAME 6 dress styles as the rose sheet (long gown, mermaid, mini party dress, A-line, ball gown, wrap dress) with identical shapes and proportions, all in red, 2 rows of 3, fill 6 cells.
+```
+
+### H8 — ملكة الموضة: البلوزات (١٢)
+- **الملفات:** `top_*`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup. All garments are laid FLAT, seen straight from the FRONT, symmetrical, shaped to fit a slim cartoon fashion doll (about 5 heads tall), each one a similar size, no mannequin, no hanger, no body inside.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 TOPS: a t-shirt, a blouse with a bow, a hoodie, a knit sweater, a crop top, in white (5 items) then the same 5 shapes in pink, then two sky-blue ones (t-shirt and hoodie). Order: 5 white, 5 pink, 2 sky blue.
+```
+
+### H9 — ملكة الموضة: التنانير والبناطيل (١٢)
+- **الملفات:** `bottom_*`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup. All garments are laid FLAT, seen straight from the FRONT, symmetrical, shaped to fit a slim cartoon fashion doll (about 5 heads tall), each one a similar size, no mannequin, no hanger, no body inside.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 BOTTOMS laid flat: a short skirt, a long skirt, a pleated skirt, jeans, leggings, shorts, shown in black (6 items) and then the same 6 in blue denim / cream (6 items).
+```
+
+### H10 — ملكة الموضة: الأحذية (١٢ — ٦ موديلات × لونين)
+- **الملفات:** `shoes_*`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 SHOES, each a PAIR seen from the FRONT-SIDE 3/4 view: high heels, ballet flats, boots, sandals, sneakers, crystal slippers, shown in white (6 pairs) and in rose pink (6 pairs).
+```
+
+### H11 — ملكة الموضة: الشنط والعقود (١٢)
+- **الملفات:** `bag_*, neck_*`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items: 5 BAGS (a clutch, a tote, a mini bag, a backpack, a crossbody bag) in rose pink, then 4 NECKLACES (pearls, a heart pendant, a star pendant, a choker) in gold, then 3 more bags in gold (clutch, tote, mini).
+```
+
+### H12 — ملكة الموضة: الحلق والأساور والنظارات (١٢)
+- **الملفات:** `ears_*, wrist_*, face_*`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 small accessories, each shown as a PAIR where natural: stud earrings, hoop earrings, drop earrings (gold), then the same three in silver, then a gold bracelet, a wristwatch, gold bangles, then black sunglasses and heart-shaped pink sunglasses seen from the front.
+```
+
+### H13 — ملكة الموضة: التيجان والإكسسوارات للرأس (١٢)
+- **الملفات:** `head_*`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 HEAD accessories seen from the front: a crown, a tiara, a hair bow, a sun hat, a flower crown, a bridal veil, a beanie, shown in gold / rose where they have colors (7 items), then 5 more: a gold crown with jewels, a silver tiara, a red hair bow, a straw sun hat with a ribbon, a pink beanie.
+```
+
+### H14 — ملكة الموضة: ٨ تسريحات شعر (طبقات شعر فقط)
+- **الملفات:** `hair_*`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 8 hairstyles drawn as HAIR ONLY (no head, no face) seen from the front, brown: long straight, curly, bun, ponytail, braid, bob, wavy, pigtails. 4 columns x 2 rows, fill 8 cells.
+```
+
+### H15 — ملكة الموضة: الحيوانات الأليفة (١٢)
+- **الملفات:** `pet_*`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 8 cute pets, FRONT view, each in a happy pose, big eyes: a kitten, a puppy, a bunny, a panda, a pony, a hamster, a parrot, a little fox, then 4 small pet items: a pet bed, a food bowl, a ball, a pink leash.
+```
+
+### H16 — ملكة الموضة: أثاث الغرف (١٢)
+- **الملفات:** `furn_*`
+- **بتفتح:** fashion_queen
+
+```
+Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 cute pieces of furniture and decor for a dream house, each seen from the front: a canopy bed, a wardrobe, a vanity table with a mirror, a sofa, a rug, a lamp, a bookshelf, a toy chest, a plant in a pot, a window with curtains, a picture frame, a bean bag.
+```
 
 
 ---

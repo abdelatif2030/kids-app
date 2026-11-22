@@ -143,6 +143,38 @@ P.append(("G5", "محل الكب كيك: ٦ أكواب إضافية وزينة �
 P.append(("G6", "حديقة الفراشات: ٦ أنواع زهور إضافية بثلاث مراحل", "fl3_*", "butterfly_garden",
           sheet(GIRL, "6 more flower types, each in two growth stages side by side in one cell pair (sprout then full bloom), cartoon: tulip, daisy, sunflower, lavender, lily, rose. 4 columns x 3 rows: row 1 sprout/bloom of tulip and daisy, row 2 sunflower and lavender, row 3 lily and rose.")))
 
+# ---- H. Fashion Queen (ages 4+): a professional doll + every clothing piece as a transparent sprite ----------------------------
+FASH = ("Premium glossy 3D-rendered cartoon art for a girls fashion dress-up game (ages 4 to 8): soft studio lighting, smooth rounded shapes, big friendly expressive eyes, "
+        "pink / lilac / white / gold palette, sparkles, stylish and kid friendly, modest and age-appropriate. No text, no letters, no numbers, no logos, no real brands, no heavy makeup.")
+FLAT = " All garments are laid FLAT, seen straight from the FRONT, symmetrical, shaped to fit a slim cartoon fashion doll (about 5 heads tall), each one a similar size, no mannequin, no hanger, no body inside."
+P.append(("H1", "ملكة الموضة: العروسة الأساسية بأوضاع (١٢)", "fq_doll_*", "fashion_queen",
+          sheet(FASH, "A stylish cartoon fashion doll girl, about 5 heads tall, slim, long legs and feet, FRONT view, arms slightly away from the body so clothes can be drawn over her, wearing only a plain white tank top and white shorts (like underwear layers) and barefoot, big friendly eyes, light-brown skin, long brown hair. 12 cells: 4 columns x 3 rows: row 1 = the SAME doll standing neutral, smiling wide, winking, surprised; row 2 = turning left (3/4 view), turning right (3/4 view), back view, side view; row 3 = hand on hip, twirling, waving, blowing a kiss. Same character in every cell.")))
+P.append(("H2", "ملكة الموضة: ٤ عرايس بألوان بشرة وشعر مختلفة (وقفة)", "fq_doll_light/dark/tan/red", "fashion_queen",
+          sheet(FASH, "4 stylish cartoon fashion doll girls with the exact same body, size and standing pose as the first doll (arms slightly away, tank top and shorts, barefoot): fair skin with blonde hair, dark skin with black curly hair, tan skin with straight dark hair, light skin with red hair. Fill the top row only (4 cells), leave the rest empty.")))
+P.append(("H3", "ملكة الموضة: ٦ فساتين — ستايلات مختلفة (لون وردي)", "dress_gown_rose, dress_mermaid_rose, dress_mini_rose, dress_aline_rose, dress_ball_rose, dress_wrap_rose", "fashion_queen",
+          sheet(FASH + FLAT, "6 DRESSES, all in rose pink, one style each, in 2 rows of 3 (fill 6 cells, leave the rest empty): an elegant long gown, a mermaid dress that flares at the knees, a short mini party dress, an A-line knee-length dress, a big princess ball gown, a wrap dress with a bow.")))
+for i, (col, nm) in enumerate([("white", "أبيض"), ("purple", "بنفسجي"), ("blue", "أزرق"), ("red", "أحمر")]):
+    P.append((f"H{4+i}", f"ملكة الموضة: نفس الـ٦ فساتين باللون {nm}", f"dress_*_{col}", "fashion_queen",
+              sheet(FASH + FLAT, f"The SAME 6 dress styles as the rose sheet (long gown, mermaid, mini party dress, A-line, ball gown, wrap dress) with identical shapes and proportions, all in {col}, 2 rows of 3, fill 6 cells.")))
+P.append(("H8", "ملكة الموضة: البلوزات (١٢)", "top_*", "fashion_queen",
+          sheet(FASH + FLAT, "12 TOPS: a t-shirt, a blouse with a bow, a hoodie, a knit sweater, a crop top, in white (5 items) then the same 5 shapes in pink, then two sky-blue ones (t-shirt and hoodie). Order: 5 white, 5 pink, 2 sky blue.")))
+P.append(("H9", "ملكة الموضة: التنانير والبناطيل (١٢)", "bottom_*", "fashion_queen",
+          sheet(FASH + FLAT, "12 BOTTOMS laid flat: a short skirt, a long skirt, a pleated skirt, jeans, leggings, shorts, shown in black (6 items) and then the same 6 in blue denim / cream (6 items).")))
+P.append(("H10", "ملكة الموضة: الأحذية (١٢ — ٦ موديلات × لونين)", "shoes_*", "fashion_queen",
+          sheet(FASH, "12 SHOES, each a PAIR seen from the FRONT-SIDE 3/4 view: high heels, ballet flats, boots, sandals, sneakers, crystal slippers, shown in white (6 pairs) and in rose pink (6 pairs).")))
+P.append(("H11", "ملكة الموضة: الشنط والعقود (١٢)", "bag_*, neck_*", "fashion_queen",
+          sheet(FASH, "12 items: 5 BAGS (a clutch, a tote, a mini bag, a backpack, a crossbody bag) in rose pink, then 4 NECKLACES (pearls, a heart pendant, a star pendant, a choker) in gold, then 3 more bags in gold (clutch, tote, mini).")))
+P.append(("H12", "ملكة الموضة: الحلق والأساور والنظارات (١٢)", "ears_*, wrist_*, face_*", "fashion_queen",
+          sheet(FASH, "12 small accessories, each shown as a PAIR where natural: stud earrings, hoop earrings, drop earrings (gold), then the same three in silver, then a gold bracelet, a wristwatch, gold bangles, then black sunglasses and heart-shaped pink sunglasses seen from the front.")))
+P.append(("H13", "ملكة الموضة: التيجان والإكسسوارات للرأس (١٢)", "head_*", "fashion_queen",
+          sheet(FASH, "12 HEAD accessories seen from the front: a crown, a tiara, a hair bow, a sun hat, a flower crown, a bridal veil, a beanie, shown in gold / rose where they have colors (7 items), then 5 more: a gold crown with jewels, a silver tiara, a red hair bow, a straw sun hat with a ribbon, a pink beanie.")))
+P.append(("H14", "ملكة الموضة: ٨ تسريحات شعر (طبقات شعر فقط)", "hair_*", "fashion_queen",
+          sheet(FASH, "8 hairstyles drawn as HAIR ONLY (no head, no face) seen from the front, brown: long straight, curly, bun, ponytail, braid, bob, wavy, pigtails. 4 columns x 2 rows, fill 8 cells.")))
+P.append(("H15", "ملكة الموضة: الحيوانات الأليفة (١٢)", "pet_*", "fashion_queen",
+          sheet(FASH, "8 cute pets, FRONT view, each in a happy pose, big eyes: a kitten, a puppy, a bunny, a panda, a pony, a hamster, a parrot, a little fox, then 4 small pet items: a pet bed, a food bowl, a ball, a pink leash.")))
+P.append(("H16", "ملكة الموضة: أثاث الغرف (١٢)", "furn_*", "fashion_queen",
+          sheet(FASH, "12 cute pieces of furniture and decor for a dream house, each seen from the front: a canopy bed, a wardrobe, a vanity table with a mirror, a sofa, a rug, a lamp, a bookshelf, a toy chest, a plant in a pot, a window with curtains, a picture frame, a bean bag.")))
+
 # ---- E. backgrounds ---------------------------------------------------------------------------------------------------------
 bgs = {
     "E1": ("خلفيات ألبسي الأميرة (٦)", "little_princess_dress", ["a pastel castle bedroom with a big window and a canopy bed", "a garden tea party with a gazebo and flowers", "a snowy ice castle with crystal pillars", "a sunny beach party with palm trees and a pastel tent", "a magic forest with glowing mushrooms and fairy lights", "a rainbow ballroom with chandeliers and a shiny floor"]),
@@ -164,7 +196,7 @@ w("**الترتيب المقترح (الأهم أولًا):** A1 ← A2 ← A3 �
 w("**نصايح لـ ChatGPT:** (1) ولّد الصورة بنسبة 3:2 (1536×1024). (2) لو الخلفية طلعت مش بيضا صافية قول: «Make the background pure flat white #FFFFFF, remove the shadows». "
   "(3) لو العناصر لزقت في بعض قول: «Increase the margin between items, no overlaps». (4) اطلب نفس الشخصية في كل الخانات: «Keep the exact same character design in every cell». "
   "(5) في الخلفيات: اطلب 16:9 (1920×1080) صورة واحدة.\n\n")
-groups = [("G", "إضافات لزيادة محتوى مستويات عالم الأميرة"), ("F", "مخلوقات بإطارات حركة (ضفدع، ديناصور، أسماك، بطل الأسطح)"), ("A", "عربيات وطيارات (منظر خلفي بالظبط)"), ("B", "شخصيات الألعاب (وضعيات)"), ("C", "قسم البنات ٢–٤ سنين (شخصيات وأغراض)"), ("D", "كروت قسم البنات وغلافه"), ("E", "خلفيات قسم البنات (٣٠)")]
+groups = [("H", "ملكة الموضة (٤+): عروسة احترافية وكل القطع كصور شفافة"), ("G", "إضافات لزيادة محتوى مستويات عالم الأميرة"), ("F", "مخلوقات بإطارات حركة (ضفدع، ديناصور، أسماك، بطل الأسطح)"), ("A", "عربيات وطيارات (منظر خلفي بالظبط)"), ("B", "شخصيات الألعاب (وضعيات)"), ("C", "قسم البنات ٢–٤ سنين (شخصيات وأغراض)"), ("D", "كروت قسم البنات وغلافه"), ("E", "خلفيات قسم البنات (٣٠)")]
 for g, title in groups:
     w("\n---\n\n## %s — %s\n\n" % (g, title))
     for pid, ttl, files, unlocks, body in P:
