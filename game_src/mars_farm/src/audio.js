@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // Mars Farm sounds: everything is synthesised with Web Audio (no files).
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 
@@ -43,3 +45,6 @@ export class Sound extends SynthBase {
     });
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

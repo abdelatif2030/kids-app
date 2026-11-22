@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Playful treetop sound, made live with Web Audio (no files): a bouncy marimba tune over plucked bass, bongos and a
 // shaker that speed up in the last seconds; birds on the menu. Effects: wooden footsteps, jump and land, a big spring
@@ -327,3 +329,6 @@ export class Sound {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

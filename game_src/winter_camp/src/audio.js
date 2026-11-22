@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 // Winter Camp sound, made live with Web Audio (no files): a soft wind, a warm slow music-box tune, axe thunks,
 // a bright pop for a log, a drop thump, building knocks with a chime, a wind howl in the blizzard, a sleigh-bell jingle for the gate.
@@ -35,3 +37,6 @@ export class Sound extends SynthBase {
 
   setMode(m) { if (m === 'off') { this.setBed(null); this.setTune(null); } else { this.setBed('wind'); this.setTune(TUNE); } }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

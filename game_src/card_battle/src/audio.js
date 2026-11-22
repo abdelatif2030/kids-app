@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // Neon synth sound for Card Battle: everything is made live with Web Audio (no files).
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 
@@ -73,3 +75,6 @@ export class Sound extends SynthBase {
 
   dispose() { this.setHum(false); super.dispose(); }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

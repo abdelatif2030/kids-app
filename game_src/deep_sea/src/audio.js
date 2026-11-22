@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Ocean sound, made live with Web Audio (no files): a floating, dreamy tune (soft pads, a bubbly marimba, a gentle
 // bass, brushed beat while hunting), darker and slower in the deep trench, a pounding beat when the shark comes.
@@ -277,3 +279,6 @@ export class Sound {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

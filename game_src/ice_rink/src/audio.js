@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // Ice Rink Brawl sound: all synthesized (Web Audio), no files. Festive winter tune + effects.
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 
@@ -56,3 +58,6 @@ export class Sound extends SynthBase {
     else this.setTune({ tempo: mode === 'boss' ? 126 : 118, beats: 16, wave: 'triangle', vol: 0.09, notes: [...MELODY, ...BASS] });
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

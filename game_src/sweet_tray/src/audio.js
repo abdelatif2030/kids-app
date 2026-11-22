@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // Sweet Tray sound: all synthesized live (Web Audio), no files. A cheerful bakery tune, a soft pop for every tap,
 // a chime that climbs with the combo, a magic sparkle, and short win / lose jingles.
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
@@ -39,3 +41,6 @@ export class Sound extends SynthBase {
     });
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

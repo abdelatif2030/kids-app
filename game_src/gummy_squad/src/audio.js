@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // Gummy Squad sound: everything is synthesised live (no files). A soft music-box lullaby for the menu and the waves that turns
 // brisk and bouncy for the King Donut fight, plus a sound for each bear's attack, candies, mints, the super and the boss.
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
@@ -50,3 +52,6 @@ export class Sound extends SynthBase {
   }
   mode(m) { this.setTune(m === 'battle' ? BATTLE : m === 'calm' ? LULLABY : null); }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 // Castaway Raft sound, made live with Web Audio (no files): rolling waves, a ukulele-like tune, a whoosh and splash
 // for the hook, a pop for every catch, wood knocks when building, a soft low "dum-dum" for the shark (never scary),
@@ -42,3 +44,6 @@ export class Sound extends SynthBase {
     if (mode === 'play') { this.setBed('waves'); this.setTune(TUNE); } else if (mode === 'menu') { this.setBed('waves'); this.setTune(TUNE); } else { this.setBed(null); this.setTune(null); }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

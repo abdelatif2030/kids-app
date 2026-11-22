@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Rooftop sound, made live with Web Audio (no files): a bouncy cartoon "spooky-fun" tune in A minor (walking bass,
 // marimba, pizzicato, kick, snare and claps while fighting; a faster beat with a brass stab for the zombie king).
@@ -349,3 +351,6 @@ export class Sound {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

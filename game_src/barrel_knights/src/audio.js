@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // Barrel Knights sound, all synthesised live (no files): march music, crowd bed, clangs, thuds, horns, creaks, rumbles.
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 
@@ -63,3 +65,6 @@ export class Sound extends SynthBase {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

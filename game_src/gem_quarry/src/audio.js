@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // Sound of the quarry, all made live with Web Audio (no files): chiptune-ish upbeat tune plus named effects.
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 
@@ -27,3 +29,6 @@ export class Sound extends SynthBase {
     this.setTune({ tempo: 132, beats: 16, wave: 'square', vol: 0.045, notes: N });
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

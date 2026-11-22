@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // Sound for «اسحب الدبوس»: everything is synthesised live (no files). Music is a soft looping tune.
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 
@@ -28,3 +30,6 @@ export class Sound extends SynthBase {
     this.setTune({ tempo: 100, beats: 16, wave: 'triangle', vol: 0.07, notes: [[0, 69, 1], [1, 72, 1], [2, 76, 2], [4, 74, 1], [5, 71, 1], [6, 67, 2], [8, 65, 1], [9, 69, 1], [10, 72, 2], [12, 71, 1], [13, 67, 1], [14, 64, 2], [0, 45, 2], [4, 43, 2], [8, 41, 2], [12, 43, 2]] });
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

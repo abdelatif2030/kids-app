@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // «سباق القمة» sound, made live with Web Audio (no files): an upbeat mountain-race tune (punchy kick, claps, hats, a
 // rolling synth bass, bright plucks and a soaring lead, a soft pad), a cold wind that rises with speed, footsteps
@@ -343,3 +345,6 @@ export class Sound {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

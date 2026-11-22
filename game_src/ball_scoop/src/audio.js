@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 
 export class Sound extends SynthBase {
@@ -27,3 +29,6 @@ export class Sound extends SynthBase {
   stopEng() { if (this.e) { try { this.e.o.stop(); } catch (_) { /* fine */ } this.e = null; } }
 }
 
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

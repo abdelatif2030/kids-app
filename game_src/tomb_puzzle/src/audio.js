@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // All sound is made live with Web Audio (no files): a mysterious-but-light plucked "oud" tune and the tomb's little effects.
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 
@@ -70,3 +72,6 @@ export class Sound extends SynthBase {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

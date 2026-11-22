@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // Sky Ace sound: all synthesized (Web Audio), no files. Upbeat adventure tune, propeller hum, shots, hits, coins, power-ups, bomb, boss.
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 
@@ -60,3 +62,6 @@ export class Sound extends SynthBase {
     this.engine(m === 'play' || m === 'boss');
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

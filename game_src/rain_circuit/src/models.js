@@ -255,13 +255,14 @@ export function makeGantry(width) {
   const g = new THREE.Group();
   for (const s of [-1, 1]) g.add(box(0.6, 6.5, 0.6, mat(0x2a2c34), (s * width) / 2, 3.25, 0));
   g.add(box(width + 0.6, 1.1, 0.8, mat(0xff5a2a), 0, 6.3, 0));
-  g.add(box(width * 0.5, 1.0, 0.3, mat(0x1a1a1e), 0, 4.9, 0.3));
+  g.add(box(width * 0.5, 1.1, 0.5, mat(0x3a3d4a), 0, 4.9, 0.18));
   const lights = [];
   for (let i = 0; i < 5; i++) {
     const l = new THREE.Mesh(new THREE.CircleGeometry(0.34, 16), new THREE.MeshBasicMaterial({ color: 0x4a1010 }));
     l.position.set(-1.6 + i * 0.8, 4.9, 0.46);
     g.add(l);
     lights.push(l);
+    const lb = new THREE.Mesh(new THREE.CircleGeometry(0.34, 16), l.material); lb.position.set(l.position.x, 4.9, -0.1); lb.rotation.y = Math.PI; g.add(lb);
   }
   return { root: g, lights };
 }

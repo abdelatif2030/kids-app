@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Cozy bakery sound, made live with Web Audio (no files): a gentle autumn waltz on plucked strings (Karplus-Strong)
 // with a music-box bell melody and soft bass; pumpkin pops, wooden thumps, the oven's "ding", a slide whistle on the
@@ -311,3 +313,6 @@ export class Sound {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

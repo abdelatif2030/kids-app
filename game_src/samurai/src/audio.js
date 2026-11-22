@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Samurai sound, made live with Web Audio (no files): taiko drums, a koto plucked in the Japanese "miyako-bushi"
 // scale (Karplus-Strong strings) and a breathy bamboo flute; a calm courtyard theme, a driving battle rhythm and a
@@ -384,3 +386,6 @@ export class Sound {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Marble Dozer sound, made live with Web Audio (no files): a playful marimba tune, a soft engine rumble while pushing, marbles knocking,
 // plinks that climb as marbles drop into the hole, a spring for the bumpers, a sparkle for the gates, and a fanfare.
@@ -206,3 +208,6 @@ export class Sound {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

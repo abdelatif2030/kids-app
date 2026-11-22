@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // Synthesised sound for «حلاوة ولا مقلب»: playful spooky-cute music + effects, all Web Audio, no files.
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 
@@ -45,3 +47,6 @@ export class Sound extends SynthBase {
     else this.setTune({ tempo: 112, beats: 16, wave: 'triangle', vol: 0.09, notes: [...MEL, ...BASS] });
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

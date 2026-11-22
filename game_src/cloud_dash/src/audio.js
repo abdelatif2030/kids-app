@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Cloud Dash sound, made live with Web Audio (no files): a bouncy candy-land tune (bass, off-beat plucks, a bright marimba
 // melody) and effects: coin plinks that climb in a row, jump / slide / landing, lane swishes, a soft bonk, the shield, magnet and
@@ -213,3 +215,6 @@ export class Sound {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

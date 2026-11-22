@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Hero Tower sound, made live with Web Audio (no files): a brave little march (bass, plucked chords, a bright
 // glockenspiel tune), and effects for every thing in the tower: a sword's metallic ring, a crystal's sparkle, a potion's
@@ -224,3 +226,6 @@ export class Sound {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

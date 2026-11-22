@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // Sounds for the Viking Slingshot, all synthesised live (Web Audio, no files).
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 
@@ -46,3 +48,6 @@ export class Sound extends SynthBase {
     this.setTune({ tempo: 96, beats: 16, wave: 'sawtooth', vol: 0.05, notes: [[0, 50, 1.5], [2, 57, 1], [3, 53, 1], [4, 57, 1.5], [6, 62, 1], [7, 60, 1], [8, 58, 1.5], [10, 57, 1], [11, 53, 1], [12, 55, 1.5], [14, 57, 2], [0, 38, 2], [4, 38, 2], [8, 34, 2], [12, 36, 2]] });
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Space-station shop sound, made live with Web Audio (no files): a bright space-lounge tune with a sparkly synth
 // arpeggio, airy pads, a soft bass and electro drums. Effects: hover-basket bloops that climb with the stack, rack
@@ -281,3 +283,6 @@ export class Sound {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

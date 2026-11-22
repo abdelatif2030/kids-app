@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 
 /** Soft courtyard sound: a fountain bed, now and then a bird, a slow plucked tune, and one looping voice per tool. */
@@ -60,3 +62,6 @@ export class Sound extends SynthBase {
   }
   dispose() { clearInterval(this._birds); super.dispose(); }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Sunny pool-party sound, made live with Web Audio (no files): a tropical tune on steel drums over ukulele strums,
 // a bouncy bass, claps and a shaker, in the round's own tempo; while racing the coach's whistle marks every beat (tap
@@ -280,3 +282,6 @@ export class Sound {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

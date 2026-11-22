@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Jungle adventure sound, made live with Web Audio (no files): an original tune (marimba lead, kalimba, flute,
 // bongos, congas, shaker and a plucked bass) that speeds up a little on each level, soft footsteps, and an effect for
@@ -445,3 +447,6 @@ export class Sound {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

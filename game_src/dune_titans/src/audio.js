@@ -1,3 +1,4 @@
+import { attachMusic } from '../../cozy_kit/sample_hook.js';
 import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Racing sound, made live with Web Audio (no files). The engine is a synthesised twin: three oscillators at the
@@ -382,3 +383,4 @@ export class Sound {
     }
   }
 }
+attachMusic(Sound);

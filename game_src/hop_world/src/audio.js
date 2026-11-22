@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // Hop World sound: every effect and the little tunes are synthesised live (Web Audio, no files).
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 
@@ -40,3 +42,6 @@ export class Sound extends SynthBase {
   /** world name for the tune, or null for silence. */
   setMode(world) { if (!world) { this.setBed(null); this.setTune(null); return; } this.setTune(TUNES[world] || TUNES.hills); }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

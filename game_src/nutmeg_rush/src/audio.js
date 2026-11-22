@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // Nutmeg Rush sound: everything is synthesised live with Web Audio (no files). A stadium crowd bed that swells with excitement,
 // kick, whistle, goal roar, comet whoosh, nutmeg "ole", warning blip, UI clicks.
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
@@ -48,3 +50,6 @@ export class Sound extends SynthBase {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

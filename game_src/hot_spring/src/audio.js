@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 // Hot Spring Village sound, made live with Web Audio (no files): a very soft wind bed, a warm slow pentatonic tune,
 // a woody slice, a splash and soft steam for the spring, bright coin pings, a paper-lantern chime for each light.
@@ -38,3 +40,6 @@ export class Sound extends SynthBase {
 
   setMode(m) { if (m === 'off') { this.setBed(null); this.setTune(null); } else { this.setBed('wind'); this.setTune(TUNE); } }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

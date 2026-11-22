@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Gum ball sound, made live with Web Audio (no files): a funky, bouncy city tune (slap bass, clavinet chords, a
 // whistled melody, claps and shakers). The rolling is a soft rumble whose pitch drops and loudness grows with the ball.
@@ -305,3 +307,6 @@ export class Sound {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

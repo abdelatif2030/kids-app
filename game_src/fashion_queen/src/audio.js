@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // Fashion Queen sound: cheerful tunes and every effect made live with Web Audio (no files). Two volumes: music and effects.
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 
@@ -61,3 +63,6 @@ export class Sound extends SynthBase {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

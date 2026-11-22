@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Retro diner sound, made live with Web Audio (no files): a little rock-and-roll band in the track's own tempo (the
 // bars sweep on its beat): walking bass, swung drums, piano stabs on the off-beats and a breathy sax melody, with soft
@@ -316,3 +318,6 @@ export class Sound {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

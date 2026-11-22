@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Underwater sound, made live with Web Audio (no files): a warm, slowly breathing pad, a bubbly music-box arpeggio,
 // soft bass, a muffled kick and brushes while defending, a darker progression for the octopus; little bubbles rise
@@ -325,3 +327,6 @@ export class Sound {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);

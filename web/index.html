@@ -45,7 +45,7 @@
     @keyframes splashbar { 0% { transform: translateX(-100%); } 100% { transform: translateX(300%); } }
     @media (prefers-reduced-motion: reduce) { #splash i { animation: none; width: 100%; opacity: .5; } }
   </style>
-</head>
+<style>html,body{touch-action:manipulation;-webkit-text-size-adjust:100%}</style><script>(function(){var l=0;var o={passive:false};document.addEventListener("gesturestart",function(e){e.preventDefault()},o);document.addEventListener("gesturechange",function(e){e.preventDefault()},o);document.addEventListener("touchmove",function(e){if(e.touches&&e.touches.length>1)e.preventDefault()},o);document.addEventListener("dblclick",function(e){e.preventDefault()},o)})();</script></head>
 <body>
   <div id="splash" aria-hidden="true"><i></i></div>
   <script src="splash.js"></script>

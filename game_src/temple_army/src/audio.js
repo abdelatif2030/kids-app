@@ -1,3 +1,5 @@
+import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
+import { SAMPLES } from './samples.js';
 // Temple Army sound: everything is synthesised live (Web Audio). Jungle ambience + tribal drums + effects. No files.
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 
@@ -75,3 +77,6 @@ export class Sound extends SynthBase {
     }
   }
 }
+
+attachSamples(Sound, SAMPLES);
+attachMusic(Sound);
