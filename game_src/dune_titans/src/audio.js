@@ -1,3 +1,4 @@
+import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
 // Racing sound, made live with Web Audio (no files). The engine is a synthesised twin: three oscillators at the
 // firing frequency (from the rpm of the current gear) through soft distortion and a low-pass that opens with the
@@ -34,6 +35,7 @@ export class Sound {
       this.music.gain.value = 0.4;
       this.music.connect(this.master);
       this.sfx = c.createGain();
+      this._decode();
       this.sfx.gain.value = 0.8;
       this.sfx.connect(this.master);
       const delay = c.createDelay(0.8);
@@ -98,6 +100,17 @@ export class Sound {
     this.tempo = mode === 'race' ? 132 : 124;
     this.step = 0;
     this.nextTime = this.ctx.currentTime + 0.12;
+  }
+
+  /** Decodes the inlined samples once; until then (or if it fails) the synth sounds play. */
+  _decode() {
+    this.buf = {};
+    for (const [n, uri] of Object.entries(SAMPLES)) {
+      try {
+        const bin = atob(uri.split(',')[1]); const u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+        const p = this.ctx.decodeAudioData(u.buffer, (b) => { this.buf[n] = b; }, () => {}); if (p && p.catch) p.catch(() => {});
+      } catch (_) { /* synth fallback */ }
+    }
   }
 
   dispose() {
@@ -295,6 +308,13 @@ export class Sound {
     if (!this.on) return;
     const t = this.ctx.currentTime + 0.005;
     const S = this.sfx;
+    if (this.buf && this.buf[name]) { // a real recorded-style sample (ElevenLabs); the synth stays as the fallback
+      const src = this.ctx.createBufferSource(); const g = this.ctx.createGain(); src.buffer = this.buf[name];
+      g.gain.value = { crash: 0.95, bump: 0.8, wall: 0.8, nitro: 0.7, overtake: 0.6, win: 0.9, crowd: 0.5, lap: 0.6 }[name] || 0.7;
+      src.connect(g); g.connect(this.sfx); src.start(t);
+      if (name === 'crash' && this.eng) { const e = this.eng.out.gain; e.cancelScheduledValues(t); e.setValueAtTime(0.01, t); e.setTargetAtTime(0.08, t + 1.3, 0.2); }
+      return;
+    }
     switch (name) {
       case 'light':
         this._tone('square', 440, t, 0.25, 0.08);

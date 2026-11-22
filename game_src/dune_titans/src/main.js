@@ -691,7 +691,7 @@ class Game {
           this.hud.title.remove();
           this._tag(t('go'), 0.8);
           break;
-        case 'nitro': if (e.id === 0) { this.sound.play('nitro'); this._tag(t('boost'), 0.9); } break;
+        case 'nitro': if (e.id === 0) { this.sound.play('nitro'); this._tag(t('boost'), 0.9); this.shake = Math.max(this.shake || 0, 0.25); const pp = this.race.player; for (let k = 0; k < 16; k++) this.sparks.emit(pp.x - Math.sin(pp.h) * 2.4, 0.6, pp.z - Math.cos(pp.h) * 2.4, (Math.random() - 0.5) * 3 - Math.sin(pp.h) * 6, Math.random() * 3, (Math.random() - 0.5) * 3 - Math.cos(pp.h) * 6, 0.5); } break;
         case 'draft': this.sound.play('draft'); this._tag(t('draft'), 1); break;
         case 'bump': this.sound.play('bump'); this.shake = 0.3; break;
         case 'wall': if (e.id === 0) { this.sound.play('wall'); this.shake = 0.45; for (let k = 0; k < 12; k++) this.sparks.emit(e.x, 0.6, e.z, (Math.random() - 0.5) * 6, Math.random() * 4, (Math.random() - 0.5) * 6, 0.5); } break;
@@ -703,7 +703,7 @@ class Game {
         case 'recover': if (e.id === 0) this.sound.play('lap'); break;
         case 'lap': if (e.id === 0) { this.sound.play('lap'); this._tag(e.lap === LAPS ? t('lastLap') : `${t('lap')} ${num(e.lap)}`, 1.4); } break;
         case 'cross': if (e.id === 0) this.sound.play('crowd'); break;
-        case 'overtake': if (e.place < before) { this.sound.play('overtake'); if (Math.random() < 0.5) this._tag(t('overtake'), 0.8); } break;
+        case 'overtake': if (e.place < before) { this.sound.play('overtake'); { const pp = this.race.player; for (let k = 0; k < 10; k++) this.sparks.emit(pp.x, 1.4, pp.z, (Math.random() - 0.5) * 5, 2 + Math.random() * 3, (Math.random() - 0.5) * 5, 0.7); } if (Math.random() < 0.5) this._tag(t('overtake'), 0.8); } break;
         case 'finish': setTimeout(() => this.mode === 'race' && this._results(), 1500); break;
         default:
       }
