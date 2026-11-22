@@ -445,7 +445,7 @@ class Game {
   startLevel(i) {
     this._endLevel();
     this.levelIndex = i;
-    applyBackdrop(THREE, this.scene, this.base, `bg_reef${(i % 5) + 1}`, () => this.levelIndex === i);
+    applyBackdrop(THREE, this.scene, this.base, `bg_reef${(i % 7) + 1}`, () => this.levelIndex === i);
     this.d = new Defense({ level: i, easy: this.age <= 4, up: this.save.up, seed: (Date.now() & 0xffff) + 1 });
     this.mode = 'play';
     this.paused = false;

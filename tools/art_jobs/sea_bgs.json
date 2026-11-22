@@ -1,0 +1,42 @@
+{
+ "style": "Glossy 3D-rendered cartoon scenery for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, cute friendly look, side view, no characters, no text, no letters.",
+ "kind_sprite": "",
+ "suffix": "Wide landscape scene.",
+ "jobs": [
+  {
+   "name": "deep_night_reef",
+   "kind": "bg",
+   "prompt": "Underwater side view of a dark blue reef with glowing coral and bioluminescent plankton, moonlight beams from above, open water in the middle."
+  },
+  {
+   "name": "deep_shipwreck",
+   "kind": "bg",
+   "prompt": "Underwater side view of a broken wooden ship half buried in sand, barrels and an anchor, schools of small fish, green-blue water, open water in the middle."
+  },
+  {
+   "name": "deep_abyss_castle",
+   "kind": "bg",
+   "prompt": "Fully underwater scene, deep purple-blue water everywhere with NO sky and NO surface, a glowing sunken castle with towers and arches in the distance, pale jellyfish lights, soft god rays, open water in the middle."
+  },
+  {
+   "name": "od_jelly_garden",
+   "kind": "bg",
+   "prompt": "Fully underwater scene in deep blue-teal water, pink and violet glowing jellyfish drifting over soft colorful coral, rich saturated colors, open water in the middle, no sky."
+  },
+  {
+   "name": "od_octopus_lair",
+   "kind": "bg",
+   "prompt": "Underwater side view of a dark blue cave with round windows, treasure piles and friendly lamps, open water in the middle."
+  },
+  {
+   "name": "od_pearl_castle",
+   "kind": "bg",
+   "prompt": "Underwater side view of a white-and-pink castle built from giant pearls and shells, open water in the middle."
+  },
+  {
+   "name": "od_ocean_floor",
+   "kind": "bg",
+   "prompt": "Underwater side view of the deepest blue trench with glowing lantern fish and a giant clam, open water in the middle."
+  }
+ ]
+}
