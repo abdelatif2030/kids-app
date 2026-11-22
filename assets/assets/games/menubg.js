@@ -2,10 +2,10 @@
 (function () {
   var host = document.getElementById('game'); if (!host) return;
   var bg = document.createElement('div');
-  bg.style.cssText = 'position:absolute;left:0;top:0;right:0;bottom:0;background:#000 url(poster.webp) center/cover no-repeat;opacity:0;transition:opacity .35s;pointer-events:none';
+  bg.style.cssText = 'position:absolute;left:0;top:0;right:0;bottom:0;background:#000 url(poster.webp) center/cover no-repeat;opacity:0;pointer-events:none';
   // the game's hero (hero.webp, cut from the owner's character sheet) stands beside the menu on wide screens
   var hero = document.createElement('img'); hero.alt = ''; hero.decoding = 'async';
-  hero.style.cssText = 'position:absolute;left:2%;bottom:0;height:58%;max-width:30%;object-fit:contain;object-position:left bottom;opacity:0;transition:opacity .35s;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))';
+  hero.style.cssText = 'position:absolute;left:2%;bottom:0;height:58%;max-width:30%;object-fit:contain;object-position:left bottom;opacity:0;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))';
   var heroOk = false; hero.onload = function () { heroOk = true; }; hero.onerror = function () { heroOk = false; }; hero.src = 'hero.webp';
   function root() { return host.querySelector('[class$="-layer"],[class*="-layer "]'); }
   function menuUp() { var p = host.querySelectorAll('[class*="-panel"]'); for (var i = 0; i < p.length; i++) { if (p[i].offsetParent !== null) return true; } return false; }
