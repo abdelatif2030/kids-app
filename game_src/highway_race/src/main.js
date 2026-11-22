@@ -7,7 +7,8 @@ import * as THREE from 'three';
 import { Race, STAGES, LANES, HALF, bend, bendSlope, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
-import { loadSprites, makeSpriteVehicle } from '../../cozy_kit/art.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { loadSprites, makeSpriteVehicle, loadGLBs, makeModelVehicle } from '../../cozy_kit/art.js';
 
 const CAR_PICS = ['car_blue', 'car_red', 'car_pink', 'car_orange', 'car_black', 'car_taxi', 'car_sedan_blue', 'car_sedan_green', 'car_police'];
 const HEAVY_PICS = ['car_truck', 'car_van', 'car_bus'];
@@ -118,8 +119,8 @@ class Game {
     this.ro.observe(el);
     this._bind();
     this.last = performance.now();
-    this.sprites = {};
-    Promise.all([this._fonts(), loadSprites(THREE, this.base, [...CAR_PICS, ...HEAVY_PICS]).then((sp) => { this.sprites = sp; })]).then(() => { this.showMenu(); this.renderer.setAnimationLoop(() => this._frame()); });
+    this.sprites = {}; this.glbs = null;
+    Promise.all([this._fonts(), loadGLBs(GLTFLoader, this.base, ['sedan', 'sedan-sports', 'hatchback-sports', 'taxi', 'suv', 'suv-luxury', 'van', 'truck', 'delivery', 'garbage-truck', 'police', 'ambulance', 'firetruck']).then((g) => { this.glbs = g; }), loadSprites(THREE, this.base, [...CAR_PICS, ...HEAVY_PICS]).then((sp) => { this.sprites = sp; })]).then(() => { this.showMenu(); this.renderer.setAnimationLoop(() => this._frame()); });
   }
 
   async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 900))]); } catch (_) { /* system font */ } }
@@ -344,7 +345,11 @@ class Game {
       const sp = this.sprites;
       const heavy = HEAVY_PICS.map((n) => sp[n]).filter(Boolean), light = ['car_pink', 'car_orange', 'car_black', 'car_taxi', 'car_sedan_blue', 'car_sedan_green', 'car_police'].map((n) => sp[n]).filter(Boolean);
       const pool = c.truck ? heavy : light;
-      m = pool.length ? paintedCar(pool[c.id % pool.length], c.truck ? 3.0 : 2.3) : c.truck ? makeTruck([0xe8e8f0, 0xe8a82a, 0x3a8ae8][c.id % 3]) : makeCar([0xe8d83a, 0x3ae8a8, 0xe83ab8, 0xf4f4f4, 0x8a5ae8][c.id % 5], false);
+      const G = this.glbs && this.glbs.sedan ? this.glbs : null;
+      if (G) { // real 3D traffic (Kenney Car Kit, CC0)
+        const keys = c.truck ? ['truck', 'van', 'delivery', 'garbage-truck', 'firetruck'] : ['sedan', 'sedan-sports', 'hatchback-sports', 'taxi', 'suv', 'suv-luxury', 'police', 'ambulance'];
+        m = makeModelVehicle(THREE, G[keys[c.id % keys.length]] || G.sedan, { length: c.truck ? 5.2 : 3.8, yaw: Math.PI }).root;
+      } else m = pool.length ? paintedCar(pool[c.id % pool.length], c.truck ? 3.0 : 2.3) : c.truck ? makeTruck([0xe8e8f0, 0xe8a82a, 0x3a8ae8][c.id % 3]) : makeCar([0xe8d83a, 0x3ae8a8, 0xe83ab8, 0xf4f4f4, 0x8a5ae8][c.id % 5], false);
       this.cars.add(m);
       this.carMeshes.set(c.id, m);
     }

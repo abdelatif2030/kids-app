@@ -7,7 +7,8 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Race, ROUNDS, RIDERS, LAPS, normalizeSave } from './sim.js';
 import { pointAt, HALF_W, WALL } from './track.js';
-import { loadSprites, makeBillboardVehicle } from '../../cozy_kit/art.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { loadSprites, makeBillboardVehicle, loadGLBs, makeModelVehicle } from '../../cozy_kit/art.js';
 import { mat, makeCar, makePalm, makeStand, makeGantry, makeChevron, makeMountain, roadTexture, makeClouds, meshTexture } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
@@ -116,8 +117,8 @@ class Game {
     this.frames = [];
     this.goodWin = 0;
     this.clock = new THREE.Clock();
-    this.pics = null;
-    Promise.all([this._fonts(), loadSprites(THREE, this.base, ['car_01','car_02','car_03','car_04','car_05','car_06','car_07','car_08','car_09','car_10','car_11','car_12']).then((sp) => { this.pics = sp; })]).then(() => {
+    this.pics = null; this.glbs = null;
+    Promise.all([this._fonts(), loadGLBs(GLTFLoader, this.base, ['race', 'race-future']).then((g) => { this.glbs = g; }), loadSprites(THREE, this.base, ['car_01','car_02','car_03','car_04','car_05','car_06','car_07','car_08','car_09','car_10','car_11','car_12']).then((sp) => { this.pics = sp; })]).then(() => {
       this.loading.remove();
       this.showMenu();
       this.renderer.setAnimationLoop(() => this._frame());
@@ -290,7 +291,11 @@ class Game {
     this.bikes = this.race.riders.map((r, k) => {
       const P = this.pics;
       let b;
-      if (P && P.car_01) {
+      const G = this.glbs;
+      if (G && G.race && G['race-future']) {
+        // real 3D race cars (Kenney Car Kit, CC0): they turn with the track
+        b = makeModelVehicle(THREE, k === 0 ? G.race : (k % 2 ? G['race-future'] : G.race), { length: 4.4, yaw: 0 });
+      } else if (P && P.car_01) {
         const names = ['car_01', 'car_02', 'car_03', 'car_04'];
         const mine = P[names[this.save.color]] || P.car_01;
         const rivalKey = ['car_05', 'car_06', 'car_07', 'car_08', 'car_09', 'car_10', 'car_11', 'car_12'][(k - 1 + 8) % 8];

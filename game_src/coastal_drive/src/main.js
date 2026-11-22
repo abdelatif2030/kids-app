@@ -9,7 +9,8 @@ import {
   mat, basic, box, makeSportsCar, makeTrafficCar, roadTexture, makePalm, makeLamp, makeRailSegment, makeHill, makeBackdrop, makeBush, makeMesa,
   makeCactus, makeTower, skyTexture, coinMesh,
 } from './models.js';
-import { loadSprites, makeSpriteVehicle, recolorSprite } from '../../cozy_kit/art.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { loadSprites, makeSpriteVehicle, recolorSprite, loadGLBs, makeModelVehicle } from '../../cozy_kit/art.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
 import { CSS, h, arc } from './ui.js';
@@ -181,6 +182,8 @@ class Game {
     this.trafficModels = new Map();
     this.sprites = {}; // painted rear-view cars (art/car_*.webp); a missing picture = the code-built 3D car
     this.playerSprite = null;
+    this.glbs = null; // real 3D traffic (Kenney Car Kit, CC0)
+    loadGLBs(GLTFLoader, this.base, ['sedan', 'sedan-sports', 'hatchback-sports', 'taxi', 'suv', 'suv-luxury', 'van', 'truck', 'delivery', 'garbage-truck', 'police', 'ambulance']).then((g) => { this.glbs = g; });
     loadSprites(THREE, this.base, ['car_player', 'car_arrow', 'car_nightfall', 'car_sedan_white', 'car_sedan_silver', 'car_suv_black', 'car_pickup', 'car_taxi', 'car_hatch', 'car_truck', 'car_van', 'car_bus']).then((sp) => { this.sprites = sp; });
     this.coins = coinMesh(80);
     s.add(this.coins);
@@ -707,11 +710,21 @@ class Game {
       let m = this.trafficModels.get(c.id);
       if (!m) {
         // only pictures drawn exactly from behind are used (a 3/4 picture looked like a car driving sideways)
+        const G = this.glbs && this.glbs.sedan ? this.glbs : null;
+        if (G) {
+          const heavy3 = c.kind === 'truck' || c.kind === 'van';
+          const keys = heavy3 ? ['truck', 'van', 'delivery', 'garbage-truck'] : ['sedan', 'sedan-sports', 'hatchback-sports', 'taxi', 'suv', 'suv-luxury', 'police', 'ambulance'];
+          const key = keys[(c.color + c.id) % keys.length];
+          m = makeModelVehicle(THREE, G[key] || G.sedan, { length: heavy3 ? 5.6 : 4.0, yaw: 0 });
+          m.wheels = []; m.tail = { emissiveIntensity: 0 }; m.flames = []; m.len = heavy3 ? 5.6 : 4.0;
+          const bm = new THREE.MeshBasicMaterial({ color: 0xffb21a });
+          m.blinkers = [-1, 1].map((sd) => { const b = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.1), bm); b.position.set(sd * (heavy3 ? 1.05 : 0.8), 0.75, (heavy3 ? 2.8 : 2.0)); b.visible = false; m.root.add(b); return b; });
+        }
         const sp0 = this.sprites || {};
         const heavy = c.kind === 'truck' || c.kind === 'van';
         const pool = (heavy ? [sp0.car_truck, sp0.car_van, sp0.car_bus] : [sp0.car_sedan_white, sp0.car_sedan_silver, sp0.car_suv_black, sp0.car_pickup, sp0.car_taxi, sp0.car_hatch, sp0.car_arrow, sp0.car_nightfall]).filter(Boolean);
         const sp = pool.length ? pool[(c.color + c.id) % pool.length] : null;
-        m = sp ? makeSpriteVehicle(THREE, sp, heavy ? 2.7 : sp === sp0.car_pickup || sp === sp0.car_suv_black ? 2.2 : 2.0) : makeTrafficCar(c.kind, c.color);
+        if (!m) m = sp ? makeSpriteVehicle(THREE, sp, heavy ? 2.7 : sp === sp0.car_pickup || sp === sp0.car_suv_black ? 2.2 : 2.0) : makeTrafficCar(c.kind, c.color);
         this.scene.add(m.root); this.trafficModels.set(c.id, m);
       }
       m.root.position.set(c.x, 0, -c.s);

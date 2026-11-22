@@ -125,6 +125,8 @@ flutter:
     - assets/games/deep_sea/
     - assets/games/deep_sea/art/
     - assets/games/coastal_drive/
+    - assets/games/coastal_drive/models/Textures/
+    - assets/games/coastal_drive/models/
     - assets/games/coastal_drive/art/
     - assets/games/hungry_frog/
     - assets/games/frost_coil/
@@ -158,12 +160,16 @@ flutter:
     - assets/games/castaway_raft/
     - assets/games/winter_camp/
     - assets/games/rain_circuit/
+    - assets/games/rain_circuit/models/Textures/
+    - assets/games/rain_circuit/models/
     - assets/games/rain_circuit/art/
     - assets/games/squad_shooter/
     - assets/games/archer_bridge/
     - assets/games/alien_sky/
     - assets/games/rhino_summit/
     - assets/games/sunset_highway/
+    - assets/games/sunset_highway/models/Textures/
+    - assets/games/sunset_highway/models/
     - assets/games/girls_world/
     - assets/games/girls_world/art/
     - assets/games/butterfly_garden/
