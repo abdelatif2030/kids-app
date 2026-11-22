@@ -337,7 +337,15 @@ export function makeRock() {
   return bake(g);
 }
 
+let _treeN = 0;
 export function makeTree(s = 1) {
+  const kind = (_treeN++ % 3 === 2) ? 'bush' : 'tree';
+  if (REAL[kind]) {
+    const b = new THREE.Box3().setFromObject(REAL[kind]); const h = (kind === 'tree' ? 3.4 : 1.3) * s;
+    const inner = REAL[kind].clone(true); const k = h / Math.max(1e-6, b.max.y - b.min.y);
+    inner.scale.setScalar(k); inner.position.y = -b.min.y * k; inner.rotation.y = _treeN * 1.7;
+    const out = new THREE.Group(); out.add(inner); return out;
+  }
   const g = new THREE.Group();
   g.add(cyl(0.18 * s, 0.25 * s, 1.6 * s, mat(0x8a5530), 0, 0.8 * s, 0, 7));
   const leaf = mat(0x4caf50, 0x0a3a10, 0.2);
@@ -350,8 +358,8 @@ export function makeTree(s = 1) {
 const REAL = {};
 export async function loadRealAnimals(base) {
   const root = (base || './').replace(/\/?$/, '/') + 'models/';
-  const PAINT = { chicken: { 'material.001': 0xffd23a, 'material.002': 0xff8a1a } }; // the chick comes in plain grey: yellow body, orange beak and feet
-  await Promise.all([['cow', 'Cow'], ['sheep', 'Sheep'], ['chicken', 'Chick']].map(async ([kind, file]) => {
+  const PAINT = { tree: { darkgreen_tree: 0x3f9a3c, green_tree: 0x62bf4a, darkred: 0xe0483a, wood: 0x8a5530 }, bush: { berry: 0xd8344a, green_bush: 0x58b848 }, chicken: { 'material.001': 0xffd23a, 'material.002': 0xff8a1a } }; // the chick comes in plain grey: yellow body, orange beak and feet
+  await Promise.all([['cow', 'Cow'], ['sheep', 'Sheep'], ['chicken', 'Chick'], ['tree', 'Apple_4'], ['bush', 'BushBerries_4']].map(async ([kind, file]) => {
     try {
       const mtl = await new Promise((ok, no) => new MTLLoader().setPath(root).load(`${file}.mtl`, ok, undefined, no));
       mtl.preload();
