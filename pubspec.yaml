@@ -150,6 +150,7 @@ flutter:
     - assets/games/sky_capy/
     - assets/games/sky_capy/art/
     - assets/games/marble_dozer/
+    - assets/games/
     - assets/games/dune_titans/
     - assets/games/dune_titans/art/
     - assets/games/dune_titans/models/
