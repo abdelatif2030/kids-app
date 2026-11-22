@@ -1,5 +1,6 @@
 # Builds docs/CHATGPT_PROMPTS.md : every prompt is ONE complete block (style + sheet rules + items) that can be pasted into ChatGPT as is.
 import io
+import os
 
 STYLE = ("Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, "
          "cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.")
@@ -175,6 +176,15 @@ P.append(("H15", "ملكة الموضة: الحيوانات الأليفة (١٢
 P.append(("H16", "ملكة الموضة: أثاث الغرف (١٢)", "furn_*", "fashion_queen",
           sheet(FASH, "12 cute pieces of furniture and decor for a dream house, each seen from the front: a canopy bed, a wardrobe, a vanity table with a mirror, a sofa, a rug, a lamp, a bookshelf, a toy chest, a plant in a pot, a window with curtains, a picture frame, a bean bag.")))
 
+# ---- I. one main sheet for every other fun game (professional pictures instead of code-drawn figures) ---------------------------
+import importlib.util
+_spec = importlib.util.spec_from_file_location('more_prompts', os.path.join(os.path.dirname(os.path.abspath(__file__)), 'more_prompts.py'))
+_mp = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_mp)
+for _k, (_gid, _ar, _view, _items) in enumerate(_mp.GAMES, 1):
+    if _items.startswith('see sheets'): continue
+    P.append((f"I{_k}", f"{_ar}: الشيت الأساسي (شخصيات وأغراض اللعبة)", f"{_gid}_*", _gid,
+              sheet(STYLE, f"12 items for the game '{_gid.replace('_', ' ')}', ALL seen from {_view} the same way, same scale, cartoon and friendly (no scary details, no blood): {_items}.")))
+
 # ---- E. backgrounds ---------------------------------------------------------------------------------------------------------
 bgs = {
     "E1": ("خلفيات ألبسي الأميرة (٦)", "little_princess_dress", ["a pastel castle bedroom with a big window and a canopy bed", "a garden tea party with a gazebo and flowers", "a snowy ice castle with crystal pillars", "a sunny beach party with palm trees and a pastel tent", "a magic forest with glowing mushrooms and fairy lights", "a rainbow ballroom with chandeliers and a shiny floor"]),
@@ -196,7 +206,7 @@ w("**الترتيب المقترح (الأهم أولًا):** A1 ← A2 ← A3 �
 w("**نصايح لـ ChatGPT:** (1) ولّد الصورة بنسبة 3:2 (1536×1024). (2) لو الخلفية طلعت مش بيضا صافية قول: «Make the background pure flat white #FFFFFF, remove the shadows». "
   "(3) لو العناصر لزقت في بعض قول: «Increase the margin between items, no overlaps». (4) اطلب نفس الشخصية في كل الخانات: «Keep the exact same character design in every cell». "
   "(5) في الخلفيات: اطلب 16:9 (1920×1080) صورة واحدة.\n\n")
-groups = [("H", "ملكة الموضة (٤+): عروسة احترافية وكل القطع كصور شفافة"), ("G", "إضافات لزيادة محتوى مستويات عالم الأميرة"), ("F", "مخلوقات بإطارات حركة (ضفدع، ديناصور، أسماك، بطل الأسطح)"), ("A", "عربيات وطيارات (منظر خلفي بالظبط)"), ("B", "شخصيات الألعاب (وضعيات)"), ("C", "قسم البنات ٢–٤ سنين (شخصيات وأغراض)"), ("D", "كروت قسم البنات وغلافه"), ("E", "خلفيات قسم البنات (٣٠)")]
+groups = [("I", "شيت أساسي لكل لعبة تسلية (باقي الألعاب)"), ("H", "ملكة الموضة (٤+): عروسة احترافية وكل القطع كصور شفافة"), ("G", "إضافات لزيادة محتوى مستويات عالم الأميرة"), ("F", "مخلوقات بإطارات حركة (ضفدع، ديناصور، أسماك، بطل الأسطح)"), ("A", "عربيات وطيارات (منظر خلفي بالظبط)"), ("B", "شخصيات الألعاب (وضعيات)"), ("C", "قسم البنات ٢–٤ سنين (شخصيات وأغراض)"), ("D", "كروت قسم البنات وغلافه"), ("E", "خلفيات قسم البنات (٣٠)")]
 for g, title in groups:
     w("\n---\n\n## %s — %s\n\n" % (g, title))
     for pid, ttl, files, unlocks, body in P:

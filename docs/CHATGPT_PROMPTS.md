@@ -1,10 +1,455 @@
-# برومتات توليد الصور من ChatGPT — جاهزة للنسخ (103 برومت)
+# برومتات توليد الصور من ChatGPT — جاهزة للنسخ (147 برومت)
 
 **الطريقة:** كل برومت تحت **كتلة واحدة كاملة** (فيها الأسلوب وقواعد الشيت والعناصر) — انسخها كلها كما هي في ChatGPT. ابعتيلي الصورة الناتجة وأنا أقصّها (`python tools/cut_sprite.py شيت.png 4x3 الأسماء مجلد_اللعبة/art`) وأركّبها في اللعبة.
 
 **الترتيب المقترح (الأهم أولًا):** A1 ← A2 ← A3 ← … (عربيات) ثم C1..C6 (ألبسي الأميرة) ثم باقي ألعاب البنات ثم B (الشخصيات) ثم E (الخلفيات).
 
 **نصايح لـ ChatGPT:** (1) ولّد الصورة بنسبة 3:2 (1536×1024). (2) لو الخلفية طلعت مش بيضا صافية قول: «Make the background pure flat white #FFFFFF, remove the shadows». (3) لو العناصر لزقت في بعض قول: «Increase the margin between items, no overlaps». (4) اطلب نفس الشخصية في كل الخانات: «Keep the exact same character design in every cell». (5) في الخلفيات: اطلب 16:9 (1920×1080) صورة واحدة.
+
+
+---
+
+## I — شيت أساسي لكل لعبة تسلية (باقي الألعاب)
+
+### I1 — مزرعتي السعيدة: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `happy_farm_*`
+- **بتفتح:** happy_farm
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'happy farm', ALL seen from the SIDE-3/4 view the same way, same scale, cartoon and friendly (no scary details, no blood): a red combine harvester, a golden wheat bundle, a corn cob, a sunflower, a hay bale, a farm trailer, a red barn, a white fence piece, a cow, a sheep, a pig, a chicken.
+```
+
+### I2 — مخبز اليقطين: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `pumpkin_pie_*`
+- **بتفتح:** pumpkin_pie
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'pumpkin pie', ALL seen from the FRONT view the same way, same scale, cartoon and friendly (no scary details, no blood): a friendly baker girl with a chef hat, a pumpkin, a pumpkin pie, an oven, a flour sack, a rolling pin, a happy bear customer, a happy bunny customer, a helper robot, a coin, a bakery counter, a pie box.
+```
+
+### I3 — الذيل الذهبي: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `golden_tail_*`
+- **بتفتح:** golden_tail
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'golden tail', ALL seen from the SIDE view facing right the same way, same scale, cartoon and friendly (no scary details, no blood): a cute plush dinosaur hero with a red bandana, a golden tail, a plush fox rival, a plush monkey rival, a plush rabbit rival, a rope bridge piece, a wooden slide, a bouncy mushroom, a tree stump platform, a coin, a countdown clock, a banana.
+```
+
+### I4 — دفاع القلعة البحرية: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `ocean_defense_*`
+- **بتفتح:** ocean_defense
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'ocean defense', ALL seen from the SIDE view facing right the same way, same scale, cartoon and friendly (no scary details, no blood): a crowned clownfish hero, a bubble stream shot, a repair coral icon, a shell shield, a whirlpool icon, a small angry fish enemy, a pufferfish enemy, a crab enemy, a jellyfish enemy, a friendly octopus boss, a coral wall piece, a pearl coin.
+```
+
+### I5 — البقاء على الإيقاع: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `rhythm_*`
+- **بتفتح:** rhythm
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'rhythm', ALL seen from the TOP-3/4 view the same way, same scale, cartoon and friendly (no scary details, no blood): a plush bunny hero, a plush panda, a plush cat, a plush bear rival, a vinyl record, a record player tonearm, a low bar obstacle, a high bar obstacle, a music note, a gap sparkle, a speaker, a golden trophy.
+```
+
+### I6 — سباق السباحة العجيب: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `splash_race_*`
+- **بتفتح:** splash_race
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'splash race', ALL seen from the SIDE view facing right the same way, same scale, cartoon and friendly (no scary details, no blood): a goggle-wearing otter swimmer, a rival duck swimmer, a rival frog swimmer, a rival penguin swimmer, a pool noodle, a floating bumper, a water slide piece, a lifebuoy, a wave, a medal, a breath bubble, a starting flag.
+```
+
+### I7 — متجر الفضاء الذكي: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `space_store_*`
+- **بتفتح:** space_store
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'space store', ALL seen from the FRONT view the same way, same scale, cartoon and friendly (no scary details, no blood): a space station shopkeeper girl, a robot cashier, a shopping basket, a shelf with colorful boxes, a checkout counter, a floating hover-cart, a star coin, an alien shopper, a round window with Earth, a robot helper, a rocket-shaped fridge, an expansion pad.
+```
+
+### I8 — كرة العلكة العملاقة: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `gum_ball_*`
+- **بتفتح:** gum_ball
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'gum ball', ALL seen from the FRONT/SIDE view the same way, same scale, cartoon and friendly (no scary details, no blood): a giant pink bubblegum ball character with a happy face, a small colorful house, a tree, a car, a bench, a street lamp, a fruit stand, a trash can, a bicycle, a dog, a candy cane, a balloon.
+```
+
+### I10 — طريق التنين الجليدي: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `frost_coil_*`
+- **بتفتح:** frost_coil
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'frost coil', ALL seen from the TOP view (tiles) the same way, same scale, cartoon and friendly (no scary details, no blood): a straight ice-pipe tile, a curved ice-pipe tile, a cross ice-pipe tile, a frozen tile, a start tile with a baby ice dragon, a glowing portal tile, a star tile, a snowy rock, an ice crystal, a snowflake, a moves counter icon, a coin.
+```
+
+### I11 — سباق القمة: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `summit_rush_*`
+- **بتفتح:** summit_rush
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'summit rush', ALL seen from the REAR view the same way, same scale, cartoon and friendly (no scary details, no blood): a runner in a red jacket from behind, 3 rival runners from behind in different colors, a boulder, a snowball, a log obstacle, a crystal, an ice pad, a wind orb, a shield orb, a finish arch, a pine tree, a flag.
+```
+
+### I12 — ركضة السحاب: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `cloud_dash_*`
+- **بتفتح:** cloud_dash
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'cloud dash', ALL seen from the REAR view the same way, same scale, cartoon and friendly (no scary details, no blood): a kid girl runner in pastel from behind running, the same girl jumping, sliding, a kid boy runner from behind, a spiky obstacle, a slime obstacle, a cloud gap piece, a wind swirl, a coin star, a magnet power, a shield power, a finish gate.
+```
+
+### I13 — سكاي كابي: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `sky_capy_*`
+- **بتفتح:** sky_capy
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'sky capy', ALL seen from the TOP view the same way, same scale, cartoon and friendly (no scary details, no blood): a capybara pilot in a small seaplane from above, a balloon enemy, a bird enemy, a cloud, a coin, a heart, a rocket power-up, a shield power-up, a paint can, a bullet, an explosion puff, a boss balloon.
+```
+
+### I14 — جرّافة الكرات: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `marble_dozer_*`
+- **بتفتح:** marble_dozer
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'marble dozer', ALL seen from the TOP view the same way, same scale, cartoon and friendly (no scary details, no blood): a bulldozer with a wide blade from above, 5 colored glossy marbles (red, blue, green, yellow, purple), a hole funnel, a bumper, a moving wall piece, a ramp, a conveyor belt piece, a gate with a number, a star, a timer icon, a gem.
+```
+
+### I15 — طوف الناجي: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `castaway_raft_*`
+- **بتفتح:** castaway_raft
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'castaway raft', ALL seen from the SIDE-3/4 view the same way, same scale, cartoon and friendly (no scary details, no blood): a cute castaway kid on a raft, a wooden raft tile, a floating barrel, a floating crate, a shark fin, a palm tree island, a rope hook, a fishing net, a message bottle, a treasure chest, a seagull, a coconut.
+```
+
+### I16 — معسكر الشتاء: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `winter_camp_*`
+- **بتفتح:** winter_camp
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'winter camp', ALL seen from the SIDE-3/4 view the same way, same scale, cartoon and friendly (no scary details, no blood): a bundled-up survivor kid, a cozy log cabin, a workshop hut, a sawmill, a glass greenhouse, a watchtower, a sled with supplies, a campfire, a pine tree, a snowman, a frozen gate, a helper worker.
+```
+
+### I17 — فرقة الجنود: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `squad_shooter_*`
+- **بتفتح:** squad_shooter
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'squad shooter', ALL seen from the REAR/TOP view the same way, same scale, cartoon and friendly (no scary details, no blood): a cartoon soldier hero from behind, 3 squad soldiers, an enemy thug, a big enemy thug, a number gate with a plus, a number gate with a multiply, a cage with a captive, a weapon crate, a bullet, a night road piece, a barrier, a star.
+```
+
+### I18 — رماة الجسر: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `archer_bridge_*`
+- **بتفتح:** archer_bridge
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'archer bridge', ALL seen from the SIDE view the same way, same scale, cartoon and friendly (no scary details, no blood): an archer hero with a bow, 3 squad archers, a skeleton enemy, a big skeleton enemy, an arrow volley, a bridge piece, a gate with numbers, a cage with a captive, a shield, a treasure chest, a torch, a banner.
+```
+
+### I19 — سباق السماء الغريبة: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `alien_sky_*`
+- **بتفتح:** alien_sky
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'alien sky', ALL seen from the REAR view the same way, same scale, cartoon and friendly (no scary details, no blood): a cute alien creature racer from behind, 5 rival creature racers in different colors, a floating rock island piece, a ring gate, a rocket pad, a crystal, a boost orb, a cloud, a planet, a star, a jump pad, a finish rocket.
+```
+
+### I20 — سباق القمة (وحيد القرن): الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `rhino_summit_*`
+- **بتفتح:** rhino_summit
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'rhino summit', ALL seen from the REAR view the same way, same scale, cartoon and friendly (no scary details, no blood): a friendly rhino runner with a scarf from behind, 5 rival animal runners from behind (goat, bear, tiger, ostrich, kangaroo), a golden gate, a rope bridge piece, a snowy rock, a log, a spike, a flag, a coin.
+```
+
+### I21 — مبدع الذكاء: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `creator_tycoon_*`
+- **بتفتح:** creator_tycoon
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'creator tycoon', ALL seen from the FRONT view the same way, same scale, cartoon and friendly (no scary details, no blood): a young creator girl at a desk, a CEO character, a laptop, a camera, a microphone, a video play icon, a photo icon, a game controller, a coin, a trophy, a coffee cup, a thumbs-up heart icon.
+```
+
+### I22 — غوّاصو اللؤلؤ: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `pearl_divers_*`
+- **بتفتح:** pearl_divers
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'pearl divers', ALL seen from the SIDE view the same way, same scale, cartoon and friendly (no scary details, no blood): a cute diver with a helmet, a diving bell with a basket, an open clam with a pearl, a closed clam, a pearl, a boat, a rival rich yacht, a coin stack, a ladder, an air bubble, a treasure chest, a coral piece.
+```
+
+### I23 — مزرعة العسل: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `honey_farm_*`
+- **بتفتح:** honey_farm
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'honey farm', ALL seen from the FRONT view the same way, same scale, cartoon and friendly (no scary details, no blood): a farmer girl with a straw hat, a cute bee, a wooden beehive in 3 growth stages (small, medium, big), a honey jar, a honey drip machine, a conveyor belt piece, a packing crate, a flower, a shop counter, a customer bear, a coin.
+```
+
+### I24 — تنين الجليد: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `ice_dragon_*`
+- **بتفتح:** ice_dragon
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'ice dragon', ALL seen from the TOP/3-4 view the same way, same scale, cartoon and friendly (no scary details, no blood): a friendly ice dragon head, a dragon body segment, a dragon tail tip, a small hero kid with a scarf, an ice wall block, a barrel, a crystal, a shrine, a snowflake, a frozen lake tile, a stone bridge piece, a key.
+```
+
+### I25 — ينابيع القرية: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `hot_spring_*`
+- **بتفتح:** hot_spring
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'hot spring', ALL seen from the FRONT-3/4 view the same way, same scale, cartoon and friendly (no scary details, no blood): a caretaker girl in a kimono, a steaming hot spring pool, a tea house, a water mill, a paper lantern, a towel stack, a wooden bucket, 3 cute visitors (monkey, bear, cat), a stone path piece, a cherry tree, a coin.
+```
+
+### I26 — مزرعة المريخ: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `mars_farm_*`
+- **بتفتح:** mars_farm
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'mars farm', ALL seen from the TOP-3/4 view the same way, same scale, cartoon and friendly (no scary details, no blood): a farmer astronaut girl, a farming drone, a greenhouse dome, a factory building, a goat pen with a space goat, a crop plot with carrots, a crop plot with potatoes, a spaceport pad, a rover, a solar panel, a water tank, a coin.
+```
+
+### I27 — تنظيف السجاد: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `rug_cleaning_*`
+- **بتفتح:** rug_cleaning
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'rug cleaning', ALL seen from the TOP view the same way, same scale, cartoon and friendly (no scary details, no blood): a dirty patterned rug, a clean version of the same rug, a pressure washer nozzle, a soap bubble cluster, a dirt splash, a bucket, a cleaning brush, a sponge, a puddle, a sparkle, two more colorful rug patterns.
+```
+
+### I28 — مقلاع الفايكنج: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `viking_sling_*`
+- **بتفتح:** viking_sling
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'viking sling', ALL seen from the SIDE view the same way, same scale, cartoon and friendly (no scary details, no blood): a chubby viking warrior with an axe, one with a shield, a giant one, a bomb viking, a goblin enemy, a goblin chief, a wooden fort piece, a stone fort piece, an ice block, a giant slingshot, a treasure chest, a gold coin.
+```
+
+### I29 — شاحنة الكور: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `ball_scoop_*`
+- **بتفتح:** ball_scoop
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'ball scoop', ALL seen from the REAR view the same way, same scale, cartoon and friendly (no scary details, no blood): a cute truck with a big front shovel from behind, 5 piles of colorful balls, a wall obstacle, a ramp, a gate with a number, a coin, a star, a tunnel, a cone, a fence piece, a trophy.
+```
+
+### I30 — الأكول: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `chomp_maze_*`
+- **بتفتح:** chomp_maze
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'chomp maze', ALL seen from the TOP view the same way, same scale, cartoon and friendly (no scary details, no blood): a round yellow chomper hero with a mouth, 4 friendly ghosts (pink, blue, green, orange), a dot, a power dot, a cherry, a strawberry, a maze wall piece, a gate, a star, a heart.
+```
+
+### I31 — عالم القفز: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `hop_world_*`
+- **بتفتح:** hop_world
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'hop world', ALL seen from the SIDE view facing right the same way, same scale, cartoon and friendly (no scary details, no blood): a cute hopping hero in a red cap, a brick block, a question block, a mushroom enemy, a turtle enemy, a coin, a flag, a pipe, a cloud, a hill, a star, a spring.
+```
+
+### I32 — النطاط: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `sky_jumper_*`
+- **بتفتح:** sky_jumper
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'sky jumper', ALL seen from the SIDE view the same way, same scale, cartoon and friendly (no scary details, no blood): a cute green jumper creature, a grass platform, a moving platform, a crumbling platform, a spring, a propeller hat, a jetpack, a flying monster, a cloud, a coin, a star, a rocket.
+```
+
+### I33 — فيزمان: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `fizz_runner_*`
+- **بتفتح:** fizz_runner
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'fizz runner', ALL seen from the REAR view the same way, same scale, cartoon and friendly (no scary details, no blood): a soda-hero runner from behind in a blue suit with a bottle-cap helmet, the same hero jumping, sliding, a fizz bubble power, a soda can coin, a spiky barrier, a slippery puddle, a bottle-cap shield, a rocket sneaker, a city gate, a crate, a finish flag.
+```
+
+### I34 — معركة الكروت: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `card_battle_*`
+- **بتفتح:** card_battle
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'card battle', ALL seen from the FRONT view the same way, same scale, cartoon and friendly (no scary details, no blood): 8 cute robot units for a card game (a blaster, a brute, a bug, a slime, a smasher, a spark, a spitter, a turret) and 4 energy and card frame icons.
+```
+
+### I35 — معركة حلبة الجليد: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `ice_rink_*`
+- **بتفتح:** ice_rink
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'ice rink', ALL seen from the FRONT view the same way, same scale, cartoon and friendly (no scary details, no blood): 3 arctic hero animals (a penguin, a fox, a bear), 6 goblin enemies (grunt, imp, thrower, brute, shaman, chief), a hockey puck, a goal and a trophy.
+```
+
+### I36 — سكة الكورة: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `nutmeg_rush_*`
+- **بتفتح:** nutmeg_rush
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'nutmeg rush', ALL seen from the SIDE/TOP view the same way, same scale, cartoon and friendly (no scary details, no blood): a football with a cute face, 3 defender characters, a goalkeeper, a goal net, a cone, a trophy, a stadium light, a scoreboard icon, a boot, a whistle, a flag.
+```
+
+### I37 — فرقة الدببة الجيلي: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `gummy_squad_*`
+- **بتفتح:** gummy_squad
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'gummy squad', ALL seen from the FRONT view the same way, same scale, cartoon and friendly (no scary details, no blood): 5 cute gummy bears in different colors as squad soldiers, 3 gummy enemy types, a giant gummy boss, a gumdrop, a lollipop tree, a candy cane, a chocolate block, a star.
+```
+
+### I38 — فرسان البرميل: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `barrel_knights_*`
+- **بتفتح:** barrel_knights
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'barrel knights', ALL seen from the SIDE view the same way, same scale, cartoon and friendly (no scary details, no blood): 4 cute knights in different armor colors, a giant wooden barrel, a mud patch, a door, a helmet, a banner, a trophy, a drawbridge, a castle wall piece, a torch, a rival knight.
+```
+
+### I39 — حلاوة ولا مقلب: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `trick_or_treat_*`
+- **بتفتح:** trick_or_treat
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'trick or treat', ALL seen from the SIDE view the same way, same scale, cartoon and friendly (no scary details, no blood): a leader kid in a witch costume, 6 follower kids in costumes (ghost, pumpkin, cat, robot, skeleton, vampire), a candy bucket, 3 candies, a house door, a jack-o-lantern, a bat.
+```
+
+### I40 — جيش المعبد: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `temple_army_*`
+- **بتفتح:** temple_army
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'temple army', ALL seen from the TOP-3/4 view the same way, same scale, cartoon and friendly (no scary details, no blood): a captain warrior, 4 tiny warriors, a stone golem boss, a spike trap, a saw trap, a vine wall, a temple door, a gem, a torch, a pillar, a bridge piece, a treasure chest.
+```
+
+### I41 — طبق الحلويات: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `sweet_tray_*`
+- **بتفتح:** sweet_tray
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'sweet tray', ALL seen from the FRONT view the same way, same scale, cartoon and friendly (no scary details, no blood): 12 sweets: a donut, a cupcake, a macaron, a cookie, an ice cream cone, a cake slice, a lollipop, a candy, a chocolate bar, a croissant, a muffin, a cherry.
+```
+
+### I42 — اسحب الدبوس: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `pin_puzzle_*`
+- **بتفتح:** pin_puzzle
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'pin puzzle', ALL seen from the FRONT view the same way, same scale, cartoon and friendly (no scary details, no blood): a cute hero character in a box, a gold pin, a bomb, a lava piece, a water drop, a treasure chest, a monster, a spike, a key, a door, a star, a coin.
+```
+
+### I43 — محجر الجواهر: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `gem_quarry_*`
+- **بتفتح:** gem_quarry
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'gem quarry', ALL seen from the SIDE-3/4 view the same way, same scale, cartoon and friendly (no scary details, no blood): a miner kid with a helmet, a mine cart, a pickaxe, 5 colored gems (red, blue, green, yellow, purple), a rock, a dynamite, a ladder, a lantern, a bag of gold.
+```
+
+### I44 — طيار السحاب: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `sky_ace_*`
+- **بتفتح:** sky_ace
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'sky ace', ALL seen from the TOP view the same way, same scale, cartoon and friendly (no scary details, no blood): a cute pilot plane, 3 enemy planes, a boss plane, a bomb, a missile, a power-up star, a shield, a coin, a cloud, a heart, an explosion puff.
+```
+
+### I45 — لغز المقبرة: الشيت الأساسي (شخصيات وأغراض اللعبة)
+- **الملفات:** `tomb_puzzle_*`
+- **بتفتح:** tomb_puzzle
+
+```
+Glossy 3D-rendered cartoon style for a children's game: soft studio lighting, smooth rounded shapes, bright saturated colors, thick clean edges, cute friendly look, simple readable silhouettes. No text, no letters, no numbers, no logos, no real brands, nothing scary, no blood.
+Image 1536x1024, pure flat white background (#FFFFFF). A grid of 4 columns x 3 rows = 12 items, each centered in its own invisible cell with at least 50 px of empty white margin on every side; items never touch, overlap or cross the image edge. All items have a similar visual size. No ground shadows, no glow beams, no particles, no road, no scenery. Light or white items must have a subtle soft grey-blue shaded edge so they stay visible on the white.
+ITEMS (left to right, top to bottom): 12 items for the game 'tomb puzzle', ALL seen from the TOP view the same way, same scale, cartoon and friendly (no scary details, no blood): an explorer kid, a pushable stone block, a pressure plate, a locked gate, a key, a mummy guard, a scarab, a torch, a statue, a treasure chest, a spike floor, an exit door.
+```
 
 
 ---
