@@ -380,7 +380,7 @@ class Game {
       place(this.rival, r.rival.x, r.rival.z);
       for (const c of r.traffic) {
         const m = this._carMesh(c);
-        const near = c.z > r.p.z - 14 && c.z < r.p.z + 260;
+        const near = c.z > r.p.z - 4 && c.z < r.p.z + 260; // a passed car vanishes just behind the player: below the chase camera its roof showed up huge and upside-down
         m.visible = near;
         if (near) place(m, LANES[c.lane], c.z);
       }
