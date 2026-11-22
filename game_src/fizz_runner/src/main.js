@@ -199,7 +199,7 @@ class Game {
 
   showLevels() {
     this._clear(); const ar = I.getLang() !== 'en';
-    const cards = ENVS.map((e, i) => { const lock = i + 1 > this.save.unlocked; const st = this.save.stars[i] || 0; const L = LOOKS[e.id]; return h('button', { class: `fz-env${lock ? ' lock' : ''}`, style: `background:linear-gradient(180deg,#${L.sky.toString(16).padStart(6, '0')},#${L.side[0].toString(16).padStart(6, '0')})`, onclick: () => { if (lock) { this.hint(I.t('locked')); return; } this.sound.play('tap'); this.start(i); } }, h('span', {}, `${i + 1}`), h('span', {}, ar ? e.ar : e.en), h('span', {}, lock ? '🔒' : '⭐'.repeat(st) || '☆')); });
+    const cards = ENVS.map((e, i) => { const lock = i + 1 > this.save.unlocked; const st = this.save.stars[i] || 0; const L = LOOKS[e.id]; return h('button', { class: `fz-env${lock ? ' lock' : ''}`, style: `background:linear-gradient(180deg,rgba(0,0,0,0) 20%,rgba(0,0,0,.85)),url(${this.base}art/env_${e.id}.webp) center/cover,linear-gradient(180deg,#${L.sky.toString(16).padStart(6, '0')},#${L.side[0].toString(16).padStart(6, '0')});text-shadow:0 2px 4px #000a`, onclick: () => { if (lock) { this.hint(I.t('locked')); return; } this.sound.play('tap'); this.start(i); } }, h('span', {}, `${i + 1}`), h('span', {}, ar ? e.ar : e.en), h('span', {}, lock ? '🔒' : '⭐'.repeat(st) || '☆')); });
     this.layer.append(h('div', { class: 'fz-dim' }, h('div', { class: 'fz-card' }, h('div', { class: 'fz-title' }, I.t('select')), h('div', { class: 'fz-grid' }, cards), h('button', { class: 'fz-btn dark', onclick: () => this.showMenu() }, I.t('back')))));
     this.hintEl = h('div', { class: 'fz-hint' }); this.layer.append(this.hintEl); this._soundPill();
   }

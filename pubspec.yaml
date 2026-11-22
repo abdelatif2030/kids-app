@@ -218,6 +218,7 @@ flutter:
     - assets/games/hop_world/
     - assets/games/hot_spring/
     - assets/games/fizz_runner/
+    - assets/games/fizz_runner/art/
     - assets/games/chomp_maze/
     - assets/games/hamster_warrior/
     - assets/games/hamster_warrior/art/
