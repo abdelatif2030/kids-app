@@ -390,7 +390,7 @@ const HEAD = { raccoon: 0x9aa3ad, bunny: 0xffc2de, cat: 0xffa94d, bear: 0x8a5a3a
 const EARS = { raccoon: 'round', bunny: 'long', cat: 'point', bear: 'round', fox: 'point', panda: 'round' };
 /** A kart model whose white driver head takes the animal's colour and gets its ears. Faces +z like the other cars of this game. */
 export function makeGlbKart(THREE, glb, racer, length = 2.7) {
-  const v = makeModelVehicle(THREE, glb, { length, yaw: Math.PI });
+  const v = makeModelVehicle(THREE, glb, { length, yaw: 0 });
   const root = v.root; let head = null; let hy = -1e9;
   root.traverse((o) => { if (o.isMesh) { const c = new THREE.Box3().setFromObject(o).getCenter(new THREE.Vector3()); if (c.y > hy) { hy = c.y; head = o; } } });
   if (head) {
