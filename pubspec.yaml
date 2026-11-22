@@ -100,6 +100,8 @@ flutter:
     - assets/games/clips/
     - assets/games/game_bg.webp
     - assets/games/carnival_race/
+    - assets/games/carnival_race/models/
+    - assets/games/carnival_race/models/Textures/
     - assets/games/carnival_race/art/
     - assets/games/jungle_adventure/
     - assets/games/jungle_adventure/art/

@@ -1,6 +1,7 @@
 // Every model in the game is built here from simple shapes: bumper cars, the six animals, and the carnival rides.
 // Original art: cute, round, bright. Lambert materials keep it fast on phones.
 import * as THREE from 'three';
+import { makeModelVehicle } from '../../cozy_kit/art.js';
 
 const geo = {
   sphere: new THREE.SphereGeometry(1, 14, 10),
@@ -381,4 +382,27 @@ export function makePodium() {
   }
   g.userData = { heights, xs };
   return g;
+}
+
+
+// ---- Real 3D karts (Kenney Car Kit, CC0) with an animal head ---------------------------------------------------------
+const HEAD = { raccoon: 0x9aa3ad, bunny: 0xffc2de, cat: 0xffa94d, bear: 0x8a5a3a, fox: 0xf07a2a, panda: 0xffffff };
+const EARS = { raccoon: 'round', bunny: 'long', cat: 'point', bear: 'round', fox: 'point', panda: 'round' };
+/** A kart model whose white driver head takes the animal's colour and gets its ears. Faces +z like the other cars of this game. */
+export function makeGlbKart(THREE, glb, racer, length = 2.7) {
+  const v = makeModelVehicle(THREE, glb, { length, yaw: Math.PI });
+  const root = v.root; let head = null; let hy = -1e9;
+  root.traverse((o) => { if (o.isMesh) { const c = new THREE.Box3().setFromObject(o).getCenter(new THREE.Vector3()); if (c.y > hy) { hy = c.y; head = o; } } });
+  if (head) {
+    head.material = head.material.clone(); head.material.color.set(HEAD[racer.animal] ?? 0xffffff);
+    const b = new THREE.Box3().setFromObject(head); const c = b.getCenter(new THREE.Vector3()); const w = b.max.x - b.min.x; const top = b.max.y;
+    const earMat = new THREE.MeshStandardMaterial({ color: HEAD[racer.animal] ?? 0xffffff, roughness: 0.7 });
+    const kind = EARS[racer.animal] ?? 'round';
+    for (const sx of [-1, 1]) {
+      const g = kind === 'long' ? new THREE.CapsuleGeometry(w * 0.09, w * 0.42, 4, 8) : kind === 'point' ? new THREE.ConeGeometry(w * 0.16, w * 0.3, 8) : new THREE.SphereGeometry(w * 0.15, 10, 8);
+      const e = new THREE.Mesh(g, earMat); e.position.set(c.x + sx * w * 0.28, top + (kind === 'long' ? w * 0.22 : kind === 'point' ? w * 0.1 : w * 0.02), c.z);
+      if (kind === 'long') e.rotation.z = -sx * 0.18; root.add(e);
+    }
+  }
+  return root;
 }

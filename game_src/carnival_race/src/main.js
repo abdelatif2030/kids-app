@@ -1,3 +1,4 @@
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 // «سباق الملاهي» — the Carnival race. Entry point: window.CarnivalRace.start(container, config, post).
 //   config: { lang: 'ar'|'en', age: 1..6, save: {...} | null, base: url of this folder }
 //   post(message): { type: 'save', save } after every change, { type: 'exit' } when the child leaves.
@@ -7,8 +8,8 @@ import { RACERS, TRAITS, UPGRADES, TRACKS, MAX_LEVEL, upgradeCost, normalizeSave
 import { TrackPath } from './track.js';
 import { Race } from './race.js';
 import { World, makeSky, mergeByMaterial } from './world.js';
-import { loadSprites, makeBillboardVehicle } from '../../cozy_kit/art.js';
-import { makeBumperCar, makeShieldBubble, glowSprite, makePodium, glow } from './models.js';
+import { loadSprites, makeBillboardVehicle, loadGLBs } from '../../cozy_kit/art.js';
+import { makeGlbKart, makeBumperCar, makeShieldBubble, glowSprite, makePodium, glow } from './models.js';
 import { setLang, getLang, t, num, name, ordinal } from './i18n.js';
 import { CSS, h, ANIMAL_EMOJI, ITEM_EMOJI, TRACK_EMOJI, TRACK_BG } from './ui.js';
 import { Sound } from './audio.js';
@@ -101,8 +102,8 @@ class Game {
     this.frameTimes = [];
     this.goodWindows = 0;
     this.clock = new THREE.Clock();
-    this.pics = null;
-    Promise.all([this._loadFonts(), loadSprites(THREE, this.base, ['bumper_mouse', 'bumper_bunny', 'bumper_cat', 'bumper_bear', 'bumper_fox', 'bumper_panda']).then((sp) => { this.pics = sp; })]).then(() => {
+    this.pics = null; this.glbs = null;
+    Promise.all([this._loadFonts(), loadGLBs(GLTFLoader, this.base, ['kart-oobi', 'kart-oodi', 'kart-ooli', 'kart-oopi', 'kart-oozi']).then((g) => { this.glbs = g; }), loadSprites(THREE, this.base, ['bumper_mouse', 'bumper_bunny', 'bumper_cat', 'bumper_bear', 'bumper_fox', 'bumper_panda']).then((sp) => { this.pics = sp; })]).then(() => {
       this._buildShowcase();
       this.loading.remove();
       this.showMenu();
@@ -185,6 +186,8 @@ class Game {
   _carModel(racerId) {
     const r = RACERS.find((x) => x.id === racerId) ?? RACERS[0];
     // the painted bumper car (animal driver seen from behind) when its picture is there; it always faces the camera
+    const KART = { raccoon: 'kart-oobi', bunny: 'kart-oodi', cat: 'kart-ooli', bear: 'kart-oopi', fox: 'kart-oozi', panda: 'kart-oobi' }[r.id];
+    if (this.glbs && this.glbs[KART]) return makeGlbKart(THREE, this.glbs[KART], r, 2.7); // real 3D kart with the animal's head (Kenney, CC0)
     const key = { raccoon: 'bumper_mouse', bunny: 'bumper_bunny', cat: 'bumper_cat', bear: 'bumper_bear', fox: 'bumper_fox', panda: 'bumper_panda' }[r.id];
     const pic = this.pics && this.pics[key];
     if (pic) { const v = makeBillboardVehicle(THREE, { c: pic }, 2.5); return v.root; }
