@@ -2,6 +2,9 @@
 // little gold crown, as on the owner's card), grumpy purple fish, yellow fast fish, pink jellyfish, a spiky
 // pufferfish, the giant purple octopus, ink balls, the spinning shell, the coral fortress (wall, towers and the hero's
 // tower) and the reef (corals, sea fans, seaweed, rocks, shells). Cartoon and round, never scary.
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
+import { loadObjModels, fitModel } from '../../cozy_kit/art.js';
 import * as THREE from 'three';
 
 const cache = new Map();
@@ -105,7 +108,23 @@ export function makeClownfish() {
 }
 
 /** An enemy fish swimming down the corridor (+z): purple grumpy fish or a yellow fast one. */
+/** Real low-poly fish (Quaternius Animated Fish Pack, CC0) for the enemy fish; coloured by team so the children still read purple = grumpy, yellow = fast. */
+let REAL_FISH = null;
+const FISH_COLORS = { fish: { top: 0x8a3ad0, bottom: 0xc89af0, fins: 0x6a2aa8 }, fast: { top: 0xffcf2a, bottom: 0xfff1a8, fins: 0xff9a1a } };
+export async function loadRealFish(base) {
+  const out = {};
+  for (const kind of Object.keys(FISH_COLORS)) {
+    const m = await loadObjModels(OBJLoader, MTLLoader, base, [[kind, kind === 'fast' ? 'Fish3' : 'Fish1']], { colors: FISH_COLORS[kind] });
+    if (m[kind]) out[kind] = m[kind];
+  }
+  REAL_FISH = Object.keys(out).length ? out : null;
+}
 export function makeEnemyFish(kind = 'fish') {
+  if (REAL_FISH && REAL_FISH[kind === 'fast' ? 'fast' : 'fish']) {
+    const root = new THREE.Group(); const body = new THREE.Group(); root.add(body);
+    body.add(fitModel(THREE, REAL_FISH[kind === 'fast' ? 'fast' : 'fish'], { length: 2.2, yaw: 0, center: true }));
+    return { root, body, tail: { rotation: { y: 0 } }, fins: [] };
+  }
   const root = new THREE.Group();
   const body = new THREE.Group();
   root.add(body);

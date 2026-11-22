@@ -113,6 +113,7 @@ flutter:
     - assets/games/golden_tail/
     - assets/games/ocean_defense/
     - assets/games/ocean_defense/art/
+    - assets/games/ocean_defense/models/
     - assets/games/moto_race/
     - assets/games/moto_race/art/
     - assets/games/rhythm/

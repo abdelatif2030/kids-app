@@ -183,8 +183,10 @@ export async function loadObjModels(OBJLoader, MTLLoader, base, pairs, { bright 
   return out;
 }
 /** Clones a loaded model, scales it to [height] and stands it on y = 0, turned by [yaw]. Returns a Group. */
-export function fitModel(THREE, obj, { height = 1, yaw = 0 } = {}) {
-  const inner = obj.clone(true); const b = new THREE.Box3().setFromObject(inner); const k = height / Math.max(1e-6, b.max.y - b.min.y);
+export function fitModel(THREE, obj, { height = 1, yaw = 0, length = 0, center = false } = {}) {
+  const inner = obj.clone(true); const b = new THREE.Box3().setFromObject(inner);
+  const k = length ? length / Math.max(1e-6, Math.max(b.max.x - b.min.x, b.max.z - b.min.z)) : height / Math.max(1e-6, b.max.y - b.min.y);
   inner.scale.setScalar(k); inner.rotation.y = yaw; inner.position.y = -b.min.y * k;
+  if (center) { inner.position.x = -((b.max.x + b.min.x) / 2) * k; inner.position.z = -((b.max.z + b.min.z) / 2) * k; inner.position.y = -((b.max.y + b.min.y) / 2) * k; }
   const g = new THREE.Group(); g.add(inner); return g;
 }

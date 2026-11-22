@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 import { Defense, LEVELS, POWERS, UPGRADES, MAX_UP, upCost, HALF_W, TOP, HERO, normalizeSave } from './sim.js';
 import {
-  mat, makeClownfish, makeEnemyFish, makeJelly, makePuffer, makeInk, makeOctopus, makeShell, makeTower, makeWall,
+  mat, makeClownfish, makeEnemyFish, loadRealFish, makeJelly, makePuffer, makeInk, makeOctopus, makeShell, makeTower, makeWall,
   makeCoral, makeSeaweed, sandTexture, causticTexture,
 } from './models.js';
 import { Sound } from './audio.js';
@@ -146,7 +146,7 @@ class Game {
     this.goodWin = 0;
     this.clock = new THREE.Clock();
     this._buildWorld();
-    this._fonts().then(() => {
+    Promise.all([this._fonts(), loadRealFish(this.base)]).then(() => {
       this.loading.remove();
       this.showMenu();
       this.renderer.setAnimationLoop(() => this._frame());
