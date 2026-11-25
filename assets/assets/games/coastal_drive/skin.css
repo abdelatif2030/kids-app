@@ -1,0 +1,12 @@
+/* Beach Cars skin: sky-blue and white with coral, rope trim (pictures in skin/*.webp) */
+.cd-btn{background:url(skin/pill_orange.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;color:#fff !important;text-shadow:0 2px 0 #7a2a10;border-radius:0 !important;padding-top:calc(var(--u)*2.4) !important;padding-bottom:calc(var(--u)*3) !important}
+.cd-btn.dark{background-image:url(skin/pill_blue.webp) !important;color:#fff !important}
+.cd-btn:disabled{background-image:url(skin/pill_grey.webp) !important}
+.cd-btn:active{transform:scale(.96)}
+.cd-head{color:#fff !important;text-shadow:0 3px 0 #0a3a6a;-webkit-text-stroke:calc(var(--u)*.7) #0a3a6a;paint-order:stroke fill}
+.cd-logo .a{background:url(skin/ribbon.webp) center/100% 100% no-repeat !important;-webkit-background-clip:border-box !important;background-clip:border-box !important;color:#fff !important;font-style:normal !important;font-size:calc(var(--u)*7.4) !important;padding:calc(var(--u)*2.4) calc(var(--u)*11) calc(var(--u)*3.4) !important;-webkit-text-stroke:calc(var(--u)*.9) #0a3a6a;paint-order:stroke fill;filter:drop-shadow(0 4px 4px rgba(0,0,0,.4)) !important}
+.cd-logo .tag{background:rgba(10,58,106,.85) !important;color:#fff !important;font-style:normal !important}
+.cd-dim:has(.cd-panel){justify-content:flex-end !important;padding-inline-end:6% !important}
+.cd-sq{background:url(skin/lv_open.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;color:#fff !important;font-weight:900;text-shadow:0 2px 0 #0a3a6a}
+.cd-sq.lock,.cd-sq:disabled{background-image:url(skin/lv_lock.webp) !important}
+.cd-panel{background:url(skin/panel.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;padding:calc(var(--u)*7) calc(var(--u)*8) !important;color:#fff}

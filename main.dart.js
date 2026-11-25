@@ -131098,7 +131098,7 @@ A.bMc.prototype={
 $0(){return $.m().a==="ar"?"\u0623\u0633\u0645\u0627\u0643 \u0627\u0644\u0623\u0639\u0645\u0627\u0642":"Deep Sea Fish"},
 $S:1}
 A.bLX.prototype={
-$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u0637\u0631\u064a\u0642 \u0627\u0644\u0633\u0627\u062d\u0644\u064a":"Coastal Drive"},
+$0(){return $.m().a==="ar"?"\u0639\u0631\u0628\u064a\u0627\u062a \u0627\u0644\u0634\u0627\u0637\u0626":"Beach Cars"},
 $S:1}
 A.bOd.prototype={
 $0(){return $.m().a==="ar"?"\u0644\u0639\u0628\u0629 \u0627\u0644\u0636\u0641\u062f\u0639 \u0627\u0644\u062c\u0627\u0626\u0639":"Hungry Frog"},
