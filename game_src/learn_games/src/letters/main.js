@@ -313,7 +313,7 @@ class Game {
       item.castShadow = true;
       g.add(item);
     } else {
-      const text = o.kind === 'number' ? this.sh.T.num(o.n) : o.ch;
+      const text = o.kind === 'number' ? (o.latin ? String(o.n) : this.sh.T.num(o.n)) : o.ch; // English levels show 0 1 2 3, not ٠ ١ ٢ ٣
       const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.7, 8), M(0xb88848));
       pole.position.set(0, 0.45 + lift, 0);
       plaque = this._plaque(text, true);

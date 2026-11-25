@@ -48,7 +48,7 @@ function optionOf(e, i, r) {
   const id = `${e.cat}|${e.en}`;
   switch (kindOf(e)) {
     case 'thing': return { id, kind: 'thing', thing: e.thing };
-    case 'number': return { id, kind: 'number', n: e.n };
+    case 'number': return { id, kind: 'number', n: e.n, latin: true };
     case 'color': { const c = colorOf(e.color); return { id, kind: 'color', hex: c.hex, metal: c.metal || 0 }; }
     case 'shape': return { id, kind: 'shape', shape: e.shape, color: SHAPE_PAINT[Math.floor(r() * SHAPE_PAINT.length)] };
     default: return { id, kind: 'letter', ch: e.ch };
