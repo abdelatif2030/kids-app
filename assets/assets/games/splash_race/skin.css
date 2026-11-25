@@ -1,0 +1,30 @@
+/* Swim Race skin: pictures made for this game (skin/*.webp) drawn over the menu pieces. Shapes keep their size; only the look changes. */
+.mr-panel{overflow:visible !important;max-height:none !important;background:url(skin/panel.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;padding:calc(var(--u)*8) calc(var(--u)*10) calc(var(--u)*12) !important;color:#fff}
+.mr-logo,.mr-title{color:#fff !important;font-size:calc(var(--u)*8.2) !important;line-height:1.15 !important;background:url(skin/ribbon.webp) center/100% 100% no-repeat;padding:calc(var(--u)*2.4) calc(var(--u)*11) calc(var(--u)*3.2) !important;margin:calc(var(--u)*-3) 0 calc(var(--u)*.5) !important;-webkit-text-stroke:calc(var(--u)*.9) #0a4a6a;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.6) 0 #0a4a6a;white-space:nowrap}
+.mr-node{background:url(skin/lv_open.webp) center/contain no-repeat !important;border:none !important;box-shadow:none !important;color:#fff !important;font-weight:900;text-shadow:0 calc(var(--u)*.4) 0 #0a4a6a}
+.mr-node.next{background-image:url(skin/lv_sel.webp) !important}
+.mr-node.lock{background-image:url(skin/lv_lock.webp) !important;font-size:0 !important;color:transparent !important}
+.mr-node.lock .stars{display:none}
+.mr-btn2{background:url(skin/pill_blue.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;color:#fff !important;font-weight:900;text-shadow:0 calc(var(--u)*.4) 0 #0a4a6a;padding-top:calc(var(--u)*1.2) !important}
+.mr-btn2.mr-big{background-image:url(skin/pill_orange.webp) !important}
+.mr-btn2.wood{background-image:url(skin/pill_blue.webp) !important}
+.mr-btn2:active{transform:scale(.96)}
+.mr-dim[style*="background: none"] .mr-panel{width:calc(var(--u)*94) !important}
+
+.mr-dim[style*="background: none"]{justify-content:flex-start !important;overflow:hidden !important;padding-inline-start:calc(var(--u)*4) !important;padding-bottom:calc(var(--u)*1) !important}
+
+/* rk-pause-right: pause and result panels sit on the right so the picture behind shows */
+.mr-dim:not([style*="background: none"]){background:rgba(5,25,60,.28) !important}
+.mr-dim:not([style*="background: none"])>.mr-panel{margin-left:auto !important;margin-right:19% !important}
+
+/* level name card: a clear banner with a bold outlined title, readable on any backdrop */
+.mr-titlecard{top:8% !important;gap:calc(var(--u)*1) !important}
+.mr-titlecard b{font-style:normal !important;font-size:calc(var(--u)*8.6) !important;letter-spacing:0 !important;color:#ffd23a !important;background:linear-gradient(180deg,rgba(14,52,120,.92),rgba(6,28,80,.92));border:calc(var(--u)*.7) solid #fff;border-radius:calc(var(--u)*3);padding:calc(var(--u)*1) calc(var(--u)*7) calc(var(--u)*1.6);-webkit-text-stroke:calc(var(--u)*.9) #061c50;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.7) 0 #061c50;box-shadow:0 calc(var(--u)*1) calc(var(--u)*2.4) rgba(0,0,0,.45)}
+.mr-titlecard i{display:none !important}
+
+
+.mr-dim:not([style*="background: none"])>.mr-panel{transform:translateY(7%)}
+.mr-lights{top:29% !important;padding:calc(var(--u)*1.4) calc(var(--u)*2.4) !important}
+.mr-lights i{width:calc(var(--u)*6.4) !important;height:calc(var(--u)*6.4) !important}
+.mr-tag{top:38% !important}
+.mr-titlecard span{display:none !important}

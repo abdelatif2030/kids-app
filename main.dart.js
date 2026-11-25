@@ -131080,13 +131080,13 @@ A.bON.prototype={
 $0(){return $.m().a==="ar"?"\u0645\u062a\u062c\u0631 \u0627\u0644\u0641\u0636\u0627\u0621 \u0627\u0644\u0630\u0643\u064a":"Space Store Manager"},
 $S:1}
 A.bOO.prototype={
-$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u0633\u0628\u0627\u062d\u0629 \u0627\u0644\u0639\u062c\u064a\u0628":"Splash Race"},
+$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u0633\u0628\u0627\u062d\u0629":"Swim Race"},
 $S:1}
 A.bNV.prototype={
 $0(){return $.m().a==="ar"?"\u0623\u0645 \u0627\u0644\u062b\u0639\u0644\u0628 \u0648\u0645\u063a\u0627\u0645\u0631\u0627\u062a \u0627\u0644\u0639\u064a\u0648\u0631":"Fox Family Rescue"},
 $S:1}
 A.bLi.prototype={
-$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u0637\u0627\u0626\u0631\u0627\u062a \u0627\u0644\u062c\u0648\u064a":"Airplane Racing"},
+$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u0637\u064a\u0627\u0631\u0627\u062a":"Plane Race"},
 $S:1}
 A.bPB.prototype={
 $0(){return $.m().a==="ar"?"\u0627\u0644\u0628\u0642\u0627\u0621 \u0639\u0644\u0649 \u0642\u064a\u062f \u0627\u0644\u062d\u064a\u0627\u0629":"Zombie Rooftop Shooter"},
