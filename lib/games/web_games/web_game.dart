@@ -359,7 +359,7 @@ final WebGame kSunsetHighway = WebGame(
   global: 'SunsetHighway',
   storeKey: 'sunset_highway',
   minAge: 4,
-  title: () => tr2('طريق الغروب', 'Sunset Highway'),
+  title: () => tr2('سباق الغروب', 'Sunset Race'),
 );
 
 /// «مبدع الذكاء» (AI Creator).

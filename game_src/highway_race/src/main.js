@@ -1,4 +1,4 @@
-// «طريق الغروب» — Sunset Highway. Entry: window.SunsetHighway.start(container, config, post).
+// «سباق الغروب» — Sunset Highway. Entry: window.SunsetHighway.start(container, config, post).
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
 // A red sports car on a palm-lined coastal highway at sunset: beat the clock, overtake the blue rival and keep the lead. Drag to
 // steer between four lanes, weave through cars and trucks (a bump only slows you), tap NITRO on clear gaps. The road bends along
@@ -16,7 +16,7 @@ const HEAVY_PICS = ['car_truck', 'car_van', 'car_bus'];
 function paintedCar(sp, width) { const v = makeSpriteVehicle(THREE, sp, width); v.body.rotation.y = Math.PI; const g = new THREE.Group(); g.add(v.root); return g; }
 
 const S = {
-  title: ['طريق الغروب', 'Sunset Highway'], stage: ['المرحلة', 'Stage'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'],
+  title: ['سباق الغروب', 'Sunset Highway'], stage: ['المرحلة', 'Stage'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'],
   resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'], next: ['المرحلة الجاية', 'Next stage'], how: ['اسحب يمين وشمال بين الحارات — نيترو في الطريق الفاضي', 'Drag between lanes — nitro on a clear road'],
   nitro: ['نيترو', 'NITRO'], first: ['الأول! 🏁', '1st! 🏁'], second: ['الثاني', '2nd'], won: ['كسبت السباق! 🏆', 'You won! 🏆'], lostRival: ['المنافس سبقك.. جرّب تاني!', 'The rival beat you.. try again!'],
   timeup: ['الوقت خلص.. جرّب تاني!', 'Time is up.. try again!'], locked: ['اكسب المرحلة اللي قبلها', 'Win the stage before'], go: ['انطلق!', 'GO!'], kmh: ['كم/س', 'km/h'],
@@ -211,7 +211,23 @@ class Game {
 
   hint(text, ms = 3000) { if (!this.hintEl) return; this.hintEl.textContent = text; this.hintEl.classList.add('show'); clearTimeout(this._ht); this._ht = setTimeout(() => this.hintEl && this.hintEl.classList.remove('show'), ms); }
 
+  /** The level's painted backdrop (art/pano<N>.webp): a mirrored ring that follows the camera. */
+  _pano(stage) {
+    if (this.panoMesh) { this.scene.remove(this.panoMesh); this.panoMesh.material.map.dispose(); this.panoMesh.material.dispose(); this.panoMesh = null; }
+    const tex = new THREE.TextureLoader().load(`${this.base}art/pano${stage + 1}.webp`, () => { ring.visible = true; });
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.wrapS = THREE.MirroredRepeatWrapping;
+    tex.repeat.set(2, 0.66);
+    tex.offset.set(0, 0.34);
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(560, 560, 300, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false, depthWrite: false }));
+    ring.visible = false;
+    ring.renderOrder = -10;
+    this.panoMesh = ring;
+    this.scene.add(ring);
+  }
+
   _look(stage) {
+    this._pano(stage);
     const night = stage === 2;
     const dusk = stage === 1;
     const sky = night ? 0x141a3a : dusk ? 0xc86a5a : 0xff9a5a;
@@ -387,6 +403,7 @@ class Game {
     }
     const bx = r ? -(bend(zp) + r.p.x * 0.6) : -bend(zp);
     this.camera.position.set(this.camera.position.x + (bx - this.camera.position.x) * Math.min(1, dt * 6), this.cw < this.ch ? 5.6 : 4.4, zp - (this.cw < this.ch ? 9.5 : 8));
+    if (this.panoMesh) this.panoMesh.position.set(this.camera.position.x, 100, this.camera.position.z);
     const la = r ? -(bend(zp + 22) + r.p.x * 0.4) : -bend(zp + 22);
     this.camera.lookAt(la, 1.2, zp + 18);
     this.renderer.render(this.scene, this.camera);

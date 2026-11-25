@@ -181,6 +181,8 @@ flutter:
     - assets/games/alien_sky/
     - assets/games/rhino_summit/
     - assets/games/sunset_highway/
+    - assets/games/sunset_highway/skin/
+    - assets/games/sunset_highway/art/
     - assets/games/sunset_highway/models/Textures/
     - assets/games/sunset_highway/models/
     - assets/games/girls_world/

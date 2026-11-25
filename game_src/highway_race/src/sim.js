@@ -6,12 +6,12 @@ import { rng, clamp } from '../../cozy_kit/ui.js';
 export const HALF = 6;
 export const LANES = [-4.5, -1.5, 1.5, 4.5];
 export const STAGES = [
-  { id: 1, ar: 'غروب الشاطئ', en: 'Beach Sunset', dist: 2200, time: 105, traffic: 1.0, rival: 30.5 },
-  { id: 2, ar: 'كورنيش المغرب', en: 'Dusk Corniche', dist: 2600, time: 112, traffic: 1.25, rival: 32 },
-  { id: 3, ar: 'ليل الميناء', en: 'Harbour Night', dist: 3000, time: 118, traffic: 1.5, rival: 32.5 },
-  { id: 4, ar: 'فجر الجبل', en: 'Mountain Dawn', dist: 3200, time: 126, traffic: 1.6, rival: 31 },
-  { id: 5, ar: 'طريق الأمطار', en: 'Rainy Road', dist: 3400, time: 130, traffic: 1.7, rival: 31.5 },
-  { id: 6, ar: 'سباق المدينة الأخير', en: 'Last City Run', dist: 3600, time: 134, traffic: 1.8, rival: 32 },
+  { id: 1, ar: 'شلالات الريان', en: 'Rayan Waterfalls', dist: 2200, time: 105, traffic: 1.0, rival: 30.5 },
+  { id: 2, ar: 'جبال السخنة', en: 'Sokhna Mountains', dist: 2600, time: 112, traffic: 1.25, rival: 32 },
+  { id: 3, ar: 'ليل العلمين', en: 'Alamein Night', dist: 3000, time: 118, traffic: 1.5, rival: 32.5 },
+  { id: 4, ar: 'الصحرا البيضا', en: 'White Desert', dist: 3200, time: 126, traffic: 1.6, rival: 31 },
+  { id: 5, ar: 'فنار بورسعيد', en: 'Port Said Light', dist: 3400, time: 130, traffic: 1.7, rival: 31.5 },
+  { id: 6, ar: 'بحيرات الجونة', en: 'Gouna Lagoons', dist: 3600, time: 134, traffic: 1.8, rival: 32 },
 ];
 
 /** The road bends: lateral offset (m) of the road centre at distance z. */
