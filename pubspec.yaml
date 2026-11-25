@@ -103,6 +103,7 @@ flutter:
     - assets/games/carnival_race/models/
     - assets/games/carnival_race/models/Textures/
     - assets/games/carnival_race/art/
+    - assets/games/carnival_race/skin/
     - assets/games/jungle_adventure/
     - assets/games/jungle_adventure/art/
     - assets/games/happy_farm/

@@ -35,7 +35,7 @@ final WebGame kCarnivalRace = WebGame(
   global: 'CarnivalRace',
   storeKey: 'carnival_race',
   minAge: 3,
-  title: () => tr2('سباق ملاهي الأبطال', 'Glowfair Rally'),
+  title: () => tr2('عربيات الملاهي', 'Funfair Cars'),
 );
 
 /// «مغامرة الأدغال» (Jungle Adventure): the 2D explorer auto-runner (docs/JUNGLE_ADVENTURE.md).

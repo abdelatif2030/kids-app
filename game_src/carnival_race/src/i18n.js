@@ -1,6 +1,6 @@
 // Arabic first (Egyptian-friendly wording), English second.
 const S = {
-  title: ['سباق ملاهي الأبطال', 'Glowfair Rally'],
+  title: ['عربيات الملاهي', 'Funfair Cars'],
   pickTrack: ['اختار الحلبة', 'Pick a track'],
   garage: ['الجراج', 'Garage'],
   race: ['يلا نتسابق!', "Let's race!"],
