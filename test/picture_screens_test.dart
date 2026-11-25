@@ -1,3 +1,4 @@
+import 'package:kids_app/media/section_voice.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -53,6 +54,7 @@ Future<void> _settle(WidgetTester t) async {
 bool _overlap(Rect a, Rect b) => a.deflate(2).overlaps(b.deflate(2));
 
 void main() {
+  SectionVoice.testing = true; // no audio plugin in widget tests
   tearDown(() => AppLocale.instance.set('ar'));
 
   group('the owner pictures are bundled and sized as the code expects', () {

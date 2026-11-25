@@ -252,6 +252,7 @@ flutter:
     - assets/audio/voices/approved.json
     - assets/audio/voices/adam/ar/
     - assets/audio/voices/fatima/ar/
+    - assets/audio/voices/lida/ar/
     - assets/branding/logo_art.webp
     - assets/branding/intro.mp4
     - assets/branding/intro_poster.webp

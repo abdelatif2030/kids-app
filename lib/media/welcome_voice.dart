@@ -6,6 +6,7 @@ import 'package:just_audio/just_audio.dart';
 
 import 'audio.dart';
 import 'audio_gate.dart';
+import 'section_voice.dart';
 
 /// «أهلاً بيكم يا أبطال»: the owner's chosen greeting (Fatima, ElevenLabs v3), said once each time the app is opened,
 /// when the child's home appears. It respects the parent's "voice on" switch and stays silent during a family call or
@@ -16,7 +17,7 @@ import 'audio_gate.dart';
 /// anywhere and says the greeting then.
 class WelcomeVoice {
   WelcomeVoice._();
-  static const asset = 'assets/audio/voices/fatima/ar/welcome_abtal.mp3';
+  static const asset = 'assets/audio/voices/lida/ar/intro_app.mp3'; // «أهلاً بيك في رحلتي! يلا نبدأ المغامرة» (voice ليدا); the older greeting stays in fatima/ar/welcome_abtal.mp3
   static bool _played = false;
   static bool _heard = false;
   static AudioPlayer? _p;
@@ -24,7 +25,10 @@ class WelcomeVoice {
 
   /// Widget tests have no audio plugin: they mark the greeting as already said.
   @visibleForTesting
-  static void skipForTests() => _played = true;
+  static void skipForTests() {
+    _played = true;
+    SectionVoice.testing = true;
+  }
 
   /// Plays the greeting the first time it is asked for in this run of the app.
   static Future<void> playOnce() async {

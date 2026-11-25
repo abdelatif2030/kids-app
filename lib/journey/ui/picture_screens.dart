@@ -1,3 +1,4 @@
+import '../../media/section_voice.dart';
 import 'package:flutter/material.dart';
 
 import '../../design/focusable_tap.dart';
@@ -190,7 +191,9 @@ class CartoonsPictureScreen extends StatelessWidget {
   static const asset = 'assets/home/cartoons_stories.webp';
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => SectionVoiceOnEnter('stories', child: _buildPage(context));
+
+  Widget _buildPage(BuildContext context) {
     final ar = AppLocale.instance.isArabic;
     void push(Widget w) => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => w));
     return Scaffold(
@@ -251,7 +254,9 @@ class LessonsPictureScreen extends StatelessWidget {
   static const asset = 'assets/home/lessons_scene.webp';
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => SectionVoiceOnEnter('videos', child: _buildPage(context));
+
+  Widget _buildPage(BuildContext context) {
     final ar = AppLocale.instance.isArabic;
     return Scaffold(
       body: SafeArea(
