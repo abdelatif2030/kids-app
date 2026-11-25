@@ -36,10 +36,10 @@ export function barnSpot(level) {
 }
 
 export const UPGRADES = [
-  { id: 'cutter', ar: 'السكينة', en: 'Cutter', sub: ['أعرض', 'Wider'], icon: '🌾', base: 1.8, step: 0.45, unit: 'm' },
-  { id: 'engine', ar: 'الموتور', en: 'Engine', sub: ['أسرع', 'Faster'], icon: '⚙️', base: 3.2, step: 0.4, unit: 'm/s' },
-  { id: 'trailer', ar: 'المقطورة', en: 'Trailer', sub: ['أكبر', 'Bigger'], icon: '🛒', base: 400, step: 200, unit: '' },
-  { id: 'barn', ar: 'المخزن', en: 'Barn', sub: ['أسعار أحسن', 'Better prices'], icon: '🏠', base: 0, step: 10, unit: '%' },
+  { id: 'cutter', ar: 'السكينة', en: 'Cutter', sub: ['أعرض', 'Wider'], icon: 'art:wheat', base: 1.8, step: 0.45, unit: 'm' },
+  { id: 'engine', ar: 'الموتور', en: 'Engine', sub: ['أسرع', 'Faster'], icon: 'art:combine', base: 3.2, step: 0.4, unit: 'm/s' },
+  { id: 'trailer', ar: 'المقطورة', en: 'Trailer', sub: ['أكبر', 'Bigger'], icon: 'art:trailer', base: 400, step: 200, unit: '' },
+  { id: 'barn', ar: 'المخزن', en: 'Barn', sub: ['أسعار أحسن', 'Better prices'], icon: 'art:barn', base: 0, step: 10, unit: '%' },
 ];
 export const MAX_LEVEL = 6;
 export const upgradeCost = (id, lvl) => ({ cutter: 120, engine: 150, trailer: 100, barn: 200 }[id] + lvl * ({ cutter: 100, engine: 90, trailer: 90, barn: 120 }[id]));

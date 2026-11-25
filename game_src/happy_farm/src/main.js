@@ -344,7 +344,7 @@ class Game {
       const maxed = lvl >= MAX_LEVEL;
       const cost = upgradeCost(u.id, lvl);
       return h('div', { class: 'hf-card' },
-        h('div', { class: 'ic' }, u.icon),
+        h('div', { class: 'ic' }, u.icon.startsWith('art:') ? h('img', { src: `${this.base}art/${u.icon.slice(4)}.webp`, alt: '' }) : u.icon),
         h('div', { class: 'nm' }, name(u)),
         h('div', { class: 'sb' }, u.sub[getLang() === 'en' ? 1 : 0]),
         h('div', { class: 'pips' }, Array.from({ length: MAX_LEVEL }, (_, i) => h('span', { class: `pip${i < lvl ? ' on' : ''}` }))),
@@ -584,7 +584,7 @@ class Game {
     const earned = this.save.coins - f.coinsAtStart;
     const hasNext = i + 1 < LEVELS.length;
     const made = [['flour', '🥖'], ['hay', '🌾'], ['corn', '🌽'], ['seeds', '🌻']].filter(([k]) => sold[k] >= 1);
-    const dim = h('div', { class: 'hf-dim' }, h('div', { class: 'hf-panel' },
+    const dim = h('div', { class: 'hf-dim hf-win' }, h('div', { class: 'hf-panel' },
       h('div', { class: 'hf-title' }, '🎉 ', t('done')),
       h('div', { class: 'hf-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= r.stars ? '' : 'off' }, '⭐'))),
       h('div', { class: 'hf-pill', style: 'font-size:calc(var(--u)*5.4)' }, h('span', { class: 'hf-coin' }), '+', num(earned)),

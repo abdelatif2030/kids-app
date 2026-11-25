@@ -151,6 +151,7 @@ export function drawLedge(ctx, x, y, th) {
 }
 
 export function drawSpikes(ctx, x, y) {
+  if (PIC.spikes) { const sh = PIC.spikes.naturalHeight / PIC.spikes.naturalWidth; ctx.drawImage(PIC.spikes, x, y + 1 - sh, 1, sh); return; } // the owner's stone spikes
   line(ctx, 0.05);
   for (let i = 0; i < 3; i++) {
     const bx = x + i / 3;

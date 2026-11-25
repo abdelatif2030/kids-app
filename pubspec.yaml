@@ -111,6 +111,7 @@ flutter:
     - assets/games/jungle_adventure/art/
     - assets/games/happy_farm/
     - assets/games/happy_farm/skin/
+    - assets/games/happy_farm/art/
     - assets/games/happy_farm/models/
     - assets/games/pumpkin_pie/
     - assets/games/samurai/

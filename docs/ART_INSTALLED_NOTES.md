@@ -27,3 +27,10 @@ menu classes `.P-card/.P-logo/.P-btn/.P-lv`, links it, lists skin/art in pubspec
   Still unused: hero/girl/monkey/parrot sheets (the game keeps its own Adam run frames), totems, spikes, rope bridge, icons other than gem and coin, win screen.
 - happy_farm: `hero.webp` removed (the key art has the hero). Backdrops, hero/cast/props/win/icons sheets still unused (top-down camera; the HUD uses emoji).
 - alien_sky backdrops 2-6 and rhino_summit backdrops 4-5 are waiting for the owner's pictures (only one and three arrived).
+
+## Third pass (same day)
+- happy_farm: shed upgrade icons are the owner's props (wheat, combine, trailer, barn), the coin and star icons replace the CSS coin and the star emoji on the results screen, and the
+  results screen has the owner's win picture behind the panel (`.hf-win`). `art/` is listed in pubspec. Not wired: the 8 backdrops (top-down camera), the hero/cast sheets, the other props and icons.
+- jungle_adventure: stone spikes picture (`art/spikes.webp`), owner's heart and coin icons in the HUD, win picture behind the "you won" screen (CSS `:has(.ja-win)`).
+  Not wired: hero/girl/monkey/parrot sheets (the game keeps its own Adam/Nour run frames), totems, rope bridge, other icons.
+- `game_src/_shot_seq.mjs` accepts `INJECT="<js>"` to run JS before the screenshot (to preview a screen that needs a finished game).
