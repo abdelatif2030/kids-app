@@ -1,0 +1,8 @@
+/* Happy farm skin: the owner's pictures (skin/*.webp) on the menu panel, title, level circles and buttons. Shapes keep their size; only the look changes. */
+.hf-panel{background:url(skin/panel.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;padding:calc(var(--u)*11) calc(var(--u)*9) calc(var(--u)*8) !important;color:#5a3a12}
+.hf-logo{color:#fff !important;font-size:calc(var(--u)*6.6) !important;background:url(skin/ribbon.webp) center/100% 100% no-repeat;padding:calc(var(--u)*2.2) calc(var(--u)*9) calc(var(--u)*3) !important;margin:calc(var(--u)*-4) 0 0 !important;-webkit-text-stroke:calc(var(--u)*.7) #7a4a0a;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.5) 0 #7a4a0a;white-space:nowrap}
+.hf-node{background:url(skin/lv_open.webp) center/contain no-repeat !important;border:none !important;box-shadow:none !important;color:#5a3a12 !important;text-shadow:none !important}
+.hf-node.next{background-image:url(skin/lv_sel.webp) !important}
+.hf-node.lock{background-image:url(skin/lv_lock.webp) !important;font-size:0 !important;color:transparent !important}
+.hf-btn{background:url(skin/pill_green.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;text-shadow:0 calc(var(--u)*.4) 0 #1f6a1f;padding-top:calc(var(--u)*2.4) !important;padding-bottom:calc(var(--u)*1.4) !important}
+.hf-btn:active{transform:scale(.96)}

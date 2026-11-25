@@ -37099,7 +37099,7 @@ break A}if("shapes"===a){s="\ud83d\udd37"
 break A}if("math"===a){s="\ud83d\udd22"
 break A}s="\u2b50"
 break A}return s},
-cjz(){var s,r,q,p=B.o.aW("https://lessons.yourdomain.com")
+cjz(){var s,r,q,p=B.o.aW("https://pub-9f36e80d6d2349feb9be77f9ef1dc3ad.r2.dev")
 if(p.length===0)return null
 s=A.b6v(B.o.lg(p,"/")?p:p+"/")
 if(s==null||!s.gRq())return null
