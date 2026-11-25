@@ -111,6 +111,7 @@ for (const line of en) {
     word = v.replace(/[*~]$/, '');
     sen = NO_ARTICLE_WORDS.test(word) && !/^(der|die|das) /.test(word) ? `Das ist ${word}.` : sentenceOf(word, plural, mass);
   }
+  if (/^(numbers|tens)/.test(cat)) sen = `${word[0].toUpperCase()}${word.slice(1)}!`;
   push(cat, e, word, sen); n++;
 }
 for (const [cat, e, w, s] of EXTRA) { push(cat, e, w, s); n++; }
