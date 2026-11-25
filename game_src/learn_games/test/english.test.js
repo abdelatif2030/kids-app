@@ -49,6 +49,19 @@ for (const age of [2, 3, 4, 5, 6]) {
   });
 }
 
+test('an Arabic word with its recording follows the praise (everything that is not a letter)', () => {
+  const ar = JSON.parse(fs.readFileSync(new URL('../../../assets/games/learn_voice/lines.json', import.meta.url), 'utf8')).filter((l) => l.lang === 'ar').map((l) => l.id);
+  const arDir = new URL('../../../assets/games/learn_voice/ar/', import.meta.url);
+  for (const lv of EN_LEVELS) {
+    if (lv.id === 'en_letters') continue;
+    for (const r of new LevelPlay(lv.id, 5, 11, null, 'meadow').rounds) {
+      assert.ok(r.arWord, `${lv.id} ${r.key}`);
+      const id = clipId(r.arWord, 'ar');
+      assert.ok(ar.includes(id) && fs.existsSync(new URL(`${id}.mp3`, arDir)), `${r.arWord} has a clip`);
+    }
+  }
+});
+
 test('a replay shows other words first, and a new word is heard slowly too', () => {
   const lv = EN_LEVELS.find((l) => l.id === 'en_animals');
   let mem = new FreshMemory(null, 2900);

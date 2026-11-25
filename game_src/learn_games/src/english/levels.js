@@ -7,6 +7,7 @@
 // Every word needs a picture / sign the app already has (tools/make_english_data.py): nothing is invented.
 import WORDS from './words.json' with { type: 'json' };
 import { colorOf } from '../letters/colors.js';
+import { numberWord } from '../letters/numbers.js';
 
 const pack = (...cats) => (e) => cats.includes(e.cat);
 export const EN_LEVELS = [
@@ -89,6 +90,8 @@ export function englishRounds(level, age, r, mem, nOpt, rounds) {
       answer: `${e.cat}|${e.en}`,
       key: keyOf(e),
       reward: e.s,
+      // what he answered, in Arabic, said with the praise («شاطر! قطة») (letters have no Arabic word)
+      arWord: e.ar || (e.n != null ? numberWord(e.n) : null),
       lang: 'en',
       // heard: the word (a new word also slowly); retry after a wrong tap: slowly; right: the sentence of the pack
       say: fresh ? [sayWord(e), saySlow(e)] : [sayWord(e)],

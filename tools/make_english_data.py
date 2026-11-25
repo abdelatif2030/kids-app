@@ -17,6 +17,14 @@ MANUAL = {
  'wake up':'h_clock','wash my face':'soap','eat breakfast':'bowl','go to school':'backpack','eat lunch':'pot','play':'teddy','eat dinner':'plate',
  'have a bath':'tub','brush my teeth':'toothbrush','sleep':'bed',
 }
+AR_TIME = {
+ 'saturday':'السبت','sunday':'الأحد','monday':'الاثنين','tuesday':'التلات','wednesday':'الأربع','thursday':'الخميس','friday':'الجمعة',
+ 'january':'يناير','february':'فبراير','march':'مارس','april':'أبريل','may':'مايو','june':'يونيو','july':'يوليو','august':'أغسطس','september':'سبتمبر','october':'أكتوبر','november':'نوفمبر','december':'ديسمبر',
+ 'summer':'الصيف','winter':'الشتا','spring':'الربيع','autumn':'الخريف','morning':'الصبح','noon':'الضهر','evening':'المسا','night':'الليل',
+}
+AR_MANUAL = {'carrot':'جزرة','grass':'حشيش','bone':'عضمة','meat':'لحمة','hay':'تبن','seeds':'حَب','strawberry':'فراولة','fire truck':'عربية مطافي',
+ 'sunflower':'عباد الشمس','leaf':'ورقة شجر','tang fish':'سمكة زرقا','bluebird':'عصفور أزرق','blue planet':'كوكب أزرق','cotton candy':'غزل البنات',
+ 'pink planet':'كوكب وردي','teddy bear':'دبدوب'}
 out, skipped = [], []
 for r in rows:
     cat, en = r['category'], r['english_word']
@@ -45,6 +53,10 @@ for r in rows:
         t = things.get(h)
         if not t: skipped.append(cat + ':' + en); continue
         e['thing'] = t[0]
+    # the Arabic word said after the praise (the owner: the child hears what he answered in Arabic too); letters have none
+    if cat in ('days','months','seasons','parts of the day'): e['ar'] = AR_TIME[en]
+    elif en in AR_MANUAL and not ar: e['ar'] = AR_MANUAL[en]
+    elif 'ch' not in e and 'n' not in e and ar and not ar.isdigit(): e['ar'] = ar
     out.append(e)
 io.open('game_src/learn_games/src/english/words.json', 'w', encoding='utf-8', newline='\n').write(json.dumps(out, ensure_ascii=False, indent=0))
 print(len(out), 'words; skipped', skipped)

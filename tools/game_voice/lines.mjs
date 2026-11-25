@@ -114,6 +114,12 @@ for (const q of extrasMod.allExtraSentences(colorsMod.colorOf)) add(q, 'ar'); //
 const shapesAll = await imp('letters/shapes_all.js');
 for (const q of shapesAll.allShapeSentences()) add(q, 'ar'); // 20 shapes: names, colours, sides
 for (const c of [...lv.CHEERS_M, ...lv.CHEERS_F]) add(c, 'ar');
+// English with Rehlaty: after the praise the child hears the Arabic word of what he answered (src/english/words.json `ar`; numbers by their Egyptian word)
+{
+  const words = JSON.parse(readFileSync(join(SRC, 'english', 'words.json'), 'utf8'));
+  const numMod = await imp('letters/numbers.js');
+  for (const w of words) { if (w.ar) add(w.ar, 'ar'); else if (w.n != null) add(numMod.numberWord(w.n), 'ar'); }
+}
 
 const all0 = [...lines.values()];
 const all = all0.sort((a, b) => a.lang.localeCompare(b.lang) || a.text.localeCompare(b.text));

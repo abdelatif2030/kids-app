@@ -894,7 +894,7 @@ ead) also reads every choice aloud, one after the other, and the choice being re
     const phrase = cheer(this.girl, this.cheerN++);
     const seq = [phrase];
     if (r.reward) seq.push(r.reward);
-    this.signText.textContent = r.reward || phrase;
+    this.signText.textContent = r.reward ? (r.arWord ? `${r.reward}  ·  ${r.arWord}` : r.reward) : phrase;
     this.signText.style.direction = r.lang === 'en' && r.reward ? 'ltr' : '';
     this.signIcon.textContent = '⭐';
     this._advDone = false;
@@ -913,7 +913,7 @@ ead) also reads every choice aloud, one after the other, and the choice being re
           if (a) a.userData.jump = 0.4;
           if (i) this.sh.sound.play('note', PENTA[i % PENTA.length]);
         }, next);
-      } else this.sh.speak(r.rewardSay ? [phrase, ...r.rewardSay] : seq, null, next);
+      } else this.sh.speak(r.rewardSay ? [phrase, ...(r.arWord ? [{ t: r.arWord, lang: 'ar' }] : []), ...r.rewardSay] : seq, null, next);
     }, 600);
     // the next question waits for the whole counting to finish: a long count (eleven apples...) takes its time; only a safety net
     this._advT = setTimeout(next, 9000 + (r.countAloud || 0) * 1700);
