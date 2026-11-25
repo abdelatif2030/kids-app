@@ -22,6 +22,8 @@ const webglOk = () => {
     return false;
   }
 };
+// 2026-11-26: the race felt too fast on a landscape phone with the close camera: the whole race runs at 78% pace (same rules, same fairness)
+const RACE_PACE = 0.78;
 const helmetDot = (c) => `<i style="display:inline-block;width:1em;height:1em;border-radius:50%;background:#${c.toString(16).padStart(6, '0')};border:2px solid #fff;vertical-align:middle"></i>`;
 const COLORS = [0xe8342a, 0x2a7ae8, 0x2ab85a, 0x8a3ae8];
 const GEARS = [0, 13, 23, 32, 41, 50, 99];
@@ -745,7 +747,7 @@ class Game {
     const race = this.race;
     const input = this._readInput();
     const before = race.player.place;
-    const events = race.step(dt, input);
+    const events = race.step(dt * RACE_PACE, input);
     const p = race.player;
     for (const e of events) {
       switch (e.type) {
@@ -819,7 +821,7 @@ class Game {
       b.back.rotation.x += spin;
       b.flames.visible = r.boost > 0;
       if (r.boost > 0) b.flames.scale.setScalar(0.8 + Math.random() * 0.5);
-      if (k === 0 && this.zl && this.save.color === 0) { this.zl.phase += r.v * dt * 7 * (r.boost > 0 ? 1.4 : 1); this.zl.draw(this.zl.phase, 5 * Math.sin(time * 14) + 2 * Math.sin(time * 23) + (r.boost > 0 ? 4 : 0), r.boost > 0 && r.crashT <= 0 ? 1 : 0); }
+      if (k === 0 && this.zl && this.save.color === 0) { this.zl.phase += r.v * RACE_PACE * dt * 7 * (r.boost > 0 ? 1.4 : 1); this.zl.draw(this.zl.phase, 5 * Math.sin(time * 14) + 2 * Math.sin(time * 23) + (r.boost > 0 ? 4 : 0), r.boost > 0 && r.crashT <= 0 ? 1 : 0); }
       if (b.pic) b.setState(r.crashT > 0 ? 'crash' : r.boost > 0 && !(k === 0 && this.zl && this.save.color === 0) ? 'nitro' : r.lean > 0.25 ? 'r' : r.lean < -0.25 ? 'l' : 'c');
       if (r.off && r.v > 8 && Math.random() < 0.6) this.dust.emit(r.x - Math.sin(r.h) * 1, 0.4, r.z - Math.cos(r.h) * 1, (Math.random() - 0.5) * 2, 1.5, (Math.random() - 0.5) * 2, 0.6);
     });
@@ -873,7 +875,7 @@ class Game {
     if (hc.lap !== lap) { hc.lap = lap; this.hud.lap.textContent = `${t('lap')} ${num(lap)}/${num(LAPS)}`; }
     const tt = Math.floor(race.time * 10);
     if (hc.t !== tt) { hc.t = tt; this.hud.time.textContent = this._fmt(race.time); }
-    const kmh = Math.round(p.v * 3.6);
+    const kmh = Math.round(p.v * 3.6 * RACE_PACE);
     if (hc.kmh !== kmh) { hc.kmh = kmh; this.hud.speedo.firstChild.textContent = num(kmh); }
     if (hc.gear !== this.gear) { hc.gear = this.gear; this.hud.speedo.lastChild.textContent = num(this.gear); }
     this.hud.speedo.classList.toggle('boost', p.boost > 0);
