@@ -16,6 +16,8 @@ export const EN_LEVELS = [
   { id: 'en_food', mode: 'en', ar: 'Yummy food', emoji: '🥕', skill: 'vocab', pick: pack('picture pack: food', 'picture pack: veg', 'picture pack: fruit2'), kinds: ['thing'] },
   { id: 'en_school', mode: 'en', ar: 'Clothes and school', emoji: '🎒', skill: 'vocab', pick: pack('picture pack: clothes', 'picture pack: school'), kinds: ['thing'] },
   { id: 'en_world', mode: 'en', ar: 'Jobs, music and weather', emoji: '🌦️', skill: 'vocab', pick: pack('picture pack: jobs', 'picture pack: music', 'picture pack: weather', 'picture pack: insects', 'picture pack: shapes'), kinds: ['thing'] },
+  { id: 'en_colorful', mode: 'en', ar: 'Colourful things', emoji: '🍓', skill: 'colors', pick: pack('things of a colour', 'animal foods'), kinds: ['thing'] },
+  { id: 'en_routine', mode: 'en', ar: 'My day', emoji: '🪥', skill: 'vocab', pick: pack('daily routine'), kinds: ['thing'] },
   { id: 'en_numbers', mode: 'en', ar: 'Numbers', emoji: '🔢', skill: 'counting', pick: pack('numbers 0-20'), kinds: ['number'] },
   { id: 'en_letters', mode: 'en', ar: 'ABC', emoji: '🔤', skill: 'vocab', pick: pack('letters A-Z (name)'), kinds: ['letter'] },
   { id: 'en_colors', mode: 'en', ar: 'Colours', emoji: '🎨', skill: 'colors', pick: pack('colours'), kinds: ['color'] },

@@ -1349,7 +1349,7 @@ const CSS = `
 .lw-fade.on{opacity:1}
 .lw-tile:focus-visible{outline:calc(var(--u)*.8) solid #6a3ad0;outline-offset:calc(var(--u)*.6)}
 @media (max-aspect-ratio:1/1){.lw-grid{grid-template-columns:repeat(3,1fr)}}
-.lw-en{direction:ltr}.lw-en .lw-grid{grid-template-columns:repeat(6,1fr)}.lw-en .lw-tile span{font-size:calc(var(--u)*2.7)}
+.lw-en{direction:ltr}.lw-en .lw-grid{grid-template-columns:repeat(7,1fr)}.lw-en .lw-tile span{font-size:calc(var(--u)*2.7)}
 @media (max-aspect-ratio:1/1){.lw-en .lw-grid{grid-template-columns:repeat(3,1fr)}}
 `;
 

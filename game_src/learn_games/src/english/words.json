@@ -903,6 +903,76 @@
 "ch": "Night"
 },
 {
+"cat": "daily routine",
+"en": "wake up",
+"w": "wake up",
+"s": "Let's wake up!",
+"thing": "h_clock"
+},
+{
+"cat": "daily routine",
+"en": "wash my face",
+"w": "wash my face",
+"s": "Let's wash my face!",
+"thing": "soap"
+},
+{
+"cat": "daily routine",
+"en": "eat breakfast",
+"w": "eat breakfast",
+"s": "Let's eat breakfast!",
+"thing": "bowl"
+},
+{
+"cat": "daily routine",
+"en": "go to school",
+"w": "go to school",
+"s": "Let's go to school!",
+"thing": "backpack"
+},
+{
+"cat": "daily routine",
+"en": "eat lunch",
+"w": "eat lunch",
+"s": "Let's eat lunch!",
+"thing": "pot"
+},
+{
+"cat": "daily routine",
+"en": "play",
+"w": "play",
+"s": "Let's play!",
+"thing": "teddy"
+},
+{
+"cat": "daily routine",
+"en": "eat dinner",
+"w": "eat dinner",
+"s": "Let's eat dinner!",
+"thing": "plate"
+},
+{
+"cat": "daily routine",
+"en": "have a bath",
+"w": "have a bath",
+"s": "Let's have a bath!",
+"thing": "tub"
+},
+{
+"cat": "daily routine",
+"en": "brush my teeth",
+"w": "brush my teeth",
+"s": "Let's brush my teeth!",
+"thing": "toothbrush"
+},
+{
+"cat": "daily routine",
+"en": "sleep",
+"w": "sleep",
+"s": "Let's sleep!",
+"thing": "bed"
+},
+{
 "cat": "animals",
 "en": "bunny",
 "w": "bunny",
@@ -2625,6 +2695,111 @@
 "thing": "r_cupcake"
 },
 {
+"cat": "animal foods",
+"en": "carrot",
+"w": "carrot",
+"s": "This is a carrot.",
+"thing": "carrot"
+},
+{
+"cat": "animal foods",
+"en": "grass",
+"w": "grass",
+"s": "This is grass.",
+"thing": "grass"
+},
+{
+"cat": "animal foods",
+"en": "bone",
+"w": "bone",
+"s": "This is a bone.",
+"thing": "bone"
+},
+{
+"cat": "animal foods",
+"en": "meat",
+"w": "meat",
+"s": "This is meat.",
+"thing": "o_chicken"
+},
+{
+"cat": "animal foods",
+"en": "hay",
+"w": "hay",
+"s": "This is hay.",
+"thing": "f_haypile"
+},
+{
+"cat": "animal foods",
+"en": "seeds",
+"w": "seeds",
+"s": "This is a seeds.",
+"thing": "seeds"
+},
+{
+"cat": "things of a colour",
+"en": "strawberry",
+"w": "strawberry",
+"s": "This is a strawberry.",
+"thing": "strawberry"
+},
+{
+"cat": "things of a colour",
+"en": "fire truck",
+"w": "fire truck",
+"s": "This is a fire truck.",
+"thing": "firetruck"
+},
+{
+"cat": "things of a colour",
+"en": "sunflower",
+"w": "sunflower",
+"s": "This is a sunflower.",
+"thing": "sunflower_1"
+},
+{
+"cat": "things of a colour",
+"en": "leaf",
+"w": "leaf",
+"s": "This is a leaf.",
+"thing": "j_leaf"
+},
+{
+"cat": "things of a colour",
+"en": "tang fish",
+"w": "tang fish",
+"s": "This is a tang fish.",
+"thing": "u_tang"
+},
+{
+"cat": "things of a colour",
+"en": "bluebird",
+"w": "bluebird",
+"s": "This is a bluebird.",
+"thing": "bird_blue"
+},
+{
+"cat": "things of a colour",
+"en": "blue planet",
+"w": "blue planet",
+"s": "This is a blue planet.",
+"thing": "s_blueplanet"
+},
+{
+"cat": "things of a colour",
+"en": "cotton candy",
+"w": "cotton candy",
+"s": "This is cotton candy.",
+"thing": "r_cotton"
+},
+{
+"cat": "things of a colour",
+"en": "pink planet",
+"w": "pink planet",
+"s": "This is a pink planet.",
+"thing": "s_pinkplanet"
+},
+{
 "cat": "toys and fruit (sorting)",
 "en": "pear",
 "w": "pear",
@@ -2637,6 +2812,13 @@
 "w": "watermelon",
 "s": "This is a watermelon.",
 "thing": "watermelon"
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "teddy bear",
+"w": "teddy bear",
+"s": "This is a teddy bear.",
+"thing": "teddy"
 },
 {
 "cat": "toys and fruit (sorting)",

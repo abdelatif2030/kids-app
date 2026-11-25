@@ -13,8 +13,8 @@ const have = (name) => fs.existsSync(new URL(`${name}.mp3`, VOICE));
 const manifest = fs.readFileSync(new URL('../../../assets/games/learn_voice/manifest.js', import.meta.url), 'utf8');
 const MAN = JSON.parse(manifest.slice(manifest.indexOf('{'), manifest.lastIndexOf('}') + 1));
 
-test('twelve English levels, each with at least eight words', () => {
-  assert.equal(EN_LEVELS.length, 12);
+test('fourteen English levels, each with at least eight words', () => {
+  assert.equal(EN_LEVELS.length, 14);
   for (const lv of EN_LEVELS) assert.ok(poolOfLevel(lv).length >= 8, lv.id);
 });
 

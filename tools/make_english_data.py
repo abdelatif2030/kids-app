@@ -9,6 +9,14 @@ things = {norm(k): v for k, v in json.load(open(sys.argv[1], encoding='utf-8')).
 rows = list(csv.DictReader(io.open('docs/ENGLISH_WORDLIST.csv', encoding='utf-8-sig')))
 COLORS = set('red blue yellow green orange purple pink black white brown gray skyblue navy lightgreen darkgreen turquoise gold silver beige maroon lemon peach lilac olive mustard magenta indigo crimson bronze caramel charcoal mint coral sand'.split())
 SHAPES = set('circle square triangle star heart octagon crescent plus semicircle trapezoid parallelogram hexagram drop'.split())
+# pictures the app has under other names (checked by hand against colors.js, animals/sim.js and HABITS)
+MANUAL = {
+ 'strawberry':'strawberry','fire truck':'firetruck','sunflower':'sunflower_1','leaf':'j_leaf','tang fish':'u_tang','bluebird':'bird_blue',
+ 'blue planet':'s_blueplanet','cotton candy':'r_cotton','pink planet':'s_pinkplanet',
+ 'carrot':'carrot','grass':'grass','bone':'bone','meat':'o_chicken','hay':'f_haypile','seeds':'seeds','teddy bear':'teddy',
+ 'wake up':'h_clock','wash my face':'soap','eat breakfast':'bowl','go to school':'backpack','eat lunch':'pot','play':'teddy','eat dinner':'plate',
+ 'have a bath':'tub','brush my teeth':'toothbrush','sleep':'bed',
+}
 out, skipped = [], []
 for r in rows:
     cat, en = r['category'], r['english_word']
@@ -28,8 +36,10 @@ for r in rows:
         e['shape'] = en
     elif cat in ('days', 'months', 'seasons', 'parts of the day'):
         e['ch'] = en.capitalize()
-    elif cat in ('daily routine', 'places (where is the ball)', 'pattern beads'):
+    elif cat in ('places (where is the ball)', 'pattern beads'):
         continue  # phrases: later, with their own pictures
+    elif en in MANUAL and cat in ('daily routine','things of a colour','animal foods','toys and fruit (sorting)'):
+        e['thing'] = MANUAL[en]
     else:
         h = norm(ar[2:] if ar.startswith('ال') else ar)
         t = things.get(h)
