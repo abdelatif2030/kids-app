@@ -199,13 +199,29 @@ class Game {
     const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
     this.zl = {
       tex, aspect: W / H, phase: 0,
-      draw: (phase, tailDeg) => {
+      draw: (phase, tailDeg, fl = 0) => {
         wg.globalCompositeOperation = 'source-over'; wg.clearRect(0, 0, W, H);
         for (let y = -P + (((phase % P) + P) % P); y < H; y += P) wg.drawImage(im.tread, 0, y);
         wg.globalCompositeOperation = 'destination-in'; wg.drawImage(im.wheel, 0, 0);
         g.clearRect(0, 0, W, H);
         g.drawImage(wc, 0, 0); g.drawImage(im.body, 0, 0);
         g.save(); g.translate(100, 214); g.rotate((tailDeg * Math.PI) / 180); g.translate(-100, -214); g.drawImage(im.tail, 0, 0); g.restore();
+        if (fl > 0) { // real-looking nitro: two jets of hot flame (red -> orange -> yellow -> white core) flickering out of the twin exhausts
+          const t = performance.now() / 1000;
+          [48, 172].forEach((cx, s) => {
+            [['#ff3a00', 1, 1, 0.85], ['#ff9a00', 0.78, 0.72, 0.92], ['#ffe14a', 0.55, 0.45, 0.97], ['#ffffff', 0.32, 0.22, 1]].forEach(([col, sc, wd, al]) => {
+              for (let q = 0; q < 3; q++) {
+                const L = (112 + 34 * Math.sin(t * 37 + q * 2 + s) + 12 * Math.sin(t * 71 + q)) * sc * fl;
+                const ang = (s ? 1 : -1) * (0.1 + 0.16 * (q - 1)) + 0.05 * Math.sin(t * 50 + q);
+                const bx = cx, by = 281, w = (q === 1 ? 19 : 12) * wd;
+                const tx = bx + Math.sin(ang) * L, ty = by + Math.cos(ang) * L;
+                g.globalAlpha = al; g.fillStyle = col; g.beginPath();
+                g.moveTo(bx - w, by - 2); g.lineTo(bx + w, by - 2); g.lineTo(bx + (tx - bx) * 0.4 + w * 1.15, by + (ty - by) * 0.4); g.lineTo(tx, ty); g.lineTo(bx + (tx - bx) * 0.4 - w * 1.15, by + (ty - by) * 0.4); g.fill();
+              }
+            });
+          });
+          g.globalAlpha = 1;
+        }
         tex.needsUpdate = true;
       },
     };
@@ -803,8 +819,8 @@ class Game {
       b.back.rotation.x += spin;
       b.flames.visible = r.boost > 0;
       if (r.boost > 0) b.flames.scale.setScalar(0.8 + Math.random() * 0.5);
-      if (k === 0 && this.zl && this.save.color === 0) { this.zl.phase += r.v * dt * 7; this.zl.draw(this.zl.phase, 5 * Math.sin(time * 14) + 2 * Math.sin(time * 23) + (r.boost > 0 ? 4 : 0)); }
-      if (b.pic) b.setState(r.crashT > 0 ? 'crash' : r.boost > 0 ? 'nitro' : r.lean > 0.25 ? 'r' : r.lean < -0.25 ? 'l' : 'c');
+      if (k === 0 && this.zl && this.save.color === 0) { this.zl.phase += r.v * dt * 7 * (r.boost > 0 ? 1.4 : 1); this.zl.draw(this.zl.phase, 5 * Math.sin(time * 14) + 2 * Math.sin(time * 23) + (r.boost > 0 ? 4 : 0), r.boost > 0 && r.crashT <= 0 ? 1 : 0); }
+      if (b.pic) b.setState(r.crashT > 0 ? 'crash' : r.boost > 0 && !(k === 0 && this.zl && this.save.color === 0) ? 'nitro' : r.lean > 0.25 ? 'r' : r.lean < -0.25 ? 'l' : 'c');
       if (r.off && r.v > 8 && Math.random() < 0.6) this.dust.emit(r.x - Math.sin(r.h) * 1, 0.4, r.z - Math.cos(r.h) * 1, (Math.random() - 0.5) * 2, 1.5, (Math.random() - 0.5) * 2, 0.6);
     });
     this.dust.update(dt);
@@ -830,13 +846,13 @@ class Game {
     const up = portrait ? 2.6 : 1.85;
     const want = new THREE.Vector3(p.x - fx * back, up, p.z - fz * back);
     if (!this.cam) this.cam = want.clone();
-    this.cam.lerp(want, Math.min(1, dt * 6));
+    this.cam.lerp(want, Math.min(1, dt * 18));
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 2);
     const sh = this.shake * 0.25;
     this.camera.position.set(this.cam.x + (Math.random() - 0.5) * sh, this.cam.y + (Math.random() - 0.5) * sh, this.cam.z);
     this.camera.lookAt(p.x + fx * 6, portrait ? 1.1 : 1.25, p.z + fz * 6);
     this.camera.rotateZ(this.bikes[0].lean.rotation.z * 0.05);
-    const fov = this.baseFov + Math.min(10, p.v * 0.12) + (p.boost > 0 ? 6 : 0);
+    const fov = this.baseFov + Math.min(4, p.v * 0.05) + (p.boost > 0 ? 3 : 0);
     if (Math.abs(this.camera.fov - fov) > 0.1) { this.camera.fov += (fov - this.camera.fov) * Math.min(1, dt * 3); this.camera.updateProjectionMatrix(); }
     this.speedlines.style.opacity = p.boost > 0 ? '1' : p.draft > 0.5 ? '0.5' : '0';
     if (this.mode === 'race') this._hudSync();
