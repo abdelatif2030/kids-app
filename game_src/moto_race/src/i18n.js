@@ -1,5 +1,5 @@
 const S = {
-  title: ['سباق الدراجات النارية', 'Motorcycle Racing'],
+  title: ['سباق الموتوسيكل', 'Motorbike Race'],
   round: ['الجولة', 'Round'],
   locked: ['اكسب ميدالية في الجولة اللي قبلها', 'Get a medal in the round before'],
   race: ['يلا نسابق!', 'Race!'],

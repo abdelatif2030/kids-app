@@ -105,7 +105,7 @@ final WebGame kMotoRace = WebGame(
   global: 'MotoRace',
   storeKey: 'moto_race',
   minAge: 3,
-  title: () => tr2('سباق الدراجات النارية', 'Motorcycle Racing'),
+  title: () => tr2('سباق الموتوسيكل', 'Motorbike Race'),
 );
 
 /// «البقاء على الإيقاع» (Rhythm Survival): plush animals on a giant spinning record (docs/RHYTHM_SURVIVAL.md).
