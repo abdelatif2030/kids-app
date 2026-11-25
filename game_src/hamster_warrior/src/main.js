@@ -11,7 +11,7 @@ import { h, css, makeI18n, rng } from '../../cozy_kit/ui.js';
 import { loadArt, loadSprites } from '../../cozy_kit/art.js';
 
 const S = {
-  title: ['الهامستر المحارب', 'Hamster Warrior'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
+  title: ['هامي الشجاع', 'Hammy the Brave'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
   next: ['المرحلة الجاية', 'Next level'], level: ['المرحلة', 'LEVEL'], how: ['اسحب لتحريك البطل', 'Drag to steer'],
   won: ['خلصت المرحلة! 🏆', 'Level complete! 🏆'], lost: ['البطل محتاج راحة 😴', 'The hero needs a rest 😴'], lost2: ['خد قلوبك تاني وجرّب من جديد', 'Take your hearts back and try again'],
   locked: ['خلّص المرحلة اللي قبلها', 'Finish the level before'], stronger: ['أقوى منك! لف حواليه', 'STRONGER. GO AROUND'],

@@ -419,7 +419,7 @@ final WebGame kHamsterWarrior = WebGame(
   global: 'HamsterWarrior',
   storeKey: 'hamster_warrior',
   minAge: 4,
-  title: () => tr2('الهامستر المحارب', 'Hamster Warrior'),
+  title: () => tr2('هامي الشجاع', 'Hammy the Brave'),
 );
 
 /// «الأكول» (Chomp Maze).
