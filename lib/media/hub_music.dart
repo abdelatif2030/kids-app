@@ -20,6 +20,7 @@ class HubMusic {
   static const double _volume = 0.26;
   static const Map<String, String> _paths = {
     'home': 'assets/audio/music/home_hub.mp3',
+    'main': 'assets/audio/music/home_main.mp3', // the main page (owner's own music, 2026-11-26)
     'fun': 'assets/audio/music/fun_hub.mp3',
     'learn': 'assets/audio/music/learn_hub.mp3',
   };

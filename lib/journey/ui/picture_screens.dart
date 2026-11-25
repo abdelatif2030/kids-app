@@ -1,3 +1,4 @@
+import '../../media/hub_music.dart';
 import '../../media/section_voice.dart';
 import 'package:flutter/material.dart';
 
@@ -52,7 +53,9 @@ class PictureHome extends StatelessWidget {
   void _push(BuildContext context, Widget w) => Navigator.push(context, MaterialPageRoute<void>(builder: (_) => w));
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => HubMusicScope(track: 'main', child: _buildPage(context));
+
+  Widget _buildPage(BuildContext context) {
     return PictureStage(
       key: const ValueKey('picture_home'),
       asset: asset,

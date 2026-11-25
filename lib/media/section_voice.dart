@@ -26,6 +26,12 @@ class SectionVoice {
 
   static const _maxWait = Duration(seconds: 12);
 
+  /// Another spoken welcome (the app greeting) tells the music to wait: complete the returned completer when it ends.
+  static Completer<void> beginExternal() {
+    _finish();
+    return _done = Completer<void>();
+  }
+
   static void _finish() {
     final d = _done;
     if (d != null && !d.isCompleted) d.complete();

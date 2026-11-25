@@ -35,12 +35,17 @@ class WelcomeVoice {
     if (_played) return;
     _played = true;
     if (!AudioPrefs.instance.voiceOn || AudioGate.instance.silenced) return;
-    final started = await _play();
-    if (!started && kIsWeb) _armFirstTouch();
+    // the main page's music starts only after this greeting ends (no await before this line: the music asks right away)
+    final done = SectionVoice.beginExternal();
+    final started = await _play(done);
+    if (!started) {
+      if (!done.isCompleted) done.complete();
+      if (kIsWeb) _armFirstTouch();
+    }
   }
 
   /// Starts the clip and reports whether sound really began within a moment (a blocked browser never starts).
-  static Future<bool> _play() async {
+  static Future<bool> _play([Completer<void>? done]) async {
     try {
       _p?.dispose();
       final p = _p = AudioPlayer();
@@ -55,10 +60,16 @@ class WelcomeVoice {
       if (ok) {
         _heard = true;
         // free the player once it has finished
-        unawaited(p.processingStateStream.firstWhere((s) => s == ProcessingState.completed).then((_) => p.dispose(), onError: (Object _) {}));
+        unawaited(p.processingStateStream.firstWhere((s) => s == ProcessingState.completed).then((_) {
+          p.dispose();
+          if (done != null && !done.isCompleted) done.complete();
+        }, onError: (Object _) {
+          if (done != null && !done.isCompleted) done.complete();
+        }));
       }
       return ok;
     } catch (_) {
+      if (done != null && !done.isCompleted) done.complete();
       return false; // no audio output here: nothing to say
     }
   }
