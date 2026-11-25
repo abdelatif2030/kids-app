@@ -1,0 +1,304 @@
+﻿level,picture,english_word,arabic_word,clip1_word_normal,clip2_same_word_READ_SLOWLY,clip3_sentence,arabic_clip_text
+Around me,HAS PICTURE (ball),ball,كورة,ball,ball,This is a ball.,كورة
+Around me,HAS PICTURE (u_star),starfish,نجمة بحر,starfish,starfish,This is a starfish.,نجمة بحر
+Around me,HAS PICTURE (q_peach),peach,خوخ,peach,peach,This is a peach.,خوخ
+Around me,HAS PICTURE (orange),orange,برتقالة,orange,orange,This is an orange.,برتقالة
+Around me,HAS PICTURE (pineapple),pineapple,أناناس,pineapple,pineapple,This is a pineapple.,أناناس
+Around me,HAS PICTURE (mango),mango,مانجا,mango,mango,This is a mango.,مانجا
+Around me,HAS PICTURE (ambulance),ambulance,عربية الإسعاف,ambulance,ambulance,This is an ambulance.,عربية الإسعاف
+Around me,HAS PICTURE (police),police car,عربية الشرطة,police car,police car,This is a police car.,عربية الشرطة
+Around me,HAS PICTURE (helicopter),helicopter,هليكوبتر,helicopter,helicopter,This is a helicopter.,هليكوبتر
+Around me,HAS PICTURE (c_schoolbus),school bus,أتوبيس مدرسي,school bus,school bus,This is a school bus.,أتوبيس مدرسي
+Around me,HAS PICTURE (c_citybus),city bus,أتوبيس المدينة,city bus,city bus,This is a city bus.,أتوبيس المدينة
+Around me,HAS PICTURE (c_taxi),taxi,تاكسي,taxi,taxi,This is a taxi.,تاكسي
+Around me,HAS PICTURE (c_tram),tram,ترام,tram,tram,This is a tram.,ترام
+Around me,HAS PICTURE (c_bulldozer),bulldozer,جرافة,bulldozer,bulldozer,This is a bulldozer.,جرافة
+Around me,HAS PICTURE (d_boat),felucca,فلوكة,felucca,felucca,This is a felucca.,فلوكة
+Around me,HAS PICTURE (d_donkeycart),donkey cart,عربة حمار,donkey cart,donkey cart,This is a donkey cart.,عربة حمار
+Around me,HAS PICTURE (tractor_f),tractor,جرار,tractor,tractor,This is a tractor.,جرار
+Around me,HAS PICTURE (w_sled),sled,زحافة,sled,sled,This is a sled.,زحافة
+Around me,HAS PICTURE (s_rover),space rover,مركبة الفضاء,space rover,space rover,This is a space rover.,مركبة الفضاء
+Around me,HAS PICTURE (s_ufo),flying saucer,طبق طائر,flying saucer,flying saucer,This is a flying saucer.,طبق طائر
+Around me,HAS PICTURE (h_fence),fence,سور,fence,fence,This is a fence.,سور
+Around me,HAS PICTURE (h_tulips),tulips,زهور التوليب,tulips,tulips,These are tulips.,زهور التوليب
+Around me,HAS PICTURE (h_birdbath),bird bath,حوض طيور,bird bath,bird bath,This is a bird bath.,حوض طيور
+Around me,HAS PICTURE (h_gnome),garden gnome,قزم الحديقة,garden gnome,garden gnome,This is a garden gnome.,قزم الحديقة
+Around me,HAS PICTURE (h_plant),plant,زرعة,plant,plant,This is a plant.,زرعة
+Around me,HAS PICTURE (r_icecream),ice cream,آيس كريم,ice cream,ice cream,This is an ice cream.,آيس كريم
+Around me,HAS PICTURE (r_lolli),lollipop,مصاصة,lollipop,lollipop,This is a lollipop.,مصاصة
+Around me,HAS PICTURE (r_gingerhouse),gingerbread house,بيت الزنجبيل,gingerbread house,gingerbread house,This is a gingerbread house.,بيت الزنجبيل
+Around me,HAS PICTURE (bird_yellow),yellow bird,عصفور أصفر,yellow bird,yellow bird,This is a yellow bird.,عصفور أصفر
+Around me,HAS PICTURE (r_rainbow),rainbow,قوس قزح,rainbow,rainbow,This is a rainbow.,قوس قزح
+Around me,HAS PICTURE (r_kite),kite,طيارة ورق,kite,kite,This is a kite.,طيارة ورق
+Around me,HAS PICTURE (r_pinwheel),pinwheel,مروحة ملونة,pinwheel,pinwheel,This is a pinwheel.,مروحة ملونة
+Around me,HAS PICTURE (b_clown),clownfish,سمكة المهرج,clownfish,clownfish,This is a clownfish.,سمكة المهرج
+Around me,HAS PICTURE (b_yellowfish),yellow fish,سمكة صفرا,yellow fish,yellow fish,This is a yellow fish.,سمكة صفرا
+Around me,HAS PICTURE (b_gull),seagull,نورس,seagull,seagull,This is a seagull.,نورس
+Around me,HAS PICTURE (b_coral),coral,مرجان,coral,coral,This is coral.,مرجان
+Around me,HAS PICTURE (b_ball),beach ball,كورة الشاطئ,beach ball,beach ball,This is a beach ball.,كورة الشاطئ
+Around me,HAS PICTURE (b_ring),life ring,عوامة,life ring,life ring,This is a life ring.,عوامة
+Around me,HAS PICTURE (b_palm1),beach palm,نخلة,beach palm,beach palm,This is a beach palm.,نخلة
+Around me,HAS PICTURE (b_boat),small boat,مركب صغير,small boat,small boat,This is a small boat.,مركب صغير
+Around me,HAS PICTURE (b_dock),dock,رصيف,dock,dock,This is a dock.,رصيف
+Around me,HAS PICTURE (b_chair),beach chair,كرسي الشاطئ,beach chair,beach chair,This is a beach chair.,كرسي الشاطئ
+Around me,HAS PICTURE (b_rocks),rocks,صخور,rocks,rocks,These are rocks.,صخور
+Around me,HAS PICTURE (b_weed),seaweed,أعشاب البحر,seaweed,seaweed,This is seaweed.,أعشاب البحر
+Around me,HAS PICTURE (b_surf),surfboard,لوح التزلج,surfboard,surfboard,This is a surfboard.,لوح التزلج
+Around me,HAS PICTURE (b_bucket),bucket,جردل,bucket,bucket,This is a bucket.,جردل
+Around me,HAS PICTURE (u_wreck),shipwreck,سفينة غارقة,shipwreck,shipwreck,This is a shipwreck.,سفينة غارقة
+Around me,HAS PICTURE (u_anchor),anchor,مرساة,anchor,anchor,This is an anchor.,مرساة
+Around me,HAS PICTURE (u_clam),clam,محارة,clam,clam,This is a clam.,محارة
+Around me,HAS PICTURE (u_anemone),sea anemone,شقائق البحر,sea anemone,sea anemone,This is a sea anemone.,شقائق البحر
+Around me,HAS PICTURE (u_puffer),puffer fish,سمكة منتفخة,puffer fish,puffer fish,This is a puffer fish.,سمكة منتفخة
+Around me,HAS PICTURE (s_rocket),small rocket,صاروخ صغير,small rocket,small rocket,This is a small rocket.,صاروخ صغير
+Around me,HAS PICTURE (s_helmet),space helmet,خوذة الفضاء,space helmet,space helmet,This is a space helmet.,خوذة الفضاء
+Around me,HAS PICTURE (s_comet),comet,مذنب,comet,comet,This is a comet.,مذنب
+Around me,HAS PICTURE (s_station),space station,محطة فضاء,space station,space station,This is a space station.,محطة فضاء
+Around me,HAS PICTURE (k_tower),tower,برج,tower,tower,This is a tower.,برج
+Around me,HAS PICTURE (k_princess),princess,أميرة,princess,princess,This is a princess.,أميرة
+Around me,HAS PICTURE (k_shield),shield,درع,shield,shield,This is a shield.,درع
+Around me,HAS PICTURE (k_torch),torch,مشعل,torch,torch,This is a torch.,مشعل
+Around me,HAS PICTURE (k_horse),knight horse,حصان الفارس,knight horse,knight horse,This is a knight horse.,حصان الفارس
+Around me,HAS PICTURE (k_jester),jester,مهرج الملك,jester,jester,This is a jester.,مهرج الملك
+Around me,HAS PICTURE (k_cottage),cottage,كوخ,cottage,cottage,This is a cottage.,كوخ
+Around me,HAS PICTURE (k_well),well,بئر,well,well,This is a well.,بئر
+Around me,HAS PICTURE (k_banner),banner,راية,banner,banner,This is a banner.,راية
+Around me,HAS PICTURE (j_hut),hut,كوخ خشب,hut,hut,This is a hut.,كوخ خشب
+Around me,HAS PICTURE (j_bridge),bridge,جسر,bridge,bridge,This is a bridge.,جسر
+Around me,HAS PICTURE (j_totem),totem,تمثال خشب,totem,totem,This is a totem.,تمثال خشب
+Around me,HAS PICTURE (silo_f),silo,صومعة,silo,silo,This is a silo.,صومعة
+Around me,HAS PICTURE (scarecrow_f),scarecrow,فزاعة,scarecrow,scarecrow,This is a scarecrow.,فزاعة
+Around me,HAS PICTURE (haystack_f),haystack,كومة قش,haystack,haystack,This is a haystack.,كومة قش
+Around me,HAS PICTURE (trough_f),trough,معلف,trough,trough,This is a trough.,معلف
+Around me,HAS PICTURE (gate_f),farm gate,بوابة المزرعة,farm gate,farm gate,This is a farm gate.,بوابة المزرعة
+Around me,HAS PICTURE (pump_f),water pump,طلمبة مية,water pump,water pump,This is a water pump.,طلمبة مية
+Around me,HAS PICTURE (f_coop),chicken coop,بيت الفراخ,chicken coop,chicken coop,This is a chicken coop.,بيت الفراخ
+Around me,HAS PICTURE (f_barrow),wheelbarrow,عربة يد,wheelbarrow,wheelbarrow,This is a wheelbarrow.,عربة يد
+Around me,HAS PICTURE (f_water_can),watering can,مرش,watering can,watering can,This is a watering can.,مرش
+Around me,HAS PICTURE (w_cabin),snow cabin,كوخ في الثلج,snow cabin,snow cabin,This is a snow cabin.,كوخ في الثلج
+Around me,HAS PICTURE (w_skis),skis,زلاجات,skis,skis,These are skis.,زلاجات
+Around me,HAS PICTURE (w_snowballs),snowballs,كور ثلج,snowballs,snowballs,These are snowballs.,كور ثلج
+Around me,HAS PICTURE (w_iceblock),ice block,قطعة ثلج,ice block,ice block,This is an ice block.,قطعة ثلج
+Around me,HAS PICTURE (c_firestation),fire station,محطة مطافي,fire station,fire station,This is a fire station.,محطة مطافي
+Around me,HAS PICTURE (c_busstop),bus stop,موقف أتوبيس,bus stop,bus stop,This is a bus stop.,موقف أتوبيس
+Around me,HAS PICTURE (c_lamp),street lamp,عمود نور,street lamp,street lamp,This is a street lamp.,عمود نور
+Around me,HAS PICTURE (c_bench),bench,دكة,bench,bench,This is a bench.,دكة
+Around me,HAS PICTURE (c_mailbox),mailbox,صندوق بريد,mailbox,mailbox,This is a mailbox.,صندوق بريد
+Around me,HAS PICTURE (d_dune),sand dune,كثبان رملية,sand dune,sand dune,This is a sand dune.,كثبان رملية
+Around me,HAS PICTURE (d_oasis),oasis,واحة,oasis,oasis,This is an oasis.,واحة
+Around me,HAS PICTURE (d_jar),jar,جرة,jar,jar,This is a jar.,جرة
+Around me,HAS PICTURE (d_cart),wooden cart,عربة خشب,wooden cart,wooden cart,This is a wooden cart.,عربة خشب
+Around me,HAS PICTURE (d_lantern),lantern,فانوس,lantern,lantern,This is a lantern.,فانوس
+Around me,HAS PICTURE (d_babycamel),baby camel,جمل صغير,baby camel,baby camel,This is a baby camel.,جمل صغير
+Animals,NEEDS PICTURE,squirrel,سنجاب,squirrel,squirrel,This is a squirrel.,سنجاب
+Animals,NEEDS PICTURE,hedgehog,قنفذ,hedgehog,hedgehog,This is a hedgehog.,قنفذ
+Animals,NEEDS PICTURE,deer,غزال,deer,deer,This is a deer.,غزال
+Animals,NEEDS PICTURE,wolf,ذئب,wolf,wolf,This is a wolf.,ذئب
+Animals,NEEDS PICTURE,hippo,فرس النهر,hippo,hippo,This is a hippo.,فرس النهر
+Animals,NEEDS PICTURE,rhino,وحيد القرن,rhino,rhino,This is a rhino.,وحيد القرن
+Animals,NEEDS PICTURE,kangaroo,كنغر,kangaroo,kangaroo,This is a kangaroo.,كنغر
+Animals,NEEDS PICTURE,koala,كوالا,koala,koala,This is a koala.,كوالا
+Animals,NEEDS PICTURE,polar bear,دب قطبي,polar bear,polar bear,This is a polar bear.,دب قطبي
+Animals,NEEDS PICTURE,puppy,جرو,puppy,puppy,This is a puppy.,جرو
+Animals,NEEDS PICTURE,kitten,قطة صغيرة,kitten,kitten,This is a kitten.,قطة صغيرة
+Animals,NEEDS PICTURE,lamb,خروف صغير,lamb,lamb,This is a lamb.,خروف صغير
+Animals,NEEDS PICTURE,calf,عجل,calf,calf,This is a calf.,عجل
+Animals,NEEDS PICTURE,hamster,هامستر,hamster,hamster,This is a hamster.,هامستر
+Animals,NEEDS PICTURE,walrus,فظ,walrus,walrus,This is a walrus.,فظ
+Animals,NEEDS PICTURE,otter,قضاعة,otter,otter,This is an otter.,قضاعة
+Animals,NEEDS PICTURE,beaver,سمور,beaver,beaver,This is a beaver.,سمور
+Animals,NEEDS PICTURE,raccoon,راكون,raccoon,raccoon,This is a raccoon.,راكون
+Animals,NEEDS PICTURE,pelican,بجعة,pelican,pelican,This is a pelican.,بجعة
+Animals,NEEDS PICTURE,stork,لقلق,stork,stork,This is a stork.,لقلق
+Animals,NEEDS PICTURE,hummingbird,طائر طنان,hummingbird,hummingbird,This is a hummingbird.,طائر طنان
+Animals,NEEDS PICTURE,woodpecker,نقار الخشب,woodpecker,woodpecker,This is a woodpecker.,نقار الخشب
+Animals,NEEDS PICTURE,lobster,استاكوزا,lobster,lobster,This is a lobster.,استاكوزا
+Animals,NEEDS PICTURE,shrimp,جمبري,shrimp,shrimp,This is a shrimp.,جمبري
+Animals,NEEDS PICTURE,beetle,خنفساء,beetle,beetle,This is a beetle.,خنفساء
+Animals,NEEDS PICTURE,grasshopper,جندب,grasshopper,grasshopper,This is a grasshopper.,جندب
+Animals,NEEDS PICTURE,wasp,دبور,wasp,wasp,This is a wasp.,دبور
+Animals,NEEDS PICTURE,mosquito,بعوضة,mosquito,mosquito,This is a mosquito.,بعوضة
+Animals,NEEDS PICTURE,llama,لاما,llama,llama,This is a llama.,لاما
+Animals,NEEDS PICTURE,leopard,نمر مرقط,leopard,leopard,This is a leopard.,نمر مرقط
+Animals,NEEDS PICTURE,chimpanzee,شمبانزي,chimpanzee,chimpanzee,This is a chimpanzee.,شمبانزي
+Animals,NEEDS PICTURE,sloth,كسلان,sloth,sloth,This is a sloth.,كسلان
+Animals,NEEDS PICTURE,squid,حبار,squid,squid,This is a squid.,حبار
+Animals,NEEDS PICTURE,meerkat,ميركات,meerkat,meerkat,This is a meerkat.,ميركات
+Me and my world,NEEDS PICTURE,happy,سعيد,happy,happy,I feel happy.,سعيد
+Me and my world,NEEDS PICTURE,sad,حزين,sad,sad,I feel sad.,حزين
+Me and my world,NEEDS PICTURE,angry,غضبان,angry,angry,I feel angry.,غضبان
+Me and my world,NEEDS PICTURE,tired,تعبان,tired,tired,I feel tired.,تعبان
+Me and my world,NEEDS PICTURE,hungry,جعان,hungry,hungry,I feel hungry.,جعان
+Me and my world,NEEDS PICTURE,thirsty,عطشان,thirsty,thirsty,I feel thirsty.,عطشان
+Me and my world,NEEDS PICTURE,scared,خايف,scared,scared,I feel scared.,خايف
+Me and my world,NEEDS PICTURE,surprised,متفاجئ,surprised,surprised,I feel surprised.,متفاجئ
+Me and my world,NEEDS PICTURE,sleepy,نعسان,sleepy,sleepy,I feel sleepy.,نعسان
+Me and my world,NEEDS PICTURE,shy,خجول,shy,shy,I feel shy.,خجول
+Me and my world,NEEDS PICTURE,proud,فخور,proud,proud,I feel proud.,فخور
+Me and my world,NEEDS PICTURE,excited,متحمس,excited,excited,I feel excited.,متحمس
+Me and my world,NEEDS PICTURE,shoulder,كتف,shoulder,shoulder,This is a shoulder.,كتف
+Me and my world,NEEDS PICTURE,neck,رقبة,neck,neck,This is a neck.,رقبة
+Me and my world,NEEDS PICTURE,arm,دراع,arm,arm,This is an arm.,دراع
+Me and my world,NEEDS PICTURE,leg,رجل,leg,leg,This is a leg.,رجل
+Me and my world,NEEDS PICTURE,elbow,كوع,elbow,elbow,This is an elbow.,كوع
+Me and my world,NEEDS PICTURE,back,ضهر,back,back,This is a back.,ضهر
+Me and my world,NEEDS PICTURE,chin,دقن,chin,chin,This is a chin.,دقن
+Me and my world,NEEDS PICTURE,cheek,خد,cheek,cheek,This is a cheek.,خد
+Me and my world,NEEDS PICTURE,eyebrow,حاجب,eyebrow,eyebrow,This is an eyebrow.,حاجب
+Me and my world,NEEDS PICTURE,tongue,لسان,tongue,tongue,This is a tongue.,لسان
+Me and my world,NEEDS PICTURE,shorts,شورت,shorts,shorts,These are shorts.,شورت
+Me and my world,NEEDS PICTURE,skirt,جيب,skirt,skirt,This is a skirt.,جيب
+Me and my world,NEEDS PICTURE,sweater,سويتر,sweater,sweater,This is a sweater.,سويتر
+Me and my world,NEEDS PICTURE,boots,بوت,boots,boots,These are boots.,بوت
+Me and my world,NEEDS PICTURE,sandals,صندل,sandals,sandals,These are sandals.,صندل
+Me and my world,NEEDS PICTURE,t-shirt,تي شيرت,t-shirt,t-shirt,This is a t-shirt.,تي شيرت
+Me and my world,NEEDS PICTURE,coat,معطف,coat,coat,This is a coat.,معطف
+Me and my world,NEEDS PICTURE,belt,حزام,belt,belt,This is a belt.,حزام
+Me and my world,NEEDS PICTURE,aunt,عمة,aunt,aunt,This is an aunt.,عمة
+Me and my world,NEEDS PICTURE,cousin,ابن العم,cousin,cousin,This is a cousin.,ابن العم
+Me and my world,NEEDS PICTURE,twins,توأم,twins,twins,These are twins.,توأم
+Me and my world,NEEDS PICTURE,neighbour,جار,neighbour,neighbour,This is a neighbour.,جار
+Me and my world,NEEDS PICTURE,baker,خباز,baker,baker,This is a baker.,خباز
+Me and my world,NEEDS PICTURE,dentist,دكتور أسنان,dentist,dentist,This is a dentist.,دكتور أسنان
+Me and my world,NEEDS PICTURE,mechanic,ميكانيكي,mechanic,mechanic,This is a mechanic.,ميكانيكي
+Me and my world,NEEDS PICTURE,waiter,جرسون,waiter,waiter,This is a waiter.,جرسون
+Me and my world,NEEDS PICTURE,captain,قبطان,captain,captain,This is a captain.,قبطان
+Me and my world,NEEDS PICTURE,scientist,عالم,scientist,scientist,This is a scientist.,عالم
+Me and my world,NEEDS PICTURE,astronaut,رائد فضاء,astronaut,astronaut,This is an astronaut.,رائد فضاء
+Me and my world,NEEDS PICTURE,gardener,جنايني,gardener,gardener,This is a gardener.,جنايني
+Me and my world,NEEDS PICTURE,fisherman,صياد سمك,fisherman,fisherman,This is a fisherman.,صياد سمك
+Me and my world,NEEDS PICTURE,shopkeeper,بقال,shopkeeper,shopkeeper,This is a shopkeeper.,بقال
+Me and my world,NEEDS PICTURE,tailor,خياط,tailor,tailor,This is a tailor.,خياط
+Me and my world,NEEDS PICTURE,vet,دكتور بيطري,vet,vet,This is a vet.,دكتور بيطري
+Food,NEEDS PICTURE,koshari,كشري,koshari,koshari,This is koshari.,كشري
+Food,NEEDS PICTURE,falafel,طعمية,falafel,falafel,This is a falafel.,طعمية
+Food,NEEDS PICTURE,fava beans,فول,fava beans,fava beans,These are fava beans.,فول
+Food,NEEDS PICTURE,molokhia,ملوخية,molokhia,molokhia,This is molokhia.,ملوخية
+Food,NEEDS PICTURE,feteer,فطير,feteer,feteer,This is a feteer.,فطير
+Food,NEEDS PICTURE,basbousa,بسبوسة,basbousa,basbousa,This is basbousa.,بسبوسة
+Food,NEEDS PICTURE,kunafa,كنافة,kunafa,kunafa,This is kunafa.,كنافة
+Food,NEEDS PICTURE,om ali,أم علي,om ali,om ali,This is om ali.,أم علي
+Food,NEEDS PICTURE,stuffed vine leaves,محشي,stuffed vine leaves,stuffed vine leaves,These are stuffed vine leaves.,محشي
+Food,NEEDS PICTURE,hummus,حمص,hummus,hummus,This is hummus.,حمص
+Food,NEEDS PICTURE,tahini,طحينة,tahini,tahini,This is tahini.,طحينة
+Food,NEEDS PICTURE,rice pudding,رز بلبن,rice pudding,rice pudding,This is rice pudding.,رز بلبن
+Food,NEEDS PICTURE,burger,برجر,burger,burger,This is a burger.,برجر
+Food,NEEDS PICTURE,sandwich,ساندوتش,sandwich,sandwich,This is a sandwich.,ساندوتش
+Food,NEEDS PICTURE,spaghetti,مكرونة,spaghetti,spaghetti,This is spaghetti.,مكرونة
+Food,NEEDS PICTURE,french fries,بطاطس مقلية,french fries,french fries,These are french fries.,بطاطس مقلية
+Food,NEEDS PICTURE,salad,سلطة,salad,salad,This is salad.,سلطة
+Food,NEEDS PICTURE,butter,زبدة,butter,butter,This is butter.,زبدة
+Food,NEEDS PICTURE,yogurt,زبادي,yogurt,yogurt,This is yogurt.,زبادي
+Food,NEEDS PICTURE,cake,تورتة,cake,cake,This is a cake.,تورتة
+Food,NEEDS PICTURE,chocolate,شوكولاتة,chocolate,chocolate,This is chocolate.,شوكولاتة
+Food,NEEDS PICTURE,jam,مربى,jam,jam,This is jam.,مربى
+Food,NEEDS PICTURE,sugar,سكر,sugar,sugar,This is sugar.,سكر
+Food,NEEDS PICTURE,salt,ملح,salt,salt,This is salt.,ملح
+Food,NEEDS PICTURE,tea,شاي,tea,tea,This is tea.,شاي
+Food,NEEDS PICTURE,lemonade,ليمونادة,lemonade,lemonade,This is lemonade.,ليمونادة
+Food,NEEDS PICTURE,cereal,كورن فليكس,cereal,cereal,This is cereal.,كورن فليكس
+Food,NEEDS PICTURE,nuts,مكسرات,nuts,nuts,These are nuts.,مكسرات
+Food,NEEDS PICTURE,peanuts,فول سوداني,peanuts,peanuts,These are peanuts.,فول سوداني
+Food,NEEDS PICTURE,spinach,سبانخ,spinach,spinach,This is spinach.,سبانخ
+Food,NEEDS PICTURE,zucchini,كوسة,zucchini,zucchini,This is a zucchini.,كوسة
+Food,NEEDS PICTURE,cabbage,كرنب,cabbage,cabbage,This is cabbage.,كرنب
+Food,NEEDS PICTURE,cauliflower,قرنبيط,cauliflower,cauliflower,This is cauliflower.,قرنبيط
+Food,NEEDS PICTURE,okra,بامية,okra,okra,This is okra.,بامية
+Food,NEEDS PICTURE,green beans,فاصوليا,green beans,green beans,These are green beans.,فاصوليا
+Food,NEEDS PICTURE,radish,فجل,radish,radish,This is a radish.,فجل
+Food,NEEDS PICTURE,grapefruit,جريب فروت,grapefruit,grapefruit,This is a grapefruit.,جريب فروت
+Food,NEEDS PICTURE,tangerine,يوسفي,tangerine,tangerine,This is a tangerine.,يوسفي
+Food,NEEDS PICTURE,guava,جوافة,guava,guava,This is a guava.,جوافة
+Food,NEEDS PICTURE,lime,ليمون أخضر,lime,lime,This is a lime.,ليمون أخضر
+Food,NEEDS PICTURE,pancake,فطيرة حلوة,pancake,pancake,This is a pancake.,فطيرة حلوة
+Food,NEEDS PICTURE,popcorn,فشار,popcorn,popcorn,This is a popcorn.,فشار
+Food,NEEDS PICTURE,sausage,سجق,sausage,sausage,This is a sausage.,سجق
+Food,NEEDS PICTURE,tuna,تونة,tuna,tuna,This is a tuna.,تونة
+Food,NEEDS PICTURE,lentil soup,شوربة عدس,lentil soup,lentil soup,This is a lentil soup.,شوربة عدس
+Food,NEEDS PICTURE,mango juice,عصير مانجا,mango juice,mango juice,This is a mango juice.,عصير مانجا
+My home and my city,NEEDS PICTURE,door,باب,door,door,This is a door.,باب
+My home and my city,NEEDS PICTURE,window,شباك,window,window,This is a window.,شباك
+My home and my city,NEEDS PICTURE,sofa,كنبة,sofa,sofa,This is a sofa.,كنبة
+My home and my city,NEEDS PICTURE,kitchen,مطبخ,kitchen,kitchen,This is a kitchen.,مطبخ
+My home and my city,NEEDS PICTURE,bathroom,حمام,bathroom,bathroom,This is a bathroom.,حمام
+My home and my city,NEEDS PICTURE,bedroom,أوضة النوم,bedroom,bedroom,This is a bedroom.,أوضة النوم
+My home and my city,NEEDS PICTURE,stairs,سلم,stairs,stairs,These are stairs.,سلم
+My home and my city,NEEDS PICTURE,roof,سطح,roof,roof,This is a roof.,سطح
+My home and my city,NEEDS PICTURE,fridge,تلاجة,fridge,fridge,This is a fridge.,تلاجة
+My home and my city,NEEDS PICTURE,oven,فرن,oven,oven,This is an oven.,فرن
+My home and my city,NEEDS PICTURE,lamp,أباجورة,lamp,lamp,This is a lamp.,أباجورة
+My home and my city,NEEDS PICTURE,carpet,سجادة,carpet,carpet,This is a carpet.,سجادة
+My home and my city,NEEDS PICTURE,mirror,مراية,mirror,mirror,This is a mirror.,مراية
+My home and my city,NEEDS PICTURE,curtain,ستارة,curtain,curtain,This is a curtain.,ستارة
+My home and my city,NEEDS PICTURE,key,مفتاح,key,key,This is a key.,مفتاح
+My home and my city,NEEDS PICTURE,cup,كوباية,cup,cup,This is a cup.,كوباية
+My home and my city,NEEDS PICTURE,plate,طبق,plate,plate,This is a plate.,طبق
+My home and my city,NEEDS PICTURE,spoon,معلقة,spoon,spoon,This is a spoon.,معلقة
+My home and my city,NEEDS PICTURE,fork,شوكة,fork,fork,This is a fork.,شوكة
+My home and my city,NEEDS PICTURE,knife,سكينة,knife,knife,This is a knife.,سكينة
+My home and my city,NEEDS PICTURE,bowl,زبدية,bowl,bowl,This is a bowl.,زبدية
+My home and my city,NEEDS PICTURE,bottle,زجاجة,bottle,bottle,This is a bottle.,زجاجة
+My home and my city,NEEDS PICTURE,pot,حلة,pot,pot,This is a pot.,حلة
+My home and my city,NEEDS PICTURE,soap,صابونة,soap,soap,This is a soap.,صابونة
+My home and my city,NEEDS PICTURE,comb,مشط,comb,comb,This is a comb.,مشط
+My home and my city,NEEDS PICTURE,bin,سلة زبالة,bin,bin,This is a bin.,سلة زبالة
+My home and my city,NEEDS PICTURE,television,تلفزيون,television,television,This is a television.,تلفزيون
+My home and my city,NEEDS PICTURE,phone,تليفون,phone,phone,This is a phone.,تليفون
+My home and my city,NEEDS PICTURE,computer,كمبيوتر,computer,computer,This is a computer.,كمبيوتر
+My home and my city,NEEDS PICTURE,pillow,مخدة,pillow,pillow,This is a pillow.,مخدة
+My home and my city,NEEDS PICTURE,blanket,بطانية,blanket,blanket,This is a blanket.,بطانية
+My home and my city,NEEDS PICTURE,chair,كرسي,chair,chair,This is a chair.,كرسي
+My home and my city,NEEDS PICTURE,garden,حديقة,garden,garden,This is a garden.,حديقة
+My home and my city,NEEDS PICTURE,park,جنينة,park,park,This is a park.,جنينة
+My home and my city,NEEDS PICTURE,zoo,حديقة الحيوان,zoo,zoo,This is a zoo.,حديقة الحيوان
+My home and my city,NEEDS PICTURE,farm,مزرعة,farm,farm,This is a farm.,مزرعة
+My home and my city,NEEDS PICTURE,beach,شاطئ,beach,beach,This is a beach.,شاطئ
+My home and my city,NEEDS PICTURE,market,سوق,market,market,This is a market.,سوق
+My home and my city,NEEDS PICTURE,mosque,جامع,mosque,mosque,This is a mosque.,جامع
+My home and my city,NEEDS PICTURE,church,كنيسة,church,church,This is a church.,كنيسة
+My home and my city,NEEDS PICTURE,library,مكتبة,library,library,This is a library.,مكتبة
+My home and my city,NEEDS PICTURE,bakery,مخبز,bakery,bakery,This is a bakery.,مخبز
+My home and my city,NEEDS PICTURE,shop,محل,shop,shop,This is a shop.,محل
+My home and my city,NEEDS PICTURE,bank,بنك,bank,bank,This is a bank.,بنك
+My home and my city,NEEDS PICTURE,airport,مطار,airport,airport,This is an airport.,مطار
+My home and my city,NEEDS PICTURE,train station,محطة قطر,train station,train station,This is a train station.,محطة قطر
+My home and my city,NEEDS PICTURE,street,شارع,street,street,This is a street.,شارع
+My home and my city,NEEDS PICTURE,traffic light,إشارة مرور,traffic light,traffic light,This is a traffic light.,إشارة مرور
+My home and my city,NEEDS PICTURE,river,نهر,river,river,This is a river.,نهر
+My home and my city,NEEDS PICTURE,sea,بحر,sea,sea,This is sea.,بحر
+My home and my city,NEEDS PICTURE,lake,بحيرة,lake,lake,This is a lake.,بحيرة
+My home and my city,NEEDS PICTURE,island,جزيرة,island,island,This is an island.,جزيرة
+My home and my city,NEEDS PICTURE,forest,غابة,forest,forest,This is a forest.,غابة
+My home and my city,NEEDS PICTURE,desert,صحرا,desert,desert,This is a desert.,صحرا
+My home and my city,NEEDS PICTURE,hill,تل,hill,hill,This is a hill.,تل
+My home and my city,NEEDS PICTURE,sky,سما,sky,sky,This is sky.,سما
+My home and my city,NEEDS PICTURE,star,نجمة,star,star,This is a star.,نجمة
+My home and my city,NEEDS PICTURE,volcano,بركان,volcano,volcano,This is a volcano.,بركان
+My home and my city,NEEDS PICTURE,cave,كهف,cave,cave,This is a cave.,كهف
+My home and my city,NEEDS PICTURE,waterfall,شلال,waterfall,waterfall,This is a waterfall.,شلال
+My home and my city,NEEDS PICTURE,balcony,بلكونة,balcony,balcony,This is a balcony.,بلكونة
+My home and my city,NEEDS PICTURE,garage,جراج,garage,garage,This is a garage.,جراج
+My home and my city,NEEDS PICTURE,lift,أسانسير,lift,lift,This is a lift.,أسانسير
+My home and my city,NEEDS PICTURE,hall,صالة,hall,hall,This is a hall.,صالة
+My home and my city,NEEDS PICTURE,toilet,تواليت,toilet,toilet,This is a toilet.,تواليت
+My home and my city,NEEDS PICTURE,shower,دش,shower,shower,This is a shower.,دش
+My home and my city,NEEDS PICTURE,bathtub,بانيو,bathtub,bathtub,This is a bathtub.,بانيو
+My home and my city,NEEDS PICTURE,washing machine,غسالة,washing machine,washing machine,This is a washing machine.,غسالة
+My home and my city,NEEDS PICTURE,vacuum cleaner,مكنسة كهربا,vacuum cleaner,vacuum cleaner,This is a vacuum cleaner.,مكنسة كهربا
+My home and my city,NEEDS PICTURE,iron,مكواة,iron,iron,This is an iron.,مكواة
+My home and my city,NEEDS PICTURE,hanger,شماعة,hanger,hanger,This is a hanger.,شماعة
+My home and my city,NEEDS PICTURE,shelf,رف,shelf,shelf,This is a shelf.,رف
+My home and my city,NEEDS PICTURE,drawer,درج,drawer,drawer,This is a drawer.,درج
+My home and my city,NEEDS PICTURE,cupboard,دولاب مطبخ,cupboard,cupboard,This is a cupboard.,دولاب مطبخ
+My home and my city,NEEDS PICTURE,school gate,بوابة المدرسة,school gate,school gate,This is a school gate.,بوابة المدرسة
+My home and my city,NEEDS PICTURE,playground,ملعب,playground,playground,This is a playground.,ملعب
+My home and my city,NEEDS PICTURE,swimming pool,حمام سباحة,swimming pool,swimming pool,This is a swimming pool.,حمام سباحة
+My home and my city,NEEDS PICTURE,cinema,سينما,cinema,cinema,This is a cinema.,سينما
+My home and my city,NEEDS PICTURE,restaurant,مطعم,restaurant,restaurant,This is a restaurant.,مطعم
+My home and my city,NEEDS PICTURE,pharmacy,صيدلية,pharmacy,pharmacy,This is a pharmacy.,صيدلية
+My home and my city,NEEDS PICTURE,supermarket,سوبر ماركت,supermarket,supermarket,This is a supermarket.,سوبر ماركت
+My home and my city,NEEDS PICTURE,police station,قسم الشرطة,police station,police station,This is a police station.,قسم الشرطة
+My home and my city,NEEDS PICTURE,post office,مكتب البريد,post office,post office,This is a post office.,مكتب البريد
+My home and my city,NEEDS PICTURE,museum,متحف,museum,museum,This is a museum.,متحف
+My home and my city,NEEDS PICTURE,stadium,استاد,stadium,stadium,This is a stadium.,استاد
+My home and my city,NEEDS PICTURE,sand,رمل,sand,sand,This is a sand.,رمل

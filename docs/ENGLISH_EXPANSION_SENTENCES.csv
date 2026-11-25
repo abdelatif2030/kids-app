@@ -1,0 +1,281 @@
+﻿level,type,english_text_to_say,note
+all,praise / help,Great job!,
+all,praise / help,Well done!,
+all,praise / help,Super!,
+all,praise / help,Excellent!,
+all,praise / help,"Wow, you did it!",
+all,praise / help,Good listening!,
+all,praise / help,Try again!,
+all,praise / help,Almost!,
+all,praise / help,Look and listen!,
+all,praise / help,Let's learn English!,
+Numbers,question,How many?,
+Numbers,plural object (said after the number),apples,
+Numbers,plural object (said after the number),balls,
+Numbers,plural object (said after the number),stars,
+Numbers,plural object (said after the number),ducks,
+Numbers,plural object (said after the number),flowers,
+Numbers,question,Show me the number.,
+Numbers,question,Which number is bigger?,
+Numbers,question,Which number is smaller?,
+Colours and shapes,phrase (word + slow + sentence),red circle,This is a red circle.
+Colours and shapes,phrase (word + slow + sentence),red square,This is a red square.
+Colours and shapes,phrase (word + slow + sentence),red triangle,This is a red triangle.
+Colours and shapes,phrase (word + slow + sentence),red star,This is a red star.
+Colours and shapes,phrase (word + slow + sentence),red heart,This is a red heart.
+Colours and shapes,phrase (word + slow + sentence),red octagon,This is a red octagon.
+Colours and shapes,phrase (word + slow + sentence),red crescent,This is a red crescent.
+Colours and shapes,phrase (word + slow + sentence),red plus,This is a red plus.
+Colours and shapes,phrase (word + slow + sentence),red semicircle,This is a red semicircle.
+Colours and shapes,phrase (word + slow + sentence),red trapezoid,This is a red trapezoid.
+Colours and shapes,phrase (word + slow + sentence),red parallelogram,This is a red parallelogram.
+Colours and shapes,phrase (word + slow + sentence),red hexagram,This is a red hexagram.
+Colours and shapes,phrase (word + slow + sentence),red drop,This is a red drop.
+Colours and shapes,phrase (word + slow + sentence),blue circle,This is a blue circle.
+Colours and shapes,phrase (word + slow + sentence),blue square,This is a blue square.
+Colours and shapes,phrase (word + slow + sentence),blue triangle,This is a blue triangle.
+Colours and shapes,phrase (word + slow + sentence),blue star,This is a blue star.
+Colours and shapes,phrase (word + slow + sentence),blue heart,This is a blue heart.
+Colours and shapes,phrase (word + slow + sentence),blue octagon,This is a blue octagon.
+Colours and shapes,phrase (word + slow + sentence),blue crescent,This is a blue crescent.
+Colours and shapes,phrase (word + slow + sentence),blue plus,This is a blue plus.
+Colours and shapes,phrase (word + slow + sentence),blue semicircle,This is a blue semicircle.
+Colours and shapes,phrase (word + slow + sentence),blue trapezoid,This is a blue trapezoid.
+Colours and shapes,phrase (word + slow + sentence),blue parallelogram,This is a blue parallelogram.
+Colours and shapes,phrase (word + slow + sentence),blue hexagram,This is a blue hexagram.
+Colours and shapes,phrase (word + slow + sentence),blue drop,This is a blue drop.
+Colours and shapes,phrase (word + slow + sentence),yellow circle,This is a yellow circle.
+Colours and shapes,phrase (word + slow + sentence),yellow square,This is a yellow square.
+Colours and shapes,phrase (word + slow + sentence),yellow triangle,This is a yellow triangle.
+Colours and shapes,phrase (word + slow + sentence),yellow star,This is a yellow star.
+Colours and shapes,phrase (word + slow + sentence),yellow heart,This is a yellow heart.
+Colours and shapes,phrase (word + slow + sentence),yellow octagon,This is a yellow octagon.
+Colours and shapes,phrase (word + slow + sentence),yellow crescent,This is a yellow crescent.
+Colours and shapes,phrase (word + slow + sentence),yellow plus,This is a yellow plus.
+Colours and shapes,phrase (word + slow + sentence),yellow semicircle,This is a yellow semicircle.
+Colours and shapes,phrase (word + slow + sentence),yellow trapezoid,This is a yellow trapezoid.
+Colours and shapes,phrase (word + slow + sentence),yellow parallelogram,This is a yellow parallelogram.
+Colours and shapes,phrase (word + slow + sentence),yellow hexagram,This is a yellow hexagram.
+Colours and shapes,phrase (word + slow + sentence),yellow drop,This is a yellow drop.
+Colours and shapes,phrase (word + slow + sentence),green circle,This is a green circle.
+Colours and shapes,phrase (word + slow + sentence),green square,This is a green square.
+Colours and shapes,phrase (word + slow + sentence),green triangle,This is a green triangle.
+Colours and shapes,phrase (word + slow + sentence),green star,This is a green star.
+Colours and shapes,phrase (word + slow + sentence),green heart,This is a green heart.
+Colours and shapes,phrase (word + slow + sentence),green octagon,This is a green octagon.
+Colours and shapes,phrase (word + slow + sentence),green crescent,This is a green crescent.
+Colours and shapes,phrase (word + slow + sentence),green plus,This is a green plus.
+Colours and shapes,phrase (word + slow + sentence),green semicircle,This is a green semicircle.
+Colours and shapes,phrase (word + slow + sentence),green trapezoid,This is a green trapezoid.
+Colours and shapes,phrase (word + slow + sentence),green parallelogram,This is a green parallelogram.
+Colours and shapes,phrase (word + slow + sentence),green hexagram,This is a green hexagram.
+Colours and shapes,phrase (word + slow + sentence),green drop,This is a green drop.
+Colours and shapes,phrase (word + slow + sentence),orange circle,This is a orange circle.
+Colours and shapes,phrase (word + slow + sentence),orange square,This is a orange square.
+Colours and shapes,phrase (word + slow + sentence),orange triangle,This is a orange triangle.
+Colours and shapes,phrase (word + slow + sentence),orange star,This is a orange star.
+Colours and shapes,phrase (word + slow + sentence),orange heart,This is a orange heart.
+Colours and shapes,phrase (word + slow + sentence),orange octagon,This is a orange octagon.
+Colours and shapes,phrase (word + slow + sentence),orange crescent,This is a orange crescent.
+Colours and shapes,phrase (word + slow + sentence),orange plus,This is a orange plus.
+Colours and shapes,phrase (word + slow + sentence),orange semicircle,This is a orange semicircle.
+Colours and shapes,phrase (word + slow + sentence),orange trapezoid,This is a orange trapezoid.
+Colours and shapes,phrase (word + slow + sentence),orange parallelogram,This is a orange parallelogram.
+Colours and shapes,phrase (word + slow + sentence),orange hexagram,This is a orange hexagram.
+Colours and shapes,phrase (word + slow + sentence),orange drop,This is a orange drop.
+Colours and shapes,phrase (word + slow + sentence),purple circle,This is a purple circle.
+Colours and shapes,phrase (word + slow + sentence),purple square,This is a purple square.
+Colours and shapes,phrase (word + slow + sentence),purple triangle,This is a purple triangle.
+Colours and shapes,phrase (word + slow + sentence),purple star,This is a purple star.
+Colours and shapes,phrase (word + slow + sentence),purple heart,This is a purple heart.
+Colours and shapes,phrase (word + slow + sentence),purple octagon,This is a purple octagon.
+Colours and shapes,phrase (word + slow + sentence),purple crescent,This is a purple crescent.
+Colours and shapes,phrase (word + slow + sentence),purple plus,This is a purple plus.
+Colours and shapes,phrase (word + slow + sentence),purple semicircle,This is a purple semicircle.
+Colours and shapes,phrase (word + slow + sentence),purple trapezoid,This is a purple trapezoid.
+Colours and shapes,phrase (word + slow + sentence),purple parallelogram,This is a purple parallelogram.
+Colours and shapes,phrase (word + slow + sentence),purple hexagram,This is a purple hexagram.
+Colours and shapes,phrase (word + slow + sentence),purple drop,This is a purple drop.
+Colours and shapes,phrase (word + slow + sentence),pink circle,This is a pink circle.
+Colours and shapes,phrase (word + slow + sentence),pink square,This is a pink square.
+Colours and shapes,phrase (word + slow + sentence),pink triangle,This is a pink triangle.
+Colours and shapes,phrase (word + slow + sentence),pink star,This is a pink star.
+Colours and shapes,phrase (word + slow + sentence),pink heart,This is a pink heart.
+Colours and shapes,phrase (word + slow + sentence),pink octagon,This is a pink octagon.
+Colours and shapes,phrase (word + slow + sentence),pink crescent,This is a pink crescent.
+Colours and shapes,phrase (word + slow + sentence),pink plus,This is a pink plus.
+Colours and shapes,phrase (word + slow + sentence),pink semicircle,This is a pink semicircle.
+Colours and shapes,phrase (word + slow + sentence),pink trapezoid,This is a pink trapezoid.
+Colours and shapes,phrase (word + slow + sentence),pink parallelogram,This is a pink parallelogram.
+Colours and shapes,phrase (word + slow + sentence),pink hexagram,This is a pink hexagram.
+Colours and shapes,phrase (word + slow + sentence),pink drop,This is a pink drop.
+Colours and shapes,phrase (word + slow + sentence),brown circle,This is a brown circle.
+Colours and shapes,phrase (word + slow + sentence),brown square,This is a brown square.
+Colours and shapes,phrase (word + slow + sentence),brown triangle,This is a brown triangle.
+Colours and shapes,phrase (word + slow + sentence),brown star,This is a brown star.
+Colours and shapes,phrase (word + slow + sentence),brown heart,This is a brown heart.
+Colours and shapes,phrase (word + slow + sentence),brown octagon,This is a brown octagon.
+Colours and shapes,phrase (word + slow + sentence),brown crescent,This is a brown crescent.
+Colours and shapes,phrase (word + slow + sentence),brown plus,This is a brown plus.
+Colours and shapes,phrase (word + slow + sentence),brown semicircle,This is a brown semicircle.
+Colours and shapes,phrase (word + slow + sentence),brown trapezoid,This is a brown trapezoid.
+Colours and shapes,phrase (word + slow + sentence),brown parallelogram,This is a brown parallelogram.
+Colours and shapes,phrase (word + slow + sentence),brown hexagram,This is a brown hexagram.
+Colours and shapes,phrase (word + slow + sentence),brown drop,This is a brown drop.
+ABC,letter + word,A is for apple.,
+ABC,big and small,"Big A, small a.",
+ABC,letter sound,A says a.,check the pronunciation by ear
+ABC,letter + word,B is for ball.,
+ABC,big and small,"Big B, small b.",
+ABC,letter sound,B says buh.,check the pronunciation by ear
+ABC,letter + word,C is for cat.,
+ABC,big and small,"Big C, small c.",
+ABC,letter sound,C says kuh.,check the pronunciation by ear
+ABC,letter + word,D is for dog.,
+ABC,big and small,"Big D, small d.",
+ABC,letter sound,D says duh.,check the pronunciation by ear
+ABC,letter + word,E is for egg.,
+ABC,big and small,"Big E, small e.",
+ABC,letter sound,E says eh.,check the pronunciation by ear
+ABC,letter + word,F is for fish.,
+ABC,big and small,"Big F, small f.",
+ABC,letter sound,F says fff.,check the pronunciation by ear
+ABC,letter + word,G is for grapes.,
+ABC,big and small,"Big G, small g.",
+ABC,letter sound,G says guh.,check the pronunciation by ear
+ABC,letter + word,H is for hat.,picture is NEW
+ABC,big and small,"Big H, small h.",
+ABC,letter sound,H says huh.,check the pronunciation by ear
+ABC,letter + word,I is for ice cream.,
+ABC,big and small,"Big I, small i.",
+ABC,letter sound,I says ih.,check the pronunciation by ear
+ABC,letter + word,J is for jellyfish.,
+ABC,big and small,"Big J, small j.",
+ABC,letter sound,J says juh.,check the pronunciation by ear
+ABC,letter + word,K is for kite.,
+ABC,big and small,"Big K, small k.",
+ABC,letter sound,K says kuh.,check the pronunciation by ear
+ABC,letter + word,L is for lion.,
+ABC,big and small,"Big L, small l.",
+ABC,letter sound,L says lll.,check the pronunciation by ear
+ABC,letter + word,M is for monkey.,
+ABC,big and small,"Big M, small m.",
+ABC,letter sound,M says mmm.,check the pronunciation by ear
+ABC,letter + word,N is for nest.,picture is NEW
+ABC,big and small,"Big N, small n.",
+ABC,letter sound,N says nnn.,check the pronunciation by ear
+ABC,letter + word,O is for orange.,
+ABC,big and small,"Big O, small o.",
+ABC,letter sound,O says oh.,check the pronunciation by ear
+ABC,letter + word,P is for pig.,
+ABC,big and small,"Big P, small p.",
+ABC,letter sound,P says puh.,check the pronunciation by ear
+ABC,letter + word,Q is for queen.,
+ABC,big and small,"Big Q, small q.",
+ABC,letter sound,Q says kwuh.,check the pronunciation by ear
+ABC,letter + word,R is for rabbit.,
+ABC,big and small,"Big R, small r.",
+ABC,letter sound,R says rrr.,check the pronunciation by ear
+ABC,letter + word,S is for sun.,
+ABC,big and small,"Big S, small s.",
+ABC,letter sound,S says sss.,check the pronunciation by ear
+ABC,letter + word,T is for tree.,
+ABC,big and small,"Big T, small t.",
+ABC,letter sound,T says tuh.,check the pronunciation by ear
+ABC,letter + word,U is for umbrella.,
+ABC,big and small,"Big U, small u.",
+ABC,letter sound,U says uh.,check the pronunciation by ear
+ABC,letter + word,V is for van.,picture is NEW
+ABC,big and small,"Big V, small v.",
+ABC,letter sound,V says vvv.,check the pronunciation by ear
+ABC,letter + word,W is for watermelon.,
+ABC,big and small,"Big W, small w.",
+ABC,letter sound,W says wuh.,check the pronunciation by ear
+ABC,letter + word,X is for xylophone.,picture is NEW
+ABC,big and small,"Big X, small x.",
+ABC,letter sound,X says ks.,check the pronunciation by ear
+ABC,letter + word,Y is for yo-yo.,picture is NEW
+ABC,big and small,"Big Y, small y.",
+ABC,letter sound,Y says yuh.,check the pronunciation by ear
+ABC,letter + word,Z is for zebra.,
+ABC,big and small,"Big Z, small z.",
+ABC,letter sound,Z says zzz.,check the pronunciation by ear
+Time and my day,question,What comes after Saturday?,
+Time and my day,question,What comes before Saturday?,
+Time and my day,sentence,Today is Saturday.,
+Time and my day,question,What comes after Sunday?,
+Time and my day,question,What comes before Sunday?,
+Time and my day,sentence,Today is Sunday.,
+Time and my day,question,What comes after Monday?,
+Time and my day,question,What comes before Monday?,
+Time and my day,sentence,Today is Monday.,
+Time and my day,question,What comes after Tuesday?,
+Time and my day,question,What comes before Tuesday?,
+Time and my day,sentence,Today is Tuesday.,
+Time and my day,question,What comes after Wednesday?,
+Time and my day,question,What comes before Wednesday?,
+Time and my day,sentence,Today is Wednesday.,
+Time and my day,question,What comes after Thursday?,
+Time and my day,question,What comes before Thursday?,
+Time and my day,sentence,Today is Thursday.,
+Time and my day,question,What comes after Friday?,
+Time and my day,question,What comes before Friday?,
+Time and my day,sentence,Today is Friday.,
+Time and my day,question,What comes after January?,
+Time and my day,question,What comes before January?,
+Time and my day,sentence,It is January.,
+Time and my day,question,What comes after February?,
+Time and my day,question,What comes before February?,
+Time and my day,sentence,It is February.,
+Time and my day,question,What comes after March?,
+Time and my day,question,What comes before March?,
+Time and my day,sentence,It is March.,
+Time and my day,question,What comes after April?,
+Time and my day,question,What comes before April?,
+Time and my day,sentence,It is April.,
+Time and my day,question,What comes after May?,
+Time and my day,question,What comes before May?,
+Time and my day,sentence,It is May.,
+Time and my day,question,What comes after June?,
+Time and my day,question,What comes before June?,
+Time and my day,sentence,It is June.,
+Time and my day,question,What comes after July?,
+Time and my day,question,What comes before July?,
+Time and my day,sentence,It is July.,
+Time and my day,question,What comes after August?,
+Time and my day,question,What comes before August?,
+Time and my day,sentence,It is August.,
+Time and my day,question,What comes after September?,
+Time and my day,question,What comes before September?,
+Time and my day,sentence,It is September.,
+Time and my day,question,What comes after October?,
+Time and my day,question,What comes before October?,
+Time and my day,sentence,It is October.,
+Time and my day,question,What comes after November?,
+Time and my day,question,What comes before November?,
+Time and my day,sentence,It is November.,
+Time and my day,question,What comes after December?,
+Time and my day,question,What comes before December?,
+Time and my day,sentence,It is December.,
+Time and my day,clock,It is 1 o'clock.,
+Time and my day,clock,It is 2 o'clock.,
+Time and my day,clock,It is 3 o'clock.,
+Time and my day,clock,It is 4 o'clock.,
+Time and my day,clock,It is 5 o'clock.,
+Time and my day,clock,It is 6 o'clock.,
+Time and my day,clock,It is 7 o'clock.,
+Time and my day,clock,It is 8 o'clock.,
+Time and my day,clock,It is 9 o'clock.,
+Time and my day,clock,It is 10 o'clock.,
+Time and my day,clock,It is 11 o'clock.,
+Time and my day,clock,It is 12 o'clock.,
+Time and my day,routine sentence,I wake up in the morning.,
+Time and my day,routine sentence,I wash my face.,
+Time and my day,routine sentence,I eat breakfast.,
+Time and my day,routine sentence,I go to school.,
+Time and my day,routine sentence,I eat lunch.,
+Time and my day,routine sentence,I play in the afternoon.,
+Time and my day,routine sentence,I eat dinner in the evening.,
+Time and my day,routine sentence,I have a bath.,
+Time and my day,routine sentence,I brush my teeth.,
+Time and my day,routine sentence,I sleep at night.,
