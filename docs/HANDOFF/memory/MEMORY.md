@@ -1,0 +1,7 @@
+- [Voice review file at the end](voice-review-file-at-the-end.md) — one listening file of all new clips, only when the owner asks
+- [Stay on Cloudflare](hosting-stay-on-cloudflare.md) — Pages + R2 chosen; Oracle trial account exists but unused
+- [Use all existing pictures](use-all-existing-pictures.md) — enrich every related level with unused art; content age-free, tiers by age
+- [Fatima voice continuity](voice-fatima-continuity.md) — voice id/settings and the new-account steps for ElevenLabs
+- [Gemini image batch](gemini-image-batch.md) — queue, helper script and Chrome steps to resume art generation
+- [ChatGPT image pipeline](chatgpt-image-pipeline.md) — ONE chat only, correct Adam/Nour reference, download+cut steps
+- [Egypt content ideas](egypt-content-ideas.md) — owner list of Egyptian places for backdrops/levels, used so far
