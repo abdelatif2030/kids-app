@@ -6,6 +6,8 @@ const S = {
   c1: ['ثلج سانت كاترين', 'St Catherine Snow'],
   c2: ['قرية الألب', 'Alps Village'],
   c3: ['قمة كليمنجارو', 'Kilimanjaro'],
+  c4: ['سانت كاترين تاني', 'Catherine Return'],
+  c5: ['قمة الألب الكبيرة', 'Grand Alps'],
   locked: ['اوصل للقمة في اللي قبله', 'Finish the race before'],
   go: ['انطلق!', 'GO!'],
   dodge: ['تفادي حلو!', 'NICE DODGE!'],
