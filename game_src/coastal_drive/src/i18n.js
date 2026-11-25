@@ -1,5 +1,5 @@
 const S = {
-  title: ['سباق الطريق الساحلي', 'Coastal Drive'],
+  title: ['عربيات الشاطئ', 'Beach Cars'],
   tagline: ['طريق سريع · زحمة · من غير فرامل', 'Highway · Traffic · No brakes'],
   play: ['يلا نسوق', 'Play'],
   garage: ['الجراج', 'Garage'],

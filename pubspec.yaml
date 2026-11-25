@@ -138,6 +138,7 @@ flutter:
     - assets/games/coastal_drive/models/Textures/
     - assets/games/coastal_drive/models/
     - assets/games/coastal_drive/art/
+    - assets/games/coastal_drive/skin/
     - assets/games/hungry_frog/
     - assets/games/frost_coil/
     - assets/games/learn_maze/

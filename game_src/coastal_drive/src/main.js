@@ -254,20 +254,20 @@ class Game {
       add(() => makeLamp(1), edge + 0.7, 45, 8);
       add(() => makeRailSegment(12), edge + 0.4, 12, 34);
       add(() => makeRailSegment(12), -(edge + 0.4), 12, 34);
-      add((i) => makeHill(15 + (i % 3) * 5, [0x3a7a2a, 0x4a8a3a, 0x2f6a24][i % 3]), (i) => edge + 48 + (i % 2) * 22, 90, 8);
+      if (false) add((i) => makeHill(15 + (i % 3) * 5, [0x3a7a2a, 0x4a8a3a, 0x2f6a24][i % 3]), (i) => edge + 48 + (i % 2) * 22, 90, 8);
       add((i) => makeBush([0x3a8a3a, 0x4a9a3a][i % 2]), (i) => edge + 3 + (i % 4) * 2, 11, 30);
       add((i) => makePalm(6 + (i % 3)), (i) => edge + 6 + (i % 3) * 3, 37, 10);
     } else if (world === 'canyon') {
-      add((i) => makeMesa(18 + (i % 3) * 8, 14 + (i % 4) * 6, 14), (i) => -(edge + 26 + (i % 3) * 14), 60, 9);
-      add((i) => makeMesa(16 + (i % 2) * 10, 12 + (i % 3) * 7, 16), (i) => edge + 24 + (i % 3) * 16, 64, 9);
+      if (false) add((i) => makeMesa(18 + (i % 3) * 8, 14 + (i % 4) * 6, 14), (i) => -(edge + 26 + (i % 3) * 14), 60, 9);
+      if (false) add((i) => makeMesa(16 + (i % 2) * 10, 12 + (i % 3) * 7, 16), (i) => edge + 24 + (i % 3) * 16, 64, 9);
       add(() => makeCactus(), (i) => (i % 2 ? 1 : -1) * (edge + 3 + (i % 5) * 1.6), 17, 26);
       add((i) => { const r = new THREE.Mesh(new THREE.DodecahedronGeometry(1 + (i % 3) * 0.6), mat(0xb8603a)); r.position.y = 0.4; const gg = new THREE.Group(); gg.add(r); return gg; }, (i) => (i % 2 ? 1 : -1) * (edge + 6 + (i % 4) * 2.5), 23, 20);
       add(() => makeLamp(1), edge + 0.7, 60, 6);
       add(() => makeRailSegment(12), edge + 0.4, 12, 34);
     } else {
       const neon = [0xff4ab8, 0x4ae8ff, 0xb84aff, 0xffd23a];
-      add((i) => makeTower(10 + (i % 3) * 4, 22 + (i % 5) * 10, 10, neon[i % 4]), (i) => -(edge + 9 + (i % 3) * 5), 16, 24);
-      add((i) => makeTower(10 + (i % 2) * 5, 20 + (i % 4) * 12, 10, neon[(i + 2) % 4]), (i) => edge + 9 + (i % 3) * 5, 17, 24);
+      if (false) add((i) => makeTower(10 + (i % 3) * 4, 22 + (i % 5) * 10, 10, neon[i % 4]), (i) => -(edge + 9 + (i % 3) * 5), 16, 24);
+      if (false) add((i) => makeTower(10 + (i % 2) * 5, 20 + (i % 4) * 12, 10, neon[(i + 2) % 4]), (i) => edge + 9 + (i % 3) * 5, 17, 24);
       add(() => makeLamp(1), edge + 0.7, 30, 12);
       add(() => makeLamp(-1), -(edge + 0.7), 30, 12);
       add(() => makeRailSegment(12), edge + 0.4, 12, 34);
@@ -500,11 +500,27 @@ class Game {
     );
   }
 
+  /** The level's painted backdrop (art/pano<N>.webp): a mirrored ring that follows the camera (the road scrolls, the scenery stays far away). */
+  _setPano(i) {
+    if (this.pano) { this.scene.remove(this.pano); this.pano.material.map.dispose(); this.pano.material.dispose(); this.pano = null; }
+    const tex = new THREE.TextureLoader().load(`${this.base}art/pano${i + 1}.webp`, () => { if (ring) ring.visible = true; });
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.wrapS = THREE.MirroredRepeatWrapping;
+    tex.repeat.set(2, 0.66);
+    tex.offset.set(0, 0.34);
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(430, 430, 230, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false, depthWrite: false }));
+    ring.visible = false;
+    ring.renderOrder = -10;
+    this.pano = ring;
+    this.scene.add(ring);
+  }
+
   startRace(i) {
     this._endRace();
     const lv = LEVELS[i];
     this.levelIndex = i;
     this._buildWorld(lv.world);
+    this._setPano(i);
     if (this.carId !== this.save.car) this._setCar(this.save.car);
     this.r = new Race({ level: i, car: this.save.car, up: this.save.up, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1 });
     this.mode = 'race';
@@ -770,11 +786,12 @@ class Game {
     for (const c of r.traffic) { const d = Math.hypot(c.x - p.x, c.s - p.s); if (d < 14 && (!near || d < near.dist)) near = { dist: d, rpm: 2600 }; }
     this.sound.engineUpdate(rpm, r.state === 'race' ? 1 : 0.3, p.speed, boost, 0, near ? { dist: near.dist * 2.8, rpm: near.rpm } : null);
     // camera: behind and above, a bit wider and lower in the nitro
-    const back = this.land ? 7.6 : 9.2;
-    const up = this.land ? 3.1 : 3.9;
+    const back = this.land ? 5.4 : 6.2;
+    const up = this.land ? 2.5 : 2.9;
     const want = new THREE.Vector3(p.x * 0.75, up - (boost ? 0.3 : 0), -p.s + back + (boost ? 0.8 : 0));
     this.camPos.lerp(want, Math.min(1, dt * (r.state === 'count' ? 2.5 : 7)));
     this.camera.position.copy(this.camPos);
+    if (this.pano) this.pano.position.set(this.camPos.x, 75, this.camPos.z);
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 1.6);
     if (this.shake > 0) this.camera.position.add(new THREE.Vector3((Math.random() - 0.5) * this.shake * 0.5, (Math.random() - 0.5) * this.shake * 0.3, 0));
     if (this.land) this.camera.lookAt(p.x * 0.85, 0.9, -p.s - 14); else this.camera.lookAt(p.x * 0.85, -0.6, -p.s - 10); // upright phone: tilt down so the road fills the screen

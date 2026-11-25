@@ -198,7 +198,7 @@ final WebGame kCoastalDrive = WebGame(
   global: 'CoastalDrive',
   storeKey: 'coastal_drive',
   minAge: 4,
-  title: () => tr2('سباق الطريق الساحلي', 'Coastal Drive'),
+  title: () => tr2('عربيات الشاطئ', 'Beach Cars'),
 );
 
 /// «لعبة الضفدع الجائع» (Hungry Frog): docs/HUNGRY_FROG.md.
