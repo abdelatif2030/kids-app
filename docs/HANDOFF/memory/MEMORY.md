@@ -5,3 +5,4 @@
 - [Gemini image batch](gemini-image-batch.md) — queue, helper script and Chrome steps to resume art generation
 - [ChatGPT image pipeline](chatgpt-image-pipeline.md) — ONE chat only, correct Adam/Nour reference, download+cut steps
 - [Egypt content ideas](egypt-content-ideas.md) — owner list of Egyptian places for backdrops/levels, used so far
+- [English + German learning worlds](english-german-learning-worlds.md) — plan, word lists, 3 exposures per word, pilot level
