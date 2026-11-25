@@ -155,6 +155,26 @@ class Game {
 
   // ---- the circuit ----------------------------------------------------------------------------------------------
 
+  /** The level's painted backdrop (art/pano<N>.webp): a mirrored ring around the circuit, its top part only (sky + landmarks). Null when the picture is missing. */
+  _panorama(roundIndex, cx, cz) {
+    this._panoTex = this._panoTex || {};
+    let tex = this._panoTex[roundIndex];
+    if (tex === undefined) {
+      tex = this._panoTex[roundIndex] = new THREE.TextureLoader().load(`${this.base}art/pano${roundIndex + 1}.webp`, undefined, undefined, () => { this._panoTex[roundIndex] = null; });
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.wrapS = THREE.MirroredRepeatWrapping;
+      tex.repeat.set(2, 0.66); // 2 mirrored copies around the ring; keep the top 66% (the road part of the picture is cut off)
+      tex.offset.set(0, 0.34);
+    }
+    if (!tex) return null;
+    const g = new THREE.CylinderGeometry(780, 780, 330, 48, 1, true);
+    const mt = new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false, depthWrite: false });
+    const cyl = new THREE.Mesh(g, mt);
+    cyl.position.set(cx, 150, cz);
+    cyl.renderOrder = -10;
+    return cyl;
+  }
+
   _buildWorld(roundIndex) {
     if (this.scene) this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
     const rd = ROUNDS[roundIndex];
@@ -175,15 +195,16 @@ class Game {
     cx /= tr.N;
     cz /= tr.N;
     this.center = { x: cx, z: cz };
-    const sea = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), mat(rd.sunset ? 0x3a7ab8 : 0x2a9ad8));
+    const GP = [[0x7cc456, 0xf0d8a0, 0x2a9ad8], [0xd9b27a, 0xe8c88a, 0x1fb5c9], [0x4f7d5a, 0x8a8aa0, 0x2a4a8a], [0xe0b868, 0xd8a858, 0x5a9ad8], [0xc9a868, 0xd8b878, 0x2a8ac8], [0x8cc460, 0xf4e0b0, 0x2a9ad8]][roundIndex] || [0x7cc456, 0xf0d8a0, 0x2a9ad8];
+    const sea = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), mat(GP[2]));
     sea.rotation.x = -Math.PI / 2;
     sea.position.set(cx, -0.4, cz);
     s.add(sea);
-    const beach = new THREE.Mesh(new THREE.CircleGeometry(380, 64), mat(0xf0d8a0));
+    const beach = new THREE.Mesh(new THREE.CircleGeometry(380, 64), mat(GP[1]));
     beach.rotation.x = -Math.PI / 2;
     beach.position.set(cx, -0.2, cz);
     s.add(beach);
-    const grass = new THREE.Mesh(new THREE.CircleGeometry(350, 64), mat(rd.sunset ? 0x7aa848 : 0x7cc456));
+    const grass = new THREE.Mesh(new THREE.CircleGeometry(350, 64), mat(GP[0]));
     grass.rotation.x = -Math.PI / 2;
     grass.position.set(cx, -0.1, cz);
     s.add(grass);
@@ -254,13 +275,15 @@ class Game {
     }
     // palms (two instanced draws), mountain islands, a lighthouse
     this._palms(tr, sideOut);
-    for (let i = 0; i < 9; i++) {
+    const pano = this._panorama(roundIndex, cx, cz);
+    if (pano) s.add(pano);
+    for (let i = 0; i < 9 && !pano; i++) {
       const a = (i / 9) * Math.PI * 2 + 0.3;
       const m = makeMountain(60 + (i % 3) * 25, 80 + (i % 4) * 30, [0x6a8a5a, 0x7a9a6a, 0x8a8a7a][i % 3]);
       m.position.set(cx + Math.cos(a) * (520 + (i % 2) * 90), -0.4, cz + Math.sin(a) * (520 + (i % 2) * 90));
       s.add(m);
     }
-    s.add(makeClouds(14, cx, cz));
+    if (!pano) s.add(makeClouds(14, cx, cz));
     // see-through catch fences in front of the crowd and the trees
     const mt = meshTexture();
     for (const side of [-1, 1]) {
@@ -286,9 +309,11 @@ class Game {
         s.add(post);
       }
     }
-    const lh = makeLighthouse();
-    lh.position.set(cx + 300, -0.2, cz - 220);
-    s.add(lh);
+    if (!pano) {
+      const lh = makeLighthouse();
+      lh.position.set(cx + 300, -0.2, cz - 220);
+      s.add(lh);
+    }
     // the riders
     this.bikes = this.race.riders.map((r, k) => {
       const P = this.bikePics;
@@ -771,7 +796,7 @@ class Game {
     const sh = this.shake * 0.25;
     this.camera.position.set(this.cam.x + (Math.random() - 0.5) * sh, this.cam.y + (Math.random() - 0.5) * sh, this.cam.z);
     this.camera.lookAt(p.x + fx * 6, 1.1, p.z + fz * 6);
-    this.camera.rotateZ(this.bikes[0].lean.rotation.z * 0.18);
+    this.camera.rotateZ(this.bikes[0].lean.rotation.z * 0.05);
     const fov = this.baseFov + Math.min(10, p.v * 0.12) + (p.boost > 0 ? 6 : 0);
     if (Math.abs(this.camera.fov - fov) > 0.1) { this.camera.fov += (fov - this.camera.fov) * Math.min(1, dt * 3); this.camera.updateProjectionMatrix(); }
     this.speedlines.style.opacity = p.boost > 0 ? '1' : p.draft > 0.5 ? '0.5' : '0';

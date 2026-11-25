@@ -7,8 +7,12 @@
 .mr-node.lock .stars{display:none}
 .mr-btn2{background:url(skin/pill_blue.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;color:#fff !important;font-weight:900;text-shadow:0 calc(var(--u)*.4) 0 #0a2a6a;padding-top:calc(var(--u)*1.2) !important}
 .mr-btn2.mr-big{background-image:url(skin/pill_orange.webp) !important}
-.mr-btn2.wood{background-image:url(skin/pill_green.webp) !important}
+.mr-btn2.wood{background-image:url(skin/pill_blue.webp) !important}
 .mr-btn2:active{transform:scale(.96)}
 .mr-dim[style*="background: none"] .mr-panel{width:calc(var(--u)*94) !important}
 
 .mr-dim[style*="background: none"]{justify-content:flex-start !important;overflow:hidden !important;padding-inline-start:calc(var(--u)*4) !important;padding-bottom:calc(var(--u)*1) !important}
+
+/* rk-pause-right: pause and result panels sit on the right so the picture behind shows */
+.mr-dim:not([style*="background: none"]){background:rgba(5,25,60,.28) !important}
+.mr-dim:not([style*="background: none"])>.mr-panel{margin-left:auto !important;margin-right:7% !important}

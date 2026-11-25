@@ -11,12 +11,12 @@ const PLAYER_VMAX = 61;
 const ACCEL = 15;
 
 export const ROUNDS = [
-  { id: 1, ar: 'كورنيش الشمس', en: 'Sunny Corniche', reverse: false, rival: 52, sunset: false, skill: 0.9 },
-  { id: 2, ar: 'طريق النخيل', en: 'Palm Road', reverse: true, rival: 55, sunset: false, skill: 0.97 },
-  { id: 3, ar: 'غروب الخليج', en: 'Bay Sunset', reverse: false, rival: 57.5, sunset: true, skill: 1.03 },
-  { id: 4, ar: 'الجائزة الكبرى', en: 'Grand Prix', reverse: true, rival: 59.5, sunset: true, skill: 1.08 },
-  { id: 5, ar: 'شاطئ الليل', en: 'Night Beach', reverse: false, rival: 60.5, sunset: true, skill: 1.1 },
-  { id: 6, ar: 'بطولة الأبطال', en: 'Champions Cup', reverse: true, rival: 61, sunset: true, skill: 1.12 },
+  { id: 1, ar: 'كورنيش الإسكندرية', en: 'Alexandria Corniche', reverse: false, rival: 52, sunset: false, skill: 0.9 },
+  { id: 2, ar: 'ساحل البحر الأحمر', en: 'Red Sea Coast', reverse: true, rival: 55, sunset: false, skill: 0.97 },
+  { id: 3, ar: 'كباري النيل', en: 'Nile Bridges', reverse: false, rival: 57.5, sunset: true, skill: 1.03 },
+  { id: 4, ar: 'هضبة الأهرامات', en: 'Giza Plateau', reverse: true, rival: 59.5, sunset: true, skill: 1.08 },
+  { id: 5, ar: 'طريق معبد الأقصر', en: 'Luxor Temple Road', reverse: false, rival: 60.5, sunset: true, skill: 1.1 },
+  { id: 6, ar: 'كأس المتحف الكبير', en: 'Grand Museum Cup', reverse: true, rival: 61, sunset: true, skill: 1.12 },
 ];
 
 export const RIDERS = [

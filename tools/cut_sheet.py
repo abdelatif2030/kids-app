@@ -38,7 +38,8 @@ im = Image.open(sheet).convert('RGB'); W, H = im.size; cw, ch = W / cols, H / ro
 for i, n in enumerate(names):
     if n == '-' or i >= cols * rows: continue
     c, r = i % cols, i // cols
-    cell = im.crop((int(c * cw), int(r * ch), int((c + 1) * cw), int((r + 1) * ch)))
+    mx, my = int(cw * 0.025), int(ch * 0.025)  # the sheets can have faint grid lines on the cell borders: stay inside them
+    cell = im.crop((int(c * cw) + mx, int(r * ch) + my, int((c + 1) * cw) - mx, int((r + 1) * ch) - my))
     spr = cut_white(cell)
     bbox = spr.getchannel('A').point(lambda v: 255 if v > 40 else 0).getbbox()
     if bbox: spr = spr.crop(bbox)
