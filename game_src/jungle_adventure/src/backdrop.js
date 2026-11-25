@@ -45,7 +45,7 @@ export class Backdrop {
     this.c = SKIES[theme] ?? SKIES.jungle;
   }
 
-  setPics(p) { this.pic = p?.['sky_' + this.theme] || null; }
+  setPics(p) { const a = p?.['sky_' + this.theme], b = p?.['sky_' + this.theme + '2']; this.pic = (a && b ? (Math.random() < 0.5 ? a : b) : a || b) || null; } // two painted skies per level, one is picked each time
 
   /** (Re)paints the layers for a screen of w x h device pixels. */
   build(w, h) {

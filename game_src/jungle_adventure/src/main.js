@@ -72,7 +72,7 @@ class Game {
     this.last = performance.now();
     // optional painted pictures (assets/games/jungle_adventure/art/*.webp); every one falls back to the code drawing
     this.pics = {};
-    loadArt(this.base, ['sky_jungle', 'sky_ruins', 'sky_temple', 'beetle', 'relic', 'adam_idle', 'adam_run1', 'adam_run2', 'adam_run3', 'adam_jump', 'adam_peak', 'adam_slide']).then((a) => {
+    loadArt(this.base, ['sky_jungle', 'sky_ruins', 'sky_temple', 'sky_jungle2', 'sky_ruins2', 'sky_temple2', 'beetle', 'relic', 'bat', 'coin', 'adam_idle', 'adam_run1', 'adam_run2', 'adam_run3', 'adam_jump', 'adam_peak', 'adam_slide']).then((a) => {
       this.pics = a; setPics(a);
       if (this.backdrop) { this.backdrop.setPics(a); this.backdrop.build(this.canvas.width, this.canvas.height); }
     });

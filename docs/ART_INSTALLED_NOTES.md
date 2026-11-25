@@ -20,3 +20,10 @@ Zips: dune_titans, rain_circuit, ball_scoop, summit_rush, rhino_summit, alien_sk
 
 Tools added: `tools/fix_checker.py` (removes a baked-in checkerboard from a skin panel), `tools/make_skin_css.py` (writes skin.css for games built on the cozy
 menu classes `.P-card/.P-logo/.P-btn/.P-lv`, links it, lists skin/art in pubspec). Gotcha fixed: an apostrophe in `'Amoora's Truck'` broke the ball_scoop build.
+
+## Second pass (same day)
+- jungle_adventure: the 3 spare backdrops are now second skies for the 3 levels (one of the two is picked at random each run); the owner's scarab replaces the beetle,
+  his bat is the bat, the emerald is the jade relic and the scarab coin is the coin (`art/beetle, bat, relic, coin`); the old `hero.webp` was removed (the key art already shows the hero).
+  Still unused: hero/girl/monkey/parrot sheets (the game keeps its own Adam run frames), totems, spikes, rope bridge, icons other than gem and coin, win screen.
+- happy_farm: `hero.webp` removed (the key art has the hero). Backdrops, hero/cast/props/win/icons sheets still unused (top-down camera; the HUD uses emoji).
+- alien_sky backdrops 2-6 and rhino_summit backdrops 4-5 are waiting for the owner's pictures (only one and three arrived).

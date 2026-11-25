@@ -735,6 +735,7 @@ export function drawCoin(ctx, x, y, t) {
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(Math.max(0.15, sx), 1);
+  if (PIC.coin) { ctx.drawImage(PIC.coin, -0.32, -0.32, 0.64, 0.64); ctx.restore(); return; } // the owner's scarab coin
   line(ctx, 0.05);
   ell(ctx, 0, 0, 0.3, 0.3, '#f5b72c');
   ell(ctx, 0, 0, 0.21, 0.21, '#ffd85a', false);
