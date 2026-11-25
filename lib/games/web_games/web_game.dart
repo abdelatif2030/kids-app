@@ -137,7 +137,7 @@ final WebGame kSplashRace = WebGame(
   global: 'SplashRace',
   storeKey: 'splash_race',
   minAge: 3,
-  title: () => tr2('سباق السباحة العجيب', 'Splash Race'),
+  title: () => tr2('سباق السباحة', 'Swim Race'),
 );
 
 /// «أم الثعلب ومغامرات العيور» (Fox Family Rescue): hop a fox mother and her cubs home (docs/FOX_FAMILY.md).

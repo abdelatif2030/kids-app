@@ -1,5 +1,5 @@
 const S = {
-  title: ['سباق السباحة العجيب', 'Splash Race'],
+  title: ['سباق السباحة', 'Swim Race'],
   round: ['الجولة', 'Round'],
   locked: ['اتأهل من الجولة اللي قبلها', 'Qualify in the round before'],
   swim: ['يلا نعوم!', 'Swim!'],

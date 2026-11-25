@@ -163,6 +163,12 @@ class Game {
     const s = (this.scene = new THREE.Scene());
     s.background = new THREE.Color(0x8fdcff);
     s.fog = new THREE.Fog(0xbfeaff, 70, 240);
+    { // the level's painted backdrop (art/pano<N>.webp): a mirrored ring that follows the camera, its water line at the pool level
+      const tex = new THREE.TextureLoader().load(`${this.base}art/pano${roundIndex + 1}.webp`, () => { ring.visible = true; });
+      tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = THREE.MirroredRepeatWrapping; tex.repeat.set(2, 0.66); tex.offset.set(0, 0.34);
+      const ring = new THREE.Mesh(new THREE.CylinderGeometry(230, 230, 160, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false }));
+      ring.visible = false; ring.renderOrder = -10; this.panoMesh = ring; s.add(ring);
+    }
     s.add(new THREE.HemisphereLight(0xf4fcff, 0x3a9ab8, 1.9));
     const sun = new THREE.DirectionalLight(0xfff8e0, 1.4);
     sun.position.set(-20, 40, 20);
@@ -591,6 +597,7 @@ class Game {
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 2);
     this.camera.position.set(this.cam.x + (Math.random() - 0.5) * this.shake * 0.3, this.cam.y, this.cam.z);
     this.camera.lookAt(this.cam.x, 0, this.cam.z - (portrait ? 8.8 : 7.2) - 7);
+    if (this.panoMesh) this.panoMesh.position.set(this.camera.position.x, 52, this.camera.position.z);
     if (this.mode !== 'race') return;
     // HUD
     const hc = this._hc;

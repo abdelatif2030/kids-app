@@ -14,12 +14,12 @@ const LEAP_T = 0.9;
 
 /** The rounds of the island tour: swimmers in, places that go on, course length and what is on it. */
 export const ROUNDS = [
-  { id: 1, ar: 'العوّامات', en: 'Floatstacles', swimmers: 12, qualify: 8, len: 250, bpm: 100, bumpers: 10, noodles: 1, walls: 1, waves: 1, slides: 1 },
-  { id: 2, ar: 'المكرونة الدوّارة', en: 'Noodle Spin', swimmers: 10, qualify: 6, len: 280, bpm: 104, bumpers: 10, noodles: 3, walls: 2, waves: 1, slides: 1 },
-  { id: 3, ar: 'جدار الموج', en: 'Wave Wall', swimmers: 8, qualify: 4, len: 300, bpm: 108, bumpers: 12, noodles: 3, walls: 3, waves: 2, slides: 2 },
-  { id: 4, ar: 'القنطرة العائمة', en: 'Floating Bridge', swimmers: 8, qualify: 4, len: 310, bpm: 110, bumpers: 12, noodles: 3, walls: 3, waves: 2, slides: 2 },
-  { id: 5, ar: 'دوامة الحلزون', en: 'Spiral Whirl', swimmers: 7, qualify: 3, len: 320, bpm: 112, bumpers: 14, noodles: 4, walls: 3, waves: 2, slides: 2 },
-  { id: 6, ar: 'النهائي', en: 'The Final', swimmers: 6, qualify: 1, len: 340, bpm: 114, bumpers: 14, noodles: 4, walls: 3, waves: 3, slides: 2 },
+  { id: 1, ar: 'أكوا بارك', en: 'Aqua Park', swimmers: 12, qualify: 8, len: 250, bpm: 100, bumpers: 10, noodles: 1, walls: 1, waves: 1, slides: 1 },
+  { id: 2, ar: 'دريم بارك', en: 'Dream Park', swimmers: 10, qualify: 6, len: 280, bpm: 104, bumpers: 10, noodles: 3, walls: 2, waves: 1, slides: 1 },
+  { id: 3, ar: 'بحيرة قارون', en: 'Qarun Lake', swimmers: 8, qualify: 4, len: 300, bpm: 108, bumpers: 12, noodles: 3, walls: 3, waves: 2, slides: 2 },
+  { id: 4, ar: 'عيون موسى', en: 'Moses Springs', swimmers: 8, qualify: 4, len: 310, bpm: 110, bumpers: 12, noodles: 3, walls: 3, waves: 2, slides: 2 },
+  { id: 5, ar: 'جزيرة أسوان', en: 'Aswan Island', swimmers: 7, qualify: 3, len: 320, bpm: 112, bumpers: 14, noodles: 4, walls: 3, waves: 2, slides: 2 },
+  { id: 6, ar: 'نهائي الأبطال', en: 'Champions Final', swimmers: 6, qualify: 1, len: 340, bpm: 114, bumpers: 14, noodles: 4, walls: 3, waves: 3, slides: 2 },
 ];
 
 export const SWIMMERS = [
