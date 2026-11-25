@@ -159,6 +159,8 @@ flutter:
     - assets/games/learn_voice/ar/
     - assets/games/learn_voice/en/
     - assets/games/summit_rush/
+    - assets/games/summit_rush/skin/
+    - assets/games/summit_rush/art/
     - assets/games/hero_tower/
     - assets/games/hero_tower/art/
     - assets/games/cloud_dash/
@@ -182,7 +184,11 @@ flutter:
     - assets/games/squad_shooter/
     - assets/games/archer_bridge/
     - assets/games/alien_sky/
+    - assets/games/alien_sky/skin/
+    - assets/games/alien_sky/art/
     - assets/games/rhino_summit/
+    - assets/games/rhino_summit/skin/
+    - assets/games/rhino_summit/art/
     - assets/games/sunset_highway/
     - assets/games/sunset_highway/skin/
     - assets/games/sunset_highway/art/
@@ -230,11 +236,14 @@ flutter:
     - assets/games/hop_world/
     - assets/games/hot_spring/
     - assets/games/fizz_runner/
+    - assets/games/fizz_runner/skin/
     - assets/games/fizz_runner/art/
     - assets/games/chomp_maze/
     - assets/games/hamster_warrior/
     - assets/games/hamster_warrior/art/
     - assets/games/ball_scoop/
+    - assets/games/ball_scoop/skin/
+    - assets/games/ball_scoop/art/
     - assets/games/ice_dragon/
     - assets/games/honey_farm/
     - assets/games/pearl_divers/

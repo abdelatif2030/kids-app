@@ -13,10 +13,10 @@ const ACCEL = 15;
 export const ROUNDS = [
   { id: 1, ar: 'كثبان الصباح', en: 'Morning Dunes', reverse: false, rival: 52, sunset: false, skill: 0.9 },
   { id: 2, ar: 'وادي الصخور', en: 'Rock Valley', reverse: true, rival: 55, sunset: false, skill: 0.97 },
-  { id: 3, ar: 'غروب الصحراء', en: 'Desert Sunset', reverse: false, rival: 57.5, sunset: true, skill: 1.03 },
-  { id: 4, ar: 'كأس التيتان', en: 'Titan Cup', reverse: true, rival: 59.5, sunset: true, skill: 1.08 },
-  { id: 5, ar: 'عاصفة الرمال', en: 'Sandstorm Run', reverse: false, rival: 60.5, sunset: true, skill: 1.1 },
-  { id: 6, ar: 'بطولة التيتان الكبرى', en: 'Titan Championship', reverse: true, rival: 61, sunset: true, skill: 1.12 },
+  { id: 3, ar: 'معبد الصخر', en: 'Rock Temple', reverse: false, rival: 57.5, sunset: false, skill: 1.03 },
+  { id: 4, ar: 'بوابة التيتان', en: 'Titan Gate', reverse: true, rival: 59.5, sunset: false, skill: 1.08 },
+  { id: 5, ar: 'معبد الملكة', en: "Queen's Temple", reverse: false, rival: 60.5, sunset: false, skill: 1.1 },
+  { id: 6, ar: 'واحة الغروب', en: 'Sunset Oasis', reverse: true, rival: 61, sunset: true, skill: 1.12 },
 ];
 
 export const RIDERS = [

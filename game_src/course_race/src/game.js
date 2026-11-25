@@ -185,7 +185,19 @@ class Game {
 
   // ---- world --------------------------------------------------------------------------------------------------------
 
+  /** The owner's painted backdrop of the level (art/pano<N>.webp): a mirrored ring around the camera. n = 0 removes it. */
+  _setPano(n) {
+    if (this.panoMesh) { this.scene.remove(this.panoMesh); this.panoMesh.material.map.dispose(); this.panoMesh.material.dispose(); this.panoMesh = null; }
+    if (!n) return;
+    const tex = new THREE.TextureLoader().load(`${this.base}art/pano${n}.webp`, () => { if (this.panoMesh && this.panoMesh.material.map === tex) this.panoMesh.visible = true; });
+    tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = THREE.MirroredRepeatWrapping; tex.repeat.set(2, 0.66); tex.offset.set(0, 0.34);
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(300, 300, 240, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false }));
+    ring.visible = false; ring.renderOrder = -10; this.panoMesh = ring; this.scene.add(ring);
+  }
+  _followPano() { if (this.panoMesh) this.panoMesh.position.set(this.camera.position.x, this.camera.position.y + 60, this.camera.position.z); }
+
   _buildWorld(race) {
+    this._setPano(race.theme === 'rhino' ? (race.round % 3) + 1 : 1);
     for (const c of [...this.world.children]) this.world.remove(c);
     for (const c of [...this.actors.children]) this.actors.remove(c);
     this.objs = new Map();
@@ -396,6 +408,7 @@ class Game {
     this.clock += dt;
     if (this.mode === 'play' && !this.paused && this.race) this._update(dt);
     this._render(dt);
+    this._followPano();
   }
 
   _update(dt) {

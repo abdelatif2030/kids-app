@@ -1,0 +1,4 @@
+/* Snow race skin: the owner's pictures (skin/*.webp) on the title and the buttons. Shapes keep their size; only the look changes. */
+.sr-logo{color:#fff !important;background:url(skin/ribbon.webp) center/100% 100% no-repeat;padding:calc(var(--u)*2.6) calc(var(--u)*9) calc(var(--u)*3.4) !important;-webkit-text-stroke:calc(var(--u)*.8) #1a4a88;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.5) 0 #1a4a88;white-space:nowrap}
+.sr-btn{background:url(skin/pill_orange.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;text-shadow:0 calc(var(--u)*.4) 0 #7a3a0a;padding-top:calc(var(--u)*2.4) !important;padding-bottom:calc(var(--u)*1.4) !important}
+.sr-btn:active{transform:scale(.96)}

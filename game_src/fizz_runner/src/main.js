@@ -131,7 +131,19 @@ class Game {
     this.sideL = []; this.sideR = [];
   }
 
+  /** The owner's painted backdrop of the level (art/pano<N>.webp): a mirrored ring around the camera. n = 0 removes it. */
+  _setPano(n) {
+    if (this.panoMesh) { this.scene.remove(this.panoMesh); this.panoMesh.material.map.dispose(); this.panoMesh.material.dispose(); this.panoMesh = null; }
+    if (!n) return;
+    const tex = new THREE.TextureLoader().load(`${this.base}art/pano${n}.webp`, () => { if (this.panoMesh && this.panoMesh.material.map === tex) this.panoMesh.visible = true; });
+    tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = THREE.MirroredRepeatWrapping; tex.repeat.set(2, 0.66); tex.offset.set(0, 0.34);
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(300, 300, 240, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false }));
+    ring.visible = false; ring.renderOrder = -10; this.panoMesh = ring; this.scene.add(ring);
+  }
+  _followPano() { if (this.panoMesh) this.panoMesh.position.set(this.camera.position.x, this.camera.position.y + 60, this.camera.position.z); }
+
   _look(envId) {
+    this._setPano((this.envIdx || 0) % 6 + 1);
     const L = LOOKS[envId];
     this.scene.background = new THREE.Color(L.sky); this.scene.fog = new THREE.Fog(L.fog, 50, 190);
     this.road.material = M(L.ground);
@@ -251,7 +263,7 @@ class Game {
       h('button', { class: 'fz-btn alt', onclick: () => this.start(this.envIdx) }, '🔄 ', I.t('restart')), won && this.envIdx < 5 ? h('button', { class: 'fz-btn', onclick: () => this.start(this.envIdx + 1) }, '▶ ', I.t('play')) : null, h('button', { class: 'fz-btn dark', onclick: () => this.showMenu() }, '🏠 ', I.t('home')))));
   }
 
-  _frame() { const now = performance.now(); const dt = Math.min(0.05, (now - this.last) / 1000); this.last = now; this.clock += dt; if (this.mode === 'play' && !this.paused && this.run) this._update(dt); this._render(dt); }
+  _frame() { const now = performance.now(); const dt = Math.min(0.05, (now - this.last) / 1000); this.last = now; this.clock += dt; if (this.mode === 'play' && !this.paused && this.run) this._update(dt); this._render(dt); this._followPano(); }
 
   _update(dt) {
     const r = this.run;

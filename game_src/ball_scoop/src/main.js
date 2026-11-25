@@ -13,7 +13,7 @@ import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 
 const S = {
-  title: ['شاحنة عمورة', 'Amoora's Truck'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
+  title: ['شاحنة عمورة', "Amoora's Truck"], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
   next: ['المرحلة الجاية', 'Next level'], level: ['المرحلة', 'LEVEL'], goal: ['الهدف', 'GOAL'], play: ['يلا نلعب', 'Play'], levels: ['المراحل', 'Levels'],
   how: ['اسحب يمين وشمال — جمّع الكور، اعدّي من البوابات، واتفادى الحيطان', 'Drag left and right: scoop balls, pass gates, dodge walls'],
   bank: ['البنك الكبير', 'The giant bank'], coins: ['عملات', 'coins'], shop: ['المتجر', 'Shop'], max: ['أقصى', 'MAX'], locked: ['خلّص المرحلة اللي قبلها', 'Finish the level before'],
@@ -111,7 +111,7 @@ class Game {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x9fe0ff);
     this.scene.fog = new THREE.Fog(0x9fe0ff, 45, 140);
-    this.camera = new THREE.PerspectiveCamera(60, 1, 0.3, 300);
+    this.camera = new THREE.PerspectiveCamera(60, 1, 0.3, 420);
     this.hemi = new THREE.HemisphereLight(0xffffff, 0xd8a868, 1.7); this.scene.add(this.hemi);
     const sun = new THREE.DirectionalLight(0xffffff, 1.1); sun.position.set(-10, 30, -10); this.scene.add(sun);
     this.world = new THREE.Group(); this.scene.add(this.world);
@@ -142,7 +142,19 @@ class Game {
   hint(text, ms = 3000) { if (!this.hintEl) return; this.hintEl.textContent = text; this.hintEl.classList.add('show'); clearTimeout(this._ht); this._ht = setTimeout(() => this.hintEl && this.hintEl.classList.remove('show'), ms); }
 
   // ---------------------------------------------------------------- world
+  /** The owner's painted backdrop of the level (art/pano<N>.webp): a mirrored ring around the camera. n = 0 removes it. */
+  _setPano(n) {
+    if (this.panoMesh) { this.scene.remove(this.panoMesh); this.panoMesh.material.map.dispose(); this.panoMesh.material.dispose(); this.panoMesh = null; }
+    if (!n) return;
+    const tex = new THREE.TextureLoader().load(`${this.base}art/pano${n}.webp`, () => { if (this.panoMesh && this.panoMesh.material.map === tex) this.panoMesh.visible = true; });
+    tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = THREE.MirroredRepeatWrapping; tex.repeat.set(2, 0.66); tex.offset.set(0, 0.34);
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(300, 300, 240, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false }));
+    ring.visible = false; ring.renderOrder = -10; this.panoMesh = ring; this.scene.add(ring);
+  }
+  _followPano() { if (this.panoMesh) this.panoMesh.position.set(this.camera.position.x, this.camera.position.y + 60, this.camera.position.z); }
+
   _buildWorld(run) {
+    this._setPano(Math.min(6, Math.floor(run.level / 5) + 1));
     for (const c of [...this.world.children]) { this.world.remove(c); c.traverse?.((o) => { if (o.isInstancedMesh) o.dispose(); }); }
     if (this.truck) this.scene.remove(this.truck);
     const th = THEME[run.theme];
@@ -450,6 +462,7 @@ class Game {
       this.camera.position.set(this.camX + sh, T.y * 0.6 + cy, zc - cz);
       this.camera.lookAt(this.camX * 0.5, ly, lz);
     }
+    this._followPano();
     this.renderer.render(this.scene, this.camera);
     this.cpuMs = (this.cpuMs || 0) * 0.95 + (performance.now() - t0) * 0.05;
     if (play) this._hud();
