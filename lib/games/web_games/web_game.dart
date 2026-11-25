@@ -409,7 +409,7 @@ final WebGame kBallScoop = WebGame(
   global: 'BallScoop',
   storeKey: 'ball_scoop',
   minAge: 4,
-  title: () => tr2('شاحنة عمورة', 'Amoora's Truck'),
+  title: () => tr2('شاحنة عمورة', "Amoora's Truck"),
 );
 
 /// «الهامستر المحارب» (Hamster Warrior).
