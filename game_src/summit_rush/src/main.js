@@ -140,6 +140,13 @@ class Game {
     if (this.world) { this.scene.remove(this.world); this.world.traverse((o) => { if (o.geometry) o.geometry.dispose(); }); }
     const w = (this.world = new THREE.Group());
     this.scene.add(w);
+    if (this.panoMesh) { this.scene.remove(this.panoMesh); this.panoMesh.material.map.dispose(); this.panoMesh.material.dispose(); }
+    { // the race's painted backdrop (art/pano<N>.webp): a mirrored ring that follows the camera
+      const tex = new THREE.TextureLoader().load(`${this.base}art/pano${((course.id - 1) % 3) + 1}.webp`, () => { ring.visible = true; });
+      tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = THREE.MirroredRepeatWrapping; tex.repeat.set(2, 0.66); tex.offset.set(0, 0.34);
+      const ring = new THREE.Mesh(new THREE.CylinderGeometry(300, 300, 240, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false }));
+      ring.visible = false; ring.renderOrder = -10; this.panoMesh = ring; this.scene.add(ring);
+    }
     const len = course.len + 120;
     const tilt = Math.atan(SLOPE);
     const plen = len / Math.cos(tilt);
@@ -602,6 +609,7 @@ class Game {
     this.camera.position.copy(this.camPos);
     if (this.shake > 0) { this.shake -= dt; this.camera.position.x += (Math.random() - 0.5) * this.shake * 0.5; this.camera.position.y += (Math.random() - 0.5) * this.shake * 0.4; }
     this.camera.lookAt(me.x * 0.75, my + (port ? 1.2 : 1.4), -me.s - 7);
+    if (this.panoMesh) this.panoMesh.position.set(this.camera.position.x, this.camera.position.y + 60, this.camera.position.z);
     const fovWant = (port ? 62 : 50) + (me.boost > 0 || me.wind > 0 ? 6 : 0);
     if (Math.abs(this.camera.fov - fovWant) > 0.05) { this.camera.fov += (fovWant - this.camera.fov) * Math.min(1, dt * 4); this.camera.updateProjectionMatrix(); }
     // sun follows

@@ -219,7 +219,7 @@ final WebGame kSummitRush = WebGame(
   global: 'SummitRush',
   storeKey: 'summit_rush',
   minAge: 4,
-  title: () => tr2('سباق القمة', 'Summit Rush'),
+  title: () => tr2('سباق التلج', 'Snow Race'),
 );
 
 /// «طريق التنين الجليدي» (Frost Coil): a snowy ice-path puzzle, from the owner's video (docs/FROST_COIL.md).
