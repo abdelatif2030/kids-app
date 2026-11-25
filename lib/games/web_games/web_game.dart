@@ -19,7 +19,10 @@ class WebGame {
   /// For a rebuilt LEARNING game: the old game id, so its learning star and progress stay the same
   /// (`GameRewards`, `ProgressStore`). Null for the fun games (no learning stars).
   final String? learnId;
-  const WebGame({required this.id, required this.folder, required this.global, required this.storeKey, required this.minAge, required this.title, this.learnId});
+
+  /// The language a learning game teaches ('en' = «English with Rehlaty»); null = the Arabic world. Passed to the page as `learnLang`.
+  final String? learnLang;
+  const WebGame({required this.id, required this.folder, required this.global, required this.storeKey, required this.minAge, required this.title, this.learnId, this.learnLang});
 
   bool get isLearning => learnId != null;
 
@@ -744,6 +747,19 @@ final WebGame kLearnLetters = WebGame(
   learnId: 'letter_fishing',
 );
 
+/// «تعلّم الإنجليزي» (English with Rehlaty): the same learning world, English levels: the child hears an English word (recorded voice pack)
+/// and taps what it means. Opened from the language chooser of the learning games; not in the Arabic games list.
+final WebGame kLearnEnglish = WebGame(
+  id: 'learn_english',
+  folder: 'learn_letters',
+  global: 'LearnLetters',
+  storeKey: 'learn_english',
+  minAge: 2,
+  title: () => tr2('تعلّم الإنجليزي', 'Learn English'),
+  learnId: 'english_world',
+  learnLang: 'en',
+);
+
 /// «الحساب والعدّ» (Counting at the Market): get N apples counted aloud, and count what is in the basket.
 final WebGame kLearnCounting = WebGame(
   id: 'learn_counting',
@@ -778,7 +794,7 @@ final WebGame kLearnAnimals = WebGame(
 );
 
 /// Rebuilt learning games, by their old game id.
-final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay, kLearnLadders, kLearnBall, kLearnPattern, kLearnLetters, kLearnCounting, kLearnShapes, kLearnAnimals]) g.learnId!: g};
+final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay, kLearnLadders, kLearnBall, kLearnPattern, kLearnLetters, kLearnCounting, kLearnShapes, kLearnAnimals, kLearnEnglish]) g.learnId!: g};
 
 /// Lets the screen ask the running game page to step back INSIDE the game first (owner 2026-11-22): the view sets [tryBack] while it is alive.
 /// It answers true when the page handled it (paused, returned to the game's menu or level list) and false when the game is at its main menu.

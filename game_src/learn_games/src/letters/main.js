@@ -19,7 +19,8 @@ const SEAM_X = 14.5;
 import { shapeGeo } from '../kit/shapes3d.js';
 import { colorOf } from './colors.js';
 import { NUMBERS } from '../kit/words.js';
-import { LEVELS, ALL_LEVELS, TOPIC_LEVELS, LevelPlay, levelsFor, cheer } from './levels.js';
+import { LEVELS, ALL_LEVELS, EVERY_LEVEL, ARABIC_LEVELS, TOPIC_LEVELS, LevelPlay, levelsFor, cheer } from './levels.js';
+import { EN_LEVELS } from '../english/levels.js';
 import { FreshMemory } from './fresh.js';
 import { themeForWorld } from '../kit/themes.js';
 import { ROUNDS } from './sim.js';
@@ -529,9 +530,14 @@ class Game {
     if (!this._ageKnown()) { this._chooseAge(() => this._startPage()); return; }
     const want = this.sh.cfg && this.sh.cfg.level;
     if (this.sh.cfg) this.sh.cfg.level = null; // only the first time: back to the list afterwards
-    if (want && ALL_LEVELS.some((l) => l.id === want)) this._enter(want);
+    if (want && EVERY_LEVEL.some((l) => l.id === want)) this._enter(want);
     else this._levels();
   }
+
+  /** True while the child learns English (the chooser in the app passes learnLang 'en'); the Arabic world is untouched. */
+  _learnEn() { return !!(this.sh.cfg && this.sh.cfg.learnLang === 'en'); }
+  /** The levels of the language being learned. */
+  _list() { return this._learnEn() ? EN_LEVELS : ARABIC_LEVELS; }
 
   _levels() {
     const sh = this.sh;
@@ -543,16 +549,17 @@ class Game {
     sh.sound.energy = 0;
     sh.layer.append(h('div', { class: 'lk-top' }, sh.backBtn(), h('span'), sh.soundBtn()));
     const unlocked = Infinity; // every level is open: the child chooses any of them
-    const list = levelsFor(sh.age);
+    const list = this._learnEn() ? EN_LEVELS : levelsFor(sh.age);
     const tiles = list.map((lv, i) => {
       const locked = i + 1 > unlocked;
       const done = !!this.save.lw.done[lv.id];
       return h('button', {
         class: `lw-tile${locked ? ' lock' : ''}${done ? ' done' : ''}`, 'aria-label': lv.ar, disabled: locked || null,
         onclick: () => { sh.sound.play('tap'); this._enter(lv.id); },
-      }, h('i', {}, locked ? '🔒' : lv.emoji), h('b', {}, sh.T.num(i + 1)), h('span', {}, lv.ar), done ? h('u', {}, '⭐') : null);
+      }, h('i', {}, locked ? '🔒' : lv.emoji), h('b', {}, this._learnEn() ? String(i + 1) : sh.T.num(i + 1)), h('span', {}, lv.ar), done ? h('u', {}, '⭐') : null);
     });
-    const oldCard = h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.18)' }, h('div', { class: 'lw-card' }, h('div', { class: 'lw-title' }, sh.t('pick')), h('div', { class: 'lw-grid' }, tiles)));
+    const oldCard = h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.18)' }, h('div', { class: `lw-card${this._learnEn() ? ' lw-en' : ''}` }, h('div', { class: 'lw-title' }, this._learnEn() ? 'Pick a game 🎧' : sh.t('pick')), h('div', { class: 'lw-grid' }, tiles)));
+    if (this._learnEn()) { sh.layer.append(oldCard); this.owl.act('cheer'); this.owl.look(0); return; } // English: its own simple list of levels
     // the owner's picture of the levels page (2026-11-13): shown when its file is there, otherwise the card above
     const topBar = sh.layer.querySelector('.lk-top');
     const img = new Image();
@@ -630,16 +637,16 @@ class Game {
     const sh = this.sh;
     if (this.st.mode !== 'menu') return;
     const en = sh.T.lang === 'en';
-    const idx = ALL_LEVELS.findIndex((l) => l.id === this.save.lw.last);
-    const next = ALL_LEVELS[(idx + 1) % ALL_LEVELS.length];
-    const last = ALL_LEVELS[idx];
+    const idx = this._list().findIndex((l) => l.id === this.save.lw.last);
+    const next = this._list()[(idx + 1) % this._list().length];
+    const last = this._list()[idx];
     if (!last) return;
     const box = h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.45);z-index:30' },
       h('div', { class: 'lw-card' },
         h('div', { class: 'lw-title' }, en ? 'Welcome back!' : 'أهلاً بيك تاني!'),
         h('div', { class: 'lw-sub' }, en ? `Last time: ${last.ar}` : `آخر مرة لعبت: ${last.ar}`),
         h('button', { class: 'lw-choice', onclick: () => { box.remove(); sh.sound.play('tap'); this._enter(next.id); } }, en ? `▶ Continue: ${next.ar}` : `▶ كمّل: ${next.ar}`),
-        h('button', { class: 'lw-choice alt', onclick: () => { box.remove(); sh.sound.play('tap'); this._enter(ALL_LEVELS[0].id); } }, en ? '↺ Start from the beginning' : '↺ ابدأ من الأول'),
+        h('button', { class: 'lw-choice alt', onclick: () => { box.remove(); sh.sound.play('tap'); this._enter(this._list()[0].id); } }, en ? '↺ Start from the beginning' : '↺ ابدأ من الأول'),
         h('button', { class: 'lw-moreclose', onclick: () => box.remove() }, en ? 'Choose a level' : 'هاختار مستوى')));
     sh.layer.append(box);
   }
@@ -650,10 +657,10 @@ class Game {
     const en = sh.T.lang === 'en';
     const lw = this.save.lw;
     const hist = lw.history || [];
-    const done = ALL_LEVELS.filter((l) => lw.done[l.id]).length;
+    const done = this._list().filter((l) => lw.done[l.id]).length;
     const stars = hist.reduce((a, x) => a + (x.s || 0), 0);
     const rows = [...hist].reverse().slice(0, 30).map((x) => {
-      const lv = ALL_LEVELS.find((l) => l.id === x.l);
+      const lv = EVERY_LEVEL.find((l) => l.id === x.l);
       const d = new Date(x.t);
       return h('div', { class: 'lw-hrow' },
         h('b', {}, `${lv ? lv.emoji : ''} ${lv ? lv.ar : x.l}  ${'⭐'.repeat(x.s || 1)}`),
@@ -664,8 +671,8 @@ class Game {
       h('div', { class: 'lw-card lw-report' },
         h('div', { class: 'lw-title' }, en ? 'My report' : 'تقريري'),
         h('div', { class: 'lw-sub' }, en
-          ? `${hist.length} games • ${done} of ${ALL_LEVELS.length} levels • ${stars} stars`
-          : `لعبت ${sh.T.num(hist.length)} لعبة • خلصت ${sh.T.num(done)} من ${sh.T.num(ALL_LEVELS.length)} مستوى • ${sh.T.num(stars)} نجمة`),
+          ? `${hist.length} games • ${done} of ${this._list().length} levels • ${stars} stars`
+          : `لعبت ${sh.T.num(hist.length)} لعبة • خلصت ${sh.T.num(done)} من ${sh.T.num(this._list().length)} مستوى • ${sh.T.num(stars)} نجمة`),
         rows.length ? h('div', { class: 'lw-hlist' }, rows) : h('div', { class: 'lw-sub' }, en ? 'Play a level and it will show here.' : 'العب مستوى وهيظهر هنا.'),
         h('button', { class: 'lw-moreclose', onclick: () => box.remove() }, en ? 'Close' : 'اقفل')));
     sh.layer.append(box);
@@ -759,11 +766,11 @@ class Game {
     const sh = this.sh;
     this._clearRound();
     this.levelId = levelId;
-    this.level = ALL_LEVELS.find((l) => l.id === levelId);
+    this.level = EVERY_LEVEL.find((l) => l.id === levelId);
     if (!keepSpin) this._spin = this.save.lw.spin || 0;
     // a level may name the place that fits it (the new levels: a farm for opposites, a home for manners, a city for safety...); the others turn through the places
     const fixedWorld = this.level.world ? WORLD_IDS.indexOf(this.level.world) : -1;
-    const worldIdx = fixedWorld >= 0 ? fixedWorld : Math.max(0, ALL_LEVELS.findIndex((l) => l.id === levelId)) + this._spin;
+    const worldIdx = fixedWorld >= 0 ? fixedWorld : Math.max(0, EVERY_LEVEL.findIndex((l) => l.id === levelId)) + this._spin;
     this._goWorld(worldIdx);
     this.mem.begin(levelId);
     if (/[?&]debug/.test(location.search)) window.__lw = this; // test hook: ?debug lets a tester put a round on screen (see docs/LEVELS_REPORT.md)
@@ -792,6 +799,7 @@ class Game {
    *  shows a neutral 'look' icon; levels about letters and numbers keep their own. */
   _barIcon() {
     const m = this.level && this.level.mode;
+    if (m === 'en') return '🔊';
     return ['pick', 'color', 'shape', 'animal', 'habit', 'word'].includes(m) ? '👀' : this.level.emoji;
   }
 
@@ -806,6 +814,7 @@ class Game {
     this.st.setPicks([...this.opts.values()], (id) => this._tap(id));
     this.st.focus = null;
     this.signText.textContent = r.prompt;
+    this.signText.style.direction = r.lang === 'en' ? 'ltr' : '';
     this.sign.classList.remove('pop');
     void this.sign.offsetWidth;
     this.sign.classList.add('pop');
@@ -827,7 +836,8 @@ ead) also reads every choice aloud, one after the other, and the choice being re
     if (full && r.read && r.read.length) {
       const ids = r.options.map((o) => o.id);
       this.sh.speak([r.prompt, ...r.read], (i) => { const o = i > 0 ? this.opts.get(ids[i - 1]) : null; if (o) o.wig = 0.6; });
-    } else this.sh.speak(r.prompt);
+    } else if (r.say) this.sh.speak(full ? r.say : (r.retry || r.say)); // English: the word (a new one also slowly); after a wrong tap, slowly
+    else this.sh.speak(r.prompt);
   }
 
   _tap(id) {
@@ -872,6 +882,7 @@ ead) also reads every choice aloud, one after the other, and the choice being re
     const seq = [phrase];
     if (r.reward) seq.push(r.reward);
     this.signText.textContent = r.reward || phrase;
+    this.signText.style.direction = r.lang === 'en' && r.reward ? 'ltr' : '';
     this.signIcon.textContent = '⭐';
     this._advDone = false;
     const next = () => {
@@ -889,7 +900,7 @@ ead) also reads every choice aloud, one after the other, and the choice being re
           if (a) a.userData.jump = 0.4;
           if (i) this.sh.sound.play('note', PENTA[i % PENTA.length]);
         }, next);
-      } else this.sh.speak(seq, null, next);
+      } else this.sh.speak(r.rewardSay ? [phrase, ...r.rewardSay] : seq, null, next);
     }, 600);
     // the next question waits for the whole counting to finish: a long count (eleven apples...) takes its time; only a safety net
     this._advT = setTimeout(next, 9000 + (r.countAloud || 0) * 1700);
@@ -908,7 +919,7 @@ ead) also reads every choice aloud, one after the other, and the choice being re
     this.st.mode = 'end';
     sh.sound.setSuspense(false);
     this.sign.remove();
-    const list = ALL_LEVELS; // the twelve map levels, then the topic levels
+    const list = this._list(); // the twelve map levels, then the topic levels
     const idx = list.findIndex((l) => l.id === this.levelId);
     this.save.lw.done[this.levelId] = true;
     this.save.lw.unlocked = Math.max(this.save.lw.unlocked || 1, idx + 2);
@@ -972,7 +983,7 @@ ead) also reads every choice aloud, one after the other, and the choice being re
     const en = sh.T.lang === 'en';
     const done = this.save.lw.done || {};
     const best = this.save.lw.best || {};
-    const tiles = ALL_LEVELS.map((lv, i) => h('button', {
+    const tiles = this._list().map((lv, i) => h('button', {
       class: `lw-jt${lv.id === this.levelId ? ' here' : ''}${done[lv.id] ? ' done' : ''}`, title: lv.ar, 'aria-label': lv.ar,
       onclick: () => { sh.sound.play('tap'); this._closeJump(); clearTimeout(this._endT); if (sh.voice && sh.voice.stop) sh.voice.stop(); this._enter(lv.id); },
     }, h('i', {}, lv.emoji), h('b', {}, sh.T.num(i + 1)), best[lv.id] ? h('u', {}, '★'.repeat(best[lv.id])) : null));
@@ -1338,6 +1349,8 @@ const CSS = `
 .lw-fade.on{opacity:1}
 .lw-tile:focus-visible{outline:calc(var(--u)*.8) solid #6a3ad0;outline-offset:calc(var(--u)*.6)}
 @media (max-aspect-ratio:1/1){.lw-grid{grid-template-columns:repeat(3,1fr)}}
+.lw-en{direction:ltr}.lw-en .lw-grid{grid-template-columns:repeat(6,1fr)}.lw-en .lw-tile span{font-size:calc(var(--u)*2.7)}
+@media (max-aspect-ratio:1/1){.lw-en .lw-grid{grid-template-columns:repeat(3,1fr)}}
 `;
 
 const api = {

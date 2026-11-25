@@ -110,3 +110,110 @@ class _LearningGamesScreenState extends State<LearningGamesScreen> {
     );
   }
 }
+
+
+/// What the child learns (the first question of the learning games): a language per card. Adding German or French later = one more entry here
+/// and its levels in the page; the Arabic world keeps everything that existed before.
+class LearnLanguage {
+  final String id;
+  final String label;
+  final String sub;
+  final String big;
+  final Color color;
+  const LearnLanguage(this.id, this.label, this.sub, this.big, this.color);
+}
+
+const List<LearnLanguage> kLearnLanguages = [
+  LearnLanguage('ar', 'عربي', 'الحروف والأرقام والأشكال والمزيد', 'أ', Color(0xFFFF8A3D)),
+  LearnLanguage('en', 'English', 'Hear it, find it, say it', 'A', Color(0xFF3D8BFF)),
+];
+
+/// «عايز تتعلم إيه؟»: the child picks Arabic (the whole learning world as it was) or English (the English levels).
+class LearnLanguageGate extends StatefulWidget {
+  final ChildProfile child;
+  final VoidCallback? onBack;
+  const LearnLanguageGate({super.key, required this.child, this.onBack});
+
+  @override
+  State<LearnLanguageGate> createState() => _LearnLanguageGateState();
+}
+
+class _LearnLanguageGateState extends State<LearnLanguageGate> {
+  bool _arabic = false;
+
+  void _pick(String id) {
+    if (id == 'ar') {
+      setState(() => _arabic = true);
+    } else if (id == 'en') {
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => learnWebGameScreen(kLearnEnglish, widget.child.id, widget.child.age)));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_arabic) return LearningGamesScreen(key: const ValueKey('games_hub'), child: widget.child, onBack: widget.onBack);
+    return Scaffold(
+      key: const ValueKey('learn_language_gate'),
+      body: Container(
+        decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF9BDCFF), Color(0xFFFFF1C9)])),
+        child: SafeArea(
+          child: Stack(children: [
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  const Text('عايز تتعلم إيه؟', textAlign: TextAlign.center, style: TextStyle(fontSize: 34, fontWeight: FontWeight.w900, color: Color(0xFF3A2A6A))),
+                  const Text('What do you want to learn?', textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFF3A2A6A))),
+                  const SizedBox(height: 18),
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 20,
+                    runSpacing: 16,
+                    children: [for (final l in kLearnLanguages) _card(l)],
+                  ),
+                ]),
+              ),
+            ),
+            PositionedDirectional(
+              start: 8,
+              top: 8,
+              child: IconButton.filled(
+                key: const ValueKey('learn_language_back'),
+                tooltip: tr2('رجوع', 'Back'),
+                onPressed: widget.onBack ?? () => Navigator.of(context).maybePop(),
+                icon: const Icon(Icons.arrow_back_rounded),
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _card(LearnLanguage l) => Semantics(
+    button: true,
+    label: l.label,
+    child: InkWell(
+      key: ValueKey('learn_lang_${l.id}'),
+      borderRadius: BorderRadius.circular(28),
+      onTap: () => _pick(l.id),
+      child: Container(
+        width: 230,
+        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
+        decoration: BoxDecoration(
+          color: l.color,
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: Colors.white, width: 5),
+          boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 10, offset: Offset(0, 6))],
+        ),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Text(l.big, style: const TextStyle(fontSize: 84, height: 1, fontWeight: FontWeight.w900, color: Colors.white)),
+          const SizedBox(height: 6),
+          Text(l.label, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: Colors.white)),
+          const SizedBox(height: 2),
+          Text(l.sub, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+        ]),
+      ),
+    ),
+  );
+}

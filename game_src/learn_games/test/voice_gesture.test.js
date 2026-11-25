@@ -52,7 +52,7 @@ test('a refused sentence that was replaced by a newer one is NOT said late', asy
   v.say('الأسد جعان! هياكل إيه؟'); await tick();
   assert.ok(v.pending);
   v.say('أحسنت'); await tick();
-  assert.ok(!v.pending || v.pending.text === 'أحسنت');
+  assert.ok(!v.pending || v.pending.text.t === 'أحسنت');
   blocked.on = false;
   ph.tap(); await tick();
   assert.ok(!ph.made[0].played.some((s) => s.endsWith(`${clipId('الأسد جعان! هياكل إيه؟', 'ar')}.mp3`)), 'the old question is gone');

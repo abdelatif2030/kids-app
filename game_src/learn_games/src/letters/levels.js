@@ -26,6 +26,7 @@ import { timeQuestions } from './time_level.js';
 import VOICED from './voiced.json' with { type: 'json' };
 import { buildBanks, allBankSentences as bankSentences, COUNT_OBJECTS } from './extra_bank.js';
 import { HABITS_MORE, familyOf } from './habits_more.js';
+import { EN_LEVELS, englishRounds } from '../english/levels.js';
 import { NEW_LEVELS, NEW_ITEMS, allNewLevelSentences } from './new_levels.js';
 const VOICED_SET = new Set(VOICED);
 /** True when the sentence has a recorded clip. Tools may set globalThis.__LEARN_ASSUME_VOICED to count what the levels could offer once every new sentence is recorded. */
@@ -116,9 +117,12 @@ export const TOPIC_LEVELS = TOPICS.map((t) => ({ id: t.id, mode: 'pick', table: 
 /** The twelve map levels, then the topic levels (reached from «مستويات أكتر»). */
 TOPIC_LEVELS.push({ id: 't_time', mode: 'time', ar: 'الأيام والفصول', emoji: '📅', skill: 'vocab', topic: true });
 TOPIC_LEVELS.push(...NEW_LEVELS); // 2026-11-20: opposites, patterns, senses and feelings, manners, safety (new_levels.js)
-export const ALL_LEVELS = [...LEVELS, ...TOPIC_LEVELS];
+/** The Arabic world's levels, and the English ones: every level can be found by id in ALL_LEVELS; a menu shows only the list of its language. */
+export const ALL_LEVELS = [...LEVELS, ...TOPIC_LEVELS]; // the Arabic world (what the Arabic tests and menus iterate)
+export const ARABIC_LEVELS = ALL_LEVELS;
+export const EVERY_LEVEL = [...ALL_LEVELS, ...EN_LEVELS]; // plus the English levels: anything looked up by id
 export const COUNT_FRUITS = [['apple', null], ['banana', 'موزة'], ['orange', 'برتقالة'], ['strawberry', 'فراولة'], ['pear', 'كمثرى']].filter(([, w]) => !w || isVoiced(`كام ${w}؟`));
-export const levelOf = (id) => ALL_LEVELS.find((l) => l.id === id);
+export const levelOf = (id) => EVERY_LEVEL.find((l) => l.id === id);
 /** The youngest (four) skip the two alphabet levels that need reading order. */
 export const levelsFor = (_age) => LEVELS; // every level is open at every age: the age only picks what comes first (tiers)
 
@@ -687,6 +691,9 @@ export class LevelPlay {
           out.push({ prompt: firstQ(w), answer: w.letter, key: `t:${w.thing}`, reward: wordReward(w), show: { type: 'thing', thing: w.thing }, options: [w.letter, ...others].sort(() => r() - 0.5).map((x) => ({ id: x, kind: 'letter', ch: letterById(x).ch })) });
         }
       }
+    } else if (mode === 'en') {
+      // English with Rehlaty: hear the English word, tap what it means (src/english/levels.js)
+      out.push(...englishRounds(this.level, this.age, r, mem, nOpt, ROUNDS));
     } else {
       // «اصطاد الحرف»: all 28 letters at every age (easy ones first); one or two rounds ask a letter WITH a vowel mark (فتحة، ضمة، كسرة)
       const ids = LETTERS.map((l) => l.id);

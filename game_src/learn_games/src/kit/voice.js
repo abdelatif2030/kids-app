@@ -70,9 +70,19 @@ export class Voice {
     if (pend && pend.run === this.run && !this.audio) { this.pending = null; this._play(pend.text); }
   }
 
-  has(text) {
+  /** A queue item: {t: the words, lang, slow}. A game may pass a plain string (said in the game's language) or {t, lang:'en', slow:true}
+   *  (English teaching words: the same word as a slower clip, `<id>_slow`). */
+  _item(x) {
+    if (typeof x === 'string') return { t: spoken(x), lang: this.lang, slow: false };
+    return { t: spoken(x.t), lang: x.lang === 'en' ? 'en' : x.lang === 'ar' ? 'ar' : this.lang, slow: !!x.slow };
+  }
+
+  _clipName(it) { return clipId(it.t, it.lang) + (it.slow ? '_slow' : ''); }
+
+  has(it) {
+    if (typeof it === 'string') it = this._item(it);
     const m = typeof window !== 'undefined' && window.__learnVoice;
-    return !!(m && m[this.lang] && m[this.lang].includes(clipId(text, this.lang)));
+    return !!(m && m[it.lang] && m[it.lang].includes(this._clipName(it)));
   }
 
   /**
@@ -81,7 +91,7 @@ export class Voice {
    */
   say(texts, onEach, onDone) {
     this.stop();
-    this.queue = (Array.isArray(texts) ? texts : [texts]).map(spoken).filter(Boolean);
+    this.queue = (Array.isArray(texts) ? texts : [texts]).filter(Boolean).map((x) => this._item(x)).filter((x) => x.t);
     this.i = 0;
     this.onEach = typeof onEach === 'function' ? onEach : null; // a game passing anything else (a number) must never break the voice
     this.onDone = typeof onDone === 'function' ? onDone : null;
@@ -109,17 +119,21 @@ export class Voice {
     }
     const text = this.queue.shift();
     if (!this.has(text)) {
-      // no recording: the device voice says this one and whatever is left, as one sentence
-      const all = [text, ...this.queue];
-      const rest = all.join(this.lang === 'en' ? ', ' : '، ');
-      this.queue = [];
+      // no recording: the device voice says this one and whatever is left of the same language, as one sentence
+      const lang = text.lang;
+      const same = [];
+      while (this.queue.length && this.queue[0].lang === lang) same.push(this.queue.shift());
+      const all = [text, ...same];
+      const rest = all.map((x) => x.t).join(lang === 'en' ? ', ' : '،  ').replace(/ {2}/g, ' ');
       this.onTalk(Math.min(8, 1.2 + rest.length * 0.09));
-      this.fallback(rest, this.lang);
+      this.fallback(rest, lang);
       // the device voice speaks it as one sentence: the things light up at an even pace meanwhile, then it is done
       const per = Math.max(600, Math.min(1100, (rest.length * 90) / all.length));
       const run = this.run;
-      all.forEach((_, k) => setTimeout(() => { if (run === this.run) this._start(this.i + k); }, k * per));
-      setTimeout(() => { if (run === this.run) this._finish(); }, all.length * per + 300);
+      const i0 = this.i;
+      this.i += all.length;
+      all.forEach((_, k) => setTimeout(() => { if (run === this.run) this._start(i0 + k); }, k * per));
+      setTimeout(() => { if (run === this.run) { if (this.queue.length) this._next(); else this._finish(); } }, all.length * per + 300);
       return;
     }
     this._start(this.i++);
@@ -134,9 +148,9 @@ export class Voice {
     this.audio = a;
     a.onloadedmetadata = () => { if (this.tok === token) this.onTalk((a.duration || 2) + 0.3); };
     a.onended = () => { if (this.tok === token && this.audio === a) { this.audio = null; this._next(); } };
-    a.onerror = () => { if (this.tok === token && this.audio === a) { this.audio = null; this.onTalk(Math.min(6, 1.2 + text.length * 0.09)); this.fallback(text, this.lang); this._next(); } };
+    a.onerror = () => { if (this.tok === token && this.audio === a) { this.audio = null; this.onTalk(Math.min(6, 1.2 + text.t.length * 0.09)); this.fallback(text.t, text.lang); this._next(); } };
     this.onTalk(2.5);
-    try { a.src = `${this.dir}${this.lang}/${clipId(text, this.lang)}.mp3`; } catch (_) { /* fine */ }
+    try { a.src = `${this.dir}${text.lang}/${this._clipName(text)}.mp3`; } catch (_) { /* fine */ }
     const run = this.run;
     const p = a.play();
     if (p && p.catch) {

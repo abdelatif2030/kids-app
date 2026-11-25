@@ -1,0 +1,2669 @@
+[
+{
+"cat": "numbers 0-20",
+"en": "zero",
+"w": "zero",
+"s": "Zero!",
+"n": 0
+},
+{
+"cat": "numbers 0-20",
+"en": "one",
+"w": "one",
+"s": "One!",
+"n": 1
+},
+{
+"cat": "numbers 0-20",
+"en": "two",
+"w": "two",
+"s": "Two!",
+"n": 2
+},
+{
+"cat": "numbers 0-20",
+"en": "three",
+"w": "three",
+"s": "Three!",
+"n": 3
+},
+{
+"cat": "numbers 0-20",
+"en": "four",
+"w": "four",
+"s": "Four!",
+"n": 4
+},
+{
+"cat": "numbers 0-20",
+"en": "five",
+"w": "five",
+"s": "Five!",
+"n": 5
+},
+{
+"cat": "numbers 0-20",
+"en": "six",
+"w": "six",
+"s": "Six!",
+"n": 6
+},
+{
+"cat": "numbers 0-20",
+"en": "seven",
+"w": "seven",
+"s": "Seven!",
+"n": 7
+},
+{
+"cat": "numbers 0-20",
+"en": "eight",
+"w": "eight",
+"s": "Eight!",
+"n": 8
+},
+{
+"cat": "numbers 0-20",
+"en": "nine",
+"w": "nine",
+"s": "Nine!",
+"n": 9
+},
+{
+"cat": "numbers 0-20",
+"en": "ten",
+"w": "ten",
+"s": "Ten!",
+"n": 10
+},
+{
+"cat": "numbers 0-20",
+"en": "eleven",
+"w": "eleven",
+"s": "Eleven!",
+"n": 11
+},
+{
+"cat": "numbers 0-20",
+"en": "twelve",
+"w": "twelve",
+"s": "Twelve!",
+"n": 12
+},
+{
+"cat": "numbers 0-20",
+"en": "thirteen",
+"w": "thirteen",
+"s": "Thirteen!",
+"n": 13
+},
+{
+"cat": "numbers 0-20",
+"en": "fourteen",
+"w": "fourteen",
+"s": "Fourteen!",
+"n": 14
+},
+{
+"cat": "numbers 0-20",
+"en": "fifteen",
+"w": "fifteen",
+"s": "Fifteen!",
+"n": 15
+},
+{
+"cat": "numbers 0-20",
+"en": "sixteen",
+"w": "sixteen",
+"s": "Sixteen!",
+"n": 16
+},
+{
+"cat": "numbers 0-20",
+"en": "seventeen",
+"w": "seventeen",
+"s": "Seventeen!",
+"n": 17
+},
+{
+"cat": "numbers 0-20",
+"en": "eighteen",
+"w": "eighteen",
+"s": "Eighteen!",
+"n": 18
+},
+{
+"cat": "numbers 0-20",
+"en": "nineteen",
+"w": "nineteen",
+"s": "Nineteen!",
+"n": 19
+},
+{
+"cat": "numbers 0-20",
+"en": "twenty",
+"w": "twenty",
+"s": "Twenty!",
+"n": 20
+},
+{
+"cat": "tens to 100",
+"en": "thirty",
+"w": "thirty",
+"s": "Thirty!",
+"n": 30
+},
+{
+"cat": "tens to 100",
+"en": "forty",
+"w": "forty",
+"s": "Forty!",
+"n": 40
+},
+{
+"cat": "tens to 100",
+"en": "fifty",
+"w": "fifty",
+"s": "Fifty!",
+"n": 50
+},
+{
+"cat": "tens to 100",
+"en": "sixty",
+"w": "sixty",
+"s": "Sixty!",
+"n": 60
+},
+{
+"cat": "tens to 100",
+"en": "seventy",
+"w": "seventy",
+"s": "Seventy!",
+"n": 70
+},
+{
+"cat": "tens to 100",
+"en": "eighty",
+"w": "eighty",
+"s": "Eighty!",
+"n": 80
+},
+{
+"cat": "tens to 100",
+"en": "ninety",
+"w": "ninety",
+"s": "Ninety!",
+"n": 90
+},
+{
+"cat": "tens to 100",
+"en": "one hundred",
+"w": "one hundred",
+"s": "One hundred!",
+"n": 100
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter a",
+"w": "letter a",
+"s": "Letter a.",
+"ch": "Aa"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter b",
+"w": "letter b",
+"s": "Letter b.",
+"ch": "Bb"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter c",
+"w": "letter c",
+"s": "Letter c.",
+"ch": "Cc"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter d",
+"w": "letter d",
+"s": "Letter d.",
+"ch": "Dd"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter e",
+"w": "letter e",
+"s": "Letter e.",
+"ch": "Ee"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter f",
+"w": "letter f",
+"s": "Letter f.",
+"ch": "Ff"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter g",
+"w": "letter g",
+"s": "Letter g.",
+"ch": "Gg"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter h",
+"w": "letter h",
+"s": "Letter h.",
+"ch": "Hh"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter i",
+"w": "letter i",
+"s": "Letter i.",
+"ch": "Ii"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter j",
+"w": "letter j",
+"s": "Letter j.",
+"ch": "Jj"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter k",
+"w": "letter k",
+"s": "Letter k.",
+"ch": "Kk"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter l",
+"w": "letter l",
+"s": "Letter l.",
+"ch": "Ll"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter m",
+"w": "letter m",
+"s": "Letter m.",
+"ch": "Mm"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter n",
+"w": "letter n",
+"s": "Letter n.",
+"ch": "Nn"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter o",
+"w": "letter o",
+"s": "Letter o.",
+"ch": "Oo"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter p",
+"w": "letter p",
+"s": "Letter p.",
+"ch": "Pp"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter q",
+"w": "letter q",
+"s": "Letter q.",
+"ch": "Qq"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter r",
+"w": "letter r",
+"s": "Letter r.",
+"ch": "Rr"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter s",
+"w": "letter s",
+"s": "Letter s.",
+"ch": "Ss"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter t",
+"w": "letter t",
+"s": "Letter t.",
+"ch": "Tt"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter u",
+"w": "letter u",
+"s": "Letter u.",
+"ch": "Uu"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter v",
+"w": "letter v",
+"s": "Letter v.",
+"ch": "Vv"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter w",
+"w": "letter w",
+"s": "Letter w.",
+"ch": "Ww"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter x",
+"w": "letter x",
+"s": "Letter x.",
+"ch": "Xx"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter y",
+"w": "letter y",
+"s": "Letter y.",
+"ch": "Yy"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter z",
+"w": "letter z",
+"s": "Letter z.",
+"ch": "Zz"
+},
+{
+"cat": "colours",
+"en": "red",
+"w": "red",
+"s": "This is red.",
+"color": "red"
+},
+{
+"cat": "colours",
+"en": "blue",
+"w": "blue",
+"s": "This is blue.",
+"color": "blue"
+},
+{
+"cat": "colours",
+"en": "yellow",
+"w": "yellow",
+"s": "This is yellow.",
+"color": "yellow"
+},
+{
+"cat": "colours",
+"en": "green",
+"w": "green",
+"s": "This is green.",
+"color": "green"
+},
+{
+"cat": "colours",
+"en": "orange",
+"w": "orange",
+"s": "This is orange.",
+"color": "orange"
+},
+{
+"cat": "colours",
+"en": "purple",
+"w": "purple",
+"s": "This is purple.",
+"color": "purple"
+},
+{
+"cat": "colours",
+"en": "pink",
+"w": "pink",
+"s": "This is pink.",
+"color": "pink"
+},
+{
+"cat": "colours",
+"en": "black",
+"w": "black",
+"s": "This is black.",
+"color": "black"
+},
+{
+"cat": "colours",
+"en": "white",
+"w": "white",
+"s": "This is white.",
+"color": "white"
+},
+{
+"cat": "colours",
+"en": "brown",
+"w": "brown",
+"s": "This is brown.",
+"color": "brown"
+},
+{
+"cat": "colours",
+"en": "gray",
+"w": "gray",
+"s": "This is gray.",
+"color": "gray"
+},
+{
+"cat": "colours",
+"en": "sky blue",
+"w": "sky blue",
+"s": "This is sky blue.",
+"color": "skyblue"
+},
+{
+"cat": "colours",
+"en": "navy",
+"w": "navy",
+"s": "This is navy.",
+"color": "navy"
+},
+{
+"cat": "colours",
+"en": "light green",
+"w": "light green",
+"s": "This is light green.",
+"color": "lightgreen"
+},
+{
+"cat": "colours",
+"en": "dark green",
+"w": "dark green",
+"s": "This is dark green.",
+"color": "darkgreen"
+},
+{
+"cat": "colours",
+"en": "turquoise",
+"w": "turquoise",
+"s": "This is turquoise.",
+"color": "turquoise"
+},
+{
+"cat": "colours",
+"en": "gold",
+"w": "gold",
+"s": "This is gold.",
+"color": "gold"
+},
+{
+"cat": "colours",
+"en": "silver",
+"w": "silver",
+"s": "This is silver.",
+"color": "silver"
+},
+{
+"cat": "colours",
+"en": "beige",
+"w": "beige",
+"s": "This is beige.",
+"color": "beige"
+},
+{
+"cat": "colours",
+"en": "maroon",
+"w": "maroon",
+"s": "This is maroon.",
+"color": "maroon"
+},
+{
+"cat": "colours",
+"en": "lemon",
+"w": "lemon",
+"s": "This is lemon.",
+"color": "lemon"
+},
+{
+"cat": "colours",
+"en": "peach",
+"w": "peach",
+"s": "This is peach.",
+"color": "peach"
+},
+{
+"cat": "colours",
+"en": "lilac",
+"w": "lilac",
+"s": "This is lilac.",
+"color": "lilac"
+},
+{
+"cat": "colours",
+"en": "olive",
+"w": "olive",
+"s": "This is olive.",
+"color": "olive"
+},
+{
+"cat": "colours",
+"en": "mustard",
+"w": "mustard",
+"s": "This is mustard.",
+"color": "mustard"
+},
+{
+"cat": "colours",
+"en": "magenta",
+"w": "magenta",
+"s": "This is magenta.",
+"color": "magenta"
+},
+{
+"cat": "colours",
+"en": "indigo",
+"w": "indigo",
+"s": "This is indigo.",
+"color": "indigo"
+},
+{
+"cat": "colours",
+"en": "crimson",
+"w": "crimson",
+"s": "This is crimson.",
+"color": "crimson"
+},
+{
+"cat": "colours",
+"en": "bronze",
+"w": "bronze",
+"s": "This is bronze.",
+"color": "bronze"
+},
+{
+"cat": "colours",
+"en": "caramel",
+"w": "caramel",
+"s": "This is caramel.",
+"color": "caramel"
+},
+{
+"cat": "colours",
+"en": "charcoal",
+"w": "charcoal",
+"s": "This is charcoal.",
+"color": "charcoal"
+},
+{
+"cat": "colours",
+"en": "mint",
+"w": "mint",
+"s": "This is mint.",
+"color": "mint"
+},
+{
+"cat": "colours",
+"en": "coral",
+"w": "coral",
+"s": "This is coral.",
+"color": "coral"
+},
+{
+"cat": "colours",
+"en": "sand",
+"w": "sand",
+"s": "This is sand.",
+"color": "sand"
+},
+{
+"cat": "shapes",
+"en": "circle",
+"w": "circle",
+"s": "This is a circle.",
+"shape": "circle"
+},
+{
+"cat": "shapes",
+"en": "square",
+"w": "square",
+"s": "This is a square.",
+"shape": "square"
+},
+{
+"cat": "shapes",
+"en": "triangle",
+"w": "triangle",
+"s": "This is a triangle.",
+"shape": "triangle"
+},
+{
+"cat": "shapes",
+"en": "star",
+"w": "star",
+"s": "This is a star.",
+"shape": "star"
+},
+{
+"cat": "shapes",
+"en": "heart",
+"w": "heart",
+"s": "This is a heart.",
+"shape": "heart"
+},
+{
+"cat": "shapes",
+"en": "octagon",
+"w": "octagon",
+"s": "This is an octagon.",
+"shape": "octagon"
+},
+{
+"cat": "shapes",
+"en": "crescent",
+"w": "crescent",
+"s": "This is a crescent.",
+"shape": "crescent"
+},
+{
+"cat": "shapes",
+"en": "plus",
+"w": "plus",
+"s": "This is a plus.",
+"shape": "plus"
+},
+{
+"cat": "shapes",
+"en": "semicircle",
+"w": "semicircle",
+"s": "This is a semicircle.",
+"shape": "semicircle"
+},
+{
+"cat": "shapes",
+"en": "trapezoid",
+"w": "trapezoid",
+"s": "This is a trapezoid.",
+"shape": "trapezoid"
+},
+{
+"cat": "shapes",
+"en": "parallelogram",
+"w": "parallelogram",
+"s": "This is a parallelogram.",
+"shape": "parallelogram"
+},
+{
+"cat": "shapes",
+"en": "hexagram",
+"w": "hexagram",
+"s": "This is a hexagram.",
+"shape": "hexagram"
+},
+{
+"cat": "shapes",
+"en": "drop",
+"w": "drop",
+"s": "This is a drop.",
+"shape": "drop"
+},
+{
+"cat": "days",
+"en": "saturday",
+"w": "saturday",
+"s": "Saturday.",
+"ch": "Saturday"
+},
+{
+"cat": "days",
+"en": "sunday",
+"w": "sunday",
+"s": "Sunday.",
+"ch": "Sunday"
+},
+{
+"cat": "days",
+"en": "monday",
+"w": "monday",
+"s": "Monday.",
+"ch": "Monday"
+},
+{
+"cat": "days",
+"en": "tuesday",
+"w": "tuesday",
+"s": "Tuesday.",
+"ch": "Tuesday"
+},
+{
+"cat": "days",
+"en": "wednesday",
+"w": "wednesday",
+"s": "Wednesday.",
+"ch": "Wednesday"
+},
+{
+"cat": "days",
+"en": "thursday",
+"w": "thursday",
+"s": "Thursday.",
+"ch": "Thursday"
+},
+{
+"cat": "days",
+"en": "friday",
+"w": "friday",
+"s": "Friday.",
+"ch": "Friday"
+},
+{
+"cat": "months",
+"en": "january",
+"w": "january",
+"s": "January.",
+"ch": "January"
+},
+{
+"cat": "months",
+"en": "february",
+"w": "february",
+"s": "February.",
+"ch": "February"
+},
+{
+"cat": "months",
+"en": "march",
+"w": "march",
+"s": "March.",
+"ch": "March"
+},
+{
+"cat": "months",
+"en": "april",
+"w": "april",
+"s": "April.",
+"ch": "April"
+},
+{
+"cat": "months",
+"en": "may",
+"w": "may",
+"s": "May.",
+"ch": "May"
+},
+{
+"cat": "months",
+"en": "june",
+"w": "june",
+"s": "June.",
+"ch": "June"
+},
+{
+"cat": "months",
+"en": "july",
+"w": "july",
+"s": "July.",
+"ch": "July"
+},
+{
+"cat": "months",
+"en": "august",
+"w": "august",
+"s": "August.",
+"ch": "August"
+},
+{
+"cat": "months",
+"en": "september",
+"w": "september",
+"s": "September.",
+"ch": "September"
+},
+{
+"cat": "months",
+"en": "october",
+"w": "october",
+"s": "October.",
+"ch": "October"
+},
+{
+"cat": "months",
+"en": "november",
+"w": "november",
+"s": "November.",
+"ch": "November"
+},
+{
+"cat": "months",
+"en": "december",
+"w": "december",
+"s": "December.",
+"ch": "December"
+},
+{
+"cat": "seasons",
+"en": "summer",
+"w": "summer",
+"s": "Summer.",
+"ch": "Summer"
+},
+{
+"cat": "seasons",
+"en": "winter",
+"w": "winter",
+"s": "Winter.",
+"ch": "Winter"
+},
+{
+"cat": "seasons",
+"en": "spring",
+"w": "spring",
+"s": "Spring.",
+"ch": "Spring"
+},
+{
+"cat": "seasons",
+"en": "autumn",
+"w": "autumn",
+"s": "Autumn.",
+"ch": "Autumn"
+},
+{
+"cat": "parts of the day",
+"en": "morning",
+"w": "morning",
+"s": "Morning.",
+"ch": "Morning"
+},
+{
+"cat": "parts of the day",
+"en": "noon",
+"w": "noon",
+"s": "Noon.",
+"ch": "Noon"
+},
+{
+"cat": "parts of the day",
+"en": "evening",
+"w": "evening",
+"s": "Evening.",
+"ch": "Evening"
+},
+{
+"cat": "parts of the day",
+"en": "night",
+"w": "night",
+"s": "Night.",
+"ch": "Night"
+},
+{
+"cat": "animals",
+"en": "bunny",
+"w": "bunny",
+"s": "This is a bunny.",
+"thing": "bunny"
+},
+{
+"cat": "animals",
+"en": "cat",
+"w": "cat",
+"s": "This is a cat.",
+"thing": "cat"
+},
+{
+"cat": "animals",
+"en": "dog",
+"w": "dog",
+"s": "This is a dog.",
+"thing": "dog"
+},
+{
+"cat": "animals",
+"en": "monkey",
+"w": "monkey",
+"s": "This is a monkey.",
+"thing": "monkey"
+},
+{
+"cat": "animals",
+"en": "cow",
+"w": "cow",
+"s": "This is a cow.",
+"thing": "cow"
+},
+{
+"cat": "animals",
+"en": "bear",
+"w": "bear",
+"s": "This is a bear.",
+"thing": "bear"
+},
+{
+"cat": "animals",
+"en": "mouse",
+"w": "mouse",
+"s": "This is a mouse.",
+"thing": "mouse"
+},
+{
+"cat": "animals",
+"en": "chick",
+"w": "chick",
+"s": "This is a chick.",
+"thing": "chick"
+},
+{
+"cat": "animals",
+"en": "horse",
+"w": "horse",
+"s": "This is a horse.",
+"thing": "horse"
+},
+{
+"cat": "animals",
+"en": "hen",
+"w": "hen",
+"s": "This is a hen.",
+"thing": "hen"
+},
+{
+"cat": "animals",
+"en": "donkey",
+"w": "donkey",
+"s": "This is a donkey.",
+"thing": "f_donkey"
+},
+{
+"cat": "animals",
+"en": "goat",
+"w": "goat",
+"s": "This is a goat.",
+"thing": "f_goat"
+},
+{
+"cat": "animals",
+"en": "parrot",
+"w": "parrot",
+"s": "This is a parrot.",
+"thing": "j_parrot"
+},
+{
+"cat": "animals",
+"en": "sheep",
+"w": "sheep",
+"s": "This is a sheep.",
+"thing": "f_sheep"
+},
+{
+"cat": "animals",
+"en": "rooster",
+"w": "rooster",
+"s": "This is a rooster.",
+"thing": "f_rooster"
+},
+{
+"cat": "animals",
+"en": "lion",
+"w": "lion",
+"s": "This is a lion.",
+"thing": "j_lion"
+},
+{
+"cat": "animals",
+"en": "tiger",
+"w": "tiger",
+"s": "This is a tiger.",
+"thing": "j_tiger"
+},
+{
+"cat": "animals",
+"en": "elephant",
+"w": "elephant",
+"s": "This is an elephant.",
+"thing": "j_elephant"
+},
+{
+"cat": "animals",
+"en": "giraffe",
+"w": "giraffe",
+"s": "This is a giraffe.",
+"thing": "j_giraffe"
+},
+{
+"cat": "animals",
+"en": "zebra",
+"w": "zebra",
+"s": "This is a zebra.",
+"thing": "j_zebra"
+},
+{
+"cat": "animals",
+"en": "gorilla",
+"w": "gorilla",
+"s": "This is a gorilla.",
+"thing": "j_gorilla"
+},
+{
+"cat": "animals",
+"en": "chameleon",
+"w": "chameleon",
+"s": "This is a chameleon.",
+"thing": "j_chameleon"
+},
+{
+"cat": "animals",
+"en": "frog",
+"w": "frog",
+"s": "This is a frog.",
+"thing": "j_frog"
+},
+{
+"cat": "animals",
+"en": "toucan",
+"w": "toucan",
+"s": "This is a toucan.",
+"thing": "j_toucan"
+},
+{
+"cat": "animals",
+"en": "penguin",
+"w": "penguin",
+"s": "This is a penguin.",
+"thing": "w_penguin"
+},
+{
+"cat": "animals",
+"en": "seal",
+"w": "seal",
+"s": "This is a seal.",
+"thing": "w_seal"
+},
+{
+"cat": "animals",
+"en": "reindeer",
+"w": "reindeer",
+"s": "This is a reindeer.",
+"thing": "w_reindeer"
+},
+{
+"cat": "animals",
+"en": "fox",
+"w": "fox",
+"s": "This is a fox.",
+"thing": "w_fox"
+},
+{
+"cat": "animals",
+"en": "camel",
+"w": "camel",
+"s": "This is a camel.",
+"thing": "d_camel"
+},
+{
+"cat": "animals",
+"en": "hawk",
+"w": "hawk",
+"s": "This is a hawk.",
+"thing": "d_hawk"
+},
+{
+"cat": "animals",
+"en": "dolphin",
+"w": "dolphin",
+"s": "This is a dolphin.",
+"thing": "u_dolphin"
+},
+{
+"cat": "animals",
+"en": "turtle",
+"w": "turtle",
+"s": "This is a turtle.",
+"thing": "u_turtle"
+},
+{
+"cat": "animals",
+"en": "bee",
+"w": "bee",
+"s": "This is a bee.",
+"thing": "bee"
+},
+{
+"cat": "animals",
+"en": "butterfly",
+"w": "butterfly",
+"s": "This is a butterfly.",
+"thing": "butterfly"
+},
+{
+"cat": "animals",
+"en": "goose",
+"w": "goose",
+"s": "This is a goose.",
+"thing": "goose"
+},
+{
+"cat": "animals",
+"en": "duck",
+"w": "duck",
+"s": "This is a duck.",
+"thing": "mallard"
+},
+{
+"cat": "animals",
+"en": "pigeon",
+"w": "pigeon",
+"s": "This is a pigeon.",
+"thing": "pigeon"
+},
+{
+"cat": "animals",
+"en": "peacock",
+"w": "peacock",
+"s": "This is a peacock.",
+"thing": "peacock"
+},
+{
+"cat": "animals",
+"en": "shark",
+"w": "shark",
+"s": "This is a shark.",
+"thing": "shark"
+},
+{
+"cat": "animals",
+"en": "cheetah",
+"w": "cheetah",
+"s": "This is a cheetah.",
+"thing": "cheetah"
+},
+{
+"cat": "animals",
+"en": "crocodile",
+"w": "crocodile",
+"s": "This is a crocodile.",
+"thing": "croc"
+},
+{
+"cat": "animals",
+"en": "iguana",
+"w": "iguana",
+"s": "This is an iguana.",
+"thing": "iguana"
+},
+{
+"cat": "animals",
+"en": "mantis",
+"w": "mantis",
+"s": "This is a mantis.",
+"thing": "mantis"
+},
+{
+"cat": "animals",
+"en": "caterpillar",
+"w": "caterpillar",
+"s": "This is a caterpillar.",
+"thing": "caterpillar"
+},
+{
+"cat": "animals",
+"en": "T. rex",
+"w": "T. rex",
+"s": "This is a T. rex.",
+"thing": "trex"
+},
+{
+"cat": "animals",
+"en": "triceratops",
+"w": "triceratops",
+"s": "This is a triceratops.",
+"thing": "triceratops"
+},
+{
+"cat": "animals",
+"en": "stegosaurus",
+"w": "stegosaurus",
+"s": "This is a stegosaurus.",
+"thing": "stego"
+},
+{
+"cat": "animals",
+"en": "brachiosaurus",
+"w": "brachiosaurus",
+"s": "This is a brachiosaurus.",
+"thing": "brachio"
+},
+{
+"cat": "animals",
+"en": "owl",
+"w": "owl",
+"s": "This is an owl.",
+"thing": "owl"
+},
+{
+"cat": "animals",
+"en": "panda",
+"w": "panda",
+"s": "This is a panda.",
+"thing": "panda"
+},
+{
+"cat": "animals",
+"en": "octopus",
+"w": "octopus",
+"s": "This is an octopus.",
+"thing": "u_octopus"
+},
+{
+"cat": "animals",
+"en": "crab",
+"w": "crab",
+"s": "This is a crab.",
+"thing": "u_crab"
+},
+{
+"cat": "animals",
+"en": "whale",
+"w": "whale",
+"s": "This is a whale.",
+"thing": "u_whale"
+},
+{
+"cat": "animals",
+"en": "bat",
+"w": "bat",
+"s": "This is a bat.",
+"thing": "i_bat"
+},
+{
+"cat": "animals",
+"en": "eagle",
+"w": "eagle",
+"s": "This is an eagle.",
+"thing": "i_eagle"
+},
+{
+"cat": "animals",
+"en": "ostrich",
+"w": "ostrich",
+"s": "This is an ostrich.",
+"thing": "i_ostrich"
+},
+{
+"cat": "animals",
+"en": "swan",
+"w": "swan",
+"s": "This is a swan.",
+"thing": "i_swan"
+},
+{
+"cat": "animals",
+"en": "sparrow",
+"w": "sparrow",
+"s": "This is a sparrow.",
+"thing": "i_sparrow"
+},
+{
+"cat": "animals",
+"en": "snail",
+"w": "snail",
+"s": "This is a snail.",
+"thing": "i_snail"
+},
+{
+"cat": "animals",
+"en": "spider",
+"w": "spider",
+"s": "This is a spider.",
+"thing": "i_spider"
+},
+{
+"cat": "animals",
+"en": "crow",
+"w": "crow",
+"s": "This is a crow.",
+"thing": "crow"
+},
+{
+"cat": "animals",
+"en": "ladybug",
+"w": "ladybug",
+"s": "This is a ladybug.",
+"thing": "ladybug"
+},
+{
+"cat": "animals",
+"en": "dragonfly",
+"w": "dragonfly",
+"s": "This is a dragonfly.",
+"thing": "dragonfly"
+},
+{
+"cat": "animals",
+"en": "flamingo",
+"w": "flamingo",
+"s": "This is a flamingo.",
+"thing": "i_flamingo"
+},
+{
+"cat": "picture pack: body",
+"en": "eye",
+"w": "eye",
+"s": "This is an eye.",
+"thing": "y_eye"
+},
+{
+"cat": "picture pack: body",
+"en": "ear",
+"w": "ear",
+"s": "This is an ear.",
+"thing": "y_ear"
+},
+{
+"cat": "picture pack: body",
+"en": "nose",
+"w": "nose",
+"s": "This is a nose.",
+"thing": "y_nose"
+},
+{
+"cat": "picture pack: body",
+"en": "mouth",
+"w": "mouth",
+"s": "This is a mouth.",
+"thing": "y_mouth"
+},
+{
+"cat": "picture pack: body",
+"en": "hand",
+"w": "hand",
+"s": "This is a hand.",
+"thing": "y_hand"
+},
+{
+"cat": "picture pack: body",
+"en": "foot",
+"w": "foot",
+"s": "This is a foot.",
+"thing": "y_foot"
+},
+{
+"cat": "picture pack: body",
+"en": "hair",
+"w": "hair",
+"s": "This is hair.",
+"thing": "y_hair"
+},
+{
+"cat": "picture pack: body",
+"en": "tooth",
+"w": "tooth",
+"s": "This is a tooth.",
+"thing": "y_tooth"
+},
+{
+"cat": "picture pack: body",
+"en": "head",
+"w": "head",
+"s": "This is a head.",
+"thing": "y_head"
+},
+{
+"cat": "picture pack: body",
+"en": "finger",
+"w": "finger",
+"s": "This is a finger.",
+"thing": "y_finger"
+},
+{
+"cat": "picture pack: body",
+"en": "knee",
+"w": "knee",
+"s": "This is a knee.",
+"thing": "y_knee"
+},
+{
+"cat": "picture pack: body",
+"en": "belly",
+"w": "belly",
+"s": "This is a belly.",
+"thing": "y_belly"
+},
+{
+"cat": "picture pack: clothes",
+"en": "shirt",
+"w": "shirt",
+"s": "This is a shirt.",
+"thing": "l_shirt"
+},
+{
+"cat": "picture pack: clothes",
+"en": "trousers",
+"w": "trousers",
+"s": "These are trousers.",
+"thing": "l_trousers"
+},
+{
+"cat": "picture pack: clothes",
+"en": "dress",
+"w": "dress",
+"s": "This is a dress.",
+"thing": "l_dress"
+},
+{
+"cat": "picture pack: clothes",
+"en": "hat",
+"w": "hat",
+"s": "This is a hat.",
+"thing": "l_hat"
+},
+{
+"cat": "picture pack: clothes",
+"en": "socks",
+"w": "socks",
+"s": "These are socks.",
+"thing": "l_socks"
+},
+{
+"cat": "picture pack: clothes",
+"en": "jacket",
+"w": "jacket",
+"s": "This is a jacket.",
+"thing": "l_jacket"
+},
+{
+"cat": "picture pack: clothes",
+"en": "scarf",
+"w": "scarf",
+"s": "This is a scarf.",
+"thing": "l_scarf"
+},
+{
+"cat": "picture pack: clothes",
+"en": "gloves",
+"w": "gloves",
+"s": "These are gloves.",
+"thing": "l_gloves"
+},
+{
+"cat": "picture pack: clothes",
+"en": "glasses",
+"w": "glasses",
+"s": "These are glasses.",
+"thing": "l_glasses"
+},
+{
+"cat": "picture pack: clothes",
+"en": "cap",
+"w": "cap",
+"s": "This is a cap.",
+"thing": "l_cap"
+},
+{
+"cat": "picture pack: clothes",
+"en": "pajamas",
+"w": "pajamas",
+"s": "These are pajamas.",
+"thing": "l_pajamas"
+},
+{
+"cat": "picture pack: clothes",
+"en": "raincoat",
+"w": "raincoat",
+"s": "This is a raincoat.",
+"thing": "l_raincoat"
+},
+{
+"cat": "picture pack: family",
+"en": "mom",
+"w": "mom",
+"s": "This is my mom.",
+"thing": "a_mama"
+},
+{
+"cat": "picture pack: family",
+"en": "dad",
+"w": "dad",
+"s": "This is my dad.",
+"thing": "a_baba"
+},
+{
+"cat": "picture pack: family",
+"en": "grandma",
+"w": "grandma",
+"s": "This is my grandma.",
+"thing": "a_grandma"
+},
+{
+"cat": "picture pack: family",
+"en": "grandpa",
+"w": "grandpa",
+"s": "This is my grandpa.",
+"thing": "a_grandpa"
+},
+{
+"cat": "picture pack: family",
+"en": "baby",
+"w": "baby",
+"s": "This is my baby.",
+"thing": "a_baby"
+},
+{
+"cat": "picture pack: family",
+"en": "brother",
+"w": "brother",
+"s": "This is my brother.",
+"thing": "a_brother"
+},
+{
+"cat": "picture pack: family",
+"en": "sister",
+"w": "sister",
+"s": "This is my sister.",
+"thing": "a_sister"
+},
+{
+"cat": "picture pack: family",
+"en": "boy",
+"w": "boy",
+"s": "This is my boy.",
+"thing": "a_boy"
+},
+{
+"cat": "picture pack: family",
+"en": "girl",
+"w": "girl",
+"s": "This is my girl.",
+"thing": "a_girl"
+},
+{
+"cat": "picture pack: family",
+"en": "friends",
+"w": "friends",
+"s": "These are friends.",
+"thing": "a_friends"
+},
+{
+"cat": "picture pack: family",
+"en": "family",
+"w": "family",
+"s": "This is a family.",
+"thing": "a_family"
+},
+{
+"cat": "picture pack: family",
+"en": "uncle",
+"w": "uncle",
+"s": "This is my uncle.",
+"thing": "a_uncle"
+},
+{
+"cat": "picture pack: food",
+"en": "bread",
+"w": "bread",
+"s": "This is bread.",
+"thing": "o_bread"
+},
+{
+"cat": "picture pack: food",
+"en": "cheese",
+"w": "cheese",
+"s": "This is cheese.",
+"thing": "o_cheese"
+},
+{
+"cat": "picture pack: food",
+"en": "egg",
+"w": "egg",
+"s": "This is an egg.",
+"thing": "o_egg"
+},
+{
+"cat": "picture pack: food",
+"en": "milk",
+"w": "milk",
+"s": "This is milk.",
+"thing": "o_milk"
+},
+{
+"cat": "picture pack: food",
+"en": "rice",
+"w": "rice",
+"s": "This is rice.",
+"thing": "o_rice"
+},
+{
+"cat": "picture pack: food",
+"en": "chicken",
+"w": "chicken",
+"s": "This is a chicken.",
+"thing": "o_chicken"
+},
+{
+"cat": "picture pack: food",
+"en": "juice",
+"w": "juice",
+"s": "This is juice.",
+"thing": "o_juice"
+},
+{
+"cat": "picture pack: food",
+"en": "water",
+"w": "water",
+"s": "This is water.",
+"thing": "o_water"
+},
+{
+"cat": "picture pack: food",
+"en": "cookie",
+"w": "cookie",
+"s": "This is a cookie.",
+"thing": "o_cookie"
+},
+{
+"cat": "picture pack: food",
+"en": "honey",
+"w": "honey",
+"s": "This is honey.",
+"thing": "o_honey"
+},
+{
+"cat": "picture pack: food",
+"en": "soup",
+"w": "soup",
+"s": "This is soup.",
+"thing": "o_soup"
+},
+{
+"cat": "picture pack: food",
+"en": "pizza",
+"w": "pizza",
+"s": "This is a pizza.",
+"thing": "o_pizza"
+},
+{
+"cat": "picture pack: fruit2",
+"en": "kiwi",
+"w": "kiwi",
+"s": "This is a kiwi.",
+"thing": "q_kiwi"
+},
+{
+"cat": "picture pack: fruit2",
+"en": "melon",
+"w": "melon",
+"s": "This is a melon.",
+"thing": "q_melon"
+},
+{
+"cat": "picture pack: fruit2",
+"en": "dates",
+"w": "dates",
+"s": "These are dates.",
+"thing": "q_dates"
+},
+{
+"cat": "picture pack: fruit2",
+"en": "fig",
+"w": "fig",
+"s": "This is a fig.",
+"thing": "q_fig"
+},
+{
+"cat": "picture pack: fruit2",
+"en": "apricot",
+"w": "apricot",
+"s": "This is an apricot.",
+"thing": "q_apricot"
+},
+{
+"cat": "picture pack: fruit2",
+"en": "berries",
+"w": "berries",
+"s": "These are berries.",
+"thing": "q_berries"
+},
+{
+"cat": "picture pack: fruit2",
+"en": "plum",
+"w": "plum",
+"s": "This is a plum.",
+"thing": "q_plum"
+},
+{
+"cat": "picture pack: fruit2",
+"en": "avocado",
+"w": "avocado",
+"s": "This is an avocado.",
+"thing": "q_avocado"
+},
+{
+"cat": "picture pack: fruit2",
+"en": "cherry",
+"w": "cherry",
+"s": "This is a cherry.",
+"thing": "q_cherry"
+},
+{
+"cat": "picture pack: fruit2",
+"en": "olives",
+"w": "olives",
+"s": "These are olives.",
+"thing": "q_olives"
+},
+{
+"cat": "picture pack: fruit2",
+"en": "coconut",
+"w": "coconut",
+"s": "This is a coconut.",
+"thing": "q_coconut"
+},
+{
+"cat": "picture pack: insects",
+"en": "ant",
+"w": "ant",
+"s": "This is an ant.",
+"thing": "i_ant"
+},
+{
+"cat": "picture pack: insects",
+"en": "fly",
+"w": "fly",
+"s": "This is a fly.",
+"thing": "i_fly"
+},
+{
+"cat": "picture pack: insects",
+"en": "worm",
+"w": "worm",
+"s": "This is a worm.",
+"thing": "i_worm"
+},
+{
+"cat": "picture pack: jobs",
+"en": "doctor",
+"w": "doctor",
+"s": "This is a doctor.",
+"thing": "z_doctor"
+},
+{
+"cat": "picture pack: jobs",
+"en": "teacher",
+"w": "teacher",
+"s": "This is a teacher.",
+"thing": "z_teacher"
+},
+{
+"cat": "picture pack: jobs",
+"en": "police",
+"w": "police",
+"s": "This is a police.",
+"thing": "z_police"
+},
+{
+"cat": "picture pack: jobs",
+"en": "firefighter",
+"w": "firefighter",
+"s": "This is a firefighter.",
+"thing": "z_firefighter"
+},
+{
+"cat": "picture pack: jobs",
+"en": "farmer",
+"w": "farmer",
+"s": "This is a farmer.",
+"thing": "z_farmer"
+},
+{
+"cat": "picture pack: jobs",
+"en": "cook",
+"w": "cook",
+"s": "This is a cook.",
+"thing": "z_cook"
+},
+{
+"cat": "picture pack: jobs",
+"en": "driver",
+"w": "driver",
+"s": "This is a driver.",
+"thing": "z_driver"
+},
+{
+"cat": "picture pack: jobs",
+"en": "pilot",
+"w": "pilot",
+"s": "This is a pilot.",
+"thing": "z_pilot"
+},
+{
+"cat": "picture pack: jobs",
+"en": "nurse",
+"w": "nurse",
+"s": "This is a nurse.",
+"thing": "z_nurse"
+},
+{
+"cat": "picture pack: jobs",
+"en": "builder",
+"w": "builder",
+"s": "This is a builder.",
+"thing": "z_builder"
+},
+{
+"cat": "picture pack: jobs",
+"en": "singer",
+"w": "singer",
+"s": "This is a singer.",
+"thing": "z_singer"
+},
+{
+"cat": "picture pack: jobs",
+"en": "painter",
+"w": "painter",
+"s": "This is a painter.",
+"thing": "z_painter"
+},
+{
+"cat": "picture pack: music",
+"en": "drum",
+"w": "drum",
+"s": "This is a drum.",
+"thing": "m_drum"
+},
+{
+"cat": "picture pack: music",
+"en": "guitar",
+"w": "guitar",
+"s": "This is a guitar.",
+"thing": "m_guitar"
+},
+{
+"cat": "picture pack: music",
+"en": "piano",
+"w": "piano",
+"s": "This is a piano.",
+"thing": "m_piano"
+},
+{
+"cat": "picture pack: music",
+"en": "violin",
+"w": "violin",
+"s": "This is a violin.",
+"thing": "m_violin"
+},
+{
+"cat": "picture pack: music",
+"en": "flute",
+"w": "flute",
+"s": "This is a flute.",
+"thing": "m_flute"
+},
+{
+"cat": "picture pack: music",
+"en": "trumpet",
+"w": "trumpet",
+"s": "This is a trumpet.",
+"thing": "m_trumpet"
+},
+{
+"cat": "picture pack: music",
+"en": "tambourine",
+"w": "tambourine",
+"s": "This is a tambourine.",
+"thing": "m_tambourine"
+},
+{
+"cat": "picture pack: music",
+"en": "oud",
+"w": "oud",
+"s": "This is an oud.",
+"thing": "m_oud"
+},
+{
+"cat": "picture pack: music",
+"en": "microphone",
+"w": "microphone",
+"s": "This is a microphone.",
+"thing": "m_mic"
+},
+{
+"cat": "picture pack: music",
+"en": "headphones",
+"w": "headphones",
+"s": "This is a headphones.",
+"thing": "m_headphones"
+},
+{
+"cat": "picture pack: music",
+"en": "music note",
+"w": "music note",
+"s": "This is a music note.",
+"thing": "m_note"
+},
+{
+"cat": "picture pack: music",
+"en": "bell",
+"w": "bell",
+"s": "This is a bell.",
+"thing": "m_bell"
+},
+{
+"cat": "picture pack: school",
+"en": "pencil",
+"w": "pencil",
+"s": "This is a pencil.",
+"thing": "e_pencil"
+},
+{
+"cat": "picture pack: school",
+"en": "book",
+"w": "book",
+"s": "This is a book.",
+"thing": "e_book"
+},
+{
+"cat": "picture pack: school",
+"en": "notebook",
+"w": "notebook",
+"s": "This is a notebook.",
+"thing": "e_notebook"
+},
+{
+"cat": "picture pack: school",
+"en": "scissors",
+"w": "scissors",
+"s": "This is a scissors.",
+"thing": "e_scissors"
+},
+{
+"cat": "picture pack: school",
+"en": "ruler",
+"w": "ruler",
+"s": "This is a ruler.",
+"thing": "e_ruler"
+},
+{
+"cat": "picture pack: school",
+"en": "eraser",
+"w": "eraser",
+"s": "This is an eraser.",
+"thing": "e_eraser"
+},
+{
+"cat": "picture pack: school",
+"en": "crayons",
+"w": "crayons",
+"s": "This is a crayons.",
+"thing": "e_crayons"
+},
+{
+"cat": "picture pack: school",
+"en": "board",
+"w": "board",
+"s": "This is a board.",
+"thing": "e_board"
+},
+{
+"cat": "picture pack: school",
+"en": "map",
+"w": "map",
+"s": "This is a map.",
+"thing": "e_map"
+},
+{
+"cat": "picture pack: school",
+"en": "glue",
+"w": "glue",
+"s": "This is a glue.",
+"thing": "e_glue"
+},
+{
+"cat": "picture pack: school",
+"en": "desk",
+"w": "desk",
+"s": "This is a desk.",
+"thing": "e_desk"
+},
+{
+"cat": "picture pack: school",
+"en": "paper",
+"w": "paper",
+"s": "This is a paper.",
+"thing": "e_paper"
+},
+{
+"cat": "picture pack: shapes",
+"en": "sphere",
+"w": "sphere",
+"s": "This is a sphere.",
+"thing": "g_sphere"
+},
+{
+"cat": "picture pack: veg",
+"en": "tomato",
+"w": "tomato",
+"s": "This is a tomato.",
+"thing": "v_tomato"
+},
+{
+"cat": "picture pack: veg",
+"en": "cucumber",
+"w": "cucumber",
+"s": "This is a cucumber.",
+"thing": "v_cucumber"
+},
+{
+"cat": "picture pack: veg",
+"en": "potato",
+"w": "potato",
+"s": "This is a potato.",
+"thing": "v_potato"
+},
+{
+"cat": "picture pack: veg",
+"en": "onion",
+"w": "onion",
+"s": "This is an onion.",
+"thing": "v_onion"
+},
+{
+"cat": "picture pack: veg",
+"en": "eggplant",
+"w": "eggplant",
+"s": "This is an eggplant.",
+"thing": "v_eggplant"
+},
+{
+"cat": "picture pack: veg",
+"en": "pepper",
+"w": "pepper",
+"s": "This is a pepper.",
+"thing": "v_pepper"
+},
+{
+"cat": "picture pack: veg",
+"en": "lettuce",
+"w": "lettuce",
+"s": "This is a lettuce.",
+"thing": "v_lettuce"
+},
+{
+"cat": "picture pack: veg",
+"en": "broccoli",
+"w": "broccoli",
+"s": "This is a broccoli.",
+"thing": "v_broccoli"
+},
+{
+"cat": "picture pack: veg",
+"en": "peas",
+"w": "peas",
+"s": "These are peas.",
+"thing": "v_peas"
+},
+{
+"cat": "picture pack: veg",
+"en": "pumpkin",
+"w": "pumpkin",
+"s": "This is a pumpkin.",
+"thing": "v_pumpkin"
+},
+{
+"cat": "picture pack: veg",
+"en": "garlic",
+"w": "garlic",
+"s": "This is a garlic.",
+"thing": "v_garlic"
+},
+{
+"cat": "picture pack: veg",
+"en": "mushroom",
+"w": "mushroom",
+"s": "This is a mushroom.",
+"thing": "v_mushroom"
+},
+{
+"cat": "picture pack: weather",
+"en": "rain",
+"w": "rain",
+"s": "This is a rain.",
+"thing": "t_rain"
+},
+{
+"cat": "picture pack: weather",
+"en": "snow",
+"w": "snow",
+"s": "This is a snow.",
+"thing": "t_snow"
+},
+{
+"cat": "picture pack: weather",
+"en": "wind",
+"w": "wind",
+"s": "This is a wind.",
+"thing": "t_wind"
+},
+{
+"cat": "picture pack: weather",
+"en": "thunder",
+"w": "thunder",
+"s": "This is a thunder.",
+"thing": "t_thunder"
+},
+{
+"cat": "picture pack: weather",
+"en": "lightning",
+"w": "lightning",
+"s": "This is a lightning.",
+"thing": "t_lightning"
+},
+{
+"cat": "picture pack: weather",
+"en": "umbrella",
+"w": "umbrella",
+"s": "This is an umbrella.",
+"thing": "t_umbrella"
+},
+{
+"cat": "picture pack: weather",
+"en": "snowflake",
+"w": "snowflake",
+"s": "This is a snowflake.",
+"thing": "t_flake"
+},
+{
+"cat": "picture pack: weather",
+"en": "flower",
+"w": "flower",
+"s": "This is a flower.",
+"thing": "t_flower"
+},
+{
+"cat": "picture pack: weather",
+"en": "leaves",
+"w": "leaves",
+"s": "This is a leaves.",
+"thing": "t_leaves"
+},
+{
+"cat": "picture pack: weather",
+"en": "hot",
+"w": "hot",
+"s": "It is hot.",
+"thing": "t_hot"
+},
+{
+"cat": "picture pack: weather",
+"en": "cold",
+"w": "cold",
+"s": "It is cold.",
+"thing": "t_cold"
+},
+{
+"cat": "picture pack: weather",
+"en": "mountain",
+"w": "mountain",
+"s": "This is a mountain.",
+"thing": "t_mountain"
+},
+{
+"cat": "picture words",
+"en": "banana",
+"w": "banana",
+"s": "This is a banana.",
+"thing": "banana"
+},
+{
+"cat": "picture words",
+"en": "apple",
+"w": "apple",
+"s": "This is an apple.",
+"thing": "apple"
+},
+{
+"cat": "picture words",
+"en": "fish",
+"w": "fish",
+"s": "This is fish.",
+"thing": "fish"
+},
+{
+"cat": "picture words",
+"en": "sun",
+"w": "sun",
+"s": "This is a sun.",
+"thing": "sun"
+},
+{
+"cat": "picture words",
+"en": "rose",
+"w": "rose",
+"s": "This is a rose.",
+"thing": "rose"
+},
+{
+"cat": "picture words",
+"en": "pomegranate",
+"w": "pomegranate",
+"s": "This is a pomegranate.",
+"thing": "pomegranate"
+},
+{
+"cat": "picture words",
+"en": "corn",
+"w": "corn",
+"s": "This is corn.",
+"thing": "corn"
+},
+{
+"cat": "picture words",
+"en": "rocket",
+"w": "rocket",
+"s": "This is a rocket.",
+"thing": "rocket"
+},
+{
+"cat": "picture words",
+"en": "plane",
+"w": "plane",
+"s": "This is a plane.",
+"thing": "plane"
+},
+{
+"cat": "picture words",
+"en": "envelope",
+"w": "envelope",
+"s": "This is an envelope.",
+"thing": "envelope"
+},
+{
+"cat": "picture words",
+"en": "grapes",
+"w": "grapes",
+"s": "These are grapes.",
+"thing": "grapes"
+},
+{
+"cat": "picture words",
+"en": "dove",
+"w": "dove",
+"s": "This is a dove.",
+"thing": "dove"
+},
+{
+"cat": "picture words",
+"en": "snake",
+"w": "snake",
+"s": "This is a snake.",
+"thing": "j_snake"
+},
+{
+"cat": "picture words",
+"en": "pig",
+"w": "pig",
+"s": "This is a pig.",
+"thing": "f_pig"
+},
+{
+"cat": "picture words",
+"en": "jellyfish",
+"w": "jellyfish",
+"s": "This is a jellyfish.",
+"thing": "u_jelly"
+},
+{
+"cat": "picture words",
+"en": "seahorse",
+"w": "seahorse",
+"s": "This is a seahorse.",
+"thing": "u_seahorse"
+},
+{
+"cat": "picture words",
+"en": "snowman",
+"w": "snowman",
+"s": "This is a snowman.",
+"thing": "w_snowman"
+},
+{
+"cat": "picture words",
+"en": "tent",
+"w": "tent",
+"s": "This is a tent.",
+"thing": "d_tent"
+},
+{
+"cat": "picture words",
+"en": "palm",
+"w": "palm",
+"s": "This is a palm.",
+"thing": "d_palm"
+},
+{
+"cat": "picture words",
+"en": "cactus",
+"w": "cactus",
+"s": "This is a cactus.",
+"thing": "d_cactus"
+},
+{
+"cat": "picture words",
+"en": "scorpion",
+"w": "scorpion",
+"s": "This is a scorpion.",
+"thing": "d_scorpion"
+},
+{
+"cat": "picture words",
+"en": "lizard",
+"w": "lizard",
+"s": "This is a lizard.",
+"thing": "d_lizard"
+},
+{
+"cat": "picture words",
+"en": "balloon",
+"w": "balloon",
+"s": "This is a balloon.",
+"thing": "d_balloon"
+},
+{
+"cat": "picture words",
+"en": "jeep",
+"w": "jeep",
+"s": "This is a jeep.",
+"thing": "d_jeep"
+},
+{
+"cat": "picture words",
+"en": "castle",
+"w": "castle",
+"s": "This is a castle.",
+"thing": "b_castle"
+},
+{
+"cat": "picture words",
+"en": "shell",
+"w": "shell",
+"s": "This is a shell.",
+"thing": "b_shell"
+},
+{
+"cat": "picture words",
+"en": "lighthouse",
+"w": "lighthouse",
+"s": "This is a lighthouse.",
+"thing": "b_lighthouse"
+},
+{
+"cat": "picture words",
+"en": "bed",
+"w": "bed",
+"s": "This is a bed.",
+"thing": "h_bed"
+},
+{
+"cat": "picture words",
+"en": "toothbrush",
+"w": "toothbrush",
+"s": "This is a toothbrush.",
+"thing": "h_toothbrush"
+},
+{
+"cat": "picture words",
+"en": "sink",
+"w": "sink",
+"s": "This is a sink.",
+"thing": "h_sink"
+},
+{
+"cat": "picture words",
+"en": "towel",
+"w": "towel",
+"s": "This is a towel.",
+"thing": "h_towel"
+},
+{
+"cat": "picture words",
+"en": "backpack",
+"w": "backpack",
+"s": "This is a backpack.",
+"thing": "h_backpack"
+},
+{
+"cat": "picture words",
+"en": "shoes",
+"w": "shoes",
+"s": "These are shoes.",
+"thing": "h_shoes"
+},
+{
+"cat": "picture words",
+"en": "wardrobe",
+"w": "wardrobe",
+"s": "This is a wardrobe.",
+"thing": "h_wardrobe"
+},
+{
+"cat": "picture words",
+"en": "table",
+"w": "table",
+"s": "This is a table.",
+"thing": "h_table"
+},
+{
+"cat": "picture words",
+"en": "broom",
+"w": "broom",
+"s": "This is a broom.",
+"thing": "h_broom"
+},
+{
+"cat": "picture words",
+"en": "clock",
+"w": "clock",
+"s": "This is a clock.",
+"thing": "h_clock"
+},
+{
+"cat": "picture words",
+"en": "swing",
+"w": "swing",
+"s": "This is a swing.",
+"thing": "h_swing"
+},
+{
+"cat": "picture words",
+"en": "bike",
+"w": "bike",
+"s": "This is a bike.",
+"thing": "h_bike"
+},
+{
+"cat": "picture words",
+"en": "tree",
+"w": "tree",
+"s": "This is a tree.",
+"thing": "h_tree"
+},
+{
+"cat": "picture words",
+"en": "school",
+"w": "school",
+"s": "This is a school.",
+"thing": "c_school"
+},
+{
+"cat": "picture words",
+"en": "hospital",
+"w": "hospital",
+"s": "This is a hospital.",
+"thing": "c_hospital"
+},
+{
+"cat": "picture words",
+"en": "light",
+"w": "light",
+"s": "This is a light.",
+"thing": "c_light"
+},
+{
+"cat": "picture words",
+"en": "fountain",
+"w": "fountain",
+"s": "This is a fountain.",
+"thing": "c_fountain"
+},
+{
+"cat": "picture words",
+"en": "skyscraper",
+"w": "skyscraper",
+"s": "This is a skyscraper.",
+"thing": "c_skyscraper"
+},
+{
+"cat": "picture words",
+"en": "king",
+"w": "king",
+"s": "This is a king.",
+"thing": "k_king"
+},
+{
+"cat": "picture words",
+"en": "queen",
+"w": "queen",
+"s": "This is a queen.",
+"thing": "k_queen"
+},
+{
+"cat": "picture words",
+"en": "dragon",
+"w": "dragon",
+"s": "This is a dragon.",
+"thing": "k_dragon"
+},
+{
+"cat": "picture words",
+"en": "knight",
+"w": "knight",
+"s": "This is a knight.",
+"thing": "k_knight"
+},
+{
+"cat": "picture words",
+"en": "wizard",
+"w": "wizard",
+"s": "This is a wizard.",
+"thing": "k_wizard"
+},
+{
+"cat": "picture words",
+"en": "chest",
+"w": "chest",
+"s": "This is a chest.",
+"thing": "k_chest"
+},
+{
+"cat": "picture words",
+"en": "alien",
+"w": "alien",
+"s": "This is an alien.",
+"thing": "s_alien"
+},
+{
+"cat": "picture words",
+"en": "robot",
+"w": "robot",
+"s": "This is a robot.",
+"thing": "s_robot"
+},
+{
+"cat": "picture words",
+"en": "moon",
+"w": "moon",
+"s": "This is a moon.",
+"thing": "s_moon"
+},
+{
+"cat": "picture words",
+"en": "ringed planet",
+"w": "ringed planet",
+"s": "This is a ringed planet.",
+"thing": "s_ringplanet"
+},
+{
+"cat": "picture words",
+"en": "balloons",
+"w": "balloons",
+"s": "These are balloons.",
+"thing": "r_balloons"
+},
+{
+"cat": "picture words",
+"en": "cloud",
+"w": "cloud",
+"s": "This is a cloud.",
+"thing": "r_cloud"
+},
+{
+"cat": "picture words",
+"en": "candy",
+"w": "candy",
+"s": "This is candy.",
+"thing": "r_candy"
+},
+{
+"cat": "picture words",
+"en": "cupcake",
+"w": "cupcake",
+"s": "This is a cupcake.",
+"thing": "r_cupcake"
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "pear",
+"w": "pear",
+"s": "This is a pear.",
+"thing": "pear"
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "watermelon",
+"w": "watermelon",
+"s": "This is a watermelon.",
+"thing": "watermelon"
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "car",
+"w": "car",
+"s": "This is a car.",
+"thing": "car"
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "bus",
+"w": "bus",
+"s": "This is a bus.",
+"thing": "bus"
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "boat",
+"w": "boat",
+"s": "This is a boat.",
+"thing": "boat"
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "train",
+"w": "train",
+"s": "This is a train.",
+"thing": "train"
+}
+]

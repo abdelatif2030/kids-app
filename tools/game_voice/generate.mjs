@@ -49,7 +49,8 @@ function manifest() {
     const d = join(DIR, lang);
     if (!existsSync(d)) continue;
     const have = new Set(readdirSync(d).filter((f) => f.endsWith('.mp3')).map((f) => f.slice(0, -4)));
-    m[lang] = lines.filter((l) => l.lang === lang && have.has(l.id)).map((l) => l.id);
+    // English clips come from the owner's voice pack (word, <id>_slow, sentence): every file counts, whatever lines.json says
+    m[lang] = lang === 'en' ? [...have] : lines.filter((l) => l.lang === lang && have.has(l.id)).map((l) => l.id);
   }
   writeFileSync(join(DIR, 'manifest.js'), `// made by tools/game_voice/generate.mjs: the recorded clips that exist\nwindow.__learnVoice = ${JSON.stringify(m)};\n`);
   console.log(`manifest: ${m.ar.length}/${lines.filter((l) => l.lang === 'ar').length} Arabic, ${m.en.length}/${lines.filter((l) => l.lang === 'en').length} English clips`);

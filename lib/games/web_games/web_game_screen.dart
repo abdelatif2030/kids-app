@@ -82,7 +82,7 @@ class _WebGameScreenState extends State<WebGameScreen> {
     // a learning game is told whether its star was already earned (it shows "new star!" only the first time)
     final done = widget.game.isLearning && id != null && (await GameRewards.doneIds(id)).contains(widget.game.learnId);
     if (!mounted) return;
-    setState(() => _config = {'lang': AppLocale.instance.isArabic ? 'ar' : 'en', 'age': widget.age, 'gender': widget.gender, 'save': save, 'done': done, 'level': widget.level});
+    setState(() => _config = {'lang': AppLocale.instance.isArabic ? 'ar' : 'en', 'age': widget.age, 'gender': widget.gender, 'save': save, 'done': done, 'level': widget.level, if (widget.game.learnLang != null) 'learnLang': widget.game.learnLang});
   }
 
   void _hidePoster() {
