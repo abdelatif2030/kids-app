@@ -23,7 +23,7 @@ $2(d,e){var x,w=null,v=0.075*d,u=C.n.a_(v,44,90)
 v=C.n.a_(v,44,90)
 x=$.m().a==="ar"?"\u0631\u062c\u0648\u0639":"Back"
 return A.a([A.ne(w,A.hg(A.b7(w,B.anO,C.I,w,w,new A.aI(C.dy,w,A.cw(C.w,3),w,C.P2,w,C.bR),w,w,w,w,w,w,w,w),B.bN9,this.a.e,40,!1,x),v,w,0.02*d,w,0.03*e,u)],y.e)},
-$S:197};(function inheritance(){var x=a.inherit
+$S:188};(function inheritance(){var x=a.inherit
 x(D.ab8,A.X)
 x(D.aKZ,A.pi)})()
 A.qq(b.typeUniverse,JSON.parse('{"ab8":{"X":[],"f":[]}}'))
@@ -34,4 +34,4 @@ B.bN9=new A.U("choice_back",y.a)
 B.bNa=new A.U("choice_educational",y.a)
 B.bNb=new A.U("choice_fun",y.a)
 B.bNT=new A.U("games_choice",y.a)})()};
-(a=>{a["CrMovTfnPI+0hkxrhTXIbkDt85w="]=a.current})($__dart_deferred_initializers__);
+(a=>{a["sJZoUrb234CC3cl9v9d5E/rL4r4="]=a.current})($__dart_deferred_initializers__);
