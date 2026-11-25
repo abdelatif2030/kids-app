@@ -786,7 +786,20 @@ class Game {
     this.sign = h('div', { class: 'lw-sign' });
     this.signText = h('span');
     this.signIcon = h('i', {}, this._barIcon());
-    this.sign.append(this.signIcon, this.signText, h('button', { class: 'lw-again', 'aria-label': sh.t('again'), onclick: (e) => { e.stopPropagation(); this._say(); } }, '🔊'));
+    if (this._learnEn()) {
+      // English: two big buttons beside the word, usable as often as the child likes: hear it again, hear it slowly (also after the right answer: the sentence)
+      const hear = (slow) => (e) => {
+        e.stopPropagation();
+        const r = this.play && this.play.cur;
+        if (!r || !r.say) return;
+        this.sh.sound.play('tap');
+        if (this.st.mode === 'found' && r.rewardSay) this.sh.speak(r.rewardSay);
+        else this.sh.speak(slow ? r.retry : [r.say[0]]);
+      };
+      this.sign.style.direction = 'ltr';
+      this.sign.append(this.signText, h('button', { class: 'lw-again lw-hear', 'aria-label': 'Listen again', onclick: hear(false) }, h('b', {}, '🔊'), h('small', {}, 'Listen')),
+        h('button', { class: 'lw-again lw-hear lw-slow', 'aria-label': 'Listen slowly', onclick: hear(true) }, h('b', {}, '🐢'), h('small', {}, 'Slowly')));
+    } else this.sign.append(this.signIcon, this.signText, h('button', { class: 'lw-again', 'aria-label': sh.t('again'), onclick: (e) => { e.stopPropagation(); this._say(); } }, '🔊'));
     sh.layer.append(this.sign);
     sh.sound.setMode('play');
     sh.sound.energy = 0;
@@ -1259,6 +1272,7 @@ const CSS = `
 .lw-sign span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lw-sign.pop{animation:lw-pop .5s cubic-bezier(.2,1.6,.4,1)}
 @keyframes lw-pop{from{transform:translateX(-50%) scale(.6)}to{transform:translateX(-50%) scale(1)}}
+.lw-hear{width:auto!important;min-width:calc(var(--u)*13);height:calc(var(--u)*13)!important;border-radius:calc(var(--u)*4)!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0 calc(var(--u)*1.5)!important;direction:ltr}.lw-hear b{font-size:calc(var(--u)*6);line-height:1}.lw-hear small{font-size:calc(var(--u)*2.6);font-weight:900;color:#5a3a00}.lw-slow{background:linear-gradient(180deg,#9be88a,#3fb84a)!important;box-shadow:0 calc(var(--u)*.5) 0 #1f7a2a!important}.lw-slow small{color:#0f4a18}
 .lw-again{flex:none;width:max(48px,calc(var(--u)*11));height:max(48px,calc(var(--u)*11));border-radius:50%;border:calc(var(--u)*.6) solid #fff;background:linear-gradient(180deg,#ffd45a,#f5a01a);font-size:calc(var(--u)*5);cursor:pointer;padding:0;box-shadow:0 calc(var(--u)*.5) 0 #b8700a}
 .lw-card{background:#fffaf0;border:calc(var(--u)*.8) solid #ffd45a;border-radius:calc(var(--u)*6);padding:calc(var(--u)*3) calc(var(--u)*4);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*2);max-width:96%;max-height:92%;overflow:auto;box-sizing:border-box;box-shadow:0 calc(var(--u)*2) calc(var(--u)*6) rgba(30,20,70,.4);pointer-events:auto}
 .lw-title{font-size:calc(var(--u)*7.5);font-weight:900;color:#fff;-webkit-text-stroke:calc(var(--u)*.7) #6a3ad0;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.8) 0 #4a2a9a}
