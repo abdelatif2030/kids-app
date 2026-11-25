@@ -15,7 +15,7 @@
 
 /* rk-pause-right: pause and result panels sit on the right so the picture behind shows */
 .mr-dim:not([style*="background: none"]){background:rgba(5,25,60,.28) !important}
-.mr-dim:not([style*="background: none"])>.mr-panel{margin-left:auto !important;margin-right:7% !important}
+.mr-dim:not([style*="background: none"])>.mr-panel{margin-left:auto !important;margin-right:19% !important}
 
 /* level name card: a clear banner with a bold outlined title, readable on any backdrop */
 .mr-titlecard{top:14% !important;gap:calc(var(--u)*1) !important}
