@@ -339,7 +339,7 @@ final WebGame kAlienSky = WebGame(
   global: 'AlienSky',
   storeKey: 'alien_sky',
   minAge: 4,
-  title: () => tr2('سباق السماء الغريبة', 'Alien Sky Race'),
+  title: () => tr2('سباق الفضا', 'Space Race'),
 );
 
 /// «سباق القمة» (Summit Race): 3D obstacle race for a helmeted rhino, same engine as the alien race.
@@ -349,7 +349,7 @@ final WebGame kRhinoSummit = WebGame(
   global: 'RhinoSummit',
   storeKey: 'rhino_summit',
   minAge: 4,
-  title: () => tr2('سباق القمة', 'Summit Race'),
+  title: () => tr2('الكركدن الصغير', 'Little Rhino'),
 );
 
 /// «طريق الغروب» (Sunset Highway): 3D coastal highway traffic race (docs/SUNSET_HIGHWAY.md).

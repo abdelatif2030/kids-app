@@ -8,7 +8,7 @@
   hero.style.cssText = 'position:absolute;left:2%;bottom:0;height:58%;max-width:30%;object-fit:contain;object-position:left bottom;opacity:0;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))';
   var heroOk = false; hero.onload = function () { heroOk = true; }; hero.onerror = function () { heroOk = false; }; hero.src = 'hero.webp';
   function root() { return host.querySelector('[class$="-layer"],[class*="-layer "]'); }
-  function menuUp() { var p = host.querySelectorAll('[class*="-panel"],[class*="-tracks"],.sh-card,.ar-card'); for (var i = 0; i < p.length; i++) { if (p[i].offsetParent !== null) return true; } return false; }
+  function menuUp() { var p = host.querySelectorAll('[class*="-panel"],[class*="-tracks"],.sh-card,.ar-card,.as-card,.rs-card'); for (var i = 0; i < p.length; i++) { if (p[i].offsetParent !== null) return true; } return false; }
   var busy = false;
   function sync() {
     if (busy) return; busy = true;
