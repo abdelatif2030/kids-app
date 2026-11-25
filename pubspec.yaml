@@ -90,6 +90,8 @@ flutter:
     - assets/content/
     - assets/branding/logo.webp
     - assets/home/home_scene.webp
+    - assets/ui/kit/
+    - assets/ui/
     - assets/games/hub_scene.webp
     - assets/games/choice_scene.webp
     - assets/games/fun_games_scene.webp
@@ -163,6 +165,7 @@ flutter:
     - assets/games/
     - assets/games/dune_titans/
     - assets/games/dune_titans/art/
+    - assets/games/dune_titans/skin/
     - assets/games/dune_titans/models/
     - assets/games/dune_titans/models/Textures/
     - assets/games/castaway_raft/

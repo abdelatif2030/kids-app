@@ -279,7 +279,7 @@ final WebGame kDuneTitans = WebGame(
   global: 'DuneTitans',
   storeKey: 'dune_titans',
   minAge: 4,
-  title: () => tr2('تيتان الكثبان', 'Dune Titans'),
+  title: () => tr2('عربيات الصحرا', 'Desert Trucks'),
 );
 
 /// «طوف الناجي» (Castaway Raft): ocean survival with a hook, from the owner's video (docs/CASTAWAY_RAFT.md).

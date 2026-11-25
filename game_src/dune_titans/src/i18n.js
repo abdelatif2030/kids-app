@@ -1,5 +1,5 @@
 const S = {
-  title: ['تيتان الكثبان', 'Dune Titans'],
+  title: ['عربيات الصحرا', 'Desert Trucks'],
   round: ['الجولة', 'Round'],
   locked: ['اكسب ميدالية في الجولة اللي قبلها', 'Get a medal in the round before'],
   race: ['يلا نسابق!', 'Race!'],
