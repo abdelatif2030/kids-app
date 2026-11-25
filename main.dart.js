@@ -131146,7 +131146,7 @@ A.bOG.prototype={
 $0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u0642\u0645\u0629":"Summit Race"},
 $S:1}
 A.bPe.prototype={
-$0(){return $.m().a==="ar"?"\u0637\u0631\u064a\u0642 \u0627\u0644\u063a\u0631\u0648\u0628":"Sunset Highway"},
+$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u063a\u0631\u0648\u0628":"Sunset Race"},
 $S:1}
 A.bMb.prototype={
 $0(){return $.m().a==="ar"?"\u0645\u0628\u062f\u0639 \u0627\u0644\u0630\u0643\u0627\u0621":"AI Creator"},

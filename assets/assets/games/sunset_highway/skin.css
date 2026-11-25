@@ -1,0 +1,11 @@
+/* Sunset Race skin: sunset magenta, orange and gold (pictures in skin/*.webp) */
+.sh-card{background:url(skin/panel.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;padding:calc(var(--u)*7) calc(var(--u)*9) !important;overflow:visible !important}
+.sh-btn{background:url(skin/pill_orange.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;color:#fff !important;text-shadow:0 2px 0 #6a1030;border-radius:0 !important;padding:calc(var(--u)*2.6) calc(var(--u)*8) calc(var(--u)*3) !important}
+.sh-btn.alt{background-image:url(skin/pill_blue.webp) !important}
+.sh-btn.dark{background-image:url(skin/pill_purple.webp) !important}
+.sh-btn:disabled{background-image:url(skin/pill_grey.webp) !important}
+.sh-btn:active{transform:scale(.96)}
+.sh-logo,.sh-title{color:#fff !important;background:url(skin/ribbon.webp) center/100% 100% no-repeat;padding:calc(var(--u)*2.2) calc(var(--u)*10) calc(var(--u)*3) !important;-webkit-text-stroke:calc(var(--u)*.8) #6a1030;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.6) 0 #6a1030;white-space:nowrap}
+.sh-dim{justify-content:flex-start !important;padding-inline-start:5% !important;background:rgba(40,10,50,.25) !important}
+.sh-lv{background:url(skin/lv_open.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;color:#fff !important}
+.sh-lv.lock{background-image:url(skin/lv_lock.webp) !important}
