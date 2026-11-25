@@ -10,7 +10,7 @@ import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 
 const S = {
-  title: ['فيزمان', 'FIZZ MAN'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], high: ['أعلى النقاط', 'HIGH SCORE'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'], missions: ['المهمات', 'MISSIONS'],
+  title: ['فيزو الشاطر', 'Fizzo the Brave'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], high: ['أعلى النقاط', 'HIGH SCORE'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'], missions: ['المهمات', 'MISSIONS'],
   score: ['النقاط', 'SCORE'], best: ['الأفضل', 'BEST'], restart: ['إعادة', 'RESTART'], home: ['الرئيسية', 'HOME'], paused: ['استراحة', 'PAUSED'], resume: ['كمّل', 'RESUME'], sound: ['الصوت', 'Sound'],
   over: ['انتهت اللعبة', 'GAME OVER'], won: ['وصلت للنهاية! 🏆', 'LEVEL COMPLETE! 🏆'], select: ['اختار المرحلة', 'SELECT LEVEL'], locked: ['خلّص المرحلة اللي قبلها', 'Finish the level before'],
   how: ['اسحب يمين/شمال لتغيير الحارة، فوق للقفز، تحت للانزلاق', 'Swipe left/right to change lane, up to jump, down to slide'], m: ['م', 'm'], tapSound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],

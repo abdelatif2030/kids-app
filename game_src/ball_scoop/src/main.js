@@ -13,7 +13,7 @@ import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 
 const S = {
-  title: ['شاحنة الكور', 'Ball Scoop'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
+  title: ['شاحنة عمورة', 'Amoora's Truck'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
   next: ['المرحلة الجاية', 'Next level'], level: ['المرحلة', 'LEVEL'], goal: ['الهدف', 'GOAL'], play: ['يلا نلعب', 'Play'], levels: ['المراحل', 'Levels'],
   how: ['اسحب يمين وشمال — جمّع الكور، اعدّي من البوابات، واتفادى الحيطان', 'Drag left and right: scoop balls, pass gates, dodge walls'],
   bank: ['البنك الكبير', 'The giant bank'], coins: ['عملات', 'coins'], shop: ['المتجر', 'Shop'], max: ['أقصى', 'MAX'], locked: ['خلّص المرحلة اللي قبلها', 'Finish the level before'],

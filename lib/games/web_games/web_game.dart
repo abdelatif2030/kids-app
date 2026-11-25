@@ -339,7 +339,7 @@ final WebGame kAlienSky = WebGame(
   global: 'AlienSky',
   storeKey: 'alien_sky',
   minAge: 4,
-  title: () => tr2('سباق الفضا', 'Space Race'),
+  title: () => tr2('زومي في الفضا', 'Zoomi in Space'),
 );
 
 /// «سباق القمة» (Summit Race): 3D obstacle race for a helmeted rhino, same engine as the alien race.
@@ -349,7 +349,7 @@ final WebGame kRhinoSummit = WebGame(
   global: 'RhinoSummit',
   storeKey: 'rhino_summit',
   minAge: 4,
-  title: () => tr2('الكركدن الصغير', 'Little Rhino'),
+  title: () => tr2('كركوز والغيوم', 'Karkoz in the Clouds'),
 );
 
 /// «طريق الغروب» (Sunset Highway): 3D coastal highway traffic race (docs/SUNSET_HIGHWAY.md).
@@ -409,7 +409,7 @@ final WebGame kBallScoop = WebGame(
   global: 'BallScoop',
   storeKey: 'ball_scoop',
   minAge: 4,
-  title: () => tr2('شاحنة الكور', 'Ball Scoop'),
+  title: () => tr2('شاحنة عمورة', 'Amoora's Truck'),
 );
 
 /// «الهامستر المحارب» (Hamster Warrior).
@@ -439,7 +439,7 @@ final WebGame kFizzRunner = WebGame(
   global: 'FizzRunner',
   storeKey: 'fizz_runner',
   minAge: 4,
-  title: () => tr2('فيزمان', 'Fizz Man'),
+  title: () => tr2('فيزو الشاطر', 'Fizzo the Brave'),
 );
 
 /// «ينابيع القرية» (Hot Spring Village).

@@ -8,8 +8,8 @@ import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 
 const THEME = {
-  alien: { id: 'alien', glob: 'AlienSky', prefix: 'as', title: ['سباق الفضا', 'Space Race'], icon: '👽', sky: 0x2a1060, fog: 0x4a2a90, panel: ['#7a3ad8', '#3a1a88'], accent: '#7affc8', end: ['الصاروخ', 'Rocket'], names: ['جزر الإقلاع', 'حقل النيازك', 'سباق الصاروخ', 'مدار الأقمار', 'عاصفة الشهب', 'قلب المجرة'] },
-  rhino: { id: 'rhino', glob: 'RhinoSummit', prefix: 'rs', title: ['الكركدن الصغير', 'Little Rhino'], icon: '🦏', sky: 0x7ac8ff, fog: 0xbfe8ff, panel: ['#4a9ad8', '#1a5aa8'], accent: '#ffd23a', end: ['البوابة الدهبية', 'Golden gate'], names: ['سحب الصباح', 'ممر المطارق', 'قمة البوابة الدهبية', 'جسر الغيوم', 'ريح الجبال', 'قمة العمالقة'] },
+  alien: { id: 'alien', glob: 'AlienSky', prefix: 'as', title: ['زومي في الفضا', 'Zoomi in Space'], icon: '👽', sky: 0x2a1060, fog: 0x4a2a90, panel: ['#7a3ad8', '#3a1a88'], accent: '#7affc8', end: ['الصاروخ', 'Rocket'], names: ['جزر الإقلاع', 'حقل النيازك', 'سباق الصاروخ', 'مدار الأقمار', 'عاصفة الشهب', 'قلب المجرة'] },
+  rhino: { id: 'rhino', glob: 'RhinoSummit', prefix: 'rs', title: ['كركوز والغيوم', 'Karkoz in the Clouds'], icon: '🦏', sky: 0x7ac8ff, fog: 0xbfe8ff, panel: ['#4a9ad8', '#1a5aa8'], accent: '#ffd23a', end: ['البوابة الدهبية', 'Golden gate'], names: ['سحب الصباح', 'ممر المطارق', 'قمة البوابة الدهبية', 'جسر الغيوم', 'ريح الجبال', 'قمة العمالقة'] },
 };
 
 const S = {
