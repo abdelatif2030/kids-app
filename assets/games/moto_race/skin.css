@@ -1,0 +1,13 @@
+/* Star Riders skin: pictures made for this game (skin/*.webp) drawn over the menu pieces. Shapes keep their size; only the look changes. */
+.mr-panel{background:url(skin/panel.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;padding:calc(var(--u)*8) calc(var(--u)*10) calc(var(--u)*12) !important;color:#fff}
+.mr-logo,.mr-title{color:#ffd23a !important;-webkit-text-stroke:calc(var(--u)*.7) #0a2a6a;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.5) 0 #0a2a6a}
+.mr-node{background:url(skin/lv_open.webp) center/contain no-repeat !important;border:none !important;box-shadow:none !important;color:#fff !important;font-weight:900;text-shadow:0 calc(var(--u)*.4) 0 #0a2a6a}
+.mr-node.next{background-image:url(skin/lv_sel.webp) !important}
+.mr-node.lock{background-image:url(skin/lv_lock.webp) !important;font-size:0 !important;color:transparent !important}
+.mr-node.lock .stars{display:none}
+.mr-btn2{background:url(skin/pill_blue.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;color:#fff !important;font-weight:900;text-shadow:0 calc(var(--u)*.4) 0 #0a2a6a;padding-top:calc(var(--u)*1.2) !important}
+.mr-btn2.mr-big{background-image:url(skin/pill_orange.webp) !important}
+.mr-btn2.wood{background-image:url(skin/pill_green.webp) !important}
+.mr-btn2:active{transform:scale(.96)}
+
+.mr-dim[style*="background:none"]{justify-content:flex-start !important;padding-inline-start:calc(var(--u)*4) !important;padding-bottom:calc(var(--u)*1) !important}

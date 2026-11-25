@@ -116,6 +116,7 @@ flutter:
     - assets/games/ocean_defense/models/
     - assets/games/moto_race/
     - assets/games/moto_race/art/
+    - assets/games/moto_race/skin/
     - assets/games/rhythm/
     - assets/games/splash_race/
     - assets/games/space_store/
