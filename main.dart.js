@@ -131104,7 +131104,7 @@ A.bOd.prototype={
 $0(){return $.m().a==="ar"?"\u0644\u0639\u0628\u0629 \u0627\u0644\u0636\u0641\u062f\u0639 \u0627\u0644\u062c\u0627\u0626\u0639":"Hungry Frog"},
 $S:1}
 A.bPd.prototype={
-$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u0642\u0645\u0629":"Summit Rush"},
+$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u062a\u0644\u062c":"Snow Race"},
 $S:1}
 A.bNW.prototype={
 $0(){return $.m().a==="ar"?"\u0637\u0631\u064a\u0642 \u0627\u0644\u062a\u0646\u064a\u0646 \u0627\u0644\u062c\u0644\u064a\u062f\u064a":"Frost Coil"},
@@ -131140,10 +131140,10 @@ A.bLk.prototype={
 $0(){return $.m().a==="ar"?"\u0631\u0645\u0627\u0629 \u0627\u0644\u062c\u0633\u0631":"Archer Bridge"},
 $S:1}
 A.bLj.prototype={
-$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u0633\u0645\u0627\u0621 \u0627\u0644\u063a\u0631\u064a\u0628\u0629":"Alien Sky Race"},
+$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u0641\u0636\u0627":"Space Race"},
 $S:1}
 A.bOG.prototype={
-$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u0642\u0645\u0629":"Summit Race"},
+$0(){return $.m().a==="ar"?"\u0627\u0644\u0643\u0631\u0643\u062f\u0646 \u0627\u0644\u0635\u063a\u064a\u0631":"Little Rhino"},
 $S:1}
 A.bPe.prototype={
 $0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u063a\u0631\u0648\u0628":"Sunset Race"},
