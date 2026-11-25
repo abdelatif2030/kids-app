@@ -60,9 +60,9 @@ const sentence = (cat, w) => {
   if (MASS.has(w) || PLUR_OK.has(w)) return `These are ${w}.`.replace('These are', MASS.has(w) ? 'This is' : 'These are');
   return `This is ${/^[aeiou]/.test(w) ? 'an' : 'a'} ${w}.`;
 };
-const rows = ['category,english_word,arabic_hint,clip1_word_normal,clip2_word_slow,clip3_sentence,file1_word,file2_slow,file3_sentence'];
+const rows = ['category,english_word,arabic_hint,clip1_word_normal,clip2_same_word_READ_SLOWLY,clip3_sentence,file1_word,file2_slow,file3_sentence'];
 let total = 0;
-for (const [cat, list] of cats) for (const x of list) { total++; rows.push([cat, x.en, x.ar, x.en, x.en + ' (slow)', sentence(cat, x.en), clipId(x.en, 'en') + '.mp3', clipId(x.en, 'en') + '_slow.mp3', clipId(sentence(cat, x.en), 'en') + '.mp3'].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')); }
+for (const [cat, list] of cats) for (const x of list) { total++; rows.push([cat, x.en, x.ar, x.en, x.en, sentence(cat, x.en), clipId(x.en, 'en') + '.mp3', clipId(x.en, 'en') + '_slow.mp3', clipId(sentence(cat, x.en), 'en') + '.mp3'].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')); }
 writeFileSync(join(ROOT, 'docs', 'ENGLISH_WORDLIST.csv'), '﻿' + rows.join('\n') + '\n');
 for (const [cat, list] of cats) console.log(String(list.length).padStart(4), cat);
 console.log(`TOTAL ${total} words -> ${total * 3} clips`);
