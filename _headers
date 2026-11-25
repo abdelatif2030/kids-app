@@ -41,3 +41,6 @@
 # so opening a game a second time does not wait for the server; an update still shows up within 10 minutes.
 /assets/assets/games/*
   Cache-Control: public, max-age=600
+
+/assets/assets/games/*
+  Cache-Control: no-cache
