@@ -131071,7 +131071,7 @@ A.bOB.prototype={
 $0(){return $.m().a==="ar"?"\u062f\u0641\u0627\u0639 \u0627\u0644\u0642\u0644\u0639\u0629 \u0627\u0644\u0628\u062d\u0631\u064a\u0629":"Ocean Defense"},
 $S:1}
 A.bOz.prototype={
-$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u062f\u0631\u0627\u062c\u0627\u062a \u0627\u0644\u0646\u0627\u0631\u064a\u0629":"Motorcycle Racing"},
+$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u0645\u0648\u062a\u0648\u0633\u064a\u0643\u0644":"Motorbike Race"},
 $S:1}
 A.bOH.prototype={
 $0(){return $.m().a==="ar"?"\u0627\u0644\u0628\u0642\u0627\u0621 \u0639\u0644\u0649 \u0627\u0644\u0625\u064a\u0642\u0627\u0639":"Rhythm Survival"},
