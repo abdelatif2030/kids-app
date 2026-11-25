@@ -117,6 +117,8 @@ class Game {
     this.goodWin = 0;
     this.clock = new THREE.Clock();
     this.bikePics = null;
+    this.zl = null; // Zizo's animated layers (body, wheel with scrolling tread, fluttering tail), built once the pictures are in
+    this._initZizoLayers();
     Promise.all([this._fonts(), loadSprites(THREE, this.base, ['bike_c', 'bike_l', 'bike_r', 'bike_crash', 'bike_rival1', 'bike_rival2', 'bike_rival3', 'bike_rival4', 'bike_rival5', 'bike_nitro']).then((sp) => { this.bikePics = sp; })]).then(() => {
       this.loading.remove();
       this.showMenu();
@@ -173,6 +175,41 @@ class Game {
     cyl.position.set(cx, 150, cz);
     cyl.renderOrder = -10;
     return cyl;
+  }
+
+  /** Zizo from behind, drawn from three transparent layers on one canvas (wheel turns with the speed, tail flutters). Null when a layer is missing. */
+  _initZizoLayers() {
+    const names = ['body', 'wheel', 'tail', 'tread'];
+    const im = {};
+    let n = 0;
+    names.forEach((k) => {
+      const i = new Image();
+      i.onload = () => { if (++n === names.length) this._makeZl(im); };
+      i.src = `${this.base}art/zl_${k}.webp`;
+      im[k] = i;
+    });
+  }
+
+  _makeZl(im) {
+    const W = 219, H = 383, P = 28;
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const g = cv.getContext('2d');
+    const wc = document.createElement('canvas'); wc.width = W; wc.height = H;
+    const wg = wc.getContext('2d');
+    const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+    this.zl = {
+      tex, aspect: W / H, phase: 0,
+      draw: (phase, tailDeg) => {
+        wg.globalCompositeOperation = 'source-over'; wg.clearRect(0, 0, W, H);
+        for (let y = -P + (((phase % P) + P) % P); y < H; y += P) wg.drawImage(im.tread, 0, y);
+        wg.globalCompositeOperation = 'destination-in'; wg.drawImage(im.wheel, 0, 0);
+        g.clearRect(0, 0, W, H);
+        g.drawImage(wc, 0, 0); g.drawImage(im.body, 0, 0);
+        g.save(); g.translate(100, 214); g.rotate((tailDeg * Math.PI) / 180); g.translate(-100, -214); g.drawImage(im.tail, 0, 0); g.restore();
+        tex.needsUpdate = true;
+      },
+    };
+    this.zl.draw(0, 0);
   }
 
   _buildWorld(roundIndex) {
@@ -321,7 +358,8 @@ class Game {
       if (P && P.bike_c) {
         // painted riders (seen from behind): the player is the red one, the rivals take the other colours
         const rivalKey = ['bike_rival1', 'bike_rival2', 'bike_rival3', 'bike_rival4', 'bike_rival5'][(k - 1 + 5) % 5];
-        const mine = [P.bike_c, P.bike_rival1, P.bike_rival2, P.bike_rival4][this.save.color] || P.bike_c;
+        let mine = [P.bike_c, P.bike_rival1, P.bike_rival2, P.bike_rival4][this.save.color] || P.bike_c;
+        if (k === 0 && this.save.color === 0 && this.zl) mine = { tex: this.zl.tex, aspect: this.zl.aspect }; // the animated Zizo
         const set = k === 0 ? { c: mine, l: this.save.color === 0 ? P.bike_l : mine, r: this.save.color === 0 ? P.bike_r : mine, crash: P.bike_crash || mine, nitro: this.save.color === 0 ? P.bike_nitro || mine : mine }
           : { c: P[rivalKey] || P.bike_c, crash: P.bike_crash || P.bike_c };
         b = makeBillboardVehicle(THREE, set, 2.7);
@@ -765,6 +803,7 @@ class Game {
       b.back.rotation.x += spin;
       b.flames.visible = r.boost > 0;
       if (r.boost > 0) b.flames.scale.setScalar(0.8 + Math.random() * 0.5);
+      if (k === 0 && this.zl && this.save.color === 0) { this.zl.phase += r.v * dt * 0.9; this.zl.draw(this.zl.phase, 5 * Math.sin(time * 14) + 2 * Math.sin(time * 23) + (r.boost > 0 ? 4 : 0)); }
       if (b.pic) b.setState(r.crashT > 0 ? 'crash' : r.boost > 0 ? 'nitro' : r.lean > 0.25 ? 'r' : r.lean < -0.25 ? 'l' : 'c');
       if (r.off && r.v > 8 && Math.random() < 0.6) this.dust.emit(r.x - Math.sin(r.h) * 1, 0.4, r.z - Math.cos(r.h) * 1, (Math.random() - 0.5) * 2, 1.5, (Math.random() - 0.5) * 2, 0.6);
     });
