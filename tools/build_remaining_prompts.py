@@ -113,7 +113,7 @@ SQ = "TECHNICAL RULES: ONE single image, square 1:1, subject centred with 12% ma
 AN = "Add Adam and Nour EXACTLY like the {pair} pair of the approved outfits sheet in this chat (never redesign them), very small, waving from the lower-left corner."
 PAIR = {'RACE': 'racing', 'COAST': 'explorer', 'FOREST': 'explorer', 'OCEAN': 'diver', 'SPACE': 'astronaut', 'DESERT': 'explorer', 'SNOW': 'snow suit', 'TOYTOWN': 'chef', 'NEON': 'racing', 'HERO': 'explorer', 'FUNFAIR': 'racing'}
 
-REPL = {('dino_grow', 'Giza Plains'): ('Serengeti Plains', 'golden savanna with acacia trees, a herd of friendly giants far away and a huge orange sun'),
+REPL = {('dino_grow', 'Giza Plains'): ('Prehistoric Savanna', 'a golden prehistoric savanna with acacia trees, a herd of friendly giants far away and a huge orange sun'),
         ('sweet_tray', 'Cairo Sweets Shop'): ('Old Sweets Shop', 'a traditional old sweets shop with glass counters, copper trays and hanging lanterns'),
         ('rug_cleaning', 'Pyramids Camp'): ('Bahariya Camp', 'a desert camp among palm trees and dark hills with colourful carpets drying on ropes')}
 
