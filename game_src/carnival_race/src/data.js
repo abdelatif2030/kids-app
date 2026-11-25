@@ -128,8 +128,8 @@ function loopPoints(start, dir, radius, shift) {
 export const TRACKS = [
   {
     id: 'pier',
-    ar: 'رصيف الغروب',
-    en: 'Sunset Pier',
+    ar: 'ملاهي النيل',
+    en: 'Nile Funfair',
     width: 13,
     difficulty: 0,
     points: [
@@ -146,8 +146,8 @@ export const TRACKS = [
   },
   {
     id: 'lanterns',
-    ar: 'طريق الفوانيس',
-    en: 'Lantern Lane',
+    ar: 'ملاهي الإسكندرية',
+    en: 'Alexandria Pier',
     width: 12,
     difficulty: 1,
     points: [
@@ -164,8 +164,8 @@ export const TRACKS = [
   },
   {
     id: 'stars',
-    ar: 'قمة النجوم',
-    en: 'Starry Summit',
+    ar: 'ليلة العيد',
+    en: 'Eid Night',
     width: 12,
     difficulty: 2,
     points: [
@@ -196,8 +196,8 @@ function mirrorTrack(src, id, ar, en, difficulty, extraHazards) {
   };
 }
 TRACKS.push(
-  mirrorTrack(TRACKS[0], 'pier2', 'رصيف الغروب المعكوس', 'Mirror Pier', 1, [{ type: 'hammer', at: 0.18 }]),
-  mirrorTrack(TRACKS[1], 'lanterns2', 'طريق الفوانيس المعكوس', 'Mirror Lantern Lane', 2, [{ type: 'teacups', at: 0.4 }]),
-  mirrorTrack(TRACKS[2], 'stars2', 'قمة النجوم المعكوسة', 'Mirror Starry Summit', 3, [{ type: 'hammer', at: 0.18 }]),
+  mirrorTrack(TRACKS[0], 'pier2', 'ملاهي باريس', 'Paris Fair', 1, [{ type: 'hammer', at: 0.18 }]),
+  mirrorTrack(TRACKS[1], 'lanterns2', 'ملاهي السندباد', 'Sinbad Fair', 2, [{ type: 'teacups', at: 0.4 }]),
+  mirrorTrack(TRACKS[2], 'stars2', 'ملاهي الثلج', 'Snow Fair', 3, [{ type: 'hammer', at: 0.18 }]),
 );
 export const TRACK_COUNT = TRACKS.length;

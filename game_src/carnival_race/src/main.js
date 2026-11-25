@@ -354,7 +354,7 @@ class Game {
       seed: (Date.now() % 100000) + index,
     });
     const scene = new THREE.Scene();
-    const world = new World(scene, track, race, { start: t('title'), sub: name(def) }, this.quality);
+    const world = new World(scene, track, race, { start: t('title'), sub: name(def), base: this.base, pano: index }, this.quality);
     const carObjs = race.cars.map((c) => {
       const m = this._carModel(c.racer.id);
       const shield = makeShieldBubble();

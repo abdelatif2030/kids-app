@@ -552,6 +552,7 @@ export class World {
     this.root.add(sun);
 
     this.sky = makeSky();
+    this.sky.traverse((o) => { o.renderOrder = -20; });
     this.root.add(this.sky);
     const water = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), new THREE.MeshLambertMaterial({ color: 0x2b1660, emissive: 0x3a1a6e, emissiveIntensity: 0.6 }));
     water.rotation.x = -Math.PI / 2;
@@ -587,6 +588,17 @@ export class World {
     const c = box.getCenter(new THREE.Vector3());
     const size = box.getSize(new THREE.Vector3());
     const R = Math.max(size.x, size.z) / 2;
+    if (labels.base && labels.pano !== undefined) { // the level's painted backdrop: a mirrored ring around the whole funfair
+      const tex = new THREE.TextureLoader().load(`${labels.base}art/pano${labels.pano + 1}.webp`, undefined, undefined, () => { ring.visible = false; });
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.wrapS = THREE.MirroredRepeatWrapping;
+      tex.repeat.set(2, 0.66);
+      tex.offset.set(0, 0.34);
+      const ring = new THREE.Mesh(new THREE.CylinderGeometry(R + 330, R + 330, 300, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false, depthWrite: false }));
+      ring.position.set(c.x, 120, c.z);
+      ring.renderOrder = -10;
+      this.root.add(ring);
+    }
     this.wheels = [];
     const nWheels = quality.low ? 2 : 3;
     let placed = 0;
