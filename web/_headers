@@ -26,7 +26,4 @@
 
 # Speed (2026-11-21): game scripts and pictures are re-checked at most every 10 minutes.
 /assets/assets/games/*
-  Cache-Control: public, max-age=600
-
-/assets/assets/games/*
   Cache-Control: no-cache

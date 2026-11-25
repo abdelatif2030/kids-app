@@ -40,7 +40,4 @@
 # Speed (2026-11-21): the games' scripts, posters and pictures are re-checked at most every 10 minutes (was: on every open),
 # so opening a game a second time does not wait for the server; an update still shows up within 10 minutes.
 /assets/assets/games/*
-  Cache-Control: public, max-age=600
-
-/assets/assets/games/*
   Cache-Control: no-cache
