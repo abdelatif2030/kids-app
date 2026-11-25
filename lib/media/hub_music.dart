@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 
 import 'audio.dart';
 import 'audio_gate.dart';
+import 'section_voice.dart';
 
 /// Quiet original background music for the big pages (owner request 2026-11-20): the child's home, the fun games, the learning games.
 /// One player for the whole app: a page CLAIMS the music when it is on top ([HubMusicScope]), the track keeps playing while the child
@@ -52,6 +53,10 @@ class HubMusic {
       if (identical(_owner, owner)) {
         _owner = null;
         _want = null;
+        // stop at once: the queued _apply would wait behind a long-running play() otherwise (owner: the music never stopped)
+        try {
+          _player?.pause();
+        } catch (_) {}
         _schedule();
       }
     });
@@ -85,7 +90,11 @@ class HubMusic {
         _loaded = want;
       }
       if (_want != want) return; // the page changed while loading: the next _apply decides
-      await p.play();
+      // the page's spoken welcome (SectionVoice) is said first; the music starts when it ends (owner request 2026-11-25)
+      await SectionVoice.waitIdle();
+      if (_want != want || AudioGate.instance.silenced) return;
+      // play() only completes when playback ends: never await it, or the queue of later pause/stop requests would wait behind it
+      unawaited(p.play().then((_) {}, onError: (Object _) {}));
     } catch (_) {
       // no audio device, blocked autoplay, a missing file: stay silent
     }

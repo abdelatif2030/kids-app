@@ -52,10 +52,7 @@ class _LearningGamesScreenState extends State<LearningGamesScreen> {
   @override
   void initState() {
     super.initState();
-    // «هنتعلم سوا النهارده», once the page is on screen
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) PageVoice.say(PageVoice.learnToday);
-    });
+    // The old «هنتعلم سوا النهارده» greeting was removed (owner, 2026-11-25): the page says only the new section greeting (SectionVoiceOnEnter 'learning').
   }
 
   @override

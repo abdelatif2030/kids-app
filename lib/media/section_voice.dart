@@ -15,6 +15,21 @@ class SectionVoice {
   static const gap = Duration(seconds: 45);
   static final Map<String, DateTime> _last = {};
   static AudioPlayer? _p;
+  static Completer<void>? _done; // open while a welcome is being said
+
+  /// Completes when the welcome being said has ended (at once when none is playing; never waits more than [_maxWait]).
+  static Future<void> waitIdle() {
+    final d = _done;
+    if (d == null || d.isCompleted) return Future<void>.value();
+    return d.future.timeout(_maxWait, onTimeout: () {});
+  }
+
+  static const _maxWait = Duration(seconds: 12);
+
+  static void _finish() {
+    final d = _done;
+    if (d != null && !d.isCompleted) d.complete();
+  }
 
   /// section id -> clip. Ids: games, fun, learning, stories, coloring, videos.
   static const clips = {
@@ -36,20 +51,29 @@ class SectionVoice {
     final last = _last[id];
     if (last != null && now.difference(last) < gap) return;
     _last[id] = now;
+    _finish();
+    final done = _done = Completer<void>();
     try {
       await _p?.stop();
       _p?.dispose();
       final p = _p = AudioPlayer();
       await p.setAsset(asset);
       unawaited(p.play().then((_) {}, onError: (Object _) {}));
-      unawaited(p.processingStateStream.firstWhere((s) => s == ProcessingState.completed).then((_) => p.dispose(), onError: (Object _) {}));
+      unawaited(p.processingStateStream.firstWhere((s) => s == ProcessingState.completed).then((_) {
+        p.dispose();
+        if (!done.isCompleted) done.complete();
+      }, onError: (Object _) {
+        if (!done.isCompleted) done.complete();
+      }));
     } catch (_) {
       // no audio here: nothing to say
+      if (!done.isCompleted) done.complete();
     }
   }
 
   static void stop() {
     _p?.stop();
+    _finish();
   }
 }
 
