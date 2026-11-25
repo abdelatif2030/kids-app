@@ -124,6 +124,7 @@ class Game {
     Promise.all([this._fonts(), loadSprites(THREE, this.base, ['bike_c', 'bike_l', 'bike_r', 'bike_crash', 'bike_rival1', 'bike_rival2', 'bike_rival3', 'bike_rival4', 'bike_rival5', 'bike_nitro']).then((sp) => { this.bikePics = sp; })]).then(() => {
       this.loading.remove();
       this.showMenu();
+      this._intro();
       this.renderer.setAnimationLoop(() => this._frame());
     });
   }
@@ -228,6 +229,17 @@ class Game {
       },
     };
     this.zl.draw(0, 0);
+  }
+
+  /** The owner's own voice greeting, once when the game opens (art: intro.mp3 next to the page). A browser that blocks sound waits for the first touch. */
+  _intro() {
+    if (this._introDone || this.sound.muted) return;
+    this._introDone = true;
+    const a = new Audio(`${this.base}intro.mp3`);
+    a.volume = 1;
+    const arm = () => { const go = () => { document.removeEventListener('pointerdown', go, true); a.play().catch(() => {}); }; document.addEventListener('pointerdown', go, true); };
+    a.play().catch(arm);
+    this._introAudio = a;
   }
 
   _buildWorld(roundIndex) {
@@ -948,6 +960,7 @@ class Game {
   }
 
   dispose() {
+    if (this._introAudio) { try { this._introAudio.pause(); } catch (_) { /* fine */ } }
     clearInterval(this._pill);
     this.sound.dispose();
     if (this.renderer) {
