@@ -123,6 +123,12 @@ class Game {
     const s = (this.scene = new THREE.Scene());
     s.fog = new THREE.Fog(FOG[world], 160, 760);
     s.add(makeSky(world));
+    { // the level's painted backdrop (art/pano<N>.webp, N = 1..5): a mirrored ring that follows the camera
+      const tex = new THREE.TextureLoader().load(`${this.base}art/pano${(i % 5) + 1}.webp`, () => { ring.visible = true; });
+      tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = THREE.MirroredRepeatWrapping; tex.repeat.set(2, 0.66); tex.offset.set(0, 0.34);
+      const ring = new THREE.Mesh(new THREE.CylinderGeometry(800, 800, 560, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false }));
+      ring.visible = false; ring.renderOrder = -9; this.panoMesh = ring; s.add(ring);
+    }
     this.sun = makeSun(world);
     s.add(this.sun);
     s.add(new THREE.HemisphereLight(0xffffff, world === 'glacier' ? 0x4a6a3a : 0x2a8ab0, 1.6));
@@ -652,6 +658,7 @@ class Game {
     const fov = this.baseFov + (pl.boost > 0 ? 10 : 0) + Math.min(6, pl.speed / 20);
     if (Math.abs(this.camera.fov - fov) > 0.05) { this.camera.fov += (fov - this.camera.fov) * Math.min(1, dt * 3); this.camera.updateProjectionMatrix(); }
     // the sun stays far away in the sky behind the course
+    if (this.panoMesh) this.panoMesh.position.set(this.camera.position.x, this.camera.position.y + 40, this.camera.position.z);
     this.sun.position.copy(this.camera.position).add(new THREE.Vector3(-0.5, 0.45, -0.6).normalize().multiplyScalar(820));
     this.sun.lookAt(this.camera.position);
     // engine sound follows the speed

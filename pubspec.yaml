@@ -128,6 +128,7 @@ flutter:
     - assets/games/fox_family/art/
     - assets/games/air_race/
     - assets/games/air_race/art/
+    - assets/games/air_race/skin/
     - assets/games/zombie_rooftop/
     - assets/games/zombie_rooftop/models/
     - assets/games/zombie_rooftop/art/

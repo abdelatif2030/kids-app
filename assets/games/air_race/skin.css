@@ -1,0 +1,14 @@
+/* Plane Race skin: sky blue and white with sunny yellow, riveted wings (pictures in skin/*.webp) */
+.ar-card{background:url(skin/panel.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;padding:calc(var(--u)*8) calc(var(--u)*10) calc(var(--u)*7) !important;overflow:visible !important}
+.ar-cbtn{background:url(skin/pill_orange.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;color:#fff !important;text-shadow:0 2px 0 #7a1a10;border-radius:0 !important;padding:calc(var(--u)*2.4) calc(var(--u)*8) calc(var(--u)*3) !important}
+.ar-cbtn.alt{background-image:url(skin/pill_blue.webp) !important}
+.ar-big{color:#fff !important;background:url(skin/ribbon.webp) center/100% 100% no-repeat;padding:calc(var(--u)*2) calc(var(--u)*10) calc(var(--u)*3) !important;-webkit-text-stroke:calc(var(--u)*.8) #0a4a8a;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.5) 0 #0a4a8a;white-space:nowrap;margin-top:calc(var(--u)*-3.5) !important}
+.ar-course{background:url(skin/pill_blue.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;color:#fff !important;text-shadow:0 2px 0 #0a3a7a;padding-block:calc(var(--u)*1.6) !important}
+.ar-course.lock{background-image:url(skin/pill_grey.webp) !important;color:#556 !important;text-shadow:none}
+.ar-course.next{background-image:url(skin/pill_gold.webp) !important;color:#5a2a00 !important;text-shadow:none}
+.ar-dim{justify-content:flex-start !important;padding-inline-start:5% !important}
+.ar-course.lock{color:#fff !important;text-shadow:0 2px 0 #2a3a4a !important;opacity:.85}
+.ar-card{padding:calc(var(--u)*6.5) calc(var(--u)*8) calc(var(--u)*5.5) !important;gap:calc(var(--u)*1) !important}
+.ar-courses{gap:calc(var(--u)*.6) !important;width:calc(var(--u)*62) !important}
+.ar-course{min-height:0 !important;padding-block:calc(var(--u)*.9) !important}
+.ar-course .no{font-size:calc(var(--u)*3.4) !important}

@@ -15,6 +15,6 @@ await S('Page.enable'); await S('Runtime.enable');
 await S('Emulation.setDeviceMetricsOverride', { width: W, height: H, deviceScaleFactor: 1, mobile: false });
 await S('Page.navigate', { url: `http://localhost:8099/${game}/index.html` }); await sleep(4500);
 const r = await S('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
-console.log(JSON.stringify(r.result && r.result.result ? r.result.result.value : r));
+console.log(JSON.stringify(r.result && r.result.result ? (r.result.exceptionDetails ? r.result.exceptionDetails.exception.description : r.result.result.value) : r));
 if (process.env.SHOT) { const sh = await S('Page.captureScreenshot', { format: 'png' }); if (sh.result) (await import('node:fs')).writeFileSync(process.env.SHOT, Buffer.from(sh.result.data, 'base64')); }
 chrome.kill(); process.exit(0);

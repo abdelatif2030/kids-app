@@ -1,5 +1,5 @@
 const S = {
-  title: ['سباق الطائرات الجوي', 'Airplane Racing'],
+  title: ['سباق الطيارات', 'Plane Race'],
   laps: ['دورتين', '2 LAPS'],
   lap: ['دورة', 'LAP'],
   locked: ['خلّص السباق اللي قبله', 'Finish the race before'],

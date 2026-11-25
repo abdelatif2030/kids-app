@@ -157,7 +157,7 @@ final WebGame kAirRace = WebGame(
   global: 'AirRace',
   storeKey: 'air_race',
   minAge: 3,
-  title: () => tr2('سباق الطائرات الجوي', 'Airplane Racing'),
+  title: () => tr2('سباق الطيارات', 'Plane Race'),
 );
 
 /// «البقاء على قيد الحياة» (Zombie Rooftop Shooter): a cartoon fighter clears city rooftops of goofy zombies and leaps
