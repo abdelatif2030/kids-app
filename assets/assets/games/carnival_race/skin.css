@@ -1,0 +1,20 @@
+/* Joy Funfair skin: pictures made for this game (skin/*.webp) over the menu pieces. */
+.cr-title{color:#fff !important;transform:none !important;font-size:calc(var(--u)*8) !important;line-height:1.15 !important;background:url(skin/ribbon.webp) center/100% 100% no-repeat;padding:calc(var(--u)*2.4) calc(var(--u)*12) calc(var(--u)*3.2) !important;-webkit-text-stroke:calc(var(--u)*.9) #b01a5c;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.6) 0 #b01a5c;white-space:nowrap}
+.cr-sub{background:rgba(120,30,120,.78);border-radius:999px;padding:calc(var(--u)*.6) calc(var(--u)*4);border:calc(var(--u)*.4) solid #ffe066}
+.cr-track{background:url(skin/panel.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;width:calc(var(--u)*29) !important;padding:calc(var(--u)*4.5) calc(var(--u)*4) calc(var(--u)*5) !important;text-shadow:0 calc(var(--u)*.4) 0 #4a1a7a}
+.cr-track.locked{filter:grayscale(.85) brightness(.8)}
+.cr-track .bs{font-size:calc(var(--u)*3.2)}
+.cr-panel{background:url(skin/panel.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;padding:calc(var(--u)*8) calc(var(--u)*10) !important;overflow:visible !important}
+.cr-btn{background:url(skin/pill_orange.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;color:#fff !important;font-weight:900;text-shadow:0 calc(var(--u)*.4) 0 #7a1a4a;padding:calc(var(--u)*2.6) calc(var(--u)*9) calc(var(--u)*3) !important;border-radius:0 !important}
+.cr-btn.blue{background-image:url(skin/pill_blue.webp) !important}
+.cr-btn.gold{background-image:url(skin/pill_gold.webp) !important}
+.cr-btn[disabled]{background-image:url(skin/pill_grey.webp) !important}
+.cr-btn:active{transform:scale(.96)}
+.cr-center{padding-left:36% !important;padding-right:2% !important;box-sizing:border-box}
+.cr-track{width:calc(var(--u)*21) !important;min-height:calc(var(--u)*26) !important;padding:calc(var(--u)*3.4) calc(var(--u)*3) calc(var(--u)*3.8) !important}
+.cr-track .ic{font-size:calc(var(--u)*8) !important}
+.cr-track .nm{font-size:calc(var(--u)*3.4) !important}
+.cr-tracks{gap:calc(var(--u)*1.6) !important}
+.cr-title{font-size:calc(var(--u)*6.6) !important}
+.cr-tracks{margin-top:calc(var(--u)*13) !important}
+.cr-track{min-height:calc(var(--u)*23) !important}

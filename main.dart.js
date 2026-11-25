@@ -131050,7 +131050,7 @@ A.Jd.prototype={
 H(){return"LearnEvent."+this.b}}
 A.Mo.prototype={}
 A.bLT.prototype={
-$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0645\u0644\u0627\u0647\u064a \u0627\u0644\u0623\u0628\u0637\u0627\u0644":"Glowfair Rally"},
+$0(){return $.m().a==="ar"?"\u0639\u0631\u0628\u064a\u0627\u062a \u0627\u0644\u0645\u0644\u0627\u0647\u064a":"Funfair Cars"},
 $S:1}
 A.bOl.prototype={
 $0(){return $.m().a==="ar"?"\u0645\u063a\u0627\u0645\u0631\u0629 \u0627\u0644\u0623\u062f\u063a\u0627\u0644":"Jungle Adventure"},
@@ -131122,7 +131122,7 @@ A.bOx.prototype={
 $0(){return $.m().a==="ar"?"\u062c\u0631\u0651\u0627\u0641\u0629 \u0627\u0644\u0643\u0631\u0627\u062a":"Marble Dozer"},
 $S:1}
 A.bMe.prototype={
-$0(){return $.m().a==="ar"?"\u062a\u064a\u062a\u0627\u0646 \u0627\u0644\u0643\u062b\u0628\u0627\u0646":"Dune Titans"},
+$0(){return $.m().a==="ar"?"\u0639\u0631\u0628\u064a\u0627\u062a \u0627\u0644\u0635\u062d\u0631\u0627":"Desert Trucks"},
 $S:1}
 A.bLU.prototype={
 $0(){return $.m().a==="ar"?"\u0637\u0648\u0641 \u0627\u0644\u0646\u0627\u062c\u064a":"Castaway Raft"},
@@ -131131,7 +131131,7 @@ A.bPk.prototype={
 $0(){return $.m().a==="ar"?"\u0645\u0639\u0633\u0643\u0631 \u0627\u0644\u0634\u062a\u0627\u0621":"Winter Camp"},
 $S:1}
 A.bOF.prototype={
-$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u062d\u0644\u0628\u0629 \u0627\u0644\u0645\u0637\u0631":"Rain Circuit"},
+$0(){return $.m().a==="ar"?"\u0633\u0628\u0627\u0642 \u0627\u0644\u0645\u0637\u0631":"Rain Race"},
 $S:1}
 A.bOP.prototype={
 $0(){return $.m().a==="ar"?"\u0641\u0631\u0642\u0629 \u0627\u0644\u062c\u0646\u0648\u062f":"Squad Shooter"},
