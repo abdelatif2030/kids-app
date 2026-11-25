@@ -6,3 +6,9 @@
 .hf-node.lock{background-image:url(skin/lv_lock.webp) !important;font-size:0 !important;color:transparent !important}
 .hf-btn{background:url(skin/pill_green.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;text-shadow:0 calc(var(--u)*.4) 0 #1f6a1f;padding-top:calc(var(--u)*2.4) !important;padding-bottom:calc(var(--u)*1.4) !important}
 .hf-btn:active{transform:scale(.96)}
+/* the owner's icons, props and win picture */
+.hf-win{background:rgba(0,0,0,.15) url(art/win.webp) center/cover no-repeat !important}
+.hf-win>.hf-panel{position:relative;z-index:1;margin-inline-start:7%;margin-inline-end:auto}
+.hf-stars span{font-size:0 !important;display:inline-block;width:calc(var(--u)*11);height:calc(var(--u)*11);background:url(art/icon_star.webp) center/contain no-repeat}
+.hf-coin{background:url(art/icon_coin.webp) center/contain no-repeat !important;border:none !important;border-radius:0 !important}
+.hf-card .ic img{height:calc(var(--u)*10);width:auto;max-width:100%;object-fit:contain}

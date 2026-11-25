@@ -1,2 +1,6 @@
 /* Jungle adventure skin: the owner's ribbon (skin/ribbon.webp) behind the title; the level cards keep their own look. */
 .ja-logo{color:#fff !important;background:url(skin/ribbon.webp) center/100% 100% no-repeat;padding:calc(var(--u)*2.6) calc(var(--u)*10) calc(var(--u)*3.4) !important;-webkit-text-stroke:calc(var(--u)*.8) #1a5a3a;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.5) 0 #1a5a3a;white-space:nowrap}
+/* the owner's coin, heart and win pictures */
+.ja-coin{background:url(art/coin.webp) center/contain no-repeat !important;border:none !important;border-radius:0 !important}
+.ja-heart{font-size:0 !important;display:inline-block;width:calc(var(--u)*5);height:calc(var(--u)*5);background:url(art/icon_heart.webp) center/contain no-repeat}
+.ja-dim:has(.ja-win){background:rgba(0,0,0,.2) url(art/win.webp) center/cover no-repeat}
