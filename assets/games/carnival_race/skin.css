@@ -16,3 +16,5 @@
 .cr-track .nm{font-size:calc(var(--u)*3.4) !important}
 .cr-tracks{gap:calc(var(--u)*1.6) !important}
 .cr-title{font-size:calc(var(--u)*6.6) !important}
+.cr-tracks{margin-top:calc(var(--u)*13) !important}
+.cr-track{min-height:calc(var(--u)*23) !important}

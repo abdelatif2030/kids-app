@@ -309,7 +309,7 @@ final WebGame kRainCircuit = WebGame(
   global: 'RainCircuit',
   storeKey: 'rain_circuit',
   minAge: 4,
-  title: () => tr2('سباق حلبة المطر', 'Rain Circuit'),
+  title: () => tr2('سباق المطر', 'Rain Race'),
 );
 
 /// «فرقة الجنود» (Squad Shooter): 3D night-road lane shooter (docs/LANE_SHOOTERS.md).

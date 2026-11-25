@@ -171,6 +171,7 @@ flutter:
     - assets/games/rain_circuit/models/Textures/
     - assets/games/rain_circuit/models/
     - assets/games/rain_circuit/art/
+    - assets/games/rain_circuit/skin/
     - assets/games/squad_shooter/
     - assets/games/archer_bridge/
     - assets/games/alien_sky/
