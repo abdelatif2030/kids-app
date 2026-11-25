@@ -1,0 +1,2 @@
+/* Jungle adventure skin: the owner's ribbon (skin/ribbon.webp) behind the title; the level cards keep their own look. */
+.ja-logo{color:#fff !important;background:url(skin/ribbon.webp) center/100% 100% no-repeat;padding:calc(var(--u)*2.6) calc(var(--u)*10) calc(var(--u)*3.4) !important;-webkit-text-stroke:calc(var(--u)*.8) #1a5a3a;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.5) 0 #1a5a3a;white-space:nowrap}
