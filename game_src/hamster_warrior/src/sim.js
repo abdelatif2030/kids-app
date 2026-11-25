@@ -9,9 +9,9 @@ import { rng, clamp } from '../../cozy_kit/ui.js';
 export const LANES = [-2.3, 0, 2.3];
 export const HALF = 3.5;
 export const CHAPTERS = [
-  { id: 1, ar: 'غابة الصباح', en: 'Morning Forest', levels: 4 },
-  { id: 2, ar: 'وادي الفطر', en: 'Mushroom Valley', levels: 4 },
-  { id: 3, ar: 'جبل الحجارة', en: 'Stone Mountain', levels: 4 },
+  { id: 1, ar: 'تلال المقطم', en: 'Moqattam Hills', levels: 4 },
+  { id: 2, ar: 'الصحرا السودا', en: 'Black Desert', levels: 4 },
+  { id: 3, ar: 'جبال الصحرا الشرقية', en: 'Eastern Mountains', levels: 4 },
 ];
 export const LEVELS = 12;
 export const HEARTS = 3;
