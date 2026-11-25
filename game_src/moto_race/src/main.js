@@ -362,7 +362,7 @@ class Game {
         if (k === 0 && this.save.color === 0 && this.zl) mine = { tex: this.zl.tex, aspect: this.zl.aspect }; // the animated Zizo
         const set = k === 0 ? { c: mine, l: this.save.color === 0 ? P.bike_l : mine, r: this.save.color === 0 ? P.bike_r : mine, crash: P.bike_crash || mine, nitro: this.save.color === 0 ? P.bike_nitro || mine : mine }
           : { c: P[rivalKey] || P.bike_c, crash: P.bike_crash || P.bike_c };
-        b = makeBillboardVehicle(THREE, set, 2.7);
+        b = makeBillboardVehicle(THREE, set, 3.0);
       } else b = makeBike(k === 0 ? COLORS[this.save.color] : r.color, r.suit, r.helmet, r.num);
       s.add(b.root);
       return b;
@@ -803,7 +803,7 @@ class Game {
       b.back.rotation.x += spin;
       b.flames.visible = r.boost > 0;
       if (r.boost > 0) b.flames.scale.setScalar(0.8 + Math.random() * 0.5);
-      if (k === 0 && this.zl && this.save.color === 0) { this.zl.phase += r.v * dt * 0.9; this.zl.draw(this.zl.phase, 5 * Math.sin(time * 14) + 2 * Math.sin(time * 23) + (r.boost > 0 ? 4 : 0)); }
+      if (k === 0 && this.zl && this.save.color === 0) { this.zl.phase += r.v * dt * 7; this.zl.draw(this.zl.phase, 5 * Math.sin(time * 14) + 2 * Math.sin(time * 23) + (r.boost > 0 ? 4 : 0)); }
       if (b.pic) b.setState(r.crashT > 0 ? 'crash' : r.boost > 0 ? 'nitro' : r.lean > 0.25 ? 'r' : r.lean < -0.25 ? 'l' : 'c');
       if (r.off && r.v > 8 && Math.random() < 0.6) this.dust.emit(r.x - Math.sin(r.h) * 1, 0.4, r.z - Math.cos(r.h) * 1, (Math.random() - 0.5) * 2, 1.5, (Math.random() - 0.5) * 2, 0.6);
     });
@@ -826,15 +826,15 @@ class Game {
     const fx = Math.sin(p.h);
     const fz = Math.cos(p.h);
     const portrait = this.cw < this.ch;
-    const back = portrait ? 6.6 : 5.6;
-    const up = portrait ? 3.0 : 2.4;
+    const back = portrait ? 5.2 : 3.7;
+    const up = portrait ? 2.6 : 1.85;
     const want = new THREE.Vector3(p.x - fx * back, up, p.z - fz * back);
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 6));
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 2);
     const sh = this.shake * 0.25;
     this.camera.position.set(this.cam.x + (Math.random() - 0.5) * sh, this.cam.y + (Math.random() - 0.5) * sh, this.cam.z);
-    this.camera.lookAt(p.x + fx * 6, 1.1, p.z + fz * 6);
+    this.camera.lookAt(p.x + fx * 6, portrait ? 1.1 : 1.25, p.z + fz * 6);
     this.camera.rotateZ(this.bikes[0].lean.rotation.z * 0.05);
     const fov = this.baseFov + Math.min(10, p.v * 0.12) + (p.boost > 0 ? 6 : 0);
     if (Math.abs(this.camera.fov - fov) > 0.1) { this.camera.fov += (fov - this.camera.fov) * Math.min(1, dt * 3); this.camera.updateProjectionMatrix(); }
