@@ -5,6 +5,7 @@
 // Eight levels. 2D canvas; all art and sound made in code. No network, no links, nothing is lost for good.
 import { Voyage, LEVELS, COST, MAX_TILES, RAFT, normalizeSave } from './sim.js';
 import { Sound } from './audio.js';
+import { View3D } from './view3d.js';
 import { setLang, setGirl, getLang, t, num } from './i18n.js';
 import { h, css } from '../../cozy_kit/ui.js';
 
@@ -27,6 +28,7 @@ class Game {
     if (!document.getElementById('cr-style')) document.head.append(h('style', { id: 'cr-style' }, CSS));
     this.root = h('div', { class: 'cr-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
+    this.view = new View3D(); this.root.append(this.view.dom);
     this.cv = h('canvas');
     this.root.append(this.cv);
     this.g = this.cv.getContext('2d');
@@ -58,6 +60,7 @@ class Game {
     this.cv.width = Math.round(this.cw * this.dpr);
     this.cv.height = Math.round(this.ch * this.dpr);
     this.u = Math.min(this.cw, this.ch) / 100;
+    this.view.setSize(this.cw, this.ch, this.u);
     this.root.style.setProperty('--u', `${this.u}px`);
   }
 
@@ -276,37 +279,13 @@ class Game {
     const H = this.ch;
     const v = this.mode === 'play' ? this.v : null;
     const tm = this.clock;
-    // water
-    const grad = g.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, '#2a9ae0');
-    grad.addColorStop(1, '#1a5eb8');
-    g.fillStyle = grad;
-    g.fillRect(0, 0, W, H);
-    g.strokeStyle = 'rgba(255,255,255,.18)';
-    g.lineWidth = Math.max(1.5, this.u * 0.35);
-    const drift = v ? v.time * 0.05 : tm * 0.03;
-    for (let i = 0; i < 34; i++) {
-      const x = ((i * 0.37 + 0.13) % 1) * W;
-      const y = (((i * 0.211 + drift) % 1.1) - 0.05) * H;
-      const w = this.u * (4 + (i % 4) * 1.5);
-      g.beginPath();
-      g.moveTo(x - w, y);
-      g.quadraticCurveTo(x, y - this.u * 1.2 + Math.sin(tm * 2 + i) * this.u * 0.4, x + w, y);
-      g.stroke();
-    }
-    if (!v) { this._drawMenuRaft(g, W, H, tm); return; }
-    // island rising from the top as the raft gets close
-    const approach = Math.max(0, (v.progress - 0.78) / 0.22);
-    const lift = v.state === 'landing' ? Math.min(1, v.landT / 2) : 0;
-    this._island(g, W, H, approach, lift, v.level.isl);
-    // things on the water
-    for (const it of v.items) this._item(g, W, H, it, tm);
-    if (v.shark.state !== 'none') this._shark(g, W, H, v.shark, tm);
-    // raft, hero, hook
-    const rx = RAFT.x * W;
-    const ry = RAFT.y * H - lift * H * 0.45;
-    this._raft(g, rx, ry, v, tm);
-    this._hook(g, rx, ry, v, W, H, tm);
+    g.clearRect(0, 0, W, H);
+    const lift = v && v.state === 'landing' ? Math.min(1, v.landT / 2) : 0;
+    const fake = v || { built: { tile: 6, sail: true, fish: false, hut: false }, hook: { phase: 'idle' }, shark: { state: 'none' }, state: 'sail', time: tm, items: [], progress: 0, level: { isl: 'palm' } };
+    const rs = v ? Math.min(W, H) * 0.145 / this.u : 14;
+    this.view.render({ v: fake, tm, raftFy: (v ? RAFT.y - 0.07 : 0.8) - lift * 0.45, rs, drift: v ? v.time * 0.05 : tm * 0.03 });
+    if (v && v.shark.state === 'bite') { const [bx, by] = this.view.project(this.view.X(v.shark.x) + 3, 8, this.view.Z(v.shark.y)); const s = this.u; g.fillStyle = '#fff'; g.strokeStyle = '#d83a2a'; g.lineWidth = s * 0.6; g.beginPath(); g.arc(bx, by, s * 2.6, 0, 6.3); g.fill(); g.stroke(); g.fillStyle = '#d83a2a'; g.font = `900 ${s * 4}px system-ui`; g.textAlign = 'center'; g.fillText('!', bx, by + s * 1.4); }
+    if (!v) return;
     // floating text
     g.textAlign = 'center';
     g.font = `900 ${this.u * 4.4}px Tajawal, system-ui, sans-serif`;
@@ -546,6 +525,7 @@ class Game {
 
   dispose() {
     cancelAnimationFrame(this.raf);
+    this.view.dispose();
     this.sound.dispose();
     if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis);
