@@ -44,7 +44,7 @@ function snowPts() { const n = 180, pos = new Float32Array(n * 3); for (let i = 
 
 export class View3D {
   constructor() {
-    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true, alpha: false }), { preset: 'day', tune: { bloom: [0.35, 0.5, 0.82] } });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true, alpha: false }), { preset: 'fresh', tune: { bloom: [0.35, 0.5, 0.82] } });
     this.dom = this.renderer.domElement; this.dom.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block';
     this.scene = new THREE.Scene(); this.scene.background = skyTex(); 
     this.cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 800);
@@ -107,7 +107,7 @@ export class View3D {
     this.rings.forEach((r, i) => { r.rotation.z = tm * (1.5 + i * 0.7) * (i % 2 ? -1 : 1); r.rotation.x = Math.sin(tm * 2 + i) * 0.25; const k = 1 - i * 0.22; r.scale.set(k * 1.6, k * 1.6, k * 1.6); });
     this.pcore.rotation.z = tm; this.pcore.scale.setScalar(1.3 + Math.sin(tm * 3) * 0.1);
     // dragon
-    const D = this.dragon; const sc = (L ? L.s / U : 30) * 0.55; D.g.visible = !(travel && travel.t > 1.05);
+    const D = this.dragon; const sc = (L ? L.s / U : 30) * 0.85; D.g.visible = !(travel && travel.t > 1.05);
     const segs = D.P.segs; const pts = trailPx && trailPx.length > 1 ? trailPx.map(([x, y]) => new THREE.Vector3(this.X(x), 3.2 * sc * 0.4, this.Z(y))) : null;
     if (pts) { const dist = sc * 0.9; segs.forEach((sg, i) => { const q = pts[Math.min(pts.length - 1, Math.floor(i * pts.length / 8))]; sg.position.copy(q); sg.scale.setScalar(sc); }); const a = pts[0], b = pts[Math.min(pts.length - 1, 2)]; segs[0].rotation.y = Math.atan2(a.x - b.x, a.z - b.z); void dist; }
     else { const bx = this.X(dragonPx[0]), bz = this.Z(dragonPx[1]); segs.forEach((sg, i) => { const a = -i * 0.55 + Math.sin(tm * 1.5) * 0.15; sg.position.set(bx - i * sc * 0.55 + Math.sin(tm * 2 + i) * 0.1 * sc, sc * 0.7 + Math.sin(tm * 2.4 - i * 0.6) * sc * 0.12, bz + 2 + Math.sin(a + i) * sc * 0.18); sg.scale.setScalar(sc); sg.rotation.y = 0; }); segs[0].rotation.y = -0.5 + Math.sin(tm) * 0.15; segs[0].position.y += sc * 0.25; }

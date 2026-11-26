@@ -46,4 +46,4 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 - creator_tycoon: tried a procedural 3D office; the existing generated art (3D-rendered creator, CEO, bin, desks, office pictures) is clearly better, so the rebuild was reverted. Keep art-driven; only polish HUD/panels. Same rule for other art-driven DOM games: do not replace good generated renders with procedural 3D.
 
 ## frost_coil (three.js rebuild, WIP)
-- Ortho tilted camera, snowy valley, 3D ice tubes, wooden board, ice dragon. Fog removed (it washed the board out). Clip NOT sent: dragon too small, sky pale, HUD text bars blank in some frames. TODO: bigger dragon, richer sky/aurora, check travel/win screens, record BEFORE/AFTER.
+- Ortho tilted camera, snowy valley, 3D ice tubes, wooden board, ice dragon. Fog removed (it washed the board out). Dragon enlarged (reads well now). Clip NOT sent yet. TODO: richer sky/aurora, check travel/win screens, record BEFORE/AFTER.
