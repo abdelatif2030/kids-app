@@ -73,7 +73,7 @@ function stepMotes(M, camera, dt) {
 
 // Playing-alongside encouragement voice (clips assets/games/_voice/<id>_<voice>.mp3, silent if missing) + soft tap SFX.
 // Moments are detected generically from the page: first touch, periodic praise while playing, idle nudge, win/lose screens appearing.
-const CHEERS = { start: 3, good: 6, combo: 2, oops: 4, near: 2, win: 3, lose: 3, idle: 2 };
+const CHEERS = { start: 3, good: 6, combo: 2, oops: 4, near: 2, win: 3, lose: 3, idle: 2, overtake: 3, boost: 3, behind: 3, collect: 3, levelup: 3 };
 const WIN_RE = /فزت|مبروك|كسبت|فاز|انتصر|أحسنت|برافو|🏆|WIN|Victory|Congrat|You won/i;
 const LOSE_RE = /خسر|حاول تاني|حاول مرة|انتهت|معلش|Game over|Try again|Failed/i;
 export function installCheer(root, voice) {
