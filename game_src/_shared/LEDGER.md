@@ -6,3 +6,10 @@ Videos: moto_race (before/after) done; coastal_drive, deep_sea in progress.
 Layer 2 (per-game deep pass, fx.js): cloud_dash DONE (video sent). ball_scoop: FX bursts + truck outline + dust trail pushed, effect subtle at gameplay framing (no video sent). Next: dino_grow, highway_race, hamster_warrior, ice_dragon.
 dino_grow DONE (outlines, halo ring on hero, flowers+grass, closer camera) video sent
 highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger car, wind streaks, nitro flames, finish confetti; video sent
+
+## QA / design pass (user directive 9:27): issues found -> fixed, per game
+- fox_family: hero was a static painted sprite (no run, tail, ears) -> real 3D fox with leg gait, tail wag, head nod/tilt, body bob, hop lean; cubs too.
+- splash_race: swimmers were animal blobs with no readable faces -> cartoon kids (skin, hair/cap, suit, eyes, smile, goggles); player stroke 2x faster plus splash wake; bloom was washing out the water -> bloom 0.12 / threshold 0.95.
+- sky_ace: hero small and flat, bullets faint -> 1.5x hero with glow and trail, bigger enemies, glowing bullets (hitboxes untouched).
+- All chase-cam games (rain_circuit, summit_rush, splash_race, deep_sea, air_race, dune_titans, carnival_race, gummy_squad): camera too far, hero small at gameplay distance -> tighter cameras.
+- Recording rule: clips are now landscape 960x540, sequential BEFORE then AFTER.

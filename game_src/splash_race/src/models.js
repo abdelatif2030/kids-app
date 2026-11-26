@@ -40,55 +40,64 @@ const FUR = {
 };
 
 /** A swimmer lying in the water (facing -z, the way the race goes). Arms paddle, the head turns to breathe. */
-export function makeSwimmer(kind = 'otter', cap = 0x2ab8c8, goggles = true) {
-  const c = FUR[kind] ?? FUR.otter;
+const SKINS = [0xf2c29a, 0xd8a070, 0x9a6a46, 0xffd9b8, 0xc98a5a, 0x7a4a2e, 0xf6cfa8, 0xb87a50];
+const HAIRS = [0x3a2418, 0xf0b030, 0x1a1a1a, 0xc8502a, 0x6a3a1a, 0x2a1a30, 0xe8c060, 0x4a2a14];
+const SUITS = [0xff4a3a, 0x3a7af0, 0xffd23a, 0xff7ab8, 0x3ac86a, 0xa04af0, 0xff8a2a, 0x2ac8c8];
+/** A cartoon kid swimmer (distinct skin, hair, cap and suit per index), lying flat, facing -z. */
+export function makeSwimmer(kind = 'otter', cap = 0x2ab8c8, goggles = true, idx = 0) {
   const root = new THREE.Group();
   const body = new THREE.Group();
   root.add(body);
-  const fur = mat(c.fur);
-  const light = mat(c.light);
-  body.add(ball(0.42, fur, 0, 0, 0.15, 0.85, 0.6, 1.25, 14)); // body lying flat
-  body.add(ball(0.3, light, 0, -0.12, 0.05, 0.75, 0.4, 1.1, 12));
-  // swimsuit band
-  body.add(cyl(0.37, 0.37, 0.22, mat(kind === 'otter' ? 0x2a6ae8 : cap), 0, 0, 0.32, 14).rotateX(Math.PI / 2));
+  const skinC = SKINS[idx % SKINS.length];
+  const skin = mat(skinC);
+  const suit = mat(idx === 0 ? 0xff3a3a : SUITS[(idx * 3 + 1) % SUITS.length]);
+  body.add(ball(0.4, suit, 0, 0, 0.2, 0.85, 0.6, 1.2, 14)); // torso in a swimsuit
+  body.add(ball(0.2, skin, 0, 0.12, 0.05, 0.9, 0.5, 0.8, 10)); // shoulders / back
   const head = new THREE.Group();
-  head.position.set(0, 0.15, -0.5);
-  head.add(ball(0.32, fur, 0, 0, 0, 1.05, 0.95, 1, 16));
-  head.add(ball(0.16, light, 0, -0.08, -0.25, 1.2, 0.8, 0.8, 12)); // muzzle
-  head.add(ball(0.06, mat(kind === 'duck' ? 0xff8a1a : 0x2a1a10), 0, -0.02, -0.38, kind === 'duck' ? 2.4 : 1.2, kind === 'duck' ? 0.6 : 0.9, kind === 'duck' ? 1.6 : 0.8, 8));
-  // swim cap
-  head.add(ball(0.335, mat(cap), 0, 0.08, 0.04, 1.06, 0.8, 1.04, 16));
-  if (goggles) {
-    for (const s of [-1, 1]) {
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.09, 0.03, 6, 14), mat(0x1a5ad8));
-      ring.position.set(s * 0.13, 0.05, -0.27);
-      head.add(ring);
-      head.add(ball(0.08, mat(0x8ad8ff, 0x3a8ad8, 0.35), s * 0.13, 0.05, -0.29, 1, 1, 0.5, 10));
-    }
-    head.add(box(0.5, 0.04, 0.05, mat(0x1a5ad8), 0, 0.05, -0.24));
-  } else {
-    for (const s of [-1, 1]) head.add(ball(0.05, mat(0x1a1010), s * 0.12, 0.05, -0.28, 1, 1.1, 0.6, 8));
+  head.position.set(0, 0.2, -0.48);
+  head.add(ball(0.36, skin, 0, 0, 0, 1.0, 0.95, 1, 18));
+  // swim cap covers the top and back of the head
+  head.add(ball(0.375, mat(cap), 0, 0.07, 0.08, 1.0, 0.85, 1.0, 18));
+  head.add(ball(0.09, mat(cap), 0, 0.36, 0.0, 1, 1, 1, 8)); // cap pom
+  // big cartoon eyes, white with dark pupils and a shine
+  for (const sx of [-1, 1]) {
+    head.add(ball(0.115, mat(0xffffff), sx * 0.14, 0.01, -0.3, 1, 1.1, 0.55, 12));
+    head.add(ball(0.065, mat(0x1a1020), sx * 0.14, 0.0, -0.345, 1, 1.15, 0.5, 10));
+    head.add(ball(0.025, mat(0xffffff, 0xffffff, 0.6), sx * 0.12, 0.04, -0.375, 1, 1, 0.5, 6));
+    head.add(ball(0.07, mat(0xff8a96), sx * 0.24, -0.11, -0.22, 1, 0.7, 0.4, 8)); // rosy cheek
+    head.add(ball(0.05, skin, sx * 0.36, -0.02, 0.0, 0.5, 1, 1, 8)); // ear
   }
-  head.add(new THREE.Mesh(new THREE.TorusGeometry(0.07, 0.015, 5, 10, Math.PI), mat(0x5a2a2a)).translateY(-0.15).translateZ(-0.31).rotateZ(Math.PI));
-  if (kind === 'otter' || kind === 'beaver') for (const s of [-1, 1]) head.add(ball(0.07, fur, s * 0.24, 0.18, 0.02, 1, 1, 0.6, 8));
+  head.add(ball(0.045, mat(0xd9835a), 0, -0.06, -0.36, 1, 0.9, 0.8, 8)); // button nose
+  const smile = new THREE.Mesh(new THREE.TorusGeometry(0.1, 0.022, 6, 14, Math.PI), mat(0x8a2a2a));
+  smile.position.set(0, -0.14, -0.33); smile.rotation.z = Math.PI;
+  head.add(smile);
+  if (goggles) {
+    const strap = mat(idx === 0 ? 0xffd23a : 0x2a5ad8);
+    head.add(box(0.74, 0.05, 0.06, strap, 0, 0.14, -0.1)); // strap round the forehead
+    for (const sx of [-1, 1]) {
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.09, 0.03, 6, 14), strap);
+      ring.position.set(sx * 0.14, 0.2, -0.32); head.add(ring);
+      head.add(ball(0.075, mat(0x8ad8ff, 0x3a8ad8, 0.4), sx * 0.14, 0.2, -0.33, 1, 1, 0.4, 10));
+    }
+  }
   body.add(head);
   const arms = [];
-  for (const s of [-1, 1]) {
+  for (const sx of [-1, 1]) {
     const arm = new THREE.Group();
-    arm.position.set(s * 0.36, 0.05, -0.15);
-    arm.add(ball(0.09, kind === 'penguin' ? fur : fur, 0, 0, -0.25, kind === 'penguin' ? 0.4 : 0.8, 0.6, 3.2, 8));
+    arm.position.set(sx * 0.38, 0.06, -0.15);
+    arm.add(ball(0.095, skin, 0, 0, -0.26, 0.8, 0.7, 3.0, 8));
+    arm.add(ball(0.12, skin, 0, 0, -0.55, 1, 0.8, 1.2, 8)); // hand
     body.add(arm);
     arms.push(arm);
   }
   const legs = [];
-  for (const s of [-1, 1]) {
-    const leg = ball(0.1, kind === 'duck' || kind === 'penguin' ? mat(0xff8a1a) : fur, s * 0.15, -0.02, 0.7, 0.9, 0.4, 1.8, 8);
+  for (const sx of [-1, 1]) {
+    const leg = new THREE.Group();
+    leg.position.set(sx * 0.15, -0.02, 0.6);
+    leg.add(ball(0.1, skin, 0, 0, 0.18, 0.9, 0.5, 2.2, 8));
+    leg.add(ball(0.11, mat(0xffffff), 0, 0, 0.5, 1, 0.45, 1.4, 8)); // foot
     body.add(leg);
     legs.push(leg);
-  }
-  if (kind === 'otter' || kind === 'beaver') {
-    const tail = ball(0.12, kind === 'beaver' ? mat(0x4a3020) : fur, 0, 0.02, 0.95, kind === 'beaver' ? 1.8 : 0.8, 0.35, 2.2, 8);
-    body.add(tail);
   }
   return { root, body, head, arms, legs };
 }

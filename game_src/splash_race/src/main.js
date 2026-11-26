@@ -221,7 +221,7 @@ class Game {
     });
     c.slides.forEach((sl) => { const m = makeSlide(sl.len, sl.side); m.position.set(sl.side * (HALF + 3.2), 0, -sl.s + 1.5); s.add(m); });
     // swimmers
-    this.models = this.sw.swimmers.map((w) => { const m = makeSwimmer(w.kind, w.cap, w.kind !== 'duck'); m.root.scale.setScalar(1.55); s.add(m.root); return m; });
+    this.models = this.sw.swimmers.map((w, wi) => { const m = makeSwimmer(w.kind, w.cap, true, wi); m.root.scale.setScalar(1.55); s.add(m.root); return m; });
     this.ring = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.75, 28), new THREE.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0.9, depthWrite: false }));
     this.ring.rotation.x = -Math.PI / 2;
     s.add(this.ring);
@@ -577,12 +577,13 @@ class Game {
       m.root.rotation.x = w.air > 0 ? -0.6 * Math.cos((1 - w.air / 0.9) * Math.PI) : w.slide ? 0.4 : 0;
       m.root.rotation.z = w.stun > 0 ? Math.sin(time * 25) * 0.4 : 0;
       m.paddle = Math.max(0, (m.paddle ?? 0) - dt);
-      const sp = time * 6 + k;
-      m.arms[0].rotation.x = m.paddle > 0 ? -2.6 * Math.sin((m.paddle / 0.45) * Math.PI) : Math.sin(sp) * 0.5;
-      m.arms[1].rotation.x = m.paddle > 0 ? 2.6 * Math.sin((m.paddle / 0.45) * Math.PI) - 1 : -Math.sin(sp) * 0.5;
-      m.legs.forEach((l, i) => { l.rotation.x = Math.sin(time * 14 + i * Math.PI) * 0.5; });
+      const sp = time * (k === 0 ? 15 : 8) + k;
+      m.arms[0].rotation.x = m.paddle > 0 ? -2.6 * Math.sin((m.paddle / 0.45) * Math.PI) : Math.sin(sp) * 1.5 - 0.6;
+      m.arms[1].rotation.x = m.paddle > 0 ? 2.6 * Math.sin((m.paddle / 0.45) * Math.PI) - 1 : -Math.sin(sp) * 1.5 - 0.6;
+      m.legs.forEach((l, i) => { l.rotation.x = Math.sin(time * (k === 0 ? 30 : 18) + i * Math.PI) * 0.6; });
       m.head.rotation.z = Math.sin(time * 3 + k) * 0.25;
       if (w.dive && Math.random() < 0.3) this.bubbles.emit(w.x + (Math.random() - 0.5) * 0.4, w.y + 0.2, -w.s, 0, 1.2, 0, 0.8);
+      if (k === 0 && !w.dive && w.air <= 0 && w.v > 1) { for (let q = 0; q < 3; q++) this.drops.emit(w.x + (Math.random() - 0.5) * 1.1, 0.12, -w.s + 0.5 + Math.random() * 0.8, (Math.random() - 0.5) * 2.2, 2 + Math.random() * 1.5, 1.5 + Math.random() * 2, 0.55); }
       if (!w.dive && w.air <= 0 && !w.slide && w.v > 3 && Math.random() < 0.25) this.drops.emit(w.x + (Math.random() - 0.5) * 0.6, 0.1, -w.s + 0.6, (Math.random() - 0.5), 1.4, 1, 0.4);
     });
     this.drops.update(dt);

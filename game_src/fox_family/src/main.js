@@ -456,7 +456,16 @@ class Game {
     const face = { up: 0, down: Math.PI, left: Math.PI / 2, right: -Math.PI / 2 }[f.face] ?? 0;
     this.fox.root.rotation.y = face;
     this.fox.root.rotation.z = f.bump > 0 ? Math.sin(time * 30) * 0.4 : 0;
-    this.fox.tail.rotation.y = Math.sin(time * 6) * 0.4;
+    this.fox.tail.rotation.y = Math.sin(time * 9) * 0.55;
+    this.fox.tail.rotation.x = 0.5 + Math.sin(time * 5) * 0.12;
+    {
+      const run = f.hop > 0 ? 1 : 0.18; const ph = time * (f.hop > 0 ? 26 : 7);
+      this.fox.legs.forEach((l, i) => { l.rotation.x = Math.sin(ph + (i % 2 ? Math.PI : 0) + (i > 1 ? 1.2 : 0)) * 0.9 * run; });
+      this.fox.body.position.y = Math.abs(Math.sin(ph)) * 0.07 * (run + 0.3);
+      this.fox.body.rotation.x = f.hop > 0 ? -0.18 : Math.sin(time * 2) * 0.03;
+      this.fox.head.rotation.x = Math.sin(time * 3.3) * 0.12 - (f.hop > 0 ? 0.12 : 0);
+      this.fox.head.rotation.z = Math.sin(time * 2.1) * 0.1;
+    }
     this.shadow.position.set(x, 0.02, z);
     this.shadow.scale.setScalar(1 - y * 0.6);
     // when home, the cubs march into the den
@@ -487,6 +496,7 @@ class Game {
   _fox(cub) {
     const P = this.pics;
     const pic = P && P.fox;
+    if (true) { const m = makeFox(cub); m.root.scale.multiplyScalar(cub ? 1.3 : 1.35); return m; }
     if (!pic) return makeFox(cub);
     const f = makePaintedFigure(THREE, { idle: pic }, cub ? 1.2 : 2.6);
     f.tail = { rotation: { x: 0, y: 0, z: 0 } };
