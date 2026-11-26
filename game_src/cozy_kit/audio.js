@@ -19,12 +19,20 @@ export class SynthBase {
       comp.threshold.value = -14;
       comp.ratio.value = 6;
       this.master.connect(comp).connect(c.destination);
+      // studio reverb: generated hall impulse, wet-mixed from both buses
+      const len = Math.floor(c.sampleRate * 1.7), ir = c.createBuffer(2, len, c.sampleRate);
+      for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
+      const conv = c.createConvolver(); conv.buffer = ir;
+      this.rev = c.createGain(); this.rev.gain.value = 0.22;
+      this.rev.connect(conv).connect(this.master);
       this.music = c.createGain();
       this.music.gain.value = 0.35;
       this.music.connect(this.master);
+      this.music.connect(this.rev);
       this.sfx = c.createGain();
       this.sfx.gain.value = 0.85;
       this.sfx.connect(this.master);
+      this.sfx.connect(this.rev);
       const b = c.createBuffer(1, c.sampleRate * 2, c.sampleRate);
       const d = b.getChannelData(0);
       for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
@@ -49,16 +57,27 @@ export class SynthBase {
   tone(type, f, t, len, vol, dest = this.sfx, a = 0.005) {
     const c = this.ctx;
     if (!c) return;
-    const o = c.createOscillator();
-    o.type = type;
-    o.frequency.value = f;
     const g = c.createGain();
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(vol, t + a);
     g.gain.exponentialRampToValueAtTime(0.0001, t + len);
-    o.connect(g).connect(dest);
-    o.start(t);
-    o.stop(t + len + 0.05);
+    let out = g;
+    if (type === 'sawtooth' || type === 'square') {
+      const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = Math.min(9000, f * 6 + 800); lp.Q.value = 0.7;
+      g.connect(lp); out = lp;
+    }
+    out.connect(dest);
+    const voices = type === 'sine' ? [0] : [-6, 6];
+    for (const det of voices) {
+      const o = c.createOscillator();
+      o.type = type;
+      o.frequency.value = f;
+      o.detune.value = det;
+      o.connect(g);
+      o.start(t);
+      o.stop(t + len + 0.05);
+    }
+    if (type === 'sine') return;
   }
 
   noise(t, len, vol, type = 'lowpass', freq = 1000, q = 1, dest = this.sfx, freqEnd) {
@@ -146,7 +165,20 @@ export class SynthBase {
       for (const [b, m, len] of tu.notes) {
         if (Math.abs(b - beat) < 1e-6) this.tone(tu.wave || 'triangle', hz(m), base, len * spb * 1.4, tu.vol || 0.12, this.music, 0.01);
       }
+      if (tu.groove !== false && !tu.noGroove) this._groove(tu, beat, base, spb);
       this.nextBeat += 0.5;
     }
+  }
+
+  /** soft drum kit under the tune: kick on the beat, snare on 2 and 4, hats on the off-eighths */
+  _groove(tu, beat, t, spb) {
+    const v = Math.min(0.2, (tu.vol || 0.1) * 1.3);
+    const on = (x) => Math.abs(beat - x) < 1e-6;
+    const whole = Math.abs(beat - Math.round(beat)) < 1e-6;
+    const br = beat % 4;
+    if (whole && (br === 0 || (br === 2 && tu.tempo >= 100))) { this.slide('sine', 150, 42, t, 0.17, v * 1.9, this.music); this.noise(t, 0.02, v * 0.5, 'lowpass', 900, 1, this.music); }
+    if (whole && (br === 1 || br === 3) && tu.tempo >= 100) this.noise(t, 0.12, v * 0.9, 'bandpass', 1800, 0.8, this.music);
+    if (!whole) this.noise(t, 0.04, v * 0.45, 'highpass', 7000, 1, this.music);
+    if (on(0) || (whole && br === 0 && beat % 8 === 0)) this.tone('sine', 55, t, spb * 1.6, v * 1.1, this.music, 0.02);
   }
 }

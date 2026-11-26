@@ -17,3 +17,7 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 ## lane_shooter (squad_shooter / archer_bridge) pass 2
 - Fixed: soldiers/enemies were boxes; now rigged 3D characters (faces, helmets, swinging legs, rifle/bow, backpack/quiver). Gates rebuilt as framed arches with number plane on the panel (no longer covers the lane). Houses with windows, trees, cones added. Camera pulled back slightly.
 - Open: cages and crates still simple; archer_bridge not yet re-recorded or recoloured.
+
+## Audio pass 1 (cozy_kit/audio.js, all games using it)
+- Added hall reverb send on music and SFX buses, detuned twin-oscillator voices with a soft low-pass on saw/square, and a drum/bass groove (kick, snare, hats, sub) under every tune. All 30 games using cozy_kit rebuilt.
+- Not verified by ear (no audio capture here); page-error check clean. Open: per-game bespoke SFX/music still to rework.
