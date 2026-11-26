@@ -743,7 +743,7 @@ class Game {
     const r = this.r;
     const tr = r.track;
     const c = r.race.player;
-    const want = tr.world(c.s - 7.6, c.x * 0.7, 4.7 + c.h * 0.6);
+    const want = tr.world(c.s - 6, c.x * 0.7, 3.7 + c.h * 0.6);
     const look = tr.world(c.s + 11, c.x * 0.5, 0.9 + c.h * 0.7);
     const up = tr.upAt(c.s);
     if (!r.camPos || dt >= 1) {

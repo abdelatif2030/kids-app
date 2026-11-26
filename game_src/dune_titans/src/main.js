@@ -800,8 +800,8 @@ class Game {
     const fx = Math.sin(p.h);
     const fz = Math.cos(p.h);
     const portrait = this.cw < this.ch;
-    const back = portrait ? 6.6 : 5.6;
-    const up = portrait ? 3.0 : 2.4;
+    const back = portrait ? 5.4 : 4.4;
+    const up = portrait ? 2.5 : 1.9;
     const want = new THREE.Vector3(p.x - fx * back, up, p.z - fz * back);
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 6));
