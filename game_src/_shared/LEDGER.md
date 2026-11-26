@@ -33,3 +33,4 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 ## sky_capy (2D) pass 1 - NOT clip-worthy
 - Larger plane/enemies/bullets/pickups, exhaust trail. Still flat 2D canvas: tiny plane, plain islands, weak HUD. Needs a 3D rewrite (three.js renderer over existing sim.js) to meet the bar. Same applies to the other ~28 canvas games.
 - sky_capy: rebuilt as three.js (view3d.js): 3D plane, floating islands with houses/windmill, cloud banks, 3D enemies/boss/birds, instanced bubbles, 2D overlay for HUD/texts. Frame-checked; pilot face still small (TODO).
+- hop_world: three.js rebuild (view3d.js): 3D fox hero with swinging limbs/tail, 3D bugs, bricks/? blocks with textures, pipes, castle, parallax scenery per world. rec.mjs now supports HOLD/JUMPK env for held-key demos.

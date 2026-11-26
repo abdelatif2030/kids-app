@@ -5,6 +5,7 @@
 import { World, LEVELS, WORLDS, normalizeSave } from './sim.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n, clamp } from '../../cozy_kit/ui.js';
+import { View3D } from './view3d.js';
 import { PAL, makeSprites, drawBackground, drawHero, drawBug, drawMushroom, drawCoin, drawPipe, drawFlag, drawCastle } from './art.js';
 
 const S = {
@@ -45,6 +46,8 @@ class Game {
     this.root = h('div', { class: 'hw-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
     this.cv = h('canvas');
+    this.view = new View3D(el);
+    this.root.append(this.view.dom);
     this.root.append(this.cv);
     this.g = this.cv.getContext('2d');
     this.layer = h('div', { class: 'hw-layer' });
@@ -69,6 +72,7 @@ class Game {
     this.cw = r.width || window.innerWidth; this.ch = r.height || window.innerHeight;
     this.dpr = Math.min(window.devicePixelRatio || 1, 2);
     this.cv.width = Math.round(this.cw * this.dpr); this.cv.height = Math.round(this.ch * this.dpr);
+    this.view.setSize(this.cw, this.ch);
     this.portrait = this.ch > this.cw;
     this.u = Math.min(this.cw, this.ch) / 100;
     this.ts = this.portrait ? this.cw / 9.5 : this.ch / 9.5;
@@ -163,7 +167,7 @@ class Game {
     return b;
   }
 
-  _say(txt, sec = 2.4) { if (!this.hint) return; this.hint.textContent = txt; this.hint.classList.add('show'); clearTimeout(this._hintT); this._hintT = setTimeout(() => this.hint && this.hint.classList.remove('show'), sec * 1000); }
+  _say(txt, sec = 2.4) { if (!this.hint) return; this.hint.textContent = txt; this.hint.classList.add('show'); if (this.view) this.view.dispose(); clearTimeout(this._hintT); this._hintT = setTimeout(() => this.hint && this.hint.classList.remove('show'), sec * 1000); }
   _later(sec, fn) { this.timers.push({ t: sec, fn }); }
 
   pauseGame() {
@@ -269,46 +273,14 @@ class Game {
     const camX = inMenu ? (this.menuT * 1.6) % Math.max(1, w.len - vw - 2) : this.cam.x;
     const camY = w.H + (this.portrait ? 4.2 : 0.2) - vh;
     const sx = (x) => Math.round((x - camX) * ts); const sy = (y) => Math.round((y - camY) * ts);
-    const world = w.world; const P = PAL[world];
-    if (inMenu) this._sprites(world);
-    const gy = sy(12);
-    drawBackground(g, world, W, H, camX, ts, gy, this.clock);
-    const grid = w.grid; const sp = this.sprites; const T = Math.ceil(ts) + 1;
-    const x0 = Math.max(0, Math.floor(camX) - 1); const x1 = Math.min(w.len - 1, Math.ceil(camX + vw) + 1);
-    const y0 = Math.max(0, Math.floor(camY)); const y1 = Math.min(w.H - 1, Math.ceil(camY + vh));
-    const solid = (c) => c === '#' || c === 'B' || c === '?' || c === 'U' || c === 'P';
-    // end of the level: castle and flag
-    drawCastle(g, P, ts, sx(w.flagX + 1.7), sy(12), this.clock);
-    drawFlag(g, ts, sx(w.flagX + 0.5), sy(5), sy(12), this.clock, '#ff5a8a');
-    for (let ty = y0; ty <= y1; ty++) {
-      for (let tx = x0; tx <= x1; tx++) {
-        const c = grid[ty][tx];
-        if (c === ' ' || c === 'F') continue;
-        let bx = sx(tx); let by = sy(ty);
-        if (c === '#') { const above = ty > 0 ? grid[ty - 1][tx] : ' '; g.drawImage(solid(above) ? sp.dirt : sp.top, bx, by, T, T); }
-        else if (c === 'B' || c === '?' || c === 'U') { const bump = this.bumps.get(`${tx},${ty}`); if (bump !== undefined) by -= Math.sin(((this.clock - bump) / 0.25) * Math.PI) * ts * 0.3; g.drawImage(c === 'B' ? sp.brick : c === '?' ? sp.q : sp.used, bx, by, T, T); }
-        else if (c === 'c') drawCoin(g, bx + ts / 2, by + ts / 2, ts, this.clock, tx * 0.7);
-        else if (c === 'P') { if (tx > 0 && grid[ty][tx - 1] === 'P') continue; drawPipe(g, P, bx, by, ts, !(ty > 0 && grid[ty - 1][tx] === 'P')); }
-      }
-    }
-    // earth under the level (tall screens)
-    if (this.portrait) for (let tx = x0; tx <= x1; tx++) if (grid[w.H - 1][tx] === '#') for (let by = sy(w.H); by < H; by += T - 1) g.drawImage(sp.dirt, sx(tx), by, T, T);
+    const world = w.world;
+    g.clearRect(0, 0, W, H);
+    this.view.render(w, world, camX, camY, vw, vh, this.clock, { inMenu, bumps: this.bumps, girl: this.girl });
     if (!inMenu) {
-      for (const m of w.mush) if (!m.taken) drawMushroom(g, sx(m.x + 0.45), sy(m.y + 1), ts, this.clock);
-      for (const e of w.enemies) {
-        if (e.dead) { const age = w.time - (e.deadAt || 0); if (age > 0.6) continue; drawBug(g, { x: sx(e.x + 0.45), y: sy(e.y + 1), s: ts, t: this.clock, dir: Math.sign(e.vx) || 1, squash: 1 }); continue; }
-        if (e.x < camX - 2 || e.x > camX + vw + 2) continue;
-        drawBug(g, { x: sx(e.x + 0.45), y: sy(e.y + 1), s: ts, t: this.clock, dir: Math.sign(e.vx) || 1, squash: 0 });
-      }
-      const p = w.p;
-      const hop = w.state === 'won' ? Math.abs(Math.sin(this.clock * 8)) * 0.3 : 0;
-      drawHero(g, { x: sx(p.x + p.w / 2), y: sy(p.y + p.h) - hop * ts, s: ts, face: p.face, vx: w.state === 'won' ? 0 : p.vx, vy: p.vy, ground: p.ground, t: this.clock, h: p.h, girl: this.girl, inv: p.inv });
       for (const f of this.fx) {
+        if (f.kind === 'chunk' || f.kind === 'spark') { if (!f.b3) { f.b3 = 1; this.view.burst(f.x, f.y, [f.col || '#ffd23a'], 1); } continue; }
         const k = f.t / (f.life || 0.7);
-        g.globalAlpha = Math.max(0, 1 - k);
-        if (f.kind === 'coin') drawCoin(g, sx(f.x), sy(f.y - k * 1.6), ts, this.clock * 2, 0);
-        else { g.fillStyle = f.col; const r = ts * f.r * (f.kind === 'chunk' ? 1.6 : 1); g.fillRect(sx(f.x) - r, sy(f.y) - r, r * 2, r * 2); }
-        g.globalAlpha = 1;
+        if (f.kind === 'coin') { const [qx, qy] = this.view.project(f.x, f.y - k * 1.6); g.globalAlpha = Math.max(0, 1 - k); drawCoin(g, qx, qy, ts * 1.2, this.clock * 2, 0); g.globalAlpha = 1; }
       }
     }
   }
