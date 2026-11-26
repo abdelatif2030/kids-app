@@ -9,6 +9,16 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 
+
+// Emoji everywhere: bundle Twemoji (colour) as a unicode-range fallback of the game font, so icons render identically on every device.
+if (typeof document !== 'undefined' && !document.getElementById('tw-emoji-font')) {
+  const st = document.createElement('style'); st.id = 'tw-emoji-font';
+  const u = new URL('../../fonts/TwemojiMozilla.ttf', location.href).href;
+  const R = 'U+1F000-1FAFF,U+2600-27BF,U+2B00-2BFF,U+2300-23FF,U+FE0F,U+200D,U+2122,U+2139,U+2194-21AA,U+2934-2935,U+3030,U+303D,U+3297,U+3299,U+00A9,U+00AE,U+203C,U+2049,U+25AA-25FE';
+  st.textContent = `@font-face{font-family:Tajawal;src:url(${u});unicode-range:${R};font-weight:100 900;font-display:swap}`;
+  document.head.appendChild(st);
+}
+
 const PRESETS = {
   // bloom: [strength, radius, threshold]; grade: contrast, saturation, warm(+)/cool(-) tint, vignette
   warm: { bloom: [0.32, 0.55, 0.82], contrast: 1.08, sat: 1.12, tint: 0.05, vig: 0.38, exposure: 1.0 },

@@ -361,14 +361,14 @@ class Game {
     this.sound.setMode('menu');
     this._build(Math.min(this.save.unlocked, LEVELS.length) - 1);
     this._clear();
-    const icons = ['☀️', '🍂', '❄️', '🌾', '🍁', '🏔️'];
+    const icons = ['\u2600', '🍂', '\u2744', '🌾', '🍁', '🏔'];
     const nodes = LEVELS.map((lv, i) => {
       const locked = i + 1 > this.save.unlocked;
       const stars = this.save.stars[lv.id] ?? 0;
       return h('button', {
         class: `fx-node${locked ? ' lock' : ''}${i + 1 === this.save.unlocked ? ' next' : ''}`, 'aria-label': name(lv), title: name(lv),
         onclick: () => { if (locked) { this.sound.play('no'); this.toast(t('locked')); return; } this.startLevel(i); },
-      }, locked ? '🔒' : icons[i], h('span', { class: 'stars' }, locked ? '' : '⭐'.repeat(stars) + '☆'.repeat(3 - stars)));
+      }, locked ? '' : icons[i], h('span', { class: 'stars' }, locked ? '' : '⭐'.repeat(stars) + '☆'.repeat(3 - stars)));
     });
     this.layer.append(
       h('button', { class: 'fx-round', style: this._topLeft(), 'aria-label': t('exit'), onclick: () => { this._saveNow(); this.post({ type: 'exit' }); } }, getLang() === 'en' ? '←' : '→'),

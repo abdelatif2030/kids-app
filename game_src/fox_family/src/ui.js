@@ -123,4 +123,10 @@ export const CSS2 = `
 .fx-arrow.lft:before,.fx-arrow.rgt:before{content:'';display:block;width:0;height:0;border-top:calc(var(--u)*2.6) solid transparent;border-bottom:calc(var(--u)*2.6) solid transparent}
 .fx-arrow.lft:before{border-right:calc(var(--u)*3.6) solid #2a2a3a}
 .fx-arrow.rgt:before{border-left:calc(var(--u)*3.6) solid #2a2a3a}
+.fx-node,.fx-node *{-webkit-text-stroke:0!important;paint-order:normal!important}
+.fx-node.lock{font-size:calc(var(--u)*7)}
+.fx-node{text-shadow:none!important;filter:none}
+.fx-node.lock{color:#6a6a74}
+.fx-node.lock:before{content:'';position:absolute;left:50%;top:46%;width:calc(var(--u)*7);height:calc(var(--u)*5.4);margin-left:calc(var(--u)*-3.5);background:linear-gradient(180deg,#8a8a96,#6a6a76);border-radius:calc(var(--u)*1.1);box-shadow:inset 0 calc(var(--u)*.4) 0 rgba(255,255,255,.35)}
+.fx-node.lock:after{content:'';position:absolute;left:50%;top:26%;width:calc(var(--u)*4);height:calc(var(--u)*4);margin-left:calc(var(--u)*-2.4);border:calc(var(--u)*1.1) solid #6a6a76;border-bottom:0;border-radius:calc(var(--u)*2.6) calc(var(--u)*2.6) 0 0}
 `;
