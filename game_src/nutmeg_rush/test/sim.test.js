@@ -232,3 +232,10 @@ test('level 1 is Warm Up with no teammate, level 2 is One-Two with one', () => {
   const m = new Match({ level: 1 }); const mate = m.mates[0]; Object.assign(m.ball, { x: mate.x, z: mate.z - 10, inv: 0 }); const ev = m.step(1 / 60);
   assert.ok(ev.some((e) => e.type === 'mateHint'), 'PASS TO YOUR MATE!');
 });
+
+import fs from 'node:fs';
+test('dragging or pressing right moves the ball to the screen\'s right (sim +x is screen-right: the ball sits at world x = -sim x)', () => {
+  const src = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(src.includes('this.pointerIn = [dx / R, -dy / R]'));
+  assert.ok(src.includes('if (k.arrowleft || k.a) jx -= 1; if (k.arrowright || k.d) jx += 1;'));
+});

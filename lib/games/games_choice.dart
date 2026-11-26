@@ -371,7 +371,6 @@ class FunGamesMore2Screen extends StatelessWidget {
               _card(context, 'fun_mars_farm', kMarsFarm, 'assets/games/mars_farm/card.webp', 'Mars Farm Colony', const Color(0xFFC8452A), const Color(0xFFFFB88A)),
               _card(context, 'fun_pin_puzzle', kPinPuzzle, 'assets/games/pin_puzzle/card.webp', 'Pull the Pin', const Color(0xFF5AE8B8), const Color(0xFFFFB8D8)),
               _card(context, 'fun_gem_quarry', kGemQuarry, 'assets/games/gem_quarry/card.webp', 'Gemlode Quarry', const Color(0xFF8A5AE8), const Color(0xFFE8C88A)),
-              _card(context, 'fun_sky_ace', kSkyAce, 'assets/games/sky_ace/card.webp', 'Sky Ace', const Color(0xFF6AB8FF), const Color(0xFFFFFFFF)),
               _card(context, 'fun_nutmeg_rush', kNutmegRush, 'assets/games/nutmeg_rush/card.webp', 'Nutmeg Rush', const Color(0xFF2A8A3A), const Color(0xFF9AF0A0)),
               _card(context, 'fun_trick_or_treat', kTrickOrTreat, 'assets/games/trick_or_treat/card.webp', 'Trick or Treat Crowd', const Color(0xFF5A2A8A), const Color(0xFFFFA82A)),
               _card(context, 'fun_viking_sling', kVikingSling, 'assets/games/viking_sling/card.webp', 'Viking Slingshot', const Color(0xFF8A5A2A), const Color(0xFF7AC8FF)),

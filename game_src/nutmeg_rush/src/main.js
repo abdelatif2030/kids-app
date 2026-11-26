@@ -116,6 +116,7 @@ class Game {
     this.root = h('div', { class: 'nm-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
     this.layer = h('div', { class: 'nm-layer' });
+    if (typeof location !== 'undefined' && /[?&]debug/.test(location.search)) window.__nm = this; // test hook
     this.mode = 'menu'; this.clock = 0; this.fx = []; this.keys = {};
     this._three();
     this.root.append(this.layer);
@@ -262,7 +263,7 @@ class Game {
       if (!this.dr || e.pointerId !== this.dr.id || !this.m) return;
       const R = this.u * 14; let dx = e.clientX - this.dr.x, dy = e.clientY - this.dr.y; const l = Math.hypot(dx, dy);
       if (l > R) { dx *= R / l; dy *= R / l; }
-      this.pointerIn = [-dx / R * (this.portrait ? 1 : 1), -dy / R]; // screen-right is sim -x
+      this.pointerIn = [dx / R, -dy / R]; // dragging right moves the ball to the screen's right: the ball sits at world x = -sim x, so sim +x is screen-right (it was the other way round: owner report 2026-11-26)
       this.joy.firstChild.style.transform = `translate(${dx * 0.8}px,${dy * 0.8}px)`;
     });
     const up = (e) => { if (this.dr && e.pointerId === this.dr.id) { this.dr = null; this.pointerIn = null; this.joy.style.display = 'none'; this.joy.firstChild.style.transform = ''; } };
@@ -285,8 +286,8 @@ class Game {
     if (!this.m) return;
     let jx = 0, jy = 0;
     if (this.pointerIn) { jx = this.pointerIn[0]; jy = this.pointerIn[1]; }
-    const k = this.keys; // sim +x is screen-left
-    if (k.arrowleft || k.a) jx += 1; if (k.arrowright || k.d) jx -= 1; if (k.arrowup || k.w) jy += 1; if (k.arrowdown || k.s) jy -= 1;
+    const k = this.keys; // sim +x is screen-right
+    if (k.arrowleft || k.a) jx -= 1; if (k.arrowright || k.d) jx += 1; if (k.arrowup || k.w) jy += 1; if (k.arrowdown || k.s) jy -= 1;
     this.m.setInput(jx, jy);
   }
   _tap() { if (this.m && this.m.tap()) { this.sound.play('shot'); this.hideTip(); if (this.shootBtn) { this.shootBtn.remove(); this.shootBtn = null; } } }
