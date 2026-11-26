@@ -3,6 +3,7 @@
 // Break cages (+soldiers), shoot number gates before passing through, grab weapon crates, defeat the enemies, win coins and
 // buy stronger bows/ranks. three.js, everything drawn from shapes in code, sound made live. No network, no ads, no tracking.
 import * as THREE from 'three';
+import { polishRenderer } from './polish.js';
 import { Run, ROAD, LANES, normalizeSave, BOW_COST, RANK_COST } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
@@ -163,7 +164,7 @@ class Game {
 
   _three() {
     const th = this.th;
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true }), { preset: 'warm' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.prepend(this.renderer.domElement);
@@ -504,8 +505,8 @@ class Game {
     // camera
     const tx = camX;
     this.camera.position.x += (tx - this.camera.position.x) * Math.min(1, dt * 4);
-    this.camera.position.set(this.camera.position.x, this.cw < this.ch ? 8.2 : 6.6, zs - (this.cw < this.ch ? 12 : 10));
-    this.camera.lookAt(this.camera.position.x * 0.6, 1.2, zs + 18);
+    this.camera.position.set(this.camera.position.x, this.cw < this.ch ? 6.4 : 4.8, zs - (this.cw < this.ch ? 9 : 7));
+    this.camera.lookAt(this.camera.position.x * 0.6, 1.3, zs + 12);
     // floating text
     this._floaters();
     this.renderer.render(this.scene, this.camera);
