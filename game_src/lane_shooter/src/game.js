@@ -11,7 +11,7 @@ import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 const THEME = {
   squad: {
     id: 'squad', glob: 'SquadShooter', prefix: 'sq', title: ['فرقة الجنود', 'Squad Shooter'], icon: '🪖', unit: ['جندي', 'soldier'],
-    sky: 0x0b1030, fog: 0x0b1030, road: 0x3a3f4a, ground: 0x12162a, panel: ['#3a6ad8', '#1a2a78'], accent: '#7affc8',
+    sky: 0x6aa8f0, fog: 0xa8d0ff, road: 0x6a7080, ground: 0x3a9a50, panel: ['#3a6ad8', '#1a2a78'], accent: '#7affc8',
     names: ['الطريق الصناعي', 'الميناء', 'المصنع', 'الأنابيب', 'المستودع', 'الجسر', 'المحطة', 'القاعدة الأخيرة'],
     enemy: 'thug', weapon: ['🔫', '🔫', '🔫', '🔫'], bow: ['بندقية', 'Rifle'], rank: ['رتبة', 'Rank'], tune: 'squad',
   },
@@ -96,9 +96,9 @@ function sprite(text, bg, sx, sy, fg) { const s = new THREE.Sprite(new THREE.Spr
 function makeUnit(th) {
   const g = new THREE.Group();
   const sq = th.id === 'squad';
-  g.add(mesh(geo.cyl, M(sq ? 0x4a6a3a : 0x2a8a8a), 0, 0.75, 0, 0.55, 0.9, 0.4));
+  g.add(mesh(geo.cyl, M(sq ? 0x2a7af0 : 0x2a8a8a), 0, 0.75, 0, 0.55, 0.9, 0.4));
   g.add(mesh(geo.sphere, M(0xf2c9a0), 0, 1.45, 0, 0.5, 0.5, 0.5));
-  if (sq) { g.add(mesh(geo.sphere, M(0x3a5a2a), 0, 1.58, 0, 0.56, 0.36, 0.56)); g.add(mesh(geo.box, M(0x222222), 0.35, 1.0, 0.45, 0.1, 0.14, 0.7)); } else {
+  if (sq) { g.add(mesh(geo.sphere, M(0xffc82a), 0, 1.58, 0, 0.56, 0.36, 0.56)); g.add(mesh(geo.box, M(0x222222), 0.35, 1.0, 0.45, 0.1, 0.14, 0.7)); } else {
     g.add(mesh(geo.cone, M(0xc83a2a), 0, 1.75, 0, 0.55, 0.5, 0.55));
     const bow = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.05, 6, 14, Math.PI), M(0x8a5a2a));
     bow.position.set(0.38, 1.0, 0.3); bow.rotation.set(0, 0, Math.PI / 2); g.add(bow);
@@ -172,7 +172,7 @@ class Game {
     this.scene.background = new THREE.Color(th.sky);
     this.scene.fog = new THREE.Fog(th.fog, 30, 120);
     this.camera = new THREE.PerspectiveCamera(60, 1, 0.3, 400);
-    this.scene.add(new THREE.HemisphereLight(th.id === 'squad' ? 0x8aa0ff : 0xffd8a0, th.id === 'squad' ? 0x202040 : 0x802010, th.id === 'squad' ? 1.3 : 1.6));
+    this.scene.add(new THREE.HemisphereLight(th.id === 'squad' ? 0xffffff : 0xffd8a0, th.id === 'squad' ? 0x6a8a58 : 0x802010, th.id === 'squad' ? 1.3 : 1.6));
     const sun = new THREE.DirectionalLight(th.id === 'squad' ? 0xaab8ff : 0xffb070, 1.2);
     sun.position.set(-20, 40, -10);
     this.scene.add(sun);
