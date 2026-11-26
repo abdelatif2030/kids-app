@@ -508,7 +508,7 @@ class Game {
     let fx = c.x; let fz = c.y; let zoom = 1 + Math.min(0.85, Math.sqrt(Math.max(1, run.n)) / 26);
     if (b && bs.phase === 'fight') { fx = c.x + (b.x - c.x) * 0.45; fz = c.y + (b.y - c.y) * 0.45; zoom += 0.3; }
     if (run.fight) zoom += 0.1;
-    const base = this.portrait ? 33 : 22; const H = base * zoom; const D = H * 0.62;
+    const base = this.portrait ? 27 : 17; const H = base * zoom; const D = H * 0.62;
     this.cf = this.cf || { x: fx, z: fz, h: H };
     const k = Math.min(1, dt * 4); this.cf.x += (fx - this.cf.x) * k; this.cf.z += (fz - this.cf.z) * k; this.cf.h += (H - this.cf.h) * Math.min(1, dt * 2);
     this.shake = Math.max(0, this.shake - dt * 1.8); const sh = this.shake * 0.5;
