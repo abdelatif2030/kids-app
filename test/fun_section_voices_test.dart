@@ -28,4 +28,16 @@ void main() {
     }
     SectionVoice.testing = false;
   });
+
+  testWidgets('no game card shows an age chip (+3, +4, Ages ...) any more (owner request 2026-11-26)', (t) async {
+    SectionVoice.testing = true;
+    for (final s in kFunSections) {
+      await t.pumpWidget(MaterialApp(home: FunSectionScreen(section: s)));
+      await t.pump();
+      expect(find.textContaining(RegExp(r'^\+\d')), findsNothing, reason: s.id);
+      expect(find.textContaining('سنين'), findsNothing, reason: s.id);
+      expect(find.textContaining('Ages'), findsNothing, reason: s.id);
+    }
+    SectionVoice.testing = false;
+  });
 }

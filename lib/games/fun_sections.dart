@@ -324,15 +324,6 @@ class _GameCard extends StatelessWidget {
                 child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
               ),
             ),
-            PositionedDirectional(
-              top: 8,
-              end: 8,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
-                decoration: BoxDecoration(color: const Color(0xCC2A1A5A), borderRadius: BorderRadius.circular(14), border: Border.all(color: Colors.white, width: 1.8)),
-                child: Text(game.id == 'girls_world' ? tr2('٢-٤ سنين', 'Ages 2-4') : game.id == 'fashion_queen' ? tr2('٤+ سنين', 'Ages 4+') : '+${game.minAge}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13)),
-              ),
-            ),
             Positioned(
               left: 8,
               right: 8,
