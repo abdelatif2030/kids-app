@@ -102,7 +102,7 @@ function makeHero() {
   const ring = mesh(new THREE.RingGeometry(0.7, 1.15, 32), new THREE.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0.8, side: THREE.DoubleSide, depthWrite: false }), 0, 0.04, 0, 1, 1, 1);
   ring.rotation.x = -Math.PI / 2; g.add(ring); g.userData.ring = ring;
   const glow = mesh(new THREE.CircleGeometry(1.2, 28), new THREE.MeshBasicMaterial({ color: 0xffe680, transparent: true, opacity: 0.35, depthWrite: false }), 0, 0.03, 0, 1, 1, 1); glow.rotation.x = -Math.PI / 2; g.add(glow);
-  outline(g, 0x3a1a06, 1.06);
+  outline(g, 0x3a1a06, 0.05);
   return g;
 }
 const _artTex = new Map();
@@ -128,7 +128,7 @@ function makeCreature(type, seed, img) {
     b.add(mesh(geo.sphere, M(0xffe04a, 0x886600), -0.25, 0.85, 0.5, 0.28, 0.2, 0.12), mesh(geo.sphere, M(0xffe04a, 0x886600), 0.25, 0.85, 0.5, 0.28, 0.2, 0.12));
   }
   g.add(b); g.userData.body = b; g.userData.seed = seed;
-  outline(g, 0x2a1030, 1.06); return g;
+  outline(g, 0x2a1030, 0.05); return g;
 }
 
 class Game {

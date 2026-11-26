@@ -9,6 +9,7 @@ import { Hunt, LEVELS, WALLS, AREA, LOOP, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 import { polishRenderer } from './polish.js';
+import { FX, outline } from './fx.js';
 
 const S = {
   title: ['تنين الجليد', 'Ice Dragon'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'],
@@ -63,6 +64,7 @@ function makeHero(color) {
   g.add(mesh(geo.cone, M(0x3a6ae8), 0, 2.0, 0, 0.7, 0.8, 0.7));
   g.add(mesh(geo.cyl, M(0x8a5a2a), 0.5, 0.9, 0.2, 0.08, 1.6, 0.08));
   g.add(mesh(geo.sphere, M(0x7affff, 0x30a0ff), 0.5, 1.8, 0.2, 0.25, 0.25, 0.25));
+  outline(g, 0x0a2a48, 0.05);
   return g;
 }
 
@@ -113,6 +115,7 @@ class Game {
     this.bulletMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(0.18, 6, 4), new THREE.MeshBasicMaterial({ color: 0x7affff }), 200);
     this.bulletMesh.frustumCulled = false;
     this.scene.add(this.bulletMesh);
+    this.pfx = new FX(this.scene);
   }
 
   _resize() {
@@ -168,7 +171,7 @@ class Game {
     this.layer.replaceChildren(); this.sound.setMode(true);
     this._clearDyn();
     const r = this.run;
-    this.heroM = makeHero(0x2a8ae8); this.dynamic.add(this.heroM);
+    this.heroM = makeHero(0x2a8ae8); this.heroM.scale.setScalar(1.6); this.dynamic.add(this.heroM);
     this.segM = r.segs.map((sg, k) => {
       const g = new THREE.Group();
       const sz = k === 0 ? 2.2 : 1.7;
@@ -227,9 +230,9 @@ class Game {
       switch (e.type) {
         case 'volley': if (Math.random() < 0.4) this.sound.play('shoot'); break;
         case 'hit': break;
-        case 'break': this.sound.play('break'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 0.6, text: '💥' }); break;
-        case 'blast': this.sound.play('blast'); this.blastM.push({ x: e.x, z: e.z, t: 0 }); if (e.n > 0) this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: `×${e.n}` }); break;
-        case 'ally': this.sound.play('ally'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: '+2 🧙' }); break;
+        case 'break': this.sound.play('break'); this.pfx.burst(new THREE.Vector3(e.x, 1, e.z), { n: 30, colors: [0xbff4ff, 0xffffff, 0x7affff, 0xffd23a], speed: 8, size: 0.9, life: 0.8, gravity: 7 }); this.fx.push({ x: e.x, z: e.z, t: 0, life: 0.6, text: '💥' }); break;
+        case 'blast': this.sound.play('blast'); this.pfx.burst(new THREE.Vector3(e.x, 1, e.z), { n: 50, colors: [0xffa02a, 0xffe04a, 0xff5a2a], speed: 11, size: 1.1, life: 0.9, gravity: 3 }); this.blastM.push({ x: e.x, z: e.z, t: 0 }); if (e.n > 0) this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: `×${e.n}` }); break;
+        case 'ally': this.sound.play('ally'); this.pfx.burst(new THREE.Vector3(e.x, 1, e.z), { n: 36, colors: [0x5af08a, 0xffffff, 0xffe04a], speed: 7, size: 0.9, life: 1, gravity: 2 }); this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: '+2 🧙' }); break;
         case 'triple': this.sound.play('triple'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: '🔱' }); break;
         case 'won': this._won(); break;
         default: break;
@@ -258,7 +261,7 @@ class Game {
       for (const sh of r.shrines) { const g = this.shrineM.get(sh.id); g.visible = !sh.dead; if (!sh.dead) { const hp = Math.ceil(sh.hp); if (g.userData.hp !== hp) { g.userData.hp = hp; g.userData.label.material.map = labelTex(String(hp), '#3a3a98'); g.userData.label.material.needsUpdate = true; } } }
       for (const b of r.barrels) { const g = this.barrelM.get(b.id); g.visible = !b.dead; g.position.set(b.x, 0.3, b.z); }
       this.heroM.position.set(r.hero.x, 0.3, r.hero.z); this.heroM.rotation.y = -r.hero.face + Math.PI / 2;
-      while (this.allyM.length < r.allies) { const a = makeHero(0x5af08a); a.scale.setScalar(0.85); this.dynamic.add(a); this.allyM.push(a); }
+      while (this.allyM.length < r.allies) { const a = makeHero(0x5af08a); a.scale.setScalar(1.2); this.dynamic.add(a); this.allyM.push(a); }
       this.allyM.forEach((a, k) => { const t = r.trail[Math.min(r.trail.length - 1, (k + 1) * 14)]; if (t) a.position.set(t.x, 0.3, t.z); });
       const m = new THREE.Matrix4(); let n = 0;
       for (const b of r.bullets) { if (n >= 200) break; m.makeTranslation(b.x, 1.2, b.z); this.bulletMesh.setMatrixAt(n++, m); }
@@ -270,7 +273,8 @@ class Game {
     }
     // camera looks down at the island at a slant
     const k = this.cw < this.ch ? 1.35 : 1;
-    this.camera.position.set(0, 24 * k, 17 * k); this.camera.lookAt(0, 0, 1.5);
+    this.pfx.update(dt); if (r && r.hero && Math.random() < 0.6) this.pfx.burst(new THREE.Vector3(r.hero.x, 0.5, r.hero.z), { n: 1, colors: [0xffffff, 0xbff4ff], speed: 1.2, size: 0.7, life: 0.6, gravity: 0, lift: 0.5 });
+    this.camera.position.set(0, 22 * k, 15.5 * k); this.camera.lookAt(0, 0, 1.5);
     this.renderer.render(this.scene, this.camera);
     this._floaters();
   }
