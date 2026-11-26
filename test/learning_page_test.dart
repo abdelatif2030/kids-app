@@ -56,6 +56,12 @@ Future<void> openLearning(WidgetTester t, Size size, {int age = 5, bool chooseAr
     await t.tap(find.byKey(const ValueKey('learn_lang_ar')));
     await t.pump();
     await t.pump(const Duration(milliseconds: 400));
+    // then the two options of a language: the levels (as before) or «اتعلّم»
+    expect(find.byKey(const ValueKey('learn_mode_screen')), findsOneWidget);
+    expect(find.byKey(const ValueKey('learn_mode_learn')), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('learn_mode_levels')));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 400));
   }
 }
 
@@ -90,6 +96,10 @@ void main() {
       await t.tap(find.byKey(const ValueKey('learn_lang_ar')));
       await t.pump();
       await t.pump(const Duration(milliseconds: 400));
+      expect(find.byKey(const ValueKey('learn_mode_screen')), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('learn_mode_levels')));
+      await t.pump();
+      await t.pump(const Duration(milliseconds: 400));
       expect(find.byKey(const ValueKey('learning_page')), findsOneWidget);
       expect(t.takeException(), isNull);
     });
@@ -101,6 +111,36 @@ void main() {
     expect(kLearnEnglish.storeKey, isNot(kLearnLetters.storeKey));
     expect(File('${kLearnEnglish.base}index.html').existsSync(), isTrue);
     expect(File('assets/games/learn_voice/en/manifest.js').existsSync() || File('assets/games/learn_voice/manifest.js').existsSync(), isTrue);
+  });
+
+  test('«اتعلّم» is registered for the four languages (own store key, learn mode, bundled page)', () {
+    final all = {'ar': kLearnBasicsAr, 'en': kLearnBasicsEn, 'de': kLearnBasicsDe, 'fr': kLearnBasicsFr};
+    for (final e in all.entries) {
+      expect(e.value.learnLang, e.key);
+      expect(e.value.learnMode, 'learn');
+      expect(kLearnWebGames.values, contains(e.value));
+      expect(File('${e.value.base}index.html').existsSync(), isTrue);
+    }
+    expect({for (final g in all.values) g.storeKey}.length, 4);
+  });
+
+  testWidgets('a language leads to two options: levels and «اتعلّم»; both are tappable', (t) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.windows;
+    for (final lang in ['en', 'de', 'fr']) {
+      await openLearning(t, const Size(1024, 768), chooseArabic: false);
+      await t.tap(find.byKey(ValueKey('learn_lang_$lang')));
+      await t.pump();
+      await t.pump(const Duration(milliseconds: 400));
+      expect(find.byKey(const ValueKey('learn_mode_screen')), findsOneWidget, reason: lang);
+      expect(find.byKey(const ValueKey('learn_mode_levels')), findsOneWidget);
+      expect(find.byKey(const ValueKey('learn_mode_learn')), findsOneWidget);
+      await t.tap(find.byKey(const ValueKey('learn_mode_learn')));
+      await t.pump();
+      await t.pump(const Duration(milliseconds: 400));
+      expect(find.byKey(ValueKey('web_learn_basics_$lang')), findsOneWidget, reason: lang);
+      expect(t.takeException(), isNull);
+    }
+    debugDefaultTargetPlatformOverride = null;
   });
 
   test('the picture is bundled and has the size the page expects', () {

@@ -141,23 +141,13 @@ class LearnLanguageGate extends StatefulWidget {
 }
 
 class _LearnLanguageGateState extends State<LearnLanguageGate> {
-  bool _arabic = false;
-
   void _pick(String id) {
-    if (id == 'ar') {
-      setState(() => _arabic = true);
-    } else if (id == 'en') {
-      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => learnWebGameScreen(kLearnEnglish, widget.child.id, widget.child.age)));
-    } else if (id == 'de') {
-      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => learnWebGameScreen(kLearnGerman, widget.child.id, widget.child.age)));
-    } else if (id == 'fr') {
-      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => learnWebGameScreen(kLearnFrench, widget.child.id, widget.child.age)));
-    }
+    // after the language: two options, the levels (as before) or «اتعلّم» (the basics one item at a time)
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => LearnModeScreen(child: widget.child, lang: id)));
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_arabic) return LearningGamesScreen(key: const ValueKey('games_hub'), child: widget.child, onBack: widget.onBack);
     return Scaffold(
       key: const ValueKey('learn_language_gate'),
       body: Container(
@@ -219,13 +209,91 @@ class _LearnLanguageGateState extends State<LearnLanguageGate> {
             child: Image.asset(
               'assets/games/learn_lang/${l.id}.webp',
               fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => Center(child: Text(l.big, style: const TextStyle(fontSize: 84, height: 1, fontWeight: FontWeight.w900, color: Colors.white))),
+              errorBuilder: (_, _, _) => Center(child: Text(l.big, style: const TextStyle(fontSize: 84, height: 1, fontWeight: FontWeight.w900, color: Colors.white))),
             ),
           ),
           const SizedBox(height: 6),
           Text(l.label, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: Colors.white)),
           const SizedBox(height: 2),
           Text(l.sub, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
+        ]),
+      ),
+    ),
+  );
+}
+
+
+/// «يلا نلعب» (the levels, as before) or «اتعلّم» (the basics, one item at a time): two big options at the top of a language.
+class LearnModeScreen extends StatelessWidget {
+  final ChildProfile child;
+  final String lang; // ar, en, de, fr
+  const LearnModeScreen({super.key, required this.child, required this.lang});
+
+  WebGame get _levels => switch (lang) { 'en' => kLearnEnglish, 'de' => kLearnGerman, 'fr' => kLearnFrench, _ => kLearnLetters };
+  WebGame get _basics => switch (lang) { 'en' => kLearnBasicsEn, 'de' => kLearnBasicsDe, 'fr' => kLearnBasicsFr, _ => kLearnBasicsAr };
+
+  void _openLevels(BuildContext context) {
+    if (lang == 'ar') {
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => LearningGamesScreen(key: const ValueKey('games_hub'), child: child)));
+    } else {
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => learnWebGameScreen(_levels, child.id, child.age)));
+    }
+  }
+
+  void _openLearn(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => learnWebGameScreen(_basics, child.id, child.age)));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final names = {'ar': 'عربي', 'en': 'English', 'de': 'Deutsch', 'fr': 'Français'};
+    return Scaffold(
+      key: const ValueKey('learn_mode_screen'),
+      body: Container(
+        decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF9BDCFF), Color(0xFFFFF1C9)])),
+        child: SafeArea(
+          child: Stack(children: [
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Text(names[lang]!, style: const TextStyle(fontSize: 38, fontWeight: FontWeight.w900, color: Color(0xFF3A2A6A))),
+                  const SizedBox(height: 14),
+                  Wrap(alignment: WrapAlignment.center, spacing: 22, runSpacing: 18, children: [
+                    _option(key: const ValueKey('learn_mode_levels'), emoji: '🎮', title: tr2('يلا نلعب', "Let's play"), sub: tr2('مستويات رحلتي في التعلّم', 'My learning journey levels'), color: const Color(0xFF3D8BFF), onTap: () => _openLevels(context)),
+                    _option(key: const ValueKey('learn_mode_learn'), emoji: '📚', title: tr2('اتعلّم', 'Learn'), sub: tr2('اختار رحلتك: حروف، أرقام، حيوانات وأكتر', 'Choose your journey: letters, numbers, animals and more'), color: const Color(0xFF2FA85A), onTap: () => _openLearn(context)),
+                  ]),
+                ]),
+              ),
+            ),
+            PositionedDirectional(
+              start: 8,
+              top: 8,
+              child: IconButton.filled(key: const ValueKey('learn_mode_back'), tooltip: tr2('رجوع', 'Back'), onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back_rounded)),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _option({required Key key, required String emoji, required String title, required String sub, required Color color, required VoidCallback onTap}) => Semantics(
+    button: true,
+    label: title,
+    child: InkWell(
+      key: key,
+      borderRadius: BorderRadius.circular(28),
+      onTap: onTap,
+      child: Container(
+        width: 270,
+        padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 14),
+        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(28), border: Border.all(color: Colors.white, width: 5), boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 10, offset: Offset(0, 6))]),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Text(emoji, style: const TextStyle(fontSize: 72, height: 1.1)),
+          const SizedBox(height: 6),
+          Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white)),
+          const SizedBox(height: 4),
+          Text(sub, textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
         ]),
       ),
     ),

@@ -1,43 +1,32 @@
-// docs/LEARN_MODE_LINES.csv: the new sentences the "Learn" (basics) mode needs in every language (file name = the game's clip id).
+// docs/LEARN_MODE_LINES.csv: every clip the «اتعلّم» (learn) mode needs that does not exist yet, in every language:
+//   - the general lines (GEN in src/learn/lines.js), the name of every section, the small words numbers are built from (up to 100 000),
+//   - the Arabic letter sentences, and the Arabic names of the section items.
+// File name = the game's clip id. Run:  node tools/make_learn_mode_lines.mjs
 import fs from 'node:fs';
 import { clipId } from '../game_src/learn_games/src/kit/voice.js';
-const GEN = [ // [key, ar, en, de, fr]
- ['start', 'يلا نتعلم سوا!', "Let's learn together!", 'Los, wir lernen zusammen!', 'On apprend ensemble !'],
- ['look', 'بص!', 'Look!', 'Schau!', 'Regarde !'],
- ['say', 'قول معايا!', 'Say it with me!', 'Sag es mit mir!', 'Répète avec moi !'],
- ['again', 'تاني!', 'Again!', 'Noch einmal!', 'Encore !'],
- ['slow', 'مرة كمان، براحة.', 'One more time, slowly.', 'Noch einmal, ganz langsam.', 'Encore une fois, doucement.'],
- ['great', 'برافو عليك!', 'Great job!', 'Super gemacht!', 'Bravo !'],
- ['next', 'اللي بعده!', 'The next one!', 'Das nächste!', 'Le suivant !'],
- ['done', 'خلصت كل حاجة! إنت شاطر!', 'You learned them all! Well done!', 'Du hast alles gelernt! Toll!', 'Tu as tout appris ! Bravo !'],
- ['again_all', 'عايز نبدأ من الأول؟', 'Do you want to start again?', 'Möchtest du von vorn anfangen?', 'Tu veux recommencer ?'],
- ['count', 'تعالى نعد سوا!', "Let's count together!", 'Zähl mit mir!', 'Comptons ensemble !'],
-];
-const SEC = [ // [key, ar, en, de, fr]  intro of every section
- ['letters', 'هنتعلم الحروف!', "Let's learn the letters!", 'Wir lernen die Buchstaben!', "On apprend les lettres !"],
- ['numbers', 'هنتعلم الأرقام!', "Let's learn the numbers!", 'Wir lernen die Zahlen!', 'On apprend les chiffres !'],
- ['tens', 'هنتعلم العشرات!', "Let's learn the tens!", 'Wir lernen die Zehnerzahlen!', 'On apprend les dizaines !'],
- ['animals', 'هنتعلم الحيوانات!', "Let's learn the animals!", 'Wir lernen die Tiere!', 'On apprend les animaux !'],
- ['colours', 'هنتعلم الألوان!', "Let's learn the colours!", 'Wir lernen die Farben!', 'On apprend les couleurs !'],
- ['shapes', 'هنتعلم الأشكال!', "Let's learn the shapes!", 'Wir lernen die Formen!', 'On apprend les formes !'],
- ['days', 'هنتعلم أيام الأسبوع!', "Let's learn the days of the week!", 'Wir lernen die Wochentage!', 'On apprend les jours de la semaine !'],
- ['months', 'هنتعلم شهور السنة!', "Let's learn the months!", 'Wir lernen die Monate!', 'On apprend les mois !'],
- ['seasons', 'هنتعلم فصول السنة!', "Let's learn the seasons!", 'Wir lernen die Jahreszeiten!', 'On apprend les saisons !'],
- ['body', 'هنتعلم جسمي!', "Let's learn the body!", 'Wir lernen den Körper!', 'On apprend le corps !'],
- ['clothes', 'هنتعلم الهدوم!', "Let's learn the clothes!", 'Wir lernen die Kleidung!', 'On apprend les vêtements !'],
- ['family', 'هنتعلم العيلة!', "Let's learn the family!", 'Wir lernen die Familie!', 'On apprend la famille !'],
- ['food', 'هنتعلم الأكل!', "Let's learn the food!", 'Wir lernen das Essen!', 'On apprend la nourriture !'],
- ['fruit', 'هنتعلم الفاكهة والخضار!', "Let's learn fruit and vegetables!", 'Wir lernen Obst und Gemüse!', 'On apprend les fruits et les légumes !'],
- ['jobs', 'هنتعلم الوظايف!', "Let's learn the jobs!", 'Wir lernen die Berufe!', 'On apprend les métiers !'],
- ['school', 'هنتعلم حاجات المدرسة!', "Let's learn school things!", 'Wir lernen Schulsachen!', "On apprend les affaires d'école !"],
- ['weather', 'هنتعلم الجو!', "Let's learn the weather!", 'Wir lernen das Wetter!', 'On apprend la météo !'],
- ['home', 'هنتعلم حاجات البيت!', "Let's learn things at home!", 'Wir lernen Dinge im Haus!', 'On apprend les choses de la maison !'],
- ['city', 'هنتعلم المدينة!', "Let's learn the city!", 'Wir lernen die Stadt!', 'On apprend la ville !'],
- ['routine', 'هنتعلم يومي!', "Let's learn my day!", 'Wir lernen meinen Tag!', 'On apprend ma journée !'],
-];
-const LANGS = ['ar', 'en', 'de', 'fr'];
+import { GEN } from '../game_src/learn_games/src/learn/lines.js';
+import { learnSections, LANGS } from '../game_src/learn_games/src/learn/sections.js';
+import { numberPartsNeeded } from '../game_src/learn_games/src/learn/numbers.js';
+
+const has = (l, id) => fs.existsSync(`assets/games/learn_voice/${l}/${id}.mp3`);
+const rows = [['language', 'file_name', 'kind', 'text']];
+const seen = new Set();
+const add = (l, text, kind, slow = false) => {
+  const id = clipId(text, l) + (slow ? '_slow' : '');
+  if (seen.has(l + id) || has(l, id)) return;
+  seen.add(l + id);
+  rows.push([l, id + '.mp3', kind, text]);
+};
+LANGS.forEach((l, i) => { for (const k of Object.keys(GEN)) add(l, GEN[k][i], 'general line'); });
+for (const l of LANGS) for (const s of learnSections(l)) {
+  add(l, s.name, 'section name');
+  for (const it of s.items) {
+    if (l === 'ar') for (const x of [...it.say, ...it.sentence]) add('ar', x.t, 'arabic item');
+  }
+}
+for (const l of LANGS) for (const p of numberPartsNeeded(l, 100000)) { add(l, p, 'number part'); if (l !== 'ar') add(l, p, 'number part read slowly', true); }
 const q = (c) => '"' + String(c).replace(/"/g, '""') + '"';
-const rows = [['language', 'file_name', 'kind', 'key', 'text']];
-for (const [kind, list] of [['general line', GEN], ['section intro', SEC]]) for (const r of list) LANGS.forEach((l, i) => rows.push([l, clipId(r[i + 1], l) + '.mp3', kind, r[0], r[i + 1]]));
 fs.writeFileSync('docs/LEARN_MODE_LINES.csv', '﻿' + rows.map((r) => r.map(q).join(',')).join('\n') + '\n');
-console.log(rows.length - 1, 'lines');
+const c = {};
+for (const r of rows.slice(1)) c[`${r[0]} ${r[2]}`] = (c[`${r[0]} ${r[2]}`] || 0) + 1;
+console.log(rows.length - 1, 'clips'); console.log(c);

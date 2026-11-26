@@ -22,7 +22,10 @@ class WebGame {
 
   /// The language a learning game teaches ('en' = «English with Rehlaty»); null = the Arabic world. Passed to the page as `learnLang`.
   final String? learnLang;
-  const WebGame({required this.id, required this.folder, required this.global, required this.storeKey, required this.minAge, required this.title, this.learnId, this.learnLang});
+
+  /// 'learn' = the «اتعلّم» mode of the learning world (the basics one item at a time) instead of the levels. Passed to the page as `learnMode`.
+  final String? learnMode;
+  const WebGame({required this.id, required this.folder, required this.global, required this.storeKey, required this.minAge, required this.title, this.learnId, this.learnLang, this.learnMode});
 
   bool get isLearning => learnId != null;
 
@@ -784,6 +787,23 @@ final WebGame kLearnFrench = WebGame(
   learnLang: 'fr',
 );
 
+/// «اتعلّم»: the basics (letters, numbers up to 100 000, animals, birds ...) one item at a time, in Arabic, English, German or French.
+WebGame _basics(String lang, String ar, String en) => WebGame(
+  id: 'learn_basics_$lang',
+  folder: 'learn_letters',
+  global: 'LearnLetters',
+  storeKey: 'learn_basics_$lang',
+  minAge: 1,
+  title: () => tr2(ar, en),
+  learnId: 'basics_$lang',
+  learnLang: lang,
+  learnMode: 'learn',
+);
+final WebGame kLearnBasicsAr = _basics('ar', 'اتعلّم', 'Learn');
+final WebGame kLearnBasicsEn = _basics('en', 'اتعلّم إنجليزي', 'Learn English');
+final WebGame kLearnBasicsDe = _basics('de', 'اتعلّم ألماني', 'Learn German');
+final WebGame kLearnBasicsFr = _basics('fr', 'اتعلّم فرنساوي', 'Learn French');
+
 /// «الحساب والعدّ» (Counting at the Market): get N apples counted aloud, and count what is in the basket.
 final WebGame kLearnCounting = WebGame(
   id: 'learn_counting',
@@ -818,7 +838,7 @@ final WebGame kLearnAnimals = WebGame(
 );
 
 /// Rebuilt learning games, by their old game id.
-final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay, kLearnLadders, kLearnBall, kLearnPattern, kLearnLetters, kLearnCounting, kLearnShapes, kLearnAnimals, kLearnEnglish, kLearnGerman, kLearnFrench]) g.learnId!: g};
+final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay, kLearnLadders, kLearnBall, kLearnPattern, kLearnLetters, kLearnCounting, kLearnShapes, kLearnAnimals, kLearnEnglish, kLearnGerman, kLearnFrench, kLearnBasicsAr, kLearnBasicsEn, kLearnBasicsDe, kLearnBasicsFr]) g.learnId!: g};
 
 /// Lets the screen ask the running game page to step back INSIDE the game first (owner 2026-11-22): the view sets [tryBack] while it is alive.
 /// It answers true when the page handled it (paused, returned to the game's menu or level list) and false when the game is at its main menu.

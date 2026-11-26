@@ -21,6 +21,9 @@ import { colorOf } from './colors.js';
 import { NUMBERS } from '../kit/words.js';
 import { LEVELS, ALL_LEVELS, EVERY_LEVEL, ARABIC_LEVELS, TOPIC_LEVELS, LevelPlay, levelsFor, cheer } from './levels.js';
 import { EN_LEVELS, DE_LEVELS, FR_LEVELS } from '../english/levels.js';
+import { learnSections, numberItem } from '../learn/sections.js';
+import { nextNumber, prevNumber } from '../learn/numbers.js';
+import { gen as learnLine } from '../learn/lines.js';
 import { FreshMemory } from './fresh.js';
 import { themeForWorld } from '../kit/themes.js';
 import { ROUNDS } from './sim.js';
@@ -339,8 +342,10 @@ class Game {
   _showStand(show) {
     if (this.standItem) { this.st.scene.remove(this.standItem); this.standItem = null; }
     this.stand.visible = false;
+    this.stand.scale.setScalar(1);
     if (!show) return;
     this.stand.visible = show.type !== 'row'; // a row of pictures (patterns) is wider than the table
+    this.stand.scale.setScalar(show.big || 1); // the «اتعلّم» mode draws one thing big
     const g = new THREE.Group();
     if (show.type === 'thing') {
       const t = makeThing(show.thing);
@@ -419,9 +424,10 @@ class Game {
       g.userData.off = new THREE.Vector3(this._portrait ? 0 : 0.5, 0, this._portrait ? -1.0 : -1.9);    } else if (show.type === 'letter') {
       const p = this._plaque(show.ch, true);
       p.position.set(0, 1.7, 0);
-      p.scale.setScalar(1.5);
+      p.scale.setScalar(show.scale || 1.5);
       g.add(p);
     }
+    if (show.big) g.scale.setScalar(show.big);
     this.st.add(g);
     this.standItem = g;
     this._placeStand();
@@ -528,6 +534,7 @@ class Game {
 
   _startPage() {
     if (!this._ageKnown()) { this._chooseAge(() => this._startPage()); return; }
+    if (this.sh.cfg && this.sh.cfg.learnMode === 'learn') { this._learnHome(); return; } // «اتعلّم» (owner 2026-11-26)
     const want = this.sh.cfg && this.sh.cfg.level;
     if (this.sh.cfg) this.sh.cfg.level = null; // only the first time: back to the list afterwards
     if (want && EVERY_LEVEL.some((l) => l.id === want)) this._enter(want);
@@ -540,6 +547,135 @@ class Game {
   _learnDe() { return !!(this.sh.cfg && this.sh.cfg.learnLang === 'de'); }
   /** The levels of the language being learned. */
   _list() { return this._learnFr() ? FR_LEVELS : this._learnDe() ? DE_LEVELS : this._learnEn() ? EN_LEVELS : ARABIC_LEVELS; }
+
+
+  // ---- «اتعلّم»: the basics, one item at a time (owner 2026-11-26) -------------------------------------------------------
+
+  _lang() { const l = this.sh.cfg && this.sh.cfg.learnLang; return l === 'en' || l === 'de' || l === 'fr' ? l : 'ar'; }
+  _lt(ar, en, de, fr) { return { ar, en, de, fr }[this._lang()]; }
+  _learnData() { return this._secs || (this._secs = learnSections(this._lang())); }
+
+  /** The sections (letters, numbers, animals, birds ...): the child picks what to learn. */
+  _learnHome() {
+    const sh = this.sh;
+    this._clearRound();
+    sh.clear();
+    this._showStand(null);
+    this.st.mode = 'menu';
+    sh.sound.setSuspense(false);
+    sh.sound.setMode('menu');
+    sh.sound.energy = 0;
+    this._L = null;
+    if (/[?&]debug/.test(location.search)) window.__lw = this; // test hook (see _begin)
+    sh.layer.append(h('div', { class: 'lk-top' }, sh.backBtn(), h('span'), sh.soundBtn()));
+    const tiles = this._learnData().map((s) => h('button', { class: 'lw-tile lw-lsec', 'aria-label': s.name, onclick: () => { sh.sound.play('tap'); this._learnOpen(s.id, 0, true); } },
+      h('i', {}, s.emoji), h('span', {}, s.name), h('small', { dir: 'ltr' }, s.kind === 'numbers' ? '0 → 100 000' : String(s.items.length))));
+    const lang = this._lang();
+    sh.layer.append(h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.18)' }, h('div', { class: `lw-card lw-learn${lang === 'ar' ? '' : ' lw-en'}` },
+      h('div', { class: 'lw-title' }, this._lt('اختار رحلتك 📚', 'Choose your journey 📚', 'Wähle deine Reise 📚', 'Choisis ton voyage 📚')),
+      h('div', { class: 'lw-grid lw-lgrid' }, tiles))));
+    this.owl.act('cheer');
+    this.owl.look(0);
+  }
+
+  _learnOpen(secId, i, intro) {
+    const sec = this._learnData().find((s) => s.id === secId);
+    if (!sec) { this._learnHome(); return; }
+    this._L = { sec, i: Math.max(0, Math.min(sec.items.length - 1, i)), num: sec.kind === 'numbers' ? (sec.items[i] ? sec.items[i].n : 0) : null, intro: !!intro };
+    this._learnShow();
+  }
+
+  _learnItem() {
+    const L = this._L;
+    return L.sec.kind === 'numbers' ? numberItem(L.num, this._lang()) : L.sec.items[L.i];
+  }
+
+  /** What is said for an item: the word, the word slowly, the word again, then its sentence. A number is said from its small recorded words when they all exist. */
+  _learnSpeech(it, withIntro) {
+    const v = this.sh.voice;
+    const has = (x) => !!(v && v.has && v.has(v._item(x)));
+    let say = it.say, slow = it.slow;
+    if (it.parts && it.n > 20 && !has(it.say[0]) && it.parts.every((p) => has({ t: p, lang: it.lang }))) {
+      say = it.parts.map((p) => ({ t: p, lang: it.lang }));
+      slow = say;
+    }
+    const q = [...say, ...slow, ...say, ...it.sentence];
+    if (withIntro) { const L = this._L; q.unshift({ t: L.sec.name, lang: this._lang() }, { t: learnLine('start', this._lang()), lang: this._lang() }); }
+    return q;
+  }
+
+  _learnShow() {
+    const sh = this.sh, L = this._L, lang = this._lang();
+    const it = this._learnItem();
+    this._clearRound();
+    sh.clear();
+    this.st.mode = 'learn';
+    sh.sound.setMode('play');
+    const isNum = L.sec.kind === 'numbers';
+    this._showStand(isNum ? null : { ...it.show, big: 1.9 }); // a number is a big sign of the page (any length), the rest stands on the table
+    const last = isNum ? nextNumber(L.num) == null : L.i >= L.sec.items.length - 1;
+    const first = isNum ? L.num <= 0 : L.i <= 0;
+    const pos = isNum ? '' : `${L.i + 1} / ${L.sec.items.length}`;
+    const go = (dir) => {
+      sh.sound.play('tap');
+      if (dir > 0) {
+        if (last) { this._learnDone(); return; }
+        if (isNum) L.num = nextNumber(L.num); else L.i++;
+      } else if (!first) { if (isNum) L.num = prevNumber(L.num); else L.i--; }
+      L.intro = false;
+      this._learnShow();
+    };
+    const say = () => { sh.speak(this._learnSpeech(this._learnItem(), false)); };
+    sh.layer.append(
+      h('div', { class: 'lk-top lw-ltop' },
+        h('button', { class: 'lk-rbtn', 'aria-label': 'back', onclick: () => { sh.sound.play('tap'); this._learnHome(); } }, '←'),
+        h('span', { class: 'lw-lprog' }, `${L.sec.emoji} ${L.sec.name}  `, h('bdi', { dir: 'ltr' }, pos)),
+        h('button', { class: 'lk-rbtn y', 'aria-label': 'pick', onclick: () => { sh.sound.play('tap'); this._learnPick(); } }, isNum ? '🔢' : '🔎'),
+        sh.soundBtn()),
+      isNum ? h('div', { class: 'lw-lbignum', dir: 'ltr', style: `font-size:calc(var(--u)*${it.label.length <= 3 ? 24 : it.label.length <= 5 ? 19 : 14})` }, it.label) : null,
+      h('button', { class: 'lw-lhit', 'aria-label': 'next', onclick: () => go(1) }),
+      h('div', { class: `lw-lbar${lang === 'ar' ? '' : ' ltr'}` },
+        h('button', { class: 'lw-lnav', 'aria-label': 'previous', disabled: first || null, onclick: () => go(-1) }, lang === 'ar' ? '▶' : '◀'),
+        h('div', { class: 'lw-lsign' }, h('b', {}, it.label), h('button', { class: 'lw-again', 'aria-label': 'again', onclick: (e) => { e.stopPropagation(); sh.sound.play('tap'); say(); } }, '🔊')),
+        h('button', { class: 'lw-lnav go', 'aria-label': 'next', onclick: () => go(1) }, lang === 'ar' ? '◀' : '▶')));
+    this.owl.act('cheer');
+    this.owl.look(0);
+    sh.speak(this._learnSpeech(it, L.intro));
+  }
+
+  /** The end of a section: no stars to count, just a kind word and the way on. */
+  _learnDone() {
+    const sh = this.sh, lang = this._lang(), L = this._L;
+    this._showStand(null);
+    sh.speak([{ t: learnLine('done', lang), lang }]);
+    sh.layer.append(h('div', { class: 'lk-dim' }, h('div', { class: `lk-card${lang === 'ar' ? '' : ' ltr'}` },
+      h('div', { class: 'lk-title', style: 'font-size:calc(var(--u)*7)' }, `${L.sec.emoji} ${L.sec.name}`),
+      h('div', { class: 'lk-starburst' }, '🌟'),
+      h('div', { class: 'lk-msg' }, learnLine('done', lang)),
+      h('button', { class: 'lk-btn', onclick: () => { sh.sound.play('tap'); this._learnOpen(L.sec.id, 0, false); } }, '↻ ', learnLine('again', lang)),
+      h('button', { class: 'lk-btn p', onclick: () => { sh.sound.play('tap'); this._learnHome(); } }, this._lt('← الأقسام', '← Sections', '← Bereiche', '← Les rubriques')))));
+  }
+
+  /** Jump to one item: a keypad for numbers (up to 100 000), a list of the words for everything else. */
+  _learnPick() {
+    const sh = this.sh, L = this._L, lang = this._lang();
+    const close = () => { const m = sh.layer.querySelector('.lw-lpick'); if (m) m.remove(); };
+    let body;
+    if (L.sec.kind === 'numbers') {
+      let v = '';
+      const shown = h('div', { class: 'lw-lnum' }, '0');
+      const upd = () => { shown.textContent = v ? numberItem(Number(v), lang).label : '0'; };
+      const key = (k) => h('button', { class: 'lw-lkey', onclick: () => { sh.sound.play('tap'); if (v.length < 6) v = (v + k).replace(/^0+(?=\d)/, ''); if (Number(v) > 100000) v = '100000'; upd(); } }, lang === 'ar' ? String(k).replace(/[0-9]/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]) : String(k));
+      body = h('div', { class: 'lw-lkeys' }, shown,
+        h('div', { class: 'lw-lpad' }, ...[1, 2, 3, 4, 5, 6, 7, 8, 9].map(key), h('button', { class: 'lw-lkey', onclick: () => { v = v.slice(0, -1); upd(); } }, '⌫'), key(0),
+          h('button', { class: 'lw-lkey ok', onclick: () => { sh.sound.play('tap'); L.num = Math.min(100000, Number(v || 0)); L.intro = false; close(); this._learnShow(); } }, 'OK')));
+    } else {
+      body = h('div', { class: 'lw-lpicklist' }, ...L.sec.items.map((x, k) => h('button', { class: `lw-lpickitem${k === L.i ? ' on' : ''}`, onclick: () => { sh.sound.play('tap'); L.i = k; L.intro = false; close(); this._learnShow(); } }, x.label)));
+    }
+    sh.layer.append(h('div', { class: 'lk-dim lw-lpick', onclick: (e) => { if (e.target === e.currentTarget) close(); } }, h('div', { class: `lw-card lw-lcard${lang === 'ar' ? '' : ' ltr'}` },
+      h('div', { class: 'lw-title' }, L.sec.kind === 'numbers' ? this._lt('اكتب رقم', 'Type a number', 'Tippe eine Zahl', 'Tape un nombre') : this._lt('اختار واحد', 'Pick one', 'Wähle eins', 'Choisis-en un')), body,
+      h('button', { class: 'lk-btn p', onclick: () => { sh.sound.play('tap'); close(); } }, '✕'))));
+  }
 
   _levels() {
     const sh = this.sh;
@@ -1370,6 +1506,14 @@ const CSS = `
 .lw-fade.on{opacity:1}
 .lw-tile:focus-visible{outline:calc(var(--u)*.8) solid #6a3ad0;outline-offset:calc(var(--u)*.6)}
 @media (max-aspect-ratio:1/1){.lw-grid{grid-template-columns:repeat(3,1fr)}}
+.lw-learn{max-width:96%;overflow-x:hidden !important}.lw-lgrid{grid-template-columns:repeat(6,minmax(0,1fr)) !important;max-height:62vh;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}.lw-lsec{min-height:calc(var(--u)*17);padding:calc(var(--u)*1) calc(var(--u)*.5) !important;gap:calc(var(--u)*.4)}.lw-lsec i{font-style:normal;font-size:calc(var(--u)*7)}.lw-lsec span{font-size:calc(var(--u)*3);line-height:1.1;text-align:center}.lw-lsec small{font-size:calc(var(--u)*2.3);opacity:.85}
+.lw-ltop{display:flex;align-items:center;justify-content:space-between;gap:calc(var(--u)*1.5);pointer-events:auto}.lw-lprog{flex:1;text-align:center;font-weight:900;font-size:calc(var(--u)*3.6);color:#fff;text-shadow:0 calc(var(--u)*.3) calc(var(--u)*1) rgba(0,0,0,.45);background:rgba(60,40,140,.55);border-radius:999px;padding:calc(var(--u)*.8) calc(var(--u)*3)}
+.lw-lbignum{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-weight:900;color:#3a2a6a;background:radial-gradient(circle at 50% 35%,#fff,#fff7d6);border:calc(var(--u)*1) solid #f5b21a;border-radius:calc(var(--u)*8);padding:calc(var(--u)*1.5) calc(var(--u)*7);box-shadow:0 calc(var(--u)*1.2) 0 #c98a1a,0 calc(var(--u)*2) calc(var(--u)*5) rgba(0,0,0,.3);pointer-events:none;white-space:nowrap;line-height:1.1}.lw-lhit{position:absolute;left:18%;right:18%;top:14%;bottom:30%;background:transparent;border:none;cursor:pointer;pointer-events:auto;z-index:2}
+.lw-lbar{position:absolute;left:0;right:0;bottom:calc(var(--u)*2.5);display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*2.5);pointer-events:auto;z-index:3}.lw-lbar.ltr{direction:ltr}
+.lw-lsign{display:flex;align-items:center;gap:calc(var(--u)*2.5);background:#fff;border:calc(var(--u)*.7) solid #6a3ad0;border-radius:calc(var(--u)*4);padding:calc(var(--u)*1.2) calc(var(--u)*3);box-shadow:0 calc(var(--u)*.8) 0 #4a2a9a;max-width:60vw}.lw-lsign b{font-size:calc(var(--u)*6);color:#3a2a6a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lw-lnav{font-family:inherit;font-weight:900;font-size:calc(var(--u)*6);width:calc(var(--u)*13);height:calc(var(--u)*13);border-radius:50%;border:calc(var(--u)*.7) solid #fff;color:#fff;background:linear-gradient(180deg,#9a6af0,#6a3ad0);box-shadow:0 calc(var(--u)*.8) 0 #4a2a9a;cursor:pointer}.lw-lnav.go{background:linear-gradient(180deg,#6ae08a,#2fa85a);box-shadow:0 calc(var(--u)*.8) 0 #1a6a3a;width:calc(var(--u)*17);height:calc(var(--u)*17);font-size:calc(var(--u)*8)}.lw-lnav[disabled]{opacity:.35}
+.lw-lcard{max-height:92%;overflow:auto;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*1.5)}.lw-lpicklist{display:flex;flex-wrap:wrap;gap:calc(var(--u)*1.2);justify-content:center;max-height:52vh;overflow:auto}.lw-lpickitem{font-family:inherit;font-weight:900;font-size:calc(var(--u)*3.6);background:#eaf4ff;border:calc(var(--u)*.4) solid #7ab8ff;border-radius:calc(var(--u)*2);padding:calc(var(--u)*1) calc(var(--u)*2.4);cursor:pointer}.lw-lpickitem.on{background:#ffd23a;border-color:#e0a010}
+.lw-lcard .lw-title{font-size:calc(var(--u)*5.4)}.lw-lcard .lk-btn{min-height:calc(var(--u)*8);font-size:calc(var(--u)*4);padding:calc(var(--u)*.6) calc(var(--u)*4)}.lw-lnum{font-weight:900;font-size:calc(var(--u)*7);color:#3a2a6a;background:#fff;border:calc(var(--u)*.6) solid #7ab8ff;border-radius:calc(var(--u)*3);padding:calc(var(--u)*1) calc(var(--u)*4);min-width:calc(var(--u)*40);text-align:center;direction:ltr}.lw-lkeys{display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*1.5)}.lw-lpad{display:grid;grid-template-columns:repeat(3,calc(var(--u)*13));gap:calc(var(--u)*.8);direction:ltr}.lw-lkey{font-family:inherit;font-weight:900;font-size:calc(var(--u)*5);height:calc(var(--u)*8);border-radius:calc(var(--u)*2.4);border:calc(var(--u)*.5) solid #7ab8ff;background:#eaf4ff;color:#3a2a6a;cursor:pointer}.lw-lkey.ok{background:linear-gradient(180deg,#6ae08a,#2fa85a);color:#fff;border-color:#fff}
 .lw-en{direction:ltr}.lw-en .lw-grid{grid-template-columns:repeat(10,minmax(0,1fr))}.lw-en .lw-tile{min-width:0;padding-inline:0}.lw-en .lw-tile span{font-size:calc(var(--u)*2.7)}
 @media (max-aspect-ratio:1/1){.lw-en .lw-grid{grid-template-columns:repeat(3,1fr)}}
 `;
