@@ -48,6 +48,7 @@ export class Sound extends SynthBase {
   setMode(on) { if (!on) { this.setBed(null); this.setTune(null); return; } this.setBed('wind'); this.setTune(TUNE); }
 
   play(n) {
+    if (typeof window !== 'undefined' && window.__cheerSfx) window.__cheerSfx(n);
     const c = this.ctx;
     if (!c || c.state !== 'running' || this.muted) return;
     const t = c.currentTime;

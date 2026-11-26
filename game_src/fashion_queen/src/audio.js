@@ -26,6 +26,7 @@ export class Sound extends SynthBase {
   setMode(name) { if (this.mode === name) return; this.mode = name; this.setTune(name ? TUNES[name] : null); }
 
   play(n) {
+    if (typeof window !== 'undefined' && window.__cheerSfx) window.__cheerSfx(n);
     const c = this.ctx;
     if (!c || c.state !== 'running' || this.muted || this.sv <= 0) return;
     const t = c.currentTime;

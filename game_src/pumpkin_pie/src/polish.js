@@ -76,6 +76,17 @@ function stepMotes(M, camera, dt) {
 const CHEERS = { start: 3, good: 6, combo: 2, oops: 4, near: 2, win: 3, lose: 3, idle: 2, overtake: 3, boost: 3, behind: 3, collect: 3, levelup: 3 };
 const WIN_RE = /فزت|مبروك|كسبت|فاز|انتصر|أحسنت|برافو|🏆|WIN|Victory|Congrat|You won/i;
 const LOSE_RE = /خسر|حاول تاني|حاول مرة|انتهت|معلش|Game over|Try again|Failed/i;
+
+// Sound -> encouragement voice: every game's Sound.play(name) calls this, so real game events (not a timer) trigger the cheer lines.
+const SFX_CHEER = { win: 'win', finish: 'win', goal: 'win', arrive: 'win', lose: 'lose', lost: 'lose', crash: 'oops', hit: 'oops', hurt: 'oops', bump: 'oops', splat: 'oops', fall: 'oops', coin: 'collect', star: 'collect', pick: 'collect', crystal: 'collect', power: 'collect', overtake: 'overtake', nitro: 'boost', boost: 'boost', dash: 'boost', combo: 'combo', unlock: 'levelup', lap: 'levelup', wave: 'levelup', miss: 'near', draft: 'near', leap: 'near', go: 'start' };
+const _sfxLast = {};
+if (typeof window !== 'undefined') window.__cheerSfx = (name) => {
+  const kind = SFX_CHEER[name]; if (!kind || !window.__cheer) return;
+  const now = performance.now(); const gap = (kind === 'collect' || kind === 'oops') ? 9000 : 4500;
+  if (now - (_sfxLast[kind] || -1e9) < gap) return; _sfxLast[kind] = now;
+  window.__cheer(kind, kind === 'win' || kind === 'lose' || kind === 'levelup');
+};
+
 export function installCheer(root, voice) {
   if (!root || root.__cheer) return; root.__cheer = true;
   const base = new URL('../_voice/', location.href).href;

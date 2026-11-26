@@ -12,6 +12,7 @@ const BOSS = [[0, 62, 0.5], [0.5, 62, 0.5], [1, 65, 1], [2, 62, 0.5], [2.5, 62, 
 
 export class Sound extends SynthBase {
   play(n, a = 0) {
+    if (typeof window !== 'undefined' && window.__cheerSfx) window.__cheerSfx(n);
     const c = this.ctx;
     if (!c || c.state !== 'running' || this.muted) return;
     const t = c.currentTime;
