@@ -7,6 +7,7 @@
 // Every word needs a picture / sign the app already has (tools/make_english_data.py): nothing is invented.
 import WORDS from './words.json' with { type: 'json' };
 import DE_WORDS from '../german/words.json' with { type: 'json' };
+import FR_WORDS from '../french/words.json' with { type: 'json' };
 import { colorOf } from '../letters/colors.js';
 import { numberWord } from '../letters/numbers.js';
 
@@ -47,12 +48,24 @@ export const DE_LEVELS = EN_LEVELS.filter((l) => DE_WORDS.some(l.pick)).map((l) 
   if (k === 'letters') d.pick = pack('letters A-Z (name)', 'letters (German only)');
   return d;
 });
+// French with Rehlaty: the same levels and pictures, the French words of docs/FRENCH_WORDLIST.csv. Ids fr_*. The map / badges / win picture are the English
+// world's until the owner's French pictures arrive (docs/FRENCH_IMAGE_PROMPTS.md).
+const FR_NAMES = { animals: 'Les animaux', first: 'Mes premiers mots', family: 'Moi et ma famille', food: 'Miam miam', school: 'Vêtements et école', world: 'Métiers, musique et météo',
+  colorful: 'Choses de couleur', routine: 'Ma journée', numbers: 'Les chiffres', letters: "L'alphabet", colors: 'Les couleurs', shapes: 'Les formes', time: 'Jours et mois', tens: 'Grands nombres', where: 'Où est la balle ?', beads: 'Les perles' };
+export const FR_LEVELS = EN_LEVELS.filter((l) => FR_WORDS.some(l.pick)).map((l) => {
+  const k = l.id.slice(3);
+  const f = { ...l, id: `fr_${k}`, mode: 'en', lang: 'fr', ar: FR_NAMES[k], words: FR_WORDS, art: { ...l.art, lang: 'fr' } };
+  if (k === 'letters') f.pick = pack('letters A-Z (name)', 'letters (French only)');
+  return f;
+});
 export const isEnglishLevel = (id) => typeof id === 'string' && id.startsWith('en_');
+export const isFrenchLevel = (id) => typeof id === 'string' && id.startsWith('fr_');
 export const isGermanLevel = (id) => typeof id === 'string' && id.startsWith('de_');
 
 const kindOf = (e) => (e.thing ? 'thing' : e.n != null ? 'number' : e.color ? 'color' : e.shape ? 'shape' : 'letter');
+const langOf = (e) => e.lang || (e.eng !== undefined ? 'de' : 'en');
 export const poolOfLevel = (lv) => (lv.words || WORDS).filter(lv.pick);
-export const wordKey = (e) => `${e.eng !== undefined ? 'de' : 'en'}:${e.cat}:${e.en}`;
+export const wordKey = (e) => `${langOf(e)}:${e.cat}:${e.en}`;
 
 /** How many of the pool a child of this age meets in one level: the youngest start with the first, easier part (the rest comes on later plays). */
 export function limitFor(age, size) {
@@ -63,7 +76,7 @@ export function limitFor(age, size) {
 const SHAPE_PAINT = ['red', 'blue', 'yellow', 'green', 'orange', 'purple'];
 
 /** The words as the voice says them. */
-const langOf = (e) => (e.eng !== undefined ? 'de' : 'en');
+
 export const sayWord = (e) => ({ t: e.w, lang: langOf(e) });
 export const saySlow = (e) => ({ t: e.w, lang: langOf(e), slow: true });
 export const saySentence = (e) => ({ t: e.s, lang: langOf(e) });

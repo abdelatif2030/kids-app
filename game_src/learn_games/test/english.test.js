@@ -25,7 +25,7 @@ test('the bigger levels reach about a hundred items (animals, food)', () => {
 test('every picture an English or German word uses exists as a bundled picture (assets/games/art) and has its size', async () => {
   const fs = await import('node:fs');
   const DIMS = JSON.parse(fs.readFileSync(new URL('../src/kit/art_dims.json', import.meta.url), 'utf8'));
-  const DE = JSON.parse(fs.readFileSync(new URL('../src/german/words.json', import.meta.url), 'utf8'));
+  const DE = [...JSON.parse(fs.readFileSync(new URL('../src/german/words.json', import.meta.url), 'utf8')), ...JSON.parse(fs.readFileSync(new URL('../src/french/words.json', import.meta.url), 'utf8'))];
   const missing = [];
   for (const e of [...WORDS, ...DE]) if (e.thing && e.thing.startsWith('x_') && !fs.existsSync(new URL(`../../../assets/games/art/${e.thing}.webp`, import.meta.url))) missing.push(e.thing);
   assert.deepEqual([...new Set(missing)], []);

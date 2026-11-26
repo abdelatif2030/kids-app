@@ -13,7 +13,7 @@ export function spoken(text) {
 }
 
 /** The languages a clip can be in: Arabic (default), English, German. */
-const L = (l) => (l === 'en' || l === 'de' ? l : 'ar');
+const L = (l) => (l === 'en' || l === 'de' || l === 'fr' ? l : 'ar');
 
 /** Stable id of a sentence: FNV-1a over "<lang>|<spoken text>", 8 hex digits. */
 export function clipId(text, lang) {
@@ -77,7 +77,7 @@ export class Voice {
    *  (English teaching words: the same word as a slower clip, `<id>_slow`). */
   _item(x) {
     if (typeof x === 'string') return { t: spoken(x), lang: this.lang, slow: false };
-    return { t: spoken(x.t), lang: x.lang === 'en' || x.lang === 'de' || x.lang === 'ar' ? x.lang : this.lang, slow: !!x.slow, optional: !!x.optional };
+    return { t: spoken(x.t), lang: x.lang === 'en' || x.lang === 'de' || x.lang === 'fr' || x.lang === 'ar' ? x.lang : this.lang, slow: !!x.slow, optional: !!x.optional };
   }
 
   _clipName(it) { return clipId(it.t, it.lang) + (it.slow ? '_slow' : ''); }

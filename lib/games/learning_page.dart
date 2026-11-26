@@ -127,6 +127,7 @@ const List<LearnLanguage> kLearnLanguages = [
   LearnLanguage('ar', 'عربي', 'الحروف والأرقام والأشكال والمزيد', 'أ', Color(0xFFFF8A3D)),
   LearnLanguage('en', 'English', 'Hear it, find it, say it', 'A', Color(0xFF3D8BFF)),
   LearnLanguage('de', 'Deutsch', 'Hören, finden, sagen', 'Ä', Color(0xFF2FA85A)),
+  LearnLanguage('fr', 'Français', 'Écouter, trouver, dire', 'É', Color(0xFFE0457B)),
 ];
 
 /// «عايز تتعلم إيه؟»: the child picks Arabic (the whole learning world as it was) or English (the English levels).
@@ -149,6 +150,8 @@ class _LearnLanguageGateState extends State<LearnLanguageGate> {
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => learnWebGameScreen(kLearnEnglish, widget.child.id, widget.child.age)));
     } else if (id == 'de') {
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => learnWebGameScreen(kLearnGerman, widget.child.id, widget.child.age)));
+    } else if (id == 'fr') {
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => learnWebGameScreen(kLearnFrench, widget.child.id, widget.child.age)));
     }
   }
 

@@ -17,3 +17,6 @@
 
 ## 4. Things nobody tested
 Real phone/iPad, listening to any recording, the Flutter webview path of the new German card, the win screens of the five games with a real finished level.
+
+## 5. French (2026-11-26)
+Built like German (`kLearnFrench`, `fr_*` levels, `src/french/words.json`, device `fr-FR` voice until recordings). `docs/FRENCH_WORDLIST.csv` = 437 words with articles and sentences, **to be checked by a French speaker**, 1311 clips to record (file names in the csv and in NEW_CLIPS_TO_RECORD.csv). Pictures: `docs/FRENCH_IMAGE_PROMPTS.md` (5 world pictures; word pictures are shared with English/German). Until they arrive French borrows the English world's map, badges and win picture and the chooser card shows the letter É.

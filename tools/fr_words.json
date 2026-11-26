@@ -1,0 +1,2624 @@
+[
+{
+"cat": "numbers 0-20",
+"en": "zero",
+"fr": "zéro",
+"s": "Zéro !"
+},
+{
+"cat": "numbers 0-20",
+"en": "one",
+"fr": "un",
+"s": "Un !"
+},
+{
+"cat": "numbers 0-20",
+"en": "two",
+"fr": "deux",
+"s": "Deux !"
+},
+{
+"cat": "numbers 0-20",
+"en": "three",
+"fr": "trois",
+"s": "Trois !"
+},
+{
+"cat": "numbers 0-20",
+"en": "four",
+"fr": "quatre",
+"s": "Quatre !"
+},
+{
+"cat": "numbers 0-20",
+"en": "five",
+"fr": "cinq",
+"s": "Cinq !"
+},
+{
+"cat": "numbers 0-20",
+"en": "six",
+"fr": "six",
+"s": "Six !"
+},
+{
+"cat": "numbers 0-20",
+"en": "seven",
+"fr": "sept",
+"s": "Sept !"
+},
+{
+"cat": "numbers 0-20",
+"en": "eight",
+"fr": "huit",
+"s": "Huit !"
+},
+{
+"cat": "numbers 0-20",
+"en": "nine",
+"fr": "neuf",
+"s": "Neuf !"
+},
+{
+"cat": "numbers 0-20",
+"en": "ten",
+"fr": "dix",
+"s": "Dix !"
+},
+{
+"cat": "numbers 0-20",
+"en": "eleven",
+"fr": "onze",
+"s": "Onze !"
+},
+{
+"cat": "numbers 0-20",
+"en": "twelve",
+"fr": "douze",
+"s": "Douze !"
+},
+{
+"cat": "numbers 0-20",
+"en": "thirteen",
+"fr": "treize",
+"s": "Treize !"
+},
+{
+"cat": "numbers 0-20",
+"en": "fourteen",
+"fr": "quatorze",
+"s": "Quatorze !"
+},
+{
+"cat": "numbers 0-20",
+"en": "fifteen",
+"fr": "quinze",
+"s": "Quinze !"
+},
+{
+"cat": "numbers 0-20",
+"en": "sixteen",
+"fr": "seize",
+"s": "Seize !"
+},
+{
+"cat": "numbers 0-20",
+"en": "seventeen",
+"fr": "dix-sept",
+"s": "Dix-sept !"
+},
+{
+"cat": "numbers 0-20",
+"en": "eighteen",
+"fr": "dix-huit",
+"s": "Dix-huit !"
+},
+{
+"cat": "numbers 0-20",
+"en": "nineteen",
+"fr": "dix-neuf",
+"s": "Dix-neuf !"
+},
+{
+"cat": "numbers 0-20",
+"en": "twenty",
+"fr": "vingt",
+"s": "Vingt !"
+},
+{
+"cat": "tens to 100",
+"en": "thirty",
+"fr": "trente",
+"s": "Trente !"
+},
+{
+"cat": "tens to 100",
+"en": "forty",
+"fr": "quarante",
+"s": "Quarante !"
+},
+{
+"cat": "tens to 100",
+"en": "fifty",
+"fr": "cinquante",
+"s": "Cinquante !"
+},
+{
+"cat": "tens to 100",
+"en": "sixty",
+"fr": "soixante",
+"s": "Soixante !"
+},
+{
+"cat": "tens to 100",
+"en": "seventy",
+"fr": "soixante-dix",
+"s": "Soixante-dix !"
+},
+{
+"cat": "tens to 100",
+"en": "eighty",
+"fr": "quatre-vingts",
+"s": "Quatre-vingts !"
+},
+{
+"cat": "tens to 100",
+"en": "ninety",
+"fr": "quatre-vingt-dix",
+"s": "Quatre-vingt-dix !"
+},
+{
+"cat": "tens to 100",
+"en": "one hundred",
+"fr": "cent",
+"s": "Cent !"
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter a",
+"fr": "A",
+"s": "A comme avion."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter b",
+"fr": "Bé",
+"s": "B comme ballon."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter c",
+"fr": "Cé",
+"s": "C comme chat."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter d",
+"fr": "Dé",
+"s": "D comme dauphin."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter e",
+"fr": "E",
+"s": "E comme éléphant."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter f",
+"fr": "Effe",
+"s": "F comme fleur."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter g",
+"fr": "Gé",
+"s": "G comme girafe."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter h",
+"fr": "Ache",
+"s": "H comme hibou."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter i",
+"fr": "I",
+"s": "I comme igloo."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter j",
+"fr": "Ji",
+"s": "J comme jardin."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter k",
+"fr": "Ka",
+"s": "K comme kiwi."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter l",
+"fr": "Elle",
+"s": "L comme lion."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter m",
+"fr": "Emme",
+"s": "M comme maison."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter n",
+"fr": "Enne",
+"s": "N comme nez."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter o",
+"fr": "O",
+"s": "O comme ours."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter p",
+"fr": "Pé",
+"s": "P comme pomme."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter q",
+"fr": "Ku",
+"s": "Q comme quatre."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter r",
+"fr": "Erre",
+"s": "R comme renard."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter s",
+"fr": "Esse",
+"s": "S comme soleil."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter t",
+"fr": "Té",
+"s": "T comme tigre."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter u",
+"fr": "U",
+"s": "U comme usine."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter v",
+"fr": "Vé",
+"s": "V comme vache."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter w",
+"fr": "Double vé",
+"s": "W comme wagon."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter x",
+"fr": "Iks",
+"s": "X comme xylophone."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter y",
+"fr": "I grec",
+"s": "Y comme yaourt."
+},
+{
+"cat": "letters A-Z (name)",
+"en": "letter z",
+"fr": "Zède",
+"s": "Z comme zèbre."
+},
+{
+"cat": "colours",
+"en": "red",
+"fr": "rouge",
+"s": "C'est rouge."
+},
+{
+"cat": "colours",
+"en": "blue",
+"fr": "bleu",
+"s": "C'est bleu."
+},
+{
+"cat": "colours",
+"en": "yellow",
+"fr": "jaune",
+"s": "C'est jaune."
+},
+{
+"cat": "colours",
+"en": "green",
+"fr": "vert",
+"s": "C'est vert."
+},
+{
+"cat": "colours",
+"en": "orange",
+"fr": "orange",
+"s": "C'est orange."
+},
+{
+"cat": "colours",
+"en": "purple",
+"fr": "violet",
+"s": "C'est violet."
+},
+{
+"cat": "colours",
+"en": "pink",
+"fr": "rose",
+"s": "C'est rose."
+},
+{
+"cat": "colours",
+"en": "black",
+"fr": "noir",
+"s": "C'est noir."
+},
+{
+"cat": "colours",
+"en": "white",
+"fr": "blanc",
+"s": "C'est blanc."
+},
+{
+"cat": "colours",
+"en": "brown",
+"fr": "marron",
+"s": "C'est marron."
+},
+{
+"cat": "colours",
+"en": "gray",
+"fr": "gris",
+"s": "C'est gris."
+},
+{
+"cat": "colours",
+"en": "sky blue",
+"fr": "bleu ciel",
+"s": "C'est bleu ciel."
+},
+{
+"cat": "colours",
+"en": "navy",
+"fr": "bleu marine",
+"s": "C'est bleu marine."
+},
+{
+"cat": "colours",
+"en": "light green",
+"fr": "vert clair",
+"s": "C'est vert clair."
+},
+{
+"cat": "colours",
+"en": "dark green",
+"fr": "vert foncé",
+"s": "C'est vert foncé."
+},
+{
+"cat": "colours",
+"en": "turquoise",
+"fr": "turquoise",
+"s": "C'est turquoise."
+},
+{
+"cat": "colours",
+"en": "gold",
+"fr": "or",
+"s": "C'est or."
+},
+{
+"cat": "colours",
+"en": "silver",
+"fr": "argent",
+"s": "C'est argent."
+},
+{
+"cat": "colours",
+"en": "beige",
+"fr": "beige",
+"s": "C'est beige."
+},
+{
+"cat": "colours",
+"en": "maroon",
+"fr": "bordeaux",
+"s": "C'est bordeaux."
+},
+{
+"cat": "colours",
+"en": "lemon",
+"fr": "jaune citron",
+"s": "C'est jaune citron."
+},
+{
+"cat": "colours",
+"en": "peach",
+"fr": "pêche",
+"s": "C'est pêche."
+},
+{
+"cat": "colours",
+"en": "lilac",
+"fr": "lilas",
+"s": "C'est lilas."
+},
+{
+"cat": "colours",
+"en": "olive",
+"fr": "vert olive",
+"s": "C'est vert olive."
+},
+{
+"cat": "colours",
+"en": "mustard",
+"fr": "moutarde",
+"s": "C'est moutarde."
+},
+{
+"cat": "colours",
+"en": "magenta",
+"fr": "magenta",
+"s": "C'est magenta."
+},
+{
+"cat": "colours",
+"en": "indigo",
+"fr": "indigo",
+"s": "C'est indigo."
+},
+{
+"cat": "colours",
+"en": "crimson",
+"fr": "rouge cramoisi",
+"s": "C'est rouge cramoisi."
+},
+{
+"cat": "colours",
+"en": "bronze",
+"fr": "bronze",
+"s": "C'est bronze."
+},
+{
+"cat": "colours",
+"en": "caramel",
+"fr": "caramel",
+"s": "C'est caramel."
+},
+{
+"cat": "colours",
+"en": "charcoal",
+"fr": "anthracite",
+"s": "C'est anthracite."
+},
+{
+"cat": "colours",
+"en": "mint",
+"fr": "vert menthe",
+"s": "C'est vert menthe."
+},
+{
+"cat": "colours",
+"en": "coral",
+"fr": "corail",
+"s": "C'est corail."
+},
+{
+"cat": "colours",
+"en": "sand",
+"fr": "sable",
+"s": "C'est sable."
+},
+{
+"cat": "shapes",
+"en": "circle",
+"fr": "le cercle",
+"s": "C'est un cercle."
+},
+{
+"cat": "shapes",
+"en": "square",
+"fr": "le carré",
+"s": "C'est un carré."
+},
+{
+"cat": "shapes",
+"en": "triangle",
+"fr": "le triangle",
+"s": "C'est un triangle."
+},
+{
+"cat": "shapes",
+"en": "star",
+"fr": "l'étoile",
+"s": "C'est une étoile."
+},
+{
+"cat": "shapes",
+"en": "heart",
+"fr": "le cœur",
+"s": "C'est un cœur."
+},
+{
+"cat": "shapes",
+"en": "rectangle",
+"fr": "le rectangle",
+"s": "C'est un rectangle."
+},
+{
+"cat": "shapes",
+"en": "oval",
+"fr": "l'ovale",
+"s": "C'est un ovale."
+},
+{
+"cat": "shapes",
+"en": "diamond",
+"fr": "le losange",
+"s": "C'est un losange."
+},
+{
+"cat": "shapes",
+"en": "pentagon",
+"fr": "le pentagone",
+"s": "C'est un pentagone."
+},
+{
+"cat": "shapes",
+"en": "hexagon",
+"fr": "l'hexagone",
+"s": "C'est un hexagone."
+},
+{
+"cat": "shapes",
+"en": "octagon",
+"fr": "l'octogone",
+"s": "C'est un octogone."
+},
+{
+"cat": "shapes",
+"en": "crescent",
+"fr": "le croissant de lune",
+"s": "C'est un croissant de lune."
+},
+{
+"cat": "shapes",
+"en": "plus",
+"fr": "le signe plus",
+"s": "C'est un signe plus."
+},
+{
+"cat": "shapes",
+"en": "semicircle",
+"fr": "le demi-cercle",
+"s": "C'est un demi-cercle."
+},
+{
+"cat": "shapes",
+"en": "trapezoid",
+"fr": "le trapèze",
+"s": "C'est un trapèze."
+},
+{
+"cat": "shapes",
+"en": "parallelogram",
+"fr": "le parallélogramme",
+"s": "C'est un parallélogramme."
+},
+{
+"cat": "shapes",
+"en": "hexagram",
+"fr": "l'hexagramme",
+"s": "C'est un hexagramme."
+},
+{
+"cat": "shapes",
+"en": "drop",
+"fr": "la goutte",
+"s": "C'est une goutte."
+},
+{
+"cat": "shapes",
+"en": "arrow",
+"fr": "la flèche",
+"s": "C'est une flèche."
+},
+{
+"cat": "shapes",
+"en": "ring",
+"fr": "l'anneau",
+"s": "C'est un anneau."
+},
+{
+"cat": "shapes",
+"en": "cube",
+"fr": "le cube",
+"s": "C'est un cube."
+},
+{
+"cat": "shapes",
+"en": "ball",
+"fr": "la balle",
+"s": "C'est une balle."
+},
+{
+"cat": "shapes",
+"en": "cone",
+"fr": "le cône",
+"s": "C'est un cône."
+},
+{
+"cat": "shapes",
+"en": "cylinder",
+"fr": "le cylindre",
+"s": "C'est un cylindre."
+},
+{
+"cat": "shapes",
+"en": "pyramid",
+"fr": "la pyramide",
+"s": "C'est une pyramide."
+},
+{
+"cat": "days",
+"en": "saturday",
+"fr": "samedi",
+"s": "Aujourd'hui, c'est samedi."
+},
+{
+"cat": "days",
+"en": "sunday",
+"fr": "dimanche",
+"s": "Aujourd'hui, c'est dimanche."
+},
+{
+"cat": "days",
+"en": "monday",
+"fr": "lundi",
+"s": "Aujourd'hui, c'est lundi."
+},
+{
+"cat": "days",
+"en": "tuesday",
+"fr": "mardi",
+"s": "Aujourd'hui, c'est mardi."
+},
+{
+"cat": "days",
+"en": "wednesday",
+"fr": "mercredi",
+"s": "Aujourd'hui, c'est mercredi."
+},
+{
+"cat": "days",
+"en": "thursday",
+"fr": "jeudi",
+"s": "Aujourd'hui, c'est jeudi."
+},
+{
+"cat": "days",
+"en": "friday",
+"fr": "vendredi",
+"s": "Aujourd'hui, c'est vendredi."
+},
+{
+"cat": "months",
+"en": "january",
+"fr": "janvier",
+"s": "Nous sommes en janvier."
+},
+{
+"cat": "months",
+"en": "february",
+"fr": "février",
+"s": "Nous sommes en février."
+},
+{
+"cat": "months",
+"en": "march",
+"fr": "mars",
+"s": "Nous sommes en mars."
+},
+{
+"cat": "months",
+"en": "april",
+"fr": "avril",
+"s": "Nous sommes en avril."
+},
+{
+"cat": "months",
+"en": "may",
+"fr": "mai",
+"s": "Nous sommes en mai."
+},
+{
+"cat": "months",
+"en": "june",
+"fr": "juin",
+"s": "Nous sommes en juin."
+},
+{
+"cat": "months",
+"en": "july",
+"fr": "juillet",
+"s": "Nous sommes en juillet."
+},
+{
+"cat": "months",
+"en": "august",
+"fr": "août",
+"s": "Nous sommes en août."
+},
+{
+"cat": "months",
+"en": "september",
+"fr": "septembre",
+"s": "Nous sommes en septembre."
+},
+{
+"cat": "months",
+"en": "october",
+"fr": "octobre",
+"s": "Nous sommes en octobre."
+},
+{
+"cat": "months",
+"en": "november",
+"fr": "novembre",
+"s": "Nous sommes en novembre."
+},
+{
+"cat": "months",
+"en": "december",
+"fr": "décembre",
+"s": "Nous sommes en décembre."
+},
+{
+"cat": "seasons",
+"en": "summer",
+"fr": "l'été",
+"s": "C'est l'été."
+},
+{
+"cat": "seasons",
+"en": "winter",
+"fr": "l'hiver",
+"s": "C'est l'hiver."
+},
+{
+"cat": "seasons",
+"en": "spring",
+"fr": "le printemps",
+"s": "C'est le printemps."
+},
+{
+"cat": "seasons",
+"en": "autumn",
+"fr": "l'automne",
+"s": "C'est l'automne."
+},
+{
+"cat": "parts of the day",
+"en": "morning",
+"fr": "le matin",
+"s": "Bonjour !"
+},
+{
+"cat": "parts of the day",
+"en": "noon",
+"fr": "midi",
+"s": "Il est midi."
+},
+{
+"cat": "parts of the day",
+"en": "evening",
+"fr": "le soir",
+"s": "Bonsoir !"
+},
+{
+"cat": "parts of the day",
+"en": "night",
+"fr": "la nuit",
+"s": "Bonne nuit !"
+},
+{
+"cat": "daily routine",
+"en": "wake up",
+"fr": "se réveiller",
+"s": "Je me réveille."
+},
+{
+"cat": "daily routine",
+"en": "wash my face",
+"fr": "se laver le visage",
+"s": "Je me lave le visage."
+},
+{
+"cat": "daily routine",
+"en": "eat breakfast",
+"fr": "prendre le petit-déjeuner",
+"s": "Je prends le petit-déjeuner."
+},
+{
+"cat": "daily routine",
+"en": "go to school",
+"fr": "aller à l'école",
+"s": "Je vais à l'école."
+},
+{
+"cat": "daily routine",
+"en": "eat lunch",
+"fr": "déjeuner",
+"s": "Je déjeune."
+},
+{
+"cat": "daily routine",
+"en": "play",
+"fr": "jouer",
+"s": "Je joue."
+},
+{
+"cat": "daily routine",
+"en": "eat dinner",
+"fr": "dîner",
+"s": "Je dîne."
+},
+{
+"cat": "daily routine",
+"en": "have a bath",
+"fr": "prendre un bain",
+"s": "Je prends un bain."
+},
+{
+"cat": "daily routine",
+"en": "brush my teeth",
+"fr": "se brosser les dents",
+"s": "Je me brosse les dents."
+},
+{
+"cat": "daily routine",
+"en": "sleep",
+"fr": "dormir",
+"s": "Je dors."
+},
+{
+"cat": "places (where is the ball)",
+"en": "on the table",
+"fr": "sur la table",
+"s": "La balle est sur la table."
+},
+{
+"cat": "places (where is the ball)",
+"en": "under the table",
+"fr": "sous la table",
+"s": "La balle est sous la table."
+},
+{
+"cat": "places (where is the ball)",
+"en": "inside the box",
+"fr": "dans la boîte",
+"s": "La balle est dans la boîte."
+},
+{
+"cat": "places (where is the ball)",
+"en": "next to the box",
+"fr": "à côté de la boîte",
+"s": "La balle est à côté de la boîte."
+},
+{
+"cat": "places (where is the ball)",
+"en": "next to the table",
+"fr": "à côté de la table",
+"s": "La balle est à côté de la table."
+},
+{
+"cat": "pattern beads",
+"en": "red ball",
+"fr": "le ballon rouge",
+"s": "C'est un ballon rouge."
+},
+{
+"cat": "pattern beads",
+"en": "blue cube",
+"fr": "le cube bleu",
+"s": "C'est un cube bleu."
+},
+{
+"cat": "pattern beads",
+"en": "yellow star",
+"fr": "l'étoile jaune",
+"s": "C'est une étoile jaune."
+},
+{
+"cat": "pattern beads",
+"en": "green heart",
+"fr": "le cœur vert",
+"s": "C'est un cœur vert."
+},
+{
+"cat": "pattern beads",
+"en": "purple ring",
+"fr": "l'anneau violet",
+"s": "C'est un anneau violet."
+},
+{
+"cat": "pattern beads",
+"en": "orange drop",
+"fr": "la goutte orange",
+"s": "C'est une goutte orange."
+},
+{
+"cat": "animals",
+"en": "bunny",
+"fr": "le lapin",
+"s": "C'est un lapin."
+},
+{
+"cat": "animals",
+"en": "cat",
+"fr": "le chat",
+"s": "C'est un chat."
+},
+{
+"cat": "animals",
+"en": "dog",
+"fr": "le chien",
+"s": "C'est un chien."
+},
+{
+"cat": "animals",
+"en": "monkey",
+"fr": "le singe",
+"s": "C'est un singe."
+},
+{
+"cat": "animals",
+"en": "cow",
+"fr": "la vache",
+"s": "C'est une vache."
+},
+{
+"cat": "animals",
+"en": "bear",
+"fr": "l'ours",
+"s": "C'est un ours."
+},
+{
+"cat": "animals",
+"en": "mouse",
+"fr": "la souris",
+"s": "C'est une souris."
+},
+{
+"cat": "animals",
+"en": "chick",
+"fr": "le poussin",
+"s": "C'est un poussin."
+},
+{
+"cat": "animals",
+"en": "horse",
+"fr": "le cheval",
+"s": "C'est un cheval."
+},
+{
+"cat": "animals",
+"en": "hen",
+"fr": "la poule",
+"s": "C'est une poule."
+},
+{
+"cat": "animals",
+"en": "donkey",
+"fr": "l'âne",
+"s": "C'est un âne."
+},
+{
+"cat": "animals",
+"en": "goat",
+"fr": "la chèvre",
+"s": "C'est une chèvre."
+},
+{
+"cat": "animals",
+"en": "parrot",
+"fr": "le perroquet",
+"s": "C'est un perroquet."
+},
+{
+"cat": "animals",
+"en": "sheep",
+"fr": "le mouton",
+"s": "C'est un mouton."
+},
+{
+"cat": "animals",
+"en": "rooster",
+"fr": "le coq",
+"s": "C'est un coq."
+},
+{
+"cat": "animals",
+"en": "lion",
+"fr": "le lion",
+"s": "C'est un lion."
+},
+{
+"cat": "animals",
+"en": "tiger",
+"fr": "le tigre",
+"s": "C'est un tigre."
+},
+{
+"cat": "animals",
+"en": "elephant",
+"fr": "l'éléphant",
+"s": "C'est un éléphant."
+},
+{
+"cat": "animals",
+"en": "giraffe",
+"fr": "la girafe",
+"s": "C'est une girafe."
+},
+{
+"cat": "animals",
+"en": "zebra",
+"fr": "le zèbre",
+"s": "C'est un zèbre."
+},
+{
+"cat": "animals",
+"en": "gorilla",
+"fr": "le gorille",
+"s": "C'est un gorille."
+},
+{
+"cat": "animals",
+"en": "chameleon",
+"fr": "le caméléon",
+"s": "C'est un caméléon."
+},
+{
+"cat": "animals",
+"en": "frog",
+"fr": "la grenouille",
+"s": "C'est une grenouille."
+},
+{
+"cat": "animals",
+"en": "toucan",
+"fr": "le toucan",
+"s": "C'est un toucan."
+},
+{
+"cat": "animals",
+"en": "penguin",
+"fr": "le pingouin",
+"s": "C'est un pingouin."
+},
+{
+"cat": "animals",
+"en": "seal",
+"fr": "le phoque",
+"s": "C'est un phoque."
+},
+{
+"cat": "animals",
+"en": "reindeer",
+"fr": "le renne",
+"s": "C'est un renne."
+},
+{
+"cat": "animals",
+"en": "fox",
+"fr": "le renard",
+"s": "C'est un renard."
+},
+{
+"cat": "animals",
+"en": "camel",
+"fr": "le chameau",
+"s": "C'est un chameau."
+},
+{
+"cat": "animals",
+"en": "hawk",
+"fr": "le faucon",
+"s": "C'est un faucon."
+},
+{
+"cat": "animals",
+"en": "dolphin",
+"fr": "le dauphin",
+"s": "C'est un dauphin."
+},
+{
+"cat": "animals",
+"en": "turtle",
+"fr": "la tortue",
+"s": "C'est une tortue."
+},
+{
+"cat": "animals",
+"en": "bee",
+"fr": "l'abeille",
+"s": "C'est une abeille."
+},
+{
+"cat": "animals",
+"en": "butterfly",
+"fr": "le papillon",
+"s": "C'est un papillon."
+},
+{
+"cat": "animals",
+"en": "goose",
+"fr": "l'oie",
+"s": "C'est une oie."
+},
+{
+"cat": "animals",
+"en": "duck",
+"fr": "le canard",
+"s": "C'est un canard."
+},
+{
+"cat": "animals",
+"en": "pigeon",
+"fr": "le pigeon",
+"s": "C'est un pigeon."
+},
+{
+"cat": "animals",
+"en": "peacock",
+"fr": "le paon",
+"s": "C'est un paon."
+},
+{
+"cat": "animals",
+"en": "shark",
+"fr": "le requin",
+"s": "C'est un requin."
+},
+{
+"cat": "animals",
+"en": "cheetah",
+"fr": "le guépard",
+"s": "C'est un guépard."
+},
+{
+"cat": "animals",
+"en": "crocodile",
+"fr": "le crocodile",
+"s": "C'est un crocodile."
+},
+{
+"cat": "animals",
+"en": "iguana",
+"fr": "l'iguane",
+"s": "C'est un iguane."
+},
+{
+"cat": "animals",
+"en": "mantis",
+"fr": "la mante religieuse",
+"s": "C'est une mante religieuse."
+},
+{
+"cat": "animals",
+"en": "caterpillar",
+"fr": "la chenille",
+"s": "C'est une chenille."
+},
+{
+"cat": "animals",
+"en": "T. rex",
+"fr": "le T-rex",
+"s": "C'est un T-rex."
+},
+{
+"cat": "animals",
+"en": "triceratops",
+"fr": "le tricératops",
+"s": "C'est un tricératops."
+},
+{
+"cat": "animals",
+"en": "stegosaurus",
+"fr": "le stégosaure",
+"s": "C'est un stégosaure."
+},
+{
+"cat": "animals",
+"en": "brachiosaurus",
+"fr": "le brachiosaure",
+"s": "C'est un brachiosaure."
+},
+{
+"cat": "animals",
+"en": "owl",
+"fr": "le hibou",
+"s": "C'est un hibou."
+},
+{
+"cat": "animals",
+"en": "panda",
+"fr": "le panda",
+"s": "C'est un panda."
+},
+{
+"cat": "animals",
+"en": "octopus",
+"fr": "la pieuvre",
+"s": "C'est une pieuvre."
+},
+{
+"cat": "animals",
+"en": "crab",
+"fr": "le crabe",
+"s": "C'est un crabe."
+},
+{
+"cat": "animals",
+"en": "whale",
+"fr": "la baleine",
+"s": "C'est une baleine."
+},
+{
+"cat": "animals",
+"en": "bat",
+"fr": "la chauve-souris",
+"s": "C'est une chauve-souris."
+},
+{
+"cat": "animals",
+"en": "eagle",
+"fr": "l'aigle",
+"s": "C'est un aigle."
+},
+{
+"cat": "animals",
+"en": "ostrich",
+"fr": "l'autruche",
+"s": "C'est une autruche."
+},
+{
+"cat": "animals",
+"en": "swan",
+"fr": "le cygne",
+"s": "C'est un cygne."
+},
+{
+"cat": "animals",
+"en": "sparrow",
+"fr": "le moineau",
+"s": "C'est un moineau."
+},
+{
+"cat": "animals",
+"en": "snail",
+"fr": "l'escargot",
+"s": "C'est un escargot."
+},
+{
+"cat": "animals",
+"en": "spider",
+"fr": "l'araignée",
+"s": "C'est une araignée."
+},
+{
+"cat": "animals",
+"en": "crow",
+"fr": "le corbeau",
+"s": "C'est un corbeau."
+},
+{
+"cat": "animals",
+"en": "ladybug",
+"fr": "la coccinelle",
+"s": "C'est une coccinelle."
+},
+{
+"cat": "animals",
+"en": "dragonfly",
+"fr": "la libellule",
+"s": "C'est une libellule."
+},
+{
+"cat": "animals",
+"en": "flamingo",
+"fr": "le flamant rose",
+"s": "C'est un flamant rose."
+},
+{
+"cat": "picture pack: body",
+"en": "eye",
+"fr": "l'œil",
+"s": "C'est un œil."
+},
+{
+"cat": "picture pack: body",
+"en": "ear",
+"fr": "l'oreille",
+"s": "C'est une oreille."
+},
+{
+"cat": "picture pack: body",
+"en": "nose",
+"fr": "le nez",
+"s": "C'est un nez."
+},
+{
+"cat": "picture pack: body",
+"en": "mouth",
+"fr": "la bouche",
+"s": "C'est une bouche."
+},
+{
+"cat": "picture pack: body",
+"en": "hand",
+"fr": "la main",
+"s": "C'est une main."
+},
+{
+"cat": "picture pack: body",
+"en": "foot",
+"fr": "le pied",
+"s": "C'est un pied."
+},
+{
+"cat": "picture pack: body",
+"en": "hair",
+"fr": "les cheveux",
+"s": "Ce sont des cheveux."
+},
+{
+"cat": "picture pack: body",
+"en": "tooth",
+"fr": "la dent",
+"s": "C'est une dent."
+},
+{
+"cat": "picture pack: body",
+"en": "head",
+"fr": "la tête",
+"s": "C'est une tête."
+},
+{
+"cat": "picture pack: body",
+"en": "finger",
+"fr": "le doigt",
+"s": "C'est un doigt."
+},
+{
+"cat": "picture pack: body",
+"en": "knee",
+"fr": "le genou",
+"s": "C'est un genou."
+},
+{
+"cat": "picture pack: body",
+"en": "belly",
+"fr": "le ventre",
+"s": "C'est un ventre."
+},
+{
+"cat": "picture pack: clothes",
+"en": "shirt",
+"fr": "le tee-shirt",
+"s": "C'est un tee-shirt."
+},
+{
+"cat": "picture pack: clothes",
+"en": "trousers",
+"fr": "le pantalon",
+"s": "C'est un pantalon."
+},
+{
+"cat": "picture pack: clothes",
+"en": "dress",
+"fr": "la robe",
+"s": "C'est une robe."
+},
+{
+"cat": "picture pack: clothes",
+"en": "hat",
+"fr": "le chapeau",
+"s": "C'est un chapeau."
+},
+{
+"cat": "picture pack: clothes",
+"en": "socks",
+"fr": "les chaussettes",
+"s": "Ce sont des chaussettes."
+},
+{
+"cat": "picture pack: clothes",
+"en": "jacket",
+"fr": "la veste",
+"s": "C'est une veste."
+},
+{
+"cat": "picture pack: clothes",
+"en": "scarf",
+"fr": "l'écharpe",
+"s": "C'est une écharpe."
+},
+{
+"cat": "picture pack: clothes",
+"en": "gloves",
+"fr": "les gants",
+"s": "Ce sont des gants."
+},
+{
+"cat": "picture pack: clothes",
+"en": "glasses",
+"fr": "les lunettes",
+"s": "Ce sont des lunettes."
+},
+{
+"cat": "picture pack: clothes",
+"en": "cap",
+"fr": "la casquette",
+"s": "C'est une casquette."
+},
+{
+"cat": "picture pack: clothes",
+"en": "pajamas",
+"fr": "le pyjama",
+"s": "C'est un pyjama."
+},
+{
+"cat": "picture pack: clothes",
+"en": "raincoat",
+"fr": "l'imperméable",
+"s": "C'est un imperméable."
+},
+{
+"cat": "picture pack: family",
+"en": "mom",
+"fr": "maman",
+"s": "C'est ma maman."
+},
+{
+"cat": "picture pack: family",
+"en": "dad",
+"fr": "papa",
+"s": "C'est mon papa."
+},
+{
+"cat": "picture pack: family",
+"en": "grandma",
+"fr": "mamie",
+"s": "C'est ma mamie."
+},
+{
+"cat": "picture pack: family",
+"en": "grandpa",
+"fr": "papi",
+"s": "C'est mon papi."
+},
+{
+"cat": "picture pack: family",
+"en": "baby",
+"fr": "le bébé",
+"s": "C'est un bébé."
+},
+{
+"cat": "picture pack: family",
+"en": "brother",
+"fr": "le frère",
+"s": "C'est mon frère."
+},
+{
+"cat": "picture pack: family",
+"en": "sister",
+"fr": "la sœur",
+"s": "C'est ma sœur."
+},
+{
+"cat": "picture pack: family",
+"en": "boy",
+"fr": "le garçon",
+"s": "C'est un garçon."
+},
+{
+"cat": "picture pack: family",
+"en": "girl",
+"fr": "la fille",
+"s": "C'est une fille."
+},
+{
+"cat": "picture pack: family",
+"en": "friends",
+"fr": "les amis",
+"s": "Ce sont mes amis."
+},
+{
+"cat": "picture pack: family",
+"en": "family",
+"fr": "la famille",
+"s": "C'est ma famille."
+},
+{
+"cat": "picture pack: family",
+"en": "uncle",
+"fr": "l'oncle",
+"s": "C'est mon oncle."
+},
+{
+"cat": "picture pack: food",
+"en": "bread",
+"fr": "le pain",
+"s": "C'est du pain."
+},
+{
+"cat": "picture pack: food",
+"en": "cheese",
+"fr": "le fromage",
+"s": "C'est du fromage."
+},
+{
+"cat": "picture pack: food",
+"en": "egg",
+"fr": "l'œuf",
+"s": "C'est un œuf."
+},
+{
+"cat": "picture pack: food",
+"en": "milk",
+"fr": "le lait",
+"s": "C'est du lait."
+},
+{
+"cat": "picture pack: food",
+"en": "rice",
+"fr": "le riz",
+"s": "C'est du riz."
+},
+{
+"cat": "picture pack: food",
+"en": "chicken",
+"fr": "le poulet",
+"s": "C'est du poulet."
+},
+{
+"cat": "picture pack: food",
+"en": "juice",
+"fr": "le jus",
+"s": "C'est du jus."
+},
+{
+"cat": "picture pack: food",
+"en": "water",
+"fr": "l'eau",
+"s": "C'est de l'eau."
+},
+{
+"cat": "picture pack: food",
+"en": "cookie",
+"fr": "le biscuit",
+"s": "C'est un biscuit."
+},
+{
+"cat": "picture pack: food",
+"en": "honey",
+"fr": "le miel",
+"s": "C'est du miel."
+},
+{
+"cat": "picture pack: food",
+"en": "soup",
+"fr": "la soupe",
+"s": "C'est de la soupe."
+},
+{
+"cat": "picture pack: food",
+"en": "pizza",
+"fr": "la pizza",
+"s": "C'est une pizza."
+},
+{
+"cat": "picture pack: fruit2",
+"en": "kiwi",
+"fr": "le kiwi",
+"s": "C'est un kiwi."
+},
+{
+"cat": "picture pack: fruit2",
+"en": "melon",
+"fr": "le melon",
+"s": "C'est un melon."
+},
+{
+"cat": "picture pack: fruit2",
+"en": "dates",
+"fr": "les dattes",
+"s": "Ce sont des dattes."
+},
+{
+"cat": "picture pack: fruit2",
+"en": "fig",
+"fr": "la figue",
+"s": "C'est une figue."
+},
+{
+"cat": "picture pack: fruit2",
+"en": "apricot",
+"fr": "l'abricot",
+"s": "C'est un abricot."
+},
+{
+"cat": "picture pack: fruit2",
+"en": "berries",
+"fr": "les baies",
+"s": "Ce sont des baies."
+},
+{
+"cat": "picture pack: fruit2",
+"en": "plum",
+"fr": "la prune",
+"s": "C'est une prune."
+},
+{
+"cat": "picture pack: fruit2",
+"en": "avocado",
+"fr": "l'avocat",
+"s": "C'est un avocat."
+},
+{
+"cat": "picture pack: fruit2",
+"en": "cherry",
+"fr": "la cerise",
+"s": "C'est une cerise."
+},
+{
+"cat": "picture pack: fruit2",
+"en": "olives",
+"fr": "les olives",
+"s": "Ce sont des olives."
+},
+{
+"cat": "picture pack: fruit2",
+"en": "coconut",
+"fr": "la noix de coco",
+"s": "C'est une noix de coco."
+},
+{
+"cat": "picture pack: insects",
+"en": "ant",
+"fr": "la fourmi",
+"s": "C'est une fourmi."
+},
+{
+"cat": "picture pack: insects",
+"en": "fly",
+"fr": "la mouche",
+"s": "C'est une mouche."
+},
+{
+"cat": "picture pack: insects",
+"en": "worm",
+"fr": "le ver",
+"s": "C'est un ver."
+},
+{
+"cat": "picture pack: jobs",
+"en": "doctor",
+"fr": "le médecin",
+"s": "C'est un médecin."
+},
+{
+"cat": "picture pack: jobs",
+"en": "teacher",
+"fr": "le professeur",
+"s": "C'est un professeur."
+},
+{
+"cat": "picture pack: jobs",
+"en": "police",
+"fr": "le policier",
+"s": "C'est un policier."
+},
+{
+"cat": "picture pack: jobs",
+"en": "firefighter",
+"fr": "le pompier",
+"s": "C'est un pompier."
+},
+{
+"cat": "picture pack: jobs",
+"en": "farmer",
+"fr": "l'agriculteur",
+"s": "C'est un agriculteur."
+},
+{
+"cat": "picture pack: jobs",
+"en": "cook",
+"fr": "le cuisinier",
+"s": "C'est un cuisinier."
+},
+{
+"cat": "picture pack: jobs",
+"en": "driver",
+"fr": "le chauffeur",
+"s": "C'est un chauffeur."
+},
+{
+"cat": "picture pack: jobs",
+"en": "pilot",
+"fr": "le pilote",
+"s": "C'est un pilote."
+},
+{
+"cat": "picture pack: jobs",
+"en": "nurse",
+"fr": "l'infirmière",
+"s": "C'est une infirmière."
+},
+{
+"cat": "picture pack: jobs",
+"en": "builder",
+"fr": "le maçon",
+"s": "C'est un maçon."
+},
+{
+"cat": "picture pack: jobs",
+"en": "singer",
+"fr": "le chanteur",
+"s": "C'est un chanteur."
+},
+{
+"cat": "picture pack: jobs",
+"en": "painter",
+"fr": "le peintre",
+"s": "C'est un peintre."
+},
+{
+"cat": "picture pack: music",
+"en": "drum",
+"fr": "le tambour",
+"s": "C'est un tambour."
+},
+{
+"cat": "picture pack: music",
+"en": "guitar",
+"fr": "la guitare",
+"s": "C'est une guitare."
+},
+{
+"cat": "picture pack: music",
+"en": "piano",
+"fr": "le piano",
+"s": "C'est un piano."
+},
+{
+"cat": "picture pack: music",
+"en": "violin",
+"fr": "le violon",
+"s": "C'est un violon."
+},
+{
+"cat": "picture pack: music",
+"en": "flute",
+"fr": "la flûte",
+"s": "C'est une flûte."
+},
+{
+"cat": "picture pack: music",
+"en": "trumpet",
+"fr": "la trompette",
+"s": "C'est une trompette."
+},
+{
+"cat": "picture pack: music",
+"en": "tambourine",
+"fr": "le tambourin",
+"s": "C'est un tambourin."
+},
+{
+"cat": "picture pack: music",
+"en": "oud",
+"fr": "l'oud",
+"s": "C'est un oud."
+},
+{
+"cat": "picture pack: music",
+"en": "microphone",
+"fr": "le micro",
+"s": "C'est un micro."
+},
+{
+"cat": "picture pack: music",
+"en": "headphones",
+"fr": "le casque",
+"s": "C'est un casque."
+},
+{
+"cat": "picture pack: music",
+"en": "music note",
+"fr": "la note",
+"s": "C'est une note."
+},
+{
+"cat": "picture pack: music",
+"en": "bell",
+"fr": "la cloche",
+"s": "C'est une cloche."
+},
+{
+"cat": "picture pack: school",
+"en": "pencil",
+"fr": "le crayon",
+"s": "C'est un crayon."
+},
+{
+"cat": "picture pack: school",
+"en": "book",
+"fr": "le livre",
+"s": "C'est un livre."
+},
+{
+"cat": "picture pack: school",
+"en": "notebook",
+"fr": "le cahier",
+"s": "C'est un cahier."
+},
+{
+"cat": "picture pack: school",
+"en": "scissors",
+"fr": "les ciseaux",
+"s": "Ce sont des ciseaux."
+},
+{
+"cat": "picture pack: school",
+"en": "ruler",
+"fr": "la règle",
+"s": "C'est une règle."
+},
+{
+"cat": "picture pack: school",
+"en": "eraser",
+"fr": "la gomme",
+"s": "C'est une gomme."
+},
+{
+"cat": "picture pack: school",
+"en": "crayons",
+"fr": "les crayons de couleur",
+"s": "Ce sont des crayons de couleur."
+},
+{
+"cat": "picture pack: school",
+"en": "board",
+"fr": "le tableau",
+"s": "C'est un tableau."
+},
+{
+"cat": "picture pack: school",
+"en": "map",
+"fr": "la carte",
+"s": "C'est une carte."
+},
+{
+"cat": "picture pack: school",
+"en": "glue",
+"fr": "la colle",
+"s": "C'est une colle."
+},
+{
+"cat": "picture pack: school",
+"en": "desk",
+"fr": "le bureau",
+"s": "C'est un bureau."
+},
+{
+"cat": "picture pack: school",
+"en": "paper",
+"fr": "le papier",
+"s": "C'est un papier."
+},
+{
+"cat": "picture pack: shapes",
+"en": "sphere",
+"fr": "la sphère",
+"s": "C'est une sphère."
+},
+{
+"cat": "picture pack: veg",
+"en": "tomato",
+"fr": "la tomate",
+"s": "C'est une tomate."
+},
+{
+"cat": "picture pack: veg",
+"en": "cucumber",
+"fr": "le concombre",
+"s": "C'est un concombre."
+},
+{
+"cat": "picture pack: veg",
+"en": "potato",
+"fr": "la pomme de terre",
+"s": "C'est une pomme de terre."
+},
+{
+"cat": "picture pack: veg",
+"en": "onion",
+"fr": "l'oignon",
+"s": "C'est un oignon."
+},
+{
+"cat": "picture pack: veg",
+"en": "eggplant",
+"fr": "l'aubergine",
+"s": "C'est une aubergine."
+},
+{
+"cat": "picture pack: veg",
+"en": "pepper",
+"fr": "le poivron",
+"s": "C'est un poivron."
+},
+{
+"cat": "picture pack: veg",
+"en": "lettuce",
+"fr": "la salade",
+"s": "C'est une salade."
+},
+{
+"cat": "picture pack: veg",
+"en": "broccoli",
+"fr": "le brocoli",
+"s": "C'est un brocoli."
+},
+{
+"cat": "picture pack: veg",
+"en": "peas",
+"fr": "les petits pois",
+"s": "Ce sont des petits pois."
+},
+{
+"cat": "picture pack: veg",
+"en": "pumpkin",
+"fr": "la citrouille",
+"s": "C'est une citrouille."
+},
+{
+"cat": "picture pack: veg",
+"en": "garlic",
+"fr": "l'ail",
+"s": "C'est un ail."
+},
+{
+"cat": "picture pack: veg",
+"en": "mushroom",
+"fr": "le champignon",
+"s": "C'est un champignon."
+},
+{
+"cat": "picture pack: weather",
+"en": "rain",
+"fr": "la pluie",
+"s": "Il pleut."
+},
+{
+"cat": "picture pack: weather",
+"en": "snow",
+"fr": "la neige",
+"s": "Il neige."
+},
+{
+"cat": "picture pack: weather",
+"en": "wind",
+"fr": "le vent",
+"s": "Il y a du vent."
+},
+{
+"cat": "picture pack: weather",
+"en": "thunder",
+"fr": "le tonnerre",
+"s": "On entend le tonnerre."
+},
+{
+"cat": "picture pack: weather",
+"en": "lightning",
+"fr": "l'éclair",
+"s": "C'est un éclair."
+},
+{
+"cat": "picture pack: weather",
+"en": "umbrella",
+"fr": "le parapluie",
+"s": "C'est un parapluie."
+},
+{
+"cat": "picture pack: weather",
+"en": "snowflake",
+"fr": "le flocon de neige",
+"s": "C'est un flocon de neige."
+},
+{
+"cat": "picture pack: weather",
+"en": "flower",
+"fr": "la fleur",
+"s": "C'est une fleur."
+},
+{
+"cat": "picture pack: weather",
+"en": "leaves",
+"fr": "les feuilles",
+"s": "Ce sont des feuilles."
+},
+{
+"cat": "picture pack: weather",
+"en": "hot",
+"fr": "chaud",
+"s": "Il fait chaud."
+},
+{
+"cat": "picture pack: weather",
+"en": "cold",
+"fr": "froid",
+"s": "Il fait froid."
+},
+{
+"cat": "picture pack: weather",
+"en": "mountain",
+"fr": "la montagne",
+"s": "C'est une montagne."
+},
+{
+"cat": "picture words",
+"en": "banana",
+"fr": "la banane",
+"s": "C'est une banane."
+},
+{
+"cat": "picture words",
+"en": "apple",
+"fr": "la pomme",
+"s": "C'est une pomme."
+},
+{
+"cat": "picture words",
+"en": "fish",
+"fr": "le poisson",
+"s": "C'est un poisson."
+},
+{
+"cat": "picture words",
+"en": "sun",
+"fr": "le soleil",
+"s": "C'est un soleil."
+},
+{
+"cat": "picture words",
+"en": "rose",
+"fr": "la rose",
+"s": "C'est une rose."
+},
+{
+"cat": "picture words",
+"en": "pomegranate",
+"fr": "la grenade",
+"s": "C'est une grenade."
+},
+{
+"cat": "picture words",
+"en": "corn",
+"fr": "le maïs",
+"s": "C'est un maïs."
+},
+{
+"cat": "picture words",
+"en": "rocket",
+"fr": "la fusée",
+"s": "C'est une fusée."
+},
+{
+"cat": "picture words",
+"en": "plane",
+"fr": "l'avion",
+"s": "C'est un avion."
+},
+{
+"cat": "picture words",
+"en": "envelope",
+"fr": "l'enveloppe",
+"s": "C'est une enveloppe."
+},
+{
+"cat": "picture words",
+"en": "grapes",
+"fr": "le raisin",
+"s": "C'est du raisin."
+},
+{
+"cat": "picture words",
+"en": "dove",
+"fr": "la colombe",
+"s": "C'est une colombe."
+},
+{
+"cat": "picture words",
+"en": "snake",
+"fr": "le serpent",
+"s": "C'est un serpent."
+},
+{
+"cat": "picture words",
+"en": "pig",
+"fr": "le cochon",
+"s": "C'est un cochon."
+},
+{
+"cat": "picture words",
+"en": "jellyfish",
+"fr": "la méduse",
+"s": "C'est une méduse."
+},
+{
+"cat": "picture words",
+"en": "seahorse",
+"fr": "l'hippocampe",
+"s": "C'est un hippocampe."
+},
+{
+"cat": "picture words",
+"en": "snowman",
+"fr": "le bonhomme de neige",
+"s": "C'est un bonhomme de neige."
+},
+{
+"cat": "picture words",
+"en": "tent",
+"fr": "la tente",
+"s": "C'est une tente."
+},
+{
+"cat": "picture words",
+"en": "palm",
+"fr": "le palmier",
+"s": "C'est un palmier."
+},
+{
+"cat": "picture words",
+"en": "cactus",
+"fr": "le cactus",
+"s": "C'est un cactus."
+},
+{
+"cat": "picture words",
+"en": "scorpion",
+"fr": "le scorpion",
+"s": "C'est un scorpion."
+},
+{
+"cat": "picture words",
+"en": "lizard",
+"fr": "le lézard",
+"s": "C'est un lézard."
+},
+{
+"cat": "picture words",
+"en": "balloon",
+"fr": "le ballon",
+"s": "C'est un ballon."
+},
+{
+"cat": "picture words",
+"en": "jeep",
+"fr": "la jeep",
+"s": "C'est une jeep."
+},
+{
+"cat": "picture words",
+"en": "castle",
+"fr": "le château",
+"s": "C'est un château."
+},
+{
+"cat": "picture words",
+"en": "shell",
+"fr": "le coquillage",
+"s": "C'est un coquillage."
+},
+{
+"cat": "picture words",
+"en": "lighthouse",
+"fr": "le phare",
+"s": "C'est un phare."
+},
+{
+"cat": "picture words",
+"en": "bed",
+"fr": "le lit",
+"s": "C'est un lit."
+},
+{
+"cat": "picture words",
+"en": "toothbrush",
+"fr": "la brosse à dents",
+"s": "C'est une brosse à dents."
+},
+{
+"cat": "picture words",
+"en": "sink",
+"fr": "le lavabo",
+"s": "C'est un lavabo."
+},
+{
+"cat": "picture words",
+"en": "towel",
+"fr": "la serviette",
+"s": "C'est une serviette."
+},
+{
+"cat": "picture words",
+"en": "backpack",
+"fr": "le sac à dos",
+"s": "C'est un sac à dos."
+},
+{
+"cat": "picture words",
+"en": "shoes",
+"fr": "les chaussures",
+"s": "Ce sont des chaussures."
+},
+{
+"cat": "picture words",
+"en": "wardrobe",
+"fr": "l'armoire",
+"s": "C'est une armoire."
+},
+{
+"cat": "picture words",
+"en": "table",
+"fr": "la table",
+"s": "C'est une table."
+},
+{
+"cat": "picture words",
+"en": "broom",
+"fr": "le balai",
+"s": "C'est un balai."
+},
+{
+"cat": "picture words",
+"en": "clock",
+"fr": "l'horloge",
+"s": "C'est une horloge."
+},
+{
+"cat": "picture words",
+"en": "swing",
+"fr": "la balançoire",
+"s": "C'est une balançoire."
+},
+{
+"cat": "picture words",
+"en": "bike",
+"fr": "le vélo",
+"s": "C'est un vélo."
+},
+{
+"cat": "picture words",
+"en": "tree",
+"fr": "l'arbre",
+"s": "C'est un arbre."
+},
+{
+"cat": "picture words",
+"en": "school",
+"fr": "l'école",
+"s": "C'est une école."
+},
+{
+"cat": "picture words",
+"en": "hospital",
+"fr": "l'hôpital",
+"s": "C'est un hôpital."
+},
+{
+"cat": "picture words",
+"en": "light",
+"fr": "la lumière",
+"s": "C'est une lumière."
+},
+{
+"cat": "picture words",
+"en": "fountain",
+"fr": "la fontaine",
+"s": "C'est une fontaine."
+},
+{
+"cat": "picture words",
+"en": "skyscraper",
+"fr": "le gratte-ciel",
+"s": "C'est un gratte-ciel."
+},
+{
+"cat": "picture words",
+"en": "king",
+"fr": "le roi",
+"s": "C'est un roi."
+},
+{
+"cat": "picture words",
+"en": "queen",
+"fr": "la reine",
+"s": "C'est une reine."
+},
+{
+"cat": "picture words",
+"en": "dragon",
+"fr": "le dragon",
+"s": "C'est un dragon."
+},
+{
+"cat": "picture words",
+"en": "knight",
+"fr": "le chevalier",
+"s": "C'est un chevalier."
+},
+{
+"cat": "picture words",
+"en": "wizard",
+"fr": "le magicien",
+"s": "C'est un magicien."
+},
+{
+"cat": "picture words",
+"en": "chest",
+"fr": "le coffre au trésor",
+"s": "C'est un coffre au trésor."
+},
+{
+"cat": "picture words",
+"en": "alien",
+"fr": "l'extraterrestre",
+"s": "C'est un extraterrestre."
+},
+{
+"cat": "picture words",
+"en": "robot",
+"fr": "le robot",
+"s": "C'est un robot."
+},
+{
+"cat": "picture words",
+"en": "moon",
+"fr": "la lune",
+"s": "C'est une lune."
+},
+{
+"cat": "picture words",
+"en": "ringed planet",
+"fr": "la planète à anneaux",
+"s": "C'est une planète à anneaux."
+},
+{
+"cat": "picture words",
+"en": "balloons",
+"fr": "les ballons",
+"s": "Ce sont des ballons."
+},
+{
+"cat": "picture words",
+"en": "cloud",
+"fr": "le nuage",
+"s": "C'est un nuage."
+},
+{
+"cat": "picture words",
+"en": "candy",
+"fr": "le bonbon",
+"s": "C'est un bonbon."
+},
+{
+"cat": "picture words",
+"en": "cupcake",
+"fr": "le cupcake",
+"s": "C'est un cupcake."
+},
+{
+"cat": "animal foods",
+"en": "carrot",
+"fr": "la carotte",
+"s": "C'est une carotte."
+},
+{
+"cat": "animal foods",
+"en": "grass",
+"fr": "l'herbe",
+"s": "C'est de l'herbe."
+},
+{
+"cat": "animal foods",
+"en": "bone",
+"fr": "l'os",
+"s": "C'est un os."
+},
+{
+"cat": "animal foods",
+"en": "meat",
+"fr": "la viande",
+"s": "C'est de la viande."
+},
+{
+"cat": "animal foods",
+"en": "hay",
+"fr": "le foin",
+"s": "C'est du foin."
+},
+{
+"cat": "animal foods",
+"en": "seeds",
+"fr": "les graines",
+"s": "Ce sont des graines."
+},
+{
+"cat": "animal foods",
+"en": "insect",
+"fr": "l'insecte",
+"s": "C'est un insecte."
+},
+{
+"cat": "things of a colour",
+"en": "strawberry",
+"fr": "la fraise",
+"s": "C'est une fraise."
+},
+{
+"cat": "things of a colour",
+"en": "fire truck",
+"fr": "le camion de pompiers",
+"s": "C'est un camion de pompiers."
+},
+{
+"cat": "things of a colour",
+"en": "sunflower",
+"fr": "le tournesol",
+"s": "C'est un tournesol."
+},
+{
+"cat": "things of a colour",
+"en": "leaf",
+"fr": "la feuille",
+"s": "C'est une feuille."
+},
+{
+"cat": "things of a colour",
+"en": "tang fish",
+"fr": "le poisson bleu",
+"s": "C'est un poisson bleu."
+},
+{
+"cat": "things of a colour",
+"en": "bluebird",
+"fr": "l'oiseau bleu",
+"s": "C'est un oiseau bleu."
+},
+{
+"cat": "things of a colour",
+"en": "blue planet",
+"fr": "la planète bleue",
+"s": "C'est une planète bleue."
+},
+{
+"cat": "things of a colour",
+"en": "cotton candy",
+"fr": "la barbe à papa",
+"s": "C'est une barbe à papa."
+},
+{
+"cat": "things of a colour",
+"en": "pink planet",
+"fr": "la planète rose",
+"s": "C'est une planète rose."
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "pear",
+"fr": "la poire",
+"s": "C'est une poire."
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "watermelon",
+"fr": "la pastèque",
+"s": "C'est une pastèque."
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "teddy bear",
+"fr": "l'ours en peluche",
+"s": "C'est un ours en peluche."
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "blocks",
+"fr": "les cubes",
+"s": "Ce sont des cubes."
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "yo-yo",
+"fr": "le yo-yo",
+"s": "C'est un yo-yo."
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "car",
+"fr": "la voiture",
+"s": "C'est une voiture."
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "bus",
+"fr": "le bus",
+"s": "C'est un bus."
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "boat",
+"fr": "le bateau",
+"s": "C'est un bateau."
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "train",
+"fr": "le train",
+"s": "C'est un train."
+},
+{
+"cat": "letters (French only)",
+"en": "letter é",
+"fr": "É",
+"s": "É comme école."
+},
+{
+"cat": "letters (French only)",
+"en": "letter è",
+"fr": "È",
+"s": "È comme mère."
+},
+{
+"cat": "letters (French only)",
+"en": "letter ç",
+"fr": "Ç",
+"s": "Ç comme garçon."
+},
+{
+"cat": "letters (French only)",
+"en": "letter ê",
+"fr": "Ê",
+"s": "Ê comme fête."
+}
+]

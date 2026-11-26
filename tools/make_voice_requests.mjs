@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import { clipId } from '../game_src/learn_games/src/kit/voice.js';
 const EN = JSON.parse(fs.readFileSync('game_src/learn_games/src/english/words.json', 'utf8'));
 const DE = JSON.parse(fs.readFileSync('game_src/learn_games/src/german/words.json', 'utf8'));
+const FR = JSON.parse(fs.readFileSync('game_src/learn_games/src/french/words.json', 'utf8'));
 const has = (lang, id) => fs.existsSync(`assets/games/learn_voice/${lang}/${id}.mp3`);
 const rows = [['language', 'file_name', 'kind', 'text', 'for_word']];
 const add = (lang, text, kind, slow, word) => {
@@ -16,6 +17,9 @@ for (const e of EN) {
 }
 for (const e of DE) {
   add('de', e.w, 'word', false, e.en); add('de', e.w, 'word read slowly', true, e.en); add('de', e.s, 'sentence', false, e.en);
+}
+for (const e of FR) {
+  add('fr', e.w, 'word', false, e.en); add('fr', e.w, 'word read slowly', true, e.en); add('fr', e.s, 'sentence', false, e.en);
 }
 const q = (c) => '"' + String(c).replace(/"/g, '""') + '"';
 // the same text is one file: keep the first row of every file name

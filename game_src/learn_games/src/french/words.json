@@ -1,0 +1,4312 @@
+[
+{
+"n": 0,
+"cat": "numbers 0-20",
+"en": "zéro",
+"eng": "zero",
+"lang": "fr",
+"w": "zéro",
+"s": "Zéro !"
+},
+{
+"n": 1,
+"cat": "numbers 0-20",
+"en": "un",
+"eng": "one",
+"lang": "fr",
+"w": "un",
+"s": "Un !"
+},
+{
+"n": 2,
+"cat": "numbers 0-20",
+"en": "deux",
+"eng": "two",
+"lang": "fr",
+"w": "deux",
+"s": "Deux !"
+},
+{
+"n": 3,
+"cat": "numbers 0-20",
+"en": "trois",
+"eng": "three",
+"lang": "fr",
+"w": "trois",
+"s": "Trois !"
+},
+{
+"n": 4,
+"cat": "numbers 0-20",
+"en": "quatre",
+"eng": "four",
+"lang": "fr",
+"w": "quatre",
+"s": "Quatre !"
+},
+{
+"n": 5,
+"cat": "numbers 0-20",
+"en": "cinq",
+"eng": "five",
+"lang": "fr",
+"w": "cinq",
+"s": "Cinq !"
+},
+{
+"n": 6,
+"cat": "numbers 0-20",
+"en": "six",
+"eng": "six",
+"lang": "fr",
+"w": "six",
+"s": "Six !"
+},
+{
+"n": 7,
+"cat": "numbers 0-20",
+"en": "sept",
+"eng": "seven",
+"lang": "fr",
+"w": "sept",
+"s": "Sept !"
+},
+{
+"n": 8,
+"cat": "numbers 0-20",
+"en": "huit",
+"eng": "eight",
+"lang": "fr",
+"w": "huit",
+"s": "Huit !"
+},
+{
+"n": 9,
+"cat": "numbers 0-20",
+"en": "neuf",
+"eng": "nine",
+"lang": "fr",
+"w": "neuf",
+"s": "Neuf !"
+},
+{
+"n": 10,
+"cat": "numbers 0-20",
+"en": "dix",
+"eng": "ten",
+"lang": "fr",
+"w": "dix",
+"s": "Dix !"
+},
+{
+"n": 11,
+"cat": "numbers 0-20",
+"en": "onze",
+"eng": "eleven",
+"lang": "fr",
+"w": "onze",
+"s": "Onze !"
+},
+{
+"n": 12,
+"cat": "numbers 0-20",
+"en": "douze",
+"eng": "twelve",
+"lang": "fr",
+"w": "douze",
+"s": "Douze !"
+},
+{
+"n": 13,
+"cat": "numbers 0-20",
+"en": "treize",
+"eng": "thirteen",
+"lang": "fr",
+"w": "treize",
+"s": "Treize !"
+},
+{
+"n": 14,
+"cat": "numbers 0-20",
+"en": "quatorze",
+"eng": "fourteen",
+"lang": "fr",
+"w": "quatorze",
+"s": "Quatorze !"
+},
+{
+"n": 15,
+"cat": "numbers 0-20",
+"en": "quinze",
+"eng": "fifteen",
+"lang": "fr",
+"w": "quinze",
+"s": "Quinze !"
+},
+{
+"n": 16,
+"cat": "numbers 0-20",
+"en": "seize",
+"eng": "sixteen",
+"lang": "fr",
+"w": "seize",
+"s": "Seize !"
+},
+{
+"n": 17,
+"cat": "numbers 0-20",
+"en": "dix-sept",
+"eng": "seventeen",
+"lang": "fr",
+"w": "dix-sept",
+"s": "Dix-sept !"
+},
+{
+"n": 18,
+"cat": "numbers 0-20",
+"en": "dix-huit",
+"eng": "eighteen",
+"lang": "fr",
+"w": "dix-huit",
+"s": "Dix-huit !"
+},
+{
+"n": 19,
+"cat": "numbers 0-20",
+"en": "dix-neuf",
+"eng": "nineteen",
+"lang": "fr",
+"w": "dix-neuf",
+"s": "Dix-neuf !"
+},
+{
+"n": 20,
+"cat": "numbers 0-20",
+"en": "vingt",
+"eng": "twenty",
+"lang": "fr",
+"w": "vingt",
+"s": "Vingt !"
+},
+{
+"n": 30,
+"cat": "tens to 100",
+"en": "trente",
+"eng": "thirty",
+"lang": "fr",
+"w": "trente",
+"s": "Trente !"
+},
+{
+"n": 40,
+"cat": "tens to 100",
+"en": "quarante",
+"eng": "forty",
+"lang": "fr",
+"w": "quarante",
+"s": "Quarante !"
+},
+{
+"n": 50,
+"cat": "tens to 100",
+"en": "cinquante",
+"eng": "fifty",
+"lang": "fr",
+"w": "cinquante",
+"s": "Cinquante !"
+},
+{
+"n": 60,
+"cat": "tens to 100",
+"en": "soixante",
+"eng": "sixty",
+"lang": "fr",
+"w": "soixante",
+"s": "Soixante !"
+},
+{
+"n": 70,
+"cat": "tens to 100",
+"en": "soixante-dix",
+"eng": "seventy",
+"lang": "fr",
+"w": "soixante-dix",
+"s": "Soixante-dix !"
+},
+{
+"n": 80,
+"cat": "tens to 100",
+"en": "quatre-vingts",
+"eng": "eighty",
+"lang": "fr",
+"w": "quatre-vingts",
+"s": "Quatre-vingts !"
+},
+{
+"n": 90,
+"cat": "tens to 100",
+"en": "quatre-vingt-dix",
+"eng": "ninety",
+"lang": "fr",
+"w": "quatre-vingt-dix",
+"s": "Quatre-vingt-dix !"
+},
+{
+"n": 100,
+"cat": "tens to 100",
+"en": "cent",
+"eng": "one hundred",
+"lang": "fr",
+"w": "cent",
+"s": "Cent !"
+},
+{
+"ch": "Aa",
+"cat": "letters A-Z (name)",
+"en": "A",
+"eng": "letter a",
+"lang": "fr",
+"w": "A",
+"s": "A comme avion."
+},
+{
+"ch": "Bb",
+"cat": "letters A-Z (name)",
+"en": "Bé",
+"eng": "letter b",
+"lang": "fr",
+"w": "Bé",
+"s": "B comme ballon."
+},
+{
+"ch": "Cc",
+"cat": "letters A-Z (name)",
+"en": "Cé",
+"eng": "letter c",
+"lang": "fr",
+"w": "Cé",
+"s": "C comme chat."
+},
+{
+"ch": "Dd",
+"cat": "letters A-Z (name)",
+"en": "Dé",
+"eng": "letter d",
+"lang": "fr",
+"w": "Dé",
+"s": "D comme dauphin."
+},
+{
+"ch": "Ee",
+"cat": "letters A-Z (name)",
+"en": "E",
+"eng": "letter e",
+"lang": "fr",
+"w": "E",
+"s": "E comme éléphant."
+},
+{
+"ch": "Ff",
+"cat": "letters A-Z (name)",
+"en": "Effe",
+"eng": "letter f",
+"lang": "fr",
+"w": "Effe",
+"s": "F comme fleur."
+},
+{
+"ch": "Gg",
+"cat": "letters A-Z (name)",
+"en": "Gé",
+"eng": "letter g",
+"lang": "fr",
+"w": "Gé",
+"s": "G comme girafe."
+},
+{
+"ch": "Hh",
+"cat": "letters A-Z (name)",
+"en": "Ache",
+"eng": "letter h",
+"lang": "fr",
+"w": "Ache",
+"s": "H comme hibou."
+},
+{
+"ch": "Ii",
+"cat": "letters A-Z (name)",
+"en": "I",
+"eng": "letter i",
+"lang": "fr",
+"w": "I",
+"s": "I comme igloo."
+},
+{
+"ch": "Jj",
+"cat": "letters A-Z (name)",
+"en": "Ji",
+"eng": "letter j",
+"lang": "fr",
+"w": "Ji",
+"s": "J comme jardin."
+},
+{
+"ch": "Kk",
+"cat": "letters A-Z (name)",
+"en": "Ka",
+"eng": "letter k",
+"lang": "fr",
+"w": "Ka",
+"s": "K comme kiwi."
+},
+{
+"ch": "Ll",
+"cat": "letters A-Z (name)",
+"en": "Elle",
+"eng": "letter l",
+"lang": "fr",
+"w": "Elle",
+"s": "L comme lion."
+},
+{
+"ch": "Mm",
+"cat": "letters A-Z (name)",
+"en": "Emme",
+"eng": "letter m",
+"lang": "fr",
+"w": "Emme",
+"s": "M comme maison."
+},
+{
+"ch": "Nn",
+"cat": "letters A-Z (name)",
+"en": "Enne",
+"eng": "letter n",
+"lang": "fr",
+"w": "Enne",
+"s": "N comme nez."
+},
+{
+"ch": "Oo",
+"cat": "letters A-Z (name)",
+"en": "O",
+"eng": "letter o",
+"lang": "fr",
+"w": "O",
+"s": "O comme ours."
+},
+{
+"ch": "Pp",
+"cat": "letters A-Z (name)",
+"en": "Pé",
+"eng": "letter p",
+"lang": "fr",
+"w": "Pé",
+"s": "P comme pomme."
+},
+{
+"ch": "Qq",
+"cat": "letters A-Z (name)",
+"en": "Ku",
+"eng": "letter q",
+"lang": "fr",
+"w": "Ku",
+"s": "Q comme quatre."
+},
+{
+"ch": "Rr",
+"cat": "letters A-Z (name)",
+"en": "Erre",
+"eng": "letter r",
+"lang": "fr",
+"w": "Erre",
+"s": "R comme renard."
+},
+{
+"ch": "Ss",
+"cat": "letters A-Z (name)",
+"en": "Esse",
+"eng": "letter s",
+"lang": "fr",
+"w": "Esse",
+"s": "S comme soleil."
+},
+{
+"ch": "Tt",
+"cat": "letters A-Z (name)",
+"en": "Té",
+"eng": "letter t",
+"lang": "fr",
+"w": "Té",
+"s": "T comme tigre."
+},
+{
+"ch": "Uu",
+"cat": "letters A-Z (name)",
+"en": "U",
+"eng": "letter u",
+"lang": "fr",
+"w": "U",
+"s": "U comme usine."
+},
+{
+"ch": "Vv",
+"cat": "letters A-Z (name)",
+"en": "Vé",
+"eng": "letter v",
+"lang": "fr",
+"w": "Vé",
+"s": "V comme vache."
+},
+{
+"ch": "Ww",
+"cat": "letters A-Z (name)",
+"en": "Double vé",
+"eng": "letter w",
+"lang": "fr",
+"w": "Double vé",
+"s": "W comme wagon."
+},
+{
+"ch": "Xx",
+"cat": "letters A-Z (name)",
+"en": "Iks",
+"eng": "letter x",
+"lang": "fr",
+"w": "Iks",
+"s": "X comme xylophone."
+},
+{
+"ch": "Yy",
+"cat": "letters A-Z (name)",
+"en": "I grec",
+"eng": "letter y",
+"lang": "fr",
+"w": "I grec",
+"s": "Y comme yaourt."
+},
+{
+"ch": "Zz",
+"cat": "letters A-Z (name)",
+"en": "Zède",
+"eng": "letter z",
+"lang": "fr",
+"w": "Zède",
+"s": "Z comme zèbre."
+},
+{
+"color": "red",
+"cat": "colours",
+"ar": "أحمر",
+"en": "rouge",
+"eng": "red",
+"lang": "fr",
+"w": "rouge",
+"s": "C'est rouge."
+},
+{
+"color": "blue",
+"cat": "colours",
+"ar": "أزرق",
+"en": "bleu",
+"eng": "blue",
+"lang": "fr",
+"w": "bleu",
+"s": "C'est bleu."
+},
+{
+"color": "yellow",
+"cat": "colours",
+"ar": "أصفر",
+"en": "jaune",
+"eng": "yellow",
+"lang": "fr",
+"w": "jaune",
+"s": "C'est jaune."
+},
+{
+"color": "green",
+"cat": "colours",
+"ar": "أخضر",
+"en": "vert",
+"eng": "green",
+"lang": "fr",
+"w": "vert",
+"s": "C'est vert."
+},
+{
+"color": "orange",
+"cat": "colours",
+"ar": "برتقالي",
+"en": "orange",
+"eng": "orange",
+"lang": "fr",
+"w": "orange",
+"s": "C'est orange."
+},
+{
+"color": "purple",
+"cat": "colours",
+"ar": "بنفسجي",
+"en": "violet",
+"eng": "purple",
+"lang": "fr",
+"w": "violet",
+"s": "C'est violet."
+},
+{
+"color": "pink",
+"cat": "colours",
+"ar": "وردي",
+"en": "rose",
+"eng": "pink",
+"lang": "fr",
+"w": "rose",
+"s": "C'est rose."
+},
+{
+"color": "black",
+"cat": "colours",
+"ar": "أسود",
+"en": "noir",
+"eng": "black",
+"lang": "fr",
+"w": "noir",
+"s": "C'est noir."
+},
+{
+"color": "white",
+"cat": "colours",
+"ar": "أبيض",
+"en": "blanc",
+"eng": "white",
+"lang": "fr",
+"w": "blanc",
+"s": "C'est blanc."
+},
+{
+"color": "brown",
+"cat": "colours",
+"ar": "بني",
+"en": "marron",
+"eng": "brown",
+"lang": "fr",
+"w": "marron",
+"s": "C'est marron."
+},
+{
+"color": "gray",
+"cat": "colours",
+"ar": "رمادي",
+"en": "gris",
+"eng": "gray",
+"lang": "fr",
+"w": "gris",
+"s": "C'est gris."
+},
+{
+"color": "skyblue",
+"cat": "colours",
+"ar": "سماوي",
+"en": "bleu ciel",
+"eng": "sky blue",
+"lang": "fr",
+"w": "bleu ciel",
+"s": "C'est bleu ciel."
+},
+{
+"color": "navy",
+"cat": "colours",
+"ar": "كحلي",
+"en": "bleu marine",
+"eng": "navy",
+"lang": "fr",
+"w": "bleu marine",
+"s": "C'est bleu marine."
+},
+{
+"color": "lightgreen",
+"cat": "colours",
+"ar": "أخضر فاتح",
+"en": "vert clair",
+"eng": "light green",
+"lang": "fr",
+"w": "vert clair",
+"s": "C'est vert clair."
+},
+{
+"color": "darkgreen",
+"cat": "colours",
+"ar": "أخضر غامق",
+"en": "vert foncé",
+"eng": "dark green",
+"lang": "fr",
+"w": "vert foncé",
+"s": "C'est vert foncé."
+},
+{
+"color": "turquoise",
+"cat": "colours",
+"ar": "تركواز",
+"en": "turquoise",
+"eng": "turquoise",
+"lang": "fr",
+"w": "turquoise",
+"s": "C'est turquoise."
+},
+{
+"color": "gold",
+"cat": "colours",
+"ar": "ذهبي",
+"en": "or",
+"eng": "gold",
+"lang": "fr",
+"w": "or",
+"s": "C'est or."
+},
+{
+"color": "silver",
+"cat": "colours",
+"ar": "فضي",
+"en": "argent",
+"eng": "silver",
+"lang": "fr",
+"w": "argent",
+"s": "C'est argent."
+},
+{
+"color": "beige",
+"cat": "colours",
+"ar": "بيج",
+"en": "beige",
+"eng": "beige",
+"lang": "fr",
+"w": "beige",
+"s": "C'est beige."
+},
+{
+"color": "maroon",
+"cat": "colours",
+"ar": "عنابي",
+"en": "bordeaux",
+"eng": "maroon",
+"lang": "fr",
+"w": "bordeaux",
+"s": "C'est bordeaux."
+},
+{
+"color": "lemon",
+"cat": "colours",
+"ar": "ليموني",
+"en": "jaune citron",
+"eng": "lemon",
+"lang": "fr",
+"w": "jaune citron",
+"s": "C'est jaune citron."
+},
+{
+"color": "peach",
+"cat": "colours",
+"ar": "خوخي",
+"en": "pêche",
+"eng": "peach",
+"lang": "fr",
+"w": "pêche",
+"s": "C'est pêche."
+},
+{
+"color": "lilac",
+"cat": "colours",
+"ar": "ليلكي",
+"en": "lilas",
+"eng": "lilac",
+"lang": "fr",
+"w": "lilas",
+"s": "C'est lilas."
+},
+{
+"color": "olive",
+"cat": "colours",
+"ar": "زيتي",
+"en": "vert olive",
+"eng": "olive",
+"lang": "fr",
+"w": "vert olive",
+"s": "C'est vert olive."
+},
+{
+"color": "mustard",
+"cat": "colours",
+"ar": "خردلي",
+"en": "moutarde",
+"eng": "mustard",
+"lang": "fr",
+"w": "moutarde",
+"s": "C'est moutarde."
+},
+{
+"color": "magenta",
+"cat": "colours",
+"ar": "فوشيا",
+"en": "magenta",
+"eng": "magenta",
+"lang": "fr",
+"w": "magenta",
+"s": "C'est magenta."
+},
+{
+"color": "indigo",
+"cat": "colours",
+"ar": "نيلي",
+"en": "indigo",
+"eng": "indigo",
+"lang": "fr",
+"w": "indigo",
+"s": "C'est indigo."
+},
+{
+"color": "crimson",
+"cat": "colours",
+"ar": "قرمزي",
+"en": "rouge cramoisi",
+"eng": "crimson",
+"lang": "fr",
+"w": "rouge cramoisi",
+"s": "C'est rouge cramoisi."
+},
+{
+"color": "bronze",
+"cat": "colours",
+"ar": "برونزي",
+"en": "bronze",
+"eng": "bronze",
+"lang": "fr",
+"w": "bronze",
+"s": "C'est bronze."
+},
+{
+"color": "caramel",
+"cat": "colours",
+"ar": "كراميل",
+"en": "caramel",
+"eng": "caramel",
+"lang": "fr",
+"w": "caramel",
+"s": "C'est caramel."
+},
+{
+"color": "charcoal",
+"cat": "colours",
+"ar": "رصاصي",
+"en": "anthracite",
+"eng": "charcoal",
+"lang": "fr",
+"w": "anthracite",
+"s": "C'est anthracite."
+},
+{
+"color": "mint",
+"cat": "colours",
+"ar": "نعناعي",
+"en": "vert menthe",
+"eng": "mint",
+"lang": "fr",
+"w": "vert menthe",
+"s": "C'est vert menthe."
+},
+{
+"color": "coral",
+"cat": "colours",
+"ar": "مرجاني",
+"en": "corail",
+"eng": "coral",
+"lang": "fr",
+"w": "corail",
+"s": "C'est corail."
+},
+{
+"color": "sand",
+"cat": "colours",
+"ar": "رملي",
+"en": "sable",
+"eng": "sand",
+"lang": "fr",
+"w": "sable",
+"s": "C'est sable."
+},
+{
+"shape": "circle",
+"cat": "shapes",
+"ar": "دايرة",
+"en": "le cercle",
+"eng": "circle",
+"lang": "fr",
+"w": "le cercle",
+"s": "C'est un cercle."
+},
+{
+"shape": "square",
+"cat": "shapes",
+"ar": "مربع",
+"en": "le carré",
+"eng": "square",
+"lang": "fr",
+"w": "le carré",
+"s": "C'est un carré."
+},
+{
+"shape": "triangle",
+"cat": "shapes",
+"ar": "مثلث",
+"en": "le triangle",
+"eng": "triangle",
+"lang": "fr",
+"w": "le triangle",
+"s": "C'est un triangle."
+},
+{
+"shape": "star",
+"cat": "shapes",
+"ar": "نجمة",
+"en": "l'étoile",
+"eng": "star",
+"lang": "fr",
+"w": "l'étoile",
+"s": "C'est une étoile."
+},
+{
+"shape": "heart",
+"cat": "shapes",
+"ar": "قلب",
+"en": "le cœur",
+"eng": "heart",
+"lang": "fr",
+"w": "le cœur",
+"s": "C'est un cœur."
+},
+{
+"thing": "x_rectangle",
+"cat": "shapes",
+"ar": "مستطيل",
+"en": "le rectangle",
+"eng": "rectangle",
+"lang": "fr",
+"w": "le rectangle",
+"s": "C'est un rectangle."
+},
+{
+"thing": "x_oval",
+"cat": "shapes",
+"ar": "شكل بيضاوي",
+"en": "l'ovale",
+"eng": "oval",
+"lang": "fr",
+"w": "l'ovale",
+"s": "C'est un ovale."
+},
+{
+"thing": "x_diamond",
+"cat": "shapes",
+"ar": "معين",
+"en": "le losange",
+"eng": "diamond",
+"lang": "fr",
+"w": "le losange",
+"s": "C'est un losange."
+},
+{
+"thing": "x_pentagon",
+"cat": "shapes",
+"ar": "شكل خماسي",
+"en": "le pentagone",
+"eng": "pentagon",
+"lang": "fr",
+"w": "le pentagone",
+"s": "C'est un pentagone."
+},
+{
+"thing": "x_hexagon",
+"cat": "shapes",
+"ar": "شكل سداسي",
+"en": "l'hexagone",
+"eng": "hexagon",
+"lang": "fr",
+"w": "l'hexagone",
+"s": "C'est un hexagone."
+},
+{
+"shape": "octagon",
+"cat": "shapes",
+"ar": "مثمن",
+"en": "l'octogone",
+"eng": "octagon",
+"lang": "fr",
+"w": "l'octogone",
+"s": "C'est un octogone."
+},
+{
+"shape": "crescent",
+"cat": "shapes",
+"ar": "هلال",
+"en": "le croissant de lune",
+"eng": "crescent",
+"lang": "fr",
+"w": "le croissant de lune",
+"s": "C'est un croissant de lune."
+},
+{
+"shape": "plus",
+"cat": "shapes",
+"ar": "علامة جمع",
+"en": "le signe plus",
+"eng": "plus",
+"lang": "fr",
+"w": "le signe plus",
+"s": "C'est un signe plus."
+},
+{
+"shape": "semicircle",
+"cat": "shapes",
+"ar": "نص دايرة",
+"en": "le demi-cercle",
+"eng": "semicircle",
+"lang": "fr",
+"w": "le demi-cercle",
+"s": "C'est un demi-cercle."
+},
+{
+"shape": "trapezoid",
+"cat": "shapes",
+"ar": "شبه منحرف",
+"en": "le trapèze",
+"eng": "trapezoid",
+"lang": "fr",
+"w": "le trapèze",
+"s": "C'est un trapèze."
+},
+{
+"shape": "parallelogram",
+"cat": "shapes",
+"ar": "متوازي أضلاع",
+"en": "le parallélogramme",
+"eng": "parallelogram",
+"lang": "fr",
+"w": "le parallélogramme",
+"s": "C'est un parallélogramme."
+},
+{
+"shape": "hexagram",
+"cat": "shapes",
+"ar": "نجمة سداسية",
+"en": "l'hexagramme",
+"eng": "hexagram",
+"lang": "fr",
+"w": "l'hexagramme",
+"s": "C'est un hexagramme."
+},
+{
+"shape": "drop",
+"cat": "shapes",
+"ar": "قطرة",
+"en": "la goutte",
+"eng": "drop",
+"lang": "fr",
+"w": "la goutte",
+"s": "C'est une goutte."
+},
+{
+"thing": "x_arrow",
+"cat": "shapes",
+"ar": "سهم",
+"en": "la flèche",
+"eng": "arrow",
+"lang": "fr",
+"w": "la flèche",
+"s": "C'est une flèche."
+},
+{
+"thing": "x_ring",
+"cat": "shapes",
+"ar": "حلقة",
+"en": "l'anneau",
+"eng": "ring",
+"lang": "fr",
+"w": "l'anneau",
+"s": "C'est un anneau."
+},
+{
+"thing": "x_cube",
+"cat": "shapes",
+"ar": "مكعب",
+"en": "le cube",
+"eng": "cube",
+"lang": "fr",
+"w": "le cube",
+"s": "C'est un cube."
+},
+{
+"thing": "x_ball",
+"cat": "shapes",
+"ar": "كورة",
+"en": "la balle",
+"eng": "ball",
+"lang": "fr",
+"w": "la balle",
+"s": "C'est une balle."
+},
+{
+"thing": "x_cone",
+"cat": "shapes",
+"ar": "مخروط",
+"en": "le cône",
+"eng": "cone",
+"lang": "fr",
+"w": "le cône",
+"s": "C'est un cône."
+},
+{
+"thing": "x_cylinder",
+"cat": "shapes",
+"ar": "أسطوانة",
+"en": "le cylindre",
+"eng": "cylinder",
+"lang": "fr",
+"w": "le cylindre",
+"s": "C'est un cylindre."
+},
+{
+"thing": "x_pyramid",
+"cat": "shapes",
+"ar": "هرم",
+"en": "la pyramide",
+"eng": "pyramid",
+"lang": "fr",
+"w": "la pyramide",
+"s": "C'est une pyramide."
+},
+{
+"ch": "Samedi",
+"cat": "days",
+"ar": "السبت",
+"en": "samedi",
+"eng": "saturday",
+"lang": "fr",
+"w": "samedi",
+"s": "Aujourd'hui, c'est samedi."
+},
+{
+"ch": "Dimanche",
+"cat": "days",
+"ar": "الأحد",
+"en": "dimanche",
+"eng": "sunday",
+"lang": "fr",
+"w": "dimanche",
+"s": "Aujourd'hui, c'est dimanche."
+},
+{
+"ch": "Lundi",
+"cat": "days",
+"ar": "الاثنين",
+"en": "lundi",
+"eng": "monday",
+"lang": "fr",
+"w": "lundi",
+"s": "Aujourd'hui, c'est lundi."
+},
+{
+"ch": "Mardi",
+"cat": "days",
+"ar": "التلات",
+"en": "mardi",
+"eng": "tuesday",
+"lang": "fr",
+"w": "mardi",
+"s": "Aujourd'hui, c'est mardi."
+},
+{
+"ch": "Mercredi",
+"cat": "days",
+"ar": "الأربع",
+"en": "mercredi",
+"eng": "wednesday",
+"lang": "fr",
+"w": "mercredi",
+"s": "Aujourd'hui, c'est mercredi."
+},
+{
+"ch": "Jeudi",
+"cat": "days",
+"ar": "الخميس",
+"en": "jeudi",
+"eng": "thursday",
+"lang": "fr",
+"w": "jeudi",
+"s": "Aujourd'hui, c'est jeudi."
+},
+{
+"ch": "Vendredi",
+"cat": "days",
+"ar": "الجمعة",
+"en": "vendredi",
+"eng": "friday",
+"lang": "fr",
+"w": "vendredi",
+"s": "Aujourd'hui, c'est vendredi."
+},
+{
+"ch": "Janvier",
+"cat": "months",
+"ar": "يناير",
+"en": "janvier",
+"eng": "january",
+"lang": "fr",
+"w": "janvier",
+"s": "Nous sommes en janvier."
+},
+{
+"ch": "Février",
+"cat": "months",
+"ar": "فبراير",
+"en": "février",
+"eng": "february",
+"lang": "fr",
+"w": "février",
+"s": "Nous sommes en février."
+},
+{
+"ch": "Mars",
+"cat": "months",
+"ar": "مارس",
+"en": "mars",
+"eng": "march",
+"lang": "fr",
+"w": "mars",
+"s": "Nous sommes en mars."
+},
+{
+"ch": "Avril",
+"cat": "months",
+"ar": "أبريل",
+"en": "avril",
+"eng": "april",
+"lang": "fr",
+"w": "avril",
+"s": "Nous sommes en avril."
+},
+{
+"ch": "Mai",
+"cat": "months",
+"ar": "مايو",
+"en": "mai",
+"eng": "may",
+"lang": "fr",
+"w": "mai",
+"s": "Nous sommes en mai."
+},
+{
+"ch": "Juin",
+"cat": "months",
+"ar": "يونيو",
+"en": "juin",
+"eng": "june",
+"lang": "fr",
+"w": "juin",
+"s": "Nous sommes en juin."
+},
+{
+"ch": "Juillet",
+"cat": "months",
+"ar": "يوليو",
+"en": "juillet",
+"eng": "july",
+"lang": "fr",
+"w": "juillet",
+"s": "Nous sommes en juillet."
+},
+{
+"ch": "Août",
+"cat": "months",
+"ar": "أغسطس",
+"en": "août",
+"eng": "august",
+"lang": "fr",
+"w": "août",
+"s": "Nous sommes en août."
+},
+{
+"ch": "Septembre",
+"cat": "months",
+"ar": "سبتمبر",
+"en": "septembre",
+"eng": "september",
+"lang": "fr",
+"w": "septembre",
+"s": "Nous sommes en septembre."
+},
+{
+"ch": "Octobre",
+"cat": "months",
+"ar": "أكتوبر",
+"en": "octobre",
+"eng": "october",
+"lang": "fr",
+"w": "octobre",
+"s": "Nous sommes en octobre."
+},
+{
+"ch": "Novembre",
+"cat": "months",
+"ar": "نوفمبر",
+"en": "novembre",
+"eng": "november",
+"lang": "fr",
+"w": "novembre",
+"s": "Nous sommes en novembre."
+},
+{
+"ch": "Décembre",
+"cat": "months",
+"ar": "ديسمبر",
+"en": "décembre",
+"eng": "december",
+"lang": "fr",
+"w": "décembre",
+"s": "Nous sommes en décembre."
+},
+{
+"ch": "L'été",
+"cat": "seasons",
+"ar": "الصيف",
+"en": "l'été",
+"eng": "summer",
+"lang": "fr",
+"w": "l'été",
+"s": "C'est l'été."
+},
+{
+"ch": "L'hiver",
+"cat": "seasons",
+"ar": "الشتا",
+"en": "l'hiver",
+"eng": "winter",
+"lang": "fr",
+"w": "l'hiver",
+"s": "C'est l'hiver."
+},
+{
+"ch": "Le printemps",
+"cat": "seasons",
+"ar": "الربيع",
+"en": "le printemps",
+"eng": "spring",
+"lang": "fr",
+"w": "le printemps",
+"s": "C'est le printemps."
+},
+{
+"ch": "L'automne",
+"cat": "seasons",
+"ar": "الخريف",
+"en": "l'automne",
+"eng": "autumn",
+"lang": "fr",
+"w": "l'automne",
+"s": "C'est l'automne."
+},
+{
+"ch": "Le matin",
+"cat": "parts of the day",
+"ar": "الصبح",
+"en": "le matin",
+"eng": "morning",
+"lang": "fr",
+"w": "le matin",
+"s": "Bonjour !"
+},
+{
+"ch": "Midi",
+"cat": "parts of the day",
+"ar": "الضهر",
+"en": "midi",
+"eng": "noon",
+"lang": "fr",
+"w": "midi",
+"s": "Il est midi."
+},
+{
+"ch": "Le soir",
+"cat": "parts of the day",
+"ar": "المسا",
+"en": "le soir",
+"eng": "evening",
+"lang": "fr",
+"w": "le soir",
+"s": "Bonsoir !"
+},
+{
+"ch": "La nuit",
+"cat": "parts of the day",
+"ar": "الليل",
+"en": "la nuit",
+"eng": "night",
+"lang": "fr",
+"w": "la nuit",
+"s": "Bonne nuit !"
+},
+{
+"thing": "x_routine_wake_up",
+"cat": "daily routine",
+"ar": "أصحى من النوم",
+"en": "se réveiller",
+"eng": "wake up",
+"lang": "fr",
+"w": "se réveiller",
+"s": "Je me réveille."
+},
+{
+"thing": "x_routine_wash_face",
+"cat": "daily routine",
+"ar": "أغسل وشّي",
+"en": "se laver le visage",
+"eng": "wash my face",
+"lang": "fr",
+"w": "se laver le visage",
+"s": "Je me lave le visage."
+},
+{
+"thing": "x_routine_breakfast",
+"cat": "daily routine",
+"ar": "أفطر",
+"en": "prendre le petit-déjeuner",
+"eng": "eat breakfast",
+"lang": "fr",
+"w": "prendre le petit-déjeuner",
+"s": "Je prends le petit-déjeuner."
+},
+{
+"thing": "x_routine_school",
+"cat": "daily routine",
+"ar": "أروح الحضانة",
+"en": "aller à l'école",
+"eng": "go to school",
+"lang": "fr",
+"w": "aller à l'école",
+"s": "Je vais à l'école."
+},
+{
+"thing": "x_routine_lunch",
+"cat": "daily routine",
+"ar": "أتغدّى",
+"en": "déjeuner",
+"eng": "eat lunch",
+"lang": "fr",
+"w": "déjeuner",
+"s": "Je déjeune."
+},
+{
+"thing": "x_routine_play",
+"cat": "daily routine",
+"ar": "ألعب",
+"en": "jouer",
+"eng": "play",
+"lang": "fr",
+"w": "jouer",
+"s": "Je joue."
+},
+{
+"thing": "x_routine_dinner",
+"cat": "daily routine",
+"ar": "أتعشّى",
+"en": "dîner",
+"eng": "eat dinner",
+"lang": "fr",
+"w": "dîner",
+"s": "Je dîne."
+},
+{
+"thing": "x_routine_bath",
+"cat": "daily routine",
+"ar": "آخد دُش",
+"en": "prendre un bain",
+"eng": "have a bath",
+"lang": "fr",
+"w": "prendre un bain",
+"s": "Je prends un bain."
+},
+{
+"thing": "x_routine_teeth",
+"cat": "daily routine",
+"ar": "أغسل سناني",
+"en": "se brosser les dents",
+"eng": "brush my teeth",
+"lang": "fr",
+"w": "se brosser les dents",
+"s": "Je me brosse les dents."
+},
+{
+"thing": "x_routine_sleep",
+"cat": "daily routine",
+"ar": "أنام",
+"en": "dormir",
+"eng": "sleep",
+"lang": "fr",
+"w": "dormir",
+"s": "Je dors."
+},
+{
+"thing": "x_where_on",
+"cat": "places (where is the ball)",
+"ar": "فوق الترابيزة",
+"en": "sur la table",
+"eng": "on the table",
+"lang": "fr",
+"w": "sur la table",
+"s": "La balle est sur la table."
+},
+{
+"thing": "x_where_under",
+"cat": "places (where is the ball)",
+"ar": "تحت الترابيزة",
+"en": "sous la table",
+"eng": "under the table",
+"lang": "fr",
+"w": "sous la table",
+"s": "La balle est sous la table."
+},
+{
+"thing": "x_where_inside",
+"cat": "places (where is the ball)",
+"ar": "جوه الصندوق",
+"en": "dans la boîte",
+"eng": "inside the box",
+"lang": "fr",
+"w": "dans la boîte",
+"s": "La balle est dans la boîte."
+},
+{
+"thing": "x_where_next_to_box",
+"cat": "places (where is the ball)",
+"ar": "جنب الصندوق",
+"en": "à côté de la boîte",
+"eng": "next to the box",
+"lang": "fr",
+"w": "à côté de la boîte",
+"s": "La balle est à côté de la boîte."
+},
+{
+"thing": "x_where_next_to_table",
+"cat": "places (where is the ball)",
+"ar": "جنب الترابيزة",
+"en": "à côté de la table",
+"eng": "next to the table",
+"lang": "fr",
+"w": "à côté de la table",
+"s": "La balle est à côté de la table."
+},
+{
+"thing": "x_bead_red_ball",
+"cat": "pattern beads",
+"ar": "كورة حمرا",
+"en": "le ballon rouge",
+"eng": "red ball",
+"lang": "fr",
+"w": "le ballon rouge",
+"s": "C'est un ballon rouge."
+},
+{
+"thing": "x_bead_blue_cube",
+"cat": "pattern beads",
+"ar": "مكعب أزرق",
+"en": "le cube bleu",
+"eng": "blue cube",
+"lang": "fr",
+"w": "le cube bleu",
+"s": "C'est un cube bleu."
+},
+{
+"thing": "x_bead_yellow_star",
+"cat": "pattern beads",
+"ar": "نجمة صفرا",
+"en": "l'étoile jaune",
+"eng": "yellow star",
+"lang": "fr",
+"w": "l'étoile jaune",
+"s": "C'est une étoile jaune."
+},
+{
+"thing": "x_bead_green_heart",
+"cat": "pattern beads",
+"ar": "قلب أخضر",
+"en": "le cœur vert",
+"eng": "green heart",
+"lang": "fr",
+"w": "le cœur vert",
+"s": "C'est un cœur vert."
+},
+{
+"thing": "x_bead_purple_ring",
+"cat": "pattern beads",
+"ar": "حلقة بنفسجي",
+"en": "l'anneau violet",
+"eng": "purple ring",
+"lang": "fr",
+"w": "l'anneau violet",
+"s": "C'est un anneau violet."
+},
+{
+"thing": "x_bead_orange_drop",
+"cat": "pattern beads",
+"ar": "نقطة برتقالي",
+"en": "la goutte orange",
+"eng": "orange drop",
+"lang": "fr",
+"w": "la goutte orange",
+"s": "C'est une goutte orange."
+},
+{
+"thing": "bunny",
+"cat": "animals",
+"ar": "الأرنب",
+"en": "le lapin",
+"eng": "bunny",
+"lang": "fr",
+"w": "le lapin",
+"s": "C'est un lapin."
+},
+{
+"thing": "cat",
+"cat": "animals",
+"ar": "القطة",
+"en": "le chat",
+"eng": "cat",
+"lang": "fr",
+"w": "le chat",
+"s": "C'est un chat."
+},
+{
+"thing": "dog",
+"cat": "animals",
+"ar": "الكلب",
+"en": "le chien",
+"eng": "dog",
+"lang": "fr",
+"w": "le chien",
+"s": "C'est un chien."
+},
+{
+"thing": "monkey",
+"cat": "animals",
+"ar": "القرد",
+"en": "le singe",
+"eng": "monkey",
+"lang": "fr",
+"w": "le singe",
+"s": "C'est un singe."
+},
+{
+"thing": "cow",
+"cat": "animals",
+"ar": "البقرة",
+"en": "la vache",
+"eng": "cow",
+"lang": "fr",
+"w": "la vache",
+"s": "C'est une vache."
+},
+{
+"thing": "bear",
+"cat": "animals",
+"ar": "الدب",
+"en": "l'ours",
+"eng": "bear",
+"lang": "fr",
+"w": "l'ours",
+"s": "C'est un ours."
+},
+{
+"thing": "mouse",
+"cat": "animals",
+"ar": "الفار",
+"en": "la souris",
+"eng": "mouse",
+"lang": "fr",
+"w": "la souris",
+"s": "C'est une souris."
+},
+{
+"thing": "chick",
+"cat": "animals",
+"ar": "الكتكوت",
+"en": "le poussin",
+"eng": "chick",
+"lang": "fr",
+"w": "le poussin",
+"s": "C'est un poussin."
+},
+{
+"thing": "horse",
+"cat": "animals",
+"ar": "الحصان",
+"en": "le cheval",
+"eng": "horse",
+"lang": "fr",
+"w": "le cheval",
+"s": "C'est un cheval."
+},
+{
+"thing": "hen",
+"cat": "animals",
+"ar": "الفرخة",
+"en": "la poule",
+"eng": "hen",
+"lang": "fr",
+"w": "la poule",
+"s": "C'est une poule."
+},
+{
+"thing": "f_donkey",
+"cat": "animals",
+"ar": "الحمار",
+"en": "l'âne",
+"eng": "donkey",
+"lang": "fr",
+"w": "l'âne",
+"s": "C'est un âne."
+},
+{
+"thing": "f_goat",
+"cat": "animals",
+"ar": "الماعز",
+"en": "la chèvre",
+"eng": "goat",
+"lang": "fr",
+"w": "la chèvre",
+"s": "C'est une chèvre."
+},
+{
+"thing": "j_parrot",
+"cat": "animals",
+"ar": "الببغاء",
+"en": "le perroquet",
+"eng": "parrot",
+"lang": "fr",
+"w": "le perroquet",
+"s": "C'est un perroquet."
+},
+{
+"thing": "f_sheep",
+"cat": "animals",
+"ar": "الخروف",
+"en": "le mouton",
+"eng": "sheep",
+"lang": "fr",
+"w": "le mouton",
+"s": "C'est un mouton."
+},
+{
+"thing": "f_rooster",
+"cat": "animals",
+"ar": "الديك",
+"en": "le coq",
+"eng": "rooster",
+"lang": "fr",
+"w": "le coq",
+"s": "C'est un coq."
+},
+{
+"thing": "j_lion",
+"cat": "animals",
+"ar": "الأسد",
+"en": "le lion",
+"eng": "lion",
+"lang": "fr",
+"w": "le lion",
+"s": "C'est un lion."
+},
+{
+"thing": "j_tiger",
+"cat": "animals",
+"ar": "النمر",
+"en": "le tigre",
+"eng": "tiger",
+"lang": "fr",
+"w": "le tigre",
+"s": "C'est un tigre."
+},
+{
+"thing": "j_elephant",
+"cat": "animals",
+"ar": "الفيل",
+"en": "l'éléphant",
+"eng": "elephant",
+"lang": "fr",
+"w": "l'éléphant",
+"s": "C'est un éléphant."
+},
+{
+"thing": "j_giraffe",
+"cat": "animals",
+"ar": "الزرافة",
+"en": "la girafe",
+"eng": "giraffe",
+"lang": "fr",
+"w": "la girafe",
+"s": "C'est une girafe."
+},
+{
+"thing": "j_zebra",
+"cat": "animals",
+"ar": "الحمار الوحشي",
+"en": "le zèbre",
+"eng": "zebra",
+"lang": "fr",
+"w": "le zèbre",
+"s": "C'est un zèbre."
+},
+{
+"thing": "j_gorilla",
+"cat": "animals",
+"ar": "الغوريلا",
+"en": "le gorille",
+"eng": "gorilla",
+"lang": "fr",
+"w": "le gorille",
+"s": "C'est un gorille."
+},
+{
+"thing": "j_chameleon",
+"cat": "animals",
+"ar": "الحرباية",
+"en": "le caméléon",
+"eng": "chameleon",
+"lang": "fr",
+"w": "le caméléon",
+"s": "C'est un caméléon."
+},
+{
+"thing": "j_frog",
+"cat": "animals",
+"ar": "الضفدع",
+"en": "la grenouille",
+"eng": "frog",
+"lang": "fr",
+"w": "la grenouille",
+"s": "C'est une grenouille."
+},
+{
+"thing": "j_toucan",
+"cat": "animals",
+"ar": "التوكان",
+"en": "le toucan",
+"eng": "toucan",
+"lang": "fr",
+"w": "le toucan",
+"s": "C'est un toucan."
+},
+{
+"thing": "w_penguin",
+"cat": "animals",
+"ar": "البطريق",
+"en": "le pingouin",
+"eng": "penguin",
+"lang": "fr",
+"w": "le pingouin",
+"s": "C'est un pingouin."
+},
+{
+"thing": "w_seal",
+"cat": "animals",
+"ar": "الفقمة",
+"en": "le phoque",
+"eng": "seal",
+"lang": "fr",
+"w": "le phoque",
+"s": "C'est un phoque."
+},
+{
+"thing": "w_reindeer",
+"cat": "animals",
+"ar": "الرنة",
+"en": "le renne",
+"eng": "reindeer",
+"lang": "fr",
+"w": "le renne",
+"s": "C'est un renne."
+},
+{
+"thing": "w_fox",
+"cat": "animals",
+"ar": "الثعلب",
+"en": "le renard",
+"eng": "fox",
+"lang": "fr",
+"w": "le renard",
+"s": "C'est un renard."
+},
+{
+"thing": "d_camel",
+"cat": "animals",
+"ar": "الجمل",
+"en": "le chameau",
+"eng": "camel",
+"lang": "fr",
+"w": "le chameau",
+"s": "C'est un chameau."
+},
+{
+"thing": "d_hawk",
+"cat": "animals",
+"ar": "الصقر",
+"en": "le faucon",
+"eng": "hawk",
+"lang": "fr",
+"w": "le faucon",
+"s": "C'est un faucon."
+},
+{
+"thing": "u_dolphin",
+"cat": "animals",
+"ar": "الدلفين",
+"en": "le dauphin",
+"eng": "dolphin",
+"lang": "fr",
+"w": "le dauphin",
+"s": "C'est un dauphin."
+},
+{
+"thing": "u_turtle",
+"cat": "animals",
+"ar": "السلحفاة",
+"en": "la tortue",
+"eng": "turtle",
+"lang": "fr",
+"w": "la tortue",
+"s": "C'est une tortue."
+},
+{
+"thing": "bee",
+"cat": "animals",
+"ar": "النحلة",
+"en": "l'abeille",
+"eng": "bee",
+"lang": "fr",
+"w": "l'abeille",
+"s": "C'est une abeille."
+},
+{
+"thing": "butterfly",
+"cat": "animals",
+"ar": "الفراشة",
+"en": "le papillon",
+"eng": "butterfly",
+"lang": "fr",
+"w": "le papillon",
+"s": "C'est un papillon."
+},
+{
+"thing": "goose",
+"cat": "animals",
+"ar": "الوزة",
+"en": "l'oie",
+"eng": "goose",
+"lang": "fr",
+"w": "l'oie",
+"s": "C'est une oie."
+},
+{
+"thing": "mallard",
+"cat": "animals",
+"ar": "البطة",
+"en": "le canard",
+"eng": "duck",
+"lang": "fr",
+"w": "le canard",
+"s": "C'est un canard."
+},
+{
+"thing": "pigeon",
+"cat": "animals",
+"ar": "الحمامة",
+"en": "le pigeon",
+"eng": "pigeon",
+"lang": "fr",
+"w": "le pigeon",
+"s": "C'est un pigeon."
+},
+{
+"thing": "peacock",
+"cat": "animals",
+"ar": "الطاووس",
+"en": "le paon",
+"eng": "peacock",
+"lang": "fr",
+"w": "le paon",
+"s": "C'est un paon."
+},
+{
+"thing": "shark",
+"cat": "animals",
+"ar": "القرش",
+"en": "le requin",
+"eng": "shark",
+"lang": "fr",
+"w": "le requin",
+"s": "C'est un requin."
+},
+{
+"thing": "cheetah",
+"cat": "animals",
+"ar": "الفهد",
+"en": "le guépard",
+"eng": "cheetah",
+"lang": "fr",
+"w": "le guépard",
+"s": "C'est un guépard."
+},
+{
+"thing": "croc",
+"cat": "animals",
+"ar": "التمساح",
+"en": "le crocodile",
+"eng": "crocodile",
+"lang": "fr",
+"w": "le crocodile",
+"s": "C'est un crocodile."
+},
+{
+"thing": "iguana",
+"cat": "animals",
+"ar": "السحلية الكبيرة",
+"en": "l'iguane",
+"eng": "iguana",
+"lang": "fr",
+"w": "l'iguane",
+"s": "C'est un iguane."
+},
+{
+"thing": "mantis",
+"cat": "animals",
+"ar": "فرس النبي",
+"en": "la mante religieuse",
+"eng": "mantis",
+"lang": "fr",
+"w": "la mante religieuse",
+"s": "C'est une mante religieuse."
+},
+{
+"thing": "caterpillar",
+"cat": "animals",
+"ar": "اليرقة",
+"en": "la chenille",
+"eng": "caterpillar",
+"lang": "fr",
+"w": "la chenille",
+"s": "C'est une chenille."
+},
+{
+"thing": "trex",
+"cat": "animals",
+"ar": "الديناصور المفترس",
+"en": "le T-rex",
+"eng": "T. rex",
+"lang": "fr",
+"w": "le T-rex",
+"s": "C'est un T-rex."
+},
+{
+"thing": "triceratops",
+"cat": "animals",
+"ar": "الديناصور أبو قرون",
+"en": "le tricératops",
+"eng": "triceratops",
+"lang": "fr",
+"w": "le tricératops",
+"s": "C'est un tricératops."
+},
+{
+"thing": "stego",
+"cat": "animals",
+"ar": "الديناصور أبو شوك",
+"en": "le stégosaure",
+"eng": "stegosaurus",
+"lang": "fr",
+"w": "le stégosaure",
+"s": "C'est un stégosaure."
+},
+{
+"thing": "brachio",
+"cat": "animals",
+"ar": "الديناصور الطويل",
+"en": "le brachiosaure",
+"eng": "brachiosaurus",
+"lang": "fr",
+"w": "le brachiosaure",
+"s": "C'est un brachiosaure."
+},
+{
+"thing": "owl",
+"cat": "animals",
+"ar": "البومة",
+"en": "le hibou",
+"eng": "owl",
+"lang": "fr",
+"w": "le hibou",
+"s": "C'est un hibou."
+},
+{
+"thing": "panda",
+"cat": "animals",
+"ar": "الباندا",
+"en": "le panda",
+"eng": "panda",
+"lang": "fr",
+"w": "le panda",
+"s": "C'est un panda."
+},
+{
+"thing": "u_octopus",
+"cat": "animals",
+"ar": "الأخطبوط",
+"en": "la pieuvre",
+"eng": "octopus",
+"lang": "fr",
+"w": "la pieuvre",
+"s": "C'est une pieuvre."
+},
+{
+"thing": "u_crab",
+"cat": "animals",
+"ar": "السرطان",
+"en": "le crabe",
+"eng": "crab",
+"lang": "fr",
+"w": "le crabe",
+"s": "C'est un crabe."
+},
+{
+"thing": "u_whale",
+"cat": "animals",
+"ar": "الحوت",
+"en": "la baleine",
+"eng": "whale",
+"lang": "fr",
+"w": "la baleine",
+"s": "C'est une baleine."
+},
+{
+"thing": "i_bat",
+"cat": "animals",
+"ar": "الخفاش",
+"en": "la chauve-souris",
+"eng": "bat",
+"lang": "fr",
+"w": "la chauve-souris",
+"s": "C'est une chauve-souris."
+},
+{
+"thing": "i_eagle",
+"cat": "animals",
+"ar": "النسر",
+"en": "l'aigle",
+"eng": "eagle",
+"lang": "fr",
+"w": "l'aigle",
+"s": "C'est un aigle."
+},
+{
+"thing": "i_ostrich",
+"cat": "animals",
+"ar": "النعامة",
+"en": "l'autruche",
+"eng": "ostrich",
+"lang": "fr",
+"w": "l'autruche",
+"s": "C'est une autruche."
+},
+{
+"thing": "i_swan",
+"cat": "animals",
+"ar": "البجعة",
+"en": "le cygne",
+"eng": "swan",
+"lang": "fr",
+"w": "le cygne",
+"s": "C'est un cygne."
+},
+{
+"thing": "i_sparrow",
+"cat": "animals",
+"ar": "العصفورة",
+"en": "le moineau",
+"eng": "sparrow",
+"lang": "fr",
+"w": "le moineau",
+"s": "C'est un moineau."
+},
+{
+"thing": "i_snail",
+"cat": "animals",
+"ar": "الحلزونة",
+"en": "l'escargot",
+"eng": "snail",
+"lang": "fr",
+"w": "l'escargot",
+"s": "C'est un escargot."
+},
+{
+"thing": "i_spider",
+"cat": "animals",
+"ar": "العنكبوت",
+"en": "l'araignée",
+"eng": "spider",
+"lang": "fr",
+"w": "l'araignée",
+"s": "C'est une araignée."
+},
+{
+"thing": "crow",
+"cat": "animals",
+"ar": "الغراب",
+"en": "le corbeau",
+"eng": "crow",
+"lang": "fr",
+"w": "le corbeau",
+"s": "C'est un corbeau."
+},
+{
+"thing": "ladybug",
+"cat": "animals",
+"ar": "الدعسوقة",
+"en": "la coccinelle",
+"eng": "ladybug",
+"lang": "fr",
+"w": "la coccinelle",
+"s": "C'est une coccinelle."
+},
+{
+"thing": "dragonfly",
+"cat": "animals",
+"ar": "اليعسوب",
+"en": "la libellule",
+"eng": "dragonfly",
+"lang": "fr",
+"w": "la libellule",
+"s": "C'est une libellule."
+},
+{
+"thing": "i_flamingo",
+"cat": "animals",
+"ar": "فلامنجو",
+"en": "le flamant rose",
+"eng": "flamingo",
+"lang": "fr",
+"w": "le flamant rose",
+"s": "C'est un flamant rose."
+},
+{
+"thing": "y_eye",
+"cat": "picture pack: body",
+"ar": "عين",
+"en": "l'œil",
+"eng": "eye",
+"lang": "fr",
+"w": "l'œil",
+"s": "C'est un œil."
+},
+{
+"thing": "y_ear",
+"cat": "picture pack: body",
+"ar": "ودن",
+"en": "l'oreille",
+"eng": "ear",
+"lang": "fr",
+"w": "l'oreille",
+"s": "C'est une oreille."
+},
+{
+"thing": "y_nose",
+"cat": "picture pack: body",
+"ar": "أنف",
+"en": "le nez",
+"eng": "nose",
+"lang": "fr",
+"w": "le nez",
+"s": "C'est un nez."
+},
+{
+"thing": "y_mouth",
+"cat": "picture pack: body",
+"ar": "فم",
+"en": "la bouche",
+"eng": "mouth",
+"lang": "fr",
+"w": "la bouche",
+"s": "C'est une bouche."
+},
+{
+"thing": "y_hand",
+"cat": "picture pack: body",
+"ar": "إيد",
+"en": "la main",
+"eng": "hand",
+"lang": "fr",
+"w": "la main",
+"s": "C'est une main."
+},
+{
+"thing": "y_foot",
+"cat": "picture pack: body",
+"ar": "رجل",
+"en": "le pied",
+"eng": "foot",
+"lang": "fr",
+"w": "le pied",
+"s": "C'est un pied."
+},
+{
+"thing": "y_hair",
+"cat": "picture pack: body",
+"ar": "شعر",
+"en": "les cheveux",
+"eng": "hair",
+"lang": "fr",
+"w": "les cheveux",
+"s": "Ce sont des cheveux."
+},
+{
+"thing": "y_tooth",
+"cat": "picture pack: body",
+"ar": "سنة",
+"en": "la dent",
+"eng": "tooth",
+"lang": "fr",
+"w": "la dent",
+"s": "C'est une dent."
+},
+{
+"thing": "y_head",
+"cat": "picture pack: body",
+"ar": "راس",
+"en": "la tête",
+"eng": "head",
+"lang": "fr",
+"w": "la tête",
+"s": "C'est une tête."
+},
+{
+"thing": "y_finger",
+"cat": "picture pack: body",
+"ar": "صباع",
+"en": "le doigt",
+"eng": "finger",
+"lang": "fr",
+"w": "le doigt",
+"s": "C'est un doigt."
+},
+{
+"thing": "y_knee",
+"cat": "picture pack: body",
+"ar": "ركبة",
+"en": "le genou",
+"eng": "knee",
+"lang": "fr",
+"w": "le genou",
+"s": "C'est un genou."
+},
+{
+"thing": "y_belly",
+"cat": "picture pack: body",
+"ar": "بطن",
+"en": "le ventre",
+"eng": "belly",
+"lang": "fr",
+"w": "le ventre",
+"s": "C'est un ventre."
+},
+{
+"thing": "l_shirt",
+"cat": "picture pack: clothes",
+"ar": "قميص",
+"en": "le tee-shirt",
+"eng": "shirt",
+"lang": "fr",
+"w": "le tee-shirt",
+"s": "C'est un tee-shirt."
+},
+{
+"thing": "l_trousers",
+"cat": "picture pack: clothes",
+"ar": "بنطلون",
+"en": "le pantalon",
+"eng": "trousers",
+"lang": "fr",
+"w": "le pantalon",
+"s": "C'est un pantalon."
+},
+{
+"thing": "l_dress",
+"cat": "picture pack: clothes",
+"ar": "فستان",
+"en": "la robe",
+"eng": "dress",
+"lang": "fr",
+"w": "la robe",
+"s": "C'est une robe."
+},
+{
+"thing": "l_hat",
+"cat": "picture pack: clothes",
+"ar": "قبعة",
+"en": "le chapeau",
+"eng": "hat",
+"lang": "fr",
+"w": "le chapeau",
+"s": "C'est un chapeau."
+},
+{
+"thing": "l_socks",
+"cat": "picture pack: clothes",
+"ar": "شراب",
+"en": "les chaussettes",
+"eng": "socks",
+"lang": "fr",
+"w": "les chaussettes",
+"s": "Ce sont des chaussettes."
+},
+{
+"thing": "l_jacket",
+"cat": "picture pack: clothes",
+"ar": "جاكت",
+"en": "la veste",
+"eng": "jacket",
+"lang": "fr",
+"w": "la veste",
+"s": "C'est une veste."
+},
+{
+"thing": "l_scarf",
+"cat": "picture pack: clothes",
+"ar": "وشاح",
+"en": "l'écharpe",
+"eng": "scarf",
+"lang": "fr",
+"w": "l'écharpe",
+"s": "C'est une écharpe."
+},
+{
+"thing": "l_gloves",
+"cat": "picture pack: clothes",
+"ar": "قفاز",
+"en": "les gants",
+"eng": "gloves",
+"lang": "fr",
+"w": "les gants",
+"s": "Ce sont des gants."
+},
+{
+"thing": "l_glasses",
+"cat": "picture pack: clothes",
+"ar": "نضارة",
+"en": "les lunettes",
+"eng": "glasses",
+"lang": "fr",
+"w": "les lunettes",
+"s": "Ce sont des lunettes."
+},
+{
+"thing": "l_cap",
+"cat": "picture pack: clothes",
+"ar": "كاب",
+"en": "la casquette",
+"eng": "cap",
+"lang": "fr",
+"w": "la casquette",
+"s": "C'est une casquette."
+},
+{
+"thing": "l_pajamas",
+"cat": "picture pack: clothes",
+"ar": "بيجامة",
+"en": "le pyjama",
+"eng": "pajamas",
+"lang": "fr",
+"w": "le pyjama",
+"s": "C'est un pyjama."
+},
+{
+"thing": "l_raincoat",
+"cat": "picture pack: clothes",
+"ar": "معطف",
+"en": "l'imperméable",
+"eng": "raincoat",
+"lang": "fr",
+"w": "l'imperméable",
+"s": "C'est un imperméable."
+},
+{
+"thing": "a_mama",
+"cat": "picture pack: family",
+"ar": "ماما",
+"en": "maman",
+"eng": "mom",
+"lang": "fr",
+"w": "maman",
+"s": "C'est ma maman."
+},
+{
+"thing": "a_baba",
+"cat": "picture pack: family",
+"ar": "بابا",
+"en": "papa",
+"eng": "dad",
+"lang": "fr",
+"w": "papa",
+"s": "C'est mon papa."
+},
+{
+"thing": "a_grandma",
+"cat": "picture pack: family",
+"ar": "تيتة",
+"en": "mamie",
+"eng": "grandma",
+"lang": "fr",
+"w": "mamie",
+"s": "C'est ma mamie."
+},
+{
+"thing": "a_grandpa",
+"cat": "picture pack: family",
+"ar": "جدو",
+"en": "papi",
+"eng": "grandpa",
+"lang": "fr",
+"w": "papi",
+"s": "C'est mon papi."
+},
+{
+"thing": "a_baby",
+"cat": "picture pack: family",
+"ar": "طفل",
+"en": "le bébé",
+"eng": "baby",
+"lang": "fr",
+"w": "le bébé",
+"s": "C'est un bébé."
+},
+{
+"thing": "a_brother",
+"cat": "picture pack: family",
+"ar": "أخ",
+"en": "le frère",
+"eng": "brother",
+"lang": "fr",
+"w": "le frère",
+"s": "C'est mon frère."
+},
+{
+"thing": "a_sister",
+"cat": "picture pack: family",
+"ar": "أخت",
+"en": "la sœur",
+"eng": "sister",
+"lang": "fr",
+"w": "la sœur",
+"s": "C'est ma sœur."
+},
+{
+"thing": "a_boy",
+"cat": "picture pack: family",
+"ar": "ولد",
+"en": "le garçon",
+"eng": "boy",
+"lang": "fr",
+"w": "le garçon",
+"s": "C'est un garçon."
+},
+{
+"thing": "a_girl",
+"cat": "picture pack: family",
+"ar": "بنت",
+"en": "la fille",
+"eng": "girl",
+"lang": "fr",
+"w": "la fille",
+"s": "C'est une fille."
+},
+{
+"thing": "a_friends",
+"cat": "picture pack: family",
+"ar": "صحاب",
+"en": "les amis",
+"eng": "friends",
+"lang": "fr",
+"w": "les amis",
+"s": "Ce sont mes amis."
+},
+{
+"thing": "a_family",
+"cat": "picture pack: family",
+"ar": "عيلة",
+"en": "la famille",
+"eng": "family",
+"lang": "fr",
+"w": "la famille",
+"s": "C'est ma famille."
+},
+{
+"thing": "a_uncle",
+"cat": "picture pack: family",
+"ar": "عمو",
+"en": "l'oncle",
+"eng": "uncle",
+"lang": "fr",
+"w": "l'oncle",
+"s": "C'est mon oncle."
+},
+{
+"thing": "o_bread",
+"cat": "picture pack: food",
+"ar": "عيش",
+"en": "le pain",
+"eng": "bread",
+"lang": "fr",
+"w": "le pain",
+"s": "C'est du pain."
+},
+{
+"thing": "o_cheese",
+"cat": "picture pack: food",
+"ar": "جبنة",
+"en": "le fromage",
+"eng": "cheese",
+"lang": "fr",
+"w": "le fromage",
+"s": "C'est du fromage."
+},
+{
+"thing": "o_egg",
+"cat": "picture pack: food",
+"ar": "بيضة",
+"en": "l'œuf",
+"eng": "egg",
+"lang": "fr",
+"w": "l'œuf",
+"s": "C'est un œuf."
+},
+{
+"thing": "o_milk",
+"cat": "picture pack: food",
+"ar": "لبن",
+"en": "le lait",
+"eng": "milk",
+"lang": "fr",
+"w": "le lait",
+"s": "C'est du lait."
+},
+{
+"thing": "o_rice",
+"cat": "picture pack: food",
+"ar": "رز",
+"en": "le riz",
+"eng": "rice",
+"lang": "fr",
+"w": "le riz",
+"s": "C'est du riz."
+},
+{
+"thing": "o_chicken",
+"cat": "picture pack: food",
+"ar": "فراخ",
+"en": "le poulet",
+"eng": "chicken",
+"lang": "fr",
+"w": "le poulet",
+"s": "C'est du poulet."
+},
+{
+"thing": "o_juice",
+"cat": "picture pack: food",
+"ar": "عصير",
+"en": "le jus",
+"eng": "juice",
+"lang": "fr",
+"w": "le jus",
+"s": "C'est du jus."
+},
+{
+"thing": "o_water",
+"cat": "picture pack: food",
+"ar": "مية",
+"en": "l'eau",
+"eng": "water",
+"lang": "fr",
+"w": "l'eau",
+"s": "C'est de l'eau."
+},
+{
+"thing": "o_cookie",
+"cat": "picture pack: food",
+"ar": "بسكوت",
+"en": "le biscuit",
+"eng": "cookie",
+"lang": "fr",
+"w": "le biscuit",
+"s": "C'est un biscuit."
+},
+{
+"thing": "o_honey",
+"cat": "picture pack: food",
+"ar": "عسل",
+"en": "le miel",
+"eng": "honey",
+"lang": "fr",
+"w": "le miel",
+"s": "C'est du miel."
+},
+{
+"thing": "o_soup",
+"cat": "picture pack: food",
+"ar": "شوربة",
+"en": "la soupe",
+"eng": "soup",
+"lang": "fr",
+"w": "la soupe",
+"s": "C'est de la soupe."
+},
+{
+"thing": "o_pizza",
+"cat": "picture pack: food",
+"ar": "بيتزا",
+"en": "la pizza",
+"eng": "pizza",
+"lang": "fr",
+"w": "la pizza",
+"s": "C'est une pizza."
+},
+{
+"thing": "q_kiwi",
+"cat": "picture pack: fruit2",
+"ar": "كيوي",
+"en": "le kiwi",
+"eng": "kiwi",
+"lang": "fr",
+"w": "le kiwi",
+"s": "C'est un kiwi."
+},
+{
+"thing": "q_melon",
+"cat": "picture pack: fruit2",
+"ar": "شمام",
+"en": "le melon",
+"eng": "melon",
+"lang": "fr",
+"w": "le melon",
+"s": "C'est un melon."
+},
+{
+"thing": "q_dates",
+"cat": "picture pack: fruit2",
+"ar": "بلح",
+"en": "les dattes",
+"eng": "dates",
+"lang": "fr",
+"w": "les dattes",
+"s": "Ce sont des dattes."
+},
+{
+"thing": "q_fig",
+"cat": "picture pack: fruit2",
+"ar": "تين",
+"en": "la figue",
+"eng": "fig",
+"lang": "fr",
+"w": "la figue",
+"s": "C'est une figue."
+},
+{
+"thing": "q_apricot",
+"cat": "picture pack: fruit2",
+"ar": "مشمش",
+"en": "l'abricot",
+"eng": "apricot",
+"lang": "fr",
+"w": "l'abricot",
+"s": "C'est un abricot."
+},
+{
+"thing": "q_berries",
+"cat": "picture pack: fruit2",
+"ar": "توت",
+"en": "les baies",
+"eng": "berries",
+"lang": "fr",
+"w": "les baies",
+"s": "Ce sont des baies."
+},
+{
+"thing": "q_plum",
+"cat": "picture pack: fruit2",
+"ar": "برقوق",
+"en": "la prune",
+"eng": "plum",
+"lang": "fr",
+"w": "la prune",
+"s": "C'est une prune."
+},
+{
+"thing": "q_avocado",
+"cat": "picture pack: fruit2",
+"ar": "أفوكادو",
+"en": "l'avocat",
+"eng": "avocado",
+"lang": "fr",
+"w": "l'avocat",
+"s": "C'est un avocat."
+},
+{
+"thing": "q_cherry",
+"cat": "picture pack: fruit2",
+"ar": "كرز",
+"en": "la cerise",
+"eng": "cherry",
+"lang": "fr",
+"w": "la cerise",
+"s": "C'est une cerise."
+},
+{
+"thing": "q_olives",
+"cat": "picture pack: fruit2",
+"ar": "زيتون",
+"en": "les olives",
+"eng": "olives",
+"lang": "fr",
+"w": "les olives",
+"s": "Ce sont des olives."
+},
+{
+"thing": "q_coconut",
+"cat": "picture pack: fruit2",
+"ar": "نارجيل",
+"en": "la noix de coco",
+"eng": "coconut",
+"lang": "fr",
+"w": "la noix de coco",
+"s": "C'est une noix de coco."
+},
+{
+"thing": "i_ant",
+"cat": "picture pack: insects",
+"ar": "نملة",
+"en": "la fourmi",
+"eng": "ant",
+"lang": "fr",
+"w": "la fourmi",
+"s": "C'est une fourmi."
+},
+{
+"thing": "i_fly",
+"cat": "picture pack: insects",
+"ar": "ذبابة",
+"en": "la mouche",
+"eng": "fly",
+"lang": "fr",
+"w": "la mouche",
+"s": "C'est une mouche."
+},
+{
+"thing": "i_worm",
+"cat": "picture pack: insects",
+"ar": "دودة",
+"en": "le ver",
+"eng": "worm",
+"lang": "fr",
+"w": "le ver",
+"s": "C'est un ver."
+},
+{
+"thing": "z_doctor",
+"cat": "picture pack: jobs",
+"ar": "دكتور",
+"en": "le médecin",
+"eng": "doctor",
+"lang": "fr",
+"w": "le médecin",
+"s": "C'est un médecin."
+},
+{
+"thing": "z_teacher",
+"cat": "picture pack: jobs",
+"ar": "مدرس",
+"en": "le professeur",
+"eng": "teacher",
+"lang": "fr",
+"w": "le professeur",
+"s": "C'est un professeur."
+},
+{
+"thing": "z_police",
+"cat": "picture pack: jobs",
+"ar": "شرطي",
+"en": "le policier",
+"eng": "police",
+"lang": "fr",
+"w": "le policier",
+"s": "C'est un policier."
+},
+{
+"thing": "z_firefighter",
+"cat": "picture pack: jobs",
+"ar": "إطفائي",
+"en": "le pompier",
+"eng": "firefighter",
+"lang": "fr",
+"w": "le pompier",
+"s": "C'est un pompier."
+},
+{
+"thing": "z_farmer",
+"cat": "picture pack: jobs",
+"ar": "فلاح",
+"en": "l'agriculteur",
+"eng": "farmer",
+"lang": "fr",
+"w": "l'agriculteur",
+"s": "C'est un agriculteur."
+},
+{
+"thing": "z_cook",
+"cat": "picture pack: jobs",
+"ar": "طباخ",
+"en": "le cuisinier",
+"eng": "cook",
+"lang": "fr",
+"w": "le cuisinier",
+"s": "C'est un cuisinier."
+},
+{
+"thing": "z_driver",
+"cat": "picture pack: jobs",
+"ar": "سواق",
+"en": "le chauffeur",
+"eng": "driver",
+"lang": "fr",
+"w": "le chauffeur",
+"s": "C'est un chauffeur."
+},
+{
+"thing": "z_pilot",
+"cat": "picture pack: jobs",
+"ar": "طيار",
+"en": "le pilote",
+"eng": "pilot",
+"lang": "fr",
+"w": "le pilote",
+"s": "C'est un pilote."
+},
+{
+"thing": "z_nurse",
+"cat": "picture pack: jobs",
+"ar": "ممرضة",
+"en": "l'infirmière",
+"eng": "nurse",
+"lang": "fr",
+"w": "l'infirmière",
+"s": "C'est une infirmière."
+},
+{
+"thing": "z_builder",
+"cat": "picture pack: jobs",
+"ar": "بناء",
+"en": "le maçon",
+"eng": "builder",
+"lang": "fr",
+"w": "le maçon",
+"s": "C'est un maçon."
+},
+{
+"thing": "z_singer",
+"cat": "picture pack: jobs",
+"ar": "مطرب",
+"en": "le chanteur",
+"eng": "singer",
+"lang": "fr",
+"w": "le chanteur",
+"s": "C'est un chanteur."
+},
+{
+"thing": "z_painter",
+"cat": "picture pack: jobs",
+"ar": "رسام",
+"en": "le peintre",
+"eng": "painter",
+"lang": "fr",
+"w": "le peintre",
+"s": "C'est un peintre."
+},
+{
+"thing": "m_drum",
+"cat": "picture pack: music",
+"ar": "طبلة",
+"en": "le tambour",
+"eng": "drum",
+"lang": "fr",
+"w": "le tambour",
+"s": "C'est un tambour."
+},
+{
+"thing": "m_guitar",
+"cat": "picture pack: music",
+"ar": "جيتار",
+"en": "la guitare",
+"eng": "guitar",
+"lang": "fr",
+"w": "la guitare",
+"s": "C'est une guitare."
+},
+{
+"thing": "m_piano",
+"cat": "picture pack: music",
+"ar": "بيانو",
+"en": "le piano",
+"eng": "piano",
+"lang": "fr",
+"w": "le piano",
+"s": "C'est un piano."
+},
+{
+"thing": "m_violin",
+"cat": "picture pack: music",
+"ar": "كمان",
+"en": "le violon",
+"eng": "violin",
+"lang": "fr",
+"w": "le violon",
+"s": "C'est un violon."
+},
+{
+"thing": "m_flute",
+"cat": "picture pack: music",
+"ar": "ناي",
+"en": "la flûte",
+"eng": "flute",
+"lang": "fr",
+"w": "la flûte",
+"s": "C'est une flûte."
+},
+{
+"thing": "m_trumpet",
+"cat": "picture pack: music",
+"ar": "بوق",
+"en": "la trompette",
+"eng": "trumpet",
+"lang": "fr",
+"w": "la trompette",
+"s": "C'est une trompette."
+},
+{
+"thing": "m_tambourine",
+"cat": "picture pack: music",
+"ar": "دف",
+"en": "le tambourin",
+"eng": "tambourine",
+"lang": "fr",
+"w": "le tambourin",
+"s": "C'est un tambourin."
+},
+{
+"thing": "m_oud",
+"cat": "picture pack: music",
+"ar": "عود",
+"en": "l'oud",
+"eng": "oud",
+"lang": "fr",
+"w": "l'oud",
+"s": "C'est un oud."
+},
+{
+"thing": "m_mic",
+"cat": "picture pack: music",
+"ar": "ميكروفون",
+"en": "le micro",
+"eng": "microphone",
+"lang": "fr",
+"w": "le micro",
+"s": "C'est un micro."
+},
+{
+"thing": "m_headphones",
+"cat": "picture pack: music",
+"ar": "سماعة",
+"en": "le casque",
+"eng": "headphones",
+"lang": "fr",
+"w": "le casque",
+"s": "C'est un casque."
+},
+{
+"thing": "m_note",
+"cat": "picture pack: music",
+"ar": "نوتة",
+"en": "la note",
+"eng": "music note",
+"lang": "fr",
+"w": "la note",
+"s": "C'est une note."
+},
+{
+"thing": "m_bell",
+"cat": "picture pack: music",
+"ar": "جرس",
+"en": "la cloche",
+"eng": "bell",
+"lang": "fr",
+"w": "la cloche",
+"s": "C'est une cloche."
+},
+{
+"thing": "e_pencil",
+"cat": "picture pack: school",
+"ar": "قلم",
+"en": "le crayon",
+"eng": "pencil",
+"lang": "fr",
+"w": "le crayon",
+"s": "C'est un crayon."
+},
+{
+"thing": "e_book",
+"cat": "picture pack: school",
+"ar": "كتاب",
+"en": "le livre",
+"eng": "book",
+"lang": "fr",
+"w": "le livre",
+"s": "C'est un livre."
+},
+{
+"thing": "e_notebook",
+"cat": "picture pack: school",
+"ar": "كراسة",
+"en": "le cahier",
+"eng": "notebook",
+"lang": "fr",
+"w": "le cahier",
+"s": "C'est un cahier."
+},
+{
+"thing": "e_scissors",
+"cat": "picture pack: school",
+"ar": "مقص",
+"en": "les ciseaux",
+"eng": "scissors",
+"lang": "fr",
+"w": "les ciseaux",
+"s": "Ce sont des ciseaux."
+},
+{
+"thing": "e_ruler",
+"cat": "picture pack: school",
+"ar": "مسطرة",
+"en": "la règle",
+"eng": "ruler",
+"lang": "fr",
+"w": "la règle",
+"s": "C'est une règle."
+},
+{
+"thing": "e_eraser",
+"cat": "picture pack: school",
+"ar": "أستيكة",
+"en": "la gomme",
+"eng": "eraser",
+"lang": "fr",
+"w": "la gomme",
+"s": "C'est une gomme."
+},
+{
+"thing": "e_crayons",
+"cat": "picture pack: school",
+"ar": "ألوان",
+"en": "les crayons de couleur",
+"eng": "crayons",
+"lang": "fr",
+"w": "les crayons de couleur",
+"s": "Ce sont des crayons de couleur."
+},
+{
+"thing": "e_board",
+"cat": "picture pack: school",
+"ar": "سبورة",
+"en": "le tableau",
+"eng": "board",
+"lang": "fr",
+"w": "le tableau",
+"s": "C'est un tableau."
+},
+{
+"thing": "e_map",
+"cat": "picture pack: school",
+"ar": "خريطة",
+"en": "la carte",
+"eng": "map",
+"lang": "fr",
+"w": "la carte",
+"s": "C'est une carte."
+},
+{
+"thing": "e_glue",
+"cat": "picture pack: school",
+"ar": "صمغ",
+"en": "la colle",
+"eng": "glue",
+"lang": "fr",
+"w": "la colle",
+"s": "C'est une colle."
+},
+{
+"thing": "e_desk",
+"cat": "picture pack: school",
+"ar": "مكتب",
+"en": "le bureau",
+"eng": "desk",
+"lang": "fr",
+"w": "le bureau",
+"s": "C'est un bureau."
+},
+{
+"thing": "e_paper",
+"cat": "picture pack: school",
+"ar": "ورقة",
+"en": "le papier",
+"eng": "paper",
+"lang": "fr",
+"w": "le papier",
+"s": "C'est un papier."
+},
+{
+"thing": "g_sphere",
+"cat": "picture pack: shapes",
+"ar": "كرة",
+"en": "la sphère",
+"eng": "sphere",
+"lang": "fr",
+"w": "la sphère",
+"s": "C'est une sphère."
+},
+{
+"thing": "v_tomato",
+"cat": "picture pack: veg",
+"ar": "طماطم",
+"en": "la tomate",
+"eng": "tomato",
+"lang": "fr",
+"w": "la tomate",
+"s": "C'est une tomate."
+},
+{
+"thing": "v_cucumber",
+"cat": "picture pack: veg",
+"ar": "خيار",
+"en": "le concombre",
+"eng": "cucumber",
+"lang": "fr",
+"w": "le concombre",
+"s": "C'est un concombre."
+},
+{
+"thing": "v_potato",
+"cat": "picture pack: veg",
+"ar": "بطاطس",
+"en": "la pomme de terre",
+"eng": "potato",
+"lang": "fr",
+"w": "la pomme de terre",
+"s": "C'est une pomme de terre."
+},
+{
+"thing": "v_onion",
+"cat": "picture pack: veg",
+"ar": "بصل",
+"en": "l'oignon",
+"eng": "onion",
+"lang": "fr",
+"w": "l'oignon",
+"s": "C'est un oignon."
+},
+{
+"thing": "v_eggplant",
+"cat": "picture pack: veg",
+"ar": "باذنجان",
+"en": "l'aubergine",
+"eng": "eggplant",
+"lang": "fr",
+"w": "l'aubergine",
+"s": "C'est une aubergine."
+},
+{
+"thing": "v_pepper",
+"cat": "picture pack: veg",
+"ar": "فلفل",
+"en": "le poivron",
+"eng": "pepper",
+"lang": "fr",
+"w": "le poivron",
+"s": "C'est un poivron."
+},
+{
+"thing": "v_lettuce",
+"cat": "picture pack: veg",
+"ar": "خس",
+"en": "la salade",
+"eng": "lettuce",
+"lang": "fr",
+"w": "la salade",
+"s": "C'est une salade."
+},
+{
+"thing": "v_broccoli",
+"cat": "picture pack: veg",
+"ar": "بروكلي",
+"en": "le brocoli",
+"eng": "broccoli",
+"lang": "fr",
+"w": "le brocoli",
+"s": "C'est un brocoli."
+},
+{
+"thing": "v_peas",
+"cat": "picture pack: veg",
+"ar": "بسلة",
+"en": "les petits pois",
+"eng": "peas",
+"lang": "fr",
+"w": "les petits pois",
+"s": "Ce sont des petits pois."
+},
+{
+"thing": "v_pumpkin",
+"cat": "picture pack: veg",
+"ar": "قرع",
+"en": "la citrouille",
+"eng": "pumpkin",
+"lang": "fr",
+"w": "la citrouille",
+"s": "C'est une citrouille."
+},
+{
+"thing": "v_garlic",
+"cat": "picture pack: veg",
+"ar": "ثوم",
+"en": "l'ail",
+"eng": "garlic",
+"lang": "fr",
+"w": "l'ail",
+"s": "C'est un ail."
+},
+{
+"thing": "v_mushroom",
+"cat": "picture pack: veg",
+"ar": "فطر",
+"en": "le champignon",
+"eng": "mushroom",
+"lang": "fr",
+"w": "le champignon",
+"s": "C'est un champignon."
+},
+{
+"thing": "t_rain",
+"cat": "picture pack: weather",
+"ar": "مطر",
+"en": "la pluie",
+"eng": "rain",
+"lang": "fr",
+"w": "la pluie",
+"s": "Il pleut."
+},
+{
+"thing": "t_snow",
+"cat": "picture pack: weather",
+"ar": "ثلج",
+"en": "la neige",
+"eng": "snow",
+"lang": "fr",
+"w": "la neige",
+"s": "Il neige."
+},
+{
+"thing": "t_wind",
+"cat": "picture pack: weather",
+"ar": "هوا",
+"en": "le vent",
+"eng": "wind",
+"lang": "fr",
+"w": "le vent",
+"s": "Il y a du vent."
+},
+{
+"thing": "t_thunder",
+"cat": "picture pack: weather",
+"ar": "رعد",
+"en": "le tonnerre",
+"eng": "thunder",
+"lang": "fr",
+"w": "le tonnerre",
+"s": "On entend le tonnerre."
+},
+{
+"thing": "t_lightning",
+"cat": "picture pack: weather",
+"ar": "برق",
+"en": "l'éclair",
+"eng": "lightning",
+"lang": "fr",
+"w": "l'éclair",
+"s": "C'est un éclair."
+},
+{
+"thing": "t_umbrella",
+"cat": "picture pack: weather",
+"ar": "شمسية",
+"en": "le parapluie",
+"eng": "umbrella",
+"lang": "fr",
+"w": "le parapluie",
+"s": "C'est un parapluie."
+},
+{
+"thing": "t_flake",
+"cat": "picture pack: weather",
+"ar": "ندفة",
+"en": "le flocon de neige",
+"eng": "snowflake",
+"lang": "fr",
+"w": "le flocon de neige",
+"s": "C'est un flocon de neige."
+},
+{
+"thing": "t_flower",
+"cat": "picture pack: weather",
+"ar": "زهرة",
+"en": "la fleur",
+"eng": "flower",
+"lang": "fr",
+"w": "la fleur",
+"s": "C'est une fleur."
+},
+{
+"thing": "t_leaves",
+"cat": "picture pack: weather",
+"ar": "أوراق",
+"en": "les feuilles",
+"eng": "leaves",
+"lang": "fr",
+"w": "les feuilles",
+"s": "Ce sont des feuilles."
+},
+{
+"thing": "t_hot",
+"cat": "picture pack: weather",
+"ar": "حر",
+"en": "chaud",
+"eng": "hot",
+"lang": "fr",
+"w": "chaud",
+"s": "Il fait chaud."
+},
+{
+"thing": "t_cold",
+"cat": "picture pack: weather",
+"ar": "برد",
+"en": "froid",
+"eng": "cold",
+"lang": "fr",
+"w": "froid",
+"s": "Il fait froid."
+},
+{
+"thing": "t_mountain",
+"cat": "picture pack: weather",
+"ar": "جبل",
+"en": "la montagne",
+"eng": "mountain",
+"lang": "fr",
+"w": "la montagne",
+"s": "C'est une montagne."
+},
+{
+"thing": "banana",
+"cat": "picture words",
+"ar": "موزة",
+"en": "la banane",
+"eng": "banana",
+"lang": "fr",
+"w": "la banane",
+"s": "C'est une banane."
+},
+{
+"thing": "apple",
+"cat": "picture words",
+"ar": "تفاحة",
+"en": "la pomme",
+"eng": "apple",
+"lang": "fr",
+"w": "la pomme",
+"s": "C'est une pomme."
+},
+{
+"thing": "fish",
+"cat": "picture words",
+"ar": "سمكة",
+"en": "le poisson",
+"eng": "fish",
+"lang": "fr",
+"w": "le poisson",
+"s": "C'est un poisson."
+},
+{
+"thing": "sun",
+"cat": "picture words",
+"ar": "شمس",
+"en": "le soleil",
+"eng": "sun",
+"lang": "fr",
+"w": "le soleil",
+"s": "C'est un soleil."
+},
+{
+"thing": "rose",
+"cat": "picture words",
+"ar": "وردة",
+"en": "la rose",
+"eng": "rose",
+"lang": "fr",
+"w": "la rose",
+"s": "C'est une rose."
+},
+{
+"thing": "pomegranate",
+"cat": "picture words",
+"ar": "رمانة",
+"en": "la grenade",
+"eng": "pomegranate",
+"lang": "fr",
+"w": "la grenade",
+"s": "C'est une grenade."
+},
+{
+"thing": "corn",
+"cat": "picture words",
+"ar": "ذرة",
+"en": "le maïs",
+"eng": "corn",
+"lang": "fr",
+"w": "le maïs",
+"s": "C'est un maïs."
+},
+{
+"thing": "rocket",
+"cat": "picture words",
+"ar": "صاروخ",
+"en": "la fusée",
+"eng": "rocket",
+"lang": "fr",
+"w": "la fusée",
+"s": "C'est une fusée."
+},
+{
+"thing": "plane",
+"cat": "picture words",
+"ar": "طيارة",
+"en": "l'avion",
+"eng": "plane",
+"lang": "fr",
+"w": "l'avion",
+"s": "C'est un avion."
+},
+{
+"thing": "envelope",
+"cat": "picture words",
+"ar": "ظرف",
+"en": "l'enveloppe",
+"eng": "envelope",
+"lang": "fr",
+"w": "l'enveloppe",
+"s": "C'est une enveloppe."
+},
+{
+"thing": "grapes",
+"cat": "picture words",
+"ar": "عنب",
+"en": "le raisin",
+"eng": "grapes",
+"lang": "fr",
+"w": "le raisin",
+"s": "C'est du raisin."
+},
+{
+"thing": "dove",
+"cat": "picture words",
+"ar": "يمامة",
+"en": "la colombe",
+"eng": "dove",
+"lang": "fr",
+"w": "la colombe",
+"s": "C'est une colombe."
+},
+{
+"thing": "j_snake",
+"cat": "picture words",
+"ar": "ثعبان",
+"en": "le serpent",
+"eng": "snake",
+"lang": "fr",
+"w": "le serpent",
+"s": "C'est un serpent."
+},
+{
+"thing": "f_pig",
+"cat": "picture words",
+"ar": "خنزير",
+"en": "le cochon",
+"eng": "pig",
+"lang": "fr",
+"w": "le cochon",
+"s": "C'est un cochon."
+},
+{
+"thing": "u_jelly",
+"cat": "picture words",
+"ar": "قنديل بحر",
+"en": "la méduse",
+"eng": "jellyfish",
+"lang": "fr",
+"w": "la méduse",
+"s": "C'est une méduse."
+},
+{
+"thing": "u_seahorse",
+"cat": "picture words",
+"ar": "حصان بحر",
+"en": "l'hippocampe",
+"eng": "seahorse",
+"lang": "fr",
+"w": "l'hippocampe",
+"s": "C'est un hippocampe."
+},
+{
+"thing": "w_snowman",
+"cat": "picture words",
+"ar": "رجل ثلج",
+"en": "le bonhomme de neige",
+"eng": "snowman",
+"lang": "fr",
+"w": "le bonhomme de neige",
+"s": "C'est un bonhomme de neige."
+},
+{
+"thing": "d_tent",
+"cat": "picture words",
+"ar": "خيمة",
+"en": "la tente",
+"eng": "tent",
+"lang": "fr",
+"w": "la tente",
+"s": "C'est une tente."
+},
+{
+"thing": "d_palm",
+"cat": "picture words",
+"ar": "نخلة",
+"en": "le palmier",
+"eng": "palm",
+"lang": "fr",
+"w": "le palmier",
+"s": "C'est un palmier."
+},
+{
+"thing": "d_cactus",
+"cat": "picture words",
+"ar": "صبار",
+"en": "le cactus",
+"eng": "cactus",
+"lang": "fr",
+"w": "le cactus",
+"s": "C'est un cactus."
+},
+{
+"thing": "d_scorpion",
+"cat": "picture words",
+"ar": "عقرب",
+"en": "le scorpion",
+"eng": "scorpion",
+"lang": "fr",
+"w": "le scorpion",
+"s": "C'est un scorpion."
+},
+{
+"thing": "d_lizard",
+"cat": "picture words",
+"ar": "سحلية",
+"en": "le lézard",
+"eng": "lizard",
+"lang": "fr",
+"w": "le lézard",
+"s": "C'est un lézard."
+},
+{
+"thing": "d_balloon",
+"cat": "picture words",
+"ar": "منطاد",
+"en": "le ballon",
+"eng": "balloon",
+"lang": "fr",
+"w": "le ballon",
+"s": "C'est un ballon."
+},
+{
+"thing": "d_jeep",
+"cat": "picture words",
+"ar": "جيب",
+"en": "la jeep",
+"eng": "jeep",
+"lang": "fr",
+"w": "la jeep",
+"s": "C'est une jeep."
+},
+{
+"thing": "b_castle",
+"cat": "picture words",
+"ar": "قلعة",
+"en": "le château",
+"eng": "castle",
+"lang": "fr",
+"w": "le château",
+"s": "C'est un château."
+},
+{
+"thing": "b_shell",
+"cat": "picture words",
+"ar": "صدفة",
+"en": "le coquillage",
+"eng": "shell",
+"lang": "fr",
+"w": "le coquillage",
+"s": "C'est un coquillage."
+},
+{
+"thing": "b_lighthouse",
+"cat": "picture words",
+"ar": "فنار",
+"en": "le phare",
+"eng": "lighthouse",
+"lang": "fr",
+"w": "le phare",
+"s": "C'est un phare."
+},
+{
+"thing": "h_bed",
+"cat": "picture words",
+"ar": "سرير",
+"en": "le lit",
+"eng": "bed",
+"lang": "fr",
+"w": "le lit",
+"s": "C'est un lit."
+},
+{
+"thing": "h_toothbrush",
+"cat": "picture words",
+"ar": "فرشاة",
+"en": "la brosse à dents",
+"eng": "toothbrush",
+"lang": "fr",
+"w": "la brosse à dents",
+"s": "C'est une brosse à dents."
+},
+{
+"thing": "h_sink",
+"cat": "picture words",
+"ar": "حوض",
+"en": "le lavabo",
+"eng": "sink",
+"lang": "fr",
+"w": "le lavabo",
+"s": "C'est un lavabo."
+},
+{
+"thing": "h_towel",
+"cat": "picture words",
+"ar": "منشفة",
+"en": "la serviette",
+"eng": "towel",
+"lang": "fr",
+"w": "la serviette",
+"s": "C'est une serviette."
+},
+{
+"thing": "h_backpack",
+"cat": "picture words",
+"ar": "شنطة",
+"en": "le sac à dos",
+"eng": "backpack",
+"lang": "fr",
+"w": "le sac à dos",
+"s": "C'est un sac à dos."
+},
+{
+"thing": "h_shoes",
+"cat": "picture words",
+"ar": "جزمة",
+"en": "les chaussures",
+"eng": "shoes",
+"lang": "fr",
+"w": "les chaussures",
+"s": "Ce sont des chaussures."
+},
+{
+"thing": "h_wardrobe",
+"cat": "picture words",
+"ar": "دولاب",
+"en": "l'armoire",
+"eng": "wardrobe",
+"lang": "fr",
+"w": "l'armoire",
+"s": "C'est une armoire."
+},
+{
+"thing": "h_table",
+"cat": "picture words",
+"ar": "ترابيزة",
+"en": "la table",
+"eng": "table",
+"lang": "fr",
+"w": "la table",
+"s": "C'est une table."
+},
+{
+"thing": "h_broom",
+"cat": "picture words",
+"ar": "مكنسة",
+"en": "le balai",
+"eng": "broom",
+"lang": "fr",
+"w": "le balai",
+"s": "C'est un balai."
+},
+{
+"thing": "h_clock",
+"cat": "picture words",
+"ar": "ساعة",
+"en": "l'horloge",
+"eng": "clock",
+"lang": "fr",
+"w": "l'horloge",
+"s": "C'est une horloge."
+},
+{
+"thing": "h_swing",
+"cat": "picture words",
+"ar": "أرجوحة",
+"en": "la balançoire",
+"eng": "swing",
+"lang": "fr",
+"w": "la balançoire",
+"s": "C'est une balançoire."
+},
+{
+"thing": "h_bike",
+"cat": "picture words",
+"ar": "عجلة",
+"en": "le vélo",
+"eng": "bike",
+"lang": "fr",
+"w": "le vélo",
+"s": "C'est un vélo."
+},
+{
+"thing": "h_tree",
+"cat": "picture words",
+"ar": "شجرة",
+"en": "l'arbre",
+"eng": "tree",
+"lang": "fr",
+"w": "l'arbre",
+"s": "C'est un arbre."
+},
+{
+"thing": "c_school",
+"cat": "picture words",
+"ar": "مدرسة",
+"en": "l'école",
+"eng": "school",
+"lang": "fr",
+"w": "l'école",
+"s": "C'est une école."
+},
+{
+"thing": "c_hospital",
+"cat": "picture words",
+"ar": "مستشفى",
+"en": "l'hôpital",
+"eng": "hospital",
+"lang": "fr",
+"w": "l'hôpital",
+"s": "C'est un hôpital."
+},
+{
+"thing": "c_light",
+"cat": "picture words",
+"ar": "إشارة",
+"en": "la lumière",
+"eng": "light",
+"lang": "fr",
+"w": "la lumière",
+"s": "C'est une lumière."
+},
+{
+"thing": "c_fountain",
+"cat": "picture words",
+"ar": "نافورة",
+"en": "la fontaine",
+"eng": "fountain",
+"lang": "fr",
+"w": "la fontaine",
+"s": "C'est une fontaine."
+},
+{
+"thing": "c_skyscraper",
+"cat": "picture words",
+"ar": "عمارة",
+"en": "le gratte-ciel",
+"eng": "skyscraper",
+"lang": "fr",
+"w": "le gratte-ciel",
+"s": "C'est un gratte-ciel."
+},
+{
+"thing": "k_king",
+"cat": "picture words",
+"ar": "ملك",
+"en": "le roi",
+"eng": "king",
+"lang": "fr",
+"w": "le roi",
+"s": "C'est un roi."
+},
+{
+"thing": "k_queen",
+"cat": "picture words",
+"ar": "ملكة",
+"en": "la reine",
+"eng": "queen",
+"lang": "fr",
+"w": "la reine",
+"s": "C'est une reine."
+},
+{
+"thing": "k_dragon",
+"cat": "picture words",
+"ar": "تنين",
+"en": "le dragon",
+"eng": "dragon",
+"lang": "fr",
+"w": "le dragon",
+"s": "C'est un dragon."
+},
+{
+"thing": "k_knight",
+"cat": "picture words",
+"ar": "فارس",
+"en": "le chevalier",
+"eng": "knight",
+"lang": "fr",
+"w": "le chevalier",
+"s": "C'est un chevalier."
+},
+{
+"thing": "k_wizard",
+"cat": "picture words",
+"ar": "ساحر",
+"en": "le magicien",
+"eng": "wizard",
+"lang": "fr",
+"w": "le magicien",
+"s": "C'est un magicien."
+},
+{
+"thing": "k_chest",
+"cat": "picture words",
+"ar": "كنز",
+"en": "le coffre au trésor",
+"eng": "chest",
+"lang": "fr",
+"w": "le coffre au trésor",
+"s": "C'est un coffre au trésor."
+},
+{
+"thing": "s_alien",
+"cat": "picture words",
+"ar": "فضائي",
+"en": "l'extraterrestre",
+"eng": "alien",
+"lang": "fr",
+"w": "l'extraterrestre",
+"s": "C'est un extraterrestre."
+},
+{
+"thing": "s_robot",
+"cat": "picture words",
+"ar": "روبوت",
+"en": "le robot",
+"eng": "robot",
+"lang": "fr",
+"w": "le robot",
+"s": "C'est un robot."
+},
+{
+"thing": "s_moon",
+"cat": "picture words",
+"ar": "قمر",
+"en": "la lune",
+"eng": "moon",
+"lang": "fr",
+"w": "la lune",
+"s": "C'est une lune."
+},
+{
+"thing": "s_ringplanet",
+"cat": "picture words",
+"ar": "كوكب",
+"en": "la planète à anneaux",
+"eng": "ringed planet",
+"lang": "fr",
+"w": "la planète à anneaux",
+"s": "C'est une planète à anneaux."
+},
+{
+"thing": "r_balloons",
+"cat": "picture words",
+"ar": "بالون",
+"en": "les ballons",
+"eng": "balloons",
+"lang": "fr",
+"w": "les ballons",
+"s": "Ce sont des ballons."
+},
+{
+"thing": "r_cloud",
+"cat": "picture words",
+"ar": "سحابة",
+"en": "le nuage",
+"eng": "cloud",
+"lang": "fr",
+"w": "le nuage",
+"s": "C'est un nuage."
+},
+{
+"thing": "r_candy",
+"cat": "picture words",
+"ar": "حلوى",
+"en": "le bonbon",
+"eng": "candy",
+"lang": "fr",
+"w": "le bonbon",
+"s": "C'est un bonbon."
+},
+{
+"thing": "r_cupcake",
+"cat": "picture words",
+"ar": "كعكة",
+"en": "le cupcake",
+"eng": "cupcake",
+"lang": "fr",
+"w": "le cupcake",
+"s": "C'est un cupcake."
+},
+{
+"thing": "carrot",
+"cat": "animal foods",
+"ar": "جزرة",
+"en": "la carotte",
+"eng": "carrot",
+"lang": "fr",
+"w": "la carotte",
+"s": "C'est une carotte."
+},
+{
+"thing": "grass",
+"cat": "animal foods",
+"ar": "حشيش",
+"en": "l'herbe",
+"eng": "grass",
+"lang": "fr",
+"w": "l'herbe",
+"s": "C'est de l'herbe."
+},
+{
+"thing": "bone",
+"cat": "animal foods",
+"ar": "عضمة",
+"en": "l'os",
+"eng": "bone",
+"lang": "fr",
+"w": "l'os",
+"s": "C'est un os."
+},
+{
+"thing": "o_chicken",
+"cat": "animal foods",
+"ar": "لحمة",
+"en": "la viande",
+"eng": "meat",
+"lang": "fr",
+"w": "la viande",
+"s": "C'est de la viande."
+},
+{
+"thing": "f_haypile",
+"cat": "animal foods",
+"ar": "تبن",
+"en": "le foin",
+"eng": "hay",
+"lang": "fr",
+"w": "le foin",
+"s": "C'est du foin."
+},
+{
+"thing": "seeds",
+"cat": "animal foods",
+"ar": "حَب",
+"en": "les graines",
+"eng": "seeds",
+"lang": "fr",
+"w": "les graines",
+"s": "Ce sont des graines."
+},
+{
+"thing": "x_caterpillar",
+"cat": "animal foods",
+"en": "l'insecte",
+"eng": "insect",
+"lang": "fr",
+"w": "l'insecte",
+"s": "C'est un insecte."
+},
+{
+"thing": "strawberry",
+"cat": "things of a colour",
+"ar": "فراولة",
+"en": "la fraise",
+"eng": "strawberry",
+"lang": "fr",
+"w": "la fraise",
+"s": "C'est une fraise."
+},
+{
+"thing": "firetruck",
+"cat": "things of a colour",
+"ar": "عربية مطافي",
+"en": "le camion de pompiers",
+"eng": "fire truck",
+"lang": "fr",
+"w": "le camion de pompiers",
+"s": "C'est un camion de pompiers."
+},
+{
+"thing": "sunflower_1",
+"cat": "things of a colour",
+"ar": "عباد الشمس",
+"en": "le tournesol",
+"eng": "sunflower",
+"lang": "fr",
+"w": "le tournesol",
+"s": "C'est un tournesol."
+},
+{
+"thing": "j_leaf",
+"cat": "things of a colour",
+"ar": "ورقة شجر",
+"en": "la feuille",
+"eng": "leaf",
+"lang": "fr",
+"w": "la feuille",
+"s": "C'est une feuille."
+},
+{
+"thing": "u_tang",
+"cat": "things of a colour",
+"ar": "سمكة زرقا",
+"en": "le poisson bleu",
+"eng": "tang fish",
+"lang": "fr",
+"w": "le poisson bleu",
+"s": "C'est un poisson bleu."
+},
+{
+"thing": "bird_blue",
+"cat": "things of a colour",
+"ar": "عصفور أزرق",
+"en": "l'oiseau bleu",
+"eng": "bluebird",
+"lang": "fr",
+"w": "l'oiseau bleu",
+"s": "C'est un oiseau bleu."
+},
+{
+"thing": "s_blueplanet",
+"cat": "things of a colour",
+"ar": "كوكب أزرق",
+"en": "la planète bleue",
+"eng": "blue planet",
+"lang": "fr",
+"w": "la planète bleue",
+"s": "C'est une planète bleue."
+},
+{
+"thing": "r_cotton",
+"cat": "things of a colour",
+"ar": "غزل البنات",
+"en": "la barbe à papa",
+"eng": "cotton candy",
+"lang": "fr",
+"w": "la barbe à papa",
+"s": "C'est une barbe à papa."
+},
+{
+"thing": "s_pinkplanet",
+"cat": "things of a colour",
+"ar": "كوكب وردي",
+"en": "la planète rose",
+"eng": "pink planet",
+"lang": "fr",
+"w": "la planète rose",
+"s": "C'est une planète rose."
+},
+{
+"thing": "pear",
+"cat": "toys and fruit (sorting)",
+"ar": "كمثرى",
+"en": "la poire",
+"eng": "pear",
+"lang": "fr",
+"w": "la poire",
+"s": "C'est une poire."
+},
+{
+"thing": "watermelon",
+"cat": "toys and fruit (sorting)",
+"ar": "بطيخ",
+"en": "la pastèque",
+"eng": "watermelon",
+"lang": "fr",
+"w": "la pastèque",
+"s": "C'est une pastèque."
+},
+{
+"thing": "teddy",
+"cat": "toys and fruit (sorting)",
+"ar": "دبدوب",
+"en": "l'ours en peluche",
+"eng": "teddy bear",
+"lang": "fr",
+"w": "l'ours en peluche",
+"s": "C'est un ours en peluche."
+},
+{
+"thing": "x_toy_blocks",
+"cat": "toys and fruit (sorting)",
+"ar": "مكعبات",
+"en": "les cubes",
+"eng": "blocks",
+"lang": "fr",
+"w": "les cubes",
+"s": "Ce sont des cubes."
+},
+{
+"thing": "x_yo_yo",
+"cat": "toys and fruit (sorting)",
+"ar": "يويو",
+"en": "le yo-yo",
+"eng": "yo-yo",
+"lang": "fr",
+"w": "le yo-yo",
+"s": "C'est un yo-yo."
+},
+{
+"thing": "car",
+"cat": "toys and fruit (sorting)",
+"ar": "عربية",
+"en": "la voiture",
+"eng": "car",
+"lang": "fr",
+"w": "la voiture",
+"s": "C'est une voiture."
+},
+{
+"thing": "bus",
+"cat": "toys and fruit (sorting)",
+"ar": "أتوبيس",
+"en": "le bus",
+"eng": "bus",
+"lang": "fr",
+"w": "le bus",
+"s": "C'est un bus."
+},
+{
+"thing": "boat",
+"cat": "toys and fruit (sorting)",
+"ar": "مركب",
+"en": "le bateau",
+"eng": "boat",
+"lang": "fr",
+"w": "le bateau",
+"s": "C'est un bateau."
+},
+{
+"thing": "train",
+"cat": "toys and fruit (sorting)",
+"ar": "قطر",
+"en": "le train",
+"eng": "train",
+"lang": "fr",
+"w": "le train",
+"s": "C'est un train."
+},
+{
+"cat": "letters (French only)",
+"ch": "Éé",
+"en": "É",
+"eng": "letter é",
+"lang": "fr",
+"w": "É",
+"s": "É comme école."
+},
+{
+"cat": "letters (French only)",
+"ch": "Èè",
+"en": "È",
+"eng": "letter è",
+"lang": "fr",
+"w": "È",
+"s": "È comme mère."
+},
+{
+"cat": "letters (French only)",
+"ch": "Çç",
+"en": "Ç",
+"eng": "letter ç",
+"lang": "fr",
+"w": "Ç",
+"s": "Ç comme garçon."
+},
+{
+"cat": "letters (French only)",
+"ch": "Êê",
+"en": "Ê",
+"eng": "letter ê",
+"lang": "fr",
+"w": "Ê",
+"s": "Ê comme fête."
+}
+]

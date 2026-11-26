@@ -20,7 +20,7 @@ import { shapeGeo } from '../kit/shapes3d.js';
 import { colorOf } from './colors.js';
 import { NUMBERS } from '../kit/words.js';
 import { LEVELS, ALL_LEVELS, EVERY_LEVEL, ARABIC_LEVELS, TOPIC_LEVELS, LevelPlay, levelsFor, cheer } from './levels.js';
-import { EN_LEVELS, DE_LEVELS } from '../english/levels.js';
+import { EN_LEVELS, DE_LEVELS, FR_LEVELS } from '../english/levels.js';
 import { FreshMemory } from './fresh.js';
 import { themeForWorld } from '../kit/themes.js';
 import { ROUNDS } from './sim.js';
@@ -535,10 +535,11 @@ class Game {
   }
 
   /** True while the child learns English (the chooser in the app passes learnLang 'en'); the Arabic world is untouched. */
-  _learnEn() { const l = this.sh.cfg && this.sh.cfg.learnLang; return l === 'en' || l === 'de'; }
+  _learnEn() { const l = this.sh.cfg && this.sh.cfg.learnLang; return l === 'en' || l === 'de' || l === 'fr'; }
+  _learnFr() { return !!(this.sh.cfg && this.sh.cfg.learnLang === 'fr'); }
   _learnDe() { return !!(this.sh.cfg && this.sh.cfg.learnLang === 'de'); }
   /** The levels of the language being learned. */
-  _list() { return this._learnDe() ? DE_LEVELS : this._learnEn() ? EN_LEVELS : ARABIC_LEVELS; }
+  _list() { return this._learnFr() ? FR_LEVELS : this._learnDe() ? DE_LEVELS : this._learnEn() ? EN_LEVELS : ARABIC_LEVELS; }
 
   _levels() {
     const sh = this.sh;
@@ -560,7 +561,7 @@ class Game {
       }, lv.art ? h('i', { class: 'lw-ic' }, h('img', { src: `${sh.base}art/${lv.art.icon}.webp`, alt: '' })) : h('i', {}, locked ? '🔒' : lv.emoji), h('b', {}, this._learnEn() ? String(i + 1) : sh.T.num(i + 1)), h('span', {}, lv.ar), done ? h('u', {}, '⭐') : null);
     });
     const mapArt = this._learnEn() && list[0].art ? `background:linear-gradient(rgba(40,30,90,.10),rgba(40,30,90,.10)),url(${sh.base}art/${list[0].art.map}.webp) center/cover no-repeat;` : '';
-    const oldCard = h('div', { class: 'lk-dim', style: mapArt + 'background-color:rgba(40,30,90,.18)' }, h('div', { class: `lw-card${this._learnEn() ? ' lw-en' : ''}` }, h('div', { class: 'lw-title' }, this._learnDe() ? 'Such ein Spiel aus 🎧' : this._learnEn() ? 'Pick a game 🎧' : sh.t('pick')), h('div', { class: 'lw-grid' }, tiles)));
+    const oldCard = h('div', { class: 'lk-dim', style: mapArt + 'background-color:rgba(40,30,90,.18)' }, h('div', { class: `lw-card${this._learnEn() ? ' lw-en' : ''}` }, h('div', { class: 'lw-title' }, this._learnFr() ? 'Choisis un jeu 🎧' : this._learnDe() ? 'Such ein Spiel aus 🎧' : this._learnEn() ? 'Pick a game 🎧' : sh.t('pick')), h('div', { class: 'lw-grid' }, tiles)));
     if (this._learnEn()) { sh.layer.append(oldCard); this.owl.act('cheer'); this.owl.look(0); return; } // English: its own simple list of levels
     // the owner's picture of the levels page (2026-11-13): shown when its file is there, otherwise the card above
     const topBar = sh.layer.querySelector('.lk-top');
@@ -801,8 +802,8 @@ class Game {
         else this.sh.speak(slow ? r.retry : [r.say[0]]);
       };
       this.sign.style.direction = 'ltr';
-      this.sign.append(this.signText, h('button', { class: 'lw-again lw-hear', 'aria-label': 'Listen again', onclick: hear(false) }, h('b', {}, '🔊'), h('small', {}, this._learnDe() ? 'Hören' : 'Listen')),
-        h('button', { class: 'lw-again lw-hear lw-slow', 'aria-label': 'Listen slowly', onclick: hear(true) }, h('b', {}, '🐢'), h('small', {}, this._learnDe() ? 'Langsam' : 'Slowly')));
+      this.sign.append(this.signText, h('button', { class: 'lw-again lw-hear', 'aria-label': 'Listen again', onclick: hear(false) }, h('b', {}, '🔊'), h('small', {}, this._learnFr() ? 'Écouter' : this._learnDe() ? 'Hören' : 'Listen')),
+        h('button', { class: 'lw-again lw-hear lw-slow', 'aria-label': 'Listen slowly', onclick: hear(true) }, h('b', {}, '🐢'), h('small', {}, this._learnFr() ? 'Lentement' : this._learnDe() ? 'Langsam' : 'Slowly')));
     } else this.sign.append(this.signIcon, this.signText, h('button', { class: 'lw-again', 'aria-label': sh.t('again'), onclick: (e) => { e.stopPropagation(); this._say(); } }, '🔊'));
     sh.layer.append(this.sign);
     sh.sound.setMode('play');
@@ -831,7 +832,7 @@ class Game {
     this.st.setPicks([...this.opts.values()], (id) => this._tap(id));
     this.st.focus = null;
     this.signText.textContent = r.prompt;
-    this.signText.style.direction = r.lang === 'en' || r.lang === 'de' ? 'ltr' : '';
+    this.signText.style.direction = r.lang === 'en' || r.lang === 'de' || r.lang === 'fr' ? 'ltr' : '';
     this.sign.classList.remove('pop');
     void this.sign.offsetWidth;
     this.sign.classList.add('pop');
@@ -899,7 +900,7 @@ ead) also reads every choice aloud, one after the other, and the choice being re
     const seq = [phrase];
     if (r.reward) seq.push(r.reward);
     this.signText.textContent = r.reward ? (r.arWord ? `${r.reward}  ·  ${r.arWord}` : r.reward) : phrase;
-    this.signText.style.direction = (r.lang === 'en' || r.lang === 'de') && r.reward ? 'ltr' : '';
+    this.signText.style.direction = (r.lang === 'en' || r.lang === 'de' || r.lang === 'fr') && r.reward ? 'ltr' : '';
     this.signIcon.textContent = '⭐';
     this._advDone = false;
     const next = () => {
