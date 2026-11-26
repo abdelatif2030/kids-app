@@ -42,6 +42,8 @@ const CSS = `
 .sl-girl{position:absolute;left:32%;bottom:calc(var(--u)*2);height:calc(var(--u)*50);width:calc(var(--u)*50*var(--ar,.6));transform:translateX(-50%);z-index:2;cursor:pointer}
 .sl-girl .base{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .sl-girl .dr{position:absolute;left:50%;top:40%;transform:translateX(-50%);width:72%;height:45%;object-fit:contain;pointer-events:none}
+.sl-girl .arm{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.sl-girl .arm.l{clip-path:inset(43% 67% 35% 15%)}.sl-girl .arm.r{clip-path:inset(43% 15% 35% 67%)}
 .sl-girl .bow{position:absolute;left:58%;top:-2%;width:30%;height:13%;object-fit:contain;pointer-events:none}
 .sl-nail{position:absolute;bottom:34%;width:7%;aspect-ratio:1;border-radius:50%;pointer-events:none;box-shadow:0 0 6px rgba(255,255,255,.8)}
 .sl-panel{position:absolute;right:calc(var(--u)*2);top:calc(var(--u)*17);bottom:calc(var(--u)*2);width:calc(var(--u)*44);z-index:6;display:flex;flex-direction:column;gap:calc(var(--u)*1.8);align-items:center;padding:calc(var(--u)*2);direction:ltr}
@@ -86,7 +88,14 @@ class Game {
     this.girlEl.replaceChildren(h('div', { class: 'gk-shadow' }));
     if (im) { this.girlEl.style.setProperty('--ar', String(im.naturalWidth / im.naturalHeight)); this.girlEl.append(h('img', { class: 'base', src: im.src, draggable: 'false', alt: '' })); }
     else this.girlEl.append(h('div', { style: 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*28)' }, '👧'));
-    if (this.m.dress) { const di = A[`dress_${String(this.m.dress).padStart(2, '0')}`]; if (di) this.girlEl.append(h('img', { class: 'dr', src: di.src, draggable: 'false', alt: '' })); }
+    if (this.m.dress) {
+      const di = A[`dress_${String(this.m.dress).padStart(2, '0')}`];
+      if (di) {
+        this.girlEl.append(h('img', { class: 'dr', src: di.src, draggable: 'false', alt: '' }));
+        // her arms and hands (hands on hips) stay IN FRONT of the dress: the dress picture is wider than her body and used to hide them (owner 2026-11-26)
+        if (im) for (const side of ['l', 'r']) this.girlEl.append(h('img', { class: `arm ${side}`, src: im.src, draggable: 'false', alt: '' }));
+      }
+    }
     if (this.m.bow) { const bi = A[`bow_${String(this.m.bow).padStart(2, '0')}`]; if (bi) this.girlEl.append(h('img', { class: 'bow', src: bi.src, draggable: 'false', alt: '' })); }
     if (this.m.polish) for (const x of [24, 36, 64, 76]) this.girlEl.append(h('div', { class: 'sl-nail', style: `left:${x}%;background:${POLISH[(this.m.polish - 1) % 4]}` }));
   }

@@ -34,8 +34,8 @@ export function drawDoll(c, cx, y0, s, look, t, opts = {}) {
   else if (hs === 'pigtails') { for (const sd of [-1, 1]) { c.beginPath(); c.ellipse(sd * px(24), px(44), px(8), px(22), sd * 0.2, 0, 6.3); c.fill(); } }
   // arms and legs
   c.fillStyle = grad(c, 0, 0, px(8), 0, skin);
-  const arm = (sd) => { c.save(); c.translate(sd * px(21), px(62)); c.rotate(sd * (0.12 + (opts.walk ? walk * 0.35 * sd : 0)) + (opts.wave && sd > 0 ? -2.3 + Math.sin(t * 9) * 0.4 : 0)); c.beginPath(); c.roundRect(-px(5), 0, px(10), px(46), px(5)); c.fill(); c.restore(); };
-  arm(-1); arm(1);
+  const arm = (sd) => { c.save(); c.translate(sd * px(21), px(62)); c.rotate(sd * (-(o.dress ? 0.24 : 0.1) + (opts.walk ? walk * 0.35 * sd : 0)) + (opts.wave && sd > 0 ? -2.3 + Math.sin(t * 9) * 0.4 : 0)); c.beginPath(); c.roundRect(-px(5), 0, px(10), px(46), px(5)); c.fill(); c.restore(); };
+  const drawArms = () => { c.fillStyle = grad(c, 0, 0, px(8), 0, skin); arm(-1); arm(1); }; // called after the clothes: arms and hands stay in front of the dress (owner 2026-11-26)
   const leg = (sd) => { c.save(); c.translate(sd * px(6), px(142)); c.rotate(opts.walk ? -walk * 0.28 * sd : 0); c.beginPath(); c.roundRect(-px(4.5), 0, px(9), px(56), px(4.5)); c.fill(); c.restore(); };
   leg(-1); leg(1);
   // bottom / dress / top
@@ -53,6 +53,20 @@ export function drawDoll(c, cx, y0, s, look, t, opts = {}) {
       else { c.moveTo(-px(16), px(58)); c.lineTo(px(16), px(58)); c.lineTo(px(18), px(100)); c.lineTo(px(38), px(174)); c.lineTo(-px(38), px(174)); c.lineTo(-px(18), px(100)); }
     });
     c.fillStyle = 'rgba(255,255,255,.35)'; c.beginPath(); c.ellipse(-px(5), px(80), px(8), px(12), 0, 0, 6.3); c.fill();
+    // a soft scoop neckline, thin straps, folds in the skirt, a ribbon sash at the waist and a trimmed hem
+    const HEM = { gown: [46, 204], ball: [52, 208], mermaid: [40, 206], mini: [30, 138], wrap: [34, 160], aline: [38, 174] }[st] || [38, 174];
+    c.fillStyle = grad(c, 0, px(54), 0, px(66), skin); c.beginPath(); c.ellipse(0, px(57), px(10.5), px(7), 0, 0, Math.PI); c.fill();
+    c.strokeStyle = shade(col, 0.8); c.lineWidth = px(1.1); c.beginPath(); c.arc(0, px(58.5), px(10.5), 0.05, Math.PI - 0.05); c.stroke();
+    c.lineWidth = px(0.7);
+    for (const k of [-0.75, -0.45, -0.15, 0.15, 0.45, 0.75]) {
+      c.strokeStyle = k < 0 ? 'rgba(255,255,255,.32)' : 'rgba(0,0,0,.09)';
+      c.beginPath(); c.moveTo(k * px(15), px(103)); c.quadraticCurveTo(k * px(HEM[0] * 0.62), px((103 + HEM[1]) / 2), k * px(HEM[0] * 0.95), px(HEM[1] - 3)); c.stroke();
+    }
+    c.fillStyle = shade(col, 0.82); c.beginPath(); c.roundRect(-px(17.5), px(97), px(35), px(5.5), px(2.5)); c.fill();
+    c.fillStyle = 'rgba(255,255,255,.5)'; c.beginPath(); c.roundRect(-px(17.5), px(97), px(35), px(1.8), px(1)); c.fill();
+    c.fillStyle = shade(col, 0.7); for (const sd of [-1, 1]) { c.beginPath(); c.moveTo(0, px(99.5)); c.quadraticCurveTo(sd * px(8), px(92), sd * px(11), px(100)); c.quadraticCurveTo(sd * px(8), px(106), 0, px(99.5)); c.fill(); }
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(0, px(99.5), px(2), 0, 6.3); c.fill();
+    c.strokeStyle = 'rgba(255,255,255,.85)'; c.lineWidth = px(1.2); c.setLineDash([px(1.6), px(2.2)]); c.beginPath(); c.moveTo(-px(HEM[0] * 0.95), px(HEM[1] - 2)); c.quadraticCurveTo(0, px(HEM[1] + 11), px(HEM[0] * 0.95), px(HEM[1] - 2)); c.stroke(); c.setLineDash([]);
     c.strokeStyle = shade(col, 0.7); c.lineWidth = px(1.2); c.beginPath(); c.moveTo(-px(16), px(100)); c.lineTo(px(16), px(100)); c.stroke();
     if (st === 'ball' || st === 'gown') { c.fillStyle = 'rgba(255,255,255,.7)'; for (let k = 0; k < 9; k++) { c.beginPath(); c.arc(px(-20 + (k * 11) % 40), px(120 + (k * 17) % 70), px(1.4), 0, 6.3); c.fill(); } }
   } else {
@@ -63,6 +77,7 @@ export function drawDoll(c, cx, y0, s, look, t, opts = {}) {
     if (top) { bodyTop(top.color); if (top.style === 'hoodie') { c.fillStyle = shade(top.color, 0.85); c.beginPath(); c.ellipse(0, px(58), px(14), px(5), 0, 0, 6.3); c.fill(); } if (top.style === 'sweater') { c.strokeStyle = shade(top.color, 0.75); c.lineWidth = px(0.9); for (let k = 0; k < 4; k++) { c.beginPath(); c.moveTo(-px(16), px(66 + k * 8)); c.lineTo(px(16), px(66 + k * 8)); c.stroke(); } } c.fillStyle = 'rgba(255,255,255,.3)'; c.beginPath(); c.ellipse(-px(5), px(76), px(7), px(10), 0, 0, 6.3); c.fill(); }
     else bodyTop('#ffd8e8');
   }
+  drawArms();
   // shoes
   const sh = get('shoes');
   if (sh) { c.fillStyle = grad(c, 0, px(196), 0, px(210), sh.color); c.strokeStyle = 'rgba(0,0,0,.25)'; c.lineWidth = px(0.8); for (const sd of [-1, 1]) { c.save(); c.translate(sd * px(6), px(198) - (opts.walk ? walk * sd * 3 : 0)); c.beginPath(); if (sh.style === 'boots') c.roundRect(-px(6), -px(14), px(13), px(24), px(3)); else c.roundRect(-px(7), 0, px(15), px(10), px(4)); c.fill(); c.stroke(); if (sh.style === 'heels' || sh.style === 'crystal') { c.fillStyle = sh.color; c.fillRect(px(3), px(8), px(2.5), px(6)); } c.restore(); } }
