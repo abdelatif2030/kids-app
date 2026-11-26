@@ -6,6 +6,7 @@
 import { Puzzle, LEVELS, trace, N, E, S, W, normalizeSave } from './sim.js';
 import { paintBackground, drawBoard, drawTile, drawStar, drawPortal, drawDragon } from './art.js';
 import { Sound } from './audio.js';
+import { View3D } from './view3d.js';
 import { setLang, setGirl, getLang, t, num } from './i18n.js';
 
 const CSS = `
@@ -80,6 +81,7 @@ class Game {
     if (!document.getElementById('fc-style')) document.head.append(h('style', { id: 'fc-style' }, CSS));
     this.root = h('div', { class: 'fc-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
+    this.view = new View3D(); this.root.append(this.view.dom);
     this.cv = h('canvas');
     this.root.append(this.cv);
     this.g = this.cv.getContext('2d');
@@ -113,7 +115,7 @@ class Game {
     this.cv.height = Math.round(this.ch * this.dpr);
     this.u = Math.min(this.cw, this.ch) / 100;
     this.root.style.setProperty('--u', `${this.u}px`);
-    this.bg = paintBackground(this.cv.width, this.cv.height);
+    this.view.setSize(this.cw, this.ch, this.u);
   }
 
   /** Board layout: tile size and top-left corner, the portal above the top-right tile, the dragon below-left. */
@@ -121,7 +123,7 @@ class Game {
     const p = this.p;
     if (!p) return null;
     const { rows, cols } = p.level;
-    const s = Math.min((this.cw * 0.62) / cols, (this.ch * 0.4) / rows, this.u * 26);
+    const s = Math.min((this.cw * 0.62) / cols, (this.ch * 0.56) / rows, this.u * 40);
     const w = s * cols;
     const hh = s * rows;
     const x = (this.cw - w) / 2;
@@ -317,7 +319,7 @@ class Game {
     const time = (now - this.t0) / 1000;
     const g = this.g;
     g.setTransform(1, 0, 0, 1, 0, 0);
-    g.drawImage(this.bg, 0, 0);
+    g.clearRect(0, 0, this.cv.width, this.cv.height);
     g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     if (this.p) this._drawPuzzle(g, dt, time);
     else this._drawMenuScene(g, time);
@@ -332,21 +334,15 @@ class Game {
   }
 
   _drawMenuScene(g, time) {
-    const s = this.u * 30;
-    drawPortal(g, this.cw * 0.68, this.ch * 0.2, s * 0.8, time);
-    drawDragon(g, this.cw * 0.3, this.ch * 0.82, s * 0.9, time);
+    this.view.render({ L: null, p: null, time, tilesInfo: [], litSet: new Set(), dragonPx: [this.cw * 0.3, this.ch * 0.82], travel: null });
   }
 
   _drawPuzzle(g, dt, time) {
     const p = this.p;
     const L = this._layout();
     const { s } = L;
-    drawBoard(g, L.x, L.y, L.w, L.h, s);
-    // the stub of ice from the portal down into the top-right tile, and from the dragon into the bottom-left tile
     const lit = new Set(p.flow.cells.map((x) => `${x.r},${x.c}`));
-    g.strokeStyle = '#bfe0f4'; g.lineWidth = s * 0.26; g.lineCap = 'butt';
-    g.beginPath(); g.moveTo(L.portal[0], L.portal[1] + s * 0.4); g.lineTo(L.portal[0], L.y); g.stroke();
-    drawPortal(g, L.portal[0], L.portal[1], s * 0.75, time, this.travel && this.travel.t > 1 ? Math.min(1, this.travel.t - 1) : 0);
+    const tilesInfo = [];
     for (const row of p.level.tiles) {
       for (const tile of row) {
         const key = `${tile.r},${tile.c}`;
@@ -357,30 +353,28 @@ class Game {
           if (an.a !== undefined) { an.a = Math.min(0, an.a + dt * 14); ang = an.a; if (an.a >= 0) this.anim.delete(key); }
           if (an.shake !== undefined) { an.shake -= dt; ox = Math.sin(an.shake * 60) * s * 0.04; if (an.shake <= 0) this.anim.delete(key); }
         }
-        const cx = L.x + (tile.c + 0.5) * s + ox;
-        const cy = L.y + (tile.r + 0.5) * s;
-        drawTile(g, cx, cy, s, tile, ang, lit.has(key), time);
-        if (tile.star) drawStar(g, cx, cy, s * 0.16, time);
+        tilesInfo.push({ r: tile.r, c: tile.c, mask: tile.mask, locked: tile.locked, star: tile.star, ang, cx: L.x + (tile.c + 0.5) * s + ox, cy: L.y + (tile.r + 0.5) * s });
       }
     }
-    // the dragon: waits on its cloud, then slides along the ice into the portal
+    let trailPx = null;
     if (this.travel) {
       this.travel.t += dt * 0.9;
       const pts = this.travel.pts;
       const k = Math.min(1, this.travel.t);
       const head = Math.floor(k * (pts.length - 1));
-      const trail = [];
-      for (let i = head; i >= Math.max(0, head - 10); i--) trail.push(pts[i]);
-      if (this.travel.t < 1.05) drawDragon(g, 0, 0, s * 1.1, time, trail);
+      trailPx = [];
+      for (let i = head; i >= Math.max(0, head - 14); i--) trailPx.push(pts[i]);
       if (this.travel.t > 1 && !this.travel.portaled) { this.travel.portaled = true; this.sound.play('portal'); }
       if (this.travel.t > 2.1 && !this.travel.done) { this.travel.done = true; this.mode = 'won'; this._winCard(); }
-    } else drawDragon(g, L.dragon[0], L.dragon[1], s * 1.1, time);
+    }
+    this.view.render({ L, tilesInfo, p, time, travel: this.travel, dragonPx: L.dragon, trailPx, litSet: lit });
   }
 
   pause() { this.sound.suspend(); }
 
   dispose() {
     cancelAnimationFrame(this._raf);
+    this.view.dispose();
     clearInterval(this._pill);
     clearTimeout(this._ht);
     this.sound.dispose();

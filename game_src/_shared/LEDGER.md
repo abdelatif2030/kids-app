@@ -44,3 +44,6 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 - castaway_raft: three.js rebuild pushed (ortho-tilted 3D sea, raft, castaway, items, shark, islands). Clip held: still top-down, hero only readable from above, HUD covers raft. TODO: lower camera pitch (EL 52 -> ~38), face the hero toward camera, verify island/shark/landing screens, richer sea (foam trails, rocks, birds). Next: creator_tycoon, fashion_queen, frost_coil.
 - castaway_raft: EL 38deg, hero 1.0. Still marginal (hero face hidden by hat, raft small). Needs bigger raft/hero, visible face, island and shark screens checked before a clip.
 - creator_tycoon: tried a procedural 3D office; the existing generated art (3D-rendered creator, CEO, bin, desks, office pictures) is clearly better, so the rebuild was reverted. Keep art-driven; only polish HUD/panels. Same rule for other art-driven DOM games: do not replace good generated renders with procedural 3D.
+
+## frost_coil (three.js rebuild, WIP)
+- Ortho tilted camera, snowy valley, 3D ice tubes, wooden board, ice dragon. Fog removed (it washed the board out). Clip NOT sent: dragon too small, sky pale, HUD text bars blank in some frames. TODO: bigger dragon, richer sky/aurora, check travel/win screens, record BEFORE/AFTER.
