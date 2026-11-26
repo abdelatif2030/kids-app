@@ -12,26 +12,26 @@ C=c[2]
 D=a.updateHolder(c[5],D)
 B=c[16]
 D.abf.prototype={
-u(d){return new A.rZ("games",this.aKj(d),null)},
+u(d){return new A.q4("games",this.aKj(d),null)},
 aKj(d){var x=$.m().a==="ar",w=x?"\u0623\u0644\u0639\u0627\u0628 \u062a\u0639\u0644\u064a\u0645\u064a\u0629":"Learning games"
 x=x?"\u0623\u0644\u0639\u0627\u0628 \u0644\u0644\u062a\u0633\u0644\u064a\u0629":"Fun games"
-x=A.a([new A.eb("choice_educational",B.bpx,0.325,0.46,w,this.c,36,B.bNR,null),new A.eb("choice_fun",B.bpp,0.335,0.46,x,this.d,36,B.bNS,null)],y.d)
-return A.Db(1.7768331562167907,"assets/games/choice_scene.webp",B.bOz,C.zs,new D.aL8(this),!1,x)}}
+x=A.a([new A.eb("choice_educational",B.bpv,0.325,0.46,w,this.c,36,B.bNO,null),new A.eb("choice_fun",B.bpn,0.335,0.46,x,this.d,36,B.bNP,null)],y.d)
+return A.Db(1.7768331562167907,"assets/games/choice_scene.webp",B.bOw,C.zs,new D.aL8(this),!1,x)}}
 var z=a.updateTypes([])
 D.aL8.prototype={
 $2(d,e){var x,w=null,v=0.075*d,u=C.n.Z(v,44,90)
 v=C.n.Z(v,44,90)
 x=$.m().a==="ar"?"\u0631\u062c\u0648\u0639":"Back"
-return A.a([A.lt(w,A.hi(A.b_(w,B.aoa,C.G,w,w,new A.aF(C.dy,w,A.cp(C.v,3),w,C.P9,w,C.bK),w,w,w,w,w,w,w,w),B.bNQ,this.a.e,40,!1,x),v,w,0.02*d,w,0.03*e,u)],y.e)},
+return A.a([A.lt(w,A.hi(A.b0(w,B.ao8,C.G,w,w,new A.aF(C.dy,w,A.cr(C.v,3),w,C.P9,w,C.bK),w,w,w,w,w,w,w,w),B.bNN,this.a.e,40,!1,x),v,w,0.02*d,w,0.03*e,u)],y.e)},
 $S:186};(function inheritance(){var x=a.inherit
 x(D.abf,A.X)
 x(D.aL8,A.nP)})()
-A.qv(b.typeUniverse,JSON.parse('{"abf":{"X":[],"f":[]}}'))
-var y={d:A.a_("x<eb>"),e:A.a_("x<f>"),a:A.a_("U<o>")};(function constants(){B.aoa=new A.ay(C.pX,30,C.v,null,null)
-B.bpp=new A.p(0.695,0.655)
-B.bpx=new A.p(0.312,0.655)
-B.bNQ=new A.U("choice_back",y.a)
-B.bNR=new A.U("choice_educational",y.a)
-B.bNS=new A.U("choice_fun",y.a)
-B.bOz=new A.U("games_choice",y.a)})()};
-(a=>{a["1TiaAvekYa6kYAnL7rtNhEmm2Zs="]=a.current})($__dart_deferred_initializers__);
+A.qw(b.typeUniverse,JSON.parse('{"abf":{"X":[],"f":[]}}'))
+var y={d:A.a_("x<eb>"),e:A.a_("x<f>"),a:A.a_("U<o>")};(function constants(){B.ao8=new A.ay(C.pX,30,C.v,null,null)
+B.bpn=new A.p(0.695,0.655)
+B.bpv=new A.p(0.312,0.655)
+B.bNN=new A.U("choice_back",y.a)
+B.bNO=new A.U("choice_educational",y.a)
+B.bNP=new A.U("choice_fun",y.a)
+B.bOw=new A.U("games_choice",y.a)})()};
+(a=>{a["8AX4Am+Y8+Bn//TKtpZYWHpq2kM="]=a.current})($__dart_deferred_initializers__);
