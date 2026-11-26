@@ -991,7 +991,8 @@ class Game {
         this.sh.sound.play('tap');
         // Listen: say again EVERYTHING that was said last (the word, the slow word, the praise and the sentence), exactly as the first time;
         // Slowly: the word slowly
-        if (!slow && this._lastQ && this._lastQ.length) this.sh.speak(this._lastQ);
+        if (!slow && r.sayAll) this.sh.speak(r.sayAll); // everything: the Arabic word, the word, slowly, the sentence
+        else if (!slow && this._lastQ && this._lastQ.length) this.sh.speak(this._lastQ);
         else this.sh.speak(slow ? r.retry : (r.sayOnly || [r.say[0]]));
       };
       this.sign.style.direction = 'ltr';

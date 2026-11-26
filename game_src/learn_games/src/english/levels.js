@@ -139,6 +139,8 @@ export function englishRounds(level, age, r, mem, nOpt, rounds) {
       // a NEW word is first said in Arabic (once), then in the language being learned, then slowly (owner 2026-11-27); a missing Arabic clip is skipped
       say: fresh ? [...arSay(e), sayWord(e), saySlow(e)] : [sayWord(e)],
       sayOnly: [sayWord(e)],
+      // the 🔊 Listen button says everything again: the Arabic word, the word, the word slowly and its sentence (owner 2026-11-27)
+      sayAll: [...arSay(e), sayWord(e), saySlow(e), saySentence(e)],
       retry: [saySlow(e)],
       rewardSay: [saySentence(e)],
       review,

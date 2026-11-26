@@ -184,3 +184,17 @@ test('English, German and French sections say the Arabic word first (once), then
   assert.ok(rounds[0].say[0].lang === 'ar' || rounds[0].say[0].lang === 'en'); // an Arabic name first when the word has one
   assert.equal(rounds[0].sayOnly[0].lang, 'en');
 });
+
+test('levels in English, German and French: a new word = Arabic name, the word, the word slowly; Listen again = all of it plus the sentence; a review round says just the word', async () => {
+  const { englishRounds, EN_LEVELS, DE_LEVELS, FR_LEVELS } = await import('../src/english/levels.js');
+  for (const [levels, lang] of [[EN_LEVELS, 'en'], [DE_LEVELS, 'de'], [FR_LEVELS, 'fr']]) {
+    const rounds = englishRounds(levels[0], 5, () => 0.5, null, 3, 8);
+    const fresh = rounds[0], review = rounds[7];
+    const target = (q) => q.filter((x) => x.lang === lang);
+    assert.deepEqual(target(fresh.say).map((x) => !!x.slow), [false, true], `${lang} new word: normal then slow`);
+    assert.ok(fresh.say[0].lang === 'ar' ? fresh.say[0].optional : true, lang);
+    assert.deepEqual(target(fresh.sayAll).map((x) => !!x.slow), [false, true, false], `${lang} listen again: word, slow, sentence`);
+    assert.equal(fresh.sayAll.filter((x) => x.lang === 'ar').length <= 1, true);
+    assert.equal(review.say.length, 1, `${lang} a review round says only the word`);
+  }
+});
