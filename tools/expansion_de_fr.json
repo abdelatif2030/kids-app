@@ -1,0 +1,2842 @@
+[
+{
+"cat": "x:around",
+"en": "starfish",
+"de": "der Seestern",
+"fr": "l'étoile de mer",
+"de_s": "Das ist ein Seestern.",
+"fr_s": "C'est une étoile de mer.",
+"flags": [
+"f"
+]
+},
+{
+"cat": "x:around",
+"en": "pineapple",
+"de": "die Ananas",
+"fr": "l'ananas",
+"de_s": "Das ist eine Ananas.",
+"fr_s": "C'est un ananas.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:around",
+"en": "mango",
+"de": "die Mango",
+"fr": "la mangue",
+"de_s": "Das ist eine Mango.",
+"fr_s": "C'est une mangue.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "ambulance",
+"de": "der Krankenwagen",
+"fr": "l'ambulance",
+"de_s": "Das ist ein Krankenwagen.",
+"fr_s": "C'est une ambulance.",
+"flags": [
+"f"
+]
+},
+{
+"cat": "x:around",
+"en": "police car",
+"de": "das Polizeiauto",
+"fr": "la voiture de police",
+"de_s": "Das ist ein Polizeiauto.",
+"fr_s": "C'est une voiture de police.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "helicopter",
+"de": "der Hubschrauber",
+"fr": "l'hélicoptère",
+"de_s": "Das ist ein Hubschrauber.",
+"fr_s": "C'est un hélicoptère.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:around",
+"en": "school bus",
+"de": "der Schulbus",
+"fr": "le bus scolaire",
+"de_s": "Das ist ein Schulbus.",
+"fr_s": "C'est un bus scolaire.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "city bus",
+"de": "der Stadtbus",
+"fr": "le bus de ville",
+"de_s": "Das ist ein Stadtbus.",
+"fr_s": "C'est un bus de ville.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "taxi",
+"de": "das Taxi",
+"fr": "le taxi",
+"de_s": "Das ist ein Taxi.",
+"fr_s": "C'est un taxi.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "tram",
+"de": "die Straßenbahn",
+"fr": "le tramway",
+"de_s": "Das ist eine Straßenbahn.",
+"fr_s": "C'est un tramway.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "bulldozer",
+"de": "der Bulldozer",
+"fr": "le bulldozer",
+"de_s": "Das ist ein Bulldozer.",
+"fr_s": "C'est un bulldozer.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "felucca",
+"de": "die Feluke",
+"fr": "la felouque",
+"de_s": "Das ist eine Feluke.",
+"fr_s": "C'est une felouque.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "donkey cart",
+"de": "der Eselskarren",
+"fr": "la charrette à âne",
+"de_s": "Das ist ein Eselskarren.",
+"fr_s": "C'est une charrette à âne.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "tractor",
+"de": "der Traktor",
+"fr": "le tracteur",
+"de_s": "Das ist ein Traktor.",
+"fr_s": "C'est un tracteur.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "sled",
+"de": "der Schlitten",
+"fr": "la luge",
+"de_s": "Das ist ein Schlitten.",
+"fr_s": "C'est une luge.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "space rover",
+"de": "das Mondfahrzeug",
+"fr": "le rover spatial",
+"de_s": "Das ist ein Mondfahrzeug.",
+"fr_s": "C'est un rover spatial.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "flying saucer",
+"de": "die fliegende Untertasse",
+"fr": "la soucoupe volante",
+"de_s": "Das ist eine fliegende Untertasse.",
+"fr_s": "C'est une soucoupe volante.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "fence",
+"de": "der Zaun",
+"fr": "la clôture",
+"de_s": "Das ist ein Zaun.",
+"fr_s": "C'est une clôture.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "tulips",
+"de": "die Tulpen",
+"fr": "les tulipes",
+"de_s": "Das sind Tulpen.",
+"fr_s": "Ce sont des tulipes.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:around",
+"en": "bird bath",
+"de": "die Vogeltränke",
+"fr": "le bain d'oiseaux",
+"de_s": "Das ist eine Vogeltränke.",
+"fr_s": "C'est un bain d'oiseaux.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "garden gnome",
+"de": "der Gartenzwerg",
+"fr": "le nain de jardin",
+"de_s": "Das ist ein Gartenzwerg.",
+"fr_s": "C'est un nain de jardin.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "plant",
+"de": "die Pflanze",
+"fr": "la plante",
+"de_s": "Das ist eine Pflanze.",
+"fr_s": "C'est une plante.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "ice cream",
+"de": "das Eis",
+"fr": "la glace",
+"de_s": "Das ist Eis.",
+"fr_s": "C'est de la glace.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:around",
+"en": "lollipop",
+"de": "der Lutscher",
+"fr": "la sucette",
+"de_s": "Das ist ein Lutscher.",
+"fr_s": "C'est une sucette.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "gingerbread house",
+"de": "das Lebkuchenhaus",
+"fr": "la maison en pain d'épices",
+"de_s": "Das ist ein Lebkuchenhaus.",
+"fr_s": "C'est une maison en pain d'épices.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "yellow bird",
+"de": "der gelbe Vogel",
+"fr": "l'oiseau jaune",
+"de_s": "Das ist ein gelbe Vogel.",
+"fr_s": "C'est un oiseau jaune.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:around",
+"en": "rainbow",
+"de": "der Regenbogen",
+"fr": "l'arc-en-ciel",
+"de_s": "Das ist ein Regenbogen.",
+"fr_s": "C'est un arc-en-ciel.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:around",
+"en": "kite",
+"de": "der Drachen",
+"fr": "le cerf-volant",
+"de_s": "Das ist ein Drachen.",
+"fr_s": "C'est un cerf-volant.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "pinwheel",
+"de": "das Windrad",
+"fr": "le moulinet",
+"de_s": "Das ist ein Windrad.",
+"fr_s": "C'est un moulinet.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "clownfish",
+"de": "der Clownfisch",
+"fr": "le poisson-clown",
+"de_s": "Das ist ein Clownfisch.",
+"fr_s": "C'est un poisson-clown.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "yellow fish",
+"de": "der gelbe Fisch",
+"fr": "le poisson jaune",
+"de_s": "Das ist ein gelbe Fisch.",
+"fr_s": "C'est un poisson jaune.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "seagull",
+"de": "die Möwe",
+"fr": "la mouette",
+"de_s": "Das ist eine Möwe.",
+"fr_s": "C'est une mouette.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "beach ball",
+"de": "der Wasserball",
+"fr": "le ballon de plage",
+"de_s": "Das ist ein Wasserball.",
+"fr_s": "C'est un ballon de plage.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "life ring",
+"de": "der Rettungsring",
+"fr": "la bouée",
+"de_s": "Das ist ein Rettungsring.",
+"fr_s": "C'est une bouée.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "beach palm",
+"de": "die Strandpalme",
+"fr": "le palmier de plage",
+"de_s": "Das ist eine Strandpalme.",
+"fr_s": "C'est un palmier de plage.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "small boat",
+"de": "das kleine Boot",
+"fr": "le petit bateau",
+"de_s": "Das ist ein kleine Boot.",
+"fr_s": "C'est un petit bateau.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "dock",
+"de": "der Steg",
+"fr": "le ponton",
+"de_s": "Das ist ein Steg.",
+"fr_s": "C'est un ponton.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "beach chair",
+"de": "der Strandstuhl",
+"fr": "la chaise de plage",
+"de_s": "Das ist ein Strandstuhl.",
+"fr_s": "C'est une chaise de plage.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "rocks",
+"de": "die Felsen",
+"fr": "les rochers",
+"de_s": "Das sind Felsen.",
+"fr_s": "Ce sont des rochers.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:around",
+"en": "seaweed",
+"de": "der Seetang",
+"fr": "les algues",
+"de_s": "Das sind Seetang.",
+"fr_s": "Ce sont des algues.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:around",
+"en": "surfboard",
+"de": "das Surfbrett",
+"fr": "la planche de surf",
+"de_s": "Das ist ein Surfbrett.",
+"fr_s": "C'est une planche de surf.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "bucket",
+"de": "der Eimer",
+"fr": "le seau",
+"de_s": "Das ist ein Eimer.",
+"fr_s": "C'est un seau.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "shipwreck",
+"de": "das Schiffswrack",
+"fr": "l'épave",
+"de_s": "Das ist ein Schiffswrack.",
+"fr_s": "C'est une épave.",
+"flags": [
+"f"
+]
+},
+{
+"cat": "x:around",
+"en": "anchor",
+"de": "der Anker",
+"fr": "l'ancre",
+"de_s": "Das ist ein Anker.",
+"fr_s": "C'est une ancre.",
+"flags": [
+"f"
+]
+},
+{
+"cat": "x:around",
+"en": "clam",
+"de": "die Muschel",
+"fr": "la palourde",
+"de_s": "Das ist eine Muschel.",
+"fr_s": "C'est une palourde.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "sea anemone",
+"de": "die Seeanemone",
+"fr": "l'anémone de mer",
+"de_s": "Das ist eine Seeanemone.",
+"fr_s": "C'est une anémone de mer.",
+"flags": [
+"f"
+]
+},
+{
+"cat": "x:around",
+"en": "puffer fish",
+"de": "der Kugelfisch",
+"fr": "le poisson-globe",
+"de_s": "Das ist ein Kugelfisch.",
+"fr_s": "C'est un poisson-globe.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "small rocket",
+"de": "die kleine Rakete",
+"fr": "la petite fusée",
+"de_s": "Das ist eine kleine Rakete.",
+"fr_s": "C'est une petite fusée.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "space helmet",
+"de": "der Weltraumhelm",
+"fr": "le casque d'astronaute",
+"de_s": "Das ist ein Weltraumhelm.",
+"fr_s": "C'est un casque d'astronaute.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "comet",
+"de": "der Komet",
+"fr": "la comète",
+"de_s": "Das ist ein Komet.",
+"fr_s": "C'est une comète.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "space station",
+"de": "die Raumstation",
+"fr": "la station spatiale",
+"de_s": "Das ist eine Raumstation.",
+"fr_s": "C'est une station spatiale.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "tower",
+"de": "der Turm",
+"fr": "la tour",
+"de_s": "Das ist ein Turm.",
+"fr_s": "C'est une tour.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "princess",
+"de": "die Prinzessin",
+"fr": "la princesse",
+"de_s": "Das ist eine Prinzessin.",
+"fr_s": "C'est une princesse.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "shield",
+"de": "der Schild",
+"fr": "le bouclier",
+"de_s": "Das ist ein Schild.",
+"fr_s": "C'est un bouclier.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "torch",
+"de": "die Fackel",
+"fr": "la torche",
+"de_s": "Das ist eine Fackel.",
+"fr_s": "C'est une torche.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "knight horse",
+"de": "das Pferd des Ritters",
+"fr": "le cheval du chevalier",
+"de_s": "Das ist ein Pferd des Ritters.",
+"fr_s": "C'est un cheval du chevalier.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "jester",
+"de": "der Hofnarr",
+"fr": "le bouffon",
+"de_s": "Das ist ein Hofnarr.",
+"fr_s": "C'est un bouffon.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "cottage",
+"de": "das Häuschen",
+"fr": "la chaumière",
+"de_s": "Das ist ein Häuschen.",
+"fr_s": "C'est une chaumière.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "well",
+"de": "der Brunnen",
+"fr": "le puits",
+"de_s": "Das ist ein Brunnen.",
+"fr_s": "C'est un puits.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "banner",
+"de": "das Banner",
+"fr": "la bannière",
+"de_s": "Das ist ein Banner.",
+"fr_s": "C'est une bannière.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "hut",
+"de": "die Hütte",
+"fr": "la cabane",
+"de_s": "Das ist eine Hütte.",
+"fr_s": "C'est une cabane.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "bridge",
+"de": "die Brücke",
+"fr": "le pont",
+"de_s": "Das ist eine Brücke.",
+"fr_s": "C'est un pont.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "totem",
+"de": "der Totempfahl",
+"fr": "le totem",
+"de_s": "Das ist ein Totempfahl.",
+"fr_s": "C'est un totem.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "silo",
+"de": "das Silo",
+"fr": "le silo",
+"de_s": "Das ist ein Silo.",
+"fr_s": "C'est un silo.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "scarecrow",
+"de": "die Vogelscheuche",
+"fr": "l'épouvantail",
+"de_s": "Das ist eine Vogelscheuche.",
+"fr_s": "C'est un épouvantail.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:around",
+"en": "haystack",
+"de": "der Heuhaufen",
+"fr": "la meule de foin",
+"de_s": "Das ist ein Heuhaufen.",
+"fr_s": "C'est une meule de foin.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "trough",
+"de": "der Futtertrog",
+"fr": "l'abreuvoir",
+"de_s": "Das ist ein Futtertrog.",
+"fr_s": "C'est un abreuvoir.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:around",
+"en": "farm gate",
+"de": "das Hoftor",
+"fr": "le portail de la ferme",
+"de_s": "Das ist ein Hoftor.",
+"fr_s": "C'est un portail de la ferme.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "water pump",
+"de": "die Wasserpumpe",
+"fr": "la pompe à eau",
+"de_s": "Das ist eine Wasserpumpe.",
+"fr_s": "C'est une pompe à eau.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "chicken coop",
+"de": "der Hühnerstall",
+"fr": "le poulailler",
+"de_s": "Das ist ein Hühnerstall.",
+"fr_s": "C'est un poulailler.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "wheelbarrow",
+"de": "die Schubkarre",
+"fr": "la brouette",
+"de_s": "Das ist eine Schubkarre.",
+"fr_s": "C'est une brouette.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "watering can",
+"de": "die Gießkanne",
+"fr": "l'arrosoir",
+"de_s": "Das ist eine Gießkanne.",
+"fr_s": "C'est un arrosoir.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:around",
+"en": "snow cabin",
+"de": "die Schneehütte",
+"fr": "la cabane dans la neige",
+"de_s": "Das ist eine Schneehütte.",
+"fr_s": "C'est une cabane dans la neige.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "skis",
+"de": "die Skier",
+"fr": "les skis",
+"de_s": "Das sind Skier.",
+"fr_s": "Ce sont des skis.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:around",
+"en": "snowballs",
+"de": "die Schneebälle",
+"fr": "les boules de neige",
+"de_s": "Das sind Schneebälle.",
+"fr_s": "Ce sont des boules de neige.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:around",
+"en": "ice block",
+"de": "der Eisblock",
+"fr": "le bloc de glace",
+"de_s": "Das ist ein Eisblock.",
+"fr_s": "C'est un bloc de glace.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "fire station",
+"de": "die Feuerwache",
+"fr": "la caserne de pompiers",
+"de_s": "Das ist eine Feuerwache.",
+"fr_s": "C'est une caserne de pompiers.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "bus stop",
+"de": "die Bushaltestelle",
+"fr": "l'arrêt de bus",
+"de_s": "Das ist eine Bushaltestelle.",
+"fr_s": "C'est un arrêt de bus.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:around",
+"en": "street lamp",
+"de": "die Straßenlaterne",
+"fr": "le lampadaire",
+"de_s": "Das ist eine Straßenlaterne.",
+"fr_s": "C'est un lampadaire.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "bench",
+"de": "die Bank",
+"fr": "le banc",
+"de_s": "Das ist eine Bank.",
+"fr_s": "C'est un banc.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "mailbox",
+"de": "der Briefkasten",
+"fr": "la boîte aux lettres",
+"de_s": "Das ist ein Briefkasten.",
+"fr_s": "C'est une boîte aux lettres.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "sand dune",
+"de": "die Sanddüne",
+"fr": "la dune de sable",
+"de_s": "Das ist eine Sanddüne.",
+"fr_s": "C'est une dune de sable.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "oasis",
+"de": "die Oase",
+"fr": "l'oasis",
+"de_s": "Das ist eine Oase.",
+"fr_s": "C'est une oasis.",
+"flags": [
+"f"
+]
+},
+{
+"cat": "x:around",
+"en": "jar",
+"de": "der Krug",
+"fr": "la jarre",
+"de_s": "Das ist ein Krug.",
+"fr_s": "C'est une jarre.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "wooden cart",
+"de": "der Holzkarren",
+"fr": "la charrette en bois",
+"de_s": "Das ist ein Holzkarren.",
+"fr_s": "C'est une charrette en bois.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "lantern",
+"de": "die Laterne",
+"fr": "la lanterne",
+"de_s": "Das ist eine Laterne.",
+"fr_s": "C'est une lanterne.",
+"flags": []
+},
+{
+"cat": "x:around",
+"en": "baby camel",
+"de": "das Kamelbaby",
+"fr": "le bébé chameau",
+"de_s": "Das ist ein Kamelbaby.",
+"fr_s": "C'est un bébé chameau.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "squirrel",
+"de": "das Eichhörnchen",
+"fr": "l'écureuil",
+"de_s": "Das ist ein Eichhörnchen.",
+"fr_s": "C'est un écureuil.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:animals",
+"en": "hedgehog",
+"de": "der Igel",
+"fr": "le hérisson",
+"de_s": "Das ist ein Igel.",
+"fr_s": "C'est un hérisson.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "deer",
+"de": "das Reh",
+"fr": "le cerf",
+"de_s": "Das ist ein Reh.",
+"fr_s": "C'est un cerf.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "wolf",
+"de": "der Wolf",
+"fr": "le loup",
+"de_s": "Das ist ein Wolf.",
+"fr_s": "C'est un loup.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "hippo",
+"de": "das Nilpferd",
+"fr": "l'hippopotame",
+"de_s": "Das ist ein Nilpferd.",
+"fr_s": "C'est un hippopotame.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:animals",
+"en": "rhino",
+"de": "das Nashorn",
+"fr": "le rhinocéros",
+"de_s": "Das ist ein Nashorn.",
+"fr_s": "C'est un rhinocéros.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "kangaroo",
+"de": "das Känguru",
+"fr": "le kangourou",
+"de_s": "Das ist ein Känguru.",
+"fr_s": "C'est un kangourou.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "koala",
+"de": "der Koala",
+"fr": "le koala",
+"de_s": "Das ist ein Koala.",
+"fr_s": "C'est un koala.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "polar bear",
+"de": "der Eisbär",
+"fr": "l'ours polaire",
+"de_s": "Das ist ein Eisbär.",
+"fr_s": "C'est un ours polaire.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:animals",
+"en": "puppy",
+"de": "der Welpe",
+"fr": "le chiot",
+"de_s": "Das ist ein Welpe.",
+"fr_s": "C'est un chiot.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "kitten",
+"de": "das Kätzchen",
+"fr": "le chaton",
+"de_s": "Das ist ein Kätzchen.",
+"fr_s": "C'est un chaton.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "lamb",
+"de": "das Lamm",
+"fr": "l'agneau",
+"de_s": "Das ist ein Lamm.",
+"fr_s": "C'est un agneau.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:animals",
+"en": "calf",
+"de": "das Kalb",
+"fr": "le veau",
+"de_s": "Das ist ein Kalb.",
+"fr_s": "C'est un veau.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "hamster",
+"de": "der Hamster",
+"fr": "le hamster",
+"de_s": "Das ist ein Hamster.",
+"fr_s": "C'est un hamster.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "walrus",
+"de": "das Walross",
+"fr": "le morse",
+"de_s": "Das ist ein Walross.",
+"fr_s": "C'est un morse.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "otter",
+"de": "der Otter",
+"fr": "la loutre",
+"de_s": "Das ist ein Otter.",
+"fr_s": "C'est une loutre.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "beaver",
+"de": "der Biber",
+"fr": "le castor",
+"de_s": "Das ist ein Biber.",
+"fr_s": "C'est un castor.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "raccoon",
+"de": "der Waschbär",
+"fr": "le raton laveur",
+"de_s": "Das ist ein Waschbär.",
+"fr_s": "C'est un raton laveur.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "pelican",
+"de": "der Pelikan",
+"fr": "le pélican",
+"de_s": "Das ist ein Pelikan.",
+"fr_s": "C'est un pélican.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "stork",
+"de": "der Storch",
+"fr": "la cigogne",
+"de_s": "Das ist ein Storch.",
+"fr_s": "C'est une cigogne.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "hummingbird",
+"de": "der Kolibri",
+"fr": "le colibri",
+"de_s": "Das ist ein Kolibri.",
+"fr_s": "C'est un colibri.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "woodpecker",
+"de": "der Specht",
+"fr": "le pic",
+"de_s": "Das ist ein Specht.",
+"fr_s": "C'est un pic.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "lobster",
+"de": "der Hummer",
+"fr": "le homard",
+"de_s": "Das ist ein Hummer.",
+"fr_s": "C'est un homard.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "shrimp",
+"de": "die Garnele",
+"fr": "la crevette",
+"de_s": "Das ist eine Garnele.",
+"fr_s": "C'est une crevette.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "beetle",
+"de": "der Käfer",
+"fr": "le scarabée",
+"de_s": "Das ist ein Käfer.",
+"fr_s": "C'est un scarabée.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "grasshopper",
+"de": "die Heuschrecke",
+"fr": "la sauterelle",
+"de_s": "Das ist eine Heuschrecke.",
+"fr_s": "C'est une sauterelle.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "wasp",
+"de": "die Wespe",
+"fr": "la guêpe",
+"de_s": "Das ist eine Wespe.",
+"fr_s": "C'est une guêpe.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "mosquito",
+"de": "die Mücke",
+"fr": "le moustique",
+"de_s": "Das ist eine Mücke.",
+"fr_s": "C'est un moustique.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "llama",
+"de": "das Lama",
+"fr": "le lama",
+"de_s": "Das ist ein Lama.",
+"fr_s": "C'est un lama.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "leopard",
+"de": "der Leopard",
+"fr": "le léopard",
+"de_s": "Das ist ein Leopard.",
+"fr_s": "C'est un léopard.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "chimpanzee",
+"de": "der Schimpanse",
+"fr": "le chimpanzé",
+"de_s": "Das ist ein Schimpanse.",
+"fr_s": "C'est un chimpanzé.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "sloth",
+"de": "das Faultier",
+"fr": "le paresseux",
+"de_s": "Das ist ein Faultier.",
+"fr_s": "C'est un paresseux.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "squid",
+"de": "der Tintenfisch",
+"fr": "le calmar",
+"de_s": "Das ist ein Tintenfisch.",
+"fr_s": "C'est un calmar.",
+"flags": []
+},
+{
+"cat": "x:animals",
+"en": "meerkat",
+"de": "das Erdmännchen",
+"fr": "le suricate",
+"de_s": "Das ist ein Erdmännchen.",
+"fr_s": "C'est un suricate.",
+"flags": []
+},
+{
+"cat": "x:family",
+"en": "happy",
+"de": "glücklich",
+"fr": "heureux",
+"de_s": "Ich bin glücklich.",
+"fr_s": "Je suis heureux.",
+"flags": [
+"feel:Ich bin glücklich.:Je suis heureux."
+]
+},
+{
+"cat": "x:family",
+"en": "sad",
+"de": "traurig",
+"fr": "triste",
+"de_s": "Ich bin traurig.",
+"fr_s": "Je suis triste.",
+"flags": [
+"feel:Ich bin traurig.:Je suis triste."
+]
+},
+{
+"cat": "x:family",
+"en": "angry",
+"de": "wütend",
+"fr": "en colère",
+"de_s": "Ich bin wütend.",
+"fr_s": "Je suis en colère.",
+"flags": [
+"feel:Ich bin wütend.:Je suis en colère."
+]
+},
+{
+"cat": "x:family",
+"en": "tired",
+"de": "müde",
+"fr": "fatigué",
+"de_s": "Ich bin müde.",
+"fr_s": "Je suis fatigué.",
+"flags": [
+"feel:Ich bin müde.:Je suis fatigué."
+]
+},
+{
+"cat": "x:family",
+"en": "hungry",
+"de": "hungrig",
+"fr": "la faim",
+"de_s": "Ich habe Hunger.",
+"fr_s": "J'ai faim.",
+"flags": [
+"feel:Ich habe Hunger.:J'ai faim."
+]
+},
+{
+"cat": "x:family",
+"en": "thirsty",
+"de": "durstig",
+"fr": "la soif",
+"de_s": "Ich habe Durst.",
+"fr_s": "J'ai soif.",
+"flags": [
+"feel:Ich habe Durst.:J'ai soif."
+]
+},
+{
+"cat": "x:family",
+"en": "scared",
+"de": "ängstlich",
+"fr": "la peur",
+"de_s": "Ich habe Angst.",
+"fr_s": "J'ai peur.",
+"flags": [
+"feel:Ich habe Angst.:J'ai peur."
+]
+},
+{
+"cat": "x:family",
+"en": "surprised",
+"de": "überrascht",
+"fr": "surpris",
+"de_s": "Ich bin überrascht.",
+"fr_s": "Je suis surpris.",
+"flags": [
+"feel:Ich bin überrascht.:Je suis surpris."
+]
+},
+{
+"cat": "x:family",
+"en": "sleepy",
+"de": "schläfrig",
+"fr": "le sommeil",
+"de_s": "Ich bin schläfrig.",
+"fr_s": "J'ai sommeil.",
+"flags": [
+"feel:Ich bin schläfrig.:J'ai sommeil."
+]
+},
+{
+"cat": "x:family",
+"en": "shy",
+"de": "schüchtern",
+"fr": "timide",
+"de_s": "Ich bin schüchtern.",
+"fr_s": "Je suis timide.",
+"flags": [
+"feel:Ich bin schüchtern.:Je suis timide."
+]
+},
+{
+"cat": "x:family",
+"en": "proud",
+"de": "stolz",
+"fr": "fier",
+"de_s": "Ich bin stolz.",
+"fr_s": "Je suis fier.",
+"flags": [
+"feel:Ich bin stolz.:Je suis fier."
+]
+},
+{
+"cat": "x:family",
+"en": "excited",
+"de": "aufgeregt",
+"fr": "excité",
+"de_s": "Ich bin aufgeregt.",
+"fr_s": "Je suis excité.",
+"flags": [
+"feel:Ich bin aufgeregt.:Je suis excité."
+]
+},
+{
+"cat": "x:family",
+"en": "shoulder",
+"de": "die Schulter",
+"fr": "l'épaule",
+"de_s": "Das ist eine Schulter.",
+"fr_s": "C'est une épaule.",
+"flags": [
+"f"
+]
+},
+{
+"cat": "x:family",
+"en": "neck",
+"de": "der Hals",
+"fr": "le cou",
+"de_s": "Das ist ein Hals.",
+"fr_s": "C'est un cou.",
+"flags": []
+},
+{
+"cat": "x:family",
+"en": "arm",
+"de": "der Arm",
+"fr": "le bras",
+"de_s": "Das ist ein Arm.",
+"fr_s": "C'est un bras.",
+"flags": []
+},
+{
+"cat": "x:family",
+"en": "leg",
+"de": "das Bein",
+"fr": "la jambe",
+"de_s": "Das ist ein Bein.",
+"fr_s": "C'est une jambe.",
+"flags": []
+},
+{
+"cat": "x:family",
+"en": "elbow",
+"de": "der Ellbogen",
+"fr": "le coude",
+"de_s": "Das ist ein Ellbogen.",
+"fr_s": "C'est un coude.",
+"flags": []
+},
+{
+"cat": "x:family",
+"en": "back",
+"de": "der Rücken",
+"fr": "le dos",
+"de_s": "Das ist ein Rücken.",
+"fr_s": "C'est un dos.",
+"flags": []
+},
+{
+"cat": "x:family",
+"en": "chin",
+"de": "das Kinn",
+"fr": "le menton",
+"de_s": "Das ist ein Kinn.",
+"fr_s": "C'est un menton.",
+"flags": []
+},
+{
+"cat": "x:family",
+"en": "cheek",
+"de": "die Wange",
+"fr": "la joue",
+"de_s": "Das ist eine Wange.",
+"fr_s": "C'est une joue.",
+"flags": []
+},
+{
+"cat": "x:family",
+"en": "eyebrow",
+"de": "die Augenbraue",
+"fr": "le sourcil",
+"de_s": "Das ist eine Augenbraue.",
+"fr_s": "C'est un sourcil.",
+"flags": []
+},
+{
+"cat": "x:family",
+"en": "tongue",
+"de": "die Zunge",
+"fr": "la langue",
+"de_s": "Das ist eine Zunge.",
+"fr_s": "C'est une langue.",
+"flags": []
+},
+{
+"cat": "x:family",
+"en": "aunt",
+"de": "die Tante",
+"fr": "la tante",
+"de_s": "Das ist eine Tante.",
+"fr_s": "C'est une tante.",
+"flags": []
+},
+{
+"cat": "x:family",
+"en": "cousin",
+"de": "der Cousin",
+"fr": "le cousin",
+"de_s": "Das ist ein Cousin.",
+"fr_s": "C'est un cousin.",
+"flags": []
+},
+{
+"cat": "x:family",
+"en": "twins",
+"de": "die Zwillinge",
+"fr": "les jumeaux",
+"de_s": "Das sind Zwillinge.",
+"fr_s": "Ce sont des jumeaux.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:family",
+"en": "neighbour",
+"de": "der Nachbar",
+"fr": "le voisin",
+"de_s": "Das ist ein Nachbar.",
+"fr_s": "C'est un voisin.",
+"flags": []
+},
+{
+"cat": "x:school",
+"en": "shorts",
+"de": "die Shorts",
+"fr": "les shorts",
+"de_s": "Das sind Shorts.",
+"fr_s": "Ce sont des shorts.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:school",
+"en": "skirt",
+"de": "der Rock",
+"fr": "la jupe",
+"de_s": "Das ist ein Rock.",
+"fr_s": "C'est une jupe.",
+"flags": []
+},
+{
+"cat": "x:school",
+"en": "sweater",
+"de": "der Pullover",
+"fr": "le pull",
+"de_s": "Das ist ein Pullover.",
+"fr_s": "C'est un pull.",
+"flags": []
+},
+{
+"cat": "x:school",
+"en": "boots",
+"de": "die Stiefel",
+"fr": "les bottes",
+"de_s": "Das sind Stiefel.",
+"fr_s": "Ce sont des bottes.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:school",
+"en": "sandals",
+"de": "die Sandalen",
+"fr": "les sandales",
+"de_s": "Das sind Sandalen.",
+"fr_s": "Ce sont des sandales.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:school",
+"en": "t-shirt",
+"de": "das T-Shirt",
+"fr": "le tee-shirt",
+"de_s": "Das ist ein T-Shirt.",
+"fr_s": "C'est un tee-shirt.",
+"flags": []
+},
+{
+"cat": "x:school",
+"en": "coat",
+"de": "der Mantel",
+"fr": "le manteau",
+"de_s": "Das ist ein Mantel.",
+"fr_s": "C'est un manteau.",
+"flags": []
+},
+{
+"cat": "x:school",
+"en": "belt",
+"de": "der Gürtel",
+"fr": "la ceinture",
+"de_s": "Das ist ein Gürtel.",
+"fr_s": "C'est une ceinture.",
+"flags": []
+},
+{
+"cat": "x:world",
+"en": "baker",
+"de": "der Bäcker",
+"fr": "le boulanger",
+"de_s": "Das ist ein Bäcker.",
+"fr_s": "C'est un boulanger.",
+"flags": []
+},
+{
+"cat": "x:world",
+"en": "dentist",
+"de": "der Zahnarzt",
+"fr": "le dentiste",
+"de_s": "Das ist ein Zahnarzt.",
+"fr_s": "C'est un dentiste.",
+"flags": []
+},
+{
+"cat": "x:world",
+"en": "mechanic",
+"de": "der Mechaniker",
+"fr": "le mécanicien",
+"de_s": "Das ist ein Mechaniker.",
+"fr_s": "C'est un mécanicien.",
+"flags": []
+},
+{
+"cat": "x:world",
+"en": "waiter",
+"de": "der Kellner",
+"fr": "le serveur",
+"de_s": "Das ist ein Kellner.",
+"fr_s": "C'est un serveur.",
+"flags": []
+},
+{
+"cat": "x:world",
+"en": "captain",
+"de": "der Kapitän",
+"fr": "le capitaine",
+"de_s": "Das ist ein Kapitän.",
+"fr_s": "C'est un capitaine.",
+"flags": []
+},
+{
+"cat": "x:world",
+"en": "scientist",
+"de": "der Wissenschaftler",
+"fr": "le scientifique",
+"de_s": "Das ist ein Wissenschaftler.",
+"fr_s": "C'est un scientifique.",
+"flags": []
+},
+{
+"cat": "x:world",
+"en": "astronaut",
+"de": "der Astronaut",
+"fr": "l'astronaute",
+"de_s": "Das ist ein Astronaut.",
+"fr_s": "C'est un astronaute.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:world",
+"en": "gardener",
+"de": "der Gärtner",
+"fr": "le jardinier",
+"de_s": "Das ist ein Gärtner.",
+"fr_s": "C'est un jardinier.",
+"flags": []
+},
+{
+"cat": "x:world",
+"en": "fisherman",
+"de": "der Fischer",
+"fr": "le pêcheur",
+"de_s": "Das ist ein Fischer.",
+"fr_s": "C'est un pêcheur.",
+"flags": []
+},
+{
+"cat": "x:world",
+"en": "shopkeeper",
+"de": "der Ladenbesitzer",
+"fr": "le commerçant",
+"de_s": "Das ist ein Ladenbesitzer.",
+"fr_s": "C'est un commerçant.",
+"flags": []
+},
+{
+"cat": "x:world",
+"en": "tailor",
+"de": "der Schneider",
+"fr": "le tailleur",
+"de_s": "Das ist ein Schneider.",
+"fr_s": "C'est un tailleur.",
+"flags": []
+},
+{
+"cat": "x:world",
+"en": "vet",
+"de": "der Tierarzt",
+"fr": "le vétérinaire",
+"de_s": "Das ist ein Tierarzt.",
+"fr_s": "C'est un vétérinaire.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "koshari",
+"de": "das Koshari",
+"fr": "le koshari",
+"de_s": "Das ist Koshari.",
+"fr_s": "C'est du koshari.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "falafel",
+"de": "die Falafel",
+"fr": "les falafels",
+"de_s": "Das sind Falafel.",
+"fr_s": "Ce sont des falafels.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:food",
+"en": "fava beans",
+"de": "die Saubohnen",
+"fr": "les fèves",
+"de_s": "Das sind Saubohnen.",
+"fr_s": "Ce sont des fèves.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:food",
+"en": "molokhia",
+"de": "die Molokhia",
+"fr": "la mouloukhia",
+"de_s": "Das ist Molokhia.",
+"fr_s": "C'est de la mouloukhia.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "feteer",
+"de": "das Feteer",
+"fr": "le feteer",
+"de_s": "Das ist Feteer.",
+"fr_s": "C'est du feteer.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "basbousa",
+"de": "die Basbousa",
+"fr": "la basboussa",
+"de_s": "Das ist Basbousa.",
+"fr_s": "C'est de la basboussa.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "kunafa",
+"de": "die Kunafa",
+"fr": "le kounafa",
+"de_s": "Das ist Kunafa.",
+"fr_s": "C'est du kounafa.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "om ali",
+"de": "das Om Ali",
+"fr": "l'Om Ali",
+"de_s": "Das ist Om Ali.",
+"fr_s": "C'est de l'Om Ali.",
+"flags": [
+"u",
+"m"
+]
+},
+{
+"cat": "x:food",
+"en": "stuffed vine leaves",
+"de": "die gefüllten Weinblätter",
+"fr": "les feuilles de vigne farcies",
+"de_s": "Das sind gefüllten Weinblätter.",
+"fr_s": "Ce sont des feuilles de vigne farcies.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:food",
+"en": "hummus",
+"de": "der Hummus",
+"fr": "le houmous",
+"de_s": "Das ist Hummus.",
+"fr_s": "C'est du houmous.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "tahini",
+"de": "das Tahini",
+"fr": "le tahini",
+"de_s": "Das ist Tahini.",
+"fr_s": "C'est du tahini.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "rice pudding",
+"de": "der Milchreis",
+"fr": "le riz au lait",
+"de_s": "Das ist Milchreis.",
+"fr_s": "C'est du riz au lait.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "burger",
+"de": "der Burger",
+"fr": "le hamburger",
+"de_s": "Das ist ein Burger.",
+"fr_s": "C'est un hamburger.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "sandwich",
+"de": "das Sandwich",
+"fr": "le sandwich",
+"de_s": "Das ist ein Sandwich.",
+"fr_s": "C'est un sandwich.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "spaghetti",
+"de": "die Spaghetti",
+"fr": "les spaghettis",
+"de_s": "Das sind Spaghetti.",
+"fr_s": "Ce sont des spaghettis.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:food",
+"en": "french fries",
+"de": "die Pommes frites",
+"fr": "les frites",
+"de_s": "Das sind Pommes frites.",
+"fr_s": "Ce sont des frites.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:food",
+"en": "salad",
+"de": "der Salat",
+"fr": "la salade",
+"de_s": "Das ist ein Salat.",
+"fr_s": "C'est une salade.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "butter",
+"de": "die Butter",
+"fr": "le beurre",
+"de_s": "Das ist Butter.",
+"fr_s": "C'est du beurre.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "yogurt",
+"de": "der Joghurt",
+"fr": "le yaourt",
+"de_s": "Das ist Joghurt.",
+"fr_s": "C'est du yaourt.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "cake",
+"de": "der Kuchen",
+"fr": "le gâteau",
+"de_s": "Das ist ein Kuchen.",
+"fr_s": "C'est un gâteau.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "chocolate",
+"de": "die Schokolade",
+"fr": "le chocolat",
+"de_s": "Das ist Schokolade.",
+"fr_s": "C'est du chocolat.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "jam",
+"de": "die Marmelade",
+"fr": "la confiture",
+"de_s": "Das ist Marmelade.",
+"fr_s": "C'est de la confiture.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "sugar",
+"de": "der Zucker",
+"fr": "le sucre",
+"de_s": "Das ist Zucker.",
+"fr_s": "C'est du sucre.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "salt",
+"de": "das Salz",
+"fr": "le sel",
+"de_s": "Das ist Salz.",
+"fr_s": "C'est du sel.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "tea",
+"de": "der Tee",
+"fr": "le thé",
+"de_s": "Das ist Tee.",
+"fr_s": "C'est du thé.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "lemonade",
+"de": "die Limonade",
+"fr": "la limonade",
+"de_s": "Das ist eine Limonade.",
+"fr_s": "C'est une limonade.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "cereal",
+"de": "die Cornflakes",
+"fr": "les céréales",
+"de_s": "Das sind Cornflakes.",
+"fr_s": "Ce sont des céréales.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:food",
+"en": "nuts",
+"de": "die Nüsse",
+"fr": "les noix",
+"de_s": "Das sind Nüsse.",
+"fr_s": "Ce sont des noix.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:food",
+"en": "peanuts",
+"de": "die Erdnüsse",
+"fr": "les cacahuètes",
+"de_s": "Das sind Erdnüsse.",
+"fr_s": "Ce sont des cacahuètes.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:food",
+"en": "spinach",
+"de": "der Spinat",
+"fr": "les épinards",
+"de_s": "Das sind Spinat.",
+"fr_s": "Ce sont des épinards.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:food",
+"en": "zucchini",
+"de": "die Zucchini",
+"fr": "la courgette",
+"de_s": "Das ist eine Zucchini.",
+"fr_s": "C'est une courgette.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "cabbage",
+"de": "der Kohl",
+"fr": "le chou",
+"de_s": "Das ist ein Kohl.",
+"fr_s": "C'est un chou.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "cauliflower",
+"de": "der Blumenkohl",
+"fr": "le chou-fleur",
+"de_s": "Das ist ein Blumenkohl.",
+"fr_s": "C'est un chou-fleur.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "okra",
+"de": "die Okra",
+"fr": "le gombo",
+"de_s": "Das ist eine Okra.",
+"fr_s": "C'est un gombo.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "green beans",
+"de": "die grünen Bohnen",
+"fr": "les haricots verts",
+"de_s": "Das sind grünen Bohnen.",
+"fr_s": "Ce sont des haricots verts.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:food",
+"en": "radish",
+"de": "das Radieschen",
+"fr": "le radis",
+"de_s": "Das ist ein Radieschen.",
+"fr_s": "C'est un radis.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "grapefruit",
+"de": "die Grapefruit",
+"fr": "le pamplemousse",
+"de_s": "Das ist eine Grapefruit.",
+"fr_s": "C'est un pamplemousse.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "tangerine",
+"de": "die Mandarine",
+"fr": "la mandarine",
+"de_s": "Das ist eine Mandarine.",
+"fr_s": "C'est une mandarine.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "guava",
+"de": "die Guave",
+"fr": "la goyave",
+"de_s": "Das ist eine Guave.",
+"fr_s": "C'est une goyave.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "lime",
+"de": "die Limette",
+"fr": "le citron vert",
+"de_s": "Das ist eine Limette.",
+"fr_s": "C'est un citron vert.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "pancake",
+"de": "der Pfannkuchen",
+"fr": "la crêpe",
+"de_s": "Das ist ein Pfannkuchen.",
+"fr_s": "C'est une crêpe.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "popcorn",
+"de": "das Popcorn",
+"fr": "le pop-corn",
+"de_s": "Das ist Popcorn.",
+"fr_s": "C'est du pop-corn.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "sausage",
+"de": "die Wurst",
+"fr": "la saucisse",
+"de_s": "Das ist eine Wurst.",
+"fr_s": "C'est une saucisse.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "tuna",
+"de": "der Thunfisch",
+"fr": "le thon",
+"de_s": "Das ist Thunfisch.",
+"fr_s": "C'est du thon.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:food",
+"en": "lentil soup",
+"de": "die Linsensuppe",
+"fr": "la soupe de lentilles",
+"de_s": "Das ist eine Linsensuppe.",
+"fr_s": "C'est une soupe de lentilles.",
+"flags": []
+},
+{
+"cat": "x:food",
+"en": "mango juice",
+"de": "der Mangosaft",
+"fr": "le jus de mangue",
+"de_s": "Das ist Mangosaft.",
+"fr_s": "C'est du jus de mangue.",
+"flags": [
+"u"
+]
+},
+{
+"cat": "x:home",
+"en": "door",
+"de": "die Tür",
+"fr": "la porte",
+"de_s": "Das ist eine Tür.",
+"fr_s": "C'est une porte.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "window",
+"de": "das Fenster",
+"fr": "la fenêtre",
+"de_s": "Das ist ein Fenster.",
+"fr_s": "C'est une fenêtre.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "sofa",
+"de": "das Sofa",
+"fr": "le canapé",
+"de_s": "Das ist ein Sofa.",
+"fr_s": "C'est un canapé.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "kitchen",
+"de": "die Küche",
+"fr": "la cuisine",
+"de_s": "Das ist eine Küche.",
+"fr_s": "C'est une cuisine.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "bathroom",
+"de": "das Badezimmer",
+"fr": "la salle de bain",
+"de_s": "Das ist ein Badezimmer.",
+"fr_s": "C'est une salle de bain.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "bedroom",
+"de": "das Schlafzimmer",
+"fr": "la chambre",
+"de_s": "Das ist ein Schlafzimmer.",
+"fr_s": "C'est une chambre.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "stairs",
+"de": "die Treppe",
+"fr": "l'escalier",
+"de_s": "Das ist eine Treppe.",
+"fr_s": "C'est un escalier.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:home",
+"en": "roof",
+"de": "das Dach",
+"fr": "le toit",
+"de_s": "Das ist ein Dach.",
+"fr_s": "C'est un toit.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "fridge",
+"de": "der Kühlschrank",
+"fr": "le frigo",
+"de_s": "Das ist ein Kühlschrank.",
+"fr_s": "C'est un frigo.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "oven",
+"de": "der Ofen",
+"fr": "le four",
+"de_s": "Das ist ein Ofen.",
+"fr_s": "C'est un four.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "lamp",
+"de": "die Lampe",
+"fr": "la lampe",
+"de_s": "Das ist eine Lampe.",
+"fr_s": "C'est une lampe.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "carpet",
+"de": "der Teppich",
+"fr": "le tapis",
+"de_s": "Das ist ein Teppich.",
+"fr_s": "C'est un tapis.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "mirror",
+"de": "der Spiegel",
+"fr": "le miroir",
+"de_s": "Das ist ein Spiegel.",
+"fr_s": "C'est un miroir.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "curtain",
+"de": "der Vorhang",
+"fr": "le rideau",
+"de_s": "Das ist ein Vorhang.",
+"fr_s": "C'est un rideau.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "key",
+"de": "der Schlüssel",
+"fr": "la clé",
+"de_s": "Das ist ein Schlüssel.",
+"fr_s": "C'est une clé.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "cup",
+"de": "die Tasse",
+"fr": "la tasse",
+"de_s": "Das ist eine Tasse.",
+"fr_s": "C'est une tasse.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "plate",
+"de": "der Teller",
+"fr": "l'assiette",
+"de_s": "Das ist ein Teller.",
+"fr_s": "C'est une assiette.",
+"flags": [
+"f"
+]
+},
+{
+"cat": "x:home",
+"en": "spoon",
+"de": "der Löffel",
+"fr": "la cuillère",
+"de_s": "Das ist ein Löffel.",
+"fr_s": "C'est une cuillère.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "fork",
+"de": "die Gabel",
+"fr": "la fourchette",
+"de_s": "Das ist eine Gabel.",
+"fr_s": "C'est une fourchette.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "knife",
+"de": "das Messer",
+"fr": "le couteau",
+"de_s": "Das ist ein Messer.",
+"fr_s": "C'est un couteau.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "bowl",
+"de": "die Schüssel",
+"fr": "le bol",
+"de_s": "Das ist eine Schüssel.",
+"fr_s": "C'est un bol.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "bottle",
+"de": "die Flasche",
+"fr": "la bouteille",
+"de_s": "Das ist eine Flasche.",
+"fr_s": "C'est une bouteille.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "pot",
+"de": "der Topf",
+"fr": "la casserole",
+"de_s": "Das ist ein Topf.",
+"fr_s": "C'est une casserole.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "soap",
+"de": "die Seife",
+"fr": "le savon",
+"de_s": "Das ist eine Seife.",
+"fr_s": "C'est un savon.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "comb",
+"de": "der Kamm",
+"fr": "le peigne",
+"de_s": "Das ist ein Kamm.",
+"fr_s": "C'est un peigne.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "bin",
+"de": "der Mülleimer",
+"fr": "la poubelle",
+"de_s": "Das ist ein Mülleimer.",
+"fr_s": "C'est une poubelle.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "television",
+"de": "der Fernseher",
+"fr": "la télévision",
+"de_s": "Das ist ein Fernseher.",
+"fr_s": "C'est une télévision.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "phone",
+"de": "das Telefon",
+"fr": "le téléphone",
+"de_s": "Das ist ein Telefon.",
+"fr_s": "C'est un téléphone.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "computer",
+"de": "der Computer",
+"fr": "l'ordinateur",
+"de_s": "Das ist ein Computer.",
+"fr_s": "C'est un ordinateur.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:home",
+"en": "pillow",
+"de": "das Kissen",
+"fr": "l'oreiller",
+"de_s": "Das ist ein Kissen.",
+"fr_s": "C'est un oreiller.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:home",
+"en": "blanket",
+"de": "die Decke",
+"fr": "la couverture",
+"de_s": "Das ist eine Decke.",
+"fr_s": "C'est une couverture.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "chair",
+"de": "der Stuhl",
+"fr": "la chaise",
+"de_s": "Das ist ein Stuhl.",
+"fr_s": "C'est une chaise.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "balcony",
+"de": "der Balkon",
+"fr": "le balcon",
+"de_s": "Das ist ein Balkon.",
+"fr_s": "C'est un balcon.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "garage",
+"de": "die Garage",
+"fr": "le garage",
+"de_s": "Das ist eine Garage.",
+"fr_s": "C'est un garage.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "lift",
+"de": "der Aufzug",
+"fr": "l'ascenseur",
+"de_s": "Das ist ein Aufzug.",
+"fr_s": "C'est un ascenseur.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:home",
+"en": "hall",
+"de": "der Flur",
+"fr": "le couloir",
+"de_s": "Das ist ein Flur.",
+"fr_s": "C'est un couloir.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "toilet",
+"de": "die Toilette",
+"fr": "les toilettes",
+"de_s": "Das sind Toilette.",
+"fr_s": "Ce sont des toilettes.",
+"flags": [
+"pl"
+]
+},
+{
+"cat": "x:home",
+"en": "shower",
+"de": "die Dusche",
+"fr": "la douche",
+"de_s": "Das ist eine Dusche.",
+"fr_s": "C'est une douche.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "bathtub",
+"de": "die Badewanne",
+"fr": "la baignoire",
+"de_s": "Das ist eine Badewanne.",
+"fr_s": "C'est une baignoire.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "washing machine",
+"de": "die Waschmaschine",
+"fr": "la machine à laver",
+"de_s": "Das ist eine Waschmaschine.",
+"fr_s": "C'est une machine à laver.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "vacuum cleaner",
+"de": "der Staubsauger",
+"fr": "l'aspirateur",
+"de_s": "Das ist ein Staubsauger.",
+"fr_s": "C'est un aspirateur.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:home",
+"en": "iron",
+"de": "das Bügeleisen",
+"fr": "le fer à repasser",
+"de_s": "Das ist ein Bügeleisen.",
+"fr_s": "C'est un fer à repasser.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "hanger",
+"de": "der Kleiderbügel",
+"fr": "le cintre",
+"de_s": "Das ist ein Kleiderbügel.",
+"fr_s": "C'est un cintre.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "shelf",
+"de": "das Regal",
+"fr": "l'étagère",
+"de_s": "Das ist ein Regal.",
+"fr_s": "C'est une étagère.",
+"flags": [
+"f"
+]
+},
+{
+"cat": "x:home",
+"en": "drawer",
+"de": "die Schublade",
+"fr": "le tiroir",
+"de_s": "Das ist eine Schublade.",
+"fr_s": "C'est un tiroir.",
+"flags": []
+},
+{
+"cat": "x:home",
+"en": "cupboard",
+"de": "der Schrank",
+"fr": "le placard",
+"de_s": "Das ist ein Schrank.",
+"fr_s": "C'est un placard.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "garden",
+"de": "der Garten",
+"fr": "le jardin",
+"de_s": "Das ist ein Garten.",
+"fr_s": "C'est un jardin.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "park",
+"de": "der Park",
+"fr": "le parc",
+"de_s": "Das ist ein Park.",
+"fr_s": "C'est un parc.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "zoo",
+"de": "der Zoo",
+"fr": "le zoo",
+"de_s": "Das ist ein Zoo.",
+"fr_s": "C'est un zoo.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "farm",
+"de": "der Bauernhof",
+"fr": "la ferme",
+"de_s": "Das ist ein Bauernhof.",
+"fr_s": "C'est une ferme.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "beach",
+"de": "der Strand",
+"fr": "la plage",
+"de_s": "Das ist ein Strand.",
+"fr_s": "C'est une plage.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "market",
+"de": "der Markt",
+"fr": "le marché",
+"de_s": "Das ist ein Markt.",
+"fr_s": "C'est un marché.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "mosque",
+"de": "die Moschee",
+"fr": "la mosquée",
+"de_s": "Das ist eine Moschee.",
+"fr_s": "C'est une mosquée.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "church",
+"de": "die Kirche",
+"fr": "l'église",
+"de_s": "Das ist eine Kirche.",
+"fr_s": "C'est une église.",
+"flags": [
+"f"
+]
+},
+{
+"cat": "x:city",
+"en": "library",
+"de": "die Bibliothek",
+"fr": "la bibliothèque",
+"de_s": "Das ist eine Bibliothek.",
+"fr_s": "C'est une bibliothèque.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "bakery",
+"de": "die Bäckerei",
+"fr": "la boulangerie",
+"de_s": "Das ist eine Bäckerei.",
+"fr_s": "C'est une boulangerie.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "shop",
+"de": "der Laden",
+"fr": "le magasin",
+"de_s": "Das ist ein Laden.",
+"fr_s": "C'est un magasin.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "bank",
+"de": "die Bank",
+"fr": "la banque",
+"de_s": "Das ist eine Bank.",
+"fr_s": "C'est une banque.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "airport",
+"de": "der Flughafen",
+"fr": "l'aéroport",
+"de_s": "Das ist ein Flughafen.",
+"fr_s": "C'est un aéroport.",
+"flags": [
+"m"
+]
+},
+{
+"cat": "x:city",
+"en": "train station",
+"de": "der Bahnhof",
+"fr": "la gare",
+"de_s": "Das ist ein Bahnhof.",
+"fr_s": "C'est une gare.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "street",
+"de": "die Straße",
+"fr": "la rue",
+"de_s": "Das ist eine Straße.",
+"fr_s": "C'est une rue.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "traffic light",
+"de": "die Ampel",
+"fr": "le feu de circulation",
+"de_s": "Das ist eine Ampel.",
+"fr_s": "C'est un feu de circulation.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "river",
+"de": "der Fluss",
+"fr": "le fleuve",
+"de_s": "Das ist ein Fluss.",
+"fr_s": "C'est un fleuve.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "sea",
+"de": "das Meer",
+"fr": "la mer",
+"de_s": "Das ist ein Meer.",
+"fr_s": "C'est une mer.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "lake",
+"de": "der See",
+"fr": "le lac",
+"de_s": "Das ist ein See.",
+"fr_s": "C'est un lac.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "island",
+"de": "die Insel",
+"fr": "l'île",
+"de_s": "Das ist eine Insel.",
+"fr_s": "C'est une île.",
+"flags": [
+"f"
+]
+},
+{
+"cat": "x:city",
+"en": "forest",
+"de": "der Wald",
+"fr": "la forêt",
+"de_s": "Das ist ein Wald.",
+"fr_s": "C'est une forêt.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "desert",
+"de": "die Wüste",
+"fr": "le désert",
+"de_s": "Das ist eine Wüste.",
+"fr_s": "C'est un désert.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "hill",
+"de": "der Hügel",
+"fr": "la colline",
+"de_s": "Das ist ein Hügel.",
+"fr_s": "C'est une colline.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "sky",
+"de": "der Himmel",
+"fr": "le ciel",
+"de_s": "Das ist ein Himmel.",
+"fr_s": "C'est un ciel.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "volcano",
+"de": "der Vulkan",
+"fr": "le volcan",
+"de_s": "Das ist ein Vulkan.",
+"fr_s": "C'est un volcan.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "cave",
+"de": "die Höhle",
+"fr": "la grotte",
+"de_s": "Das ist eine Höhle.",
+"fr_s": "C'est une grotte.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "waterfall",
+"de": "der Wasserfall",
+"fr": "la cascade",
+"de_s": "Das ist ein Wasserfall.",
+"fr_s": "C'est une cascade.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "school gate",
+"de": "das Schultor",
+"fr": "la porte de l'école",
+"de_s": "Das ist ein Schultor.",
+"fr_s": "C'est une porte de l'école.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "playground",
+"de": "der Spielplatz",
+"fr": "l'aire de jeux",
+"de_s": "Das ist ein Spielplatz.",
+"fr_s": "C'est une aire de jeux.",
+"flags": [
+"f"
+]
+},
+{
+"cat": "x:city",
+"en": "swimming pool",
+"de": "das Schwimmbad",
+"fr": "la piscine",
+"de_s": "Das ist ein Schwimmbad.",
+"fr_s": "C'est une piscine.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "cinema",
+"de": "das Kino",
+"fr": "le cinéma",
+"de_s": "Das ist ein Kino.",
+"fr_s": "C'est un cinéma.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "restaurant",
+"de": "das Restaurant",
+"fr": "le restaurant",
+"de_s": "Das ist ein Restaurant.",
+"fr_s": "C'est un restaurant.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "pharmacy",
+"de": "die Apotheke",
+"fr": "la pharmacie",
+"de_s": "Das ist eine Apotheke.",
+"fr_s": "C'est une pharmacie.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "supermarket",
+"de": "der Supermarkt",
+"fr": "le supermarché",
+"de_s": "Das ist ein Supermarkt.",
+"fr_s": "C'est un supermarché.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "police station",
+"de": "die Polizeistation",
+"fr": "le commissariat",
+"de_s": "Das ist eine Polizeistation.",
+"fr_s": "C'est un commissariat.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "post office",
+"de": "die Post",
+"fr": "la poste",
+"de_s": "Das ist eine Post.",
+"fr_s": "C'est une poste.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "museum",
+"de": "das Museum",
+"fr": "le musée",
+"de_s": "Das ist ein Museum.",
+"fr_s": "C'est un musée.",
+"flags": []
+},
+{
+"cat": "x:city",
+"en": "stadium",
+"de": "das Stadion",
+"fr": "le stade",
+"de_s": "Das ist ein Stadion.",
+"fr_s": "C'est un stade.",
+"flags": []
+}
+]
