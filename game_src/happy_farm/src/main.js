@@ -6,10 +6,14 @@ import * as THREE from 'three';
 import { LEVELS, UPGRADES, MAX_LEVEL, CROPS, upgradeCost, statOf, normalizeSave, buyUpgrade, finishLevel } from './data.js';
 import { Farm } from './sim.js';
 import { FarmWorld } from './world.js';
-import { makeCombine, makeTrailer, makeTree, makeBarn, makeHayBale, makeSack, mat, loadRealAnimals } from './models.js';
+import { makeCombine as _mc, makeTrailer as _mtl, makeTree as _mt, makeBarn as _mb, makeHayBale as _mh, makeSack, mat, loadRealAnimals } from './models.js';
+import { FX, outline } from './fx.js';
+const _ol = (o, c, k = 0.04) => { outline(o.root || o, c, k); return o; };
+const makeCombine = (...a) => _ol(_mc(...a), 0x10204a), makeTrailer = (...a) => _ol(_mtl(...a), 0x3a1a04), makeTree = (...a) => _ol(_mt(...a), 0x143008), makeBarn = (...a) => _ol(_mb(...a), 0x3a0808), makeHayBale = (...a) => _ol(_mh(...a), 0x4a3408);
 import { Sound } from './audio.js';
 import { setLang, getLang, t, num, name } from './i18n.js';
 import { CSS, h } from './ui.js';
+import { polishRenderer } from './polish.js';
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
@@ -93,7 +97,7 @@ class Game {
     }
     this.loading = h('div', { class: 'hf-loading' }, t('loading'));
     this.root.append(this.loading);
-    this.renderer = new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' }), { preset: 'fresh' });
     this.maxPR = Math.min(window.devicePixelRatio || 1, this.quality.low ? 1.25 : 1.5);
     this.pr = this.maxPR;
     this.renderer.setPixelRatio(this.pr);
@@ -379,13 +383,13 @@ class Game {
     const scene = new THREE.Scene();
     const world = new FarmWorld(scene, farm, this.quality);
     const comb = makeCombine(farm.cutter);
-    scene.add(comb.root);
+    scene.add(comb.root); comb.root.scale.setScalar(1.25); const pfx = new FX(scene);
     const trailer = makeTrailer();
     scene.add(trailer.root);
     const chaff = new Particles(scene, 260, 0.22, 0xf6d36a);
     const grain = new Particles(scene, 200, 0.2, 0xffc928);
     const smoke = new Particles(scene, 60, 0.6, 0xe6e6e6);
-    this.f = { farm, scene, world, comb, trailer, chaff, grain, smoke, tr: { x: farm.t.x - 3, z: farm.t.z, heading: farm.t.heading }, cam: null, endT: -1, coinsAtStart: this.save.coins, cutFlash: 0 };
+    this.f = { pfx, farm, scene, world, comb, trailer, chaff, grain, smoke, tr: { x: farm.t.x - 3, z: farm.t.z, heading: farm.t.heading }, cam: null, endT: -1, coinsAtStart: this.save.coins, cutFlash: 0 };
     this.mode = 'play';
     this.paused = false;
     this.sound.setMode('farm');
@@ -451,7 +455,7 @@ class Game {
       switch (e.type) {
         case 'cut': {
           cutNow += e.cells.length;
-          f.world.cut(e.cells);
+          f.world.cut(e.cells); f.pfx.burst(new THREE.Vector3(tt.x, 1.2, tt.z), { n: 10, colors: [0xffd23a, 0xfff2a0, 0xf6d36a], speed: 5, size: 0.6, life: 0.6, gravity: 5 });
           // chaff bursts from the cutter
           const box = farm.cutterBox();
           for (let k = 0; k < Math.min(6, e.cells.length * 2); k++) {
@@ -523,13 +527,13 @@ class Game {
     f.chaff.update(dt, 7);
     f.grain.update(dt, 9);
     f.smoke.update(dt, -0.6);
-    f.world.update(dt, time);
+    f.world.update(dt, time); f.pfx.update(dt);
 
     // camera: above and a little behind, smoothly following
     const portrait = this.cw < this.ch;
     const camX = tt.x;
-    const camZ = tt.z + (portrait ? 13 : 11);
-    const camY = portrait ? 22 : 17;
+    const camZ = tt.z + (portrait ? 10 : 8);
+    const camY = portrait ? 17 : 12.5;
     if (!f.cam) f.cam = new THREE.Vector3(camX, camY, camZ);
     f.cam.lerp(new THREE.Vector3(camX, camY, camZ), Math.min(1, dt * 3));
     this.camera.position.copy(f.cam);

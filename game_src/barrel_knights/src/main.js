@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import { Match, ROUNDS, PITCH, BARREL_R, KNIGHT_R, COLORS, HELMETS, RIVAL_COLOR, MATCH_TIME, normalizeSave, applyResult, buy, equip } from './sim.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { polishRenderer } from './polish.js';
 
 const S = {
   title: ['فرسان البرميل', 'BARREL KNIGHTS'], play: ['العب', 'PLAY'], rounds: ['الجولات', 'ROUNDS'], knights: ['الفرسان', 'KNIGHTS'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
@@ -144,7 +145,7 @@ class Game {
 
   // ---- scene
   _three() {
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true }), { preset: 'warm' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.prepend(this.renderer.domElement);

@@ -10,6 +10,7 @@ import { makePlane, makeRing, ringGeometry, Instancer, palm, pine, island, cliff
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name, clock } from './i18n.js';
 import { CSS, h } from './ui.js';
+import { polishRenderer } from './polish.js';
 
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
 const webglOk = () => {
@@ -47,7 +48,7 @@ class Game {
     }
     this.loading = h('div', { class: 'ar-loading' }, t('loading'));
     this.root.append(this.loading);
-    this.renderer = new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' }), { preset: 'warm' });
     this.maxPR = Math.min(window.devicePixelRatio || 1, this.quality.low ? 1.25 : 1.5);
     this.pr = this.maxPR;
     this.renderer.setPixelRatio(this.pr);
@@ -634,8 +635,8 @@ class Game {
     });
     // camera: behind and above the player's plane, leaning a little into turns
     const portrait = this.cw < this.ch;
-    const back = portrait ? 15 : 12.5;
-    const lift = portrait ? 4.6 : 3.8;
+    const back = portrait ? 11.5 : 9.5;
+    const lift = portrait ? 3.6 : 3;
     const want = V(tr.pos(pl.s - back, pl.x * 0.8, pl.y * 0.8 + lift));
     const look = V(tr.pos(pl.s + 16, pl.x * 0.9, pl.y * 0.9 + 0.8));
     if (this.mode === 'menu') {

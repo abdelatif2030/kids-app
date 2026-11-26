@@ -1,3 +1,4 @@
+import { outline as _ol } from './fx.js';
 // Temple Army art: every model is built from three.js primitives and canvas textures in code. No files.
 import * as THREE from 'three';
 import { TILE, SKINS } from './sim.js';
@@ -107,7 +108,7 @@ export class Horde {
 }
 
 // ---------- the captain ----------
-export function makeCaptain(skin) {
+function _makeCaptain(skin) {
   const g = new THREE.Group(); const body = new THREE.Group(); g.add(body);
   const tun = M(skin.tunic); const cape = M(skin.cape); const helm = M(skin.helm, 0x222211); const skinM = M(0xf2c9a0); const dark = M(0x3a2a20);
   body.add(mesh(geo.cyl, tun, 0, 0.9, 0, 0.8, 1.0, 0.6)); // torso
@@ -132,7 +133,7 @@ export function recolorCaptain(g, skin) { // rebuild instead (cheap): caller rep
 }
 
 // ---------- level things ----------
-export function makeGate(op, v, good, label, vertical) {
+function _makeGate(op, v, good, label, vertical) {
   const g = new THREE.Group(); const stone = M(0x8a8a78); const col = good ? 0x3af08a : 0xff4a3a;
   g.add(mesh(geo.box, stone, -1.25, 1.3, 0, 0.5, 2.6, 0.6), mesh(geo.box, stone, 1.25, 1.3, 0, 0.5, 2.6, 0.6), mesh(geo.box, stone, 0, 2.7, 0, 3.0, 0.5, 0.7));
   g.add(mesh(geo.box, M(col, col), 0, 2.97, 0, 3.1, 0.12, 0.74));
@@ -144,7 +145,7 @@ export function makeGate(op, v, good, label, vertical) {
   g.userData.vertical = vertical; return g;
 }
 
-export function makeTrap() {
+function _makeTrap() {
   const g = new THREE.Group();
   g.add(mesh(geo.box, M(0x3a3a3a), 0, 0.05, 0, 2.5, 0.1, 2.5));
   const rim = mesh(geo.box, new THREE.MeshLambertMaterial({ color: 0x444444, emissive: 0x000000 }), 0, 0.12, 0, 2.3, 0.05, 2.3); g.add(rim); g.userData.rim = rim;
@@ -153,7 +154,7 @@ export function makeTrap() {
   g.userData.spikes = spikes; return g;
 }
 
-export function makeLever() {
+function _makeLever() {
   const g = new THREE.Group();
   g.add(mesh(geo.box, M(0x6a6a60), 0, 0.2, 0, 1.4, 0.4, 1.0), mesh(geo.box, M(0x4a4a44), 0, 0.7, -0.3, 1.0, 1.0, 0.3));
   const arm = new THREE.Group(); arm.position.set(0, 0.45, 0.05); arm.add(mesh(geo.cyl, M(0x8a5a2a), 0, 0.7, 0, 0.14, 1.4, 0.14), mesh(geo.sphere, M(0xe83a3a, 0x801010), 0, 1.45, 0, 0.4, 0.4, 0.4));
@@ -162,7 +163,7 @@ export function makeLever() {
   return g;
 }
 
-export function makeSaw() {
+function _makeSaw() {
   const g = new THREE.Group(); const metal = M(0xc0c4cc, 0x202028);
   const disc = new THREE.Group(); disc.position.y = 1.5;
   const d = mesh(geo.cyl, metal, 0, 0, 0, 2.6, 0.14, 2.6); d.rotation.x = Math.PI / 2; disc.add(d);
@@ -172,7 +173,7 @@ export function makeSaw() {
   g.userData.disc = disc; return g;
 }
 
-export function makeCage() {
+function _makeCage() {
   const g = new THREE.Group(); const bars = new THREE.Group(); g.add(bars);
   g.add(mesh(geo.box, M(0x6a5a3a), 0, 0.08, 0, 2.2, 0.16, 2.2));
   for (let i = 0; i < 8; i++) { const a = (i / 8) * Math.PI * 2; bars.add(mesh(geo.cyl, M(0x8a8a90), Math.cos(a) * 1.0, 0.9, Math.sin(a) * 1.0, 0.1, 1.7, 0.1)); }
@@ -182,9 +183,9 @@ export function makeCage() {
   g.userData.bars = bars; g.userData.pris = pris; return g;
 }
 
-export function makeCoin() { const g = mesh(geo.cyl, M(0xffd23a, 0xaa7a00), 0, 1.0, 0, 0.8, 0.12, 0.8); g.rotation.x = Math.PI / 2; const w = new THREE.Group(); w.add(g); return w; }
+function _makeCoin() { const g = mesh(geo.cyl, M(0xffd23a, 0xaa7a00), 0, 1.0, 0, 0.8, 0.12, 0.8); g.rotation.x = Math.PI / 2; const w = new THREE.Group(); w.add(g); return w; }
 
-export function makeTorch(glowTex) {
+function _makeTorch(glowTex) {
   const g = new THREE.Group();
   g.add(mesh(geo.cyl, M(0x5a3a1a), 0, 1.3, 0, 0.14, 1.1, 0.14));
   const fl = mesh(geo.cone, M(0xffa020, 0xff8010), 0, 1.15, 0, 0.4, 0.8, 0.4); fl.position.y = 2.1; g.add(fl);
@@ -192,7 +193,7 @@ export function makeTorch(glowTex) {
   g.userData.fl = fl; g.userData.glow = sp; return g;
 }
 
-export function makeExit(open) {
+function _makeExit(open) {
   const g = new THREE.Group(); const stone = M(0x8a8678);
   g.add(mesh(geo.box, stone, -1.3, 1.6, 0, 0.7, 3.2, 0.9), mesh(geo.box, stone, 1.3, 1.6, 0, 0.7, 3.2, 0.9), mesh(geo.box, stone, 0, 3.4, 0, 3.3, 0.7, 1.0));
   const door = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 3.0), new THREE.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0.6, side: THREE.DoubleSide, depthWrite: false }));
@@ -203,7 +204,7 @@ export function makeExit(open) {
 }
 
 // ---------- bosses ----------
-export function makeBrute() {
+function _makeBrute() {
   const g = new THREE.Group(); const green = M(0x6aa83a); const dark = M(0x4a7a2a);
   const body = new THREE.Group(); g.add(body);
   body.add(mesh(geo.sphere, green, 0, 2.3, 0, 3.4, 3.6, 2.6), mesh(geo.sphere, M(0x9ac860), 0, 2.0, 0.9, 2.4, 2.4, 1.6), mesh(geo.box, M(0x7a4a2a), 0, 1.2, 0.3, 2.8, 0.9, 2.2));
@@ -221,7 +222,7 @@ export function makeBrute() {
   g.userData = { body, armR, armL, kind: 'brute' }; return g;
 }
 
-export function makeGolem() {
+function _makeGolem() {
   const g = new THREE.Group(); const rock = M(0x8a8478); const rock2 = M(0x6a665c); const moss = M(0x4a8a3a);
   const body = new THREE.Group(); g.add(body);
   const parts = [];
@@ -252,3 +253,15 @@ export function makeTrees(W, H, rand) {
   }
   g.add(trunk, crown); return g;
 }
+
+export const makeCaptain = (...a) => _ol(_makeCaptain(...a), 0x1c1030, 0.04);
+export const makeGate = (...a) => _ol(_makeGate(...a), 0x1c1030, 0.04);
+export const makeTrap = (...a) => _ol(_makeTrap(...a), 0x1c1030, 0.04);
+export const makeLever = (...a) => _ol(_makeLever(...a), 0x1c1030, 0.04);
+export const makeSaw = (...a) => _ol(_makeSaw(...a), 0x1c1030, 0.04);
+export const makeCage = (...a) => _ol(_makeCage(...a), 0x1c1030, 0.04);
+export const makeCoin = (...a) => _ol(_makeCoin(...a), 0x1c1030, 0.04);
+export const makeTorch = (...a) => _ol(_makeTorch(...a), 0x1c1030, 0.04);
+export const makeExit = (...a) => _ol(_makeExit(...a), 0x1c1030, 0.04);
+export const makeBrute = (...a) => _ol(_makeBrute(...a), 0x1c1030, 0.04);
+export const makeGolem = (...a) => _ol(_makeGolem(...a), 0x1c1030, 0.04);

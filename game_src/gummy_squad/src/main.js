@@ -8,6 +8,7 @@ import { Run, ARENA, BEARS, KINDS, UPGRADES, normalizeSave, buyUpgrade, upgradeC
 import { Sound } from './audio.js';
 import { G, mesh, basic, clay, makeBear, makeEnemy, makeBoss, makeCandy, makeMint, makeJaw, shadowDisc, softDot, stripeTex, swirlTex } from './models.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { polishRenderer } from './polish.js';
 
 const S = {
   title: ['فرقة الدببة الجيلي', 'GUMMY SQUAD'], play: ['العب', 'PLAY'], stage: ['المرحلة', 'Stage'], nextStage: ['المرحلة الجاية', 'Next stage'], upgrades: ['التطويرات', 'UPGRADES'], settings: ['الإعدادات', 'SETTINGS'], back: ['رجوع', 'Back'],
@@ -104,7 +105,7 @@ class Game {
 
   // ------------------------------------------------------------ the 3D world
   _three() {
-    const r = (this.renderer = new THREE.WebGLRenderer({ antialias: true }));
+    const r = (this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true }), { preset: 'warm' }));
     r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     r.outputColorSpace = THREE.SRGBColorSpace; r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.25;
     this.root.prepend(r.domElement);
@@ -633,7 +634,7 @@ class Game {
     this.camTarget.x += (tx - this.camTarget.x) * Math.min(1, dt * 5); this.camTarget.z += (tz - this.camTarget.z) * Math.min(1, dt * 5);
     this.shake = Math.max(0, this.shake - dt * 2.2);
     const sh = this.shake * 0.45;
-    const d = fit.d;
+    const d = fit.d * 0.86;
     c.position.set(this.camTarget.x + (Math.random() - 0.5) * sh, Math.sin(fit.e) * d, this.camTarget.z + Math.cos(fit.e) * d + (Math.random() - 0.5) * sh);
     c.lookAt(this.camTarget.x, 0, this.camTarget.z);
   }

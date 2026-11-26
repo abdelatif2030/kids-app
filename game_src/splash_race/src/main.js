@@ -12,6 +12,7 @@ import {
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
 import { CSS, CSS2, CSS3, h } from './ui.js';
+import { polishRenderer } from './polish.js';
 
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
 const webglOk = () => {
@@ -100,7 +101,7 @@ class Game {
     }
     this.loading = h('div', { class: 'sp-loading' }, t('loading'));
     this.root.append(this.loading);
-    this.renderer = new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' }), { preset: 'warm', tune: { bloom: [0.12, 0.4, 0.95], contrast: 1.14, sat: 1.15, vig: 0.28 } });
     this.maxPR = Math.min(window.devicePixelRatio || 1, this.quality.low ? 1.25 : 1.5);
     this.pr = this.maxPR;
     this.renderer.setPixelRatio(this.pr);
@@ -220,7 +221,7 @@ class Game {
     });
     c.slides.forEach((sl) => { const m = makeSlide(sl.len, sl.side); m.position.set(sl.side * (HALF + 3.2), 0, -sl.s + 1.5); s.add(m); });
     // swimmers
-    this.models = this.sw.swimmers.map((w) => { const m = makeSwimmer(w.kind, w.cap, w.kind !== 'duck'); m.root.scale.setScalar(1.55); s.add(m.root); return m; });
+    this.models = this.sw.swimmers.map((w, wi) => { const m = makeSwimmer(w.kind, w.cap, true, wi); m.root.scale.setScalar(1.55); s.add(m.root); return m; });
     this.ring = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.75, 28), new THREE.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0.9, depthWrite: false }));
     this.ring.rotation.x = -Math.PI / 2;
     s.add(this.ring);
@@ -525,6 +526,7 @@ class Game {
       switch (e.type) {
         case 'count': this.sound.play('count'); this.hud.count.textContent = num(e.n); break;
         case 'go':
+          if (window.__cheer) window.__cheer('start', true);
           this.sound.play('go');
           this.hud.count.textContent = '';
           this.sound.setTempo(sw.round.bpm);
@@ -540,17 +542,17 @@ class Game {
         }
         case 'stroke': {
           const w = sw.swimmers[e.id];
-          if (e.id === 0) this.sound.play('stroke', e.grade);
+          if (e.id === 0) { this.sound.play('stroke', e.grade); if (e.grade === 'perfect' && window.__cheer) window.__cheer('combo'); }
           this.drops.splash(w.x, -w.s, e.id === 0 ? 10 : 5, e.grade === 'perfect' ? 3.5 : 2.2);
           this.models[e.id].paddle = 0.45;
           break;
         }
-        case 'leap': if (e.id === 0) this.sound.play('leap'); break;
-        case 'bonk': if (e.id === 0) { this.sound.play('bonk'); this.shake = 0.35; } break;
+        case 'leap': if (e.id === 0) { this.sound.play('leap'); if (window.__cheer) window.__cheer('near'); } break;
+        case 'bonk': if (e.id === 0) { if (window.__cheer) window.__cheer('oops'); this.sound.play('bonk'); this.shake = 0.35; } break;
         case 'breath': this.sound.play('breath'); this.toast(t('breath'), 1.2); this.sound.setUnder(false); break;
         case 'slide': if (e.id === 0) { this.sound.play('slide'); this.toast(t('slide'), 1.2); } break;
         case 'splash': this.drops.splash(e.x, -e.s, e.id === 0 ? 24 : 10, 4); if (e.id === 0) this.sound.play('splash'); break;
-        case 'finish': if (e.id === 0) this.sound.play('finish'); break;
+        case 'finish': if (e.id === 0) { this.sound.play('finish'); if (window.__cheer) window.__cheer((sw.player.rank || 9) <= 3 ? 'win' : 'lose', true); } break;
         case 'over': setTimeout(() => this.mode === 'race' && this._results(), 1500); break;
         default:
       }
@@ -576,12 +578,13 @@ class Game {
       m.root.rotation.x = w.air > 0 ? -0.6 * Math.cos((1 - w.air / 0.9) * Math.PI) : w.slide ? 0.4 : 0;
       m.root.rotation.z = w.stun > 0 ? Math.sin(time * 25) * 0.4 : 0;
       m.paddle = Math.max(0, (m.paddle ?? 0) - dt);
-      const sp = time * 6 + k;
-      m.arms[0].rotation.x = m.paddle > 0 ? -2.6 * Math.sin((m.paddle / 0.45) * Math.PI) : Math.sin(sp) * 0.5;
-      m.arms[1].rotation.x = m.paddle > 0 ? 2.6 * Math.sin((m.paddle / 0.45) * Math.PI) - 1 : -Math.sin(sp) * 0.5;
-      m.legs.forEach((l, i) => { l.rotation.x = Math.sin(time * 14 + i * Math.PI) * 0.5; });
-      m.head.rotation.z = Math.sin(time * 3 + k) * 0.25;
+      const sp = time * (k === 0 ? 15 : 8) + k;
+      m.arms[0].rotation.x = m.paddle > 0 ? -2.6 * Math.sin((m.paddle / 0.45) * Math.PI) : Math.sin(sp) * 1.5 - 0.6;
+      m.arms[1].rotation.x = m.paddle > 0 ? 2.6 * Math.sin((m.paddle / 0.45) * Math.PI) - 1 : -Math.sin(sp) * 1.5 - 0.6;
+      m.legs.forEach((l, i) => { l.rotation.x = Math.sin(time * (k === 0 ? 30 : 18) + i * Math.PI) * 0.6; });
+      m.head.rotation.z = Math.sin(time * 3 + k) * 0.25; m.head.rotation.y = Math.sin(time * (k === 0 ? 5 : 3.4) + k * 1.7) * (k === 0 ? 1.45 : 1.2); // breathing turns show the face
       if (w.dive && Math.random() < 0.3) this.bubbles.emit(w.x + (Math.random() - 0.5) * 0.4, w.y + 0.2, -w.s, 0, 1.2, 0, 0.8);
+      if (k === 0 && !w.dive && w.air <= 0 && w.v > 1) { for (let q = 0; q < 3; q++) this.drops.emit(w.x + (Math.random() - 0.5) * 1.1, 0.12, -w.s + 0.5 + Math.random() * 0.8, (Math.random() - 0.5) * 2.2, 2 + Math.random() * 1.5, 1.5 + Math.random() * 2, 0.55); }
       if (!w.dive && w.air <= 0 && !w.slide && w.v > 3 && Math.random() < 0.25) this.drops.emit(w.x + (Math.random() - 0.5) * 0.6, 0.1, -w.s + 0.6, (Math.random() - 0.5), 1.4, 1, 0.4);
     });
     this.drops.update(dt);
@@ -591,17 +594,31 @@ class Game {
     this.ring.visible = !p.slide && this.mode !== 'menu';
     // camera behind and above the otter
     const portrait = this.cw < this.ch;
-    const want = new THREE.Vector3(p.x * 0.55, portrait ? 6.2 : 4.6, -p.s + (portrait ? 8.8 : 7.2));
+    const want = new THREE.Vector3(p.x * 0.55, portrait ? 4.9 : 3.5, -p.s + (portrait ? 6.8 : 5.4));
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 4));
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 2);
     this.camera.position.set(this.cam.x + (Math.random() - 0.5) * this.shake * 0.3, this.cam.y, this.cam.z);
     this.camera.lookAt(this.cam.x, 0, this.cam.z - (portrait ? 8.8 : 7.2) - 7);
+    { // front-view cam on the start line and when the player finishes, so the cartoon faces read
+      const want = (sw.state === 'start' || p.done) ? 1 : 0;
+      this._introK = (this._introK ?? 0) + (want - (this._introK ?? 0)) * Math.min(1, dt * (want ? 4 : 1.6));
+      const k = this._introK;
+      if (k > 0.01) {
+        const e = k * k * (3 - 2 * k);
+        const fp = new THREE.Vector3(p.x * 0.5, 1.5, -p.s - (sw.state === 'start' ? 6.5 : 5));
+        const fl = new THREE.Vector3(p.x * 0.5, 0.45, -p.s + 0.2);
+        const cp = this.camera.position.clone().lerp(fp, e);
+        const dir = new THREE.Vector3(); this.camera.getWorldDirection(dir);
+        const cl = this.camera.position.clone().addScaledVector(dir, 10).lerp(fl, e);
+        this.camera.position.copy(cp); this.camera.lookAt(cl);
+      }
+    }
     if (this.panoMesh) this.panoMesh.position.set(this.camera.position.x, 52, this.camera.position.z);
     if (this.mode !== 'race') return;
     // HUD
     const hc = this._hc;
-    if (hc.rank !== p.rank) { hc.rank = p.rank; this.hud.place.textContent = num(p.rank ?? sw.swimmers.length); }
+    if (hc.rank !== p.rank) { if (window.__cheer && hc.rank && p.rank) window.__cheer(p.rank < hc.rank ? 'overtake' : 'behind'); hc.rank = p.rank; this.hud.place.textContent = num(p.rank ?? sw.swimmers.length); }
     const q = sw.qualifiedCount;
     if (hc.q !== q) { hc.q = q; this.hud.qual.textContent = `${num(q)}/${num(sw.round.qualify)}`; }
     const L = sw.round.len;

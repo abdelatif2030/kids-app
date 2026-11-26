@@ -10,6 +10,8 @@ import { Run, LEVELS, LANE_W, levelSpec, normalizeSave } from './sim.js';
 import { Sound } from './audio.js';
 import { applyBackdrop } from '../../cozy_kit/art.js';
 import { setLang, setGirl, getLang, isGirl, t, num } from './i18n.js';
+import { polishRenderer } from './polish.js';
+import { FX, outline } from './fx.js';
 
 const CSS = `
 .cd-root{position:absolute;inset:0;overflow:hidden;font-family:Tajawal,system-ui,sans-serif;color:#4a2a6a;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent;background:#b8a8f0}
@@ -200,7 +202,7 @@ class Game {
   // ---- the 3D world -------------------------------------------------------------------------------------------------
 
   _initGL() {
-    const r = this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+    const r = this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' }), { preset: 'fresh', tune: { bloom: [0.12, 0.4, 0.97], vig: 0.28 } });
     r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     r.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(r.domElement);
@@ -279,7 +281,20 @@ class Game {
     this.itemsGroup = new THREE.Group();
     sc.add(this.itemsGroup);
     this.kid = this._makeKid();
+    outline(this.kid.root, 0x2a1a3a, 0.055);
     sc.add(this.kid.root);
+    this.fx = new FX(sc);
+    // sun glow and a giant rainbow far ahead (follow the runner)
+    this.sky = new THREE.Group();
+    const rc = [0xff4d6d, 0xff9a3c, 0xffe04a, 0x5ee07a, 0x4ab4ff, 0x7a5cff, 0xc76bff];
+    rc.forEach((c, i) => { const t = new THREE.Mesh(new THREE.TorusGeometry(70 - i * 2.6, 1.4, 6, 64, Math.PI), new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.85, fog: false, depthWrite: false })); this.sky.add(t); });
+    this.sky.position.set(-20, -14, 0); this.sky.rotation.y = 0.15; sc.add(this.sky);
+    const sunS = new THREE.Sprite(new THREE.SpriteMaterial({ map: puffTex(), color: 0xfff2b0, transparent: true, depthWrite: false, fog: false, blending: THREE.AdditiveBlending }));
+    sunS.scale.set(60, 60, 1); sunS.material.opacity = 0.45; this.sunS = sunS; sc.add(sunS);
+    // cape: flutters behind the kid
+    const cape = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.95, 1, 4), new THREE.MeshLambertMaterial({ color: 0xff3a5c, side: THREE.DoubleSide }));
+    cape.position.set(0, 1.25, -0.2); cape.geometry.translate(0, -0.45, 0); this.kid.body.add(cape); this.kid.cape = cape;
+    outline(cape, 0x2a1a3a, 0.0);
     this.finish = this._makeFinish();
     sc.add(this.finish);
     this.shieldMesh = new THREE.Mesh(this.geo.sphere, this.mat.shield);
@@ -353,6 +368,7 @@ class Game {
     } else if (it.type === 'slow') {
       const sp = new THREE.Sprite(this.spriteMat.slow); sp.scale.set(1.5, 1.5, 1); sp.position.y = 1.2; g.add(sp); g.userData.sprite = sp;
     }
+    if (it.type !== 'coin' && it.type !== 'crumble' && it.type !== 'wind') outline(g, 0x2a1a3a, 0.07);
     return g;
   }
 
@@ -619,7 +635,7 @@ class Game {
         else if (nxt.type === 'wind') { this._say(t('wind'), 1.8); this.sound.play('wind'); }
       }
     }
-    if (r.state === 'won' && this.mode === 'play') { this.mode = 'finishing'; this.finT = 0; this._say(t('finish'), 2.4, true); this.sound.play('finish'); }
+    if (r.state === 'won' && this.mode === 'play') { this.fx && this.fx.burst({ x: 0, y: 3, z: r.z + 2 }, { n: 120, colors: [0xff4d6d, 0xffe04a, 0x5ee07a, 0x4ab4ff, 0xc76bff, 0xffffff], speed: 8, size: 0.5, life: 2.2, gravity: 3, lift: 3 }); this.mode = 'finishing'; this.finT = 0; this._say(t('finish'), 2.4, true); this.sound.play('finish'); }
     else if (r.state === 'lost' && this.mode === 'play') { this.mode = 'lostwait'; this.finT = 0; }
   }
 
@@ -627,14 +643,15 @@ class Game {
     const r = this.run;
     void time;
     switch (e.type) {
-      case 'coin': this.combo = Math.min(8, this.combo + 1); this.comboT = 0.6; this.sound.play('coin', this.combo); this._pop(e.i); break;
-      case 'power': this.sound.play(e.kind === 'shield' ? 'shield' : 'power'); this._say(t(e.kind), 1.8, true); this._pop(e.i); break;
-      case 'hit': this.sound.play('hit'); this.flash = 1; this.shake = 0.35; this._say(t('ouch'), 1); break;
+      case 'coin': this.fx && this.fx.burst({ x: laneX(r.lane), y: r.y + 1.2, z: r.z + 0.6 }, { n: 8, color: 0xffd23a, colors: [0xffd23a, 0xffb020, 0xffffff], speed: 3.2, size: 0.16, life: 0.55, gravity: 4 }); this.combo = Math.min(8, this.combo + 1); this.comboT = 0.6; this.sound.play('coin', this.combo); this._pop(e.i); break;
+      case 'power': this.fx && this.fx.burst({ x: laneX(r.lane), y: r.y + 1.3, z: r.z + 0.6 }, { n: 28, colors: [0x6ad0ff, 0xff6aa8, 0xffd84a, 0xb08aff], speed: 6, size: 0.22, life: 0.9, gravity: 2 }); this.sound.play(e.kind === 'shield' ? 'shield' : 'power'); this._say(t(e.kind), 1.8, true); this._pop(e.i); break;
+      case 'hit': this.fx && this.fx.burst({ x: laneX(r.lane), y: r.y + 1, z: r.z + 0.8 }, { n: 26, colors: [0xff4d6d, 0xffffff, 0xffe04a], speed: 7, size: 0.25, life: 0.7, gravity: 8 }); this.sound.play('hit'); this.flash = 1; this.shake = 0.35; this._say(t('ouch'), 1); break;
       case 'fall': this.sound.play('fall'); this.flash = 1; this.shake = 0.5; this._say(t('fell'), 1.3); break;
       case 'shieldpop': this.sound.play('shield'); this._say(t('shieldPop'), 1.4, true); break;
       case 'crack': this.sound.play('crack'); break;
       case 'gust': this.sound.play('wind'); break;
       case 'land': {
+        this.fx && this.fx.burst({ x: laneX(r.lane), y: 0.15, z: r.z }, { n: 12, colors: [0xffffff, 0xf4e8ff], speed: 3, size: 0.3, life: 0.6, gravity: -0.5, flat: true, up: 0.1 });
         this.sound.play('land');
         if (this.jumpFrom != null) {
           const passed = r.level.items.some((i) => ['barrier', 'slime', 'spike', 'gap', 'crumble'].includes(i.type) && i.lane === r.lane && i.z > this.jumpFrom - 0.5 && i.z < r.z + 0.5);
@@ -698,8 +715,14 @@ class Game {
       if (p.t >= 0.35) { this.itemsGroup.remove(p.o); if (p.mat) p.mat.dispose(); }
     }
     this.pops = this.pops.filter((p) => p.t < 0.35);
+    if (this.fx) { this.fx.update(dt); this.fx.setViewportScale(this.ch || 400); }
+    if (this.sky) { this.sky.position.z = z + 150; this.sunS.position.set(40, 38, z + 170); }
     if (r) {
       this._items(r, time);
+      this.stepT = (this.stepT || 0) + dt;
+      if (this.fx && r.state === 'run' && r.grounded && this.stepT > 0.11) { this.stepT = 0; this.fx.burst({ x: laneX(r.lane) + (Math.random() - 0.5) * 0.3, y: 0.1, z: r.z - 0.2 }, { n: 2, colors: [0xffffff, 0xffe8ff], speed: 0.8, size: 0.22, life: 0.5, gravity: -0.3, up: 0.2, vz: -2 }); }
+      if (this.fx && r.state === 'run') { const ci = Math.floor(time * 24) % 7; this.fx.burst({ x: this.kidX == null ? 0 : this.kidX, y: r.y + 0.9, z: r.z - 0.4 }, { n: 1, color: [0xff4d6d, 0xff9a3c, 0xffe04a, 0x5ee07a, 0x4ab4ff, 0x7a5cff, 0xc76bff][ci], speed: 0.15, size: 0.12, life: 0.45, gravity: 0, up: 0, vz: -3 }); }
+      if (this.kid.cape) { const cp = this.kid.cape; cp.rotation.x = 0.55 + Math.sin(time * 16) * 0.12 + (r.grounded ? 0 : 0.35); cp.scale.y = 1 + Math.sin(time * 22) * 0.06; }
       const x = laneX(r.lane);
       const k = this.kid;
       const wall = Math.abs(r.lane) === 2;

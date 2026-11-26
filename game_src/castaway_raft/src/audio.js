@@ -18,6 +18,7 @@ const TUNE = {
 
 export class Sound extends SynthBase {
   play(name, arg) {
+    if (typeof window !== 'undefined' && window.__cheerSfx) window.__cheerSfx(name);
     const c = this.ctx;
     if (!c || c.state !== 'running' || this.muted) return;
     const t = c.currentTime;

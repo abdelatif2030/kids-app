@@ -9,6 +9,8 @@ import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { loadSprites, makeSpriteVehicle, loadGLBs, makeModelVehicle } from '../../cozy_kit/art.js';
+import { polishRenderer } from './polish.js';
+import { FX } from './fx.js';
 
 const CAR_PICS = ['car_blue', 'car_red', 'car_pink', 'car_orange', 'car_black', 'car_taxi', 'car_sedan_blue', 'car_sedan_green', 'car_police'];
 const HEAVY_PICS = ['car_truck', 'car_van', 'car_bus'];
@@ -126,7 +128,7 @@ class Game {
   async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 900))]); } catch (_) { /* system font */ } }
 
   _three() {
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true }), { preset: 'warm' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.prepend(this.renderer.domElement);
@@ -163,6 +165,19 @@ class Game {
     }
     this.cars = new THREE.Group();
     this.scene.add(this.cars);
+    this.vfx = new FX(this.scene, 500);
+    // race gantries over the road, every 80 m: glowing pylons, striped beam, bulb string
+    this.arches = [];
+    const bannerTex = (() => { const c = document.createElement('canvas'); c.width = 256; c.height = 32; const x = c.getContext('2d'); for (let i = 0; i < 16; i++) { x.fillStyle = i % 2 ? '#ff3a6a' : '#ffd23a'; x.fillRect(i * 16, 0, 16, 16); x.fillStyle = i % 2 ? '#ffd23a' : '#ff3a6a'; x.fillRect(i * 16, 16, 16, 16); } const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+    for (let i = 0; i < 9; i++) {
+      const g = new THREE.Group();
+      for (const sx of [-1, 1]) { g.add(mesh(geo.cyl, M(0x2a2e3a), sx * (HALF + 0.9), 3.6, 0, 0.7, 7.2, 0.7)); g.add(mesh(geo.sphere, new THREE.MeshBasicMaterial({ color: 0xffe08a }), sx * (HALF + 0.9), 7.4, 0, 0.9, 0.9, 0.9)); }
+      g.add(mesh(geo.box, new THREE.MeshBasicMaterial({ map: bannerTex }), 0, 7.0, 0, HALF * 2 + 2.4, 1.3, 0.35));
+      for (let k = 0; k < 14; k++) { const t = k / 13; g.add(mesh(geo.sphere, new THREE.MeshBasicMaterial({ color: k % 3 === 0 ? 0xff5a8a : k % 3 === 1 ? 0xffe04a : 0x6ad0ff }), (t * 2 - 1) * (HALF + 0.6), 6.1 - Math.sin(t * Math.PI) * 0.7, 0, 0.32, 0.32, 0.32)); }
+      this.scene.add(g); this.arches.push(g);
+    }
+    const sunGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'); const gr = x.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(255,230,160,1)'); gr.addColorStop(0.3, 'rgba(255,170,90,0.55)'); gr.addColorStop(1, 'rgba(255,120,60,0)'); x.fillStyle = gr; x.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })(), transparent: true, depthWrite: false, fog: false, blending: THREE.AdditiveBlending, opacity: 0.8 }));
+    sunGlow.scale.set(420, 420, 1); this.sunGlow = sunGlow; this.scene.add(sunGlow);
   }
 
   _resize() {
@@ -269,7 +284,7 @@ class Game {
     this._look(i);
     this._clearCars();
     const sp = this.sprites;
-    this.me = sp.car_red ? paintedCar(sp.car_red, 2.3) : makeCar(0xe8342a, true);
+    this.me = sp.car_red ? paintedCar(sp.car_red, 2.8) : makeCar(0xe8342a, true);
     this.rival = sp.car_blue ? paintedCar(sp.car_blue, 2.3) : makeCar(0x2a6ae8, true);
     this.cars.add(this.me, this.rival);
     this.mode = 'play'; this.paused = false; this.lastCount = 4;
@@ -337,9 +352,9 @@ class Game {
     for (const e of r.step(dt)) {
       switch (e.type) {
         case 'go': this.sound.play('go'); this.countEl.textContent = I.t('go'); setTimeout(() => this.countEl && (this.countEl.style.display = 'none'), 700); this.hint(I.t('how'), 3500); break;
-        case 'bump': this.sound.play('bump'); break;
-        case 'overtake': this.sound.play('over'); this.hint(I.t('overtake'), 1800); break;
-        case 'finish': case 'timeup': this._end(e); break;
+        case 'bump': this.vfx.burst({ x: -(bend(r.p.z) + r.p.x), y: 0.8, z: r.p.z + 2 }, { n: 30, colors: [0xffe04a, 0xff7a1a, 0xffffff], speed: 7, size: 0.35, life: 0.6, gravity: 8 }); this.sound.play('bump'); break;
+        case 'overtake': this.vfx.burst({ x: -(bend(r.p.z) + r.p.x), y: 2, z: r.p.z + 3 }, { n: 40, colors: [0x6aff8a, 0xffe04a, 0xffffff, 0x4ab4ff], speed: 8, size: 0.4, life: 1.1, gravity: 3, lift: 2 }); this.sound.play('over'); this.hint(I.t('overtake'), 1800); break;
+        case 'finish': case 'timeup': if (e.type === 'finish') this.vfx.burst({ x: -(bend(r.p.z) + r.p.x), y: 4, z: r.p.z + 4 }, { n: 140, colors: [0xff4d6d, 0xffe04a, 0x5ee07a, 0x4ab4ff, 0xc76bff, 0xffffff], speed: 10, size: 0.6, life: 2.4, gravity: 4, lift: 4 }); this._end(e); break;
         default: break;
       }
     }
@@ -387,7 +402,21 @@ class Game {
       const side = i % 3 === 0 ? -1 : 1;
       p.position.set(-bend(z) + side * (HALF + 5 + (i % 4) * 1.5), 0, z);
     });
+    this.arches.forEach((g, i) => { const z = Math.floor((zp - 20) / 80) * 80 + i * 80; g.position.set(-bend(z), 0, z); g.rotation.y = -Math.atan(bendSlope(z)); });
     this.sea.position.set(-bend(zp) + 330, -0.6, zp);
+    this.vfx.update(dt); this.vfx.setViewportScale(this.ch || 400);
+    if (r && r.state === 'run') {
+      const px = -(bend(r.p.z) + r.p.x); const sp = r.p.v;
+      this._st = (this._st || 0) + dt;
+      if (this._st > 0.03) {
+        this._st = 0;
+        // wind streaks flying past the camera
+        for (let k = 0; k < 2; k++) this.vfx.burst({ x: px + (Math.random() - 0.5) * 22, y: 0.4 + Math.random() * 5, z: r.p.z + 24 + Math.random() * 10 }, { n: 1, colors: [0xffffff, 0xffe8c0], speed: 0.1, size: 0.18, life: 0.35, gravity: 0, up: 0, vz: -(sp * 1.1) });
+        if (r.p.nitro > 0) for (const sx of [-0.5, 0.5]) this.vfx.burst({ x: px + sx, y: 0.5, z: r.p.z - 2.2 }, { n: 3, colors: [0xff7a1a, 0xffd23a, 0x6ad0ff], speed: 1.2, size: 0.5, life: 0.4, gravity: 0, up: 0.1, vz: -14 });
+        else if (sp > 8) this.vfx.burst({ x: px + (Math.random() < 0.5 ? -0.8 : 0.8), y: 0.15, z: r.p.z - 1.8 }, { n: 1, colors: [0xf0e0c8], speed: 1, size: 0.6, life: 0.5, gravity: -0.4, up: 0.2, vz: -6 });
+      }
+    }
+    if (this.sunGlow) this.sunGlow.position.copy(this.sunDisc.position);
     this.sunDisc.position.set(-bend(zp + 500) * 0.3, this.sunDisc.position.y, zp + 560);
     if (r) {
       const place = (m, x, z, v) => { m.position.set(-(bend(z) + x), 0, z); m.rotation.y = -Math.atan(bendSlope(z)) + (v ? 0 : 0); };

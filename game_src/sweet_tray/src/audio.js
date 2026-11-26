@@ -8,6 +8,7 @@ const PENTA = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24];
 
 export class Sound extends SynthBase {
   play(n, arg = 0) {
+    if (typeof window !== 'undefined' && window.__cheerSfx) window.__cheerSfx(n);
     const c = this.ctx;
     if (!c || c.state !== 'running' || this.muted) return;
     const t = c.currentTime;

@@ -319,7 +319,7 @@ class App {
       if (e.type === 'drone') drawUfo(g, e.x, e.y, 1, t + e.id, e.charge > 0, e.flash);
       else {
         const o = e.type === 'black' ? { body: ['#6a6a78', '#2a2a34'], wing: ['#5a5a68', '#22222c'], acc: '#ffcf3a', stripe: '#ffcf3a' } : { body: ['#ff7a6a', '#c82a2a'], wing: ['#ff6a5a', '#a81a1a'], acc: '#fff', stripe: '#fff' };
-        drawPlane(g, { x: e.x, y: e.y, s: e.type === 'bomber' ? 1.7 : 0.85, rot: Math.PI, tilt: clamp(-e.vx / 120, -0.3, 0.3), enemy: true, t: t + e.id, twin: e.type === 'bomber', bigWing: e.type === 'bomber', ...(e.type === 'bomber' ? { body: ['#9ab07a', '#5a7a4a'], wing: ['#8aa070', '#4a6a3a'], acc: '#ffcf3a', stripe: '#e84a3a' } : o) });
+        drawPlane(g, { x: e.x, y: e.y, s: e.type === 'bomber' ? 2.1 : 1.15, rot: Math.PI, tilt: clamp(-e.vx / 120, -0.3, 0.3), enemy: true, t: t + e.id, twin: e.type === 'bomber', bigWing: e.type === 'bomber', ...(e.type === 'bomber' ? { body: ['#9ab07a', '#5a7a4a'], wing: ['#8aa070', '#4a6a3a'], acc: '#ffcf3a', stripe: '#e84a3a' } : o) });
         if (e.flash > 0) { g.fillStyle = 'rgba(255,255,255,.6)'; g.beginPath(); g.ellipse(e.x, e.y, e.r * 0.9, e.r, 0, 0, 6.3); g.fill(); }
       }
     }
@@ -328,14 +328,14 @@ class App {
       drawBoss(g, b, t, BOSS_TINT[(f.stage - 1) % 8]);
     }
     // bullets
-    for (const q of f.pbul) { g.fillStyle = 'rgba(255,240,140,.45)'; g.fillRect(q.x - 1.4, q.y - 3.2, 2.8, 6.4); g.fillStyle = '#fff6c0'; g.beginPath(); g.roundRect(q.x - 0.8, q.y - 2.6, 1.6, 5.2, 0.8); g.fill(); }
+    for (const q of f.pbul) { g.save(); g.shadowColor='#ffe27a'; g.shadowBlur=7; g.fillStyle = 'rgba(255,240,140,.55)'; g.fillRect(q.x - 2, q.y - 5, 4, 10); g.fillStyle = '#fff'; g.beginPath(); g.roundRect(q.x - 1.2, q.y - 4, 2.4, 8, 1.2); g.fill(); g.restore(); }
     for (const q of f.ebul) { const pu = 1 + Math.sin(t * 14 + q.x) * 0.1; g.fillStyle = 'rgba(255,70,120,.35)'; g.beginPath(); g.arc(q.x, q.y, q.r * 1.7 * pu, 0, 6.3); g.fill(); g.fillStyle = '#ff4a7a'; g.strokeStyle = '#fff'; g.lineWidth = 0.45; g.beginPath(); g.arc(q.x, q.y, q.r * pu, 0, 6.3); g.fill(); g.stroke(); g.fillStyle = '#fff'; g.beginPath(); g.arc(q.x - 0.4, q.y - 0.4, q.r * 0.35, 0, 6.3); g.fill(); }
     // player
     const p = f.p;
     if (!isDemo || true) {
       if (f.state !== 'losing' && f.state !== 'lose') {
         const blink = p.inv > 0 && p.inv < 50 && Math.floor(t * 14) % 2 === 0;
-        drawPlane(g, { x: p.x, y: p.y, s: 1, ...skin, t, tilt: clamp(p.vx / 140, -1, 1) * 0.28, alpha: blink ? 0.4 : 1, girl: this.girl });
+        g.save(); g.shadowColor='rgba(255,230,120,.95)'; g.shadowBlur=9; for (let i=1;i<=5;i++){ g.globalAlpha=0.16*(6-i)/5*(blink?0.4:1); g.fillStyle='#ffd86a'; g.beginPath(); g.ellipse(p.x, p.y+8+i*3.2, 2.6-i*0.3, 3.4, 0, 0, 6.3); g.fill(); } g.globalAlpha=1; drawPlane(g, { x: p.x, y: p.y, s: 1.5, ...skin, t, tilt: clamp(p.vx / 140, -1, 1) * 0.28, alpha: blink ? 0.4 : 1, girl: this.girl }); g.restore();
         if (p.shield > 0) { g.strokeStyle = `rgba(120,210,255,${0.6 + Math.sin(t * 8) * 0.2})`; g.fillStyle = 'rgba(120,210,255,.18)'; g.lineWidth = 1; g.beginPath(); g.arc(p.x, p.y, 13, 0, 6.3); g.fill(); g.stroke(); }
         if (p.x2 > 0) { g.fillStyle = '#d88aff'; g.font = '900 4px Tajawal, system-ui'; g.textAlign = 'center'; g.fillText('X2', p.x, p.y + 14); }
       }

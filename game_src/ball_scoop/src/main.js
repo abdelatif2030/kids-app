@@ -11,6 +11,8 @@ import { Pile, heapPoints, DECOR_MAX } from './pile.js';
 import { R, TUB, tubBoxes } from './physics.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { polishRenderer } from './polish.js';
+import { FX, outline } from './fx.js';
 
 const S = {
   title: ['شاحنة عمورة', "Amoora's Truck"], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
@@ -104,7 +106,7 @@ class Game {
   async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 900))]); } catch (_) { /* system font */ } }
 
   _three() {
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true }), { preset: 'warm' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.prepend(this.renderer.domElement);
@@ -115,6 +117,7 @@ class Game {
     this.hemi = new THREE.HemisphereLight(0xffffff, 0xd8a868, 1.7); this.scene.add(this.hemi);
     const sun = new THREE.DirectionalLight(0xffffff, 1.1); sun.position.set(-10, 30, -10); this.scene.add(sun);
     this.world = new THREE.Group(); this.scene.add(this.world);
+    this.vfx = new FX(this.scene, 500);
     this.balls = new THREE.InstancedMesh(geo.sphere, new THREE.MeshPhongMaterial({ color: 0xffffff, shininess: 70, specular: 0x555555 }), 900);
     this.balls.frustumCulled = false; this.balls.instanceMatrix.setUsage(THREE.DynamicDrawUsage); this.scene.add(this.balls);
     this.colSeen = new Int8Array(900).fill(-1);
@@ -389,13 +392,13 @@ class Game {
     this.pile.update(dt, ev);
     for (const e of ev) {
       switch (e.type) {
-        case 'scoop': this.sound.play('scoop', e.n); this._fx(`+${e.n}`); break;
-        case 'gate': this.sound.play(e.op === 'mul' ? 'gatex' : e.v >= 0 ? 'gate+' : 'gate-', e.v); this._fx(e.op === 'mul' ? `x${e.v}` : e.v >= 0 ? `+${e.v}` : `${e.v}`, true); break;
-        case 'wall': this.sound.play('wall'); this._fx(`-${e.lost}`); this.hint(I.t('hitWall'), 1500); this.shake = 0.5; break;
+        case 'scoop': this.vfx.burst({ x: this.pile.w.T.x, y: this.pile.w.T.y + 1.6, z: this.pile.w.T.z + 1.8 }, { n: Math.min(14, 4 + e.n), colors: [0xffd23a, 0xff5a7a, 0x4ac8ff, 0x7aff6a], speed: 5, size: 0.35, life: 0.6, gravity: 8, vz: 3 }); this.sound.play('scoop', e.n); this._fx(`+${e.n}`); break;
+        case 'gate': this.vfx.burst({ x: this.pile.w.T.x, y: this.pile.w.T.y + 2, z: this.pile.w.T.z + 2 }, { n: 34, colors: e.v >= 0 ? [0x6aff8a, 0xffffff, 0xffe04a] : [0xff4d6d, 0xffa0a0], speed: 7, size: 0.4, life: 0.9, gravity: 4, vz: 4 }); this.sound.play(e.op === 'mul' ? 'gatex' : e.v >= 0 ? 'gate+' : 'gate-', e.v); this._fx(e.op === 'mul' ? `x${e.v}` : e.v >= 0 ? `+${e.v}` : `${e.v}`, true); break;
+        case 'wall': this.vfx.burst({ x: this.pile.w.T.x, y: this.pile.w.T.y + 1.5, z: this.pile.w.T.z + 2 }, { n: 30, colors: [0xff4d6d, 0xffffff, 0xffc04a], speed: 8, size: 0.4, life: 0.7, gravity: 9 }); this.sound.play('wall'); this._fx(`-${e.lost}`); this.hint(I.t('hitWall'), 1500); this.shake = 0.5; break;
         case 'jump': this.sound.play('jump'); break;
-        case 'land': this.sound.play('land'); this.shake = 0.25; break;
+        case 'land': this.vfx.burst({ x: this.pile.w.T.x, y: this.pile.w.T.y + 0.2, z: this.pile.w.T.z }, { n: 16, colors: [0xffffff, 0xf4e8d0], speed: 4, size: 0.8, life: 0.6, gravity: -0.5, flat: true, up: 0.1 }); this.sound.play('land'); this.shake = 0.25; break;
         case 'bump': this.sound.play('land'); break;
-        case 'finish': this.sound.play('bank'); this.coinEl.style.display = 'block'; break;
+        case 'finish': this.vfx.burst({ x: this.pile.w.T.x, y: this.pile.w.T.y + 4, z: this.pile.w.T.z + 3 }, { n: 140, colors: [0xff4d6d, 0xffe04a, 0x5ee07a, 0x4ab4ff, 0xc76bff, 0xffffff], speed: 10, size: 0.55, life: 2.4, gravity: 4, lift: 4 }); this.sound.play('bank'); this.coinEl.style.display = 'block'; break;
         case 'tilt': this.sound.play('tilt'); break;
         case 'done': this.finished = true; this._done(e.stars); break;
         default: break;
@@ -442,7 +445,9 @@ class Game {
     const T = this.pile.w.T;
     if (run) {
       this._syncThings(run, run.z, dt);
-      if (this.truckW !== run.W) { this.scene.remove(this.truck); this.truckW = run.W; this.truck = makeTruck(run.W); this.scene.add(this.truck); }
+      this.vfx.update(dt); this.vfx.setViewportScale(this.ch || 400);
+      if (play && run.state === 'run' && this.pile.w.T) { this._dustT = (this._dustT || 0) + dt; const Tt = this.pile.w.T; if (this._dustT > 0.05) { this._dustT = 0; for (const sx of [-1, 1]) this.vfx.burst({ x: Tt.x + sx * run.W * 0.5, y: Tt.y + 0.2, z: Tt.z - 1.6 }, { n: 1, colors: [0xfff2d8, 0xe8d0a8], speed: 1.2, size: 0.7, life: 0.55, gravity: -0.6, up: 0.2, vz: -4 }); } }
+      if (this.truckW !== run.W) { this.scene.remove(this.truck); this.truckW = run.W; this.truck = makeTruck(run.W); outline(this.truck, 0x1b2a3a, 0.035); this.scene.add(this.truck); }
       this.truck.position.set(T.x, T.y, T.z);
       this.truck.rotation.set(T.pitch, T.yaw, 0, 'YXZ');
       this.truck.userData.tilt.rotation.x = run.tilt || 0;

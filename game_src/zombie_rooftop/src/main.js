@@ -11,12 +11,15 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import { loadSprites, loadObjModels, fitModel } from '../../cozy_kit/art.js';
 import {
-  mat, basic, box, LOOKS, makeHero, makeWeapon, makeZombie, makeVent, makeWaterTower, makeTanks, makePlanter, makeChimney,
+  mat, basic, box, LOOKS, makeHero as _mh, makeWeapon, makeZombie, makeVent, makeWaterTower, makeTanks, makePlanter, makeChimney,
   makePad, makeCrate, makeHeart, coinGeometry, makeRoof, makeBuilding, makeNeonSign, makeCrane, makeClockTower, skyTexture,
 } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, isGirl, t, num, name } from './i18n.js';
 import { CSS, h } from './ui.js';
+import { polishRenderer } from './polish.js';
+import { FX, outline } from './fx.js';
+const makeHero = (...a) => { const o = _mh(...a); outline(o.root, 0x1a0a20, 0.05); return o; };
 
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
 const webglOk = () => {
@@ -181,7 +184,7 @@ class Game {
     }
     this.loading = h('div', { class: 'zr-loading' }, t('loading'));
     this.root.append(this.loading);
-    this.renderer = new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' }), { preset: 'night' });
     this.maxPR = Math.min(window.devicePixelRatio || 1, this.quality.low ? 1.25 : 1.6);
     this.pr = this.maxPR;
     this.renderer.setPixelRatio(this.pr);
@@ -252,7 +255,7 @@ class Game {
     this.sun.position.set(-8, 20, 6);
     s.add(this.sun);
     this.hero = makeHero(isGirl());
-    s.add(this.hero.root);
+    s.add(this.hero.root); this.hero.root.scale.setScalar(1.35); this.pfx = new FX(s);
     this._setGun(this.save.weapon);
     this.muzzle = new THREE.PointLight(0xffe08a, 0, 5);
     s.add(this.muzzle);
@@ -833,7 +836,7 @@ class Game {
         this.sparks.burst(e.x, 1, e.z, 3, 2, 0.3);
         break;
       case 'pop': {
-        S.play('pop');
+        S.play('pop'); this.pfx.burst(new THREE.Vector3(e.x, 1, e.z), { n: 26, colors: [0x7bd83a, 0xc8ff5a, 0xffe04a, 0xffffff], speed: 8, size: 0.8, life: 0.8, gravity: 6 });
         const big = e.kind === 'brute' || e.kind === 'king';
         this.puff.burst(e.x, 0.9, e.z, big ? 40 : 18, big ? 3.2 : 2.2, 0.8);
         this._splat(e.x, e.z, big ? 1.8 : 1);
@@ -1074,9 +1077,9 @@ class Game {
     const padOn = g.state === 'pad';
     this.pad.glow.material.opacity = padOn ? 0.25 + Math.sin(time * 5) * 0.12 : 0;
     this.pad.arrows.forEach((a, i) => { a.position.y = 0.25 + (padOn ? Math.max(0, Math.sin(time * 6 - i)) * 0.15 : 0); });
-    this._ambient(dt, time);
+    this._ambient(dt, time); this.pfx.update(dt);
     // camera follows the hero (high and steep, like the video)
-    const far = this.land ? new THREE.Vector3(0, 10, 8.5) : new THREE.Vector3(0, 11.5, 9.5); // closer and lower, like the video
+    const far = this.land ? new THREE.Vector3(0, 7.5, 6.5) : new THREE.Vector3(0, 9, 7.5); // closer and lower, like the video
     const tx = Math.max(-Math.max(0, this.W - (this.land ? 6 : 4)), Math.min(Math.max(0, this.W - (this.land ? 6 : 4)), hr.root.position.x));
     const tz = g.state === 'leap' || g.state === 'won' ? hr.root.position.z : Math.max(-this.D + 3, Math.min(this.D - 3, hr.root.position.z));
     const ty = g.state === 'leap' || g.state === 'won' ? hr.root.position.y * 0.5 : 0;

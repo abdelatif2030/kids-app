@@ -6,12 +6,16 @@
 import * as THREE from 'three';
 import { Store, PADS, DISPENSER, RACKS, SHELVES, CHECKOUTS, SHUTTLES, BOUNDS, normalizeSave } from './sim.js';
 import {
-  mat, makeAstronaut, makeAlien, makeBasket, makeDispenser, makeRack, makeShelf, makeCheckout, makeRobot, loadRealRobot, makeCoin,
+  mat, makeAstronaut as _ma, makeAlien as _mal, makeBasket, makeDispenser, makeRack, makeShelf, makeCheckout, makeRobot, loadRealRobot, makeCoin,
   makeShuttlePad, makeDeck, makePlanet, makeStars, makeHazard,
 } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
 import { CSS, CSS2, h } from './ui.js';
+import { polishRenderer } from './polish.js';
+import { FX, outline } from './fx.js';
+const makeAstronaut = (...a) => { const o = _ma(...a); outline(o.root, 0x14123a, 0.05); return o; };
+const makeAlien = (...a) => { const o = _mal(...a); outline(o.root || o, 0x14123a, 0.05); return o; };
 
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
 const webglOk = () => {
@@ -68,7 +72,7 @@ class Game {
     }
     this.loading = h('div', { class: 'ss-loading', style: 'background:#1a1440;color:#3ad8c8' }, t('loading'));
     this.root.append(this.loading);
-    this.renderer = new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' }), { preset: 'warm' });
     this.maxPR = Math.min(window.devicePixelRatio || 1, this.quality.low ? 1.25 : 1.5);
     this.pr = this.maxPR;
     this.renderer.setPixelRatio(this.pr);
@@ -176,7 +180,7 @@ class Game {
     // the child
     this.hero = makeAstronaut(0xf2f6fa, this.girl ? 0xff6aa8 : 0x3ad8c8, 0xf0c09a, this.girl ? 0x6a3a1a : 0x3a2414);
     if (this.girl) this.hero.head.add(new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 8), mat(0x6a3a1a)).translateY(-0.05).translateZ(-0.32));
-    s.add(this.hero.root);
+    s.add(this.hero.root); this.hero.root.scale.setScalar(1.35); this.pfx = new FX(s);
     this.heroStack = new Pool(this.hero.back, () => makeBasket(0.7), 10, (b, i) => b.position.set(0, -0.1 + i * 0.25, 0.1));
     this.ring = new THREE.Mesh(new THREE.RingGeometry(0.45, 0.6, 28), new THREE.MeshBasicMaterial({ color: 0xffc83a, transparent: true, opacity: 0.9 }));
     this.ring.rotation.x = -Math.PI / 2;
@@ -429,7 +433,7 @@ class Game {
     const events = st.step(dt, this._readInput());
     for (const e of events) {
       switch (e.type) {
-        case 'pick': this.sound.play('pick', e.n); break;
+        case 'pick': this.sound.play('pick', e.n); this.pfx.burst(new THREE.Vector3(this.hero.root.position.x, 1.3, this.hero.root.position.z), { n: 14, colors: [0xffe680, 0x7affff, 0xffffff], speed: 4, size: 0.7, life: 0.7, gravity: 2 }); break;
         case 'full': this.sound.play('full'); this.toast(t('full'), 1); break;
         case 'rack': this.sound.play('rack'); break;
         case 'arrive': if (Math.random() < 0.6) this.sound.play('arrive'); { const sh = this.shuttles.find((x) => Math.abs(x.sh.x - e.x) < 0.1); if (sh) sh.land = 1; } break;
@@ -438,7 +442,7 @@ class Game {
           this._burst(e.x, 1.4, e.z, 10);
           break;
         }
-        case 'collect': this.sound.play('coin', (this._run = (this._run ?? 0) + 1)); this._dirty = true; break;
+        case 'collect': this.pfx.burst(new THREE.Vector3(this.hero.root.position.x, 1.5, this.hero.root.position.z), { n: 24, colors: [0xffd23a, 0xfff2a0, 0xffffff], speed: 6, size: 0.8, life: 0.8, gravity: 4 }); this.sound.play('coin', (this._run = (this._run ?? 0) + 1)); this._dirty = true; break;
         case 'pay': this.sound.play('pay', e.paid / e.cost); this._dirty = true; break;
         case 'unlock': {
           const pad = PADS.find((p) => p.id === e.pad);
@@ -465,13 +469,14 @@ class Game {
     const px = Math.max(-4, Math.min(4, st.p.x));
     const pz = Math.max(-5, Math.min(5, st.p.z));
     // a diagonal, tilted view of the station (like the video), so space and the planet show past the deck edge
-    const ox = portrait ? 5.5 : 6.5;
-    const oz = portrait ? 9.5 : 8;
-    const want = new THREE.Vector3(px + ox, portrait ? 12.5 : 9.5, pz + oz);
+    const ox = portrait ? 4.5 : 5;
+    const oz = portrait ? 8 : 6;
+    const want = new THREE.Vector3(px + ox, portrait ? 10.5 : 7.5, pz + oz);
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 3));
     this.camera.position.copy(this.cam);
     this.camera.lookAt(this.cam.x - ox, 0, this.cam.z - oz - 1);
+    this.pfx.update(dt); if (this.mode === 'play' && Math.random() < 0.5) this.pfx.burst(new THREE.Vector3(st.p.x, 0.15, st.p.z), { n: 1, colors: [0xbffcff, 0xffffff, 0xffe680], speed: 1.2, size: 0.55, life: 0.6, gravity: 0, lift: 0.6 });
     this._guide(time);
     this._labels();
   }

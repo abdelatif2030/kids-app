@@ -13,6 +13,7 @@ import { mat, makeCar, makePalm, makeStand, makeGantry, makeChevron, makeMountai
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
 import { CSS, CSS2, CSS3, h } from './ui.js';
+import { polishRenderer } from './polish.js';
 
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
 const webglOk = () => {
@@ -96,7 +97,7 @@ class Game {
     }
     this.loading = h('div', { class: 'mr-loading' }, t('loading'));
     this.root.append(this.loading);
-    this.renderer = new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' }), { preset: 'night' });
     this.maxPR = Math.min(window.devicePixelRatio || 1, this.quality.low ? 1.25 : 1.5);
     this.pr = this.maxPR;
     this.renderer.setPixelRatio(this.pr);
@@ -808,8 +809,8 @@ class Game {
     const fx = Math.sin(p.h);
     const fz = Math.cos(p.h);
     const portrait = this.cw < this.ch;
-    const back = portrait ? 6.6 : 5.6;
-    const up = portrait ? 3.0 : 2.4;
+    const back = portrait ? 5.4 : 4.4;
+    const up = portrait ? 2.5 : 1.9;
     const want = new THREE.Vector3(p.x - fx * back, up, p.z - fz * back);
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 6));

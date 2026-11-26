@@ -13,6 +13,7 @@ import { makeGlbKart, makeBumperCar, makeShieldBubble, glowSprite, makePodium, g
 import { setLang, getLang, t, num, name, ordinal } from './i18n.js';
 import { CSS, h, ANIMAL_EMOJI, ITEM_EMOJI, TRACK_EMOJI, TRACK_BG } from './ui.js';
 import { Sound } from './audio.js';
+import { polishRenderer } from './polish.js';
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const damp = (k, dt) => 1 - Math.exp(-k * dt);
@@ -57,7 +58,7 @@ class Game {
     this.loading = h('div', { class: 'cr-loading' }, t('loading'));
     this.root.append(this.loading);
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' }), { preset: 'candy' });
     this.maxPR = Math.min(window.devicePixelRatio || 1, this.quality.low ? 1.25 : 1.5);
     this.pr = this.maxPR;
     this.renderer.setPixelRatio(this.pr);
@@ -742,7 +743,7 @@ class Game {
     const r = this.r;
     const tr = r.track;
     const c = r.race.player;
-    const want = tr.world(c.s - 7.6, c.x * 0.7, 4.7 + c.h * 0.6);
+    const want = tr.world(c.s - 6, c.x * 0.7, 3.7 + c.h * 0.6);
     const look = tr.world(c.s + 11, c.x * 0.5, 0.9 + c.h * 0.7);
     const up = tr.upAt(c.s);
     if (!r.camPos || dt >= 1) {

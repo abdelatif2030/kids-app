@@ -19,6 +19,7 @@ export class Sound extends SynthBase {
   constructor() { super(); this.last = {}; this.eng = null; }
   gate(k, ms) { const n = performance.now(); if (this.last[k] && n - this.last[k] < ms) return false; this.last[k] = n; return true; }
   play(n) {
+    if (typeof window !== 'undefined' && window.__cheerSfx) window.__cheerSfx(n);
     const c = this.ctx;
     if (!c || c.state !== 'running' || this.muted) return;
     const t = c.currentTime;

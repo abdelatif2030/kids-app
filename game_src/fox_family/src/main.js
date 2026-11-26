@@ -6,10 +6,13 @@
 import * as THREE from 'three';
 import { Trip, LEVELS, COLS, normalizeSave } from './sim.js';
 import { loadSprites, makePaintedFigure } from '../../cozy_kit/art.js';
-import { mat, makeFox, makeVehicle, makeTrain, makeLog, makeTree, makeBerry, makeDen, laneTexture } from './models.js';
+import { mat, makeFox, makeVehicle as _mv, makeTrain as _mt, makeLog as _ml, makeTree as _mtr, makeBerry, makeDen, laneTexture } from './models.js';
+import { FX, outline } from './fx.js';
+const makeVehicle = (...a) => outline(_mv(...a), 0x1a2410, 0.05), makeTrain = (...a) => outline(_mt(...a), 0x1a2410, 0.04), makeLog = (...a) => outline(_ml(...a), 0x2a1808, 0.05), makeTree = (...a) => { const t = outline(_mtr(...a), 0x14240c, 0.05); t.userData.isTree = true; return t; };
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
 import { CSS, CSS2, h } from './ui.js';
+import { polishRenderer } from './polish.js';
 
 const C = 1.2; // one square
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
@@ -46,7 +49,7 @@ class Game {
     }
     this.loading = h('div', { class: 'fx-loading', style: 'color:#f07a2a' }, t('loading'));
     this.root.append(this.loading);
-    this.renderer = new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' }), { preset: 'warm' });
     this.maxPR = Math.min(window.devicePixelRatio || 1, this.quality.low ? 1.25 : 1.5);
     this.pr = this.maxPR;
     this.renderer.setPixelRatio(this.pr);
@@ -99,6 +102,76 @@ class Game {
     this.camera.aspect = this.cw / this.ch;
     this.camera.fov = this.cw < this.ch ? 62 : 46;
     this.camera.updateProjectionMatrix();
+  }
+
+
+  /** Cartoon world dressing: hills, drifting clouds, flowers, mushrooms, rocks, fences, butterflies, flowing river and swaying trees. */
+  _dress(s, lv, tex) {
+    const sea = lv.season;
+    const pal = { summer: { hill: [0x5cc04a, 0x7ad65a, 0x48ad55], fl: [0xff5a8a, 0xffd23a, 0xffffff, 0xa06af0] }, autumn: { hill: [0xd89a3a, 0xe8b24a, 0xc8782a], fl: [0xff8a2a, 0xe8442a, 0xffd23a, 0xffb86a] }, winter: { hill: [0xe8f2fa, 0xd0e4f2, 0xf6fbff], fl: [0xaad8ff, 0xffffff, 0xff8aa8, 0x8ab8ff] } }[sea];
+    const zFar = -this.trip.den * C - 14;
+    this.sway = []; this.clouds = []; this.flies = [];
+    // rolling hills, back and sides
+    for (let i = 0; i < 14; i++) {
+      const col = pal.hill[i % 3];
+      const hill = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 12), new THREE.MeshLambertMaterial({ color: col }));
+      const r = 5 + (i * 37 % 5);
+      const side = i % 2 ? 1 : -1;
+      hill.scale.set(r * 1.5, r * 0.55, r);
+      hill.position.set(side * (18 + (i * 29 % 12)), -1, zFar - (i % 5) * 4 + (i > 9 ? this.trip.den * C * 0.5 : 0));
+      if (i < 8) hill.position.set((i - 4) * 12, -1.5, zFar - 8 - (i % 3) * 4);
+      s.add(hill);
+    }
+    // clouds
+    for (let i = 0; i < 7; i++) {
+      const c = new THREE.Group();
+      for (let k = 0; k < 4; k++) { const b = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 8), new THREE.MeshBasicMaterial({ color: 0xffffff })); b.scale.set(1.8 - k * 0.2, 0.9, 1); b.position.set(k * 1.6 - 2.4, k % 2 * 0.4, 0); c.add(b); }
+      c.position.set(-40 + i * 14, 12 + (i % 3) * 3, zFar + 8 - (i % 4) * 14);
+      c.scale.setScalar(1.3 + (i % 3) * 0.5);
+      s.add(c); this.clouds.push(c);
+    }
+    // flowers, mushrooms, rocks, fence posts beside the board
+    const fm = [pal.fl.map((c) => new THREE.MeshLambertMaterial({ color: c }))][0];
+    const stem = new THREE.MeshLambertMaterial({ color: 0x3aa04a });
+    const stone = new THREE.MeshLambertMaterial({ color: 0xa8a8b4 });
+    const wood = new THREE.MeshLambertMaterial({ color: 0xc88a4a });
+    this.trip.rows.forEach((row) => {
+      if (row.type !== 'grass' && row.type !== 'den') return;
+      for (let k = 0; k < 9; k++) {
+        const h = row.r * 31 + k * 17;
+        const side = h % 2 ? 1 : -1;
+        const x = side * ((COLS / 2 + 0.3 + (h % 13) / 4) * C);
+        const z = -row.r * C + ((h * 3) % 10 - 5) / 10 * C * 0.8;
+        const kind = h % 4;
+        if (kind === 0 || kind === 1) {
+          const f = new THREE.Group();
+          f.add(new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.3, 5), stem).translateY(0.15));
+          const head = new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 6), fm[h % fm.length]); head.position.y = 0.34; f.add(head);
+          f.add(new THREE.Mesh(new THREE.SphereGeometry(0.06, 6, 5), new THREE.MeshLambertMaterial({ color: 0xffe44a })).translateY(0.4));
+          f.position.set(x, 0, z); s.add(f); this.sway.push({ m: f, ph: h, amp: 0.25, base: 0 });
+        } else if (kind === 2) {
+          const m = new THREE.Group();
+          m.add(new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 0.25, 8), new THREE.MeshLambertMaterial({ color: 0xfff0d8 })).translateY(0.12));
+          const cap = new THREE.Mesh(new THREE.SphereGeometry(0.22, 10, 6, 0, 6.3, 0, 1.6), new THREE.MeshLambertMaterial({ color: 0xe84040 })); cap.position.y = 0.24; m.add(cap);
+          m.position.set(x, 0, z); s.add(m);
+        } else {
+          const r = new THREE.Mesh(new THREE.DodecahedronGeometry(0.22 + (h % 3) * 0.08), stone); r.position.set(x, 0.12, z); r.scale.y = 0.7; s.add(r);
+        }
+      }
+      if (row.r % 3 === 1) for (const side of [-1, 1]) for (let k = 0; k < 4; k++) { // picket fence
+        const post = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.55, 0.12), wood); post.position.set(side * (COLS / 2 + 0.2) * C, 0.28, -row.r * C + (k - 1.5) * C * 0.25); s.add(post);
+      }
+    });
+    // butterflies
+    for (let i = 0; i < 7; i++) {
+      const b = new THREE.Group();
+      const wc = new THREE.MeshBasicMaterial({ color: pal.fl[i % 4], side: THREE.DoubleSide });
+      for (const sx of [-1, 1]) { const w = new THREE.Mesh(new THREE.CircleGeometry(0.16, 8), wc); w.position.x = sx * 0.1; w.rotation.x = -Math.PI / 2; b.add(w); b.userData['w' + sx] = w; }
+      s.add(b); this.flies.push({ m: b, cx: (i - 3) * 2.2, cz: -(2 + i * 1.7) * C, ph: i * 1.3 });
+    }
+    // trees sway and get a cartoon outline
+    s.traverse((o) => { if (o.userData && o.userData.isTree) this.sway.push({ m: o, ph: o.position.x + o.position.z, amp: 0.05, base: 0 }); });
+    this.riverTex = tex.river || null; this.lilyTex = tex.lily || null;
   }
 
   // ---- a level -------------------------------------------------------------------------------------------------------
@@ -171,6 +244,9 @@ class Game {
     this.cubModels = this.trip.cubs.map((c) => { const m = this._fox(true); m.root.position.set(c.x * C, 0, -c.r * C); s.add(m.root); m.call = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 6), mat(0xffd23a, 0xffaa00, 0.6)); m.call.position.y = 1.2; m.root.add(m.call); return m; });
     this.fox = this._fox(false);
     s.add(this.fox.root);
+    this.pfx = new FX(s);
+    this._dress(s, lv, tex);
+    { const ring = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.95, 32), new THREE.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0.85, side: THREE.DoubleSide, depthWrite: false })); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.06; this.fox.root.add(ring); }
     this.shadow = new THREE.Mesh(new THREE.CircleGeometry(0.4, 16), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.25, depthWrite: false }));
     this.shadow.rotation.x = -Math.PI / 2;
     s.add(this.shadow);
@@ -387,14 +463,16 @@ class Game {
   _playFrame(dt, time) {
     const tr = this.trip;
     const events = tr.step(dt);
+    if (this.pfx) this.pfx.update(dt);
     for (const e of events) {
       switch (e.type) {
-        case 'hop': this.sound.play('hop'); break;
+        case 'hop': this.sound.play('hop'); if (this.pfx) this.pfx.burst(new THREE.Vector3(this.fox.root.position.x, 0.2, this.fox.root.position.z), { n: 10, colors: [0xffffff, 0xf2e6c0], speed: 3, size: 0.8, life: 0.5, gravity: 0, flat: true }); break;
         case 'plop': this.sound.play('plop'); break;
-        case 'berry': this.sound.play('berry', e.n); break;
-        case 'cub': this.sound.play('cub'); this.toast(t('cub'), 1.6); break;
-        case 'stop': if (Math.abs(e.r - tr.fox.r) < 4) this.sound.play('stop'); break;
+        case 'berry': if (window.__cheer) window.__cheer(e.n >= 3 ? 'combo' : 'good'); this.sound.play('berry', e.n); if (this.pfx) this.pfx.burst(new THREE.Vector3(this.fox.root.position.x, 1.2, this.fox.root.position.z), { n: 30, colors: [0xff3a5a, 0xffd23a, 0xffffff], speed: 8, size: 0.9, life: 0.9, gravity: 5 }); break;
+        case 'cub': if (window.__cheer) window.__cheer('win', true); this.sound.play('cub'); this.toast(t('cub'), 1.6); break;
+        case 'stop': if (Math.abs(e.r - tr.fox.r) < 4) { this.sound.play('stop'); if (window.__cheer) window.__cheer('near'); } break;
         case 'bump':
+          if (window.__cheer) window.__cheer('oops', true);
           this.sound.play(e.why === 'splash' ? 'splash' : 'bump');
           this._pop(e.why === 'splash' ? t('splash') : t('bump'), e.x, e.r);
           this._burst(e.x * C, -e.r * C, e.why === 'splash' ? 24 : 12);
@@ -403,6 +481,7 @@ class Game {
         case 'trainWarn': if (Math.abs(e.r - tr.fox.r) < 5) this.sound.play('trainWarn'); break;
         case 'train': if (Math.abs(e.r - tr.fox.r) < 6) this.sound.play('train'); break;
         case 'den':
+          if (window.__cheer) window.__cheer('win', true);
           this.sound.play('den');
           this.hud.goal.textContent = t('welcome');
           for (let k = 0; k < tr.parade.length; k++) setTimeout(() => this.sound.play('march'), 300 + k * 300);
@@ -450,7 +529,23 @@ class Game {
     const face = { up: 0, down: Math.PI, left: Math.PI / 2, right: -Math.PI / 2 }[f.face] ?? 0;
     this.fox.root.rotation.y = face;
     this.fox.root.rotation.z = f.bump > 0 ? Math.sin(time * 30) * 0.4 : 0;
-    this.fox.tail.rotation.y = Math.sin(time * 6) * 0.4;
+    if (this.sway) {
+      for (const w of this.sway) w.m.rotation.z = Math.sin(time * 2.2 + w.ph) * w.amp;
+      for (const c of this.clouds) { c.position.x += dt * 0.6; if (c.position.x > 50) c.position.x = -50; }
+      for (const b of this.flies) { const a = time * 1.1 + b.ph; b.m.position.set(b.cx + Math.sin(a) * 1.6, 1.1 + Math.sin(a * 2.3) * 0.35, b.cz + Math.cos(a * 0.8) * 1.2); b.m.rotation.y = a; const fl = Math.sin(time * 18 + b.ph) * 0.9; b.m.userData.w1.rotation.z = fl; b.m.userData['w-1'].rotation.z = -fl; }
+      if (this.riverTex) this.riverTex.offset.x = (time * 0.12) % 1;
+      if (this.lilyTex) this.lilyTex.offset.x = (time * 0.08) % 1;
+    }
+    this.fox.tail.rotation.y = Math.sin(time * 9) * 0.55;
+    this.fox.tail.rotation.x = 0.5 + Math.sin(time * 5) * 0.12;
+    {
+      const run = f.hop > 0 ? 1 : 0.18; const ph = time * (f.hop > 0 ? 26 : 7);
+      this.fox.legs.forEach((l, i) => { l.rotation.x = Math.sin(ph + (i % 2 ? Math.PI : 0) + (i > 1 ? 1.2 : 0)) * 0.9 * run; });
+      this.fox.body.position.y = Math.abs(Math.sin(ph)) * 0.07 * (run + 0.3);
+      this.fox.body.rotation.x = f.hop > 0 ? -0.18 : Math.sin(time * 2) * 0.03;
+      this.fox.head.rotation.x = Math.sin(time * 3.3) * 0.12 - (f.hop > 0 ? 0.12 : 0);
+      this.fox.head.rotation.z = Math.sin(time * 2.1) * 0.1;
+    }
     this.shadow.position.set(x, 0.02, z);
     this.shadow.scale.setScalar(1 - y * 0.6);
     // when home, the cubs march into the den
@@ -481,8 +576,9 @@ class Game {
   _fox(cub) {
     const P = this.pics;
     const pic = P && P.fox;
+    if (true) { const m = makeFox(cub); m.root.scale.multiplyScalar(cub ? 1.3 : 1.35); return m; }
     if (!pic) return makeFox(cub);
-    const f = makePaintedFigure(THREE, { idle: pic }, cub ? 0.95 : 1.9);
+    const f = makePaintedFigure(THREE, { idle: pic }, cub ? 1.2 : 2.6);
     f.tail = { rotation: { x: 0, y: 0, z: 0 } };
     return f;
   }

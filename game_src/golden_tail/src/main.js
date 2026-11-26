@@ -6,10 +6,14 @@
 import * as THREE from 'three';
 import { Chase } from './sim.js';
 import { LEVELS, RIVALS, PLATFORMS, STRIPS, MUSHROOMS, GROUND_R, normalizeSave } from './data.js';
-import { mat, cone, makeDino, makeAnimal, makeGoldenTail, makeDeck, makeStrip, makeMushroom, makeTree, makeBush } from './models.js';
+import { mat, cone, makeDino, makeAnimal, makeGoldenTail, makeDeck as _md, makeStrip, makeMushroom as _mm, makeTree as _mt, makeBush as _mbu } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
 import { CSS, CSS2, CSS3, h } from './ui.js';
+import { polishRenderer } from './polish.js';
+import { outline } from './fx.js';
+const _ol = (o, c, k = 0.04) => { outline(o.root || o, c, k); return o; };
+const makeDeck = (...a) => _ol(_md(...a), 0x3a1c06), makeMushroom = (...a) => _ol(_mm(...a), 0x4a0a1a), makeTree = (...a) => _ol(_mt(...a), 0x0e2a08), makeBush = (...a) => _ol(_mbu(...a), 0x0e2a08);
 
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
 const webglOk = () => {
@@ -99,7 +103,7 @@ class Game {
     }
     this.loading = h('div', { class: 'gt-loading' }, t('loading'));
     this.root.append(this.loading);
-    this.renderer = new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' }), { preset: 'warm' });
     this.maxPR = Math.min(window.devicePixelRatio || 1, this.quality.low ? 1.25 : 1.5);
     this.pr = this.maxPR;
     this.renderer.setPixelRatio(this.pr);
@@ -198,7 +202,7 @@ class Game {
       s.add(b);
     }
     this.dino = makeDino();
-    s.add(this.dino.root);
+    s.add(this.dino.root); this.dino.root.scale.setScalar(1.3);
     this.tail = makeGoldenTail();
     s.add(this.tail.root);
     // a golden arrow bouncing over whoever wears the tail
@@ -586,7 +590,7 @@ class Game {
     this.sparkles.update(dt);
     // camera: behind and above the dino
     const portrait = this.cw < this.ch;
-    const want = new THREE.Vector3(p.x, p.y + (portrait ? 7.5 : 5.6), p.z + (portrait ? 8 : 6.6));
+    const want = new THREE.Vector3(p.x, p.y + (portrait ? 6.2 : 4.5), p.z + (portrait ? 6.6 : 5.3));
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 4));
     this.camera.position.copy(this.cam);

@@ -340,6 +340,7 @@ export class Sound {
   // ---- effects --------------------------------------------------------------------------------------------------
 
   play(name, arg) {
+    if (typeof window !== 'undefined' && window.__cheerSfx) window.__cheerSfx(name);
     if (!this.ctx || this.ctx.state !== 'running') return;
     const t = this.ctx.currentTime + 0.005;
     const S = this.sfx;

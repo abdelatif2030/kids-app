@@ -8,6 +8,7 @@ import * as THREE from 'three';
 import { Match, LEVELS, PITCH, SKINS, LEG_OFF, LANE_LEN, LANE_W, LIVES, DUMMY_R, normalizeSave, buySkin, selectSkin } from './sim.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { polishRenderer } from './polish.js';
 
 const S = {
   title: ['سكة الكورة', 'NUTMEG RUSH'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], balls: ['الكور', 'BALLS'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
@@ -131,7 +132,7 @@ class Game {
   // ---------- the 3D world ----------
   _three() {
     const L = PITCH.L, HW = PITCH.W / 2;
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true }), { preset: 'warm' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.prepend(this.renderer.domElement);

@@ -25,6 +25,7 @@ export class Sound extends SynthBase {
   }
 
   play(n) {
+    if (typeof window !== 'undefined' && window.__cheerSfx) window.__cheerSfx(n);
     const c = this.ctx;
     if (!c || c.state !== 'running' || this.muted) return;
     const t = c.currentTime;
