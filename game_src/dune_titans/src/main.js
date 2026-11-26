@@ -164,12 +164,12 @@ class Game {
       tex = this._panoTex[roundIndex] = new THREE.TextureLoader().load(`${this.base}art/pano${roundIndex + 1}.webp`, undefined, undefined, () => { this._panoTex[roundIndex] = null; });
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.wrapS = THREE.MirroredRepeatWrapping;
-      tex.repeat.set(2, 0.66);
-      tex.offset.set(0, 0.34);
+      tex.repeat.set(3, 1); // the WHOLE picture, 3 times round (it used to crop the top third: the rock arch lost its top and showed as a flat blue wedge, owner 2026-11-26)
+      tex.offset.set(0, 0);
     }
     if (!tex) return null;
-    const cyl = new THREE.Mesh(new THREE.CylinderGeometry(780, 780, 330, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false, depthWrite: false }));
-    cyl.position.set(cx, 150, cz);
+    const cyl = new THREE.Mesh(new THREE.CylinderGeometry(780, 780, 305, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false, depthWrite: false }));
+    cyl.position.set(cx, 137.5, cz); // the same bottom edge as before; the picture is squeezed into 305 high so that its TOP (rock arches, temple roofs) is inside the view
     cyl.renderOrder = -10;
     return cyl;
   }
@@ -315,7 +315,7 @@ class Game {
       if (G && G[kn[0]]) {
         // real 3D trucks (Kenney, CC0): they turn with the track like real cars. The player's colour picks the model, the rivals take the others.
         const key = k === 0 ? kn[this.save.color % 4] : kn[(k + 1) % 4];
-        b = makeModelVehicle(THREE, G[key] || G[kn[0]], { length: 4.6, yaw: 0, tint: k === 0 ? null : [0xffffff, 0xffe8c8, 0xc8e8ff, 0xf0d0ff, 0xd8ffd8][k % 5] });
+        b = makeModelVehicle(THREE, G[key] || G[kn[0]], { length: 3.8, yaw: 0, tint: k === 0 ? null : [0xffffff, 0xffe8c8, 0xc8e8ff, 0xf0d0ff, 0xd8ffd8][k % 5] });
       } else if (P && P.truck_01) {
         const names = ['truck_01', 'truck_02', 'truck_03', 'truck_04'];
         const mine = P[names[this.save.color]] || P.truck_01;

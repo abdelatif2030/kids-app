@@ -416,7 +416,7 @@ class Game {
     for (let k = 0; k < n; k++) { rp[k * 3] = (Math.random() - 0.5) * 60; rp[k * 3 + 1] = Math.random() * 30; rp[k * 3 + 2] = (Math.random() - 0.5) * 60; }
     this.rainG = new THREE.BufferGeometry();
     this.rainG.setAttribute('position', new THREE.BufferAttribute(rp, 3));
-    this.rain = new THREE.Points(this.rainG, new THREE.PointsMaterial({ color: 0xcfe0f4, size: 0.18, transparent: true, opacity: 0.7, depthWrite: false }));
+    this.rain = new THREE.Points(this.rainG, new THREE.PointsMaterial({ color: 0xcfe0f4, size: 3.4, sizeAttenuation: false, map: dotTexture(), transparent: true, opacity: 0.75, depthWrite: false }) /* round drops of a fixed small size: the old flat squares grew into big blue boxes when a drop passed near the camera (owner report 2026-11-26) */);
     this.rain.frustumCulled = false;
     s.add(this.rain);
   }
