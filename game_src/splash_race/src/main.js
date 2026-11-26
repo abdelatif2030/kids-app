@@ -600,6 +600,20 @@ class Game {
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 2);
     this.camera.position.set(this.cam.x + (Math.random() - 0.5) * this.shake * 0.3, this.cam.y, this.cam.z);
     this.camera.lookAt(this.cam.x, 0, this.cam.z - (portrait ? 8.8 : 7.2) - 7);
+    { // front-view cam on the start line and when the player finishes, so the cartoon faces read
+      const want = (sw.state === 'start' || p.done) ? 1 : 0;
+      this._introK = (this._introK ?? 0) + (want - (this._introK ?? 0)) * Math.min(1, dt * (want ? 4 : 1.6));
+      const k = this._introK;
+      if (k > 0.01) {
+        const e = k * k * (3 - 2 * k);
+        const fp = new THREE.Vector3(p.x * 0.5, 1.5, -p.s - (sw.state === 'start' ? 6.5 : 5));
+        const fl = new THREE.Vector3(p.x * 0.5, 0.45, -p.s + 0.2);
+        const cp = this.camera.position.clone().lerp(fp, e);
+        const dir = new THREE.Vector3(); this.camera.getWorldDirection(dir);
+        const cl = this.camera.position.clone().addScaledVector(dir, 10).lerp(fl, e);
+        this.camera.position.copy(cp); this.camera.lookAt(cl);
+      }
+    }
     if (this.panoMesh) this.panoMesh.position.set(this.camera.position.x, 52, this.camera.position.z);
     if (this.mode !== 'race') return;
     // HUD
