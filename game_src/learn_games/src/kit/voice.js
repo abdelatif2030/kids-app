@@ -52,7 +52,7 @@ export class Voice {
       const sc = document.createElement('script');
       sc.id = 'learn-voice-manifest';
       sc.src = `${this.dir}manifest.js`;
-      sc.onerror = () => { window.__learnVoice = window.__learnVoice || { ar: [], en: [] }; };
+      sc.onerror = () => { window.__learnVoice = window.__learnVoice || { ar: [], en: [], de: [], fr: [] }; };
       document.head.append(sc);
     }
   }

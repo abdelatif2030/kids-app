@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kids_app/auth/auth_pictures.dart' show kGoogleSignInAllowed;
+import 'package:kids_app/auth/auth_pictures.dart' show kAppleSignInAllowed, kGoogleSignInAllowed;
 import 'package:kids_app/journey/ui/privacy_screen.dart';
 import 'package:kids_app/legal/terms_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,12 +32,14 @@ void main() {
     expect(RegExp(r'UIRequiresFullScreen</key>\s*<true/>').hasMatch(File('ios/Runner/Info.plist').readAsStringSync()), isTrue);
   });
 
-  test('Google sign-in is hidden on iPhone until Sign in with Apple exists, and shown elsewhere', () {
-    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-    expect(kGoogleSignInAllowed, isFalse);
-    debugDefaultTargetPlatformOverride = TargetPlatform.android;
-    expect(kGoogleSignInAllowed, isTrue);
+  test('Sign in with Apple is offered wherever Google sign-in is (guideline 4.8)', () {
+    for (final p in [TargetPlatform.iOS, TargetPlatform.android]) {
+      debugDefaultTargetPlatformOverride = p;
+      expect(kGoogleSignInAllowed && !kAppleSignInAllowed, isFalse, reason: '$p');
+    }
     debugDefaultTargetPlatformOverride = null;
+    final src = File('lib/auth/auth_pictures.dart').readAsStringSync();
+    expect(src.contains("ValueKey('login_apple')") && src.contains("ValueKey('register_apple')"), isTrue);
   });
 
   test('the hosted privacy page exists for the store listing', () {

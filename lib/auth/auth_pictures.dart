@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -160,6 +159,11 @@ class _LoginPictureScreenState extends State<LoginPictureScreen> {
 
   Future<void> _google() => _guard((repo) async {
     await repo.signInWithGoogle(role: UserRole.parent);
+    if (mounted) widget.onDone();
+  });
+
+  Future<void> _apple() => _guard((repo) async {
+    await repo.signInWithApple(role: UserRole.parent);
     if (mounted) widget.onDone();
   });
 
@@ -327,6 +331,17 @@ class _LoginPictureScreenState extends State<LoginPictureScreen> {
               onTap: _google,
             ),
           ),
+          if (kAppleSignInAllowed) ...[
+            const SizedBox(height: 10),
+            KeyedSubtree(
+              key: const ValueKey('login_apple'),
+              child: AuthOutlineButton(
+                label: tr2('تسجيل الدخول بحساب أبل', 'Sign in with Apple'),
+                leading: const Icon(Icons.apple, size: 26, color: Colors.black),
+                onTap: _apple,
+              ),
+            ),
+          ],
           ],
           const SizedBox(height: 6),
           const LegalLinks(color: authInk),
@@ -552,6 +567,12 @@ class _RegisterPictureScreenState extends State<RegisterPictureScreen> {
 
   Future<void> _google() => _guard((repo) async {
     await repo.signInWithGoogle(role: UserRole.parent);
+    await _saveExtras();
+    if (mounted) Navigator.pop(context, true);
+  });
+
+  Future<void> _apple() => _guard((repo) async {
+    await repo.signInWithApple(role: UserRole.parent);
     await _saveExtras();
     if (mounted) Navigator.pop(context, true);
   });
@@ -812,6 +833,17 @@ class _RegisterPictureScreenState extends State<RegisterPictureScreen> {
               onTap: _google,
             ),
           ),
+          if (kAppleSignInAllowed) ...[
+            const SizedBox(height: 10),
+            KeyedSubtree(
+              key: const ValueKey('register_apple'),
+              child: AuthOutlineButton(
+                label: tr2('التسجيل بحساب أبل', 'Register with Apple'),
+                leading: const Icon(Icons.apple, size: 26, color: Colors.black),
+                onTap: _apple,
+              ),
+            ),
+          ],
           ],
           const SizedBox(height: 6),
           const LegalLinks(color: authInk),
@@ -848,9 +880,10 @@ class _RegisterPictureScreenState extends State<RegisterPictureScreen> {
 
 /// What opens after the intro: the sign-in page when the online accounts are switched on and nobody is signed in,
 /// otherwise [HomeEntry]. Release 1 is offline, so there the start screen is simply the first page.
-/// Apple rule 4.8: an app that offers "Sign in with Google" on iPhone must offer "Sign in with Apple" too. That package is not added
-/// (owner approval needed), so Google sign-in is hidden on iOS until it is; e-mail sign-up works everywhere.
-bool get kGoogleSignInAllowed => kIsWeb || defaultTargetPlatform != TargetPlatform.iOS;
+/// Apple rule 4.8: Google sign-in on iPhone must come with Sign in with Apple. Both are offered now (the Apple button sits right under
+/// the Google one wherever Google is shown). The Apple button needs the setup in docs/APPLE_SIGN_IN_SETUP.md to work for real.
+bool get kGoogleSignInAllowed => true;
+bool get kAppleSignInAllowed => kGoogleSignInAllowed;
 
 class AuthGate extends StatefulWidget {
   /// Tests: decide without the global gate.

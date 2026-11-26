@@ -4,7 +4,10 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, kReleaseMode;
+import 'package:crypto/crypto.dart' show sha256;
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'dart:math' show Random;
 
 import 'teachers_market.dart';
 import 'teachers_models.dart';
@@ -141,6 +144,45 @@ class FirebaseTeacherRepository implements TeacherRepository {
         }
       });
 
+  /// Sign in with Apple (store rule 4.8: offered beside Google). On the web Firebase opens Apple's own pop-up; on iPhone the system
+  /// sheet is used with a one-time nonce. A brand-new account gets a users/{uid} record with the chosen role.
+  @override
+  Future<void> signInWithApple({required UserRole role}) => _guard(() async {
+        UserCredential cred;
+        try {
+          if (kIsWeb) {
+            cred = await _auth.signInWithPopup(OAuthProvider('apple.com')..addScope('email')..addScope('name'));
+          } else {
+            final raw = _nonce();
+            final apple = await SignInWithApple.getAppleIDCredential(
+              scopes: [AppleIDAuthorizationScopes.email, AppleIDAuthorizationScopes.fullName],
+              nonce: sha256.convert(utf8.encode(raw)).toString(),
+            );
+            final oauth = OAuthProvider('apple.com').credential(idToken: apple.identityToken, rawNonce: raw);
+            cred = await _auth.signInWithCredential(oauth);
+          }
+        } on SignInWithAppleAuthorizationException catch (e) {
+          throw AccountException(e.code == AuthorizationErrorCode.canceled
+              ? tr2('تم إلغاء الدخول', 'Sign-in was cancelled')
+              : tr2('تعذر الدخول بحساب أبل، حاول مرة أخرى', 'Apple sign-in failed, please try again'));
+        }
+        final user = cred.user!;
+        final doc = _db.collection('users').doc(user.uid);
+        if (!(await doc.get()).exists) {
+          await doc.set({
+            'role': role.name,
+            'name': (user.displayName ?? '').trim(),
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        }
+      });
+
+  static String _nonce([int length = 32]) {
+    const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-._';
+    final r = Random.secure();
+    return List.generate(length, (_) => chars[r.nextInt(chars.length)]).join();
+  }
+
   @override
   Future<void> deleteAccount() => _guard(() async {
         final u = _auth.currentUser;
@@ -159,7 +201,7 @@ class FirebaseTeacherRepository implements TeacherRepository {
           await u.delete();
         } on FirebaseAuthException catch (e) {
           if (e.code == 'requires-recent-login') {
-            throw AccountException(loc('لأمانك، سجّل الدخول من جديد ثم كرّر حذف الحساب'));
+            throw AccountException(tr2('لأمانك، سجّل الدخول من جديد ثم كرّر حذف الحساب', 'For your safety, sign in again and then repeat the account deletion'));
           }
           rethrow;
         }

@@ -66,6 +66,20 @@ class FakeTeacherRepository implements TeacherRepository {
     _current = AppUser(uid, 'google.user@example.com');
   }
 
+  int appleSignIns = 0;
+  @override
+  Future<void> signInWithApple({required UserRole role}) async {
+    appleSignIns++;
+    final hit = _users.entries.where((e) => e.value.email == 'apple.user@example.com').firstOrNull;
+    if (hit != null) {
+      _current = AppUser(hit.key, 'apple.user@example.com');
+      return;
+    }
+    final uid = 'u${_nextId++}';
+    _users[uid] = (email: 'apple.user@example.com', password: '', name: 'Apple User', role: role);
+    _current = AppUser(uid, 'apple.user@example.com');
+  }
+
   final List<String> resetsSent = [];
 
   @override

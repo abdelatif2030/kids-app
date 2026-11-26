@@ -593,6 +593,9 @@ abstract class TeacherRepository {
   /// with a short message if it is cancelled or fails.
   Future<void> signInWithGoogle({required UserRole role});
 
+  /// Sign in with Apple (required by Apple whenever another third-party sign-in is offered on iPhone).
+  Future<void> signInWithApple({required UserRole role});
+
   /// Sends a password-reset e-mail. It never says whether the address has an account (no account probing).
   Future<void> sendPasswordReset(String email);
   Future<void> signOut();
