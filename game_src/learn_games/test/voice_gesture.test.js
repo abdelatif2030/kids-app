@@ -77,3 +77,18 @@ test('an optional Arabic word without a recording is skipped (no robotic device 
   assert.deepEqual(said.map((x) => x[1]), ['recorded', 'recorded']);
   assert.ok(clipId('قطة', 'ar'));
 });
+
+test('a sentence with no recording is SILENT: the device voice is never used, and the queue still moves on', async () => {
+  const { Voice } = await import('../src/kit/voice.js');
+  const device = [];
+  const v = new Voice('./', 'ar', (t, l) => device.push([t, l]), () => {});
+  const played = [];
+  v.has = (it) => it.t === 'recorded';
+  v._play = (it) => { played.push(it.t); v._next(); };
+  globalThis.window = globalThis.window || {}; window.__learnVoice = true;
+  const lit = [];
+  await new Promise((resolve) => v.say([{ t: 'no clip here', lang: 'ar' }, { t: 'recorded', lang: 'ar' }], (i) => lit.push(i), resolve));
+  assert.deepEqual(device, []);
+  assert.deepEqual(played, ['recorded']);
+  assert.deepEqual(lit, [0, 1]);
+});

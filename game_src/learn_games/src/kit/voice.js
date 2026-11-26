@@ -125,21 +125,11 @@ export class Voice {
     // would sound like another person and could run over the next clip
     if (text.optional && !this.has(text)) { this._next(); return; }
     if (!this.has(text)) {
-      // no recording: the device voice says this one and whatever is left of the same language, as one sentence
-      const lang = text.lang;
-      const same = [];
-      while (this.queue.length && this.queue[0].lang === lang) same.push(this.queue.shift());
-      const all = [text, ...same];
-      const rest = all.map((x) => x.t).join(lang === 'ar' ? '،  ' : ', ').replace(/ {2}/g, ' ');
-      this.onTalk(Math.min(8, 1.2 + rest.length * 0.09));
-      this.fallback(rest, lang);
-      // the device voice speaks it as one sentence: the things light up at an even pace meanwhile, then it is done
-      const per = Math.max(900, Math.min(2600, (rest.length * 130) / all.length)); // long enough that the device voice is done before the next clip starts
+      // no recording yet: SILENT (owner 2026-11-26: the device voice sounds like another person and he wants nothing that is not good).
+      // The text is on screen, the thing lights up, and the queue moves on; the clip is on the owner's list to record.
+      this._start(this.i++);
       const run = this.run;
-      const i0 = this.i;
-      this.i += all.length;
-      all.forEach((_, k) => setTimeout(() => { if (run === this.run) this._start(i0 + k); }, k * per));
-      setTimeout(() => { if (run === this.run) { if (this.queue.length) this._next(); else this._finish(); } }, all.length * per + 600);
+      setTimeout(() => { if (run === this.run) this._next(); }, 700);
       return;
     }
     this._start(this.i++);
@@ -154,7 +144,7 @@ export class Voice {
     this.audio = a;
     a.onloadedmetadata = () => { if (this.tok === token) this.onTalk((a.duration || 2) + 0.3); };
     a.onended = () => { if (this.tok === token && this.audio === a) { this.audio = null; this._next(); } };
-    a.onerror = () => { if (this.tok === token && this.audio === a) { this.audio = null; this.onTalk(Math.min(6, 1.2 + text.t.length * 0.09)); this.fallback(text.t, text.lang); this._next(); } };
+    a.onerror = () => { if (this.tok === token && this.audio === a) { this.audio = null; this._next(); } }; // a clip that cannot load: silent, never the device voice
     this.onTalk(2.5);
     try { a.src = `${this.dir}${text.lang}/${this._clipName(text)}.mp3`; } catch (_) { /* fine */ }
     const run = this.run;
