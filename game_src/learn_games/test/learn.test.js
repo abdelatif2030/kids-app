@@ -168,3 +168,19 @@ test('every Arabic levels page (the first twelve and the topic pages) is drawn b
   assert.equal((src.match(/this\._drawBoard\(/g) || []).length, 2);
   assert.ok(!src.includes("class: 'lw-hit', 'aria-label': lv.ar")); // the old invisible buttons over the picture's own tiles are gone
 });
+
+test('English, German and French sections say the Arabic word first (once), then the word; Arabic sections do not repeat it', async () => {
+  for (const l of ['en', 'de', 'fr']) {
+    const sec = learnSections(l).find((s) => s.id === 'farm');
+    const it = sec.items[0];
+    assert.ok(it.arSay.length === 1 && it.arSay[0].lang === 'ar' && it.arSay[0].optional, l);
+  }
+  assert.equal((learnSections('ar').find((s) => s.id === 'farm').items[0].arSay || []).length, 0);
+  const nine = learnSections('de').find((s) => s.id === 'numbers').items.find((x) => x.n === 9);
+  assert.equal(nine.arSay[0].lang, 'ar');
+  const { englishRounds } = await import('../src/english/levels.js');
+  const lv = (await import('../src/english/levels.js')).EN_LEVELS[0];
+  const rounds = englishRounds(lv, 5, () => 0.5, null, 3, 5);
+  assert.ok(rounds[0].say[0].lang === 'ar' || rounds[0].say[0].lang === 'en'); // an Arabic name first when the word has one
+  assert.equal(rounds[0].sayOnly[0].lang, 'en');
+});

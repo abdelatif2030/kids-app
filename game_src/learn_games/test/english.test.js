@@ -88,7 +88,7 @@ test('a replay shows other words first, and a new word is heard slowly too', () 
     const firsts = p.rounds.slice(0, ROUNDS - 3);
     for (const r of firsts) {
       assert.ok(!seen.has(r.key), 'new words first, no repeat across games');
-      assert.equal(r.say.length, 2, 'a new word: normal then slow');
+      assert.equal(r.say.filter((x) => x.lang !== 'ar').length, 2, 'a new word: normal then slow (after its Arabic name)');
       seen.add(r.key);
     }
     for (const r of p.rounds) mem.note(r.key);

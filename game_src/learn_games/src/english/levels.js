@@ -83,6 +83,8 @@ const SHAPE_PAINT = ['red', 'blue', 'yellow', 'green', 'orange', 'purple'];
 
 export const sayWord = (e) => ({ t: e.w, lang: langOf(e) });
 export const saySlow = (e) => ({ t: e.w, lang: langOf(e), slow: true });
+/** The Arabic word of a row (or of a number) as an optional clip: silent when it has no recording. */
+export const arSay = (e) => { const a = e.ar || (e.n != null ? numberWord(e.n) : null); return a ? [{ t: a, lang: 'ar', optional: true }] : []; };
 export const saySentence = (e) => ({ t: e.s, lang: langOf(e) });
 
 function optionOf(e, i, r) {
@@ -134,7 +136,9 @@ export function englishRounds(level, age, r, mem, nOpt, rounds) {
       arWord: e.ar || (e.n != null ? numberWord(e.n) : null),
       lang: langOf(e),
       // heard: the word (a new word also slowly); retry after a wrong tap: slowly; right: the sentence of the pack
-      say: fresh ? [sayWord(e), saySlow(e)] : [sayWord(e)],
+      // a NEW word is first said in Arabic (once), then in the language being learned, then slowly (owner 2026-11-27); a missing Arabic clip is skipped
+      say: fresh ? [...arSay(e), sayWord(e), saySlow(e)] : [sayWord(e)],
+      sayOnly: [sayWord(e)],
       retry: [saySlow(e)],
       rewardSay: [saySentence(e)],
       review,

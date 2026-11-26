@@ -85,6 +85,10 @@ export function showOf(e) {
 }
 
 /** The items of a words section in one language; Arabic uses the Arabic name of the English row (rows without one are left out). */
+const EN_AR = new Map(EN.map((e) => [engOf(e).toLowerCase(), e.ar]));
+/** The Arabic name of a row as an optional clip (heard first in the English / German / French sections). */
+function arOfRow(e) { const a = e.ar || EN_AR.get(engOf(e).toLowerCase()); return a ? [{ t: a, lang: 'ar', optional: true }] : []; }
+
 function wordItems(def, lang) {
   const rows = (lang === 'ar' ? EN : WORDS[lang]).filter(def.pick);
   const out = [];
@@ -98,7 +102,7 @@ function wordItems(def, lang) {
     if (seen.has(key)) continue;
     seen.add(key);
     if (lang === 'ar') out.push({ key, show, label, lang: 'ar', say: [{ t: label, lang: 'ar' }], slow: [{ t: label, lang: 'ar' }], sentence: [] });
-    else out.push({ key, show, label: e.cat.startsWith('letters') || e.cat === 'days' || e.cat === 'months' || e.n != null ? (e.ch || e.en) : e.en, lang, say: [{ t: e.w, lang }], slow: [{ t: e.w, lang, slow: true }], sentence: [{ t: e.s, lang }] });
+    else out.push({ key, arSay: arOfRow(e), show, label: e.cat.startsWith('letters') || e.cat === 'days' || e.cat === 'months' || e.n != null ? (e.ch || e.en) : e.en, lang, say: [{ t: e.w, lang }], slow: [{ t: e.w, lang, slow: true }], sentence: [{ t: e.s, lang }] });
   }
   return out;
 }
@@ -118,7 +122,7 @@ export function numberItem(n, lang) {
   const digits = formatNumber(n, lang);
   const len = String(n).length;
   const scale = len <= 2 ? 1.6 : len === 3 ? 1.35 : len === 4 ? 1.1 : len === 5 ? 0.9 : 0.78;
-  return { key: `numbers:${n}`, n, show: { type: 'letter', ch: digits, scale }, label: digits, lang, say: [{ t: text, lang }], slow: [{ t: text, lang, slow: true }], sentence: [], parts: numberWords(n, lang).parts };
+  return { key: `numbers:${n}`, n, arSay: lang !== 'ar' && n <= 100 ? [{ t: numberWord(n), lang: 'ar', optional: true }] : [], show: { type: 'letter', ch: digits, scale }, label: digits, lang, say: [{ t: text, lang }], slow: [{ t: text, lang, slow: true }], sentence: [], parts: numberWords(n, lang).parts };
 }
 export function formatNumber(n, lang) {
   const sep = lang === 'de' ? '.' : lang === 'fr' ? ' ' : ',';

@@ -31,7 +31,7 @@ test('every level builds 8 rounds with one right option, in French', () => {
       assert.equal(r.lang, 'fr');
       assert.equal(r.options.filter((o) => o.id === r.answer).length, 1);
       assert.equal(new Set(r.options.map((o) => o.id)).size, r.options.length);
-      assert.equal(r.say[0].lang, 'fr');
+      assert.equal(r.say.find((x) => x.lang !== 'ar').lang, 'fr'); // the Arabic name (optional) may come first
       assert.equal(r.rewardSay[0].lang, 'fr');
     }
   }

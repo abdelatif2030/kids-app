@@ -639,7 +639,8 @@ class Game {
       say = it.parts.map((p) => ({ t: p, lang: it.lang }));
       slow = say;
     }
-    const q = it.once ? [...say, ...it.sentence] : [...say, ...slow, ...say, ...it.sentence];
+    const ar = it.arSay || []; // in English / German / French the Arabic word is heard first, once
+    const q = it.once ? [...ar, ...say, ...it.sentence] : [...ar, ...say, ...slow, ...say, ...it.sentence];
     if (withIntro) { const L = this._L; q.unshift({ t: L.sec.name, lang: this._lang() }, { t: learnLine('start', this._lang()), lang: this._lang() }); }
     return q;
   }
@@ -991,7 +992,7 @@ class Game {
         // Listen: say again EVERYTHING that was said last (the word, the slow word, the praise and the sentence), exactly as the first time;
         // Slowly: the word slowly
         if (!slow && this._lastQ && this._lastQ.length) this.sh.speak(this._lastQ);
-        else this.sh.speak(slow ? r.retry : [r.say[0]]);
+        else this.sh.speak(slow ? r.retry : (r.sayOnly || [r.say[0]]));
       };
       this.sign.style.direction = 'ltr';
       this.sign.append(this.signText, h('button', { class: 'lw-again lw-hear', 'aria-label': 'Listen again', onclick: hear(false) }, h('b', {}, '🔊'), h('small', {}, this._learnFr() ? 'Écouter' : this._learnDe() ? 'Hören' : 'Listen')),
