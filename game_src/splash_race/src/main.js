@@ -618,7 +618,7 @@ class Game {
     if (this.mode !== 'race') return;
     // HUD
     const hc = this._hc;
-    if (hc.rank !== p.rank) { hc.rank = p.rank; this.hud.place.textContent = num(p.rank ?? sw.swimmers.length); }
+    if (hc.rank !== p.rank) { if (window.__cheer && hc.rank && p.rank) window.__cheer(p.rank < hc.rank ? 'overtake' : 'behind'); hc.rank = p.rank; this.hud.place.textContent = num(p.rank ?? sw.swimmers.length); }
     const q = sw.qualifiedCount;
     if (hc.q !== q) { hc.q = q; this.hud.qual.textContent = `${num(q)}/${num(sw.round.qualify)}`; }
     const L = sw.round.len;
