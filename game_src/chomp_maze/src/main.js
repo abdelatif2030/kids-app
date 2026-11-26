@@ -3,6 +3,7 @@
 // A classic maze chase with ORIGINAL characters: Sunny the round chomper eats every dot while four ghost blobs wander and chase;
 // power fruits make them scared so Sunny can eat them. Swipe (or arrows/WASD) to turn. 8 levels over 4 mazes, easy mode for the
 // youngest. 2D canvas, art and sound made in code. No network, no ads, no tracking.
+import { View3D } from './view3d.js';
 import { Game as Maze, LEVELS, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
@@ -48,7 +49,7 @@ class Game {
     if (!document.getElementById('cm-style')) document.head.append(h('style', { id: 'cm-style' }, css('cm', '#3a6ae8', '#101840', '#ffe04a')));
     this.root = h('div', { class: 'cm-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
-    this.cv = h('canvas'); this.root.append(this.cv); this.g = this.cv.getContext('2d');
+    this.view = new View3D(el); this.root.append(this.view.dom); this.cv = h('canvas'); this.root.append(this.cv); this.g = this.cv.getContext('2d');
     this.layer = h('div', { class: 'cm-layer' }); this.root.append(this.layer);
     this.mode = 'menu'; this.clock = 0; this.drag = null;
     this._resize();
@@ -59,7 +60,7 @@ class Game {
   }
 
   async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 900))]); } catch (_) { /* system font */ } }
-  _resize() { const r = this.el.getBoundingClientRect(); this.cw = r.width || window.innerWidth; this.ch = r.height || window.innerHeight; this.dpr = Math.min(window.devicePixelRatio || 1, 2); this.cv.width = Math.round(this.cw * this.dpr); this.cv.height = Math.round(this.ch * this.dpr); this.u = Math.min(this.cw, this.ch) / 100; this.root.style.setProperty('--u', `${this.u}px`); }
+  _resize() { const r = this.el.getBoundingClientRect(); this.cw = r.width || window.innerWidth; this.ch = r.height || window.innerHeight; this.dpr = Math.min(window.devicePixelRatio || 1, 2); this.view.setSize(this.cw, this.ch); this.cv.width = Math.round(this.cw * this.dpr); this.cv.height = Math.round(this.ch * this.dpr); this.u = Math.min(this.cw, this.ch) / 100; this.root.style.setProperty('--u', `${this.u}px`); }
 
   _bind() {
     const unlock = () => this.sound.unlock();
@@ -118,7 +119,7 @@ class Game {
     if (this.ready > 0) { this.ready -= dt; return; }
     for (const e of g.step(dt)) {
       switch (e.type) {
-        case 'dot': this.sound.play('dot'); break;
+        case 'dot': this.sound.play('dot'); this.view.burst(g.pm.x, g.pm.y); break;
         case 'power': this.sound.play('power'); break;
         case 'eatGhost': this.sound.play('eatGhost', e.n); break;
         case 'caught': this.sound.play('caught'); this.ready = 1.2; break;
@@ -131,34 +132,12 @@ class Game {
   }
 
   _draw() {
-    const c = this.g; c.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-    const W = this.cw; const H = this.ch;
-    const bg = c.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#0a1038'); bg.addColorStop(1, '#241060'); c.fillStyle = bg; c.fillRect(0, 0, W, H);
-    const g = this.game; if (!g) return;
-    const top = this.u * 18;
-    const cell = Math.min(W / (g.w + 0.6), (H - top - this.u * 4) / g.h);
-    const ox = (W - cell * g.w) / 2; const oy = top + ((H - top - this.u * 4) - cell * g.h) / 2;
-    const col = WALL_COLORS[this.levelIdx % 4];
-    // walls
-    for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) {
-      const ch = g.map[y][x];
-      if (ch === '#') { c.fillStyle = col; c.shadowColor = col; c.shadowBlur = cell * 0.25; c.beginPath(); c.roundRect(ox + x * cell + cell * 0.08, oy + y * cell + cell * 0.08, cell * 0.84, cell * 0.84, cell * 0.28); c.fill(); c.shadowBlur = 0; c.fillStyle = 'rgba(255,255,255,.18)'; c.beginPath(); c.roundRect(ox + x * cell + cell * 0.18, oy + y * cell + cell * 0.14, cell * 0.64, cell * 0.2, cell * 0.1); c.fill(); }
-      else if (ch === '-') { c.fillStyle = '#ff9ad0'; c.fillRect(ox + x * cell, oy + y * cell + cell * 0.4, cell, cell * 0.2); }
-      else if (ch === '.') { c.fillStyle = '#fff4c8'; c.beginPath(); c.arc(ox + (x + 0.5) * cell, oy + (y + 0.5) * cell, cell * 0.1, 0, 6.3); c.fill(); }
-      else if (ch === 'o') { const k = 0.28 + Math.sin(this.clock * 6) * 0.04; c.font = `${cell * 0.9}px system-ui`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('🍒', ox + (x + 0.5) * cell, oy + (y + 0.55) * cell); void k; }
-    }
-    // ghosts
-    for (const gh of g.ghosts) this._ghost(c, gh, ox, oy, cell, g);
-    // the chomper
-    const p = g.pm; const px = ox + (p.x + 0.5) * cell; const py = oy + (p.y + 0.5) * cell;
-    const mouth = (Math.abs(Math.sin(this.clock * 12)) * 0.35 + 0.05) * (p.moving ? 1 : 0.4);
-    const ang = { r: 0, l: Math.PI, u: -Math.PI / 2, d: Math.PI / 2 }[p.dir];
-    const blink = g.invuln > 0 && Math.floor(this.clock * 10) % 2;
-    if (!blink) {
-      c.fillStyle = '#ffe04a'; c.shadowColor = '#ffe04a'; c.shadowBlur = cell * 0.4; c.beginPath(); c.moveTo(px, py); c.arc(px, py, cell * 0.46, ang + mouth * Math.PI, ang + (2 - mouth) * Math.PI); c.closePath(); c.fill(); c.shadowBlur = 0;
-      c.fillStyle = '#1a1a1a'; const ex = px + Math.cos(ang - 1.2) * cell * 0.2; const ey = py + Math.sin(ang - 1.2) * cell * 0.2 - cell * 0.05; c.beginPath(); c.arc(ex, ey, cell * 0.06, 0, 6.3); c.fill();
-    }
-    if (this.ready > 0) { c.fillStyle = '#ffe04a'; c.font = `900 ${cell * 1.2}px Tajawal, system-ui`; c.textAlign = 'center'; c.fillText(I.t('ready'), W / 2, oy + g.h * cell * 0.55); }
+    const c = this.g; c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, this.cv.width, this.cv.height); c.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    let g = this.game; const inGame = !!g && (this.mode === 'play' || this.mode === 'over' || this.mode === 'win' || this.mode === 'lose' || this.mode === 'pause' || this.mode === 'end');
+    if (!g) { g = this.demo || (this.demo = new Maze({ level: 0, seed: 3 })); }
+    const lvl = this.game ? this.levelIdx : 0;
+    this.view.render(g, lvl, WALL_COLORS[lvl % 4], this.clock);
+    if (this.game && this.ready > 0) { const W = this.cw; c.fillStyle = '#ffe04a'; c.strokeStyle = 'rgba(20,10,60,.9)'; c.lineWidth = 6; c.font = `900 ${Math.min(W, this.ch) * 0.1}px Tajawal, system-ui`; c.textAlign = 'center'; c.strokeText(I.t('ready'), W / 2, this.ch * 0.5); c.fillText(I.t('ready'), W / 2, this.ch * 0.5); }
   }
 
   _ghost(c, gh, ox, oy, cell, g) {
@@ -178,7 +157,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play' && !this.paused) this.togglePause(); }
-  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
+  dispose() { if (this.view) this.view.dispose(); cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
 }
 
 const api = { start(el, config, post) { const g = new Game(el, config || {}, post); api.last = g; return { dispose: () => g.dispose(), pause: () => g.pause() }; } };

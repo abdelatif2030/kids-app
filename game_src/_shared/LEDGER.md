@@ -36,3 +36,5 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 - hop_world: three.js rebuild (view3d.js): 3D fox hero with swinging limbs/tail, 3D bugs, bricks/? blocks with textures, pipes, castle, parallax scenery per world. rec.mjs now supports HOLD/JUMPK env for held-key demos.
 - sky_jumper: three.js rebuild (view3d.js): 3D creature w/ propeller hat+jetpack, grass islands/crystal/crumble/spring platforms, horned monsters, height-deepening sky. Drawn heart/pause/up/flag icons added to polish.js (applied to all games' src/polish.js and rebuilt).
 - sky_jumper: refined face/single creature pushed (2e5b297e). Not resent: still not a clear leap vs BEFORE hero art (bigger hero + better bot needed). TODO next pass: hero scale up, richer platforms, use existing background images. Next games: card_battle, castaway_raft, chomp_maze.
+
+- chomp_maze: three.js neon-candy board rebuilt (view3d.js). Renders and plays, npm test 0 fail. Chomper and ghosts are too small at gameplay distance, board too wide. TODO: tighter camera following the chomper, bigger chomper, then BEFORE/AFTER clip. Not sent.
