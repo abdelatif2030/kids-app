@@ -19,7 +19,7 @@ const S = {
   jump: ['قفز', 'Jump'], left: ['شمال', 'Left'], right: ['يمين', 'Right'], mute: ['الصوت', 'Sound'], coins: ['عملات', 'Coins'],
 };
 const I = makeI18n(S);
-const WORLD_ICON = ['🌳', '🦇', '🏜️', '❄️'];
+const WORLD_ICON = ['', '', '', ''];
 
 class Game {
   constructor(el, config, post) {

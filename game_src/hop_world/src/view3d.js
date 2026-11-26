@@ -151,7 +151,7 @@ export class View3D {
     const vh3 = this.h > this.w ? vh : 8.6;
     const dist = Math.max(vh3 * 0.5, (vw * 0.5) / this.camera.aspect) / t * 0.97;
     const hy = o.inMenu ? 0 : Y(w.p.y + w.p.h);
-    const cx = camX + vw / 2, cy = (this.h > this.w ? Y(camY + vh / 2) : 2.8 + Math.max(0, hy - 2.5) * 0.45);
+    const cx = camX + vw / 2, cy = (this.h > this.w ? Y(camY + vh / 2) : Math.max(-3, Math.min(2.8 + Math.max(0, hy - 2.5) * 0.45, hy + 3)));
     this.camera.position.set(cx, cy + dist * 0.12, dist); this.camera.lookAt(cx, cy - dist * 0.012, 0);
     this.sun.position.set(cx - 8, 16, 14); this.sun.target.position.set(cx, cy, 0);
     for (const { l, par } of this.scen.userData.layers) l.position.x = cx * (1 - par) - 8;
