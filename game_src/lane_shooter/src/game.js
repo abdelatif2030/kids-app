@@ -16,10 +16,10 @@ const THEME = {
     enemy: 'thug', weapon: ['🔫', '🔫', '🔫', '🔫'], bow: ['بندقية', 'Rifle'], rank: ['رتبة', 'Rank'], tune: 'squad',
   },
   archers: {
-    id: 'archers', glob: 'ArcherBridge', prefix: 'ab', title: ['رماة الجسر', 'Archer Bridge'], icon: '🏹', unit: ['رامي', 'archer'],
+    id: 'archers', glob: 'ArcherBridge', prefix: 'ab', title: ['رماة الجسر', 'Archer Bridge'], icon: '👥', unit: ['رامي', 'archer'],
     sky: 0x5a1a10, fog: 0x7a2a14, road: 0x8a8274, ground: 0xff6a1a, panel: ['#d8742a', '#7a2a0a'], accent: '#ffd23a',
     names: ['بوابة الجسر', 'وادي النار', 'برج العظام', 'الهاوية', 'ممر الجمر', 'قلعة اللهب', 'جسر التنين', 'عرش الهيكل'],
-    enemy: 'skeleton', weapon: ['🏹', '🏹', '🏹', '🏹'], bow: ['قوس', 'Bow'], rank: ['رتبة', 'Rank'], tune: 'archers',
+    enemy: 'skeleton', weapon: ['🎯', '🎯', '🎯', '🎯'], bow: ['قوس', 'Bow'], rank: ['رتبة', 'Rank'], tune: 'archers',
   },
 };
 
