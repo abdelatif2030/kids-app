@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'demo/demo_mode.dart';
 import 'parent_settings.dart';
 
 enum RestReason { limit, quiet }
@@ -50,6 +51,12 @@ class SessionManager with WidgetsBindingObserver {
     _bonus = prefs.getInt('bonus_$_day') ?? 0;
     _limitSeconds = await settings.dailyLimitMinutes() * 60;
     _quietOn = await settings.quietEnabled();
+    // The hosted demo is for people who test the app (owner 2026-11-26: a tester kept getting «حان وقت الراحة» after her first hour): no daily limit and
+    // no quiet hours there. The real app keeps both.
+    if (DemoMode.enabled) {
+      _limitSeconds = 24 * 3600 * 30;
+      _quietOn = false;
+    }
     final s = await settings.quietStart();
     final e = await settings.quietEnd();
     _quietStart = s.hour * 60 + s.minute;
