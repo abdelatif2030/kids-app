@@ -220,8 +220,9 @@ class _LearnLanguageGateState extends State<LearnLanguageGate> {
             final usable = (box.maxWidth - 32).clamp(280.0, 1000.0);
             final cols = wide ? 4 : 2;
             final bigSize = short ? 22.0 : wide ? 34.0 : 24.0;
-            final ribbonH = short ? 44.0 : 96.0;
-            final gapsH = short ? 28.0 : 64.0;
+            final ribbonH = short ? 52.0 : 100.0;
+            final bottomRoom = short ? 34.0 : 20.0; // the phone's home bar / browser bar covers the bottom edge: leave room
+            final gapsH = (short ? 40.0 : 68.0) + bottomRoom;
             final minLogoH = short ? 54.0 : 110.0;
             final cardMaxH = box.maxHeight - ribbonH - gapsH - minLogoH;
             var w = ((usable - gap * (cols - 1)) / cols).clamp(110.0, 230.0);
@@ -234,7 +235,7 @@ class _LearnLanguageGateState extends State<LearnLanguageGate> {
             return Stack(children: [
               Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  padding: EdgeInsets.fromLTRB(16, 8, 16, bottomRoom),
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
                     AppLogo(width: logoW),
                     const SizedBox(height: 4),
@@ -396,14 +397,15 @@ class _LearnModeScreenState extends State<LearnModeScreen> {
             final gapW = wide ? 22.0 : 12.0;
             final w = ((box.maxWidth - 56 - gapW) / 2).clamp(110.0, 300.0);
             final ribbonH = short ? 44.0 : 96.0;
-            final gapsH = short ? 28.0 : 64.0;
+            final bottomRoom = short ? 34.0 : 20.0;
+            final gapsH = (short ? 28.0 : 64.0) + bottomRoom;
             final optionsH = short ? 200.0 : 360.0;
             final logoH = (box.maxHeight - ribbonH - gapsH - optionsH).clamp(short ? 54.0 : 100.0, 380.0);
             final logoW = (logoH / 0.78) < box.maxWidth * 0.62 ? logoH / 0.78 : box.maxWidth * 0.62;
             return Stack(children: [
               Center(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  padding: EdgeInsets.fromLTRB(16, 8, 16, bottomRoom),
                   child: Directionality(
                     textDirection: TextDirection.rtl,
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
