@@ -13,3 +13,7 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 - sky_ace: hero small and flat, bullets faint -> 1.5x hero with glow and trail, bigger enemies, glowing bullets (hitboxes untouched).
 - All chase-cam games (rain_circuit, summit_rush, splash_race, deep_sea, air_race, dune_titans, carnival_race, gummy_squad): camera too far, hero small at gameplay distance -> tighter cameras.
 - Recording rule: clips are now landscape 960x540, sequential BEFORE then AFTER.
+
+## lane_shooter (squad_shooter / archer_bridge) pass 2
+- Fixed: soldiers/enemies were boxes; now rigged 3D characters (faces, helmets, swinging legs, rifle/bow, backpack/quiver). Gates rebuilt as framed arches with number plane on the panel (no longer covers the lane). Houses with windows, trees, cones added. Camera pulled back slightly.
+- Open: cages and crates still simple; archer_bridge not yet re-recorded or recoloured.

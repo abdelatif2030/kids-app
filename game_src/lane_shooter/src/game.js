@@ -93,32 +93,91 @@ function labelTex(text, bg, fg = '#fff', w = 256, hh = 128) {
 }
 function sprite(text, bg, sx, sy, fg) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: labelTex(text, bg, fg), transparent: true, depthTest: false })); s.scale.set(sx, sy, 1); s.renderOrder = 10; return s; }
 
+const HEM = new THREE.SphereGeometry(0.5, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2);
+function limb(par, x, y, mat, len, w, tip, tipMat) {
+  const p = new THREE.Group(); p.position.set(x, y, 0);
+  p.add(mesh(geo.cyl, mat, 0, -len / 2, 0, w, len, w));
+  p.add(mesh(geo.sphere, mat, 0, 0, 0, w * 1.15, w * 1.15, w * 1.15));
+  if (tip) p.add(mesh(geo.box, tipMat, 0, -len, 0.05, tip[0], tip[1], tip[2]));
+  par.add(p); return p;
+}
+function face(g, y, z, r, mad) {
+  for (const sx of [-1, 1]) {
+    g.add(mesh(geo.sphere, M(0xffffff), sx * 0.12 * r, y, z, 0.15 * r, 0.17 * r, 0.1 * r));
+    g.add(mesh(geo.sphere, M(mad ? 0x330000 : 0x15151f, mad ? 0xff2a1a : 0), sx * 0.12 * r, y - 0.005, z + 0.04 * r, 0.08 * r, 0.1 * r, 0.06 * r));
+    if (mad) { const br = mesh(geo.box, M(0x201020), sx * 0.13 * r, y + 0.13 * r, z + 0.03, 0.2 * r, 0.05 * r, 0.06); br.rotation.z = -sx * 0.45; g.add(br); }
+  }
+  g.add(mesh(geo.box, M(mad ? 0x200808 : 0xa04030), 0, y - 0.17 * r, z - 0.005, (mad ? 0.26 : 0.18) * r, 0.045 * r, 0.05));
+  if (!mad) for (const sx of [-1, 1]) g.add(mesh(geo.sphere, M(0xf08a7a), sx * 0.2 * r, y - 0.1 * r, z - 0.03, 0.1 * r, 0.07 * r, 0.04));
+}
 function makeUnit(th) {
   const g = new THREE.Group();
   const sq = th.id === 'squad';
-  g.add(mesh(geo.cyl, M(sq ? 0x2a7af0 : 0x2a8a8a), 0, 0.75, 0, 0.55, 0.9, 0.4));
-  g.add(mesh(geo.sphere, M(0xf2c9a0), 0, 1.45, 0, 0.5, 0.5, 0.5));
-  if (sq) { g.add(mesh(geo.sphere, M(0xffc82a), 0, 1.58, 0, 0.56, 0.36, 0.56)); g.add(mesh(geo.box, M(0x222222), 0.35, 1.0, 0.45, 0.1, 0.14, 0.7)); } else {
-    g.add(mesh(geo.cone, M(0xc83a2a), 0, 1.75, 0, 0.55, 0.5, 0.55));
-    const bow = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.05, 6, 14, Math.PI), M(0x8a5a2a));
-    bow.position.set(0.38, 1.0, 0.3); bow.rotation.set(0, 0, Math.PI / 2); g.add(bow);
+  const vest = M(sq ? 0x2a7af0 : 0x2a9a6a), pants = M(sq ? 0x25324f : 0x5a3a22), skin = M(0xf2c9a0), boot = M(0x1a1a22);
+  g.add(mesh(geo.cyl, vest, 0, 1.15, 0, 0.62, 0.72, 0.42));
+  g.add(mesh(geo.box, M(0x4a3a22), 0, 0.8, 0, 0.66, 0.1, 0.46));
+  g.add(mesh(geo.box, M(0xffc82a), 0, 0.8, 0.235, 0.12, 0.1, 0.03));
+  if (sq) { g.add(mesh(geo.box, M(0x3a5a30), 0, 1.2, -0.3, 0.46, 0.56, 0.26)); g.add(mesh(geo.box, M(0xffffff), 0, 1.42, 0.22, 0.5, 0.06, 0.04)); }
+  else { const q = mesh(geo.cyl, M(0x6a4a2a), 0.12, 1.25, -0.3, 0.22, 0.7, 0.22); q.rotation.z = 0.25; g.add(q); for (let i = 0; i < 3; i++) g.add(mesh(geo.cone, M(0xe8e0d0), 0.2 + i * 0.03, 1.66, -0.3 + (i - 1) * 0.06, 0.07, 0.2, 0.07)); }
+  g.add(mesh(geo.sphere, skin, 0, 1.78, 0, 0.5, 0.52, 0.5));
+  face(g, 1.8, 0.23, 1, false);
+  if (sq) {
+    g.add(mesh(HEM, M(0xffc82a), 0, 1.84, 0, 0.64, 0.6, 0.64));
+    g.add(mesh(geo.cyl, M(0xe0a010), 0, 1.86, 0.12, 0.62, 0.05, 0.68));
+    g.add(mesh(geo.box, M(0xe0a010), 0, 2.02, 0, 0.06, 0.05, 0.64));
+  } else {
+    g.add(mesh(geo.cone, M(0xc83a2a), 0, 2.15, -0.02, 0.62, 0.55, 0.62));
+    g.add(mesh(geo.cyl, M(0x8a2418), 0, 1.92, 0, 0.7, 0.07, 0.7));
+    g.add(mesh(geo.box, M(0xfff0c0), 0.2, 2.28, -0.05, 0.05, 0.38, 0.14));
   }
-  g.add(mesh(geo.cyl, M(0x2a2f3a), -0.14, 0.2, 0, 0.18, 0.4, 0.18));
-  g.add(mesh(geo.cyl, M(0x2a2f3a), 0.14, 0.2, 0, 0.18, 0.4, 0.18));
+  const ud = g.userData;
+  ud.legL = limb(g, -0.16, 0.8, pants, 0.55, 0.2, [0.24, 0.16, 0.36], boot);
+  ud.legR = limb(g, 0.16, 0.8, pants, 0.55, 0.2, [0.24, 0.16, 0.36], boot);
+  ud.armL = limb(g, -0.4, 1.4, vest, 0.5, 0.17); ud.armR = limb(g, 0.4, 1.4, vest, 0.5, 0.17);
+  ud.armL.rotation.x = ud.armR.rotation.x = -1.3;
+  for (const a of [ud.armL, ud.armR]) a.add(mesh(geo.sphere, skin, 0, -0.5, 0, 0.2, 0.2, 0.2));
+  if (sq) {
+    const gun = new THREE.Group(); gun.position.set(0.18, 1.12, 0.35);
+    gun.add(mesh(geo.box, M(0x2a2e36), 0, 0, 0, 0.12, 0.16, 0.7));
+    gun.add(mesh(geo.cyl, M(0x555a66), 0, 0.02, 0.5, 0.06, 0.5, 0.06)).rotation.x = 0;
+    gun.children[1].rotation.x = Math.PI / 2;
+    gun.add(mesh(geo.box, M(0x6a4a2a), 0, -0.05, -0.38, 0.1, 0.2, 0.3));
+    g.add(gun); ud.gun = gun;
+  } else {
+    const bow = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.045, 6, 16, Math.PI), M(0x8a5a2a));
+    bow.position.set(0.42, 1.2, 0.4); bow.rotation.set(0, 0, Math.PI / 2); g.add(bow);
+    g.add(mesh(geo.box, M(0xeeeeee), 0.42, 1.2, 0.4, 0.015, 1.0, 0.015));
+  }
   return g;
+}
+function animUnit(u, t, i) {
+  const d = u.userData; if (!d.legL) return;
+  const ph = t * 10 + i * 1.7;
+  d.legL.rotation.x = Math.sin(ph) * 0.8; d.legR.rotation.x = -Math.sin(ph) * 0.8;
+  if (d.gun) d.gun.rotation.x = Math.sin(ph * 0.5) * 0.02;
+  d.armL.rotation.x = -1.3 + Math.sin(ph) * 0.08; d.armR.rotation.x = -1.3 - Math.sin(ph) * 0.08;
 }
 
 function makeEnemy(th, boss) {
   const g = new THREE.Group();
   const sk = th.enemy === 'skeleton';
-  g.add(mesh(geo.cyl, M(sk ? 0xe8e4d4 : 0x8a3a8a), 0, 0.8, 0, 0.6, 1.0, 0.45));
-  g.add(mesh(geo.sphere, M(sk ? 0xf4f0e0 : 0xb86ab8), 0, 1.55, 0, 0.62, 0.62, 0.6));
-  g.add(mesh(geo.sphere, M(0x111111, 0xff2a2a), -0.14, 1.6, 0.27, 0.14, 0.14, 0.1));
-  g.add(mesh(geo.sphere, M(0x111111, 0xff2a2a), 0.14, 1.6, 0.27, 0.14, 0.14, 0.1));
-  g.add(mesh(geo.box, M(0x8a8a92), 0.45, 1.0, 0.3, 0.1, 0.1, 0.9));
-  g.add(mesh(geo.cyl, M(0x3a3a44), -0.15, 0.22, 0, 0.2, 0.45, 0.2));
-  g.add(mesh(geo.cyl, M(0x3a3a44), 0.15, 0.22, 0, 0.2, 0.45, 0.2));
-  g.scale.setScalar(boss ? 2.6 : 1);
+  const body = M(sk ? 0xe8e4d4 : 0x7a2a9a), pants = M(sk ? 0xcfc8b4 : 0x3a2a4a);
+  g.add(mesh(geo.cyl, body, 0, 1.0, 0, 0.85, 0.95, 0.6));
+  if (sk) for (let i = 0; i < 3; i++) g.add(mesh(geo.box, M(0x40382a), 0, 0.85 + i * 0.2, 0.3, 0.7, 0.06, 0.04));
+  else { g.add(mesh(geo.box, M(0x2a1a3a), 0, 0.6, 0, 0.9, 0.14, 0.64)); g.add(mesh(geo.box, M(0xd8b020), 0, 0.6, 0.33, 0.2, 0.14, 0.03)); }
+  g.add(mesh(geo.sphere, M(sk ? 0xf4f0e0 : 0xb86ab8), 0, 1.75, 0, 0.7, 0.66, 0.64));
+  face(g, 1.78, 0.31, 1.3, true);
+  if (sk) { g.add(mesh(geo.box, M(0xe0d8c0), 0, 1.5, 0.28, 0.4, 0.14, 0.12)); }
+  else for (const sx of [-1, 1]) { const h2 = mesh(geo.cone, M(0xf0e8d0), sx * 0.3, 2.2, 0, 0.16, 0.4, 0.16); h2.rotation.z = -sx * 0.35; g.add(h2); }
+  const ud = g.userData;
+  ud.legL = limb(g, -0.22, 0.6, pants, 0.55, 0.26, [0.3, 0.2, 0.42], M(0x2a2a30));
+  ud.legR = limb(g, 0.22, 0.6, pants, 0.55, 0.26, [0.3, 0.2, 0.42], M(0x2a2a30));
+  ud.armL = limb(g, -0.55, 1.35, body, 0.6, 0.22); ud.armR = limb(g, 0.55, 1.35, body, 0.6, 0.22);
+  ud.armL.rotation.x = -0.5; ud.armR.rotation.x = -1.1;
+  const wp = new THREE.Group(); wp.position.set(0, -0.6, 0.1); ud.armR.add(wp);
+  if (sk) { wp.add(mesh(geo.box, M(0xb8c0cc), 0, 0, 0.5, 0.08, 0.14, 1.1)); wp.add(mesh(geo.box, M(0x6a4a2a), 0, 0, -0.1, 0.1, 0.2, 0.25)); }
+  else { wp.add(mesh(geo.cyl, M(0x6a4a2a), 0, 0.3, 0, 0.14, 1.0, 0.14)); wp.add(mesh(geo.sphere, M(0x555a66), 0, 0.85, 0, 0.4, 0.4, 0.4)); wp.rotation.x = -0.6; }
+  g.scale.setScalar(boss ? 2.6 : 1.05);
   return g;
 }
 
@@ -236,6 +295,10 @@ class Game {
           this.world.add(mesh(geo.cyl, M(0x555a66), side * (ROAD + 1.6), 2.5, z, 0.2, 5, 0.2));
           this.world.add(mesh(geo.sphere, M(0xfff0b0, 0xfff0b0), side * (ROAD + 1.6), 5.2, z, 0.7, 0.7, 0.7));
           const k = (z / 14) | 0;
+          { const tx = side * (ROAD + 9 + (k % 3) * 2.5); this.world.add(mesh(geo.cyl, M(0x6a4a2a), tx, 1, z + 6, 0.5, 2, 0.5)); this.world.add(mesh(geo.cone, M(0x2a8a3a), tx, 3.2, z + 6, 3, 3.2, 3)); this.world.add(mesh(geo.cone, M(0x3aa04a), tx, 4.9, z + 6, 2.2, 2.6, 2.2)); }
+          if (k % 3 === 0) { const c = mesh(geo.cone, M(0xff7a1a), side * (ROAD - 0.6), 0.45, z + 5, 0.5, 0.9, 0.5); this.world.add(c); this.world.add(mesh(geo.box, M(0xffffff), side * (ROAD - 0.6), 0.5, z + 5, 0.34, 0.12, 0.34)); }
+          if (k % 2) for (let wy = 0; wy < 2; wy++) for (let wz = -1; wz <= 1; wz++) this.world.add(mesh(geo.box, M(0x9ad8ff, 0x3a6a9a), side * (ROAD + 3.2), 1.0 + wy * 1.2, z + 3 + wz * 1.6, 0.05, 0.7, 0.9));
+          if (k % 2) this.world.add(mesh(geo.box, M(0x8a4a3a), side * (ROAD + 4.5), 3.0, z + 3, 2.9, 0.3, 5.9));
           if (k % 2) this.world.add(mesh(geo.box, M([0xc84a2a, 0x2a6ac8, 0xd8a82a][k % 3]), side * (ROAD + 4.5), 1.4, z + 3, 2.6, 2.8, 5.5));
           else this.world.add(mesh(geo.cyl, M(0x8a6a2a), side * (ROAD + 3.2), 0.8, z, 1.1, 1.6, 1.1));
         } else {
@@ -261,10 +324,16 @@ class Game {
       g.add(g.userData.label);
     } else if (t.kind === 'gate') {
       const pos = t.val >= 0;
-      const panel = mesh(geo.box, new THREE.MeshBasicMaterial({ color: pos ? 0x3a8aff : 0xff3a4a, transparent: true, opacity: 0.45 }), 0, 1.8, 0, t.w, 3.4, 0.2);
+      const fr = M(pos ? 0x2a5ac8 : 0xc82a3a), lamp = M(pos ? 0x9ad0ff : 0xffb0a0, pos ? 0x4a9aff : 0xff4a3a);
+      const panel = mesh(geo.box, new THREE.MeshBasicMaterial({ color: pos ? 0x3a8aff : 0xff3a4a, transparent: true, opacity: 0.32, depthWrite: false }), 0, 1.95, 0, t.w, 3.3, 0.1);
       g.add(panel);
-      g.add(mesh(geo.box, M(pos ? 0x2a5ac8 : 0xc82a3a), -t.w / 2, 1.8, 0, 0.3, 3.6, 0.3));
-      g.add(mesh(geo.box, M(pos ? 0x2a5ac8 : 0xc82a3a), t.w / 2, 1.8, 0, 0.3, 3.6, 0.3));
+      for (const sx of [-1, 1]) {
+        g.add(mesh(geo.cyl, fr, sx * t.w / 2, 2.2, 0, 0.38, 4.4, 0.38));
+        g.add(mesh(geo.cyl, M(0xdddddd), sx * t.w / 2, 0.15, 0, 0.62, 0.3, 0.62));
+        g.add(mesh(geo.sphere, lamp, sx * t.w / 2, 4.55, 0, 0.6, 0.6, 0.6));
+      }
+      g.add(mesh(geo.box, fr, 0, 4.2, 0, t.w + 0.5, 0.5, 0.5));
+      for (let i = 0; i < 6; i++) { const st = mesh(geo.box, M(0xffffff), -t.w / 2 + (i + 0.5) * t.w / 6, 4.2, -0.27, t.w / 14, 0.5, 0.02); st.rotation.z = 0.5; g.add(st); }
       g.userData.panel = panel;
       g.userData.last = null;
     } else if (t.kind === 'cage') {
@@ -461,8 +530,8 @@ class Game {
           if (g.userData.last !== key) {
             g.userData.last = key;
             if (g.userData.num) g.remove(g.userData.num);
-            const s = sprite(t.val >= 0 ? `+${t.val}` : `${t.val}`, t.val >= 0 ? '#2a6ae0' : '#e02a3a', 2.8, 1.4);
-            s.position.y = 4.2;
+            const s = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.6), new THREE.MeshBasicMaterial({ map: labelTex(t.val >= 0 ? `+${t.val}` : `${t.val}`, t.val >= 0 ? '#2a6ae0' : '#e02a3a'), transparent: true, depthWrite: false }));
+            s.rotation.y = Math.PI; s.position.set(0, 2.1, -0.12);
             g.add(s);
             g.userData.num = s;
           }
@@ -470,7 +539,7 @@ class Game {
           const key = `${Math.ceil(t.hp)}`;
           if (g.userData.last !== key) { g.userData.last = key; g.userData.label.material.map = labelTex(key, t.kind === 'enemy' ? '#8a1a1a' : '#3a3a58'); g.userData.label.material.needsUpdate = true; }
         }
-        if (t.kind === 'enemy') g.rotation.y = Math.PI + Math.sin(this.clock * 6 + t.id) * 0.1;
+        if (t.kind === 'enemy') { g.rotation.y = Math.PI + Math.sin(this.clock * 6 + t.id) * 0.1; const eg = g.children[0]; if (eg && eg.userData.legL) { const ph = this.clock * 7 + t.id; eg.userData.legL.rotation.x = Math.sin(ph) * 0.6; eg.userData.legR.rotation.x = -Math.sin(ph) * 0.6; eg.userData.armR.rotation.x = -1.1 + Math.sin(ph * 1.3) * 0.5; eg.position.y = Math.abs(Math.sin(ph)) * 0.08; } }
         if (t.kind === 'crate') g.rotation.y = this.clock;
       }
       // squad formation
@@ -484,14 +553,15 @@ class Game {
         const px = (col - (rowN - 1) / 2) * 0.95;
         u.position.set(-r.x - px, Math.abs(Math.sin(this.clock * 9 + i)) * 0.12, zs - row * 1.0);
         u.rotation.y = 0;
+        animUnit(u, this.clock, i);
       });
       if (!this.cntSprite || this.cntKey !== r.n) {
         if (this.cntSprite) this.squadG.remove(this.cntSprite);
         this.cntKey = r.n;
-        this.cntSprite = sprite(String(r.n), '#1a4a8a', 2.6, 1.3);
+        this.cntSprite = sprite(String(r.n), '#1a4a8a', 1.7, 0.85);
         this.squadG.add(this.cntSprite);
       }
-      this.cntSprite.position.set(-r.x, 3.4, zs);
+      this.cntSprite.position.set(-r.x, 3.0, zs);
       // bullets
       const m = new THREE.Matrix4();
       let k = 0;
@@ -505,7 +575,7 @@ class Game {
     // camera
     const tx = camX;
     this.camera.position.x += (tx - this.camera.position.x) * Math.min(1, dt * 4);
-    this.camera.position.set(this.camera.position.x, this.cw < this.ch ? 6.4 : 4.8, zs - (this.cw < this.ch ? 9 : 7));
+    this.camera.position.set(this.camera.position.x, this.cw < this.ch ? 6.4 : 5.5, zs - (this.cw < this.ch ? 9 : 8.6));
     this.camera.lookAt(this.camera.position.x * 0.6, 1.3, zs + 12);
     // floating text
     this._floaters();
