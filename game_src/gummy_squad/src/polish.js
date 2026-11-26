@@ -31,6 +31,37 @@ if (typeof document !== 'undefined' && !document.getElementById('tw-emoji-font')
   } catch (_) { /* old browser */ }
 }
 
+// Drawn icons (CSS only) for the emoji every menu/HUD reuses: lock, star, coin. A DOM observer swaps them in, so every game
+// gets the same crisp icons on every device with no per-game edits.
+if (typeof document !== 'undefined' && !document.getElementById('tw-icons')) {
+  const st = document.createElement('style'); st.id = 'tw-icons';
+  st.textContent = `.tw-lock{display:inline-block;position:relative;width:.85em;height:.62em;background:linear-gradient(#f2f6fc,#b8c6dc);border-radius:.12em;vertical-align:-.04em;margin:.25em .2em 0}
+.tw-lock::before{content:"";position:absolute;left:18%;top:-.42em;width:64%;height:.5em;border:.13em solid #c9d6ea;border-bottom:0;border-radius:.4em .4em 0 0;box-sizing:border-box}
+.tw-lock::after{content:"";position:absolute;left:44%;top:.18em;width:12%;height:.22em;background:#5a6a88;border-radius:.1em}
+.tw-star{display:inline-block;width:.95em;height:.95em;background:linear-gradient(#ffe680,#ffb300);clip-path:polygon(50% 0,62% 36%,100% 38%,70% 60%,80% 100%,50% 76%,20% 100%,30% 60%,0 38%,38% 36%);vertical-align:-.12em;margin:0 .08em}
+.tw-coin{display:inline-block;width:.88em;height:.88em;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff1a8,#f5b400 60%,#c98400);border:.09em solid #b87400;box-sizing:border-box;vertical-align:-.12em;margin:0 .1em;position:relative}
+.tw-coin::after{content:"";position:absolute;inset:.17em;border:.07em solid rgba(150,90,0,.55);border-radius:50%}`;
+  document.head.appendChild(st);
+  const RE = /(\u{1F512}|\u2B50|\u{1FA99})\uFE0F?/gu;
+  const CLS = { '\u{1F512}': 'tw-lock', '\u2B50': 'tw-star', '\u{1FA99}': 'tw-coin' };
+  const sweep = () => {
+    if (!document.body) return;
+    const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const hits = [];
+    for (let n = w.nextNode(); n; n = w.nextNode()) { const pt = n.parentNode; if (pt && /^(SCRIPT|STYLE|TEXTAREA|OPTION)$/.test(pt.nodeName)) continue; RE.lastIndex = 0; if (RE.test(n.nodeValue)) hits.push(n); }
+    for (const n of hits) {
+      const frag = document.createDocumentFragment(); let last = 0; const t = n.nodeValue; RE.lastIndex = 0; let m;
+      while ((m = RE.exec(t))) { if (m.index > last) frag.append(t.slice(last, m.index)); const sp = document.createElement('span'); sp.className = CLS[m[1]]; frag.append(sp); last = m.index + m[0].length; }
+      if (last < t.length) frag.append(t.slice(last));
+      n.parentNode.replaceChild(frag, n);
+    }
+  };
+  let pend = 0;
+  const kick = () => { if (pend) return; pend = setTimeout(() => { pend = 0; sweep(); }, 30); };
+  const go = () => { new MutationObserver(kick).observe(document.body, { childList: true, subtree: true, characterData: true }); sweep(); };
+  if (document.body) go(); else document.addEventListener('DOMContentLoaded', go);
+}
+
 const PRESETS = {
   // bloom: [strength, radius, threshold]; grade: contrast, saturation, warm(+)/cool(-) tint, vignette
   warm: { bloom: [0.32, 0.55, 0.82], contrast: 1.08, sat: 1.12, tint: 0.05, vig: 0.38, exposure: 1.0 },

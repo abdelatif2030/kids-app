@@ -28,3 +28,4 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 
 ## Menu glyph pass (38 games)
 - Found: menu logo emoji rendered as missing-glyph boxes (text-stroke logos); removed emoji from titles in 38 games. Emoji font re-registered after the game's own font so it is not shadowed. Open: menu buttons still use emoji icons (levels, settings, locks) in many games; should become CSS/SVG icons per game, same as course_race menu.
+- Icons: lock, star and coin emoji are now swapped for CSS-drawn icons in every polished game (DOM observer in polish.js). Verified golden_tail menu. Open: canvas-drawn text and settings/other emoji icons.
