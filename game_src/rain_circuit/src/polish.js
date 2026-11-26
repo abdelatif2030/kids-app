@@ -108,7 +108,7 @@ export function installCheer(root, voice) {
 export function polishRenderer(renderer, opts = {}) {
   const q = new URLSearchParams(typeof location !== 'undefined' ? location.search : '');
   if (q.has('nopolish')) return renderer;
-  const preset = PRESETS[q.get('look') || opts.preset || 'warm'] || PRESETS.warm;
+  const preset = Object.assign({}, PRESETS[q.get('look') || opts.preset || 'warm'] || PRESETS.warm, opts.tune || {});
   const low = q.has('low') || !!opts.low;
   const rec = q.has('rec');
   const origRender = renderer.render.bind(renderer);
