@@ -133,3 +133,8 @@ test('the Arabic names of the section items now have their recordings (the owner
   }
   assert.ok(missing.length < 40, `missing ${missing.length}: ${missing.slice(0, 5)}`);
 });
+
+test('the number pad and the end card sit above the full-screen next button (a tap on a key used to close the pad)', () => {
+  const src = fs.readFileSync(new URL('../src/letters/main.js', import.meta.url), 'utf8');
+  assert.ok(src.includes('.lw-lpick,.lw-ldone{z-index:5}') && src.includes("'lk-dim lw-ldone'") && /\.lw-lhit\{[^}]*z-index:2\}/.test(src));
+});
