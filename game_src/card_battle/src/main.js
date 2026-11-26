@@ -7,6 +7,7 @@ import { Battle, CARDS, UNITS, SPELLS, DIFFS, DT, L, HALF, CX, MATCH_TIME, ENERG
 import { drawUnit, drawPlayerBase, drawUFO, drawCardIcon, ground, bar, glow, blob, setArt } from './art.js';
 import { loadArt } from '../../cozy_kit/art.js';
 import { Sound } from './audio.js';
+import { View3D } from './view3d.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 
 const S = {
@@ -43,6 +44,7 @@ class Game {
     if (!document.getElementById('cb-style')) document.head.append(h('style', { id: 'cb-style' }, css('cb', '#3a2a8a', '#12083a', '#35f0ff') + CSS));
     this.root = h('div', { class: 'cb-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
+    this.view = new View3D(); this.root.append(this.view.dom);
     this.cv = h('canvas');
     this.root.append(this.cv);
     this.g = this.cv.getContext('2d');
@@ -67,6 +69,7 @@ class Game {
     const r = this.el.getBoundingClientRect();
     this.cw = r.width || window.innerWidth; this.ch = r.height || window.innerHeight;
     this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.view.setSize(this.cw, this.ch);
     this.cv.width = Math.round(this.cw * this.dpr); this.cv.height = Math.round(this.ch * this.dpr);
     this.u = Math.min(this.cw, this.ch * 0.62) / 100;
     this.root.style.setProperty('--u', `${Math.min(this.u, 6.2)}px`);
@@ -78,79 +81,17 @@ class Game {
     const topH = this.topEl ? this.topEl.offsetTop + this.topEl.offsetHeight : ch * 0.14;
     const botH = this.botEl ? this.botEl.offsetHeight : ch * 0.27;
     const rt = topH + 4; const rb = ch - botH - 2;
-    const farY = rt + Math.max(36, (rb - rt) * 0.1);
-    const nearY = rb - Math.max(10, (rb - rt) * 0.035);
-    this.Zf = 1.85; this.cx = cw / 2;
-    this.k = (nearY - farY) / (1 - 1 / this.Zf);
-    this.hor = nearY - this.k;
-    this.sNear = Math.min((cw / 2 - 4) / 5, ((nearY - farY) / 16) * 1.45);
-    this.nearY = nearY; this.farY = farY;
-    this._bakeBg();
+    this.cx = cw / 2; this.view.fit(rt + 6, rb);
   }
-  _Z(y) { return 1 + (L - y) * (this.Zf - 1) / L; }
-  sc(y) { return this.sNear / this._Z(y); }
-  sy(y) { return this.hor + this.k / this._Z(y); }
-  P(x, y, z = 0) { const s = this.sc(y); return [this.cx + (x - CX) * s, this.sy(y) - z * s]; }
-  inv(px, py) {
-    const Z = this.k / (py - this.hor);
-    const y = L - (Z - 1) * L / (this.Zf - 1);
-    return [CX + (px - this.cx) / (this.sNear / Z), y];
-  }
+  sc(y) { const a = this.view.project(CX, y, 0); const b = this.view.project(CX + 1, y, 0); return Math.abs(b[0] - a[0]); }
+  sy(y) { return this.view.project(CX, y, 0)[1]; }
+  P(x, y, z = 0) { return this.view.project(x, y, z); }
+  inv(px, py) { return this.view.unproject(px, py); }
   ell(x, y, r) { const [px, py] = this.P(x, y); const rx = r * this.sc(y); const ry = Math.abs(this.sy(y + r) - this.sy(y - r)) / 2; return [px, py, rx, ry]; }
 
   _poly(g, pts) { g.beginPath(); pts.forEach(([x, y], i) => { const [px, py] = this.P(x, y); if (i) g.lineTo(px, py); else g.moveTo(px, py); }); g.closePath(); }
   _hexPts() { return [[CX - 3.6, 0], [CX + 3.6, 0], [10, HALF], [CX + 3.6, L], [CX - 3.6, L], [0, HALF]]; }
 
-  _bakeBg() {
-    const cw = this.cw; const ch = this.ch; const d = this.dpr;
-    const c = this.bg || (this.bg = document.createElement('canvas'));
-    c.width = Math.round(cw * d); c.height = Math.round(ch * d);
-    const g = c.getContext('2d'); g.setTransform(d, 0, 0, d, 0, 0);
-    const sky = g.createLinearGradient(0, 0, 0, ch); sky.addColorStop(0, '#0a0430'); sky.addColorStop(0.5, '#1a0a4a'); sky.addColorStop(1, '#07041a');
-    g.fillStyle = sky; g.fillRect(0, 0, cw, ch);
-    glow(g, cw * 0.2, ch * 0.2, cw * 0.7, 'rgba(255,60,200,.28)'); glow(g, cw * 0.85, ch * 0.5, cw * 0.8, 'rgba(40,120,255,.25)');
-    let sd = 7; const rnd = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
-    for (let i = 0; i < 90; i++) { g.fillStyle = `rgba(255,255,255,${0.2 + rnd() * 0.7})`; const r = 0.4 + rnd() * 1.4; g.beginPath(); g.arc(rnd() * cw, rnd() * ch, r, 0, TAU); g.fill(); }
-    // platform slab (the side of the floating hexagon)
-    const th = Math.max(10, (this.nearY - this.farY) * 0.035);
-    const pts = this._hexPts();
-    g.save(); g.translate(0, th); this._poly(g, pts); g.fillStyle = '#0a0626'; g.fill(); g.restore();
-    const sl = g.createLinearGradient(0, this.farY, 0, this.nearY + th);
-    sl.addColorStop(0, '#5a1a7a'); sl.addColorStop(1, '#0e3a6a');
-    g.save(); this._poly(g, pts); g.lineWidth = th * 2.2; g.lineJoin = 'round'; g.strokeStyle = 'rgba(0,0,0,.0)'; g.restore();
-    // underside glow
-    glow(g, this.cx, this.nearY + th * 2, cw * 0.5, 'rgba(60,200,255,.25)');
-    // floor
-    this._poly(g, pts);
-    const fl = g.createLinearGradient(0, this.farY, 0, this.nearY);
-    fl.addColorStop(0, '#34104e'); fl.addColorStop(0.49, '#1c1048'); fl.addColorStop(0.51, '#0c2050'); fl.addColorStop(1, '#0a3466');
-    g.fillStyle = fl; g.fill();
-    g.save(); this._poly(g, pts); g.clip();
-    // honeycomb
-    const hr = 0.95; g.lineWidth = 1;
-    for (let row = -1; row < 20; row++) {
-      for (let col = -1; col < 9; col++) {
-        const x = col * hr * 1.732 + (row % 2 ? hr * 0.866 : 0) + 0.2; const y = row * hr * 1.5;
-        if (y < -0.5 || y > L + 0.5 || Math.abs(x - CX) > arenaHalfW(Math.min(L, Math.max(0, y))) + 1) continue;
-        g.beginPath();
-        for (let k = 0; k < 6; k++) { const a = Math.PI / 6 + k * Math.PI / 3; const [px, py] = this.P(x + Math.cos(a) * hr * 0.97, y + Math.sin(a) * hr * 0.97); if (k) g.lineTo(px, py); else g.moveTo(px, py); }
-        g.closePath();
-        g.strokeStyle = y < HALF ? 'rgba(255,100,220,.16)' : 'rgba(80,220,255,.17)'; g.stroke();
-        if (((row * 7 + col * 3) % 11) === 0) { g.fillStyle = y < HALF ? 'rgba(255,100,220,.07)' : 'rgba(80,220,255,.08)'; g.fill(); }
-      }
-    }
-    // centre line
-    const a = this.P(0, HALF); const b = this.P(10, HALF);
-    g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 2; g.setLineDash([10, 8]); g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); g.setLineDash([]);
-    const [mx, my] = this.P(CX, HALF); glow(g, mx, my, cw * 0.18, 'rgba(255,255,255,.22)');
-    g.restore();
-    // neon rim
-    const rim = g.createLinearGradient(0, this.farY, 0, this.nearY);
-    rim.addColorStop(0, '#ff3fd0'); rim.addColorStop(0.5, '#b070ff'); rim.addColorStop(1, '#35e0ff');
-    this._poly(g, pts); g.lineJoin = 'round';
-    g.strokeStyle = rim; g.globalAlpha = 0.25; g.lineWidth = 9; g.stroke(); g.globalAlpha = 0.5; g.lineWidth = 5; g.stroke(); g.globalAlpha = 1; g.lineWidth = 2; g.stroke();
-    for (const [x, y] of pts) { const [px, py] = this.P(x, y); glow(g, px, py, 14, y < HALF ? '#ff3fd0' : y > HALF ? '#35e0ff' : '#c090ff'); }
-  }
 
   // ---- input -----------------------------------------------------------------------------------------------------------
   _bind() {
@@ -240,7 +181,7 @@ class Game {
   _menuPic(on) {
     const pic = this.pics && this.pics.bg_menu;
     this.root.style.background = on && pic ? `#07041a url(${pic.src}) center/cover no-repeat` : '';
-    this.cv.style.visibility = on && pic ? 'hidden' : '';
+    this.cv.style.visibility = on && pic ? 'hidden' : ''; this.view.dom.style.visibility = on && pic ? 'hidden' : '';
   }
 
   _av(who, emoji) {
@@ -477,16 +418,19 @@ class Game {
   _draw() {
     const g = this.g; const d = this.dpr;
     g.setTransform(d, 0, 0, d, 0, 0);
-    g.drawImage(this.bg, 0, 0, this.cw, this.ch);
+    g.clearRect(0, 0, this.cw, this.ch);
     if (this.shake > 0.1) g.translate((Math.random() - 0.5) * this.shake, (Math.random() - 0.5) * this.shake);
     const b = this.battle; const al = b.state === 'play' && this.mode === 'play' ? b.alpha : 0;
+    const snap = { bases: b.base, units: [], projs: [] };
+    for (const u of b.units) { snap.units.push({ u, x: u.px + (u.x - u.px) * al, y: u.py + (u.y - u.py) * al }); }
+    for (const p of b.projs) { const dx = p.t.x - p.x; const dy = p.t.y - p.y; const dl = Math.hypot(dx, dy) || 1; snap.projs.push({ p, x: p.x + (dx / dl) * p.spd * DT * al, y: p.y + (dy / dl) * p.spd * DT * al, dx: dx / dl, dy: dy / dl }); }
+    this.view.render(snap, this.clock, this.shake);
     this._zone(g);
     for (const f of this.fxs) this._drawField(g, f);
     // depth-sorted things
     const list = [];
     for (const bs of b.base) list.push({ y: bs.y, f: () => this._base(g, bs) });
     for (const u of b.units) { const ix = u.px + (u.x - u.px) * al; const iy = u.py + (u.y - u.py) * al; list.push({ y: iy, f: () => this._unit(g, u, ix, iy) }); }
-    for (const p of b.projs) { const dx = p.t.x - p.x; const dy = p.t.y - p.y; const dl = Math.hypot(dx, dy) || 1; const ex = p.x + (dx / dl) * p.spd * DT * al; const ey = p.y + (dy / dl) * p.spd * DT * al; list.push({ y: ey + 0.5, f: () => this._proj2(g, p, ex, ey, dx / dl, dy / dl) }); }
     list.sort((a, c) => a.y - c.y);
     for (const it of list) it.f();
     this._ghostPreview(g);
@@ -537,9 +481,7 @@ class Game {
   _unit(g, u, x, y) {
     const d = UNITS[u.kind]; const [px, py] = this.P(x, y); const s = this.sc(y);
     const R = u.r * s;
-    ground(g, px, py, R, u.side, d.building ? 1 : 0.8 + 0.2 * Math.sin(this.clock * 4 + u.id));
     const sp = u.spawn > 0 ? 1 - u.spawn / 0.45 : 1;
-    drawUnit(g, u.kind, px, py, s, u.r, { t: u.age + this.clock * 0, side: u.side, moving: u.moving, atk: u.atk, flash: u.flash, spawn: sp, ang: u.ang });
     if (u.hp < u.max && u.spawn <= 0) { const frac = u.hp / u.max; bar(g, px, py - R * (d.building ? 3.0 : u.r > 0.5 ? 3.3 : 2.9), Math.max(R * 2.2, 18), Math.max(3, R * 0.28), frac, frac > 0.5 ? '#5aff9a' : frac > 0.25 ? '#ffd23a' : '#ff4a5a'); }
     if (d.building) { bar(g, px, py + R * 0.9, R * 1.6, Math.max(2, R * 0.14), u.life / UNITS.turret.life, '#35e0ff'); }
   }
@@ -547,8 +489,8 @@ class Game {
   _base(g, bs) {
     const [px, py] = this.P(bs.x, bs.y); const s = this.sc(bs.y); const R = BASE_R * s;
     const o = { t: this.clock, flash: bs.flash, atk: bs.atk };
-    if (bs.hp <= 0) { blob(g, px, py, R * 1.3, R * 0.55, '#3a2a40', '#0a0612', '#222'); glow(g, px, py - R * 0.3, R * 1.2, 'rgba(255,120,40,.6)'); return; }
-    if (bs.side === 0) { drawPlayerBase(g, px, py, s, o); bar(g, px, py + R * 0.85, R * 2.6, Math.max(5, R * 0.24), bs.hp / bs.max, '#35e0ff'); } else { const hy = drawUFO(g, px, py, s, o); bar(g, px, hy - R * 1.9, R * 2.6, Math.max(5, R * 0.24), bs.hp / bs.max, '#ff3fd0'); }
+    if (bs.hp <= 0) { glow(g, px, py - R * 0.3, R * 1.2, 'rgba(255,120,40,.6)'); return; }
+    if (bs.side === 0) { bar(g, px, py + R * 0.85, R * 2.6, Math.max(5, R * 0.24), bs.hp / bs.max, '#35e0ff'); } else { const hy = this.P(bs.x, bs.y, 3.4)[1] + R * 0.3; bar(g, px, hy - R * 1.9, R * 2.6, Math.max(5, R * 0.24), bs.hp / bs.max, '#ff3fd0'); }
   }
 
   _proj2(g, p, x, y, dx, dy) {
@@ -613,7 +555,7 @@ class Game {
 
   pause() { if (this.mode === 'play') this.pauseGame(); else this.sound.suspend(); }
   dispose() {
-    cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect();
+    cancelAnimationFrame(this.raf); this.view.dispose(); this.sound.dispose(); if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey);
     this.root.remove();
   }
