@@ -581,7 +581,7 @@ class Game {
       m.arms[0].rotation.x = m.paddle > 0 ? -2.6 * Math.sin((m.paddle / 0.45) * Math.PI) : Math.sin(sp) * 1.5 - 0.6;
       m.arms[1].rotation.x = m.paddle > 0 ? 2.6 * Math.sin((m.paddle / 0.45) * Math.PI) - 1 : -Math.sin(sp) * 1.5 - 0.6;
       m.legs.forEach((l, i) => { l.rotation.x = Math.sin(time * (k === 0 ? 30 : 18) + i * Math.PI) * 0.6; });
-      m.head.rotation.z = Math.sin(time * 3 + k) * 0.25;
+      m.head.rotation.z = Math.sin(time * 3 + k) * 0.25; m.head.rotation.y = Math.sin(time * (k === 0 ? 5 : 3.4) + k * 1.7) * (k === 0 ? 1.45 : 1.2); // breathing turns show the face
       if (w.dive && Math.random() < 0.3) this.bubbles.emit(w.x + (Math.random() - 0.5) * 0.4, w.y + 0.2, -w.s, 0, 1.2, 0, 0.8);
       if (k === 0 && !w.dive && w.air <= 0 && w.v > 1) { for (let q = 0; q < 3; q++) this.drops.emit(w.x + (Math.random() - 0.5) * 1.1, 0.12, -w.s + 0.5 + Math.random() * 0.8, (Math.random() - 0.5) * 2.2, 2 + Math.random() * 1.5, 1.5 + Math.random() * 2, 0.55); }
       if (!w.dive && w.air <= 0 && !w.slide && w.v > 3 && Math.random() < 0.25) this.drops.emit(w.x + (Math.random() - 0.5) * 0.6, 0.1, -w.s + 0.6, (Math.random() - 0.5), 1.4, 1, 0.4);

@@ -80,6 +80,11 @@ export function makeSwimmer(kind = 'otter', cap = 0x2ab8c8, goggles = true, idx 
       head.add(ball(0.075, mat(0x8ad8ff, 0x3a8ad8, 0.4), sx * 0.14, 0.2, -0.33, 1, 1, 0.4, 10));
     }
   }
+  // hair pigtails / bun so the back of the head still reads as a character
+  const hair = mat(HAIRS[(idx * 5 + 2) % HAIRS.length]);
+  if (idx % 2 === 0) { for (const sx of [-1, 1]) { head.add(ball(0.13, hair, sx * 0.3, -0.04, 0.3, 1, 1.5, 1, 10)); head.add(ball(0.05, mat(0xffffff), sx * 0.3, 0.1, 0.27, 1, 1, 1, 6)); } }
+  else { head.add(ball(0.17, hair, 0, 0.12, 0.42, 1, 1, 1, 10)); head.add(ball(0.19, hair, 0, -0.08, 0.34, 1.1, 0.8, 0.9, 10)); }
+  head.scale.setScalar(1.4); head.position.y += 0.08;
   body.add(head);
   const arms = [];
   for (const sx of [-1, 1]) {
