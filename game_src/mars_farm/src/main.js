@@ -165,7 +165,7 @@ class Game {
     let armed = false;
     const nb = h('button', { class: 'mf-btn dark', onclick: () => { if (has && !armed) { armed = true; nb.textContent = I.t('sure'); this.sound.play('err'); return; } this._newGame(); } }, I.t('newgame'));
     this._modalMenu = h('div', { class: 'mf-dim' }, h('div', { class: 'mf-card' },
-      h('div', { class: 'mf-logo' }, '🚀 ', I.t('title')),
+      h('div', { class: 'mf-logo' }, I.t('title')),
       h('div', { class: 'mf-small' }, I.t('how')), h('div', { class: 'mf-small' }, I.t('how2')),
       this.c.won ? h('div', { class: 'mf-small' }, '🏆 ' + I.t('welcome')) : h('div', { class: 'mf-small' }, `⭐ ${I.t('level')} ${I.num(this.c.level)}`),
       h('button', { class: 'mf-btn', onclick: () => { this.sound.play('tap'); this.start(); } }, has ? I.t('cont') : I.t('play')),

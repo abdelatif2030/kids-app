@@ -155,7 +155,7 @@ class Game {
     this.mode = 'menu'; this.p = null; this.layer.replaceChildren(); this.sound.setMode(false);
     this.demo = new Puzzle({ level: 0 });
     this.layer.append(h('div', { class: 'pp-dim' }, h('div', { class: 'pp-card' },
-      h('div', { class: 'pp-logo' }, '📌 ', I.t('title')), h('div', { class: 'pp-small' }, I.t('how')),
+      h('div', { class: 'pp-logo' }, I.t('title')), h('div', { class: 'pp-small' }, I.t('how')),
       h('button', { class: 'pp-btn', onclick: () => { this.sound.play('tap'); this.startLevel(Math.min(this.save.unlocked, LEVELS) - 1); } }, I.t('play')),
       h('button', { class: 'pp-btn alt', onclick: () => this.showLevels() }, I.t('levels')),
       h('button', { class: 'pp-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));

@@ -75,7 +75,7 @@ class Game {
 
   showMenu() {
     this.mode = 'menu'; this.c = new Climb({ seed: 1, easy: true }); this.layer.replaceChildren(); this.sound.setMode(false);
-    this.layer.append(h('div', { class: 'sj-dim' }, h('div', { class: 'sj-card' }, h('div', { class: 'sj-logo' }, '🦘 ', I.t('title')), h('div', { class: 'sj-small' }, I.t('how')), h('div', { class: 'sj-small' }, `🏆 ${I.t('best')}: ${I.num(this.save.best)}`), h('button', { class: 'sj-btn', onclick: () => { this.sound.play('tap'); this.start(); } }, I.t('play')), h('button', { class: 'sj-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));
+    this.layer.append(h('div', { class: 'sj-dim' }, h('div', { class: 'sj-card' }, h('div', { class: 'sj-logo' }, I.t('title')), h('div', { class: 'sj-small' }, I.t('how')), h('div', { class: 'sj-small' }, `🏆 ${I.t('best')}: ${I.num(this.save.best)}`), h('button', { class: 'sj-btn', onclick: () => { this.sound.play('tap'); this.start(); } }, I.t('play')), h('button', { class: 'sj-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));
     this._soundPill();
   }
 

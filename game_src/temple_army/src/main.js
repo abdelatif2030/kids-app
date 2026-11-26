@@ -219,7 +219,7 @@ class Game {
   showMenu() {
     this.mode = 'menu'; this.paused = false; this._clear(); this.sound.setMode('menu'); this.hideBoss();
     if (!this.demo || !this.run || this.run.state !== 'play') this._startDemo(this.demoLevel % LEVELS.length);
-    this.layer.append(h('div', { class: 'ta-dim ta-light' }, h('div', { class: 'ta-card' }, h('div', { class: 'ta-logo' }, '⚔️ ', I.t('title')),
+    this.layer.append(h('div', { class: 'ta-dim ta-light' }, h('div', { class: 'ta-card' }, h('div', { class: 'ta-logo' }, I.t('title')),
       h('div', { class: 'ta-menu' },
         h('button', { class: 'ta-btn', onclick: () => { this.sound.play('tap'); this.startLevel(Math.min(this.save.unlocked, LEVELS.length) - 1); } }, '▶ ', I.t('play')),
         h('button', { class: 'ta-btn dark', onclick: () => { this.sound.play('tap'); this.showLevels(); } }, '🗺️ ', I.t('levels')),

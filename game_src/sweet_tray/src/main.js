@@ -216,7 +216,7 @@ class UI {
     this.game = new Game(makeLevel(3)); this.spr.clear(); this.ghosts = []; this._layout();
     const cur = Math.min(this.save.unlocked, LEVELS);
     this.layer.append(h('div', { class: 'st-dim' }, h('div', { class: 'st-card' },
-      h('div', { class: 'st-logo' }, '🍰 ', I.t('title')), h('div', { class: 'st-small' }, I.t('how')),
+      h('div', { class: 'st-logo' }, I.t('title')), h('div', { class: 'st-small' }, I.t('how')),
       h('button', { class: 'st-btn', onclick: () => { this.sound.play('ui'); this.startLevel(cur); } }, I.t('play')),
       h('button', { class: 'st-btn alt', onclick: () => { this.sound.play('ui'); this.showMap(); } }, I.t('levels')),
       h('button', { class: 'st-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));

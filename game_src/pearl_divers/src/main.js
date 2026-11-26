@@ -137,7 +137,7 @@ class Game {
     this.sound.setMode(false);
     this.l = new Lagoon({ seed: 1 }); this.cam = 0;
     this.layer.append(h('div', { class: 'pd-dim' }, h('div', { class: 'pd-card' },
-      h('div', { class: 'pd-logo' }, '🦪 ', I.t('title')), h('div', { class: 'pd-small' }, I.t('how')),
+      h('div', { class: 'pd-logo' }, I.t('title')), h('div', { class: 'pd-small' }, I.t('how')),
       h('button', { class: 'pd-btn', onclick: () => { this.sound.play('buy'); this.start(); } }, I.t('play')),
       h('button', { class: 'pd-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));
     this._soundPill();

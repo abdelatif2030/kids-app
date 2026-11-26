@@ -306,7 +306,7 @@ class Game {
     let card;
     if (screen === 'main') {
       const next = Math.min(LEVELS, this.save.unlocked);
-      card = h('div', { class: 'bs-card' }, h('div', { class: 'bs-logo' }, '🚜 ', I.t('title')), coins, h('div', { class: 'bs-small' }, I.t('how')),
+      card = h('div', { class: 'bs-card' }, h('div', { class: 'bs-logo' }, I.t('title')), coins, h('div', { class: 'bs-small' }, I.t('how')),
         h('button', { class: 'bs-btn', onclick: () => { this.sound.play('tap'); this.start(next - 1); } }, `▶ ${I.t('play')} — ${I.t('level')} ${I.num(next)}`),
         h('button', { class: 'bs-btn dark', onclick: () => { this.sound.play('tap'); this.showMenu('levels'); } }, `🗺️ ${I.t('levels')}`),
         h('button', { class: 'bs-btn dark', onclick: () => { this.sound.play('tap'); this.showMenu('shop'); } }, `🛒 ${I.t('shop')}`),

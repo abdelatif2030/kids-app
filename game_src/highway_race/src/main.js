@@ -269,7 +269,7 @@ class Game {
       return h('button', { class: `sh-btn${lock ? ' dark' : ''}`, onclick: () => { if (lock) { this.hint(I.t('locked')); return; } this.sound.play('tap'); this.start(i); } }, `${lock ? '🔒' : '🏎️'} ${I.t('stage')} ${I.num(i + 1)} · ${ar ? s.ar : s.en} ${'⭐'.repeat(st)}`);
     }));
     this.layer.append(h('div', { class: 'sh-dim' }, h('div', { class: 'sh-card' },
-      h('div', { class: 'sh-logo' }, '🌅 ', I.t('title')), h('div', { class: 'sh-small' }, I.t('how')), cards,
+      h('div', { class: 'sh-logo' }, I.t('title')), h('div', { class: 'sh-small' }, I.t('how')), cards,
       h('button', { class: 'sh-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));
     this.hintEl = h('div', { class: 'sh-hint' });
     this.layer.append(this.hintEl);

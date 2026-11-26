@@ -255,7 +255,7 @@ class Game {
     this.battle = new Battle({ seed: 1, difficulty: this.diff }); this.parts = []; this.texts = []; this.beams = []; this.fxs = [];
     const btns = ['easy', 'normal', 'hard', 'expert', 'legend'].map((d) => h('button', { class: `cb-diff${d === this.diff ? ' on' : ''}`, onclick: () => { this.diff = d; this.sound.play('tap'); this.showMenu(); } }, h('b', {}, I.t(d)), this._stars(this.save.stars[d])));
     this.layer.append(h('div', { class: 'cb-dim' }, h('div', { class: 'cb-card' },
-      h('div', { class: 'cb-logo' }, '⚡ ', I.t('title')),
+      h('div', { class: 'cb-logo' }, I.t('title')),
       h('div', { class: 'cb-small' }, I.t('diff')), h('div', { class: 'cb-diffs' }, btns),
       h('button', { class: 'cb-btn', onclick: () => { this.sound.unlock(); this.sound.play('tap'); this.start(); } }, I.t('play')),
       h('button', { class: 'cb-btn dark', onclick: () => this.showHow() }, I.t('howBtn')),

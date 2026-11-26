@@ -99,7 +99,7 @@ class Game {
     this.mode = 'menu'; this.layer.replaceChildren(); this.sound.setMode(false);
     this.f = new Farm({ seed: 1 }); this.cam = { x: 20, y: 14 };
     this.layer.append(h('div', { class: 'hf-dim' }, h('div', { class: 'hf-card' },
-      h('div', { class: 'hf-logo' }, '🍯 ', I.t('title')), h('div', { class: 'hf-small' }, I.t('how')),
+      h('div', { class: 'hf-logo' }, I.t('title')), h('div', { class: 'hf-small' }, I.t('how')),
       h('button', { class: 'hf-btn', onclick: () => { this.sound.play('tap'); this.start(); } }, I.t('play')),
       h('button', { class: 'hf-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));
     this._soundPill();

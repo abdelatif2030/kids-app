@@ -157,7 +157,7 @@ class Game {
       const lock = i + 1 > this.save.unlocked; const st = this.save.stars[i + 1] || 0;
       return h('button', { class: `id-btn${lock ? ' dark' : ''}`, onclick: () => { if (lock) { this.hint(I.t('locked')); return; } this.sound.play('tap'); this.start(i); } }, `${lock ? '🔒' : '🐉'} ${I.t('level')} ${I.num(i + 1)} · ${ar ? l.ar : l.en} ${'⭐'.repeat(st)}`);
     }));
-    this.layer.append(h('div', { class: 'id-dim' }, h('div', { class: 'id-card' }, h('div', { class: 'id-logo' }, '🐉 ', I.t('title')), h('div', { class: 'id-small' }, I.t('how')), cards, h('button', { class: 'id-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));
+    this.layer.append(h('div', { class: 'id-dim' }, h('div', { class: 'id-card' }, h('div', { class: 'id-logo' }, I.t('title')), h('div', { class: 'id-small' }, I.t('how')), cards, h('button', { class: 'id-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));
     this.hintEl = h('div', { class: 'id-hint' }); this.layer.append(this.hintEl);
     this._soundPill();
   }

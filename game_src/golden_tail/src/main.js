@@ -378,7 +378,7 @@ class Game {
       h('button', { class: 'gt-round', style: this._topLeft(), 'aria-label': t('exit'), onclick: () => { this._saveNow(); this.post({ type: 'exit' }); } }, getLang() === 'en' ? '←' : '→'),
       h('div', { class: 'gt-dim', style: 'background:none' },
         h('div', { class: 'gt-panel' },
-          h('div', { class: 'gt-logo' }, '🦖 ', t('title'), ' ✨'),
+          h('div', { class: 'gt-logo' }, t('title')),
           h('div', { class: 'gt-map', style: 'margin-bottom:calc(var(--u)*4)' }, nodes),
           h('button', { class: 'gt-btn2 gt-big', onclick: () => this.startLevel(Math.min(this.save.unlocked, LEVELS.length) - 1) }, '▶ ', t('play')))),
       this._mute(`bottom:max(calc(var(--u)*3),env(safe-area-inset-bottom));inset-inline-end:calc(var(--u)*3)`),

@@ -106,7 +106,7 @@ class Game {
     }));
     this.layer.append(h('div', { class: 'cr-dim' },
       h('div', { class: 'cr-card' },
-        h('div', { class: 'cr-logo' }, '🏝️ ', t('title')),
+        h('div', { class: 'cr-logo' }, t('title')),
         h('div', { class: 'cr-small' }, t('tapSea')),
         lvs,
         h('button', { class: 'cr-btn dark', onclick: () => this.post({ type: 'exit' }) }, t('exit')))));

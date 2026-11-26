@@ -187,7 +187,7 @@ class Game {
     this.sound.setMode('menu');
     const best = this.save.bestTime ? `🏆 ${t('best')}: ${fmtTime(this.save.bestTime)}` : '';
     this.layer.append(h('div', { class: 'hs-dim' }, h('div', { class: 'hs-card' },
-      h('div', { class: 'hs-logo' }, '♨️ ', t('title')),
+      h('div', { class: 'hs-logo' }, t('title')),
       h('div', { class: 'hs-small' }, t('goal')),
       h('div', { class: 'hs-small' }, t('how')),
       best ? h('div', { class: 'hs-small' }, best) : null,

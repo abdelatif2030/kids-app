@@ -232,7 +232,7 @@ class Game {
     const mute = h('button', { class: 'rc-round', 'aria-label': 'sound', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); mute.textContent = this.save.muted ? '🔇' : '🔊'; this._saveNow(); } }, this.save.muted ? '🔇' : '🔊');
     this.layer.append(h('div', { class: 'rc-top' }, mute, this._coinPill()),
       h('div', { class: 'rc-dim', style: 'background:rgba(40,25,5,.38)' }, h('div', { class: 'rc-card rc-menu' },
-        h('div', { class: 'rc-logo' }, '🧽 ', I.t('title')), h('div', { class: 'rc-small' }, I.t('tagline')),
+        h('div', { class: 'rc-logo' }, I.t('title')), h('div', { class: 'rc-small' }, I.t('tagline')),
         this._btn('', I.t('play'), () => this.showLevels()), this._btn('alt', `🔧 ${I.t('shop')}`, () => this.showShop()), this._btn('dark', I.t('exit'), () => this.post({ type: 'exit' })))));
     this._soundPill();
   }

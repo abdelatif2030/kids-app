@@ -126,7 +126,7 @@ class Game {
     this._clear();
     this.sound.setMode('menu');
     this.layer.append(h('div', { class: 'wc-dim' }, h('div', { class: 'wc-card' },
-      h('div', { class: 'wc-logo' }, '🏕️ ', t('title')),
+      h('div', { class: 'wc-logo' }, t('title')),
       h('div', { class: 'wc-small' }, t('how')),
       h('div', { class: 'wc-small' }, `🏆 ${t('logs')}: ${num(this.save.best)}`),
       h('button', { class: 'wc-btn', onclick: () => { this.sound.play('tap'); this.start(); } }, t('play')),

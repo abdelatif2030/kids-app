@@ -384,7 +384,7 @@ class Game {
   showMenu() {
     this.mode = 'menu'; this.paused = false; this._clear(); this.sound.setMode(null);
     this._loadLevel(0, true);
-    this.layer.append(h('div', { class: 'dg-dim', style: 'background:rgba(5,25,10,.25)' }, h('div', { class: 'dg-card' }, h('div', { class: 'dg-logo' }, '🦖 ', I.t('title')),
+    this.layer.append(h('div', { class: 'dg-dim', style: 'background:rgba(5,25,10,.25)' }, h('div', { class: 'dg-card' }, h('div', { class: 'dg-logo' }, I.t('title')),
       h('div', { class: 'dg-menu' },
         h('button', { class: 'dg-btn', onclick: () => { this.sound.play('tap'); this.start(Math.min(this.save.unlocked - 1, 2)); } }, '▶ ', I.t('play')),
         h('button', { class: 'dg-btn dark', onclick: () => { this.sound.play('tap'); this.showLevels(); } }, '🗺️ ', I.t('levels')),

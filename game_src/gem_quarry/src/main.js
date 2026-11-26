@@ -127,7 +127,7 @@ class Game {
   showMenu() {
     this.mode = 'menu'; this._clear(); this.sound.setMode(false); this.q = new Quarry({ level: 1, easy: true }); this.needLayout = true; this.menuT = 0;
     this.layer.append(h('div', { class: 'gq-dim' }, h('div', { class: 'gq-card' },
-      h('div', { class: 'gq-logo' }, '💎 ', I.t('title')),
+      h('div', { class: 'gq-logo' }, I.t('title')),
       h('div', { class: 'gq-ribbon' }, `⚠️ ${I.t('banner')}`),
       h('div', { class: 'gq-small' }, I.t('how')),
       h('button', { class: 'gq-btn', onclick: () => { this.sound.play('tap'); this.showMap(); } }, I.t('play')),

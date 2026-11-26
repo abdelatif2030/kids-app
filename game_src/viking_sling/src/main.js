@@ -130,7 +130,7 @@ class Game {
     this.b = null; this.camX = 0;
     const stars = Object.values(this.save.stars).reduce((a, v) => a + v, 0);
     this.layer.append(h('div', { class: 'vs-dim' }, h('div', { class: 'vs-card' },
-      h('div', { class: 'vs-logo' }, '🪓 ', I.t('title')), h('div', { class: 'vs-small' }, I.t('how')),
+      h('div', { class: 'vs-logo' }, I.t('title')), h('div', { class: 'vs-small' }, I.t('how')),
       h('div', { class: 'vs-row' }, h('div', { class: 'vs-pill' }, `🪙 ${I.num(this.save.gold)}`), h('div', { class: 'vs-pill' }, `⭐ ${I.num(stars)}`)),
       h('button', { class: 'vs-btn', onclick: () => { this.sound.play('tap'); this.startLevel(Math.min(this.save.unlocked, LEVELS.length) - 1); } }, I.t('play')),
       h('div', { class: 'vs-row' }, h('button', { class: 'vs-btn dark', onclick: () => this.showLevels() }, I.t('levels')), h('button', { class: 'vs-btn dark', onclick: () => this.showShop() }, I.t('shop'))),

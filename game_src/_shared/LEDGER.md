@@ -25,3 +25,6 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 ## course_race obstacles pass
 - Fixed: plain slab gates/doors, bare sweeper bar and hammer replaced with striped, capped, spiked models; meteors lumpy with glow. Open: level menu title overlap and stray scrollbar, alien clip not re-recorded.
 - course_race menu: tall button list with emoji tofu, banner overlap and stray scrollbar replaced by a 3x2 level-card grid with CSS stars and padlocks (no emoji), readable hint, hidden scrollbar. Verified by screenshot (rhino). Open: in-game HUD icon spans (th.icon, rocket/flag emoji) not yet replaced.
+
+## Menu glyph pass (38 games)
+- Found: menu logo emoji rendered as missing-glyph boxes (text-stroke logos); removed emoji from titles in 38 games. Emoji font re-registered after the game's own font so it is not shadowed. Open: menu buttons still use emoji icons (levels, settings, locks) in many games; should become CSS/SVG icons per game, same as course_race menu.

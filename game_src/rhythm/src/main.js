@@ -306,7 +306,7 @@ class Game {
       h('button', { class: 'rh-round', style: this._topLeft(), 'aria-label': t('exit'), onclick: () => { this._saveNow(); this.post({ type: 'exit' }); } }, getLang() === 'en' ? '←' : '→'),
       h('div', { class: 'rh-dim', style: 'background:rgba(40,30,20,.25)' },
         h('div', { class: 'rh-panel' },
-          h('div', { class: 'rh-logo' }, '🎵 ', t('title')),
+          h('div', { class: 'rh-logo' }, t('title')),
           h('div', { class: 'rh-title', style: 'font-size:calc(var(--u)*4.4)' }, '🌍 ', t('tour')),
           // the play button first, so it is on screen even on a phone held sideways
           h('button', { class: 'rh-btn2 rh-big', onclick: () => this.startTrack(this.save.unlocked - 1) }, '▶ ', t('play')),

@@ -351,7 +351,7 @@ class Game {
     this.sim = createState(1); this._buildBg();
     const next = Math.min(this.save.unlocked, LEVELS.length);
     this.layer.append(h('div', { class: 'ir-dim' }, h('div', { class: 'ir-card' },
-      h('div', { class: 'ir-logo' }, '⛸️ ', I.t('title')),
+      h('div', { class: 'ir-logo' }, I.t('title')),
       h('div', { class: 'ir-small' }, `🪙 ${I.num(this.save.coins)}`),
       h('button', { class: 'ir-btn', onclick: () => { this.sound.play('tap'); this.startLevel(next); } }, `${I.t('play')} (${I.t('level')} ${I.num(next)})`),
       h('button', { class: 'ir-btn dark', onclick: () => { this.sound.play('tap'); this.showLevels(); } }, I.t('levels')),

@@ -397,7 +397,7 @@ class Game {
       h('div', { class: 'od-top' }, this._coins()),
       h('div', { class: 'od-dim', style: 'background:none' },
         h('div', { class: 'od-panel' },
-          h('div', { class: 'od-logo' }, '🐠 ', t('title')),
+          h('div', { class: 'od-logo' }, t('title')),
           h('div', { class: 'od-map', style: 'margin-bottom:calc(var(--u)*4)' }, nodes),
           h('div', { style: 'display:flex;gap:calc(var(--u)*2);flex-wrap:wrap;justify-content:center' },
             h('button', { class: 'od-btn2 od-big', onclick: () => this.startLevel(this.save.unlocked - 1) }, '▶ ', t('play')),

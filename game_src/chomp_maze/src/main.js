@@ -84,7 +84,7 @@ class Game {
   showMenu() {
     this.mode = 'menu'; this.game = new Maze({ level: 0 }); this._clear(); this.sound.setMode(false);
     const lvs = h('div', { class: 'cm-lvs' }, Array.from({ length: LEVELS }, (_, i) => { const lock = i + 1 > this.save.unlocked; const st = this.save.stars[i + 1] || 0; return h('button', { class: `cm-lv${lock ? ' lock' : ''}`, onclick: () => { if (lock) { this.hint(I.t('locked')); return; } this.sound.play('tap'); this.start(i); } }, h('i', {}, lock ? '🔒' : '🟡'), h('span', {}, I.num(i + 1)), h('span', {}, '⭐'.repeat(st) || '·')); }));
-    this.layer.append(h('div', { class: 'cm-dim' }, h('div', { class: 'cm-card' }, h('div', { class: 'cm-logo' }, '🟡 ', I.t('title')), h('div', { class: 'cm-small' }, I.t('how')), h('div', { class: 'cm-small' }, `🏆 ${I.t('score')}: ${I.num(this.save.best)}`), lvs, h('button', { class: 'cm-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));
+    this.layer.append(h('div', { class: 'cm-dim' }, h('div', { class: 'cm-card' }, h('div', { class: 'cm-logo' }, I.t('title')), h('div', { class: 'cm-small' }, I.t('how')), h('div', { class: 'cm-small' }, `🏆 ${I.t('score')}: ${I.num(this.save.best)}`), lvs, h('button', { class: 'cm-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));
     this.hintEl = h('div', { class: 'cm-hint' }); this.layer.append(this.hintEl); this._soundPill();
   }
 

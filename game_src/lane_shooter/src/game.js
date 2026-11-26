@@ -397,7 +397,7 @@ class Game {
     const shop = h('div', { style: 'display:flex;gap:calc(var(--u)*2);width:100%' },
       this._shopBtn('bow', th.bow, BOW_COST, 3), this._shopBtn('rank', th.rank, RANK_COST, 4));
     this.layer.append(h('div', { class: `${p}-dim` }, h('div', { class: `${p}-card` },
-      h('div', { class: `${p}-logo` }, th.icon + ' ', th.title[ar ? 0 : 1]),
+      h('div', { class: `${p}-logo` }, th.title[ar ? 0 : 1]),
       h('div', { class: `${p}-small` }, I.t('drag')),
       h('div', { class: `${p}-pill` }, `🪙 ${I.num(this.save.coins)}`),
       shop, lvs,

@@ -327,7 +327,7 @@ class Game {
       h('div', { class: 'hf-top' }, this._coins()),
       h('div', { class: 'hf-dim', style: 'background:none' },
         h('div', { class: 'hf-panel', style: 'background:rgba(255,247,230,.9)' },
-          h('div', { class: 'hf-logo' }, '🚜 ', t('title')),
+          h('div', { class: 'hf-logo' }, t('title')),
           h('div', { style: 'font-weight:900;font-size:calc(var(--u)*4)' }, t('pick')),
           h('div', { class: 'hf-map' }, nodes),
           h('button', { class: 'hf-btn wood', style: 'margin-top:calc(var(--u)*3)', onclick: () => this.showShed() }, '🏚️ ', t('shed')))),

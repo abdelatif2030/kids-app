@@ -430,7 +430,7 @@ class Game {
     this.mode = 'menu'; this.paused = false; this._clear(); this.sound.setMode('menu'); this.dyn.visible = true; if (this.preview) this.preview.visible = false;
     this._demo();
     const next = Math.min(this.save.unlocked - 1, ROUNDS.length - 1);
-    this.layer.append(h('div', { class: 'bk-dim bk-clear' }, h('div', { class: 'bk-card' }, h('div', { class: 'bk-logo' }, '🛢️ ', I.t('title'), ' ⚔️'),
+    this.layer.append(h('div', { class: 'bk-dim bk-clear' }, h('div', { class: 'bk-card' }, h('div', { class: 'bk-logo' }, I.t('title')),
       h('div', { class: 'bk-coins' }, `🪙 ${I.num(this.save.coins)}`),
       h('div', { class: 'bk-menu' },
         h('button', { class: 'bk-btn', onclick: this._tap(() => this.start(next)) }, '▶ ', I.t('play')),

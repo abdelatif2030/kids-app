@@ -174,7 +174,7 @@ class Game {
     this.sound.setMode(false);
     const bgp = this.art && this.art.office_sunset;
     this.layer.append(h('div', { class: 'ct-dim', style: bgp ? `background:linear-gradient(rgba(5,10,40,.45),rgba(5,10,40,.65)),url(${bgp.src}) center/cover no-repeat` : '' }, h('div', { class: 'ct-card2 ct-card' },
-      h('div', { class: 'ct-logo' }, '💼 ', I.t('title')), h('div', { class: 'ct-small' }, I.t('tapGreen')),
+      h('div', { class: 'ct-logo' }, I.t('title')), h('div', { class: 'ct-small' }, I.t('tapGreen')),
       h('div', { class: 'ct-small' }, `🏆 ${I.t('masters')}: ${I.num(this.save.best)}`),
       h('button', { class: 'ct-btn', onclick: () => { this.sound.play('tap'); this.start(); } }, I.t('play')),
       h('button', { class: 'ct-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));

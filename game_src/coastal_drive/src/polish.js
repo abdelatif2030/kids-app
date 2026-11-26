@@ -17,6 +17,18 @@ if (typeof document !== 'undefined' && !document.getElementById('tw-emoji-font')
   const R = 'U+1F000-1FAFF,U+2600-27BF,U+2B00-2BFF,U+2300-23FF,U+FE0F,U+200D,U+2122,U+2139,U+2194-21AA,U+2934-2935,U+3030,U+303D,U+3297,U+3299,U+00A9,U+00AE,U+203C,U+2049,U+25AA-25FE';
   st.textContent = `@font-face{font-family:Tajawal;src:url(${u});unicode-range:${R};font-weight:100 900;font-display:swap}`;
   document.head.appendChild(st);
+  // games register their own 'Tajawal' FontFace (no unicode-range) which would shadow the emoji face above: re-add emoji last
+  try {
+    const origAdd = document.fonts.add.bind(document.fonts);
+    document.fonts.add = (f) => {
+      const r = origAdd(f);
+      if (f && !f.__tw && String(f.family).replace(/["']/g, '') === 'Tajawal') {
+        const e = new FontFace('Tajawal', `url(${u})`, { unicodeRange: R, weight: '100 900' });
+        e.__tw = 1; e.load().then(() => origAdd(e)).catch(() => {});
+      }
+      return r;
+    };
+  } catch (_) { /* old browser */ }
 }
 
 const PRESETS = {

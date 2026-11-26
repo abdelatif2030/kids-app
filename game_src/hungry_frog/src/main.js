@@ -363,7 +363,7 @@ class Game {
       h('button', { class: 'hf-round', style: this._tl(), 'aria-label': t('exit'), onclick: () => { this._saveNow(); this.post({ type: 'exit' }); } }, getLang() === 'en' ? '←' : '→'),
       h('div', { class: 'hf-top' }, this._dropsPill()),
       this._mute(this._tr()),
-      h('div', { class: 'hf-logo' }, '🐸 ', t('title')),
+      h('div', { class: 'hf-logo' }, t('title')),
       h('div', { class: 'hf-menu' },
         h('button', { class: 'hf-btn', onclick: () => this.startLevel(Math.min(this.save.unlocked, LEVELS.length) - 1) }, '▶ ', t('play')),
         h('button', { class: 'hf-btn brown', onclick: () => this.showMap() }, '🗺 ', t('map'))),

@@ -120,7 +120,7 @@ class Game {
       lvs.append(b);
     }
     this.layer.append(h('div', { class: 'hw-dim' }, h('div', { class: 'hw-card' },
-      h('div', { class: 'hw-logo' }, '🦊 ', I.t('title')), h('div', { class: 'hw-small' }, I.t('sub')), lvs,
+      h('div', { class: 'hw-logo' }, I.t('title')), h('div', { class: 'hw-small' }, I.t('sub')), lvs,
       h('div', { style: 'display:flex;gap:8px;width:100%;align-items:center' }, this._muteBtn(), h('button', { class: 'hw-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit'))))));
     this._soundPill();
   }

@@ -236,7 +236,7 @@ class Game {
       h('div', { class: 'pp-top' }, this._coins()),
       h('div', { class: 'pp-dim', style: 'background:none' },
         h('div', { class: 'pp-panel', style: 'background:rgba(255,247,230,.92)' },
-          h('div', { class: 'pp-logo' }, '🥧 ', t('title'), ' 🎃'),
+          h('div', { class: 'pp-logo' }, t('title')),
           h('div', { style: 'font-weight:900;font-size:calc(var(--u)*4)' }, t('who')),
           h('div', { class: 'pp-chefs' }, chefBtn('girl', '👩‍🍳'), chefBtn('boy', '👨‍🍳')),
           this.save.served ? h('div', { class: 'pp-stat' }, h('span', {}, '😊 ', num(this.save.served), ' ', t('served')), h('span', {}, '🥧 ', num(this.save.pies), ' ', t('pies'))) : null,

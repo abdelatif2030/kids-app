@@ -407,7 +407,7 @@ class Game {
       h('button', { class: 'sp-round', style: this._topLeft(), 'aria-label': t('exit'), onclick: () => { this._saveNow(); this.post({ type: 'exit' }); } }, getLang() === 'en' ? '←' : '→'),
       h('div', { class: 'sp-dim', style: 'background:rgba(20,120,160,.25)' },
         h('div', { class: 'sp-panel' },
-          h('div', { class: 'sp-logo', style: 'font-size:calc(var(--u)*7)' }, '🦦 ', t('title')),
+          h('div', { class: 'sp-logo', style: 'font-size:calc(var(--u)*7)' }, t('title')),
           h('div', { class: 'sp-map' }, svg, isles),
           h('button', { class: 'sp-btn2 sp-big', onclick: () => this.startRound(this.save.unlocked - 1) }, '▶ ', t('swim')))),
       this._mute(`bottom:max(calc(var(--u)*3),env(safe-area-inset-bottom));inset-inline-end:calc(var(--u)*3)`),

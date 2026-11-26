@@ -390,7 +390,7 @@ class Game {
     this._build(Math.min(this._lastOpen(), 0) === 0 ? 0 : 0); this.menuSpin = true;
     const cont = this.save.unlocked > 1 || Object.keys(this.save.stars).length > 0;
     const idx = Math.min(this._lastOpen(), LEVELS.length - 1);
-    this.layer.append(h('div', { class: 'tp-dim', style: 'background:rgba(10,5,0,.5)' }, h('div', { class: 'tp-card' }, h('div', { class: 'tp-logo' }, '𓂀 ', I.t('title')), h('div', { class: 'tp-small' }, I.t('sub')),
+    this.layer.append(h('div', { class: 'tp-dim', style: 'background:rgba(10,5,0,.5)' }, h('div', { class: 'tp-card' }, h('div', { class: 'tp-logo' }, I.t('title')), h('div', { class: 'tp-small' }, I.t('sub')),
       h('button', { class: 'tp-btn', onclick: () => { this.sound.play('tap'); this.start(idx); } }, '▶ ', cont ? I.t('cont') : I.t('play')),
       h('button', { class: 'tp-btn dark', onclick: () => { this.sound.play('tap'); this.showLevels(); } }, '🗺️ ', I.t('levels')),
       h('button', { class: 'tp-btn dark', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); this.showMenu(); } }, `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`),

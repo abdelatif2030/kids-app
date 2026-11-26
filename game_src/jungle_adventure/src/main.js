@@ -283,7 +283,7 @@ class Game {
       h('button', { class: 'ja-round', style: 'top:max(calc(var(--u)*2.5),env(safe-area-inset-top));inset-inline-start:calc(var(--u)*3)', 'aria-label': t('menu'), onclick: () => this.showMenu() }, getLang() === 'en' ? '←' : '→'),
       h('div', { class: 'ja-shop' },
         h('div', { class: 'ja-shop-top' },
-          h('div', { class: 'ja-logo', style: 'font-size:calc(var(--u)*8)' }, '🛍️ ', t('shop')),
+          h('div', { class: 'ja-logo', style: 'font-size:calc(var(--u)*8)' }, t('shop')),
           coins),
         h('div', { class: 'ja-shop-body' },
           h('div', { class: 'ja-glass ja-preview' },

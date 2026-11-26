@@ -572,7 +572,7 @@ class Game {
       h('button', { class: 'mr-round', style: this._topLeft(), 'aria-label': t('exit'), onclick: () => { this._saveNow(); this.post({ type: 'exit' }); } }, getLang() === 'en' ? '←' : '→'),
       h('div', { class: 'mr-dim', style: 'background:none;align-items:flex-end' },
         h('div', { class: 'mr-panel' },
-          h('div', { class: 'mr-logo' }, '🏎️ ', t('title')),
+          h('div', { class: 'mr-logo' }, t('title')),
           h('div', { class: 'mr-map' }, nodes),
           h('div', { style: 'display:flex;align-items:center;gap:calc(var(--u)*2);font-weight:900' }, t('bike'), h('div', { class: 'mr-colors' }, colors)),
           h('button', { class: 'mr-btn2 mr-big', onclick: () => this.startRace(this.save.unlocked - 1) }, '▶ ', t('race')))),

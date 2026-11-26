@@ -111,7 +111,7 @@ class Game {
     if (!this.sim || this.sim.state !== 'run') this._attract(this.menuLevel);
     const next = Math.min(this.save.unlocked, NUM_LEVELS);
     this.layer.append(this.card(
-      h('div', { class: 'tt-logo' }, '🎃 ', I.t('title')), h('div', { class: 'tt-small' }, I.t('sub')),
+      h('div', { class: 'tt-logo' }, I.t('title')), h('div', { class: 'tt-small' }, I.t('sub')),
       this.btn(`${I.t('play')} · ${I.t('street')} ${I.num(next)}`, () => this.startLevel(next)),
       this.btn(I.t('levels'), () => this.showLevels(), 'dark'), this.btn(`${I.t('costumes')} 👻`, () => this.showShop(), 'dark'),
       this.btn(I.t('settings'), () => this.showSettings(), 'dark'), this.btn(I.t('exit'), () => this.post({ type: 'exit' }), 'alt')));

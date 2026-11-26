@@ -119,7 +119,7 @@ class App {
   showMenu() {
     this.sound.setMode('menu'); if (!this.demo || this.demo.state !== 'play') this._newDemo(); this.f = this.demo; this.preview = false;
     this._screen('menu', h('div', { class: 'sa-demo' }, I.t('demo')),
-      this._card(null, h('div', { class: 'sa-logo' }, '✈️ ', I.t('title')),
+      this._card(null, h('div', { class: 'sa-logo' }, I.t('title')),
         this._btn(`▶ ${I.t('play')}`, () => this.startStage(Math.min(this.save.unlocked, STAGES))),
         this._btn(I.t('stages'), () => this.showStages(), 'dark'), this._btn(I.t('hangar'), () => this.showHangar(), 'dark'),
         this._btn(I.t('settings'), () => this.showSettings(), 'dark'), this._btn(I.t('exit'), () => this.post({ type: 'exit' }), 'alt')));
