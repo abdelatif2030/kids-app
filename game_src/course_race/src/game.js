@@ -348,15 +348,19 @@ class Game {
     const demo = new Race({ theme: th.id, round: 0, seed: 1 });
     this._buildWorld(demo);
     this.demo = demo;
-    const cards = h('div', { style: 'display:flex;flex-direction:column;gap:calc(var(--u)*1.6);width:100%' }, ROUNDS.map((r, i) => {
+    const star = (on) => h('span', { style: `display:inline-block;width:calc(var(--u)*3.4);height:calc(var(--u)*3.4);margin:0 calc(var(--u)*.3);background:${on ? '#ffd23a' : 'rgba(255,255,255,.3)'};clip-path:polygon(50% 0,62% 36%,100% 38%,70% 60%,80% 100%,50% 76%,20% 100%,30% 60%,0 38%,38% 36%)` });
+    const lockIcon = () => h('span', { style: 'display:inline-block;position:relative;width:calc(var(--u)*3);height:calc(var(--u)*2.4);background:#dfe8f4;border-radius:calc(var(--u)*.5);margin-top:calc(var(--u)*1.4)' }, h('span', { style: 'position:absolute;left:18%;top:-70%;width:64%;height:90%;border:calc(var(--u)*.7) solid #dfe8f4;border-bottom:0;border-radius:calc(var(--u)*2) calc(var(--u)*2) 0 0;box-sizing:border-box' }));
+    const cards = h('div', { style: 'display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--u)*1.6);width:100%' }, ROUNDS.map((r, i) => {
       const lock = i + 1 > this.save.unlocked;
       const st = this.save.stars[i + 1] || 0;
-      return h('button', { class: `${p}-btn${lock ? ' dark' : ''}`, onclick: () => { if (lock) { this.hint(I.t('locked')); return; } this.sound.play('tap'); this.start(i); } },
-        `${lock ? '🔒' : th.icon} ${I.t('level')} ${I.num(i + 1)} · ${th.names[i]} ${'⭐'.repeat(st)}`);
+      return h('button', { class: `${p}-btn${lock ? ' dark' : ''}`, style: 'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.4);padding:calc(var(--u)*1.4) calc(var(--u)*1);min-height:calc(var(--u)*17);font-size:calc(var(--u)*3.2);line-height:1.15', onclick: () => { if (lock) { this.hint(I.t('locked')); return; } this.sound.play('tap'); this.start(i); } },
+        h('span', { style: 'font-size:calc(var(--u)*5.6)' }, I.num(i + 1)),
+        h('span', {}, th.names[i]),
+        h('span', { style: 'display:flex;align-items:center;height:calc(var(--u)*3.6)' }, lock ? lockIcon() : [1, 2, 3].map((k) => star(k <= st))));
     }));
-    this.layer.append(h('div', { class: `${p}-dim` }, h('div', { class: `${p}-card` },
-      h('div', { class: `${p}-logo` }, th.icon + ' ', th.title[ar ? 0 : 1]),
-      h('div', { class: `${p}-small` }, I.t('drag')),
+    this.layer.append(h('div', { class: `${p}-dim`, style: 'overflow:hidden' }, h('div', { class: `${p}-card`, style: 'scrollbar-width:none' },
+      h('div', { class: `${p}-logo`, style: 'font-size:calc(var(--u)*7)' }, th.title[ar ? 0 : 1]),
+      h('div', { class: `${p}-small`, style: 'margin:calc(var(--u)*4.5) 0 calc(var(--u)*.5);position:relative;z-index:2;color:#fff;text-shadow:0 0 6px #123,0 0 3px #123' }, I.t('drag')),
       cards,
       h('button', { class: `${p}-btn dark`, onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));
     this.hintEl = h('div', { class: `${p}-hint` });
