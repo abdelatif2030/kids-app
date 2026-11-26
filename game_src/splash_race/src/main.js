@@ -594,12 +594,12 @@ class Game {
     this.ring.visible = !p.slide && this.mode !== 'menu';
     // camera behind and above the otter
     const portrait = this.cw < this.ch;
-    const want = new THREE.Vector3(p.x * 0.55 + (portrait ? 0 : 3.2), portrait ? 5.6 : 4.4, -p.s + (portrait ? 7.2 : 4.6));
+    const want = new THREE.Vector3(p.x + (portrait ? 0 : 2.0), portrait ? 5.6 : 2.7, -p.s + (portrait ? 7.2 : 3.6));
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 4));
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 2);
     this.camera.position.set(this.cam.x + (Math.random() - 0.5) * this.shake * 0.3, this.cam.y, this.cam.z);
-    this.camera.lookAt(this.cam.x - (portrait ? 0 : 2.6), 0.4, this.cam.z - (portrait ? 8.8 : 6.4) - 5);
+    this.camera.lookAt(this.cam.x - (portrait ? 0 : 2.0), 0.5, this.cam.z - (portrait ? 13.8 : 3.6) - (portrait ? 0 : 3.5));
     { // front-view cam on the start line and when the player finishes, so the cartoon faces read
       const want = (sw.state === 'start' || p.done) ? 1 : 0;
       this._introK = (this._introK ?? 0) + (want - (this._introK ?? 0)) * Math.min(1, dt * (want ? 4 : 1.6));
