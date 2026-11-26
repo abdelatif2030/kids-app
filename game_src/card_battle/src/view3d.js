@@ -243,7 +243,7 @@ export class View3D {
   burst() { /* sparks are drawn by the 2D overlay */ }
   _unitObj(u) {
     let e = this.pool.get(u.id);
-    if (!e) { const b = BUILD[u.kind](); const h = HEIGHT[u.kind]; b.g.scale.setScalar(h * 1.6); const o = new THREE.Group(); o.add(b.g); const sd = makeShadow(u.r); this.scene.add(sd); this.scene.add(o); e = { o, b, sd, h, ph: u.id * 1.7 }; this.pool.set(u.id, e); }
+    if (!e) { const b = BUILD[u.kind](); const h = HEIGHT[u.kind]; b.g.scale.setScalar(h * 2.0); const o = new THREE.Group(); o.add(b.g); const sd = makeShadow(u.r * 1.3); this.scene.add(sd); this.scene.add(o); e = { o, b, sd, h, ph: u.id * 1.7 }; this.pool.set(u.id, e); }
     return e;
   }
   render(snap, clock, shake = 0) {
