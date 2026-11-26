@@ -77,6 +77,13 @@ class FakeTeacherRepository implements TeacherRepository {
   @override
   Future<void> signOut() async => _current = null;
 
+  bool accountDeleted = false;
+  @override
+  Future<void> deleteAccount() async {
+    accountDeleted = true;
+    _current = null;
+  }
+
   /// The app owner hiding a teacher in the Firebase console.
   void suspend(String uid) {
     _teachers[uid] = _teachers[uid]!.copyWith(status: teacherStatusSuspended);

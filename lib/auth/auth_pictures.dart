@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'auth_shell.dart';
 import '../firebase_config.dart';
 import '../journey/ui/start_screen.dart';
 import '../l10n/strings.dart';
+import '../legal/terms_screen.dart';
 import '../online_gate.dart';
 import '../teachers_models.dart';
 import 'account_extras.dart';
@@ -314,6 +316,7 @@ class _LoginPictureScreenState extends State<LoginPictureScreen> {
             ),
           ),
           const SizedBox(height: 14),
+          if (kGoogleSignInAllowed) ...[
           AuthOr(tr2('أو', 'or')),
           const SizedBox(height: 14),
           KeyedSubtree(
@@ -324,7 +327,10 @@ class _LoginPictureScreenState extends State<LoginPictureScreen> {
               onTap: _google,
             ),
           ),
-          const SizedBox(height: 10),
+          ],
+          const SizedBox(height: 6),
+          const LegalLinks(color: authInk),
+          const SizedBox(height: 4),
           Wrap(
             alignment: WrapAlignment.center,
             crossAxisAlignment: WrapCrossAlignment.center,
@@ -796,6 +802,7 @@ class _RegisterPictureScreenState extends State<RegisterPictureScreen> {
               onTap: _byEmail,
             ),
           ),
+          if (kGoogleSignInAllowed) ...[
           const SizedBox(height: 12),
           KeyedSubtree(
             key: const ValueKey('register_google'),
@@ -805,6 +812,9 @@ class _RegisterPictureScreenState extends State<RegisterPictureScreen> {
               onTap: _google,
             ),
           ),
+          ],
+          const SizedBox(height: 6),
+          const LegalLinks(color: authInk),
           // «Register later» is not offered in the demo: there the account is needed (owner decision).
           if (!DemoMode.enabled) ...[
             const SizedBox(height: 8),
@@ -838,6 +848,10 @@ class _RegisterPictureScreenState extends State<RegisterPictureScreen> {
 
 /// What opens after the intro: the sign-in page when the online accounts are switched on and nobody is signed in,
 /// otherwise [HomeEntry]. Release 1 is offline, so there the start screen is simply the first page.
+/// Apple rule 4.8: an app that offers "Sign in with Google" on iPhone must offer "Sign in with Apple" too. That package is not added
+/// (owner approval needed), so Google sign-in is hidden on iOS until it is; e-mail sign-up works everywhere.
+bool get kGoogleSignInAllowed => kIsWeb || defaultTargetPlatform != TargetPlatform.iOS;
+
 class AuthGate extends StatefulWidget {
   /// Tests: decide without the global gate.
   final bool? showLogin;

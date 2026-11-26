@@ -91,11 +91,11 @@ class _OwnLessonsScreenState extends State<OwnLessonsScreen> {
               final r = snap.data ?? const LessonsResult(LessonsState.failed, []);
               switch (r.state) {
                 case LessonsState.notConnected:
-                  return _Message(keyName: 'lessons_not_connected', icon: Icons.cloud_off_rounded, title: tr2('الفيديوهات قادمة قريباً', 'Videos are coming soon'), text: tr2('سنضيف هنا دروس الفيديو قريباً.', 'Video lessons will appear here soon.'));
+                  return _Message(keyName: 'lessons_not_connected', icon: Icons.cloud_off_rounded, title: tr2('الفيديوهات غير متاحة الآن', 'Videos are not available right now'), text: tr2('تعذّر الوصول لدروس الفيديو. جرّب مرة أخرى لاحقاً.', 'The video lessons could not be reached. Please try again later.'));
                 case LessonsState.failed:
                   return _Message(keyName: 'lessons_failed', icon: Icons.wifi_off_rounded, title: tr2('لا يوجد اتصال', 'No connection'), text: tr2('تحتاج الدروس إلى الإنترنت. تحقق من الاتصال وحاول مرة أخرى.', 'The lessons need the internet. Check your connection and try again.'), onRetry: _retry);
                 case LessonsState.empty:
-                  return _Message(keyName: 'lessons_empty', icon: Icons.video_library_outlined, title: tr2('لا توجد دروس بعد', 'No lessons yet'), text: tr2('سنضيف الدروس هنا قريباً.', 'We will add lessons here soon.'));
+                  return _Message(keyName: 'lessons_empty', icon: Icons.video_library_outlined, title: tr2('لا توجد دروس بعد', 'No lessons yet'), text: tr2('لا توجد دروس مناسبة لهذا القسم الآن.', 'There are no lessons for this section right now.'));
                 case LessonsState.ready:
                   break;
               }
@@ -104,7 +104,7 @@ class _OwnLessonsScreenState extends State<OwnLessonsScreen> {
                   if (l.fitsAge(widget.child.age) && (widget.only == null || widget.only!.contains(l.category)) && !widget.exclude.contains(l.category)) l,
               ];
               if (forAge.isEmpty) {
-                return _Message(keyName: 'lessons_empty', icon: Icons.video_library_outlined, title: tr2('لا توجد دروس لعمرك بعد', 'No lessons for this age yet'), text: tr2('سنضيف الدروس هنا قريباً.', 'We will add lessons here soon.'));
+                return _Message(keyName: 'lessons_empty', icon: Icons.video_library_outlined, title: tr2('لا توجد دروس لعمرك بعد', 'No lessons for this age yet'), text: tr2('لا توجد دروس مناسبة لهذا القسم الآن.', 'There are no lessons for this section right now.'));
               }
               final cats = [for (final c in kLessonCategories) if (forAge.any((l) => l.category == c)) c];
               final selected = _category != null && cats.contains(_category) ? _category : null;

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:kids_app/companion/companion_ui.dart' show CompanionCard;
 import 'package:kids_app/journey/models.dart';
 import 'package:kids_app/journey/repository.dart';
 import 'package:kids_app/journey/reward_totals.dart';
@@ -85,7 +86,7 @@ void main() {
     await t.pageBack();
     await t.pump(const Duration(milliseconds: 600));
     await open('pet');
-    expect(find.byKey(const ValueKey('coming_soon')), findsOneWidget);
+    expect(find.byType(CompanionCard), findsOneWidget);
   });
 
   test('stars come from finished things only: videos and games add up with the journey', () async {

@@ -1,7 +1,10 @@
 import '../../design/layout.dart';
 import 'package:flutter/material.dart';
 
+import '../../account_deletion.dart';
 import '../../data_reset.dart';
+import '../../legal/terms_screen.dart';
+import '../../teachers_models.dart' show AccountException;
 import '../../l10n/strings.dart';
 
 /// What the app keeps, what it never does, and the parent's data reset.
@@ -43,6 +46,43 @@ class PrivacyScreen extends StatelessWidget {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(SnackBar(content: Text(loc('تم حذف بيانات الأطفال من هذا الجهاز.'))));
+    }
+  }
+
+  /// Store rule: deleting the account (and its data) is possible inside the app. Always shown: with no online account it erases
+  /// everything the app kept on this device; with a signed-in account it deletes that account first.
+  Future<void> _deleteAccount(BuildContext context) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(tr2('حذف حسابي وبياناتي؟', 'Delete my account and data?')),
+        content: Text(tr2(
+            'سيُحذف حسابك (إن كان لك حساب) وكل ما حفظه التطبيق على هذا الجهاز: ملفات الأطفال وتقدمهم والرسومات وما كتبته عند التسجيل. لا يمكن التراجع.',
+            'Your account (if you have one) and everything the app kept on this device will be deleted: the profiles of your children, their progress, drawings and what you typed at sign-up. This cannot be undone.')),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(tr2('إلغاء', 'Cancel'))),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(tr2('احذف نهائياً', 'Delete for good')),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !context.mounted) return;
+    String message;
+    try {
+      await deleteAccountAndData();
+      message = tr2('تم حذف الحساب والبيانات.', 'Your account and data were deleted.');
+    } on AccountException catch (e) {
+      message = e.message;
+    } catch (_) {
+      message = tr2('تعذر حذف الحساب الآن، حاول مرة أخرى.', 'Could not delete the account now, please try again.');
+    }
+    if (context.mounted) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -113,6 +153,16 @@ class PrivacyScreen extends StatelessWidget {
             icon: const Icon(Icons.delete_forever_rounded),
             label: Text(loc('حذف بيانات الأطفال من هذا الجهاز')),
           ),
+          const SizedBox(height: 10),
+          FilledButton.icon(
+            key: const ValueKey('delete_account'),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => _deleteAccount(context),
+            icon: const Icon(Icons.person_off_rounded),
+            label: Text(tr2('حذف حسابي وبياناتي', 'Delete my account and data')),
+          ),
+          const SizedBox(height: 12),
+          const LegalLinks(),
         ],
       ),
     );

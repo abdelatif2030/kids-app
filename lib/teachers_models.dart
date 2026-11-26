@@ -597,6 +597,10 @@ abstract class TeacherRepository {
   Future<void> sendPasswordReset(String email);
   Future<void> signOut();
 
+  /// Deletes the signed-in account from inside the app (store rule): the records the client may delete, then the sign-in identity.
+  /// Throws [AccountException] when a fresh sign-in is needed. The rest is cleaned by the backend function (docs/ACCOUNT_DELETION_DESIGN.md).
+  Future<void> deleteAccount();
+
   /// Teachers that are visible (not suspended by the app owner).
   Future<List<TeacherProfile>> approvedTeachers();
   Future<TeacherProfile?> myTeacherProfile();

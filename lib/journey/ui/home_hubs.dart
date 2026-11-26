@@ -172,18 +172,6 @@ class CartoonsHubScreen extends StatelessWidget {
               color: RC.lavender,
               onTap: () => _open(context, StoriesHomeScreen(child: child)),
             ),
-            // The hand-picked videos now live under «اتعلم واكتشف» (by age, parent-approved). This place is kept for our own
-            // Rehlaty cartoon episodes, which do not exist yet.
-            _HubTile(
-              keyName: 'episodes',
-              emoji: '🎬',
-              title: tr2('حلقات رحلتي', 'Rehlaty episodes'),
-              hint: tr2('قريباً: حلقات كرتونية خاصة بنا', 'Coming soon: our own cartoon episodes'),
-              color: RC.sky,
-              onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(tr2('الحلقات قادمة قريباً!', 'Episodes are coming soon!'))),
-              ),
-            ),
           ],
         ),
       ),

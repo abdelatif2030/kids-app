@@ -21,7 +21,7 @@ import '../reward_totals.dart';
 import '../stickers.dart';
 import 'home_hubs.dart';
 import 'my_day_cards.dart';
-import 'picture_screens.dart' show ComingSoonScreen;
+import '../../companion/companion_ui.dart' show CompanionCard;
 
 /// «ملفي الشخصي» (2026-11-07): the owner's picture of the child's own page. The painted numbers of the design were erased
 /// and are drawn live from what the child really did; every island and button opens a real page (the pet is the only one
@@ -147,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 PictureSpot('edit', const Offset(0.624, 0.202), 0.04, 0.07, tr2('تغيير صورتي', 'Change my picture'), () => _pickAvatar(p), radius: 24, key: const ValueKey('profile_edit')),
                 PictureSpot('stickers', const Offset(0.215, 0.553), 0.27, 0.25, tr2('ألبوم ملصقاتي', 'My sticker album'), () => _go(_CardPage(title: tr2('ألبوم الملصقات', 'Sticker album'), card: StickerAlbumCard(child: p))), radius: 28, key: const ValueKey('profile_stickers')),
                 PictureSpot('tree', const Offset(0.498, 0.51), 0.28, 0.30, tr2('شجرة نجاحي', 'My success tree'), () => _go(_CardPage(title: tr2('حديقتي', 'My garden'), card: GardenCard(child: p))), radius: 28, key: const ValueKey('profile_tree')),
-                PictureSpot('pet', const Offset(0.756, 0.515), 0.21, 0.31, tr2('حيواني الأليف', 'My pet'), () => _go(ComingSoonScreen(title: tr2('حيواني الأليف', 'My pet'), message: tr2('حيوانك الأليف جاي قريب!', 'Your pet is coming soon!'), icon: Icons.pets_rounded)), radius: 28, key: const ValueKey('profile_pet')),
+                PictureSpot('pet', const Offset(0.756, 0.515), 0.21, 0.31, tr2('حيواني الأليف', 'My pet'), () => _go(_CardPage(title: tr2('رفيقي', 'My companion'), card: CompanionCard(child: p))), radius: 28, key: const ValueKey('profile_pet')),
                 PictureSpot('surprise', const Offset(0.19, 0.818), 0.24, 0.27, tr2('صندوق مفاجآتي', 'My surprise box'), () => _surprise(p), radius: 28, key: const ValueKey('profile_surprise')),
                 PictureSpot('room', const Offset(0.453, 0.818), 0.25, 0.27, tr2('غرفتي السحرية', 'My magic room'), () => _go(WorldScreen(child: p)), radius: 28, key: const ValueKey('profile_room')),
                 PictureSpot('journey', const Offset(0.718, 0.818), 0.245, 0.27, tr2('رحلتي في التعلم', 'My learning journey'), () => _go(LearnHubScreen(child: p)), radius: 28, key: const ValueKey('profile_journey')),

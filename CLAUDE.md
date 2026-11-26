@@ -23,6 +23,11 @@ Mini-school plan (user asked for all of it; built in this order on branch featur
 A. Subjects/curriculum, B. weekly plan + parent notes, C. drawing, D. letters/words + math games, E. UI polish: all built (see Status).
 F. Teachers/accounts: BUILT on branch feature/teachers (user approved the safe design and Firebase, and the packages firebase_core, firebase_auth, cloud_firestore; NO analytics package). Switched off until the user creates a Firebase project (docs/teachers-setup.md, firestore.rules); `kFirebaseEnabled` in lib/firebase_config.dart is false. Safety design: only parents register/book, inside Parent settings behind the PIN; no chat or messaging; teachers are approved by the owner in the Firebase console (status pending -> approved) and a teacher can never approve themselves; lesson links must be https and are shown to the parent to copy (no url_launcher, no external link from child screens); no child data except an optional age on a request. Paid plans (free plan first) are not built.
 
+## Apple review rules (non-negotiable; docs/APPLE_REVIEW_RULES.md, guard test test/apple_review_test.dart)
+- Paid subscriptions inside the app: Apple In-App Purchase ONLY (never Stripe, MyFatoorah, Moyasar, PayPal, Fawry...). A paywall needs Restore purchases, price/period/auto-renew text and links to privacy + terms (`LegalLinks`).
+- Every sign-up/sign-in/paywall screen shows the privacy and terms links; the user can delete the account inside the app (Parent settings -> Privacy and data).
+- Google sign-in is hidden on iOS until Sign in with Apple exists. No "coming soon" screens or empty features. Screenshots only from the real build. A report button on any user-generated content.
+
 ## Working agreements
 - Standing owner approval (2026-11-02): after finishing a piece of work, commit and push to `feature/rehlaty` without asking again. This covers ONLY committing/pushing source to that branch. Deploying to `demo-site`, publishing Firebase rules, adding packages, and anything outward-facing still follow their own rules.
 - Ask the user before installing any package, and explain why it was chosen.

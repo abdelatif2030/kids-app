@@ -44,6 +44,11 @@ Future<void> _show(WidgetTester t, Widget w) async {
   await t.pump(const Duration(milliseconds: 300));
 }
 
+Future<void> _pop(WidgetTester t) async {
+  Navigator.of(t.element(find.byType(Scaffold).last)).pop();
+  await _settle(t);
+}
+
 Future<void> _settle(WidgetTester t) async {
   await t.pump();
   await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 120)));
@@ -129,7 +134,7 @@ void main() {
   });
 
   group('cartoons and stories', () {
-    testWidgets('two islands: cartoons says episodes are coming, stories opens an EMPTY page (audio stories come later), back leaves', (t) async {
+    testWidgets('two islands: cartoons opens the video lessons, stories opens the stories home, back leaves', (t) async {
       _size(t, const Size(1672, 941));
       await _setup(t);
       await _show(t, const CartoonsPictureScreen(child: _kid));
@@ -137,15 +142,15 @@ void main() {
       final b = t.getRect(find.byKey(const ValueKey('hub_stories')));
       expect(_overlap(a, b), isFalse);
       await t.tap(find.byKey(const ValueKey('hub_cartoons')));
-      await t.pump();
-      expect(find.text('الحلقات الكرتونية قادمة قريباً!'), findsOneWidget);
+      await _settle(t);
+      expect(find.byType(LessonsPictureScreen), findsOneWidget);
       expect(find.byType(VideoListScreen), findsNothing, reason: 'no YouTube content');
+      await _pop(t);
+      await _settle(t);
       await t.tap(find.byKey(const ValueKey('hub_stories')));
       await _settle(t);
-      expect(find.byKey(const ValueKey('coming_soon')), findsOneWidget);
-      expect(find.text('هنا ستظهر القصص الصوتية قريباً.'), findsOneWidget);
-      expect(find.byType(StoriesHomeScreen), findsNothing, reason: 'the stories slot is empty on purpose');
-      await t.pageBack();
+      expect(find.byType(StoriesHomeScreen), findsOneWidget);
+      await _pop(t);
       await _settle(t);
       expect(find.byKey(const ValueKey('cartoons_picture')), findsOneWidget);
     });
@@ -183,7 +188,7 @@ void main() {
       expect(find.byKey(const ValueKey('lessons_more')), findsNothing);
     });
 
-    testWidgets('quran, songs and drawing are empty pages; speech shows every lesson video but the counting ones; maths shows only those', (t) async {
+    testWidgets('quran and songs open the lesson list of their own subject, drawing opens the studio; speech shows every lesson video but the counting ones; maths shows only those', (t) async {
       _size(t, const Size(1672, 941));
       await _setup(t);
       await _show(t, const LessonsPictureScreen(child: _kid));
@@ -194,9 +199,9 @@ void main() {
 
       for (final id in ['quran', 'songs', 'drawing']) {
         await open(id);
-        expect(find.byKey(const ValueKey('coming_soon')), findsOneWidget, reason: id);
-        expect(find.byType(OwnLessonsScreen), findsNothing, reason: id);
-        await t.pageBack();
+        expect(find.byKey(const ValueKey('coming_soon')), findsNothing, reason: id);
+        expect(find.byType(OwnLessonsScreen), id == 'drawing' ? findsNothing : findsOneWidget, reason: id);
+        await _pop(t);
         await _settle(t);
       }
       await open('speech');
@@ -204,7 +209,7 @@ void main() {
       expect(screen.child.id, 'k1');
       expect(screen.exclude, {'math'});
       expect(screen.only, isNull);
-      await t.pageBack();
+      await _pop(t);
       await _settle(t);
       await open('math');
       screen = t.widget<OwnLessonsScreen>(find.byType(OwnLessonsScreen));

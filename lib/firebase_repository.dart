@@ -142,6 +142,35 @@ class FirebaseTeacherRepository implements TeacherRepository {
       });
 
   @override
+  Future<void> deleteAccount() => _guard(() async {
+        final u = _auth.currentUser;
+        if (u == null) return;
+        // what the client may delete first (the rules decide); the rest is the backend function's job
+        try {
+          final fam = await _db.collection('users').doc(u.uid).collection('families').get();
+          for (final d in fam.docs) {
+            await d.reference.delete();
+          }
+        } catch (_) {}
+        try {
+          await _db.collection('users').doc(u.uid).delete();
+        } catch (_) {}
+        try {
+          await u.delete();
+        } on FirebaseAuthException catch (e) {
+          if (e.code == 'requires-recent-login') {
+            throw AccountException(loc('لأمانك، سجّل الدخول من جديد ثم كرّر حذف الحساب'));
+          }
+          rethrow;
+        }
+        if (!kIsWeb) {
+          try {
+            await GoogleSignIn.instance.signOut();
+          } catch (_) {}
+        }
+      });
+
+  @override
   Future<void> signOut() async {
     await _auth.signOut();
     if (!kIsWeb) {

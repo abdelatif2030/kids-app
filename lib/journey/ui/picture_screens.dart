@@ -12,6 +12,8 @@ import '../../parent_screens.dart';
 import '../avatars.dart';
 import '../models.dart';
 import '../../lessons_own/own_lessons_screens.dart';
+import '../../stories/story_screens.dart' show StoriesHomeScreen;
+import '../../studio/studio_screens.dart' show StudioScreen;
 
 // The owner's own pictures, each used whole with invisible buttons on top (see PictureStage). The numbers below are
 // where things sit on each 1672 x 941 picture, as fractions of its width and height.
@@ -212,8 +214,8 @@ class CartoonsPictureScreen extends StatelessWidget {
           ],
           spots: [
             _back(context),
-            PictureSpot('cartoons', const Offset(0.299, 0.66), 0.40, 0.62, tr2('الكرتون', 'Cartoons'), () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(tr2('الحلقات الكرتونية قادمة قريباً!', 'Cartoon episodes are coming soon!')))), key: const ValueKey('hub_cartoons')),
-            PictureSpot('stories', const Offset(0.718, 0.66), 0.40, 0.62, tr2('القصص', 'Stories'), () => push(ComingSoonScreen(title: tr2('القصص', 'Stories'), message: tr2('هنا ستظهر القصص الصوتية قريباً.', 'Audio stories will appear here soon.'), icon: Icons.headphones_rounded)), key: const ValueKey('hub_stories')),
+            PictureSpot('cartoons', const Offset(0.299, 0.66), 0.40, 0.62, tr2('الكرتون', 'Cartoons'), () => push(LessonsPictureScreen(child: child)), key: const ValueKey('hub_cartoons')),
+            PictureSpot('stories', const Offset(0.718, 0.66), 0.40, 0.62, tr2('القصص', 'Stories'), () => push(StoriesHomeScreen(child: child)), key: const ValueKey('hub_stories')),
           ],
         ),
       ),
@@ -231,21 +233,13 @@ class _LessonTile {
   const _LessonTile(this.id, this.center, this.name, this.title, this.open);
 }
 
-/// Every slot of «دروسي» is an empty page for now (owner decision, 2026-11-06): educational videos will be added to each
-/// slot later. Nothing else (no old lessons, no YouTube) opens from a slot.
-Widget _slot(String title) => ComingSoonScreen(
-      title: title,
-      message: tr2('هنا ستظهر الفيديوهات التعليمية قريباً.', 'Educational videos will appear here soon.'),
-      icon: Icons.play_circle_outline_rounded,
-    );
-
 final List<_LessonTile> _lessonTiles = [
   // The five tiles of the owner's picture (2026-11-07). Quran, songs and drawing are empty pages for now. «Learning to speak»
   // shows ALL the owner's lesson videos except the counting and numbers ones; «Maths» shows only those.
-  _LessonTile('quran', const Offset(0.114, 0.65), const Offset(0.114, 0.707), () => tr2('القرآن الكريم', 'The Holy Quran'), (_, c) => _slot(tr2('القرآن الكريم', 'The Holy Quran'))),
+  _LessonTile('quran', const Offset(0.114, 0.65), const Offset(0.114, 0.707), () => tr2('القرآن الكريم', 'The Holy Quran'), (_, c) => OwnLessonsScreen(child: c, only: const {'quran'})),
   _LessonTile('speech', const Offset(0.311, 0.65), const Offset(0.311, 0.707), () => tr2('تعليم النطق', 'Learning to speak'), (_, c) => OwnLessonsScreen(child: c, exclude: const {'math'})),
-  _LessonTile('songs', const Offset(0.502, 0.65), const Offset(0.502, 0.707), () => tr2('أناشيد', 'Songs'), (_, c) => _slot(tr2('أناشيد', 'Songs'))),
-  _LessonTile('drawing', const Offset(0.697, 0.65), const Offset(0.697, 0.707), () => tr2('الرسم', 'Drawing'), (_, c) => _slot(tr2('الرسم', 'Drawing'))),
+  _LessonTile('songs', const Offset(0.502, 0.65), const Offset(0.502, 0.707), () => tr2('أناشيد', 'Songs'), (_, c) => OwnLessonsScreen(child: c, only: const {'songs'})),
+  _LessonTile('drawing', const Offset(0.697, 0.65), const Offset(0.697, 0.707), () => tr2('الرسم', 'Drawing'), (_, c) => StudioScreen(child: c)),
   _LessonTile('math', const Offset(0.891, 0.65), const Offset(0.891, 0.707), () => tr2('الرياضيات', 'Maths'), (_, c) => OwnLessonsScreen(child: c, only: const {'math'})),
 ];
 
@@ -282,38 +276,3 @@ class LessonsPictureScreen extends StatelessWidget {
 }
 
 
-/// A calm, empty page for a section that has no content yet (audio stories, cartoon episodes...). It sits on the unified
-/// scenery picture and says plainly that content is coming; nothing is faked.
-class ComingSoonScreen extends StatelessWidget {
-  final String title;
-  final String message;
-  final IconData icon;
-  const ComingSoonScreen({super.key, required this.title, required this.message, this.icon = Icons.hourglass_top_rounded});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0, foregroundColor: Colors.white, title: Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 24, color: Colors.white))),
-      body: PictureBackdrop(
-        child: SafeArea(
-          child: Center(
-            child: Container(
-              key: const ValueKey('coming_soon'),
-              margin: const EdgeInsets.all(24),
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 22),
-              decoration: BoxDecoration(color: Colors.white.withAlpha(235), borderRadius: BorderRadius.circular(28), border: Border.all(color: const Color(0xFF8A52E8), width: 3)),
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Icon(icon, size: 56, color: const Color(0xFF5B2BB8)),
-                const SizedBox(height: 10),
-                Text(title, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: Color(0xFF3A2A6E))),
-                const SizedBox(height: 6),
-                Text(message, textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, color: Color(0xFF3A2A6E))),
-              ]),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
