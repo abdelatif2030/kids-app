@@ -94,6 +94,9 @@ function makeRunner(kind, color) {
     body.add(mesh(geo.sphere, M(0xe83a2a), 0, 1.35, 0.75, 0.82, 0.5, 0.78)); // helmet
     body.add(mesh(geo.sphere, M(0x111111), -0.28, 1.1, 1.05, 0.13, 0.13, 0.1));
     body.add(mesh(geo.sphere, M(0x111111), 0.28, 1.1, 1.05, 0.13, 0.13, 0.1));
+    body.add(mesh(geo.box, M(0xf2b82a), 0, 1.32, -0.05, 1.05, 0.12, 1.1)); body.add(mesh(geo.box, M(0xe83a2a), 0, 1.4, -0.05, 0.8, 0.1, 0.8));
+    body.add(mesh(geo.sphere, M(color), 0, 0.95, -0.7, 0.9, 0.85, 0.5));
+    for (const sx of [-1, 1]) body.add(mesh(geo.sphere, M(0xffd23a, 0xffd23a), sx * 0.52, 1.1, 0.28, 0.14, 0.14, 0.14));
     const limbs = [];
     for (const [sx, sz, ph] of [[-0.3, 0.45, 0], [0.3, 0.45, Math.PI], [-0.3, -0.45, Math.PI], [0.3, -0.45, 0]]) { const pv = new THREE.Group(); pv.position.set(sx, 0.5, sz); pv.add(mesh(geo.cyl, M(0x6a6a76), 0, -0.25, 0, 0.3, 0.5, 0.3)); pv.add(mesh(geo.sphere, M(0x3a3a46), 0, -0.5, 0.06, 0.34, 0.16, 0.4)); pv.userData.ph = ph; body.add(pv); limbs.push(pv); }
     for (const sx of [-1, 1]) { const ear = mesh(geo.cone, M(color), sx * 0.38, 1.62, 0.72, 0.18, 0.3, 0.12); body.add(ear); }
@@ -264,7 +267,7 @@ class Game {
     for (const e of race.els) this._make(e, al);
     // runners
     this.rivalMeshes = race.rivals.map((rv, i) => { const m = makeRunner(th.id, [0xff7a3a, 0x3ac8e8, 0xe8e83a, 0xe83ae8, 0x7ae83a][i % 5]); this.actors.add(m); return m; });
-    this.me = makeRunner(th.id, al ? 0x5af0a0 : 0x9aa0b0);
+    this.me = makeRunner(th.id, al ? 0x5af0a0 : 0x7f9cc8);
     this.actors.add(this.me);
   }
 
