@@ -89,6 +89,7 @@ export function installCheer(root, voice) {
     const p = a.play(); if (p && p.catch) p.catch(done);
     setTimeout(done, 4000);
   };
+  window.__cheer = (kind, force) => { if (CHEERS[kind]) { started = true; say(kind, !!force); } }; // games call this on real events: start good combo oops near win lose idle
   const pop = () => { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); const o = AC.createOscillator(), g = AC.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(520, AC.currentTime); o.frequency.exponentialRampToValueAtTime(900, AC.currentTime + 0.08); g.gain.setValueAtTime(0.08, AC.currentTime); g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + 0.12); o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime + 0.13); } catch (e) {} };
   const onInput = () => { lastInput = performance.now(); pop(); if (!started) { started = true; say('start', true); } };
   root.addEventListener('pointerdown', onInput, { passive: true });

@@ -526,6 +526,7 @@ class Game {
       switch (e.type) {
         case 'count': this.sound.play('count'); this.hud.count.textContent = num(e.n); break;
         case 'go':
+          if (window.__cheer) window.__cheer('start', true);
           this.sound.play('go');
           this.hud.count.textContent = '';
           this.sound.setTempo(sw.round.bpm);
@@ -541,17 +542,17 @@ class Game {
         }
         case 'stroke': {
           const w = sw.swimmers[e.id];
-          if (e.id === 0) this.sound.play('stroke', e.grade);
+          if (e.id === 0) { this.sound.play('stroke', e.grade); if (e.grade === 'perfect' && window.__cheer) window.__cheer('combo'); }
           this.drops.splash(w.x, -w.s, e.id === 0 ? 10 : 5, e.grade === 'perfect' ? 3.5 : 2.2);
           this.models[e.id].paddle = 0.45;
           break;
         }
-        case 'leap': if (e.id === 0) this.sound.play('leap'); break;
-        case 'bonk': if (e.id === 0) { this.sound.play('bonk'); this.shake = 0.35; } break;
+        case 'leap': if (e.id === 0) { this.sound.play('leap'); if (window.__cheer) window.__cheer('near'); } break;
+        case 'bonk': if (e.id === 0) { if (window.__cheer) window.__cheer('oops'); this.sound.play('bonk'); this.shake = 0.35; } break;
         case 'breath': this.sound.play('breath'); this.toast(t('breath'), 1.2); this.sound.setUnder(false); break;
         case 'slide': if (e.id === 0) { this.sound.play('slide'); this.toast(t('slide'), 1.2); } break;
         case 'splash': this.drops.splash(e.x, -e.s, e.id === 0 ? 24 : 10, 4); if (e.id === 0) this.sound.play('splash'); break;
-        case 'finish': if (e.id === 0) this.sound.play('finish'); break;
+        case 'finish': if (e.id === 0) { this.sound.play('finish'); if (window.__cheer) window.__cheer((sw.player.rank || 9) <= 3 ? 'win' : 'lose', true); } break;
         case 'over': setTimeout(() => this.mode === 'race' && this._results(), 1500); break;
         default:
       }
