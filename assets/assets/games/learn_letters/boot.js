@@ -8,7 +8,7 @@
     else {
       if (window.console) console.log('[letters]', s);
       // opened on its own (a browser check): say words with the browser's voice
-      if (msg.type === 'speak' && window.speechSynthesis) { var u = new SpeechSynthesisUtterance(msg.text); u.lang = msg.lang === 'en' ? 'en-US' : msg.lang === 'de' ? 'de-DE' : 'ar-EG'; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+      if (msg.type === 'speak' && window.speechSynthesis) { var u = new SpeechSynthesisUtterance(msg.text); u.lang = msg.lang === 'en' ? 'en-US' : msg.lang === 'de' ? 'de-DE' : msg.lang === 'fr' ? 'fr-FR' : 'ar-EG'; speechSynthesis.cancel(); speechSynthesis.speak(u); }
     }
   }
   window.crStart = function (config) {
@@ -21,7 +21,7 @@
   window.crStop = function () { if (game) game.dispose(); game = null; };
   if (!window.RehlatyRace) {
     var q = new URLSearchParams(location.search);
-    window.crStart({ lang: q.get('lang') || 'ar', age: Number(q.get('age') || 5), gender: q.get("g") || "boy", level: q.get('level') || undefined, learnLang: q.get('learnLang') || undefined });
+    window.crStart({ lang: q.get('lang') || 'ar', age: Number(q.get('age') || 5), gender: q.get("g") || "boy", level: q.get('level') || undefined, learnLang: q.get('learnLang') || undefined, learnMode: q.get('learnMode') || undefined });
   } else {
     post({ type: 'loaded' });
   }
