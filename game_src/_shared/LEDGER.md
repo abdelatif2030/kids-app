@@ -21,3 +21,6 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 ## Audio pass 1 (cozy_kit/audio.js, all games using it)
 - Added hall reverb send on music and SFX buses, detuned twin-oscillator voices with a soft low-pass on saw/square, and a drum/bass groove (kick, snare, hats, sub) under every tune. All 30 games using cozy_kit rebuilt.
 - Not verified by ear (no audio capture here); page-error check clean. Open: per-game bespoke SFX/music still to rework.
+
+## course_race obstacles pass
+- Fixed: plain slab gates/doors, bare sweeper bar and hammer replaced with striped, capped, spiked models; meteors lumpy with glow. Open: level menu title overlap and stray scrollbar, alien clip not re-recorded.

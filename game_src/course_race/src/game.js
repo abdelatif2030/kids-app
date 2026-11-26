@@ -274,27 +274,39 @@ class Game {
   _make(e, al) {
     const g = new THREE.Group();
     if (e.kind === 'door') {
-      g.userData.l = mesh(geo.box, M(0xe8564a, 0x401010), -HALF / 2, 1.8, 0, HALF, 3.6, 0.5);
-      g.userData.r = mesh(geo.box, M(0xe8564a, 0x401010), HALF / 2, 1.8, 0, HALF, 3.6, 0.5);
+      const slab = (sx) => { const d = new THREE.Group(); d.position.set(sx * HALF / 2, 0, 0); d.add(mesh(geo.box, M(0xe8564a, 0x401010), 0, 1.8, 0, HALF, 3.6, 0.5)); d.add(mesh(geo.box, M(0xffd23a, 0x604000), 0, 3.5, -0.3, HALF, 0.3, 0.2)); d.add(mesh(geo.box, M(0xffd23a, 0x604000), 0, 0.15, -0.3, HALF, 0.3, 0.2)); for (let i = 0; i < 4; i++) { const st = mesh(geo.box, M(0xffffff), (i - 1.5) * HALF * 0.24, 1.8, -0.28, 0.35, 3.0, 0.06); st.rotation.z = 0.35; d.add(st); } d.add(mesh(geo.sphere, M(0xffd23a, 0x806000), -sx * HALF * 0.4, 1.8, -0.35, 0.5, 0.5, 0.2)); return d; };
+      g.userData.l = slab(-1); g.userData.r = slab(1);
       g.add(g.userData.l, g.userData.r);
     } else if (e.kind === 'gate') {
       g.add(mesh(geo.box, M(0xff4a3a), -HALF, 1.5, 0, 0.6, 3, 0.6), mesh(geo.box, M(0xff4a3a), HALF, 1.5, 0, 0.6, 3, 0.6));
-      g.userData.panel = mesh(geo.box, M(0xffd23a, 0x604000), 0, 1.3, 0, HALF * 2, 2.6, 0.35);
-      g.add(g.userData.panel);
+      for (const sx of [-1, 1]) g.add(mesh(geo.sphere, M(0xffd23a, 0x806000), sx * HALF, 3.2, 0, 0.9, 0.9, 0.9));
+      const pn = new THREE.Group();
+      pn.add(mesh(geo.box, M(0xffd23a, 0x604000), 0, 1.3, 0, HALF * 2, 2.6, 0.35));
+      for (let i = 0; i < 7; i++) { const st = mesh(geo.box, M(i % 2 ? 0xffffff : 0xe8564a), (i - 3) * HALF * 0.27, 1.3, -0.2, 0.45, 2.8, 0.06); st.rotation.z = 0.45; pn.add(st); }
+      pn.add(mesh(geo.box, M(0xe8564a), 0, 2.65, -0.15, HALF * 2, 0.25, 0.4));
+      g.userData.panel = pn;
+      g.add(pn);
     } else if (e.kind === 'meteor') {
       g.userData.shadow = mesh(geo.cyl, new THREE.MeshBasicMaterial({ color: 0xff3a3a, transparent: true, opacity: 0.5 }), e.x, 0.05, 0, e.rad * 2, 0.02, e.rad * 2);
       g.userData.rock = mesh(geo.sphere, M(0x8a6a5a, 0x4a1a00), e.x, 20, 0, 2.2, 2.2, 2.2);
+      for (const [x, y, z, r] of [[0.35, 0.3, -0.3, 0.45], [-0.3, 0.2, -0.35, 0.38], [0.1, -0.35, -0.4, 0.4], [-0.4, -0.15, 0.25, 0.35], [0.3, 0.4, 0.3, 0.3]]) g.userData.rock.add(mesh(geo.sphere, M(0x5a4238, 0x200800), x, y, z, r, r, r));
+      g.userData.rock.add(mesh(geo.sphere, new THREE.MeshBasicMaterial({ color: 0xff7a1a, transparent: true, opacity: 0.35 }), 0, 0, 0, 1.25, 1.25, 1.25));
       g.add(g.userData.shadow, g.userData.rock);
     } else if (e.kind === 'sweeper') {
       g.add(mesh(geo.cyl, M(0x6a6a7a), 0, 0.8, 0, 0.8, 1.6, 0.8));
       g.userData.bar = new THREE.Group();
       g.userData.bar.add(mesh(geo.box, M(0xff5a3a), 0, 0.6, 0, e.radius * 2, 0.5, 0.5));
+      for (let i = -3; i <= 3; i++) g.userData.bar.add(mesh(geo.box, M(i % 2 ? 0xffffff : 0x2a2a3a), (i * e.radius * 2) / 7, 0.6, -0.27, (e.radius * 2) / 8, 0.5, 0.06));
+      for (const sx of [-1, 1]) g.userData.bar.add(mesh(geo.sphere, M(0xffd23a, 0x806000), sx * e.radius, 0.6, 0, 0.8, 0.8, 0.8));
+      g.add(mesh(geo.sphere, M(0xffd23a, 0x806000), 0, 1.7, 0, 0.9, 0.9, 0.9));
       g.userData.bar.position.y = 0.2;
       g.add(g.userData.bar);
     } else if (e.kind === 'hammer') {
       g.add(mesh(geo.box, M(0x6a6a7a), e.x - 3.4, 3.2, 0, 0.5, 6.4, 0.5), mesh(geo.box, M(0x6a6a7a), e.x + 3.4, 3.2, 0, 0.5, 6.4, 0.5), mesh(geo.box, M(0x6a6a7a), e.x, 6.2, 0, 7.2, 0.5, 0.5));
       g.userData.arm = new THREE.Group();
       g.userData.arm.add(mesh(geo.box, M(0x8a5a2a), 0, -1.6, 0, 0.25, 3.2, 0.25), mesh(geo.box, M(0xc8c8d4), 0, -3.4, 0, 1.6, 1.2, 1.2));
+      for (const sx of [-1, 1]) { const sp = mesh(geo.cone, M(0xffd23a, 0x604000), sx * 1.05, -3.4, 0, 0.5, 0.7, 0.5); sp.rotation.z = -sx * Math.PI / 2; g.userData.arm.add(sp); }
+      g.userData.arm.add(mesh(geo.box, M(0xe8564a), 0, -3.4, -0.62, 1.7, 0.35, 0.1));
       g.userData.arm.position.set(e.x, 6.2, 0);
       g.add(g.userData.arm);
     } else if (e.kind === 'ring') {
