@@ -45,6 +45,13 @@ class SectionVoice {
     'stories': 'assets/audio/voices/lida/ar/section_stories.mp3',
     'coloring': 'assets/audio/voices/lida/ar/section_coloring.mp3',
     'videos': 'assets/audio/voices/lida/ar/section_videos.mp3',
+    // the six sections inside «ألعاب للتسلية» (owner's recordings 2026-11-26): id = 'fun_' + the section id of lib/games/fun_sections.dart
+    'fun_racing': 'assets/audio/voices/fun_sections/cat_races.mp3',
+    'fun_action': 'assets/audio/voices/fun_sections/cat_action.mp3',
+    'fun_runners': 'assets/audio/voices/fun_sections/cat_runjump.mp3',
+    'fun_build': 'assets/audio/voices/fun_sections/cat_farms.mp3',
+    'fun_puzzle': 'assets/audio/voices/fun_sections/cat_puzzles.mp3',
+    'fun_girls': 'assets/audio/voices/fun_sections/cat_girls.mp3',
   };
 
   static bool testing = false; // widget tests have no audio plugin

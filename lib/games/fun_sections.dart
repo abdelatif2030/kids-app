@@ -260,7 +260,7 @@ class FunSectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final games = [for (final id in section.games) if (_byId(id) != null) _byId(id)!];
-    return HubMusicScope(
+    return SectionVoiceOnEnter('fun_${section.id}', child: HubMusicScope(
       track: 'fun',
       child: Scaffold(
       key: ValueKey('fun_section_page_${section.id}'),
@@ -285,7 +285,7 @@ class FunSectionScreen extends StatelessWidget {
           ]),
         ),
       ]),
-    ));
+    )));
   }
 }
 
