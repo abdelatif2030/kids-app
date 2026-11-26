@@ -149,7 +149,8 @@ class Game {
     this.road.material = M(L.ground);
     for (const b of [...this.sideL, ...this.sideR]) this.scene.remove(b.m);
     this.sideL = []; this.sideR = [];
-    for (let side = 0; side < 2; side++) for (let i = 0; i < 26; i++) {
+    // the big boxes along the road hid the painted backdrop and filled the screen (owner 2026-11-26): only the low highway rails and lamps are kept
+    for (let side = 0; side < 2; side++) for (let i = 0; i < (envId === 'highway' ? 26 : 0); i++) {
       const g = new THREE.Group();
       const col = L.side[(i + side) % 3];
       const hgt = 8 + ((i * 7 + side * 3) % 5) * 4;
