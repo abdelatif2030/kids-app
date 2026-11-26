@@ -503,7 +503,7 @@ class Game {
   /** The level's painted backdrop (art/pano<N>.webp): a mirrored ring that follows the camera (the road scrolls, the scenery stays far away). */
   _setPano(i) {
     if (this.pano) { this.scene.remove(this.pano); this.pano.material.map.dispose(); this.pano.material.dispose(); this.pano = null; }
-    const tex = new THREE.TextureLoader().load(`${this.base}art/pano${i + 1}.webp`, () => { if (ring) ring.visible = true; });
+    const tex = new THREE.TextureLoader().load(`${this.base}art/pano${i + 1}.webp`, () => { if (ring) ring.visible = true; if (this.backdrop) this.backdrop.visible = false; /* the painted ring replaces the flat hill wall, which stood IN FRONT of the far cars and hid them (owner 2026-11-26) */ });
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.wrapS = THREE.MirroredRepeatWrapping;
     tex.repeat.set(2, 0.66);

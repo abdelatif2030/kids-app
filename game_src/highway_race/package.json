@@ -5,7 +5,7 @@
   "description": "Rehlaty sunset coastal highway race (three.js). Built into assets/games/sunset_highway/game.js",
   "scripts": {
     "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/sunset_highway/game.js",
-    "test": "node --test test/sim.test.js"
+    "test": "node --test test/"
   },
   "dependencies": { "three": "0.170.0" },
   "devDependencies": { "esbuild": "0.24.0" }

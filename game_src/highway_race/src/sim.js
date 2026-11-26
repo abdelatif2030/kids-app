@@ -6,12 +6,12 @@ import { rng, clamp } from '../../cozy_kit/ui.js';
 export const HALF = 6;
 export const LANES = [-4.5, -1.5, 1.5, 4.5];
 export const STAGES = [
-  { id: 1, ar: 'شلالات الريان', en: 'Rayan Waterfalls', dist: 2200, time: 105, traffic: 1.0, rival: 30.5 },
-  { id: 2, ar: 'جبال السخنة', en: 'Sokhna Mountains', dist: 2600, time: 112, traffic: 1.25, rival: 32 },
-  { id: 3, ar: 'ليل العلمين', en: 'Alamein Night', dist: 3000, time: 118, traffic: 1.5, rival: 32.5 },
-  { id: 4, ar: 'الصحرا البيضا', en: 'White Desert', dist: 3200, time: 126, traffic: 1.6, rival: 31 },
-  { id: 5, ar: 'فنار بورسعيد', en: 'Port Said Light', dist: 3400, time: 130, traffic: 1.7, rival: 31.5 },
-  { id: 6, ar: 'بحيرات الجونة', en: 'Gouna Lagoons', dist: 3600, time: 134, traffic: 1.8, rival: 32 },
+  { id: 1, ar: 'شلالات الريان', en: 'Rayan Waterfalls', dist: 2200, time: 105, traffic: 1.0, rival: 35.7 },
+  { id: 2, ar: 'جبال السخنة', en: 'Sokhna Mountains', dist: 2600, time: 112, traffic: 1.25, rival: 37.4 },
+  { id: 3, ar: 'ليل العلمين', en: 'Alamein Night', dist: 3000, time: 118, traffic: 1.5, rival: 38.0 },
+  { id: 4, ar: 'الصحرا البيضا', en: 'White Desert', dist: 3200, time: 126, traffic: 1.6, rival: 36.3 },
+  { id: 5, ar: 'فنار بورسعيد', en: 'Port Said Light', dist: 3400, time: 130, traffic: 1.7, rival: 36.9 },
+  { id: 6, ar: 'بحيرات الجونة', en: 'Gouna Lagoons', dist: 3600, time: 134, traffic: 1.8, rival: 37.4 },
 ];
 
 /** The road bends: lateral offset (m) of the road centre at distance z. */
@@ -62,11 +62,11 @@ export class Race {
     p.x += (this.targetX - p.x) * Math.min(1, dt * 7);
     p.x = clamp(p.x, -HALF + 0.9, HALF - 0.9);
     void slope;
-    const cruise = this.easy ? 27 : 29.5;
+    const cruise = this.easy ? 31 : 36; // faster (owner 2026-11-26: «سباق الغروب سرعتها بطيئة شوية»): about 112 / 130 km/h
     const top = cruise * (p.nitro > 0 ? 1.4 : 1);
     const target = p.bump > 0 ? top * 0.45 : top;
     p.bump = Math.max(0, p.bump - dt);
-    p.v += (target - p.v) * Math.min(1, dt * (target > p.v ? 1.6 : 4));
+    p.v += (target - p.v) * Math.min(1, dt * (target > p.v ? 2.2 : 4));
     p.z += p.v * dt;
     // traffic
     for (const c of this.traffic) {
