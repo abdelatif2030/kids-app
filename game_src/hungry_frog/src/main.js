@@ -6,11 +6,14 @@
 // with a boss. No network, no links, no ads.
 import * as THREE from 'three';
 import { Pond, LEVELS, BOSS, KINDS, W, D, sizeOf, baseKind, normalizeSave } from './sim.js';
-import { mat, basic, makeFrog, makeBully, makeSnake, makeHeron, makeFly, makePad, makeLotus, makeCattail, waterTexture } from './models.js';
+import { mat, basic, makeFrog as _mf, makeBully as _mb, makeSnake as _ms, makeHeron as _mh, makeFly, makePad, makeLotus, makeCattail, waterTexture } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
 import { CSS, h } from './ui.js';
 import { polishRenderer } from './polish.js';
+import { FX, outline } from './fx.js';
+const _ol = (o, c) => { outline(o.root || o, c, 0.05); return o; };
+const makeFrog = _mf, makeBully = _mb, makeSnake = (...a) => _ol(_ms(...a), 0x1a0a2a), makeHeron = (...a) => _ol(_mh(...a), 0x1a1a2a);
 
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
 const webglOk = () => {
@@ -176,7 +179,7 @@ class Game {
     this.sun = new THREE.DirectionalLight(0xffffff, 1.2);
     this.sun.position.set(-10, 25, 12);
     s.add(this.sun);
-    this.frog = makeFrog();
+    this.frog = makeFrog(); this.pfx = new FX(s);
     s.add(this.frog.root);
     // the tongue: a pink tube rebuilt while it is out, with a sticky ball at the tip
     this.tongueMat = new THREE.MeshLambertMaterial({ color: 0xff5a8a, emissive: 0x5a0a2a, emissiveIntensity: 0.3 });
@@ -534,7 +537,7 @@ class Game {
       case 'tongue': S.play('tongue'); this.tongueWob.v = 0; break;
       case 'stick': S.play('stick'); this.tongueWob.v = 6; break;
       case 'miss': S.play('miss'); break;
-      case 'eat': {
+      case 'eat': { this.pfx.burst(new THREE.Vector3(f.x, 1.2, f.z), { n: 28, colors: [0x7bff4a, 0xffe04a, 0xffffff, 0xff7ab0], speed: 7, size: 0.8, life: 0.8, gravity: 5 });
         S.play('gulp', baseKind(e.kind));
         setTimeout(() => S.play('grow', e.combo), 160);
         this.gulpT = 0.35;
@@ -738,10 +741,10 @@ class Game {
         if (k >= 1) bm.root.visible = false;
       }
     }
-    this._ambient(dt, time);
+    this._ambient(dt, time); this.pfx.update(dt);
     // camera: high and steep like the video; zooms out as the frog grows
     const zoom = 1 + Math.min(1.6, (R - 0.45) * 1.1);
-    const off = this.land ? new THREE.Vector3(0, 7 * zoom, 5.5 * zoom) : new THREE.Vector3(0, 8 * zoom, 5.5 * zoom); // close on the frog, like the video
+    const off = this.land ? new THREE.Vector3(0, 5.6 * zoom, 4.4 * zoom) : new THREE.Vector3(0, 6.4 * zoom, 4.4 * zoom); // close on the frog, like the video
     const cx = Math.max(-W + 4, Math.min(W - 4, f.x));
     const cz = Math.max(-D + 4, Math.min(D - 2, f.z));
     this.camLook.lerp(new THREE.Vector3(cx, 0, cz - 1), Math.min(1, dt * 4));
