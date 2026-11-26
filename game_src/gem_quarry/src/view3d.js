@@ -93,8 +93,9 @@ export class View3D {
     this.cam.matrixWorld.identity(); this.cam.matrixWorldInverse.identity();
     this.scene.add(new THREE.HemisphereLight(0xfff0d0, 0x9a7a50, 1.5));
     const sun = new THREE.DirectionalLight(0xfff0cc, 2.2); sun.position.set(14, 30, -6); sun.target.position.set(4, 0, 6); this.scene.add(sun, sun.target);
+    this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); const sc = sun.shadow.camera; sc.left = -34; sc.right = 34; sc.top = 34; sc.bottom = -34; sc.near = 1; sc.far = 120; sun.shadow.bias = -0.0005; sun.position.set(24, 40, 4); sun.target.position.set(4, 0, 6);
     this.W = 1; this.H = 1; this.glow = M(0x8a3be8, 0x7a2be0, 1.0, { f: 1, r: 0.25 });
-    this.ground = new THREE.Mesh(new THREE.PlaneGeometry(260, 260), new THREE.MeshStandardMaterial({ map: sandTex(), roughness: 1 })); this.ground.rotation.x = -Math.PI / 2; this.scene.add(this.ground);
+    this.ground = new THREE.Mesh(new THREE.PlaneGeometry(260, 260), new THREE.MeshStandardMaterial({ map: sandTex(), roughness: 1 })); this.ground.rotation.x = -Math.PI / 2; this.ground.receiveShadow = true; this.scene.add(this.ground);
     this._world();
     this.workers = []; for (let i = 0; i < 11; i++) { const w = makeWorker(i); w.visible = false; this.scene.add(w); this.workers.push(w); }
     this.trucks = new Map();
@@ -120,6 +121,7 @@ export class View3D {
     add(S, G.box, M(0xffd23a, 0, 0, { r: 0.6 }), 10, 0.05, 10, 2.4, 0.1, 2.4);
     for (let i = -3; i <= 3; i++) add(S, G.box, M(0x2a2a30), 10 + i * 0.6, 0.11, 10, 0.26, 0.02, 2.4).rotation.y = 0.6;
     for (let i = 0; i < 34; i++) { const x = -16 + ((i * 7.7) % 32); const y = -12 + ((i * 13.3) % 34); if (this._near(x, y)) continue; const k = i % 3; if (k === 0) add(S, G.sph, M(0xb08a58, 0, 0, { r: 1, f: 1 }), x, 0.25, y, 0.9 + (i % 4) * 0.3, 0.6, 0.8); else if (k === 1) { const cg = grp(S, x, 0, y); add(cg, G.cyl, M(0x3a9a58), 0, 0.8, 0, 0.45, 1.6, 0.45); add(cg, G.sph, M(0x3a9a58), 0, 1.6, 0, 0.45); add(cg, G.cyl, M(0x3a9a58), 0.4, 1.0, 0, 0.28, 0.7, 0.28); } else add(S, G.cone, M(0xd8b878, 0, 0, { r: 1 }), x, 0.3, y, 1.6, 0.6, 1.6); }
+    for (const [x, y] of [[-7, 3], [4, 0.5], [13, 6], [12, 13], [-2, 9], [2, 17.5], [-5, -1]]) { const p = grp(S, x, 0, y); const trunk = add(p, G.cyl, M(0x8a5a2c), 0, 1.6, 0, 0.35, 3.2, 0.35); trunk.rotation.z = 0.15; for (let k = 0; k < 6; k++) { const l = add(p, G.cone, M(0x2fa85a, 0, 0, { r: 0.6 }), Math.cos(k * 1.05) * 0.9 + 0.4, 3.3, Math.sin(k * 1.05) * 0.9, 0.5, 2.0, 0.5); l.rotation.z = -Math.cos(k * 1.05) * 1.2 - 0.3; l.rotation.x = Math.sin(k * 1.05) * 1.2; } add(p, G.sph, M(0x6a3a14), 0.3, 3.1, 0.2, 0.4); }
     for (const [x, y, r] of [[-19, -6, 1.6], [-10, -16, 1.8], [15, -13, 1.6], [16, 7, 1.3], [-14, 7, 1.2], [13, 19, 1.4], [-6, 13, 1.1]]) { const m = add(S, G.cyl, M(0xb9835a, 0, 0, { r: 1, f: 1 }), x, r * 0.5, y, r * 2, r, r * 2); m.rotation.y = x; add(S, G.cyl, M(0xd9a46a, 0, 0, { r: 1, f: 1 }), x, r * 1.02, y, r * 1.7, r * 0.1, r * 1.7); }
   }
 
