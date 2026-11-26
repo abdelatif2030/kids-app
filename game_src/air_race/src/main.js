@@ -635,8 +635,8 @@ class Game {
     });
     // camera: behind and above the player's plane, leaning a little into turns
     const portrait = this.cw < this.ch;
-    const back = portrait ? 15 : 12.5;
-    const lift = portrait ? 4.6 : 3.8;
+    const back = portrait ? 11.5 : 9.5;
+    const lift = portrait ? 3.6 : 3;
     const want = V(tr.pos(pl.s - back, pl.x * 0.8, pl.y * 0.8 + lift));
     const look = V(tr.pos(pl.s + 16, pl.x * 0.9, pl.y * 0.9 + 0.8));
     if (this.mode === 'menu') {

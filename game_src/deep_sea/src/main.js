@@ -602,7 +602,7 @@ class Game {
     for (const [id, m] of this.models) if (!seen.has(id)) { this.scene.remove(m.root); this.models.delete(id); const tg = this.warnTags.get(id); if (tg) { tg.remove(); this.warnTags.delete(id); } }
     this._ambient(dt, time);
     // camera: straight from the side (like the video), following the fish; it pulls back as the fish grows
-    const dist = (this.land ? 11 : 13) + L * 2.4;
+    const dist = (this.land ? 8.5 : 10) + L * 2.2;
     const halfH = Math.tan((this.camera.fov * Math.PI) / 360) * dist;
     const cy = Math.max(this.floorY + halfH * 0.75, Math.min(this.hy + 2 - halfH * 0.6, -f.z));
     const cx = f.x;
