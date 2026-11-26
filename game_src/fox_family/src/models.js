@@ -36,46 +36,57 @@ export function makeFox(cub = false) {
   const root = new THREE.Group();
   const body = new THREE.Group();
   root.add(body);
-  const orange = mat(0xf07a2a);
-  const white = mat(0xfff4e6);
-  const dark = mat(0x3a2418);
-  body.add(ball(0.32, orange, 0, 0.42, 0.05, 0.85, 0.85, 1.2, 14));
-  body.add(ball(0.2, white, 0, 0.38, -0.2, 0.8, 0.8, 0.6, 12));
+  const orange = mat(0xee6a1e);
+  const deep = mat(0xcf5212);
+  const white = mat(0xfffaf0);
+  const dark = mat(0x2a1a12);
+  // sleek torso, lighter belly and a white chest bib
+  body.add(ball(0.3, orange, 0, 0.45, 0.08, 0.8, 0.82, 1.55, 16));
+  body.add(ball(0.2, deep, 0, 0.6, 0.12, 0.9, 0.5, 1.5, 12)); // darker back stripe
+  body.add(ball(0.2, white, 0, 0.36, -0.2, 0.75, 0.8, 0.8, 12)); // chest bib
+  // legs: thin orange legs with dark socks and little paws
   const legs = [];
-  for (const [x, z] of [[-0.14, -0.2], [0.14, -0.2], [-0.14, 0.25], [0.14, 0.25]]) {
-    const l = cyl(0.06, 0.05, 0.28, dark, x, 0.14, z, 8);
-    body.add(l);
-    legs.push(l);
+  for (const [x, z] of [[-0.12, -0.2], [0.12, -0.2], [-0.12, 0.3], [0.12, 0.3]]) {
+    const leg = new THREE.Group();
+    leg.position.set(x, 0.3, z);
+    leg.add(cyl(0.05, 0.04, 0.2, orange, 0, -0.05, 0, 8));
+    leg.add(cyl(0.045, 0.04, 0.12, dark, 0, -0.2, 0, 8));
+    leg.add(ball(0.06, dark, 0, -0.27, -0.02, 1, 0.6, 1.4, 8));
+    body.add(leg);
+    legs.push(leg);
   }
+  // head: round skull, long tapered snout with a black nose, white cheek ruffs, big eyes
   const head = new THREE.Group();
-  head.position.set(0, 0.78, -0.32);
-  head.add(ball(0.28, orange, 0, 0, 0, 1.05, 0.95, 1, 16));
-  head.add(ball(0.14, white, 0, -0.08, -0.2, 1.1, 0.75, 1.3, 12)); // muzzle
-  head.add(ball(0.05, dark, 0, -0.04, -0.4, 1, 0.8, 0.8, 8)); // nose
-  for (const s of [-1, 1]) {
-    head.add(ball(0.07, mat(0x1a1010), s * 0.11, 0.06, -0.22, 1, 1.2, 0.7, 10));
-    head.add(ball(0.025, mat(0xffffff), s * 0.11 + 0.02, 0.09, -0.27, 1, 1, 0.5, 6));
-    const ear = cone(0.1, 0.24, orange, s * 0.17, 0.27, 0.02, 4);
-    ear.rotation.z = -s * 0.25;
-    head.add(ear);
-    head.add(cone(0.05, 0.12, dark, s * 0.19, 0.36, 0.02, 4).rotateZ(-s * 0.25));
-    head.add(ball(0.05, mat(0xff9aa8), s * 0.17, -0.06, -0.18, 1, 0.6, 0.4, 8));
+  head.position.set(0, 0.72, -0.4);
+  head.add(ball(0.25, orange, 0, 0, 0, 1.05, 0.95, 1, 18));
+  head.add(ball(0.12, white, 0, -0.07, -0.2, 0.95, 0.7, 1.45, 14)); // muzzle
+  const snout = cone(0.095, 0.3, orange, 0, -0.03, -0.3, 12); snout.rotation.x = -Math.PI / 2; head.add(snout);
+  head.add(ball(0.045, mat(0x120a08), 0, -0.03, -0.47, 1.2, 0.9, 1, 10)); // nose
+  for (const sx of [-1, 1]) {
+    head.add(ball(0.11, white, sx * 0.2, -0.08, -0.04, 0.8, 0.8, 1.1, 10)); // cheek ruff
+    head.add(ball(0.065, mat(0xffffff), sx * 0.115, 0.06, -0.19, 1, 1.2, 0.6, 12)); // eye white
+    head.add(ball(0.045, mat(0x1c1008), sx * 0.12, 0.055, -0.225, 1, 1.2, 0.6, 10)); // pupil
+    head.add(ball(0.016, mat(0xffffff, 0xffffff, 0.7), sx * 0.105, 0.085, -0.25, 1, 1, 0.6, 6)); // shine
+    const ear = cone(0.1, 0.3, orange, sx * 0.14, 0.27, 0.02, 4); ear.rotation.z = -sx * 0.22; head.add(ear);
+    const tip = cone(0.075, 0.14, dark, sx * 0.165, 0.38, 0.02, 4); tip.rotation.z = -sx * 0.22; head.add(tip);
+    const inner = cone(0.06, 0.2, mat(0xffc0a8), sx * 0.14, 0.26, -0.03, 4); inner.rotation.z = -sx * 0.22; head.add(inner);
   }
   if (!cub) {
-    // the lavender bow
     const bow = new THREE.Group();
-    bow.position.set(0.14, 0.22, 0.02);
-    for (const s of [-1, 1]) bow.add(ball(0.08, mat(0xb08af0), s * 0.08, 0, 0, 1, 0.7, 0.4, 8));
-    bow.add(ball(0.04, mat(0x8a5ad8), 0, 0, 0, 1, 1, 1, 6));
+    bow.position.set(0.14, 0.22, 0.0);
+    for (const sx of [-1, 1]) bow.add(ball(0.07, mat(0xb08af0), sx * 0.07, 0, 0, 1, 0.7, 0.4, 8));
+    bow.add(ball(0.035, mat(0x8a5ad8), 0, 0, 0, 1, 1, 1, 6));
     head.add(bow);
-    body.add(cyl(0.2, 0.22, 0.08, mat(0xb08af0), 0, 0.6, -0.25, 12)); // little scarf
   }
   body.add(head);
+  // big bushy tail with fur tufts and a white tip
   const tail = new THREE.Group();
-  tail.position.set(0, 0.5, 0.38);
-  tail.add(ball(0.16, orange, 0, 0.08, 0.18, 1, 1, 1.9, 10));
-  tail.add(ball(0.1, white, 0, 0.12, 0.45, 1, 1, 1.1, 8));
-  tail.rotation.x = 0.5;
+  tail.position.set(0, 0.55, 0.42);
+  tail.add(ball(0.18, orange, 0, 0.1, 0.22, 1.05, 1.0, 1.9, 14));
+  tail.add(ball(0.15, deep, 0, 0.22, 0.2, 0.8, 0.6, 1.5, 10));
+  tail.add(ball(0.14, white, 0, 0.16, 0.56, 1, 1, 1.2, 12));
+  for (let i = 0; i < 6; i++) { const f = cone(0.05, 0.16, i % 2 ? orange : deep, (i % 3 - 1) * 0.13, 0.12 + (i % 2) * 0.1, 0.1 + i * 0.09, 5); f.rotation.x = 1.2; f.rotation.z = (i % 3 - 1) * 0.5; tail.add(f); }
+  tail.rotation.x = 0.55;
   body.add(tail);
   root.scale.setScalar(cub ? 0.55 : 1);
   return { root, body, head, legs, tail };
