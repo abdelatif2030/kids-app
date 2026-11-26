@@ -69,6 +69,13 @@ const STAND = new THREE.Vector3(-1.5, 0, 5.4); // the picture of the question st
 const RACK = new THREE.Vector3(5.2, 0, 3.0);
 const RACK_S = 0.6;
 
+/** Inline SVG snail for the "Slowly" button: no emoji font needed. */
+function snailIcon() {
+  const b = h('b', {});
+  b.innerHTML = '<svg viewBox="0 0 64 48" width="1.5em" height="1.1em" aria-hidden="true"><path d="M6 40h42c6 0 10-4 10-9 0-3-2-5-4-6l-3-9" fill="none" stroke="#2a6b3a" stroke-width="5" stroke-linecap="round"/><circle cx="31" cy="22" r="15" fill="#e8a23a" stroke="#8a4b12" stroke-width="3"/><path d="M31 22m-8 0a8 8 0 1 1 8 8" fill="none" stroke="#8a4b12" stroke-width="3" stroke-linecap="round"/><path d="M52 22l-2-9M57 24l4-8" stroke="#2a6b3a" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="12" r="2.4" fill="#2a6b3a"/><circle cx="61" cy="15" r="2.4" fill="#2a6b3a"/></svg>';
+  return b;
+}
+
 class Game {
   constructor(el, cfg, post) {
     this.sh = new Shell(el, cfg, post, { text: TEXT, theme: THEME_WORLD });
@@ -799,8 +806,12 @@ class Game {
         else this.sh.speak(slow ? r.retry : [r.say[0]]);
       };
       this.sign.style.direction = 'ltr';
+      // The guide animal next to the word card (owner 2026-11-26): the dog for English, the hedgehog for German.
+      // The painted LANG-03/04 guide poses replace these stand-ins when they land (swap the file name here).
+      const guideArt = this._learnDe() ? 'x_hedgehog' : 's_dog';
+      this.sign.append(h('img', { class: 'lw-guide', src: `../art/${guideArt}.webp`, alt: this._learnDe() ? 'Igel Ibo' : 'Rehlaty dog' }));
       this.sign.append(this.signText, h('button', { class: 'lw-again lw-hear', 'aria-label': 'Listen again', onclick: hear(false) }, h('b', {}, '🔊'), h('small', {}, this._learnDe() ? 'Hören' : 'Listen')),
-        h('button', { class: 'lw-again lw-hear lw-slow', 'aria-label': 'Listen slowly', onclick: hear(true) }, h('b', {}, '🐢'), h('small', {}, this._learnDe() ? 'Langsam' : 'Slowly')));
+        h('button', { class: 'lw-again lw-hear lw-slow', 'aria-label': 'Listen slowly', onclick: hear(true) }, snailIcon(), h('small', {}, this._learnDe() ? 'Langsam' : 'Slowly')));
     } else this.sign.append(this.signIcon, this.signText, h('button', { class: 'lw-again', 'aria-label': sh.t('again'), onclick: (e) => { e.stopPropagation(); this._say(); } }, '🔊'));
     sh.layer.append(this.sign);
     sh.sound.setMode('play');
@@ -1272,6 +1283,8 @@ ead) also reads every choice aloud, one after the other, and the choice being re
 const CSS = `
 .lw-sign{position:absolute;left:50%;bottom:max(calc(var(--u)*3),env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;align-items:center;gap:calc(var(--u)*2);background:#fff;border:calc(var(--u)*.7) solid #2a9ae0;border-radius:calc(var(--u)*4);padding:calc(var(--u)*1.2) calc(var(--u)*2) calc(var(--u)*1.2) calc(var(--u)*3);color:#3a2a5a;font-weight:900;font-size:max(20px,calc(var(--u)*5.4));box-shadow:0 calc(var(--u)*1) calc(var(--u)*2.4) rgba(10,40,70,.3);pointer-events:auto;max-width:94%}
 .lw-sign i{font-style:normal;font-size:1.5em}
+.lw-guide{position:absolute;right:calc(100% + var(--u)*1.2);bottom:calc(var(--u)*-1);width:calc(var(--u)*16);max-width:17vw;height:auto;pointer-events:none;filter:drop-shadow(0 calc(var(--u)*.6) calc(var(--u)*1) rgba(10,40,70,.35));animation:lw-guide-bob 2.6s ease-in-out infinite}
+@keyframes lw-guide-bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(calc(var(--u)*-1.2)) rotate(2deg)}}
 .lw-sign span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lw-sign.pop{animation:lw-pop .5s cubic-bezier(.2,1.6,.4,1)}
 @keyframes lw-pop{from{transform:translateX(-50%) scale(.6)}to{transform:translateX(-50%) scale(1)}}
