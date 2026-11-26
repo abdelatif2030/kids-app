@@ -189,6 +189,7 @@ class Game {
     const sun = new THREE.DirectionalLight(0xfff2d8, 1.4);
     sun.position.set(-8, 20, 6);
     s.add(sun);
+    const rim = new THREE.DirectionalLight(0xffc890, 1.1); rim.position.set(6, 6, -10); s.add(rim);
     const tex = {};
     this.vehicleModels = [];
     this.platformModels = [];
@@ -562,12 +563,12 @@ class Game {
     // camera follows the fox's row, looking up the board
     const portrait = this.cw < this.ch;
     // closer and tilted (like the video): big tractors and trucks near the fox, the lanes ahead shrinking away
-    const want = new THREE.Vector3(x * 0.45, portrait ? 10 : 8.5, z + (portrait ? 6 : 6.5));
+    const want = new THREE.Vector3(x * 0.45 + (portrait ? 1.6 : 2.4), portrait ? 7.4 : 5.2, z + (portrait ? 5.6 : 5.4));
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 4));
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 2);
     this.camera.position.set(this.cam.x + (Math.random() - 0.5) * this.shake * 0.3, this.cam.y, this.cam.z);
-    this.camera.lookAt(this.cam.x, 0, this.cam.z - (portrait ? 6 : 6.5) - (portrait ? 2.2 : 1.6));
+    this.camera.lookAt(this.cam.x - (portrait ? 1.6 : 2.4) * 0.8, 0.5, this.cam.z - (portrait ? 6 : 5.4) - (portrait ? 2.2 : 1.2));
   }
 
   // ---- loop ----------------------------------------------------------------------------------------------------------
@@ -576,7 +577,7 @@ class Game {
   _fox(cub) {
     const P = this.pics;
     const pic = P && P.fox;
-    if (true) { const m = makeFox(cub); m.root.scale.multiplyScalar(cub ? 1.3 : 1.35); return m; }
+    if (true) { const m = makeFox(cub); m.root.scale.multiplyScalar(cub ? 1.35 : 1.8); return m; }
     if (!pic) return makeFox(cub);
     const f = makePaintedFigure(THREE, { idle: pic }, cub ? 1.2 : 2.6);
     f.tail = { rotation: { x: 0, y: 0, z: 0 } };
