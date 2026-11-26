@@ -101,7 +101,7 @@ class Game {
     }
     this.loading = h('div', { class: 'sp-loading' }, t('loading'));
     this.root.append(this.loading);
-    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' }), { preset: 'warm' });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' }), { preset: 'warm', tune: { bloom: [0.12, 0.4, 0.95], contrast: 1.14, sat: 1.15, vig: 0.28 } });
     this.maxPR = Math.min(window.devicePixelRatio || 1, this.quality.low ? 1.25 : 1.5);
     this.pr = this.maxPR;
     this.renderer.setPixelRatio(this.pr);
