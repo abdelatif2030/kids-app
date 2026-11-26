@@ -1,0 +1,15 @@
+/* Happy farm skin: the owner's pictures (skin/*.webp) on the menu panel, title, level circles and buttons. Shapes keep their size; only the look changes. */
+.pp-panel{background:url(skin/panel.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;padding:calc(var(--u)*11) calc(var(--u)*9) calc(var(--u)*8) !important;color:#5a3a12}
+.pp-logo{color:#fff !important;font-size:calc(var(--u)*6.6) !important;background:url(skin/ribbon.webp) center/100% 100% no-repeat;padding:calc(var(--u)*2.2) calc(var(--u)*9) calc(var(--u)*3) !important;margin:calc(var(--u)*-4) 0 0 !important;-webkit-text-stroke:calc(var(--u)*.7) #7a4a0a;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.5) 0 #7a4a0a;white-space:nowrap}
+.pp-node{background:url(skin/lv_open.webp) center/contain no-repeat !important;border:none !important;box-shadow:none !important;color:#5a3a12 !important;text-shadow:none !important}
+.pp-node.next{background-image:url(skin/lv_sel.webp) !important}
+.pp-node.lock{background-image:url(skin/lv_lock.webp) !important;font-size:0 !important;color:transparent !important}
+.pp-btn{background:url(skin/pill_green.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;text-shadow:0 calc(var(--u)*.4) 0 #1f6a1f;padding-top:calc(var(--u)*2.4) !important;padding-bottom:calc(var(--u)*1.4) !important}
+.pp-btn:active{transform:scale(.96)}
+/* the owner's icons, props and win picture */
+.pp-win{background:rgba(0,0,0,.15) url(art/win.webp) center/cover no-repeat !important}
+.pp-win>.pp-panel{position:relative;z-index:1;margin-inline-start:7%;margin-inline-end:auto}
+.pp-stars span{font-size:0 !important;display:inline-block;width:calc(var(--u)*11);height:calc(var(--u)*11);background:url(art/icon_star.webp) center/contain no-repeat}.pp-stars span.off{opacity:.3;filter:grayscale(1)}
+.pp-coin{background:url(art/icon_coin.webp) center/contain no-repeat !important;border:none !important;border-radius:0 !important}
+
+.pp-panel{scrollbar-width:none;-ms-overflow-style:none}.pp-panel::-webkit-scrollbar{display:none}

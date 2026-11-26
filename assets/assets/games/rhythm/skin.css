@@ -1,0 +1,17 @@
+/* Happy farm skin: the owner's pictures (skin/*.webp) on the menu panel, title, level circles and buttons. Shapes keep their size; only the look changes. */
+.rh-panel{background:url(skin/panel.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;padding:calc(var(--u)*11) calc(var(--u)*9) calc(var(--u)*8) !important;color:#fff}
+.rh-logo{color:#fff !important;font-size:calc(var(--u)*6.6) !important;background:url(skin/ribbon.webp) center/100% 100% no-repeat;padding:calc(var(--u)*2.2) calc(var(--u)*9) calc(var(--u)*3) !important;margin:calc(var(--u)*-4) 0 0 !important;-webkit-text-stroke:calc(var(--u)*.7) #3a1470;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.5) 0 #3a1470;white-space:nowrap}
+.rh-node{background:url(skin/lv_open.webp) center/contain no-repeat !important;border:none !important;box-shadow:none !important;color:#fff !important;text-shadow:none !important}
+.rh-node.next{background-image:url(skin/lv_sel.webp) !important}
+.rh-node.lock{background-image:url(skin/lv_lock.webp) !important;font-size:0 !important;color:transparent !important}
+.rh-btn{background:url(skin/pill_purple.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;text-shadow:0 calc(var(--u)*.4) 0 #2a0a5a;padding-top:calc(var(--u)*2.4) !important;padding-bottom:calc(var(--u)*1.4) !important}
+.rh-btn:active{transform:scale(.96)}
+/* the owner's icons, props and win picture */
+.rh-win{background:rgba(0,0,0,.15) url(art/win.webp) center/cover no-repeat !important}
+.rh-win>.rh-panel{position:relative;z-index:1;margin-inline-start:7%;margin-inline-end:auto}
+.rh-stars span{font-size:0 !important;display:inline-block;width:calc(var(--u)*11);height:calc(var(--u)*11);background:url(art/icon_star.webp) center/contain no-repeat}.rh-stars span.off{opacity:.3;filter:grayscale(1)}
+.rh-coin{background:url(art/icon_coin.webp) center/contain no-repeat !important;border:none !important;border-radius:0 !important}
+
+.rh-panel{scrollbar-width:none;-ms-overflow-style:none}.rh-panel::-webkit-scrollbar{display:none}
+.rh-root .rh-panel .rh-title{color:#ffd86a !important}
+.rh-root .rh-panel{background:url(skin/panel.webp) center/100% 100% no-repeat !important;border:none !important}
