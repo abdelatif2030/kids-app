@@ -592,7 +592,7 @@ class Game {
     this.ring.visible = !p.slide && this.mode !== 'menu';
     // camera behind and above the otter
     const portrait = this.cw < this.ch;
-    const want = new THREE.Vector3(p.x * 0.55, portrait ? 6.2 : 4.6, -p.s + (portrait ? 8.8 : 7.2));
+    const want = new THREE.Vector3(p.x * 0.55, portrait ? 4.9 : 3.5, -p.s + (portrait ? 6.8 : 5.4));
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 4));
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 2);

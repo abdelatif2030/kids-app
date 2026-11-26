@@ -601,8 +601,8 @@ class Game {
     // camera: behind and above, looking up the slope (portrait: a little higher and closer, as in the video)
     const port = this.camera.aspect < 1;
     const my = Y(me.s);
-    const back = port ? 7 : 7.8;
-    const up = port ? 5.4 : 4.6;
+    const back = port ? 5.4 : 6;
+    const up = port ? 4.2 : 3.5;
     const want = new THREE.Vector3(me.x * 0.8, my + up, -me.s + back);
     if (this.mode === 'menu') want.set(me.x * 0.5, my + (port ? 3.2 : 3), -me.s + (port ? 6 : 7));
     if (!this.camPos) this.camPos = want.clone();
