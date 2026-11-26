@@ -27,7 +27,8 @@ function makeHero() {
   const sn = mesh(geo.sph, M(0x8ed02e), 0, -0.1, 0.42, 0.6, 0.4, 0.55); head.add(sn); head.add(mesh(geo.sph, M(0x4a7a1a), 0.1, 0.02, 0.7, 0.1, 0.08, 0.08)); head.add(mesh(geo.sph, M(0x4a7a1a), -0.1, 0.02, 0.7, 0.1, 0.08, 0.08));
   const sm = mesh(geo.hem, M(0x7a1a2a), 0, -0.24, 0.55, 0.32, 0.14, 0.2); sm.rotation.x = Math.PI; head.add(sm);
   for (const s of [-1, 1]) {
-    head.add(mesh(geo.sph, eyeW, s * 0.26, 0.22, 0.38, 0.44, 0.5, 0.22)); head.add(mesh(geo.sph, pup, s * 0.26, 0.2, 0.5, 0.22, 0.28, 0.1)); head.add(mesh(geo.sph, eyeW, s * 0.26 + 0.05, 0.28, 0.58, 0.08, 0.08, 0.04));
+    head.add(mesh(geo.sph, eyeW, s * 0.19, 0.24, 0.4, 0.36, 0.42, 0.2)); head.add(mesh(geo.sph, pup, s * 0.17, 0.22, 0.5, 0.2, 0.25, 0.1)); head.add(mesh(geo.sph, eyeW, s * 0.17 + 0.04, 0.29, 0.58, 0.07, 0.07, 0.04));
+    const lid = mesh(geo.hem, skin, s * 0.19, 0.3, 0.4, 0.4, 0.26, 0.24); lid.rotation.x = 0.15; head.add(lid);
   }
   const tail = mesh(geo.tor, skin, 0.7, 0.4, -0.3, 0.9, 0.9, 0.9); tail.rotation.y = 1.2; body.add(tail);
   const legs = []; for (const s of [-1, 1]) { const l = new THREE.Group(); l.position.set(s * 0.28, 0.12, 0.05); l.add(mesh(geo.cyl, dark, 0, -0.1, 0, 0.2, 0.3, 0.2)); l.add(mesh(geo.sph, M(0xff8a3a), 0, -0.28, 0.1, 0.36, 0.18, 0.5)); body.add(l); legs.push(l); }
@@ -135,7 +136,7 @@ export class View3D {
     // creature, drawn wrapped at both edges
     const offs = [0, -W, W];
     this.heroes.forEach((hero, i) => {
-      const x = p.x + offs[i]; hero.visible = i === 0 || (x > -0.9 && x < W + 0.9); if (!hero.visible) return;
+      const x = p.x + offs[i]; hero.visible = i === 0; if (!hero.visible) return;
       const u = hero.userData, up = p.vy > 6, down = p.vy < -6;
       hero.position.set(x, p.y, 0.3); hero.scale.setScalar(1.35); hero.rotation.y = (p.face >= 0 ? 0.55 : -0.55);
       u.body.scale.set(up ? 0.88 : down ? 1.08 : 1, up ? 1.16 : down ? 0.9 : 1, up ? 0.9 : 1);
