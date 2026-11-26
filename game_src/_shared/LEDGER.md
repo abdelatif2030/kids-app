@@ -49,3 +49,8 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 - Ortho tilted camera, snowy valley, 3D ice tubes, wooden board, ice dragon. Fog removed (it washed the board out). Dragon enlarged (reads well now). Clip NOT sent yet. TODO: richer sky/aurora, check travel/win screens, record BEFORE/AFTER.
 - frost_coil clip (BEFORE/AFTER) HELD, not a clear leap: BEFORE has cabin, dusk mood and a cute dragon; AFTER is pale/washed, lost the cabin, no motion in idle. TODO: restore dusk sky + cabin + aurora in 3D, darker richer grade, animate idle dragon, fix blank HUD title bars (white strips on top of HUD).
 - frost_coil v3: cooler dusk grade + cabin added; cabin roof shape off (use a proper gable), HUD title strips still blank white bars, sky/aurora never visible (ground covers view). Still held; low priority vs other games.
+
+## gem_quarry (three.js rebuild, WIP)
+- Custom affine projection matrix keeps main.js's iso P() so taps/fx/HUD unchanged. 3D workers (limbs, pickaxe), trucks, crates, crystals, depot, workshop.
+- FIXED existing bug: menubg.js shows the poster when any element with class *-panel is visible; gq-panel (upgrade pads) matched and covered gameplay in landscape. Renamed to gq-pads.
+- NOT sent: scene still small in landscape (portrait BBOX), mine cut off at bottom, flat colors. TODO: landscape-specific layout/scale up, richer terrain, shadows, pile/crate polish, replace emoji (hint/!), menu/level select/end screens polish, pad icons as SVG (emoji tofu in pad panel).

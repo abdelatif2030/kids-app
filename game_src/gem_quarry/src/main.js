@@ -5,6 +5,7 @@
 // 2.5D isometric canvas, all art and sound made in code. Rules live in sim.js.
 import { Quarry, LEVELS, KINDS, MAXLV, normalizeSave, recordWin } from './sim.js';
 import { Sound } from './audio.js';
+import { View3D } from './view3d.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 
 const S = {
@@ -55,6 +56,7 @@ class Game {
     if (!document.getElementById('gq-style')) document.head.append(h('style', { id: 'gq-style' }, css('gq', '#9a4be0', '#5a1fa8', '#ffe27a') + STYLE));
     this.root = h('div', { class: 'gq-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
+    this.view = new View3D(); this.root.append(this.view.dom);
     this.cv = h('canvas'); this.root.append(this.cv);
     this.g = this.cv.getContext('2d');
     this.layer = h('div', { class: 'gq-layer' }); this.root.append(this.layer);
@@ -77,7 +79,7 @@ class Game {
     this.root.style.setProperty('--u', `${Math.min(this.u, 6.2)}px`);
     this.land = this.cw > this.ch * 1.15;
     this.root.classList.toggle('land', this.land);
-    this.bg = null; this.needLayout = true;
+    this.bg = null; this.needLayout = true; this.view.setSize(this.cw, this.ch);
   }
 
   _layout() {
@@ -160,7 +162,7 @@ class Game {
       h('div', { class: 'gq-top2' }, menu, h('div', { class: 'gq-pill' }, '🪙 ', this.coinEl), h('div', { class: 'gq-pill' }, '📦 ', this.goalEl)),
       h('div', { class: 'gq-bar2' }, h('div', { class: 'gq-bar' }, this.barEl)));
     this.pads = {};
-    this.panel = h('div', { class: 'gq-panel' });
+    this.panel = h('div', { class: 'gq-pads' });
     for (const k of KINDS) {
       if (!this.q.has(k) || (k === 'loader' && this.easy && !this.q.cfg.tools.includes('loader'))) continue;
       const cost = h('small', {}, ''); const pips = h('em', {}, '');
@@ -411,38 +413,9 @@ class Game {
     const g = this.g; g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     if (!this.q || !this.s) return;
     const q = this.q;
-    const bgKey = `${this.cw}x${this.ch}|${q.up.road}|${q.up.mine2}`;
-    if (!this.bg || this.bgKey !== bgKey) { this.bg = this._bgRender(); this.bgKey = bgKey; }
-    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(this.bg, 0, 0); g.restore();
-    const items = [];
-    const add = (d, fn) => items.push({ d, fn });
-    // depot
-    add(-5, () => {
-      this._building(g, -5.6, -5.6, 4, 4, 3.0, '#d0a060', '#e8c080', '#f0d8a0');
-      const [dx, dy] = this.P(-1.55, -1.55 - 0.0, 1.0); g.fillStyle = '#5a3a1a'; g.beginPath(); g.roundRect(dx - this.s * 0.7, dy - this.s * 0.7, this.s * 1.0, this.s * 1.3, this.s * 0.15); g.fill();
-      const [sx, sy] = this.P(-3.6, -3.6, 5.0); g.font = `${this.s * 1.5}px system-ui`; g.textAlign = 'center'; g.fillText('📦', sx, sy);
-    });
-    // workshop
-    if (q.up.polish > 0) add(9 + 3, () => {
-      this._building(g, 8.2, 2.2, 3.4, 3.2, 2.4, '#b88ad8', '#d8b0f0', '#e8d0ff');
-      const [sx, sy] = this.P(9.9, 3.8, 4.8 + Math.sin(this.clock * 3) * 0.15); g.font = `${this.s * (1.1 + q.up.polish * 0.3)}px system-ui`; g.textAlign = 'center'; g.fillText('💎', sx, sy);
-      if (q.up.polish > 1) { const [lx, ly] = this.P(8, 5.8, 2.5); g.font = `${this.s * 0.9}px system-ui`; g.fillText('✨', lx, ly + Math.sin(this.clock * 4) * this.s * 0.2); }
-    });
-    // crystals + diggers
-    const glow = 0.5 + 0.5 * Math.sin(this.clock * 2.5);
-    CRYSTALS.forEach((c, i) => add(c[0] + c[1], () => this._crystal(g, c[0], c[1], c[2], c[3], i === 0 ? glow : 0)));
-    if (q.up.mine2) CRYSTALS2.forEach((c) => add(c[0] + c[1], () => this._crystal(g, c[0], c[1], c[2], c[3], glow)));
-    const nd = Math.min(q.up.diggers, DIG_POS.length);
-    for (let i = 0; i < nd; i++) add(DIG_POS[i][0] + DIG_POS[i][1] + 0.2, () => this._worker(g, DIG_POS[i][0], DIG_POS[i][1], i, true));
-    if (q.up.mine2) { add(2.4 + 12.4 + 3, () => this._worker(g, 3.0, 12.4, 5, true)); add(2.4 + 13.6, () => this._worker(g, 1.6, 12.8, 6, true)); }
-    // loader helper
-    if (q.up.loader > 0) {
-      const t = (Math.sin(this.clock * 1.6) + 1) / 2; const lx = PILE_AT[0] + 1.2 + (PAD[0] - PILE_AT[0] - 2.4) * t; const ly = PILE_AT[1] - 0.6 + (PAD[1] - PILE_AT[1] + 0.4) * t;
-      add(lx + ly, () => this._worker(g, lx, ly, 3, false, q.pile > 0 ? 1 : 0));
-    }
-    // pile of crates
-    add(PILE_AT[0] + PILE_AT[1] + 1, () => this._pile(g, q));
-    // trucks
+    g.clearRect(0, 0, this.cw, this.ch);
+    this.view.setLayout(this.s, this.ox, this.oy);
+    const trucks = [];
     for (const t of q.trucks) {
       const v = this.vis.get(t.id); if (!v) continue;
       let p;
@@ -452,10 +425,16 @@ class Game {
       let px = p.x; let py = p.y;
       if (t.st !== 'wait') { if (p.ax === 'x') py += p.off; else px += p.off; v.x = px; v.y = py; }
       const bob = t.st === 'wait' ? 0 : Math.abs(Math.sin(this.clock * 14 + t.id)) * 0.04;
-      add(px + py + 0.6, () => this._truck(g, px, py, p.ax, p.sign, t.load, q.truckCap(), bob));
+      trucks.push({ id: t.id, x: px, y: py, ax: p.ax, sign: p.sign, load: t.load, cap: q.truckCap(), bob, moving: t.st !== 'wait' });
     }
-    items.sort((a, b) => a.d - b.d);
-    for (const it of items) it.fn();
+    const diggers = [];
+    const nd = Math.min(q.up.diggers, DIG_POS.length);
+    for (let i = 0; i < nd; i++) diggers.push({ x: DIG_POS[i][0], y: DIG_POS[i][1], i, busy: true });
+    if (q.up.mine2) { diggers.push({ x: 3.0, y: 12.4, i: 5, busy: true }, { x: 1.6, y: 12.8, i: 6, busy: true }); }
+    let loader = null;
+    if (q.up.loader > 0) { const t = (Math.sin(this.clock * 1.6) + 1) / 2; loader = { x: PILE_AT[0] + 1.2 + (PAD[0] - PILE_AT[0] - 2.4) * t, y: PILE_AT[1] - 0.6 + (PAD[1] - PILE_AT[1] + 0.4) * t, carry: q.pile > 0 ? 1 : 0 }; }
+    this.view.render({ q, clock: this.clock, trucks, diggers, loader, glow: 0.5 + 0.5 * Math.sin(this.clock * 2.5), pile: Math.ceil(24 * (q.pile / q.pileCap())), pileAt: PILE_AT });
+    this._pile(g, q);
     this._fxDraw(g);
   }
 
@@ -463,12 +442,6 @@ class Game {
     const shown = Math.ceil(24 * (q.pile / q.pileCap()));
     const [x0, y0] = PILE_AT; const full = q.isFull();
     const shake = full ? Math.sin(this.clock * 30) * 0.04 : 0;
-    this._shadow(g, x0 + 0.7, y0 + 0.5, 1.7, 0.7);
-    this._box(g, x0 - 0.2, y0 - 0.2, 0, 2.2, 1.6, 0.18, '#a07840', '#7a5a2a', '#8a6830');
-    for (let i = 0; i < shown; i++) {
-      const layer = Math.floor(i / 6); const k = i % 6; const cx = x0 + 0.05 + (k % 3) * 0.64 + shake; const cy = y0 + 0.05 + Math.floor(k / 3) * 0.64;
-      this._crate(g, cx, cy, 0.18 + layer * 0.5);
-    }
     if (full) {
       const [sx, sy] = this.P(x0 + 1, y0 + 0.8, 0.18 + Math.ceil(shown / 6) * 0.5 + 1.1 + Math.abs(Math.sin(this.clock * 6)) * 0.3);
       g.fillStyle = '#e8261a'; g.strokeStyle = '#fff'; g.lineWidth = this.s * 0.14; g.beginPath(); g.arc(sx, sy, this.s * 0.95, 0, 6.3); g.fill(); g.stroke();
@@ -494,7 +467,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play') this.pauseGame(); }
-  dispose() { cancelAnimationFrame(this.raf); clearTimeout(this._ht); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
+  dispose() { cancelAnimationFrame(this.raf); this.view.dispose(); clearTimeout(this._ht); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
 }
 
 const STYLE = `
@@ -508,7 +481,7 @@ const STYLE = `
 .gq-warn{position:absolute;left:50%;top:calc(var(--u)*24);transform:translateX(-50%) scale(.8);background:#e8261a;border:calc(var(--u)*.5) solid #fff;border-radius:999px;color:#fff;font-weight:900;font-size:calc(var(--u)*4.2);padding:calc(var(--u)*1) calc(var(--u)*4);opacity:0;transition:opacity .2s,transform .2s;white-space:nowrap;box-shadow:0 calc(var(--u)*.6) calc(var(--u)*1.4) rgba(0,0,0,.4)}
 .gq-warn.show{opacity:1;transform:translateX(-50%) scale(1);animation:gqwarn .7s infinite alternate}
 @keyframes gqwarn{to{transform:translateX(-50%) scale(1.08)}}
-.gq-panel{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*1.4);padding:calc(var(--u)*2) calc(var(--u)*2) max(calc(var(--u)*2.5),env(safe-area-inset-bottom));pointer-events:none;direction:ltr;background:linear-gradient(180deg,rgba(90,40,150,0),rgba(90,40,150,.28))}
+.gq-pads{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*1.4);padding:calc(var(--u)*2) calc(var(--u)*2) max(calc(var(--u)*2.5),env(safe-area-inset-bottom));pointer-events:none;direction:ltr;background:linear-gradient(180deg,rgba(90,40,150,0),rgba(90,40,150,.28))}
 .gq-pad{pointer-events:auto;font-family:inherit;font-weight:900;color:#fff;border:calc(var(--u)*.45) solid #fff;border-radius:calc(var(--u)*3);background:linear-gradient(180deg,#8a62b8,#58348a);padding:calc(var(--u)*1) calc(var(--u)*.6);min-height:calc(var(--u)*19);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.1);font-size:calc(var(--u)*3);box-shadow:0 calc(var(--u)*.7) 0 #2e1058,0 calc(var(--u)*1) calc(var(--u)*1.4) rgba(0,0,0,.35);line-height:1.1}
 .gq-pad i{font-style:normal;font-size:calc(var(--u)*6)}.gq-pad em{font-style:normal;font-size:calc(var(--u)*2);letter-spacing:.1em;opacity:.9;min-height:1em}
 .gq-pad small{font-size:calc(var(--u)*3.2);color:#ffe27a;background:rgba(0,0,0,.35);border-radius:99px;padding:0 calc(var(--u)*1.6)}
@@ -525,7 +498,7 @@ const STYLE = `
 .gq-lv{background:linear-gradient(180deg,#a870e8,#6a38b8);box-shadow:0 calc(var(--u)*.6) 0 #2e1058}
 .gq-lv.lock{background:linear-gradient(180deg,#b8b0c4,#8a8498);box-shadow:0 calc(var(--u)*.6) 0 #5a5468}
 .gq-lvs{grid-template-columns:repeat(5,1fr)}
-@media (orientation:landscape){.gq-lvs{grid-template-columns:repeat(5,1fr)}.gq-root.land .gq-panel{left:auto;top:calc(var(--u)*14);bottom:0;width:calc(var(--u)*50);grid-template-columns:repeat(2,1fr);align-content:center;background:none}}
+@media (orientation:landscape){.gq-lvs{grid-template-columns:repeat(5,1fr)}.gq-root.land .gq-pads{left:auto;top:calc(var(--u)*14);bottom:0;width:calc(var(--u)*50);grid-template-columns:repeat(2,1fr);align-content:center;background:none}}
 .gq-root.land .gq-hud{right:calc(var(--u)*50)}
 .gq-root.land .gq-warn,.gq-root.land .gq-hint{left:35%}
 .gq-card{background:linear-gradient(180deg,#9a4be0,#5a1fa8)}
