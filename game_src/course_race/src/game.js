@@ -75,7 +75,12 @@ function makeRunner(kind, color) {
     body.add(mesh(geo.sphere, M(0x111111), -0.22, 1.1, 0.52, 0.14, 0.18, 0.1));
     body.add(mesh(geo.sphere, M(0x111111), 0.22, 1.1, 0.52, 0.14, 0.18, 0.1));
     for (const s of [-1, 1]) { body.add(mesh(geo.cyl, M(color), s * 0.25, 1.75, 0, 0.06, 0.5, 0.06)); body.add(mesh(geo.sphere, M(0xffe04a, 0xffe04a), s * 0.25, 2.05, 0, 0.16, 0.16, 0.16)); }
-    body.add(mesh(geo.box, M(0x8a8fa0), 0, 0.9, -0.55, 0.6, 0.8, 0.3));
+    for (const sx of [-0.2, 0.2]) { body.add(mesh(geo.cyl, M(0xd6dbe8), sx, 0.95, -0.55, 0.26, 0.8, 0.26)); body.add(mesh(geo.sphere, M(0xff5a8a, 0xff2a5a), sx, 1.38, -0.55, 0.26, 0.2, 0.26)); body.add(mesh(geo.cyl, M(0x4a4f66), sx, 0.5, -0.55, 0.22, 0.14, 0.22)); }
+    body.add(mesh(geo.sphere, new THREE.MeshBasicMaterial({ color: 0xbff4ff, transparent: true, opacity: 0.16, depthWrite: false }), 0, 1.05, 0.05, 1.45, 1.55, 1.3));
+    const limbs = [];
+    for (const [sx, sy, ph] of [[-1, 0.72, 0], [1, 0.72, Math.PI]]) { const pv = new THREE.Group(); pv.position.set(sx * 0.62, sy + 0.2, 0); pv.add(mesh(geo.cyl, M(color), 0, -0.25, 0, 0.18, 0.55, 0.18)); pv.add(mesh(geo.sphere, M(0xffffff), 0, -0.55, 0, 0.26, 0.26, 0.26)); pv.userData.ph = ph; pv.userData.arm = true; body.add(pv); limbs.push(pv); }
+    for (const [sx, ph] of [[-1, Math.PI], [1, 0]]) { const pv = new THREE.Group(); pv.position.set(sx * 0.3, 0.45, 0); pv.add(mesh(geo.cyl, M(color), 0, -0.2, 0, 0.2, 0.45, 0.2)); pv.add(mesh(geo.sphere, M(0x3a3f66), 0, -0.45, 0.1, 0.32, 0.2, 0.46)); pv.userData.ph = ph; body.add(pv); limbs.push(pv); }
+    g.userData.limbs = limbs;
     const flame = mesh(geo.cone, B(0xffa02a), 0, 0.35, -0.55, 0.3, 0.7, 0.3);
     flame.rotation.x = Math.PI;
     flame.visible = false;
@@ -89,7 +94,11 @@ function makeRunner(kind, color) {
     body.add(mesh(geo.sphere, M(0xe83a2a), 0, 1.35, 0.75, 0.82, 0.5, 0.78)); // helmet
     body.add(mesh(geo.sphere, M(0x111111), -0.28, 1.1, 1.05, 0.13, 0.13, 0.1));
     body.add(mesh(geo.sphere, M(0x111111), 0.28, 1.1, 1.05, 0.13, 0.13, 0.1));
-    for (const [sx, sz] of [[-0.3, 0.45], [0.3, 0.45], [-0.3, -0.45], [0.3, -0.45]]) body.add(mesh(geo.cyl, M(0x6a6a76), sx, 0.25, sz, 0.28, 0.5, 0.28));
+    const limbs = [];
+    for (const [sx, sz, ph] of [[-0.3, 0.45, 0], [0.3, 0.45, Math.PI], [-0.3, -0.45, Math.PI], [0.3, -0.45, 0]]) { const pv = new THREE.Group(); pv.position.set(sx, 0.5, sz); pv.add(mesh(geo.cyl, M(0x6a6a76), 0, -0.25, 0, 0.3, 0.5, 0.3)); pv.add(mesh(geo.sphere, M(0x3a3a46), 0, -0.5, 0.06, 0.34, 0.16, 0.4)); pv.userData.ph = ph; body.add(pv); limbs.push(pv); }
+    for (const sx of [-1, 1]) { const ear = mesh(geo.cone, M(color), sx * 0.38, 1.62, 0.72, 0.18, 0.3, 0.12); body.add(ear); }
+    const tail = new THREE.Group(); tail.position.set(0, 1.0, -0.78); tail.add(mesh(geo.cyl, M(color), 0, -0.2, -0.1, 0.1, 0.5, 0.1)); tail.add(mesh(geo.sphere, M(0xf4efe0), 0, -0.48, -0.14, 0.2, 0.2, 0.2)); tail.userData.tail = true; body.add(tail);
+    g.userData.limbs = limbs; g.userData.tail = tail;
   }
   g.add(body);
   g.userData.body = body;
@@ -483,6 +492,8 @@ class Game {
     const b = m.userData.body;
     const run = Math.abs(Math.sin(this.clock * 12 + (me ? 0 : x))) * (grounded ? 0.12 : 0);
     b.position.y = run;
+    const lm = m.userData.limbs;
+    if (lm) { const sw = grounded ? 0.9 : 0.25; const t = this.clock * 13 + (me ? 0 : x * 3); for (const l of lm) { l.rotation.x = Math.sin(t + l.userData.ph) * sw * (l.userData.arm ? 1.1 : 1); if (!grounded) l.rotation.z = (l.position.x > 0 ? -1 : 1) * 0.5; else l.rotation.z = 0; } if (m.userData.tail) m.userData.tail.rotation.z = Math.sin(this.clock * 9) * 0.5; }
     b.rotation.x = grounded ? 0 : -0.25;
     if (me && p) {
       m.visible = p.fall <= 0;
