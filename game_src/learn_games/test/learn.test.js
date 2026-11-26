@@ -89,3 +89,11 @@ test('pictures of the new sections exist (bundled x_ pictures)', () => {
     if (t && t.startsWith('x_')) assert.ok(fs.existsSync(new URL(`../../../assets/games/art/${t}.webp`, import.meta.url)), t);
   }
 });
+
+test('the resume question has a recording slot per language (docs/RESUME_VOICE_LINES.csv uses the game\'s clip ids)', async () => {
+  const { clipId } = await import('../src/kit/voice.js');
+  const csv = fs.readFileSync(new URL('../../../docs/RESUME_VOICE_LINES.csv', import.meta.url), 'utf8');
+  for (const [l, t] of [['ar', 'إيه رأيك تكمّل من مكان ما كنت واقف، ولا تبدأ من الأول؟'], ['en', 'How about continuing where you stopped, or starting from the beginning?'], ['de', 'Möchtest du dort weitermachen, wo du aufgehört hast, oder von vorne anfangen?'], ['fr', "Tu veux continuer là où tu t'es arrêté, ou recommencer depuis le début ?"]]) {
+    assert.ok(csv.includes(`${clipId(t, l)}.mp3`), l);
+  }
+});

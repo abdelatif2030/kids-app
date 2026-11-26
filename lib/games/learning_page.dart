@@ -387,7 +387,7 @@ class _LearnModeScreenState extends State<LearnModeScreen> {
             final wide = box.maxWidth >= 640;
             final short = box.maxHeight < 460;
             final gapW = wide ? 22.0 : 12.0;
-            final w = ((box.maxWidth - 40 - gapW) / 2).clamp(120.0, 300.0);
+            final w = ((box.maxWidth - 56 - gapW) / 2).clamp(110.0, 300.0);
             return Stack(children: [
               Center(
                 child: SingleChildScrollView(
@@ -400,9 +400,9 @@ class _LearnModeScreenState extends State<LearnModeScreen> {
                       _titleRibbon(t.$1, short ? '' : t.$6, bigSize: short ? 22 : wide ? 34 : 26),
                       SizedBox(height: short ? 10 : wide ? 22 : 14),
                       Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        _option(key: const ValueKey('learn_mode_levels'), width: w, short: short, emoji: '🎮', title: t.$2, sub: t.$3, color: const Color(0xFF3D8BFF), onTap: _openLevels),
+                        _option(key: const ValueKey('learn_mode_levels'), width: w, short: short, art: _levelsArt(short ? 56 : 92), emoji: '🎮', title: t.$2, sub: t.$3, color: const Color(0xFF3D8BFF), onTap: _openLevels),
                         SizedBox(width: gapW),
-                        _option(key: const ValueKey('learn_mode_learn'), width: w, short: short, emoji: '📚', title: t.$4, sub: t.$5, color: const Color(0xFF2FA85A), onTap: _openLearn),
+                        _option(key: const ValueKey('learn_mode_learn'), width: w, short: short, art: _learnArt(short ? 56 : 92), emoji: '📚', title: t.$4, sub: t.$5, color: const Color(0xFF2FA85A), onTap: _openLearn),
                       ]),
                     ]),
                   ),
@@ -421,7 +421,50 @@ class _LearnModeScreenState extends State<LearnModeScreen> {
     );
   }
 
-  Widget _option({required Key key, required double width, required bool short, required String emoji, required String title, required String sub, required Color color, required VoidCallback onTap}) => Semantics(
+  /// The picture of «مستويات»: three steps going up to a star (the owner's picture assets/games/learn_lang/mode_levels.webp replaces it when it is there).
+  Widget _levelsArt(double h) => SizedBox(
+    height: h,
+    child: Image.asset('assets/games/learn_lang/mode_levels.webp', height: h, fit: BoxFit.contain, errorBuilder: (_, _, _) {
+      Widget step(String n, double f, Color c) => Container(
+        width: h * 0.46,
+        height: h * f,
+        alignment: Alignment.topCenter,
+        padding: EdgeInsets.only(top: h * 0.04),
+        decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(h * 0.12), border: Border.all(color: Colors.white, width: 3), boxShadow: const [BoxShadow(color: Color(0x44000000), blurRadius: 4, offset: Offset(0, 3))]),
+        child: Text(n, style: TextStyle(fontSize: h * 0.26, fontWeight: FontWeight.w900, color: Colors.white)),
+      );
+      return Stack(alignment: Alignment.bottomCenter, children: [
+        Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.end, children: [
+          step('1', 0.38, const Color(0xFFFFB02E)),
+          SizedBox(width: h * 0.05),
+          step('2', 0.58, const Color(0xFFFF7A59)),
+          SizedBox(width: h * 0.05),
+          step('3', 0.8, const Color(0xFFE0457B)),
+        ]),
+        Positioned(top: 0, right: h * 0.1, child: Text('⭐', style: TextStyle(fontSize: h * 0.32))),
+      ]);
+    }),
+  );
+
+  /// The picture of «اتعلّم»: an open book with the first things a child learns floating over it.
+  Widget _learnArt(double h) => SizedBox(
+    height: h,
+    child: Image.asset('assets/games/learn_lang/mode_learn.webp', height: h, fit: BoxFit.contain, errorBuilder: (_, _, _) {
+      Widget bubble(String e) => Container(
+        width: h * 0.34,
+        height: h * 0.34,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: const [BoxShadow(color: Color(0x44000000), blurRadius: 4, offset: Offset(0, 3))]),
+        child: Text(e, style: TextStyle(fontSize: h * 0.2)),
+      );
+      return Column(mainAxisSize: MainAxisSize.min, children: [
+        Row(mainAxisSize: MainAxisSize.min, children: [bubble('🔤'), SizedBox(width: h * 0.06), bubble('🔢'), SizedBox(width: h * 0.06), bubble('🦁')]),
+        Text('📖', style: TextStyle(fontSize: h * 0.5, height: 1.0)),
+      ]);
+    }),
+  );
+
+  Widget _option({required Key key, required double width, required bool short, required Widget art, required String emoji, required String title, required String sub, required Color color, required VoidCallback onTap}) => Semantics(
     button: true,
     label: title,
     child: InkWell(
@@ -439,8 +482,8 @@ class _LearnModeScreenState extends State<LearnModeScreen> {
           boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 12, offset: Offset(0, 7))],
         ),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text(emoji, style: TextStyle(fontSize: short ? 40 : 64, height: 1.1)),
-          const SizedBox(height: 6),
+          FittedBox(fit: BoxFit.scaleDown, child: art),
+          const SizedBox(height: 8),
           Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: short ? 24 : 30, fontWeight: FontWeight.w900, color: Colors.white)),
           const SizedBox(height: 6),
           Text(sub, textAlign: TextAlign.center, style: TextStyle(fontSize: short ? 12.5 : 15, fontWeight: FontWeight.w600, color: Colors.white, height: 1.25)),

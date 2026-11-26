@@ -175,6 +175,10 @@ void main() {
     expect(LearnPickVoice.gate, endsWith('learn_pick/gate.mp3'));
     for (final l in ['ar', 'en', 'de', 'fr']) { expect(LearnPickVoice.mode(l), endsWith('learn_pick/mode_$l.mp3')); }
     expect(File('assets/audio/voices/learn_pick/README.txt').existsSync(), isTrue);
+    // the owner's recordings (2026-11-26): five clips, each a few seconds long
+    for (final f in ['gate', 'mode_ar', 'mode_en', 'mode_de', 'mode_fr']) {
+      expect(File('assets/audio/voices/learn_pick/$f.mp3').lengthSync(), greaterThan(20000), reason: f);
+    }
     expect(File('pubspec.yaml').readAsStringSync(), contains('- assets/audio/voices/learn_pick/'));
   });
 

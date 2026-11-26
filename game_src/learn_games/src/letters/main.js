@@ -679,6 +679,7 @@ class Game {
 
   _levels() {
     const sh = this.sh;
+    if (/[?&]debug/.test(location.search)) window.__lw = this; // test hook (see _begin)
     this._clearRound();
     sh.clear();
     this.st.mode = 'menu';
@@ -698,7 +699,13 @@ class Game {
     });
     const mapArt = this._learnEn() && list[0].art ? `background:linear-gradient(rgba(40,30,90,.10),rgba(40,30,90,.10)),url(${sh.base}art/${list[0].art.map}.webp) center/cover no-repeat;` : '';
     const oldCard = h('div', { class: 'lk-dim', style: mapArt + 'background-color:rgba(40,30,90,.18)' }, h('div', { class: `lw-card${this._learnEn() ? ' lw-en' : ''}` }, h('div', { class: 'lw-title' }, this._learnFr() ? 'Choisis un jeu 🎧' : this._learnDe() ? 'Such ein Spiel aus 🎧' : this._learnEn() ? 'Pick a game 🎧' : sh.t('pick')), h('div', { class: 'lw-grid' }, tiles)));
-    if (this._learnEn()) { sh.layer.append(oldCard); this.owl.act('cheer'); this.owl.look(0); return; } // English: its own simple list of levels
+    if (this._learnEn()) {
+      sh.layer.append(oldCard);
+      this.owl.act('cheer');
+      this.owl.look(0);
+      if (!this._askedResume && (this.save.lw.history || []).length && this.save.lw.last) { this._askedResume = true; setTimeout(() => this._resumeChoice(), 600); }
+      return;
+    } // English / German / French: their own simple list of levels
     // the owner's picture of the levels page (2026-11-13): shown when its file is there, otherwise the card above
     const topBar = sh.layer.querySelector('.lk-top');
     const img = new Image();
@@ -773,21 +780,29 @@ class Game {
 
   /** On opening: continue after the last level played, or start again from the first one. */
   _resumeChoice() {
-    const sh = this.sh;
+    const sh = this.sh, lang = this._lang();
     if (this.st.mode !== 'menu') return;
-    const en = sh.T.lang === 'en';
-    const idx = this._list().findIndex((l) => l.id === this.save.lw.last);
-    const next = this._list()[(idx + 1) % this._list().length];
-    const last = this._list()[idx];
+    const list = this._list();
+    const idx = list.findIndex((l) => l.id === this.save.lw.last);
+    const last = list[idx];
     if (!last) return;
+    const next = list[(idx + 1) % list.length];
+    const T = {
+      ar: ['أهلاً بيك تاني!', 'إيه رأيك تكمّل من مكان ما كنت واقف، ولا تبدأ من الأول؟', `آخر مرة لعبت: ${last.ar}`, `▶ كمّل: ${next.ar}`, '↺ ابدأ من الأول', 'هاختار مستوى'],
+      en: ['Welcome back!', 'How about continuing where you stopped, or starting from the beginning?', `Last time: ${last.ar}`, `▶ Continue: ${next.ar}`, '↺ Start from the beginning', 'Choose a level'],
+      de: ['Willkommen zurück!', 'Möchtest du dort weitermachen, wo du aufgehört hast, oder von vorne anfangen?', `Letztes Mal: ${last.ar}`, `▶ Weiter: ${next.ar}`, '↺ Von vorne anfangen', 'Level auswählen'],
+      fr: ['Bon retour !', "Tu veux continuer là où tu t'es arrêté, ou recommencer depuis le début ?", `La dernière fois : ${last.ar}`, `▶ Continuer : ${next.ar}`, '↺ Recommencer depuis le début', 'Choisir un niveau'],
+    }[lang];
     const box = h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.45);z-index:30' },
-      h('div', { class: 'lw-card' },
-        h('div', { class: 'lw-title' }, en ? 'Welcome back!' : 'أهلاً بيك تاني!'),
-        h('div', { class: 'lw-sub' }, en ? `Last time: ${last.ar}` : `آخر مرة لعبت: ${last.ar}`),
-        h('button', { class: 'lw-choice', onclick: () => { box.remove(); sh.sound.play('tap'); this._enter(next.id); } }, en ? `▶ Continue: ${next.ar}` : `▶ كمّل: ${next.ar}`),
-        h('button', { class: 'lw-choice alt', onclick: () => { box.remove(); sh.sound.play('tap'); this._enter(this._list()[0].id); } }, en ? '↺ Start from the beginning' : '↺ ابدأ من الأول'),
-        h('button', { class: 'lw-moreclose', onclick: () => box.remove() }, en ? 'Choose a level' : 'هاختار مستوى')));
+      h('div', { class: `lw-card lw-resume${lang === 'ar' ? '' : ' ltr'}` },
+        h('div', { class: 'lw-title' }, T[0]),
+        h('div', { class: 'lw-ask' }, T[1]),
+        h('div', { class: 'lw-sub' }, T[2]),
+        h('button', { class: 'lw-choice', onclick: () => { box.remove(); sh.sound.play('tap'); this._enter(next.id); } }, T[3]),
+        h('button', { class: 'lw-choice alt', onclick: () => { box.remove(); sh.sound.play('tap'); this._enter(list[0].id); } }, T[4]),
+        h('button', { class: 'lw-moreclose', onclick: () => box.remove() }, T[5])));
     sh.layer.append(box);
+    sh.speak([{ t: T[1], lang }]); // the owner records it (docs/RESUME_VOICE_LINES.csv); silent until then
   }
 
   /** «تقريري»: games played, stars, and what was learned in each game (kept on the device). */
@@ -1506,7 +1521,7 @@ const CSS = `
 .lw-fade.on{opacity:1}
 .lw-tile:focus-visible{outline:calc(var(--u)*.8) solid #6a3ad0;outline-offset:calc(var(--u)*.6)}
 @media (max-aspect-ratio:1/1){.lw-grid{grid-template-columns:repeat(3,1fr)}}
-.lw-learn{max-width:96%;overflow-x:hidden !important}.lw-lgrid{grid-template-columns:repeat(6,minmax(0,1fr)) !important;max-height:62vh;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}.lw-lsec{min-height:calc(var(--u)*17);padding:calc(var(--u)*1) calc(var(--u)*.5) !important;gap:calc(var(--u)*.4)}.lw-lsec i{font-style:normal;font-size:calc(var(--u)*7)}.lw-lsec span{font-size:calc(var(--u)*3);line-height:1.1;text-align:center}.lw-lsec small{font-size:calc(var(--u)*2.3);opacity:.85}
+.lw-learn{max-width:96%;overflow-x:hidden !important}.lw-lgrid{grid-template-columns:repeat(6,minmax(0,1fr)) !important;max-height:62vh;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}.lw-lsec{min-height:calc(var(--u)*17);padding:calc(var(--u)*1) calc(var(--u)*.5) !important;gap:calc(var(--u)*.4)}.lw-lsec i{font-style:normal;font-size:calc(var(--u)*7)}.lw-lsec span{font-size:calc(var(--u)*2.5);line-height:1.1;text-align:center}.lw-lsec small{font-size:calc(var(--u)*2.3);opacity:.85}
 .lw-ltop{display:flex;align-items:center;justify-content:space-between;gap:calc(var(--u)*1.5);pointer-events:auto}.lw-lprog{flex:1;text-align:center;font-weight:900;font-size:calc(var(--u)*3.6);color:#fff;text-shadow:0 calc(var(--u)*.3) calc(var(--u)*1) rgba(0,0,0,.45);background:rgba(60,40,140,.55);border-radius:999px;padding:calc(var(--u)*.8) calc(var(--u)*3)}
 .lw-lbignum{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-weight:900;color:#3a2a6a;background:radial-gradient(circle at 50% 35%,#fff,#fff7d6);border:calc(var(--u)*1) solid #f5b21a;border-radius:calc(var(--u)*8);padding:calc(var(--u)*1.5) calc(var(--u)*7);box-shadow:0 calc(var(--u)*1.2) 0 #c98a1a,0 calc(var(--u)*2) calc(var(--u)*5) rgba(0,0,0,.3);pointer-events:none;white-space:nowrap;line-height:1.1}.lw-lhit{position:absolute;left:18%;right:18%;top:14%;bottom:30%;background:transparent;border:none;cursor:pointer;pointer-events:auto;z-index:2}
 .lw-lbar{position:absolute;left:0;right:0;bottom:calc(var(--u)*2.5);display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*2.5);pointer-events:auto;z-index:3}.lw-lbar.ltr{direction:ltr}
@@ -1514,7 +1529,25 @@ const CSS = `
 .lw-lnav{font-family:inherit;font-weight:900;font-size:calc(var(--u)*6);width:calc(var(--u)*13);height:calc(var(--u)*13);border-radius:50%;border:calc(var(--u)*.7) solid #fff;color:#fff;background:linear-gradient(180deg,#9a6af0,#6a3ad0);box-shadow:0 calc(var(--u)*.8) 0 #4a2a9a;cursor:pointer}.lw-lnav.go{background:linear-gradient(180deg,#6ae08a,#2fa85a);box-shadow:0 calc(var(--u)*.8) 0 #1a6a3a;width:calc(var(--u)*17);height:calc(var(--u)*17);font-size:calc(var(--u)*8)}.lw-lnav[disabled]{opacity:.35}
 .lw-lcard{max-height:92%;overflow:auto;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*1.5)}.lw-lpicklist{display:flex;flex-wrap:wrap;gap:calc(var(--u)*1.2);justify-content:center;max-height:52vh;overflow:auto}.lw-lpickitem{font-family:inherit;font-weight:900;font-size:calc(var(--u)*3.6);background:#eaf4ff;border:calc(var(--u)*.4) solid #7ab8ff;border-radius:calc(var(--u)*2);padding:calc(var(--u)*1) calc(var(--u)*2.4);cursor:pointer}.lw-lpickitem.on{background:#ffd23a;border-color:#e0a010}
 .lw-lcard .lw-title{font-size:calc(var(--u)*5.4)}.lw-lcard .lk-btn{min-height:calc(var(--u)*8);font-size:calc(var(--u)*4);padding:calc(var(--u)*.6) calc(var(--u)*4)}.lw-lnum{font-weight:900;font-size:calc(var(--u)*7);color:#3a2a6a;background:#fff;border:calc(var(--u)*.6) solid #7ab8ff;border-radius:calc(var(--u)*3);padding:calc(var(--u)*1) calc(var(--u)*4);min-width:calc(var(--u)*40);text-align:center;direction:ltr}.lw-lkeys{display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*1.5)}.lw-lpad{display:grid;grid-template-columns:repeat(3,calc(var(--u)*13));gap:calc(var(--u)*.8);direction:ltr}.lw-lkey{font-family:inherit;font-weight:900;font-size:calc(var(--u)*5);height:calc(var(--u)*8);border-radius:calc(var(--u)*2.4);border:calc(var(--u)*.5) solid #7ab8ff;background:#eaf4ff;color:#3a2a6a;cursor:pointer}.lw-lkey.ok{background:linear-gradient(180deg,#6ae08a,#2fa85a);color:#fff;border-color:#fff}
-.lw-en{direction:ltr}.lw-en .lw-grid{grid-template-columns:repeat(10,minmax(0,1fr))}.lw-en .lw-tile{min-width:0;padding-inline:0}.lw-en .lw-tile span{font-size:calc(var(--u)*2.7)}
+/* the look of the level lists and the sections (owner 2026-11-26): cosy panel, ribbon title, sticker tiles with a colour each */
+.lw-card{background:linear-gradient(180deg,#fffdf2,#ffefc4) !important;border:calc(var(--u)*1) solid #f4b02a !important;box-shadow:0 calc(var(--u)*1.4) 0 #c98a1a,0 calc(var(--u)*3) calc(var(--u)*7) rgba(30,20,70,.42),inset 0 0 0 calc(var(--u)*.6) #fff7d8 !important;padding-top:calc(var(--u)*3) !important}
+.lw-title{background:linear-gradient(180deg,#9a6af0,#5f33cc);padding:calc(var(--u)*.9) calc(var(--u)*8);border-radius:999px;border:calc(var(--u)*.7) solid #fff;box-shadow:0 calc(var(--u)*.8) 0 #3e1f94,0 calc(var(--u)*1.4) calc(var(--u)*3) rgba(0,0,0,.3);font-size:calc(var(--u)*5.6) !important;-webkit-text-stroke:0 !important;text-shadow:0 calc(var(--u)*.5) 0 #3e1f94 !important;margin-top:calc(var(--u)*-1);color:#fff}
+.lw-tile{--c1:#ff8a65;--c2:#f4511e;--cd:#b23a14;background:linear-gradient(180deg,var(--c1),var(--c2)) !important;border:calc(var(--u)*.7) solid #fff !important;border-radius:calc(var(--u)*3.4) !important;box-shadow:0 calc(var(--u)*.9) 0 var(--cd),0 calc(var(--u)*1.4) calc(var(--u)*2.4) rgba(20,30,70,.3) !important;transition:transform .12s}
+.lw-tile:nth-child(8n+2){--c1:#ffd54f;--c2:#f59e0b;--cd:#b87a07}.lw-tile:nth-child(8n+3){--c1:#aed86a;--c2:#43a047;--cd:#2b7a30}.lw-tile:nth-child(8n+4){--c1:#5fd8e8;--c2:#0a9be0;--cd:#0a6fa8}
+.lw-tile:nth-child(8n+5){--c1:#8f9bff;--c2:#5666d8;--cd:#35449a}.lw-tile:nth-child(8n+6){--c1:#cf7fe0;--c2:#9a2bb8;--cd:#661a7e}.lw-tile:nth-child(8n+7){--c1:#ff7fae;--c2:#e0246a;--cd:#a01248}.lw-tile:nth-child(8n+8){--c1:#46d6c4;--c2:#0c9686;--cd:#0a5f55}
+.lw-tile:hover{transform:translateY(calc(var(--u)*-.5)) scale(1.03)}
+.lw-tile i:not(.lw-ic){background:rgba(255,255,255,.93);border-radius:50%;width:calc(var(--u)*9.4);height:calc(var(--u)*9.4);display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*5.6) !important;box-shadow:inset 0 calc(var(--u)*-.5) 0 rgba(0,0,0,.08),0 calc(var(--u)*.3) calc(var(--u)*.8) rgba(0,0,0,.2)}
+.lw-tile span{overflow-wrap:break-word;hyphens:auto;max-width:100%;color:#fff;font-weight:900;-webkit-text-stroke:calc(var(--u)*.45) rgba(0,0,0,.38);paint-order:stroke fill;text-shadow:0 calc(var(--u)*.35) 0 rgba(0,0,0,.28);letter-spacing:.01em}
+.lw-tile b{background:#fff !important;color:var(--cd) !important;width:calc(var(--u)*5.2);height:calc(var(--u)*5.2);display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*3.1) !important;box-shadow:0 calc(var(--u)*.3) calc(var(--u)*.6) rgba(0,0,0,.25);top:calc(var(--u)*.7) !important;left:calc(var(--u)*.9) !important}
+.lw-tile u{top:calc(var(--u)*.5);bottom:auto !important;right:calc(var(--u)*.7) !important;font-size:calc(var(--u)*4.6) !important;filter:drop-shadow(0 calc(var(--u)*.3) calc(var(--u)*.4) rgba(0,0,0,.4))}
+.lw-tile.done{box-shadow:0 calc(var(--u)*.9) 0 var(--cd),0 0 0 calc(var(--u)*.7) #ffd23a,0 calc(var(--u)*1.4) calc(var(--u)*2.4) rgba(20,30,70,.3) !important}
+.lw-tile.lock{--c1:#d8d8e4;--c2:#a8a8b8;--cd:#7a7a8a}
+.lw-lsec small{background:rgba(255,255,255,.85);color:var(--cd);border-radius:999px;padding:0 calc(var(--u)*1.2);font-weight:900;opacity:1 !important}
+.lw-resume{width:min(92%,calc(var(--u)*60)) !important;max-width:none !important}.lw-resume .lw-title{font-size:calc(var(--u)*4.6) !important;white-space:nowrap;padding-inline:calc(var(--u)*5)}.lw-ask{font-size:calc(var(--u)*3.8);font-weight:900;color:#4a2a9a;text-align:center;line-height:1.35;margin-top:calc(var(--u)*1)}
+.lw-choice{font-size:calc(var(--u)*3.6) !important;padding:calc(var(--u)*1.8) calc(var(--u)*3) !important;border:calc(var(--u)*.5) solid #fff !important;box-shadow:0 calc(var(--u)*.8) 0 #1a7a3a,0 calc(var(--u)*1.2) calc(var(--u)*2) rgba(0,0,0,.25) !important}.lw-choice.alt{box-shadow:0 calc(var(--u)*.8) 0 #1a6ab8,0 calc(var(--u)*1.2) calc(var(--u)*2) rgba(0,0,0,.25) !important}
+.lw-card.ltr{direction:ltr}
+.lw-en .lw-lgrid{grid-template-columns:repeat(7,minmax(0,1fr)) !important}.lw-en .lw-lsec span{font-size:calc(var(--u)*1.95)}.lw-en .lw-grid:not(.lw-lgrid) .lw-tile{height:calc(var(--u)*15.5);min-height:80px}
+.lw-en{direction:ltr}.lw-en .lw-grid{grid-template-columns:repeat(8,minmax(0,1fr))}.lw-en .lw-tile{min-width:0;padding-inline:0}.lw-en .lw-tile span{font-size:calc(var(--u)*2.7)}
 @media (max-aspect-ratio:1/1){.lw-en .lw-grid{grid-template-columns:repeat(3,1fr)}}
 `;
 
