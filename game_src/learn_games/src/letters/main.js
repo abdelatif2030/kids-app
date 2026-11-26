@@ -366,7 +366,8 @@ class Game {
         const a = makeThing(show.thing || 'apple');
         a.scale.setScalar(size);
         const r = Math.floor(k / cols), c = k % cols;
-        a.position.set((c - (cols - 1) / 2) * 0.62 * size + (r % 2) * 0.12, 0.76, (r - (rows - 1) / 2) * 0.52 * size);
+        const sp = show.spread || 1; // the counting pictures stand further apart so each one can be counted
+        a.position.set((c - (cols - 1) / 2) * 0.62 * size * sp + (r % 2) * 0.12, 0.76, (r - (rows - 1) / 2) * 0.52 * size * sp);
         g.add(a);
         apples.push(a);
       }
@@ -638,7 +639,7 @@ class Game {
       say = it.parts.map((p) => ({ t: p, lang: it.lang }));
       slow = say;
     }
-    const q = [...say, ...slow, ...say, ...it.sentence];
+    const q = it.once ? [...say, ...it.sentence] : [...say, ...slow, ...say, ...it.sentence];
     if (withIntro) { const L = this._L; q.unshift({ t: L.sec.name, lang: this._lang() }, { t: learnLine('start', this._lang()), lang: this._lang() }); }
     return q;
   }
@@ -651,7 +652,8 @@ class Game {
     this.st.mode = 'learn';
     sh.sound.setMode('play');
     const isNum = L.sec.kind === 'numbers';
-    this._showStand(isNum ? null : { ...it.show, big: 1.9 }); // a number is a big sign of the page (any length), the rest stands on the table
+    const textOnly = isNum || it.display === 'text';
+    this._showStand(textOnly ? null : { big: 1.9, ...it.show }); // a number is a big sign of the page (any length), the rest stands on the table
     const last = isNum ? nextNumber(L.num) == null : L.i >= L.sec.items.length - 1;
     const first = isNum ? L.num <= 0 : L.i <= 0;
     const pos = isNum ? '' : `${L.i + 1} / ${L.sec.items.length}`;
@@ -672,6 +674,8 @@ class Game {
         h('button', { class: 'lk-rbtn y', 'aria-label': 'pick', onclick: () => { sh.sound.play('tap'); this._learnPick(); } }, isNum ? '🔢' : '🔎'),
         sh.soundBtn()),
       isNum ? h('div', { class: 'lw-lbignum', dir: 'ltr', style: `font-size:calc(var(--u)*${it.label.length <= 3 ? 24 : it.label.length <= 5 ? 19 : 14})` }, it.label) : null,
+      !isNum && it.display === 'text' ? h('div', { class: 'lw-lbignum', dir: lang === 'ar' ? 'rtl' : 'ltr', style: `font-size:calc(var(--u)*${it.fs || Math.max(7, Math.min(22, 70 / Math.max(3, it.text.length)))})` }, it.text) : null,
+      it.caption ? h('div', { class: 'lw-lcap', dir: lang === 'ar' ? 'rtl' : 'ltr' }, it.caption) : null,
       h('button', { class: 'lw-lhit', 'aria-label': 'next', onclick: () => go(1) }),
       h('div', { class: `lw-lbar${lang === 'ar' ? '' : ' ltr'}` },
         h('button', { class: 'lw-lnav', 'aria-label': 'previous', disabled: first || null, onclick: () => go(-1) }, lang === 'ar' ? '▶' : '◀'),
@@ -1567,6 +1571,7 @@ const CSS = `
 .lw-ltop{display:flex;align-items:center;justify-content:space-between;gap:calc(var(--u)*1.5);pointer-events:auto}.lw-lprog{flex:1;text-align:center;font-weight:900;font-size:calc(var(--u)*3.6);color:#fff;text-shadow:0 calc(var(--u)*.3) calc(var(--u)*1) rgba(0,0,0,.45);background:rgba(60,40,140,.55);border-radius:999px;padding:calc(var(--u)*.8) calc(var(--u)*3)}
 .lw-lbignum{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-weight:900;color:#3a2a6a;background:radial-gradient(circle at 50% 35%,#fff,#fff7d6);border:calc(var(--u)*1) solid #f5b21a;border-radius:calc(var(--u)*8);padding:calc(var(--u)*1.5) calc(var(--u)*7);box-shadow:0 calc(var(--u)*1.2) 0 #c98a1a,0 calc(var(--u)*2) calc(var(--u)*5) rgba(0,0,0,.3);pointer-events:none;white-space:nowrap;line-height:1.1}/* the pick pad and the end card must sit ABOVE the full-screen next button (z-index 2), else a tap on a key advances the number and closes the pad (owner 2026-11-26) */
 .lw-lpick,.lw-ldone{z-index:5}
+.lw-lcap{position:absolute;left:50%;top:15%;transform:translateX(-50%);width:max-content;max-width:90%;text-align:center;font-weight:900;color:#3a2a6a;background:#fff;border:calc(var(--u)*.7) solid #6a3ad0;border-radius:calc(var(--u)*3);padding:calc(var(--u)*1) calc(var(--u)*2.4);font-size:calc(var(--u)*4.4);box-shadow:0 calc(var(--u)*.7) 0 #4a2a9a;z-index:1;pointer-events:none;line-height:1.25}
 .lw-lhit{position:absolute;left:18%;right:18%;top:14%;bottom:30%;background:transparent;border:none;cursor:pointer;pointer-events:auto;z-index:2}
 .lw-lbar{position:absolute;left:0;right:0;bottom:calc(var(--u)*2.5);display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*2.5);pointer-events:auto;z-index:3}.lw-lbar.ltr{direction:ltr}
 .lw-lsign{display:flex;align-items:center;gap:calc(var(--u)*2.5);background:#fff;border:calc(var(--u)*.7) solid #6a3ad0;border-radius:calc(var(--u)*4);padding:calc(var(--u)*1.2) calc(var(--u)*3);box-shadow:0 calc(var(--u)*.8) 0 #4a2a9a;max-width:60vw}.lw-lsign b{font-size:calc(var(--u)*6);color:#3a2a6a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

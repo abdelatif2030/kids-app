@@ -8,6 +8,7 @@ import { LETTERS } from '../letters/sim.js';
 import { numberWord } from '../letters/numbers.js';
 import { numberWords, numberSequence } from './numbers.js';
 import { colorOf } from '../letters/colors.js';
+import { EXTRA_DEFS } from './extra.js';
 
 export const LANGS = ['ar', 'en', 'de', 'fr'];
 const WORDS = { en: EN, de: DE, fr: FR };
@@ -129,9 +130,14 @@ export function formatNumber(n, lang) {
 /** All the sections of a language with at least [min] items. `numbers` has no list: it is a walk (see numberSequence). */
 export function learnSections(lang, min = 4) {
   const out = [];
-  for (const def of SECTION_DEFS) {
+  // the order: the basics, then counting right after the numbers, and the newer kinds (sentences, stories, reading, sounds, marks) at the end
+  const defs = [];
+  for (const d of SECTION_DEFS) { defs.push(d); if (d.id === 'numbers') defs.push(...EXTRA_DEFS.filter((x) => x.after)); }
+  defs.push(...EXTRA_DEFS.filter((x) => !x.after));
+  for (const def of defs) {
     let items;
-    if (def.kind === 'numbers') items = numberSequence(100000).map((n) => numberItem(n, lang));
+    if (def.build) items = def.build(lang);
+    else if (def.kind === 'numbers') items = numberSequence(100000).map((n) => numberItem(n, lang));
     else if (def.kind === 'letters') items = letterItems(lang);
     else items = wordItems(def, lang);
     if (items.length >= min) out.push({ id: def.id, emoji: def.emoji, name: sectionName(def, lang), nameAr: def.name[0], kind: def.kind || 'words', items });

@@ -5,6 +5,7 @@ import { numberWords, numberSequence, nextNumber, prevNumber, numberPartsNeeded 
 import { learnSections, numberItem, formatNumber, LANGS } from '../src/learn/sections.js';
 import { numberWord } from '../src/letters/numbers.js';
 
+const EXTRA_IDS = new Set(['count', 'ordinals', 'sentences', 'story1', 'story2', 'story3', 'story4', 'story5', 'sight', 'phonics', 'harakat', 'forms']);
 const T = (n, l) => numberWords(n, l).text;
 
 test('number words: spot checks in the four languages', () => {
@@ -67,7 +68,7 @@ test('sections: every language has the big ones, every item is complete and has 
       assert.ok(s.items.length >= 4, `${l} ${s.id}`);
       const keys = new Set();
       for (const it of s.items) {
-        assert.ok(it.label && it.show && it.say.length && it.say[0].t, `${l} ${s.id} ${it.key}`);
+        assert.ok(it.label && (it.show || it.display === 'text') && it.say.length && it.say[0].t, `${l} ${s.id} ${it.key}`);
         assert.ok(!keys.has(it.key), `duplicate ${it.key}`); keys.add(it.key);
       }
     }
@@ -128,7 +129,7 @@ test('the Arabic names of the section items now have their recordings (the owner
   const { clipId } = await import('../src/kit/voice.js');
   let missing = [];
   for (const s of learnSections('ar')) for (const it of s.items) for (const x of [...it.say, ...it.sentence]) {
-    if (s.id === 'letters' || s.id === 'numbers') continue;
+    if (s.id === 'letters' || s.id === 'numbers' || EXTRA_IDS.has(s.id)) continue; // the newer kinds have their own list of lines to record
     if (!fs.existsSync(new URL(`../../../assets/games/learn_voice/ar/${clipId(x.t, 'ar')}.mp3`, import.meta.url))) missing.push(x.t);
   }
   assert.ok(missing.length < 40, `missing ${missing.length}: ${missing.slice(0, 5)}`);
@@ -137,4 +138,27 @@ test('the Arabic names of the section items now have their recordings (the owner
 test('the number pad and the end card sit above the full-screen next button (a tap on a key used to close the pad)', () => {
   const src = fs.readFileSync(new URL('../src/letters/main.js', import.meta.url), 'utf8');
   assert.ok(src.includes('.lw-lpick,.lw-ldone{z-index:5}') && src.includes("'lk-dim lw-ldone'") && /\.lw-lhit\{[^}]*z-index:2\}/.test(src));
+});
+
+test('the six newer kinds of sections exist (counting, ordinals, sentences, stories, reading words, letter sounds, Arabic marks and forms)', () => {
+  const ids = (l) => learnSections(l).map((s) => s.id);
+  for (const l of LANGS) for (const id of ['count', 'ordinals', 'sentences', 'story1', 'story2', 'story3', 'story4', 'story5', 'sight']) assert.ok(ids(l).includes(id), `${l} ${id}`);
+  for (const l of ['en', 'de', 'fr']) assert.ok(ids(l).includes('phonics'), l);
+  assert.ok(ids('ar').includes('harakat') && ids('ar').includes('forms') && !ids('en').includes('harakat'));
+  const sec = (l, id) => learnSections(l).find((s) => s.id === id);
+  assert.equal(sec('en', 'count').items[2].say.length, 3); // counting aloud: one, two, three
+  assert.equal(sec('en', 'count').items[2].show.n, 3);
+  assert.equal(sec('de', 'ordinals').items[0].text, '1.');
+  assert.equal(sec('fr', 'ordinals').items[0].text, '1er');
+  for (const l of LANGS) for (let k = 1; k <= 5; k++) assert.equal(sec(l, 'story' + k).items.length, 4, `${l} story${k}`);
+  assert.equal(sec('en', 'phonics').items[0].say[0].t, 'ah');
+});
+
+test('every picture the new sections use exists in the art folder', () => {
+  const missing = new Set();
+  for (const l of LANGS) for (const s of learnSections(l)) for (const it of s.items) {
+    const t = it.show && it.show.thing;
+    if (t && /^[a-z]_/.test(t) && !fs.existsSync(new URL(`../../../assets/games/art/${t}.webp`, import.meta.url))) missing.add(t); // ids like fish / cat are drawn in code
+  }
+  assert.deepEqual([...missing], []);
 });
