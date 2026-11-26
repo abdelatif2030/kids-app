@@ -44,16 +44,17 @@ function snowPts() { const n = 180, pos = new Float32Array(n * 3); for (let i = 
 
 export class View3D {
   constructor() {
-    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true, alpha: false }), { preset: 'fresh', tune: { bloom: [0.35, 0.5, 0.82] } });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true, alpha: false }), { preset: 'night', tune: { bloom: [0.3, 0.5, 0.88], exposure: 1.1, vig: 0.4 } });
     this.dom = this.renderer.domElement; this.dom.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block';
     this.scene = new THREE.Scene(); this.scene.background = skyTex(); 
     this.cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 800);
-    this.scene.add(new THREE.HemisphereLight(0xdfeaff, 0x6a7aaa, 1.8)); const sun = new THREE.DirectionalLight(0xdfeaff, 1.7); sun.position.set(-20, 40, 30); this.scene.add(sun);
+    this.scene.add(new THREE.HemisphereLight(0xb8c8ff, 0x5a5a9a, 1.25)); const sun = new THREE.DirectionalLight(0xffe0c0, 1.5); sun.position.set(-20, 40, 30); this.scene.add(sun);
     this.W = 1; this.H = 1; this.u = 1; this.wood = woodTex(); this.tiles = new Map(); this.key = '';
-    this.ground = add(this.scene, G.box, M(0xeaf4ff, 0, 0, { r: 0.95 }), 0, -1.2, 0, 400, 2, 400);
+    this.ground = add(this.scene, G.box, M(0xa4b2e0, 0, 0, { r: 0.95 }), 0, -1.2, 0, 400, 2, 400);
     for (let i = 0; i < 26; i++) { const a = i * 2.4, rr = 46 + (i % 5) * 9; const p = pine(10 + (i % 4) * 4); p.position.set(Math.cos(a) * rr * 1.5, 0, Math.sin(a) * rr * 0.9 - 30); this.scene.add(p); (this.pines = this.pines || []).push(p); }
     for (let i = 0; i < 14; i++) add(this.scene, G.sph, M(0xffffff, 0, 0, { r: 0.95 }), -90 + i * 14, 0, -48 + (i % 3) * 6, 22, 8, 14);
     this.moon = add(this.scene, G.sph, new THREE.MeshBasicMaterial({ color: 0xfff6d8 }), 60, 70, -150, 16); add(this.scene, G.sph, new THREE.MeshBasicMaterial({ color: 0xfff6d8, transparent: true, opacity: 0.18 }), 60, 70, -151, 28);
+    this.cabin = grp(this.scene, 0, 0, 0); add(this.cabin, G.box, M(0x8a5a2c, 0, 0, { r: 0.8 }), 0, 7, 0, 26, 14, 18); const rf = add(this.cabin, G.cone, M(0xf4f8ff, 0, 0, { r: 0.9 }), 0, 18, 0, 34, 10, 34); rf.scale.set(34, 10, 24); rf.rotation.y = Math.PI / 4; for (const wx of [-6, 6]) add(this.cabin, G.box, M(0xffd070, 0xffb040, 1.6), wx, 8, 9.2, 5, 5, 0.6); add(this.cabin, G.box, M(0x4a2a10, 0, 0, { r: 0.8 }), 0, 4, 9.2, 5, 8, 0.6);
     this.snow = snowPts(); this.scene.add(this.snow);
     this.boardG = new THREE.Group(); this.scene.add(this.boardG);
     this.portal = grp(this.scene); this.rings = [0, 1, 2].map((i) => { const r = add(this.portal, G.tor, M(i % 2 ? 0xff7ad8 : 0x7affd8, i % 2 ? 0xff40c0 : 0x40ffc0, 1.6), 0, 0, 0, 1, 1, 1); r.userData.i = i; return r; }); this.pcore = add(this.portal, G.disc, new THREE.MeshBasicMaterial({ color: 0xc8f0ff, transparent: true, opacity: 0.7, side: THREE.DoubleSide }), 0, 0, 0, 1, 1, 1);
@@ -107,6 +108,7 @@ export class View3D {
     this.rings.forEach((r, i) => { r.rotation.z = tm * (1.5 + i * 0.7) * (i % 2 ? -1 : 1); r.rotation.x = Math.sin(tm * 2 + i) * 0.25; const k = 1 - i * 0.22; r.scale.set(k * 1.6, k * 1.6, k * 1.6); });
     this.pcore.rotation.z = tm; this.pcore.scale.setScalar(1.3 + Math.sin(tm * 3) * 0.1);
     // dragon
+    this.cabin.position.set(this.X(this.W * 0.87), 0, this.Z(this.H * 0.45)); this.cabin.scale.setScalar(0.6);
     const D = this.dragon; const sc = (L ? L.s / U : 30) * 0.85; D.g.visible = !(travel && travel.t > 1.05);
     const segs = D.P.segs; const pts = trailPx && trailPx.length > 1 ? trailPx.map(([x, y]) => new THREE.Vector3(this.X(x), 3.2 * sc * 0.4, this.Z(y))) : null;
     if (pts) { const dist = sc * 0.9; segs.forEach((sg, i) => { const q = pts[Math.min(pts.length - 1, Math.floor(i * pts.length / 8))]; sg.position.copy(q); sg.scale.setScalar(sc); }); const a = pts[0], b = pts[Math.min(pts.length - 1, 2)]; segs[0].rotation.y = Math.atan2(a.x - b.x, a.z - b.z); void dist; }

@@ -48,3 +48,4 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 ## frost_coil (three.js rebuild, WIP)
 - Ortho tilted camera, snowy valley, 3D ice tubes, wooden board, ice dragon. Fog removed (it washed the board out). Dragon enlarged (reads well now). Clip NOT sent yet. TODO: richer sky/aurora, check travel/win screens, record BEFORE/AFTER.
 - frost_coil clip (BEFORE/AFTER) HELD, not a clear leap: BEFORE has cabin, dusk mood and a cute dragon; AFTER is pale/washed, lost the cabin, no motion in idle. TODO: restore dusk sky + cabin + aurora in 3D, darker richer grade, animate idle dragon, fix blank HUD title bars (white strips on top of HUD).
+- frost_coil v3: cooler dusk grade + cabin added; cabin roof shape off (use a proper gable), HUD title strips still blank white bars, sky/aurora never visible (ground covers view). Still held; low priority vs other games.
