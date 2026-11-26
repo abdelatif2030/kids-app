@@ -38,3 +38,4 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 - sky_jumper: refined face/single creature pushed (2e5b297e). Not resent: still not a clear leap vs BEFORE hero art (bigger hero + better bot needed). TODO next pass: hero scale up, richer platforms, use existing background images. Next games: card_battle, castaway_raft, chomp_maze.
 
 - chomp_maze: three.js neon-candy board rebuilt (view3d.js). Renders and plays, npm test 0 fail. Chomper and ghosts are too small at gameplay distance, board too wide. TODO: tighter camera following the chomper, bigger chomper, then BEFORE/AFTER clip. Not sent.
+- chomp_maze: follow camera + bigger chomper, clip sent (b003c522). Next: card_battle, castaway_raft.
