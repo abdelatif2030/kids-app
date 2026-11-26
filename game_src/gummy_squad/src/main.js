@@ -634,7 +634,7 @@ class Game {
     this.camTarget.x += (tx - this.camTarget.x) * Math.min(1, dt * 5); this.camTarget.z += (tz - this.camTarget.z) * Math.min(1, dt * 5);
     this.shake = Math.max(0, this.shake - dt * 2.2);
     const sh = this.shake * 0.45;
-    const d = fit.d;
+    const d = fit.d * 0.86;
     c.position.set(this.camTarget.x + (Math.random() - 0.5) * sh, Math.sin(fit.e) * d, this.camTarget.z + Math.cos(fit.e) * d + (Math.random() - 0.5) * sh);
     c.lookAt(this.camTarget.x, 0, this.camTarget.z);
   }
