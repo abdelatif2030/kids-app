@@ -89,8 +89,11 @@ export class View3D {
     if (this.key !== g || this.wc !== wallColor) { this.key = g; this.wc = wallColor; this._build(g, new THREE.Color(wallColor).getHex()); }
     const cx = g.w / 2, cz = g.h / 2; const t = Math.tan((this.camera.fov * Math.PI) / 360); const asp = this.camera.aspect;
     const pitch = 1.08;
-    const d = Math.max((g.h * 0.78) / (2 * t), (g.w * 0.62) / (2 * t * asp)) * 1.12;
-    this.camera.position.set(cx, Math.sin(pitch) * d, cz + Math.cos(pitch) * d + 0.3); this.camera.lookAt(cx, 0, cz - g.h * topPad * -0.0);
+    const dFull = Math.max((g.h * 0.78) / (2 * t), (g.w * 0.62) / (2 * t * asp)) * 1.12; const d = Math.max(9, dFull * 0.55);
+    const tx = g.pm.x + 0.5, tz = g.pm.y + 0.5; if (this.fx === undefined) { this.fx = tx; this.fz = tz; }
+    const k = Math.min(1, dt * 5); this.fx += (tx - this.fx) * k; this.fz += (tz - this.fz) * k;
+    const hx = Math.min(g.w, Math.max(0, this.fx)), hz = this.fz;
+    this.camera.position.set(hx, Math.sin(pitch) * d, hz + Math.cos(pitch) * d + 0.3); this.camera.lookAt(hx, 0, hz - 0.6);
     // dots
     let n = 0; const m = new THREE.Matrix4(), q = new THREE.Quaternion(), p = new THREE.Vector3(), s = new THREE.Vector3(); let ci = 0;
     for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) {
@@ -103,7 +106,7 @@ export class View3D {
     // chomper
     const pm = g.pm; const u = this.pm.userData; const open = (Math.abs(Math.sin(clock * 12)) * 0.5 + 0.05) * (pm.moving ? 1 : 0.35);
     this.pm.visible = !(g.invuln > 0 && Math.floor(clock * 10) % 2);
-    this.pm.position.set(pm.x + 0.5, 0.48, pm.y + 0.5); this.pm.scale.setScalar(1.0);
+    this.pm.position.set(pm.x + 0.5, 0.48, pm.y + 0.5); this.pm.scale.setScalar(1.35);
     this.pm.rotation.y = turn(this.pm.rotation.y, DIR[pm.dir] ?? 0, dt * 16);
     u.top.rotation.z = open; u.bot.rotation.z = -open;
     u.body.position.y = Math.abs(Math.sin(clock * 12)) * 0.03 * (pm.moving ? 1 : 0);
