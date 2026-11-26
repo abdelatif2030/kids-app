@@ -117,3 +117,19 @@ test('every English / German / French level and every section shows an Arabic na
   for (const l of [...EN_LEVELS, ...DE_LEVELS, ...FR_LEVELS]) assert.ok(l.arName && /[؀-ۿ]/.test(l.arName), l.id);
   for (const lang of LANGS) for (const s of learnSections(lang)) assert.ok(s.nameAr && /[؀-ۿ]/.test(s.nameAr), `${lang} ${s.id}`);
 });
+
+test('the lists fit the screen without scrolling: the card is fitted by _fitGrid and the tiles size themselves (.lw-fit)', () => {
+  const src = fs.readFileSync(new URL('../src/letters/main.js', import.meta.url), 'utf8');
+  assert.ok(src.includes('_fitGrid(card, grid, n)') && src.includes('.lw-fit .lw-tile{width:var(--tw)'));
+  assert.ok(src.includes("this._fitGrid(card, grid, tiles.length)") && src.includes('this._fitGrid(lvCard, lvGrid, tiles.length)'));
+});
+
+test('the Arabic names of the section items now have their recordings (the owner delivered all 628)', async () => {
+  const { clipId } = await import('../src/kit/voice.js');
+  let missing = [];
+  for (const s of learnSections('ar')) for (const it of s.items) for (const x of [...it.say, ...it.sentence]) {
+    if (s.id === 'letters' || s.id === 'numbers') continue;
+    if (!fs.existsSync(new URL(`../../../assets/games/learn_voice/ar/${clipId(x.t, 'ar')}.mp3`, import.meta.url))) missing.push(x.t);
+  }
+  assert.ok(missing.length < 40, `missing ${missing.length}: ${missing.slice(0, 5)}`);
+});

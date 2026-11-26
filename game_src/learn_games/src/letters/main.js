@@ -571,12 +571,50 @@ class Game {
     const lang = this._lang();
     const tiles = this._learnData().map((s) => h('button', { class: 'lw-tile lw-lsec', 'aria-label': s.name, onclick: () => { sh.sound.play('tap'); this._learnOpen(s.id, 0, true); } },
       h('i', {}, s.emoji), lang !== 'ar' ? h('span', { class: 'lw-bi' }, h('em', {}, s.nameAr), h('small', { dir: 'ltr' }, s.name)) : h('span', {}, s.name), h('small', { dir: 'ltr' }, s.kind === 'numbers' ? '0 → 100 000' : String(s.items.length))));
-    sh.layer.append(h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.18)' }, h('div', { class: `lw-card lw-learn${lang === 'ar' ? '' : ' lw-en'}` },
+    const grid = h('div', { class: 'lw-grid lw-lgrid' }, tiles);
+    const card = h('div', { class: `lw-card lw-learn${lang === 'ar' ? '' : ' lw-en'}` },
       h('div', { class: 'lw-title' }, this._lt('اختار رحلتك 📚', 'Choose your journey 📚', 'Wähle deine Reise 📚', 'Choisis ton voyage 📚')),
       lang !== 'ar' ? h('div', { class: 'lw-arsub' }, 'اختار رحلتك') : null,
-      h('div', { class: 'lw-grid lw-lgrid' }, tiles))));
+      grid);
+    sh.layer.append(h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.18)' }, card));
+    this._fitGrid(card, grid, tiles.length);
     this.owl.act('cheer');
     this.owl.look(0);
+  }
+
+
+  /** Fits [n] tiles into the card with NO scrolling (owner 2026-11-26): the number of columns that makes the tiles biggest for this screen shape;
+   *  the tiles take their size from --tw / --th (see .lw-fit). Re-fits when the window changes. */
+  _fitGrid(card, grid, n) {
+    const sh = this.sh;
+    grid.classList.add('lw-fit');
+    const fit = () => {
+      if (!grid.isConnected) return false;
+      const W = sh.root.clientWidth || 800, H = sh.root.clientHeight || 450;
+      grid.style.display = 'none';
+      const header = card.offsetHeight; // title, sub line and paddings
+      grid.style.display = '';
+      const gap = Math.max(5, Math.round(Math.min(W, H) * 0.014));
+      const dim = card.parentElement, cs = getComputedStyle(dim);
+      const innerH = dim.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom), innerW = dim.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      const availW = Math.min(innerW * 0.96, 1400) - 44, availH = innerH * 0.92 - header - 6; // the card is at most 92% x 96% of the free area
+      let best = null;
+      for (let c = 2; c <= 14; c++) {
+        const rows = Math.ceil(n / c);
+        const tw = Math.min(190, (availW - gap * (c - 1)) / c), th0 = (availH - gap * (rows - 1)) / rows;
+        const th = Math.min(th0, tw * 1.22);
+        const score = Math.min(tw * 1.1, th * 1.1);
+        if (!best || score > best.score) best = { c, tw: Math.min(tw, th * 1.12), th, score };
+      }
+      grid.style.setProperty('--tw', `${Math.floor(best.tw)}px`);
+      grid.style.setProperty('--th', `${Math.floor(best.th)}px`);
+      grid.style.setProperty('grid-template-columns', `repeat(${best.c}, ${Math.floor(best.tw)}px)`, 'important');
+      grid.style.gap = `${gap}px`;
+      return true;
+    };
+    requestAnimationFrame(() => { fit(); });
+    const ro = new ResizeObserver(() => { if (!fit()) ro.disconnect(); });
+    ro.observe(sh.root);
   }
 
   _learnOpen(secId, i, intro) {
@@ -699,9 +737,12 @@ class Game {
       }, lv.art ? h('i', { class: 'lw-ic' }, h('img', { src: `${sh.base}art/${lv.art.icon}.webp`, alt: '' })) : h('i', {}, locked ? '🔒' : lv.emoji), h('b', {}, this._learnEn() ? String(i + 1) : sh.T.num(i + 1)), lv.arName ? h('span', { class: 'lw-bi' }, h('em', {}, lv.arName), h('small', { dir: 'ltr' }, lv.ar)) : h('span', {}, lv.ar), done ? h('u', {}, '⭐') : null);
     });
     const mapArt = this._learnEn() && list[0].art ? `background:linear-gradient(rgba(40,30,90,.10),rgba(40,30,90,.10)),url(${sh.base}art/${list[0].art.map}.webp) center/cover no-repeat;` : '';
-    const oldCard = h('div', { class: 'lk-dim', style: mapArt + 'background-color:rgba(40,30,90,.18)' }, h('div', { class: `lw-card${this._learnEn() ? ' lw-en' : ''}` }, h('div', { class: 'lw-title' }, this._learnFr() ? 'Choisis un jeu 🎧' : this._learnDe() ? 'Such ein Spiel aus 🎧' : this._learnEn() ? 'Pick a game 🎧' : sh.t('pick')), this._learnEn() ? h('div', { class: 'lw-arsub' }, 'اختار لعبة') : null, h('div', { class: 'lw-grid' }, tiles)));
+    const lvGrid = h('div', { class: 'lw-grid' }, tiles);
+    const lvCard = h('div', { class: `lw-card${this._learnEn() ? ' lw-en' : ''}` }, h('div', { class: 'lw-title' }, this._learnFr() ? 'Choisis un jeu 🎧' : this._learnDe() ? 'Such ein Spiel aus 🎧' : this._learnEn() ? 'Pick a game 🎧' : sh.t('pick')), this._learnEn() ? h('div', { class: 'lw-arsub' }, 'اختار لعبة') : null, lvGrid);
+    const oldCard = h('div', { class: 'lk-dim', style: mapArt + 'background-color:rgba(40,30,90,.18)' }, lvCard);
+    const mountOld = () => { sh.layer.append(oldCard); this._fitGrid(lvCard, lvGrid, tiles.length); };
     if (this._learnEn()) {
-      sh.layer.append(oldCard);
+      mountOld();
       this.owl.act('cheer');
       this.owl.look(0);
       if (!this._askedResume && (this.save.lw.history || []).length && this.save.lw.last) { this._askedResume = true; setTimeout(() => this._resumeChoice(), 600); }
@@ -713,7 +754,7 @@ class Game {
     img.className = 'lw-pic-img';
     img.alt = '';
     img.onload = () => { if (this.st.mode === 'menu') { if (topBar) topBar.remove(); sh.layer.append(this._levelsPicture(img, list)); } };
-    img.onerror = () => { if (this.st.mode === 'menu') sh.layer.append(oldCard); };
+    img.onerror = () => { if (this.st.mode === 'menu') mountOld(); };
     img.src = `${sh.base}../art/levels_page.webp`;
     this.owl.act('cheer');
     this.owl.look(0);
@@ -1549,6 +1590,17 @@ const CSS = `
 .lw-bi{display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.2);width:100%}.lw-bi em{font-style:normal;font-size:calc(var(--u)*3.3);line-height:1.1;font-weight:900;direction:rtl}.lw-bi small{font-size:calc(var(--u)*1.9);font-weight:800;opacity:.95;line-height:1.05;-webkit-text-stroke:0;text-shadow:0 calc(var(--u)*.25) 0 rgba(0,0,0,.3)}
 .lw-arsub{font-weight:900;color:#5a3a9a;font-size:calc(var(--u)*3.6);margin-top:calc(var(--u)*-.6);direction:rtl}
 .lw-en .lw-tile span.lw-bi{font-size:0}.lw-en .lw-lsec span.lw-bi{font-size:0}
+/* tiles that fit the screen without scrolling (owner 2026-11-26): everything in a tile is in proportion to its height */
+.lw-grid.lw-fit{max-height:none !important;overflow:visible !important;justify-content:center;grid-auto-rows:var(--th)}
+.lw-fit .lw-tile{width:var(--tw) !important;height:var(--th) !important;min-width:0 !important;min-height:0 !important;padding:calc(var(--th)*.04) calc(var(--tw)*.03) !important;gap:calc(var(--th)*.02);border-radius:calc(var(--th)*.16) !important}
+.lw-fit .lw-tile i:not(.lw-ic){width:calc(var(--th)*.4);height:calc(var(--th)*.4);font-size:calc(var(--th)*.24) !important}
+.lw-fit .lw-tile i.lw-ic{width:calc(var(--th)*.42) !important;height:calc(var(--th)*.42) !important}
+.lw-fit .lw-tile span{font-size:calc(var(--th)*.15) !important}
+.lw-fit .lw-bi em{font-size:calc(var(--th)*.16) !important}.lw-fit .lw-bi small{font-size:calc(var(--th)*.095) !important}
+.lw-fit .lw-tile b{width:calc(var(--th)*.2) !important;height:calc(var(--th)*.2) !important;font-size:calc(var(--th)*.12) !important}
+.lw-fit .lw-tile u{font-size:calc(var(--th)*.2) !important}
+.lw-fit .lw-lsec small{font-size:calc(var(--th)*.1) !important;padding:0 calc(var(--th)*.06)}
+.lw-card:has(.lw-fit){overflow:hidden !important}
 .lw-card.ltr{direction:ltr}
 .lw-en .lw-lgrid{grid-template-columns:repeat(7,minmax(0,1fr)) !important}.lw-en .lw-lsec span{font-size:calc(var(--u)*1.95)}.lw-en .lw-grid:not(.lw-lgrid) .lw-tile{height:calc(var(--u)*18);min-height:84px}
 .lw-en{direction:ltr}.lw-en .lw-grid{grid-template-columns:repeat(8,minmax(0,1fr))}.lw-en .lw-tile{min-width:0;padding-inline:0}.lw-en .lw-tile span{font-size:calc(var(--u)*2.7)}
