@@ -5,7 +5,7 @@
 import * as THREE from 'three';
 import { polishRenderer } from './polish.js';
 
-const TAU = Math.PI * 2, EL = (52 * Math.PI) / 180, SIN = Math.sin(EL), COS = Math.cos(EL);
+const TAU = Math.PI * 2, EL = (38 * Math.PI) / 180, SIN = Math.sin(EL), COS = Math.cos(EL);
 const CELLS = [[1, 1], [0, 1], [1, 2], [0, 2], [1, 0], [0, 0], [2, 1], [2, 2], [2, 0]];
 const G = {
   box: new THREE.BoxGeometry(1, 1, 1), sph: new THREE.SphereGeometry(0.5, 18, 12), cyl: new THREE.CylinderGeometry(0.5, 0.5, 1, 16), cone: new THREE.ConeGeometry(0.5, 1, 14),
@@ -162,7 +162,7 @@ export class View3D {
     if (fl !== this.flags || this.exRs !== this.rs) { this.flags = fl; this.exRs = this.rs; this._extras(v.built); }
     const bob = Math.sin(tm * 1.6) * 0.5; this.raft.position.set(this.X(0.5), bob, this.Z(raftFy)); this.raft.rotation.z = Math.sin(tm * 1.1) * 0.02; this.raft.rotation.x = Math.sin(tm * 0.9) * 0.02;
     const s = this.rs; this.foam.scale.set(s * 3, s * 3, 1); this.foam.position.y = 0.1 - bob;
-    const throwing = v.hook && v.hook.phase === 'out'; const H = this.hero; H.g.position.set(s * 0.1, 1.05, s * 0.4); H.g.scale.setScalar(s * 0.9); const hop = Math.abs(Math.sin(tm * 3));
+    const throwing = v.hook && v.hook.phase === 'out'; const H = this.hero; H.g.position.set(s * 0.1, 1.05, s * 0.4); H.g.scale.setScalar(s * 1.0); const hop = Math.abs(Math.sin(tm * 3));
     H.P.body.position.y = 0.4 + hop * 0.03; H.P.arms[0].rotation.x = Math.sin(tm * 2) * 0.25; H.P.arms[0].rotation.z = 0.15;
     H.P.arms[1].rotation.x = throwing ? -2.6 : 0.1; H.P.arms[1].rotation.z = throwing ? -0.4 : -0.15; H.P.head.rotation.z = Math.sin(tm * 1.5) * 0.05; H.P.legs.forEach((l, i) => { l.rotation.x = Math.sin(tm * 3 + i * Math.PI) * 0.06; });
     if (this.sailCloth) { this.sailCloth.scale.z = 0.5 + Math.sin(tm * 2) * 0.12; this.sailCloth.rotation.y = Math.sin(tm * 1.6) * 0.1; }
