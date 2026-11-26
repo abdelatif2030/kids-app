@@ -126,6 +126,7 @@ class LearnLanguage {
 const List<LearnLanguage> kLearnLanguages = [
   LearnLanguage('ar', 'عربي', 'الحروف والأرقام والأشكال والمزيد', 'أ', Color(0xFFFF8A3D)),
   LearnLanguage('en', 'English', 'Hear it, find it, say it', 'A', Color(0xFF3D8BFF)),
+  LearnLanguage('de', 'Deutsch', 'Hören, finden, sagen', 'Ä', Color(0xFF2FA85A)),
 ];
 
 /// «عايز تتعلم إيه؟»: the child picks Arabic (the whole learning world as it was) or English (the English levels).
@@ -146,6 +147,8 @@ class _LearnLanguageGateState extends State<LearnLanguageGate> {
       setState(() => _arabic = true);
     } else if (id == 'en') {
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => learnWebGameScreen(kLearnEnglish, widget.child.id, widget.child.age)));
+    } else if (id == 'de') {
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => learnWebGameScreen(kLearnGerman, widget.child.id, widget.child.age)));
     }
   }
 
@@ -207,7 +210,15 @@ class _LearnLanguageGateState extends State<LearnLanguageGate> {
           boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 10, offset: Offset(0, 6))],
         ),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text(l.big, style: const TextStyle(fontSize: 84, height: 1, fontWeight: FontWeight.w900, color: Colors.white)),
+          // the owner's card picture of this language world (assets/games/learn_lang/<id>.webp); the big letter is the fallback
+          SizedBox(
+            height: 130,
+            child: Image.asset(
+              'assets/games/learn_lang/${l.id}.webp',
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => Center(child: Text(l.big, style: const TextStyle(fontSize: 84, height: 1, fontWeight: FontWeight.w900, color: Colors.white))),
+            ),
+          ),
           const SizedBox(height: 6),
           Text(l.label, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: Colors.white)),
           const SizedBox(height: 2),

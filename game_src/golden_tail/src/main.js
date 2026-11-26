@@ -467,7 +467,7 @@ class Game {
       this.sparkles.burst(c.player.x, c.player.y + 1.5, c.player.z, 80, 7);
     } else this.sound.play('lose');
     const hasNext = r.win && i + 1 < LEVELS.length;
-    const dim = h('div', { class: 'gt-dim' }, h('div', { class: 'gt-panel' },
+    const dim = h('div', { class: r.win ? 'gt-dim gt-win' : 'gt-dim' }, h('div', { class: 'gt-panel' },
       h('div', { class: 'gt-title' }, r.win ? t('win') : t('lose')),
       r.win ? h('div', { class: 'gt-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= r.stars ? '' : 'off' }, '⭐'))) : null,
       h('div', { class: 'gt-stat' }, h('span', {}, '✨ ', t('held'), ' ', num(Math.round(r.held)), t('sec')), h('span', {}, '✋ ', t('grabs'), ' ', num(r.grabs))),

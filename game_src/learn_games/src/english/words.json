@@ -698,6 +698,46 @@
 },
 {
 "cat": "shapes",
+"en": "rectangle",
+"w": "rectangle",
+"s": "This is a rectangle.",
+"thing": "x_rectangle",
+"ar": "مستطيل"
+},
+{
+"cat": "shapes",
+"en": "oval",
+"w": "oval",
+"s": "This is an oval.",
+"thing": "x_oval",
+"ar": "شكل بيضاوي"
+},
+{
+"cat": "shapes",
+"en": "diamond",
+"w": "diamond",
+"s": "This is a diamond.",
+"thing": "x_diamond",
+"ar": "معين"
+},
+{
+"cat": "shapes",
+"en": "pentagon",
+"w": "pentagon",
+"s": "This is a pentagon.",
+"thing": "x_pentagon",
+"ar": "شكل خماسي"
+},
+{
+"cat": "shapes",
+"en": "hexagon",
+"w": "hexagon",
+"s": "This is a hexagon.",
+"thing": "x_hexagon",
+"ar": "شكل سداسي"
+},
+{
+"cat": "shapes",
 "en": "octagon",
 "w": "octagon",
 "s": "This is an octagon.",
@@ -759,6 +799,62 @@
 "s": "This is a drop.",
 "shape": "drop",
 "ar": "قطرة"
+},
+{
+"cat": "shapes",
+"en": "arrow",
+"w": "arrow",
+"s": "This is an arrow.",
+"thing": "x_arrow",
+"ar": "سهم"
+},
+{
+"cat": "shapes",
+"en": "ring",
+"w": "ring",
+"s": "This is a ring.",
+"thing": "x_ring",
+"ar": "حلقة"
+},
+{
+"cat": "shapes",
+"en": "cube",
+"w": "cube",
+"s": "This is a cube.",
+"thing": "x_cube",
+"ar": "مكعب"
+},
+{
+"cat": "shapes",
+"en": "ball",
+"w": "ball",
+"s": "This is a ball.",
+"thing": "x_ball",
+"ar": "كورة"
+},
+{
+"cat": "shapes",
+"en": "cone",
+"w": "cone",
+"s": "This is a cone.",
+"thing": "x_cone",
+"ar": "مخروط"
+},
+{
+"cat": "shapes",
+"en": "cylinder",
+"w": "cylinder",
+"s": "This is a cylinder.",
+"thing": "x_cylinder",
+"ar": "أسطوانة"
+},
+{
+"cat": "shapes",
+"en": "pyramid",
+"w": "pyramid",
+"s": "This is a pyramid.",
+"thing": "x_pyramid",
+"ar": "هرم"
 },
 {
 "cat": "days",
@@ -981,7 +1077,7 @@
 "en": "wake up",
 "w": "wake up",
 "s": "Let's wake up!",
-"thing": "h_clock",
+"thing": "x_routine_wake_up",
 "ar": "أصحى من النوم"
 },
 {
@@ -989,7 +1085,7 @@
 "en": "wash my face",
 "w": "wash my face",
 "s": "Let's wash my face!",
-"thing": "soap",
+"thing": "x_routine_wash_face",
 "ar": "أغسل وشّي"
 },
 {
@@ -997,7 +1093,7 @@
 "en": "eat breakfast",
 "w": "eat breakfast",
 "s": "Let's eat breakfast!",
-"thing": "bowl",
+"thing": "x_routine_breakfast",
 "ar": "أفطر"
 },
 {
@@ -1005,7 +1101,7 @@
 "en": "go to school",
 "w": "go to school",
 "s": "Let's go to school!",
-"thing": "backpack",
+"thing": "x_routine_school",
 "ar": "أروح الحضانة"
 },
 {
@@ -1013,7 +1109,7 @@
 "en": "eat lunch",
 "w": "eat lunch",
 "s": "Let's eat lunch!",
-"thing": "pot",
+"thing": "x_routine_lunch",
 "ar": "أتغدّى"
 },
 {
@@ -1021,7 +1117,7 @@
 "en": "play",
 "w": "play",
 "s": "Let's play!",
-"thing": "teddy",
+"thing": "x_routine_play",
 "ar": "ألعب"
 },
 {
@@ -1029,7 +1125,7 @@
 "en": "eat dinner",
 "w": "eat dinner",
 "s": "Let's eat dinner!",
-"thing": "plate",
+"thing": "x_routine_dinner",
 "ar": "أتعشّى"
 },
 {
@@ -1037,7 +1133,7 @@
 "en": "have a bath",
 "w": "have a bath",
 "s": "Let's have a bath!",
-"thing": "tub",
+"thing": "x_routine_bath",
 "ar": "آخد دُش"
 },
 {
@@ -1045,7 +1141,7 @@
 "en": "brush my teeth",
 "w": "brush my teeth",
 "s": "Let's brush my teeth!",
-"thing": "toothbrush",
+"thing": "x_routine_teeth",
 "ar": "أغسل سناني"
 },
 {
@@ -1053,8 +1149,96 @@
 "en": "sleep",
 "w": "sleep",
 "s": "Let's sleep!",
-"thing": "bed",
+"thing": "x_routine_sleep",
 "ar": "أنام"
+},
+{
+"cat": "places (where is the ball)",
+"en": "on the table",
+"w": "on the table",
+"s": "The ball is on the table.",
+"thing": "x_where_on",
+"ar": "فوق الترابيزة"
+},
+{
+"cat": "places (where is the ball)",
+"en": "under the table",
+"w": "under the table",
+"s": "The ball is under the table.",
+"thing": "x_where_under",
+"ar": "تحت الترابيزة"
+},
+{
+"cat": "places (where is the ball)",
+"en": "inside the box",
+"w": "inside the box",
+"s": "The ball is inside the box.",
+"thing": "x_where_inside",
+"ar": "جوه الصندوق"
+},
+{
+"cat": "places (where is the ball)",
+"en": "next to the box",
+"w": "next to the box",
+"s": "The ball is next to the box.",
+"thing": "x_where_next_to_box",
+"ar": "جنب الصندوق"
+},
+{
+"cat": "places (where is the ball)",
+"en": "next to the table",
+"w": "next to the table",
+"s": "The ball is next to the table.",
+"thing": "x_where_next_to_table",
+"ar": "جنب الترابيزة"
+},
+{
+"cat": "pattern beads",
+"en": "red ball",
+"w": "red ball",
+"s": "This is a red ball.",
+"thing": "x_bead_red_ball",
+"ar": "كورة حمرا"
+},
+{
+"cat": "pattern beads",
+"en": "blue cube",
+"w": "blue cube",
+"s": "This is a blue cube.",
+"thing": "x_bead_blue_cube",
+"ar": "مكعب أزرق"
+},
+{
+"cat": "pattern beads",
+"en": "yellow star",
+"w": "yellow star",
+"s": "This is a yellow star.",
+"thing": "x_bead_yellow_star",
+"ar": "نجمة صفرا"
+},
+{
+"cat": "pattern beads",
+"en": "green heart",
+"w": "green heart",
+"s": "This is a green heart.",
+"thing": "x_bead_green_heart",
+"ar": "قلب أخضر"
+},
+{
+"cat": "pattern beads",
+"en": "purple ring",
+"w": "purple ring",
+"s": "This is a purple ring.",
+"thing": "x_bead_purple_ring",
+"ar": "حلقة بنفسجي"
+},
+{
+"cat": "pattern beads",
+"en": "orange drop",
+"w": "orange drop",
+"s": "This is an orange drop.",
+"thing": "x_bead_orange_drop",
+"ar": "نقطة برتقالي"
 },
 {
 "cat": "animals",
@@ -3073,6 +3257,13 @@
 "ar": "حَب"
 },
 {
+"cat": "animal foods",
+"en": "insect",
+"w": "insect",
+"s": "This is an insect.",
+"thing": "x_caterpillar"
+},
+{
 "cat": "things of a colour",
 "en": "strawberry",
 "w": "strawberry",
@@ -3170,6 +3361,22 @@
 },
 {
 "cat": "toys and fruit (sorting)",
+"en": "blocks",
+"w": "blocks",
+"s": "These are blocks.",
+"thing": "x_toy_blocks",
+"ar": "مكعبات"
+},
+{
+"cat": "toys and fruit (sorting)",
+"en": "yo-yo",
+"w": "yo-yo",
+"s": "This is a yo-yo.",
+"thing": "x_yo_yo",
+"ar": "يويو"
+},
+{
+"cat": "toys and fruit (sorting)",
 "en": "car",
 "w": "car",
 "s": "This is a car.",
@@ -3199,5 +3406,2381 @@
 "s": "This is a train.",
 "thing": "train",
 "ar": "قطر"
+},
+{
+"cat": "x:around",
+"en": "starfish",
+"w": "starfish",
+"s": "This is a starfish.",
+"thing": "u_star",
+"ar": "نجمة بحر"
+},
+{
+"cat": "x:around",
+"en": "pineapple",
+"w": "pineapple",
+"s": "This is a pineapple.",
+"thing": "pineapple",
+"ar": "أناناس"
+},
+{
+"cat": "x:around",
+"en": "mango",
+"w": "mango",
+"s": "This is a mango.",
+"thing": "mango",
+"ar": "مانجا"
+},
+{
+"cat": "x:around",
+"en": "ambulance",
+"w": "ambulance",
+"s": "This is an ambulance.",
+"thing": "ambulance",
+"ar": "عربية الإسعاف"
+},
+{
+"cat": "x:around",
+"en": "police car",
+"w": "police car",
+"s": "This is a police car.",
+"thing": "police",
+"ar": "عربية الشرطة"
+},
+{
+"cat": "x:around",
+"en": "helicopter",
+"w": "helicopter",
+"s": "This is a helicopter.",
+"thing": "helicopter",
+"ar": "هليكوبتر"
+},
+{
+"cat": "x:around",
+"en": "school bus",
+"w": "school bus",
+"s": "This is a school bus.",
+"thing": "c_schoolbus",
+"ar": "أتوبيس مدرسي"
+},
+{
+"cat": "x:around",
+"en": "city bus",
+"w": "city bus",
+"s": "This is a city bus.",
+"thing": "c_citybus",
+"ar": "أتوبيس المدينة"
+},
+{
+"cat": "x:around",
+"en": "taxi",
+"w": "taxi",
+"s": "This is a taxi.",
+"thing": "c_taxi",
+"ar": "تاكسي"
+},
+{
+"cat": "x:around",
+"en": "tram",
+"w": "tram",
+"s": "This is a tram.",
+"thing": "c_tram",
+"ar": "ترام"
+},
+{
+"cat": "x:around",
+"en": "bulldozer",
+"w": "bulldozer",
+"s": "This is a bulldozer.",
+"thing": "c_bulldozer",
+"ar": "جرافة"
+},
+{
+"cat": "x:around",
+"en": "felucca",
+"w": "felucca",
+"s": "This is a felucca.",
+"thing": "d_boat",
+"ar": "فلوكة"
+},
+{
+"cat": "x:around",
+"en": "donkey cart",
+"w": "donkey cart",
+"s": "This is a donkey cart.",
+"thing": "d_donkeycart",
+"ar": "عربة حمار"
+},
+{
+"cat": "x:around",
+"en": "tractor",
+"w": "tractor",
+"s": "This is a tractor.",
+"thing": "tractor_f",
+"ar": "جرار"
+},
+{
+"cat": "x:around",
+"en": "sled",
+"w": "sled",
+"s": "This is a sled.",
+"thing": "w_sled",
+"ar": "زحافة"
+},
+{
+"cat": "x:around",
+"en": "space rover",
+"w": "space rover",
+"s": "This is a space rover.",
+"thing": "s_rover",
+"ar": "مركبة الفضاء"
+},
+{
+"cat": "x:around",
+"en": "flying saucer",
+"w": "flying saucer",
+"s": "This is a flying saucer.",
+"thing": "s_ufo",
+"ar": "طبق طائر"
+},
+{
+"cat": "x:around",
+"en": "fence",
+"w": "fence",
+"s": "This is a fence.",
+"thing": "h_fence",
+"ar": "سور"
+},
+{
+"cat": "x:around",
+"en": "tulips",
+"w": "tulips",
+"s": "These are tulips.",
+"thing": "h_tulips",
+"ar": "زهور التوليب"
+},
+{
+"cat": "x:around",
+"en": "bird bath",
+"w": "bird bath",
+"s": "This is a bird bath.",
+"thing": "h_birdbath",
+"ar": "حوض طيور"
+},
+{
+"cat": "x:around",
+"en": "garden gnome",
+"w": "garden gnome",
+"s": "This is a garden gnome.",
+"thing": "h_gnome",
+"ar": "قزم الحديقة"
+},
+{
+"cat": "x:around",
+"en": "plant",
+"w": "plant",
+"s": "This is a plant.",
+"thing": "h_plant",
+"ar": "زرعة"
+},
+{
+"cat": "x:around",
+"en": "ice cream",
+"w": "ice cream",
+"s": "This is an ice cream.",
+"thing": "r_icecream",
+"ar": "آيس كريم"
+},
+{
+"cat": "x:around",
+"en": "lollipop",
+"w": "lollipop",
+"s": "This is a lollipop.",
+"thing": "r_lolli",
+"ar": "مصاصة"
+},
+{
+"cat": "x:around",
+"en": "gingerbread house",
+"w": "gingerbread house",
+"s": "This is a gingerbread house.",
+"thing": "r_gingerhouse",
+"ar": "بيت الزنجبيل"
+},
+{
+"cat": "x:around",
+"en": "yellow bird",
+"w": "yellow bird",
+"s": "This is a yellow bird.",
+"thing": "bird_yellow",
+"ar": "عصفور أصفر"
+},
+{
+"cat": "x:around",
+"en": "rainbow",
+"w": "rainbow",
+"s": "This is a rainbow.",
+"thing": "r_rainbow",
+"ar": "قوس قزح"
+},
+{
+"cat": "x:around",
+"en": "kite",
+"w": "kite",
+"s": "This is a kite.",
+"thing": "r_kite",
+"ar": "طيارة ورق"
+},
+{
+"cat": "x:around",
+"en": "pinwheel",
+"w": "pinwheel",
+"s": "This is a pinwheel.",
+"thing": "r_pinwheel",
+"ar": "مروحة ملونة"
+},
+{
+"cat": "x:around",
+"en": "clownfish",
+"w": "clownfish",
+"s": "This is a clownfish.",
+"thing": "b_clown",
+"ar": "سمكة المهرج"
+},
+{
+"cat": "x:around",
+"en": "yellow fish",
+"w": "yellow fish",
+"s": "This is a yellow fish.",
+"thing": "b_yellowfish",
+"ar": "سمكة صفرا"
+},
+{
+"cat": "x:around",
+"en": "seagull",
+"w": "seagull",
+"s": "This is a seagull.",
+"thing": "b_gull",
+"ar": "نورس"
+},
+{
+"cat": "x:around",
+"en": "beach ball",
+"w": "beach ball",
+"s": "This is a beach ball.",
+"thing": "b_ball",
+"ar": "كورة الشاطئ"
+},
+{
+"cat": "x:around",
+"en": "life ring",
+"w": "life ring",
+"s": "This is a life ring.",
+"thing": "b_ring",
+"ar": "عوامة"
+},
+{
+"cat": "x:around",
+"en": "beach palm",
+"w": "beach palm",
+"s": "This is a beach palm.",
+"thing": "b_palm1",
+"ar": "نخلة"
+},
+{
+"cat": "x:around",
+"en": "small boat",
+"w": "small boat",
+"s": "This is a small boat.",
+"thing": "b_boat",
+"ar": "مركب صغير"
+},
+{
+"cat": "x:around",
+"en": "dock",
+"w": "dock",
+"s": "This is a dock.",
+"thing": "b_dock",
+"ar": "رصيف"
+},
+{
+"cat": "x:around",
+"en": "beach chair",
+"w": "beach chair",
+"s": "This is a beach chair.",
+"thing": "b_chair",
+"ar": "كرسي الشاطئ"
+},
+{
+"cat": "x:around",
+"en": "rocks",
+"w": "rocks",
+"s": "These are rocks.",
+"thing": "b_rocks",
+"ar": "صخور"
+},
+{
+"cat": "x:around",
+"en": "seaweed",
+"w": "seaweed",
+"s": "This is seaweed.",
+"thing": "b_weed",
+"ar": "أعشاب البحر"
+},
+{
+"cat": "x:around",
+"en": "surfboard",
+"w": "surfboard",
+"s": "This is a surfboard.",
+"thing": "b_surf",
+"ar": "لوح التزلج"
+},
+{
+"cat": "x:around",
+"en": "bucket",
+"w": "bucket",
+"s": "This is a bucket.",
+"thing": "b_bucket",
+"ar": "جردل"
+},
+{
+"cat": "x:around",
+"en": "shipwreck",
+"w": "shipwreck",
+"s": "This is a shipwreck.",
+"thing": "u_wreck",
+"ar": "سفينة غارقة"
+},
+{
+"cat": "x:around",
+"en": "anchor",
+"w": "anchor",
+"s": "This is an anchor.",
+"thing": "u_anchor",
+"ar": "مرساة"
+},
+{
+"cat": "x:around",
+"en": "clam",
+"w": "clam",
+"s": "This is a clam.",
+"thing": "u_clam",
+"ar": "محارة"
+},
+{
+"cat": "x:around",
+"en": "sea anemone",
+"w": "sea anemone",
+"s": "This is a sea anemone.",
+"thing": "u_anemone",
+"ar": "شقائق البحر"
+},
+{
+"cat": "x:around",
+"en": "puffer fish",
+"w": "puffer fish",
+"s": "This is a puffer fish.",
+"thing": "u_puffer",
+"ar": "سمكة منتفخة"
+},
+{
+"cat": "x:around",
+"en": "small rocket",
+"w": "small rocket",
+"s": "This is a small rocket.",
+"thing": "s_rocket",
+"ar": "صاروخ صغير"
+},
+{
+"cat": "x:around",
+"en": "space helmet",
+"w": "space helmet",
+"s": "This is a space helmet.",
+"thing": "s_helmet",
+"ar": "خوذة الفضاء"
+},
+{
+"cat": "x:around",
+"en": "comet",
+"w": "comet",
+"s": "This is a comet.",
+"thing": "s_comet",
+"ar": "مذنب"
+},
+{
+"cat": "x:around",
+"en": "space station",
+"w": "space station",
+"s": "This is a space station.",
+"thing": "s_station",
+"ar": "محطة فضاء"
+},
+{
+"cat": "x:around",
+"en": "tower",
+"w": "tower",
+"s": "This is a tower.",
+"thing": "k_tower",
+"ar": "برج"
+},
+{
+"cat": "x:around",
+"en": "princess",
+"w": "princess",
+"s": "This is a princess.",
+"thing": "k_princess",
+"ar": "أميرة"
+},
+{
+"cat": "x:around",
+"en": "shield",
+"w": "shield",
+"s": "This is a shield.",
+"thing": "k_shield",
+"ar": "درع"
+},
+{
+"cat": "x:around",
+"en": "torch",
+"w": "torch",
+"s": "This is a torch.",
+"thing": "k_torch",
+"ar": "مشعل"
+},
+{
+"cat": "x:around",
+"en": "knight horse",
+"w": "knight horse",
+"s": "This is a knight horse.",
+"thing": "k_horse",
+"ar": "حصان الفارس"
+},
+{
+"cat": "x:around",
+"en": "jester",
+"w": "jester",
+"s": "This is a jester.",
+"thing": "k_jester",
+"ar": "مهرج الملك"
+},
+{
+"cat": "x:around",
+"en": "cottage",
+"w": "cottage",
+"s": "This is a cottage.",
+"thing": "k_cottage",
+"ar": "كوخ"
+},
+{
+"cat": "x:around",
+"en": "well",
+"w": "well",
+"s": "This is a well.",
+"thing": "k_well",
+"ar": "بئر"
+},
+{
+"cat": "x:around",
+"en": "banner",
+"w": "banner",
+"s": "This is a banner.",
+"thing": "k_banner",
+"ar": "راية"
+},
+{
+"cat": "x:around",
+"en": "hut",
+"w": "hut",
+"s": "This is a hut.",
+"thing": "j_hut",
+"ar": "كوخ خشب"
+},
+{
+"cat": "x:around",
+"en": "bridge",
+"w": "bridge",
+"s": "This is a bridge.",
+"thing": "j_bridge",
+"ar": "جسر"
+},
+{
+"cat": "x:around",
+"en": "totem",
+"w": "totem",
+"s": "This is a totem.",
+"thing": "j_totem",
+"ar": "تمثال خشب"
+},
+{
+"cat": "x:around",
+"en": "silo",
+"w": "silo",
+"s": "This is a silo.",
+"thing": "silo_f",
+"ar": "صومعة"
+},
+{
+"cat": "x:around",
+"en": "scarecrow",
+"w": "scarecrow",
+"s": "This is a scarecrow.",
+"thing": "scarecrow_f",
+"ar": "فزاعة"
+},
+{
+"cat": "x:around",
+"en": "haystack",
+"w": "haystack",
+"s": "This is a haystack.",
+"thing": "haystack_f",
+"ar": "كومة قش"
+},
+{
+"cat": "x:around",
+"en": "trough",
+"w": "trough",
+"s": "This is a trough.",
+"thing": "trough_f",
+"ar": "معلف"
+},
+{
+"cat": "x:around",
+"en": "farm gate",
+"w": "farm gate",
+"s": "This is a farm gate.",
+"thing": "gate_f",
+"ar": "بوابة المزرعة"
+},
+{
+"cat": "x:around",
+"en": "water pump",
+"w": "water pump",
+"s": "This is a water pump.",
+"thing": "pump_f",
+"ar": "طلمبة مية"
+},
+{
+"cat": "x:around",
+"en": "chicken coop",
+"w": "chicken coop",
+"s": "This is a chicken coop.",
+"thing": "f_coop",
+"ar": "بيت الفراخ"
+},
+{
+"cat": "x:around",
+"en": "wheelbarrow",
+"w": "wheelbarrow",
+"s": "This is a wheelbarrow.",
+"thing": "f_barrow",
+"ar": "عربة يد"
+},
+{
+"cat": "x:around",
+"en": "watering can",
+"w": "watering can",
+"s": "This is a watering can.",
+"thing": "f_water_can",
+"ar": "مرش"
+},
+{
+"cat": "x:around",
+"en": "snow cabin",
+"w": "snow cabin",
+"s": "This is a snow cabin.",
+"thing": "w_cabin",
+"ar": "كوخ في الثلج"
+},
+{
+"cat": "x:around",
+"en": "skis",
+"w": "skis",
+"s": "These are skis.",
+"thing": "w_skis",
+"ar": "زلاجات"
+},
+{
+"cat": "x:around",
+"en": "snowballs",
+"w": "snowballs",
+"s": "These are snowballs.",
+"thing": "w_snowballs",
+"ar": "كور ثلج"
+},
+{
+"cat": "x:around",
+"en": "ice block",
+"w": "ice block",
+"s": "This is an ice block.",
+"thing": "w_iceblock",
+"ar": "قطعة ثلج"
+},
+{
+"cat": "x:around",
+"en": "fire station",
+"w": "fire station",
+"s": "This is a fire station.",
+"thing": "c_firestation",
+"ar": "محطة مطافي"
+},
+{
+"cat": "x:around",
+"en": "bus stop",
+"w": "bus stop",
+"s": "This is a bus stop.",
+"thing": "c_busstop",
+"ar": "موقف أتوبيس"
+},
+{
+"cat": "x:around",
+"en": "street lamp",
+"w": "street lamp",
+"s": "This is a street lamp.",
+"thing": "c_lamp",
+"ar": "عمود نور"
+},
+{
+"cat": "x:around",
+"en": "bench",
+"w": "bench",
+"s": "This is a bench.",
+"thing": "c_bench",
+"ar": "دكة"
+},
+{
+"cat": "x:around",
+"en": "mailbox",
+"w": "mailbox",
+"s": "This is a mailbox.",
+"thing": "c_mailbox",
+"ar": "صندوق بريد"
+},
+{
+"cat": "x:around",
+"en": "sand dune",
+"w": "sand dune",
+"s": "This is a sand dune.",
+"thing": "d_dune",
+"ar": "كثبان رملية"
+},
+{
+"cat": "x:around",
+"en": "oasis",
+"w": "oasis",
+"s": "This is an oasis.",
+"thing": "d_oasis",
+"ar": "واحة"
+},
+{
+"cat": "x:around",
+"en": "jar",
+"w": "jar",
+"s": "This is a jar.",
+"thing": "d_jar",
+"ar": "جرة"
+},
+{
+"cat": "x:around",
+"en": "wooden cart",
+"w": "wooden cart",
+"s": "This is a wooden cart.",
+"thing": "d_cart",
+"ar": "عربة خشب"
+},
+{
+"cat": "x:around",
+"en": "lantern",
+"w": "lantern",
+"s": "This is a lantern.",
+"thing": "d_lantern",
+"ar": "فانوس"
+},
+{
+"cat": "x:around",
+"en": "baby camel",
+"w": "baby camel",
+"s": "This is a baby camel.",
+"thing": "d_babycamel",
+"ar": "جمل صغير"
+},
+{
+"cat": "x:animals",
+"en": "squirrel",
+"w": "squirrel",
+"s": "This is a squirrel.",
+"thing": "x_squirrel",
+"ar": "سنجاب"
+},
+{
+"cat": "x:animals",
+"en": "hedgehog",
+"w": "hedgehog",
+"s": "This is a hedgehog.",
+"thing": "x_hedgehog",
+"ar": "قنفذ"
+},
+{
+"cat": "x:animals",
+"en": "deer",
+"w": "deer",
+"s": "This is a deer.",
+"thing": "x_deer",
+"ar": "غزال"
+},
+{
+"cat": "x:animals",
+"en": "wolf",
+"w": "wolf",
+"s": "This is a wolf.",
+"thing": "x_wolf",
+"ar": "ذئب"
+},
+{
+"cat": "x:animals",
+"en": "hippo",
+"w": "hippo",
+"s": "This is a hippo.",
+"thing": "x_hippo",
+"ar": "فرس النهر"
+},
+{
+"cat": "x:animals",
+"en": "rhino",
+"w": "rhino",
+"s": "This is a rhino.",
+"thing": "x_rhino",
+"ar": "وحيد القرن"
+},
+{
+"cat": "x:animals",
+"en": "kangaroo",
+"w": "kangaroo",
+"s": "This is a kangaroo.",
+"thing": "x_kangaroo",
+"ar": "كنغر"
+},
+{
+"cat": "x:animals",
+"en": "koala",
+"w": "koala",
+"s": "This is a koala.",
+"thing": "x_koala",
+"ar": "كوالا"
+},
+{
+"cat": "x:animals",
+"en": "polar bear",
+"w": "polar bear",
+"s": "This is a polar bear.",
+"thing": "x_polar_bear",
+"ar": "دب قطبي"
+},
+{
+"cat": "x:animals",
+"en": "puppy",
+"w": "puppy",
+"s": "This is a puppy.",
+"thing": "x_puppy",
+"ar": "جرو"
+},
+{
+"cat": "x:animals",
+"en": "kitten",
+"w": "kitten",
+"s": "This is a kitten.",
+"thing": "x_kitten",
+"ar": "قطة صغيرة"
+},
+{
+"cat": "x:animals",
+"en": "lamb",
+"w": "lamb",
+"s": "This is a lamb.",
+"thing": "x_lamb",
+"ar": "خروف صغير"
+},
+{
+"cat": "x:animals",
+"en": "calf",
+"w": "calf",
+"s": "This is a calf.",
+"thing": "x_calf",
+"ar": "عجل"
+},
+{
+"cat": "x:animals",
+"en": "hamster",
+"w": "hamster",
+"s": "This is a hamster.",
+"thing": "x_hamster",
+"ar": "هامستر"
+},
+{
+"cat": "x:animals",
+"en": "walrus",
+"w": "walrus",
+"s": "This is a walrus.",
+"thing": "x_walrus",
+"ar": "فظ"
+},
+{
+"cat": "x:animals",
+"en": "otter",
+"w": "otter",
+"s": "This is an otter.",
+"thing": "x_otter",
+"ar": "قضاعة"
+},
+{
+"cat": "x:animals",
+"en": "beaver",
+"w": "beaver",
+"s": "This is a beaver.",
+"thing": "x_beaver",
+"ar": "سمور"
+},
+{
+"cat": "x:animals",
+"en": "raccoon",
+"w": "raccoon",
+"s": "This is a raccoon.",
+"thing": "x_raccoon",
+"ar": "راكون"
+},
+{
+"cat": "x:animals",
+"en": "pelican",
+"w": "pelican",
+"s": "This is a pelican.",
+"thing": "x_pelican",
+"ar": "بجعة"
+},
+{
+"cat": "x:animals",
+"en": "stork",
+"w": "stork",
+"s": "This is a stork.",
+"thing": "x_stork",
+"ar": "لقلق"
+},
+{
+"cat": "x:animals",
+"en": "hummingbird",
+"w": "hummingbird",
+"s": "This is a hummingbird.",
+"thing": "x_hummingbird",
+"ar": "طائر طنان"
+},
+{
+"cat": "x:animals",
+"en": "woodpecker",
+"w": "woodpecker",
+"s": "This is a woodpecker.",
+"thing": "x_woodpecker",
+"ar": "نقار الخشب"
+},
+{
+"cat": "x:animals",
+"en": "lobster",
+"w": "lobster",
+"s": "This is a lobster.",
+"thing": "x_lobster",
+"ar": "استاكوزا"
+},
+{
+"cat": "x:animals",
+"en": "shrimp",
+"w": "shrimp",
+"s": "This is a shrimp.",
+"thing": "x_shrimp",
+"ar": "جمبري"
+},
+{
+"cat": "x:animals",
+"en": "beetle",
+"w": "beetle",
+"s": "This is a beetle.",
+"thing": "x_beetle",
+"ar": "خنفساء"
+},
+{
+"cat": "x:animals",
+"en": "grasshopper",
+"w": "grasshopper",
+"s": "This is a grasshopper.",
+"thing": "x_grasshopper",
+"ar": "جندب"
+},
+{
+"cat": "x:animals",
+"en": "wasp",
+"w": "wasp",
+"s": "This is a wasp.",
+"thing": "x_wasp",
+"ar": "دبور"
+},
+{
+"cat": "x:animals",
+"en": "mosquito",
+"w": "mosquito",
+"s": "This is a mosquito.",
+"thing": "x_mosquito",
+"ar": "بعوضة"
+},
+{
+"cat": "x:animals",
+"en": "llama",
+"w": "llama",
+"s": "This is a llama.",
+"thing": "x_llama",
+"ar": "لاما"
+},
+{
+"cat": "x:animals",
+"en": "leopard",
+"w": "leopard",
+"s": "This is a leopard.",
+"thing": "x_leopard",
+"ar": "نمر مرقط"
+},
+{
+"cat": "x:animals",
+"en": "chimpanzee",
+"w": "chimpanzee",
+"s": "This is a chimpanzee.",
+"thing": "x_chimpanzee",
+"ar": "شمبانزي"
+},
+{
+"cat": "x:animals",
+"en": "sloth",
+"w": "sloth",
+"s": "This is a sloth.",
+"thing": "x_sloth",
+"ar": "كسلان"
+},
+{
+"cat": "x:animals",
+"en": "squid",
+"w": "squid",
+"s": "This is a squid.",
+"thing": "x_squid",
+"ar": "حبار"
+},
+{
+"cat": "x:animals",
+"en": "meerkat",
+"w": "meerkat",
+"s": "This is a meerkat.",
+"thing": "x_meerkat",
+"ar": "ميركات"
+},
+{
+"cat": "x:family",
+"en": "happy",
+"w": "happy",
+"s": "I feel happy.",
+"thing": "x_happy",
+"ar": "سعيد"
+},
+{
+"cat": "x:family",
+"en": "sad",
+"w": "sad",
+"s": "I feel sad.",
+"thing": "x_sad",
+"ar": "حزين"
+},
+{
+"cat": "x:family",
+"en": "angry",
+"w": "angry",
+"s": "I feel angry.",
+"thing": "x_angry",
+"ar": "غضبان"
+},
+{
+"cat": "x:family",
+"en": "tired",
+"w": "tired",
+"s": "I feel tired.",
+"thing": "x_tired",
+"ar": "تعبان"
+},
+{
+"cat": "x:family",
+"en": "hungry",
+"w": "hungry",
+"s": "I feel hungry.",
+"thing": "x_hungry",
+"ar": "جعان"
+},
+{
+"cat": "x:family",
+"en": "thirsty",
+"w": "thirsty",
+"s": "I feel thirsty.",
+"thing": "x_thirsty",
+"ar": "عطشان"
+},
+{
+"cat": "x:family",
+"en": "scared",
+"w": "scared",
+"s": "I feel scared.",
+"thing": "x_scared",
+"ar": "خايف"
+},
+{
+"cat": "x:family",
+"en": "surprised",
+"w": "surprised",
+"s": "I feel surprised.",
+"thing": "x_surprised",
+"ar": "متفاجئ"
+},
+{
+"cat": "x:family",
+"en": "sleepy",
+"w": "sleepy",
+"s": "I feel sleepy.",
+"thing": "x_sleepy",
+"ar": "نعسان"
+},
+{
+"cat": "x:family",
+"en": "shy",
+"w": "shy",
+"s": "I feel shy.",
+"thing": "x_shy",
+"ar": "خجول"
+},
+{
+"cat": "x:family",
+"en": "proud",
+"w": "proud",
+"s": "I feel proud.",
+"thing": "x_proud",
+"ar": "فخور"
+},
+{
+"cat": "x:family",
+"en": "excited",
+"w": "excited",
+"s": "I feel excited.",
+"thing": "x_excited",
+"ar": "متحمس"
+},
+{
+"cat": "x:family",
+"en": "shoulder",
+"w": "shoulder",
+"s": "This is a shoulder.",
+"thing": "x_shoulder",
+"ar": "كتف"
+},
+{
+"cat": "x:family",
+"en": "neck",
+"w": "neck",
+"s": "This is a neck.",
+"thing": "x_neck",
+"ar": "رقبة"
+},
+{
+"cat": "x:family",
+"en": "arm",
+"w": "arm",
+"s": "This is an arm.",
+"thing": "x_arm",
+"ar": "دراع"
+},
+{
+"cat": "x:family",
+"en": "leg",
+"w": "leg",
+"s": "This is a leg.",
+"thing": "x_leg",
+"ar": "رجل"
+},
+{
+"cat": "x:family",
+"en": "elbow",
+"w": "elbow",
+"s": "This is an elbow.",
+"thing": "x_elbow",
+"ar": "كوع"
+},
+{
+"cat": "x:family",
+"en": "back",
+"w": "back",
+"s": "This is a back.",
+"thing": "x_back",
+"ar": "ضهر"
+},
+{
+"cat": "x:family",
+"en": "chin",
+"w": "chin",
+"s": "This is a chin.",
+"thing": "x_chin",
+"ar": "دقن"
+},
+{
+"cat": "x:family",
+"en": "cheek",
+"w": "cheek",
+"s": "This is a cheek.",
+"thing": "x_cheek",
+"ar": "خد"
+},
+{
+"cat": "x:family",
+"en": "eyebrow",
+"w": "eyebrow",
+"s": "This is an eyebrow.",
+"thing": "x_eyebrow",
+"ar": "حاجب"
+},
+{
+"cat": "x:family",
+"en": "tongue",
+"w": "tongue",
+"s": "This is a tongue.",
+"thing": "x_tongue",
+"ar": "لسان"
+},
+{
+"cat": "x:school",
+"en": "shorts",
+"w": "shorts",
+"s": "These are shorts.",
+"thing": "x_shorts",
+"ar": "شورت"
+},
+{
+"cat": "x:school",
+"en": "skirt",
+"w": "skirt",
+"s": "This is a skirt.",
+"thing": "x_skirt",
+"ar": "جيب"
+},
+{
+"cat": "x:school",
+"en": "sweater",
+"w": "sweater",
+"s": "This is a sweater.",
+"thing": "x_sweater",
+"ar": "سويتر"
+},
+{
+"cat": "x:school",
+"en": "boots",
+"w": "boots",
+"s": "These are boots.",
+"thing": "x_boots",
+"ar": "بوت"
+},
+{
+"cat": "x:school",
+"en": "sandals",
+"w": "sandals",
+"s": "These are sandals.",
+"thing": "x_sandals",
+"ar": "صندل"
+},
+{
+"cat": "x:school",
+"en": "t-shirt",
+"w": "t-shirt",
+"s": "This is a t-shirt.",
+"thing": "x_t_shirt",
+"ar": "تي شيرت"
+},
+{
+"cat": "x:school",
+"en": "coat",
+"w": "coat",
+"s": "This is a coat.",
+"thing": "x_coat",
+"ar": "معطف"
+},
+{
+"cat": "x:school",
+"en": "belt",
+"w": "belt",
+"s": "This is a belt.",
+"thing": "x_belt",
+"ar": "حزام"
+},
+{
+"cat": "x:family",
+"en": "aunt",
+"w": "aunt",
+"s": "This is an aunt.",
+"thing": "x_aunt",
+"ar": "عمة"
+},
+{
+"cat": "x:family",
+"en": "cousin",
+"w": "cousin",
+"s": "This is a cousin.",
+"thing": "x_cousin",
+"ar": "ابن العم"
+},
+{
+"cat": "x:family",
+"en": "twins",
+"w": "twins",
+"s": "These are twins.",
+"thing": "x_twins",
+"ar": "توأم"
+},
+{
+"cat": "x:family",
+"en": "neighbour",
+"w": "neighbour",
+"s": "This is a neighbour.",
+"thing": "x_neighbour",
+"ar": "جار"
+},
+{
+"cat": "x:world",
+"en": "baker",
+"w": "baker",
+"s": "This is a baker.",
+"thing": "x_baker",
+"ar": "خباز"
+},
+{
+"cat": "x:world",
+"en": "dentist",
+"w": "dentist",
+"s": "This is a dentist.",
+"thing": "x_dentist",
+"ar": "دكتور أسنان"
+},
+{
+"cat": "x:world",
+"en": "mechanic",
+"w": "mechanic",
+"s": "This is a mechanic.",
+"thing": "x_mechanic",
+"ar": "ميكانيكي"
+},
+{
+"cat": "x:world",
+"en": "waiter",
+"w": "waiter",
+"s": "This is a waiter.",
+"thing": "x_waiter",
+"ar": "جرسون"
+},
+{
+"cat": "x:world",
+"en": "captain",
+"w": "captain",
+"s": "This is a captain.",
+"thing": "x_captain",
+"ar": "قبطان"
+},
+{
+"cat": "x:world",
+"en": "scientist",
+"w": "scientist",
+"s": "This is a scientist.",
+"thing": "x_scientist",
+"ar": "عالم"
+},
+{
+"cat": "x:world",
+"en": "astronaut",
+"w": "astronaut",
+"s": "This is an astronaut.",
+"thing": "x_astronaut",
+"ar": "رائد فضاء"
+},
+{
+"cat": "x:world",
+"en": "gardener",
+"w": "gardener",
+"s": "This is a gardener.",
+"thing": "x_gardener",
+"ar": "جنايني"
+},
+{
+"cat": "x:world",
+"en": "fisherman",
+"w": "fisherman",
+"s": "This is a fisherman.",
+"thing": "x_fisherman",
+"ar": "صياد سمك"
+},
+{
+"cat": "x:world",
+"en": "shopkeeper",
+"w": "shopkeeper",
+"s": "This is a shopkeeper.",
+"thing": "x_shopkeeper",
+"ar": "بقال"
+},
+{
+"cat": "x:world",
+"en": "tailor",
+"w": "tailor",
+"s": "This is a tailor.",
+"thing": "x_tailor",
+"ar": "خياط"
+},
+{
+"cat": "x:world",
+"en": "vet",
+"w": "vet",
+"s": "This is a vet.",
+"thing": "x_vet",
+"ar": "دكتور بيطري"
+},
+{
+"cat": "x:food",
+"en": "koshari",
+"w": "koshari",
+"s": "This is koshari.",
+"thing": "x_koshari",
+"ar": "كشري"
+},
+{
+"cat": "x:food",
+"en": "falafel",
+"w": "falafel",
+"s": "This is a falafel.",
+"thing": "x_falafel",
+"ar": "طعمية"
+},
+{
+"cat": "x:food",
+"en": "fava beans",
+"w": "fava beans",
+"s": "These are fava beans.",
+"thing": "x_fava_beans",
+"ar": "فول"
+},
+{
+"cat": "x:food",
+"en": "molokhia",
+"w": "molokhia",
+"s": "This is molokhia.",
+"thing": "x_molokhia",
+"ar": "ملوخية"
+},
+{
+"cat": "x:food",
+"en": "feteer",
+"w": "feteer",
+"s": "This is a feteer.",
+"thing": "x_feteer",
+"ar": "فطير"
+},
+{
+"cat": "x:food",
+"en": "basbousa",
+"w": "basbousa",
+"s": "This is basbousa.",
+"thing": "x_basbousa",
+"ar": "بسبوسة"
+},
+{
+"cat": "x:food",
+"en": "kunafa",
+"w": "kunafa",
+"s": "This is kunafa.",
+"thing": "x_kunafa",
+"ar": "كنافة"
+},
+{
+"cat": "x:food",
+"en": "om ali",
+"w": "om ali",
+"s": "This is om ali.",
+"thing": "x_om_ali",
+"ar": "أم علي"
+},
+{
+"cat": "x:food",
+"en": "stuffed vine leaves",
+"w": "stuffed vine leaves",
+"s": "These are stuffed vine leaves.",
+"thing": "x_stuffed_vine_leaves",
+"ar": "محشي"
+},
+{
+"cat": "x:food",
+"en": "hummus",
+"w": "hummus",
+"s": "This is hummus.",
+"thing": "x_hummus",
+"ar": "حمص"
+},
+{
+"cat": "x:food",
+"en": "tahini",
+"w": "tahini",
+"s": "This is tahini.",
+"thing": "x_tahini",
+"ar": "طحينة"
+},
+{
+"cat": "x:food",
+"en": "rice pudding",
+"w": "rice pudding",
+"s": "This is rice pudding.",
+"thing": "x_rice_pudding",
+"ar": "رز بلبن"
+},
+{
+"cat": "x:food",
+"en": "burger",
+"w": "burger",
+"s": "This is a burger.",
+"thing": "x_burger",
+"ar": "برجر"
+},
+{
+"cat": "x:food",
+"en": "sandwich",
+"w": "sandwich",
+"s": "This is a sandwich.",
+"thing": "x_sandwich",
+"ar": "ساندوتش"
+},
+{
+"cat": "x:food",
+"en": "spaghetti",
+"w": "spaghetti",
+"s": "This is spaghetti.",
+"thing": "x_spaghetti",
+"ar": "مكرونة"
+},
+{
+"cat": "x:food",
+"en": "french fries",
+"w": "french fries",
+"s": "These are french fries.",
+"thing": "x_french_fries",
+"ar": "بطاطس مقلية"
+},
+{
+"cat": "x:food",
+"en": "salad",
+"w": "salad",
+"s": "This is salad.",
+"thing": "x_salad",
+"ar": "سلطة"
+},
+{
+"cat": "x:food",
+"en": "butter",
+"w": "butter",
+"s": "This is butter.",
+"thing": "x_butter",
+"ar": "زبدة"
+},
+{
+"cat": "x:food",
+"en": "yogurt",
+"w": "yogurt",
+"s": "This is yogurt.",
+"thing": "x_yogurt",
+"ar": "زبادي"
+},
+{
+"cat": "x:food",
+"en": "cake",
+"w": "cake",
+"s": "This is a cake.",
+"thing": "x_cake",
+"ar": "تورتة"
+},
+{
+"cat": "x:food",
+"en": "chocolate",
+"w": "chocolate",
+"s": "This is chocolate.",
+"thing": "x_chocolate",
+"ar": "شوكولاتة"
+},
+{
+"cat": "x:food",
+"en": "jam",
+"w": "jam",
+"s": "This is jam.",
+"thing": "x_jam",
+"ar": "مربى"
+},
+{
+"cat": "x:food",
+"en": "sugar",
+"w": "sugar",
+"s": "This is sugar.",
+"thing": "x_sugar",
+"ar": "سكر"
+},
+{
+"cat": "x:food",
+"en": "salt",
+"w": "salt",
+"s": "This is salt.",
+"thing": "x_salt",
+"ar": "ملح"
+},
+{
+"cat": "x:food",
+"en": "tea",
+"w": "tea",
+"s": "This is tea.",
+"thing": "x_tea",
+"ar": "شاي"
+},
+{
+"cat": "x:food",
+"en": "lemonade",
+"w": "lemonade",
+"s": "This is lemonade.",
+"thing": "x_lemonade",
+"ar": "ليمونادة"
+},
+{
+"cat": "x:food",
+"en": "cereal",
+"w": "cereal",
+"s": "This is cereal.",
+"thing": "x_cereal",
+"ar": "كورن فليكس"
+},
+{
+"cat": "x:food",
+"en": "nuts",
+"w": "nuts",
+"s": "These are nuts.",
+"thing": "x_nuts",
+"ar": "مكسرات"
+},
+{
+"cat": "x:food",
+"en": "peanuts",
+"w": "peanuts",
+"s": "These are peanuts.",
+"thing": "x_peanuts",
+"ar": "فول سوداني"
+},
+{
+"cat": "x:food",
+"en": "spinach",
+"w": "spinach",
+"s": "This is spinach.",
+"thing": "x_spinach",
+"ar": "سبانخ"
+},
+{
+"cat": "x:food",
+"en": "zucchini",
+"w": "zucchini",
+"s": "This is a zucchini.",
+"thing": "x_zucchini",
+"ar": "كوسة"
+},
+{
+"cat": "x:food",
+"en": "cabbage",
+"w": "cabbage",
+"s": "This is cabbage.",
+"thing": "x_cabbage",
+"ar": "كرنب"
+},
+{
+"cat": "x:food",
+"en": "cauliflower",
+"w": "cauliflower",
+"s": "This is cauliflower.",
+"thing": "x_cauliflower",
+"ar": "قرنبيط"
+},
+{
+"cat": "x:food",
+"en": "okra",
+"w": "okra",
+"s": "This is okra.",
+"thing": "x_okra",
+"ar": "بامية"
+},
+{
+"cat": "x:food",
+"en": "green beans",
+"w": "green beans",
+"s": "These are green beans.",
+"thing": "x_green_beans",
+"ar": "فاصوليا"
+},
+{
+"cat": "x:food",
+"en": "radish",
+"w": "radish",
+"s": "This is a radish.",
+"thing": "x_radish",
+"ar": "فجل"
+},
+{
+"cat": "x:food",
+"en": "grapefruit",
+"w": "grapefruit",
+"s": "This is a grapefruit.",
+"thing": "x_grapefruit",
+"ar": "جريب فروت"
+},
+{
+"cat": "x:food",
+"en": "tangerine",
+"w": "tangerine",
+"s": "This is a tangerine.",
+"thing": "x_tangerine",
+"ar": "يوسفي"
+},
+{
+"cat": "x:food",
+"en": "guava",
+"w": "guava",
+"s": "This is a guava.",
+"thing": "x_guava",
+"ar": "جوافة"
+},
+{
+"cat": "x:food",
+"en": "lime",
+"w": "lime",
+"s": "This is a lime.",
+"thing": "x_lime",
+"ar": "ليمون أخضر"
+},
+{
+"cat": "x:food",
+"en": "pancake",
+"w": "pancake",
+"s": "This is a pancake.",
+"thing": "x_pancake",
+"ar": "فطيرة حلوة"
+},
+{
+"cat": "x:food",
+"en": "popcorn",
+"w": "popcorn",
+"s": "This is a popcorn.",
+"thing": "x_popcorn",
+"ar": "فشار"
+},
+{
+"cat": "x:food",
+"en": "sausage",
+"w": "sausage",
+"s": "This is a sausage.",
+"thing": "x_sausage",
+"ar": "سجق"
+},
+{
+"cat": "x:food",
+"en": "tuna",
+"w": "tuna",
+"s": "This is a tuna.",
+"thing": "x_tuna",
+"ar": "تونة"
+},
+{
+"cat": "x:food",
+"en": "lentil soup",
+"w": "lentil soup",
+"s": "This is a lentil soup.",
+"thing": "x_lentil_soup",
+"ar": "شوربة عدس"
+},
+{
+"cat": "x:food",
+"en": "mango juice",
+"w": "mango juice",
+"s": "This is a mango juice.",
+"thing": "x_mango_juice",
+"ar": "عصير مانجا"
+},
+{
+"cat": "x:home",
+"en": "door",
+"w": "door",
+"s": "This is a door.",
+"thing": "x_door",
+"ar": "باب"
+},
+{
+"cat": "x:home",
+"en": "window",
+"w": "window",
+"s": "This is a window.",
+"thing": "x_window",
+"ar": "شباك"
+},
+{
+"cat": "x:home",
+"en": "sofa",
+"w": "sofa",
+"s": "This is a sofa.",
+"thing": "x_sofa",
+"ar": "كنبة"
+},
+{
+"cat": "x:home",
+"en": "kitchen",
+"w": "kitchen",
+"s": "This is a kitchen.",
+"thing": "x_kitchen",
+"ar": "مطبخ"
+},
+{
+"cat": "x:home",
+"en": "bathroom",
+"w": "bathroom",
+"s": "This is a bathroom.",
+"thing": "x_bathroom",
+"ar": "حمام"
+},
+{
+"cat": "x:home",
+"en": "bedroom",
+"w": "bedroom",
+"s": "This is a bedroom.",
+"thing": "x_bedroom",
+"ar": "أوضة النوم"
+},
+{
+"cat": "x:home",
+"en": "stairs",
+"w": "stairs",
+"s": "These are stairs.",
+"thing": "x_stairs",
+"ar": "سلم"
+},
+{
+"cat": "x:home",
+"en": "roof",
+"w": "roof",
+"s": "This is a roof.",
+"thing": "x_roof",
+"ar": "سطح"
+},
+{
+"cat": "x:home",
+"en": "fridge",
+"w": "fridge",
+"s": "This is a fridge.",
+"thing": "x_fridge",
+"ar": "تلاجة"
+},
+{
+"cat": "x:home",
+"en": "oven",
+"w": "oven",
+"s": "This is an oven.",
+"thing": "x_oven",
+"ar": "فرن"
+},
+{
+"cat": "x:home",
+"en": "lamp",
+"w": "lamp",
+"s": "This is a lamp.",
+"thing": "x_lamp",
+"ar": "أباجورة"
+},
+{
+"cat": "x:home",
+"en": "carpet",
+"w": "carpet",
+"s": "This is a carpet.",
+"thing": "x_carpet",
+"ar": "سجادة"
+},
+{
+"cat": "x:home",
+"en": "mirror",
+"w": "mirror",
+"s": "This is a mirror.",
+"thing": "x_mirror",
+"ar": "مراية"
+},
+{
+"cat": "x:home",
+"en": "curtain",
+"w": "curtain",
+"s": "This is a curtain.",
+"thing": "x_curtain",
+"ar": "ستارة"
+},
+{
+"cat": "x:home",
+"en": "key",
+"w": "key",
+"s": "This is a key.",
+"thing": "x_key",
+"ar": "مفتاح"
+},
+{
+"cat": "x:home",
+"en": "cup",
+"w": "cup",
+"s": "This is a cup.",
+"thing": "x_cup",
+"ar": "كوباية"
+},
+{
+"cat": "x:home",
+"en": "plate",
+"w": "plate",
+"s": "This is a plate.",
+"thing": "x_plate",
+"ar": "طبق"
+},
+{
+"cat": "x:home",
+"en": "spoon",
+"w": "spoon",
+"s": "This is a spoon.",
+"thing": "x_spoon",
+"ar": "معلقة"
+},
+{
+"cat": "x:home",
+"en": "fork",
+"w": "fork",
+"s": "This is a fork.",
+"thing": "x_fork",
+"ar": "شوكة"
+},
+{
+"cat": "x:home",
+"en": "knife",
+"w": "knife",
+"s": "This is a knife.",
+"thing": "x_knife",
+"ar": "سكينة"
+},
+{
+"cat": "x:home",
+"en": "bowl",
+"w": "bowl",
+"s": "This is a bowl.",
+"thing": "x_bowl",
+"ar": "زبدية"
+},
+{
+"cat": "x:home",
+"en": "bottle",
+"w": "bottle",
+"s": "This is a bottle.",
+"thing": "x_bottle",
+"ar": "زجاجة"
+},
+{
+"cat": "x:home",
+"en": "pot",
+"w": "pot",
+"s": "This is a pot.",
+"thing": "x_pot",
+"ar": "حلة"
+},
+{
+"cat": "x:home",
+"en": "soap",
+"w": "soap",
+"s": "This is a soap.",
+"thing": "x_soap",
+"ar": "صابونة"
+},
+{
+"cat": "x:home",
+"en": "comb",
+"w": "comb",
+"s": "This is a comb.",
+"thing": "x_comb",
+"ar": "مشط"
+},
+{
+"cat": "x:home",
+"en": "bin",
+"w": "bin",
+"s": "This is a bin.",
+"thing": "x_bin",
+"ar": "سلة زبالة"
+},
+{
+"cat": "x:home",
+"en": "television",
+"w": "television",
+"s": "This is a television.",
+"thing": "x_television",
+"ar": "تلفزيون"
+},
+{
+"cat": "x:home",
+"en": "phone",
+"w": "phone",
+"s": "This is a phone.",
+"thing": "x_phone",
+"ar": "تليفون"
+},
+{
+"cat": "x:home",
+"en": "computer",
+"w": "computer",
+"s": "This is a computer.",
+"thing": "x_computer",
+"ar": "كمبيوتر"
+},
+{
+"cat": "x:home",
+"en": "pillow",
+"w": "pillow",
+"s": "This is a pillow.",
+"thing": "x_pillow",
+"ar": "مخدة"
+},
+{
+"cat": "x:home",
+"en": "blanket",
+"w": "blanket",
+"s": "This is a blanket.",
+"thing": "x_blanket",
+"ar": "بطانية"
+},
+{
+"cat": "x:home",
+"en": "chair",
+"w": "chair",
+"s": "This is a chair.",
+"thing": "x_chair",
+"ar": "كرسي"
+},
+{
+"cat": "x:city",
+"en": "garden",
+"w": "garden",
+"s": "This is a garden.",
+"thing": "x_garden",
+"ar": "حديقة"
+},
+{
+"cat": "x:city",
+"en": "park",
+"w": "park",
+"s": "This is a park.",
+"thing": "x_park",
+"ar": "جنينة"
+},
+{
+"cat": "x:city",
+"en": "zoo",
+"w": "zoo",
+"s": "This is a zoo.",
+"thing": "x_zoo",
+"ar": "حديقة الحيوان"
+},
+{
+"cat": "x:city",
+"en": "farm",
+"w": "farm",
+"s": "This is a farm.",
+"thing": "x_farm",
+"ar": "مزرعة"
+},
+{
+"cat": "x:city",
+"en": "beach",
+"w": "beach",
+"s": "This is a beach.",
+"thing": "x_beach",
+"ar": "شاطئ"
+},
+{
+"cat": "x:city",
+"en": "market",
+"w": "market",
+"s": "This is a market.",
+"thing": "x_market",
+"ar": "سوق"
+},
+{
+"cat": "x:city",
+"en": "mosque",
+"w": "mosque",
+"s": "This is a mosque.",
+"thing": "x_mosque",
+"ar": "جامع"
+},
+{
+"cat": "x:city",
+"en": "church",
+"w": "church",
+"s": "This is a church.",
+"thing": "x_church",
+"ar": "كنيسة"
+},
+{
+"cat": "x:city",
+"en": "library",
+"w": "library",
+"s": "This is a library.",
+"thing": "x_library",
+"ar": "مكتبة"
+},
+{
+"cat": "x:city",
+"en": "bakery",
+"w": "bakery",
+"s": "This is a bakery.",
+"thing": "x_bakery",
+"ar": "مخبز"
+},
+{
+"cat": "x:city",
+"en": "shop",
+"w": "shop",
+"s": "This is a shop.",
+"thing": "x_shop",
+"ar": "محل"
+},
+{
+"cat": "x:city",
+"en": "bank",
+"w": "bank",
+"s": "This is a bank.",
+"thing": "x_bank",
+"ar": "بنك"
+},
+{
+"cat": "x:city",
+"en": "airport",
+"w": "airport",
+"s": "This is an airport.",
+"thing": "x_airport",
+"ar": "مطار"
+},
+{
+"cat": "x:city",
+"en": "train station",
+"w": "train station",
+"s": "This is a train station.",
+"thing": "x_train_station",
+"ar": "محطة قطر"
+},
+{
+"cat": "x:city",
+"en": "street",
+"w": "street",
+"s": "This is a street.",
+"thing": "x_street",
+"ar": "شارع"
+},
+{
+"cat": "x:city",
+"en": "traffic light",
+"w": "traffic light",
+"s": "This is a traffic light.",
+"thing": "x_traffic_light",
+"ar": "إشارة مرور"
+},
+{
+"cat": "x:city",
+"en": "river",
+"w": "river",
+"s": "This is a river.",
+"thing": "x_river",
+"ar": "نهر"
+},
+{
+"cat": "x:city",
+"en": "sea",
+"w": "sea",
+"s": "This is sea.",
+"thing": "x_sea",
+"ar": "بحر"
+},
+{
+"cat": "x:city",
+"en": "lake",
+"w": "lake",
+"s": "This is a lake.",
+"thing": "x_lake",
+"ar": "بحيرة"
+},
+{
+"cat": "x:city",
+"en": "island",
+"w": "island",
+"s": "This is an island.",
+"thing": "x_island",
+"ar": "جزيرة"
+},
+{
+"cat": "x:city",
+"en": "forest",
+"w": "forest",
+"s": "This is a forest.",
+"thing": "x_forest",
+"ar": "غابة"
+},
+{
+"cat": "x:city",
+"en": "desert",
+"w": "desert",
+"s": "This is a desert.",
+"thing": "x_desert",
+"ar": "صحرا"
+},
+{
+"cat": "x:city",
+"en": "hill",
+"w": "hill",
+"s": "This is a hill.",
+"thing": "x_hill",
+"ar": "تل"
+},
+{
+"cat": "x:city",
+"en": "sky",
+"w": "sky",
+"s": "This is sky.",
+"thing": "x_sky",
+"ar": "سما"
+},
+{
+"cat": "x:city",
+"en": "volcano",
+"w": "volcano",
+"s": "This is a volcano.",
+"thing": "x_volcano",
+"ar": "بركان"
+},
+{
+"cat": "x:city",
+"en": "cave",
+"w": "cave",
+"s": "This is a cave.",
+"thing": "x_cave",
+"ar": "كهف"
+},
+{
+"cat": "x:city",
+"en": "waterfall",
+"w": "waterfall",
+"s": "This is a waterfall.",
+"thing": "x_waterfall",
+"ar": "شلال"
+},
+{
+"cat": "x:home",
+"en": "balcony",
+"w": "balcony",
+"s": "This is a balcony.",
+"thing": "x_balcony",
+"ar": "بلكونة"
+},
+{
+"cat": "x:home",
+"en": "garage",
+"w": "garage",
+"s": "This is a garage.",
+"thing": "x_garage",
+"ar": "جراج"
+},
+{
+"cat": "x:home",
+"en": "lift",
+"w": "lift",
+"s": "This is a lift.",
+"thing": "x_lift",
+"ar": "أسانسير"
+},
+{
+"cat": "x:home",
+"en": "hall",
+"w": "hall",
+"s": "This is a hall.",
+"thing": "x_hall",
+"ar": "صالة"
+},
+{
+"cat": "x:home",
+"en": "toilet",
+"w": "toilet",
+"s": "This is a toilet.",
+"thing": "x_toilet",
+"ar": "تواليت"
+},
+{
+"cat": "x:home",
+"en": "shower",
+"w": "shower",
+"s": "This is a shower.",
+"thing": "x_shower",
+"ar": "دش"
+},
+{
+"cat": "x:home",
+"en": "bathtub",
+"w": "bathtub",
+"s": "This is a bathtub.",
+"thing": "x_bathtub",
+"ar": "بانيو"
+},
+{
+"cat": "x:home",
+"en": "washing machine",
+"w": "washing machine",
+"s": "This is a washing machine.",
+"thing": "x_washing_machine",
+"ar": "غسالة"
+},
+{
+"cat": "x:home",
+"en": "vacuum cleaner",
+"w": "vacuum cleaner",
+"s": "This is a vacuum cleaner.",
+"thing": "x_vacuum_cleaner",
+"ar": "مكنسة كهربا"
+},
+{
+"cat": "x:home",
+"en": "iron",
+"w": "iron",
+"s": "This is an iron.",
+"thing": "x_iron",
+"ar": "مكواة"
+},
+{
+"cat": "x:home",
+"en": "hanger",
+"w": "hanger",
+"s": "This is a hanger.",
+"thing": "x_hanger",
+"ar": "شماعة"
+},
+{
+"cat": "x:home",
+"en": "shelf",
+"w": "shelf",
+"s": "This is a shelf.",
+"thing": "x_shelf",
+"ar": "رف"
+},
+{
+"cat": "x:home",
+"en": "drawer",
+"w": "drawer",
+"s": "This is a drawer.",
+"thing": "x_drawer",
+"ar": "درج"
+},
+{
+"cat": "x:home",
+"en": "cupboard",
+"w": "cupboard",
+"s": "This is a cupboard.",
+"thing": "x_cupboard",
+"ar": "دولاب مطبخ"
+},
+{
+"cat": "x:city",
+"en": "school gate",
+"w": "school gate",
+"s": "This is a school gate.",
+"thing": "x_school_gate",
+"ar": "بوابة المدرسة"
+},
+{
+"cat": "x:city",
+"en": "playground",
+"w": "playground",
+"s": "This is a playground.",
+"thing": "x_playground",
+"ar": "ملعب"
+},
+{
+"cat": "x:city",
+"en": "swimming pool",
+"w": "swimming pool",
+"s": "This is a swimming pool.",
+"thing": "x_swimming_pool",
+"ar": "حمام سباحة"
+},
+{
+"cat": "x:city",
+"en": "cinema",
+"w": "cinema",
+"s": "This is a cinema.",
+"thing": "x_cinema",
+"ar": "سينما"
+},
+{
+"cat": "x:city",
+"en": "restaurant",
+"w": "restaurant",
+"s": "This is a restaurant.",
+"thing": "x_restaurant",
+"ar": "مطعم"
+},
+{
+"cat": "x:city",
+"en": "pharmacy",
+"w": "pharmacy",
+"s": "This is a pharmacy.",
+"thing": "x_pharmacy",
+"ar": "صيدلية"
+},
+{
+"cat": "x:city",
+"en": "supermarket",
+"w": "supermarket",
+"s": "This is a supermarket.",
+"thing": "x_supermarket",
+"ar": "سوبر ماركت"
+},
+{
+"cat": "x:city",
+"en": "police station",
+"w": "police station",
+"s": "This is a police station.",
+"thing": "x_police_station",
+"ar": "قسم الشرطة"
+},
+{
+"cat": "x:city",
+"en": "post office",
+"w": "post office",
+"s": "This is a post office.",
+"thing": "x_post_office",
+"ar": "مكتب البريد"
+},
+{
+"cat": "x:city",
+"en": "museum",
+"w": "museum",
+"s": "This is a museum.",
+"thing": "x_museum",
+"ar": "متحف"
+},
+{
+"cat": "x:city",
+"en": "stadium",
+"w": "stadium",
+"s": "This is a stadium.",
+"thing": "x_stadium",
+"ar": "استاد"
 }
 ]

@@ -20,7 +20,7 @@ import { shapeGeo } from '../kit/shapes3d.js';
 import { colorOf } from './colors.js';
 import { NUMBERS } from '../kit/words.js';
 import { LEVELS, ALL_LEVELS, EVERY_LEVEL, ARABIC_LEVELS, TOPIC_LEVELS, LevelPlay, levelsFor, cheer } from './levels.js';
-import { EN_LEVELS } from '../english/levels.js';
+import { EN_LEVELS, DE_LEVELS } from '../english/levels.js';
 import { FreshMemory } from './fresh.js';
 import { themeForWorld } from '../kit/themes.js';
 import { ROUNDS } from './sim.js';
@@ -535,9 +535,10 @@ class Game {
   }
 
   /** True while the child learns English (the chooser in the app passes learnLang 'en'); the Arabic world is untouched. */
-  _learnEn() { return !!(this.sh.cfg && this.sh.cfg.learnLang === 'en'); }
+  _learnEn() { const l = this.sh.cfg && this.sh.cfg.learnLang; return l === 'en' || l === 'de'; }
+  _learnDe() { return !!(this.sh.cfg && this.sh.cfg.learnLang === 'de'); }
   /** The levels of the language being learned. */
-  _list() { return this._learnEn() ? EN_LEVELS : ARABIC_LEVELS; }
+  _list() { return this._learnDe() ? DE_LEVELS : this._learnEn() ? EN_LEVELS : ARABIC_LEVELS; }
 
   _levels() {
     const sh = this.sh;
@@ -549,16 +550,17 @@ class Game {
     sh.sound.energy = 0;
     sh.layer.append(h('div', { class: 'lk-top' }, sh.backBtn(), h('span'), sh.soundBtn()));
     const unlocked = Infinity; // every level is open: the child chooses any of them
-    const list = this._learnEn() ? EN_LEVELS : levelsFor(sh.age);
+    const list = this._learnEn() ? this._list() : levelsFor(sh.age);
     const tiles = list.map((lv, i) => {
       const locked = i + 1 > unlocked;
       const done = !!this.save.lw.done[lv.id];
       return h('button', {
         class: `lw-tile${locked ? ' lock' : ''}${done ? ' done' : ''}`, 'aria-label': lv.ar, disabled: locked || null,
         onclick: () => { sh.sound.play('tap'); this._enter(lv.id); },
-      }, h('i', {}, locked ? '🔒' : lv.emoji), h('b', {}, this._learnEn() ? String(i + 1) : sh.T.num(i + 1)), h('span', {}, lv.ar), done ? h('u', {}, '⭐') : null);
+      }, lv.art ? h('i', { class: 'lw-ic' }, h('img', { src: `${sh.base}art/${lv.art.icon}.webp`, alt: '' })) : h('i', {}, locked ? '🔒' : lv.emoji), h('b', {}, this._learnEn() ? String(i + 1) : sh.T.num(i + 1)), h('span', {}, lv.ar), done ? h('u', {}, '⭐') : null);
     });
-    const oldCard = h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.18)' }, h('div', { class: `lw-card${this._learnEn() ? ' lw-en' : ''}` }, h('div', { class: 'lw-title' }, this._learnEn() ? 'Pick a game 🎧' : sh.t('pick')), h('div', { class: 'lw-grid' }, tiles)));
+    const mapArt = this._learnEn() && list[0].art ? `background:linear-gradient(rgba(40,30,90,.10),rgba(40,30,90,.10)),url(${sh.base}art/${list[0].art.map}.webp) center/cover no-repeat;` : '';
+    const oldCard = h('div', { class: 'lk-dim', style: mapArt + 'background-color:rgba(40,30,90,.18)' }, h('div', { class: `lw-card${this._learnEn() ? ' lw-en' : ''}` }, h('div', { class: 'lw-title' }, this._learnDe() ? 'Such ein Spiel aus 🎧' : this._learnEn() ? 'Pick a game 🎧' : sh.t('pick')), h('div', { class: 'lw-grid' }, tiles)));
     if (this._learnEn()) { sh.layer.append(oldCard); this.owl.act('cheer'); this.owl.look(0); return; } // English: its own simple list of levels
     // the owner's picture of the levels page (2026-11-13): shown when its file is there, otherwise the card above
     const topBar = sh.layer.querySelector('.lk-top');
@@ -797,8 +799,8 @@ class Game {
         else this.sh.speak(slow ? r.retry : [r.say[0]]);
       };
       this.sign.style.direction = 'ltr';
-      this.sign.append(this.signText, h('button', { class: 'lw-again lw-hear', 'aria-label': 'Listen again', onclick: hear(false) }, h('b', {}, '🔊'), h('small', {}, 'Listen')),
-        h('button', { class: 'lw-again lw-hear lw-slow', 'aria-label': 'Listen slowly', onclick: hear(true) }, h('b', {}, '🐢'), h('small', {}, 'Slowly')));
+      this.sign.append(this.signText, h('button', { class: 'lw-again lw-hear', 'aria-label': 'Listen again', onclick: hear(false) }, h('b', {}, '🔊'), h('small', {}, this._learnDe() ? 'Hören' : 'Listen')),
+        h('button', { class: 'lw-again lw-hear lw-slow', 'aria-label': 'Listen slowly', onclick: hear(true) }, h('b', {}, '🐢'), h('small', {}, this._learnDe() ? 'Langsam' : 'Slowly')));
     } else this.sign.append(this.signIcon, this.signText, h('button', { class: 'lw-again', 'aria-label': sh.t('again'), onclick: (e) => { e.stopPropagation(); this._say(); } }, '🔊'));
     sh.layer.append(this.sign);
     sh.sound.setMode('play');
@@ -827,7 +829,7 @@ class Game {
     this.st.setPicks([...this.opts.values()], (id) => this._tap(id));
     this.st.focus = null;
     this.signText.textContent = r.prompt;
-    this.signText.style.direction = r.lang === 'en' ? 'ltr' : '';
+    this.signText.style.direction = r.lang === 'en' || r.lang === 'de' ? 'ltr' : '';
     this.sign.classList.remove('pop');
     void this.sign.offsetWidth;
     this.sign.classList.add('pop');
@@ -895,7 +897,7 @@ ead) also reads every choice aloud, one after the other, and the choice being re
     const seq = [phrase];
     if (r.reward) seq.push(r.reward);
     this.signText.textContent = r.reward ? (r.arWord ? `${r.reward}  ·  ${r.arWord}` : r.reward) : phrase;
-    this.signText.style.direction = r.lang === 'en' && r.reward ? 'ltr' : '';
+    this.signText.style.direction = (r.lang === 'en' || r.lang === 'de') && r.reward ? 'ltr' : '';
     this.signIcon.textContent = '⭐';
     this._advDone = false;
     const next = () => {
@@ -963,6 +965,7 @@ ead) also reads every choice aloud, one after the other, and the choice being re
       // the very last level: the end card (the star the first time), then back to the levels
       sh.sound.setMode('calm');
       sh.finishCard(this.level.ar, this.level.emoji, () => this._begin(this.levelId, true), null, () => this._levels());
+      if (this.level.art) { const c = [...sh.layer.querySelectorAll('.lk-dim')].pop(); if (c) c.style.cssText += `background:linear-gradient(rgba(0,0,0,.12),rgba(0,0,0,.12)),url(${sh.base}art/${this.level.art.win}.webp) center/cover no-repeat;`; }
       setTimeout(() => this._report(), 1500); // the whole journey is done: the child's report
       return;
     }
@@ -1280,6 +1283,7 @@ const CSS = `
 .lw-tile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.4);width:calc(var(--u)*17);min-width:92px;height:calc(var(--u)*19);min-height:96px;border:calc(var(--u)*.6) solid #fff;border-radius:calc(var(--u)*3.4);background:linear-gradient(180deg,#8ad8ff,#3aa0f0);color:#fff;font-family:inherit;font-weight:900;cursor:pointer;padding:calc(var(--u)*.8);box-shadow:0 calc(var(--u)*.8) 0 #1a6ab8,0 calc(var(--u)*1) calc(var(--u)*2) rgba(20,40,80,.3)}
 .lw-tile:active{transform:translateY(calc(var(--u)*.5))}
 .lw-tile i{font-style:normal;font-size:calc(var(--u)*6.5);line-height:1}
+.lw-tile i.lw-ic{width:calc(var(--u)*9);height:calc(var(--u)*9)}.lw-tile i.lw-ic img{width:100%;height:100%;object-fit:contain;display:block}
 .lw-tile b{position:absolute;top:calc(var(--u)*.6);left:calc(var(--u)*1);font-size:calc(var(--u)*3);background:#ffd23a;color:#5a3a00;border-radius:999px;min-width:calc(var(--u)*4.6);text-align:center}
 .lw-tile span{font-size:calc(var(--u)*3.3);line-height:1.15;text-align:center}
 .lw-tile u{position:absolute;bottom:calc(var(--u)*.4);right:calc(var(--u)*.8);text-decoration:none;font-size:calc(var(--u)*3.6)}
@@ -1363,7 +1367,7 @@ const CSS = `
 .lw-fade.on{opacity:1}
 .lw-tile:focus-visible{outline:calc(var(--u)*.8) solid #6a3ad0;outline-offset:calc(var(--u)*.6)}
 @media (max-aspect-ratio:1/1){.lw-grid{grid-template-columns:repeat(3,1fr)}}
-.lw-en{direction:ltr}.lw-en .lw-grid{grid-template-columns:repeat(7,1fr)}.lw-en .lw-tile span{font-size:calc(var(--u)*2.7)}
+.lw-en{direction:ltr}.lw-en .lw-grid{grid-template-columns:repeat(10,minmax(0,1fr))}.lw-en .lw-tile{min-width:0;padding-inline:0}.lw-en .lw-tile span{font-size:calc(var(--u)*2.7)}
 @media (max-aspect-ratio:1/1){.lw-en .lw-grid{grid-template-columns:repeat(3,1fr)}}
 `;
 

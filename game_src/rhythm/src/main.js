@@ -415,7 +415,7 @@ class Game {
     } else this.sound.play('lose');
     const place = won ? 1 : sh.left + 1;
     const hasNext = won && i + 1 < TRACKS.length;
-    const dim = h('div', { class: 'rh-dim' }, h('div', { class: 'rh-panel' },
+    const dim = h('div', { class: won ? 'rh-dim rh-win' : 'rh-dim' }, h('div', { class: 'rh-panel' },
       h('div', { class: 'rh-logo', style: 'font-size:calc(var(--u)*8)' }, won ? '' : t('knocked')),
       won ? h('div', { class: 'rh-title' }, t('win')) : null,
       won ? h('div', { class: 'rh-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= r.stars ? '' : 'off' }, '⭐'))) : h('div', { class: 'rh-box' }, h('b', {}, num(place)), h('span', {}, t('place'))),

@@ -594,7 +594,7 @@ class Game {
       this.sound.play('win');
     } else this.sound.play('down');
     const hasNext = won && i + 1 < STAGES.length;
-    const dim = h('div', { class: 'sa-dim' }, h('div', { class: 'sa-panel' },
+    const dim = h('div', { class: won ? 'sa-dim sa-win' : 'sa-dim' }, h('div', { class: 'sa-panel' },
       h('div', { class: 'sa-title' }, won ? t('win') : t('down')),
       won ? h('div', { class: 'sa-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= stars ? '' : 'off' }, '⭐'))) : null,
       h('div', { class: 'sa-stat' }, h('span', {}, '✴️ ', num(f.kills), ' ', t('kills')), h('span', {}, '🔥 ', t('best'), ' ', num(f.bestCombo))),

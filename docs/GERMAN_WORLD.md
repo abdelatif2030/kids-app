@@ -1,0 +1,6 @@
+# German with Rehlaty («تعلّم الألماني»)
+Same world and method as English (docs/ENGLISH_WORLD.md): the chooser «عايز تتعلم إيه؟» has a third card, Deutsch. Hear the German word, tap the picture / number / letter / colour / shape.
+- Words: `docs/GERMAN_WORDLIST.csv` (437 rows) -> `src/german/words.json` (`tools/make_german_data.py`): every row is shown with the SAME picture as its English row. 16 levels (Tiere, Meine ersten Wörter, Ich und meine Familie, Lecker essen, Kleidung und Schule, Berufe/Musik/Wetter, Bunte Dinge, Mein Tag, Zahlen, ABC (with Ä Ö Ü ß), Farben, Formen, Tage und Monate, Große Zahlen, Wo ist der Ball?, Perlen). Ids `de_*`.
+- Voice: clip ids are `clipId(text,'de')` (checked against the csv by test/german.test.js); `assets/games/learn_voice/de/` is EMPTY: the device German voice (`de-DE`) speaks until the owner's recordings arrive (file list: `docs/NEW_CLIPS_TO_RECORD.csv`).
+- Flutter: `kLearnGerman` (learnLang 'de', store key learn_german), `LearnLanguageGate` card, `AppAudio` maps 'de' to de-DE, every learning page's boot.js too.
+- Not built: German versions of the 297 expansion words (needs the German words + articles), listening to the Arabic meaning after the praise (German rows have no Arabic voice yet).

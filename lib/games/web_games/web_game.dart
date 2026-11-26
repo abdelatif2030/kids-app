@@ -760,6 +760,18 @@ final WebGame kLearnEnglish = WebGame(
   learnLang: 'en',
 );
 
+/// «تعلّم الألماني» (German with Rehlaty): the same world and method as English, German words (the owner's German voice pack).
+final WebGame kLearnGerman = WebGame(
+  id: 'learn_german',
+  folder: 'learn_letters',
+  global: 'LearnLetters',
+  storeKey: 'learn_german',
+  minAge: 2,
+  title: () => tr2('تعلّم الألماني', 'Learn German'),
+  learnId: 'german_world',
+  learnLang: 'de',
+);
+
 /// «الحساب والعدّ» (Counting at the Market): get N apples counted aloud, and count what is in the basket.
 final WebGame kLearnCounting = WebGame(
   id: 'learn_counting',
@@ -794,7 +806,7 @@ final WebGame kLearnAnimals = WebGame(
 );
 
 /// Rebuilt learning games, by their old game id.
-final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay, kLearnLadders, kLearnBall, kLearnPattern, kLearnLetters, kLearnCounting, kLearnShapes, kLearnAnimals, kLearnEnglish]) g.learnId!: g};
+final Map<String, WebGame> kLearnWebGames = {for (final g in [kLearnMaze, kLearnSort, kLearnTreasure, kLearnDay, kLearnLadders, kLearnBall, kLearnPattern, kLearnLetters, kLearnCounting, kLearnShapes, kLearnAnimals, kLearnEnglish, kLearnGerman]) g.learnId!: g};
 
 /// Lets the screen ask the running game page to step back INSIDE the game first (owner 2026-11-22): the view sets [tryBack] while it is alive.
 /// It answers true when the page handled it (paused, returned to the game's menu or level list) and false when the game is at its main menu.

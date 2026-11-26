@@ -12,9 +12,12 @@ export function spoken(text) {
     .trim();
 }
 
+/** The languages a clip can be in: Arabic (default), English, German. */
+const L = (l) => (l === 'en' || l === 'de' ? l : 'ar');
+
 /** Stable id of a sentence: FNV-1a over "<lang>|<spoken text>", 8 hex digits. */
 export function clipId(text, lang) {
-  const s = `${lang === 'en' ? 'en' : 'ar'}|${spoken(text)}`;
+  const s = `${L(lang)}|${spoken(text)}`;
   let h = 0x811c9dc5;
   for (const ch of new TextEncoder().encode(s)) { h ^= ch; h = Math.imul(h, 0x01000193) >>> 0; }
   return h.toString(16).padStart(8, '0');
@@ -27,7 +30,7 @@ export class Voice {
   /** [base] is the game's folder URL; [fallback](text, lang) speaks with the device voice; [onTalk](secs) ducks the music. */
   constructor(base, lang, fallback, onTalk) {
     this.dir = `${base}../learn_voice/`;
-    this.lang = lang === 'en' ? 'en' : 'ar';
+    this.lang = L(lang);
     this.fallback = fallback;
     this.onTalk = onTalk || (() => {});
     this.queue = [];
@@ -74,7 +77,7 @@ export class Voice {
    *  (English teaching words: the same word as a slower clip, `<id>_slow`). */
   _item(x) {
     if (typeof x === 'string') return { t: spoken(x), lang: this.lang, slow: false };
-    return { t: spoken(x.t), lang: x.lang === 'en' ? 'en' : x.lang === 'ar' ? 'ar' : this.lang, slow: !!x.slow };
+    return { t: spoken(x.t), lang: x.lang === 'en' || x.lang === 'de' || x.lang === 'ar' ? x.lang : this.lang, slow: !!x.slow };
   }
 
   _clipName(it) { return clipId(it.t, it.lang) + (it.slow ? '_slow' : ''); }
@@ -124,7 +127,7 @@ export class Voice {
       const same = [];
       while (this.queue.length && this.queue[0].lang === lang) same.push(this.queue.shift());
       const all = [text, ...same];
-      const rest = all.map((x) => x.t).join(lang === 'en' ? ', ' : '،  ').replace(/ {2}/g, ' ');
+      const rest = all.map((x) => x.t).join(lang === 'ar' ? '،  ' : ', ').replace(/ {2}/g, ' ');
       this.onTalk(Math.min(8, 1.2 + rest.length * 0.09));
       this.fallback(rest, lang);
       // the device voice speaks it as one sentence: the things light up at an even pace meanwhile, then it is done

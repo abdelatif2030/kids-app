@@ -26,7 +26,7 @@ import { timeQuestions } from './time_level.js';
 import VOICED from './voiced.json' with { type: 'json' };
 import { buildBanks, allBankSentences as bankSentences, COUNT_OBJECTS } from './extra_bank.js';
 import { HABITS_MORE, familyOf } from './habits_more.js';
-import { EN_LEVELS, englishRounds } from '../english/levels.js';
+import { EN_LEVELS, DE_LEVELS, englishRounds } from '../english/levels.js';
 import { NEW_LEVELS, NEW_ITEMS, allNewLevelSentences } from './new_levels.js';
 const VOICED_SET = new Set(VOICED);
 /** True when the sentence has a recorded clip. Tools may set globalThis.__LEARN_ASSUME_VOICED to count what the levels could offer once every new sentence is recorded. */
@@ -120,7 +120,7 @@ TOPIC_LEVELS.push(...NEW_LEVELS); // 2026-11-20: opposites, patterns, senses and
 /** The Arabic world's levels, and the English ones: every level can be found by id in ALL_LEVELS; a menu shows only the list of its language. */
 export const ALL_LEVELS = [...LEVELS, ...TOPIC_LEVELS]; // the Arabic world (what the Arabic tests and menus iterate)
 export const ARABIC_LEVELS = ALL_LEVELS;
-export const EVERY_LEVEL = [...ALL_LEVELS, ...EN_LEVELS]; // plus the English levels: anything looked up by id
+export const EVERY_LEVEL = [...ALL_LEVELS, ...EN_LEVELS, ...DE_LEVELS]; // plus the English levels: anything looked up by id
 export const COUNT_FRUITS = [['apple', null], ['banana', 'موزة'], ['orange', 'برتقالة'], ['strawberry', 'فراولة'], ['pear', 'كمثرى']].filter(([, w]) => !w || isVoiced(`كام ${w}؟`));
 export const levelOf = (id) => EVERY_LEVEL.find((l) => l.id === id);
 /** The youngest (four) skip the two alphabet levels that need reading order. */

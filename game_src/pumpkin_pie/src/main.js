@@ -289,7 +289,7 @@ class Game {
   _complete() {
     this.sound.play('complete');
     this.world.sparkles.burst(this.bakery.p.x, 2, this.bakery.p.z, 80);
-    const dim = h('div', { class: 'pp-dim' }, h('div', { class: 'pp-panel' },
+    const dim = h('div', { class: 'pp-dim pp-win' }, h('div', { class: 'pp-panel' },
       h('div', { class: 'pp-title' }, t('done')),
       h('div', { class: 'pp-stars' }, '⭐⭐⭐'),
       h('div', { class: 'pp-stat' }, h('span', {}, '😊 ', num(this.save.served), ' ', t('served')), h('span', {}, '🥧 ', num(this.save.pies), ' ', t('pies'))),

@@ -13,13 +13,28 @@ const have = (name) => fs.existsSync(new URL(`${name}.mp3`, VOICE));
 const manifest = fs.readFileSync(new URL('../../../assets/games/learn_voice/manifest.js', import.meta.url), 'utf8');
 const MAN = JSON.parse(manifest.slice(manifest.indexOf('{'), manifest.lastIndexOf('}') + 1));
 
-test('fourteen English levels, each with at least eight words', () => {
-  assert.equal(EN_LEVELS.length, 14);
-  for (const lv of EN_LEVELS) assert.ok(poolOfLevel(lv).length >= 8, lv.id);
+test('19 English levels, each with enough words (the two small phrase levels have 5-6)', () => {
+  assert.equal(EN_LEVELS.length, 19);
+  for (const lv of EN_LEVELS) assert.ok(poolOfLevel(lv).length >= (['en_where', 'en_beads'].includes(lv.id) ? 5 : 8), lv.id);
+});
+
+test('the bigger levels reach about a hundred items (animals, food)', () => {
+  for (const [id, n] of [['en_animals', 90], ['en_food', 70]]) assert.ok(poolOfLevel(EN_LEVELS.find((l) => l.id === id)).length >= n, id);
+});
+
+test('every picture an English or German word uses exists as a bundled picture (assets/games/art) and has its size', async () => {
+  const fs = await import('node:fs');
+  const DIMS = JSON.parse(fs.readFileSync(new URL('../src/kit/art_dims.json', import.meta.url), 'utf8'));
+  const DE = JSON.parse(fs.readFileSync(new URL('../src/german/words.json', import.meta.url), 'utf8'));
+  const missing = [];
+  for (const e of [...WORDS, ...DE]) if (e.thing && e.thing.startsWith('x_') && !fs.existsSync(new URL(`../../../assets/games/art/${e.thing}.webp`, import.meta.url))) missing.push(e.thing);
+  assert.deepEqual([...new Set(missing)], []);
+  const noDims = [...new Set([...WORDS, ...DE].filter((e) => e.thing && e.thing.startsWith('x_') && !DIMS[e.thing]).map((e) => e.thing))];
+  assert.deepEqual(noDims, []);
 });
 
 test('every English word has its word clip, slow clip and sentence clip (and the manifest lists them)', () => {
-  for (const e of WORDS) {
+  for (const e of WORDS.filter((x) => !x.cat.startsWith('x:'))) {
     const w = clipId(e.w, 'en'), s = clipId(e.s, 'en');
     assert.ok(have(w) && have(`${w}_slow`) && have(s), `${e.en}`);
     assert.ok(MAN.en.includes(w) && MAN.en.includes(`${w}_slow`) && MAN.en.includes(s), `${e.en} in manifest`);
@@ -53,8 +68,9 @@ test('an Arabic word with its recording follows the praise (everything that is n
   const ar = JSON.parse(fs.readFileSync(new URL('../../../assets/games/learn_voice/lines.json', import.meta.url), 'utf8')).filter((l) => l.lang === 'ar').map((l) => l.id);
   const arDir = new URL('../../../assets/games/learn_voice/ar/', import.meta.url);
   for (const lv of EN_LEVELS) {
-    if (lv.id === 'en_letters') continue;
+    if (['en_letters', 'en_where', 'en_beads'].includes(lv.id)) continue; // the phrase levels: their Arabic is said by the device voice until the owner records it
     for (const r of new LevelPlay(lv.id, 5, 11, null, 'meadow').rounds) {
+      if (r.key.startsWith('en:x:')) continue; // the expansion words: their Arabic clips come with the owner's recordings (device voice until then)
       assert.ok(r.arWord, `${lv.id} ${r.key}`);
       const id = clipId(r.arWord, 'ar');
       assert.ok(ar.includes(id), `${r.arWord} is in the voice list`); // its clip comes from the owner's own recordings (docs/ENGLISH_VOICE_REQUEST.csv); until then the device voice says it

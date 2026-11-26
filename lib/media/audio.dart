@@ -96,6 +96,7 @@ class TtsSpeech implements SpeechBackend, VoiceTunable {
       'ar' => ['ar-SA', 'ar'],
       'ar-EG' => ['ar-EG', 'ar-SA', 'ar'], // the learning games speak Egyptian Arabic
       'en' => ['en-US', 'en'],
+      'de' => ['de-DE', 'de'],
       _ => [lang],
     };
     for (final c in candidates) {

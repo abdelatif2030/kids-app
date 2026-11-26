@@ -197,7 +197,9 @@ class Game {
   _followPano() { if (this.panoMesh) this.panoMesh.position.set(this.camera.position.x, this.camera.position.y + 60, this.camera.position.z); }
 
   _buildWorld(race) {
-    this._setPano(race.theme === 'rhino' ? (race.round % 3) + 1 : 1);
+    // the owner's backdrops: rhino 5, alien 6 (the alien final is the star arch); a round with two or three picks one at random each run
+    const pool = race.theme === 'rhino' ? [[1, 4], [2, 5], [3]][race.round % 3] : [[1, 2], [3, 4, 5], [6]][race.round % 3];
+    this._setPano(pool[Math.floor(Math.random() * pool.length)]);
     for (const c of [...this.world.children]) this.world.remove(c);
     for (const c of [...this.actors.children]) this.actors.remove(c);
     this.objs = new Map();

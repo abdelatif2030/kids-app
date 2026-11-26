@@ -552,7 +552,7 @@ class Game {
     } else this.sound.play('lose');
     this._saveNow();
     const hasNext = won && i + 1 < LEVELS.length;
-    const dim = h('div', { class: 'od-dim' }, h('div', { class: 'od-panel' },
+    const dim = h('div', { class: won ? 'od-dim od-win' : 'od-dim' }, h('div', { class: 'od-panel' },
       h('div', { class: 'od-title' }, won ? t('win') : t('lose')),
       won ? h('div', { class: 'od-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= r.stars ? '' : 'off' }, '⭐'))) : null,
       h('div', { class: 'od-stat' }, h('span', {}, '🐚 +', num(d.coins)), h('span', {}, '🐟 ', num(d.kills), ' ', t('kills'))),

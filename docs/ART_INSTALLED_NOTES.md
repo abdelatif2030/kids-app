@@ -34,3 +34,15 @@ menu classes `.P-card/.P-logo/.P-btn/.P-lv`, links it, lists skin/art in pubspec
 - jungle_adventure: stone spikes picture (`art/spikes.webp`), owner's heart and coin icons in the HUD, win picture behind the "you won" screen (CSS `:has(.ja-win)`).
   Not wired: hero/girl/monkey/parrot sheets (the game keeps its own Adam/Nour run frames), totems, rope bridge, other icons.
 - `game_src/_shot_seq.mjs` accepts `INJECT="<js>"` to run JS before the screenshot (to preview a screen that needs a finished game).
+
+## Fourth pass (2026-11-26): packs for pumpkin pie, rhythm, samurai, golden tail, ocean defense; alien/rhino backdrops; English + German worlds
+Tools: `tools/install_pack.py <game> <zips dir> <panel RGB> <win#> <icons#> <backdrops>` (key art -> poster + card, skin pieces, win picture, coin/star icons, backdrops),
+`tools/install_en_images.py` + the cut jobs (252 word pictures `assets/games/art/x_<word>.webp`, sizes added to `src/kit/art_dims.json`), `tools/make_english_data.py`, `tools/make_german_data.py`.
+| Game | Installed | Not wired |
+|---|---|---|
+| pumpkin_pie, rhythm, samurai, golden_tail, ocean_defense | key art (poster + card), skin (panel, ribbon, pills, level circles, play, sound) + `skin.css` linked, win picture behind the results screen (`<p>-win` class), owner's coin and star icons | the 3D/top-down cameras never show a horizon, so the 4-7 painted backdrops, hero/cast sheets, props, other icons stay in the zips (same reason as happy farm); ocean defense's `bg_reef1-7` were replaced by the owner's 7 backdrops (not visible from the top-down camera) |
+| alien_sky | backdrops 2-6 (`art/pano2..6`): race 1 picks pano 1-2, race 2 picks 3-5, the final shows the star arch (6) | |
+| rhino_summit | backdrops 4-5: race 1 picks 1 or 4, race 2 picks 2 or 5, race 3 shows 3 | |
+| happy_farm | (zips part1-3 checked: everything usable was already installed) | 8 backdrops, hero/cast sheets |
+| learn_letters (English + German) | map picture behind the level list, round badges on the level tiles, win picture behind the end card; language cards on the chooser (`assets/games/learn_lang`) | the level backdrops (en_l01-09, de_l01-10): the 3D world's ground and sky cover them, so they were not kept; LANG-01/03..11 (island map, dog/hedgehog poses, medallions, seasons, stickers, album) are not used yet |
+| English words | 252 new word pictures; new levels Around me, My home, My city and places, Where is the ball?, Beads; the routine level uses the owner's routine pictures; 12 shapes with the owner's pictures | no pictures missing |
