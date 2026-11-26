@@ -81,7 +81,7 @@ class Game {
     const topH = this.topEl ? this.topEl.offsetTop + this.topEl.offsetHeight : ch * 0.14;
     const botH = this.botEl ? this.botEl.offsetHeight : ch * 0.27;
     const rt = topH + 4; const rb = ch - botH - 2;
-    this.cx = cw / 2; this.view.fit(rt + 6, rb);
+    this.cx = cw / 2; this.view.fit(rt + 4, rb - Math.max(30, (rb - rt) * 0.1));
   }
   sc(y) { const a = this.view.project(CX, y, 0); const b = this.view.project(CX + 1, y, 0); return Math.abs(b[0] - a[0]); }
   sy(y) { return this.view.project(CX, y, 0)[1]; }

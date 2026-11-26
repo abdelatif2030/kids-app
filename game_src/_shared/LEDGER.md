@@ -39,3 +39,4 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 
 - chomp_maze: three.js neon-candy board rebuilt (view3d.js). Renders and plays, npm test 0 fail. Chomper and ghosts are too small at gameplay distance, board too wide. TODO: tighter camera following the chomper, bigger chomper, then BEFORE/AFTER clip. Not sent.
 - chomp_maze: follow camera + bigger chomper, clip sent (b003c522). Next: card_battle, castaway_raft.
+- card_battle: three.js rebuild pushed (3D hex arena, tower, UFO, robots/aliens). Clip NOT sent: units still small in landscape, tower looks off-center, floor bright. TODO: bigger units, centered tower, richer fights (more units on the bot), use existing bg_menu art in menu, bespoke music. Next: castaway_raft.

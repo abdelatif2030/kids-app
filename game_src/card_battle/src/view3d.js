@@ -188,7 +188,7 @@ export class View3D {
     const g = add(this.scene, G.disc, new THREE.MeshBasicMaterial({ color: 0x35c8ff, transparent: true, opacity: 0.1, depthWrite: false }), CX, -2.5, HALF, 13, 13, 1); g.rotation.x = -Math.PI / 2;
   }
   _base0() {
-    const g = this.pbase = new THREE.Group(); g.position.set(CX, 0, 14.7); this.scene.add(g);
+    const g = this.pbase = new THREE.Group(); g.position.set(CX, 0, 14.4); g.scale.setScalar(1.25); this.scene.add(g);
     const st = M(0xdfe8ff, 0, 0, { m: 0.35, r: 0.3 }), cy = M(0x35e0ff, 0x35e0ff, 1.4);
     add(g, G.cyl, M(0x2a2f55, 0, 0, { m: 0.5 }), 0, 0.15, 0, 2.7, 0.3, 2.7); add(g, G.cyl, cy, 0, 0.32, 0, 2.5, 0.04, 2.5);
     add(g, G.cyl, st, 0, 0.9, 0, 1.8, 1.2, 1.8); add(g, G.cyl, cy, 0, 0.8, 0, 1.86, 0.1, 1.86); add(g, G.cyl, cy, 0, 1.3, 0, 1.86, 0.06, 1.86);
@@ -243,7 +243,7 @@ export class View3D {
   burst() { /* sparks are drawn by the 2D overlay */ }
   _unitObj(u) {
     let e = this.pool.get(u.id);
-    if (!e) { const b = BUILD[u.kind](); const h = HEIGHT[u.kind]; b.g.scale.setScalar(h * 1.35); const o = new THREE.Group(); o.add(b.g); const sd = makeShadow(u.r); this.scene.add(sd); this.scene.add(o); e = { o, b, sd, h, ph: u.id * 1.7 }; this.pool.set(u.id, e); }
+    if (!e) { const b = BUILD[u.kind](); const h = HEIGHT[u.kind]; b.g.scale.setScalar(h * 1.6); const o = new THREE.Group(); o.add(b.g); const sd = makeShadow(u.r); this.scene.add(sd); this.scene.add(o); e = { o, b, sd, h, ph: u.id * 1.7 }; this.pool.set(u.id, e); }
     return e;
   }
   render(snap, clock, shake = 0) {
