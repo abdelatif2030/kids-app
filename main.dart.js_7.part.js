@@ -4,7 +4,7 @@ this.b=e},
 cki(d){var x,w,v,u,t,s,r=B.aq(d.h(0,"i")),q=B.aq(d.h(0,"f")),p=B.aq(d.h(0,"c")),o=B.ag(d.h(0,"n"))
 if(o==null)o=""
 x=B.aq(d.h(0,"r"))
-w=J.n(d.h(0,"s"),"c")?C.a_E:C.bAp
+w=J.n(d.h(0,"s"),"c")?C.a_D:C.bAo
 v=B.aq(d.h(0,"k"))
 u=B.aq(d.h(0,"b"))
 t=B.b_(d.h(0,"t"))
@@ -97,7 +97,7 @@ v.l(0,"f",w.b)
 v.l(0,"c",w.c)
 v.l(0,"n",w.d)
 v.l(0,"r",w.e)
-v.l(0,"s",w.f===C.a_E?"c":"r")
+v.l(0,"s",w.f===C.a_D?"c":"r")
 v.l(0,"k",w.r)
 v.l(0,"b",w.w)
 v.l(0,"t",w.x)
@@ -127,7 +127,7 @@ return B.c(B.aQ(),$async$G1)
 case 2:s=e
 r=B.a([],y.k)
 q=v.a
-if(q==null)q=C.bfE
+if(q==null)q=C.bfD
 u=q.length
 t=0
 for(;t<q.length;q.length===u||(0,B.y)(q),++t)r.push(q[t].cN())
@@ -225,13 +225,13 @@ var y={k:B.a_("x<aA<o,@>>"),g:B.a_("I<rD>"),y:B.a_("aA<o,@>"),r:B.a_("rD"),w:B.a
 C.vy=new A.GW(0,"offline")
 C.Di=new A.GW(1,"partial")
 C.ov=new A.GW(2,"online")
-C.a56=new A.GW(3,"unverified")
-C.aiS=new B.a8(16,12,16,12)
-C.alW=new B.ah(983339,"MaterialIcons",!1)
-C.bfE=x([],B.a_("x<rD>"))
-C.a_E=new A.ahn(0,"child")
-C.bAp=new A.ahn(1,"relative")
+C.a55=new A.GW(3,"unverified")
+C.aiR=new B.a8(16,12,16,12)
+C.alV=new B.ah(983339,"MaterialIcons",!1)
+C.bfD=x([],B.a_("x<rD>"))
+C.a_D=new A.ahn(0,"child")
+C.bAo=new A.ahn(1,"relative")
 C.o4=new B.C(!0,null,null,null,null,null,null,D.bV,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)})();(function lazyInitializers(){var x=a.lazyFinal
 x($,"czE","c9T",()=>new A.aas($.ac()))
-x($,"cFu","cd7",()=>B.a([A.tW("games",new A.bMe(),C.vy,new A.bMf(),"lib/games, lib/color_game.dart, lib/math_game.dart: no network calls; progress in shared_preferences"),A.tW("letters",new A.bMg(),C.Di,new A.bMq(),"lib/literacy, lib/library/vocab.dart; audio via flutter_tts (offline availability depends on installed voices: not verified on a device)"),A.tW("stories",new A.bMr(),C.Di,new A.bMs(),"lib/stories/story_data.dart; assets/audio/*.mp3 bundled; no story uses remote media"),A.tW("studio",new A.bMt(),C.vy,new A.bMu(),"lib/studio: FamilyGallery in shared_preferences"),A.tW("parent",new A.bMv(),C.vy,new A.bMw(),"lib/parent_screens.dart, dashboard_screen.dart, lib/print; local data only"),A.tW("videos",new A.bMx(),C.ov,new A.bMh(),"lib/player_screen.dart (YouTube IFrame), lib/main.dart img.youtube.com thumbnails"),A.tW("chat",new A.bMi(),C.ov,new A.bMj(),"lib/family/firebase_family_repository.dart (Firestore)"),A.tW("calls",new A.bMk(),C.ov,new A.bMl(),"lib/family/call_*: WebRTC + Firestore signalling"),A.tW("teachers",new A.bMm(),C.ov,new A.bMn(),"lib/teachers_*, firebase_repository.dart"),A.tW("web",new A.bMo(),C.a56,new A.bMp(),"No service worker offline test performed")],B.a_("x<a8f>")))})()};
-(a=>{a["aTNMsYnFdJ2bj+yNnnJsQptaRQs="]=a.current})($__dart_deferred_initializers__);
+x($,"cFu","cd7",()=>B.a([A.tW("games",new A.bMe(),C.vy,new A.bMf(),"lib/games, lib/color_game.dart, lib/math_game.dart: no network calls; progress in shared_preferences"),A.tW("letters",new A.bMg(),C.Di,new A.bMq(),"lib/literacy, lib/library/vocab.dart; audio via flutter_tts (offline availability depends on installed voices: not verified on a device)"),A.tW("stories",new A.bMr(),C.Di,new A.bMs(),"lib/stories/story_data.dart; assets/audio/*.mp3 bundled; no story uses remote media"),A.tW("studio",new A.bMt(),C.vy,new A.bMu(),"lib/studio: FamilyGallery in shared_preferences"),A.tW("parent",new A.bMv(),C.vy,new A.bMw(),"lib/parent_screens.dart, dashboard_screen.dart, lib/print; local data only"),A.tW("videos",new A.bMx(),C.ov,new A.bMh(),"lib/player_screen.dart (YouTube IFrame), lib/main.dart img.youtube.com thumbnails"),A.tW("chat",new A.bMi(),C.ov,new A.bMj(),"lib/family/firebase_family_repository.dart (Firestore)"),A.tW("calls",new A.bMk(),C.ov,new A.bMl(),"lib/family/call_*: WebRTC + Firestore signalling"),A.tW("teachers",new A.bMm(),C.ov,new A.bMn(),"lib/teachers_*, firebase_repository.dart"),A.tW("web",new A.bMo(),C.a55,new A.bMp(),"No service worker offline test performed")],B.a_("x<a8f>")))})()};
+(a=>{a["LOg5sw3sDkYJzjPN8CPbPEfI1BM="]=a.current})($__dart_deferred_initializers__);
