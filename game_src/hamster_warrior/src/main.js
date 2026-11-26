@@ -10,6 +10,7 @@ import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n, rng } from '../../cozy_kit/ui.js';
 import { loadArt, loadSprites } from '../../cozy_kit/art.js';
 import { polishRenderer } from './polish.js';
+import { FX, outline } from './fx.js';
 
 const S = {
   title: ['هامي الشجاع', 'Hammy the Brave'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
@@ -101,6 +102,7 @@ function makeHero() {
   const ring = mesh(new THREE.RingGeometry(0.7, 1.15, 32), new THREE.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0.8, side: THREE.DoubleSide, depthWrite: false }), 0, 0.04, 0, 1, 1, 1);
   ring.rotation.x = -Math.PI / 2; g.add(ring); g.userData.ring = ring;
   const glow = mesh(new THREE.CircleGeometry(1.2, 28), new THREE.MeshBasicMaterial({ color: 0xffe680, transparent: true, opacity: 0.35, depthWrite: false }), 0, 0.03, 0, 1, 1, 1); glow.rotation.x = -Math.PI / 2; g.add(glow);
+  outline(g, 0x3a1a06, 1.06);
   return g;
 }
 const _artTex = new Map();
@@ -126,7 +128,7 @@ function makeCreature(type, seed, img) {
     b.add(mesh(geo.sphere, M(0xffe04a, 0x886600), -0.25, 0.85, 0.5, 0.28, 0.2, 0.12), mesh(geo.sphere, M(0xffe04a, 0x886600), 0.25, 0.85, 0.5, 0.28, 0.2, 0.12));
   }
   g.add(b); g.userData.body = b; g.userData.seed = seed;
-  return g;
+  outline(g, 0x2a1030, 1.06); return g;
 }
 
 class Game {
@@ -170,6 +172,7 @@ class Game {
     const sun = new THREE.DirectionalLight(0xfff0c0, 1.3); sun.position.set(-12, 30, -14); this.scene.add(sun);
     this.world = new THREE.Group(); this.scene.add(this.world);
     this.hero = makeHero(); this.scene.add(this.hero);
+    this.pfx = new FX(this.scene); this._sunSp = sprite(canvasTex(128, 128, (g) => { const r = g.createRadialGradient(64, 64, 0, 64, 64, 64); r.addColorStop(0, 'rgba(255,250,210,1)'); r.addColorStop(0.25, 'rgba(255,220,120,.85)'); r.addColorStop(1, 'rgba(255,200,80,0)'); g.fillStyle = r; g.fillRect(0, 0, 128, 128); }), 70, 70); this._sunSp.material.blending = THREE.AdditiveBlending; this._sunSp.material.fog = false; this._sunSp.material.depthWrite = false; this._sunSp.renderOrder = -4; this._sunSp.position.set(-30, 40, -150); this.scene.add(this._sunSp);
     this.heroPill = sprite(pillTex('power', '5'), 3.0, 1.3); this.scene.add(this.heroPill);
     this.flash = sprite(canvasTex(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,230,1)'); r.addColorStop(0.5, 'rgba(255,230,120,.6)'); r.addColorStop(1, 'rgba(255,200,60,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); }), 1, 1);
     this.flash.material.blending = THREE.AdditiveBlending; this.flash.visible = false; this.scene.add(this.flash); this.flashT = 0;
@@ -334,7 +337,7 @@ class Game {
     for (const e of r.step(dt)) {
       switch (e.type) {
         case 'card': this.sound.play(e.v > 0 ? 'card' : 'bad'); this.fx.push({ t: 0, life: 1, text: `${e.v > 0 ? '+' : '−'}${Math.abs(e.v)}`, good: e.v > 0 }); this._burst(-r.x, 1.6, r.z + 0.5, e.v > 0 ? ['#6ab4ff', '#ffffff'] : ['#ff6a7a', '#ffffff'], 10); break;
-        case 'absorb': this.sound.play('absorb'); this.fx.push({ t: 0, life: 1, text: `+${fmt(e.gain)}`, good: true }); this._burst(-r.x, 1.4, r.z + 0.8, ['#7be04a', '#ffe04a', '#ffffff'], 16, 5); this.flashT = 0.28; this.pop = 0.35; break;
+        case 'absorb': this.sound.play('absorb'); this.fx.push({ t: 0, life: 1, text: `+${fmt(e.gain)}`, good: true }); this._burst(-r.x, 1.4, r.z + 0.8, ['#7be04a', '#ffe04a', '#ffffff'], 16, 5); this.flashT = 0.28; this.pop = 0.35; if (this.pfx) this.pfx.burst(new THREE.Vector3(this.hero.position.x, 1.5, this.hero.position.z), { n: 40, colors: [0xffe04a, 0x7be04a, 0xffffff, 0xff7ab0], speed: 9, size: 0.7, life: 0.9, gravity: 6 }); break;
         case 'hurt': this.sound.play('hurt'); this.shake = 0.5; this._burst(-r.x, 1.4, r.z, ['#ff5a5a', '#ffd23a'], 10); this._updateHearts(); this.hint(I.t('stronger'), 1600); break;
         case 'warn': this.sound.play('warn'); this.hint(I.t('stronger'), 1800); break;
         case 'coin': this.sound.play('coin'); break;
@@ -378,7 +381,7 @@ class Game {
     const body = this.hero.userData.body; body.rotation.z = Math.sin(this.clock * 13) * 0.07;
     const k = play ? 15 : 3; const f = this.hero.userData.feet; f[0].position.z = Math.sin(this.clock * k) * 0.4; f[1].position.z = -Math.sin(this.clock * k) * 0.4; f[0].position.y = 0.12 + Math.max(0, Math.sin(this.clock * k)) * 0.22; f[1].position.y = 0.12 + Math.max(0, -Math.sin(this.clock * k)) * 0.22;
     this.hero.userData.stick.rotation.z = -0.45 + Math.sin(this.clock * 8) * 0.1;
-    this.pop = Math.max(0, (this.pop || 0) - dt); this.hero.scale.setScalar(1 + this.pop * 0.5);
+    this.pop = Math.max(0, (this.pop || 0) - dt); this.hero.scale.setScalar(1.35 + this.pop * 0.6); if (this.pfx) { this.pfx.update(dt); if (this.mode === 'play') { this._dustT = (this._dustT || 0) + dt; if (this._dustT > 0.07) { this._dustT = 0; this.pfx.burst(new THREE.Vector3(this.hero.position.x, 0.2, this.hero.position.z - 0.5), { n: 2, colors: [0xffe9b0, 0xffffff], speed: 1.5, size: 0.5, life: 0.5, gravity: 0, lift: 1 }); } } }
     this.hero.visible = !(this.run && this.run.hit > 0.2 && Math.floor(this.clock * 14) % 2 === 1);
     const ringS = 1 + Math.sin(this.clock * 4) * 0.08; this.hero.userData.ring.scale.set(ringS, ringS, 1);
     this._heroPic(play, r);
