@@ -160,7 +160,7 @@ class Game {
     if (x < -sx || x > this.cw + sx) return;
     const s = sx * 0.55; const squash = p.vy > 6 ? 1.12 : p.vy < -6 ? 0.92 : 1;
     g.save(); g.translate(x, y); g.scale(p.face >= 0 ? 1 : -1, 1);
-    if (ART.hero) { pic(g, ART.hero, s * 0.15, -s * 1.1 * (p.vy > 6 ? 0.98 : 1), s * 3.0 * (squash > 1 ? 0.97 : 1)); }
+    if (ART.hero) { const a = s * 0.6; /* the picture is drawn 40% smaller (owner 2026-11-26); the jump rules are unchanged */ pic(g, ART.hero, a * 0.15, -a * 1.1 * (p.vy > 6 ? 0.98 : 1), a * 3.0 * (squash > 1 ? 0.97 : 1)); }
     else {
     g.fillStyle = '#b8e84a'; g.strokeStyle = '#3a5a1a'; g.lineWidth = 2.5;
     g.beginPath(); g.ellipse(0, -s * 1.1, s * 0.95, s * 1.05 * squash, 0, 0, 6.3); g.fill(); g.stroke();
