@@ -568,11 +568,12 @@ class Game {
     this._L = null;
     if (/[?&]debug/.test(location.search)) window.__lw = this; // test hook (see _begin)
     sh.layer.append(h('div', { class: 'lk-top' }, sh.backBtn(), h('span'), sh.soundBtn()));
-    const tiles = this._learnData().map((s) => h('button', { class: 'lw-tile lw-lsec', 'aria-label': s.name, onclick: () => { sh.sound.play('tap'); this._learnOpen(s.id, 0, true); } },
-      h('i', {}, s.emoji), h('span', {}, s.name), h('small', { dir: 'ltr' }, s.kind === 'numbers' ? '0 → 100 000' : String(s.items.length))));
     const lang = this._lang();
+    const tiles = this._learnData().map((s) => h('button', { class: 'lw-tile lw-lsec', 'aria-label': s.name, onclick: () => { sh.sound.play('tap'); this._learnOpen(s.id, 0, true); } },
+      h('i', {}, s.emoji), lang !== 'ar' ? h('span', { class: 'lw-bi' }, h('em', {}, s.nameAr), h('small', { dir: 'ltr' }, s.name)) : h('span', {}, s.name), h('small', { dir: 'ltr' }, s.kind === 'numbers' ? '0 → 100 000' : String(s.items.length))));
     sh.layer.append(h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.18)' }, h('div', { class: `lw-card lw-learn${lang === 'ar' ? '' : ' lw-en'}` },
       h('div', { class: 'lw-title' }, this._lt('اختار رحلتك 📚', 'Choose your journey 📚', 'Wähle deine Reise 📚', 'Choisis ton voyage 📚')),
+      lang !== 'ar' ? h('div', { class: 'lw-arsub' }, 'اختار رحلتك') : null,
       h('div', { class: 'lw-grid lw-lgrid' }, tiles))));
     this.owl.act('cheer');
     this.owl.look(0);
@@ -695,10 +696,10 @@ class Game {
       return h('button', {
         class: `lw-tile${locked ? ' lock' : ''}${done ? ' done' : ''}`, 'aria-label': lv.ar, disabled: locked || null,
         onclick: () => { sh.sound.play('tap'); this._enter(lv.id); },
-      }, lv.art ? h('i', { class: 'lw-ic' }, h('img', { src: `${sh.base}art/${lv.art.icon}.webp`, alt: '' })) : h('i', {}, locked ? '🔒' : lv.emoji), h('b', {}, this._learnEn() ? String(i + 1) : sh.T.num(i + 1)), h('span', {}, lv.ar), done ? h('u', {}, '⭐') : null);
+      }, lv.art ? h('i', { class: 'lw-ic' }, h('img', { src: `${sh.base}art/${lv.art.icon}.webp`, alt: '' })) : h('i', {}, locked ? '🔒' : lv.emoji), h('b', {}, this._learnEn() ? String(i + 1) : sh.T.num(i + 1)), lv.arName ? h('span', { class: 'lw-bi' }, h('em', {}, lv.arName), h('small', { dir: 'ltr' }, lv.ar)) : h('span', {}, lv.ar), done ? h('u', {}, '⭐') : null);
     });
     const mapArt = this._learnEn() && list[0].art ? `background:linear-gradient(rgba(40,30,90,.10),rgba(40,30,90,.10)),url(${sh.base}art/${list[0].art.map}.webp) center/cover no-repeat;` : '';
-    const oldCard = h('div', { class: 'lk-dim', style: mapArt + 'background-color:rgba(40,30,90,.18)' }, h('div', { class: `lw-card${this._learnEn() ? ' lw-en' : ''}` }, h('div', { class: 'lw-title' }, this._learnFr() ? 'Choisis un jeu 🎧' : this._learnDe() ? 'Such ein Spiel aus 🎧' : this._learnEn() ? 'Pick a game 🎧' : sh.t('pick')), h('div', { class: 'lw-grid' }, tiles)));
+    const oldCard = h('div', { class: 'lk-dim', style: mapArt + 'background-color:rgba(40,30,90,.18)' }, h('div', { class: `lw-card${this._learnEn() ? ' lw-en' : ''}` }, h('div', { class: 'lw-title' }, this._learnFr() ? 'Choisis un jeu 🎧' : this._learnDe() ? 'Such ein Spiel aus 🎧' : this._learnEn() ? 'Pick a game 🎧' : sh.t('pick')), this._learnEn() ? h('div', { class: 'lw-arsub' }, 'اختار لعبة') : null, h('div', { class: 'lw-grid' }, tiles)));
     if (this._learnEn()) {
       sh.layer.append(oldCard);
       this.owl.act('cheer');
@@ -1545,8 +1546,11 @@ const CSS = `
 .lw-lsec small{background:rgba(255,255,255,.85);color:var(--cd);border-radius:999px;padding:0 calc(var(--u)*1.2);font-weight:900;opacity:1 !important}
 .lw-resume{width:min(92%,calc(var(--u)*60)) !important;max-width:none !important}.lw-resume .lw-title{font-size:calc(var(--u)*4.6) !important;white-space:nowrap;padding-inline:calc(var(--u)*5)}.lw-ask{font-size:calc(var(--u)*3.8);font-weight:900;color:#4a2a9a;text-align:center;line-height:1.35;margin-top:calc(var(--u)*1)}
 .lw-choice{font-size:calc(var(--u)*3.6) !important;padding:calc(var(--u)*1.8) calc(var(--u)*3) !important;border:calc(var(--u)*.5) solid #fff !important;box-shadow:0 calc(var(--u)*.8) 0 #1a7a3a,0 calc(var(--u)*1.2) calc(var(--u)*2) rgba(0,0,0,.25) !important}.lw-choice.alt{box-shadow:0 calc(var(--u)*.8) 0 #1a6ab8,0 calc(var(--u)*1.2) calc(var(--u)*2) rgba(0,0,0,.25) !important}
+.lw-bi{display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.2);width:100%}.lw-bi em{font-style:normal;font-size:calc(var(--u)*3.3);line-height:1.1;font-weight:900;direction:rtl}.lw-bi small{font-size:calc(var(--u)*1.9);font-weight:800;opacity:.95;line-height:1.05;-webkit-text-stroke:0;text-shadow:0 calc(var(--u)*.25) 0 rgba(0,0,0,.3)}
+.lw-arsub{font-weight:900;color:#5a3a9a;font-size:calc(var(--u)*3.6);margin-top:calc(var(--u)*-.6);direction:rtl}
+.lw-en .lw-tile span.lw-bi{font-size:0}.lw-en .lw-lsec span.lw-bi{font-size:0}
 .lw-card.ltr{direction:ltr}
-.lw-en .lw-lgrid{grid-template-columns:repeat(7,minmax(0,1fr)) !important}.lw-en .lw-lsec span{font-size:calc(var(--u)*1.95)}.lw-en .lw-grid:not(.lw-lgrid) .lw-tile{height:calc(var(--u)*15.5);min-height:80px}
+.lw-en .lw-lgrid{grid-template-columns:repeat(7,minmax(0,1fr)) !important}.lw-en .lw-lsec span{font-size:calc(var(--u)*1.95)}.lw-en .lw-grid:not(.lw-lgrid) .lw-tile{height:calc(var(--u)*18);min-height:84px}
 .lw-en{direction:ltr}.lw-en .lw-grid{grid-template-columns:repeat(8,minmax(0,1fr))}.lw-en .lw-tile{min-width:0;padding-inline:0}.lw-en .lw-tile span{font-size:calc(var(--u)*2.7)}
 @media (max-aspect-ratio:1/1){.lw-en .lw-grid{grid-template-columns:repeat(3,1fr)}}
 `;

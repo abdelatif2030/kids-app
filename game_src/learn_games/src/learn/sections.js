@@ -134,7 +134,7 @@ export function learnSections(lang, min = 4) {
     if (def.kind === 'numbers') items = numberSequence(100000).map((n) => numberItem(n, lang));
     else if (def.kind === 'letters') items = letterItems(lang);
     else items = wordItems(def, lang);
-    if (items.length >= min) out.push({ id: def.id, emoji: def.emoji, name: sectionName(def, lang), kind: def.kind || 'words', items });
+    if (items.length >= min) out.push({ id: def.id, emoji: def.emoji, name: sectionName(def, lang), nameAr: def.name[0], kind: def.kind || 'words', items });
   }
   return out;
 }

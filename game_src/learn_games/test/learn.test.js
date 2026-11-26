@@ -111,3 +111,9 @@ test('every English word of the new sections has its clips now (the owner delive
     assert.equal(missing, 0);
   });
 });
+
+test('every English / German / French level and every section shows an Arabic name (the child must know what he enters)', async () => {
+  const { EN_LEVELS, DE_LEVELS, FR_LEVELS } = await import('../src/english/levels.js');
+  for (const l of [...EN_LEVELS, ...DE_LEVELS, ...FR_LEVELS]) assert.ok(l.arName && /[؀-ۿ]/.test(l.arName), l.id);
+  for (const lang of LANGS) for (const s of learnSections(lang)) assert.ok(s.nameAr && /[؀-ۿ]/.test(s.nameAr), `${lang} ${s.id}`);
+});

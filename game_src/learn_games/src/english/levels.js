@@ -33,6 +33,10 @@ export const EN_LEVELS = [
   { id: 'en_beads', mode: 'en', ar: 'Beads', emoji: '🔴', skill: 'shapes', pick: pack('pattern beads'), kinds: ['thing'] },
   { id: 'en_tens', mode: 'en', ar: 'Big numbers', emoji: '🔟', skill: 'counting', pick: pack('tens to 100'), kinds: ['number'] },
 ];
+// Arabic names (the child must always see what he enters: the Arabic is the main line of a tile, the language's own name the small one)
+const AR_NAMES = { animals: 'الحيوانات', first: 'أول كلماتي', family: 'أنا وعيلتي', food: 'الأكل الحلو', school: 'الهدوم والمدرسة', world: 'الوظايف والموسيقى والجو', colorful: 'حاجات ملونة', routine: 'يومي',
+  numbers: 'الأرقام', letters: 'الحروف', colors: 'الألوان', shapes: 'الأشكال', time: 'الأيام والشهور', tens: 'الأرقام الكبيرة', around: 'حواليّا', home: 'البيت', city: 'المدينة والأماكن', where: 'الكورة فين؟', beads: 'الخرز' };
+for (const l of EN_LEVELS) l.arName = AR_NAMES[l.id.slice(3)];
 // The owner's pictures of the English / German worlds (assets/games/learn_letters/art): a painted backdrop for each level (en_l01.. / de_l01..)
 // and a round badge (en_i0.. / de_i0..). Several levels of the same topic share one.
 const EN_ART = { animals: [1, 0], first: [9, 7], family: [7, 6], food: [5, 4], school: [6, 5], world: [8, 7], colorful: [2, 1], routine: [7, 7], numbers: [3, 2], letters: [9, 8], colors: [2, 1], shapes: [4, 3], time: [8, 7], tens: [3, 2], around: [9, 7], home: [7, 6], city: [8, 7], where: [4, 3], beads: [2, 1] };

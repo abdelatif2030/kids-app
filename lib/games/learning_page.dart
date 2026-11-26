@@ -219,11 +219,17 @@ class _LearnLanguageGateState extends State<LearnLanguageGate> {
             final gap = wide ? 18.0 : 12.0;
             final usable = (box.maxWidth - 32).clamp(280.0, 1000.0);
             final cols = wide ? 4 : 2;
-            final logoW = short ? 64.0 : wide ? 170.0 : 120.0;
             final bigSize = short ? 22.0 : wide ? 34.0 : 24.0;
-            final avail = box.maxHeight - (logoW * 0.6 + bigSize * 1.5 + (short ? 70 : 100));
+            final ribbonH = short ? 44.0 : 96.0;
+            final gapsH = short ? 28.0 : 64.0;
+            final minLogoH = short ? 54.0 : 110.0;
+            final cardMaxH = box.maxHeight - ribbonH - gapsH - minLogoH;
             var w = ((usable - gap * (cols - 1)) / cols).clamp(110.0, 230.0);
-            if (wide && avail > 0) w = w.clamp(80.0, (avail / 1.17).clamp(110.0, 230.0));
+            if (wide) w = w.clamp(80.0, (cardMaxH / 1.17).clamp(100.0, 230.0));
+            final cardsH = wide ? w * 1.17 : w * 1.17 * 2 + gap;
+            // the logo takes ALL the free space above the title (owner 2026-11-26: it was small in a big empty area)
+            final logoH = (box.maxHeight - ribbonH - gapsH - cardsH).clamp(minLogoH, 380.0);
+            final logoW = (logoH / 0.78) < box.maxWidth * 0.62 ? logoH / 0.78 : box.maxWidth * 0.62;
             final cards = [for (final l in kLearnLanguages) _LanguageCard(lang: l, width: w, onTap: () => _pick(l.id))];
             return Stack(children: [
               Center(
@@ -338,11 +344,13 @@ class _LearnModeScreenState extends State<LearnModeScreen> {
   ChildProfile get child => widget.child;
   String get lang => widget.lang;
 
-  static const _text = {
-    'ar': ('عربي', 'يلا نلعب', 'مستويات رحلتي في التعلّم', 'اتعلّم', 'اختار اللي إنت عايزه: حروف، أرقام، حيوانات وأكتر', 'حابب تلعب المستويات ولا تتعلم وتختار؟'),
-    'en': ('English', "Let's play", 'The levels of my learning journey', 'Learn', 'Pick what you like: letters, numbers, animals and more', 'Play the levels, or learn and choose?'),
-    'de': ('Deutsch', 'Los geht\'s', 'Die Level meiner Lernreise', 'Lernen', 'Such dir aus, was du magst: Buchstaben, Zahlen, Tiere und mehr', 'Level spielen, oder lernen und auswählen?'),
-    'fr': ('Français', 'On joue', 'Les niveaux de mon voyage', 'Apprendre', 'Choisis ce que tu aimes : lettres, chiffres, animaux et plus', 'Jouer aux niveaux, ou apprendre et choisir ?'),
+  // Arabic is the main text on every language (the child must know what he enters); the language's own words are the small line
+  static const _ar = ('يلا نلعب', 'مستويات رحلتي في التعلّم', 'اتعلّم', 'اختار اللي إنت عايزه: حروف، أرقام، حيوانات وأكتر', 'حابب تلعب المستويات ولا تتعلم وتختار؟');
+  static const _own = {
+    'ar': ('عربي', '', ''),
+    'en': ('English', "Let's play", 'Learn'),
+    'de': ('Deutsch', "Los geht's", 'Lernen'),
+    'fr': ('Français', 'On joue', 'Apprendre'),
   };
 
   WebGame get _levels => switch (lang) { 'en' => kLearnEnglish, 'de' => kLearnGerman, 'fr' => kLearnFrench, _ => kLearnLetters };
@@ -376,8 +384,7 @@ class _LearnModeScreenState extends State<LearnModeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final t = _text[lang]!;
-    final rtl = lang == 'ar';
+    final own = _own[lang]!;
     return Scaffold(
       key: const ValueKey('learn_mode_screen'),
       body: PictureBackdrop(
@@ -388,21 +395,26 @@ class _LearnModeScreenState extends State<LearnModeScreen> {
             final short = box.maxHeight < 460;
             final gapW = wide ? 22.0 : 12.0;
             final w = ((box.maxWidth - 56 - gapW) / 2).clamp(110.0, 300.0);
+            final ribbonH = short ? 44.0 : 96.0;
+            final gapsH = short ? 28.0 : 64.0;
+            final optionsH = short ? 200.0 : 360.0;
+            final logoH = (box.maxHeight - ribbonH - gapsH - optionsH).clamp(short ? 54.0 : 100.0, 380.0);
+            final logoW = (logoH / 0.78) < box.maxWidth * 0.62 ? logoH / 0.78 : box.maxWidth * 0.62;
             return Stack(children: [
               Center(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                   child: Directionality(
-                    textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
+                    textDirection: TextDirection.rtl,
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      AppLogo(width: short ? 56 : wide ? 130 : 96),
+                      AppLogo(width: logoW),
                       const SizedBox(height: 4),
-                      _titleRibbon(t.$1, short ? '' : t.$6, bigSize: short ? 22 : wide ? 34 : 26),
+                      _titleRibbon(_ar.$5, short || lang == 'ar' ? '' : own.$1, bigSize: short ? 20 : wide ? 32 : 22),
                       SizedBox(height: short ? 10 : wide ? 22 : 14),
                       Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        _option(key: const ValueKey('learn_mode_levels'), width: w, short: short, art: _levelsArt(short ? 56 : 92), emoji: '🎮', title: t.$2, sub: t.$3, color: const Color(0xFF3D8BFF), onTap: _openLevels),
+                        _option(key: const ValueKey('learn_mode_levels'), width: w, short: short, art: _levelsArt(short ? 56 : 92), emoji: '🎮', title: _ar.$1, title2: own.$2, sub: _ar.$2, color: const Color(0xFF3D8BFF), onTap: _openLevels),
                         SizedBox(width: gapW),
-                        _option(key: const ValueKey('learn_mode_learn'), width: w, short: short, art: _learnArt(short ? 56 : 92), emoji: '📚', title: t.$4, sub: t.$5, color: const Color(0xFF2FA85A), onTap: _openLearn),
+                        _option(key: const ValueKey('learn_mode_learn'), width: w, short: short, art: _learnArt(short ? 56 : 92), emoji: '📚', title: _ar.$3, title2: own.$3, sub: _ar.$4, color: const Color(0xFF2FA85A), onTap: _openLearn),
                       ]),
                     ]),
                   ),
@@ -464,7 +476,7 @@ class _LearnModeScreenState extends State<LearnModeScreen> {
     }),
   );
 
-  Widget _option({required Key key, required double width, required bool short, required Widget art, required String emoji, required String title, required String sub, required Color color, required VoidCallback onTap}) => Semantics(
+  Widget _option({required Key key, required double width, required bool short, required Widget art, required String emoji, required String title, String title2 = '', required String sub, required Color color, required VoidCallback onTap}) => Semantics(
     button: true,
     label: title,
     child: InkWell(
@@ -486,6 +498,7 @@ class _LearnModeScreenState extends State<LearnModeScreen> {
           const SizedBox(height: 8),
           Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: short ? 24 : 30, fontWeight: FontWeight.w900, color: Colors.white)),
           const SizedBox(height: 6),
+          if (title2.isNotEmpty) Text(title2, textDirection: TextDirection.ltr, textAlign: TextAlign.center, style: TextStyle(fontSize: short ? 13 : 17, fontWeight: FontWeight.w800, color: const Color(0xFFFFF3C4))),
           Text(sub, textAlign: TextAlign.center, style: TextStyle(fontSize: short ? 12.5 : 15, fontWeight: FontWeight.w600, color: Colors.white, height: 1.25)),
         ]),
       ),
