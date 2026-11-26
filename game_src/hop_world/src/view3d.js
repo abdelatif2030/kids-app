@@ -91,9 +91,9 @@ function makeCastle(P) {
 function buildScenery(world) {
   const g = new THREE.Group(); const layers = [];
   const L = (z, par) => { const l = new THREE.Group(); l.position.z = z; g.add(l); layers.push({ l, par }); return l; };
-  const hillC = world === 'hills' ? 0x7ad07a : world === 'cave' ? 0x4a3a8a : world === 'desert' ? 0xe8b068 : 0xcfe6f6;
+  const hillC = world === 'hills' ? 0x58c05a : world === 'cave' ? 0x4a3a8a : world === 'desert' ? 0xe8b068 : 0xcfe6f6;
   const l1 = L(-26, 0.35), l2 = L(-12, 0.6);
-  for (let i = 0; i < 40; i++) l1.add(mesh(geo.sph, M(hillC), i * 13 + Math.sin(i * 7) * 3, 2 + (i % 3), 0, 14 + (i % 4) * 4, 10 + (i % 3) * 4, 6));
+  for (let i = 0; i < 40; i++) l1.add(mesh(geo.sph, M(hillC), i * 13 + Math.sin(i * 7) * 3, -1 + (i % 3), 0, 16 + (i % 4) * 4, 7 + (i % 3) * 2.5, 6));
   for (let i = 0; i < 60; i++) {
     const x = i * 8 + Math.sin(i * 3) * 2;
     if (world === 'hills' || world === 'snow') { const sn = world === 'snow'; l2.add(mesh(geo.cyl, M(0x6a4a2a), x, 1, 0, 0.5, 2, 0.5)); l2.add(mesh(geo.cone, M(sn ? 0xe8f4ff : 0x2a9a4a), x, 3.2 + (i % 2) * 0.3, 0, 2.2, 3.4, 2.2)); if (sn) l2.add(mesh(geo.cone, M(0x2a7a5a), x, 2.6, 0, 2.4, 2.2, 2.4)); }
@@ -134,7 +134,9 @@ export class View3D {
     if (this.flagG) this.scene.remove(this.flagG);
     const f = new THREE.Group(); f.add(mesh(geo.cyl, M(0xf0f0f0), 0, 3.5, 0, 0.12, 7, 0.12)); f.add(mesh(geo.sph, M(0xffd23a, 0x604000), 0, 7.1, 0, 0.35, 0.35, 0.35));
     const cl = mesh(geo.box, M(0xff5a8a, 0x401020), 0.8, 6.2, 0, 1.5, 0.9, 0.05); f.add(cl); f.userData.cloth = cl; this.flagG = f; this.scene.add(f);
-    const P = PAL[world]; const sky = new THREE.Color(P.sky[1]); this.scene.background = sky; this.scene.fog = new THREE.Fog(sky, 45, 120);
+    const P = PAL[world]; const sky = new THREE.Color(P.sky[1]);
+    const gc = document.createElement('canvas'); gc.width = 4; gc.height = 256; const gg = gc.getContext('2d'); const gr = gg.createLinearGradient(0, 0, 0, 256); gr.addColorStop(0, world === 'hills' ? '#2a8cff' : P.sky[0]); gr.addColorStop(0.7, world === 'hills' ? '#8fd6ff' : P.sky[1]); gr.addColorStop(1, P.sky[1]); gg.fillStyle = gr; gg.fillRect(0, 0, 4, 256);
+    const bt = new THREE.CanvasTexture(gc); bt.colorSpace = THREE.SRGBColorSpace; this.scene.background = bt; this.scene.fog = new THREE.Fog(sky, 90, 200);
     const set = (k, c, tx) => { const m = this.inst[k]; m.material = new THREE.MeshLambertMaterial({ color: tx ? 0xffffff : c, map: tx || null }); };
     set('top', P.dirt); set('dirt', P.dirtD); set('grass', P.top); set('brick', 0xffffff, brickTex(P.brick, P.brickD)); set('q', 0xffffff, this.tex.q); set('u', 0xffffff, this.tex.u);
     set('pb', P.pipe); set('pr', P.pipeD);
