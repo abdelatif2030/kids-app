@@ -221,7 +221,7 @@ class Game {
     });
     c.slides.forEach((sl) => { const m = makeSlide(sl.len, sl.side); m.position.set(sl.side * (HALF + 3.2), 0, -sl.s + 1.5); s.add(m); });
     // swimmers
-    this.models = this.sw.swimmers.map((w, wi) => { const m = makeSwimmer(w.kind, w.cap, true, wi); m.root.scale.setScalar(wi === 0 ? 2.3 : 1.95); s.add(m.root); return m; });
+    this.models = this.sw.swimmers.map((w, wi) => { const m = makeSwimmer(w.kind, w.cap, true, wi); m.root.scale.setScalar(wi === 0 ? 1.8 : 1.55); s.add(m.root); return m; });
     this.ring = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.75, 28), new THREE.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0.9, depthWrite: false }));
     this.ring.rotation.x = -Math.PI / 2;
     s.add(this.ring);

@@ -578,7 +578,7 @@ class Game {
   _fox(cub) {
     const P = this.pics;
     const pic = P && P.fox;
-    if (true) { const m = makeFox(cub); m.root.scale.multiplyScalar(cub ? 1.35 : 1.8); return m; }
+    if (true) { const m = makeFox(cub); m.root.scale.multiplyScalar(cub ? 0.85 : 1.1); return m; }
     if (!pic) return makeFox(cub);
     const f = makePaintedFigure(THREE, { idle: pic }, cub ? 1.2 : 2.6);
     f.tail = { rotation: { x: 0, y: 0, z: 0 } };
