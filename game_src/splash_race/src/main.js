@@ -221,7 +221,7 @@ class Game {
     });
     c.slides.forEach((sl) => { const m = makeSlide(sl.len, sl.side); m.position.set(sl.side * (HALF + 3.2), 0, -sl.s + 1.5); s.add(m); });
     // swimmers
-    this.models = this.sw.swimmers.map((w, wi) => { const m = makeSwimmer(w.kind, w.cap, true, wi); m.root.scale.setScalar(wi === 0 ? 2.1 : 1.5); s.add(m.root); return m; });
+    this.models = this.sw.swimmers.map((w, wi) => { const m = makeSwimmer(w.kind, w.cap, true, wi); m.root.scale.setScalar(wi === 0 ? 2.3 : 1.95); s.add(m.root); return m; });
     this.ring = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.75, 28), new THREE.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0.9, depthWrite: false }));
     this.ring.rotation.x = -Math.PI / 2;
     s.add(this.ring);
@@ -594,7 +594,7 @@ class Game {
     this.ring.visible = !p.slide && this.mode !== 'menu';
     // camera behind and above the otter
     const portrait = this.cw < this.ch;
-    const want = new THREE.Vector3(p.x * 0.55 + (portrait ? 0 : 3.2), portrait ? 5.6 : 5.2, -p.s + (portrait ? 7.2 : 5.6));
+    const want = new THREE.Vector3(p.x * 0.55 + (portrait ? 0 : 3.2), portrait ? 5.6 : 4.4, -p.s + (portrait ? 7.2 : 4.6));
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 4));
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 2);
