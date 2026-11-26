@@ -4,3 +4,4 @@ Applied to (32): air_race ball_scoop barrel_knights carnival_race cloud_dash coa
 Not yet: fizz_runner (other agent), course_race, lane_shooter (renderer in game.js), cozy_kit, 2D canvas games (~29).
 Videos: moto_race (before/after) done; coastal_drive, deep_sea in progress.
 Layer 2 (per-game deep pass, fx.js): cloud_dash DONE (video sent). ball_scoop: FX bursts + truck outline + dust trail pushed, effect subtle at gameplay framing (no video sent). Next: dino_grow, highway_race, hamster_warrior, ice_dragon.
+dino_grow DONE (outlines, halo ring on hero, flowers+grass, closer camera) video sent

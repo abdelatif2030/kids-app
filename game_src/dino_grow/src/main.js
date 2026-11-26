@@ -9,6 +9,7 @@ import { Dino, LEVELS, STAGES, SPECIES, stageOf, zoomFor, toneOf, normalizeSave,
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 import { polishRenderer } from './polish.js';
+import { outline } from './fx.js';
 
 const S = {
   title: ['ديناصور صغير يكبر', 'DINO GROW'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
@@ -245,6 +246,15 @@ function buildScenery(level, sim) {
     else if (i % 3 === 1) rockAt(sol, x, z, 0.3 + R() * 0.4, 0x4a3a3a); else sol.add(geo.cone, 0x2a1e20, x, 0.35, z, 0.4, 0.7, 0.4);
   }
   if (id === 'volcano') for (let i = 0; i < 5; i++) { const a = i * 1.4 + 0.5; glow.add(geo.cyl, 0xff8a2a, Math.sin(a) * (half - 6), 0.05, Math.cos(a) * (half - 6), 5 + R() * 2, 0.06, 4 + R() * 2); }
+  // grass tufts and flowers: lively ground at hero distance
+  const FL = id === 'volcano' ? [0xff8a2a, 0xffc04a, 0xff5a1a] : [0xffffff, 0xffe04a, 0xff7ab8, 0xb08aff, 0x6ad0ff];
+  for (let i = 0; i < 520; i++) {
+    const x = (R() * 2 - 1) * (half - 0.5); const z = (R() * 2 - 1) * (half - 0.5);
+    if (sim.obstacles.some((o) => Math.hypot(o.x - x, o.z - z) < o.r + 0.3)) continue;
+    const gc = id === 'volcano' ? 0x3a2a2a : id === 'swamp' ? 0x5a8a44 : [0x3fae3c, 0x56c24a, 0x7ad65a][i % 3];
+    sol.add(geo.cone, gc, x, 0.22, z, 0.16, 0.5 + R() * 0.3, 0.16); sol.add(geo.cone, gc, x + 0.12, 0.18, z + 0.05, 0.13, 0.4 + R() * 0.3, 0.13, 0, 0, 0.3);
+    if (i % 4 === 0 && id !== 'volcano') { sol.add(geo.cyl, 0x3a9a3a, x + 0.3, 0.25, z, 0.03, 0.5, 0.03); sol.add(geo.sphere, FL[(i / 4 | 0) % FL.length], x + 0.3, 0.55, z, 0.2, 0.12, 0.2); sol.add(geo.sphere, 0xffd23a, x + 0.3, 0.6, z, 0.08, 0.06, 0.08); }
+  }
   // border ring + distant scenery
   for (let side = 0; side < 4; side++) for (let i = -half - 2; i <= half + 2; i += 3.2) {
     const j = (R() - 0.5) * 1.6; const out = half + 2 + R() * 1.5; const x = side < 2 ? (side ? out : -out) : i + j; const z = side < 2 ? i + j : (side === 2 ? out : -out);
@@ -453,7 +463,7 @@ class Game {
     this._makePlayer(this.sim.player.stage);
     this.boss = null;
     if (this.sim.boss) {
-      const m = makeModel(LOOKS.boss); const W = new THREE.Group(); W.add(m); const sh = mesh(new THREE.CircleGeometry(1, 20), BM(0x000000, 0.3), 0, 0.04, 0); sh.rotation.x = -Math.PI / 2; sh.scale.setScalar(this.sim.boss.r * 1.3); W.add(sh); m.scale.setScalar(this.sim.boss.r * FM.biped); this.things.add(W);
+      const m = makeModel(LOOKS.boss); outline(m, 0x2a1010, 0.03); const W = new THREE.Group(); W.add(m); const sh = mesh(new THREE.CircleGeometry(1, 20), BM(0x000000, 0.3), 0, 0.04, 0); sh.rotation.x = -Math.PI / 2; sh.scale.setScalar(this.sim.boss.r * 1.3); W.add(sh); m.scale.setScalar(this.sim.boss.r * FM.biped); this.things.add(W);
       const spr = new THREE.Sprite(numMat(I.num(this.sim.boss.power), 'boss')); spr.renderOrder = 10; this.things.add(spr); this.boss = { W, m, spr, pose: 0, fall: 0 };
     }
     this.camDist = zoomFor(this.sim.player.P); this.stats = { cd: 0 };
@@ -461,14 +471,15 @@ class Game {
 
   _makePlayer(stage) {
     if (this.playerRec) this.things.remove(this.playerRec.W, this.playerRec.spr);
-    const m = makeModel(PLAYER_LOOK[stage]); const W = new THREE.Group(); W.add(m);
+    const m = makeModel(PLAYER_LOOK[stage]); outline(m, 0x16241a, 0.045); const W = new THREE.Group(); W.add(m);
+    const halo = new THREE.Mesh(new THREE.RingGeometry(0.82, 1, 40), new THREE.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0.85, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending })); halo.rotation.x = -Math.PI / 2; halo.position.y = 0.07; W.add(halo);
     const sh = mesh(new THREE.CircleGeometry(1, 20), BM(0x000000, 0.3), 0, 0.04, 0); sh.rotation.x = -Math.PI / 2; W.add(sh);
     const spr = new THREE.Sprite(numMat('0', 'gold')); spr.renderOrder = 10; this.things.add(W, spr);
-    this.playerRec = { W, m, sh, spr, key: '' };
+    this.playerRec = { W, m, sh, spr, key: '', halo };
   }
 
   _creatureRec(c) {
-    const sp = SPECIES[c.kind]; const m = makeModel(LOOKS[sp.look]); const W = new THREE.Group(); W.add(m);
+    const sp = SPECIES[c.kind]; const m = makeModel(LOOKS[sp.look]); outline(m, 0x16241a, 0.05); const W = new THREE.Group(); W.add(m);
     const sh = mesh(new THREE.CircleGeometry(1, 16), BM(0x000000, 0.28), 0, 0.04, 0); sh.rotation.x = -Math.PI / 2; sh.scale.setScalar(c.r * 1.2); W.add(sh);
     const spr = new THREE.Sprite(numMat(String(c.power), 'white')); spr.renderOrder = 9; this.things.add(W, spr);
     const rec = { W, m, spr, key: '', age: 0, sc: c.r * FM[LOOKS[sp.look].m] }; this.recs.set(c.id, rec); return rec;
@@ -587,7 +598,7 @@ class Game {
     const zf = this.camDist / 24; void camPrev;
     // player
     const pr = this.playerRec; this.pop = Math.max(1, (this.pop || 1) - dt * 1.4);
-    pr.W.position.set(p.x, 0, p.z); pr.m.rotation.y = p.face;
+    pr.W.position.set(p.x, 0, p.z); pr.m.rotation.y = p.face; if (pr.halo) { const hs = p.r * 1.7 * (1 + Math.sin(clock * 4) * 0.05); pr.halo.scale.set(hs, hs, 1); pr.halo.material.opacity = 0.55 + Math.sin(clock * 4) * 0.2; }
     const pm = pr.m; const sc = p.r * FM.biped * this.pop; pm.scale.setScalar(sc); pr.sh.scale.setScalar(p.r * 1.25);
     pm.userData.open = p.pounceT > 0 ? 1 : 0;
     const stepped = animate(pm, dt, p.speedNow * (p.pounceT > 0 ? 0.5 : 1), clock);
@@ -643,7 +654,7 @@ class Game {
     this._parts(dt);
     // camera
     this.shake = Math.max(0, this.shake - dt * 3); const sh = Math.min(1.5, this.shake) * 0.25 * zf * (0.4 + Math.min(1, p.r / 3) * 0.6);
-    const portrait = this.cw < this.ch; const d = this.camDist * (portrait ? 1.05 : 1);
+    const portrait = this.cw < this.ch; const d = this.camDist * (portrait ? 1.05 : 1) * 0.78;
     if (this.mode === 'menu') { const a = clock * 0.25; this.camera.position.set(p.x + Math.sin(a) * 10, 6.5, p.z + Math.cos(a) * 10); this.camera.lookAt(p.x, 1.5, p.z); }
     else { this.camera.position.set(p.x + (Math.random() - 0.5) * sh, d * 0.88, p.z + d * 0.46 + (Math.random() - 0.5) * sh); this.camera.lookAt(p.x, 0, p.z - d * 0.03); }
     this.sun.position.set(p.x - 12, 30, p.z + 10); this.sun.target.position.set(p.x, 0, p.z); this.sun.target.updateMatrixWorld();
