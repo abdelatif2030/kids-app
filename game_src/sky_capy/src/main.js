@@ -524,6 +524,16 @@ class Game {
 
   // ---- drawing ------------------------------------------------------------------------------------------------------
 
+  _trail(g, x, y, S, time) {
+    // exhaust puffs streaming behind the plane, fading as they drift down
+    for (let i = 0; i < 9; i++) {
+      const k = i / 9; const wob = Math.sin(time * 14 + i * 1.7) * S * 0.6 * k;
+      g.globalAlpha = 0.5 * (1 - k); g.fillStyle = i % 2 ? '#ffffff' : '#bfe9ff';
+      g.beginPath(); g.arc(x + wob, y + S * (9 + i * 3.2), S * (1.8 - k * 0.9), 0, Math.PI * 2); g.fill();
+    }
+    g.globalAlpha = 1;
+  }
+
   _draw(time, dt) {
     const g = this.g;
     g.setTransform(1, 0, 0, 1, 0, 0);
@@ -556,12 +566,12 @@ class Game {
     // pickups
     for (const p of r.pickups) {
       if (p.kind === 'cage') drawCageItem(g, p.bird, this.X(p.x), this.Y(p.y), S * 6, time);
-      else drawPickup(g, p.kind, this.X(p.x), this.Y(p.y), S * (p.kind === 'capsule' ? 6 : 4.2), time, p.cap);
+      else drawPickup(g, p.kind, this.X(p.x), this.Y(p.y), S * (p.kind === 'capsule' ? 8 : 5.8), time, p.cap);
     }
     // enemies
     for (const en of r.enemies) {
-      if (en.type === 'boss') drawBoss(g, this.X(en.x), this.Y(en.y), S * en.r * 1.35, time, en.hp / en.hp0);
-      else drawEnemy(g, en.type, this.X(en.x), this.Y(en.y), S * en.r * 2.1, time, en.hp / en.hp0);
+      if (en.type === 'boss') drawBoss(g, this.X(en.x), this.Y(en.y), S * en.r * 1.7, time, en.hp / en.hp0);
+      else drawEnemy(g, en.type, this.X(en.x), this.Y(en.y), S * en.r * 2.9, time, en.hp / en.hp0);
       if (en.type === 'boss') { // the captain's HP bar
         const bw = S * 50, bx = this.cw / 2 - bw / 2, by = this.Y(2);
         g.fillStyle = 'rgba(29,42,74,0.6)'; g.fillRect(bx, by, bw, S * 2.2); g.fillStyle = '#ff5a4a'; g.fillRect(bx, by, bw * Math.max(0, en.hp / en.hp0), S * 2.2);
@@ -572,12 +582,13 @@ class Game {
     for (const p of r.pickups) if (p.kind === 'cage') this._tag(g, t('hintCage'), this.X(p.x), this.Y(p.y) - S * 9, true, time);
     for (const b of r.eb) drawEnemyBullet(g, this.X(b.x), this.Y(b.y), S * b.r);
     // wings
-    for (const w of r.wings) drawBird(g, w.type, this.X(w.x), this.Y(w.y), S * 5.2, time);
+    for (const w of r.wings) drawBird(g, w.type, this.X(w.x), this.Y(w.y), S * 7, time);
     // the plane
-    drawPlane(g, this.X(r.px), this.Y(r.py), S * 9, time, r.stats.paint, this.tilt, r.inv > 0 && r.state === 'play');
-    if (r.inv > 0.3 && r.state === 'play') { g.strokeStyle = 'rgba(120,210,255,0.8)'; g.lineWidth = S * 0.6; g.beginPath(); g.arc(this.X(r.px), this.Y(r.py), S * 11 + Math.sin(time * 12) * S * 0.6, 0, Math.PI * 2); g.stroke(); }
+    this._trail(g, this.X(r.px), this.Y(r.py), S, time);
+    drawPlane(g, this.X(r.px), this.Y(r.py), S * 13, time, r.stats.paint, this.tilt, r.inv > 0 && r.state === 'play');
+    if (r.inv > 0.3 && r.state === 'play') { g.strokeStyle = 'rgba(120,210,255,0.8)'; g.lineWidth = S * 0.6; g.beginPath(); g.arc(this.X(r.px), this.Y(r.py), S * 15 + Math.sin(time * 12) * S * 0.6, 0, Math.PI * 2); g.stroke(); }
     // bullets
-    for (const b of r.bullets) drawBubble(g, this.X(b.x), this.Y(b.y), S * b.r * 1.4, b.kind);
+    for (const b of r.bullets) drawBubble(g, this.X(b.x), this.Y(b.y), S * b.r * 2.0, b.kind);
     // effects
     for (const f of this.fx) { f.k += dt * 2.2; if (f.kind === 'pop') drawPopBurst(g, this.X(f.x), this.Y(f.y), S * f.s, Math.min(1, f.k), f.e); }
     this.fx = this.fx.filter((f) => f.k < 1);
