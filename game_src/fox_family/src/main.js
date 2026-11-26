@@ -6,7 +6,9 @@
 import * as THREE from 'three';
 import { Trip, LEVELS, COLS, normalizeSave } from './sim.js';
 import { loadSprites, makePaintedFigure } from '../../cozy_kit/art.js';
-import { mat, makeFox, makeVehicle, makeTrain, makeLog, makeTree, makeBerry, makeDen, laneTexture } from './models.js';
+import { mat, makeFox, makeVehicle as _mv, makeTrain as _mt, makeLog as _ml, makeTree as _mtr, makeBerry, makeDen, laneTexture } from './models.js';
+import { FX, outline } from './fx.js';
+const makeVehicle = (...a) => outline(_mv(...a), 0x1a2410, 0.05), makeTrain = (...a) => outline(_mt(...a), 0x1a2410, 0.04), makeLog = (...a) => outline(_ml(...a), 0x2a1808, 0.05), makeTree = (...a) => outline(_mtr(...a), 0x14240c, 0.05);
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
 import { CSS, CSS2, h } from './ui.js';
@@ -172,6 +174,8 @@ class Game {
     this.cubModels = this.trip.cubs.map((c) => { const m = this._fox(true); m.root.position.set(c.x * C, 0, -c.r * C); s.add(m.root); m.call = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 6), mat(0xffd23a, 0xffaa00, 0.6)); m.call.position.y = 1.2; m.root.add(m.call); return m; });
     this.fox = this._fox(false);
     s.add(this.fox.root);
+    this.pfx = new FX(s);
+    { const ring = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.95, 32), new THREE.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0.85, side: THREE.DoubleSide, depthWrite: false })); ring.rotation.x = -Math.PI / 2; ring.position.y = 0.06; this.fox.root.add(ring); }
     this.shadow = new THREE.Mesh(new THREE.CircleGeometry(0.4, 16), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.25, depthWrite: false }));
     this.shadow.rotation.x = -Math.PI / 2;
     s.add(this.shadow);
@@ -388,11 +392,12 @@ class Game {
   _playFrame(dt, time) {
     const tr = this.trip;
     const events = tr.step(dt);
+    if (this.pfx) this.pfx.update(dt);
     for (const e of events) {
       switch (e.type) {
-        case 'hop': this.sound.play('hop'); break;
+        case 'hop': this.sound.play('hop'); if (this.pfx) this.pfx.burst(new THREE.Vector3(this.fox.root.position.x, 0.2, this.fox.root.position.z), { n: 10, colors: [0xffffff, 0xf2e6c0], speed: 3, size: 0.8, life: 0.5, gravity: 0, flat: true }); break;
         case 'plop': this.sound.play('plop'); break;
-        case 'berry': this.sound.play('berry', e.n); break;
+        case 'berry': this.sound.play('berry', e.n); if (this.pfx) this.pfx.burst(new THREE.Vector3(this.fox.root.position.x, 1.2, this.fox.root.position.z), { n: 30, colors: [0xff3a5a, 0xffd23a, 0xffffff], speed: 8, size: 0.9, life: 0.9, gravity: 5 }); break;
         case 'cub': this.sound.play('cub'); this.toast(t('cub'), 1.6); break;
         case 'stop': if (Math.abs(e.r - tr.fox.r) < 4) this.sound.play('stop'); break;
         case 'bump':
@@ -483,7 +488,7 @@ class Game {
     const P = this.pics;
     const pic = P && P.fox;
     if (!pic) return makeFox(cub);
-    const f = makePaintedFigure(THREE, { idle: pic }, cub ? 0.95 : 1.9);
+    const f = makePaintedFigure(THREE, { idle: pic }, cub ? 1.2 : 2.6);
     f.tail = { rotation: { x: 0, y: 0, z: 0 } };
     return f;
   }
