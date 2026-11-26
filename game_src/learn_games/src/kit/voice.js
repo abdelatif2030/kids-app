@@ -77,7 +77,7 @@ export class Voice {
    *  (English teaching words: the same word as a slower clip, `<id>_slow`). */
   _item(x) {
     if (typeof x === 'string') return { t: spoken(x), lang: this.lang, slow: false };
-    return { t: spoken(x.t), lang: x.lang === 'en' || x.lang === 'de' || x.lang === 'ar' ? x.lang : this.lang, slow: !!x.slow };
+    return { t: spoken(x.t), lang: x.lang === 'en' || x.lang === 'de' || x.lang === 'ar' ? x.lang : this.lang, slow: !!x.slow, optional: !!x.optional };
   }
 
   _clipName(it) { return clipId(it.t, it.lang) + (it.slow ? '_slow' : ''); }
@@ -121,6 +121,9 @@ export class Voice {
       return;
     }
     const text = this.queue.shift();
+    // an optional item (the Arabic word after the praise in English/German) is said only from a recording: the robotic device voice
+    // would sound like another person and could run over the next clip
+    if (text.optional && !this.has(text)) { this._next(); return; }
     if (!this.has(text)) {
       // no recording: the device voice says this one and whatever is left of the same language, as one sentence
       const lang = text.lang;
@@ -131,12 +134,12 @@ export class Voice {
       this.onTalk(Math.min(8, 1.2 + rest.length * 0.09));
       this.fallback(rest, lang);
       // the device voice speaks it as one sentence: the things light up at an even pace meanwhile, then it is done
-      const per = Math.max(600, Math.min(1100, (rest.length * 90) / all.length));
+      const per = Math.max(900, Math.min(2600, (rest.length * 130) / all.length)); // long enough that the device voice is done before the next clip starts
       const run = this.run;
       const i0 = this.i;
       this.i += all.length;
       all.forEach((_, k) => setTimeout(() => { if (run === this.run) this._start(i0 + k); }, k * per));
-      setTimeout(() => { if (run === this.run) { if (this.queue.length) this._next(); else this._finish(); } }, all.length * per + 300);
+      setTimeout(() => { if (run === this.run) { if (this.queue.length) this._next(); else this._finish(); } }, all.length * per + 600);
       return;
     }
     this._start(this.i++);

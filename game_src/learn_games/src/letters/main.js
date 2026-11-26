@@ -795,7 +795,9 @@ class Game {
         const r = this.play && this.play.cur;
         if (!r || !r.say) return;
         this.sh.sound.play('tap');
-        if (this.st.mode === 'found' && r.rewardSay) this.sh.speak(r.rewardSay);
+        // Listen: say again EVERYTHING that was said last (the word, the slow word, the praise and the sentence), exactly as the first time;
+        // Slowly: the word slowly
+        if (!slow && this._lastQ && this._lastQ.length) this.sh.speak(this._lastQ);
         else this.sh.speak(slow ? r.retry : [r.say[0]]);
       };
       this.sign.style.direction = 'ltr';
@@ -851,7 +853,7 @@ ead) also reads every choice aloud, one after the other, and the choice being re
     if (full && r.read && r.read.length) {
       const ids = r.options.map((o) => o.id);
       this.sh.speak([r.prompt, ...r.read], (i) => { const o = i > 0 ? this.opts.get(ids[i - 1]) : null; if (o) o.wig = 0.6; });
-    } else if (r.say) this.sh.speak(full ? r.say : (r.retry || r.say)); // English: the word (a new one also slowly); after a wrong tap, slowly
+    } else if (r.say) { const q = full ? r.say : (r.retry || r.say); if (full) this._lastQ = q; this.sh.speak(q); } // English: the word (a new one also slowly); after a wrong tap, slowly
     else this.sh.speak(r.prompt);
   }
 
@@ -915,7 +917,7 @@ ead) also reads every choice aloud, one after the other, and the choice being re
           if (a) a.userData.jump = 0.4;
           if (i) this.sh.sound.play('note', PENTA[i % PENTA.length]);
         }, next);
-      } else this.sh.speak(r.rewardSay ? [phrase, ...(r.arWord ? [{ t: r.arWord, lang: 'ar' }] : []), ...r.rewardSay] : seq, null, next);
+      } else { const q = r.rewardSay ? [phrase, ...(r.arWord ? [{ t: r.arWord, lang: 'ar', optional: true }] : []), ...r.rewardSay] : seq; if (r.rewardSay) this._lastQ = q; this.sh.speak(q, null, next); }
     }, 600);
     // the next question waits for the whole counting to finish: a long count (eleven apples...) takes its time; only a safety net
     this._advT = setTimeout(next, 9000 + (r.countAloud || 0) * 1700);

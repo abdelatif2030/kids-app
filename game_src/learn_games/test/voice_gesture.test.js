@@ -65,3 +65,15 @@ test('the first tap unlocks the element with a silent clip', async () => {
   assert.equal(v.unlocked, true);
   assert.ok(ph.made[0].played[0].startsWith('data:audio/wav'));
 });
+
+test('an optional Arabic word without a recording is skipped (no robotic device voice), a recorded one is played', async () => {
+  const { Voice, clipId } = await import('../src/kit/voice.js');
+  const said = [];
+  const v = new Voice('./', 'en', (t, l) => said.push([t, l]), () => {});
+  v.has = (it) => it.t === 'recorded';
+  v._play = (it) => { said.push(['clip', it.t]); v._next(); };
+  globalThis.window = globalThis.window || {}; window.__learnVoice = true;
+  v.say([{ t: 'recorded', lang: 'en' }, { t: 'قطة', lang: 'ar', optional: true }, { t: 'recorded', lang: 'en' }]);
+  assert.deepEqual(said.map((x) => x[1]), ['recorded', 'recorded']);
+  assert.ok(clipId('قطة', 'ar'));
+});
