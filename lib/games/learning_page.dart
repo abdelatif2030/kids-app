@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../media/hub_music.dart';
 import '../media/section_voice.dart';
 
+import '../design/app_logo.dart';
 import '../design/picture_stage.dart';
 import '../journey/models.dart';
 import '../journey/resume.dart';
@@ -130,7 +131,53 @@ const List<LearnLanguage> kLearnLanguages = [
   LearnLanguage('fr', 'Français', 'Écouter, trouver, dire', 'É', Color(0xFFE0457B)),
 ];
 
-/// «عايز تتعلم إيه؟»: the child picks Arabic (the whole learning world as it was) or English (the English levels).
+/// The voices of the two choice screens (the owner records them: docs/LEARN_PICK_VOICE_LINES.csv). A missing file is silent.
+class LearnPickVoice {
+  LearnPickVoice._();
+  static const gate = 'assets/audio/voices/learn_pick/gate.mp3';
+  static String mode(String lang) => 'assets/audio/voices/learn_pick/mode_$lang.mp3';
+
+  static void say(String asset) {
+    if (isTestBinding()) return; // no audio plugin in widget tests
+    PageVoice.say(asset);
+  }
+
+  static void stop() {
+    if (isTestBinding()) return;
+    PageVoice.stop();
+  }
+}
+
+/// A round speaker button that says the question again.
+Widget _speakerButton(VoidCallback onTap, {Key? key}) => Semantics(
+  button: true,
+  label: tr2('اسمع تاني', 'Listen again'),
+  child: Material(
+    key: key,
+    color: const Color(0xFFFFB02E),
+    shape: const CircleBorder(side: BorderSide(color: Colors.white, width: 3)),
+    elevation: 4,
+    child: InkWell(customBorder: const CircleBorder(), onTap: onTap, child: const Padding(padding: EdgeInsets.all(12), child: Icon(Icons.volume_up_rounded, color: Colors.white, size: 30))),
+  ),
+);
+
+/// The title ribbon of a choice screen: big line + small line.
+Widget _titleRibbon(String big, String small, {double bigSize = 34}) => Container(
+  padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 10),
+  decoration: BoxDecoration(
+    gradient: const LinearGradient(colors: [Color(0xFF7C4DDB), Color(0xFF5B2FC0)]),
+    borderRadius: BorderRadius.circular(30),
+    border: Border.all(color: Colors.white, width: 4),
+    boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 10, offset: Offset(0, 5))],
+  ),
+  child: Column(mainAxisSize: MainAxisSize.min, children: [
+    Text(big, textAlign: TextAlign.center, style: TextStyle(fontSize: bigSize, fontWeight: FontWeight.w900, color: Colors.white, height: 1.15)),
+    if (small.isNotEmpty) Text(small, textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFFEADFFF))),
+  ]),
+);
+
+/// «تحب تتعلم إيه النهارده؟»: the four languages side by side, all the same size, with the app's logo on top and a voice that asks
+/// the question (owner request 2026-11-26).
 class LearnLanguageGate extends StatefulWidget {
   final ChildProfile child;
   final VoidCallback? onBack;
@@ -141,7 +188,20 @@ class LearnLanguageGate extends StatefulWidget {
 }
 
 class _LearnLanguageGateState extends State<LearnLanguageGate> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => LearnPickVoice.say(LearnPickVoice.gate));
+  }
+
+  @override
+  void dispose() {
+    LearnPickVoice.stop();
+    super.dispose();
+  }
+
   void _pick(String id) {
+    LearnPickVoice.stop();
     // after the language: two options, the levels (as before) or «اتعلّم» (the basics one item at a time)
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => LearnModeScreen(child: widget.child, lang: id)));
   }
@@ -150,34 +210,110 @@ class _LearnLanguageGateState extends State<LearnLanguageGate> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: const ValueKey('learn_language_gate'),
-      body: Container(
-        decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF9BDCFF), Color(0xFFFFF1C9)])),
+      body: PictureBackdrop(
+        fallback: (c) => Container(decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF9BDCFF), Color(0xFFFFF1C9)])), child: c),
         child: SafeArea(
-          child: Stack(children: [
-            Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  const Text('عايز تتعلم إيه؟', textAlign: TextAlign.center, style: TextStyle(fontSize: 34, fontWeight: FontWeight.w900, color: Color(0xFF3A2A6A))),
-                  const Text('What do you want to learn?', textAlign: TextAlign.center, style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Color(0xFF3A2A6A))),
-                  const SizedBox(height: 18),
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    spacing: 20,
-                    runSpacing: 16,
-                    children: [for (final l in kLearnLanguages) _card(l)],
-                  ),
-                ]),
+          child: LayoutBuilder(builder: (context, box) {
+            final wide = box.maxWidth >= 640;
+            final short = box.maxHeight < 460; // a phone held sideways: everything must fit without scrolling
+            final gap = wide ? 18.0 : 12.0;
+            final usable = (box.maxWidth - 32).clamp(280.0, 1000.0);
+            final cols = wide ? 4 : 2;
+            final logoW = short ? 64.0 : wide ? 170.0 : 120.0;
+            final bigSize = short ? 22.0 : wide ? 34.0 : 24.0;
+            final avail = box.maxHeight - (logoW * 0.6 + bigSize * 1.5 + (short ? 70 : 100));
+            var w = ((usable - gap * (cols - 1)) / cols).clamp(110.0, 230.0);
+            if (wide && avail > 0) w = w.clamp(80.0, (avail / 1.17).clamp(110.0, 230.0));
+            final cards = [for (final l in kLearnLanguages) _LanguageCard(lang: l, width: w, onTap: () => _pick(l.id))];
+            return Stack(children: [
+              Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    AppLogo(width: logoW),
+                    const SizedBox(height: 4),
+                    _titleRibbon('تحب تتعلم إيه النهارده؟', short ? '' : 'What do you want to learn today?', bigSize: bigSize),
+                    SizedBox(height: short ? 10 : wide ? 22 : 14),
+                    Wrap(alignment: WrapAlignment.center, spacing: gap, runSpacing: gap, children: cards),
+                  ]),
+                ),
               ),
-            ),
-            PositionedDirectional(
-              start: 8,
-              top: 8,
-              child: IconButton.filled(
-                key: const ValueKey('learn_language_back'),
-                tooltip: tr2('رجوع', 'Back'),
-                onPressed: widget.onBack ?? () => Navigator.of(context).maybePop(),
-                icon: const Icon(Icons.arrow_back_rounded),
+              PositionedDirectional(
+                start: 8,
+                top: 8,
+                child: IconButton.filled(
+                  key: const ValueKey('learn_language_back'),
+                  tooltip: tr2('رجوع', 'Back'),
+                  onPressed: widget.onBack ?? () => Navigator.of(context).maybePop(),
+                  icon: const Icon(Icons.arrow_back_rounded),
+                ),
+              ),
+              PositionedDirectional(end: 8, top: 8, child: _speakerButton(() => LearnPickVoice.say(LearnPickVoice.gate), key: const ValueKey('learn_language_speak'))),
+            ]);
+          }),
+        ),
+      ),
+    );
+  }
+}
+
+/// One language card: the same size for all four, a picture (or a painted one for French) with the name on its ribbon.
+class _LanguageCard extends StatelessWidget {
+  final LearnLanguage lang;
+  final double width;
+  final VoidCallback onTap;
+  const _LanguageCard({required this.lang, required this.width, required this.onTap});
+
+  static const _ribbon = {'ar': Color(0xFFD83A3A), 'en': Color(0xFF2F7BE0), 'de': Color(0xFF2FA85A), 'fr': Color(0xFFE0457B)};
+
+  Widget _art() {
+    if (lang.id == 'fr') {
+      // painted like the others (no picture yet): sunrise sky, a bakery and a tower in emoji
+      return DecoratedBox(
+        decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFFFD6E8), Color(0xFFFFF1C9)])),
+        child: Center(child: Padding(padding: EdgeInsets.only(bottom: width * 0.18), child: Text('🥐🗼', style: TextStyle(fontSize: width * 0.34)))),
+      );
+    }
+    return Image.asset(
+      'assets/games/learn_lang/${lang.id}.webp',
+      fit: BoxFit.cover,
+      errorBuilder: (_, _, _) => Center(child: Text(lang.big, style: TextStyle(fontSize: width * 0.4, fontWeight: FontWeight.w900, color: lang.color))),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final h = width * 1.17;
+    return Semantics(
+      button: true,
+      label: lang.label,
+      child: InkWell(
+        key: ValueKey('learn_lang_${lang.id}'),
+        borderRadius: BorderRadius.circular(26),
+        onTap: onTap,
+        child: Container(
+          width: width,
+          height: h,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: Colors.white, width: 5),
+            boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 12, offset: Offset(0, 7))],
+            color: Colors.white,
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(fit: StackFit.expand, children: [
+            _art(),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: width * 0.045),
+                color: _ribbon[lang.id],
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(lang.label, style: TextStyle(fontSize: width * 0.16, fontWeight: FontWeight.w900, color: Colors.white, shadows: const [Shadow(color: Color(0x88000000), blurRadius: 3, offset: Offset(0, 2))])),
+                ),
               ),
             ),
           ]),
@@ -185,54 +321,47 @@ class _LearnLanguageGateState extends State<LearnLanguageGate> {
       ),
     );
   }
-
-  Widget _card(LearnLanguage l) => Semantics(
-    button: true,
-    label: l.label,
-    child: InkWell(
-      key: ValueKey('learn_lang_${l.id}'),
-      borderRadius: BorderRadius.circular(28),
-      onTap: () => _pick(l.id),
-      child: Container(
-        width: 230,
-        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
-        decoration: BoxDecoration(
-          color: l.color,
-          borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: Colors.white, width: 5),
-          boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 10, offset: Offset(0, 6))],
-        ),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          // the owner's card picture of this language world (assets/games/learn_lang/<id>.webp); the big letter is the fallback
-          SizedBox(
-            height: 130,
-            child: Image.asset(
-              'assets/games/learn_lang/${l.id}.webp',
-              fit: BoxFit.contain,
-              errorBuilder: (_, _, _) => Center(child: Text(l.big, style: const TextStyle(fontSize: 84, height: 1, fontWeight: FontWeight.w900, color: Colors.white))),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(l.label, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: Colors.white)),
-          const SizedBox(height: 2),
-          Text(l.sub, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
-        ]),
-      ),
-    ),
-  );
 }
 
-
-/// «يلا نلعب» (the levels, as before) or «اتعلّم» (the basics, one item at a time): two big options at the top of a language.
-class LearnModeScreen extends StatelessWidget {
+/// «يلا نلعب» (the levels, as before) or «اتعلّم» (the basics, one item at a time): two big options at the top of a language,
+/// written in the language chosen and explained by a voice.
+class LearnModeScreen extends StatefulWidget {
   final ChildProfile child;
   final String lang; // ar, en, de, fr
   const LearnModeScreen({super.key, required this.child, required this.lang});
 
+  @override
+  State<LearnModeScreen> createState() => _LearnModeScreenState();
+}
+
+class _LearnModeScreenState extends State<LearnModeScreen> {
+  ChildProfile get child => widget.child;
+  String get lang => widget.lang;
+
+  static const _text = {
+    'ar': ('عربي', 'يلا نلعب', 'مستويات رحلتي في التعلّم', 'اتعلّم', 'اختار اللي إنت عايزه: حروف، أرقام، حيوانات وأكتر', 'حابب تلعب المستويات ولا تتعلم وتختار؟'),
+    'en': ('English', "Let's play", 'The levels of my learning journey', 'Learn', 'Pick what you like: letters, numbers, animals and more', 'Play the levels, or learn and choose?'),
+    'de': ('Deutsch', 'Los geht\'s', 'Die Level meiner Lernreise', 'Lernen', 'Such dir aus, was du magst: Buchstaben, Zahlen, Tiere und mehr', 'Level spielen, oder lernen und auswählen?'),
+    'fr': ('Français', 'On joue', 'Les niveaux de mon voyage', 'Apprendre', 'Choisis ce que tu aimes : lettres, chiffres, animaux et plus', 'Jouer aux niveaux, ou apprendre et choisir ?'),
+  };
+
   WebGame get _levels => switch (lang) { 'en' => kLearnEnglish, 'de' => kLearnGerman, 'fr' => kLearnFrench, _ => kLearnLetters };
   WebGame get _basics => switch (lang) { 'en' => kLearnBasicsEn, 'de' => kLearnBasicsDe, 'fr' => kLearnBasicsFr, _ => kLearnBasicsAr };
 
-  void _openLevels(BuildContext context) {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => LearnPickVoice.say(LearnPickVoice.mode(lang)));
+  }
+
+  @override
+  void dispose() {
+    LearnPickVoice.stop();
+    super.dispose();
+  }
+
+  void _openLevels() {
+    LearnPickVoice.stop();
     if (lang == 'ar') {
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => LearningGamesScreen(key: const ValueKey('games_hub'), child: child)));
     } else {
@@ -240,44 +369,59 @@ class LearnModeScreen extends StatelessWidget {
     }
   }
 
-  void _openLearn(BuildContext context) {
+  void _openLearn() {
+    LearnPickVoice.stop();
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => learnWebGameScreen(_basics, child.id, child.age)));
   }
 
   @override
   Widget build(BuildContext context) {
-    final names = {'ar': 'عربي', 'en': 'English', 'de': 'Deutsch', 'fr': 'Français'};
+    final t = _text[lang]!;
+    final rtl = lang == 'ar';
     return Scaffold(
       key: const ValueKey('learn_mode_screen'),
-      body: Container(
-        decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF9BDCFF), Color(0xFFFFF1C9)])),
+      body: PictureBackdrop(
+        fallback: (c) => Container(decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF9BDCFF), Color(0xFFFFF1C9)])), child: c),
         child: SafeArea(
-          child: Stack(children: [
-            Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  Text(names[lang]!, style: const TextStyle(fontSize: 38, fontWeight: FontWeight.w900, color: Color(0xFF3A2A6A))),
-                  const SizedBox(height: 14),
-                  Wrap(alignment: WrapAlignment.center, spacing: 22, runSpacing: 18, children: [
-                    _option(key: const ValueKey('learn_mode_levels'), emoji: '🎮', title: tr2('يلا نلعب', "Let's play"), sub: tr2('مستويات رحلتي في التعلّم', 'My learning journey levels'), color: const Color(0xFF3D8BFF), onTap: () => _openLevels(context)),
-                    _option(key: const ValueKey('learn_mode_learn'), emoji: '📚', title: tr2('اتعلّم', 'Learn'), sub: tr2('اختار رحلتك: حروف، أرقام، حيوانات وأكتر', 'Choose your journey: letters, numbers, animals and more'), color: const Color(0xFF2FA85A), onTap: () => _openLearn(context)),
-                  ]),
-                ]),
+          child: LayoutBuilder(builder: (context, box) {
+            final wide = box.maxWidth >= 640;
+            final short = box.maxHeight < 460;
+            final gapW = wide ? 22.0 : 12.0;
+            final w = ((box.maxWidth - 40 - gapW) / 2).clamp(120.0, 300.0);
+            return Stack(children: [
+              Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  child: Directionality(
+                    textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
+                    child: Column(mainAxisSize: MainAxisSize.min, children: [
+                      AppLogo(width: short ? 56 : wide ? 130 : 96),
+                      const SizedBox(height: 4),
+                      _titleRibbon(t.$1, short ? '' : t.$6, bigSize: short ? 22 : wide ? 34 : 26),
+                      SizedBox(height: short ? 10 : wide ? 22 : 14),
+                      Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        _option(key: const ValueKey('learn_mode_levels'), width: w, short: short, emoji: '🎮', title: t.$2, sub: t.$3, color: const Color(0xFF3D8BFF), onTap: _openLevels),
+                        SizedBox(width: gapW),
+                        _option(key: const ValueKey('learn_mode_learn'), width: w, short: short, emoji: '📚', title: t.$4, sub: t.$5, color: const Color(0xFF2FA85A), onTap: _openLearn),
+                      ]),
+                    ]),
+                  ),
+                ),
               ),
-            ),
-            PositionedDirectional(
-              start: 8,
-              top: 8,
-              child: IconButton.filled(key: const ValueKey('learn_mode_back'), tooltip: tr2('رجوع', 'Back'), onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back_rounded)),
-            ),
-          ]),
+              PositionedDirectional(
+                start: 8,
+                top: 8,
+                child: IconButton.filled(key: const ValueKey('learn_mode_back'), tooltip: tr2('رجوع', 'Back'), onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back_rounded)),
+              ),
+              PositionedDirectional(end: 8, top: 8, child: _speakerButton(() => LearnPickVoice.say(LearnPickVoice.mode(lang)), key: const ValueKey('learn_mode_speak'))),
+            ]);
+          }),
         ),
       ),
     );
   }
 
-  Widget _option({required Key key, required String emoji, required String title, required String sub, required Color color, required VoidCallback onTap}) => Semantics(
+  Widget _option({required Key key, required double width, required bool short, required String emoji, required String title, required String sub, required Color color, required VoidCallback onTap}) => Semantics(
     button: true,
     label: title,
     child: InkWell(
@@ -285,15 +429,21 @@ class LearnModeScreen extends StatelessWidget {
       borderRadius: BorderRadius.circular(28),
       onTap: onTap,
       child: Container(
-        width: 270,
-        padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 14),
-        decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(28), border: Border.all(color: Colors.white, width: 5), boxShadow: const [BoxShadow(color: Color(0x55000000), blurRadius: 10, offset: Offset(0, 6))]),
+        width: width,
+        constraints: BoxConstraints(minHeight: short ? 150 : 230),
+        padding: EdgeInsets.symmetric(vertical: short ? 10 : 20, horizontal: 12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color.lerp(color, Colors.white, 0.18)!, color]),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: Colors.white, width: 5),
+          boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 12, offset: Offset(0, 7))],
+        ),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text(emoji, style: const TextStyle(fontSize: 72, height: 1.1)),
+          Text(emoji, style: TextStyle(fontSize: short ? 40 : 64, height: 1.1)),
           const SizedBox(height: 6),
-          Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white)),
-          const SizedBox(height: 4),
-          Text(sub, textAlign: TextAlign.center, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
+          Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: short ? 24 : 30, fontWeight: FontWeight.w900, color: Colors.white)),
+          const SizedBox(height: 6),
+          Text(sub, textAlign: TextAlign.center, style: TextStyle(fontSize: short ? 12.5 : 15, fontWeight: FontWeight.w600, color: Colors.white, height: 1.25)),
         ]),
       ),
     ),

@@ -88,7 +88,7 @@ void main() {
   for (final (name, size) in kSizes) {
     testWidgets('$name: the language question shows Arabic and English cards that fit, and Arabic opens the learning page', (t) async {
       await openLearning(t, size, chooseArabic: false);
-      expect(find.text('عايز تتعلم إيه؟'), findsOneWidget);
+      expect(find.text('تحب تتعلم إيه النهارده؟'), findsOneWidget);
       expect(find.byKey(const ValueKey('learn_lang_ar')), findsOneWidget);
       expect(find.byKey(const ValueKey('learn_lang_en')), findsOneWidget);
       expect(find.byKey(const ValueKey('learning_page')), findsNothing);
@@ -141,6 +141,41 @@ void main() {
       expect(t.takeException(), isNull);
     }
     debugDefaultTargetPlatformOverride = null;
+  });
+
+  for (final (name, size) in [('tablet', const Size(1024, 768)), ('phone landscape', const Size(844, 390)), ('desktop', const Size(1366, 768))]) {
+    testWidgets('$name: the four language cards are side by side in ONE row and all the same size', (t) async {
+      await openLearning(t, size, chooseArabic: false);
+      final rects = [for (final l in ['ar', 'en', 'de', 'fr']) t.getRect(find.byKey(ValueKey('learn_lang_$l')))];
+      for (final r in rects) {
+        expect(r.width, closeTo(rects.first.width, 0.5), reason: '$name: same size');
+        expect(r.height, closeTo(rects.first.height, 0.5), reason: '$name: same size');
+        expect(r.top, closeTo(rects.first.top, 0.5), reason: '$name: same row');
+        expect(r.left >= 0 && r.right <= size.width, isTrue, reason: '$name: inside the screen');
+      }
+      expect(find.byKey(const ValueKey('app_logo')), findsOneWidget);
+      expect(find.byKey(const ValueKey('learn_language_speak')), findsOneWidget);
+      expect(t.takeException(), isNull);
+    });
+  }
+
+  testWidgets('phone portrait: the four cards are two and two, still the same size', (t) async {
+    await openLearning(t, const Size(360, 700), chooseArabic: false);
+    final rects = [for (final l in ['ar', 'en', 'de', 'fr']) t.getRect(find.byKey(ValueKey('learn_lang_$l')))];
+    for (final r in rects) {
+      expect(r.width, closeTo(rects.first.width, 0.5));
+      expect(r.height, closeTo(rects.first.height, 0.5));
+    }
+    expect(rects[0].top, closeTo(rects[1].top, 0.5));
+    expect(rects[2].top, closeTo(rects[3].top, 0.5));
+    expect(t.takeException(), isNull);
+  });
+
+  test('the voices of the choice screens are named and their folder is bundled', () {
+    expect(LearnPickVoice.gate, endsWith('learn_pick/gate.mp3'));
+    for (final l in ['ar', 'en', 'de', 'fr']) { expect(LearnPickVoice.mode(l), endsWith('learn_pick/mode_$l.mp3')); }
+    expect(File('assets/audio/voices/learn_pick/README.txt').existsSync(), isTrue);
+    expect(File('pubspec.yaml').readAsStringSync(), contains('- assets/audio/voices/learn_pick/'));
   });
 
   test('the picture is bundled and has the size the page expects', () {
