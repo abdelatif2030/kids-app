@@ -10,6 +10,7 @@ import { makePlane, makeRing, ringGeometry, Instancer, palm, pine, island, cliff
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name, clock } from './i18n.js';
 import { CSS, h } from './ui.js';
+import { polishRenderer } from './polish.js';
 
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
 const webglOk = () => {
@@ -47,7 +48,7 @@ class Game {
     }
     this.loading = h('div', { class: 'ar-loading' }, t('loading'));
     this.root.append(this.loading);
-    this.renderer = new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: !this.quality.low, powerPreference: 'high-performance' }), { preset: 'warm' });
     this.maxPR = Math.min(window.devicePixelRatio || 1, this.quality.low ? 1.25 : 1.5);
     this.pr = this.maxPR;
     this.renderer.setPixelRatio(this.pr);

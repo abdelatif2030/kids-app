@@ -9,6 +9,7 @@ import { Run, LEVELS, UPG, HALF, LANES, upgradeCost, normalizeSave, isBossLevel 
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n, rng } from '../../cozy_kit/ui.js';
 import { loadArt, loadSprites } from '../../cozy_kit/art.js';
+import { polishRenderer } from './polish.js';
 
 const S = {
   title: ['هامي الشجاع', 'Hammy the Brave'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
@@ -157,7 +158,7 @@ class Game {
   async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 900))]); } catch (_) { /* system font */ } }
 
   _three() {
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true }), { preset: 'warm' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.prepend(this.renderer.domElement);

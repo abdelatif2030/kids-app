@@ -10,6 +10,7 @@ import { LEVELS, TOMBS } from './levels.js';
 import { Sound } from './audio.js';
 import * as TX from './textures.js';
 import { geo, M, mesh, Mesher, makeExplorer, makeBlock, makeKey, makeBrazier, makePlate, makeDoor, makeExit, makeArrow, makePit, GRP_COL, GRP_CSS } from './models.js';
+import { polishRenderer } from './polish.js';
 
 const S = {
   title: ['لغز المقبرة', 'TOMB PUZZLE'], sub: ['مغامرة الفرعون الصغير', 'The little explorer\'s adventure'], play: ['العب', 'PLAY'], cont: ['كمّل', 'CONTINUE'], levels: ['المراحل', 'LEVELS'],
@@ -80,7 +81,7 @@ class Game {
 
   // ---------- three.js ----------
   _three() {
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true }), { preset: 'night' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.prepend(this.renderer.domElement);

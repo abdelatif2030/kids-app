@@ -9,6 +9,7 @@ import { Sound } from './audio.js';
 import { makeBot } from './bot.js';
 import * as Art from './art.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { polishRenderer } from './polish.js';
 
 const S = {
   title: ['جيش المعبد', 'TEMPLE ARMY'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], shop: ['المتجر', 'SHOP'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
@@ -54,7 +55,7 @@ class Game {
 
   // ---------------- three.js ----------------
   _three() {
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true }), { preset: 'warm' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.prepend(this.renderer.domElement);

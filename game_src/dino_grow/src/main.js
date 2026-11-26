@@ -8,6 +8,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { Dino, LEVELS, STAGES, SPECIES, stageOf, zoomFor, toneOf, normalizeSave, rng } from './sim.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { polishRenderer } from './polish.js';
 
 const S = {
   title: ['ديناصور صغير يكبر', 'DINO GROW'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
@@ -302,7 +303,7 @@ class Game {
   async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 900))]); } catch (_) { /* system font */ } }
 
   _three() {
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true }), { preset: 'warm' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.prepend(this.renderer.domElement);

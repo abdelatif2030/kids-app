@@ -14,6 +14,7 @@ import {
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num } from './i18n.js';
 import { CSS, h, logo } from './ui.js';
+import { polishRenderer } from './polish.js';
 
 const SLOPE = 0.16; // the run climbs 16 cm per metre
 const Y = (s) => s * SLOPE;
@@ -33,7 +34,7 @@ class Game {
     if (!document.getElementById('sr-style')) document.head.append(h('style', { id: 'sr-style' }, CSS));
     this.root = h('div', { class: 'sr-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' }), { preset: 'warm' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;

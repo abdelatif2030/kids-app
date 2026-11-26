@@ -10,6 +10,7 @@ import { Run, LEVELS, LANE_W, levelSpec, normalizeSave } from './sim.js';
 import { Sound } from './audio.js';
 import { applyBackdrop } from '../../cozy_kit/art.js';
 import { setLang, setGirl, getLang, isGirl, t, num } from './i18n.js';
+import { polishRenderer } from './polish.js';
 
 const CSS = `
 .cd-root{position:absolute;inset:0;overflow:hidden;font-family:Tajawal,system-ui,sans-serif;color:#4a2a6a;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent;background:#b8a8f0}
@@ -200,7 +201,7 @@ class Game {
   // ---- the 3D world -------------------------------------------------------------------------------------------------
 
   _initGL() {
-    const r = this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+    const r = this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' }), { preset: 'warm' });
     r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     r.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(r.domElement);
