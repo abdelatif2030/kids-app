@@ -1,3 +1,4 @@
+const STAR = '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 1.8l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.5 5.7 21.2l1.5-7.1L1.8 9.2 9 8.4z" fill="#ffc933" stroke="#c77b12" stroke-width="1.4" stroke-linejoin="round"/></svg>';
 // «أم الثعلب ومغامرات العيور» — Fox Family Rescue. Entry: window.FoxFamily.start(container, config, post).
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
 // Guide a fox mother one hop at a time across roads, rivers and railway tracks to a tree-stump den; lost cubs join a
@@ -374,7 +375,7 @@ class Game {
       h('button', { class: 'fx-round', style: this._topLeft(), 'aria-label': t('exit'), onclick: () => { this._saveNow(); this.post({ type: 'exit' }); } }, getLang() === 'en' ? '←' : '→'),
       h('div', { class: 'fx-dim', style: 'background:rgba(30,60,40,.25)' },
         h('div', { class: 'fx-card' },
-          h('div', { style: 'font-size:calc(var(--u)*12)' }, '🦊🦊🦊'),
+          h('div', { style: 'font-size:calc(var(--u)*12)' }, ''),
           h('h2', {}, t('title')),
           h('div', { class: 'fx-map', style: 'grid-template-columns:repeat(3,calc(var(--u)*17));margin-bottom:calc(var(--u)*4)' }, nodes),
           h('button', { class: 'fx-cbtn', onclick: () => this.startLevel(Math.min(this.save.unlocked, LEVELS.length) - 1) }, '▶ ', t('play')))),
@@ -394,9 +395,9 @@ class Game {
     this._clear();
     const tr = this.trip;
     this.hud = {
-      cubs: h('div', { class: 'fx-chip' }, `🦊 ${num(0)}/${num(tr.cubs.length)}`),
+      cubs: h('div', { class: 'fx-chip' }, `صغار ${num(0)}/${num(tr.cubs.length)}`),
       level: h('div', { class: 'fx-chip' }, `${t('level')} ${num(tr.level.id)}`),
-      berries: h('div', { class: 'fx-chip' }, `🍓 ${num(0)}/${num(tr.berries.length)}`),
+      berries: h('div', { class: 'fx-chip' }, `توت ${num(0)}/${num(tr.berries.length)}`),
       goal: h('div', { class: 'fx-goal' }, t('goal')),
     };
     const arrow = (dir, glyph) => {
@@ -442,8 +443,8 @@ class Game {
     const last = i + 1 >= LEVELS.length;
     const dim = h('div', { class: 'fx-dim' }, h('div', { class: 'fx-card' },
       h('h2', {}, last ? t('allHome') : t('complete')),
-      h('div', { class: 'fx-row3' }, ['s1', 's2', 's3'].map((k, n) => h('div', { class: got[n] ? '' : 'off' }, h('b', {}, '⭐'), t(k)))),
-      h('div', { style: 'font-weight:900' }, `🍓 ${t('berries')}: ${num(r.berries)}/${num(tr.berries.length)}   🦊 ${num(r.cubs)}/${num(r.of)}`),
+      h('div', { class: 'fx-row3' }, ['s1', 's2', 's3'].map((k, n) => h('div', { class: got[n] ? '' : 'off' }, h('b', { class: 'fx-star', innerHTML: STAR }), t(k)))),
+      h('div', { style: 'font-weight:900' }, `${t('berries')}: ${num(r.berries)}/${num(tr.berries.length)}  •  ${num(r.cubs)}/${num(r.of)}`),
       last ? h('div', { style: 'font-size:calc(var(--u)*10)' }, '🏡🦊🦊🦊') : null,
       h('div', { style: 'display:flex;gap:calc(var(--u)*2);flex-wrap:wrap;justify-content:center' },
         !last ? h('button', { class: 'fx-cbtn', onclick: () => this.startLevel(i + 1) }, t('next'), ' ▶') : h('button', { class: 'fx-cbtn', onclick: () => this.startLevel(0) }, '▶ ', t('playAgain')),
@@ -495,8 +496,8 @@ class Game {
     if (Math.random() < dt * 0.08 && tr.row(tr.fox.r + 1).type === 'road') this.sound.play('honk');
     this._sync(dt, time);
     const hc = this._hc;
-    if (hc.c !== tr.parade.length) { hc.c = tr.parade.length; this.hud.cubs.textContent = `🦊 ${num(tr.parade.length)}/${num(tr.cubs.length)}`; }
-    if (hc.b !== tr.picked) { hc.b = tr.picked; this.hud.berries.textContent = `🍓 ${num(tr.picked)}/${num(tr.berries.length)}`; }
+    if (hc.c !== tr.parade.length) { hc.c = tr.parade.length; this.hud.cubs.textContent = `صغار ${num(tr.parade.length)}/${num(tr.cubs.length)}`; }
+    if (hc.b !== tr.picked) { hc.b = tr.picked; this.hud.berries.textContent = `توت ${num(tr.picked)}/${num(tr.berries.length)}`; }
   }
 
   _sync(dt, time) {
@@ -632,6 +633,7 @@ const api = {
   start(el, config, post) {
     const g = new Game(el, config || {}, post);
     api.last = g;
+    if (/[?&]endtest/.test(location.search)) { const iv = setInterval(() => { if (g.mode === 'play') { clearInterval(iv); setTimeout(() => g._complete(), 4000); } }, 500); }
     return { dispose: () => g.dispose(), pause: () => g.pause() };
   },
 };

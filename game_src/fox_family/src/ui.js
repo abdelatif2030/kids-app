@@ -64,6 +64,7 @@ export function h(tag, attrs = {}, ...kids) {
     if (v === undefined || v === null || v === false) continue;
     if (k === 'class') e.className = v;
     else if (k === 'text') e.textContent = v;
+    else if (k === 'innerHTML') e.innerHTML = v;
     else if (k.startsWith('on')) e.addEventListener(k.slice(2).toLowerCase(), v);
     else if (k === 'style') e.style.cssText = v;
     else e.setAttribute(k, v === true ? '' : v);
@@ -129,4 +130,5 @@ export const CSS2 = `
 .fx-node.lock{color:#6a6a74}
 .fx-node.lock:before{content:'';position:absolute;left:50%;top:46%;width:calc(var(--u)*7);height:calc(var(--u)*5.4);margin-left:calc(var(--u)*-3.5);background:linear-gradient(180deg,#8a8a96,#6a6a76);border-radius:calc(var(--u)*1.1);box-shadow:inset 0 calc(var(--u)*.4) 0 rgba(255,255,255,.35)}
 .fx-node.lock:after{content:'';position:absolute;left:50%;top:26%;width:calc(var(--u)*4);height:calc(var(--u)*4);margin-left:calc(var(--u)*-2.4);border:calc(var(--u)*1.1) solid #6a6a76;border-bottom:0;border-radius:calc(var(--u)*2.6) calc(var(--u)*2.6) 0 0}
+.fx-row3 b.fx-star{display:block;width:calc(var(--u)*9);height:calc(var(--u)*9);margin:0 auto calc(var(--u)*.6);filter:drop-shadow(0 calc(var(--u)*.5) 0 rgba(0,0,0,.18))}.fx-row3 .off b.fx-star{filter:grayscale(1) opacity(.35)}
 `;
