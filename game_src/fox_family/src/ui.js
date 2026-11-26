@@ -104,4 +104,23 @@ export const CSS2 = `
 .fx-chef.on{border-color:#f2a51e;background:#fff3d0;box-shadow:0 0 0 calc(var(--u)*.6) #ffd75e}
 .fx-big{font-size:calc(var(--u)*6);padding:calc(var(--u)*2.4) calc(var(--u)*8)}
 .fx-stat{display:flex;gap:calc(var(--u)*3);font-weight:900;font-size:calc(var(--u)*3.6)}
+
+/* cartoon HUD pass */
+.fx-bar{top:max(calc(var(--u)*2),env(safe-area-inset-top))!important;gap:calc(var(--u)*1.6)!important}
+.fx-chip{font-size:calc(var(--u)*4)!important;padding:calc(var(--u)*.8) calc(var(--u)*3)!important;border:calc(var(--u)*.7) solid #fff!important;color:#fff!important;text-shadow:0 calc(var(--u)*.3) 0 rgba(0,0,0,.35);-webkit-text-stroke:calc(var(--u)*.12) rgba(0,0,0,.25);box-shadow:0 calc(var(--u)*.9) 0 rgba(0,0,0,.28),0 calc(var(--u)*1.4) calc(var(--u)*2) rgba(0,0,0,.25)!important;transform:rotate(-1.5deg)}
+.fx-chip:nth-child(1){background:linear-gradient(180deg,#ff9a5c,#e8571c)!important}
+.fx-chip:nth-child(2){background:linear-gradient(180deg,#ff6f9c,#d9305f)!important;transform:rotate(1.2deg)}
+.fx-chip:nth-child(3){background:linear-gradient(180deg,#5ab8ff,#2a6ad8)!important}
+.fx-goal{top:calc(max(calc(var(--u)*2),env(safe-area-inset-top)) + var(--u)*10.5)!important;background:linear-gradient(180deg,#7a4a22,#5a3416);color:#ffe9b8!important;border:calc(var(--u)*.5) solid #c98a3a;border-radius:calc(var(--u)*1.6);padding:calc(var(--u)*.5) calc(var(--u)*3);text-shadow:0 calc(var(--u)*.3) 0 rgba(0,0,0,.5)!important;box-shadow:0 calc(var(--u)*.7) 0 #3a2410;white-space:nowrap}
+.fx-arrow{border:calc(var(--u)*.7) solid #fff!important;background:linear-gradient(180deg,#ffffff,#dfe8f5)!important;box-shadow:0 calc(var(--u)*1.1) 0 #9fb0c8,0 calc(var(--u)*1.8) calc(var(--u)*2.4) rgba(0,0,0,.3)!important}
+.fx-arrow.up{background:linear-gradient(180deg,#8cf2c0,#2fcf86)!important;box-shadow:0 calc(var(--u)*1.1) 0 #1a9a62,0 calc(var(--u)*1.8) calc(var(--u)*2.4) rgba(0,0,0,.3)!important}
+.fx-card{border:calc(var(--u)*.8) solid #ffd27a;background:linear-gradient(180deg,#fffdf6,#fff1d0);box-shadow:0 calc(var(--u)*1.4) 0 #e0a35c,0 calc(var(--u)*3) calc(var(--u)*7) rgba(0,0,0,.32)!important}
+.fx-card h2{color:#c2552a;-webkit-text-stroke:calc(var(--u)*.15) #fff;text-shadow:0 calc(var(--u)*.4) 0 rgba(255,255,255,.8)}
+.fx-cbtn{background:linear-gradient(180deg,#8cf2c0,#2fcf86)!important;color:#fff!important;text-shadow:0 calc(var(--u)*.3) 0 rgba(0,0,0,.3);border:calc(var(--u)*.6) solid #fff!important;box-shadow:0 calc(var(--u)*1) 0 #1a9a62!important}
+.fx-cbtn.alt{background:linear-gradient(180deg,#fff,#dfe8f5)!important;color:#3a4a6a!important;text-shadow:none;box-shadow:0 calc(var(--u)*1) 0 #9fb0c8!important}
+.fx-node{border-color:#fff;box-shadow:0 calc(var(--u)*1) 0 #8a4f1d,0 calc(var(--u)*1.8) calc(var(--u)*3) rgba(0,0,0,.3);font-size:calc(var(--u)*6.4)}
+.fx-logo{font-size:calc(var(--u)*11);-webkit-text-stroke:calc(var(--u)*.7) #8a4f1d;text-shadow:0 calc(var(--u)*1.2) 0 #8a4f1d,0 calc(var(--u)*2) calc(var(--u)*3) rgba(0,0,0,.35);transform:rotate(-2deg)}
+.fx-arrow.lft:before,.fx-arrow.rgt:before{content:'';display:block;width:0;height:0;border-top:calc(var(--u)*2.6) solid transparent;border-bottom:calc(var(--u)*2.6) solid transparent}
+.fx-arrow.lft:before{border-right:calc(var(--u)*3.6) solid #2a2a3a}
+.fx-arrow.rgt:before{border-left:calc(var(--u)*3.6) solid #2a2a3a}
 `;

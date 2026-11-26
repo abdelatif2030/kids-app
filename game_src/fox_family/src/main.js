@@ -400,7 +400,7 @@ class Game {
       goal: h('div', { class: 'fx-goal' }, t('goal')),
     };
     const arrow = (dir, glyph) => {
-      const b = h('button', { class: `fx-arrow${dir === 'up' ? ' up' : ''}`, 'aria-label': dir }, glyph);
+      const b = h('button', { class: `fx-arrow${dir === 'up' ? ' up' : ''}${dir === 'left' ? ' lft' : dir === 'right' ? ' rgt' : ''}`, 'aria-label': dir }, glyph);
       b.addEventListener('pointerdown', (e) => { e.stopPropagation(); e.preventDefault(); this._hop(dir); });
       return b;
     };
@@ -408,7 +408,7 @@ class Game {
       h('button', { class: 'fx-round', style: this._topLeft(), 'aria-label': t('paused'), onclick: (e) => { e.stopPropagation(); this.pause(); } }, '⏸'),
       h('div', { class: 'fx-bar' }, this.hud.level, this.hud.berries, this.hud.cubs, this._mute()),
       this.hud.goal,
-      h('div', { class: 'fx-arrows' }, arrow('left', '←'), arrow('down', '↓'), arrow('up', '↑'), arrow('right', '→')),
+      h('div', { class: 'fx-arrows' }, arrow('left', ''), arrow('down', '↓'), arrow('up', '↑'), arrow('right', '')),
       this._toastEl(),
     );
     this._hc = {};
