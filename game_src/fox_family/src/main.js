@@ -563,12 +563,12 @@ class Game {
     // camera follows the fox's row, looking up the board
     const portrait = this.cw < this.ch;
     // closer and tilted (like the video): big tractors and trucks near the fox, the lanes ahead shrinking away
-    const want = new THREE.Vector3(x * 0.45 + (portrait ? 1.6 : 2.4), portrait ? 7.4 : 5.2, z + (portrait ? 5.6 : 5.4));
+    const want = new THREE.Vector3(x * 0.45 + (portrait ? 3.2 : 5.2), portrait ? 6.6 : 4.6, z + (portrait ? 4.2 : 3.8));
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 4));
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 2);
     this.camera.position.set(this.cam.x + (Math.random() - 0.5) * this.shake * 0.3, this.cam.y, this.cam.z);
-    this.camera.lookAt(this.cam.x - (portrait ? 1.6 : 2.4) * 0.8, 0.5, this.cam.z - (portrait ? 6 : 5.4) - (portrait ? 2.2 : 1.2));
+    this.camera.lookAt(this.cam.x - (portrait ? 3.2 : 5.2) * 0.85, 0.5, this.cam.z - (portrait ? 6 : 5.4) - (portrait ? 2.2 : 1.2));
   }
 
   // ---- loop ----------------------------------------------------------------------------------------------------------
