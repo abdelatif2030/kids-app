@@ -3,6 +3,7 @@
 // rhino.js. Drag to steer, tap/JUMP to jump, JET (alien) to recover. Three rounds: qualify, then win the final. three.js, art and
 // sound made in code. No network, no ads, no tracking. Nothing is lost: a hit pushes you back, a fall puts you back on the ledge.
 import * as THREE from 'three';
+import { polishRenderer } from './polish.js';
 import { Race, ROUNDS, HALF, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
@@ -130,7 +131,7 @@ class Game {
 
   _three() {
     const th = this.th;
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true }), { preset: 'fresh' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.root.prepend(this.renderer.domElement);
@@ -470,8 +471,8 @@ class Game {
     const px = play ? -r.p.x : 0;
     const pz = play ? Math.min(r.p.z, r.L + 4) : -4 + Math.sin(this.clock * 0.4) * 2;
     this.camera.position.x += (px * 0.7 - this.camera.position.x) * Math.min(1, dt * 5);
-    this.camera.position.set(this.camera.position.x, this.cw < this.ch ? 6.4 : 5.2, pz - (this.cw < this.ch ? 9.5 : 8));
-    this.camera.lookAt(this.camera.position.x * 0.5, 1.4, pz + 14);
+    this.camera.position.set(this.camera.position.x, this.cw < this.ch ? 5.2 : 3.6, pz - (this.cw < this.ch ? 7.5 : 5.6));
+    this.camera.lookAt(this.camera.position.x * 0.5, 1.2, pz + 10);
     if (this.goldGate && play && r.p.finished) this.goldGate.rotation.z = Math.sin(this.clock * 10) * 0.05;
     this.renderer.render(this.scene, this.camera);
   }
