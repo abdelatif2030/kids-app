@@ -6,6 +6,7 @@
 // ranks, a top-10 table with initials, and a hangar where feathers buy upgrades and paint. 2D canvas, all art and sound made in code.
 import { Run, W, H, UPGRADES, PAINTS, ENEMY, normalizeSave, upgradeLevel, buyUpgrade, buyPaint, qualifies, addScore } from './sim.js';
 import { paintSky, drawCloud, drawIsland, drawPlane, drawEnemy, drawBoss, drawBird, drawCageItem, drawPickup, drawBubble, drawEnemyBullet, drawPopBurst, PAINT_COLORS, ART } from './art.js';
+import { View3D } from './view3d.js';
 import { loadArt } from '../../cozy_kit/art.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num } from './i18n.js';
@@ -142,6 +143,8 @@ class Game {
     this.root = h('div', { class: 'sc-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
     this.cv = h('canvas');
+    this.view = new View3D(this.el);
+    this.root.append(this.view.dom);
     this.root.append(this.cv);
     this.g = this.cv.getContext('2d');
     this.layer = h('div', { class: 'sc-layer' });
@@ -182,6 +185,7 @@ class Game {
     this.fx0 = (this.cw - W * this.sc) / 2;
     this.fy0 = (this.ch - H * this.sc) / 2;
     this.skyKey = '';
+    this.view.setSize(this.cw, this.ch);
   }
 
   _sky() {
@@ -191,6 +195,7 @@ class Game {
     return this.sky;
   }
 
+  P(x, y, wy = 0) { return this.view.project(x, y, wy); }
   X(x) { return this.fx0 + x * this.sc; }
   Y(y) { return this.fy0 + y * this.sc; }
 
@@ -199,7 +204,7 @@ class Game {
   _bind() {
     const root = this.root;
     for (const ev of ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown']) root.addEventListener(ev, () => this.sound.unlock(), { capture: true, passive: true });
-    const toWorld = (e) => { const r = root.getBoundingClientRect(); return [((e.clientX - r.left) - this.fx0) / this.sc, ((e.clientY - r.top) - this.fy0) / this.sc]; };
+    const toWorld = (e) => this.view.pick(e.clientX, e.clientY, root.getBoundingClientRect());
     let drag = false;
     root.addEventListener('pointerdown', (e) => { if (e.target.closest('button')) return; if (this.mode !== 'play') return; drag = true; const [x, y] = toWorld(e); this.input.tx = x; this.input.ty = y - 14; this._hideHint(); });
     root.addEventListener('pointermove', (e) => { if (this.mode !== 'play') return; if (!drag && e.pointerType === 'touch') return; const [x, y] = toWorld(e); this.input.tx = x; this.input.ty = y - (e.pointerType === 'touch' ? 14 : 0); });
@@ -537,63 +542,28 @@ class Game {
   _draw(time, dt) {
     const g = this.g;
     g.setTransform(1, 0, 0, 1, 0, 0);
-    g.drawImage(this._sky(), 0, 0);
+    g.clearRect(0, 0, this.cv.width, this.cv.height);
     g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-    if (ART.clouds) { // mirrored tiles scroll down so the seam never shows
-      const im = ART.clouds; const cw = this.cw, ch = this.ch; const k = Math.max(cw / im.naturalWidth, ch / im.naturalHeight) * 1.1; const iw = im.naturalWidth * k, ih = im.naturalHeight * k;
-      const off = (time * this.sc * 6) % (2 * ih); g.globalAlpha = 0.5;
-      for (let n = -1; n * ih - ih + off < ch; n++) { const y0 = n * ih + off - ih; g.save(); if (((n % 2) + 2) % 2) { g.translate(0, y0 + ih); g.scale(1, -1); g.drawImage(im, (cw - iw) / 2, 0, iw, ih); } else g.drawImage(im, (cw - iw) / 2, y0, iw, ih); g.restore(); }
-      g.globalAlpha = 1;
-    }
-    // islands and clouds scroll down (the plane flies up)
-    const stage = this.run ? this.run.stage : 1;
-    for (const c of this.clouds) { c.y += c.v * dt * 0.06; if (c.y > 1.1) { c.y = -0.1; c.x = Math.random(); } drawCloud(g, c.x * this.cw, c.y * this.ch, this.sc * 10 * c.s, 0.55); }
-    for (const [i, isl] of this.islands.entries()) {
-      const cy = ((isl.y * this.ch + this.scroll * this.sc * 0.5 * (0.6 + i * 0.06)) % (this.ch * 1.3)) - this.ch * 0.15;
-      const kind = stage === 3 ? 2 : stage === 2 ? 1 : isl.k === 2 ? 0 : isl.k;
-      drawIsland(g, isl.x * this.cw, cy, this.sc * 100 * isl.s * 1.1, stage === 1 ? 0 : kind, time);
-    }
-    for (const c of this.clouds) if (c.s > 1.5) drawCloud(g, (c.x * 1.2 % 1.2) * this.cw, ((c.y + 0.4) % 1.1) * this.ch, this.sc * 12 * c.s, 0.9);
     const r = this.run;
-    if (!r) {
-      drawPlane(g, this.cw / 2, this.ch * 0.7, this.sc * 22, time, this.save.paint, Math.sin(time) * 0.3);
-      return;
-    }
-    let sx = 0, sy = 0;
-    if (this.shake > 0) { this.shake = Math.max(0, this.shake - dt); sx = (Math.random() - 0.5) * this.shake * 14; sy = (Math.random() - 0.5) * this.shake * 14; }
-    g.save(); g.translate(sx, sy);
+    this.view.render(r, time, dt, this.tilt || 0, r ? r.stats.paint : this.save.paint);
+    if (!r) return;
     const S = this.sc;
-    // pickups
-    for (const p of r.pickups) {
-      if (p.kind === 'cage') drawCageItem(g, p.bird, this.X(p.x), this.Y(p.y), S * 6, time);
-      else drawPickup(g, p.kind, this.X(p.x), this.Y(p.y), S * (p.kind === 'capsule' ? 8 : 5.8), time, p.cap);
-    }
-    // enemies
+    g.save();
     for (const en of r.enemies) {
-      if (en.type === 'boss') drawBoss(g, this.X(en.x), this.Y(en.y), S * en.r * 1.7, time, en.hp / en.hp0);
-      else drawEnemy(g, en.type, this.X(en.x), this.Y(en.y), S * en.r * 2.9, time, en.hp / en.hp0);
       if (en.type === 'boss') { // the captain's HP bar
-        const bw = S * 50, bx = this.cw / 2 - bw / 2, by = this.Y(2);
+        const bw = Math.min(this.cw * 0.5, S * 60), bx = this.cw / 2 - bw / 2, by = this.ch * 0.15;
         g.fillStyle = 'rgba(29,42,74,0.6)'; g.fillRect(bx, by, bw, S * 2.2); g.fillStyle = '#ff5a4a'; g.fillRect(bx, by, bw * Math.max(0, en.hp / en.hp0), S * 2.2);
         g.strokeStyle = '#fff'; g.lineWidth = 2; g.strokeRect(bx, by, bw, S * 2.2);
       }
     }
-    for (const en of r.enemies) if (en.type === 'cage' && en.y > 4 && !this.run.pickups.some((p) => p.kind === 'cage')) this._tag(g, t('hintFree'), this.X(en.x), this.Y(en.y) + S * 14);
-    for (const p of r.pickups) if (p.kind === 'cage') this._tag(g, t('hintCage'), this.X(p.x), this.Y(p.y) - S * 9, true, time);
-    for (const b of r.eb) drawEnemyBullet(g, this.X(b.x), this.Y(b.y), S * b.r);
-    // wings
-    for (const w of r.wings) drawBird(g, w.type, this.X(w.x), this.Y(w.y), S * 7, time);
-    // the plane
-    this._trail(g, this.X(r.px), this.Y(r.py), S, time);
-    drawPlane(g, this.X(r.px), this.Y(r.py), S * 13, time, r.stats.paint, this.tilt, r.inv > 0 && r.state === 'play');
-    if (r.inv > 0.3 && r.state === 'play') { g.strokeStyle = 'rgba(120,210,255,0.8)'; g.lineWidth = S * 0.6; g.beginPath(); g.arc(this.X(r.px), this.Y(r.py), S * 15 + Math.sin(time * 12) * S * 0.6, 0, Math.PI * 2); g.stroke(); }
-    // bullets
-    for (const b of r.bullets) drawBubble(g, this.X(b.x), this.Y(b.y), S * b.r * 2.0, b.kind);
+    for (const en of r.enemies) if (en.type === 'cage' && en.y > 4 && !this.run.pickups.some((p) => p.kind === 'cage')) { const [qx, qy] = this.P(en.x, en.y); this._tag(g, t('hintFree'), qx, qy + S * 14); }
+    for (const p of r.pickups) if (p.kind === 'cage') { const [qx, qy] = this.P(p.x, p.y); this._tag(g, t('hintCage'), qx, qy - S * 9, true, time); }
+    if (r.inv > 0.3 && r.state === 'play') { const [qx, qy] = this.P(r.px, r.py); g.strokeStyle = 'rgba(120,210,255,0.8)'; g.lineWidth = S * 0.6; g.beginPath(); g.arc(qx, qy, S * 15 + Math.sin(time * 12) * S * 0.6, 0, Math.PI * 2); g.stroke(); }
     // effects
-    for (const f of this.fx) { f.k += dt * 2.2; if (f.kind === 'pop') drawPopBurst(g, this.X(f.x), this.Y(f.y), S * f.s, Math.min(1, f.k), f.e); }
+    for (const f of this.fx) { f.k += dt * 2.2; if (f.kind === 'pop' && !f.b3) { f.b3 = 1; this.view.burst(f.x, f.y, f.e); } }
     this.fx = this.fx.filter((f) => f.k < 1);
     g.textAlign = 'center'; g.font = `900 ${Math.max(11, S * 4)}px Tajawal, system-ui, sans-serif`; g.lineWidth = 3; g.strokeStyle = 'rgba(29,42,74,0.9)';
-    for (const tx of this.texts) { tx.k += dt * 1.1; g.globalAlpha = Math.max(0, 1 - tx.k); g.fillStyle = tx.c; const yy = this.Y(tx.y) - tx.k * S * 8; g.strokeText(tx.text, this.X(tx.x), yy); g.fillText(tx.text, this.X(tx.x), yy); }
+    for (const tx of this.texts) { tx.k += dt * 1.1; g.globalAlpha = Math.max(0, 1 - tx.k); g.fillStyle = tx.c; const [qx, qy] = this.P(tx.x, tx.y); const yy = qy - tx.k * S * 8; g.strokeText(tx.text, qx, yy); g.fillText(tx.text, qx, yy); }
     g.globalAlpha = 1;
     this.texts = this.texts.filter((x) => x.k < 1);
     g.restore();
@@ -630,6 +600,7 @@ class Game {
     if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis);
     window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey);
+    this.view.dispose();
     this.root.remove();
   }
 }
