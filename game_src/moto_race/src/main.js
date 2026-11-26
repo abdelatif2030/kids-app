@@ -392,7 +392,7 @@ class Game {
         if (k === 0 && this.save.color === 0 && this.zl) mine = { tex: this.zl.tex, aspect: this.zl.aspect }; // the animated Zizo
         const set = k === 0 ? { c: mine, l: this.save.color === 0 ? P.bike_l : mine, r: this.save.color === 0 ? P.bike_r : mine, crash: P.bike_crash || mine, nitro: this.save.color === 0 ? P.bike_nitro || mine : mine }
           : { c: P[rivalKey] || P.bike_c, crash: P.bike_crash || P.bike_c };
-        b = makeBillboardVehicle(THREE, set, 3.0);
+        b = makeBillboardVehicle(THREE, set, 2.1);
       } else b = makeBike(k === 0 ? COLORS[this.save.color] : r.color, r.suit, r.helmet, r.num);
       s.add(b.root);
       return b;
@@ -856,8 +856,8 @@ class Game {
     const fx = Math.sin(p.h);
     const fz = Math.cos(p.h);
     const portrait = this.cw < this.ch;
-    const back = portrait ? 5.2 : 3.7;
-    const up = portrait ? 2.6 : 1.85;
+    const back = portrait ? 5.2 : 4.0;
+    const up = portrait ? 2.6 : 2.1;
     const want = new THREE.Vector3(p.x - fx * back, up, p.z - fz * back);
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 18));

@@ -9,9 +9,9 @@ function robot(w, dt, wobble = 0.06) {
   const off = w.beatOffset(w.time + (Math.sin(w.time * 3.7) * wobble));
   if (Math.abs(off) < 0.035) w.stroke();
   const c = w.course;
-  const noodle = c.noodles.find((n) => n.s - p.s > -1.2 && n.s - p.s < n.len + 2.2 && Math.abs(n.x - p.x) < n.len + 1);
+  const noodle = c.noodles.find((n) => n.s - p.s > -1.2 && n.s - p.s < n.len + 2.2 + p.v * 0.3 && Math.abs(n.x - p.x) < n.len + 1);
   let want = 0;
-  for (const b of c.bumpers) { const d = b.s - p.s; if (d > 0 && d < 8 && Math.abs(b.x - p.x) < 1.7) want = b.x + (p.x > b.x ? 2.5 : -2.5); }
+  for (const b of c.bumpers) { const d = b.s - p.s; if (d > 0 && d < 8 + p.v * 1.2 && Math.abs(b.x - p.x) < 1.7) want = b.x + (p.x > b.x ? 2.5 : -2.5); }
   return { x: Math.max(-1, Math.min(1, (want - p.x) * 0.8)), dive: !!noodle && p.breath > 0.2 };
 }
 

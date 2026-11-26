@@ -5,8 +5,8 @@
 // final needs first. Deterministic with a seed so a robot test can swim it.
 
 export const HALF = 7; // course half width
-const CRUISE = 2.3;
-const VMAX = 10;
+const CRUISE = 3.6;
+const VMAX = 14;
 const STEER = 3.4;
 const PERFECT = 0.1; // seconds from the beat
 const GOOD = 0.2;
@@ -110,13 +110,13 @@ export class Swim {
     sw.lastStroke = this.time;
     const off = Math.abs(this.beatOffset());
     const grade = off <= PERFECT ? 'perfect' : off <= GOOD ? 'good' : 'off';
-    sw.v = Math.min(VMAX, sw.v + (grade === 'perfect' ? 2.3 : grade === 'good' ? 1.5 : 0.45) * (sw.dive ? 0.7 : 1));
+    sw.v = Math.min(VMAX, sw.v + (grade === 'perfect' ? 3.2 : grade === 'good' ? 2.1 : 0.6) * (sw.dive ? 0.7 : 1));
     if (sw.isPlayer && grade === 'perfect') this.perfects++;
     // a good stroke right in front of a floating wall leaps it
     if (grade !== 'off' && !sw.dive) {
       for (const w of this.course.walls) {
         const d = w.s - sw.s;
-        if (d > 0 && d < 4.5 && sw.x > w.x0 - 0.5 && sw.x < w.x1 + 0.5) { sw.air = LEAP_T; sw.v = Math.max(sw.v, 5.5); this.events.push({ type: 'leap', id: sw.id }); break; }
+        if (d > 0 && d < 4.5 + sw.v * 0.45 && sw.x > w.x0 - 0.5 && sw.x < w.x1 + 0.5) { sw.air = LEAP_T; sw.v = Math.max(sw.v, 5.5); this.events.push({ type: 'leap', id: sw.id }); break; }
       }
     }
     this.events.push({ type: 'stroke', id: sw.id, grade });
