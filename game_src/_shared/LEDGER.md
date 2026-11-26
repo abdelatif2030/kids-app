@@ -56,3 +56,4 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 - NOT sent: scene still small in landscape (portrait BBOX), mine cut off at bottom, flat colors. TODO: landscape-specific layout/scale up, richer terrain, shadows, pile/crate polish, replace emoji (hint/!), menu/level select/end screens polish, pad icons as SVG (emoji tofu in pad panel).
 - gem_quarry: pad icons now inline SVG (no emoji). Still TODO: scene scale/terrain richness before sending clip.
 - gem_quarry: palms + soft shadows added; still small scene in landscape, clip held.
+- gem_quarry: diorama island over the game's own poster.webp as 3D backdrop. Clip recorded for sending.

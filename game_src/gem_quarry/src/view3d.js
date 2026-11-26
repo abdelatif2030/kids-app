@@ -85,17 +85,20 @@ function makeTruck() {
 }
 
 export class View3D {
-  constructor() {
+  constructor(base = './') {
     this.renderer = polishRenderer(new THREE.WebGLRenderer({ antialias: true, alpha: false }), { preset: 'warm', tune: { bloom: [0.28, 0.5, 0.88] } });
     this.dom = this.renderer.domElement; this.dom.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block';
-    this.scene = new THREE.Scene(); this.scene.background = skyTex();
+    this.scene = new THREE.Scene(); this.scene.background = skyTex(); this.bgTex = null; new THREE.TextureLoader().load(`${base}poster.webp`, (t) => { t.colorSpace = THREE.SRGBColorSpace; this.bgTex = t; this.scene.background = t; this._cover(); });
     this.cam = new THREE.PerspectiveCamera(); this.cam.matrixAutoUpdate = false; this.cam.matrixWorldAutoUpdate = false;
     this.cam.matrixWorld.identity(); this.cam.matrixWorldInverse.identity();
     this.scene.add(new THREE.HemisphereLight(0xfff0d0, 0x9a7a50, 1.5));
     const sun = new THREE.DirectionalLight(0xfff0cc, 2.2); sun.position.set(14, 30, -6); sun.target.position.set(4, 0, 6); this.scene.add(sun, sun.target);
     this.renderer.shadowMap.enabled = true; this.renderer.shadowMap.type = THREE.PCFSoftShadowMap; sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); const sc = sun.shadow.camera; sc.left = -34; sc.right = 34; sc.top = 34; sc.bottom = -34; sc.near = 1; sc.far = 120; sun.shadow.bias = -0.0005; sun.position.set(24, 40, 4); sun.target.position.set(4, 0, 6);
     this.W = 1; this.H = 1; this.glow = M(0x8a3be8, 0x7a2be0, 1.0, { f: 1, r: 0.25 });
-    this.ground = new THREE.Mesh(new THREE.PlaneGeometry(260, 260), new THREE.MeshStandardMaterial({ map: sandTex(), roughness: 1 })); this.ground.rotation.x = -Math.PI / 2; this.ground.receiveShadow = true; this.scene.add(this.ground);
+    const sandM = new THREE.MeshStandardMaterial({ map: sandTex(), roughness: 1 });
+    this.ground = new THREE.Mesh(new THREE.BoxGeometry(31, 4, 37), [M(0x8a5a34, 0, 0, { r: 1 }), M(0x8a5a34, 0, 0, { r: 1 }), sandM, M(0x6a4024, 0, 0, { r: 1 }), M(0x8a5a34, 0, 0, { r: 1 }), M(0x8a5a34, 0, 0, { r: 1 })]); this.ground.position.set(2.5, -2.02, 6); this.ground.receiveShadow = true; this.scene.add(this.ground);
+    for (const [w, d, x, z] of [[31.8, 0.8, 2.5, -12.4], [31.8, 0.8, 2.5, 24.4], [0.8, 37.8, -13.4, 6], [0.8, 37.8, 18.4, 6]]) { const r = add(this.scene, G.box, M(0x5aa83a, 0, 0, { r: 0.9 }), x, 0.1, z, w, 0.4, d); r.castShadow = false; }
+    this.ground.material[2].map.repeat.set(4, 4);
     this._world();
     this.workers = []; for (let i = 0; i < 11; i++) { const w = makeWorker(i); w.visible = false; this.scene.add(w); this.workers.push(w); }
     this.trucks = new Map();
@@ -139,7 +142,13 @@ export class View3D {
     for (let i = 0; i < NODES.length - 1; i++) { const a = NODES[i]; const b = NODES[i + 1]; const n = Math.round(Math.hypot(b[0] - a[0], b[1] - a[1])); for (let k = 0; k < n; k += 2) { const f = (k + 0.5) / n; add(this.roadG, G.box, M(level >= 3 ? 0xffe27a : 0xe8dcc0, 0, 0, { r: 0.9 }), a[0] + (b[0] - a[0]) * f, 0.11, a[1] + (b[1] - a[1]) * f, b[0] === a[0] ? 0.12 : 0.5, 0.02, b[0] === a[0] ? 0.5 : 0.12); } }
   }
 
-  setSize(w, h) { this.W = w; this.H = h; this.renderer.setSize(w, h, false); }
+  _cover() {
+    const t = this.bgTex; if (!t || !t.image) return; const ta = t.image.width / t.image.height; const sa = this.W / this.H;
+    t.repeat.set(1, 1); t.offset.set(0, 0);
+    if (sa > ta) { t.repeat.y = ta / sa; t.offset.y = (1 - t.repeat.y) / 2; } else { t.repeat.x = sa / ta; t.offset.x = (1 - t.repeat.x) / 2; }
+    t.needsUpdate = true;
+  }
+  setSize(w, h) { this.W = w; this.H = h; this.renderer.setSize(w, h, false); this._cover(); }
 
   setLayout(s, ox, oy) {
     const W = this.W; const H = this.H;

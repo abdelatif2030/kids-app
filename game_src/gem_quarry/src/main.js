@@ -67,7 +67,7 @@ class Game {
     if (!document.getElementById('gq-style')) document.head.append(h('style', { id: 'gq-style' }, css('gq', '#9a4be0', '#5a1fa8', '#ffe27a') + STYLE));
     this.root = h('div', { class: 'gq-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
-    this.view = new View3D(); this.root.append(this.view.dom);
+    this.view = new View3D(this.base); this.root.append(this.view.dom);
     this.cv = h('canvas'); this.root.append(this.cv);
     this.g = this.cv.getContext('2d');
     this.layer = h('div', { class: 'gq-layer' }); this.root.append(this.layer);
