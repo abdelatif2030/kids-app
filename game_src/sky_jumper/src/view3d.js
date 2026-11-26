@@ -18,17 +18,18 @@ const mesh = (g, m, x = 0, y = 0, z = 0, a = 1, b = 1, c = 1) => { const o = new
 function makeHero() {
   const g = new THREE.Group(); const body = new THREE.Group(); g.add(body);
   const skin = M(0xa6e03a), dark = M(0x5aa022), belly = M(0xeaf8a8), eyeW = M(0xffffff), pup = M(0x16161e);
-  body.add(mesh(geo.sph, skin, 0, 0.6, 0, 1.05, 1.15, 0.95)); body.add(mesh(geo.sph, belly, 0, 0.5, 0.3, 0.7, 0.8, 0.5));
+  body.add(mesh(geo.sph, skin, 0, 0.62, 0, 1.3, 1.25, 1.1)); body.add(mesh(geo.sph, belly, 0, 0.5, 0.36, 0.9, 0.9, 0.55));
   for (const s of [-1, 1]) { // spots, ears
     body.add(mesh(geo.sph, dark, s * 0.32, 0.95, -0.1, 0.18, 0.14, 0.1));
-    const ear = mesh(geo.cone, skin, s * 0.35, 1.28, -0.05, 0.28, 0.5, 0.2); ear.rotation.z = -s * 0.4; body.add(ear);
+    body.add(mesh(geo.sph, skin, s * 0.42, 1.34, -0.05, 0.42, 0.44, 0.2)); body.add(mesh(geo.sph, M(0xff8ab0), s * 0.42, 1.34, 0.04, 0.28, 0.3, 0.12));
   }
   const head = new THREE.Group(); head.position.set(0, 0.88, 0.2); body.add(head);
-  const sn = mesh(geo.sph, M(0x86c82a), 0, -0.08, 0.5, 0.5, 0.34, 0.8); head.add(sn); head.add(mesh(geo.sph, M(0x4a7a1a), 0.12, 0.0, 0.88, 0.1, 0.08, 0.08)); head.add(mesh(geo.sph, M(0x4a7a1a), -0.12, 0.0, 0.88, 0.1, 0.08, 0.08));
-  const sm = mesh(geo.hem, M(0x7a1a2a), 0, -0.2, 0.55, 0.3, 0.12, 0.5); sm.rotation.x = Math.PI; head.add(sm);
+  const sn = mesh(geo.sph, M(0x8ed02e), 0, -0.1, 0.42, 0.6, 0.4, 0.55); head.add(sn); head.add(mesh(geo.sph, M(0x4a7a1a), 0.1, 0.02, 0.7, 0.1, 0.08, 0.08)); head.add(mesh(geo.sph, M(0x4a7a1a), -0.1, 0.02, 0.7, 0.1, 0.08, 0.08));
+  const sm = mesh(geo.hem, M(0x7a1a2a), 0, -0.24, 0.55, 0.32, 0.14, 0.2); sm.rotation.x = Math.PI; head.add(sm);
   for (const s of [-1, 1]) {
-    head.add(mesh(geo.sph, eyeW, s * 0.22, 0.2, 0.34, 0.34, 0.4, 0.2)); head.add(mesh(geo.sph, pup, s * 0.22, 0.2, 0.44, 0.17, 0.22, 0.1)); head.add(mesh(geo.sph, eyeW, s * 0.22 + 0.04, 0.26, 0.5, 0.06, 0.06, 0.04));
+    head.add(mesh(geo.sph, eyeW, s * 0.26, 0.22, 0.38, 0.44, 0.5, 0.22)); head.add(mesh(geo.sph, pup, s * 0.26, 0.2, 0.5, 0.22, 0.28, 0.1)); head.add(mesh(geo.sph, eyeW, s * 0.26 + 0.05, 0.28, 0.58, 0.08, 0.08, 0.04));
   }
+  const tail = mesh(geo.tor, skin, 0.7, 0.4, -0.3, 0.9, 0.9, 0.9); tail.rotation.y = 1.2; body.add(tail);
   const legs = []; for (const s of [-1, 1]) { const l = new THREE.Group(); l.position.set(s * 0.28, 0.12, 0.05); l.add(mesh(geo.cyl, dark, 0, -0.1, 0, 0.2, 0.3, 0.2)); l.add(mesh(geo.sph, M(0xff8a3a), 0, -0.28, 0.1, 0.36, 0.18, 0.5)); body.add(l); legs.push(l); }
   const arms = []; for (const s of [-1, 1]) { const a = new THREE.Group(); a.position.set(s * 0.52, 0.65, 0.05); a.add(mesh(geo.cyl, dark, s * 0.1, 0, 0, 0.16, 0.34, 0.16)).children.at(-1).rotation.z = s * 1.0; a.add(mesh(geo.sph, skin, s * 0.26, -0.12, 0, 0.2, 0.2, 0.2)); body.add(a); arms.push(a); }
   // propeller hat
@@ -134,9 +135,9 @@ export class View3D {
     // creature, drawn wrapped at both edges
     const offs = [0, -W, W];
     this.heroes.forEach((hero, i) => {
-      const x = p.x + offs[i]; hero.visible = x > -2 && x < W + 2; if (!hero.visible) return;
+      const x = p.x + offs[i]; hero.visible = i === 0 || (x > -0.9 && x < W + 0.9); if (!hero.visible) return;
       const u = hero.userData, up = p.vy > 6, down = p.vy < -6;
-      hero.position.set(x, p.y, 0.3); hero.rotation.y = (p.face >= 0 ? 0.55 : -0.55);
+      hero.position.set(x, p.y, 0.3); hero.scale.setScalar(1.35); hero.rotation.y = (p.face >= 0 ? 0.55 : -0.55);
       u.body.scale.set(up ? 0.88 : down ? 1.08 : 1, up ? 1.16 : down ? 0.9 : 1, up ? 0.9 : 1);
       u.legs[0].rotation.x = u.legs[1].rotation.x = up ? 0.7 : -0.4 + Math.sin(clock * 10) * 0.1; u.arms[0].rotation.z = up ? 1.2 : 0.2; u.arms[1].rotation.z = up ? -1.2 : -0.2;
       u.head.rotation.z = Math.sin(clock * 4) * 0.05;
@@ -153,7 +154,7 @@ export class View3D {
     this._sweep(this.pool.plat);
     this.pool.plat.get('menu').userData.seen = true;
     const b = Math.abs(Math.sin(clock * 3)); const hero = this.heroes[0]; hero.visible = true; this.heroes[1].visible = this.heroes[2].visible = false;
-    hero.position.set(W / 2, 2.35 + b * 2.0, 0.3); hero.rotation.y = Math.sin(clock) * 0.6; const u = hero.userData; u.body.scale.set(1, 1 + (b < 0.15 ? -0.1 : 0.08), 1);
+    hero.position.set(W / 2, 2.35 + b * 2.0, 0.3); hero.scale.setScalar(1.35); hero.rotation.y = Math.sin(clock) * 0.6; const u = hero.userData; u.body.scale.set(1, 1 + (b < 0.15 ? -0.1 : 0.08), 1);
     u.legs.forEach((l) => { l.rotation.x = b > 0.2 ? 0.7 : -0.3; }); u.arms[0].rotation.z = 1.2; u.arms[1].rotation.z = -1.2; u.prop.visible = u.jet.visible = u.shield.visible = false;
   }
 }
