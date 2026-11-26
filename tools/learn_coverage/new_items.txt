@@ -1,0 +1,467 @@
+# section|age|english|arabic|german|french|picture (what to draw)
+# ages: 1-3 / 3-6 / 5-8.  German with article (nouns) or infinitive (verbs); French with article or infinitive. A native speaker must check de/fr.
+sounds|1-3|woof woof (dog)|هو هو|wau wau|ouaf ouaf|dog barking, speech bubble with notes
+sounds|1-3|meow (cat)|مياو|miau|miaou|cat meowing
+sounds|1-3|moo (cow)|مووو|muh|meuh|cow mooing
+sounds|1-3|baa (sheep)|مأمأ|mäh|bêê|sheep bleating
+sounds|1-3|quack (duck)|كواك كواك|quak quak|coin coin|duck quacking
+sounds|1-3|cluck (hen)|قاق قاق|gack gack|cot cot|hen clucking
+sounds|1-3|cock-a-doodle-doo (rooster)|كوكو كوكو|kikeriki|cocorico|rooster crowing at sunrise
+sounds|1-3|neigh (horse)|هيييه|iah|hihihi|horse neighing
+sounds|1-3|roar (lion)|زئير|brüll|grrr|lion roaring
+sounds|1-3|oink (pig)|أنك أنك|grunz grunz|grouin grouin|pig oinking
+sounds|1-3|hee-haw (donkey)|هيييه هوووه|iah iah|hi-han|donkey braying
+sounds|1-3|tweet (bird)|تويت تويت|piep piep|cui cui|small bird singing
+action|3-6|to eat|يأكل|essen|manger|child eating an apple
+action|3-6|to drink|يشرب|trinken|boire|child drinking water
+action|3-6|to sleep|ينام|schlafen|dormir|child sleeping in bed
+action|3-6|to run|يجري|rennen|courir|child running
+action|3-6|to walk|يمشي|gehen|marcher|child walking
+action|3-6|to jump|يقفز|springen|sauter|child jumping
+action|3-6|to sit|يقعد|sitzen|s'asseoir|child sitting on a chair
+action|3-6|to stand|يقف|stehen|se tenir debout|child standing
+action|3-6|to open|يفتح|öffnen|ouvrir|child opening a door
+action|3-6|to close|يقفل|schließen|fermer|child closing a door
+action|3-6|to wash|يغسل|waschen|laver|child washing hands
+action|3-6|to brush teeth|ينضف سنانه|Zähne putzen|se brosser les dents|child brushing teeth
+action|3-6|to play|يلعب|spielen|jouer|children playing with a ball
+action|3-6|to read|يقرأ|lesen|lire|child reading a book
+action|3-6|to write|يكتب|schreiben|écrire|child writing with a pencil
+action|3-6|to draw|يرسم|malen|dessiner|child drawing
+action|3-6|to sing|يغني|singen|chanter|child singing with notes
+action|3-6|to dance|يرقص|tanzen|danser|child dancing
+action|3-6|to swim|يسبح|schwimmen|nager|child swimming
+action|3-6|to throw|يرمي|werfen|lancer|child throwing a ball
+action|3-6|to catch|يمسك|fangen|attraper|child catching a ball
+action|3-6|to give|يدّي|geben|donner|child giving a gift
+action|3-6|to hug|يحضن|umarmen|faire un câlin|two children hugging
+action|3-6|to laugh|يضحك|lachen|rire|child laughing
+action|3-6|to cry|يعيّط|weinen|pleurer|child with a tear
+action|3-6|to look|ينظر|schauen|regarder|child looking through a magnifier
+action|3-6|to listen|يسمع|hören|écouter|child with a hand at the ear
+action|3-6|to climb|يتسلق|klettern|grimper|child climbing a ladder
+action|3-6|to build|يبني|bauen|construire|child building blocks
+action|3-6|to help|يساعد|helfen|aider|child helping carry a box
+action|3-6|to wait|يستنى|warten|attendre|child waiting at a bus stop
+action|3-6|to push|يزق|schieben|pousser|child pushing a cart
+action|3-6|to pull|يشد|ziehen|tirer|child pulling a wagon
+opposite|3-6|big - small|كبير - صغير|groß - klein|grand - petit|big and small elephant/mouse
+opposite|3-6|tall - short|طويل - قصير|hoch - niedrig|haut - bas|tall and short giraffe/rabbit
+opposite|3-6|long - short|طويل - قصير (حبل)|lang - kurz|long - court|long and short rope
+opposite|3-6|hot - cold|سخن - ساقع|heiß - kalt|chaud - froid|hot tea and ice cream
+opposite|3-6|fast - slow|سريع - بطيء|schnell - langsam|rapide - lent|rabbit and snail
+opposite|3-6|heavy - light|تقيل - خفيف|schwer - leicht|lourd - léger|stone and feather
+opposite|3-6|full - empty|مليان - فاضي|voll - leer|plein - vide|full and empty glass
+opposite|3-6|open - closed|مفتوح - مقفول|offen - geschlossen|ouvert - fermé|open and closed door
+opposite|3-6|up - down|فوق - تحت|oben - unten|en haut - en bas|bird high, fish low
+opposite|3-6|day - night|نهار - ليل|Tag - Nacht|jour - nuit|sun scene and moon scene
+opposite|3-6|clean - dirty|نضيف - وسخ|sauber - schmutzig|propre - sale|clean and muddy shoes
+opposite|3-6|wet - dry|مبلول - ناشف|nass - trocken|mouillé - sec|wet and dry towel
+opposite|3-6|happy - sad|فرحان - زعلان|fröhlich - traurig|content - triste|two faces
+opposite|3-6|new - old|جديد - قديم|neu - alt|neuf - vieux|new and old shoe
+opposite|3-6|hard - soft|صلب - ناعم|hart - weich|dur - mou|rock and pillow
+opposite|3-6|loud - quiet|عالي - هادي|laut - leise|fort - doux|drum and a sleeping baby
+opposite|3-6|near - far|قريب - بعيد|nah - weit|près - loin|near and far tree
+opposite|3-6|many - few|كتير - قليل|viel - wenig|beaucoup - peu|many and few apples
+opposite|3-6|thick - thin|تخين - رفيع|dick - dünn|épais - mince|thick and thin book
+opposite|3-6|inside - outside|جوه - بره|drinnen - draußen|dedans - dehors|cat in and out of a house
+opposite|3-6|in front - behind|قدام - ورا|vorne - hinten|devant - derrière|ball in front of and behind a box
+where|3-6|in|في|in|dans|ball in a box
+where|3-6|on|على|auf|sur|ball on a box
+where|3-6|under|تحت|unter|sous|ball under a table
+where|3-6|behind|ورا|hinter|derrière|cat behind a tree
+where|3-6|in front of|قدّام|vor|devant|cat in front of a tree
+where|3-6|next to|جنب|neben|à côté de|ball next to a box
+where|3-6|between|بين|zwischen|entre|ball between two boxes
+where|3-6|above|فوق|über|au-dessus de|bird above a house
+where|3-6|left|شمال|links|gauche|child pointing left
+where|3-6|right|يمين|rechts|droite|child pointing right
+describe|4-7|beautiful|جميل|schön|beau|beautiful flower
+describe|4-7|funny|مضحك|lustig|drôle|clown face
+describe|4-7|brave|شجاع|mutig|courageux|child hero cape
+describe|4-7|kind|طيب|nett|gentil|child sharing a toy
+describe|4-7|sweet|حلو|süß|sucré|candy
+describe|4-7|sour|حامض|sauer|acide|lemon with a face
+describe|4-7|salty|مالح|salzig|salé|salt shaker and chips
+describe|4-7|tasty|لذيذ|lecker|délicieux|happy child with a plate
+describe|4-7|round|مدوّر|rund|rond|ball
+describe|4-7|rough|خشن|rau|rugueux|stone surface
+describe|4-7|smooth|أملس|glatt|lisse|smooth egg
+describe|4-7|bright|منوّر|hell|lumineux|bright lamp
+describe|4-7|dark|مضلّم|dunkel|sombre|dark room
+describe|4-7|strong|قوي|stark|fort|strong weightlifter bear
+describe|4-7|tired|تعبان|müde|fatigué|yawning child
+describe|4-7|clever|شاطر|klug|intelligent|child with a light bulb
+polite|2-6|hello|مرحبا|hallo|bonjour|children waving
+polite|2-6|goodbye|مع السلامة|auf Wiedersehen|au revoir|child waving goodbye
+polite|2-6|please|لو سمحت|bitte|s'il te plaît|child asking politely
+polite|2-6|thank you|شكرا|danke|merci|child receiving a gift
+polite|2-6|sorry|آسف|Entschuldigung|pardon|child saying sorry
+polite|2-6|good morning|صباح الخير|guten Morgen|bonjour (le matin)|child waking up with sun
+polite|2-6|good night|تصبح على خير|gute Nacht|bonne nuit|child in bed with moon
+polite|2-6|welcome|أهلا وسهلا|willkommen|bienvenue|child opening a door to a guest
+polite|2-6|excuse me|عن إذنك|entschuldigen Sie|excusez-moi|child passing politely
+polite|2-6|yes|أيوه|ja|oui|child nodding
+polite|2-6|no|لأ|nein|non|child shaking head
+polite|2-6|I love you|بحبك|ich hab dich lieb|je t'aime|child giving a heart
+question|5-8|who?|مين؟|wer?|qui ?|question mark and a child
+question|5-8|what?|إيه؟|was?|quoi ?|question mark and a box
+question|5-8|where?|فين؟|wo?|où ?|question mark and a map pin
+question|5-8|when?|إمتى؟|wann?|quand ?|question mark and a clock
+question|5-8|why?|ليه؟|warum?|pourquoi ?|thinking child
+question|5-8|how?|إزاي؟|wie?|comment ?|child with tools
+question|5-8|how many?|كام؟|wie viele?|combien ?|apples with a question mark
+question|5-8|which?|أنهي؟|welche?|lequel ?|three balls one pointed
+people|5-8|I|أنا|ich|je|child pointing to herself
+people|5-8|you|إنت|du|tu|child pointing to the viewer
+people|5-8|he|هو|er|il|boy
+people|5-8|she|هي|sie|elle|girl
+people|5-8|we|إحنا|wir|nous|group of children
+people|5-8|they|هم|sie (plural)|ils / elles|group in the distance
+people|5-8|my|بتاعي|mein|mon / ma|child hugging a toy
+people|5-8|your|بتاعك|dein|ton / ta|child offering a toy
+bathroom|2-6|soap|صابونة|die Seife|le savon|bar of soap with bubbles
+bathroom|2-6|towel|فوطة|das Handtuch|la serviette|folded towel
+bathroom|2-6|toothbrush|فرشاة أسنان|die Zahnbürste|la brosse à dents|toothbrush
+bathroom|2-6|toothpaste|معجون أسنان|die Zahnpasta|le dentifrice|toothpaste tube
+bathroom|2-6|shampoo|شامبو|das Shampoo|le shampooing|shampoo bottle
+bathroom|2-6|bathtub|بانيو|die Badewanne|la baignoire|bathtub with bubbles
+bathroom|2-6|shower|دش|die Dusche|la douche|shower head
+bathroom|2-6|sink|حوض|das Waschbecken|le lavabo|sink
+bathroom|2-6|mirror|مراية|der Spiegel|le miroir|mirror
+bathroom|2-6|comb|مشط|der Kamm|le peigne|comb
+bathroom|2-6|tissues|مناديل|die Taschentücher|les mouchoirs|tissue box
+bathroom|2-6|potty|القصرية|der Topf|le pot|child potty
+health|4-8|doctor's visit|زيارة الدكتور|der Arztbesuch|la visite chez le médecin|child with a doctor
+health|4-8|fever|حرارة|das Fieber|la fièvre|thermometer and a sick child
+health|4-8|thermometer|ترمومتر|das Thermometer|le thermomètre|thermometer
+health|4-8|medicine|دواء|die Medizin|le médicament|medicine bottle and spoon
+health|4-8|bandage|شاش|der Verband|le pansement|plaster on a knee
+health|4-8|cough|كحة|der Husten|la toux|child coughing into elbow
+health|4-8|sneeze|عطس|das Niesen|l'éternuement|child sneezing into tissue
+health|4-8|headache|صداع|die Kopfschmerzen|le mal de tête|child holding head
+health|4-8|stomach ache|وجع بطن|die Bauchschmerzen|le mal de ventre|child holding tummy
+health|4-8|vitamins|فيتامينات|die Vitamine|les vitamines|fruit and vegetables with sparkles
+health|4-8|wash your hands|اغسل إيديك|Hände waschen|se laver les mains|hands under a tap
+health|4-8|healthy food|أكل صحي|gesundes Essen|la nourriture saine|plate with fruit and vegetables
+health|4-8|exercise|رياضة|die Bewegung|le sport|child stretching
+health|4-8|sleep well|نوم كفاية|gut schlafen|bien dormir|child sleeping with moon
+safety|4-8|traffic light|إشارة المرور|die Ampel|le feu de circulation|traffic light red/yellow/green
+safety|4-8|zebra crossing|عبور المشاة|der Zebrastreifen|le passage piéton|crossing with stripes
+safety|4-8|seat belt|حزام الأمان|der Sicherheitsgurt|la ceinture de sécurité|child in car seat with belt
+safety|4-8|helmet|خوذة|der Helm|le casque|bike helmet
+safety|4-8|fire extinguisher|طفاية حريق|der Feuerlöscher|l'extincteur|red extinguisher
+safety|4-8|first aid kit|شنطة إسعاف|der Erste-Hilfe-Kasten|la trousse de secours|first aid box
+safety|4-8|hold hands|امسك إيد ماما|an der Hand halten|donner la main|child holding an adult's hand
+safety|4-8|look both ways|بص يمين وشمال|nach links und rechts schauen|regarder des deux côtés|child at the kerb looking
+safety|4-8|exit sign|علامة الخروج|das Notausgangsschild|la sortie de secours|green exit sign
+safety|4-8|lifeguard|منقذ|der Rettungsschwimmer|le maître-nageur|lifeguard at the beach
+safety|4-8|ask a grown-up|اسأل حد كبير|Erwachsene fragen|demander à un adulte|child asking a parent
+shop|4-8|money|فلوس|das Geld|l'argent|coins and notes
+shop|4-8|coin|عملة معدنية|die Münze|la pièce|shiny coin
+shop|4-8|banknote|ورقة فلوس|der Geldschein|le billet|paper note (no real currency design)
+shop|4-8|wallet|محفظة|die Geldbörse|le portefeuille|wallet
+shop|4-8|piggy bank|حصّالة|das Sparschwein|la tirelire|piggy bank
+shop|4-8|shop|محل|der Laden|le magasin|small shop
+shop|4-8|market|سوق|der Markt|le marché|market stall
+shop|4-8|price|السعر|der Preis|le prix|price tag
+shop|4-8|cashier|كاشير|die Kassiererin|la caissière|cashier at till
+shop|4-8|shopping basket|سلة|der Einkaufskorb|le panier|basket with groceries
+shop|4-8|receipt|إيصال|die Quittung|le ticket de caisse|receipt
+shop|4-8|cheap - expensive|رخيص - غالي|billig - teuer|bon marché - cher|two price tags
+time|4-8|clock|ساعة حائط|die Uhr|l'horloge|wall clock
+time|4-8|watch|ساعة إيد|die Armbanduhr|la montre|wristwatch
+time|4-8|alarm clock|منبه|der Wecker|le réveil|alarm clock ringing
+time|4-8|calendar|تقويم|der Kalender|le calendrier|wall calendar
+time|4-8|hour|ساعة|die Stunde|l'heure|clock with hour hand highlighted
+time|4-8|minute|دقيقة|die Minute|la minute|clock with minute hand highlighted
+time|4-8|second|ثانية|die Sekunde|la seconde|stopwatch
+time|4-8|today|النهارده|heute|aujourd'hui|calendar with today circled
+time|4-8|tomorrow|بكرة|morgen|demain|calendar next day
+time|4-8|yesterday|إمبارح|gestern|hier|calendar previous day
+time|4-8|week|أسبوع|die Woche|la semaine|seven days row
+time|4-8|weekend|الأجازة|das Wochenende|le week-end|family at the park
+time|4-8|birthday|عيد ميلاد|der Geburtstag|l'anniversaire|cake with candles
+number2|5-8|first|الأول|erste|premier|runner on podium 1
+number2|5-8|second|التاني|zweite|deuxième|runner on podium 2
+number2|5-8|third|التالت|dritte|troisième|runner on podium 3
+number2|5-8|fourth|الرابع|vierte|quatrième|4th in a queue
+number2|5-8|fifth|الخامس|fünfte|cinquième|5th in a queue
+number2|5-8|last|الأخير|letzte|dernier|last in a queue
+number2|5-8|half|نص|die Hälfte|la moitié|half pizza
+number2|5-8|quarter|ربع|das Viertel|le quart|quarter pizza
+number2|5-8|whole|كامل|ganz|entier|whole pizza
+number2|5-8|all|كل|alle|tous|all apples
+number2|5-8|none|ولا واحد|keine|aucun|empty basket
+number2|5-8|a pair|زوج|das Paar|la paire|pair of shoes
+number2|5-8|more|أكتر|mehr|plus|big pile vs small pile
+number2|5-8|less|أقل|weniger|moins|small pile vs big pile
+number2|5-8|equal|متساوي|gleich|égal|two equal piles
+math|5-8|plus|زائد|plus|plus|2 + 3 with apples
+math|5-8|minus|ناقص|minus|moins|5 - 2 with apples
+math|5-8|times|ضرب|mal|fois|2 x 3 with groups
+math|5-8|divided by|قسمة|geteilt durch|divisé par|6 apples into 2 groups
+math|5-8|equals|يساوي|ist gleich|égale|equals sign scales
+math|5-8|even number|عدد زوجي|gerade Zahl|le nombre pair|pairs of dots
+math|5-8|odd number|عدد فردي|ungerade Zahl|le nombre impair|dots with one left over
+math|5-8|zero|صفر|null|zéro|empty basket
+math|5-8|ruler|مسطرة|das Lineal|la règle|ruler
+math|5-8|metre|متر|der Meter|le mètre|metre stick
+math|5-8|centimetre|سنتيمتر|der Zentimeter|le centimètre|short ruler piece
+math|5-8|kilogram|كيلو|das Kilogramm|le kilogramme|scale with 1 kg
+math|5-8|litre|لتر|der Liter|le litre|1 litre bottle
+math|5-8|scale|ميزان|die Waage|la balance|kitchen scale
+math|5-8|measuring tape|متر خياطة|das Maßband|le mètre ruban|measuring tape
+math|5-8|graph|رسم بياني|das Diagramm|le graphique|bar chart
+earth|5-8|Asia|آسيا|Asien|l'Asie|continent on globe
+earth|5-8|Africa|أفريقيا|Afrika|l'Afrique|continent on globe
+earth|5-8|Europe|أوروبا|Europa|l'Europe|continent on globe
+earth|5-8|North America|أمريكا الشمالية|Nordamerika|l'Amérique du Nord|continent on globe
+earth|5-8|South America|أمريكا الجنوبية|Südamerika|l'Amérique du Sud|continent on globe
+earth|5-8|Australia (continent)|أستراليا|Australien|l'Australie|continent on globe
+earth|5-8|Antarctica|القارة القطبية الجنوبية|die Antarktis|l'Antarctique|ice continent with penguins
+earth|5-8|ocean|محيط|der Ozean|l'océan|wide ocean
+earth|5-8|mountain|جبل|der Berg|la montagne|mountain with snow
+earth|5-8|island|جزيرة|die Insel|l'île|island with a palm
+earth|5-8|lake|بحيرة|der See|le lac|lake
+earth|5-8|forest|غابة|der Wald|la forêt|forest
+earth|5-8|valley|وادي|das Tal|la vallée|valley
+earth|5-8|waterfall|شلال|der Wasserfall|la cascade|waterfall
+earth|5-8|map|خريطة|die Karte|la carte|map
+earth|5-8|compass|بوصلة|der Kompass|la boussole|compass
+earth|5-8|north|شمال|Norden|le nord|compass N
+earth|5-8|south|جنوب|Süden|le sud|compass S
+earth|5-8|east|شرق|Osten|l'est|compass E
+earth|5-8|west|غرب|Westen|l'ouest|compass W
+country|5-8|Egypt|مصر|Ägypten|l'Égypte|flag and a pyramid
+country|5-8|Saudi Arabia|السعودية|Saudi-Arabien|l'Arabie saoudite|flag and a palm
+country|5-8|United Arab Emirates|الإمارات|die Vereinigten Arabischen Emirate|les Émirats arabes unis|flag and a tower
+country|5-8|Kuwait|الكويت|Kuwait|le Koweït|flag and a tower
+country|5-8|Qatar|قطر|Katar|le Qatar|flag and a dhow
+country|5-8|Jordan|الأردن|Jordanien|la Jordanie|flag and Petra
+country|5-8|Lebanon|لبنان|der Libanon|le Liban|flag and a cedar
+country|5-8|Palestine|فلسطين|Palästina|la Palestine|flag and an olive tree
+country|5-8|Syria|سوريا|Syrien|la Syrie|flag and a castle
+country|5-8|Iraq|العراق|der Irak|l'Irak|flag and a palm
+country|5-8|Morocco|المغرب|Marokko|le Maroc|flag and a lantern
+country|5-8|Algeria|الجزائر|Algerien|l'Algérie|flag
+country|5-8|Tunisia|تونس|Tunesien|la Tunisie|flag
+country|5-8|Libya|ليبيا|Libyen|la Libye|flag
+country|5-8|Sudan|السودان|der Sudan|le Soudan|flag and the Nile
+country|5-8|Yemen|اليمن|der Jemen|le Yémen|flag
+country|5-8|Oman|عُمان|Oman|Oman|flag
+country|5-8|Bahrain|البحرين|Bahrain|Bahreïn|flag
+country|5-8|Turkey|تركيا|die Türkei|la Turquie|flag and a mosque
+country|5-8|Germany|ألمانيا|Deutschland|l'Allemagne|flag and a castle
+country|5-8|France|فرنسا|Frankreich|la France|flag and a tower
+country|5-8|United Kingdom|بريطانيا|das Vereinigte Königreich|le Royaume-Uni|flag and a clock tower
+country|5-8|Italy|إيطاليا|Italien|l'Italie|flag and a pizza
+country|5-8|Spain|إسبانيا|Spanien|l'Espagne|flag
+country|5-8|Switzerland|سويسرا|die Schweiz|la Suisse|flag and mountains
+country|5-8|United States|أمريكا|die USA|les États-Unis|flag
+country|5-8|Canada|كندا|Kanada|le Canada|flag and a maple leaf
+country|5-8|Brazil|البرازيل|Brasilien|le Brésil|flag
+country|5-8|China|الصين|China|la Chine|flag and a wall
+country|5-8|Japan|اليابان|Japan|le Japon|flag and Mount Fuji
+country|5-8|India|الهند|Indien|l'Inde|flag
+country|5-8|Russia|روسيا|Russland|la Russie|flag
+country|5-8|Australia|أستراليا (دولة)|Australien|l'Australie|flag and a kangaroo
+egypt|3-8|the pyramids|الأهرامات|die Pyramiden|les pyramides|pyramids of Giza
+egypt|3-8|the Sphinx|أبو الهول|die Sphinx|le Sphinx|Sphinx
+egypt|3-8|the Nile|نهر النيل|der Nil|le Nil|Nile with feluccas
+egypt|3-8|felucca|فلوكة|die Feluke|la felouque|sailing felucca
+egypt|3-8|Cairo Tower|برج القاهرة|der Kairoturm|la tour du Caire|Cairo Tower
+egypt|3-8|Karnak Temple|معبد الكرنك|der Karnak-Tempel|le temple de Karnak|temple columns
+egypt|3-8|Abu Simbel|أبو سمبل|Abu Simbel|Abou Simbel|big statues at the temple
+egypt|3-8|Citadel of Saladin|قلعة صلاح الدين|die Saladin-Zitadelle|la citadelle de Saladin|citadel with mosque
+egypt|3-8|Khan el-Khalili|خان الخليلي|der Khan el-Khalili|le Khan el-Khalili|old market with lanterns
+egypt|3-8|Bibliotheca Alexandrina|مكتبة الإسكندرية|die Bibliothek von Alexandria|la bibliothèque d'Alexandrie|round library building
+egypt|3-8|Red Sea|البحر الأحمر|das Rote Meer|la mer Rouge|coral reef and fish
+egypt|3-8|Sinai|سيناء|der Sinai|le Sinaï|mountain and desert
+egypt|3-8|Aswan High Dam|السد العالي|der Assuan-Staudamm|le haut barrage d'Assouan|dam
+egypt|3-8|pharaoh|فرعون|der Pharao|le pharaon|friendly pharaoh with crown
+egypt|3-8|mummy|مومياء|die Mumie|la momie|friendly wrapped mummy
+egypt|3-8|hieroglyphs|هيروغليفية|die Hieroglyphen|les hiéroglyphes|wall of symbols
+egypt|3-8|papyrus|بردي|der Papyrus|le papyrus|papyrus scroll and plant
+egypt|3-8|camel ride|ركوب الجمل|das Kamelreiten|la balade à dos de chameau|child on a camel
+egypt|3-8|Egyptian Museum|المتحف المصري|das Ägyptische Museum|le musée égyptien|pink museum building
+egypt|3-8|Siwa Oasis|واحة سيوة|die Oase Siwa|l'oasis de Siwa|oasis with palms
+egypt|3-8|Egyptian flag|علم مصر|die ägyptische Flagge|le drapeau égyptien|Egyptian flag
+world|5-8|Eiffel Tower|برج إيفل|der Eiffelturm|la tour Eiffel|Eiffel Tower
+world|5-8|Big Ben|بيج بن|Big Ben|Big Ben|clock tower
+world|5-8|Brandenburg Gate|بوابة براندنبورغ|das Brandenburger Tor|la porte de Brandebourg|gate
+world|5-8|Statue of Liberty|تمثال الحرية|die Freiheitsstatue|la statue de la Liberté|statue
+world|5-8|Great Wall of China|سور الصين العظيم|die Chinesische Mauer|la Grande Muraille de Chine|wall over hills
+world|5-8|Colosseum|الكولوسيوم|das Kolosseum|le Colisée|arena
+world|5-8|Leaning Tower of Pisa|برج بيزا المائل|der Schiefe Turm von Pisa|la tour de Pise|leaning tower
+world|5-8|Taj Mahal|تاج محل|das Taj Mahal|le Taj Mahal|white palace
+world|5-8|Neuschwanstein Castle|قلعة نويشفانشتاين|Schloss Neuschwanstein|le château de Neuschwanstein|fairytale castle
+world|5-8|Mount Fuji|جبل فوجي|der Fuji|le mont Fuji|snowy mountain
+deen|4-8|mosque|مسجد|die Moschee|la mosquée|mosque with a dome
+deen|4-8|minaret|مئذنة|das Minarett|le minaret|minaret
+deen|4-8|Quran|القرآن|der Koran|le Coran|closed book on a stand
+deen|4-8|prayer|صلاة|das Gebet|la prière|child praying on a mat
+deen|4-8|prayer mat|سجادة|der Gebetsteppich|le tapis de prière|prayer mat
+deen|4-8|wudu|وضوء|die rituelle Waschung (Wudu)|les ablutions (wudu)|child washing hands at a tap
+deen|4-8|call to prayer|الأذان|der Gebetsruf|l'appel à la prière|minaret with sound waves
+deen|4-8|Ramadan|رمضان|der Ramadan|le ramadan|crescent and lantern
+deen|4-8|fasting|صيام|das Fasten|le jeûne|child with a sunset table
+deen|4-8|iftar|إفطار|das Fastenbrechen (Iftar)|la rupture du jeûne (iftar)|family table at sunset with dates
+deen|4-8|Ramadan lantern|فانوس رمضان|die Ramadan-Laterne|la lanterne du ramadan|colourful lantern
+deen|4-8|Eid|عيد|das Fest (Eid)|l'Aïd|children in new clothes with balloons
+deen|4-8|charity|صدقة|die Spende|la charité|child giving a coin
+deen|4-8|Kaaba|الكعبة|die Kaaba|la Kaaba|Kaaba (respectful, no people)
+deen|4-8|Hajj|الحج|die Hadsch|le hajj|pilgrims in white seen from far
+deen|4-8|crescent|هلال|der Halbmond|le croissant de lune|crescent moon and star
+nature2|4-8|root|جذر|die Wurzel|la racine|plant root
+nature2|4-8|stem|ساق|der Stängel|la tige|plant stem
+nature2|4-8|leaf|ورقة شجر|das Blatt|la feuille|leaf
+nature2|4-8|seed|بذرة|der Samen|la graine|seeds
+nature2|4-8|trunk|جذع|der Stamm|le tronc|tree trunk
+nature2|4-8|branch|فرع|der Ast|la branche|branch
+nature2|4-8|egg|بيضة|das Ei|l'œuf|egg on a leaf
+nature2|4-8|chrysalis|شرنقة|die Puppe|la chrysalide|chrysalis
+nature2|4-8|tadpole|شرغوف|die Kaulquappe|le têtard|tadpole
+nature2|4-8|sun|شمس|die Sonne|le soleil|smiling sun
+nature2|4-8|moon|قمر|der Mond|la lune|moon
+nature2|4-8|star|نجمة|der Stern|l'étoile|star
+nature2|4-8|cloud|سحابة|die Wolke|le nuage|cloud
+nature2|4-8|ice|ثلج|das Eis|la glace|ice cubes
+nature2|4-8|steam|بخار|der Dampf|la vapeur|steaming cup
+nature2|4-8|magnet|مغناطيس|der Magnet|l'aimant|horseshoe magnet
+nature2|4-8|battery|بطارية|die Batterie|la pile|battery
+nature2|4-8|light bulb|لمبة|die Glühbirne|l'ampoule|glowing bulb
+nature2|4-8|electricity|كهرباء|der Strom|l'électricité|plug and spark (friendly)
+nature2|4-8|recycling bin|صندوق إعادة التدوير|der Recyclingbehälter|la poubelle de recyclage|green bin with arrows
+nature2|4-8|trash can|صندوق زبالة|der Mülleimer|la poubelle|trash can
+nature2|4-8|save water|وفّر المياه|Wasser sparen|économiser l'eau|closed tap and a drop
+nature2|4-8|plant a tree|ازرع شجرة|einen Baum pflanzen|planter un arbre|child planting a sapling
+senses|4-8|see|يشوف|sehen|voir|eye
+senses|4-8|hear|يسمع (حاسة)|hören (Sinn)|entendre|ear
+senses|4-8|smell|يشم|riechen|sentir|nose with a flower
+senses|4-8|taste|يدوق|schmecken|goûter|tongue and lemon
+senses|4-8|touch|يلمس|fühlen|toucher|hand on a furry toy
+inside|5-8|heart|قلب|das Herz|le cœur|friendly heart organ (cartoon)
+inside|5-8|brain|مخ|das Gehirn|le cerveau|friendly brain
+inside|5-8|lungs|رئتين|die Lunge|les poumons|lungs
+inside|5-8|stomach|معدة|der Magen|l'estomac|stomach
+inside|5-8|bones|عظام|die Knochen|les os|friendly bones
+inside|5-8|skeleton|هيكل عظمي|das Skelett|le squelette|friendly skeleton waving
+inside|5-8|muscle|عضلة|der Muskel|le muscle|child showing a biceps
+inside|5-8|skin|جلد|die Haut|la peau|hand
+inside|5-8|blood|دم|das Blut|le sang|a single drop (no gore)
+inside|5-8|teeth|أسنان|die Zähne|les dents|smiling teeth
+material|5-8|wood|خشب|das Holz|le bois|wooden log
+material|5-8|metal|معدن|das Metall|le métal|metal bar
+material|5-8|plastic|بلاستيك|der Kunststoff|le plastique|plastic bottle
+material|5-8|glass|زجاج|das Glas|le verre|glass jar
+material|5-8|paper|ورق|das Papier|le papier|paper sheets
+material|5-8|cloth|قماش|der Stoff|le tissu|folded cloth
+material|5-8|stone|حجر|der Stein|la pierre|stone
+material|5-8|rubber|مطاط|der Gummi|le caoutchouc|rubber ball
+material|5-8|wool|صوف|die Wolle|la laine|wool ball
+material|5-8|leather|جلد (خامة)|das Leder|le cuir|leather shoe
+drink|2-6|water|مياه|das Wasser|l'eau|glass of water
+drink|2-6|milk|لبن|die Milch|le lait|glass of milk
+drink|2-6|juice|عصير|der Saft|le jus|juice
+drink|2-6|tea|شاي|der Tee|le thé|cup of tea
+drink|2-6|lemonade|ليمونادة|die Limonade|la limonade|lemonade
+drink|2-6|sugarcane juice|عصير قصب|der Zuckerrohrsaft|le jus de canne à sucre|sugarcane juice
+drink|2-6|hibiscus tea|كركديه|der Hibiskustee|le thé d'hibiscus|red hibiscus drink
+drink|2-6|smoothie|سموذي|der Smoothie|le smoothie|smoothie
+drink|2-6|hot chocolate|شوكولاتة ساخنة|die heiße Schokolade|le chocolat chaud|mug with steam
+sweet|2-6|ice cream|آيس كريم|das Eis (Speiseeis)|la glace|ice cream cone
+sweet|2-6|chocolate|شوكولاتة|die Schokolade|le chocolat|chocolate bar
+sweet|2-6|candy|حلوى|das Bonbon|le bonbon|wrapped candy
+sweet|2-6|lollipop|لوليبوب|der Lutscher|la sucette|lollipop
+sweet|2-6|cake|تورتة|der Kuchen|le gâteau|cake
+sweet|2-6|cookie|بسكوت|der Keks|le biscuit|cookie
+sweet|2-6|honey|عسل|der Honig|le miel|honey jar
+sweet|2-6|jam|مربى|die Marmelade|la confiture|jam jar
+sweet|2-6|basbousa|بسبوسة|die Basbousa|la basboussa|basbousa square
+sweet|2-6|kunafa|كنافة|die Kunafa|le kunafa|kunafa
+sweet|2-6|baklava|بقلاوة|die Baklava|le baklava|baklava
+sweet|2-6|rice pudding|رز بلبن|der Milchreis|le riz au lait|bowl of rice pudding
+egyfood|3-8|koshari|كشري|der Koshari|le koshari|koshari bowl
+egyfood|3-8|ful medames|فول|die Ful-Bohnen|les fèves ful|ful dish
+egyfood|3-8|falafel (taameya)|طعمية|die Falafel|le falafel|falafel balls
+egyfood|3-8|molokhia|ملوخية|die Molokhia|la mouloukhieh|molokhia bowl
+egyfood|3-8|stuffed vine leaves|ورق عنب|die gefüllten Weinblätter|les feuilles de vigne farcies|rolled vine leaves
+egyfood|3-8|stuffed vegetables|محشي|das gefüllte Gemüse|les légumes farcis|stuffed peppers
+egyfood|3-8|fiteer|فطير|das Fiteer|le fiteer|layered pastry
+egyfood|3-8|rice|رز|der Reis|le riz|bowl of rice
+egyfood|3-8|lentils|عدس|die Linsen|les lentilles|lentils
+egyfood|3-8|hummus|حمص|der Hummus|le houmous|hummus bowl
+playground|2-6|slide|زحليقة|die Rutsche|le toboggan|slide
+playground|2-6|swing|أرجوحة|die Schaukel|la balançoire|swing
+playground|2-6|seesaw|ميزان (ملاهي)|die Wippe|la bascule|seesaw
+playground|2-6|sandpit|حفرة الرمل|der Sandkasten|le bac à sable|sandpit with a bucket
+playground|2-6|bucket|جردل|der Eimer|le seau|bucket
+playground|2-6|spade|مجرفة صغيرة|die Schaufel|la pelle|small spade
+playground|2-6|sandcastle|قلعة رمل|die Sandburg|le château de sable|sandcastle
+playground|2-6|shell|صدفة|die Muschel|le coquillage|shell
+playground|2-6|bench|مقعد|die Bank|le banc|park bench
+playground|2-6|fountain|نافورة|der Springbrunnen|la fontaine|fountain
+playground|2-6|picnic|نزهة|das Picknick|le pique-nique|picnic blanket with food
+playground|2-6|tent|خيمة|das Zelt|la tente|camping tent
+people2|3-8|firefighter|رجل إطفاء|der Feuerwehrmann|le pompier|firefighter with a helmet
+people2|3-8|police officer|ضابط شرطة|der Polizist|le policier|police officer
+people2|3-8|pilot|طيار|der Pilot|le pilote|pilot
+people2|3-8|farmer|فلاح|der Bauer|l'agriculteur|farmer
+people2|3-8|baker|خباز|der Bäcker|le boulanger|baker with bread
+people2|3-8|chef|طباخ|der Koch|le cuisinier|chef with a hat
+people2|3-8|driver|سواق|der Fahrer|le conducteur|bus driver
+people2|3-8|engineer|مهندس|der Ingenieur|l'ingénieur|engineer with a helmet and plans
+people2|3-8|scientist|عالم|der Wissenschaftler|le scientifique|scientist with a flask
+people2|3-8|astronaut|رائد فضاء|der Astronaut|l'astronaute|astronaut
+people2|3-8|nurse|ممرضة|die Krankenschwester|l'infirmière|nurse
+people2|3-8|vet|دكتور بيطري|der Tierarzt|le vétérinaire|vet with a dog
+people2|3-8|teacher|مدرّس|der Lehrer|le professeur|teacher at the board
+people2|3-8|artist|فنان|der Künstler|l'artiste|painter with a palette
+people2|3-8|tailor|ترزي|der Schneider|le tailleur|tailor with a tape
+people2|3-8|carpenter|نجار|der Tischler|le menuisier|carpenter with a saw
+instrument|3-8|oud|عود|die Oud|l'oud|oud
+instrument|3-8|qanun|قانون|die Kanun|le qanun|qanun
+instrument|3-8|darbuka|دربكة|die Darbuka|la darbouka|darbuka drum
+instrument|3-8|ney (reed flute)|ناي|die Rohrflöte (Ney)|le nay|ney
+instrument|3-8|violin|كمان|die Geige|le violon|violin
+instrument|3-8|piano|بيانو|das Klavier|le piano|piano
+instrument|3-8|guitar|جيتار|die Gitarre|la guitare|guitar
+instrument|3-8|trumpet|بوق|die Trompete|la trompette|trumpet
+instrument|3-8|xylophone|إكسيليفون|das Xylophon|le xylophone|xylophone
+instrument|3-8|harp|قيثارة|die Harfe|la harpe|harp
+instrument|3-8|tambourine|رق|das Tamburin|le tambourin|tambourine
+instrument|3-8|accordion|أكورديون|das Akkordeon|l'accordéon|accordion
+tech|4-8|mobile phone|موبايل|das Handy|le téléphone portable|phone
+tech|4-8|tablet|تابلت|das Tablet|la tablette|tablet
+tech|4-8|computer|كمبيوتر|der Computer|l'ordinateur|laptop
+tech|4-8|keyboard|كيبورد|die Tastatur|le clavier|keyboard
+tech|4-8|mouse (computer)|ماوس|die Maus (Computer)|la souris (ordinateur)|computer mouse
+tech|4-8|television|تلفزيون|der Fernseher|la télévision|TV
+tech|4-8|remote control|ريموت|die Fernbedienung|la télécommande|remote
+tech|4-8|camera|كاميرا|die Kamera|l'appareil photo|camera
+tech|4-8|headphones|سماعات|die Kopfhörer|le casque audio|headphones
+tech|4-8|robot|روبوت|der Roboter|le robot|friendly robot
+tech|4-8|printer|طابعة|der Drucker|l'imprimante|printer
+tech|4-8|wifi|واي فاي|das WLAN|le wifi|wifi sign
+accessory|3-6|glasses|نضارة|die Brille|les lunettes|glasses
+accessory|3-6|sunglasses|نضارة شمس|die Sonnenbrille|les lunettes de soleil|sunglasses
+accessory|3-6|hat|قبعة|der Hut|le chapeau|hat
+accessory|3-6|scarf|إيشارب|der Schal|l'écharpe|scarf
+accessory|3-6|gloves|جوانتي|die Handschuhe|les gants|gloves
+accessory|3-6|umbrella|شمسية|der Regenschirm|le parapluie|umbrella
+accessory|3-6|belt|حزام|der Gürtel|la ceinture|belt
+accessory|3-6|ring|خاتم|der Ring|la bague|ring
+accessory|3-6|necklace|عقد|die Kette|le collier|necklace
+accessory|3-6|crown|تاج|die Krone|la couronne|crown
+accessory|3-6|hair clip|توكة|die Haarspange|la barrette|hair clip
+accessory|3-6|handbag|شنطة إيد|die Handtasche|le sac à main|handbag
+party|2-6|party|حفلة|die Party|la fête|party scene
+party|2-6|balloon|بالونة|der Luftballon|le ballon|balloons
+party|2-6|present|هدية|das Geschenk|le cadeau|gift box
+party|2-6|candle|شمعة|die Kerze|la bougie|candle
+party|2-6|party hat|طاقية حفلة|der Partyhut|le chapeau de fête|party hat
+party|2-6|fireworks|ألعاب نارية|das Feuerwerk|le feu d'artifice|fireworks
+party|2-6|confetti|ورق ملون|das Konfetti|les confettis|confetti
+party|2-6|greeting card|كارت تهنئة|die Glückwunschkarte|la carte de vœux|card with a heart
+party|2-6|wedding|فرح|die Hochzeit|le mariage|bride and groom (cartoon)
