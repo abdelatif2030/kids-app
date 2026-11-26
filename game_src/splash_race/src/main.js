@@ -574,7 +574,7 @@ class Game {
     sw.course.noodles.forEach((n, k) => { this.noodles[k].userData.arm.rotation.y = n.a; });
     sw.swimmers.forEach((w, k) => {
       const m = this.models[k];
-      m.root.position.set(w.x, w.y - 0.12 + Math.sin(time * 4 + k) * 0.04, -w.s);
+      m.root.position.set(w.x + (k === 0 ? 0 : (k - (sw.swimmers.length - 1) / 2) * 1.25), w.y - 0.12 + Math.sin(time * 4 + k) * 0.04, -w.s);
       m.root.rotation.x = w.air > 0 ? -0.6 * Math.cos((1 - w.air / 0.9) * Math.PI) : w.slide ? 0.4 : 0;
       m.root.rotation.z = w.stun > 0 ? Math.sin(time * 25) * 0.4 : 0;
       m.paddle = Math.max(0, (m.paddle ?? 0) - dt);
