@@ -162,3 +162,9 @@ test('every picture the new sections use exists in the art folder', () => {
   }
   assert.deepEqual([...missing], []);
 });
+
+test('every Arabic levels page (the first twelve and the topic pages) is drawn by the same board code', () => {
+  const src = fs.readFileSync(new URL('../src/letters/main.js', import.meta.url), 'utf8');
+  assert.equal((src.match(/this\._drawBoard\(/g) || []).length, 2);
+  assert.ok(!src.includes("class: 'lw-hit', 'aria-label': lv.ar")); // the old invisible buttons over the picture's own tiles are gone
+});

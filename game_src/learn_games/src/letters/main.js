@@ -785,23 +785,27 @@ class Game {
     return { wrap, place };
   }
 
-  /** The levels page as the owner's picture, with invisible buttons on the twelve tiles, home, sound and "next level". */
+  /** The drawn board of 12 tiles used by EVERY levels page (owner 2026-11-26: page 1 now looks exactly like the other pages): a panel that covers the
+   *  picture's own tiles, then the tiles (colour by position, big icon, number, name, stars). `items` = [{lv, n, can}] (at most 12). */
+  _drawBoard(place, items, done, best = {}) {
+    const sh = this.sh;
+    const cols = [0.723, 0.532, 0.343], rows = [0.327, 0.489, 0.647, 0.807];
+    place(h('div', { class: 'lw-board' }), 0.5255, 0.57, 0.69, 0.71);
+    items.forEach(({ lv, n, can }, k) => {
+      const cx = cols[k % 3], cy = rows[Math.floor(k / 3)];
+      const stars = best[lv.id];
+      const b = h('button', { class: `lw-ptile c${(k + Math.floor(k / 3)) % 6}${done[lv.id] ? ' done' : ''}${can === false ? ' off' : ''}`, 'aria-label': lv.ar, disabled: can === false || null, onclick: () => { sh.sound.play('tap'); this._enter(lv.id); } },
+        h('i', {}, h('em', {}, lv.emoji)), h('b', {}, sh.T.num(n)), h('span', {}, lv.ar), stars ? h('small', {}, '★'.repeat(stars)) : null, done[lv.id] ? h('u', {}, '⭐') : null);
+      place(b, cx, cy, 0.178, 0.157);
+    });
+  }
+
+  /** The levels page as the owner's picture, with the drawn board of twelve tiles, home, sound and "next level". */
   _levelsPicture(img, list) {
     const sh = this.sh;
     const { wrap, place } = this._pictureFrame(img, 1226 / 1283); // the picture's width / height
-    const cols = [0.723, 0.532, 0.343]; // right to left, like the picture
-    const rows = [0.327, 0.489, 0.647, 0.807];
     const open = new Set(list.map((l) => l.id));
-    LEVELS.forEach((lv, i) => {
-      const cx = cols[i % 3], cy = rows[Math.floor(i / 3)];
-      const can = open.has(lv.id);
-      const b = h('button', { class: 'lw-hit', 'aria-label': lv.ar, disabled: !can || null, onclick: () => { sh.sound.play('tap'); this._enter(lv.id); } });
-      place(b, cx, cy, 0.17, 0.148);
-      if (!can) b.classList.add('off');
-      if (this.save.lw.done[lv.id]) place(h('i', { class: 'lw-star' }, '⭐'), cx + 0.066, cy - 0.07, 0.05, 0.045);
-      const best = (this.save.lw.best || {})[lv.id];
-      if (best) place(h('i', { class: 'lw-best' }, '★'.repeat(best)), cx, cy + 0.068, 0.15, 0.035);
-    });
+    this._drawBoard(place, LEVELS.map((lv, i) => ({ lv, n: i + 1, can: open.has(lv.id) })), this.save.lw.done || {}, this.save.lw.best || {});
     // «تقريري»: what was played and learned (the history), and the choice to continue after the last level played
     place(h('button', { class: 'lw-more lw-rep', onclick: () => { sh.sound.play('tap'); this._report(); } }, sh.T.lang === 'en' ? '📒 My report' : '📒 تقريري'), 0.86, 0.945, 0.22, 0.06);
     if (!this._askedResume && (this.save.lw.history || []).length && this.save.lw.last) { this._askedResume = true; setTimeout(() => this._resumeChoice(), 600); }
@@ -902,17 +906,8 @@ class Game {
     const done = this.save.lw.done || {};
     const { wrap, place } = this._pictureFrame(img, 1226 / 1283);
     const PER = 12, pages = Math.ceil(TOPIC_LEVELS.length / PER);
-    const cols = [0.723, 0.532, 0.343], rows = [0.327, 0.489, 0.647, 0.807];
     const slice = TOPIC_LEVELS.slice(page * PER, page * PER + PER);
-    slice.forEach((lv, k) => {
-      const n = LEVELS.length + page * PER + k + 1;
-      const cx = cols[k % 3], cy = rows[Math.floor(k / 3)];
-      const b = h('button', { class: `lw-ptile${done[lv.id] ? ' done' : ''}`, 'aria-label': lv.ar, onclick: () => { sh.sound.play('tap'); this._enter(lv.id); } },
-        h('i', {}, lv.emoji), h('b', {}, sh.T.num(n)), h('span', {}, lv.ar), done[lv.id] ? h('u', {}, '⭐') : null);
-      place(b, cx, cy, 0.178, 0.157);
-    });
-    // empty places on a short last page are covered too, so no picture of a first-page tile shows through
-    for (let k = slice.length; k < PER; k++) place(h('div', { class: 'lw-ptile empty' }), cols[k % 3], rows[Math.floor(k / 3)], 0.178, 0.157);
+    this._drawBoard(place, slice.map((lv, k) => ({ lv, n: LEVELS.length + page * PER + k + 1 })), done, this.save.lw.best || {});
     const go = (p) => { sh.sound.play('tap'); this._moreLevels(p); };
     const first = h('button', { class: 'lw-more', onclick: () => { sh.sound.play('tap'); this._clearPicPages(); this._levels(); } }, en ? `↩ First levels (${page + 1}/${pages})` : `↩ المستويات الأولى (${sh.T.num(page + 1)}/${sh.T.num(pages)})`);
     place(first, 0.5, 0.945, 0.34, 0.06);
@@ -1502,15 +1497,20 @@ const CSS = `
 .lw-hrow{background:#fff;border-radius:calc(var(--u)*1.6);padding:calc(var(--u)*1) calc(var(--u)*1.6);margin:calc(var(--u)*.6) 0;font-size:calc(var(--u)*2.3);color:#3a2a5a;text-align:right}
 .lw-hrow b{display:block}.lw-hrow small{color:#8a7aaa}.lw-hrow span{display:block;font-size:calc(var(--u)*2);color:#5a4a7a}
 .lw-report{max-width:min(92vw,calc(var(--u)*60))}
-.lw-ptile{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;border:calc(var(--u)*.55) solid #ffd45a;border-radius:18%;background:linear-gradient(180deg,#fffdf4,#ffeec2);box-shadow:0 calc(var(--u)*.6) 0 #c88a10,inset 0 0 0 calc(var(--u)*.3) #fff;font-family:inherit;cursor:pointer;padding:0;overflow:hidden}
-.lw-ptile.empty{pointer-events:none;background:linear-gradient(180deg,#fff6d6,#ffe9a8);box-shadow:inset 0 0 0 calc(var(--u)*.3) #fff}
-.lw-ptile i{font-style:normal;font-size:calc(var(--u)*7);line-height:1.1}
-.lw-ptile b{position:absolute;top:4%;right:7%;min-width:22%;border-radius:999px;background:#7a3fd0;color:#fff;font-size:calc(var(--u)*2.6);line-height:1.35;text-align:center}
-.lw-ptile span{font-size:calc(var(--u)*2.7);font-weight:900;color:#4a2a8a;line-height:1.1;text-align:center;padding:0 4%;max-width:96%}
-.lw-ptile u{position:absolute;bottom:3%;left:6%;text-decoration:none;font-size:calc(var(--u)*3.4)}
-.lw-ptile.done{border-color:#7ad060}
-.lw-ptitle{position:absolute;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:calc(var(--u)*3.6);text-shadow:0 calc(var(--u)*.3) 0 #5a2fb0,0 0 calc(var(--u)*1) #5a2fb0;pointer-events:none}
-.lw-navb{font-size:calc(var(--u)*2.3)}
+.lw-board{position:absolute;border-radius:7%;background:linear-gradient(180deg,#fff7d9,#ffe7a3);border:calc(var(--u)*.7) solid #f5b21a;box-shadow:0 calc(var(--u)*.7) 0 #c88a10,inset 0 0 calc(var(--u)*2) rgba(255,255,255,.9);pointer-events:none}
+.lw-ptile{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*.1);border:calc(var(--u)*.55) solid var(--bd,#ffd45a);border-radius:18%;background:linear-gradient(180deg,#fff,var(--bg,#ffeec2));box-shadow:0 calc(var(--u)*.6) 0 var(--sh,#c88a10),inset 0 0 0 calc(var(--u)*.3) #fff;font-family:inherit;cursor:pointer;padding:0;overflow:hidden;transition:transform .12s}
+.lw-ptile:active{transform:translateY(calc(var(--u)*.4)) scale(.97)}
+.lw-ptile:focus-visible{outline:calc(var(--u)*.7) solid #7a3fd0}
+.lw-ptile.c0{--bg:#ffe0e0;--bd:#ff9a9a;--sh:#c85a5a}.lw-ptile.c1{--bg:#ffefc9;--bd:#ffc04a;--sh:#c88a10}.lw-ptile.c2{--bg:#dcf5d0;--bd:#7ad060;--sh:#4a9a3a}
+.lw-ptile.c3{--bg:#d6ecff;--bd:#6ab8ff;--sh:#3a7ac0}.lw-ptile.c4{--bg:#ebdcff;--bd:#b48aff;--sh:#7a52c0}.lw-ptile.c5{--bg:#ffdff1;--bd:#ff8ac8;--sh:#c04a90}
+.lw-ptile.off{filter:grayscale(.8);opacity:.6;pointer-events:none}
+.lw-ptile i{font-style:normal;display:flex;align-items:center;justify-content:center;width:46%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,rgba(255,255,255,.55));box-shadow:0 calc(var(--u)*.3) 0 rgba(0,0,0,.08)}
+.lw-ptile i em{font-style:normal;font-size:calc(var(--u)*5.2);line-height:1}
+.lw-ptile b{position:absolute;top:4%;right:7%;min-width:24%;border-radius:999px;background:#7a3fd0;color:#fff;font-size:calc(var(--u)*2.5);line-height:1.4;text-align:center;box-shadow:0 calc(var(--u)*.25) 0 #4a2a9a}
+.lw-ptile span{font-size:calc(var(--u)*2.7);font-weight:900;color:#3f2480;line-height:1.1;text-align:center;padding:0 5%;max-width:98%}
+.lw-ptile small{font-size:calc(var(--u)*2);color:#e8a10a;line-height:1;letter-spacing:.1em}
+.lw-ptile u{position:absolute;top:3%;left:6%;text-decoration:none;font-size:calc(var(--u)*3.2)}
+.lw-ptile.done{border-color:#58c040}
 .lw-hit{position:absolute;border:none;background:transparent;padding:0;margin:0;cursor:pointer;opacity:0;border-radius:18%}
 .lw-hit:focus-visible{opacity:1;outline:calc(var(--u)*.8) solid #fff200;background:rgba(255,242,0,.18)}
 .lw-hit.off{pointer-events:none}
