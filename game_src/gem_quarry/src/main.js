@@ -21,7 +21,18 @@ const S = {
   road: ['طريق أسرع', 'Faster road'], loader: ['عامل تحميل', 'Loader'], polish: ['ورشة تلميع', 'Polish shop'], mine2: ['منجم ثاني', 'Second mine'],
 };
 const I = makeI18n(S);
-const ICON = { diggers: '⛏️', trucks: '🚚', pile: '📦', truckCap: '🧰', road: '🛣️', loader: '🧑‍🏭', polish: '✨', mine2: '⛰️' };
+const SV = {
+  diggers: '<path d="M8 40 L36 12" stroke="#a8682a" stroke-width="5" stroke-linecap="round"/><path d="M14 10 Q34 4 44 22 Q30 16 14 10Z" fill="#dfe4f0" stroke="#5a6078" stroke-width="2.5"/>',
+  trucks: '<rect x="4" y="18" width="24" height="16" rx="3" fill="#ffc42a" stroke="#7a5000" stroke-width="2.5"/><path d="M28 22h10l6 8v4H28z" fill="#ffd84a" stroke="#7a5000" stroke-width="2.5"/><circle cx="14" cy="36" r="5" fill="#333" stroke="#fff" stroke-width="2"/><circle cx="36" cy="36" r="5" fill="#333" stroke="#fff" stroke-width="2"/>',
+  pile: '<rect x="8" y="14" width="32" height="26" rx="3" fill="#e0a850" stroke="#6a4010" stroke-width="2.5"/><path d="M8 24h32M24 14v26" stroke="#6a4010" stroke-width="2.5"/>',
+  truckCap: '<rect x="6" y="20" width="36" height="20" rx="3" fill="#e0a850" stroke="#6a4010" stroke-width="2.5"/><path d="M14 20v-6h20v6" fill="none" stroke="#6a4010" stroke-width="3"/><path d="M24 10v8M20 14l4-5 4 5" stroke="#9dffb0" stroke-width="3" fill="none" stroke-linecap="round"/>',
+  road: '<path d="M16 42L22 6h4l6 36z" fill="#6a6a78" stroke="#2a2a34" stroke-width="2.5"/><path d="M24 10v6M24 22v6M24 34v6" stroke="#ffe27a" stroke-width="3" stroke-linecap="round"/>',
+  loader: '<circle cx="24" cy="14" r="7" fill="#f2c9a0" stroke="#6a4020" stroke-width="2"/><path d="M16 12a8 8 0 0116 0z" fill="#ffc61a" stroke="#7a5000" stroke-width="2"/><rect x="14" y="22" width="20" height="18" rx="6" fill="#3ac88a" stroke="#14604a" stroke-width="2.5"/>',
+  polish: '<path d="M24 4l6 14 14 6-14 6-6 14-6-14-14-6 14-6z" fill="#fff2a0" stroke="#b08a00" stroke-width="2.5" stroke-linejoin="round"/>',
+  mine2: '<path d="M4 40L18 12l10 16 6-8 10 20z" fill="#8a6a50" stroke="#3a2a20" stroke-width="2.5" stroke-linejoin="round"/><path d="M20 40l4-16 6 16z" fill="#b36cff" stroke="#4a1a8a" stroke-width="2"/>',
+};
+const ICON = {}; for (const k of Object.keys(SV)) ICON[k] = k;
+function icon(k) { const d = document.createElement('span'); d.className = 'gq-ico'; d.innerHTML = `<svg viewBox="0 0 48 48" width="100%" height="100%">${SV[k] || ''}</svg>`; return d; }
 
 // ---- world geometry (units; screen X = x - y, Y = (x + y) * B - z * C) -------------------------------------------------------
 const B = 0.62; const C = 0.95;
@@ -167,7 +178,7 @@ class Game {
       if (!this.q.has(k) || (k === 'loader' && this.easy && !this.q.cfg.tools.includes('loader'))) continue;
       const cost = h('small', {}, ''); const pips = h('em', {}, '');
       const b = h('button', { class: 'gq-pad', onclick: () => { if (this.q.buy(k)) { this.sound.play('buy'); this._buyFx(k); } else this.sound.play('no'); } },
-        h('i', {}, ICON[k]), h('span', {}, I.t(k)), pips, cost);
+        h('i', {}, icon(k)), h('span', {}, I.t(k)), pips, cost);
       this.pads[k] = { b, cost, pips, key: '' }; this.panel.append(b);
     }
     const banner = h('div', { class: 'gq-intro' }, h('div', { class: 'gq-ribbon' }, `⚠️ ${I.t('banner')}`), h('div', { class: 'gq-small' }, `${I.t('level')} ${I.num(id)} · ${I.t('goal')} ${I.num(this.q.goal)} 📦`));
@@ -471,7 +482,7 @@ class Game {
 }
 
 const STYLE = `
-.gq-root{background:#e6c98a}
+.gq-root{background:#e6c98a}.gq-ico{display:inline-block;width:calc(var(--u)*5.2);height:calc(var(--u)*5.2)}
 .gq-hint{top:calc(var(--u)*34)}
 .gq-hud{position:absolute;left:0;right:0;top:0;padding-bottom:calc(var(--u)*1);pointer-events:none}
 .gq-top2{display:flex;gap:calc(var(--u)*1.6);direction:ltr;align-items:center;justify-content:space-between;padding:max(calc(var(--u)*2.5),env(safe-area-inset-top)) calc(var(--u)*3) 0}

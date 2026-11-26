@@ -54,3 +54,4 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 - Custom affine projection matrix keeps main.js's iso P() so taps/fx/HUD unchanged. 3D workers (limbs, pickaxe), trucks, crates, crystals, depot, workshop.
 - FIXED existing bug: menubg.js shows the poster when any element with class *-panel is visible; gq-panel (upgrade pads) matched and covered gameplay in landscape. Renamed to gq-pads.
 - NOT sent: scene still small in landscape (portrait BBOX), mine cut off at bottom, flat colors. TODO: landscape-specific layout/scale up, richer terrain, shadows, pile/crate polish, replace emoji (hint/!), menu/level select/end screens polish, pad icons as SVG (emoji tofu in pad panel).
+- gem_quarry: pad icons now inline SVG (no emoji). Still TODO: scene scale/terrain richness before sending clip.
