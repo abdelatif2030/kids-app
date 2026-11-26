@@ -97,3 +97,17 @@ test('the resume question has a recording slot per language (docs/RESUME_VOICE_L
     assert.ok(csv.includes(`${clipId(t, l)}.mp3`), l);
   }
 });
+
+test('the top bar (back and sound) stays clickable above a full-screen card (the back arrow bug of 2026-11-26)', () => {
+  const css = fs.readFileSync(new URL('../src/kit/shell.js', import.meta.url), 'utf8');
+  assert.ok(/\.lk-top\{[^}]*z-index:6;pointer-events:none\}\.lk-top>\*\{pointer-events:auto\}/.test(css));
+});
+
+test('every English word of the new sections has its clips now (the owner delivered all 891)', () => {
+  const EN = JSON.parse(fs.readFileSync(new URL('../src/english/words.json', import.meta.url), 'utf8'));
+  let missing = 0;
+  return import('../src/kit/voice.js').then(({ clipId }) => {
+    for (const e of EN) for (const id of [clipId(e.w, 'en'), `${clipId(e.w, 'en')}_slow`, clipId(e.s, 'en')]) if (!fs.existsSync(new URL(`../../../assets/games/learn_voice/en/${id}.mp3`, import.meta.url))) missing++;
+    assert.equal(missing, 0);
+  });
+});
