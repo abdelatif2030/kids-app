@@ -221,7 +221,7 @@ class Game {
     });
     c.slides.forEach((sl) => { const m = makeSlide(sl.len, sl.side); m.position.set(sl.side * (HALF + 3.2), 0, -sl.s + 1.5); s.add(m); });
     // swimmers
-    this.models = this.sw.swimmers.map((w, wi) => { const m = makeSwimmer(w.kind, w.cap, true, wi); m.root.scale.setScalar(1.55); s.add(m.root); return m; });
+    this.models = this.sw.swimmers.map((w, wi) => { const m = makeSwimmer(w.kind, w.cap, true, wi); m.root.scale.setScalar(wi === 0 ? 2.1 : 1.5); s.add(m.root); return m; });
     this.ring = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.75, 28), new THREE.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0.9, depthWrite: false }));
     this.ring.rotation.x = -Math.PI / 2;
     s.add(this.ring);
@@ -594,12 +594,12 @@ class Game {
     this.ring.visible = !p.slide && this.mode !== 'menu';
     // camera behind and above the otter
     const portrait = this.cw < this.ch;
-    const want = new THREE.Vector3(p.x * 0.55, portrait ? 4.9 : 3.5, -p.s + (portrait ? 6.8 : 5.4));
+    const want = new THREE.Vector3(p.x * 0.55 + (portrait ? 0 : 3.2), portrait ? 5.6 : 5.2, -p.s + (portrait ? 7.2 : 5.6));
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, dt * 4));
     this.shake = Math.max(0, (this.shake ?? 0) - dt * 2);
     this.camera.position.set(this.cam.x + (Math.random() - 0.5) * this.shake * 0.3, this.cam.y, this.cam.z);
-    this.camera.lookAt(this.cam.x, 0, this.cam.z - (portrait ? 8.8 : 7.2) - 7);
+    this.camera.lookAt(this.cam.x - (portrait ? 0 : 2.6), 0.4, this.cam.z - (portrait ? 8.8 : 6.4) - 5);
     { // front-view cam on the start line and when the player finishes, so the cartoon faces read
       const want = (sw.state === 'start' || p.done) ? 1 : 0;
       this._introK = (this._introK ?? 0) + (want - (this._introK ?? 0)) * Math.min(1, dt * (want ? 4 : 1.6));
