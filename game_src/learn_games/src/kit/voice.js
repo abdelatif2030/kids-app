@@ -55,6 +55,14 @@ export class Voice {
       sc.onerror = () => { window.__learnVoice = window.__learnVoice || { ar: [], en: [], de: [], fr: [] }; };
       document.head.append(sc);
     }
+    // the «Example» sentences of the words (a script too, so the game bundle stays small)
+    if (typeof document !== 'undefined' && !window.__learnExamples && !document.getElementById('learn-examples')) {
+      const ex = document.createElement('script');
+      ex.id = 'learn-examples';
+      ex.src = `${this.dir}examples.js`;
+      ex.onerror = () => { window.__learnExamples = window.__learnExamples || {}; };
+      document.head.append(ex);
+    }
   }
 
   _element() {

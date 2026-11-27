@@ -22,6 +22,7 @@ import { NUMBERS } from '../kit/words.js';
 import { LEVELS, ALL_LEVELS, EVERY_LEVEL, ARABIC_LEVELS, TOPIC_LEVELS, LevelPlay, levelsFor, cheer } from './levels.js';
 import { EN_LEVELS, DE_LEVELS, FR_LEVELS } from '../english/levels.js';
 import { learnSections, numberItem } from '../learn/sections.js';
+import { EXTRA_DEFS } from '../learn/extra.js';
 import { nextNumber, prevNumber } from '../learn/numbers.js';
 import { gen as learnLine } from '../learn/lines.js';
 import { FreshMemory } from './fresh.js';
@@ -71,6 +72,8 @@ const PORTRAIT = { portrait: true, span: 8.8, off: 0, zs: [-4.4, -2.5], hero: [-
 const STAND = new THREE.Vector3(-1.5, 0, 5.4); // the picture of the question stands in FRONT of the choices (nearer the child), not among them
 const RACK = new THREE.Vector3(5.2, 0, 3.0);
 const RACK_S = 0.6;
+
+const EXTRA_IDS = new Set(EXTRA_DEFS.map((d) => d.id));
 
 class Game {
   constructor(el, cfg, post) {
@@ -625,6 +628,45 @@ class Game {
     this._learnShow();
   }
 
+  /** The «Example» button above the word's sign: tap it to open the examples 1 2 3 4 (the picture of the scene first, when there is one). Every row
+   *  shows the sentence in the language being learned with the word highlighted, and its Arabic under it; tap a row to hear it (Arabic, then the language).
+   *  The text is always shown; the voice plays when the example has a recording. */
+  _exampleButton(it, lang) {
+    const sh = this.sh, L = this._L;
+    if (!L || EXTRA_IDS.has(L.sec.id) || L.sec.kind === 'numbers') return null;
+    const key = it.key.split(':').slice(1).join(':').toLowerCase();
+    const table = (typeof window !== 'undefined' && window.__learnExamples) || {};
+    const list = (table[key] || []).filter((e) => e[lang]);
+    if (!list.length) return null;
+    const label = this._lt('مثال', 'Example', 'Beispiel', 'Exemple');
+    const dir = lang === 'ar' ? 'rtl' : 'ltr';
+    const bare = (w) => String(w || '').replace(/^(der|die|das|le|la|les|l'|the|a|an|ال)\s?/i, '').trim();
+    const hl = (text, word) => { // the learned word stands out in the sentence
+      const w = bare(word); const i = w ? text.toLowerCase().indexOf(w.toLowerCase()) : -1;
+      if (i < 0) return [document.createTextNode(text)];
+      return [document.createTextNode(text.slice(0, i)), h('mark', {}, text.slice(i, i + w.length)), document.createTextNode(text.slice(i + w.length))];
+    };
+    const slug = key.replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+    const panel = h('div', { class: 'lw-expanel', dir, style: 'display:none' });
+    // a small picture beside every example: its own scene (ex_<word>_<n>.webp) or the word's scene (ex_<word>.webp); no picture = no frame
+    // beside every example (outside its card) a square picture box: the example's own scene (ex_<word>_<n>.webp), else the word's scene (ex_<word>.webp), else a small
+    // sign of the kind of sentence (look, find, where...). Never a picture that does not belong to the word.
+    const box = (n, ic) => { const b = h('div', { class: 'lw-exbox' }, h('i', {}, ic || '💡')); const img = new Image(); img.alt = ''; let second = false; img.onload = () => { b.replaceChildren(img); }; img.onerror = () => { if (!second) { second = true; img.src = `${sh.base}../art/ex_${slug}.webp`; } }; img.src = `${sh.base}../art/ex_${slug}_${n}.webp`; return b; };
+    const rows = list.map((e, i) => {
+      const main = h('span', { class: 'lw-exmain', dir: lang === 'ar' ? 'rtl' : 'ltr' }, ...hl(e[lang], it.label));
+      const sub = lang !== 'ar' && e.ar ? h('small', { class: 'lw-exar', dir: 'rtl' }, ...hl(e.ar, it.arSay && it.arSay[0] ? it.arSay[0].t : '')) : null;
+      return h('button', { class: 'lw-exrow', 'aria-label': `${label} ${i + 1}`, onclick: (ev) => {
+        ev.stopPropagation(); sh.sound.play('tap'); rows.forEach((r, j) => r.classList.toggle('on', j === i));
+        sh.speak([...(lang !== 'ar' && e.ar ? [{ t: e.ar, lang: 'ar', optional: true }] : []), { t: e[lang], lang, optional: true }]);
+      } }, h('b', {}, String(i + 1)), h('div', { class: 'lw-extext' }, main, sub), h('i', {}, '🔊'));
+    });
+    list.forEach((e, i) => panel.append(h('div', { class: 'lw-exline' }, rows[i], box(i + 1, e.ic))));
+    let open = false;
+    const chip = h('button', { class: 'lw-ex', 'aria-label': label, onclick: (ev) => { ev.stopPropagation(); sh.sound.play('tap'); open = !open; panel.style.display = open ? 'flex' : 'none'; chip.classList.toggle('open', open); } },
+      h('i', {}, '💡'), h('span', {}, label), list.length > 1 ? h('em', {}, String(list.length)) : null);
+    return h('div', { class: 'lw-exw' }, chip, panel);
+  }
+
   _learnItem() {
     const L = this._L;
     return L.sec.kind === 'numbers' ? numberItem(L.num, this._lang()) : L.sec.items[L.i];
@@ -677,6 +719,7 @@ class Game {
       isNum ? h('div', { class: 'lw-lbignum', dir: 'ltr', style: `font-size:calc(var(--u)*${it.label.length <= 3 ? 24 : it.label.length <= 5 ? 19 : 14})` }, it.label) : null,
       !isNum && it.display === 'text' ? h('div', { class: 'lw-lbignum', dir: lang === 'ar' ? 'rtl' : 'ltr', style: `font-size:calc(var(--u)*${it.fs || Math.max(7, Math.min(22, 70 / Math.max(3, it.text.length)))})` }, it.text) : null,
       it.caption ? h('div', { class: 'lw-lcap', dir: lang === 'ar' ? 'rtl' : 'ltr' }, it.caption) : null,
+      this._exampleButton(it, lang),
       h('button', { class: 'lw-lhit', 'aria-label': 'next', onclick: () => go(1) }),
       h('div', { class: `lw-lbar${lang === 'ar' ? '' : ' ltr'}` },
         h('button', { class: 'lw-lnav', 'aria-label': 'previous', disabled: first || null, onclick: () => go(-1) }, lang === 'ar' ? '▶' : '◀'),
@@ -1574,6 +1617,18 @@ const CSS = `
 .lw-lbignum{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-weight:900;color:#3a2a6a;background:radial-gradient(circle at 50% 35%,#fff,#fff7d6);border:calc(var(--u)*1) solid #f5b21a;border-radius:calc(var(--u)*8);padding:calc(var(--u)*1.5) calc(var(--u)*7);box-shadow:0 calc(var(--u)*1.2) 0 #c98a1a,0 calc(var(--u)*2) calc(var(--u)*5) rgba(0,0,0,.3);pointer-events:none;white-space:nowrap;line-height:1.1}/* the pick pad and the end card must sit ABOVE the full-screen next button (z-index 2), else a tap on a key advances the number and closes the pad (owner 2026-11-26) */
 .lw-lpick,.lw-ldone{z-index:5}
 .lw-lcap{position:absolute;left:50%;top:15%;transform:translateX(-50%);width:max-content;max-width:90%;text-align:center;font-weight:900;color:#3a2a6a;background:#fff;border:calc(var(--u)*.7) solid #6a3ad0;border-radius:calc(var(--u)*3);padding:calc(var(--u)*1) calc(var(--u)*2.4);font-size:calc(var(--u)*4.4);box-shadow:0 calc(var(--u)*.7) 0 #4a2a9a;z-index:1;pointer-events:none;line-height:1.25}
+.lw-exw{position:absolute;left:50%;bottom:calc(var(--u)*15);transform:translateX(-50%);display:flex;flex-direction:column-reverse;align-items:center;gap:calc(var(--u)*1);z-index:4;pointer-events:none;max-width:92%}
+.lw-exw>*{pointer-events:auto}
+.lw-ex{display:flex;align-items:center;gap:calc(var(--u)*1.2);font-family:inherit;font-weight:900;font-size:calc(var(--u)*3.2);color:#fff;background:linear-gradient(180deg,#ffb84a,#f08a1a);border:calc(var(--u)*.5) solid #fff;border-radius:999px;padding:calc(var(--u)*.7) calc(var(--u)*2.6);cursor:pointer;box-shadow:0 calc(var(--u)*.5) 0 #b8600a;text-shadow:0 calc(var(--u)*.2) 0 rgba(0,0,0,.25)}
+.lw-ex i{font-style:normal;font-size:calc(var(--u)*3.8)}.lw-ex em{font-style:normal;background:#fff;color:#c86a0a;border-radius:999px;min-width:calc(var(--u)*3.4);text-align:center;font-size:calc(var(--u)*2.6);line-height:1.35;text-shadow:none}
+.lw-ex.open{filter:brightness(1.08);transform:translateY(calc(var(--u)*.3))}
+.lw-expanel{width:min(94vw,calc(var(--u)*92));flex-direction:column;gap:calc(var(--u)*1.1);background:rgba(255,255,255,.96);border:calc(var(--u)*.6) solid #6a3ad0;border-radius:calc(var(--u)*3);padding:calc(var(--u)*1.4);box-shadow:0 calc(var(--u)*.7) 0 #4a2a9a;max-width:100%}
+.lw-exrow{display:flex;align-items:center;gap:calc(var(--u)*1.6);font-family:inherit;font-weight:800;font-size:calc(var(--u)*3.3);color:#3a2a6a;background:#f1ebff;border:calc(var(--u)*.35) solid #cdbdf5;border-radius:calc(var(--u)*2.2);padding:calc(var(--u)*.7) calc(var(--u)*1.8);cursor:pointer;text-align:start}
+.lw-exrow b{flex:none;width:calc(var(--u)*4.6);height:calc(var(--u)*4.6);border-radius:50%;background:#7a3fd0;color:#fff;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*2.8)}
+.lw-extext{flex:1;display:flex;flex-direction:column;gap:calc(var(--u)*.3);line-height:1.25;min-width:0}.lw-exmain mark{background:#ffe066;color:#3a2a6a;border-radius:calc(var(--u)*.6);padding:0 calc(var(--u)*.5)}.lw-exar{font-size:calc(var(--u)*2.7);color:#6a5a9a;font-weight:700}.lw-exar mark{background:#ffe9a0;color:#6a4a0a;border-radius:calc(var(--u)*.5);padding:0 calc(var(--u)*.4)}.lw-exrow i{font-style:normal;font-size:calc(var(--u)*3.6)}
+.lw-exline{display:flex;align-items:stretch;gap:calc(var(--u)*1.2)}.lw-exline .lw-exrow{flex:1;min-width:0}
+.lw-exbox{flex:none;width:calc(var(--u)*13);min-height:calc(var(--u)*13);border-radius:calc(var(--u)*2.4);border:calc(var(--u)*.5) solid #cdbdf5;background:linear-gradient(180deg,#fff,#efe6ff);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 calc(var(--u)*.4) 0 #cdbdf5}.lw-exbox i{font-style:normal;font-size:calc(var(--u)*6.4)}.lw-exbox img{width:100%;height:100%;object-fit:cover;display:block}
+.lw-exrow.on{background:#fff0b8;border-color:#f5b21a}
 .lw-lhit{position:absolute;left:18%;right:18%;top:14%;bottom:30%;background:transparent;border:none;cursor:pointer;pointer-events:auto;z-index:2}
 .lw-lbar{position:absolute;left:0;right:0;bottom:calc(var(--u)*2.5);display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*2.5);pointer-events:auto;z-index:3}.lw-lbar.ltr{direction:ltr}
 .lw-lsign{display:flex;align-items:center;gap:calc(var(--u)*2.5);background:#fff;border:calc(var(--u)*.7) solid #6a3ad0;border-radius:calc(var(--u)*4);padding:calc(var(--u)*1.2) calc(var(--u)*3);box-shadow:0 calc(var(--u)*.8) 0 #4a2a9a;max-width:60vw}.lw-lsign b{font-size:calc(var(--u)*6);color:#3a2a6a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

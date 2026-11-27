@@ -203,3 +203,24 @@ test('the screen layer never writes "null" on screen for an optional piece that 
   const src = fs.readFileSync(new URL('../src/kit/shell.js', import.meta.url), 'utf8');
   assert.ok(src.includes('rawAppend(...kids.filter((k) => k !== null && k !== undefined && k !== false))'));
 });
+
+test('the «Example» sentences: up to 4 per word, the four languages say the same thing, nothing is broken, and the game has the button', () => {
+  const g = {}; globalThis.window = g;
+  const src = fs.readFileSync(new URL('../../../assets/games/learn_voice/examples.js', import.meta.url), 'utf8');
+  new Function('window', src)(g);
+  const table = g.__learnExamples; const keys = Object.keys(table);
+  assert.ok(keys.length > 600, `words with examples ${keys.length}`);
+  let ar = 0, en = 0, de = 0, fr = 0;
+  for (const k of keys) {
+    assert.ok(table[k].length >= 1 && table[k].length <= 4, k);
+    for (const e of table[k]) {
+      for (const l of ['ar', 'en', 'de', 'fr']) if (e[l]) assert.ok(!/undefined|null|NaN|\{|\}/.test(e[l]) && e[l].length > 3, `${k} ${l}: ${e[l]}`);
+      if (e.ar) ar++; if (e.en) en++; if (e.de) de++; if (e.fr) fr++;
+    }
+  }
+  assert.ok(ar > 2000 && en > 2000 && de > 1000 && fr > 1000, `${ar} ${en} ${de} ${fr}`);
+  assert.deepEqual(table.night[0], { ar: 'النجوم بتلمع بالليل.', en: 'The stars shine at night.', de: 'Nachts leuchten die Sterne.', fr: 'La nuit, les étoiles brillent.', ic: '🌙' });
+  const main = fs.readFileSync(new URL('../src/letters/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes('_exampleButton(it, lang)') && main.includes("class: 'lw-ex'") && main.includes('lw-exar'));
+  delete globalThis.window;
+});
