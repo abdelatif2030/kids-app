@@ -219,7 +219,7 @@ test('the «Example» sentences: up to 4 per word, the four languages say the sa
     }
   }
   assert.ok(ar > 2000 && en > 2000 && de > 1000 && fr > 1000, `${ar} ${en} ${de} ${fr}`);
-  assert.deepEqual(table.night[0], { ar: 'النجوم بتلمع بالليل.', en: 'The stars shine at night.', de: 'Nachts leuchten die Sterne.', fr: 'La nuit, les étoiles brillent.', ic: '🌙' });
+  assert.deepEqual(table.night[0], { ar: 'النجوم بتلمع بالليل.', en: 'The stars shine at night.', de: 'Nachts leuchten die Sterne.', fr: 'La nuit, les étoiles brillent.', it: 'Di notte brillano le stelle.', ic: '🌙' });
   const main = fs.readFileSync(new URL('../src/letters/main.js', import.meta.url), 'utf8');
   assert.ok(main.includes('_exampleButton(it, lang)') && main.includes("class: 'lw-ex'") && main.includes('lw-exar'));
   delete globalThis.window;
