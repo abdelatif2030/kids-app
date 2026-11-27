@@ -25,7 +25,7 @@ const webglOk = () => {
 };
 const rng = (seed) => { let x = seed >>> 0 || 1; return () => { x ^= x << 13; x ^= x >>> 17; x ^= x << 5; return (x >>> 0) / 4294967296; }; };
 const V = (a) => new THREE.Vector3(a[0], a[1], a[2]);
-const FOG = { lagoon: 0xbfe6fa, glacier: 0xc8dcf0, sunset: 0xffc8a0 };
+const FOG = { lagoon: 0xbfe6fa, glacier: 0xc8dcf0, sunset: 0xffc8a0, desert: 0xf2ddb0 };
 const RIVAL_COLORS = { jet: '#2a6ad8', racer: '#ffffff', biplane: '#ffc21a' };
 
 class Game {
@@ -130,20 +130,21 @@ class Game {
     const s = (this.scene = new THREE.Scene());
     s.fog = new THREE.Fog(FOG[world], 160, 760);
     s.add(makeSky(world));
-    { // the level's painted backdrop (art/pano<N>.webp, N = 1..5): a mirrored ring that follows the camera
-      const tex = new THREE.TextureLoader().load(`${this.base}art/pano${(i % 5) + 1}.webp`, () => { ring.visible = true; });
+    { // the course's own painted backdrop (art/pano<N>.webp, N = the course's pano field — each painting
+      // depicts that course's real landmark: airport, New Capital, Alex Library, Montaza, Baron Palace)
+      const tex = new THREE.TextureLoader().load(`${this.base}art/pano${c.pano}.webp`, () => { ring.visible = true; });
       tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = THREE.MirroredRepeatWrapping; tex.repeat.set(2, 0.66); tex.offset.set(0, 0.34);
       const ring = new THREE.Mesh(new THREE.CylinderGeometry(800, 800, 560, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false }));
       ring.visible = false; ring.renderOrder = -9; this.panoMesh = ring; s.add(ring);
     }
     this.sun = makeSun(world);
     s.add(this.sun);
-    s.add(new THREE.HemisphereLight(0xffffff, world === 'glacier' ? 0x4a6a3a : 0x2a8ab0, 1.6));
+    s.add(new THREE.HemisphereLight(0xffffff, world === 'glacier' ? 0x4a6a3a : world === 'desert' ? 0x9a8a5a : 0x2a8ab0, 1.6));
     const light = new THREE.DirectionalLight(world === 'sunset' ? 0xffd2a0 : 0xfff6e0, 1.9);
     light.position.set(-300, 400, 200);
     s.add(light);
-    // the ground: sea for the islands, green valleys for the mountain pass
-    const ground = new THREE.Mesh(new THREE.CircleGeometry(1400, 48).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ color: world === 'glacier' ? 0x4f8f3f : world === 'sunset' ? 0x2a86b8 : 0x18a6d6 }));
+    // the ground: sea for the coastal courses, sand for the desert capital, green valleys for the mountain pass
+    const ground = new THREE.Mesh(new THREE.CircleGeometry(1400, 48).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ color: world === 'glacier' ? 0x4f8f3f : world === 'desert' ? 0xdcbc7f : world === 'sunset' ? 0x2a86b8 : 0x18a6d6 }));
     s.add(ground);
     this.water = world !== 'glacier' ? ground : null;
     // scenery around the course (instanced so phones stay smooth)

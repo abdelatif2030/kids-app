@@ -25,16 +25,16 @@ function rng(seed) {
 
 // Courses: shape numbers make the loop; obstacles are placed at ring numbers so the ring line always flies clear.
 export const COURSES = [
-  { id: 1, ar: 'مطار القاهرة', en: 'Cairo Airport', world: 'lagoon', rx: 380, rz: 300, wob: [0.22, 3, 0.4], hy: [34, 10], rings: 26, golden: 4,
+  { id: 1, ar: 'مطار القاهرة', en: 'Cairo Airport', world: 'sunset', pano: 1, rx: 380, rz: 300, wob: [0.22, 3, 0.4], hy: [34, 10], rings: 26, golden: 4,
     bridges: [5, 14, 21], pillars: [3, 9, 17, 24], arches: [12] },
-  { id: 2, ar: 'العاصمة الجديدة', en: 'New Capital', world: 'glacier', rx: 420, rz: 330, wob: [0.28, 2, 1.1], hy: [46, 14], rings: 28, golden: 4,
+  { id: 2, ar: 'العاصمة الجديدة', en: 'New Capital', world: 'desert', pano: 2, rx: 420, rz: 330, wob: [0.28, 2, 1.1], hy: [46, 14], rings: 28, golden: 4,
     bridges: [19], pillars: [4, 10, 15, 23, 26], arches: [7, 13, 21], canyon: [0.62, 0.74] },
-  { id: 3, ar: 'مكتبة إسكندرية', en: 'Alex Library', world: 'sunset', rx: 400, rz: 340, wob: [0.3, 4, 2.2], hy: [38, 12], rings: 30, golden: 5,
+  { id: 3, ar: 'مكتبة إسكندرية', en: 'Alex Library', world: 'lagoon', pano: 3, rx: 400, rz: 340, wob: [0.3, 4, 2.2], hy: [38, 12], rings: 30, golden: 5,
     bridges: [4, 11, 18, 26], pillars: [2, 8, 15, 22, 28], arches: [6, 20] },
   // 2026-11-21: two longer courses
-  { id: 4, ar: 'قصر المنتزه', en: 'Montaza Palace', world: 'lagoon', rx: 440, rz: 340, wob: [0.3, 4, 1.5], hy: [40, 12], rings: 30, golden: 5,
+  { id: 4, ar: 'قصر المنتزه', en: 'Montaza Palace', world: 'lagoon', pano: 4, rx: 440, rz: 340, wob: [0.3, 4, 1.5], hy: [40, 12], rings: 30, golden: 5,
     bridges: [3, 9, 15, 22, 27], pillars: [2, 7, 12, 18, 25], arches: [5, 13, 20] },
-  { id: 5, ar: 'قصر البارون', en: 'Baron Palace', world: 'glacier', rx: 460, rz: 360, wob: [0.3, 3, 2.6], hy: [48, 14], rings: 32, golden: 5,
+  { id: 5, ar: 'قصر البارون', en: 'Baron Palace', world: 'sunset', pano: 5, rx: 460, rz: 360, wob: [0.3, 3, 2.6], hy: [48, 14], rings: 32, golden: 5,
     bridges: [10, 24], pillars: [3, 8, 14, 19, 27, 30], arches: [6, 12, 17, 23, 29], canyon: [0.5, 0.64] },
 ];
 

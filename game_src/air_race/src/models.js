@@ -106,7 +106,7 @@ export function makePlane(who) {
 
 // ---- rings ------------------------------------------------------------------------------------------------------------
 
-const RING_COLORS = { lagoon: [0x8a3ae0, 0xffd21a], glacier: [0x5a6a9a, 0xffd21a], sunset: [0xff5a8a, 0xffe14a] };
+const RING_COLORS = { lagoon: [0x8a3ae0, 0xffd21a], glacier: [0x5a6a9a, 0xffd21a], sunset: [0xff5a8a, 0xffe14a], desert: [0xe07a3a, 0xffd21a] };
 
 export function ringGeometry(world, golden, R) {
   const g = new THREE.TorusGeometry(R + 0.55, 0.62, 8, 60);

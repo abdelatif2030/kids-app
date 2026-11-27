@@ -104,3 +104,26 @@ test('damaged saves load safely', () => {
   assert.deepEqual(normalizeSave(null), { unlocked: 1, stars: {}, best: {}, muted: false });
   assert.deepEqual(normalizeSave({ unlocked: 9, stars: { 1: 7, 2: 2 }, best: { 1: 'x', 2: 61.234 }, muted: 'yes' }), { unlocked: 3, stars: { 2: 2 }, best: { 2: 61.23 }, muted: false });
 });
+
+test('every course flies over its own real place (B2: explicit pano, no ice over Cairo)', async () => {
+  const { existsSync } = await import('node:fs');
+  const { fileURLToPath } = await import('node:url');
+  const artDir = fileURLToPath(new URL('../../../assets/games/air_race/art/', import.meta.url));
+  for (const c of COURSES) {
+    assert.ok(Number.isInteger(c.pano), `course ${c.id} must name its panorama explicitly`);
+    assert.ok(existsSync(`${artDir}pano${c.pano}.webp`), `missing pano${c.pano}.webp for course ${c.id}`);
+    assert.notEqual(c.world, 'glacier', `course ${c.id} (${c.en}) is an Egyptian landmark, not a glacier`);
+  }
+  const byId = Object.fromEntries(COURSES.map((c) => [c.id, c]));
+  assert.equal(byId[2].world, 'desert', 'the New Capital stands in the desert');
+  assert.equal(byId[5].world, 'sunset', 'the Baron Palace panorama is a sunset');
+  assert.equal(byId[3].world, 'lagoon', 'the Alexandria Library stands on the sea');
+});
+
+import fs from 'node:fs';
+
+test('Nile Air Tour anchor: title renamed; five landmark courses unchanged', () => {
+  const i18n = fs.readFileSync(new URL('../src/i18n.js', import.meta.url), 'utf8');
+  assert.ok(i18n.includes("title: ['جولة النيل الجوية', 'Nile Air Tour']"));
+  assert.deepEqual(COURSES.map((c) => c.en), ['Cairo Airport', 'New Capital', 'Alex Library', 'Montaza Palace', 'Baron Palace']);
+});
