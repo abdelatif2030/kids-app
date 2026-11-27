@@ -16,10 +16,27 @@ void main() {
     }
   });
 
+  // Owner decision (2026-11-27): sky_ace was removed from the fun sections
+  // because the owner could not play it. It stays registered as a web game
+  // but must NOT be reachable from any section. Do not "fix" this by
+  // re-adding it to a section; this exclusion list is the intended state.
+  const intentionallyUnsectioned = {'sky_ace'};
+
   test('every fun (non-learning) web game with a card is reachable from a section', () {
     final listed = <String>{for (final s in kFunSections) ...s.games};
-    final missing = [for (final g in kWebGames) if (!g.isLearning && !listed.contains(g.id)) g.id];
+    final missing = [
+      for (final g in kWebGames)
+        if (!g.isLearning && !listed.contains(g.id) && !intentionallyUnsectioned.contains(g.id)) g.id
+    ];
     expect(missing, isEmpty, reason: 'fun games not in any section: $missing');
+  });
+
+  test('owner-removed games stay out of every section (sky_ace)', () {
+    final listed = <String>{for (final s in kFunSections) ...s.games};
+    for (final id in intentionallyUnsectioned) {
+      expect(listed.contains(id), isFalse,
+          reason: '$id was removed from the fun sections by owner decision and must not come back');
+    }
   });
 
   testWidgets('the sections page shows the tiles and a tile opens its games', (t) async {
