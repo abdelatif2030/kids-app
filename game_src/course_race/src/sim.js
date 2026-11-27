@@ -1,7 +1,7 @@
 // Obstacle course race with no drawing (used by «سباق السماء الغريبة» alien sky and «سباق الغيوم» rhino summit).
 // The runner moves forward by itself; the child steers left/right, taps to jump and (alien) taps the jetpack to recover
 // from a missed jump (3 bursts). Obstacles never end the game: a hit knocks the runner back a few metres, a fall puts it
-// back on the ledge with a short pause. Rivals run beside. Three rounds: finish in the top K to qualify, win the final.
+// back on the ledge with a short pause. Rivals run beside. Six rounds: finish in the top K to qualify, win the final.
 //   alien: gaps, rings (speed), doors that open and close, meteors, tube shortcuts, jetpack, rocket at the end
 //   rhino: gaps, breakaway gates, spinning sweepers, swinging hammers, bounce pads, power-ups, golden gate at the end
 import { rng, clamp } from '../../cozy_kit/ui.js';
@@ -10,9 +10,9 @@ export const HALF = 3.6;
 export const ROUNDS = [
   { id: 1, len: 220, rivals: 5, qualify: 4 },
   { id: 2, len: 280, rivals: 5, qualify: 3 },
-  { id: 3, len: 340, rivals: 5, qualify: 1 },
-  { id: 4, len: 380, rivals: 5, qualify: 1 },
-  { id: 5, len: 420, rivals: 5, qualify: 1 },
+  { id: 3, len: 340, rivals: 5, qualify: 2 },
+  { id: 4, len: 380, rivals: 5, qualify: 2 },
+  { id: 5, len: 420, rivals: 5, qualify: 2 },
   { id: 6, len: 460, rivals: 5, qualify: 1 },
 ];
 const G = 28;
@@ -55,7 +55,7 @@ export function buildCourse(theme, round, seed) {
 }
 
 export class Race {
-  /** opts: { theme: 'alien'|'rhino', round (0..2), easy, seed } */
+  /** opts: { theme: 'alien'|'rhino', round (0..5), easy, seed } */
   constructor(opts = {}) {
     this.theme = opts.theme || 'alien';
     this.round = clamp(opts.round ?? 0, 0, ROUNDS.length - 1);
@@ -160,7 +160,7 @@ export class Race {
         }
         case 'ring': if (!e.hit && Math.abs(dz) < 1 && Math.abs(p.x - e.x) < e.rad && p.y < 3.4 && !p.finished) { e.hit = true; p.boost = 1.4; p.rings += 1; ev.push({ type: 'ring' }); } break;
         case 'boost': if (!e.hit && Math.abs(dz) < 1 && Math.abs(p.x - e.x) < e.rad && !p.finished) { e.hit = true; p.boost = 2; ev.push({ type: 'power' }); } break;
-        case 'pad': if (!e.hit && Math.abs(dz) < 1 && Math.abs(p.x - e.x) < e.rad && !p.finished && p.grounded) { e.hit = true; p.vy = 16; p.grounded = false; ev.push({ type: 'bounce' }); setTimeout(() => {}, 0); } else if (e.hit && Math.abs(dz) > 3) e.hit = false; break;
+        case 'pad': if (!e.hit && Math.abs(dz) < 1 && Math.abs(p.x - e.x) < e.rad && !p.finished && p.grounded) { e.hit = true; p.vy = 16; p.grounded = false; ev.push({ type: 'bounce' }); } else if (e.hit && Math.abs(dz) > 3) e.hit = false; break;
         case 'tube': if (!e.hit && Math.abs(dz) < 1 && Math.abs(p.x - e.x) < e.rad && p.y < 1.2 && !p.finished) { e.hit = true; p.z += e.skip; p.stun = 0; ev.push({ type: 'tube' }); } break;
         default: break;
       }
@@ -184,7 +184,7 @@ export class Race {
       for (const rv of this.rivals) if (rv.finished) ahead += 1;
       p.place = ahead + 1;
       this.qualified = p.place <= this.cfg.qualify;
-      this.won = this.round === 2 && p.place === 1;
+      this.won = this.round === ROUNDS.length - 1 && p.place === 1;
       ev.push({ type: 'finish', place: p.place, qualified: this.qualified });
     }
     return ev;
@@ -201,6 +201,6 @@ export class Race {
 export function normalizeSave(s) {
   const o = s && typeof s === 'object' ? s : {};
   const stars = {};
-  for (let i = 1; i <= 3; i++) { const v = o.stars && Number(o.stars[i]); if (v >= 1 && v <= 3) stars[i] = Math.floor(v); }
+  for (let i = 1; i <= ROUNDS.length; i++) { const v = o.stars && Number(o.stars[i]); if (v >= 1 && v <= 3) stars[i] = Math.floor(v); }
   return { unlocked: Math.max(1, Math.min(ROUNDS.length, Math.max(Math.floor(Number(o.unlocked)) || 1, ...Object.keys(stars).map((k) => Number(k) + 1)))), stars, wins: Math.max(0, Math.floor(Number(o.wins)) || 0), muted: !!o.muted };
 }

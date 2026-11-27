@@ -1,6 +1,6 @@
 // Shared 3D obstacle-course race for «سباق السماء الغريبة» (alien, floating islands, rings, doors, meteors, tubes, jetpack,
 // rocket) and «سباق الغيوم» (helmeted rhino, breakaway gates, sweepers, hammers, bounce pads, golden gate). Entry: alien.js /
-// rhino.js. Drag to steer, tap/JUMP to jump, JET (alien) to recover. Three rounds: qualify, then win the final. three.js, art and
+// rhino.js. Drag to steer, tap/JUMP to jump, JET (alien) to recover. Six rounds: qualify, then win the final. three.js, art and
 // sound made in code. No network, no ads, no tracking. Nothing is lost: a hit pushes you back, a fall puts you back on the ledge.
 import * as THREE from 'three';
 import { Race, ROUNDS, HALF, normalizeSave } from './sim.js';
@@ -390,11 +390,11 @@ class Game {
   _finish() {
     const p = this.p; const r = this.race; const ar = I.getLang() !== 'en';
     const q = r.qualified;
-    const final = this.round === 2;
+    const final = this.round === ROUNDS.length - 1;
     if (q) {
       const st = r.p.place === 1 ? 3 : r.p.place <= 2 ? 2 : 1;
       this.save.stars[this.round + 1] = Math.max(this.save.stars[this.round + 1] || 0, st);
-      this.save.unlocked = Math.max(this.save.unlocked, Math.min(3, this.round + 2));
+      this.save.unlocked = Math.max(this.save.unlocked, Math.min(ROUNDS.length, this.round + 2));
       if (final && r.won) this.save.wins += 1;
     }
     this.post({ type: 'save', save: this.save });

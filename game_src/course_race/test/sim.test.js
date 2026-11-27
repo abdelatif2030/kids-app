@@ -67,3 +67,30 @@ test('damaged saves load safely', () => {
   assert.equal(normalizeSave(null).unlocked, 1);
   assert.equal(normalizeSave({ unlocked: 99 }).unlocked, 6);
 });
+
+test('the campaign runs all six rounds: qualifying unlocks the next, the trophy is only the final', () => {
+  // Regression: the unlock chain used to cap at round 3 (unlocked <= 3 in the
+  // shell, won/final hard-coded to round index 2, stars for rounds 4-6 dropped
+  // by normalizeSave), which made rounds 4-6 of both games unplayable.
+  for (const theme of ['alien', 'rhino']) {
+    let unlocked = 1;
+    for (let i = 0; i < ROUNDS.length; i++) {
+      assert.ok(i + 1 <= unlocked, `${theme} round ${i + 1} must be unlocked before it is played`);
+      const { r } = run(theme, i);
+      assert.equal(r.state, 'done');
+      assert.ok(r.qualified, `${theme} round ${i + 1}: the robot must be able to qualify`);
+      assert.equal(r.won, i === ROUNDS.length - 1 && r.p.place === 1,
+        `${theme} round ${i + 1}: won must be the final-round win only`);
+      if (r.qualified) unlocked = Math.max(unlocked, Math.min(ROUNDS.length, i + 2));
+    }
+    assert.equal(unlocked, ROUNDS.length, `${theme}: the whole campaign unlocks end to end`);
+  }
+});
+
+test('stars for rounds 4-6 survive a save round-trip', () => {
+  const s = normalizeSave({ stars: { 4: 3, 5: 2, 6: 1 } });
+  assert.deepEqual(s.stars, { 4: 3, 5: 2, 6: 1 });
+  assert.equal(s.unlocked, 6);
+  const s2 = normalizeSave({ stars: { 5: 2 } });
+  assert.equal(s2.unlocked, 6, 'a star in round 5 implies round 6 is unlocked');
+});
