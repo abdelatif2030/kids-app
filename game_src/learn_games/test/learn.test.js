@@ -224,3 +224,11 @@ test('the «Example» sentences: up to 4 per word, the four languages say the sa
   assert.ok(main.includes('_exampleButton(it, lang)') && main.includes("class: 'lw-ex'") && main.includes('lw-exar'));
   delete globalThis.window;
 });
+
+test('the examples panel does not cover the child or the thing: the picture slides up (phone upright) or a little left (wide screen) while it is open, and slides back when leaving', () => {
+  const main = fs.readFileSync(new URL('../src/letters/main.js', import.meta.url), 'utf8');
+  const stage = fs.readFileSync(new URL('../src/kit/stage3d.js', import.meta.url), 'utf8');
+  assert.ok(stage.includes('shiftView(dx = 0, dy = 0)') && stage.includes('setViewOffset'));
+  assert.ok(main.includes('_exampleView(open, panel)') && main.includes('this.st.shiftView(0, 0); // leaving a word'));
+  assert.ok(main.includes('@media (min-aspect-ratio:115/100){.lw-expanel{left:auto;right:'));
+});

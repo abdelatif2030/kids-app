@@ -76,6 +76,7 @@ export class Stage {
     r.setSize(w, hh, false);
     r.domElement.style.width = '100%';
     r.domElement.style.height = '100%';
+    this._w = w; this._hh = hh;
     const c = this.camera;
     c.aspect = w / hh;
     c.updateProjectionMatrix();
@@ -89,6 +90,15 @@ export class Stage {
     const target = new THREE.Vector3(...(wide ? wide.target : this.o.target));
     c.position.copy(target).addScaledVector(dir, d);
     c.lookAt(target);
+    this._applyShift();
+  }
+
+  /** Slides the whole picture by [dx, dy] pixels (left / up) without moving anything in the scene: used to keep the child and the thing in view beside a panel. (0, 0) = back to normal. */
+  shiftView(dx = 0, dy = 0) { this._shift = [dx, dy]; this._applyShift(); }
+  _applyShift() {
+    const c = this.camera, s = this._shift;
+    if (!this._w || !s || (!s[0] && !s[1])) { c.clearViewOffset(); } else { c.setViewOffset(this._w, this._hh, s[0], s[1], this._w, this._hh); }
+    c.updateProjectionMatrix();
   }
 
   /** The things the child may tap now: [{ hit: Mesh with userData.id }, ...] and the callback(id). */

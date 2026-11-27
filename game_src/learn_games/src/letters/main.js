@@ -648,6 +648,7 @@ class Game {
     };
     const slug = key.replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
     const panel = h('div', { class: 'lw-expanel', dir, style: 'display:none' });
+    this._exOpen = false;
     // a small picture beside every example: its own scene (ex_<word>_<n>.webp) or the word's scene (ex_<word>.webp); no picture = no frame
     // beside every example (outside its card) a square picture box: the example's own scene (ex_<word>_<n>.webp), else the word's scene (ex_<word>.webp), else a small
     // sign of the kind of sentence (look, find, where...). Never a picture that does not belong to the word.
@@ -662,9 +663,21 @@ class Game {
     });
     list.forEach((e, i) => panel.append(h('div', { class: 'lw-exline' }, rows[i], box(i + 1, e.ic))));
     let open = false;
-    const chip = h('button', { class: 'lw-ex', 'aria-label': label, onclick: (ev) => { ev.stopPropagation(); sh.sound.play('tap'); open = !open; panel.style.display = open ? 'flex' : 'none'; chip.classList.toggle('open', open); } },
+    const chip = h('button', { class: 'lw-ex', 'aria-label': label, onclick: (ev) => { ev.stopPropagation(); sh.sound.play('tap'); open = !open; panel.style.display = open ? 'flex' : 'none'; chip.classList.toggle('open', open); this._exampleView(open, panel); } },
       h('i', {}, '💡'), h('span', {}, label), list.length > 1 ? h('em', {}, String(list.length)) : null);
-    return h('div', { class: 'lw-exw' }, chip, panel);
+    sh.layer.append(panel);
+    return h('div', { class: 'lw-exw' }, chip);
+  }
+
+  /** While the examples are open the picture slides away from them: up on a phone held upright (the panel sits at the bottom), a little to the left on a wide screen
+   *  (the panel sits at the right), so the child and the thing being learned stay in view. */
+  _exampleView(open, panel) {
+    const W = this.cw || this.sh.root.clientWidth, H = this.ch || this.sh.root.clientHeight;
+    if (!open) { this.st.shiftView(0, 0); return; }
+    const wide = W > H * 1.15;
+    const r = panel.getBoundingClientRect();
+    if (wide) this.st.shiftView(Math.round(W * 0.07), 0);
+    else this.st.shiftView(0, Math.round(Math.min(H * 0.3, r.height * 0.55)));
   }
 
   _learnItem() {
@@ -985,6 +998,7 @@ class Game {
   }
 
   _clearRound() {
+    if (this.st && this.st.shiftView) this.st.shiftView(0, 0); // leaving a word closes the examples: the picture slides back
     for (const o of this.opts.values()) this.st.scene.remove(o.g);
     this.opts.clear();
     this.leap = null;
@@ -1622,12 +1636,13 @@ const CSS = `
 .lw-ex{display:flex;align-items:center;gap:calc(var(--u)*1.2);font-family:inherit;font-weight:900;font-size:calc(var(--u)*3.2);color:#fff;background:linear-gradient(180deg,#ffb84a,#f08a1a);border:calc(var(--u)*.5) solid #fff;border-radius:999px;padding:calc(var(--u)*.7) calc(var(--u)*2.6);cursor:pointer;box-shadow:0 calc(var(--u)*.5) 0 #b8600a;text-shadow:0 calc(var(--u)*.2) 0 rgba(0,0,0,.25)}
 .lw-ex i{font-style:normal;font-size:calc(var(--u)*3.8)}.lw-ex em{font-style:normal;background:#fff;color:#c86a0a;border-radius:999px;min-width:calc(var(--u)*3.4);text-align:center;font-size:calc(var(--u)*2.6);line-height:1.35;text-shadow:none}
 .lw-ex.open{filter:brightness(1.08);transform:translateY(calc(var(--u)*.3))}
-.lw-expanel{width:min(94vw,calc(var(--u)*92));flex-direction:column;gap:calc(var(--u)*1.1);background:rgba(255,255,255,.96);border:calc(var(--u)*.6) solid #6a3ad0;border-radius:calc(var(--u)*3);padding:calc(var(--u)*1.4);box-shadow:0 calc(var(--u)*.7) 0 #4a2a9a;max-width:100%}
-.lw-exrow{display:flex;align-items:center;gap:calc(var(--u)*1.6);font-family:inherit;font-weight:800;font-size:calc(var(--u)*3.3);color:#3a2a6a;background:#f1ebff;border:calc(var(--u)*.35) solid #cdbdf5;border-radius:calc(var(--u)*2.2);padding:calc(var(--u)*.7) calc(var(--u)*1.8);cursor:pointer;text-align:start}
+.lw-expanel{position:absolute;z-index:5;left:calc(var(--u)*2);right:calc(var(--u)*2);bottom:calc(var(--u)*23);max-height:42%;overflow-y:auto;flex-direction:column;gap:calc(var(--u)*.9);background:rgba(255,255,255,.96);border:calc(var(--u)*.6) solid #6a3ad0;border-radius:calc(var(--u)*3);padding:calc(var(--u)*1.4);box-shadow:0 calc(var(--u)*.7) 0 #4a2a9a;max-width:100%}
+.lw-exrow{display:flex;align-items:center;gap:calc(var(--u)*1.4);font-family:inherit;font-weight:800;font-size:calc(var(--u)*3);color:#3a2a6a;background:#f1ebff;border:calc(var(--u)*.35) solid #cdbdf5;border-radius:calc(var(--u)*2.2);padding:calc(var(--u)*.5) calc(var(--u)*1.6);cursor:pointer;text-align:start}
 .lw-exrow b{flex:none;width:calc(var(--u)*4.6);height:calc(var(--u)*4.6);border-radius:50%;background:#7a3fd0;color:#fff;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*2.8)}
 .lw-extext{flex:1;display:flex;flex-direction:column;gap:calc(var(--u)*.3);line-height:1.25;min-width:0}.lw-exmain mark{background:#ffe066;color:#3a2a6a;border-radius:calc(var(--u)*.6);padding:0 calc(var(--u)*.5)}.lw-exar{font-size:calc(var(--u)*2.7);color:#6a5a9a;font-weight:700}.lw-exar mark{background:#ffe9a0;color:#6a4a0a;border-radius:calc(var(--u)*.5);padding:0 calc(var(--u)*.4)}.lw-exrow i{font-style:normal;font-size:calc(var(--u)*3.6)}
-.lw-exline{display:flex;align-items:stretch;gap:calc(var(--u)*1.2)}.lw-exline .lw-exrow{flex:1;min-width:0}
-.lw-exbox{flex:none;width:calc(var(--u)*13);min-height:calc(var(--u)*13);border-radius:calc(var(--u)*2.4);border:calc(var(--u)*.5) solid #cdbdf5;background:linear-gradient(180deg,#fff,#efe6ff);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 calc(var(--u)*.4) 0 #cdbdf5}.lw-exbox i{font-style:normal;font-size:calc(var(--u)*6.4)}.lw-exbox img{width:100%;height:100%;object-fit:cover;display:block}
+.lw-exline{display:flex;align-items:stretch;gap:calc(var(--u)*1.2)}
+@media (min-aspect-ratio:115/100){.lw-expanel{left:auto;right:calc(var(--u)*2);top:calc(var(--u)*13);bottom:auto;width:min(44%,calc(var(--u)*88));max-height:calc(100% - var(--u)*29)}}.lw-exline .lw-exrow{flex:1;min-width:0}
+.lw-exbox{flex:none;width:calc(var(--u)*11);min-height:calc(var(--u)*11);border-radius:calc(var(--u)*2.4);border:calc(var(--u)*.5) solid #cdbdf5;background:linear-gradient(180deg,#fff,#efe6ff);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 calc(var(--u)*.4) 0 #cdbdf5}.lw-exbox i{font-style:normal;font-size:calc(var(--u)*5.2)}.lw-exbox img{width:100%;height:100%;object-fit:cover;display:block}
 .lw-exrow.on{background:#fff0b8;border-color:#f5b21a}
 .lw-lhit{position:absolute;left:18%;right:18%;top:14%;bottom:30%;background:transparent;border:none;cursor:pointer;pointer-events:auto;z-index:2}
 .lw-lbar{position:absolute;left:0;right:0;bottom:calc(var(--u)*2.5);display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*2.5);pointer-events:auto;z-index:3}.lw-lbar.ltr{direction:ltr}
