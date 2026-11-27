@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Battle, CARDS, UNITS, DT, HALF, MATCH_TIME, DOUBLE_AT, ENERGY_MAX, REGEN, normalizeSave, recordResult, Deck, mulberry32 } from '../src/sim.js';
+import { Battle, CARDS, ALIEN_CARDS, UNITS, DT, HALF, ENERGY_MAX, REGEN, normalizeSave, recordResult, Deck, mulberry32, CAMPAIGN, DIFFS, DIFF_RANK, recordCampaignResult, campaignUnlocked } from '../src/sim.js';
 
 function adv(b, sec) { const ev = []; for (let t = 0; t < sec - 1e-9; t += DT) ev.push(...b.step(DT)); return ev; }
 
@@ -24,7 +24,7 @@ function bot(b) {
   return false;
 }
 
-function run(seed, diff, useBot = true, limit = MATCH_TIME + 5) {
+function run(seed, diff, useBot = true, limit = 1200) {
   const b = new Battle({ seed, difficulty: diff });
   let t = 0;
   let next = 0;
@@ -36,31 +36,30 @@ function run(seed, diff, useBot = true, limit = MATCH_TIME + 5) {
   return { b, t };
 }
 
-test('a match always ends within the 150 s limit, even if nobody plays', () => {
-  for (const d of ['easy', 'normal', 'hard']) {
-    const { b, t } = run(7, d, false);
-    assert.notEqual(b.state, 'play');
-    assert.ok(t <= MATCH_TIME + 0.2, `${d} ended at ${t}`);
-    assert.ok(b.over);
+test('kind rules (2.2): no match clock — with both bases alive the battle simply continues', () => {
+  const b = new Battle({ seed: 7, difficulty: 'easy' });
+  let sawDouble = false;
+  for (let t = 0; t < 400; t += DT) { // far beyond the old 150 s limit
+    b.base[0].hp = b.base[0].max; b.base[1].hp = b.base[1].max; // keep both bases standing
+    for (const e of b.step(DT)) if (e.type === 'double') sawDouble = true;
   }
+  assert.equal(b.state, 'play', 'time alone never ends a match');
+  assert.equal(sawDouble, false, 'no late-match energy surge exists');
+  assert.equal(b.energyRate, REGEN);
 });
 
-test('energy fills at the normal rate, then twice as fast in the last minute', () => {
+test('energy fills at one constant rate for the whole match', () => {
   const b = new Battle({ seed: 1, difficulty: 'easy' });
   b.energy = 0;
   adv(b, 2.8);
   assert.ok(Math.abs(b.energy - 1) < 0.05);
   assert.equal(b.energyRate, REGEN);
-  while (b.timeLeft > DOUBLE_AT + 1) adv(b, 1);
+  for (let t = 0; t < 300; t += DT) { b.base[0].hp = b.base[0].max; b.base[1].hp = b.base[1].max; b.step(DT); } // five minutes in…
+  assert.equal(b.state, 'play');
   b.energy = 0;
-  const ev1 = adv(b, 2);
-  assert.ok(Math.abs(b.energy - 2 * REGEN * 2) < 0.1 || b.energy > 0);
-  while (b.timeLeft > DOUBLE_AT - 1) adv(b, 0.5);
-  b.energy = 0;
-  adv(b, 2.8);
-  assert.ok(Math.abs(b.energy - 2) < 0.1, `got ${b.energy}`);
-  assert.equal(b.energyRate, REGEN * 2);
-  void ev1;
+  adv(b, 2.8); // …still the same gentle rate
+  assert.ok(Math.abs(b.energy - 1) < 0.05, `got ${b.energy}`);
+  assert.equal(b.energyRate, REGEN);
 });
 
 test('energy never passes 10 and a card needs its cost', () => {
@@ -137,19 +136,19 @@ test('turret shoots, units explode into events, bases are destroyed', () => {
   assert.ok(b.over.stars >= 1);
 });
 
-test('time-out: more base health fraction wins; stars follow health left', () => {
+test('a match ends when a base falls; stars follow the base health left', () => {
   const b = new Battle({ seed: 2, difficulty: 'easy' });
-  b.base[1].hp = b.base[1].max * 0.5;
-  b.tick = Math.round(MATCH_TIME / DT) - 1;
+  b.base[1].hp = 0;
   b.step(DT * 2);
   assert.equal(b.state, 'won');
   assert.equal(b.over.stars, 3);
   const c = new Battle({ seed: 2, difficulty: 'easy' });
-  c.base[0].hp = 600; c.base[1].hp = c.base[1].max * 0.5; c.tick = Math.round(MATCH_TIME / DT) - 1;
+  c.base[0].hp = c.base[0].max * 0.6; c.base[1].hp = 0;
   c.step(DT * 2);
+  assert.equal(c.state, 'won');
   assert.equal(c.over.stars, 2);
   const d = new Battle({ seed: 2, difficulty: 'easy' });
-  d.base[0].hp = 300; d.tick = Math.round(MATCH_TIME / DT) - 1;
+  d.base[0].hp = 0;
   d.step(DT * 2);
   assert.equal(d.state, 'lost');
   assert.equal(d.over.stars, 0);
@@ -191,4 +190,92 @@ test('save normalisation and recording', () => {
 
 test('unit table sanity', () => {
   for (const [k, u] of Object.entries(UNITS)) { assert.ok(u.hp > 0 && u.dmg > 0 && u.r > 0, k); }
+});
+
+// ---- Phase 2E (Batch F): the 8-duel Nile campaign ---------------------------------------------------------------------------------
+
+test('campaign: 8 duels, distinct landmarks, rising difficulty curve', () => {
+  assert.equal(CAMPAIGN.length, 8);
+  assert.equal(new Set(CAMPAIGN.map((d) => d.id)).size, 8);
+  assert.equal(new Set(CAMPAIGN.map((d) => d.en)).size, 8);
+  for (const d of CAMPAIGN) {
+    assert.ok(d.ar && d.en && d.icon, d.id);
+    assert.ok(DIFFS[d.diff], `${d.id} diff ${d.diff}`);
+    assert.ok(Array.isArray(d.focus) && d.focus.length >= 1 && d.focus.every((f) => ALIEN_CARDS[f]), `${d.id} focus must name real alien cards`);
+  }
+  const ranks = CAMPAIGN.map((d) => DIFF_RANK[d.diff]);
+  for (let i = 1; i < ranks.length; i++) assert.ok(ranks[i] >= ranks[i - 1], `duel ${i + 1} easier than duel ${i}`);
+  assert.ok(ranks[ranks.length - 1] > ranks[0], 'the finale is harder than the opener');
+});
+
+test('campaign: unlock chain — win k unlocks k+1, win 8 completes the tour', () => {
+  let s = normalizeSave(null);
+  assert.equal(s.campaign.unlocked, 1);
+  assert.equal(campaignUnlocked(s, 0), true);
+  assert.equal(campaignUnlocked(s, 1), false);
+  for (let i = 0; i < CAMPAIGN.length; i++) {
+    assert.equal(campaignUnlocked(s, i), true, `duel ${i + 1} should be unlocked before playing it`);
+    s = recordCampaignResult(s, i, { state: 'won', stars: 2 });
+    assert.equal(s.campaign.won[i], true);
+    if (i + 1 < CAMPAIGN.length) {
+      assert.equal(s.campaign.unlocked, i + 2);
+      assert.equal(campaignUnlocked(s, i + 1), true);
+      assert.equal(s.campaign.complete, false);
+    }
+  }
+  assert.equal(s.campaign.complete, true);
+  assert.equal(s.campaign.unlocked, CAMPAIGN.length);
+  assert.deepEqual(s.campaign.album, CAMPAIGN.map((d) => d.id));
+});
+
+test('campaign: album award logic — win earns the card once, a loss earns nothing', () => {
+  let s = normalizeSave(null);
+  s = recordCampaignResult(s, 0, { state: 'lost', stars: 0 });
+  assert.deepEqual(s.campaign.album, []);
+  assert.equal(s.campaign.won[0], false);
+  assert.equal(s.campaign.unlocked, 1);
+  s = recordCampaignResult(s, 0, { state: 'draw', stars: 0 });
+  assert.deepEqual(s.campaign.album, []);
+  s = recordCampaignResult(s, 0, { state: 'won', stars: 1 });
+  assert.deepEqual(s.campaign.album, [CAMPAIGN[0].id]);
+  s = recordCampaignResult(s, 0, { state: 'won', stars: 3 }); // replaying a won duel…
+  assert.deepEqual(s.campaign.album, [CAMPAIGN[0].id], '…never duplicates the card');
+  assert.equal(recordCampaignResult(s, 99, { state: 'won', stars: 3 }).campaign.album.length, 1, 'bad index ignored');
+});
+
+test('campaign: save migration — an old save starts a fresh tour and keeps free play intact', () => {
+  const old = { stars: { easy: 3, hard: 2 }, wins: 7, plays: 12, muted: true, tutorial: true, diff: 'hard' };
+  const s = normalizeSave(old);
+  assert.deepEqual(s.campaign, { unlocked: 1, won: [false, false, false, false, false, false, false, false], album: [], complete: false });
+  assert.equal(s.stars.easy, 3); assert.equal(s.stars.hard, 2);
+  assert.equal(s.wins, 7); assert.equal(s.plays, 12); assert.equal(s.diff, 'hard'); assert.equal(s.muted, true);
+  const r = recordResult(s, 'hard', { state: 'won', stars: 3 }); // free play still records exactly as before…
+  assert.equal(r.wins, 8); assert.equal(r.stars.hard, 3);
+  assert.deepEqual(r.campaign, s.campaign, '…and never disturbs the campaign');
+  const junk = normalizeSave({ campaign: { unlocked: 99, won: [true, 'x'], album: ['giza', 'nope', 'giza'] } });
+  assert.equal(junk.campaign.unlocked, 8);
+  assert.deepEqual(junk.campaign.album, ['aswan', 'philae', 'giza'], 'album is healed from won duels, deduped, in tour order');
+});
+
+test('campaign: every duel completes with a winner, and the test bot wins each duel at least sometimes', () => {
+  for (let i = 0; i < CAMPAIGN.length; i++) {
+    const d = CAMPAIGN[i];
+    const seeds = Array.from({ length: d.diff === 'hard' ? 24 : 12 }, (_, k) => k + 1); // Hard is the tightest duel for the bot (see REVIEW)
+    let wins = 0;
+    for (const seed of seeds) {
+      const { b } = run(seed, d.diff);
+      assert.notEqual(b.state, 'play', `duel ${i + 1} (${d.en}) seed ${seed} never ended`);
+      if (b.state === 'won') wins++;
+    }
+    console.log(`duel ${i + 1} ${d.en} [${d.diff}] bot wins ${wins}/${seeds.length}`);
+    assert.ok(wins >= 1, `duel ${i + 1} (${d.en}, ${d.diff}) is a wall for the test bot: 0/${seeds.length} wins`);
+  }
+});
+
+import fs from 'node:fs';
+
+test("Heroes' Cards anchor: neon battle becomes the heroes' card game", () => {
+  const main = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes("title: ['بطاقات الأبطال', \"Heroes' Cards\"]"));
+  assert.ok(!main.includes('Neon Card Battle'));
 });

@@ -1,9 +1,9 @@
-// «معركة الكروت النيون» — Neon Card Battle. Entry: window.CardBattle.start(container, config, post).
+// «بطاقات الأبطال» — Heroes' Cards. Entry: window.CardBattle.start(container, config, post).
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
 // Drag a card from your hand onto your half of the glowing arena (spells can go anywhere). Robots fight on their own; the Alien
 // Overlord answers with slimes, bugs and brutes. Destroy his UFO, or have more base health when 2:30 is up. Canvas 2D, art and
 // sound made in code. All the rules live in sim.js (pure, tested); this file only draws and listens.
-import { Battle, CARDS, UNITS, SPELLS, DIFFS, DT, L, HALF, CX, MATCH_TIME, ENERGY_MAX, BASE_R, arenaHalfW, normalizeSave, recordResult } from './sim.js';
+import { Battle, CARDS, UNITS, SPELLS, DIFFS, DT, L, HALF, CX, ENERGY_MAX, BASE_R, arenaHalfW, normalizeSave, recordResult, CAMPAIGN, recordCampaignResult, campaignUnlocked } from './sim.js';
 import { drawUnit, drawPlayerBase, drawUFO, drawCardIcon, ground, bar, glow, blob, setArt } from './art.js';
 import { loadArt } from '../../cozy_kit/art.js';
 import { Sound } from './audio.js';
@@ -13,22 +13,28 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 const CARD_CLIPS = { trick: 3, bump: 2, charge: 2, win: 2, lose: 2, count: 1 };
 
 const S = {
-  title: ['معركة الكروت النيون', 'Neon Card Battle'], play: ['يلا نقاتل!', 'Battle!'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'],
+  title: ['بطاقات الأبطال', "Heroes' Cards"], play: ['يلا نلعب!', 'Play!'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'],
   again: ['مرة تانية', 'Play again'], resume: ['كمّل', 'Resume'], paused: ['إيقاف مؤقت', 'Paused'], howBtn: ['إزاي ألعب؟', 'How to play'],
   diff: ['اختار الصعوبة', 'Choose difficulty'], easy: ['سهل', 'Easy'], normal: ['عادي', 'Normal'], hard: ['صعب', 'Hard'], expert: ['خبير', 'Expert'], legend: ['أسطورة', 'Legend'],
   next: ['التالي', 'NEXT'], hint: ['اسحب كارت على الساحة', 'DRAG A CARD ONTO THE FIELD'], hintTap: ['دوس على الساحة عشان تنزّله', 'Tap the field to drop it'],
   win: ['انتصرت! 🏆', 'Victory! 🏆'], lose: ['خسرنا المعركة', 'Defeat'], draw: ['تعادل', 'Draw'],
-  winText: ['دمّرت الكائن الفضائي!', 'You beat the Alien Overlord!'], timeWin: ['القاعدة بتاعتك أقوى!', 'Your base was stronger!'], loseText: ['جرّب تاني بكروت مختلفة', 'Try again with different cards'], drawText: ['الاتنين متساويين!', 'Both bases were equal!'],
+  winText: ['دمّرت الكائن الفضائي!', 'You beat the Alien Overlord!'], loseText: ['جرّب تاني بكروت مختلفة', 'Try again with different cards'], drawText: ['الاتنين متساويين!', 'Both bases were equal!'],
   baseLeft: ['صحة القاعدة', 'Base health'], time: ['الوقت', 'Time'], kills: ['أعداء دمّرتهم', 'Enemies destroyed'],
-  double: ['الطاقة ×٢ !', 'Energy ×2 !'], go: ['قتال!', 'FIGHT!'], restart: ['من الأول', 'Restart'], soundOn: ['الصوت شغّال', 'Sound on'], soundOff: ['الصوت مقفول', 'Sound off'], tUnit: ['وحدة', 'UNIT'], tSpell: ['سحر', 'SPELL'], tBuild: ['مبنى', 'BUILDING'],
+  go: ['قتال!', 'FIGHT!'], restart: ['من الأول', 'Restart'], soundOn: ['الصوت شغّال', 'Sound on'], soundOff: ['الصوت مقفول', 'Sound off'], tUnit: ['وحدة', 'UNIT'], tSpell: ['سحر', 'SPELL'], tBuild: ['مبنى', 'BUILDING'],
   d_spark: ['روبوت سريع بيضرب من قريب.', 'Fast little robot. Hits up close.'], d_blaster: ['رامي ليزر بيضرب من بعيد.', 'Laser shooter. Hits from afar.'], d_smash: ['مدرّع تقيل وقوي جدًا.', 'Heavy and very strong.'], d_swarm: ['٣ روبوتات صغيرة سريعة.', 'Three small fast robots.'], d_turret: ['برج بلازما بيضرب ويختفي بعد شوية.', 'Plasma turret. Fires, then fades away.'], d_plasma: ['موجة تضرب كل اللي في الدايرة.', 'A wave that hits everything in the circle.'], d_blackhole: ['ثقب بيشدّ الأعداء ويأذيهم.', 'Pulls enemies in and hurts them.'], d_repair: ['مجال بيعالج روبوتاتك.', 'A field that heals your robots.'], sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
   how1: ['١) اسحب كارت من إيدك على نصفك من الساحة', '1) Drag a card onto your half of the arena'], how2: ['٢) الروبوتات بتقاتل لوحدها', '2) Robots fight by themselves'],
   how3: ['٣) الطاقة بتتشحن مع الوقت — الكروت بتكلّف طاقة', '3) Energy refills over time — cards cost energy'], how4: ['٤) الموجة والثقب والإصلاح تنزل في أي مكان', '4) Spells can go anywhere on the field'],
-  how5: ['٥) في آخر دقيقة الطاقة بتتشحن ضعف السرعة!', '5) In the last minute energy flows twice as fast!'], how6: ['دمّر الطبق الطائر أو خلّي قاعدتك أقوى لما الوقت يخلص', 'Destroy the UFO, or keep a stronger base when time is up'],
+  how5: ['٥) مفيش وقت بيخلص — العب على مهلك وفكّر في كل كارت', '5) There is no clock — play at your own pace and think about every card'], how6: ['دمّر الطبق الطائر عشان تكسب', 'Destroy the UFO to win'],
   back: ['رجوع', 'Back'], low: ['طاقة ناقصة', 'Not enough energy'],
   spark: ['شرارة', 'Spark'], blaster: ['رامي', 'Blaster'], smash: ['مدرّع', 'Smasher'], swarm: ['سرب', 'Swarm'], turret: ['برج', 'Turret'],
   plasma: ['موجة بلازما', 'Plasma Wave'], blackhole: ['ثقب أسود', 'Black Hole'], repair: ['مجال إصلاح', 'Repair Field'],
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'],
+  campBtn: ['🗺️ رحلة النيل', '🗺️ Nile Tour'], albumBtn: ['🏺 ألبوم المعالم', '🏺 Landmark Album'],
+  campTitle: ['رحلة النيل — ٨ مبارزات', 'The Nile Tour — 8 Duels'], campSub: ['سافر على النيل من أسوان للمتحف الكبير، واكسب كل معلم!', 'Sail the Nile from Aswan to the Grand Museum and win every landmark!'],
+  albumTitle: ['ألبوم المعالم', 'Landmark Album'], albumSub: ['اكسب مبارزة عشان تكسب كارت المعلم بتاعها', 'Win a duel to earn its landmark card'],
+  duel: ['مبارزة', 'Duel'], locked: ['مقفول', 'Locked'], tourDone: ['🎉 خلّصت رحلة النيل كلها! انت بطل الأبطال!', '🎉 You finished the whole Nile Tour! You are the Grand Champion!'],
+  nextDuel: ['المبارزة اللي بعدها', 'Next duel'], campMap: ['خريطة الرحلة', 'Tour map'], retryDuel: ['حاول المبارزة تاني', 'Try this duel again'],
+  cardWon: ['كسبت كارت المعلم!', 'You earned the landmark card!'], vs: ['ضد', 'vs'],
 };
 const I = makeI18n(S);
 const TAU = Math.PI * 2;
@@ -55,7 +61,7 @@ class Game {
     this.g = this.cv.getContext('2d');
     this.layer = h('div', { class: 'cb-layer' });
     this.root.append(this.layer);
-    this.mode = 'menu'; this.clock = 0; this.parts = []; this.texts = []; this.beams = []; this.fxs = []; this.shake = 0; this.drag = null; this.sel = -1;
+    this.mode = 'menu'; this.clock = 0; this.parts = []; this.texts = []; this.beams = []; this.fxs = []; this.shake = 0; this.drag = null; this.sel = -1; this.duel = null; this.battleDiff = this.diff;
     this.battle = new Battle({ seed: 1, difficulty: this.diff });
     this.icons = {};
     for (const id of Object.keys(CARDS)) { const c = h('canvas'); c.width = c.height = 128; drawCardIcon(c.getContext('2d'), id, 128); this.icons[id] = c; }
@@ -261,12 +267,55 @@ class Game {
     this.sound.setMode(false); this.drag = null; this.sel = -1;
     this.battle = new Battle({ seed: 1, difficulty: this.diff }); this.parts = []; this.texts = []; this.beams = []; this.fxs = [];
     const btns = ['easy', 'normal', 'hard', 'expert', 'legend'].map((d) => h('button', { class: `cb-diff${d === this.diff ? ' on' : ''}`, onclick: () => { this.diff = d; this.sound.play('tap'); this.showMenu(); } }, h('b', {}, I.t(d)), this._stars(this.save.stars[d])));
+    const wonCount = this.save.campaign.won.filter(Boolean).length;
     this.layer.append(h('div', { class: 'cb-dim' }, h('div', { class: 'cb-card' },
       h('div', { class: 'cb-logo' }, '⚡ ', I.t('title')),
       h('div', { class: 'cb-small' }, I.t('diff')), h('div', { class: 'cb-diffs' }, btns),
       h('button', { class: 'cb-btn', onclick: () => { this.sound.unlock(); this.sound.play('tap'); this.start(); } }, I.t('play')),
+      h('button', { class: 'cb-btn', onclick: () => { this.sound.play('tap'); this.showCampaign(); } }, `${I.t('campBtn')} · ${I.num(wonCount)}/${I.num(CAMPAIGN.length)}`),
+      h('button', { class: 'cb-btn dark', onclick: () => { this.sound.play('tap'); this.showAlbum(); } }, I.t('albumBtn')),
       h('button', { class: 'cb-btn dark', onclick: () => this.showHow() }, I.t('howBtn')),
       h('button', { class: 'cb-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));
+    this._soundPill();
+  }
+
+  // ---- the Nile Tour: 8 duels in order, locked / unlocked / done ------------------------------------------------------
+  showCampaign() {
+    this.mode = 'campaign'; this.layer.replaceChildren(); this.topEl = this.botEl = null; this._proj(); this._menuPic(true);
+    const camp = this.save.campaign;
+    const rows = CAMPAIGN.map((d, i) => {
+      const done = camp.won[i];
+      const open = campaignUnlocked(this.save, i);
+      const state = done ? '✅' : open ? '▶️' : '🔒';
+      return h('button', { class: `cb-stop${done ? ' done' : ''}${open ? '' : ' locked'}`, disabled: open ? null : 'disabled', onclick: open ? () => { this.sound.unlock(); this.sound.play('tap'); this.start(i); } : null },
+        h('span', { class: 'cb-stop-ic' }, d.icon),
+        h('span', { class: 'cb-stop-tx' }, h('b', {}, `${I.num(i + 1)}. ${I.getLang() === 'en' ? d.en : d.ar}`), h('i', {}, `${I.t('duel')} · ${I.t(d.diff)} · ${I.t('vs')} ${I.getLang() === 'en' ? d.foeEn : d.foeAr}`)),
+        h('span', { class: 'cb-stop-st' }, state));
+    });
+    this.layer.append(h('div', { class: 'cb-dim' }, h('div', { class: 'cb-card cb-wide' },
+      h('div', { class: 'cb-title' }, I.t('campTitle')),
+      h('div', { class: 'cb-small' }, I.t('campSub')),
+      camp.complete ? h('div', { class: 'cb-small cb-tourwin' }, I.t('tourDone')) : null,
+      h('div', { class: 'cb-stops' }, rows),
+      h('button', { class: 'cb-btn dark', onclick: () => this.showMenu() }, I.t('back')))));
+    this._soundPill();
+  }
+
+  // ---- the landmark album: one card per won duel, collection joy only --------------------------------------------------
+  showAlbum() {
+    this.mode = 'album'; this.layer.replaceChildren(); this.topEl = this.botEl = null; this._proj(); this._menuPic(true);
+    const cards = CAMPAIGN.map((d, i) => {
+      const owned = this.save.campaign.album.includes(d.id);
+      return h('div', { class: `cb-acard${owned ? '' : ' locked'}` },
+        h('div', { class: 'cb-acard-ic' }, owned ? d.icon : '🔒'),
+        h('div', { class: 'cb-acard-nm' }, owned ? (I.getLang() === 'en' ? d.en : d.ar) : I.t('locked')),
+        h('div', { class: 'cb-acard-sub' }, `${I.t('duel')} ${I.num(i + 1)}`));
+    });
+    this.layer.append(h('div', { class: 'cb-dim' }, h('div', { class: 'cb-card cb-wide' },
+      h('div', { class: 'cb-title' }, I.t('albumTitle')),
+      h('div', { class: 'cb-small' }, I.t('albumSub')),
+      h('div', { class: 'cb-album' }, cards),
+      h('button', { class: 'cb-btn dark', onclick: () => this.showMenu() }, I.t('back')))));
     this._soundPill();
   }
 
@@ -278,22 +327,22 @@ class Game {
       h('button', { class: 'cb-btn dark', onclick: () => { this.layer.lastChild.remove(); if (this.mode === 'menu') this.showMenu(); else void back; } }, I.t('back')))));
   }
 
-  start() {
+  start(duel = null) {
     this.voice.say('count');
     this._menuPic(false);
+    this.duel = Number.isInteger(duel) && CAMPAIGN[duel] && campaignUnlocked(this.save, duel) ? duel : null;
+    this.battleDiff = this.duel !== null ? CAMPAIGN[this.duel].diff : this.diff;
     this.mode = 'play'; this.layer.replaceChildren(); this.parts = []; this.texts = []; this.beams = []; this.fxs = []; this.sel = -1; this.endT = 0; this.shake = 0;
-    this.battle = new Battle({ seed: (Date.now() & 0xffffff) + 1, difficulty: this.diff });
+    this.battle = new Battle({ seed: (Date.now() & 0xffffff) + 1, difficulty: this.battleDiff });
     this.sound.setMode(true); this.hintOn = !this.save.tutorial;
     const b = this.battle;
-    this.timerEl = h('span', {}, '2:30'); this.x2El = h('span', { class: 'cb-x2' }, '×2');
     this.eHp = h('b', {}); this.eTx = h('span', {}); this.pHp = h('b', {}); this.pTx = h('span', {});
     this.infoEl = h('div', { class: 'cb-info' });
     this.pauseBtn = h('button', { class: 'cb-round cb-pausebtn', 'aria-label': I.t('paused'), onclick: () => this.pauseGame() }, '⏸');
-    // top bar like the original: robot avatar + its vertical health bar, timer in the middle, alien avatar + its bar
+    // top bar like the original: robot avatar + its vertical health bar, alien avatar + its bar (no clock — untimed play)
     this.topEl = h('div', { class: 'cb-topw' },
       h('div', { class: 'cb-toprow' },
         this._av('robot', '🤖'), h('div', { class: 'cb-vb robot' }, this.pHp),
-        h('div', { class: 'cb-pill cb-timer' }, this.timerEl, this.x2El),
         h('div', { class: 'cb-vb alien' }, this.eHp), this._av('alien', '👾')),
       h('div', { class: 'cb-hpnums' }, h('span', { class: 'robot' }, this.pTx), h('span', { class: 'alien' }, this.eTx)));
     this.cardEls = [0, 1, 2, 3].map((slot) => {
@@ -308,6 +357,7 @@ class Game {
       h('div', { class: 'cb-erow' }, h('div', { class: 'cb-next' }, h('div', { class: 'cb-nextl' }, I.t('next')), this.nextCv), this.eNum, this.engEl),
       h('div', { class: 'cb-hand' }, this.cardEls.map((c) => c.el)));
     this.ghostEl = h('div', { class: 'cb-ghost' }, h('canvas', { width: 128, height: 128 }));
+    if (this.duel !== null) { const d = CAMPAIGN[this.duel]; this.layer.append(h('div', { class: 'cb-duelpill' }, `${d.icon} ${I.getLang() === 'en' ? d.en : d.ar} · ${I.t('duel')} ${I.num(this.duel + 1)}`)); }
     this.hintEl = h('div', { class: 'cb-hint show' }, h('span', { class: 'cb-finger' }, '👆'), h('span', {}, I.t('hint')));
     this.banner = h('div', { class: 'cb-banner' });
     this.layer.append(this.topEl, this.pauseBtn, this.botEl, this.infoEl, this.hintEl, this.banner);
@@ -327,7 +377,7 @@ class Game {
     this.pauseEl = h('div', { class: 'cb-dim' }, h('div', { class: 'cb-card' },
       h('div', { class: 'cb-title' }, I.t('paused')),
       h('button', { class: 'cb-btn', onclick: () => this.resumeGame() }, I.t('resume')),
-      h('button', { class: 'cb-btn dark', onclick: () => { this.pauseEl.remove(); this.start(); } }, I.t('restart')),
+      h('button', { class: 'cb-btn dark', onclick: () => { this.pauseEl.remove(); this.start(this.duel); } }, I.t('restart')),
       h('button', { class: 'cb-btn dark', onclick: () => this.showHow() }, I.t('howBtn')),
       (this.soundBtn = h('button', { class: 'cb-btn dark', onclick: () => this._toggleSound() }, this.sound.muted ? '🔇 ' + I.t('soundOff') : '🔊 ' + I.t('soundOn'))),
       h('button', { class: 'cb-btn dark', onclick: () => { this.pauseEl.remove(); this.showMenu(); } }, I.t('menu'))));
@@ -337,21 +387,34 @@ class Game {
 
   _result() {
     const b = this.battle; const o = b.over;
-    this.save = recordResult(this.save, this.diff, o); this.post({ type: 'save', save: this.save });
+    const duel = this.duel;
+    const hadCard = duel !== null ? this.save.campaign.album.includes(CAMPAIGN[duel].id) : true;
+    this.save = recordResult(this.save, this.battleDiff || this.diff, o);
+    if (duel !== null) this.save = recordCampaignResult(this.save, duel, o);
+    this.post({ type: 'save', save: this.save });
     this.mode = 'result';
     const won = o.state === 'won';
     const title = won ? I.t('win') : o.state === 'lost' ? I.t('lose') : I.t('draw');
-    const sub = won ? (b.base[1].hp <= 0 ? I.t('winText') : I.t('timeWin')) : o.state === 'lost' ? I.t('loseText') : I.t('drawText');
+    const sub = won ? I.t('winText') : o.state === 'lost' ? I.t('loseText') : I.t('drawText');
     const mm = `${Math.floor(o.time / 60)}:${String(Math.floor(o.time % 60)).padStart(2, '0')}`;
     this.sound.setMode(false); this.sound.play(won ? 'win' : 'lose');
     if (won) for (let i = 0; i < o.stars; i++) setTimeout(() => this.sound.play('star'), 300 + i * 350);
+    const campBtns = duel !== null ? [
+      won && !hadCard ? h('div', { class: 'cb-small cb-tourwin' }, `${CAMPAIGN[duel].icon} ${I.t('cardWon')} ${I.getLang() === 'en' ? CAMPAIGN[duel].en : CAMPAIGN[duel].ar}`) : null,
+      won && this.save.campaign.complete && duel === CAMPAIGN.length - 1 ? h('div', { class: 'cb-small cb-tourwin' }, I.t('tourDone')) : null,
+      won && duel + 1 < CAMPAIGN.length ? h('button', { class: 'cb-btn', onclick: () => this.start(duel + 1) }, I.t('nextDuel')) : null,
+      h('button', { class: 'cb-btn', onclick: () => this.start(duel) }, I.t('retryDuel')),
+      h('button', { class: 'cb-btn dark', onclick: () => this.showCampaign() }, I.t('campMap')),
+    ] : [
+      h('button', { class: 'cb-btn', onclick: () => this.start() }, I.t('again')),
+    ];
     this.layer.replaceChildren(h('div', { class: 'cb-dim' }, h('div', { class: 'cb-card' },
       h('div', { class: 'cb-title', style: won ? '' : 'color:#ff9ad8' }, title), h('div', { class: 'cb-small' }, sub),
       this._stars(o.stars, true),
       h('div', { class: 'cb-pill' }, `${I.t('baseLeft')}: ${I.num(Math.round(o.baseFrac * 100))}%`),
       h('div', { class: 'cb-small' }, `${I.t('time')} ${I.num(mm)} · ${I.t('kills')}: ${I.num(b.stats.kills)}`),
       won ? h('div', { class: 'cb-small' }, I.t('win_' + (this.girl ? 'f' : 'm'))) : null,
-      h('button', { class: 'cb-btn', onclick: () => this.start() }, I.t('again')),
+      campBtns,
       h('button', { class: 'cb-btn dark', onclick: () => this.showMenu() }, I.t('menu')))));
   }
 
@@ -386,15 +449,11 @@ class Game {
 
   _hud(force) {
     const b = this.battle;
-    const left = Math.ceil(b.timeLeft);
-    const tx = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
-    if (tx !== this.lastTx || force) { this.timerEl.textContent = I.num(tx); this.lastTx = tx; this.timerEl.parentNode.classList.toggle('hurry', left <= 10); }
-    this.x2El.style.display = b.doubled ? 'inline' : 'none';
     this.eHp.style.height = `${Math.max(0, (b.base[1].hp / b.base[1].max) * 100)}%`; this.eTx.textContent = I.num(Math.ceil(b.base[1].hp));
     this.pHp.style.height = `${Math.max(0, (b.base[0].hp / b.base[0].max) * 100)}%`; this.pTx.textContent = I.num(Math.ceil(b.base[0].hp));
     const e = b.energy;
     this.eFill.style.width = `${(e / ENERGY_MAX) * 100}%`; this.eNum.textContent = I.num(Math.floor(e));
-    this.engEl.classList.toggle('x2', b.doubled); this.eNum.classList.toggle('x2', b.doubled); this.engEl.classList.toggle('full', e >= ENERGY_MAX - 0.01);
+    this.engEl.classList.toggle('full', e >= ENERGY_MAX - 0.01);
     b.deck.hand.forEach((id, i) => {
       const c = this.cardEls[i];
       if (c.id !== id) { c.id = id; const g = c.cv.getContext('2d'); g.clearRect(0, 0, 128, 128); g.drawImage(this.icons[id], 0, 0); c.cost.textContent = I.num(CARDS[id].cost); c.nm.textContent = I.t(id); c.el.setAttribute('aria-label', `${I.t(id)} ${CARDS[id].cost}`); }
@@ -435,7 +494,6 @@ class Game {
       }
       case 'plasma': this._burst(e.x, e.y, 36, ['#35f0ff', '#fff', '#a0f0ff'], 6); this.shake = Math.max(this.shake, 7); break;
       case 'heal': this.parts.push({ x: e.x + (Math.random() - 0.5) * 0.6, y: e.y, z: 0.3, vx: 0, vy: 0, vz: 1.4, life: 0.8, max: 0.8, col: '#7affa0', size: 0.2, kind: 'plus' }); break;
-      case 'double': snd.play('double'); this.voice.say('charge'); this._say(I.t('double')); snd.setMode(true, true); break;
       case 'win': case 'lose': case 'draw': if (e.type !== 'draw') this.voice.say(e.type); this._endFx(e.type); break;
       default: break;
     }
@@ -697,9 +755,27 @@ const CSS = `
 @keyframes cbfinger{0%{transform:translateY(8px)}50%{transform:translateY(-10px)}100%{transform:translateY(8px)}}
 @keyframes cbbanner{0%{opacity:0;transform:scale(.4)}20%{opacity:1;transform:scale(1.15)}70%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.3)}}
 @keyframes cbstar{0%{transform:scale(0) rotate(-90deg);opacity:0}70%{transform:scale(1.4) rotate(10deg);opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
+.cb-wide{max-height:92%;overflow-y:auto}
+.cb-stops{display:flex;flex-direction:column;gap:calc(var(--u)*1.2);width:100%}
+.cb-stop{display:flex;align-items:center;gap:calc(var(--u)*2);font-family:inherit;color:#fff;text-align:start;border:calc(var(--u)*.5) solid #5a6ac8;border-radius:calc(var(--u)*3);background:linear-gradient(180deg,#2a2080,#140a48);padding:calc(var(--u)*1.4) calc(var(--u)*2.5);cursor:pointer}
+.cb-stop.done{border-color:#5aff9a}
+.cb-stop.locked{opacity:.45;cursor:default}
+.cb-stop-ic{font-size:calc(var(--u)*6)}
+.cb-stop-tx{flex:1;display:flex;flex-direction:column}
+.cb-stop-tx b{font-size:calc(var(--u)*4.2)}
+.cb-stop-tx i{font-style:normal;font-size:calc(var(--u)*3);color:#a8c8ff}
+.cb-stop-st{font-size:calc(var(--u)*4.5)}
+.cb-tourwin{color:#ffe86a;font-size:calc(var(--u)*4)}
+.cb-album{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--u)*1.6);width:100%}
+.cb-acard{border-radius:calc(var(--u)*2.6);background:linear-gradient(180deg,#3d2c92,#170c4c);border:calc(var(--u)*.55) solid #ffd23a;box-shadow:0 0 calc(var(--u)*2) rgba(255,210,58,.35);padding:calc(var(--u)*2) calc(var(--u)*1);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.6);text-align:center}
+.cb-acard.locked{border-color:#5a6ac8;box-shadow:none;filter:saturate(.3) brightness(.7)}
+.cb-acard-ic{font-size:calc(var(--u)*8)}
+.cb-acard-nm{font-size:calc(var(--u)*3.4);font-weight:900}
+.cb-acard-sub{font-size:calc(var(--u)*2.6);color:#a8c8ff}
+.cb-duelpill{position:absolute;top:calc(var(--u)*19);left:50%;transform:translateX(-50%);background:rgba(20,10,70,.85);border:calc(var(--u)*.4) solid #ffd23a;border-radius:999px;color:#fff;font-weight:900;font-size:calc(var(--u)*3.4);padding:calc(var(--u)*.8) calc(var(--u)*3.5);white-space:nowrap;pointer-events:none;z-index:3}
 `;
 
-void MATCH_TIME; void DIFFS;
+void DIFFS;
 const api = { start(el, config, post) { const g = new Game(el, config || {}, post); api.last = g; return { dispose: () => g.dispose(), pause: () => g.pause() }; } };
 window.CardBattle = api;
 export default api;

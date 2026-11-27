@@ -8,10 +8,8 @@ export const W = 10;
 export const L = 16;
 export const HALF = 8;
 export const CX = 5;
-export const MATCH_TIME = 150;
-export const DOUBLE_AT = 60; // energy flows twice as fast when this many seconds (or less) are left
+export const REGEN = 1 / 2.8; // energy per second — constant: there is no match clock and no late-match surge
 export const ENERGY_MAX = 10;
-export const REGEN = 1 / 2.8; // energy per second
 export const START_ENERGY = 5;
 export const BASE_HP = 1000;
 export const BASE_R = 1.25;
@@ -118,7 +116,6 @@ export class Battle {
     this.acc = 0;
     this.state = 'play';
     this.over = null;
-    this.doubled = false;
     this.energy = START_ENERGY;
     this.aiEnergy = this.dp.aiStart;
     this.base = [
@@ -135,9 +132,8 @@ export class Battle {
     this.stats = { played: 0, kills: 0, lost: 0 };
   }
 
-  get timeLeft() { return Math.max(0, MATCH_TIME - this.tick * DT); }
   get alpha() { return this.acc / DT; }
-  get energyRate() { return REGEN * (this.timeLeft <= DOUBLE_AT ? 2 : 1); }
+  get energyRate() { return REGEN; }
   _ev(e) { this.events.push(e); }
 
   /** Where may this card be dropped? Units and the turret: own half. Spells: anywhere in the arena. */
@@ -217,9 +213,7 @@ export class Battle {
 
   _tick() {
     this.tick++;
-    const tl = this.timeLeft;
-    const rate = REGEN * (tl <= DOUBLE_AT ? 2 : 1);
-    if (!this.doubled && tl <= DOUBLE_AT) { this.doubled = true; this._ev({ type: 'double' }); }
+    const rate = REGEN;
     this.energy = Math.min(ENERGY_MAX, this.energy + rate * DT);
     this.aiEnergy = Math.min(ENERGY_MAX, this.aiEnergy + rate * DT * this.dp.aiRegen);
     for (const u of this.units) { u.px = u.x; u.py = u.y; }
@@ -469,7 +463,7 @@ export class Battle {
     this.state = state;
     const pf = this.base[0].hp / this.base[0].max;
     const stars = state === 'won' ? 1 + (pf >= 0.5 ? 1 : 0) + (pf >= 0.85 ? 1 : 0) : 0;
-    this.over = { state, stars, baseHp: Math.max(0, Math.round(this.base[0].hp)), baseFrac: Math.max(0, pf), time: Math.min(MATCH_TIME, this.tick * DT) };
+    this.over = { state, stars, baseHp: Math.max(0, Math.round(this.base[0].hp)), baseFrac: Math.max(0, pf), time: this.tick * DT };
     this._ev({ type: state === 'won' ? 'win' : state === 'lost' ? 'lose' : 'draw', stars });
   }
 
@@ -479,13 +473,7 @@ export class Battle {
     if (p <= 0 && e <= 0) this._end('draw');
     else if (e <= 0) this._end('won');
     else if (p <= 0) this._end('lost');
-    else if (this.tick >= Math.round(MATCH_TIME / DT)) {
-      const pf = p / this.base[0].max;
-      const ef = e / this.base[1].max;
-      if (pf > ef + 1e-9) this._end('won');
-      else if (pf < ef - 1e-9) this._end('lost');
-      else this._end('draw');
-    }
+    // no clock: a match ends only when a base falls — the child plays at their own pace
   }
 }
 
@@ -528,11 +516,41 @@ export class AI {
   }
 }
 
-// ---- saved progress (stars per difficulty, wins, the tutorial flag, sound) ----------------------------------------------
+export const DIFF_RANK = { easy: 0, normal: 1, hard: 2, expert: 3, legend: 4 };
+
+// ---- the Nile campaign (Phase 2E, Batch F): 8 duels, south → north along the Nile -------------------------------
+// HONEST NOTE on theming: the sim has NO deck-selection system — the Overlord's AI always
+// draws from the single shared ALIEN_CARDS pool with hard-coded preference orders (see AI.update).
+// So a duel cannot honestly restrict the opponent's deck. Each duel is therefore themed
+// MECHANICALLY by its difficulty key (the rising curve below, the only per-match knob the sim
+// offers) and NARRATIVELY by `focus` — the alien kind the place is famous for in its flavour
+// text. `focus` is descriptive only; it does not change which cards the AI may play.
+export const CAMPAIGN = [
+  { id: 'aswan', ar: 'أسوان', en: 'Aswan', icon: '🌴', diff: 'easy', focus: ['bug'], foeAr: 'حارس أسوان', foeEn: 'the Aswan Guard' },
+  { id: 'philae', ar: 'جزيرة فيلة', en: 'Philae Island', icon: '🏝️', diff: 'easy', focus: ['spitter'], foeAr: 'حارسة فيلة', foeEn: 'the Philae Keeper' },
+  { id: 'luxor', ar: 'معبد الأقصر', en: 'Luxor Temple', icon: '🏛️', diff: 'normal', focus: ['slime'], foeAr: 'حارس الأقصر', foeEn: 'the Luxor Guard' },
+  { id: 'saqqara', ar: 'سقارة', en: 'Saqqara', icon: '🔺', diff: 'normal', focus: ['bug', 'slime'], foeAr: 'حارس سقارة', foeEn: 'the Saqqara Guard' },
+  { id: 'giza', ar: 'أهرامات الجيزة', en: 'Giza Pyramids', icon: '🐪', diff: 'hard', focus: ['brute'], foeAr: 'عملاق الجيزة', foeEn: 'the Giza Giant' },
+  { id: 'oldcairo', ar: 'القاهرة القديمة', en: 'Old Cairo', icon: '🕌', diff: 'expert', focus: ['spitter', 'slime'], foeAr: 'بطل القاهرة القديمة', foeEn: 'the Old Cairo Champion' },
+  { id: 'qaitbey', ar: 'قلعة قايتباي', en: 'Qaitbey Citadel', icon: '🏰', diff: 'expert', focus: ['brute', 'spitter'], foeAr: 'قائد قايتباي', foeEn: 'the Qaitbey Captain' },
+  { id: 'gem', ar: 'المتحف المصري الكبير', en: 'Grand Egyptian Museum', icon: '🏺', diff: 'expert', focus: ['slime', 'bug', 'brute', 'spitter'], foeAr: 'البطل الأخير', foeEn: 'the Grand Champion' },
+];
+
+// ---- saved progress (stars per difficulty, wins, the tutorial flag, sound, the campaign) ---------------------------
 export function normalizeSave(s) {
   const o = s && typeof s === 'object' ? s : {};
   const st = o.stars && typeof o.stars === 'object' ? o.stars : {};
   const n = (v, max) => (Number.isFinite(+v) ? Math.max(0, Math.min(max, Math.floor(+v))) : 0);
+  // Campaign: old saves have no `campaign` field at all — they migrate to a fresh tour
+  // (duel 1 unlocked, nothing won, empty album) and lose nothing else.
+  const c = o.campaign && typeof o.campaign === 'object' ? o.campaign : {};
+  const wonRaw = Array.isArray(c.won) ? c.won : [];
+  const won = CAMPAIGN.map((_, i) => !!wonRaw[i]);
+  const albumSet = new Set(Array.isArray(c.album) ? c.album.filter((id) => CAMPAIGN.some((d) => d.id === id)) : []);
+  won.forEach((w, i) => { if (w) albumSet.add(CAMPAIGN[i].id); }); // a won duel always owns its landmark card
+  const album = CAMPAIGN.filter((d) => albumSet.has(d.id)).map((d) => d.id);
+  const highestWon = won.reduce((m, w, i) => (w ? Math.max(m, i + 1) : m), 0);
+  const unlocked = Math.max(1, Math.min(CAMPAIGN.length, Math.max(n(c.unlocked, CAMPAIGN.length), highestWon + (highestWon < CAMPAIGN.length ? 1 : 0) || 1)));
   return {
     stars: { easy: n(st.easy, 3), normal: n(st.normal, 3), hard: n(st.hard, 3), expert: n(st.expert, 3), legend: n(st.legend, 3) },
     wins: n(o.wins, 1e6),
@@ -540,7 +558,33 @@ export function normalizeSave(s) {
     muted: !!o.muted,
     tutorial: !!o.tutorial,
     diff: DIFFS[o.diff] ? o.diff : 'easy',
+    campaign: { unlocked, won, album, complete: won.every(Boolean) },
   };
+}
+
+/** Is campaign duel `idx` (0-based) playable in this save? Won duels stay replayable. */
+export function campaignUnlocked(save, idx) {
+  const s = normalizeSave(save);
+  return Number.isInteger(idx) && idx >= 0 && idx < CAMPAIGN.length && idx < s.campaign.unlocked;
+}
+
+/**
+ * Record a campaign duel result. Winning marks the duel, awards its landmark card
+ * (never a duplicate) and unlocks the next duel; winning duel 8 completes the tour.
+ * A loss or draw changes nothing — gentle retry, no penalty. Plays/stars are NOT
+ * touched here (recordResult owns those, so a campaign match counts exactly once).
+ */
+export function recordCampaignResult(save, idx, over) {
+  const s = normalizeSave(save);
+  if (!Number.isInteger(idx) || idx < 0 || idx >= CAMPAIGN.length) return s;
+  if (!over || over.state !== 'won') return s;
+  s.campaign.won[idx] = true;
+  const id = CAMPAIGN[idx].id;
+  if (!s.campaign.album.includes(id)) s.campaign.album.push(id);
+  s.campaign.album = CAMPAIGN.filter((d) => s.campaign.album.includes(d.id)).map((d) => d.id);
+  s.campaign.unlocked = Math.max(s.campaign.unlocked, Math.min(CAMPAIGN.length, idx + 2));
+  s.campaign.complete = s.campaign.won.every(Boolean);
+  return s;
 }
 
 export function recordResult(save, difficulty, over) {
