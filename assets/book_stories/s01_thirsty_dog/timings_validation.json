@@ -1,0 +1,121 @@
+[
+ {
+  "page": "title",
+  "audio": "s01_title.mp3",
+  "duration_s": 4.4,
+  "sentences": 1,
+  "pauses_detected": 1,
+  "boundaries_anchored": "0/0",
+  "speech_coverage": 0.74,
+  "first_word_ms": 231,
+  "last_word_end_ms": 4094,
+  "flags": [],
+  "status": "OK"
+ },
+ {
+  "page": "p01",
+  "audio": "s01_p01.mp3",
+  "duration_s": 9.32,
+  "sentences": 1,
+  "pauses_detected": 2,
+  "boundaries_anchored": "2/2",
+  "speech_coverage": 0.829,
+  "first_word_ms": 286,
+  "last_word_end_ms": 9025,
+  "flags": [],
+  "status": "OK"
+ },
+ {
+  "page": "p02",
+  "audio": "s01_p02.mp3",
+  "duration_s": 10.12,
+  "sentences": 2,
+  "pauses_detected": 4,
+  "boundaries_anchored": "3/3",
+  "speech_coverage": 0.674,
+  "first_word_ms": 353,
+  "last_word_end_ms": 9876,
+  "flags": [],
+  "status": "OK"
+ },
+ {
+  "page": "p03",
+  "audio": "s01_p03.mp3",
+  "duration_s": 11.88,
+  "sentences": 3,
+  "pauses_detected": 5,
+  "boundaries_anchored": "4/4",
+  "speech_coverage": 0.597,
+  "first_word_ms": 322,
+  "last_word_end_ms": 11583,
+  "flags": [],
+  "status": "OK"
+ },
+ {
+  "page": "p04",
+  "audio": "s01_p04.mp3",
+  "duration_s": 9.52,
+  "sentences": 1,
+  "pauses_detected": 2,
+  "boundaries_anchored": "2/2",
+  "speech_coverage": 0.758,
+  "first_word_ms": 293,
+  "last_word_end_ms": 9087,
+  "flags": [],
+  "status": "OK"
+ },
+ {
+  "page": "p05",
+  "audio": "s01_p05.mp3",
+  "duration_s": 5.64,
+  "sentences": 1,
+  "pauses_detected": 1,
+  "boundaries_anchored": "1/1",
+  "speech_coverage": 0.764,
+  "first_word_ms": 244,
+  "last_word_end_ms": 5362,
+  "flags": [],
+  "status": "OK"
+ },
+ {
+  "page": "p06",
+  "audio": "s01_p06.mp3",
+  "duration_s": 10.08,
+  "sentences": 1,
+  "pauses_detected": 3,
+  "boundaries_anchored": "2/2",
+  "speech_coverage": 0.771,
+  "first_word_ms": 0,
+  "last_word_end_ms": 9808,
+  "flags": [],
+  "status": "OK"
+ },
+ {
+  "page": "p07",
+  "audio": "s01_p07.mp3",
+  "duration_s": 8.72,
+  "sentences": 2,
+  "pauses_detected": 3,
+  "boundaries_anchored": "3/3",
+  "speech_coverage": 0.707,
+  "first_word_ms": 363,
+  "last_word_end_ms": 8389,
+  "flags": [],
+  "status": "OK"
+ },
+ {
+  "page": "p08",
+  "audio": "s01_p08.mp3",
+  "duration_s": 17.04,
+  "sentences": 3,
+  "pauses_detected": 3,
+  "boundaries_anchored": "3/5",
+  "speech_coverage": 0.786,
+  "first_word_ms": 0,
+  "last_word_end_ms": 16656,
+  "flags": [
+   "only 3/5 clause boundaries anchored to a detected pause — the rest are interpolated"
+  ],
+  "status": "SUSPICIOUS"
+ }
+]
