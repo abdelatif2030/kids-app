@@ -11,6 +11,13 @@ export const MAX_BALLS = 99999;
 export const FRONT = 3.9; // the shovel lip is this far ahead of the truck origin
 export const THEMES = ['meadow', 'desert', 'snow', 'candy', 'space'];
 export const themeOf = (lv) => THEMES[Math.min(4, Math.floor(lv / 6))];
+/** Which shipped panorama (art/pano<N>.webp) belongs to each theme — matched by what the painting
+    actually shows, NOT by rotation: meadow levels run the sea bridge (Alexandria/Qaitbay coast),
+    desert runs the Old Cairo bazaar, candy is the funfair, space is the rainbow sky road.
+    Snow has NO truthful painting (none of the six is a winter scene), so it keeps its code-drawn
+    world with no ring (0). The treasure-vault painting (6) is the finale: the last level only. */
+export const THEME_PANO = { meadow: 3, desert: 2, snow: 0, candy: 1, space: 5 };
+export const panoOf = (lv) => (lv >= LEVELS - 1 ? 6 : THEME_PANO[themeOf(lv)] ?? 0);
 export const UPG = [
   { id: 'start', ar: 'كور بداية', en: 'Start balls', icon: '🔴', base: 40, grow: 1.55, max: 8, per: 8 },
   { id: 'wide', ar: 'مجرفة أعرض', en: 'Wider shovel', icon: '↔️', base: 60, grow: 1.7, max: 6, per: 0.3 },

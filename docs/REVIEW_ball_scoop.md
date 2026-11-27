@@ -15,3 +15,38 @@ Meadow theme is now sea blue sky/water, orange planks, red/white rails, white cl
 
 ## Still different
 No ball icon inside the bubble; camera angle and gate frame width not changed; other themes (desert, snow, candy, space) are the game's own extras.
+
+## Phase 2B (Batch B2) — panorama ↔ theme alignment
+The backdrop ring was chosen by a 5-level rotation (`floor(level/5)+1`) while themes change
+every 6 levels, so backdrops drifted out of their worlds (a candy funfair behind the sea
+bridge, the Alexandria coast behind snow…). Now `panoOf(level)` in sim.js keys the painting
+to the theme by what it actually depicts: meadow/sea → pano3 (Alexandria, Qaitbay Citadel),
+desert → pano2 (Old Cairo bazaar), candy → pano1 (funfair), space → pano5 (rainbow sky
+road), finale level 30 → pano6 (treasure vault). Snow has no truthful painting among the
+six, so it keeps its code-drawn world with no ring rather than a wrong picture.
+Tests: new regression test asserts pano constancy inside a theme, the five mappings, the
+finale override and that all six files exist — `npm test` 9/9, build ok. Playtest
+(phase2b_verify.mjs, real clicks): level 1 shows pano3 visible; snow level 13 has no ring;
+finale shows pano6; zero page errors. Frames in ~/workspace/projects/audit/shots_phase2b/.
+
+---
+
+## Phase 2D — Egypt anchor: «جولة الكورنيش / Corniche Scoop Tour» (2026-11-27)
+
+**What changed (names only):** the title «شاحنة عمورة / Amoora's Truck»
+→ **«جولة الكورنيش / Corniche Scoop Tour»**, and the five theme names
+now tell the truth about the panoramas Phase 2B matched to them:
+meadow → **Qaitbey Coast** (its pano is the Alexandria/Qaitbey sea
+bridge), desert → **Khan el-Khalili** (the Old Cairo bazaar pano),
+snow → **Catherine Snow** (code-drawn, no pano), candy → **Moulid
+Funfair**, space → **Rainbow Sky Road**. Theme keys, pano mapping,
+levels, upgrades and saves are unchanged.
+
+**Tested:** `npm test` 10/10 (+1 anchor test; one import fix in the
+test file on the way). Build green. Click-flow: menu title via the
+harness; gameplay confirmed with a single-click check — level-1 run
+HUD with the 150-ball goal, 0 page errors; menu frames at 3 sizes.
+
+**Not done (Batch F):** a named 30-stop tour card (each level a
+Corniche stop from Qaitbey to Montazah) is not built. Not tested on a
+real device.

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Run, buildRoad, levelLen, LEVELS, UPG, upgradeCost, normalizeSave, robotRun, robotSteer, goalFor, themeOf, THEMES, FIN } from '../src/sim.js';
+import { Run, buildRoad, levelLen, LEVELS, UPG, upgradeCost, normalizeSave, robotRun, robotSteer, goalFor, themeOf, panoOf, THEMES, THEME_PANO, FIN } from '../src/sim.js';
 import { Pile, capFor } from '../src/pile.js';
 
 test('thirty levels in five themes, each road longer, ending at the bank', () => {
@@ -110,4 +110,32 @@ test('physics: the bank finale pours the pile into the pit and keeps the count',
   assert.equal(run.state, 'done');
   assert.ok(run.coins > 0);
   assert.ok(pile.bankStart > 0 && pile.banked >= pile.bankStart * 0.6, `banked ${pile.banked}/${pile.bankStart}`);
+});
+
+test('panoramas follow the theme, not a rotation (B2: pano keyed to what the painting shows)', async () => {
+  const { existsSync } = await import('node:fs');
+  const { fileURLToPath } = await import('node:url');
+  const artDir = fileURLToPath(new URL('../../../assets/games/ball_scoop/art/', import.meta.url));
+  // pano changes exactly at theme boundaries (every 6 levels), never mid-theme
+  // (the single exception is the finale override, asserted separately below)
+  for (let lv = 0; lv < LEVELS - 2; lv++) {
+    if (themeOf(lv) === themeOf(lv + 1)) assert.equal(panoOf(lv), panoOf(lv + 1), `levels ${lv}/${lv + 1} share a theme but not a pano`);
+  }
+  assert.equal(panoOf(0), 3, 'sea-bridge meadow levels fly the Alexandria coast');
+  assert.equal(panoOf(6), 2, 'desert levels run the Old Cairo bazaar');
+  assert.equal(panoOf(12), 0, 'snow has no truthful painting: no ring');
+  assert.equal(panoOf(18), 1, 'candy levels get the funfair');
+  assert.equal(panoOf(24), 5, 'space levels get the rainbow sky road');
+  assert.equal(panoOf(LEVELS - 1), 6, 'the finale gets the treasure vault');
+  for (let n = 1; n <= 6; n++) assert.ok(existsSync(`${artDir}pano${n}.webp`), `missing pano${n}.webp`);
+});
+
+import fs from 'node:fs';
+
+test('Corniche Scoop Tour anchor: theme names match the panoramas\' true places', () => {
+  const main = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes("title: ['جولة الكورنيش', 'Corniche Scoop Tour']"));
+  assert.ok(main.includes("'Qaitbey Coast'") && main.includes("'Khan el-Khalili'") && main.includes("'Moulid Funfair'"));
+  assert.deepEqual(THEMES, ['meadow', 'desert', 'snow', 'candy', 'space']); // keys unchanged
+  assert.equal(THEME_PANO.meadow, 3); // pano mapping from Phase 2B unchanged
 });

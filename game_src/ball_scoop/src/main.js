@@ -6,7 +6,7 @@
 // a GOAL per level (stars), a bank finale where the shovel tips everything into the giant bank, and a coin shop.
 // three.js, art and sound made in code. No network, no ads.
 import * as THREE from 'three';
-import { Run, LEVELS, UPG, HALF, FIN, THEMES, themeOf, upgradeCost, normalizeSave, goalFor, robotSteer, shovelW } from './sim.js';
+import { Run, LEVELS, UPG, HALF, FIN, THEMES, themeOf, panoOf, upgradeCost, normalizeSave, goalFor, robotSteer, shovelW } from './sim.js';
 import { Pile, heapPoints, DECOR_MAX } from './pile.js';
 import { R, TUB, tubBoxes } from './physics.js';
 import { Sound } from './audio.js';
@@ -16,13 +16,13 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 const SCOOP_CLIPS = { go: 2, pickup: 2, charge: 3, bump: 2, win: 2 };
 
 const S = {
-  title: ['شاحنة عمورة', "Amoora's Truck"], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
+  title: ['جولة الكورنيش', 'Corniche Scoop Tour'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
   next: ['المرحلة الجاية', 'Next level'], level: ['المرحلة', 'LEVEL'], goal: ['الهدف', 'GOAL'], play: ['يلا نلعب', 'Play'], levels: ['المراحل', 'Levels'],
   how: ['اسحب يمين وشمال — جمّع الكور، اعدّي من البوابات، واتفادى الحيطان', 'Drag left and right: scoop balls, pass gates, dodge walls'],
   bank: ['البنك الكبير', 'The giant bank'], coins: ['عملات', 'coins'], shop: ['المتجر', 'Shop'], max: ['أقصى', 'MAX'], locked: ['خلّص المرحلة اللي قبلها', 'Finish the level before'],
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'], sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'], balls: ['كور', 'balls'], best: ['أحسن', 'Best'],
   hitWall: ['الحيطة وقّعت كور!', 'The wall knocked balls out!'], buy: ['اشتري', 'Buy'], back: ['رجوع', 'Back'], banked: ['في البنك', 'In the bank'],
-  meadow: ['المرج', 'Meadow'], desert: ['الصحراء', 'Desert'], snow: ['الثلج', 'Snow'], candy: ['الحلوى', 'Candy'], space: ['الفضاء', 'Space'],
+  meadow: ['ساحل قلعة قايتباي', 'Qaitbey Coast'], desert: ['خان الخليلي', 'Khan el-Khalili'], snow: ['ثلج سانت كاترين', 'Catherine Snow'], candy: ['ملاهي المولد', 'Moulid Funfair'], space: ['طريق قوس قزح', 'Rainbow Sky Road'],
   start: ['كور بداية', 'Start balls'], wide: ['مجرفة أعرض', 'Wider shovel'], coin: ['عملات أكتر', 'Coin value'], magnet: ['مغناطيس', 'Magnet range'], armor: ['درع للحيطان', 'Wall armour'],
 };
 const I = makeI18n(S);
@@ -161,7 +161,7 @@ class Game {
   _followPano() { if (this.panoMesh) this.panoMesh.position.set(this.camera.position.x, this.camera.position.y + 60, this.camera.position.z); }
 
   _buildWorld(run) {
-    this._setPano(Math.min(6, Math.floor(run.level / 5) + 1));
+    this._setPano(panoOf(run.level));
     for (const c of [...this.world.children]) { this.world.remove(c); c.traverse?.((o) => { if (o.isInstancedMesh) o.dispose(); }); }
     if (this.truck) this.scene.remove(this.truck);
     const th = THEME[run.theme];
