@@ -9,7 +9,18 @@ import { View3D } from './view3d.js';
 import { setLang, setGirl, getLang, t, num } from './i18n.js';
 import { h, css } from '../../cozy_kit/ui.js';
 
-const CSS = css('cr', '#3aa8d8', '#1a6a98', '#ffd23a');
+const CSS = css('cr', '#3aa8d8', '#1a6a98', '#ffd23a') + `@media (orientation:landscape){.cr-bot{left:auto!important;right:calc(var(--u)*2)!important;flex-direction:column;align-items:flex-end;justify-content:flex-end}.cr-bot[style]{bottom:calc(var(--u)*26)!important}.cr-lvico{display:inline-block;width:calc(var(--u)*5);height:calc(var(--u)*5)}}.cr-lvico{display:inline-block;width:calc(var(--u)*7);height:calc(var(--u)*7)}`;
+const LVSV = [
+  '<path d="M24 6v20" stroke="#7a4a1c" stroke-width="4" stroke-linecap="round"/><path d="M24 8Q10 6 6 18Q16 10 24 14ZM24 8Q38 6 42 18Q32 10 24 14ZM24 12Q12 16 12 28Q18 18 24 18ZM24 12Q36 16 36 28Q30 18 24 18Z" fill="#3ac86a" stroke="#14602a" stroke-width="1.5"/><path d="M6 40Q24 30 42 40Z" fill="#f0d890" stroke="#8a6a20" stroke-width="2"/>',
+  '<rect x="6" y="18" width="36" height="12" rx="6" fill="#c48a46" stroke="#6a4010" stroke-width="2.5"/><circle cx="38" cy="24" r="4" fill="#e8c080" stroke="#6a4010" stroke-width="2"/>',
+  '<path d="M6 40Q24 34 42 40" stroke="#fff" stroke-width="3" fill="none"/><path d="M12 36Q22 8 24 8Q26 24 38 36Z" fill="#5a6a8a" stroke="#2a3050" stroke-width="2.5" stroke-linejoin="round"/>',
+  '<path d="M6 40L14 16 26 8 38 18 42 40Z" fill="#9a9aa8" stroke="#3a3a48" stroke-width="2.5" stroke-linejoin="round"/>',
+  '<path d="M24 42V24M24 30Q14 28 12 16M24 24Q34 22 36 10M24 34Q32 32 38 26" stroke="#ff7a8a" stroke-width="4" fill="none" stroke-linecap="round"/>',
+  '<path d="M12 28a8 8 0 010-16 10 10 0 0118 -2 8 8 0 018 18z" fill="#8a96b0" stroke="#3a4060" stroke-width="2.5"/><path d="M24 28l-6 12 8-5-3 10 10-14h-7l4-8z" fill="#ffe14a" stroke="#a07a00" stroke-width="2"/>',
+  '<path d="M4 30Q10 14 28 16Q40 18 44 10Q44 30 30 36Q12 40 4 30Z" fill="#3a6aa8" stroke="#1a3060" stroke-width="2.5"/><circle cx="14" cy="26" r="2" fill="#fff"/>',
+  '<path d="M24 6L38 16 32 40H16L10 16z" fill="#6ad8ff" stroke="#1a5a8a" stroke-width="2.5" stroke-linejoin="round"/><path d="M10 16h28M24 6l-4 10 4 24 4-24z" fill="none" stroke="#fff" stroke-width="1.8"/>',
+];
+const lvIcon = (i) => { const d = document.createElement('span'); d.className = 'cr-lvico'; d.innerHTML = `<svg viewBox="0 0 48 48" width="100%" height="100%">${LVSV[i % 8]}</svg>`; return d; };
 const ICON = { wood: '🪵', crate: '📦', barrel: '🛢️', bottle: '🍾' };
 const CELLS = [[1, 1], [0, 1], [1, 2], [0, 2], [1, 0], [0, 0], [2, 1], [2, 2], [2, 0]];
 const BUILD_ICON = { tile: '🟫', sail: '⛵', fish: '🎣', hut: '🛖' };
@@ -103,9 +114,9 @@ class Game {
       const lock = l.id > this.save.unlocked;
       const st = this.save.stars[l.id] || 0;
       return h('button', { class: `cr-lv${lock ? ' lock' : ''}`, 'aria-label': `${t('level')} ${l.id}`, onclick: () => { if (lock) { this.hint(t('locked')); return; } this.sound.play('tap'); this.start(i); } },
-        h('i', {}, lock ? '🔒' : ['🌴', '🪵', '🦈', '🪨', '🪸', '⛈️', '🐋', '💎'][i]),
+        h('i', {}, lock ? '🔒' : lvIcon(i)),
         h('span', {}, num(l.id)),
-        h('span', {}, '⭐'.repeat(st) || '·'));
+        h('span', {}, '★'.repeat(st) || '·'));
     }));
     this.layer.append(h('div', { class: 'cr-dim' },
       h('div', { class: 'cr-card' },

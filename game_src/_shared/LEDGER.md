@@ -61,3 +61,4 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 - AUDIT TODO: menubg.js covers gameplay with poster whenever an element with class containing -panel/-tracks is visible. Check in-game panels in: carnival_race coastal_drive dune_titans fashion_queen golden_tail happy_farm moto_race ocean_defense pumpkin_pie rain_circuit rhythm samurai space_store splash_race zombie_rooftop (screenshot gameplay in landscape; rename in-game panel class if poster shows).
 - gem_quarry menu: hero beside the card, blurred live 3D backdrop; level select bigger names. (frame-checked; hero size reduced to avoid card overlap, not re-recorded)
 - castaway_raft v2: hat brim raised (face visible), front fill light, hero + raft bigger. HUD buttons still cover the lower raft; menu level buttons use emoji palm.
+- castaway_raft: landscape HUD moved to the right column (raft uncovered); level-select emoji replaced with drawn SVG icons (not screenshot-verified).
