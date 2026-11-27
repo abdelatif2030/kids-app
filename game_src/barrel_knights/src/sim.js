@@ -4,9 +4,7 @@
 export const PITCH = { hw: 15, hl: 20, gate: 5, pocket: 3.5 };
 export const BARREL_R = 1.6; // the video's barrel is about three knights wide
 export const KNIGHT_R = 0.7;
-export const MATCH_TIME = 60; // the video: one minute, first to two
-export const GOAL_LIMIT = 2;
-export const OVERTIME = 30;
+export const GOAL_LIMIT = 2; // first to two goals — untimed: there is no match clock and no overtime
 export const DIFFS = ['easy', 'normal', 'hard'];
 const KNIGHT_SPEED = 7.2, DASH_SPEED = 17.5, DASH_TIME = 0.28, ACCEL = 40;
 const DOOR_HALF = 1.9, DOOR_CLOSED = 5, DOOR_WARN = 1.4, DOOR_OPEN = 2.4;
@@ -14,15 +12,15 @@ const BOULDER_R = 1.1, BOULDER_WARN = 1.6, BOULDER_SPEED = 11;
 const MUD_R = 3.2;
 
 export const ROUNDS = [
-  { id: 'squire', ar: 'كأس الفرسان الصغار', en: 'Squire Cup', skill: 0, mud: 0, doors: 0, boulderEvery: 0, look: 'day' },
-  { id: 'meadow', ar: 'كأس المرج', en: 'Meadow Cup', skill: 0.04, mud: 2, doors: 0, boulderEvery: 0, look: 'day' },
-  { id: 'trap', ar: 'كأس الأبواب السرية', en: 'Trapdoor Cup', skill: 0.08, mud: 0, doors: 2, boulderEvery: 0, look: 'day' },
-  { id: 'rock', ar: 'كأس الصخور', en: 'Boulder Cup', skill: 0.12, mud: 0, doors: 0, boulderEvery: 9, look: 'dusk' },
-  { id: 'swamp', ar: 'كأس المستنقع', en: 'Swamp Cup', skill: 0.16, mud: 4, doors: 2, boulderEvery: 0, look: 'dusk' },
-  { id: 'castle', ar: 'كأس القلعة', en: 'Castle Cup', skill: 0.2, mud: 2, doors: 4, boulderEvery: 9, look: 'dusk' },
-  { id: 'storm', ar: 'كأس العاصفة', en: 'Storm Cup', skill: 0.24, mud: 3, doors: 4, boulderEvery: 7, look: 'night' },
-  { id: 'dragon', ar: 'كأس التنين', en: 'Dragon Cup', skill: 0.28, mud: 4, doors: 6, boulderEvery: 6, look: 'night' },
-  { id: 'royal', ar: 'الكأس الملكي', en: 'Royal Final', skill: 0.32, mud: 4, doors: 6, boulderEvery: 5.5, look: 'royal', final: true },
+  { id: 'squire', ar: 'كأس ساحة القلعة', en: 'Citadel Yard Cup', skill: 0, mud: 0, doors: 0, boulderEvery: 0, look: 'day' },
+  { id: 'meadow', ar: 'كأس حديقة القلعة', en: 'Citadel Garden Cup', skill: 0.04, mud: 2, doors: 0, boulderEvery: 0, look: 'day' },
+  { id: 'trap', ar: 'كأس الأبواب السرية', en: 'Secret Doors Cup', skill: 0.08, mud: 0, doors: 2, boulderEvery: 0, look: 'day' },
+  { id: 'rock', ar: 'كأس أسوار القلعة', en: 'Citadel Walls Cup', skill: 0.12, mud: 0, doors: 0, boulderEvery: 9, look: 'dusk' },
+  { id: 'swamp', ar: 'كأس خندق القلعة', en: 'Citadel Moat Cup', skill: 0.16, mud: 4, doors: 2, boulderEvery: 0, look: 'dusk' },
+  { id: 'castle', ar: 'كأس برج القلعة', en: 'Citadel Tower Cup', skill: 0.2, mud: 2, doors: 4, boulderEvery: 9, look: 'dusk' },
+  { id: 'storm', ar: 'كأس القلعة في العاصفة', en: 'Citadel Storm Cup', skill: 0.24, mud: 3, doors: 4, boulderEvery: 7, look: 'night' },
+  { id: 'dragon', ar: 'كأس الفوانيس', en: 'Lantern Cup', skill: 0.28, mud: 4, doors: 6, boulderEvery: 6, look: 'night' },
+  { id: 'royal', ar: 'نهائي كأس القلعة', en: 'Citadel Grand Final', skill: 0.32, mud: 4, doors: 6, boulderEvery: 5.5, look: 'royal', final: true },
 ];
 export const DOOR_SPOTS = [[-8, -6], [8, 6], [8, -6], [-8, 6], [0, -12], [0, 12], [-9, -15], [9, 15]];
 export const MUD_SPOTS = [[-7, 0], [7, 0], [0, -9], [0, 9], [-9, -12], [9, 12]];
@@ -102,7 +100,7 @@ export class Match {
     this.dashBuf = 0;
     const base = { easy: 0.04, normal: 0.42, hard: 0.68 }[this.diff];
     this.skill = [{ easy: 0.75, normal: 0.55, hard: 0.5 }[this.diff], clamp(base + this.cfg.skill - (this.young ? 0.15 : 0), 0, 1)];
-    this.score = [0, 0]; this.timeLeft = MATCH_TIME; this.overtime = false; this.t = 0; this.playTime = 0;
+    this.score = [0, 0]; this.t = 0; this.playTime = 0;
     this.goalLimit = GOAL_LIMIT;
     this.ev = [];
     this.knights = [];
@@ -177,7 +175,7 @@ export class Match {
       if (this.phaseT <= 0) this._afterGoal();
       return;
     }
-    this.playTime += h; this.timeLeft -= h;
+    this.playTime += h;
     this._control(h); this._hazards(h); this._physics(h, true);
     const b = this.barrel;
     if (Math.abs(b.x) < PITCH.gate && Math.abs(b.z) > PITCH.hl + 0.3) {
@@ -186,21 +184,11 @@ export class Match {
       this._emit({ type: 'goal', team, score: this.score.slice() });
       return;
     }
-    if (this.timeLeft <= 0) {
-      this.timeLeft = 0;
-      if (this.score[0] !== this.score[1]) this._end();
-      else if (!this.overtime) { this.overtime = true; this.timeLeft = OVERTIME; this._emit({ type: 'overtime' }); }
-      else this._end();
-    }
   }
 
   _afterGoal() {
     const mx = Math.max(this.score[0], this.score[1]);
-    if (mx >= this.goalLimit || this.overtime) return this._end();
-    if (this.timeLeft <= 0) {
-      if (this.score[0] !== this.score[1]) return this._end();
-      this.overtime = true; this.timeLeft = OVERTIME; this._emit({ type: 'overtime' });
-    }
+    if (mx >= this.goalLimit) return this._end();
     this._kickoff(2.2);
   }
 

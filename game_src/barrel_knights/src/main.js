@@ -5,7 +5,7 @@
 // Telegraphed hazards: trapdoors, mud, rolling boulders. Nine tournament rounds, stars, coins for armour colours and helmets.
 // Original characters, art and sound made in code. No network, no ads, no tracking; the save stays on the device.
 import * as THREE from 'three';
-import { Match, ROUNDS, PITCH, BARREL_R, KNIGHT_R, COLORS, HELMETS, RIVAL_COLOR, MATCH_TIME, normalizeSave, applyResult, buy, equip } from './sim.js';
+import { Match, ROUNDS, PITCH, BARREL_R, KNIGHT_R, COLORS, HELMETS, RIVAL_COLOR, normalizeSave, applyResult, buy, equip } from './sim.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 import { VoiceCoach } from '../../cozy_kit/voice.js';
@@ -13,15 +13,15 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 const BARREL_CLIPS = { go: 2, trick: 3, bump: 2, near: 1, win: 2, lose: 2, count: 1 };
 
 const S = {
-  title: ['فرسان البرميل', 'BARREL KNIGHTS'], play: ['العب', 'PLAY'], rounds: ['الجولات', 'ROUNDS'], knights: ['الفرسان', 'KNIGHTS'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
+  title: ['فرسان القلعة', 'CITADEL KNIGHTS'], play: ['العب', 'PLAY'], rounds: ['الجولات', 'ROUNDS'], knights: ['الفرسان', 'KNIGHTS'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
   back: ['رجوع', 'Back'], paused: ['استراحة', 'PAUSED'], resume: ['كمّل', 'RESUME'], restart: ['إعادة', 'RESTART'], home: ['الرئيسية', 'HOME'], next: ['الجولة التالية', 'NEXT ROUND'],
   dash: ['اندفاع', 'DASH'], goal: ['هدف!', 'GOAL!'], go: ['يلا!', 'GO!'], round: ['الجولة', 'Round'], sound: ['الصوت', 'Sound'], diff: ['الصعوبة', 'Difficulty'],
   easy: ['سهل', 'Easy'], normal: ['عادي', 'Normal'], hard: ['صعب', 'Hard'], victory: ['فزتم! 🏆', 'YOU WIN! 🏆'], lose: ['حظ أوفر المرة الجاية', 'Good try!'], draw: ['تعادل', 'DRAW'],
-  coins: ['عملات', 'Coins'], earned: ['كسبت', 'Earned'], locked: ['خلّص الجولة اللي قبلها', 'Finish the round before'], overtime: ['وقت إضافي!', 'OVERTIME!'],
-  how: ['اسحب بإصبعك للحركة، واضغط اندفاع لدفع البرميل وإبعاد الخصوم', 'Drag to move, press DASH to shove the barrel and bump rivals'],
-  how2: ['ادفع البرميل العملاق داخل بوابة الخصم! الأبواب المخفية والصخور والطين بتتنبّه قبل ما تشتغل.', 'Push the giant barrel through the rival gate! Trapdoors, boulders and mud always warn you first.'],
+  coins: ['عملات', 'Coins'], earned: ['كسبت', 'Earned'], locked: ['خلّص الجولة اللي قبلها', 'Finish the round before'], firstTo: ['الأول لهدفين ⚽', 'First to 2 ⚽'],
+  how: ['اسحب بإصبعك للحركة، واضغط اندفاع لدفع الزير وإبعاد الخصوم', 'Drag to move, press DASH to shove the water jar and bump rivals'],
+  how2: ['ادفع الزير العملاق داخل بوابة الخصم! الأبواب المخفية والصخور والطين بتتنبّه قبل ما تشتغل.', 'Push the giant water jar through the rival gate! Trapdoors, boulders and mud always warn you first.'],
   colors: ['ألوان الدرع', 'Armour'], helmets: ['الخوذات', 'Helmets'], equipped: ['لابسه', 'On'], notEnough: ['العملات مش كفاية', 'Not enough coins'], tapSound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
-  final: ['النهائي', 'FINAL'], match: ['مباراة', 'MATCH'], first: ['الأول لهدفين', 'FIRST TO 2'], ready: ['استعد؟', 'READY?'], tip: ['ادفع البرميل داخل بوابتهم!', 'SHOVE IT THROUGH THEIR GATE!'], yourTeam: ['فريقك', 'You'], rivals: ['الخصوم', 'Rivals'],
+  final: ['النهائي', 'FINAL'], match: ['مباراة', 'MATCH'], first: ['الأول لهدفين', 'FIRST TO 2'], ready: ['استعد؟', 'READY?'], tip: ['ادفع الزير داخل بوابتهم!', 'SHOVE IT THROUGH THEIR GATE!'], yourTeam: ['فريقك', 'You'], rivals: ['الخصوم', 'Rivals'],
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'],
 };
 const I = makeI18n(S);
@@ -513,7 +513,7 @@ class Game {
 
   _hud() {
     const pause = h('button', { class: 'bk-round', 'aria-label': I.t('paused'), onclick: () => this.togglePause() }, '⏸');
-    this.scoreA = h('b', {}, '0'); this.scoreB = h('b', {}, '0'); this.timeEl = h('span', { class: 'bk-time' }, '2:00');
+    this.scoreA = h('b', {}, '0'); this.scoreB = h('b', {}, '0'); this.timeEl = h('span', { class: 'bk-time' }, I.t('firstTo'));
     const shield = (c, ico) => h('i', { class: 'bk-shield', style: `--c:#${c.toString(16).padStart(6, '0')}` }, ico);
     const board = h('div', { class: 'bk-board' }, h('div', { class: 'bk-score' }, shield(this.playerColor, '🏰'), this.scoreA, h('em', {}, '-'), this.scoreB, shield(RIVAL_COLOR, '☀')), this.timeEl);
     this.matchBadge = h('div', { class: 'bk-mbadge' }, h('small', {}, I.t('match')), h('b', {}, I.num(this.round + 1)));
@@ -585,7 +585,6 @@ class Game {
           const gz = e.team === 0 ? -PITCH.hl : PITCH.hl; for (let i = 0; i < 70; i++) this.puff((Math.random() - 0.5) * 10, 1 + Math.random() * 3, gz + (e.team === 0 ? 1 : -1) * Math.random() * 3, 1, [0xffd23a, 0xff5a8a, 0x5ae8ff, 0x7af07a, 0xffffff][i % 5], 5, -4, 3);
           break;
         }
-        case 'overtime': if (live) { this._banner(I.t('overtime'), '', 2000, '#ff8a3a'); this.sound.play('whistle'); } break;
         case 'over': if (live) { this.over = true; this.overT = 1.2; this.resEv = e.result; this.sound.play('whistle'); } break;
         default: break;
       }
@@ -613,9 +612,6 @@ class Game {
     const m = this.m;
     if (this.scoreA.textContent !== String(m.score[0])) this.scoreA.textContent = I.num(m.score[0]);
     if (this.scoreB.textContent !== String(m.score[1])) this.scoreB.textContent = I.num(m.score[1]);
-    const tl = Math.ceil(Math.max(0, m.timeLeft)); const txt = `${Math.floor(tl / 60)}:${String(tl % 60).padStart(2, '0')}`;
-    const full = m.overtime ? `⏱ ${txt}` : txt; if (this.timeEl.textContent !== (I.getLang() === 'en' ? full : full.replace(/[0-9]/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]))) this.timeEl.textContent = I.getLang() === 'en' ? full : full.replace(/[0-9]/g, (d) => '٠١٢٣٤٥٦٧٨٩'[d]);
-    this.timeEl.classList.toggle('low', tl <= 15 && !m.overtime);
     const p = m.knights[0]; const f = clamp(1 - p.cd / (this.age <= 4 ? 1.1 : 1.5), 0, 1);
     this.dashFill.style.setProperty('--f', `${Math.round(f * 100)}%`); this.dashBtn.classList.toggle('ready', f >= 1);
   }
@@ -771,4 +767,4 @@ const EXTRA_CSS = `
 const api = { start(el, config, post) { const g = new Game(el, config || {}, post); api.last = g; return { dispose: () => g.dispose(), pause: () => g.pause() }; } };
 window.BarrelKnights = api;
 export default api;
-void MATCH_TIME; void KNIGHT_R; void HELMETS;
+void KNIGHT_R; void HELMETS;

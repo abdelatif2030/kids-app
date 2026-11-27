@@ -83,12 +83,16 @@ test('a barrel hitting the end wall beside the gate bounces and does not score',
   assert.ok(m.barrel.z >= -PITCH.hl + BARREL_R - 0.01);
 });
 
-test('the match ends by time (a lead wins, a draw goes to overtime then ends)', () => {
+test('kind rules (2.3): no match clock — a goalless match simply never ends', () => {
   const m = new Match({ seed: 5 });
-  run(m, 140, (mm) => { mm.input.x = 0; mm.input.z = 0; });
-  assert.equal(m.phase, 'over');
-  const lead = new Match({ seed: 5 }); run(lead, 4); lead.score = [1, 0]; lead.timeLeft = 0.5;
-  run(lead, 2); assert.equal(lead.phase, 'over'); assert.ok(lead.result().win);
+  assert.equal(m.timeLeft, undefined, 'the clock field is gone');
+  assert.equal(m.overtime, undefined, 'overtime is gone');
+  run(m, 400, (mm) => { // pin the barrel at centre: nobody can score, and nothing else may end it
+    mm.barrel.x = 0; mm.barrel.z = 0; mm.barrel.vx = 0; mm.barrel.vz = 0;
+    mm.input.x = 0; mm.input.z = 0;
+  });
+  assert.notEqual(m.phase, 'over');
+  assert.deepEqual(m.score, [0, 0]);
 });
 
 test('first to two goals ends the match', () => {
@@ -153,4 +157,11 @@ test('save normalisation, shop and results', () => {
   assert.equal(buy(s, 'helmet', 'crown').reason, 'coins');
   const t = normalizeSave(null); applyResult(t, 0, { win: true, goals: [3, 1], stars: 2, coins: 20 });
   assert.equal(t.unlocked, 2); assert.equal(t.stars[0], 2); assert.equal(t.coins, 20);
+});
+
+test('Citadel Knights anchor: nine Citadel festival cups, ids unchanged', () => {
+  assert.equal(ROUNDS.length, 9);
+  assert.deepEqual(ROUNDS.map((r) => r.id), ['squire', 'meadow', 'trap', 'rock', 'swamp', 'castle', 'storm', 'dragon', 'royal']);
+  assert.ok(ROUNDS.every((r) => /Citadel|قلعة|Secret|Lantern|الفوانيس|الأبواب/.test(r.en + r.ar)));
+  assert.equal(ROUNDS[8].final, true);
 });
