@@ -288,10 +288,14 @@ class _LanguageCard extends StatelessWidget {
       );
     }
     if (lang.id == 'fr') {
-      // painted like the others (no picture yet): sunrise sky, a bakery and a tower in emoji
-      return DecoratedBox(
-        decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFFFD6E8), Color(0xFFFFF1C9)])),
-        child: Center(child: Padding(padding: EdgeInsets.only(bottom: width * 0.18), child: Text('🥐🗼', style: TextStyle(fontSize: width * 0.34)))),
+      // the owner's French card (2026-11-27); the painted one (sunrise sky, a bakery and a tower) stays as the fallback
+      return Image.asset(
+        'assets/games/learn_lang/fr.webp',
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) => DecoratedBox(
+          decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFFFD6E8), Color(0xFFFFF1C9)])),
+          child: Center(child: Padding(padding: EdgeInsets.only(bottom: width * 0.18), child: Text('🥐🗼', style: TextStyle(fontSize: width * 0.34)))),
+        ),
       );
     }
     return Image.asset(

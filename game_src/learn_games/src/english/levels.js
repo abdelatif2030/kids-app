@@ -53,13 +53,16 @@ export const DE_LEVELS = EN_LEVELS.filter((l) => DE_WORDS.some(l.pick)).map((l) 
   if (k === 'letters') d.pick = pack('letters A-Z (name)', 'letters (German only)');
   return d;
 });
+// The owner's world pictures of French and Italian: 16 badges in the same order (animals, first words, family, food, school, world, colorful, routine, numbers, letters, colors, shapes, time, where, beads, tens)
+const BADGE = { animals: 0, first: 1, family: 2, food: 3, school: 4, world: 5, colorful: 6, routine: 7, numbers: 8, letters: 9, colors: 10, shapes: 11, time: 12, where: 13, beads: 14, tens: 15, around: 1, home: 2, city: 5 };
+const worldArt = (l, k, lang) => (BADGE[k] !== undefined ? { ...l.art, lang, icon: `${lang}_i${BADGE[k]}`, map: `${lang}_map`, win: `${lang}_win` } : { ...l.art, lang });
 // French with Rehlaty: the same levels and pictures, the French words of docs/FRENCH_WORDLIST.csv. Ids fr_*. The map / badges / win picture are the English
 // world's until the owner's French pictures arrive (docs/FRENCH_IMAGE_PROMPTS.md).
 const FR_NAMES = { animals: 'Les animaux', first: 'Mes premiers mots', family: 'Moi et ma famille', food: 'Miam miam', school: 'Vêtements et école', world: 'Métiers, musique et météo',
   colorful: 'Choses de couleur', routine: 'Ma journée', numbers: 'Les chiffres', letters: "L'alphabet", colors: 'Les couleurs', shapes: 'Les formes', time: 'Jours et mois', tens: 'Grands nombres', where: 'Où est la balle ?', beads: 'Les perles', around: 'Autour de moi', home: 'Ma maison', city: 'Ma ville et les lieux' };
 export const FR_LEVELS = EN_LEVELS.filter((l) => FR_WORDS.some(l.pick)).map((l) => {
   const k = l.id.slice(3);
-  const f = { ...l, id: `fr_${k}`, mode: 'en', lang: 'fr', ar: FR_NAMES[k], words: FR_WORDS, art: { ...l.art, lang: 'fr' } };
+  const f = { ...l, id: `fr_${k}`, mode: 'en', lang: 'fr', ar: FR_NAMES[k], words: FR_WORDS, art: worldArt(l, k, 'fr') };
   if (k === 'letters') f.pick = pack('letters A-Z (name)', 'letters (French only)');
   return f;
 });
@@ -70,8 +73,7 @@ const IT_NAMES = { animals: 'Gli animali', first: 'Le mie prime parole', family:
 export const IT_LEVELS = EN_LEVELS.filter((l) => IT_WORDS.some(l.pick)).map((l) => {
   const k = l.id.slice(3);
   // the owner's Italian-world pictures (2026-11-27): 16 badges in the order of docs/ITALIAN_IMAGE_PROMPTS.md, the sea map and the win picture
-  const BADGE = { animals: 0, first: 1, family: 2, food: 3, school: 4, world: 5, colorful: 6, routine: 7, numbers: 8, letters: 9, colors: 10, shapes: 11, time: 12, where: 13, beads: 14, tens: 15, around: 1, home: 2, city: 5 };
-  const art = BADGE[k] !== undefined ? { ...l.art, lang: 'it', icon: `it_i${BADGE[k]}`, map: 'it_map', win: 'it_win' } : { ...l.art, lang: 'it' };
+  const art = worldArt(l, k, 'it');
   return { ...l, id: `it_${k}`, mode: 'en', lang: 'it', ar: IT_NAMES[k] || l.ar, words: IT_WORDS, art };
 });
 export const isItalianLevel = (id) => typeof id === 'string' && id.startsWith('it_');
