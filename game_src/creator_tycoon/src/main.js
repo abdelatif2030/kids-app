@@ -42,7 +42,7 @@ const SCENE = [
   'linear-gradient(180deg,#ffb86a 0,#ffe0a8 55%,#b8864e 55%,#7a5028 100%)',
 ];
 // Optional generated pictures (assets/games/creator_tycoon/art/*.webp). Each one is optional: a missing picture keeps the emoji/gradient look.
-const ART_NAMES = ['office_dark', 'office_bright', 'office_sunset', 'creator', 'ceo', 'bin', 'desk_1', 'desk_2', 'desk_3', 'photo_a', 'photo_b', 'video_a', 'video_b', 'game_a', 'game_b', 'slop_a', 'slop_b'];
+const ART_NAMES = ['office_sunset', 'creator', 'ceo', 'bin', 'desk_1', 'desk_2', 'desk_3', 'photo_a', 'photo_b', 'video_a', 'video_b', 'game_a', 'game_b', 'slop_a', 'slop_b'];
 const ART_CARDS = { photo: ['photo_a', 'photo_b'], video: ['video_a', 'video_b'], game: ['game_a', 'game_b'], slop: ['slop_a', 'slop_b'] };
 const DESK_ART = ['desk_1', 'desk_1', 'desk_1', 'desk_2', 'desk_3'];
 const DESK = ['🖥️', '🖥️', '💻', '🖥️🖥️', '🖥️🖥️🖥️'];
@@ -176,6 +176,7 @@ class Game {
   _soundPill() { const pill = h('button', { class: 'ct-soundpill', onclick: () => this.sound.unlock() }, I.t('sound')); this.layer.append(pill); const tick = () => { if (!this.root.isConnected) return; pill.style.display = !this.sound.ctx || this.sound.on || this.sound.muted ? 'none' : 'block'; setTimeout(tick, 600); }; tick(); }
 
   showMenu() {
+    if (this.s) this._persist(); // bank whatever the career earned before leaving the desk
     this.mode = 'menu'; this.modal = null;
     this.layer.replaceChildren();
     this.sound.setMode(false);
@@ -191,6 +192,7 @@ class Game {
   start() {
     this.voice.say('go');
     this.s = new Studio({ seed: (Date.now() & 0xffff) + 1 });
+    if (this.save.career) this.s.applyCareer(this.save.career); // the career survives between sessions
     this.mode = 'play'; this.modal = null; this.lastKind = 'photo'; this.cardT = 0; this.bossT = 0;
     this.layer.replaceChildren();
     this.sound.setMode(true);
@@ -308,7 +310,7 @@ class Game {
     const items = {};
     const grid = h('div', { class: 'ct-shop' }, SHOP.map((it) => {
       const lvl = h('span', {}, ''); const cost = h('small', {}, '');
-      const b = h('button', { class: 'ct-item', onclick: () => { if (this.s.buy(it.id)) { this.sound.play('coin'); refresh(); } } }, h('span', {}, ar ? it.ar : it.en), h('small', {}, ar ? it.desc[0] : it.desc[1]), lvl, cost);
+      const b = h('button', { class: 'ct-item', onclick: () => { if (this.s.buy(it.id)) { this.sound.play('coin'); this._persist(); refresh(); } } }, h('span', {}, ar ? it.ar : it.en), h('small', {}, ar ? it.desc[0] : it.desc[1]), lvl, cost);
       items[it.id] = { b, lvl, cost };
       return b;
     }));
@@ -342,6 +344,7 @@ class Game {
       switch (e.type) {
         case 'event': this.sound.play('event'); if (e.id === 'trend') { this.voice.say('charge'); this._banner2(`${I.t('trend')}!`, I.t('trendTxt')); } break;
         case 'order': this.sound.play('event'); this.voice.say('near'); break;
+        case 'promote': this._persist(); break;
         case 'orderLate': this.voice.say('bump'); this._pop(I.t('clientLeft'), '#ff4a3a', -10); this.e.boss.classList.add('show'); this.bossT = 2.5; break;
         case 'auto': this.sound.play('coin'); this.e.hint.textContent = I.t('gpuHint'); break;
         case 'won': this._won(); break;
@@ -383,17 +386,32 @@ class Game {
     if (s.goal) el.hint.textContent = lag ? I.t('lag') : s.stars > 0 ? `${I.num(s.goal - s.stars)} ${I.t('more')}` : I.t('tapGreen');
   }
 
-  /** Office look for a level: generated pictures when they loaded, otherwise the emoji and gradients. */
+  /** Office look for a level: the owner's one office picture serves every rank,
+   *  mood-tinted per rank band (dark office → bright → sunset); without it, the emoji and gradients. */
   _dressScene(ri) {
     const A = this.art; const el = this.e;
-    const bg = ri <= 1 ? 'office_dark' : ri <= 3 ? 'office_bright' : 'office_sunset';
-    el.scene.style.background = A[bg] ? `#0a1030 url(${A[bg].src}) center/cover no-repeat` : SCENE[ri];
-    el.scene.classList.toggle('arted', !!A[bg]);
+    const TINTS = [
+      'linear-gradient(rgba(8,12,48,.62),rgba(8,12,48,.62))',
+      'linear-gradient(rgba(10,18,60,.48),rgba(10,18,60,.48))',
+      'linear-gradient(rgba(16,32,80,.30),rgba(16,32,80,.30))',
+      'linear-gradient(rgba(24,40,90,.16),rgba(24,40,90,.16))',
+      'linear-gradient(rgba(60,30,60,.10),rgba(60,30,60,.10))',
+      '',
+    ];
+    const art = A.office_sunset;
+    el.scene.style.background = art ? `${TINTS[Math.min(ri, TINTS.length - 1)] ? TINTS[Math.min(ri, TINTS.length - 1)] + ',' : ''}#0a1030 url(${art.src}) center/cover no-repeat` : SCENE[ri];
+    el.scene.classList.toggle('arted', !!art);
     const put = (node, name, emoji) => { if (A[name]) { node.classList.add('art'); node.replaceChildren(h('img', { src: A[name].src, alt: '', draggable: 'false' })); } else { node.classList.remove('art'); node.textContent = emoji; } };
     put(el.desk, DESK_ART[ri], DESK[ri]); put(el.me, 'creator', '🧑‍💻'); put(el.bin, 'bin', '🗑️'); put(el.boss, 'ceo', '👩‍💼');
   }
 
   _banner2(a, b) { const x = h('div', { class: 'ct-banner' }, a, h('small', {}, b)); this.e.scene.append(x); setTimeout(() => x.remove(), 2300); }
+
+  /** Persist the career (rank, cash, upgrades…) so closing the game never loses it. */
+  _persist() {
+    if (this.s) this.save.career = this.s.career();
+    this.post({ type: 'save', save: this.save });
+  }
 
   _won() {
     if (this.wonShown) return;
@@ -401,7 +419,7 @@ class Game {
     const s = this.s;
     this.save.best = Math.max(this.save.best, s.masterpieces);
     this.save.wins += 1;
-    this.post({ type: 'save', save: this.save });
+    this._persist();
     this.sound.play('promote');
     this.voice.say('win');
     this.modal = 'won';

@@ -36,3 +36,15 @@ Menu, start, real mouse click on PHOTO, generating card, result card, promotion 
 - No INSTALL button (its purpose in the video is not clear), no "slop goes viral -4 stars" (kept out on purpose), no coin shower or confetti.
 - The shop is our own (GPU, wider zone, slower needle, richer clients; the video's shop was not shown).
 - Sound is synthesized, not the video's; not listened to by a person.
+
+---
+
+## Phase 1 fix review — Moss, 2026-11-27 (commit 2f6d8b97)
+
+**What was wrong.** (1) The career was never persisted: rank, cash, stars and shop upgrades lived only in the in-memory Studio; the save carried just best/wins/muted and was posted only on a win — closing the game reset the player to intern. (2) ART_NAMES requested `office_dark` and `office_bright`, which do not exist in the game's art folder (only `office_sunset.webp` of the three): ranks 0–3 always fell back to flat gradients and every session fired two doomed image loads.
+
+**What changed and why.** `Studio.career()`/`applyCareer()` snapshot and restore exactly the durable state (cash, stars, rank, total, slop, masterpieces, streak, four upgrade levels); session-ephemeral state (needle, zone, order/event, timers) is deliberately not saved. `normalizeSave` validates the career (rank clamped to the six ranks, upgrades clamped to shop maxima, money floored at 0). The shell persists through one seam, `_persist()`: on every successful purchase, on promotion, on the win, and when returning to the menu; `start()` restores before the first frame. Offices: the two missing names removed from the request list; `_dressScene` uses the owner's existing office_sunset for every rank with a per-rank mood tint (deep blue → lighter → clear sunset), so ranks still feel like different offices. No owner art deleted or altered.
+
+**Tested.** npm test 11/11 (2 new: snapshot round-trip; garbage-career clamping). Browser via the real shell entry with real mouse clicks (~/tools/recorder/phase1_verify.mjs): seeded career {rank 2, cash 432, gpu 2} restored through the Play click (cash 440 after ~3 s — the restored GPU upgrade auto-earns, so the restore is live); scene background = office_sunset with the rank-2 tint; zero requests for the two missing backgrounds; a real shop purchase (المتجر button → item click) posted a save whose career upgrade total rose 7 → 8; zero page errors. fps 57.5 rAF under CDP 4× CPU throttling, headless SwiftShader, 1024×768 (phase1_fps.mjs) — a software-GL lower bound, not a device measurement.
+
+**Not verified.** A full intern→board career across two separate browser sessions (unit robot reaches the board in one session; cross-session restore verified at rank 2). No real-device/iOS WebView test exists here. VoiceCoach is wired but no owner clips are installed for this game yet (expected go_1.mp3 404 in the standalone page); clips arrive via the owner's generator.

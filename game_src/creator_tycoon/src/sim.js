@@ -109,6 +109,27 @@ export class Studio {
   /** Close the promotion window ("Next level"). */
   next() { this.promo = false; this.order = null; this.orderT = 6; this.zone.w = this.zoneW; }
 
+  /** The durable career: everything a returning player keeps. Session-ephemeral
+   *  state (needle, zone, order, event, timers) is deliberately not in here. */
+  career() {
+    return {
+      cash: Math.floor(this.cash), stars: Math.floor(this.stars), rank: this.rank,
+      total: Math.floor(this.total), slop: Math.floor(this.slop),
+      masterpieces: Math.floor(this.masterpieces), streak: Math.floor(this.streak),
+      up: { gpu: this.up.gpu, zone: this.up.zone, needle: this.up.needle, cash: this.up.cash },
+    };
+  }
+
+  /** Restore a career snapshot (already validated by normalizeSave). */
+  applyCareer(c) {
+    if (!c) return;
+    this.cash = c.cash; this.stars = c.stars; this.rank = c.rank;
+    this.total = c.total; this.slop = c.slop;
+    this.masterpieces = c.masterpieces; this.streak = c.streak;
+    this.up = { gpu: c.up.gpu, zone: c.up.zone, needle: c.up.needle, cash: c.up.cash };
+    this.zone.w = this.zoneW;
+  }
+
   step(dt) {
     if (this.state !== 'play' || this.promo) return;
     this.time += dt;
@@ -134,7 +155,20 @@ export class Studio {
   }
 }
 
+function validCareer(c) {
+  if (!c || typeof c !== 'object') return null;
+  const num = (v, max) => Math.max(0, Math.min(max, Math.floor(Number(v)) || 0));
+  const up = {};
+  for (const s of SHOP) up[s.id] = num(c.up && c.up[s.id], s.max);
+  return {
+    cash: num(c.cash, 1e9), stars: num(c.stars, 999), rank: num(c.rank, RANKS.length - 1),
+    total: num(c.total, 1e9), slop: num(c.slop, 1e9),
+    masterpieces: num(c.masterpieces, 1e6), streak: num(c.streak, 999),
+    up,
+  };
+}
+
 export function normalizeSave(s) {
   const o = s && typeof s === 'object' ? s : {};
-  return { best: Math.max(0, Math.floor(Number(o.best)) || 0), wins: Math.max(0, Math.floor(Number(o.wins)) || 0), muted: !!o.muted };
+  return { best: Math.max(0, Math.floor(Number(o.best)) || 0), wins: Math.max(0, Math.floor(Number(o.wins)) || 0), muted: !!o.muted, career: validCareer(o.career) };
 }

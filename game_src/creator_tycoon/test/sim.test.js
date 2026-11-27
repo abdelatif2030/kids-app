@@ -93,3 +93,27 @@ test('client orders from level 2 give bonus stars; hot streak at level 3; trend 
 test('damaged saves load safely', () => {
   assert.equal(normalizeSave(null).best, 0);
 });
+
+test('career snapshot round-trips: rank, cash, stars and upgrades survive a new session', () => {
+  const a = new Studio({ seed: 7 });
+  a.cash = 432; a.stars = 3; a.rank = 2; a.total = 900; a.slop = 5; a.masterpieces = 4; a.streak = 2;
+  a.up.gpu = 2; a.up.zone = 1; a.up.needle = 3; a.up.cash = 1;
+  const snap = a.career();
+  const b = new Studio({ seed: 99 });
+  b.applyCareer(snap);
+  assert.equal(b.rank, 2); assert.equal(b.cash, 432); assert.equal(b.stars, 3);
+  assert.equal(b.total, 900); assert.equal(b.masterpieces, 4);
+  assert.deepEqual(b.up, { gpu: 2, zone: 1, needle: 3, cash: 1 });
+});
+
+test('normalizeSave validates the career: garbage is clamped, a missing career stays null', () => {
+  const bad = normalizeSave({ career: { cash: -50, rank: 99, up: { gpu: 999, zone: -2 } } });
+  assert.equal(bad.career.cash, 0);
+  assert.equal(bad.career.rank, RANKS.length - 1);
+  assert.equal(bad.career.up.gpu, SHOP.find((s) => s.id === 'gpu').max);
+  assert.equal(bad.career.up.zone, 0);
+  assert.equal(normalizeSave({}).career, null);
+  assert.equal(normalizeSave(null).career, null);
+  const good = normalizeSave({ career: { cash: 10, rank: 1, up: { needle: 2 } } });
+  assert.equal(good.career.rank, 1); assert.equal(good.career.up.needle, 2);
+});
