@@ -1,0 +1,370 @@
+0|zero|-
+1|uno|-
+2|due|-
+3|tre|-
+4|quattro|-
+5|cinque|-
+6|sei|-
+7|sette|-
+8|otto|-
+9|nove|-
+10|dieci|-
+11|undici|-
+12|dodici|-
+13|tredici|-
+14|quattordici|-
+15|quindici|-
+16|sedici|-
+17|diciassette|-
+18|diciotto|-
+19|diciannove|-
+20|venti|-
+21|trenta|-
+22|quaranta|-
+23|cinquanta|-
+24|sessanta|-
+25|settanta|-
+26|ottanta|-
+27|novanta|-
+28|cento|-
+29|a|L
+30|bi|L
+31|ci|L
+32|di|L
+33|e|L
+34|effe|L
+35|gi|L
+36|acca|L
+37|i|L
+38|i lunga|L
+39|cappa|L
+40|elle|L
+41|emme|L
+42|enne|L
+43|o|L
+44|pi|L
+45|cu|L
+46|erre|L
+47|esse|L
+48|ti|L
+49|u|L
+50|vu|L
+51|doppia vu|L
+52|ics|L
+53|ipsilon|L
+54|zeta|L
+55|rosso|C
+56|blu|C
+57|giallo|C
+58|verde|C
+59|arancione|C
+60|viola|C
+61|rosa|C
+62|nero|C
+63|bianco|C
+64|marrone|C
+65|grigio|C
+66|azzurro|C
+67|blu scuro|C
+68|verde chiaro|C
+69|verde scuro|C
+70|turchese|C
+71|oro|C
+72|argento|C
+73|beige|C
+74|bordeaux|C
+75|giallo limone|C
+76|pesca|C
+77|lilla|C
+78|verde oliva|C
+79|senape|C
+80|magenta|C
+81|indaco|C
+82|cremisi|C
+83|bronzo|C
+84|caramello|C
+85|grigio antracite|C
+86|menta|C
+87|corallo|C
+88|sabbia|C
+89|il cerchio|m
+90|il quadrato|m
+91|il triangolo|m
+92|la stella|f
+93|il cuore|m
+94|il rettangolo|m
+95|l'ovale|m
+96|il rombo|m
+97|il pentagono|m
+98|l'esagono|m
+99|l'ottagono|m
+100|la mezzaluna|f
+101|il più|m
+102|il semicerchio|m
+103|il trapezio|m
+104|il parallelogramma|m
+105|la stella a sei punte|f
+106|la goccia|f
+107|la freccia|f
+108|l'anello|m
+109|il cubo|m
+110|la palla|f
+111|il cono|m
+112|il cilindro|m
+113|la piramide|f
+114|sabato|D
+115|domenica|D
+116|lunedì|D
+117|martedì|D
+118|mercoledì|D
+119|giovedì|D
+120|venerdì|D
+121|gennaio|M
+122|febbraio|M
+123|marzo|M
+124|aprile|M
+125|maggio|M
+126|giugno|M
+127|luglio|M
+128|agosto|M
+129|settembre|M
+130|ottobre|M
+131|novembre|M
+132|dicembre|M
+133|l'estate|f
+134|l'inverno|m
+135|la primavera|f
+136|l'autunno|m
+137|la mattina|f
+138|il mezzogiorno|m
+139|la sera|f
+140|la notte|f
+141|mi sveglio|R
+142|mi lavo la faccia|R
+143|faccio colazione|R
+144|vado a scuola|R
+145|pranzo|R
+146|gioco|R
+147|ceno|R
+148|faccio il bagno|R
+149|mi lavo i denti|R
+150|dormo|R
+151|sul tavolo|P
+152|sotto il tavolo|P
+153|dentro la scatola|P
+154|accanto alla scatola|P
+155|accanto al tavolo|P
+156|la palla rossa|f
+157|il cubo blu|m
+158|la stella gialla|f
+159|il cuore verde|m
+160|l'anello viola|m
+161|la goccia arancione|f
+162|il coniglio|m
+163|il gatto|m
+164|il cane|m
+165|la scimmia|f
+166|la mucca|f
+167|l'orso|m
+168|il topo|m
+169|il pulcino|m
+170|il cavallo|m
+171|la gallina|f
+172|l'asino|m
+173|la capra|f
+174|il pappagallo|m
+175|la pecora|f
+176|il gallo|m
+177|il leone|m
+178|la tigre|f
+179|l'elefante|m
+180|la giraffa|f
+181|la zebra|f
+182|il gorilla|m
+183|il camaleonte|m
+184|la rana|f
+185|il tucano|m
+186|il pinguino|m
+187|la foca|f
+188|la renna|f
+189|la volpe|f
+190|il cammello|m
+191|il falco|m
+192|il delfino|m
+193|la tartaruga|f
+194|l'ape|f
+195|la farfalla|f
+196|l'oca|f
+197|l'anatra|f
+198|il piccione|m
+199|il pavone|m
+200|lo squalo|m
+201|il ghepardo|m
+202|il coccodrillo|m
+203|l'iguana|f
+204|la mantide|f
+205|il bruco|m
+206|il tirannosauro|m
+207|il triceratopo|m
+208|lo stegosauro|m
+209|il brachiosauro|m
+210|il gufo|m
+211|il panda|m
+212|il polpo|m
+213|il granchio|m
+214|la balena|f
+215|il pipistrello|m
+216|l'aquila|f
+217|lo struzzo|m
+218|il cigno|m
+219|il passero|m
+220|la lumaca|f
+221|il ragno|m
+222|il corvo|m
+223|la coccinella|f
+224|la libellula|f
+225|il fenicottero|m
+226|l'occhio|m
+227|l'orecchio|m
+228|il naso|m
+229|la bocca|f
+230|la mano|f
+231|il piede|m
+232|i capelli|mp
+233|il dente|m
+234|la testa|f
+235|il dito|m
+236|il ginocchio|m
+237|la pancia|f
+238|la camicia|f
+239|i pantaloni|mp
+240|il vestito|m
+241|il cappello|m
+242|i calzini|mp
+243|la giacca|f
+244|la sciarpa|f
+245|i guanti|mp
+246|gli occhiali|mp
+247|il berretto|m
+248|il pigiama|m
+249|l'impermeabile|m
+250|la mamma|f
+251|il papà|m
+252|la nonna|f
+253|il nonno|m
+254|il neonato|m
+255|il fratello|m
+256|la sorella|f
+257|il bambino|m
+258|la bambina|f
+259|gli amici|mp
+260|la famiglia|f
+261|lo zio|m
+262|il pane|m
+263|il formaggio|m
+264|l'uovo|m
+265|il latte|m
+266|il riso|m
+267|il pollo|m
+268|il succo|m
+269|l'acqua|f
+270|il biscotto|m
+271|il miele|m
+272|la zuppa|f
+273|la pizza|f
+274|il kiwi|m
+275|il melone|m
+276|i datteri|mp
+277|il fico|m
+278|l'albicocca|f
+279|i frutti di bosco|mp
+280|la prugna|f
+281|l'avocado|m
+282|la ciliegia|f
+283|le olive|fp
+284|la noce di cocco|f
+285|la formica|f
+286|la mosca|f
+287|il verme|m
+288|il dottore|m
+289|il maestro|m
+290|il poliziotto|m
+291|il pompiere|m
+292|l'agricoltore|m
+293|il cuoco|m
+294|l'autista|m
+295|il pilota|m
+296|l'infermiera|f
+297|il muratore|m
+298|il cantante|m
+299|il pittore|m
+300|il tamburo|m
+301|la chitarra|f
+302|il pianoforte|m
+303|il violino|m
+304|il flauto|m
+305|la tromba|f
+306|il tamburello|m
+307|l'oud|m
+308|il microfono|m
+309|le cuffie|fp
+310|la nota musicale|f
+311|la campana|f
+312|la matita|f
+313|il libro|m
+314|il quaderno|m
+315|le forbici|fp
+316|il righello|m
+317|la gomma|f
+318|i pastelli|mp
+319|la lavagna|f
+320|la cartina|f
+321|la colla|f
+322|il banco|m
+323|il foglio|m
+324|la sfera|f
+325|il pomodoro|m
+326|il cetriolo|m
+327|la patata|f
+328|la cipolla|f
+329|la melanzana|f
+330|il peperone|m
+331|la lattuga|f
+332|i broccoli|mp
+333|i piselli|mp
+334|la zucca|f
+335|l'aglio|m
+336|il fungo|m
+337|la pioggia|f
+338|la neve|f
+339|il vento|m
+340|il tuono|m
+341|il fulmine|m
+342|l'ombrello|m
+343|il fiocco di neve|m
+344|il fiore|m
+345|le foglie|fp
+346|il caldo|m
+347|il freddo|m
+348|la montagna|f
+349|la banana|f
+350|la mela|f
+351|il pesce|m
+352|il sole|m
+353|la rosa|f
+354|il melograno|m
+355|il mais|m
+356|il razzo|m
+357|l'aereo|m
+358|la busta|f
+359|l'uva|f
+360|la colomba|f
+361|il serpente|m
+362|il maiale|m
+363|la medusa|f
+364|il cavalluccio marino|m
+365|il pupazzo di neve|m
+366|la tenda|f
+367|la palma|f
+368|il cactus|m
+369|lo scorpione|m

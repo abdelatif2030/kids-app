@@ -232,3 +232,15 @@ test('the examples panel does not cover the child or the thing: the picture slid
   assert.ok(main.includes('_exampleView(open, panel)') && main.includes('this.st.shiftView(0, 0); // leaving a word'));
   assert.ok(main.includes('@media (min-aspect-ratio:115/100){.lw-expanel{left:auto;right:'));
 });
+
+test('Italian numbers (ready for the Italian world): ventuno, ventotto, ventitré, centotto, duemila, ventunomila, centomila, un milione', () => {
+  const it = (n) => numberWords(n, 'it').text;
+  assert.deepEqual([0, 3, 13, 21, 23, 28, 33, 99, 100, 101, 103, 108, 180, 200, 1000, 1003, 2000, 21000, 100000, 1000000].map(it),
+    ['zero', 'tre', 'tredici', 'ventuno', 'ventitré', 'ventotto', 'trentatré', 'novantanove', 'cento', 'centouno', 'centotré', 'centotto', 'centottanta', 'duecento', 'mille', 'milletré', 'duemila', 'ventunomila', 'centomila', 'un milione']);
+});
+
+test('Italian clips get their own ids (it|text), different from the other languages', async () => {
+  const { clipId } = await import('../src/kit/voice.js');
+  assert.notEqual(clipId('cane', 'it'), clipId('cane', 'ar'));
+  assert.notEqual(clipId('cane', 'it'), clipId('cane', 'fr'));
+});

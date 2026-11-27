@@ -1,4 +1,4 @@
-// Number words for the «اتعلّم» (learn) mode: any whole number 0..999 999 (and 1 000 000) in Arabic (Egyptian), English, German and French.
+// Number words for the «اتعلّم» (learn) mode: any whole number 0..999 999 (and 1 000 000) in Arabic (Egyptian), English, German, French and Italian.
 // numberWords(n, lang) -> { parts: [...], text } : `parts` are the small words a recorded voice can be built from (twenty, three, hundred, thousand ...),
 // `text` is the whole phrase (what the device voice reads when a part has no recording yet).
 const clamp = (n) => Math.max(0, Math.min(1000000, Math.floor(Number(n) || 0)));
@@ -73,6 +73,37 @@ function fr(n) {
   return p;
 }
 
+// ---- Italian ----
+const IT_U = ['zero', 'uno', 'due', 'tre', 'quattro', 'cinque', 'sei', 'sette', 'otto', 'nove', 'dieci', 'undici', 'dodici', 'tredici', 'quattordici', 'quindici', 'sedici', 'diciassette', 'diciotto', 'diciannove'];
+const IT_T = ['', '', 'venti', 'trenta', 'quaranta', 'cinquanta', 'sessanta', 'settanta', 'ottanta', 'novanta'];
+const IT_H = ['', 'cento', 'duecento', 'trecento', 'quattrocento', 'cinquecento', 'seicento', 'settecento', 'ottocento', 'novecento'];
+function it99(n) { // 1..99: ventuno, ventotto (the vowel drops before uno and otto), trentatré
+  if (n < 20) return IT_U[n];
+  const t = Math.floor(n / 10), u = n % 10;
+  if (!u) return IT_T[t];
+  const tw = u === 1 || u === 8 ? IT_T[t].slice(0, -1) : IT_T[t];
+  return tw + IT_U[u];
+}
+const itJoin = (p) => p.join('').replace(/cento(?=ott)/g, 'cent'); // centotto, centottanta
+const itWord = (n) => { // 1..999 as one word
+  const p = [];
+  if (n >= 100) { p.push(IT_H[Math.floor(n / 100)]); n %= 100; }
+  if (n) p.push(it99(n));
+  return itJoin(p);
+};
+function it(n) {
+  if (n === 0) return ['zero'];
+  if (n === 1000000) return ['un milione'];
+  const p = [];
+  const k = Math.floor(n / 1000);
+  if (k) p.push(k === 1 ? 'mille' : `${itWord(k)}mila`);
+  n %= 1000;
+  if (n >= 100) { p.push(IT_H[Math.floor(n / 100)]); n %= 100; }
+  if (n) p.push(it99(n));
+  return p;
+}
+const itText = (p) => { const t = itJoin(p); return t.length > 3 && t.endsWith('tre') ? `${t.slice(0, -3)}tré` : t; }; // ventitré, centotré
+
 // ---- Arabic (Egyptian) ----
 const AR_U = ['صفر', 'واحد', 'اتنين', 'تلاتة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'تمانية', 'تسعة', 'عشرة', 'حداشر', 'اتناشر', 'تلاتاشر', 'أربعتاشر', 'خمستاشر', 'ستاشر', 'سبعتاشر', 'تمنتاشر', 'تسعتاشر'];
 const AR_T = ['', '', 'عشرين', 'تلاتين', 'أربعين', 'خمسين', 'ستين', 'سبعين', 'تمانين', 'تسعين'];
@@ -104,12 +135,12 @@ function ar(n) {
   return p;
 }
 
-const TABLE = { en, de, fr, ar };
+const TABLE = { en, de, fr, it, ar };
 export function numberWords(n, lang) {
   n = clamp(n);
   const fn = TABLE[lang] || en;
   const parts = fn(n);
-  let text = lang === 'de' ? deText(parts) : parts.join(' ');
+  let text = lang === 'de' ? deText(parts) : lang === 'it' ? itText(parts) : parts.join(' ');
   if (lang === 'fr') text = text.replace(/quatre-vingt (?!mille)/g, 'quatre-vingt-');
   return { parts, text };
 }

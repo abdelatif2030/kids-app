@@ -13,7 +13,7 @@ export function spoken(text) {
 }
 
 /** The languages a clip can be in: Arabic (default), English, German. */
-const L = (l) => (l === 'en' || l === 'de' || l === 'fr' ? l : 'ar');
+const L = (l) => (l === 'en' || l === 'de' || l === 'fr' || l === 'it' ? l : 'ar');
 
 /** Stable id of a sentence: FNV-1a over "<lang>|<spoken text>", 8 hex digits. */
 export function clipId(text, lang) {

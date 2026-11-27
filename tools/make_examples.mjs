@@ -11,10 +11,12 @@ import { clipId } from '../game_src/learn_games/src/kit/voice.js';
 import { learnSections } from '../game_src/learn_games/src/learn/sections.js';
 
 const rd = (f) => JSON.parse(fs.readFileSync(new URL(`../game_src/learn_games/src/${f}/words.json`, import.meta.url), 'utf8'));
-const EN = rd('english'), DE = rd('german'), FR = rd('french');
+const EN = rd('english'), DE = rd('german'), FR = rd('french'), IT = rd('italian');
 const engOf = (e) => (e.eng !== undefined ? e.eng : e.en).toLowerCase();
 const byKey = (rows) => new Map(rows.map((e) => [engOf(e), e]));
-const M = { en: byKey(EN), de: byKey(DE), fr: byKey(FR) };
+const M = { en: byKey(EN), de: byKey(DE), fr: byKey(FR), it: byKey(IT) };
+const IT_ART = /^(il|lo|la|i|gli|le|l') ?/;
+const itPlural = (w) => /^(i|gli|le) /.test(w);
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const DE_ART = /^(der|die|das) /;
 const FR_ART = /^(le|la|les|l') ?/;
@@ -23,13 +25,13 @@ const noArt = (w) => w.replace(DE_ART, '').replace(/^(le|la|les) /, '').replace(
 
 // pattern -> [ar, en, de, fr] builders
 const P = {
-  look: [(w) => `بُصّ على ${w}!`, (w) => `Look at the ${w}!`, (w) => `Schau dir ${accDe(w)} an!`, (w) => `Regarde ${w} !`],
-  see: [(w) => `أنا شايف ${w}.`, (w) => `I can see the ${w}.`, (w) => `Ich sehe ${accDe(w)}.`, (w) => `Je vois ${w}.`],
-  where: [(w) => `فين ${w}؟`, (w) => `Where is the ${w}?`, (w) => `Wo ist ${w}?`, (w) => `Où est ${w} ?`],
-  find: [(w) => `تقدر تلاقي ${w}؟`, (w) => `Can you find the ${w}?`, (w) => `Kannst du ${accDe(w)} finden?`, (w) => `Peux-tu trouver ${w} ?`],
-  show: [(w) => `وريني ${w}!`, (w) => `Show me the ${w}!`, (w) => `Zeig mir ${accDe(w)}!`, (w) => `Montre-moi ${w} !`],
-  like: [(w) => `أنا بحب ${w}.`, (w) => `I like the ${w}.`, (w) => `Ich mag ${accDe(w)}.`, (w) => `J'aime ${w}.`],
-  want: [(w) => `عايز ${w}.`, (w) => `I want the ${w}.`, (w) => `Ich möchte ${accDe(w)}.`, (w) => `Je veux ${w}.`],
+  look: [(w) => `بُصّ على ${w}!`, (w) => `Look at the ${w}!`, (w) => `Schau dir ${accDe(w)} an!`, (w) => `Regarde ${w} !`, (w) => `Guarda ${w}!`],
+  see: [(w) => `أنا شايف ${w}.`, (w) => `I can see the ${w}.`, (w) => `Ich sehe ${accDe(w)}.`, (w) => `Je vois ${w}.`, (w) => `Vedo ${w}.`],
+  where: [(w) => `فين ${w}؟`, (w) => `Where is the ${w}?`, (w) => `Wo ist ${w}?`, (w) => `Où est ${w} ?`, (w) => (itPlural(w) ? `Dove sono ${w}?` : `Dov'è ${w}?`)],
+  find: [(w) => `تقدر تلاقي ${w}؟`, (w) => `Can you find the ${w}?`, (w) => `Kannst du ${accDe(w)} finden?`, (w) => `Peux-tu trouver ${w} ?`, (w) => `Riesci a trovare ${w}?`],
+  show: [(w) => `وريني ${w}!`, (w) => `Show me the ${w}!`, (w) => `Zeig mir ${accDe(w)}!`, (w) => `Montre-moi ${w} !`, (w) => `Mostrami ${w}!`],
+  like: [(w) => `أنا بحب ${w}.`, (w) => `I like the ${w}.`, (w) => `Ich mag ${accDe(w)}.`, (w) => `J'aime ${w}.`, (w) => (itPlural(w) ? `Mi piacciono ${w}.` : `Mi piace ${w}.`)],
+  want: [(w) => `عايز ${w}.`, (w) => `I want the ${w}.`, (w) => `Ich möchte ${accDe(w)}.`, (w) => `Je veux ${w}.`, (w) => `Voglio ${w}.`],
 };
 const ICON = { look: '👀', see: '👁️', where: '❓', find: '🔎', show: '👉', like: '❤️', want: '🤲' };
 const HAND_ICON = { morning: '🌅', afternoon: '☀️', evening: '🌇', night: '🌙', spring: '🌸', summer: '🏖️', autumn: '🍂', winter: '❄️' };
@@ -51,6 +53,7 @@ const HAND = {
   autumn: [['الورق بيقع في الخريف.', 'Leaves fall in autumn.', 'Im Herbst fallen die Blätter.', 'En automne, les feuilles tombent.'], ['الجو معتدل في الخريف.', 'The weather is mild in autumn.', 'Im Herbst ist das Wetter mild.', 'En automne, il fait doux.'], ['المدرسة بتبدأ في الخريف.', 'School starts in autumn.', 'Im Herbst beginnt die Schule.', "En automne, l'école commence."]],
   winter: [['الدنيا برد في الشتا.', 'It is cold in winter.', 'Im Winter ist es kalt.', 'En hiver, il fait froid.'], ['بنلبس هدوم تقيلة في الشتا.', 'We wear warm clothes in winter.', 'Im Winter tragen wir warme Kleidung.', 'En hiver, nous portons des vêtements chauds.'], ['المطر بينزل في الشتا.', 'It rains in winter.', 'Im Winter regnet es.', 'En hiver, il pleut.']],
 };
+const HAND_IT = {"morning": ["Buongiorno! Il sole è alto.", "Al mattino mi lavo i denti.", "Al mattino faccio colazione."], "afternoon": ["Il pomeriggio giochiamo.", "Il pomeriggio pranziamo.", "Il pomeriggio il sole è alto."], "evening": ["La sera ceniamo.", "La sera il sole tramonta.", "La sera ascolto una storia."], "night": ["Di notte brillano le stelle.", "Di notte dormiamo.", "Di notte esce la luna."], "spring": ["In primavera crescono i fiori.", "In primavera il tempo è bello.", "In primavera volano le farfalle."], "summer": ["In estate nuotiamo.", "In estate fa caldo.", "In estate mangiamo il gelato."], "autumn": ["In autunno cadono le foglie.", "In autunno il tempo è mite.", "In autunno inizia la scuola."], "winter": ["In inverno fa freddo.", "In inverno indossiamo vestiti caldi.", "In inverno piove."]};
 const DAYS = [
   (a, e, d, f) => [`هنتقابل يوم ${a}.`, `See you on ${cap(e)}!`, d && `Bis ${d}!`, f && `À ${f} !`],
   (a, e, d, f) => [`بنلعب يوم ${a}.`, `We play on ${cap(e)}.`, d && `Am ${d} spielen wir.`, f && `Le ${f}, nous jouons.`],
@@ -71,7 +74,7 @@ const COLOURS = [
 const isPlural = (en) => /s$/.test(en) && !/(ss|us|is)$/.test(en);
 
 const table = {}; // key -> [{ar,en,de,fr}, ...] (aligned: example i in every language says the same thing)
-const rows = [['key', 'section', 'example_no', 'arabic', 'english', 'german', 'french']];
+const rows = [['key', 'section', 'example_no', 'arabic', 'english', 'german', 'french', 'italian']];
 const secOf = new Map();
 for (const s of learnSections('en')) {
   if (SKIP.has(s.id)) continue;
@@ -80,12 +83,12 @@ for (const s of learnSections('en')) {
 let spin = 0;
 for (const [k, sec] of secOf) {
   const en = M.en.get(k); if (!en) continue;
-  const de = M.de.get(k), fr = M.fr.get(k);
+  const de = M.de.get(k), fr = M.fr.get(k), it = M.it.get(k);
   const sets = []; // each: [ar, en, de, fr]
-  if (HAND[k]) sets.push(...HAND[k].map((x) => [...x, HAND_ICON[k]]));
-  else if (sec === 'days') for (const f of DAYS) sets.push([...f(en.ar, en.w, de && de.w, fr && fr.w), '📅']);
-  else if (sec === 'months') for (const f of MONTHS) sets.push([...f(en.ar, en.w, de && de.w, fr && fr.w), '🗓️']);
-  else if (sec === 'colours') for (const f of COLOURS) sets.push([...f(en.ar, en.w, de && de.w, fr && fr.w), '🎨']);
+  if (HAND[k]) sets.push(...HAND[k].map((x, i) => [...x, (HAND_IT[k] || [])[i] || null, HAND_ICON[k]]));
+  else if (sec === 'days') DAYS.forEach((f, i) => { const w = it && it.w; const t = [`Ci vediamo ${w}!`, `Il ${w} giochiamo.`, `${cap(w || '')} è un bel giorno.`, `${cap(w || '')} vedo la mia famiglia.`][i]; sets.push([...f(en.ar, en.w, de && de.w, fr && fr.w), w ? t : null, '📅']); });
+  else if (sec === 'months') MONTHS.forEach((f, i) => { const w = it && it.w; const t = [`Il mio compleanno è a ${w}.`, `${cap(w || '')} è un mese dell'anno.`, `A ${w} ci divertiamo.`, `Il mio mese preferito è ${w}.`][i]; sets.push([...f(en.ar, en.w, de && de.w, fr && fr.w), w ? t : null, '🗓️']); });
+  else if (sec === 'colours') COLOURS.forEach((f, i) => { const w = it && it.w; const d = w ? (/^[aeiou]/.test(w) ? `l'${w}` : `il ${w}`) : ''; const t = [`Mi piace ${d}.`, `${cap(d)} è un bel colore.`, `Riesci a trovare qualcosa di ${w}?`][i]; sets.push([...f(en.ar, en.w, de && de.w, fr && fr.w), w ? t : null, '🎨']); });
   else if (!SPECIAL.has(sec)) {
     const pool = POOLS[sec] || DEFAULT;
     const plural = isPlural(en.w);
@@ -96,11 +99,12 @@ for (const [k, sec] of secOf) {
       const b = P[p];
       const deOk = de && DE_ART.test(de.w) && !(p === 'where' && /^die /.test(de.w) && plural);
       const frOk = fr && FR_ART.test(fr.w) && !(p === 'where' && /^les /.test(fr.w));
-      sets.push([en.ar ? b[0](en.ar) : null, b[1](en.w), deOk ? b[2](de.w) : null, frOk ? b[3](fr.w) : null, ICON[p]]);
+      const itOk = it && IT_ART.test(it.w);
+      sets.push([en.ar ? b[0](en.ar) : null, b[1](en.w), deOk ? b[2](de.w) : null, frOk ? b[3](fr.w) : null, itOk ? b[4](it.w) : null, ICON[p]]);
     }
   } else continue;
-  table[k] = sets.map((s) => ({ ar: s[0] || '', en: s[1] || '', de: s[2] || '', fr: s[3] || '', ic: s[4] || '💡' }));
-  sets.forEach((s, i) => rows.push([k, sec, i + 1, s[0] || '', s[1] || '', s[2] || '', s[3] || '']));
+  table[k] = sets.map((s) => ({ ar: s[0] || '', en: s[1] || '', de: s[2] || '', fr: s[3] || '', it: s[4] || '', ic: s[5] || '💡' }));
+  sets.forEach((s, i) => rows.push([k, sec, i + 1, s[0] || '', s[1] || '', s[2] || '', s[3] || '', s[4] || '']));
 }
 fs.writeFileSync(new URL('../assets/games/learn_voice/examples.js', import.meta.url), `// made by tools/make_examples.mjs: up to 4 example sentences per word (Arabic, English, German, French)
 window.__learnExamples = ${JSON.stringify(table)};
@@ -109,8 +113,8 @@ const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
 fs.writeFileSync(new URL('../docs/EXAMPLES_ALL_ITEMS.csv', import.meta.url), '\ufeff' + rows.map((r) => r.map(q).join(',')).join('\n') + '\n');
 const has = (lang, id) => fs.existsSync(new URL(`../assets/games/learn_voice/${lang}/${id}.mp3`, import.meta.url));
 const req = [['language', 'example_no', 'text', 'file_name']]; const seen = new Set();
-const per = { ar: { words: 0, sentences: 0 }, en: { words: 0, sentences: 0 }, de: { words: 0, sentences: 0 }, fr: { words: 0, sentences: 0 } };
-for (const [k, arr] of Object.entries(table)) for (const l of ['ar', 'en', 'de', 'fr']) {
+const per = { ar: { words: 0, sentences: 0 }, en: { words: 0, sentences: 0 }, de: { words: 0, sentences: 0 }, fr: { words: 0, sentences: 0 }, it: { words: 0, sentences: 0 } };
+for (const [k, arr] of Object.entries(table)) for (const l of ['ar', 'en', 'de', 'fr', 'it']) {
   let any = false;
   arr.forEach((e, i) => { const t = e[l]; if (!t) return; any = true; per[l].sentences++; const id = clipId(t, l); if (seen.has(l + id) || has(l, id)) return; seen.add(l + id); req.push([l, i + 1, t, id + '.mp3']); });
   if (any) per[l].words++;

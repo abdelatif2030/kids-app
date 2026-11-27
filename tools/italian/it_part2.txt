@@ -1,0 +1,360 @@
+370|la lucertola|f
+371|la mongolfiera|f
+372|la jeep|f
+373|il castello|m
+374|la conchiglia|f
+375|il faro|m
+376|il letto|m
+377|lo spazzolino|m
+378|il lavandino|m
+379|l'asciugamano|m
+380|lo zaino|m
+381|le scarpe|fp
+382|l'armadio|m
+383|il tavolo|m
+384|la scopa|f
+385|l'orologio|m
+386|l'altalena|f
+387|la bicicletta|f
+388|l'albero|m
+389|la scuola|f
+390|l'ospedale|m
+391|il semaforo|m
+392|la fontana|f
+393|il grattacielo|m
+394|il re|m
+395|la regina|f
+396|il drago|m
+397|il cavaliere|m
+398|il mago|m
+399|il forziere|m
+400|l'alieno|m
+401|il robot|m
+402|la luna|f
+403|il pianeta con gli anelli|m
+404|i palloncini|mp
+405|la nuvola|f
+406|la caramella|f
+407|il cupcake|m
+408|la carota|f
+409|l'erba|f
+410|l'osso|m
+411|la carne|f
+412|il fieno|m
+413|i semi|mp
+414|l'insetto|m
+415|la fragola|f
+416|il camion dei pompieri|m
+417|il girasole|m
+418|la foglia|f
+419|il pesce azzurro|m
+420|l'uccellino azzurro|m
+421|il pianeta blu|m
+422|lo zucchero filato|m
+423|il pianeta rosa|m
+424|la pera|f
+425|l'anguria|f
+426|l'orsacchiotto|m
+427|i cubetti|mp
+428|lo yo-yo|m
+429|la macchina|f
+430|l'autobus|m
+431|la barca|f
+432|il treno|m
+433|la stella marina|f
+434|l'ananas|m
+435|il mango|m
+436|l'ambulanza|f
+437|l'auto della polizia|f
+438|l'elicottero|m
+439|lo scuolabus|m
+440|l'autobus urbano|m
+441|il taxi|m
+442|il tram|m
+443|il bulldozer|m
+444|la feluca|f
+445|il carro con l'asino|m
+446|il trattore|m
+447|lo slittino|m
+448|il rover spaziale|m
+449|il disco volante|m
+450|la recinzione|f
+451|i tulipani|mp
+452|la vaschetta per uccelli|f
+453|il nano da giardino|m
+454|la pianta|f
+455|il gelato|m
+456|il lecca-lecca|m
+457|la casetta di pan di zenzero|f
+458|l'uccellino giallo|m
+459|l'arcobaleno|m
+460|l'aquilone|m
+461|la girandola|f
+462|il pesce pagliaccio|m
+463|il pesce giallo|m
+464|il gabbiano|m
+465|il pallone da spiaggia|m
+466|il salvagente|m
+467|la palma da spiaggia|f
+468|la barchetta|f
+469|il molo|m
+470|la sedia a sdraio|f
+471|le rocce|fp
+472|le alghe|fp
+473|la tavola da surf|f
+474|il secchiello|m
+475|il relitto|m
+476|l'ancora|f
+477|la vongola|f
+478|l'anemone di mare|m
+479|il pesce palla|m
+480|il razzetto|m
+481|il casco spaziale|m
+482|la cometa|f
+483|la stazione spaziale|f
+484|la torre|f
+485|la principessa|f
+486|lo scudo|m
+487|la torcia|f
+488|il cavallo del cavaliere|m
+489|il giullare|m
+490|la casetta|f
+491|il pozzo|m
+492|lo stendardo|m
+493|la capanna|f
+494|il ponte|m
+495|il totem|m
+496|il silo|m
+497|lo spaventapasseri|m
+498|il pagliaio|m
+499|l'abbeveratoio|m
+500|il cancello della fattoria|m
+501|la pompa dell'acqua|f
+502|il pollaio|m
+503|la carriola|f
+504|l'annaffiatoio|m
+505|la baita|f
+506|gli sci|mp
+507|le palle di neve|fp
+508|il blocco di ghiaccio|m
+509|la caserma dei pompieri|f
+510|la fermata dell'autobus|f
+511|il lampione|m
+512|la panchina|f
+513|la cassetta della posta|f
+514|la duna di sabbia|f
+515|l'oasi|f
+516|la giara|f
+517|il carretto di legno|m
+518|la lanterna|f
+519|il cucciolo di cammello|m
+520|lo scoiattolo|m
+521|il riccio|m
+522|il cervo|m
+523|il lupo|m
+524|l'ippopotamo|m
+525|il rinoceronte|m
+526|il canguro|m
+527|il koala|m
+528|l'orso polare|m
+529|il cucciolo di cane|m
+530|il gattino|m
+531|l'agnello|m
+532|il vitello|m
+533|il criceto|m
+534|il tricheco|m
+535|la lontra|f
+536|il castoro|m
+537|il procione|m
+538|il pellicano|m
+539|la cicogna|f
+540|il colibrì|m
+541|il picchio|m
+542|l'aragosta|f
+543|il gambero|m
+544|lo scarabeo|m
+545|la cavalletta|f
+546|la vespa|f
+547|la zanzara|f
+548|il lama|m
+549|il leopardo|m
+550|lo scimpanzé|m
+551|il bradipo|m
+552|il calamaro|m
+553|il suricato|m
+554|felice|A
+555|triste|A
+556|arrabbiato|A
+557|stanco|A
+558|affamato|A
+559|assetato|A
+560|spaventato|A
+561|sorpreso|A
+562|assonnato|A
+563|timido|A
+564|orgoglioso|A
+565|emozionato|A
+566|la spalla|f
+567|il collo|m
+568|il braccio|m
+569|la gamba|f
+570|il gomito|m
+571|la schiena|f
+572|il mento|m
+573|la guancia|f
+574|il sopracciglio|m
+575|la lingua|f
+576|i pantaloncini|mp
+577|la gonna|f
+578|il maglione|m
+579|gli stivali|mp
+580|i sandali|mp
+581|la maglietta|f
+582|il cappotto|m
+583|la cintura|f
+584|la zia|f
+585|il cugino|m
+586|i gemelli|mp
+587|il vicino|m
+588|il panettiere|m
+589|il dentista|m
+590|il meccanico|m
+591|il cameriere|m
+592|il capitano|m
+593|lo scienziato|m
+594|l'astronauta|m
+595|il giardiniere|m
+596|il pescatore|m
+597|il negoziante|m
+598|il sarto|m
+599|il veterinario|m
+600|il koshari|m
+601|il falafel|m
+602|le fave|fp
+603|la molokhia|f
+604|il feteer|m
+605|la basbousa|f
+606|il kunafa|m
+607|l'om ali|m
+608|le foglie di vite ripiene|fp
+609|l'hummus|m
+610|la tahina|f
+611|il budino di riso|m
+612|l'hamburger|m
+613|il panino|m
+614|gli spaghetti|mp
+615|le patatine fritte|fp
+616|l'insalata|f
+617|il burro|m
+618|lo yogurt|m
+619|la torta|f
+620|il cioccolato|m
+621|la marmellata|f
+622|lo zucchero|m
+623|il sale|m
+624|il tè|m
+625|la limonata|f
+626|i cereali|mp
+627|la frutta secca|f
+628|le arachidi|fp
+629|gli spinaci|mp
+630|la zucchina|f
+631|il cavolo|m
+632|il cavolfiore|m
+633|l'okra|f
+634|i fagiolini|mp
+635|il ravanello|m
+636|il pompelmo|m
+637|il mandarino|m
+638|la guaiava|f
+639|il lime|m
+640|il pancake|m
+641|i popcorn|mp
+642|la salsiccia|f
+643|il tonno|m
+644|la zuppa di lenticchie|f
+645|il succo di mango|m
+646|la porta|f
+647|la finestra|f
+648|il divano|m
+649|la cucina|f
+650|il bagno|m
+651|la camera da letto|f
+652|le scale|fp
+653|il tetto|m
+654|il frigorifero|m
+655|il forno|m
+656|la lampada|f
+657|il tappeto|m
+658|lo specchio|m
+659|la tenda|f
+660|la chiave|f
+661|la tazza|f
+662|il piatto|m
+663|il cucchiaio|m
+664|la forchetta|f
+665|il coltello|m
+666|la ciotola|f
+667|la bottiglia|f
+668|la pentola|f
+669|il sapone|m
+670|il pettine|m
+671|il cestino|m
+672|la televisione|f
+673|il telefono|m
+674|il computer|m
+675|il cuscino|m
+676|la coperta|f
+677|la sedia|f
+678|il giardino|m
+679|il parco|m
+680|lo zoo|m
+681|la fattoria|f
+682|la spiaggia|f
+683|il mercato|m
+684|la moschea|f
+685|la chiesa|f
+686|la biblioteca|f
+687|la panetteria|f
+688|il negozio|m
+689|la banca|f
+690|l'aeroporto|m
+691|la stazione ferroviaria|f
+692|la strada|f
+693|il semaforo|m
+694|il fiume|m
+695|il mare|m
+696|il lago|m
+697|l'isola|f
+698|la foresta|f
+699|il deserto|m
+700|la collina|f
+701|il cielo|m
+702|il vulcano|m
+703|la grotta|f
+704|la cascata|f
+705|il balcone|m
+706|il garage|m
+707|l'ascensore|m
+708|la sala|f
+709|la toilette|f
+710|la doccia|f
+711|la vasca da bagno|f
+712|la lavatrice|f
+713|l'aspirapolvere|m
+714|il ferro da stiro|m
+715|l'appendiabiti|m
+716|lo scaffale|m
+717|il cassetto|m
+718|la credenza|f
+719|il cancello della scuola|m
+720|il parco giochi|m
+721|la piscina|f
+722|il cinema|m
+723|il ristorante|m
+724|la farmacia|f
+725|il supermercato|m
+726|la stazione di polizia|f
+727|l'ufficio postale|m
+728|il museo|m
+729|lo stadio|m
