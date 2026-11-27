@@ -251,7 +251,8 @@ test('the 386 new words (extra_words.js) add 24 sections in the five languages, 
   globalThis.window = {}; new Function('window', src)(globalThis.window);
   try {
     const X = globalThis.window.__learnExtraWords;
-    for (const l of ['en', 'de', 'fr', 'it']) assert.equal(X[l].length, 386, l);
+    for (const l of ['en', 'it']) assert.equal(X[l].length, 386, l);
+    for (const l of ['de', 'fr']) assert.equal(X[l].length, 386 + 297, l); // plus the catch-up words that join the existing sections
     const base = learnSections('en').length;
     for (const lang of ['ar', 'en', 'de', 'fr', 'it']) {
       const secs = learnSections(lang).filter((s) => s.id.startsWith('n_'));
@@ -261,5 +262,15 @@ test('the 386 new words (extra_words.js) add 24 sections in the five languages, 
       for (const s of secs) for (const it of s.items) { assert.ok(it.show && it.show.thing, `${lang} ${it.key} picture`); assert.ok(it.label, `${lang} ${it.key} label`); }
     }
     assert.ok(base >= 41);
+  } finally { delete globalThis.window; }
+});
+
+test('German and French have as many words as English after the catch-up (sections and items within 1%)', async () => {
+  const fs = await import('node:fs');
+  globalThis.window = {}; new Function('window', fs.readFileSync(new URL('../../../assets/games/learn_voice/extra_words.js', import.meta.url), 'utf8'))(globalThis.window);
+  try {
+    const cnt = (l) => { const s = learnSections(l); return [s.length, s.reduce((a, x) => a + x.items.length, 0)]; };
+    const [es, ei] = cnt('en');
+    for (const l of ['de', 'fr', 'it']) { const [ls, li] = cnt(l); assert.equal(ls, es, `${l} sections`); assert.ok(Math.abs(li - ei) / ei < 0.01, `${l} items ${li} vs ${ei}`); }
   } finally { delete globalThis.window; }
 });
