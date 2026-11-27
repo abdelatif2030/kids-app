@@ -210,3 +210,40 @@ pool size 44 (churning) → 15 (exactly the window), DOM style mutations
 npm test 13/13. Delivered as rehlaty_sunset_lite.zip (النسخة الخفيفة ٢); the
 package now also carries games/three_shared.js, which the shared-engine build
 loads before game.js.
+
+## Real nitro jets (2026-11-27, after the owner's first successful playtest)
+
+Owner verdict on the fixed build: the game runs and he loves it — his one
+note was «شكل النيترو وهو بيخرج مش حقيقي»: the ALIVE rainbow sparkle particles
+did not read as a real exhaust flame. The rainbow flame is gone.
+
+What the nitro is now (all in `game_src/highway_race/src/main.js`; sim.js
+untouched; gameplay, stages, voices, music, scoring identical):
+- Twin jets, one per chrome exhaust tip (x = ±0.486, y = 0.21, z = −2.16 on
+  the hero): ONE merged mesh of crossed additive planes (vertical + horizontal
+  per pipe), textured from a canvas drawn once — layered teardrop with a
+  white-hot nozzle core, pale-blue inner cone, azure body, deep-blue fringe,
+  and four shock diamonds (the bright beads a real jet shows) shrinking
+  toward the tip. Real nitro burns blue; so does this.
+- The jets rake 3.4° down toward the road so their length reads from the
+  high chase camera, and a soft blue radial glow pools on the road under
+  the exhaust, breathing with the flame.
+- Behaviour follows the real burn state (`r.p.nitro`, 2.4 s): ignition
+  flare-up (fast ramp + a 38% overshoot that settles), sustained burn with
+  layered sine flicker (27/41/63 Hz components at ±13% combined — smooth
+  amplitude play, never on/off strobing), sputter-out in the last 0.45 s
+  (length chops and shrinks), then a 0.16 s fade tail. Nothing pops.
+- Embers: a few orange / white-blue sparks from the existing pooled
+  particle system (rates cut so they read as sparks, not bubbles); the
+  ignition puff is 8 sparks. The speed-lines overlay and FOV punch are
+  unchanged.
+Performance: assets are cached on the instance and the meshes are built
+once per stage start; per frame the effect is only scale/opacity writes —
+zero allocations, zero rebuilds. Draw calls while burning: +2 (flame mesh
++ glow), inside the normal traffic variance (measured 264–298 across
+normal and lite runs, vs 265–288 for the rainbow build); triangles +18.
+Verified with the real click flow (menu button, audio unlocked): zero page
+errors in normal and lite modes, npm test 13/13. Headless screenshots at
+ignition / sustained / sputter show twin blue-white jets streaming from
+both pipes, brightest at the nozzle — foreshortened by the chase camera,
+as a real rear flame is.
