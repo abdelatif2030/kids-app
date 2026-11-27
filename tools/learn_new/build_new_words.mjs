@@ -94,6 +94,24 @@ body.forEach((r, i) => {
   }
 });
 
+// German and French lack ~300 words the English world has (docs/EXPANSION_DE_FR.csv: house, city, around me, feelings...): they join the existing sections of the English row
+{
+  const ENW = JSON.parse(fs.readFileSync(new URL('../../game_src/learn_games/src/english/words.json', import.meta.url), 'utf8'));
+  const [h2, ...b2] = csv(fs.readFileSync(new URL('../../docs/EXPANSION_DE_FR.csv', import.meta.url), 'utf8').replace(/^﻿/, '')).filter((r) => r.length > 3);
+  const c2 = (r, n) => r[h2.indexOf(n)];
+  let n2 = 0;
+  for (const r of b2) {
+    const eng = c2(r, 'english').trim();
+    const er = ENW.find((e) => e.en.toLowerCase() === eng.toLowerCase());
+    if (!er) throw new Error('no English row for ' + eng);
+    for (const [lang, w, sx] of [['de', c2(r, 'german').trim(), c2(r, 'german_sentence').trim()], ['fr', c2(r, 'french').trim(), c2(r, 'french_sentence').trim()]]) {
+      rows[lang].push({ cat: er.cat, en: w, w, s: sx, thing: er.thing, eng, lang, ar: c2(r, 'arabic').trim() });
+    }
+    n2++;
+  }
+  console.log('German/French catch-up words', n2);
+}
+
 fs.writeFileSync(new URL('../../assets/games/learn_voice/extra_words.js', import.meta.url), `// made by tools/learn_new/build_new_words.mjs (386 new words, five languages)\nwindow.__learnExtraWords = ${JSON.stringify(rows)};\n`);
 
 const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
