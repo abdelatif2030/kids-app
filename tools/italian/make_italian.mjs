@@ -30,7 +30,7 @@ const rows = [];
 EN.forEach((e, i) => {
   const { w, g } = IT.get(i);
   const key = (e.eng !== undefined ? e.eng : e.en);
-  const row = { ...e, eng: key, en: w, w };
+  const row = { ...e, eng: key, en: w, w, lang: 'it' };
   if (g === 'm' || g === 'f') row.s = `È ${indef(w, g)}.`;
   else if (g === 'mp' || g === 'fp') row.s = `Sono ${w}.`;
   else if (g === 'L') { const ch = key.replace('letter ', ''); row.en = ch.toUpperCase(); row.w = ch.toUpperCase() === 'I' ? 'I' : w; row.s = `${ch.toUpperCase()} come ${LETTER_WORD[ch]}.`; }

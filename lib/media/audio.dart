@@ -98,6 +98,7 @@ class TtsSpeech implements SpeechBackend, VoiceTunable {
       'en' => ['en-US', 'en'],
       'de' => ['de-DE', 'de'],
       'fr' => ['fr-FR', 'fr'],
+      'it' => ['it-IT', 'it'],
       _ => [lang],
     };
     for (final c in candidates) {

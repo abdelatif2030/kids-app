@@ -52,7 +52,7 @@ export class Voice {
       const sc = document.createElement('script');
       sc.id = 'learn-voice-manifest';
       sc.src = `${this.dir}manifest.js`;
-      sc.onerror = () => { window.__learnVoice = window.__learnVoice || { ar: [], en: [], de: [], fr: [] }; };
+      sc.onerror = () => { window.__learnVoice = window.__learnVoice || { ar: [], en: [], de: [], fr: [], it: [] }; };
       document.head.append(sc);
     }
     // the «Example» sentences of the words (a script too, so the game bundle stays small)
@@ -85,7 +85,7 @@ export class Voice {
    *  (English teaching words: the same word as a slower clip, `<id>_slow`). */
   _item(x) {
     if (typeof x === 'string') return { t: spoken(x), lang: this.lang, slow: false };
-    return { t: spoken(x.t), lang: x.lang === 'en' || x.lang === 'de' || x.lang === 'fr' || x.lang === 'ar' ? x.lang : this.lang, slow: !!x.slow, optional: !!x.optional };
+    return { t: spoken(x.t), lang: x.lang === 'en' || x.lang === 'de' || x.lang === 'fr' || x.lang === 'it' || x.lang === 'ar' ? x.lang : this.lang, slow: !!x.slow, optional: !!x.optional };
   }
 
   _clipName(it) { return clipId(it.t, it.lang) + (it.slow ? '_slow' : ''); }

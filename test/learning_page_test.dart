@@ -114,19 +114,19 @@ void main() {
   });
 
   test('«اتعلّم» is registered for the four languages (own store key, learn mode, bundled page)', () {
-    final all = {'ar': kLearnBasicsAr, 'en': kLearnBasicsEn, 'de': kLearnBasicsDe, 'fr': kLearnBasicsFr};
+    final all = {'ar': kLearnBasicsAr, 'en': kLearnBasicsEn, 'de': kLearnBasicsDe, 'fr': kLearnBasicsFr, 'it': kLearnBasicsIt};
     for (final e in all.entries) {
       expect(e.value.learnLang, e.key);
       expect(e.value.learnMode, 'learn');
       expect(kLearnWebGames.values, contains(e.value));
       expect(File('${e.value.base}index.html').existsSync(), isTrue);
     }
-    expect({for (final g in all.values) g.storeKey}.length, 4);
+    expect({for (final g in all.values) g.storeKey}.length, 5);
   });
 
   testWidgets('a language leads to two options: levels and «اتعلّم»; both are tappable', (t) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.windows;
-    for (final lang in ['en', 'de', 'fr']) {
+    for (final lang in ['en', 'de', 'fr', 'it']) {
       await openLearning(t, const Size(1024, 768), chooseArabic: false);
       await t.tap(find.byKey(ValueKey('learn_lang_$lang')));
       await t.pump();
@@ -144,9 +144,9 @@ void main() {
   });
 
   for (final (name, size) in [('tablet', const Size(1024, 768)), ('phone landscape', const Size(844, 390)), ('desktop', const Size(1366, 768))]) {
-    testWidgets('$name: the four language cards are side by side in ONE row and all the same size', (t) async {
+    testWidgets('$name: the five language cards are side by side in ONE row and all the same size', (t) async {
       await openLearning(t, size, chooseArabic: false);
-      final rects = [for (final l in ['ar', 'en', 'de', 'fr']) t.getRect(find.byKey(ValueKey('learn_lang_$l')))];
+      final rects = [for (final l in ['ar', 'en', 'de', 'fr', 'it']) t.getRect(find.byKey(ValueKey('learn_lang_$l')))];
       for (final r in rects) {
         expect(r.width, closeTo(rects.first.width, 0.5), reason: '$name: same size');
         expect(r.height, closeTo(rects.first.height, 0.5), reason: '$name: same size');
@@ -159,15 +159,16 @@ void main() {
     });
   }
 
-  testWidgets('phone portrait: the four cards are two and two, still the same size', (t) async {
+  testWidgets('phone portrait: the five cards wrap, still the same size, still the same size', (t) async {
     await openLearning(t, const Size(360, 700), chooseArabic: false);
-    final rects = [for (final l in ['ar', 'en', 'de', 'fr']) t.getRect(find.byKey(ValueKey('learn_lang_$l')))];
+    final rects = [for (final l in ['ar', 'en', 'de', 'fr', 'it']) t.getRect(find.byKey(ValueKey('learn_lang_$l')))];
     for (final r in rects) {
       expect(r.width, closeTo(rects.first.width, 0.5));
       expect(r.height, closeTo(rects.first.height, 0.5));
     }
     expect(rects[0].top, closeTo(rects[1].top, 0.5));
     expect(rects[2].top, closeTo(rects[3].top, 0.5));
+    expect(rects[4].width, closeTo(rects[0].width, 0.5));
     expect(t.takeException(), isNull);
   });
 

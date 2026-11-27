@@ -19,6 +19,6 @@ test('character clips are under 1 MB each and the art folder under 60 MB', () =>
   assert.ok(total < 60 * 1024 * 1024, `art is ${Math.round(total / 1048576)} MB`);
 });
 
-test('the letters game bundle stays under 1.8 MB (minified; the English, German and French word lists are inside)', () => {
+test('the letters game bundle stays under 1.8 MB (minified; the English, German, French and Italian word lists are inside)', () => {
   assert.ok(statSync(join(GAMES, 'learn_letters', 'game.js')).size < 1.8 * 1024 * 1024);
 });

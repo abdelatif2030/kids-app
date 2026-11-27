@@ -127,7 +127,7 @@ class _WebGameScreenState extends State<WebGameScreen> {
         if (text is String && text.isNotEmpty && text.length <= 200) {
           // the games' words are Egyptian Arabic: an Egyptian voice when the device has one (docs/LEARNING_GAMES_REBUILD.md)
           // and the games' brighter, child-like voice (owner request), kept clear
-          AppAudio.say(text, lang: msg['lang'] == 'en' ? 'en' : msg['lang'] == 'de' ? 'de' : msg['lang'] == 'fr' ? 'fr' : 'ar-EG', slow: msg['slow'] == true, childVoice: true);
+          AppAudio.say(text, lang: msg['lang'] == 'en' ? 'en' : msg['lang'] == 'de' ? 'de' : msg['lang'] == 'fr' ? 'fr' : msg['lang'] == 'it' ? 'it' : 'ar-EG', slow: msg['slow'] == true, childVoice: true);
         }
       case 'round':
       case 'complete':

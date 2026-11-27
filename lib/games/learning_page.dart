@@ -129,6 +129,7 @@ const List<LearnLanguage> kLearnLanguages = [
   LearnLanguage('en', 'English', 'Hear it, find it, say it', 'A', Color(0xFF3D8BFF)),
   LearnLanguage('de', 'Deutsch', 'Hören, finden, sagen', 'Ä', Color(0xFF2FA85A)),
   LearnLanguage('fr', 'Français', 'Écouter, trouver, dire', 'É', Color(0xFFE0457B)),
+  LearnLanguage('it', 'Italiano', 'Ascoltare, trovare, dire', 'I', Color(0xFFE8892B)),
 ];
 
 /// The voices of the two choice screens (the owner records them: docs/LEARN_PICK_VOICE_LINES.csv). A missing file is silent.
@@ -218,7 +219,7 @@ class _LearnLanguageGateState extends State<LearnLanguageGate> {
             final short = box.maxHeight < 460; // a phone held sideways: everything must fit without scrolling
             final gap = wide ? 18.0 : 12.0;
             final usable = (box.maxWidth - 32).clamp(280.0, 1000.0);
-            final cols = wide ? 4 : 2;
+            final cols = wide ? kLearnLanguages.length : 2;
             final bigSize = short ? 22.0 : wide ? 34.0 : 24.0;
             final ribbonH = short ? 52.0 : 100.0;
             final bottomRoom = short ? 34.0 : 20.0; // the phone's home bar / browser bar covers the bottom edge: leave room
@@ -227,7 +228,8 @@ class _LearnLanguageGateState extends State<LearnLanguageGate> {
             final cardMaxH = box.maxHeight - ribbonH - gapsH - minLogoH;
             var w = ((usable - gap * (cols - 1)) / cols).clamp(110.0, 230.0);
             if (wide) w = w.clamp(80.0, (cardMaxH / 1.17).clamp(100.0, 230.0));
-            final cardsH = wide ? w * 1.17 : w * 1.17 * 2 + gap;
+            final rows = (kLearnLanguages.length / cols).ceil();
+            final cardsH = w * 1.17 * rows + gap * (rows - 1);
             // the logo takes ALL the free space above the title (owner 2026-11-26: it was small in a big empty area)
             final logoH = (box.maxHeight - ribbonH - gapsH - cardsH).clamp(minLogoH, 380.0);
             final logoW = (logoH / 0.78) < box.maxWidth * 0.62 ? logoH / 0.78 : box.maxWidth * 0.62;
@@ -264,16 +266,23 @@ class _LearnLanguageGateState extends State<LearnLanguageGate> {
   }
 }
 
-/// One language card: the same size for all four, a picture (or a painted one for French) with the name on its ribbon.
+/// One language card: the same size for all of them, a picture (or a painted one for French) with the name on its ribbon.
 class _LanguageCard extends StatelessWidget {
   final LearnLanguage lang;
   final double width;
   final VoidCallback onTap;
   const _LanguageCard({required this.lang, required this.width, required this.onTap});
 
-  static const _ribbon = {'ar': Color(0xFFD83A3A), 'en': Color(0xFF2F7BE0), 'de': Color(0xFF2FA85A), 'fr': Color(0xFFE0457B)};
+  static const _ribbon = {'ar': Color(0xFFD83A3A), 'en': Color(0xFF2F7BE0), 'de': Color(0xFF2FA85A), 'fr': Color(0xFFE0457B), 'it': Color(0xFFE8892B)};
 
   Widget _art() {
+    if (lang.id == 'it') {
+      // painted like the others until the owner's picture arrives: warm sky, a pizza and a bell tower in emoji
+      return DecoratedBox(
+        decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFFFE2B8), Color(0xFFFFF6D8)])),
+        child: Center(child: Padding(padding: EdgeInsets.only(bottom: width * 0.18), child: Text('🍕🏛️', style: TextStyle(fontSize: width * 0.34)))),
+      );
+    }
     if (lang.id == 'fr') {
       // painted like the others (no picture yet): sunrise sky, a bakery and a tower in emoji
       return DecoratedBox(
@@ -334,7 +343,7 @@ class _LanguageCard extends StatelessWidget {
 /// written in the language chosen and explained by a voice.
 class LearnModeScreen extends StatefulWidget {
   final ChildProfile child;
-  final String lang; // ar, en, de, fr
+  final String lang; // ar, en, de, fr, it
   const LearnModeScreen({super.key, required this.child, required this.lang});
 
   @override
@@ -352,10 +361,11 @@ class _LearnModeScreenState extends State<LearnModeScreen> {
     'en': ('English', "Let's play", 'Learn'),
     'de': ('Deutsch', "Los geht's", 'Lernen'),
     'fr': ('Français', 'On joue', 'Apprendre'),
+    'it': ('Italiano', 'Giochiamo', 'Imparare'),
   };
 
-  WebGame get _levels => switch (lang) { 'en' => kLearnEnglish, 'de' => kLearnGerman, 'fr' => kLearnFrench, _ => kLearnLetters };
-  WebGame get _basics => switch (lang) { 'en' => kLearnBasicsEn, 'de' => kLearnBasicsDe, 'fr' => kLearnBasicsFr, _ => kLearnBasicsAr };
+  WebGame get _levels => switch (lang) { 'en' => kLearnEnglish, 'de' => kLearnGerman, 'fr' => kLearnFrench, 'it' => kLearnItalian, _ => kLearnLetters };
+  WebGame get _basics => switch (lang) { 'en' => kLearnBasicsEn, 'de' => kLearnBasicsDe, 'fr' => kLearnBasicsFr, 'it' => kLearnBasicsIt, _ => kLearnBasicsAr };
 
   @override
   void initState() {

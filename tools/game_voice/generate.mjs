@@ -44,8 +44,8 @@ const voiced = (l) => {
 };
 
 function manifest() {
-  const m = { ar: [], en: [], de: [], fr: [] };
-  for (const lang of ['ar', 'en', 'de', 'fr']) {
+  const m = { ar: [], en: [], de: [], fr: [], it: [] };
+  for (const lang of ['ar', 'en', 'de', 'fr', 'it']) {
     const d = join(DIR, lang);
     if (!existsSync(d)) continue;
     const have = new Set(readdirSync(d).filter((f) => f.endsWith('.mp3')).map((f) => f.slice(0, -4)));
@@ -53,7 +53,7 @@ function manifest() {
     m[lang] = lang !== 'ar' ? [...have] : lines.filter((l) => l.lang === lang && have.has(l.id)).map((l) => l.id);
   }
   writeFileSync(join(DIR, 'manifest.js'), `// made by tools/game_voice/generate.mjs: the recorded clips that exist\nwindow.__learnVoice = ${JSON.stringify(m)};\n`);
-  console.log(`manifest: ${m.ar.length}/${lines.filter((l) => l.lang === 'ar').length} Arabic, ${m.en.length}/${lines.filter((l) => l.lang === 'en').length} English, ${m.de.length} German, ${m.fr.length} French clips`);
+  console.log(`manifest: ${m.ar.length}/${lines.filter((l) => l.lang === 'ar').length} Arabic, ${m.en.length}/${lines.filter((l) => l.lang === 'en').length} English, ${m.de.length} German, ${m.fr.length} French, ${m.it.length} Italian clips`);
 }
 
 const xml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

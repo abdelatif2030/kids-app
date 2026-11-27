@@ -8,6 +8,7 @@
 import WORDS from './words.json' with { type: 'json' };
 import DE_WORDS from '../german/words.json' with { type: 'json' };
 import FR_WORDS from '../french/words.json' with { type: 'json' };
+import IT_WORDS from '../italian/words.json' with { type: 'json' };
 import { colorOf } from '../letters/colors.js';
 import { numberWord } from '../letters/numbers.js';
 
@@ -62,6 +63,15 @@ export const FR_LEVELS = EN_LEVELS.filter((l) => FR_WORDS.some(l.pick)).map((l) 
   if (k === 'letters') f.pick = pack('letters A-Z (name)', 'letters (French only)');
   return f;
 });
+// Italian with Rehlaty: the same levels and pictures, the Italian words of docs/ITALIAN_WORDLIST.csv. Ids it_*. The map / badges / win picture are the English
+// world's until the owner's Italian pictures arrive (docs/ITALIAN_IMAGE_PROMPTS.md).
+const IT_NAMES = { animals: 'Gli animali', first: 'Le mie prime parole', family: 'Io e la mia famiglia', food: 'Gnam gnam', school: 'Vestiti e scuola', world: 'Mestieri, musica e tempo',
+  colorful: 'Cose colorate', routine: 'La mia giornata', numbers: 'I numeri', letters: "L'alfabeto", colors: 'I colori', shapes: 'Le forme', time: 'Giorni e mesi', tens: 'Numeri grandi', where: "Dov'è la palla?", beads: 'Le perle' };
+export const IT_LEVELS = EN_LEVELS.filter((l) => IT_WORDS.some(l.pick)).map((l) => {
+  const k = l.id.slice(3);
+  return { ...l, id: `it_${k}`, mode: 'en', lang: 'it', ar: IT_NAMES[k] || l.ar, words: IT_WORDS, art: { ...l.art, lang: 'it' } };
+});
+export const isItalianLevel = (id) => typeof id === 'string' && id.startsWith('it_');
 export const isEnglishLevel = (id) => typeof id === 'string' && id.startsWith('en_');
 export const isFrenchLevel = (id) => typeof id === 'string' && id.startsWith('fr_');
 export const isGermanLevel = (id) => typeof id === 'string' && id.startsWith('de_');

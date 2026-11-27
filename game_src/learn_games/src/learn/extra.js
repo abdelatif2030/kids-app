@@ -4,13 +4,14 @@
 import EN from '../english/words.json' with { type: 'json' };
 import DE from '../german/words.json' with { type: 'json' };
 import FR from '../french/words.json' with { type: 'json' };
+import IT from '../italian/words.json' with { type: 'json' };
 import { LETTERS } from '../letters/sim.js';
 import { numberWord } from '../letters/numbers.js';
 import { numberWords } from './numbers.js';
 
-const IDX = { ar: 0, en: 1, de: 2, fr: 3 };
+const IDX = { ar: 0, en: 1, de: 2, fr: 3, it: 4 };
 const pick = (a, lang) => a[IDX[lang]];
-const WORDS = { en: EN, de: DE, fr: FR };
+const WORDS = { en: EN, de: DE, fr: FR, it: IT };
 const engOf = (e) => (e.eng !== undefined ? e.eng : e.en);
 const BYKEY = new Map(EN.map((e) => [engOf(e).toLowerCase(), e]));
 const thingOf = (key) => { const e = BYKEY.get(key); return e && e.thing ? e.thing : null; };
@@ -35,12 +36,14 @@ const ORD = {
   ar: ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن', 'التاسع', 'العاشر', 'الحادي عشر', 'الثاني عشر', 'الثالث عشر', 'الرابع عشر', 'الخامس عشر', 'السادس عشر', 'السابع عشر', 'الثامن عشر', 'التاسع عشر', 'العشرين'],
   en: ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'seventeenth', 'eighteenth', 'nineteenth', 'twentieth'],
   de: ['erste', 'zweite', 'dritte', 'vierte', 'fünfte', 'sechste', 'siebte', 'achte', 'neunte', 'zehnte', 'elfte', 'zwölfte', 'dreizehnte', 'vierzehnte', 'fünfzehnte', 'sechzehnte', 'siebzehnte', 'achtzehnte', 'neunzehnte', 'zwanzigste'],
+  it: ['primo', 'secondo', 'terzo', 'quarto', 'quinto', 'sesto', 'settimo', 'ottavo', 'nono', 'decimo', 'undicesimo', 'dodicesimo', 'tredicesimo', 'quattordicesimo', 'quindicesimo', 'sedicesimo', 'diciassettesimo', 'diciottesimo', 'diciannovesimo', 'ventesimo'],
   fr: ['premier', 'deuxième', 'troisième', 'quatrième', 'cinquième', 'sixième', 'septième', 'huitième', 'neuvième', 'dixième', 'onzième', 'douzième', 'treizième', 'quatorzième', 'quinzième', 'seizième', 'dix-septième', 'dix-huitième', 'dix-neuvième', 'vingtième'],
 };
 function ordinalSign(n, lang) {
   if (lang === 'en') return `${n}${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'}`;
   if (lang === 'de') return `${n}.`;
   if (lang === 'fr') return n === 1 ? '1er' : `${n}e`;
+  if (lang === 'it') return `${n}º`;
   return digits(n, 'ar');
 }
 function ordinalItems(lang) {
@@ -70,31 +73,36 @@ function sentenceItems(lang) {
 
 // ---------------------------------------------------------------- picture stories: 4 pages each (picture + one sentence)
 const STORIES = [
-  { id: 'story1', emoji: '🐱', name: ['قصة: القطة الجعانة', 'Story: The hungry cat', 'Geschichte: Die hungrige Katze', 'Histoire : Le chat affamé'], pics: ['cat', 'fish', 'o_milk', 'h_bed'], pages: [
+  { id: 'story1', emoji: '🐱', name: ['قصة: القطة الجعانة', 'Story: The hungry cat', 'Geschichte: Die hungrige Katze', 'Histoire : Le chat affamé', 'Storia: La gatta affamata'], pics: ['cat', 'fish', 'o_milk', 'h_bed'], pages: [
     ['في قطة صغيرة جعانة.', 'القطة شافت سمكة.', 'القطة شربت شوية لبن.', 'دلوقتي القطة نامت في السرير. تصبحي على خير!'],
     ['A little cat is hungry.', 'She sees a fish.', 'She drinks some milk.', 'Now she goes to bed. Good night!'],
     ['Eine kleine Katze hat Hunger.', 'Sie sieht einen Fisch.', 'Sie trinkt etwas Milch.', 'Jetzt geht sie ins Bett. Gute Nacht!'],
-    ['Un petit chat a faim.', 'Il voit un poisson.', 'Il boit du lait.', 'Maintenant il va au lit. Bonne nuit !']] },
-  { id: 'story2', emoji: '🪁', name: ['قصة: يوم مشمس', 'Story: A sunny day', 'Geschichte: Ein sonniger Tag', 'Histoire : Un jour de soleil'], pics: ['sun', 'r_kite', 'r_cloud', 't_rain'], pages: [
+    ['Un petit chat a faim.', 'Il voit un poisson.', 'Il boit du lait.', 'Maintenant il va au lit. Bonne nuit !'],
+    ['C\'è una gattina affamata.', 'Vede un pesce.', 'Beve un po\' di latte.', 'Ora va a letto. Buonanotte!']] },
+  { id: 'story2', emoji: '🪁', name: ['قصة: يوم مشمس', 'Story: A sunny day', 'Geschichte: Ein sonniger Tag', 'Histoire : Un jour de soleil', 'Storia: Una giornata di sole'], pics: ['sun', 'r_kite', 'r_cloud', 't_rain'], pages: [
     ['الشمس طلعت.', 'سامي معاه طيارة ورق.', 'جت سحابة كبيرة.', 'مطر! سامي جري على البيت.'],
     ['The sun is up.', 'Sam has a red kite.', 'A big cloud comes.', 'Rain! Sam runs home.'],
     ['Die Sonne scheint.', 'Sam hat einen roten Drachen.', 'Eine große Wolke kommt.', 'Es regnet! Sam rennt nach Hause.'],
-    ['Le soleil brille.', 'Sam a un cerf-volant rouge.', 'Un gros nuage arrive.', 'Il pleut ! Sam court à la maison.']] },
-  { id: 'story3', emoji: '🐄', name: ['قصة: في المزرعة', 'Story: At the farm', 'Geschichte: Auf dem Bauernhof', 'Histoire : À la ferme'], pics: ['cow', 'horse', 'mallard', 'dog'], pages: [
+    ['Le soleil brille.', 'Sam a un cerf-volant rouge.', 'Un gros nuage arrive.', 'Il pleut ! Sam court à la maison.'],
+    ['Il sole è alto.', 'Sami ha un aquilone rosso.', 'Arriva una grande nuvola.', 'Piove! Sami corre a casa.']] },
+  { id: 'story3', emoji: '🐄', name: ['قصة: في المزرعة', 'Story: At the farm', 'Geschichte: Auf dem Bauernhof', 'Histoire : À la ferme', 'Storia: In fattoria'], pics: ['cow', 'horse', 'mallard', 'dog'], pages: [
     ['البقرة بتقول موو.', 'الحصان بيجري بسرعة.', 'البطة بتعوم في البركة.', 'الكلب بيقول هو هو. صباح الخير يا مزرعة!'],
     ['The cow says moo.', 'The horse runs fast.', 'The duck swims in the pond.', 'The dog says woof. Good morning, farm!'],
     ['Die Kuh macht muh.', 'Das Pferd rennt schnell.', 'Die Ente schwimmt im Teich.', 'Der Hund sagt wau. Guten Morgen, Bauernhof!'],
-    ['La vache fait meuh.', 'Le cheval court vite.', 'Le canard nage dans la mare.', 'Le chien fait ouaf. Bonjour, la ferme !']] },
-  { id: 'story4', emoji: '🚌', name: ['قصة: يوم آدم', "Story: Adam's day", 'Geschichte: Adams Tag', "Histoire : La journée d'Adam"], pics: ['a_boy', 'o_bread', 'bus', 'e_book'], pages: [
+    ['La vache fait meuh.', 'Le cheval court vite.', 'Le canard nage dans la mare.', 'Le chien fait ouaf. Bonjour, la ferme !'],
+    ['La mucca fa muuu.', 'Il cavallo corre veloce.', 'L\'anatra nuota nello stagno.', 'Il cane fa bau. Buongiorno, fattoria!']] },
+  { id: 'story4', emoji: '🚌', name: ['قصة: يوم آدم', "Story: Adam's day", 'Geschichte: Adams Tag', "Histoire : La journée d'Adam", 'Storia: La giornata di Adam'], pics: ['a_boy', 'o_bread', 'bus', 'e_book'], pages: [
     ['آدم صحي من النوم.', 'أكل عيش في الفطار.', 'راح المدرسة بالأتوبيس.', 'قرأ كتاب. يوم جميل!'],
     ['Adam is awake.', 'He eats bread for breakfast.', 'He goes to school by bus.', 'He reads a book. What a nice day!'],
     ['Adam ist wach.', 'Er isst Brot zum Frühstück.', 'Er fährt mit dem Bus zur Schule.', 'Er liest ein Buch. Was für ein schöner Tag!'],
-    ['Adam est réveillé.', 'Il mange du pain au petit déjeuner.', "Il va à l'école en bus.", 'Il lit un livre. Quelle belle journée !']] },
-  { id: 'story5', emoji: '🍎', name: ['قصة: التفاحة الحمرا', 'Story: The red apple', 'Geschichte: Der rote Apfel', 'Histoire : La pomme rouge'], pics: ['h_tree', 'apple', 'a_girl', 'a_baby'], pages: [
+    ['Adam est réveillé.', 'Il mange du pain au petit déjeuner.', "Il va à l'école en bus.", 'Il lit un livre. Quelle belle journée !'],
+    ['Adam è sveglio.', 'Mangia il pane a colazione.', 'Va a scuola con l\'autobus.', 'Legge un libro. Che bella giornata!']] },
+  { id: 'story5', emoji: '🍎', name: ['قصة: التفاحة الحمرا', 'Story: The red apple', 'Geschichte: Der rote Apfel', 'Histoire : La pomme rouge', 'Storia: La mela rossa'], pics: ['h_tree', 'apple', 'a_girl', 'a_baby'], pages: [
     ['في شجرة طويلة.', 'تفاحة حمرا وقعت.', 'نور شالت التفاحة.', 'نور قسمتها مع أخوها الصغير.'],
     ['There is a tall tree.', 'A red apple falls down.', 'Nour picks it up.', 'She shares it with her baby brother.'],
     ['Da ist ein hoher Baum.', 'Ein roter Apfel fällt herunter.', 'Nour hebt ihn auf.', 'Sie teilt ihn mit ihrem kleinen Bruder.'],
-    ['Il y a un grand arbre.', 'Une pomme rouge tombe.', 'Nour la ramasse.', 'Elle la partage avec son petit frère.']] },
+    ['Il y a un grand arbre.', 'Une pomme rouge tombe.', 'Nour la ramasse.', 'Elle la partage avec son petit frère.'],
+    ['C\'è un albero alto.', 'Una mela rossa cade giù.', 'Nour la raccoglie.', 'La divide con il suo fratellino.']] },
 ];
 export const STORY_DEFS = STORIES.map((s) => ({ id: s.id, emoji: s.emoji, name: s.name }));
 function storyItems(story, lang) {
@@ -107,6 +115,7 @@ const SIGHT = {
   ar: 'هذا هذه ده دي أنا إنت هو هي إحنا في على من إلى مع لا فين مين إيه ليه كبير صغير حلو جميل بيت ماما بابا يلا تعالى'.split(' '),
   en: 'the a and is it in on at to of you I we he she my me can see go like look this that have are was for with up down big said play come here'.split(' '),
   de: 'der die das und ist ich du er sie wir es in auf mit von zu ein nicht ja nein mein dein da hier was wer wo wie groß klein gut Mama Papa kann sehen gehen'.split(' '),
+  it: 'il lo la un una e è sono io tu lui lei noi di a in su con per non sì no mio tuo qui là che chi dove come grande piccolo buono bello mamma papà'.split(' '),
   fr: 'le la les un une et est je tu il elle nous vous dans sur avec de du à pas oui non mon ma ton ici là que qui où comment grand petit bon papa maman'.split(' '),
 };
 function sightItems(lang) {
@@ -117,9 +126,10 @@ function sightItems(lang) {
 const SOUNDS = {
   en: { a: 'ah', b: 'buh', c: 'kuh', d: 'duh', e: 'eh', f: 'fff', g: 'guh', h: 'huh', i: 'ih', j: 'juh', k: 'kuh', l: 'lll', m: 'mmm', n: 'nnn', o: 'aw', p: 'puh', q: 'kwuh', r: 'rrr', s: 'sss', t: 'tuh', u: 'uh', v: 'vvv', w: 'wuh', x: 'ks', y: 'yuh', z: 'zzz' },
   de: { a: 'a', b: 'bö', c: 'kö', d: 'dö', e: 'e', f: 'ff', g: 'gö', h: 'hö', i: 'i', j: 'jö', k: 'kö', l: 'll', m: 'mm', n: 'nn', o: 'o', p: 'pö', q: 'kwö', r: 'rr', s: 'ss', t: 'tö', u: 'u', v: 'ff', w: 'wö', x: 'ks', y: 'ü', z: 'ts', ä: 'ä', ö: 'ö', ü: 'ü', ß: 'ss' },
+  it: { a: 'a', b: 'bu', c: 'ku', d: 'du', e: 'e', f: 'fff', g: 'gu', i: 'i', l: 'lll', m: 'mmm', n: 'nnn', o: 'o', p: 'pu', q: 'ku', r: 'rrr', s: 'sss', t: 'tu', u: 'u', v: 'vvv', z: 'ts' },
   fr: { a: 'a', b: 'beu', c: 'keu', d: 'deu', e: 'eu', f: 'ff', g: 'gu', h: '', i: 'i', j: 'jj', k: 'keu', l: 'll', m: 'mm', n: 'nn', o: 'o', p: 'peu', q: 'keu', r: 'rr', s: 'ss', t: 'teu', u: 'u', v: 'vv', w: 'weu', x: 'ks', y: 'i', z: 'zz', é: 'é', è: 'è', ê: 'ê', à: 'a', ç: 'ss' },
 };
-const ARTICLE = /^(der|die|das|ein|eine|le|la|les|l'|un|une|the|a|an)\s+/i;
+const ARTICLE = /^(der|die|das|ein|eine|le|la|les|l'|un|une|the|a|an|il|lo|i|gli|le)\s*/i;
 const PREFER = ['animals', 'x:animals', 'picture words', 'picture pack: food', 'x:food', 'things of a colour', 'picture pack: school', 'x:home', 'x:around'];
 function phonicsItems(lang) {
   if (lang === 'ar') return [];
@@ -166,12 +176,12 @@ function formItems(lang) {
 
 // ---------------------------------------------------------------- the definitions (id, emoji, names, builder)
 export const EXTRA_DEFS = [
-  { id: 'count', emoji: '🍎', name: ['عدّ معايا', 'Count with me', 'Zähl mit', 'Compte avec moi'], build: countItems, after: 'numbers' },
-  { id: 'ordinals', emoji: '🥇', name: ['الأول والتاني', 'First, second, third', 'Erste, zweite, dritte', 'Premier, deuxième'], build: ordinalItems, after: 'count' },
-  { id: 'sentences', emoji: '💬', name: ['جمل قصيرة', 'Short sentences', 'Kurze Sätze', 'Phrases courtes'], build: sentenceItems },
+  { id: 'count', emoji: '🍎', name: ['عدّ معايا', 'Count with me', 'Zähl mit', 'Compte avec moi', 'Conta con me'], build: countItems, after: 'numbers' },
+  { id: 'ordinals', emoji: '🥇', name: ['الأول والتاني', 'First, second, third', 'Erste, zweite, dritte', 'Premier, deuxième', 'Primo, secondo, terzo'], build: ordinalItems, after: 'count' },
+  { id: 'sentences', emoji: '💬', name: ['جمل قصيرة', 'Short sentences', 'Kurze Sätze', 'Phrases courtes', 'Frasi brevi'], build: sentenceItems },
   ...STORIES.map((s) => ({ id: s.id, emoji: s.emoji, name: s.name, build: (lang) => storyItems(s, lang) })),
-  { id: 'sight', emoji: '📖', name: ['كلمات للقراءة', 'Words to read', 'Wörter zum Lesen', 'Mots à lire'], build: sightItems },
-  { id: 'phonics', emoji: '🔈', name: ['أصوات الحروف', 'Letter sounds', 'Buchstabenlaute', 'Les sons des lettres'], build: phonicsItems },
-  { id: 'harakat', emoji: '✏️', name: ['الحركات', 'Vowel marks', 'Vokalzeichen', 'Voyelles'], build: harakatItems },
-  { id: 'forms', emoji: '🔠', name: ['شكل الحرف', 'Letter forms', 'Buchstabenformen', 'Formes des lettres'], build: formItems },
+  { id: 'sight', emoji: '📖', name: ['كلمات للقراءة', 'Words to read', 'Wörter zum Lesen', 'Mots à lire', 'Parole da leggere'], build: sightItems },
+  { id: 'phonics', emoji: '🔈', name: ['أصوات الحروف', 'Letter sounds', 'Buchstabenlaute', 'Les sons des lettres', 'I suoni delle lettere'], build: phonicsItems },
+  { id: 'harakat', emoji: '✏️', name: ['الحركات', 'Vowel marks', 'Vokalzeichen', 'Voyelles', 'Le vocali (arabo)'], build: harakatItems },
+  { id: 'forms', emoji: '🔠', name: ['شكل الحرف', 'Letter forms', 'Buchstabenformen', 'Formes des lettres', 'Forme delle lettere (arabo)'], build: formItems },
 ];

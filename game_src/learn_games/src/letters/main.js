@@ -20,7 +20,7 @@ import { shapeGeo } from '../kit/shapes3d.js';
 import { colorOf } from './colors.js';
 import { NUMBERS } from '../kit/words.js';
 import { LEVELS, ALL_LEVELS, EVERY_LEVEL, ARABIC_LEVELS, TOPIC_LEVELS, LevelPlay, levelsFor, cheer } from './levels.js';
-import { EN_LEVELS, DE_LEVELS, FR_LEVELS } from '../english/levels.js';
+import { EN_LEVELS, DE_LEVELS, FR_LEVELS, IT_LEVELS } from '../english/levels.js';
 import { learnSections, numberItem } from '../learn/sections.js';
 import { EXTRA_DEFS } from '../learn/extra.js';
 import { nextNumber, prevNumber } from '../learn/numbers.js';
@@ -546,17 +546,18 @@ class Game {
   }
 
   /** True while the child learns English (the chooser in the app passes learnLang 'en'); the Arabic world is untouched. */
-  _learnEn() { const l = this.sh.cfg && this.sh.cfg.learnLang; return l === 'en' || l === 'de' || l === 'fr'; }
+  _learnEn() { const l = this.sh.cfg && this.sh.cfg.learnLang; return l === 'en' || l === 'de' || l === 'fr' || l === 'it'; }
   _learnFr() { return !!(this.sh.cfg && this.sh.cfg.learnLang === 'fr'); }
+  _learnIt() { return !!(this.sh.cfg && this.sh.cfg.learnLang === 'it'); }
   _learnDe() { return !!(this.sh.cfg && this.sh.cfg.learnLang === 'de'); }
   /** The levels of the language being learned. */
-  _list() { return this._learnFr() ? FR_LEVELS : this._learnDe() ? DE_LEVELS : this._learnEn() ? EN_LEVELS : ARABIC_LEVELS; }
+  _list() { return this._learnIt() ? IT_LEVELS : this._learnFr() ? FR_LEVELS : this._learnDe() ? DE_LEVELS : this._learnEn() ? EN_LEVELS : ARABIC_LEVELS; }
 
 
   // ---- «اتعلّم»: the basics, one item at a time (owner 2026-11-26) -------------------------------------------------------
 
-  _lang() { const l = this.sh.cfg && this.sh.cfg.learnLang; return l === 'en' || l === 'de' || l === 'fr' ? l : 'ar'; }
-  _lt(ar, en, de, fr) { return { ar, en, de, fr }[this._lang()]; }
+  _lang() { const l = this.sh.cfg && this.sh.cfg.learnLang; return l === 'en' || l === 'de' || l === 'fr' || l === 'it' ? l : 'ar'; }
+  _lt(ar, en, de, fr, it) { const l = this._lang(); return l === 'it' ? (it || en) : { ar, en, de, fr }[l]; }
   _learnData() { return this._secs || (this._secs = learnSections(this._lang())); }
 
   /** The sections (letters, numbers, animals, birds ...): the child picks what to learn. */
@@ -577,7 +578,7 @@ class Game {
       h('i', {}, s.emoji), lang !== 'ar' ? h('span', { class: 'lw-bi' }, h('em', {}, s.nameAr), h('small', { dir: 'ltr' }, s.name)) : h('span', {}, s.name), h('small', { dir: 'ltr' }, s.kind === 'numbers' ? '0 → 100 000' : String(s.items.length))));
     const grid = h('div', { class: 'lw-grid lw-lgrid' }, tiles);
     const card = h('div', { class: `lw-card lw-learn${lang === 'ar' ? '' : ' lw-en'}` },
-      h('div', { class: 'lw-title' }, this._lt('اختار رحلتك 📚', 'Choose your journey 📚', 'Wähle deine Reise 📚', 'Choisis ton voyage 📚')),
+      h('div', { class: 'lw-title' }, this._lt('اختار رحلتك 📚', 'Choose your journey 📚', 'Wähle deine Reise 📚', 'Choisis ton voyage 📚', 'Scegli il tuo viaggio 📚')),
       lang !== 'ar' ? h('div', { class: 'lw-arsub' }, 'اختار رحلتك') : null,
       grid);
     sh.layer.append(h('div', { class: 'lk-dim', style: 'background:rgba(40,30,90,.18)' }, card));
@@ -638,7 +639,7 @@ class Game {
     const table = (typeof window !== 'undefined' && window.__learnExamples) || {};
     const list = (table[key] || []).filter((e) => e[lang]);
     if (!list.length) return null;
-    const label = this._lt('مثال', 'Example', 'Beispiel', 'Exemple');
+    const label = this._lt('مثال', 'Example', 'Beispiel', 'Exemple', 'Esempio');
     const dir = lang === 'ar' ? 'rtl' : 'ltr';
     const bare = (w) => String(w || '').replace(/^(der|die|das|le|la|les|l'|the|a|an|ال)\s?/i, '').trim();
     const hl = (text, word) => { // the learned word stands out in the sentence
@@ -753,7 +754,7 @@ class Game {
       h('div', { class: 'lk-starburst' }, '🌟'),
       h('div', { class: 'lk-msg' }, learnLine('done', lang)),
       h('button', { class: 'lk-btn', onclick: () => { sh.sound.play('tap'); this._learnOpen(L.sec.id, 0, false); } }, '↻ ', learnLine('again', lang)),
-      h('button', { class: 'lk-btn p', onclick: () => { sh.sound.play('tap'); this._learnHome(); } }, this._lt('← الأقسام', '← Sections', '← Bereiche', '← Les rubriques')))));
+      h('button', { class: 'lk-btn p', onclick: () => { sh.sound.play('tap'); this._learnHome(); } }, this._lt('← الأقسام', '← Sections', '← Bereiche', '← Les rubriques', '← Sezioni')))));
   }
 
   /** Jump to one item: a keypad for numbers (up to 100 000), a list of the words for everything else. */
@@ -773,7 +774,7 @@ class Game {
       body = h('div', { class: 'lw-lpicklist' }, ...L.sec.items.map((x, k) => h('button', { class: `lw-lpickitem${k === L.i ? ' on' : ''}`, onclick: () => { sh.sound.play('tap'); L.i = k; L.intro = false; close(); this._learnShow(); } }, x.label)));
     }
     sh.layer.append(h('div', { class: 'lk-dim lw-lpick', onclick: (e) => { if (e.target === e.currentTarget) close(); } }, h('div', { class: `lw-card lw-lcard${lang === 'ar' ? '' : ' ltr'}` },
-      h('div', { class: 'lw-title' }, L.sec.kind === 'numbers' ? this._lt('اكتب رقم', 'Type a number', 'Tippe eine Zahl', 'Tape un nombre') : this._lt('اختار واحد', 'Pick one', 'Wähle eins', 'Choisis-en un')), body,
+      h('div', { class: 'lw-title' }, L.sec.kind === 'numbers' ? this._lt('اكتب رقم', 'Type a number', 'Tippe eine Zahl', 'Tape un nombre', 'Scrivi un numero') : this._lt('اختار واحد', 'Pick one', 'Wähle eins', 'Choisis-en un', 'Scegline uno')), body,
       h('button', { class: 'lk-btn p', onclick: () => { sh.sound.play('tap'); close(); } }, '✕'))));
   }
 
@@ -799,7 +800,7 @@ class Game {
     });
     const mapArt = this._learnEn() && list[0].art ? `background:linear-gradient(rgba(40,30,90,.10),rgba(40,30,90,.10)),url(${sh.base}art/${list[0].art.map}.webp) center/cover no-repeat;` : '';
     const lvGrid = h('div', { class: 'lw-grid' }, tiles);
-    const lvCard = h('div', { class: `lw-card${this._learnEn() ? ' lw-en' : ''}` }, h('div', { class: 'lw-title' }, this._learnFr() ? 'Choisis un jeu 🎧' : this._learnDe() ? 'Such ein Spiel aus 🎧' : this._learnEn() ? 'Pick a game 🎧' : sh.t('pick')), this._learnEn() ? h('div', { class: 'lw-arsub' }, 'اختار لعبة') : null, lvGrid);
+    const lvCard = h('div', { class: `lw-card${this._learnEn() ? ' lw-en' : ''}` }, h('div', { class: 'lw-title' }, this._learnIt() ? 'Scegli un gioco 🎧' : this._learnFr() ? 'Choisis un jeu 🎧' : this._learnDe() ? 'Such ein Spiel aus 🎧' : this._learnEn() ? 'Pick a game 🎧' : sh.t('pick')), this._learnEn() ? h('div', { class: 'lw-arsub' }, 'اختار لعبة') : null, lvGrid);
     const oldCard = h('div', { class: 'lk-dim', style: mapArt + 'background-color:rgba(40,30,90,.18)' }, lvCard);
     const mountOld = () => { sh.layer.append(oldCard); this._fitGrid(lvCard, lvGrid, tiles.length); };
     if (this._learnEn()) {
@@ -1053,8 +1054,8 @@ class Game {
         else this.sh.speak(slow ? r.retry : (r.sayOnly || [r.say[0]]));
       };
       this.sign.style.direction = 'ltr';
-      this.sign.append(this.signText, h('button', { class: 'lw-again lw-hear', 'aria-label': 'Listen again', onclick: hear(false) }, h('b', {}, '🔊'), h('small', {}, this._learnFr() ? 'Écouter' : this._learnDe() ? 'Hören' : 'Listen')),
-        h('button', { class: 'lw-again lw-hear lw-slow', 'aria-label': 'Listen slowly', onclick: hear(true) }, h('b', {}, '🐢'), h('small', {}, this._learnFr() ? 'Lentement' : this._learnDe() ? 'Langsam' : 'Slowly')));
+      this.sign.append(this.signText, h('button', { class: 'lw-again lw-hear', 'aria-label': 'Listen again', onclick: hear(false) }, h('b', {}, '🔊'), h('small', {}, this._learnIt() ? 'Ascolta' : this._learnFr() ? 'Écouter' : this._learnDe() ? 'Hören' : 'Listen')),
+        h('button', { class: 'lw-again lw-hear lw-slow', 'aria-label': 'Listen slowly', onclick: hear(true) }, h('b', {}, '🐢'), h('small', {}, this._learnIt() ? 'Piano' : this._learnFr() ? 'Lentement' : this._learnDe() ? 'Langsam' : 'Slowly')));
     } else this.sign.append(this.signIcon, this.signText, h('button', { class: 'lw-again', 'aria-label': sh.t('again'), onclick: (e) => { e.stopPropagation(); this._say(); } }, '🔊'));
     sh.layer.append(this.sign);
     sh.sound.setMode('play');
@@ -1083,7 +1084,7 @@ class Game {
     this.st.setPicks([...this.opts.values()], (id) => this._tap(id));
     this.st.focus = null;
     this.signText.textContent = r.prompt;
-    this.signText.style.direction = r.lang === 'en' || r.lang === 'de' || r.lang === 'fr' ? 'ltr' : '';
+    this.signText.style.direction = r.lang === 'en' || r.lang === 'de' || r.lang === 'fr' || r.lang === 'it' ? 'ltr' : '';
     this.sign.classList.remove('pop');
     void this.sign.offsetWidth;
     this.sign.classList.add('pop');
@@ -1151,7 +1152,7 @@ ead) also reads every choice aloud, one after the other, and the choice being re
     const seq = [phrase];
     if (r.reward) seq.push(r.reward);
     this.signText.textContent = r.reward ? (r.arWord ? `${r.reward}  ·  ${r.arWord}` : r.reward) : phrase;
-    this.signText.style.direction = (r.lang === 'en' || r.lang === 'de' || r.lang === 'fr') && r.reward ? 'ltr' : '';
+    this.signText.style.direction = (r.lang === 'en' || r.lang === 'de' || r.lang === 'fr' || r.lang === 'it') && r.reward ? 'ltr' : '';
     this.signIcon.textContent = '⭐';
     this._advDone = false;
     const next = () => {
