@@ -233,7 +233,6 @@ class Game2 {
     this.fx = []; this.texts = []; this.tracks = [];
     this.stick = null;
     this.burst = { n: 0, t: 0 };
-    this.lastTick = 99;
     this._build();
     this.sound.setMode('play');
     const d = this.gm.def;
@@ -257,7 +256,7 @@ class Game2 {
     this.layer.append(this._exitBtn(), h('button', { class: 'md-round', style: 'left:calc(var(--u)*12)', 'aria-label': t('pause'), onclick: () => this._pause() }, '⏸'), this._soundBtn(),
       h('div', { class: 'md-top' },
         h('div', { class: 'md-ribbon' }, `${t('level').toUpperCase()} ${num(this.n)}`),
-        h('div', { class: 'md-timer' }, '⏱ ', this.hud.time, h('div', { class: 'bar' }, this.hud.bar), this.hud.stars),
+        h('div', { class: 'md-timer' }, '🎯 ', this.hud.time, h('div', { class: 'bar' }, this.hud.bar), this.hud.stars),
         h('div', { class: 'md-counts' }, pills)),
       this.sayEl, this.hintEl);
     this._hud();
@@ -266,13 +265,12 @@ class Game2 {
   _hud() {
     const g = this.gm;
     if (!g || !this.hud) return;
-    const s = Math.max(0, Math.ceil(g.timeLeft));
-    this.hud.time.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-    const f = g.timeLeft / g.def.time;
-    this.hud.bar.style.width = `${f * 100}%`;
-    this.hud.bar.classList.toggle('low', f < 0.25);
-    const st = g.starsLive;
-    this.hud.stars.replaceChildren(...[1, 2, 3].map((k) => h('i', { class: k <= st ? '' : 'off' }, '⭐')));
+    // a progress pill, not a timer: marbles delivered of the level's target, and the bar FILLS up
+    const delivered = g.counts.reduce((a, c, i) => a + Math.min(c, g.holes[i].target), 0);
+    const total = g.holes.reduce((a, hl) => a + hl.target, 0);
+    this.hud.time.textContent = `${num(delivered)}/${num(total)}`;
+    this.hud.bar.style.width = `${total ? (delivered / total) * 100 : 0}%`;
+    this.hud.stars.replaceChildren(...[1, 2, 3].map(() => h('i', { class: 'off' }, '⭐')));
     this.hud.counts.forEach((c) => { const hl = g.holes[c.i]; c.el.textContent = `${num(Math.min(g.counts[c.i], hl.target))}/${num(hl.target)}`; c.pill.classList.toggle('done', g.done[c.i]); });
   }
 
@@ -303,16 +301,6 @@ class Game2 {
       h('button', { class: 'md-btn dark', onclick: () => this.showMenu() }, t('levels')))));
   }
 
-  _loseCard() {
-    this.sound.play('lose');
-    this.voice.say('lose');
-    this.mode = 'lost';
-    this.layer.append(h('div', { class: 'md-dim' }, h('div', { class: 'md-card' },
-      h('div', { class: 'md-title' }, t('timeup')), h('div', { class: 'md-small' }, t('timeupText')),
-      h('button', { class: 'md-btn', onclick: () => this.startLevel(this.n) }, '↻ ', t('tryAgain')),
-      h('button', { class: 'md-btn dark', onclick: () => this.showMenu() }, t('levels')))));
-  }
-
   // ---- the loop -----------------------------------------------------------------------------------------------------
 
   _loop() {
@@ -337,7 +325,6 @@ class Game2 {
       else if (e.type === 'bump') { if (!this._bumpGate || performance.now() - this._bumpGate > 120) { this._bumpGate = performance.now(); this.sound.play('bump'); this.fx.push({ k: 0, kind: 'bump', x: e.x, y: e.y }); } }
       else if (e.type === 'push') click++;
       else if (e.type === 'won') { this.mode = 'wait'; setTimeout(() => this._winCard(e.stars), 900); }
-      else if (e.type === 'lost') { this.mode = 'wait'; setTimeout(() => this._loseCard(), 600); }
     }
     if (this.burst.t > 0) this.burst.t -= dt;
     if (click && Math.random() < 0.3) this.sound.play('click');
@@ -347,7 +334,6 @@ class Game2 {
     if (D.speed > 3) { const last = this.tracks[this.tracks.length - 1]; if (!last || Math.hypot(last.x - D.x, last.y - D.y) > 1.6) this.tracks.push({ x: D.x - Math.cos(D.a) * 2.2, y: D.y - Math.sin(D.a) * 2.2, a: D.a, k: 0 }); }
     for (const tr of this.tracks) tr.k += dt * 0.18;
     this.tracks = this.tracks.filter((tr) => tr.k < 1).slice(-160);
-    if (g.timeLeft < 6 && g.state === 'play' && Math.ceil(g.timeLeft) !== this.lastTick) { this.lastTick = Math.ceil(g.timeLeft); this.sound.play('tick'); }
     this._hud();
   }
 

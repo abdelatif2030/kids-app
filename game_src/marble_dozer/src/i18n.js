@@ -1,5 +1,5 @@
 const S = {
-  title: ['جرّافة الكرات', 'Marble Dozer'],
+  title: ['البنّاء الصغير', 'Little Builder'],
   play: ['يلا نلعب', 'Play'], level: ['المرحلة', 'Level'], levels: ['المراحل', 'Levels'],
   drag: ['اسحب عشان تسوق', 'DRAG TO DRIVE'],
   firstPush: ['أول دفعة', 'First Push'], twoColors: ['لونين', 'Two Colors'], doubleUp: ['ضعف الضعف', 'Double Up'], movingWalls: ['حيطان بتتحرك', 'Moving Walls'],
@@ -9,7 +9,7 @@ const S = {
   blue: ['الأزرق', 'BLUE'], red: ['الأحمر', 'RED'], yellow: ['الأصفر', 'YELLOW'], green: ['الأخضر', 'GREEN'], purple: ['البنفسجي', 'PURPLE'],
   done: ['خلّص!', 'DONE!'],
   complete: ['المرحلة خلصت!', 'Level complete!'],
-  timeup: ['الوقت خلص!', "Time's up!"], timeupText: ['جرّب تاني، هتلحق المرة دي!', 'Try again, you can make it!'],
+
   tryAgain: ['جرّب تاني', 'Try again'], next: ['المرحلة الجاية', 'Next level'], replay: ['العب تاني', 'Replay'],
   allDone: ['خلصت كل المراحل! 🎉', 'All levels done! 🎉'],
   pause: ['وقفة', 'Paused'], resume: ['كمّل', 'Resume'], back: ['رجوع', 'Back'], exit: ['خروج', 'Exit'],

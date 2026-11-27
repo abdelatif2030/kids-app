@@ -1,5 +1,5 @@
 // «جرّافة الكرات» — Marble Dozer: the rules and the physics (pure, no browser). A little yellow bulldozer in a small wooden arena full of
-// coloured marbles: push each colour into the matching hole before the time runs out, using the walls, ramps and multiplier gates.
+// coloured marbles: push each colour into the matching hole — at your own pace, there is no clock — using the walls, ramps and multiplier gates.
 // Every level adds something: a second colour and a wall, multiplier gates, moving walls, bumpers, conveyor belts, ramps...
 // Marbles bounce and roll (friction, bounces, marble-to-marble collisions); the bulldozer's blade pushes them.
 // The arena is 60 wide and 90 tall (x to the right, y DOWN; the holes are at the top like in the picture).
@@ -16,30 +16,30 @@ export function rng(seed) {
   return () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; };
 }
 
-/** The level definitions (data only). [easy] = younger children: more time and fewer marbles to deliver. */
+/** The level definitions (data only). [easy] = younger children: fewer marbles to deliver. */
 export function levelDef(n, easy = false) {
-  const D = { n, name: '', time: 45, holes: [], clusters: [], walls: [], bumpers: [], belts: [], ramps: [], gates: [], start: { x: AW / 2, y: AH - 12, a: -Math.PI / 2 } };
+  const D = { n, name: '', holes: [], clusters: [], walls: [], bumpers: [], belts: [], ramps: [], gates: [], start: { x: AW / 2, y: AH - 12, a: -Math.PI / 2 } };
   const hole = (c, x, y, target, r = 5.2) => D.holes.push({ c, x, y, r, target });
   const cluster = (c, x, y, count) => D.clusters.push({ c, x, y, count });
   const wall = (x1, y1, x2, y2, move = null) => D.walls.push({ x1, y1, x2, y2, move });
   switch (n) {
-    case 1: D.name = 'firstPush'; D.time = 50; hole(0, 40, 8, 30); cluster(0, 27, 50, 30); break;
-    case 2: D.name = 'twoColors'; D.time = 70; hole(0, 18, 8, 30); hole(1, 44, 9, 30); cluster(0, 17, 55, 30); cluster(1, 43, 52, 30); wall(30, 6, 30, 40); break;
-    case 3: D.name = 'doubleUp'; D.time = 70; hole(2, 16, 8, 36); hole(0, 44, 8, 36); cluster(2, 17, 66, 18); cluster(0, 43, 66, 18);
+    case 1: D.name = 'firstPush'; hole(0, 40, 8, 30); cluster(0, 27, 50, 30); break;
+    case 2: D.name = 'twoColors'; hole(0, 18, 8, 30); hole(1, 44, 9, 30); cluster(0, 17, 55, 30); cluster(1, 43, 52, 30); wall(30, 6, 30, 40); break;
+    case 3: D.name = 'doubleUp'; hole(2, 16, 8, 36); hole(0, 44, 8, 36); cluster(2, 17, 66, 18); cluster(0, 43, 66, 18);
       D.gates.push({ id: 1, x1: 8, y1: 44, x2: 26, y2: 44, mul: 2 }, { id: 2, x1: 34, y1: 44, x2: 52, y2: 44, mul: 2 }); wall(30, 40, 30, 56); break;
-    case 4: D.name = 'movingWalls'; D.time = 75; hole(0, 14, 8, 24); hole(1, 46, 8, 24); cluster(0, 17, 66, 24); cluster(1, 43, 66, 24);
+    case 4: D.name = 'movingWalls'; hole(0, 14, 8, 24); hole(1, 46, 8, 24); cluster(0, 17, 66, 24); cluster(1, 43, 66, 24);
       wall(8, 36, 24, 36, { ax: 14, ay: 0, per: 5, ph: 0 }); wall(36, 28, 52, 28, { ax: -14, ay: 0, per: 5, ph: 1.5 }); break;
-    case 5: D.name = 'bumpIt'; D.time = 75; hole(0, 30, 8, 28); hole(2, 12, 9, 20); cluster(0, 30, 66, 28); cluster(2, 46, 62, 20);
+    case 5: D.name = 'bumpIt'; hole(0, 30, 8, 28); hole(2, 12, 9, 20); cluster(0, 30, 66, 28); cluster(2, 46, 62, 20);
       D.bumpers.push({ x: 22, y: 38, r: 3.2 }, { x: 38, y: 38, r: 3.2 }, { x: 30, y: 26, r: 3.2 }); break;
-    case 6: D.name = 'beltUp'; D.time = 80; hole(1, 44, 8, 26); hole(0, 16, 8, 26); cluster(1, 20, 66, 26); cluster(0, 42, 66, 26);
+    case 6: D.name = 'beltUp'; hole(1, 44, 8, 26); hole(0, 16, 8, 26); cluster(1, 20, 66, 26); cluster(0, 42, 66, 26);
       D.belts.push({ x: 6, y: 34, w: 24, h: 6, dx: 1, dy: 0, speed: 9 }, { x: 30, y: 24, w: 24, h: 6, dx: -1, dy: 0, speed: 9 }); break;
-    case 7: D.name = 'rampUp'; D.time = 80; hole(2, 46, 8, 26); hole(0, 14, 8, 26); cluster(2, 18, 68, 26); cluster(0, 42, 68, 26);
+    case 7: D.name = 'rampUp'; hole(2, 46, 8, 26); hole(0, 14, 8, 26); cluster(2, 18, 68, 26); cluster(0, 42, 68, 26);
       D.ramps.push({ x: 8, y: 36, w: 14, h: 12, dx: 0, dy: -1, boost: 28 }, { x: 38, y: 36, w: 14, h: 12, dx: 0, dy: -1, boost: 28 }); wall(30, 34, 30, 58); break;
-    case 8: D.name = 'tripleTrouble'; D.time = 85; hole(0, 14, 8, 36); hole(1, 46, 8, 36); cluster(0, 17, 66, 12); cluster(1, 43, 66, 12);
+    case 8: D.name = 'tripleTrouble'; hole(0, 14, 8, 36); hole(1, 46, 8, 36); cluster(0, 17, 66, 12); cluster(1, 43, 66, 12);
       D.gates.push({ id: 1, x1: 6, y1: 46, x2: 26, y2: 46, mul: 3 }, { id: 2, x1: 34, y1: 46, x2: 54, y2: 46, mul: 3 }); D.bumpers.push({ x: 30, y: 30, r: 3.4 }); wall(30, 40, 30, 60); break;
-    case 9: D.name = 'mixMaster'; D.time = 95; hole(0, 12, 8, 24); hole(1, 30, 7, 24); hole(2, 48, 8, 24); cluster(0, 16, 66, 24); cluster(1, 30, 70, 24); cluster(2, 44, 66, 24);
+    case 9: D.name = 'mixMaster'; hole(0, 12, 8, 24); hole(1, 30, 7, 24); hole(2, 48, 8, 24); cluster(0, 16, 66, 24); cluster(1, 30, 70, 24); cluster(2, 44, 66, 24);
       D.bumpers.push({ x: 20, y: 34, r: 3 }, { x: 40, y: 34, r: 3 }); wall(10, 24, 22, 24, { ax: 12, ay: 0, per: 6, ph: 0 }); wall(38, 24, 50, 24, { ax: -12, ay: 0, per: 6, ph: 2 }); break;
-    default: D.name = 'marbleMaster'; D.time = 100; hole(0, 12, 8, 30); hole(1, 30, 7, 30); hole(2, 48, 8, 30); cluster(0, 16, 62, 10); cluster(1, 30, 70, 30); cluster(2, 44, 62, 10);
+    default: D.name = 'marbleMaster'; hole(0, 12, 8, 30); hole(1, 30, 7, 30); hole(2, 48, 8, 30); cluster(0, 16, 62, 10); cluster(1, 30, 70, 30); cluster(2, 44, 62, 10);
       D.gates.push({ id: 1, x1: 6, y1: 52, x2: 24, y2: 52, mul: 3 }, { id: 2, x1: 36, y1: 52, x2: 54, y2: 52, mul: 3 });
       D.bumpers.push({ x: 30, y: 36, r: 3.2 }); D.belts.push({ x: 6, y: 26, w: 18, h: 5, dx: 1, dy: 0, speed: 8 }, { x: 36, y: 26, w: 18, h: 5, dx: -1, dy: 0, speed: 8 });
       D.ramps.push({ x: 24, y: 30, w: 12, h: 10, dx: 0, dy: -1, boost: 24 }); break;
@@ -52,8 +52,7 @@ export function levelDef(n, easy = false) {
     D.walls.push({ x1: h.x - (h.r + 0.6), y1: h.y + 0.5, x2: edge(h.x - (h.r + 0.6) - spread), y2: h.y + spread + 3, move: null, funnel: true });
     D.walls.push({ x1: h.x + (h.r + 0.6), y1: h.y + 0.5, x2: edge(h.x + (h.r + 0.6) + spread), y2: h.y + spread + 3, move: null, funnel: true });
   }
-  D.time = Math.round(D.time * 1.25); // generous: the owner's video shows quick deliveries by a person; a robot is slower
-  if (easy) { D.time = Math.round(D.time * 1.3); for (const h of D.holes) h.target = Math.max(8, Math.round(h.target * 0.75)); }
+  if (easy) { for (const h of D.holes) h.target = Math.max(8, Math.round(h.target * 0.75)); }
   return D;
 }
 
@@ -66,8 +65,7 @@ export class Game {
     this.def = levelDef(n, easy);
     this.r = rng(seed * 7919 + n * 104729);
     this.t = 0;
-    this.timeLeft = this.def.time;
-    this.state = 'play'; // 'play' | 'won' | 'lost'
+    this.state = 'play'; // 'play' | 'won' — a level can only be finished, never lost
     this.marbles = [];
     this.counts = this.def.holes.map(() => 0);
     this.done = this.def.holes.map(() => false);
@@ -99,8 +97,7 @@ export class Game {
   }
 
   get needed() { return this.holes.map((h, i) => Math.max(0, h.target - this.counts[i])); }
-  get stars() { const f = this.timeLeft / this.def.time; return f >= 0.5 ? 3 : f >= 0.25 ? 2 : 1; }
-  get starsLive() { const f = this.timeLeft / this.def.time; return f >= 0.5 ? 3 : f >= 0.25 ? 2 : 1; }
+  get stars() { return 3; } // stars are for finishing the level — never for beating a clock
 
   /** Advance dt seconds. input = { sx, sy } the stick (a world direction, length 0..1). Returns events. */
   step(dt, input = {}) {
@@ -111,11 +108,7 @@ export class Game {
     const h = dt / n;
     for (let i = 0; i < n; i++) this._sub(h, input, ev);
     this.t += dt;
-    this.timeLeft -= dt;
-    if (this.state === 'play') {
-      if (this.counts.every((c, i) => c >= this.holes[i].target)) { this.state = 'won'; ev.push({ type: 'won', stars: this.stars }); }
-      else if (this.timeLeft <= 0) { this.timeLeft = 0; this.state = 'lost'; ev.push({ type: 'lost' }); }
-    }
+    if (this.state === 'play' && this.counts.every((c, i) => c >= this.holes[i].target)) { this.state = 'won'; ev.push({ type: 'won', stars: this.stars }); }
     return ev;
   }
 

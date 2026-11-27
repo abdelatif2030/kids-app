@@ -39,10 +39,10 @@ function play(g, maxSec) {
   return t;
 }
 
-test('ten levels with valid data: holes inside the arena, enough marbles of each colour (multiplier gates count), time and targets set', () => {
+test('ten levels with valid data: holes inside the arena, enough marbles of each colour (multiplier gates count), targets set and no clock in the data', () => {
   for (let n = 1; n <= LEVELS; n++) for (const easy of [false, true]) {
     const d = levelDef(n, easy);
-    assert.ok(d.time >= 40 && d.holes.length >= 1);
+    assert.ok(d.time === undefined && d.holes.length >= 1);
     for (const h of d.holes) {
       assert.ok(h.x > 4 && h.x < AW - 4 && h.y > 4 && h.y < AH / 2, `hole in the top half (level ${n})`);
       const have = d.clusters.filter((c) => c.c === h.c).reduce((a, c) => a + c.count, 0);
@@ -122,19 +122,20 @@ test('conveyor belts carry marbles, bumpers kick them, ramps boost them, moving 
   assert.ok(mm.vx < 0 || mm.x < bp.x, 'the bumper threw it back');
 });
 
-test('a simple robot delivers marbles into the right hole on level 1 and 2 (the whole pipeline works); time out ends a level', () => {
+test('a simple robot delivers marbles into the right hole on level 1 and 2 (the whole pipeline works); kind rules (2.4): a level can never time out or be lost', () => {
   for (const n of [1, 2]) {
     const g = new Game(n, 5);
-    play(g, g.def.time + 5);
+    play(g, 300); // far longer than the old 50–100 s budgets
     assert.ok(g.counts.reduce((a, b) => a + b, 0) >= 4, `level ${n} delivered ${JSON.stringify(g.counts)}`);
-    assert.ok(['won', 'lost'].includes(g.state));
+    assert.ok(g.state === 'won' || g.state === 'play', `level ${n}: never lost (state ${g.state})`);
   }
-  const lose = new Game(1, 6);
-  for (let i = 0; i < 90 * 60; i++) lose.step(1 / 60, {});
-  assert.equal(lose.state, 'lost');
+  const idle = new Game(1, 6);
+  for (let i = 0; i < 90 * 60; i++) idle.step(1 / 60, {});
+  assert.equal(idle.state, 'play', '90 idle minutes: still playing, never lost');
+  assert.equal(idle.timeLeft, undefined, 'the countdown field is gone');
 });
 
-test('a won level gives 1-3 stars by the time left, and a "done" event fires once per colour', () => {
+test('a won level gives 3 stars for finishing (never for speed), and a "done" event fires once per colour', () => {
   const g = new Game(1, 7);
   g.counts[0] = g.holes[0].target - 1;
   const m = g.marbles[0]; m.x = g.holes[0].x; m.y = g.holes[0].y;
@@ -142,11 +143,20 @@ test('a won level gives 1-3 stars by the time left, and a "done" event fires onc
   assert.ok(ev.some((e) => e.type === 'done') && ev.some((e) => e.type === 'won'));
   assert.equal(g.state, 'won');
   assert.equal(g.stars, 3);
-  g.timeLeft = g.def.time * 0.3; assert.equal(g.stars, 2);
-  g.timeLeft = g.def.time * 0.1; assert.equal(g.stars, 1);
+  const slow = new Game(1, 7); // finishing slowly earns exactly the same stars
+  slow.counts[0] = slow.holes[0].target;
+  const ev2 = slow.step(1 / 60, {});
+  assert.equal(ev2.find((e) => e.type === 'won')?.stars, 3);
 });
 
 test('save normalising is safe', () => {
   assert.deepEqual(normalizeSave(null), { unlocked: 1, stars: {}, muted: false });
   assert.equal(normalizeSave({ unlocked: 99 }).unlocked, LEVELS);
+});
+
+import fs from 'node:fs';
+
+test('Little Builder anchor: title renamed, sorting game untouched', () => {
+  const i18n = fs.readFileSync(new URL('../src/i18n.js', import.meta.url), 'utf8');
+  assert.ok(i18n.includes("title: ['البنّاء الصغير', 'Little Builder']"));
 });
