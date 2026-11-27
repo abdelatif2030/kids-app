@@ -25,4 +25,18 @@ if [ -n "${LESSONS_BASE_URL:-}" ]; then
   host="$(printf '%s' "$LESSONS_BASE_URL" | sed -E 's#^(https?://[^/]+).*#\1#')"
   sed -i -E "s#media-src 'self'#media-src 'self' $host#; s#img-src 'self'#img-src 'self' $host#; s#connect-src 'self'#connect-src 'self' $host#" "$out/_headers"
 fi
+# Learn-world voice clips come from the R2 bucket (docs/LEARNING_MASTER_PLAN_V2.md, D4): Cloudflare Pages allows 20,000 files per deploy.
+# The clips are NOT shipped in the demo: window.__learnVoiceBase (appended to manifest.js) points the game at the bucket, the CSP allows that host
+# for media, and the local clip files are removed from the output. Set LEARN_VOICE_R2_URL="" to keep the clips inside the demo.
+vr="${LEARN_VOICE_R2_URL-https://pub-0be2a52cbdc9457abd633a86141df8da.r2.dev}"
+if [ -n "$vr" ]; then
+  vdir="$out/assets/assets/games/learn_voice"
+  if [ -d "$vdir" ]; then
+    printf 'window.__learnVoiceBase=%s;
+' "\"${vr%/}/learn_voice/\"" >> "$vdir/manifest.js"
+    for l in ar en de fr it; do rm -rf "$vdir/$l"; done
+    sed -i -E "s#media-src 'self'#media-src 'self' ${vr%/}#; s#connect-src 'self'#connect-src 'self' ${vr%/}#" "$out/_headers"
+    echo "learn voices: served from $vr (local clips removed from the build)"
+  fi
+fi
 echo "built $out (login headers installed)"

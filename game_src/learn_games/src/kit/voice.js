@@ -154,7 +154,7 @@ export class Voice {
     a.onended = () => { if (this.tok === token && this.audio === a) { this.audio = null; this._next(); } };
     a.onerror = () => { if (this.tok === token && this.audio === a) { this.audio = null; this._next(); } }; // a clip that cannot load: silent, never the device voice
     this.onTalk(2.5);
-    try { a.src = `${this.dir}${text.lang}/${this._clipName(text)}.mp3`; } catch (_) { /* fine */ }
+    try { a.src = `${window.__learnVoiceBase || this.dir}${text.lang}/${this._clipName(text)}.mp3`; } catch (_) { /* fine */ } // the hosted demo sets window.__learnVoiceBase (in manifest.js) to the R2 bucket
     const run = this.run;
     const p = a.play();
     if (p && p.catch) {
