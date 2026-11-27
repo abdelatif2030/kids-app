@@ -24,3 +24,15 @@ Frames of the original video (purple dusk street, lit houses, orange trees, pick
 Not used: jack-o-lantern (generator returned a whole house scene), spider boss, kids/costumes, porches (animated or interactive and need the code art). Fallbacks to the code drawings remain for every picture.
 Checked in headless Edge at 390x780: menu, levels 1-7 played from startLevel (montage of all seven), dog forced awake in level 3; HUD, count tag, kids, candy and hazards stay readable; no console errors besides 404s for optional files before they existed; rAF 60 with and without pictures. `npm test` 16 pass; rebuilt.
 Still off: the painted houses sit far bigger than the code houses, so the code porches in front can look doubled; the dog is small and a 3/4 view with purple-orange fur rather than a brown side view; sound/real device not tested.
+
+---
+
+## Phase 1 fix review — Moss, 2026-11-27 (commit 8271446f)
+
+**What was wrong.** The win card chose its line with `I.t('win_f') === I.t('win_m') ? 'm' : 'm'` — 'm' on both branches. Girl players never saw the feminine win line, even though the config gender was already being passed to setGirl and to VoiceCoach; the Game just never stored it.
+
+**What changed and why.** The constructor stores `this.girl`; the card now uses 'f' when the player is a girl and the language actually has a distinct feminine form (where the forms are identical the choice is moot), else 'm'. Same pattern as the castaway_raft fix.
+
+**Tested.** npm test 16/16 (sim untouched). Browser differential through the real `_won()`: girl instance shows «شطووووورة!» and boy «شطووووور!»; zero page errors. fps 8.2 rAF under CDP 4× CPU throttling in headless SwiftShader — low in this software-GL environment (full-screen canvas painting predates this change; the fix touches only the win card). A comparable lower bound, not a device number; canvas paint cost logged as a Phase-2 perf item in docs/AI_WORK_LOG.md.
+
+**Not verified.** German/French feminine forms not eyeballed (the guard falls back to win_m wherever forms are identical). No real-device test. Voice clips for this game are not installed yet; VoiceCoach is wired and the lines are on the owner's "add to instinct" list.

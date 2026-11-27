@@ -36,6 +36,7 @@ class Game {
   constructor(el, config, post) {
     this.el = el; this.post = post || (() => {}); this.base = config.base || './';
     I.setLang(config.lang); I.setGirl(config.gender === 'girl');
+    this.girl = config.gender === 'girl'; // the Game itself must remember: the win line depends on it
     this.easy = easyFor(config.age);
     this.save = normalizeSave(config.save);
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
@@ -221,7 +222,7 @@ class Game {
     this.layer.replaceChildren();
     const nextOk = this.level < NUM_LEVELS;
     this.layer.append(this.card(h('div', { class: 'tt-title' }, I.t('won')), h('div', { class: 'tt-stars' }, ...[1, 2, 3].map((i) => h('span', { class: i <= res.stars ? '' : 'off' }, '⭐'))),
-      h('div', { class: 'tt-small' }, I.t('win_' + (I.t('win_f') === I.t('win_m') ? 'm' : 'm'))),
+      h('div', { class: 'tt-small' }, I.t('win_' + (this.girl && I.t('win_f') !== I.t('win_m') ? 'f' : 'm'))), // was: 'm' on both branches — girls never saw the feminine line
       h('div', { class: 'tt-pill' }, `👻 ${I.num(res.kids)}`), h('div', { class: 'tt-pill' }, `${I.t('earned')} 🍬 ${I.num(res.earned)}`),
       nextOk ? this.btn(I.t('next'), () => this.startLevel(this.level + 1)) : null, this.btn(I.t('again'), () => this.startLevel(this.level), nextOk ? 'dark' : ''), this.btn(I.t('menu'), () => this.showMenu(), 'dark')));
     this._soundPill();
