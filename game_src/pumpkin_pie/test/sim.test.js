@@ -183,3 +183,13 @@ test('stars are earned by service, never automatic', () => {
   assert.equal(starsFor(35), 2);
   assert.equal(starsFor(80), 3);
 });
+
+import fs from 'node:fs';
+
+test('Hara Bakery anchor: title renamed, pumpkin stays the hero crop, earned stars unchanged', () => {
+  const i18n = fs.readFileSync(new URL('../src/i18n.js', import.meta.url), 'utf8');
+  assert.ok(i18n.includes("title: ['مخبز الحارة', 'Hara Bakery']"));
+  assert.equal(starsFor(0), 1); // stars are earned by serving, never timed
+  assert.equal(starsFor(35), 2);
+  assert.equal(starsFor(80), 3);
+});

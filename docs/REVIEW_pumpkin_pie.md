@@ -36,3 +36,25 @@ loaded. The bakery yard floated on a flat autumn colour.
   bake → serve, with waiter/farmer helpers), space_store is **logistics** (baskets/racks/queues/
   delivery rockets) — and space_store was renamed «متجر النيل الفضائي» with station wings.
 - Tests: pumpkin_pie **9/9** (new starsFor thresholds). Harness 4/4, zero errors, frames eyeballed.
+
+---
+
+## Phase 2D — Egypt anchor: «مخبز الحارة / Hara Bakery» (2026-11-27)
+
+**What changed (name only):** the title «مخبز اليقطين / Pumpkin Pie
+Maker» → **«مخبز الحارة / Hara Bakery»** — the little bakery now
+explicitly sits in an Egyptian hara, with the pumpkin staying the hero
+crop exactly as the plan keeps it, and Nour/Adam (the app's own kids)
+already the chefs. Stars were converted to earned-by-serving in Phase
+2C and are re-pinned by a test here.
+
+**Tested:** `npm test` 10/10 (+1 anchor test); build green; real
+click-flow verify PASS — menu shows «مخبز الحارة» and the chef pick,
+Play reaches the bakery floor with its first hint, frames at 3 sizes,
+0 page errors.
+
+**Not done:** the Batch F expansion set (kunafa tray, qatayef pan, Eid
+kahk oven, a second oven line) is not built; the open owner question
+from Phase 2C stands — the shipped European street panoramas wired in
+2B vs an Egyptian hara reskin of the backdrop. Not tested on a real
+device.
