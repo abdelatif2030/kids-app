@@ -1,0 +1,386 @@
+il bau bau del cane
+il miao del gatto
+il muu della mucca
+il bè della pecora
+il qua qua dell'anatra
+il coccodè della gallina
+il chicchirichì del gallo
+il nitrito del cavallo
+il ruggito del leone
+il grugnito del maiale
+il raglio dell'asino
+il cip cip dell'uccellino
+mangiare
+bere
+dormire
+correre
+camminare
+saltare
+sedersi
+stare in piedi
+aprire
+chiudere
+lavare
+lavarsi i denti
+giocare
+leggere
+scrivere
+disegnare
+cantare
+ballare
+nuotare
+lanciare
+prendere
+dare
+abbracciare
+ridere
+piangere
+guardare
+ascoltare
+arrampicarsi
+costruire
+aiutare
+aspettare
+spingere
+tirare
+grande - piccolo
+alto - basso
+lungo - corto
+caldo - freddo
+veloce - lento
+pesante - leggero
+pieno - vuoto
+aperto - chiuso
+su - giù
+giorno - notte
+pulito - sporco
+bagnato - asciutto
+felice - triste
+nuovo - vecchio
+duro - morbido
+forte - piano
+vicino - lontano
+molti - pochi
+spesso - sottile
+dentro - fuori
+davanti - dietro
+dentro
+sopra
+sotto
+dietro
+davanti a
+accanto a
+tra
+sopra
+sinistra
+destra
+bello
+divertente
+coraggioso
+gentile
+dolce
+aspro
+salato
+buono
+rotondo
+ruvido
+liscio
+luminoso
+buio
+forte
+intelligente
+ciao
+arrivederci
+per favore
+grazie
+scusa
+buongiorno
+buonanotte
+benvenuto
+permesso
+sì
+no
+ti voglio bene
+chi?
+che cosa?
+dove?
+quando?
+perché?
+come?
+quanti?
+quale?
+io
+tu
+lui
+lei
+noi
+loro
+mio
+tuo
+il dentifricio
+lo shampoo
+i fazzoletti
+il vasino
+la visita dal dottore
+la febbre
+il termometro
+la medicina
+il cerotto
+la tosse
+lo starnuto
+il mal di testa
+il mal di pancia
+le vitamine
+lavati le mani
+il cibo sano
+fare movimento
+dormire bene
+le strisce pedonali
+la cintura di sicurezza
+l'estintore
+la cassetta del pronto soccorso
+tenersi per mano
+guardare a destra e a sinistra
+l'uscita di sicurezza
+il bagnino
+chiedere a un adulto
+i soldi
+la moneta
+la banconota
+il portafoglio
+il salvadanaio
+il prezzo
+il cassiere
+il cestino della spesa
+lo scontrino
+economico - costoso
+l'orologio da parete
+l'orologio da polso
+la sveglia
+il calendario
+l'ora
+il minuto
+il secondo
+oggi
+domani
+ieri
+la settimana
+il fine settimana
+il compleanno
+primo
+secondo
+terzo
+quarto
+quinto
+ultimo
+la metà
+un quarto
+intero
+tutti
+nessuno
+un paio
+di più
+di meno
+uguale
+più
+meno
+per
+diviso
+uguale a
+il numero pari
+il numero dispari
+lo zero
+il righello
+il metro
+il centimetro
+il chilogrammo
+il litro
+la bilancia
+il metro a nastro
+il grafico
+l'Asia
+l'Africa
+l'Europa
+l'America del Nord
+l'America del Sud
+l'Oceania
+l'Antartide
+l'oceano
+la montagna
+l'isola
+il lago
+la foresta
+la valle
+la cascata
+la mappa
+la bussola
+il nord
+il sud
+l'est
+l'ovest
+l'Egitto
+l'Arabia Saudita
+gli Emirati Arabi Uniti
+il Kuwait
+il Qatar
+la Giordania
+il Libano
+la Palestina
+la Siria
+l'Iraq
+il Marocco
+l'Algeria
+la Tunisia
+la Libia
+il Sudan
+lo Yemen
+l'Oman
+il Bahrein
+la Turchia
+la Germania
+la Francia
+il Regno Unito
+l'Italia
+la Spagna
+la Svizzera
+gli Stati Uniti
+il Canada
+il Brasile
+la Cina
+il Giappone
+l'India
+la Russia
+l'Australia
+le piramidi
+la Sfinge
+il Nilo
+la feluca
+la Torre del Cairo
+il Tempio di Karnak
+Abu Simbel
+la Cittadella di Saladino
+il Khan el-Khalili
+la Biblioteca di Alessandria
+il Mar Rosso
+il Sinai
+la diga di Assuan
+il faraone
+la mummia
+i geroglifici
+il papiro
+il giro in cammello
+il Museo Egizio
+l'oasi di Siwa
+la bandiera egiziana
+la Torre Eiffel
+il Big Ben
+la Porta di Brandeburgo
+la Statua della Libertà
+la Grande Muraglia cinese
+il Colosseo
+la Torre di Pisa
+il Taj Mahal
+il castello di Neuschwanstein
+il monte Fuji
+la moschea
+il minareto
+il Corano
+la preghiera
+il tappeto da preghiera
+l'abluzione
+il richiamo alla preghiera
+il Ramadan
+il digiuno
+l'iftar
+la lanterna del Ramadan
+l'Eid
+la carità
+la Kaaba
+l'Hajj
+la mezzaluna
+la radice
+il gambo
+il seme
+il tronco
+il ramo
+la crisalide
+il girino
+il ghiaccio
+il vapore
+il magnete
+la batteria
+la lampadina
+l'elettricità
+il bidone del riciclo
+il cestino
+risparmiare acqua
+piantare un albero
+vedere
+sentire
+annusare
+assaggiare
+toccare
+il cervello
+i polmoni
+lo stomaco
+le ossa
+lo scheletro
+il muscolo
+la pelle
+il sangue
+i denti
+il legno
+il metallo
+la plastica
+il vetro
+la stoffa
+la pietra
+la gomma
+la lana
+il cuoio
+il succo di canna da zucchero
+il tè all'ibisco
+il frullato
+la cioccolata calda
+il baklava
+il ful medames
+le verdure ripiene
+il fiteer
+le lenticchie
+lo scivolo
+l'altalena a dondolo
+la buca di sabbia
+la paletta
+il castello di sabbia
+il picnic
+il poliziotto
+il cuoco
+l'ingegnere
+l'artista
+il falegname
+il qanun
+la darbuka
+il ney
+lo xilofono
+l'arpa
+la fisarmonica
+il telefono cellulare
+il tablet
+la tastiera
+il telecomando
+la macchina fotografica
+la stampante
+il wifi
+gli occhiali da sole
+la collana
+la corona
+la molletta
+la borsa
+la festa
+il regalo
+la candela
+il cappellino da festa
+i fuochi d'artificio
+i coriandoli
+il biglietto d'auguri
+il matrimonio
