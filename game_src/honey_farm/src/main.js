@@ -10,6 +10,9 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 
 const HONEY_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 2, bump: 2, win: 2 };
 
+/** Money is Egyptian pounds, never dollars. */
+const CUR = () => (I.getLang() === 'en' ? 'EGP' : 'ج.م');
+
 const S = {
   title: ['مزرعة العسل', 'Honey Farm'], play: ['يلا نبدأ', 'Start'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], again: ['من الأول', 'Play again'],
   how: ['اسحب المزارع: خد البرطمانات من الخلايا للماكينة، وصّل الصناديق للزبون، وخد الفلوس', 'Drag the farmer: jars from hives to the machine, crates to customers, then pick up the cash'],
@@ -102,7 +105,15 @@ class Game {
 
   _soundPill() { const pill = h('button', { class: 'hf-soundpill', onclick: () => this.sound.unlock() }, I.t('sound')); this.layer.append(pill); const tick = () => { if (!this.root.isConnected) return; pill.style.display = !this.sound.ctx || this.sound.on || this.sound.muted ? 'none' : 'block'; setTimeout(tick, 600); }; tick(); }
 
+  /** Persist the farm as it stands (money, goal progress, purchases). Only a live
+   *  session farm is ever snapshotted — the menu's demo farm must not overwrite it. */
+  _persistFarm() {
+    if (this.mode === 'play' && this.f) this.save.farm = this.f.snapshot();
+    this.post({ type: 'save', save: this.save });
+  }
+
   showMenu() {
+    this._persistFarm(); // bank the session farm before the menu replaces it with a demo
     this.mode = 'menu'; this.layer.replaceChildren(); this.sound.setMode(false);
     this.f = new Farm({ seed: 1 }); this.cam = { x: 20, y: 14 };
     this.layer.append(h('div', { class: 'hf-dim' }, h('div', { class: 'hf-card' },
@@ -115,13 +126,14 @@ class Game {
   start() {
     this.voice.say('go');
     this.f = new Farm({ seed: (Date.now() & 0xffff) + 1 });
+    if (this.save.farm) this.f.applySnapshot(this.save.farm); // the farm you built is still there
     this.mode = 'play'; this.fx = [];
     this.layer.replaceChildren(); this.sound.setMode(true);
     this.cashEl = h('span', {}, ''); this.goalEl = h('span', {}, '');
     this.barEl = h('b', { style: 'width:0%' });
     const back = h('button', { class: 'hf-round', 'aria-label': I.t('menu'), onclick: () => this.showMenu() }, '☰');
     this.items = {};
-    const mk = (kind, icon, name) => { const cost = h('small', {}, ''); const b = h('button', { class: 'hf-item', onclick: () => { if (this.f.buy(kind)) this.sound.play('buy'); } }, h('i', {}, icon), h('span', {}, name), cost); this.items[kind] = { b, cost }; return b; };
+    const mk = (kind, icon, name) => { const cost = h('small', {}, ''); const b = h('button', { class: 'hf-item', onclick: () => { if (this.f.buy(kind)) { this.sound.play('buy'); this._persistFarm(); } } }, h('i', {}, icon), h('span', {}, name), cost); this.items[kind] = { b, cost }; return b; };
     this.layer.append(h('div', { class: 'hf-top' }, back, h('div', { class: 'hf-pill' }, this.cashEl), h('div', { class: 'hf-pill' }, this.goalEl)),
       h('div', { class: 'hf-top', style: 'top:calc(var(--u)*15)' }, h('div', { class: 'hf-bar' }, this.barEl)),
       h('div', { class: 'hf-shop' }, mk('hive', '🐝', I.t('hive')), mk('bag', '🎒', I.t('bag')), mk('conveyor', '➡️', I.t('conveyor')), mk('machine2', '⚙️', I.t('machine2'))));
@@ -147,7 +159,7 @@ class Game {
         case 'pick': this.sound.play('pick'); this.voice.say('pickup'); break;
         case 'drop': this.sound.play('drop'); break;
         case 'crate': this.sound.play('crate'); this.voice.say('trick'); break;
-        case 'sale': this.sound.play('sale'); this.voice.say('charge'); this.fx.push({ x: SPOTS.counter.x, y: SPOTS.counter.y - 2, t: 0, text: `+$${e.pay}` }); break;
+        case 'sale': this.sound.play('sale'); this.voice.say('charge'); this.fx.push({ x: SPOTS.counter.x, y: SPOTS.counter.y - 2, t: 0, text: `+${e.pay} ${CUR()}` }); this._persistFarm(); break;
         case 'cash': this.sound.play('cash'); this.voice.say('pickup'); break;
         case 'left': this.sound.play('left'); this.voice.say('bump'); break;
         case 'won': this._won(); break;
@@ -165,7 +177,8 @@ class Game {
   }
 
   _won() {
-    this.save.wins += 1; this.post({ type: 'save', save: this.save }); this.sound.play('win'); this.voice.say('win');
+    this.save.wins += 1; this.save.farm = null; // goal reached: the next game starts a fresh farm
+    this.post({ type: 'save', save: this.save }); this.sound.play('win'); this.voice.say('win');
     this.layer.append(h('div', { class: 'hf-dim' }, h('div', { class: 'hf-card' },
       h('div', { class: 'hf-title' }, I.t('won')), h('div', { class: 'hf-small' }, I.t('wonText')),
       h('div', { class: 'hf-pill' }, `${I.t('served')}: ${I.num(this.f.served)}`),
@@ -233,7 +246,7 @@ class Game {
     const cx = this._sx(SPOTS.cash.x); const cy = this._sy(SPOTS.cash.y);
     g.fillStyle = 'rgba(255,255,255,.5)'; g.beginPath(); g.arc(cx, cy, pm * 1.4, 0, 6.3); g.fill();
     g.font = `900 ${pm * 1.4}px system-ui`; g.textAlign = 'center'; g.fillText(f.cashPile > 0 ? '💰' : '', cx, cy + pm * 0.5);
-    if (f.cashPile > 0) { g.font = `900 ${pm * 0.8}px Tajawal, system-ui`; g.fillStyle = '#6a3a10'; g.fillText(`$${f.cashPile}`, cx, cy + pm * 1.6); }
+    if (f.cashPile > 0) { g.font = `900 ${pm * 0.8}px Tajawal, system-ui`; g.fillStyle = '#6a3a10'; g.fillText(`${f.cashPile} ${CUR()}`, cx, cy + pm * 1.6); }
   }
 
   _customer(g, c, i) {

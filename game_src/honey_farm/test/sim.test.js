@@ -62,3 +62,24 @@ test('upgrades cost cash; impatient customers just leave', () => {
 });
 
 test('damaged saves load safely', () => { assert.equal(normalizeSave(null).wins, 0); });
+
+test('farm snapshot round-trips: money, goal progress and purchases survive a new session', () => {
+  const a = new Farm({ seed: 5 });
+  a.cash = 275; a.earned = 640; a.served = 9; a.left = 1; a.cashPile = 35;
+  a.bag = 8; a.hives[3].open = true; a.hives[4].open = true; a.machine2.open = true; a.conveyor = true;
+  const b = new Farm({ seed: 8 });
+  b.applySnapshot(normalizeSave({ farm: a.snapshot() }).farm);
+  assert.equal(b.cash, 275); assert.equal(b.earned, 640); assert.equal(b.served, 9);
+  assert.equal(b.bag, 8); assert.equal(b.cashPile, 35);
+  assert.equal(b.hives.filter((x) => x.open).length, 4);
+  assert.equal(b.machine2.open, true); assert.equal(b.conveyor, true);
+});
+
+test('normalizeSave validates the farm snapshot and never restores a finished goal', () => {
+  assert.equal(normalizeSave({}).farm, null);
+  const bad = normalizeSave({ farm: { cash: -5, earned: 99999, bag: 7, hives: [false, false] } });
+  assert.equal(bad.farm.cash, 0);
+  assert.equal(bad.farm.earned, GOAL - 1);
+  assert.equal(bad.farm.bag, 4);
+  assert.deepEqual(bad.farm.hives.slice(0, 2), [true, true]); // starter hives always open
+});

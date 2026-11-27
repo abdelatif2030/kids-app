@@ -100,9 +100,44 @@ export class Farm {
     if (this.earned >= GOAL) { this.state = 'won'; ev.push({ type: 'won' }); }
     return ev;
   }
+
+  /** The durable farm: money, goal progress and everything the player bought.
+   *  Jars in flight, waiting customers and timers are one morning's work — they restart fresh. */
+  snapshot() {
+    return {
+      cash: Math.floor(this.cash), earned: Math.floor(this.earned),
+      served: Math.floor(this.served), left: Math.floor(this.left),
+      bag: this.bag, hives: this.hives.map((h) => !!h.open),
+      machine2: !!this.machine2.open, conveyor: !!this.conveyor,
+      cashPile: Math.floor(this.cashPile),
+    };
+  }
+
+  /** Restore a farm snapshot (already validated by normalizeSave). */
+  applySnapshot(s) {
+    if (!s) return;
+    this.cash = s.cash; this.earned = s.earned; this.served = s.served; this.left = s.left;
+    this.bag = s.bag; this.cashPile = s.cashPile;
+    this.hives.forEach((h, i) => { h.open = !!s.hives[i]; });
+    this.machine2.open = !!s.machine2; this.conveyor = !!s.conveyor;
+  }
+}
+
+function validFarm(f) {
+  if (!f || typeof f !== 'object') return null;
+  const num = (v, max) => Math.max(0, Math.min(max, Math.floor(Number(v)) || 0));
+  const hives = SPOTS.hives.map((_, i) => !!(Array.isArray(f.hives) && f.hives[i]));
+  hives[0] = true; hives[1] = true; // the two starter hives are always open
+  return {
+    // earned is capped below GOAL: reaching the goal clears the snapshot (see _won in main.js),
+    // so a restored farm must never re-trigger the win on its first step.
+    cash: num(f.cash, 1e9), earned: num(f.earned, GOAL - 1), served: num(f.served, 1e6), left: num(f.left, 1e6),
+    bag: [4, 6, 8, 10].includes(f.bag) ? f.bag : 4,
+    hives, machine2: !!f.machine2, conveyor: !!f.conveyor, cashPile: num(f.cashPile, 1e9),
+  };
 }
 
 export function normalizeSave(s) {
   const o = s && typeof s === 'object' ? s : {};
-  return { wins: Math.max(0, Math.floor(Number(o.wins)) || 0), best: Math.max(0, Math.floor(Number(o.best)) || 0), muted: !!o.muted };
+  return { wins: Math.max(0, Math.floor(Number(o.wins)) || 0), best: Math.max(0, Math.floor(Number(o.best)) || 0), muted: !!o.muted, farm: validFarm(o.farm) };
 }
