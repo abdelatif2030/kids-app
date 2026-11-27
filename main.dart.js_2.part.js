@@ -1,6 +1,6 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
 $__dart_deferred_initializers__.current=function(a,b,c,$){var J,A,B,C={
-c1Z(d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,b0,b1,b2,b3,b4,b5,b6,b7,b8,b9,c0,c1){var w=t==null?B.pP:t,v=s==null?B.oG:s,u=g==null?B.aR:g
+c2_(d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,b0,b1,b2,b3,b4,b5,b6,b7,b8,b9,c0,c1){var w=t==null?B.pP:t,v=s==null?B.oG:s,u=g==null?B.aR:g
 return new C.J9(k,b3,a0,a5,a4,a8,a6,a7,p,o,w,v,b2===!0,i,b1===!0,b0,b7,b5,b6,c0,b8,b9,j,r===!0,q,d,b4,a1,a9,n,a2,a3,l,m,f,e===!0,h,c1,u,null)},
 J9:function J9(d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,b0,b1,b2,b3,b4,b5,b6,b7,b8,b9){var _=this
 _.w=d
@@ -82,7 +82,7 @@ MR:function MR(d,e,f){this.f=d
 this.b=e
 this.a=f},
 akR:function akR(){},
-cw_(d){var w
+cw0(d){var w
 switch(d.a){case 0:w=$.m().a==="ar"?"\u0627\u0644\u062e\u062f\u0645\u0627\u062a \u0639\u0628\u0631 \u0627\u0644\u0625\u0646\u062a\u0631\u0646\u062a \u063a\u064a\u0631 \u0645\u0641\u0639\u0651\u0644\u0629 \u0641\u064a \u0647\u0630\u0627 \u0627\u0644\u0625\u0635\u062f\u0627\u0631.":"Online services are not part of this version."
 break
 case 1:w=$.m().a==="ar"?"\u0644\u0645 \u064a\u064f\u0631\u0628\u0637 \u0628\u0639\u062f \u0645\u0634\u0631\u0648\u0639 \u0627\u0644\u062e\u062f\u0645\u0629 (\u064a\u0631\u0628\u0637\u0647 \u0635\u0627\u062d\u0628 \u0627\u0644\u062a\u0637\u0628\u064a\u0642).":"The online service project has not been connected yet (the app owner does this)."
@@ -139,7 +139,7 @@ this.b=e},
 ann:function ann(d,e){this.c=d
 this.a=e},
 biu:function biu(){},
-cnu(d){var w,v,u
+cnv(d){var w,v,u
 for(w=$.e0().b,w=A.d4(w,w.r,A.z(w).c),v=w.$ti.c;w.t();){u=w.d;(u==null?v.a(u):u).b9F(d)}}},D,E,F
 J=c[1]
 A=c[0]
@@ -150,10 +150,10 @@ E=c[14]
 F=c[20]
 C.J9.prototype={
 ghr(){var w=this,v=w.w
-return v==null?A.c2_(w.ok,!1,w.to,w.x2,w.db,w.k2,w.rx,w.ry,w.p4,w.ch,w.ay,w.k4,w.k3,w.cx,w.CW,w.y,w.p2,w.R8,w.RG,w.Q,w.z,w.at,w.ax,w.as,w.p3,w.dy,!1,!1,w.x,w.p1,w.fx,w.fy,w.fr,w.id,w.k1,w.go,w.xr):v},
+return v==null?A.c20(w.ok,!1,w.to,w.x2,w.db,w.k2,w.rx,w.ry,w.p4,w.ch,w.ay,w.k4,w.k3,w.cx,w.CW,w.y,w.p2,w.R8,w.RG,w.Q,w.z,w.at,w.ax,w.as,w.p3,w.dy,!1,!1,w.x,w.p1,w.fx,w.fy,w.fr,w.id,w.k1,w.go,w.xr):v},
 dt(d){return!this.ghr().j(0,d.ghr())},
 pH(d,e){var w=null
-return C.c1Z(w,w,w,e,w,w,w,this.ghr(),w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w)}}
+return C.c2_(w,w,w,e,w,w,w,this.ghr(),w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w)}}
 C.aoF.prototype={}
 C.akS.prototype={
 cN(){var w=this.aza(),v=this.cy
@@ -163,7 +163,7 @@ v.$flags=1
 w.l(0,"fields",v)
 return w}}
 C.aBt.prototype={
-BM(d,e){var w=this.gb4e(),v=A.bW5(d)
+BM(d,e){var w=this.gb4e(),v=A.bW6(d)
 $.e0().LE(v,new C.akS(new A.fQ(w,new C.aBu(),w.$ti.i("fQ<1,oI>")),e.a,e.b,!1,e.d,e.e,e.f,e.r,e.w,e.x,!0,e.z,e.Q,e.as,e.at,!0,B.aE,B.bfN,null,!1))
 return v}}
 C.aBp.prototype={
@@ -179,12 +179,12 @@ a56(d){this.d.M(0,d)},
 bG(){this.de()
 var w=this.c
 w.toString
-this.e=A.c_t(w)==null},
+this.e=A.c_u(w)==null},
 u(d){return new C.MR(this,this.a.c,null)},
 m(){this.ae()
 if(!this.e)return
 this.a.toString
-switch(0){case 0:C.cnu(!0)
+switch(0){case 0:C.cnv(!0)
 break}}}
 C.MR.prototype={
 dt(d){return this.f!==d.f}}
@@ -196,7 +196,7 @@ v=w?"\u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u0641\u064a \u0647\u0630\u0627
 w=w?"\u0633\u062a\u0623\u062a\u064a \u0641\u064a \u0625\u0635\u062f\u0627\u0631 \u0644\u0627\u062d\u0642. \u0643\u0644 \u0645\u0627 \u0639\u062f\u0627 \u0630\u0644\u0643 \u064a\u0639\u0645\u0644 \u0628\u0644\u0627 \u0625\u0646\u062a\u0631\u0646\u062a.":"It is planned for a later version. Everything else works without internet."
 return A.dC(new E.RS(B.mC,v,this.c+"\n"+w,s,s),s,B.S,s,s,s,s,B.ai)}w=$.m().a==="ar"?"\u063a\u064a\u0631 \u0645\u062a\u0627\u062d \u0641\u064a \u0647\u0630\u0627 \u0627\u0644\u0625\u0635\u062f\u0627\u0631 \u0628\u0639\u062f":"Not available in this version yet"
 v=A.a([],x.s)
-for(u=r.length,t=0;t<r.length;r.length===u||(0,A.x)(r),++t)v.push("\u2022 "+C.cw_(r[t]))
+for(u=r.length,t=0;t<r.length;r.length===u||(0,A.x)(r),++t)v.push("\u2022 "+C.cw0(r[t]))
 v=B.f.aA(v,"\n")
 u=$.m().a==="ar"?"\u0643\u0644 \u0645\u0627 \u0639\u062f\u0627 \u0630\u0644\u0643 \u064a\u0639\u0645\u0644 \u0628\u0644\u0627 \u0625\u0646\u062a\u0631\u0646\u062a.":"Everything else works without internet."
 return A.dC(new E.RS(B.mC,w,this.c+"\n"+v+"\n"+u,s,s),s,B.S,s,s,s,s,B.ai)}}
@@ -338,8 +338,8 @@ r=A.cu(r,n?3:1)
 q=n?D.zy:o
 if(d===B.fR)p=B.ye
 else p=d===B.jJ?B.mF:B.I0
-return A.aV(A.bTx(A.aS(o,!0,o,A.h4(!1,u,!0,A.a7n(A.hZ(B.W,A.a4(A.a([A.ci(p,B.w,o,30),B.b2,A.d(w,o,o,o,o,o,F.a17,o,o,o),A.d(m,o,o,o,o,o,D.a1g,B.a1,o,o)],x.p),B.z,o,B.cq,B.x,0,B.B),B.G,B.cV),o,B.aU,new A.aF(o,o,r,s,q,new A.dB(B.ed,B.jU,B.b0,t,o,o),B.a_),B.pu,o,118,B.bu,o),o,!0,o,o,o,o,new A.T("role_"+d.b,x.O),o,o,o,o,o,o,new C.bbH(this,d),o,o,o,o,o,o,o),!1,o,o,o,!0,o,!1,o,o,o,o,o,o,o,o,o,o,w+". "+m,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,n,o,o,o,o,o,o,B.Q,o),B.aU,B.pu,v),1)},
-u(d){var w=null,v=C.c1Z(w,w,new A.h5(4,A.b4(16),B.aj),w,w,w,w,w,w,w,w,w,w,B.w,!0,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w)
+return A.aV(A.bTy(A.aS(o,!0,o,A.h4(!1,u,!0,A.a7n(A.hZ(B.W,A.a4(A.a([A.ci(p,B.w,o,30),B.b2,A.d(w,o,o,o,o,o,F.a17,o,o,o),A.d(m,o,o,o,o,o,D.a1g,B.a1,o,o)],x.p),B.z,o,B.cq,B.x,0,B.B),B.G,B.cV),o,B.aU,new A.aF(o,o,r,s,q,new A.dB(B.ed,B.jU,B.b0,t,o,o),B.a_),B.pu,o,118,B.bu,o),o,!0,o,o,o,o,new A.T("role_"+d.b,x.O),o,o,o,o,o,o,new C.bbH(this,d),o,o,o,o,o,o,o),!1,o,o,o,!0,o,!1,o,o,o,o,o,o,o,o,o,o,w+". "+m,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,n,o,o,o,o,o,o,B.Q,o),B.aU,B.pu,v),1)},
+u(d){var w=null,v=C.c2_(w,w,new A.h5(4,A.b4(16),B.aj),w,w,w,w,w,w,w,w,w,w,B.w,!0,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w,w)
 return A.bq(A.bJ(w,!0,B.Y,w,w,0,B.w,w,A.d(A.e("\u062d\u0633\u0627\u0628 \u0627\u0644\u0623\u0647\u0644 \u0648\u0627\u0644\u0645\u062f\u0631\u0633\u064a\u0646"),w,w,w,w,w,w,w,w,w),w),D.Fr,A.j5(new C.Q1(A.fB(new C.bbR(this,v)),w),D.a6n,B.co),w,!1,w,w)}}
 C.ann.prototype={
 u(d){var w,v
@@ -347,7 +347,7 @@ if(!A.GD(d)){w=$.ao
 w.toString
 v=B.o.p(A.hS(A.F(w).a,null),"Test")}else v=!0
 if(v)return this.c
-return A.cnV(new C.biu(),this.c,B.wS,B.km,new A.b5(0,1,x.t),x.i)}}
+return A.cnW(new C.biu(),this.c,B.wS,B.km,new A.b5(0,1,x.t),x.i)}}
 var z=a.updateTypes(["a8<~>()"])
 C.bbT.prototype={
 $1(d){return d.cN()},
@@ -439,7 +439,7 @@ if(k.a.e.length>1){j=A.a([],g)
 for(i=A.pH(k.a.e,0,x.G),w=J.ax(i.a),i=i.b,v=new A.o7(w,i);v.t();){u=v.c
 u=u>=0?new A.Y(i+u,w.gG()):A.aa(A.dc())
 t=A.a([],g)
-if(u.a>0)t.push(B.c5)
+if(u.a>0)t.push(B.c6)
 t.push(k.aYb(u.b))
 B.f.N(j,t)}j=A.aB(j,B.z,o,B.r,B.x,0,o)
 if(k.r){i="\u0627\u0644\u062d\u0633\u0627\u0628 \u0627\u0644\u062c\u062f\u064a\u062f \u0633\u064a\u0643\u0648\u0646 \u062d\u0633\u0627\u0628 "+(k.gGv()===B.jJ?"\u0645\u062f\u0631\u0633":"\u0648\u0644\u064a \u0623\u0645\u0631")
@@ -483,7 +483,7 @@ t=A.aV(A.aS(o,!0,o,A.h4(!1,r,!0,A.b1(o,D.bzt,B.G,o,o,new A.aF(B.w,o,o,A.b4(16),o
 r=v?n:m
 v=v?"\u063a\u064a\u0631 \u0645\u0641\u0639\u0651\u0644":"not available yet"
 q=A.b4(16)
-v=A.aB(A.a([t,B.c5,A.aV(A.yg(A.aS(o,!0,o,A.b1(o,A.aB(A.a([A.ci(D.amm,B.w,o,28),B.fL,A.d("Apple",o,o,o,o,o,A.ar(o,o,B.w,o,o,o,o,o,o,o,o,o,o,o,B.bY,o,o,!0,o,o,o,o,o,o,o,o),o,o,o)],g),B.z,o,B.cq,B.x,0,o),B.G,o,o,new A.aF(B.a3,o,o,q,o,o,B.a_),o,52,new A.T("provider_apple",x.O),o,o,o,o,o),!1,o,o,!1,!0,o,!1,o,o,o,o,o,o,o,o,o,o,r+" Apple ("+v+")",o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,B.Q,o),0.45),1)],g),B.z,o,B.r,B.x,0,o)
+v=A.aB(A.a([t,B.c6,A.aV(A.yg(A.aS(o,!0,o,A.b1(o,A.aB(A.a([A.ci(D.amm,B.w,o,28),B.fL,A.d("Apple",o,o,o,o,o,A.ar(o,o,B.w,o,o,o,o,o,o,o,o,o,o,o,B.bY,o,o,!0,o,o,o,o,o,o,o,o),o,o,o)],g),B.z,o,B.cq,B.x,0,o),B.G,o,o,new A.aF(B.a3,o,o,q,o,o,B.a_),o,52,new A.T("provider_apple",x.O),o,o,o,o,o),!1,o,o,!1,!0,o,!1,o,o,o,o,o,o,o,o,o,o,r+" Apple ("+v+")",o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,B.Q,o),0.45),1)],g),B.z,o,B.r,B.x,0,o)
 if(k.a.e.length>1)k=j.a==="ar"?"\u0623\u0648\u0644 \u0645\u0631\u0629\u061f \u0627\u062e\u062a\u0631 \u0648\u0644\u064a \u0627\u0644\u0623\u0645\u0631 \u0623\u0648 \u0627\u0644\u0645\u062f\u0631\u0633 \u0645\u0646 \xab\u062d\u0633\u0627\u0628 \u062c\u062f\u064a\u062f\xbb \u062b\u0645 \u0627\u0636\u063a\u0637 Google. \u0627\u0644\u062f\u062e\u0648\u0644 \u0639\u0628\u0631 Apple \u063a\u064a\u0631 \u0645\u0641\u0639\u0651\u0644 \u0628\u0639\u062f.":"First time? Pick Parent or Teacher in the sign-up form, then press Google. Apple sign-in is not available yet."
 else k=j.a==="ar"?"\u0627\u0644\u062f\u062e\u0648\u0644 \u0639\u0628\u0631 Apple \u063a\u064a\u0631 \u0645\u0641\u0639\u0651\u0644 \u0628\u0639\u062f.":"Apple sign-in is not available yet."
 k=A.a4(A.a([u,B.a7,v,B.b2,A.d(k,o,o,o,o,o,D.a0V,B.a1,o,o)],g),B.z,o,B.r,B.x,0,B.B)
@@ -572,4 +572,4 @@ D.bNT=new A.T("auth_error",x.O)
 D.bNU=new A.T("auth_forgot",x.O)
 D.bNV=new A.T("auth_info",x.O)
 D.bQq=new A.T("provider_google",x.O)})()};
-(a=>{a["bjAjWEV0d5Tvn4teaJciEghT6QM="]=a.current})($__dart_deferred_initializers__);
+(a=>{a["6wsHC9zOUkf87A0BDamTwDOxB7o="]=a.current})($__dart_deferred_initializers__);

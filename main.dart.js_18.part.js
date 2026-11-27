@@ -1,6 +1,6 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
 $__dart_deferred_initializers__.current=function(a,b,c,$){var A,C,D={
-ciT(d,e,f,g){return new D.abp(f,g,e,d)},
+ciU(d,e,f,g){return new D.abp(f,g,e,d)},
 abp:function abp(d,e,f,g){var _=this
 _.c=d
 _.d=e
@@ -23,7 +23,7 @@ $2(d,e){var x,w=null,v=0.075*d,u=C.n.Z(v,44,90)
 v=C.n.Z(v,44,90)
 x=$.m().a==="ar"?"\u0631\u062c\u0648\u0639":"Back"
 return A.a([A.lu(w,A.h2(A.b1(w,B.aoj,C.G,w,w,new A.aF(C.dy,w,A.cu(C.w,3),w,C.Pb,w,C.bK),w,w,w,w,w,w,w,w),B.bO7,this.a.e,40,!1,x),v,w,0.02*d,w,0.03*e,u)],y.e)},
-$S:191};(function inheritance(){var x=a.inherit
+$S:199};(function inheritance(){var x=a.inherit
 x(D.abp,A.X)
 x(D.aLl,A.nR)})()
 A.qx(b.typeUniverse,JSON.parse('{"abp":{"X":[],"f":[]}}'))
@@ -34,4 +34,4 @@ B.bO7=new A.T("choice_back",y.a)
 B.bO8=new A.T("choice_educational",y.a)
 B.bO9=new A.T("choice_fun",y.a)
 B.bOS=new A.T("games_choice",y.a)})()};
-(a=>{a["z433aw9GWSEfae6/Hadsegu4QW0="]=a.current})($__dart_deferred_initializers__);
+(a=>{a["PImvTjPHvfhM7KR0ziLlNekhINg="]=a.current})($__dart_deferred_initializers__);
