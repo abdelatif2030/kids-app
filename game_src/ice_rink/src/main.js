@@ -6,6 +6,7 @@ import {
   createState, fire, step, drain, previewPath, heroes, foes, teamHp, teamMax, LEVELS, HEROES, HERO_ORDER, W, H, DT, normalizeSave, upgradeCost,
 } from './sim.js';
 import { Sound } from './audio.js';
+import { Rink3D } from './rink3d.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 import { loadArt } from '../../cozy_kit/art.js';
 // Pictures made for the game (assets/games/ice_rink/art/): when one is loaded it replaces the code-drawn hero or goblin.
@@ -186,6 +187,8 @@ class Game {
     this.root = h('div', { class: 'ir-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
     this.bg = document.createElement('canvas');
+    this.bg.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none'; this.root.append(this.bg);
+    try { this.r3 = new Rink3D(this.root, W, H); } catch (e) { this.r3 = null; }
     this.cv = h('canvas'); this.root.append(this.cv);
     this.g = this.cv.getContext('2d');
     this.layer = h('div', { class: 'ir-layer' }); this.root.append(this.layer);
@@ -215,6 +218,7 @@ class Game {
     const topR = uu * 15; const botR = this.land ? uu * 9 : uu * 26; const colW = this.land ? uu * 36 : 0;
     this.sc = Math.max(2, Math.min((this.cw - colW) / (W + 9), (this.ch - topR - botR) / (H + 9)));
     this.ox = (this.cw - colW - W * this.sc) / 2; this.oy = topR + (this.ch - topR - botR - H * this.sc) / 2;
+    if (this.r3) { this.r3.resize(this.cw, this.ch, this.dpr); this.r3.build(this.ox, this.oy, this.sc); }
     this._buildBg();
   }
   X(x) { return this.ox + x * this.sc; }
@@ -249,6 +253,7 @@ class Game {
     };
     for (let x = ox - sc * 2; x < ox + W * sc + sc * 3; x += sc * 3.4) { crowd(x + R() * sc, oy - sc * 4.1 + R() * sc * 0.6); }
     for (let y = oy; y < oy + H * sc; y += sc * 5) { if (ox > sc * 5) { crowd(ox - sc * 3.4, y); crowd(ox + W * sc + sc * 3.4, y + sc * 2); } }
+    if (!this.r3) {
     // wooden rim
     const rim = sc * 3;
     const wood = g.createLinearGradient(0, oy - rim, 0, oy + H * sc + rim); wood.addColorStop(0, '#b87a3a'); wood.addColorStop(0.5, '#8a5222'); wood.addColorStop(1, '#6a3a16');
@@ -275,6 +280,7 @@ class Game {
     const edge = g.createLinearGradient(0, oy, 0, oy + sc * 2.2); edge.addColorStop(0, 'rgba(255,255,255,.95)'); edge.addColorStop(1, 'rgba(255,255,255,0)');
     g.fillStyle = edge; g.fillRect(ox, oy, W * sc, sc * 2.2);
     g.restore();
+    }
     this.bgLevel = null;
   }
 
@@ -554,7 +560,7 @@ class Game {
   // ---------------------------------------------------------------- draw
   _draw() {
     const g = this.g; g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-    g.drawImage(this.bg, 0, 0, this.cw, this.ch);
+    if (this.r3) { g.clearRect(0, 0, this.cw, this.ch); this.r3.render(this.clock); } else g.drawImage(this.bg, 0, 0, this.cw, this.ch);
     const s = this.sim; if (!s) return;
     const sc = this.sc;
     g.save();

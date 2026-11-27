@@ -64,3 +64,4 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 - castaway_raft: landscape HUD moved to the right column (raft uncovered); level-select emoji replaced with drawn SVG icons (not screenshot-verified).
 - card_battle: landscape camera now fits the hex arena to the frame (side-on, solved by bisection). Remaining: tower HP bars offset from towers, units sparse. Clip held.
 - ice_rink: art-driven (goblin_*/hero_* webp + bg_festival), main.js 675 lines canvas2D. Next: poster backdrop + 3D diorama approach, keep art sprites as billboards.
+- ice_rink: added src/rink3d.js (three.js lit ice, 3D wooden boards with snow caps, corner lanterns, string lights, snowfall) under the 2D sprite layer; straight-down perspective keeps sim/taps exact. Landscape still a narrow portrait rink with small sprites, fox art has a box bg. Held, not a clear leap yet.
