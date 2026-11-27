@@ -56,7 +56,7 @@ export const DE_LEVELS = EN_LEVELS.filter((l) => DE_WORDS.some(l.pick)).map((l) 
 // French with Rehlaty: the same levels and pictures, the French words of docs/FRENCH_WORDLIST.csv. Ids fr_*. The map / badges / win picture are the English
 // world's until the owner's French pictures arrive (docs/FRENCH_IMAGE_PROMPTS.md).
 const FR_NAMES = { animals: 'Les animaux', first: 'Mes premiers mots', family: 'Moi et ma famille', food: 'Miam miam', school: 'Vêtements et école', world: 'Métiers, musique et météo',
-  colorful: 'Choses de couleur', routine: 'Ma journée', numbers: 'Les chiffres', letters: "L'alphabet", colors: 'Les couleurs', shapes: 'Les formes', time: 'Jours et mois', tens: 'Grands nombres', where: 'Où est la balle ?', beads: 'Les perles' };
+  colorful: 'Choses de couleur', routine: 'Ma journée', numbers: 'Les chiffres', letters: "L'alphabet", colors: 'Les couleurs', shapes: 'Les formes', time: 'Jours et mois', tens: 'Grands nombres', where: 'Où est la balle ?', beads: 'Les perles', around: 'Autour de moi', home: 'Ma maison', city: 'Ma ville et les lieux' };
 export const FR_LEVELS = EN_LEVELS.filter((l) => FR_WORDS.some(l.pick)).map((l) => {
   const k = l.id.slice(3);
   const f = { ...l, id: `fr_${k}`, mode: 'en', lang: 'fr', ar: FR_NAMES[k], words: FR_WORDS, art: { ...l.art, lang: 'fr' } };
@@ -66,7 +66,7 @@ export const FR_LEVELS = EN_LEVELS.filter((l) => FR_WORDS.some(l.pick)).map((l) 
 // Italian with Rehlaty: the same levels and pictures, the Italian words of docs/ITALIAN_WORDLIST.csv. Ids it_*. The map / badges / win picture are the English
 // world's until the owner's Italian pictures arrive (docs/ITALIAN_IMAGE_PROMPTS.md).
 const IT_NAMES = { animals: 'Gli animali', first: 'Le mie prime parole', family: 'Io e la mia famiglia', food: 'Gnam gnam', school: 'Vestiti e scuola', world: 'Mestieri, musica e tempo',
-  colorful: 'Cose colorate', routine: 'La mia giornata', numbers: 'I numeri', letters: "L'alfabeto", colors: 'I colori', shapes: 'Le forme', time: 'Giorni e mesi', tens: 'Numeri grandi', where: "Dov'è la palla?", beads: 'Le perle' };
+  colorful: 'Cose colorate', routine: 'La mia giornata', numbers: 'I numeri', letters: "L'alfabeto", colors: 'I colori', shapes: 'Le forme', time: 'Giorni e mesi', tens: 'Numeri grandi', where: "Dov'è la palla?", beads: 'Le perle', around: 'Intorno a me', home: 'La mia casa', city: 'La mia città e i luoghi' };
 export const IT_LEVELS = EN_LEVELS.filter((l) => IT_WORDS.some(l.pick)).map((l) => {
   const k = l.id.slice(3);
   // the owner's Italian-world pictures (2026-11-27): 16 badges in the order of docs/ITALIAN_IMAGE_PROMPTS.md, the sea map and the win picture
