@@ -137,6 +137,8 @@ flutter:
     - assets/games/splash_race/art/
     - assets/games/splash_race/skin/
     - assets/games/space_store/
+    - assets/games/space_store/art/
+    - assets/games/space_store/skin/
     - assets/games/space_store/models/
     - assets/games/fox_family/
     - assets/games/fox_family/art/

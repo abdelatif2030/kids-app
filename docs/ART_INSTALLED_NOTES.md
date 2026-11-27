@@ -46,3 +46,8 @@ Tools: `tools/install_pack.py <game> <zips dir> <panel RGB> <win#> <icons#> <bac
 | happy_farm | (zips part1-3 checked: everything usable was already installed) | 8 backdrops, hero/cast sheets |
 | learn_letters (English + German) | map picture behind the level list, round badges on the level tiles, win picture behind the end card; language cards on the chooser (`assets/games/learn_lang`) | the level backdrops (en_l01-09, de_l01-10): the 3D world's ground and sky cover them, so they were not kept; LANG-01/03..11 (island map, dog/hedgehog poses, medallions, seasons, stickers, album) are not used yet |
 | English words | 252 new word pictures; new levels Around me, My home, My city and places, Where is the ball?, Beads; the routine level uses the owner's routine pictures; 12 shapes with the owner's pictures | no pictures missing |
+
+## Fifth pass (2026-11-27): space_store (14 pictures from the owner's two zips)
+- Installed with `tools/install_pack.py space_store ... 12 13 6,7,8,9` + `tools/make_skin_css.py`: key art -> poster + card (menu background and the card of the fun page), skin pieces (`skin/`), win picture (`art/win.webp`), 12 icons (`art/icon_*.webp`), 4 backdrops (`art/pano1..4.webp`, NOT wired: the store is seen from above like the farm).
+- The game's menu/pause/win panels are `.ss-panel` (not the shared `.ss-card`), so `skin.css` styles `.ss-root .ss-panel` (the owner's frame with the cart and awning) and the ribbon title.
+- Not used yet: hero sheet (04), cast sheet (05: robot cashiers, alien customers, cats), props/shelves/baskets sheets (10, 11), picture 14 (level-complete frame). The old `hero.webp` was removed (the key art shows the hero).
