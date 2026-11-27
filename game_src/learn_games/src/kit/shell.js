@@ -111,6 +111,9 @@ export class Shell {
     this.root = h('div', { class: 'lk-root', dir: this.T.lang === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
     this.layer = h('div', { class: 'lk-layer' });
+    // a null / false child (an optional piece of a screen) must never be written on screen as the word "null" (owner screenshot 2026-11-27)
+    const rawAppend = this.layer.append.bind(this.layer);
+    this.layer.append = (...kids) => rawAppend(...kids.filter((k) => k !== null && k !== undefined && k !== false));
     this.root.append(this.layer);
     for (const ev of ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown']) this.root.addEventListener(ev, () => this.sound.unlock(), { capture: true, passive: true });
     this._onVis = () => { if (document.hidden) this.sound.suspend(); else this.sound.resume(); };

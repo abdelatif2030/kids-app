@@ -198,3 +198,8 @@ test('levels in English, German and French: a new word = Arabic name, the word, 
     assert.equal(review.say.length, 1, `${lang} a review round says only the word`);
   }
 });
+
+test('the screen layer never writes "null" on screen for an optional piece that is missing', () => {
+  const src = fs.readFileSync(new URL('../src/kit/shell.js', import.meta.url), 'utf8');
+  assert.ok(src.includes('rawAppend(...kids.filter((k) => k !== null && k !== undefined && k !== false))'));
+});
