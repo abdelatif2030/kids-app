@@ -27,6 +27,7 @@ if (IT.length !== body.length) throw new Error(`Italian list has ${IT.length} li
 
 const cap = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 const PLURAL = new Set('tissues,hieroglyphs,the pyramids,vitamins,lentils,fireworks,sunglasses,stuffed vegetables,teeth,bones,lungs'.split(','));
+const PLURAL_COUNTRY = new Set(['United Arab Emirates', 'United States']);
 const UNCOUNT = new Set('money,wood,metal,plastic,glass,cloth,stone,rubber,wool,leather,ice,steam,electricity,toothpaste,shampoo,confetti,ful medames,baklava,blood,skin,paper'.split(','));
 const PLAIN = new Set('save water,plant a tree,camel ride,a pair,wash your hands,healthy food,exercise,sleep well,doctor\'s visit,hold hands,look both ways,ask a grown-up,exit sign'.split(','));
 const WHERE = { // 'the ball is ... the box' per language (hand written: the cases differ)
@@ -61,7 +62,7 @@ function sentence(kind, lang, key, w, extra) {
     }
     case 'where': return WHERE[extra.en] ? WHERE[extra.en][LI[lang]] : '';
     case 'noun': {
-      const pl = PLURAL.has(extra.en);
+      const pl = PLURAL.has(extra.en) || (lang !== 'en' && PLURAL_COUNTRY.has(extra.en)); // the Emirates and the States are plural in German and French (Italian reads the article)
       if (lang === 'en') {
         if (pl) return `These are ${w}.`;
         if (UNCOUNT.has(extra.en) || /^(the |[A-Z])/.test(w)) return `This is ${w}.`;
