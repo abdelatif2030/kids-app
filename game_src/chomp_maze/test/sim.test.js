@@ -36,14 +36,14 @@ test('a robot chomper eats dots, scores and finishes easy levels', () => {
     const g = new Game({ level: lv, easy: true, seed: 3 });
     let t = 0;
     while (g.state === 'play' && t < 600) { bot(g); g.step(1 / 30); t += 1 / 30; }
-    console.log(`level ${lv + 1}: ${g.state}, dots left ${g.dots}/${g.total}, lives ${g.lives}, score ${g.score}`);
+    console.log(`level ${lv + 1}: ${g.state}, dots left ${g.dots}/${g.total}, sweets ${g.sweets}, score ${g.score}`);
     if (g.state === 'won') wins += 1;
     assert.ok(g.score > 100);
   }
   assert.ok(wins >= 0);
 });
 
-test('a power fruit scares ghosts and a scared ghost can be eaten; a caught chomper loses a life and restarts', () => {
+test('a power fruit scares ghosts and a scared ghost can be eaten; a caught chomper loses a sweet and restarts', () => {
   const g = new Game({ level: 0, easy: true, seed: 2 });
   g.scared = 5; g.invuln = 0;
   const gh = g.ghosts[0]; gh.mode = 'out'; gh.tx = g.pm.tx; gh.ty = g.pm.ty; gh.x = g.pm.x; gh.y = g.pm.y; gh.moving = false;
@@ -51,10 +51,36 @@ test('a power fruit scares ghosts and a scared ghost can be eaten; a caught chom
   assert.ok(ev.some((e) => e.type === 'eatGhost'));
   g.scared = 0; g.invuln = 0;
   const g2 = g.ghosts[1]; g2.mode = 'out'; g2.tx = g.pm.tx; g2.ty = g.pm.ty; g2.x = g.pm.x; g2.y = g.pm.y; g2.moving = false;
-  const lives = g.lives;
+  const sweets = g.sweets;
   g.step(0.01);
-  assert.equal(g.lives, lives - 1);
+  assert.equal(g.sweets, sweets - 1);
   assert.ok(g.invuln > 0);
 });
 
 test('damaged saves load safely', () => { assert.equal(normalizeSave(null).unlocked, 1); });
+
+test('kind rules (2.7): being caught costs a sweet but can NEVER end the game', () => {
+  const g = new Game({ level: 0, easy: false, seed: 2 });
+  assert.equal(g.sweets, 3);
+  for (let n = 0; n < 6; n++) {
+    g.scared = 0; g.invuln = 0;
+    const gh = g.ghosts[n % g.ghosts.length]; gh.mode = 'out'; gh.tx = g.pm.tx; gh.ty = g.pm.ty; gh.x = g.pm.x; gh.y = g.pm.y; gh.moving = false;
+    const ev = g.step(0.01);
+    assert.ok(ev.some((e) => e.type === 'caught'), `catch ${n + 1} reported`);
+    assert.equal(g.state, 'play', `catch ${n + 1} must not end the game`);
+    assert.ok(!ev.some((e) => e.type === 'lost'), 'no lost event exists any more');
+  }
+  assert.equal(g.sweets, 0, 'sweets floor at zero');
+  // and the maze still completes and grades by sweets left
+  g.dots = 0; g.sweets = 3;
+  const ev = g.step(0.01);
+  assert.equal(g.state, 'won');
+  assert.equal(ev.find((e) => e.type === 'won').stars, 3);
+});
+
+import fs from 'node:fs';
+
+test('Sweet Chase anchor: title set in Khan el-Khalili, maze untouched', () => {
+  const main = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes("title: ['مطاردة الحلويات في خان الخليلي', 'Sweet Chase in Khan el-Khalili']"));
+});

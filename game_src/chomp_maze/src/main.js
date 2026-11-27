@@ -11,7 +11,7 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 const CHOMP_CLIPS = { go: 2, trick: 3, charge: 2, bump: 2, win: 2, lose: 2 };
 
 const S = {
-  title: ['الأكول', 'Chomp Maze'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
+  title: ['مطاردة الحلويات في خان الخليلي', 'Sweet Chase in Khan el-Khalili'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
   next: ['المرحلة الجاية', 'Next level'], level: ['المرحلة', 'Level'], how: ['اسحب إصبعك عشان تغيّر الاتجاه — كُل كل النقط! الفاكهة بتخوّف الأشباح', 'Swipe to turn: eat every dot! Fruits scare the ghosts'],
   won: ['خلّصت كل النقط! 🎉', 'All dots eaten! 🎉'], lost: ['خلصت المحاولات.. جرّب تاني!', 'Out of tries.. try again!'], locked: ['خلّص المرحلة اللي قبلها', 'Finish the level before'],
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'], sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'], score: ['النقاط', 'Score'], ready: ['استعد!', 'Ready!'],
@@ -35,7 +35,20 @@ class Sound extends SynthBase {
       default: break;
     }
   }
-  setMode(on) { if (!on) { this.setBed(null); this.setTune(null); return; } this.setTune({ tempo: 132, beats: 16, wave: 'square', vol: 0.03, notes: [[0, 57, 1], [1, 60, 1], [2, 64, 1], [3, 60, 1], [4, 55, 1], [5, 59, 1], [6, 62, 1], [7, 59, 1], [8, 57, 1], [9, 60, 1], [10, 64, 1], [11, 69, 1], [12, 67, 1], [13, 64, 1], [14, 60, 2], [0, 33, 2], [4, 31, 2], [8, 33, 2], [12, 36, 2]] }); }
+  /** Real code-generated music in the house pattern (SynthBase tunes): a bouncy chase loop while
+      playing, a calm loop under the menu. (The old single line ran at vol 0.03 — effectively silent.) */
+  setMode(mode) {
+    if (mode === 'play') this.setTune({ tempo: 126, beats: 16, wave: 'triangle', vol: 0.06, notes: [
+      [0, 72, 0.5], [0.5, 76, 0.5], [1, 79, 0.5], [1.5, 76, 0.5], [2, 81, 0.5], [2.5, 79, 0.5], [3, 76, 0.5], [3.5, 72, 0.5],
+      [4, 74, 0.5], [4.5, 77, 0.5], [5, 81, 0.5], [5.5, 77, 0.5], [6, 79, 0.5], [6.5, 76, 0.5], [7, 74, 0.5], [7.5, 71, 0.5],
+      [8, 72, 0.5], [8.5, 76, 0.5], [9, 79, 0.5], [9.5, 76, 0.5], [10, 81, 0.5], [10.5, 84, 0.5], [11, 81, 0.5], [11.5, 79, 0.5],
+      [12, 77, 0.5], [12.5, 74, 0.5], [13, 76, 0.5], [13.5, 71, 0.5], [14, 72, 1], [15, 67, 1],
+      [0, 48, 1], [2, 43, 1], [4, 45, 1], [6, 43, 1], [8, 48, 1], [10, 43, 1], [12, 41, 1], [14, 43, 1]] });
+    else if (mode === 'menu') this.setTune({ tempo: 92, beats: 16, wave: 'triangle', vol: 0.05, notes: [
+      [0, 72, 2], [2, 76, 2], [4, 79, 2], [6, 76, 2], [8, 74, 2], [10, 71, 2], [12, 72, 4],
+      [0, 48, 4], [4, 45, 4], [8, 43, 4], [12, 48, 4]] });
+    else { this.setBed(null); this.setTune(null); }
+  }
 }
 
 const WALL_COLORS = ['#3a6ae8', '#e8564a', '#7a4ad8', '#2aa88a'];
@@ -89,7 +102,7 @@ class Game {
   hint(text, ms = 3000) { if (!this.hintEl) return; this.hintEl.textContent = text; this.hintEl.classList.add('show'); clearTimeout(this._ht); this._ht = setTimeout(() => this.hintEl && this.hintEl.classList.remove('show'), ms); }
 
   showMenu() {
-    this.mode = 'menu'; this.game = new Maze({ level: 0 }); this._clear(); this.sound.setMode(false);
+    this.mode = 'menu'; this.game = new Maze({ level: 0 }); this._clear(); this.sound.setMode('menu');
     const lvs = h('div', { class: 'cm-lvs' }, Array.from({ length: LEVELS }, (_, i) => { const lock = i + 1 > this.save.unlocked; const st = this.save.stars[i + 1] || 0; return h('button', { class: `cm-lv${lock ? ' lock' : ''}`, onclick: () => { if (lock) { this.hint(I.t('locked')); return; } this.sound.play('tap'); this.start(i); } }, h('i', {}, lock ? '🔒' : '🟡'), h('span', {}, I.num(i + 1)), h('span', {}, '⭐'.repeat(st) || '·')); }));
     this.layer.append(h('div', { class: 'cm-dim' }, h('div', { class: 'cm-card' }, h('div', { class: 'cm-logo' }, '🟡 ', I.t('title')), h('div', { class: 'cm-small' }, I.t('how')), h('div', { class: 'cm-small' }, `🏆 ${I.t('score')}: ${I.num(this.save.best)}`), lvs, h('button', { class: 'cm-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));
     this.hintEl = h('div', { class: 'cm-hint' }); this.layer.append(this.hintEl); this._soundPill();
@@ -100,7 +113,7 @@ class Game {
     this.levelIdx = i;
     this.game = new Maze({ level: i, easy: this.age <= 5, seed: (Date.now() & 0xffff) + 1 });
     this.mode = 'play'; this.paused = false; this.ready = 1.4;
-    this._clear(); this.sound.setMode(true);
+    this._clear(); this.sound.setMode('play');
     this.scoreEl = h('span', {}, ''); this.livesEl = h('span', {}, '');
     const back = h('button', { class: 'cm-round', 'aria-label': I.t('menu'), onclick: () => this.showMenu() }, '☰');
     const pause = h('button', { class: 'cm-round', 'aria-label': I.t('paused'), onclick: () => this.togglePause() }, '⏸');
@@ -135,7 +148,7 @@ class Game {
         default: break;
       }
     }
-    this.scoreEl.textContent = `⭐ ${I.num(g.score)}`; this.livesEl.textContent = '🟡'.repeat(Math.max(0, g.lives));
+    this.scoreEl.textContent = `⭐ ${I.num(g.score)}`; this.livesEl.textContent = '🍬'.repeat(Math.max(0, g.sweets));
   }
 
   _draw() {

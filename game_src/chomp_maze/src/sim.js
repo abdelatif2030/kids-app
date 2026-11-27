@@ -1,6 +1,7 @@
 // Chomp Maze with no drawing (a classic maze-chase in the spirit of the arcade games kids remember, with ORIGINAL characters):
 // a round yellow chomper eats every dot in a maze while four coloured ghosts wander and chase; power fruits make the ghosts
-// scared for a few seconds so they can be eaten. 3 lives; touching a ghost costs a life (the chomper restarts at home).
+// scared for a few seconds so they can be eaten. Touching a ghost costs one of Sunny's sweets (never the game:
+// the chomper simply restarts at home — there is no losing a maze, only finishing it).
 // 8 levels over 4 different mazes, faster and busier each time. Easy mode for the youngest (slower, scared ghosts last longer).
 // Deterministic with a seed.
 import { rng } from '../../cozy_kit/ui.js';
@@ -37,7 +38,7 @@ export class Game {
     while (qq.length) { const [x, y] = qq.shift(); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx; const ny = y + dy; if (nx < 0 || nx >= this.w || seen.has(`${nx},${ny}`) || !this.open(nx, ny)) continue; seen.add(`${nx},${ny}`); qq.push([nx, ny]); } }
     for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) { const c = this.map[y][x]; if ((c === '.' || c === 'o') && !seen.has(`${x},${y}`)) { this.map[y][x] = ' '; this.dots -= 1; } }
     this.total = this.dots;
-    this.lives = this.easy ? 5 : 3; this.score = 0; this.state = 'play'; this.time = 0; this.scared = 0; this.events = []; this.eatChain = 0;
+    this.sweets = this.easy ? 5 : 3; this.score = 0; this.state = 'play'; this.time = 0; this.scared = 0; this.events = []; this.eatChain = 0;
     this.speed = (this.easy ? 4.6 : 5.4) + this.level * 0.18;
     this.ghostSpeed = (this.easy ? 3.0 : 4.2) + this.level * 0.25;
     this.house = { x: 10, y: 9 };
@@ -78,10 +79,10 @@ export class Game {
       if (g.mode === 'house' || g.mode === 'eyes') continue;
       if (Math.hypot(g.x - this.pm.x, g.y - this.pm.y) < 0.6) {
         if (this.scared > 0 && !g.eaten) { g.eaten = true; g.mode = 'eyes'; this.eatChain += 1; this.score += 200 * this.eatChain; ev.push({ type: 'eatGhost', n: this.eatChain }); }
-        else if (this.invuln <= 0 && g.mode !== 'eyes') { this.lives -= 1; ev.push({ type: 'caught' }); if (this.lives <= 0) { this.state = 'lost'; ev.push({ type: 'lost' }); } else this._reset(); break; }
+        else if (this.invuln <= 0 && g.mode !== 'eyes') { this.sweets = Math.max(0, this.sweets - 1); ev.push({ type: 'caught' }); this._reset(); break; }
       }
     }
-    if (this.dots <= 0) { this.state = 'won'; this.stars = this.lives >= (this.easy ? 4 : 3) ? 3 : this.lives >= 2 ? 2 : 1; ev.push({ type: 'won', stars: this.stars }); }
+    if (this.dots <= 0) { this.state = 'won'; this.stars = this.sweets >= (this.easy ? 4 : 3) ? 3 : this.sweets >= 2 ? 2 : 1; ev.push({ type: 'won', stars: this.stars }); }
     return ev;
   }
 
