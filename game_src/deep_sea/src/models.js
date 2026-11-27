@@ -1,5 +1,5 @@
-// Every model of «أسماك الأعماق», built from shapes in code: the player's fish (a blue fusilier with a yellow stripe,
-// like the video), shrimp, plankton, sardines, damselfish, striped butterflyfish, a round spotted pufferfish, the big
+// Every model of «بُوري في البحر الأحمر», built from shapes in code: the hero Bouri (a silvery grey mullet),
+// shrimp, plankton, sardines, anthias, striped butterflyfish, a round spotted pufferfish, the big
 // grouper, mackerel, squid with tentacles, barracuda, glowing lanternfish, the anglerfish with its light, tuna and the
 // shark; and the sea: sand with light ripples, rock arches, corals, sea fans, kelp, and the dark trench. Faces +z.
 import * as THREE from 'three';
@@ -45,7 +45,7 @@ function eyes(g, x, y, z, r) {
 }
 
 const LOOK = {
-  player: { body: 0x2a7ad8, belly: 0xe8f4ff, stripe: 0xffd23a, tail: 0xffd23a },
+  player: { body: 0x9aa8b0, belly: 0xf2f6f8, stripe: 0x6a7a84, tail: 0x7a8a94 }, // Bouri the grey mullet: silvery grey
   damsel: { body: 0x3ad8e8, belly: 0xc8f8ff, tail: 0x2a8ad8 },
   sardine: { body: 0x9ab8d0, belly: 0xffffff, tail: 0x8aa8c0 },
   mackerel: { body: 0x3a8a8a, belly: 0xe8f0f0, stripe: 0x1a4a5a, tail: 0x2a6a7a },

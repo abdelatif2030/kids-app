@@ -1,8 +1,9 @@
-// Dino Grow — pure game logic (no DOM, no three.js). Deterministic for a given seed and input sequence.
-// You are a baby dinosaur. Everything shows a POWER number. You may eat only what is weaker than you (power < yours).
-// Touching something stronger only pushes you back and costs a little power (never a hard fail). Eating grows your power, and at
-// thresholds you EVOLVE. Three levels: Jungle, Swamp, Volcano Valley. Levels 1 and 2 end when you outgrow and eat their ALPHA (a big red
-// hunter whose power is shown: 'BEAT THE ALPHA 36'); the Volcano Valley boss telegraphs stomps and fire.
+// Little Spino (سبينو الصغير) — pure game logic (no DOM, no three.js). Deterministic for a given seed and input sequence.
+// You are a baby Spinosaurus — Egypt's own dinosaur, whose bones were found in the Bahariya Oasis. Everything shows a POWER number.
+// You may eat only what is weaker than you (power < yours). Touching something stronger only pushes you back and costs a little power
+// (never a hard fail). Eating grows your power, and at thresholds you EVOLVE. The levels are real Egyptian fossil places: Bahariya Oasis,
+// Wadi El Hitan (the whale valley) and the Black Desert (plus a harder return visit to each). Levels 1 and 2 end when you outgrow and eat
+// their ALPHA (a big red hunter whose power is shown: 'BEAT THE ALPHA 36'); the Black Desert boss telegraphs stomps and fire.
 
 export const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 export function rng(seed) {
@@ -10,12 +11,12 @@ export function rng(seed) {
   return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; };
 }
 
-/** Evolution stages: a name, the power it begins at. */
+/** Evolution stages: a Spinosaurus growth name, the power it begins at, and one true Spinosaurus fact [ar, en] shown for that stage. */
 export const STAGES = [
-  { id: 'baby', at: 0, ar: 'ديناصور صغير', en: 'Baby Raptor' },
-  { id: 'raptor', at: 10, ar: 'رابتور', en: 'Raptor' },
-  { id: 'hunter', at: 32, ar: 'صيّاد التاج', en: 'Crest Hunter' },
-  { id: 'giant', at: 70, ar: 'عملاق', en: 'Giant' },
+  { id: 'baby', at: 0, ar: 'صغير سبينو', en: 'Hatchling Spino', fact: ['سبينوسورس عاش في مصر من زمان أوي!', 'Spinosaurus lived in Egypt long, long ago!'] },
+  { id: 'brave', at: 10, ar: 'سبينو الشجاع', en: 'Brave Spino', fact: ['سبينوسورس كان أكبر من تي ريكس!', 'Spinosaurus was bigger than T. rex!'] },
+  { id: 'hunter', at: 32, ar: 'سبينو الصيّاد', en: 'Spino Hunter', fact: ['سبينو بيحب المية وبياكل السمك!', 'Spino loved water and ate fish!'] },
+  { id: 'spino', at: 70, ar: 'سبينوسورس', en: 'Spinosaurus', fact: ['العلماء فاكرين إن شراعه كان بيبرّده ويلفت النظر!', 'Scientists think its sail helped it stay cool and show off!'] },
 ];
 export function stageOf(P) { let s = 0; for (let i = 1; i < STAGES.length; i++) if (P >= STAGES[i].at) s = i; return s; }
 /** The player's body radius grows with power. */
@@ -59,27 +60,27 @@ const SP = {
   ankyloRed: { power: 32, f: 0.95, ai: 'wander', fleeK: 0.45, ws: 1.4, respawn: 12, look: 'ankyloRed', ar: 'أنكيلو الحمم', en: 'Lava Ankylo' },
   trikeRed: { power: 48, f: 0.95, ai: 'wander', fleeK: 0.45, ws: 1.6, respawn: 14, look: 'trikeRed', ar: 'ترايسيرا الحمم', en: 'Lava Trike' },
   spino: { power: 72, f: 0.95, ai: 'hunter', fleeK: 0.55, ws: 1.8, respawn: 22, look: 'spino', ar: 'سبينو', en: 'Spino' },
-  alphaRaptor: { power: 36, f: 1.5, ai: 'hunter', fleeK: 0.8, ws: 2.2, respawn: 0, look: 'raptorRed', alpha: true, ar: 'زعيم الأنياب', en: 'Snapjaw Alpha' },
-  alphaGator: { power: 80, f: 1.35, ai: 'hunter', fleeK: 0.75, ws: 1.8, respawn: 0, look: 'swampRex', alpha: true, ar: 'زعيم المستنقع', en: 'Marsh Fang Alpha' },
+  alphaRaptor: { power: 36, f: 1.5, ai: 'hunter', fleeK: 0.8, ws: 2.2, respawn: 0, look: 'raptorRed', alpha: true, ar: 'ناب البحرية', en: 'Bahariya Fang' },
+  alphaGator: { power: 80, f: 1.35, ai: 'hunter', fleeK: 0.75, ws: 1.8, respawn: 0, look: 'swampRex', alpha: true, ar: 'ناب وادي الحيتان', en: 'Whale Valley Fang' },
   rex: { power: 88, f: 0.95, ai: 'hunter', fleeK: 0.5, ws: 1.8, respawn: 26, look: 'rex', ar: 'ريكس', en: 'Rex' },
 };
 export const SPECIES = SP;
 for (const [k, s] of Object.entries(SP)) { s.key = k; s.r = (0.55 + 0.2 * Math.sqrt(s.power)) * s.f; s.gain = gainOf(s.power); }
 
 export const LEVELS = [
-  { id: 'jungle', ar: 'الغابة', en: 'Fern Hollow', sub: ['كُل الأخضر، اجري من الأحمر!', 'Eat green, run from red!'], half: 28, start: 3, goal: 37, alpha: { kind: 'alphaRaptor', summon: 20 }, par: 100, obst: { kinds: ['tree', 'tree', 'rock'], n: 14 },
+  { id: 'jungle', ar: 'واحة البحرية', en: 'Bahariya Oasis', sub: ['هنا لقوا عظام سبينو من زمان!', 'Spino bones were found here long ago!'], half: 28, start: 3, goal: 37, alpha: { kind: 'alphaRaptor', summon: 20 }, par: 100, obst: { kinds: ['tree', 'tree', 'rock'], n: 14 },
     species: [['beetle', 10], ['egg', 6], ['compy', 6], ['dodo', 5], ['stegoBaby', 4], ['trike', 3], ['raptorRed', 3], ['rexJr', 2]] },
-  { id: 'swamp', ar: 'المستنقع', en: 'Mirefen Swamp', sub: ['اسحب الصيّادين إلى الطين!', 'Lure the divers into the mud!'], half: 32, start: 40, goal: 81, alpha: { kind: 'alphaGator', summon: 55 }, par: 140, obst: { kinds: ['stump', 'rock', 'stump'], n: 13 },
+  { id: 'swamp', ar: 'وادي الحيتان', en: 'Wadi El Hitan', sub: ['هنا عاشت حيتان قديمة في بحر قديم!', 'Ancient whales lived in an old sea here!'], half: 32, start: 40, goal: 81, alpha: { kind: 'alphaGator', summon: 55 }, par: 140, obst: { kinds: ['stump', 'rock', 'stump'], n: 13 },
     species: [['mudbug', 10], ['frog', 8], ['swampEgg', 6], ['gator', 4], ['ankylo', 4], ['calf', 3], ['swampRex', 2]] },
-  { id: 'volcano', ar: 'وادي البركان', en: 'Volcano Valley', sub: ['اهرب من الدوس والنار!', 'Dodge the stomps and the fire!'], half: 36, start: 56, goal: 100, par: 220, obst: { kinds: ['rock', 'pillar', 'rock'], n: 14 },
+  { id: 'volcano', ar: 'الصحراء السوداء', en: 'Black Desert', sub: ['تلال سودا من براكين قديمة!', 'Black hills from old volcanoes!'], half: 36, start: 56, goal: 100, par: 220, obst: { kinds: ['rock', 'pillar', 'rock'], n: 14 },
     boss: { power: 100, hp: 3, r: 4 },
     species: [['emberbug', 8], ['lavaEgg', 6], ['lizard', 6], ['ankyloRed', 3], ['trikeRed', 4], ['spino', 3], ['rex', 2]] },
-  // 2026-11-21: three harder visits of the same valleys (same look, bigger world, stronger rivals)
-  { id: 'jungle2', look: 'jungle', ar: 'الغابة العميقة', en: 'Deep Fern Hollow', sub: ['الغابة بقت أخطر!', 'The hollow got wilder!'], half: 32, start: 6, goal: 55, alpha: { kind: 'alphaRaptor', summon: 30 }, par: 130, obst: { kinds: ['tree', 'tree', 'rock'], n: 14 },
+  // 2026-11-21: three harder return visits to the same fossil places (same look, bigger world, stronger rivals)
+  { id: 'jungle2', look: 'jungle', ar: 'قلب واحة البحرية', en: 'Deep Bahariya Oasis', sub: ['الواحة أعمق والمنافسين أقوى!', 'Deeper into the oasis, stronger rivals!'], half: 32, start: 6, goal: 55, alpha: { kind: 'alphaRaptor', summon: 30 }, par: 130, obst: { kinds: ['tree', 'tree', 'rock'], n: 14 },
     species: [['beetle', 8], ['egg', 6], ['compy', 6], ['dodo', 5], ['stegoBaby', 5], ['trike', 4], ['raptorRed', 4], ['rexJr', 3]] },
-  { id: 'swamp2', look: 'swamp', ar: 'المستنقع الأسود', en: 'Black Mire', sub: ['الطين أعمق والصيّادين أكتر!', 'Deeper mud, more divers!'], half: 36, start: 50, goal: 105, alpha: { kind: 'alphaGator', summon: 70 }, par: 170, obst: { kinds: ['stump', 'stump', 'rock'], n: 14 },
+  { id: 'swamp2', look: 'swamp', ar: 'وادي الحيتان العميق', en: 'Deep Wadi El Hitan', sub: ['برك أعمق وحيتان أقدم!', 'Deeper pools, older whales!'], half: 36, start: 50, goal: 105, alpha: { kind: 'alphaGator', summon: 70 }, par: 170, obst: { kinds: ['stump', 'stump', 'rock'], n: 14 },
     species: [['mudbug', 9], ['frog', 8], ['swampEgg', 6], ['gator', 5], ['ankylo', 5], ['calf', 4], ['swampRex', 3]] },
-  { id: 'volcano2', look: 'volcano', ar: 'قمة البركان', en: 'Volcano Peak', sub: ['البركان بيزمجر!', 'The volcano roars!'], half: 40, start: 70, goal: 130, par: 260, obst: { kinds: ['rock', 'pillar', 'rock'], n: 16 },
+  { id: 'volcano2', look: 'volcano', ar: 'قمة الصحراء السوداء', en: 'Black Desert Peak', sub: ['البركان القديم بيزمجر!', 'The old volcano roars!'], half: 40, start: 70, goal: 130, par: 260, obst: { kinds: ['rock', 'pillar', 'rock'], n: 16 },
     boss: { power: 140, hp: 4, r: 4.4 },
     species: [['emberbug', 8], ['lavaEgg', 6], ['lizard', 6], ['ankyloRed', 4], ['trikeRed', 5], ['spino', 4], ['rex', 3]] },
 ];

@@ -1,13 +1,17 @@
-// 12 hand-made rooms in 3 tombs. Every room hides exactly 2 ankh keys (8 per tomb). `par` = the fewest moves that collect
+// 20 hand-made rooms in 5 tombs. Every room hides exactly 2 ankh keys (8 per tomb). `par` = the fewest moves that collect
 // both keys and reach the exit, plus a little slack (checked by the node tests with a breadth-first solver).
+// Tomb ids and room ids are APPEND-ONLY: saves index progress by room id and unlock rooms in list order, so existing
+// entries never move. `fact` is the museum book's one-line true fact for the exhibit (ar + en).
 export const TOMBS = [
-  { id: 'sand', name: ['رمال الفرعون', 'Pharaoh Sands'], icon: '🏜️' },
-  { id: 'gold', name: ['الكنز الذهبي', 'Golden Treasury'], icon: '👑' },
-  { id: 'moon', name: ['مقبرة القمر', 'Moonlit Tomb'], icon: '🌙' },
+  { id: 'sand', name: ['سقارة', 'Saqqara'], icon: '🏜️', fact: ['هرم سقارة المدرّج أقدم هرم حجري في مصر، اتبنى للملك زوسر من أكتر من ٤٥٠٠ سنة.', "Saqqara's Step Pyramid is Egypt's oldest stone pyramid, built for King Djoser over 4,500 years ago."] },
+  { id: 'gold', name: ['وادي الملوك', 'Valley of the Kings'], icon: '👑', fact: ['في وادي الملوك اتدفن أكتر من ٦٠ ملك وملكة في مقابر مخبّية جوه الجبل.', 'More than 60 kings and queens were buried in hidden tombs inside the mountain at the Valley of the Kings.'] },
+  { id: 'moon', name: ['أبو سمبل', 'Abu Simbel'], icon: '🌙', fact: ['معابد أبو سمبل منحوتة جوه الجبل، واتنقلت حجر حجر لمكان أعلى عشان مية السد ما تغرّقهاش.', "Abu Simbel's temples are carved into a mountain, and they were moved stone by stone to higher ground so the dam's water would not flood them."] },
+  { id: 'tut', name: ['مقبرة توت عنخ آمون', 'Tomb of Tutankhamun'], icon: '✨', fact: ['مقبرة توت عنخ آمون اتلقت مليانة كنوز دهب سنة ١٩٢٢، والملك الصغير مات وهو عنده حوالي ١٩ سنة.', "Tutankhamun's tomb was found full of golden treasures in 1922; the young king died when he was about 19 years old."] },
+  { id: 'hat', name: ['معبد حتشبسوت', 'Temple of Hatshepsut'], icon: '🏛️', fact: ['حتشبسوت كانت ملكة قوية حكمت مصر، ومعبدها في الدير البحري طالع على الجبل في تلات مستويات.', 'Hatshepsut was a strong queen who ruled Egypt; her temple at Deir el-Bahari climbs the cliff in three terraces.'] },
 ];
 
 export const LEVELS = [
-  // ---- Tomb 1: sand ----
+  // ---- Tomb 1: sand — سقارة / Saqqara
   { id: 1, tomb: 0, par: 25, hint: ['استكشف المقبرة! اجمع المفاتيح ثم اخرج', 'Explore the tomb! Find the keys, then leave'], arrows: [[1, 4, 'U'], [1, 2, 'U'], [3, 1, 'R']],
     rows: [
       '#######',
@@ -43,7 +47,7 @@ export const LEVELS = [
       '#..X.#A#',
       '#1...#K#',
       '########'] },
-  // ---- Tomb 2: gold ----
+  // ---- Tomb 2: gold — وادي الملوك / Valley of the Kings
   { id: 5, tomb: 1, par: 18, hint: ['الأرض المتشققة تقع بعد أن تتركها!', 'Cracked floor falls once you leave it!'],
     rows: [
       '########',
@@ -80,7 +84,7 @@ export const LEVELS = [
       '#####2B#',
       '######E#',
       '########'] },
-  // ---- Tomb 3: moon ----
+  // ---- Tomb 3: moon — أبو سمبل / Abu Simbel
   { id: 9, tomb: 2, par: 14, hint: ['حفرتان وحجران', 'Two pits, two blocks'],
     rows: [
       '########',
@@ -117,5 +121,77 @@ export const LEVELS = [
       '###L####',
       '###G####',
       '###E####',
+      '########'] },
+  // ---- Tomb 4: tut — مقبرة توت عنخ آمون / Tomb of Tutankhamun (Phase 2F, appended; ids 13-16)
+  { id: 13, tomb: 3, par: 21, hint: ['ادفع حجراً على القرص، واملأ الحفرة بالحجر التاني', 'Push one block onto the plate, and fill the pit with the other block'],
+    rows: [
+      '########',
+      '#@..#K.#',
+      '#.X.A.X#',
+      '#..1#.p#',
+      '#K..#.E#',
+      '########'] },
+  { id: 14, tomb: 3, par: 31, hint: ['أشعل المشعلين، والمفتاح الأول يفتح الباب المقفل', 'Light both torches — the first key opens the locked door'],
+    rows: [
+      '########',
+      '#@c....#',
+      '#.###TG#',
+      '#K...#E#',
+      '#..T.###',
+      '#..#LK.#',
+      '########'] },
+  { id: 15, tomb: 3, par: 18, hint: ['بابان وحجران: افتح الأول عشان توصل للتاني', 'Two doors, two blocks: open the first to reach the second'],
+    rows: [
+      '########',
+      '#@X.1#K#',
+      '#...A..#',
+      '#.X2B..#',
+      '#K...#E#',
+      '########'] },
+  { id: 16, tomb: 3, par: 25, hint: ['غرفة توت عنخ آمون الذهبية: القرص والمشاعل معاً', "Tutankhamun's golden room: the plate and the torches together"],
+    rows: [
+      '########',
+      '#@.X1AT#',
+      '#.X...K#',
+      '#....###',
+      '#K.pTGE#',
+      '#..c...#',
+      '########'] },
+  // ---- Tomb 5: hat — معبد حتشبسوت / Temple of Hatshepsut (Phase 2F, appended; ids 17-20)
+  { id: 17, tomb: 4, par: 24, hint: ['الباب محتاج حجرين على قرصين في نفس الوقت!', 'The door needs two blocks on two plates at the same time!'],
+    rows: [
+      '########',
+      '#@.....#',
+      '#.X..X.#',
+      '#..11..#',
+      '#K.#A#K#',
+      '#..#E###',
+      '########'] },
+  { id: 18, tomb: 4, par: 24, hint: ['المفتاح الذهبي يفتح الباب المقفل اللي تحت', 'The golden key opens the locked door below'],
+    rows: [
+      '########',
+      '#@K.c.T#',
+      '#......#',
+      '##L#####',
+      '#..TK.##',
+      '#....GE#',
+      '########'] },
+  { id: 19, tomb: 4, par: 18, hint: ['املأ الحفرة بحجر، وادفع الحجر التاني على القرص', 'Fill the pit with one block, then push the other onto the plate'],
+    rows: [
+      '########',
+      '#@.XpK.#',
+      '#..###.#',
+      '#.X.1A.#',
+      '#K...#E#',
+      '########'] },
+  { id: 20, tomb: 4, par: 33, hint: ['الغرفة الأخيرة: كل أسرار المقابر معاً!', 'The last chamber: every tomb secret at once!'],
+    rows: [
+      '########',
+      '#@cK...#',
+      '#.###T.#',
+      '#..X1A.#',
+      '#T.###.#',
+      '#..X.pG#',
+      '#K...#E#',
       '########'] },
 ];

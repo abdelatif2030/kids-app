@@ -1,5 +1,5 @@
-// Screens and HUD like the owner's video, made to fit a phone: dark navy glass panels, a teal Play button, the lives
-// pill (little fish), the timer pill, the goal pill with a fish and a bar, white "Bait ball incoming" toasts, a gold
+// Screens and HUD like the owner's video, made to fit a phone: dark navy glass panels, a teal Play button, the goal
+// pill with a fish and a bar (no timer pill, no lives pill — kind rules), white "Bait ball incoming" toasts, a gold
 // "Combo x4", a red round dash button. The level card fits the screen without scrolling.
 export const CSS = `
 .ds-root{position:absolute;inset:0;overflow:hidden;font-family:Tajawal,system-ui,sans-serif;color:#fff;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent;background:#1a6a9a}
@@ -9,11 +9,6 @@ export const CSS = `
 .ds-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*5);font-weight:900;color:#5ae8d0;background:#0e3a5a}
 .ds-glass{background:rgba(12,30,48,.78);border:calc(var(--u)*.3) solid rgba(160,220,255,.18);border-radius:calc(var(--u)*3);box-shadow:0 calc(var(--u)*.6) calc(var(--u)*2) rgba(0,0,0,.3)}
 .ds-top{position:absolute;top:max(calc(var(--u)*2.4),env(safe-area-inset-top));left:calc(var(--u)*3);right:calc(var(--u)*3);display:flex;gap:calc(var(--u)*1.6);align-items:center;direction:ltr}
-.ds-lives{display:flex;gap:calc(var(--u)*.4);padding:calc(var(--u)*1.2) calc(var(--u)*2);font-size:calc(var(--u)*4)}
-.ds-lives b{filter:hue-rotate(120deg) saturate(1.5)}
-.ds-lives b.off{filter:grayscale(1);opacity:.3}
-.ds-timer{flex:1;display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*1.4);padding:calc(var(--u)*1) calc(var(--u)*2);font-size:calc(var(--u)*5.4);font-weight:900;font-variant-numeric:tabular-nums}
-.ds-timer.low{color:#ff8a8a}
 .ds-sq{width:calc(var(--u)*11);height:calc(var(--u)*11);border:none;color:#fff;font-size:calc(var(--u)*4.4);font-weight:900;cursor:pointer;padding:0;font-family:inherit;display:flex;align-items:center;justify-content:center;flex:none}
 .ds-goal{position:absolute;top:calc(max(calc(var(--u)*2.4),env(safe-area-inset-top)) + var(--u)*14);left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:calc(var(--u)*2);padding:calc(var(--u)*1.2) calc(var(--u)*3);min-width:calc(var(--u)*62);box-sizing:border-box}
 .ds-goal .fish{font-size:calc(var(--u)*7)}
@@ -62,6 +57,15 @@ export const CSS = `
 .ds-lv .nm{flex:1;font-weight:900;font-size:calc(var(--u)*4.6)}
 .ds-lv .nm small{display:block;font-size:calc(var(--u)*3.2);opacity:.85;font-weight:700}
 .ds-lv .st{font-size:calc(var(--u)*4);white-space:nowrap}
+.ds-album{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(var(--u)*2)}
+.ds-acard{background:rgba(255,255,255,.08);border-radius:calc(var(--u)*2.4);padding:calc(var(--u)*2);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.8);text-align:center}
+.ds-acard .ic{font-size:calc(var(--u)*9)}
+.ds-acard .nm{font-weight:900;font-size:calc(var(--u)*4.4)}
+.ds-acard .alt{font-size:calc(var(--u)*2.8);opacity:.75;font-weight:700}
+.ds-acard .fact{font-size:calc(var(--u)*3.2);line-height:1.45}
+.ds-acard .st{font-size:calc(var(--u)*3.4)}
+.ds-acard.lock{filter:grayscale(.9);opacity:.62}
+.ds-acard .shadow{filter:grayscale(1) brightness(.25);opacity:.55}
 .ds-stars{font-size:calc(var(--u)*11);text-align:center;letter-spacing:calc(var(--u)*1)}
 .ds-stars .off{filter:grayscale(1);opacity:.3}
 .ds-boxes{display:flex;gap:calc(var(--u)*2)}

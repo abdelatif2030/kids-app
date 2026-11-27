@@ -1,10 +1,12 @@
-// «أسماك الأعماق» — Deep Sea Fish. Entry: window.DeepSea.start(container, config, post).
+// «بُوري في البحر الأحمر» — Bouri of the Red Sea. Entry: window.DeepSea.start(container, config, post).
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
-// A small fish in a 3D sea: drag to swim, tap the red button to dash. Eat creatures smaller than you to grow, keep
-// away from bigger predators (a red "!" warns before they lunge), finish each timed challenge: the Sunlit Reef, the
-// Kelp Forest (hunt squid) and the Deep Trench (grow big enough to devour the shark). No network, no links, no ads.
+// Bouri the grey mullet in a 3D Red Sea: drag to swim, tap the red button to dash. Eat creatures smaller than you
+// to grow, keep away from bigger predators (a red "!" warns before they lunge). No timer and no lives: swim at
+// your own pace through Hurghada Reef, Ras Mohammed (hunt squid), the Blue Hole (grow big enough to devour the
+// reef shark), Dolphin House, the Great Wreck, Elphinstone, Wadi El Gemal and the Hamata Islands, and collect
+// the reef album. No network, no links, no ads.
 import * as THREE from 'three';
-import { Sea, LEVELS, SPECIES, EAT, DANGER, normalizeSave } from './sim.js';
+import { Sea, LEVELS, SPECIES, EAT, DANGER, normalizeSave, albumEntries } from './sim.js';
 import { mat, basic, makeFish, sandTexture, causticTexture, makeRock, makeArch, makeCoral, makeKelp } from './models.js';
 import { Sound } from './audio.js';
 import { applyBackdrop } from '../../cozy_kit/art.js';
@@ -24,7 +26,6 @@ const webglOk = () => {
   }
 };
 const U = (cm) => cm / 10;
-const fmt = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
 let _dot;
 function dotTexture() {
@@ -265,14 +266,13 @@ class Game {
     } else {
       for (let i = 0; i < 40; i++) { const gl = new THREE.Mesh(new THREE.SphereGeometry(0.15, 6, 4), basic([0x5ae8ff, 0xb85aff, 0x5aff8a][i % 3])); gl.position.set((rand(i + 1000) * 2 - 1) * half, floorY + 0.5 + rand(i) * hy * 2, -3 - rand(i + 1100) * 10); g.add(gl); }
     }
-    // light rays slanting down from the surface (not in the trench)
-    if (lv.biome !== 'trench') {
-      for (let i = 0; i < 14; i++) {
-        const ray = new THREE.Mesh(new THREE.PlaneGeometry(2.5 + rand(i) * 3, hy * 4), new THREE.MeshBasicMaterial({ color: 0xc8f0ff, transparent: true, opacity: 0.07, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }));
-        ray.position.set((rand(i + 1200) * 2 - 1) * half, hy, -6 - rand(i + 1300) * 10);
-        ray.rotation.set(0, 0, 0.35);
-        g.add(ray);
-      }
+    // god-rays slanting down from the surface in EVERY world (the aquarium look) — deep worlds (trench/abyss,
+    // low sun) get fainter rays via the palette's sun value; static planes, zero per-frame cost
+    for (let i = 0; i < 14; i++) {
+      const ray = new THREE.Mesh(new THREE.PlaneGeometry(2.5 + rand(i) * 3, hy * 4), new THREE.MeshBasicMaterial({ color: 0xc8f0ff, transparent: true, opacity: 0.025 + B.sun * 0.035, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }));
+      ray.position.set((rand(i + 1200) * 2 - 1) * half, hy, -6 - rand(i + 1300) * 10);
+      ray.rotation.set(0, 0, 0.35);
+      g.add(ray);
     }
     // bubble columns rise from the floor (as in the video)
     this.columns = Array.from({ length: Math.round(half / 5) }, (_, i) => ({ x: (rand(i + 1500) * 2 - 1) * half, z: -1 - rand(i + 1600) * 6, t: rand(i) }));
@@ -371,7 +371,8 @@ class Game {
       h('div', { class: 'ds-logo' }, h('b', {}, t('title')), h('span', {}, t('tagline'))),
       h('div', { class: 'ds-menu' },
         h('button', { class: 'ds-btn', onclick: () => this.showIntro(Math.min(this.save.unlocked, LEVELS.length) - 1) }, t('play')),
-        h('button', { class: 'ds-btn ghost', onclick: () => this.showLevels() }, t('levels'))),
+        h('button', { class: 'ds-btn ghost', onclick: () => this.showLevels() }, t('levels')),
+        h('button', { class: 'ds-btn ghost', onclick: () => this.showAlbum() }, '📖 ', t('album'))),
       this._toastEl(),
     );
   }
@@ -396,13 +397,42 @@ class Game {
     );
   }
 
+  /** The reef album: one card per stop, featuring a species Bouri meets there. A card opens when its stop is
+   * completed (stars > 0, via the pure albumEntries in sim.js); locked cards are silhouettes with a secret line. */
+  showAlbum() {
+    this.mode = 'album';
+    this._clear();
+    const en = getLang() === 'en';
+    const cards = albumEntries(this.save).map(({ level: lv, unlocked }) => {
+      const sp = SPECIES[lv.species];
+      return unlocked
+        ? h('div', { class: 'ds-acard' },
+          h('div', { class: 'ic' }, lv.fish),
+          h('div', { class: 'nm' }, name(sp)),
+          h('div', { class: 'alt' }, `${name(lv)} · ${en ? sp.ar : sp.en}`),
+          h('div', { class: 'fact' }, en ? lv.fact.en : lv.fact.ar),
+          h('div', { class: 'st' }, '⭐'.repeat(this.save.stars[lv.id] ?? 0)))
+        : h('div', { class: 'ds-acard lock' },
+          h('div', { class: 'ic shadow' }, lv.fish),
+          h('div', { class: 'nm' }, '🔒 ؟؟؟'),
+          h('div', { class: 'fact' }, t('lockedFact')));
+    });
+    this.layer.append(
+      h('div', { class: 'ds-dim' }, h('div', { class: 'ds-card ds-glass' },
+        h('h2', {}, '📖 ', t('album')),
+        h('h3', {}, t('albumSub')),
+        h('div', { class: 'ds-album' }, cards),
+        h('button', { class: 'ds-btn ghost', onclick: () => this.showMenu() }, t('back')))),
+      this._toastEl(),
+    );
+  }
+
   /** The level card: everything fits on a phone, big and clear (the video's card was cut off). */
   showIntro(i) {
     this.mode = 'intro';
     this._clear();
     this._buildSea(i);
     const lv = LEVELS[i];
-    const easy = this.age <= 4;
     const goal = [t('growTo', { n: num(lv.goal) })];
     if (lv.task) goal.push(t('eatSquid', { n: num(lv.task.n) }));
     if (lv.boss) goal.push(t('eatShark'));
@@ -410,8 +440,8 @@ class Game {
       h('div', { class: 'ds-dim' }, h('div', { class: 'ds-card ds-glass' },
         h('div', {}, h('h2', {}, `${t('level')} ${num(lv.id)}`), h('h3', {}, name(lv))),
         h('div', { class: 'ds-row' }, h('div', { class: 'ds-pic' }, lv.boss ? '🦈' : lv.task ? '🦑' : '🐠'), h('div', { class: 'ds-goaltxt' }, goal.join(' '))),
-        h('div', { class: 'ds-info' }, '⏱', t('seconds', { n: num(Math.round(lv.time * (easy ? 1.25 : 1))) })),
-        h('div', { class: 'ds-info star' }, '⭐', t('stars3', { n: num(Math.round(lv.star3 * (easy ? 1.25 : 1))) })),
+        h('div', { class: 'ds-info' }, '🌊', t('noRush')),
+        h('div', { class: 'ds-info star' }, '⭐', t('stars3', { n: num(lv.star3) })),
         h('button', { class: 'ds-btn', onclick: () => this.startLevel(i) }, t('start')),
         h('button', { class: 'ds-btn ghost', onclick: () => this.showMenu() }, t('back')))),
       this._toastEl(),
@@ -443,8 +473,6 @@ class Game {
   _hud() {
     this._clear();
     this.hud = {
-      lives: h('div', { class: 'ds-lives ds-glass' }),
-      timer: h('div', { class: 'ds-timer ds-glass' }, '⏱', h('span')),
       goalT: h('span'),
       bar: h('i', { style: 'width:0%' }),
       cm: h('b'),
@@ -452,7 +480,7 @@ class Game {
       dash: h('button', { class: 'ds-dash', 'aria-label': 'dash', onclick: (e) => { e.stopPropagation(); this._dash(); } }, '💨'),
     };
     this.layer.append(
-      h('div', { class: 'ds-top' }, this.hud.lives, this.hud.timer, h('button', { class: 'ds-sq ds-glass', 'aria-label': t('paused'), onclick: (e) => { e.stopPropagation(); this.pause(); } }, '❚❚')),
+      h('div', { class: 'ds-top' }, h('div', { style: 'flex:1' }), h('button', { class: 'ds-sq ds-glass', 'aria-label': t('paused'), onclick: (e) => { e.stopPropagation(); this.pause(); } }, '❚❚')),
       h('div', { class: 'ds-goal ds-glass' }, h('span', { class: 'fish' }, '🐟'), h('div', { class: 'txt' }, this.hud.goalT, h('div', { class: 'bar' }, this.hud.bar)), this.hud.cm),
       this.hud.combo,
       this.hud.dash,
@@ -484,26 +512,25 @@ class Game {
     const lv = LEVELS[i];
     this.mode = 'results';
     this.sound.setMode('menu');
+    // every finished swim is a win now (no timer, no lives): record stars/best and unlock the next stop
     this.save.best[lv.id] = Math.max(this.save.best[lv.id] ?? 0, Math.round(r.cm));
-    if (r.won) {
-      this.save.stars[lv.id] = Math.max(this.save.stars[lv.id] ?? 0, r.stars);
-      if (lv.id + 1 > this.save.unlocked && i + 1 < LEVELS.length) this.save.unlocked = lv.id + 1;
-      this.sound.play('won');
-      this.voice.say('win');
-      [0, 1, 2].forEach((k) => k < r.stars && setTimeout(() => this.sound.play('star', k), 700 + k * 280));
-    } else { this.sound.play('lost'); this.voice.say('lose'); }
+    this.save.stars[lv.id] = Math.max(this.save.stars[lv.id] ?? 0, r.stars);
+    if (lv.id + 1 > this.save.unlocked && i + 1 < LEVELS.length) this.save.unlocked = lv.id + 1;
+    this.sound.play('won');
+    this.voice.say('win');
+    [0, 1, 2].forEach((k) => k < r.stars && setTimeout(() => this.sound.play('star', k), 700 + k * 280));
     this._saveNow();
-    const hasNext = r.won && i + 1 < LEVELS.length;
+    const hasNext = i + 1 < LEVELS.length;
     this.layer.append(h('div', { class: 'ds-dim' }, h('div', { class: 'ds-card ds-glass' },
-      h('h2', { style: `text-align:center;color:${r.won ? '#9affe8' : '#ff9aaa'}` }, r.won ? t('won') : r.by === 'time' ? t('lostTime') : t('eatenTitle')),
+      h('h2', { style: 'text-align:center;color:#9affe8' }, t('won')),
       h('h3', { style: 'text-align:center' }, `${t('level')} ${num(lv.id)} · ${name(lv)}`),
-      r.won ? h('div', { class: 'ds-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= r.stars ? '' : 'off' }, '⭐'))) : null,
+      h('div', { class: 'ds-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= r.stars ? '' : 'off' }, '⭐'))),
       h('div', { class: 'ds-boxes' },
-        h('div', {}, h('small', {}, t('timeLeft')), h('b', {}, `${num(Math.max(0, Math.round(s.left)))} ${getLang() === 'en' ? 's' : 'ث'}`)),
+        h('div', {}, h('small', {}, t('time')), h('b', {}, `${num(r.time)} ${getLang() === 'en' ? 's' : 'ث'}`)),
         h('div', {}, h('small', {}, t('fishEaten')), h('b', {}, num(r.eaten))),
         h('div', {}, h('small', {}, t('finalSize')), h('b', {}, `${num(Math.round(r.cm))} ${t('cm')}`))),
-      r.won ? h('div', { class: 'ds-info star', style: 'justify-content:center' }, t('win')) : null,
-      hasNext ? h('button', { class: 'ds-btn', onclick: () => this.showIntro(i + 1) }, t('next')) : h('button', { class: 'ds-btn', onclick: () => this.startLevel(i) }, r.won ? t('again') : t('retry')),
+      h('div', { class: 'ds-info star', style: 'justify-content:center' }, t('win')),
+      hasNext ? h('button', { class: 'ds-btn', onclick: () => this.showIntro(i + 1) }, t('next')) : h('button', { class: 'ds-btn', onclick: () => this.startLevel(i) }, t('again')),
       h('button', { class: 'ds-btn ghost', onclick: () => this.showLevels() }, t('levels')))));
   }
 
@@ -521,10 +548,8 @@ class Game {
     if (mx || mz) this.moved = true;
     s.setMove(mx, mz);
     const before = s.state;
-    const tick = Math.ceil(s.left);
     for (const e of s.step(dt)) this._event(e, s);
-    if (Math.ceil(s.left) !== tick && s.left <= 10 && s.left > 0) this.sound.play('tick');
-    if ((before === 'play' || before === 'boss') && (s.state === 'won' || s.state === 'lost')) setTimeout(() => this.mode === 'play' && this.s === s && this._results(), s.state === 'won' ? 1600 : 1200);
+    if ((before === 'play' || before === 'boss') && s.state === 'won') setTimeout(() => this.mode === 'play' && this.s === s && this._results(), 1600);
     this._sync(dt, time);
   }
 
@@ -647,12 +672,9 @@ class Game {
     if (!this.hud) return;
     const hc = this._hc;
     const f = s.fish;
-    if (hc.lives !== s.lives) { hc.lives = s.lives; this.hud.lives.replaceChildren(...Array.from({ length: s.maxLives }, (_, i) => h('b', { class: i < s.lives ? '' : 'off' }, '🐟'))); }
-    const tm = fmt(Math.ceil(s.left));
-    if (hc.tm !== tm) { hc.tm = tm; this.hud.timer.lastChild.textContent = getLang() === 'en' ? tm : num(tm); this.hud.timer.classList.toggle('low', s.left <= 10); }
     const goal = s.state === 'boss' ? t('boss') : s.level.task && f.cm >= s.level.goal ? t('squidLeft', { a: num(s.squid), b: num(s.level.task.n) }) : t('growTo', { n: num(s.level.goal) });
     if (hc.goal !== goal) { hc.goal = goal; this.hud.goalT.textContent = goal; }
-    const w = Math.round(Math.max(0, Math.min(1, (f.cm - s.level.start) / (s.level.goal - s.level.start))) * 100);
+    const w = Math.round(Math.max(0, Math.min(1, (f.cm - s.startCm) / (s.level.goal - s.startCm))) * 100);
     if (hc.w !== w) { hc.w = w; this.hud.bar.style.width = `${w}%`; }
     const cm = `${num(Math.round(f.cm))} ${t('cm')}`;
     if (hc.cm !== cm) { hc.cm = cm; this.hud.cm.textContent = cm; }

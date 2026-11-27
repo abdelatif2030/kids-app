@@ -2,7 +2,7 @@
   "name": "deep_sea",
   "private": true,
   "type": "module",
-  "description": "Rehlaty «أسماك الأعماق» underwater eat-and-grow fish game (three.js). Built into assets/games/deep_sea/game.js",
+  "description": "Rehlaty «بُوري في البحر الأحمر / Bouri of the Red Sea» underwater eat-and-grow fish game (three.js). Built into assets/games/deep_sea/game.js",
   "scripts": {
     "build": "node ../cozy_kit/build_game.mjs src/main.js ../../assets/games/deep_sea/game.js",
     "test": "node --test test/sim.test.js"

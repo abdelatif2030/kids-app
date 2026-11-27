@@ -1,6 +1,6 @@
 import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
 import { SAMPLES } from './samples.js';
-// Dino Grow sound: everything is synthesised live (Web Audio), no files. Per-level ambience beds (jungle birds and insects,
+// Little Spino sound: everything is synthesised live (Web Audio), no files. Per-level ambience beds (oasis birds and insects,
 // swamp bubbles and frogs, volcano rumble), per-level music, stomps that get deeper with size, chomp, evolve fanfare, roars.
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 

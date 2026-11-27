@@ -1,17 +1,20 @@
-// «سيف الساموراي» — Samurai Action. Entry: window.SamuraiAction.start(container, config, post).
+// «حارس المعبد» — Guardian of the Temple. Entry: window.SamuraiAction.start(container, config, post).
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
-// A little samurai (Adam or Nour) defends a cherry-blossom courtyard from cartoon ninjas, then a giant red oni.
-// Drag to move, the sword swings by itself, flick (or the ⚡ button) to dash. No blood: beaten ninjas turn into a puff
-// of petals. No network, no links, no ads, no tracking. Everything drawn and played from code.
+// A young temple guardian (Adam or Nour) defends a Pharaonic temple arena from shadow raiders (tomb robbers),
+// then a giant stone golem statue that wakes up. Drag to move, the khopesh swings by itself, flick (or the
+// ⚡ button) to dash. No blood: beaten raiders turn into a puff of golden sand sparkles. No network, no links,
+// no ads, no tracking. Everything drawn and played from code. (The window API name stays SamuraiAction — the
+// Flutter shell and boot.js call it by that name; the Batch E reskin changed the game's identity, not its API.)
+// NOTE: the old painted cut-outs in art/ (hero/slash/dash/win/ninja_*/oni.webp) depict the previous samurai /
+// ninja / oni identity, so they are no longer loaded; the files stay on disk untouched for the owner to decide.
 import * as THREE from 'three';
 import { Fight, STAGES, ARENA, normalizeSave } from './sim.js';
-import { loadSprites, makePaintedFigure } from '../../cozy_kit/art.js';
 import { VoiceCoach } from '../../cozy_kit/voice.js';
 
 const SAMURAI_CLIPS = { trick: 3, bump: 3, lap: 2, near: 2, win: 2, lose: 2, count: 1 };
 import {
-  mat, makeSamurai, makeNinja, makeOni, makeShuriken, makeTorii, makeLantern, makeCherryTree, makeTemple,
-  courtyardTexture, petalGeometry,
+  mat, makeGuardian, makeRaider, makeGolem, makeScarab, makePylonGate, makeBrazier, makePalmTree, makeTemple,
+  templeFloorTexture, moteGeometry,
 } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setHero, getLang, t, num } from './i18n.js';
@@ -27,12 +30,12 @@ const webglOk = () => {
   }
 };
 const MOODS = [
-  { sky: 0xf0c8d8, fog: 0xe8c8d4, hemi: [0xfff0f4, 0x7a6a5a, 1.65], sun: [0xfff0e0, 1.4], night: false },
-  { sky: 0xffb48a, fog: 0xffc8a0, hemi: [0xffe0c8, 0x7a5a4a, 1.7], sun: [0xffb070, 1.5], night: false },
-  { sky: 0x2a2a5a, fog: 0x3a3a6a, hemi: [0xb8b8ff, 0x3a2a4a, 1.2], sun: [0xc8c8ff, 0.7], night: true },
-  { sky: 0x1c3a3a, fog: 0x2a4a4a, hemi: [0xa8ffe0, 0x2a3a3a, 1.2], sun: [0xc8fff0, 0.7], night: true }, // 4: bamboo night
-  { sky: 0xdce8f4, fog: 0xe4eef8, hemi: [0xf4f8ff, 0x7a8a9a, 1.75], sun: [0xffffff, 1.3], night: false }, // 5: snowy dojo
-  { sky: 0xffd890, fog: 0xffdca8, hemi: [0xfff0d0, 0x7a6a4a, 1.7], sun: [0xffd070, 1.6], night: false }, // 6: castle gate at sunrise
+  { sky: 0xf7d9a8, fog: 0xf2d3a0, hemi: [0xfff4dc, 0x8a7455, 1.65], sun: [0xfff0d0, 1.4], night: false }, // 1: courtyard, morning gold
+  { sky: 0xffb48a, fog: 0xffc8a0, hemi: [0xffe0c8, 0x7a5a4a, 1.7], sun: [0xffb070, 1.5], night: false }, // 2: hypostyle hall, sunset
+  { sky: 0xf9d5c0, fog: 0xf3cdb4, hemi: [0xffe8da, 0x8a6a55, 1.6], sun: [0xffd9b0, 1.35], night: false }, // 3: temple roof, dawn
+  { sky: 0x2a2a5a, fog: 0x3a3a6a, hemi: [0xb8b8ff, 0x3a2a4a, 1.2], sun: [0xc8c8ff, 0.7], night: true }, // 4: courtyard at night
+  { sky: 0xd98a5a, fog: 0xe0a070, hemi: [0xffd9ae, 0x6a4a30, 1.45], sun: [0xffc080, 1.1], night: false }, // 5: hypostyle hall, torchlight dusk
+  { sky: 0xffd890, fog: 0xffdca8, hemi: [0xfff0d0, 0x7a6a4a, 1.7], sun: [0xffd070, 1.6], night: false }, // 6: temple roof, sunrise
 ];
 
 let _dot;
@@ -51,13 +54,13 @@ function dotTexture() {
   return _dot;
 }
 
-/** Petal bursts: many little pink petal meshes in one instanced draw. */
-class PetalBurst {
+/** Sand-sparkle bursts: many little golden mote meshes in one instanced draw. */
+class SandBurst {
   constructor(scene, n) {
     this.n = n;
-    this.mesh = new THREE.InstancedMesh(petalGeometry(), new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide }), n);
+    this.mesh = new THREE.InstancedMesh(moteGeometry(), new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide }), n);
     this.mesh.frustumCulled = false;
-    const cols = [0xffb7d0, 0xff8fb8, 0xffd8e6, 0xffffff];
+    const cols = [0xffd98a, 0xffc84a, 0xfff0b0, 0xffffff];
     this.p = [];
     for (let i = 0; i < n; i++) {
       this.mesh.setColorAt(i, new THREE.Color(cols[i % 4]));
@@ -87,7 +90,7 @@ class PetalBurst {
         p.vy -= 5 * dt;
         p.vx *= 1 - dt * 1.5;
         p.vz *= 1 - dt * 1.5;
-        if (p.vy < -1.2) p.vy = -1.2; // petals float down
+        if (p.vy < -1.2) p.vy = -1.2; // sparkles drift down slowly
         p.x += p.vx * dt;
         p.y += p.vy * dt;
         p.z += p.vz * dt;
@@ -159,15 +162,8 @@ class Game {
     this.goodWin = 0;
     this.clock = new THREE.Clock();
     this._buildScene(0);
-    this.pics = null;
-    Promise.all([this._fonts(), loadSprites(THREE, this.base, ['hero', 'slash', 'dash', 'win', 'ninja_blue', 'ninja_green', 'ninja_purple', 'oni']).then((sp) => {
-      this.pics = sp;
-      if (sp.hero && this.hero && !this.hero.painted) { // the scene was built before the pictures arrived: swap in the painted samurai
-        const old = this.hero; const par = old.root.parent;
-        this.hero = makePaintedFigure(THREE, { idle: sp.hero, slash: sp.slash || sp.hero, dash: sp.dash || sp.hero, win: sp.win || sp.hero }, 2.6);
-        if (par) { par.remove(old.root); par.add(this.hero.root); }
-      }
-    })]).then(() => {
+    this.pics = null; // the old painted cut-outs are not loaded any more (see the header note)
+    Promise.all([this._fonts()]).then(() => {
       this.loading.remove();
       this.showMenu();
       this.renderer.setAnimationLoop(() => this._frame());
@@ -202,7 +198,7 @@ class Game {
     this.camera.updateProjectionMatrix();
   }
 
-  // ---- the courtyard ------------------------------------------------------------------------------------------------
+  // ---- the temple arena ----------------------------------------------------------------------------------------------
 
   _buildScene(stageIndex) {
     if (this.scene) this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
@@ -215,20 +211,22 @@ class Game {
     const sun = new THREE.DirectionalLight(mood.sun[0], mood.sun[1]);
     sun.position.set(-8, 20, 10);
     s.add(sun);
-    const grass = new THREE.Mesh(new THREE.PlaneGeometry(90, 90), mat(mood.night ? 0x3a4a3a : 0x6a8a4a));
-    grass.rotation.x = -Math.PI / 2;
-    grass.position.y = -0.02;
-    s.add(grass);
-    const floor = new THREE.Mesh(new THREE.CircleGeometry(ARENA + 0.4, 64), new THREE.MeshLambertMaterial({ map: courtyardTexture(mood.night) }));
+    const sand = new THREE.Mesh(new THREE.PlaneGeometry(90, 90), mat(mood.night ? 0x4a4238 : 0xcfa96f));
+    sand.rotation.x = -Math.PI / 2;
+    sand.position.y = -0.02;
+    s.add(sand);
+    const floor = new THREE.Mesh(new THREE.CircleGeometry(ARENA + 0.4, 64), new THREE.MeshLambertMaterial({ map: templeFloorTexture(mood.night) }));
     floor.rotation.x = -Math.PI / 2;
     s.add(floor);
-    const rim = new THREE.Mesh(new THREE.RingGeometry(ARENA + 0.4, ARENA + 1.1, 64), mat(mood.night ? 0x5a5060 : 0x5a5048));
+    const rim = new THREE.Mesh(new THREE.RingGeometry(ARENA + 0.4, ARENA + 1.1, 64), mat(mood.night ? 0x5a5060 : 0x8a7455));
     rim.rotation.x = -Math.PI / 2;
     rim.position.y = 0.01;
     s.add(rim);
-    // torii gates where ninjas come in, the temple behind, trees and lanterns around
+    // pylon gates where raiders slip in, the temple behind, palm trees and braziers around. Backdrops are
+    // code-drawn temple silhouettes: the shipped pano1..5.webp are explicitly Japanese scenes (torii, Fuji,
+    // cherry blossom, pagodas), so they stay on disk unused — see docs/REVIEW_samurai.md.
     for (const [x, z] of [[0, ARENA + 0.8], [ARENA + 0.8, 0], [-ARENA - 0.8, 0]]) {
-      const g = makeTorii();
+      const g = makePylonGate();
       g.position.set(x, 0, z);
       g.rotation.y = Math.atan2(x, z);
       s.add(g);
@@ -238,14 +236,14 @@ class Game {
     s.add(temple);
     const trees = [[-12.5, -8], [12.5, -8], [-14, 4], [14, 4], [-10, 12], [10, 12], [-16, -2], [16, -2], [-6, 14.5], [6, 14.5], [-9, -12.5], [9, -12.5]];
     trees.forEach(([x, z], i) => {
-      const tr = makeCherryTree(1 + (i % 3) * 0.2, mood.night ? 0xe89ac0 : 0xffa8c8);
+      const tr = makePalmTree(1 + (i % 3) * 0.2);
       tr.position.set(x, 0, z);
       tr.rotation.y = i;
       s.add(tr);
     });
     for (let i = 0; i < 8; i++) {
       const a = (i / 8) * Math.PI * 2 + Math.PI / 8;
-      const l = makeLantern(mood.night);
+      const l = makeBrazier(mood.night);
       l.position.set(Math.sin(a) * (ARENA + 2), 0, Math.cos(a) * (ARENA + 2));
       s.add(l);
       if (mood.night && i % 2 === 0) {
@@ -254,8 +252,8 @@ class Game {
         s.add(pl);
       }
     }
-    // the samurai
-    this.hero = this.pics && this.pics.hero ? makePaintedFigure(THREE, { idle: this.pics.hero, slash: this.pics.slash || this.pics.hero, dash: this.pics.dash || this.pics.hero, win: this.pics.win || this.pics.hero }, 2.6) : makeSamurai(this.save.hero);
+    // the guardian
+    this.hero = makeGuardian(this.save.hero);
     s.add(this.hero.root);
     this.ring = new THREE.Mesh(new THREE.RingGeometry(0.55, 0.72, 32), new THREE.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0.85 }));
     this.ring.rotation.x = -Math.PI / 2;
@@ -269,14 +267,14 @@ class Game {
     // the dash trail: a few glowing ghosts
     this.trail = [];
     for (let i = 0; i < 10; i++) {
-      const m = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.06, 1), new THREE.MeshBasicMaterial({ color: i % 2 ? 0xff9ac0 : 0xbfe6ff, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
+      const m = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.06, 1), new THREE.MeshBasicMaterial({ color: i % 2 ? 0xffc84a : 0xfff0b0, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending }));
       m.position.y = 0.9;
       s.add(m);
       this.trail.push({ m, life: 0 });
     }
-    this.petals = new PetalBurst(s, this.quality.low ? 220 : 400);
+    this.petals = new SandBurst(s, this.quality.low ? 220 : 400);
     this.sparks = this._sparks(s);
-    // falling petals in the air
+    // drifting sand / sun motes in the air
     this._ambient(s);
     // telegraphs (red circles on the floor)
     this.marks = [];
@@ -322,7 +320,7 @@ class Game {
 
   _ambient(scene) {
     const n = this.quality.low ? 50 : 110;
-    const inst = new THREE.InstancedMesh(petalGeometry(), new THREE.MeshBasicMaterial({ color: 0xffb7d0, side: THREE.DoubleSide }), n);
+    const inst = new THREE.InstancedMesh(moteGeometry(), new THREE.MeshBasicMaterial({ color: 0xffd98a, side: THREE.DoubleSide }), n);
     inst.frustumCulled = false;
     this.air = { inst, d: [] };
     for (let i = 0; i < n; i++) this.air.d.push({ x: (Math.random() - 0.5) * 30, y: Math.random() * 10, z: (Math.random() - 0.5) * 30, r: Math.random() * 6, w: 0.5 + Math.random() });
@@ -499,7 +497,7 @@ class Game {
         h('div', { class: 'sa-panel' },
           h('div', { class: 'sa-logo' }, '⚔️ ', t('title')),
           h('div', { style: 'font-weight:900;font-size:calc(var(--u)*4)' }, t('who')),
-          h('div', { class: 'sa-chefs' }, heroBtn('boy', '🥷'), heroBtn('girl', '🌸')),
+          h('div', { class: 'sa-chefs' }, heroBtn('boy', '👦'), heroBtn('girl', '👧')),
           h('div', { class: 'sa-map', style: 'margin-bottom:calc(var(--u)*3)' }, nodes))),
       this._mute(this._bottomEnd()),
       this._toastEl(),
@@ -541,7 +539,7 @@ class Game {
       kills: h('b', {}, num(0)),
       combo: h('div', { class: 'sa-combo', style: 'opacity:0' }, h('b', {}, ''), h('span', {}, t('combo')), h('i', { style: 'width:100%' })),
       banner: h('div', { class: 'sa-banner' }),
-      bossbar: h('div', { class: 'sa-bossbar' }, '👹 ', t('oni'), h('div', {}, h('i', { style: 'width:100%' }))),
+      bossbar: h('div', { class: 'sa-bossbar' }, '🗿 ', t('oni'), h('div', {}, h('i', { style: 'width:100%' }))),
       dash: h('button', { class: 'sa-dashbtn', 'aria-label': 'dash', onclick: (e) => { e.stopPropagation(); const i = this._readInput(); this._dash(i.x, i.z); } }, '⚡'),
     };
     this.hud.dash.addEventListener('pointerdown', (e) => e.stopPropagation());
@@ -702,7 +700,7 @@ class Game {
         this.sound.setMode('boss');
         this._banner(t('boss'), 2.2);
         this.hud.bossbar.style.display = 'block';
-        this.oni = this.pics && this.pics.oni ? makePaintedFigure(THREE, { idle: this.pics.oni }, 4.4) : makeOni();
+        this.oni = makeGolem();
         this.oni.root.scale.setScalar(1.25);
         this.scene.add(this.oni.root);
         break;
@@ -747,7 +745,7 @@ class Game {
   _sync(dt, rdt, time) {
     const f = this.fight;
     const p = f.p;
-    // the samurai
+    // the guardian
     this._walk(this.hero, p.x, p.z, p.face, p.moving, rdt, time);
     const sw = p.slash > 0 ? 1 - p.slash / 0.18 : 0;
     this.hero.arms[1].rotation.x = p.slash > 0 ? -1.6 + sw * 2.4 : p.dash > 0 ? -1.4 : -0.5 + Math.sin(time * 13) * 0.3 * p.moving;
@@ -770,12 +768,12 @@ class Game {
       this._spark(p.x, 0.9, p.z, 2, 2);
     }
     for (const tr of this.trail) { tr.life = Math.max(0, tr.life - rdt); tr.m.material.opacity = tr.life * 2.6; }
-    // ninjas
+    // raiders
     let mi = 0;
     for (const e of f.enemies) {
       let m = this.ninjaModels.get(e.id);
       if (!m) {
-        { const key = { ninja: 'ninja_blue', big: 'ninja_green', thrower: 'ninja_purple' }[e.kind] || 'ninja_blue'; m = this.pics && this.pics[key] ? makePaintedFigure(THREE, { idle: this.pics[key] }, e.kind === 'big' ? 3.4 : 2.3) : makeNinja(e.kind); }
+        m = makeRaider(e.kind);
         m.warn = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.42, 4), mat(0xff3a3a, 0xff0000, 0.6));
         m.warn.rotation.x = Math.PI;
         m.warn.position.y = e.kind === 'big' ? 2.5 : 1.85;
@@ -802,14 +800,14 @@ class Game {
       const alive = new Set(f.enemies.map((e) => e.id));
       for (const [id, m] of this.ninjaModels) if (!alive.has(id)) { this.scene.remove(m.root); this.ninjaModels.delete(id); }
     }
-    // thrown stars
-    while (this.starModels.length < f.stars.length) { const s = makeShuriken(); this.scene.add(s); this.starModels.push(s); }
+    // thrown scarabs
+    while (this.starModels.length < f.stars.length) { const s = makeScarab(); this.scene.add(s); this.starModels.push(s); }
     this.starModels.forEach((s, i) => {
       const st = f.stars[i];
       s.visible = !!st;
       if (st) { s.position.set(st.x, 1, st.z); s.rotation.y = time * 18; }
     });
-    // the oni
+    // the golem
     const b = f.boss;
     if (b && this.oni) {
       const o = this.oni;
@@ -834,7 +832,7 @@ class Game {
           this.chargeMark.rotation.z = -Math.atan2(b.ax, b.az);
         } else this.chargeMark.material.opacity = 0;
       } else {
-        // the giant topples over and pops into petals
+        // the giant topples over and crumbles into sand sparkles
         this.oniDown = (this.oniDown ?? 0) + dt;
         o.root.rotation.x = Math.min(Math.PI / 2, this.oniDown * 1.6);
         o.root.scale.setScalar(Math.max(0.01, 1.25 * (1 - Math.max(0, this.oniDown - 0.8) * 1.5)));
@@ -848,7 +846,7 @@ class Game {
     this._airStep(rdt, time);
     // camera follows, with a little shake
     const portrait = this.cw < this.ch;
-    // closer and more tilted, following the samurai (like the video)
+    // closer and more tilted, following the guardian (like the video)
     const want = new THREE.Vector3(p.x * 0.85, portrait ? 11 : 8.5, p.z * 0.85 + (portrait ? 9 : 7.5));
     if (!this.cam) this.cam = want.clone();
     this.cam.lerp(want, Math.min(1, rdt * 4));
@@ -911,7 +909,7 @@ class Game {
       if (this.mode === 'play' && !this.paused) this._fightFrame(dt, time);
       else if (this.mode === 'results') { this.petals.update(dt, time); this._airStep(dt, time); }
     } else {
-      // menu: the samurai stands in the middle of the courtyard, the camera slowly circles
+      // menu: the guardian stands in the middle of the arena, the camera slowly circles
       this._airStep(dt, time);
       this.hero.root.position.set(0, 0, 0);
       this.hero.root.rotation.y = Math.sin(time * 0.6) * 0.4;

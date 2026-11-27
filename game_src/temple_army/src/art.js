@@ -1,4 +1,4 @@
-// Temple Army art: every model is built from three.js primitives and canvas textures in code. No files.
+// Guardians of Karnak art: every model is built from three.js primitives and canvas textures in code. No files.
 import * as THREE from 'three';
 import { TILE, SKINS } from './sim.js';
 
@@ -28,6 +28,8 @@ export function floorTexture(def, W, H, solid) {
     g.beginPath(); g.moveTo(x * px, y * px + px * (0.35 + r() * 0.3)); g.lineTo(x * px + px, y * px + px * (0.35 + r() * 0.3)); g.stroke();
     // cracks
     if (r() < 0.35) { g.strokeStyle = 'rgba(30,25,20,.5)'; g.lineWidth = 1.5; g.beginPath(); let cx = x * px + r() * px; let cy = y * px + r() * px; g.moveTo(cx, cy); for (let i = 0; i < 4; i++) { cx += (r() - 0.5) * 14; cy += (r() - 0.5) * 14; g.lineTo(cx, cy); } g.stroke(); }
+    // faint carved hieroglyph on some slabs (drawn into the floor texture once, at build time)
+    if (r() < 0.16) drawGlyph(g, GLYPH_KINDS[Math.floor(r() * GLYPH_KINDS.length)], x * px + px / 2, y * px + px / 2, px * 0.32, 'rgba(122,90,32,.30)');
     // moss, thicker near walls
     const wallNear = (solid[y * W + x - 1] ? 1 : 0) + (solid[y * W + x + 1] ? 1 : 0) + (solid[(y - 1) * W + x] ? 1 : 0) + (solid[(y + 1) * W + x] ? 1 : 0);
     const blobs = 1 + wallNear * 2;
@@ -57,6 +59,47 @@ export function starTexture() {
   g.closePath(); g.fillStyle = '#ffe04a'; g.fill(); g.lineWidth = 4; g.strokeStyle = '#fff'; g.stroke();
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t;
 }
+// ---------- hieroglyphs: simple Egyptian motifs drawn with canvas paths (no font dependence) ----------
+// Drawn once into cached textures at load/build time — never per frame.
+export const GLYPH_KINDS = ['sun', 'ankh', 'eye', 'scarab', 'feather', 'water', 'was'];
+export function drawGlyph(g, kind, cx, cy, s, col) {
+  g.save(); g.translate(cx, cy); g.strokeStyle = col; g.fillStyle = col; g.lineWidth = Math.max(1.2, s * 0.1); g.lineCap = 'round'; g.lineJoin = 'round';
+  const u = s;
+  if (kind === 'sun') { g.beginPath(); g.arc(0, 0, u * 0.58, 0, 6.3); g.stroke(); g.beginPath(); g.arc(0, 0, u * 0.2, 0, 6.3); g.fill(); }
+  else if (kind === 'ankh') { g.beginPath(); g.ellipse(0, -u * 0.52, u * 0.3, u * 0.4, 0, 0, 6.3); g.stroke(); g.beginPath(); g.moveTo(0, -u * 0.12); g.lineTo(0, u * 0.9); g.moveTo(-u * 0.55, u * 0.18); g.lineTo(u * 0.55, u * 0.18); g.stroke(); }
+  else if (kind === 'eye') { // Eye of Horus
+    g.beginPath(); g.moveTo(-u * 0.85, 0); g.quadraticCurveTo(0, -u * 0.75, u * 0.85, 0); g.quadraticCurveTo(0, u * 0.55, -u * 0.85, 0); g.stroke();
+    g.beginPath(); g.arc(0, -u * 0.05, u * 0.26, 0, 6.3); g.fill();
+    g.beginPath(); g.moveTo(-u * 0.9, -u * 0.42); g.quadraticCurveTo(0, -u * 0.95, u * 0.95, -u * 0.5); g.stroke();
+    g.beginPath(); g.moveTo(-u * 0.25, u * 0.42); g.lineTo(-u * 0.25, u * 0.9); g.moveTo(u * 0.35, u * 0.38); g.quadraticCurveTo(u * 0.6, u * 0.8, u * 0.9, u * 0.75); g.stroke();
+  } else if (kind === 'scarab') {
+    g.beginPath(); g.ellipse(0, u * 0.12, u * 0.5, u * 0.62, 0, 0, 6.3); g.stroke();
+    g.beginPath(); g.moveTo(0, -u * 0.5); g.lineTo(0, u * 0.74); g.moveTo(-u * 0.48, -u * 0.1); g.quadraticCurveTo(0, u * 0.25, u * 0.48, -u * 0.1); g.stroke();
+    g.beginPath(); g.arc(0, -u * 0.68, u * 0.22, 0, 6.3); g.fill();
+    for (const sgn of [-1, 1]) for (let k = 0; k < 3; k++) { g.beginPath(); g.moveTo(sgn * u * 0.48, -u * 0.25 + k * u * 0.3); g.lineTo(sgn * u * 0.88, -u * 0.45 + k * u * 0.38); g.stroke(); }
+  } else if (kind === 'feather') { g.beginPath(); g.moveTo(0, u * 0.9); g.lineTo(0, -u * 0.85); g.moveTo(0, -u * 0.85); g.quadraticCurveTo(u * 0.55, -u * 0.2, 0, u * 0.55); g.moveTo(0, -u * 0.85); g.quadraticCurveTo(-u * 0.55, -u * 0.2, 0, u * 0.55); g.stroke(); }
+  else if (kind === 'water') { for (const yy of [-0.35, 0.35]) { g.beginPath(); for (let k = 0; k <= 4; k++) { const x = -u * 0.85 + k * u * 0.425; const y = yy * u + (k % 2 ? -u * 0.16 : u * 0.16); if (k === 0) g.moveTo(x, y); else g.lineTo(x, y); } g.stroke(); } }
+  else { // was sceptre: angled head, straight shaft, forked base
+    g.beginPath(); g.moveTo(0, -u * 0.35); g.lineTo(0, u * 0.62); g.moveTo(0, -u * 0.35); g.lineTo(u * 0.42, -u * 0.72); g.lineTo(u * 0.1, -u * 0.78); g.moveTo(0, u * 0.62); g.lineTo(-u * 0.32, u * 0.92); g.moveTo(0, u * 0.62); g.lineTo(u * 0.32, u * 0.92); g.stroke();
+  }
+  g.restore();
+}
+let _bandTex = null;
+export function glyphBandTexture() {
+  if (_bandTex) return _bandTex;
+  const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 96; const g = cv.getContext('2d');
+  for (let i = 0; i < 14; i++) { const x = 38 + i * 72; drawGlyph(g, GLYPH_KINDS[i % GLYPH_KINDS.length], x + 2, 50, 30, 'rgba(60,38,8,.85)'); drawGlyph(g, GLYPH_KINDS[i % GLYPH_KINDS.length], x, 48, 30, '#ffd23a'); }
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; _bandTex = t; return t;
+}
+let _scarabTex = null;
+export function scarabTexture() {
+  if (_scarabTex) return _scarabTex;
+  const cv = document.createElement('canvas'); cv.width = cv.height = 128; const g = cv.getContext('2d');
+  drawGlyph(g, 'sun', 64, 20, 15, '#ffd23a');
+  drawGlyph(g, 'scarab', 64, 74, 42, '#ffe98a');
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; _scarabTex = t; return t;
+}
+
 export function glowTexture() {
   const cv = document.createElement('canvas'); cv.width = cv.height = 64; const g = cv.getContext('2d');
   const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,200,90,.95)'); gr.addColorStop(0.4, 'rgba(255,140,40,.4)'); gr.addColorStop(1, 'rgba(255,100,20,0)');
@@ -122,6 +165,8 @@ export function makeCaptain(skin) {
   g.userData.armR.add(mesh(geo.box, M(0xd8dce8, 0x333340), 0.0, -0.7, 0.55, 0.08, 0.07, 1.2)); // sword
   g.userData.armR.add(mesh(geo.box, M(0xffd23a), 0, -0.7, 0.0, 0.3, 0.07, 0.07));
   g.userData.armL.add(mesh(geo.cyl, M(0xc87a2a), -0.15, -0.55, 0.0, 0.7, 0.08, 0.7)); g.userData.armL.children[g.userData.armL.children.length - 1].rotation.z = Math.PI / 2;
+  const scarab = new THREE.Mesh(new THREE.CircleGeometry(0.3, 20), new THREE.MeshBasicMaterial({ map: scarabTexture(), transparent: true, depthWrite: false }));
+  scarab.position.set(-0.21, -0.55, 0); scarab.rotation.y = -Math.PI / 2; g.userData.armL.add(scarab); // scarab emblem on the captain's shield
   for (const [grp, x] of [[g.userData.legL, -0.2], [g.userData.legR, 0.2]]) { grp.position.set(x, 0.55, 0); grp.add(mesh(geo.cyl, dark, 0, -0.25, 0, 0.22, 0.5, 0.22), mesh(geo.box, dark, 0, -0.52, 0.06, 0.26, 0.12, 0.38)); body.add(grp); }
   g.userData.body = body; body.scale.setScalar(1.6);
   const sh = mesh(new THREE.CircleGeometry(0.9, 14), new THREE.MeshBasicMaterial({ color: 0, transparent: true, opacity: 0.3, depthWrite: false }), 0, 0.03, 0); sh.rotation.x = -Math.PI / 2; g.add(sh);
@@ -135,6 +180,8 @@ export function recolorCaptain(g, skin) { // rebuild instead (cheap): caller rep
 export function makeGate(op, v, good, label, vertical) {
   const g = new THREE.Group(); const stone = M(0x8a8a78); const col = good ? 0x3af08a : 0xff4a3a;
   g.add(mesh(geo.box, stone, -1.25, 1.3, 0, 0.5, 2.6, 0.6), mesh(geo.box, stone, 1.25, 1.3, 0, 0.5, 2.6, 0.6), mesh(geo.box, stone, 0, 2.7, 0, 3.0, 0.5, 0.7));
+  const band = new THREE.Mesh(new THREE.PlaneGeometry(2.9, 0.42), new THREE.MeshBasicMaterial({ map: glyphBandTexture(), transparent: true, depthWrite: false }));
+  band.position.set(0, 2.7, 0.37); g.add(band); // hieroglyph frieze carved across the gate lintel
   g.add(mesh(geo.box, M(col, col), 0, 2.97, 0, 3.1, 0.12, 0.74));
   const panel = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 2.4), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.32, side: THREE.DoubleSide, depthWrite: false }));
   panel.position.y = 1.25; g.add(panel); g.userData.panel = panel;
@@ -195,6 +242,8 @@ export function makeTorch(glowTex) {
 export function makeExit(open) {
   const g = new THREE.Group(); const stone = M(0x8a8678);
   g.add(mesh(geo.box, stone, -1.3, 1.6, 0, 0.7, 3.2, 0.9), mesh(geo.box, stone, 1.3, 1.6, 0, 0.7, 3.2, 0.9), mesh(geo.box, stone, 0, 3.4, 0, 3.3, 0.7, 1.0));
+  const band = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.46), new THREE.MeshBasicMaterial({ map: glyphBandTexture(), transparent: true, depthWrite: false }));
+  band.position.set(0, 3.4, 0.52); g.add(band); // hieroglyph frieze across the exit lintel
   const door = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 3.0), new THREE.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0.6, side: THREE.DoubleSide, depthWrite: false }));
   door.position.y = 1.5; g.add(door); g.userData.door = door;
   const beam = mesh(geo.cyl, new THREE.MeshBasicMaterial({ color: 0xffe880, transparent: true, opacity: 0.18, depthWrite: false }), 0, 5, 0, 2.0, 10, 2.0); g.add(beam); g.userData.beam = beam;

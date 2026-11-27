@@ -1,4 +1,6 @@
-// Pure, deterministic rules of «لغز المقبرة» (Tomb Puzzle). No DOM, no three.js: used by the game and by node tests.
+import { LEVELS, TOMBS } from './levels.js';
+
+// Pure, deterministic rules of «سليم وكنوز الفراعنة» (Salim and the Pharaohs' Treasure). No DOM, no three.js: used by the game and by node tests.
 // Legend of a level (array of strings):
 //   # wall, ' ' void, . floor, ~ carpet floor, @ start, E exit, X pushable block, K ankh key, L locked door (spends a key),
 //   1-4 sun plates (open doors A-D when every plate of that number is pressed by a block or the explorer),
@@ -189,9 +191,13 @@ export function hintMove(L, s) {
   return r.found ? r.path[0] : null;
 }
 
+/** Stars are for completion + collection ONLY (house kind rule). The ankh keys are the room's collectible:
+ *  1 star for reaching the exit, +1 for finding at least one ankh key on the way, +1 for finding EVERY key the
+ *  room offers. Move count NEVER gates a star; `par` survives only as a best-moves sparkle hint in the UI. */
 export function starsFor(L, s) {
-  const all = s.keys === L.keyFull;
-  return 1 + (all ? 1 : 0) + (all && s.moves <= L.par ? 1 : 0);
+  if (!s.won) return 0;
+  if (s.keys === L.keyFull) return 3;
+  return s.keys !== 0 ? 2 : 1;
 }
 
 /** Moves with undo / reset. A fall can be undone too. */
@@ -210,5 +216,23 @@ export function normalizeSave(sv) {
   const o = sv && typeof sv === 'object' ? sv : {};
   const num = (v, d) => (Number.isFinite(v) ? v : d);
   const map = (m) => { const r = {}; if (m && typeof m === 'object') for (const k of Object.keys(m)) if (Number.isFinite(m[k])) r[k] = m[k]; return r; };
-  return { unlocked: Math.max(1, Math.min(12, num(o.unlocked, 1))), stars: map(o.stars), keys: map(o.keys), best: map(o.best), muted: !!o.muted };
+  // The cap is the room count (20 since Phase 2F). Old 3-tomb saves keep their unlocked value (<= 12) and their
+  // per-room stars/keys/best maps untouched — room ids never moved, so they migrate cleanly.
+  return { unlocked: Math.max(1, Math.min(20, num(o.unlocked, 1))), stars: map(o.stars), keys: map(o.keys), best: map(o.best), muted: !!o.muted };
+}
+
+/** Museum book entries for a save: one exhibit per tomb. An exhibit is OPEN once every room of its tomb has been
+ * completed (stars > 0); it then shows the tomb's collected ankh keys and stars. Pure and derived entirely from the
+ * existing save (stars/keys maps) — no new persistence, so old saves show their tombs exactly as completed. */
+export function museumEntries(sv) {
+  const s = normalizeSave(sv);
+  return TOMBS.map((tomb, ti) => {
+    const rooms = LEVELS.filter((l) => l.tomb === ti);
+    const done = rooms.filter((l) => (s.stars[l.id] || 0) > 0).length;
+    return {
+      tomb, rooms: rooms.length, done, complete: rooms.length > 0 && done === rooms.length,
+      keys: rooms.reduce((a, l) => a + (s.keys[l.id] || 0), 0), totalKeys: rooms.reduce((a, l) => a + parseLevel(l).keyCells.length, 0),
+      stars: rooms.reduce((a, l) => a + (s.stars[l.id] || 0), 0),
+    };
+  });
 }

@@ -1,15 +1,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseLevel, initState, step, solve, hintMove, starsFor, Puzzle, normalizeSave, T, doorOpen } from '../src/sim.js';
+import { parseLevel, initState, step, solve, hintMove, starsFor, Puzzle, normalizeSave, museumEntries, T, doorOpen } from '../src/sim.js';
 import { LEVELS, TOMBS } from '../src/levels.js';
 
 const mk = (rows, extra = {}) => parseLevel({ id: 99, tomb: 0, rows, par: 10, ...extra });
 const run = (P, moves) => { let last; for (const m of moves) last = P.move(m); return last; };
 
-test('12 rooms in 3 tombs, 2 ankh keys each (8 per tomb), one start and one exit', () => {
-  assert.equal(LEVELS.length, 12);
-  assert.equal(TOMBS.length, 3);
-  for (let t = 0; t < 3; t++) {
+test('20 rooms in 5 tombs, 2 ankh keys each (8 per tomb), one start and one exit', () => {
+  assert.equal(LEVELS.length, 20);
+  assert.equal(TOMBS.length, 5);
+  assert.deepEqual(LEVELS.map((l) => l.id), Array.from({ length: 20 }, (_, i) => i + 1), 'room ids are sequential and never renumbered');
+  for (let t = 0; t < 5; t++) {
     const ls = LEVELS.filter((l) => l.tomb === t);
     assert.equal(ls.length, 4);
     assert.equal(ls.reduce((a, l) => a + parseLevel(l).keyCells.length, 0), 8);
@@ -193,26 +194,101 @@ test('undo and reset', () => {
   assert.equal(P.s.moves, 1);
 });
 
-test('stars: finish, all keys, all keys within par', () => {
+test('stars: completion + collection only — par never gates a star', () => {
   const L = mk(['######', '#@KE.#', '######'], { par: 2 });
   const P = new Puzzle(L);
   run(P, 'RR');
   assert.equal(starsFor(L, P.s), 3);
+  // a SLOW solve (moves well over par) with every key still earns all 3 stars
   const L2 = mk(['######', '#@KE.#', '######'], { par: 1 });
   const P2 = new Puzzle(L2); run(P2, 'RR');
-  assert.equal(starsFor(L2, P2.s), 2);
+  assert.ok(P2.s.moves > L2.par, 'this solve really is over par');
+  assert.equal(starsFor(L2, P2.s), 3, 'par must not gate the 3rd star');
+  const P2b = new Puzzle(L2); run(P2b, 'RR'); P2b.s.moves = 999;
+  assert.equal(starsFor(L2, P2b.s), 3, 'even a very slow all-keys solve keeps 3 stars');
   const L3 = mk(['#######', '#@.KE.#', '#.###.#', '#######'].map((r) => r.slice(0, 7)));
   const P3 = new Puzzle(L3); run(P3, 'RRR');
   assert.equal(starsFor(L3, P3.s), 3);
+  // exit reached with a key left behind: completion star only
   const L4 = mk(['######', '#@EK.#', '######']);
   const P4 = new Puzzle(L4); run(P4, 'R');
   assert.equal(starsFor(L4, P4.s), 1);
+  // not won yet: no stars at all
+  const P5 = new Puzzle(L);
+  assert.equal(starsFor(L, P5.s), 0);
+});
+
+test('stars: partial collection earns the middle star', () => {
+  // two keys in the room; the second hides in an alcove the exit path can skip
+  const L = mk(['#########', '#@K..E..#', '#..K....#', '#########']);
+  const P = new Puzzle(L); run(P, 'RRRR'); // one key, then straight to the exit
+  assert.equal(P.s.won, true);
+  assert.equal(starsFor(L, P.s), 2, 'solved with some but not all keys: 2 stars');
+  const P2 = new Puzzle(L); run(P2, 'RRDURR'); // both keys (detour into the alcove), then the exit
+  assert.equal(P2.s.won, true);
+  assert.equal(starsFor(L, P2.s), 3, 'every key collected: 3 stars, speed irrelevant');
+});
+
+test('tomb names are the real places (Saqqara / Valley of the Kings / Abu Simbel / Tutankhamun / Hatshepsut), ids append-only', () => {
+  assert.deepEqual(TOMBS.map((t) => t.id), ['sand', 'gold', 'moon', 'tut', 'hat']);
+  assert.deepEqual(TOMBS.map((t) => t.name), [['سقارة', 'Saqqara'], ['وادي الملوك', 'Valley of the Kings'], ['أبو سمبل', 'Abu Simbel'], ['مقبرة توت عنخ آمون', 'Tomb of Tutankhamun'], ['معبد حتشبسوت', 'Temple of Hatshepsut']]);
+  for (const t of TOMBS) { assert.equal(t.fact.length, 2, `tomb ${t.id} has an ar+en museum fact`); assert.ok(t.fact[0].length > 10 && t.fact[1].length > 10); }
+});
+
+test('no room is a copy or a horizontal mirror of another room', () => {
+  const sig = (rows) => rows.join('/');
+  const mirror = (rows) => rows.map((r) => [...r].reverse().join('')).join('/');
+  const seen = new Set();
+  for (const d of LEVELS) {
+    assert.ok(!seen.has(sig(d.rows)), `room ${d.id} duplicates an earlier room`);
+    assert.ok(!seen.has(mirror(d.rows)), `room ${d.id} mirrors an earlier room`);
+    seen.add(sig(d.rows)); seen.add(mirror(d.rows));
+  }
 });
 
 test('save is sanitised', () => {
   assert.deepEqual(normalizeSave(null), { unlocked: 1, stars: {}, keys: {}, best: {}, muted: false });
   const s = normalizeSave({ unlocked: 99, stars: { 1: 3, 2: 'x' }, muted: 1 });
-  assert.equal(s.unlocked, 12); assert.deepEqual(s.stars, { 1: 3 }); assert.equal(s.muted, true);
+  assert.equal(s.unlocked, 20); assert.deepEqual(s.stars, { 1: 3 }); assert.equal(s.muted, true);
+});
+
+test('old 3-tomb save migrates cleanly: progress kept, new tombs simply locked', () => {
+  const old = { unlocked: 12, stars: { 1: 3, 2: 3, 3: 2, 4: 3, 5: 1 }, keys: { 1: 2, 2: 2, 3: 1, 4: 2, 5: 0 }, best: { 1: 21 }, muted: false };
+  const s = normalizeSave(old);
+  assert.equal(s.unlocked, 12, 'an old save at the old cap stays at 12, it is not inflated');
+  assert.deepEqual(s.stars, old.stars); assert.deepEqual(s.keys, old.keys); assert.deepEqual(s.best, old.best);
+  const full = normalizeSave({ unlocked: 12, stars: Object.fromEntries(Array.from({ length: 12 }, (_, i) => [i + 1, 3])), keys: Object.fromEntries(Array.from({ length: 12 }, (_, i) => [i + 1, 2])) });
+  const entries = museumEntries(full);
+  assert.deepEqual(entries.map((e) => e.complete), [true, true, true, false, false], 'the 3 old tombs show complete, the 2 new ones locked');
+  assert.equal(entries[0].keys, 8); assert.equal(entries[0].stars, 12);
+});
+
+test('unlock chain walks all 20 rooms in order across all 5 tombs', () => {
+  // the same progression rule the game applies on a win: unlocked = max(unlocked, min(LEVELS.length, idx + 2))
+  let unlocked = normalizeSave(null).unlocked;
+  assert.equal(unlocked, 1);
+  for (let idx = 0; idx < LEVELS.length; idx++) {
+    assert.ok(idx + 1 <= unlocked, `room ${LEVELS[idx].id} is reachable when its turn comes`);
+    unlocked = Math.max(unlocked, Math.min(LEVELS.length, idx + 2));
+    const next = LEVELS[idx + 1];
+    if (next) assert.ok(next.id <= unlocked, `winning room ${LEVELS[idx].id} unlocks room ${next.id} (tomb ${next.tomb})`);
+  }
+  assert.equal(unlocked, 20);
+  for (let t = 0; t < 5; t++) assert.equal(LEVELS.filter((l) => l.tomb === t).length, 4, `tomb ${t} is crossed by the chain`);
+});
+
+test('museum book: fresh save all locked, a finished tomb opens with its keys, stars and fact', () => {
+  const fresh = museumEntries(null);
+  assert.equal(fresh.length, 5);
+  assert.ok(fresh.every((e) => !e.complete && e.done === 0 && e.keys === 0));
+  const partial = museumEntries({ stars: { 1: 3, 2: 2, 3: 1 }, keys: { 1: 2, 2: 1, 3: 2 } });
+  assert.equal(partial[0].complete, false, 'a tomb with an unfinished room stays locked');
+  assert.equal(partial[0].done, 3);
+  const done = museumEntries({ stars: { 1: 3, 2: 3, 3: 3, 4: 2 }, keys: { 1: 2, 2: 2, 3: 2, 4: 1 } });
+  assert.equal(done[0].complete, true);
+  assert.equal(done[0].keys, 7); assert.equal(done[0].totalKeys, 8); assert.equal(done[0].stars, 11);
+  assert.equal(done[0].tomb.fact.length, 2);
+  assert.ok(done.slice(1).every((e) => !e.complete));
 });
 
 test('initState is a fresh copy', () => {

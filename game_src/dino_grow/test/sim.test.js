@@ -125,6 +125,19 @@ test('levels 1 and 2 end only when you eat the alpha (BEAT THE ALPHA 36), not by
   assert.ok(done && g.won);
 });
 
+test('Egypt identity: levels are the real fossil places, stages are Spinosaurus growth, alpha powers unchanged', () => {
+  assert.deepEqual(LEVELS.slice(0, 3).map((l) => l.en), ['Bahariya Oasis', 'Wadi El Hitan', 'Black Desert']);
+  assert.deepEqual(LEVELS.slice(0, 3).map((l) => l.ar), ['واحة البحرية', 'وادي الحيتان', 'الصحراء السوداء']);
+  for (const l of LEVELS.slice(0, 3)) { assert.ok(l.sub[0].length > 0 && l.sub[1].length > 0, 'each place teaches one kid line'); }
+  assert.deepEqual(STAGES.map((s) => s.en), ['Hatchling Spino', 'Brave Spino', 'Spino Hunter', 'Spinosaurus']);
+  assert.equal(STAGES[3].ar, 'سبينوسورس');
+  for (const s of STAGES) { assert.ok(s.fact && s.fact[0].length > 0 && s.fact[1].length > 0, `stage ${s.id} carries a true Spino fact in AR + EN`); }
+  assert.match(STAGES[3].fact[1], /Scientists think/); // the sail fact stays honestly hedged
+  assert.equal(SPECIES.alphaRaptor.power, 36); assert.equal(SPECIES.alphaRaptor.en, 'Bahariya Fang');
+  assert.equal(SPECIES.alphaGator.power, 80); assert.equal(SPECIES.alphaGator.en, 'Whale Valley Fang');
+  assert.equal(LEVELS[2].boss.power, 100); // the Black Desert boss is untouched
+});
+
 test('a weaker player cannot eat the alpha: it only bumps', () => {
   const g = new Dino({ level: 1, seed: 1 }); g.creatures = []; g.player.P = 60; g.step(0.02, {}); assert.ok(g.alpha && g.alpha.power === 80);
   const a = g.alpha; g.creatures = [a]; g.player.x = a.x; g.player.z = a.z; g.player.inv = 0;

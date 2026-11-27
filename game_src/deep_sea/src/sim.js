@@ -1,16 +1,21 @@
-// «أسماك الأعماق» — the rules with no drawing. A small fish swims (drag to steer) and eats sea creatures smaller than
-// itself to grow; bigger predators chase it and, after a short "!" warning, lunge — a short DASH (button) catches prey
-// or escapes. Each level is a timed challenge: grow to the goal size before the time runs out. Three levels: Sunlit
-// Reef (bait balls), Kelp Forest (hunt the squid), Deep Trench (grow big enough to devour the shark). Sizes are in cm;
-// one world unit is 10 cm. Losing all lives or the time only means "try again". Deterministic with a seed for tests.
+// «بُوري في البحر الأحمر» — the rules with no drawing. Bouri the grey mullet swims (drag to steer) and eats sea
+// creatures smaller than itself to grow; bigger predators chase it and, after a short "!" warning, lunge — a short
+// DASH (button) catches prey or escapes. There is NO timer and NO lives (kind rules): the child swims at their own
+// pace until Bouri reaches the level goal, and a predator bite is only a bump plus a small growth cost — never a
+// fail state, never progress loss. Eight Red Sea stops: Hurghada Reef (bait balls), Ras Mohammed (hunt the squid),
+// the Blue Hole (grow big enough to devour the reef shark), Dolphin House, the Great Wreck, Elphinstone,
+// Wadi El Gemal (a calm seagrass-lagoon breather: no task, no boss, only the grouper hunts) and the Hamata Islands
+// (the finale: a squid hunt AND the reef-shark boss in one stop — the only stop that combines both). Sizes are
+// in cm; one world unit is 10 cm. Finishing fast still earns bonus stars, but slowly finishing always wins too.
+// Deterministic with a seed for tests.
 
 export const SPECIES = {
   plankton: { cm: [2, 3], speed: 0.4, school: 0, color: 'g', ar: 'بلانكتون', en: 'Plankton' },
   shrimp: { cm: [3, 5], speed: 1.2, ar: 'جمبري', en: 'Shrimp' },
   jelly: { cm: [8, 16], speed: 0.5, ar: 'قنديل البحر', en: 'Jellyfish' },
   sardine: { cm: [4, 7], speed: 3.0, school: 1, ar: 'سردين', en: 'Sardine' },
-  damsel: { cm: [6, 10], speed: 2.2, ar: 'سمكة صغيرة', en: 'Damselfish' },
-  butterfly: { cm: [11, 18], speed: 2.0, school: 1, ar: 'سمكة الفراشة', en: 'Butterflyfish' },
+  damsel: { cm: [6, 10], speed: 2.2, ar: 'سمكة الأنثياس', en: 'Anthias' },
+  butterfly: { cm: [11, 18], speed: 2.0, school: 1, ar: 'فراشة البحر الأحمر', en: 'Red Sea Butterflyfish' },
   puffer: { cm: [16, 24], speed: 1.3, ar: 'السمكة المنفوخة', en: 'Pufferfish' },
   grouper: { cm: [50, 70], speed: 2.4, predator: true, ar: 'الهامور', en: 'Grouper' },
   squid: { cm: [35, 70], speed: 3.4, squid: true, ar: 'حبار', en: 'Squid' },
@@ -18,24 +23,42 @@ export const SPECIES = {
   barracuda: { cm: [110, 140], speed: 3.6, predator: true, ar: 'باراكودا', en: 'Barracuda' },
   lantern: { cm: [30, 60], speed: 1.8, ar: 'سمكة الفانوس', en: 'Lanternfish' },
   angler: { cm: [90, 150], speed: 2.2, predator: true, ar: 'أبو الشص', en: 'Anglerfish' },
-  tuna: { cm: [80, 130], speed: 3.4, school: 1, ar: 'تونة', en: 'Tuna' },
-  shark: { cm: [240, 240], speed: 3.8, predator: true, boss: true, ar: 'القرش', en: 'Shark' },
+  tuna: { cm: [80, 130], speed: 3.4, school: 1, ar: 'تونة البحر الأحمر', en: 'Red Sea Tuna' },
+  shark: { cm: [240, 240], speed: 3.8, predator: true, boss: true, ar: 'قرش الشعاب', en: 'Reef Shark' },
 };
 
+// Red Sea stops in sailing order. `star3`/`star2` are now only fast-finish BONUS thresholds (seconds): finishing
+// slower still wins with 1 star — there is no countdown and no fail. `look` picks the colours/art plate, `biome`
+// the scenery. The wreck plate (bg_wreck) already sails at stop 5, so the trench dive (stop 3) is the Blue Hole.
+// `species` + `fish` + `fact` feed the reef album: each stop features one species Bouri actually meets there
+// (in its mix, or its boss), with one true, simple fact in both languages. Stops 7–8 (Phase 2F) are APPENDED —
+// ids 1–6 are save data and never renumber. Only six bg plates ship, wired 1-to-1 to stops 1–6, so stops 7–8
+// cycle the plates by biome: Wadi El Gemal (reef) reuses bg_reef, Hamata (kelp) reuses bg_kelp.
 export const LEVELS = [
-  { id: 1, ar: 'الشعاب المشمسة', en: 'Sunlit Reef', biome: 'reef', start: 10, goal: 45, time: 150, star3: 90, star2: 120, half: 48, halfY: 9,
-    mix: [['plankton', 4], ['shrimp', 3], ['damsel', 4], ['jelly', 2], ['butterfly', 3], ['puffer', 2], ['grouper', 1]], bait: 'sardine' },
-  { id: 2, ar: 'غابة الأعشاب البحرية', en: 'Kelp Forest', biome: 'kelp', start: 30, goal: 110, time: 120, star3: 70, star2: 95, half: 75, halfY: 13,
-    mix: [['butterfly', 3], ['puffer', 2], ['mackerel', 4], ['squid', 4], ['barracuda', 1]], bait: 'mackerel', task: { kind: 'squid', n: 3 } },
-  { id: 3, ar: 'أخدود الأعماق', en: 'Deep Trench', biome: 'trench', start: 70, goal: 250, time: 140, star3: 85, star2: 115, half: 120, halfY: 20,
-    mix: [['lantern', 4], ['squid', 3], ['tuna', 3], ['angler', 1], ['barracuda', 1]], bait: 'lantern', boss: 'shark' },
-  // 2026-11-21: three more dives (a night reef, a sunken ship, the abyss fortress); `look` picks the colours, `biome` the scenery
-  { id: 4, ar: 'شعاب الليل', en: 'Night Reef', biome: 'reef', look: 'night', start: 60, goal: 180, time: 130, star3: 80, star2: 105, half: 60, halfY: 11,
-    mix: [['butterfly', 3], ['jelly', 3], ['mackerel', 3], ['squid', 3], ['barracuda', 2], ['grouper', 1]], bait: 'mackerel' },
-  { id: 5, ar: 'حطام السفينة', en: 'Sunken Ship', biome: 'kelp', look: 'wreck', start: 90, goal: 300, time: 125, star3: 75, star2: 100, half: 85, halfY: 15,
-    mix: [['mackerel', 3], ['squid', 4], ['tuna', 3], ['barracuda', 2]], bait: 'mackerel', task: { kind: 'squid', n: 5 } },
-  { id: 6, ar: 'قلعة الأعماق', en: 'Abyss Fortress', biome: 'trench', look: 'abyss', start: 130, goal: 450, time: 150, star3: 95, star2: 125, half: 130, halfY: 22,
-    mix: [['lantern', 3], ['tuna', 3], ['squid', 3], ['angler', 2], ['barracuda', 2]], bait: 'tuna', boss: 'shark' },
+  { id: 1, ar: 'شعاب الغردقة', en: 'Hurghada Reef', biome: 'reef', start: 10, goal: 45, star3: 90, star2: 120, half: 48, halfY: 9,
+    mix: [['plankton', 4], ['shrimp', 3], ['damsel', 4], ['jelly', 2], ['butterfly', 3], ['puffer', 2], ['grouper', 1]], bait: 'sardine',
+    species: 'damsel', fish: '🐠', fact: { ar: 'الأنثياس بتعوم مع بعضها في سحابة وردية وبرتقالية كبيرة فوق الشعاب المرجانية.', en: 'Anthias swim together in one big pink-and-orange cloud above the coral reef.' } },
+  { id: 2, ar: 'رأس محمد', en: 'Ras Mohammed', biome: 'kelp', start: 30, goal: 110, star3: 70, star2: 95, half: 75, halfY: 13,
+    mix: [['butterfly', 3], ['puffer', 2], ['mackerel', 4], ['squid', 4], ['barracuda', 1]], bait: 'mackerel', task: { kind: 'squid', n: 3 },
+    species: 'squid', fish: '🦑', fact: { ar: 'الحبار بيطلّع سحابة حبر غامقة عشان يختفي، وبعدين يهرب لورا بسرعة!', en: 'A squid squirts a cloud of dark ink to hide, then jets away backwards!' } },
+  { id: 3, ar: 'الثقب الأزرق', en: 'The Blue Hole', biome: 'trench', start: 70, goal: 250, star3: 85, star2: 115, half: 120, halfY: 20,
+    mix: [['lantern', 4], ['squid', 3], ['tuna', 3], ['angler', 1], ['barracuda', 1]], bait: 'lantern', boss: 'shark',
+    species: 'shark', fish: '🦈', fact: { ar: 'قرش الشعاب خجول وهادي، بيعوم بهدوء حوالين الشعاب ومش بيقرب من الناس.', en: 'Reef sharks are shy and calm — they cruise slowly around the reef and stay away from people.' } },
+  { id: 4, ar: 'بيت الدلافين', en: 'Dolphin House', biome: 'reef', look: 'night', start: 60, goal: 180, star3: 80, star2: 105, half: 60, halfY: 11,
+    mix: [['butterfly', 3], ['jelly', 3], ['mackerel', 3], ['squid', 3], ['barracuda', 2], ['grouper', 1]], bait: 'mackerel',
+    species: 'jelly', fish: '🪼', fact: { ar: 'قنديل البحر معندوش مخ ولا قلب، وبيعوم مع الميه زي مظلة صغيرة.', en: 'A jellyfish has no brain and no heart — it drifts with the water like a tiny umbrella.' } },
+  { id: 5, ar: 'السفينة الغارقة', en: 'The Great Wreck', biome: 'kelp', look: 'wreck', start: 90, goal: 300, star3: 75, star2: 100, half: 85, halfY: 15,
+    mix: [['mackerel', 3], ['squid', 4], ['tuna', 3], ['barracuda', 2]], bait: 'mackerel', task: { kind: 'squid', n: 5 },
+    species: 'tuna', fish: '🐟', fact: { ar: 'التونة بتعوم بسرعة كبيرة ومش بتقف أبدًا، حتى وهي نايمة بتفضل تتحرك!', en: 'Tuna swim very fast and never stop moving — they even keep swimming while they sleep!' } },
+  { id: 6, ar: 'إلفينستون', en: 'Elphinstone', biome: 'trench', look: 'abyss', start: 130, goal: 450, star3: 95, star2: 125, half: 130, halfY: 22,
+    mix: [['lantern', 3], ['tuna', 3], ['squid', 3], ['angler', 2], ['barracuda', 2]], bait: 'tuna', boss: 'shark',
+    species: 'angler', fish: '💡', fact: { ar: 'سمكة أبو الشص شايلة لمبة صغيرة بتنوّر في الضلمة عشان تجذب الأكل لعندها.', en: 'The anglerfish carries a tiny lamp that glows in the dark to lure its food closer.' } },
+  { id: 7, ar: 'محمية وادي الجمال', en: 'Wadi El Gemal', biome: 'reef', start: 160, goal: 540, star3: 100, star2: 135, half: 140, halfY: 23,
+    mix: [['plankton', 3], ['shrimp', 4], ['jelly', 2], ['damsel', 3], ['butterfly', 2], ['puffer', 2], ['grouper', 1]], bait: 'sardine',
+    species: 'shrimp', fish: '🦐', fact: { ar: 'قلب الجمبري موجود في راسه!', en: "A shrimp's heart is in its head!" } },
+  { id: 8, ar: 'جزر حماطة', en: 'Hamata Islands', biome: 'kelp', start: 200, goal: 650, star3: 110, star2: 145, half: 150, halfY: 24,
+    mix: [['butterfly', 2], ['mackerel', 3], ['squid', 4], ['tuna', 4], ['barracuda', 2], ['grouper', 1]], bait: 'tuna', task: { kind: 'squid', n: 4 }, boss: 'shark',
+    species: 'barracuda', fish: '⚡', fact: { ar: 'الباراكودا جسمها طويل زي السهم، وبتندفع في الميه بسرعة كبيرة.', en: 'The barracuda is long like an arrow, and it darts through the water super fast.' } },
 ];
 
 export const EAT = 0.9; // you can eat anything up to 90% of your size
@@ -64,12 +87,12 @@ export class Sea {
     this.half = this.level.half;
     this.halfY = this.level.halfY;
     this.seen = new Set();
-    this.fish = { x: 0, z: 0, cm: this.level.start, a: Math.PI, vx: 0, vz: 0, dashT: 0, dashCd: 0, invul: 0, y: 0 };
-    this.lives = this.easy ? 4 : 3;
-    this.maxLives = this.lives;
-    this.left = this.level.time * (this.easy ? 1.25 : 1);
+    // age-4 easy mode is gentler without any clock: Bouri starts a little bigger and a bite costs less growth
+    this.startCm = this.easy ? Math.round(this.level.start * 1.25) : this.level.start;
+    this.fish = { x: 0, z: 0, cm: this.startCm, a: Math.PI, vx: 0, vz: 0, dashT: 0, dashCd: 0, invul: 0, y: 0 };
+    this.bites = 0;
     this.t = 0;
-    this.state = 'play'; // play -> boss -> won | lost
+    this.state = 'play'; // play -> boss -> won (there is no lost state: no timer, no lives)
     this.creatures = [];
     this.nextId = 1;
     this.eaten = 0;
@@ -89,7 +112,7 @@ export class Sea {
 
   dash() {
     const f = this.fish;
-    if (f.dashCd > 0 || this.state === 'won' || this.state === 'lost') return false;
+    if (f.dashCd > 0 || this.state === 'won') return false;
     f.dashT = DASH_T;
     f.dashCd = DASH_CD;
     this.pending.push({ type: 'dash' });
@@ -190,11 +213,9 @@ export class Sea {
   step(dt) {
     this.events = this.pending;
     this.pending = [];
-    if (this.state === 'won' || this.state === 'lost') return this.events;
+    if (this.state === 'won') return this.events;
     this.t += dt;
     const f = this.fish;
-    this.left -= dt;
-    if (this.left <= 0) { this.left = 0; this._end(false, 'time'); return this.events; }
     f.invul = Math.max(0, f.invul - dt);
     f.dashCd = Math.max(0, f.dashCd - dt);
     this.comboT -= dt;
@@ -249,7 +270,7 @@ export class Sea {
         const s = this._spawn(false, 'shark', { x: f.x + (f.x > 0 ? -30 : 30), z: 0 }, SPECIES.shark.cm[0]);
         s.boss = true;
         this.events.push({ type: 'boss' });
-      } else this._end(true);
+      } else this._end();
     }
     return this.events;
   }
@@ -264,34 +285,34 @@ export class Sea {
     const gain = Math.min(c.cm * 0.1 * (1 + Math.min(4, this.combo - 1) * 0.08), this.level.goal * 1.2 - f.cm > 0 ? 999 : 0.2);
     f.cm = Math.round((f.cm + gain) * 10) / 10;
     this.events.push({ type: 'eat', kind: c.kind, cm: c.cm, gain, combo: this.combo, x: c.x, z: c.z, dash: f.dashT > 0 });
-    if (c.boss) this._end(true);
+    if (c.boss) this._end();
   }
 
   _bitten(c) {
     const f = this.fish;
-    this.lives--;
+    this.bites++;
     f.invul = 2.2;
     this.combo = 0;
-    // pushed away (the fish escapes, a little smaller)
+    // a bump, never a fail: Bouri is pushed away and loses a little growth (less on easy), never below the start size
     const dx = f.x - c.x;
     const dz = f.z - c.z;
     const l = Math.hypot(dx, dz) || 1;
     f.vx = (dx / l) * 10;
     f.vz = (dz / l) * 10;
-    f.cm = Math.max(this.level.start, Math.round(f.cm * 0.94 * 10) / 10);
+    f.cm = Math.max(this.startCm, Math.round(f.cm * (this.easy ? 0.97 : 0.94) * 10) / 10);
     c.lunge = 0;
     c.cool = 5;
     c.a += Math.PI; // the hunter swims off after a bite
-    this.events.push({ type: 'bitten', kind: c.kind, lives: this.lives });
-    if (this.lives <= 0) this._end(false, c.kind);
+    this.events.push({ type: 'bitten', kind: c.kind, bites: this.bites });
   }
 
-  _end(won, by) {
-    this.state = won ? 'won' : 'lost';
-    const used = this.level.time * (this.easy ? 1.25 : 1) - this.left;
-    const stars = won ? 1 + (used <= this.level.star2 * (this.easy ? 1.25 : 1) ? 1 : 0) + (used <= this.level.star3 * (this.easy ? 1.25 : 1) ? 1 : 0) : 0;
-    this.result = { won, stars, cm: this.fish.cm, eaten: this.eaten, squid: this.squid, time: Math.round(used), by };
-    this.events.push({ type: won ? 'won' : 'lost', by });
+  _end() {
+    this.state = 'won';
+    const used = this.t;
+    // stars reward a fast finish only — a slow, careful swim still wins with 1 star
+    const stars = 1 + (used <= this.level.star2 ? 1 : 0) + (used <= this.level.star3 ? 1 : 0);
+    this.result = { won: true, stars, cm: this.fish.cm, eaten: this.eaten, squid: this.squid, time: Math.round(used), bites: this.bites };
+    this.events.push({ type: 'won' });
   }
 }
 
@@ -337,4 +358,13 @@ export function normalizeSave(raw) {
   const b = {};
   if (s.best && typeof s.best === 'object') for (const lv of LEVELS) { const v = Number(s.best[lv.id]); if (v > 0) b[lv.id] = Math.min(Math.round(v), 9999); }
   return { unlocked: Math.min(LEVELS.length, Math.max(Number.isFinite(u) ? Math.max(1, u) : 1, ...Object.keys(stars).map((k) => Number(k) + 1))), stars, best: b, muted: s.muted === true };
+}
+
+/** Reef album entries for a save: a stop's card is unlocked once the stop has been completed (stars > 0).
+ * Stop-completion unlocks, not per-run species encounters: the sim's `seen` set lives only inside a run and is
+ * never persisted, while stars ARE the save — so the album derives purely from existing save fields and old
+ * saves migrate for free (a finished 6-stop save shows stops 1–6 open, 7–8 locked). Pure, so it is testable. */
+export function albumEntries(save) {
+  const s = normalizeSave(save);
+  return LEVELS.map((level) => ({ level, unlocked: (s.stars[level.id] ?? 0) > 0 }));
 }

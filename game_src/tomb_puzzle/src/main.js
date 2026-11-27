@@ -1,6 +1,6 @@
-// «لغز المقبرة» — Tomb Puzzle. Entry: window.TombPuzzle.start(container, config, post).
+// «سليم وكنوز الفراعنة» — Salim and the Pharaohs' Treasure. Entry: window.TombPuzzle.start(container, config, post).
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
-// A 3/4-view Egyptian tomb puzzle adventure (three.js, everything drawn in code): walk the little explorer through 12 rooms in 3 tombs,
+// A 3/4-view Egyptian tomb puzzle adventure (three.js, everything drawn in code): walk the little explorer through 20 rooms in 5 tombs,
 // push stone blocks onto sun plates to open doors, fill pits, collect 8 ankh keys per tomb, light braziers, open locked doors and
 // beware of the crumbling floor. Undo, reset, hints and stars. Arabic (RTL) and English. No network, no ads, no tracking.
 import * as THREE from 'three';
@@ -8,18 +8,18 @@ import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 import { VoiceCoach } from '../../cozy_kit/voice.js';
 
 const TOMB_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 2, bump: 2, win: 2, lose: 2 };
-import { parseLevel, Puzzle, step, stateKey, hintMove, starsFor, normalizeSave, cloneState, doorOpen, gateOpen, lockOpen, groupPressed, DIR_KEYS, DIRS, T } from './sim.js';
+import { parseLevel, Puzzle, step, stateKey, hintMove, starsFor, normalizeSave, museumEntries, cloneState, doorOpen, gateOpen, lockOpen, groupPressed, DIR_KEYS, DIRS, T } from './sim.js';
 import { LEVELS, TOMBS } from './levels.js';
 import { Sound } from './audio.js';
 import * as TX from './textures.js';
 import { geo, M, mesh, Mesher, makeExplorer, makeBlock, makeKey, makeBrazier, makePlate, makeDoor, makeExit, makeArrow, makePit, GRP_COL, GRP_CSS } from './models.js';
 
 const S = {
-  title: ['لغز المقبرة', 'TOMB PUZZLE'], sub: ['مغامرة الفرعون الصغير', 'The little explorer\'s adventure'], play: ['العب', 'PLAY'], cont: ['كمّل', 'CONTINUE'], levels: ['المراحل', 'LEVELS'],
+  title: ['سليم وكنوز الفراعنة', 'Salim and the Pharaohs\' Treasure'], sub: ['مغامرة سليم المستكشف الصغير', 'Little Salim the explorer\'s adventure'], play: ['العب', 'PLAY'], cont: ['كمّل', 'CONTINUE'], levels: ['المراحل', 'LEVELS'],
   quit: ['خروج', 'QUIT'], back: ['رجوع', 'Back'], sound: ['الصوت', 'Sound'], paused: ['استراحة', 'PAUSED'], resume: ['كمّل', 'RESUME'], restart: ['من الأول', 'RESTART'], home: ['القائمة', 'MENU'],
   moves: ['حركات', 'Moves'], par: ['الأفضل', 'Par'], keysWord: ['المفاتيح', 'Keys'], next: ['المرحلة التالية', 'NEXT ROOM'], replay: ['العب تاني', 'PLAY AGAIN'],
   won: ['وصلت للمخرج! 🏆', 'You found the exit! 🏆'], select: ['اختار الغرفة', 'CHOOSE A ROOM'], locked: ['خلّص الغرفة اللي قبلها', 'Finish the room before'], room: ['غرفة', 'Room'],
-  st1: ['وصلت للمخرج', 'Reached the exit'], st2: ['جمعت المفتاحين', 'Found both keys'], st3: ['بأقل حركات', 'Within the par moves'],
+  st1: ['وصلت للمخرج', 'Reached the exit'], st2: ['وجدت مفتاح عنخ', 'Found an ankh key'], st3: ['جمعت كل مفاتيح الغرفة', 'Found every key in the room'], sparkle: ['✨ بريق الأفضل: خلّصت بأقل حركات!', '✨ Best-moves sparkle: fewest moves!'],
   fall: ['انهارت الأرض! نبدأ الغرفة من جديد', 'The floor gave way! Back to the start'], stuck: ['اضغط ↩ للرجوع خطوة', 'Tap ↩ to step back'], deadRoom: ['الغرفة اتعقدت! دوس ↩ ترجع خطوة أو 🔄 تبدأ من الأول', 'This room is jammed! Tap ↩ to step back or 🔄 to restart'], thatWay: ['جرّب هذا الاتجاه!', 'Try this way!'],
   bLock: ['الباب يحتاج مفتاحاً', 'This door needs a key'], bDoor: ['الباب مغلق: اضغط القرص الذهبي', 'Door closed: press the golden plate'], bGate: ['أشعل كل المشاعل لتفتح البوابة', 'Light every torch to open the gate'],
   bPit: ['حفرة! ادفع حجراً فيها', 'A pit! Push a block into it'], bBlock: ['الحجر لا يتحرك هناك', 'The block can\'t move there'], bBraz: ['المشعل مضاء', 'Already lit'],
@@ -27,6 +27,8 @@ const S = {
   tapSound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'], undo: ['تراجع', 'Undo'], reset: ['إعادة الغرفة', 'Reset room'], hintB: ['تلميح', 'Hint'], pause: ['استراحة', 'Pause'],
   how: ['اسحب بإصبعك أو اضغط على المربع لتتحرك. ادفع الأحجار، اجمع المفاتيح، واصل للمخرج', 'Drag or tap a tile to move. Push blocks, collect keys, reach the exit'],
   tombKeys: ['مفاتيح المقبرة', 'Tomb keys'],
+  museum: ['كتاب المتحف', 'MUSEUM BOOK'], museumSub: ['كل مقبرة تخلّصها بتبقى معرض في المتحف!', 'Every tomb you finish becomes a museum exhibit!'],
+  museumLocked: ['لسه مقفول — خلّص كل غرف المقبرة عشان تفتحه', 'Still locked — finish every room in this tomb to open it'], museumStars: ['نجوم المقبرة', 'Tomb stars'],
 };
 const I = makeI18n(S);
 const CSS = css('tp', '#6a3f1a', '#2a160a', '#ffd25a') + `
@@ -48,10 +50,24 @@ const CSS = css('tp', '#6a3f1a', '#2a160a', '#ffd25a') + `
 .tp-star.off{filter:grayscale(1);opacity:.3}
 @keyframes tpstar{70%{transform:scale(1.25)}100%{transform:scale(1)}}
 .tp-pill.big{font-size:calc(var(--u)*4.4)}
+.tp-museum{display:flex;flex-direction:column;gap:calc(var(--u)*2);width:100%;max-height:62vh;overflow-y:auto}
+.tp-exhibit{border:calc(var(--u)*.5) solid #ffd25a;border-radius:calc(var(--u)*3);background:linear-gradient(180deg,rgba(74,42,18,.92),rgba(42,22,10,.92));padding:calc(var(--u)*2.4) calc(var(--u)*3);color:#ffe9a8;text-align:start}
+.tp-exhibit .ic{font-size:calc(var(--u)*8);line-height:1}
+.tp-exhibit .nm{font-weight:900;font-size:calc(var(--u)*4.6);color:#ffd25a}
+.tp-exhibit .alt{font-size:calc(var(--u)*3.2);opacity:.75;font-weight:700}
+.tp-exhibit .fact{font-size:calc(var(--u)*3.6);line-height:1.45;margin-top:calc(var(--u)*1)}
+.tp-exhibit .meta{display:flex;gap:calc(var(--u)*3);align-items:center;font-weight:900;font-size:calc(var(--u)*3.6);margin-top:calc(var(--u)*1.2);flex-wrap:wrap}
+.tp-exhibit .meta span{white-space:nowrap}
+.tp-exhibit.lock{border-color:rgba(255,255,255,.35);color:#cfc4b2}
+.tp-exhibit.lock .ic{filter:grayscale(1) brightness(.45)}
+.tp-exhibit.lock .nm{color:#b8ab94}
+.tp-exhibit.lock .fact{opacity:.8}
 `;
 
-const TOMB_LOOK = ['sand', 'gold', 'moon'];
-const TOMB_BTN = ['linear-gradient(180deg,#e8b868,#a8702a)', 'linear-gradient(180deg,#f4d048,#b88a10)', 'linear-gradient(180deg,#8aa0e8,#3a4c9a)'];
+
+
+const TOMB_LOOK = ['sand', 'gold', 'moon', 'tut', 'hat'];
+const TOMB_BTN = ['linear-gradient(180deg,#e8b868,#a8702a)', 'linear-gradient(180deg,#f4d048,#b88a10)', 'linear-gradient(180deg,#8aa0e8,#3a4c9a)', 'linear-gradient(180deg,#f7dc6a,#a87b12)', 'linear-gradient(180deg,#eec39a,#b0763f)'];
 const ANKH_SVG = '<svg class="tp-ank" viewBox="0 0 24 24" fill="none" stroke="#ffd25a" stroke-linecap="round"><ellipse cx="12" cy="7" rx="4.6" ry="5.6" stroke-width="2.4"/><path d="M12 12.8V23M6 16h12" stroke-width="2.8"/></svg>';
 const FACE = { U: Math.PI, D: 0, L: -Math.PI / 2, R: Math.PI / 2 }; // explorer model faces +z (south)
 const ARROW_Y = { U: 0, L: Math.PI / 2, D: Math.PI, R: -Math.PI / 2 };
@@ -72,7 +88,7 @@ class Game {
     this.root = h('div', { class: 'tp-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
     this.layer = h('div', { class: 'tp-layer' });
-    this.mode = 'menu'; this.clock = 0; this.cd = 0; this.buf = null; this.fx = []; this.texCache = {};
+    this.mode = 'menu'; this.clock = 0; this.cd = 0; this.buf = null; this.fx = []; this.texCache = {}; this.extCache = {}; this.extWanted = null;
     this.vs = null; this.lastBanner = ''; this.lastBumpT = 0;
     this._three();
     this.root.append(this.layer);
@@ -114,6 +130,19 @@ class Game {
     const P = TX.PAL[look];
     const t = { P, floor: TX.makeFloorTex(P), crumble: TX.makeCrumbleTex(P), wallSide: TX.makeWallSideTex(P), wallTop: TX.makeWallTopTex(P), carpet: TX.makeCarpetTex(P), block: TX.makeBlockTex(P), plate: [0, 1, 2, 3].map((g) => TX.makePlateTex(GRP_CSS[g])), door: [0, 1, 2, 3].map((g) => TX.makeDoorTex(GRP_CSS[g])), lock: TX.makeDoorTex('#fff', 'lock'), gate: TX.makeDoorTex('#fff', 'gate') };
     return (this.texCache[look] = t);
+  }
+
+  /** Menu / tomb-map backdrop from the shared art pool (assets/games/art/ via ../art/). Graceful fallback: if the
+   *  picture fails to load, the tomb's own rendered background stays exactly as it was — no broken screen. In-tomb
+   *  screens never use this: _build() always restores the tomb's own colour background when a room starts. */
+  _exterior(name) {
+    this.extWanted = name;
+    const hit = this.extCache[name];
+    if (hit) { this.scene.background = hit; return; }
+    TX.loadExteriorTex(`${this.base}../art/${name}`, (t) => {
+      this.extCache[name] = t;
+      if (this.extWanted === name) this.scene.background = t;
+    }, () => { /* pool picture missing: keep the existing background */ });
   }
 
   _resize() {
@@ -393,19 +422,20 @@ class Game {
 
   showMenu() {
     this.mode = 'menu'; this.paused = false; this.locked = false; this.sound.setMode(false); this._clear();
-    this._build(Math.min(this._lastOpen(), 0) === 0 ? 0 : 0); this.menuSpin = true;
+    this._build(Math.min(this._lastOpen(), 0) === 0 ? 0 : 0); this.menuSpin = true; this._exterior('desert_pano.webp'); // the panorama is the exterior backdrop; d_pyramid2.webp is a black-background icon cutout — as a full-screen backdrop it renders as a black field behind the card (checked in the Batch E frames), so the pano serves both exterior screens
     const cont = this.save.unlocked > 1 || Object.keys(this.save.stars).length > 0;
     const idx = Math.min(this._lastOpen(), LEVELS.length - 1);
     this.layer.append(h('div', { class: 'tp-dim', style: 'background:rgba(10,5,0,.5)' }, h('div', { class: 'tp-card' }, h('div', { class: 'tp-logo' }, '𓂀 ', I.t('title')), h('div', { class: 'tp-small' }, I.t('sub')),
       h('button', { class: 'tp-btn', onclick: () => { this.sound.play('tap'); this.start(idx); } }, '▶ ', cont ? I.t('cont') : I.t('play')),
       h('button', { class: 'tp-btn dark', onclick: () => { this.sound.play('tap'); this.showLevels(); } }, '🗺️ ', I.t('levels')),
+      h('button', { class: 'tp-btn dark', onclick: () => { this.sound.play('tap'); this.showMuseum(); } }, '🏛️ ', I.t('museum')),
       h('button', { class: 'tp-btn dark', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.voice.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); this.showMenu(); } }, `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`),
       h('button', { class: 'tp-btn alt', onclick: () => this.post({ type: 'exit' }) }, I.t('quit')))));
     this._soundPill();
   }
 
   showLevels() {
-    this._clear(); const ar = I.getLang() !== 'en'; const sv = this.save;
+    this._clear(); this._exterior('desert_pano.webp'); const ar = I.getLang() !== 'en'; const sv = this.save;
     const tombs = TOMBS.map((tb, ti) => {
       const ls = LEVELS.map((l, i) => [l, i]).filter(([l]) => l.tomb === ti);
       const keys = ls.reduce((a, [l]) => a + (sv.keys[l.id] || 0), 0);
@@ -422,9 +452,25 @@ class Game {
     this.bannerEl = h('div', { class: 'tp-banner' }); this.layer.append(this.bannerEl); this._soundPill();
   }
 
+  /** Museum book: one exhibit per tomb, derived from the existing save (museumEntries). A finished tomb shows its
+   *  name (ar+en), its collected ankh keys and stars, and a one-line true fact; an unfinished tomb stays a locked
+   *  silhouette. Read-only — it never writes to the save. */
+  showMuseum() {
+    this.mode = 'museum'; this._clear(); this._exterior('desert_pano.webp'); const en = I.getLang() === 'en'; const sv = this.save;
+    const cards = museumEntries(sv).map((e) => {
+      const nm = en ? e.tomb.name[1] : e.tomb.name[0]; const alt = en ? e.tomb.name[0] : e.tomb.name[1];
+      if (!e.complete) return h('div', { class: 'tp-exhibit lock' }, h('div', { class: 'ic' }, e.tomb.icon), h('div', { class: 'nm' }, '🔒 ', nm), h('div', { class: 'alt' }, alt), h('div', { class: 'fact' }, I.t('museumLocked')), h('div', { class: 'meta' }, h('span', {}, `${I.num(e.done)}/${I.num(e.rooms)}`)));
+      const meta = h('div', { class: 'meta' }, h('span', {}, `${I.t('tombKeys')} ${I.num(e.keys)}/${I.num(e.totalKeys)}`), h('span', {}, `⭐ ${I.num(e.stars)}`));
+      meta.firstChild.insertAdjacentHTML('beforeend', ANKH_SVG);
+      return h('div', { class: 'tp-exhibit' }, h('div', { class: 'ic' }, e.tomb.icon), h('div', { class: 'nm' }, nm), h('div', { class: 'alt' }, alt), h('div', { class: 'fact' }, en ? e.tomb.fact[1] : e.tomb.fact[0]), meta);
+    });
+    this.layer.append(h('div', { class: 'tp-dim', style: 'background:rgba(10,5,0,.6)' }, h('div', { class: 'tp-card' }, h('div', { class: 'tp-title' }, '🏛️ ', I.t('museum')), h('div', { class: 'tp-small' }, I.t('museumSub')), h('div', { class: 'tp-museum' }, cards), h('button', { class: 'tp-btn dark', onclick: () => this.showMenu() }, I.t('back')))));
+    this._soundPill();
+  }
+
   start(idx) {
     this.voice.say('go');
-    this.menuSpin = false; this._build(idx); this.mode = 'play'; this.paused = false; this.locked = false; this.cd = 0.2; this.buf = null; this.auto = null; this.fallT = -1;
+    this.extWanted = null; this.menuSpin = false; this._build(idx); this.mode = 'play'; this.paused = false; this.locked = false; this.cd = 0.2; this.buf = null; this.auto = null; this.fallT = -1;
     this._clear(); this.sound.setMode(true);
     this.movesEl = h('span', {}); this.keysEl = h('span', {}); this.lvEl = h('span', {}, `${I.t('room')} ${I.num(idx + 1)}`);
     const keyPill = h('div', { class: 'tp-pill' }, this.keysEl); keyPill.insertAdjacentHTML('beforeend', ANKH_SVG);
@@ -462,7 +508,8 @@ class Game {
     const row = (on, t) => h('div', { class: `tp-row${on ? '' : ' off'}` }, h('span', {}, on ? '⭐' : '☆'), h('span', {}, t));
     const starEls = [0, 1, 2].map((i) => h('span', { class: `tp-star${i < stars ? '' : ' off'}`, style: `animation-delay:${0.15 + i * 0.25}s` }, '⭐'));
     this.layer.append(h('div', { class: 'tp-dim' }, h('div', { class: 'tp-card' }, h('div', { class: 'tp-logo', style: 'font-size:calc(var(--u)*7)' }, last ? I.t('fin') : I.t('won')), h('div', {}, starEls),
-      row(true, I.t('st1')), row(all, I.t('st2')), row(all && s.moves <= L.par, `${I.t('st3')} (${I.num(s.moves)}/${I.num(L.par)})`),
+      row(true, I.t('st1')), row(s.keys !== 0, I.t('st2')), row(all, I.t('st3')),
+      s.moves <= L.par ? h('div', { class: 'tp-small' }, I.t('sparkle')) : null,
       !last ? h('button', { class: 'tp-btn', onclick: () => this.start(this.idx + 1) }, '▶ ', I.t('next')) : null,
       h('button', { class: `tp-btn ${last ? '' : 'dark'}`, onclick: () => this.start(this.idx) }, '🔄 ', I.t('replay')),
       h('button', { class: 'tp-btn dark', onclick: () => this.showLevels() }, '🗺️ ', I.t('levels')))));

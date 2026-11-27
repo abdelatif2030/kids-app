@@ -1,8 +1,9 @@
-// «ديناصور صغير يكبر» — Dino Grow. Entry: window.DinoGrow.start(container, config, post).
+// «سبينو الصغير» — Little Spino. Entry: window.DinoGrow.start(container, config, post).
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
-// A 3D (three.js, top-down 3/4 camera) eat-and-grow game. Eat what is weaker than you (green/white numbers), run from what is stronger
-// (red numbers), evolve, and in Volcano Valley outgrow the giant boss. Original cartoon dinos built from primitives in code, no gore
-// (eaten creatures vanish in sparkles and leaves), sound synthesised in code. No network, no ads, no tracking.
+// A 3D (three.js, top-down 3/4 camera) eat-and-grow game starring a baby Spinosaurus — Egypt's own dinosaur. Eat what is weaker than you
+// (green/white numbers), run from what is stronger (red numbers), evolve through real Spinosaurus growth stages across real fossil places
+// (Bahariya Oasis, Wadi El Hitan, the Black Desert), and in the Black Desert outgrow the giant boss. Original cartoon dinos built from
+// primitives in code, no gore (eaten creatures vanish in sparkles and leaves), sound synthesised in code. No network, no ads, no tracking.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { Dino, LEVELS, STAGES, SPECIES, stageOf, zoomFor, toneOf, normalizeSave, rng } from './sim.js';
@@ -13,12 +14,13 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 const DINO_CLIPS = { pickup: 3, charge: 2, bump: 2, near: 1, trick: 3, win: 2, count: 1 };
 
 const S = {
-  title: ['ديناصور صغير يكبر', 'DINO GROW'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
+  title: ['سبينو الصغير', 'LITTLE SPINO'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
   back: ['رجوع', 'Back'], paused: ['استراحة', 'PAUSED'], resume: ['كمّل', 'RESUME'], restart: ['إعادة', 'RESTART'], home: ['الرئيسية', 'HOME'], sound: ['الصوت', 'Sound'],
   tapSound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'], select: ['اختار المرحلة', 'SELECT LEVEL'], locked: ['خلّص المرحلة اللي قبلها', 'Finish the level before'],
   how: ['اسحب بإصبعك عشان تتحرك، وزرار الانقضاض عشان تمسك الهربان', 'Drag to move, and tap POUNCE to catch fast prey'],
   complete: ['المرحلة خلصت! 🏆', 'LEVEL COMPLETE! 🏆'], time: ['الوقت', 'Time'], power: ['القوة', 'Power'], eaten: ['اللي أكلته', 'Eaten'], bumps: ['خبطات', 'Bumps'],
-  next: ['المرحلة الجاية', 'NEXT LEVEL'], again: ['العب تاني', 'PLAY AGAIN'], all: ['خلّصت كل المراحل! أنت أقوى ديناصور 🦖', 'You beat every level! Strongest dino! 🦖'],
+  next: ['المرحلة الجاية', 'NEXT LEVEL'], again: ['العب تاني', 'PLAY AGAIN'], all: ['خلّصت كل المراحل! أنت أقوى سبينو 🦖', 'You beat every level! Strongest Spino! 🦖'],
+  album: ['من ألبوم سبينو', 'From the Spino album'],
   pounce: ['انقضّ', 'POUNCE'], boss: ['الزعيم', 'BOSS'], goal: ['الهدف', 'Goal'], next_stage: ['التطور الجاي', 'Next'], max: ['أقوى شكل!', 'Max form!'],
   h_eat: ['كُل الأخضر والأبيض عشان تكبر!', 'Eat GREEN and WHITE to grow!'], h_red: ['الأحمر أكبر منك - اجري!', 'RED IS BIGGER - RUN!'],
   h_pounce: ['اضغط انقضّ عشان تمسك الهربان!', 'Tap POUNCE to catch fast prey!'], h_evolve: ['تطوّرت! بقيت', 'You evolved! Now a'],
@@ -31,9 +33,12 @@ const S = {
 };
 const I = makeI18n(S);
 const LOOK = {
-  jungle: { sky: 0x9fe8ff, fog: 0xbff0ff, ground: 0x4cae3c, patch: 0x3c9a30, sun: 0xfff2c8, hemi: [0xffffff, 0x6a9a58] },
-  swamp: { sky: 0xb4d4a0, fog: 0x9cbc90, ground: 0x3c6e48, patch: 0x2e5a3a, sun: 0xe8f0c0, hemi: [0xf0ffe0, 0x4a6a50] },
-  volcano: { sky: 0x6a2e2a, fog: 0x7a3a30, ground: 0x3e2c2e, patch: 0x2c1e20, sun: 0xffb070, hemi: [0xffd0a8, 0x5a3030] },
+  // Bahariya Oasis: palm-oasis green with sandy patches.
+  jungle: { sky: 0x9fe8ff, fog: 0xd8ecc0, ground: 0x55a83e, patch: 0xd9c078, sun: 0xfff2c8, hemi: [0xffffff, 0x8a9a58] },
+  // Wadi El Hitan: sandy whale-bone desert; the ground patches are the wetland pools (teal, see buildScenery).
+  swamp: { sky: 0xd8e8e8, fog: 0xd8cba0, ground: 0xc2a061, patch: 0xa8894f, sun: 0xfff0c0, hemi: [0xfff8e0, 0x9a8a5a] },
+  // Black Desert: dark volcanic ground and hills.
+  volcano: { sky: 0x6a2e2a, fog: 0x5a3230, ground: 0x2e2426, patch: 0x1e1618, sun: 0xffb070, hemi: [0xffd0a8, 0x40302e] },
 };
 const FM = { beetle: 1.7, egg: 1.5, frog: 1.5, biped: 0.95, quad: 0.8 };
 
@@ -70,15 +75,18 @@ function makeBiped(o) {
   body.add(mesh(geo.sphere, b, 0, 1.05, 0.18, 0.9, 0.7, 1.3));
   const head = new THREE.Group(); head.position.set(0, 1.78, 0.82); head.scale.setScalar(o.big || 1); body.add(head);
   head.add(mesh(geo.sphere, c, 0, 0, 0, 0.95, 0.85, 1.0));
-  head.add(mesh(geo.sphere, c, 0, -0.1, 0.5, 0.65, 0.5, 0.75));
-  head.add(mesh(geo.sphere, M(tint(o.c, 0.7)), 0, 0.05, 0.85, 0.12, 0.08, 0.08));
+  const sn = o.snout || 1; // Spinosaurus has a long crocodile-like snout (snout > 1 stretches the muzzle and jaw)
+  head.add(mesh(geo.sphere, c, 0, -0.1, 0.5 + (sn - 1) * 0.25, 0.65, 0.5, 0.75 * sn));
+  head.add(mesh(geo.sphere, M(tint(o.c, 0.7)), 0, 0.05, 0.85 * sn, 0.12, 0.08, 0.08));
   const jaw = new THREE.Group(); jaw.position.set(0, -0.2, 0.2); head.add(jaw);
-  jaw.add(mesh(geo.sphere, b, 0, -0.03, 0.32, 0.55, 0.2, 0.72));
+  jaw.add(mesh(geo.sphere, b, 0, -0.03, 0.32 + (sn - 1) * 0.2, 0.55, 0.2, 0.72 * sn));
   if (o.teeth) { teethRow(jaw, 0.08, 0.5, 0.4, 4, 0.1); }
   eyes(head, o, 0.2, 0.3, 0.3);
   if (o.crest) for (let i = 0; i < 4; i++) head.add(mesh(geo.cone, M(o.s || 0xffd23a), 0, 0.5 - i * 0.08, -0.15 - i * 0.18, 0.18, 0.5 - i * 0.07, 0.18));
   if (o.horns) for (const s of [-1, 1]) { const hn = mesh(geo.cone, M(0xf4ecd0), s * 0.35, 0.5, 0.05, 0.22, 0.7, 0.22); hn.rotation.z = -s * 0.35; head.add(hn); }
   if (o.sail) for (let i = 0; i < 6; i++) body.add(mesh(geo.box, M(o.s || 0xff9a3a), 0, 1.75 + Math.sin(i * 0.5) * 0.4, 0.5 - i * 0.32, 0.12, 0.8 + Math.sin(i * 0.5) * 0.5, 0.3));
+  // The hero's Spinosaurus sail: one low rounded plate along the back, built once with the model; sailK grows it per evolution stage.
+  if (o.sailRound) { const k = o.sailK || 1; body.add(mesh(geo.sphere, M(o.s || 0xff9a3a), 0, 1.5 + 0.35 * k, -0.05, 0.16, 1.5 * k, 1.75)); }
   if (o.spikes) for (let i = 0; i < 5; i++) body.add(mesh(geo.cone, M(o.s || 0xffd23a, o.glow || 0), 0, 1.75 - i * 0.04, 0.5 - i * 0.3, 0.28, 0.5, 0.28));
   const tail = tailChain(body, o, 1.15, -0.65, 0.65, 3);
   const legs = [];
@@ -149,11 +157,12 @@ const LOOKS = {
   spino: { m: 'biped', c: 0x2a5ac0, b: 0xc0d8ff, teeth: true, sail: true, s: 0xff9a3a, big: 1.2 }, rex: { m: 'biped', c: 0x9a2a2a, b: 0xffb888, teeth: true, big: 1.35, spikes: true, s: 0xe8c860 },
   boss: { m: 'biped', c: 0x5a1a1a, b: 0xff8a3a, teeth: true, big: 1.25, horns: true, spikes: true, s: 0xffa020, glow: 0x803000, eye: 0xffe04a, eyeGlow: 0xffa000, eyeS: 1.2 },
 };
+// The hero is a baby Spinosaurus at every stage: long snout + the signature back sail, which grows with each evolution (sailK).
 const PLAYER_LOOK = [
-  { m: 'biped', c: 0x62d84c, b: 0xeaffb0, big: 1.45, eyeS: 1.45 },
-  { m: 'biped', c: 0x24b8a8, b: 0xd8fff0, big: 1.25, eyeS: 1.25, crest: true, teeth: true, s: 0xffd23a },
-  { m: 'biped', c: 0xff8a2a, b: 0xffe6a8, big: 1.2, eyeS: 1.15, teeth: true, spikes: true, s: 0xffe04a },
-  { m: 'biped', c: 0x7a50e0, b: 0xffd8f0, big: 1.15, eyeS: 1.1, teeth: true, spikes: true, horns: true, s: 0xffe04a, glow: 0x806000 },
+  { m: 'biped', c: 0x62d84c, b: 0xeaffb0, big: 1.45, eyeS: 1.45, snout: 1.3, sailRound: true, sailK: 0.45, s: 0xffd23a },
+  { m: 'biped', c: 0x24b8a8, b: 0xd8fff0, big: 1.25, eyeS: 1.25, crest: true, teeth: true, snout: 1.35, sailRound: true, sailK: 0.7, s: 0xffd23a },
+  { m: 'biped', c: 0xff8a2a, b: 0xffe6a8, big: 1.2, eyeS: 1.15, teeth: true, snout: 1.4, sailRound: true, sailK: 1.0, s: 0xffe04a },
+  { m: 'biped', c: 0x7a50e0, b: 0xffd8f0, big: 1.15, eyeS: 1.1, teeth: true, horns: true, snout: 1.45, sailRound: true, sailK: 1.3, s: 0xffe04a, glow: 0x806000 },
 ];
 const BUILD = { biped: makeBiped, quad: makeQuad, beetle: makeBeetle, egg: makeEgg, frog: makeFrog };
 const makeModel = (look) => BUILD[look.m](look);
@@ -390,8 +399,8 @@ class Game {
   }
 
   showLevels() {
-    this._clear(); const ar = I.getLang() !== 'en'; const ic = ['🌴', '🐊', '🌋', '🌴', '🐊', '🌋'];
-    const bg = ['#5ac84a,#2a8a3a', '#6a9a70,#2e5a46', '#e0602a,#5a1e1e', '#3f9a38,#1f6a2c', '#56806a,#26463a', '#c8441c,#4a1414'];
+    this._clear(); const ar = I.getLang() !== 'en'; const ic = ['🌴', '🐋', '🌋', '🌴', '🐋', '🌋'];
+    const bg = ['#7ac74f,#3a7a2a', '#d9b96a,#5a8a7a', '#5a4038,#1e1416', '#5aa844,#2a6626', '#c8a452,#4a7a6e', '#4a3436,#140c0e'];
     const cards = LEVELS.map((l, i) => { const lock = i + 1 > this.save.unlocked; const st = this.save.stars[i] || 0; return h('button', { class: `dg-env${lock ? ' lock' : ''}`, style: `background:linear-gradient(180deg,${bg[i].split(',')[0]},${bg[i].split(',')[1]})`, onclick: () => { if (lock) { this.plainHint(I.t('locked')); return; } this.sound.play('tap'); this.start(i); } }, h('i', {}, ic[i]), h('span', {}, `${I.num(i + 1)}. ${ar ? l.ar : l.en}`), h('span', {}, lock ? '🔒' : '⭐'.repeat(st) + '☆'.repeat(3 - st))); });
     this.layer.append(h('div', { class: 'dg-dim', style: 'background:rgba(5,25,10,.25)' }, h('div', { class: 'dg-card' }, h('div', { class: 'dg-title' }, I.t('select')), h('div', { class: 'dg-grid' }, cards), h('button', { class: 'dg-btn dark', onclick: () => this.showMenu() }, I.t('back')))));
     this.hintEl = h('div', { class: 'dg-hint' }); this.layer.append(this.hintEl); this._soundPill();
@@ -496,11 +505,12 @@ class Game {
     s.stars[i] = Math.max(s.stars[i] || 0, won); s.unlocked = Math.max(s.unlocked, Math.min(LEVELS.length, i + 2)); s.eaten += r.eaten;
     const sc = Math.round(r.time); if (!s.best[i] || sc < s.best[i]) s.best[i] = sc;
     this.post({ type: 'save', save: s }); this.sound.play('win'); this.voice.say('win'); this.mode = 'over';
-    const last = i === LEVELS.length - 1; const mm = Math.floor(r.time / 60); const ss = Math.round(r.time % 60);
+    const last = i === LEVELS.length - 1; const ar = I.getLang() !== 'en'; const mm = Math.floor(r.time / 60); const ss = Math.round(r.time % 60);
     const stars = h('div', { class: 'dg-stars' }); for (let k = 0; k < 3; k++) { const sp = h('span', { class: k < won ? '' : 'off', style: `animation-delay:${0.3 + k * 0.35}s` }, '⭐'); stars.append(sp); if (k < won) setTimeout(() => this.sound.play('star'), 300 + k * 350); }
     this.layer.append(h('div', { class: 'dg-dim' }, h('div', { class: 'dg-card' }, h('div', { class: 'dg-logo', style: 'color:#7dff9a' }, I.t('complete')), h('div', { class: 'dg-small' }, I.t(this.girl ? 'win_f' : 'win_m')), stars,
       h('div', { class: 'dg-row' }, h('span', {}, `⏱ ${I.t('time')}`), h('span', {}, `${I.num(mm)}:${I.num(String(ss).padStart(2, '0'))}`)), h('div', { class: 'dg-row' }, h('span', {}, `⚡ ${I.t('power')}`), h('span', {}, I.num(Math.round(r.power)))),
       h('div', { class: 'dg-row' }, h('span', {}, `🍖 ${I.t('eaten')}`), h('span', {}, I.num(r.eaten))), h('div', { class: 'dg-row' }, h('span', {}, `💥 ${I.t('bumps')}`), h('span', {}, I.num(r.hits))),
+      h('div', { class: 'dg-small' }, `🦖 ${I.t('album')}: ${STAGES[r.stage].fact[ar ? 0 : 1]}`),
       last ? h('div', { class: 'dg-small' }, I.t('all')) : h('button', { class: 'dg-btn', onclick: () => this.start(i + 1) }, '▶ ', I.t('next')),
       h('button', { class: 'dg-btn alt', onclick: () => this.start(i) }, '🔄 ', I.t('again')), h('button', { class: 'dg-btn dark', onclick: () => this.showMenu() }, '🏠 ', I.t('home')))));
   }
@@ -552,7 +562,7 @@ class Game {
           this._makePlayer(e.stage); this.pop = 1.7; this.sound.play('evolve'); this.voice.say('charge'); this.shake += 0.6;
           this.burst('star', p.x, 2, p.z, 36, 9, 1.2, 0.9, [0xffe04a, 0xffffff, 0x8affea, 0xff9ae0], 2);
           this.burst('dot', p.x, 1, p.z, 16, 6, 0.8, 2.2, [0xffffff], 0); const ar = I.getLang() !== 'en';
-          this.banner(I.t('evolved'), ar ? STAGES[e.stage].ar : STAGES[e.stage].en);
+          const stg = STAGES[e.stage]; this.banner(I.t('evolved'), `${ar ? stg.ar : stg.en} — ${stg.fact[ar ? 0 : 1]}`);
           break;
         }
         case 'bump': {

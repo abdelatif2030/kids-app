@@ -1,18 +1,19 @@
 import { attachSamples, attachMusic } from '../../cozy_kit/sample_hook.js';
 import { SAMPLES } from './samples.js';
 import { iosKeepAlive, iosPause, iosWatch } from './ios_audio.js';
-// Samurai sound, made live with Web Audio (no files): taiko drums, a koto plucked in the Japanese "miyako-bushi"
-// scale (Karplus-Strong strings) and a breathy bamboo flute; a calm courtyard theme, a driving battle rhythm and a
-// heavier one for the oni. Effects: sword swooshes, the dash "shing", petal poofs, combo chimes that climb, a clang
-// for a deflected star, a soft bonk when hurt, the oni's growl and club slam, gongs for waves and a big finishing cut.
+// Guardian of the Temple sound, made live with Web Audio (no files): a soft duff frame drum, an oud plucked in
+// the Hijaz scale (Karplus-Strong strings) and a breathy nay flute; a calm temple theme, a driving battle rhythm
+// and a heavier one for the stone golem. Effects: khopesh swooshes, the dash "shing", sand-sparkle poofs, combo
+// chimes that climb, a clang for a deflected scarab, a soft bonk when hurt, the golem's stone rumble and club
+// slam, gongs for waves and a big finishing cut.
 // Gentle volumes behind a limiter; one button mutes everything. Same phone sound safeguards as the other games.
 const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
-// D miyako-bushi: D Eb G A Bb
-const SCALE = [62, 63, 67, 69, 70, 74, 75, 79, 81, 82];
-// koto phrase (16 eighths): scale index or -1
-const KOTO = [4, -1, 3, 2, -1, 1, 0, -1, 2, -1, 3, 4, -1, 5, 4, -1];
-// flute: [quarter, scale index, length in quarters] over 8 bars
-const FLUTE = [[0, 7, 4], [8, 6, 4], [16, 5, 6], [24, 4, 8]];
+// D Hijaz: D Eb F# G A (×2 octaves) — the Batch E retune: same array shape and indices, Egyptian scale.
+const SCALE = [62, 63, 66, 67, 69, 74, 75, 78, 79, 81];
+// oud phrase (16 eighths): scale index or -1
+const OUD = [4, -1, 3, 2, -1, 1, 0, -1, 2, -1, 3, 4, -1, 5, 4, -1];
+// nay flute: [quarter, scale index, length in quarters] over 8 bars
+const NAY = [[0, 7, 4], [8, 6, 4], [16, 5, 6], [24, 4, 8]];
 
 export class Sound {
   constructor() {
@@ -229,7 +230,7 @@ export class Sound {
     this._noise(t, Math.min(0.5, len), vol * 0.35, 'bandpass', hz(m) * 2, 3, this.music);
   }
 
-  taiko(t, vol = 0.5, f = 70, dest = this.music) {
+  duff(t, vol = 0.5, f = 70, dest = this.music) {
     this._slideG(f * 1.6, f, t, 0.35, vol, dest);
     this._noise(t, 0.08, vol * 0.25, 'lowpass', 900, 0.7, dest);
   }
@@ -258,18 +259,18 @@ export class Sound {
     while (this.nextTime < ahead) {
       const t = this.nextTime;
       const e = this.step % 16;
-      const k = KOTO[e];
+      const k = OUD[e];
       if (k >= 0) this.pluck(SCALE[k] + (boss ? -12 : 0), t, battle ? 0.2 : 0.16);
       if (!battle && e === 0) this.pluck(SCALE[0] - 24, t, 0.3);
       if (battle) {
-        // don - don - doko - don
-        if (e % 8 === 0) this.taiko(t, boss ? 0.6 : 0.45, boss ? 58 : 70);
-        if (e % 8 === 4) this.taiko(t, 0.3, 90);
-        if (e % 8 === 6 || e % 8 === 7) this.taiko(t, 0.18, 120);
+        // dum - dum - taka - dum (a soft frame-drum duff pattern, lighter than the old taiko)
+        if (e % 8 === 0) this.duff(t, boss ? 0.55 : 0.34, boss ? 58 : 88);
+        if (e % 8 === 4) this.duff(t, 0.22, 110);
+        if (e % 8 === 6 || e % 8 === 7) this.duff(t, 0.13, 140);
         if (e % 2 === 1) this._noise(t, 0.03, 0.03, 'highpass', 6000, 0.8, this.music);
         if (boss && e % 4 === 2) this._tone('square', hz(SCALE[0] - 24), t, 0.12, 0.03, this.music);
       }
-      if (!battle || boss) for (const [at, idx, len] of FLUTE) if (this.step % 64 === at * 2) this._flute(SCALE[idx], t, len * eighth * 2, battle ? 0.045 : 0.055);
+      if (!battle || boss) for (const [at, idx, len] of NAY) if (this.step % 64 === at * 2) this._flute(SCALE[idx], t, len * eighth * 2, battle ? 0.045 : 0.055);
       if (!battle && e === 8 && Math.random() < 0.3) this._noise(t, 1.5, 0.012, 'bandpass', 900, 0.4, this.music);
       this.step++;
       this.nextTime += eighth;
@@ -343,14 +344,14 @@ export class Sound {
         lfo.start(t);
         o.stop(t + 1.4);
         lfo.stop(t + 1.4);
-        this.taiko(t, 0.5, 50, S);
+        this.duff(t, 0.5, 50, S);
         break;
       }
       case 'bossWind':
         this._slideG(200, 420, t, 0.6, 0.07, S);
         break;
       case 'slam':
-        this.taiko(t, 0.8, 45, S);
+        this.duff(t, 0.8, 45, S);
         this._noise(t, 0.5, 0.18, 'lowpass', 500, 0.7, S, 120);
         break;
       case 'sweep':
@@ -371,7 +372,7 @@ export class Sound {
         break;
       case 'win':
         [[62, 0], [67, 0.15], [69, 0.3], [74, 0.45], [79, 0.7], [81, 0.85], [86, 1.05]].forEach(([m, d]) => this.pluck(m, t + d, 0.4, S));
-        this.taiko(t + 1.05, 0.5, 70, S);
+        this.duff(t + 1.05, 0.5, 70, S);
         break;
       case 'down':
         [74, 70, 67, 62].forEach((m, i) => this.pluck(m, t + i * 0.16, 0.3, S));

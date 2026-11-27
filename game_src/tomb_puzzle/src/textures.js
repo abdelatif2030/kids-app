@@ -5,6 +5,8 @@ export const PAL = {
   sand: { bg: 0x1c120b, floorA: '#dcbc82', floorB: '#cfae72', line: '#a07a44', wall: '#c99a5c', wallDark: '#8c6236', glyph: '#6d4120', trim: '#f0c850', carpet: '#b3202a', carpet2: '#7e1219', amb: 0xffe2b8, ambG: 0x6a4a2a, ambI: 1.15, sun: 0xffd9a0, sunI: 1.1, torch: 0xffa040 },
   gold: { bg: 0x241705, floorA: '#e6c872', floorB: '#d8b85c', line: '#9a7420', wall: '#d6a840', wallDark: '#8a6414', glyph: '#6a4208', trim: '#fff0a0', carpet: '#9c1530', carpet2: '#640a1a', amb: 0xfff0c0, ambG: 0x7a5a1a, ambI: 1.2, sun: 0xffe090, sunI: 1.2, torch: 0xffb030 },
   moon: { bg: 0x070c1c, floorA: '#8e9cbc', floorB: '#7f8eb0', line: '#566486', wall: '#7585ae', wallDark: '#434f78', glyph: '#27335c', trim: '#c4d8ff', carpet: '#2c40a0', carpet2: '#1a2a70', amb: 0xaec4ff, ambG: 0x28345a, ambI: 1.0, sun: 0xbcd0ff, sunI: 0.85, torch: 0xff9a48 },
+  tut: { bg: 0x1a1206, floorA: '#dfc078', floorB: '#cdb068', line: '#96702a', wall: '#c9992e', wallDark: '#7c5a10', glyph: '#5f4306', trim: '#ffe98a', carpet: '#147d72', carpet2: '#0b4f47', amb: 0xffeec2, ambG: 0x6a521a, ambI: 1.2, sun: 0xffdf94, sunI: 1.15, torch: 0xffa840 },
+  hat: { bg: 0x201410, floorA: '#e6cdb2', floorB: '#dbc09e', line: '#b08a5e', wall: '#d9b98c', wallDark: '#9a7648', glyph: '#7a5226', trim: '#fff0cd', carpet: '#b3543f', carpet2: '#7e3222', amb: 0xffe8cc, ambG: 0x77543a, ambI: 1.15, sun: 0xffd9ae, sunI: 1.1, torch: 0xff9a40 },
 };
 
 function rngf(seed) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
@@ -133,6 +135,15 @@ export function makeArrowTex() {
   g.fillStyle = 'rgba(255,214,80,.95)'; g.strokeStyle = 'rgba(90,50,0,.85)'; g.lineWidth = 6; g.lineJoin = 'round';
   g.beginPath(); g.moveTo(64, 10); g.lineTo(112, 68); g.lineTo(80, 68); g.lineTo(80, 118); g.lineTo(48, 118); g.lineTo(48, 68); g.lineTo(16, 68); g.closePath(); g.fill(); g.stroke();
   return tex(c);
+}
+
+/** Loads a shared-pool exterior picture (assets/games/art/, reached via a ../art/ relative path) as a texture for
+ *  the menu / tomb-map backdrops. Failure is graceful by design: on error it calls onErr and the caller simply keeps
+ *  its existing background — the screen never breaks because a pool picture is missing. */
+export function loadExteriorTex(url, onOk, onErr) {
+  try {
+    new THREE.TextureLoader().load(url, (t) => { t.colorSpace = THREE.SRGBColorSpace; if (onOk) onOk(t); }, undefined, () => { if (onErr) onErr(); });
+  } catch (_) { if (onErr) onErr(); }
 }
 
 export function makeGlowTex(col = '255,200,100') {

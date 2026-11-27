@@ -2,8 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Fight, STAGES, ARENA, normalizeSave } from '../src/sim.js';
 
-/** A robot samurai: walks to the nearest ninja, dashes away from swings and the oni's attacks, dashes through the
- * oni when it is tired. */
+/** A robot guardian: walks to the nearest raider, dashes away from swings and the golem's attacks, dashes through the
+ * golem when it is tired. */
 function robot(f) {
   const p = f.p;
   const b = f.boss;
@@ -44,7 +44,7 @@ function robot(f) {
 }
 
 for (const [i, st] of STAGES.entries()) {
-  test(`a robot samurai wins stage ${st.id}`, () => {
+  test(`a robot guardian wins stage ${st.id}`, () => {
     let won = null;
     for (let seed = 1; seed <= 4 && !won; seed++) {
       const f = new Fight({ stage: i, seed });
@@ -63,7 +63,7 @@ for (const [i, st] of STAGES.entries()) {
   });
 }
 
-test('a swing that reaches the samurai costs a heart; a dash dodges it', () => {
+test('a swing that reaches the guardian costs a heart; a dash dodges it', () => {
   const f = new Fight({ stage: 0 });
   f.p.x = 0;
   f.p.z = 0;
@@ -82,7 +82,7 @@ test('a swing that reaches the samurai costs a heart; a dash dodges it', () => {
   assert.equal(g.p.hp, g.maxHp);
 });
 
-test('the sword swings by itself at a ninja in reach and a combo grows', () => {
+test('the khopesh swings by itself at a raider in reach and a combo grows', () => {
   const f = new Fight({ stage: 0 });
   f.p.x = 0;
   f.p.z = 0;
@@ -93,7 +93,7 @@ test('the sword swings by itself at a ninja in reach and a combo grows', () => {
   assert.ok(f.combo >= 2);
 });
 
-test('a dash cuts every ninja on its path', () => {
+test('a dash cuts every raider on its path', () => {
   const f = new Fight({ stage: 0 });
   f.p.x = -4;
   f.p.z = 0;
@@ -105,7 +105,7 @@ test('a dash cuts every ninja on its path', () => {
   assert.equal(kills, 3);
 });
 
-test('nobody leaves the courtyard', () => {
+test('nobody leaves the temple arena', () => {
   const f = new Fight({ stage: 2, seed: 3 });
   for (let i = 0; i < 2000; i++) {
     f.step(1 / 30, { x: 1, z: 0.4 });
@@ -116,7 +116,7 @@ test('nobody leaves the courtyard', () => {
   }
 });
 
-test('younger children get more hearts and slower ninjas', () => {
+test('younger children get more hearts and slower raiders', () => {
   const f = new Fight({ stage: 0, easy: true });
   assert.ok(f.maxHp > new Fight({ stage: 0 }).maxHp);
   assert.ok(f.speedMul < 1);
@@ -131,7 +131,7 @@ test('damaged saves load safely', () => {
   }
 });
 
-test('standing still is not enough: the ninjas win in the end', () => {
+test('standing still is not enough: the raiders win in the end', () => {
   const f = new Fight({ stage: 1, seed: 2 });
   f.p.slashCd = 1e9;
   for (let i = 0; i < 30 * 200 && f.state !== 'down'; i++) { f.p.slashCd = 9; f.step(1 / 30); }

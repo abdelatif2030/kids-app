@@ -1,9 +1,11 @@
-// «سيف الساموراي» — the rules with no drawing. A little samurai defends a cherry-blossom courtyard from waves of
-// cartoon ninjas, then a giant oni with a spiked club. Drag to move, the sword swings by itself at a ninja in reach,
-// a swipe dashes (a fast glowing cut that also dodges). No blood: a beaten ninja turns into a puff of petals.
+// «حارس المعبد» — Guardian of the Temple: the rules with no drawing. A young temple guardian defends a Pharaonic
+// temple arena from waves of shadow raiders (tomb robbers), then a giant stone golem with a pillar club. Drag to
+// move, the khopesh swings by itself at a raider in reach, a swipe dashes (a fast glowing cut that also dodges).
+// No blood: a beaten raider puffs into golden sand sparkles. (Enemy kinds keep their sim ids — ninja / big /
+// thrower — from the proven wave sim; only the presentation changed in the Batch E reskin.)
 // Deterministic with a seed, so a robot test can play every stage.
 
-export const ARENA = 10.5; // courtyard radius
+export const ARENA = 10.5; // temple arena radius
 const SPEED = 5.4;
 const DASH_SPEED = 24;
 const DASH_TIME = 0.2;
@@ -41,7 +43,7 @@ function rng(seed) {
 const ang = (a) => { while (a > Math.PI) a -= Math.PI * 2; while (a < -Math.PI) a += Math.PI * 2; return a; };
 
 export class Fight {
-  /** opts: { stage (0..2), easy (younger children: slower ninjas, more hearts), seed } */
+  /** opts: { stage (0..2), easy (younger children: slower raiders, more hearts), seed } */
   constructor(opts = {}) {
     this.stage = STAGES[opts.stage ?? 0];
     this.easy = !!opts.easy;
@@ -98,7 +100,7 @@ export class Fight {
     return true;
   }
 
-  // ---- the samurai --------------------------------------------------------------------------------------------------
+  // ---- the guardian --------------------------------------------------------------------------------------------------
 
   _player(dt, input) {
     const p = this.p;
@@ -186,7 +188,7 @@ export class Fight {
     return true;
   }
 
-  // ---- ninjas -------------------------------------------------------------------------------------------------------
+  // ---- raiders --------------------------------------------------------------------------------------------------------
 
   _spawn(dt) {
     if (this.state !== 'fight') return;
@@ -265,7 +267,7 @@ export class Fight {
       }
       this._clamp(e, ARENA);
     }
-    // ninjas do not stand inside each other
+    // raiders do not stand inside each other
     for (let i = 0; i < this.enemies.length; i++) {
       for (let j = i + 1; j < this.enemies.length; j++) {
         const a = this.enemies[i];
@@ -314,7 +316,7 @@ export class Fight {
     this.stars = this.stars.filter((s) => !s.gone);
   }
 
-  // ---- the oni ------------------------------------------------------------------------------------------------------
+  // ---- the stone golem ------------------------------------------------------------------------------------------------
 
   _boss(dt) {
     const b = this.boss;
@@ -341,7 +343,7 @@ export class Fight {
         }
         break;
       case 'slamWind':
-        // the oni steps towards where the club will land
+        // the golem steps towards where the club will land
         { const sx = b.ax - b.x; const sz = b.az - b.z; const sd = Math.hypot(sx, sz); b.face = Math.atan2(sx, sz); if (sd > 2.2) { b.x += (sx / sd) * 1.4 * dt; b.z += (sz / sd) * 1.4 * dt; } }
         if (b.t <= 0) {
           this.events.push({ type: 'slam', x: b.ax, z: b.az });
@@ -372,7 +374,7 @@ export class Fight {
         break;
       default:
     }
-    // the samurai cannot stand inside the oni
+    // the guardian cannot stand inside the golem
     if (d < 1.6 && p.dash <= 0) { p.x = b.x + (dx / d) * 1.6; p.z = b.z + (dz / d) * 1.6; this._clamp(p); }
   }
 

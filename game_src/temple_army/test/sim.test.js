@@ -9,7 +9,7 @@ test('at least six levels, every map is rectangular with one start and one exit'
   for (const d of LEVELS) {
     const w = d.map[0].length;
     assert.ok(d.map.every((r) => r.length === w), `${d.id} rectangular`);
-    const all = d.map.join('');
+    const all = (d.floors || [d.map]).flat().join(''); // 2-floor levels: S and E live on different floors
     assert.equal((all.match(/S/g) || []).length, 1); assert.equal((all.match(/E/g) || []).length, 1);
     assert.ok(d.map[0].split('').every((c) => c === '#') && d.map[d.map.length - 1].split('').every((c) => c === '#'));
     assert.ok(d.map.every((r) => r[0] === '#' && r[w - 1] === '#'), 'closed border');
@@ -103,7 +103,14 @@ test('every level is solvable (exit reachable once levers are pulled, levers rea
       left = left.filter((q) => !ok.includes(q));
     }
     for (const s of l.saws) l.solid[s.ty * l.W + s.tx] = 0;
-    assert.ok(bfs(r, [sx, sy], (x, y) => x === l.exit.tx && y === l.exit.ty), `level ${i + 1} reachable`);
+    if (r.floorLv) { // 2-floor: stairs reachable downstairs, exit reachable from the stairs upstairs
+      const st = l.stairs[0];
+      assert.ok(bfs(r, [sx, sy], (x, y) => x === st.tx && y === st.ty), `level ${i + 1} staircase reachable`);
+      const up = r.floorLv[1]; const saved = r.lv; r.lv = up;
+      const [ux, uy] = r.tileOf(up.stairs[0].x, up.stairs[0].y);
+      assert.ok(bfs(r, [ux, uy], (x, y) => x === up.exit.tx && y === up.exit.ty), `level ${i + 1} upper exit reachable`);
+      r.lv = saved;
+    } else assert.ok(bfs(r, [sx, sy], (x, y) => x === l.exit.tx && y === l.exit.ty), `level ${i + 1} reachable`);
   }
 });
 
@@ -167,4 +174,87 @@ test('crowd formation: hundreds of followers stay out of the walls', () => {
     assert.equal(pts.length, n);
     for (const p of pts) assert.ok(r.free(p.x, p.y, 0.15), `point in wall n=${n}`);
   }
+});
+
+test('Batch E: the six levels are the real Egyptian temples, Karnak first', () => {
+  assert.deepEqual(LEVELS.slice(0, 6).map((d) => d.name[1]), ['Karnak Temple', 'Philae Temple', 'Edfu Temple', 'Abu Simbel Temple', 'Luxor Temple', 'Dendera Temple']);
+  assert.deepEqual(LEVELS.slice(0, 6).map((d) => d.name[0]), ['معبد الكرنك', 'معبد فيلة', 'معبد إدفو', 'معبد أبو سمبل', 'معبد الأقصر', 'معبد دندرة']);
+});
+
+// ---------------- Phase 2G: 2-floor Karnak + procession finale ----------------
+const fnv = (s) => { let x = 0x811c9dc5; for (let i = 0; i < s.length; i++) { x ^= s.charCodeAt(i); x = Math.imul(x, 0x01000193) >>> 0; } return x.toString(16).padStart(8, '0'); };
+const fp = (d) => fnv(JSON.stringify({ id: d.id, name: d.name, map: d.map, start: d.start, gates: d.gates, hordes: d.hordes, boss: d.boss || null, par: d.par }));
+
+test('Phase 2G freeze: the original six levels are byte-identical (ids, order, data)', () => {
+  assert.deepEqual(LEVELS.slice(0, 6).map(fp), ['5bc4b171', '9b608079', '7eaf13e0', '93eadbb2', '7e412af7', 'cdd2b4fa']);
+  assert.deepEqual(LEVELS.map((d) => d.id), [1, 2, 3, 4, 5, 6, 7, 8], 'append-only: two new levels at the end');
+});
+
+test('Phase 2G: Karnak level 7 really has two floors joined by one staircase each', () => {
+  const d = LEVELS[6];
+  assert.equal(d.floors.length, 2);
+  const r = new Run({ level: 6 });
+  assert.equal(r.floorLv.length, 2);
+  for (const fl of r.floorLv) assert.equal(fl.stairs.length, 1, 'exactly one staircase per floor');
+  assert.equal(r.floorLv[0].exit, null, 'no exit on the ground floor — you must climb');
+  assert.ok(r.floorLv[1].exit, 'the exit is on the upper floor');
+  assert.ok(r.floorLv[0].start, 'the run starts on the ground floor');
+});
+
+test('Phase 2G: the staircase carries the army (and coins) to the other floor, with no bounce', () => {
+  const r = new Run({ level: 6 }); const st = r.lv.stairs[0];
+  r.cap.x = st.x; r.cap.y = st.y; const evs = r.step(0.05);
+  assert.equal(r.floorIdx, 1); assert.ok(evs.some((e) => e.type === 'floor' && e.floor === 1));
+  const up = r.lv.stairs[0]; assert.equal(Math.floor(r.cap.x / TILE), up.tx); assert.equal(Math.floor(r.cap.y / TILE), up.ty);
+  for (let i = 0; i < 10; i++) r.step(0.05); // standing on the arrival stairs must NOT bounce back down
+  assert.equal(r.floorIdx, 1);
+});
+
+test('Phase 2G: scripted bot proof — Karnak 2-floor is completed via the upper floor', () => {
+  const r = new Run({ level: 6 }); const bot = makeBot(); let floors = 0;
+  while (r.state === 'play' && r.t < 400) for (const e of r.step(1 / 30, bot(r))) if (e.type === 'floor') floors++;
+  assert.equal(r.state, 'won'); assert.ok(floors >= 1, 'the bot climbed the staircase'); assert.equal(r.floorIdx, 1);
+  assert.ok(r.result.stars >= 1);
+});
+
+test('Phase 2G: the procession finale is hazard-free, all-growing, and the bot completes it', () => {
+  const d = LEVELS[7];
+  assert.equal(d.procession, true);
+  const r = new Run({ level: 7 });
+  assert.equal(r.lv.hordes.length, 0); assert.equal(r.lv.traps.length, 0); assert.equal(r.lv.saws.length, 0); assert.equal(r.lv.boss, null);
+  for (const g of r.lv.gates) assert.ok(g.op === 'x' || g.op === '+', 'every procession gate grows the crowd');
+  const done = playLevel(7, {});
+  assert.equal(done.state, 'won'); assert.ok(done.result.survivors > LEVELS[7].start, 'the parade grows on the way');
+});
+
+test('Phase 2G: unlock chain — each win unlocks exactly the next level, through the finale', () => {
+  const s = defaultSave();
+  for (let i = 0; i < LEVELS.length; i++) {
+    assert.ok(i + 1 <= s.unlocked, `level ${i + 1} is unlocked when reached`);
+    const r = playLevel(i, {});
+    assert.equal(r.state, 'won', `campaign level ${i + 1} won`);
+    // the same rule main.js _results applies on a win:
+    s.stars[i] = Math.max(s.stars[i] || 0, r.result.stars); s.unlocked = Math.max(s.unlocked, Math.min(LEVELS.length, i + 2));
+  }
+  assert.equal(s.unlocked, LEVELS.length);
+});
+
+test('Phase 2G: an old 6-level save migrates — progress kept, new levels appended locked', () => {
+  const old = { unlocked: 4, stars: [3, 2, 1, 0, 0, 0], best: [50, 40, 30, 0, 0, 0], coins: 77, skin: 'sand', skins: ['sand'], up: { start: 1, power: 0, speed: 0 } };
+  const s = normalizeSave(old);
+  assert.equal(s.stars.length, LEVELS.length); assert.equal(s.best.length, LEVELS.length);
+  assert.deepEqual(s.stars.slice(0, 6), [3, 2, 1, 0, 0, 0]); assert.deepEqual(s.stars.slice(6), [0, 0]);
+  assert.equal(s.unlocked, 4); assert.equal(s.coins, 77); assert.equal(s.up.start, 1);
+  const done = normalizeSave({ unlocked: 7, stars: [3, 3, 3, 3, 3, 3] }); // finished the old campaign
+  assert.equal(done.unlocked, 7, 'a finished old campaign unlocks the new Karnak 2-floor level, not the finale');
+});
+
+test('Batch E kind rule: a negative or divide gate can never wipe out the army', () => {
+  for (const n of [1, 2, 5, 40]) {
+    assert.ok(applyGate(n, '-', 999) >= 1, `minus gate floors at 1 (n=${n})`);
+    assert.ok(applyGate(n, '/', 99) >= 1, `divide gate floors at 1 (n=${n})`);
+  }
+  // every gate fork offers at least one growing gate, so a kind path always exists
+  const r = new Run({ level: 0 });
+  for (const grp of r.lv.groups) assert.ok(grp.gates.some((id) => { const g = r.lv.gates[id]; return g.op === 'x' || g.op === '+'; }), 'each fork has a growing gate');
 });

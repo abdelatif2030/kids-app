@@ -1,4 +1,4 @@
-// «جيش المعبد» — Temple Army. Entry: window.TempleArmy.start(container, config, post).
+// «حرّاس الكرنك» — Guardians of Karnak. Entry: window.TempleArmy.start(container, config, post).
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
 // Lead a growing army of tiny warriors through jungle temples: pick the best gates, free prisoners, dodge spikes, pull levers,
 // beat enemy crowds and two bosses. 3D (three.js) from primitives, sound synthesised live. No network, no ads, no tracking.
@@ -14,7 +14,7 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 const TEMPLE_CLIPS = { charge: 3, trick: 3, pickup: 2, bump: 3, near: 2, win: 2, lose: 2, count: 1 };
 
 const S = {
-  title: ['جيش المعبد', 'TEMPLE ARMY'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], shop: ['المتجر', 'SHOP'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
+  title: ['حرّاس الكرنك', 'GUARDIANS OF KARNAK'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], shop: ['المتجر', 'SHOP'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
   select: ['اختار المعبد', 'CHOOSE A TEMPLE'], locked: ['خلّص المعبد اللي قبله', 'Finish the temple before'], back: ['رجوع', 'Back'], paused: ['استراحة', 'PAUSED'], resume: ['كمّل', 'RESUME'],
   restart: ['إعادة', 'RESTART'], home: ['الرئيسية', 'HOME'], sound: ['الصوت', 'Sound'], won: ['انتصرت! 🏆', 'VICTORY! 🏆'], over: ['خسر الجيش', 'ARMY LOST'], army: ['الجيش', 'Army'],
   coins: ['العملات', 'Coins'], next: ['المعبد التالي', 'NEXT TEMPLE'], tapSound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'], max: ['أقصى', 'MAX'], equip: ['البس', 'WEAR'], worn: ['لابس ✓', 'WORN ✓'],
@@ -26,6 +26,7 @@ const S = {
   h1: ['اسحب لتحريك القائد · اختر البوابة الأحسن!', 'Drag to move · pick the best gate!'], h2: ['انتظر حتى تنزل الأشواك الحمراء ثم اعبر', 'Wait for the red glowing spikes to sink, then cross'],
   h3: ['اهرب من الدائرة الحمراء ثم اضرب الوحش بجيشك!', 'Run out of the red circle, then hit the brute with your army!'], h4: ['ادخل الذراع لتحطيم المنشار!', 'Walk into the lever to break the saw!'],
   h5: ['حرّر الأسرى قبل البوابات لتكبر أكثر', 'Free prisoners before the gates to grow bigger'], h6: ['تغلّب على العملاق بالأعداد الكبيرة!', 'Overwhelm the golem with numbers!'],
+  h7: ['الكرنك من طابقين! ادخل السلم الكبير عشان تطلع للطابق العلوي', 'Karnak has two floors! Take the grand staircase to the upper floor'], h8: ['موكب احتفال! امشِ بالحرّاس لحد بوابة الكرنك واجمع الأصحاب في الطريق 🎉', 'A celebration parade! March the guardians to the Karnak gate and gather friends on the way 🎉'],
 };
 const I = makeI18n(S);
 const NOSND = { play() {} };
@@ -95,7 +96,7 @@ class Game {
     this.scene.background = new THREE.Color(T.sky); this.scene.fog = new THREE.Fog(T.fog, 55, 170);
     this.hemi.color.set(0xfff2d8); this.hemi.groundColor.set(new THREE.Color(T.fog).multiplyScalar(0.6));
     const W = lv.W; const H = lv.H; const wallSolid = new Uint8Array(W * H); // real walls only (saws stand in corridors)
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (def.map[y][x] === '#') wallSolid[y * W + x] = 1;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (lv.rows[y][x] === '#') wallSolid[y * W + x] = 1; // active floor's map (2-floor levels)
     // floor
     const floorTex = Art.floorTexture(def, W, H, wallSolid);
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(W * TILE, H * TILE), new THREE.MeshLambertMaterial({ map: floorTex }));
@@ -118,7 +119,7 @@ class Game {
       o.position.set((x + 0.5) * TILE, hh / 2, (y + 0.5) * TILE); o.scale.set(TILE * 1.0, hh, TILE * 1.0); o.rotation.set(0, 0, 0); o.updateMatrix(); wm.setMatrixAt(i, o.matrix);
       wm.setColorAt(i, col.set(T.wall).offsetHSL((rand() - 0.5) * 0.03, 0, (rand() - 0.5) * 0.12));
       o.position.y = hh + 0.12; o.scale.set(TILE * 1.04, 0.28, TILE * 1.04); o.updateMatrix(); cm.setMatrixAt(i, o.matrix);
-      cm.setColorAt(i, col.set(0x4f9a44).offsetHSL((rand() - 0.5) * 0.05, 0, (rand() - 0.5) * 0.1));
+      cm.setColorAt(i, col.set(T.wall).offsetHSL((rand() - 0.5) * 0.03, -0.02, 0.05 + (rand() - 0.5) * 0.08)); // sandstone cap, not moss (Batch E)
     });
     this.stage.add(wm, cm);
     // torches + vines on walls that face the corridor to the south, plus a few on west/east faces
@@ -142,6 +143,11 @@ class Game {
     for (const c of lv.cages) { const m = Art.makeCage(); m.position.set(c.x, 0, c.y); this.stage.add(m); this.ent.cages.push(m); }
     for (const c of lv.coins) { const m = Art.makeCoin(); m.position.set(c.x, 0, c.y); this.stage.add(m); this.ent.coins.push(m); }
     if (lv.exit) { const m = Art.makeExit(lv.exit.open); m.position.set(lv.exit.x, 0, lv.exit.y); this.stage.add(m); this.ent.exit = m; this.exitOpen = lv.exit.open; }
+    for (const s of lv.stairs) { // grand staircase marker: three gold-trimmed stone steps (2-floor levels)
+      const g = new THREE.Group();
+      for (let k = 0; k < 3; k++) { const st = Art.mesh(Art.geo.box, Art.M(k === 2 ? 0xffd23a : T.wall), 0, 0.18 + k * 0.22, -0.9 + k * 0.9, TILE * 0.92, 0.36 + k * 0.22, 0.85); g.add(st); }
+      g.position.set(s.x, 0, s.y); this.stage.add(g);
+    }
     this.ent.hordes = lv.hordes.map((hd) => this._hordeLayout(run, hd));
     if (lv.boss) { const m = lv.boss.kind === 'brute' ? Art.makeBrute() : Art.makeGolem(); m.position.set(lv.boss.x, 0, lv.boss.y); this.stage.add(m); this.ent.boss = { m, down: 0, impact: 0 }; }
     // labels
@@ -281,7 +287,7 @@ class Game {
     this.mini = null; // the original video has no minimap
     this.layer.append(h('div', { class: 'ta-top' }, pause, h('div', { class: 'ta-pill small' }, this.goalEl = h('span', {}, I.t('g_gate'))), h('div', { style: 'display:flex;gap:calc(var(--u)*1.2)' }, h('div', { class: 'ta-pill' }, this.coinEl), h('span', { style: 'display:none' }, this.armyEl))), this.bossBar);
     this.hintEl = h('div', { class: 'ta-hint', style: 'top:calc(var(--u)*24)' }); this.layer.append(this.hintEl); this._soundPill();
-    this.hideBoss(); this.hint(I.t(`h${Math.min(6, i + 1)}`), 5000);
+    this.hideBoss(); const lvName = I.getLang() === 'en' ? LEVELS[i].name[1] : LEVELS[i].name[0]; this.hint(`${lvName} · ${I.t(`h${Math.min(8, i + 1)}`)}`, 5000);
     for (const e of this.labels.values()) this.layer.append(e);
     this.capLab = h('div', { class: 'ta-lab me plain' }); this.layer.append(this.capLab);
   }
@@ -377,6 +383,7 @@ class Game {
         case 'impact': snd.play('slam'); this.shake = Math.max(this.shake, 0.7); this._burst(e.x, e.y, 14, 0.5); if (this.ent.boss) this.ent.boss.impact = 1; if (e.hit) this.hit = 1; this._teleEnd(); break;
         case 'bossDown': snd.play('crumble'); this.voice.say('win'); this.shake = 0.9; if (this.ent.boss) this.ent.boss.down = 0.001; { const b = run.lv.boss; this._burst(b.x, b.y, 40, 2); } if (this.mode === 'play') this.sound.setMode('play'); break;
         case 'exitOpen': snd.play('open'); break;
+        case 'floor': snd.play('open'); this._buildLevel(run); this._float(c.x, 3.4, c.y, e.floor === 1 ? '⬆️ الطابق العلوي' : '⬇️ الطابق الأرضي', '#ffe04a'); this._burst(c.x, c.y, 18, 1.5); break; // 2-floor Karnak: rebuild the stage for the new floor
         case 'won': case 'over': break;
         default: break;
       }
@@ -526,7 +533,7 @@ class Game {
   _buildMini(run) {
     const W = run.lv.W; const H = run.lv.H; const cv = document.createElement('canvas'); cv.width = W * 8; cv.height = H * 8; const g = cv.getContext('2d');
     g.fillStyle = 'rgba(10,25,20,.78)'; g.fillRect(0, 0, cv.width, cv.height);
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (run.def.map[y][x] !== '#') { g.fillStyle = 'rgba(190,200,160,.75)'; g.fillRect(x * 8, y * 8, 8, 8); }
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (run.lv.rows[y][x] !== '#') { g.fillStyle = 'rgba(190,200,160,.75)'; g.fillRect(x * 8, y * 8, 8, 8); }
     this.miniBase = cv;
   }
   _drawMini() {
