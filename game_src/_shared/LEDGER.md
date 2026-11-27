@@ -63,3 +63,4 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 - castaway_raft v2: hat brim raised (face visible), front fill light, hero + raft bigger. HUD buttons still cover the lower raft; menu level buttons use emoji palm.
 - castaway_raft: landscape HUD moved to the right column (raft uncovered); level-select emoji replaced with drawn SVG icons (not screenshot-verified).
 - card_battle: landscape camera now fits the hex arena to the frame (side-on, solved by bisection). Remaining: tower HP bars offset from towers, units sparse. Clip held.
+- ice_rink: art-driven (goblin_*/hero_* webp + bg_festival), main.js 675 lines canvas2D. Next: poster backdrop + 3D diorama approach, keep art sprites as billboards.
