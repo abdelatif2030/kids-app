@@ -22,6 +22,7 @@ class Game {
     this.post = post || (() => {});
     setLang(config.lang);
     setGirl(config.gender === 'girl');
+    this.girl = config.gender === 'girl'; // the Game itself must remember: the win line depends on it
     this.age = Number(config.age) || 5;
     this.save = normalizeSave(config.save);
     this.base = config.base || './';
@@ -219,7 +220,10 @@ class Game {
       h('button', { class: 'cr-btn dark', onclick: () => this.showMenu() }, t('menu')))));
   }
 
-  _girl() { return t('win_f') !== t('win_m') && false; }
+  /** Feminine win text only for a girl player, and only where the language actually
+   *  has a distinct feminine form (otherwise win_m and win_f read the same anyway).
+   *  Was: `... && false` — hard-wired off, so girls always got the boy's line. */
+  _girl() { return this.girl && t('win_f') !== t('win_m'); }
 
   // ---- loop ---------------------------------------------------------------------------------------------------------
 
