@@ -226,13 +226,14 @@ export class View3D {
   setSize(w, h) { this.w = w; this.h = h; this.renderer.setSize(w, h, false); this.camera.aspect = w / h; this.camera.updateProjectionMatrix(); }
   /** frame the arena inside the vertical band [rt, rb] (CSS px) */
   fit(rt, rb) {
-    const cam = this.camera, w = this.w, h = this.h; const pitch = 0.86; const tgt = new THREE.Vector3(CX, 0, HALF + 0.4);
-    const place = (d) => { cam.position.set(tgt.x, tgt.y + Math.sin(pitch) * d, tgt.z + Math.cos(pitch) * d); cam.lookAt(tgt); cam.clearViewOffset(); cam.updateProjectionMatrix(); cam.updateMatrixWorld(true); };
-    const span = () => this.project(CX, L, 0)[1] - this.project(CX, 0, 0)[1];
-    const wid = () => this.project(10, HALF, 0)[0] - this.project(0, HALF, 0)[0];
-    const wantS = (rb - rt) * 0.94, wantW = w - 12; let lo = 6, hi = 200;
+    const cam = this.camera, w = this.w, h = this.h; const land = w > h * 1.3; const pitch = land ? 0.7 : 0.86; const yaw = land ? Math.PI / 2 : 0; this.sinP = Math.sin(pitch); this.yaw = yaw;
+    const tgt = new THREE.Vector3(CX, 0, land ? HALF : HALF + 0.4);
+    const place = (d) => { cam.position.set(tgt.x + Math.sin(yaw) * Math.cos(pitch) * d, tgt.y + Math.sin(pitch) * d, tgt.z + Math.cos(yaw) * Math.cos(pitch) * d); cam.lookAt(tgt); cam.clearViewOffset(); cam.updateProjectionMatrix(); cam.updateMatrixWorld(true); };
+    const span = () => (land ? Math.abs(this.project(10, HALF, 0)[1] - this.project(0, HALF, 0)[1]) : this.project(CX, L, 0)[1] - this.project(CX, 0, 0)[1]);
+    const wid = () => (land ? Math.abs(this.project(CX, L, 0)[0] - this.project(CX, 0, 0)[0]) : this.project(10, HALF, 0)[0] - this.project(0, HALF, 0)[0]);
+    const wantS = (rb - rt) * (land ? 0.8 : 0.94), wantW = w - (land ? 40 : 12); let lo = 6, hi = 200;
     for (let i = 0; i < 28; i++) { const d = (lo + hi) / 2; place(d); (span() > wantS || wid() > wantW ? (lo = d) : (hi = d)); }
-    place(hi); const py = this.project(CX, HALF, 0)[1]; const c = (rt + rb) / 2; cam.setViewOffset(w, h, 0, py - c, w, h); cam.updateMatrixWorld(true);
+    place(hi); const p0 = this.project(CX, HALF, 0); const c = (rt + rb) / 2; cam.setViewOffset(w, h, 0, p0[1] - c, w, h); cam.updateMatrixWorld(true);
     this.base = cam.position.clone();
   }
   project(x, y, z = 0) { const v = new THREE.Vector3(x, z, y).project(this.camera); return [(v.x + 1) / 2 * this.w, (1 - v.y) / 2 * this.h]; }
@@ -243,7 +244,7 @@ export class View3D {
   burst() { /* sparks are drawn by the 2D overlay */ }
   _unitObj(u) {
     let e = this.pool.get(u.id);
-    if (!e) { const b = BUILD[u.kind](); const h = HEIGHT[u.kind]; b.g.scale.setScalar(h * 2.0); const o = new THREE.Group(); o.add(b.g); const sd = makeShadow(u.r * 1.3); this.scene.add(sd); this.scene.add(o); e = { o, b, sd, h, ph: u.id * 1.7 }; this.pool.set(u.id, e); }
+    if (!e) { const b = BUILD[u.kind](); const h = HEIGHT[u.kind]; b.g.scale.setScalar(h * (this.w > this.h * 1.3 ? 2.4 : 2.0)); const o = new THREE.Group(); o.add(b.g); const sd = makeShadow(u.r * 1.3); this.scene.add(sd); this.scene.add(o); e = { o, b, sd, h, ph: u.id * 1.7 }; this.pool.set(u.id, e); }
     return e;
   }
   render(snap, clock, shake = 0) {

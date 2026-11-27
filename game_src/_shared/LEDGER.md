@@ -62,3 +62,4 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 - gem_quarry menu: hero beside the card, blurred live 3D backdrop; level select bigger names. (frame-checked; hero size reduced to avoid card overlap, not re-recorded)
 - castaway_raft v2: hat brim raised (face visible), front fill light, hero + raft bigger. HUD buttons still cover the lower raft; menu level buttons use emoji palm.
 - castaway_raft: landscape HUD moved to the right column (raft uncovered); level-select emoji replaced with drawn SVG icons (not screenshot-verified).
+- card_battle: landscape camera now fits the hex arena to the frame (side-on, solved by bisection). Remaining: tower HP bars offset from towers, units sparse. Clip held.

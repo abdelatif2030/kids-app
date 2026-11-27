@@ -83,11 +83,11 @@ class Game {
     const rt = topH + 4; const rb = ch - botH - 2;
     this.cx = cw / 2; this.view.fit(rt + 4, rb - Math.max(30, (rb - rt) * 0.1));
   }
-  sc(y) { const a = this.view.project(CX, y, 0); const b = this.view.project(CX + 1, y, 0); return Math.abs(b[0] - a[0]); }
+  sc(y) { const a = this.view.project(CX, y, 0); const b = this.view.project(CX + 1, y, 0); return Math.hypot(b[0] - a[0], (b[1] - a[1]) / (this.view.sinP || 1)); }
   sy(y) { return this.view.project(CX, y, 0)[1]; }
   P(x, y, z = 0) { return this.view.project(x, y, z); }
   inv(px, py) { return this.view.unproject(px, py); }
-  ell(x, y, r) { const [px, py] = this.P(x, y); const rx = r * this.sc(y); const ry = Math.abs(this.sy(y + r) - this.sy(y - r)) / 2; return [px, py, rx, ry]; }
+  ell(x, y, r) { const [px, py] = this.P(x, y); const rx = r * this.sc(y); const ry = rx * (this.view.sinP || 0.78); return [px, py, rx, ry]; }
 
   _poly(g, pts) { g.beginPath(); pts.forEach(([x, y], i) => { const [px, py] = this.P(x, y); if (i) g.lineTo(px, py); else g.moveTo(px, py); }); g.closePath(); }
   _hexPts() { return [[CX - 3.6, 0], [CX + 3.6, 0], [10, HALF], [CX + 3.6, L], [CX - 3.6, L], [0, HALF]]; }
