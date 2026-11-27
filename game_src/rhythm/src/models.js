@@ -339,14 +339,19 @@ export function makeDiner() {
     booth.rotation.y = ry;
     g.add(booth);
   }
+  const walls = [];
   for (const [x0, z0, w, ry] of [[0, -22, 60, 0], [-26, 0, 50, Math.PI / 2], [26, 0, 50, Math.PI / 2]]) {
-    const wall = box(w, 10, 0.5, mat(0xf2dcc0), x0, 3, z0);
+    // tall walls: they carry the venue panorama (see _setPano in main.js), so they must
+    // rise well into the top-down camera's view
+    const wall = box(w, 15, 0.5, mat(0xf2dcc0), x0, 5.5, z0);
     wall.rotation.y = ry;
     g.add(wall);
+    walls.push(wall);
     const stripe = box(w, 0.8, 0.55, mat(0x7ad0c8), x0, -0.6, z0);
     stripe.rotation.y = ry;
     g.add(stripe);
   }
+  g.userData.walls = walls;
   const jb = new THREE.Group();
   jb.add(box(3, 4.5, 1.6, mat(0xb84a2a), 0, 0.55, 0));
   jb.add(cyl(1.5, 1.5, 1.6, mat(0xffd23a, 0xaa7700, 0.4), 0, 2.8, 0, 24).rotateX(Math.PI / 2));

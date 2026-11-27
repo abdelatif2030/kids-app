@@ -55,11 +55,13 @@ test('a robot survives every track of the world tour', () => {
   }
 });
 
-test('standing still and never jumping gets you knocked off', () => {
+test('standing still and never jumping costs you lives (knocked off, saved, knocked off again)', () => {
   const s = new Show({ track: 0, seed: 3 });
-  let t = 0;
-  while ((s.state === 'intro' || s.state === 'play') && t < 200) { s.step(1 / 30, { x: 0, z: 0 }); t += 1 / 30; }
-  assert.equal(s.state, 'out');
+  let t = 0; let saves = 0;
+  while ((s.state === 'intro' || s.state === 'play') && t < 200) { for (const e of s.step(1 / 30, { x: 0, z: 0 })) if (e.type === 'saved') saves++; t += 1 / 30; }
+  // kind rules: nobody is suddenly out — but passivity is still punished:
+  // the idle player is knocked off and brought back until the lives run low
+  assert.ok(saves >= 1 && s.lives < 3, `saves ${saves} lives ${s.lives}`);
 });
 
 test('a low bar is cleared by a hop, a high bar by ducking; hit otherwise', () => {
@@ -98,20 +100,27 @@ test('the record carries you round, flips direction, gaps drop you, the edge dro
   g.arms = [];
   Object.assign(g.player, { x: 3, z: 0 });
   g.gaps = [{ r0: 2, r1: 4, a0: -0.3, span: 0.6, warn: 0.01, openT: 2, open: false, phi0: g.phi }];
+  let saved = false;
+  for (let i = 0; i < 10; i++) for (const e of g.step(1 / 30, { x: 0, z: 0 })) if (e.type === 'saved') saved = true;
+  assert.ok(saved && g.lives === 2, 'first gap fall returns you to the middle (kind rules: no sudden death)');
+  g.lives = 1; // with the last life spent, the next fall is out
+  Object.assign(g.player, { x: 3, z: 0 });
+  g.gaps = [{ r0: 2, r1: 4, a0: -0.3, span: 0.6, warn: 0.01, openT: 2, open: false, phi0: g.phi }];
   let out = false;
   for (let i = 0; i < 10; i++) for (const e of g.step(1 / 30, { x: 0, z: 0 })) if (e.type === 'out' && e.id === 0) out = true;
-  assert.ok(out, 'fell through the gap');
+  assert.ok(out, 'fell through the gap on the last life');
   // the edge
   const e = new Show({ track: 0, seed: 1 });
   e.state = 'play';
   e.arms = [];
+  e.lives = 1;
   Object.assign(e.player, { x: R - 0.5, z: 0 });
   let off = false;
   for (let i = 0; i < 30; i++) for (const ev of e.step(1 / 30, { x: 1, z: 0 })) if (ev.type === 'out' && ev.id === 0) off = true;
   assert.ok(off, 'ran off the edge');
 });
 
-test('bumping sends a rival away; the youngest get extra lives', () => {
+test('bumping sends a rival away; everyone gets extra lives', () => {
   const s = new Show({ track: 0, seed: 1 });
   s.state = 'play';
   s.arms = [];
@@ -138,4 +147,19 @@ test('damaged saves load safely', () => {
     assert.ok(s.unlocked >= 1 && s.unlocked <= TRACKS.length);
     for (const v of Object.values(s.stars)) assert.ok(v >= 1 && v <= 3);
   }
+});
+
+test('every track has a shipped panorama wired for its venue (art/pano<track+1>.webp)', async () => {
+  const { existsSync } = await import('node:fs');
+  const { fileURLToPath } = await import('node:url');
+  const artDir = fileURLToPath(new URL('../../../assets/games/rhythm/art/', import.meta.url));
+  for (let i = 0; i < TRACKS.length; i++) assert.ok(existsSync(`${artDir}pano${i + 1}.webp`), `missing pano${i + 1}.webp for track ${i}`);
+});
+
+import fs from 'node:fs';
+
+test('Cairo Rhythm anchor + kind rules: Egyptian venues, and three lives for everyone', () => {
+  const i18n = fs.readFileSync(new URL('../src/i18n.js', import.meta.url), 'utf8');
+  assert.ok(i18n.includes("title: ['إيقاع القاهرة', 'Cairo Rhythm']"));
+  assert.deepEqual(TRACKS.map((t) => t.en), ['Hara Café', 'Khan el-Khalili Records', 'Hara Rooftop', 'Nile Lounge', "Grandma's Music Box", 'Cairo Opera House', 'Cairo Grand Orchestra']);
 });

@@ -118,8 +118,13 @@ class Game {
     const sun = new THREE.DirectionalLight(0xfff0e0, 1.3);
     sun.position.set(-6, 22, 10);
     s.add(sun);
-    s.add(makeDiner());
-    s.add(makeDeck(R));
+    const diner = makeDiner();
+    this.dinerWalls = diner.userData.walls || [];
+    s.add(diner);
+    const deck = makeDeck(R);
+    this.deckSide = deck.children[0]; // the stage skirt — the one backdrop the top-down camera always sees
+    this.deckSide.material = this.deckSide.material.clone();
+    s.add(deck);
     this.record = new THREE.Mesh(new THREE.CylinderGeometry(R, R, 0.24, 96), [
       mat(0x18181c),
       new THREE.MeshLambertMaterial({ map: recordTexture() }),
@@ -142,6 +147,36 @@ class Game {
     this.ring = new THREE.Mesh(new THREE.RingGeometry(0.42, 0.56, 28), new THREE.MeshBasicMaterial({ color: 0xffd23a, transparent: true, opacity: 0.9, depthWrite: false }));
     this.ring.rotation.x = -Math.PI / 2;
     s.add(this.ring);
+  }
+
+  /** The owner's painted panorama of the track's venue (art/pano<N>.webp): painted on the diner walls
+      (portrait / menu-orbit views) AND wrapped around the stage skirt — the backdrop band the top-down
+      gameplay camera always has in frame. Track i shows pano i+1. */
+  _setPano(i) {
+    if (!this.dinerWalls || !this.dinerWalls.length) return;
+    const tex = new THREE.TextureLoader().load(`${this.base}art/pano${i + 1}.webp`);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.repeat.set(1.8, 0.62);
+    tex.offset.set(0, 0.36);
+    for (const w of this.dinerWalls) {
+      w.material.map = tex;
+      w.material.color.setHex(0xffffff);
+      w.material.needsUpdate = true;
+    }
+    if (this._panoTex && this._panoTex !== tex) this._panoTex.dispose();
+    this._panoTex = tex;
+    if (this.deckSide) {
+      const band = new THREE.TextureLoader().load(`${this.base}art/pano${i + 1}.webp`);
+      band.colorSpace = THREE.SRGBColorSpace;
+      band.wrapS = THREE.RepeatWrapping;
+      band.repeat.set(3, 1);
+      if (this._bandTex) this._bandTex.dispose();
+      this._bandTex = band;
+      this.deckSide.material.map = band;
+      this.deckSide.material.color.setHex(0xffffff);
+      this.deckSide.material.needsUpdate = true;
+    }
   }
 
   _setup(show) {
@@ -296,6 +331,7 @@ class Game {
     this.menuShow = new Show({ track: 0, seed: 3 });
     this.menuShow.state = 'play';
     this._setup(this.menuShow);
+    this._setPano(0);
     this._clear();
     const rows = [];
     for (let i = 0; i < TRACKS.length; i++) {
@@ -327,6 +363,7 @@ class Game {
     this.trackIndex = i;
     this.show = new Show({ track: i, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1 });
     this._setup(this.show);
+    this._setPano(i);
     this.mode = 'play';
     this.paused = false;
     this.sound.setTempo(this.show.track.bpm);

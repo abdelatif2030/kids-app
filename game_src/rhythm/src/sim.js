@@ -11,15 +11,15 @@ const JUMP_T = 0.62; // seconds in the air
 const DUCK_T = 0.7;
 const FRICTION = 5;
 
-/** Five tracks of the world tour, each adding something new. bpm sets the beat everything follows. */
+/** Seven tracks of the world tour, each adding something new. bpm sets the beat everything follows. */
 export const TRACKS = [
-  { id: 1, ar: 'مطعم الجوكبوكس', en: 'Jukebox Diner', bpm: 112, len: 40, arms: [['low', 8]], high: false, gaps: false, flip: false, tonearm: false },
-  { id: 2, ar: 'محل الأسطوانات', en: 'Record Shop', bpm: 116, len: 45, arms: [['low', 8], ['high', 12]], gaps: false, flip: false, tonearm: false },
-  { id: 3, ar: 'علّية الأحد', en: 'Sunday Loft', bpm: 120, len: 50, arms: [['low', 8], ['high', 10]], gaps: true, flip: false, tonearm: false },
-  { id: 4, ar: 'صالة المخمل', en: 'Velvet Lounge', bpm: 124, len: 55, arms: [['low', 6], ['high', 10]], gaps: true, flip: true, tonearm: false },
-  { id: 5, ar: 'صندوق الموسيقى', en: 'Music Box', bpm: 128, len: 60, arms: [['low', 6], ['high', 8], ['low', 12]], gaps: true, flip: true, tonearm: true },
-  { id: 6, ar: 'قاعة الحفلات', en: 'Concert Hall', bpm: 132, len: 64, arms: [['low', 6], ['high', 7], ['low', 9]], gaps: true, flip: true, tonearm: true },
-  { id: 7, ar: 'الأوركسترا الكبرى', en: 'Grand Orchestra', bpm: 136, len: 70, arms: [['high', 6], ['low', 6], ['high', 8], ['low', 10]], gaps: true, flip: true, tonearm: true },
+  { id: 1, ar: 'مقهى الحارة', en: 'Hara Café', bpm: 112, len: 40, arms: [['low', 8]], high: false, gaps: false, flip: false, tonearm: false },
+  { id: 2, ar: 'أسطوانات خان الخليلي', en: 'Khan el-Khalili Records', bpm: 116, len: 45, arms: [['low', 8], ['high', 12]], gaps: false, flip: false, tonearm: false },
+  { id: 3, ar: 'سطح الحارة', en: 'Hara Rooftop', bpm: 120, len: 50, arms: [['low', 8], ['high', 10]], gaps: true, flip: false, tonearm: false },
+  { id: 4, ar: 'صالة النيل', en: 'Nile Lounge', bpm: 124, len: 55, arms: [['low', 6], ['high', 10]], gaps: true, flip: true, tonearm: false },
+  { id: 5, ar: 'صندوق موسيقى الجدة', en: "Grandma's Music Box", bpm: 128, len: 60, arms: [['low', 6], ['high', 8], ['low', 12]], gaps: true, flip: true, tonearm: true },
+  { id: 6, ar: 'دار الأوبرا', en: 'Cairo Opera House', bpm: 132, len: 64, arms: [['low', 6], ['high', 7], ['low', 9]], gaps: true, flip: true, tonearm: true },
+  { id: 7, ar: 'أوركسترا القاهرة', en: 'Cairo Grand Orchestra', bpm: 136, len: 70, arms: [['high', 6], ['low', 6], ['high', 8], ['low', 10]], gaps: true, flip: true, tonearm: true },
 ];
 
 export const ANIMALS = ['bear', 'bunny', 'fox', 'cat', 'raccoon', 'panda', 'sheep', 'chick', 'frog', 'mouse', 'pig', 'koala'];
@@ -36,7 +36,7 @@ function rng(seed) {
 const wrap = (a) => { while (a > Math.PI) a -= Math.PI * 2; while (a < -Math.PI) a += Math.PI * 2; return a; };
 
 export class Show {
-  /** opts: { track (0..4), easy, seed } */
+  /** opts: { track (0..6), easy, seed } */
   constructor(opts = {}) {
     this.track = TRACKS[opts.track ?? 0];
     this.easy = !!opts.easy;
@@ -49,7 +49,7 @@ export class Show {
     this.spinTarget = this.spin;
     this.phi = 0; // the record's angle
     this.events = [];
-    this.lives = this.easy ? 3 : 1;
+    this.lives = 3; // kind rules: everyone gets three returns to the middle — a fall is never sudden death
     // arms: one full turn every `period` beats, all coming round the same way; their angle says where they are
     this.arms = this.track.arms.map(([type, period], k) => ({ type, period, a: (k * Math.PI * 2) / this.track.arms.length + Math.PI, warn: 0 }));
     this.gaps = [];
@@ -301,9 +301,10 @@ export class Show {
 
   _fall(a, why) {
     if (a.isPlayer && this.lives > 1) {
-      // the youngest have extra lives: back in the middle
+      // back in the middle — radius 1.2 is inside every gap ring (gaps start at 2.2),
+      // so a saved player never lands straight back in the gap that dropped them
       this.lives--;
-      Object.assign(a, { x: 3, z: 0, vx: 0, vz: 0, stun: 0.6, air: 0 });
+      Object.assign(a, { x: 1.2, z: 0, vx: 0, vz: 0, stun: 0.6, air: 0 });
       this.events.push({ type: 'saved', why, lives: this.lives });
       return;
     }
