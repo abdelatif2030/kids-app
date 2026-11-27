@@ -677,7 +677,7 @@ class Game {
     if (!open) { this.st.shiftView(0, 0); return; }
     const wide = W > H * 1.15;
     const r = panel.getBoundingClientRect();
-    if (wide) this.st.shiftView(Math.round(W * 0.12), 0);
+    if (wide) { /* wide: the picture stays exactly where it is; the panel sits in the free area on the right */ }
     else this.st.shiftView(0, Math.round(Math.min(H * 0.3, r.height * 0.55)));
   }
 
@@ -1642,7 +1642,7 @@ const CSS = `
 .lw-exrow b{flex:none;width:calc(var(--u)*4.6);height:calc(var(--u)*4.6);border-radius:50%;background:#7a3fd0;color:#fff;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*2.8)}
 .lw-extext{flex:1;display:flex;flex-direction:column;gap:calc(var(--u)*.3);line-height:1.25;min-width:0}.lw-exmain mark{background:#ffe066;color:#3a2a6a;border-radius:calc(var(--u)*.6);padding:0 calc(var(--u)*.5)}.lw-exar{font-size:calc(var(--u)*2.7);color:#6a5a9a;font-weight:700}.lw-exar mark{background:#ffe9a0;color:#6a4a0a;border-radius:calc(var(--u)*.5);padding:0 calc(var(--u)*.4)}.lw-exrow i{font-style:normal;font-size:calc(var(--u)*3.6)}
 .lw-exline{display:flex;align-items:stretch;gap:calc(var(--u)*1.2)}
-@media (min-aspect-ratio:115/100){.lw-expanel{left:auto;right:calc(var(--u)*1);top:calc(var(--u)*19);bottom:auto;width:min(38%,calc(var(--u)*78));max-height:calc(100% - var(--u)*26)}}.lw-exline .lw-exrow{flex:1;min-width:0}
+@media (min-aspect-ratio:115/100){.lw-expanel{left:auto;right:calc(var(--u)*1);top:calc(var(--u)*19);bottom:auto;width:min(42%,calc(var(--u)*86));max-height:calc(100% - var(--u)*26)}}.lw-exline .lw-exrow{flex:1;min-width:0}
 .lw-exbox{flex:none;width:calc(var(--u)*11);min-height:calc(var(--u)*11);border-radius:calc(var(--u)*2.4);border:calc(var(--u)*.5) solid #cdbdf5;background:linear-gradient(180deg,#fff,#efe6ff);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 calc(var(--u)*.4) 0 #cdbdf5}.lw-exbox i{font-style:normal;font-size:calc(var(--u)*5.2)}.lw-exbox img{width:100%;height:100%;object-fit:cover;display:block}
 .lw-exrow.on{background:#fff0b8;border-color:#f5b21a}
 .lw-lhit{position:absolute;left:18%;right:18%;top:14%;bottom:30%;background:transparent;border:none;cursor:pointer;pointer-events:auto;z-index:2}
