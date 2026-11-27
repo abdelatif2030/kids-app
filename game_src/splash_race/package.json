@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Rehlaty Splash Race: tropical swimming obstacle race (three.js). Built into assets/games/splash_race/game.js",
   "scripts": {
-    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/splash_race/game.js",
+    "build": "node ../cozy_kit/build_game.mjs src/main.js ../../assets/games/splash_race/game.js",
     "test": "node --test test/sim.test.js"
   },
   "dependencies": {
