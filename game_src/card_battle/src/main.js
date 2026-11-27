@@ -490,7 +490,7 @@ class Game {
     const [px, py] = this.P(bs.x, bs.y); const s = this.sc(bs.y); const R = BASE_R * s;
     const o = { t: this.clock, flash: bs.flash, atk: bs.atk };
     if (bs.hp <= 0) { glow(g, px, py - R * 0.3, R * 1.2, 'rgba(255,120,40,.6)'); return; }
-    if (bs.side === 0) { bar(g, px, py + R * 0.85, R * 2.6, Math.max(5, R * 0.24), bs.hp / bs.max, '#35e0ff'); } else { const hy = this.P(bs.x, bs.y, 3.4)[1] + R * 0.3; bar(g, px, hy - R * 1.9, R * 2.6, Math.max(5, R * 0.24), bs.hp / bs.max, '#ff3fd0'); }
+    { const hy = this.P(bs.x, bs.y, 2.6)[1]; bar(g, px, hy, R * 2.6, Math.max(5, R * 0.24), bs.hp / bs.max, bs.side === 0 ? '#35e0ff' : '#ff3fd0'); }
   }
 
   _proj2(g, p, x, y, dx, dy) {
