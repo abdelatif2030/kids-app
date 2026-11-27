@@ -282,7 +282,7 @@ class Game {
     g.clearRect(0, 0, W, H);
     const lift = v && v.state === 'landing' ? Math.min(1, v.landT / 2) : 0;
     const fake = v || { built: { tile: 6, sail: true, fish: false, hut: false }, hook: { phase: 'idle' }, shark: { state: 'none' }, state: 'sail', time: tm, items: [], progress: 0, level: { isl: 'palm' } };
-    const rs = v ? Math.min(W, H) * 0.145 / this.u : 14;
+    const rs = v ? Math.min(W, H) * 0.19 / this.u : 14;
     this.view.render({ v: fake, tm, raftFy: (v ? RAFT.y - 0.07 : 0.8) - lift * 0.45, rs, drift: v ? v.time * 0.05 : tm * 0.03 });
     if (v && v.shark.state === 'bite') { const [bx, by] = this.view.project(this.view.X(v.shark.x) + 3, 8, this.view.Z(v.shark.y)); const s = this.u; g.fillStyle = '#fff'; g.strokeStyle = '#d83a2a'; g.lineWidth = s * 0.6; g.beginPath(); g.arc(bx, by, s * 2.6, 0, 6.3); g.fill(); g.stroke(); g.fillStyle = '#d83a2a'; g.font = `900 ${s * 4}px system-ui`; g.textAlign = 'center'; g.fillText('!', bx, by + s * 1.4); }
     if (!v) return;

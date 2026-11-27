@@ -33,7 +33,7 @@ function makeHero() {
   add(P.head, G.sph, SKIN, 0, 0, 0, 0.6, 0.58, 0.55);
   [-1, 1].forEach((s) => { add(P.head, G.sph, M(0xffffff), s * 0.12, 0.04, 0.24, 0.14); add(P.head, G.sph, M(0x2a1a0a), s * 0.12, 0.04, 0.3, 0.075); add(P.head, G.sph, M(0xff9a8a), s * 0.2, -0.08, 0.22, 0.1, 0.07, 0.04); });
   add(P.head, G.sph, M(0xc8503a), 0, -0.13, 0.27, 0.12, 0.05, 0.04);
-  add(P.head, G.cyl, M(0xe8c868), 0, 0.22, 0, 0.98, 0.04, 0.98); add(P.head, G.cyl, M(0xe8c868), 0, 0.3, 0, 0.52, 0.2, 0.52); add(P.head, G.cyl, M(0xd83a2a), 0, 0.25, 0, 0.53, 0.05, 0.53);
+  add(P.head, G.cyl, M(0xe8c868), 0, 0.3, -0.1, 0.8, 0.04, 0.8); add(P.head, G.cyl, M(0xe8c868), 0, 0.38, -0.1, 0.46, 0.18, 0.46); add(P.head, G.cyl, M(0xd83a2a), 0, 0.33, -0.1, 0.47, 0.05, 0.47);
   return { g, P };
 }
 function makeShark() {
@@ -75,7 +75,7 @@ export class View3D {
     this.dom = this.renderer.domElement; this.dom.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block';
     this.scene = new THREE.Scene(); this.scene.background = new THREE.Color(0x2a9ae0);
     this.cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 600);
-    this.scene.add(new THREE.HemisphereLight(0xcfeaff, 0x2a5a98, 0.75)); const sun = new THREE.DirectionalLight(0xfff0d0, 2.2); sun.position.set(-30, 50, -20); this.scene.add(sun);
+    this.scene.add(new THREE.HemisphereLight(0xcfeaff, 0x2a5a98, 0.75)); const sun = new THREE.DirectionalLight(0xfff0d0, 2.2); sun.position.set(-30, 50, 10); this.scene.add(sun); const fill = new THREE.DirectionalLight(0xfff4e0, 1.6); fill.position.set(10, 40, 45); this.scene.add(fill);
     this.W = 1; this.H = 1; this.u = 1;
     // water
     const seg = 56; this.wg = new THREE.PlaneGeometry(1, 1, seg, seg); this.wg.rotateX(-Math.PI / 2);
@@ -162,7 +162,7 @@ export class View3D {
     if (fl !== this.flags || this.exRs !== this.rs) { this.flags = fl; this.exRs = this.rs; this._extras(v.built); }
     const bob = Math.sin(tm * 1.6) * 0.5; this.raft.position.set(this.X(0.5), bob, this.Z(raftFy)); this.raft.rotation.z = Math.sin(tm * 1.1) * 0.02; this.raft.rotation.x = Math.sin(tm * 0.9) * 0.02;
     const s = this.rs; this.foam.scale.set(s * 3, s * 3, 1); this.foam.position.y = 0.1 - bob;
-    const throwing = v.hook && v.hook.phase === 'out'; const H = this.hero; H.g.position.set(s * 0.1, 1.05, s * 0.4); H.g.scale.setScalar(s * 1.0); const hop = Math.abs(Math.sin(tm * 3));
+    const throwing = v.hook && v.hook.phase === 'out'; const H = this.hero; H.g.position.set(s * 0.1, 1.05, s * 0.4); H.g.scale.setScalar(s * 1.2); const hop = Math.abs(Math.sin(tm * 3));
     H.P.body.position.y = 0.4 + hop * 0.03; H.P.arms[0].rotation.x = Math.sin(tm * 2) * 0.25; H.P.arms[0].rotation.z = 0.15;
     H.P.arms[1].rotation.x = throwing ? -2.6 : 0.1; H.P.arms[1].rotation.z = throwing ? -0.4 : -0.15; H.P.head.rotation.z = Math.sin(tm * 1.5) * 0.05; H.P.legs.forEach((l, i) => { l.rotation.x = Math.sin(tm * 3 + i * Math.PI) * 0.06; });
     if (this.sailCloth) { this.sailCloth.scale.z = 0.5 + Math.sin(tm * 2) * 0.12; this.sailCloth.rotation.y = Math.sin(tm * 1.6) * 0.1; }
