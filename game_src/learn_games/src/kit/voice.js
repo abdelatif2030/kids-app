@@ -55,6 +55,17 @@ export class Voice {
       sc.onerror = () => { window.__learnVoice = window.__learnVoice || { ar: [], en: [], de: [], fr: [], it: [] }; };
       document.head.append(sc);
     }
+    // the 386 new words (a script too: the game bundle stays small); the learn screens re-read their sections when it arrives
+    if (typeof document !== 'undefined' && !window.__learnExtraWords && !document.getElementById('learn-extra-words')) {
+      const xw = document.createElement('script');
+      xw.id = 'learn-extra-words';
+      xw.src = `${this.dir}extra_words.js`;
+      xw.onerror = () => { window.__learnExtraWords = window.__learnExtraWords || null; };
+      document.head.append(xw);
+      const xd = document.createElement('script'); // the pictures' sizes of those words
+      xd.src = `${this.dir}extra_art_dims.js`;
+      document.head.append(xd);
+    }
     // the «Example» sentences of the words (a script too, so the game bundle stays small)
     if (typeof document !== 'undefined' && !window.__learnExamples && !document.getElementById('learn-examples')) {
       const ex = document.createElement('script');

@@ -244,3 +244,22 @@ test('Italian clips get their own ids (it|text), different from the other langua
   assert.notEqual(clipId('cane', 'it'), clipId('cane', 'ar'));
   assert.notEqual(clipId('cane', 'it'), clipId('cane', 'fr'));
 });
+
+test('the 386 new words (extra_words.js) add 24 sections in the five languages, each item with a picture and an Arabic name', async () => {
+  const fs = await import('node:fs');
+  const src = fs.readFileSync(new URL('../../../assets/games/learn_voice/extra_words.js', import.meta.url), 'utf8');
+  globalThis.window = {}; new Function('window', src)(globalThis.window);
+  try {
+    const X = globalThis.window.__learnExtraWords;
+    for (const l of ['en', 'de', 'fr', 'it']) assert.equal(X[l].length, 386, l);
+    const base = learnSections('en').length;
+    for (const lang of ['ar', 'en', 'de', 'fr', 'it']) {
+      const secs = learnSections(lang).filter((s) => s.id.startsWith('n_'));
+      assert.equal(secs.length, 24, `${lang} new sections`);
+      const items = secs.reduce((a, s) => a + s.items.length, 0);
+      assert.equal(items, 386, `${lang} items`);
+      for (const s of secs) for (const it of s.items) { assert.ok(it.show && it.show.thing, `${lang} ${it.key} picture`); assert.ok(it.label, `${lang} ${it.key} label`); }
+    }
+    assert.ok(base >= 41);
+  } finally { delete globalThis.window; }
+});

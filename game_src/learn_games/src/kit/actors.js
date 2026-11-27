@@ -39,7 +39,7 @@ function pic(name, h, layers = 1) {
     }
     return grp;
   }
-  const [w, hh] = DIMS[name];
+  const [w, hh] = DIMS[name] || extraDims()[name];
   const g = new THREE.PlaneGeometry((h * w) / hh, h);
   g.translate(0, h / 2, 0);
   const m = new THREE.MeshBasicMaterial({ map: tex(name), transparent: true, alphaTest: 0.08, toneMapped: false, side: THREE.DoubleSide });
@@ -156,11 +156,13 @@ for (const n of EXTRA_ART) ART_FILE[n] = n;
 for (const n of Object.keys(DIMS)) if (!ART_FILE[n]) ART_FILE[n] = n;
 const BIG = new Set(['cow', 'sheep', 'dog', 'cat', 'giraffe', 'lion', 'elephant', 'elephant2', 'fox', 'camel', 'crow', 'sheep_n', 'cat_n', 'giraffe_n', 'horse_n', 'rabbit_n', 'duck_n', 'hen_n', 'bee_n', 'butterfly_n', 'clownfish_n', 'croc', 'horse', 'pig', 'rabbit', 'mallard', 'hen', 'chick', 'bee', 'butterfly', 'frog_n', 'dove_n', 'grapes_n', 'plane_n', 'monkey', 'clownfish', 'pigeon', 'frog', 'panda', 'tiger', 'zebra', 'penguin', 'parrot']);
 for (const n of EXTRA_ART) BIG.add(n);
-export const hasArt = (id) => !!ART_FILE[id] && !!DIMS[ART_FILE[id]];
+// pictures of the new words are registered by a script (assets/games/learn_voice/extra_art_dims.js), not in the bundle
+const extraDims = () => (typeof window !== 'undefined' && window.__learnArtDims) || {};
+export const hasArt = (id) => { const f = ART_FILE[id] || (extraDims()[id] ? id : null); return !!f && !!(DIMS[f] || extraDims()[f]); };
 export function artThing(id) {
   if (!hasArt(id)) return null;
   const g = new THREE.Group();
-  const file = ART_FILE[id];
+  const file = ART_FILE[id] || id;
   const h = BIG.has(file) ? 1.5 : 1.0;
   g.add(pic(file, h));
   g.userData.id = id;

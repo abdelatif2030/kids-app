@@ -10,6 +10,7 @@ import { numberWord } from '../letters/numbers.js';
 import { numberWords, numberSequence } from './numbers.js';
 import { colorOf } from '../letters/colors.js';
 import { EXTRA_DEFS } from './extra.js';
+import { NEW_SECTIONS } from './newsections.js';
 
 export const LANGS = ['ar', 'en', 'de', 'fr', 'it'];
 const WORDS = { en: EN, de: DE, fr: FR, it: IT };
@@ -90,8 +91,15 @@ const EN_AR = new Map(EN.map((e) => [engOf(e).toLowerCase(), e.ar]));
 /** The Arabic name of a row as an optional clip (heard first in the English / German / French sections). */
 function arOfRow(e) { const a = e.ar || EN_AR.get(engOf(e).toLowerCase()); return a ? [{ t: a, lang: 'ar', optional: true }] : []; }
 
+// the base word lists plus the words loaded by script (assets/games/learn_voice/extra_words.js: the 386 new words, kept out of the game bundle)
+const rowsOf = (lang) => {
+  const base = lang === 'ar' ? EN : WORDS[lang];
+  const extra = typeof window !== 'undefined' && window.__learnExtraWords && window.__learnExtraWords[lang === 'ar' ? 'en' : lang];
+  return extra ? [...base, ...extra] : base;
+};
+
 function wordItems(def, lang) {
-  const rows = (lang === 'ar' ? EN : WORDS[lang]).filter(def.pick);
+  const rows = rowsOf(lang).filter(def.pick);
   const out = [];
   const seen = new Set();
   for (const e of rows) {
@@ -99,11 +107,12 @@ function wordItems(def, lang) {
     if (!show) continue;
     const label = lang === 'ar' ? e.ar : e.en;
     if (!label) continue;
-    const key = `${def.id}:${engOf(e)}`;
+    let key = `${def.id}:${engOf(e)}`;
+    if (seen.has(key) && e.cat && e.cat.startsWith('new:')) key += '#2'; // the new words may repeat a word in one section (the unit «second» and the ordinal «second»)
     if (seen.has(key)) continue;
     seen.add(key);
     if (lang === 'ar') out.push({ key, show, label, lang: 'ar', say: [{ t: label, lang: 'ar' }], slow: [{ t: label, lang: 'ar' }], sentence: [] });
-    else out.push({ key, arSay: arOfRow(e), show, label: e.cat.startsWith('letters') || e.cat === 'days' || e.cat === 'months' || e.n != null ? (e.ch || e.en) : e.en, lang, say: [{ t: e.w, lang }], slow: [{ t: e.w, lang, slow: true }], sentence: [{ t: e.s, lang }] });
+    else out.push({ key, arSay: arOfRow(e), show, label: e.cat.startsWith('letters') || e.cat === 'days' || e.cat === 'months' || e.n != null ? (e.ch || e.en) : e.en, lang, say: [{ t: e.w, lang }], slow: [{ t: e.w, lang, slow: true }], sentence: e.s ? [{ t: e.s, lang }] : [] });
   }
   return out;
 }
@@ -138,6 +147,7 @@ export function learnSections(lang, min = 4) {
   // the order: the basics, then counting right after the numbers, and the newer kinds (sentences, stories, reading, sounds, marks) at the end
   const defs = [];
   for (const d of SECTION_DEFS) { defs.push(d); if (d.id === 'numbers') defs.push(...EXTRA_DEFS.filter((x) => x.after)); }
+  defs.push(...NEW_SECTIONS); // the 386 new words (they appear only when their script is loaded)
   defs.push(...EXTRA_DEFS.filter((x) => !x.after));
   for (const def of defs) {
     let items;

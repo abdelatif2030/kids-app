@@ -558,7 +558,7 @@ class Game {
 
   _lang() { const l = this.sh.cfg && this.sh.cfg.learnLang; return l === 'en' || l === 'de' || l === 'fr' || l === 'it' ? l : 'ar'; }
   _lt(ar, en, de, fr, it) { const l = this._lang(); return l === 'it' ? (it || en) : { ar, en, de, fr }[l]; }
-  _learnData() { return this._secs || (this._secs = learnSections(this._lang())); }
+  _learnData() { const ex = !!window.__learnExtraWords; if (!this._secs || this._secsEx !== ex) { this._secs = learnSections(this._lang()); this._secsEx = ex; } return this._secs; }
 
   /** The sections (letters, numbers, animals, birds ...): the child picks what to learn. */
   _learnHome() {
