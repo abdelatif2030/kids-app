@@ -32,3 +32,15 @@ Menu, start (hint + bubble), real mouse tap, divers working, two and four ledges
 - Landscape screens use the same portrait column, so the sky/boat area is cramped at 844x390.
 - Prices and pearl values are our own (the video only shows 10K hire, 16K x3, 12K new ledge, 250K x3, goal $1.50M), tuned so a robot wins in ~3 minutes.
 - Sound is synthesized, not the video's; not listened to by a person.
+
+---
+
+## Phase 1 fix review — Moss, 2026-11-27 (commit 4633943d)
+
+**What was wrong.** (1) `_won()` stored `Math.max(best, time)` — the SLOWEST winning dive became the "best". (2) The upgrade button label was the literal 'x3' / `x${3}` in three places, disconnected from the sim (verified against the sim: the per-level multiplier really is ×3, `3 ** upLvl` — the label was right by luck, not by construction). (3) Money rendered with $ in six places in an Egyptian-pounds game.
+
+**What changed and why.** The sim exports `recordBest(best, time)` — fastest wins: a first win sets it, a slower win never replaces it, a faster win improves it; `_won()` uses it. `UP_MULT = 3` is now exported from the sim and used by `mult()`, the buy event, the button label and the buy fx, so the advertised multiplier cannot drift from the paid one. All $ renders became ج.م / EGP via one CUR() helper.
+
+**Tested.** npm test 7/7 (2 new: recordBest cases including the exact old-bug case — best 95 vs a 130 s dive stays 95; sim mult equals UP_MULT^upLvl). Browser through the real shell: three scaffolded finished dives (130 s, 80 s, 200 s) posted best = 130 → 80 → 80; zero page errors. fps 10.4 rAF under CDP 4× CPU throttling in headless SwiftShader — low in this software-GL environment (the game's per-frame canvas painting predates this change; nothing per-frame was added). Treat as a comparable lower bound, not a device number; the canvas paint cost is logged as a Phase-2 perf item in docs/AI_WORK_LOG.md.
+
+**Not verified.** Pre-fix saves may hold an inflated "best" (a slow time); it now only improves when beaten — no migration was attempted (guessing a "plausible" best would falsify the record). No real-device test. Voice clips are partial for this game (6/16 real clips installed from batch 2; the rest are pending from the owner's generator).

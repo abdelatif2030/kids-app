@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Lagoon, LEDGES, RIVAL_GOAL, MAX_HIRE, normalizeSave } from '../src/sim.js';
+import { Lagoon, LEDGES, RIVAL_GOAL, MAX_HIRE, UP_MULT, recordBest, normalizeSave } from '../src/sim.js';
 
 /** A robot owner: taps all the time and buys the cheapest useful thing. */
 function tick(l, t) {
@@ -55,3 +55,18 @@ test('HIRE makes a diver work by himself; UPGRADE triples pearls; NEW LEDGE open
 });
 
 test('damaged saves load safely', () => { assert.equal(normalizeSave(null).wins, 0); });
+
+test('best is the FASTEST dive: a slower win never replaces it (the old Math.max bug)', () => {
+  assert.equal(recordBest(0, 95), 95); // first win sets the best
+  assert.equal(recordBest(95, 130), 95); // slower dive: best unchanged
+  assert.equal(recordBest(95, 80), 80); // faster dive: best improves
+  assert.equal(recordBest(95, 0), 95); // no time recorded: keep the best
+});
+
+test('the upgrade multiplier the shop advertises is the one the sim pays', () => {
+  const l = new Lagoon({ seed: 3 });
+  const a = l.areas[0];
+  assert.equal(l.mult(a), 1);
+  a.upLvl = 2;
+  assert.equal(l.mult(a), UP_MULT ** 2);
+});

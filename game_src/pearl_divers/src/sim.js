@@ -34,7 +34,7 @@ export class Lagoon {
     while (a.divers.length < 1 + a.hired) a.divers.push({ phase: 'down', t: a.divers.length === 0 ? 0 : this.rand() * 1.2, has: false, auto: a.divers.length > 0 });
   }
 
-  mult(a) { return 3 ** a.upLvl; }
+  mult(a) { return UP_MULT ** a.upLvl; }
   get openCount() { return this.areas.filter((a) => a.isOpen).length; }
   /** The next ledge that can still be opened (below the last open one). */
   get nextLedge() { return this.areas.find((a) => !a.isOpen) || null; }
@@ -53,7 +53,7 @@ export class Lagoon {
     const a = this.areas.find((x) => x.id === id);
     this.cash -= c;
     if (kind === 'area') a.isOpen = true; else if (kind === 'hire') { a.hired += 1; this._fixDivers(a); } else a.upLvl += 1;
-    this.events.push({ type: 'buy', kind, id, mult: kind === 'up' ? 3 : 1 });
+    this.events.push({ type: 'buy', kind, id, mult: kind === 'up' ? UP_MULT : 1 });
     return true;
   }
 
@@ -99,4 +99,16 @@ export class Lagoon {
 export function normalizeSave(s) {
   const o = s && typeof s === 'object' ? s : {};
   return { wins: Math.max(0, Math.floor(Number(o.wins)) || 0), best: Math.max(0, Math.floor(Number(o.best)) || 0), muted: !!o.muted };
+}
+
+/** Each UPGRADE multiplies a ledge's pearl value by this much (the shop label reads it from here, never a literal). */
+export const UP_MULT = 3;
+
+/** "Best" is the FASTEST winning dive, in seconds. A slower win must never replace it
+ *  (the old code used Math.max and so kept the slowest dive as the "best"). */
+export function recordBest(best, time) {
+  const b = Math.max(0, Math.floor(Number(best)) || 0);
+  const t = Math.max(0, Math.round(Number(time)) || 0);
+  if (!t) return b;
+  return b > 0 ? Math.min(b, t) : t;
 }

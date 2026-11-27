@@ -5,7 +5,7 @@
 // coins fly to your cash. Per ledge: HIRE (a diver who works alone) and an up-arrow x3 button; below the last ledge NEW LEDGE.
 // A bar at the top races your wealth to the rival's fortune on the pink yacht. 2D canvas, art and sound made in code.
 // No network, nothing lost for good.
-import { Lagoon, LEDGES, RIVAL_GOAL, MAX_HIRE, MAX_UP, BELL_TIME, normalizeSave } from './sim.js';
+import { Lagoon, LEDGES, RIVAL_GOAL, MAX_HIRE, MAX_UP, BELL_TIME, UP_MULT, recordBest, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 import { loadArt } from '../../cozy_kit/art.js';
@@ -38,6 +38,9 @@ class Sound extends SynthBase {
   }
   setMode(on) { if (!on) { this.setBed(null); this.setTune(null); return; } this.setBed('waves'); this.setTune({ tempo: 96, beats: 16, wave: 'sine', vol: 0.1, notes: [[0, 69, 2], [2, 72, 1], [3, 76, 1], [4, 74, 2], [6, 72, 1], [7, 69, 1], [8, 67, 2], [10, 71, 1], [11, 74, 1], [12, 72, 2], [14, 69, 2], [0, 45, 4], [8, 43, 4]] }); }
 }
+
+/** Money is Egyptian pounds, never dollars. */
+const CUR = () => (I.getLang() === 'en' ? 'EGP' : 'ج.م');
 
 const f = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e4 ? `${(n / 1e3).toFixed(1)}K` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : String(Math.round(n)));
 // Optional generated pictures (assets/games/pearl_divers/art/*.webp). Each one is optional: a missing picture is drawn in code as before.
@@ -158,7 +161,7 @@ class Game {
     this.sound.setMode(true);
     this.cashEl = h('span', {}, '');
     this.cashBox = h('div', { class: 'pd-cash' }, h('i'), this.cashEl);
-    this.fill = h('b', {}); this.goalTxt = h('span', {}, `$${f(RIVAL_GOAL)}`); this.coinMark = h('u', {}, '🪙');
+    this.fill = h('b', {}); this.goalTxt = h('span', {}, `${f(RIVAL_GOAL)} ${CUR()}`); this.coinMark = h('u', {}, '🪙');
     const menu = h('button', { class: 'pd-menu', 'aria-label': I.t('menu'), onclick: () => this.showMenu() }, '☰');
     this.layer.append(h('div', { class: 'pd-hud' }, h('div', { class: 'pd-cashrow' }, this.cashBox, menu),
       h('div', { class: 'pd-race' }, h('div', { class: 'pd-you' }, I.t('you')), h('div', { class: 'pd-track' }, this.fill, this.goalTxt, this.coinMark, this.rivalEm = h('em', {}, '🧔')))));
@@ -167,7 +170,7 @@ class Game {
     this.layer.append(this.btnLayer);
     this.shopEls = [];
     const mk = (cls, icon, label) => { const cost = h('b', {}, ''); const lab = h('span', {}, label); const b = h('button', { class: `pd-shopb ${cls}` }, h('i', {}, icon), lab, cost); b.style.display = 'none'; this.btnLayer.append(b); return { b, cost, lab }; };
-    this.l.areas.forEach((a) => { this.shopEls.push({ hire: mk('pd-hire', '📣', I.t('hire')), up: mk('pd-upb', '⬆️', 'x3') }); });
+    this.l.areas.forEach((a) => { this.shopEls.push({ hire: mk('pd-hire', '📣', I.t('hire')), up: mk('pd-upb', '⬆️', `x${UP_MULT}`) }); });
     this.shopEls.forEach((s, i) => {
       const id = this.l.areas[i].id;
       s.hire.b.onclick = () => { if (this.l.buy('hire', id)) this.sound.play('buy'); };
@@ -227,18 +230,18 @@ class Game {
         this.sound.play('sold');
         this.voice.say('charge');
         const b = this._boatPos();
-        this.fx.push({ x: b.x, y: Math.max(b.y, this.u * 16), t: 0, text: `+$${f(e.cash)}`, big: true });
+        this.fx.push({ x: b.x, y: Math.max(b.y, this.u * 16), t: 0, text: `+${f(e.cash)} ${CUR()}`, big: true });
         const n = Math.min(6, 2 + Math.floor(Math.log10(Math.max(10, e.cash))));
         for (let i = 0; i < n; i++) this.coins.push({ x: b.x, y: Math.max(b.y, this.u * 16), t: -i * 0.07, dx: (Math.random() - 0.5) * this.u * 8 });
       }
-      if (e.type === 'buy' && e.kind === 'up') { const i = l.areas.findIndex((a) => a.id === e.id); this.fx.push({ x: L.x0 + L.Wc * 0.82, y: L.surf + i * L.rowH - this.cam + L.rowH * 0.2, t: 0, text: 'x3', big: true }); }
+      if (e.type === 'buy' && e.kind === 'up') { const i = l.areas.findIndex((a) => a.id === e.id); this.fx.push({ x: L.x0 + L.Wc * 0.82, y: L.surf + i * L.rowH - this.cam + L.rowH * 0.2, t: 0, text: `x${UP_MULT}`, big: true }); }
       if (e.type === 'won') this._won();
     }
     // camera follows the deepest open ledge, with room for the NEW LEDGE button
     const open = l.openCount;
     const want = Math.max(0, L.surf + open * L.rowH + L.rowH * 0.34 - this.ch);
     this.cam += (want - this.cam) * Math.min(1, dt * 2.5);
-    this.cashEl.textContent = `$${f(l.cash)}`;
+    this.cashEl.textContent = `${f(l.cash)} ${CUR()}`;
     const frac = Math.min(1, l.earned / RIVAL_GOAL);
     this.fill.style.width = `${Math.max(3, frac * 100)}%`;
     this.coinMark.style.left = `${Math.max(3, frac * 100)}%`;
@@ -256,11 +259,11 @@ class Game {
       const hc = l.cost('hire', a.id); const uc = l.cost('up', a.id);
       this._place(s.hire, vis && hc !== null, L.x0 + L.Wc * 0.03, y, hc, l.cash, a.hired >= MAX_HIRE);
       this._place(s.up, vis && uc !== null, L.x0 + L.Wc * 0.45, y, uc, l.cash, a.upLvl >= MAX_UP);
-      s.up.lab.textContent = `x${3}`;
+      s.up.lab.textContent = `x${UP_MULT}`;
     });
     const nx = l.nextLedge;
     const ly = L.surf + open * L.rowH - this.cam - this.u * 1;
-    if (nx) { this.ledgeBtn.b.style.display = 'flex'; this.ledgeBtn.b.style.left = `${L.x0 + L.Wc * 0.5 - this.ledgeBtn.b.offsetWidth / 2}px`; this.ledgeBtn.b.style.top = `${Math.min(ly, this.ch - this.u * 10)}px`; this.ledgeBtn.cost.textContent = `$${f(nx.open)}`; this.ledgeBtn.b.classList.toggle('off', l.cash < nx.open); this.ledgeBtn.b.classList.toggle('can', l.cash >= nx.open); this.ledgeBtn.b.querySelector('i').textContent = l.cash >= nx.open ? '🔓' : '🔒'; } else this.ledgeBtn.b.style.display = 'none';
+    if (nx) { this.ledgeBtn.b.style.display = 'flex'; this.ledgeBtn.b.style.left = `${L.x0 + L.Wc * 0.5 - this.ledgeBtn.b.offsetWidth / 2}px`; this.ledgeBtn.b.style.top = `${Math.min(ly, this.ch - this.u * 10)}px`; this.ledgeBtn.cost.textContent = `${f(nx.open)} ${CUR()}`; this.ledgeBtn.b.classList.toggle('off', l.cash < nx.open); this.ledgeBtn.b.classList.toggle('can', l.cash >= nx.open); this.ledgeBtn.b.querySelector('i').textContent = l.cash >= nx.open ? '🔓' : '🔒'; } else this.ledgeBtn.b.style.display = 'none';
     if (!this.tappedOnce || l.areas.every((a) => a.boost <= 0 && a.hired === 0)) this.idleT += dt; else this.idleT = 0;
   }
 
@@ -268,14 +271,14 @@ class Game {
     el.b.style.display = vis ? 'flex' : 'none';
     if (!vis) return;
     el.b.style.left = `${x}px`; el.b.style.top = `${y}px`;
-    el.cost.textContent = `$${f(cost)}`;
+    el.cost.textContent = `${f(cost)} ${CUR()}`;
     el.b.classList.toggle('off', cash < cost); el.b.classList.toggle('can', cash >= cost);
     void maxed;
   }
 
   _won() {
     this.save.wins += 1;
-    this.save.best = Math.max(this.save.best, Math.round(this.l.time));
+    this.save.best = recordBest(this.save.best, this.l.time); // fastest dive is the best — never the slowest
     this.post({ type: 'save', save: this.save });
     this.sound.play('win');
     this.voice.say('win');
@@ -284,7 +287,7 @@ class Game {
       if (!this.root.isConnected || this.mode !== 'play') return;
       this.layer.append(h('div', { class: 'pd-win' }, h('div', { class: 'pd-wcard' },
         h('div', { class: 'pd-wt' }, I.t('youWin')), h('div', { class: 'pd-stars' }, h('span', {}, '⭐'), h('span', {}, '⭐'), h('span', {}, '⭐')),
-        h('div', { class: 'pd-mon' }, h('span', {}, '🪙'), `$${f(this.l.earned)}`), h('div', { class: 'pd-small' }, I.t('wonText')),
+        h('div', { class: 'pd-mon' }, h('span', {}, '🪙'), `${f(this.l.earned)} ${CUR()}`), h('div', { class: 'pd-small' }, I.t('wonText')),
         h('button', { class: 'pd-btn', onclick: () => this.start() }, I.t('again')),
         h('button', { class: 'pd-btn dark', onclick: () => this.showMenu() }, I.t('menu')))));
     }, 1800);
