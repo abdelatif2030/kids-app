@@ -1,6 +1,7 @@
 # Installs the owner's 830-image batch (2026-11-27) for the learn world:
 #   LNW-01..47  word cut-outs on white   -> assets/games/art/<picture_id>.webp (transparent, via tools/cut_sheet.py)
-#   EXP-01..55  one scene per word       -> assets/games/art/ex_<word>.webp     (rounded tile, small)
+#   EXP-01..55  one scene per word       -> assets_src/learn_scene_words/ex_<word>.webp  (NOT bundled: Cloudflare Pages allows 20,000 files per deploy;
+#                                           every example has its own EXE scene, so the word-level fallback is not needed)
 #   EXE-001..214 one scene per example   -> assets/games/art/ex_<word>_<n>.webp
 # The cell order and the grid come from the prompt docs (the same ones the sheets were made from).
 #   python -X utf8 tools/install_learn_sheets.py <incoming dir with part3/ part4/ part5/> [lnw|exp|exe|all] [--workers N]
@@ -9,6 +10,7 @@ from concurrent.futures import ProcessPoolExecutor
 from PIL import Image, ImageDraw, ImageChops
 
 ART = 'assets/games/art/'
+WORD_ART = 'assets_src/learn_scene_words/'
 SCENE = 320          # px of the longest side of a scene picture
 SCENE_Q = 74
 
@@ -44,7 +46,8 @@ def tile_bbox(cell, tol=14):
 
 
 def cut_scenes(args):
-    sheet, cols, rows, names = args
+    sheet, cols, rows, names = args[:4]
+    kind = args[4] if len(args) > 4 else 'exe'
     im = Image.open(sheet).convert('RGB')
     W, H = im.size
     cw, ch = W / cols, H / rows
@@ -69,7 +72,7 @@ def cut_scenes(args):
         a = m.resize((w, h), Image.LANCZOS)
         o = t.convert('RGBA')
         o.putalpha(a)
-        o.save(ART + n + '.webp', quality=SCENE_Q, method=6)
+        o.save((WORD_ART if kind == 'exp' else ART) + n + '.webp', quality=SCENE_Q, method=6)
         made.append(n)
     return sheet, made, bad
 
@@ -79,6 +82,7 @@ def main():
     what = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith('--') else 'all'
     workers = int(sys.argv[sys.argv.index('--workers') + 1]) if '--workers' in sys.argv else 4
     os.makedirs(ART, exist_ok=True)
+    os.makedirs(WORD_ART, exist_ok=True)
     report = {'lnw': {}, 'exp': {}, 'exe': {}}
     jobs = []
     if what in ('lnw', 'all'):
@@ -93,7 +97,7 @@ def main():
                 assert p, sid
                 jobs.append((key, sid, (p, c, r, names)))
     with ProcessPoolExecutor(workers) as ex:
-        futs = [(k, sid, ex.submit(cut_lnw if k == 'lnw' else cut_scenes, a)) for k, sid, a in jobs]
+        futs = [(k, sid, ex.submit(cut_lnw if k == 'lnw' else cut_scenes, a + ((k,) if k != 'lnw' else ()))) for k, sid, a in jobs]
         for k, sid, f in futs:
             res = f.result()
             report[k][sid] = res[1:] if k != 'lnw' else {'rc': res[1], 'err': res[2]}
