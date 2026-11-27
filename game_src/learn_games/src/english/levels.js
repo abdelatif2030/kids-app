@@ -69,7 +69,10 @@ const IT_NAMES = { animals: 'Gli animali', first: 'Le mie prime parole', family:
   colorful: 'Cose colorate', routine: 'La mia giornata', numbers: 'I numeri', letters: "L'alfabeto", colors: 'I colori', shapes: 'Le forme', time: 'Giorni e mesi', tens: 'Numeri grandi', where: "Dov'è la palla?", beads: 'Le perle' };
 export const IT_LEVELS = EN_LEVELS.filter((l) => IT_WORDS.some(l.pick)).map((l) => {
   const k = l.id.slice(3);
-  return { ...l, id: `it_${k}`, mode: 'en', lang: 'it', ar: IT_NAMES[k] || l.ar, words: IT_WORDS, art: { ...l.art, lang: 'it' } };
+  // the owner's Italian-world pictures (2026-11-27): 16 badges in the order of docs/ITALIAN_IMAGE_PROMPTS.md, the sea map and the win picture
+  const BADGE = { animals: 0, first: 1, family: 2, food: 3, school: 4, world: 5, colorful: 6, routine: 7, numbers: 8, letters: 9, colors: 10, shapes: 11, time: 12, where: 13, beads: 14, tens: 15, around: 1, home: 2, city: 5 };
+  const art = BADGE[k] !== undefined ? { ...l.art, lang: 'it', icon: `it_i${BADGE[k]}`, map: 'it_map', win: 'it_win' } : { ...l.art, lang: 'it' };
+  return { ...l, id: `it_${k}`, mode: 'en', lang: 'it', ar: IT_NAMES[k] || l.ar, words: IT_WORDS, art };
 });
 export const isItalianLevel = (id) => typeof id === 'string' && id.startsWith('it_');
 export const isEnglishLevel = (id) => typeof id === 'string' && id.startsWith('en_');

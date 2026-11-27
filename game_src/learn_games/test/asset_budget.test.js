@@ -12,11 +12,11 @@ test('no picture of the game is larger than 300 KB', () => {
   assert.deepEqual(big.map(([f, s]) => `${f} ${Math.round(s / 1024)}KB`), []);
 });
 
-test('character clips are under 1 MB each and the art folder under 60 MB', () => {
+test('character clips are under 1 MB each and the art folder under 90 MB (the 3,600 example pictures of the owner, 2026-11-27, are 41 MB of it)', () => {
   const big = sizes(join(GAMES, 'clips')).filter(([, s]) => s > 1024 * 1024);
   assert.deepEqual(big.map(([f]) => f), []);
   const total = sizes(join(GAMES, 'art')).reduce((a, [, s]) => a + s, 0);
-  assert.ok(total < 60 * 1024 * 1024, `art is ${Math.round(total / 1048576)} MB`);
+  assert.ok(total < 90 * 1024 * 1024, `art is ${Math.round(total / 1048576)} MB`);
 });
 
 test('the letters game bundle stays under 1.8 MB (minified; the English, German, French and Italian word lists are inside)', () => {

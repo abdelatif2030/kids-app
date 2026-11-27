@@ -277,10 +277,14 @@ class _LanguageCard extends StatelessWidget {
 
   Widget _art() {
     if (lang.id == 'it') {
-      // painted like the others until the owner's picture arrives: warm sky, a pizza and a bell tower in emoji
-      return DecoratedBox(
-        decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFFFE2B8), Color(0xFFFFF6D8)])),
-        child: Center(child: Padding(padding: EdgeInsets.only(bottom: width * 0.18), child: Text('🍕🏛️', style: TextStyle(fontSize: width * 0.34)))),
+      // the owner's Italian card (2026-11-27); the painted one (warm sky, pizza and a bell tower) stays as the fallback
+      return Image.asset(
+        'assets/games/learn_lang/it.webp',
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) => DecoratedBox(
+          decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFFFE2B8), Color(0xFFFFF6D8)])),
+          child: Center(child: Padding(padding: EdgeInsets.only(bottom: width * 0.18), child: Text('🍕🏛️', style: TextStyle(fontSize: width * 0.34)))),
+        ),
       );
     }
     if (lang.id == 'fr') {
