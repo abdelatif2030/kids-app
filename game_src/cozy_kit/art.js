@@ -152,10 +152,27 @@ export function loadGLBs(GLTFLoader, base, names) {
 
 /** A glTF vehicle as a game vehicle: scaled to [length] metres along z, wheels on the ground, nose toward +z after [yaw] (model facing is a per-pack fact).
  *  Returns the same fields the games' own bikes/trucks have (root, lean, rider, front, back, flames) so the race code runs unchanged. */
-export function makeModelVehicle(THREE, scene, { length = 4, yaw = 0, tint = null } = {}) {
+let _glowTex = null;
+function glowTexture(THREE) {
+  if (_glowTex) return _glowTex;
+  const cv = document.createElement('canvas'); cv.width = cv.height = 128;
+  const g = cv.getContext('2d');
+  const gr = g.createRadialGradient(64, 64, 2, 64, 64, 63);
+  gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.35, 'rgba(255,255,255,.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+  _glowTex = new THREE.CanvasTexture(cv);
+  return _glowTex;
+}
+
+export function makeModelVehicle(THREE, scene, { length = 4, yaw = 0, tint = null, lights = false } = {}) {
   const root = new THREE.Group(); const lean = new THREE.Group(); root.add(lean);
   const m = scene.clone(true);
-  m.traverse((o) => { if (o.isMesh && tint != null) { o.material = o.material.clone(); o.material.color.multiply(new THREE.Color(tint)); } });
+  const wheels = [];
+  m.traverse((o) => {
+    if (o.isMesh && tint != null) { o.material = o.material.clone(); o.material.color.multiply(new THREE.Color(tint)); }
+    if (o.isMesh && o.material && o.material.isMeshStandardMaterial) o.material.envMapIntensity = 0.9; // sunset reflections on the paint
+    if (/wheel/i.test(o.name || '')) { o.rotation.order = 'YXZ'; wheels.push({ o, front: /front/i.test(o.name) }); }
+  });
   const box0 = new THREE.Box3().setFromObject(m); const size = box0.getSize(new THREE.Vector3());
   const k = length / Math.max(size.z, size.x);
   m.scale.setScalar(k); m.rotation.y = yaw;
@@ -164,8 +181,36 @@ export function makeModelVehicle(THREE, scene, { length = 4, yaw = 0, tint = nul
   lean.add(m);
   const shadow = new THREE.Mesh(new THREE.CircleGeometry(length * 0.55, 20), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.28, depthWrite: false }));
   shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.04; shadow.scale.set(0.75, 1.15, 1); root.add(shadow);
-  const dummy = { rotation: { x: 0, y: 0, z: 0 }, position: { x: 0, y: 0, z: 0 } };
-  return { root, lean, rider: { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } }, front: dummy, back: { rotation: { x: 0 } }, flames: { visible: false, scale: { setScalar() {}, set() {} } }, model: true };
+  // wheel radius in world units, from a wheel's own bounding box after scaling
+  let radius = length * 0.08;
+  if (wheels.length) { const wb = new THREE.Box3().setFromObject(wheels[0].o); radius = Math.max(0.05, (wb.max.y - wb.min.y) / 2); }
+  // headlight / taillight glow at dusk: soft additive sprites at the body extremes; brake brightens the rear pair
+  let brakeMats = [];
+  if (lights) {
+    const tex = glowTexture(THREE);
+    const mkGlow = (color, x, y, z, s, op) => {
+      const mat = new THREE.SpriteMaterial({ map: tex, color, transparent: true, opacity: op, blending: THREE.AdditiveBlending, depthWrite: false });
+      const sp = new THREE.Sprite(mat); sp.position.set(x, y, z); sp.scale.set(s, s, 1); lean.add(sp); return mat;
+    };
+    const hw = size.x * 0.32, hy = size.y * 0.45, ry = size.y * 0.62, fz = size.z / 2 + 0.06, rz = -size.z / 2 - 0.06;
+    mkGlow(0xffd9a0, -hw, hy, fz, 0.85, 0.85); mkGlow(0xffd9a0, hw, hy, fz, 0.85, 0.85);
+    brakeMats = [mkGlow(0xff3524, -hw, ry, rz, 0.6, 0.6), mkGlow(0xff3524, hw, ry, rz, 0.6, 0.6)];
+  }
+  const veh = {
+    root, lean, wheels, radius, model: true,
+    rider: { position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 } },
+    front: { rotation: { x: 0, y: 0, z: 0 }, position: { x: 0, y: 0, z: 0 } },
+    back: { rotation: { x: 0 } },
+    flames: { visible: false, scale: { setScalar() {}, set() {} } },
+    /** Roll the wheels at ground speed [v] (m/s); front wheels also steer by [steer] radians. */
+    spin(v, dt, steer = 0) {
+      if (!wheels.length || dt <= 0) return;
+      const d = (v * dt) / radius;
+      for (const w of wheels) { w.o.rotation.x += d; if (w.front) w.o.rotation.y = steer; }
+    },
+    setBrake(on) { for (const mt of brakeMats) mt.opacity = on ? 1.0 : 0.6; },
+  };
+  return veh;
 }
 
 // ---- OBJ + MTL models (Quaternius CC0 packs) ------------------------------------------------------------------------------

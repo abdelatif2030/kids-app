@@ -6,6 +6,9 @@
 import { Quarry, LEVELS, KINDS, MAXLV, normalizeSave, recordWin } from './sim.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const GEM_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 2, near: 1, win: 2 };
 
 const S = {
   title: ['محجر الجواهر', 'Gemlode Quarry'], play: ['يلا نبدأ', 'Play'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'],
@@ -52,6 +55,10 @@ class Game {
     this.easy = Number(config.age) > 0 && Number(config.age) <= 4;
     this.base = config.base || './';
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: GEM_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('gq-style')) document.head.append(h('style', { id: 'gq-style' }, css('gq', '#9a4be0', '#5a1fa8', '#ffe27a') + STYLE));
     this.root = h('div', { class: 'gq-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -109,7 +116,7 @@ class Game {
   _tap() {
     if (this.mode !== 'play') return;
     const q = this.q; const f = q.front(); const n = q.tapLoad();
-    if (n) { this.sound.play('drop'); const [x, y] = this.P(PAD[0], PAD[1], 2); this.fx.push({ kind: 'text', x, y: y - this.s, t: 0, text: `📦×${I.num(n)}`, col: '#fff' }); this.hintT = 99; }
+    if (n) { this.sound.play('drop'); this.voice.say('trick'); const [x, y] = this.P(PAD[0], PAD[1], 2); this.fx.push({ kind: 'text', x, y: y - this.s, t: 0, text: `📦×${I.num(n)}`, col: '#fff' }); this.hintT = 99; }
     else if (!f) { this.sound.play('no'); this._hint(I.t('wait')); }
   }
 
@@ -149,6 +156,7 @@ class Game {
   }
 
   startLevel(id) {
+    this.voice.say('go');
     this.level = id; this.q = new Quarry({ level: id, easy: this.easy });
     this.mode = 'play'; this.fx = []; this.vis = new Map(); this.hintT = 0; this.warnT = 0; this.endT = 0; this.needLayout = true;
     this._clear(); this.sound.setMode(true);
@@ -164,7 +172,7 @@ class Game {
     for (const k of KINDS) {
       if (!this.q.has(k) || (k === 'loader' && this.easy && !this.q.cfg.tools.includes('loader'))) continue;
       const cost = h('small', {}, ''); const pips = h('em', {}, '');
-      const b = h('button', { class: 'gq-pad', onclick: () => { if (this.q.buy(k)) { this.sound.play('buy'); this._buyFx(k); } else this.sound.play('no'); } },
+      const b = h('button', { class: 'gq-pad', onclick: () => { if (this.q.buy(k)) { this.sound.play('buy'); this.voice.say('charge'); this._buyFx(k); } else this.sound.play('no'); } },
         h('i', {}, ICON[k]), h('span', {}, I.t(k)), pips, cost);
       this.pads[k] = { b, cost, pips, key: '' }; this.panel.append(b);
     }
@@ -196,7 +204,7 @@ class Game {
   _won() {
     const q = this.q; const stars = q.stars();
     this.save = recordWin(this.save, this.level, stars); this.post({ type: 'save', save: this.save });
-    this.sound.play('win'); this.endT = 0.0001; this.confetti();
+    this.sound.play('win'); this.voice.say('win'); this.endT = 0.0001; this.confetti();
     this._pendingResult = { stars };
   }
 
@@ -245,9 +253,10 @@ class Game {
         case 'dig': if (this.clock - this.digSnd > 0.18) { this.digSnd = this.clock; this.sound.play('dig'); } this._sparkle(); break;
         case 'deliver': {
           this.sound.play('coin'); this.sound.play('horn');
+          this.voice.say('pickup');
           const [x, y] = this.P(GATE[0] - 1, GATE[1] - 1, 3.4); this.fx.push({ kind: 'text', x, y, t: 0, text: `+${I.num(e.pay)} 🪙`, col: '#ffe27a' }); break;
         }
-        case 'overflow': this.sound.play('warn'); this.warnT = 0; break;
+        case 'overflow': this.sound.play('warn'); this.voice.say('near'); this.warnT = 0; break;
         case 'won': this._won(); break;
         default: break;
       }
@@ -494,7 +503,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play') this.pauseGame(); }
-  dispose() { cancelAnimationFrame(this.raf); clearTimeout(this._ht); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
+  dispose() { cancelAnimationFrame(this.raf); clearTimeout(this._ht); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
 }
 
 const STYLE = `

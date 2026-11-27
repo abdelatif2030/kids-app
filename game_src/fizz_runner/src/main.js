@@ -8,6 +8,9 @@ import * as THREE from 'three';
 import { Run, ENVS, LANES, MISSIONS, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const FIZZ_CLIPS = { pickup: 2, trick: 3, charge: 2, bump: 2, near: 1, win: 2, lose: 2, go: 2 };
 
 const S = {
   title: ['فيزو الشاطر', 'Fizzo the Brave'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], high: ['أعلى النقاط', 'HIGH SCORE'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'], missions: ['المهمات', 'MISSIONS'],
@@ -99,6 +102,10 @@ class Game {
     this.save = normalizeSave(config.save);
     this.base = config.base || './';
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: FIZZ_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('fz-style')) document.head.append(h('style', { id: 'fz-style' }, css('fz', '#2a6ae8', '#0a2a98', '#ffe04a') + '.fz-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--u)*1.6);width:100%}.fz-env{border:calc(var(--u)*.5) solid #fff;border-radius:calc(var(--u)*3);font-family:inherit;color:#fff;font-weight:900;padding:calc(var(--u)*1.2);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.4);font-size:calc(var(--u)*2.6);min-height:calc(var(--u)*22);cursor:pointer;justify-content:flex-end}.fz-env.lock{filter:grayscale(1) brightness(.6)}.fz-menu{display:flex;flex-direction:column;gap:calc(var(--u)*1.6);width:100%}.fz-row{display:flex;justify-content:space-between;width:100%;font-weight:900;font-size:calc(var(--u)*3.2)}'));
     this.root = h('div', { class: 'fz-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -226,13 +233,14 @@ class Game {
 
   showSettings() {
     this._clear();
-    const b = h('button', { class: 'fz-btn', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); b.textContent = `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`; this.sound.play('tap'); } }, `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`);
+    const b = h('button', { class: 'fz-btn', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.voice.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); b.textContent = `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`; this.sound.play('tap'); } }, `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`);
     this.layer.append(h('div', { class: 'fz-dim' }, h('div', { class: 'fz-card' }, h('div', { class: 'fz-title' }, '⚙️ ', I.t('settings')), b, h('div', { class: 'fz-small' }, I.t('how')), h('button', { class: 'fz-btn dark', onclick: () => this.showMenu() }, I.t('back')))));
   }
 
   _clearThings() { for (const m of this.meshes ? this.meshes.values() : []) this.world.remove(m); this.meshes = new Map(); }
 
   start(i) {
+    this.voice.say('go');
     this.envIdx = i;
     this.run = new Run({ env: i, seed: (Date.now() & 0xffff) + 1, easy: this.age <= 4 });
     this._look(this.run.env.id); this._clearThings();
@@ -251,6 +259,7 @@ class Game {
   }
 
   _finish(won) {
+    this.voice.say(won ? 'win' : 'lose');
     const r = this.run; const sc = r.finalScore ?? Math.round(r.score);
     const best = this.save.best[this.envIdx] || 0; if (sc > best) this.save.best[this.envIdx] = sc;
     this.save.totalCans += r.cans; this.save.totalDist += Math.round(r.z);
@@ -270,10 +279,10 @@ class Game {
     const r = this.run;
     for (const e of r.step(dt)) {
       switch (e.type) {
-        case 'can': this.sound.play('can'); break; case 'jump': this.sound.play('jump'); break; case 'slide': this.sound.play('slide'); break; case 'land': this.sound.play('land'); break;
-        case 'stunt': this.sound.play('stunt'); this.fx.push({ t: 0, life: 1.1, text: '⭐ STUNT +300' }); break; case 'ramp': this.sound.play('jump'); break;
-        case 'power': this.sound.play('power'); this.fx.push({ t: 0, life: 1, text: { magnet: '🧲', shield: '🛡️', star: '⭐' }[e.kind] }); break;
-        case 'shieldHit': this.sound.play('shield'); this.shake = 0.4; break; case 'smash': this.sound.play('crash'); break;
+        case 'can': this.sound.play('can'); this.voice.say('pickup'); break; case 'jump': this.sound.play('jump'); break; case 'slide': this.sound.play('slide'); break; case 'land': this.sound.play('land'); break;
+        case 'stunt': this.sound.play('stunt'); this.voice.say('trick'); this.fx.push({ t: 0, life: 1.1, text: '⭐ STUNT +300' }); break; case 'ramp': this.sound.play('jump'); break;
+        case 'power': this.sound.play('power'); this.voice.say('charge'); this.fx.push({ t: 0, life: 1, text: { magnet: '🧲', shield: '🛡️', star: '⭐' }[e.kind] }); break;
+        case 'shieldHit': this.sound.play('shield'); this.voice.say('near'); this.shake = 0.4; break; case 'smash': this.sound.play('crash'); this.voice.say('bump'); break;
         case 'over': this.sound.play('crash'); this.shake = 0.8; this._finish(false); break; case 'won': this._finish(true); break;
         default: break;
       }
@@ -339,7 +348,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play' && !this.paused) this.togglePause(); }
-  dispose() { this.renderer.setAnimationLoop(null); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
+  dispose() { this.renderer.setAnimationLoop(null); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
 }
 
 const api = { start(el, config, post) { const g = new Game(el, config || {}, post); api.last = g; return { dispose: () => g.dispose(), pause: () => g.pause() }; } };

@@ -6,6 +6,9 @@
 import * as THREE from 'three';
 import { Race, COURSES, LAPS, KMH, TUBE_X, normalizeSave } from './sim.js';
 import { loadSprites, makeBillboardVehicle } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const AIR_CLIPS = { go: 2, nitro: 3, pickup: 2, bump: 3, lap: 2, win: 2, lose: 2, count: 1 };
 import { makePlane, makeRing, ringGeometry, Instancer, palm, pine, island, cliff, mountain, cloud, makeBridge, makePillar, makeArch, makeSky, makeSun } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name, clock } from './i18n.js';
@@ -36,6 +39,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: AIR_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.quality = { low: lowEnd() };
     if (!document.getElementById('ar-style')) document.head.append(h('style', { id: 'ar-style', text: CSS }));
     this.root = h('div', { class: 'ar-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -368,6 +375,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -472,6 +480,7 @@ class Game {
     const i = this.courseIndex;
     const c = COURSES[i];
     this.mode = 'results';
+    this.voice.say(r.place === 1 ? 'win' : 'lose');
     this.save.stars[c.id] = Math.max(this.save.stars[c.id] ?? 0, r.stars);
     if (!this.save.best[c.id] || r.time < this.save.best[c.id]) this.save.best[c.id] = Math.round(r.time * 100) / 100;
     if (i + 2 > this.save.unlocked && i + 1 < COURSES.length) this.save.unlocked = i + 2;
@@ -513,20 +522,21 @@ class Game {
     const events = race.step(dt);
     for (const e of events) {
       switch (e.type) {
-        case 'count': this.sound.play('count'); this._count(num(e.n)); break;
-        case 'go': this.sound.play('go'); this._count(t('go')); break;
+        case 'count': this.sound.play('count'); if (e.n >= 3) this.voice.say('count'); this._count(num(e.n)); break;
+        case 'go': this.sound.play('go'); this.voice.say('go'); this._count(t('go')); break;
         case 'ring':
           this.sound.play('ring', e);
+          this.voice.say('pickup');
           if (e.full) this.sound.play('full');
           this.ringModels[e.k].userData.flash = 0.45;
           if (e.golden) this._pop('+ ⚡');
           if (e.full && !this.toldBoost) { this.toldBoost = true; this.toast(t('boostNow'), 2.4); }
           break;
         case 'miss': this.sound.play('miss'); break;
-        case 'boost': this.sound.play('boost'); break;
-        case 'bump': this.sound.play('bump'); this.shake = 0.6; this._pop(t('bump')); break;
+        case 'boost': this.sound.play('boost'); this.voice.say('nitro'); break;
+        case 'bump': this.sound.play('bump'); this.voice.say('bump'); this.shake = 0.6; this._pop(t('bump')); break;
         case 'edge': if (!this._edgeT || time - this._edgeT > 0.6) { this.sound.play('edge'); this._edgeT = time; } break;
-        case 'lap': this.sound.play('lap'); this.toast(t('lapNow'), 2); break;
+        case 'lap': this.sound.play('lap'); this.voice.say('lap'); this.toast(t('lapNow'), 2); break;
         case 'finish':
           this.sound.play('finish');
           this._count('🏁');
@@ -703,6 +713,8 @@ class Game {
   dispose() {
     clearInterval(this._pill);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
       if (this.scene) this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });

@@ -7,6 +7,9 @@
 import { Run, W, H, UPGRADES, PAINTS, ENEMY, normalizeSave, upgradeLevel, buyUpgrade, buyPaint, qualifies, addScore } from './sim.js';
 import { paintSky, drawCloud, drawIsland, drawPlane, drawEnemy, drawBoss, drawBird, drawCageItem, drawPickup, drawBubble, drawEnemyBullet, drawPopBurst, PAINT_COLORS, ART } from './art.js';
 import { loadArt } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const CAPY_CLIPS = { go: 2, trick: 3, pickup: 2, charge: 2, bump: 3, near: 2, win: 2, lose: 2 };
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num } from './i18n.js';
 
@@ -138,6 +141,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: CAPY_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('sc-style')) document.head.append(h('style', { id: 'sc-style' }, CSS));
     this.root = h('div', { class: 'sc-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -239,7 +246,7 @@ class Game {
   _saveNow() { this.post({ type: 'save', save: JSON.parse(JSON.stringify(this.save)) }); }
   _soundBtn() {
     const b = h('button', { class: 'sc-round', 'aria-label': 'sound' }, this.sound.muted ? '🔇' : '🔊');
-    b.addEventListener('click', (e) => { e.stopPropagation(); this.sound.unlock(); this.sound.setMuted(!this.sound.muted); this.save.muted = this.sound.muted; this._saveNow(); b.textContent = this.sound.muted ? '🔇' : '🔊'; });
+    b.addEventListener('click', (e) => { e.stopPropagation(); this.sound.unlock(); this.sound.setMuted(!this.sound.muted); this.voice.setMuted(this.sound.muted); this.save.muted = this.sound.muted; this._saveNow(); b.textContent = this.sound.muted ? '🔇' : '🔊'; });
     return b;
   }
   _exitBtn() { return h('button', { class: 'sc-round', 'aria-label': t('exit'), onclick: () => { this._saveNow(); this.post({ type: 'exit' }); } }, getLang() === 'en' ? '←' : '→'); }
@@ -294,6 +301,7 @@ class Game {
   }
 
   startRun() {
+    this.voice.say('go');
     this.run = new Run(this.save, Math.floor(Math.random() * 1e9), this.easy);
     this.mode = 'play';
     this.fx = []; this.texts = []; this.pops.clear();
@@ -415,6 +423,7 @@ class Game {
   _stageCard(rank) {
     const r = this.run;
     this.mode = 'card';
+    this.voice.say('win');
     this.sound.play('rank');
     this.layer.append(h('div', { class: 'sc-dim' }, h('div', { class: 'sc-card' },
       h('div', { class: 'sc-title' }, t('clear')),
@@ -428,6 +437,7 @@ class Game {
   _gameOver() {
     const r = this.run;
     this.mode = 'over';
+    this.voice.say('lose');
     this.sound.play('dead');
     this.save.feathers = Math.min(99999, this.save.feathers + r.feathers);
     this.save.best = Math.max(this.save.best, r.score);
@@ -496,23 +506,24 @@ class Game {
       case 'hit': this.sound.play('hit'); if (e.dmg) this.texts.push({ x: e.x, y: e.y - 4, text: `-${Math.round(e.dmg * 10) / 10 >= 1 ? Math.round(e.dmg) : e.dmg.toFixed(1)}`, c: '#fff', k: 0 }); break;
       case 'pop':
         this.sound.play('pop', r.combo);
+        this.voice.say('trick');
         this.fx.push({ k: 0, kind: 'pop', x: e.x, y: e.y, s: ENEMY[e.kind].r * 2, e: e.kind });
         this.texts.push({ x: e.x, y: e.y - 6, text: `+${num(e.pts)}`, c: '#ffd23a', k: 0 });
         if (!this.save.badges.includes('firstpop')) { this.save.badges.push('firstpop'); this._saveNow(); this._ach(t('firstPop')); }
         break;
-      case 'pearl': this.sound.play('pearl', Math.min(8, r.pearls % 9)); break;
+      case 'pearl': this.sound.play('pearl', Math.min(8, r.pearls % 9)); this.voice.say('pickup'); break;
       case 'feather': this.sound.play('feather'); break;
-      case 'capsule': this.sound.play('capsule'); this._toast(`💊 ${t(e.cap)}`, 1.8); break;
-      case 'rescue': this.sound.play('rescue'); this._toast(`🐦 ${t('hintBird')} (${t(e.bird)})`, 2.6); break;
+      case 'capsule': this.sound.play('capsule'); this.voice.say('charge'); this._toast(`💊 ${t(e.cap)}`, 1.8); break;
+      case 'rescue': this.sound.play('rescue'); this.voice.say('charge'); this._toast(`🐦 ${t('hintBird')} (${t(e.bird)})`, 2.6); break;
       case 'wingshot': if (Math.random() < 0.35) this.sound.play('chirp'); break;
       case 'heal': this.texts.push({ x: e.x, y: e.y - 8, text: '+6', c: '#7af05a', k: 0 }); break;
-      case 'hurt': this.sound.play('hurt'); this.shake = 0.35; this.texts.push({ x: e.x, y: e.y - 6, text: `-${e.dmg}`, c: '#ff6a6a', k: 0 }); break;
+      case 'hurt': this.sound.play('hurt'); this.voice.say('bump'); this.shake = 0.35; this.texts.push({ x: e.x, y: e.y - 6, text: `-${e.dmg}`, c: '#ff6a6a', k: 0 }); break;
       case 'storm': this.sound.play('storm'); break;
-      case 'combo': if (e.mult > 1) this.sound.play('combo', e.mult); break;
-      case 'thief': this._banner(t('thief'), t('thiefSub'), 2.4); this.sound.play('boss'); break;
+      case 'combo': if (e.mult > 1) { this.sound.play('combo', e.mult); this.voice.say('trick'); } break;
+      case 'thief': this._banner(t('thief'), t('thiefSub'), 2.4); this.sound.play('boss'); this.voice.say('near'); break;
       case 'loot': this.texts.push({ x: e.x, y: e.y - 8, text: '🪶 +6', c: '#ffd23a', k: 0 }); this.sound.play('feather'); break;
-      case 'boss': this.sound.play('boss'); this._banner('⚓', t('hintBoss'), 2.4); break;
-      case 'bossdown': this.sound.play('rank'); this.shake = 0.6; break;
+      case 'boss': this.sound.play('boss'); this.voice.say('near'); this._banner('⚓', t('hintBoss'), 2.4); break;
+      case 'bossdown': this.sound.play('rank'); this.voice.say('win'); this.shake = 0.6; break;
       default:
     }
     // contextual hints, once each
@@ -616,6 +627,8 @@ class Game {
     cancelAnimationFrame(this._raf);
     clearInterval(this._pill); clearTimeout(this._tt); clearTimeout(this._bt);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis);
     window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey);

@@ -11,7 +11,7 @@ const badge = (n) => (n > 0 ? h('span', { class: 'fq-badge' }, n) : null);
 
 export function menuView(g) {
   const mb = (cls, ic, label, fn, n) => h('button', { class: `fq-mb ${cls}`, onclick: () => { g.sound.play('tap'); fn(); } }, h('i', {}, ic), label, badge(n));
-  const play = h('button', { class: 'fq-btn gold big', style: 'position:relative', onclick: () => { g.sound.play('ok'); g.go('map'); } }, '▶ ', g.t('play'), badge(L.levelsReady(g.save)));
+  const play = h('button', { class: 'fq-btn gold big', style: 'position:relative', onclick: () => { g.sound.play('ok'); g.voice.say('go'); g.go('map'); } }, '▶ ', g.t('play'), badge(L.levelsReady(g.save)));
   const grid = h('div', { class: 'fq-menu' },
     mb('', '👗', g.t('m_studio'), () => g.go('studio')), mb('p2', '💄', g.t('m_salon'), () => g.go('salon')), mb('p4', '🐶', g.t('m_pets'), () => g.go('pets')),
     mb('p3', '🏠', g.t('m_house'), () => g.go('house')), mb('', '🌟', g.t('m_runway'), () => g.go('runway')), mb('p4', '🎯', g.t('m_missions'), () => g.go('missions'), L.claimableCount(g.save)));

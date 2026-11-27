@@ -6,6 +6,9 @@
 import * as THREE from 'three';
 import { Trip, LEVELS, COLS, normalizeSave } from './sim.js';
 import { loadSprites, makePaintedFigure } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const FOX_CLIPS = { go: 2, pickup: 2, charge: 2, bump: 3, near: 1, win: 2 };
 import { mat, makeFox, makeVehicle, makeTrain, makeLog, makeTree, makeBerry, makeDen, laneTexture } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
@@ -35,6 +38,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: FOX_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.quality = { low: lowEnd() };
     if (!document.getElementById('fx-style')) document.head.append(h('style', { id: 'fx-style', text: CSS + CSS2 }));
     this.root = h('div', { class: 'fx-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -262,6 +269,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -306,6 +314,7 @@ class Game {
   }
 
   startLevel(i) {
+    this.voice.say('go');
     this._build(i);
     this.mode = 'play';
     this.paused = false;
@@ -360,6 +369,7 @@ class Game {
     this.save.berries += r.berries;
     if (i + 2 > this.save.unlocked && i + 1 < LEVELS.length) this.save.unlocked = i + 2;
     this._saveNow();
+    this.voice.say('win');
     const got = [true, r.berries >= tr.berries.length, r.bumps === 0];
     got.forEach((g, k) => { if (g) setTimeout(() => this.sound.play('star', k), 300 + k * 250); });
     const last = i + 1 >= LEVELS.length;
@@ -391,19 +401,21 @@ class Game {
       switch (e.type) {
         case 'hop': this.sound.play('hop'); break;
         case 'plop': this.sound.play('plop'); break;
-        case 'berry': this.sound.play('berry', e.n); break;
-        case 'cub': this.sound.play('cub'); this.toast(t('cub'), 1.6); break;
+        case 'berry': this.sound.play('berry', e.n); this.voice.say('pickup'); break;
+        case 'cub': this.sound.play('cub'); this.voice.say('charge'); this.toast(t('cub'), 1.6); break;
         case 'stop': if (Math.abs(e.r - tr.fox.r) < 4) this.sound.play('stop'); break;
         case 'bump':
           this.sound.play(e.why === 'splash' ? 'splash' : 'bump');
+          this.voice.say('bump');
           this._pop(e.why === 'splash' ? t('splash') : t('bump'), e.x, e.r);
           this._burst(e.x * C, -e.r * C, e.why === 'splash' ? 24 : 12);
           this.shake = 0.35;
           break;
-        case 'trainWarn': if (Math.abs(e.r - tr.fox.r) < 5) this.sound.play('trainWarn'); break;
+        case 'trainWarn': if (Math.abs(e.r - tr.fox.r) < 5) { this.sound.play('trainWarn'); this.voice.say('near'); } break;
         case 'train': if (Math.abs(e.r - tr.fox.r) < 6) this.sound.play('train'); break;
         case 'den':
           this.sound.play('den');
+          this.voice.say('win');
           this.hud.goal.textContent = t('welcome');
           for (let k = 0; k < tr.parade.length; k++) setTimeout(() => this.sound.play('march'), 300 + k * 300);
           break;
@@ -518,6 +530,8 @@ class Game {
   dispose() {
     clearInterval(this._pill);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
       if (this.scene) this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });

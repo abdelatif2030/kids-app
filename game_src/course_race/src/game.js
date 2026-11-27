@@ -6,6 +6,9 @@ import * as THREE from 'three';
 import { Race, ROUNDS, HALF, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const COURSE_CLIPS = { go: 2, nitro: 3, pickup: 2, charge: 2, trick: 2, bump: 3, win: 2, lose: 2, count: 1 };
 
 const THEME = {
   alien: { id: 'alien', glob: 'AlienSky', prefix: 'as', title: ['زومي في الفضا', 'Zoomi in Space'], icon: '👽', sky: 0x2a1060, fog: 0x4a2a90, panel: ['#7a3ad8', '#3a1a88'], accent: '#7affc8', end: ['الصاروخ', 'Rocket'], names: ['جزر الإقلاع', 'حقل النيازك', 'سباق الصاروخ', 'مدار الأقمار', 'عاصفة الشهب', 'قلب المجرة'] },
@@ -107,6 +110,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound(th.id);
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: COURSE_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     const p = th.prefix;
     this.p = p;
     if (!document.getElementById(`${p}-style`)) document.head.append(h('style', { id: `${p}-style` }, css(p, th.panel[0], th.panel[1], th.accent) + `.${p}-big{position:absolute;bottom:calc(var(--u)*5);width:calc(var(--u)*22);height:calc(var(--u)*22);border-radius:50%;border:calc(var(--u)*.8) solid #fff;font-family:inherit;font-weight:900;font-size:calc(var(--u)*4.4);color:#fff;background:linear-gradient(180deg,#6ae08a,#2fa85a);box-shadow:0 calc(var(--u)*1) calc(var(--u)*2) rgba(0,0,0,.4);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;pointer-events:auto}.${p}-count{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);font-size:calc(var(--u)*30);font-weight:900;color:#fff;-webkit-text-stroke:calc(var(--u)*1) rgba(0,0,0,.6);paint-order:stroke fill;pointer-events:none}`));
@@ -392,6 +399,7 @@ class Game {
     }
     this.post({ type: 'save', save: this.save });
     this.sound.play(q ? 'win' : 'lose');
+    this.voice.say(q ? 'win' : 'lose');
     this.layer.append(h('div', { class: `${p}-dim` }, h('div', { class: `${p}-card` },
       h('div', { class: `${p}-title` }, final && r.won ? I.t('win') : q ? I.t('qualified') : `${I.t('notq')}${I.num(r.cfg.qualify)}`),
       h('div', { class: `${p}-pill` }, `${I.t('place')}: ${I.num(r.p.place)}/${I.num(r.cfg.rivals + 1)}`),
@@ -418,24 +426,24 @@ class Game {
     const was = r.state;
     for (const e of r.step(dt)) {
       switch (e.type) {
-        case 'go': this.sound.play('go'); this.countEl.textContent = I.t('go'); setTimeout(() => this.countEl && (this.countEl.style.display = 'none'), 700); if (this.th.id === 'alien') this.hint(I.t('jetHint'), 3500); else this.hint(I.t('drag'), 3000); break;
+        case 'go': this.sound.play('go'); this.voice.say('go'); this.countEl.textContent = I.t('go'); setTimeout(() => this.countEl && (this.countEl.style.display = 'none'), 700); if (this.th.id === 'alien') this.hint(I.t('jetHint'), 3500); else this.hint(I.t('drag'), 3000); break;
         case 'jump': this.sound.play('jump'); break;
         case 'land': this.sound.play('land'); break;
-        case 'ring': this.sound.play('ring'); this.fx.push({ t: 0, life: 0.8, text: '⚡' }); break;
-        case 'power': this.sound.play('power'); this.fx.push({ t: 0, life: 0.8, text: '⭐' }); break;
-        case 'hit': this.sound.play('hit'); this.fx.push({ t: 0, life: 0.9, text: '💥' }); break;
-        case 'jet': this.sound.play('jet'); break;
+        case 'ring': this.sound.play('ring'); this.voice.say('pickup'); this.fx.push({ t: 0, life: 0.8, text: '⚡' }); break;
+        case 'power': this.sound.play('power'); this.voice.say('charge'); this.fx.push({ t: 0, life: 0.8, text: '⭐' }); break;
+        case 'hit': this.sound.play('hit'); this.voice.say('bump'); this.fx.push({ t: 0, life: 0.9, text: '💥' }); break;
+        case 'jet': this.sound.play('jet'); this.voice.say('nitro'); break;
         case 'fall': this.sound.play('fall'); break;
-        case 'bounce': this.sound.play('bounce'); break;
+        case 'bounce': this.sound.play('bounce'); this.voice.say('nitro'); break;
         case 'tube': this.sound.play('tube'); this.fx.push({ t: 0, life: 0.8, text: '🌀' }); break;
-        case 'smash': this.sound.play('smash'); { const o = this.objs.get(r.els.find((x) => x.kind === 'gate' && x.hit && !x.gone)?.id); const el = r.els.find((x) => x.kind === 'gate' && x.hit && !x.gone); if (el) el.gone = true; if (o && o.userData.panel) o.userData.panel.visible = false; } break;
+        case 'smash': this.sound.play('smash'); this.voice.say('trick'); { const o = this.objs.get(r.els.find((x) => x.kind === 'gate' && x.hit && !x.gone)?.id); const el = r.els.find((x) => x.kind === 'gate' && x.hit && !x.gone); if (el) el.gone = true; if (o && o.userData.panel) o.userData.panel.visible = false; } break;
         case 'finish': this._finish(); break;
         default: break;
       }
     }
     if (was === 'count') {
       const c = Math.ceil(r.go);
-      if (c !== this.lastCount && c > 0) { this.lastCount = c; this.countEl.textContent = I.num(c); this.sound.play('beep'); }
+      if (c !== this.lastCount && c > 0) { this.lastCount = c; this.countEl.textContent = I.num(c); this.sound.play('beep'); if (c >= 3) this.voice.say('count'); }
     }
     this.placeEl.textContent = `${I.t('place')} ${I.num(r.place)}/${I.num(r.cfg.rivals + 1)}`;
     this.barEl.style.width = `${Math.round(Math.max(0, Math.min(1, r.p.z / r.L)) * 100)}%`;
@@ -499,6 +507,8 @@ class Game {
   dispose() {
     this.renderer.setAnimationLoop(null);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis);
     window.removeEventListener('keydown', this._onKey);

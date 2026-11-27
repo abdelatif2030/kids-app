@@ -9,6 +9,9 @@ import { Roll, buildCity, THINGS, GOALS, STARS, PICK, HALF, normalizeSave } from
 import { kindGeometry, vcMat, makeGum, tileTexture } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const GUM_CLIPS = { go: 2, count: 1, pickup: 2, charge: 2, bump: 2, win: 2 };
 import { CSS, h } from './ui.js';
 
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
@@ -49,6 +52,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: GUM_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.quality = { low: lowEnd() };
     if (!document.getElementById('gb-style')) document.head.append(h('style', { id: 'gb-style', text: CSS }));
     this.root = h('div', { class: 'gb-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -297,6 +304,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -401,6 +409,7 @@ class Game {
     this.save.plays++;
     this._saveNow();
     this.sound.play('win');
+    this.voice.say('win');
     [0, 1, 2].forEach((k) => k < r.stars && setTimeout(() => this.sound.play('star', k), 700 + k * 280));
     this.layer.append(h('div', { class: 'gb-dim' }, h('div', { class: 'gb-card' },
       h('h2', {}, t('timeUp')),
@@ -442,10 +451,11 @@ class Game {
   _event(e, g) {
     const S = this.sound;
     switch (e.type) {
-      case 'count': S.play('count'); this._count(num(e.n)); break;
-      case 'go': S.play('go'); this._count(t('go')); setTimeout(() => this.mode === 'play' && !this.moved && this.toast(t('hint'), 3), 1200); break;
+      case 'count': S.play('count'); if (e.n >= 3) this.voice.say('count'); this._count(num(e.n)); break;
+      case 'go': S.play('go'); this.voice.say('go'); this._count(t('go')); setTimeout(() => this.mode === 'play' && !this.moved && this.toast(t('hint'), 3), 1200); break;
       case 'tick': S.play('tick', e.n); break;
       case 'stick': {
+        this.voice.say('pickup');
         const th = this.city[e.id];
         const grp = THINGS[e.kind].g;
         const rel = Math.min(1, e.s / (e.from * PICK));
@@ -464,6 +474,7 @@ class Game {
       }
       case 'bump':
         S.play('bump');
+        this.voice.say('bump');
         this.shake = 0.4;
         if ((this._tooBigT ?? 0) <= 0) { this.toast(t('tooBig'), 1.6); this._tooBigT = 6; }
         break;
@@ -477,6 +488,7 @@ class Game {
       }
       case 'bigger': {
         S.play('bigger');
+        this.voice.say('charge');
         const goal = GOALS[e.goal - 1];
         const next = GOALS[e.goal];
         this.hud.bigger.lastChild.textContent = next ? t('nowRoll', { x: getLang() === 'en' ? goal.en.toUpperCase() : goal.ar }) : name(goal);
@@ -629,6 +641,8 @@ class Game {
     clearTimeout(this._tt);
     clearTimeout(this._bT);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
       if (this.scene) this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });

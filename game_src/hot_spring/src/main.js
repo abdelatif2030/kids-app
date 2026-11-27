@@ -9,6 +9,9 @@ import { Village, SIZE, SPRING, GATE, TEAHOUSE, LANTERNS, LANTERN_AT, UPGRADES, 
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num } from './i18n.js';
 import { h, css } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const SPRING_CLIPS = { go: 2, trick: 2, pickup: 2, charge: 2, win: 2 };
 
 const CSS = css('hs', '#e0803a', '#a8431f', '#ffe08a') + `
 .hs-slice{display:inline-block;width:calc(var(--u)*3.6);height:calc(var(--u)*3.6);border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff3b8,#f2c250 65%,#c98a2a);border:calc(var(--u)*.35) solid #fff}
@@ -67,6 +70,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: SPRING_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('hs-style')) document.head.append(h('style', { id: 'hs-style' }, CSS));
     this.root = h('div', { class: 'hs-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -197,6 +204,7 @@ class Game {
   }
 
   start() {
+    this.voice.say('go');
     this.c = new Village({ easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1 });
     this.mode = 'play';
     this.paused = false;
@@ -242,6 +250,7 @@ class Game {
     this.save.guests += c.thawed;
     this.post({ type: 'save', save: this.save });
     this.sound.play('win');
+    this.voice.say('win');
     this.layer.append(h('div', { class: 'hs-dim' }, h('div', { class: 'hs-card' },
       h('div', { class: 'hs-title' }, '🏮 ', t('done')),
       h('div', { class: 'hs-small' }, t('doneText')),
@@ -308,11 +317,11 @@ class Game {
         case 'drop': this.sound.play('drop'); this.fx.push({ x: e.x, y: e.y - 1.2, text: '♨️', t: 0, life: 0.8 }); this._burst(SPRING.x, SPRING.y, 2); break;
         case 'splash': this.sound.play('splash'); break;
         case 'arrive': this.sound.play('arrive'); if (!this.said.guest) { this.said.guest = 1; this.hint(t('guestIn'), 3000); } break;
-        case 'thaw': this.sound.play('thaw'); this.fx.push({ x: e.x, y: e.y - 1.8, text: '😊', t: 0, life: 1.2 }); this._burst(e.x, e.y, 6); break;
-        case 'coin': this.sound.play('coin'); this.fx.push({ x: e.x, y: e.y - 1, text: `+${num(e.n)}`, t: 0, life: 1 }); break;
-        case 'tea': this.sound.play('tea'); this.fx.push({ x: e.x, y: e.y - 1.6, text: '🍵', t: 0, life: 1 }); break;
-        case 'buy': this.sound.play('buy'); this.hint(`${t('bought')}: ${t(UP_KEY[e.id])}`, 3200); this.fx.push({ x: e.x, y: e.y - 1.5, text: '✨', t: 0, life: 1.2 }); this._burst(e.x, e.y, 10); break;
-        case 'lantern': this.sound.play('lantern'); this.hint(t('lantern'), 3200); this._burst(LANTERNS[e.i].x, LANTERNS[e.i].y, 8); break;
+        case 'thaw': this.sound.play('thaw'); this.voice.say('trick'); this.fx.push({ x: e.x, y: e.y - 1.8, text: '😊', t: 0, life: 1.2 }); this._burst(e.x, e.y, 6); break;
+        case 'coin': this.sound.play('coin'); this.voice.say('pickup'); this.fx.push({ x: e.x, y: e.y - 1, text: `+${num(e.n)}`, t: 0, life: 1 }); break;
+        case 'tea': this.sound.play('tea'); this.voice.say('charge'); this.fx.push({ x: e.x, y: e.y - 1.6, text: '🍵', t: 0, life: 1 }); break;
+        case 'buy': this.sound.play('buy'); this.voice.say('charge'); this.hint(`${t('bought')}: ${t(UP_KEY[e.id])}`, 3200); this.fx.push({ x: e.x, y: e.y - 1.5, text: '✨', t: 0, life: 1.2 }); this._burst(e.x, e.y, 10); break;
+        case 'lantern': this.sound.play('lantern'); this.voice.say('charge'); this.hint(t('lantern'), 3200); this._burst(LANTERNS[e.i].x, LANTERNS[e.i].y, 8); break;
         case 'glow': this.sound.play('glow'); this.hint(t('glow'), 4000); break;
         case 'done': this._result(); break;
         default: break;
@@ -838,6 +847,8 @@ class Game {
     cancelAnimationFrame(this.raf);
     clearTimeout(this._ht);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis);
     window.removeEventListener('keydown', this._onKey);

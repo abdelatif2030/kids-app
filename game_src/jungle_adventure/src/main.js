@@ -7,6 +7,9 @@ import { Sim, P } from './sim.js';
 import { setPics, THEMES, drawSolid, drawLedge, drawSpikes, drawHero, drawBeetle, drawBat, drawCoin, drawRelic, drawPower, drawFlag, drawGoal, drawShield } from './art.js';
 import { Backdrop } from './backdrop.js';
 import { loadArt } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const JUNGLE_CLIPS = { pickup: 2, charge: 3, trick: 3, bump: 3, lap: 2, win: 2, lose: 2, count: 1 };
 import { Sound } from './audio.js';
 import { normalizeSave, applyLevel } from './save.js';
 import { HEROES, CATS, SHOP, ITEM, owns, buy, wear, lookOf } from './shop.js';
@@ -30,6 +33,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: this.save.hero === 'girl', clips: JUNGLE_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
 
     if (!document.getElementById('ja-style')) document.head.append(h('style', { id: 'ja-style', text: CSS }));
     this.root = h('div', { class: 'ja-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -188,6 +195,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -298,6 +306,7 @@ class Game {
   }
 
   startLevel(i) {
+    this.voice.say('count');
     setHero(this.save.hero); // the words follow whoever is playing
     this.levelIndex = i;
     const lv = LEVELS[i];
@@ -496,37 +505,40 @@ class Game {
       case 'jump': S.play('jump'); this._puff(p.x, p.y, '#e9dcc0', 4); break;
       case 'kick': S.play('kick'); this._puff(p.x + p.dir * -0.4, p.y - 0.7, '#e9dcc0', 4); break;
       case 'land': S.play('land', e.hard); if (e.hard) this._puff(p.x, p.y, '#e9dcc0', 6); break;
-      case 'coin': S.play('coin'); this._sparkle(e.x, e.y, '#ffe066', 4); break;
+      case 'coin': S.play('coin'); this.voice.say('pickup'); this._sparkle(e.x, e.y, '#ffe066', 4); break;
       case 'relic':
         S.play(e.all ? 'allRelics' : 'relic');
+        this.voice.say('charge');
         this.toast(e.all ? t('allRelics') : t('relic'), e.all ? `+${num(10)}` : '', 1.4);
         this._sparkle(e.x, e.y, '#7dffb0', 14);
         if (e.all) this.sim.coins += 10;
         break;
       case 'stomp':
         S.play('stomp');
+        this.voice.say('trick');
         setTimeout(() => S.play('coin'), 90);
         this._puff(e.x, e.y, '#ff8fb8', 8);
         this.particles.push({ x: e.x, y: e.y - 0.6, vx: 0, vy: -7, life: 0.7, max: 0.7, coin: true, g: 14 });
         break;
-      case 'hurt': S.play('hurt'); this.toast(t('ouch'), '', 0.7); break;
+      case 'hurt': S.play('hurt'); this.voice.say('bump'); this.toast(t('ouch'), '', 0.7); break;
       case 'fall': S.play('fall'); break;
       case 'respawn': S.play('respawn'); this._sparkle(p.x, p.y - 0.7, '#ffffff', 10); break;
-      case 'shield': S.play('shield'); this.toast(t('shield')); break;
+      case 'shield': S.play('shield'); this.voice.say('charge'); this.toast(t('shield')); break;
       case 'shieldPop': S.play('shieldPop'); break;
-      case 'magnet': S.play('magnet'); this.toast(t('magnet')); break;
-      case 'boots': S.play('boots'); this.toast(t('boots')); break;
-      case 'hourglass': S.play('hourglass'); this.toast(t('hourglass')); break;
-      case 'checkpoint': S.play('checkpoint'); this.toast(t('checkpoint'), '', 1); this._sparkle(e.x, e.y - 1.8, '#ff6b6b', 8); break;
+      case 'magnet': S.play('magnet'); this.voice.say('charge'); this.toast(t('magnet')); break;
+      case 'boots': S.play('boots'); this.voice.say('charge'); this.toast(t('boots')); break;
+      case 'hourglass': S.play('hourglass'); this.voice.say('charge'); this.toast(t('hourglass')); break;
+      case 'checkpoint': S.play('checkpoint'); this.voice.say('lap'); this.toast(t('checkpoint'), '', 1); this._sparkle(e.x, e.y - 1.8, '#ff6b6b', 8); break;
       case 'tick': S.play('tick'); break;
       case 'bonk': S.play('bonk'); break;
       case 'win':
         S.play('win');
+        this.voice.say('win');
         if (e.bonus) this.toast(t('timeBonus'), `+${num(e.bonus)}`, 1.6);
         this._sparkle(this.sim.goal.x, this.sim.goal.y - 2, '#ffd166', 30);
         this.endT = 1.8;
         break;
-      case 'lose': S.play('lose'); this.endT = 1.2; break;
+      case 'lose': S.play('lose'); this.voice.say('lose'); this.endT = 1.2; break;
       default:
     }
   }
@@ -725,6 +737,8 @@ class Game {
     clearInterval(this._pillTimer);
     cancelAnimationFrame(this.raf);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     this.ro.disconnect();
     window.removeEventListener('keydown', this._onKey);
     window.removeEventListener('keyup', this._onKey);

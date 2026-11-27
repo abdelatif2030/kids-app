@@ -6,6 +6,9 @@ import { Game, autoInput, STAGES, UPGRADES, SKINS, normalizeSave, buyUpgrade, bu
 import { Sound } from './audio.js';
 import { drawBackground, drawPlane, drawUfo, drawBoss, makeScenery, star4, SKIN_COLORS, THEMES } from './art.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const SKY_CLIPS = { trick: 3, pickup: 2, charge: 2, bump: 3, nitro: 2, near: 2, win: 2, lose: 2, count: 1 };
 
 const S = {
   title: ['طيار السحاب', 'Sky Ace'], play: ['العب', 'PLAY'], stages: ['المراحل', 'STAGES'], hangar: ['الورشة', 'HANGAR'], settings: ['الإعدادات', 'SETTINGS'],
@@ -35,6 +38,10 @@ class App {
     this.easy = Number(config.age || 5) <= 3;
     this.base = config.base || './';
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: this.girl, clips: SKY_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('sa-style')) document.head.append(h('style', { id: 'sa-style' }, css('sa', '#3a98f0', '#1a52b8', '#ffe14a') + `
 .sa-root{background:#8fd0ff}
 .sa-hud2{position:absolute;top:calc(var(--u)*15.5);left:calc(var(--u)*3);right:calc(var(--u)*3);display:flex;gap:calc(var(--u)*1.4);direction:ltr;align-items:center;pointer-events:none}
@@ -156,7 +163,7 @@ class App {
   }
 
   showSettings() {
-    const snd = this._btn(this.save.muted ? I.t('sndOff') : I.t('sndOn'), () => { this.save = { ...this.save, muted: !this.save.muted }; this.sound.setMuted(this.save.muted); this._persist(); this.showSettings(); }, 'dark');
+    const snd = this._btn(this.save.muted ? I.t('sndOff') : I.t('sndOn'), () => { this.save = { ...this.save, muted: !this.save.muted }; this.sound.setMuted(this.save.muted); this.voice.setMuted(this.save.muted); this._persist(); this.showSettings(); }, 'dark');
     const lang = this._btn(I.t('lang'), () => { const l = I.getLang() === 'en' ? 'ar' : 'en'; I.setLang(l); this.save = { ...this.save, lang: l }; this.root.setAttribute('dir', l === 'en' ? 'ltr' : 'rtl'); this._persist(); this.showSettings(); }, 'dark');
     this._screen('menu', this._card(I.t('settings'), snd, lang, this._btn(I.t('back'), () => this.showMenu())));
   }
@@ -178,6 +185,7 @@ class App {
       h('div', { class: 'sa-hud2' }, this.coinEl, this.x2El, this.pwEl), this.bossEl, this.banner, this.hint, this.bombEl);
     if (!this.save.tutorial) { this.hand = h('div', { class: 'sa-hand' }, '👆'); this.layer.append(this.hand); this.say(I.t('how'), 6000); } else this.hand = null;
     this.say(`${I.t('stage')} ${I.num(n)} — ${this._stageName(n)}`, 2400);
+    this.voice.say('count');
     this._soundPill();
   }
 
@@ -191,7 +199,7 @@ class App {
   }
 
   showResult(r) {
-    this.mode = 'result'; this.sound.setMode(null); this.sound.play(r.won ? 'win' : 'lose');
+    this.mode = 'result'; this.sound.setMode(null); this.sound.play(r.won ? 'win' : 'lose'); this.voice.say(r.won ? 'win' : 'lose');
     const before = this.save;
     this.save = finishStage({ ...this.save, tutorial: true }, this.stageN, r); this._persist();
     const stars = h('div', { class: 'sa-stars' }); for (let i = 0; i < 3; i++) stars.append(h('span', { class: i < r.stars ? '' : 'off' }, '⭐'));
@@ -241,14 +249,14 @@ class App {
         case 'shot': this.sound.play('shot'); break;
         case 'warn': this.sound.play('warn'); break;
         case 'fire': this.sound.play('efire'); break;
-        case 'hit': this.sound.play('hit'); this.shake = 0.35; this.flashEl.style.opacity = '0.35'; setTimeout(() => { this.flashEl.style.opacity = '0'; }, 120); break;
+        case 'hit': this.sound.play('hit'); this.voice.say('bump'); this.shake = 0.35; this.flashEl.style.opacity = '0.35'; setTimeout(() => { this.flashEl.style.opacity = '0'; }, 120); break;
         case 'shield': this.sound.play('shield'); break;
-        case 'kill': this.sound.play('pop'); break;
-        case 'coin': this.sound.play('coin'); break;
-        case 'power': this.sound.play('power'); this.say(I.t(`p_${e.kind}`), 1400); break;
-        case 'bomb': this.sound.play('bomb'); this.flashEl.style.background = '#fff'; this.flashEl.style.opacity = '0.8'; setTimeout(() => { this.flashEl.style.opacity = '0'; setTimeout(() => { this.flashEl.style.background = '#f33'; }, 300); }, 90); this.shake = 0.5; break;
+        case 'kill': this.sound.play('pop'); this.voice.say('trick'); break;
+        case 'coin': this.sound.play('coin'); this.voice.say('pickup'); break;
+        case 'power': this.sound.play('power'); this.voice.say('charge'); this.say(I.t(`p_${e.kind}`), 1400); break;
+        case 'bomb': this.sound.play('bomb'); this.voice.say('nitro'); this.flashEl.style.background = '#fff'; this.flashEl.style.opacity = '0.8'; setTimeout(() => { this.flashEl.style.opacity = '0'; setTimeout(() => { this.flashEl.style.background = '#f33'; }, 300); }, 90); this.shake = 0.5; break;
         case 'bossHit': this.sound.play('bosshit'); break;
-        case 'boss': this.sound.play('boss'); this.sound.setMode('boss'); this._banner(I.t('warn'), 2600); break;
+        case 'boss': this.sound.play('boss'); this.voice.say('near'); this.sound.setMode('boss'); this._banner(I.t('warn'), 2600); break;
         case 'bossPhase': this.sound.play('phase'); this._banner(I.t('phase'), 1800); break;
         case 'bossDown': this.sound.play('bomb'); this.shake = 0.6; break;
         case 'down': this.sound.play('hit'); break;
@@ -357,7 +365,7 @@ class App {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play') this.showPause(); }
-  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.root.remove(); }
+  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.root.remove(); }
 }
 
 void statsFor; void THEMES;

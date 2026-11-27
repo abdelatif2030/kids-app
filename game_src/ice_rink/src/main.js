@@ -8,6 +8,9 @@ import {
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 import { loadArt } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const RINK_CLIPS = { trick: 3, charge: 2, bump: 3, pickup: 2, near: 1, win: 2, lose: 2, count: 1 };
 // Pictures made for the game (assets/games/ice_rink/art/): when one is loaded it replaces the code-drawn hero or goblin.
 let ART = {};
 function pic(g, img, R) {
@@ -145,6 +148,10 @@ class Game {
     this.save = normalizeSave(config.save);
     this.base = config.base || './';
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: RINK_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('ir-style')) document.head.append(h('style', { id: 'ir-style' }, css('ir', '#4a8ad8', '#1f3e7a', '#ffe27a') + `
 .ir-root{background:#d4e6f4}
 .ir-gala{position:absolute;left:calc(var(--u)*2);right:calc(var(--u)*2);display:flex;align-items:center;gap:calc(var(--u)*1.6);background:rgba(255,255,255,.92);border-radius:99px;padding:calc(var(--u)*1.2) calc(var(--u)*2.4);pointer-events:auto;box-shadow:0 calc(var(--u)*.5) calc(var(--u)*1.4) rgba(30,60,110,.3);color:#1f3e7a;font-weight:900;font-size:calc(var(--u)*3.2);direction:ltr}
@@ -344,7 +351,7 @@ class Game {
   _soundPill() { const pill = h('button', { class: 'ir-soundpill', onclick: () => this.sound.unlock() }, I.t('sound')); this.layer.append(pill); const tick = () => { if (!this.root.isConnected) return; pill.style.display = !this.sound.ctx || this.sound.on || this.sound.muted ? 'none' : 'block'; setTimeout(tick, 600); }; tick(); }
   _persist() { this.post({ type: 'save', save: this.save }); }
   lvName(i) { return (I.getLang() === 'en' ? NAMES_EN : NAMES)[i - 1]; }
-  _muteBtn() { const b = h('button', { class: 'ir-round', 'aria-label': 'sound', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); b.textContent = this.save.muted ? '🔇' : '🔊'; this._persist(); } }, this.save.muted ? '🔇' : '🔊'); return b; }
+  _muteBtn() { const b = h('button', { class: 'ir-round', 'aria-label': 'sound', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.voice.setMuted(this.save.muted); b.textContent = this.save.muted ? '🔇' : '🔊'; this._persist(); } }, this.save.muted ? '🔇' : '🔊'); return b; }
 
   showMenu() {
     this.mode = 'menu'; this.layer.replaceChildren(); this.sound.setMode(false); this.sound.setMode('player');
@@ -391,6 +398,7 @@ class Game {
   }
 
   startLevel(n) {
+    this.voice.say('count');
     this.level = n; this.sim = createState(n, { seed: (Date.now() & 0xffff) + n, up: this.save.up });
     this.mode = 'play'; this.parts = []; this.texts = []; this.trails = []; this.glow = {}; this.hop = {}; this.ff = false; this.aim = null; this.armed = {}; this.galaOff = false; this.acc = 0; this.endTimer = 0; this.ended = false;
     this.sel = 'penguin'; this._buildBg(); this._levelBg = null;
@@ -467,14 +475,14 @@ class Game {
     const sd = this.sound; const now = performance.now();
     for (const e of evs) {
       switch (e.t) {
-        case 'launch': sd.play('whoosh', e.power); this._spark(e.x, e.y, '#fff', 'snow', 6); if (e.special) { sd.play('special'); this._ring(e.x, e.y, 14, '#ffe27a'); } break;
+        case 'launch': sd.play('whoosh', e.power); this._spark(e.x, e.y, '#fff', 'snow', 6); if (e.special) { sd.play('special'); this.voice.say('charge'); this._ring(e.x, e.y, 14, '#ffe27a'); } break;
         case 'hit': sd.play('hit'); this._ring(e.x, e.y, 4 + Math.min(6, e.v / 8), '#fff'); this._spark(e.x, e.y, '#ffe27a', 'star', 4); this.shake = Math.max(this.shake, Math.min(1, e.v / 45)); break;
-        case 'crystal': sd.play('crystal', e.v / 40); this.glow[e.id] = 1; this._spark(e.x, e.y, '#9fe8ff', 'star', 3); break;
+        case 'crystal': sd.play('crystal', e.v / 40); this.voice.say('pickup'); this.glow[e.id] = 1; this._spark(e.x, e.y, '#9fe8ff', 'star', 3); break;
         case 'wall': sd.play('wall', e.v / 40); if (e.v > 22) this._spark(e.x, e.y, '#fff', 'snow', 5); break;
-        case 'chain': sd.play('chain'); this._spark(e.x, e.y, '#ffd23a', 'star', 6); this._text(e.x, e.y - 3, '✨', '#fff', 1.2); break;
+        case 'chain': sd.play('chain'); this.voice.say('trick'); this._spark(e.x, e.y, '#ffd23a', 'star', 6); this._text(e.x, e.y - 3, '✨', '#fff', 1.2); break;
         case 'bump': sd.play('bump'); break;
-        case 'dmg': this._text(e.x, e.y, `-${e.v}`, e.side === 'foe' ? '#fff3a0' : '#ff7a7a', e.v > 14 ? 1.4 : 1); if (e.side === 'hero') sd.play('hurt'); break;
-        case 'puff': sd.play('squeak'); sd.play('puff'); this._spark(e.x, e.y, '#ffe27a', 'star', e.boss ? 40 : 14); this._spark(e.x, e.y, '#fff', 'snow', 10); this._ring(e.x, e.y, e.r * 2.5, '#ffe27a'); this.shake = Math.max(this.shake, e.boss ? 1 : 0.4); break;
+        case 'dmg': this._text(e.x, e.y, `-${e.v}`, e.side === 'foe' ? '#fff3a0' : '#ff7a7a', e.v > 14 ? 1.4 : 1); if (e.side === 'hero') { sd.play('hurt'); this.voice.say('bump'); } break;
+        case 'puff': sd.play('squeak'); sd.play('puff'); this.voice.say('trick'); this._spark(e.x, e.y, '#ffe27a', 'star', e.boss ? 40 : 14); this._spark(e.x, e.y, '#fff', 'snow', 10); this._ring(e.x, e.y, e.r * 2.5, '#ffe27a'); this.shake = Math.max(this.shake, e.boss ? 1 : 0.4); break;
         case 'wave': sd.play(e.kind === 'stomp' ? 'stomp' : 'wave'); this._ring(e.x, e.y, e.rad, e.kind === 'flame' ? '#ff8a3a' : e.kind === 'slam' ? '#ffe27a' : e.kind === 'stomp' ? '#ff6a6a' : '#9fe8ff'); this._spark(e.x, e.y, '#fff', 'snow', 16); this.shake = Math.max(this.shake, 0.8); break;
         case 'special': this._ring(e.x, e.y, 10, '#ffe27a'); break;
         case 'throw': sd.play('throw'); break;
@@ -485,10 +493,10 @@ class Game {
         case 'spawn': this._spark(e.x, e.y, '#fff', 'snow', 10); sd.play('puff'); break;
         case 'stunned': this._text(e.x, e.y - 3, '💫', '#fff', 1.4); break;
         case 'burn': this._text(e.x, e.y - 3, '🔥', '#fff', 1.2); break;
-        case 'heroKO': this._text(e.x, e.y - 3, `💤 ${I.t('ko')}`, '#fff', 1.2); sd.play('lose'); break;
-        case 'phase': if (e.phase === 'enemy') { this._banner('foe'); sd.setMode('enemy'); } else { this._banner('you'); sd.setMode(LEVELS[this.level - 1].boss ? 'boss' : 'player'); this.ff = false; } break;
-        case 'won': this.endTimer = 1.1; this.ended = 'won'; break;
-        case 'lost': this.endTimer = 1.1; this.ended = 'lost'; break;
+        case 'heroKO': this._text(e.x, e.y - 3, `💤 ${I.t('ko')}`, '#fff', 1.2); sd.play('lose'); this.voice.say('bump'); break;
+        case 'phase': if (e.phase === 'enemy') { this._banner('foe'); this.voice.say('near'); sd.setMode('enemy'); } else { this._banner('you'); sd.setMode(LEVELS[this.level - 1].boss ? 'boss' : 'player'); this.ff = false; } break;
+        case 'won': this.endTimer = 1.1; this.ended = 'won'; this.voice.say('win'); break;
+        case 'lost': this.endTimer = 1.1; this.ended = 'lost'; this.voice.say('lose'); break;
         default: break;
       }
     }
@@ -666,7 +674,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play') this.showPause(); }
-  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); this.root.remove(); }
+  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); this.root.remove(); }
 }
 
 void teamHp; void teamMax; void foes;

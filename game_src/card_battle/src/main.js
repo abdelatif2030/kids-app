@@ -8,6 +8,9 @@ import { drawUnit, drawPlayerBase, drawUFO, drawCardIcon, ground, bar, glow, blo
 import { loadArt } from '../../cozy_kit/art.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const CARD_CLIPS = { trick: 3, bump: 2, charge: 2, win: 2, lose: 2, count: 1 };
 
 const S = {
   title: ['معركة الكروت النيون', 'Neon Card Battle'], play: ['يلا نقاتل!', 'Battle!'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'],
@@ -39,6 +42,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: CARD_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.diff = this.save.diff;
     if (!document.getElementById('cb-style')) document.head.append(h('style', { id: 'cb-style' }, css('cb', '#3a2a8a', '#12083a', '#35f0ff') + CSS));
     this.root = h('div', { class: 'cb-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -272,6 +279,7 @@ class Game {
   }
 
   start() {
+    this.voice.say('count');
     this._menuPic(false);
     this.mode = 'play'; this.layer.replaceChildren(); this.parts = []; this.texts = []; this.beams = []; this.fxs = []; this.sel = -1; this.endT = 0; this.shake = 0;
     this.battle = new Battle({ seed: (Date.now() & 0xffffff) + 1, difficulty: this.diff });
@@ -311,7 +319,7 @@ class Game {
   }
 
   _say(text) { this.banner.textContent = text; this.banner.classList.remove('go'); void this.banner.offsetWidth; this.banner.classList.add('go'); }
-  _toggleSound() { this.sound.setMuted(!this.sound.muted); this.save.muted = this.sound.muted; if (this.soundBtn) this.soundBtn.textContent = this.sound.muted ? '🔇 ' + I.t('soundOff') : '🔊 ' + I.t('soundOn'); this.post({ type: 'save', save: this.save }); }
+  _toggleSound() { this.sound.setMuted(!this.sound.muted); this.voice.setMuted(this.sound.muted); this.save.muted = this.sound.muted; if (this.soundBtn) this.soundBtn.textContent = this.sound.muted ? '🔇 ' + I.t('soundOff') : '🔊 ' + I.t('soundOn'); this.post({ type: 'save', save: this.save }); }
 
   pauseGame() { if (this.mode !== 'play') return; this.mode = 'pause'; this.drag = null; if (this.ghostEl) this.ghostEl.style.display = 'none'; this.sound.suspend(); this.showPause(); }
   showPause() {
@@ -413,8 +421,9 @@ class Game {
       case 'shot': snd.play(e.proj === 'goo' ? 'goo' : 'laser'); this._spark(e.x, e.y, 0.9, e.proj === 'goo' ? '#9aff5a' : '#7af8ff', 3, 0.3); break;
       case 'hit': snd.play('hit'); this._burst(e.tx, e.ty, 4, ['#fff', UNIT_SIDE_COL[e.side]], 2); break;
       case 'impact': this._burst(e.x, e.y, 5, [e.proj === 'goo' ? '#9aff5a' : '#7af8ff', '#fff'], 2.2); break;
-      case 'dmg': this._float(e); if (e.base) { snd.play('baseHit'); this.shake = Math.max(this.shake, e.side === 0 ? 5 : 2); } break;
+      case 'dmg': this._float(e); if (e.base) { snd.play('baseHit'); if (e.side === 0) this.voice.say('bump'); this.shake = Math.max(this.shake, e.side === 0 ? 5 : 2); } break;
       case 'die': {
+        if (e.side === 1) this.voice.say('trick');
         this._burst(e.x, e.y, e.silent ? 8 : 22, e.side === 0 ? ['#35e0ff', '#fff', '#8aa0ff'] : ['#ff3fd0', '#a0ff5a', '#fff'], 4.5);
         this._ring(e.x, e.y, 0.9, e.side === 0 ? '#35e0ff' : '#ff3fd0');
         snd.play('boom'); break;
@@ -426,8 +435,8 @@ class Game {
       }
       case 'plasma': this._burst(e.x, e.y, 36, ['#35f0ff', '#fff', '#a0f0ff'], 6); this.shake = Math.max(this.shake, 7); break;
       case 'heal': this.parts.push({ x: e.x + (Math.random() - 0.5) * 0.6, y: e.y, z: 0.3, vx: 0, vy: 0, vz: 1.4, life: 0.8, max: 0.8, col: '#7affa0', size: 0.2, kind: 'plus' }); break;
-      case 'double': snd.play('double'); this._say(I.t('double')); snd.setMode(true, true); break;
-      case 'win': case 'lose': case 'draw': this._endFx(e.type); break;
+      case 'double': snd.play('double'); this.voice.say('charge'); this._say(I.t('double')); snd.setMode(true, true); break;
+      case 'win': case 'lose': case 'draw': if (e.type !== 'draw') this.voice.say(e.type); this._endFx(e.type); break;
       default: break;
     }
   }
@@ -613,7 +622,7 @@ class Game {
 
   pause() { if (this.mode === 'play') this.pauseGame(); else this.sound.suspend(); }
   dispose() {
-    cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect();
+    cancelAnimationFrame(this.raf); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey);
     this.root.remove();
   }

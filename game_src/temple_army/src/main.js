@@ -9,6 +9,9 @@ import { Sound } from './audio.js';
 import { makeBot } from './bot.js';
 import * as Art from './art.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const TEMPLE_CLIPS = { charge: 3, trick: 3, pickup: 2, bump: 3, near: 2, win: 2, lose: 2, count: 1 };
 
 const S = {
   title: ['جيش المعبد', 'TEMPLE ARMY'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], shop: ['المتجر', 'SHOP'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
@@ -34,6 +37,10 @@ class Game {
     this.age = Number(config.age) || 5; this.easy = this.age <= 4;
     this.save = normalizeSave(config.save); this.base = config.base || './';
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: TEMPLE_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.auto = /[?&]bot=1/.test(location.search);
     if (!document.getElementById('ta-style')) document.head.append(h('style', { id: 'ta-style' }, css('ta', '#2a8a5a', '#12503a', '#ffd23a') + TA_CSS));
     this.root = h('div', { class: 'ta-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -241,7 +248,7 @@ class Game {
 
   showSettings() {
     this._clear();
-    const b = h('button', { class: 'ta-btn', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); b.textContent = `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`; this.sound.play('tap'); } }, `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`);
+    const b = h('button', { class: 'ta-btn', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.voice.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); b.textContent = `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`; this.sound.play('tap'); } }, `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`);
     this.layer.append(h('div', { class: 'ta-dim ta-light' }, h('div', { class: 'ta-card' }, h('div', { class: 'ta-title' }, '⚙️ ', I.t('settings')), b, h('div', { class: 'ta-small' }, I.t('how')), h('button', { class: 'ta-btn dark', onclick: () => this.showMenu() }, I.t('back')))));
   }
 
@@ -263,6 +270,7 @@ class Game {
   }
 
   startLevel(i) {
+    this.voice.say('count');
     this.levelIdx = i; this.demo = false; this.run = new Run({ level: i, easy: this.easy, up: this.save.up });
     this.bot = this.auto ? makeBot() : null; this._buildLevel(this.run);
     this.mode = 'play'; this.paused = false; this.endAt = 0; this.shake = 0;
@@ -293,7 +301,7 @@ class Game {
     const r = this.run.result; const i = this.levelIdx; const s = this.save;
     if (r.won) { s.stars[i] = Math.max(s.stars[i] || 0, r.stars); s.unlocked = Math.max(s.unlocked, Math.min(LEVELS.length, i + 2)); s.best[i] = Math.max(s.best[i] || 0, r.survivors); }
     s.coins += r.coins; this.post({ type: 'save', save: s });
-    this.sound.setMode(null); this.sound.play(r.won ? 'win' : 'over'); if (r.won) this.sound.play('cheer');
+    this.sound.setMode(null); this.sound.play(r.won ? 'win' : 'over'); this.voice.say(r.won ? 'win' : 'lose'); if (r.won) this.sound.play('cheer');
     this.mode = 'end';
     const starsEl = h('div', { class: 'ta-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= r.stars ? '' : 'off' }, '⭐')));
     this.layer.append(h('div', { class: 'ta-dim' }, h('div', { class: 'ta-card' },
@@ -353,21 +361,21 @@ class Game {
     const run = this.run; const c = run.cap;
     for (const e of evs) {
       switch (e.type) {
-        case 'gate': snd.play(e.good ? 'gateGood' : 'gateBad'); this._float(c.x, 3.2, c.y, gateLabel(e.op, e.v), e.good ? '#7affb0' : '#ff7a6a'); this._burst(c.x, c.y, e.good ? 14 : 5, 1.5); if (e.good) snd.play('cheer'); break;
-        case 'cage': snd.play('cage'); snd.play('cheer'); this._float(c.x, 3, c.y, `+${e.count}`, '#7ad8ff'); { const q = run.lv.cages[e.id]; this._burst(q.x, q.y, 16, 1.2); this.anims.push({ t: 0, life: 0.6, id: e.id, kind: 'cage' }); } break;
-        case 'coin': snd.play('coin'); break;
+        case 'gate': snd.play(e.good ? 'gateGood' : 'gateBad'); this.voice.say(e.good ? 'charge' : 'bump'); this._float(c.x, 3.2, c.y, gateLabel(e.op, e.v), e.good ? '#7affb0' : '#ff7a6a'); this._burst(c.x, c.y, e.good ? 14 : 5, 1.5); if (e.good) snd.play('cheer'); break;
+        case 'cage': snd.play('cage'); snd.play('cheer'); this.voice.say('charge'); this._float(c.x, 3, c.y, `+${e.count}`, '#7ad8ff'); { const q = run.lv.cages[e.id]; this._burst(q.x, q.y, 16, 1.2); this.anims.push({ t: 0, life: 0.6, id: e.id, kind: 'cage' }); } break;
+        case 'coin': snd.play('coin'); this.voice.say('pickup'); break;
         case 'lever': snd.play('lever'); break;
         case 'sawBreak': { snd.play('sawBreak'); const q = run.lv.saws[e.id]; this._burst(q.x, q.y, 22, 1.5); this.shake = Math.max(this.shake, 0.35); break; }
-        case 'sawHit': case 'trapHit': snd.play('hit'); this.shake = Math.max(this.shake, 0.5); this.hit = 1; this._burst(c.x, c.y, 8, 1); break;
+        case 'sawHit': case 'trapHit': snd.play('hit'); this.voice.say('bump'); this.shake = Math.max(this.shake, 0.5); this.hit = 1; this._burst(c.x, c.y, 8, 1); break;
         case 'hurt': this._float(c.x, 3, c.y, `−${e.amount}`, '#ff6a5a'); break;
         case 'trapWarn': if (Math.hypot(run.lv.traps[e.id].x - c.x, run.lv.traps[e.id].y - c.y) < 16) snd.play('trapWarn'); break;
         case 'trapUp': if (Math.hypot(run.lv.traps[e.id].x - c.x, run.lv.traps[e.id].y - c.y) < 16) snd.play('trapUp'); break;
         case 'fightStart': snd.play('fight'); this.fightTick = 0; break;
-        case 'fightEnd': if (e.won) { snd.play('cheer'); this._float(c.x, 3.2, c.y, `⚔️ ${e.left}`, '#ffe04a'); } else this.hit = 1; break;
-        case 'bossStart': snd.play('roar'); this.shake = 0.5; snd.setMode && this.mode === 'play' && this.sound.setMode('boss'); break;
+        case 'fightEnd': if (e.won) { snd.play('cheer'); this.voice.say('trick'); this._float(c.x, 3.2, c.y, `⚔️ ${e.left}`, '#ffe04a'); } else { this.hit = 1; this.voice.say('bump'); } break;
+        case 'bossStart': snd.play('roar'); this.voice.say('near'); this.shake = 0.5; snd.setMode && this.mode === 'play' && this.sound.setMode('boss'); break;
         case 'tele': snd.play('tele'); this._teleStart(e); break;
         case 'impact': snd.play('slam'); this.shake = Math.max(this.shake, 0.7); this._burst(e.x, e.y, 14, 0.5); if (this.ent.boss) this.ent.boss.impact = 1; if (e.hit) this.hit = 1; this._teleEnd(); break;
-        case 'bossDown': snd.play('crumble'); this.shake = 0.9; if (this.ent.boss) this.ent.boss.down = 0.001; { const b = run.lv.boss; this._burst(b.x, b.y, 40, 2); } if (this.mode === 'play') this.sound.setMode('play'); break;
+        case 'bossDown': snd.play('crumble'); this.voice.say('win'); this.shake = 0.9; if (this.ent.boss) this.ent.boss.down = 0.001; { const b = run.lv.boss; this._burst(b.x, b.y, 40, 2); } if (this.mode === 'play') this.sound.setMode('play'); break;
         case 'exitOpen': snd.play('open'); break;
         case 'won': case 'over': break;
         default: break;
@@ -537,7 +545,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play' && !this.paused) this.togglePause(); }
-  dispose() { this.renderer.setAnimationLoop(null); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
+  dispose() { this.renderer.setAnimationLoop(null); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
 }
 
 const TA_CSS = `

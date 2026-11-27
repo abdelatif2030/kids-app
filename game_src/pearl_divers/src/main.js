@@ -9,6 +9,9 @@ import { Lagoon, LEDGES, RIVAL_GOAL, MAX_HIRE, MAX_UP, BELL_TIME, normalizeSave 
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 import { loadArt } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const PEARL_CLIPS = { go: 2, pickup: 2, charge: 2, win: 2 };
 
 const S = {
   title: ['غوّاصو اللؤلؤ', 'Pearl Divers'], play: ['يلا نغوص', 'Dive in'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], again: ['من الأول', 'Play again'],
@@ -52,6 +55,10 @@ class Game {
     loadArt(this.base, ART_NAMES).then((a) => { this.art = a; this._rivalFace(); });
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: PEARL_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('pd-style')) document.head.append(h('style', { id: 'pd-style' }, css('pd', '#2ab8d8', '#1a5a98', '#ffe04a') + `
 .pd-root{background:#1a6aa8;touch-action:manipulation}
 .pd-hud{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--u)*1.2);width:min(94%,calc(var(--u)*62));display:flex;flex-direction:column;gap:calc(var(--u)*1.2);pointer-events:none;direction:ltr}
@@ -144,6 +151,7 @@ class Game {
   }
 
   start() {
+    this.voice.say('go');
     this.l = new Lagoon({ seed: (Date.now() & 0xffff) + 1 });
     this.mode = 'play'; this.fx = []; this.coins = []; this.cam = 0; this.tappedOnce = false; this.bubbleT = 3.2; this.winT = 0; this.idleT = 0;
     this.layer.replaceChildren();
@@ -212,9 +220,12 @@ class Game {
     const l = this.l; const L = this._lay();
     l.step(dt);
     for (const e of l.drain()) {
+      if (e.type === 'clam') this.voice.say('pickup');
       if (e.type === 'clam' && Math.random() < 0.4) this.sound.play('clam');
+      if (e.type === 'buy') this.voice.say('charge');
       if (e.type === 'sold') {
         this.sound.play('sold');
+        this.voice.say('charge');
         const b = this._boatPos();
         this.fx.push({ x: b.x, y: Math.max(b.y, this.u * 16), t: 0, text: `+$${f(e.cash)}`, big: true });
         const n = Math.min(6, 2 + Math.floor(Math.log10(Math.max(10, e.cash))));
@@ -267,6 +278,7 @@ class Game {
     this.save.best = Math.max(this.save.best, Math.round(this.l.time));
     this.post({ type: 'save', save: this.save });
     this.sound.play('win');
+    this.voice.say('win');
     this.winT = 0.001;
     setTimeout(() => {
       if (!this.root.isConnected || this.mode !== 'play') return;
@@ -460,7 +472,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); }
-  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
+  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
 }
 
 const api = { start(el, config, post) { const g = new Game(el, config || {}, post); api.last = g; return { dispose: () => g.dispose(), pause: () => g.pause() }; } };

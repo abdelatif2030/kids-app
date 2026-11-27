@@ -6,6 +6,9 @@
 import * as THREE from 'three';
 import { Fight, STAGES, ARENA, normalizeSave } from './sim.js';
 import { loadSprites, makePaintedFigure } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const SAMURAI_CLIPS = { trick: 3, bump: 3, lap: 2, near: 2, win: 2, lose: 2, count: 1 };
 import {
   mat, makeSamurai, makeNinja, makeOni, makeShuriken, makeTorii, makeLantern, makeCherryTree, makeTemple,
   courtyardTexture, petalGeometry,
@@ -114,6 +117,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: this.save.hero === 'girl', clips: SAMURAI_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.quality = { low: lowEnd() };
     if (!document.getElementById('sa-style')) document.head.append(h('style', { id: 'sa-style', text: CSS + CSS2 + CSS3 }));
     this.root = h('div', { class: 'sa-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -436,6 +443,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -503,6 +511,7 @@ class Game {
     if (i !== this.stageIndex) this._buildScene(i);
     this.levelIndex = i;
     this.fight = new Fight({ stage: i, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1 });
+    this.voice.say('count');
     this.mode = 'play';
     this.paused = false;
     this.timeScale = 1;
@@ -592,7 +601,8 @@ class Game {
       this.save.best = Math.max(this.save.best, r.bestCombo);
       this._saveNow();
       this.sound.play('win');
-    } else this.sound.play('down');
+      this.voice.say('win');
+    } else { this.sound.play('down'); this.voice.say('lose'); }
     const hasNext = won && i + 1 < STAGES.length;
     const dim = h('div', { class: won ? 'sa-dim sa-win' : 'sa-dim' }, h('div', { class: 'sa-panel' },
       h('div', { class: 'sa-title' }, won ? t('win') : t('down')),
@@ -661,6 +671,7 @@ class Game {
       case 'hit': this.sound.play('hit'); this._spark(e.x, 1, e.z, 8); this.shake = 0.12; break;
       case 'kill': {
         this.sound.play('poof', e.combo);
+        this.voice.say('trick');
         this.petals.burst(e.x, 1, e.z, e.kind === 'big' ? 40 : 26, e.kind === 'big' ? 1.3 : 1);
         this._spark(e.x, 1, e.z, 12);
         this.shake = Math.max(this.shake, 0.1);
@@ -671,20 +682,23 @@ class Game {
         if (e.last) this._slowmo(0.7);
         break;
       }
-      case 'deflect': this.sound.play('deflect'); this._spark(e.x, 1, e.z, 10, 8); break;
+      case 'deflect': this.sound.play('deflect'); this.voice.say('trick'); this._spark(e.x, 1, e.z, 10, 8); break;
       case 'throw': this.sound.play('throw'); break;
       case 'wind': this.sound.play('wind'); break;
       case 'strike': this.sound.play('slash', 0); break;
       case 'hurt':
         this.sound.play('hurt');
+        this.voice.say('bump');
         this.shake = 0.35;
         this._hearts(e.hp, f.maxHp);
         break;
       case 'wave':
         this.sound.play('gong');
+        this.voice.say('lap');
         this._banner(`${t('wave')} ${num(e.n)}/${num(e.of)}`);
         break;
       case 'boss':
+        this.voice.say('near');
         this.sound.setMode('boss');
         this._banner(t('boss'), 2.2);
         this.hud.bossbar.style.display = 'block';
@@ -707,6 +721,7 @@ class Game {
         if (e.how === 'dash') this._slice(t('slice'), f.boss.x, f.boss.z);
         break;
       case 'bossDown':
+        this.voice.say('win');
         this._slowmo(1.2);
         this.petals.burst(e.x, 2.5, e.z, 160, 2.2);
         this._spark(e.x, 2.5, e.z, 60, 12);
@@ -932,6 +947,8 @@ class Game {
   dispose() {
     clearInterval(this._pill);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
       this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });

@@ -8,6 +8,9 @@ import * as THREE from 'three';
 import { Hunt, LEVELS, WALLS, AREA, LOOP, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const DRAGON_CLIPS = { trick: 3, nitro: 2, charge: 2, win: 2, count: 1 };
 
 const S = {
   title: ['تنين الجليد', 'Ice Dragon'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'],
@@ -74,6 +77,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: DRAGON_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('id-style')) document.head.append(h('style', { id: 'id-style' }, css('id', '#4ab8e8', '#1a4a98', '#bfffff')));
     this.root = h('div', { class: 'id-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -162,6 +169,7 @@ class Game {
 
   start(i) {
     this.levelIdx = i;
+    this.voice.say('count');
     this.run = new Hunt({ level: i, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1 });
     this.mode = 'play'; this.paused = false;
     this.layer.replaceChildren(); this.sound.setMode(true);
@@ -206,6 +214,7 @@ class Game {
     this.save.unlocked = Math.max(this.save.unlocked, Math.min(3, lv + 1));
     this.post({ type: 'save', save: this.save });
     this.sound.play('win');
+    this.voice.say('win');
     const last = this.levelIdx >= LEVELS.length - 1;
     this.layer.append(h('div', { class: 'id-dim' }, h('div', { class: 'id-card' }, h('div', { class: 'id-title' }, I.t('won')),
       h('div', { class: 'id-stars' }, [1, 2, 3].map((s) => h('span', { class: s <= r.stars ? '' : 'off' }, '⭐'))),
@@ -226,10 +235,10 @@ class Game {
       switch (e.type) {
         case 'volley': if (Math.random() < 0.4) this.sound.play('shoot'); break;
         case 'hit': break;
-        case 'break': this.sound.play('break'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 0.6, text: '💥' }); break;
-        case 'blast': this.sound.play('blast'); this.blastM.push({ x: e.x, z: e.z, t: 0 }); if (e.n > 0) this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: `×${e.n}` }); break;
-        case 'ally': this.sound.play('ally'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: '+2 🧙' }); break;
-        case 'triple': this.sound.play('triple'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: '🔱' }); break;
+        case 'break': this.sound.play('break'); this.voice.say('trick'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 0.6, text: '💥' }); break;
+        case 'blast': this.sound.play('blast'); if (e.n > 0) this.voice.say('nitro'); this.blastM.push({ x: e.x, z: e.z, t: 0 }); if (e.n > 0) this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: `×${e.n}` }); break;
+        case 'ally': this.sound.play('ally'); this.voice.say('charge'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: '+2 🧙' }); break;
+        case 'triple': this.sound.play('triple'); this.voice.say('trick'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: '🔱' }); break;
         case 'won': this._won(); break;
         default: break;
       }
@@ -287,7 +296,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play' && !this.paused) this.togglePause(); }
-  dispose() { this.renderer.setAnimationLoop(null); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
+  dispose() { this.renderer.setAnimationLoop(null); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
 }
 
 void LOOP;

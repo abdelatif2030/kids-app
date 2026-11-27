@@ -6,6 +6,9 @@ import { Game, makeLevel, normalizeSave, LEVELS, TRAY_CAP, COMBO_TIME, BONUS_MAX
 import { Sound } from './audio.js';
 import { buildSprites, drawBackground, SP, SPRITE_FILL } from './sprites.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const SWEET_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 2, bump: 2, win: 2, lose: 2 };
 
 const S = {
   title: ['طبق الحلويات', 'Sweet Tray'], play: ['يلا نلعب', 'Play'], levels: ['المراحل', 'Levels'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'],
@@ -32,6 +35,10 @@ class UI {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: SWEET_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('st-style')) document.head.append(h('style', { id: 'st-style' }, css('st', '#ff9ec7', '#e8609a', '#fff2a8') + `
 .st-root{background:#ffe9f1}
 .st-badge{display:flex;flex-direction:column;align-items:center;line-height:1;background:linear-gradient(180deg,#ffb0d2,#ee6ca4);border:calc(var(--u)*.6) solid #fff;border-radius:calc(var(--u)*3.4);padding:calc(var(--u)*.8) calc(var(--u)*4.5);box-shadow:0 calc(var(--u)*.7) calc(var(--u)*1.4) rgba(120,30,70,.4)}
@@ -166,7 +173,7 @@ class UI {
     const g = this.game; const L = this.L;
     for (const e of ev) {
       switch (e.type) {
-        case 'blocked': this.shake.set(e.id, 0.4); this.sound.play('blocked'); if (!this.hinted) { this.hinted = true; this._hint(I.t('blocked')); } break;
+        case 'blocked': this.shake.set(e.id, 0.4); this.sound.play('blocked'); this.voice.say('bump'); if (!this.hinted) { this.hinted = true; this._hint(I.t('blocked')); } break;
         case 'pick': {
           this.sound.play('tap');
           this.spr.set(e.id, { x: before.x, y: before.y, s: this.itemSize(), kind: g.items[e.id].kind, t: 0, land: false });
@@ -174,6 +181,7 @@ class UI {
         }
         case 'match': {
           this.sound.play('match', e.combo); if (e.combo > 1) this.sound.play('combo', e.combo);
+          this.voice.say(e.combo > 1 ? 'trick' : 'pickup');
           for (const id of e.ids) { const s = this.spr.get(id); if (s) { const idx = this._lastTray ? e.ids.indexOf(id) : 0; void idx; this.ghosts.push({ id, t: 0, wand: false }); s.ghost = true; } }
           // freeze ghost targets at their slots before removal: the pick event carries the full tray order
           const pickEv = ev.find((x) => x.type === 'pick');
@@ -184,7 +192,7 @@ class UI {
           break;
         }
         case 'wand': {
-          this.sound.play('wand'); this._hint(I.t('wand'));
+          this.sound.play('wand'); this.voice.say('charge'); this._hint(I.t('wand'));
           for (const id of e.ids) {
             const it = g.items[id]; const fromTray = e.fromTray.includes(id);
             let s = this.spr.get(id);
@@ -194,8 +202,8 @@ class UI {
           }
           break;
         }
-        case 'won': this.sound.play('win'); this._won(); break;
-        case 'lost': this.sound.play('lose'); this._lost(); break;
+        case 'won': this.sound.play('win'); this.voice.say('win'); this._won(); break;
+        case 'lost': this.sound.play('lose'); this.voice.say('lose'); this._lost(); break;
         default: break;
       }
     }
@@ -238,6 +246,7 @@ class UI {
   }
 
   startLevel(n) {
+    this.voice.say('go');
     this.n = clamp(n, 1, LEVELS);
     this.timers.forEach(clearTimeout); this.timers = [];
     this.game = new Game(makeLevel(this.n));
@@ -271,7 +280,7 @@ class UI {
   showPause() {
     if (this.mode !== 'play') return;
     this.mode = 'pause'; this.sound.suspend();
-    const snd = h('button', { class: 'st-btn alt', onclick: () => { this.sound.setMuted(!this.sound.muted); this.save.muted = this.sound.muted; this.post({ type: 'save', save: this.save }); snd.textContent = this.sound.muted ? I.t('soundOff') : I.t('soundOn'); } }, this.sound.muted ? I.t('soundOff') : I.t('soundOn'));
+    const snd = h('button', { class: 'st-btn alt', onclick: () => { this.sound.setMuted(!this.sound.muted); this.voice.setMuted(this.sound.muted); this.save.muted = this.sound.muted; this.post({ type: 'save', save: this.save }); snd.textContent = this.sound.muted ? I.t('soundOff') : I.t('soundOn'); } }, this.sound.muted ? I.t('soundOff') : I.t('soundOn'));
     this.pauseEl = h('div', { class: 'st-dim' }, h('div', { class: 'st-card' }, h('div', { class: 'st-title' }, I.t('pause')),
       h('button', { class: 'st-btn', onclick: () => { this.pauseEl.remove(); this.mode = 'play'; this.sound.resume(); } }, I.t('resume')),
       h('button', { class: 'st-btn alt', onclick: () => { this.pauseEl.remove(); this.startLevel(this.n); this.sound.resume(); } }, I.t('restart')),
@@ -456,7 +465,7 @@ class UI {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play') this.showPause(); }
-  dispose() { cancelAnimationFrame(this.raf); this.timers.forEach(clearTimeout); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); this.root.remove(); }
+  dispose() { cancelAnimationFrame(this.raf); this.timers.forEach(clearTimeout); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); this.root.remove(); }
 }
 
 void MAX_CAP; void solveState;

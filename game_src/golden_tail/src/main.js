@@ -9,6 +9,9 @@ import { LEVELS, RIVALS, PLATFORMS, STRIPS, MUSHROOMS, GROUND_R, normalizeSave }
 import { mat, cone, makeDino, makeAnimal, makeGoldenTail, makeDeck, makeStrip, makeMushroom, makeTree, makeBush } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const TAIL_CLIPS = { go: 2, trick: 3, bump: 3, win: 2, lose: 2, count: 1 };
 import { CSS, CSS2, CSS3, h } from './ui.js';
 
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
@@ -88,6 +91,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: TAIL_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.quality = { low: lowEnd() };
     if (!document.getElementById('gt-style')) document.head.append(h('style', { id: 'gt-style', text: CSS + CSS2 + CSS3 }));
     this.root = h('div', { class: 'gt-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -329,6 +336,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -464,8 +472,9 @@ class Game {
       if (i + 2 > this.save.unlocked && i + 1 < LEVELS.length) this.save.unlocked = i + 2;
       this._saveNow();
       this.sound.play('win');
+      this.voice.say('win');
       this.sparkles.burst(c.player.x, c.player.y + 1.5, c.player.z, 80, 7);
-    } else this.sound.play('lose');
+    } else { this.sound.play('lose'); this.voice.say('lose'); }
     const hasNext = r.win && i + 1 < LEVELS.length;
     const dim = h('div', { class: r.win ? 'gt-dim gt-win' : 'gt-dim' }, h('div', { class: 'gt-panel' },
       h('div', { class: 'gt-title' }, r.win ? t('win') : t('lose')),
@@ -488,9 +497,10 @@ class Game {
     const events = c.step(dt, this._readInput());
     for (const e of events) {
       switch (e.type) {
-        case 'count': this.sound.play('count'); this.hud.count.querySelector('.n').textContent = num(e.n); break;
+        case 'count': this.sound.play('count'); if (e.n >= 3) this.voice.say('count'); this.hud.count.querySelector('.n').textContent = num(e.n); break;
         case 'go':
           this.sound.play('go');
+          this.voice.say('go');
           this.hud.count.remove();
           this._banner(t('go'), 0.8);
           setTimeout(() => this.mode === 'play' && this.toast(t('hint'), 2.6), 900);
@@ -507,13 +517,14 @@ class Game {
         case 'whiff': this.sound.play('whiff'); break;
         case 'fell':
           this.sound.play('stolen');
+          this.voice.say('bump');
           this.toast(t('fell'), 1.8);
           this.sparkles.burst(c.player.x, c.player.y + 1, c.player.z, 30, 4);
           this.cam = null;
           break;
         case 'steal':
           this.sparkles.burst(e.x, e.y + 1, e.z, e.by === 0 ? 40 : 18, e.by === 0 ? 6 : 4);
-          if (e.by === 0) { this.sound.play('grab'); this._banner(t('got')); } else if (e.from === 0) { this.sound.play('stolen'); this.toast(t('lost'), 1.6); } else this.sound.play('rivalGrab');
+          if (e.by === 0) { this.sound.play('grab'); this.voice.say('trick'); this._banner(t('got')); } else if (e.from === 0) { this.sound.play('stolen'); this.voice.say('bump'); this.toast(t('lost'), 1.6); } else this.sound.play('rivalGrab');
           break;
         case 'over':
           this.sound.play(e.win ? 'win' : 'lose');
@@ -693,6 +704,8 @@ class Game {
   dispose() {
     clearInterval(this._pill);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
       this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });

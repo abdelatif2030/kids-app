@@ -9,6 +9,9 @@ import { mat, basic, makeFish, sandTexture, causticTexture, makeRock, makeArch, 
 import { Sound } from './audio.js';
 import { applyBackdrop } from '../../cozy_kit/art.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const SEA_CLIPS = { go: 2, pickup: 2, trick: 2, nitro: 2, charge: 2, near: 2, bump: 2, win: 2, lose: 2 };
 import { CSS, h } from './ui.js';
 
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
@@ -97,6 +100,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: SEA_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.quality = { low: lowEnd() };
     if (!document.getElementById('ds-style')) document.head.append(h('style', { id: 'ds-style', text: CSS }));
     this.root = h('div', { class: 'ds-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -332,6 +339,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -411,6 +419,7 @@ class Game {
   }
 
   startLevel(i) {
+    this.voice.say('go');
     this._endLevel();
     this._buildSea(i);
     this.levelIndex = i;
@@ -480,8 +489,9 @@ class Game {
       this.save.stars[lv.id] = Math.max(this.save.stars[lv.id] ?? 0, r.stars);
       if (lv.id + 1 > this.save.unlocked && i + 1 < LEVELS.length) this.save.unlocked = lv.id + 1;
       this.sound.play('won');
+      this.voice.say('win');
       [0, 1, 2].forEach((k) => k < r.stars && setTimeout(() => this.sound.play('star', k), 700 + k * 280));
-    } else this.sound.play('lost');
+    } else { this.sound.play('lost'); this.voice.say('lose'); }
     this._saveNow();
     const hasNext = r.won && i + 1 < LEVELS.length;
     this.layer.append(h('div', { class: 'ds-dim' }, h('div', { class: 'ds-card ds-glass' },
@@ -525,6 +535,7 @@ class Game {
       case 'eat': {
         const big = e.cm > f.cm * 0.4;
         S.play(big ? 'bigGulp' : 'gulp', e.combo);
+        this.voice.say(e.combo >= 3 && e.combo % 3 === 0 ? 'trick' : 'pickup');
         if (e.combo >= 3) { this.hud.combo.textContent = `${t('combo')} ×${num(e.combo)}`; this.hud.combo.classList.remove('pop'); void this.hud.combo.offsetWidth; this.hud.combo.classList.add('pop'); if (e.combo % 3 === 0) S.play('combo'); }
         this.bubbles.burst(e.x, -e.z, 0.4, big ? 18 : 6, 2, 0.8);
         this.bits.burst(e.x, -e.z, 0.4, 6, 2, 0.4);
@@ -535,15 +546,15 @@ class Game {
         if (e.kind === 'squid' && s.level.task) this.toast(t('squidLeft', { a: num(Math.min(s.squid, s.level.task.n)), b: num(s.level.task.n) }), 1.4, '🦑');
         break;
       }
-      case 'dash': S.play('dash'); this.bubbles.burst(f.x, -f.z, 0.4, 14, 3, 0.6); break;
-      case 'warn': S.play('warn'); if (!this._warned) { this._warned = true; this.toast(t('warn'), 2, '❗', true); } break;
-      case 'lunge': S.play('lunge'); break;
-      case 'bitten': S.play('bitten'); this.shake = 0.5; this.toast(t('bitten'), 1.4, '💥', true); break;
-      case 'bait': S.play('bait'); this.toast(t('bait'), 2.2, '🐟'); break;
+      case 'dash': S.play('dash'); this.voice.say('nitro'); this.bubbles.burst(f.x, -f.z, 0.4, 14, 3, 0.6); break;
+      case 'warn': S.play('warn'); this.voice.say('near'); if (!this._warned) { this._warned = true; this.toast(t('warn'), 2, '❗', true); } break;
+      case 'lunge': S.play('lunge'); this.voice.say('near'); break;
+      case 'bitten': S.play('bitten'); this.voice.say('bump'); this.shake = 0.5; this.toast(t('bitten'), 1.4, '💥', true); break;
+      case 'bait': S.play('bait'); this.voice.say('pickup'); this.toast(t('bait'), 2.2, '🐟'); break;
       case 'ink': S.play('ink'); this.ink.burst(e.x, -e.z, 0, 16, 1.5, 2); break;
-      case 'canEat': S.play('combo'); this.toast(t('canEat', { x: name(SPECIES[e.kind]) }), 2.4, { plankton: '🟢', shrimp: '🦐', jelly: '🪼', sardine: '🐟', damsel: '🐠', butterfly: '🐠', puffer: '🐡', squid: '🦑', mackerel: '🐟', lantern: '🐟', tuna: '🐟' }[e.kind] || '🐟'); break;
-      case 'boss': S.play('boss'); S.setMode('boss'); this.toast(t('boss'), 3, '🦈', true); this.shake = 0.6; break;
-      case 'won': S.play('grow'); this.bubbles.burst(f.x, -f.z, 0.4, 60, 5, 1.4); break;
+      case 'canEat': S.play('combo'); this.voice.say('charge'); this.toast(t('canEat', { x: name(SPECIES[e.kind]) }), 2.4, { plankton: '🟢', shrimp: '🦐', jelly: '🪼', sardine: '🐟', damsel: '🐠', butterfly: '🐠', puffer: '🐡', squid: '🦑', mackerel: '🐟', lantern: '🐟', tuna: '🐟' }[e.kind] || '🐟'); break;
+      case 'boss': S.play('boss'); S.setMode('boss'); this.voice.say('near'); this.toast(t('boss'), 3, '🦈', true); this.shake = 0.6; break;
+      case 'won': S.play('grow'); this.voice.say('win'); this.bubbles.burst(f.x, -f.z, 0.4, 60, 5, 1.4); break;
       default:
     }
   }
@@ -697,6 +708,8 @@ class Game {
     clearInterval(this._pill);
     clearTimeout(this._tt);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
       this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });

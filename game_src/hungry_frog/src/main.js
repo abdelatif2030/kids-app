@@ -9,6 +9,9 @@ import { Pond, LEVELS, BOSS, KINDS, W, D, sizeOf, baseKind, normalizeSave } from
 import { mat, basic, makeFrog, makeBully, makeSnake, makeHeron, makeFly, makePad, makeLotus, makeCattail, waterTexture } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const FROG_CLIPS = { go: 2, pickup: 2, trick: 3, charge: 2, near: 2, bump: 2, win: 2, lose: 2 };
 import { CSS, h } from './ui.js';
 
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
@@ -96,6 +99,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: FROG_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.quality = { low: lowEnd() };
     if (!document.getElementById('hf-style')) document.head.append(h('style', { id: 'hf-style', text: CSS }));
     this.root = h('div', { class: 'hf-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -331,6 +338,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -387,6 +395,7 @@ class Game {
   }
 
   startLevel(i) {
+    this.voice.say('go');
     this._endLevel();
     this._buildPond(i);
     this.levelIndex = i;
@@ -484,8 +493,9 @@ class Game {
       this.save.stars[lv.id] = Math.max(this.save.stars[lv.id] ?? 0, r.stars);
       if (lv.id + 1 > this.save.unlocked && i + 1 < LEVELS.length) this.save.unlocked = lv.id + 1;
       this.sound.play('win');
+      this.voice.say('win');
       [0, 1, 2].forEach((k) => k < r.stars && setTimeout(() => this.sound.play('star', k), 700 + k * 280));
-    } else this.sound.play('gulped');
+    } else { this.sound.play('gulped'); this.voice.say('lose'); }
     this._saveNow();
     const hasNext = r.won && i + 1 < LEVELS.length;
     const card = r.won
@@ -535,6 +545,7 @@ class Game {
       case 'miss': S.play('miss'); break;
       case 'eat': {
         S.play('gulp', baseKind(e.kind));
+        this.voice.say(e.combo >= 3 ? 'trick' : 'pickup');
         setTimeout(() => S.play('grow', e.combo), 160);
         this.gulpT = 0.35;
         const q = this._proj(f.x, sizeOf(f.power) * 2.2, f.z);
@@ -552,19 +563,22 @@ class Game {
       case 'splash': S.play('splash'); this._ripple(e.x, e.z, 1.2); this.drops.burst(e.x, 0.2, e.z, 10, 2.5, 0.5); break;
       case 'aim':
         S.play('aim');
+        this.voice.say('near');
         if (!this.redWarned) { this.redWarned = true; this.hint(t('redBigger'), 3); }
         break;
       case 'lash': S.play('lash'); break;
-      case 'hurt': S.play('hurt'); this.shake = 0.5; break;
-      case 'heron': S.play('heron'); break;
-      case 'strike': S.play('strike'); this.drops.burst(e.x, 0.3, e.z, 24, 4, 0.7); this._ripple(e.x, e.z, 2.5); break;
+      case 'hurt': S.play('hurt'); this.voice.say('bump'); this.shake = 0.5; break;
+      case 'heron': S.play('heron'); this.voice.say('near'); break;
+      case 'strike': S.play('strike'); this.voice.say('bump'); this.drops.burst(e.x, 0.3, e.z, 24, 4, 0.7); this._ripple(e.x, e.z, 2.5); break;
       case 'evolve':
         S.play('evolve');
+        this.voice.say('charge');
         this.sparkle.burst(f.x, 1, f.z, 60, 5, 1);
         this._big(t('evolved'), t('growTo2', { n: num(p.level.boss) }), 2.2);
         break;
       case 'boss': {
         S.play('boss', baseKind(e.kind));
+        this.voice.say('near');
         S.setMode('boss');
         const b = p.boss;
         this.bossModel = baseKind(e.kind) === 'heron' ? makeHeron() : baseKind(e.kind) === 'snake' ? makeSnake(e.kind === 'snake2' ? 0xc84aa8 : 0x6aa82a) : makeBully(true);
@@ -579,11 +593,13 @@ class Game {
       }
       case 'bossHit':
         S.play('bossHit');
+        this.voice.say('trick');
         this.sparkle.burst(p.boss.x, 1, p.boss.z, 16, 4, 0.5);
         this.hud.boss.querySelector('i').style.width = `${(e.hp / p.boss.max) * 100}%`;
         break;
       case 'bossDown':
         S.play('bossDown');
+        this.voice.say('win');
         this.sparkle.burst(p.boss.x, 1.5, p.boss.z, 120, 7, 1.2);
         this.bossDownT = 0;
         break;
@@ -856,6 +872,8 @@ class Game {
     clearTimeout(this._ht);
     clearTimeout(this._bgT);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
       this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });

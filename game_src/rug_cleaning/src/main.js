@@ -8,6 +8,9 @@ import { loadArt } from '../../cozy_kit/art.js';
 import { Sound } from './audio.js';
 import { I } from './i18n.js';
 import { h, css } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const RUG_CLIPS = { go: 2, trick: 2, charge: 2, win: 2, lose: 2 };
 
 const TOOL = ['beat', 'foam', 'scrub', 'jet', 'squeegee']; // also the keys of ICONS, t_* and h_*
 const ic = (k) => { const e = document.createElement('span'); e.innerHTML = ICONS[k]; return e; };
@@ -70,6 +73,10 @@ class Game {
     this.save = normalizeSave(config.save);
     this.base = config.base || './';
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: RUG_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('rc-style')) document.head.append(h('style', { id: 'rc-style' }, STYLE));
     this.root = h('div', { class: 'rc-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -229,7 +236,7 @@ class Game {
 
   showMenu() {
     this.mode = 'menu'; this.job = null; this.paused = false; this.layer.replaceChildren(); this.sound.setMode(true); this._buildFrame();
-    const mute = h('button', { class: 'rc-round', 'aria-label': 'sound', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); mute.textContent = this.save.muted ? '🔇' : '🔊'; this._saveNow(); } }, this.save.muted ? '🔇' : '🔊');
+    const mute = h('button', { class: 'rc-round', 'aria-label': 'sound', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.voice.setMuted(this.save.muted); mute.textContent = this.save.muted ? '🔇' : '🔊'; this._saveNow(); } }, this.save.muted ? '🔇' : '🔊');
     this.layer.append(h('div', { class: 'rc-top' }, mute, this._coinPill()),
       h('div', { class: 'rc-dim', style: 'background:rgba(40,25,5,.38)' }, h('div', { class: 'rc-card rc-menu' },
         h('div', { class: 'rc-logo' }, '🧽 ', I.t('title')), h('div', { class: 'rc-small' }, I.t('tagline')),
@@ -264,7 +271,7 @@ class Game {
       const can = !maxed && this.save.coins >= cost;
       return h('div', { class: 'rc-row' }, id === 'nozzle' ? h('span', { style: 'font-size:calc(var(--u)*7)' }, '💧') : ic(id === 'brush' ? 'scrub' : id),
         h('span', { class: 'nm' }, I.t(`u_${id}`)), h('span', { class: 'pips' }, '●'.repeat(lvl) + '○'.repeat(MAX_LEVEL - lvl)),
-        h('button', { class: `rc-buy${can || maxed ? '' : ' no'}`, onclick: () => { if (maxed) return; if (!can) { this.sound.play('no'); return; } this.save.coins -= cost; this.save.upg[id]++; this.sound.play('buy'); this._saveNow(); this.showShop(); } }, maxed ? I.t('maxed') : `💰 ${I.num(cost)}`));
+        h('button', { class: `rc-buy${can || maxed ? '' : ' no'}`, onclick: () => { if (maxed) return; if (!can) { this.sound.play('no'); return; } this.save.coins -= cost; this.save.upg[id]++; this.sound.play('buy'); this.voice.say('charge'); this._saveNow(); this.showShop(); } }, maxed ? I.t('maxed') : `💰 ${I.num(cost)}`));
     });
     this.layer.append(h('div', { class: 'rc-top' }, h('button', { class: 'rc-round', onclick: () => this.showLevels() }, '☰'), this._coinPill()),
       h('div', { class: 'rc-dim', style: 'background:rgba(40,25,5,.5);padding-top:calc(var(--u)*14)' }, h('div', { class: 'rc-card' }, h('div', { class: 'rc-title' }, `🔧 ${I.t('shop')}`), ...rows, this._btn('', I.t('back'), () => this.showLevels()))));
@@ -291,6 +298,8 @@ class Game {
 
   start(levelId, accepted) {
     if (!accepted) { this._ticket(LEVELS[levelId - 1]); return; }
+    this.voice.say('go');
+    this._half = false;
     const def = LEVELS[levelId - 1]; const a = this._avail();
     const portrait = a.w < a.h;
     const cols = portrait ? ROWS : COLS; const rows = portrait ? COLS : ROWS;
@@ -371,6 +380,7 @@ class Game {
     this._saveNow();
     const after = this._snap();
     this.sound.play(pay.stars ? 'win' : 'no');
+    this.voice.say(pay.stars ? 'win' : 'lose');
     const ar = j.cols / j.rows;
     const wrap = h('div', { class: 'rc-cmp', style: `--ar:${ar}` }, this.before, after, h('div', { class: 'lb', style: 'left:calc(var(--u)*1)' }, I.t('before')), h('div', { class: 'lb', style: 'right:calc(var(--u)*1)' }, I.t('after')));
     const hd = h('div', { class: 'hd' }, h('i', {}, '↔')); wrap.append(hd);
@@ -455,7 +465,8 @@ class Game {
       const clean = j.cleanliness(); const pc = Math.round(100 * Math.max(0, Math.min(1, (clean - this.c0) / Math.max(0.05, 0.97 - this.c0))));
       this.pctEl.textContent = `${I.num(pc)}%`; this.pctBar.style.width = `${pc}%`;
       const rd = j.progress(4) >= READY && j.progress(0) >= READY; this.nextBtn.classList.toggle('ready', rd);
-      if (rd && !this.chimed) { this.chimed = true; snd.play('coin'); }
+      if (pc >= 50 && !this._half) { this._half = true; this.voice.say('charge'); }
+      if (rd && !this.chimed) { this.chimed = true; snd.play('coin'); this.voice.say('trick'); }
       this.coinEl.textContent = I.num(this.save.coins); this.timeEl.textContent = mmss(j.time); this.waterEl.textContent = `${I.num(j.water.toFixed(1))}`;
     }
   }
@@ -504,7 +515,7 @@ class Game {
   }
 
   pause() { this.sound.silence(); this.sound.suspend(); if (this.mode === 'play') this._pause(); }
-  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); this.root.remove(); }
+  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); this.root.remove(); }
 }
 
 void STAGES;

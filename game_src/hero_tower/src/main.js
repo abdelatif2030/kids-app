@@ -7,6 +7,9 @@
 // code. Three chapters. No network, no links, no scores to lose.
 import { CHAPTERS, Tower, fmt, normalizeSave, TROLL_FLOOR, SORCERER_FLOOR } from './sim.js';
 import { loadArt } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const TOWER_CLIPS = { trick: 3, pickup: 3, charge: 2, bump: 2, win: 2, lose: 2, count: 1 };
 import { setArt, paintSky, drawCloud, drawRoom, drawBase, poly, drawHero, drawFoe, drawBoss, drawItem, drawBubble, drawPoof, drawFire, THEMES } from './art.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num } from './i18n.js';
@@ -86,6 +89,10 @@ class Game {
     loadArt(this.base, ['hero', 'hero_attack', 'hero_hurt', 'hero_win', 'foe_slime', 'foe_goblin', 'foe_skeleton', 'foe_imp', 'foe_orc', 'boss_troll', 'boss_sorcerer', 'boss_dragon', 'sky_castle', 'sky_ice', 'sky_fire']).then((a) => { setArt(a); this.skyKey = ''; });
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: TOWER_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('ht-style')) document.head.append(h('style', { id: 'ht-style' }, CSS));
     this.root = h('div', { class: 'ht-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -234,6 +241,7 @@ class Game {
     if (res.type === 'locked') { this._float(sp.x, sp.y - sp.s * 0.9, '🔑?', '#ffd23a'); this.sound.play('no'); this._hint(t('needKey'), 2.2); this.anim.set(th.id, { hit: 0, shake: 0.4 }); return 'back'; }
     if (res.type === 'lose') {
       this.sound.play('lose');
+      this.voice.say('bump');
       this.shakeHero = 0.5;
       this._float(sp.x, sp.y - sp.s * 1.1, t('almost'), '#ff8a8a');
       if (th.type === 'boss') this.sound.play('roar');
@@ -244,15 +252,16 @@ class Game {
     this.anim.set(th.id, { hit: 0.001, open: th.type === 'chest' });
     const kind = th.type;
     if (kind === 'enemy' || kind === 'boss') {
+      this.voice.say('trick');
       this.sound.play('hit', Math.min(10, Math.round(Math.log2(th.power + 1))));
       this.fx.push({ k: 0, kind: 'poof', x: sp.x, y: sp.y - sp.s * 0.45, s: sp.s });
       this._float(sp.x, sp.y - sp.s * 1.2, `+${fmt(res.gain)}`, '#7af05a');
-    } else if (kind === 'sword') { this.sound.play('sword'); this._float(sp.x, sp.y - sp.s * 1.1, `+${fmt(res.gain)}`, '#ffd23a'); }
-    else if (kind === 'potion') { this.sound.play('potion'); this._float(sp.x, sp.y - sp.s * 1.1, `+${fmt(res.gain)}`, '#ff98a8'); }
-    else if (kind === 'crystal') { this.sound.play('crystal'); this._float(sp.x, sp.y - sp.s * 1.1, `+${fmt(res.gain)}`, '#e0a0ff'); }
-    else if (kind === 'mult') { this.sound.play('crystal'); this._float(sp.x, sp.y - sp.s * 1.1, `×${th.mul}`, '#ffd23a'); this.sound.play('power'); }
-    else if (kind === 'key') { this.sound.play('key'); this._float(sp.x, sp.y - sp.s * 1.1, '🔑', '#ffd23a'); }
-    else if (kind === 'chest') { this.sound.play('chest'); this._float(sp.x, sp.y - sp.s * 1.1, `+${fmt(res.gain)}`, '#ffd23a'); }
+    } else if (kind === 'sword') { this.voice.say('charge'); this.sound.play('sword'); this._float(sp.x, sp.y - sp.s * 1.1, `+${fmt(res.gain)}`, '#ffd23a'); }
+    else if (kind === 'potion') { this.voice.say('charge'); this.sound.play('potion'); this._float(sp.x, sp.y - sp.s * 1.1, `+${fmt(res.gain)}`, '#ff98a8'); }
+    else if (kind === 'crystal') { this.voice.say('pickup'); this.sound.play('crystal'); this._float(sp.x, sp.y - sp.s * 1.1, `+${fmt(res.gain)}`, '#e0a0ff'); }
+    else if (kind === 'mult') { this.voice.say('pickup'); this.sound.play('crystal'); this._float(sp.x, sp.y - sp.s * 1.1, `×${th.mul}`, '#ffd23a'); this.sound.play('power'); }
+    else if (kind === 'key') { this.voice.say('charge'); this.sound.play('key'); this._float(sp.x, sp.y - sp.s * 1.1, '🔑', '#ffd23a'); }
+    else if (kind === 'chest') { this.voice.say('pickup'); this.sound.play('chest'); this._float(sp.x, sp.y - sp.s * 1.1, `+${fmt(res.gain)}`, '#ffd23a'); }
     this.powerShown = this.powerShown ?? before;
     this.puff = 0.35;
     this.gainPulse = 1;
@@ -287,7 +296,7 @@ class Game {
   }
   _soundBtn(style) {
     const b = h('button', { class: 'ht-round', style, 'aria-label': 'sound' }, this.sound.muted ? '🔇' : '🔊');
-    b.addEventListener('click', (e) => { e.stopPropagation(); this.sound.unlock(); this.sound.setMuted(!this.sound.muted); this.save.muted = this.sound.muted; this._saveNow(); b.textContent = this.sound.muted ? '🔇' : '🔊'; });
+    b.addEventListener('click', (e) => { e.stopPropagation(); this.sound.unlock(); this.sound.setMuted(!this.sound.muted); this.voice.setMuted(this.sound.muted); this.save.muted = this.sound.muted; this._saveNow(); b.textContent = this.sound.muted ? '🔇' : '🔊'; });
     return b;
   }
   _backBtn() {
@@ -319,6 +328,7 @@ class Game {
 
   startChapter(ch) {
     this.chapter = ch;
+    this.voice.say('count');
     this.tw = new Tower(ch, Math.floor(Math.random() * 1e9), this.easy);
     this.mode = 'play';
     this.busy = false;
@@ -383,6 +393,7 @@ class Game {
 
   _loseCard() {
     const tw = this.tw;
+    this.voice.say('lose');
     this.mode = 'lose';
     this.layer.append(h('div', { class: 'ht-dim' }, h('div', { class: 'ht-card' },
       h('div', { class: 'ht-title' }, t('almost')),
@@ -417,6 +428,7 @@ class Game {
     this.save.plays++;
     this._saveNow();
     this.sound.play('win');
+    this.voice.say('win');
     this.mode = 'won';
     const last = ch.id >= CHAPTERS.length;
     this.layer.append(h('div', { class: 'ht-dim' }, h('div', { class: 'ht-card' },
@@ -660,6 +672,8 @@ class Game {
     clearTimeout(this._ht);
     clearTimeout(this._bt);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis);
     this.root.remove();

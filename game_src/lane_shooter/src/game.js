@@ -6,6 +6,9 @@ import * as THREE from 'three';
 import { Run, ROAD, LANES, normalizeSave, BOW_COST, RANK_COST } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const LANE_CLIPS = { trick: 3, charge: 3, bump: 2, win: 2, lose: 2, count: 1 };
 
 const THEME = {
   squad: {
@@ -133,6 +136,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound(th.id);
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: LANE_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     const p = th.prefix;
     this.p = p;
     if (!document.getElementById(`${p}-style`)) document.head.append(h('style', { id: `${p}-style` }, css(p, th.panel[0], th.panel[1], th.accent)));
@@ -349,6 +356,7 @@ class Game {
 
   start(i) {
     const p = this.p;
+    this.voice.say('count');
     this.levelIndex = i;
     this.run = new Run({ level: i, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1, bow: this.save.bow, rank: this.save.rank });
     this._buildWorld(this.run.L);
@@ -395,6 +403,7 @@ class Game {
     }
     this.post({ type: 'save', save: this.save });
     this.sound.play(won ? 'win' : 'lose');
+    this.voice.say(won ? 'win' : 'lose');
     const last = this.levelIndex >= 7;
     this.layer.append(h('div', { class: `${p}-dim` }, h('div', { class: `${p}-card` },
       h('div', { class: `${p}-title` }, won ? I.t('win') : I.t('lost')),
@@ -424,11 +433,11 @@ class Game {
       switch (e.type) {
         case 'volley': if (Math.random() < 0.5) this.sound.play('shoot'); break;
         case 'hit': break;
-        case 'kill': this.sound.play('kill'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 0.7, text: `+${e.coins}🪙` }); break;
-        case 'gate': this.sound.play('gate', e.val); this.fx.push({ x: r.x, z: r.zs + 3, t: 0, life: 1, text: e.val >= 0 ? `+${e.val}` : `${e.val}` }); break;
-        case 'free': this.sound.play('free'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: `+${e.n}` }); break;
-        case 'weapon': this.sound.play('weapon'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: `${this.th.weapon[0]}↑` }); break;
-        case 'hurt': this.sound.play('hurt'); this.fx.push({ x: r.x, z: r.zs + 2, t: 0, life: 1, text: `-${e.n}` }); break;
+        case 'kill': this.sound.play('kill'); this.voice.say('trick'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 0.7, text: `+${e.coins}🪙` }); break;
+        case 'gate': this.sound.play('gate', e.val); if (e.val > 0) this.voice.say('charge'); this.fx.push({ x: r.x, z: r.zs + 3, t: 0, life: 1, text: e.val >= 0 ? `+${e.val}` : `${e.val}` }); break;
+        case 'free': this.sound.play('free'); this.voice.say('charge'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: `+${e.n}` }); break;
+        case 'weapon': this.sound.play('weapon'); this.voice.say('charge'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: `${this.th.weapon[0]}↑` }); break;
+        case 'hurt': this.sound.play('hurt'); this.voice.say('bump'); this.fx.push({ x: r.x, z: r.zs + 2, t: 0, life: 1, text: `-${e.n}` }); break;
         case 'done': this._end(true); break;
         case 'lost': this._end(false); break;
         default: break;
@@ -533,6 +542,8 @@ class Game {
   dispose() {
     this.renderer.setAnimationLoop(null);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis);
     window.removeEventListener('keydown', this._onKey);

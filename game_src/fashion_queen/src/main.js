@@ -8,6 +8,9 @@ import * as L from './logic.js';
 import { Sound } from './audio.js';
 import { FQ_CSS } from './style.js';
 import { I, t } from './i18n.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const FASHION_CLIPS = { go: 2, pickup: 2, charge: 2, trick: 2, near: 1, win: 2 };
 import { drawDoll, drawStage, BG_PICS } from './art.js';
 import { loadArt } from '../../cozy_kit/art.js';
 import { makeThumbs } from './thumbs.js';
@@ -34,6 +37,10 @@ class Game {
     L.ensureDaily(this.save);
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: this.lang, girl: true, clips: FASHION_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.sound.mv = this.save.music; this.sound.sv = this.save.sfx;
     if (!document.getElementById('fq-style')) document.head.append(h('style', { id: 'fq-style' }, FQ_CSS));
     this.root = h('div', { class: 'fq-root', dir: this.lang === 'en' ? 'ltr' : 'rtl' });
@@ -170,6 +177,7 @@ class Game {
 
   setMuted(m) {
     this.sound.muted = m; if (this.sound.ctx) this.sound.setMuted(m);
+    this.voice.setMuted(m);
     this.save.muted = m; this.refreshBar(); this.commit();
   }
 
@@ -192,7 +200,7 @@ class Game {
   }
   afterEvent() {
     const now = L.claimableCount(this.save) + L.levelsReady(this.save);
-    if (now > this._ready) { this.toast(t('missionReady')); this.sound.play('ok'); }
+    if (now > this._ready) { this.toast(t('missionReady')); this.sound.play('ok'); this.voice.say('near'); }
     this._ready = now;
   }
 
@@ -202,6 +210,7 @@ class Game {
     const parts = [r.coins ? `+${this.num(r.coins)} 🪙` : '', r.dia ? `+${this.num(r.dia)} 💎` : '', r.stars ? `+${this.num(r.stars)} ⭐` : ''].filter(Boolean);
     if (parts.length) this.floatText(x ?? this.stage.x + this.stage.w / 2, y ?? this.stage.y + this.stage.h * 0.4, parts.join('  '), '#ffd23a');
     this.sound.play(r.dia || r.stars ? 'reward' : 'coin');
+    if (parts.length) this.voice.say('pickup');
     this.refreshBar();
     this.afterEvent();
     this.commit();
@@ -214,7 +223,7 @@ class Game {
       img: o.img, icon: o.icon, title: o.title, text: t('buyAsk'), price: this.priceStr(p), yes: `${t('buy')}`,
       onYes: () => {
         const r = L.buy(this.save, kind, id);
-        if (r.ok) { this.sound.play('buy'); this.toast(t('bought')); this.burst(this.cw / 2, this.ch * 0.4, ['✨', '💖', '⭐'], 10); this.refreshBar(); this.afterEvent(); this.commit(); if (o.after) o.after(); }
+        if (r.ok) { this.sound.play('buy'); this.voice.say('charge'); this.toast(t('bought')); this.burst(this.cw / 2, this.ch * 0.4, ['✨', '💖', '⭐'], 10); this.refreshBar(); this.afterEvent(); this.commit(); if (o.after) o.after(); }
         else { this.sound.play('error'); this.toast(r.reason === 'poor' ? t('poor') : t('oops')); }
       },
     });
@@ -359,6 +368,8 @@ class Game {
     this.flush();
     if (this.view && this.view.dispose) this.view.dispose();
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis);
     window.removeEventListener('keydown', this._onKey);

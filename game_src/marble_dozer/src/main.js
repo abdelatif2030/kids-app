@@ -6,6 +6,9 @@
 import { Game, AW, AH, MR, COLORS, LEVELS, levelDef, normalizeSave } from './sim.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num } from './i18n.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const DOZER_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 2, win: 2, lose: 2 };
 
 const CSS = `
 .md-root{position:absolute;inset:0;overflow:hidden;font-family:Tajawal,system-ui,sans-serif;color:#3a2a5a;user-select:none;-webkit-user-select:none;touch-action:none;-webkit-tap-highlight-color:transparent;background:#f6e6ff}
@@ -91,6 +94,10 @@ class Game2 {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: DOZER_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('md-style')) document.head.append(h('style', { id: 'md-style' }, CSS));
     this.root = h('div', { class: 'md-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -193,7 +200,7 @@ class Game2 {
   _hideHint() { if (this.hintEl) this.hintEl.classList.remove('show'); }
   _soundBtn() {
     const b = h('button', { class: 'md-round', style: 'right:calc(var(--u)*2)', 'aria-label': 'sound' }, this.sound.muted ? '🔇' : '🔊');
-    b.addEventListener('click', (e) => { e.stopPropagation(); this.sound.unlock(); this.sound.setMuted(!this.sound.muted); this.save.muted = this.sound.muted; this._saveNow(); b.textContent = this.sound.muted ? '🔇' : '🔊'; });
+    b.addEventListener('click', (e) => { e.stopPropagation(); this.sound.unlock(); this.sound.setMuted(!this.sound.muted); this.voice.setMuted(this.sound.muted); this.save.muted = this.sound.muted; this._saveNow(); b.textContent = this.sound.muted ? '🔇' : '🔊'; });
     return b;
   }
   _exitBtn() { return h('button', { class: 'md-round', style: 'left:calc(var(--u)*2)', 'aria-label': t('exit'), onclick: () => { this._saveNow(); this.post({ type: 'exit' }); } }, getLang() === 'en' ? '←' : '→'); }
@@ -219,6 +226,7 @@ class Game2 {
   }
 
   startLevel(n) {
+    this.voice.say('go');
     this.n = n;
     this.gm = new Game(n, Math.floor(Math.random() * 1e9), this.easy);
     this.mode = 'play';
@@ -283,6 +291,7 @@ class Game2 {
     if (this.n + 1 > this.save.unlocked && this.n < LEVELS) this.save.unlocked = this.n + 1;
     this._saveNow();
     this.sound.play('win');
+    this.voice.say('win');
     this.mode = 'won';
     const last = this.n >= LEVELS;
     this.layer.append(h('div', { class: 'md-dim' }, h('div', { class: 'md-card' },
@@ -296,6 +305,7 @@ class Game2 {
 
   _loseCard() {
     this.sound.play('lose');
+    this.voice.say('lose');
     this.mode = 'lost';
     this.layer.append(h('div', { class: 'md-dim' }, h('div', { class: 'md-card' },
       h('div', { class: 'md-title' }, t('timeup')), h('div', { class: 'md-small' }, t('timeupText')),
@@ -321,9 +331,9 @@ class Game2 {
     const ev = g.step(dt, inp);
     let click = 0;
     for (const e of ev) {
-      if (e.type === 'score') { this.sound.play('score', (this.burst.n = this.burst.t > 0 ? this.burst.n + 1 : 1)); this.burst.t = 1.2; this._confetti(e.x, e.y, e.c); if (this.burst.n === 8) { this._say(t('awesome'), '', 1.2); this.sound.play('awesome'); } }
-      else if (e.type === 'done') { this._say(`${t(COLORS[e.c])} ${t('done')}`, '', 1.5, true); this.sound.play('done'); }
-      else if (e.type === 'gate') { this.sound.play('gate'); const [sx, sy] = this.P(e.x, e.y); this.texts.push({ x: sx, y: sy, text: `+${e.mul - 1}`, k: 0 }); }
+      if (e.type === 'score') { this.sound.play('score', (this.burst.n = this.burst.t > 0 ? this.burst.n + 1 : 1)); this.voice.say('pickup'); this.burst.t = 1.2; this._confetti(e.x, e.y, e.c); if (this.burst.n === 8) { this._say(t('awesome'), '', 1.2); this.sound.play('awesome'); this.voice.say('trick'); } }
+      else if (e.type === 'done') { this._say(`${t(COLORS[e.c])} ${t('done')}`, '', 1.5, true); this.sound.play('done'); this.voice.say('charge'); }
+      else if (e.type === 'gate') { this.sound.play('gate'); this.voice.say('charge'); const [sx, sy] = this.P(e.x, e.y); this.texts.push({ x: sx, y: sy, text: `+${e.mul - 1}`, k: 0 }); }
       else if (e.type === 'bump') { if (!this._bumpGate || performance.now() - this._bumpGate > 120) { this._bumpGate = performance.now(); this.sound.play('bump'); this.fx.push({ k: 0, kind: 'bump', x: e.x, y: e.y }); } }
       else if (e.type === 'push') click++;
       else if (e.type === 'won') { this.mode = 'wait'; setTimeout(() => this._winCard(e.stars), 900); }
@@ -471,6 +481,8 @@ class Game2 {
     cancelAnimationFrame(this._raf);
     clearInterval(this._pill); clearTimeout(this._st); clearTimeout(this._hintT);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis);
     window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey);

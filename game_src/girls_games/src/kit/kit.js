@@ -69,8 +69,18 @@ export const STAGE_FALLBACK = [
  * opts: { post, lang, title, places:[{ar,en,emoji}], bgs:[img|null x6], onPlace(i) }
  * returns { root, layer, setBg(i), say(text), sparkle(x,y), finish(onAgain,line), openPlaces(), place, dispose() }
  */
+import { VoiceCoach } from '../../../cozy_kit/voice.js';
+
+const TODDLER_CLIPS = { trick: 3, win: 2 };
+
 export function makeStage(el, opts) {
   const { post, lang, title, places, bgs, onPlace } = opts;
+  // Spoken praise for the youngest players (owner instruction 2026-11-27 supersedes the
+  // 2026-11-22 melody-only note): the fairy's lines are now also spoken aloud by VoiceCoach,
+  // with pre-generated clips in each game's own voice/ folder; the melody and fairy stay.
+  const voice = new VoiceCoach({ base: opts.base || './', lang, girl: true, clips: TODDLER_CLIPS });
+  const voiceArm = () => voice.unlock();
+  document.addEventListener('pointerdown', voiceArm, true);
   if (!document.getElementById('gk-style')) document.head.append(h('style', { id: 'gk-style' }, CSS));
   const en = lang === 'en';
   const root = h('div', { class: 'gk-root', dir: en ? 'ltr' : 'rtl' });
@@ -103,8 +113,8 @@ export function makeStage(el, opts) {
     root.append(e);
     setTimeout(() => e.remove(), 2500);
   };
-  // no spoken voice (owner 2026-11-22): every reward is a note of an interactive melody, plus the little fairy
-  const say = (t) => { if (t) { music.tap(); fairy(); } };
+  // every reward is a note of an interactive melody, the little fairy, and a spoken praise line
+  const say = (t) => { if (t) { music.tap(); fairy(); voice.setMuted(music.muted); voice.say('trick'); } };
   const sparkle = (x, y, n = 8) => {
     music.pop();
     const r = root.getBoundingClientRect();
@@ -136,6 +146,7 @@ export function makeStage(el, opts) {
       h('button', { class: 'gk-btn go', onclick: () => { dim.remove(); onAgain(); } }, en ? 'Again!' : 'تاني!')));
     root.append(dim);
     music.success(); fairy();
+    voice.setMuted(music.muted); voice.say('win');
     post({ type: 'star' });
   };
   // progress dots under the title: how many looks / girls / friends / orders of this level are done (a level now takes several rounds)
@@ -146,5 +157,5 @@ export function makeStage(el, opts) {
     h('button', { class: 'gk-rb', 'aria-label': en ? 'Back' : 'رجوع', onclick: () => post({ type: 'exit' }) }, en ? '←' : '→'),
     h('div', { class: 'gk-title' }, title),
     h('button', { class: 'gk-rb p', 'aria-label': en ? 'Places' : 'الأماكن', onclick: openPlaces }, '🗺️')));
-  return { root, layer, setBg, say, sparkle, progress, finish, openPlaces, get place() { return place; }, dispose() { ro.disconnect(); root.remove(); } };
+  return { root, layer, setBg, say, sparkle, progress, finish, openPlaces, get place() { return place; }, dispose() { ro.disconnect(); voice.dispose(); document.removeEventListener('pointerdown', voiceArm, true); root.remove(); } };
 }

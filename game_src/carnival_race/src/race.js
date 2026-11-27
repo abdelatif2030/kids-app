@@ -449,7 +449,7 @@ export class Race {
         if (Math.abs(ds) < 1.6 && Math.abs(t.x - c.x) < 1.9) {
           t.live = false;
           c.collected++;
-          this.emit('ticket', { total: c.collected });
+          this.emit('ticket', { total: c.collected, car: c.id });
         }
       }
     }

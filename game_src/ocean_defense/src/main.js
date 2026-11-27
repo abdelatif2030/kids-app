@@ -11,6 +11,9 @@ import {
 } from './models.js';
 import { Sound } from './audio.js';
 import { applyBackdrop } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const OCEAN_CLIPS = { trick: 3, bump: 3, lap: 2, near: 2, charge: 2, win: 2, lose: 2, count: 1 };
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
 import { CSS, CSS2, CSS3, h } from './ui.js';
 
@@ -112,6 +115,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: OCEAN_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.quality = { low: lowEnd() };
     if (!document.getElementById('od-style')) document.head.append(h('style', { id: 'od-style', text: CSS + CSS2 + CSS3 }));
     this.root = h('div', { class: 'od-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -352,6 +359,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -447,6 +455,7 @@ class Game {
     this.levelIndex = i;
     applyBackdrop(THREE, this.scene, this.base, `bg_reef${(i % 7) + 1}`, () => this.levelIndex === i);
     this.d = new Defense({ level: i, easy: this.age <= 4, up: this.save.up, seed: (Date.now() & 0xffff) + 1 });
+    this.voice.say('count');
     this.mode = 'play';
     this.paused = false;
     this.input.aimed = false;
@@ -542,6 +551,7 @@ class Game {
     const r = d.result;
     const i = this.levelIndex;
     this.mode = 'results';
+    this.voice.say(won ? 'win' : 'lose');
     this.sound.setMode('menu');
     this.save.coins += d.coins;
     if (won) {
@@ -583,6 +593,7 @@ class Game {
           break;
         case 'kill': {
           this.sound.play('kill', d.kills);
+          this.voice.say('trick');
           this.sparks.burst(e.x, 1, e.z, 16, 4);
           this.pearls.emit(e.x, 1.2, e.z, 0, 4, 2, 0.8);
           this._num(e.x, e.z, e.coin ? `+${num(e.coin)}🐚` : '');
@@ -590,15 +601,17 @@ class Game {
         }
         case 'wallHit':
           this.sound.play('wallHit');
+          this.voice.say('bump');
           this.shake = 0.35;
           this.sparks.burst(e.x, 1.2, 0, 20, 4);
           if (!this._warned && e.wall < d.wallMax * 0.7) { this._warned = true; this.toast(t('wallHurt'), 2.2); }
           break;
-        case 'levelUp': this._powerChoice(e.choices); break;
+        case 'levelUp': this.voice.say('charge'); this._powerChoice(e.choices); break;
         case 'bounce': if (Math.random() < 0.6) this.sound.play('bounce'); break;
         case 'whirl': this.sound.play('whirl'); break;
-        case 'wave': this.sound.play('wave'); this._banner(`${t('wave')} ${num(e.n)}/${num(3)}`); break;
+        case 'wave': this.sound.play('wave'); this.voice.say('lap'); this._banner(`${t('wave')} ${num(e.n)}/${num(3)}`); break;
         case 'boss':
+          this.voice.say('near');
           this.sound.setMode('boss');
           this.sound.play('boss');
           this._banner(t('boss'), 2.2);
@@ -614,6 +627,7 @@ class Game {
           break;
         case 'bossDown':
           this.sound.play('bossDown');
+          this.voice.say('win');
           this.sparks.burst(e.x, 2, e.z, 90, 8);
           this.pearls.burst(e.x, 2, e.z, 40, 5);
           this.octoDown = 0;
@@ -786,6 +800,8 @@ class Game {
   dispose() {
     clearInterval(this._pill);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
       this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });

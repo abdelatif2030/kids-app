@@ -9,6 +9,9 @@ import { FarmWorld } from './world.js';
 import { makeCombine, makeTrailer, makeTree, makeBarn, makeHayBale, makeSack, mat, loadRealAnimals } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, getLang, t, num, name } from './i18n.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const FARM_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 2, near: 1, bump: 2, win: 2 };
 import { CSS, h } from './ui.js';
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -82,6 +85,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: FARM_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.quality = { low: lowEnd() };
     if (!document.getElementById('hf-style')) document.head.append(h('style', { id: 'hf-style', text: CSS }));
     this.root = h('div', { class: 'hf-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -241,6 +248,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -354,7 +362,7 @@ class Game {
           disabled: maxed || this.save.coins < cost,
           onclick: () => {
             const r = buyUpgrade(this.save, u.id);
-            if (r === 'bought') { this.sound.play('buy'); this._saveNow(); this.showShed(); this.toast(t('bought'), 1); } else { this.sound.play('no'); this.toast(t('needMore'), 2); }
+            if (r === 'bought') { this.sound.play('buy'); this.voice.say('charge'); this._saveNow(); this.showShed(); this.toast(t('bought'), 1); } else { this.sound.play('no'); this.toast(t('needMore'), 2); }
           },
         }, maxed ? t('max') : h('span', { style: 'display:inline-flex;align-items:center;gap:calc(var(--u)*1)' }, h('span', { class: 'hf-coin' }), num(cost))));
     });
@@ -386,6 +394,7 @@ class Game {
     const grain = new Particles(scene, 200, 0.2, 0xffc928);
     const smoke = new Particles(scene, 60, 0.6, 0xe6e6e6);
     this.f = { farm, scene, world, comb, trailer, chaff, grain, smoke, tr: { x: farm.t.x - 3, z: farm.t.z, heading: farm.t.heading }, cam: null, endT: -1, coinsAtStart: this.save.coins, cutFlash: 0 };
+    this.voice.say('go');
     this.mode = 'play';
     this.paused = false;
     this.sound.setMode('farm');
@@ -461,22 +470,25 @@ class Game {
           f.cutFlash = 0.3;
           break;
         }
-        case 'full': this.sound.play('full'); this.toast(t('full'), 2.4); break;
+        case 'full': this.sound.play('full'); this.voice.say('near'); this.toast(t('full'), 2.4); break;
         case 'unloadStart': this.sound.play('pour'); break;
         case 'coins':
           this.save.coins += e.n;
           this.sound.play('coin', e.total);
+          this.voice.say('pickup');
           if (Math.random() < 0.35) this._floatCoin(e.n);
           break;
-        case 'unloaded': this.toast(t('emptied'), 1.4); this._saveNow(); this._stack(); break;
-        case 'rock': this.sound.play('rock'); this.toast(t('rock'), 1.2); break;
+        case 'unloaded': this.voice.say('trick'); this.toast(t('emptied'), 1.4); this._saveNow(); this._stack(); break;
+        case 'rock': this.sound.play('rock'); this.voice.say('bump'); this.toast(t('rock'), 1.2); break;
         case 'penned':
           this.sound.play(e.kind === 'cow' ? 'cow' : e.kind === 'chicken' ? 'chicken' : 'sheep');
+          this.voice.say('charge');
           setTimeout(() => this.sound.play('penned'), 300);
           this.toast(e.n === e.of ? t('allPenned') : t('penned'), 1.6);
           break;
         case 'done':
           this.sound.play('done');
+          this.voice.say('win');
           this.toast(t('done'), 2);
           f.endT = 1.6;
           break;
@@ -641,6 +653,8 @@ class Game {
   dispose() {
     clearInterval(this._pill);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
       this._endFarm();

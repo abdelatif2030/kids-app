@@ -9,6 +9,9 @@ import { Run, LEVELS, UPG, HALF, LANES, upgradeCost, normalizeSave, isBossLevel 
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n, rng } from '../../cozy_kit/ui.js';
 import { loadArt, loadSprites } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const HAMSTER_CLIPS = { charge: 2, trick: 2, pickup: 2, bump: 2, near: 1, win: 2, lose: 2, count: 1 };
 
 const S = {
   title: ['هامي الشجاع', 'Hammy the Brave'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
@@ -137,6 +140,10 @@ class Game {
     this.base = config.base || './';
     this.girl = config.gender === 'girl';
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: HAMSTER_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('hw-style')) document.head.append(h('style', { id: 'hw-style' }, css('hw', '#5aa83a', '#2a5a1a', '#ffe04a') + HUD_CSS));
     this.root = h('div', { class: 'hw-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -288,6 +295,7 @@ class Game {
 
   start(i) {
     this.levelIdx = i;
+    this.voice.say('count');
     this.run = new Run({ level: i, seed: (Date.now() & 0xffff) + 1, up: this.save.up, easy: this.age <= 4 });
     this._buildWorld(this.run);
     this.mode = 'play'; this.paused = false; this.fx = []; this._pk = null;
@@ -311,6 +319,7 @@ class Game {
   _confetti() { const cols = ['#ffd23a', '#ff5a7a', '#3aa8ff', '#5ae05a', '#ff9a3a']; for (let i = 0; i < 36; i++) this.layer.append(h('span', { class: 'hw2-conf', style: `left:${Math.random() * 100}%;background:${cols[i % 5]};animation-delay:${Math.random() * 0.6}s;animation-duration:${1.6 + Math.random() * 1.4}s` })); }
 
   _won() {
+    this.voice.say('win');
     const r = this.run; const lv = this.levelIdx + 1;
     this.save.coins += r.reward; this.save.stars[lv] = Math.max(this.save.stars[lv] || 0, r.stars);
     this.save.unlocked = Math.max(this.save.unlocked, Math.min(LEVELS, lv + 1));
@@ -321,7 +330,7 @@ class Game {
   }
 
   _lost() {
-    this.sound.play('lose'); this.fx = [];
+    this.sound.play('lose'); this.voice.say('lose'); this.fx = [];
     this.layer.append(h('div', { class: 'hw-dim' }, h('div', { class: 'hw-card' }, h('div', { class: 'hw-title' }, I.t('lost')), h('div', { class: 'hw-small' }, I.t('lost2')), h('button', { class: 'hw-btn', onclick: () => this.start(this.levelIdx) }, I.t('again')), h('button', { class: 'hw-btn dark', onclick: () => this.showMenu() }, I.t('menu')))));
   }
 
@@ -332,11 +341,11 @@ class Game {
     const r = this.run;
     for (const e of r.step(dt)) {
       switch (e.type) {
-        case 'card': this.sound.play(e.v > 0 ? 'card' : 'bad'); this.fx.push({ t: 0, life: 1, text: `${e.v > 0 ? '+' : '−'}${Math.abs(e.v)}`, good: e.v > 0 }); this._burst(-r.x, 1.6, r.z + 0.5, e.v > 0 ? ['#6ab4ff', '#ffffff'] : ['#ff6a7a', '#ffffff'], 10); break;
-        case 'absorb': this.sound.play('absorb'); this.fx.push({ t: 0, life: 1, text: `+${fmt(e.gain)}`, good: true }); this._burst(-r.x, 1.4, r.z + 0.8, ['#7be04a', '#ffe04a', '#ffffff'], 16, 5); this.flashT = 0.28; this.pop = 0.35; break;
-        case 'hurt': this.sound.play('hurt'); this.shake = 0.5; this._burst(-r.x, 1.4, r.z, ['#ff5a5a', '#ffd23a'], 10); this._updateHearts(); this.hint(I.t('stronger'), 1600); break;
-        case 'warn': this.sound.play('warn'); this.hint(I.t('stronger'), 1800); break;
-        case 'coin': this.sound.play('coin'); break;
+        case 'card': this.sound.play(e.v > 0 ? 'card' : 'bad'); if (e.v > 0) this.voice.say('charge'); this.fx.push({ t: 0, life: 1, text: `${e.v > 0 ? '+' : '−'}${Math.abs(e.v)}`, good: e.v > 0 }); this._burst(-r.x, 1.6, r.z + 0.5, e.v > 0 ? ['#6ab4ff', '#ffffff'] : ['#ff6a7a', '#ffffff'], 10); break;
+        case 'absorb': this.sound.play('absorb'); this.voice.say('trick'); this.fx.push({ t: 0, life: 1, text: `+${fmt(e.gain)}`, good: true }); this._burst(-r.x, 1.4, r.z + 0.8, ['#7be04a', '#ffe04a', '#ffffff'], 16, 5); this.flashT = 0.28; this.pop = 0.35; break;
+        case 'hurt': this.sound.play('hurt'); this.voice.say('bump'); this.shake = 0.5; this._burst(-r.x, 1.4, r.z, ['#ff5a5a', '#ffd23a'], 10); this._updateHearts(); this.hint(I.t('stronger'), 1600); break;
+        case 'warn': this.sound.play('warn'); this.voice.say('near'); this.hint(I.t('stronger'), 1800); break;
+        case 'coin': this.sound.play('coin'); this.voice.say('pickup'); break;
         case 'won': this._won(); break;
         case 'lost': this._lost(); break;
         default: break;
@@ -417,7 +426,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play' && !this.paused) this.togglePause(); }
-  dispose() { this.disposed = true; this.renderer.setAnimationLoop(null); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
+  dispose() { this.disposed = true; this.renderer.setAnimationLoop(null); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
 }
 
 const HUD_CSS = `

@@ -8,6 +8,9 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { Dino, LEVELS, STAGES, SPECIES, stageOf, zoomFor, toneOf, normalizeSave, rng } from './sim.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const DINO_CLIPS = { pickup: 3, charge: 2, bump: 2, near: 1, trick: 3, win: 2, count: 1 };
 
 const S = {
   title: ['ديناصور صغير يكبر', 'DINO GROW'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
@@ -263,6 +266,10 @@ class Game {
     I.setLang(config.lang); I.setGirl(config.gender === 'girl');
     this.age = Number(config.age) || 5; this.girl = config.gender === 'girl'; this.save = normalizeSave(config.save); this.base = config.base || './';
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: this.girl, clips: DINO_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('dg-style')) document.head.append(h('style', { id: 'dg-style' }, css('dg', '#3fae4a', '#17692e', '#ffe04a') + `
 .dg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--u)*1.6);width:100%}.dg-env{border:calc(var(--u)*.5) solid #fff;border-radius:calc(var(--u)*3);font-family:inherit;color:#fff;font-weight:900;padding:calc(var(--u)*1.2);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.4);font-size:calc(var(--u)*3);min-height:calc(var(--u)*24);cursor:pointer;justify-content:flex-end;text-shadow:0 1px 3px #000}.dg-env i{font-style:normal;font-size:calc(var(--u)*9)}.dg-env.lock{filter:grayscale(1) brightness(.6)}
 .dg-menu{display:flex;flex-direction:column;gap:calc(var(--u)*1.6);width:100%}.dg-row{display:flex;justify-content:space-between;width:100%;font-weight:900;font-size:calc(var(--u)*3.6)}
@@ -392,7 +399,7 @@ class Game {
 
   showSettings() {
     this._clear();
-    const b = h('button', { class: 'dg-btn', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); b.textContent = `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`; this.sound.play('tap'); } }, `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`);
+    const b = h('button', { class: 'dg-btn', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.voice.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); b.textContent = `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`; this.sound.play('tap'); } }, `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`);
     this.layer.append(h('div', { class: 'dg-dim', style: 'background:rgba(5,25,10,.25)' }, h('div', { class: 'dg-card' }, h('div', { class: 'dg-title' }, '⚙️ ', I.t('settings')), b, h('div', { class: 'dg-small' }, I.t('how')), h('button', { class: 'dg-btn dark', onclick: () => this.showMenu() }, I.t('back')))));
   }
 
@@ -474,6 +481,7 @@ class Game {
   }
 
   start(i) {
+    this.voice.say('count');
     this._clear(); this.sound.unlock();
     this._loadLevel(i, false); this.mode = 'play'; this.paused = false; this.shake = 0; this.shown = new Set(); this.pounceQ = false; this.stick = null;
     this.sound.setMode(i);
@@ -487,7 +495,7 @@ class Game {
     const i = this.level; const s = this.save; const won = r.stars;
     s.stars[i] = Math.max(s.stars[i] || 0, won); s.unlocked = Math.max(s.unlocked, Math.min(LEVELS.length, i + 2)); s.eaten += r.eaten;
     const sc = Math.round(r.time); if (!s.best[i] || sc < s.best[i]) s.best[i] = sc;
-    this.post({ type: 'save', save: s }); this.sound.play('win'); this.mode = 'over';
+    this.post({ type: 'save', save: s }); this.sound.play('win'); this.voice.say('win'); this.mode = 'over';
     const last = i === LEVELS.length - 1; const mm = Math.floor(r.time / 60); const ss = Math.round(r.time % 60);
     const stars = h('div', { class: 'dg-stars' }); for (let k = 0; k < 3; k++) { const sp = h('span', { class: k < won ? '' : 'off', style: `animation-delay:${0.3 + k * 0.35}s` }, '⭐'); stars.append(sp); if (k < won) setTimeout(() => this.sound.play('star'), 300 + k * 350); }
     this.layer.append(h('div', { class: 'dg-dim' }, h('div', { class: 'dg-card' }, h('div', { class: 'dg-logo', style: 'color:#7dff9a' }, I.t('complete')), h('div', { class: 'dg-small' }, I.t(this.girl ? 'win_f' : 'win_m')), stars,
@@ -532,7 +540,7 @@ class Game {
     for (const e of evs) {
       switch (e.type) {
         case 'eat': {
-          this.sound.play('chomp'); pr.m.userData.bite = 0.35;
+          this.sound.play('chomp'); this.voice.say('pickup'); pr.m.userData.bite = 0.35;
           this.burst('star', e.x, 1.2, e.z, 10, 5, 0.7, 0.7, [0xffe04a, 0xffffff, 0xffb0e0], 4);
           this.burst('leaf', e.x, 0.8, e.z, 8, 4, 1, 0.6, [0x6adb5a, 0x3aa83a, 0x9aff7a], 5);
           this.floatText(`+${I.num(e.gain)}`, e.x, 2.5, e.z, '#9dff7a');
@@ -541,27 +549,27 @@ class Game {
           break;
         }
         case 'evolve': {
-          this._makePlayer(e.stage); this.pop = 1.7; this.sound.play('evolve'); this.shake += 0.6;
+          this._makePlayer(e.stage); this.pop = 1.7; this.sound.play('evolve'); this.voice.say('charge'); this.shake += 0.6;
           this.burst('star', p.x, 2, p.z, 36, 9, 1.2, 0.9, [0xffe04a, 0xffffff, 0x8affea, 0xff9ae0], 2);
           this.burst('dot', p.x, 1, p.z, 16, 6, 0.8, 2.2, [0xffffff], 0); const ar = I.getLang() !== 'en';
           this.banner(I.t('evolved'), ar ? STAGES[e.stage].ar : STAGES[e.stage].en);
           break;
         }
         case 'bump': {
-          this.sound.play('bump'); this.shake += 0.7; this.burst('star', p.x, 1.5, p.z, 12, 6, 0.6, 0.6, [0xff4a4a, 0xffa040], 6);
+          this.sound.play('bump'); this.voice.say('bump'); this.shake += 0.7; this.burst('star', p.x, 1.5, p.z, 12, 6, 0.6, 0.6, [0xff4a4a, 0xffa040], 6);
           if (e.lost) this.floatText(`-${I.num(e.lost)}`, p.x, 2.8, p.z, '#ff6a6a'); if (e.src !== 'fire' && e.src !== 'stomp') this.hint('bump', 2200);
           break;
         }
         case 'pounce': this.sound.play('pounce'); this.burst('puff', p.x, 0.3, p.z, 6, 3, 0.5, 1.2, [0xd8c8a0], 0); break;
-        case 'alert': { if (!this.alertT || this.clock - this.alertT > 2) { this.alertT = this.clock; this.sound.play('alert'); this.hint('red', 3000); } this.floatText('❗', e.x, 4.5, e.z, '#ff4a4a', 0.9); break; }
+        case 'alert': { if (!this.alertT || this.clock - this.alertT > 2) { this.alertT = this.clock; this.sound.play('alert'); this.voice.say('near'); this.hint('red', 3000); } this.floatText('❗', e.x, 4.5, e.z, '#ff4a4a', 0.9); break; }
         case 'telegraph': this.sound.play('telegraph'); this.hint(e.kind === 'stomp' ? 'stomp' : 'fire', 2400); break;
         case 'stomp': this.sound.play('stomp', 1); this.sound.play('roar'); this.shake += 1.6; this.shockT = 0.55; this.shock.position.set(e.x, 0.15, e.z); this.shockR = e.radius;
           this.burst('puff', e.x, 0.5, e.z, 26, 11, 0.9, 3.2, [0xcbb68a, 0x9a8a6a], 0); break;
         case 'fire': this.sound.play('fire'); this.burst('dot', e.x, 3, e.z, 12, 7, 0.6, 2.2, [0xff9a2a, 0xffd23a], 0); break;
-        case 'bossBite': this.sound.play('bossHit'); this.sound.play('roar'); this.shake += 1.2; this.burst('star', e.x, 3, e.z, 28, 9, 1, 1, [0xffe04a, 0xff7a2a, 0xffffff], 3); this.hint('bossHit', 2000); this.floatText(`💥 ${'❤️'.repeat(e.hp)}`, e.x, 8, e.z, '#ffffff', 1.4); break;
-        case 'bossDown': this.sound.play('roar'); this.shake += 2; this.burst('star', e.x, 3, e.z, 60, 12, 1.8, 1.3, [0xffe04a, 0xffffff, 0xff9ae0, 0x8affea], 2); break;
+        case 'bossBite': this.sound.play('bossHit'); this.voice.say('trick'); this.sound.play('roar'); this.shake += 1.2; this.burst('star', e.x, 3, e.z, 28, 9, 1, 1, [0xffe04a, 0xff7a2a, 0xffffff], 3); this.hint('bossHit', 2000); this.floatText(`💥 ${'❤️'.repeat(e.hp)}`, e.x, 8, e.z, '#ffffff', 1.4); break;
+        case 'bossDown': this.sound.play('roar'); this.voice.say('win'); this.shake += 2; this.burst('star', e.x, 3, e.z, 60, 12, 1.8, 1.3, [0xffe04a, 0xffffff, 0xff9ae0, 0x8affea], 2); break;
         case 'alpha': { this.sound.play('roar'); this.sound.play('alert'); this.hint('alpha', 3600); break; }
-        case 'alphaDown': { const sp = SPECIES[e.kind]; const ar = I.getLang() !== 'en'; this.sound.play('roar'); this.shake += 1; this.banner(I.t('defeated'), ar ? sp.ar : sp.en); this.burst('star', e.x, 3, e.z, 40, 10, 1.4, 1.1, [0xffe04a, 0xffffff, 0xff9ae0, 0x8affea], 2); break; }
+        case 'alphaDown': { const sp = SPECIES[e.kind]; const ar = I.getLang() !== 'en'; this.sound.play('roar'); this.voice.say('trick'); this.shake += 1; this.banner(I.t('defeated'), ar ? sp.ar : sp.en); this.burst('star', e.x, 3, e.z, 40, 10, 1.4, 1.1, [0xffe04a, 0xffffff, 0xff9ae0, 0x8affea], 2); break; }
         case 'complete': this._finish(e); break;
         default: break;
       }
@@ -667,7 +675,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play' && !this.paused) this.togglePause(); }
-  dispose() { this.renderer.setAnimationLoop(null); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKeyUp); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
+  dispose() { this.renderer.setAnimationLoop(null); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKeyUp); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
 }
 
 const api = { start(el, config, post) { const g = new Game(el, config || {}, post); api.last = g; return { dispose: () => g.dispose(), pause: () => g.pause() }; } };

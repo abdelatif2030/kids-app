@@ -8,6 +8,9 @@ import { Run, ARENA, BEARS, KINDS, UPGRADES, normalizeSave, buyUpgrade, upgradeC
 import { Sound } from './audio.js';
 import { G, mesh, basic, clay, makeBear, makeEnemy, makeBoss, makeCandy, makeMint, makeJaw, shadowDisc, softDot, stripeTex, swirlTex } from './models.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const GUMMY_CLIPS = { trick: 3, pickup: 2, bump: 3, lap: 2, near: 2, charge: 2, win: 2, lose: 2, count: 1 };
 
 const S = {
   title: ['فرقة الدببة الجيلي', 'GUMMY SQUAD'], play: ['العب', 'PLAY'], stage: ['المرحلة', 'Stage'], nextStage: ['المرحلة الجاية', 'Next stage'], upgrades: ['التطويرات', 'UPGRADES'], settings: ['الإعدادات', 'SETTINGS'], back: ['رجوع', 'Back'],
@@ -83,6 +86,10 @@ class Game {
     this.age = Number(config.age) || 5;
     this.base = config.base || './';
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: GUMMY_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('gs-style')) document.head.append(h('style', { id: 'gs-style' }, STYLE));
     this.root = h('div', { class: 'gs-root' });
     el.append(this.root);
@@ -319,12 +326,13 @@ class Game {
 
   showSettings() {
     this.mode = 'menu'; this._clear();
-    const snd = h('button', { class: 'gs-btn dark', onclick: this._tap(() => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this._persist(); this.showSettings(); }) }, `🔊 ${I.t('sound')}: ${this.save.muted ? I.t('off') : I.t('on')}`);
+    const snd = h('button', { class: 'gs-btn dark', onclick: this._tap(() => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.voice.setMuted(this.save.muted); this._persist(); this.showSettings(); }) }, `🔊 ${I.t('sound')}: ${this.save.muted ? I.t('off') : I.t('on')}`);
     const lang = h('button', { class: 'gs-btn dark', onclick: this._tap(() => { this.save.lang = I.getLang() === 'ar' ? 'en' : 'ar'; I.setLang(this.save.lang); this._persist(); this.root.setAttribute('dir', this.dir); this.showSettings(); }) }, `🌐 ${I.t('language')}: ${I.getLang() === 'ar' ? 'العربية' : 'English'}`);
     this.layer.append(h('div', { class: 'gs-dim' }, h('div', { class: 'gs-card' }, h('div', { class: 'gs-title' }, I.t('settings')), snd, lang, h('div', { class: 'gs-small' }, I.t('how')), h('button', { class: 'gs-btn', onclick: this._tap(() => this.showMenu()) }, I.t('back')))));
   }
 
   startRun() {
+    this.voice.say('count');
     this._endRunVisuals();
     this.run = new Run({ seed: (Date.now() & 0xffffff) | 1, upgrades: this.save.upgrades, easy: this.age <= 3, stage: this.selStage ?? 0 });
     this.mode = 'play'; this.paused = false; this.shake = 0; this.endT = 0; this.bossDeadAt = null; this.camInit = false; this.hintShown = 0;
@@ -384,6 +392,7 @@ class Game {
     this.save = applyResult(this.save, res); this._persist();
     this.sound.mode('calm');
     this.sound.play(res.win ? 'win' : 'lose');
+    this.voice.say(res.win ? 'win' : 'lose');
     const stars = h('div', { class: 'gs-stars' }, ...[0, 1, 2].map((i) => h('span', { class: i < res.stars ? '' : 'off' }, '⭐')));
     this.layer.append(h('div', { class: 'gs-dim' }, h('div', { class: 'gs-card' }, h('div', { class: 'gs-title', style: 'font-size:calc(var(--u)*6.5)' }, I.t(res.win ? 'won' : 'lost')), res.win ? stars : null,
       h('div', { class: 'gs-row' }, h('span', {}, I.t('earned')), h('span', {}, '🍬 ', I.num(res.candies))), res.win ? h('div', { class: 'gs-row' }, h('span', {}, I.t('bonus')), h('span', {}, '🍬 ', I.num(res.bonus))) : null,
@@ -432,14 +441,14 @@ class Game {
         case 'shoot': S_.play(e.idx === 1 ? 'lime' : 'blue'); this.bearVis[e.idx].userData.kick = 1; break;
         case 'hit': if (this._throttle('hit', 70)) S_.play('hit'); this.addSparks(e.x, 1.2, e.y, 0xffffff, 2, 2); break;
         case 'impact': if (e.kind === 'magic') { S_.play('limeBoom'); this.addSparks(e.x, 1, e.y, 0xb0ff6a, 12, 4); this.decal(e.x, e.y, 1.7, 0xb0ff6a, 0.35, 0.4); } else if (e.kind === 'gum') { if (this._throttle('imp', 60)) S_.play('impact'); this.addSparks(e.x, 1, e.y, 0x8ab8ff, 3, 2); } else this.addSparks(e.x, 1, e.y, 0xc08aff, 5, 2); break;
-        case 'crumble': { S_.play('crumble'); const c = e.kind === 'boss' ? 0xff6ab8 : KINDS[e.kind].color; this.addBits(e.x, 0.8, e.y, c, e.kind === 'tank' ? 22 : 12, 5, 5); this.addBits(e.x, 0.8, e.y, 0xffffff, 4, 4, 4); this.addSparks(e.x, 1, e.y, c, 14, 4); break; }
-        case 'candy': if (this._throttle('candy', 50)) S_.play('candy'); break;
+        case 'crumble': { S_.play('crumble'); this.voice.say('trick'); const c = e.kind === 'boss' ? 0xff6ab8 : KINDS[e.kind].color; this.addBits(e.x, 0.8, e.y, c, e.kind === 'tank' ? 22 : 12, 5, 5); this.addBits(e.x, 0.8, e.y, 0xffffff, 4, 4, 4); this.addSparks(e.x, 1, e.y, c, 14, 4); break; }
+        case 'candy': if (this._throttle('candy', 50)) { S_.play('candy'); this.voice.say('pickup'); } break;
         case 'mintDrop': this.hint(I.t('mintHint'), 3500); S_.play('warn'); break;
         case 'revive': S_.play('revive'); this.addSparks(e.x, 1, e.y, 0x8affd8, 30, 5); this.decal(e.x, e.y, 2.4, 0x8affd8, 0.7, 0.6, true); break;
         case 'heal': S_.play('mint'); this.addSparks(this.squad().x, 1, this.squad().y, 0x8affd8, 20, 4); break;
-        case 'bearHit': S_.play('bearHit'); this.shake = Math.max(this.shake, 0.25); this.addSparks(e.x, 1.2, e.y, 0xff5a6a, 6, 3); break;
-        case 'bearDown': S_.play('bearDown'); this.addBits(e.x, 0.8, e.y, BEARS[e.idx].color, 14, 3, 4); this.shake = 0.5; break;
-        case 'wave': if (e.n > 1) { this.banner(`${I.t('wave')} ${I.num(e.n)}`); S_.play('wave'); } break;
+        case 'bearHit': S_.play('bearHit'); this.voice.say('bump'); this.shake = Math.max(this.shake, 0.25); this.addSparks(e.x, 1.2, e.y, 0xff5a6a, 6, 3); break;
+        case 'bearDown': S_.play('bearDown'); this.voice.say('bump'); this.addBits(e.x, 0.8, e.y, BEARS[e.idx].color, 14, 3, 4); this.shake = 0.5; break;
+        case 'wave': if (e.n > 1) { this.banner(`${I.t('wave')} ${I.num(e.n)}`); S_.play('wave'); this.voice.say('lap'); } break;
         case 'waveClear': S_.play('wave'); break;
         case 'spit': S_.play('spit'); break;
         case 'fuse': S_.play('warn'); break;
@@ -449,13 +458,13 @@ class Game {
         case 'splat': S_.play('splat'); this.addBits(e.x, 0.5, e.y, 0xff6ab8, 14, 4, 4); this.decal(e.x, e.y, e.r, 0xff6ab8, 5, 0.38); this.shake = Math.max(this.shake, 0.15); break;
         case 'blast': S_.play('blast'); this.addBits(e.x, 0.5, e.y, 0xffa23a, 18, 6, 5); this.addSparks(e.x, 1, e.y, 0xffe04a, 24, 6); this.decal(e.x, e.y, e.r, 0x3a2a30, 6, 0.35); this.shake = Math.max(this.shake, 0.4); break;
         case 'bossSlam': S_.play('slam'); this.shake = 0.9; this.addBits(e.x, 0.8, e.y, 0xd89a5a, 16, 6, 6); break;
-        case 'bossIntro': S_.mode('battle'); S_.play('roar'); this.banner(I.t('bossIntro'), 2400); break;
+        case 'bossIntro': S_.mode('battle'); S_.play('roar'); this.voice.say('near'); this.banner(I.t('bossIntro'), 2400); break;
         case 'bossLand': S_.play('slam'); this.shake = 1.0; this.addBits(e.x, 0.8, e.y, 0xff6ab8, 24, 7, 6); break;
         case 'phase': S_.play('roar'); this.shake = 0.7; break;
         case 'summon': S_.play('roar'); this.addSparks(e.x, 2, e.y, 0xff6ab8, 24, 5); break;
-        case 'super': S_.play('super'); this.banner(I.t('super'), 900); break;
+        case 'super': S_.play('super'); this.voice.say('charge'); this.banner(I.t('super'), 900); break;
         case 'jawLand': S_.play('superBoom'); this.shake = 1.4; this.addBits(e.x, 1, e.y, 0xff8ad0, 40, 9, 8); this.addBits(e.x, 1, e.y, 0x6aeaff, 24, 8, 8); this.addSparks(e.x, 1, e.y, 0xffffff, 40, 9); this.decal(e.x, e.y, e.r, 0xffffff, 0.6, 0.7, true); this.decal(e.x, e.y, e.r * 0.9, 0xff8ad0, 6, 0.3); break;
-        case 'bossDown': this.bossDeadAt = this.clock; S_.play('roar'); this.shake = 1.2; this.addBits(e.x, 1.5, e.y, 0xff6ab8, 60, 8, 8); this.addBits(e.x, 1.5, e.y, 0xd89a5a, 40, 8, 8); this.addSparks(e.x, 2, e.y, 0xffe04a, 60, 8); this.bossBarEl.style.display = 'none'; break;
+        case 'bossDown': this.bossDeadAt = this.clock; S_.play('roar'); this.voice.say('win'); this.shake = 1.2; this.addBits(e.x, 1.5, e.y, 0xff6ab8, 60, 8, 8); this.addBits(e.x, 1.5, e.y, 0xd89a5a, 40, 8, 8); this.addSparks(e.x, 2, e.y, 0xffe04a, 60, 8); this.bossBarEl.style.display = 'none'; break;
         case 'won': this.banner('🎉', 2400); break;
         default: break;
       }
@@ -640,7 +649,7 @@ class Game {
 
   pause() { this.sound.suspend(); if (this.mode === 'play' && !this.paused) this.togglePause(); }
   dispose() {
-    this.renderer.setAnimationLoop(null); this.sound.dispose(); if (this.ro) this.ro.disconnect();
+    this.renderer.setAnimationLoop(null); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey);
     this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove();
   }

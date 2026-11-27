@@ -8,6 +8,9 @@ import { Camp, BUILDS, SITE, FIRE, SIZE, HELPER_COST, normalizeSave } from './si
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num } from './i18n.js';
 import { h, css } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const CAMP_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 2, near: 1, win: 2 };
 
 const CSS = css('wc', '#5aa8e0', '#2a5a98', '#bfe8ff') + `
 .wc-hp{position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--u)*24);background:rgba(20,50,90,.7);border:calc(var(--u)*.4) solid #bfe8ff;border-radius:999px;color:#fff;font-weight:900;font-size:calc(var(--u)*3.6);padding:calc(var(--u)*1) calc(var(--u)*3);display:flex;gap:calc(var(--u)*2);align-items:center;white-space:nowrap}
@@ -24,6 +27,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: CAMP_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('wc-style')) document.head.append(h('style', { id: 'wc-style' }, CSS));
     this.root = h('div', { class: 'wc-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -135,6 +142,7 @@ class Game {
   }
 
   start() {
+    this.voice.say('go');
     this.c = new Camp({ easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1 });
     this.mode = 'play';
     this.paused = false;
@@ -178,6 +186,7 @@ class Game {
     this.save.finished += 1;
     this.post({ type: 'save', save: this.save });
     this.sound.play('win');
+    this.voice.say('win');
     this.layer.append(h('div', { class: 'wc-dim' }, h('div', { class: 'wc-card' },
       h('div', { class: 'wc-title' }, '🚪 ', t('done')),
       h('div', { class: 'wc-small' }, t('doneText')),
@@ -207,13 +216,13 @@ class Game {
     for (const e of c.step(dt, this._input())) {
       switch (e.type) {
         case 'chop': this.sound.play('chop'); this.puff(e.x, e.y, 3); break;
-        case 'log': this.sound.play('log'); if (e.me) this.fx.push({ x: e.x, y: e.y - 1, text: '+🪵', t: 0, life: 1 }); break;
-        case 'drop': this.sound.play('drop'); this.fx.push({ x: SITE.x, y: SITE.y - 1.5, text: `+${num(e.n)}`, t: 0, life: 1 }); break;
-        case 'built': this.sound.play('built'); this.hint(`${t('built')}: ${t(e.id)}`, 3000); break;
-        case 'storm': this.sound.play('storm'); this.hint(t('storm'), 4500); break;
-        case 'stormEnd': this.sound.play('stormEnd'); this.hint(t('stormEnd'), 2500); break;
-        case 'gate': this.sound.play('gate'); this.hint(t('gate'), 3500); break;
-        case 'hire': break;
+        case 'log': this.sound.play('log'); if (e.me) { this.voice.say('pickup'); this.fx.push({ x: e.x, y: e.y - 1, text: '+🪵', t: 0, life: 1 }); } break;
+        case 'drop': this.sound.play('drop'); this.voice.say('trick'); this.fx.push({ x: SITE.x, y: SITE.y - 1.5, text: `+${num(e.n)}`, t: 0, life: 1 }); break;
+        case 'built': this.sound.play('built'); this.voice.say('charge'); this.hint(`${t('built')}: ${t(e.id)}`, 3000); break;
+        case 'storm': this.sound.play('storm'); this.voice.say('near'); this.hint(t('storm'), 4500); break;
+        case 'stormEnd': this.sound.play('stormEnd'); this.voice.say('charge'); this.hint(t('stormEnd'), 2500); break;
+        case 'gate': this.sound.play('gate'); this.voice.say('charge'); this.hint(t('gate'), 3500); break;
+        case 'hire': this.voice.say('charge'); break;
         case 'done': this._result(); break;
         default: break;
       }
@@ -474,6 +483,8 @@ class Game {
   dispose() {
     cancelAnimationFrame(this.raf);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis);
     window.removeEventListener('keydown', this._onKey);

@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Rehlaty «أسماك الأعماق» underwater eat-and-grow fish game (three.js). Built into assets/games/deep_sea/game.js",
   "scripts": {
-    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/deep_sea/game.js",
+    "build": "node ../cozy_kit/build_game.mjs src/main.js ../../assets/games/deep_sea/game.js",
     "test": "node --test test/sim.test.js"
   },
   "dependencies": {

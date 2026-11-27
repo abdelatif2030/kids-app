@@ -8,6 +8,9 @@ import { Show, TRACKS, ANIMALS, R, normalizeSave } from './sim.js';
 import { mat, makeAnimal, addHeadphones, recordTexture, makeBar, makeTonearm, makeDeck, makeDiner } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const RHYTHM_CLIPS = { go: 2, trick: 2, bump: 3, charge: 2, win: 2, lose: 2, count: 1 };
 import { CSS, CSS2, CSS3, h } from './ui.js';
 
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
@@ -33,6 +36,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: RHYTHM_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.quality = { low: lowEnd() };
     if (!document.getElementById('rh-style')) document.head.append(h('style', { id: 'rh-style', text: CSS + CSS2 + CSS3 }));
     this.root = h('div', { class: 'rh-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -258,6 +265,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -412,7 +420,8 @@ class Game {
       if (i + 2 > this.save.unlocked && i + 1 < TRACKS.length) this.save.unlocked = i + 2;
       this._saveNow();
       this.sound.play('win');
-    } else this.sound.play('lose');
+      this.voice.say('win');
+    } else { this.sound.play('lose'); this.voice.say('lose'); }
     const place = won ? 1 : sh.left + 1;
     const hasNext = won && i + 1 < TRACKS.length;
     const dim = h('div', { class: won ? 'rh-dim rh-win' : 'rh-dim' }, h('div', { class: 'rh-panel' },
@@ -439,9 +448,10 @@ class Game {
     const p = sh.player;
     for (const e of events) {
       switch (e.type) {
-        case 'count': this.sound.play('count', e.n); this.hud.count.textContent = num(e.n); break;
+        case 'count': this.sound.play('count', e.n); if (e.n >= 3) this.voice.say('count'); this.hud.count.textContent = num(e.n); break;
         case 'go':
           this.sound.play('go');
+          this.voice.say('go');
           this.hud.count.textContent = '';
           this.sound.setTempo(sh.track.bpm);
           this._hint('hintLow', 3);
@@ -453,16 +463,16 @@ class Game {
         }
         case 'jump': if (e.id === 0) this.sound.play('jump'); break;
         case 'duck': if (e.id === 0) this.sound.play('duck'); break;
-        case 'hit': if (e.id === 0) { this.sound.play('hit'); this.shake = 0.4; } else if (Math.hypot(e.x - p.x, e.z - p.z) < 4) this.sound.play('bump'); break;
-        case 'bump': this.sound.play('bump'); this._pop(t('bump'), e.x, e.z); break;
+        case 'hit': if (e.id === 0) { this.sound.play('hit'); this.voice.say('bump'); this.shake = 0.4; } else if (Math.hypot(e.x - p.x, e.z - p.z) < 4) this.sound.play('bump'); break;
+        case 'bump': this.sound.play('bump'); this.voice.say('bump'); this._pop(t('bump'), e.x, e.z); break;
         case 'out': {
           this.sound.play('out');
-          if (e.id !== 0) this._pop(t('out'), e.x, e.z);
+          if (e.id !== 0) { this._pop(t('out'), e.x, e.z); this.voice.say('trick'); }
           this.fallers.push({ id: e.id, t: 0, x: e.x, z: e.z });
           this.hud.faces.children[e.id].classList.add('off');
           break;
         }
-        case 'saved': this.sound.play('saved'); this.toast(`${t('saved')} ${'❤️'.repeat(e.lives)}`, 1.8); this.hud.hearts.textContent = '❤️'.repeat(e.lives); break;
+        case 'saved': this.sound.play('saved'); this.voice.say('charge'); this.toast(`${t('saved')} ${'❤️'.repeat(e.lives)}`, 1.8); this.hud.hearts.textContent = '❤️'.repeat(e.lives); break;
         case 'flipWarn': this.sound.play('flipWarn'); this._hint('hintFlip'); break;
         case 'flip': this.sound.play('flip'); this.shake = 0.3; break;
         case 'gapWarn': this.sound.play('gapWarn'); this._hint('hintGap'); break;
@@ -593,6 +603,8 @@ class Game {
   dispose() {
     clearInterval(this._pill);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
       this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });

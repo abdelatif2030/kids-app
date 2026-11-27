@@ -6,6 +6,9 @@
 import { Game as Maze, LEVELS, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const CHOMP_CLIPS = { go: 2, trick: 3, charge: 2, bump: 2, win: 2, lose: 2 };
 
 const S = {
   title: ['الأكول', 'Chomp Maze'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
@@ -45,6 +48,10 @@ class Game {
     this.save = normalizeSave(config.save);
     this.base = config.base || './';
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: CHOMP_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('cm-style')) document.head.append(h('style', { id: 'cm-style' }, css('cm', '#3a6ae8', '#101840', '#ffe04a')));
     this.root = h('div', { class: 'cm-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -89,6 +96,7 @@ class Game {
   }
 
   start(i) {
+    this.voice.say('go');
     this.levelIdx = i;
     this.game = new Maze({ level: i, easy: this.age <= 5, seed: (Date.now() & 0xffff) + 1 });
     this.mode = 'play'; this.paused = false; this.ready = 1.4;
@@ -106,7 +114,7 @@ class Game {
     const g = this.game; const lv = this.levelIdx + 1;
     if (won) { this.save.stars[lv] = Math.max(this.save.stars[lv] || 0, g.stars); this.save.unlocked = Math.max(this.save.unlocked, Math.min(LEVELS, lv + 1)); }
     this.save.best = Math.max(this.save.best, g.score);
-    this.post({ type: 'save', save: this.save }); this.sound.play(won ? 'win' : 'lose');
+    this.post({ type: 'save', save: this.save }); this.sound.play(won ? 'win' : 'lose'); this.voice.say(won ? 'win' : 'lose');
     this.layer.append(h('div', { class: 'cm-dim' }, h('div', { class: 'cm-card' }, h('div', { class: 'cm-title' }, won ? I.t('won') : I.t('lost')), won ? h('div', { class: 'cm-stars' }, [1, 2, 3].map((s) => h('span', { class: s <= g.stars ? '' : 'off' }, '⭐'))) : null, h('div', { class: 'cm-pill' }, `${I.t('score')} ${I.num(g.score)}`),
       won && this.levelIdx < LEVELS - 1 ? h('button', { class: 'cm-btn', onclick: () => this.start(this.levelIdx + 1) }, I.t('next')) : null, h('button', { class: 'cm-btn alt', onclick: () => this.start(this.levelIdx) }, I.t('again')), h('button', { class: 'cm-btn dark', onclick: () => this.showMenu() }, I.t('menu')))));
   }
@@ -119,9 +127,9 @@ class Game {
     for (const e of g.step(dt)) {
       switch (e.type) {
         case 'dot': this.sound.play('dot'); break;
-        case 'power': this.sound.play('power'); break;
-        case 'eatGhost': this.sound.play('eatGhost', e.n); break;
-        case 'caught': this.sound.play('caught'); this.ready = 1.2; break;
+        case 'power': this.sound.play('power'); this.voice.say('charge'); break;
+        case 'eatGhost': this.sound.play('eatGhost', e.n); this.voice.say('trick'); break;
+        case 'caught': this.sound.play('caught'); this.voice.say('bump'); this.ready = 1.2; break;
         case 'won': this._end(true); break;
         case 'lost': this._end(false); break;
         default: break;
@@ -178,7 +186,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play' && !this.paused) this.togglePause(); }
-  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
+  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
 }
 
 const api = { start(el, config, post) { const g = new Game(el, config || {}, post); api.last = g; return { dispose: () => g.dispose(), pause: () => g.pause() }; } };

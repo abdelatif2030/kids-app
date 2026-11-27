@@ -11,6 +11,9 @@ import {
 } from './models.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { loadSprites, makeSpriteVehicle, recolorSprite, loadGLBs, makeModelVehicle } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const COAST_CLIPS = { go: 2, nitro: 3, near: 3, bump: 3, pickup: 2, win: 2, lose: 2, count: 1 };
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
 import { CSS, h, arc } from './ui.js';
@@ -97,6 +100,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: COAST_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.quality = { low: lowEnd() };
     if (!document.getElementById('cd-style')) document.head.append(h('style', { id: 'cd-style', text: CSS }));
     this.root = h('div', { class: 'cd-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -382,6 +389,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -611,6 +619,7 @@ class Game {
     const i = this.levelIndex;
     const lv = LEVELS[i];
     this.mode = 'results';
+    this.voice.say(res.won ? 'win' : 'lose');
     this.sound.engines(false);
     this.sound.setMode('menu');
     const total = res.coins + res.reward;
@@ -655,27 +664,30 @@ class Game {
   _event(e, r) {
     const S = this.sound;
     switch (e.type) {
-      case 'count': S.play('count'); this._count(num(e.n), true); break;
+      case 'count': S.play('count'); if (e.n >= 3) this.voice.say('count'); this._count(num(e.n), true); break;
       case 'go':
         S.play('go');
+        this.voice.say('go');
         this._count(t('go'));
         setTimeout(() => this.mode === 'race' && !this._steered && this.toast(t('steer'), 3), 1500);
         break;
       case 'nearMiss':
         S.play('near', e.combo);
+        this.voice.say('near');
         this._pop('near', `${t('nearMiss').toUpperCase()} +${num(this.r.mult)}`);
         if (e.combo >= 2) { this._pop('combo', `${t('combo').toUpperCase()} ×${num(Math.min(5, e.combo))}`); if (e.combo % 3 === 0) S.play('combo'); }
         this.streakBurst = 0.3;
         if (e.gap < 0.6 && Math.random() < 0.5) setTimeout(() => S.play('honk', e.kind), 250);
         break;
       case 'coin':
-        if ((this._coinT ?? 0) <= 0) { S.play('coin'); this._coinT = 0.05; }
+        if ((this._coinT ?? 0) <= 0) { S.play('coin'); this.voice.say('pickup'); this._coinT = 0.05; }
         this.coinFx.burst(e.x, 1, -e.s, 6, 3, 0.4);
         break;
-      case 'nitro': S.play('nitro'); this.shake = 0.25; break;
+      case 'nitro': S.play('nitro'); this.voice.say('nitro'); this.shake = 0.25; break;
       case 'nitroEnd': S.play('nitroEnd'); break;
       case 'crash':
         S.play('crash');
+        this.voice.say('bump');
         setTimeout(() => S.play('honk'), 300);
         this.shake = 0.8;
         this.sparks.burst(e.x, 0.8, -e.s, 40, 7, 0.6);
@@ -684,7 +696,7 @@ class Game {
       case 'blink': if ((this.r.traffic.find((c) => c.id === e.id)?.s ?? 1e9) - this.r.p.s < 70) S.play('blink'); break;
       case 'needMore': S.play('needMore'); this.toast(t('needMore', { n: num(e.left) }), 3); break;
       case 'finish': S.play('finish'); this._count('🏁'); break;
-      case 'wrecked': S.play('wrecked'); this._count(t('wrecked')); break;
+      case 'wrecked': S.play('wrecked'); this.voice.say('bump'); this._count(t('wrecked')); break;
       default:
     }
   }
@@ -909,6 +921,8 @@ class Game {
     clearInterval(this._pill);
     clearTimeout(this._tt);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
       this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });

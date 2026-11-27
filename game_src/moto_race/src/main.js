@@ -8,6 +8,9 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Race, ROUNDS, RIDERS, LAPS, normalizeSave } from './sim.js';
 import { pointAt, HALF_W, WALL } from './track.js';
 import { loadSprites, makeBillboardVehicle } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const MOTO_CLIPS = { go: 2, nitro: 3, overtake: 3, bump: 3, draft: 2, lap: 2, win: 2, lose: 2, count: 1 };
 import { mat, makeBike, makePalm, makeStand, makeGantry, makeChevron, makeMountain, makeLighthouse, roadTexture, makeClouds, meshTexture } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
@@ -86,6 +89,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: MOTO_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.quality = { low: lowEnd() };
     if (!document.getElementById('mr-style')) document.head.append(h('style', { id: 'mr-style', text: CSS + CSS2 + CSS3 }));
     this.root = h('div', { class: 'mr-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -246,6 +253,7 @@ class Game {
     if (this.scene) this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
     const rd = ROUNDS[roundIndex];
     this.race = new Race({ round: roundIndex, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1 });
+    this.voice.say('count');
     const tr = this.race.track;
     const s = (this.scene = new THREE.Scene());
     const sky = rd.sunset ? 0xffb07a : 0x8fd0ff;
@@ -590,6 +598,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -728,6 +737,7 @@ class Game {
     if (!this.save.best[id] || r.time < this.save.best[id]) this.save.best[id] = Math.round(r.time * 10) / 10;
     this._saveNow();
     this.sound.play(r.place === 1 ? 'win' : 'finish');
+    this.voice.say(r.place === 1 ? 'win' : 'lose');
     const top = race.order.slice(0, 3);
     const podium = [top[1], top[0], top[2]].map((rr, k) => rr && h('div', {},
       (() => { const e = h('span', { class: 'f' }); e.innerHTML = helmetDot(rr.helmet); return e; })(),
@@ -766,6 +776,7 @@ class Game {
         case 'light': this.sound.play('light'); this.lights.forEach((l, k) => l.material.color.set(k < e.n ? 0xff2a2a : 0x4a1010)); [...this.hud.lights.children].forEach((l, k) => l.classList.toggle('on', k < e.n)); break;
         case 'go':
           this.sound.play('go');
+          this.voice.say('go');
           this.lights.forEach((l) => l.material.color.set(0x3aff6a));
           this.hud.lights.classList.add('go');
           [...this.hud.lights.children].forEach((l) => l.classList.add('on'));
@@ -773,19 +784,19 @@ class Game {
           this.hud.title.remove();
           this._tag(t('go'), 0.8);
           break;
-        case 'nitro': if (e.id === 0) { this.sound.play('nitro'); this._tag(t('boost'), 0.9); } break;
-        case 'draft': this.sound.play('draft'); this._tag(t('draft'), 1); break;
+        case 'nitro': if (e.id === 0) { this.sound.play('nitro'); this.voice.say('nitro'); this._tag(t('boost'), 0.9); } break;
+        case 'draft': this.sound.play('draft'); this.voice.say('draft'); this._tag(t('draft'), 1); break;
         case 'bump': this.sound.play('bump'); this.shake = 0.3; break;
-        case 'wall': if (e.id === 0) { this.sound.play('wall'); this.shake = 0.45; for (let k = 0; k < 12; k++) this.sparks.emit(e.x, 0.6, e.z, (Math.random() - 0.5) * 6, Math.random() * 4, (Math.random() - 0.5) * 6, 0.5); } break;
+        case 'wall': if (e.id === 0) { this.sound.play('wall'); this.voice.say('bump'); this.shake = 0.45; for (let k = 0; k < 12; k++) this.sparks.emit(e.x, 0.6, e.z, (Math.random() - 0.5) * 6, Math.random() * 4, (Math.random() - 0.5) * 6, 0.5); } break;
         case 'grass': if (e.id === 0) this.sound.play('grass'); break;
         case 'crash':
-          if (e.id === 0) { this.sound.play('crash'); this.shake = 0.8; this._tag(t('crash'), 1.4, true); }
+          if (e.id === 0) { this.sound.play('crash'); this.voice.say('bump'); this.shake = 0.8; this._tag(t('crash'), 1.4, true); }
           for (let k = 0; k < 18; k++) this.sparks.emit(e.x, 0.5, e.z, (Math.random() - 0.5) * 8, Math.random() * 5, (Math.random() - 0.5) * 8, 0.6);
           break;
         case 'recover': if (e.id === 0) this.sound.play('lap'); break;
-        case 'lap': if (e.id === 0) { this.sound.play('lap'); this._tag(e.lap === LAPS ? t('lastLap') : `${t('lap')} ${num(e.lap)}`, 1.4); } break;
+        case 'lap': if (e.id === 0) { this.sound.play('lap'); this.voice.say('lap'); this._tag(e.lap === LAPS ? t('lastLap') : `${t('lap')} ${num(e.lap)}`, 1.4); } break;
         case 'cross': if (e.id === 0) this.sound.play('crowd'); break;
-        case 'overtake': if (e.place < before) { this.sound.play('overtake'); if (Math.random() < 0.5) this._tag(t('overtake'), 0.8); } break;
+        case 'overtake': if (e.place < before) { this.sound.play('overtake'); this.voice.say('overtake'); if (Math.random() < 0.5) this._tag(t('overtake'), 0.8); } break;
         case 'finish': setTimeout(() => this.mode === 'race' && this._results(), 1500); break;
         default:
       }
@@ -963,6 +974,8 @@ class Game {
     if (this._introAudio) { try { this._introAudio.pause(); } catch (_) { /* fine */ } }
     clearInterval(this._pill);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
       if (this.scene) this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });

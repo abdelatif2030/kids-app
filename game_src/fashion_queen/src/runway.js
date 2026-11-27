@@ -27,6 +27,7 @@ export function runwayShowView(g, arg) {
     const r = L.finishRunway(g.save, theme.id, sc.stars);
     g.refreshBar(); g.afterEvent(); g.commit();
     g.sound.play(sc.stars === 3 ? 'win' : 'ok'); g.sound.play('applause');
+    g.voice.say(sc.stars === 3 ? 'win' : 'charge');
     if (sc.stars >= 2) g.confetti();
     const st = h('div', { class: 'fq-stars' }, [0, 1, 2].map((i) => h('span', { class: i < sc.stars ? '' : 'off' }, '⭐')));
     const spans = [...st.children];

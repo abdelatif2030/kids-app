@@ -7,6 +7,9 @@ import { loadArt } from '../../cozy_kit/art.js';
 import { setPics, THEMES, sprite, drawKid, drawPorch, drawPit, drawSprinkler, drawDog, drawJack, drawHedge, drawSpider, buildTile, buildSky, drawMoon, drawLeaf, drawHero } from './art.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n, rng } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const TT_CLIPS = { go: 2, pickup: 2, charge: 2, trick: 3, bump: 3, near: 2, win: 2 };
 
 const NAMES = [['زقاق اليقطين', 'Pumpkin Lane'], ['الحديقة الضبابية', 'Foggy Park'], ['القصر الودود', 'Friendly Mansion'], ['مزرعة القش', 'Haystack Farm'], ['تلّة حلوى الذرة', 'Candy-Corn Hill'], ['جسر الفوانيس', 'Lantern Bridge'], ['موكب منتصف الليل', 'Midnight Parade']];
 const CNAMES = { ghost: ['شبح الملاية', 'Sheet ghost'], pumpkin: ['بدلة يقطينة', 'Pumpkin suit'], witch: ['ساحرة صغيرة', 'Little witch'], robot: ['روبوت كرتون', 'Cardboard robot'], cat: ['قطة', 'Kitty'], mummy: ['مومياء لطيفة', 'Friendly mummy'], dino: ['ديناصور', 'Dino'], bat: ['خفّاش', 'Bat'] };
@@ -36,6 +39,10 @@ class Game {
     this.easy = easyFor(config.age);
     this.save = normalizeSave(config.save);
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: TT_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('tt-style')) document.head.append(h('style', { id: 'tt-style' }, css('tt', '#ff9a3a', '#7a2a8a', '#ffd24a') + CSS));
     this.root = h('div', { class: 'tt-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -149,13 +156,14 @@ class Game {
     this.layer.replaceChildren();
     const en = I.getLang() === 'en';
     this.layer.append(this.card(h('div', { class: 'tt-title' }, I.t('settings')),
-      this.btn(`${I.t('soundOn')}: ${this.save.muted ? I.t('off') : I.t('on')}`, () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); this.showSettings(); }),
+      this.btn(`${I.t('soundOn')}: ${this.save.muted ? I.t('off') : I.t('on')}`, () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.voice.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); this.showSettings(); }),
       this.btn(`${I.t('lang')}: ${en ? 'English' : 'العربية'}`, () => { I.setLang(en ? 'ar' : 'en'); this.root.setAttribute('dir', en ? 'rtl' : 'ltr'); this.showSettings(); }),
       this.btn(I.t('back'), () => this.showMenu(), 'dark')));
   }
 
   // ---- play ----------------------------------------------------------------------------------------------------------------
   startLevel(n) {
+    this.voice.say('go');
     this.level = n; this.themeIdx = n - 1; this.sim = new Sim({ level: n, easy: this.easy, seed: (Date.now() & 0xfff) + 1 });
     this.mode = 'play'; this.fx = []; this.parts = []; this.held = false; this.sound.setMode('play'); this.won = false;
     this.layer.replaceChildren();
@@ -183,23 +191,23 @@ class Game {
       switch (e.type) {
         case 'jump': this.sound.play('jump'); break;
         case 'land': this.sound.play('land'); break;
-        case 'candy': this.sound.play('candy', s.candy); this._pop(e.x, e.y, ['#ffd24a', '#ff6a9a'], 4); break;
+        case 'candy': this.sound.play('candy', s.candy); this.voice.say('pickup'); this._pop(e.x, e.y, ['#ffd24a', '#ff6a9a'], 4); break;
         case 'ring':
-          if (e.kind === 'friendly') { this.sound.play('bell'); this.sound.play('join'); this.fx.push({ x: e.x, y: e.high ? 3.6 : 2.4, t: 0, text: `+${e.n}`, col: '#7aff9a' }); this._pop(e.x, e.high ? 2.8 : 1.6, ['#ffd24a', '#7aff9a', '#fff'], 14); }
-          else { this.sound.play('bell'); this.sound.play('scare'); this.fx.push({ x: e.x, y: 3.6, t: 0, text: `-${e.lost}`, col: '#ff7a7a' }); this._pop(e.x, 2.5, ['#ff7a7a'], 8); }
+          if (e.kind === 'friendly') { this.sound.play('bell'); this.sound.play('join'); this.voice.say('charge'); this.fx.push({ x: e.x, y: e.high ? 3.6 : 2.4, t: 0, text: `+${e.n}`, col: '#7aff9a' }); this._pop(e.x, e.high ? 2.8 : 1.6, ['#ffd24a', '#7aff9a', '#fff'], 14); }
+          else { this.sound.play('bell'); this.sound.play('scare'); this.voice.say('bump'); this.fx.push({ x: e.x, y: 3.6, t: 0, text: `-${e.lost}`, col: '#ff7a7a' }); this._pop(e.x, 2.5, ['#ff7a7a'], 8); }
           break;
-        case 'hit': this.sound.play('hit'); this.fx.push({ x: s.hero.x, y: 2.4, t: 0, text: e.lost ? `-${e.lost}` : '!', col: '#ff9a7a' }); break;
-        case 'float': this.sound.play('bell'); this.sound.play('join'); this.fx.push({ x: e.x, y: e.y + 0.6, t: 0, text: `+${e.n}`, col: '#7aff9a' }); this._pop(e.x, e.y, ['#ff7ab0', '#ffd24a', '#fff'], 16); break;
-        case 'perfect': this.sound.play('cheer'); this.fx.push({ x: e.x, y: e.y + 1, t: 0, text: I.t('perfect'), col: '#ffd24a', big: true }); this._pop(e.x, e.y, ['#ffd24a', '#fff'], 14); break;
+        case 'hit': this.sound.play('hit'); this.voice.say('bump'); this.fx.push({ x: s.hero.x, y: 2.4, t: 0, text: e.lost ? `-${e.lost}` : '!', col: '#ff9a7a' }); break;
+        case 'float': this.sound.play('bell'); this.sound.play('join'); this.voice.say('charge'); this.fx.push({ x: e.x, y: e.y + 0.6, t: 0, text: `+${e.n}`, col: '#7aff9a' }); this._pop(e.x, e.y, ['#ff7ab0', '#ffd24a', '#fff'], 16); break;
+        case 'perfect': this.sound.play('cheer'); this.voice.say('trick'); this.fx.push({ x: e.x, y: e.y + 1, t: 0, text: I.t('perfect'), col: '#ffd24a', big: true }); this._pop(e.x, e.y, ['#ffd24a', '#fff'], 14); break;
         case 'recollect': this.sound.play('recollect'); this.fx.push({ x: e.x, y: 2, t: 0, text: '+1', col: '#7aff9a' }); break;
         case 'return': this.sound.play('recollect'); break;
         case 'hedgePush': this.sound.play('push'); break;
-        case 'hedgeBreak': this.sound.play('break'); this._pop(e.x + 0.8, 1.5, ['#38a046', '#2a7a34', '#ff6a8a'], 26); break;
+        case 'hedgeBreak': this.sound.play('break'); this.voice.say('trick'); this._pop(e.x + 0.8, 1.5, ['#38a046', '#2a7a34', '#ff6a8a'], 26); break;
         case 'wake': this.sound.play('wake'); break;
-        case 'bossStart': this.sound.setMode('boss'); this.hint(I.t('hintBoss'), 3.5); break;
-        case 'bossTele': this.sound.play('warn'); this.hint(I.t(e.attack === 'roll' ? 'tRoll' : e.attack === 'stomp' ? 'tStomp' : 'tSwat'), e.tele + 0.6); break;
-        case 'bossHit': this.sound.play('boing'); this.sound.play('cheer'); this._pop(s.boss.x - 1, 3.5, ['#ffd24a', '#ff6a9a', '#7ad0ff'], 24); break;
-        case 'bossDown': this.sound.play('deflate'); break;
+        case 'bossStart': this.sound.setMode('boss'); this.voice.say('near'); this.hint(I.t('hintBoss'), 3.5); break;
+        case 'bossTele': this.sound.play('warn'); this.voice.say('near'); this.hint(I.t(e.attack === 'roll' ? 'tRoll' : e.attack === 'stomp' ? 'tStomp' : 'tSwat'), e.tele + 0.6); break;
+        case 'bossHit': this.sound.play('boing'); this.sound.play('cheer'); this.voice.say('trick'); this._pop(s.boss.x - 1, 3.5, ['#ffd24a', '#ff6a9a', '#7ad0ff'], 24); break;
+        case 'bossDown': this.sound.play('deflate'); this.voice.say('win'); break;
         case 'won': this._won(e); break;
         default: break;
       }
@@ -208,7 +216,7 @@ class Game {
   _pop(x, y, cols, n) { for (let i = 0; i < n && this.parts.length < 160; i++) { const a = Math.random() * 6.28; const v = 2 + Math.random() * 4; this.parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v + 2, t: 0, life: 0.8 + Math.random() * 0.5, col: cols[i % cols.length], s: 0.12 + Math.random() * 0.12 }); } }
 
   _won(res) {
-    if (this.won) return; this.won = true; this.mode = 'result'; this.sound.setMode(false); this.sound.play('win');
+    if (this.won) return; this.won = true; this.mode = 'result'; this.sound.setMode(false); this.sound.play('win'); this.voice.say('win');
     this.save = applyResult(this.save, this.level, res); this.post({ type: 'save', save: this.save });
     this.layer.replaceChildren();
     const nextOk = this.level < NUM_LEVELS;
@@ -390,7 +398,7 @@ class Game {
     if (a.type === 'roll' && a.t < a.tele) { g.fillStyle = '#ffd24a'; g.font = `900 ${1.4 * u}px system-ui`; g.textAlign = 'center'; g.fillText('⚠', X(hero.x) + 3 * u, gy - 1.6 * u + Math.sin(this.clock * 20) * 0.1 * u); }
   }
 
-  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.root.remove(); }
+  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.root.remove(); }
 }
 
 const CSS = `

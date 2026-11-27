@@ -7,6 +7,9 @@ import { Puzzle, LEVELS, trace, N, E, S, W, normalizeSave } from './sim.js';
 import { paintBackground, drawBoard, drawTile, drawStar, drawPortal, drawDragon } from './art.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num } from './i18n.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const COIL_CLIPS = { go: 2, pickup: 2, charge: 2, bump: 2, win: 2, lose: 2 };
 
 const CSS = `
 .fc-root{position:absolute;inset:0;overflow:hidden;font-family:Tajawal,system-ui,sans-serif;color:#4a2a14;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent;background:#7a74b8}
@@ -76,6 +79,10 @@ class Game {
     this.save = normalizeSave(config.save);
     this.base = config.base || './';
     this.sound = new Sound();
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: COIL_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.sound.muted = !!this.save.muted;
     if (!document.getElementById('fc-style')) document.head.append(h('style', { id: 'fc-style' }, CSS));
     this.root = h('div', { class: 'fc-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -158,12 +165,12 @@ class Game {
     const before = p.flow.cells.length;
     const ev = p.tap(r, c);
     if (!ev) return;
-    if (ev.type === 'stuck') { this.sound.play('stuck'); this.anim.set(`${r},${c}`, { shake: 0.3 }); this._hint(t('frozen'), 1.6); return; }
+    if (ev.type === 'stuck') { this.sound.play('stuck'); this.voice.say('bump'); this.anim.set(`${r},${c}`, { shake: 0.3 }); this._hint(t('frozen'), 1.6); return; }
     this.sound.play('turn');
     this.anim.set(`${r},${c}`, { a: -Math.PI / 2 }); // turns from the old angle to the new one
     this.taps = (this.taps ?? 0) + 1;
-    if (ev.reach > before) setTimeout(() => this.sound.play('reach', ev.reach), 90);
-    if (p.flow.cells.some((x) => p.level.tiles[x.r][x.c].star) && !this.starSaid) { this.starSaid = true; setTimeout(() => this.sound.play('star'), 200); }
+    if (ev.reach > before) setTimeout(() => { this.sound.play('reach', ev.reach); this.voice.say('pickup'); }, 90);
+    if (p.flow.cells.some((x) => p.level.tiles[x.r][x.c].star) && !this.starSaid) { this.starSaid = true; setTimeout(() => { this.sound.play('star'); this.voice.say('charge'); }, 200); }
     this._hud();
     if (ev.won) {
       this.mode = 'travel';
@@ -206,7 +213,7 @@ class Game {
   }
   _soundBtn() {
     const b = h('button', { class: 'fc-round fc-wood', style: 'right:calc(var(--u)*4)', 'aria-label': 'sound' }, this.sound.muted ? '🔇' : '🔊');
-    b.addEventListener('click', (e) => { e.stopPropagation(); this.sound.unlock(); this.sound.setMuted(!this.sound.muted); this.save.muted = this.sound.muted; this._saveNow(); b.textContent = this.sound.muted ? '🔇' : '🔊'; });
+    b.addEventListener('click', (e) => { e.stopPropagation(); this.sound.unlock(); this.sound.setMuted(!this.sound.muted); this.voice.setMuted(this.sound.muted); this.save.muted = this.sound.muted; this._saveNow(); b.textContent = this.sound.muted ? '🔇' : '🔊'; });
     return b;
   }
 
@@ -231,6 +238,7 @@ class Game {
   }
 
   startLevel(i) {
+    this.voice.say('go');
     this.levelIndex = i;
     this.p = new Puzzle(i, this.age <= 4);
     this.mode = 'play';
@@ -284,6 +292,7 @@ class Game {
     this._saveNow();
     this._hud();
     this.sound.play('win');
+    this.voice.say('win');
     const last = this.levelIndex + 1 >= LEVELS.length;
     this.layer.append(h('div', { class: 'fc-dim' }, h('div', { class: 'fc-card' },
       h('div', { class: 'fc-logo', style: 'font-size:calc(var(--u)*8)' }, t('title')),
@@ -297,6 +306,7 @@ class Game {
   }
 
   _outCard() {
+    this.voice.say('lose');
     this.layer.append(h('div', { class: 'fc-dim' }, h('div', { class: 'fc-card' },
       h('div', { class: 'fc-logo', style: 'font-size:calc(var(--u)*8)' }, t('title')),
       h('div', { class: 'fc-pill' }, t('outTitle')),
@@ -384,6 +394,8 @@ class Game {
     clearInterval(this._pill);
     clearTimeout(this._ht);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis);
     this.root.remove();

@@ -8,6 +8,9 @@
 import { Studio, RANKS, KINDS, SHOP, UNLOCKS, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const TYCOON_CLIPS = { go: 2, trick: 3, pickup: 2, bump: 2, charge: 2, near: 1, win: 2 };
 import { loadArt } from '../../cozy_kit/art.js';
 
 const S = {
@@ -76,6 +79,10 @@ class Game {
     this.artP = loadArt(this.base, ART_NAMES).then((a) => { this.art = a; this.artKey = ''; });
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: TYCOON_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('ct-style')) document.head.append(h('style', { id: 'ct-style' }, css('ct', '#2a3a9a', '#141c5a', '#ffe04a') + `
 .ct-root{background:#0a1030;touch-action:manipulation}
 .ct-app{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,calc(var(--u)*66));display:flex;flex-direction:column;gap:calc(var(--u)*1);padding:calc(var(--u)*1.4);box-sizing:border-box}
@@ -182,6 +189,7 @@ class Game {
   }
 
   start() {
+    this.voice.say('go');
     this.s = new Studio({ seed: (Date.now() & 0xffff) + 1 });
     this.mode = 'play'; this.modal = null; this.lastKind = 'photo'; this.cardT = 0; this.bossT = 0;
     this.layer.replaceChildren();
@@ -265,6 +273,7 @@ class Game {
       card.classList.add('done', slop ? 'slop' : res === 'ok' ? 'ok' : 'master');
       tag.textContent = slop ? I.t('slop') : res === 'ok' ? I.t('ok') : I.t('master');
       if (e0) card.append(h('div', { class: 'pls' }, `+${I.num(e0.stars)} ${I.t('stars')}`));
+      this.voice.say(slop ? 'bump' : res === 'ok' ? 'pickup' : 'trick');
       if (slop) { this._pop(I.t('bad'), '#ff4a3a', 40); setTimeout(() => card.classList.add('trash'), 500); setTimeout(() => card.remove(), 1250); } else { this._pop(res === 'perfect' ? I.t('perfect') : res === 'ok' ? I.t('ok') : I.t('master'), res === 'ok' ? '#fff' : '#ffe04a', 40); setTimeout(() => card.remove(), 1400); }
     }, 650);
   }
@@ -275,6 +284,7 @@ class Game {
     const r = RANKS[s.rank];
     this.modal = 'promo';
     this.sound.play('promote');
+    this.voice.say('charge');
     const ul = (UNLOCKS[s.rank] || []).map((u) => ({ video: I.t('newVideo'), game: I.t('newGame'), orders: I.t('newOrders'), hot: I.t('newHot'), events: I.t('newEvents') }[u]));
     const box = h('div', { class: 'ct-win ct-prm' }, h('div', { class: 'ct-wt' }, h('span', {}, `${I.t('levelDone')} ${I.num(s.rank)}`)), h('div', { class: 'ct-wb' },
       h('div', { class: 'ct-big' }, '✅'), h('h2', {}, I.t('promoted')),
@@ -330,9 +340,9 @@ class Game {
     const ar = I.getLang() !== 'en';
     for (const e of s.drain()) {
       switch (e.type) {
-        case 'event': this.sound.play('event'); if (e.id === 'trend') this._banner2(`${I.t('trend')}!`, I.t('trendTxt')); break;
-        case 'order': this.sound.play('event'); break;
-        case 'orderLate': this._pop(I.t('clientLeft'), '#ff4a3a', -10); this.e.boss.classList.add('show'); this.bossT = 2.5; break;
+        case 'event': this.sound.play('event'); if (e.id === 'trend') { this.voice.say('charge'); this._banner2(`${I.t('trend')}!`, I.t('trendTxt')); } break;
+        case 'order': this.sound.play('event'); this.voice.say('near'); break;
+        case 'orderLate': this.voice.say('bump'); this._pop(I.t('clientLeft'), '#ff4a3a', -10); this.e.boss.classList.add('show'); this.bossT = 2.5; break;
         case 'auto': this.sound.play('coin'); this.e.hint.textContent = I.t('gpuHint'); break;
         case 'won': this._won(); break;
         default: break;
@@ -393,6 +403,7 @@ class Game {
     this.save.wins += 1;
     this.post({ type: 'save', save: this.save });
     this.sound.play('promote');
+    this.voice.say('win');
     this.modal = 'won';
     this.layer.append(h('div', { class: 'ct-dim' }, h('div', { class: 'ct-card' },
       h('div', { class: 'ct-title' }, '👑 ', I.t('won')), h('div', { class: 'ct-small' }, I.t('wonText')),
@@ -402,7 +413,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); }
-  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
+  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
 }
 
 const api = { start(el, config, post) { const g = new Game(el, config || {}, post); api.last = g; return { dispose: () => g.dispose(), pause: () => g.pause() }; } };

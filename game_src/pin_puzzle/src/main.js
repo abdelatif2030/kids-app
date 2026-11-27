@@ -6,6 +6,9 @@
 import { Puzzle, LEVELS, W, H, R, JAR, slide, normalizeSave } from './sim.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const PIN_CLIPS = { go: 2, pickup: 2, charge: 2, bump: 2, win: 2, lose: 2 };
 
 const S = {
   title: ['اسحب الدبوس', 'Pull the Pin'], play: ['يلا نلعب', 'Play'], levels: ['المراحل', 'Levels'], exit: ['خروج', 'Exit'],
@@ -41,6 +44,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: PIN_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('pp-style')) document.head.append(h('style', { id: 'pp-style' }, CSS));
     this.root = h('div', { class: 'pp-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -175,6 +182,7 @@ class Game {
   }
 
   startLevel(i) {
+    this.voice.say('go');
     this.puzzleLevel = Math.max(0, Math.min(LEVELS - 1, i));
     this.p = new Puzzle({ level: this.puzzleLevel });
     this.mode = 'play'; this.fx = []; this.hintId = 0; this.acc = 0; this.bg = null; this.idle = 0; this.drag = null;
@@ -185,7 +193,7 @@ class Game {
     this.layer.append(h('div', { class: 'pp-top' },
       h('div', { class: 'pp-sbtn' }, btn('', I.t('menu'), '☰', () => this.showPause()), btn('', I.t('restart'), '↻', () => this.restart()), this.undoBtn),
       h('div', { class: 'pp-mid' }, h('div', { class: 'pp-pill' }, `${I.t('level')} ${I.num(this.puzzleLevel + 1)}`, ' · ', this.cntEl), h('div', { class: 'pp-bar', style: 'width:100%' }, this.barEl)),
-      h('div', { class: 'pp-sbtn' }, btn('', I.t('hint'), '💡', () => this.showHint()), btn('', 'sound', this.sound.muted ? '🔇' : '🔊', () => { this.sound.setMuted(!this.sound.muted); this.save.muted = this.sound.muted; this.post({ type: 'save', save: this.save }); this.soundBtn.textContent = this.sound.muted ? '🔇' : '🔊'; }))));
+      h('div', { class: 'pp-sbtn' }, btn('', I.t('hint'), '💡', () => this.showHint()), btn('', 'sound', this.sound.muted ? '🔇' : '🔊', () => { this.sound.setMuted(!this.sound.muted); this.voice.setMuted(this.sound.muted); this.save.muted = this.sound.muted; this.post({ type: 'save', save: this.save }); this.soundBtn.textContent = this.sound.muted ? '🔇' : '🔊'; }))));
     this.soundBtn = this.layer.querySelectorAll('.pp-sbtn')[1].lastChild;
     this.tipEl = h('div', { class: 'pp-tip' }, '');
     this.layer.append(this.tipEl);
@@ -210,6 +218,7 @@ class Game {
   _won() {
     const p = this.p; const lv = this.puzzleLevel + 1;
     this.sound.play('win');
+    this.voice.say('win');
     this.save.stars[lv] = Math.max(this.save.stars[lv] || 0, p.stars);
     this.save.unlocked = Math.max(this.save.unlocked, Math.min(LEVELS, lv + 1));
     this.post({ type: 'save', save: this.save });
@@ -227,6 +236,7 @@ class Game {
 
   _failed() {
     this.sound.play('fail');
+    this.voice.say('lose');
     this.layer.append(h('div', { class: 'pp-dim', id: 'pp-fail' }, h('div', { class: 'pp-card' },
       h('div', { class: 'pp-title' }, I.t('fail')), h('div', { class: 'pp-small' }, I.t('failText')),
       h('div', { class: 'pp-acts' },
@@ -255,9 +265,9 @@ class Game {
     while (this.acc >= 1 / 60 && n < 3) {
       this.acc -= 1 / 60; n += 1;
       for (const e of p.step(1 / 60)) {
-        if (e.type === 'jar') { this.sound.play('plink', e.n % 11); this.fx.push({ k: 'spark', x: e.x, y: e.y, t: 0, life: 0.6 }); }
-        else if (e.type === 'lost') { this.sound.play('lava'); this.fx.push({ k: 'puff', x: e.x, y: 9.3, t: 0, life: 0.8 }); }
-        else if (e.type === 'goal') this.sound.play('goal');
+        if (e.type === 'jar') { this.sound.play('plink', e.n % 11); this.voice.say('pickup'); this.fx.push({ k: 'spark', x: e.x, y: e.y, t: 0, life: 0.6 }); }
+        else if (e.type === 'lost') { this.sound.play('lava'); this.voice.say('bump'); this.fx.push({ k: 'puff', x: e.x, y: 9.3, t: 0, life: 0.8 }); }
+        else if (e.type === 'goal') { this.sound.play('goal'); this.voice.say('charge'); }
         else if (e.type === 'hit') this.sound.play('hit', e.v);
         else if (e.type === 'won') this._won();
         else if (e.type === 'failed') this._failed();
@@ -402,7 +412,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); }
-  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
+  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
 }
 
 const api = { start(el, config, post) { const g = new Game(el, config || {}, post); api.last = g; return { dispose: () => g.dispose(), pause: () => g.pause() }; } };

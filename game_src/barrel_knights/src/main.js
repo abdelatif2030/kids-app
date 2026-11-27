@@ -8,6 +8,9 @@ import * as THREE from 'three';
 import { Match, ROUNDS, PITCH, BARREL_R, KNIGHT_R, COLORS, HELMETS, RIVAL_COLOR, MATCH_TIME, normalizeSave, applyResult, buy, equip } from './sim.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const BARREL_CLIPS = { go: 2, trick: 3, bump: 2, near: 1, win: 2, lose: 2, count: 1 };
 
 const S = {
   title: ['فرسان البرميل', 'BARREL KNIGHTS'], play: ['العب', 'PLAY'], rounds: ['الجولات', 'ROUNDS'], knights: ['الفرسان', 'KNIGHTS'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
@@ -126,6 +129,10 @@ class Game {
     this.save = normalizeSave(config.save);
     this.base = config.base || './';
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: BARREL_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('bk-style')) document.head.append(h('style', { id: 'bk-style' }, css('bk', '#8a5a2a', '#4a2a10', '#ffd23a') + EXTRA_CSS));
     this.root = h('div', { class: 'bk-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -453,7 +460,7 @@ class Game {
 
   showSettings() {
     this._clear();
-    const snd = h('button', { class: 'bk-btn', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this._persist(); snd.textContent = `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`; this.sound.play('tap'); } }, `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`);
+    const snd = h('button', { class: 'bk-btn', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.voice.setMuted(this.save.muted); this._persist(); snd.textContent = `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`; this.sound.play('tap'); } }, `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`);
     const dbtn = (id) => h('button', { class: `bk-seg${this.save.diff === id ? ' on' : ''}`, onclick: () => { this.save.diff = id; this._persist(); this.showSettings(); } }, I.t(id));
     this.layer.append(h('div', { class: 'bk-dim' }, h('div', { class: 'bk-card' }, h('div', { class: 'bk-title' }, '⚙️ ', I.t('settings')), snd,
       h('div', { class: 'bk-small' }, I.t('diff')), h('div', { class: 'bk-segs' }, dbtn('easy'), dbtn('normal'), dbtn('hard')),
@@ -538,7 +545,7 @@ class Game {
     const ar = I.getLang() !== 'en'; this.over = true;
     const before = this.save.stars[this.round] || 0;
     applyResult(this.save, this.round, res); this._persist();
-    this.sound.play(res.win ? 'win' : 'lose'); this.sound.setMode(null);
+    this.sound.play(res.win ? 'win' : 'lose'); if (!res.draw) this.voice.say(res.win ? 'win' : 'lose'); this.sound.setMode(null);
     const stars = h('div', { class: 'bk-stars' }, [1, 2, 3].map((n) => h('span', { class: n <= res.stars ? '' : 'off', style: `animation-delay:${n * 0.25}s` }, '⭐')));
     const final = this.round === ROUNDS.length - 1;
     void before; void ar;
@@ -559,10 +566,10 @@ class Game {
     for (const e of evs) {
       const k = e.id !== undefined && m.knights[e.id];
       switch (e.type) {
-        case 'count': if (live) { this.sound.play('count'); this._banner(I.num(e.n), I.t('ready'), 900, '#fff'); } break;
-        case 'go': if (live) { this.sound.play('go'); this.sound.play('whistle'); this._banner(I.t('go'), '', 900, '#7af07a'); if (m.kickoffs === 1) this.hint(I.t('tip'), 3600); } break;
+        case 'count': if (live) { this.sound.play('count'); if (e.n >= 3) this.voice.say('count'); this._banner(I.num(e.n), I.t('ready'), 900, '#fff'); } break;
+        case 'go': if (live) { this.sound.play('go'); this.voice.say('go'); this.sound.play('whistle'); this._banner(I.t('go'), '', 900, '#7af07a'); if (m.kickoffs === 1) this.hint(I.t('tip'), 3600); } break;
         case 'dash': if (k) { this.puff(k.x, 0.3, k.z, 8, 0xe8d8b0, 2.5); if (live) this.sound.play('dash'); } break;
-        case 'barrelHit': { const b = m.barrel; this.puff(b.x, 0.8, b.z, 5 + Math.round(e.power * 10), e.dash ? 0xffe9a0 : 0xe8d8b0, 3 + e.power * 4); if (live) { this.sound.play('thud', e.power); if (e.dash) this.sound.play('clang'); } if (e.power > 0.5) this.shakeT = Math.max(this.shakeT, 0.25 + e.power * 0.2); break; }
+        case 'barrelHit': { const b = m.barrel; this.puff(b.x, 0.8, b.z, 5 + Math.round(e.power * 10), e.dash ? 0xffe9a0 : 0xe8d8b0, 3 + e.power * 4); if (live) { this.sound.play('thud', e.power); if (e.dash) this.sound.play('clang'); if (e.dash && e.power > 0.5) this.voice.say('trick'); } if (e.power > 0.5) this.shakeT = Math.max(this.shakeT, 0.25 + e.power * 0.2); break; }
         case 'fence': if (live) this.sound.play('fence', e.power); break;
         case 'stun': if (k) { this.puff(k.x, 1.8, k.z, 14, 0xffe04a, 4, -4, 2); if (live) this.sound.play('stun'); } break;
         case 'clash': if (live) this.sound.play('clang'); break;
@@ -570,11 +577,11 @@ class Game {
         case 'doorWarn': if (live) this.sound.play('creak'); break;
         case 'doorOpen': if (live) this.sound.play('dooropen'); break;
         case 'fall': if (k) { this.puff(k.x, 0.4, k.z, 12, 0x6a4a2a, 3); if (live) this.sound.play('doorfall'); } break;
-        case 'boulderWarn': if (live) this.sound.play('warn'); break;
+        case 'boulderWarn': if (live) { this.sound.play('warn'); this.voice.say('near'); } break;
         case 'boulderGo': if (live) this.sound.play('rumble'); break;
         case 'goal': {
           this.cheer = 3; this.goalTeam = e.team; this.shakeT = 0.5;
-          if (live) { this.sound.play(e.team === 0 ? 'goal' : 'conceded'); if (e.team !== 0) this.sound.swell(0.07, 1.6); this._banner(I.t('goal'), '', 2300, e.team === 0 ? '#ffd23a' : '#ff8a8a', true); }
+          if (live) { this.sound.play(e.team === 0 ? 'goal' : 'conceded'); this.voice.say(e.team === 0 ? 'win' : 'bump'); if (e.team !== 0) this.sound.swell(0.07, 1.6); this._banner(I.t('goal'), '', 2300, e.team === 0 ? '#ffd23a' : '#ff8a8a', true); }
           const gz = e.team === 0 ? -PITCH.hl : PITCH.hl; for (let i = 0; i < 70; i++) this.puff((Math.random() - 0.5) * 10, 1 + Math.random() * 3, gz + (e.team === 0 ? 1 : -1) * Math.random() * 3, 1, [0xffd23a, 0xff5a8a, 0x5ae8ff, 0x7af07a, 0xffffff][i % 5], 5, -4, 3);
           break;
         }
@@ -692,7 +699,7 @@ class Game {
 
   pause() { this.sound.suspend(); if (this.mode === 'play' && !this.paused) this.togglePause(); }
   dispose() {
-    this.renderer.setAnimationLoop(null); this.sound.dispose(); if (this.ro) this.ro.disconnect();
+    this.renderer.setAnimationLoop(null); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKeyUp);
     this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove();
   }

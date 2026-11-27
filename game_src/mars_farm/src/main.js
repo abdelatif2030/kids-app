@@ -6,6 +6,9 @@ import { drawWorld, sp, isTall } from './draw.js';
 import { Sound } from './audio.js';
 import { I, EMOJI, LEVEL_TITLES, nm, lt, taskText, unlockText, REGION_NAMES } from './i18n.js';
 import { h, css } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const MARS_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 3, win: 2 };
 
 const EXTRA = `
 .mf-root{background:#3a1d3f}
@@ -53,6 +56,10 @@ class Game {
     this.rawSave = config.save;
     this.base = config.base || './';
     this.sound = new Sound();
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: MARS_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.easy = Number(config.age) > 0 && Number(config.age) <= 4;
     this.c = new Colony({ save: isSave(config.save) ? config.save : null, seed: (Date.now() & 0xfffff) + 1, speed: this.easy ? 1.3 : 1 });
     if (!document.getElementById('mf-style')) document.head.append(h('style', { id: 'mf-style' }, css('mf', '#ff8a4a', '#a8381a', '#ffe08a') + EXTRA));
@@ -186,6 +193,7 @@ class Game {
   }
 
   start() {
+    this.voice.say('go');
     this.mode = 'play'; this.started = true; this._closeModal();
     this.layer.replaceChildren(); this.layer.className = 'mf-layer'; this.hintEl = null; this.sound.setMode(true);
     this._buildHud();
@@ -365,7 +373,7 @@ class Game {
   }
   _levelReady() {
     if (this.modalEl && this.modalEl !== this._modalMenu && this.levelModal) return;
-    const c = this.c; const last = c.level >= MAX_LEVEL; this.sound.play('ready');
+    const c = this.c; const last = c.level >= MAX_LEVEL; this.sound.play('ready'); this.voice.say('win');
     const next = LEVELS[Math.min(c.level, MAX_LEVEL - 1)]; // the unlocks of the level that comes next
     const card = h('div', { class: 'mf-card' },
       h('div', { class: 'mf-title' }, last ? `🎉 ${I.t('finalTitle')}` : `🎉 ${I.t('levelDone')} ${I.num(c.level)}`),
@@ -422,21 +430,21 @@ class Game {
     const s = this.sound; const c = this.c;
     switch (e.type) {
       case 'plant': s.play('plant'); break;
-      case 'harvest': s.play('harvest'); this._fxAt(e.x, e.y, `+${I.num(e.n)} ${EMOJI[e.crop]}`); break;
+      case 'harvest': s.play('harvest'); this.voice.say('pickup'); this._fxAt(e.x, e.y, `+${I.num(e.n)} ${EMOJI[e.crop]}`); break;
       case 'ripe': if (this.clock - this.ripeT > 0.7) { this.ripeT = this.clock; s.play('ripe'); } break;
-      case 'milk': s.play('milk'); this._fxAt(e.x, e.y, `+${I.num(e.n)} 🥛`); break;
+      case 'milk': s.play('milk'); this.voice.say('pickup'); this._fxAt(e.x, e.y, `+${I.num(e.n)} 🥛`); break;
       case 'feed': s.play('feed'); break;
       case 'milkready': s.play('goat'); break;
       case 'load': s.play('load'); break;
-      case 'made': s.play('harvest'); this._fxAt(e.x, e.y, `+${I.num(e.n)} ${EMOJI[e.good]}`); break;
+      case 'made': s.play('harvest'); this.voice.say('trick'); this._fxAt(e.x, e.y, `+${I.num(e.n)} ${EMOJI[e.good]}`); break;
       case 'done': s.play('done'); break;
-      case 'goat': s.play('goat'); this._fxAt(e.x, e.y, '🐐 +1'); break;
-      case 'build': s.play('build'); this._fxAt(e.x, e.y, EMOJI[e.kind]); this._burst(...sp(this, e.x + 0.5, e.y + 0.5, 6), 14, ['#ffe08a', '#fff', '#ff9a5a']); if (e.kind === 'home' || e.kind === 'field') this.hudKey = ''; break;
-      case 'region': s.play('region'); this._refit(false); { const r = REGIONS[e.id]; this._burst(...sp(this, r.x + r.w / 2, r.y + r.h / 2, 6), 30, ['#ffe08a', '#7af0b0', '#fff', '#ff8aa8']); } break;
-      case 'deliver': s.play('drone'); setTimeout(() => s.play('coin'), 800); this.drones.push({ t: 0, dur: 2.2, reward: e.reward }); setTimeout(() => this.fx.push({ gx: HQ.x + 1, gy: HQ.y + 1, t: 0, text: `+${I.num(e.reward)} 🪙` }), 900); break;
-      case 'colonist': s.play('colonist'); { const homes = c.blds.filter((b) => b.k === 'home'); const hm = homes[(e.n - 1) % Math.max(1, homes.length)]; if (hm) this.pods.push({ gx: hm.x + 0.5, gy: hm.y + 1.4, t: 0 }); } break;
+      case 'goat': s.play('goat'); this.voice.say('charge'); this._fxAt(e.x, e.y, '🐐 +1'); break;
+      case 'build': s.play('build'); this.voice.say('charge'); this._fxAt(e.x, e.y, EMOJI[e.kind]); this._burst(...sp(this, e.x + 0.5, e.y + 0.5, 6), 14, ['#ffe08a', '#fff', '#ff9a5a']); if (e.kind === 'home' || e.kind === 'field') this.hudKey = ''; break;
+      case 'region': s.play('region'); this.voice.say('charge'); this._refit(false); { const r = REGIONS[e.id]; this._burst(...sp(this, r.x + r.w / 2, r.y + r.h / 2, 6), 30, ['#ffe08a', '#7af0b0', '#fff', '#ff8aa8']); } break;
+      case 'deliver': s.play('drone'); this.voice.say('pickup'); setTimeout(() => s.play('coin'), 800); this.drones.push({ t: 0, dur: 2.2, reward: e.reward }); setTimeout(() => this.fx.push({ gx: HQ.x + 1, gy: HQ.y + 1, t: 0, text: `+${I.num(e.reward)} 🪙` }), 900); break;
+      case 'colonist': s.play('colonist'); this.voice.say('charge'); { const homes = c.blds.filter((b) => b.k === 'home'); const hm = homes[(e.n - 1) % Math.max(1, homes.length)]; if (hm) this.pods.push({ gx: hm.x + 0.5, gy: hm.y + 1.4, t: 0 }); } break;
       case 'levelready': this._levelReady(); break;
-      case 'level': s.play('levelup'); this._refit(false); this._burst(this.cw / 2, this.ch / 3, 40, ['#ffe08a', '#7af0b0', '#fff', '#ff8aa8']); this.hudKey = ''; break;
+      case 'level': s.play('levelup'); this.voice.say('charge'); this._refit(false); this._burst(this.cw / 2, this.ch / 3, 40, ['#ffe08a', '#7af0b0', '#fff', '#ff8aa8']); this.hudKey = ''; break;
       case 'shuttle': this._startCelebration(); break;
       default: break;
     }
@@ -491,7 +499,7 @@ class Game {
   pause() { this.sound.suspend(); this._save(true); }
   dispose() {
     this._save(true);
-    cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect();
+    cancelAnimationFrame(this.raf); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis); this.root.remove();
   }
 }

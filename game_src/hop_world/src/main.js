@@ -5,6 +5,9 @@
 import { World, LEVELS, WORLDS, normalizeSave } from './sim.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n, clamp } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const HOP_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 2, bump: 3, lap: 1, win: 2, lose: 2 };
 import { PAL, makeSprites, drawBackground, drawHero, drawBug, drawMushroom, drawCoin, drawPipe, drawFlag, drawCastle } from './art.js';
 
 const S = {
@@ -30,6 +33,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: this.girl, clips: HOP_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('hw-style')) document.head.append(h('style', { id: 'hw-style' }, css('hw', '#ff9a3c', '#d9601a', '#ffe35a') + `
 .hw-root{background:#5cc8ff;--c:80px}
 .hw-pad{position:absolute;left:calc(var(--u)*2);bottom:max(calc(var(--u)*2.5),env(safe-area-inset-bottom));display:flex;gap:calc(var(--c)*.14);direction:ltr;pointer-events:auto;touch-action:none;padding:calc(var(--c)*.1)}
@@ -103,7 +110,7 @@ class Game {
 
   _soundPill() { const pill = h('button', { class: 'hw-soundpill', onclick: () => this.sound.unlock() }, I.t('sound')); this.layer.append(pill); const tick = () => { if (!this.root.isConnected) return; pill.style.display = !this.sound.ctx || this.sound.on || this.sound.muted ? 'none' : 'block'; setTimeout(tick, 600); }; tick(); }
 
-  _toggleMute(btn) { this.sound.setMuted(!this.sound.muted); this.save.muted = this.sound.muted; btn.textContent = this.sound.muted ? '🔇' : '🔊'; this.post({ type: 'save', save: this.save }); }
+  _toggleMute(btn) { this.sound.setMuted(!this.sound.muted); this.voice.setMuted(this.sound.muted); this.save.muted = this.sound.muted; btn.textContent = this.sound.muted ? '🔇' : '🔊'; this.post({ type: 'save', save: this.save }); }
   _muteBtn() { const b = h('button', { class: 'hw-round', 'aria-label': I.t('mute') }, this.sound.muted ? '🔇' : '🔊'); b.onclick = () => this._toggleMute(b); return b; }
 
   stars(n) { return h('div', { class: 'hw-stars' }, [1, 2, 3].map((i) => h('span', { class: i <= n ? '' : 'off' }, '⭐'))); }
@@ -126,6 +133,7 @@ class Game {
   }
 
   startLevel(i) {
+    this.voice.say('go');
     this.level = i;
     this.w = new World({ level: i, seed: 5, easy: this.easy });
     this.mode = 'play'; this.fx = []; this.bumps.clear(); this.timers = []; this.acc = 0; this.padDir = 0; this.jumpBtn = false;
@@ -222,17 +230,17 @@ class Game {
     const w = this.w; const p = w.p; const s = this.sound;
     switch (e.type) {
       case 'jump': s.play('jump'); this._burst(p.x + 0.4, p.y + p.h, 4, ['#fff', '#e8e0d0'], 'dust', 1.5); break;
-      case 'coin': s.play('coin'); this._burst(p.x + 0.4, p.y + 0.4, 5, ['#ffe45a', '#fff'], 'spark', 3); break;
+      case 'coin': s.play('coin'); this.voice.say('pickup'); this._burst(p.x + 0.4, p.y + 0.4, 5, ['#ffe45a', '#fff'], 'spark', 3); break;
       case 'block': this.bumps.set(`${e.tx},${e.ty}`, this.clock); s.play('block'); this.fx.push({ kind: 'coin', x: e.tx + 0.5, y: e.ty - 0.2, t: 0, life: 0.6 }); if (e.mush) { s.play('appear'); this._say(I.t('hintMush'), 1.8); } break;
       case 'bump': this.bumps.set(`${e.tx},${e.ty}`, this.clock); s.play('bump'); break;
       case 'brick': s.play('brick'); this._burst(e.tx + 0.5, e.ty + 0.5, 10, [P(this.w).brick, P(this.w).brickD], 'chunk', 5); break;
-      case 'stomp': s.play('stomp'); this._burst(e.x + 0.45, e.y + 0.6, 8, ['#ffe45a', '#fff', '#ff9ad8'], 'spark', 4); break;
-      case 'power': s.play('power'); this._say(I.t('hintBig'), 2); this._burst(p.x + 0.4, p.y + 0.8, 14, ['#ffe45a', '#a05ae8', '#fff'], 'spark', 5); break;
-      case 'shrink': s.play('shrink'); break;
-      case 'lose': s.play('lose'); this.camSnap = true; this._flash(); break;
-      case 'checkpoint': s.play('check'); this._say(I.t('hintCp'), 1.6); break;
-      case 'lost': this._later(0.7, () => this._showLost()); break;
-      case 'won': s.play('win'); s.setMode(null); this._burst(p.x + 0.4, p.y, 24, ['#ffe45a', '#ff6a8a', '#6ae0ff', '#fff'], 'spark', 6); this._later(1.1, () => this._showWon()); break;
+      case 'stomp': s.play('stomp'); this.voice.say('trick'); this._burst(e.x + 0.45, e.y + 0.6, 8, ['#ffe45a', '#fff', '#ff9ad8'], 'spark', 4); break;
+      case 'power': s.play('power'); this.voice.say('charge'); this._say(I.t('hintBig'), 2); this._burst(p.x + 0.4, p.y + 0.8, 14, ['#ffe45a', '#a05ae8', '#fff'], 'spark', 5); break;
+      case 'shrink': s.play('shrink'); this.voice.say('bump'); break;
+      case 'lose': s.play('lose'); this.voice.say('bump'); this.camSnap = true; this._flash(); break;
+      case 'checkpoint': s.play('check'); this.voice.say('lap'); this._say(I.t('hintCp'), 1.6); break;
+      case 'lost': this.voice.say('lose'); this._later(0.7, () => this._showLost()); break;
+      case 'won': s.play('win'); this.voice.say('win'); s.setMode(null); this._burst(p.x + 0.4, p.y, 24, ['#ffe45a', '#ff6a8a', '#6ae0ff', '#fff'], 'spark', 6); this._later(1.1, () => this._showWon()); break;
       default: break;
     }
   }
@@ -314,7 +322,7 @@ class Game {
   }
 
   dispose() {
-    cancelAnimationFrame(this.raf); clearTimeout(this._hintT); this.sound.dispose(); if (this.ro) this.ro.disconnect();
+    cancelAnimationFrame(this.raf); clearTimeout(this._hintT); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey);
     this.root.remove();
   }

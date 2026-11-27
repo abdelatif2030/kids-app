@@ -11,6 +11,9 @@ import { Pile, heapPoints, DECOR_MAX } from './pile.js';
 import { R, TUB, tubBoxes } from './physics.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const SCOOP_CLIPS = { go: 2, pickup: 2, charge: 3, bump: 2, win: 2 };
 
 const S = {
   title: ['شاحنة عمورة', "Amoora's Truck"], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'], again: ['تاني', 'Again'],
@@ -84,6 +87,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: SCOOP_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('bs-style')) document.head.append(h('style', { id: 'bs-style' }, css('bs', '#ffa82a', '#a85a10', '#fff0a0') + EXTRA_CSS));
     this.root = h('div', { class: 'bs-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -340,6 +347,7 @@ class Game {
   }
 
   start(i) {
+    this.voice.say('go');
     this.levelIdx = i;
     const goal = goalFor(i);
     this.run = new Run({ level: i, up: this.save.up, easy: this.age <= 4, goal });
@@ -364,7 +372,7 @@ class Game {
     this.save.coins += r.coins; this.save.best[lv] = Math.max(this.save.best[lv] || 0, r.balls);
     this.save.stars[lv] = Math.max(this.save.stars[lv] || 0, stars);
     this.save.unlocked = Math.max(this.save.unlocked, Math.min(LEVELS, lv + 1));
-    this.post({ type: 'save', save: this.save }); this.sound.play('win');
+    this.post({ type: 'save', save: this.save }); this.sound.play('win'); this.voice.say('win');
     const st = h('div', { class: 'bs-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= stars ? 'on' : 'off', style: `animation-delay:${k * 0.25}s` }, '★')));
     this.layer.append(h('div', { class: 'bs-dim' }, h('div', { class: 'bs-card' }, h('div', { class: 'bs-title' }, I.t('win')), st,
       h('div', { class: 'bs-pill' }, `🏦 ${I.num(r.balls)} / 🎯 ${I.num(r.goal)}`), h('div', { class: 'bs-pill' }, `🪙 +${I.num(r.coins)}`),
@@ -389,13 +397,13 @@ class Game {
     this.pile.update(dt, ev);
     for (const e of ev) {
       switch (e.type) {
-        case 'scoop': this.sound.play('scoop', e.n); this._fx(`+${e.n}`); break;
-        case 'gate': this.sound.play(e.op === 'mul' ? 'gatex' : e.v >= 0 ? 'gate+' : 'gate-', e.v); this._fx(e.op === 'mul' ? `x${e.v}` : e.v >= 0 ? `+${e.v}` : `${e.v}`, true); break;
-        case 'wall': this.sound.play('wall'); this._fx(`-${e.lost}`); this.hint(I.t('hitWall'), 1500); this.shake = 0.5; break;
+        case 'scoop': this.sound.play('scoop', e.n); this.voice.say('pickup'); this._fx(`+${e.n}`); break;
+        case 'gate': this.sound.play(e.op === 'mul' ? 'gatex' : e.v >= 0 ? 'gate+' : 'gate-', e.v); if (e.op === 'mul' || e.v >= 0) this.voice.say('charge'); this._fx(e.op === 'mul' ? `x${e.v}` : e.v >= 0 ? `+${e.v}` : `${e.v}`, true); break;
+        case 'wall': this.sound.play('wall'); this.voice.say('bump'); this._fx(`-${e.lost}`); this.hint(I.t('hitWall'), 1500); this.shake = 0.5; break;
         case 'jump': this.sound.play('jump'); break;
         case 'land': this.sound.play('land'); this.shake = 0.25; break;
         case 'bump': this.sound.play('land'); break;
-        case 'finish': this.sound.play('bank'); this.coinEl.style.display = 'block'; break;
+        case 'finish': this.sound.play('bank'); this.voice.say('win'); this.coinEl.style.display = 'block'; break;
         case 'tilt': this.sound.play('tilt'); break;
         case 'done': this.finished = true; this._done(e.stars); break;
         default: break;
@@ -493,7 +501,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play' && !this.paused) this.togglePause(); }
-  dispose() { this.renderer.setAnimationLoop(null); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
+  dispose() { this.renderer.setAnimationLoop(null); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
 }
 
 const EXTRA_CSS = `

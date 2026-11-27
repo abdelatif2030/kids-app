@@ -9,6 +9,9 @@ import * as THREE from 'three';
 import { Run, LEVELS, LANE_W, levelSpec, normalizeSave } from './sim.js';
 import { Sound } from './audio.js';
 import { applyBackdrop } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const CLOUD_CLIPS = { pickup: 2, charge: 2, trick: 2, bump: 3, win: 2, lose: 2, count: 1 };
 import { setLang, setGirl, getLang, isGirl, t, num } from './i18n.js';
 
 const CSS = `
@@ -172,6 +175,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: CLOUD_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('cd-style')) document.head.append(h('style', { id: 'cd-style' }, CSS));
     this.root = h('div', { class: 'cd-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -457,7 +464,7 @@ class Game {
   _hideHand() { if (this.handEl) this.handEl.classList.remove('show'); }
   _soundBtn() {
     const b = h('button', { class: 'cd-round', 'aria-label': 'sound' }, this.sound.muted ? '🔇' : '🔊');
-    b.addEventListener('click', (e) => { e.stopPropagation(); this.sound.unlock(); this.sound.setMuted(!this.sound.muted); this.save.muted = this.sound.muted; this._saveNow(); b.textContent = this.sound.muted ? '🔇' : '🔊'; });
+    b.addEventListener('click', (e) => { e.stopPropagation(); this.sound.unlock(); this.sound.setMuted(!this.sound.muted); this.voice.setMuted(this.sound.muted); this.save.muted = this.sound.muted; this._saveNow(); b.textContent = this.sound.muted ? '🔇' : '🔊'; });
     return b;
   }
 
@@ -488,6 +495,7 @@ class Game {
   }
 
   startLevel(n) {
+    this.voice.say('count');
     this.n = n;
     this.run = new Run(n, Math.floor(Math.random() * 1e9), this.easy);
     this.mode = 'play';
@@ -564,6 +572,7 @@ class Game {
     this.save.coins = Math.min(999999, this.save.coins + r.coins);
     this._saveNow();
     this.sound.play('finish');
+    this.voice.say('win');
     this.mode = 'won';
     const last = this.n >= LEVELS;
     this.layer.append(h('div', { class: 'cd-dim' }, h('div', { class: 'cd-card' },
@@ -577,6 +586,7 @@ class Game {
   }
 
   _loseCard() {
+    this.voice.say('lose');
     this.mode = 'lost';
     this.layer.append(h('div', { class: 'cd-dim' }, h('div', { class: 'cd-card' },
       h('div', { class: 'cd-title' }, t('lostTitle')),
@@ -627,10 +637,10 @@ class Game {
     const r = this.run;
     void time;
     switch (e.type) {
-      case 'coin': this.combo = Math.min(8, this.combo + 1); this.comboT = 0.6; this.sound.play('coin', this.combo); this._pop(e.i); break;
-      case 'power': this.sound.play(e.kind === 'shield' ? 'shield' : 'power'); this._say(t(e.kind), 1.8, true); this._pop(e.i); break;
-      case 'hit': this.sound.play('hit'); this.flash = 1; this.shake = 0.35; this._say(t('ouch'), 1); break;
-      case 'fall': this.sound.play('fall'); this.flash = 1; this.shake = 0.5; this._say(t('fell'), 1.3); break;
+      case 'coin': this.combo = Math.min(8, this.combo + 1); this.comboT = 0.6; this.sound.play('coin', this.combo); this.voice.say('pickup'); this._pop(e.i); break;
+      case 'power': this.sound.play(e.kind === 'shield' ? 'shield' : 'power'); this.voice.say('charge'); this._say(t(e.kind), 1.8, true); this._pop(e.i); break;
+      case 'hit': this.sound.play('hit'); this.voice.say('bump'); this.flash = 1; this.shake = 0.35; this._say(t('ouch'), 1); break;
+      case 'fall': this.sound.play('fall'); this.voice.say('bump'); this.flash = 1; this.shake = 0.5; this._say(t('fell'), 1.3); break;
       case 'shieldpop': this.sound.play('shield'); this._say(t('shieldPop'), 1.4, true); break;
       case 'crack': this.sound.play('crack'); break;
       case 'gust': this.sound.play('wind'); break;
@@ -638,7 +648,7 @@ class Game {
         this.sound.play('land');
         if (this.jumpFrom != null) {
           const passed = r.level.items.some((i) => ['barrier', 'slime', 'spike', 'gap', 'crumble'].includes(i.type) && i.lane === r.lane && i.z > this.jumpFrom - 0.5 && i.z < r.z + 0.5);
-          if (passed && r.time - this.lastLandSay > 4) { this.lastLandSay = r.time; this._say(t('perfect'), 1.2, true); this.sound.play('perfect'); }
+          if (passed && r.time - this.lastLandSay > 4) { this.lastLandSay = r.time; this._say(t('perfect'), 1.2, true); this.sound.play('perfect'); this.voice.say('trick'); }
           this.jumpFrom = null;
         }
         break;
@@ -807,6 +817,8 @@ class Game {
     clearInterval(this._pill);
     clearTimeout(this._st);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis);
     window.removeEventListener('keydown', this._onKey);

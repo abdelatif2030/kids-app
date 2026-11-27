@@ -11,6 +11,9 @@ import {
 } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const STORE_CLIPS = { go: 2, trick: 2, charge: 2, pickup: 2, near: 1, win: 2 };
 import { CSS, CSS2, h } from './ui.js';
 
 const lowEnd = () => (navigator.deviceMemory ?? 4) <= 3 || (navigator.hardwareConcurrency ?? 4) <= 4;
@@ -57,6 +60,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: this.girl, clips: STORE_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.quality = { low: lowEnd() };
     if (!document.getElementById('ss-style')) document.head.append(h('style', { id: 'ss-style', text: CSS + CSS2 }));
     this.root = h('div', { class: 'ss-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -335,6 +342,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -372,6 +380,7 @@ class Game {
   }
 
   play() {
+    this.voice.say('go');
     this.mode = 'play';
     this.paused = false;
     this.sound.setMode('play');
@@ -412,6 +421,7 @@ class Game {
 
   _complete() {
     this.sound.play('complete');
+    this.voice.say('win');
     this._burst(this.store.p.x, 2, this.store.p.z, 120);
     const dim = h('div', { class: 'ss-dim' }, h('div', { class: 'ss-panel' },
       h('div', { class: 'ss-title' }, t('done')),
@@ -430,11 +440,12 @@ class Game {
     for (const e of events) {
       switch (e.type) {
         case 'pick': this.sound.play('pick', e.n); break;
-        case 'full': this.sound.play('full'); this.toast(t('full'), 1); break;
-        case 'rack': this.sound.play('rack'); break;
+        case 'full': this.sound.play('full'); this.voice.say('near'); this.toast(t('full'), 1); break;
+        case 'rack': this.sound.play('rack'); this.voice.say('trick'); break;
         case 'arrive': if (Math.random() < 0.6) this.sound.play('arrive'); { const sh = this.shuttles.find((x) => Math.abs(x.sh.x - e.x) < 0.1); if (sh) sh.land = 1; } break;
         case 'sold': {
           this.sound.play(e.by === 'robot' && dist(st.p, e) > 6 ? 'beep' : 'sold');
+          this.voice.say('pickup');
           this._burst(e.x, 1.4, e.z, 10);
           break;
         }
@@ -443,6 +454,7 @@ class Game {
         case 'unlock': {
           const pad = PADS.find((p) => p.id === e.pad);
           this.sound.play(e.pad.startsWith('robot') ? 'robot' : 'unlock');
+          this.voice.say('charge');
           if (e.pad.startsWith('robot')) setTimeout(() => this.sound.play('unlock'), 350);
           this.syncUnlocked();
           this._burst(pad.x, 1, pad.z, 50);
@@ -651,6 +663,8 @@ class Game {
     clearInterval(this._pill);
     if (this.save) this._saveNow();
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
       this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });

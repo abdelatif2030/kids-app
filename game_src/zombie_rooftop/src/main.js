@@ -10,6 +10,9 @@ import { Rooftop, ROOFS, PERKS, UPGRADES, WEAPONS, MAX_UP, upCost, weaponOf, nor
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader.js';
 import { loadSprites, loadObjModels, fitModel } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const ZOMBIE_CLIPS = { trick: 3, pickup: 2, charge: 2, bump: 3, lap: 2, near: 2, win: 2, lose: 2, count: 1 };
 import {
   mat, basic, box, LOOKS, makeHero, makeWeapon, makeZombie, makeVent, makeWaterTower, makeTanks, makePlanter, makeChimney,
   makePad, makeCrate, makeHeart, coinGeometry, makeRoof, makeBuilding, makeNeonSign, makeCrane, makeClockTower, skyTexture,
@@ -170,6 +173,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: ZOMBIE_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.quality = { low: lowEnd() };
     if (!document.getElementById('zr-style')) document.head.append(h('style', { id: 'zr-style', text: CSS }));
     this.root = h('div', { class: 'zr-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
@@ -479,6 +486,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -644,6 +652,7 @@ class Game {
     if (this.worldIndex !== i) { this._buildWorld(endless ? 0 : i, endless); this.worldIndex = i; }
     this.roofIndex = i;
     this.g = new Rooftop({ roof: endless ? 0 : i, endless, easy: this.age <= 4, up: this.save.up, weapon: this.save.weapon, seed: (Date.now() & 0xffff) + 1 });
+    this.voice.say('count');
     this._setGun(this.g.weapon);
     this.mode = 'play';
     this.paused = false;
@@ -776,6 +785,7 @@ class Game {
       if (id + 1 > this.save.unlocked) { this.save.unlocked = id + 1; unlockedNext = true; }
     }
     this._saveNow();
+    this.voice.say(r.won ? 'win' : 'lose');
     if (r.won) {
       this.sound.play('win');
       [0, 1, 2].forEach((k) => k < r.stars && setTimeout(() => this.sound.play('star', k), 500 + k * 280));
@@ -834,6 +844,7 @@ class Game {
         break;
       case 'pop': {
         S.play('pop');
+        this.voice.say('trick');
         const big = e.kind === 'brute' || e.kind === 'king';
         this.puff.burst(e.x, 0.9, e.z, big ? 40 : 18, big ? 3.2 : 2.2, 0.8);
         this._splat(e.x, e.z, big ? 1.8 : 1);
@@ -843,6 +854,7 @@ class Game {
       }
       case 'spawn':
         if (e.kind === 'king') {
+          this.voice.say('near');
           S.play('king');
           S.setMode('king');
           this._banner(t('king'), 2.2);
@@ -863,7 +875,7 @@ class Game {
       case 'tankHit': S.play('clink'); break;
       case 'tankBack': break;
       case 'coin':
-        if ((this._coinT ?? 0) <= 0) { S.play('coin'); this._coinT = 0.06; }
+        if ((this._coinT ?? 0) <= 0) { S.play('coin'); this.voice.say('pickup'); this._coinT = 0.06; }
         this.coinSpark.burst(g.hero.x, 1.4, g.hero.z, 3, 2, 0.3);
         break;
       case 'heal':
@@ -873,9 +885,11 @@ class Game {
         break;
       case 'ouch':
         S.play('ouch');
+        this.voice.say('bump');
         this.hurtT = 0.25;
         break;
       case 'wave':
+        this.voice.say('lap');
         S.play('wave');
         this._banner(`${t('wave')} ${num(e.n)}`, 1.6);
         this.waveKills = 0;
@@ -889,6 +903,7 @@ class Game {
         this.toast(t('tip_crate'), 2.6, '🎁');
         break;
       case 'weapon': {
+        this.voice.say('charge');
         S.play('weapon');
         this._setGun(e.weapon);
         this.sparks.burst(e.x, 1, e.z, 40, 5);
@@ -897,7 +912,7 @@ class Game {
         if (!this.save.weapons.includes(e.weapon)) { this.save.weapons.push(e.weapon); this.save.weapon = e.weapon; this._saveNow(); }
         break;
       }
-      case 'levelUp': this._perkChoice(e.choices); break;
+      case 'levelUp': this.voice.say('charge'); this._perkChoice(e.choices); break;
       case 'pad':
         S.play('pad');
         this._banner(t('roofCleared'), 2);
@@ -1221,6 +1236,8 @@ class Game {
     clearTimeout(this._tt);
     clearTimeout(this._bt);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
       this.scene.traverse((o) => { if (o.geometry) o.geometry.dispose(); });

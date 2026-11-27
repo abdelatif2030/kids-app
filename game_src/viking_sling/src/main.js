@@ -7,6 +7,9 @@ import { LEVELS } from './levels.js';
 import { Sound } from './audio.js';
 import { loadArt } from '../../cozy_kit/art.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const VIKING_CLIPS = { trick: 3, nitro: 2, charge: 2, win: 2, lose: 2, count: 1 };
 
 const S = {
   title: ['مقلاع الفايكنج', 'Viking Slingshot'], play: ['يلا نلعب', 'Play'], levels: ['المراحل', 'Levels'], shop: ['المتجر', 'Shop'], exit: ['خروج', 'Exit'],
@@ -32,6 +35,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: VIKING_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('vs-style')) document.head.append(h('style', { id: 'vs-style' }, css('vs', '#4a8ac8', '#244a80', '#ffd23a') + `
 .vs-root{background:#79c6ee}
 .vs-queue{position:absolute;left:calc(var(--u)*2);bottom:max(calc(var(--u)*2),env(safe-area-inset-bottom));display:flex;gap:calc(var(--u)*1);direction:ltr;pointer-events:none}
@@ -166,6 +173,7 @@ class Game {
 
   startLevel(i) {
     this.li = i;
+    this.voice.say('count');
     this.b = new Battle(i, { power: this.save.up.power, extra: this.save.up.extra, seed: (Date.now() & 0xffff) + 1 });
     this.mode = 'play'; this.parts = []; this.floats = []; this.shown = false; this.drag = null; this.pan = null; this.manualCam = false;
     this.camX = this._maxCam(); this.holdT = 0.9; this.paused = false;
@@ -198,6 +206,7 @@ class Game {
     recordResult(this.save, this.li, res); if (won && this.firstRaid) this.save.gold += 45; // one-time bonus for the first win of a level
     this._persist();
     this.sound.play(won ? 'win' : 'lose');
+    this.voice.say(won ? 'win' : 'lose');
     const hasNext = won && this.li + 1 < LEVELS.length;
     const kids = [h('div', { class: 'vs-title' }, won ? I.t('win') : I.t('lose'))];
     if (won) kids.push(h('div', { class: 'vs-small' }, I.t('win_m')), h('div', { class: 'vs-stars' }, ...[1, 2, 3].map((n) => h('span', { class: n <= b.stars ? '' : 'off' }, '⭐'))),
@@ -277,11 +286,11 @@ class Game {
       case 'goblin': {
         P(e.x, e.y, 9, ['#ffe04a', '#fff', '#ffb02a'], { sp: 6, life: 1.1, sz: 0.3, g: 6, kind: 'star' });
         this.floats.push({ x: e.x, y: e.y + 0.6, t: 0, text: `+${I.num(e.gold)}` });
-        this.sound.play('pop'); setTimeout(() => this.sound.play('coin'), 120); if (e.boss) this.shake = 0.6; break;
+        this.sound.play('pop'); this.voice.say('trick'); setTimeout(() => this.sound.play('coin'), 120); if (e.boss) this.shake = 0.6; break;
       }
-      case 'boom': { this.sound.play('boom'); this.shake = 0.5; this.booms = (this.booms || []).concat([{ x: e.x, y: e.y, r: e.radius, t: 0 }]); P(e.x, e.y, 22, ['#ff8a2a', '#ffd23a', '#555', '#ff5a2a'], { sp: 9, life: 0.8, sz: 0.4, g: 2, kind: 'puff' }); break; }
+      case 'boom': { this.sound.play('boom'); this.voice.say('nitro'); this.shake = 0.5; this.booms = (this.booms || []).concat([{ x: e.x, y: e.y, r: e.radius, t: 0 }]); P(e.x, e.y, 22, ['#ff8a2a', '#ffd23a', '#555', '#ff5a2a'], { sp: 9, life: 0.8, sz: 0.4, g: 2, kind: 'puff' }); break; }
       case 'vikingGone': P(e.x, e.y, 6, ['#fff'], { sp: 2, life: 0.5, sz: 0.3, g: -2, kind: 'puff' }); break;
-      case 'ability': this.sound.play('dash'); P(e.x, e.y, 5, ['#fff', '#ffd23a'], { sp: 3, life: 0.4, sz: 0.2, g: 0, kind: 'puff' }); break;
+      case 'ability': this.sound.play('dash'); this.voice.say('charge'); P(e.x, e.y, 5, ['#fff', '#ffd23a'], { sp: 3, life: 0.4, sz: 0.2, g: 0, kind: 'puff' }); break;
       case 'launch': break;
       default: break;
     }
@@ -494,7 +503,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); }
-  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
+  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
 }
 
 void GOBLINS;

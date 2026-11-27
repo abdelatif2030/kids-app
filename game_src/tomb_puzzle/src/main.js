@@ -5,6 +5,9 @@
 // beware of the crumbling floor. Undo, reset, hints and stars. Arabic (RTL) and English. No network, no ads, no tracking.
 import * as THREE from 'three';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const TOMB_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 2, bump: 2, win: 2, lose: 2 };
 import { parseLevel, Puzzle, step, stateKey, hintMove, starsFor, normalizeSave, cloneState, doorOpen, gateOpen, lockOpen, groupPressed, DIR_KEYS, DIRS, T } from './sim.js';
 import { LEVELS, TOMBS } from './levels.js';
 import { Sound } from './audio.js';
@@ -61,6 +64,10 @@ class Game {
     this.base = config.base || './';
     this.save = normalizeSave(config.save);
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: TOMB_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('tp-style')) document.head.append(h('style', { id: 'tp-style' }, CSS));
     this.root = h('div', { class: 'tp-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -316,11 +323,11 @@ class Game {
           if (e.fill) this.sound.play('crumble');
           break;
         }
-        case 'key': { const [x, z] = cellXZ(e.cell); this._burst(x, 0.7, z, 0xffd050, 10); this.sound.play('key'); this.banner(I.t('keyFound'), 1300); break; }
-        case 'plate': this.sound.play(e.on ? 'plate' : 'unplate'); if (L.doors.some((c) => L.doorAt[c] === e.grp)) doorSound = true; if (e.on) { const pc = L.platesByGrp[e.grp]; for (const c of pc) { const [x, z] = cellXZ(c); this._burst(x, 0.2, z, 0xffe080, 6); } } break;
-        case 'light': { const [x, z] = cellXZ(e.cell); this._burst(x, 1.0, z, 0xffa030, 10); this.sound.play('light'); this.face = FACE[e.dir]; break; }
-        case 'gate': this.sound.play('door'); this.banner(I.t('gateOpened'), 1600); break;
-        case 'unlock': { const [x, z] = cellXZ(e.cell); this._burst(x, 0.7, z, 0xffd050, 10); this.sound.play('unlock'); break; }
+        case 'key': { const [x, z] = cellXZ(e.cell); this._burst(x, 0.7, z, 0xffd050, 10); this.sound.play('key'); this.voice.say('pickup'); this.banner(I.t('keyFound'), 1300); break; }
+        case 'plate': this.sound.play(e.on ? 'plate' : 'unplate'); if (e.on) this.voice.say('trick'); if (L.doors.some((c) => L.doorAt[c] === e.grp)) doorSound = true; if (e.on) { const pc = L.platesByGrp[e.grp]; for (const c of pc) { const [x, z] = cellXZ(c); this._burst(x, 0.2, z, 0xffe080, 6); } } break;
+        case 'light': { const [x, z] = cellXZ(e.cell); this._burst(x, 1.0, z, 0xffa030, 10); this.sound.play('light'); this.voice.say('trick'); this.face = FACE[e.dir]; break; }
+        case 'gate': this.sound.play('door'); this.voice.say('charge'); this.banner(I.t('gateOpened'), 1600); break;
+        case 'unlock': { const [x, z] = cellXZ(e.cell); this._burst(x, 0.7, z, 0xffd050, 10); this.sound.play('unlock'); this.voice.say('charge'); break; }
         case 'crack': { const [x, z] = cellXZ(e.cell); this._burst(x, 0.1, z, 0xc8a070, 4); this.sound.play('crack'); break; }
         case 'crumble': { const [x, z] = cellXZ(e.cell); this._burst(x, 0.1, z, 0xc8a070, 8); this.sound.play('crumble'); break; }
         case 'bump': this._bump(e); break;
@@ -339,14 +346,14 @@ class Game {
     this.auto = null; this.face = FACE[e.dir]; this.bumpT = 0.18; this.bumpDir = e.dir;
     const now = performance.now(); if (now - this.lastBumpT < 700) return; this.lastBumpT = now;
     const msg = { lock: 'bLock', door: 'bDoor', gate: 'bGate', pit: 'bPit', block: 'bBlock', brazier: 'bBraz' }[e.why];
-    this.sound.play('bump'); if (msg) this.banner(I.t(msg), 1700);
+    this.sound.play('bump'); this.voice.say('bump'); if (msg) this.banner(I.t(msg), 1700);
   }
 
   _fall(ev, before) {
     this.locked = true; this.auto = null; this.buf = null;
     const w = this.L.w; const vs = cloneState(before);
     for (const e of ev) { if (e.type === 'crack') vs.terr[e.cell] = T.CRACKED; if (e.type === 'crumble') vs.terr[e.cell] = T.PIT; if (e.type === 'move') vs.p = e.to; }
-    this.vs = vs; this.fallT = 0; this.fallCell = vs.p; void w; this.sound.play('fall'); this.banner(I.t('fall'), 2200);
+    this.vs = vs; this.fallT = 0; this.fallCell = vs.p; void w; this.sound.play('fall'); this.voice.say('lose'); this.banner(I.t('fall'), 2200);
   }
 
   _win() {
@@ -355,7 +362,7 @@ class Game {
     sv.stars[def.id] = Math.max(sv.stars[def.id] || 0, stars); sv.keys[def.id] = Math.max(sv.keys[def.id] || 0, this._popcount(s.keys));
     sv.best[def.id] = sv.best[def.id] ? Math.min(sv.best[def.id], s.moves) : s.moves; sv.unlocked = Math.max(sv.unlocked, Math.min(LEVELS.length, this.idx + 2));
     this.post({ type: 'save', save: sv });
-    this.jumpT = 0; this.sound.play('win'); const [ex, ez] = [(L.exit % L.w) + 0.5, ((L.exit / L.w) | 0) + 0.5]; this._burst(ex, 1.0, ez, 0xffe080, 24);
+    this.jumpT = 0; this.sound.play('win'); this.voice.say('win'); const [ex, ez] = [(L.exit % L.w) + 0.5, ((L.exit / L.w) | 0) + 0.5]; this._burst(ex, 1.0, ez, 0xffe080, 24);
     setTimeout(() => { if (this.mode === 'play' && this.L === L) this._results(stars); }, 1100);
   }
   _popcount(n) { let c = 0; while (n) { c += n & 1; n >>= 1; } return c; }
@@ -392,7 +399,7 @@ class Game {
     this.layer.append(h('div', { class: 'tp-dim', style: 'background:rgba(10,5,0,.5)' }, h('div', { class: 'tp-card' }, h('div', { class: 'tp-logo' }, '𓂀 ', I.t('title')), h('div', { class: 'tp-small' }, I.t('sub')),
       h('button', { class: 'tp-btn', onclick: () => { this.sound.play('tap'); this.start(idx); } }, '▶ ', cont ? I.t('cont') : I.t('play')),
       h('button', { class: 'tp-btn dark', onclick: () => { this.sound.play('tap'); this.showLevels(); } }, '🗺️ ', I.t('levels')),
-      h('button', { class: 'tp-btn dark', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); this.showMenu(); } }, `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`),
+      h('button', { class: 'tp-btn dark', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.voice.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); this.showMenu(); } }, `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`),
       h('button', { class: 'tp-btn alt', onclick: () => this.post({ type: 'exit' }) }, I.t('quit')))));
     this._soundPill();
   }
@@ -416,6 +423,7 @@ class Game {
   }
 
   start(idx) {
+    this.voice.say('go');
     this.menuSpin = false; this._build(idx); this.mode = 'play'; this.paused = false; this.locked = false; this.cd = 0.2; this.buf = null; this.auto = null; this.fallT = -1;
     this._clear(); this.sound.setMode(true);
     this.movesEl = h('span', {}); this.keysEl = h('span', {}); this.lvEl = h('span', {}, `${I.t('room')} ${I.num(idx + 1)}`);
@@ -442,7 +450,7 @@ class Game {
     if (this.paused) {
       this.pauseEl = h('div', { class: 'tp-dim' }, h('div', { class: 'tp-card' }, h('div', { class: 'tp-title' }, I.t('paused')), h('button', { class: 'tp-btn', onclick: () => this.togglePause() }, '▶ ', I.t('resume')),
         h('button', { class: 'tp-btn dark', onclick: () => { this.togglePause(); this.resetRoom(); } }, '🔄 ', I.t('restart')),
-        h('button', { class: 'tp-btn dark', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); this.togglePause(); this.togglePause(); } }, `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`),
+        h('button', { class: 'tp-btn dark', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.voice.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); this.togglePause(); this.togglePause(); } }, `${this.save.muted ? '🔇' : '🔊'} ${I.t('sound')}`),
         h('button', { class: 'tp-btn dark', onclick: () => { this.paused = false; this.showLevels(); this.mode = 'menu'; this.sound.setMode(false); } }, '🗺️ ', I.t('levels')),
         h('button', { class: 'tp-btn dark', onclick: () => { this.paused = false; this.showMenu(); } }, '🏠 ', I.t('home'))));
       this.layer.append(this.pauseEl);
@@ -548,7 +556,7 @@ class Game {
   pause() { this.sound.suspend(); if (this.mode === 'play' && !this.paused) this.togglePause(); }
   dispose() {
     clearTimeout(this._deadT); clearTimeout(this._idleT);
-    this.renderer.setAnimationLoop(null); this.sound.dispose(); if (this.ro) this.ro.disconnect();
+    this.renderer.setAnimationLoop(null); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey);
     this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove();
   }

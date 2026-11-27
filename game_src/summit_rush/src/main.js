@@ -12,6 +12,9 @@ import {
   makeShieldBubble, makePine, makeRock, makeFlag, makeArch, makeMountain, snowTexture, bankTexture, starTexture, puffTexture,
 } from './models.js';
 import { Sound } from './audio.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const SUMMIT_CLIPS = { go: 2, nitro: 3, overtake: 3, near: 3, bump: 3, pickup: 2, win: 2, lose: 2, count: 1 };
 import { setLang, setGirl, getLang, t, num } from './i18n.js';
 import { CSS, h, logo } from './ui.js';
 
@@ -30,6 +33,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: SUMMIT_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('sr-style')) document.head.append(h('style', { id: 'sr-style' }, CSS));
     this.root = h('div', { class: 'sr-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -285,7 +292,7 @@ class Game {
 
   _soundBtn() {
     const b = h('button', { class: 'sr-round', 'aria-label': 'sound' }, this.sound.muted ? '🔇' : '🔊');
-    b.addEventListener('click', (e) => { e.stopPropagation(); this.sound.unlock(); this.sound.setMuted(!this.sound.muted); this.save.muted = this.sound.muted; this._saveNow(); b.textContent = this.sound.muted ? '🔇' : '🔊'; });
+    b.addEventListener('click', (e) => { e.stopPropagation(); this.sound.unlock(); this.sound.setMuted(!this.sound.muted); this.voice.setMuted(this.sound.muted); this.save.muted = this.sound.muted; this._saveNow(); b.textContent = this.sound.muted ? '🔇' : '🔊'; });
     return b;
   }
 
@@ -429,9 +436,9 @@ class Game {
     const mePos = new THREE.Vector3(me.x, Y(me.s) + 1.2, -me.s);
     for (const e of evs) {
       switch (e.type) {
-        case 'count': this._big(num(e.n), 'count'); this.sound.play('count'); break;
-        case 'go': this._big(t('go'), 'go'); this.sound.play('go'); if (this.hint) { this.hint.remove(); this.hint = null; } break;
-        case 'crystal': {
+        case 'count': this._big(num(e.n), 'count'); this.sound.play('count'); if (e.n >= 3) this.voice.say('count'); break;
+        case 'go': this._big(t('go'), 'go'); this.sound.play('go'); this.voice.say('go'); if (this.hint) { this.hint.remove(); this.hint = null; } break;
+        case 'crystal': this.voice.say('pickup'); {
           const now = this.race.t;
           this.streak = now - this.lastCrystalT < 0.6 ? this.streak + 1 : 0;
           this.lastCrystalT = now;
@@ -442,15 +449,16 @@ class Game {
           this._plus(`+${num(10)}`, p);
           break;
         }
-        case 'dodge': this._float(t('dodge')); this.sound.play('dodge'); this._sparkle(mePos, 12); this._plus(`+${num(5)}`, mePos); break;
-        case 'overtake': this._float(t('overtake')); this.sound.play('overtake'); this._plus(`+${num(20)}`, mePos); break;
-        case 'boost': this.sound.play('boost'); this._puff(mePos.clone().setY(mePos.y - 1), 6, 0.6); break;
-        case 'tailwind': this._float(t('tailwind'), 'wind'); this.sound.play('tailwind'); this._puff(mePos, 10, 1); break;
+        case 'dodge': this._float(t('dodge')); this.sound.play('dodge'); this.voice.say('near'); this._sparkle(mePos, 12); this._plus(`+${num(5)}`, mePos); break;
+        case 'overtake': this._float(t('overtake')); this.sound.play('overtake'); this.voice.say('overtake'); this._plus(`+${num(20)}`, mePos); break;
+        case 'boost': this.sound.play('boost'); this.voice.say('nitro'); this._puff(mePos.clone().setY(mePos.y - 1), 6, 0.6); break;
+        case 'tailwind': this._float(t('tailwind'), 'wind'); this.sound.play('tailwind'); this.voice.say('nitro'); this._puff(mePos, 10, 1); break;
         case 'shield': this._float(t('shield'), 'shield'); this.sound.play('shield'); break;
         case 'blocked': this._float(t('blocked'), 'shield'); this.sound.play('blocked'); this._sparkle(mePos, 14, 0xcfe8ff); break;
         case 'wipeout':
           this._float(t('wipeout'), 'pill');
           this.sound.play('wipeout');
+          this.voice.say('bump');
           if (!this.easy) this.sound.play('heart');
           this._puff(mePos.clone().setY(mePos.y - 0.8), 12, 1);
           this.shake = 0.45;
@@ -458,8 +466,8 @@ class Game {
         case 'up': this.sound.play('up'); break;
         case 'summit': this.sound.play('summit'); break;
         case 'finish': setTimeout(() => this._winCard(e.place), 1200); break;
-        case 'out': this.sound.play('lose'); setTimeout(() => this._loseCard('out'), 900); break;
-        case 'timeup': this.sound.play('lose'); setTimeout(() => this._loseCard('time'), 600); break;
+        case 'out': this.sound.play('lose'); this.voice.say('lose'); setTimeout(() => this._loseCard('out'), 900); break;
+        case 'timeup': this.sound.play('lose'); this.voice.say('lose'); setTimeout(() => this._loseCard('time'), 600); break;
         default:
       }
     }
@@ -467,6 +475,7 @@ class Game {
 
   _winCard(place) {
     this.mode = 'end';
+    this.voice.say(place === 1 ? 'win' : 'lose');
     this.sound.setMode('end');
     const c = this.race.course;
     const best = this.save.best[c.id];
@@ -659,6 +668,8 @@ class Game {
     window.removeEventListener('keydown', this._onKey);
     document.removeEventListener('visibilitychange', this._onVis);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.ro) this.ro.disconnect();
     this.renderer.dispose();
     try { this.renderer.forceContextLoss(); } catch (_) { /* already gone */ } // free the GL context now (phones allow only a few)

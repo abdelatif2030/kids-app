@@ -7,6 +7,9 @@ import { Voyage, LEVELS, COST, MAX_TILES, RAFT, normalizeSave } from './sim.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num } from './i18n.js';
 import { h, css } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const RAFT_CLIPS = { go: 2, pickup: 2, charge: 2, trick: 2, near: 2, bump: 2, win: 2 };
 
 const CSS = css('cr', '#3aa8d8', '#1a6a98', '#ffd23a');
 const ICON = { wood: '🪵', crate: '📦', barrel: '🛢️', bottle: '🍾' };
@@ -24,6 +27,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: RAFT_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('cr-style')) document.head.append(h('style', { id: 'cr-style' }, CSS));
     this.root = h('div', { class: 'cr-root', dir: getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -124,6 +131,7 @@ class Game {
   }
 
   start(i) {
+    this.voice.say('go');
     this.levelIndex = i;
     this.v = new Voyage({ level: i, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1 });
     this.mode = 'play';
@@ -195,6 +203,7 @@ class Game {
     this.save.coins += v.reward;
     this.post({ type: 'save', save: this.save });
     this.sound.play('win');
+    this.voice.say('win');
     const row = (ok, text) => h('div', { class: 'cr-small', style: 'width:100%;text-align:start' }, ok ? '✅ ' : '▫️ ', text);
     const last = L.id >= LEVELS.length;
     this.layer.append(h('div', { class: 'cr-dim' }, h('div', { class: 'cr-card' },
@@ -236,16 +245,17 @@ class Game {
         case 'miss': this.sound.play('splash'); break;
         case 'got': {
           this.sound.play(e.what === 'bottle' ? 'bottle' : 'got');
+          this.voice.say(e.what === 'bottle' ? 'charge' : 'pickup');
           this.fx.push({ x: RAFT.x, y: RAFT.y - 0.1, text: e.what === 'bottle' ? '+🍾' : `+${e.n} ${t(e.what)}`, t: 0, life: 1.1 });
           break;
         }
         case 'needBuild': this.hint(t('needBuild'), 5000); break;
-        case 'sharkIn': this.sound.play('sharkIn'); this.hint(t('shark'), 4000); break;
-        case 'sharkWarn': this.sound.play('sharkIn'); break;
-        case 'bitten': this.sound.play('bite'); this.fx.push({ x: RAFT.x + 0.1, y: RAFT.y, text: e.wood ? `-1 ${t('wood')}` : '', t: 0, life: 1.2 }); this.hint(t('bitten'), 1800); break;
-        case 'scare': this.sound.play('scare'); this.hint(t('scared'), 2200); break;
-        case 'fish': this.sound.play('fish'); this.fx.push({ x: RAFT.x + 0.22, y: RAFT.y - 0.05, text: `+${num(e.n)} 🐟`, t: 0, life: 1.1 }); break;
-        case 'landing': this.sound.play('land'); break;
+        case 'sharkIn': this.sound.play('sharkIn'); this.voice.say('near'); this.hint(t('shark'), 4000); break;
+        case 'sharkWarn': this.sound.play('sharkIn'); this.voice.say('near'); break;
+        case 'bitten': this.sound.play('bite'); this.voice.say('bump'); this.fx.push({ x: RAFT.x + 0.1, y: RAFT.y, text: e.wood ? `-1 ${t('wood')}` : '', t: 0, life: 1.2 }); this.hint(t('bitten'), 1800); break;
+        case 'scare': this.sound.play('scare'); this.voice.say('trick'); this.hint(t('scared'), 2200); break;
+        case 'fish': this.sound.play('fish'); this.voice.say('pickup'); this.fx.push({ x: RAFT.x + 0.22, y: RAFT.y - 0.05, text: `+${num(e.n)} 🐟`, t: 0, life: 1.1 }); break;
+        case 'landing': this.sound.play('land'); this.voice.say('charge'); break;
         case 'done': this._result(); break;
         default: break;
       }
@@ -547,6 +557,8 @@ class Game {
   dispose() {
     cancelAnimationFrame(this.raf);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis);
     this.root.remove();

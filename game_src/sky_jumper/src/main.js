@@ -7,6 +7,9 @@ import { Climb, W, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 import { loadArt } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const JUMPER_CLIPS = { go: 2, nitro: 2, charge: 2, trick: 2, bump: 2, win: 2, lose: 2 };
 // Optional generated pictures; a missing one stays null and the code-drawn version is used.
 const ART = {};
 const pic = (g, im, x, y, w) => { const hh = w * im.naturalHeight / im.naturalWidth; g.drawImage(im, x - w / 2, y - hh / 2, w, hh); };
@@ -47,6 +50,10 @@ class Game {
     this.save = normalizeSave(config.save);
     this.base = config.base || './';
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: JUMPER_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('sj-style')) document.head.append(h('style', { id: 'sj-style' }, css('sj', '#3aa8e8', '#1a5aa8', '#ffe04a')));
     this.root = h('div', { class: 'sj-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -80,6 +87,7 @@ class Game {
   }
 
   start() {
+    this.voice.say('go');
     this.c = new Climb({ seed: (Date.now() & 0xffff) + 1, easy: this.age <= 5 });
     this.mode = 'play'; this.paused = false; this.camY = 0;
     this.layer.replaceChildren(); this.sound.setMode(true);
@@ -95,7 +103,7 @@ class Game {
   _over() {
     const sc = this.c.score; const rec = sc > this.save.best;
     if (rec) this.save.best = sc;
-    this.post({ type: 'save', save: this.save }); this.sound.play('over');
+    this.post({ type: 'save', save: this.save }); this.sound.play('over'); this.voice.say(rec ? 'win' : 'lose');
     this.layer.append(h('div', { class: 'sj-dim' }, h('div', { class: 'sj-card' }, h('div', { class: 'sj-title' }, I.t('over')), h('div', { class: 'sj-pill' }, `${I.t('score')} ${I.num(sc)}`), rec ? h('div', { class: 'sj-small' }, I.t('newBest')) : null, h('button', { class: 'sj-btn', onclick: () => this.start() }, I.t('again')), h('button', { class: 'sj-btn dark', onclick: () => this.showMenu() }, I.t('menu')))));
   }
 
@@ -104,7 +112,7 @@ class Game {
   _update(dt) {
     const c = this.c;
     for (const e of c.step(dt)) {
-      switch (e.type) { case 'bounce': this.sound.play('bounce'); break; case 'spring': this.sound.play('spring'); break; case 'crumble': this.sound.play('crumble'); break; case 'power': this.sound.play('power'); break; case 'squash': this.sound.play('squash'); break; case 'bonk': this.sound.play('bonk'); break; case 'over': this._over(); break; default: break; }
+      switch (e.type) { case 'bounce': this.sound.play('bounce'); break; case 'spring': this.sound.play('spring'); this.voice.say('nitro'); break; case 'crumble': this.sound.play('crumble'); break; case 'power': this.sound.play('power'); this.voice.say('charge'); break; case 'squash': this.sound.play('squash'); this.voice.say('trick'); break; case 'bonk': this.sound.play('bonk'); this.voice.say('bump'); break; case 'over': this._over(); break; default: break; }
     }
     this.scoreEl.textContent = `⬆ ${I.num(c.score)}`;
     this.camY = Math.max(this.camY, c.height);
@@ -176,7 +184,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play' && !this.paused) this.togglePause(); }
-  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
+  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); this.root.remove(); }
 }
 
 const api = { start(el, config, post) { const g = new Game(el, config || {}, post); api.last = g; return { dispose: () => g.dispose(), pause: () => g.pause() }; } };

@@ -9,6 +9,9 @@ import { TrackPath } from './track.js';
 import { Race } from './race.js';
 import { World, makeSky, mergeByMaterial } from './world.js';
 import { loadSprites, makeBillboardVehicle, loadGLBs } from '../../cozy_kit/art.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const CARNIVAL_CLIPS = { go: 2, nitro: 3, overtake: 2, bump: 3, trick: 2, pickup: 2, lap: 2, win: 2, lose: 2, count: 1 };
 import { makeGlbKart, makeBumperCar, makeShieldBubble, glowSprite, makePodium, glow } from './models.js';
 import { setLang, getLang, t, num, name, ordinal } from './i18n.js';
 import { CSS, h, ANIMAL_EMOJI, ITEM_EMOJI, TRACK_EMOJI, TRACK_BG } from './ui.js';
@@ -43,6 +46,10 @@ class Game {
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
     this.base = config.base || './';
+    this.voice = new VoiceCoach({ base: this.base, lang: getLang(), girl: config.gender === 'girl', clips: CARNIVAL_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     this.quality = { low: lowEndDevice() };
 
     if (!document.getElementById('cr-style')) document.head.append(h('style', { id: 'cr-style', text: CSS }));
@@ -206,6 +213,7 @@ class Game {
       e.stopPropagation();
       this.sound.unlock();
       this.sound.setMuted(!this.sound.muted);
+      this.voice.setMuted(this.sound.muted);
       this.save.muted = this.sound.muted;
       this._saveNow();
       b.textContent = this.sound.muted ? '🔇' : '🔊';
@@ -615,30 +623,40 @@ class Game {
     this._sfx(e, me);
     switch (e.type) {
       case 'count':
+        if (e.n >= 3) this.voice.say('count');
         this.hud.count.textContent = num(e.n);
         break;
       case 'go':
+        this.voice.say('go');
         this.hud.count.classList.add('word');
         this.hud.count.textContent = t('go');
         setTimeout(() => this.hud && this.hud.count && (this.hud.count.textContent = ''), 700);
         break;
       case 'lap':
+        this.voice.say('lap');
         this.toast(e.lap === r.race.laps ? t('lastLap') : `${t('lap')} ${num(e.lap)}`, 1.4);
         break;
       case 'lead':
+        this.voice.say('overtake');
         this.toast(t('lead'), 1.2);
         break;
+      case 'boost':
+        this.voice.say('nitro');
+        break;
+      case 'ticket':
+        if (e.car === me) this.voice.say('pickup');
+        break;
       case 'spin':
-        if (e.car === me) this.toast(t('oops'), 0.9);
+        if (e.car === me) { this.voice.say('bump'); this.toast(t('oops'), 0.9); }
         break;
       case 'shieldPop':
         if (e.car === me) this.toast(t('shielded'), 1);
         break;
       case 'trick':
-        if (e.car === me) this.toast(t('trick'), 1);
+        if (e.car === me) { this.voice.say('trick'); this.toast(t('trick'), 1); }
         break;
       case 'driftBoost':
-        if (e.car === me && e.tier >= 2) this.toast(t('drift'), 0.8);
+        if (e.car === me && e.tier >= 2) { this.voice.say('nitro'); this.toast(t('drift'), 0.8); }
         break;
       case 'bump':
         if (r.race.time - r.lastToastBump > 4) {
@@ -811,6 +829,7 @@ class Game {
     this.sound.engine(false);
     this.sound.setMode('menu');
     if (place === 1) this.sound.play('win');
+    this.voice.say(place === 1 ? 'win' : 'lose');
     // the podium with the top three
     this.turntable.visible = false;
     this.podium.visible = true;
@@ -856,6 +875,8 @@ class Game {
   dispose() {
     clearInterval(this._pillTimer);
     this.sound.dispose();
+    this.voice.dispose();
+    document.removeEventListener('pointerdown', this._voiceArm, true);
     if (this.renderer) {
       this.renderer.setAnimationLoop(null);
       this._endRace();

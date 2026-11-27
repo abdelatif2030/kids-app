@@ -8,6 +8,9 @@ import * as THREE from 'three';
 import { Match, LEVELS, PITCH, SKINS, LEG_OFF, LANE_LEN, LANE_W, LIVES, DUMMY_R, normalizeSave, buySkin, selectSkin } from './sim.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const NUTMEG_CLIPS = { trick: 3, near: 2, bump: 2, pickup: 2, nitro: 2, win: 2, lose: 2, count: 1 };
 
 const S = {
   title: ['سكة الكورة', 'NUTMEG RUSH'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], balls: ['الكور', 'BALLS'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
@@ -87,6 +90,10 @@ class Game {
     this.age = Number(config.age) || 5; this.base = config.base || './';
     this.save = normalizeSave(config.save);
     this.sound = new Sound(); this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: NUTMEG_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('nm-style')) document.head.append(h('style', { id: 'nm-style' }, css('nm', '#1f6ae0', '#0a2470', '#ffe04a') + `
 .nm-menu{display:flex;flex-direction:column;gap:${U(1.6)};width:100%}.nm-row{display:flex;justify-content:space-between;width:100%;font-weight:900;font-size:${U(3.6)}}
 .nm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:${U(1.6)};width:100%}.nm-lvl{border:${U(.5)} solid #fff;border-radius:${U(3)};font-family:inherit;color:#fff;font-weight:900;padding:${U(1.2)};display:flex;flex-direction:column;align-items:center;gap:${U(.4)};font-size:${U(3)};min-height:${U(22)};cursor:pointer;justify-content:center;background:linear-gradient(180deg,#2fa84a,#12662a)}.nm-lvl.lock{filter:grayscale(1) brightness(.6)}
@@ -340,7 +347,7 @@ class Game {
 
   showSettings() {
     this._clear();
-    const b = h('button', { class: 'nm-btn', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); b.textContent = `${this.save.muted ? '🔇' : '🔊'} ${tx('sound')}`; this.sound.play('tap'); } }, `${this.save.muted ? '🔇' : '🔊'} ${tx('sound')}`);
+    const b = h('button', { class: 'nm-btn', onclick: () => { this.save.muted = !this.save.muted; this.sound.setMuted(this.save.muted); this.voice.setMuted(this.save.muted); this.post({ type: 'save', save: this.save }); b.textContent = `${this.save.muted ? '🔇' : '🔊'} ${tx('sound')}`; this.sound.play('tap'); } }, `${this.save.muted ? '🔇' : '🔊'} ${tx('sound')}`);
     this._card(h('div', { class: 'nm-title' }, '⚙️ ', tx('settings')), b, h('div', { class: 'nm-small' }, tx('how')), h('button', { class: 'nm-btn dark', onclick: () => this.showMenu() }, tx('back')));
     this._soundPill();
   }
@@ -350,6 +357,7 @@ class Game {
   }
 
   _newMatch(i) {
+    this.voice.say('count');
     this.m = new Match({ level: i, seed: (Date.now() & 0xff) + 1, easy: this.age <= 4 });
     this._clearActors(); this._buildActors(); this.fx = []; this.shake = 0; this.camInit = false; this.celebrate = 0;
   }
@@ -381,7 +389,7 @@ class Game {
     const i = this.levelIdx, sv = this.save;
     sv.stars[i] = Math.max(sv.stars[i], r.stars); sv.unlocked = Math.max(sv.unlocked, Math.min(5, i + 2)); sv.coins += r.coins; sv.goals += 1; sv.tricks += r.tricks; sv.best[i] = Math.max(sv.best[i], r.score);
     this.post({ type: 'save', save: sv });
-    this.sound.play('win'); this.mode = 'result';
+    this.sound.play('win'); this.voice.say('win'); this.mode = 'result';
     if (this.shootBtn) { this.shootBtn.remove(); this.shootBtn = null; }
     const row = (a, b) => h('div', { class: 'nm-row' }, h('span', {}, a), h('span', {}, b));
     const stars = h('div', { class: 'nm-stars' }, ...[1, 2, 3].map((n) => h('span', { class: n <= r.stars ? '' : 'off' }, '⭐')));
@@ -392,6 +400,7 @@ class Game {
   }
 
   _fail(r) {
+    this.voice.say('lose');
     const i = this.levelIdx, sv = this.save; sv.coins += r.coins; this.post({ type: 'save', save: sv });
     this.mode = 'result'; if (this.shootBtn) { this.shootBtn.remove(); this.shootBtn = null; } this.hideTip();
     const saved = r.reason === 'saved';
@@ -438,21 +447,21 @@ class Game {
       switch (e.type) {
         case 'tackleWarn': this.sound.play('warn'); break;
         case 'slide': this.sound.play('slide'); break;
-        case 'nutmeg': this.sound.play('nutmeg'); this.say('nutmeg', 'yellow'); this._burst(this.ball.position, 0xffe04a, 14); this.sound.excite(0.6); break;
-        case 'onetwo': this.sound.play('onetwo'); this.sound.play('kick'); this.say('onetwo', 'cyan'); this._burst(this.ball.position, 0x5ac8ff, 14); this.hideTip(); break;
-        case 'dodge': this.sound.play('dodge'); this.say('dodge', 'cyan'); break;
-        case 'stolen': this.sound.play('stolen'); this.say('stolen', 'red'); this.shake = 0.7; this.sound.excite(0.15); break;
-        case 'burn': this.sound.play('burn'); this.say('burn', 'yellow'); this._burst(this.ball.position, 0xff6a1a, 24); break;
-        case 'cometOn': this.sound.play('comet'); this.say('comet'); this.sound.excite(0.9); break;
+        case 'nutmeg': this.sound.play('nutmeg'); this.voice.say('trick'); this.say('nutmeg', 'yellow'); this._burst(this.ball.position, 0xffe04a, 14); this.sound.excite(0.6); break;
+        case 'onetwo': this.sound.play('onetwo'); this.sound.play('kick'); this.voice.say('trick'); this.say('onetwo', 'cyan'); this._burst(this.ball.position, 0x5ac8ff, 14); this.hideTip(); break;
+        case 'dodge': this.sound.play('dodge'); this.voice.say('near'); this.say('dodge', 'cyan'); break;
+        case 'stolen': this.sound.play('stolen'); this.voice.say('bump'); this.say('stolen', 'red'); this.shake = 0.7; this.sound.excite(0.15); break;
+        case 'burn': this.sound.play('burn'); this.voice.say('trick'); this.say('burn', 'yellow'); this._burst(this.ball.position, 0xff6a1a, 24); break;
+        case 'cometOn': this.sound.play('comet'); this.voice.say('nitro'); this.say('comet'); this.sound.excite(0.9); break;
         case 'cometOff': this.sound.excite(0.3); break;
         case 'shootStart': this._shootUI(); this.sound.play('whistle'); break;
-        case 'coin': this.sound.play('coin'); this._burst(this.ball.position, 0xffd23a, 5); break;
-        case 'blocked': this.sound.play('tap'); this.say('blocked', 'red'); this.shake = 0.3; break;
+        case 'coin': this.sound.play('coin'); this.voice.say('pickup'); this._burst(this.ball.position, 0xffd23a, 5); break;
+        case 'blocked': this.sound.play('tap'); this.voice.say('bump'); this.say('blocked', 'red'); this.shake = 0.3; break;
         case 'mateHint': this.tip('mate', 3600); break;
         case 'lost': this.sound.play('stolen'); break;
         case 'shoot': this.sound.play('shot'); this.hideTip(); if (this.shootBtn) { this.shootBtn.remove(); this.shootBtn = null; } break;
-        case 'save': this.sound.play('save'); this.say('savedT', 'cyan'); this.shake = 0.6; break;
-        case 'goal': this.sound.play('goal'); this.say('goal'); this.celebrate = 3; this.netT = 0; this.netX = e.x; this._confettiBurst(); break;
+        case 'save': this.sound.play('save'); this.voice.say('trick'); this.say('savedT', 'cyan'); this.shake = 0.6; break;
+        case 'goal': this.sound.play('goal'); this.voice.say('win'); this.say('goal'); this.celebrate = 3; this.netT = 0; this.netX = e.x; this._confettiBurst(); break;
         case 'end': if (e.result.goal) this._finish(e.result); else this._fail(e.result); break;
         default: break;
       }
@@ -606,7 +615,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); if (this.mode === 'play' && !this.paused) this.togglePause(); }
-  dispose() { this.dead = true; this.renderer.setAnimationLoop(null); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
+  dispose() { this.dead = true; this.renderer.setAnimationLoop(null); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.renderer.dispose(); try { this.renderer.forceContextLoss(); } catch (_) { /* fine */ } this.root.remove(); }
 }
 const WXdir = (d) => -d;
 

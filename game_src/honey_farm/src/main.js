@@ -6,6 +6,9 @@
 import { Farm, SPOTS, SIZE, GOAL, HIVE_COST, BAG_COST, CONVEYOR_COST, MACHINE2_COST, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
+import { VoiceCoach } from '../../cozy_kit/voice.js';
+
+const HONEY_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 2, bump: 2, win: 2 };
 
 const S = {
   title: ['مزرعة العسل', 'Honey Farm'], play: ['يلا نبدأ', 'Start'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], again: ['من الأول', 'Play again'],
@@ -46,6 +49,10 @@ class Game {
     this.base = config.base || './';
     this.sound = new Sound();
     this.sound.muted = !!this.save.muted;
+    this.voice = new VoiceCoach({ base: this.base, lang: I.getLang(), girl: config.gender === 'girl', clips: HONEY_CLIPS });
+    this.voice.setMuted(this.sound.muted);
+    this._voiceArm = () => this.voice.unlock();
+    document.addEventListener('pointerdown', this._voiceArm, true);
     if (!document.getElementById('hf-style')) document.head.append(h('style', { id: 'hf-style' }, css('hf', '#f0b030', '#a85a10', '#fff0a0') + `
 .hf-root{background:#8ad860}.hf-shop{position:absolute;left:0;right:0;bottom:0;display:flex;gap:calc(var(--u)*1.2);padding:calc(var(--u)*1.6);box-sizing:border-box;justify-content:center;pointer-events:none}
 .hf-item{pointer-events:auto;font-family:inherit;border:calc(var(--u)*.4) solid #fff;border-radius:calc(var(--u)*3);background:linear-gradient(180deg,#e8a830,#a85a10);padding:calc(var(--u)*1.2) calc(var(--u)*1.4);cursor:pointer;font-weight:900;font-size:calc(var(--u)*2.8);color:#fff;display:flex;flex-direction:column;align-items:center;flex:1;max-width:calc(var(--u)*26);gap:calc(var(--u)*.2)}
@@ -106,6 +113,7 @@ class Game {
   }
 
   start() {
+    this.voice.say('go');
     this.f = new Farm({ seed: (Date.now() & 0xffff) + 1 });
     this.mode = 'play'; this.fx = [];
     this.layer.replaceChildren(); this.sound.setMode(true);
@@ -136,12 +144,12 @@ class Game {
     const f = this.f;
     for (const e of f.step(dt, this._input())) {
       switch (e.type) {
-        case 'pick': this.sound.play('pick'); break;
+        case 'pick': this.sound.play('pick'); this.voice.say('pickup'); break;
         case 'drop': this.sound.play('drop'); break;
-        case 'crate': this.sound.play('crate'); break;
-        case 'sale': this.sound.play('sale'); this.fx.push({ x: SPOTS.counter.x, y: SPOTS.counter.y - 2, t: 0, text: `+$${e.pay}` }); break;
-        case 'cash': this.sound.play('cash'); break;
-        case 'left': this.sound.play('left'); break;
+        case 'crate': this.sound.play('crate'); this.voice.say('trick'); break;
+        case 'sale': this.sound.play('sale'); this.voice.say('charge'); this.fx.push({ x: SPOTS.counter.x, y: SPOTS.counter.y - 2, t: 0, text: `+$${e.pay}` }); break;
+        case 'cash': this.sound.play('cash'); this.voice.say('pickup'); break;
+        case 'left': this.sound.play('left'); this.voice.say('bump'); break;
         case 'won': this._won(); break;
         default: break;
       }
@@ -157,7 +165,7 @@ class Game {
   }
 
   _won() {
-    this.save.wins += 1; this.post({ type: 'save', save: this.save }); this.sound.play('win');
+    this.save.wins += 1; this.post({ type: 'save', save: this.save }); this.sound.play('win'); this.voice.say('win');
     this.layer.append(h('div', { class: 'hf-dim' }, h('div', { class: 'hf-card' },
       h('div', { class: 'hf-title' }, I.t('won')), h('div', { class: 'hf-small' }, I.t('wonText')),
       h('div', { class: 'hf-pill' }, `${I.t('served')}: ${I.num(this.f.served)}`),
@@ -253,7 +261,7 @@ class Game {
   }
 
   pause() { this.sound.suspend(); }
-  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.root.remove(); }
+  dispose() { cancelAnimationFrame(this.raf); this.sound.dispose(); this.voice.dispose(); document.removeEventListener('pointerdown', this._voiceArm, true); if (this.ro) this.ro.disconnect(); document.removeEventListener('visibilitychange', this._onVis); window.removeEventListener('keydown', this._onKey); window.removeEventListener('keyup', this._onKey); this.root.remove(); }
 }
 
 void HIVE_COST; void BAG_COST;

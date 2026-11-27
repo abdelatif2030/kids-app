@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Rehlaty «كرة العلكة العملاقة» rolling and growing gum ball game (three.js). Built into assets/games/gum_ball/game.js",
   "scripts": {
-    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/gum_ball/game.js",
+    "build": "node ../cozy_kit/build_game.mjs src/main.js ../../assets/games/gum_ball/game.js",
     "test": "node --test test/sim.test.js"
   },
   "dependencies": {
