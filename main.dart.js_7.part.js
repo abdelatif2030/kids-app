@@ -1,14 +1,14 @@
 ((a,b)=>{a[b]=a[b]||{}})(self,"$__dart_deferred_initializers__")
 $__dart_deferred_initializers__.current=function(a,b,c,$){var J,B,D,A={ahv:function ahv(d,e){this.a=d
 this.b=e},
-ckJ(d){var x,w,v,u,t,s,r=B.aq(d.h(0,"i")),q=B.aq(d.h(0,"f")),p=B.aq(d.h(0,"c")),o=B.ah(d.h(0,"n"))
+ckM(d){var x,w,v,u,t,s,r=B.aq(d.h(0,"i")),q=B.aq(d.h(0,"f")),p=B.aq(d.h(0,"c")),o=B.ah(d.h(0,"n"))
 if(o==null)o=""
 x=B.aq(d.h(0,"r"))
-w=J.n(d.h(0,"s"),"c")?C.a_F:C.bAD
+w=J.n(d.h(0,"s"),"c")?C.a_G:C.bAL
 v=B.aq(d.h(0,"k"))
 u=B.aq(d.h(0,"b"))
 t=B.b_(d.h(0,"t"))
-s=B.c0(d.h(0,"a"))
+s=B.c1(d.h(0,"a"))
 if(s==null)s=0
 return new A.rE(r,q,p,o,x,w,v,u,t,s,B.ah(d.h(0,"x")))},
 rE:function rE(d,e,f,g,h,i,j,k,l,m,n){var _=this
@@ -31,7 +31,7 @@ _.d=null
 _.B$=0
 _.K$=d
 _.aE$=_.a1$=0},
-aIf:function aIf(d){this.a=d},
+aIg:function aIg(d){this.a=d},
 tY(d,e,f,g,h){return new A.a8o(d,e,f,g)},
 H5:function H5(d,e){this.a=d
 this.b=e},
@@ -62,27 +62,27 @@ bMP:function bMP(){},
 bMQ:function bMQ(){},
 GI(d,e){var x=null,w=d.ag(y.q).f
 w.iA()
-w.fu(B.fC(x,x,x,x,D.Br,D.N,x,B.d(e,x,x,x,x,x,x,x,x,x),x,D.bU,x,x,x,x,x,x,x,x,x,x))},
-aIg(){var x=0,w=B.l(y.y),v,u
-var $async$aIg=B.h(function(d,e){if(d===1)return B.i(e,w)
-for(;;)switch(x){case 0:u=B
-x=3
-return B.c(B.aP(),$async$aIg)
-case 3:v=u.nF(e,"family_prefs")
-x=1
-break
-case 1:return B.j(v,w)}})
-return B.k($async$aIg,w)},
+w.fu(B.fC(x,x,x,x,D.Br,D.N,x,B.d(e,x,x,x,x,x,x,x,x,x),x,D.bW,x,x,x,x,x,x,x,x,x,x))},
 aIh(){var x=0,w=B.l(y.y),v,u
 var $async$aIh=B.h(function(d,e){if(d===1)return B.i(e,w)
 for(;;)switch(x){case 0:u=B
 x=3
 return B.c(B.aP(),$async$aIh)
+case 3:v=u.nF(e,"family_prefs")
+x=1
+break
+case 1:return B.j(v,w)}})
+return B.k($async$aIh,w)},
+aIi(){var x=0,w=B.l(y.y),v,u
+var $async$aIi=B.h(function(d,e){if(d===1)return B.i(e,w)
+for(;;)switch(x){case 0:u=B
+x=3
+return B.c(B.aP(),$async$aIi)
 case 3:v=u.nF(e,"family_seen")
 x=1
 break
 case 1:return B.j(v,w)}})
-return B.k($async$aIh,w)}},C
+return B.k($async$aIi,w)}},C
 J=c[1]
 B=c[0]
 D=c[2]
@@ -97,7 +97,7 @@ v.l(0,"f",w.b)
 v.l(0,"c",w.c)
 v.l(0,"n",w.d)
 v.l(0,"r",w.e)
-v.l(0,"s",w.f===C.a_F?"c":"r")
+v.l(0,"s",w.f===C.a_G?"c":"r")
 v.l(0,"k",w.r)
 v.l(0,"b",w.w)
 v.l(0,"t",w.x)
@@ -115,7 +115,7 @@ s=u.a
 if(s!=null&&t===u.d){v=s
 x=1
 break}u.d=t
-v=u.a=B.tD(t,"family_outbox",A.cx4(),y.r)
+v=u.a=B.tD(t,"family_outbox",A.cx7(),y.r)
 x=1
 break
 case 1:return B.j(v,w)}})
@@ -127,7 +127,7 @@ return B.c(B.aP(),$async$G4)
 case 2:s=e
 r=B.a([],y.k)
 q=v.a
-if(q==null)q=C.bfO
+if(q==null)q=C.bfV
 u=q.length
 t=0
 for(;t<q.length;q.length===u||(0,B.x)(q),++t)r.push(q[t].cN())
@@ -142,7 +142,7 @@ var $async$JK=B.h(function(e,f){if(e===1)return B.i(f,w)
 for(;;)switch(x){case 0:u=J
 x=2
 return B.c(v.NO(),$async$JK)
-case 2:u.c_6(f,new A.aIf(d))
+case 2:u.c_9(f,new A.aIg(d))
 x=3
 return B.c(v.G4(),$async$JK)
 case 3:return B.j(null,w)}})
@@ -151,7 +151,7 @@ A.H5.prototype={
 H(){return"Availability."+this.b}}
 A.a8o.prototype={}
 var z=a.updateTypes(["G(rE)","rE(aA<o,@>)"])
-A.aIf.prototype={
+A.aIg.prototype={
 $1(d){return d.c===this.a},
 $S:z+0}
 A.bMF.prototype={
@@ -214,24 +214,24 @@ $S:1}
 A.bMQ.prototype={
 $0(){return $.m().a==="ar"?"\u0644\u0645 \u0646\u062a\u062d\u0642\u0642 \u0645\u0646 \u0639\u0645\u0644 \u0635\u0641\u062d\u0629 \u0627\u0644\u0648\u064a\u0628 \u062f\u0648\u0646 \u0627\u062a\u0635\u0627\u0644 \u0628\u0639\u062f \u062a\u062d\u0645\u064a\u0644\u0647\u0627.":"We have not verified that the web page works offline after loading."},
 $S:1};(function installTearOffs(){var x=a._static_1
-x(A,"cx4","ckJ",1)})();(function inheritance(){var x=a.inheritMany,w=a.inherit
+x(A,"cx7","ckM",1)})();(function inheritance(){var x=a.inheritMany,w=a.inherit
 x(B.w7,[A.ahv,A.H5])
 x(B.Q,[A.rE,A.a8o])
 w(A.aaB,B.k7)
-w(A.aIf,B.k8)
+w(A.aIg,B.k8)
 x(B.mP,[A.bMF,A.bMG,A.bMH,A.bMR,A.bMS,A.bMT,A.bMU,A.bMV,A.bMW,A.bMX,A.bMY,A.bMI,A.bMJ,A.bMK,A.bML,A.bMM,A.bMN,A.bMO,A.bMP,A.bMQ])})()
 B.qx(b.typeUniverse,JSON.parse('{"aaB":{"as":[]}}'))
 var y={k:B.a_("y<aA<o,@>>"),g:B.a_("I<rE>"),y:B.a_("aA<o,@>"),r:B.a_("rE"),w:B.a_("o"),q:B.a_("tz"),b:B.a_("@"),v:B.a_("~")};(function constants(){var x=a.makeConstList
 C.vB=new A.H5(0,"offline")
 C.Dj=new A.H5(1,"partial")
 C.ow=new A.H5(2,"online")
-C.a57=new A.H5(3,"unverified")
-C.aiV=new B.a8(16,12,16,12)
-C.am0=new B.ag(983339,"MaterialIcons",!1)
-C.bfO=x([],B.a_("y<rE>"))
-C.a_F=new A.ahv(0,"child")
-C.bAD=new A.ahv(1,"relative")
-C.o5=new B.C(!0,null,null,null,null,null,null,D.bW,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)})();(function lazyInitializers(){var x=a.lazyFinal
-x($,"cA5","cah",()=>new A.aaB($.ac()))
-x($,"cFX","cdx",()=>B.a([A.tY("games",new A.bMF(),C.vB,new A.bMG(),"lib/games, lib/color_game.dart, lib/math_game.dart: no network calls; progress in shared_preferences"),A.tY("letters",new A.bMH(),C.Dj,new A.bMR(),"lib/literacy, lib/library/vocab.dart; audio via flutter_tts (offline availability depends on installed voices: not verified on a device)"),A.tY("stories",new A.bMS(),C.Dj,new A.bMT(),"lib/stories/story_data.dart; assets/audio/*.mp3 bundled; no story uses remote media"),A.tY("studio",new A.bMU(),C.vB,new A.bMV(),"lib/studio: FamilyGallery in shared_preferences"),A.tY("parent",new A.bMW(),C.vB,new A.bMX(),"lib/parent_screens.dart, dashboard_screen.dart, lib/print; local data only"),A.tY("videos",new A.bMY(),C.ow,new A.bMI(),"lib/player_screen.dart (YouTube IFrame), lib/main.dart img.youtube.com thumbnails"),A.tY("chat",new A.bMJ(),C.ow,new A.bMK(),"lib/family/firebase_family_repository.dart (Firestore)"),A.tY("calls",new A.bML(),C.ow,new A.bMM(),"lib/family/call_*: WebRTC + Firestore signalling"),A.tY("teachers",new A.bMN(),C.ow,new A.bMO(),"lib/teachers_*, firebase_repository.dart"),A.tY("web",new A.bMP(),C.a57,new A.bMQ(),"No service worker offline test performed")],B.a_("y<a8o>")))})()};
-(a=>{a["2DP8GT3KV943mvmWmJUl5tSmsB8="]=a.current})($__dart_deferred_initializers__);
+C.a58=new A.H5(3,"unverified")
+C.aiZ=new B.a7(16,12,16,12)
+C.am4=new B.ag(983339,"MaterialIcons",!1)
+C.bfV=x([],B.a_("y<rE>"))
+C.a_G=new A.ahv(0,"child")
+C.bAL=new A.ahv(1,"relative")
+C.o5=new B.C(!0,null,null,null,null,null,null,D.bY,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)})();(function lazyInitializers(){var x=a.lazyFinal
+x($,"cA8","cak",()=>new A.aaB($.ac()))
+x($,"cG_","cdA",()=>B.a([A.tY("games",new A.bMF(),C.vB,new A.bMG(),"lib/games, lib/color_game.dart, lib/math_game.dart: no network calls; progress in shared_preferences"),A.tY("letters",new A.bMH(),C.Dj,new A.bMR(),"lib/literacy, lib/library/vocab.dart; audio via flutter_tts (offline availability depends on installed voices: not verified on a device)"),A.tY("stories",new A.bMS(),C.Dj,new A.bMT(),"lib/stories/story_data.dart; assets/audio/*.mp3 bundled; no story uses remote media"),A.tY("studio",new A.bMU(),C.vB,new A.bMV(),"lib/studio: FamilyGallery in shared_preferences"),A.tY("parent",new A.bMW(),C.vB,new A.bMX(),"lib/parent_screens.dart, dashboard_screen.dart, lib/print; local data only"),A.tY("videos",new A.bMY(),C.ow,new A.bMI(),"lib/player_screen.dart (YouTube IFrame), lib/main.dart img.youtube.com thumbnails"),A.tY("chat",new A.bMJ(),C.ow,new A.bMK(),"lib/family/firebase_family_repository.dart (Firestore)"),A.tY("calls",new A.bML(),C.ow,new A.bMM(),"lib/family/call_*: WebRTC + Firestore signalling"),A.tY("teachers",new A.bMN(),C.ow,new A.bMO(),"lib/teachers_*, firebase_repository.dart"),A.tY("web",new A.bMP(),C.a58,new A.bMQ(),"No service worker offline test performed")],B.a_("y<a8o>")))})()};
+(a=>{a["kU7VfC7Uny62GscA0oxCrjPnsaY="]=a.current})($__dart_deferred_initializers__);
