@@ -93,6 +93,7 @@ export const CSS = `
 .cd-worlds{display:flex;flex-direction:column;gap:calc(var(--u)*1.4)}
 .cd-world{border-radius:calc(var(--u)*2);padding:calc(var(--u)*2) calc(var(--u)*3);display:flex;justify-content:space-between;align-items:center;font-size:calc(var(--u)*4);font-style:italic;font-weight:900;text-transform:uppercase;text-shadow:0 calc(var(--u)*.3) calc(var(--u)*.8) rgba(0,0,0,.6);min-height:calc(var(--u)*9)}
 .cd-world.azure{background:linear-gradient(90deg,rgba(26,28,34,.2),rgba(26,28,34,0)),linear-gradient(180deg,#8ac8f0 0 45%,#3a9ac8 46% 60%,#e8d4a0 61%)}
+.cd-world.nile{background:linear-gradient(90deg,rgba(26,28,34,.2),rgba(26,28,34,0)),linear-gradient(180deg,#a8d8f0 0 40%,#2a7ad8 41% 58%,#e8d4a0 59% 75%,#4a9a44 76%)}
 .cd-world.canyon{background:linear-gradient(180deg,#ff9a5a 0 40%,#c8503a 41% 75%,#8a3a2a 76%)}
 .cd-world.neon{background:linear-gradient(180deg,#2a1a5a 0 50%,#6a2aa8 51% 70%,#ff4ab8 71% 74%,#1a1030 75%)}
 .cd-world small{font-size:calc(var(--u)*2.8);opacity:.9}

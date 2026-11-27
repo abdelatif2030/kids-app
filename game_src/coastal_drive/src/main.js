@@ -85,6 +85,7 @@ class Glow {
 
 const LOOK = {
   azure: { sky: ['#6aaee8', '#e8f2f8'], fog: 0xcfe2ee, fogNear: 25, fogFar: 190, hemi: [0xf4f8ff, 0x7a8a6a, 1.6], sun: [0xfff4e0, 1.7], left: 0xe8d4a0, right: 0x5aa04a, sea: 0x2a9ad8 },
+  nile: { sky: ['#7ec8e8', '#fdf0d0'], fog: 0xe8dcc0, fogNear: 25, fogFar: 190, hemi: [0xfff6e0, 0x8a7a4a, 1.6], sun: [0xffeec0, 1.7], left: 0xe8d4a0, right: 0x4a9a44, sea: 0x2a7ad8 },
   canyon: { sky: ['#ff8a4a', '#ffd8a0'], fog: 0xf0b888, fogNear: 25, fogFar: 180, hemi: [0xffe8d0, 0x8a5a3a, 1.5], sun: [0xffd8a8, 1.6], left: 0xd89a5a, right: 0xd08a50, sea: null },
   neon: { sky: ['#1a0e3a', '#6a2a8a'], fog: 0x3a1a5a, fogNear: 40, fogFar: 220, hemi: [0x9a8ae8, 0x2a1a4a, 1.2], sun: [0xc8b8ff, 0.7], left: 0x24242c, right: 0x24242c, sea: null },
 };
@@ -255,7 +256,7 @@ class Game {
       }
     };
     const edge = LANE_W * 2 + 1.9;
-    if (world === 'azure') {
+    if (world === 'azure' || world === 'nile') {
       add((i) => { const p = makePalm(5.5 + (i % 3)); p.rotation.y = i; return p; }, (i) => -(edge + 3 + (i % 3) * 1.6), 14, 22);
       add((i) => { const p = makePalm(6 + (i % 2)); p.rotation.y = i * 2; return p; }, (i) => -(edge + 7 + (i % 4) * 1.4), 21, 14);
       add(() => makeLamp(1), edge + 0.7, 45, 8);

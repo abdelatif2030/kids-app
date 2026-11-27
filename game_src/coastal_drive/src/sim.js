@@ -39,16 +39,17 @@ export const upCost = (lvl) => 80 * (lvl + 1);
 /** Three worlds, two levels each. km to reach, near misses needed, coin reward, traffic density. */
 export const WORLDS = [
   { id: 'azure', ar: 'الساحل الأزرق', en: 'Azure Coast' },
+  { id: 'nile', ar: 'نيل النوبة', en: 'Nubian Nile' },
   { id: 'canyon', ar: 'الوادي الأحمر', en: 'Red Canyon' },
   { id: 'neon', ar: 'مدينة النيون', en: 'Neon City' },
 ];
 export const LEVELS = [
   { id: 1, world: 'azure', ar: 'واحة سيوة', en: 'Siwa Oasis', km: 2.6, near: 12, reward: 300, density: 1.0, swerve: 0 },
   { id: 2, world: 'azure', ar: 'لاجون دهب', en: 'Dahab Lagoon', km: 3.0, near: 15, reward: 350, density: 1.08, swerve: 0.15 },
-  { id: 3, world: 'canyon', ar: 'نوبة أسوان', en: 'Nubian Aswan', km: 3.2, near: 16, reward: 450, density: 1.12, swerve: 0.2 },
+  { id: 3, world: 'nile', ar: 'نوبة أسوان', en: 'Nubian Aswan', km: 3.2, near: 16, reward: 450, density: 1.12, swerve: 0.2 },
   { id: 4, world: 'canyon', ar: 'جبل موسى', en: 'Mount Sinai', km: 3.6, near: 18, reward: 500, density: 1.16, swerve: 0.25 },
-  { id: 5, world: 'neon', ar: 'شاطئ مطروح', en: 'Matrouh Beach', km: 3.8, near: 20, reward: 600, density: 1.2, swerve: 0.25 },
-  { id: 6, world: 'neon', ar: 'مدينة الألعاب', en: 'Game City', km: 4.2, near: 24, reward: 750, density: 1.25, swerve: 0.3 },
+  { id: 5, world: 'azure', ar: 'شاطئ مطروح', en: 'Matrouh Beach', km: 3.8, near: 20, reward: 600, density: 1.2, swerve: 0.25 },
+  { id: 6, world: 'neon', ar: 'العلمين الجديدة', en: 'New Alamein', km: 4.2, near: 24, reward: 750, density: 1.25, swerve: 0.3 },
 ];
 
 export const COUNTDOWN = 3.4;

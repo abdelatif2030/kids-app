@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Race, LEVELS, LANES, robotDrive, normalizeSave, CARS } from '../src/sim.js';
+import { Race, LEVELS, WORLDS, LANES, robotDrive, normalizeSave, CARS } from '../src/sim.js';
 
 function drive(opts, mode = 'robot', maxT = 400) {
   const r = new Race(opts);
@@ -111,4 +111,14 @@ test('saves are cleaned', () => {
   assert.equal(s.up.engine, 0);
   assert.equal(s.up.nitro, 2);
   assert.deepEqual(s.stars, { 1: 2 });
+});
+
+test('place names match their worlds (B2: no neon beach, no canyon Aswan, no Game City)', () => {
+  const byId = Object.fromEntries(LEVELS.map((l) => [l.id, l]));
+  for (const l of LEVELS) assert.ok(WORLDS.some((w) => w.id === l.world), `level ${l.id} world ${l.world} must exist in WORLDS`);
+  assert.equal(byId[3].world, 'nile', 'Nubian Aswan drives the Nubian Nile world');
+  assert.equal(byId[5].world, 'azure', 'Matrouh Beach is a sea world, not neon');
+  assert.equal(byId[6].en, 'New Alamein');
+  assert.equal(byId[6].ar, 'العلمين الجديدة');
+  assert.ok(!LEVELS.some((l) => /game city|مدينة الألعاب/i.test(`${l.en} ${l.ar}`)), 'no placeholder city names');
 });
