@@ -1,10 +1,12 @@
 // «سباق القمة» — Summit Rush rules (pure, no drawing, deterministic for the tests).
-// Four runners race UP a snowy mountain slope to the summit before the clock (60 s) runs out: the child (red jacket)
+// Four runners race UP a snowy mountain slope to light the summit lanterns and reach the top: the child (red jacket)
 // and three rivals (teal, yellow, purple). Drag left/right to change where you run. Boulders, snowballs and logs roll
 // DOWN the slope along red warning ladders painted on the snow; a hit is a wipeout (the runner falls on their back,
 // loses a heart and some ground, then gets up). Gold crystals give +10, a near miss "nice dodge" +5, passing a rival
 // "overtake" +20. Blue ice boost pads and glowing orbs (tailwind = speed, shield = one free hit) help you pass.
-// Three hearts; age 4 = easy mode (slower, fewer rolling things, a hit costs no heart). Three courses.
+// KIND RULES: there is no fail clock and no running out of hearts — the course clock is the moment the summit
+// lanterns light (a celebration that warms everyone back to 3 hearts), and the run ends only when the child
+// reaches the summit, in whatever place. Three hearts; age 4 = easy mode (slower, fewer rolling things, a hit costs no heart). Three courses.
 export const HALF = 4.6; // half the width of the run (metres)
 export const LANES = [-3.6, -1.8, 0, 1.8, 3.6];
 
@@ -68,7 +70,8 @@ export class Race {
     this.lay = layCourse(this.course, this.seed + courseIndex * 31);
     this.time = this.course.time + (this.easy ? 15 : 0);
     this.t = 0;
-    this.state = 'count'; // count -> run -> won | out | timeup
+    this.state = 'count'; // count -> run -> won (the run can only end by reaching the summit)
+    this.lanterns = false; // the summit lanterns light at course.time — a celebration, never a deadline
     this.countdown = 3;
     this.events = [];
     this.runners = RACERS.map((rc, i) => ({
@@ -144,9 +147,8 @@ export class Race {
     const rank = this.rankOf(this.me);
     if (rank < this.lastRank && this.me.s > 15 && !this.me.finished) { this.me.score += 20; this._emit('overtake', { rank }); }
     this.lastRank = rank;
+    if (!this.lanterns && this.t >= this.time) { this.lanterns = true; this.me.lives = 3; this._emit('lanterns'); }
     if (this.me.finished && this.state === 'run') { this.state = 'won'; this.place = this.rankOf(this.me); this._emit('finish', { place: this.place }); }
-    else if (this.me.lives <= 0 && this.me.down <= 0) { this.state = 'out'; this._emit('out'); }
-    else if (this.t >= this.time) { this.state = 'timeup'; this.place = this.rankOf(this.me); this._emit('timeup', { place: this.place }); }
     return this.events;
   }
 
@@ -209,7 +211,7 @@ export class Race {
         rn.boost = 0;
         rn.wind = 0;
         if (rn.me) {
-          if (!this.easy) rn.lives--;
+          if (!this.easy) rn.lives = Math.max(0, rn.lives - 1);
           this._emit('wipeout', { kind: hz.kind, lives: rn.lives });
         }
       } else if (rn.me && ds < 1.2 && dx < reach + 1.1 && hz.s < rn.s && !rn.dodge.has(hz.id) && !hz[`hit_${rn.id}`]) {

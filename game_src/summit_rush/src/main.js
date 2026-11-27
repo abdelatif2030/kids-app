@@ -369,9 +369,8 @@ class Game {
       this.hudEl.hearts.replaceChildren(...[0, 1, 2].map((i) => h('span', { class: i < hearts ? '' : 'off' }, '♥')));
     }
     const rem = Math.ceil(race.remaining);
-    this.hudEl.clock.lastChild.textContent = num(rem);
-    this.hudEl.clock.querySelector('.sr-ring').setAttribute('stroke-dashoffset', String(100.5 * (1 - race.remaining / race.time)));
-    this.hudEl.clock.classList.toggle('low', rem <= 10 && race.state === 'run');
+    this.hudEl.clock.lastChild.textContent = race.lanterns ? '🏮' : num(rem);
+    this.hudEl.clock.querySelector('.sr-ring').setAttribute('stroke-dashoffset', String(race.lanterns ? 0 : 100.5 * (race.remaining / race.time)));
     const side = getLang() === 'en' ? 'left' : 'right';
     race.runners.forEach((rn, i) => {
       this.hudEl.dots[i].style[side] = `${Math.min(1, rn.s / race.course.len) * 100}%`;
@@ -466,8 +465,7 @@ class Game {
         case 'up': this.sound.play('up'); break;
         case 'summit': this.sound.play('summit'); break;
         case 'finish': setTimeout(() => this._winCard(e.place), 1200); break;
-        case 'out': this.sound.play('lose'); this.voice.say('lose'); setTimeout(() => this._loseCard('out'), 900); break;
-        case 'timeup': this.sound.play('lose'); this.voice.say('lose'); setTimeout(() => this._loseCard('time'), 600); break;
+        case 'lanterns': this.sound.play('summit'); this.voice.say('charge'); this._float(t('lanterns'), 'pill'); break;
         default:
       }
     }
@@ -475,7 +473,7 @@ class Game {
 
   _winCard(place) {
     this.mode = 'end';
-    this.voice.say(place === 1 ? 'win' : 'lose');
+    this.voice.say('win');
     this.sound.setMode('end');
     const c = this.race.course;
     const best = this.save.best[c.id];
@@ -497,20 +495,6 @@ class Game {
       last ? null : h('button', { class: 'sr-btn', onclick: () => this.showMenu(this.ci + 1) }, t('next'), ' ▶'),
       h('button', { class: `sr-btn${last ? '' : ' alt'}`, onclick: () => this.showMenu(this.ci) }, '↻ ', t('again')),
       h('button', { class: 'sr-btn alt', onclick: () => this.showMenu(this.ci) }, t('courses')))));
-  }
-
-  _loseCard(why) {
-    this.mode = 'end';
-    this.sound.setMode('end');
-    this.layer.append(h('div', { class: 'sr-dim' }, h('div', { class: 'sr-card-end' },
-      logo(t('title'), t(`c${this.race.course.id}`), true),
-      h('div', { class: 'sr-medal' }, why === 'out' ? '❄️' : '⏱️'),
-      h('div', { class: 'sr-endtitle' }, why === 'out' ? t('outTitle') : t('timeTitle')),
-      h('div', { class: 'sr-endsub' }, why === 'out' ? t('outText') : t('timeText')),
-      h('div', { class: 'sr-stats' },
-        h('div', {}, h('small', {}, t('score')), h('b', {}, num(this.race.me.score))),
-        h('div', {}, h('small', {}, t('crystals')), h('b', {}, '💎 ', num(this.race.lay.crystals.filter((x) => x.got).length)))),
-      h('button', { class: 'sr-btn', onclick: () => this.showMenu(this.ci) }, '↻ ', t('again')))));
   }
 
   // ---- frame --------------------------------------------------------------------------------------------------------

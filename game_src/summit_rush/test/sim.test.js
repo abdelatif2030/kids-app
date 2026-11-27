@@ -49,18 +49,31 @@ test('a careful robot reaches the summit in time on every course, in the top two
   }
 });
 
-test('standing still in the middle gets hit: a wipeout costs a heart and ground; three hits end the race', () => {
+test('standing still in the middle gets hit again and again — but kind rules: the race can never be lost', () => {
   const { r, seen } = play(1, { seed: 5 }, (race) => race.steer(race.me.x));
   assert.ok(seen.has('wipeout'));
-  assert.ok(r.state === 'out' || r.state === 'won' || r.state === 'timeup');
-  if (r.state === 'out') assert.equal(r.me.lives, 0);
+  assert.ok(!seen.has('out') && !seen.has('timeup'), 'no fail endings exist');
+  assert.notEqual(r.state, 'timeup');
+});
+
+test('the summit lanterns light at the course moment (a celebration that restores hearts, not a deadline)', () => {
+  const r = new Race(0, { seed: 1 });
+  r.state = 'run';
+  r.me.lives = 1;
+  r.t = r.time - 0.01;
+  const ev = r.step(0.05);
+  assert.ok(ev.some((e) => e.type === 'lanterns'));
+  assert.equal(r.lanterns, true);
+  assert.equal(r.me.lives, 3, 'lantern light warms everyone back to full hearts');
+  assert.equal(r.state, 'run', 'the race continues past the lantern moment');
+  const ev2 = r.step(0.05);
+  assert.ok(!ev2.some((e) => e.type === 'lanterns'), 'lanterns fire once only');
 });
 
 test('easy mode (age 4): hits cost no heart', () => {
   const { r, seen } = play(1, { seed: 5, easy: true }, (race) => race.steer(race.me.x));
   assert.ok(seen.has('wipeout'));
   assert.equal(r.me.lives, 3);
-  assert.notEqual(r.state, 'out');
 });
 
 test('a wipeout puts the runner on the ground, pushes them back, then they get up', () => {
@@ -119,4 +132,15 @@ test('the course: crystals inside the run, orbs of both kinds, pads', () => {
 test('progress is cleaned when loaded', () => {
   assert.deepEqual(normalizeSave(null), { unlocked: 1, best: {}, crystals: 0, muted: false });
   assert.deepEqual(normalizeSave({ unlocked: 9, best: { 1: 2, 2: 7 }, crystals: -3, muted: 1 }), { unlocked: 5, best: { 1: 2 }, crystals: 0, muted: true });
+});
+
+import fs from 'node:fs';
+
+test('Catherine Summit anchor: all five courses climb Mount Catherine', () => {
+  const i18n = fs.readFileSync(new URL('../src/i18n.js', import.meta.url), 'utf8');
+  assert.ok(i18n.includes("title: ['قمة سانت كاترين', 'Catherine Summit']"));
+  assert.ok(i18n.includes('Wadi El-Arbaein'));
+  assert.ok(i18n.includes('Mount Catherine Summit'));
+  assert.ok(!i18n.includes('Kilimanjaro') && !i18n.includes('Alps'));
+  assert.equal(COURSES.length, 5);
 });
