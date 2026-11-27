@@ -59,3 +59,4 @@ highway_race (assets/games/sunset_highway) DONE: race gantries, sun glow, bigger
 - gem_quarry: diorama island over the game's own poster.webp as 3D backdrop. Clip recorded for sending.
 - gem_quarry v2: oasis, grass+flowers, lamps, flag, birds, sparkles, bigger workers/trucks, drawn hand hint, no emoji in fx. BEFORE clip now uses old game.js with the gq-panel->gq-pads fix so real old gameplay shows.
 - AUDIT TODO: menubg.js covers gameplay with poster whenever an element with class containing -panel/-tracks is visible. Check in-game panels in: carnival_race coastal_drive dune_titans fashion_queen golden_tail happy_farm moto_race ocean_defense pumpkin_pie rain_circuit rhythm samurai space_store splash_race zombie_rooftop (screenshot gameplay in landscape; rename in-game panel class if poster shows).
+- gem_quarry menu: hero beside the card, blurred live 3D backdrop; level select bigger names. (frame-checked; hero size reduced to avoid card overlap, not re-recorded)
