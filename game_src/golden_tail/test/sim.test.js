@@ -211,3 +211,21 @@ test('falling off a deck takes the dino back to the start (and the tail goes to 
   for (let i = 0; i < 60; i++) for (const e of d.step(1 / 30, { x: -1, z: 0 })) if (e.type === 'fell') f2 = true;
   assert.ok(!f2 && d.player.y < 0.1, `walked down the ramp, y=${d.player.y} ${ramp.kind}`);
 });
+
+test('every level has a shipped panorama wired as its backdrop (art/pano<level+1>.webp)', async () => {
+  const { existsSync } = await import('node:fs');
+  const { fileURLToPath } = await import('node:url');
+  const artDir = fileURLToPath(new URL('../../../assets/games/golden_tail/art/', import.meta.url));
+  for (let i = 0; i < LEVELS.length; i++) assert.ok(existsSync(`${artDir}pano${i + 1}.webp`), `missing pano${i + 1}.webp for level ${i}`);
+  assert.ok(existsSync(`${artDir}win.webp`), 'missing win.webp');
+  assert.ok(existsSync(`${artDir}icon_star.webp`), 'missing icon_star.webp');
+});
+
+import fs from 'node:fs';
+
+test('Golden Tail Oasis anchor: title and levels move to the oasis', () => {
+  const i18n = fs.readFileSync(new URL('../src/i18n.js', import.meta.url), 'utf8');
+  assert.ok(i18n.includes("title: ['الذيل الذهبي في الواحة', 'Golden Tail Oasis']"));
+  assert.deepEqual(LEVELS.map((l) => l.en), ['Palm Plaza', 'Oasis Bridges', 'Oasis Bouncers', 'Sand Slides', 'Oasis Lookout', 'Oasis Cup']);
+  assert.deepEqual(LEVELS.map((l) => l.time), [40, 45, 50, 55, 60, 60]); // round clocks unchanged
+});

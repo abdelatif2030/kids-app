@@ -50,6 +50,8 @@ export const CSS = `
 .gt-logo{font-size:calc(var(--u)*9);font-weight:900;color:#fff;-webkit-text-stroke:calc(var(--u)*.5) #8a4f1d;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.8) 0 #8a4f1d;text-align:center}
 .gt-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*5);font-weight:900;color:#f2a51e;background:#bfe8ff}
 .gt-stars{font-size:calc(var(--u)*10);letter-spacing:calc(var(--u)*1)}
+.gt-stars img{width:calc(var(--u)*9);height:calc(var(--u)*9);vertical-align:middle}
+.gt-winart{width:calc(var(--u)*30);max-width:60vw;border-radius:calc(var(--u)*2);display:block;margin:0 auto}
 .gt-stars .off{filter:grayscale(1);opacity:.4}
 .gt-made{display:flex;gap:calc(var(--u)*2);flex-wrap:wrap;justify-content:center}
 .gt-made div{background:#fff;border:calc(var(--u)*.4) solid #e0c9a3;border-radius:calc(var(--u)*2);padding:calc(var(--u)*1) calc(var(--u)*2);text-align:center;font-weight:900}

@@ -164,6 +164,17 @@ class Game {
 
   // ---- the playground -----------------------------------------------------------------------------------------------
 
+  /** The owner's painted panorama of the level (art/pano<N>.webp): a mirrored ring around the playground. Level i shows pano i+1. */
+  _setPano(n) {
+    if (this.panoMesh) { this.scene.remove(this.panoMesh); this.panoMesh.material.map.dispose(); this.panoMesh.material.dispose(); this.panoMesh = null; }
+    if (!n) return;
+    const tex = new THREE.TextureLoader().load(`${this.base}art/pano${n}.webp`, () => { if (this.panoMesh && this.panoMesh.material.map === tex) this.panoMesh.visible = true; });
+    tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = THREE.MirroredRepeatWrapping; tex.repeat.set(2, 0.66); tex.offset.set(0, 0.34);
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(58, 58, 42, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false }));
+    ring.visible = false; ring.renderOrder = -10; this.panoMesh = ring; this.scene.add(ring);
+  }
+  _followPano() { if (this.panoMesh) this.panoMesh.position.set(this.camera.position.x, this.camera.position.y + 8, this.camera.position.z); }
+
   _buildWorld() {
     const s = (this.scene = new THREE.Scene());
     s.background = new THREE.Color(0x9fd8ff);
@@ -361,6 +372,7 @@ class Game {
     this.mode = 'menu';
     this.paused = false;
     this.chase = null;
+    this._setPano(1);
     if (this.joy) this.joy.style.display = 'none';
     this.sound.setMode('menu');
     this._setRivals(5);
@@ -393,6 +405,7 @@ class Game {
   startLevel(i) {
     this.levelIndex = i;
     this.chase = new Chase({ level: i, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1 });
+    this._setPano(i + 1);
     this._setRivals(this.chase.rivals.length);
     this.mode = 'play';
     this.paused = false;
@@ -477,8 +490,9 @@ class Game {
     } else { this.sound.play('lose'); this.voice.say('lose'); }
     const hasNext = r.win && i + 1 < LEVELS.length;
     const dim = h('div', { class: r.win ? 'gt-dim gt-win' : 'gt-dim' }, h('div', { class: 'gt-panel' },
+      r.win ? h('img', { class: 'gt-winart', src: `${this.base}art/win.webp`, alt: '' }) : null,
       h('div', { class: 'gt-title' }, r.win ? t('win') : t('lose')),
-      r.win ? h('div', { class: 'gt-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= r.stars ? '' : 'off' }, '⭐'))) : null,
+      r.win ? h('div', { class: 'gt-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= r.stars ? '' : 'off' }, h('img', { src: `${this.base}art/icon_star.webp`, alt: '⭐' })))) : null,
       h('div', { class: 'gt-stat' }, h('span', {}, '✨ ', t('held'), ' ', num(Math.round(r.held)), t('sec')), h('span', {}, '✋ ', t('grabs'), ' ', num(r.grabs))),
       h('div', { style: 'display:flex;gap:calc(var(--u)*2);flex-wrap:wrap;justify-content:center' },
         hasNext ? h('button', { class: 'gt-btn2', onclick: () => this.startLevel(i + 1) }, t('next'), ' ▶') : null,
@@ -602,6 +616,7 @@ class Game {
     this.cam.lerp(want, Math.min(1, dt * 4));
     this.camera.position.copy(this.cam);
     this.camera.lookAt(this.cam.x, this.cam.y - (portrait ? 7.5 : 5.6) + 1.0, this.cam.z - (portrait ? 8 : 6.6) - 1.5);
+    this._followPano();
     // HUD
     const hc = this._hc;
     const secs = Math.ceil(c.timeLeft);
@@ -678,6 +693,7 @@ class Game {
       const r = portrait ? 14 : 10;
       this.camera.position.set(Math.sin(a) * r, deck.y + (portrait ? 9 : 5), Math.cos(a) * r);
       this.camera.lookAt(0, deck.y + 0.8, 0);
+      this._followPano();
       this.sparkles.update(dt);
     }
     this.renderer.render(this.scene, this.camera);
