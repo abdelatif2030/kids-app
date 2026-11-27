@@ -664,7 +664,7 @@ class Game {
     });
     list.forEach((e, i) => panel.append(h('div', { class: 'lw-exline' }, rows[i], box(i + 1, e.ic))));
     let open = false;
-    const chip = h('button', { class: 'lw-ex', 'aria-label': label, onclick: (ev) => { ev.stopPropagation(); sh.sound.play('tap'); open = !open; panel.style.display = open ? 'flex' : 'none'; chip.classList.toggle('open', open); this._exampleView(open, panel); } },
+    const chip = h('button', { class: 'lw-ex', 'aria-label': label, onclick: (ev) => { ev.stopPropagation(); sh.sound.play('tap'); open = !open; panel.style.display = open ? 'flex' : 'none'; chip.classList.toggle('open', open); this._exampleView(open, panel); if (open) setTimeout(() => { if (open && panel.isConnected) this._exampleView(true, panel); }, 500); /* the thing settles first, then the room is measured again */ } },
       h('i', {}, '💡'), h('span', {}, label), list.length > 1 ? h('em', {}, String(list.length)) : null);
     sh.layer.append(panel);
     return h('div', { class: 'lw-exw' }, chip);
@@ -677,8 +677,36 @@ class Game {
     if (!open) { this.st.shiftView(0, 0); return; }
     const wide = W > H * 1.15;
     const r = panel.getBoundingClientRect();
-    if (wide) { /* wide: the picture stays exactly where it is; the panel sits in the free area on the right */ }
-    else this.st.shiftView(0, Math.round(Math.min(H * 0.3, r.height * 0.55)));
+    panel.style.width = '';
+    this.st.shiftView(0, 0);
+    if (wide) {
+      // wide: the picture stays exactly where it is; the panel takes the free area on the right, as wide as that area allows (never over the thing being learned)
+      const right = this._standRight();
+      const gap = Math.round(W * 0.08); // room for the animal's idle wiggle and its loose 3D box
+      const free = W - 8 - (right + gap);
+      if (right != null && free < W * 0.42) panel.style.width = `${Math.max(W * 0.28, free)}px`;
+      const over = right != null ? right + gap - (W - 8 - panel.getBoundingClientRect().width) : 0;
+      if (over > 0) this.st.shiftView(Math.round(over), 0); // only when even the narrowest panel would touch it: slide the picture by just that much
+    } else this.st.shiftView(0, Math.round(Math.min(H * 0.3, r.height * 0.55)));
+  }
+
+  /** The right edge (px inside the game) of the thing on the table, from the 3D boxes of its pieces; null when there is nothing there. */
+  _standRight() {
+    let grp = this.standItem; if (!grp) return null;
+    const pet = grp.userData && grp.userData.pet; if (pet && pet.inner) grp = pet.inner;
+    const W = this.cw || this.sh.root.clientWidth;
+    grp.updateMatrixWorld(true);
+    let maxX = -Infinity;
+    grp.traverse((m) => {
+      if (!m.geometry || !m.visible) return;
+      if (!m.geometry.boundingBox) m.geometry.computeBoundingBox();
+      const b = m.geometry.boundingBox; if (!b || !isFinite(b.min.x)) return;
+      for (const x of [b.min.x, b.max.x]) for (const y of [b.min.y, b.max.y]) for (const z of [b.min.z, b.max.z]) {
+        const v = new THREE.Vector3(x, y, z).applyMatrix4(m.matrixWorld).project(this.st.camera);
+        maxX = Math.max(maxX, (v.x + 1) / 2 * W);
+      }
+    });
+    return isFinite(maxX) ? maxX : null;
   }
 
   _learnItem() {
