@@ -1,7 +1,7 @@
 // «طريق التنين الجليدي» — Frost Coil. Entry: window.FrostCoil.start(container, config, post).
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
 // A snowy-night puzzle (like the owner's video): tap wooden tiles to turn their ice tubes and build a path from the
-// little ice dragon to the portal before the moves run out. The ice glows as far as it reaches; then the dragon slides
+// little ice dragon to the portal — turns are unlimited. The ice glows as far as it reaches; then the dragon slides
 // along the path into the portal. Twelve levels. 2D canvas, all art and sound made in code. No network, no links.
 import { Puzzle, LEVELS, trace, N, E, S, W, normalizeSave } from './sim.js';
 import { paintBackground, drawBoard, drawTile, drawStar, drawPortal, drawDragon } from './art.js';
@@ -176,7 +176,7 @@ class Game {
       this.mode = 'travel';
       this.travel = { t: 0, pts: this._pathPoints() };
       setTimeout(() => this.sound.play('whoosh'), 250);
-    } else if (ev.out) setTimeout(() => { this.sound.play('out'); this._outCard(); }, 500);
+    }
   }
 
   /** Points along the ice from the dragon to the portal (for the dragon's slide). */
@@ -275,10 +275,9 @@ class Game {
     if (!p || !this.hud) return;
     this.hud.lvT.textContent = `${t('level').toUpperCase()} ${num(p.level.id)}/${num(LEVELS.length)}`;
     this.hud.lv.style.width = `${(p.level.id / LEVELS.length) * 100}%`;
-    const f = Math.max(0, p.movesLeft / p.level.moves);
+    const f = Math.min(1, p.flow.cells.length / p.level.path.length); // ice progress toward the portal — fills up, never drains
     this.hud.bar.style.width = `${f * 100}%`;
-    this.hud.bar.classList.toggle('low', f < 0.4);
-    this.hud.barT.textContent = num(p.movesLeft);
+    this.hud.barT.textContent = `${num(p.flow.cells.length)}/${num(p.level.path.length)}`;
     this.hud.coins.textContent = num(this.save.coins);
   }
 
@@ -302,18 +301,6 @@ class Game {
       h('div', { class: 'fc-small' }, `${t('reward')} +${num(r.coins)} `, h('i', { class: 'fc-coin', style: 'vertical-align:middle' })),
       h('div', { class: 'fc-small', style: 'color:#3a8a5a' }, last ? t('allDone') : t('win')),
       last ? h('button', { class: 'fc-btn', onclick: () => this.showMenu() }, t('levels')) : h('button', { class: 'fc-btn', onclick: () => this.startLevel(this.levelIndex + 1) }, t('next'), ' ▶'),
-      h('button', { class: 'fc-btn wood', onclick: () => this.showMenu() }, t('levels')))));
-  }
-
-  _outCard() {
-    this.voice.say('lose');
-    this.layer.append(h('div', { class: 'fc-dim' }, h('div', { class: 'fc-card' },
-      h('div', { class: 'fc-logo', style: 'font-size:calc(var(--u)*8)' }, t('title')),
-      h('div', { class: 'fc-pill' }, t('outTitle')),
-      h('div', { class: 'fc-small' }, `${t('level')} ${num(this.p.level.id)}/${num(LEVELS.length)}`),
-      h('div', { class: 'fc-small', style: 'color:#4a2a14;font-size:calc(var(--u)*4.2)' }, t('outText')),
-      h('div', { class: 'fc-small' }, `${t('reward')} ${num(0)} `, h('i', { class: 'fc-coin', style: 'vertical-align:middle' })),
-      h('button', { class: 'fc-btn', onclick: () => this.startLevel(this.levelIndex) }, '↻ ', t('tryAgain')),
       h('button', { class: 'fc-btn wood', onclick: () => this.showMenu() }, t('levels')))));
   }
 

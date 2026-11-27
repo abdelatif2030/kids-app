@@ -177,9 +177,10 @@ export function drawStar(g, x, y, r, time) {
   g.save();
   g.translate(x, y);
   g.rotate(Math.sin(time * 2) * 0.12);
-  const gl = g.createRadialGradient(0, 0, 0, 0, 0, r * 1.8);
+  const pulse = 1.8 + Math.sin(time * 3) * 0.3; // the sparkle breathes — a friendly beacon showing the way
+  const gl = g.createRadialGradient(0, 0, 0, 0, 0, r * pulse);
   gl.addColorStop(0, 'rgba(255,220,90,0.55)'); gl.addColorStop(1, 'rgba(255,220,90,0)');
-  g.fillStyle = gl; g.beginPath(); g.arc(0, 0, r * 1.8, 0, Math.PI * 2); g.fill();
+  g.fillStyle = gl; g.beginPath(); g.arc(0, 0, r * pulse, 0, Math.PI * 2); g.fill();
   g.beginPath();
   for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + (i * Math.PI) / 5; const rr2 = i % 2 ? r * 0.45 : r; g.lineTo(Math.cos(a) * rr2, Math.sin(a) * rr2); }
   g.closePath();

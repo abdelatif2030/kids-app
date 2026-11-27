@@ -9,18 +9,18 @@ test('a quarter turn goes N->E->S->W', () => {
   assert.equal(turnN(N | E, 4), N | E);
 });
 
-test('every level starts unsolved, is solvable, and the moves leave room to spare', () => {
+test('every level starts unsolved and is solvable', () => {
   for (let i = 0; i < LEVELS.length; i++) {
     const lv = makeLevel(i);
     assert.equal(trace(lv).done, false, `level ${i + 1} starts solved`);
     assert.ok(lv.min >= 3, `level ${i + 1} too easy (${lv.min})`);
-    assert.ok(lv.moves >= lv.min + 8, `level ${i + 1}`);
+    assert.equal(lv.moves, undefined, `level ${i + 1} carries no move budget`);
     assert.ok(lv.path[0][0] === lv.rows - 1 && lv.path[0][1] === 0);
     assert.ok(lv.path.at(-1)[0] === 0 && lv.path.at(-1)[1] === lv.cols - 1);
     const p = new Puzzle(i);
     assert.equal(solve(p), 'won', `level ${i + 1}`);
     assert.ok(p.result.stars >= 2, `level ${i + 1} stars ${p.result.stars}`);
-    console.log(`level ${i + 1}: ${lv.rows}x${lv.cols} path ${lv.path.length} min ${lv.min} moves ${lv.moves} stars ${p.result.stars}`);
+    console.log(`level ${i + 1}: ${lv.rows}x${lv.cols} path ${lv.path.length} min ${lv.min} stars ${p.result.stars}`);
   }
 });
 
@@ -34,21 +34,22 @@ test('frozen and cross tiles do not turn and cost no move', () => {
   const p = new Puzzle(10);
   const frozen = p.level.tiles.flat().find((t) => t.locked);
   assert.ok(frozen);
-  const before = p.movesLeft;
+  const before = p.movesUsed;
   assert.equal(p.tap(frozen.r, frozen.c).type, 'stuck');
-  assert.equal(p.movesLeft, before);
+  assert.equal(p.movesUsed, before);
   assert.equal(turnsTo(frozen), 0);
 });
 
-test('running out of moves ends the try (try again, nothing lost)', () => {
+test('kind rules (2.5): turns are unlimited — tapping forever can never end or fail the puzzle', () => {
   const p = new Puzzle(0);
-  // turn a tile off the path over and over
+  assert.equal(p.movesLeft, undefined, 'the move budget is gone');
   const off = p.level.tiles.flat().find((t) => !t.onPath && !t.cross) || p.level.tiles[0][0];
   let ev;
-  while (p.state === 'play') ev = p.tap(off.r, off.c);
-  assert.equal(p.state, 'out');
-  assert.ok(ev.out);
-  assert.equal(p.result.won, false);
+  for (let i = 0; i < 500; i++) ev = p.tap(off.r, off.c);
+  assert.equal(p.state, 'play');
+  assert.equal(p.result, null);
+  assert.ok(!ev.out);
+  assert.equal(p.movesUsed, 500);
 });
 
 test('the ice glows further as the path grows from the dragon', () => {
@@ -61,8 +62,9 @@ test('the ice glows further as the path grows from the dragon', () => {
   assert.ok(last.reach >= 1);
 });
 
-test('easy mode gives more moves', () => {
-  assert.ok(makeLevel(0, true).moves > makeLevel(0).moves);
+test('easy mode: same solvable levels — there is no budget left to inflate', () => {
+  assert.equal(makeLevel(0, true).moves, undefined);
+  assert.equal(solve(new Puzzle(0, true)), 'won');
 });
 
 test('saves are cleaned', () => {
@@ -70,4 +72,11 @@ test('saves are cleaned', () => {
   assert.equal(s.unlocked, 12);
   assert.equal(s.coins, 0);
   assert.deepEqual(s.stars, { 1: 3 });
+});
+
+import fs from 'node:fs';
+
+test('Snow Dragon of Alexandria anchor: title renamed, coil game untouched', () => {
+  const i18n = fs.readFileSync(new URL('../src/i18n.js', import.meta.url), 'utf8');
+  assert.ok(i18n.includes("title: ['تنين إسكندرية الثلجي', 'Snow Dragon of Alexandria']"));
 });

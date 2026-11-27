@@ -1,9 +1,10 @@
 // «طريق التنين الجليدي» — Frost Coil: the rules with no drawing. A grid of wooden tiles, each with an ice tube
 // (straight or curved; crosses and frozen tiles later). Tap a tile to turn it a quarter turn. Build an unbroken ice
 // path from the little ice dragon (it enters the bottom-left tile from the left) to the portal (it leaves the
-// top-right tile from the top) before the moves run out. A star on the path is a bonus. Twelve levels, 3x3 to 5x5.
+// top-right tile from the top) — turns are unlimited, there is no way to fail. A sparkle on the path is a
+// friendly guide: route the ice through it for the third star. Twelve levels, 3x3 to 5x5.
 // Each level is made from a fixed seed: a real path is laid first, then the tiles are turned, so every level can be
-// solved and the moves always leave room to spare.
+// solved.
 
 export const N = 1;
 export const E = 2;
@@ -114,8 +115,7 @@ export function makeLevel(index, easy = false) {
     if (t.mask === t.solved) t.mask = turn(t.mask); // straight tiles: two turns can land on the answer again
   }
   const min = pathTiles.reduce((a, t) => a + turnsTo(t), 0);
-  const moves = min + L.slack + (easy ? Math.ceil(min * 0.5) + 4 : 0);
-  return { id: L.id, rows, cols, tiles, path, min, moves };
+  return { id: L.id, rows, cols, tiles, path, min };
 }
 
 /** Quarter turns needed to bring a tile to an answer (any mask that gives the same openings). */
@@ -157,8 +157,8 @@ export class Puzzle {
   constructor(index, easy = false) {
     this.index = index;
     this.level = makeLevel(index, easy);
-    this.movesLeft = this.level.moves;
-    this.state = 'play'; // play -> won | out
+    this.movesUsed = 0;
+    this.state = 'play'; // play -> won (never 'out': turns are unlimited)
     this.events = [];
     this.result = null;
     this.flow = trace(this.level);
@@ -171,21 +171,16 @@ export class Puzzle {
     if (!t) return null;
     if (t.locked || t.cross) return { type: 'stuck', r, c };
     t.mask = turn(t.mask);
-    this.movesLeft--;
+    this.movesUsed++;
     const before = this.flow.cells.length;
     this.flow = trace(this.level);
     const ev = { type: 'turn', r, c, reach: this.flow.cells.length, grew: this.flow.cells.length > before };
     if (this.flow.done) {
       this.state = 'won';
       const star = this.flow.cells.some((x) => this.level.tiles[x.r][x.c].star);
-      const spare = this.movesLeft;
-      const stars = 1 + (star ? 1 : 0) + (spare >= Math.ceil(this.level.moves * 0.3) ? 1 : 0);
-      this.result = { won: true, stars, star, movesLeft: spare, coins: 10 + stars * 5 };
+      const stars = 2 + (star ? 1 : 0); // finishing always earns 2; the sparkle on the path earns the third
+      this.result = { won: true, stars, star, movesUsed: this.movesUsed, coins: 10 + stars * 5 };
       ev.won = true;
-    } else if (this.movesLeft <= 0) {
-      this.state = 'out';
-      this.result = { won: false, stars: 0, coins: 0 };
-      ev.out = true;
     }
     return ev;
   }
