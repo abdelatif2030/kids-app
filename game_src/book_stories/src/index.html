@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>كتاب الحكايات — رحلتي</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 6c-3-2.4-7-3-11-3v22c4 0 8 .6 11 3 3-2.4 7-3 11-3V3c-4 0-8 .6-11 3z' fill='%23c96f2e'/%3E%3Cpath d='M16 6v22' stroke='%237a4a1b' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+@font-face{font-family:'Tajawal';src:url('../fonts/Tajawal-Regular.ttf') format('truetype'),url('fonts/Tajawal-Regular.ttf') format('truetype');font-weight:400}
+@font-face{font-family:'Tajawal';src:url('../fonts/Tajawal-Bold.ttf') format('truetype'),url('fonts/Tajawal-Bold.ttf') format('truetype');font-weight:700}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{
+  font-family:'Tajawal','Noto Naskh Arabic','Traditional Arabic',sans-serif;
+  background:radial-gradient(120% 90% at 50% 0%,#7a4a2b 0%,#5b3520 55%,#40240f 100%);
+  color:#3a2410;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;user-select:none;-webkit-user-select:none;
+}
+body::before{content:'';position:fixed;inset:0;opacity:.16;pointer-events:none;
+  background:radial-gradient(circle at 20% 30%,#ffd98a 0 6px,transparent 7px),
+             radial-gradient(circle at 80% 70%,#ffd98a 0 5px,transparent 6px),
+             radial-gradient(circle at 60% 15%,#ffd98a 0 4px,transparent 5px)}
+#stage{width:min(97vw,1100px);height:min(96dvh,760px);display:flex;flex-direction:column;gap:8px;padding:6px}
+/* ---------- the book ---------- */
+#bookWrap{flex:1;position:relative;perspective:1600px;min-height:0}
+#book{position:absolute;inset:0;display:flex;border-radius:14px;overflow:hidden;perspective:2300px;
+  background:linear-gradient(180deg,#fdf3d3,#f7e3ae);
+  box-shadow:0 18px 50px rgba(0,0,0,.55),0 4px 14px rgba(0,0,0,.4),inset 0 0 0 6px #a5672a,inset 0 0 0 9px #caa25e}
+.half{flex:1 1 50%;position:relative;overflow:hidden;padding:18px 20px}
+.half.text{background:linear-gradient(270deg,#fdf6da 60%,#f3dfae 100%)}
+.half.art{background:linear-gradient(90deg,#fdeed3 55%,#f5e0ac 100%);display:flex;align-items:center;justify-content:center}
+#spine{position:absolute;top:0;bottom:0;left:50%;width:44px;transform:translateX(-50%);pointer-events:none;z-index:5;
+  background:linear-gradient(90deg,transparent,rgba(122,74,27,.28) 45%,rgba(122,74,27,.4) 50%,rgba(122,74,27,.28) 55%,transparent)}
+.words{font-size:clamp(21px,3.4vmin,34px);line-height:2.05;font-weight:700;color:#43301a;
+  text-align:justify;text-align-last:right;margin:0}
+.words .w{opacity:0;transition:opacity .18s ease,color .18s ease,background .18s ease;border-radius:10px;padding:0 3px}
+.words .w.shown{opacity:.92}
+.words .w.now{opacity:1;color:#b03a00;background:#ffd34d;box-shadow:0 0 0 3px #ffd34d,0 0 18px 4px rgba(255,190,40,.75)}
+.words.titleWords{font-size:clamp(28px,5vmin,46px);text-align:center;text-align-last:center;line-height:1.9}
+.pageno{position:absolute;bottom:8px;inset-inline-start:16px;font-size:15px;color:#a5762f;font-weight:700}
+.artBox{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.artBox svg{width:100%;height:100%;max-height:100%}
+/* page-turn leaf */
+.leaf{position:absolute;top:0;bottom:0;width:50%;z-index:8;transform-style:preserve-3d;will-change:transform}
+.leaf .face{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.leaf .face.back{transform:rotateY(180deg)}
+.leaf .shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(80,45,5,.0),rgba(80,45,5,.35));opacity:0}
+#leafShadow{position:absolute;top:0;bottom:0;width:50%;z-index:7;pointer-events:none;opacity:0;
+  background:radial-gradient(60% 100% at 50% 50%,rgba(90,50,10,.4),transparent 70%)}
+/* ---------- controls ---------- */
+#controls{display:flex;gap:10px;justify-content:center;align-items:center;padding:2px 0}
+.cbtn{width:60px;height:60px;border-radius:50%;border:3px solid #caa25e;background:linear-gradient(180deg,#fff7dd,#f3dfae);
+  box-shadow:0 4px 10px rgba(0,0,0,.35);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.cbtn:active{transform:scale(.93)}
+.cbtn svg{width:30px;height:30px;fill:#7a4a1b}
+.cbtn.main{width:74px;height:74px;background:linear-gradient(180deg,#ffdf7e,#ffb52e);border-color:#a5672a}
+.cbtn.main svg{width:36px;height:36px;fill:#6b3410}
+.cbtn:disabled{opacity:.35;pointer-events:none}
+/* ---------- cover & end screens ---------- */
+.screen{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;text-align:center;padding:20px;border-radius:14px;
+  background:linear-gradient(180deg,#fdf3d3,#f3dfae);box-shadow:inset 0 0 0 6px #a5672a,inset 0 0 0 9px #caa25e}
+.screen h1{margin:0;font-size:clamp(30px,5.5vmin,52px);color:#7a3410;line-height:1.5}
+.screen p{margin:0;font-size:clamp(17px,2.6vmin,23px);color:#6b4a22;font-weight:700}
+.screen .artBox{flex:0 0 auto;width:min(62%,430px);height:38%}
+.bigbtn{font-family:inherit;font-size:clamp(22px,3.4vmin,30px);font-weight:700;color:#fff;cursor:pointer;
+  background:linear-gradient(180deg,#e2701d,#c2520a);border:3px solid #8a4d12;border-radius:999px;
+  padding:14px 44px;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+.bigbtn:active{transform:scale(.96)}
+.hidden{display:none!important}
+/* svg scene animations */
+@keyframes drift{from{transform:translateX(-14px)}to{transform:translateX(14px)}}
+@keyframes spinSlow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+@keyframes wag{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(16deg)}}
+@keyframes pant{0%,100%{transform:scaleY(.75)}50%{transform:scaleY(1.15)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes floatUp{0%{transform:translateY(6px);opacity:0}25%{opacity:.95}100%{transform:translateY(-26px);opacity:0}}
+@keyframes sparkle{0%,100%{opacity:.15}50%{opacity:.95}}
+@keyframes flowX{from{transform:translateX(0)}to{transform:translateX(-46px)}}
+.anim-cloud{animation:drift 7s ease-in-out infinite alternate}
+.anim-rays{transform-box:fill-box;transform-origin:center;animation:spinSlow 46s linear infinite}
+.anim-sway{transform-box:fill-box;transform-origin:top center;animation:sway 3.6s ease-in-out infinite}
+.anim-wag{transform-box:fill-box;transform-origin:left center;animation:wag .8s ease-in-out infinite}
+.anim-pant{transform-box:fill-box;transform-origin:top center;animation:pant .55s ease-in-out infinite}
+.anim-bob{animation:bob 3.2s ease-in-out infinite}
+.anim-heart{animation:floatUp 3.4s ease-in infinite}
+.anim-spark{animation:sparkle 2.2s ease-in-out infinite}
+body.reduced .anim-cloud,body.reduced .anim-rays,body.reduced .anim-sway,body.reduced .anim-wag,
+body.reduced .anim-pant,body.reduced .anim-bob,body.reduced .anim-heart,body.reduced .anim-spark{animation:none!important}
+/* portrait: stack art over text, fade turns */
+@media (orientation:portrait){
+  #book{flex-direction:column}
+  .half{flex:1 1 50%;padding:12px 14px}
+  #spine{left:0;right:0;top:50%;bottom:auto;width:auto;height:40px;transform:translateY(-50%);
+    background:linear-gradient(180deg,transparent,rgba(122,74,27,.3) 50%,transparent)}
+  .words{font-size:clamp(19px,5.4vw,27px);line-height:1.95}
+}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bookWrap">
+    <div id="book">
+      <div class="half text" id="textHalf">
+        <p class="words" id="words"></p>
+        <div class="pageno" id="pageno"></div>
+      </div>
+      <div class="half art" id="artHalf"><div class="artBox" id="artBox"></div></div>
+      <div id="spine"></div>
+      <div id="leafShadow"></div>
+    </div>
+    <div id="coverScreen" class="screen">
+      <div class="artBox" id="coverArt"></div>
+      <h1 id="coverTitle"></h1>
+      <p>حكاية هادئة تُسمَع وتُقرَأ، كلمةً كلمة</p>
+      <button class="bigbtn" id="startBtn">ابدأ الحكاية 📖</button>
+    </div>
+    <div id="endScreen" class="screen hidden">
+      <div class="artBox" id="endArt"></div>
+      <h1>انتهت الحكاية 🌙</h1>
+      <p>الرَّحمةُ بالحيوانِ تجعلُ قلوبَنا أجمل</p>
+      <button class="bigbtn" id="againBtn">اقرأها مرة أخرى</button>
+    </div>
+  </div>
+  <div id="controls">
+    <button class="cbtn" id="restartBtn" title="من البداية"><svg viewBox="0 0 24 24"><path d="M12 5V1L6 7l6 6V9a5 5 0 1 1-5 5H5a7 7 0 1 0 7-9z"/></svg></button>
+    <button class="cbtn" id="prevBtn" title="السابق"><svg viewBox="0 0 24 24"><path d="M6 5h2.5v14H6zM19 5v14L9.5 12z"/></svg></button>
+    <button class="cbtn main" id="playBtn" title="تشغيل / إيقاف"><svg viewBox="0 0 24 24" id="playIcon"><path d="M7 4l13 8-13 8z"/></svg></button>
+    <button class="cbtn" id="nextBtn" title="التالي"><svg viewBox="0 0 24 24"><path d="M15.5 5H18v14h-2.5zM5 5v14l9.5-7z"/></svg></button>
+    <button class="cbtn" id="replayBtn" title="إعادة الصفحة"><svg viewBox="0 0 24 24"><path d="M12 5V1l6 6-6 6V9a5 5 0 1 0 5 5h2a7 7 0 1 1-7-9z"/></svg></button>
+    <button class="cbtn" id="muteBtn" title="الصوت"><svg viewBox="0 0 24 24" id="muteIcon"><path d="M3 9v6h4l6 6V3L7 9H3zm13.5 3a3.5 3.5 0 0 0-2-3.15v6.3a3.5 3.5 0 0 0 2-3.15zM14.5 3.9v2.1a5 5 0 0 1 0 11.9v2.1a7 7 0 0 0 0-16z"/></svg></button>
+  </div>
+</div>
+<audio id="narrator" preload="auto"></audio>
+<script>
+'use strict';
+/* =====================================================================
+   كتاب الحكايات — Rehlaty Story Book player
+   Data-driven: everything comes from <story>/story.json. A new story is a
+   new folder with a new story.json + narration clips. No code changes.
+   ===================================================================== */
+const $=id=>document.getElementById(id);
+const params=new URLSearchParams(location.search);
+const STORY_ID=params.get('story')||'s01_thirsty_dog';
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(REDUCED)document.body.classList.add('reduced');
+const PORTRAIT=()=>matchMedia('(orientation: portrait)').matches;
+</script>
+<script>
+/* ============================ ART (SVG, drawn in code) ============================
+   The man is ALWAYS drawn from behind / as a simple figure — no face, ever.
+   The final page (sky) contains no person at all. */
+function sun(x,y,r,rays){return `<g><g class="anim-rays" opacity=".55">${Array.from({length:12},(_,i)=>{const a=i*30*Math.PI/180;return `<line x1="${x+Math.cos(a)*(r+4)}" y1="${y+Math.sin(a)*(r+4)}" x2="${x+Math.cos(a)*(r+15)}" y2="${y+Math.sin(a)*(r+15)}" stroke="#f5a623" stroke-width="5" stroke-linecap="round"/>`}).join('')}</g><circle cx="${x}" cy="${y}" r="${r}" fill="#ffcf4d" stroke="#f5a623" stroke-width="3"/></g>`}
+function cloud(x,y,s){return `<g class="anim-cloud" opacity=".92"><g transform="translate(${x},${y}) scale(${s})"><ellipse cx="0" cy="0" rx="34" ry="15" fill="#fff"/><ellipse cx="-20" cy="4" rx="22" ry="11" fill="#fff"/><ellipse cx="20" cy="4" rx="24" ry="12" fill="#fff"/></g></g>`}
+function hills(c1,c2){return `<path d="M0 218 Q90 168 190 205 T400 195 V300 H0 Z" fill="${c1}"/><path d="M0 252 Q110 208 230 242 T400 238 V300 H0 Z" fill="${c2}"/>`}
+/* man from behind: robe + wrapped head-cloth, NO face (we see his back) */
+function man(x,y,s,pose){
+  const robe='#c96f2e',cloth='#f3e2b8',skin='#d99e63';
+  let legs='',arms='';
+  if(pose==='walk'){legs=`<path d="M-9 96 L-13 118 M9 96 L14 114" stroke="#8a5a24" stroke-width="7" stroke-linecap="round"/>`}
+  if(pose==='sit'){return `<g transform="translate(${x},${y}) scale(${s})"><ellipse cx="0" cy="104" rx="30" ry="9" fill="#a8a29e"/><path d="M-26 40 Q-30 96 -20 104 H22 Q30 92 25 40 Z" fill="${robe}"/><path d="M-25 52 Q-44 74 -34 96" stroke="${robe}" stroke-width="11" fill="none" stroke-linecap="round"/><path d="M25 52 Q42 70 36 92" stroke="${robe}" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="0" cy="16" r="19" fill="${skin}"/><path d="M-20 12 a20 20 0 0 1 40 0 l0 8 q-20 8 -40 0 Z" fill="${cloth}"/><path d="M13 20 q8 22 2 40 l-10 -3 q4 -20 2 -35 Z" fill="${cloth}"/></g>`}
+  if(pose==='kneel'){return `<g transform="translate(${x},${y}) scale(${s})"><path d="M-24 46 Q-28 92 -34 108 L30 108 Q26 84 22 46 Z" fill="${robe}"/><path d="M22 54 Q44 66 40 88" stroke="${robe}" stroke-width="11" fill="none" stroke-linecap="round"/><path d="M-22 54 Q-38 72 -30 92" stroke="${robe}" stroke-width="11" fill="none" stroke-linecap="round"/><circle cx="0" cy="20" r="19" fill="${skin}"/><path d="M-20 16 a20 20 0 0 1 40 0 l0 8 q-20 8 -40 0 Z" fill="${cloth}"/><path d="M13 24 q8 22 2 40 l-10 -3 q4 -20 2 -35 Z" fill="${cloth}"/></g>`}
+  arms=`<path d="M-24 50 Q-40 70 -34 92" stroke="${robe}" stroke-width="11" fill="none" stroke-linecap="round"/><path d="M24 50 Q40 70 34 92" stroke="${robe}" stroke-width="11" fill="none" stroke-linecap="round"/>`;
+  if(pose==='carry'){arms=`<path d="M-24 50 Q-42 62 -38 78" stroke="${robe}" stroke-width="11" fill="none" stroke-linecap="round"/><path d="M24 50 Q42 62 38 78" stroke="${robe}" stroke-width="11" fill="none" stroke-linecap="round"/>`}
+  return `<g transform="translate(${x},${y}) scale(${s})">${legs}<path d="M-25 38 Q-28 84 -24 116 L24 116 Q28 84 25 38 Q0 26 -25 38 Z" fill="${robe}"/>${arms}<circle cx="0" cy="14" r="19" fill="${skin}"/><path d="M-20 10 a20 20 0 0 1 40 0 l0 8 q-20 8 -40 0 Z" fill="${cloth}"/><path d="M13 18 q8 22 2 42 l-10 -3 q4 -22 2 -37 Z" fill="${cloth}"/></g>`}
+function dog(x,y,s,happy){
+  const fur='#d9a05f',dark='#b57e3e';
+  return `<g transform="translate(${x},${y}) scale(${s})">
+  <g class="anim-wag"><path d="M30 26 Q52 20 50 2" stroke="${dark}" stroke-width="8" fill="none" stroke-linecap="round"/></g>
+  <ellipse cx="0" cy="30" rx="36" ry="24" fill="${fur}"/>
+  <path d="M-18 48 l-3 14 M16 48 l3 14" stroke="${dark}" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="-34" cy="8" r="19" fill="${fur}"/>
+  <path d="M-46 -6 q-8 16 2 24 q10 -4 6 -18 Z" fill="${dark}"/>
+  <ellipse cx="-46" cy="16" rx="9" ry="7" fill="${fur}"/><circle cx="-52" cy="13" r="3.4" fill="#5b3a1a"/>
+  <circle cx="-38" cy="2" r="3.2" fill="#40260e"/>
+  <g class="anim-pant"><path d="M-50 20 q-2 12 4 15 q6 -3 4 -15 Z" fill="#ef7d9b"/></g>
+  ${happy?'<path d="M-58 30 q10 6 20 2" stroke="#8a5a24" stroke-width="3" fill="none" stroke-linecap="round"/>':''}</g>`}
+function well(x,y,s){return `<g transform="translate(${x},${y}) scale(${s})">
+  <path d="M-52 62 V-38 M52 62 V-38" stroke="#8a5a24" stroke-width="9" stroke-linecap="round"/>
+  <path d="M-64 -36 H64 L44 -58 H-44 Z" fill="#b5441d"/>
+  <line x1="-56" y1="-36" x2="56" y2="-36" stroke="#8a5a24" stroke-width="7"/>
+  <g class="anim-sway"><line x1="0" y1="-36" x2="0" y2="16" stroke="#7c5a2e" stroke-width="3.5"/>
+  <path d="M-13 16 h26 l-4 20 h-18 Z" fill="#a5712e"/><path d="M-13 16 h26" stroke="#7c4f16" stroke-width="4"/></g>
+  <path d="M-58 96 a58 20 0 0 1 116 0 Z" fill="#9c8d7d"/>
+  <ellipse cx="0" cy="96" rx="58" ry="19" fill="#8a7a68"/>
+  <ellipse cx="0" cy="94" rx="46" ry="14" fill="#3f8fbf"/>
+  <ellipse class="anim-spark" cx="-14" cy="92" rx="10" ry="3.4" fill="#bde6ff"/>
+  <ellipse class="anim-spark" cx="16" cy="97" rx="7" ry="2.4" fill="#bde6ff" style="animation-delay:1.1s"/>
+  <path d="M-58 96 a58 20 0 0 0 116 0" fill="none" stroke="#77685a" stroke-width="4"/></g>`}
+function bird(x,y,s){return `<g class="anim-cloud" style="animation-duration:11s"><path d="M${x} ${y} q6 -6 12 0 q6 -6 12 0" stroke="#5b7a99" stroke-width="2.6" fill="none" stroke-linecap="round" transform="scale(${s})"/></g>`}
+function scene(inner,skyTop,skyBot,id){return `<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" role="img"><defs><linearGradient id="sky-${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${skyTop}"/><stop offset="1" stop-color="${skyBot}"/></linearGradient></defs><rect width="400" height="300" fill="url(#sky-${id})"/>${inner}</svg>`}
+const ART={
+cover(){return scene(`${sun(322,58,30)}${cloud(80,52,.9)}${cloud(215,34,.6)}${hills('#cde6a5','#a9d18a')}${well(300,150,.92)}${dog(96,196,.95)}${bird(140,70,1)}`,'#aee3ff','#fdf3d3','cover')},
+road(){return scene(`${sun(66,60,34)}${cloud(300,44,.7)}${hills('#e8d9a0','#d9bd7f')}<path d="M168 300 Q205 235 196 190 T212 128" stroke="#cbb27f" stroke-width="30" fill="none" stroke-linecap="round"/><path d="M168 300 Q205 235 196 190 T212 128" stroke="#e6d3a3" stroke-width="20" fill="none" stroke-linecap="round"/>${man(196,120,.62,'walk')}<path class="anim-spark" d="M60 150 q6 -14 0 -26 M96 168 q6 -14 0 -26" stroke="#f5a623" stroke-width="4" fill="none" stroke-linecap="round"/>`,'#ffe3a1','#fdf3d3','road')},
+thirst(){return scene(`${sun(330,56,36)}${cloud(90,40,.55)}${hills('#ecd9a3','#dec188')}<path d="M30 262 l36 -8 M90 276 l40 -6 M250 268 l38 -8 M320 280 l34 -6" stroke="#b98d4f" stroke-width="4" stroke-linecap="round"/><ellipse cx="212" cy="238" rx="46" ry="12" fill="#a8a29e"/>${man(212,128,1,'sit')}<g transform="translate(292,196)"><path d="M0 8 q26 -12 34 8 q6 20 -10 30 q-22 10 -32 -6 q-8 -20 8 -32Z" fill="#8a5a24"/><rect x="26" y="-2" width="10" height="14" rx="4" fill="#6e4517"/></g>`,'#ffe9b0','#fdf3d3','thirst')},
+well(){return scene(`${sun(56,50,28)}${cloud(310,46,.8)}${hills('#cde6a5','#a9d18a')}${well(215,132,1.15)}${man(96,128,.95,'stand')}${bird(300,84,1)}<circle class="anim-spark" cx="238" cy="212" r="4" fill="#7ec3ee"/><circle class="anim-spark" cx="262" cy="196" r="3" fill="#7ec3ee" style="animation-delay:.8s"/>`,'#aee3ff','#fdf3d3','well')},
+dog(){return scene(`${sun(352,48,28)}${cloud(80,42,.7)}${hills('#ecd9a3','#dec188')}<g opacity=".55">${well(66,120,.62)}</g><path d="M120 268 l40 -8 M220 278 l42 -6 M300 264 l36 -8" stroke="#b98d4f" stroke-width="4" stroke-linecap="round"/>${dog(212,168,1.5)}`,'#ffe9b0','#fdf3d3','dog')},
+thought(){return scene(`${sun(52,52,26)}${cloud(320,40,.65)}${hills('#cde6a5','#a9d18a')}${man(108,132,1,'stand')}${dog(316,196,.9)}<g class="anim-bob"><ellipse cx="212" cy="84" rx="66" ry="42" fill="#ffffff" opacity=".95"/><circle cx="160" cy="116" r="10" fill="#fff" opacity=".95"/><circle cx="142" cy="130" r="6" fill="#fff" opacity=".95"/><path d="M212 52 q16 20 16 32 a16 16 0 1 1 -32 0 q0 -12 16 -32Z" fill="#3f8fbf"/><ellipse cx="206" cy="82" rx="5" ry="3" fill="#bde6ff"/></g>`,'#aee3ff','#fdf3d3','thought')},
+shoe(){return scene(`${cloud(84,44,.7)}${cloud(300,34,.55)}${hills('#cde6a5','#a9d18a')}${well(120,124,1.02)}${man(268,140,.92,'kneel')}<g transform="translate(316,196) rotate(24)"><path d="M-6 0 h34 q12 2 12 12 l0 6 H-6 Z" fill="#7c4a1e"/><path d="M-6 0 h10 v-12 h14 v12" fill="#7c4a1e"/></g><path d="M330 214 q2 12 -2 22" stroke="#3f8fbf" stroke-width="5" fill="none" stroke-linecap="round" class="anim-spark"/><ellipse cx="326" cy="242" rx="26" ry="7" fill="#3f8fbf" opacity=".8"/><ellipse class="anim-spark" cx="318" cy="240" rx="9" ry="2.6" fill="#bde6ff"/>`,'#aee3ff','#fdf3d3','shoe')},
+drink(){return scene(`${sun(60,52,28)}${cloud(310,42,.75)}${hills('#cde6a5','#a9d18a')}${man(92,138,.9,'kneel')}${dog(238,182,1.25,true)}<g transform="translate(196,238) rotate(10)"><path d="M-6 0 h32 q12 2 12 11 l0 6 H-6 Z" fill="#7c4a1e"/><path d="M-6 0 h9 v-11 h13 v11" fill="#7c4a1e"/><ellipse cx="14" cy="1" rx="15" ry="4" fill="#3f8fbf"/></g><path class="anim-heart" d="M286 128 c-4 -8 -18 -8 -18 2 c0 8 10 12 18 18 c8 -6 18 -10 18 -18 c0 -10 -14 -10 -18 -2Z" fill="#ef7d9b"/><path class="anim-heart" style="animation-delay:1.6s" d="M318 148 c-3 -6 -13 -6 -13 2 c0 6 7 9 13 13 c6 -4 13 -7 13 -13 c0 -8 -10 -8 -13 -2Z" fill="#f5a3ba"/>`,'#aee3ff','#fdf3d3','drink')},
+sky(){return scene(`${hills('#7d9b76','#5d7d5a')}<path d="M352 36 a30 30 0 1 0 14 54 a24 24 0 1 1 -14 -54Z" fill="#ffe9a8"/><circle class="anim-spark" cx="60" cy="52" r="3" fill="#fff"/><circle class="anim-spark" cx="130" cy="30" r="2.4" fill="#fff" style="animation-delay:.7s"/><circle class="anim-spark" cx="238" cy="58" r="2.8" fill="#fff" style="animation-delay:1.3s"/><circle class="anim-spark" cx="310" cy="110" r="2.2" fill="#fff" style="animation-delay:.4s"/><g opacity=".92">${well(96,168,.8)}</g>${dog(268,208,.9,true)}`,'#8fb7e8','#f7d9b0','sky')}
+};
+</script>
+<script>
+/* ============================ AUDIO (all synthesized) ============================
+   Narrator: the recorded mp3 clips only. Music + ambience + SFX: WebAudio
+   synthesis, original, no copyrighted material. speechSynthesis is NEVER used. */
+const AU={ctx:null,master:null,musicG:null,ambG:null,windG:null,started:false,amb:'calm',
+  pluckCache:{},
+  init(){ if(this.ctx)return; const C=window.AudioContext||window.webkitAudioContext; if(!C)return;
+    this.ctx=new C(); this.master=this.ctx.createGain(); this.master.gain.value=1; this.master.connect(this.ctx.destination);
+    this.musicG=this.ctx.createGain(); this.musicG.gain.value=.05; this.musicG.connect(this.master);
+    this.ambG=this.ctx.createGain(); this.ambG.gain.value=1; this.ambG.connect(this.master);
+    // narrator routed through the graph so mute covers it
+    try{ const src=this.ctx.createMediaElementSource($('narrator')); const g=this.ctx.createGain(); g.gain.value=1; src.connect(g); g.connect(this.master);}catch(e){/* element plays directly */}
+    this._wind(); this._musicLoop(); this._critters();
+  },
+  resume(){ if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume(); },
+  setMuted(m){ if(this.master)this.master.gain.value=m?0:1; $('narrator').muted=m; },
+  duck(on){ if(this.musicG)this.musicG.gain.setTargetAtTime(on?.018:.05,this.ctx.currentTime,.4); },
+  _noiseBuf(sec){ const b=this.ctx.createBuffer(1,this.ctx.sampleRate*sec,this.ctx.sampleRate); const d=b.getChannelData(0); for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1; return b; },
+  _wind(){ const c=this.ctx; const src=c.createBufferSource(); src.buffer=this._noiseBuf(3); src.loop=true;
+    const f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=420;
+    this.windG=c.createGain(); this.windG.gain.value=.012;
+    const lfo=c.createOscillator(); lfo.frequency.value=.08; const lg=c.createGain(); lg.gain.value=.006;
+    lfo.connect(lg); lg.connect(this.windG.gain);
+    src.connect(f); f.connect(this.windG); this.windG.connect(this.ambG); src.start(); lfo.start(); },
+  setAmbience(kind){ this.amb=kind; if(!this.ctx)return;
+    const target=kind==='wind'?.05:kind==='well'?.016:.012;
+    this.windG.gain.setTargetAtTime(target,this.ctx.currentTime,1.2); },
+  _pluck(freq){ // Karplus-Strong plucked string (oud-like)
+    if(this.pluckCache[freq])return this.pluckCache[freq];
+    const c=this.ctx,sr=c.sampleRate,dur=1.4,N=Math.round(sr/freq),len=Math.floor(sr*dur);
+    const buf=c.createBuffer(1,len,sr),out=buf.getChannelData(0),line=new Float32Array(N);
+    for(let i=0;i<N;i++)line[i]=Math.random()*2-1;
+    let idx=0; for(let i=0;i<len;i++){ const cur=line[idx]; out[i]=cur; const nxt=line[(idx+1)%N]; line[idx]=(cur+nxt)*.5*.996; idx=(idx+1)%N; }
+    this.pluckCache[freq]=buf; return buf; },
+  _note(freq,when,vol){ const c=this.ctx; const s=c.createBufferSource(); s.buffer=this._pluck(freq);
+    const g=c.createGain(); g.gain.value=vol; s.connect(g); g.connect(this.musicG); s.start(when); },
+  _musicLoop(){ // gentle original lullaby in D hijaz, sparse and quiet
+    const D4=293.66,Eb4=311.13,Fs4=369.99,G4=392,A4=440,Bb4=466.16,C5=523.25,D5=587.33;
+    const bars=[[D4,null,Fs4,null,G4,null,Fs4,null],[Eb4,null,D4,null,null,null,A4,null],
+                [Bb4,null,A4,null,G4,null,Fs4,null],[Eb4,null,Fs4,null,D4,null,null,null]];
+    let bar=0; const step=()=>{ if(!this.ctx)return; const t=this.ctx.currentTime+.1,beat=.62;
+      bars[bar%bars.length].forEach((f,i)=>{ if(f)this._note(f,t+i*beat,.5); });
+      if(bar%2===0)this._note(bar%4===2?Bb4/2:D4/2,t,.35);
+      bar++; this._musicTimer=setTimeout(step,beat*8*1000); };
+    step(); },
+  _critters(){ const chirp=()=>{ if(this.ctx&&(this.amb==='calm'||this.amb==='wind')){
+      const c=this.ctx,t=c.currentTime,o=c.createOscillator(),g=c.createGain();
+      o.type='sine'; const f=2300+Math.random()*700;
+      o.frequency.setValueAtTime(f,t); o.frequency.exponentialRampToValueAtTime(f*1.3,t+.09);
+      o.frequency.exponentialRampToValueAtTime(f*.9,t+.18);
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.028,t+.03); g.gain.exponentialRampToValueAtTime(.0001,t+.25);
+      o.connect(g); g.connect(this.ambG); o.start(t); o.stop(t+.3); }
+    if(this.ctx&&this.amb==='well'){ const c=this.ctx,t=c.currentTime,o=c.createOscillator(),g=c.createGain();
+      o.type='sine'; o.frequency.setValueAtTime(880+Math.random()*260,t); o.frequency.exponentialRampToValueAtTime(420,t+.16);
+      g.gain.setValueAtTime(.05,t); g.gain.exponentialRampToValueAtTime(.0001,t+.2);
+      o.connect(g); g.connect(this.ambG); o.start(t); o.stop(t+.22); }
+    this._critterTimer=setTimeout(chirp,2600+Math.random()*4200); }; },
+  pageTurn(){ if(!this.ctx)return; const c=this.ctx,t=c.currentTime;
+    const s=c.createBufferSource(); s.buffer=this._noiseBuf(.6);
+    const f=c.createBiquadFilter(); f.type='bandpass'; f.Q.value=1.1;
+    f.frequency.setValueAtTime(480,t); f.frequency.exponentialRampToValueAtTime(1750,t+.34); f.frequency.exponentialRampToValueAtTime(700,t+.55);
+    const g=c.createGain(); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.22,t+.1);
+    g.gain.linearRampToValueAtTime(.12,t+.36); g.gain.linearRampToValueAtTime(0,t+.58);
+    s.connect(f); f.connect(g); g.connect(this.master); s.start(t); s.stop(t+.6);
+    const o=c.createOscillator(),og=c.createGain(); o.type='sine'; o.frequency.value=165;
+    og.gain.setValueAtTime(0,t+.4); og.gain.linearRampToValueAtTime(.06,t+.44); og.gain.exponentialRampToValueAtTime(.0001,t+.62);
+    o.connect(og); og.connect(this.master); o.start(t+.4); o.stop(t+.65); }
+};
+</script>
+<script>
+/* ============================ PLAYER ============================ */
+const S={story:null,page:0,playing:false,muted:false,flipping:false,screen:'cover',
+  audioOk:false,silentStart:0,silentFrozen:0,curWord:-2,lastT:0,holdFlip:false,ended:false};
+const narr=$('narrator');
+const arNum=n=>String(n).replace(/\d/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+
+function pageCount(){return S.story.pages.length}
+function curPage(){return S.story.pages[S.page]}
+
+function halfHTML(kind,page,pageIdx){
+  if(kind==='text'){
+    const spans=page.words.map((w,i)=>`<span class="w" data-i="${i}">${w.w}</span>`).join(' ');
+    const titleCls=page.id==='title'?' titleWords':'';
+    const no=page.id==='title'?'':`صفحة ${arNum(pageIdx===undefined?S.page:pageIdx)} من ${arNum(pageCount()-1)}`;
+    return `<p class="words${titleCls}" id="words">${spans}</p><div class="pageno">${no}</div>`;
+  }
+  return `<div class="artBox">${ART[page.art]?ART[page.art]():ART.cover()}</div>`;
+}
+function renderSpread(page){
+  $('textHalf').innerHTML=halfHTML('text',page);
+  $('artHalf').innerHTML=halfHTML('art',page);
+  S.curWord=-2; S.lastT=0;
+}
+/* ---------- clocks ---------- */
+function pageTime(){
+  if(S.audioOk) return narr.currentTime*1000;
+  if(S.playing) return performance.now()-S.silentStart;
+  return S.silentFrozen;
+}
+function seekTo(ms){
+  if(S.audioOk){ try{narr.currentTime=ms/1000}catch(e){} }
+  else{ S.silentFrozen=ms; S.silentStart=performance.now()-ms; }
+  S.lastT=ms; updateWords(ms,true);
+}
+/* ---------- word sync ---------- */
+function updateWords(t,force){
+  const words=curPage().words, spans=$('textHalf').querySelectorAll('.w');
+  if(!spans.length)return;
+  let cur=-1;
+  for(let i=0;i<words.length;i++){ if(t>=words[i].start)cur=i; else break; }
+  if(cur===S.curWord&&!force)return;
+  S.curWord=cur;
+  spans.forEach((sp,i)=>{ sp.classList.toggle('shown',i<=cur); sp.classList.toggle('now',i===cur); });
+}
+/* ---------- page loading / playback ---------- */
+function loadAudio(page){
+  return new Promise(res=>{
+    const src=`${STORY_ID}/${S.story.audioDir}/${page.audio}`;
+    if(narr.dataset.src===src){res(S.audioOk);return}
+    narr.dataset.src=src;
+    let done=false; const finish=ok=>{if(!done){done=true;S.audioOk=ok;res(ok)}};
+    narr.oncanplay=()=>finish(true);
+    narr.onerror=()=>finish(false);
+    narr.src=src; narr.load();
+    setTimeout(()=>finish(false),2500);
+  });
+}
+async function enterPage(idx,{autoplay=true}={}){
+  S.page=idx; S.ended=false;
+  renderSpread(curPage());
+  AU.setAmbience(curPage().ambience);
+  await loadAudio(curPage());
+  seekTo(0);
+  if(autoplay&&S.playing){ startClock(); } else { pauseClock(); }
+}
+function startClock(){
+  if(S.audioOk){ AU.resume(); narr.play().catch(()=>{}); }
+  else{ S.silentStart=performance.now()-S.silentFrozen; }
+  AU.duck(true);
+}
+function pauseClock(){
+  if(S.audioOk){ narr.pause(); }
+  else{ S.silentFrozen=pageTime(); }
+  AU.duck(false);
+}
+function setPlaying(on){
+  S.playing=on;
+  $('playIcon').innerHTML=on?'<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>':'<path d="M7 4l13 8-13 8z"/>';
+  if(S.screen!=='book')return;
+  if(on)startClock(); else pauseClock();
+}
+/* ---------- page turn (real curl: leaf + bend shading + cast shadow) ---------- */
+function flipTo(idx,dir){
+  if(S.flipping||idx===S.page)return;
+  const from=curPage(); S.flipping=true; pauseClock(); AU.pageTurn();
+  const done=()=>{ S.flipping=false; enterPage(idx); };
+  if(REDUCED||PORTRAIT()){
+    $('book').style.transition='opacity .22s'; $('book').style.opacity='0';
+    setTimeout(()=>{ $('book').style.opacity='1'; done(); },230); return;
+  }
+  const book=$('book');
+  const leaf=document.createElement('div'); leaf.className='leaf';
+  const front=document.createElement('div'); front.className='face front';
+  const back=document.createElement('div'); back.className='face back';
+  const shadeF=document.createElement('div'); shadeF.className='shade';
+  const shadeB=document.createElement('div'); shadeB.className='shade';
+  front.appendChild(shadeF); back.appendChild(shadeB); leaf.appendChild(front); leaf.appendChild(back);
+  const newPage=S.story.pages[idx];
+  if(dir>0){ // next: leaf lifts the ART half (left) over to the TEXT half (right)
+    leaf.style.left='0'; leaf.style.transformOrigin='100% 50%';
+    front.innerHTML=halfHTML('art',from); front.className='face front half art'; front.style.padding='18px 20px';
+    back.innerHTML=halfHTML('text',newPage,idx); back.className='face back half text'; back.style.padding='18px 20px';
+    front.style.background='linear-gradient(90deg,#fdeed3 55%,#f5e0ac 100%)';
+    back.style.background='linear-gradient(270deg,#fdf6da 60%,#f3dfae 100%)';
+    $('artHalf').innerHTML=halfHTML('art',newPage); // revealed as the leaf lifts
+  }else{ // prev: leaf lifts the TEXT half (right) back over to the ART half (left)
+    leaf.style.right='0'; leaf.style.transformOrigin='0% 50%';
+    front.innerHTML=halfHTML('text',from); front.className='face front half text'; front.style.padding='18px 20px';
+    back.innerHTML=halfHTML('art',newPage); back.className='face back half art'; back.style.padding='18px 20px';
+    front.style.background='linear-gradient(270deg,#fdf6da 60%,#f3dfae 100%)';
+    back.style.background='linear-gradient(90deg,#fdeed3 55%,#f5e0ac 100%)';
+    $('textHalf').innerHTML=halfHTML('text',newPage);
+  }
+  book.appendChild(leaf);
+  const shadow=$('leafShadow');
+  shadow.style.left=dir>0?'50%':'0';
+  const DUR=780; let prog=0,last=performance.now();
+  const stepFn=now=>{
+    const dt=now-last; last=now;
+    if(!(S.holdFlip&&prog>=0.5))prog=Math.min(1,prog+dt/DUR);
+    const e=prog<.5?2*prog*prog:1-Math.pow(-2*prog+2,2)/2;
+    leaf.style.transform=`rotateY(${dir>0?180*e:-180*e}deg)`;
+    const sh=Math.sin(e*Math.PI);
+    shadeF.style.opacity=sh*.55; shadeB.style.opacity=sh*.35;
+    shadeF.style.background='linear-gradient(90deg,rgba(80,45,5,0),rgba(80,45,5,.4))';
+    shadow.style.opacity=sh*.75;
+    if(prog<1)requestAnimationFrame(stepFn);
+    else{ leaf.remove(); shadow.style.opacity='0'; done(); }
+  };
+  requestAnimationFrame(stepFn);
+}
+/* ---------- flow ---------- */
+narr.addEventListener('ended',()=>{ if(S.screen==='book'&&S.playing&&!S.flipping)onPageEnd(); });
+function onPageEnd(){
+  if(S.ended)return; S.ended=true; pauseClock();
+  if(S.page<pageCount()-1){ setTimeout(()=>{ if(S.playing)flipTo(S.page+1,1); },850); }
+  else setTimeout(()=>{ if(S.playing){ S.screen='end'; $('endScreen').classList.remove('hidden'); AU.setAmbience('calm'); } },1000);
+}
+function tick(){
+  if(S.screen==='book'&&S.playing&&!S.flipping){
+    const t=pageTime(); updateWords(t);
+    if(t>=curPage().durationMs+350)onPageEnd();
+  }
+  requestAnimationFrame(tick);
+}
+/* ---------- controls ---------- */
+$('startBtn').onclick=()=>{ AU.init(); AU.resume(); $('coverScreen').classList.add('hidden');
+  S.screen='book'; S.playing=true; setPlaying(true); enterPage(0); };
+$('againBtn').onclick=()=>{ $('endScreen').classList.add('hidden'); S.screen='book'; S.playing=true; setPlaying(true); enterPage(0); };
+$('playBtn').onclick=()=>{ if(S.screen==='book')setPlaying(!S.playing); };
+$('nextBtn').onclick=()=>{ if(S.screen==='book'&&!S.flipping&&S.page<pageCount()-1)flipTo(S.page+1,1); };
+$('prevBtn').onclick=()=>{ if(S.screen==='book'&&!S.flipping&&S.page>0)flipTo(S.page-1,-1); };
+$('replayBtn').onclick=()=>{ if(S.screen==='book'&&!S.flipping){ // reload the clip (works even on servers without Range support, where currentTime seeks are ignored)
+  delete narr.dataset.src; S.audioOk=false; enterPage(S.page); if(!S.playing)setPlaying(true); } };
+$('restartBtn').onclick=()=>{ if(S.screen==='book'&&!S.flipping){ if(S.page===0){seekTo(0); if(!S.playing)setPlaying(true);} else flipTo(0,S.page>0?-1:1); } };
+$('muteBtn').onclick=()=>{ S.muted=!S.muted; AU.init(); AU.setMuted(S.muted);
+  $('muteIcon').innerHTML=S.muted
+    ?'<path d="M3 9v6h4l6 6V3L7 9H3zm14.5 3l4-4-1.8-1.8-4 4-4-4L10 8l4 4-4 4 1.7 1.8 4-4 4 4L21.5 16l-4-4z" transform="scale(0.92) translate(1,1)"/>'
+    :'<path d="M3 9v6h4l6 6V3L7 9H3zm13.5 3a3.5 3.5 0 0 0-2-3.15v6.3a3.5 3.5 0 0 0 2-3.15zM14.5 3.9v2.1a5 5 0 0 1 0 11.9v2.1a7 7 0 0 0 0-16z"/>'; };
+document.addEventListener('keydown',e=>{
+  if(S.screen!=='book')return;
+  if(e.code==='Space'){e.preventDefault();setPlaying(!S.playing)}
+  if(e.code==='ArrowLeft')$('nextBtn').click();
+  if(e.code==='ArrowRight')$('prevBtn').click();
+});
+/* ---------- boot ---------- */
+fetch(`${STORY_ID}/story.json`).then(r=>r.json()).then(story=>{
+  S.story=story;
+  document.title=`كتاب الحكايات — ${story.title}`;
+  $('coverTitle').textContent=story.title;
+  $('coverArt').innerHTML=ART.cover();
+  $('endArt').innerHTML=ART.sky();
+  renderSpread(story.pages[0]);
+}).catch(()=>{ $('coverTitle').textContent='تعذر تحميل القصة'; });
+requestAnimationFrame(tick);
+/* test hooks (used by the automated review harness) */
+window.__book={S,enterPage,flipTo,seekTo,setPlaying,
+  state:()=>({screen:S.screen,page:S.page,playing:S.playing,audioOk:S.audioOk,
+    curWord:S.curWord,shown:document.querySelectorAll('#textHalf .w.shown').length,
+    total:curPage()?curPage().words.length:0}),
+  start:()=>$('startBtn').click(),
+  holdFlip:v=>{S.holdFlip=v}};
+</script>
+</body>
+</html>
