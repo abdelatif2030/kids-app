@@ -4,7 +4,7 @@
 // the entrance rack, serve astronaut and alien shoppers at the checkout, gather star coins, build a second rack,
 // robot cashiers and at last the hyper checkout. No network, no links, no ads, no tracking.
 import * as THREE from 'three';
-import { Store, PADS, DISPENSER, RACKS, SHELVES, CHECKOUTS, SHUTTLES, BOUNDS, normalizeSave } from './sim.js';
+import { Store, PADS, DISPENSER, RACKS, SHELVES, CHECKOUTS, SHUTTLES, BOUNDS, normalizeSave, starsFor } from './sim.js';
 import {
   mat, makeAstronaut, makeAlien, makeBasket, makeDispenser, makeRack, makeShelf, makeCheckout, makeRobot, loadRealRobot, makeCoin,
   makeShuttlePad, makeDeck, makePlanet, makeStars, makeHazard,
@@ -425,7 +425,7 @@ class Game {
     this._burst(this.store.p.x, 2, this.store.p.z, 120);
     const dim = h('div', { class: 'ss-dim' }, h('div', { class: 'ss-panel' },
       h('div', { class: 'ss-title' }, t('done')),
-      h('div', { class: 'ss-stars' }, '⭐⭐⭐'),
+      h('div', { class: 'ss-stars' }, '⭐'.repeat(starsFor(this.save.served)) + '☆'.repeat(3 - starsFor(this.save.served))),
       h('div', { class: 'ss-stat' }, h('span', {}, '😊 ', num(this.save.served), ' ', t('served'))),
       h('button', { class: 'ss-btn', onclick: () => { dim.remove(); this.paused = false; } }, '▶ ', t('keep'))));
     this.paused = true;
@@ -443,6 +443,8 @@ class Game {
         case 'full': this.sound.play('full'); this.voice.say('near'); this.toast(t('full'), 1); break;
         case 'rack': this.sound.play('rack'); this.voice.say('trick'); break;
         case 'arrive': if (Math.random() < 0.6) this.sound.play('arrive'); { const sh = this.shuttles.find((x) => Math.abs(x.sh.x - e.x) < 0.1); if (sh) sh.land = 1; } break;
+        case 'rocket': this.sound.play('arrive'); this.voice.say('pickup'); this.toast(t('rocket'), 2.2); { const sh = this.shuttles.find((x) => Math.abs(x.sh.x - e.x) < 0.1); if (sh) sh.land = 1; } break;
+        case 'giveUp': this.toast(t('bye'), 2.4); break;
         case 'sold': {
           this.sound.play(e.by === 'robot' && dist(st.p, e) > 6 ? 'beep' : 'sold');
           this.voice.say('pickup');

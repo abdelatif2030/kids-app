@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Bakery } from '../src/sim.js';
+import { Bakery, starsFor } from '../src/sim.js';
 import { PADS, normalizeSave, capacityOf, OVENS, COUNTER_ZONE, CASH_ZONE, CHUTE, FIELDS, BOUNDS } from '../src/data.js';
 
 const dist = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
@@ -167,4 +167,19 @@ test('damaged saves load safely', () => {
   const s = normalizeSave({ unlocked: ['nope', 'basket', 'basket'], paid: { field2: 9999, chute: 5 } });
   assert.deepEqual(s.unlocked, ['basket']);
   assert.deepEqual(s.paid, { chute: 5 });
+});
+
+test('all four shipped panoramas + win art exist for the backdrop ring', async () => {
+  const { existsSync } = await import('node:fs');
+  const { fileURLToPath } = await import('node:url');
+  const artDir = fileURLToPath(new URL('../../../assets/games/pumpkin_pie/art/', import.meta.url));
+  for (let n = 1; n <= 4; n++) assert.ok(existsSync(`${artDir}pano${n}.webp`), `missing pano${n}.webp`);
+  assert.ok(existsSync(`${artDir}win.webp`), 'missing win.webp');
+});
+
+test('stars are earned by service, never automatic', () => {
+  assert.equal(starsFor(0), 1);
+  assert.equal(starsFor(34), 1);
+  assert.equal(starsFor(35), 2);
+  assert.equal(starsFor(80), 3);
 });

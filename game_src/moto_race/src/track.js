@@ -1,15 +1,17 @@
-// The coastal circuit: a smooth closed curve through control points, sampled every 2 m. Each sample knows its
-// position, direction, curvature and distance from the start line, so the race can find where anything is on the
-// track quickly. Pure maths, no drawing.
+// Moto Race — the heritage coastal Grand Prix circuit (Alexandria → Giza → Luxor tour). A smooth closed curve
+// through control points, sampled every 2 m. Each sample knows its position, direction, curvature and distance
+// from the start line, so the race can find where anything is on the track quickly. Pure maths, no drawing.
+// This layout belongs to Moto Race alone: a long main straight by the stands, a tightened hairpin, fast sweepers
+// along the sea, and the Sphinx chicane on the back straight — dune_titans and rain_circuit have their own tracks.
 
 export const HALF_W = 6.5; // road half width (m)
 export const WALL = HALF_W + 4; // the barriers
 const STEP = 2;
 
-// a coastal Grand Prix: long main straight by the stands, a hairpin, fast sweepers along the sea, a twisty section
+// the heritage circuit: main straight, tight hairpin at the harbour end, sea sweepers, then the chicane
 const POINTS = [
-  [0, 0], [120, 0], [220, 4], [278, 30], [298, 80], [282, 128], [236, 150], [178, 150], [146, 178], [150, 232],
-  [126, 284], [60, 306], [-20, 300], [-92, 270], [-136, 214], [-140, 150], [-112, 104], [-118, 60], [-90, 18], [-48, 2],
+  [0, 0], [120, 0], [220, 4], [276, 28], [292, 74], [280, 126], [236, 150], [178, 150], [146, 178], [150, 232],
+  [126, 284], [88, 314], [38, 316], [-20, 300], [-92, 270], [-136, 214], [-140, 150], [-112, 104], [-118, 60], [-90, 18], [-48, 2],
 ];
 
 function catmull(p0, p1, p2, p3, t) {

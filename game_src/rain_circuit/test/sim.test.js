@@ -1,14 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Race, ROUNDS, LAPS, normalizeSave } from '../src/sim.js';
-import { buildTrack, nearest, lateral, pointAt, curvAhead, safeSpeed, HALF_W, WALL } from '../src/track.js';
+import { buildTrack, nearest, lateral, pointAt, curvAhead, safeSpeed, wetAt, HALF_W, WALL } from '../src/track.js';
 
 /** A robot rider: the same racing brain the rivals use, steering through the child's controls. */
 function robot(race, opts = {}) {
   const r = race.player;
   const ctl = race._ai(r);
   const c = curvAhead(race.track, r.i, 25 + r.v * 1.3);
-  const target = safeSpeed(race.track, r.i, r.v, 16 * 0.95);
+  const target = safeSpeed(race.track, r.i, r.v, race.gripBase * wetAt(race.track, r.i) * 0.95, 15);
   return { steer: ctl.steer, brake: !opts.noBrake && r.v > target + 1.5, nitro: opts.nitro !== false && c.abs < 0.003 && r.nitro > 0.6 };
 }
 
@@ -22,14 +22,19 @@ function run(race, opts) {
   return { t, walls };
 }
 
-test('the circuit is a smooth closed loop about 1.7 km long', () => {
+test('the corniche is a smooth closed loop about 1.9 km long, with puddles', () => {
   const tr = buildTrack();
   assert.ok(tr.length > 1400 && tr.length < 2400, `length ${tr.length}`);
   let maxCurv = 0;
   for (let i = 0; i < tr.N; i++) maxCurv = Math.max(maxCurv, Math.abs(tr.curv[i]));
   assert.ok(maxCurv < 1 / 18, `tightest corner radius ${(1 / maxCurv).toFixed(1)} m`);
-  // the start is a straight
-  for (let i = 0; i < 25; i++) assert.ok(Math.abs(tr.curv[i]) < 0.006);
+  // the wet profile: merely damp at the start line, standing water in the puddle bands
+  assert.ok(wetAt(tr, 0) > 0.95, `start wet ${wetAt(tr, 0)}`);
+  let minWet = 1;
+  for (let i = 0; i < tr.N; i++) minWet = Math.min(minWet, wetAt(tr, i));
+  assert.ok(minWet < 0.65, `deepest puddle grip ${minWet}`);
+  // the start sweeps gently onto the harbour straight (radius > 60 m — no kink at the line)
+  for (let i = 0; i < 25; i++) assert.ok(Math.abs(tr.curv[i]) < 0.016);
   const p = pointAt(tr, 100, 3);
   assert.ok(Math.abs(lateral(tr, nearest(tr, p.x, p.z), p.x, p.z) - 3) < 0.5, 'right is right');
   const rev = buildTrack(true);
@@ -75,7 +80,8 @@ test('the slipstream builds behind a rider and gives speed and nitro; nitro is a
   assert.ok(p.nitro > 0.05);
   const race2 = new Race({ round: 0, seed: 2 });
   race2.state = 'race';
-  race2.player.v = 40;
+  // on the harbour straight for the boost check (the grid sits just before the citadel hairpin)
+  Object.assign(race2.player, pointAt(race2.track, 30, 0), { h: race2.track.ang[30], v: 40, i: 30, prog: 60, nitro: 1 });
   race2.step(1 / 30, { nitro: true });
   assert.ok(race2.player.boost > 0);
   let v0 = race2.player.v;

@@ -1,31 +1,35 @@
-// The race with no drawing. Six riders, two laps of the coastal circuit. The bikes accelerate by themselves (the child
-// steers, brakes and fires nitro); grip limits how sharp a bike can turn at speed, so a corner taken too fast runs
-// wide onto the grass (slow) or against the soft barriers (never a crash). Riding close behind someone fills the
-// slipstream (more top speed and nitro); nitro is a short boost. The rivals follow a racing line, brake for corners
+// Alexandria Storm GP — the race with no drawing. Six cars, two laps of the Corniche in a winter storm.
+// The cars accelerate by themselves (the child steers, brakes and fires nitro); the road is WET, so grip is
+// scarce and scarcer every round as the storm grows (each round's `rain`), and the puddle bands (wetAt) are
+// slipperiest of all — a corner taken too fast slides wide onto the promenade (slow) or against the sea wall
+// (never a crash). Brakes bite late on a wet road (DECEL). Riding close behind someone fills the slipstream
+// (more top speed and nitro); nitro is a short boost. The rivals follow a racing line, brake for corners
 // and overtake. Deterministic with a seed, so a robot test can race.
-import { buildTrack, nearest, lateral, pointAt, curvAhead, safeSpeed, HALF_W, WALL } from './track.js';
+import { buildTrack, nearest, lateral, pointAt, curvAhead, safeSpeed, wetAt, HALF_W, WALL } from './track.js';
 
-export const LAPS = 3;
-const GRIP = 16; // m/s² of cornering
-const PLAYER_VMAX = 61;
-const ACCEL = 15;
+export const LAPS = 2;
+export const GRIP = 12.5; // m/s² of cornering on wet tarmac, before the round's rain and the puddles
+const DECEL = 15; // wet braking: the cars need much longer to slow down
+const PLAYER_VMAX = 59;
+const ACCEL = 14;
+const STEER_RATE = 5.5; // the steering answers slowly, like tyres on a wet road
 
 export const ROUNDS = [
-  { id: 1, ar: 'تلال المطر', en: 'Rain Hills', reverse: false, rival: 52, sunset: false, skill: 0.9 },
-  { id: 2, ar: 'طريق النخيل المبلول', en: 'Wet Palm Road', reverse: true, rival: 55, sunset: false, skill: 0.97 },
-  { id: 3, ar: 'وادي الضباب', en: 'Misty Valley', reverse: false, rival: 57.5, sunset: true, skill: 1.03 },
-  { id: 4, ar: 'كأس العاصفة', en: 'Storm Cup', reverse: true, rival: 59.5, sunset: true, skill: 1.08 },
-  { id: 5, ar: 'مستنقع الرعد', en: 'Thunder Marsh', reverse: false, rival: 60.5, sunset: true, skill: 1.1 },
-  { id: 6, ar: 'بطولة العاصفة الكبرى', en: 'Grand Storm Championship', reverse: true, rival: 61, sunset: true, skill: 1.12 },
+  { id: 1, ar: 'سيدي جابر', en: 'Sidi Gaber', reverse: false, rival: 50, sunset: false, skill: 0.9, rain: 0.3 },
+  { id: 2, ar: 'محطة الرمل', en: 'Raml Station', reverse: true, rival: 52.5, sunset: false, skill: 0.97, rain: 0.45 },
+  { id: 3, ar: 'المنشية', en: 'El Mansheya', reverse: false, rival: 54.5, sunset: false, skill: 1.03, rain: 0.6 },
+  { id: 4, ar: 'جسر ستانلي', en: 'Stanley Bridge', reverse: true, rival: 56, sunset: false, skill: 1.08, rain: 0.75 },
+  { id: 5, ar: 'المنتزه', en: 'Montazah', reverse: false, rival: 56.5, sunset: true, skill: 1.07, rain: 0.9 },
+  { id: 6, ar: 'نهائي قلعة قايتباي', en: 'Qaitbey Citadel Final', reverse: true, rival: 57.5, sunset: true, skill: 1.08, rain: 1 },
 ];
 
 export const RIDERS = [
   { kind: 'kid', ar: 'أنت', en: 'You', color: 0xe8342a, suit: 0x1c1d22, helmet: 0xe8342a, num: 7 },
-  { kind: 'rider', ar: 'سليم', en: 'Salim', color: 0x2a6ae8, suit: 0x1a2a5a, helmet: 0x2a6ae8, num: 12 },
-  { kind: 'rider', ar: 'ليلى', en: 'Laila', color: 0xff6aa8, suit: 0x3a1a2a, helmet: 0xffffff, num: 21 },
-  { kind: 'rider', ar: 'عمر', en: 'Omar', color: 0x2ab85a, suit: 0x1a3a22, helmet: 0xffd23a, num: 5 },
-  { kind: 'rider', ar: 'مريم', en: 'Mariam', color: 0xf2d21a, suit: 0x2a2c34, helmet: 0xf2b21a, num: 33 },
-  { kind: 'rider', ar: 'يوسف', en: 'Youssef', color: 0x8a3ae8, suit: 0x241a3a, helmet: 0x8a3ae8, num: 46 },
+  { kind: 'rider', ar: 'فريدة', en: 'Farida', color: 0xff6aa8, suit: 0x3a1a2a, helmet: 0xffffff, num: 21 },
+  { kind: 'rider', ar: 'زياد', en: 'Ziad', color: 0x2a6ae8, suit: 0x1a2a5a, helmet: 0x2a6ae8, num: 12 },
+  { kind: 'rider', ar: 'هناء', en: 'Hana', color: 0x2ab85a, suit: 0x1a3a22, helmet: 0xffd23a, num: 5 },
+  { kind: 'rider', ar: 'رامي', en: 'Rami', color: 0xf2d21a, suit: 0x2a2c34, helmet: 0xf2b21a, num: 33 },
+  { kind: 'rider', ar: 'دينا', en: 'Dina', color: 0x8a3ae8, suit: 0x241a3a, helmet: 0x8a3ae8, num: 46 },
 ];
 
 function rng(seed) {
@@ -45,6 +49,7 @@ export class Race {
   constructor(opts = {}) {
     this.round = ROUNDS[opts.round ?? 0];
     this.track = buildTrack(this.round.reverse);
+    this.gripBase = GRIP * (1 - 0.28 * (this.round.rain ?? 0.5)); // the harder it rains, the less anyone grips
     this.easy = !!opts.easy;
     this.assist = opts.assist ?? (this.easy ? 0.75 : 0.35);
     this.rand = rng(opts.seed ?? 11);
@@ -65,7 +70,7 @@ export class Race {
       return {
         id: k, ...r, x: p.x, z: p.z, h: p.a, v: 0, i, lat: side, prog: -back, steer: 0, lean: 0, vmax,
         nitro: k === 0 ? 1 : 0.5, boost: 0, draft: 0, crashT: 0, off: false, place: k + 1, done: false, finishT: 0,
-        lane: (this.rand() - 0.5) * 3, wallT: 0, isPlayer: k === 0, grip: k === 0 ? GRIP : GRIP * this.round.skill * (this.easy ? 0.9 : 1),
+        lane: (this.rand() - 0.5) * 3, wallT: 0, isPlayer: k === 0, grip: k === 0 ? this.gripBase * 1.05 : this.gripBase * this.round.skill * (this.easy ? 0.9 : 1), // the hero car wears the good wet tyres
       };
     });
     this.player = this.riders[0];
@@ -118,7 +123,7 @@ export class Race {
     let brake = !!input.brake;
     if (this.easy && !brake) {
       // the youngest also get a gentle automatic brake before a corner
-      if (r.v > safeSpeed(this.track, r.i, r.v, GRIP) * 1.05) brake = true;
+      if (r.v > safeSpeed(this.track, r.i, r.v, this.gripBase * wetAt(this.track, r.i), DECEL) * 1.05) brake = true;
     }
     if (input.nitro && r.nitro >= 0.3 && r.boost <= 0) {
       r.boost = 0.8 + r.nitro * 2;
@@ -149,7 +154,7 @@ export class Race {
     // speed for the corner, a little rubber band so races stay close
     const lead = r.prog - this.player.prog;
     let vmax = r.vmax * (lead > 70 ? 0.92 : lead < -90 ? 1.06 : 1);
-    vmax = Math.min(vmax, safeSpeed(tr, r.i, r.v, r.grip * 0.95));
+    vmax = Math.min(vmax, safeSpeed(tr, r.i, r.v, r.grip * wetAt(tr, r.i) * 0.95, DECEL));
     const brake = r.v > vmax + 1.5;
     // nitro on a straight now and then
     if (r.nitro >= 0.9 && c.abs < 0.003 && r.boost <= 0 && this.rand() < 0.01) { r.boost = 2; r.nitro = 0; this.events.push({ type: 'nitro', id: r.id }); }
@@ -166,7 +171,7 @@ export class Race {
       r.x += Math.sin(r.h) * r.v * dt;
       r.z += Math.cos(r.h) * r.v * dt;
       if (r.crashT <= 0) {
-        // back on the bike, on the track, pointing the right way
+        // back on the road, pointing the right way
         const side = Math.max(-HALF_W + 1.5, Math.min(HALF_W - 1.5, r.lat));
         const p = pointAt(tr, r.i, side);
         Object.assign(r, { x: p.x, z: p.z, h: tr.ang[r.i], lat: side, v: 6, steer: 0, off: false, boost: 0 });
@@ -182,12 +187,13 @@ export class Race {
     else if (ctl.gas !== false) r.v += (r.boost > 0 ? ACCEL * 1.8 : ACCEL) * Math.max(0, 1 - r.v / vmax) * dt;
     if (r.v > vmax) r.v -= (r.v - vmax) * (r.off ? 2.5 : 1.2) * dt;
     // steering: grip limits the turn at speed (too fast = runs wide)
-    r.steer += (ctl.steer - r.steer) * Math.min(1, dt * 8);
-    const maxYaw = Math.min(1.5, r.grip / Math.max(6, r.v));
+    r.steer += (ctl.steer - r.steer) * Math.min(1, dt * STEER_RATE);
+    const gripNow = r.grip * wetAt(tr, r.i); // puddles bite here
+    const maxYaw = Math.min(1.5, gripNow / Math.max(6, r.v));
     const yaw = r.steer * maxYaw * Math.min(1, r.v / 4);
     r.h = wrap(r.h - yaw * dt);
-    r.lean = clamp(-yaw * r.v / GRIP, -1, 1); // lean into the turn (visual)
-    if (Math.abs(r.steer) > 0.85 && r.v > 30 && !r.off) r.skid = Math.min(1, (r.skid ?? 0) + dt * 3); else r.skid = Math.max(0, (r.skid ?? 0) - dt * 4);
+    r.lean = clamp(-yaw * r.v / gripNow, -1, 1); // lean into the turn (visual)
+    if (Math.abs(r.steer) > 0.85 && r.v > 24 && !r.off) r.skid = Math.min(1, (r.skid ?? 0) + dt * 3); else r.skid = Math.max(0, (r.skid ?? 0) - dt * 4);
     r.x += Math.sin(r.h) * r.v * dt;
     r.z += Math.cos(r.h) * r.v * dt;
     const before = r.i;
@@ -250,8 +256,8 @@ export class Race {
     const tr = this.track;
     r.v = Math.max(18, r.v - 8 * dt);
     const ctl = this._ai(r);
-    r.steer += (ctl.steer - r.steer) * Math.min(1, dt * 8);
-    const yaw = r.steer * Math.min(1.5, GRIP / Math.max(6, r.v));
+    r.steer += (ctl.steer - r.steer) * Math.min(1, dt * STEER_RATE);
+    const yaw = r.steer * Math.min(1.5, r.grip / Math.max(6, r.v));
     r.h = wrap(r.h - yaw * dt);
     r.x += Math.sin(r.h) * r.v * dt;
     r.z += Math.cos(r.h) * r.v * dt;

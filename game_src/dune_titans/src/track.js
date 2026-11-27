@@ -1,15 +1,23 @@
-// The coastal circuit: a smooth closed curve through control points, sampled every 2 m. Each sample knows its
-// position, direction, curvature and distance from the start line, so the race can find where anything is on the
-// track quickly. Pure maths, no drawing.
+// Oasis Rally — the Western Desert track. One long loop of dirt road between oasis camps, sampled every 2 m.
+// Nothing like the coastal circuit it was born from: the loop is more than twice as long, the road is wide
+// enough for rally trucks side by side, the corners are broad desert sweepers, and the sand itself changes
+// along the way — firm packed dirt in most places, soft drifts in the dune fields where cornering grip drops.
+// Pure maths, no drawing.
 
-export const HALF_W = 6.5; // road half width (m)
-export const WALL = HALF_W + 4; // the barriers
+export const HALF_W = 9; // a wide dirt road for trucks (m)
+export const WALL = HALF_W + 6; // the rock outcrops and marker posts at the edge
 const STEP = 2;
+const SCALE = 2.0;
 
-// a coastal Grand Prix: long main straight by the stands, a hairpin, fast sweepers along the sea, a twisty section
+// a desert loop: long straights between camps, a flowing S through the dune sea, one tight rock-valley pass
 const POINTS = [
-  [0, 0], [120, 0], [220, 4], [278, 30], [298, 80], [282, 128], [236, 150], [178, 150], [146, 178], [150, 232],
-  [126, 284], [60, 306], [-20, 300], [-92, 270], [-136, 214], [-140, 150], [-112, 104], [-118, 60], [-90, 18], [-48, 2],
+  [0, 0], [180, 0], [330, 20], [420, 90], [440, 190], [390, 270], [290, 300], [210, 270], [190, 340], [230, 430],
+  [180, 510], [80, 540], [-40, 520], [-140, 450], [-170, 340], [-150, 230], [-100, 150], [-110, 70], [-60, 20],
+];
+
+// soft-sand drifts sit at these fractions of the lap (centre, depth of the grip dip)
+const DRIFTS = [
+  [0.16, 0.3], [0.44, 0.38], [0.68, 0.3], [0.88, 0.42],
 ];
 
 function catmull(p0, p1, p2, p3, t) {
@@ -19,7 +27,7 @@ function catmull(p0, p1, p2, p3, t) {
 }
 
 export function buildTrack(reverse = false) {
-  const big = POINTS.map(([x, z]) => [x * 1.3, z * 1.3]);
+  const big = POINTS.map(([x, z]) => [x * SCALE, z * SCALE]);
   const pts = reverse ? [...big].reverse() : big;
   const n = pts.length;
   // dense polyline
@@ -65,7 +73,7 @@ export function buildTrack(reverse = false) {
   const curv = new Float64Array(N);
   for (let i = 0; i < N; i++) {
     const j = (i + 1) % N;
-    ang[i] = Math.atan2(xs[j] - xs[i], zs[j] - zs[i]); // heading: 0 = +z, like the bikes
+    ang[i] = Math.atan2(xs[j] - xs[i], zs[j] - zs[i]); // heading: 0 = +z, like the trucks
   }
   for (let i = 0; i < N; i++) {
     let d = ang[(i + 2) % N] - ang[(i - 2 + N) % N];
@@ -73,7 +81,23 @@ export function buildTrack(reverse = false) {
     while (d < -Math.PI) d += Math.PI * 2;
     curv[i] = d / (4 * STEP); // 1/radius, sign = turning direction
   }
-  return { N, step: STEP, length: N * STEP, xs, zs, ang, curv, reverse };
+  // the sand grip profile: 1 on packed dirt, dipping inside each drift (smooth gaussian dips)
+  const grip = new Float64Array(N).fill(1);
+  for (let i = 0; i < N; i++) {
+    const f = i / N;
+    for (const [c, depth] of DRIFTS) {
+      let d = Math.abs(f - c);
+      if (d > 0.5) d = 1 - d;
+      grip[i] -= depth * Math.exp(-(d * d) / (2 * 0.012 * 0.012));
+    }
+  }
+  return { N, step: STEP, length: N * STEP, xs, zs, ang, curv, grip, reverse };
+}
+
+/** Cornering grip multiplier at sample i: soft sand in the drifts, firm dirt elsewhere. */
+export function gripAt(tr, i) {
+  const k = ((i % tr.N) + tr.N) % tr.N;
+  return tr.grip[k];
 }
 
 /** Index of the sample nearest to (x, z), searching near a hint index. */
@@ -97,7 +121,6 @@ export function lateral(tr, i, x, z) {
   const a = tr.ang[i];
   const dx = x - tr.xs[i];
   const dz = z - tr.zs[i];
-  // right vector of heading a (forward = (sin a, cos a)) is (cos a, -sin a)... in x/z: right = (-cos a, sin a)? use cross
   return dx * -Math.cos(a) + dz * Math.sin(a);
 }
 
@@ -108,7 +131,7 @@ export function pointAt(tr, i, side = 0) {
   return { x: tr.xs[k] - Math.cos(a) * side, z: tr.zs[k] + Math.sin(a) * side, a };
 }
 
-/** The tightest curvature in the next `metres` (for braking and for the riders' speed choice). */
+/** The tightest curvature in the next `metres` (for braking and for the drivers' speed choice). */
 export function curvAhead(tr, i, metres) {
   let m = 0;
   let sign = 0;

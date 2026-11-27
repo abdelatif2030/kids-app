@@ -1,9 +1,11 @@
-// Obstacle course race with no drawing (used by «سباق السماء الغريبة» alien sky and «سباق الغيوم» rhino summit).
-// The runner moves forward by itself; the child steers left/right, taps to jump and (alien) taps the jetpack to recover
-// from a missed jump (3 bursts). Obstacles never end the game: a hit knocks the runner back a few metres, a fall puts it
-// back on the ledge with a short pause. Rivals run beside. Six rounds: finish in the top K to qualify, win the final.
+// Obstacle course race with no drawing (used by «زومي في الفضا» alien sky and «كركوز وقمم مصر» rhino summit).
+// The runner moves forward by itself; the child steers left/right and taps to jump. Each hero has ONE special the
+// other does not: the alien's JETPACK (3 bursts, recovers a missed jump) and the rhino's HEAD-CHARGE (a metered
+// burst that smashes gates for a big boost; an uncharged gate still breaks but bumps him back). Obstacles never end
+// the game: a hit knocks the runner back a few metres, a fall puts it back on the ledge with a short pause.
+// Rivals run beside. Six rounds: finish in the top K to qualify, win the final.
 //   alien: gaps, rings (speed), doors that open and close, meteors, tube shortcuts, jetpack, rocket at the end
-//   rhino: gaps, breakaway gates, spinning sweepers, swinging hammers, bounce pads, power-ups, golden gate at the end
+//   rhino: gaps, breakaway gates (charge!), spinning sweepers, swinging hammers, bounce pads (refill the charge), golden gate at the end
 import { rng, clamp } from '../../cozy_kit/ui.js';
 
 export const HALF = 3.6;
@@ -66,7 +68,7 @@ export class Race {
     this.L = c.L;
     this.els = c.els;
     if (this.easy) for (const e of this.els) if (e.kind === 'gap') e.len = Math.max(3.4, e.len - 1.4);
-    this.p = { x: 0, z: 0, y: 0, vy: 0, grounded: true, stun: 0, fall: 0, boost: 0, jets: 3, jet: 0, safeZ: 0, hits: 0, falls: 0, rings: 0, finished: false, place: 0 };
+    this.p = { x: 0, z: 0, y: 0, vy: 0, grounded: true, stun: 0, fall: 0, boost: 0, jets: 3, jet: 0, charge: 1, charging: 0, safeZ: 0, hits: 0, falls: 0, rings: 0, finished: false, place: 0 };
     this.rivals = Array.from({ length: this.cfg.rivals }, (_, i) => ({ id: i + 1, z: -2 - i * 1.4, x: -3 + i * 1.2, speed: 10.2 + this.rand() * 1.5 + this.round * 0.35, stumble: 0, nextS: 3 + this.rand() * 5, finished: false, t: 0 }));
     this.time = 0;
     this.go = 3; // countdown
@@ -89,7 +91,16 @@ export class Race {
     return true;
   }
 
-  get speed() { return (this.easy ? 10.5 : 12) * (this.p.boost > 0 ? 1.35 : 1); }
+  /** The rhino's head-charge: a 1.3 s burst paid from the charge meter (the alien has no charge). */
+  charge() {
+    const p = this.p;
+    if (this.theme !== 'rhino' || p.charging > 0 || p.charge < 0.35 || p.stun > 0 || p.fall > 0 || this.state !== 'run') return false;
+    p.charging = 1.3;
+    this.events.push({ type: 'charge' });
+    return true;
+  }
+
+  get speed() { return (this.easy ? 10.5 : 12) * (this.p.boost > 0 ? 1.35 : 1) * (this.p.charging > 0 ? 1.45 : 1); }
 
   _overGap(z) { for (const e of this.els) if (e.kind === 'gap' && z > e.z && z < e.z + e.len) return e; return null; }
 
@@ -105,6 +116,8 @@ export class Race {
     }
     // player
     p.boost = Math.max(0, p.boost - dt);
+    if (p.charging > 0) { p.charging = Math.max(0, p.charging - dt); p.charge = Math.max(0, p.charge - dt / 1.3); }
+    else p.charge = Math.min(1, p.charge + dt / 3.5);
     p.stun = Math.max(0, p.stun - dt);
     p.x += (this.targetX - p.x) * Math.min(1, dt * 10);
     if (p.fall > 0) {
@@ -133,7 +146,12 @@ export class Race {
           if (!open && dz > -0.4 && dz < 0.5 && p.y < 2.4 && p.stun <= 0 && !p.finished) { p.z = e.z - 1.2; p.stun = 0.5; p.hits += 1; ev.push({ type: 'hit', kind: 'door' }); }
           break;
         }
-        case 'gate': if (!e.hit && dz > -0.4 && dz < 0.6 && !p.finished) { e.hit = true; p.boost = Math.max(p.boost, p.y > 0.8 ? 0 : 1.2); ev.push({ type: 'smash', kind: 'gate', diving: p.y <= 0.8 }); } break;
+        case 'gate': if (!e.hit && dz > -0.4 && dz < 0.6 && !p.finished) {
+          e.hit = true;
+          if (p.y > 0.8) { ev.push({ type: 'smash', kind: 'gate', diving: true }); } // a clean dive through the frame
+          else if (p.charging > 0) { p.boost = Math.max(p.boost, 1.6); ev.push({ type: 'smash', kind: 'gate', charged: true }); }
+          else { p.z = Math.max(0, p.z - 2.5); p.stun = Math.max(p.stun, 0.45); p.hits += 1; ev.push({ type: 'smash', kind: 'gate', charged: false }); ev.push({ type: 'hit', kind: 'gate' }); }
+        } break;
         case 'meteor': {
           const ph = (this.time + e.phase) % e.period;
           e.fall = ph / e.period; // 0..1 falling, impact at ~0.85-1
@@ -160,7 +178,7 @@ export class Race {
         }
         case 'ring': if (!e.hit && Math.abs(dz) < 1 && Math.abs(p.x - e.x) < e.rad && p.y < 3.4 && !p.finished) { e.hit = true; p.boost = 1.4; p.rings += 1; ev.push({ type: 'ring' }); } break;
         case 'boost': if (!e.hit && Math.abs(dz) < 1 && Math.abs(p.x - e.x) < e.rad && !p.finished) { e.hit = true; p.boost = 2; ev.push({ type: 'power' }); } break;
-        case 'pad': if (!e.hit && Math.abs(dz) < 1 && Math.abs(p.x - e.x) < e.rad && !p.finished && p.grounded) { e.hit = true; p.vy = 16; p.grounded = false; ev.push({ type: 'bounce' }); } else if (e.hit && Math.abs(dz) > 3) e.hit = false; break;
+        case 'pad': if (!e.hit && Math.abs(dz) < 1 && Math.abs(p.x - e.x) < e.rad && !p.finished && p.grounded) { e.hit = true; p.vy = 16; p.grounded = false; p.charge = 1; ev.push({ type: 'bounce' }); } else if (e.hit && Math.abs(dz) > 3) e.hit = false; break;
         case 'tube': if (!e.hit && Math.abs(dz) < 1 && Math.abs(p.x - e.x) < e.rad && p.y < 1.2 && !p.finished) { e.hit = true; p.z += e.skip; p.stun = 0; ev.push({ type: 'tube' }); } break;
         default: break;
       }

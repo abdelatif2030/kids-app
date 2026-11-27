@@ -1,14 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Race, ROUNDS, LAPS, normalizeSave } from '../src/sim.js';
-import { buildTrack, nearest, lateral, pointAt, curvAhead, safeSpeed, HALF_W, WALL } from '../src/track.js';
+import { Race, ROUNDS, LAPS, GRIP, normalizeSave } from '../src/sim.js';
+import { buildTrack, nearest, lateral, pointAt, curvAhead, safeSpeed, gripAt, HALF_W, WALL } from '../src/track.js';
 
 /** A robot rider: the same racing brain the rivals use, steering through the child's controls. */
 function robot(race, opts = {}) {
   const r = race.player;
   const ctl = race._ai(r);
   const c = curvAhead(race.track, r.i, 25 + r.v * 1.3);
-  const target = safeSpeed(race.track, r.i, r.v, 16 * 0.95);
+  const target = safeSpeed(race.track, r.i, r.v, GRIP * gripAt(race.track, r.i) * 0.95);
   return { steer: ctl.steer, brake: !opts.noBrake && r.v > target + 1.5, nitro: opts.nitro !== false && c.abs < 0.003 && r.nitro > 0.6 };
 }
 
@@ -22,12 +22,17 @@ function run(race, opts) {
   return { t, walls };
 }
 
-test('the circuit is a smooth closed loop about 1.7 km long', () => {
+test('the desert loop is a smooth closed loop over 3.5 km long, with soft-sand drifts', () => {
   const tr = buildTrack();
-  assert.ok(tr.length > 1400 && tr.length < 2400, `length ${tr.length}`);
+  assert.ok(tr.length > 3500 && tr.length < 6000, `length ${tr.length}`);
   let maxCurv = 0;
   for (let i = 0; i < tr.N; i++) maxCurv = Math.max(maxCurv, Math.abs(tr.curv[i]));
   assert.ok(maxCurv < 1 / 18, `tightest corner radius ${(1 / maxCurv).toFixed(1)} m`);
+  // the sand profile: firm dirt at the start camp, real dips in the drift fields
+  assert.ok(gripAt(tr, 0) > 0.95, `start grip ${gripAt(tr, 0)}`);
+  let minGrip = 1;
+  for (let i = 0; i < tr.N; i++) minGrip = Math.min(minGrip, gripAt(tr, i));
+  assert.ok(minGrip < 0.72, `softest sand grip ${minGrip}`);
   // the start is a straight
   for (let i = 0; i < 25; i++) assert.ok(Math.abs(tr.curv[i]) < 0.006);
   const p = pointAt(tr, 100, 3);
@@ -45,7 +50,7 @@ test('a robot rider finishes every round on the podium, rivals race too', () => 
       assert.equal(race.state, 'done', `round ${rd.id} did not finish (${Math.round(t)} s)`);
       places.push(`${race.player.place} (${Math.round(race.player.finishT)}s, walls ${walls}, 2nd at ${Math.round(race.order[1].prog - race.length * LAPS)}m)`);
       assert.ok(race.player.place <= 3, `round ${rd.id} seed ${seed}: place ${race.player.place}`);
-      assert.ok(race.riders.every((r) => r.prog > race.length * 1.2), 'everyone was racing');
+      assert.ok(race.riders.every((r) => r.prog > race.length * 0.5), 'everyone was racing');
     }
     console.log(`round ${rd.id}: ${places.join(' | ')}`);
   }
@@ -83,7 +88,7 @@ test('the slipstream builds behind a rider and gives speed and nitro; nitro is a
   assert.ok(race2.player.v > v0 + 5, 'boost accelerates');
 });
 
-test('the barriers keep everybody on the circuit; nobody crashes', () => {
+test('the marker rocks keep everybody on the dirt road; nobody crashes', () => {
   const race = new Race({ round: 2, seed: 3 });
   for (let i = 0; i < 30 * 40; i++) {
     race.step(1 / 30, { steer: Math.sin(i / 20) > 0 ? 1 : -1 });

@@ -1,7 +1,10 @@
-// Shared 3D obstacle-course race for «سباق السماء الغريبة» (alien, floating islands, rings, doors, meteors, tubes, jetpack,
-// rocket) and «سباق الغيوم» (helmeted rhino, breakaway gates, sweepers, hammers, bounce pads, golden gate). Entry: alien.js /
-// rhino.js. Drag to steer, tap/JUMP to jump, JET (alien) to recover. Six rounds: qualify, then win the final. three.js, art and
-// sound made in code. No network, no ads, no tracking. Nothing is lost: a hit pushes you back, a fall puts you back on the ledge.
+// Shared 3D obstacle-course race engine, two different games. Entry: alien.js / rhino.js.
+//   alien «زومي في الفضا»: floating islands, rings, doors, meteors, tubes, a JETPACK to recover a missed jump, rocket.
+//   rhino «كركوز وقمم مصر»: Karkoz climbs Egypt's peaks (Galala → Red Sea mountains → Saint Catherine) — breakaway
+//   gates he smashes with a metered HEAD-CHARGE, sweepers, hammers, bounce pads that refill the charge, golden gate.
+// Drag to steer, tap/JUMP to jump, JET (alien) / CHARGE (rhino) for the special. Six rounds: qualify, then win the
+// final. three.js, art and sound made in code. No network, no ads, no tracking. Nothing is lost: a hit pushes you
+// back, a fall puts you back on the ledge.
 import * as THREE from 'three';
 import { Race, ROUNDS, HALF, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
@@ -12,16 +15,18 @@ const COURSE_CLIPS = { go: 2, nitro: 3, pickup: 2, charge: 2, trick: 2, bump: 3,
 
 const THEME = {
   alien: { id: 'alien', glob: 'AlienSky', prefix: 'as', title: ['زومي في الفضا', 'Zoomi in Space'], icon: '👽', sky: 0x2a1060, fog: 0x4a2a90, panel: ['#7a3ad8', '#3a1a88'], accent: '#7affc8', end: ['الصاروخ', 'Rocket'], names: ['جزر الإقلاع', 'حقل النيازك', 'سباق الصاروخ', 'مدار الأقمار', 'عاصفة الشهب', 'قلب المجرة'] },
-  rhino: { id: 'rhino', glob: 'RhinoSummit', prefix: 'rs', title: ['كركوز والغيوم', 'Karkoz in the Clouds'], icon: '🦏', sky: 0x7ac8ff, fog: 0xbfe8ff, panel: ['#4a9ad8', '#1a5aa8'], accent: '#ffd23a', end: ['البوابة الدهبية', 'Golden gate'], names: ['سحب الصباح', 'ممر المطارق', 'قمة البوابة الدهبية', 'جسر الغيوم', 'ريح الجبال', 'قمة العمالقة'] },
+  rhino: { id: 'rhino', glob: 'RhinoSummit', prefix: 'rs', title: ['كركوز وقمم مصر', 'Karkoz Climbs Egypt'], icon: '🦏', sky: 0x7ac8ff, fog: 0xbfe8ff, panel: ['#4a9ad8', '#1a5aa8'], accent: '#ffd23a', end: ['البوابة الدهبية', 'Golden gate'], names: ['سفوح الجلالة', 'جبال البحر الأحمر', 'وادي فيران', 'سانت كاترين', 'قمة موسى', 'قمة كاترين الكبرى'] },
 };
 
 const S = {
   level: ['الجولة', 'Round'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'],
   again: ['تاني', 'Again'], next: ['الجولة الجاية', 'Next round'], drag: ['اسحب يمين وشمال — دوس للقفز', 'Drag to steer — tap to jump'],
-  jump: ['قفز', 'JUMP'], jet: ['جيت', 'JET'], place: ['المركز', 'Place'], qualified: ['عدّيت للجولة الجاية!', 'You qualified!'],
+  jump: ['قفز', 'JUMP'], jet: ['جيت', 'JET'], chargeBtn: ['انطلق', 'CHARGE'], place: ['المركز', 'Place'], qualified: ['عدّيت للجولة الجاية!', 'You qualified!'],
   notq: ['قرّبت! لازم تبقى في أول ', 'So close! You need the top '], win: ['كسبت السباق! 🏆', 'You won the race! 🏆'], go: ['انطلق!', 'GO!'],
   locked: ['خلّص الجولة اللي قبلها', 'Finish the round before'], sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
   jetHint: ['لو وقعت قريب من الحافة دوس جيت!', 'Missed a jump? Tap JET!'], win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'],
+  chargeHint: ['دوس «انطلق» قبل البوابة عشان تكسّرها وتجري أسرع!', 'Tap CHARGE before a gate to smash it and speed up!'],
+  summit: ['📔 سجل القمم: وصلت', '📔 Summit journal: you reached'],
 };
 const I = makeI18n(S);
 
@@ -42,6 +47,7 @@ class Sound extends SynthBase {
       case 'bounce': this.slide('sine', 200, 900, t, 0.25, 0.12); break;
       case 'tube': this.slide('sawtooth', 200, 1200, t, 0.4, 0.07); break;
       case 'smash': this.noise(t, 0.2, 0.15, 'bandpass', 800, 1); this.tone('square', 180, t, 0.1, 0.06); break;
+      case 'charge': this.noise(t, 0.35, 0.12, 'lowpass', 700); this.slide('sawtooth', 90, 220, t, 0.3, 0.08); break;
       case 'beep': this.tone('square', 440, t, 0.15, 0.08); break;
       case 'go': this.tone('square', 880, t, 0.4, 0.1); break;
       case 'win': [0, 4, 7, 12, 16, 19, 24].forEach((s, i) => this.tone('triangle', hz(72 + s), t + i * 0.1, 0.6, 0.14)); break;
@@ -181,7 +187,7 @@ class Game {
       if (k === 'arrowleft' || k === 'a') this.race.targetX = -(HALF - 0.5);
       if (k === 'arrowright' || k === 'd') this.race.targetX = HALF - 0.5;
       if (k === ' ' || k === 'arrowup' || k === 'w') this._jump();
-      if (k === 'j' || k === 'shift') this.race.jetpack() && this.sound.play('jet');
+      if (k === 'j' || k === 'shift') this._special();
     };
     window.addEventListener('keydown', this._onKey);
     this._onVis = () => { if (document.hidden) this.sound.suspend(); else this.sound.resume(); };
@@ -189,6 +195,13 @@ class Game {
   }
 
   _jump() { if (this.race) this.race.jump(); }
+
+  /** The hero's one special: the alien's jetpack, the rhino's head-charge. */
+  _special() {
+    if (!this.race) return;
+    if (this.th.id === 'alien') { if (this.race.jetpack()) this.sound.play('jet'); }
+    else if (this.race.charge()) this.sound.play('charge');
+  }
 
   // ---- world --------------------------------------------------------------------------------------------------------
 
@@ -368,7 +381,10 @@ class Game {
     this.layer.append(this.countEl, this.hintEl, jumpBtn);
     if (th.id === 'alien') {
       this.jetEl = h('span', {}, '3');
-      this.layer.append(h('button', { class: `${p}-big`, style: 'left:calc(var(--u)*4);background:linear-gradient(180deg,#ffb84a,#f08a1a)', 'aria-label': I.t('jet'), onclick: () => { if (this.race && this.race.jetpack()) this.sound.play('jet'); } }, h('span', { style: 'font-size:calc(var(--u)*7)' }, '🚀'), h('span', {}, I.t('jet'), ' ', this.jetEl)));
+      this.layer.append(h('button', { class: `${p}-big`, style: 'left:calc(var(--u)*4);background:linear-gradient(180deg,#ffb84a,#f08a1a)', 'aria-label': I.t('jet'), onclick: () => this._special() }, h('span', { style: 'font-size:calc(var(--u)*7)' }, '🚀'), h('span', {}, I.t('jet'), ' ', this.jetEl)));
+    } else {
+      this.jetEl = h('span', {}, '١٠٠٪');
+      this.layer.append(h('button', { class: `${p}-big`, style: 'left:calc(var(--u)*4);background:linear-gradient(180deg,#ffb84a,#f08a1a)', 'aria-label': I.t('chargeBtn'), onclick: () => this._special() }, h('span', { style: 'font-size:calc(var(--u)*7)' }, '🦏'), h('span', {}, I.t('chargeBtn'), ' ', this.jetEl)));
     }
     this._soundPill();
     this.lastCount = 4;
@@ -403,6 +419,7 @@ class Game {
     this.layer.append(h('div', { class: `${p}-dim` }, h('div', { class: `${p}-card` },
       h('div', { class: `${p}-title` }, final && r.won ? I.t('win') : q ? I.t('qualified') : `${I.t('notq')}${I.num(r.cfg.qualify)}`),
       h('div', { class: `${p}-pill` }, `${I.t('place')}: ${I.num(r.p.place)}/${I.num(r.cfg.rivals + 1)}`),
+      this.th.id === 'rhino' ? h('div', { class: `${p}-pill` }, `${I.t('summit')} ${this.th.names[this.round]}`) : null,
       q && !final ? h('button', { class: `${p}-btn`, onclick: () => this.start(this.round + 1) }, I.t('next')) : null,
       h('button', { class: `${p}-btn alt`, onclick: () => this.start(this.round) }, I.t('again')),
       h('button', { class: `${p}-btn dark`, onclick: () => this.showMenu() }, I.t('menu')))));
@@ -426,17 +443,18 @@ class Game {
     const was = r.state;
     for (const e of r.step(dt)) {
       switch (e.type) {
-        case 'go': this.sound.play('go'); this.voice.say('go'); this.countEl.textContent = I.t('go'); setTimeout(() => this.countEl && (this.countEl.style.display = 'none'), 700); if (this.th.id === 'alien') this.hint(I.t('jetHint'), 3500); else this.hint(I.t('drag'), 3000); break;
+        case 'go': this.sound.play('go'); this.voice.say('go'); this.countEl.textContent = I.t('go'); setTimeout(() => this.countEl && (this.countEl.style.display = 'none'), 700); if (this.th.id === 'alien') this.hint(I.t('jetHint'), 3500); else this.hint(I.t('chargeHint'), 3500); break;
         case 'jump': this.sound.play('jump'); break;
         case 'land': this.sound.play('land'); break;
         case 'ring': this.sound.play('ring'); this.voice.say('pickup'); this.fx.push({ t: 0, life: 0.8, text: '⚡' }); break;
         case 'power': this.sound.play('power'); this.voice.say('charge'); this.fx.push({ t: 0, life: 0.8, text: '⭐' }); break;
         case 'hit': this.sound.play('hit'); this.voice.say('bump'); this.fx.push({ t: 0, life: 0.9, text: '💥' }); break;
         case 'jet': this.sound.play('jet'); this.voice.say('nitro'); break;
+        case 'charge': this.sound.play('charge'); this.voice.say('charge'); this.fx.push({ t: 0, life: 0.8, text: '💨' }); break;
         case 'fall': this.sound.play('fall'); break;
         case 'bounce': this.sound.play('bounce'); this.voice.say('nitro'); break;
         case 'tube': this.sound.play('tube'); this.fx.push({ t: 0, life: 0.8, text: '🌀' }); break;
-        case 'smash': this.sound.play('smash'); this.voice.say('trick'); { const o = this.objs.get(r.els.find((x) => x.kind === 'gate' && x.hit && !x.gone)?.id); const el = r.els.find((x) => x.kind === 'gate' && x.hit && !x.gone); if (el) el.gone = true; if (o && o.userData.panel) o.userData.panel.visible = false; } break;
+        case 'smash': this.sound.play('smash'); if (e.charged) { this.voice.say('trick'); this.fx.push({ t: 0, life: 0.8, text: '💥⚡' }); } { const o = this.objs.get(r.els.find((x) => x.kind === 'gate' && x.hit && !x.gone)?.id); const el = r.els.find((x) => x.kind === 'gate' && x.hit && !x.gone); if (el) el.gone = true; if (o && o.userData.panel) o.userData.panel.visible = false; } break;
         case 'finish': this._finish(); break;
         default: break;
       }
@@ -447,7 +465,7 @@ class Game {
     }
     this.placeEl.textContent = `${I.t('place')} ${I.num(r.place)}/${I.num(r.cfg.rivals + 1)}`;
     this.barEl.style.width = `${Math.round(Math.max(0, Math.min(1, r.p.z / r.L)) * 100)}%`;
-    if (this.jetEl) this.jetEl.textContent = I.num(r.p.jets);
+    if (this.jetEl) this.jetEl.textContent = this.th.id === 'alien' ? I.num(r.p.jets) : `${I.num(Math.round(r.p.charge * 100))}٪`;
     for (const f of this.fx) f.t += dt;
     this.fx = this.fx.filter((f) => f.t < f.life);
   }
@@ -494,6 +512,7 @@ class Game {
     b.position.y = run;
     b.rotation.x = grounded ? 0 : -0.25;
     if (me && p) {
+      if (p.charging > 0) b.rotation.x = -0.38;
       m.visible = p.fall <= 0;
       if (m.userData.flame) m.userData.flame.visible = p.jet > 0;
       m.userData.shadow.visible = p.y > -1;

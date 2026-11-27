@@ -1,6 +1,6 @@
 const S = {
-  title: ['متجر الفضاء الذكي', 'Space Store Manager'],
-  sub: ['اعمل أنشط سوبرماركت في المدار!', 'Run the busiest pantry in orbit!'],
+  title: ['متجر النيل الفضائي', 'Nile Space Store'],
+  sub: ['سوبرماركت محطة فضا فوق النيل!', 'A space-station supermarket above the Nile!'],
   play: ['يلا نشتغل!', 'Play now!'],
   exit: ['خروج', 'Exit'],
   paused: ['استراحة', 'Paused'],
@@ -15,6 +15,8 @@ const S = {
   full: ['إيدك مليانة!', 'Hands full!'],
   opened: ['اتفتح', 'New'],
   robot: ['روبوت شغّال! 🤖', 'Robot at work! 🤖'],
+  rocket: ['وصل صاروخ توصيل من النيل! 🚀', 'A delivery rocket from the Nile! 🚀'],
+  bye: ['زبون مشي — الرف كان فاضي! عبّيه بسرعة 🧺', 'A shopper left — the rack was empty! Restock it 🧺'],
   done_m: ['شطوووووور! بقيت سوبرماركت فضاء كبير 🚀', 'Well done! A busy space supermarket 🚀'],
   done_f: ['شطووووورة! بقيت سوبرماركت فضاء كبير 🚀', 'Well done! A busy space supermarket 🚀'],
   served: ['زبون اتبسط', 'happy shoppers'],

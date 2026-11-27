@@ -53,3 +53,16 @@ corrected; a no-op `setTimeout` in the sim removed. Rhino-specific behaviour
   in-WebView audibility was not re-verified in this fix.
 - Rhino's missing signature mechanic (the Batch D head-charge that would
   differentiate it from alien_sky's jetpack) is a later phase, not this fix.
+
+## Batch D3 — the head-charge and the Egypt ladder (2026-11-27)
+- **New mechanic, the rhino's alone: the HEAD-CHARGE.** A metered 1.3 s burst (×1.45 speed) on its own
+  big «انطلق / CHARGE» button (meter % shown on the button; J/Shift works too). Gates now have three
+  outcomes: **charged smash** → boost 1.6 s + celebration; **clean dive** through the frame (airborne)
+  → passes free; **walking into one on the ground** → it still breaks (never a hard block) but bumps
+  him back 2.5 m with a short stun. Bounce pads refill the meter to full; it also refills over 3.5 s.
+  The rhino visibly leans head-down while charging. `Race.charge()` returns false for the alien.
+- **Its own ladder:** «كركوز وقمم مصر / Karkoz Climbs Egypt» — سفوح الجلالة → جبال البحر الأحمر →
+  وادي فيران → سانت كاترين → قمة موسى → قمة كاترين الكبرى, and the end card now keeps a **summit
+  journal** line (📔 سجل القمم: وصلت …) naming the peak reached.
+- Tests: course_race **7/7** (new: charge gates/pads/alien-exclusion). Harness 5/5, zero errors,
+  frames eyeballed — the CHARGE button shows the live meter.

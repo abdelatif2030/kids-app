@@ -1,16 +1,24 @@
-// The coastal circuit: a smooth closed curve through control points, sampled every 2 m. Each sample knows its
-// position, direction, curvature and distance from the start line, so the race can find where anything is on the
-// track quickly. Pure maths, no drawing.
+// Alexandria Storm GP — the Corniche circuit. A seafront loop in Alexandria, sampled every 2 m: a long
+// straight along the harbour, gentle sweepers past the beaches, and one tight hairpin around the Qaitbey
+// Citadel at the far end. The road is WET: most of it is merely slippery, and the puddle bands (wetAt) are
+// worse — cornering grip there drops to little more than half. Pure maths, no drawing.
 
-export const HALF_W = 6.5; // road half width (m)
-export const WALL = HALF_W + 4; // the barriers
+export const HALF_W = 6; // a city corniche road (m)
+export const WALL = HALF_W + 4; // the sea wall and the soft barriers
 const STEP = 2;
+const SCALE = 1.15;
 
-// a coastal Grand Prix: long main straight by the stands, a hairpin, fast sweepers along the sea, a twisty section
+// the corniche: harbour straight, beach sweepers, citadel hairpin, back along the bay
 const POINTS = [
-  [0, 0], [120, 0], [220, 4], [278, 30], [298, 80], [282, 128], [236, 150], [178, 150], [146, 178], [150, 232],
-  [126, 284], [60, 306], [-20, 300], [-92, 270], [-136, 214], [-140, 150], [-112, 104], [-118, 60], [-90, 18], [-48, 2],
+  [0, 0], [95, -2], [200, 0], [380, 6], [520, 30], [590, 90], [600, 170], [560, 240], [470, 275], [330, 282],
+  [180, 278], [60, 258], [-24, 206], [-58, 142], [-62, 74], [-44, 32],
 ];
+
+// standing-water bands along the lap (centre fraction, half-width fraction): grip dips inside them
+const PUDDLES = [
+  [0.14, 0.028], [0.4, 0.034], [0.66, 0.028], [0.87, 0.034],
+];
+const PUDDLE_DEPTH = 0.45; // grip multiplier reaches 1 - this at a puddle's centre
 
 function catmull(p0, p1, p2, p3, t) {
   const t2 = t * t;
@@ -19,7 +27,7 @@ function catmull(p0, p1, p2, p3, t) {
 }
 
 export function buildTrack(reverse = false) {
-  const big = POINTS.map(([x, z]) => [x * 1.3, z * 1.3]);
+  const big = POINTS.map(([x, z]) => [x * SCALE, z * SCALE]);
   const pts = reverse ? [...big].reverse() : big;
   const n = pts.length;
   // dense polyline
@@ -65,7 +73,7 @@ export function buildTrack(reverse = false) {
   const curv = new Float64Array(N);
   for (let i = 0; i < N; i++) {
     const j = (i + 1) % N;
-    ang[i] = Math.atan2(xs[j] - xs[i], zs[j] - zs[i]); // heading: 0 = +z, like the bikes
+    ang[i] = Math.atan2(xs[j] - xs[i], zs[j] - zs[i]); // heading: 0 = +z, like the cars
   }
   for (let i = 0; i < N; i++) {
     let d = ang[(i + 2) % N] - ang[(i - 2 + N) % N];
@@ -73,7 +81,26 @@ export function buildTrack(reverse = false) {
     while (d < -Math.PI) d += Math.PI * 2;
     curv[i] = d / (4 * STEP); // 1/radius, sign = turning direction
   }
-  return { N, step: STEP, length: N * STEP, xs, zs, ang, curv, reverse };
+  // the wet profile: 1 on merely-damp tarmac, dipping inside each puddle band (cosine ramps at the edges)
+  const wet = new Float64Array(N).fill(1);
+  for (let i = 0; i < N; i++) {
+    const f = i / N;
+    for (const [c, hw] of PUDDLES) {
+      let d = Math.abs(f - c);
+      if (d > 0.5) d = 1 - d;
+      if (d < hw) {
+        const w = 0.5 + 0.5 * Math.cos((Math.PI * d) / hw);
+        wet[i] = Math.min(wet[i], 1 - PUDDLE_DEPTH * w);
+      }
+    }
+  }
+  return { N, step: STEP, length: N * STEP, xs, zs, ang, curv, wet, reverse };
+}
+
+/** Cornering grip multiplier at sample i: 1 on damp tarmac, well under 1 in the puddles. */
+export function wetAt(tr, i) {
+  const k = ((i % tr.N) + tr.N) % tr.N;
+  return tr.wet[k];
 }
 
 /** Index of the sample nearest to (x, z), searching near a hint index. */
@@ -97,7 +124,6 @@ export function lateral(tr, i, x, z) {
   const a = tr.ang[i];
   const dx = x - tr.xs[i];
   const dz = z - tr.zs[i];
-  // right vector of heading a (forward = (sin a, cos a)) is (cos a, -sin a)... in x/z: right = (-cos a, sin a)? use cross
   return dx * -Math.cos(a) + dz * Math.sin(a);
 }
 
@@ -108,7 +134,7 @@ export function pointAt(tr, i, side = 0) {
   return { x: tr.xs[k] - Math.cos(a) * side, z: tr.zs[k] + Math.sin(a) * side, a };
 }
 
-/** The tightest curvature in the next `metres` (for braking and for the riders' speed choice). */
+/** The tightest curvature in the next `metres` (for braking and for the drivers' speed choice). */
 export function curvAhead(tr, i, metres) {
   let m = 0;
   let sign = 0;

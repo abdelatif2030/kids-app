@@ -79,3 +79,73 @@ test('damaged saves load safely', () => {
   assert.equal(normalizeSave(null).unlocked, 1);
   assert.equal(normalizeSave({ bow: 99 }).bow, 3);
 });
+
+test('rescue squad: swimmers are rescued by rings and by reaching the boat; logs are the danger', () => {
+  const road = buildRoad(3, 5, 'squad');
+  assert.ok(road.things.some((t) => t.trait === 'swim'));
+  assert.ok(road.things.some((t) => t.trait === 'log'));
+  assert.ok(road.things.some((t) => t.trait === 'wreck' && t.boss));
+  // ring a swimmer down to zero -> rescued, crew grows
+  const r = new Run({ level: 0, seed: 2, theme: 'squad' });
+  r.things = [{ id: 1, kind: 'enemy', trait: 'swim', x: 0, z: 14, hp: 1, w: 1.1, t: 0 }];
+  const n0 = r.n;
+  let rescued = false;
+  for (let i = 0; i < 90 && !rescued; i++) for (const e of r.step(1 / 30)) if (e.type === 'rescue') rescued = true;
+  assert.ok(rescued && r.n === n0 + 1, `rescued ${rescued}, crew ${n0} -> ${r.n}`);
+  // a swimmer who reaches the boat climbs aboard too
+  const r2 = new Run({ level: 0, seed: 2, theme: 'squad' });
+  r2.things = [{ id: 1, kind: 'enemy', trait: 'swim', x: 0, z: 4, hp: 9, w: 1.1, t: 0 }];
+  const n1 = r2.n;
+  let rescued2 = false;
+  for (let i = 0; i < 120 && !rescued2; i++) for (const e of r2.step(1 / 30)) if (e.type === 'rescue') rescued2 = true;
+  assert.ok(rescued2 && r2.n === n1 + 1);
+  // the current really pushes the boat
+  const r3 = new Run({ level: 0, seed: 2, theme: 'squad' });
+  r3.things = [];
+  let moved = 0;
+  for (let i = 0; i < 300; i++) { r3.step(1 / 30); moved = Math.max(moved, Math.abs(r3.x)); }
+  assert.ok(moved > 0.2, `current drift moved the boat ${moved}`);
+});
+
+test('archers: targets stand still, the wind bends arrows, the grand target blocks the bridge', () => {
+  const road = buildRoad(2, 5, 'archers');
+  assert.ok(road.things.some((t) => t.trait === 'target'));
+  assert.ok(road.things.some((t) => t.trait === 'grand' && t.boss));
+  const r = new Run({ level: 2, seed: 2, theme: 'archers' });
+  const tgt = r.things.find((t) => t.trait === 'target');
+  const z0 = tgt.z;
+  for (let i = 0; i < 60; i++) r.step(1 / 30);
+  assert.equal(tgt.z, z0, 'targets never advance');
+  // wind: some level has a real wind, and a flying arrow's x drifts with it
+  const windy = [0, 1, 2, 3, 4, 5, 6, 7].map((l) => new Run({ level: l, seed: 1, theme: 'archers' }).wind);
+  assert.ok(windy.some((w) => w !== 0), `winds ${windy}`);
+  const rw = new Run({ level: windy.findIndex((w) => w !== 0), seed: 1, theme: 'archers' });
+  rw.things = [];
+  for (let i = 0; i < 12 && !rw.bullets.length; i++) rw.step(1 / 30);
+  const b = rw.bullets[0];
+  assert.ok(b, 'an arrow is flying');
+  const bx = b.x;
+  for (let i = 0; i < 10; i++) rw.step(1 / 30);
+  assert.ok(Math.abs(b.x - bx) > 0.01, `arrow bent by wind ${bx} -> ${b.x}`);
+  // the grand target blocks like a gate until shot down
+  const rb = new Run({ level: 0, seed: 2, theme: 'archers' });
+  rb.things = [{ id: 1, kind: 'enemy', trait: 'grand', x: 0, z: 8, hp: 9999, w: 3.2, t: 0, boss: true }];
+  for (let i = 0; i < 90; i++) rb.step(1 / 30);
+  assert.ok(rb.zs < 8, `blocked at ${rb.zs}`);
+});
+
+test('rescue has sixteen Nile reaches; a robot rescuer and a robot archer both finish their games', () => {
+  for (let i = 0; i < 16; i++) assert.ok(buildRoad(i, 5, 'squad').things.some((t) => t.boss), `rescue level ${i + 1} boss`);
+  function playT(level, theme, opts = {}) {
+    const r = new Run({ level, seed: opts.seed ?? 5, theme, bow: opts.bow, rank: opts.rank });
+    let t = 0;
+    while (r.state === 'run' && t < 400) { robot(r); r.step(1 / 30); t += 1 / 30; }
+    return r;
+  }
+  let wins = 0;
+  for (let i = 8; i < 16; i++) { const r = playT(i, 'squad', { bow: 3, rank: 4 }); if (r.state === 'done') wins += 1; }
+  assert.ok(wins >= 5, `rescue late levels ${wins}/8 won`);
+  wins = 0;
+  for (let i = 0; i < 8; i++) { const r = playT(i, 'archers', { bow: Math.min(3, i >> 1), rank: Math.min(4, i >> 1) }); if (r.state === 'done') wins += 1; }
+  assert.ok(wins >= 6, `archers levels ${wins}/8 won`);
+});

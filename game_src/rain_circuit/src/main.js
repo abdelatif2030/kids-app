@@ -1,12 +1,13 @@
-// «سباق الدراجات النارية» — Motorcycle Racing. Entry: window.MotoRace.start(container, config, post).
+// «عاصفة إسكندرية» — Alexandria Storm GP. Entry: window.RainCircuit.start(container, config, post).
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
-// A sunny coastal circuit with palms, mountains and grandstands: two laps against five animal riders. The bike
-// accelerates by itself; drag (or hold a side) to lean, brake before tight corners, ride in a slipstream and fire
-// nitro to overtake. No crashes: barriers are soft. No network, no links, no ads, no tracking.
+// A Grand Prix along Alexandria's Corniche in a winter storm that grows every round: the road is wet, the
+// puddles shine (and really do steal grip — see wetAt in track.js), the rain thickens and the fog closes in.
+// The car accelerates by itself; drag (or hold a side) to steer, brake early on the wet road, ride in a
+// slipstream and fire nitro to overtake. No crashes: barriers are soft. No network, no links, no ads, no tracking.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Race, ROUNDS, RIDERS, LAPS, normalizeSave } from './sim.js';
-import { pointAt, HALF_W, WALL } from './track.js';
+import { pointAt, wetAt, HALF_W, WALL } from './track.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { loadSprites, makeBillboardVehicle, loadGLBs, makeModelVehicle } from '../../cozy_kit/art.js';
 import { VoiceCoach } from '../../cozy_kit/voice.js';
@@ -190,7 +191,7 @@ class Game {
     const s = (this.scene = new THREE.Scene());
     const sky = rd.sunset ? 0x8a98a8 : 0x9aa8b8;
     s.background = new THREE.Color(sky);
-    s.fog = new THREE.Fog(rd.sunset ? 0xa8b4c0 : 0xb4bec8, 90, 420);
+    s.fog = new THREE.Fog(rd.sunset ? 0xa8b4c0 : 0xb4bec8, 90, 430 - 180 * (rd.rain ?? 0.5));
     s.add(new THREE.HemisphereLight(rd.sunset ? 0xffe0c0 : 0xf4fbff, 0x4a6a4a, rd.sunset ? 1.1 : 1.3));
     const sun = new THREE.DirectionalLight(rd.sunset ? 0xffb070 : 0xfff4dc, rd.sunset ? 1.6 : 1.5);
     sun.position.set(-120, 200, 80);
@@ -233,6 +234,26 @@ class Game {
     rg.setIndex(idx);
     rg.computeVertexNormals();
     s.add(new THREE.Mesh(rg, new THREE.MeshLambertMaterial({ map: tex, side: THREE.DoubleSide })));
+    // the puddles are VISIBLE: flat shining ellipses on the road wherever the wet profile dips
+    {
+      const pudMat = new THREE.MeshBasicMaterial({ color: 0x9fc4e8, transparent: true, opacity: 0.4, depthWrite: false });
+      const pudGeo = new THREE.CircleGeometry(1, 20);
+      let run = 0;
+      for (let i = 0; i < tr.N; i++) {
+        if (wetAt(tr, i) < 0.8) { run++; continue; }
+        if (run >= 6) {
+          const mid = i - Math.floor(run / 2);
+          const pp = pointAt(tr, mid, ((mid * 7) % 5 - 2) * 1.1);
+          const pud = new THREE.Mesh(pudGeo, pudMat);
+          pud.rotation.x = -Math.PI / 2;
+          pud.rotation.z = pp.a;
+          pud.scale.set(2.6 + (mid % 3), (run * tr.step) / 2.2, 1);
+          pud.position.set(pp.x, 0.035, pp.z);
+          s.add(pud);
+        }
+        run = 0;
+      }
+    }
     // red and white curbs, and soft barriers
     s.add(this._band(tr, HALF_W, HALF_W + 1.3, 0.04, [0xe8342a, 0xffffff], 2));
     s.add(this._band(tr, -HALF_W - 1.3, -HALF_W, 0.04, [0xe8342a, 0xffffff], 2));
@@ -280,7 +301,7 @@ class Game {
       }
     }
     // palms (two instanced draws), mountain islands, a lighthouse
-    this._palms(tr, sideOut);
+    this._palms(tr, sideOut, rd.rain ?? 0.5);
     const pano = this._panorama(roundIndex, cx, cz);
     if (pano) s.add(pano);
     for (let i = 0; i < 9 && !pano; i++) {
@@ -388,7 +409,7 @@ class Game {
     return new THREE.CanvasTexture(c);
   }
 
-  _palms(tr, sideOut) {
+  _palms(tr, sideOut, rainLvl = 0.5) {
     // palms along the road, soft green hills beyond, glowing blue pickups, rain
     const s = this.scene;
     const palm = makePalm(1);
@@ -424,7 +445,7 @@ class Game {
     for (let k = 0; k < n; k++) { rp[k * 3] = (Math.random() - 0.5) * 60; rp[k * 3 + 1] = Math.random() * 30; rp[k * 3 + 2] = (Math.random() - 0.5) * 60; }
     this.rainG = new THREE.BufferGeometry();
     this.rainG.setAttribute('position', new THREE.BufferAttribute(rp, 3));
-    this.rain = new THREE.Points(this.rainG, new THREE.PointsMaterial({ color: 0xcfe0f4, size: 3.4, sizeAttenuation: false, map: dotTexture(), transparent: true, opacity: 0.75, depthWrite: false }) /* round drops of a fixed small size: the old flat squares grew into big blue boxes when a drop passed near the camera (owner report 2026-11-26) */);
+    this.rain = new THREE.Points(this.rainG, new THREE.PointsMaterial({ color: 0xcfe0f4, size: 3.4, sizeAttenuation: false, map: dotTexture(), transparent: true, opacity: 0.45 + 0.4 * rainLvl, depthWrite: false }) /* round drops of a fixed small size: the old flat squares grew into big blue boxes when a drop passed near the camera (owner report 2026-11-26) */);
     this.rain.frustumCulled = false;
     s.add(this.rain);
   }

@@ -6,9 +6,10 @@
 import { buildTrack, nearest, lateral, pointAt, curvAhead, safeSpeed, HALF_W, WALL } from './track.js';
 
 export const LAPS = 2;
-const GRIP = 16; // m/s² of cornering
+export const GRIP = 16; // m/s² of cornering — dry tarmac, the grippiest of the three race games
 const PLAYER_VMAX = 61;
-const ACCEL = 15;
+const ACCEL = 16; // light bikes jump off the line
+const STEER_RATE = 10; // and they flick side to side faster than trucks or wet cars
 
 export const ROUNDS = [
   { id: 1, ar: 'كورنيش الإسكندرية', en: 'Alexandria Corniche', reverse: false, rival: 52, sunset: false, skill: 0.9 },
@@ -182,7 +183,7 @@ export class Race {
     else if (ctl.gas !== false) r.v += (r.boost > 0 ? ACCEL * 1.8 : ACCEL) * Math.max(0, 1 - r.v / vmax) * dt;
     if (r.v > vmax) r.v -= (r.v - vmax) * (r.off ? 2.5 : 1.2) * dt;
     // steering: grip limits the turn at speed (too fast = runs wide)
-    r.steer += (ctl.steer - r.steer) * Math.min(1, dt * 8);
+    r.steer += (ctl.steer - r.steer) * Math.min(1, dt * STEER_RATE);
     const maxYaw = Math.min(1.5, r.grip / Math.max(6, r.v));
     const yaw = r.steer * maxYaw * Math.min(1, r.v / 4);
     r.h = wrap(r.h - yaw * dt);
@@ -250,7 +251,7 @@ export class Race {
     const tr = this.track;
     r.v = Math.max(18, r.v - 8 * dt);
     const ctl = this._ai(r);
-    r.steer += (ctl.steer - r.steer) * Math.min(1, dt * 8);
+    r.steer += (ctl.steer - r.steer) * Math.min(1, dt * STEER_RATE);
     const yaw = r.steer * Math.min(1.5, GRIP / Math.max(6, r.v));
     r.h = wrap(r.h - yaw * dt);
     r.x += Math.sin(r.h) * r.v * dt;

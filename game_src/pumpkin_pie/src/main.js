@@ -5,7 +5,7 @@
 // links, no ads, no tracking. Everything drawn and played from code.
 import * as THREE from 'three';
 import { PADS, OVENS, COUNTER_ZONE, CASH_ZONE, CHUTE, normalizeSave } from './data.js';
-import { Bakery } from './sim.js';
+import { Bakery, starsFor } from './sim.js';
 import { BakeryWorld } from './world.js';
 import { mat } from './models.js';
 import { Sound } from './audio.js';
@@ -233,6 +233,7 @@ class Game {
     this.mode = 'menu';
     this.paused = false;
     this.sound.setMode('menu');
+    this._setPano(this._panoForProgress());
     this._clear();
     const chefBtn = (kind, face) => h('button', {
       class: `pp-chef${this.save.chef === kind ? ' on' : ''}`,
@@ -295,13 +296,29 @@ class Game {
     this.layer.append(dim);
   }
 
+  /** The owner's painted panoramas (art/pano1..4.webp) as a ring around the bakery yard; the view
+      changes as the bakery grows — one new panorama per three expansions opened. */
+  _panoForProgress() { return 1 + Math.min(3, Math.floor((this.save.unlocked || []).length / 3)); }
+  _setPano(n) {
+    if (this._panoN === n) return;
+    this._panoN = n;
+    if (this.panoMesh) { this.scene.remove(this.panoMesh); this.panoMesh.material.map.dispose(); this.panoMesh.material.dispose(); this.panoMesh = null; }
+    if (!n) return;
+    const tex = new THREE.TextureLoader().load(`${this.base}art/pano${n}.webp`, () => { if (this.panoMesh && this.panoMesh.material.map === tex) this.panoMesh.visible = true; });
+    tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = THREE.MirroredRepeatWrapping; tex.repeat.set(2, 0.66); tex.offset.set(0, 0.34);
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(42, 42, 30, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false }));
+    ring.visible = false; ring.renderOrder = -10; this.panoMesh = ring; this.scene.add(ring);
+  }
+  _followPano() { if (this.panoMesh) this.panoMesh.position.set(this.camera.position.x, this.camera.position.y + 6, this.camera.position.z); }
+
   _complete() {
     this.sound.play('complete');
     this.voice.say('win');
     this.world.sparkles.burst(this.bakery.p.x, 2, this.bakery.p.z, 80);
     const dim = h('div', { class: 'pp-dim pp-win' }, h('div', { class: 'pp-panel' },
+      h('img', { class: 'pp-winart', src: `${this.base}art/win.webp`, alt: '' }),
       h('div', { class: 'pp-title' }, t('done')),
-      h('div', { class: 'pp-stars' }, '⭐⭐⭐'),
+      h('div', { class: 'pp-stars' }, '⭐'.repeat(starsFor(this.save.served)) + '☆'.repeat(3 - starsFor(this.save.served))),
       h('div', { class: 'pp-stat' }, h('span', {}, '😊 ', num(this.save.served), ' ', t('served')), h('span', {}, '🥧 ', num(this.save.pies), ' ', t('pies'))),
       h('button', { class: 'pp-btn', onclick: () => { dim.remove(); this.paused = false; } }, '▶ ', t('keep'))));
     this.paused = true;
@@ -345,6 +362,7 @@ class Game {
           this.sound.play('unlock');
           this.voice.say('charge');
           this.world.syncUnlocked();
+          this._setPano(this._panoForProgress());
           this.world.sparkles.burst(pad.x, 1, pad.z, 40);
           this.toast(`✨ ${t('opened')}: ${name(pad)} ${pad.icon}`, 2.4);
           this._saveNow();
@@ -369,6 +387,7 @@ class Game {
     this.cam.lerp(want, Math.min(1, dt * 3));
     this.camera.position.copy(this.cam);
     this.camera.lookAt(this.cam.x, 0, this.cam.z - (portrait ? 10.5 : 8.2) - 1.4);
+    this._followPano();
 
     this._guide(time);
     this._labels();
@@ -472,6 +491,7 @@ class Game {
         const r = portrait ? 26 : 20;
         this.camera.position.set(Math.sin(a) * r * 0.5, portrait ? 20 : 14, 6 + Math.cos(a) * r * 0.6);
         this.camera.lookAt(0, 0, -1);
+        this._followPano();
         this.cam = null;
       }
     }

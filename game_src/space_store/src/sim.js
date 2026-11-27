@@ -1,4 +1,5 @@
-// «متجر الفضاء الذكي» — the rules with no drawing. A little astronaut runs a grocery store on a space station: pick
+// «متجر النيل الفضائي» Nile Space Store — the rules with no drawing. A little astronaut runs a grocery store on a
+// space station above the Nile: pick
 // up floating hover-baskets at the dispenser, stack them on the entrance rack, serve shoppers (astronauts and aliens)
 // at the checkout, and pick up the star coins they leave. Coins build a second rack, a bigger basket stack, robot
 // cashiers, more shelves, a second shuttle, and at last the hyper checkout. Deterministic with a seed.
@@ -27,16 +28,20 @@ export const CHECKOUTS = [
 ];
 export const SHUTTLES = [{ x: -7.4, z: -6.4 }, { x: 0.5, z: -7.2, needs: 'shuttle2' }];
 
-/** The expansions, paid by standing on their pad; the next two are shown. */
+/** The station wings, paid by standing on their pad; the next two are shown. (Ids are save-stable; only the
+ *  names changed when the store became the Nile Space Store.) */
 export const PADS = [
-  { id: 'rack2', cost: 25, x: -5.4, z: -2.5, icon: '🧺', ar: 'رف سلال تاني', en: 'Second basket rack' },
-  { id: 'bigstack', cost: 35, x: -7, z: 1.2, icon: '🎒', ar: 'تشيل سلال أكتر', en: 'Carry more baskets' },
-  { id: 'robot1', cost: 55, x: 7.4, z: 6.8, icon: '🤖', ar: 'روبوت كاشير', en: 'Robot cashier' },
-  { id: 'shelves2', cost: 65, x: 5.5, z: -1.6, icon: '🍎', ar: 'رفوف أكتر', en: 'More shelves' },
-  { id: 'shuttle2', cost: 80, x: 0.5, z: -4.6, icon: '🚀', ar: 'مكوك تاني', en: 'Second shuttle' },
-  { id: 'robot2', cost: 95, x: 9, z: -2.6, icon: '🤖', ar: 'روبوت كاشير تاني', en: 'Second robot cashier' },
-  { id: 'hyper', cost: 140, x: -1, z: 4.3, icon: '⚡', ar: 'الكاشير الخارق', en: 'Hyper checkout' },
+  { id: 'rack2', cost: 25, x: -5.4, z: -2.5, icon: '🧺', ar: 'جناح السلال', en: 'Basket Wing' },
+  { id: 'bigstack', cost: 35, x: -7, z: 1.2, icon: '🎒', ar: 'مخزن أكبر', en: 'Bigger Store-room' },
+  { id: 'robot1', cost: 55, x: 7.4, z: 6.8, icon: '🤖', ar: 'روبوت كاشير', en: 'Robot Cashier' },
+  { id: 'shelves2', cost: 65, x: 5.5, z: -1.6, icon: '🌴', ar: 'قبة الحديقة', en: 'Garden Dome' },
+  { id: 'shuttle2', cost: 80, x: 0.5, z: -4.6, icon: '🚀', ar: 'مكوك النيل', en: 'Nile Shuttle' },
+  { id: 'robot2', cost: 95, x: 9, z: -2.6, icon: '🤖', ar: 'روبوت كاشير تاني', en: 'Second Robot Cashier' },
+  { id: 'hyper', cost: 140, x: -1, z: 4.3, icon: '⚡', ar: 'كاشير البرق', en: 'Lightning Checkout' },
 ];
+
+/** Stars are EARNED by service, never given: finishing the station is one, a busy station earns more. */
+export function starsFor(served) { return served >= 90 ? 3 : served >= 40 ? 2 : 1; }
 
 export const SHOPPERS = ['astro', 'alien', 'astro2', 'blob', 'alien2', 'squid'];
 
@@ -62,6 +67,7 @@ export class Store {
     this.checkouts = CHECKOUTS.map((c) => ({ ...c, t: 0, cash: 0 }));
     this.shoppers = [];
     this.spawnT = 1;
+    this.rocketT = 25; // the first Nile delivery rocket
     this.nextId = 1;
     this.events = [];
     this.time = 0;
@@ -78,6 +84,7 @@ export class Store {
     this.time += dt;
     this._move(this.p, input, dt);
     this._dispense(dt);
+    this._rocket(dt);
     this._player(dt);
     this._shoppers(dt);
     this._checkouts(dt);
@@ -110,6 +117,17 @@ export class Store {
         a[push[0][1]] = push[0][2];
       }
     }
+  }
+
+  /** A delivery rocket from the Nile docks every so often and tops the dispenser up with fresh baskets. */
+  _rocket(dt) {
+    this.rocketT -= dt;
+    if (this.rocketT > 0) return;
+    this.rocketT = 40 + this.rand() * 15;
+    const from = SHUTTLES.filter((s) => this.open(s))[0] || SHUTTLES[0];
+    const add = Math.min(3, DISPENSER.cap - this.dispenser);
+    this.dispenser += add;
+    this.events.push({ type: 'rocket', x: from.x, z: from.z, add });
   }
 
   _dispense(dt) {
@@ -180,7 +198,7 @@ export class Store {
     if (this.spawnT <= 0 && this.shoppers.length < max) {
       this.spawnT = (this.has('shuttle2') ? 2.2 : 3.4) * (0.8 + this.rand() * 0.4);
       const from = shuttles[Math.floor(this.rand() * shuttles.length)];
-      this.shoppers.push({ id: this.nextId++, kind: SHOPPERS[Math.floor(this.rand() * SHOPPERS.length)], x: from.x, z: from.z, home: from, state: 'toRack', basket: false, goods: 0, t: 0, heading: 0, moving: 0, target: null, lane: null, happy: 0 });
+      this.shoppers.push({ id: this.nextId++, kind: SHOPPERS[Math.floor(this.rand() * SHOPPERS.length)], x: from.x, z: from.z, home: from, state: 'toRack', basket: false, goods: 0, t: 0, heading: 0, moving: 0, target: null, lane: null, happy: 0, patience: 0 });
       this.events.push({ type: 'arrive', x: from.x, z: from.z });
     }
     for (const s of this.shoppers) {
@@ -196,6 +214,11 @@ export class Store {
           s.target = null;
           this.events.push({ type: 'takeBasket', id: s.id });
         } else if (dist(s, s.target) < 0.3) s.waiting = rack.n === 0;
+        // nobody waits forever at an empty rack: after a while the shopper waves and heads home, kindly
+        if (s.waiting) {
+          s.patience += dt;
+          if (s.patience >= 18) { s.state = 'leave'; s.waiting = false; this.events.push({ type: 'giveUp', id: s.id }); }
+        } else s.patience = 0;
       } else if (s.state === 'shop') {
         s.waiting = false;
         if (!s.target || this._walk(s, s.target, dt)) {

@@ -1,7 +1,10 @@
-// Shared 3D lane-shooter game for «فرقة الجنود» (squad, night industrial road) and «رماة الجسر» (archers, stone bridge over
-// lava). Entry through squad.js / archers.js. A squad advances by itself and shoots by itself; drag to steer left and right.
-// Break cages (+soldiers), shoot number gates before passing through, grab weapon crates, defeat the enemies, win coins and
-// buy stronger bows/ranks. three.js, everything drawn from shapes in code, sound made live. No network, no ads, no tracking.
+// One lane engine, two different games. Entry through squad.js / archers.js.
+//   squad   → «فرقة الإنقاذ» Rescue Squad: a lifeboat crew on the Nile — throw life rings to swimmers, free the
+//             ducklings from the nets, grow at the numbered buoys, clear the sunken wreck. The current pushes
+//             the boat; there are no guns and nobody is an enemy.
+//   archers → «رماة جسر قصر النيل» Qasr El Nil Archers: target shooting on a great bridge over the Nile — arrows
+//             arc, the wind bends them, the targets are wooden dummies on the far bank.
+// three.js, everything drawn from shapes in code, sound made live. No network, no ads, no tracking.
 import * as THREE from 'three';
 import { Run, ROAD, LANES, normalizeSave, BOW_COST, RANK_COST } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
@@ -12,16 +15,20 @@ const LANE_CLIPS = { trick: 3, charge: 3, bump: 2, win: 2, lose: 2, count: 1 };
 
 const THEME = {
   squad: {
-    id: 'squad', glob: 'SquadShooter', prefix: 'sq', title: ['فرقة الجنود', 'Squad Shooter'], icon: '🪖', unit: ['جندي', 'soldier'],
-    sky: 0x0b1030, fog: 0x0b1030, road: 0x3a3f4a, ground: 0x12162a, panel: ['#3a6ad8', '#1a2a78'], accent: '#7affc8',
-    names: ['الطريق الصناعي', 'الميناء', 'المصنع', 'الأنابيب', 'المستودع', 'الجسر', 'المحطة', 'القاعدة الأخيرة'],
-    enemy: 'thug', weapon: ['🔫', '🔫', '🔫', '🔫'], bow: ['بندقية', 'Rifle'], rank: ['رتبة', 'Rank'], tune: 'squad',
+    id: 'squad', glob: 'SquadShooter', prefix: 'sq', title: ['فرقة الإنقاذ', 'Rescue Squad'], icon: '🛟', unit: ['منقذ', 'rescuer'],
+    sky: 0x8fd0ff, fog: 0xbfe4ff, road: 0x2a7ab8, ground: 0x4a8a44, panel: ['#2a8ac8', '#1a4a78'], accent: '#ffd23a',
+    names: ['أسوان', 'إسنا', 'الأقصر', 'قنا', 'نجع حمادي', 'سوهاج', 'أسيوط', 'المنيا', 'بني سويف', 'الجيزة', 'القاهرة', 'بنها', 'طنطا', 'المنصورة', 'دمياط', 'رشيد'],
+    enemy: 'swimmer', weapon: ['🛟', '🛟', '🛟', '🛟'], bow: ['طوق نجاة', 'Life Ring'], rank: ['رتبة', 'Rank'], tune: 'squad',
+    gateHint: ['اضرب أرقام العوّامات عشان تكبّر الفرقة قبل ما تعدّي!', 'Hit the buoy numbers to grow the crew before you pass!'],
+    cageHint: ['حرّر البطّات الصغيرة من الشبكة!', 'Free the little ducklings from the net!'],
   },
   archers: {
-    id: 'archers', glob: 'ArcherBridge', prefix: 'ab', title: ['رماة الجسر', 'Archer Bridge'], icon: '🏹', unit: ['رامي', 'archer'],
-    sky: 0x5a1a10, fog: 0x7a2a14, road: 0x8a8274, ground: 0xff6a1a, panel: ['#d8742a', '#7a2a0a'], accent: '#ffd23a',
-    names: ['بوابة الجسر', 'وادي النار', 'برج العظام', 'الهاوية', 'ممر الجمر', 'قلعة اللهب', 'جسر التنين', 'عرش الهيكل'],
-    enemy: 'skeleton', weapon: ['🏹', '🏹', '🏹', '🏹'], bow: ['قوس', 'Bow'], rank: ['رتبة', 'Rank'], tune: 'archers',
+    id: 'archers', glob: 'ArcherBridge', prefix: 'ab', title: ['رماة جسر قصر النيل', 'Qasr El Nil Archers'], icon: '🏹', unit: ['رامي', 'archer'],
+    sky: 0xffd8a0, fog: 0xf2c894, road: 0x9a8a72, ground: 0x2a6a9a, panel: ['#d8742a', '#7a2a0a'], accent: '#ffd23a',
+    names: ['جسر قصر النيل', 'جسر الجلاء', 'جسر ستانلي', 'جسر المنيا', 'جسر سوهاج', 'جسر الأقصر', 'جسر أسوان', 'سد أسوان'],
+    enemy: 'target', weapon: ['🏹', '🏹', '🏹', '🏹'], bow: ['قوس', 'Bow'], rank: ['رتبة', 'Rank'], tune: 'archers',
+    gateHint: ['اضرب الأرقام عشان تكبر قبل ما تعدّي!', 'Shoot the numbers to grow before you pass!'],
+    cageHint: ['اكسر القفص عشان تحرّر رماة!', 'Break the cage to free more archers!'],
   },
 };
 
@@ -43,7 +50,7 @@ class Sound extends SynthBase {
     if (!c || c.state !== 'running' || this.muted) return;
     const t = c.currentTime;
     switch (name) {
-      case 'shoot': this.noise(t, 0.05, 0.05, 'highpass', 2500); this.tone('square', this.kind === 'squad' ? 220 : 520, t, 0.05, 0.03); break;
+      case 'shoot': if (this.kind === 'squad') { this.noise(t, 0.08, 0.05, 'lowpass', 900); this.tone('sine', 540, t, 0.06, 0.03); } else { this.noise(t, 0.05, 0.05, 'highpass', 2500); this.tone('square', 520, t, 0.05, 0.03); } break;
       case 'hit': this.tone('triangle', 300, t, 0.05, 0.05); break;
       case 'kill': this.noise(t, 0.18, 0.1, 'bandpass', 700, 2); this.slide('triangle', 400, 120, t, 0.18, 0.08); break;
       case 'gate': (a > 0 ? [0, 4, 7] : [0, -3, -6]).forEach((s, i) => this.tone('triangle', hz(72 + s), t + i * 0.06, 0.2, 0.12)); break;
@@ -64,7 +71,7 @@ class Sound extends SynthBase {
     const notes = sq
       ? [[0, 45, 1], [1, 45, 1], [2, 48, 1], [3, 45, 1], [4, 43, 1], [5, 43, 1], [6, 47, 1], [7, 43, 1], [8, 45, 1], [9, 45, 1], [10, 52, 1], [11, 50, 1], [12, 48, 1], [13, 47, 1], [14, 45, 2], [0, 69, 2], [8, 72, 2], [12, 69, 2]]
       : [[0, 57, 2], [2, 60, 1], [3, 64, 1], [4, 62, 2], [6, 60, 1], [7, 57, 1], [8, 55, 2], [10, 59, 1], [11, 62, 1], [12, 60, 2], [14, 57, 2], [0, 40, 4], [8, 43, 4]];
-    this.setTune({ tempo: sq ? 124 : 96, beats: 16, wave: sq ? 'sawtooth' : 'triangle', vol: sq ? 0.07 : 0.11, notes });
+    this.setTune({ tempo: sq ? 112 : 96, beats: 16, wave: 'triangle', vol: sq ? 0.09 : 0.11, notes });
   }
 }
 
@@ -98,9 +105,13 @@ function sprite(text, bg, sx, sy, fg) { const s = new THREE.Sprite(new THREE.Spr
 function makeUnit(th) {
   const g = new THREE.Group();
   const sq = th.id === 'squad';
-  g.add(mesh(geo.cyl, M(sq ? 0x4a6a3a : 0x2a8a8a), 0, 0.75, 0, 0.55, 0.9, 0.4));
+  g.add(mesh(geo.cyl, M(sq ? 0xff7a1a : 0x2a8a8a), 0, 0.75, 0, 0.55, 0.9, 0.4));
   g.add(mesh(geo.sphere, M(0xf2c9a0), 0, 1.45, 0, 0.5, 0.5, 0.5));
-  if (sq) { g.add(mesh(geo.sphere, M(0x3a5a2a), 0, 1.58, 0, 0.56, 0.36, 0.56)); g.add(mesh(geo.box, M(0x222222), 0.35, 1.0, 0.45, 0.1, 0.14, 0.7)); } else {
+  if (sq) {
+    g.add(mesh(geo.sphere, M(0xff8a2a), 0, 1.58, 0, 0.56, 0.36, 0.56));
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.09, 6, 14), M(0xffffff));
+    ring.position.set(0.4, 1.0, 0.35); g.add(ring);
+  } else {
     g.add(mesh(geo.cone, M(0xc83a2a), 0, 1.75, 0, 0.55, 0.5, 0.55));
     const bow = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.05, 6, 14, Math.PI), M(0x8a5a2a));
     bow.position.set(0.38, 1.0, 0.3); bow.rotation.set(0, 0, Math.PI / 2); g.add(bow);
@@ -110,14 +121,45 @@ function makeUnit(th) {
   return g;
 }
 
-function makeEnemy(th, boss) {
+function makeEnemy(th, boss, trait) {
   const g = new THREE.Group();
-  const sk = th.enemy === 'skeleton';
-  g.add(mesh(geo.cyl, M(sk ? 0xe8e4d4 : 0x8a3a8a), 0, 0.8, 0, 0.6, 1.0, 0.45));
-  g.add(mesh(geo.sphere, M(sk ? 0xf4f0e0 : 0xb86ab8), 0, 1.55, 0, 0.62, 0.62, 0.6));
-  g.add(mesh(geo.sphere, M(0x111111, 0xff2a2a), -0.14, 1.6, 0.27, 0.14, 0.14, 0.1));
-  g.add(mesh(geo.sphere, M(0x111111, 0xff2a2a), 0.14, 1.6, 0.27, 0.14, 0.14, 0.1));
-  g.add(mesh(geo.box, M(0x8a8a92), 0.45, 1.0, 0.3, 0.1, 0.1, 0.9));
+  if (trait === 'swim') {
+    // a swimmer in the water: head and shoulders above the surface, arms on a float
+    g.add(mesh(geo.sphere, M(0xf2c9a0), 0, 0.55, 0, 0.55, 0.55, 0.55));
+    g.add(mesh(geo.sphere, M(0x3a2a1a), 0, 0.72, -0.05, 0.57, 0.4, 0.57));
+    g.add(mesh(geo.cyl, M(0x2a8ac8), 0, 0.18, 0, 0.75, 0.35, 0.6));
+    return g;
+  }
+  if (trait === 'log' || trait === 'wreck') {
+    // floating logs (the wreck is a bigger pile of them)
+    const n = trait === 'wreck' ? 4 : 1;
+    for (let i = 0; i < n; i++) {
+      const log = mesh(geo.cyl, M(0x8a5a2a), (i % 2) * 0.9 - 0.45, 0.25 + Math.floor(i / 2) * 0.45, (i % 3) * 0.3 - 0.3, 0.55, 2.6, 0.55);
+      log.rotation.z = Math.PI / 2;
+      log.rotation.y = (i * 37 % 40 - 20) * 0.02;
+      g.add(log);
+    }
+    if (trait === 'wreck') g.add(mesh(geo.box, M(0x6a4a22), 0, 1.1, 0, 2.6, 0.5, 1.6));
+    return g;
+  }
+  if (trait === 'target' || trait === 'grand') {
+    // a wooden target dummy on the far bank: post, board, rings, gold centre — nobody is hurt
+    g.add(mesh(geo.cyl, M(0x8a5a2a), 0, 0.8, 0, 0.22, 1.6, 0.22));
+    const board = mesh(geo.cyl, M(0xf4f0e0), 0, 1.9, 0, 1.5, 0.18, 1.5);
+    board.rotation.x = Math.PI / 2;
+    g.add(board);
+    const ringM = mesh(geo.cyl, M(0xe83a2a), 0, 1.9, 0.1, 0.95, 0.18, 0.95);
+    ringM.rotation.x = Math.PI / 2;
+    g.add(ringM);
+    const bull = mesh(geo.cyl, M(0xffd23a), 0, 1.9, 0.2, 0.42, 0.18, 0.42);
+    bull.rotation.x = Math.PI / 2;
+    g.add(bull);
+    if (trait === 'grand') g.scale.setScalar(2.2);
+    return g;
+  }
+  // legacy look (unused by the current themes)
+  g.add(mesh(geo.cyl, M(0x8a3a8a), 0, 0.8, 0, 0.6, 1.0, 0.45));
+  g.add(mesh(geo.sphere, M(0xb86ab8), 0, 1.55, 0, 0.62, 0.62, 0.6));
   g.add(mesh(geo.cyl, M(0x3a3a44), -0.15, 0.22, 0, 0.2, 0.45, 0.2));
   g.add(mesh(geo.cyl, M(0x3a3a44), 0.15, 0.22, 0, 0.2, 0.45, 0.2));
   g.scale.setScalar(boss ? 2.6 : 1);
@@ -178,8 +220,8 @@ class Game {
     this.scene.background = new THREE.Color(th.sky);
     this.scene.fog = new THREE.Fog(th.fog, 30, 120);
     this.camera = new THREE.PerspectiveCamera(60, 1, 0.3, 400);
-    this.scene.add(new THREE.HemisphereLight(th.id === 'squad' ? 0x8aa0ff : 0xffd8a0, th.id === 'squad' ? 0x202040 : 0x802010, th.id === 'squad' ? 1.3 : 1.6));
-    const sun = new THREE.DirectionalLight(th.id === 'squad' ? 0xaab8ff : 0xffb070, 1.2);
+    this.scene.add(new THREE.HemisphereLight(0xeaf6ff, th.id === 'squad' ? 0x3a7a3a : 0x2a5a8a, 1.5));
+    const sun = new THREE.DirectionalLight(th.id === 'squad' ? 0xfff4dc : 0xffb070, 1.2);
     sun.position.set(-20, 40, -10);
     this.scene.add(sun);
     this.world = new THREE.Group();
@@ -232,25 +274,32 @@ class Game {
     this.objs.clear();
     const th = this.th;
     const sq = th.id === 'squad';
-    this.world.add(mesh(geo.box, M(th.ground, sq ? 0 : 0x401000), 0, -0.6, L / 2, 120, 0.2, L + 160));
+    this.world.add(mesh(geo.box, M(th.ground), 0, -0.6, L / 2, 120, 0.2, L + 160));
     this.world.add(mesh(geo.box, M(th.road), 0, -0.1, L / 2, ROAD * 2 + 0.6, 0.2, L + 80));
     for (let z = 4; z < L + 60; z += 6) { for (const x of [-1.6, 1.6]) this.world.add(mesh(geo.box, M(sq ? 0xe8d84a : 0x6a6458), x, 0.02, z, 0.15, 0.02, 2.6)); }
     for (const side of [-1, 1]) {
       this.world.add(mesh(geo.box, M(sq ? 0x6a707c : 0x5a5448), side * (ROAD + 0.5), 0.45, L / 2, 0.7, 0.9, L + 80));
       for (let z = 10; z < L + 60; z += 14) {
         if (sq) {
-          this.world.add(mesh(geo.cyl, M(0x555a66), side * (ROAD + 1.6), 2.5, z, 0.2, 5, 0.2));
-          this.world.add(mesh(geo.sphere, M(0xfff0b0, 0xfff0b0), side * (ROAD + 1.6), 5.2, z, 0.7, 0.7, 0.7));
+          // a palm on the bank, and huts between the palms
+          const trunk = mesh(geo.cyl, M(0x8a6a2a), side * (ROAD + 1.8), 2.2, z, 0.35, 4.4, 0.35);
+          trunk.rotation.z = side * 0.12;
+          this.world.add(trunk);
+          for (let f = 0; f < 3; f++) this.world.add(mesh(geo.sphere, M(0x3a9a3a), side * (ROAD + 1.8) + (f - 1) * 0.9, 4.6, z + (f % 2) * 0.7 - 0.35, 1.5, 0.6, 1.5));
           const k = (z / 14) | 0;
-          if (k % 2) this.world.add(mesh(geo.box, M([0xc84a2a, 0x2a6ac8, 0xd8a82a][k % 3]), side * (ROAD + 4.5), 1.4, z + 3, 2.6, 2.8, 5.5));
-          else this.world.add(mesh(geo.cyl, M(0x8a6a2a), side * (ROAD + 3.2), 0.8, z, 1.1, 1.6, 1.1));
+          if (k % 2) {
+            this.world.add(mesh(geo.box, M(0xe8dcc0), side * (ROAD + 4.6), 1.1, z + 3, 2.8, 2.2, 3.4));
+            this.world.add(mesh(geo.cone, M(0xc86a2a), side * (ROAD + 4.6), 2.9, z + 3, 3.4, 1.6, 3.4));
+          }
         } else {
+          // stone blocks and the bridge lamps of Qasr El Nil
           this.world.add(mesh(geo.box, M(0x6a6458), side * (ROAD + 0.5), 1.1, z, 0.9, 0.7, 1.2));
-          this.world.add(mesh(geo.cone, M(0xff8a2a, 0xff5a10), side * (ROAD + 3.5), 0.5, z + 4, 1.4, 2.2 + ((z / 14) % 3), 1.4));
+          this.world.add(mesh(geo.cyl, M(0x3a3a44), side * (ROAD + 1.6), 2.5, z + 4, 0.16, 5, 0.16));
+          this.world.add(mesh(geo.sphere, M(0xfff0b0, 0xfff0b0), side * (ROAD + 1.6), 5.2, z + 4, 0.7, 0.7, 0.7));
         }
       }
     }
-    if (!sq) { const lava = mesh(geo.box, new THREE.MeshBasicMaterial({ color: 0xff7a1a }), 0, -4, L / 2, 300, 0.2, L + 200); this.world.add(lava); }
+    if (!sq) { const river = mesh(geo.box, new THREE.MeshBasicMaterial({ color: 0x2a7ab8 }), 0, -4, L / 2, 300, 0.2, L + 200); this.world.add(river); }
     // finish line
     this.world.add(mesh(geo.box, M(0xffffff, 0x8888ff), 0, 0.05, L + 6, ROAD * 2, 0.06, 1.2));
   }
@@ -261,8 +310,8 @@ class Game {
     const th = this.th;
     const g = new THREE.Group();
     if (t.kind === 'enemy') {
-      g.add(makeEnemy(th, t.boss));
-      g.userData.label = sprite(String(Math.ceil(t.hp)), '#8a1a1a', t.boss ? 3.4 : 1.7, t.boss ? 1.7 : 0.85);
+      g.add(makeEnemy(th, t.boss, t.trait));
+      g.userData.label = sprite(String(Math.ceil(t.hp)), t.trait === 'swim' ? '#1a6a9a' : '#8a5a1a', t.boss ? 3.4 : 1.7, t.boss ? 1.7 : 0.85);
       g.userData.label.position.y = t.boss ? 5.6 : 2.6;
       g.add(g.userData.label);
     } else if (t.kind === 'gate') {
@@ -277,7 +326,19 @@ class Game {
       g.add(mesh(geo.box, M(0x9a9aa4), 0, 1.3, 0, t.w, 0.2, 2));
       for (let i = -3; i <= 3; i++) g.add(mesh(geo.cyl, M(0x6a6a78), (i * t.w) / 7, 1.3, 1, 0.1, 2.6, 0.1));
       g.add(mesh(geo.box, M(0x9a9aa4), 0, 2.6, 0, t.w, 0.2, 2));
-      for (let i = 0; i < 2; i++) { const u = makeUnit(th); u.position.set(-0.6 + i * 1.2, 0, 0); g.add(u); }
+      if (th.id === 'squad') {
+        // a fishing net with two little ducklings inside
+        for (let i = 0; i < 2; i++) {
+          const duck = new THREE.Group();
+          duck.add(mesh(geo.sphere, M(0xffd23a), 0, 0.55, 0, 0.55, 0.5, 0.6));
+          duck.add(mesh(geo.sphere, M(0xffd23a), 0, 0.95, 0.25, 0.38, 0.38, 0.38));
+          duck.add(mesh(geo.cone, M(0xff8a2a), 0, 0.9, 0.55, 0.22, 0.3, 0.22));
+          duck.position.set(-0.6 + i * 1.2, 0, 0);
+          g.add(duck);
+        }
+      } else {
+        for (let i = 0; i < 2; i++) { const u = makeUnit(th); u.position.set(-0.6 + i * 1.2, 0, 0); g.add(u); }
+      }
       g.userData.label = sprite(String(Math.ceil(t.hp)), '#3a3a58', 1.5, 0.75);
       g.userData.label.position.y = 3.5;
       g.add(g.userData.label);
@@ -358,7 +419,7 @@ class Game {
     const p = this.p;
     this.voice.say('count');
     this.levelIndex = i;
-    this.run = new Run({ level: i, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1, bow: this.save.bow, rank: this.save.rank });
+    this.run = new Run({ level: i, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1, bow: this.save.bow, rank: this.save.rank, theme: this.th.id });
     this._buildWorld(this.run.L);
     this._clearUnits();
     this.mode = 'play';
@@ -399,12 +460,12 @@ class Game {
     if (won) {
       const lv = this.levelIndex + 1;
       this.save.stars[lv] = Math.max(this.save.stars[lv] || 0, r.stars);
-      this.save.unlocked = Math.max(this.save.unlocked, Math.min(8, lv + 1));
+      this.save.unlocked = Math.max(this.save.unlocked, Math.min(this.th.names.length, lv + 1));
     }
     this.post({ type: 'save', save: this.save });
     this.sound.play(won ? 'win' : 'lose');
     this.voice.say(won ? 'win' : 'lose');
-    const last = this.levelIndex >= 7;
+    const last = this.levelIndex >= this.th.names.length - 1;
     this.layer.append(h('div', { class: `${p}-dim` }, h('div', { class: `${p}-card` },
       h('div', { class: `${p}-title` }, won ? I.t('win') : I.t('lost')),
       won ? h('div', { class: `${p}-stars` }, [1, 2, 3].map((s) => h('span', { class: s <= r.stars ? '' : 'off' }, '⭐'))) : null,
@@ -436,6 +497,7 @@ class Game {
         case 'kill': this.sound.play('kill'); this.voice.say('trick'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 0.7, text: `+${e.coins}🪙` }); break;
         case 'gate': this.sound.play('gate', e.val); if (e.val > 0) this.voice.say('charge'); this.fx.push({ x: r.x, z: r.zs + 3, t: 0, life: 1, text: e.val >= 0 ? `+${e.val}` : `${e.val}` }); break;
         case 'free': this.sound.play('free'); this.voice.say('charge'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: `+${e.n}` }); break;
+        case 'rescue': this.sound.play('free'); this.voice.say('pickup'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: `+${e.n} 🛟` }); break;
         case 'weapon': this.sound.play('weapon'); this.voice.say('charge'); this.fx.push({ x: e.x, z: e.z, t: 0, life: 1, text: `${this.th.weapon[0]}↑` }); break;
         case 'hurt': this.sound.play('hurt'); this.voice.say('bump'); this.fx.push({ x: r.x, z: r.zs + 2, t: 0, life: 1, text: `-${e.n}` }); break;
         case 'done': this._end(true); break;
@@ -446,8 +508,8 @@ class Game {
     this.cntEl.textContent = `${this.th.icon} ${I.num(r.n)}`;
     this.coinEl.textContent = `🪙 ${I.num(r.coins)}`;
     this.barEl.style.width = `${Math.round(Math.min(1, r.zs / r.L) * 100)}%`;
-    if (!this.said.gate && r.things.some((t) => t.kind === 'gate' && !t.dead && t.z - r.zs < 12 && t.z > r.zs)) { this.said.gate = 1; this.hint(I.t('gateHint'), 3500); }
-    if (!this.said.cage && r.things.some((t) => t.kind === 'cage' && !t.dead && t.z - r.zs < 16 && t.z > r.zs)) { this.said.cage = 1; this.hint(I.t('cageHint'), 3500); }
+    if (!this.said.gate && r.things.some((t) => t.kind === 'gate' && !t.dead && t.z - r.zs < 12 && t.z > r.zs)) { this.said.gate = 1; this.hint(this.th.gateHint ? this.th.gateHint[I.getLang() === 'en' ? 1 : 0] : I.t('gateHint'), 3500); }
+    if (!this.said.cage && r.things.some((t) => t.kind === 'cage' && !t.dead && t.z - r.zs < 16 && t.z > r.zs)) { this.said.cage = 1; this.hint(this.th.cageHint ? this.th.cageHint[I.getLang() === 'en' ? 1 : 0] : I.t('cageHint'), 3500); }
     for (const f of this.fx) f.t += dt;
     this.fx = this.fx.filter((f) => f.t < f.life);
   }
@@ -476,9 +538,10 @@ class Game {
           }
         } else if (g.userData.label && t.hp !== undefined) {
           const key = `${Math.ceil(t.hp)}`;
-          if (g.userData.last !== key) { g.userData.last = key; g.userData.label.material.map = labelTex(key, t.kind === 'enemy' ? '#8a1a1a' : '#3a3a58'); g.userData.label.material.needsUpdate = true; }
+          if (g.userData.last !== key) { g.userData.last = key; g.userData.label.material.map = labelTex(key, t.kind === 'enemy' ? (t.trait === 'swim' ? '#1a6a9a' : '#8a5a1a') : '#3a3a58'); g.userData.label.material.needsUpdate = true; }
         }
-        if (t.kind === 'enemy') g.rotation.y = Math.PI + Math.sin(this.clock * 6 + t.id) * 0.1;
+        if (t.kind === 'enemy' && t.trait === 'swim') g.position.y = Math.sin(this.clock * 3 + t.id * 1.7) * 0.12 - 0.05;
+        else if (t.kind === 'enemy') g.rotation.y = Math.PI + Math.sin(this.clock * 6 + t.id) * 0.1;
         if (t.kind === 'crate') g.rotation.y = this.clock;
       }
       // squad formation
@@ -503,7 +566,7 @@ class Game {
       // bullets
       const m = new THREE.Matrix4();
       let k = 0;
-      for (const b of r.bullets) { if (k >= 240) break; m.makeTranslation(-b.x, 1.1, b.z); this.bulletMesh.setMatrixAt(k++, m); }
+      for (const b of r.bullets) { if (k >= 240) break; m.makeTranslation(-b.x, b.y ?? 1.1, b.z); this.bulletMesh.setMatrixAt(k++, m); }
       m.makeScale(0, 0, 0);
       for (let j = k; j < Math.max(k, this.lastBullets || 0); j++) this.bulletMesh.setMatrixAt(j, m);
       this.lastBullets = k;

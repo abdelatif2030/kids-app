@@ -94,3 +94,34 @@ test('stars for rounds 4-6 survive a save round-trip', () => {
   const s2 = normalizeSave({ stars: { 5: 2 } });
   assert.equal(s2.unlocked, 6, 'a star in round 5 implies round 6 is unlocked');
 });
+
+test('the head-charge is the rhino\u2019s alone: charging smashes gates for a boost, walking into one bumps, pads refill', () => {
+  const alien = new Race({ theme: 'alien', round: 0, seed: 2 });
+  const r = new Race({ theme: 'rhino', round: 0, seed: 2 });
+  for (let i = 0; i < 100 && r.state === 'count'; i++) r.step(1 / 30);
+  assert.equal(r.state, 'run');
+  // walking into a gate on the ground bumps him back
+  const gate = { id: 900, kind: 'gate', z: 6, x: 0, w: 7.2, hp: 1 };
+  r.els = [gate];
+  r.p.z = 5.8; r.p.y = 0;
+  r.step(1 / 30);
+  assert.ok(gate.hit && r.p.hits === 1 && r.p.stun > 0, `uncharged gate: hits ${r.p.hits}, stun ${r.p.stun}`);
+  // charging smashes the next one for a boost, no hit taken
+  const gate2 = { id: 901, kind: 'gate', z: 30, x: 0, w: 7.2, hp: 1 };
+  r.els = [gate2];
+  r.p.stun = 0; r.p.charge = 1;
+  assert.ok(r.charge());
+  r.p.z = 29.8; r.p.y = 0;
+  r.step(1 / 30);
+  assert.ok(gate2.hit && r.p.boost > 0 && r.p.hits === 1, `charged gate: boost ${r.p.boost}, hits ${r.p.hits}`);
+  assert.ok(r.p.charging > 0 && r.p.charge < 1, 'the meter drains while charging');
+  // a bounce pad refills the meter
+  r.p.charge = 0.2; r.p.charging = 0;
+  const pad = { id: 902, kind: 'pad', z: 60, x: 0, rad: 1.4 };
+  r.els = [pad];
+  r.p.z = 59.8; r.p.y = 0; r.p.grounded = true;
+  r.step(1 / 30);
+  assert.equal(r.p.charge, 1);
+  // and the alien truly has no charge to call
+  assert.equal(alien.charge(), false);
+});

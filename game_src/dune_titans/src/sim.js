@@ -1,31 +1,34 @@
-// The race with no drawing. Six riders, two laps of the coastal circuit. The bikes accelerate by themselves (the child
-// steers, brakes and fires nitro); grip limits how sharp a bike can turn at speed, so a corner taken too fast runs
-// wide onto the grass (slow) or against the soft barriers (never a crash). Riding close behind someone fills the
-// slipstream (more top speed and nitro); nitro is a short boost. The rivals follow a racing line, brake for corners
-// and overtake. Deterministic with a seed, so a robot test can race.
-import { buildTrack, nearest, lateral, pointAt, curvAhead, safeSpeed, HALF_W, WALL } from './track.js';
+// Oasis Rally — the race with no drawing. Six rally trucks, one long leg across the Western Desert from oasis
+// to oasis. The trucks accelerate by themselves (the child steers, brakes and fires nitro); SAND decides how
+// sharp a truck can turn: packed dirt grips, the soft drifts (gripAt) let it slide wide, and leaving the dirt
+// road means deep sand that bogs a heavy truck right down (never a crash — the marker rocks just bump it back).
+// Riding close behind someone fills the slipstream (more top speed and nitro); nitro is a short boost. The
+// rivals follow a racing line, brake for corners and overtake. Deterministic with a seed, so a robot test can race.
+import { buildTrack, nearest, lateral, pointAt, curvAhead, safeSpeed, gripAt, HALF_W, WALL } from './track.js';
 
-export const LAPS = 3;
-const GRIP = 16; // m/s² of cornering
-const PLAYER_VMAX = 61;
-const ACCEL = 15;
+export const LAPS = 1; // a rally leg is point-to-point: one long run, camp to camp
+export const GRIP = 11.5; // m/s² of cornering on packed dirt — sand gives far less than tarmac
+const PLAYER_VMAX = 57;
+const ACCEL = 10.5; // heavy trucks gather speed slowly
+const STEER_RATE = 6; // and their steering is heavy too
+const OFF_FACTOR = 0.32; // deep sand off the dirt road
 
 export const ROUNDS = [
-  { id: 1, ar: 'كثبان الصباح', en: 'Morning Dunes', reverse: false, rival: 52, sunset: false, skill: 0.9 },
-  { id: 2, ar: 'وادي الصخور', en: 'Rock Valley', reverse: true, rival: 55, sunset: false, skill: 0.97 },
-  { id: 3, ar: 'معبد الصخر', en: 'Rock Temple', reverse: false, rival: 57.5, sunset: false, skill: 1.03 },
-  { id: 4, ar: 'بوابة التيتان', en: 'Titan Gate', reverse: true, rival: 59.5, sunset: false, skill: 1.08 },
-  { id: 5, ar: 'معبد الملكة', en: "Queen's Temple", reverse: false, rival: 60.5, sunset: false, skill: 1.1 },
-  { id: 6, ar: 'واحة الغروب', en: 'Sunset Oasis', reverse: true, rival: 61, sunset: true, skill: 1.12 },
+  { id: 1, ar: 'سيوة ← البحر الرملي', en: 'Siwa → Great Sand Sea', reverse: false, rival: 46, sunset: false, skill: 0.9 },
+  { id: 2, ar: 'البحر الرملي ← البحرية', en: 'Sand Sea → Bahariya', reverse: true, rival: 48.5, sunset: false, skill: 0.97 },
+  { id: 3, ar: 'الصحراء البيضاء', en: 'White Desert', reverse: false, rival: 50.5, sunset: false, skill: 1.03 },
+  { id: 4, ar: 'الصحراء السوداء', en: 'Black Desert', reverse: true, rival: 52, sunset: false, skill: 1.08 },
+  { id: 5, ar: 'واحة الفرافرة', en: 'Farafra Oasis', reverse: false, rival: 53.5, sunset: false, skill: 1.1 },
+  { id: 6, ar: 'كأس الواحات: الداخلة', en: 'Oasis Cup: Dakhla', reverse: true, rival: 55, sunset: true, skill: 1.12 },
 ];
 
 export const RIDERS = [
   { kind: 'kid', ar: 'أنت', en: 'You', color: 0xff7a1a, suit: 0x1c1d22, helmet: 0xff7a1a, num: 7 },
-  { kind: 'rider', ar: 'سليم', en: 'Salim', color: 0x2a6ae8, suit: 0x1a2a5a, helmet: 0x2a6ae8, num: 12 },
-  { kind: 'rider', ar: 'ليلى', en: 'Laila', color: 0xff6aa8, suit: 0x3a1a2a, helmet: 0xffffff, num: 21 },
-  { kind: 'rider', ar: 'عمر', en: 'Omar', color: 0x2ab85a, suit: 0x1a3a22, helmet: 0xffd23a, num: 5 },
-  { kind: 'rider', ar: 'مريم', en: 'Mariam', color: 0xf2d21a, suit: 0x2a2c34, helmet: 0xf2b21a, num: 33 },
-  { kind: 'rider', ar: 'يوسف', en: 'Youssef', color: 0x8a3ae8, suit: 0x241a3a, helmet: 0x8a3ae8, num: 46 },
+  { kind: 'rider', ar: 'حسن', en: 'Hassan', color: 0x2a6ae8, suit: 0x1a2a5a, helmet: 0x2a6ae8, num: 12 },
+  { kind: 'rider', ar: 'نادية', en: 'Nadia', color: 0xff6aa8, suit: 0x3a1a2a, helmet: 0xffffff, num: 21 },
+  { kind: 'rider', ar: 'طارق', en: 'Tarek', color: 0x2ab85a, suit: 0x1a3a22, helmet: 0xffd23a, num: 5 },
+  { kind: 'rider', ar: 'سلمى', en: 'Salma', color: 0xf2d21a, suit: 0x2a2c34, helmet: 0xf2b21a, num: 33 },
+  { kind: 'rider', ar: 'بلال', en: 'Bilal', color: 0x8a3ae8, suit: 0x241a3a, helmet: 0x8a3ae8, num: 46 },
 ];
 
 function rng(seed) {
@@ -118,7 +121,7 @@ export class Race {
     let brake = !!input.brake;
     if (this.easy && !brake) {
       // the youngest also get a gentle automatic brake before a corner
-      if (r.v > safeSpeed(this.track, r.i, r.v, GRIP) * 1.05) brake = true;
+      if (r.v > safeSpeed(this.track, r.i, r.v, GRIP * gripAt(this.track, r.i)) * 1.05) brake = true;
     }
     if (input.nitro && r.nitro >= 0.3 && r.boost <= 0) {
       r.boost = 0.8 + r.nitro * 2;
@@ -149,7 +152,7 @@ export class Race {
     // speed for the corner, a little rubber band so races stay close
     const lead = r.prog - this.player.prog;
     let vmax = r.vmax * (lead > 70 ? 0.92 : lead < -90 ? 1.06 : 1);
-    vmax = Math.min(vmax, safeSpeed(tr, r.i, r.v, r.grip * 0.95));
+    vmax = Math.min(vmax, safeSpeed(tr, r.i, r.v, r.grip * gripAt(tr, r.i) * 0.95));
     const brake = r.v > vmax + 1.5;
     // nitro on a straight now and then
     if (r.nitro >= 0.9 && c.abs < 0.003 && r.boost <= 0 && this.rand() < 0.01) { r.boost = 2; r.nitro = 0; this.events.push({ type: 'nitro', id: r.id }); }
@@ -166,7 +169,7 @@ export class Race {
       r.x += Math.sin(r.h) * r.v * dt;
       r.z += Math.cos(r.h) * r.v * dt;
       if (r.crashT <= 0) {
-        // back on the bike, on the track, pointing the right way
+        // back in the truck, on the road, pointing the right way
         const side = Math.max(-HALF_W + 1.5, Math.min(HALF_W - 1.5, r.lat));
         const p = pointAt(tr, r.i, side);
         Object.assign(r, { x: p.x, z: p.z, h: tr.ang[r.i], lat: side, v: 6, steer: 0, off: false, boost: 0 });
@@ -176,17 +179,18 @@ export class Race {
     }
     r.boost = Math.max(0, r.boost - dt);
     r.wallT = Math.max(0, r.wallT - dt);
-    let vmax = r.vmax * (1 + 0.1 * r.draft) * (r.boost > 0 ? 1.3 : 1) * (r.off ? 0.5 : 1);
+    let vmax = r.vmax * (1 + 0.1 * r.draft) * (r.boost > 0 ? 1.3 : 1) * (r.off ? OFF_FACTOR : 1);
     if (ctl.vmax) vmax = Math.min(vmax, ctl.vmax * (1 + 0.1 * r.draft) * (r.boost > 0 ? 1.3 : 1));
     if (ctl.brake) r.v = Math.max(0, r.v - 30 * dt);
     else if (ctl.gas !== false) r.v += (r.boost > 0 ? ACCEL * 1.8 : ACCEL) * Math.max(0, 1 - r.v / vmax) * dt;
     if (r.v > vmax) r.v -= (r.v - vmax) * (r.off ? 2.5 : 1.2) * dt;
     // steering: grip limits the turn at speed (too fast = runs wide)
-    r.steer += (ctl.steer - r.steer) * Math.min(1, dt * 8);
-    const maxYaw = Math.min(1.5, r.grip / Math.max(6, r.v));
+    r.steer += (ctl.steer - r.steer) * Math.min(1, dt * STEER_RATE);
+    const gripNow = r.grip * gripAt(tr, r.i); // the sand under the wheels right now
+    const maxYaw = Math.min(1.5, gripNow / Math.max(6, r.v));
     const yaw = r.steer * maxYaw * Math.min(1, r.v / 4);
     r.h = wrap(r.h - yaw * dt);
-    r.lean = clamp(-yaw * r.v / GRIP, -1, 1); // lean into the turn (visual)
+    r.lean = clamp(-yaw * r.v / gripNow, -1, 1); // lean into the turn (visual)
     if (Math.abs(r.steer) > 0.85 && r.v > 30 && !r.off) r.skid = Math.min(1, (r.skid ?? 0) + dt * 3); else r.skid = Math.max(0, (r.skid ?? 0) - dt * 4);
     r.x += Math.sin(r.h) * r.v * dt;
     r.z += Math.cos(r.h) * r.v * dt;
@@ -200,7 +204,7 @@ export class Race {
     r.lat = lateral(tr, r.i, r.x, r.z);
     const wasOff = r.off;
     r.off = Math.abs(r.lat) > HALF_W + 0.3;
-    if (r.off && !wasOff) this.events.push({ type: 'grass', id: r.id });
+    if (r.off && !wasOff) this.events.push({ type: 'sand', id: r.id });
     // the soft barriers
     if (Math.abs(r.lat) > WALL - 0.5) {
       const side = Math.sign(r.lat);
@@ -250,7 +254,7 @@ export class Race {
     const tr = this.track;
     r.v = Math.max(18, r.v - 8 * dt);
     const ctl = this._ai(r);
-    r.steer += (ctl.steer - r.steer) * Math.min(1, dt * 8);
+    r.steer += (ctl.steer - r.steer) * Math.min(1, dt * STEER_RATE);
     const yaw = r.steer * Math.min(1.5, GRIP / Math.max(6, r.v));
     r.h = wrap(r.h - yaw * dt);
     r.x += Math.sin(r.h) * r.v * dt;

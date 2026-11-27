@@ -82,3 +82,10 @@ campaign and capped everything at round 3:
   not re-verified in this fix.
 - The Batch D identity separation (jetpack vs head-charge) is a later phase;
   this fix deliberately changes progression only, not the shared chassis.
+
+## Batch D3 — pair separation (2026-11-27)
+- Alien keeps the **jetpack** as its exclusive special (3 bursts, recover a missed jump); it has no
+  head-charge (`Race.charge()` returns false for the alien theme — asserted in tests and in the
+  real-click harness). The keyboard special key (J/Shift) and the big button now dispatch through one
+  `_special()` so each hero only ever fires its own move.
+- Tests: course_race **7/7**. Harness 5/5, zero errors: menu «زومي في الفضا», race runs, jets = 3.

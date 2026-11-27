@@ -356,7 +356,7 @@ export class Sound {
         this._noise(t + 0.1, 0.5, 0.12, 'highpass', 4000, 0.8);
         if (this.eng) { const g = this.eng.out.gain; g.cancelScheduledValues(t); g.setValueAtTime(0.01, t); g.setTargetAtTime(0.08, t + 1.3, 0.2); }
         break;
-      case 'grass':
+      case 'sand':
         this._noise(t, 0.35, 0.08, 'lowpass', 500);
         break;
       case 'lap':

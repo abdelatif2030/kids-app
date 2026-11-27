@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Store, PADS, DISPENSER, RACKS, CHECKOUTS, BOUNDS, normalizeSave } from '../src/sim.js';
+import { Store, PADS, DISPENSER, RACKS, CHECKOUTS, BOUNDS, normalizeSave, starsFor } from '../src/sim.js';
 
 const dist = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 
@@ -152,4 +152,29 @@ test('damaged saves load safely', () => {
     assert.ok(s.coins >= 0 && Array.isArray(s.unlocked) && s.complete === false);
   }
   assert.deepEqual(normalizeSave({ unlocked: ['nope', 'rack2', 'rack2'], paid: { hyper: 9999, robot1: 3 } }).paid, { robot1: 3 });
+});
+
+test('shoppers never wait forever at an empty rack, delivery rockets dock, stars are earned', () => {
+  const save = normalizeSave({});
+  const st = new Store(save, 5);
+  // drain the rack path: no baskets anywhere, dispenser empty
+  st.dispenser = 0;
+  st.rocketT = 9999; // keep rockets out of this part
+  let gaveUp = false;
+  for (let i = 0; i < 60 * 40 && !gaveUp; i++) {
+    st.dispenser = 0; // the child never restocks in this test
+    for (const e of st.step(1 / 60, { x: 0, z: 0 })) if (e.type === 'giveUp') gaveUp = true;
+  }
+  assert.ok(gaveUp, 'a shopper gave up kindly instead of waiting forever');
+  // a rocket tops the dispenser up
+  const st2 = new Store(normalizeSave({}), 5);
+  st2.dispenser = 0;
+  st2.rocketT = 0.01;
+  let rocket = null;
+  for (const e of st2.step(1 / 60, { x: 0, z: 0 })) if (e.type === 'rocket') rocket = e;
+  assert.ok(rocket && st2.dispenser === 3, `rocket delivered ${rocket && rocket.add}, dispenser ${st2.dispenser}`);
+  assert.equal(starsFor(0), 1);
+  assert.equal(starsFor(39), 1);
+  assert.equal(starsFor(40), 2);
+  assert.equal(starsFor(90), 3);
 });

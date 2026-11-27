@@ -6,6 +6,9 @@ import {
   COUNTER_CAP, PADS, CUSTOMER_KINDS, capacityOf,
 } from './data.js';
 
+/** Stars are EARNED by service, never given: finishing the bakery is one, a busy bakery earns more. */
+export function starsFor(served) { return served >= 80 ? 3 : served >= 35 ? 2 : 1; }
+
 const TICK = 0.13; // seconds between two items moving
 const SPEED = 4.8;
 const RADIUS = 0.35;

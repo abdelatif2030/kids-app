@@ -1,8 +1,9 @@
-// «سباق الدراجات النارية» — Motorcycle Racing. Entry: window.MotoRace.start(container, config, post).
+// «رالي الواحات» — Oasis Rally. Entry: window.DuneTitans.start(container, config, post).
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
-// A sunny coastal circuit with palms, mountains and grandstands: two laps against five animal riders. The bike
-// accelerates by itself; drag (or hold a side) to lean, brake before tight corners, ride in a slipstream and fire
-// nitro to overtake. No crashes: barriers are soft. No network, no links, no ads, no tracking.
+// A rally of six trucks across Egypt's Western Desert: one long leg per round, Siwa to Dakhla, over packed
+// dirt and soft sand drifts that steal your grip. The truck accelerates by itself; drag (or hold a side) to
+// steer, brake before the sweepers, ride in a slipstream and fire nitro to overtake. No crashes: the marker
+// rocks just bump you back. No network, no links, no ads, no tracking.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Race, ROUNDS, RIDERS, LAPS, normalizeSave } from './sim.js';
@@ -726,7 +727,7 @@ class Game {
         case 'draft': this.sound.play('draft'); this.voice.say('draft'); this._tag(t('draft'), 1); break;
         case 'bump': this.sound.play('bump'); this.shake = 0.3; break;
         case 'wall': if (e.id === 0) { this.sound.play('wall'); this.voice.say('bump'); this.shake = 0.45; for (let k = 0; k < 12; k++) this.sparks.emit(e.x, 0.6, e.z, (Math.random() - 0.5) * 6, Math.random() * 4, (Math.random() - 0.5) * 6, 0.5); } break;
-        case 'grass': if (e.id === 0) this.sound.play('grass'); break;
+        case 'sand': if (e.id === 0) this.sound.play('sand'); break;
         case 'crash':
           if (e.id === 0) { this.sound.play('crash'); this.voice.say('bump'); this.shake = 0.8; this._tag(t('crash'), 1.4, true); }
           for (let k = 0; k < 18; k++) this.sparks.emit(e.x, 0.5, e.z, (Math.random() - 0.5) * 8, Math.random() * 5, (Math.random() - 0.5) * 8, 0.6);
@@ -837,8 +838,9 @@ class Game {
       this.hud.pos.firstChild.textContent = num(p.place);
       this.hud.pos.classList.toggle('up', !!up);
     }
-    const lap = race.lap;
-    if (hc.lap !== lap) { hc.lap = lap; this.hud.lap.textContent = `${t('lap')} ${num(lap)}/${num(LAPS)}`; }
+    // a rally leg has no laps: the pill shows how much of the leg is done, as a percentage
+    const pct = Math.min(100, Math.max(0, Math.floor((100 * p.prog) / race.length)));
+    if (hc.lap !== pct) { hc.lap = pct; this.hud.lap.textContent = `${t('leg')} ${num(pct)}٪`; }
     const tt = Math.floor(race.time * 10);
     if (hc.t !== tt) { hc.t = tt; this.hud.time.textContent = this._fmt(race.time); }
     const kmh = Math.round(p.v * 3.6);
