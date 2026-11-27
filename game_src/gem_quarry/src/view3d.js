@@ -104,7 +104,26 @@ export class View3D {
     this.trucks = new Map();
     this.pileG = grp(this.scene); this.pileCrates = []; for (let i = 0; i < 24; i++) { const k = i % 6; const c = crate(this.pileG, 0.05 + (k % 3) * 0.64 + 0.31, 0.18 + Math.floor(i / 6) * 0.5, 0.05 + Math.floor(k / 3) * 0.64 + 0.31, 1); c.visible = false; this.pileCrates.push(c); }
     add(this.pileG, G.box, M(0xa07840, 0, 0, { r: 0.8 }), 0.9, 0.09, 0.8, 2.2, 0.18, 1.6);
-    this.roadKey = '';
+    this.roadKey = ''; this._extras();
+  }
+
+  _extras() {
+    const S = this.scene; let sd = 7; const rnd = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
+    const free = (x, y) => !this._near(x, y) && x > -12 && x < 17 && y > -11 && y < 23.5 && !(Math.abs(x - y) < 3.2 && x > -1 && x < 18);
+    // grass patches and flowers
+    for (let i = 0; i < 34; i++) { const x = -12 + rnd() * 29; const y = -11 + rnd() * 34; if (!free(x, y)) continue; const r = 0.9 + rnd() * 1.6; const gp = add(S, G.cyl, M(0x7ac24a, 0, 0, { r: 1 }), x, 0.03, y, r * 2, 0.05, r * 1.6); gp.castShadow = false;
+      for (let k = 0; k < 5; k++) { const a = rnd() * TAU; const d = rnd() * r * 0.8; const fl = add(S, G.sph, M([0xff6a8a, 0xffe05a, 0xffffff, 0xff9a3a][k % 4], 0, 0, { r: 0.6 }), x + Math.cos(a) * d, 0.22, y + Math.sin(a) * d, 0.22); fl.castShadow = false; add(S, G.cyl, M(0x3a9a3a), x + Math.cos(a) * d, 0.1, y + Math.sin(a) * d, 0.04, 0.2, 0.04).castShadow = false; } }
+    // oasis pond
+    this.pond = add(S, G.cyl, new THREE.MeshStandardMaterial({ color: 0x4ac8f0, emissive: 0x2a98d0, emissiveIntensity: 0.5, roughness: 0.1, metalness: 0.2 }), 12.5, 0.06, -3.5, 5.4, 0.1, 4); add(S, G.cyl, M(0xb9a070, 0, 0, { r: 1 }), 12.5, 0.02, -3.5, 6.4, 0.06, 5); for (const [dx, dz] of [[-2, 1], [2.2, 0.6], [0.4, -1.8]]) { const r = add(S, G.sph, M(0xa09080, 0, 0, { r: 1, f: 1 }), 12.5 + dx, 0.25, -3.5 + dz, 0.8, 0.5, 0.7); void r; }
+    // barrels and hay near the depot, lamps along the road
+    for (const [x, y] of [[-0.5, -3.2], [0.6, -2.6], [-3.4, 0.4]]) { const b = add(S, G.cyl, M(0x9a5a2a, 0, 0, { r: 0.7 }), x, 0.55, y, 0.9, 1.1, 0.9); add(S, G.cyl, M(0x3a2a1a), x, 0.35, y, 0.95, 0.1, 0.95); add(S, G.cyl, M(0x3a2a1a), x, 0.8, y, 0.95, 0.1, 0.95); void b; }
+    this.lamps = []; for (const [x, y] of [[7.2, 8.4], [3.4, 7.5], [2.4, 2.6], [12.2, 8.4], [-1.8, 3.4]]) { add(S, G.cyl, M(0x4a3a2a), x, 1.4, y, 0.14, 2.8, 0.14); const bulb = add(S, G.sph, M(0xfff0a0, 0xffd060, 1.6), x, 2.95, y, 0.5); this.lamps.push(bulb); }
+    // flag on the depot
+    const fl = grp(S, -3.6, 6.6, -3.6); add(fl, G.cyl, M(0x6a4a2a), 0, 0.4, 0, 0.1, 2.6, 0.1); this.flag = add(fl, G.box, M(0xe8342a, 0, 0, { r: 0.6 }), 0.65, 1.3, 0, 1.3, 0.8, 0.06);
+    // dust sparkles over the mine, flying birds
+    const pg = new THREE.BufferGeometry(); const N = 60; const pos = new Float32Array(N * 3); for (let i = 0; i < N; i++) { pos[i * 3] = 3 + rnd() * 10; pos[i * 3 + 1] = rnd() * 4; pos[i * 3 + 2] = 11 + rnd() * 8; } pg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    this.sparks = new THREE.Points(pg, new THREE.PointsMaterial({ color: 0xe8c0ff, size: 0.35, transparent: true, opacity: 0.9, depthWrite: false })); this.sparks.frustumCulled = false; S.add(this.sparks); this.sparkBase = pos.slice();
+    this.birds = [0, 1, 2].map((i) => { const b = grp(S); const wl = add(b, G.box, M(0x2a2a3a), -0.35, 0, 0, 0.7, 0.05, 0.25); const wr = add(b, G.box, M(0x2a2a3a), 0.35, 0, 0, 0.7, 0.05, 0.25); add(b, G.sph, M(0x2a2a3a), 0, 0, 0, 0.3); b.userData = { wl, wr, i }; return b; });
   }
 
   _world() {
@@ -125,7 +144,7 @@ export class View3D {
     for (let i = -3; i <= 3; i++) add(S, G.box, M(0x2a2a30), 10 + i * 0.6, 0.11, 10, 0.26, 0.02, 2.4).rotation.y = 0.6;
     for (let i = 0; i < 34; i++) { const x = -16 + ((i * 7.7) % 32); const y = -12 + ((i * 13.3) % 34); if (this._near(x, y)) continue; const k = i % 3; if (k === 0) add(S, G.sph, M(0xb08a58, 0, 0, { r: 1, f: 1 }), x, 0.25, y, 0.9 + (i % 4) * 0.3, 0.6, 0.8); else if (k === 1) { const cg = grp(S, x, 0, y); add(cg, G.cyl, M(0x3a9a58), 0, 0.8, 0, 0.45, 1.6, 0.45); add(cg, G.sph, M(0x3a9a58), 0, 1.6, 0, 0.45); add(cg, G.cyl, M(0x3a9a58), 0.4, 1.0, 0, 0.28, 0.7, 0.28); } else add(S, G.cone, M(0xd8b878, 0, 0, { r: 1 }), x, 0.3, y, 1.6, 0.6, 1.6); }
     for (const [x, y] of [[-7, 3], [4, 0.5], [13, 6], [12, 13], [-2, 9], [2, 17.5], [-5, -1]]) { const p = grp(S, x, 0, y); const trunk = add(p, G.cyl, M(0x8a5a2c), 0, 1.6, 0, 0.35, 3.2, 0.35); trunk.rotation.z = 0.15; for (let k = 0; k < 6; k++) { const l = add(p, G.cone, M(0x2fa85a, 0, 0, { r: 0.6 }), Math.cos(k * 1.05) * 0.9 + 0.4, 3.3, Math.sin(k * 1.05) * 0.9, 0.5, 2.0, 0.5); l.rotation.z = -Math.cos(k * 1.05) * 1.2 - 0.3; l.rotation.x = Math.sin(k * 1.05) * 1.2; } add(p, G.sph, M(0x6a3a14), 0.3, 3.1, 0.2, 0.4); }
-    for (const [x, y, r] of [[-19, -6, 1.6], [-10, -16, 1.8], [15, -13, 1.6], [16, 7, 1.3], [-14, 7, 1.2], [13, 19, 1.4], [-6, 13, 1.1]]) { const m = add(S, G.cyl, M(0xb9835a, 0, 0, { r: 1, f: 1 }), x, r * 0.5, y, r * 2, r, r * 2); m.rotation.y = x; add(S, G.cyl, M(0xd9a46a, 0, 0, { r: 1, f: 1 }), x, r * 1.02, y, r * 1.7, r * 0.1, r * 1.7); }
+    for (const [x, y, r] of [[-11, -9, 1.6], [-9, -10, 1.0], [15, -9, 1.5], [16, 8, 1.2], [-11, 7, 1.2], [14, 21, 1.4], [-6, 13, 1.1]]) { add(S, G.sph, M(0xb08a58, 0, 0, { r: 1, f: 1 }), x, r * 0.4, y, r * 2, r * 1.1, r * 1.7); add(S, G.sph, M(0xc89a68, 0, 0, { r: 1, f: 1 }), x + r * 0.9, r * 0.25, y + r * 0.3, r, r * 0.6, r * 0.9); }
   }
 
   _near(x, y) { return (x > -8 && x < 12 && y > -8 && y < 12) || (x > 0 && x < 13 && y > 9 && y < 20) || (x > -3 && x < 5 && y > 9 && y < 16); }
@@ -169,7 +188,7 @@ export class View3D {
     this.pileCrates.forEach((c, i) => { c.visible = i < o.pile; });
     let wi = 0;
     const place = (x, y, i, busy, carry) => {
-      const w = this.workers[wi++]; w.visible = true; w.position.set(x, 0, y); w.rotation.y = Math.PI / 4; w.scale.setScalar(1.45);
+      const w = this.workers[wi++]; w.visible = true; w.position.set(x, 0, y); w.rotation.y = Math.PI / 4; w.scale.setScalar(1.9);
       const u = w.userData; const sw = busy ? Math.sin(clock * 7 + i * 1.7) : Math.sin(clock * 8 + i) * 0.7;
       u.body.position.y = Math.abs(sw) * 0.06; u.aR.rotation.x = busy ? -1.6 + sw * 1.1 : Math.sin(clock * 8 + i) * 0.5; u.aL.rotation.x = busy ? -0.5 - sw * 0.3 : -Math.sin(clock * 8 + i) * 0.5;
       u.pick.visible = !!busy; u.lL.rotation.x = busy ? 0 : sw * 0.6; u.lR.rotation.x = busy ? 0 : -sw * 0.6; u.head.rotation.y = Math.sin(clock * 1.3 + i) * 0.25;
@@ -182,12 +201,16 @@ export class View3D {
     for (const t of trucks) {
       seen.add(t.id); let tr = this.trucks.get(t.id);
       if (!tr) { tr = makeTruck(); this.scene.add(tr); this.trucks.set(t.id, tr); }
-      tr.visible = true; tr.position.set(t.x, 0, t.y); tr.scale.setScalar(1.35);
+      tr.visible = true; tr.position.set(t.x, 0, t.y); tr.scale.setScalar(1.6);
       tr.rotation.y = t.ax === 'x' ? (t.sign > 0 ? 0 : Math.PI) : (t.sign > 0 ? -Math.PI / 2 : Math.PI / 2);
       const u = tr.userData; u.lift.position.y = t.bob * 1.2; u.wheels.forEach((wh) => { wh.rotation.y += t.moving ? 0.3 : 0; });
       const n = Math.min(4, Math.ceil((t.load / t.cap) * 4)); u.slots.forEach((c, i) => { c.visible = i < n; });
     }
     for (const [id, tr] of this.trucks) if (!seen.has(id)) tr.visible = false;
+    const tm = clock; this.flag.rotation.y = Math.sin(tm * 4) * 0.4; this.pond.material.emissiveIntensity = 0.45 + Math.sin(tm * 2) * 0.12;
+    this.lamps.forEach((l, i) => { l.scale.setScalar(0.5 + Math.sin(tm * 3 + i) * 0.04); });
+    const pa = this.sparks.geometry.attributes.position; for (let i = 0; i < pa.count; i++) { pa.array[i * 3 + 1] = (this.sparkBase[i * 3 + 1] + tm * 0.5 + i) % 4; pa.array[i * 3] = this.sparkBase[i * 3] + Math.sin(tm + i) * 0.4; } pa.needsUpdate = true;
+    this.birds.forEach((b) => { const i = b.userData.i; const a = tm * 0.5 + i * 2.1; b.position.set(4 + Math.cos(a) * 14, 9 + Math.sin(tm + i) * 0.6, 4 + Math.sin(a) * 10); b.rotation.y = -a; const f = Math.sin(tm * 12 + i) * 0.7; b.userData.wl.rotation.z = f; b.userData.wr.rotation.z = -f; });
     this.renderer.render(this.scene, this.cam);
   }
 

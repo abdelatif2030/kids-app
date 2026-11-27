@@ -122,7 +122,7 @@ class Game {
   _tap() {
     if (this.mode !== 'play') return;
     const q = this.q; const f = q.front(); const n = q.tapLoad();
-    if (n) { this.sound.play('drop'); const [x, y] = this.P(PAD[0], PAD[1], 2); this.fx.push({ kind: 'text', x, y: y - this.s, t: 0, text: `📦×${I.num(n)}`, col: '#fff' }); this.hintT = 99; }
+    if (n) { this.sound.play('drop'); const [x, y] = this.P(PAD[0], PAD[1], 2); this.fx.push({ kind: 'text', x, y: y - this.s, t: 0, text: `×${I.num(n)}`, col: '#fff' }); this.hintT = 99; }
     else if (!f) { this.sound.play('no'); this._hint(I.t('wait')); }
   }
 
@@ -191,7 +191,7 @@ class Game {
   _buyFx(k) {
     const spots = { diggers: PILE_AT, trucks: PAD, pile: PILE_AT, truckCap: PAD, road: [5, 7.5], loader: PAD, polish: [9, 3], mine2: [2.2, 12.2] };
     const s = spots[k]; const [x, y] = this.P(s[0], s[1], 2);
-    this.fx.push({ kind: 'text', x, y, t: 0, text: '⬆️', col: '#9dffb0' });
+    this.fx.push({ kind: 'text', x, y, t: 0, text: '+', col: '#9dffb0' });
     for (let i = 0; i < 8; i++) this.fx.push({ kind: 'spark', x, y, t: 0, vx: (i - 3.5) * 14 * this.s / 20, vy: -30 - (i % 3) * 8, col: ['#ffe27a', '#d6a8ff', '#9dffb0'][i % 3] });
   }
 
@@ -258,7 +258,7 @@ class Game {
         case 'dig': if (this.clock - this.digSnd > 0.18) { this.digSnd = this.clock; this.sound.play('dig'); } this._sparkle(); break;
         case 'deliver': {
           this.sound.play('coin'); this.sound.play('horn');
-          const [x, y] = this.P(GATE[0] - 1, GATE[1] - 1, 3.4); this.fx.push({ kind: 'text', x, y, t: 0, text: `+${I.num(e.pay)} 🪙`, col: '#ffe27a' }); break;
+          const [x, y] = this.P(GATE[0] - 1, GATE[1] - 1, 3.4); this.fx.push({ kind: 'text', x, y, t: 0, text: `+${I.num(e.pay)}`, col: '#ffe27a' }); break;
         }
         case 'overflow': this.sound.play('warn'); this.warnT = 0; break;
         case 'won': this._won(); break;
@@ -458,8 +458,15 @@ class Game {
       g.fillStyle = '#e8261a'; g.strokeStyle = '#fff'; g.lineWidth = this.s * 0.14; g.beginPath(); g.arc(sx, sy, this.s * 0.95, 0, 6.3); g.fill(); g.stroke();
       g.fillStyle = '#fff'; g.font = `900 ${this.s * 1.5}px Tajawal, system-ui`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('!', sx, sy + this.s * 0.08); g.textBaseline = 'alphabetic';
     } else if (this.mode === 'play' && !q.easy && this.hintT < 99 && q.pile > 2 && q.front()) {
-      const [sx, sy] = this.P(x0 + 1, y0 + 0.8, 3.2 + Math.abs(Math.sin(this.clock * 5)) * 0.4); g.font = `${this.s * 1.7}px system-ui`; g.textAlign = 'center'; g.fillText('👆', sx, sy);
+      const [sx, sy] = this.P(x0 + 1, y0 + 0.8, 3.2 + Math.abs(Math.sin(this.clock * 5)) * 0.4); this._hand(g, sx, sy);
     }
+  }
+
+  _hand(g, x, y) {
+    const k = this.s * 0.5; g.save(); g.translate(x, y); g.lineJoin = 'round'; g.strokeStyle = '#6a3a10'; g.lineWidth = k * 0.16; g.fillStyle = '#ffe0b8';
+    g.beginPath(); g.roundRect(-k * 0.38, -k * 2.0, k * 0.76, k * 2.2, k * 0.38); g.fill(); g.stroke();
+    g.beginPath(); g.roundRect(-k * 1.1, -k * 0.6, k * 2.2, k * 1.5, k * 0.5); g.fill(); g.stroke();
+    g.beginPath(); g.arc(0, k * 1.2, k * 0.5, 0, 6.3); g.fillStyle = 'rgba(255,255,255,.55)'; g.fill(); g.restore();
   }
 
   _fxDraw(g) {
