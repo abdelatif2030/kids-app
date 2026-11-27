@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Rehlaty Space Store Manager: a grocery store on a space station (three.js). Built into assets/games/space_store/game.js",
   "scripts": {
-    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/space_store/game.js",
+    "build": "node ../cozy_kit/build_game.mjs src/main.js ../../assets/games/space_store/game.js",
     "test": "node --test test/sim.test.js"
   },
   "dependencies": {

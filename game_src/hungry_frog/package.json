@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Rehlaty «لعبة الضفدع الجائع» pond eat-and-grow frog game (three.js). Built into assets/games/hungry_frog/game.js",
   "scripts": {
-    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/hungry_frog/game.js",
+    "build": "node ../cozy_kit/build_game.mjs src/main.js ../../assets/games/hungry_frog/game.js",
     "test": "node --test test/sim.test.js"
   },
   "dependencies": {
