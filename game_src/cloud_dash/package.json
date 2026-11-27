@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Rehlaty «ركضة السحاب» pastel cloud runner (three.js). Built into assets/games/cloud_dash/game.js",
   "scripts": {
-    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/cloud_dash/game.js",
+    "build": "node ../cozy_kit/build_game.mjs src/main.js ../../assets/games/cloud_dash/game.js",
     "test": "node --test test/sim.test.js"
   },
   "dependencies": {
