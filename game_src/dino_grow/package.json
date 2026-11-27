@@ -3,6 +3,6 @@
   "private": true,
   "type": "module",
   "description": "Rehlaty Dino Grow (three.js). Built into assets/games/dino_grow/game.js",
-  "scripts": { "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/dino_grow/game.js", "test": "node --test test/sim.test.js" },
+  "scripts": { "build": "node ../cozy_kit/build_game.mjs src/main.js ../../assets/games/dino_grow/game.js", "test": "node --test test/sim.test.js" },
   "dependencies": { "three": "0.170.0" }, "devDependencies": { "esbuild": "0.24.0" }
 }

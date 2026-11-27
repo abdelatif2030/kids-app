@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Rehlaty hamster warrior power runner (three.js). Built into assets/games/hamster_warrior/game.js",
   "scripts": {
-    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/hamster_warrior/game.js",
+    "build": "node ../cozy_kit/build_game.mjs src/main.js ../../assets/games/hamster_warrior/game.js",
     "test": "node --test test/sim.test.js"
   },
   "dependencies": { "three": "0.170.0" },

@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Rehlaty ice dragon maze shooter (three.js). Built into assets/games/ice_dragon/game.js",
   "scripts": {
-    "build": "esbuild src/main.js --bundle --minify --format=iife --target=es2019 --outfile=../../assets/games/ice_dragon/game.js",
+    "build": "node ../cozy_kit/build_game.mjs src/main.js ../../assets/games/ice_dragon/game.js",
     "test": "node --test test/sim.test.js"
   },
   "dependencies": { "three": "0.170.0" },
