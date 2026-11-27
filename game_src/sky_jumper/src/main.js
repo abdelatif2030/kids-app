@@ -73,7 +73,7 @@ class Game {
     this._onVis = () => { if (document.hidden) this.sound.suspend(); else this.sound.resume(); };
     document.addEventListener('visibilitychange', this._onVis);
     this.last = performance.now();
-    Promise.all([this._fonts(), loadArt(this.base, ['hero', 'monster']).then((a) => Object.assign(ART, a))]).then(() => { this.showMenu(); this._loop(); });
+    Promise.all([this._fonts(), loadArt(this.base, ['hero', 'monster', 'platform_grass', 'jetpack', 'propeller']).then((a) => Object.assign(ART, a))]).then(() => { this.showMenu(); this._loop(); });
   }
 
   async _fonts() { try { const f = new FontFace('Tajawal', `url(${this.base}../../fonts/Tajawal-ExtraBold.ttf)`, { weight: '900' }); await Promise.race([f.load().then((ff) => document.fonts.add(ff)), new Promise((r) => setTimeout(r, 900))]); } catch (_) { /* system font */ } }
@@ -157,11 +157,43 @@ class Game {
       if (pl.kind === 'crumble') { g.strokeStyle = '#5a3a1a'; g.beginPath(); g.moveTo(x - 4, y - 5); g.lineTo(x, y + 7); g.moveTo(x + 8, y - 5); g.lineTo(x + 4, y + 7); g.stroke(); }
       if (pl.kind === 'spring') { g.strokeStyle = '#888'; g.lineWidth = 3; g.beginPath(); for (let k = 0; k < 5; k++) { g.lineTo(x + (k % 2 ? 6 : -6), y - 6 - k * 3); } g.stroke(); g.fillStyle = '#e8564a'; g.fillRect(x - 9, y - 24, 18, 5); }
     }
-    for (const it of c.items) { const x = it.x * sx; const y = Y(it.y); const im = it.kind === 'jetpack' ? ART.jetpack : ART.propeller; if (im) { pic(g, im, x, y - sx * 0.35, sx * 1.0); continue; } g.font = `${sx * 1.1}px system-ui`; g.textAlign = 'center'; g.fillText(it.kind === 'jetpack' ? '🚀' : '🚁', x, y); }
+    for (const it of c.items) { const x = it.x * sx; const y = Y(it.y); const im = it.kind === 'jetpack' ? ART.jetpack : ART.propeller; if (im) { pic(g, im, x, y - sx * 0.35, sx * 1.0); continue; } this._item(g, it.kind, x, y - sx * 0.35, sx * 1.0); }
     for (const m of c.mons) { if (m.dead) continue; const x = m.x * sx; const y = Y(m.y); if (ART.monster) { pic(g, ART.monster, x, y, sx * 1.35); continue; } g.fillStyle = '#9a5ad8'; g.strokeStyle = '#3a1a5a'; g.lineWidth = 2; g.beginPath(); g.ellipse(x, y, sx * 0.55, sx * 0.5, 0, 0, 6.3); g.fill(); g.stroke(); g.fillStyle = '#fff'; g.beginPath(); g.arc(x - sx * 0.2, y - sx * 0.1, sx * 0.17, 0, 6.3); g.arc(x + sx * 0.2, y - sx * 0.1, sx * 0.17, 0, 6.3); g.fill(); g.fillStyle = '#111'; g.beginPath(); g.arc(x - sx * 0.2, y - sx * 0.1, sx * 0.07, 0, 6.3); g.arc(x + sx * 0.2, y - sx * 0.1, sx * 0.07, 0, 6.3); g.fill(); g.beginPath(); g.moveTo(x - sx * 0.3, y + sx * 0.18); g.lineTo(x + sx * 0.3, y + sx * 0.18); g.stroke(); }
     for (const s of c.shots) { g.fillStyle = '#ff8a2a'; g.beginPath(); g.arc(s.x * sx, Y(s.y), 6, 0, 6.3); g.fill(); }
     // the creature (drawn wrapped at both edges)
     for (const dx of [0, -W, W]) this._creature(g, (c.p.x + dx) * sx, Y(c.p.y), sx, c.p);
+  }
+
+  /** A power-up drawn in code, in the game's own cartoon style — the fallback used to be
+   *  🚀/🚁 emoji text (the art hooks for jetpack/propeller were never even requested, so
+   *  the emoji always showed). If art/jetpack.webp or art/propeller.webp ever ships, the
+   *  picture wins and this painter is skipped. (x, y) is the centre, w the full width. */
+  _item(g, kind, x, y, w) {
+    g.save(); g.translate(x, y);
+    g.lineWidth = Math.max(1.5, w * 0.045); g.strokeStyle = '#2a2a3a'; g.lineJoin = 'round';
+    if (kind === 'jetpack') {
+      const flick = 0.75 + 0.25 * Math.sin(this.clock * 13 + x * 0.7);
+      for (const sgn of [-1, 1]) { // twin exhaust flames, always lit so the pickup reads as "fast!"
+        g.fillStyle = '#ff8a2a'; g.beginPath(); g.moveTo(sgn * w * 0.16 - w * 0.07, w * 0.34); g.lineTo(sgn * w * 0.16 + w * 0.07, w * 0.34); g.lineTo(sgn * w * 0.16, w * (0.34 + 0.3 * flick)); g.closePath(); g.fill();
+        g.fillStyle = '#ffd24a'; g.beginPath(); g.moveTo(sgn * w * 0.16 - w * 0.035, w * 0.34); g.lineTo(sgn * w * 0.16 + w * 0.035, w * 0.34); g.lineTo(sgn * w * 0.16, w * (0.34 + 0.17 * flick)); g.closePath(); g.fill();
+      }
+      for (const sgn of [-1, 1]) { // two silver tanks with red caps
+        const tx = sgn * w * 0.16;
+        const grad = g.createLinearGradient(tx - w * 0.13, 0, tx + w * 0.13, 0);
+        grad.addColorStop(0, '#e8eef5'); grad.addColorStop(0.5, '#aebfd2'); grad.addColorStop(1, '#7e93ab');
+        g.fillStyle = grad; g.beginPath(); g.roundRect(tx - w * 0.13, -w * 0.3, w * 0.26, w * 0.64, w * 0.1); g.fill(); g.stroke();
+        g.fillStyle = '#e8564a'; g.beginPath(); g.roundRect(tx - w * 0.09, -w * 0.42, w * 0.18, w * 0.14, w * 0.05); g.fill(); g.stroke();
+      }
+      g.fillStyle = '#5a6a86'; g.beginPath(); g.roundRect(-w * 0.3, -w * 0.05, w * 0.6, w * 0.13, w * 0.05); g.fill(); g.stroke(); // strap band
+    } else { // propeller hat
+      const spin = Math.abs(Math.cos(this.clock * 35 + x * 0.5));
+      g.strokeStyle = '#2a2a3a'; g.beginPath(); g.moveTo(0, w * 0.08); g.lineTo(0, -w * 0.3); g.stroke(); // mast
+      g.fillStyle = '#e8564a'; g.beginPath(); g.ellipse(0, -w * 0.36, w * (0.08 + 0.42 * spin), w * 0.075, 0, 0, 6.3); g.fill(); g.stroke(); // blade (width pulses = spinning)
+      g.fillStyle = '#ffb03a'; g.beginPath(); g.arc(0, -w * 0.36, w * 0.07, 0, 6.3); g.fill(); g.stroke(); // hub
+      g.fillStyle = '#2ab8a8'; g.beginPath(); g.arc(0, w * 0.12, w * 0.3, Math.PI, 0); g.closePath(); g.fill(); g.stroke(); // cap dome
+      g.fillStyle = '#1f8a7c'; g.beginPath(); g.roundRect(-w * 0.34, w * 0.08, w * 0.68, w * 0.09, w * 0.04); g.fill(); g.stroke(); // brim
+    }
+    g.restore();
   }
 
   _creature(g, x, y, sx, p) {
@@ -178,7 +210,7 @@ class Game {
     g.fillStyle = '#5a9a1a'; for (const fx of [-0.55, 0.45]) { g.beginPath(); g.ellipse(fx * s, -s * 0.1 + (p.vy > 0 ? -s * 0.2 : 0), s * 0.32, s * 0.22, 0, 0, 6.3); g.fill(); g.stroke(); }
     g.strokeStyle = '#3a5a1a'; g.lineWidth = 3; g.beginPath(); g.moveTo(-s * 0.9, -s * 1.5); g.lineTo(-s * 1.3, -s * 1.9); g.stroke();
     }
-    if (p.fly > 0) { g.font = `${s * 1.8}px system-ui`; g.textAlign = 'center'; g.fillText(p.flyKind === 'jetpack' ? '🔥' : '🚁', 0, p.flyKind === 'jetpack' ? s * 0.6 : -s * 2.6); }
+    if (p.fly > 0) { if (p.flyKind === 'jetpack') this._item(g, 'jetpack', -s * 0.95, -s * 1.0, s * 1.15); else this._item(g, 'propeller', 0, -s * 2.35, s * 1.2); }
     if (p.shield > 0 && Math.floor(this.clock * 10) % 2) { g.globalAlpha = 0.4; g.fillStyle = '#fff'; g.beginPath(); g.arc(0, -s, s * 1.6, 0, 6.3); g.fill(); g.globalAlpha = 1; }
     g.restore();
   }
