@@ -51,3 +51,10 @@ Tools: `tools/install_pack.py <game> <zips dir> <panel RGB> <win#> <icons#> <bac
 - Installed with `tools/install_pack.py space_store ... 12 13 6,7,8,9` + `tools/make_skin_css.py`: key art -> poster + card (menu background and the card of the fun page), skin pieces (`skin/`), win picture (`art/win.webp`), 12 icons (`art/icon_*.webp`), 4 backdrops (`art/pano1..4.webp`, NOT wired: the store is seen from above like the farm).
 - The game's menu/pause/win panels are `.ss-panel` (not the shared `.ss-card`), so `skin.css` styles `.ss-root .ss-panel` (the owner's frame with the cart and awning) and the ribbon title.
 - Not used yet: hero sheet (04), cast sheet (05: robot cashiers, alien customers, cats), props/shelves/baskets sheets (10, 11), picture 14 (level-complete frame). The old `hero.webp` was removed (the key art shows the hero).
+
+## Sixth pass (2026-11-27): fox_family, zombie_rooftop, gum_ball, hungry_frog, deep_sea
+- Same pack layout (01 key art, 02 skin, 03 pills, 04 hero, 05 cast, backdrops, prop sheets, win, icons). `install_pack.py` + `make_skin_css.py`: key art -> poster + card (the fun-page card), skin pieces, win picture, icons, backdrops (`art/pano*.webp`, NOT wired: they are top-down or 3D games where the ring does not fit).
+- fox_family: backdrops 6-11, win 14, icons 15. zombie_rooftop: 8 roof backdrops 6-13, win 16, icons 17 (its panels are `.zr-panel`, so skin.css styles that). gum_ball: backdrops 6-10, win 13, icons 14. hungry_frog: backdrops 6-11, win 14, icons 15.
+- deep_sea: only part 1 arrived (key art, skin, pills, hero, cast, 4 backdrops). Win picture and icons wait for part 2.
+- Not used yet: hero/cast sheets and the prop/vehicle sheets of all five games.
+- Voices (same day): German 2107, English 898, French 594, Arabic 193 clips installed; `tools/make_missing_by_language.mjs` now reports 0 missing lines for English, German and French.

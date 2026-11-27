@@ -1,0 +1,9 @@
+
+/* Hungry Frog skin: the owner's pictures (skin/*.webp) drawn over the menu pieces. Shapes keep their size; only the look changes. */
+.hf-card{overflow-x:hidden !important;overflow-y:auto !important;max-height:94% !important;background:url(skin/panel.webp) center/100% 100% no-repeat !important;border:none !important;box-shadow:none !important;padding:calc(var(--u)*15) calc(var(--u)*12) calc(var(--u)*11) !important;gap:calc(var(--u)*1.1) !important;color:#1a5a3a !important}
+.hf-logo{color:#fff !important;font-size:calc(var(--u)*7) !important;line-height:1.15 !important;background:url(skin/ribbon.webp) center/100% 100% no-repeat;padding:calc(var(--u)*2.6) calc(var(--u)*10) calc(var(--u)*3.6) !important;margin:calc(var(--u)*-4) 0 calc(var(--u)*.5) !important;-webkit-text-stroke:calc(var(--u)*.8) #2a7a4a;paint-order:stroke fill;text-shadow:0 calc(var(--u)*.5) 0 #2a7a4a;white-space:nowrap}
+.hf-small{color:#1a5a3a !important;opacity:1 !important;font-size:calc(var(--u)*3) !important}
+.hf-btn{text-shadow:0 calc(var(--u)*.4) 0 #2a7a4a;min-height:calc(var(--u)*8.6) !important;font-size:calc(var(--u)*4.2) !important;padding-top:calc(var(--u)*.6) !important;padding-bottom:calc(var(--u)*.6) !important}
+.hf-lv{background:url(skin/lv_open.webp) center/contain no-repeat !important;border:none !important;box-shadow:none !important;color:#1a5a3a !important;text-shadow:none !important}
+.hf-lv.lock{background-image:url(skin/lv_lock.webp) !important;font-size:0 !important;color:transparent !important}
+.hf-lv.lock i,.hf-lv.lock span{display:none !important}
