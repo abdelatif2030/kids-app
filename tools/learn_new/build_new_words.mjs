@@ -26,9 +26,9 @@ const IT = fs.readFileSync(new URL('./it_words.txt', import.meta.url), 'utf8').s
 if (IT.length !== body.length) throw new Error(`Italian list has ${IT.length} lines, the CSV has ${body.length} rows`);
 
 const cap = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
-const PLURAL = new Set('tissues,hieroglyphs,the pyramids,vitamins,lentils,fireworks,sunglasses,stuffed vegetables,teeth,bones,lungs'.split(','));
+const PLURAL = new Set('raisins,lips,running shoes,tissues,hieroglyphs,the pyramids,vitamins,lentils,fireworks,sunglasses,stuffed vegetables,teeth,bones,lungs'.split(','));
 const PLURAL_COUNTRY = new Set(['United Arab Emirates', 'United States']);
-const UNCOUNT = new Set('money,wood,metal,plastic,glass,cloth,stone,rubber,wool,leather,ice,steam,electricity,toothpaste,shampoo,confetti,ful medames,baklava,blood,skin,paper'.split(','));
+const UNCOUNT = new Set('toast,swimming,jelly,spaghetti bolognese,sandwich bread,baladi bread,money,wood,metal,plastic,glass,cloth,stone,rubber,wool,leather,ice,steam,electricity,toothpaste,shampoo,confetti,ful medames,baklava,blood,skin,paper'.split(','));
 const PLAIN = new Set('save water,plant a tree,camel ride,a pair,wash your hands,healthy food,exercise,sleep well,doctor\'s visit,hold hands,look both ways,ask a grown-up,exit sign'.split(','));
 const WHERE = { // 'the ball is ... the box' per language (hand written: the cases differ)
   in: ['The ball is in the box.', 'Der Ball ist in der Kiste.', 'La balle est dans la boîte.', 'La palla è nella scatola.'],
@@ -110,6 +110,27 @@ body.forEach((r, i) => {
     n2++;
   }
   console.log('German/French catch-up words', n2);
+}
+
+// Wave 1 part 2: the 202 «LRN» words (docs/WAVE1_LRN_WORDS.csv + tools/learn_new/it_lrn_words.txt); pictures y_<name>.webp by Muse
+{
+  const [h3, ...b3] = csv(fs.readFileSync(new URL('../../docs/WAVE1_LRN_WORDS.csv', import.meta.url), 'utf8').replace(/^﻿/, '')).filter((r) => r.length > 3);
+  const c3 = (r, n) => r[h3.indexOf(n)];
+  const IT3 = fs.readFileSync(new URL('./it_lrn_words.txt', import.meta.url), 'utf8').split('\n').filter((l) => l.trim());
+  if (IT3.length !== b3.length) throw new Error(`LRN Italian list has ${IT3.length} lines, the CSV has ${b3.length}`);
+  b3.forEach((r, i) => {
+    const en = c3(r, 'english').trim();
+    const sec = NEW_SECTION_OF['l_' + c3(r, 'section')]; if (!sec) throw new Error('no LRN section for ' + c3(r, 'section'));
+    const words = { en, de: c3(r, 'german').trim(), fr: c3(r, 'french').trim(), it: IT3[i].trim() };
+    for (const lang of ['en', 'de', 'fr', 'it']) {
+      const w = words[lang];
+      const row = { cat: `new:${sec.id}`, en: w, w, s: sentence('noun', lang, '', w, { en }), thing: c3(r, 'picture_file_id').trim() };
+      if (lang === 'en') row.ar = c3(r, 'arabic').trim();
+      else { row.eng = en; row.lang = lang; row.ar = c3(r, 'arabic').trim(); }
+      rows[lang].push(row);
+    }
+  });
+  console.log('LRN words', b3.length);
 }
 
 fs.writeFileSync(new URL('../../assets/games/learn_voice/extra_words.js', import.meta.url), `// made by tools/learn_new/build_new_words.mjs (386 new words, five languages)\nwindow.__learnExtraWords = ${JSON.stringify(rows)};\n`);

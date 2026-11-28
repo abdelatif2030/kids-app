@@ -27,6 +27,29 @@ export const NEW_SECTIONS = [
   D('n_helpers', '🎻', ['ناس بتساعدنا وآلات موسيقية', 'Helpers and instruments', 'Helfer und Instrumente', 'Métiers et instruments', 'Aiutanti e strumenti'], ['people2', 'instrument'], 'noun'),
   D('n_fun', '🎉', ['تكنولوجيا وإكسسوارات وحفلات', 'Tech, accessories and parties', 'Technik, Accessoires und Feste', 'Technologie, accessoires et fêtes', 'Tecnologia, accessori e feste'], ['tech', 'accessory', 'party'], 'noun'),
 ];
+
+// Wave 1 part 2: the 202 «LRN» words (docs/WAVE1_LRN_WORDS.csv, pictures by Muse). One section per CSV section, cat `new:l_<csv>`.
+const L = (csv, emoji, name) => D('l_' + csv, emoji, name, ['l_' + csv], 'noun');
+export const LRN_SECTIONS = [
+  L('birds', '🦜', ['طيور أكتر', 'More birds', 'Mehr Vögel', 'Plus d’oiseaux', 'Altri uccelli']),
+  L('wild', '🦌', ['حيوانات برية أكتر', 'More wild animals', 'Mehr Wildtiere', 'Plus d’animaux sauvages', 'Altri animali selvatici']),
+  L('farm', '🐠', ['حيوانات أليفة', 'Pets and small animals', 'Haustiere', 'Les animaux de compagnie', 'Animali da compagnia']),
+  L('sea', '🦈', ['حيوانات البحر', 'Sea animals', 'Meerestiere', 'Les animaux marins', 'Animali del mare']),
+  L('insects', '🐝', ['حشرات', 'Insects', 'Insekten', 'Les insectes', 'Gli insetti']),
+  L('reptiles', '🦎', ['زواحف وديناصورات', 'Reptiles and dinosaurs', 'Reptilien und Dinos', 'Reptiles et dinosaures', 'Rettili e dinosauri']),
+  L('fruit', '🫐', ['فواكه أكتر', 'More fruit', 'Mehr Obst', 'Plus de fruits', 'Altra frutta']),
+  L('veg', '🥬', ['خضار أكتر', 'More vegetables', 'Mehr Gemüse', 'Plus de légumes', 'Altre verdure']),
+  L('food', '🥐', ['أكل وفطار', 'Food and breakfast', 'Essen und Frühstück', 'Repas et petit-déjeuner', 'Cibo e colazione']),
+  L('vehicles', '🚜', ['مركبات أكتر', 'More vehicles', 'Mehr Fahrzeuge', 'Plus de véhicules', 'Altri veicoli']),
+  L('nature', '🌳', ['طبيعة', 'Nature', 'Natur', 'La nature', 'La natura']),
+  L('space', '🪐', ['الفضاء', 'Space', 'Weltraum', 'L’espace', 'Lo spazio']),
+  L('sports', '⚽', ['رياضة', 'Sports', 'Sport', 'Le sport', 'Lo sport']),
+  L('toys', '🧸', ['ألعاب', 'Toys', 'Spielzeug', 'Les jouets', 'I giocattoli']),
+  L('kitchen', '🍳', ['المطبخ', 'In the kitchen', 'In der Küche', 'La cuisine', 'In cucina']),
+  L('tools', '🔧', ['الأدوات', 'Tools', 'Werkzeuge', 'Les outils', 'Gli attrezzi']),
+  L('face', '👄', ['وشي وجسمي', 'Face and body parts', 'Gesicht und Körper', 'Visage et corps', 'Viso e corpo']),
+  L('school', '🎒', ['المدرسة', 'School things', 'Schulsachen', 'L’école', 'La scuola']),
+];
 // csv section -> new section (the kind of sentence can differ per section; senses are verbs, the body-inside words are nouns)
 export const NEW_SECTION_OF = {};
 for (const s of NEW_SECTIONS) for (const c of s.csv) NEW_SECTION_OF[c] = { id: s.id, kind: s.kind };
@@ -34,3 +57,4 @@ NEW_SECTION_OF.inside = { id: 'n_body', kind: 'noun' };
 NEW_SECTION_OF.senses = { id: 'n_body', kind: 'verb' };
 NEW_SECTION_OF.question = { id: 'n_questions', kind: 'plain' };
 NEW_SECTION_OF.health = { id: 'n_health', kind: 'noun' };
+for (const s of LRN_SECTIONS) NEW_SECTION_OF[s.csv[0]] = { id: s.id, kind: 'noun' };

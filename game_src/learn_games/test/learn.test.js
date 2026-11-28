@@ -251,14 +251,17 @@ test('the 386 new words (extra_words.js) add 24 sections in the five languages, 
   globalThis.window = {}; new Function('window', src)(globalThis.window);
   try {
     const X = globalThis.window.__learnExtraWords;
-    for (const l of ['en', 'it']) assert.equal(X[l].length, 386, l);
-    for (const l of ['de', 'fr']) assert.equal(X[l].length, 386 + 297, l); // plus the catch-up words that join the existing sections
+    for (const l of ['en', 'it']) assert.equal(X[l].length, 386 + 202, l); // plus the 202 LRN words (Muse's pictures)
+    for (const l of ['de', 'fr']) assert.equal(X[l].length, 386 + 297 + 202, l); // plus the catch-up words that join the existing sections
     const base = learnSections('en').length;
     for (const lang of ['ar', 'en', 'de', 'fr', 'it']) {
       const secs = learnSections(lang).filter((s) => s.id.startsWith('n_'));
       assert.equal(secs.length, 24, `${lang} new sections`);
       const items = secs.reduce((a, s) => a + s.items.length, 0);
       assert.equal(items, 386, `${lang} items`);
+      const lrn = learnSections(lang).filter((s) => s.id.startsWith('l_'));
+      assert.equal(lrn.length, 18, `${lang} LRN sections`);
+      assert.equal(lrn.reduce((a, s) => a + s.items.length, 0), 202, `${lang} LRN items`);
       for (const s of secs) for (const it of s.items) { assert.ok(it.show && it.show.thing, `${lang} ${it.key} picture`); assert.ok(it.label, `${lang} ${it.key} label`); }
     }
     assert.ok(base >= 41);

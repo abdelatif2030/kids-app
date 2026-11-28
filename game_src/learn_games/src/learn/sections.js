@@ -10,7 +10,7 @@ import { numberWord } from '../letters/numbers.js';
 import { numberWords, numberSequence } from './numbers.js';
 import { colorOf } from '../letters/colors.js';
 import { EXTRA_DEFS } from './extra.js';
-import { NEW_SECTIONS } from './newsections.js';
+import { NEW_SECTIONS, LRN_SECTIONS } from './newsections.js';
 
 export const LANGS = ['ar', 'en', 'de', 'fr', 'it'];
 const WORDS = { en: EN, de: DE, fr: FR, it: IT };
@@ -147,7 +147,7 @@ export function learnSections(lang, min = 4) {
   // the order: the basics, then counting right after the numbers, and the newer kinds (sentences, stories, reading, sounds, marks) at the end
   const defs = [];
   for (const d of SECTION_DEFS) { defs.push(d); if (d.id === 'numbers') defs.push(...EXTRA_DEFS.filter((x) => x.after)); }
-  defs.push(...NEW_SECTIONS); // the 386 new words (they appear only when their script is loaded)
+  defs.push(...NEW_SECTIONS, ...LRN_SECTIONS); // the 386 new words (they appear only when their script is loaded)
   defs.push(...EXTRA_DEFS.filter((x) => !x.after));
   for (const def of defs) {
     let items;
