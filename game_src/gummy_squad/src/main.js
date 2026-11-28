@@ -4,7 +4,7 @@
 // by themselves), dodge the telegraphed glaze rain and King Donut's rolling charge, tap SUPER for a giant jawbreaker. Candies buy
 // upgrades between runs. Portrait and landscape. three.js, art and sound made in code. No network, no ads, no tracking.
 import * as THREE from 'three';
-import { Run, ARENA, BEARS, KINDS, UPGRADES, normalizeSave, buyUpgrade, upgradeCost, applyResult, STAGES } from './sim.js';
+import { Run, ARENA, BEARS, KINDS, UPGRADES, normalizeSave, buyUpgrade, upgradeCost, applyResult, STAGES, placeOf, bossOf, RECIPES, recipeOf } from './sim.js';
 import { Sound } from './audio.js';
 import { G, mesh, basic, clay, makeBear, makeEnemy, makeBoss, makeCandy, makeMint, makeJaw, shadowDisc, softDot, stripeTex, swirlTex } from './models.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
@@ -13,16 +13,17 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 const GUMMY_CLIPS = { trick: 3, pickup: 2, bump: 3, lap: 2, near: 2, charge: 2, win: 2, lose: 2, count: 1 };
 
 const S = {
-  title: ['فرقة الدببة الجيلي', 'GUMMY SQUAD'], play: ['العب', 'PLAY'], stage: ['المرحلة', 'Stage'], nextStage: ['المرحلة الجاية', 'Next stage'], upgrades: ['التطويرات', 'UPGRADES'], settings: ['الإعدادات', 'SETTINGS'], back: ['رجوع', 'Back'],
+  title: ['فرقة الحلويات', 'THE SWEET SHOP SQUAD'], play: ['العب', 'PLAY'], stage: ['المرحلة', 'Stage'], nextStage: ['المرحلة الجاية', 'Next stage'], upgrades: ['التطويرات', 'UPGRADES'], settings: ['الإعدادات', 'SETTINGS'], back: ['رجوع', 'Back'],
   sound: ['الصوت', 'Sound'], on: ['شغّال', 'On'], off: ['مقفول', 'Off'], language: ['اللغة', 'Language'], quit: ['خروج', 'Quit'],
   paused: ['استراحة', 'PAUSED'], resume: ['كمّل', 'RESUME'], restart: ['من الأول', 'RESTART'], home: ['الرئيسية', 'HOME'],
-  wave: ['الموجة', 'WAVE'], boss: ['الملك دونات', 'KING DONUT'], bossIntro: ['الملك دونات وصل!', 'King Donut is here!'], super: ['سوبر', 'SUPER'],
-  won: ['كسبتوا! الملك بقى فتافيت 🍩', 'You win! King Donut is crumbs 🍩'], lost: ['الدببة دابت 💧', 'The bears melted 💧'], again: ['العب تاني', 'Play again'],
+  wave: ['الموجة', 'WAVE'], boss: ['الزعيم', 'THE BOSS'], super: ['سوبر', 'SUPER'],
+  won: ['كسبتوا! الزعيم بقى فتافيت 🍩', 'You win! The boss is crumbs 🍩'], lost: ['الفرقة دابت 💧', 'The squad melted 💧'], again: ['العب تاني', 'Play again'],
   earned: ['حلويات جمعتها', 'Candies collected'], bonus: ['مكافأة الفوز', 'Win bonus'], total: ['معاك', 'You have'],
-  dmg: ['قوة الضرب', 'Sweet Power'], dmgD: ['الدببة بتضرب أقوى', 'Bears hit harder'], hp: ['صحة الدببة', 'Bear Health'], hpD: ['الدببة تتحمل أكتر', 'Bears take more'], chg: ['شحن السوبر', 'Super Charge'], chgD: ['السوبر يتشحن أسرع', 'Super charges faster'],
-  buy: ['اشتري', 'Buy'], max: ['أقصى مستوى', 'MAX'], how: ['اسحب في أي مكان لتحريك الفرقة. الدببة بتضرب لوحدها!', 'Drag anywhere to move the squad. The bears fight by themselves!'],
+  dmg: ['قوة الضرب', 'Sweet Power'], dmgD: ['الفرقة بتضرب أقوى', 'The squad hits harder'], hp: ['صحة الفرقة', 'Squad Health'], hpD: ['الفرقة تتحمل أكتر', 'The squad takes more'], chg: ['شحن السوبر', 'Super Charge'], chgD: ['السوبر يتشحن أسرع', 'Super charges faster'],
+  buy: ['اشتري', 'Buy'], max: ['أقصى مستوى', 'MAX'], how: ['اسحب في أي مكان لتحريك الفرقة. الفرقة بتضرب لوحدها!', 'Drag anywhere to move the squad. The squad fights by itself!'],
   tapSound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'], mintHint: ['خد النعناع لتصحّي دبدوب!', 'Grab the mint to wake a bear!'], dodge: ['اهرب من الدوائر الحمرا!', 'Dodge the red circles!'],
-  b0: ['فراولة', 'Strawberry'], b1: ['ليمون', 'Lime'], b2: ['توتة', 'Blueberry'], stars: ['نجوم', 'stars'], best: ['أفضل نتيجة', 'Best'],
+  b0: ['كنافة', 'Kunafa'], b1: ['بسبوسة', 'Basbousa'], b2: ['قطايف', 'Qatayef'], stars: ['نجوم', 'stars'], best: ['أفضل نتيجة', 'Best'],
+  recipes: ['الوصفات', 'RECIPES'], newRecipe: ['وصفة جديدة!', 'New recipe!'], lockedRecipe: ['لسه مقفولة — اكسب المرحلة عشان تتعلمها', 'Locked — win the stage to learn it'],
 };
 const I = makeI18n(S);
 const TAU = Math.PI * 2;
@@ -76,6 +77,12 @@ const STYLE = css('gs', '#6a4ad0', '#2a1a78', '#ffd0f0') + `
 .gs-row{display:flex;justify-content:space-between;align-items:center;width:100%;font-weight:900;font-size:calc(var(--u)*4)}
 .gs-stars{font-size:calc(var(--u)*11);letter-spacing:calc(var(--u)*1)}.gs-stars .off{filter:grayscale(1);opacity:.3}
 .gs-soundpill{background:#ffd166}
+.gs-recipe{background:linear-gradient(180deg,rgba(255,210,90,.28),rgba(255,150,200,.22));border:calc(var(--u)*.4) solid #ffd23a;border-radius:calc(var(--u)*3);padding:calc(var(--u)*1.8) calc(var(--u)*2.4);display:flex;flex-direction:column;gap:calc(var(--u)*.6);font-weight:900;font-size:calc(var(--u)*4);width:100%;box-sizing:border-box}
+.gs-recipe small{font-size:calc(var(--u)*3.2);opacity:.9;font-weight:700}
+.gs-rrow{display:flex;align-items:center;gap:calc(var(--u)*2);background:rgba(20,10,60,.55);border-radius:calc(var(--u)*3);padding:calc(var(--u)*1.6);width:100%;box-sizing:border-box}
+.gs-rrow>div{flex:1;display:flex;flex-direction:column;gap:calc(var(--u)*.5);font-weight:900;font-size:calc(var(--u)*3.8)}
+.gs-rrow small{font-size:calc(var(--u)*2.9);opacity:.85;font-weight:700}
+.gs-rrow.locked{opacity:.65}
 `;
 
 class Game {
@@ -304,10 +311,11 @@ class Game {
       h('div', { class: 'gs-btns' },
         h('div', { class: 'gs-stagebar' },
           h('button', { class: 'gs-round', 'aria-label': '-', onclick: this._tap(() => { this.selStage = Math.max(0, this.selStage - 1); this.showMenu(); }) }, '◀'),
-          h('b', {}, I.t('stage'), ' ', I.num(this.selStage + 1), ' / ', I.num(STAGES)),
+          h('b', {}, I.t('stage'), ' ', I.num(this.selStage + 1), ' / ', I.num(STAGES), ' · ', I.getLang() === 'en' ? placeOf(this.selStage).en : placeOf(this.selStage).ar),
           h('button', { class: 'gs-round', 'aria-label': '+', onclick: this._tap(() => { this.selStage = Math.min(this.save.stage, this.selStage + 1); this.showMenu(); }) }, '▶')),
         h('button', { class: 'gs-btn go', onclick: this._tap(() => this.startRun()) }, '▶ ', I.t('play')),
         h('button', { class: 'gs-btn', onclick: this._tap(() => this.showUpgrades()) }, '🍭 ', I.t('upgrades')),
+        h('button', { class: 'gs-btn', onclick: this._tap(() => this.showRecipes()) }, '📖 ', I.t('recipes'), ' ', I.num(this.save.recipes.length), '/', I.num(RECIPES.length)),
         h('button', { class: 'gs-btn dark', onclick: this._tap(() => this.showSettings()) }, '⚙ ', I.t('settings'))),
       h('button', { class: 'gs-round', style: 'position:absolute;top:max(calc(var(--u)*2.5),env(safe-area-inset-top));left:calc(var(--u)*3);direction:ltr', 'aria-label': I.t('quit'), onclick: this._tap(() => this.post({ type: 'exit' })) }, '✕')));
     this._soundPill();
@@ -322,6 +330,18 @@ class Game {
         h('button', { class: 'gs-buy', disabled: !can, onclick: this._tap(() => { const s = buyUpgrade(this.save, k); if (s) { this.save = s; this._persist(); this.sound.play('mint'); this.showUpgrades(); } }) }, cost === null ? I.t('max') : `🍬 ${I.num(cost)}`));
     });
     this.layer.append(h('div', { class: 'gs-dim' }, h('div', { class: 'gs-card' }, h('div', { class: 'gs-title' }, I.t('upgrades')), h('div', { class: 'gs-row' }, h('span', {}, I.t('total')), h('span', {}, '🍬 ', I.num(this.save.candies))), h('div', { class: 'gs-up' }, ...rows), h('button', { class: 'gs-btn dark', onclick: this._tap(() => this.showMenu()) }, I.t('back')))));
+  }
+
+  showRecipes() {
+    this.mode = 'menu'; this._clear();
+    const en = I.getLang() === 'en';
+    const rows = RECIPES.map((r, i) => {
+      const got = this.save.recipes.includes(i);
+      return h('div', { class: `gs-rrow${got ? '' : ' locked'}` }, h('div', { class: 'gs-uico' }, got ? '🍰' : '🔒'),
+        h('div', {}, h('div', {}, got ? (en ? r.en : r.ar) : (en ? placeOf(i).en : placeOf(i).ar)),
+          h('small', {}, got ? (en ? r.ingEn : r.ingAr) : I.t('lockedRecipe'))));
+    });
+    this.layer.append(h('div', { class: 'gs-dim' }, h('div', { class: 'gs-card' }, h('div', { class: 'gs-title' }, '📖 ', I.t('recipes'), ' ', I.num(this.save.recipes.length), '/', I.num(RECIPES.length)), h('div', { class: 'gs-up' }, ...rows), h('button', { class: 'gs-btn dark', onclick: this._tap(() => this.showMenu()) }, I.t('back')))));
   }
 
   showSettings() {
@@ -389,6 +409,7 @@ class Game {
   _end() {
     const run = this.run; const res = run.result;
     this.endShown = true;
+    const isNewRecipe = res.win && !this.save.recipes.includes(res.stage);
     this.save = applyResult(this.save, res); this._persist();
     this.sound.mode('calm');
     this.sound.play(res.win ? 'win' : 'lose');
@@ -397,6 +418,7 @@ class Game {
     this.layer.append(h('div', { class: 'gs-dim' }, h('div', { class: 'gs-card' }, h('div', { class: 'gs-title', style: 'font-size:calc(var(--u)*6.5)' }, I.t(res.win ? 'won' : 'lost')), res.win ? stars : null,
       h('div', { class: 'gs-row' }, h('span', {}, I.t('earned')), h('span', {}, '🍬 ', I.num(res.candies))), res.win ? h('div', { class: 'gs-row' }, h('span', {}, I.t('bonus')), h('span', {}, '🍬 ', I.num(res.bonus))) : null,
       h('div', { class: 'gs-row' }, h('span', {}, I.t('total')), h('span', {}, '🍬 ', I.num(this.save.candies))),
+      res.win ? h('div', { class: 'gs-recipe' }, h('div', {}, '📖 ', isNewRecipe ? I.t('newRecipe') : I.t('recipes')), h('div', {}, I.getLang() === 'en' ? recipeOf(res.stage).en : recipeOf(res.stage).ar), h('small', {}, I.getLang() === 'en' ? recipeOf(res.stage).ingEn : recipeOf(res.stage).ingAr)) : null,
       res.win && this.selStage < this.save.stage ? h('button', { class: 'gs-btn go', onclick: this._tap(() => { this.endShown = false; this.selStage += 1; this.startRun(); }) }, '▶ ', I.t('nextStage')) : null,
       h('button', { class: 'gs-btn go', onclick: this._tap(() => { this.endShown = false; this.startRun(); }) }, '▶ ', I.t('again')),
       h('button', { class: 'gs-btn', onclick: this._tap(() => { this.endShown = false; this.showUpgrades(); }) }, '🍭 ', I.t('upgrades')),
@@ -424,7 +446,7 @@ class Game {
   _hudUpdate() {
     const run = this.run; if (!this.hud) return;
     this.candyEl.textContent = I.num(run.candies);
-    this.waveEl.textContent = run.bossFight || run.boss ? I.t('boss') : `${I.t('wave')} ${I.num(run.wave + 1)}/${I.num(2)}`;
+    this.waveEl.textContent = run.bossFight || run.boss ? (I.getLang() === 'en' ? bossOf(run.stage).en : bossOf(run.stage).ar) : `${I.t('wave')} ${I.num(run.wave + 1)}/${I.num(run.waves.length)}`;
     run.bears.forEach((b, i) => { const p = this.hud.por[i]; const f = b.hp / b.maxHp; const w = `${Math.round(f * 100)}%`; if (this.hud.last[i] !== w) { p.hp.style.width = w; this.hud.last[i] = w; p.bar.classList.toggle('low', f < 0.34); } p.el.classList.toggle('down', !b.alive); });
     const pct = Math.round(run.charge);
     if (this._pct !== pct) { this._pct = pct; this.superBtn.style.setProperty('--p', `${pct}%`); this.superBtn.classList.toggle('ready', pct >= 100); }
@@ -458,7 +480,7 @@ class Game {
         case 'splat': S_.play('splat'); this.addBits(e.x, 0.5, e.y, 0xff6ab8, 14, 4, 4); this.decal(e.x, e.y, e.r, 0xff6ab8, 5, 0.38); this.shake = Math.max(this.shake, 0.15); break;
         case 'blast': S_.play('blast'); this.addBits(e.x, 0.5, e.y, 0xffa23a, 18, 6, 5); this.addSparks(e.x, 1, e.y, 0xffe04a, 24, 6); this.decal(e.x, e.y, e.r, 0x3a2a30, 6, 0.35); this.shake = Math.max(this.shake, 0.4); break;
         case 'bossSlam': S_.play('slam'); this.shake = 0.9; this.addBits(e.x, 0.8, e.y, 0xd89a5a, 16, 6, 6); break;
-        case 'bossIntro': S_.mode('battle'); S_.play('roar'); this.voice.say('near'); this.banner(I.t('bossIntro'), 2400); break;
+        case 'bossIntro': S_.mode('battle'); S_.play('roar'); this.voice.say('near'); this.banner(I.getLang() === 'en' ? `${bossOf(this.run.stage).en} is here!` : `${bossOf(this.run.stage).ar} وصل!`, 2400); break;
         case 'bossLand': S_.play('slam'); this.shake = 1.0; this.addBits(e.x, 0.8, e.y, 0xff6ab8, 24, 7, 6); break;
         case 'phase': S_.play('roar'); this.shake = 0.7; break;
         case 'summon': S_.play('roar'); this.addSparks(e.x, 2, e.y, 0xff6ab8, 24, 5); break;

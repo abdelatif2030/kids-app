@@ -2,7 +2,7 @@
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
 // Triple-match puzzle: tap sweets that are not covered, they fly into a 7-slot tray, three of a kind vanish.
 // Combos, a bonus meter with a magic wand, undo / shuffle / extra slot helpers, 36 levels. Canvas 2D, art and sound in code.
-import { Game, makeLevel, normalizeSave, LEVELS, TRAY_CAP, COMBO_TIME, BONUS_MAX, MAX_CAP, solveState } from './sim.js';
+import { Game, makeLevel, normalizeSave, LEVELS, CHAPTERS, chapterOf, TRAY_CAP, COMBO_TIME, BONUS_MAX, MAX_CAP, solveState } from './sim.js';
 import { Sound } from './audio.js';
 import { buildSprites, drawBackground, SP, SPRITE_FILL } from './sprites.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
@@ -11,7 +11,7 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 const SWEET_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 2, bump: 2, win: 2, lose: 2 };
 
 const S = {
-  title: ['طبق الحلويات', 'Sweet Tray'], play: ['يلا نلعب', 'Play'], levels: ['المراحل', 'Levels'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'],
+  title: ['صينية الكنافة', 'Kunafa Tray'], play: ['يلا نلعب', 'Play'], levels: ['المراحل', 'Levels'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'],
   how: ['دوس على الحلويات اللي مش مغطّاة، وكل ٣ زي بعض بيختفوا. لا تملّي الطبق الصغير!', 'Tap sweets that are not covered. Three of a kind vanish. Do not fill the little tray!'],
   level: ['المرحلة', 'LEVEL'], pause: ['وقفة', 'Paused'], resume: ['كمّل', 'Resume'], restart: ['من الأول', 'Restart'], sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
   soundOn: ['🔊 الصوت شغال', '🔊 Sound on'], soundOff: ['🔇 الصوت واقف', '🔇 Sound off'],
@@ -20,9 +20,13 @@ const S = {
   next: ['المرحلة الجاية', 'Next level'], replay: ['العب تاني', 'Play again'],
   full: ['مفيش مكان!', 'OUT OF SPACE!'], fullText: ['الطبق الصغير اتملى. جرّب تاني، من غير ما تخسر حاجة!', 'The tray is full. Try again, nothing is lost!'],
   stars: ['نجوم', 'Stars'], score: ['النقاط', 'Score'], wand: ['عصاية سحرية!', 'Magic wand!'], blocked: ['مغطّاة! شيل اللي فوقها الأول', 'Covered! Clear the ones on top first'],
+  chapter: ['الفصل', 'Chapter'], chapDone: ['خلّصت فصل', 'Chapter complete'],
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'], locked: ['مقفول', 'Locked'],
 };
 const I = makeI18n(S);
+const chapName = (ch) => ch.name[I.getLang() === 'en' ? 1 : 0];
+// one accent colour per chapter board, for map headers and the chapter banner
+const CHAP_ACCENT = { shop: '#e8609a', ramadan: '#7a4fd0', mawled: '#e2483d', picnic: '#58a84a' };
 const TAU = Math.PI * 2;
 const PASTEL = ['#ff8fb8', '#8fe3c8', '#ffe08a', '#b7a0ff', '#8fd0ff', '#ffb38a'];
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -55,6 +59,9 @@ class UI {
 .st-lv{background:linear-gradient(180deg,#ffd0e4,#f58cb8);box-shadow:0 calc(var(--u)*.6) 0 #b04a80;color:#7a2250}.st-lv.lock{background:linear-gradient(180deg,#e6dce2,#c4b4be);box-shadow:0 calc(var(--u)*.6) 0 #8e7e88;color:#fff}
 .st-lvs{grid-template-columns:repeat(4,1fr)}@media (orientation:landscape){.st-lvs{grid-template-columns:repeat(9,1fr)}.st-lv{min-height:calc(var(--u)*17)}}
 .st-title{color:#fff6a8}
+.st-chaphead{width:100%;box-sizing:border-box;border-radius:calc(var(--u)*2.6);padding:calc(var(--u)*1.1) calc(var(--u)*3);font-weight:900;font-size:calc(var(--u)*4.2);color:#fff;text-align:center;box-shadow:0 calc(var(--u)*.5) calc(var(--u)*1) rgba(60,10,40,.3)}
+.st-chapbanner{position:absolute;left:50%;top:calc(var(--u)*15.5);transform:translateX(-50%);border:calc(var(--u)*.45) solid #fff;border-radius:999px;color:#fff;font-weight:900;font-size:calc(var(--u)*4.4);padding:calc(var(--u)*1.4) calc(var(--u)*5);white-space:nowrap;opacity:0;transition:opacity .35s;pointer-events:none;box-shadow:0 calc(var(--u)*.7) calc(var(--u)*1.6) rgba(60,10,40,.35);max-width:94%;overflow:hidden;text-overflow:ellipsis;z-index:5}
+.st-chapbanner.show{opacity:1}
 ` ));
     this.root = h('div', { class: 'st-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -64,6 +71,7 @@ class UI {
     this.layer = h('div', { class: 'st-layer' });
     this.root.append(this.layer);
     this.mode = 'menu'; this.clock = 0; this.fx = []; this.parts = []; this.spr = new Map(); this.ghosts = []; this.shake = new Map();
+    this.boardId = 'shop'; this._lastChap = 0;
     this.sprites = buildSprites();
     this.dispScore = 0; this.idle = 0; this.hintId = -1; this.timers = [];
     this.game = new Game(makeLevel(Math.min(3, LEVELS)));
@@ -127,7 +135,7 @@ class UI {
   _bg() {
     const c = document.createElement('canvas'); c.width = Math.round(this.cw * this.dpr); c.height = Math.round(this.ch * this.dpr);
     const g = c.getContext('2d'); g.scale(this.dpr, this.dpr);
-    drawBackground(g, this.cw, this.ch, this.L.plate, this.L);
+    drawBackground(g, this.cw, this.ch, this.L.plate, this.L, this.boardId || 'shop');
     this.bg = c;
   }
 
@@ -221,6 +229,7 @@ class UI {
 
   showMenu() {
     this.mode = 'menu'; this.layer.replaceChildren(); this.sound.setMode(false); this.helpBox = null;
+    this.boardId = 'shop'; this._lastChap = 0;
     this.game = new Game(makeLevel(3)); this.spr.clear(); this.ghosts = []; this._layout();
     const cur = Math.min(this.save.unlocked, LEVELS);
     this.layer.append(h('div', { class: 'st-dim' }, h('div', { class: 'st-card' },
@@ -233,21 +242,27 @@ class UI {
 
   showMap() {
     this.mode = 'map'; this.layer.replaceChildren(); this.helpBox = null;
-    const grid = h('div', { class: 'st-lvs' });
-    for (let n = 1; n <= LEVELS; n++) {
-      const open = n <= this.save.unlocked; const st = this.save.stars[n] || 0;
-      grid.append(h('button', { class: `st-lv${open ? '' : ' lock'}`, 'aria-label': `${I.t('level')} ${n}`, onclick: () => { if (open) { this.sound.play('ui'); this.startLevel(n); } } },
-        h('i', {}, open ? I.num(n) : '🔒'), h('span', {}, open ? '⭐'.repeat(st) + '☆'.repeat(3 - st) : I.t('locked'))));
+    const kids = [h('div', { class: 'st-title' }, I.t('levels'))];
+    for (const ch of CHAPTERS) {
+      kids.push(h('div', { class: 'st-chaphead', style: `background:${CHAP_ACCENT[ch.board]}` }, `${I.t('chapter')} ${I.num(ch.id)} · ${chapName(ch)}`));
+      const grid = h('div', { class: 'st-lvs' });
+      for (let n = ch.from; n <= ch.to; n++) {
+        const open = n <= this.save.unlocked; const st = this.save.stars[n] || 0;
+        grid.append(h('button', { class: `st-lv${open ? '' : ' lock'}`, 'aria-label': `${I.t('level')} ${n}`, onclick: () => { if (open) { this.sound.play('ui'); this.startLevel(n); } } },
+          h('i', {}, open ? I.num(n) : '🔒'), h('span', {}, open ? '⭐'.repeat(st) + '☆'.repeat(3 - st) : I.t('locked'))));
+      }
+      kids.push(grid);
     }
-    this.layer.append(h('div', { class: 'st-dim' }, h('div', { class: 'st-card', style: 'max-height:96%;width:calc(var(--u)*92)' },
-      h('div', { class: 'st-title' }, I.t('levels')), grid,
-      h('button', { class: 'st-btn dark', onclick: () => this.showMenu() }, I.t('menu')))));
+    kids.push(h('button', { class: 'st-btn dark', onclick: () => this.showMenu() }, I.t('menu')));
+    this.layer.append(h('div', { class: 'st-dim' }, h('div', { class: 'st-card', style: 'max-height:96%;width:calc(var(--u)*92)' }, ...kids)));
     this._soundPill();
   }
 
   startLevel(n) {
     this.voice.say('go');
     this.n = clamp(n, 1, LEVELS);
+    const ch = chapterOf(this.n);
+    this.boardId = ch.board;
     this.timers.forEach(clearTimeout); this.timers = [];
     this.game = new Game(makeLevel(this.n));
     this.spr.clear(); this.ghosts = []; this.fx = []; this.parts = []; this.shake.clear(); this.dispScore = 0; this.idle = 0; this.hintId = -1; this.hintText = ''; this.hinted = false;
@@ -263,6 +278,15 @@ class UI {
     this.layer.append(this.helpBox);
     this.hintEl = h('div', { class: 'st-hint' }); this.layer.append(this.hintEl);
     this._layout(); this._soundPill();
+    // entering a new chapter: a short banner names it (the board behind already changed)
+    if (ch.from === this.n || this._lastChap !== ch.id) {
+      this._lastChap = ch.id;
+      const banner = h('div', { class: 'st-chapbanner', style: `background:${CHAP_ACCENT[ch.board]}` }, `${I.t('chapter')} ${I.num(ch.id)} · ${chapName(ch)}`);
+      this.layer.append(banner);
+      this.later(() => banner.classList.add('show'), 40);
+      this.later(() => banner.classList.remove('show'), 2500);
+      this.later(() => banner.remove(), 2950);
+    }
   }
 
   helper(key) {
@@ -298,8 +322,10 @@ class UI {
     this.later(() => {
       this.mode = 'end';
       for (let i = 0; i < 5; i++) this._burst(this.cw * (0.15 + i * 0.17), this.ch * 0.4, 14);
+      const chEnd = chapterOf(this.n).to === this.n;
       this.layer.append(h('div', { class: 'st-dim' }, h('div', { class: 'st-card' },
         h('div', { class: 'st-title' }, I.t('won')), h('div', { class: 'st-small' }, I.t('wonText')),
+        chEnd ? h('div', { class: 'st-small', style: 'font-size:calc(var(--u)*4.8);font-weight:900' }, `🎉 ${I.t('chapDone')} «${chapName(chapterOf(this.n))}»!`) : null,
         h('div', { class: 'st-stars' }, [0, 1, 2].map((i) => h('span', { class: i < st ? '' : 'off' }, '⭐'))),
         h('div', { class: 'st-title', style: 'font-size:calc(var(--u)*6)' }, I.t('win')),
         h('div', { class: 'st-pill' }, `${I.t('score')}: ${I.num(g.score)}`),

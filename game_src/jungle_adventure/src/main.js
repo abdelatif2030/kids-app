@@ -235,16 +235,44 @@ class Game {
         h('div', { class: 'ja-logo' }, t('title')),
         total,
         h('div', { class: 'ja-sub ja-shadow', style: 'opacity:1' }, t('pick')),
-        h('div', { class: 'ja-cards' }, cards),
+        h('div', { class: 'ja-cards', style: 'max-height:calc(var(--u)*66);overflow-y:auto;padding:calc(var(--u)*.6);pointer-events:auto' }, cards),
         h('div', { class: 'ja-sub ja-shadow', style: 'opacity:1' }, t('chooseHero')),
         h('div', { class: 'ja-heroes' }, Object.keys(HEROES).map((hero) => h('button', {
           class: `ja-hero${hero === this.save.hero ? ' sel' : ''}`,
           'aria-label': name(HEROES[hero]),
           onclick: () => { this.save.hero = hero; setHero(hero); this._saveNow(); this.showMenu(); },
         }, this._heroCanvas(hero, 13, 'ja-hero-pic'), h('span', {}, name(HEROES[hero])))),
-        h('button', { class: 'ja-hero ja-shopbtn', 'aria-label': t('shop'), onclick: () => this.showShop() }, h('span', { class: 'ic' }, '🛍️'), h('span', {}, t('shop'))))),
+        h('div', { class: 'ja-heroes' },
+          h('button', { class: 'ja-hero ja-shopbtn', 'aria-label': t('shop'), onclick: () => this.showShop() }, h('span', { class: 'ic' }, '🛍️'), h('span', {}, t('shop'))),
+          h('button', { class: 'ja-hero ja-shopbtn', 'aria-label': t('album'), onclick: () => this.showAlbum() }, h('span', { class: 'ic' }, '💎'), h('span', {}, t('album')))))),
       back,
       this._muteBtn('bottom:max(calc(var(--u)*3),env(safe-area-inset-bottom));inset-inline-end:calc(var(--u)*3)'),
+      this._toastEl(),
+    );
+  }
+
+  /** The relic album: one named relic per map, earned by finding all 3 hidden jade relics in that map. */
+  showAlbum() {
+    this.mode = 'album';
+    this.sim = null;
+    this.sound.setMode('menu');
+    this._clear();
+    const found = new Set(this.save.album ?? []);
+    const rows = LEVELS.map((lv) => {
+      const has = found.has(lv.id);
+      return h('div', { class: 'ja-stat', style: 'display:flex;align-items:center;gap:calc(var(--u)*2);min-width:calc(var(--u)*62);text-align:start' },
+        h('span', { style: 'font-size:calc(var(--u)*6)' }, has ? '💎' : '❔'),
+        h('span', {},
+          h('b', { style: 'display:block;font-size:calc(var(--u)*4)' }, has ? name(lv.relicName) : t('albumHidden')),
+          h('span', { style: 'font-size:calc(var(--u)*3);opacity:.8' }, name(lv))));
+    });
+    this.layer.append(
+      h('button', { class: 'ja-round', style: 'top:max(calc(var(--u)*2.5),env(safe-area-inset-top));inset-inline-start:calc(var(--u)*3)', 'aria-label': t('menu'), onclick: () => this.showMenu() }, getLang() === 'en' ? '←' : '→'),
+      h('div', { class: 'ja-center', style: 'overflow:auto;justify-content:flex-start;padding-top:max(calc(var(--u)*12),env(safe-area-inset-top))' },
+        h('div', { class: 'ja-logo', style: 'font-size:calc(var(--u)*8)' }, '💎 ', t('album')),
+        h('div', { class: 'ja-sub ja-shadow', style: 'opacity:1' }, t('albumSub')),
+        h('div', { class: 'ja-sub ja-shadow', style: 'opacity:1' }, `${num(found.size)}/${num(LEVELS.length)}`),
+        h('div', { style: 'display:flex;flex-direction:column;gap:calc(var(--u)*1.6);padding-bottom:calc(var(--u)*6)' }, rows)),
       this._toastEl(),
     );
   }
@@ -338,7 +366,7 @@ class Game {
       h('div', { class: 'ja-hud ja-shadow' },
         h('div', { class: 'grp' }, this.hud.hearts, h('span', { class: 'grp' }, h('span', { class: 'ja-coin' }), this.hud.coins)),
         h('div', { class: 'grp' }, this.hud.gems, h('span', {}, '⏱ ', this.hud.clock))),
-      h('div', { class: 'ja-prog ja-shadow' }, `${t('level')} ${num(this.levelIndex + 1)}`, h('div', { class: 'ja-bar' }, this.hud.fill, this.hud.dot, h('span', { class: 'end' }, this.levelIndex === 2 ? '☀️' : '🗿'))),
+      h('div', { class: 'ja-prog ja-shadow' }, `${t('level')} ${num(this.levelIndex + 1)}`, h('div', { class: 'ja-bar' }, this.hud.fill, this.hud.dot, h('span', { class: 'end' }, sim.goal?.kind === 'altar' ? '☀️' : '🗿'))),
       h('button', { class: 'ja-round', style: 'bottom:max(calc(var(--u)*3),env(safe-area-inset-bottom));inset-inline-start:calc(var(--u)*3)', 'aria-label': t('paused'), onclick: (e) => { e.stopPropagation(); this.pause(); } }, '⏸'),
       this._muteBtn('bottom:max(calc(var(--u)*3),env(safe-area-inset-bottom));inset-inline-end:calc(var(--u)*3)'),
       (this.hintEl = h('div', { class: 'ja-hint ja-shadow' })),
@@ -433,6 +461,7 @@ class Game {
       won && result.bonus ? h('div', { class: 'ja-sub' }, `${t('bonus')}: +${num(result.bonus)}`) : null,
       h('div', { class: 'ja-reward' }, `${t('reward')}: `, reward),
       res.unlockedNext ? h('div', { class: 'ja-reward' }, '🎉 ', t('newLevel')) : null,
+      res.albumNew ? h('div', { class: 'ja-reward' }, '💎 ', t('albumNew'), ' ', name(LEVELS[i].relicName)) : null,
       hasNext ? h('button', { class: 'ja-btn', onclick: () => this.startLevel(i + 1) }, t('next'), ' ▶') : h('button', { class: 'ja-btn', onclick: () => this.startLevel(i) }, '↻ ', t('retry')),
       hasNext ? h('button', { class: 'ja-btn ghost', onclick: () => this.startLevel(i) }, '↻ ', t('retry')) : null,
       h('button', { class: 'ja-btn ghost', onclick: () => this.showMenu() }, t('menu')));

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { makeLevel, solve, topFirst, Game, normalizeSave, LEVELS, TRAY_CAP, COMBO_TIME, levelParams } from '../src/sim.js';
+import { makeLevel, solve, topFirst, Game, normalizeSave, LEVELS, CHAPTERS, CHAPTER_SIZE, chapterOf, TRAY_CAP, COMBO_TIME, levelParams } from '../src/sim.js';
 
 /** A tiny hand-made level: items in a row, no overlaps, given kinds. */
 function row(kinds) {
@@ -141,4 +141,66 @@ test('damaged saves load safely and progress is clamped', () => {
   assert.equal(s.stars[3], 3); assert.equal(s.stars[4], 1); assert.equal(s.stars[99], undefined);
   assert.equal(s.unlocked, 5);
   assert.equal(normalizeSave({ unlocked: 500 }).unlocked, LEVELS);
+});
+
+import fs from 'node:fs';
+
+test('Kunafa Tray anchor: title renamed; the full-tray state stays recoverable', () => {
+  const main = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes("title: ['صينية الكنافة', 'Kunafa Tray']"));
+  const sim = fs.readFileSync(new URL('../src/sim.js', import.meta.url), 'utf8');
+  assert.ok(/state === 'lost' && this\.tray\.length < this\.cap\) this\.state = 'play'/.test(sim), 'lost state must be escapable with a helper');
+});
+
+test('chapters: 4 chapters x 9 trays cover levels 1-36 with no gaps or overlaps', () => {
+  assert.equal(CHAPTERS.length, 4);
+  assert.equal(CHAPTER_SIZE, 9);
+  const seen = [];
+  for (const ch of CHAPTERS) {
+    assert.equal(ch.to - ch.from + 1, CHAPTER_SIZE, `chapter ${ch.id} owns 9 levels`);
+    assert.ok(ch.name[0] && ch.name[1], `chapter ${ch.id} has ar+en names`);
+    for (let n = ch.from; n <= ch.to; n++) seen.push(n);
+  }
+  assert.deepEqual(seen, Array.from({ length: LEVELS }, (_, i) => i + 1), 'chapters tile 1..LEVELS exactly');
+  assert.equal(new Set(CHAPTERS.map((c) => c.board)).size, 4, 'each chapter has its own board');
+  assert.deepEqual(CHAPTERS.map((c) => c.board), ['shop', 'ramadan', 'mawled', 'picnic']);
+});
+
+test('chapterOf maps the chapter boundaries correctly', () => {
+  const want = [[1, 1], [9, 1], [10, 2], [18, 2], [19, 3], [27, 3], [28, 4], [36, 4]];
+  for (const [n, id] of want) assert.equal(chapterOf(n).id, id, `level ${n} is chapter ${id}`);
+  for (let n = 1; n <= LEVELS; n++) {
+    const ch = chapterOf(n);
+    assert.ok(n >= ch.from && n <= ch.to, `level ${n} inside its chapter range`);
+  }
+  assert.equal(chapterOf(0).id, 1, 'clamped like levelParams');
+  assert.equal(chapterOf(999).id, 4, 'clamped like levelParams');
+});
+
+test('every level in every chapter is completed by the constructive top-first path', () => {
+  for (const ch of CHAPTERS) {
+    for (let n = ch.from; n <= ch.to; n++) {
+      const lv = makeLevel(n);
+      const g = new Game(lv); g.bonus = -1e9; // no wand: the pure constructive path
+      for (const id of topFirst(lv)) g.tap(id);
+      assert.equal(g.state, 'won', `chapter ${ch.id} level ${n} top-first wins`);
+    }
+  }
+});
+
+test('chapters do not change saves: an existing save opens identically', () => {
+  const saved = { unlocked: 20, stars: { 1: 3, 9: 2, 18: 1, 19: 3 }, muted: true };
+  assert.deepEqual(normalizeSave(saved), saved);
+  assert.deepEqual(normalizeSave({ unlocked: 36, stars: {} }), { unlocked: 36, stars: {}, muted: false });
+  assert.equal(normalizeSave({ unlocked: 10 }).unlocked, 10, 'mid-chapter progress is untouched');
+});
+
+test('chapter boards are wired: main switches the board per chapter, sprites draw all four', () => {
+  const main = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes('chapterOf(this.n)'), 'startLevel resolves the chapter');
+  assert.ok(main.includes('this.boardId = ch.board'), 'the board follows the chapter');
+  assert.ok(main.includes('for (const ch of CHAPTERS)'), 'level select is grouped by chapter');
+  const sprites = fs.readFileSync(new URL('../src/sprites.js', import.meta.url), 'utf8');
+  for (const b of ['shop', 'ramadan', 'mawled', 'picnic']) assert.ok(sprites.includes(`'${b}'`) || b === 'shop', `board ${b} handled`);
+  for (const fn of ['drawRamadan', 'drawMawled', 'drawPicnic']) assert.ok(sprites.includes(`function ${fn}`), `${fn} exists`);
 });

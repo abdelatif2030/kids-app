@@ -102,4 +102,4 @@ export function h(tag, attrs = {}, ...kids) {
   return e;
 }
 
-export const LEVEL_ICON = { trail: '🌿', ruins: '🏛️', temple: '☀️' };
+export const LEVEL_ICON = { trail: '🌿', ruins: '🏛️', temple: '☀️', falls: '💦', qarun: '🏯', hitan: '🐋', oasis: '🌴', salt: '💠', shali: '🏰', spring: '💧', palms: '🥥', oracle: '🔮' };

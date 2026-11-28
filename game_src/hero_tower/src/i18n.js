@@ -1,5 +1,5 @@
 const S = {
-  title: ['برج الأبطال', 'Hero Tower'],
+  title: ['برج القلعة', 'Citadel Tower'],
   play: ['يلا نلعب', 'Play'],
   chapter: ['الفصل', 'Chapter'],
   chapters: ['الفصول', 'Chapters'],
@@ -44,6 +44,16 @@ const S = {
   castle: ['القلعة', 'The Castle'],
   ice: ['برج الجليد', 'The Ice Tower'],
   fire: ['برج النار', 'The Fire Tower'],
+  citadel: ['قلعة صلاح الدين', 'Salah El-Din Citadel'],
+  catherine: ['أبراج سانت كاترين', 'Saint Catherine Towers'],
+  pharos: ['منارة فاروس', 'Pharos Lighthouse'],
+  nubia: ['حصن النوبة', 'The Nubian Fortress'],
+  shali: ['قلعة شالي في سيوة', 'Shali Fortress, Siwa'],
+  philae: ['برج جزيرة فيلة', 'Philae Island Tower'],
+  qaitbey: ['قلعة قايتباي في إسكندرية', 'Qaitbey Citadel, Alexandria'],
+  zweila: ['باب زويلة في القاهرة', 'Bab Zuweila, Cairo'],
+  sea: ['برج البحر', 'The Sea Tower'],
+  dawn: ['برج الفجر', 'The Dawn Tower'],
   locked: ['اكسب الفصل اللي قبله', 'Win the chapter before'],
 };
 let lang = 'ar';

@@ -114,7 +114,7 @@ class Game {
     this.layer = h('div', { class: 'mr-layer' });
     this.speedlines = h('div', { class: 'mr-speedlines' });
     this.root.append(this.speedlines, this.layer);
-    this.camera = new THREE.PerspectiveCamera(62, 1, 0.3, 900);
+    this.camera = new THREE.PerspectiveCamera(62, 1, 0.3, 2400); // far enough for the 780 m pano ring seen from the far side of the biggest leg (Phase 2E tracks reach ≈740 m from centre)
     this.input = { pointer: null, ox: 0, x: 0, t0: 0, moved: false, steer: 0, brake: false, nitro: false, keys: new Set() };
     this.mode = 'menu';
     this.paused = false;
@@ -203,6 +203,11 @@ class Game {
     cx /= tr.N;
     cz /= tr.N;
     this.center = { x: cx, z: cz };
+    // how far this leg reaches from its centre (Phase 2E legs differ: ≈590–740 m) — the
+    // decorative rings (dune humps, mountains) sit beyond it, never on the road
+    let ext = 0;
+    for (let i = 0; i < tr.N; i++) ext = Math.max(ext, Math.hypot(tr.xs[i] - cx, tr.zs[i] - cz));
+    this.extent = ext;
     const sea = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), mat(rd.sunset ? 0xc8854a : 0xe0b872));
     sea.rotation.x = -Math.PI / 2;
     sea.position.set(cx, -0.4, cz);
@@ -287,7 +292,7 @@ class Game {
     for (let i = 0; i < 9 && !pano; i++) {
       const a = (i / 9) * Math.PI * 2 + 0.3;
       const m = makeMountain(60 + (i % 3) * 25, 80 + (i % 4) * 30, [0xb07a4a, 0xc08a52, 0x9a6a42][i % 3]);
-      m.position.set(cx + Math.cos(a) * (520 + (i % 2) * 90), -0.4, cz + Math.sin(a) * (520 + (i % 2) * 90));
+      m.position.set(cx + Math.cos(a) * (this.extent + 150 + (i % 2) * 90), -0.4, cz + Math.sin(a) * (this.extent + 150 + (i % 2) * 90));
       s.add(m);
     }
     if (!pano) s.add(makeClouds(14, cx, cz));
@@ -309,7 +314,8 @@ class Game {
       fg.setIndex(idx);
       mt.repeat.set(1, 2.5);
       s.add(new THREE.Mesh(fg, new THREE.MeshBasicMaterial({ map: mt, transparent: true, alphaTest: 0.3, side: THREE.DoubleSide })));
-      for (let i = 0; i < tr.N; i += 6) {
+      const postStep = Math.max(6, Math.round(tr.N / 340)); // ≈the old post count, whatever the leg's length
+      for (let i = 0; i < tr.N; i += postStep) {
         const p = pointAt(tr, i, side * (WALL + 0.5));
         const post = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.6, 5), mat(0x6a6e78));
         post.position.set(p.x, 2.1, p.z);
@@ -395,7 +401,8 @@ class Game {
     const s = this.scene;
     const rockG = makeRock(1, 0x9a7a5a).geometry;
     const spots = [];
-    for (let i = 0; i < tr.N; i += 7) {
+    const spotStep = Math.max(7, Math.round(tr.N / 290)); // roadside density stays ≈the old track's, per metre
+    for (let i = 0; i < tr.N; i += spotStep) {
       for (const side of [-1, 1]) {
         if (side === sideOut && i > 2 && i < 66) continue;
         const k = (i * 7 + side * 3) % 5;
@@ -415,12 +422,13 @@ class Game {
     s.add(iR);
     spots.filter((q2) => q2[4] === 3).forEach(([x, z, sc, r]) => { const c = makeCactus(sc); c.position.set(x, 0, z); c.rotation.y = r; s.add(c); });
     spots.filter((q2) => q2[4] === 4 && Math.floor(q2[3]) % 3 === 0).forEach(([x, z, sc, r], n) => { const t2 = makeTent([0xe8342a, 0xffd23a, 0x2a7ae8][n % 3]); t2.position.set(x, 0, z); t2.rotation.y = r; s.add(t2); });
-    // dune humps far off (soft, no collision) and a helicopter that circles the arena
+    // dune humps far off (soft, no collision) and a helicopter that circles the arena —
+    // the ring sits beyond this leg's extent (Phase 2E legs reach ≈590–740 m, past the old 420 m ring)
     for (let i = 0; i < 26; i++) {
       const a = (i / 26) * Math.PI * 2;
       const d = new THREE.Mesh(new THREE.SphereGeometry(40 + (i % 4) * 14, 12, 8), mat(i % 2 ? 0xe0ae6a : 0xd89a58));
       d.scale.y = 0.35;
-      d.position.set(this.center.x + Math.cos(a) * (420 + (i % 3) * 40), -6, this.center.z + Math.sin(a) * (420 + (i % 3) * 40));
+      d.position.set(this.center.x + Math.cos(a) * (this.extent + 70 + (i % 3) * 40), -6, this.center.z + Math.sin(a) * (this.extent + 70 + (i % 3) * 40));
       s.add(d);
     }
     // oasis pools by the road (the video's water crossings, here only for looks)

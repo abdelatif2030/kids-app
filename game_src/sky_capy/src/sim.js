@@ -24,6 +24,62 @@ export const ENEMY = {
 };
 
 export const BIRDS = ['robin', 'jay', 'canary'];
+
+/** Phase 2E (Batch F): the Journey — 8 Nile river stops, south → north, flown in order.
+ *  [base] reuses one of the 3 legacy stage patterns; [sky]/[island] pick the existing
+ *  per-stage backdrop palette / island kind; [boss] is the boss kind ending the stop. */
+export const STOPS = [
+  { id: 'nasser', ar: 'بحيرة ناصر', en: 'Lake Nasser', base: 1, sky: 0, island: 0, boss: 'captain' },
+  { id: 'aswan', ar: 'أسوان', en: 'Aswan', base: 2, sky: 1, island: 1, boss: 'captain' },
+  { id: 'komombo', ar: 'كوم أمبو', en: 'Kom Ombo', base: 3, sky: 2, island: 2, boss: 'heron' },
+  { id: 'edfu', ar: 'إدفو', en: 'Edfu', base: 1, sky: 1, island: 0, boss: 'captain' },
+  { id: 'luxor', ar: 'الأقصر', en: 'Luxor', base: 2, sky: 2, island: 1, boss: 'heron' },
+  { id: 'qena', ar: 'قنا', en: 'Qena', base: 3, sky: 0, island: 2, boss: 'captain' },
+  { id: 'cairo', ar: 'القاهرة', en: 'Cairo', base: 1, sky: 2, island: 1, boss: 'heron' },
+  { id: 'alexandria', ar: 'الإسكندرية', en: 'Alexandria', base: 3, sky: 0, island: 2, boss: 'heron' },
+];
+/** The second boss kind: the Storm Heron — faster, tougher, tighter bolt fan, summons gyros. */
+export const BOSS_KINDS = {
+  captain: { hp: 150, score: 5000, fire: 1.3 },
+  heron: { hp: 190, score: 7500, fire: 1.05 },
+};
+
+/** The 20 badges. [test] reads a stats snapshot (see Run.badgeStats / checkBadges). */
+export const BADGES = [
+  { id: 'firstpop', test: (s) => s.pops >= 1 },
+  { id: 'pop10', test: (s) => s.pops >= 10 },
+  { id: 'pop50', test: (s) => s.pops >= 50 },
+  { id: 'pop150', test: (s) => s.pops >= 150 },
+  { id: 'combo10', test: (s) => s.maxCombo >= 10 },
+  { id: 'combo20', test: (s) => s.maxCombo >= 20 },
+  { id: 'rescue1', test: (s) => s.rescues >= 1 },
+  { id: 'rescue3', test: (s) => s.rescues >= 3 },
+  { id: 'fullwings', test: (s) => !!s.fullWings },
+  { id: 'boss1', test: (s) => s.bosses >= 1 },
+  { id: 'boss3', test: (s) => s.bosses >= 3 },
+  { id: 'storm1', test: (s) => s.storms >= 1 },
+  { id: 'feather25', test: (s) => s.feathers >= 25 },
+  { id: 'pearl50', test: (s) => s.pearls >= 50 },
+  { id: 'score10k', test: (s) => s.score >= 10000 },
+  { id: 'score30k', test: (s) => s.score >= 30000 },
+  { id: 'rankS', test: (s) => s.ranks.some((r) => (r.rank || r) === 'S') },
+  { id: 'journey4', test: (s) => s.journeyStops >= 4 },
+  { id: 'journeyDone', test: (s) => !!s.journeyComplete },
+  { id: 'migration1', test: (s) => s.migrationLoops >= 1 },
+];
+/** Award every badge whose condition the snapshot meets; returns the newly awarded ids. */
+export function checkBadges(save, stats) {
+  if (!Array.isArray(save.badges)) save.badges = [];
+  const got = [];
+  for (const b of BADGES) {
+    if (save.badges.includes(b.id)) continue;
+    let ok = false;
+    try { ok = !!b.test(stats); } catch (_) { ok = false; }
+    if (ok) { save.badges.push(b.id); got.push(b.id); }
+  }
+  save.badges = save.badges.slice(0, 20);
+  return got;
+}
 export const CAPSULES = ['spread', 'pierce', 'rapid'];
 
 export const UPGRADES = [
@@ -88,6 +144,23 @@ export function buildStage(n, loop = 0, seed = 1, easy = false) {
 }
 const pickOf = (r, a) => a[Math.floor(r() * a.length)];
 
+/** Phase 2E: one Journey stop's timeline, built with the exact stage mechanism:
+ *  the stop's base pattern (boss stripped), a density ramp across stops, and a
+ *  boss event that ENDS the timeline (captain or Storm Heron, hp ramping). */
+export function buildStop(stopIdx, loop = 0, seed = 1, easy = false) {
+  const stop = STOPS[Math.max(0, Math.min(STOPS.length - 1, stopIdx - 1))];
+  const r = rng(seed * 104729 + stopIdx * 7919 + loop * 31);
+  const ev = buildStage(stop.base, loop, seed + stopIdx * 131, easy).filter((e) => e.type !== 'boss').map((e) => ({ ...e }));
+  const lastT = Math.max(...ev.map((e) => e.t));
+  const extra = (stopIdx - 1) + loop * 2;
+  for (let i = 0; i < extra; i++) ev.push({ t: 6 + r() * Math.max(4, lastT - 8), type: pickOf(r, ['balloon', 'gyro', 'glider', 'umbrella']), x: 15 + r() * 70 });
+  ev.sort((a, b) => a.t - b.t);
+  const kind = BOSS_KINDS[stop.boss] || BOSS_KINDS.captain;
+  const bossHp = Math.round((kind.hp + 45 * (stopIdx - 1)) * (1 + 0.35 * loop) * (easy ? 0.7 : 1));
+  ev.push({ t: Math.max(...ev.map((e) => e.t)) + 5, type: 'boss', x: 50, bossKind: stop.boss, bossHp });
+  return ev;
+}
+
 export function upgradeLevel(save, id) { return Math.max(0, Math.min(3, (save.up && save.up[id]) | 0)); }
 
 /** The stats a save gives the plane. */
@@ -106,9 +179,15 @@ export function planeStats(save, easy = false) {
 
 export class Run {
   /** [save] = the hangar save (upgrades, paint). [easy] = younger children. */
-  constructor(save, seed = 1, easy = false) {
+  constructor(save, seed = 1, easy = false, opts = {}) {
     this.save = save || {};
     this.easy = easy;
+    // Phase 2E: 'journey' = the 8-stop Nile journey (the menu's lead mode);
+    // 'migration' = the legacy endless 3-stage loop (post-game Migration Season),
+    // which stays the Run default so the original loop behaviour is untouched.
+    this.mode = opts.mode === 'journey' ? 'journey' : 'migration';
+    this.startStop = this.mode === 'journey' ? Math.max(1, Math.min(8, opts.stop || 1)) : 1;
+    this.c = { pops: 0, rescues: 0, bosses: 0, storms: 0, maxCombo: 0, maxMult: 1, fullWings: false };
     this.seed = seed;
     this.r = rng(seed);
     this.stats = planeStats(this.save, easy);
@@ -128,15 +207,15 @@ export class Run {
     this.tank = 1; // the bubble tank ring (hold FIRE drains it)
     this.fireT = 0;
     this.id = 0;
-    this.state = 'play'; // 'play' | 'stageclear' | 'dead'
+    this.state = 'play'; // 'play' | 'stageclear' | 'dead' | 'journeycomplete'
     this.ranks = [];
     this.sd = null;
-    this._startStage(1);
+    this._startStage(this.startStop);
   }
 
   _startStage(n) {
     this.stage = n;
-    this.events = buildStage(n, this.loop, this.seed + this.loop * 17, this.easy);
+    this.events = this.mode === 'journey' ? buildStop(n, this.loop, this.seed + this.loop * 17, this.easy) : buildStage(n, this.loop, this.seed + this.loop * 17, this.easy);
     this.ei = 0;
     this.t = 0;
     this.sd = { spawned: 0, popped: 0, lost: 0, hp0: this.hp, name: n };
@@ -145,7 +224,25 @@ export class Run {
     this.stageLen = Math.max(...this.events.map((e) => e.t)) + 4;
   }
 
-  get stageCount() { return 3; }
+  get stageCount() { return this.mode === 'journey' ? STOPS.length : 3; }
+  /** The current stop (journey) or null (migration). */
+  get stop() { return this.mode === 'journey' ? STOPS[this.stage - 1] : null; }
+  /** Backdrop palette index for art.paintSky / island kind (existing per-stage system). */
+  get backdrop() { return this.stop ? this.stop.sky : (this.stage - 1) % 3; }
+  get islandKind() { return this.stop ? this.stop.island : (this.stage - 1) % 3; }
+  /** Stats snapshot for the badge audit (checkBadges). */
+  badgeStats(save) {
+    const sv = save || this.save || {};
+    const journeyInRun = this.mode === 'journey' ? (this.startStop - 1) + this.ranks.length : 0;
+    return {
+      pops: this.c.pops, rescues: this.c.rescues, bosses: this.c.bosses, storms: this.c.storms,
+      maxCombo: this.c.maxCombo, maxMult: this.c.maxMult, fullWings: this.c.fullWings,
+      feathers: this.feathers, pearls: this.pearls, score: this.score, ranks: this.ranks,
+      journeyStops: Math.min(8, Math.max(sv.journeyStops || 0, journeyInRun)),
+      journeyComplete: !!sv.journeyDone || this.state === 'journeycomplete',
+      migrationLoops: this.mode === 'migration' ? this.loop : 0,
+    };
+  }
   get progress() { return Math.min(1, this.t / this.stageLen); }
   /** The thief that grabbed the village feathers (the video's THIEF! bar): how far he has flown (0 = just arrived, 1 = got away), or null. */
   get thief() { const th = this.enemies.find((e) => e.type === 'thief' && !e.gone); return th ? { k: Math.max(0, Math.min(1, (th.y + 8) / (H + 18))), x: th.x, y: th.y } : null; }
@@ -155,7 +252,8 @@ export class Run {
   _spawn(e) {
     const spec = ENEMY[e.type];
     const hpScale = (1 + 0.35 * this.loop) * (this.easy ? 0.7 : 1);
-    const en = { id: this._id(), type: e.type, x: e.x, y: e.type === 'boss' ? -20 : -8, t: 0, hp: Math.ceil(spec.hp * hpScale), hp0: Math.ceil(spec.hp * hpScale), r: spec.r, fireT: 1 + this.r() * 1.5, bird: e.bird || null, dir: this.r() < 0.5 ? -1 : 1, x0: e.x };
+    const bossHp = e.type === 'boss' ? Math.ceil((e.bossHp || spec.hp) * (e.bossHp ? 1 : hpScale)) : 0;
+    const en = { id: this._id(), type: e.type, x: e.x, y: e.type === 'boss' ? -20 : -8, t: 0, hp: e.type === 'boss' ? bossHp : Math.ceil(spec.hp * hpScale), hp0: e.type === 'boss' ? bossHp : Math.ceil(spec.hp * hpScale), r: spec.r, fireT: 1 + this.r() * 1.5, bird: e.bird || null, dir: this.r() < 0.5 ? -1 : 1, x0: e.x, bossKind: e.type === 'boss' ? (e.bossKind || 'captain') : null };
     this.enemies.push(en);
     this.sd.spawned++;
   }
@@ -183,7 +281,7 @@ export class Run {
     while (this.ei < this.events.length && this.events[this.ei].t <= this.t) {
       const e = this.events[this.ei++];
       if (e.type === 'capsule') this.pickups.push({ id: this._id(), kind: 'capsule', cap: e.kind, x: e.x, y: -6, vy: 14 });
-      else { this._spawn(e); if (e.type === 'boss') { this.bossAlive = true; ev.push({ type: 'boss' }); } else if (e.type === 'thief') ev.push({ type: 'thief' }); }
+      else { this._spawn(e); if (e.type === 'boss') { this.bossAlive = true; ev.push({ type: 'boss', bossKind: e.bossKind || 'captain' }); } else if (e.type === 'thief') ev.push({ type: 'thief' }); }
     }
     // firing: a baseline stream, faster while FIRE is held (and the tank has bubbles)
     const hold = !!input.fire && this.tank > 0.02;
@@ -274,15 +372,18 @@ export class Run {
     } else if (en.type === 'thief') {
       en.y += sp * 0.6 * dt; en.x += (this.px - en.x) * 0.9 * dt; // swoops at the pearls (it is just a fast pest)
     } else if (en.type === 'boss') {
-      if (en.y < 30) en.y += sp * 3 * dt; else en.y = 30 + Math.sin(en.t * 0.6) * 3;
-      en.x = W / 2 + Math.sin(en.t * 0.5) * 30;
+      const heron = en.bossKind === 'heron';
+      if (en.y < 30) en.y += sp * 3 * dt; else en.y = 30 + Math.sin(en.t * (heron ? 0.9 : 0.6)) * 3;
+      en.x = W / 2 + Math.sin(en.t * (heron ? 0.75 : 0.5)) * 30;
       en.fireT -= dt;
       const phase = en.hp < en.hp0 * 0.34 ? 3 : en.hp < en.hp0 * 0.67 ? 2 : 1;
       if (en.fireT <= 0 && en.y > 20) {
-        en.fireT = spec.fire / (phase === 3 ? 1.5 : 1);
-        for (let i = -phase; i <= phase; i++) this._shootAt(en, 22, i * 0.22);
+        const kind = BOSS_KINDS[en.bossKind] || BOSS_KINDS.captain;
+        en.fireT = kind.fire / (phase === 3 ? 1.5 : 1);
+        if (heron) { for (let i = -phase; i <= phase; i++) this._shootAt(en, 26, i * 0.16); }
+        else for (let i = -phase; i <= phase; i++) this._shootAt(en, 22, i * 0.22);
         ev.push({ type: 'eshoot' });
-        if (phase >= 2 && Math.floor(en.t) % 7 === 0 && !en.summoned) { en.summoned = true; this._spawn({ type: 'glider', x: 20 }); this._spawn({ type: 'glider', x: 80 }); }
+        if (phase >= 2 && Math.floor(en.t) % 7 === 0 && !en.summoned) { en.summoned = true; const s2 = heron ? 'gyro' : 'glider'; this._spawn({ type: s2, x: 20 }); this._spawn({ type: s2, x: 80 }); }
         if (Math.floor(en.t) % 7 !== 0) en.summoned = false;
       }
     }
@@ -291,10 +392,13 @@ export class Run {
 
   _pop(en, ev, rammed = false) {
     this.sd.popped++;
+    this.c.pops++;
+    if (en.type === 'boss') this.c.bosses++;
     this.combo++; this.comboT = 3;
+    this.c.maxCombo = Math.max(this.c.maxCombo, this.combo);
     const m = Math.min(5, 1 + Math.floor(this.combo / 5));
-    if (m !== this.mult) { this.mult = m; ev.push({ type: 'combo', mult: m }); }
-    const pts = ENEMY[en.type].score * this.mult;
+    if (m !== this.mult) { this.mult = m; this.c.maxMult = Math.max(this.c.maxMult, m); ev.push({ type: 'combo', mult: m }); }
+    const pts = ((en.type === 'boss' && en.bossKind === 'heron' ? BOSS_KINDS.heron.score : ENEMY[en.type].score)) * this.mult;
     this.score += pts;
     ev.push({ type: 'pop', x: en.x, y: en.y, kind: en.type, pts });
     // pearls and feathers
@@ -312,8 +416,10 @@ export class Run {
     else if (p.kind === 'feather') { this.feathers++; ev.push({ type: 'feather', x: p.x, y: p.y }); }
     else if (p.kind === 'capsule') { this.weapon = p.cap; this.weaponT = 12; ev.push({ type: 'capsule', cap: p.cap }); }
     else if (p.kind === 'cage') {
+      this.c.rescues++;
       if (this.wings.length < 2) this.wings.push({ type: p.bird, t: 1, x: this.px, y: this.py });
       else { this.wings[0] = { type: p.bird, t: 1, x: this.px, y: this.py }; }
+      if (this.wings.length >= 2) this.c.fullWings = true;
       this.score += 500;
       ev.push({ type: 'rescue', bird: p.bird });
     }
@@ -330,6 +436,7 @@ export class Run {
   storm() {
     if (this.state !== 'play' || this.storms <= 0) return false;
     this.storms--;
+    this.c.storms++;
     this.eb = [];
     this.inv = Math.max(this.inv, 1.2);
     const ev = [{ type: 'storm' }];
@@ -358,14 +465,21 @@ export class Run {
     const rank = this._rank();
     this.ranks.push({ stage: this.stage, loop: this.loop, rank });
     this.score += { S: 2000, A: 1200, B: 600, C: 200 }[rank];
+    if (this.mode === 'journey' && this.stage >= STOPS.length) {
+      this.state = 'journeycomplete';
+      ev.push({ type: 'journeycomplete', rank, stage: this.stage });
+      return;
+    }
     this.state = 'stageclear';
     ev.push({ type: 'stageclear', rank, stage: this.stage });
   }
 
-  /** After the stage card: the next stage (the loop makes it harder). */
+  /** After the stage card: the next stage (the loop makes it harder).
+   *  Journey: advance to the next stop. Migration: legacy loop, unchanged. */
   nextStage() {
     if (this.state !== 'stageclear') return;
-    if (this.stage >= 3) { this.loop++; this._startStage(1); } else this._startStage(this.stage + 1);
+    if (this.mode === 'journey') this._startStage(this.stage + 1);
+    else if (this.stage >= 3) { this.loop++; this._startStage(1); } else this._startStage(this.stage + 1);
     this.state = 'play';
     this.bullets = []; this.eb = [];
   }
@@ -380,7 +494,7 @@ export function normalizeSave(s) {
   const owned = new Set(['lagoon', ...(Array.isArray(o.owned) ? o.owned.filter((id) => PAINTS.some((p) => p.id === id)) : [])]);
   const paint = owned.has(o.paint) ? o.paint : 'lagoon';
   const top = (Array.isArray(o.top) ? o.top : []).filter((e) => e && typeof e.name === 'string' && Number.isFinite(e.score)).map((e) => ({ name: e.name.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 3) || 'AAA', score: Math.floor(e.score), stage: Math.floor(e.stage) || 1 })).sort((a, b) => b.score - a.score).slice(0, 10);
-  return { feathers: Math.max(0, Math.min(99999, Math.floor(Number(o.feathers)) || 0)), up, owned: [...owned], paint, top, muted: !!o.muted, best: Math.max(0, Math.floor(Number(o.best)) || 0), badges: Array.isArray(o.badges) ? o.badges.filter((b) => typeof b === 'string').slice(0, 20) : [] };
+  return { feathers: Math.max(0, Math.min(99999, Math.floor(Number(o.feathers)) || 0)), up, owned: [...owned], paint, top, muted: !!o.muted, best: Math.max(0, Math.floor(Number(o.best)) || 0), badges: Array.isArray(o.badges) ? o.badges.filter((b) => typeof b === 'string').slice(0, 20) : [], journeyStops: Math.max(0, Math.min(8, Math.floor(Number(o.journeyStops)) || 0)), journeyDone: !!o.journeyDone };
 }
 
 /** Buy the next level of an upgrade: returns { ok, save } (the save is changed in place). */

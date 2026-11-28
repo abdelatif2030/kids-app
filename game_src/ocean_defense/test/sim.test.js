@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Defense, LEVELS, HERO, HALF_W, WALL_Z, KINDS, normalizeSave, waveOf } from '../src/sim.js';
+import { Defense, LEVELS, HERO, HALF_W, WALL_Z, KINDS, normalizeSave, waveOf, guideEntries } from '../src/sim.js';
 
 /** A robot: aims at the enemy closest to the wall (or the octopus), picks repair when hurt, else shell / whirl / spread. */
 function play(d) {
@@ -127,4 +127,90 @@ test('damaged saves load safely', () => {
     assert.ok(s.coins >= 0);
     for (const v of Object.values(s.up)) assert.ok(v >= 0 && v <= 5);
   }
+});
+
+test('Red Sea Reef Fort anchor: the original seven Red Sea sites keep ids/boss numbers', () => {
+  assert.deepEqual(LEVELS.slice(0, 7).map((l) => l.id), [1, 2, 3, 4, 5, 6, 7]);
+  assert.deepEqual(LEVELS.slice(0, 7).map((l) => l.boss), [40, 60, 80, 100, 130, 160, 200]);
+  assert.match(LEVELS[2].en, /Ras Mohammed/);
+  assert.match(LEVELS[4].ar, /الثقب الأزرق/);
+});
+
+test('Batch F: ten reefs — three new southern sites continue the tour and the boss curve', () => {
+  assert.equal(LEVELS.length, 10);
+  assert.deepEqual(LEVELS.map((l) => l.id), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  assert.deepEqual(LEVELS.map((l) => l.boss), [40, 60, 80, 100, 130, 160, 200, 240, 280, 320]);
+  assert.match(LEVELS[7].en, /Marsa Alam/);
+  assert.match(LEVELS[8].en, /Elphinstone/);
+  assert.match(LEVELS[9].en, /Brothers/);
+  // every reef carries an album fact in both languages
+  for (const lv of LEVELS) {
+    assert.ok(lv.fact.ar.length > 10 && lv.fact.en.length > 10, `fact for ${lv.en}`);
+    assert.ok(lv.fish, `fish for ${lv.en}`);
+  }
+  // the new reefs differ in more than boss HP: later waves are bigger and denser
+  const count = (i) => [0, 1, 2].reduce((n, w) => n + waveOf(i, w, () => 0.5).length, 0);
+  assert.ok(count(9) > count(7) && count(7) > count(6), 'wave size keeps growing into the new reefs');
+});
+
+test('Batch F: the unlock chain walks all ten reefs', () => {
+  const stars = {};
+  for (let done = 0; done < LEVELS.length; done++) {
+    const s = normalizeSave({ stars: { ...stars } });
+    assert.equal(s.unlocked, Math.min(LEVELS.length, done + 1), `after ${done} wins`);
+    stars[done + 1] = 2; // completing reef `done + 1`
+  }
+  const end = normalizeSave({ stars });
+  assert.equal(end.unlocked, LEVELS.length, 'the chain caps at the last reef, never beyond');
+  assert.deepEqual(Object.keys(end.stars).map(Number), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+});
+
+test('Batch F: a seven-level save migrates cleanly into the ten-reef tour', () => {
+  const old = { unlocked: 7, stars: { 1: 3, 2: 2, 3: 3, 4: 1, 5: 2, 6: 3, 7: 1 }, coins: 120, up: { power: 3, wall: 2, pearl: 1 }, muted: true };
+  const s = normalizeSave(old);
+  assert.deepEqual(s.stars, old.stars, 'every earned star survives');
+  assert.equal(s.unlocked, 8, 'Marsa Alam unlocks from the finished Red Sea Deep');
+  assert.equal(s.coins, 120);
+  assert.deepEqual(s.up, old.up);
+  assert.equal(s.muted, true);
+  // a finished old campaign (all 7 starred) also opens reef 8, not a lock-up at 7
+  assert.equal(normalizeSave({ unlocked: 7, stars: old.stars }).unlocked, 8);
+});
+
+test('Batch F: reef-guide album locks every entry until its reef is completed', () => {
+  const fresh = guideEntries(null);
+  assert.equal(fresh.length, 10);
+  assert.ok(fresh.every((e) => !e.unlocked), 'a new child sees ten shadowed entries');
+  const mid = guideEntries({ stars: { 1: 1, 3: 2 } });
+  assert.deepEqual(mid.map((e) => e.unlocked), [true, false, true, false, false, false, false, false, false, false]);
+  const full = guideEntries({ stars: Object.fromEntries(LEVELS.map((l) => [l.id, 1])) });
+  assert.ok(full.every((e) => e.unlocked), 'finishing the tour opens the whole album');
+  // finishing a reef in a migrated 7-level save unlocks exactly its own entry
+  const migrated = guideEntries({ stars: { 7: 3 } });
+  assert.equal(migrated[6].unlocked, true);
+  assert.equal(migrated[7].unlocked, false);
+});
+
+test('Batch F: scripted campaign — first reef to last, the whole tour completes', () => {
+  const save = normalizeSave(null);
+  const up = { power: 0, wall: 0, pearl: 0 };
+  for (const [i, lv] of LEVELS.entries()) {
+    assert.ok(i + 1 <= save.unlocked, `reef ${lv.id} is unlocked when its turn comes`);
+    let won = false;
+    for (let seed = 1; seed <= 3 && !won; seed++) {
+      const d = new Defense({ level: i, seed, up: { ...up } });
+      play(d);
+      won = d.state === 'won';
+      if (won) save.stars[lv.id] = Math.max(save.stars[lv.id] ?? 0, d.result.stars);
+    }
+    assert.ok(won, `campaign stalls at reef ${lv.id} (${lv.en})`);
+    // spend the shells the way the shop allows before the next reef
+    up.power = Math.min(5, i + 1);
+    up.wall = Math.min(5, i + 1);
+    up.pearl = Math.min(5, Math.floor((i + 1) / 2));
+    const s2 = normalizeSave(save);
+    save.unlocked = s2.unlocked;
+  }
+  assert.equal(Object.keys(save.stars).length, 10, 'all ten reefs starred');
+  assert.ok(guideEntries(save).every((e) => e.unlocked), 'the album is complete at the end of the campaign');
 });

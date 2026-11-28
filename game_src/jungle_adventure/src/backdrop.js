@@ -7,6 +7,8 @@ const SKIES = {
   jungle: { top: '#4f9aa6', mid: '#9cc6c0', low: '#c4d8c0', sun: '#f2f4e0', far: '#5f8f94', farMist: '#9cbfbc', mid1: '#2c5440', mid2: '#213f33', near: '#132e22', vine: '#1f4430' },
   ruins: { top: '#6aa79a', mid: '#c9d9b4', low: '#f3c47f', sun: '#ffe7b0', far: '#86a397', farMist: '#d6e2c8', mid1: '#5f7a5c', mid2: '#46604a', near: '#22432c', vine: '#2f5a34' },
   temple: { top: '#e7895a', mid: '#f7b973', low: '#ffd98a', sun: '#fff4cc', far: '#c58a6a', farMist: '#f6caa0', mid1: '#a26a45', mid2: '#7c4f33', near: '#3b4a26', vine: '#4a5a2a' },
+  // Siwa: a pale desert sky over golden dunes, with green palm groves in front (Phase 2E)
+  oasis: { top: '#5faec4', mid: '#bcd9bd', low: '#f2d492', sun: '#fff3c4', far: '#c49a68', farMist: '#e6cf9f', mid1: '#3f7a3a', mid2: '#2c5a30', near: '#173d20', vine: '#265430' },
 };
 
 function rng(seed) {
@@ -174,7 +176,7 @@ export class Backdrop {
     const g = cv.getContext('2d');
     const r = rng(this.theme.length * 31);
     const ground = h * 0.72;
-    if (this.theme === 'jungle') {
+    if (this.theme === 'jungle' || this.theme === 'oasis') {
       // canopy of round trees and palms
       for (let i = 0; i < 26; i++) {
         const x = (i / 26) * W + r() * 30;

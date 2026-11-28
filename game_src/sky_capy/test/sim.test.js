@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Run, buildStage, normalizeSave, buyUpgrade, buyPaint, qualifies, addScore, planeStats, ENEMY, UPGRADES, PAINTS, W } from '../src/sim.js';
+import { Run, buildStage, buildStop, STOPS, BADGES, checkBadges, BOSS_KINDS, normalizeSave, buyUpgrade, buyPaint, qualifies, addScore, planeStats, ENEMY, UPGRADES, PAINTS, W } from '../src/sim.js';
 
 /** A robot: slides under the nearest pirate and keeps firing; collects cages and capsules on the way. */
 function bot(run, maxSec = 400, dt = 1 / 30) {
@@ -139,4 +139,125 @@ test('the thief carries the village feathers: popping him drops a bundle of feat
   run._pop(th, ev2);
   assert.ok(ev2.some((e) => e.type === 'loot'));
   assert.ok(run.pickups.filter((p) => p.kind === 'feather').length >= before + 6);
+});
+
+// ---- Phase 2E (Batch F): the Nile Journey, Migration Season, 20 badges, save migration ----
+
+test('journey: 8 Nile stops south→north with names, rising difficulty, each timeline ending in a boss', () => {
+  assert.equal(STOPS.length, 8);
+  assert.deepEqual(STOPS.map((s) => s.en), ['Lake Nasser', 'Aswan', 'Kom Ombo', 'Edfu', 'Luxor', 'Qena', 'Cairo', 'Alexandria']);
+  for (const s of STOPS) assert.ok(s.ar.length > 1 && s.en.length > 1);
+  const kinds = new Set(STOPS.map((s) => s.boss));
+  assert.ok(kinds.has('captain') && kinds.has('heron'), 'two boss kinds across the journey');
+  let prevHp = 0; let prevLen = 0;
+  for (let i = 1; i <= 8; i++) {
+    const ev = buildStop(i, 0, 5);
+    for (let k = 1; k < ev.length; k++) assert.ok(ev[k].t >= ev[k - 1].t, 'sorted');
+    const last = ev.at(-1);
+    assert.equal(last.type, 'boss', `stop ${i} ends with a boss event`);
+    assert.equal(last.bossKind, STOPS[i - 1].boss);
+    assert.ok(last.bossHp > prevHp, `boss hp rises (stop ${i})`);
+    prevHp = last.bossHp;
+    if (i === 1) prevLen = ev.length;
+    if (i === 8) assert.ok(ev.length > prevLen, 'the finale stop is denser than the first');
+    assert.ok(ev.some((e) => e.type === 'cage') && ev.some((e) => e.type === 'capsule'));
+  }
+  assert.ok(BOSS_KINDS.heron.hp > BOSS_KINDS.captain.hp, 'the Storm Heron is the tougher second boss');
+});
+
+test('journey playthrough: stops 1→8 complete in order, the finale ends the journey (no silent loop), migration unlocks', () => {
+  const save = normalizeSave(null);
+  const run = new Run(save, 21, false, { mode: 'journey', stop: 1 });
+  run.hp = 1e9; run.stats.maxHp = 1e9;
+  assert.equal(run.stageCount, 8);
+  let stops = 0;
+  for (let guard = 0; guard < 12 && run.state !== 'journeycomplete'; guard++) {
+    if (stops === 2) assert.ok(run.storm(), 'a storm is available mid-journey');
+    const secs = bot(run, 600);
+    assert.ok(secs < 599, `stop ${run.stage} should end (state ${run.state})`);
+    if (run.state === 'stageclear') {
+      stops++;
+      // completing stop k persists progress k and unlocks k+1
+      save.journeyStops = Math.max(save.journeyStops, run.stage);
+      assert.equal(save.journeyStops, stops);
+      run.nextStage();
+      assert.equal(run.stage, stops + 1);
+    } else if (run.state === 'journeycomplete') { stops++; }
+  }
+  assert.equal(stops, 8);
+  assert.equal(run.state, 'journeycomplete');
+  assert.equal(run.ranks.length, 8);
+  save.journeyStops = 8; save.journeyDone = true;
+  const stats = run.badgeStats(save);
+  assert.equal(stats.journeyStops, 8);
+  assert.equal(stats.journeyComplete, true);
+  assert.equal(stats.bosses, 8, 'one boss per stop');
+  // migration season: the legacy loop still loops after the journey
+  const mig = new Run(save, 21, false, { mode: 'migration' });
+  assert.equal(mig.stageCount, 3);
+  assert.equal(mig.mode, 'migration');
+});
+
+test('journey failure keeps progress: a failed stop is retried, completed stops stay completed', () => {
+  const save = normalizeSave({ journeyStops: 3 });
+  const run = new Run(save, 9, false, { mode: 'journey', stop: save.journeyStops + 1 });
+  assert.equal(run.stage, 4, 'the run resumes at the first uncompleted stop');
+  run.hp = 1; run.inv = 0;
+  run._hurt(50, []);
+  assert.equal(run.state, 'play'); // hurt alone does not end it mid-step; hp clamps in step
+  run.step(0.05, {});
+  assert.equal(run.state, 'dead');
+  assert.equal(save.journeyStops, 3, 'progress unchanged after a failed stop');
+  assert.equal(normalizeSave(save).journeyStops, 3);
+});
+
+test('all 20 badges are awardable across journey + migration play', () => {
+  assert.equal(BADGES.length, 20);
+  assert.equal(new Set(BADGES.map((b) => b.id)).size, 20);
+  const save = normalizeSave(null);
+  // journey run (invulnerable robot, one storm used)
+  const run = new Run(save, 33, false, { mode: 'journey', stop: 1 });
+  run.hp = 1e9; run.stats.maxHp = 1e9;
+  for (let guard = 0; guard < 12 && run.state !== 'journeycomplete'; guard++) {
+    if (run.stage === 1 && run.c.storms === 0) run.storm();
+    bot(run, 600);
+    if (run.state === 'stageclear') { save.journeyStops = Math.max(save.journeyStops, run.stage); checkBadges(save, run.badgeStats(save)); run.nextStage(); }
+  }
+  assert.equal(run.state, 'journeycomplete');
+  save.journeyStops = 8; save.journeyDone = true;
+  checkBadges(save, run.badgeStats(save));
+  // migration run: complete one legacy loop (4 stage clears, as the old test does)
+  const mig = new Run(save, 11, false, { mode: 'migration' });
+  mig.hp = 1e9; mig.stats.maxHp = 1e9;
+  let clears = 0;
+  for (let guard = 0; guard < 8 && clears < 4; guard++) { bot(mig); if (mig.state === 'stageclear') { clears++; mig.nextStage(); } }
+  assert.equal(mig.loop, 1);
+  checkBadges(save, mig.badgeStats(save));
+  // combo20: the bot takes hits (each resets the combo), so drive the real _pop
+  // mechanic directly — 20 unbroken pops, exactly as a skilled run earns it.
+  const cr = new Run(save, 5, false, { mode: 'journey', stop: 1 });
+  const ev20 = [];
+  for (let i = 0; i < 20; i++) { cr._spawn({ type: 'balloon', x: 50 }); const e = cr.enemies.pop(); e.hp = 0; cr._pop(e, ev20); }
+  assert.equal(cr.c.maxCombo, 20);
+  checkBadges(save, { ...run.badgeStats(save), maxCombo: cr.c.maxCombo, maxMult: cr.c.maxMult });
+  const missing = BADGES.map((b) => b.id).filter((id) => !save.badges.includes(id));
+  assert.deepEqual(missing, [], `every badge earned; counters journey=${JSON.stringify(run.c)} mig=${JSON.stringify(mig.c)} score=${run.score + mig.score}`);
+});
+
+test('save migration: an old save gains journey 0/done false and keeps everything else exactly', () => {
+  const old = { feathers: 321, up: { engine: 2, armor: 1 }, owned: ['royal', 'grape'], paint: 'royal', top: [{ name: 'cap', score: 1234, stage: 2 }], muted: true, best: 4321, badges: ['firstpop'] };
+  const s = normalizeSave(old);
+  assert.equal(s.journeyStops, 0);
+  assert.equal(s.journeyDone, false);
+  assert.equal(s.feathers, 321);
+  assert.equal(s.up.engine, 2); assert.equal(s.up.armor, 1);
+  assert.deepEqual([...s.owned].sort(), ['grape', 'lagoon', 'royal']);
+  assert.equal(s.paint, 'royal');
+  assert.equal(s.best, 4321);
+  assert.equal(s.muted, true);
+  assert.deepEqual(s.badges, ['firstpop']);
+  assert.equal(s.top[0].score, 1234);
+  const s2 = normalizeSave({ journeyStops: 99, journeyDone: 1 });
+  assert.equal(s2.journeyStops, 8, 'journey progress clamps to the 8 stops');
+  assert.equal(s2.journeyDone, true);
 });

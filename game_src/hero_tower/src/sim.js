@@ -1,4 +1,4 @@
-// «برج الأبطال» — Hero Tower: the rules (pure, no browser). A little knight starts at the bottom of a tall tower and climbs
+// «برج القلعة» — Citadel Tower: the rules (pure, no browser). A little knight starts at the bottom of a tall tower and climbs
 // floor by floor. Every floor has foes and treasures with POWER numbers:
 //   - a foe weaker than the hero (its number is green) is defeated when tapped, and the hero ABSORBS its power (hero += foe);
 //   - a foe stronger (red) wins the round: nothing is lost for good, the floor is simply tried again (gently);
@@ -12,14 +12,21 @@ export function rng(seed) {
   return () => { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; };
 }
 
+// Eight towers of Egypt: `theme` is the visual look, `place` is the chapter's
+// real Egyptian site (i18n key). ids/floors/numbers of chapters 1–6 are save
+// data — unchanged. Chapters 7–8 (Phase 2E) add two genuinely new looks:
+// 'sea' (Qaitbey Citadel, Alexandria) and 'dawn' (Bab Zuweila, old Cairo).
 export const CHAPTERS = [
-  { id: 1, theme: 'castle', floors: 12, start: 8, ratio: 0.72, mulMax: 2 },
-  { id: 2, theme: 'ice', floors: 12, start: 12, ratio: 0.78, mulMax: 2 },
-  { id: 3, theme: 'fire', floors: 12, start: 20, ratio: 0.84, mulMax: 3 },
-  // 2026-11-21: three harder visits (same looks, bigger numbers)
-  { id: 4, theme: 'castle', floors: 12, start: 30, ratio: 0.86, mulMax: 3 },
-  { id: 5, theme: 'ice', floors: 12, start: 44, ratio: 0.88, mulMax: 3 },
-  { id: 6, theme: 'fire', floors: 12, start: 60, ratio: 0.9, mulMax: 4 },
+  { id: 1, theme: 'castle', place: 'citadel', floors: 12, start: 8, ratio: 0.72, mulMax: 2 },
+  { id: 2, theme: 'ice', place: 'catherine', floors: 12, start: 12, ratio: 0.78, mulMax: 2 },
+  { id: 3, theme: 'fire', place: 'pharos', floors: 12, start: 20, ratio: 0.84, mulMax: 3 },
+  // three harder towers (a second visit to each look, at a new place)
+  { id: 4, theme: 'castle', place: 'nubia', floors: 12, start: 30, ratio: 0.86, mulMax: 3 },
+  { id: 5, theme: 'ice', place: 'shali', floors: 12, start: 44, ratio: 0.88, mulMax: 3 },
+  { id: 6, theme: 'fire', place: 'philae', floors: 12, start: 60, ratio: 0.9, mulMax: 4 },
+  // two new-look towers (Phase 2E): the sea fortress and the dawn gate
+  { id: 7, theme: 'sea', place: 'qaitbey', floors: 12, start: 68, ratio: 0.91, mulMax: 4 },
+  { id: 8, theme: 'dawn', place: 'zweila', floors: 12, start: 78, ratio: 0.92, mulMax: 4 },
 ];
 
 export const FOE_KINDS = ['slime', 'goblin', 'skeleton', 'imp', 'orc'];

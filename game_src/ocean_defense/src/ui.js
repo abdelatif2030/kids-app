@@ -26,6 +26,7 @@ export const CSS = `
 .od-dim{position:absolute;inset:0;background:rgba(40,25,10,.35);display:flex;align-items:center;justify-content:center;padding:calc(var(--u)*3);box-sizing:border-box}
 .od-panel{background:#fff7e6;border:calc(var(--u)*.8) solid #c98a3a;border-radius:calc(var(--u)*4);box-shadow:0 calc(var(--u)*1.2) 0 #a8692a,0 calc(var(--u)*2) calc(var(--u)*6) rgba(0,0,0,.3);padding:calc(var(--u)*3) calc(var(--u)*4);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*2);max-width:100%;max-height:100%;overflow:auto;box-sizing:border-box;pointer-events:auto}
 .od-title{font-size:calc(var(--u)*7);font-weight:900;color:#c2552a;text-align:center;line-height:1.1}
+.od-small{font-size:calc(var(--u)*3.8);font-weight:700;color:#1a6ac8}
 .od-btn2{font-family:inherit;font-weight:900;font-size:calc(var(--u)*4.4);color:#fff;border:none;border-radius:calc(var(--u)*2.6);padding:calc(var(--u)*1.8) calc(var(--u)*5);min-height:calc(var(--u)*11);cursor:pointer;background:linear-gradient(180deg,#5ccf5a,#33a333);box-shadow:0 calc(var(--u)*.8) 0 #1f7a1f;display:inline-flex;align-items:center;gap:calc(var(--u)*1.2);justify-content:center}
 .od-btn2.wood{background:linear-gradient(180deg,#e0a35c,#c27a35);box-shadow:0 calc(var(--u)*.8) 0 #8a4f1d}
 .od-btn2[disabled]{background:#c9c4bb;box-shadow:0 calc(var(--u)*.8) 0 #9a958c}
@@ -126,4 +127,10 @@ export const CSS3 = `
 .od-power:active{transform:scale(.95)}
 .od-num{position:absolute;font-weight:900;font-size:calc(var(--u)*4.2);color:#fff;-webkit-text-stroke:calc(var(--u)*.3) #0f2a4a;paint-order:stroke fill;pointer-events:none;animation:odNum .7s ease-out forwards}
 @keyframes odNum{to{transform:translateY(calc(var(--u)*-8));opacity:0}}
+.od-album{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(var(--u)*2);width:min(92vw,calc(var(--u)*150))}
+.od-card.lock{filter:grayscale(.9);opacity:.62}
+.od-card .shadow{filter:grayscale(1) brightness(.25);opacity:.55}
+.od-card .alt{font-size:calc(var(--u)*2.8);opacity:.75;font-weight:700}
+.od-card .fact{font-size:calc(var(--u)*3.2);line-height:1.45}
+.od-speak{min-height:max(52px,calc(var(--u)*11));padding:calc(var(--u)*1.2) calc(var(--u)*4.5);border-radius:999px;font-size:calc(var(--u)*4.2);margin-top:calc(var(--u)*.6)}
 `;

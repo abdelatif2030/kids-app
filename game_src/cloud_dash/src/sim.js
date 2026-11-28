@@ -13,6 +13,88 @@ export const JUMP_V = 9.2;
 export const GRAVITY = 24;
 export const LEVELS = 10;
 
+// Dash Over Egypt: every level runs under a named Egyptian sky (display only —
+// specs, generation and saves are unchanged).
+export const SKIES = [
+  { ar: 'سماء القاهرة', en: 'Cairo Sky' },
+  { ar: 'سماء الجيزة', en: 'Giza Sky' },
+  { ar: 'دلتا النيل', en: 'Nile Delta' },
+  { ar: 'سماء الإسكندرية', en: 'Alexandria Sky' },
+  { ar: 'ساحل البحر الأحمر', en: 'Red Sea Coast' },
+  { ar: 'سماء سيناء', en: 'Sinai Sky' },
+  { ar: 'واحة سيوة', en: 'Siwa Oasis' },
+  { ar: 'واحات الصحراء الغربية', en: 'Western Desert Oases' },
+  { ar: 'سماء الأقصر', en: 'Luxor Sky' },
+  { ar: 'سماء أسوان', en: 'Aswan Sky' },
+];
+export const skyIndexOf = (n) => Math.max(0, Math.min(SKIES.length - 1, n - 1));
+export const skyOf = (n) => SKIES[skyIndexOf(n)];
+
+// Phase 2E (Batch F): every sky LOOKS like its place. One palette per sky, in
+// the same order as SKIES (paletteOf clamps exactly like skyOf, so the name on
+// the HUD and the colours on screen always agree — endless runs past level 10
+// stay under the Aswan sky, just like the name does). Data only: main.js turns
+// a palette into the sky gradient, the fog, the lights, the cloud tint, the
+// track tint and a multiply tint over the painted backdrop. All colours are
+// #rrggbb. One coherent pastel-cartoon family, ten different moods:
+//   Cairo hazy gold · Giza desert amber · Delta fresh green-blue morning ·
+//   Alexandria bright sea teal · Red Sea turquoise over coral · Sinai rose
+//   dawn · Siwa emerald + gold · Western Desert pale chalk · Luxor deep gold
+//   late afternoon · Aswan Nile blue + granite rose.
+export const PALETTES = [
+  { // 1 Cairo — warm hazy gold
+    top: '#d9a860', mid: '#f2cd96', bottom: '#ffe9c2', fog: '#f0cd9c',
+    hemiSky: '#fff3da', hemiGround: '#d9b384', hemiInt: 1.25,
+    sun: '#ffd9a0', sunInt: 1.25, cloud: '#ffedd2', tint: '#ffe3b3', ground: '#fff1d6',
+  },
+  { // 2 Giza — desert amber, big sun
+    top: '#dd943a', mid: '#f6ba60', bottom: '#ffe2ab', fog: '#eeb264',
+    hemiSky: '#ffecc2', hemiGround: '#d99c52', hemiInt: 1.3,
+    sun: '#ffcf7a', sunInt: 1.45, cloud: '#ffe8be', tint: '#ffdaa1', ground: '#ffedca',
+  },
+  { // 3 Nile Delta — fresh green-blue morning
+    top: '#63b8e4', mid: '#a5ded2', bottom: '#e9ffd6', fog: '#b7e5c9',
+    hemiSky: '#ecfcff', hemiGround: '#9bd3a2', hemiInt: 1.25,
+    sun: '#fff3c2', sunInt: 1.2, cloud: '#eaffea', tint: '#d9f5dc', ground: '#eaffe0',
+  },
+  { // 4 Alexandria — sea teal, bright
+    top: '#38b1d6', mid: '#8bdde6', bottom: '#e6faff', fog: '#a2dfe9',
+    hemiSky: '#ecfcff', hemiGround: '#7cc2c6', hemiInt: 1.3,
+    sun: '#ffffff', sunInt: 1.3, cloud: '#eefcff', tint: '#c9f1f4', ground: '#e6fbff',
+  },
+  { // 5 Red Sea Coast — turquoise over coral warmth
+    top: '#2ab8ab', mid: '#79e0cb', bottom: '#ffe1bd', fog: '#9fe0c8',
+    hemiSky: '#e8fff7', hemiGround: '#e3a87c', hemiInt: 1.3,
+    sun: '#ffe9b8', sunInt: 1.3, cloud: '#fff0dc', tint: '#cdf0dc', ground: '#fff0d8',
+  },
+  { // 6 Sinai — rose dawn over mountains
+    top: '#c284b4', mid: '#f0a5b4', bottom: '#ffd7bf', fog: '#eaafc0',
+    hemiSky: '#ffe6ef', hemiGround: '#ac87a6', hemiInt: 1.2,
+    sun: '#ffb894', sunInt: 1.15, cloud: '#ffe1e7', tint: '#ffd4de', ground: '#ffe6ea',
+  },
+  { // 7 Siwa — palm-oasis emerald + gold
+    top: '#46a87a', mid: '#a4d996', bottom: '#ffecac', fog: '#b9e0a9',
+    hemiSky: '#f2ffe8', hemiGround: '#86b464', hemiInt: 1.3,
+    sun: '#ffd76e', sunInt: 1.3, cloud: '#f4ffde', tint: '#ddf2c1', ground: '#f0ffcf',
+  },
+  { // 8 Western Desert Oases — pale chalk white-gold
+    top: '#ddd2a6', mid: '#f3ead0', bottom: '#fffbe9', fog: '#ece2c2',
+    hemiSky: '#fffdf1', hemiGround: '#d5c89f', hemiInt: 1.3,
+    sun: '#fff2c6', sunInt: 1.35, cloud: '#fffef5', tint: '#f8efcf', ground: '#fffbe9',
+  },
+  { // 9 Luxor — deep gold late afternoon
+    top: '#d67f2c', mid: '#f0a54c', bottom: '#ffd68c', fog: '#eaa452',
+    hemiSky: '#ffe4b2', hemiGround: '#b57a3c', hemiInt: 1.3,
+    sun: '#ffbe62', sunInt: 1.4, cloud: '#ffdfae', tint: '#ffd08f', ground: '#ffe9bd',
+  },
+  { // 10 Aswan — Nile blue + granite rose
+    top: '#468bd4', mid: '#8abfec', bottom: '#ffd6cd', fog: '#a5c9e9',
+    hemiSky: '#ecf6ff', hemiGround: '#d2948b', hemiInt: 1.25,
+    sun: '#ffe9cf', sunInt: 1.25, cloud: '#ffe9e3', tint: '#d4e8f7', ground: '#ffe9e2',
+  },
+];
+export const paletteOf = (n) => PALETTES[skyIndexOf(n)];
+
 /** What each level uses (a feature appears in a level and stays). */
 export function levelSpec(n, easy = false) {
   const f = (k) => n >= k;

@@ -1,4 +1,4 @@
-// «دفاع القلعة البحرية» — the rules with no drawing. A little clownfish on the coral fortress aims a stream of glowing
+// «قلعة مرجان البحر الأحمر» — the rules with no drawing. Marjan, a little clownfish on the coral fortress, aims a stream of glowing
 // bubbles up a reef corridor; grumpy fish, jellyfish and pufferfish swim towards the wall; beaten ones leave pearls
 // (experience) and shells (coins). Each level up offers three powers: repair the fortress, a spinning shell that
 // bounces off the coral walls, a whirlpool that pulls enemies together, a second stream, faster shots. The third wave
@@ -18,16 +18,37 @@ export const KINDS = {
   ink: { hp: 2, speed: 3.2, r: 0.35, dmg: 10, xp: 0, coin: 0 },
 };
 
-/** Five levels; each has three waves, the last one ends with the octopus. */
+/** Ten levels — a Red Sea marine-park tour; each has three waves, the last
+ * one ends with Octo the rival octopus. ids/boss numbers are save data.
+ * Difficulty also grows with the level index everywhere the sim consumes it:
+ * waveOf (more swimmers, more puffers/jellies, tighter spawns), enemy hp,
+ * swim speed and the octopus's helpers — so every reef plays differently,
+ * not just with a tougher boss. `fish` + `fact` feed the reef-guide album:
+ * one true, simple fact per reef, in both languages. */
 export const LEVELS = [
-  { id: 1, ar: 'المياه الضحلة', en: 'Sunlit Shallows', boss: 40 },
-  { id: 2, ar: 'غابة المرجان', en: 'Coral Forest', boss: 60 },
-  { id: 3, ar: 'كهف اللؤلؤ', en: 'Pearl Cave', boss: 80 },
-  { id: 4, ar: 'حديقة قناديل البحر', en: 'Jelly Garden', boss: 100 },
-  { id: 5, ar: 'عرين الأخطبوط', en: "Octopus's Lair", boss: 130 },
-  { id: 6, ar: 'قلعة اللؤلؤ', en: 'Pearl Fortress', boss: 160 },
-  { id: 7, ar: 'قاع المحيط', en: 'Ocean Floor', boss: 200 },
+  { id: 1, ar: 'شعاب الغردقة', en: 'Hurghada Shallows', boss: 40, fish: '🐠', fact: { ar: 'سمكة المهرج مرجان بتعيش جوه شقائق النعمان اللاسعة، ومش بتوجعها خالص!', en: "Marjan the clownfish lives inside the stinging anemone's arms, and it never hurts him!" } },
+  { id: 2, ar: 'جزيرة الجفتون', en: 'Giftun Island', boss: 60, fish: '🐬', fact: { ar: 'جزيرة الجفتون محمية طبيعية، والدلافين بتيجي ترتاح وتلعب في المياه الهادية حواليها.', en: 'Giftun Island is a nature reserve, and dolphins come to rest and play in the calm water around it.' } },
+  { id: 3, ar: 'محمية رأس محمد', en: 'Ras Mohammed', boss: 80, fish: '🪸', fact: { ar: 'رأس محمد أول محمية طبيعية في مصر، وفيها أكتر من ٢٠٠ نوع من المرجان الملوّن.', en: "Ras Mohammed is Egypt's very first national park, with more than 200 kinds of colourful coral." } },
+  { id: 4, ar: 'شعاب دهب', en: 'Dahab Reefs', boss: 100, fish: '🐟', fact: { ar: 'كلمة دهب يعني ذهب! والشعاب المرجانية هناك بتبدأ من عند الشط على طول.', en: 'The word Dahab means gold! And its coral reefs begin right at the shore.' } },
+  { id: 5, ar: 'الثقب الأزرق', en: 'The Blue Hole', boss: 130, fish: '🔵', fact: { ar: 'الثقب الأزرق حفرة عميقة تحت الميه عمقها أكتر من ١٠٠ متر، وشكلها من فوق دايرة زرقا غامقة.', en: 'The Blue Hole is an underwater sinkhole more than 100 metres deep, and from above it looks like a dark blue circle.' } },
+  { id: 6, ar: 'جزيرة تيران', en: 'Tiran Island', boss: 160, fish: '🐢', fact: { ar: 'حول جزيرة تيران أربع شعاب مرجانية مشهورة، والسلاحف البحرية بتحب تعوم وترتاح هناك.', en: 'Four famous coral reefs surround Tiran Island, and sea turtles love to swim and rest there.' } },
+  { id: 7, ar: 'أعماق البحر الأحمر', en: 'Red Sea Deep', boss: 200, fish: '🌊', fact: { ar: 'البحر الأحمر من أدفى بحار العالم، وعمقه بيعدّي ٢٠٠٠ متر في أعمق حتة فيه.', en: 'The Red Sea is one of the warmest seas in the world, and it is more than 2,000 metres deep at its deepest.' } },
+  { id: 8, ar: 'مرسى علم', en: 'Marsa Alam', boss: 240, fish: '🐮', fact: { ar: 'في مرسى علم بيعيش الدوجونج — بقرة البحر اللطيفة — وبياكل عشب البحر زي البقرة في المراعي.', en: 'Marsa Alam is home to the dugong — the gentle sea cow — which grazes on seagrass like a cow in a meadow.' } },
+  { id: 9, ar: 'شعاب ألفينستون', en: 'Elphinstone Reef', boss: 280, fish: '🦈', fact: { ar: 'شعاب ألفينستون حيطان مرجان ملوّنة نازلة في الأعماق، وقروش كبيرة بتعوم حواليها بهدوء.', en: 'Elphinstone Reef is a wall of colourful coral dropping into the deep, where big sharks cruise calmly by.' } },
+  { id: 10, ar: 'جزر الإخوة', en: 'Brothers Islands', boss: 320, fish: '🏝️', fact: { ar: 'جزر الإخوة جزيرتين صغيرين في نص البحر الأحمر، وعلى الجزيرة الكبيرة فنار قديم بينوّر للسفن.', en: 'The Brothers are two tiny islands in the middle of the Red Sea, and the bigger one has an old lighthouse that guides the ships.' } },
 ];
+
+/** Reef-guide album entries for a save: an entry is unlocked once its level
+ * has been completed (stars > 0). Pure, so the album logic is testable. */
+export function guideEntries(save) {
+  const s = normalizeSave(save);
+  return LEVELS.map((level) => ({ level, unlocked: (s.stars[level.id] ?? 0) > 0 }));
+}
+
+/** Voice clip file stem (no extension) narrating a reef's guide fact:
+ * voice/<lang>/reef<id>_1.mp3 under the game's assets. Pure, so the
+ * album's tap-to-listen wiring is testable. */
+export function reefClipName(level) { return `reef${level.id}_1`; }
 
 export const POWERS = [
   { id: 'repair', icon: '🧱', ar: 'صلّح القلعة', en: 'Repair the fortress', sub: ['+٣٥ للسور', '+35 wall'] },
@@ -77,7 +98,7 @@ export function waveOf(level, wave, rand) {
 }
 
 export class Defense {
-  /** opts: { level (0..4), easy, up: {power, wall, pearl}, seed } */
+  /** opts: { level (0..9), easy, up: {power, wall, pearl}, seed } */
   constructor(opts = {}) {
     this.levelIndex = opts.level ?? 0;
     this.level = LEVELS[this.levelIndex];
@@ -400,7 +421,10 @@ export class Defense {
   }
 }
 
-/** Save: { unlocked (1..5), stars, coins, up: {power, wall, pearl}, muted } made safe. */
+/** Save: { unlocked (1..LEVELS.length), stars, coins, up: {power, wall, pearl}, muted } made safe.
+ * Unlocks are derived from LEVELS, so a save written when there were fewer
+ * levels (e.g. 7) opens cleanly into a longer tour: its stars are kept and
+ * the next reef unlocks from them. */
 export function normalizeSave(raw) {
   const s = raw && typeof raw === 'object' ? raw : {};
   const stars = {};

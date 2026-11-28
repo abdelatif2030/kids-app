@@ -4,7 +4,7 @@
 // islands and pops sky-pirate rats in balloons, gyrocopters and gliders with streams of bubbles. Rescued songbirds join as wings and shoot
 // on their own; capsules, pearls and a screen-clearing Bubble Storm; three stages then a harder loop; HP bar, combo multipliers, stage
 // ranks, a top-10 table with initials, and a hangar where feathers buy upgrades and paint. 2D canvas, all art and sound made in code.
-import { Run, W, H, UPGRADES, PAINTS, ENEMY, normalizeSave, upgradeLevel, buyUpgrade, buyPaint, qualifies, addScore } from './sim.js';
+import { Run, W, H, UPGRADES, PAINTS, ENEMY, STOPS, checkBadges, normalizeSave, upgradeLevel, buyUpgrade, buyPaint, qualifies, addScore } from './sim.js';
 import { paintSky, drawCloud, drawIsland, drawPlane, drawEnemy, drawBoss, drawBird, drawCageItem, drawPickup, drawBubble, drawEnemyBullet, drawPopBurst, PAINT_COLORS, ART } from './art.js';
 import { loadArt } from '../../cozy_kit/art.js';
 import { VoiceCoach } from '../../cozy_kit/voice.js';
@@ -192,7 +192,7 @@ class Game {
   }
 
   _sky() {
-    const st = this.run ? this.run.stage : 1;
+    const st = this.run ? this.run.backdrop + 1 : 1;
     const key = `${st}${this.cv.width}x${this.cv.height}`;
     if (this.skyKey !== key) { this.sky = paintSky(this.cv.width, this.cv.height, st); this.skyKey = key; }
     return this.sky;
@@ -257,14 +257,17 @@ class Game {
     this.run = null;
     this.sound.setMode('menu');
     this._clear();
-    this.layer.append(this._topRow(),
-      h('div', { class: 'sc-menu' },
-        h('div', { class: 'sc-biglogo' }, t('title')),
-        h('div', { class: 'sc-bestpill' }, `🏆 ${t('best')} ${num(this.save.best)}`),
-        h('button', { class: 'sc-playbtn', onclick: () => this.startRun() }, t('play')),
-        h('div', { class: 'sc-icons' },
-          h('button', { class: 'sc-icon', onclick: () => this.showHangar() }, h('i', {}, '🔧'), t('hangar')),
-          h('button', { class: 'sc-icon', onclick: () => this.showTop() }, h('i', {}, '🏆'), t('top10')))));
+    const kids = [
+      h('div', { class: 'sc-biglogo' }, t('title')),
+      h('div', { class: 'sc-bestpill' }, `🏆 ${t('best')} ${num(this.save.best)}`),
+    ];
+    if (this.save.journeyStops > 0 && !this.save.journeyDone) kids.push(h('div', { class: 'sc-bestpill' }, `🗺️ ${t('journey')}: ${num(this.save.journeyStops)}/${num(8)}`));
+    kids.push(h('button', { class: 'sc-playbtn', onclick: () => this.startRun('journey') }, this.save.journeyDone ? `${t('journey')} ↻` : t('journey')));
+    if (this.save.journeyDone) kids.push(h('button', { class: 'sc-btn blue', style: 'width:auto;padding-left:calc(var(--u)*6);padding-right:calc(var(--u)*6)', onclick: () => this.startRun('migration') }, `🦩 ${t('migration')}`));
+    kids.push(h('div', { class: 'sc-icons' },
+      h('button', { class: 'sc-icon', onclick: () => this.showHangar() }, h('i', {}, '🔧'), t('hangar')),
+      h('button', { class: 'sc-icon', onclick: () => this.showTop() }, h('i', {}, '🏆'), t('top10'))));
+    this.layer.append(this._topRow(), h('div', { class: 'sc-menu' }, kids));
   }
 
   showTop() {
@@ -300,9 +303,12 @@ class Game {
       h('button', { class: 'sc-btn blue', onclick: () => this.showMenu() }, t('back')))));
   }
 
-  startRun() {
+  startRun(mode = 'journey') {
     this.voice.say('go');
-    this.run = new Run(this.save, Math.floor(Math.random() * 1e9), this.easy);
+    // Journey resumes at the first uncompleted stop (a finished journey replays from stop 1);
+    // Migration Season is the legacy endless loop, unlocked by finishing the journey.
+    const stop = mode === 'journey' ? (this.save.journeyDone ? 1 : Math.min(8, (this.save.journeyStops || 0) + 1)) : 1;
+    this.run = new Run(this.save, Math.floor(Math.random() * 1e9), this.easy, { mode, stop });
     this.mode = 'play';
     this.fx = []; this.texts = []; this.pops.clear();
     this.input = { tx: W / 2, ty: H - 30, fire: false };
@@ -398,9 +404,18 @@ class Game {
 
   _stageIntro() {
     const r = this.run;
-    this._banner(t(`stage${r.stage}`), r.loop ? `${t('loop')} ${num(r.loop + 1)}` : '', 2.4);
-    if (r.stage === 1 && r.loop === 0) { this._dragHint = true; setTimeout(() => this.mode === 'play' && this._toast(t('hintDrag'), 3), 600); setTimeout(() => this.mode === 'play' && this._toast(t('hint1'), 3), 4200); }
+    if (r.mode === 'journey') this._banner(t(`stop${r.stage}`), `${t('journey')} · ${num(r.stage)}/${num(8)}`, 2.4);
+    else this._banner(t(`stage${r.stage}`), r.loop ? `${t('loop')} ${num(r.loop + 1)}` : '', 2.4);
+    if (r.stage === r.startStop && r.loop === 0) { this._dragHint = true; setTimeout(() => this.mode === 'play' && this._toast(t('hintDrag'), 3), 600); setTimeout(() => this.mode === 'play' && this._toast(t('hint1'), 3), 4200); }
     this.sound.setMode('play');
+  }
+
+  /** Award any newly-earned badges from the current run; returns the new ids. */
+  _awardBadges() {
+    if (!this.run) return [];
+    const got = checkBadges(this.save, this.run.badgeStats(this.save));
+    if (got.length) { this._saveNow(); this._ach(t(`badge_${got[0]}`)); }
+    return got;
   }
 
   _pause() {
@@ -425,13 +440,40 @@ class Game {
     this.mode = 'card';
     this.voice.say('win');
     this.sound.play('rank');
+    // Journey progress persists the moment a stop is cleared — a later failed
+    // stop never takes completed stops away.
+    if (r.mode === 'journey') { this.save.journeyStops = Math.max(this.save.journeyStops || 0, r.stage); this._saveNow(); }
+    this._awardBadges();
     this.layer.append(h('div', { class: 'sc-dim' }, h('div', { class: 'sc-card' },
       h('div', { class: 'sc-title' }, t('clear')),
-      h('div', { class: 'sc-small' }, t(`stage${r.stage}`)),
+      h('div', { class: 'sc-small' }, r.mode === 'journey' ? t(`stop${r.stage}`) : t(`stage${r.stage}`)),
       h('div', { class: 'sc-rank' }, rank),
       h('div', { class: 'sc-small' }, `${t('score')}: ${num(r.score)}`),
       h('div', { class: 'sc-small' }, `🪶 ${num(r.feathers)}  ·  🫧 ${num(r.pearls)}`),
       h('button', { class: 'sc-btn green', onclick: () => { this.layer.querySelector('.sc-dim:last-child')?.remove(); r.nextStage(); this.mode = 'play'; this.last = performance.now(); this._stageIntro(); } }, t('cont'), ' ▶'))));
+  }
+
+  _journeyCard() {
+    const r = this.run;
+    this.mode = 'over';
+    this.voice.say('win');
+    this.sound.play('rank');
+    this.save.journeyStops = 8;
+    this.save.journeyDone = true;
+    this.save.feathers = Math.min(99999, this.save.feathers + r.feathers);
+    this.save.best = Math.max(this.save.best, r.score);
+    this._saveNow();
+    this._awardBadges();
+    const ranks = r.ranks.map((x) => x.rank).join(' ') || '-';
+    this.layer.append(h('div', { class: 'sc-dim' }, h('div', { class: 'sc-card' },
+      h('div', { class: 'sc-ribbon' }, t('journeyDoneT')),
+      h('div', { class: 'sc-small' }, t('journeyDoneSub')),
+      h('div', { class: 'sc-bigscore' }, num(r.score)),
+      h('div', { class: 'sc-small' }, `${t('rank')}: ${ranks}`),
+      h('div', { class: 'sc-pill' }, `🪶 +${num(r.feathers)}`),
+      h('div', { class: 'sc-row' },
+        h('button', { class: 'sc-btn blue', onclick: () => this.showMenu() }, t('back')),
+        h('button', { class: 'sc-btn green', onclick: () => this.startRun('migration') }, `🦩 ${t('migration')}`)))));
   }
 
   _gameOver() {
@@ -442,12 +484,14 @@ class Game {
     this.save.feathers = Math.min(99999, this.save.feathers + r.feathers);
     this.save.best = Math.max(this.save.best, r.score);
     this._saveNow();
+    this._awardBadges();
+    const stageNum = r.mode === 'journey' ? r.stage : r.stage + r.loop * 3;
     const ranks = r.ranks.map((x) => x.rank).join(' ') || '-';
     const finish = (name) => {
-      if (name) { this.save.top = addScore(this.save.top, { name, score: r.score, stage: r.stage + r.loop * 3 }); this._saveNow(); }
+      if (name) { this.save.top = addScore(this.save.top, { name, score: r.score, stage: stageNum }); this._saveNow(); }
       this.layer.append(h('div', { class: 'sc-dim' }, h('div', { class: 'sc-card' },
         h('div', { class: 'sc-ribbon' }, t('gameOver')),
-        h('div', { class: 'sc-small' }, `${t('stageWord')} ${num(r.stage + r.loop * 3)}`),
+        h('div', { class: 'sc-small' }, `${t('stageWord')} ${num(stageNum)}`),
         h('div', { class: 'sc-bigscore' }, num(r.score)),
         h('div', { class: 'sc-small' }, `${t('hiScore')} ${num(this.save.best)}`),
         h('div', { class: 'sc-pill' }, `🪶 +${num(r.feathers)}`),
@@ -494,6 +538,7 @@ class Game {
     this.scroll += dt * (r.stage === 3 ? 22 : 18);
     for (const e of events) this._event(e);
     if (r.state === 'stageclear' && this.mode === 'play') { const rank = r.ranks.at(-1).rank; setTimeout(() => this._stageCard(rank), 500); this.mode = 'wait'; }
+    else if (r.state === 'journeycomplete' && this.mode === 'play') { this.mode = 'wait'; setTimeout(() => this._journeyCard(), 700); }
     else if (r.state === 'dead' && this.mode === 'play') { this.mode = 'wait'; setTimeout(() => this._gameOver(), 900); }
     if (r.bossAlive && !this.bossMode) { this.bossMode = true; this.sound.setMode('boss'); } else if (!r.bossAlive && this.bossMode) { this.bossMode = false; this.sound.setMode('play'); }
     this._hudUpdate();
@@ -522,7 +567,7 @@ class Game {
       case 'combo': if (e.mult > 1) { this.sound.play('combo', e.mult); this.voice.say('trick'); } break;
       case 'thief': this._banner(t('thief'), t('thiefSub'), 2.4); this.sound.play('boss'); this.voice.say('near'); break;
       case 'loot': this.texts.push({ x: e.x, y: e.y - 8, text: '🪶 +6', c: '#ffd23a', k: 0 }); this.sound.play('feather'); break;
-      case 'boss': this.sound.play('boss'); this.voice.say('near'); this._banner('⚓', t('hintBoss'), 2.4); break;
+      case 'boss': this.sound.play('boss'); this.voice.say('near'); this._banner(e.bossKind === 'heron' ? '🦩' : '⚓', e.bossKind === 'heron' ? t('bossHeron') : t('hintBoss'), 2.4); break;
       case 'bossdown': this.sound.play('rank'); this.voice.say('win'); this.shake = 0.6; break;
       default:
     }
@@ -551,7 +596,7 @@ class Game {
     for (const c of this.clouds) { c.y += c.v * dt * 0.06; if (c.y > 1.1) { c.y = -0.1; c.x = Math.random(); } drawCloud(g, c.x * this.cw, c.y * this.ch, this.sc * 10 * c.s, 0.55); }
     for (const [i, isl] of this.islands.entries()) {
       const cy = ((isl.y * this.ch + this.scroll * this.sc * 0.5 * (0.6 + i * 0.06)) % (this.ch * 1.3)) - this.ch * 0.15;
-      const kind = stage === 3 ? 2 : stage === 2 ? 1 : isl.k === 2 ? 0 : isl.k;
+      const kind = this.run ? this.run.islandKind : (isl.k === 2 ? 0 : isl.k);
       drawIsland(g, isl.x * this.cw, cy, this.sc * 100 * isl.s * 1.1, stage === 1 ? 0 : kind, time);
     }
     for (const c of this.clouds) if (c.s > 1.5) drawCloud(g, (c.x * 1.2 % 1.2) * this.cw, ((c.y + 0.4) % 1.1) * this.ch, this.sc * 12 * c.s, 0.9);

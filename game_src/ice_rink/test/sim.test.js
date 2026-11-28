@@ -152,21 +152,21 @@ test('preview path returns points', () => {
 
 test('save normalising', () => {
   const sv = normalizeSave({ unlocked: 99, stars: { 1: 5, 2: 2 }, coins: -4, up: { fox: { hp: 9 } } });
-  assert.equal(sv.unlocked, 12); assert.equal(sv.stars[2], 2); assert.equal(sv.stars[1], undefined); assert.equal(sv.coins, 0); assert.equal(sv.up.fox.hp, 5);
+  assert.equal(sv.unlocked, 16); assert.equal(sv.stars[2], 2); assert.equal(sv.stars[1], undefined); assert.equal(sv.coins, 0); assert.equal(sv.up.fox.hp, 5);
   assert.deepEqual(HERO_ORDER, ['penguin', 'fox', 'bear']);
 });
 
-test('a bounded-search robot wins at least 11 of 12 levels', { timeout: 900000 }, () => {
+test('a bounded-search robot wins all 16 levels', { timeout: 1200000 }, () => {
   let won = 0; const rows = [];
   const only = Number(process.env.IR_LEVEL || 0);
   if (only) { const { s, turns } = playLevel(only); console.log(`ROBOT L${only}:${s.phase} turns=${turns} stars=${s.stars} hp=${teamHp(s)}`); return; }
-  for (let i = 1; i <= 12; i++) {
+  for (let i = 1; i <= 16; i++) {
     const { s, turns } = playLevel(i);
     if (s.phase === 'won') won++;
     rows.push(`L${i}:${s.phase} turns=${turns} stars=${s.stars} hp=${teamHp(s)}`);
   }
   console.log(rows.join('\n'));
-  assert.ok(won >= 11, `won ${won}/12`);
+  assert.equal(won, 16, `won ${won}/16`);
 });
 
 test('team Gala Spirit meter is shared and any hero can use it', () => {
@@ -202,4 +202,55 @@ test('Mending Glow: the bear heals an ally she touches', () => {
   fire(s, 'bear', -Math.PI / 2, 1, false);
   for (let i = 0; i < 800 && s.phase === 'shot'; i++) step(s);
   assert.ok(pen.hp > 30);
+});
+
+test('Sharm Ice Rink anchor: original twelve-stop Egypt winter tour unchanged (names, bosses, layouts)', () => {
+  assert.equal(LEVELS[0].name, 'Sharm Start');
+  assert.equal(LEVELS[4].name, 'Mall of Egypt Walls');
+  assert.equal(LEVELS[11].name, 'Catherine Final');
+  assert.equal(LEVELS[5].boss, true);
+  assert.equal(LEVELS[11].boss, true);
+  // first-12 foe layouts pinned exactly as Phase 2D left them
+  assert.deepEqual(LEVELS[0].foes, [['grunt', 20, 28], ['grunt', 40, 28]]);
+  assert.deepEqual(LEVELS[11].foes, [['king', 30, 18], ['brute', 14, 32], ['brute', 46, 32], ['thrower', 18, 10], ['thrower', 42, 10]]);
+  for (let i = 0; i < 12; i++) assert.equal(LEVELS[i].show, false);
+});
+
+test('Phase 2E structure: 16 chapters, encore tour appended after the Catherine Final, chapter 16 is the skating show', () => {
+  assert.equal(LEVELS.length, 16);
+  assert.deepEqual(LEVELS.slice(12).map((l) => l.name), ['Alexandria Corniche Rink', 'Genena Mall Rink', 'Catherine Champions Cup', 'Sharm Skating Show']);
+  assert.equal(LEVELS[14].boss, true, 'chapter 15 is the encore boss cup');
+  assert.equal(LEVELS.filter((l) => l.boss).length, 3);
+  const show = LEVELS[15];
+  assert.equal(show.show, true);
+  assert.equal(show.boss, false);
+  assert.ok(LEVELS.slice(0, 15).every((l) => !l.show), 'only the finale is a show');
+  // the show field reaches the sim state, and only there
+  assert.equal(createState(16).show, true);
+  assert.equal(createState(15).show, false);
+  // new chapters differ in more than name: distinct foe mixes / scenery across 13-16
+  const sig = LEVELS.slice(12).map((l) => JSON.stringify([l.foes, l.crystals, l.blocks, l.pools]));
+  assert.equal(new Set(sig).size, 4);
+});
+
+test('Phase 2E save migration: a 12-chapter save keeps its stars and unlocks, new chapters stay locked behind progress', () => {
+  const old = { unlocked: 12, stars: { 1: 3, 6: 2, 12: 3 }, coins: 140, up: { penguin: { hp: 2, atk: 1 } } };
+  const sv = normalizeSave(old);
+  assert.equal(sv.unlocked, 12, 'unlock count intact — chapters 13-16 remain locked until 12 is beaten again under the derived rule');
+  assert.deepEqual(sv.stars, { 1: 3, 6: 2, 12: 3 });
+  assert.equal(sv.coins, 140);
+  assert.equal(sv.up.penguin.hp, 2);
+  // a finished-game save can now grow to the new cap
+  assert.equal(normalizeSave({ unlocked: 16 }).unlocked, 16);
+  assert.equal(normalizeSave({ unlocked: 99 }).unlocked, 16);
+  // unlock chain across all 16: every chapter state builds, in order
+  for (let i = 1; i <= 16; i++) assert.ok(createState(i).bodies.length >= 5, `chapter ${i} builds`);
+});
+
+test('Phase 2E show finale: performers never hurt the heroes — the routine is pure performance', { timeout: 300000 }, () => {
+  const { s, turns } = playLevel(16);
+  assert.equal(s.phase, 'won');
+  assert.equal(s.taken, 0, 'no hero took damage in the show');
+  assert.equal(teamHp(s), 264, 'full team health at the curtain call');
+  assert.ok(turns <= 15, `show finished in ${turns} turns`);
 });

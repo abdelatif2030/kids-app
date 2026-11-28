@@ -29,20 +29,29 @@ export const FOES = {
   king: { hp: 140, r: 5.6, m: 5, atk: 16, speed: 40, armor: 0.12, ai: 'boss', err: 0.1, coins: 40 },
 };
 
-const L = (name, foes, o = {}, boss = false) => ({ name, foes, crystals: o.c || [], blocks: o.b || [], pools: o.p || [], boss });
+const L = (name, foes, o = {}, boss = false) => ({ name, foes, crystals: o.c || [], blocks: o.b || [], pools: o.p || [], boss, show: !!o.show, hpMul: o.hp ?? null, atkMul: o.atk ?? null });
 export const LEVELS = [
-  L('Snow Start', [['grunt', 20, 28], ['grunt', 40, 28]]),
-  L('Two Friends', [['grunt', 14, 22], ['grunt', 30, 30], ['grunt', 46, 22]], { c: [[30, 54, 3]] }),
-  L('Snowball Fight', [['grunt', 18, 26], ['grunt', 42, 26], ['thrower', 30, 14]], { c: [[18, 50, 3], [42, 50, 3]] }),
+  L('Sharm Start', [['grunt', 20, 28], ['grunt', 40, 28]]),
+  L('Rink Friends', [['grunt', 14, 22], ['grunt', 30, 30], ['grunt', 46, 22]], { c: [[30, 54, 3]] }),
+  L('Snowball Match', [['grunt', 18, 26], ['grunt', 42, 26], ['thrower', 30, 14]], { c: [[18, 50, 3], [42, 50, 3]] }),
   L('Slush Pool', [['grunt', 16, 24], ['grunt', 44, 24], ['imp', 24, 36], ['imp', 36, 36]], { p: [[30, 48, 10]], c: [[12, 42, 2.8], [48, 42, 2.8]] }),
-  L('Ice Walls', [['grunt', 30, 16], ['grunt', 12, 22], ['thrower', 48, 22], ['imp', 30, 32]], { b: [[18, 40, 12, 2.4], [42, 40, 12, 2.4]], c: [[30, 56, 3]] }),
-  L('Chief Grumbo', [['chief', 30, 20], ['grunt', 14, 34], ['grunt', 46, 34]], { c: [[22, 50, 3], [38, 50, 3]] }, true),
-  L('Big Trouble', [['brute', 30, 24], ['imp', 14, 32], ['imp', 46, 32], ['thrower', 30, 12]], { c: [[20, 46, 3], [40, 46, 3], [30, 60, 2.6]] }),
-  L('Healer Hideout', [['shaman', 30, 12], ['grunt', 18, 24], ['grunt', 42, 24], ['brute', 30, 32]], { b: [[20, 16, 2.4, 14], [40, 16, 2.4, 14]], c: [[30, 52, 3]] }),
-  L('Double Brutes', [['brute', 16, 26], ['brute', 44, 26], ['thrower', 30, 14], ['shaman', 30, 22]], { c: [[30, 40, 3.2], [14, 52, 2.8], [46, 52, 2.8]] }),
-  L('Imp Swarm', [['imp', 10, 20], ['imp', 22, 26], ['imp', 38, 26], ['imp', 50, 20], ['imp', 30, 34], ['imp', 30, 18], ['thrower', 16, 12], ['thrower', 44, 12]], { p: [[30, 52, 9]], c: [[18, 44, 2.6], [42, 44, 2.6]] }),
-  L('Goblin Camp', [['brute', 18, 24], ['brute', 42, 24], ['shaman', 14, 12], ['shaman', 46, 12], ['thrower', 30, 14], ['thrower', 30, 30], ['grunt', 30, 22]], { b: [[30, 44, 16, 2.4]], c: [[12, 50, 2.8], [48, 50, 2.8]], p: [[30, 62, 8]] }),
-  L('Goblin King', [['king', 30, 18], ['brute', 14, 32], ['brute', 46, 32], ['thrower', 18, 10], ['thrower', 42, 10]], { c: [[22, 46, 3], [38, 46, 3], [30, 58, 2.8]] }, true),
+  L('Mall of Egypt Walls', [['grunt', 30, 16], ['grunt', 12, 22], ['thrower', 48, 22], ['imp', 30, 32]], { b: [[18, 40, 12, 2.4], [42, 40, 12, 2.4]], c: [[30, 56, 3]] }),
+  L('Captain Snow', [['chief', 30, 20], ['grunt', 14, 34], ['grunt', 46, 34]], { c: [[22, 50, 3], [38, 50, 3]] }, true),
+  L('The Big Match', [['brute', 30, 24], ['imp', 14, 32], ['imp', 46, 32], ['thrower', 30, 12]], { c: [[20, 46, 3], [40, 46, 3], [30, 60, 2.6]] }),
+  L('Healers Rest', [['shaman', 30, 12], ['grunt', 18, 24], ['grunt', 42, 24], ['brute', 30, 32]], { b: [[20, 16, 2.4, 14], [40, 16, 2.4, 14]], c: [[30, 52, 3]] }),
+  L('The Two Giants', [['brute', 16, 26], ['brute', 44, 26], ['thrower', 30, 14], ['shaman', 30, 22]], { c: [[30, 40, 3.2], [14, 52, 2.8], [46, 52, 2.8]] }),
+  L('The Little Swarm', [['imp', 10, 20], ['imp', 22, 26], ['imp', 38, 26], ['imp', 50, 20], ['imp', 30, 34], ['imp', 30, 18], ['thrower', 16, 12], ['thrower', 44, 12]], { p: [[30, 52, 9]], c: [[18, 44, 2.6], [42, 44, 2.6]] }),
+  L('Ice Team Camp', [['brute', 18, 24], ['brute', 42, 24], ['shaman', 14, 12], ['shaman', 46, 12], ['thrower', 30, 14], ['thrower', 30, 30], ['grunt', 30, 22]], { b: [[30, 44, 16, 2.4]], c: [[12, 50, 2.8], [48, 50, 2.8]], p: [[30, 62, 8]] }),
+  L('Catherine Final', [['king', 30, 18], ['brute', 14, 32], ['brute', 46, 32], ['thrower', 18, 10], ['thrower', 42, 10]], { c: [[22, 46, 3], [38, 46, 3], [30, 58, 2.8]] }, true),
+  // Encore tour (Phase 2E): appended AFTER the Catherine Final so existing saves
+  // (stars keyed by chapter number, unlocked = highest chapter reached) stay correct.
+  L('Alexandria Corniche Rink', [['brute', 30, 22], ['grunt', 14, 28], ['grunt', 46, 28], ['thrower', 16, 12], ['thrower', 44, 12], ['shaman', 30, 32]], { c: [[20, 46, 3], [40, 46, 3], [30, 58, 2.6]], p: [[12, 58, 7]] }),
+  L('Genena Mall Rink', [['brute', 16, 24], ['brute', 44, 24], ['thrower', 30, 12], ['thrower', 30, 30], ['grunt', 30, 20], ['shaman', 48, 10]], { b: [[18, 40, 12, 2.4], [42, 40, 12, 2.4]], c: [[30, 54, 3], [12, 50, 2.6]] }),
+  L('Catherine Champions Cup', [['king', 30, 16], ['brute', 13, 30], ['brute', 47, 30], ['shaman', 30, 28], ['thrower', 18, 8], ['thrower', 42, 8]], { c: [[22, 44, 3], [38, 44, 3], [30, 56, 2.8]] }, true),
+  // Skating-show finale: the other skaters are fellow performers, not opponents —
+  // they skate friendly laps (never attack) and the routine ends when Lulu's team
+  // has gently bumped every performer into the closing formation. See `show` in foeAct.
+  L('Sharm Skating Show', [['imp', 16, 24], ['imp', 44, 24], ['imp', 30, 16], ['grunt', 22, 32], ['grunt', 38, 32]], { c: [[14, 46, 2.8], [30, 50, 3], [46, 46, 2.8], [30, 64, 2.6]], show: true, hp: 0.5, atk: 0.5 }),
 ];
 
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
@@ -59,7 +68,7 @@ export function createState(level = 1, { seed = 1, up = {} } = {}) {
   const lv = LEVELS[level - 1];
   const s = {
     level, seed: (seed * 2654435761) >>> 0 || 1, t: 0, pt: 0, phase: 'aim', turn: 1, bodies: [], proj: [], pools: [], blocks: [],
-    nextId: 1, cd: {}, ev: [], shot: null, eq: [], eTimer: 0, kills: 0, dealt: 0, taken: 0, coins: 0, boss: lv.boss, stars: 0, gala: 20,
+    nextId: 1, cd: {}, ev: [], shot: null, eq: [], eTimer: 0, kills: 0, dealt: 0, taken: 0, coins: 0, boss: lv.boss, show: !!lv.show, stars: 0, gala: 20,
   };
   for (const id of HERO_ORDER) {
     const d = HEROES[id]; const u = up[id] || {};
@@ -70,7 +79,7 @@ export function createState(level = 1, { seed = 1, up = {} } = {}) {
     });
   }
   const sc = level - 1;
-  for (const [type, x, y] of lv.foes) addFoe(s, type, x, y, 1 + 0.05 * sc, 1 + 0.03 * sc);
+  for (const [type, x, y] of lv.foes) addFoe(s, type, x, y, lv.hpMul ?? (1 + 0.05 * sc), lv.atkMul ?? (1 + 0.03 * sc));
   for (const [x, y, r] of lv.crystals) s.bodies.push({ id: s.nextId++, kind: 'crystal', type: 'crystal', x, y, vx: 0, vy: 0, r, m: 1e9, im: 0, alive: true });
   for (const [x, y, w, h] of lv.blocks) s.blocks.push({ x, y, hw: w / 2, hh: h / 2 });
   for (const [x, y, r] of lv.pools) s.pools.push({ x, y, r });
@@ -338,7 +347,7 @@ function foeAct(s, f) {
   const spd = f.speed * (0.85 + 0.3 * rnd(s));
   const dist = hyp(T.x - f.x, T.y - f.y);
   switch (f.ai) {
-    case 'charge': launchFoe(s, f, base + jitter, spd, true); return 0.5;
+    case 'charge': launchFoe(s, f, base + jitter, spd, !s.show); return 0.5; // in the skating show, performers skate laps and never bump-attack the heroes
     case 'throw':
       if (dist < 58) {
         const a = base + jitter;

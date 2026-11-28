@@ -4,7 +4,7 @@
 // stop grumpy fish, jellyfish and pufferfish before they reach the wall, choose a power at each level up (repair,
 // spinning shell, whirlpool, more bubbles, faster), and beat the giant octopus. No network, no links, no ads.
 import * as THREE from 'three';
-import { Defense, LEVELS, POWERS, UPGRADES, MAX_UP, upCost, HALF_W, TOP, HERO, normalizeSave } from './sim.js';
+import { Defense, LEVELS, POWERS, UPGRADES, MAX_UP, upCost, HALF_W, TOP, HERO, normalizeSave, guideEntries, reefClipName } from './sim.js';
 import {
   mat, makeClownfish, makeEnemyFish, loadRealFish, makeJelly, makePuffer, makeInk, makeOctopus, makeShell, makeTower, makeWall,
   makeCoral, makeSeaweed, sandTexture, causticTexture,
@@ -405,10 +405,12 @@ class Game {
       h('div', { class: 'od-dim', style: 'background:none' },
         h('div', { class: 'od-panel' },
           h('div', { class: 'od-logo' }, '🐠 ', t('title')),
+          h('div', { class: 'od-small', style: 'text-align:center;margin-bottom:calc(var(--u)*2)' }, t('hero')),
           h('div', { class: 'od-map', style: 'margin-bottom:calc(var(--u)*4)' }, nodes),
           h('div', { style: 'display:flex;gap:calc(var(--u)*2);flex-wrap:wrap;justify-content:center' },
             h('button', { class: 'od-btn2 od-big', onclick: () => this.startLevel(this.save.unlocked - 1) }, '▶ ', t('play')),
-            h('button', { class: 'od-btn2 wood', onclick: () => this.showShop() }, '🐚 ', t('shop'))))),
+            h('button', { class: 'od-btn2 wood', onclick: () => this.showShop() }, '🐚 ', t('shop')),
+            h('button', { class: 'od-btn2 wood', onclick: () => this.showAlbum() }, '📖 ', t('album'))))),
       this._mute(this._bottomEnd()),
       this._toastEl(),
     );
@@ -446,6 +448,36 @@ class Game {
           h('div', { class: 'od-title' }, '🐚 ', t('shop')),
           this._coins(),
           h('div', { class: 'od-grid', style: 'grid-template-columns:repeat(3,minmax(0,1fr))' }, cards))),
+      this._toastEl(),
+    );
+  }
+
+  showAlbum() {
+    this.mode = 'album';
+    this._clear();
+    const en = getLang() === 'en';
+    const cards = guideEntries(this.save).map(({ level: lv, unlocked }) => unlocked
+      ? h('div', { class: 'od-card' },
+        h('div', { class: 'ic' }, lv.fish),
+        h('div', { class: 'nm' }, name(lv)),
+        h('div', { class: 'alt' }, en ? lv.ar : lv.en),
+        h('div', { class: 'fact' }, en ? lv.fact.en : lv.fact.ar),
+        h('div', { class: 'st' }, '⭐'.repeat(this.save.stars[lv.id] ?? 0)),
+        h('button', {
+          class: 'od-btn2 od-speak', 'aria-label': t('listen'),
+          onclick: () => { this.voice.unlock(); this.voice.playClip(reefClipName(lv), en ? lv.fact.en : lv.fact.ar); },
+        }, '🔊 ', t('listen')))
+      : h('div', { class: 'od-card lock' },
+        h('div', { class: 'ic shadow' }, lv.fish),
+        h('div', { class: 'nm' }, '🔒 ؟؟؟'),
+        h('div', { class: 'fact' }, t('lockedFact'))));
+    this.layer.append(
+      h('button', { class: 'od-round', style: this._topLeft(), 'aria-label': t('back'), onclick: () => this.showMenu() }, getLang() === 'en' ? '←' : '→'),
+      h('div', { class: 'od-dim', style: 'background:none' },
+        h('div', { class: 'od-panel' },
+          h('div', { class: 'od-title' }, '📖 ', t('album')),
+          h('div', { class: 'od-small', style: 'text-align:center' }, t('albumSub')),
+          h('div', { class: 'od-album' }, cards))),
       this._toastEl(),
     );
   }

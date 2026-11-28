@@ -35,10 +35,56 @@ export const WAVES = [
   [[0.5, 'gummy', 3], [3, 'sour', 3], [7, 'gummy', 3], [10, 'sour', 2]],
   [[0.5, 'gummy', 3], [2.5, 'spitter', 2], [5, 'sour', 3], [8, 'tank', 1], [10, 'bomber', 2], [13, 'spitter', 2], [15, 'gummy', 3]],
 ];
-/** 2026-11-21: six stages. Each stage makes the sweets tougher and the boss stronger; from stage 3 a third wave comes first. */
-export const STAGES = 6;
+/** Ten stages (Phase 2E Batch F: was six). Each stage makes the sweets tougher and the boss stronger;
+ * from stage 3 a third wave comes first, from stage 7 a fourth, and the stage-10 finale opens with the richest wave of all. */
+export const STAGES = 10;
 const THIRD_WAVE = [[0.5, 'gummy', 4], [2.5, 'sour', 4], [5, 'spitter', 2], [7.5, 'bomber', 2], [10, 'sour', 3]];
+const FOURTH_WAVE = [[0.5, 'gummy', 4], [2.5, 'spitter', 3], [5, 'tank', 1], [7.5, 'sour', 4], [10, 'bomber', 3], [13, 'spitter', 2]];
+const FINALE_WAVE = [[0.5, 'gummy', 5], [2.5, 'sour', 4], [5, 'spitter', 3], [7.5, 'tank', 2], [10, 'bomber', 3], [13, 'gummy', 4], [16, 'spitter', 2]];
 export const stageMul = (stage) => ({ hp: 1 + 0.25 * stage, boss: 1 + 0.35 * stage, spd: 1 + 0.04 * stage });
+/** Egypt anchor: the ten stages are one sweet-shop tour of Egypt, and the boss
+ * is a rotating roster — not the same king ten times (stats still scale via stageMul). */
+export const STAGE_PLACES = [
+  { ar: 'محل الحلويات', en: 'The Sweet Shop' },
+  { ar: 'خيمة رمضان', en: 'The Ramadan Tent' },
+  { ar: 'فرن الحارة', en: 'The Hara Bakery' },
+  { ar: 'سوق المولد', en: 'The Moulid Market' },
+  { ar: 'ليلة العيد', en: 'Eid Night' },
+  { ar: 'احتفال العيد', en: 'The Eid Feast' },
+  { ar: 'نصبة حلاوة المولد', en: 'The Moulid Sweet Stall' },
+  { ar: 'دكان الحلواني الكبير', en: 'The Grand Halawani Shop' },
+  { ar: 'سوق ليلة رمضان', en: 'The Ramadan Night Market' },
+  { ar: 'مائدة العيد الكبيرة', en: 'The Grand Eid Banquet' },
+];
+export const BOSSES = [
+  { ar: 'ملك التمر', en: 'Date King' },
+  { ar: 'ملكة العسل', en: 'Honey Queen' },
+  { ar: 'عملاق الكنافة', en: 'Kunafa Giant' },
+  { ar: 'ملك التمر', en: 'Date King' },
+  { ar: 'ملكة العسل', en: 'Honey Queen' },
+  { ar: 'عملاق الكنافة', en: 'Kunafa Giant' },
+  { ar: 'ملك التمر', en: 'Date King' },
+  { ar: 'ملكة العسل', en: 'Honey Queen' },
+  { ar: 'عملاق الكنافة', en: 'Kunafa Giant' },
+  { ar: 'أبطال الحلويات الثلاثة', en: 'The Three Sweet Champions' },
+];
+export const placeOf = (stage) => STAGE_PLACES[Math.max(0, Math.min(STAGE_PLACES.length - 1, stage | 0))];
+export const bossOf = (stage) => BOSSES[Math.max(0, Math.min(BOSSES.length - 1, stage | 0))];
+/** Recipe cards: winning a stage teaches the squad that place's sweet. One simple
+ * card per stage — a name and a short ingredient line a child can read. Pure collection joy. */
+export const RECIPES = [
+  { ar: 'كنافة', en: 'Kunafa', ingAr: 'كنافة، سمن، سكر، مكسرات', ingEn: 'Kunafa pastry, ghee, sugar, nuts' },
+  { ar: 'قطايف', en: 'Qatayef', ingAr: 'دقيق، ماء، خميرة، مكسرات', ingEn: 'Flour, water, yeast, nuts' },
+  { ar: 'بسبوسة', en: 'Basbousa', ingAr: 'سميد، سكر، زبادي، سمن', ingEn: 'Semolina, sugar, yogurt, ghee' },
+  { ar: 'سمسمية', en: 'Sesame Brittle', ingAr: 'سمسم، سكر، عسل، ليمون', ingEn: 'Sesame, sugar, honey, lemon' },
+  { ar: 'أم علي', en: 'Om Ali', ingAr: 'رقاق، لبن، سكر، مكسرات', ingEn: 'Pastry flakes, milk, sugar, nuts' },
+  { ar: 'كحك العيد', en: 'Eid Kahk', ingAr: 'دقيق، سمن، سكر، ملبن', ingEn: 'Flour, ghee, sugar, malban filling' },
+  { ar: 'فولية', en: 'Peanut Brittle', ingAr: 'فول سوداني، سكر، عسل، ليمون', ingEn: 'Peanuts, sugar, honey, lemon' },
+  { ar: 'لقمة القاضي', en: 'Luqmat al-Qadi', ingAr: 'دقيق، نشا، خميرة، شربات', ingEn: 'Flour, starch, yeast, sweet syrup' },
+  { ar: 'مهلبية', en: 'Mahallabia', ingAr: 'لبن، نشا، سكر، مكسرات', ingEn: 'Milk, starch, sugar, nuts' },
+  { ar: 'وليمة الحلويات', en: 'The Grand Sweet Feast', ingAr: 'كنافة، بسبوسة، كحك، قطايف', ingEn: 'Kunafa, basbousa, kahk, qatayef' },
+];
+export const recipeOf = (stage) => RECIPES[Math.max(0, Math.min(RECIPES.length - 1, stage | 0))];
 export const BOSS = { hp: 1100, r: 1.9, speed: 2.0, touch: 10 };
 const RAIN = { warn: [1.5, 1.3, 1.1], r: [1.9, 2.0, 2.2], dmg: 14 };
 const CHARGE = { warn: [1.35, 1.2, 1.05], speed: [14, 16, 18], dmg: 22, stun: [1.9, 1.7, 1.4] };
@@ -56,11 +102,21 @@ export function normalizeSave(raw) {
   const r = raw && typeof raw === 'object' ? raw : {};
   const num = (v, a, b, d = 0) => (Number.isFinite(Number(v)) ? clamp(Math.floor(Number(v)), a, b) : d);
   const u = r.upgrades && typeof r.upgrades === 'object' ? r.upgrades : {};
+  const stage = num(r.stage, 0, STAGES - 1); // the highest stage opened (0 = only the first)
+  // Collected recipe cards (stage indices). Old saves have no field: derive the
+  // stages that must already have been won to open `stage`, so nobody loses progress.
+  const recipes = (() => {
+    const out = new Set();
+    if (Array.isArray(r.recipes)) { for (const x of r.recipes) { const n = Math.floor(Number(x)); if (Number.isFinite(n) && n >= 0 && n < STAGES) out.add(n); } }
+    else for (let i = 0; i < stage; i++) out.add(i);
+    return [...out].sort((a, b) => a - b);
+  })();
   return {
     candies: num(r.candies, 0, 999999),
     upgrades: { damage: num(u.damage, 0, UPGRADES.damage.max), health: num(u.health, 0, UPGRADES.health.max), charge: num(u.charge, 0, UPGRADES.charge.max) },
     bestStars: num(r.bestStars, 0, 3),
-    stage: num(r.stage, 0, 5), // the highest stage opened (0 = only the first)
+    stage,
+    recipes,
     runs: num(r.runs, 0, 999999),
     wins: num(r.wins, 0, 999999),
     muted: !!r.muted,
@@ -85,7 +141,11 @@ export function applyResult(save, res) {
   const s = normalizeSave(save);
   s.candies = Math.min(999999, s.candies + res.candies + (res.bonus || 0));
   s.runs += 1;
-  if (res.win) { s.wins += 1; s.bestStars = Math.max(s.bestStars, res.stars); if (res.stage === s.stage && s.stage < STAGES - 1) s.stage += 1; }
+  if (res.win) {
+    s.wins += 1; s.bestStars = Math.max(s.bestStars, res.stars);
+    if (res.stage === s.stage && s.stage < STAGES - 1) s.stage += 1;
+    if (Number.isFinite(Number(res.stage))) { const st = clamp(Math.floor(Number(res.stage)), 0, STAGES - 1); if (!s.recipes.includes(st)) { s.recipes.push(st); s.recipes.sort((a, b) => a - b); } }
+  }
   return s;
 }
 
@@ -101,7 +161,11 @@ export class Run {
     this.easy = !!opts.easy;
     this.stage = Math.max(0, Math.min(STAGES - 1, opts.stage | 0));
     this.mul = stageMul(this.stage);
-    this.waves = this.stage >= 2 ? [THIRD_WAVE, ...WAVES] : WAVES;
+    const extra = [];
+    if (this.stage >= 9) extra.push(FINALE_WAVE);
+    if (this.stage >= 6) extra.push(FOURTH_WAVE);
+    if (this.stage >= 2) extra.push(THIRD_WAVE);
+    this.waves = extra.length ? [...extra, ...WAVES] : WAVES;
     this.t = 0; this.state = 'wave'; this.wave = 0; this.waveT = 0; this.spawnIdx = 0; this.gapT = 0;
     this.squad = { x: 0, y: 7, face: -Math.PI / 2, moving: false };
     this.bears = BEARS.map((b, i) => ({ id: b.id, idx: i, def: b, x: SLOTS[i][1] * 0 + this.squad.x, y: this.squad.y + 1, hp: Math.round(b.hp * this.hpMul), maxHp: Math.round(b.hp * this.hpMul), alive: true, inv: 0, cd: 0.3 + i * 0.1, aim: -Math.PI / 2, flash: 0, swing: 0, hasTarget: false }));

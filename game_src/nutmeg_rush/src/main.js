@@ -10,10 +10,10 @@ import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 import { VoiceCoach } from '../../cozy_kit/voice.js';
 
-const NUTMEG_CLIPS = { trick: 3, near: 2, bump: 2, pickup: 2, nitro: 2, win: 2, lose: 2, count: 1 };
+const NUTMEG_CLIPS = { trick: 3, near: 2, bump: 2, pickup: 2, nitro: 2, win: 2, lose: 2, count: 1, refill: 1 };
 
 const S = {
-  title: ['سكة الكورة', 'NUTMEG RUSH'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], balls: ['الكور', 'BALLS'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
+  title: ['كورة الحارة', 'HARA FOOTBALL'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], balls: ['الكور', 'BALLS'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'],
   back: ['رجوع', 'Back'], sound: ['الصوت', 'Sound'], paused: ['استراحة', 'PAUSED'], resume: ['كمّل', 'RESUME'], restart: ['إعادة', 'RETRY'], home: ['الرئيسية', 'HOME'], next: ['التالي', 'NEXT'],
   select: ['اختار المرحلة', 'SELECT LEVEL'], locked: ['خلّص المرحلة اللي قبلها', 'Finish the level before'], start: ['يلا!', "LET'S GO!"], level: ['المرحلة', 'LEVEL'],
   tip1: ['ابعد عن الممرات الحمرا الوامضة', 'Dodge the flashing RED lanes'], tip2: ['مرّر الكورة بين رجلين المدافع!', "Roll the ball between a defender's legs!"],
@@ -21,6 +21,7 @@ const S = {
   tip5: ['في الشباك دوس لما الدايرة تبقى خضرا', 'At the goal, TAP when the ring is GREEN'],
   how: ['اسحب صباعك عشان تحرّك الكورة', 'Drag your finger to roll the ball'],
   nutmeg: ['بين الرجلين!', 'NUTMEG!'], onetwo: ['تمريرة وراجعة!', 'ONE-TWO!'], stolen: ['اتسرقت!', 'STOLEN!'], dodge: ['فلتّ منه!', 'DODGE!'],
+  refill: ['العيال جابوا كور تانية! كمّل لعب ⚽', 'The kids fetched more balls! Play on! ⚽'],
   comet: ['🔥 كرة نار!! 🔥', '🔥 FLAMING COMET! 🔥'], burn: ['حرقتو!', 'BURNED THROUGH!'], goal: ['جووووول!', 'GOOOAL!'], save: ['الحارس صدّها! جرّب تاني', 'SAVED! Try again'],
   shootHint: ['دوس لما الدايرة تبقى خضرا!', 'TAP when the ring is GREEN!'], shootGo: ['اضرب!', 'SHOOT!'], shootWait: ['استنى...', 'WAIT...'],
   tricks: ['حركات', 'Tricks'], time: ['الوقت', 'Time'], coins: ['العملات', 'Coins'], score: ['النقاط', 'Score'], won: ['جووووول! 🏆', 'GOAL! 🏆'],
@@ -308,11 +309,11 @@ class Game {
 
   showMenu() {
     this.mode = 'menu'; this.m = null; this._clear(); this.sound.crowd(true); this.sound.excite(0.2); this.menuT = 0;
-    const ar = I.getLang() !== 'en', i = Math.min(this.save.unlocked - 1, 4), d = LEVELS[i];
-    const lv = h('div', { class: 'nm-lvname' }, `${tx('levelN')} ${I.num(i + 1)} - ${ar ? d.ar : d.en}`.toUpperCase());
+    const ar = I.getLang() !== 'en', i = Math.min(this.save.unlocked - 1, LEVELS.length - 1), d = LEVELS[i];
+    const lv = h('div', { class: 'nm-lvname' }, `${tx('levelN')} ${I.num(i + 1)} - ${ar ? d.ar : d.en} • ${ar ? 'ضد' : 'VS'} ${ar ? d.team.ar : d.team.en}`.toUpperCase());
     this.layer.append(h('div', { class: 'nm-coinpill' }, '🪙', h('span', {}, I.num(this.save.coins))));
     this.layer.append(h('div', { class: 'nm-menu2' },
-      h('div', { class: 'nm-title2' }, ar ? h('b', {}, tx('title')) : [document.createTextNode('NUTMEG'), h('b', {}, 'RUSH')]), h('div', { class: 'nm-ribbon' }, tx('youAre')), lv,
+      h('div', { class: 'nm-title2' }, ar ? h('b', {}, tx('title')) : [document.createTextNode('HARA'), h('b', {}, 'FOOTBALL')]), h('div', { class: 'nm-ribbon' }, tx('youAre')), lv,
       h('button', { class: 'nm-play', onclick: () => { this.sound.play('whistle'); this.showBrief(i); } }, '▶ ', tx('play')),
       h('div', { class: 'nm-tiles' },
         h('button', { class: 'nm-tile', onclick: () => { this.sound.play('tap'); this.showLevels(); } }, h('i', {}, '▦'), tx('levels')),
@@ -323,7 +324,7 @@ class Game {
 
   showLevels() {
     this._clear(); const ar = I.getLang() !== 'en';
-    const cards = LEVELS.map((d, i) => { const lock = i + 1 > this.save.unlocked, st = this.save.stars[i] || 0; return h('button', { class: `nm-lvl${lock ? ' lock' : ''}`, onclick: () => { if (lock) { this.hint(tx('locked')); return; } this.sound.play('tap'); this.showBrief(i); } }, h('span', { style: `font-size:${U(7)}` }, I.num(i + 1)), h('span', {}, ar ? d.ar : d.en), h('span', {}, lock ? '🔒' : '⭐'.repeat(st) || '☆')); });
+    const cards = LEVELS.map((d, i) => { const lock = i + 1 > this.save.unlocked, st = this.save.stars[i] || 0; return h('button', { class: `nm-lvl${lock ? ' lock' : ''}`, onclick: () => { if (lock) { this.hint(tx('locked')); return; } this.sound.play('tap'); this.showBrief(i); } }, h('span', { style: `font-size:${U(7)}` }, I.num(i + 1)), h('span', {}, ar ? d.ar : d.en), h('span', { style: `font-size:${U(3)};opacity:.85` }, `⚔ ${ar ? d.team.ar : d.team.en}`), h('span', {}, lock ? '🔒' : '⭐'.repeat(st) || '☆')); });
     this._card(h('div', { class: 'nm-title' }, tx('select')), h('div', { class: 'nm-grid' }, cards), h('button', { class: 'nm-btn dark', onclick: () => this.showMenu() }, tx('back')));
     this.hintEl = h('div', { class: 'nm-hint' }); this.layer.append(this.hintEl); this._soundPill();
   }
@@ -387,7 +388,7 @@ class Game {
 
   _finish(r) {
     const i = this.levelIdx, sv = this.save;
-    sv.stars[i] = Math.max(sv.stars[i], r.stars); sv.unlocked = Math.max(sv.unlocked, Math.min(5, i + 2)); sv.coins += r.coins; sv.goals += 1; sv.tricks += r.tricks; sv.best[i] = Math.max(sv.best[i], r.score);
+    sv.stars[i] = Math.max(sv.stars[i], r.stars); sv.unlocked = Math.max(sv.unlocked, Math.min(LEVELS.length, i + 2)); sv.coins += r.coins; sv.goals += 1; sv.tricks += r.tricks; sv.best[i] = Math.max(sv.best[i] || 0, r.score);
     this.post({ type: 'save', save: sv });
     this.sound.play('win'); this.voice.say('win'); this.mode = 'result';
     if (this.shootBtn) { this.shootBtn.remove(); this.shootBtn = null; }
@@ -395,7 +396,7 @@ class Game {
     const stars = h('div', { class: 'nm-stars' }, ...[1, 2, 3].map((n) => h('span', { class: n <= r.stars ? '' : 'off' }, '⭐')));
     this.layer.append(h('div', { class: 'nm-dim', style: 'background:rgba(5,8,25,.45)' }, h('div', { class: 'nm-white' }, h('h2', {}, tx('goal')), stars, h('p', {}, tx('win')),
       row(tx('score'), I.num(r.score)), row(`🦵 ${tx('nut')}`, I.num(r.stats.nutmegs)), row(`🔵 ${tx('one')}`, I.num(r.stats.onetwos)), row(`💨 ${tx('dod')}`, I.num(r.stats.dodges)), row(`🪙 ${tx('coins')}`, `+${I.num(r.coins)}`),
-      i < 4 ? h('button', { class: 'nm-red', onclick: () => this.showBrief(i + 1) }, '▶ ', tx('next')) : h('button', { class: 'nm-red', onclick: () => this.showBrief(i) }, '↻ ', tx('tryAgain')),
+      i < LEVELS.length - 1 ? h('button', { class: 'nm-red', onclick: () => this.showBrief(i + 1) }, '▶ ', tx('next')) : h('button', { class: 'nm-red', onclick: () => this.showBrief(i) }, '↻ ', tx('tryAgain')),
       h('button', { class: 'nm-navy', onclick: () => this.showMenu() }, '⌂ ', tx('menu')))));
   }
 
@@ -451,6 +452,7 @@ class Game {
         case 'onetwo': this.sound.play('onetwo'); this.sound.play('kick'); this.voice.say('trick'); this.say('onetwo', 'cyan'); this._burst(this.ball.position, 0x5ac8ff, 14); this.hideTip(); break;
         case 'dodge': this.sound.play('dodge'); this.voice.say('near'); this.say('dodge', 'cyan'); break;
         case 'stolen': this.sound.play('stolen'); this.voice.say('bump'); this.say('stolen', 'red'); this.shake = 0.7; this.sound.excite(0.15); break;
+        case 'refill': this.sound.play('coin'); this.voice.say('refill'); this.say('refill', 'cyan'); this._burst(this.ball.position, 0x5ad8ff, 14); break;
         case 'burn': this.sound.play('burn'); this.voice.say('trick'); this.say('burn', 'yellow'); this._burst(this.ball.position, 0xff6a1a, 24); break;
         case 'cometOn': this.sound.play('comet'); this.voice.say('nitro'); this.say('comet'); this.sound.excite(0.9); break;
         case 'cometOff': this.sound.excite(0.3); break;

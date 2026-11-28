@@ -1,10 +1,10 @@
-// «برج الأبطال» — Hero Tower. Entry: window.HeroTower.start(container, config, post).
+// «برج القلعة» — Citadel Tower. Entry: window.HeroTower.start(container, config, post).
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
 // A casual tower-climbing power puzzle (like the owner's video, drawn from scratch): a little knight starts at the bottom of a tall
 // tower and climbs floor by floor. Tap a GREEN foe (weaker than you) to defeat it and add its power to yours; a RED foe is stronger
 // (it only bonks you gently and the floor is tried again). Swords, potions and chests add power; a crystal multiplies it, so the
 // order matters. A troll waits halfway, a dark sorcerer at the top and a dragon on the roof. 2D canvas, all art and sound made in
-// code. Three chapters. No network, no links, no scores to lose.
+// code. Eight chapters, each a real Egyptian tower (Citadel, Saint Catherine, Pharos, Nubia, Shali, Philae, Qaitbey, Bab Zuweila). No network, no links, no scores to lose.
 import { CHAPTERS, Tower, fmt, normalizeSave, TROLL_FLOOR, SORCERER_FLOOR } from './sim.js';
 import { loadArt } from '../../cozy_kit/art.js';
 import { VoiceCoach } from '../../cozy_kit/voice.js';
@@ -46,15 +46,25 @@ const CSS = `
 .ht-btn.alt{background:linear-gradient(180deg,#ffb84a,#f08a1a);box-shadow:0 calc(var(--u)*.9) 0 #a85a0a}
 .ht-btn.dark{background:linear-gradient(180deg,#8a6ad8,#5a3aa8);box-shadow:0 calc(var(--u)*.9) 0 #2a1a6a;font-size:calc(var(--u)*4.2)}
 .ht-btn:active{transform:translateY(calc(var(--u)*.5))}
-.ht-btn:focus-visible,.ht-round:focus-visible,.ht-ch:focus-visible{outline:calc(var(--u)*.7) solid #ffd23a;outline-offset:calc(var(--u)*.5)}
-.ht-chs{display:flex;gap:calc(var(--u)*2);width:100%}
-.ht-ch{flex:1;border:none;font-family:inherit;border-radius:calc(var(--u)*3);padding:calc(var(--u)*2) calc(var(--u)*1);color:#fff;font-weight:900;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.6);font-size:calc(var(--u)*3.6)}
-.ht-ch i{font-style:normal;font-size:calc(var(--u)*8)}
-.ht-ch.castle{background:linear-gradient(180deg,#c070a0,#7a3a90);box-shadow:0 calc(var(--u)*.7) 0 #3a1a60}
-.ht-ch.ice{background:linear-gradient(180deg,#7ab8f0,#3a78c8);box-shadow:0 calc(var(--u)*.7) 0 #1a3a8a}
-.ht-ch.fire{background:linear-gradient(180deg,#f08a4a,#c83a2a);box-shadow:0 calc(var(--u)*.7) 0 #7a1a1a}
-.ht-ch.lock{background:linear-gradient(180deg,#b8b8c8,#8a8a9a);box-shadow:0 calc(var(--u)*.7) 0 #6a6a7a}
-@media (orientation:landscape){.ht-card{width:calc(var(--u)*110);max-width:94vw;gap:calc(var(--u)*1.2);padding:calc(var(--u)*2) calc(var(--u)*4)}.ht-logo{font-size:calc(var(--u)*9)}.ht-stars{font-size:calc(var(--u)*7)}.ht-title{font-size:calc(var(--u)*6)}.ht-btn{min-height:calc(var(--u)*8.5);font-size:calc(var(--u)*4);padding:calc(var(--u)*.6) calc(var(--u)*4)}.ht-btn.dark{font-size:calc(var(--u)*3.6)}.ht-stat div{font-size:calc(var(--u)*4)}.ht-stat small{font-size:calc(var(--u)*2.4)}}
+.ht-btn:focus-visible,.ht-round:focus-visible,.ht-seg:focus-visible{outline:calc(var(--u)*.7) solid #ffd23a;outline-offset:calc(var(--u)*.5)}
+.ht-tower{display:flex;flex-direction:column-reverse;align-items:center;gap:calc(var(--u)*.8);width:100%}
+.ht-seg{border:calc(var(--u)*.35) solid rgba(255,255,255,.55);font-family:inherit;border-radius:calc(var(--u)*2.2);padding:calc(var(--u)*1.1) calc(var(--u)*2.4);color:#fff;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*1.6);font-size:calc(var(--u)*3.4);min-height:calc(var(--u)*7.5);box-sizing:border-box}
+.ht-seg i{font-style:normal;font-size:calc(var(--u)*4.6)}
+.ht-seg .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ht-seg .st{font-size:calc(var(--u)*3);letter-spacing:calc(var(--u)*.2)}
+.ht-seg.castle{background:linear-gradient(180deg,#c070a0,#7a3a90);box-shadow:0 calc(var(--u)*.7) 0 #3a1a60}
+.ht-seg.ice{background:linear-gradient(180deg,#7ab8f0,#3a78c8);box-shadow:0 calc(var(--u)*.7) 0 #1a3a8a}
+.ht-seg.fire{background:linear-gradient(180deg,#f08a4a,#c83a2a);box-shadow:0 calc(var(--u)*.7) 0 #7a1a1a}
+.ht-seg.sea{background:linear-gradient(180deg,#2ea8bc,#0e5a74);box-shadow:0 calc(var(--u)*.7) 0 #083a4a}
+.ht-seg.dawn{background:linear-gradient(180deg,#f0a56a,#c85a6a);box-shadow:0 calc(var(--u)*.7) 0 #7a2a44}
+.ht-seg.lock{background:linear-gradient(180deg,#b8b8c8,#8a8a9a);box-shadow:0 calc(var(--u)*.7) 0 #6a6a7a}
+.ht-seg.lit{border-color:#ffd23a;box-shadow:0 0 calc(var(--u)*1.8) rgba(255,210,58,.8),0 calc(var(--u)*.7) 0 rgba(90,60,0,.55)}
+.ht-seg.now{border-color:#fff;animation:ht-pulse 1.6s ease-in-out infinite}
+@keyframes ht-pulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.3)}}
+.ht-roof{width:34%;height:calc(var(--u)*4.2);background:linear-gradient(180deg,#8a6ad8,#5a3aa8);clip-path:polygon(50% 0,100% 100%,0 100%)}
+.ht-roof.lit{background:linear-gradient(180deg,#ffe27a,#f0a020)}
+.ht-dragon{font-size:calc(var(--u)*5.2);line-height:1;margin-bottom:calc(var(--u)*-1.2)}
+@media (orientation:landscape){.ht-card{width:calc(var(--u)*110);max-width:94vw;gap:calc(var(--u)*1.2);padding:calc(var(--u)*2) calc(var(--u)*4)}.ht-logo{font-size:calc(var(--u)*9)}.ht-stars{font-size:calc(var(--u)*7)}.ht-title{font-size:calc(var(--u)*6)}.ht-btn{min-height:calc(var(--u)*8.5);font-size:calc(var(--u)*4);padding:calc(var(--u)*.6) calc(var(--u)*4)}.ht-btn.dark{font-size:calc(var(--u)*3.6)}.ht-stat div{font-size:calc(var(--u)*4)}.ht-stat small{font-size:calc(var(--u)*2.4)}.ht-tower{gap:calc(var(--u)*.5)}.ht-seg{min-height:calc(var(--u)*5.6);padding:calc(var(--u)*.4) calc(var(--u)*2);font-size:calc(var(--u)*3)}.ht-seg i{font-size:calc(var(--u)*3.8)}.ht-roof{height:calc(var(--u)*3)}.ht-dragon{font-size:calc(var(--u)*4)}}
 .ht-soundpill{position:absolute;left:50%;bottom:calc(var(--u)*22);transform:translateX(-50%);z-index:30;font-family:inherit;font-weight:900;font-size:calc(var(--u)*4.6);color:#1f2a24;background:#ffd166;border:calc(var(--u)*.6) solid #fff;border-radius:999px;padding:calc(var(--u)*2) calc(var(--u)*5);box-shadow:0 calc(var(--u)*1) calc(var(--u)*3) rgba(0,0,0,.4);cursor:pointer;display:none;pointer-events:auto}
 `;
 
@@ -71,7 +81,7 @@ function h(tag, attrs = {}, ...kids) {
   return e;
 }
 
-const ICON = { castle: '🏰', ice: '❄️', fire: '🔥' };
+const ICON = { castle: '🏰', ice: '❄️', fire: '🔥', sea: '⚓', dawn: '🌅' };
 const HOME_X = 0.1; // where the hero stands when he comes up on the left (the other side is 1 - HOME_X)
 const exitRight = (i) => i % 2 === 0; // the ladders zig-zag: floor 1 exits on the right, floor 2 on the left ...
 const ease = (k) => k * k * (3 - 2 * k);
@@ -314,12 +324,17 @@ class Game {
       h('div', { class: 'ht-dim', style: 'background:none' }, h('div', { class: 'ht-card' },
         h('div', { class: 'ht-logo' }, t('title')),
         h('div', { class: 'ht-small' }, '🏰 ⚔️ 🐉'),
-        h('div', { class: 'ht-chs' }, CHAPTERS.map((ch) => {
+        // the tower map: the chapters ARE the tower — stacked segments,
+        // chapter 1 at the base, the dragon's roof on top. A segment lights
+        // up gold once its chapter is won (stars from the save), the chapter
+        // you can climb next pulses, locked ones stay grey.
+        h('div', { class: 'ht-tower' }, CHAPTERS.map((ch) => {
           const locked = ch.id > this.save.unlocked;
           const st = this.save.stars[ch.id] ?? 0;
-          return h('button', { class: `ht-ch ${locked ? 'lock' : ch.theme}`, 'aria-label': `${t('chapter')} ${ch.id}`, onclick: () => { if (locked) { this.sound.play('no'); return; } this.startChapter(ch); } },
-            h('i', {}, locked ? '🔒' : ICON[ch.theme]), t(ch.theme), h('span', {}, locked ? '' : '⭐'.repeat(st) || '·'));
-        })),
+          const now = !locked && st === 0 && ch.id === this.save.unlocked;
+          return h('button', { class: `ht-seg ${locked ? 'lock' : ch.theme}${st ? ' lit' : ''}${now ? ' now' : ''}`, style: `width:${100 - (ch.id - 1) * 3}%`, 'aria-label': `${t('chapter')} ${ch.id}`, onclick: () => { if (locked) { this.sound.play('no'); return; } this.startChapter(ch); } },
+            h('i', {}, locked ? '🔒' : ICON[ch.theme]), h('span', { class: 'nm' }, t(ch.place)), h('span', { class: 'st' }, locked ? '' : '⭐'.repeat(st)));
+        }), h('div', { class: 'ht-roof' + (done >= CHAPTERS.length ? ' lit' : '') }), h('div', { class: 'ht-dragon' }, '🐉')),
         h('button', { class: 'ht-btn', onclick: () => this.startChapter(CHAPTERS[Math.min(this.save.unlocked, CHAPTERS.length) - 1]) }, '▶ ', t('play')),
         done >= CHAPTERS.length ? h('div', { class: 'ht-small' }, t('allDone')) : null)),
       this._soundBtn('top:max(calc(var(--u)*2.5),env(safe-area-inset-top));right:calc(var(--u)*3)'),
@@ -433,7 +448,7 @@ class Game {
     const last = ch.id >= CHAPTERS.length;
     this.layer.append(h('div', { class: 'ht-dim' }, h('div', { class: 'ht-card' },
       h('div', { class: 'ht-title' }, t('complete')),
-      h('div', { class: 'ht-small' }, `${t(ch.theme)} · ${t('win')}`),
+      h('div', { class: 'ht-small' }, `${t(ch.place)} · ${t('win')}`),
       h('div', { class: 'ht-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= stars ? '' : 'off' }, '⭐'))),
       h('div', { class: 'ht-stat' }, h('div', {}, h('small', {}, t('power')), fmt(tw.p)), h('div', {}, h('small', {}, t('floors')), `${num(tw.total - 1)}/${num(tw.total - 1)}`)),
       last ? h('div', { class: 'ht-small' }, t('allDone')) : h('button', { class: 'ht-btn', onclick: () => this.startChapter(CHAPTERS[ch.id]) }, t('next'), ' ▶'),
@@ -559,7 +574,7 @@ class Game {
       // the ground fades from a warm hill top into a dusk shade that belongs to the painted sky (no flat bright strip)
       const gy = top0 + G.fh + baseH * 0.9;
       const gg = g.createLinearGradient(0, gy, 0, this.ch);
-      const [c1, c2] = theme === 'ice' ? ['#f2f8ff', '#a8c4e0'] : theme === 'fire' ? ['#7a3a28', '#3a1a1a'] : ['#7ca04a', '#3a5a3c'];
+      const [c1, c2] = theme === 'ice' ? ['#f2f8ff', '#a8c4e0'] : theme === 'fire' ? ['#7a3a28', '#3a1a1a'] : theme === 'sea' ? ['#3ec8d8', '#0e5a74'] : theme === 'dawn' ? ['#c98a5a', '#6a3a44'] : ['#7ca04a', '#3a5a3c'];
       gg.addColorStop(0, c1); gg.addColorStop(1, c2);
       g.fillStyle = gg;
       g.beginPath(); g.moveTo(0, gy + this.u * 1.2);

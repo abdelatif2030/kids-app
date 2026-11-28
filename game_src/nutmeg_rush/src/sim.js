@@ -6,7 +6,7 @@
 // mouth and the keeper's reach is shown: tap when the target is outside his reach.
 
 export const PITCH = { W: 34, L: 78, BOX_Z: 58, SHOOT_Z: 63, GOAL_W: 14, GOAL_H: 3.6, GOAL_D: 3.2 };
-export const LIVES = 3; // the balls in the corner: a steal takes one; with none left it is full time
+export const LIVES = 3; // the balls in the corner: a steal takes one; when the last one goes the kids fetch more — the match never ends on balls
 export const BALL_SPEED = 9.5; // top speed with the stick fully out; it stops when you let go (the ball only moves while you drag)
 export const DUMMY_R = 0.75;
 export const COIN_R = 1.35;
@@ -23,14 +23,29 @@ export const LANE_W = 3.2;
 export const TRIGGER_DIST = 8.5;
 export const TRICKS = { nutmeg: { heat: 34, score: 200 }, onetwo: { heat: 28, score: 150 }, dodge: { heat: 16, score: 60 }, burn: { heat: 0, score: 100 } };
 
+// Batch F: 12 levels = 4 venues x 3. The original 7 tunings are kept verbatim at
+// slots 1, 2, 4, 6, 8, 10 and 12 (the old stadium final is now the Cup Final);
+// the 5 new levels interpolate the same curves so difficulty rises smoothly.
+export const VENUES = [
+  { ar: 'الحارة', en: 'Hara' },
+  { ar: 'المدرسة', en: 'School' },
+  { ar: 'نادي الحي', en: 'Local Club' },
+  { ar: 'استاد القاهرة', en: 'Cairo Stadium' },
+];
+
 export const LEVELS = [
-  { id: 1, ar: 'تسخين', en: 'Warm Up', defenders: 2, mates: 0, chase: 3.6, windup: 1.1, cooldown: 3.4, aggro: 13, reach: 2.3, sway: 2.0, tspeed: 1.3, trickGoal: 2, par: 22 },
-  { id: 2, ar: 'تمريرة وراجعة', en: 'One-Two', defenders: 3, mates: 1, chase: 4.2, windup: 0.95, cooldown: 3.0, aggro: 15, reach: 2.6, sway: 2.4, tspeed: 1.6, trickGoal: 3, par: 26 },
-  { id: 3, ar: 'ليلة الكأس', en: 'Cup Night', defenders: 4, mates: 2, chase: 4.8, windup: 0.85, cooldown: 2.6, aggro: 17, reach: 2.9, sway: 2.8, tspeed: 1.9, trickGoal: 4, par: 30 },
-  { id: 4, ar: 'المدرج الكبير', en: 'Big Stand', defenders: 5, mates: 2, chase: 5.3, windup: 0.75, cooldown: 2.2, aggro: 18, reach: 3.2, sway: 3.2, tspeed: 2.3, trickGoal: 5, par: 34 },
-  { id: 5, ar: 'نهائي الأبطال', en: 'Champions Final', defenders: 6, mates: 3, chase: 5.8, windup: 0.68, cooldown: 1.9, aggro: 20, reach: 3.5, sway: 3.6, tspeed: 2.8, trickGoal: 6, par: 38 },
-  { id: 6, ar: 'كأس الأساطير', en: 'Legends Cup', defenders: 7, mates: 3, chase: 6.1, windup: 0.64, cooldown: 1.7, aggro: 21, reach: 3.7, sway: 3.9, tspeed: 3.1, trickGoal: 7, par: 42 },
-  { id: 7, ar: 'بطولة العالم', en: 'World Final', defenders: 8, mates: 4, chase: 6.4, windup: 0.6, cooldown: 1.55, aggro: 22, reach: 3.9, sway: 4.2, tspeed: 3.4, trickGoal: 8, par: 46 },
+  { id: 1, venue: 0, ar: 'ملعب الحارة', en: 'Hara Pitch', team: { ar: 'أولاد الحارة', en: 'Hara Kids' }, defenders: 2, mates: 0, chase: 3.6, windup: 1.1, cooldown: 3.4, aggro: 13, reach: 2.3, sway: 2.0, tspeed: 1.3, trickGoal: 2, par: 22 },
+  { id: 2, venue: 0, ar: 'تحدي الحارة', en: 'Hara Challenge', team: { ar: 'صقور الحارة', en: 'Hara Falcons' }, defenders: 3, mates: 1, chase: 4.2, windup: 0.95, cooldown: 3.0, aggro: 15, reach: 2.6, sway: 2.4, tspeed: 1.6, trickGoal: 3, par: 26 },
+  { id: 3, venue: 0, ar: 'نهائي الحارة', en: 'Hara Final', team: { ar: 'نجوم الحارة', en: 'Hara Stars' }, defenders: 4, mates: 1, chase: 4.5, windup: 0.9, cooldown: 2.8, aggro: 16, reach: 2.75, sway: 2.6, tspeed: 1.75, trickGoal: 3, par: 28 },
+  { id: 4, venue: 1, ar: 'ملعب المدرسة', en: 'School Pitch', team: { ar: 'أبطال المدرسة', en: 'School Champs' }, defenders: 4, mates: 2, chase: 4.8, windup: 0.85, cooldown: 2.6, aggro: 17, reach: 2.9, sway: 2.8, tspeed: 1.9, trickGoal: 4, par: 30 },
+  { id: 5, venue: 1, ar: 'ماتش المدرسة الكبير', en: 'School Big Match', team: { ar: 'أسود المدرسة', en: 'School Lions' }, defenders: 5, mates: 2, chase: 5.0, windup: 0.8, cooldown: 2.4, aggro: 17, reach: 3.05, sway: 3.0, tspeed: 2.1, trickGoal: 4, par: 32 },
+  { id: 6, venue: 1, ar: 'بطولة المدارس', en: 'Schools Cup', team: { ar: 'فرسان المدارس', en: 'School Knights' }, defenders: 5, mates: 2, chase: 5.3, windup: 0.75, cooldown: 2.2, aggro: 18, reach: 3.2, sway: 3.2, tspeed: 2.3, trickGoal: 5, par: 34 },
+  { id: 7, venue: 2, ar: 'اختبارات النادي', en: 'Club Trials', team: { ar: 'مواهب النادي', en: 'Club Talents' }, defenders: 6, mates: 3, chase: 5.5, windup: 0.72, cooldown: 2.05, aggro: 19, reach: 3.35, sway: 3.4, tspeed: 2.5, trickGoal: 5, par: 36 },
+  { id: 8, venue: 2, ar: 'نادي الحي', en: 'Local Club', team: { ar: 'نجوم الحي', en: 'Local Stars' }, defenders: 6, mates: 3, chase: 5.8, windup: 0.68, cooldown: 1.9, aggro: 20, reach: 3.5, sway: 3.6, tspeed: 2.8, trickGoal: 6, par: 38 },
+  { id: 9, venue: 2, ar: 'مشوار الكأس', en: 'Club Cup Run', team: { ar: 'ذئاب النادي', en: 'Club Wolves' }, defenders: 7, mates: 3, chase: 6.0, windup: 0.66, cooldown: 1.8, aggro: 20, reach: 3.6, sway: 3.75, tspeed: 2.95, trickGoal: 6, par: 40 },
+  { id: 10, venue: 3, ar: 'نصف نهائي الكأس', en: 'Cup Semi-Final', team: { ar: 'نجوم الكأس', en: 'Cup Stars' }, defenders: 7, mates: 3, chase: 6.1, windup: 0.64, cooldown: 1.7, aggro: 21, reach: 3.7, sway: 3.9, tspeed: 3.1, trickGoal: 7, par: 42 },
+  { id: 11, venue: 3, ar: 'استاد القاهرة الدولي', en: 'Cairo International Stadium', team: { ar: 'أبطال الاستاد', en: 'Stadium Champs' }, defenders: 8, mates: 4, chase: 6.3, windup: 0.62, cooldown: 1.6, aggro: 21, reach: 3.8, sway: 4.05, tspeed: 3.25, trickGoal: 7, par: 44 },
+  { id: 12, venue: 3, ar: 'نهائي الكأس', en: 'Cup Final', team: { ar: 'فريق الأحلام', en: 'Dream Team' }, defenders: 8, mates: 4, chase: 6.4, windup: 0.6, cooldown: 1.55, aggro: 22, reach: 3.9, sway: 4.2, tspeed: 3.4, trickGoal: 8, par: 46 },
 ];
 
 export const SKINS = [
@@ -53,8 +68,8 @@ export function normalizeSave(s) {
   if (!owned.includes('classic')) owned.unshift('classic');
   const stars = Array.isArray(o.stars) ? o.stars.slice(0, LEVELS.length).map((v) => clamp(Math.round(num(v)), 0, 3)) : [];
   while (stars.length < LEVELS.length) stars.push(0);
-  const best = Array.isArray(o.best) ? o.best.slice(0, 5).map((v) => Math.max(0, Math.round(num(v)))) : [];
-  while (best.length < 5) best.push(0);
+  const best = Array.isArray(o.best) ? o.best.slice(0, LEVELS.length).map((v) => Math.max(0, Math.round(num(v)))) : [];
+  while (best.length < LEVELS.length) best.push(0);
   return {
     unlocked: clamp(Math.max(Math.round(num(o.unlocked, 1)), ...stars.map((v, i) => (v > 0 ? i + 2 : 1))), 1, LEVELS.length), stars, best,
     coins: Math.max(0, Math.round(num(o.coins))), owned,
@@ -83,7 +98,7 @@ export class Match {
     this.mode = 'play'; this.modeT = 0; this.time = 0; this.clock = 0;
     this.input = { jx: 0, jy: 0 };
     this.ball = { x: 0, z: 4, vx: 0, vz: 0, inv: 1.0 };
-    this.lives = LIVES; this.coins = 0; this.reason = null; this.hintMate = false;
+    this.lives = LIVES; this.refills = 0; this.coins = 0; this.reason = null; this.hintMate = false;
     this.dummies = []; this.coinList = []; this.blockT = 0;
     this.pass = null; this.shot = null;
     this.heat = 0; this.cometT = 0; this.lastTrick = -9;
@@ -315,7 +330,13 @@ export class Match {
     b.x = best.x; b.z = best.z; b.vx = 0; b.vz = 0; b.inv = 1.8;
     this.lives = Math.max(0, this.lives - 1);
     this.emit('stolen', { id: d.id, lives: this.lives });
-    if (this.lives <= 0) { this.reason = 'lives'; this.mode = 'lost'; this.modeT = 0; this.emit('lost', { reason: 'lives' }); }
+    if (this.lives <= 0) {
+      // Kind rule (owner decision): running out of balls NEVER ends the match
+      // and is never a fail state. Street football: the kids fetch more balls
+      // and play goes on — the HUD balls fill back up with a kind cheer.
+      this.lives = LIVES; this.refills++;
+      this.emit('refill', { stolen: this.stats.stolen });
+    }
   }
 
   // ---------- teammates, one-two ----------
@@ -399,7 +420,11 @@ export class Match {
   result() {
     const tricks = this.tricks, got = this.coins;
     if (this.goals === 0) return { goal: false, reason: this.reason || 'time', stars: 0, coins: got, tricks, time: this.time, score: Math.round(this.score), stats: { ...this.stats } };
-    const stars = 1 + (tricks >= this.def.trickGoal ? 1 : 0) + (this.time <= this.def.par ? 1 : 0);
+    // Kind rules (Batch C): par time no longer grades. Stars = the goal itself,
+    // the trick goal, and a clean run (no ball stolen). `par` stays in the data, unused.
+    // The clean run reads stats.stolen, not lives: balls refill when they run
+    // out, so lives alone can no longer tell a clean run from a refilled one.
+    const stars = 1 + (tricks >= this.def.trickGoal ? 1 : 0) + (this.stats.stolen === 0 ? 1 : 0);
     const coins = got + 10 + tricks * 4 + stars * 8;
     return { goal: true, reason: null, stars, coins, tricks, time: this.time, score: Math.round(this.score), stats: { ...this.stats } };
   }

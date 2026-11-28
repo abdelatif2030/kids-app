@@ -13,13 +13,16 @@ const ACCEL = 10.5; // heavy trucks gather speed slowly
 const STEER_RATE = 6; // and their steering is heavy too
 const OFF_FACTOR = 0.32; // deep sand off the dirt road
 
+// Phase 2E: every round is its OWN leg geometry (track.js LEG_DEFS, same index) —
+// no shared circuit, no reversed reruns. The oasis order is the Western Desert route:
+// Siwa → Great Sand Sea → Bahariya → White Desert → Black Desert → Farafra → Dakhla.
 export const ROUNDS = [
-  { id: 1, ar: 'سيوة ← البحر الرملي', en: 'Siwa → Great Sand Sea', reverse: false, rival: 46, sunset: false, skill: 0.9 },
-  { id: 2, ar: 'البحر الرملي ← البحرية', en: 'Sand Sea → Bahariya', reverse: true, rival: 48.5, sunset: false, skill: 0.97 },
-  { id: 3, ar: 'الصحراء البيضاء', en: 'White Desert', reverse: false, rival: 50.5, sunset: false, skill: 1.03 },
-  { id: 4, ar: 'الصحراء السوداء', en: 'Black Desert', reverse: true, rival: 52, sunset: false, skill: 1.08 },
-  { id: 5, ar: 'واحة الفرافرة', en: 'Farafra Oasis', reverse: false, rival: 53.5, sunset: false, skill: 1.1 },
-  { id: 6, ar: 'كأس الواحات: الداخلة', en: 'Oasis Cup: Dakhla', reverse: true, rival: 55, sunset: true, skill: 1.12 },
+  { id: 1, ar: 'سيوة ← البحر الرملي', en: 'Siwa → Great Sand Sea', rival: 46, sunset: false, skill: 0.9 },
+  { id: 2, ar: 'البحر الرملي ← البحرية', en: 'Sand Sea → Bahariya', rival: 48.5, sunset: false, skill: 0.97 },
+  { id: 3, ar: 'الصحراء البيضاء', en: 'White Desert', rival: 50.5, sunset: false, skill: 1.03 },
+  { id: 4, ar: 'الصحراء السوداء', en: 'Black Desert', rival: 52, sunset: false, skill: 1.08 },
+  { id: 5, ar: 'واحة الفرافرة', en: 'Farafra Oasis', rival: 53.5, sunset: false, skill: 1.1 },
+  { id: 6, ar: 'كأس الواحات: الداخلة', en: 'Oasis Cup: Dakhla', rival: 55, sunset: true, skill: 1.12 },
 ];
 
 export const RIDERS = [
@@ -44,10 +47,10 @@ const wrap = (a) => { while (a > Math.PI) a -= Math.PI * 2; while (a < -Math.PI)
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 
 export class Race {
-  /** opts: { round (0..3), easy, assist (0..1), seed } */
+  /** opts: { round (0..5), easy, assist (0..1), seed } */
   constructor(opts = {}) {
     this.round = ROUNDS[opts.round ?? 0];
-    this.track = buildTrack(this.round.reverse);
+    this.track = buildTrack(opts.round ?? 0);
     this.easy = !!opts.easy;
     this.assist = opts.assist ?? (this.easy ? 0.75 : 0.35);
     this.rand = rng(opts.seed ?? 11);

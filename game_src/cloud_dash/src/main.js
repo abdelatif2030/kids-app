@@ -6,9 +6,8 @@
 // shield, a coin magnet and slow motion. Reach the finish gate with your hearts. 3D (three.js), all models, textures and sound made
 // in code. Ten levels. No network, no links.
 import * as THREE from 'three';
-import { Run, LEVELS, LANE_W, levelSpec, normalizeSave } from './sim.js';
+import { Run, LEVELS, skyOf, skyIndexOf, paletteOf, LANE_W, levelSpec, normalizeSave } from './sim.js';
 import { Sound } from './audio.js';
-import { applyBackdrop } from '../../cozy_kit/art.js';
 import { VoiceCoach } from '../../cozy_kit/voice.js';
 
 const CLOUD_CLIPS = { pickup: 2, charge: 2, trick: 2, bump: 3, win: 2, lose: 2, count: 1 };
@@ -102,12 +101,12 @@ function checkerTex() {
   tx.colorSpace = THREE.SRGBColorSpace;
   return tx;
 }
-function skyTex() {
+function skyTex(pal) {
   const c = document.createElement('canvas');
   c.width = 4; c.height = 256;
   const g = c.getContext('2d');
   const gr = g.createLinearGradient(0, 0, 0, 256);
-  gr.addColorStop(0, '#8a98f0'); gr.addColorStop(0.5, '#e8b0ec'); gr.addColorStop(1, '#ffe0e8');
+  gr.addColorStop(0, pal.top); gr.addColorStop(0.5, pal.mid); gr.addColorStop(1, pal.bottom);
   g.fillStyle = gr; g.fillRect(0, 0, 4, 256);
   const tx = new THREE.CanvasTexture(c);
   tx.colorSpace = THREE.SRGBColorSpace;
@@ -212,12 +211,28 @@ class Game {
     r.outputColorSpace = THREE.SRGBColorSpace;
     this.root.append(r.domElement);
     const sc = this.scene = new THREE.Scene();
-    sc.background = skyTex();
+    // Phase 2E: per-sky palettes. The gradient textures are cached per sky
+    // (10 tiny 4x256 canvases); the painted backdrop (art/bg_sky.webp — the
+    // only backdrop picture this game has, so no per-sky keys exist) is kept
+    // and re-tinted per sky into ONE canvas texture that is disposed and
+    // repainted only when the sky changes. Nothing here runs per frame.
+    this._skyTexCache = new Map(); // sky index -> gradient CanvasTexture
+    this._skyIdx = -1;
+    this._bgImg = null; // the painted backdrop image, once loaded
+    this._bgTinted = null; // the current sky's tinted backdrop texture
+    sc.background = this._skyGradient(0);
     sc.fog = new THREE.Fog(0xf6c8ea, 55, 175);
-    applyBackdrop(THREE, sc, this.base, 'bg_sky');
+    try {
+      new THREE.TextureLoader().load(`${(this.base || './').replace(/\/?$/, '/')}art/bg_sky.webp`, (tex) => {
+        this._bgImg = tex.image;
+        tex.dispose();
+        if (this._skyIdx >= 0) this._paintBackground(this._skyIdx); // repaint under the sky already on screen
+      }, undefined, () => { /* missing picture: the gradient stays, exactly as before */ });
+    } catch (_) { /* keep the gradient */ }
     this.cam = new THREE.PerspectiveCamera(62, 1, 0.1, 260);
-    sc.add(new THREE.HemisphereLight(0xfff4ff, 0xc8a8f0, 1.25));
-    const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+    this.hemi = new THREE.HemisphereLight(0xfff4ff, 0xc8a8f0, 1.25);
+    sc.add(this.hemi);
+    const sun = this.sun = new THREE.DirectionalLight(0xffffff, 1.2);
     sun.position.set(-6, 14, 8);
     sc.add(sun);
     // shared geometry and materials
@@ -243,6 +258,7 @@ class Game {
       red: M(0xe83a4a), blue: M(0x4a8aff), skin: M(0xffd0a8), hair: M(0x6a3a22), orange: M(0xff8a2a), cloth: M(0x3a78e8), shoe: M(0xfff0d8),
       wind: new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55, depthWrite: false }),
     };
+    this._tileBase = PASTEL.map((c) => new THREE.Color(c)); // multiplied by the sky's ground tint in _applySky
     this.spriteMat = {};
     for (const k of ['coin', 'shield', 'magnet', 'slow']) this.spriteMat[k] = new THREE.SpriteMaterial({ map: iconTex(k), transparent: true, depthWrite: false, fog: false });
     this.pops = []; // collected sprites flying up and fading
@@ -381,6 +397,62 @@ class Game {
     }
   }
 
+  /** The cached gradient texture for a sky index (painted once per sky, ever). */
+  _skyGradient(idx) {
+    let tx = this._skyTexCache.get(idx);
+    if (!tx) { tx = skyTex(paletteOf(idx + 1)); this._skyTexCache.set(idx, tx); }
+    return tx;
+  }
+
+  /** Repaint the scene background for a sky: the painted backdrop multiplied
+   *  by the sky's tint (plus a whisper of its gradient), or — until the
+   *  picture arrives / if it is missing — the sky's own gradient. The old
+   *  tinted texture is disposed; at most one tinted backdrop exists. */
+  _paintBackground(idx) {
+    const pal = paletteOf(idx + 1);
+    if (!this._bgImg) { this.scene.background = this._skyGradient(idx); return; }
+    const img = this._bgImg;
+    const scale = Math.min(1, 1024 / (img.width || 1024));
+    const c = document.createElement('canvas');
+    c.width = Math.max(2, Math.round((img.width || 1024) * scale));
+    c.height = Math.max(2, Math.round((img.height || 512) * scale));
+    const g = c.getContext('2d');
+    g.drawImage(img, 0, 0, c.width, c.height);
+    g.globalCompositeOperation = 'multiply';
+    g.fillStyle = pal.tint; g.fillRect(0, 0, c.width, c.height);
+    g.globalCompositeOperation = 'source-over';
+    const gr = g.createLinearGradient(0, 0, 0, c.height);
+    gr.addColorStop(0, pal.top); gr.addColorStop(1, pal.bottom);
+    g.globalAlpha = 0.16; g.fillStyle = gr; g.fillRect(0, 0, c.width, c.height);
+    g.globalAlpha = 1;
+    const tx = new THREE.CanvasTexture(c);
+    tx.colorSpace = THREE.SRGBColorSpace;
+    if (this._bgTinted) this._bgTinted.dispose();
+    this._bgTinted = tx;
+    this.scene.background = tx;
+  }
+
+  /** Put sky [n]'s palette on the scene (run start / menu only — never per
+   *  frame): background, fog, hemisphere + sun lights, cloud tint and the
+   *  track tiles' ground tint. Same clamping as the HUD sky name. */
+  _applySky(n) {
+    const idx = skyIndexOf(n);
+    const pal = paletteOf(n);
+    this._skyIdx = idx;
+    this._paintBackground(idx);
+    this.scene.fog.color.set(pal.fog);
+    this.hemi.color.set(pal.hemiSky);
+    this.hemi.groundColor.set(pal.hemiGround);
+    this.hemi.intensity = pal.hemiInt;
+    this.sun.color.set(pal.sun);
+    this.sun.intensity = pal.sunInt;
+    const cloud = new THREE.Color(pal.cloud);
+    for (const p of this.puffs) p.material.color.copy(cloud);
+    const ground = new THREE.Color(pal.ground);
+    this.mat.tiles.forEach((m, i) => m.color.copy(this._tileBase[i]).multiply(ground));
+    this.root.style.background = pal.bottom;
+  }
+
   // ---- layout and input ---------------------------------------------------------------------------------------------
 
   _resize() {
@@ -472,6 +544,7 @@ class Game {
     this.mode = 'menu';
     this.run = null;
     this.finish.visible = false;
+    this._applySky(Math.min(this.save.unlocked, LEVELS)); // the menu flies under the sky Play will start in
     this._resetWorld();
     this.sound.setMode('menu');
     this._clear();
@@ -509,10 +582,11 @@ class Game {
     this.jumpFrom = null;
     this.seenInput = false;
     this.lastLandSay = -9;
+    this._applySky(n);
     this._resetWorld();
     this.sound.setMode('play');
     this._buildHud();
-    this._say(`${t('level')} ${num(n)}`, 1.8, true);
+    this._say(`${t('level')} ${num(n)} · ${getLang() === 'en' ? skyOf(n).en : skyOf(n).ar}`, 1.8, true);
     const spec = this.run.spec;
     const tip = n === 1 ? t('dodge') : n === 2 ? t('slide') : n === 3 ? t('gaps') : n === 4 ? t('spikes') : n === 5 ? t('wind') : n === 6 ? t('wall') : '';
     if (tip) setTimeout(() => this.mode === 'play' && this._say(tip, 2.4), 1900);
@@ -533,7 +607,7 @@ class Game {
         h('button', { class: 'cd-round', 'aria-label': t('pause'), onclick: () => this._pause() }, '⏸'),
         h('div', { class: 'cd-prog' }, this.hud.bar, h('i', {}, '🏆')),
         this._soundBtn()),
-      h('div', { class: 'cd-lvl' }, `${t('level').toUpperCase()} ${num(this.n)}`),
+      h('div', { class: 'cd-lvl' }, `${t('level').toUpperCase()} ${num(this.n)} · ${getLang() === 'en' ? skyOf(this.n).en : skyOf(this.n).ar}`),
       h('div', { class: 'cd-row2' }, this.hud.hearts, h('div', { class: 'cd-coins' }, h('i', { class: 'cd-coin' }), this.hud.coins)),
       this.hud.pw, this.sayEl, this.handEl,
     );
@@ -822,6 +896,9 @@ class Game {
     if (this.ro) this.ro.disconnect();
     document.removeEventListener('visibilitychange', this._onVis);
     window.removeEventListener('keydown', this._onKey);
+    for (const tx of this._skyTexCache.values()) tx.dispose();
+    this._skyTexCache.clear();
+    if (this._bgTinted) { this._bgTinted.dispose(); this._bgTinted = null; }
     this.renderer.dispose();
     try { this.renderer.forceContextLoss(); } catch (_) { /* already gone */ } // free the GL context now (phones allow only a few)
     this.root.remove();

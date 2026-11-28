@@ -6,6 +6,25 @@
 // 3 kinds, so clearing the pile from the top never needs more than 6 tray slots. `solve()` proves it by search.
 
 export const LEVELS = 36;
+
+// ---------- chapters (Phase 2E Batch F: presentation + framing only) ----------
+// The 36 generated levels are grouped into 4 chapters of 9 trays. A chapter changes
+// the BOARD the sweets sit on (board id -> look in sprites.js) and the framing in
+// the UI — never the level data: makeLevel(n) output is identical with or without
+// chapters, and saves (stars/unlocked) are untouched.
+export const CHAPTER_SIZE = 9;
+export const CHAPTERS = [
+  { id: 1, board: 'shop', name: ['دكان الحلواني', 'The Sweet Shop'], from: 1, to: 9 },
+  { id: 2, board: 'ramadan', name: ['ليالي رمضان', 'Ramadan Nights'], from: 10, to: 18 },
+  { id: 3, board: 'mawled', name: ['نصبة المولد', 'The Mawled Stall'], from: 19, to: 27 },
+  { id: 4, board: 'picnic', name: ['نزهة العيلة', 'The Family Picnic'], from: 28, to: 36 },
+];
+
+/** The chapter that owns level n (n is clamped to 1..LEVELS, like levelParams). */
+export function chapterOf(n) {
+  const lv = Math.max(1, Math.min(LEVELS, Math.floor(n) || 1));
+  return CHAPTERS.find((c) => lv >= c.from && lv <= c.to) || CHAPTERS[0];
+}
 export const TRAY_CAP = 7;
 export const MAX_CAP = 8;
 export const KIND_COUNT = 12;

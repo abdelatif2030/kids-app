@@ -38,3 +38,109 @@ Video: `20261118-1756-33.2358567.mp4` (322x624 portrait screen recording, 3.5 mi
 - The original restarts the whole run after a loss; ours retries the floor (kinder for children, intended).
 - The original has bombs, a "level up" armor change for the hero (gold sword after the troll) and an endless "the spire rises higher" loop; ours has 3 fixed chapters and a "Chapter complete" screen with Replay (as the brief says).
 - Not tested on a real phone; sound not heard by a person. `docs/HERO_TOWER.md` still says the crystal multiplies (outside the allowed files; update it to "gold coin multiplies, crystal adds").
+
+---
+
+## Phase 2D — Egypt anchor: «برج القلعة / Citadel Tower» (2026-11-27)
+
+**What was wrong:** the game was a generic fantasy tower; worse, chapters
+4–6 repeated chapters 1–3's names exactly ("same looks, bigger numbers" —
+the code comment admitted it), so half the game had no identity at all.
+
+**What changed (names only — ids, floors, numbers, saves untouched):**
+- Title: «برج الأبطال / Hero Tower» → **«برج القلعة / Citadel Tower»**.
+- Every chapter now carries its own real Egyptian tower via a new `place`
+  key on CHAPTERS (the visual `theme` is unchanged): 1 Salah El-Din Citadel
+  (castle), 2 Saint Catherine Towers (ice), 3 Pharos Lighthouse (fire — the
+  lighthouse flame), 4 The Nubian Fortress (castle), 5 Shali Fortress, Siwa
+  (ice), 6 Philae Island Tower (fire). Chapter buttons and the win card now
+  show the place name, so no two chapters share a name.
+
+**Kind rules:** already satisfied (a stronger foe only bonks gently, the
+floor retries with its start power, nothing is lost) — verified in sim.
+
+**Tested:** `npm test` 20/20 (+1 anchor test: six distinct places, ids and
+floor counts unchanged); build green; real click-flow verify PASS — menu
+shows the new title and all six place names, Play reaches floor 1/12,
+frames at 844×390 / 1024×768 / 1366×1024, 0 page errors.
+
+**Not done (Batch F):** the plan's visible tower map (floors lighting up)
+and two genuinely new-look chapters are not built; the six places are
+carried by names on the existing three looks. ≈60 min target: 6 chapters ×
+13 floors already exist structurally. Not tested on a real device.
+
+---
+
+## Phase 2E — Batch F: two new-look chapters + the visible tower map (2026-11-27)
+
+**Chapters/floors:** 6 chapters × 13 floors (72 + 6 roofs counted in the 13)
+→ **8 chapters × 13 floors = 104 floors**. Chapters 1–6 untouched (ids,
+themes, places, start/ratio/mulMax, save semantics). Two new chapters were
+appended, continuing the difficulty curve of chapters 5–6:
+
+- **Chapter 7 — «قلعة قايتباي في إسكندرية / Qaitbey Citadel, Alexandria»**,
+  place `qaitbey`, NEW theme `sea`: start 68, ratio 0.91, mulMax 4.
+- **Chapter 8 — «باب زويلة في القاهرة / Bab Zuweila, Cairo»**, place
+  `zweila`, NEW theme `dawn`: start 78, ratio 0.92, mulMax 4.
+
+**The two new themes (art.js, code-painted, no external images):**
+- `sea`: teal sky gradient; `paintSky` draws the Mediterranean into the
+  lower sky — a bright horizon line, a layered sea gradient, white wave
+  crests and gull silhouettes. Rooms are pale sandstone with a round
+  porthole window (waves inside it) and wave trim on the floor boards;
+  the tower base gets foam lapping at the stone; the ground strip is sea
+  water. Menu icon ⚓, teal segment gradient.
+- `dawn`: rose-gold sky gradient; `paintSky` draws a big low sun with a
+  warm halo and an old-Cairo skyline of domes and two minarets silhouetted
+  against it. Rooms are warm rose sandstone with a hanging lantern (lit,
+  gently flickering) and a small crescent beside the window. Menu icon 🌅,
+  rose-gold segment gradient.
+Both run on the same cached `paintSky` path as the old themes (painted
+once per size/theme; a missing `ART['sky_sea'/'sky_dawn']` image simply
+falls through to the procedural painting, exactly like the existing
+themes). No per-frame painting was added — the room accents ride the
+existing `drawRoom`/`drawBase` calls.
+
+**The visible tower map (menu):** the old horizontal chapter-button row
+is now the tower itself. The chapter selector is a vertical stack of
+tapered segments (chapter 1 at the base, each higher chapter 3% narrower)
+topped by a roof triangle and the dragon. Progress comes only from the
+existing save (`normalizeSave`: `stars` per chapter + `unlocked`):
+a won chapter's segment lights up with a gold border/glow and shows its
+stars; the next climbable chapter (id === unlocked, no stars yet) pulses;
+locked chapters stay grey with 🔒. The segments ARE the chapter buttons —
+same click behaviour, same lock sound. Per-floor progress does not exist
+in the save, so the map is honestly per-chapter. Eyeballed at 844×390,
+1024×768 and 1366×1024 with a mid-progress save (1–6 won, 7 current,
+8 locked): all 8 segments + roof + Play fit at 844×390 with no scrolling,
+lit/current/locked states are unmistakable at all three sizes. Sea and
+dawn gameplay frames were also eyeballed: both looks are unmistakably
+their own, not castle/ice/fire recolours.
+
+**Playtime estimate (honest):** measured from the sim — a planned-order
+clear averages ≈68 taps per chapter (10 seeds/chapter), 409 taps for 6
+chapters → 547 taps for 8. At ~0.6 s of dash/strike animation plus a
+child's 2–4 s think-and-tap per action and ~1.5 s per ladder climb,
+flawless play is ≈20–33 min before → ≈26–45 min after. With normal child
+pacing (wrong taps, gentle retries, replays) the full 8-chapter climb
+lands around the plan's ≈60 min of engagement; the flawless-run number
+itself is below 60 and is stated as such.
+
+**Kind rules:** untouched — gentle bonk, floor retries with start power,
+nothing lost; no timers/lives/stars changes.
+
+**Tested:** `npm test` **28/28** (was 20; +4 new Phase 2E tests pinning
+CHAPTERS.length === 8, distinct new theme keys/places, chapters 7–8 build
++ robot climb, the full 1→8 unlock chain, and 6-chapter save migration —
+plus the existing per-chapter solver tests now also cover 7–8 in normal
+and easy). `npm run build` green, game.js **141.1 KB**. Official harness
+`phase2e_verify.mjs hero_tower` → **PASS, 0 page errors** (real menu
+clicks, Play reaches floor 1/12). Scripted sim playthrough completes
+chapters 1→8 in order, the unlock chain reaching the chapter-8 roof.
+
+**Not tested:** on a real device; the new chapters played by a human
+end-to-end in the browser (sim robot + first-floor frames only); sound
+not heard. No new spoken lines were needed, so nothing for Instinct.
+
+**Owner question:** none blocking. Note the win card's "all chapters
+done" line now triggers after chapter 8, as derived from CHAPTERS.length.

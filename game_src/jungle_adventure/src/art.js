@@ -8,6 +8,7 @@ export const THEMES = {
   jungle: { body: '#4a3020', shade: '#3a2418', speck: '#2e1c12', top: '#3f8a2c', topLight: '#5aa83a', topShade: '#2c6a20', edge: '#24160c', ledge: '#6a4a2a', ledgeShade: '#4a321c' }, // dark soil under a grass strip, like the video
   ruins: { body: '#7f8f7c', shade: '#61715f', speck: '#566554', top: '#5f9a3a', topLight: '#86c04f', topShade: '#43772a', edge: '#3d4a3b', ledge: '#9aa894', ledgeShade: '#73826f', brick: true },
   temple: { body: '#c4a067', shade: '#a07f4b', speck: '#8d6e3f', top: '#7aa64a', topLight: '#a3cc63', topShade: '#58802f', edge: '#6e5530', ledge: '#d8b77a', ledgeShade: '#ad8c55', brick: true, sun: true },
+  oasis: { body: '#d9b878', shade: '#bd9a58', speck: '#a8853f', top: '#4d9a3a', topLight: '#6cb84e', topShade: '#38702a', edge: '#8a6a34', ledge: '#caa25e', ledgeShade: '#a37f42' }, // Siwa: golden sand under a palm-green strip (Phase 2E)
 };
 
 function line(ctx, w = 0.06) {

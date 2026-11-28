@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Run, ARENA, BEAR_R, KINDS, MIN_WARN, normalizeSave, buyUpgrade, applyResult, upgradeCost } from '../src/sim.js';
+import { Run, ARENA, BEAR_R, KINDS, MIN_WARN, normalizeSave, buyUpgrade, applyResult, upgradeCost, STAGES, STAGE_PLACES, BOSSES, placeOf, bossOf, RECIPES, recipeOf } from '../src/sim.js';
 
 // A simple robot player: dodges telegraphed hazards, kites the nearest enemy, picks up mints, uses the super.
 export function robot(run) {
@@ -198,20 +198,86 @@ test('bears stay inside the arena', () => {
   assert.ok(BEAR_R > 0);
 });
 
-test('six stages: every stage is winnable by the robot with upgrades that grow, later stages are tougher', () => {
-  const ups = [{ damage: 2, health: 2, charge: 2 }, { damage: 2, health: 2, charge: 2 }, { damage: 3, health: 3, charge: 3 }, { damage: 3, health: 3, charge: 3 }, { damage: 4, health: 4, charge: 4 }, { damage: 5, health: 5, charge: 5 }];
+test('ten stages: every stage is winnable by the robot with upgrades that grow, later stages are tougher', () => {
+  const ups = [{ damage: 2, health: 2, charge: 2 }, { damage: 2, health: 2, charge: 2 }, { damage: 3, health: 3, charge: 3 }, { damage: 3, health: 3, charge: 3 }, { damage: 4, health: 4, charge: 4 }, { damage: 5, health: 5, charge: 5 }, { damage: 5, health: 5, charge: 5 }, { damage: 5, health: 5, charge: 5 }, { damage: 5, health: 5, charge: 5 }, { damage: 5, health: 5, charge: 5 }];
   let prevBoss = 0;
-  for (let st = 0; st < 6; st++) {
+  for (let st = 0; st < STAGES; st++) {
     let won = 0;
-    for (let seed = 1; seed <= 6; seed++) { const r = new Run({ seed, upgrades: ups[st], stage: st }); while (!r.over && r.t < 400) r.step(1 / 60, robot(r)); if (r.state === 'won') won++; }
+    for (let seed = 1; seed <= 6; seed++) { const r = new Run({ seed, upgrades: ups[st], stage: st }); while (!r.over && r.t < 700) r.step(1 / 60, robot(r)); if (r.state === 'won') won++; }
     console.log(`stage ${st + 1}: won ${won}/6`);
     assert.ok(won >= 3, `stage ${st + 1} won ${won}/6`);
     const b = new Run({ seed: 1, stage: st }); b._spawnBoss(); assert.ok(b.boss.maxHp > prevBoss); prevBoss = b.boss.maxHp;
   }
 });
-test('stages open one by one', () => {
+test('stages open one by one, all the way to stage 10', () => {
   let s = normalizeSave(null); assert.equal(s.stage, 0);
   s = applyResult(s, { win: true, stars: 2, candies: 5, bonus: 0, stage: 0 }); assert.equal(s.stage, 1);
   s = applyResult(s, { win: true, stars: 2, candies: 5, bonus: 0, stage: 0 }); assert.equal(s.stage, 1, 'replaying an old stage opens nothing new');
-  assert.equal(normalizeSave({ stage: 99 }).stage, 5);
+  assert.equal(normalizeSave({ stage: 99 }).stage, 9);
+  // full unlock chain: winning the highest opened stage opens the next, up to the finale
+  let c = normalizeSave(null);
+  for (let st = 0; st < STAGES; st++) { assert.equal(c.stage, st); c = applyResult(c, { win: true, stars: 3, candies: 5, bonus: 0, stage: st }); }
+  assert.equal(c.stage, STAGES - 1, 'the chain stops at the finale');
+  assert.deepEqual(c.recipes, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'a full campaign collects every recipe');
+});
+
+test('Sweet Shop anchor: ten Egyptian places and a rotating boss roster', () => {
+  assert.equal(STAGES, 10);
+  assert.equal(STAGE_PLACES.length, STAGES);
+  assert.equal(BOSSES.length, STAGES);
+  for (let st = 0; st < STAGES; st++) { assert.ok(placeOf(st).ar && placeOf(st).en, `place ${st + 1}`); assert.ok(bossOf(st).ar && bossOf(st).en, `boss ${st + 1}`); }
+  assert.equal(placeOf(1).ar, 'خيمة رمضان');
+  assert.equal(placeOf(4).en, 'Eid Night');
+  assert.equal(placeOf(9).en, 'The Grand Eid Banquet');
+  // three distinct bosses rotate across stages 1-9 (was: King Donut x6); the finale is all three together
+  assert.deepEqual([...new Set(BOSSES.slice(0, 9).map((b) => b.en))], ['Date King', 'Honey Queen', 'Kunafa Giant']);
+  assert.equal(bossOf(9).en, 'The Three Sweet Champions');
+  assert.equal(bossOf(99).en, 'The Three Sweet Champions'); // clamped, never undefined
+  assert.equal(placeOf(-3).en, 'The Sweet Shop'); // clamped low too
+});
+
+test('wave count grows with the tour: 2 waves, then a third, a fourth, and the richest finale opening', () => {
+  const waves = (st) => new Run({ seed: 1, stage: st }).waves.length;
+  assert.equal(waves(0), 2);
+  assert.equal(waves(1), 2);
+  assert.equal(waves(2), 3);
+  assert.equal(waves(5), 3);
+  assert.equal(waves(6), 4);
+  assert.equal(waves(8), 4);
+  assert.equal(waves(9), 5);
+  // the finale opening is the richest single wave of the game
+  const finale = new Run({ seed: 1, stage: 9 }).waves[0];
+  const finaleCount = finale.reduce((n, [, , c]) => n + c, 0);
+  for (let st = 0; st < 9; st++) for (const w of new Run({ seed: 1, stage: st }).waves) assert.ok(w.reduce((n, [, , c]) => n + c, 0) <= finaleCount, `stage ${st + 1} wave richer than the finale opening`);
+});
+
+test('recipe cards: one readable card per stage, collected on a win, never duplicated', () => {
+  assert.equal(RECIPES.length, STAGES);
+  for (let st = 0; st < STAGES; st++) { const r = recipeOf(st); assert.ok(r.ar && r.en && r.ingAr && r.ingEn, `recipe ${st + 1}`); }
+  assert.equal(recipeOf(0).en, 'Kunafa');
+  assert.equal(recipeOf(99).en, 'The Grand Sweet Feast'); // clamped
+  let s = normalizeSave(null);
+  assert.deepEqual(s.recipes, []);
+  s = applyResult(s, { win: true, stars: 2, candies: 5, bonus: 0, stage: 0 });
+  assert.deepEqual(s.recipes, [0], 'winning stage 1 collects recipe 1');
+  s = applyResult(s, { win: true, stars: 3, candies: 5, bonus: 0, stage: 0 });
+  assert.deepEqual(s.recipes, [0], 'replaying a stage adds no duplicate');
+  s = applyResult(s, { win: false, stars: 0, candies: 5, bonus: 0, stage: 1 });
+  assert.deepEqual(s.recipes, [0], 'a lost run collects nothing');
+  s = applyResult(s, { win: true, stars: 1, candies: 5, bonus: 0, stage: 4 });
+  assert.deepEqual(s.recipes, [0, 4], 'recipes stay sorted by stage');
+});
+
+test('save migration: a six-stage save opens safely in the ten-stage game', () => {
+  // a finished old save: stage 5 was the old finale, no recipes field existed
+  const old = normalizeSave({ candies: 500, upgrades: { damage: 5, health: 5, charge: 5 }, bestStars: 3, stage: 5, wins: 9, runs: 12 });
+  assert.equal(old.stage, 5, 'the old highest opened stage is preserved');
+  assert.deepEqual(old.recipes, [0, 1, 2, 3, 4], 'recipes derive from the stages already beaten');
+  const wonFinale = applyResult(old, { win: true, stars: 3, candies: 5, bonus: 0, stage: 5 });
+  assert.equal(wonFinale.stage, 6, 'the tour continues past the old finale');
+  assert.ok(wonFinale.recipes.includes(5));
+  // garbage in the recipes field can never crash or poison the save
+  assert.deepEqual(normalizeSave({ recipes: 'junk' }).recipes, []);
+  assert.deepEqual(normalizeSave({ stage: 2, recipes: [3, 3, 99, -1, 'x', 0] }).recipes, [0, 3]);
+  assert.deepEqual(normalizeSave(null).recipes, []);
 });

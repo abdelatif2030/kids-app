@@ -41,6 +41,9 @@ export const THEMES = {
   castle: { sky: ['#3a2a78', '#b05a9a', '#ffb878'], brick: '#c08a64', brick2: '#a87050', wood: '#8a5a34', glow: '#ffd27a', far: '#5a3a8a' },
   ice: { sky: ['#4a78c8', '#9ad0f0', '#eaf8ff'], brick: '#a8c0d8', brick2: '#8aa8c4', wood: '#6a7a98', glow: '#bff0ff', far: '#7a98c8' },
   fire: { sky: ['#2a1030', '#a02838', '#ff9a40'], brick: '#8a4a48', brick2: '#6e3a3a', wood: '#5a3028', glow: '#ff9a3a', far: '#5a1a30' },
+  // Phase 2E new looks (not recolours): Qaitbey by the sea, and Bab Zuweila at dawn.
+  sea: { sky: ['#0e5a74', '#2ea8bc', '#bfeee2'], brick: '#cbb086', brick2: '#a98f62', wood: '#4a6a74', glow: '#ffe9a3', far: '#1d7a90' },
+  dawn: { sky: ['#4a2a6a', '#e87a6a', '#ffd9a0'], brick: '#d9a878', brick2: '#b57f52', wood: '#6e4030', glow: '#ffd98a', far: '#7a4460' },
 };
 
 /** The sky behind the tower (painted once per size and theme). [h] is the height of the world the camera has risen (0 = the ground). */
@@ -56,6 +59,57 @@ export function paintSky(w, h, theme) {
   if (pic) { const k = Math.max(w / pic.naturalWidth, h / pic.naturalHeight); const pw = pic.naturalWidth * k, ph = pic.naturalHeight * k; g.drawImage(pic, (w - pw) / 2, (h - ph) / 2, pw, ph); }
   // a big soft sun / moon and far hills
   g.fillStyle = 'rgba(255,255,255,0.18)'; g.beginPath(); g.arc(w * 0.78, h * 0.3, h * 0.13, 0, TAU); g.fill();
+  if (theme === 'sea') {
+    // Qaitbey: the Mediterranean takes the lower sky — a bright horizon band,
+    // layered waves with white crests, and gulls wheeling over the water.
+    const hy = h * 0.66;
+    const sg = g.createLinearGradient(0, hy, 0, h);
+    sg.addColorStop(0, '#3ec8d8'); sg.addColorStop(0.25, '#1d96b4'); sg.addColorStop(1, '#0e5a74');
+    g.fillStyle = sg; g.fillRect(0, hy, w, h - hy);
+    g.fillStyle = 'rgba(255,255,255,0.55)'; g.fillRect(0, hy, w, Math.max(2, h * 0.008));
+    g.strokeStyle = 'rgba(255,255,255,0.5)'; g.lineWidth = Math.max(1.5, h * 0.006); g.lineCap = 'round';
+    for (let row = 0; row < 4; row++) {
+      const wy = hy + (h - hy) * (0.22 + row * 0.22);
+      const len = w * 0.05, step = w * 0.11, off = (row % 2) * step * 0.5;
+      g.beginPath();
+      for (let x = -step + off; x < w + step; x += step) { g.moveTo(x, wy); g.quadraticCurveTo(x + len * 0.5, wy - h * 0.018, x + len, wy); }
+      g.stroke();
+    }
+    g.strokeStyle = 'rgba(20,60,80,0.75)'; g.lineWidth = Math.max(1.5, h * 0.007);
+    for (const [gx, gy, gs] of [[0.16, 0.2, 1], [0.3, 0.13, 0.7], [0.6, 0.24, 0.85], [0.86, 0.12, 0.6]]) {
+      const s = h * 0.035 * gs;
+      g.beginPath();
+      g.moveTo(gx * w - s, gy * h); g.quadraticCurveTo(gx * w - s * 0.4, gy * h - s * 0.7, gx * w, gy * h);
+      g.quadraticCurveTo(gx * w + s * 0.4, gy * h - s * 0.7, gx * w + s, gy * h);
+      g.stroke();
+    }
+    return c;
+  }
+  if (theme === 'dawn') {
+    // Bab Zuweila at dawn: a big rose-gold sun rising low, and the old-Cairo
+    // skyline — domes and minarets — silhouetted against it.
+    const sx = w * 0.5, sy = h * 0.72, sr = h * 0.3;
+    const halo = g.createRadialGradient(sx, sy, sr * 0.2, sx, sy, sr * 2.1);
+    halo.addColorStop(0, 'rgba(255,190,110,0.55)'); halo.addColorStop(1, 'rgba(255,190,110,0)');
+    g.fillStyle = halo; g.fillRect(0, 0, w, h);
+    const sun = g.createLinearGradient(0, sy - sr, 0, sy + sr);
+    sun.addColorStop(0, '#ffe9b0'); sun.addColorStop(0.6, '#ffb37a'); sun.addColorStop(1, '#f08a6a');
+    g.fillStyle = sun; g.beginPath(); g.arc(sx, sy, sr, 0, TAU); g.fill();
+    g.fillStyle = T.far;
+    g.beginPath(); g.moveTo(0, h); g.lineTo(0, h * 0.8);
+    // a row of domes and two minarets along the horizon
+    const base = h * 0.86;
+    for (let x = 0; x < w; x += w / 9) { g.lineTo(x, base + h * 0.02 * Math.sin(x * 0.02)); g.arc(x + w / 18, base, w / 22, Math.PI, 0); }
+    g.lineTo(w, h * 0.8); g.lineTo(w, h); g.closePath(); g.fill();
+    g.fillStyle = T.far;
+    for (const mx of [0.18, 0.82]) { // minaret shafts with a balcony and a pointed cap
+      const mw = w * 0.022, top = h * 0.34;
+      g.fillRect(w * mx - mw / 2, top + h * 0.1, mw, base - top);
+      g.fillRect(w * mx - mw * 0.95, h * 0.52, mw * 1.9, h * 0.025);
+      poly(g, [[w * mx - mw * 0.8, top + h * 0.1], [w * mx, top], [w * mx + mw * 0.8, top + h * 0.1]], T.far);
+    }
+    return c;
+  }
   g.fillStyle = T.far;
   g.beginPath(); g.moveTo(0, h);
   for (let x = 0; x <= w; x += w / 14) g.lineTo(x, h * (0.78 + 0.05 * Math.sin(x * 0.011) + 0.03 * Math.sin(x * 0.027)));
@@ -106,6 +160,29 @@ export function drawRoom(g, x, y, w, h, theme, n, time, exitSide, entrySide) {
   g.fillStyle = 'rgba(255,220,170,0.25)'; g.fillRect(x, y + h * 0.9, w, h * 0.02);
   g.strokeStyle = 'rgba(0,0,0,0.25)'; g.lineWidth = 1;
   for (let bx = x; bx < x + w; bx += h * 0.5) { g.beginPath(); g.moveTo(bx, y + h * 0.9); g.lineTo(bx, y + h); g.stroke(); }
+  // theme dressing: sea rooms get a round porthole and wave trim; dawn rooms
+  // get a hanging lantern and a small crescent over the window
+  if (theme === 'sea') {
+    g.beginPath(); g.arc(x + w * 0.5, wy + h * 0.1, h * 0.21, 0, TAU); g.fillStyle = '#2ea8bc'; g.fill();
+    g.lineWidth = h * 0.035; g.strokeStyle = '#8a6a3a'; g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,0.75)'; g.lineWidth = h * 0.016; g.lineCap = 'round';
+    g.beginPath();
+    for (let px = x + w * 0.36; px < x + w * 0.6; px += h * 0.09) { g.moveTo(px, wy + h * 0.16); g.quadraticCurveTo(px + h * 0.045, wy + h * 0.1, px + h * 0.09, wy + h * 0.16); }
+    g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,0.55)'; g.lineWidth = h * 0.014;
+    g.beginPath();
+    for (let px = x + w * 0.06; px < x + w * 0.9; px += h * 0.13) { g.moveTo(px, y + h * 0.965); g.quadraticCurveTo(px + h * 0.06, y + h * 0.92, px + h * 0.12, y + h * 0.965); }
+    g.stroke();
+  } else if (theme === 'dawn') {
+    const lx = x + w * 0.5, ly = y + h * 0.06;
+    g.strokeStyle = '#5a3423'; g.lineWidth = h * 0.014; g.beginPath(); g.moveTo(lx, y); g.lineTo(lx, ly); g.stroke();
+    poly(g, [[lx - h * 0.05, ly + h * 0.05], [lx, ly], [lx + h * 0.05, ly + h * 0.05], [lx + h * 0.035, ly + h * 0.15], [lx - h * 0.035, ly + h * 0.15]], '#e8a020', h * 0.012);
+    const fl = 1 + 0.1 * Math.sin(time * 7 + n);
+    ell(g, lx, ly + h * 0.1, h * 0.02 * fl, h * 0.028 * fl, '#fff2a0');
+    g.fillStyle = 'rgba(255,190,100,0.14)'; g.beginPath(); g.arc(lx, ly + h * 0.1, h * 0.22, 0, TAU); g.fill();
+    g.strokeStyle = '#ffd98a'; g.lineWidth = h * 0.02; g.lineCap = 'round';
+    g.beginPath(); g.arc(wx + h * 0.3, wy - h * 0.02, h * 0.07, Math.PI * 0.3, Math.PI * 1.55); g.stroke();
+  }
   // the stone sides of the tower
   g.fillStyle = T.brick2; g.fillRect(x - h * 0.06, y, h * 0.06, h); g.fillRect(x + w, y, h * 0.06, h);
   const ladder = (lx, top, bottom) => {
@@ -133,6 +210,12 @@ export function drawBase(g, x, y, w, h, theme) {
   g.fillStyle = '#6a3a22'; g.beginPath(); g.moveTo(dx - dw / 2, y + h); g.lineTo(dx - dw / 2, y + h * 0.4); g.arc(dx, y + h * 0.4, dw / 2, Math.PI, 0); g.lineTo(dx + dw / 2, y + h); g.closePath(); g.fill();
   g.lineWidth = h * 0.06; g.strokeStyle = '#3a2418'; g.stroke();
   g.strokeStyle = '#3a2418'; g.lineWidth = h * 0.04; g.beginPath(); g.moveTo(dx, y + h * 0.1); g.lineTo(dx, y + h); g.stroke();
+  if (theme === 'sea') { // Qaitbey stands in the water: foam lapping at the base
+    g.strokeStyle = 'rgba(255,255,255,0.8)'; g.lineWidth = Math.max(1.5, h * 0.05); g.lineCap = 'round';
+    g.beginPath();
+    for (let px = x - h * 0.2; px < x + w + h * 0.2; px += h * 0.34) { g.moveTo(px, y + h * 0.94); g.quadraticCurveTo(px + h * 0.17, y + h * 0.8, px + h * 0.32, y + h * 0.94); }
+    g.stroke();
+  }
 }
 
 // ---- the little knight -----------------------------------------------------------------------------------------------

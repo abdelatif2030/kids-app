@@ -19,21 +19,21 @@ function pic(g, img, R) {
 }
 
 const S = {
-  title: ['معركة حلبة الجليد', 'Ice Rink Brawl'], play: ['يلا نلعب', 'Play'], levels: ['المراحل', 'Levels'], heroes: ['الأبطال', 'Heroes'],
+  title: ['حلبة شرم', 'Sharm Ice Rink'], play: ['يلا نلعب', 'Play'], levels: ['المراحل', 'Levels'], heroes: ['الأبطال', 'Heroes'],
   exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], resume: ['كمّل', 'Resume'], restart: ['من الأول', 'Restart'], next: ['المرحلة الجاية', 'Next level'],
-  retry: ['جرّب تاني', 'Try again'], level: ['المرحلة', 'Level'], yourTurn: ['دورك!', 'Your turn!'], foeTurn: ['دور الغيلان!', 'Goblins move!'],
-  won: ['كسبت!', 'You won!'], lost: ['الغيلان كسبوا', 'The goblins won'], lostText: ['أبطالك محتاجين راحة. جرّب تاني!', 'Your heroes need a rest. Try again!'],
+  retry: ['جرّب تاني', 'Try again'], level: ['المرحلة', 'Level'], yourTurn: ['دورك!', 'Your turn!'], foeTurn: ['دور الفريق التاني!', 'The other team moves!'],
+  won: ['كسبت!', 'You won!'], lost: ['الفريق التاني كسب', 'The other team won'], lostText: ['أبطالك محتاجين راحة. جرّب تاني!', 'Your heroes need a rest. Try again!'],
   coins: ['عملات', 'Coins'], howTo: ['اسحب البطل لورا وسيّبه', 'Drag a hero back and let go'], sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
-  penguin: ['بنجو', 'Pengo'], fox: ['لهب', 'Ember'], bear: ['دبدوب', 'Bruno'],
+  penguin: ['لولو', 'Lulu'], fox: ['لهب', 'Ember'], bear: ['دبدوب', 'Bruno'],
   spin: ['دوّامة الجليد', 'Icy Spin'], flame: ['اندفاعة اللهب', 'Flame Dash'], slam: ['ضربة الدب', 'Bear Slam'],
-  spin_d: ['موجة تدفع الغيلان بعيد', 'A wave that knocks goblins back'], flame_d: ['تخترق الغيلان وتحرقهم', 'Pierces and burns goblins'], slam_d: ['ضربة تشلّ الغيلان اللي حواليه', 'Stuns goblins around it'],
+  spin_d: ['موجة تدفع المنافسين بعيد', 'A wave that knocks rivals back'], flame_d: ['تعدّي بين المنافسين وتدوّخهم', 'Dashes through rivals and dazzles them'], slam_d: ['ضربة تدوّخ المنافسين اللي حواليه', 'Stuns rivals around it'],
   hp: ['صحة', 'Health'], pow: ['قوة', 'Power'], max: ['أقصى', 'Max'], ready: ['جاهز!', 'Ready!'], gala: ['روح المهرجان', 'Gala Spirit'], turnw: ['الدور', 'Turn'],
   p_shield: ['حائط الدرع', 'Shield Wall'], p_shield_d: ['بياخد ضرر أقل بنسبة ٣٠٪.', 'Takes 30% less damage.'], p_ricochet: ['الارتداد', 'Ricochet'], p_ricochet_d: ['كل ارتداد من الحيطة قبل الضربة بيزوّد الضرر ٤٠٪.', 'Every wall bounce before a hit adds +40% damage.'], p_mend: ['وهج الشفاء', 'Mending Glow'], p_mend_d: ['بتعالج كل صاحب بتلمسه.', 'Heals every ally she touches.'], team: ['الفريق', 'Team'], ko: ['نايم', 'KO'],
   ff: ['اضغط للتسريع', 'Tap to speed up'], pause: ['وقفة', 'Paused'], continue: ['كمّل اللعب', 'Continue'], upgrades: ['تقوية الأبطال', 'Upgrade heroes'],
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'], boss: ['زعيم!', 'Boss!'], special: ['قدرة خاصة', 'Special'],
 };
-const NAMES = ['بداية الثلج', 'صحبة اتنين', 'حرب كور الثلج', 'بركة الثلج الطري', 'حيطان الجليد', 'الزعيم جرومبو', 'مشكلة كبيرة', 'ملجأ المعالج', 'الوحشين الكبار', 'سرب العفاريت', 'معسكر الغيلان', 'ملك الغيلان'];
-const NAMES_EN = ['Snow Start', 'Two Friends', 'Snowball Fight', 'Slush Pool', 'Ice Walls', 'Chief Grumbo', 'Big Trouble', 'Healer Hideout', 'Double Brutes', 'Imp Swarm', 'Goblin Camp', 'Goblin King'];
+const NAMES = ['بداية في شرم', 'أصحاب الحلبة', 'ماتش كور الثلج', 'بركة الثلج الطري', 'حيطان مول مصر', 'كابتن فريق الثلج', 'الماتش الكبير', 'استراحة المعالج', 'العملاقين', 'سرب الصغيرين', 'معسكر فريق الجليد', 'نهائي سانت كاترين', 'حلبة كورنيش إسكندرية', 'حلبة مول جنينة', 'كأس أبطال كاترين', 'عرض شرم للتزلج'];
+const NAMES_EN = ['Sharm Start', 'Rink Friends', 'Snowball Match', 'Slush Pool', 'Mall of Egypt Walls', 'Captain Snow', 'The Big Match', "Healers Rest", 'The Two Giants', 'The Little Swarm', 'Ice Team Camp', 'Catherine Final', 'Alexandria Corniche Rink', 'Genena Mall Rink', 'Catherine Champions Cup', 'Sharm Skating Show'];
 const I = makeI18n(S);
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
 const TAU = Math.PI * 2;
@@ -374,7 +374,7 @@ class Game {
     for (let i = 1; i <= LEVELS.length; i++) {
       const lock = i > this.save.unlocked; const st = this.save.stars[i] || 0;
       grid.append(h('button', { class: `ir-lv${lock ? ' lock' : ''}`, disabled: lock ? true : undefined, onclick: () => { this.sound.play('tap'); this.startLevel(i); } },
-        h('i', {}, lock ? '🔒' : LEVELS[i - 1].boss ? '👑' : I.num(i)), h('span', {}, lock ? '' : '⭐'.repeat(st) + '☆'.repeat(3 - st))));
+        h('i', {}, lock ? '🔒' : LEVELS[i - 1].boss ? '👑' : LEVELS[i - 1].show ? '🎉' : I.num(i)), h('span', {}, lock ? '' : '⭐'.repeat(st) + '☆'.repeat(3 - st))));
     }
     this.layer.append(h('div', { class: 'ir-dim' }, h('div', { class: 'ir-card' }, h('div', { class: 'ir-title' }, I.t('levels')), grid,
       h('button', { class: 'ir-btn dark', onclick: () => this.showMenu() }, I.t('menu')))));

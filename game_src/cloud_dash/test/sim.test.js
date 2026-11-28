@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Run, generateLevel, levelSpec, LEVELS, normalizeSave } from '../src/sim.js';
+import { Run, generateLevel, levelSpec, LEVELS, SKIES, skyOf, skyIndexOf, PALETTES, paletteOf, normalizeSave } from '../src/sim.js';
 
 /** A simple robot: looks ahead in its own lane; jumps over low hazards and gaps, slides under bars. */
 function bot(run, dt = 1 / 60, maxSec = 400) {
@@ -93,4 +93,58 @@ test('save normalising is safe', () => {
   assert.deepEqual(normalizeSave(null), { unlocked: 1, stars: {}, coins: 0, muted: false });
   assert.equal(normalizeSave({ unlocked: 99 }).unlocked, LEVELS);
   assert.equal(levelSpec(1, true).hearts, 5);
+});
+
+test('Phase 2E palettes: every sky has a complete, valid palette', () => {
+  assert.equal(PALETTES.length, LEVELS);
+  const HEX = /^#[0-9a-f]{6}$/i;
+  const fields = ['top', 'mid', 'bottom', 'fog', 'hemiSky', 'hemiGround', 'sun', 'cloud', 'tint', 'ground'];
+  for (const [i, p] of PALETTES.entries()) {
+    for (const f of fields) assert.ok(HEX.test(p[f] || ''), `sky ${i + 1} palette.${f} is a valid colour (got ${p[f]})`);
+    assert.ok(Number.isFinite(p.hemiInt) && p.hemiInt > 0, `sky ${i + 1} hemiInt`);
+    assert.ok(Number.isFinite(p.sunInt) && p.sunInt > 0, `sky ${i + 1} sunInt`);
+  }
+});
+
+test('Phase 2E palettes: pairwise distinct skies (no shared sky-top + fog)', () => {
+  const seen = new Set();
+  for (const p of PALETTES) {
+    const key = `${p.top}+${p.fog}`;
+    assert.ok(!seen.has(key), `duplicate palette combo ${key}`);
+    seen.add(key);
+  }
+  assert.equal(new Set(PALETTES.map((p) => p.top)).size, LEVELS, 'every sky top is unique');
+  assert.equal(new Set(PALETTES.map((p) => p.fog)).size, LEVELS, 'every fog is unique');
+});
+
+test('Phase 2E palettes: palette index always matches the sky name shown (runs 1..10 and beyond)', () => {
+  for (let n = 1; n <= LEVELS; n++) {
+    assert.equal(skyIndexOf(n), n - 1);
+    assert.equal(paletteOf(n), PALETTES[n - 1], `run ${n} palette`);
+    assert.equal(skyOf(n), SKIES[n - 1], `run ${n} name`);
+  }
+  // endless / out-of-range runs clamp the palette exactly like the name
+  assert.equal(paletteOf(11), PALETTES[LEVELS - 1]);
+  assert.equal(paletteOf(99), paletteOf(10));
+  assert.equal(skyOf(99).en, 'Aswan Sky');
+  assert.equal(paletteOf(0), PALETTES[0]);
+  assert.equal(paletteOf(-3), paletteOf(1));
+});
+
+test('Phase 2E: a full run still completes on skies 1, 5 and 10', () => {
+  for (const n of [1, 5, 10]) for (let seed = 1; seed <= 4; seed++) {
+    const run = bot(new Run(n, seed));
+    assert.equal(run.state, 'won', `sky ${n} (${skyOf(n).en}) seed ${seed} ended ${run.state}`);
+    assert.equal(paletteOf(n), PALETTES[n - 1]);
+  }
+});
+
+test('Dash Over Egypt anchor: ten named Egyptian skies, specs unchanged', () => {
+  assert.equal(SKIES.length, LEVELS);
+  assert.equal(skyOf(1).en, 'Cairo Sky');
+  assert.equal(skyOf(10).en, 'Aswan Sky');
+  assert.equal(skyOf(99).en, 'Aswan Sky'); // clamps
+  assert.ok(SKIES.every((s) => s.ar && s.en));
+  assert.equal(levelSpec(1).length, 520);
+  assert.equal(levelSpec(10).length, 520 + 90 * 9);
 });

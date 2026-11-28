@@ -86,7 +86,7 @@ test('holding jumps higher than tapping', () => {
 test('save: damaged data loads safely; levels open one by one; best results are kept', () => {
   assert.deepEqual(normalizeSave('junk'), emptySave());
   const s = normalizeSave({ unlocked: 99, coins: -4, best: { trail: { relics: 9, coins: 'x' } } });
-  assert.equal(s.unlocked, 6);
+  assert.equal(s.unlocked, LEVELS.length);
   assert.equal(s.coins, 0);
   assert.equal(s.best.trail.relics, 3);
   const save = emptySave();
@@ -147,6 +147,77 @@ test('landing on a beetle from any jump squashes it and gives a coin; running in
   b.vx = 0;
   for (let i = 0; i < 30; i++) sim.step(1 / 60, { down: false, pressed: false });
   assert.equal(sim.hearts, 2, 'running into it costs a heart');
+});
+
+test('Phase 2E: 12 real maps — no remix copies, every layout distinct, Fayoum then Siwa', () => {
+  assert.equal(LEVELS.length, 12);
+  assert.deepEqual(LEVELS.map((l) => l.id), ['trail', 'ruins', 'temple', 'falls', 'qarun', 'hitan', 'oasis', 'salt', 'shali', 'spring', 'palms', 'oracle']);
+  const sigs = new Set(LEVELS.map((l) => l.rows.join('\n')));
+  assert.equal(sigs.size, 12, 'all 12 row-signatures are distinct (no remix products)');
+  for (const l of LEVELS) {
+    assert.ok(!('extraBeetles' in l), `${l.id} carries the old remix marker`);
+    assert.ok(l.ar && l.en && l.relicName?.ar && l.relicName?.en, `${l.id} has ar/en names and a named relic`);
+  }
+  // island 2 (Siwa, maps 7–12) must look different from island 1: the oasis backdrop theme
+  for (const l of LEVELS.slice(6)) assert.ok(l.theme === 'oasis' || l.theme === 'temple', `${l.id} theme ${l.theme}`);
+  assert.equal(LEVELS[11].rows.join('').includes('A'), true, 'the finale ends at the sun altar');
+});
+
+test('Phase 2E: the unlock chain walks all 12 maps in order', () => {
+  const save = emptySave();
+  for (let i = 0; i < LEVELS.length; i++) {
+    assert.equal(save.unlocked, i + 1, `map ${i + 1} is the frontier`);
+    applyLevel(save, i, { won: true, coins: 10, relics: 0, bonus: 0 });
+  }
+  assert.equal(save.unlocked, 12);
+  for (const l of LEVELS) assert.equal(save.best[l.id].done, true);
+});
+
+test('Phase 2E: an old 6-level save migrates — unlocks and stars survive by index/id', () => {
+  // a save from the remix era: 6 maps open, stars on trail + the old trail2/ruins2/temple2 ids
+  const old = {
+    unlocked: 6, coins: 321,
+    best: {
+      trail: { relics: 3, coins: 90, done: true },
+      ruins: { relics: 2, coins: 70, done: true },
+      temple: { relics: 1, coins: 55, done: true },
+      trail2: { relics: 3, coins: 88, done: true },
+      ruins2: { relics: 0, coins: 12, done: false },
+      temple2: { relics: 2, coins: 60, done: true },
+    },
+  };
+  const s = normalizeSave(old);
+  assert.equal(s.unlocked, 6, 'the first 6 maps (indices 0–5) stay open — the new maps 4–6 sit at the same indices');
+  assert.equal(s.coins, 321);
+  assert.equal(s.best.trail.relics, 3);
+  assert.equal(s.best.ruins.relics, 2);
+  assert.equal(s.best.temple.relics, 1);
+  assert.equal(s.best.trail2, undefined, 'remix-era ids are gone; their slots are the new falls/qarun/hitan maps');
+  // trail had all 3 relics, so its album relic migrates in for free
+  assert.deepEqual(s.album, ['trail']);
+  // and the chain continues from index 5 into the new maps
+  applyLevel(s, 5, { won: true, coins: 10, relics: 0, bonus: 0 });
+  assert.equal(s.unlocked, 7);
+});
+
+test('Phase 2E: relic album — finding all 3 hidden relics in a map earns its named relic', () => {
+  const save = emptySave();
+  let r = applyLevel(save, 3, { won: true, coins: 50, relics: 2, bonus: 0 });
+  assert.equal(r.albumNew, false);
+  assert.deepEqual(save.album, [], 'two of three is not the album relic yet');
+  r = applyLevel(save, 3, { won: false, coins: 20, relics: 3, bonus: 0 });
+  assert.equal(r.albumNew, true, 'the exploration itself earns it — no win required, never a streak');
+  assert.deepEqual(save.album, ['falls']);
+  r = applyLevel(save, 3, { won: true, coins: 50, relics: 3, bonus: 0 });
+  assert.equal(r.albumNew, false, 'earned once only');
+  // a relic is never required: winning with 0 relics still opens the next map
+  const s2 = emptySave();
+  applyLevel(s2, 0, { won: true, coins: 10, relics: 0, bonus: 0 });
+  assert.equal(s2.unlocked, 2);
+  assert.deepEqual(s2.album, []);
+  // album survives a save/load round trip and unknown ids are dropped
+  const s3 = normalizeSave({ album: ['falls', 'nope', 'oracle'], best: {} });
+  assert.deepEqual(s3.album, ['falls', 'oracle']);
 });
 
 test('shop: coins buy clothes, free outfits are always there, a hero only wears what was bought', async () => {
