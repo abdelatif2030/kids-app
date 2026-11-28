@@ -33595,7 +33595,7 @@ bRq:function bRq(a){this.a=a},
 bKE:function bKE(){},
 bKG:function bKG(a){this.a=a},
 bKF:function bKF(a){this.a=a},
-c_f(a,b,c){var s,r=null,q=b==null?r:B.o.aV(b),p=c==="girl"||c==="boy"?c:r,o=a==null?r:B.h.Z(a,1,6)
+c_f(a,b,c){var s,r=null,q=b==null?r:B.o.aV(b),p=c==="girl"||c==="boy"?c:r,o=a==null?r:B.h.Z(a,1,8)
 if(q==null||q.length===0)s=r
 else s=new A.jh(q).gv(0)>40?A.ft(A.vK(new A.jh(q),40,t.Dc.i("D.E")),0,r):q
 return new A.Pd(p,o,s)},
@@ -33978,7 +33978,7 @@ var $async$ay0=A.h(function(e,f){if(e===1)return A.i(f,r)
 for(;;)switch(s){case 0:n=$.ct()
 m=A.bVp()
 m.a=B.o.aV(d)
-m.b=B.h.Z(a,1,6)
+m.b=B.h.Z(a,1,8)
 m.z=b
 m.y=c==="girl"||c==="boy"?c:null
 p=Date.now()
@@ -42932,8 +42932,8 @@ break
 case 1:return A.j(q,r)}})
 return A.k($async$Pj,r)},
 Gq(a){var s,r=A.a([],t.t)
-for(s=1;s<=6;++s)r.push(s)
-if(a!=null&&a>6)r.push(a)
+for(s=1;s<=8;++s)r.push(s)
+if(a!=null&&a>8)r.push(a)
 return r},
 x1(){var s=0,r=A.l(t.a),q,p=2,o=[],n,m,l,k,j
 var $async$x1=A.h(function(a,b){if(a===1){o.push(b)
@@ -128077,7 +128077,7 @@ m=A.b1(B.W,A.hZ(B.W,A.d(o,i,i,i,i,i,B.a1e,i,i,i),B.G,B.cV),B.G,i,B.a6e,new A.aF(
 o=h.a==="ar"?"\u0623\u0643\u0628\u0631":"Older"
 o=A.aB(A.a([n,B.u_,new A.hi(1,B.cR,m,i),B.u_,j.ahW("register_age_up",B.HP,o,new A.bwK(j))],g),B.z,i,B.cq,B.x,0,i)
 n=h.a==="ar"
-m=A.bh(A.d(n?"\u0645\u0646 1 \u0625\u0644\u0649 6 \u0633\u0646\u0648\u0627\u062a":"From 1 to 6 years",B.bQr,i,i,i,i,B.bIy,i,i,i),i,i,i)
+m=A.bh(A.d(n?"\u0645\u0646 1 \u0625\u0644\u0649 8 \u0633\u0646\u0648\u0627\u062a":"From 1 to 8 years",B.bQr,i,i,i,i,B.bIy,i,i,i),i,i,i)
 l=j.r
 k=n?"\u0627\u062e\u062a\u0631 \u0623\u0648 \u0627\u0643\u062a\u0628 \u0645\u062f\u064a\u0646\u062a\u0643":"Type your city"
 l=A.PX(B.jz,l,B.bQv,k,B.alH,i,!1,40,!1,i,new A.a8C(l,40,i))
@@ -128093,8 +128093,8 @@ n.push(B.J9)
 return new A.Q0("assets/auth/register.webp",A.a4(n,B.cQ,i,B.r,B.ar,0,B.B),new A.bwL(a),f,e,B.bQC)}}
 A.bwH.prototype={
 $0(){var s=this.a,r=s.x
-if(r==null)r=this.b>0?0:7
-s.x=B.h.Z(r+this.b,1,6)},
+if(r==null)r=this.b>0?0:9
+s.x=B.h.Z(r+this.b,1,8)},
 $S:0}
 A.bwF.prototype={
 $0(){return this.a.y=!0},
@@ -152700,7 +152700,7 @@ B.i_=s([0,1,1,2,4,8,1,1,2,4,8,4,8,4],t.t)
 B.rH=s(["worksheet","lesson_plan","activity","story","other"],t.s)
 B.bac=s(["cat","dog","cow","sheep","duck","rabbit","fish","bird","lion","elephant","apple","banana","orange","grapes","strawberry","carrot","bread","milk","egg","tomato","chair","bed","door","book","ball","house","shoe","lamp","car","bus","train","plane","ship","sun","moon","star","cloud","rain","tree","flower","sea","eye","ear","nose","mouth","hand","foot","eat","drink","sleep"],t.s)
 B.baj=s(["\ud83c\udf4e","\u2b50","\ud83d\udc1f","\ud83c\udf88","\ud83c\udf53"],t.s)
-B.bar=s(["\u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0645\u062e\u0635\u0651\u0635 \u0644\u0623\u0637\u0641\u0627\u0644 \u0645\u0646 \u0633\u0646\u0629 \u0625\u0644\u0649 \u0666 \u0633\u0646\u0648\u0627\u062a \u0648\u064a\u0633\u062a\u062e\u062f\u0645\u0647 \u0627\u0644\u0637\u0641\u0644 \u0628\u0625\u0634\u0631\u0627\u0641 \u0648\u0644\u064a\u0651 \u0627\u0644\u0623\u0645\u0631\u060c \u0648\u0648\u0644\u064a \u0627\u0644\u0623\u0645\u0631 \u0647\u0648 \u0645\u0646 \u064a\u0628\u062f\u0623 \u0627\u0644\u062c\u0644\u0633\u0629 \u0648\u064a\u062d\u062f\u062f \u0648\u0642\u062a\u0647\u0627.","\u0627\u0644\u0645\u062d\u062a\u0648\u0649 \u062a\u0639\u0644\u064a\u0645\u064a \u0648\u062a\u0631\u0641\u064a\u0647\u064a \u0648\u0644\u0627 \u064a\u063a\u0646\u064a \u0639\u0646 \u0627\u0644\u062a\u0639\u0644\u064a\u0645 \u0627\u0644\u0631\u0633\u0645\u064a \u0648\u0644\u0627 \u0639\u0646 \u0627\u0644\u0627\u0633\u062a\u0634\u0627\u0631\u0629 \u0627\u0644\u0637\u0628\u064a\u0629 \u0623\u0648 \u0627\u0644\u0646\u0641\u0633\u064a\u0629.","\u0644\u0627 \u0625\u0639\u0644\u0627\u0646\u0627\u062a \u0648\u0644\u0627 \u0631\u0648\u0627\u0628\u0637 \u062e\u0627\u0631\u062c\u064a\u0629 \u0644\u0644\u0637\u0641\u0644 \u0648\u0644\u0627 \u062a\u062a\u0628\u0651\u0639. \u0627\u0642\u0631\u0623 \u0633\u064a\u0627\u0633\u0629 \u0627\u0644\u062e\u0635\u0648\u0635\u064a\u0629 \u0644\u0645\u0639\u0631\u0641\u0629 \u0645\u0627 \u064a\u064f\u062d\u0641\u0638 \u0648\u0623\u064a\u0646.","\u0625\u0646 \u0648\u064f\u062c\u062f \u0627\u0634\u062a\u0631\u0627\u0643 \u0645\u062f\u0641\u0648\u0639 \u0641\u064a \u0623\u064a \u0648\u0642\u062a \u0641\u0633\u064a\u062a\u0645 \u062d\u0635\u0631\u0627\u064b \u0639\u0628\u0631 \u0646\u0638\u0627\u0645 \u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643 \u062f\u0627\u062e\u0644 \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0641\u064a \u0627\u0644\u0645\u062a\u062c\u0631 (App Store \u0623\u0648 Google Play)\u060c \u0648\u064a\u064f\u062c\u062f\u064e\u0651\u062f \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b \u0645\u0627 \u0644\u0645 \u062a\u0644\u063a\u0650\u0647 \u0642\u0628\u0644 \u0646\u0647\u0627\u064a\u0629 \u0627\u0644\u0641\u062a\u0631\u0629 \u0645\u0646 \u0625\u0639\u062f\u0627\u062f\u0627\u062a \u062d\u0633\u0627\u0628 \u0627\u0644\u0645\u062a\u062c\u0631\u060c \u0648\u064a\u0645\u0643\u0646 \u0627\u0633\u062a\u0639\u0627\u062f\u0629 \u0627\u0644\u0645\u0634\u062a\u0631\u064a\u0627\u062a \u0645\u0646 \u062f\u0627\u062e\u0644 \u0627\u0644\u062a\u0637\u0628\u064a\u0642.","\u064a\u0645\u0643\u0646\u0643 \u062d\u0630\u0641 \u062d\u0633\u0627\u0628\u0643 \u0648\u0628\u064a\u0627\u0646\u0627\u062a\u0643 \u0641\u064a \u0623\u064a \u0648\u0642\u062a \u0645\u0646 \xab\u0627\u0644\u062e\u0635\u0648\u0635\u064a\u0629 \u0648\u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a\xbb \u062f\u0627\u062e\u0644 \u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0648\u0644\u064a\u0651 \u0627\u0644\u0623\u0645\u0631.","\u0644\u0627 \u062a\u0633\u062a\u062e\u062f\u0645 \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0644\u0623\u064a \u063a\u0631\u0636 \u0645\u062e\u0627\u0644\u0641 \u0644\u0644\u0642\u0627\u0646\u0648\u0646\u060c \u0648\u0644\u0627 \u062a\u0634\u0627\u0631\u0643 \u0627\u0644\u0631\u0645\u0632 \u0627\u0644\u0633\u0631\u064a \u0645\u0639 \u0627\u0644\u0623\u0637\u0641\u0627\u0644.","\u0646\u062d\u062a\u0641\u0638 \u0628\u062d\u0642 \u062a\u062d\u062f\u064a\u062b \u0647\u0630\u0647 \u0627\u0644\u0634\u0631\u0648\u0637\u060c \u0648\u0633\u0646\u064f\u0638\u0647\u0631 \u0627\u0644\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062c\u062f\u064a\u062f \u0647\u0646\u0627."],t.s)
+B.bar=s(["\u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0645\u062e\u0635\u0651\u0635 \u0644\u0623\u0637\u0641\u0627\u0644 \u0645\u0646 \u0633\u0646\u0629 \u0625\u0644\u0649 \u0668 \u0633\u0646\u0648\u0627\u062a \u0648\u064a\u0633\u062a\u062e\u062f\u0645\u0647 \u0627\u0644\u0637\u0641\u0644 \u0628\u0625\u0634\u0631\u0627\u0641 \u0648\u0644\u064a\u0651 \u0627\u0644\u0623\u0645\u0631\u060c \u0648\u0648\u0644\u064a \u0627\u0644\u0623\u0645\u0631 \u0647\u0648 \u0645\u0646 \u064a\u0628\u062f\u0623 \u0627\u0644\u062c\u0644\u0633\u0629 \u0648\u064a\u062d\u062f\u062f \u0648\u0642\u062a\u0647\u0627.","\u0627\u0644\u0645\u062d\u062a\u0648\u0649 \u062a\u0639\u0644\u064a\u0645\u064a \u0648\u062a\u0631\u0641\u064a\u0647\u064a \u0648\u0644\u0627 \u064a\u063a\u0646\u064a \u0639\u0646 \u0627\u0644\u062a\u0639\u0644\u064a\u0645 \u0627\u0644\u0631\u0633\u0645\u064a \u0648\u0644\u0627 \u0639\u0646 \u0627\u0644\u0627\u0633\u062a\u0634\u0627\u0631\u0629 \u0627\u0644\u0637\u0628\u064a\u0629 \u0623\u0648 \u0627\u0644\u0646\u0641\u0633\u064a\u0629.","\u0644\u0627 \u0625\u0639\u0644\u0627\u0646\u0627\u062a \u0648\u0644\u0627 \u0631\u0648\u0627\u0628\u0637 \u062e\u0627\u0631\u062c\u064a\u0629 \u0644\u0644\u0637\u0641\u0644 \u0648\u0644\u0627 \u062a\u062a\u0628\u0651\u0639. \u0627\u0642\u0631\u0623 \u0633\u064a\u0627\u0633\u0629 \u0627\u0644\u062e\u0635\u0648\u0635\u064a\u0629 \u0644\u0645\u0639\u0631\u0641\u0629 \u0645\u0627 \u064a\u064f\u062d\u0641\u0638 \u0648\u0623\u064a\u0646.","\u0625\u0646 \u0648\u064f\u062c\u062f \u0627\u0634\u062a\u0631\u0627\u0643 \u0645\u062f\u0641\u0648\u0639 \u0641\u064a \u0623\u064a \u0648\u0642\u062a \u0641\u0633\u064a\u062a\u0645 \u062d\u0635\u0631\u0627\u064b \u0639\u0628\u0631 \u0646\u0638\u0627\u0645 \u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643 \u062f\u0627\u062e\u0644 \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0641\u064a \u0627\u0644\u0645\u062a\u062c\u0631 (App Store \u0623\u0648 Google Play)\u060c \u0648\u064a\u064f\u062c\u062f\u064e\u0651\u062f \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b \u0645\u0627 \u0644\u0645 \u062a\u0644\u063a\u0650\u0647 \u0642\u0628\u0644 \u0646\u0647\u0627\u064a\u0629 \u0627\u0644\u0641\u062a\u0631\u0629 \u0645\u0646 \u0625\u0639\u062f\u0627\u062f\u0627\u062a \u062d\u0633\u0627\u0628 \u0627\u0644\u0645\u062a\u062c\u0631\u060c \u0648\u064a\u0645\u0643\u0646 \u0627\u0633\u062a\u0639\u0627\u062f\u0629 \u0627\u0644\u0645\u0634\u062a\u0631\u064a\u0627\u062a \u0645\u0646 \u062f\u0627\u062e\u0644 \u0627\u0644\u062a\u0637\u0628\u064a\u0642.","\u064a\u0645\u0643\u0646\u0643 \u062d\u0630\u0641 \u062d\u0633\u0627\u0628\u0643 \u0648\u0628\u064a\u0627\u0646\u0627\u062a\u0643 \u0641\u064a \u0623\u064a \u0648\u0642\u062a \u0645\u0646 \xab\u0627\u0644\u062e\u0635\u0648\u0635\u064a\u0629 \u0648\u0627\u0644\u0628\u064a\u0627\u0646\u0627\u062a\xbb \u062f\u0627\u062e\u0644 \u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0648\u0644\u064a\u0651 \u0627\u0644\u0623\u0645\u0631.","\u0644\u0627 \u062a\u0633\u062a\u062e\u062f\u0645 \u0627\u0644\u062a\u0637\u0628\u064a\u0642 \u0644\u0623\u064a \u063a\u0631\u0636 \u0645\u062e\u0627\u0644\u0641 \u0644\u0644\u0642\u0627\u0646\u0648\u0646\u060c \u0648\u0644\u0627 \u062a\u0634\u0627\u0631\u0643 \u0627\u0644\u0631\u0645\u0632 \u0627\u0644\u0633\u0631\u064a \u0645\u0639 \u0627\u0644\u0623\u0637\u0641\u0627\u0644.","\u0646\u062d\u062a\u0641\u0638 \u0628\u062d\u0642 \u062a\u062d\u062f\u064a\u062b \u0647\u0630\u0647 \u0627\u0644\u0634\u0631\u0648\u0637\u060c \u0648\u0633\u0646\u064f\u0638\u0647\u0631 \u0627\u0644\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u062c\u062f\u064a\u062f \u0647\u0646\u0627."],t.s)
 B.a3m=new A.Ar(0,"defaultPolicy")
 B.a3n=new A.Ar(1,"longFormAudio")
 B.a3o=new A.Ar(2,"longFormVideo")
@@ -153122,7 +153122,7 @@ B.d5=new A.kZ(3,"linux")
 B.cz=new A.kZ(4,"macOS")
 B.d6=new A.kZ(5,"windows")
 B.bet=s([B.bH,B.d4,B.aV,B.d5,B.cz,B.d6],A.a_("y<kZ>"))
-B.bev=s(["The app is made for children aged 1 to 6 and is used by the child under a parent's supervision. The parent starts each session and sets its length.","The content is for learning and fun. It is not a replacement for school or for medical or psychological advice.","No ads, no external links for the child, no tracking. Read the privacy policy to see what is kept and where.","If a paid subscription is ever offered, it is sold ONLY through the store's own in-app subscription (App Store or Google Play). It renews automatically unless you cancel before the period ends in your store account settings, and purchases can be restored inside the app.",'You can delete your account and data at any time from "Privacy and data" in the parent settings.',"Do not use the app for anything unlawful, and do not share the parent PIN with children.","We may update these terms; the new date will be shown here."],t.s)
+B.bev=s(["The app is made for children aged 1 to 8 and is used by the child under a parent's supervision. The parent starts each session and sets its length.","The content is for learning and fun. It is not a replacement for school or for medical or psychological advice.","No ads, no external links for the child, no tracking. Read the privacy policy to see what is kept and where.","If a paid subscription is ever offered, it is sold ONLY through the store's own in-app subscription (App Store or Google Play). It renews automatically unless you cancel before the period ends in your store account settings, and purchases can be restored inside the app.",'You can delete your account and data at any time from "Privacy and data" in the parent settings.',"Do not use the app for anything unlawful, and do not share the parent PIN with children.","We may update these terms; the new date will be shown here."],t.s)
 B.a2C=new A.MZ(0,"topLeft")
 B.a2F=new A.MZ(3,"bottomRight")
 B.bUq=new A.w5(B.a2C,B.a2F)
