@@ -183,6 +183,7 @@ flutter:
     - assets/games/learn_voice/en/
     - assets/games/learn_voice/de/
     - assets/games/learn_voice/fr/
+    - assets/games/learn_voice/it/
     - assets/games/summit_rush/
     - assets/games/summit_rush/skin/
     - assets/games/summit_rush/art/
