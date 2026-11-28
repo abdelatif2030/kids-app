@@ -15,6 +15,20 @@ export const STAGES = [
   { id: 4, ar: 'الصحرا البيضا', en: 'White Desert', dist: 7800, time: 335, traffic: 1.55, rival: 37.4, trucks: 0.40, cones: 0.8, gentle: 34 },
   { id: 5, ar: 'فنار بورسعيد', en: 'Port Said Light', dist: 8800, time: 372, traffic: 1.6, rival: 37.8, trucks: 0.42, cones: 1, gentle: 52 },
   { id: 6, ar: 'بحيرات الجونة', en: 'Gouna Lagoons', dist: 9800, time: 408, traffic: 1.7, rival: 38.2, trucks: 0.44, cones: 1, gentle: 58 },
+  // Season 2 (Phase 2F): a second journey across new Egyptian places — down the Nile valley to
+  // Luxor and Aswan, out to the Siwa oasis, and a Sinai finale at Dahab. The difficulty curves
+  // continue smoothly from stage 6 (longer, busier, a touch faster rival); ids 1–6 are NEVER
+  // renumbered or altered because saves index by stage.
+  // Certification Sweep A: Season 2 previously ran cones:1 on every stage (identical slalom
+  // density). Cone density now varies per stage as a layout signature (calm lake/corniche
+  // straights, a Luxor/Dahab slalom), and each stage carries a `motif` — code-drawn venue
+  // scenery composited over its reused panorama in main.js, so no two stages share a backdrop.
+  { id: 7, ar: 'بحيرة الفيوم', en: 'Fayoum Lake', dist: 10400, time: 428, traffic: 1.78, rival: 38.5, trucks: 0.46, cones: 0.4, gentle: 64, motif: 'fayoum' },
+  { id: 8, ar: 'كورنيش المنيا', en: 'Minya Corniche', dist: 11000, time: 452, traffic: 1.86, rival: 38.8, trucks: 0.48, cones: 0.7, gentle: 72, motif: 'minya' },
+  { id: 9, ar: 'معابد الأقصر', en: 'Luxor Temples', dist: 11600, time: 476, traffic: 1.94, rival: 39.1, trucks: 0.50, cones: 1, gentle: 80, motif: 'luxor' },
+  { id: 10, ar: 'نيل أسوان', en: 'Aswan Nile', dist: 12200, time: 500, traffic: 2.02, rival: 39.4, trucks: 0.51, cones: 0.5, gentle: 90, motif: 'aswan' },
+  { id: 11, ar: 'واحة سيوة', en: 'Siwa Oasis', dist: 12800, time: 524, traffic: 2.10, rival: 39.7, trucks: 0.52, cones: 0.8, gentle: 100, motif: 'siwa' },
+  { id: 12, ar: 'شواطئ دهب', en: 'Dahab Shores', dist: 13400, time: 548, traffic: 2.18, rival: 40.0, trucks: 0.53, cones: 1, gentle: 112, motif: 'dahab' },
 ];
 
 /** The road bends: lateral offset (m) of the road centre at distance z. */

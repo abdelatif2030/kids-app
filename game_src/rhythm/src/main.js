@@ -4,7 +4,7 @@
 // duck the high ones, keep off the gaps and the tonearm, bump rivals, and still be on the record when the song ends.
 // No network, no links, no ads, no tracking. Everything drawn and played from code.
 import * as THREE from 'three';
-import { Show, TRACKS, ANIMALS, R, normalizeSave } from './sim.js';
+import { Show, TRACKS, ANIMALS, R, normalizeSave, panoOf, tourComplete } from './sim.js';
 import { mat, makeAnimal, addHeadphones, recordTexture, makeBar, makeTonearm, makeDeck, makeDiner } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
@@ -23,6 +23,65 @@ const webglOk = () => {
   }
 };
 const FACE = { bear: '🐻', bunny: '🐰', fox: '🦊', cat: '🐱', raccoon: '🦝', panda: '🐼', sheep: '🐑', chick: '🐤', frog: '🐸', mouse: '🐭', pig: '🐷', koala: '🐨' };
+
+/** Certification Sweep A — code-drawn venue motifs. Tracks 8–12 reuse a shipped panorama, so
+    each one gets its own venue scenery painted in code over that panorama on a canvas
+    (1024×512, drawn once per track start — never per frame, no new image files). Each motif
+    is deliberately unmistakable: arches+ouds, citadel towers, felucca sails, park trees,
+    Ramadan lanterns — so no two tracks share a background. */
+function drawMotifCanvas(img, motif) {
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 512;
+  const x = c.getContext('2d');
+  x.drawImage(img, 0, 0, 1024, 512);
+  const W = 1024, H = 512, base = 512;
+  if (motif === 'oud') {
+    x.fillStyle = 'rgba(120,62,10,0.42)'; x.fillRect(0, 190, W, 322);
+    x.fillStyle = 'rgba(40,20,8,0.96)';
+    for (let i = 0; i < 6; i++) { const ax = i * 176 + 6; x.beginPath(); x.moveTo(ax, base); x.lineTo(ax, 300); x.quadraticCurveTo(ax + 82, 168, ax + 164, 300); x.lineTo(ax + 164, base); x.closePath(); x.fill(); }
+    x.fillStyle = 'rgba(255,196,92,0.95)';
+    for (let i = 0; i < 6; i++) { const ax = i * 176 + 34; x.beginPath(); x.moveTo(ax, base); x.lineTo(ax, 330); x.quadraticCurveTo(ax + 54, 232, ax + 108, 330); x.lineTo(ax + 108, base); x.closePath(); x.fill(); }
+    x.strokeStyle = 'rgba(24,12,4,0.97)'; x.fillStyle = 'rgba(24,12,4,0.97)';
+    for (let i = 0; i < 4; i++) { const cx = 140 + i * 256, cy = 92; x.beginPath(); x.ellipse(cx, cy, 36, 46, 0.5, 0, Math.PI * 2); x.fill(); x.lineWidth = 11; x.beginPath(); x.moveTo(cx + 24, cy - 36); x.lineTo(cx + 66, cy - 78); x.stroke(); }
+  } else if (motif === 'citadel') {
+    x.fillStyle = 'rgba(146,102,52,0.96)'; x.fillRect(0, 252, W, 260);
+    for (let bx = 0; bx < W; bx += 58) x.fillRect(bx, 222, 34, 32);
+    x.fillStyle = 'rgba(110,74,34,0.98)';
+    for (const tx of [80, 824]) { x.fillRect(tx, 96, 120, 416); for (let bx = 0; bx < 120; bx += 30) x.fillRect(tx + bx, 70, 20, 28); }
+    x.fillStyle = 'rgba(196,30,30,0.97)';
+    for (const tx of [140, 884]) { x.beginPath(); x.moveTo(tx, 70); x.lineTo(tx + 72, 88); x.lineTo(tx, 106); x.closePath(); x.fill(); x.fillRect(tx - 3, 22, 6, 50); }
+  } else if (motif === 'boat') {
+    x.fillStyle = 'rgba(18,96,160,0.55)'; x.fillRect(0, 268, W, 244);
+    x.fillStyle = 'rgba(255,252,240,0.97)';
+    for (const [sx, sy, s] of [[180, 330, 1.25], [560, 356, 1], [880, 322, 1.4]]) {
+      x.beginPath(); x.moveTo(sx, sy - 218 * s); x.lineTo(sx, sy); x.lineTo(sx + 138 * s, sy); x.closePath(); x.fill();
+      x.beginPath(); x.moveTo(sx - 10 * s, sy - 196 * s); x.lineTo(sx - 10 * s, sy); x.lineTo(sx - 82 * s, sy); x.closePath(); x.fill();
+      x.fillStyle = 'rgba(80,44,18,0.97)'; x.fillRect(sx - 92 * s, sy, 224 * s, 17 * s); x.fillStyle = 'rgba(255,252,240,0.97)';
+    }
+    x.strokeStyle = 'rgba(255,255,255,0.85)'; x.lineWidth = 7;
+    for (let i = 0; i < 3; i++) { x.beginPath(); for (let px = 0; px <= W; px += 16) x.lineTo(px, 428 + i * 26 + Math.sin(px * 0.03 + i) * 8); x.stroke(); }
+  } else if (motif === 'park') {
+    x.fillStyle = 'rgba(34,128,52,0.52)'; x.fillRect(0, 238, W, 274);
+    for (let i = 0; i < 7; i++) {
+      const tx = 70 + i * 145, ty = 330 + (i % 2) * 30, r = 78 + (i % 3) * 16;
+      x.fillStyle = 'rgba(74,42,16,0.97)'; x.fillRect(tx - 10, ty, 20, 182);
+      x.fillStyle = 'rgba(18,102,38,0.97)'; x.beginPath(); x.arc(tx, ty, r, 0, Math.PI * 2); x.arc(tx - r * 0.72, ty + 22, r * 0.68, 0, Math.PI * 2); x.arc(tx + r * 0.72, ty + 22, r * 0.68, 0, Math.PI * 2); x.fill();
+      x.fillStyle = 'rgba(255,96,96,0.92)'; for (let f = 0; f < 5; f++) { x.beginPath(); x.arc(tx + Math.sin(f * 2.4 + i) * r * 0.6, ty + Math.cos(f * 1.9 + i) * r * 0.5, 8, 0, Math.PI * 2); x.fill(); }
+    }
+  } else if (motif === 'lanterns') {
+    x.fillStyle = 'rgba(34,12,80,0.46)'; x.fillRect(0, 0, W, H);
+    x.strokeStyle = 'rgba(10,4,24,0.92)'; x.lineWidth = 5;
+    for (let i = 0; i < 5; i++) {
+      const lx = 110 + i * 205, ly = 158 + (i % 2) * 44;
+      x.beginPath(); x.moveTo(lx - 130, 0); x.quadraticCurveTo(lx, 58, lx + 130, 0); x.stroke();
+      x.beginPath(); x.moveTo(lx, 30); x.lineTo(lx, ly - 74); x.stroke();
+      x.fillStyle = 'rgba(255,192,52,0.99)'; x.beginPath(); x.moveTo(lx, ly - 74); x.lineTo(lx + 44, ly - 12); x.lineTo(lx + 26, ly + 62); x.lineTo(lx - 26, ly + 62); x.lineTo(lx - 44, ly - 12); x.closePath(); x.fill();
+      x.fillStyle = 'rgba(255,242,196,0.97)'; x.beginPath(); x.arc(lx, ly, 14, 0, Math.PI * 2); x.fill();
+    }
+    x.fillStyle = 'rgba(255,232,160,0.97)'; x.beginPath(); x.arc(922, 92, 40, 0, Math.PI * 2); x.fill();
+    x.fillStyle = 'rgba(52,22,110,0.6)'; x.beginPath(); x.arc(942, 78, 35, 0, Math.PI * 2); x.fill();
+  }
+  return c;
+}
 const JUMP_T = 0.62;
 
 class Game {
@@ -154,29 +213,48 @@ class Game {
       gameplay camera always has in frame. Track i shows pano i+1. */
   _setPano(i) {
     if (!this.dinerWalls || !this.dinerWalls.length) return;
-    const tex = new THREE.TextureLoader().load(`${this.base}art/pano${i + 1}.webp`);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    tex.wrapS = THREE.RepeatWrapping;
-    tex.repeat.set(1.8, 0.62);
-    tex.offset.set(0, 0.36);
-    for (const w of this.dinerWalls) {
-      w.material.map = tex;
-      w.material.color.setHex(0xffffff);
-      w.material.needsUpdate = true;
+    // tracks 1–7 show their own panorama; the Phase 2F tracks reuse a fitting shipped one (panoOf)
+    // BUT Certification Sweep A: tracks 8–12 each carry a code-drawn venue motif composited over
+    // the reused panorama (canvas, no new image files), so no two tracks share a background.
+    const pano = panoOf(TRACKS[i]);
+    const motif = TRACKS[i].motif || null;
+    const apply = (makeTex) => {
+      const tex = makeTex(1.8, 0.62, 0, 0.36);
+      for (const w of this.dinerWalls) {
+        w.material.map = tex;
+        w.material.color.setHex(0xffffff);
+        w.material.needsUpdate = true;
+      }
+      if (this._panoTex && this._panoTex !== tex) this._panoTex.dispose();
+      this._panoTex = tex;
+      if (this.deckSide) {
+        const band = makeTex(3, 1, 0, 0);
+        if (this._bandTex) this._bandTex.dispose();
+        this._bandTex = band;
+        this.deckSide.material.map = band;
+        this.deckSide.material.color.setHex(0xffffff);
+        this.deckSide.material.needsUpdate = true;
+      }
+    };
+    if (!motif) {
+      apply((rx, ry, ox, oy) => {
+        const t2 = new THREE.TextureLoader().load(`${this.base}art/pano${pano}.webp`);
+        t2.colorSpace = THREE.SRGBColorSpace; t2.wrapS = THREE.RepeatWrapping; t2.repeat.set(rx, ry); t2.offset.set(ox, oy);
+        return t2;
+      });
+      return;
     }
-    if (this._panoTex && this._panoTex !== tex) this._panoTex.dispose();
-    this._panoTex = tex;
-    if (this.deckSide) {
-      const band = new THREE.TextureLoader().load(`${this.base}art/pano${i + 1}.webp`);
-      band.colorSpace = THREE.SRGBColorSpace;
-      band.wrapS = THREE.RepeatWrapping;
-      band.repeat.set(3, 1);
-      if (this._bandTex) this._bandTex.dispose();
-      this._bandTex = band;
-      this.deckSide.material.map = band;
-      this.deckSide.material.color.setHex(0xffffff);
-      this.deckSide.material.needsUpdate = true;
-    }
+    const img = new Image();
+    img.onload = () => {
+      if (this._disposed) return;
+      apply((rx, ry, ox, oy) => {
+        const t2 = new THREE.CanvasTexture(drawMotifCanvas(img, motif));
+        t2.colorSpace = THREE.SRGBColorSpace; t2.wrapS = THREE.RepeatWrapping; t2.repeat.set(rx, ry); t2.offset.set(ox, oy);
+        return t2;
+      });
+    };
+    img.onerror = () => { if (!this._disposed) apply((rx, ry, ox, oy) => { const t2 = new THREE.TextureLoader().load(`${this.base}art/pano${pano}.webp`); t2.colorSpace = THREE.SRGBColorSpace; t2.wrapS = THREE.RepeatWrapping; t2.repeat.set(rx, ry); t2.offset.set(ox, oy); return t2; }); };
+    img.src = `${this.base}art/pano${pano}.webp`;
   }
 
   _setup(show) {
@@ -332,11 +410,15 @@ class Game {
     this.menuShow.state = 'play';
     this._setup(this.menuShow);
     this._setPano(0);
+    this.sound.setLead('sax');
     this._clear();
+    // encore unlocks only once the whole 12-track tour is complete; it is a replay mode, never a gate
+    const done = tourComplete(this.save);
+    if (!done) this.encoreMode = false;
     const rows = [];
     for (let i = 0; i < TRACKS.length; i++) {
       const tk = TRACKS[i];
-      const locked = i + 1 > this.save.unlocked;
+      const locked = i + 1 > this.save.unlocked && !(this.encoreMode && done);
       const stars = this.save.stars[tk.id] ?? 0;
       rows.push(h('div', { class: 'rh-row' },
         h('div', { class: 'lbl' }, name(tk)),
@@ -353,6 +435,10 @@ class Game {
           h('div', { class: 'rh-title', style: 'font-size:calc(var(--u)*4.4)' }, '🌍 ', t('tour')),
           // the play button first, so it is on screen even on a phone held sideways
           h('button', { class: 'rh-btn2 rh-big', onclick: () => this.startTrack(this.save.unlocked - 1) }, '▶ ', t('play')),
+          done ? h('button', {
+            class: this.encoreMode ? 'rh-btn2' : 'rh-btn2 wood', 'aria-label': t('encore'),
+            onclick: () => { this.encoreMode = !this.encoreMode; this.sound.play('tap'); this.showMenu(); this.toast(t(this.encoreMode ? 'encoreOn' : 'encoreOff'), 2); },
+          }, '🎉 ', t('encore'), this.encoreMode ? ' ✓' : '') : null,
           h('div', { class: 'rh-shelf' }, rows))),
       this._mute(`bottom:max(calc(var(--u)*3),env(safe-area-inset-bottom));inset-inline-end:calc(var(--u)*3)`),
       this._toastEl(),
@@ -361,12 +447,13 @@ class Game {
 
   startTrack(i) {
     this.trackIndex = i;
-    this.show = new Show({ track: i, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1 });
+    this.show = new Show({ track: i, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1, encore: !!this.encoreMode });
     this._setup(this.show);
     this._setPano(i);
     this.mode = 'play';
     this.paused = false;
-    this.sound.setTempo(this.show.track.bpm);
+    this.sound.setTempo(this.show.bpm);
+    this.sound.setLead(this.show.track.lead);
     this.sound.setMode('play');
     this.sound.setCrackle(true);
     this._hud();
@@ -398,7 +485,7 @@ class Game {
     duck.addEventListener('pointercancel', off);
     this.layer.append(
       h('button', { class: 'rh-round', style: this._topLeft(), 'aria-label': t('paused'), onclick: (e) => { e.stopPropagation(); this.pause(); } }, '⏸'),
-      h('div', { class: 'rh-hudl' }, this.hud.track, this.hud.left, this.hud.faces),
+      h('div', { class: 'rh-hudl' }, this.hud.track, this.hud.left, this.hud.faces, sh.encore ? h('div', { class: 'rh-box' }, h('b', {}, '🎉'), h('span', {}, t('encore'))) : null),
       this.hud.ring,
       this.hud.hearts,
       this.hud.beat,
@@ -451,21 +538,25 @@ class Game {
     this.mode = 'results';
     this.joy.style.display = 'none';
     this.sound.setMode('menu');
-    if (won) {
+    // encore is pure replay joy: it never writes stars or unlocks, and normal mode is untouched by it
+    if (won && !sh.encore) {
       const id = TRACKS[i].id;
       this.save.stars[id] = Math.max(this.save.stars[id] ?? 0, r.stars);
       if (i + 2 > this.save.unlocked && i + 1 < TRACKS.length) this.save.unlocked = i + 2;
       this._saveNow();
+    }
+    if (won) {
       this.sound.play('win');
       this.voice.say('win');
     } else { this.sound.play('lose'); this.voice.say('lose'); }
     const place = won ? 1 : sh.left + 1;
-    const hasNext = won && i + 1 < TRACKS.length;
+    const hasNext = won && i + 1 < TRACKS.length && (!!sh.encore || i + 2 <= this.save.unlocked);
     const dim = h('div', { class: won ? 'rh-dim rh-win' : 'rh-dim' }, h('div', { class: 'rh-panel' },
       h('div', { class: 'rh-logo', style: 'font-size:calc(var(--u)*8)' }, won ? '' : t('knocked')),
       won ? h('div', { class: 'rh-title' }, t('win')) : null,
       won ? h('div', { class: 'rh-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= r.stars ? '' : 'off' }, '⭐'))) : h('div', { class: 'rh-box' }, h('b', {}, num(place)), h('span', {}, t('place'))),
       h('div', { class: 'rh-stat' }, h('span', {}, `${num(sh.left)} ${t('left')}`)),
+      sh.encore ? h('div', { class: 'rh-stat' }, h('span', {}, t('encoreNote'))) : null,
       h('div', { style: 'display:flex;gap:calc(var(--u)*2);flex-wrap:wrap;justify-content:center' },
         hasNext ? h('button', { class: 'rh-btn2', onclick: () => this.startTrack(i + 1) }, t('next'), ' ▶') : null,
         h('button', { class: hasNext ? 'rh-btn2 wood' : 'rh-btn2', onclick: () => this.startTrack(i) }, '↻ ', t('retry')),
@@ -490,7 +581,7 @@ class Game {
           this.sound.play('go');
           this.voice.say('go');
           this.hud.count.textContent = '';
-          this.sound.setTempo(sh.track.bpm);
+          this.sound.setTempo(sh.bpm);
           this._hint('hintLow', 3);
           break;
         case 'beat': {
@@ -588,7 +679,7 @@ class Game {
       m.legs[1].rotation.x = a.air > 0 ? 0.5 : -sw;
       m.arms.forEach((ar, i) => { ar.rotation.x = a.air > 0 ? -2.4 : Math.sin(time * 10 + i * 3 + k) * 0.4; });
       // a little dance to the beat, ducking flattens, a hit makes you wobble
-      const bounce = Math.abs(Math.sin((time * Math.PI * (this.show ? this.show.track.bpm : 110)) / 60)) * 0.06;
+      const bounce = Math.abs(Math.sin((time * Math.PI * (this.show ? this.show.bpm : 110)) / 60)) * 0.06;
       m.body.position.y = bounce;
       m.body.scale.set(1, a.duck > 0 ? 0.55 : 1, 1);
       m.body.rotation.z = a.stun > 0 ? Math.sin(time * 20) * 0.35 : 0;
@@ -638,6 +729,7 @@ class Game {
   }
 
   dispose() {
+    this._disposed = true;
     clearInterval(this._pill);
     this.sound.dispose();
     this.voice.dispose();

@@ -97,7 +97,7 @@ export class Race {
       if (!c.isPlayer) {
         const diff = opts.difficulty ?? 0;
         // rivals get a little faster on later tracks; easy mode keeps them gentle
-        const base = [0.86, 0.9, 0.94, 0.97][diff] ?? 0.9;
+        const base = [0.86, 0.9, 0.94, 0.97, 0.985][diff] ?? 0.9;
         c.skill = (this.easy ? base - 0.1 : base) + (i / 5) * 0.06 + (this.rand() - 0.5) * 0.04;
         c.lineNoise = (this.rand() - 0.5) * 0.5;
         c.itemTimer = 1 + this.rand() * 3;

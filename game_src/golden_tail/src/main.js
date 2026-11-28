@@ -5,7 +5,7 @@
 // tracking. Everything drawn and played from code.
 import * as THREE from 'three';
 import { Chase } from './sim.js';
-import { LEVELS, RIVALS, PLATFORMS, STRIPS, MUSHROOMS, GROUND_R, normalizeSave } from './data.js';
+import { LEVELS, RIVALS, GROUND_R, normalizeSave, getArena } from './data.js';
 import { mat, cone, makeDino, makeAnimal, makeGoldenTail, makeDeck, makeStrip, makeMushroom, makeTree, makeBush } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
@@ -193,14 +193,9 @@ class Game {
       d.position.set(x, 0.01, z);
       s.add(d);
     }
-    for (const p of PLATFORMS) s.add(makeDeck(p, false));
-    for (const st of STRIPS) s.add(makeStrip(st));
-    this.mushrooms = MUSHROOMS.map((m) => {
-      const mm = makeMushroom();
-      mm.root.position.set(m.x, 0, m.z);
-      s.add(mm.root);
-      return mm;
-    });
+    this.playground = new THREE.Group();
+    s.add(this.playground);
+    this._buildPlayground(0);
     // forest around the playground
     for (let i = 0; i < 28; i++) {
       const a = (i / 28) * Math.PI * 2;
@@ -237,6 +232,24 @@ class Game {
     s.add(this.dizzy);
     this.sparkles = new Sparkles(s, 260);
     this.animals = [];
+  }
+
+  /** Rebuild the decks/strips/mushrooms for one level's own arena (build-time only; the old group's
+   *  geometries are disposed, the shared cached materials are kept). */
+  _buildPlayground(i) {
+    this.arena = getArena(i);
+    if (this.playground) {
+      this.playground.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
+      this.playground.clear();
+    } else this.playground = new THREE.Group();
+    for (const p of this.arena.platforms) this.playground.add(makeDeck(p, false));
+    for (const st of this.arena.strips) this.playground.add(makeStrip(st));
+    this.mushrooms = this.arena.mushrooms.map((m) => {
+      const mm = makeMushroom();
+      mm.root.position.set(m.x, 0, m.z);
+      this.playground.add(mm.root);
+      return mm;
+    });
   }
 
   _setRivals(n) {
@@ -372,6 +385,7 @@ class Game {
     this.mode = 'menu';
     this.paused = false;
     this.chase = null;
+    this._buildPlayground(0);
     this._setPano(1);
     if (this.joy) this.joy.style.display = 'none';
     this.sound.setMode('menu');
@@ -405,6 +419,7 @@ class Game {
   startLevel(i) {
     this.levelIndex = i;
     this.chase = new Chase({ level: i, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1 });
+    this._buildPlayground(i);
     this._setPano(i + 1);
     this._setRivals(this.chase.rivals.length);
     this.mode = 'play';
@@ -524,7 +539,7 @@ class Game {
         case 'land': if (e.who === 0) this.sound.play('land', e.hard); break;
         case 'bounce': {
           if (e.who === 0 || Math.hypot(e.x - c.player.x, e.z - c.player.z) < 10) this.sound.play('bounce');
-          const m = this.mushrooms[MUSHROOMS.findIndex((mm) => mm.x === e.x && mm.z === e.z)];
+          const m = this.mushrooms[this.arena.mushrooms.findIndex((mm) => mm.x === e.x && mm.z === e.z)];
           if (m) m.squash = 1;
           break;
         }
@@ -672,7 +687,7 @@ class Game {
     else if (this.mode === 'results') { this.sparkles.update(dt); this._sync(0.0001, time); }
     else if (this.mode === 'menu') {
       // the dino and friends dance on the big deck while the camera circles
-      const deck = PLATFORMS[0];
+      const deck = getArena(0).platforms[0];
       const all = [this.dino, ...this.animals];
       all.forEach((m, i) => {
         const a = (i / all.length) * Math.PI * 2 + time * 0.4;

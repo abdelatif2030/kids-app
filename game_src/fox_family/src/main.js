@@ -4,7 +4,7 @@
 // parade that follows her exact path. Three short levels (summer meadow, autumn woods, winter hills). No network,
 // no links, no ads, no tracking. Everything drawn and played from code.
 import * as THREE from 'three';
-import { Trip, LEVELS, COLS, normalizeSave } from './sim.js';
+import { Trip, LEVELS, COLS, normalizeSave, picnicEntries, picnicClipName, LEVEL_TINTS } from './sim.js';
 import { loadSprites, makePaintedFigure } from '../../cozy_kit/art.js';
 import { VoiceCoach } from '../../cozy_kit/voice.js';
 
@@ -117,8 +117,9 @@ class Game {
     this.trip = new Trip({ level: i, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1 });
     this.sound.setSeason(lv.season);
     const s = (this.scene = new THREE.Scene());
-    s.background = new THREE.Color(SKY[lv.season]);
-    s.fog = new THREE.Fog(SKY[lv.season], 26, 60);
+    const tint = LEVEL_TINTS[i] || { sky: SKY[lv.season], ground: 0x7cc85a };
+    s.background = new THREE.Color(tint.sky);
+    s.fog = new THREE.Fog(tint.sky, 26, 60);
     s.add(new THREE.HemisphereLight(0xfffbf0, 0x6a7a4a, 1.9));
     const sun = new THREE.DirectionalLight(0xfff2d8, 1.4);
     sun.position.set(-8, 20, 6);
@@ -129,7 +130,7 @@ class Game {
     this.trains = [];
     this.trip.rows.forEach((row) => {
       const key = row.type === 'den' ? 'grass' : row.type;
-      if (!tex[key]) { tex[key] = laneTexture(key, lv.season); tex[key].wrapS = THREE.RepeatWrapping; tex[key].repeat.set(5, 1); }
+      if (!tex[key]) { tex[key] = laneTexture(key, lv.season, key === 'grass' ? tint.grass : null); tex[key].wrapS = THREE.RepeatWrapping; tex[key].repeat.set(5, 1); }
       const strip = new THREE.Mesh(new THREE.BoxGeometry(34, row.type === 'river' || row.type === 'lily' ? 0.1 : 0.3, C), new THREE.MeshLambertMaterial({ map: tex[key] }));
       strip.position.set(0, row.type === 'river' || row.type === 'lily' ? -0.2 : -0.15, -row.r * C);
       s.add(strip);
@@ -164,7 +165,7 @@ class Game {
         this.trains.push({ m: tr, row, lights });
       }
     });
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 40), new THREE.MeshLambertMaterial({ color: { summer: 0x7cc85a, autumn: 0x9aa84a, winter: 0xeef3f8 }[lv.season] }));
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 40), new THREE.MeshLambertMaterial({ color: tint.ground }));
     ground.rotation.x = -Math.PI / 2;
     ground.position.set(0, -0.31, 20 - C / 2);
     s.add(ground);
@@ -292,7 +293,7 @@ class Game {
     this.sound.setMode('menu');
     this._build(Math.min(this.save.unlocked, LEVELS.length) - 1);
     this._clear();
-    const icons = ['☀️', '🍂', '❄️', '🌾', '🍁', '🏔️'];
+    const icons = ['☀️', '🍂', '❄️', '🌾', '🍁', '🏔️', '⛰️', '🐋', '🦆', '🌾', '🚜', '🏡'];
     const nodes = LEVELS.map((lv, i) => {
       const locked = i + 1 > this.save.unlocked;
       const stars = this.save.stars[lv.id] ?? 0;
@@ -307,8 +308,41 @@ class Game {
         h('div', { class: 'fx-card' },
           h('div', { style: 'font-size:calc(var(--u)*12)' }, '🦊🦊🦊'),
           h('h2', {}, t('title')),
-          h('div', { class: 'fx-map', style: 'grid-template-columns:repeat(3,calc(var(--u)*17));margin-bottom:calc(var(--u)*4)' }, nodes),
-          h('button', { class: 'fx-cbtn', onclick: () => this.startLevel(Math.min(this.save.unlocked, LEVELS.length) - 1) }, '▶ ', t('play')))),
+          h('div', { class: 'fx-map fx-map12', style: 'margin-bottom:calc(var(--u)*4)' }, nodes),
+          h('button', { class: 'fx-cbtn', onclick: () => this.startLevel(Math.min(this.save.unlocked, LEVELS.length) - 1) }, '▶ ', t('play')),
+          h('button', { class: 'fx-cbtn alt', onclick: () => this.showAlbum() }, '🧺 ', t('album')))),
+      this._toastEl(),
+    );
+  }
+
+  /** The berry picnic album: one card per journey, opened by finishing that journey (stars > 0, via the
+   * pure picnicEntries in sim.js); locked cards are silhouettes with a secret line. */
+  showAlbum() {
+    this.mode = 'album';
+    this._clear();
+    const en = getLang() === 'en';
+    const cards = picnicEntries(this.save).map(({ level: lv, picnic, unlocked }) => unlocked
+      ? h('div', { class: 'fx-acard' },
+        h('div', { class: 'ic' }, picnic.icon),
+        h('div', { class: 'nm' }, name(lv)),
+        h('div', { class: 'alt' }, en ? lv.ar : lv.en),
+        h('div', { class: 'fact' }, en ? picnic.en : picnic.ar),
+        h('div', { class: 'st' }, '⭐'.repeat(this.save.stars[lv.id] ?? 0)),
+        h('button', {
+          class: 'fx-speak', 'aria-label': t('listen'),
+          onclick: () => { this.voice.unlock(); this.voice.playClip(picnicClipName(lv), en ? picnic.en : picnic.ar); },
+        }, '🔊 ', t('listen')))
+      : h('div', { class: 'fx-acard lock' },
+        h('div', { class: 'ic' }, picnic.icon),
+        h('div', { class: 'nm' }, '🔒 ؟؟؟'),
+        h('div', { class: 'fact' }, t('lockedFact'))));
+    this.layer.append(
+      h('button', { class: 'fx-round', style: this._topLeft(), 'aria-label': t('back'), onclick: () => this.showMenu() }, getLang() === 'en' ? '←' : '→'),
+      h('div', { class: 'fx-dim', style: 'background:rgba(30,60,40,.25)' },
+        h('div', { class: 'fx-card', style: 'max-height:94%;overflow:auto' },
+          h('h2', {}, '🧺 ', t('album')),
+          h('div', { style: 'font-weight:700;text-align:center' }, t('albumSub')),
+          h('div', { class: 'fx-album' }, cards))),
       this._toastEl(),
     );
   }

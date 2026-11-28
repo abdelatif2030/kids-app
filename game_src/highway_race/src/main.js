@@ -28,8 +28,60 @@ const S = {
   timeup: ['الوقت خلص.. جرّب تاني!', 'Time is up.. try again!'], locked: ['اكسب المرحلة اللي قبلها', 'Win the stage before'], go: ['انطلق!', 'GO!'], kmh: ['كم/س', 'km/h'],
   ahead: ['أنت في المقدمة', 'You lead'], behind: ['المنافس قدامك', 'Rival ahead'], behindN: ['برق قدامك', 'Barq is ahead'], taunt: ['برق بيقول: إلحقني لو تقدر! 😄', 'Barq says: catch me if you can! 😄'], rainbow: ['قوس قزح! 🌈', 'A rainbow! 🌈'], almost: ['قربت أوي! حاول تاني 💪', 'So close! Try again 💪'], stickers: ['ملصقاتي 🏅', 'My stickers 🏅'], carColor: ['لون العربية 🎨', 'Car colour 🎨'], rest: ['استراحة سريعة 🌴', 'A quick rest 🌴'], sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'], overtake: ['عدّيته! 👍', 'Overtake! 👍'],
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'], m: ['م', 'm'],
+  season1: ['الموسم الأول 🌅', 'Season 1 🌅'], season2: ['الموسم الثاني — رحلة جديدة 🗺️', 'Season 2 — A New Journey 🗺️'],
 };
 const I = makeI18n(S);
+
+/** Certification Sweep A — code-drawn venue motifs for Season 2. Stages 7–12 reuse a Season-1
+    panorama; a tint alone left them near-identical to their Season-1 twins (and stage 12 shared
+    pano2 with both stage 2 and stage 9). Each Season-2 stage now gets its own venue scenery
+    painted in code over the panorama on a canvas (1024×512, once per stage start — never per
+    frame, no new image files): Fayoum reeds + pink flamingos, Minya green fields + a felucca,
+    Luxor pylon gates + an obelisk, Aswan granite boulders + island palms, a Siwa spring pool
+    among dunes, and Dahab's mountain ridge over a coral shore. */
+function drawHighwayMotif(img, motif) {
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 512;
+  const x = c.getContext('2d');
+  x.drawImage(img, 0, 0, 1024, 512);
+  const W = 1024, base = 512;
+  const silhouette = (fn) => { x.save(); fn(); x.restore(); };
+  if (motif === 'fayoum') {
+    x.fillStyle = 'rgba(40,140,170,0.20)'; x.fillRect(0, 356, W, 156);
+    x.strokeStyle = 'rgba(20,90,50,0.95)'; x.lineWidth = 7;
+    for (let i = 0; i < 26; i++) { const rx = i * 41 + 8; x.beginPath(); x.moveTo(rx, base); x.quadraticCurveTo(rx + 6, 380, rx + (i % 2 ? 16 : -12), 336 - (i % 3) * 14); x.stroke(); }
+    silhouette(() => { x.fillStyle = 'rgba(240,110,150,0.96)'; for (const [fx, fy, s] of [[250, 300, 1], [620, 282, 0.8], [860, 312, 1.15]]) { x.beginPath(); x.ellipse(fx, fy, 34 * s, 20 * s, 0, 0, Math.PI * 2); x.fill(); x.beginPath(); x.arc(fx + 36 * s, fy - 20 * s, 11 * s, 0, Math.PI * 2); x.fill(); x.fillRect(fx + 8 * s, fy + 14 * s, 5 * s, 52 * s); x.fillRect(fx - 20 * s, fy + 14 * s, 5 * s, 52 * s); } });
+  } else if (motif === 'minya') {
+    x.fillStyle = 'rgba(46,150,70,0.34)'; x.fillRect(0, 368, W, 144);
+    x.strokeStyle = 'rgba(30,110,52,0.8)'; x.lineWidth = 4;
+    for (let px = 0; px < W; px += 128) { x.beginPath(); x.moveTo(px, base); x.lineTo(px + 340, 368); x.stroke(); }
+    x.fillStyle = 'rgba(255,252,240,0.96)';
+    x.beginPath(); x.moveTo(742, 128); x.lineTo(742, 330); x.lineTo(880, 330); x.closePath(); x.fill();
+    x.fillStyle = 'rgba(90,52,24,0.95)'; x.fillRect(690, 330, 220, 16);
+  } else if (motif === 'luxor') {
+    silhouette(() => { x.fillStyle = 'rgba(96,58,22,0.94)';
+      for (const gx of [60, 700]) { x.beginPath(); x.moveTo(gx, base); x.lineTo(gx + 26, 238); x.lineTo(gx + 96, 238); x.lineTo(gx + 122, base); x.closePath(); x.fill(); x.beginPath(); x.moveTo(gx + 218, base); x.lineTo(gx + 244, 238); x.lineTo(gx + 314, 238); x.lineTo(gx + 340, base); x.closePath(); x.fill(); x.fillRect(gx + 96, 238, 218, 34); }
+      x.beginPath(); x.moveTo(478, base); x.lineTo(492, 196); x.lineTo(506, 196); x.lineTo(520, base); x.closePath(); x.fill(); x.beginPath(); x.moveTo(484, 196); x.lineTo(514, 196); x.lineTo(499, 168); x.closePath(); x.fill(); });
+  } else if (motif === 'aswan') {
+    silhouette(() => { x.fillStyle = 'rgba(110,88,80,0.95)';
+      for (const [bx, by, r] of [[120, 470, 64], [230, 492, 44], [760, 478, 56], [880, 496, 40], [520, 500, 34]]) { x.beginPath(); x.arc(bx, by, r, Math.PI, 0); x.fill(); }
+      x.strokeStyle = 'rgba(24,100,44,0.95)'; x.lineWidth = 9;
+      for (const px of [330, 640]) { x.beginPath(); x.moveTo(px, 470); x.quadraticCurveTo(px + 8, 400, px + 2, 356); x.stroke(); x.strokeStyle = 'rgba(24,100,44,0.95)'; for (let f = 0; f < 6; f++) { const a = -Math.PI * 0.9 + f * 0.34; x.lineWidth = 7; x.beginPath(); x.moveTo(px + 2, 356); x.quadraticCurveTo(px + 2 + Math.cos(a) * 34, 356 + Math.sin(a) * 30 - 12, px + 2 + Math.cos(a) * 58, 356 + Math.sin(a) * 44); x.stroke(); } } });
+    x.fillStyle = 'rgba(30,140,190,0.22)'; x.fillRect(0, 420, W, 92);
+  } else if (motif === 'siwa') {
+    x.fillStyle = 'rgba(226,178,96,0.30)';
+    x.beginPath(); x.moveTo(0, 512); x.quadraticCurveTo(260, 356, 560, 470); x.quadraticCurveTo(800, 540, 1024, 430); x.lineTo(1024, 512); x.closePath(); x.fill();
+    x.fillStyle = 'rgba(30,170,160,0.88)'; x.beginPath(); x.ellipse(512, 452, 168, 42, 0, 0, Math.PI * 2); x.fill();
+    x.fillStyle = 'rgba(190,240,235,0.85)'; x.beginPath(); x.ellipse(512, 446, 108, 24, 0, 0, Math.PI * 2); x.fill();
+    x.strokeStyle = 'rgba(24,100,44,0.96)';
+    for (const px of [180, 330, 700, 856]) { x.lineWidth = 10; x.beginPath(); x.moveTo(px, 486); x.quadraticCurveTo(px + 8, 408, px + 2, 348); x.stroke(); for (let f = 0; f < 6; f++) { const a = -Math.PI * 0.92 + f * 0.36; x.lineWidth = 8; x.beginPath(); x.moveTo(px + 2, 348); x.quadraticCurveTo(px + 2 + Math.cos(a) * 38, 348 + Math.sin(a) * 32 - 14, px + 2 + Math.cos(a) * 66, 348 + Math.sin(a) * 48); x.stroke(); } }
+  } else if (motif === 'dahab') {
+    silhouette(() => { x.fillStyle = 'rgba(94,62,110,0.90)'; x.beginPath(); x.moveTo(0, 380); x.lineTo(150, 238); x.lineTo(300, 330); x.lineTo(470, 208); x.lineTo(640, 322); x.lineTo(800, 226); x.lineTo(1024, 348); x.lineTo(1024, 512); x.lineTo(0, 512); x.closePath(); x.fill(); });
+    x.fillStyle = 'rgba(255,120,110,0.85)';
+    for (const [cx, cy, r] of [[180, 486, 15], [420, 498, 11], [700, 490, 13], [920, 500, 10]]) { x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.fill(); x.fillRect(cx - 3, cy - r - 12, 6, 14); }
+    x.fillStyle = 'rgba(20,150,180,0.26)'; x.fillRect(0, 428, W, 84);
+  }
+  return c;
+}
 
 class Sound extends SynthBase {
   constructor() { super(); this.eng = null; }
@@ -148,7 +200,7 @@ const scratchCol = new THREE.Color(); // reused by burst()/burstSky(): a fresh C
 
 // garage: hero paint colours — red is free, the others are gifts for finishing stages 2, 4 and 6
 const HERO_COLORS = [0xef3e4a, 0x2a9d8f, 0xb197fc, 0xffcf3f];
-const STAGE_EMOJI = ['🌊', '🏔️', '🌙', '🏜️', '🗼', '🏝️'];
+const STAGE_EMOJI = ['🌊', '🏔️', '🌙', '🏜️', '🗼', '🏝️', '🦩', '🌾', '🏛️', '⛵', '🌴', '🐠'];
 
 /** a hand-drawn golden star on a transparent canvas (pickups + bump stars share the look) */
 function makeStarTexture() {
@@ -334,6 +386,23 @@ class Game {
       r.visible = false;
       this.scene.add(r);
       this.rocks.push(r);
+    }
+    // Luxor dressing (Season 2): temple pylon pairs with an obelisk, merged sandstone —
+    // silhouettes along the road, shown only on the Luxor stage (theme.temples)
+    const templeGeo = mergeGeometries([
+      bake(geo.box, 0xd9a860, -3.1, 3.5, 0, 2.4, 7, 1.4),
+      bake(geo.box, 0xd9a860, 3.1, 3.5, 0, 2.4, 7, 1.4),
+      bake(geo.box, 0xc79348, 0, 6.6, 0, 8.6, 1.1, 1.4),
+      bake(geo.box, 0xc79348, 0, 0.8, 0, 9.6, 1.6, 1.2),
+      bake(new THREE.CylinderGeometry(0.06, 0.75, 6.4, 4), 0xe0b26a, 6.4, 3.2, 0, 1, 1, 1, Math.PI / 4),
+      bake(geo.sphere, 0xc79348, -6.2, 0.7, 0.4, 1.6, 1.3, 2.6),
+    ]);
+    this.temples = [];
+    for (let i = 0; i < 12; i++) {
+      const t = new THREE.Mesh(templeGeo, vcMat);
+      t.visible = false;
+      this.scene.add(t);
+      this.temples.push(t);
     }
     // a living cartoon sky (owner 2026-11-27): puffy clouds drifting overhead and birds flapping in the distance
     const cloudGeo = mergeGeometries([
@@ -701,34 +770,60 @@ class Game {
 
   hint(text, ms = 3000) { if (!this.hintEl) return; this.hintEl.textContent = text; this.hintEl.classList.add('show'); clearTimeout(this._ht); this._ht = setTimeout(() => this.hintEl && this.hintEl.classList.remove('show'), ms); }
 
-  /** The level's painted backdrop (art/pano<N>.webp): a mirrored ring that follows the camera. */
-  _pano(stage) {
+  /** The level's painted backdrop (art/pano<N>.webp): a mirrored ring that follows the camera.
+   *  Season 2 adds NO new image files: its stages reuse a Season-1 pano (theme.pano) with a
+   *  per-stage colour tint (theme.panoTint) so each place still reads as its own world. */
+  _pano(stage, panoFile = stage + 1, tint = 0xffffff, motif = null) {
     if (this.panoMesh) { this.scene.remove(this.panoMesh); this.panoMesh.material.map.dispose(); this.panoMesh.material.dispose(); this.panoMesh = null; }
-    const tex = new THREE.TextureLoader().load(`${this.base}art/pano${stage + 1}.webp`, () => { ring.visible = true; });
-    tex.colorSpace = THREE.SRGBColorSpace;
-    tex.wrapS = THREE.MirroredRepeatWrapping;
-    tex.repeat.set(2, 0.66);
-    tex.offset.set(0, 0.34);
-    const ring = new THREE.Mesh(new THREE.CylinderGeometry(560, 560, 300, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false, depthWrite: false }));
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(560, 560, 300, 48, 1, true), new THREE.MeshBasicMaterial({ color: tint, side: THREE.BackSide, fog: false, depthWrite: false }));
     ring.visible = false;
     ring.renderOrder = -10;
     this.panoMesh = ring;
     this.scene.add(ring);
+    const setTex = (tex) => {
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.wrapS = THREE.MirroredRepeatWrapping;
+      tex.repeat.set(2, 0.66);
+      tex.offset.set(0, 0.34);
+      if (this.panoMesh !== ring) { tex.dispose(); return; }
+      ring.material.map = tex;
+      ring.material.needsUpdate = true;
+      ring.visible = true;
+    };
+    // Season 2 stages carry a code-drawn motif: composite it over the reused pano (once, here).
+    if (motif) {
+      const img = new Image();
+      img.onload = () => setTex(new THREE.CanvasTexture(drawHighwayMotif(img, motif)));
+      img.onerror = () => setTex(new THREE.TextureLoader().load(`${this.base}art/pano${panoFile}.webp`));
+      img.src = `${this.base}art/pano${panoFile}.webp`;
+      return;
+    }
+    setTex(new THREE.TextureLoader().load(`${this.base}art/pano${panoFile}.webp`));
   }
 
   _look(stage) {
-    this._pano(stage);
     // every stage is its own world (owner 2026-11-27): golden falls, red dusk mountains, a starry night,
-    // the white desert at bright morning, purple harbour twilight, and turquoise lagoon finale
+    // the white desert at bright morning, purple harbour twilight, and turquoise lagoon finale.
+    // Season 2 (Phase 2F) adds six more: Fayoum's lake morning, Minya's green Nile corniche, Luxor's
+    // temple dusk (pylon dressing), Aswan's bright Nile with granite rocks and feluccas, Siwa's oasis
+    // sunset (palms + desert rocks, no sea dressing), and Dahab's sea-and-mountains finale.
+    // Dressing flags: palms (default on), rocks (desert / granite / mountains), boats, lighthouse, temples.
     const THEMES = [
-      { sky: 0xff9a5a, fog: 0xffb888, sea: 0x2a7a9a, hemi: 0xffd0a0, hemiI: 1.5, sun: 0xffa060, disc: 0xfff0c0, discY: 45 },
-      { sky: 0xe86a4a, fog: 0xe09a7a, sea: 0x2a6a8a, hemi: 0xffc098, hemiI: 1.35, sun: 0xff8a50, disc: 0xffdf9e, discY: 30 },
-      { sky: 0x141a3a, fog: 0x141a3a, sea: 0x1a3a6a, hemi: 0x6a7ad8, hemiI: 1.1, sun: 0x8a9aff, disc: 0xe8f0ff, discY: 90, night: true },
-      { sky: 0xbfd9e8, fog: 0xe8e0cc, sea: 0xe8dcc0, hemi: 0xfff2d8, hemiI: 1.6, sun: 0xffdf9e, disc: 0xfff6da, discY: 62, desert: true },
-      { sky: 0x7a5a9a, fog: 0x9a7ab0, sea: 0x2a5a8a, hemi: 0xd8b0e8, hemiI: 1.3, sun: 0xd88ad8, disc: 0xffc8e8, discY: 26 },
-      { sky: 0x6ad0c8, fog: 0xa8e0d0, sea: 0x1fa8b8, hemi: 0xffe0b0, hemiI: 1.55, sun: 0xffa060, disc: 0xfff0c0, discY: 40 },
+      { sky: 0xff9a5a, fog: 0xffb888, sea: 0x2a7a9a, hemi: 0xffd0a0, hemiI: 1.5, sun: 0xffa060, disc: 0xfff0c0, discY: 45, pano: 1, boats: true, lighthouse: true },
+      { sky: 0xe86a4a, fog: 0xe09a7a, sea: 0x2a6a8a, hemi: 0xffc098, hemiI: 1.35, sun: 0xff8a50, disc: 0xffdf9e, discY: 30, pano: 2, boats: true, lighthouse: true },
+      { sky: 0x141a3a, fog: 0x141a3a, sea: 0x1a3a6a, hemi: 0x6a7ad8, hemiI: 1.1, sun: 0x8a9aff, disc: 0xe8f0ff, discY: 90, night: true, pano: 3, boats: true, lighthouse: true },
+      { sky: 0xbfd9e8, fog: 0xe8e0cc, sea: 0xe8dcc0, hemi: 0xfff2d8, hemiI: 1.6, sun: 0xffdf9e, disc: 0xfff6da, discY: 62, desert: true, pano: 4 },
+      { sky: 0x7a5a9a, fog: 0x9a7ab0, sea: 0x2a5a8a, hemi: 0xd8b0e8, hemiI: 1.3, sun: 0xd88ad8, disc: 0xffc8e8, discY: 26, pano: 5, boats: true, lighthouse: true },
+      { sky: 0x6ad0c8, fog: 0xa8e0d0, sea: 0x1fa8b8, hemi: 0xffe0b0, hemiI: 1.55, sun: 0xffa060, disc: 0xfff0c0, discY: 40, pano: 6, boats: true, lighthouse: true },
+      { sky: 0x9fd8ec, fog: 0xc4e4ee, sea: 0x3d9db8, hemi: 0xfff0d0, hemiI: 1.55, sun: 0xffc878, disc: 0xfff3cf, discY: 55, pano: 1, panoTint: 0xd8ecff, boats: true },
+      { sky: 0xffc98a, fog: 0xf2cf9e, sea: 0x2f8f6e, hemi: 0xffe2b0, hemiI: 1.5, sun: 0xffa860, disc: 0xfff0c0, discY: 38, pano: 5, panoTint: 0xffe9c4, boats: true },
+      { sky: 0xe8975a, fog: 0xdda06e, sea: 0x35708e, hemi: 0xffd9a8, hemiI: 1.4, sun: 0xff9550, disc: 0xffe2ae, discY: 24, pano: 2, panoTint: 0xffd9a8, boats: true, temples: true },
+      { sky: 0x7ec8ee, fog: 0xbfe6f2, sea: 0x1fa8c8, hemi: 0xfff4dc, hemiI: 1.6, sun: 0xffdf9e, disc: 0xfff6da, discY: 70, pano: 6, panoTint: 0xeafcff, boats: true, rocks: true },
+      { sky: 0xffab63, fog: 0xf7c489, sea: 0x3fae9c, hemi: 0xffe0ae, hemiI: 1.5, sun: 0xff9a55, disc: 0xffe9bb, discY: 30, pano: 4, panoTint: 0xffe3b0, rocks: true },
+      { sky: 0x6fc3e8, fog: 0xa8d8e8, sea: 0x1498b8, hemi: 0xffe6bb, hemiI: 1.55, sun: 0xffab60, disc: 0xfff0c0, discY: 44, pano: 2, panoTint: 0xcfeeff, boats: true, lighthouse: true, rocks: true },
     ];
     const t = THEMES[stage] || THEMES[0];
+    this._pano(stage, t.pano || stage + 1, t.panoTint || 0xffffff, (STAGES[stage] && STAGES[stage].motif) || null);
     this.scene.background = new THREE.Color(t.sky);
     this.scene.fog = new THREE.Fog(t.fog, 80, 380);
     this.hemi.color.set(t.hemi);
@@ -738,9 +833,14 @@ class Game {
     this.sunDisc.position.y = t.discY;
     this.sea.material = M(t.sea);
     if (this.stars) this.stars.visible = !!t.night;
-    this.rocksOn = !!t.desert;
-    if (this.palms) for (const p of this.palms) p.visible = !this.rocksOn;
+    this.rocksOn = !!t.desert || !!t.rocks;
+    this.palmsOn = !t.desert;
+    this.boatsOn = !!t.boats;
+    this.lighthouseOn = !!t.lighthouse;
+    this.templesOn = !!t.temples;
+    if (this.palms) for (const p of this.palms) p.visible = this.palmsOn;
     if (this.rocks) for (const r of this.rocks) r.visible = this.rocksOn;
+    if (this.temples) for (const r of this.temples) r.visible = this.templesOn;
   }
 
   showMenu() {
@@ -750,12 +850,16 @@ class Game {
     this.demoZ = 0;
     this._clearCars();
     const ar = I.getLang() !== 'en';
-    const cards = h('div', { style: 'display:flex;flex-direction:column;gap:calc(var(--u)*1.6);width:100%' }, STAGES.map((s, i) => {
+    const stageBtn = (s, i) => {
       const lock = i + 1 > this.save.unlocked;
       const st = this.save.stars[i + 1] || 0;
       return h('button', { class: `sh-btn${lock ? ' dark' : ''}`, onclick: () => { if (lock) { this.hint(I.t('locked')); return; } this.sound.play('tap'); this.start(i); } }, `${lock ? '🔒' : '🏎️'} ${I.t('stage')} ${I.num(i + 1)} · ${ar ? s.ar : s.en} ${'⭐'.repeat(st)}`);
-    }));
-    const stickers = h('div', { style: 'display:flex;gap:calc(var(--u)*1.2);justify-content:center' }, STAGES.map((s, i) => h('span', { style: `font-size:calc(var(--u)*6);opacity:${this.save.stars[i + 1] ? 1 : 0.3}` }, STAGE_EMOJI[i])));
+    };
+    const seasonHead = (key) => h('div', { class: 'sh-small', style: 'font-weight:900;margin-top:calc(var(--u)*1.2)' }, I.t(key));
+    const cards = h('div', { style: 'display:flex;flex-direction:column;gap:calc(var(--u)*1.6);width:100%' },
+      seasonHead('season1'), ...STAGES.slice(0, 6).map((s, i) => stageBtn(s, i)),
+      seasonHead('season2'), ...STAGES.slice(6).map((s, j) => stageBtn(s, j + 6)));
+    const stickers = h('div', { style: 'display:flex;flex-wrap:wrap;gap:calc(var(--u)*1.2);justify-content:center' }, STAGES.map((s, i) => h('span', { style: `font-size:calc(var(--u)*5.4);opacity:${this.save.stars[i + 1] ? 1 : 0.3}` }, STAGE_EMOJI[i])));
     const colorRow = h('div', { style: 'display:flex;gap:calc(var(--u)*1.6);justify-content:center' }, HERO_COLORS.map((c, i) => {
       const unlocked = i === 0 || !!this.save.stars[[0, 2, 4, 6][i]];
       return h('button', { 'aria-label': I.t('carColor'), style: `width:calc(var(--u)*7);height:calc(var(--u)*7);border-radius:50%;border:${(this.save.color || 0) === i ? 'calc(var(--u)*.7) solid #fff' : 'calc(var(--u)*.3) solid rgba(255,255,255,.4)'};background:#${c.toString(16).padStart(6, '0')};opacity:${unlocked ? 1 : 0.4};cursor:pointer;font-size:calc(var(--u)*3.2);font-family:inherit`, onclick: () => { if (!unlocked) { this.hint(I.t('locked')); return; } this.save.color = i; this.post({ type: 'save', save: this.save }); this.sound.play('tap'); this.showMenu(); } }, unlocked ? '' : '🔒');
@@ -1185,14 +1289,14 @@ class Game {
       for (const a of [this.arch, this.archGold]) for (let i = 0; i < 3; i++) { const b = a.userData.balloons[i]; b.rotation.z = Math.sin(this.tNow * 1.8 + i * 2.1) * 0.14; b.rotation.x = Math.cos(this.tNow * 1.3 + i * 1.7) * 0.08; }
     }
     if (this.boats) for (const b of this.boats) {
-      b.visible = !this.rocksOn;
+      b.visible = !!this.boatsOn;
       const off = ((b.userData.off - zp) % 700 + 700) % 700 - 60;
       const z = zp + off;
       b.position.set(-bend(z) + 58 + (b.userData.off % 3) * 9, Math.sin(this.tNow * 1.2 + b.userData.off) * 0.25, z);
       b.rotation.z = Math.sin(this.tNow * 1.1 + b.userData.off * 2) * 0.05;
     }
     if (this.lighthouse) {
-      this.lighthouse.visible = !this.rocksOn;
+      this.lighthouse.visible = !!this.lighthouseOn;
       const rel = ((900 - zp) % 1600 + 1600) % 1600 - 80;
       const z = zp + rel;
       this.lighthouse.position.set(-bend(z) + HALF + 15, 0, z);
@@ -1340,6 +1444,12 @@ class Game {
         const z = Math.floor((zp - 10) / 26) * 26 + i * 26;
         const side = i % 3 === 0 ? -1 : 1;
         rk.position.set(-bend(z) + side * (HALF + 6 + (i % 4) * 2), 0, z);
+      });
+      if (this.templesOn && this.temples) this.temples.forEach((tm, i) => {
+        const z = Math.floor((zp - 10) / 34) * 34 + i * 34;
+        const side = i % 2 === 0 ? -1 : 1;
+        tm.position.set(-bend(z) + side * (HALF + 9 + (i % 3) * 2), 0, z);
+        tm.rotation.y = side > 0 ? Math.PI : 0; // pylons face the road from both sides
       });
     }
     const bx = r ? -(bend(zp) + r.p.x * 0.6) : -bend(zp);

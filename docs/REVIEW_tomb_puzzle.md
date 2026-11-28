@@ -171,3 +171,97 @@ Pure rules live in `src/sim.js` (BFS solver included), content in
   are unchanged, and no displayed text was added beyond the renamed
   title/subtitle/tomb names and the results-row wording, which reuse the
   existing i18n mechanism.
+
+## Certification Sweep A (2026-11-27) — INCOMPLETE: environment blocker, see status
+
+### Level inventory (all 20 rooms; solver-measured, sim.js BFS, all-keys route)
+
+| # | Tomb (look variant) | Design / mechanic challenge | Size | Optimal | Par | States |
+|---|---|---|---|---|---|---|
+| 1 | Saqqara (v0) | Intro: carpet halls, collect 2 keys, exit — no blocks | 7×7 | 20 | 25 | 46 |
+| 2 | Saqqara (v1) | First block→plate→door | 7×7 | 20 | 25 | 1,003 |
+| 3 | Saqqara (v2) | Pit-filling with the only block | 7×6 | 18 | 23 | 376 |
+| 4 | Saqqara (v3) | Locked door (spend a key) + plate/door | 8×7 | 22 | 28 | 1,192 |
+| 5 | Valley of the Kings (v0) | Crumbling floor ×3, no blocks | 8×6 | 14 | 18 | 146 |
+| 6 | Valley of the Kings (v1) | Two plates, one door, two blocks | 7×7 | 36 | 45 | 1,304 |
+| 7 | Valley of the Kings (v2) | Two torches → gate | 7×7 | 18 | 23 | 215 |
+| 8 | Valley of the Kings (v3) | Two blocks, two plate/door pairs (chain) | 8×8 | 16 | 20 | 235 |
+| 9 | Abu Simbel (v0) | Two pits, two blocks | 8×6 | 11 | 14 | 867 |
+| 10 | Abu Simbel (v1) | Crumbling floor + plate/door, keys first | 8×5 | 10 | 13 | 66 |
+| 11 | Abu Simbel (v2) | Torches → key → locked door, crumble ×2 | 7×8 | 27 | 34 | 9,162 |
+| 12 | Abu Simbel (v3) | Everything at once: plate, lock, torches, pit, crumble | 8×10 | 27 | 34 | 894 |
+| 13 | Tutankhamun (v0) | Plate + pit with two blocks | 8×6 | 16 | 21 | 305 |
+| 14 | Tutankhamun (v1) | Torches + locked door, crumble | 8×7 | 25 | 31 | 232 |
+| 15 | Tutankhamun (v2) | Two-door chain, two blocks | 8×6 | 14 | 18 | 1,630 |
+| 16 | Tutankhamun (v3) | Plate + torches + pit + crumble together | 8×7 | 20 | 25 | 24,289 |
+| 17 | Hatshepsut (v0) | Two plates held at once, two blocks | 8×7 | 19 | 24 | 10,046 |
+| 18 | Hatshepsut (v1) | Golden key → locked door below, torches, crumble | 8×7 | 19 | 24 | 339 |
+| 19 | Hatshepsut (v2) | Pit-fill + plate with two blocks | 8×6 | 14 | 18 | 606 |
+| 20 | Hatshepsut (v3) | Finale: every tomb secret at once | 8×8 | 26 | 33 | 3,991 |
+
+No two rooms share a layout (pinned by the no-copy/no-mirror test); difficulty is
+carried by mechanic combinations and state-space size, not by numbers alone.
+
+### ❌ found and fixed this sweep
+1. **Rooms inside one tomb shared an identical background.** All four rooms of a
+   tomb rendered from the same palette with the same canvas-texture RNG seeds —
+   byte-identical floors, walls, carpets and glyphs; only the layout differed.
+   Protocol hard rule: two levels sharing a background = ❌. **Fix (commit
+   3825642b):** new pure `roomVariant(def)` in sim.js (the room's position inside
+   its tomb, 0–3); `textures.js` gained `variantPalette()` (per-variant carpet
+   colour scheme — tomb colour / teal / royal blue / purple — plus floor/wall/bg
+   tint shifts), per-variant carpet patterns (stripes / zigzag / diamonds), and
+   seeded texture makers (floor/wall/block/crumble glyph & speckle seeds shift
+   per variant). `main.js` `_tex(look, variant)` caches per (tomb, variant);
+   textures are built once when a room is built — no per-frame work added.
+   Regression tests pin variants [0,1,2,3] per tomb and consecutive-room
+   difference. Zero new image/audio files (code-drawn only).
+
+### Evidence gathered (fixed build)
+- `npm test` **25/25** (was 23; +2 Sweep A tests: room variants, pre-2F-shaped
+  save). The solver test replays all 20 rooms to a 3-star all-keys win.
+- `npm run build` green; game.js **160.6 KB** (≤200 KB).
+- Real click-flow browser runs on the fixed build (harness
+  `~/tools/recorder/cert_a_tomb_puzzle.mjs`, frames in
+  `~/workspace/audit/cert_a/tomb_puzzle/`): fresh menu title ✅, museum opens
+  with all 5 exhibits locked ✅, fresh map 19 locked / room 1 open ✅, touch
+  swipe moved the explorer ✅, pause card + pause→levels ✅, **rooms 1–8 won
+  end-to-end via real map clicks + real keyboard input, each 3 stars at the
+  exact solver move count (20/20, 20/20, 18/18, 22/22, 14/14, 36/36, 18/18,
+  16/16), room 1 results→replay restarted at 0 moves ✅, 0 page errors** in
+  those runs. Menu/museum/map frames eyeballed clean.
+
+### Cycle status — NOT certified yet (honest)
+The full 3-cycle protocol (every room's start/mid/end frames at 844×390,
+1024×768, 1366×1024 + portrait, per-room look-distance check, gentle-fall,
+old-save and perf sections, then cycles 2–3) could **not** be completed: the
+shared VM collapsed under ~a dozen concurrent sweep agents (load average
+peaked at 174, repeated OOM kills and two runtime restarts), and long
+Chromium/SwiftShader sessions were killed faster than the 20-room campaign
+could finish. A resumable runner (`~/workspace/audit/cert_a/runner.sh`,
+chunks: menu / rooms 0–5 / 5–10 / 10–15 / 15–20 / misc per cycle, skipping
+clean chunks) is left running/detached and accumulates `checks_*.json` +
+frames under `~/workspace/audit/cert_a/tomb_puzzle/cycle<N>/`; remaining
+chunks must be re-driven when the machine is calm. **No two consecutive
+clean rounds are claimed.**
+
+### Decisions
+- Variant 0 of each tomb keeps the exact pre-sweep look (the shipped identity);
+  variants 1–3 are new. Museum/menu exterior (desert panorama) unchanged.
+- No mechanic, id, save or par changes — the fix is presentation-only, so all
+  2F playtime math (≈57 min campaign) stands.
+
+### غير مؤكد (unconfirmed)
+- Rooms 9–20 not yet won in the browser on the fixed build (solver-proven +
+  unit-replayed only); per-room look-distance numbers not yet measured
+  (frames + sampling harness exist and are queued in the runner).
+- Gentle-fall, old-pre-2F-save, VoiceCoach-cooldown and museum-seeded flows
+  are unit-proven and harness-scripted but their browser sections did not
+  complete before the environment collapse.
+- Perf under 4× CPU throttling NOT measured (no numbers claimed); changed
+  code adds no per-frame allocations (audit: texture construction happens in
+  `_build` only). Real device / iPhone WebView untested; audio not heard by
+  a human; EN UI not re-screenshotted this sweep.
+
+### Add to instinct
+- None. No new spoken lines; VoiceCoach clips unchanged.

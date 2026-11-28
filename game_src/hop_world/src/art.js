@@ -1,4 +1,5 @@
-// Hop World art, all drawn in code: four worlds (sunny hills, crystal cave, desert, snowy castle), tile sprites, the hero,
+// Hop World art, all drawn in code: eight worlds (sunny hills, crystal cave, desert, snowy castle, Nile island, Karnak
+// temple, Alexandria shore, Siwa oasis), tile sprites, the hero,
 // the walking bugs, coins, the power-up, the flag and the castle. Nothing here comes from a file or from another game.
 const TAU = Math.PI * 2;
 const hash = (n) => { const v = Math.sin(n * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
@@ -8,6 +9,10 @@ export const PAL = {
   cave: { sky: ['#1c1438', '#3a2a66'], top: '#9a8ae0', topD: '#6a58b8', dirt: '#5a4a8a', dirtD: '#40336a', brick: '#6a8ae0', brickD: '#3e56a8', pipe: '#26c8b8', pipeD: '#16887c', castle: '#8a7ac8' },
   desert: { sky: ['#ffb468', '#ffeabc'], top: '#f8dc8a', topD: '#e0b860', dirt: '#dca454', dirtD: '#b87c30', brick: '#f0b848', brickD: '#b87c18', pipe: '#d86a4a', pipeD: '#a03e24', castle: '#f0d090' },
   snow: { sky: ['#a8d0f0', '#f4faff'], top: '#ffffff', topD: '#c8e0f4', dirt: '#9cc4e8', dirtD: '#7aa4d0', brick: '#78d0f0', brickD: '#3a98c8', pipe: '#8ad8ff', pipeD: '#4a9ac8', castle: '#dcecfa' },
+  nile: { sky: ['#7ad8e8', '#e8fbff'], top: '#4ec86a', topD: '#2f9e4a', dirt: '#a8743c', dirtD: '#7e5226', brick: '#d8a04a', brickD: '#a87424', pipe: '#2aa8c8', pipeD: '#187a96', castle: '#f4e2b8' },
+  temple: { sky: ['#ffc478', '#fff0d0'], top: '#e8c078', topD: '#c49a48', dirt: '#c89858', dirtD: '#9e7438', brick: '#e0aa50', brickD: '#a87828', pipe: '#c86a3a', pipeD: '#96461e', castle: '#eed49a' },
+  shore: { sky: ['#6ac4f0', '#dff6ff'], top: '#f4e2a0', topD: '#dcc478', dirt: '#d8b878', dirtD: '#b08e4e', brick: '#7ac8e8', brickD: '#3e90b8', pipe: '#f0785a', pipeD: '#b84a30', castle: '#f6ecd2' },
+  oasis: { sky: ['#8ae0c8', '#f2fff2'], top: '#5cc85e', topD: '#38a844', dirt: '#caa050', dirtD: '#a37c34', brick: '#e8b84a', brickD: '#b8892a', pipe: '#3ab894', pipeD: '#22856a', castle: '#f8e8bc' },
 };
 
 function sprite(px, fn) { const c = document.createElement('canvas'); c.width = c.height = px; fn(c.getContext('2d'), px); return c; }
@@ -22,6 +27,10 @@ export function makeSprites(px, world) {
     if (world === 'desert') { g.fillRect(0, s * 0.48, s, s * 0.04); g.fillRect(s * 0.5, 0, s * 0.04, s * 0.48); g.fillRect(s * 0.25, s * 0.52, s * 0.04, s * 0.48); }
     if (world === 'snow') { g.strokeStyle = '#d8ecff'; g.lineWidth = s * 0.04; g.beginPath(); g.moveTo(s * 0.2, s * 0.1); g.lineTo(s * 0.45, s * 0.5); g.lineTo(s * 0.35, s * 0.9); g.stroke(); }
     if (world === 'cave') { g.fillStyle = '#7ae8f0'; g.fillRect(s * 0.62, s * 0.3, s * 0.06, s * 0.1); g.fillRect(s * 0.2, s * 0.7, s * 0.05, s * 0.08); }
+    if (world === 'nile') { g.strokeStyle = '#2f9e4a'; g.lineWidth = s * 0.045; g.beginPath(); g.moveTo(s * 0.3, s * 0.95); g.quadraticCurveTo(s * 0.22, s * 0.6, s * 0.34, s * 0.42); g.moveTo(s * 0.68, s * 0.95); g.quadraticCurveTo(s * 0.76, s * 0.62, s * 0.62, s * 0.45); g.stroke(); }
+    if (world === 'temple') { g.strokeStyle = P.dirtD; g.lineWidth = s * 0.05; g.beginPath(); g.moveTo(s * 0.15, s * 0.4); g.lineTo(s * 0.85, s * 0.4); g.moveTo(s * 0.3, s * 0.62); g.lineTo(s * 0.7, s * 0.62); g.stroke(); g.fillStyle = P.dirtD; g.beginPath(); g.arc(s * 0.5, s * 0.78, s * 0.07, 0, TAU); g.fill(); }
+    if (world === 'shore') { g.fillStyle = '#fff6da'; g.beginPath(); g.arc(s * 0.3, s * 0.62, s * 0.09, 0, TAU); g.arc(s * 0.68, s * 0.36, s * 0.06, 0, TAU); g.fill(); }
+    if (world === 'oasis') { g.fillStyle = '#8a5a24'; g.beginPath(); g.arc(s * 0.32, s * 0.6, s * 0.08, 0, TAU); g.arc(s * 0.66, s * 0.72, s * 0.06, 0, TAU); g.fill(); }
   };
   const top = sprite(px, (g, s) => {
     body(g, s);
@@ -66,10 +75,23 @@ function cloud(g, x, y, s, col) { g.fillStyle = col; g.beginPath(); g.arc(x, y, 
 /** A repeating object every `per` px, shifted by `off`; calls fn(x, n) with the absolute repeat index n. */
 function repeat(W, per, off, fn) { const n0 = Math.floor(off / per); const x0 = -(off - n0 * per); for (let k = 0; x0 + k * per < W + per; k++) fn(x0 + k * per, n0 + k); }
 
-export function drawBackground(g, world, W, H, camX, ts, gy, t) {
+/** Which backdrop dressing a level wears: the two levels of a world share a
+ *  palette but never the same backdrop — the second level (variant 1) is the
+ *  golden-hour visit, with a warm sky wash and pennant bunting. Purely
+ *  cosmetic: it reads no game state and consumes no rng, so the pinned
+ *  level layouts (grid + enemies) are untouched. */
+export const bgVariant = (level) => (level % 2 === 1 ? 1 : 0);
+
+export function drawBackground(g, world, W, H, camX, ts, gy, t, variant = 0) {
   const P = PAL[world] || PAL.hills;
   const gr = g.createLinearGradient(0, 0, 0, Math.max(gy, H * 0.6)); gr.addColorStop(0, P.sky[0]); gr.addColorStop(1, P.sky[1]);
   g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  if (variant === 1) {
+    // golden-hour wash over the sky only (above the ground line)
+    const wg = g.createLinearGradient(0, 0, 0, Math.max(gy, H * 0.6));
+    wg.addColorStop(0, 'rgba(255,116,32,0.30)'); wg.addColorStop(1, 'rgba(255,196,64,0.10)');
+    g.fillStyle = wg; g.fillRect(0, 0, W, Math.max(gy, H * 0.6));
+  }
   const cx = camX * ts;
   if (world === 'hills') {
     g.fillStyle = '#fff6a8'; g.beginPath(); g.arc(W * 0.82, gy * 0.26, ts * 1.1, 0, TAU); g.fill();
@@ -91,12 +113,64 @@ export function drawBackground(g, world, W, H, camX, ts, gy, t) {
     ridge(g, W, H, cx * 0.3, gy - ts * 0.8, ts * 1.4, ts * 16, '#f2c680', 1);
     ridge(g, W, H, cx * 0.5, gy - ts * 0.1, ts * 1.0, ts * 10, '#eab468', 4);
     repeat(W, ts * 9, cx * 0.5, (x, n) => { if (hash(n) < 0.4) return; g.fillStyle = '#6ab04a'; const s = ts * 0.35; g.fillRect(x - s * 0.3, gy - s * 3, s * 0.6, s * 3); g.fillRect(x - s * 1.1, gy - s * 2.2, s * 0.5, s * 1.1); g.fillRect(x - s * 1.1, gy - s * 1.2, s * 0.9, s * 0.4); g.fillRect(x + s * 0.6, gy - s * 2.6, s * 0.5, s * 1.3); g.fillRect(x + s * 0.2, gy - s * 1.5, s * 0.9, s * 0.4); });
+  } else if (world === 'nile') {
+    g.fillStyle = '#fff6a8'; g.beginPath(); g.arc(W * 0.16, gy * 0.24, ts * 1.0, 0, TAU); g.fill();
+    for (let i = 0; i < 5; i++) { const span = W + ts * 8; const x = ((i * ts * 7.3 - cx * 0.1 - t * ts * 0.2) % span + span) % span - ts * 4; cloud(g, x, gy * (0.1 + hash(i + 2) * 0.28), ts * (1.2 + hash(i + 6)), 'rgba(255,255,255,.9)'); }
+    // the river itself: a bright band with slow wave lines and feluccas
+    g.fillStyle = '#3ab8d8'; g.fillRect(0, gy - ts * 1.15, W, ts * 1.15);
+    g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = Math.max(1.5, ts * 0.05);
+    for (let rI = 0; rI < 3; rI++) { g.beginPath(); for (let x = 0; x <= W; x += 16) { const y = gy - ts * (0.3 + rI * 0.32) + Math.sin(x * 0.05 + t * 1.6 + rI * 2) * ts * 0.05; x === 0 ? g.moveTo(x, y) : g.lineTo(x, y); } g.stroke(); }
+    repeat(W, ts * 17, cx * 0.25, (x, n) => { const s = ts * (1.5 + hash(n) * 0.7); const by = gy - ts * 1.15; g.strokeStyle = '#7a4a22'; g.lineWidth = ts * 0.07; g.beginPath(); g.moveTo(x, by); g.lineTo(x, by - s * 1.5); g.stroke(); g.fillStyle = '#fff'; g.beginPath(); g.moveTo(x, by - s * 1.5); g.lineTo(x + s * 0.85, by - s * 0.25); g.lineTo(x, by - s * 0.25); g.closePath(); g.fill(); g.fillStyle = '#a8642e'; g.fillRect(x - s * 0.55, by - s * 0.12, s * 1.15, s * 0.13); });
+    ridge(g, W, H, cx * 0.45, gy - ts * 0.15, ts * 0.7, ts * 11, '#5cc86a', 2);
+    repeat(W, ts * 4.2, cx * 0.55, (x, n) => { if (hash(n) < 0.35) return; g.strokeStyle = '#2f9e4a'; g.lineWidth = ts * 0.06; const hh = ts * (0.9 + hash(n + 3) * 0.7); for (let b = -1; b <= 1; b++) { g.beginPath(); g.moveTo(x, gy); g.quadraticCurveTo(x + b * ts * 0.22, gy - hh * 0.6, x + b * ts * 0.4, gy - hh); g.stroke(); } });
+  } else if (world === 'temple') {
+    g.fillStyle = '#fff2c0'; g.beginPath(); g.arc(W * 0.85, gy * 0.3, ts * 1.4, 0, TAU); g.fill();
+    ridge(g, W, H, cx * 0.15, gy - ts * 0.9, ts * 1.5, ts * 15, '#eec27e', 4);
+    // a long colonnade marching behind the playfield
+    repeat(W, ts * 3.4, cx * 0.35, (x, n) => { const cw = ts * 0.85; const chh = ts * (3.4 + hash(n) * 0.5); g.fillStyle = '#dcb26a'; g.fillRect(x, gy - chh, cw, chh); g.fillStyle = '#c49a48'; g.fillRect(x, gy - chh, cw, ts * 0.5); g.fillRect(x - ts * 0.12, gy - chh - ts * 0.28, cw + ts * 0.24, ts * 0.3); g.fillStyle = 'rgba(120,80,20,.35)'; g.fillRect(x + cw * 0.62, gy - chh, cw * 0.16, chh); });
+    ridge(g, W, H, cx * 0.5, gy - ts * 0.1, ts * 0.8, ts * 10, '#e2b96e', 1);
+    repeat(W, ts * 13, cx * 0.5, (x, n) => { if (hash(n) < 0.45) return; const s = ts * 0.8; g.fillStyle = '#8a5a24'; g.beginPath(); g.moveTo(x, gy); g.lineTo(x + s * 0.16, gy - s * 2.4); g.lineTo(x + s * 0.32, gy); g.closePath(); g.fill(); });
+  } else if (world === 'shore') {
+    g.fillStyle = '#fff6a8'; g.beginPath(); g.arc(W * 0.8, gy * 0.22, ts * 1.05, 0, TAU); g.fill();
+    for (let i = 0; i < 4; i++) { const span = W + ts * 8; const x = ((i * ts * 8.1 - cx * 0.08 - t * ts * 0.3) % span + span) % span - ts * 4; cloud(g, x, gy * (0.1 + hash(i + 1) * 0.26), ts * (1.3 + hash(i + 5)), 'rgba(255,255,255,.92)'); }
+    // the Mediterranean: horizon band, sparkle and rolling wave crests
+    g.fillStyle = '#2a9ad8'; g.fillRect(0, gy - ts * 1.5, W, ts * 1.5);
+    g.fillStyle = 'rgba(255,255,255,.5)';
+    for (let i = 0; i < 26; i++) { const x = ((hash(i * 3) * W - cx * 0.2 + Math.sin(t * 2 + i) * 6) % W + W) % W; const y = gy - ts * (0.25 + hash(i + 7) * 1.1); g.fillRect(x, y, ts * 0.22, Math.max(1.5, ts * 0.045)); }
+    g.strokeStyle = 'rgba(255,255,255,.75)'; g.lineWidth = Math.max(1.5, ts * 0.06);
+    for (let rI = 0; rI < 2; rI++) { g.beginPath(); for (let x = 0; x <= W; x += 14) { const y = gy - ts * (0.35 + rI * 0.55) + Math.sin(x * 0.06 + t * 2.2 + rI * 2.4) * ts * 0.06; x === 0 ? g.moveTo(x, y) : g.lineTo(x, y); } g.stroke(); }
+    // gulls
+    g.strokeStyle = '#3a6a8a'; g.lineWidth = Math.max(1.5, ts * 0.045);
+    repeat(W, ts * 9, cx * 0.3, (x, n) => { const y = gy - ts * (2.6 + hash(n) * 1.2) + Math.sin(t * 2 + n * 2) * ts * 0.12; const s = ts * 0.3; g.beginPath(); g.moveTo(x - s, y); g.quadraticCurveTo(x - s * 0.4, y - s * 0.55, x, y); g.quadraticCurveTo(x + s * 0.4, y - s * 0.55, x + s, y); g.stroke(); });
+    ridge(g, W, H, cx * 0.5, gy - ts * 0.05, ts * 0.55, ts * 9, '#eed88e', 3);
+  } else if (world === 'oasis') {
+    g.fillStyle = '#fff6a8'; g.beginPath(); g.arc(W * 0.2, gy * 0.24, ts * 1.0, 0, TAU); g.fill();
+    ridge(g, W, H, cx * 0.12, gy - ts * 1.1, ts * 1.8, ts * 16, '#f0cd82', 1);
+    ridge(g, W, H, cx * 0.3, gy - ts * 0.5, ts * 1.1, ts * 12, '#e4bc66', 5);
+    // the spring: a turquoise pool in front of the dunes
+    g.fillStyle = '#3ec8b8'; g.beginPath(); g.ellipse(W * 0.5 - ((cx * 0.42) % (W + ts * 10)) + ts * 5, gy - ts * 0.12, ts * 2.6, ts * 0.3, 0, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(255,255,255,.5)'; g.beginPath(); g.ellipse(W * 0.5 - ((cx * 0.42) % (W + ts * 10)) + ts * 5, gy - ts * 0.16, ts * 1.7, ts * 0.16, 0, 0, TAU); g.fill();
+    repeat(W, ts * 5.2, cx * 0.5, (x, n) => { const s = ts * (1.5 + hash(n) * 0.8); g.strokeStyle = '#8a5a24'; g.lineWidth = ts * 0.13; g.beginPath(); g.moveTo(x, gy); g.quadraticCurveTo(x + s * 0.12, gy - s * 1.1, x + s * 0.3, gy - s * 1.9); g.stroke(); g.strokeStyle = '#38a844'; g.lineWidth = ts * 0.09; for (let f = 0; f < 6; f++) { const a = Math.PI * (0.08 + f * 0.17); g.beginPath(); g.moveTo(x + s * 0.3, gy - s * 1.9); g.quadraticCurveTo(x + s * 0.3 + Math.cos(a) * s * 0.55, gy - s * 1.9 - Math.sin(a) * s * 0.5 - s * 0.18, x + s * 0.3 + Math.cos(a) * s * 0.95, gy - s * 1.9 - Math.sin(a) * s * 0.42 + s * 0.22); g.stroke(); } g.fillStyle = '#e8a83a'; for (let d = 0; d < 3; d++) { g.beginPath(); g.arc(x + s * 0.3 + (hash(n + d) - 0.5) * s * 0.7, gy - s * (1.55 + hash(n + d + 4) * 0.25), ts * 0.09, 0, TAU); g.fill(); } });
   } else {
     repeat(W, ts * 11, cx * 0.1, (x, n) => { const b = ts * (7 + hash(n) * 3); const hh = b * 0.75; const by = gy - ts * 0.4; g.fillStyle = '#b4c8e6'; g.beginPath(); g.moveTo(x - b / 2, by); g.lineTo(x, by - hh); g.lineTo(x + b / 2, by); g.closePath(); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.moveTo(x - b * 0.14, by - hh * 0.72); g.lineTo(x, by - hh); g.lineTo(x + b * 0.14, by - hh * 0.72); g.lineTo(x + b * 0.05, by - hh * 0.66); g.lineTo(x - b * 0.04, by - hh * 0.74); g.closePath(); g.fill(); });
     repeat(W, ts * 34, cx * 0.2, (x) => { const c = '#9ab4d8'; g.fillStyle = c; const b = gy - ts * 0.6; g.fillRect(x, b - ts * 3, ts * 4, ts * 3); g.fillRect(x - ts * 0.6, b - ts * 4.5, ts * 1.4, ts * 4.5); g.fillRect(x + ts * 3.2, b - ts * 4.5, ts * 1.4, ts * 4.5); g.beginPath(); g.moveTo(x - ts * 0.8, b - ts * 4.5); g.lineTo(x + ts * 0.1, b - ts * 6); g.lineTo(x + ts, b - ts * 4.5); g.fill(); g.beginPath(); g.moveTo(x + ts * 3, b - ts * 4.5); g.lineTo(x + ts * 3.9, b - ts * 6); g.lineTo(x + ts * 4.8, b - ts * 4.5); g.fill(); g.fillStyle = '#fff'; g.fillRect(x, b - ts * 3.1, ts * 4, ts * 0.2); });
     repeat(W, ts * 3.2, cx * 0.4, (x, n) => { const s = ts * (0.7 + hash(n) * 0.5); for (let l = 0; l < 3; l++) { g.fillStyle = '#4a8c78'; g.beginPath(); g.moveTo(x, gy - s * (1.1 + l * 0.8) - ts * 0.2); g.lineTo(x + s * (0.65 - l * 0.12), gy - s * (0.1 + l * 0.8)); g.lineTo(x - s * (0.65 - l * 0.12), gy - s * (0.1 + l * 0.8)); g.closePath(); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.moveTo(x, gy - s * (1.1 + l * 0.8) - ts * 0.2); g.lineTo(x + s * 0.22, gy - s * (0.75 + l * 0.8)); g.lineTo(x - s * 0.22, gy - s * (0.75 + l * 0.8)); g.closePath(); g.fill(); } });
     g.fillStyle = 'rgba(255,255,255,.9)';
     for (let i = 0; i < 46; i++) { const sp = 0.4 + hash(i + 3) * 0.9; const x = ((hash(i) * W - cx * 0.3 * sp + Math.sin(t * 0.8 + i) * 12) % W + W) % W; const y = (hash(i + 9) * H + t * 36 * sp) % H; g.beginPath(); g.arc(x, y, 1.4 + hash(i + 5) * 1.6, 0, TAU); g.fill(); }
+  }
+  if (variant === 1) {
+    // pennant bunting strung across the top of the golden-hour visit — the
+    // unmistakable marker that this level's backdrop differs from its pair.
+    const cols = ['#ff5a8a', '#ffd23a', '#6ae0ff', '#7ae08a'];
+    g.strokeStyle = 'rgba(60,40,20,.55)'; g.lineWidth = Math.max(1.5, ts * 0.045);
+    repeat(W, ts * 7, cx * 0.45, (x0) => {
+      const y0 = gy - ts * 5.1; const sag = ts * 0.55;
+      g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo(x0 + ts * 3.5, y0 + sag * 2, x0 + ts * 7, y0); g.stroke();
+      for (let f = 0; f < 6; f++) {
+        const u = (f + 0.5) / 6; const bx = x0 + ts * 7 * u; const by = y0 + sag * 2 * u * (1 - u) * 2;
+        g.fillStyle = cols[f % 4]; g.beginPath(); g.moveTo(bx - ts * 0.3, by); g.lineTo(bx + ts * 0.3, by); g.lineTo(bx, by + ts * 0.62); g.closePath(); g.fill();
+      }
+    });
   }
 }
 
@@ -215,6 +289,73 @@ export function drawFlag(g, s, x, topY, groundY, t, hue) {
   const w = Math.sin(t * 5) * s * 0.08;
   g.fillStyle = hue; g.beginPath(); g.moveTo(x + s * 0.06, topY + s * 0.1); g.quadraticCurveTo(x + s * 0.8, topY + s * 0.1 + w, x + s * 1.5, topY + s * 0.55 + w); g.quadraticCurveTo(x + s * 0.8, topY + s * 0.7 - w, x + s * 0.06, topY + s * 1.0); g.closePath(); g.fill(); g.strokeStyle = 'rgba(0,0,0,.4)'; g.stroke();
   g.fillStyle = '#fff'; g.beginPath(); g.arc(x + s * 0.55, topY + s * 0.55, s * 0.17, 0, TAU); g.fill();
+  g.restore();
+}
+
+/** A world's signature set-piece, drawn standing on the ground line.
+ *  x: screen px of its centre, groundY: screen px of the ground surface, s: tile px.
+ *  Pure decoration — never solid, never interactive. */
+export function drawLandmark(g, kind, x, groundY, s, t) {
+  g.save(); g.translate(x, groundY); g.lineJoin = 'round';
+  const stone = '#dcb26a'; const stoneD = '#b8892a';
+  if (kind === 'sphinx') {
+    g.fillStyle = stone; g.fillRect(-s * 1.7, -s * 0.85, s * 3.1, s * 0.85); // body
+    g.fillRect(s * 1.05, -s * 1.9, s * 0.95, s * 1.9); // chest/head block
+    g.beginPath(); g.arc(s * 1.52, -s * 2.15, s * 0.52, 0, TAU); g.fill(); // head
+    g.fillStyle = stoneD; g.fillRect(s * 1.0, -s * 2.62, s * 1.05, s * 0.22); // headdress band
+    g.fillRect(-s * 1.7, -s * 0.3, s * 3.1, s * 0.1);
+    g.fillStyle = '#8a5a24'; g.beginPath(); g.arc(s * 1.66, -s * 2.2, s * 0.07, 0, TAU); g.fill(); // eye
+    g.fillRect(-s * 2.15, -s * 0.5, s * 0.5, s * 0.5); // front paw hint
+  } else if (kind === 'lighthouse') {
+    for (let i = 0; i < 5; i++) { g.fillStyle = i % 2 ? '#f4f0e6' : '#e8564a'; const w = s * (1.05 - i * 0.09); g.fillRect(-w / 2, -s * (0.75 + i * 0.72), w, s * 0.72); }
+    g.fillStyle = '#3a4a5a'; g.fillRect(-s * 0.42, -s * 4.65, s * 0.84, s * 0.3);
+    const sw = 0.5 + 0.5 * Math.sin(t * 1.4);
+    g.fillStyle = `rgba(255,240,160,${0.25 + 0.3 * sw})`; g.beginPath(); g.moveTo(0, -s * 4.5); g.lineTo(s * 3.4, -s * (4.9 - sw * 0.8)); g.lineTo(s * 3.4, -s * (3.9 - sw * 0.8)); g.closePath(); g.fill();
+    g.fillStyle = '#ffe45a'; g.beginPath(); g.arc(0, -s * 4.5, s * 0.2, 0, TAU); g.fill();
+    g.fillStyle = '#7a8a96'; g.fillRect(-s * 1.3, -s * 0.18, s * 2.6, s * 0.18); // rocks
+  } else if (kind === 'palms') {
+    g.fillStyle = '#3ec8b8'; g.beginPath(); g.ellipse(0, -s * 0.1, s * 2.3, s * 0.28, 0, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(255,255,255,.55)'; g.beginPath(); g.ellipse(-s * 0.4, -s * 0.14, s * 1.3, s * 0.13, 0, 0, TAU); g.fill();
+    for (const [px, ps] of [[-1.5, 1.15], [0.2, 1.45], [1.6, 1.0]]) {
+      g.strokeStyle = '#8a5a24'; g.lineWidth = s * 0.13; g.beginPath(); g.moveTo(px * s, 0); g.quadraticCurveTo(px * s + s * 0.14, -s * 1.2 * ps, px * s + s * 0.34, -s * 2.1 * ps); g.stroke();
+      g.strokeStyle = '#38a844'; g.lineWidth = s * 0.09;
+      for (let f = 0; f < 6; f++) { const a = Math.PI * (0.08 + f * 0.17); g.beginPath(); g.moveTo(px * s + s * 0.34, -s * 2.1 * ps); g.quadraticCurveTo(px * s + s * 0.34 + Math.cos(a) * s * 0.6, -s * 2.1 * ps - Math.sin(a) * s * 0.5 - s * 0.2, px * s + s * 0.34 + Math.cos(a) * s * 1.0, -s * 2.1 * ps - Math.sin(a) * s * 0.42 + s * 0.24); g.stroke(); }
+      g.fillStyle = '#e8a83a'; g.beginPath(); g.arc(px * s + s * 0.42, -s * 1.95 * ps, s * 0.1, 0, TAU); g.arc(px * s + s * 0.2, -s * 1.88 * ps, s * 0.09, 0, TAU); g.fill();
+    }
+  } else if (kind === 'columns') {
+    g.fillStyle = stoneD; g.fillRect(-s * 2.3, -s * 0.22, s * 4.6, s * 0.22); // plinth
+    for (const cxo of [-1.7, 0, 1.7]) {
+      g.fillStyle = stone; g.fillRect(cxo * s - s * 0.34, -s * 3.1, s * 0.68, s * 2.9);
+      g.fillStyle = stoneD; g.fillRect(cxo * s - s * 0.46, -s * 3.42, s * 0.92, s * 0.34);
+      g.fillStyle = 'rgba(120,80,20,.3)'; g.fillRect(cxo * s + s * 0.12, -s * 3.1, s * 0.1, s * 2.9);
+    }
+    g.fillStyle = stone; g.fillRect(-s * 2.3, -s * 3.85, s * 4.6, s * 0.45); // lintel
+    g.fillStyle = stoneD; g.beginPath(); g.arc(0, -s * 3.62, s * 0.13, 0, TAU); g.fill();
+  } else if (kind === 'tomb') {
+    g.fillStyle = '#8a6ab8'; g.beginPath(); g.moveTo(-s * 1.9, 0); g.lineTo(-s * 1.3, -s * 2.6); g.lineTo(s * 1.3, -s * 2.6); g.lineTo(s * 1.9, 0); g.closePath(); g.fill(); // rock face
+    g.fillStyle = '#241a48'; g.fillRect(-s * 0.55, -s * 1.7, s * 1.1, s * 1.7); // doorway
+    g.fillStyle = '#c8b060'; g.fillRect(-s * 0.72, -s * 1.95, s * 1.44, s * 0.25); // lintel
+    g.fillStyle = '#7ae8f0'; g.beginPath(); g.moveTo(-s * 1.5, -s * 2.9); g.lineTo(-s * 1.32, -s * 2.35); g.lineTo(-s * 1.68, -s * 2.35); g.closePath(); g.fill(); // crystal
+    g.fillStyle = 'rgba(255,255,255,.25)'; g.fillRect(-s * 0.55, -s * 1.7, s * 0.2, s * 1.7);
+  } else if (kind === 'monastery') {
+    g.fillStyle = '#f6f2ea'; g.fillRect(-s * 1.6, -s * 1.7, s * 3.2, s * 1.7);
+    g.fillRect(-s * 0.5, -s * 2.5, s * 1.0, s * 0.85);
+    g.beginPath(); g.arc(0, -s * 2.5, s * 0.52, Math.PI, 0); g.fill(); // dome
+    g.fillStyle = '#c8a83a'; g.fillRect(-s * 0.05, -s * 3.35, s * 0.1, s * 0.35); g.fillRect(-s * 0.17, -s * 3.22, s * 0.34, s * 0.09);
+    g.fillStyle = '#3a2a4a'; g.beginPath(); g.moveTo(-s * 0.3, 0); g.lineTo(-s * 0.3, -s * 0.85); g.arc(0, -s * 0.85, s * 0.3, Math.PI, 0); g.lineTo(s * 0.3, 0); g.closePath(); g.fill(); // door
+    g.fillStyle = '#ffe9a0'; g.fillRect(-s * 1.15, -s * 1.25, s * 0.34, s * 0.42); g.fillRect(s * 0.81, -s * 1.25, s * 0.34, s * 0.42);
+  } else if (kind === 'sail') {
+    g.strokeStyle = '#7a4a22'; g.lineWidth = s * 0.07; g.beginPath(); g.moveTo(0, 0); g.lineTo(0, -s * 2.3); g.stroke();
+    g.fillStyle = '#fff'; g.beginPath(); g.moveTo(0, -s * 2.3); g.lineTo(s * 1.35, -s * 0.3); g.lineTo(0, -s * 0.3); g.closePath(); g.fill();
+    g.fillStyle = '#ffd23a'; g.beginPath(); g.moveTo(0, -s * 2.3); g.lineTo(-s * 0.7, -s * 0.3); g.lineTo(0, -s * 0.3); g.closePath(); g.fill();
+    g.fillStyle = '#a8642e'; g.fillRect(-s * 0.95, -s * 0.22, s * 1.9, s * 0.22);
+  } else if (kind === 'saqia') {
+    g.strokeStyle = '#7a4a22'; g.lineWidth = s * 0.12;
+    g.beginPath(); g.moveTo(-s * 0.9, 0); g.lineTo(0, -s * 1.5); g.lineTo(s * 0.9, 0); g.stroke();
+    g.strokeStyle = '#a8642e'; g.lineWidth = s * 0.1; g.beginPath(); g.arc(0, -s * 1.5, s * 0.95, 0, TAU); g.stroke();
+    for (let i = 0; i < 6; i++) { const a = (i / 6) * TAU + t * 0.25; g.beginPath(); g.moveTo(0, -s * 1.5); g.lineTo(Math.cos(a) * s * 0.95, -s * 1.5 + Math.sin(a) * s * 0.95); g.stroke(); }
+    g.fillStyle = '#3ab8d8'; g.beginPath(); g.ellipse(s * 0.2, -s * 0.08, s * 1.5, s * 0.18, 0, 0, TAU); g.fill();
+  }
   g.restore();
 }
 

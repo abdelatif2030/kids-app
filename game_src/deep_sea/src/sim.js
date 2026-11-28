@@ -33,7 +33,8 @@ export const SPECIES = {
 // `species` + `fish` + `fact` feed the reef album: each stop features one species Bouri actually meets there
 // (in its mix, or its boss), with one true, simple fact in both languages. Stops 7–8 (Phase 2F) are APPENDED —
 // ids 1–6 are save data and never renumber. Only six bg plates ship, wired 1-to-1 to stops 1–6, so stops 7–8
-// cycle the plates by biome: Wadi El Gemal (reef) reuses bg_reef, Hamata (kelp) reuses bg_kelp.
+// shared a plate by biome in 2F; Certification Sweep A gave each its own `look` palette + code-drawn dressing
+// (lagoon seagrass meadows / islands coral gardens in main.js' BIOME table), so no two stops share a background.
 export const LEVELS = [
   { id: 1, ar: 'شعاب الغردقة', en: 'Hurghada Reef', biome: 'reef', start: 10, goal: 45, star3: 90, star2: 120, half: 48, halfY: 9,
     mix: [['plankton', 4], ['shrimp', 3], ['damsel', 4], ['jelly', 2], ['butterfly', 3], ['puffer', 2], ['grouper', 1]], bait: 'sardine',
@@ -53,10 +54,10 @@ export const LEVELS = [
   { id: 6, ar: 'إلفينستون', en: 'Elphinstone', biome: 'trench', look: 'abyss', start: 130, goal: 450, star3: 95, star2: 125, half: 130, halfY: 22,
     mix: [['lantern', 3], ['tuna', 3], ['squid', 3], ['angler', 2], ['barracuda', 2]], bait: 'tuna', boss: 'shark',
     species: 'angler', fish: '💡', fact: { ar: 'سمكة أبو الشص شايلة لمبة صغيرة بتنوّر في الضلمة عشان تجذب الأكل لعندها.', en: 'The anglerfish carries a tiny lamp that glows in the dark to lure its food closer.' } },
-  { id: 7, ar: 'محمية وادي الجمال', en: 'Wadi El Gemal', biome: 'reef', start: 160, goal: 540, star3: 100, star2: 135, half: 140, halfY: 23,
+  { id: 7, ar: 'محمية وادي الجمال', en: 'Wadi El Gemal', biome: 'reef', look: 'lagoon', start: 160, goal: 540, star3: 100, star2: 135, half: 140, halfY: 23,
     mix: [['plankton', 3], ['shrimp', 4], ['jelly', 2], ['damsel', 3], ['butterfly', 2], ['puffer', 2], ['grouper', 1]], bait: 'sardine',
     species: 'shrimp', fish: '🦐', fact: { ar: 'قلب الجمبري موجود في راسه!', en: "A shrimp's heart is in its head!" } },
-  { id: 8, ar: 'جزر حماطة', en: 'Hamata Islands', biome: 'kelp', start: 200, goal: 650, star3: 110, star2: 145, half: 150, halfY: 24,
+  { id: 8, ar: 'جزر حماطة', en: 'Hamata Islands', biome: 'kelp', look: 'islands', start: 200, goal: 650, star3: 110, star2: 145, half: 150, halfY: 24,
     mix: [['butterfly', 2], ['mackerel', 3], ['squid', 4], ['tuna', 4], ['barracuda', 2], ['grouper', 1]], bait: 'tuna', task: { kind: 'squid', n: 4 }, boss: 'shark',
     species: 'barracuda', fish: '⚡', fact: { ar: 'الباراكودا جسمها طويل زي السهم، وبتندفع في الميه بسرعة كبيرة.', en: 'The barracuda is long like an arrow, and it darts through the water super fast.' } },
 ];
@@ -368,3 +369,8 @@ export function albumEntries(save) {
   const s = normalizeSave(save);
   return LEVELS.map((level) => ({ level, unlocked: (s.stars[level.id] ?? 0) > 0 }));
 }
+
+/** Voice clip file stem (no extension) narrating a stop's album fact:
+ * voice/<lang>/fact<id>_1.mp3 under the game's assets. Pure, so the
+ * naming contract with the Instinct recordings is testable. */
+export function factClipName(level) { return `fact${level.id}_1`; }

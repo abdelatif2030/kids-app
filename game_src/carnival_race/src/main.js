@@ -362,7 +362,9 @@ class Game {
       seed: (Date.now() % 100000) + index,
     });
     const scene = new THREE.Scene();
-    const world = new World(scene, track, race, { start: t('title'), sub: name(def), base: this.base, pano: index }, this.quality);
+    // Backdrop panoramas: only pano1..pano6 exist as art, so later tracks reuse them in turn
+    // (Phase 2F tracks 7-9 ride under pano1/2/3 skies) instead of asking for files that do not exist.
+    const world = new World(scene, track, race, { start: t('title'), sub: name(def), base: this.base, pano: index % 6, variant: index }, this.quality);
     const carObjs = race.cars.map((c) => {
       const m = this._carModel(c.racer.id);
       const shield = makeShieldBubble();

@@ -6,7 +6,7 @@
 // reef shark), Dolphin House, the Great Wreck, Elphinstone, Wadi El Gemal and the Hamata Islands, and collect
 // the reef album. No network, no links, no ads.
 import * as THREE from 'three';
-import { Sea, LEVELS, SPECIES, EAT, DANGER, normalizeSave, albumEntries } from './sim.js';
+import { Sea, LEVELS, SPECIES, EAT, DANGER, normalizeSave, albumEntries, factClipName } from './sim.js';
 import { mat, basic, makeFish, sandTexture, causticTexture, makeRock, makeArch, makeCoral, makeKelp } from './models.js';
 import { Sound } from './audio.js';
 import { applyBackdrop } from '../../cozy_kit/art.js';
@@ -88,6 +88,10 @@ const BIOME = {
   wreck: { pic: 'bg_wreck', bg: 0x2a6a5a, fog: 0x2a6a5a, near: 7, far: 52, sand: ['#8a8060', '#7a7050'], hemi: [0xa8d8c8, 0x2a3a2a, 1.4], sun: 0.8, rock: 0x6a5a3a },
   abyss: { pic: 'bg_abyss', bg: 0x120830, fog: 0x1a0a40, near: 5, far: 48, sand: ['#3a2a5a', '#2a1a4a'], hemi: [0x8a5ae8, 0x0a0a2a, 0.8], sun: 0.25, rock: 0x3a2a5a },
   trench: { pic: 'bg_trench', bg: 0x061a30, fog: 0x08203a, near: 6, far: 55, sand: ['#3a4a5a', '#2a3a4a'], hemi: [0x5a7ab8, 0x0a1a2a, 0.9], sun: 0.3, rock: 0x2a3a4a },
+  // Certification Sweep A: stops 7–8 get their OWN palettes (they shared stop 1/2's in 2F). Same shipped
+  // plates, but different water, light, sand and rock — plus look-specific dressing in _buildSea below.
+  lagoon: { pic: 'bg_reef', bg: 0x2fd8a8, fog: 0x4ad8b0, near: 9, far: 78, sand: ['#f0e6b8', '#e2d498'], hemi: [0xeafff2, 0x5a9a6a, 2.1], sun: 1.55, rock: 0x7aa86a },
+  islands: { pic: 'bg_kelp', bg: 0x1a86d8, fog: 0x2a96d8, near: 9, far: 74, sand: ['#eee2bc', '#ddd0a2'], hemi: [0xe8f8ff, 0x4a7a6a, 2.0], sun: 1.45, rock: 0x8a9a7a },
 };
 
 class Game {
@@ -266,6 +270,14 @@ class Game {
     } else {
       for (let i = 0; i < 40; i++) { const gl = new THREE.Mesh(new THREE.SphereGeometry(0.15, 6, 4), basic([0x5ae8ff, 0xb85aff, 0x5aff8a][i % 3])); gl.position.set((rand(i + 1000) * 2 - 1) * half, floorY + 0.5 + rand(i) * hy * 2, -3 - rand(i + 1100) * 10); g.add(gl); }
     }
+    // Certification Sweep A look dressing (build-time only, no per-frame cost): Wadi El Gemal is a seagrass
+    // lagoon — dense short grass meadows over the sand; Hamata is an island reef — coral gardens in the kelp.
+    if (lv.look === 'lagoon') {
+      for (let i = 0; i < 46; i++) kelp((rand(i + 2100) * 2 - 1) * half, -0.8 - rand(i + 2200) * 9, hy * 0.55 + rand(i + 2300) * hy * 0.4, 0.55);
+    } else if (lv.look === 'islands') {
+      const cols = [0xff8a5a, 0xffd23a, 0x3ad8c8, 0xff6a8a];
+      for (let i = 0; i < 30; i++) { const c = makeCoral(i % 3, cols[i % cols.length]); c.position.set((rand(i + 2400) * 2 - 1) * half, floorY, -1 - rand(i + 2500) * 10); c.rotation.y = rand(i + 2600) * 6; c.scale.setScalar(0.9 + rand(i + 2700) * 1.1); g.add(c); }
+    }
     // god-rays slanting down from the surface in EVERY world (the aquarium look) — deep worlds (trench/abyss,
     // low sun) get fainter rays via the palette's sun value; static planes, zero per-frame cost
     for (let i = 0; i < 14; i++) {
@@ -411,7 +423,11 @@ class Game {
           h('div', { class: 'nm' }, name(sp)),
           h('div', { class: 'alt' }, `${name(lv)} · ${en ? sp.ar : sp.en}`),
           h('div', { class: 'fact' }, en ? lv.fact.en : lv.fact.ar),
-          h('div', { class: 'st' }, '⭐'.repeat(this.save.stars[lv.id] ?? 0)))
+          h('div', { class: 'st' }, '⭐'.repeat(this.save.stars[lv.id] ?? 0)),
+          h('button', {
+            class: 'ds-speak', 'aria-label': t('listen'),
+            onclick: () => { this.voice.unlock(); this.voice.playClip(factClipName(lv), en ? lv.fact.en : lv.fact.ar); },
+          }, '🔊 ', t('listen')))
         : h('div', { class: 'ds-acard lock' },
           h('div', { class: 'ic shadow' }, lv.fish),
           h('div', { class: 'nm' }, '🔒 ؟؟؟'),

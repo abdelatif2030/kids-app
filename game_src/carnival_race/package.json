@@ -5,7 +5,7 @@
   "scripts": {
     "build": "node ../cozy_kit/build_game.mjs src/main.js ../../assets/games/carnival_race/game.js",
     "watch": "esbuild src/main.js --bundle --format=iife --target=es2019 --outfile=../../assets/games/carnival_race/game.js --watch",
-    "test": "node --test test/race.test.js"
+    "test": "node --test test/race.test.js test/sim.test.js"
   },
   "dependencies": {
     "three": "0.170.0"

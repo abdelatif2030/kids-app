@@ -8,7 +8,7 @@ import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 import { VoiceCoach } from '../../cozy_kit/voice.js';
 
 const TOMB_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 2, bump: 2, win: 2, lose: 2 };
-import { parseLevel, Puzzle, step, stateKey, hintMove, starsFor, normalizeSave, museumEntries, cloneState, doorOpen, gateOpen, lockOpen, groupPressed, DIR_KEYS, DIRS, T } from './sim.js';
+import { parseLevel, Puzzle, step, stateKey, hintMove, starsFor, normalizeSave, museumEntries, cloneState, doorOpen, gateOpen, lockOpen, groupPressed, DIR_KEYS, DIRS, T, roomVariant } from './sim.js';
 import { LEVELS, TOMBS } from './levels.js';
 import { Sound } from './audio.js';
 import * as TX from './textures.js';
@@ -125,11 +125,16 @@ class Game {
     this.dust = new THREE.Points(dg, new THREE.PointsMaterial({ map: this.glowTex, size: 0.18, transparent: true, opacity: 0.45, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true })); this.dust.frustumCulled = false; this.scene.add(this.dust);
   }
 
-  _tex(look) {
-    if (this.texCache[look]) return this.texCache[look];
-    const P = TX.PAL[look];
-    const t = { P, floor: TX.makeFloorTex(P), crumble: TX.makeCrumbleTex(P), wallSide: TX.makeWallSideTex(P), wallTop: TX.makeWallTopTex(P), carpet: TX.makeCarpetTex(P), block: TX.makeBlockTex(P), plate: [0, 1, 2, 3].map((g) => TX.makePlateTex(GRP_CSS[g])), door: [0, 1, 2, 3].map((g) => TX.makeDoorTex(GRP_CSS[g])), lock: TX.makeDoorTex('#fff', 'lock'), gate: TX.makeDoorTex('#fff', 'gate') };
-    return (this.texCache[look] = t);
+  _tex(look, variant = 0) {
+    const key = `${look}|${variant}`;
+    if (this.texCache[key]) return this.texCache[key];
+    // Certification Sweep A: every room gets its own code-drawn look — variant palette (carpet scheme +
+    // floor/wall tint + scene bg) and variant glyph/speckle seeds, so rooms inside one tomb never share
+    // a background. Textures are built once per (tomb, variant) and cached; nothing is built per frame.
+    const P = TX.variantPalette(TX.PAL[look], variant);
+    const sd = variant * 101;
+    const t = { P, floor: TX.makeFloorTex(P, 7 + sd), crumble: TX.makeCrumbleTex(P, 11 + sd), wallSide: TX.makeWallSideTex(P, 3 + sd), wallTop: TX.makeWallTopTex(P, 5 + sd), carpet: TX.makeCarpetTex(P, variant), block: TX.makeBlockTex(P, 9 + sd), plate: [0, 1, 2, 3].map((g) => TX.makePlateTex(GRP_CSS[g])), door: [0, 1, 2, 3].map((g) => TX.makeDoorTex(GRP_CSS[g])), lock: TX.makeDoorTex('#fff', 'lock'), gate: TX.makeDoorTex('#fff', 'gate') };
+    return (this.texCache[key] = t);
   }
 
   /** Menu / tomb-map backdrop from the shared art pool (assets/games/art/ via ../art/). Graceful fallback: if the
@@ -177,7 +182,7 @@ class Game {
 
   _build(idx) {
     this.idx = idx; const def = LEVELS[idx]; const L = this.L = parseLevel(def); this.P = new Puzzle(L); this.vs = null;
-    const look = TOMB_LOOK[def.tomb]; const tx = this.tx = this._tex(look); const Pal = tx.P;
+    const look = TOMB_LOOK[def.tomb]; const tx = this.tx = this._tex(look, roomVariant(def)); const Pal = tx.P;
     this._clearStage();
     this.scene.background = new THREE.Color(Pal.bg);
     this.hemi.color.set(Pal.amb); this.hemi.groundColor.set(Pal.ambG); this.hemi.intensity = Pal.ambI * 1.35; this.sun.color.set(Pal.sun); this.sun.intensity = Pal.sunI * 1.15;

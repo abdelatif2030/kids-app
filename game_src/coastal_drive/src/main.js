@@ -2,7 +2,7 @@
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
 // A sports car on a busy coastal highway (palms, beach and sea on one side, green hills, guard rail and street lamps
 // on the other): drag or tap to change lanes, pass close to traffic for near misses, chain them for a combo, collect
-// coins and fire the nitro. Six levels in three worlds, a garage with four cars and upgrades. No network, no links.
+// coins and fire the nitro. Twelve levels in four worlds, a garage with four cars and upgrades. No network, no links.
 import * as THREE from 'three';
 import { Race, LEVELS, WORLDS, CARS, UPGRADES, MAX_UP, upCost, carOf, LANES, LANE_W, X_MAX, COUNTDOWN, normalizeSave } from './sim.js';
 import {
@@ -89,6 +89,27 @@ const LOOK = {
   canyon: { sky: ['#ff8a4a', '#ffd8a0'], fog: 0xf0b888, fogNear: 25, fogFar: 180, hemi: [0xffe8d0, 0x8a5a3a, 1.5], sun: [0xffd8a8, 1.6], left: 0xd89a5a, right: 0xd08a50, sea: null },
   neon: { sky: ['#1a0e3a', '#6a2a8a'], fog: 0x3a1a5a, fogNear: 40, fogFar: 220, hemi: [0x9a8ae8, 0x2a1a4a, 1.2], sun: [0xc8b8ff, 0.7], left: 0x24242c, right: 0x24242c, sea: null },
 };
+
+// Certification Sweep A: per-level backdrop variation (code-drawn only, no new image files).
+// Worlds are shared by several levels and levels 7-12 reuse an earlier level's pano file, so before
+// this table five levels were pixel-identical in background to their pano donor (L7=L1, L8=L2,
+// L9=L5, L10=L4, L12=L4, L11=L6). Every level now gets its own sky gradient, fog colour and pano
+// tint, so all 12 backgrounds are clearly different. One line per level, in level order; a test in
+// test/backdrop.test.js pins all 12 (sky, fog, panoTint) triples distinct.
+const LEVEL_LOOK = [
+  { sky: ['#6aaee8', '#e8f2f8'], fog: 0xcfe2ee, panoTint: 0xffffff },
+  { sky: ['#5aa8e8', '#ffe8c8'], fog: 0xd8e8ee, panoTint: 0xfff2dd },
+  { sky: ['#7ec8e8', '#fdf0d0'], fog: 0xe8dcc0, panoTint: 0xffffff },
+  { sky: ['#ff8a4a', '#ffd8a0'], fog: 0xf0b888, panoTint: 0xffffff },
+  { sky: ['#4aa3e8', '#e0f4ff'], fog: 0xcfe8f4, panoTint: 0xeaf6ff },
+  { sky: ['#1a0e3a', '#6a2a8a'], fog: 0x3a1a5a, panoTint: 0xffffff },
+  { sky: ['#7a9ae8', '#ffd9b0'], fog: 0xe8d8c8, panoTint: 0xffd9b8 },
+  { sky: ['#6ab0e8', '#ffd9a0'], fog: 0xe0dcc0, panoTint: 0xffe2b0 },
+  { sky: ['#2a9ae8', '#c8f4ff'], fog: 0xb8e8f0, panoTint: 0xc8f0ff },
+  { sky: ['#8a4a8a', '#ffb080'], fog: 0xd8a0b0, panoTint: 0xe8c0d8 },
+  { sky: ['#0a1a4a', '#2a4a9a'], fog: 0x1a2a5a, panoTint: 0xb8c8ff },
+  { sky: ['#e85a2a', '#ffd8a0'], fog: 0xf0a878, panoTint: 0xffc8a0 },
+];
 
 class Game {
   constructor(el, config, post) {
@@ -210,14 +231,20 @@ class Game {
   }
 
   /** The road and the scenery of one world. Things are recycled as the car drives on. */
-  _buildWorld(world) {
-    if (this.world === world && this.worldGroup) return;
+  _buildWorld(world, levelIndex = -1) {
+    // the cache key includes the level: two levels in the same world must still rebuild so the
+    // per-level LEVEL_LOOK variation (sky/fog) is applied (Certification Sweep A)
+    const key = `${world}:${levelIndex}`;
+    if (this.worldKey === key && this.worldGroup) return;
     if (this.worldGroup) {
       this.scene.remove(this.worldGroup);
       this.worldGroup.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
     }
     this.world = world;
-    const L = LOOK[world];
+    this.worldKey = key;
+    const base = LOOK[world];
+    const ov = levelIndex >= 0 ? LEVEL_LOOK[levelIndex] : null;
+    const L = ov ? { ...base, sky: ov.sky, fog: ov.fog } : base;
     const g = (this.worldGroup = new THREE.Group());
     this.scene.add(g);
     this.scene.background = skyTexture(L.sky[0], L.sky[1]);
@@ -510,14 +537,16 @@ class Game {
   }
 
   /** The level's painted backdrop (art/pano<N>.webp): a mirrored ring that follows the camera (the road scrolls, the scenery stays far away). */
-  _setPano(i) {
+  _setPano(i, levelIndex = -1) {
     if (this.pano) { this.scene.remove(this.pano); this.pano.material.map.dispose(); this.pano.material.dispose(); this.pano = null; }
     const tex = new THREE.TextureLoader().load(`${this.base}art/pano${i + 1}.webp`, () => { if (ring) ring.visible = true; if (this.backdrop) this.backdrop.visible = false; /* the painted ring replaces the flat hill wall, which stood IN FRONT of the far cars and hid them (owner 2026-11-26) */ });
     tex.colorSpace = THREE.SRGBColorSpace;
     tex.wrapS = THREE.MirroredRepeatWrapping;
     tex.repeat.set(2, 0.66);
     tex.offset.set(0, 0.34);
-    const ring = new THREE.Mesh(new THREE.CylinderGeometry(430, 430, 230, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false, depthWrite: false }));
+    // per-level tint so a reused pano file does not repeat its donor level's backdrop (Sweep A)
+    const tint = levelIndex >= 0 && LEVEL_LOOK[levelIndex] ? LEVEL_LOOK[levelIndex].panoTint : 0xffffff;
+    const ring = new THREE.Mesh(new THREE.CylinderGeometry(430, 430, 230, 48, 1, true), new THREE.MeshBasicMaterial({ map: tex, color: tint, side: THREE.BackSide, fog: false, depthWrite: false }));
     ring.visible = false;
     ring.renderOrder = -10;
     this.pano = ring;
@@ -528,8 +557,8 @@ class Game {
     this._endRace();
     const lv = LEVELS[i];
     this.levelIndex = i;
-    this._buildWorld(lv.world);
-    this._setPano(i);
+    this._buildWorld(lv.world, i);
+    this._setPano(lv.pano ? lv.pano - 1 : i, i); // levels 7-12 reuse a same-world pano (only pano1..6.webp exist)
     if (this.carId !== this.save.car) this._setCar(this.save.car);
     this.r = new Race({ level: i, car: this.save.car, up: this.save.up, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1 });
     this.mode = 'race';

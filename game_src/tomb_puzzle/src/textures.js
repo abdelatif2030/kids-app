@@ -10,6 +10,32 @@ export const PAL = {
 };
 
 function rngf(seed) { let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+
+/** Per-room palette variants (Certification Sweep A): rooms inside one tomb used to share byte-identical
+ * textures. Variant v (0..3, the room's position in its tomb) shifts the floor/wall tints, darkens/lightens
+ * the scene background and swaps the carpet to a clearly different colour scheme, so no two rooms of a tomb
+ * look alike. All still code-drawn here — no image files. */
+const CARPET_SCHEMES = [null, ['#0f7a6a', '#084a40'], ['#2c4aa0', '#182a66'], ['#7a2a8a', '#481452']];
+const TINT_MIX = [0, 0.12, 0.24, 0.1];
+const TINT_TO = [null, '#ffffff', '#ffe9a8', '#2a1a08'];
+function mixHex(hex, to, f) {
+  if (!to || !f) return hex;
+  const a = parseInt(hex.slice(1), 16); const b = parseInt(to.slice(1), 16);
+  const ch = (s) => Math.round(((a >> s) & 255) * (1 - f) + ((b >> s) & 255) * f);
+  return `#${((ch(16) << 16) | (ch(8) << 8) | ch(0)).toString(16).padStart(6, '0')}`;
+}
+function mixNum(n, to, f) { return parseInt(mixHex(`#${n.toString(16).padStart(6, '0')}`, to, f).slice(1), 16); }
+export function variantPalette(P, v = 0) {
+  if (!v) return P;
+  const to = TINT_TO[v] || '#ffffff'; const f = TINT_MIX[v] || 0;
+  const cs = CARPET_SCHEMES[v];
+  return {
+    ...P,
+    bg: mixNum(P.bg, to, f * 0.7), floorA: mixHex(P.floorA, to, f), floorB: mixHex(P.floorB, to, f),
+    wall: mixHex(P.wall, to, f), wallDark: mixHex(P.wallDark, to, f * 0.8),
+    carpet: cs ? cs[0] : P.carpet, carpet2: cs ? cs[1] : P.carpet2,
+  };
+}
 function canvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return [c, c.getContext('2d')]; }
 function tex(c, repeat = false) {
   const t = new THREE.CanvasTexture(c);
@@ -36,8 +62,8 @@ export function glyph(g, kind, x, y, s, col) {
   g.restore();
 }
 
-export function makeFloorTex(P) {
-  const [c, g] = canvas(256, 256); const r = rngf(7);
+export function makeFloorTex(P, seed = 7) {
+  const [c, g] = canvas(256, 256); const r = rngf(seed);
   g.fillStyle = P.floorA; g.fillRect(0, 0, 256, 256);
   for (let i = 0; i < 1100; i++) { g.fillStyle = r() > 0.5 ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.06)'; g.fillRect(r() * 256, r() * 256, 2 + r() * 3, 2 + r() * 3); }
   g.fillStyle = P.floorB; g.fillRect(8, 8, 240, 240);
@@ -47,8 +73,8 @@ export function makeFloorTex(P) {
   return tex(c);
 }
 
-export function makeCrumbleTex(P) {
-  const [c, g] = canvas(256, 256); const r = rngf(11);
+export function makeCrumbleTex(P, seed = 11) {
+  const [c, g] = canvas(256, 256); const r = rngf(seed);
   g.fillStyle = P.floorB; g.fillRect(0, 0, 256, 256);
   g.fillStyle = 'rgba(70,40,10,.22)'; g.fillRect(0, 0, 256, 256);
   for (let i = 0; i < 900; i++) { g.fillStyle = r() > 0.5 ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.1)'; g.fillRect(r() * 256, r() * 256, 2 + r() * 4, 2 + r() * 4); }
@@ -58,8 +84,8 @@ export function makeCrumbleTex(P) {
   return tex(c);
 }
 
-export function makeWallSideTex(P) {
-  const [c, g] = canvas(256, 256); const r = rngf(3);
+export function makeWallSideTex(P, seed = 3) {
+  const [c, g] = canvas(256, 256); const r = rngf(seed);
   g.fillStyle = P.wall; g.fillRect(0, 0, 256, 256);
   for (let i = 0; i < 1400; i++) { g.fillStyle = r() > 0.5 ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.06)'; g.fillRect(r() * 256, r() * 256, 2 + r() * 4, 2 + r() * 4); }
   g.fillStyle = P.wallDark; g.fillRect(0, 0, 256, 20); g.fillStyle = P.trim; g.fillRect(0, 20, 256, 6);
@@ -70,15 +96,15 @@ export function makeWallSideTex(P) {
   return tex(c);
 }
 
-export function makeWallTopTex(P) {
-  const [c, g] = canvas(128, 128); const r = rngf(5);
+export function makeWallTopTex(P, seed = 5) {
+  const [c, g] = canvas(128, 128); const r = rngf(seed);
   g.fillStyle = P.wall; g.fillRect(0, 0, 128, 128);
   for (let i = 0; i < 400; i++) { g.fillStyle = r() > 0.5 ? 'rgba(255,255,255,.12)' : 'rgba(0,0,0,.08)'; g.fillRect(r() * 128, r() * 128, 2 + r() * 3, 2 + r() * 3); }
   g.strokeStyle = P.trim; g.lineWidth = 5; g.strokeRect(4, 4, 120, 120);
   return tex(c);
 }
 
-export function makeCarpetTex(P) {
+export function makeCarpetTex(P, variant = 0) {
   const [c, g] = canvas(256, 256);
   g.fillStyle = P.carpet; g.fillRect(0, 0, 256, 256);
   g.fillStyle = P.carpet2; for (let i = 0; i < 8; i++) { g.beginPath(); g.moveTo(40 + 22 * (i % 2), i * 32 + 16); g.lineTo(60 + 22 * (i % 2), i * 32); g.lineTo(80 + 22 * (i % 2), i * 32 + 16); g.lineTo(60 + 22 * (i % 2), i * 32 + 32); g.fill(); }
@@ -89,6 +115,11 @@ export function makeCarpetTex(P) {
   g.save(); g.translate(128, 128); g.fillStyle = '#f4d878'; g.strokeStyle = '#7a4a10'; g.lineWidth = 3;
   for (const a of [-1.1, -0.55, 0, 0.55, 1.1]) { g.save(); g.rotate(a); g.beginPath(); g.ellipse(0, -44, 14, 40, 0, 0, 7); g.fill(); g.stroke(); g.restore(); }
   g.fillStyle = '#e8402a'; g.beginPath(); g.arc(0, 0, 14, 0, 7); g.fill(); g.stroke(); g.restore();
+  // per-room pattern so carpets inside one tomb never repeat (Certification Sweep A)
+  g.strokeStyle = 'rgba(232,192,80,.85)'; g.fillStyle = 'rgba(232,192,80,.85)'; g.lineWidth = 5;
+  if (variant === 1) { for (let y = 26; y < 256; y += 36) { g.beginPath(); g.moveTo(30, y); g.lineTo(226, y); g.stroke(); } }
+  else if (variant === 2) { for (let y = 24; y < 256; y += 32) { g.beginPath(); for (let x = 30; x <= 226; x += 14) g.lineTo(x, y + ((x / 14) % 2 ? -7 : 7)); g.stroke(); } }
+  else if (variant === 3) { for (let y = 28; y < 256; y += 28) for (let x = 42 + ((y / 28) % 2) * 14; x < 230; x += 28) { g.save(); g.translate(x, y); g.rotate(Math.PI / 4); g.fillRect(-6, -6, 12, 12); g.restore(); } }
   return tex(c);
 }
 
@@ -103,8 +134,8 @@ export function makePlateTex(col) {
   return tex(c);
 }
 
-export function makeBlockTex(P) {
-  const [c, g] = canvas(256, 256); const r = rngf(9);
+export function makeBlockTex(P, seed = 9) {
+  const [c, g] = canvas(256, 256); const r = rngf(seed);
   g.fillStyle = P.wall; g.fillRect(0, 0, 256, 256);
   g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(0, 0, 256, 10);
   for (let i = 0; i < 700; i++) { g.fillStyle = r() > 0.5 ? 'rgba(255,255,255,.07)' : 'rgba(0,0,0,.08)'; g.fillRect(r() * 256, r() * 256, 2 + r() * 4, 2 + r() * 4); }

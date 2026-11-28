@@ -200,4 +200,112 @@ TRACKS.push(
   mirrorTrack(TRACKS[1], 'lanterns2', 'ملاهي السندباد', 'Sinbad Fair', 2, [{ type: 'teacups', at: 0.4 }]),
   mirrorTrack(TRACKS[2], 'stars2', 'ملاهي الثلج', 'Snow Fair', 3, [{ type: 'hammer', at: 0.18 }]),
 );
+
+// Certification Sweep A: tracks 4-6 began as exact left-right mirrors of tracks 1-3 — a child who
+// learned one already knew the other, and the layout read as the same track. They are now authored
+// variants: several corners moved by metres (point COUNTS unchanged, so the pinned identities and
+// save behaviour hold), and their ramps/tunnels/arches/items/hazard placements re-authored so each
+// drives differently from its source. Hazard counts are unchanged; hazard spots/types moved.
+function varyTrack(t, moved, feats) {
+  for (const [i, x, z] of moved) { t.points[i].p[0] = x; t.points[i].p[2] = z; }
+  Object.assign(t, feats);
+  return t;
+}
+varyTrack(TRACKS[3], // pier2 «Paris Fair»: wider north bend, tighter south return, a tunnel the pier never had
+  [[3, -44, 158], [7, -122, 58], [11, -128, -66], [13, -24, -102]],
+  {
+    items: [0.18, 0.5, 0.82],
+    ramps: [0.3, 0.78],
+    hazards: [{ type: 'teacups', at: 0.22 }, { type: 'hammer', at: 0.55 }, { type: 'teacups', at: 0.84 }],
+    tunnels: [[0.6, 0.68]],
+    arches: [0.4],
+  });
+varyTrack(TRACKS[4], // lanterns2 «Sinbad Fair»: swung-out east loop (mirrored side), tunnel moved to the opening straight
+  [[2, 34, 128], [5, 112, 62], [8, 88, -44], [11, 48, -128]],
+  {
+    items: [0.14, 0.44, 0.7, 0.9],
+    ramps: [0.2, 0.66],
+    hazards: [{ type: 'teacups', at: 0.18 }, { type: 'hammer', at: 0.47 }, { type: 'boat', at: 0.7 }, { type: 'teacups', at: 0.88 }],
+    tunnels: [[0.14, 0.22]],
+    arches: [0.5],
+  });
+varyTrack(TRACKS[5], // stars2 «Snow Fair»: only post-loop points move (indices 0-10 are the loop itself)
+  [[12, 34, 152], [15, 132, 118], [18, 138, -28], [21, 58, -44]],
+  {
+    items: [0.14, 0.4, 0.66, 0.88],
+    ramps: [0.6],
+    hazards: [{ type: 'hammer', at: 0.18 }, { type: 'teacups', at: 0.38 }, { type: 'hammer', at: 0.55 }, { type: 'boat', at: 0.72 }, { type: 'teacups', at: 0.9 }],
+    tunnels: [[0.55, 0.63]],
+    arches: [0.45, 0.8],
+  });
+
+// Phase 2F: three NEW authored tracks (not mirrors), appended so existing ids/order never change.
+// Each has its own layout identity: a pinched two-lobe "figure-eight" for the moulid crowds, a long
+// riverside loop for Luxor, and a wide flowing beach loop for Matrouh. Only the hazard types the
+// engine already supports (teacups / hammer / boat) are used.
+TRACKS.push(
+  {
+    id: 'moulid',
+    ar: 'ملاهي مولد القاهرة',
+    en: 'Cairo Moulid Fair',
+    width: 12,
+    difficulty: 2,
+    // Two lobes joined at a narrow waist near the start: the road pinches in, loops the east crowd
+    // lobe, squeezes back through the waist and loops the west lobe — a figure-eight feel with no
+    // self-crossing, so track space stays unambiguous.
+    points: [
+      { p: [0, 0, 0] }, { p: [10, 0, 35] }, { p: [35, 1, 70] }, { p: [70, 2, 85] }, { p: [100, 2, 70] },
+      { p: [110, 1, 40] }, { p: [95, 0, 10] }, { p: [65, 0, -2] }, { p: [35, 0, 8] }, { p: [10, 0, 16] },
+      { p: [-8, 0, -8] }, { p: [-30, 0, -32] }, { p: [-58, 1, -60] }, { p: [-88, 2, -72] }, { p: [-108, 1, -48] },
+      { p: [-106, 0, -14] }, { p: [-82, 0, 6] }, { p: [-48, 0, 10] }, { p: [-22, 0, 4] },
+    ],
+    items: [0.08, 0.3, 0.52, 0.74, 0.9],
+    tickets: [[0.05, 0], [0.16, 0.45], [0.28, -0.45], [0.42, 0], [0.58, -0.4], [0.7, 0.45], [0.84, 0], [0.95, -0.35]],
+    ramps: [0.46, 0.86],
+    hazards: [{ type: 'teacups', at: 0.18 }, { type: 'hammer', at: 0.4 }, { type: 'boat', at: 0.68 }, { type: 'teacups', at: 0.82 }],
+    tunnels: [[0.54, 0.62]],
+    arches: [0.25, 0.75],
+  },
+  {
+    id: 'luxor',
+    ar: 'ملاهي الأقصر',
+    en: 'Luxor Fair',
+    width: 13,
+    difficulty: 3,
+    // A long riverside loop: two long straights along the Nile joined by sweeping temple-end curves,
+    // with a gentle climb over the middle of the lap.
+    points: [
+      { p: [0, 0, 0] }, { p: [0, 0, 80] }, { p: [5, 1, 150] }, { p: [20, 2, 210] }, { p: [45, 3, 245] },
+      { p: [80, 3, 250] }, { p: [105, 2, 225] }, { p: [115, 1, 170] }, { p: [105, 0, 110] }, { p: [110, 0, 50] },
+      { p: [125, 1, -10] }, { p: [110, 2, -60] }, { p: [70, 2, -85] }, { p: [30, 1, -80] }, { p: [5, 0, -45] },
+    ],
+    items: [0.07, 0.28, 0.5, 0.71, 0.9],
+    tickets: [[0.04, 0], [0.14, -0.45], [0.24, 0.4], [0.38, 0], [0.55, -0.45], [0.66, 0.45], [0.8, 0], [0.93, -0.4]],
+    ramps: [0.33, 0.66, 0.92],
+    hazards: [{ type: 'hammer', at: 0.15 }, { type: 'boat', at: 0.42 }, { type: 'teacups', at: 0.58 }, { type: 'hammer', at: 0.78 }, { type: 'boat', at: 0.95 }],
+    tunnels: [[0.2, 0.29], [0.82, 0.9]],
+    arches: [0.12, 0.6],
+  },
+  {
+    id: 'matrouh',
+    ar: 'ملاهي شاطئ مطروح',
+    en: 'Matrouh Beach Fair',
+    width: 14,
+    difficulty: 4,
+    // The widest, most flowing loop: big sweepers around the bay, gentle heights, long sight-lines —
+    // the fastest-feeling track, kept kind by its width.
+    points: [
+      { p: [0, 0, 0] }, { p: [-10, 0, 70] }, { p: [-35, 1, 130] }, { p: [-80, 2, 165] }, { p: [-130, 2, 160] },
+      { p: [-165, 1, 115] }, { p: [-160, 0, 60] }, { p: [-120, 0, 25] }, { p: [-70, 1, -5] }, { p: [-40, 2, -50] },
+      { p: [-30, 2, -105] }, { p: [-5, 1, -150] }, { p: [40, 0, -165] }, { p: [85, 0, -140] }, { p: [105, 1, -90] },
+      { p: [95, 1, -40] }, { p: [55, 0, -15] }, { p: [20, 0, 5] },
+    ],
+    items: [0.06, 0.24, 0.44, 0.63, 0.82, 0.94],
+    tickets: [[0.03, 0], [0.12, 0.45], [0.22, -0.4], [0.36, 0], [0.5, 0.45], [0.68, -0.45], [0.78, 0], [0.9, 0.4]],
+    ramps: [0.3, 0.55, 0.8],
+    hazards: [{ type: 'boat', at: 0.14 }, { type: 'hammer', at: 0.38 }, { type: 'teacups', at: 0.56 }, { type: 'boat', at: 0.74 }, { type: 'hammer', at: 0.9 }],
+    tunnels: [[0.6, 0.68]],
+    arches: [0.2, 0.66],
+  },
+);
 export const TRACK_COUNT = TRACKS.length;

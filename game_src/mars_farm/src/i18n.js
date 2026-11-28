@@ -31,6 +31,11 @@ const S = {
   tutPlant: ['اضغط على حقل فاضي عشان تزرع قمح 🌾', 'Tap an empty field to plant wheat 🌾'], tutRipe: ['المحصول جاهز! اضغط عليه عشان تحصده', 'The crop is ripe! Tap it to harvest'],
   tutOrder: ['عندك طلب جاهز! اضغط على المركز 📦', 'An order is ready! Tap the HQ 📦'], tutGoat: ['اضغط على الحظيرة عشان تأكل الماعز', 'Tap the pen to feed the goats'],
   full: ['كامل', 'Full'], free: ['ببلاش', 'Free'], homeInfo: ['مستعمرين', 'colonists'],
+  research: ['أبحاث', 'Research'], researchTitle: ['أبحاث المستعمرة 🔬', 'Colony research 🔬'],
+  researchHint: ['اشتري تحسينات لطيفة بفلوس المستعمرة — بتفضل معاك على طول!', 'Buy gentle upgrades with colony coins — they stay with you forever!'],
+  bonusTask: ['هدف إضافي ⭐', 'Bonus goal ⭐'], milestoneTask: ['هدف المستعمرة ⭐', 'Colony goal ⭐'],
+  starsEarned: ['نجوم المستوى', 'Level stars'], totalStars: ['كل النجوم', 'Total stars'],
+  needFirst: ['محتاج الأول', 'Needs first'], bought: ['عندك ✓', 'Owned ✓'],
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'],
   recenter: ['وسّط الشاشة', 'Center view'],
 };
@@ -40,7 +45,17 @@ export const LEVEL_TITLES = [
   ['أول حقل', 'First field'], ['جزر وبيوت', 'Carrots and homes'], ['المخبز', 'The bakery'], ['دره وجيران', 'Corn and neighbours'],
   ['الجبنة', 'Cheese'], ['العصير', 'Juice'], ['تجارة الدرون', 'Drone trade'], ['مزرعة أكبر', 'A bigger farm'],
   ['مدينة صغيرة', 'A small town'], ['كل المنتجات', 'All the products'], ['كل الأرض', 'All the land'], ['محطة الفضاء', 'The spaceport'],
+  ['بوابة أوليمبوس', 'Olympus Gate'], ['مزارع أوليمبوس', 'Olympus Farms'], ['مدينة أوليمبوس', 'Olympus Town'], ['قمة أوليمبوس', 'Olympus Summit'],
 ];
+// Research node names + what they do: [name ar, name en, desc ar, desc en]
+export const RESEARCH_TEXT = {
+  sprouts: ['بذور سريعة', 'Fast sprouts', 'المحاصيل بتكبر أسرع', 'Crops grow faster'],
+  ovens: ['أفران سريعة', 'Fast ovens', 'المخبز والمصانع بيشتغلوا أسرع', 'The bakery and factories work faster'],
+  drone: ['درون إضافي', 'Extra drone', 'طلب إضافي في نفس الوقت', 'One more order at the same time'],
+  bargain: ['بناء أوفر', 'Cheaper building', 'كل المباني أرخص شوية', 'Every building costs a little less'],
+  welcome: ['ترحيب سريع', 'Warm welcome', 'المستعمرين بيوصلوا أسرع', 'Colonists arrive sooner'],
+  bigorders: ['طلبات أكبر', 'Bigger orders', 'الطلبات بتدفع فلوس أكتر', 'Orders pay more coins'],
+};
 export const REGION_NAMES = [['الوسط', 'Centre'], ['الشمال', 'North'], ['الغرب', 'West'], ['الشرق', 'East'], ['الجنوب', 'South'], ['شمال غرب', 'North-west'], ['شمال شرق', 'North-east'], ['جنوب غرب', 'South-west'], ['جنوب شرق', 'South-east']];
 export const EMOJI = {
   wheat: '🌾', carrot: '🥕', corn: '🌽', milk: '🥛', bread: '🍞', cheese: '🧀', juice: '🧃',

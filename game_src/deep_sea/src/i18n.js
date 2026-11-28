@@ -14,6 +14,7 @@ const S = {
   album: ['ألبوم الشعاب', 'Reef album'],
   albumSub: ['كل محطة ليها سمكة وسرّ — كمّل المحطة عشان تعرفه!', 'Every stop has a fish and a secret — finish the stop to learn it!'],
   lockedFact: ['لسه سرّ! كمّل المحطة دي عشان تعرف حكاية السمكة', "Still a secret! Finish this stop to learn the fish's story"],
+  listen: ['اسمع', 'Listen'],
   growTo: ['كبّر لحد {n} سم', 'Grow to {n} cm'],
   eatSquid: ['وكُل {n} حبار', 'and eat {n} squid'],
   eatShark: ['وبعدها كُل القرش!', 'then devour the shark!'],

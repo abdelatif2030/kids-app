@@ -1,10 +1,10 @@
 // «مزرعة المريخ» — Mars Farm Colony. Entry: window.MarsFarm.start(container, config, post).
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
 // Isometric farming and colony building. Logic lives in sim.js, drawing in draw.js, sound in audio.js, texts in i18n.js.
-import { Colony, GRID, REGIONS, CROPS, BUILD, LEVELS, ITEMS, MAX_LEVEL, HQ, regionOf, levelBonus, isSave, normalizeSave } from './sim.js';
+import { Colony, GRID, REGIONS, CROPS, BUILD, LEVELS, ITEMS, MAX_LEVEL, HQ, regionOf, levelBonus, isSave, normalizeSave, RESEARCH } from './sim.js';
 import { drawWorld, sp, isTall } from './draw.js';
 import { Sound } from './audio.js';
-import { I, EMOJI, LEVEL_TITLES, nm, lt, taskText, unlockText, REGION_NAMES } from './i18n.js';
+import { I, EMOJI, LEVEL_TITLES, RESEARCH_TEXT, nm, lt, taskText, unlockText, REGION_NAMES } from './i18n.js';
 import { h, css } from '../../cozy_kit/ui.js';
 import { VoiceCoach } from '../../cozy_kit/voice.js';
 
@@ -113,7 +113,10 @@ class Game {
   }
   _pick(sx, sy) {
     const [gx, gy] = this._unproject(sx, sy); const tx = Math.floor(gx); const ty = Math.floor(gy);
-    for (const [d, big] of [[2, true], [1, false], [0, false]]) {
+    // The tapped tile's own building always wins (Cert Sweep A fix): the tall-building lookahead
+    // below used to run first, so a tap on the starter field at (5,5) — exactly 2 tiles up-left of
+    // the 2-wide HQ — opened the orders panel instead of planting/harvesting that field.
+    for (const [d, big] of [[0, false], [2, true], [1, false]]) {
       const b = this.c.bldAt(tx + d, ty + d);
       if (b && (d === 0 || (isTall(b.k) && (d === 1 || b.w === 2)))) return { x: tx + d, y: ty + d, b };
     }
@@ -175,6 +178,7 @@ class Game {
       h('div', { class: 'mf-logo' }, '🚀 ', I.t('title')),
       h('div', { class: 'mf-small' }, I.t('how')), h('div', { class: 'mf-small' }, I.t('how2')),
       this.c.won ? h('div', { class: 'mf-small' }, '🏆 ' + I.t('welcome')) : h('div', { class: 'mf-small' }, `⭐ ${I.t('level')} ${I.num(this.c.level)}`),
+      this.c.totalStars() > 0 ? h('div', { class: 'mf-small' }, `${I.t('totalStars')}: ⭐ ${I.num(this.c.totalStars())}`) : null,
       h('button', { class: 'mf-btn', onclick: () => { this.sound.play('tap'); this.start(); } }, has ? I.t('cont') : I.t('play')),
       has ? nb : null,
       h('button', { class: 'mf-btn dark', onclick: () => { this._save(true); this.post({ type: 'exit' }); } }, I.t('exit'))));
@@ -223,6 +227,7 @@ class Game {
     const row2 = h('div', { class: 'mf-rowb big' },
       h('button', { class: 'mf-bld', onclick: () => this.showBuild() }, h('i', {}, '🏗️'), h('span', {}, I.t('build'))),
       h('button', { class: 'mf-bld', onclick: () => this.showOrders() }, h('i', {}, '📦'), h('span', {}, I.t('orders')), this.ordBadge),
+      h('button', { class: 'mf-bld', onclick: () => this.showResearch() }, h('i', {}, '🔬'), h('span', {}, I.t('research'))),
       h('button', { class: 'mf-bld', onclick: () => this.showTasks() }, h('i', {}, '📋'), h('span', {}, I.t('tasks')), this.taskBadge));
     this.dock = h('div', { class: 'mf-dock' }, row1, row2); this.layer.append(this.dock);
     this._soundPill();
@@ -354,6 +359,24 @@ class Game {
     };
     render(); this._modal(card); this.refreshPanel = render;
   }
+  showResearch() {
+    if (this.mode !== 'play') return;
+    const c = this.c; const en = I.getLang() === 'en';
+    const card = h('div', { class: 'mf-card' });
+    const render = () => {
+      const list = h('div', { class: 'mf-list' });
+      for (const def of RESEARCH) {
+        const txt = RESEARCH_TEXT[def.id]; const owned = c.hasResearch(def.id); const chk = c.canResearch(def.id);
+        const locked = !owned && chk.why === 'locked';
+        const sub = owned ? I.t('bought') : locked ? `${I.t('needFirst')}: ${RESEARCH_TEXT[chk.needs[0]][en ? 1 : 0]}` : txt[en ? 3 : 2];
+        list.append(h('div', { class: `mf-item${owned || locked ? ' dim' : ''}` }, h('i', {}, owned ? '✅' : '🔬'),
+          h('div', { class: 'grow' }, txt[en ? 1 : 0], h('small', {}, sub)),
+          owned ? h('span', {}, '⭐') : h('button', { class: `mf-mini${chk.ok ? '' : ' off'}`, onclick: () => { const r = c.buyResearch(def.id); if (r.ok) { this.sound.play('levelup'); this._dirty(); this.refreshPanel && this.refreshPanel(); } else { this.sound.play('err'); this._say(r.why === 'locked' ? I.t('needFirst') : I.t('needCoins')); } } }, `🪙 ${I.num(def.cost)}`)));
+      }
+      card.replaceChildren(h('div', { class: 'mf-title' }, I.t('researchTitle')), h('div', { class: 'mf-small' }, I.t('researchHint')), list, h('button', { class: 'mf-btn dark', onclick: () => this._closeModal() }, I.t('close')));
+    };
+    render(); this._modal(card); this.refreshPanel = render;
+  }
   _send(id) {
     const r = this.c.sendOrder(id);
     if (!r.ok) { this.sound.play('err'); this._say(I.t('need')); return; }
@@ -367,7 +390,14 @@ class Game {
       const list = h('div', { class: 'mf-list' });
       for (const t of c.tasks()) list.append(h('div', { class: `mf-item${t.done ? ' dim' : ''}` }, h('i', {}, t.done ? '✅' : '🎯'),
         h('div', { class: 'grow' }, taskText(t), h('div', { class: 'mf-prog' }, h('b', { style: `width:${Math.round(t.v / t.n * 100)}%` }))), h('span', {}, `${I.num(t.v)}/${I.num(t.n)}`)));
-      card.replaceChildren(h('div', { class: 'mf-title' }, `⭐ ${I.t('level')} ${I.num(c.level)}`), h('div', { class: 'mf-small' }, lt(LEVEL_TITLES[c.level - 1])), list, h('button', { class: 'mf-btn dark', onclick: () => this._closeModal() }, I.t('close')));
+      for (const [t, label] of [[c.bonusTask(), 'bonusTask'], [c.milestoneTask(), 'milestoneTask']]) {
+        if (!t) continue;
+        list.append(h('div', { class: `mf-item${t.done ? ' dim' : ''}` }, h('i', {}, t.done ? '⭐' : '☆'),
+          h('div', { class: 'grow' }, `${I.t(label)}: ${taskText(t)}`, h('div', { class: 'mf-prog' }, h('b', { style: `width:${Math.round(t.v / t.n * 100)}%` }))), h('span', {}, `${I.num(t.v)}/${I.num(t.n)}`)));
+      }
+      const title = LEVELS[c.level - 1].name ? lt(LEVELS[c.level - 1].name) : lt(LEVEL_TITLES[c.level - 1]);
+      card.replaceChildren(h('div', { class: 'mf-title' }, `⭐ ${I.t('level')} ${I.num(c.level)}`), h('div', { class: 'mf-small' }, title),
+        h('div', { class: 'mf-small' }, `${I.t('totalStars')}: ⭐ ${I.num(c.totalStars())}`), list, h('button', { class: 'mf-btn dark', onclick: () => this._closeModal() }, I.t('close')));
     };
     render(); this._modal(card); this.refreshPanel = render;
   }
@@ -380,6 +410,7 @@ class Game {
       h('div', { class: 'mf-small' }, I.t(c.gender === 'girl' ? 'win_f' : 'win_m')),
       last ? h('div', { class: 'mf-small' }, I.t('finalText')) : h('div', { class: 'mf-small' }, `${I.t('newIn')}:`),
       last ? null : h('div', { class: 'mf-list' }, (next.unlock.length ? next.unlock : []).map((u) => h('div', { class: 'mf-item' }, unlockText(u)))),
+      h('div', { class: 'mf-pill' }, `${I.t('starsEarned')}: ${'⭐'.repeat(c.currentStars())}${'☆'.repeat(3 - c.currentStars())}`),
       h('div', { class: 'mf-pill' }, `${I.t('bonus')}: 🪙 ${I.num(levelBonus(c.level))}`),
       h('button', { class: 'mf-btn', onclick: () => { this.levelModal = false; this._closeModal(); c.advance(); this._dirty(); } }, last ? I.t('shuttleBtn') : `${I.t('nextLevel')} ${I.num(c.level + 1)}`));
     this.levelModal = true; this._modal(card, { dismiss: false });
@@ -443,6 +474,7 @@ class Game {
       case 'region': s.play('region'); this.voice.say('charge'); this._refit(false); { const r = REGIONS[e.id]; this._burst(...sp(this, r.x + r.w / 2, r.y + r.h / 2, 6), 30, ['#ffe08a', '#7af0b0', '#fff', '#ff8aa8']); } break;
       case 'deliver': s.play('drone'); this.voice.say('pickup'); setTimeout(() => s.play('coin'), 800); this.drones.push({ t: 0, dur: 2.2, reward: e.reward }); setTimeout(() => this.fx.push({ gx: HQ.x + 1, gy: HQ.y + 1, t: 0, text: `+${I.num(e.reward)} 🪙` }), 900); break;
       case 'colonist': s.play('colonist'); this.voice.say('charge'); { const homes = c.blds.filter((b) => b.k === 'home'); const hm = homes[(e.n - 1) % Math.max(1, homes.length)]; if (hm) this.pods.push({ gx: hm.x + 0.5, gy: hm.y + 1.4, t: 0 }); } break;
+      case 'research': s.play('levelup'); this.voice.say('charge'); break;
       case 'levelready': this._levelReady(); break;
       case 'level': s.play('levelup'); this.voice.say('charge'); this._refit(false); this._burst(this.cw / 2, this.ch / 3, 40, ['#ffe08a', '#7af0b0', '#fff', '#ff8aa8']); this.hudKey = ''; break;
       case 'shuttle': this._startCelebration(); break;

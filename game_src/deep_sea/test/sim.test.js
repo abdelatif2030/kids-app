@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Sea, LEVELS, robotSwim, normalizeSave, albumEntries, SPECIES, EAT } from '../src/sim.js';
+import { Sea, LEVELS, robotSwim, normalizeSave, albumEntries, factClipName, SPECIES, EAT } from '../src/sim.js';
 
 function swim(opts, mode = 'robot') {
   const s = new Sea(opts);
@@ -64,6 +64,14 @@ test('eight stops: ids 1..8 appended, the first six gameplay fields unchanged', 
   assert.equal(LEVELS[7].en, 'Hamata Islands');
   assert.ok(LEVELS[7].task && LEVELS[7].boss, 'Hamata combines the squid hunt and the shark boss — the only stop that does');
   assert.ok(LEVELS[6].goal > LEVELS[5].goal && LEVELS[7].goal > LEVELS[6].goal, 'the growth curve keeps rising gently');
+});
+
+test('Certification Sweep A: every stop has its own background look; album clip stems are stable', () => {
+  const looks = LEVELS.map((l) => l.look || l.biome);
+  assert.equal(new Set(looks).size, LEVELS.length, `no two stops share a background look: ${looks.join(',')}`);
+  assert.equal(LEVELS[6].look, 'lagoon', 'Wadi El Gemal has the seagrass-lagoon look, not stop 1’s reef look');
+  assert.equal(LEVELS[7].look, 'islands', 'Hamata has the islands look, not stop 2’s kelp look');
+  assert.deepEqual(LEVELS.map((l) => factClipName(l)), LEVELS.map((l) => `fact${l.id}_1`));
 });
 
 test('the reef album locks and unlocks with stop completion', () => {

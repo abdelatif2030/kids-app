@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseLevel, initState, step, solve, hintMove, starsFor, Puzzle, normalizeSave, museumEntries, T, doorOpen } from '../src/sim.js';
+import { parseLevel, initState, step, solve, hintMove, starsFor, Puzzle, normalizeSave, museumEntries, T, doorOpen, roomVariant } from '../src/sim.js';
 import { LEVELS, TOMBS } from '../src/levels.js';
 
 const mk = (rows, extra = {}) => parseLevel({ id: 99, tomb: 0, rows, par: 10, ...extra });
@@ -289,6 +289,29 @@ test('museum book: fresh save all locked, a finished tomb opens with its keys, s
   assert.equal(done[0].keys, 7); assert.equal(done[0].totalKeys, 8); assert.equal(done[0].stars, 11);
   assert.equal(done[0].tomb.fact.length, 2);
   assert.ok(done.slice(1).every((e) => !e.complete));
+});
+
+test('Certification Sweep A: every room has its own visual variant inside its tomb', () => {
+  // the renderer keys carpet scheme / tints / glyph seeds off roomVariant — rooms of one tomb must all differ
+  for (let t = 0; t < 5; t++) {
+    const vs = LEVELS.filter((l) => l.tomb === t).map((l) => roomVariant(l));
+    assert.deepEqual(vs, [0, 1, 2, 3], `tomb ${t} rooms carry variants 0..3 in order`);
+    assert.equal(new Set(vs).size, 4, `tomb ${t}: no two rooms share a variant`);
+  }
+  for (let i = 1; i < LEVELS.length; i++) if (LEVELS[i].tomb === LEVELS[i - 1].tomb) assert.notEqual(roomVariant(LEVELS[i]), roomVariant(LEVELS[i - 1]), `rooms ${LEVELS[i - 1].id} and ${LEVELS[i].id} must not share a look`);
+});
+
+test('Certification Sweep A: a pre-2F-shaped save (12-room era) loads unbroken and keeps progressing', () => {
+  // exactly the shape a finished pre-2F install would hold: cap-era unlocked, stars/keys only for rooms 1-12
+  const pre = { unlocked: 12, stars: { 1: 3, 2: 3, 3: 3, 4: 3, 5: 2, 6: 3, 7: 3, 8: 2, 9: 3, 10: 3, 11: 2, 12: 3 }, keys: { 1: 2, 12: 2 }, best: { 1: 19, 12: 30 }, muted: true };
+  const s = normalizeSave(pre);
+  assert.equal(s.unlocked, 12); assert.equal(s.muted, true);
+  assert.deepEqual(s.stars, pre.stars); assert.deepEqual(s.best, pre.best);
+  const entries = museumEntries(s);
+  assert.equal(entries.length, 5);
+  assert.deepEqual(entries.map((e) => e.complete), [true, true, true, false, false]);
+  // and the chain continues: winning room 12 under the current rule opens room 13 (Tut)
+  assert.equal(Math.max(s.unlocked, Math.min(LEVELS.length, 12 + 1)), 13);
 });
 
 test('initState is a fresh copy', () => {

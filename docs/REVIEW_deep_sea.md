@@ -125,3 +125,117 @@ and eyeballed: goal pill only, silvery Bouri centre-frame, god-ray bands visible
 - Stops 7–8 have no dedicated bg plates (biome-cycle reuse, see above) — owner art decision.
 - Not played on a real phone/tablet; SwiftShader headless only. Sound not listened to by a person.
 - Dart-side display names for stops 7–8 in the app registry were not touched (lib/ is out of bounds).
+
+## Certification Sweep A — deep_sea (2026-11-27/28)
+
+Harness: `~/tools/recorder/cert_dsfx_run.mjs` + `cert_dsfx_tail.mjs` (real menu click-flow, audio unlocked by
+real clicks, seeded saves via the game's own `window.crStart`, frames in `~/workspace/audit_dsfx/deep_sea/c{1,2,3}/`).
+A cycle = fresh menu at 844×390 / 1024×768 / 1366×1024 + portrait 390×844, Play→intro→dive click-flow, EVERY stop
+entered via the real levels screen, start+mid frames at 1024×768, last stop at all 4 sizes, album fresh + full-save,
+old pre-2F save load, keyboard input, rAF perf plain + 4× CPU throttle, `npm test`.
+
+### Level inventory (8 stops)
+
+| # | Stop | Background (look / plate) | World | Start→goal | Mechanic signature |
+|---|------|---------------------------|-------|-----------|--------------------|
+| 1 | شعاب الغردقة / Hurghada Reef | reef / bg_reef — teal reef, corals | 48×9 | 10→45 cm | learn-to-eat mix, sardine bait balls, grouper |
+| 2 | رأس محمد / Ras Mohammed | kelp / bg_kelp — deep green kelp forest | 75×13 | 30→110 | squid hunt ×3, barracuda |
+| 3 | الثقب الأزرق / The Blue Hole | trench / bg_trench — dark trench, glow fish | 120×20 | 70→250 | reef-shark boss finale |
+| 4 | بيت الدلافين / Dolphin House | night (reef) / bg_night — deep blue night | 60×11 | 60→180 | night mix, 2 barracuda + grouper |
+| 5 | السفينة الغارقة / The Great Wreck | wreck (kelp) / bg_wreck — green wreck, anchor dressing | 85×15 | 90→300 | squid hunt ×5 |
+| 6 | إلفينستون / Elphinstone | abyss (trench) / bg_abyss — purple abyss fortress | 130×22 | 130→450 | shark boss, anglerfish |
+| 7 | محمية وادي الجمال / Wadi El Gemal | **lagoon** / bg_reef plate, emerald palette + seagrass meadows (Sweep A) | 140×23 | 160→540 | calm breather: no task, no boss, small-food mix |
+| 8 | جزر حماطة / Hamata Islands | **islands** / bg_kelp plate, bright island-blue palette + coral gardens (Sweep A) | 150×24 | 200→650 | only stop combining squid hunt ×4 AND shark boss |
+
+Difficulty rises by goal size, world size and predator mix only — no timers, no lives, no fail state (a bite is a
+bump + small growth cost). Stars are fast-finish bonuses; finishing slowly always wins with 1 star.
+
+### ❌ found in cycle 1 and fixed
+
+1. **Stops 7–8 shared their backgrounds with stops 1–2** (same BIOME palette + plate: 7≡1 reef, 8≡2 kelp).
+   Fix (commit `1e53966d`): stops 7/8 gained their own `look`s (`lagoon`, `islands`) — new BIOME palettes
+   (emerald shallows / bright island blue: water, fog, sand, rock, light all differ) plus code-drawn dressing
+   built once at sea-build (46 seagrass tufts in the lagoon; 30 corals in Hamata's kelp). Zero new image files.
+   Verified in cycle-2/3 frames: stop 7 is bright emerald seagrass shallows, stop 8 bright blue with a coral
+   garden — unmistakably different from stops 1/2. Regression test pins all 8 `(look||biome)` keys distinct.
+2. **The reef album had NO listen buttons** — the 2F wiring premise did not exist in code (cycle-1 full-save
+   album: 🔊 count 1 = the mute toggle only; cards were screen-only even though the fact clips are the album's
+   spoken content). Fix (same commit): unlocked cards gained a 🔊 «اسمع» button wired exactly like fox_family's
+   album — `voice.playClip(factClipName(lv), factText)` with the pure `factClipName` export (`fact<id>_1`) —
+   and locked cards keep no button. Cycle-2/3 full-save album: 🔊 count 9 (8 cards + mute); fresh album: 8/8
+   locked, no card buttons. The fact clips themselves are still NOT recorded (checked both voice folders: no
+   `fact*_1.mp3` in ar/en) — until Instinct's clips land, the kit's spoken fallback reads the fact, which is
+   the accepted interim behaviour; the 16 lines stay on the add-to-instinct list below.
+3. **Portrait menu title was clipped** at 390×844 («بُوري في البحر الأحمر» ran off both edges; `.ds-logo b`
+   used `calc(var(--u)*13)` with `nowrap`). Fix: `font-size:min(calc(var(--u)*13),8.5vw)`. Cycle-2/3 portrait
+   menu frame shows the full title inside the screen; landscape sizes unchanged.
+
+### Cycles
+
+- **Cycle 1 ❌** — the three defects above. Everything else passed: fresh Play→intro→dive flow, all 8 stops
+  entered via real levels-screen clicks with correct HUD goals (45/110/250/180/300/450/540/650 cm), 0 page
+  errors in every session, album fresh 8/8 locked, old pre-2F save (6 stops starred) loads clean.
+- **Cycle 2 ✅ zero ❌** — full pass on the fixed build: all 8 stops entered, stop 7 lagoon + stop 8 islands
+  frames eyeballed distinct, album full = 8 open cards each with a listen button (frame eyeballed), album
+  fresh = 8 locked with none, portrait title fits, old save clean, `npm test` 14/14.
+- **Cycle 3 ✅ zero ❌** — full repeat, `failures=0`: all 8 stops entered (stop-8 HUD showed live squid-task
+  progress ٢/٤ and combo ×٦ in the harness's own play), album fresh/full identical to cycle 2, old save clean.
+  Two consecutive clean cycles (2+3) after a 3-cycle sweep — **CERTIFIED**.
+
+### Final review (as a first-time viewer, cycle-3 frames)
+
+Menu is calm and clear at all sizes; every stop reads as its own place (teal reef → green kelp → dark trench →
+night blue → wreck green → purple abyss → emerald lagoon → bright islands). HUD never covers Bouri or the dash
+button; goal pill + task pill stay readable mid-action (stop-8 mid frame: tuna school, barracuda, god-rays,
+267 cm Bouri). The weakest moment remains stop 3–6 pacing for a skilled player (see length judgement) — a
+design/length question already with the owner, not a defect found by play.
+
+### Length — reported judgement (not a ❌, per the owner's logged question)
+
+Re-measured with the 2F method (median robot win time per stop over 6 seeds, sim 30 Hz; child model = robot ×3
++ 20 s/stop): robot medians 87/27.6/18/13.2/14.1/8.4/51.1/18.1 s, sum **237.5 s** → child model ≈ **14.5 min**
+(2F measured 221 s → ≈13.7 min; same ballpark, seed variance). Still short of the ≈30 min master-plan target
+for the same structural reason logged in 2F: the robot snowballs through stops 3–6 in seconds and stops 1–6
+may not be rebalanced without an owner decision. No padding was added to fake the number.
+
+### Performance
+
+- No per-frame rebuilds in changed code: the new dressing is built once in `_buildSea`; the album button is
+  static DOM; palettes are data. `npm run build` game.js **150.5 KB** (≤200 KB budget).
+- Headless rAF (SwiftShader on a shared 1.5-CPU cell with several sibling agents running): cycle 1 median/p90
+  3899.9/10799.5 ms plain, 5133.2/9483 ms at 4× CPU throttle; cycle 3 3683.2/4499.8 ms plain, 4133.2/5483.1 ms
+  throttled. These numbers measure the shared headless host, not the game — the same harness on an idle host
+  in earlier phases rendered this game interactively. **No device fps claim is made** (see غير مؤكد).
+- Tests: `npm test` **14/14 pass** (13 from 2F + 1 new Sweep A regression: distinct looks + clip stems).
+  The sim robot clears all 8 stops, 48/48 sampled wins incl. Hamata's squid-hunt-then-shark.
+
+### Voice / audio checks
+
+- VoiceCoach events fire from real play (combo counter visible in HUD during harness play; clips for
+  go/pickup/trick/nitro/near/bump/win exist in both languages — 18 files per lang on disk). Cooldown logic is
+  the shared kit's (9 s per-event / 4 s global), unchanged by this sweep and not re-timed by ear.
+- Album fact clips `fact1–8` (ar/en): **absent** → pending (below). Picnic-style fallback reads the line aloud
+  via the kit until they land.
+
+### Add to instinct (unchanged from 2F — still unrecorded, now wired and waiting)
+
+deep_sea, install to `assets/games/deep_sea/voice/<lang>/fact<stop>_1.mp3`:
+fact1 ar «الأنثياس بتعوم مع بعضها في سحابة وردية وبرتقالية كبيرة فوق الشعاب المرجانية.» / en "Anthias swim together in one big pink-and-orange cloud above the coral reef." ·
+fact2 ar «الحبار بيطلّع سحابة حبر غامقة عشان يختفي، وبعدين يهرب لورا بسرعة!» / en "A squid squirts a cloud of dark ink to hide, then jets away backwards!" ·
+fact3 ar «قرش الشعاب خجول وهادي، بيعوم بهدوء حوالين الشعاب ومش بيقرب من الناس.» / en "Reef sharks are shy and calm — they cruise slowly around the reef and stay away from people." ·
+fact4 ar «قنديل البحر معندوش مخ ولا قلب، وبيعوم مع الميه زي مظلة صغيرة.» / en "A jellyfish has no brain and no heart — it drifts with the water like a tiny umbrella." ·
+fact5 ar «التونة بتعوم بسرعة كبيرة ومش بتقف أبدًا، حتى وهي نايمة بتفضل تتحرك!» / en "Tuna swim very fast and never stop moving — they even keep swimming while they sleep!" ·
+fact6 ar «سمكة أبو الشص شايلة لمبة صغيرة بتنوّر في الضلمة عشان تجذب الأكل لعندها.» / en "The anglerfish carries a tiny lamp that glows in the dark to lure its food closer." ·
+fact7 ar «قلب الجمبري موجود في راسه!» / en "A shrimp's heart is in its head!" ·
+fact8 ar «الباراكودا جسمها طويل زي السهم، وبتندفع في الميه بسرعة كبيرة.» / en "The barracuda is long like an arrow, and it darts through the water super fast."
+
+### غير مؤكد (unconfirmed)
+
+- Real-device / iPhone WebView performance and touch feel — headless SwiftShader only; the rAF numbers above
+  are host-contention artefacts, not device measurements.
+- No human has listened to the audio in this sweep (VoiceCoach timing/levels by code + kit contract only);
+  the album's spoken fallback voice is the kit's interim voice, not a recorded narrator.
+- A full human start-to-finish playthrough of stops 7–8 in the browser (sim robot + click-entry + live HUD
+  progress only); English album/menu rendering not screenshotted (Arabic was; en strings share the i18n path).
+- Draw calls / triangle counts not read from the live renderer (the game does not expose `renderer.info`);
+  perf evidence is build-time-only dressing + frame behaviour, not a renderer profile.

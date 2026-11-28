@@ -363,6 +363,69 @@ export function makePlanet() {
   return g;
 }
 
+/** Chapter 2 dressing: the Moon-base deck — grey regolith tiles, code-drawn craters and pale rocks. */
+export function makeMoonDeck(b) {
+  const g = new THREE.Group();
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const x = c.getContext('2d');
+  x.fillStyle = '#9a9aa4';
+  x.fillRect(0, 0, 256, 256);
+  x.strokeStyle = '#83838e';
+  x.lineWidth = 4;
+  for (let i = 0; i <= 256; i += 64) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, 256); x.stroke(); x.beginPath(); x.moveTo(0, i); x.lineTo(256, i); x.stroke(); }
+  for (let i = 0; i < 260; i++) { x.fillStyle = `rgba(${60 + (i % 4) * 12},${60 + (i % 4) * 12},${66 + (i % 4) * 12},0.25)`; x.beginPath(); x.arc((i * 53) % 256, (i * 97) % 256, 1 + (i % 5), 0, Math.PI * 2); x.fill(); }
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(5, 4.5);
+  const w = b.x1 - b.x0 + 1;
+  const d = b.z1 - b.z0 + 1;
+  g.add(new THREE.Mesh(new THREE.BoxGeometry(w, 0.6, d), [mat(0x74747e), mat(0x74747e), new THREE.MeshLambertMaterial({ map: tex }), mat(0x5a5a64), mat(0x74747e), mat(0x74747e)]).translateY(-0.3));
+  const rail = mat(0xffc83a, 0xaa7700, 0.4);
+  for (const [cx, cz, lw, ld] of [[0, b.z0 - 0.5, w, 0.12], [0, b.z1 + 0.5, w, 0.12], [b.x0 - 0.5, 0, 0.12, d], [b.x1 + 0.5, 0, 0.12, d]]) {
+    g.add(box(lw, 0.1, ld, rail, cx, 0.8, cz));
+    const n = Math.round(Math.max(lw, ld) / 1.2);
+    for (let i = 0; i <= n; i++) {
+      const px = lw > ld ? -lw / 2 + (i * lw) / n : cx;
+      const pz = lw > ld ? cz : -ld / 2 + (i * ld) / n;
+      g.add(cyl(0.04, 0.04, 0.8, mat(0xd8d8e0), lw > ld ? px : cx, 0.4, lw > ld ? cz : pz, 6));
+    }
+  }
+  // craters: a dark bowl disc with a pale rim ring, plus a few moon rocks
+  for (const [px, pz, r] of [[5.5, -4.5, 2.0], [-5.5, 3.5, 2.3], [1.5, 5.5, 1.6], [-8.6, -7.6, 1.1], [8.8, 7.4, 1.2]]) {
+    const bowl = new THREE.Mesh(new THREE.CircleGeometry(r, 28), mat(0x6e6e78));
+    bowl.rotation.x = -Math.PI / 2;
+    bowl.position.set(px, 0.012, pz);
+    g.add(bowl);
+    const rim = new THREE.Mesh(new THREE.RingGeometry(r * 0.92, r * 1.12, 28), mat(0xbdbdc6));
+    rim.rotation.x = -Math.PI / 2;
+    rim.position.set(px, 0.016, pz);
+    g.add(rim);
+  }
+  for (const [px, pz, s] of [[-8.8, 0.5, 0.5], [8.9, -1.5, 0.7], [-1, -8.2, 0.45], [6.8, 8.1, 0.55]]) g.add(ball(s, mat(0x8a8a94), px, s * 0.4, pz, 1, 0.75, 1, 8));
+  return g;
+}
+
+/** Earth in the Moon sky: a blue marble with green lands and white cloud swirls, drawn on a canvas. */
+export function makeEarth() {
+  const g = new THREE.Group();  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 128;
+  const x = c.getContext('2d');
+  x.fillStyle = '#2a6ae8';
+  x.fillRect(0, 0, 256, 128);
+  x.fillStyle = '#3aa85a';
+  for (const [lx, ly, lw, lh] of [[30, 30, 55, 26], [110, 55, 70, 30], [195, 25, 45, 22], [70, 85, 40, 18], [170, 95, 55, 16]]) { x.beginPath(); x.ellipse(lx, ly, lw / 2, lh / 2, 0.4, 0, Math.PI * 2); x.fill(); }
+  x.fillStyle = 'rgba(255,255,255,0.75)';
+  for (let i = 0; i < 12; i++) { x.beginPath(); x.ellipse((i * 47) % 256, (i * 29) % 128, 16 + (i % 3) * 7, 4 + (i % 2) * 2, 0.3, 0, Math.PI * 2); x.fill(); }
+  x.fillStyle = '#eaf6ff';
+  x.fillRect(0, 0, 256, 7);
+  x.fillRect(0, 121, 256, 7);
+  const earth = new THREE.Mesh(new THREE.SphereGeometry(22, 36, 24), new THREE.MeshLambertMaterial({ map: new THREE.CanvasTexture(c), emissive: 0x1a3a6a, emissiveIntensity: 0.35 }));
+  g.add(earth);
+  return g;
+}
+
 export function makeStars(n) {
   const pos = new Float32Array(n * 3);
   for (let i = 0; i < n; i++) {

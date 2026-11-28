@@ -44,7 +44,7 @@ export const CSS = `
 .ds-btn:active{transform:translateY(calc(var(--u)*.5))}
 .ds-btn:focus-visible,.ds-sq:focus-visible,.ds-dash:focus-visible,.ds-lv:focus-visible{outline:calc(var(--u)*.7) solid #ffd23a;outline-offset:calc(var(--u)*.5)}
 .ds-logo{position:absolute;top:calc(var(--u)*20);left:50%;transform:translateX(-50%);text-align:center;white-space:nowrap}
-.ds-logo b{display:block;font-size:calc(var(--u)*13);font-weight:900;color:#fff4dc;-webkit-text-stroke:calc(var(--u)*.7) #a8421a;paint-order:stroke fill;text-shadow:0 calc(var(--u)*1.2) 0 #6a2a0a;line-height:1}
+.ds-logo b{display:block;font-size:min(calc(var(--u)*13),8.5vw);font-weight:900;color:#fff4dc;-webkit-text-stroke:calc(var(--u)*.7) #a8421a;paint-order:stroke fill;text-shadow:0 calc(var(--u)*1.2) 0 #6a2a0a;line-height:1}
 .ds-logo span{display:inline-block;margin-top:calc(var(--u)*2.6);font-size:calc(var(--u)*4.2);font-weight:900;color:#ffd23a;letter-spacing:.04em}
 .ds-menu{position:absolute;left:50%;bottom:max(calc(var(--u)*12),env(safe-area-inset-bottom));transform:translateX(-50%);width:calc(var(--u)*70);display:flex;flex-direction:column;gap:calc(var(--u)*3)}
 .ds-lvs{display:flex;flex-direction:column;gap:calc(var(--u)*2)}
@@ -66,6 +66,7 @@ export const CSS = `
 .ds-acard .st{font-size:calc(var(--u)*3.4)}
 .ds-acard.lock{filter:grayscale(.9);opacity:.62}
 .ds-acard .shadow{filter:grayscale(1) brightness(.25);opacity:.55}
+.ds-speak{font-family:inherit;font-weight:900;font-size:calc(var(--u)*3);border:none;border-radius:999px;padding:calc(var(--u)*.7) calc(var(--u)*2.4);cursor:pointer;background:#ffd75e;color:#5a3a1a;box-shadow:0 calc(var(--u)*.5) 0 #c98a14}
 .ds-stars{font-size:calc(var(--u)*11);text-align:center;letter-spacing:calc(var(--u)*1)}
 .ds-stars .off{filter:grayscale(1);opacity:.3}
 .ds-boxes{display:flex;gap:calc(var(--u)*2)}

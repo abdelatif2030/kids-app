@@ -2,13 +2,12 @@
 // (softly), bounce on mushrooms; whoever wears the golden tail when the clock reaches zero wins the round. The dino
 // grabs with the GRAB button (automatic for the youngest), the animals grab when they reach the tail. They find their
 // way with a small walking graph; only the dino can jump (over the broken bridge, onto the low deck, off a deck).
-import { GROUND_R, G, PLATFORMS, MUSHROOMS, TRUNKS, LEVELS, RIVALS, floorAt, buildGraph, distancesTo } from './data.js';
+import { GROUND_R, G, LEVELS, RIVALS, floorAt, buildGraph, distancesTo, getArena } from './data.js';
 
 const PLAYER_SPEED = 5.2;
 const JUMP_V = 8.8;
 const SLIDE_SPEED = 10;
 const GRAB_R = 1.6;
-const P = Object.fromEntries(PLATFORMS.map((p) => [p.id, p]));
 
 function rng(seed) {
   let s = seed >>> 0 || 1;
@@ -20,23 +19,25 @@ function rng(seed) {
   };
 }
 
-let GRAPH = null;
-let DIST = null;
-function graph() {
-  if (!GRAPH) {
-    GRAPH = buildGraph();
-    DIST = GRAPH.map((n) => distancesTo(GRAPH, n.i));
+const GRAPHS = new Map();
+function graph(levelIndex, arena) {
+  if (!GRAPHS.has(levelIndex)) {
+    const nodes = buildGraph(arena);
+    GRAPHS.set(levelIndex, { nodes, dist: nodes.map((n) => distancesTo(nodes, n.i)) });
   }
-  return { nodes: GRAPH, dist: DIST };
+  return GRAPHS.get(levelIndex);
 }
 
 export class Chase {
   /** opts: { level (0..5), easy, seed } */
   constructor(opts = {}) {
-    this.level = LEVELS[opts.level ?? 0];
+    this.levelIndex = opts.level ?? 0;
+    this.level = LEVELS[this.levelIndex];
+    this.arena = getArena(this.levelIndex);
+    this.Plat = Object.fromEntries(this.arena.platforms.map((p) => [p.id, p]));
     this.easy = !!opts.easy;
     this.rand = rng(opts.seed ?? 9);
-    const { nodes, dist } = graph();
+    const { nodes, dist } = graph(this.levelIndex, this.arena);
     this.nodes = nodes;
     this.dist = dist;
     this.timeLeft = this.level.time;
@@ -44,13 +45,13 @@ export class Chase {
     this.state = 'ready'; // ready (3-2-1) -> play -> over
     this.readyT = 3;
     this.events = [];
-    this.player = this._ent(0, 'dino', 0, P.p0.y, 1.5, PLAYER_SPEED);
+    this.player = this._ent(0, 'dino', 0, this.Plat.p0.y, 1.5, PLAYER_SPEED);
     this.player.isPlayer = true;
     this.rivals = [];
     const spots = ['p1', 'p2', 'p4', 'p3', 'p5'];
     for (let i = 0; i < this.level.rivals; i++) {
       const r = RIVALS[i];
-      const p = P[spots[i]];
+      const p = this.Plat[spots[i]];
       const sp = this.level.speed * (this.easy ? 0.8 : 1) * (0.96 + this.rand() * 0.08);
       const e = this._ent(i + 1, r.kind, p.x, p.y, p.z, sp);
       e.name = r;
@@ -84,7 +85,7 @@ export class Chase {
       near.immune = 1.2;
       this.lost++;
     }
-    Object.assign(p, { x: P.p0.x, y: P.p0.y, z: P.p0.z + 1.5, vy: 0, grounded: true, surf: P.p0, launch: null, stun: 0.6, immune: 1.2, fallFrom: 0 });
+    Object.assign(p, { x: this.Plat.p0.x, y: this.Plat.p0.y, z: this.Plat.p0.z + 1.5, vy: 0, grounded: true, surf: this.Plat.p0, launch: null, stun: 0.6, immune: 1.2, fallFrom: 0 });
     this.events.push({ type: 'fell', x: fx, z: fz });
   }
 
@@ -217,7 +218,7 @@ export class Chase {
       }
     }
     // tree trunks below the decks
-    for (const tr of TRUNKS) {
+    for (const tr of this.arena.trunks) {
       if (e.y > tr.top) continue;
       const d = Math.hypot(e.x - tr.x, e.z - tr.z);
       const min = tr.r + 0.35;
@@ -227,7 +228,7 @@ export class Chase {
     if (r > GROUND_R - 0.6) { e.x *= (GROUND_R - 0.6) / r; e.z *= (GROUND_R - 0.6) / r; }
     void ox; void oz;
     // up and down
-    const f = floorAt(e.x, e.z, e.y);
+    const f = floorAt(e.x, e.z, e.y, 0.45, this.arena);
     if (e.grounded && e.y - f.y <= 0.55 && e.vy <= 0) {
       e.y = f.y;
       e.surf = f.surf;
@@ -235,7 +236,7 @@ export class Chase {
       if (e.grounded) { e.grounded = false; e.vy = Math.min(e.vy, 0); e.fallFrom = e.y; }
       e.vy -= G * dt;
       e.y += e.vy * dt;
-      const f2 = floorAt(e.x, e.z, Math.max(e.y, f.y));
+      const f2 = floorAt(e.x, e.z, Math.max(e.y, f.y), 0.45, this.arena);
       if (e.vy <= 0 && e.y <= f2.y) {
         const fell = -e.vy;
         e.y = f2.y;
@@ -251,9 +252,9 @@ export class Chase {
     }
     // mushrooms throw you up onto a deck
     if (e.grounded && e.y < 0.05) {
-      for (const m of MUSHROOMS) {
+      for (const m of this.arena.mushrooms) {
         if (Math.hypot(e.x - m.x, e.z - m.z) < m.r) {
-          const t = P[m.to];
+          const t = this.Plat[m.to];
           const vy = Math.sqrt(2 * G * (t.y + 2.2));
           const T = vy / G + Math.sqrt((2 * 2.2) / G);
           e.vy = vy;

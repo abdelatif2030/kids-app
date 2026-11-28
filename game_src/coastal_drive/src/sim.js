@@ -2,7 +2,7 @@
 // brakes): steer between the lanes, pass close to cars, vans and trucks for near misses, chain them for a combo
 // multiplier, collect coins, and fire the nitro for a burst of speed. A crash costs a heart and slows the car down;
 // the cars only bump, nobody is hurt. A level is won by reaching its distance with enough near misses.
-// Six levels in three worlds (Azure Coast, Red Canyon, Neon City), a garage with four cars and three upgrades.
+// Twelve levels in four worlds (Azure Coast, Nubian Nile, Red Canyon, Neon City), a garage with four cars and three upgrades.
 // Distances are metres along the road (s); x is across the road. Deterministic with a seed for the robot tests.
 
 export const LANE_W = 3.4;
@@ -36,7 +36,10 @@ export const UPGRADES = [
 export const MAX_UP = 3;
 export const upCost = (lvl) => 80 * (lvl + 1);
 
-/** Three worlds, two levels each. km to reach, near misses needed, coin reward, traffic density. */
+/** Four worlds. km to reach, near misses needed, coin reward, traffic density.
+ * `pano` (levels 7-12 only): the 1-based painted-backdrop file this level reuses. Backdrops ship per level
+ * (art/pano1..6.webp for levels 1-6), so a later level reuses the pano of an earlier level in the same world
+ * instead of pointing at a file that does not exist. Levels 1-6 have no `pano` field: theirs is their own id. */
 export const WORLDS = [
   { id: 'azure', ar: 'الساحل الأزرق', en: 'Azure Coast' },
   { id: 'nile', ar: 'نيل النوبة', en: 'Nubian Nile' },
@@ -50,6 +53,13 @@ export const LEVELS = [
   { id: 4, world: 'canyon', ar: 'جبل موسى', en: 'Mount Sinai', km: 3.6, near: 18, reward: 500, density: 1.16, swerve: 0.25 },
   { id: 5, world: 'azure', ar: 'شاطئ مطروح', en: 'Matrouh Beach', km: 3.8, near: 20, reward: 600, density: 1.2, swerve: 0.25 },
   { id: 6, world: 'neon', ar: 'العلمين الجديدة', en: 'New Alamein', km: 4.2, near: 24, reward: 750, density: 1.25, swerve: 0.3 },
+  // Phase 2F: the long coastal tour continues — real Egyptian sea places only, curves rising gently from level 6.
+  { id: 7, world: 'azure', ar: 'كورنيش الإسكندرية', en: 'Alexandria Corniche', km: 4.4, near: 26, reward: 850, density: 1.26, swerve: 0.31, pano: 1 },
+  { id: 8, world: 'azure', ar: 'رأس البر', en: 'Ras El Bar', km: 4.6, near: 27, reward: 900, density: 1.27, swerve: 0.31, pano: 2 },
+  { id: 9, world: 'azure', ar: 'مارينا الغردقة', en: 'Hurghada Marina', km: 4.7, near: 28, reward: 1000, density: 1.28, swerve: 0.32, pano: 5 },
+  { id: 10, world: 'canyon', ar: 'شرم الشيخ', en: 'Sharm El Sheikh', km: 4.9, near: 30, reward: 1100, density: 1.29, swerve: 0.32, pano: 4 },
+  { id: 11, world: 'neon', ar: 'كورنيش بورسعيد', en: 'Port Said Corniche', km: 5.0, near: 32, reward: 1250, density: 1.3, swerve: 0.33, pano: 6 },
+  { id: 12, world: 'canyon', ar: 'مرتفعات طابا', en: 'Taba Heights', km: 5.2, near: 34, reward: 1500, density: 1.31, swerve: 0.34, pano: 4 },
 ];
 
 export const COUNTDOWN = 3.4;
@@ -66,7 +76,7 @@ function rng(seed) {
 }
 
 export class Race {
-  /** opts: { level (0..5), car, up: {engine, nitro, armor}, easy, seed } */
+  /** opts: { level (0..11), car, up: {engine, nitro, armor}, easy, seed } */
   constructor(opts = {}) {
     this.levelIndex = Math.max(0, Math.min(LEVELS.length - 1, opts.level ?? 0));
     this.level = LEVELS[this.levelIndex];

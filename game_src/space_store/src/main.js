@@ -4,10 +4,10 @@
 // the entrance rack, serve astronaut and alien shoppers at the checkout, gather star coins, build a second rack,
 // robot cashiers and at last the hyper checkout. No network, no links, no ads, no tracking.
 import * as THREE from 'three';
-import { Store, PADS, DISPENSER, RACKS, SHELVES, CHECKOUTS, SHUTTLES, BOUNDS, normalizeSave, starsFor } from './sim.js';
+import { Store, AREAS, PADS, BOUNDS, normalizeSave, starsFor } from './sim.js';
 import {
   mat, makeAstronaut, makeAlien, makeBasket, makeDispenser, makeRack, makeShelf, makeCheckout, makeRobot, loadRealRobot, makeCoin,
-  makeShuttlePad, makeDeck, makePlanet, makeStars, makeHazard,
+  makeShuttlePad, makeDeck, makeMoonDeck, makePlanet, makeEarth, makeStars, makeHazard,
 } from './models.js';
 import { Sound } from './audio.js';
 import { setLang, setGirl, getLang, t, num, name } from './i18n.js';
@@ -95,7 +95,10 @@ class Game {
     this.frames = [];
     this.goodWin = 0;
     this.clock = new THREE.Clock();
-    this.store = new Store(this.save, (Date.now() & 0xffff) + 1);
+    // one Store per chapter, sharing the single save (one coin purse, one happy-shopper count)
+    this.seed = (Date.now() & 0xffff) + 1;
+    this.stores = { station: new Store(this.save, this.seed, 'station'), moon: new Store(this.save, this.seed + 7, 'moon') };
+    this.store = this.stores[this.save.area];
     this._buildWorld();
     Promise.all([this._fonts(), loadRealRobot(this.base)]).then(() => {
       this.loading.remove();
@@ -141,19 +144,50 @@ class Game {
     sun.position.set(-8, 20, 10);
     s.add(sun);
     s.add(makeStars(this.quality.low ? 300 : 700));
-    const planet = makePlanet();
-    planet.position.set(-8, -25, 33); // its top shows beyond the deck's front edge, like the video
-    s.add(planet);
-    this.planet = planet;
-    s.add(makeDeck(BOUNDS));
+    // both chapters are built once, up front; travel just toggles which group is visible
+    this.worlds = { station: this._buildArea(AREAS.station, false), moon: this._buildArea(AREAS.moon, true) };
+    this.world = this.worlds[this.store.area];
+    for (const w of Object.values(this.worlds)) { w.group.visible = w === this.world; s.add(w.group); }
+    // the child
+    this.hero = makeAstronaut(0xf2f6fa, this.girl ? 0xff6aa8 : 0x3ad8c8, 0xf0c09a, this.girl ? 0x6a3a1a : 0x3a2414);
+    if (this.girl) this.hero.head.add(new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 8), mat(0x6a3a1a)).translateY(-0.05).translateZ(-0.32));
+    s.add(this.hero.root);
+    this.heroStack = new Pool(this.hero.back, () => makeBasket(0.7), 10, (b, i) => b.position.set(0, -0.1 + i * 0.25, 0.1));
+    this.ring = new THREE.Mesh(new THREE.RingGeometry(0.45, 0.6, 28), new THREE.MeshBasicMaterial({ color: 0xffc83a, transparent: true, opacity: 0.9 }));
+    this.ring.rotation.x = -Math.PI / 2;
+    s.add(this.ring);
+    this.arrow = new THREE.Mesh(new THREE.ConeGeometry(0.4, 0.9, 4), mat(0xffc83a, 0xff9a00, 0.7));
+    this.arrow.rotation.x = Math.PI;
+    s.add(this.arrow);
+    this.shopperModels = new Map();
+    this.sparks = this._sparks(s);
+    this.syncUnlocked(true);
+  }
+
+  /** One chapter's floor, built with the same patterns: the station deck with its orange planet, or the grey
+   *  Moon base with craters and Earth in the sky. Everything is placed from the area's sim config. */
+  _buildArea(cfg, moon) {
+    const s = new THREE.Group();
+    let sky;
+    if (moon) {
+      s.add(makeMoonDeck(BOUNDS));
+      sky = makeEarth();
+      sky.position.set(-4, -4, -48); // Earth hangs low over the far edge of the base, inside the steep camera's sky band
+      s.add(sky);
+    } else {
+      sky = makePlanet();
+      sky.position.set(-8, -25, 33); // its top shows beyond the deck's front edge, like the video
+      s.add(sky);
+      s.add(makeDeck(BOUNDS));
+    }
     const disp = makeDispenser();
-    disp.position.set(DISPENSER.x, 0, DISPENSER.z);
+    disp.position.set(cfg.dispenser.x, 0, cfg.dispenser.z);
     s.add(disp);
     const hz = makeHazard(3.2, 2.6);
-    hz.position.set(DISPENSER.x, 0.015, DISPENSER.z);
+    hz.position.set(cfg.dispenser.x, 0.015, cfg.dispenser.z);
     s.add(hz);
-    this.dispBaskets = new Pool(s, () => makeBasket(0.9), DISPENSER.cap, (b, i) => b.position.set(DISPENSER.x - 0.5 + (i % 2) * 1.0, 0.15 + Math.floor(i / 2) * 0.32, DISPENSER.z));
-    this.rackModels = RACKS.map((r) => {
+    const dispBaskets = new Pool(s, () => makeBasket(0.9), cfg.dispenser.cap, (b, i) => b.position.set(cfg.dispenser.x - 0.5 + (i % 2) * 1.0, 0.15 + Math.floor(i / 2) * 0.32, cfg.dispenser.z));
+    const rackModels = cfg.racks.map((r) => {
       const g = new THREE.Group();
       const rack = makeRack();
       g.add(rack);
@@ -162,10 +196,10 @@ class Game {
       const pool = new Pool(g, () => makeBasket(0.55), r.cap, (b, i) => b.position.set(-0.55 + (i % 4) * 0.37, 0.24 + Math.floor(i / 4) * 0.55, 0));
       return { g, pool, id: r.id };
     });
-    this.shelfModels = SHELVES.map((sh) => { const m = makeShelf(); m.position.set(sh.x, 0, sh.z); s.add(m); return { m, sh }; });
-    this.checkoutModels = CHECKOUTS.map((c) => {
+    const shelfModels = cfg.shelves.map((sh) => { const m = makeShelf(); m.position.set(sh.x, 0, sh.z); s.add(m); return { m, sh }; });
+    const checkoutModels = cfg.checkouts.map((c) => {
       const g = new THREE.Group();
-      g.add(makeCheckout(c.id === 'hyper'));
+      g.add(makeCheckout(c.id === 'hyper' || c.id === 'moonstar'));
       g.position.set(c.x, 0, c.z);
       s.add(g);
       let robot = null;
@@ -179,20 +213,9 @@ class Game {
       if (!c.robot) { till = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.05, 28), new THREE.MeshBasicMaterial({ color: 0x3ad8c8, transparent: true, opacity: 0.8 })); till.rotation.x = -Math.PI / 2; till.position.set(c.till.x, 0.03, c.till.z); s.add(till); }
       return { g, robot, coins, ring, till, c };
     });
-    this.shuttles = SHUTTLES.map((sh) => { const m = makeShuttlePad(); m.position.set(sh.x, 0, sh.z); s.add(m); return { m, sh, land: 0 }; });
-    // the child
-    this.hero = makeAstronaut(0xf2f6fa, this.girl ? 0xff6aa8 : 0x3ad8c8, 0xf0c09a, this.girl ? 0x6a3a1a : 0x3a2414);
-    if (this.girl) this.hero.head.add(new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 8), mat(0x6a3a1a)).translateY(-0.05).translateZ(-0.32));
-    s.add(this.hero.root);
-    this.heroStack = new Pool(this.hero.back, () => makeBasket(0.7), 10, (b, i) => b.position.set(0, -0.1 + i * 0.25, 0.1));
-    this.ring = new THREE.Mesh(new THREE.RingGeometry(0.45, 0.6, 28), new THREE.MeshBasicMaterial({ color: 0xffc83a, transparent: true, opacity: 0.9 }));
-    this.ring.rotation.x = -Math.PI / 2;
-    s.add(this.ring);
-    this.arrow = new THREE.Mesh(new THREE.ConeGeometry(0.4, 0.9, 4), mat(0xffc83a, 0xff9a00, 0.7));
-    this.arrow.rotation.x = Math.PI;
-    s.add(this.arrow);
-    this.padModels = new Map();
-    for (const p of PADS) {
+    const shuttles = cfg.shuttles.map((sh) => { const m = makeShuttlePad(); m.position.set(sh.x, 0, sh.z); s.add(m); return { m, sh, land: 0 }; });
+    const padModels = new Map();
+    for (const p of cfg.pads) {
       const g = new THREE.Group();
       const disc = new THREE.Mesh(new THREE.CircleGeometry(0.85, 32), new THREE.MeshBasicMaterial({ color: 0x3a2a9a, transparent: true, opacity: 0.85 }));
       disc.rotation.x = -Math.PI / 2;
@@ -209,11 +232,9 @@ class Game {
       g.position.set(p.x, 0, p.z);
       g.visible = false;
       s.add(g);
-      this.padModels.set(p.id, { g, prog, ring, f: -1 });
+      padModels.set(p.id, { g, prog, ring, f: -1 });
     }
-    this.shopperModels = new Map();
-    this.sparks = this._sparks(s);
-    this.syncUnlocked(true);
+    return { group: s, sky, dispBaskets, rackModels, shelfModels, checkoutModels, shuttles, padModels, cfg };
   }
 
   _sparks(scene) {
@@ -241,10 +262,51 @@ class Game {
 
   syncUnlocked(quiet = false) {
     const st = this.store;
-    for (const r of this.rackModels) this._show(r.g, st.open(RACKS.find((x) => x.id === r.id)), quiet);
-    for (const sm of this.shelfModels) this._show(sm.m, st.open(sm.sh), quiet);
-    for (const cm of this.checkoutModels) { const on = st.open(cm.c); this._show(cm.g, on, quiet); if (cm.robot) this._show(cm.robot, on, quiet); cm.ring.visible = on; }
-    for (const sh of this.shuttles) this._show(sh.m, st.open(sh.sh), quiet);
+    const w = this.world;
+    for (const r of w.rackModels) this._show(r.g, st.open(st.cfg.racks.find((x) => x.id === r.id)), quiet);
+    for (const sm of w.shelfModels) this._show(sm.m, st.open(sm.sh), quiet);
+    for (const cm of w.checkoutModels) { const on = st.open(cm.c); this._show(cm.g, on, quiet); if (cm.robot) this._show(cm.robot, on, quiet); cm.ring.visible = on; }
+    for (const sh of w.shuttles) this._show(sh.m, st.open(sh.sh), quiet);
+  }
+
+  /** Ride the Nile Shuttle between the station (chapter 1) and the Moon base (chapter 2). The Moon stays
+   *  locked until the station is finished; travelling is free, instant and saved. */
+  travel() {
+    const to = this.store.area === 'moon' ? 'station' : 'moon';
+    if (to === 'moon' && !this.store.stationComplete) return;
+    if (this.stores[to].area !== to) this.stores[to] = new Store(this.save, this.seed + (to === 'moon' ? 7 : 0), to);
+    this.store = this.stores[to];
+    this.save.area = to;
+    for (const [, m] of this.shopperModels) this.scene.remove(m.root);
+    this.shopperModels.clear();
+    this.world = this.worlds[to];
+    for (const w of Object.values(this.worlds)) w.group.visible = w === this.world;
+    this.syncUnlocked(true);
+    this.cam = null;
+    this._hc = {};
+    if (this.mode === 'play') { this._buildPadLabels(); this._refreshTravel(); }
+    this._saveNow();
+    this.sound.play('arrive');
+    this.toast(to === 'moon' ? t('moonHi') : t('stationHi'), 2.4);
+  }
+
+  _refreshTravel() {
+    if (!this.travelBtn) return;
+    const can = this.store.stationComplete;
+    this.travelBtn.style.display = can ? 'inline-flex' : 'none';
+    if (can) this.travelBtn.textContent = this.store.area === 'moon' ? t('toStation') : t('toMoon');
+  }
+
+  _buildPadLabels() {
+    if (this.padLblEls) for (const el of this.padLblEls) el.remove();
+    this.padLblEls = [];
+    this.padLbls = new Map();
+    for (const p of this.store.cfg.pads) {
+      const lbl = h('div', { class: 'ss-padlbl', style: 'display:none' }, h('span', { class: 'ic' }, p.icon), h('span', { class: 'c' }, '⭐ ', h('b', {}, '')), h('span', { class: 'n' }, name(p)));
+      this.padLbls.set(p.id, lbl);
+      this.padLblEls.push(lbl);
+      this.layer.append(lbl);
+    }
   }
 
   _show(o, on, quiet) {
@@ -386,21 +448,19 @@ class Game {
     this.sound.setMode('play');
     this._clear();
     this.hud = { obj: h('div', { class: 'ss-obj' }, h('i'), h('span', {}, '')), max: h('div', { class: 'ss-bubble', style: 'display:none;color:#2a1e6a' }, 'MAX') };
-    this.padLbls = new Map();
-    for (const p of PADS) {
-      const lbl = h('div', { class: 'ss-padlbl', style: 'display:none' }, h('span', { class: 'ic' }, p.icon), h('span', { class: 'c' }, '⭐ ', h('b', {}, '')), h('span', { class: 'n' }, name(p)));
-      this.padLbls.set(p.id, lbl);
-      this.layer.append(lbl);
-    }
+    this._buildPadLabels();
+    this.travelBtn = h('button', { class: 'ss-btn', style: 'position:absolute;bottom:max(calc(var(--u)*3),env(safe-area-inset-bottom));inset-inline-start:calc(var(--u)*3);display:none', onclick: (e) => { e.stopPropagation(); this.travel(); } }, '');
     this.layer.append(
       h('button', { class: 'ss-round', style: this._topLeft(), 'aria-label': t('paused'), onclick: (e) => { e.stopPropagation(); this.pause(); } }, '⏸'),
       h('div', { class: 'ss-top', style: 'inset-inline-start:auto;inset-inline-end:calc(var(--u)*3)' }, this._coins()),
       this.hud.obj,
       this.hud.max,
+      this.travelBtn,
       this._mute('top:max(calc(var(--u)*2.4),env(safe-area-inset-top));inset-inline-start:calc(var(--u)*16)'),
       this._toastEl(),
     );
     this._hc = {};
+    this._refreshTravel();
     if (!this.save.served) setTimeout(() => this.mode === 'play' && this.toast(t('drag'), 3), 500);
   }
 
@@ -419,15 +479,20 @@ class Game {
     this.layer.append(dim);
   }
 
-  _complete() {
+  /** Chapter-end card: the station card points at the Moon chapter; the Moon card is the whole-game finale.
+   *  Stars are the same earned starsFor(served) over both chapters — never automatic. */
+  _complete(moon = false) {
     this.sound.play('complete');
     this.voice.say('win');
     this._burst(this.store.p.x, 2, this.store.p.z, 120);
+    const stars = starsFor(this.save.served);
     const dim = h('div', { class: 'ss-dim' }, h('div', { class: 'ss-panel' },
-      h('div', { class: 'ss-title' }, t('done')),
-      h('div', { class: 'ss-stars' }, '⭐'.repeat(starsFor(this.save.served)) + '☆'.repeat(3 - starsFor(this.save.served))),
+      h('div', { class: 'ss-title' }, moon ? t('doneMoon') : t('done')),
+      h('div', { class: 'ss-stars' }, '⭐'.repeat(stars) + '☆'.repeat(3 - stars)),
       h('div', { class: 'ss-stat' }, h('span', {}, '😊 ', num(this.save.served), ' ', t('served'))),
-      h('button', { class: 'ss-btn', onclick: () => { dim.remove(); this.paused = false; } }, '▶ ', t('keep'))));
+      !moon ? h('div', { style: 'font-weight:700;font-size:calc(var(--u)*4);opacity:.9' }, '🌕 ', t('moonNext')) : null,
+      !moon ? h('button', { class: 'ss-btn', onclick: () => { dim.remove(); this.paused = false; this.travel(); } }, '🚀 ', t('toMoon')) : null,
+      h('button', { class: 'ss-btn wood', onclick: () => { dim.remove(); this.paused = false; } }, '▶ ', t('keep'))));
     this.paused = true;
     this.layer.append(dim);
   }
@@ -442,8 +507,8 @@ class Game {
         case 'pick': this.sound.play('pick', e.n); break;
         case 'full': this.sound.play('full'); this.voice.say('near'); this.toast(t('full'), 1); break;
         case 'rack': this.sound.play('rack'); this.voice.say('trick'); break;
-        case 'arrive': if (Math.random() < 0.6) this.sound.play('arrive'); { const sh = this.shuttles.find((x) => Math.abs(x.sh.x - e.x) < 0.1); if (sh) sh.land = 1; } break;
-        case 'rocket': this.sound.play('arrive'); this.voice.say('pickup'); this.toast(t('rocket'), 2.2); { const sh = this.shuttles.find((x) => Math.abs(x.sh.x - e.x) < 0.1); if (sh) sh.land = 1; } break;
+        case 'arrive': if (Math.random() < 0.6) this.sound.play('arrive'); { const sh = this.world.shuttles.find((x) => Math.abs(x.sh.x - e.x) < 0.1); if (sh) sh.land = 1; } break;
+        case 'rocket': this.sound.play('arrive'); this.voice.say('pickup'); this.toast(t(st.area === 'moon' ? 'rocketMoon' : 'rocket'), 2.2); { const sh = this.world.shuttles.find((x) => Math.abs(x.sh.x - e.x) < 0.1); if (sh) sh.land = 1; } break;
         case 'giveUp': this.toast(t('bye'), 2.4); break;
         case 'sold': {
           this.sound.play(e.by === 'robot' && dist(st.p, e) > 6 ? 'beep' : 'sold');
@@ -459,12 +524,14 @@ class Game {
           this.voice.say('charge');
           if (e.pad.startsWith('robot')) setTimeout(() => this.sound.play('unlock'), 350);
           this.syncUnlocked();
+          this._refreshTravel();
           this._burst(pad.x, 1, pad.z, 50);
           this.toast(`✨ ${t('opened')}: ${name(pad)} ${pad.icon}`, 2.4);
           this._saveNow();
           break;
         }
-        case 'complete': setTimeout(() => this._complete(), 1200); break;
+        case 'complete': setTimeout(() => this._complete(false), 1200); break;
+        case 'moonComplete': setTimeout(() => this._complete(true), 1200); break;
         default:
       }
     }
@@ -492,19 +559,20 @@ class Game {
 
   _sync(dt, time) {
     const st = this.store;
+    const w = this.world;
     const p = st.p;
-    this.dispBaskets.show(st.dispenser);
-    this.dispBaskets.items.forEach((b, i) => { b.position.y = 0.15 + Math.floor(i / 2) * 0.32 + Math.sin(time * 3 + i) * 0.04; });
-    st.racks.forEach((r, k) => this.rackModels[k].pool.show(r.n));
+    w.dispBaskets.show(st.dispenser);
+    w.dispBaskets.items.forEach((b, i) => { b.position.y = 0.15 + Math.floor(i / 2) * 0.32 + Math.sin(time * 3 + i) * 0.04; });
+    st.racks.forEach((r, k) => w.rackModels[k].pool.show(r.n));
     st.checkouts.forEach((c, k) => {
-      const cm = this.checkoutModels[k];
+      const cm = w.checkoutModels[k];
       cm.coins.show(Math.min(24, Math.ceil(c.cash / 2)));
       if (cm.robot && cm.robot.visible) { cm.robot.position.y = Math.abs(Math.sin(time * (c.busy ? 10 : 2))) * 0.08; cm.robot.userData.light.material.emissiveIntensity = c.busy ? 1 : 0.2; }
     });
-    for (const o of [...this.rackModels.map((r) => r.g), ...this.shelfModels.map((s) => s.m), ...this.checkoutModels.flatMap((c) => [c.g, c.robot].filter(Boolean)), ...this.shuttles.map((s) => s.m)]) {
+    for (const o of [...w.rackModels.map((r) => r.g), ...w.shelfModels.map((s) => s.m), ...w.checkoutModels.flatMap((c) => [c.g, c.robot].filter(Boolean)), ...w.shuttles.map((s) => s.m)]) {
       if (o.userData.grow !== undefined) { o.userData.grow = Math.min(1, o.userData.grow + dt * 2); o.scale.setScalar(Math.max(0.01, easeBack(o.userData.grow))); if (o.userData.grow >= 1) delete o.userData.grow; }
     }
-    for (const sh of this.shuttles) {
+    for (const sh of w.shuttles) {
       sh.land = Math.max(0, sh.land - dt * 0.8);
       sh.m.userData.shuttle.position.y = 0.6 + sh.land * sh.land * 8;
       sh.m.userData.shuttle.rotation.y = time * 0.3;
@@ -557,7 +625,7 @@ class Game {
     for (const [id, m] of this.shopperModels) if (!seen.has(id)) { this.scene.remove(m.root); this.shopperModels.delete(id); }
     // pads
     const shown = new Set(st.pads.map((x) => x.id));
-    for (const [id, pm] of this.padModels) {
+    for (const [id, pm] of w.padModels) {
       const on = shown.has(id);
       pm.g.visible = on;
       if (!on) continue;
@@ -576,7 +644,7 @@ class Game {
       if (s.life[k] <= 0) s.pos[k * 3 + 1] = -50;
     }
     s.g.attributes.position.needsUpdate = true;
-    this.planet.rotation.y += dt * 0.02;
+    w.sky.rotation.y += dt * 0.02;
   }
 
   /** The yellow arrow and the objective banner: what to do next (always shown, as in the video). */
@@ -587,10 +655,10 @@ class Game {
     const rack = st.racks.filter((r) => st.open(r)).sort((a, b) => a.n - b.n)[0];
     const pad = st.pads.find((pd) => this.save.coins >= Math.min(10, pd.cost - (this.save.paid[pd.id] ?? 0)));
     const cash = st.checkouts.filter((c) => c.cash >= 3).sort((a, b) => b.cash - a.cash)[0];
-    const waiting = st._queue(main).some((s) => s.front) && !st.has('hyper');
+    const waiting = st._queue(main).some((s) => s.front) && !st.has(st.cfg.topPad);
     let target;
     let obj;
-    if (p.stack > 0) { target = { x: rack.x, z: rack.z + 0.9 }; obj = t('oStock'); } else if (pad) { target = pad; obj = `${t('oBuild')} ${name(pad)}`; } else if (waiting && rack.n > 1) { target = main.till; obj = t('oServe'); } else if (cash) { target = cash.coins; obj = t('oCoins'); } else if (rack.n < 6) { target = DISPENSER; obj = t('oGrab'); } else { target = main.till; obj = t('oServe'); }
+    if (p.stack > 0) { target = { x: rack.x, z: rack.z + 0.9 }; obj = t('oStock'); } else if (pad) { target = pad; obj = `${t('oBuild')} ${name(pad)}`; } else if (waiting && rack.n > 1) { target = main.till; obj = t('oServe'); } else if (cash) { target = cash.coins; obj = t('oCoins'); } else if (rack.n < 6) { target = st.cfg.dispenser; obj = t('oGrab'); } else { target = main.till; obj = t('oServe'); }
     const show = dist(target, p) > 1.1;
     this.arrow.visible = show;
     if (show) { this.arrow.position.set(target.x, 2.2 + Math.abs(Math.sin(time * 4)) * 0.5, target.z); this.arrow.rotation.y = time * 2; }

@@ -30,7 +30,7 @@ export const SHUTTLES = [{ x: -7.4, z: -6.4 }, { x: 0.5, z: -7.2, needs: 'shuttl
 
 /** The station wings, paid by standing on their pad; the next two are shown. (Ids are save-stable; only the
  *  names changed when the store became the Nile Space Store.) */
-export const PADS = [
+export const STATION_PADS = [
   { id: 'rack2', cost: 25, x: -5.4, z: -2.5, icon: '🧺', ar: 'جناح السلال', en: 'Basket Wing' },
   { id: 'bigstack', cost: 35, x: -7, z: 1.2, icon: '🎒', ar: 'مخزن أكبر', en: 'Bigger Store-room' },
   { id: 'robot1', cost: 55, x: 7.4, z: 6.8, icon: '🤖', ar: 'روبوت كاشير', en: 'Robot Cashier' },
@@ -39,6 +39,52 @@ export const PADS = [
   { id: 'robot2', cost: 95, x: 9, z: -2.6, icon: '🤖', ar: 'روبوت كاشير تاني', en: 'Second Robot Cashier' },
   { id: 'hyper', cost: 140, x: -1, z: 4.3, icon: '⚡', ar: 'كاشير البرق', en: 'Lightning Checkout' },
 ];
+
+/** Chapter 2 — the Moon base: the same store machinery on grey regolith, mirrored left↔right so it feels like a
+ *  different place. Baskets arrive by Earth-supply rocket; the dome grows glowing moon melons. The pad ids are
+ *  NEW and appended after the station's — old saves never had them, so nothing already earned can shift. */
+export const MOON_DISPENSER = { x: 6.5, z: 4.5, r: 1.4, cap: 14, every: 0.7 };
+export const MOON_RACKS = [
+  { id: 'moonrack1', x: 2.5, z: 1.5, r: 1.3, cap: 12 },
+  { id: 'moonrack2', x: 2.5, z: -2.5, r: 1.3, cap: 12, needs: 'moon_rack' },
+];
+export const MOON_SHELVES = [
+  { x: -3, z: -6.2 }, { x: -5.5, z: -6.2 }, { x: -8, z: -6.2 },
+  { x: -3, z: -3.8, needs: 'moon_dome' }, { x: -5.5, z: -3.8, needs: 'moon_dome' }, { x: -8, z: -3.8, needs: 'moon_dome' },
+];
+export const MOON_CHECKOUTS = [
+  { id: 'moonmain', x: -3, z: 3, till: { x: -4.6, z: 3 }, coins: { x: -3, z: 5.2 }, serve: 1.0, robot: false },
+  { id: 'moonrobot', x: -7.4, z: 3, till: { x: -9, z: 3 }, coins: { x: -7.4, z: 5.2 }, serve: 1.5, robot: true, needs: 'moon_robot' },
+  { id: 'moonstar', x: 1, z: 6.4, till: { x: -0.6, z: 6.4 }, coins: { x: 3, z: 7.2 }, serve: 0.45, robot: true, needs: 'moon_checkout' },
+];
+export const MOON_SHUTTLES = [{ x: 7.4, z: -6.4 }, { x: -0.5, z: -7.2, needs: 'moon_dome' }];
+export const MOON_PADS = [
+  { id: 'moon_rack', cost: 150, x: 5.4, z: -2.5, icon: '🧺', ar: 'رف قمر تاني', en: 'Second Moon Rack' },
+  { id: 'moon_dome', cost: 190, x: -5.5, z: -1.6, icon: '🍈', ar: 'قبة بطيخ القمر', en: 'Moon Melon Dome' },
+  { id: 'moon_robot', cost: 240, x: -7.4, z: 6.8, icon: '🤖', ar: 'روبوت قمر', en: 'Moon Robot' },
+  { id: 'moon_checkout', cost: 300, x: 1, z: 4.3, icon: '⚡', ar: 'كاشير النجوم', en: 'Star Checkout' },
+];
+
+/** Every pad in the game: chapter 1 first (order and ids unchanged), chapter 2 appended. */
+export const PADS = [...STATION_PADS, ...MOON_PADS];
+
+/** The two play areas. Each is a full store layout on the same BOUNDS; `fastPad` opens the second shuttle and
+ *  quicker spawns, `bonusPad` adds +1 coin a sale, `coinBonus` is the area's flat sale bonus (moon tourists pay
+ *  star prices for moon melons). */
+export const AREAS = {
+  station: {
+    id: 'station', start: { x: -4, z: 4 }, dispenser: DISPENSER, racks: RACKS, shelves: SHELVES, checkouts: CHECKOUTS, shuttles: SHUTTLES, pads: STATION_PADS,
+    spawn: 3.4, spawnFast: 2.2, fastPad: 'shuttle2', maxBase: 6, maxFast: 4, maxTop: 2, topPad: 'hyper', bonusPad: 'shelves2', coinBonus: 0,
+  },
+  moon: {
+    id: 'moon', start: { x: 4, z: 4 }, dispenser: MOON_DISPENSER, racks: MOON_RACKS, shelves: MOON_SHELVES, checkouts: MOON_CHECKOUTS, shuttles: MOON_SHUTTLES, pads: MOON_PADS,
+    spawn: 2.6, spawnFast: 1.9, fastPad: 'moon_dome', maxBase: 7, maxFast: 3, maxTop: 2, topPad: 'moon_checkout', bonusPad: 'moon_dome', coinBonus: 2,
+  },
+};
+
+export const padsDone = (pads, unlocked) => pads.every((p) => unlocked.includes(p.id));
+/** Chapter 1 finished (all seven station wings) — this is what unlocks the trip to the Moon. */
+export const stationComplete = (save) => padsDone(STATION_PADS, save.unlocked || []);
 
 /** Stars are EARNED by service, never given: finishing the station is one, a busy station earns more. */
 export function starsFor(served) { return served >= 90 ? 3 : served >= 40 ? 2 : 1; }
@@ -56,15 +102,18 @@ function rng(seed) {
 }
 
 export class Store {
-  /** `save` is a normalized save; it is changed in place. */
-  constructor(save, seed = 3) {
+  /** `save` is a normalized save; it is changed in place. `area` picks the chapter's layout; asking for the
+   *  Moon before the station is finished is refused kindly — the store stays on the station. */
+  constructor(save, seed = 3, area) {
     this.save = save;
     this.rand = rng(seed);
-    this.p = { x: -4, z: 4, heading: Math.PI, moving: 0, stack: 0, tick: 0 };
+    this.area = (area || save.area) === 'moon' && stationComplete(save) ? 'moon' : 'station';
+    this.cfg = AREAS[this.area];
+    this.p = { x: this.cfg.start.x, z: this.cfg.start.z, heading: Math.PI, moving: 0, stack: 0, tick: 0 };
     this.dispenser = 6;
     this.dispT = 0;
-    this.racks = RACKS.map((r) => ({ ...r, n: 0 }));
-    this.checkouts = CHECKOUTS.map((c) => ({ ...c, t: 0, cash: 0 }));
+    this.racks = this.cfg.racks.map((r) => ({ ...r, n: 0 }));
+    this.checkouts = this.cfg.checkouts.map((c) => ({ ...c, t: 0, cash: 0 }));
     this.shoppers = [];
     this.spawnT = 1;
     this.rocketT = 25; // the first Nile delivery rocket
@@ -76,8 +125,12 @@ export class Store {
   has(id) { return this.save.unlocked.includes(id); }
   open(o) { return !o.needs || this.has(o.needs); }
   get capacity() { return this.has('bigstack') ? 10 : 6; }
-  get pads() { return PADS.filter((p) => !this.has(p.id)).slice(0, 2); }
-  get complete() { return this.save.unlocked.length === PADS.length; }
+  get pads() { return this.cfg.pads.filter((p) => !this.has(p.id)).slice(0, 2); }
+  get stationComplete() { return stationComplete(this.save); }
+  get moonComplete() { return padsDone(MOON_PADS, this.save.unlocked); }
+  get allComplete() { return this.stationComplete && this.moonComplete; }
+  /** The CURRENT chapter's completion (chapter 1 on the station, chapter 2 on the Moon). */
+  get complete() { return this.area === 'moon' ? this.moonComplete : this.stationComplete; }
 
   step(dt, input = { x: 0, z: 0 }) {
     this.events = [];
@@ -97,7 +150,7 @@ export class Store {
     const s = [];
     for (const c of this.checkouts) if (this.open(c)) s.push([c.x - 1.1, c.z - 0.5, c.x + 1.1, c.z + 0.5]);
     for (const r of this.racks) if (this.open(r)) s.push([r.x - 0.8, r.z - 0.35, r.x + 0.8, r.z + 0.35]);
-    for (const sh of SHELVES) if (this.open(sh)) s.push([sh.x - 0.7, sh.z - 0.5, sh.x + 0.7, sh.z + 0.5]);
+    for (const sh of this.cfg.shelves) if (this.open(sh)) s.push([sh.x - 0.7, sh.z - 0.5, sh.x + 0.7, sh.z + 0.5]);
     return s;
   }
 
@@ -119,20 +172,21 @@ export class Store {
     }
   }
 
-  /** A delivery rocket from the Nile docks every so often and tops the dispenser up with fresh baskets. */
+  /** A delivery rocket docks every so often and tops the dispenser up with fresh baskets — from the Nile at the
+   *  station, an Earth-supply rocket at the Moon base. */
   _rocket(dt) {
     this.rocketT -= dt;
     if (this.rocketT > 0) return;
     this.rocketT = 40 + this.rand() * 15;
-    const from = SHUTTLES.filter((s) => this.open(s))[0] || SHUTTLES[0];
-    const add = Math.min(3, DISPENSER.cap - this.dispenser);
+    const from = this.cfg.shuttles.filter((s) => this.open(s))[0] || this.cfg.shuttles[0];
+    const add = Math.min(3, this.cfg.dispenser.cap - this.dispenser);
     this.dispenser += add;
     this.events.push({ type: 'rocket', x: from.x, z: from.z, add });
   }
 
   _dispense(dt) {
     this.dispT += dt;
-    if (this.dispT >= DISPENSER.every && this.dispenser < DISPENSER.cap) { this.dispT = 0; this.dispenser++; this.events.push({ type: 'spawnBasket' }); }
+    if (this.dispT >= this.cfg.dispenser.every && this.dispenser < this.cfg.dispenser.cap) { this.dispT = 0; this.dispenser++; this.events.push({ type: 'spawnBasket' }); }
   }
 
   _player(dt) {
@@ -140,7 +194,7 @@ export class Store {
     p.tick -= dt;
     if (p.tick > 0) return;
     // pick hover-baskets at the dispenser
-    if (dist(p, DISPENSER) < DISPENSER.r && this.dispenser > 0 && p.stack < this.capacity) {
+    if (dist(p, this.cfg.dispenser) < this.cfg.dispenser.r && this.dispenser > 0 && p.stack < this.capacity) {
       this.dispenser--;
       p.stack++;
       p.tick = TICK;
@@ -182,7 +236,8 @@ export class Store {
           delete this.save.paid[pad.id];
           this.save.unlocked.push(pad.id);
           this.events.push({ type: 'unlock', pad: pad.id });
-          if (this.complete && !this.save.complete) { this.save.complete = true; this.events.push({ type: 'complete' }); }
+          if (this.stationComplete && !this.save.complete) { this.save.complete = true; this.events.push({ type: 'complete' }); }
+          if (this.moonComplete && !this.save.moonComplete) { this.save.moonComplete = true; this.events.push({ type: 'moonComplete' }); }
         }
         return;
       }
@@ -192,11 +247,12 @@ export class Store {
   // ---- shoppers ----------------------------------------------------------------------------------------------------
 
   _shoppers(dt) {
-    const shuttles = SHUTTLES.filter((s) => this.open(s));
+    const cfg = this.cfg;
+    const shuttles = cfg.shuttles.filter((s) => this.open(s));
     this.spawnT -= dt;
-    const max = 6 + (this.has('shuttle2') ? 4 : 0) + (this.has('hyper') ? 2 : 0);
+    const max = cfg.maxBase + (this.has(cfg.fastPad) ? cfg.maxFast : 0) + (this.has(cfg.topPad) ? cfg.maxTop : 0);
     if (this.spawnT <= 0 && this.shoppers.length < max) {
-      this.spawnT = (this.has('shuttle2') ? 2.2 : 3.4) * (0.8 + this.rand() * 0.4);
+      this.spawnT = (this.has(cfg.fastPad) ? cfg.spawnFast : cfg.spawn) * (0.8 + this.rand() * 0.4);
       const from = shuttles[Math.floor(this.rand() * shuttles.length)];
       this.shoppers.push({ id: this.nextId++, kind: SHOPPERS[Math.floor(this.rand() * SHOPPERS.length)], x: from.x, z: from.z, home: from, state: 'toRack', basket: false, goods: 0, t: 0, heading: 0, moving: 0, target: null, lane: null, happy: 0, patience: 0 });
       this.events.push({ type: 'arrive', x: from.x, z: from.z });
@@ -222,7 +278,7 @@ export class Store {
       } else if (s.state === 'shop') {
         s.waiting = false;
         if (!s.target || this._walk(s, s.target, dt)) {
-          const shelves = SHELVES.filter((x) => this.open(x));
+          const shelves = cfg.shelves.filter((x) => this.open(x));
           const sh = shelves[Math.floor(this.rand() * shelves.length)];
           s.target = { x: sh.x + (this.rand() - 0.5) * 1.2, z: sh.z + 0.9 };
           s.goods++;
@@ -273,7 +329,7 @@ export class Store {
       c.t += dt;
       if (c.t >= c.serve) {
         c.t = 0;
-        const coins = 3 + Math.min(4, front.goods) + (this.has('shelves2') ? 1 : 0);
+        const coins = 3 + Math.min(4, front.goods) + (this.has(this.cfg.bonusPad) ? 1 : 0) + this.cfg.coinBonus;
         c.cash += coins;
         this.save.served++;
         front.state = 'leave';
@@ -285,7 +341,11 @@ export class Store {
   }
 }
 
-/** Save: { coins, unlocked, paid, served, complete, muted } made safe. */
+/** Save: { coins, unlocked, paid, served, complete, moonComplete, area, muted } made safe.
+ *  `complete` keeps its chapter-1 meaning exactly (the station flag + all seven station wings), so an old
+ *  finished save loads finished — with the Moon chapter newly available, never "incomplete again". The Moon
+ *  fields default safely: area falls back to the station unless the station is finished, moonComplete is
+ *  false until all four moon pads are really unlocked. */
 export function normalizeSave(raw) {
   const s = raw && typeof raw === 'object' ? raw : {};
   const ids = new Set(PADS.map((p) => p.id));
@@ -293,5 +353,15 @@ export function normalizeSave(raw) {
   const paid = {};
   if (s.paid && typeof s.paid === 'object') for (const p of PADS) { const v = Math.floor(Number(s.paid[p.id])); if (v > 0 && v < p.cost && !unlocked.includes(p.id)) paid[p.id] = v; }
   const n = (v) => (Number.isFinite(Number(v)) && Number(v) > 0 ? Math.floor(Number(v)) : 0);
-  return { coins: Math.min(n(s.coins), 999999), unlocked, paid, served: n(s.served), complete: s.complete === true && unlocked.length === PADS.length, muted: s.muted === true };
+  const stDone = padsDone(STATION_PADS, unlocked);
+  return {
+    coins: Math.min(n(s.coins), 999999),
+    unlocked,
+    paid,
+    served: n(s.served),
+    complete: s.complete === true && stDone,
+    moonComplete: s.moonComplete === true && padsDone(MOON_PADS, unlocked),
+    area: s.area === 'moon' && stDone ? 'moon' : 'station',
+    muted: s.muted === true,
+  };
 }

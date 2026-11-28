@@ -221,6 +221,16 @@ export function normalizeSave(sv) {
   return { unlocked: Math.max(1, Math.min(20, num(o.unlocked, 1))), stars: map(o.stars), keys: map(o.keys), best: map(o.best), muted: !!o.muted };
 }
 
+/** A room's visual variant: its position inside its own tomb (0..3). Certification Sweep A found that the four
+ * rooms of a tomb rendered with byte-identical canvas textures (same palette, same RNG seeds), so rooms inside
+ * one tomb shared one background look. The renderer now keys its code-drawn textures off this variant — every
+ * room in a tomb gets a different carpet scheme, floor/wall tint and glyph seed. Pure data: no save impact. */
+export function roomVariant(def) {
+  let v = 0;
+  for (const l of LEVELS) { if (l.id === def.id) break; if (l.tomb === def.tomb) v++; }
+  return v;
+}
+
 /** Museum book entries for a save: one exhibit per tomb. An exhibit is OPEN once every room of its tomb has been
  * completed (stars > 0); it then shows the tomb's collected ankh keys and stars. Pure and derived entirely from the
  * existing save (stars/keys maps) — no new persistence, so old saves show their tombs exactly as completed. */

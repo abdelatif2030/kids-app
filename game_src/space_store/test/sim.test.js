@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Store, PADS, DISPENSER, RACKS, CHECKOUTS, BOUNDS, normalizeSave, starsFor } from '../src/sim.js';
+import { Store, PADS, STATION_PADS, MOON_PADS, DISPENSER, RACKS, CHECKOUTS, BOUNDS, normalizeSave, starsFor, stationComplete } from '../src/sim.js';
 
 const dist = (a, b) => Math.hypot(a.x - b.x, a.z - b.z);
 
@@ -11,7 +11,7 @@ function robot(st) {
   if (p.stack >= st.capacity) st._unload = true;
   const pad = st.pads.find((pd) => st.save.coins >= Math.min(pd.cost - (st.save.paid[pd.id] ?? 0), 20));
   const main = st.checkouts[0];
-  const waiting = st._queue(main).some((s) => s.front) && !st.has('hyper');
+  const waiting = st._queue(main).some((s) => s.front) && !st.has(st.cfg.topPad);
   const rack = st.racks.filter((r) => st.open(r)).sort((a, b) => a.n - b.n)[0];
   const coins = st.checkouts.filter((c) => c.cash >= 6).sort((a, b) => b.cash - a.cash)[0];
   let target;
@@ -19,7 +19,7 @@ function robot(st) {
   else if (waiting && rack.n > 2) target = main.till;
   else if (coins && p.stack === 0) target = coins.coins;
   else if (st._unload || (p.stack > 0 && st.dispenser === 0)) target = { x: rack.x, z: rack.z + 0.9 };
-  else if (rack.n < 6 || p.stack > 0) target = DISPENSER;
+  else if (rack.n < 6 || p.stack > 0) target = st.cfg.dispenser;
   else if (waiting) target = main.till;
   else target = coins ? coins.coins : main.till;
   return steer(st, target);
@@ -177,4 +177,85 @@ test('shoppers never wait forever at an empty rack, delivery rockets dock, stars
   assert.equal(starsFor(39), 1);
   assert.equal(starsFor(40), 2);
   assert.equal(starsFor(90), 3);
+});
+
+const STATION_IDS = ['rack2', 'bigstack', 'robot1', 'shelves2', 'shuttle2', 'robot2', 'hyper'];
+const finishedStation = () => normalizeSave({ unlocked: [...STATION_IDS], complete: true, served: 95, coins: 12 });
+
+test('chapter 2: moon pads are appended with new stable ids and costs continue the station curve', () => {
+  assert.deepEqual(PADS.slice(0, 7).map((p) => p.id), STATION_IDS, 'the seven station pads keep order and ids');
+  assert.deepEqual(STATION_PADS.map((p) => p.id), STATION_IDS);
+  assert.deepEqual(MOON_PADS.map((p) => p.id), ['moon_rack', 'moon_dome', 'moon_robot', 'moon_checkout']);
+  assert.ok(MOON_PADS.every((p) => !STATION_IDS.includes(p.id)), 'moon ids are new');
+  const costs = PADS.map((p) => p.cost);
+  assert.deepEqual(costs, [...costs].sort((a, b) => a - b), 'one ascending coin curve across both chapters');
+});
+
+test('chapter 2: an old finished save loads finished, with the Moon newly available — never incomplete again', () => {
+  const s = finishedStation();
+  assert.equal(s.complete, true, 'chapter 1 stays complete');
+  assert.equal(s.moonComplete, false);
+  assert.equal(s.area, 'station');
+  assert.ok(stationComplete(s));
+  const moon = new Store(s, 3, 'moon');
+  assert.equal(moon.area, 'moon', 'a finished station may travel');
+  assert.equal(moon.complete, false, 'chapter 2 itself is not done yet');
+  assert.deepEqual(moon.pads.map((p) => p.id), ['moon_rack', 'moon_dome'], 'moon pads are offered first two at a time');
+  // a save that claims the Moon without finishing the station is sent back to the station, kindly
+  const cheat = normalizeSave({ unlocked: ['rack2'], area: 'moon' });
+  assert.equal(cheat.area, 'station');
+  assert.equal(new Store(cheat, 3).area, 'station');
+  assert.equal(new Store(normalizeSave({}), 3, 'moon').area, 'station', 'the sim itself refuses early travel');
+  // a save written while on the Moon round-trips
+  const onMoon = normalizeSave({ unlocked: [...STATION_IDS], complete: true, area: 'moon', paid: { moon_dome: 40 } });
+  assert.equal(onMoon.area, 'moon');
+  assert.equal(onMoon.paid.moon_dome, 40);
+});
+
+test('chapter 2: moon shoppers still leave kindly, and Earth-supply rockets top the moon dispenser', () => {
+  const st = new Store(finishedStation(), 5, 'moon');
+  st.dispenser = 0;
+  st.rocketT = 9999;
+  let gaveUp = false;
+  for (let i = 0; i < 60 * 40 && !gaveUp; i++) {
+    st.dispenser = 0;
+    for (const e of st.step(1 / 60, { x: 0, z: 0 })) if (e.type === 'giveUp') gaveUp = true;
+  }
+  assert.ok(gaveUp, 'a moon shopper gave up kindly instead of waiting forever');
+  const st2 = new Store(finishedStation(), 5, 'moon');
+  st2.dispenser = 0;
+  st2.rocketT = 0.01;
+  let rocket = null;
+  for (const e of st2.step(1 / 60, { x: 0, z: 0 })) if (e.type === 'rocket') rocket = e;
+  assert.ok(rocket && st2.dispenser === 3, 'the Earth-supply rocket delivered baskets');
+});
+
+test('chapter 2: a robot manager builds the whole Moon base and the game reads fully complete', () => {
+  const save = finishedStation();
+  save.coins = 0;
+  const servedBefore = save.served;
+  const st = new Store(save, 7, 'moon');
+  assert.equal(st.area, 'moon');
+  let t = 0;
+  const at = {};
+  let moonEvent = false;
+  while (!save.moonComplete && t < 1800) {
+    for (const e of st.step(1 / 30, robot(st))) {
+      if (e.type === 'unlock') at[e.pad] = Math.round(t);
+      if (e.type === 'moonComplete') moonEvent = true;
+    }
+    t += 1 / 30;
+  }
+  console.log('moon unlocked at (s):', JSON.stringify(at), 'served', save.served);
+  assert.ok(save.moonComplete, `moon not finished in ${Math.round(t)} s: ${save.unlocked.join(',')}`);
+  assert.ok(moonEvent, 'the moonComplete event fired');
+  assert.equal(save.complete, true, 'chapter 1 completion never regressed');
+  assert.ok(st.allComplete && st.complete);
+  assert.ok(save.served > servedBefore, 'moon service added happy shoppers to the shared count');
+  assert.equal(starsFor(save.served), 3, 'stars still come from the one shared served counter');
+  // and the finished whole game survives a save round-trip
+  const back = normalizeSave(JSON.parse(JSON.stringify(save)));
+  assert.equal(back.complete, true);
+  assert.equal(back.moonComplete, true);
+  assert.equal(new Store(back, 7, 'moon').allComplete, true);
 });

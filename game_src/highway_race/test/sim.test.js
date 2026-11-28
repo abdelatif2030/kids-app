@@ -25,10 +25,24 @@ function run(stage, easy = false, seed = 5) {
   return { r, t };
 }
 
-test('three stages, longer and busier', () => {
-  assert.equal(STAGES.length, 6);
+test('twelve stages in two seasons, longer and busier, ids never renumbered', () => {
+  assert.equal(STAGES.length, 12);
   assert.ok(STAGES[2].dist > STAGES[0].dist && STAGES[2].traffic > STAGES[0].traffic);
   assert.ok(Math.abs(bend(500)) < 40);
+  // Season 1 is frozen (saves index by stage): spot-check the original six rows verbatim
+  assert.deepEqual(STAGES.slice(0, 6).map((s) => [s.id, s.dist, s.time, s.gentle]), [
+    [1, 4800, 225, 6], [2, 5800, 262, 11], [3, 6800, 300, 18],
+    [4, 7800, 335, 34], [5, 8800, 372, 52], [6, 9800, 408, 58],
+  ]);
+  // Season 2 continues every difficulty curve smoothly from stage 6
+  for (let i = 1; i < STAGES.length; i++) {
+    const a = STAGES[i - 1], b = STAGES[i];
+    assert.equal(b.id, a.id + 1);
+    assert.ok(b.dist > a.dist && b.time > a.time, `stage ${b.id} longer`);
+    assert.ok(b.traffic >= a.traffic && b.rival >= a.rival && b.trucks >= a.trucks, `stage ${b.id} busier`);
+    assert.ok(b.gentle > a.gentle, `stage ${b.id} gentle allowance grows`);
+  }
+  assert.deepEqual(STAGES.slice(6).map((s) => s.en), ['Fayoum Lake', 'Minya Corniche', 'Luxor Temples', 'Aswan Nile', 'Siwa Oasis', 'Dahab Shores']);
 });
 
 test('a robot driver beats the clock and the rival on every stage, with a few bumps', () => {
@@ -118,13 +132,41 @@ test('milestones fire exactly once each at 25/50/75 percent', () => {
   assert.equal(count, 3);
 });
 
-test('save keeps stars for all six stages and the chosen car colour', () => {
-  const s = normalizeSave({ stars: { 5: 2, 6: 3 }, unlocked: 6, color: 2 });
+test('save keeps stars for all twelve stages and the chosen car colour', () => {
+  const s = normalizeSave({ stars: { 5: 2, 6: 3, 11: 1, 12: 3 }, unlocked: 12, color: 2 });
   assert.equal(s.stars[5], 2);
   assert.equal(s.stars[6], 3);
+  assert.equal(s.stars[11], 1);
+  assert.equal(s.stars[12], 3);
   assert.equal(s.color, 2);
   assert.equal(normalizeSave({ color: 9 }).color, 3);
   assert.equal(normalizeSave(null).color, 0);
+});
+
+test('old six-stage save migrates: progress intact, Season 2 locked until stage 6 is won', () => {
+  // a finished Season-1 save from before Phase 2F: all six stages starred, unlocked capped at 6
+  const old = normalizeSave({ stars: { 1: 3, 2: 3, 3: 2, 4: 3, 5: 2, 6: 3 }, unlocked: 6, color: 1, muted: true });
+  assert.equal(old.stars[1], 3);
+  assert.equal(old.stars[6], 3);
+  assert.equal(old.color, 1);
+  assert.equal(old.muted, true);
+  // winning stage 6 (stars[6] present) is exactly what opens stage 7
+  assert.equal(old.unlocked, 7);
+  // a mid-Season-1 save keeps Season 2 fully locked
+  const mid = normalizeSave({ stars: { 1: 3, 2: 2 }, unlocked: 3 });
+  assert.equal(mid.unlocked, 3);
+  assert.equal(mid.stars[7], undefined);
+});
+
+test('unlock chain walks 1 to 12: earning stars on stage N opens stage N+1', () => {
+  let save = normalizeSave(null);
+  assert.equal(save.unlocked, 1);
+  for (let n = 1; n <= 12; n++) {
+    assert.ok(save.unlocked >= n, `stage ${n} should be reachable`);
+    save = normalizeSave({ ...save, stars: { ...save.stars, [n]: 3 } });
+    if (n < 12) assert.equal(save.unlocked, n + 1, `winning stage ${n} opens stage ${n + 1}`);
+  }
+  assert.equal(save.unlocked, 12);
 });
 
 test('doing nothing in the right lane runs out the clock or loses the lead, but never crashes the game', () => {
@@ -158,5 +200,19 @@ test('a bump slows the car for a moment and never repeats while protected; nitro
 
 test('damaged saves load safely', () => {
   assert.equal(normalizeSave(null).unlocked, 1);
-  assert.equal(normalizeSave({ unlocked: 99 }).unlocked, 6);
+  assert.equal(normalizeSave({ unlocked: 99 }).unlocked, 12);
+});
+
+test('Certification Sweep A: Season 2 stages have distinct cone layouts and distinct code-drawn motifs', async () => {
+  const s2 = STAGES.slice(6);
+  // cone density is a per-stage layout signature now — not the same slalom on all six
+  assert.ok(new Set(s2.map((s) => s.cones)).size >= 4, `cone layouts too uniform: ${s2.map((s) => s.cones).join(',')}`);
+  // distinct venue motifs, all drawn in code in main.js (no new image files)
+  assert.deepEqual(s2.map((s) => s.motif), ['fayoum', 'minya', 'luxor', 'aswan', 'siwa', 'dahab']);
+  const fs = await import('node:fs');
+  const main = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes('drawHighwayMotif'), 'motif compositor missing from main.js');
+  for (const m of ['fayoum', 'minya', 'luxor', 'aswan', 'siwa', 'dahab']) assert.ok(main.includes(`motif === '${m}'`), `motif ${m} not drawn`);
+  // Season 1 rows stay frozen (id/dist/time/gentle pinned by the earlier test) and carry no motif
+  assert.ok(STAGES.slice(0, 6).every((s) => !s.motif));
 });
