@@ -1,6 +1,7 @@
 ﻿"file_name_in_assets/audio/voices/learn_pick","language","when","text","style"
-"gate.mp3","ar","شاشة اختيار اللغة (بتتقال أول ما تفتح)","تحب تتعلم إيه النهارده؟ عربي... إنجليش... دويتش... ولا فرنش؟","دافي، مبتسم، وقفة صغيرة بعد كل لغة"
+"gate.mp3","ar","شاشة اختيار اللغة (بتتقال أول ما تفتح)","تحب تتعلم إيه النهارده؟ عربي... إنجليش... دويتش... فرنش... ولا إيطالي؟","دافي، مبتسم، وقفة صغيرة بعد كل لغة"
 "mode_ar.mp3","ar","بعد ما يختار عربي","حابب تلعب مستويات رحلتي في التعلّم؟ ولا حابب تتعلّم وتختار الحاجات اللي إنت عايزها؟","واضح وبسيط، وقفة بين الاختيارين"
 "mode_en.mp3","en","after choosing English","Would you like to play the levels of my learning journey, or learn and pick the things you like?","warm and clear, a small pause between the two choices"
 "mode_de.mp3","de","nach der Wahl von Deutsch","Möchtest du die Level meiner Lernreise spielen, oder lieber lernen und dir aussuchen, was du magst?","freundlich und klar, kleine Pause zwischen den zwei Möglichkeiten"
 "mode_fr.mp3","fr","après avoir choisi le français","Tu veux jouer aux niveaux de mon voyage d'apprentissage, ou apprendre et choisir ce que tu aimes ?","chaleureux et clair, une petite pause entre les deux choix"
+"mode_it.mp3","it","dopo aver scelto l'italiano","Vuoi giocare i livelli del mio viaggio di apprendimento, o imparare e scegliere le cose che ti piacciono?","caldo e chiaro, una piccola pausa tra le due scelte"
