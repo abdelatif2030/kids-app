@@ -319,12 +319,12 @@ void main() {
 
   group('the sign-up page', () {
     testWidgets(
-      'nothing is pre-selected; the age stays inside 1 to 6 and shows its real range',
+      'nothing is pre-selected; the age stays inside 1 to 8 and shows its real range',
       (t) async {
         await _show(t, RegisterPictureScreen(repo: FakeTeacherRepository()));
         expect(find.text('اختر العمر'), findsOneWidget);
         expect(
-          find.text('من 1 إلى 6 سنوات'),
+          find.text('من 1 إلى 8 سنوات'),
           findsOneWidget,
           reason: 'the painted "2 to 10" was erased: the real range is shown',
         );
@@ -333,7 +333,7 @@ void main() {
           await t.tap(find.byKey(const ValueKey('register_age_up')));
         }
         await t.pump();
-        expect(find.text('6 سنوات'), findsOneWidget);
+        expect(find.text('8 سنوات'), findsOneWidget);
         for (var i = 0; i < 9; i++) {
           await t.tap(find.byKey(const ValueKey('register_age_down')));
         }
@@ -469,18 +469,18 @@ void main() {
   });
 
   group('account extras', () {
-    test('are cleaned: gender is one of two ids, age 1 to 6, city trimmed and shortened; nothing is sent anywhere', () async {
+    test('are cleaned: gender is one of two ids, age 1 to 8, city trimmed and shortened; nothing is sent anywhere', () async {
       final e = AccountExtras.clean(
         gender: 'x',
         age: 99,
         city: '  ${'م' * 80}  ',
       );
       expect(e.gender, isNull);
-      expect(e.age, 6);
+      expect(e.age, 8);
       expect(e.city!.runes.length, AccountExtras.maxCity);
       await e.save();
       final back = await AccountExtras.load();
-      expect(back.age, 6);
+      expect(back.age, 8);
       await AccountExtras.clear();
       expect((await AccountExtras.load()).isEmpty, isTrue);
       // the file only uses shared_preferences: no network package

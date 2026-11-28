@@ -2,24 +2,24 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// What a parent may add when creating an account: the child's gender, the child's age (1 to 6) and a city. All three are
+/// What a parent may add when creating an account: the child's gender, the child's age (1 to 8) and a city. All three are
 /// optional and are kept ONLY on this device (never sent to the account service, never used to choose content). They
 /// are removed with the rest of the local data.
 class AccountExtras {
   final String? gender; // 'girl' | 'boy' | null
-  final int? age; // 1..6 | null
+  final int? age; // 1..8 | null
   final String? city; // up to 40 characters | null
   const AccountExtras({this.gender, this.age, this.city});
 
   static const key = 'account_extras';
   static const minAge = 1;
-  static const maxAge = 6;
+  static const maxAge = 8;
   static const maxCity = 40;
 
   bool get isEmpty =>
       gender == null && age == null && (city == null || city!.isEmpty);
 
-  /// A clean copy: gender must be one of the two ids, age is kept inside 1 to 6, the city is trimmed and shortened.
+  /// A clean copy: gender must be one of the two ids, age is kept inside 1 to 8, the city is trimmed and shortened.
   factory AccountExtras.clean({String? gender, int? age, String? city}) {
     final c = city?.trim();
     return AccountExtras(

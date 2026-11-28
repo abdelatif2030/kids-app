@@ -11,7 +11,7 @@ class TermsScreen extends StatelessWidget {
   const TermsScreen({super.key});
 
   static const _ar = [
-    'التطبيق مخصّص لأطفال من سنة إلى ٦ سنوات ويستخدمه الطفل بإشراف وليّ الأمر، وولي الأمر هو من يبدأ الجلسة ويحدد وقتها.',
+    'التطبيق مخصّص لأطفال من سنة إلى ٨ سنوات ويستخدمه الطفل بإشراف وليّ الأمر، وولي الأمر هو من يبدأ الجلسة ويحدد وقتها.',
     'المحتوى تعليمي وترفيهي ولا يغني عن التعليم الرسمي ولا عن الاستشارة الطبية أو النفسية.',
     'لا إعلانات ولا روابط خارجية للطفل ولا تتبّع. اقرأ سياسة الخصوصية لمعرفة ما يُحفظ وأين.',
     'إن وُجد اشتراك مدفوع في أي وقت فسيتم حصراً عبر نظام الاشتراك داخل التطبيق في المتجر (App Store أو Google Play)، ويُجدَّد تلقائياً ما لم تلغِه قبل نهاية الفترة من إعدادات حساب المتجر، ويمكن استعادة المشتريات من داخل التطبيق.',
@@ -20,7 +20,7 @@ class TermsScreen extends StatelessWidget {
     'نحتفظ بحق تحديث هذه الشروط، وسنُظهر التاريخ الجديد هنا.',
   ];
   static const _en = [
-    'The app is made for children aged 1 to 6 and is used by the child under a parent\'s supervision. The parent starts each session and sets its length.',
+    'The app is made for children aged 1 to 8 and is used by the child under a parent\'s supervision. The parent starts each session and sets its length.',
     'The content is for learning and fun. It is not a replacement for school or for medical or psychological advice.',
     'No ads, no external links for the child, no tracking. Read the privacy policy to see what is kept and where.',
     'If a paid subscription is ever offered, it is sold ONLY through the store\'s own in-app subscription (App Store or Google Play). It renews automatically unless you cancel before the period ends in your store account settings, and purchases can be restored inside the app.',

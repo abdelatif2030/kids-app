@@ -69,13 +69,13 @@ String? validateDemoNickname(String raw) {
   return null;
 }
 
-/// Creates the child profile of the demo: nickname, age 1-6 and a cartoon avatar. Everything else takes the same
+/// Creates the child profile of the demo: nickname, age 1-8 and a cartoon avatar. Everything else takes the same
 /// defaults the normal onboarding starts from. No photo, no birth date, no gender, no real name.
 Future<ChildProfile> createDemoChild({required String nickname, required int age, String? avatar, String? gender}) async {
   final store = JourneyStore.instance;
   final draft = ProfileDraft()
     ..nickname = nickname.trim()
-    ..age = age.clamp(1, 6)
+    ..age = age.clamp(1, 8)
     ..avatar = avatar
     ..gender = gender == 'girl' || gender == 'boy' ? gender : null;
   final profile = await store.addProfile(draft.toProfile(store.newId()));
@@ -161,7 +161,7 @@ class DemoBanner extends StatelessWidget {
       );
 }
 
-/// Make a child for the demo: nickname, age 1-6, avatar. Pops with the new [ChildProfile].
+/// Make a child for the demo: nickname, age 1-8, avatar. Pops with the new [ChildProfile].
 class DemoCreateChildScreen extends StatefulWidget {
   const DemoCreateChildScreen({super.key});
 
@@ -244,7 +244,7 @@ class _DemoCreateChildScreenState extends State<DemoCreateChildScreen> {
                 Text(tr2('العمر', 'Age'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: RC.ink)),
                 const SizedBox(height: 6),
                 Wrap(spacing: 10, runSpacing: 10, children: [
-                  for (var a = 1; a <= 6; a++)
+                  for (var a = 1; a <= 8; a++)
                     ChoiceChip(
                       key: ValueKey('demo_age_$a'),
                       label: Padding(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), child: Text('$a', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900))),

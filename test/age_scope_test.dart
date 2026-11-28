@@ -14,11 +14,11 @@ void main() {
     await AppLocale.instance.set('en');
   });
 
-  test('pickers offer ages 1-6 only, plus an older legacy value so it is never rewritten', () {
-    expect(ageChoices(), [1, 2, 3, 4, 5, 6]);
-    expect(ageChoices(current: 4), [1, 2, 3, 4, 5, 6]);
-    expect(ageChoices(current: 9), [1, 2, 3, 4, 5, 6, 9]);
-    expect(ageChoices(current: null), [1, 2, 3, 4, 5, 6]);
+  test('pickers offer ages 1-8 only, plus an older legacy value so it is never rewritten', () {
+    expect(ageChoices(), [1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(ageChoices(current: 4), [1, 2, 3, 4, 5, 6, 7, 8]);
+    expect(ageChoices(current: 9), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    expect(ageChoices(current: null), [1, 2, 3, 4, 5, 6, 7, 8]);
   });
 
   test('a legacy profile with age 10 still loads (stored ages up to 12 are kept)', () {
@@ -36,17 +36,17 @@ void main() {
     expect(_read('CLAUDE.md').split('\n').first.contains('ages 1-12'), isFalse);
   });
 
-  testWidgets('the profile form offers ages 1-6, and an old age stays selectable when editing', (t) async {
+  testWidgets('the profile form offers ages 1-8, and an old age stays selectable when editing', (t) async {
     t.view.physicalSize = const Size(900, 2200);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
     for (final age in [4, 9]) {
       await t.pumpWidget(MaterialApp(key: UniqueKey(), home: Scaffold(body: SingleChildScrollView(child: BasicsForm(draft: ProfileDraft()..age = age, onChanged: () {})))));
       await t.pump();
-      for (var a = 1; a <= 6; a++) {
+      for (var a = 1; a <= 8; a++) {
         expect(find.widgetWithText(ChoiceChip, '$a'), findsWidgets, reason: 'age $a');
       }
-      expect(find.widgetWithText(ChoiceChip, '7'), findsNothing);
+      expect(find.widgetWithText(ChoiceChip, '10'), findsNothing);
       expect(find.widgetWithText(ChoiceChip, '12'), findsNothing);
       if (age == 9) expect(t.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, '9')).selected, isTrue);
     }

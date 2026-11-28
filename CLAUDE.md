@@ -1,6 +1,6 @@
 # Kids App
 
-Arabic-first kids app (official target: ages 1-6 only; content and profiles for ages 7-12 from earlier versions are kept as legacy but not offered for new use), Android first, Flutter. A "mini home school": the parent enters the child's age; the app shows only age-appropriate, hand-reviewed content, organised by subject.
+Arabic-first kids app (official target: ages 1-8 (owner decision 2026-11-28, was 1-6); content and profiles for ages 9-12 from earlier versions are kept as legacy but not offered for new use), Android first, Flutter. A "mini home school": the parent enters the child's age; the app shows only age-appropriate, hand-reviewed content, organised by subject.
 
 ## Rules (non-negotiable)
 - NO YouTube content (owner decision 2026-11-06): `assets/videos.json` is empty and `YoutubeContent` (lib/content_flags.dart) is off; the old YouTube video machinery is dormant code. The only videos are the owner's OWN lesson videos (made by the owner's family) streamed from the owner's own storage using a `lessons.json` list (lib/lessons_own, docs/OWN_VIDEOS.md); the single allowed host is `LESSONS_BASE_URL`. No free search, no ads, no external links, no tracking. Never rip or re-host third-party videos.
