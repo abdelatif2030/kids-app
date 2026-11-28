@@ -4,11 +4,24 @@
 // pool noodles, leap floating walls, dodge bumpers, ride waves, take slide shortcuts, watch your breath, qualify
 // through the rounds and win the final. No network, no links, no ads, no tracking.
 import * as THREE from 'three';
-import { Swim, ROUNDS, HALF, normalizeSave } from './sim.js';
+import { Swim, ROUNDS, HALF, normalizeSave, stampEntries } from './sim.js';
 import {
   mat, makeSwimmer, makeStandingOtter, makeBumper, makeNoodle, makeFloatWall, makeRope, makeSlide, makeFinishArch,
-  makeStartBlock, makeIsland, waterTexture,
+  makeStartBlock, makeIsland, waterTexture, makeReeds, makeFelucca, makeWaterwheel, makeFlamingo, makeRocks,
+  makeSpringPool, makeCoral,
 } from './models.js';
+
+/** Director Protocol: per-round light/water themes so each Egyptian water has its
+ * own air — Nile morning, Faiyum bright, Qarun golden, Sinai springs clear,
+ * Aswan sunset, Red Sea dusk final. Presentation only. */
+const ROUND_THEMES = [
+  { sky: 0x8fdcff, fog: 0xbfeaff, floor: 0x7ae0f0, sun: 0xfff8e0, sunI: 1.4 },
+  { sky: 0x9fe0ff, fog: 0xc4ecff, floor: 0x86d8e8, sun: 0xfff8e0, sunI: 1.4 },
+  { sky: 0xaee6ff, fog: 0xd8f0ff, floor: 0x7ad0d8, sun: 0xfff2cc, sunI: 1.5 },
+  { sky: 0x8fd4f8, fog: 0xbfeaff, floor: 0x9adcc0, sun: 0xfff8e0, sunI: 1.4 },
+  { sky: 0xffd9a8, fog: 0xffd9b0, floor: 0x7ac8d8, sun: 0xffc888, sunI: 1.3 },
+  { sky: 0x35477a, fog: 0x4a5f9e, floor: 0x2a7a9a, sun: 0xbfd0ff, sunI: 1.0 },
+];
 import { Sound } from './audio.js';
 import { VoiceCoach } from '../../cozy_kit/voice.js';
 
@@ -168,8 +181,9 @@ class Game {
     this.sw = new Swim({ round: roundIndex, easy: this.age <= 4, seed: (Date.now() & 0xffff) + 1 });
     const L = this.sw.round.len;
     const s = (this.scene = new THREE.Scene());
-    s.background = new THREE.Color(0x8fdcff);
-    s.fog = new THREE.Fog(0xbfeaff, 70, 240);
+    const theme = ROUND_THEMES[roundIndex] ?? ROUND_THEMES[0];
+    s.background = new THREE.Color(theme.sky);
+    s.fog = new THREE.Fog(theme.fog, 70, 240);
     { // the level's painted backdrop (art/pano<N>.webp): a mirrored ring that follows the camera, its water line at the pool level
       const tex = new THREE.TextureLoader().load(`${this.base}art/pano${roundIndex + 1}.webp`, () => { ring.visible = true; });
       tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = THREE.MirroredRepeatWrapping; tex.repeat.set(2, 0.66); tex.offset.set(0, 0.34);
@@ -177,7 +191,7 @@ class Game {
       ring.visible = false; ring.renderOrder = -10; this.panoMesh = ring; s.add(ring);
     }
     s.add(new THREE.HemisphereLight(0xf4fcff, 0x3a9ab8, 1.9));
-    const sun = new THREE.DirectionalLight(0xfff8e0, 1.4);
+    const sun = new THREE.DirectionalLight(theme.sun, theme.sunI);
     sun.position.set(-20, 40, 20);
     s.add(sun);
     this.water = waterTexture();
@@ -187,7 +201,7 @@ class Game {
     water.position.set(0, 0, -L / 2);
     s.add(water);
     // a lighter pool floor under the water so divers show through
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(160, L + 200), mat(0x7ae0f0));
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(160, L + 200), mat(theme.floor));
     floor.rotation.x = -Math.PI / 2;
     floor.position.set(0, -1.6, -L / 2);
     s.add(floor);
@@ -204,6 +218,7 @@ class Game {
       isl.position.set(side * (26 + (i % 4) * 9), -0.6, 10 - i * ((L + 40) / 14));
       s.add(isl);
     }
+    this._dress(roundIndex, L);
     const blockCols = [0xe8342a, 0x2a6ae8, 0xffd23a, 0x2ab8c8];
     this.sw.swimmers.forEach((w, k) => {
       const b = makeStartBlock(blockCols[k % 4]);
@@ -234,6 +249,61 @@ class Game {
     this.drops = new Drops(s, 260, 0.35, 0xffffff);
     this.bubbles = new Drops(s, 80, 0.22, 0xe0f8ff);
     this.cam = null;
+  }
+
+  /** Director Protocol dressing: each round's banks carry ITS place, code-drawn —
+   * Nile reeds + feluccas, Faiyum waterwheels, Qarun flamingos, Sinai spring
+   * pools among rocks, Aswan granite + feluccas, Red Sea coral on the floor.
+   * Deterministic placement (own LCG), static geometry, zero new files. This is
+   * what separates the rounds in the 3D view itself: rounds 1/2's panoramas are
+   * both water parks and 3/4's both falls+flowers, so the foreground dressing —
+   * not the backdrop — is what a child actually races past. */
+  _dress(roundIndex, L) {
+    const s = this.scene;
+    let seed = roundIndex * 131 + 7;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    this.wheels = [];
+    const bank = (k, make, y = -0.2) => {
+      const side = k % 2 ? 1 : -1;
+      const m = make();
+      m.position.set(side * (HALF + 5 + rnd() * 5), y, -18 - k * ((L - 26) / 8) - rnd() * 6);
+      m.rotation.y = rnd() * Math.PI;
+      const sc = 0.9 + rnd() * 0.5;
+      m.scale.setScalar(sc);
+      s.add(m);
+      return m;
+    };
+    if (roundIndex === 0) { // Nile Pool: reed banks + feluccas sailing by
+      for (let k = 0; k < 8; k++) bank(k, makeReeds);
+      for (const k of [2, 5]) { const f = makeFelucca(); f.position.set(k === 2 ? -19.5 : 20.5, 0, -40 - k * 34); f.rotation.y = 0.4; s.add(f); }
+    } else if (roundIndex === 1) { // Faiyum Pool: waterwheels (Wadi El Rayan) + rocks
+      for (let k = 0; k < 8; k++) {
+        if (k % 3 === 1) { const w = bank(k, makeWaterwheel, 0); this.wheels.push(w.userData.wheel); }
+        else bank(k, () => makeRocks(0xc0aa84));
+      }
+    } else if (roundIndex === 2) { // Qarun Lake: flamingos in the shallows + reeds
+      for (let k = 0; k < 8; k++) {
+        if (k % 2 === 0) { const f = makeFlamingo(); f.position.set((k % 4 ? 1 : -1) * (HALF + 2.2), -0.15, -24 - k * ((L - 30) / 8)); f.rotation.y = rnd() * Math.PI; s.add(f); }
+        else bank(k, makeReeds);
+      }
+    } else if (roundIndex === 3) { // Moses Springs: spring pools among Sinai rocks
+      for (let k = 0; k < 8; k++) {
+        if (k % 3 === 2) bank(k, makeSpringPool, 0.1);
+        else bank(k, () => makeRocks(0xbd9a72));
+      }
+    } else if (roundIndex === 4) { // Aswan Island: pink granite + feluccas
+      for (let k = 0; k < 8; k++) bank(k, () => makeRocks(0xc09a8a));
+      for (const k of [1, 4, 6]) { const f = makeFelucca(); f.position.set(k % 2 ? 20.5 : -20.5, 0, -30 - k * 36); f.rotation.y = -0.3; s.add(f); }
+    } else { // Red Sea Final: coral gardens on the floor inside both ropes
+      for (let k = 0; k < 10; k++) {
+        const c = makeCoral();
+        c.position.set((k % 2 ? 1 : -1) * (HALF - 0.9), -0.55, -16 - k * ((L - 24) / 10) - rnd() * 5);
+        c.rotation.y = rnd() * Math.PI;
+        c.scale.setScalar(1.5);
+        s.add(c);
+      }
+      for (let k = 0; k < 6; k++) bank(k, () => makeRocks(0x8a7a8a));
+    }
   }
 
   _waveTex() {
@@ -389,7 +459,11 @@ class Game {
     this.otter.rotation.y = 0;
     this.scene.add(this.otter);
     this._clear();
-    const spots = [[50, 86], [24, 70], [72, 58], [28, 44], [70, 30], [46, 12]];
+    // Director Protocol: roomier tour path — the old spots put isle centres
+    // 15–19u apart on 16u circles, so neighbours overlapped and labels/stars
+    // covered each other (cycle-1 frame menu_1024x768). New path on the wider
+    // 92u map keeps ≥23u between centres.
+    const spots = [[14, 82], [36, 60], [60, 74], [82, 52], [62, 28], [34, 14]];
     const isles = ROUNDS.map((rd, i) => {
       const locked = i + 1 > this.save.unlocked;
       const stars = this.save.stars[rd.id] ?? 0;
@@ -416,7 +490,45 @@ class Game {
         h('div', { class: 'sp-panel' },
           h('div', { class: 'sp-logo', style: 'font-size:calc(var(--u)*7)' }, '🦦 ', t('title')),
           h('div', { class: 'sp-map' }, svg, isles),
-          h('button', { class: 'sp-btn2 sp-big', onclick: () => this.startRound(this.save.unlocked - 1) }, '▶ ', t('swim')))),
+          h('button', { class: 'sp-btn2 sp-big', onclick: () => this.startRound(this.save.unlocked - 1) }, '▶ ', t('swim')),
+          h('button', { class: 'sp-btn2 wood', onclick: () => this.showAlbum() }, '🏅 ', t('album'), ' (', num(stampEntries(this.save).filter((e) => e.unlocked).length), '/', num(ROUNDS.length), ')'))),
+      this._mute(`bottom:max(calc(var(--u)*3),env(safe-area-inset-bottom));inset-inline-end:calc(var(--u)*3)`),
+      this._toastEl(),
+    );
+  }
+
+  /** The water-stamps album (Phase 2H, sky_jumper passport / ocean_defense album
+   * pattern): one stamp per tour round, earned by FINISHING that round. Derived
+   * purely from the existing save via stampEntries — nothing new is persisted,
+   * so old saves show the stamps they already earned. Earned stamps show icon +
+   * place name + one true fact (display-only until the Instinct clips land);
+   * locked stamps are grey silhouettes with a hint and no fact at all. */
+  showAlbum() {
+    this.mode = 'album';
+    this.paused = false;
+    if (this.joy) this.joy.style.display = 'none';
+    this.sound.setUnder(false);
+    this.sound.setMode('menu');
+    this._clear();
+    const en = getLang() === 'en';
+    const cards = stampEntries(this.save).map((e) => e.unlocked
+      ? h('div', { class: 'sp-card' },
+        h('div', { class: 'ic' }, e.icon),
+        h('div', { class: 'nm' }, name(e.round)),
+        h('div', { class: 'fact' }, en ? e.fact.en : e.fact.ar),
+        h('div', { class: 'got' }, '🏅 ', t('stampGot')))
+      : h('div', { class: 'sp-card lock' },
+        h('div', { class: 'ic' }, '🔒'),
+        h('div', { class: 'nm' }, '؟؟؟'),
+        h('div', { class: 'fact' }, en ? e.hint.en : e.hint.ar)));
+    this.layer.append(
+      h('button', { class: 'sp-round', style: this._topLeft(), 'aria-label': t('back'), onclick: () => this.showMenu() }, getLang() === 'en' ? '←' : '→'),
+      h('div', { class: 'sp-dim', style: 'background:rgba(20,120,160,.25)' },
+        h('div', { class: 'sp-panel' },
+          h('div', { class: 'sp-title' }, '🏅 ', t('album')),
+          h('div', { style: 'text-align:center;font-weight:700' }, t('albumSub')),
+          h('div', { class: 'sp-album' }, cards),
+          h('button', { class: 'sp-btn2 wood', onclick: () => this.showMenu() }, t('menu')))),
       this._mute(`bottom:max(calc(var(--u)*3),env(safe-area-inset-bottom));inset-inline-end:calc(var(--u)*3)`),
       this._toastEl(),
     );
@@ -457,7 +569,7 @@ class Game {
     dv.addEventListener('pointerup', off);
     dv.addEventListener('pointercancel', off);
     this.layer.append(
-      h('div', { class: 'sp-hudtop' }, this.hud.place, h('div', { class: 'sp-roundbar' }, h('b', {}, sw.round.id === 4 ? t('final') : `${t('round')} ${num(sw.round.id)}`), this.hud.prog), this.hud.qual),
+      h('div', { class: 'sp-hudtop' }, this.hud.place, h('div', { class: 'sp-roundbar' }, h('b', {}, sw.round.id === ROUNDS.length ? t('final') : `${t('round')} ${num(sw.round.id)}`), this.hud.prog), this.hud.qual),
       h('button', { class: 'sp-round', style: 'top:calc(max(calc(var(--u)*2.4),env(safe-area-inset-top)) + var(--u)*16);inset-inline-start:calc(var(--u)*3)', 'aria-label': t('paused'), onclick: (e) => { e.stopPropagation(); this.pause(); } }, '⏸'),
       this.hud.breath, this.hud.grade, this.hud.hint, this.hud.count, this.hud.stroke, this.hud.dive,
       this._mute('top:calc(max(calc(var(--u)*2.4),env(safe-area-inset-top)) + var(--u)*16);inset-inline-end:calc(var(--u)*3)'),
@@ -499,22 +611,27 @@ class Game {
     this.sound.setUnder(false);
     this.sound.setMode('menu');
     const finalWin = i === ROUNDS.length - 1 && r.place === 1;
+    // Kind rules: EVERY finisher is stamped and the tour moves on — qualifying
+    // still earns the stars, but nobody is eliminated for finishing behind.
+    const id = ROUNDS[i].id;
+    this.save.stamps = this.save.stamps || {};
+    this.save.stamps[id] = true;
+    if (i + 2 > this.save.unlocked && i + 1 < ROUNDS.length) this.save.unlocked = i + 2;
     if (r.qualified) {
-      const id = ROUNDS[i].id;
       this.save.stars[id] = Math.max(this.save.stars[id] ?? 0, r.stars);
-      if (i + 2 > this.save.unlocked && i + 1 < ROUNDS.length) this.save.unlocked = i + 2;
-      this._saveNow();
       this.sound.play('win');
       this.voice.say('win');
-    } else { this.sound.play('lose'); this.voice.say('lose'); }
-    const hasNext = r.qualified && i + 1 < ROUNDS.length;
+    } else { this.sound.play('splash'); this.voice.say('lose'); }
+    this._saveNow();
+    const hasNext = i + 1 < ROUNDS.length;
     const dim = h('div', { class: 'sp-dim' }, h('div', { class: 'sp-panel' },
       h('div', { class: 'sp-title' }, finalWin ? t('win') : r.qualified ? t('qual') : t('out')),
-      r.qualified ? h('div', { class: 'sp-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= r.stars ? '' : 'off' }, '⭐'))) : null,
+      r.qualified ? h('div', { class: 'sp-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= r.stars ? '' : 'off' }, '⭐'))) : h('div', { class: 'sp-stat' }, t('stamp')),
       h('div', { class: 'sp-stat' }, h('span', {}, '🏁 ', t('place'), ' ', num(r.place)), h('span', {}, '⭐ ', t('perfect'), ' ', num(sw.perfects))),
       h('div', { style: 'display:flex;gap:calc(var(--u)*2);flex-wrap:wrap;justify-content:center' },
         hasNext ? h('button', { class: 'sp-btn2', onclick: () => this.startRound(i + 1) }, t('next'), ' ▶') : null,
         h('button', { class: hasNext ? 'sp-btn2 wood' : 'sp-btn2', onclick: () => this.startRound(i) }, '↻ ', t('again')),
+        h('button', { class: 'sp-btn2 wood', onclick: () => this.showAlbum() }, '🏅 ', t('album')),
         h('button', { class: 'sp-btn2 wood', onclick: () => this.showMenu() }, t('menu')))));
     this.hud.stroke.remove();
     this.hud.dive.remove();
@@ -578,6 +695,7 @@ class Game {
   _sync(dt, time) {
     const sw = this.sw;
     this.water.offset.y = (this.water.offset.y + dt * 0.05) % 1;
+    if (this.wheels) for (const w of this.wheels) w.rotation.z -= dt * 0.5; // Faiyum waterwheels turn
     for (const wv of this.waves) wv.material.map.offset.y = (wv.material.map.offset.y - dt * 0.6) % 1;
     sw.course.noodles.forEach((n, k) => { this.noodles[k].userData.arm.rotation.y = n.a; });
     sw.swimmers.forEach((w, k) => {

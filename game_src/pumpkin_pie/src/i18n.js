@@ -1,5 +1,5 @@
 const S = {
-  title: ['مخبز اليقطين', 'Pumpkin Pie Maker'],
+  title: ['مخبز الحارة', 'Hara Bakery'],
   play: ['يلا نخبز!', "Let's bake!"],
   who: ['مين الشيف؟', 'Who is the chef?'],
   girl: ['نور', 'Nour'],

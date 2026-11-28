@@ -11,13 +11,13 @@ export const SEG = 1.7;
 export const RANGE = 10;
 
 export const LEVELS = [
-  { id: 1, ar: 'كهف الصقيع', en: 'Frost Cave', seg: 11, hp: 6, speed: 2.0, shrines: 3, barrels: 3 },
-  { id: 2, ar: 'قناة الفيروز', en: 'Turquoise Channel', seg: 15, hp: 9, speed: 2.3, shrines: 4, barrels: 3 },
-  { id: 3, ar: 'عرين التنين', en: 'Dragon Lair', seg: 20, hp: 13, speed: 2.6, shrines: 4, barrels: 4 },
+  { id: 1, ar: 'واحة الثلج', en: 'Snow Oasis', seg: 11, hp: 6, speed: 2.0, shrines: 3, barrels: 3, layout: 0 },
+  { id: 2, ar: 'بحيرة الفيروز', en: 'Turquoise Lake', seg: 15, hp: 9, speed: 2.3, shrines: 4, barrels: 3, layout: 0 },
+  { id: 3, ar: 'عرين تنين الواحة', en: 'Oasis Dragon Lair', seg: 20, hp: 13, speed: 2.6, shrines: 4, barrels: 4, layout: 1 },
   // 2026-11-21: three more hunts, a longer dragon each time
-  { id: 4, ar: 'جسر الجليد', en: 'Ice Bridge', seg: 23, hp: 15, speed: 2.8, shrines: 5, barrels: 4 },
-  { id: 5, ar: 'بحيرة الأشباح', en: 'Ghost Lake', seg: 26, hp: 17, speed: 2.9, shrines: 5, barrels: 5 },
-  { id: 6, ar: 'قلب الجبل', en: 'Mountain Heart', seg: 29, hp: 20, speed: 3.1, shrines: 6, barrels: 5 },
+  { id: 4, ar: 'جسر الواحة', en: 'Oasis Bridge', seg: 23, hp: 15, speed: 2.8, shrines: 5, barrels: 4, layout: 1 },
+  { id: 5, ar: 'بحيرة الواحة الهادية', en: 'Calm Oasis Lake', seg: 26, hp: 17, speed: 2.9, shrines: 5, barrels: 5, layout: 2 },
+  { id: 6, ar: 'قلب جبل سانت كاترين', en: 'Heart of Mount Catherine', seg: 29, hp: 20, speed: 3.1, shrines: 6, barrels: 5, layout: 2 },
 ];
 
 /** Point on the square ring for arc length s (clockwise from the top-left corner). */
@@ -35,16 +35,46 @@ export function ringPoint(s) {
   }
 }
 
-// ice blocks inside the area (centre x, z, half width, half depth): a small maze with open lanes
-export const WALLS = [
-  { x: -3.5, z: -3.5, hw: 2.2, hd: 0.5 }, { x: 3.5, z: -3.5, hw: 2.2, hd: 0.5 },
-  { x: -3.5, z: 3.5, hw: 2.2, hd: 0.5 }, { x: 3.5, z: 3.5, hw: 2.2, hd: 0.5 },
-  { x: 0, z: 0, hw: 0.5, hd: 2.2 }, { x: -6.2, z: 0, hw: 0.5, hd: 1.4 }, { x: 6.2, z: 0, hw: 0.5, hd: 1.4 },
+// Three maze layouts (Phase 2F), one per leg of the journey. Ice blocks are
+// (centre x, z, half width, half depth) with open lanes between them. Layout 0
+// is the original maze, byte-equivalent. Each layout also carries its water
+// serpent variant: body/head tint, body scale and a gentle speed multiplier on
+// top of the level's own cfg curve (parameters only — same serpent mechanics).
+export const LAYOUTS = [
+  { // Fayoum oasis — the original maze and the original serpent
+    place: 'Fayoum oasis', tint: 0x3ad8c8, head: 0x2a8ae8, scale: 1.0, speedMul: 1.0,
+    walls: [
+      { x: -3.5, z: -3.5, hw: 2.2, hd: 0.5 }, { x: 3.5, z: -3.5, hw: 2.2, hd: 0.5 },
+      { x: -3.5, z: 3.5, hw: 2.2, hd: 0.5 }, { x: 3.5, z: 3.5, hw: 2.2, hd: 0.5 },
+      { x: 0, z: 0, hw: 0.5, hd: 2.2 }, { x: -6.2, z: 0, hw: 0.5, hd: 1.4 }, { x: 6.2, z: 0, hw: 0.5, hd: 1.4 },
+    ],
+  },
+  { // Nile bend — staggered vertical bars, the river bends left, right, left
+    place: 'Nile bend', tint: 0x27c878, head: 0x1a9a6a, scale: 0.85, speedMul: 1.07,
+    walls: [
+      { x: -3.8, z: -2.6, hw: 0.5, hd: 2.6 }, { x: 0.2, z: 0.4, hw: 0.5, hd: 2.6 }, { x: 3.6, z: 2.6, hw: 0.5, hd: 2.6 },
+      { x: -5.2, z: 3.4, hw: 1.2, hd: 0.5 }, { x: 5.2, z: -3.4, hw: 1.2, hd: 0.5 },
+    ],
+  },
+  { // Red Sea lagoon — a broken coral ring around a centre block, gaps at the diagonals
+    place: 'Red Sea lagoon', tint: 0x4a6ae8, head: 0x3a4ad8, scale: 1.15, speedMul: 0.93,
+    walls: [
+      { x: 0, z: 0, hw: 0.6, hd: 0.6 },
+      { x: 0, z: -4.0, hw: 2.6, hd: 0.5 }, { x: 0, z: 4.0, hw: 2.6, hd: 0.5 },
+      { x: -4.0, z: 0, hw: 0.5, hd: 2.6 }, { x: 4.0, z: 0, hw: 0.5, hd: 2.6 },
+      { x: -4.9, z: -4.9, hw: 0.55, hd: 0.55 }, { x: 4.9, z: -4.9, hw: 0.55, hd: 0.55 },
+      { x: -4.9, z: 4.9, hw: 0.55, hd: 0.55 }, { x: 4.9, z: 4.9, hw: 0.55, hd: 0.55 },
+    ],
+  },
 ];
 
-function blocked(x, z, r = 0.45) {
+// the original maze, kept as a named export (layout 0's walls)
+export const WALLS = LAYOUTS[0].walls;
+
+/** Is a circle of radius r at (x, z) blocked in the given wall set? */
+export function blockedIn(walls, x, z, r = 0.45) {
   if (Math.abs(x) > AREA - 0.4 || Math.abs(z) > AREA - 0.4) return true;
-  for (const w of WALLS) if (Math.abs(x - w.x) < w.hw + r && Math.abs(z - w.z) < w.hd + r) return true;
+  for (const w of walls) if (Math.abs(x - w.x) < w.hw + r && Math.abs(z - w.z) < w.hd + r) return true;
   return false;
 }
 
@@ -53,6 +83,9 @@ export class Hunt {
   constructor(opts = {}) {
     this.level = clamp(opts.level ?? 0, 0, LEVELS.length - 1);
     this.cfg = LEVELS[this.level];
+    this.layout = LAYOUTS[this.cfg.layout ?? 0];
+    this.walls = this.layout.walls;
+    this.speed = this.cfg.speed * this.layout.speedMul; // serpent variant pace
     this.easy = !!opts.easy;
     this.rand = rng((opts.seed ?? 3) + 41);
     this.hero = { x: 0, z: 5.6, vx: 0, vz: 0, face: -Math.PI / 2 };
@@ -102,14 +135,14 @@ export class Hunt {
       for (const [ax, az] of [[vx * dt, 0], [0, vz * dt]]) {
         const nx = h.x + ax;
         const nz = h.z + az;
-        let free = !blocked(nx, nz, 0.4);
+        let free = !blockedIn(this.walls, nx, nz, 0.4);
         for (const b of this.barrels) {
           if (b.dead) continue;
           if (Math.hypot(nx - b.x, nz - b.z) < 0.95) {
             const bx = b.x + ax * 1.0;
             const bz = b.z + az * 1.0;
             const clash = this.barrels.some((o) => o !== b && !o.dead && Math.hypot(o.x - bx, o.z - bz) < 0.9) || this.shrines.some((s) => !s.dead && Math.hypot(s.x - bx, s.z - bz) < 1.2);
-            if (!clash && !blocked(bx, bz, 0.45)) { b.x = bx; b.z = bz; } else free = false;
+            if (!clash && !blockedIn(this.walls, bx, bz, 0.45)) { b.x = bx; b.z = bz; } else free = false;
           }
         }
         if (free) { h.x = nx; h.z = nz; }
@@ -118,7 +151,7 @@ export class Hunt {
     this.trail.unshift({ x: h.x, z: h.z });
     if (this.trail.length > 400) this.trail.pop();
     // the dragon winds along the channel
-    this.s += this.cfg.speed * (this.easy ? 0.8 : 1) * dt;
+    this.s += this.speed * (this.easy ? 0.8 : 1) * dt;
     this._place();
     // the dragon's body triggers barrels it touches
     for (const b of this.barrels) {
@@ -165,12 +198,21 @@ export class Hunt {
         if (br.dead || b.life <= 0) continue;
         if (this._near(x0, z0, b.x, b.z, br.x, br.z, 0.7)) { b.life = 0; this._blast(br); }
       }
-      for (const w of WALLS) if (Math.abs(b.x - w.x) < w.hw && Math.abs(b.z - w.z) < w.hd) b.life = 0;
+      for (const w of this.walls) if (Math.abs(b.x - w.x) < w.hw && Math.abs(b.z - w.z) < w.hd) b.life = 0;
     }
     this.bullets = this.bullets.filter((b) => b.life > 0);
     for (const bl of this.blasts) bl.t += dt;
     this.blasts = this.blasts.filter((bl) => bl.t < 0.7);
-    if (this.alive === 0) { this.state = 'won'; this.stars = this.time < 70 + this.level * 25 ? 3 : this.time < 130 + this.level * 40 ? 2 : 1; ev.push({ type: 'won', stars: this.stars }); }
+    if (this.alive === 0) {
+      this.state = 'won';
+      // Stars are completion + collection ONLY (house kind rule — Certification Sweep A fix). The old rule
+      // graded stars by finishing TIME (3 stars only under a time threshold), which is speed grading and is
+      // banned. Now: 1 star for freeing the oasis, +1 for cracking at least one shrine on the way, +1 for
+      // cracking EVERY shrine the hunt offers — at any speed, however long the child explores.
+      const cracked = this.shrines.filter((s) => s.dead).length;
+      this.stars = 1 + (cracked > 0 ? 1 : 0) + (cracked === this.shrines.length ? 1 : 0);
+      ev.push({ type: 'won', stars: this.stars });
+    }
     return ev;
   }
 
@@ -192,7 +234,7 @@ export class Hunt {
 
   /** A straight shot is clear when no ice block lies between. */
   _clear(a, b) {
-    for (let k = 1; k < 8; k++) { const t = k / 8; const x = a.x + (b.x - a.x) * t; const z = a.z + (b.z - a.z) * t; for (const w of WALLS) if (Math.abs(x - w.x) < w.hw && Math.abs(z - w.z) < w.hd) return false; }
+    for (let k = 1; k < 8; k++) { const t = k / 8; const x = a.x + (b.x - a.x) * t; const z = a.z + (b.z - a.z) * t; for (const w of this.walls) if (Math.abs(x - w.x) < w.hw && Math.abs(z - w.z) < w.hd) return false; }
     return true;
   }
 
@@ -216,6 +258,6 @@ export class Hunt {
 export function normalizeSave(s) {
   const o = s && typeof s === 'object' ? s : {};
   const stars = {};
-  for (let i = 1; i <= 3; i++) { const v = o.stars && Number(o.stars[i]); if (v >= 1 && v <= 3) stars[i] = Math.floor(v); }
+  for (let i = 1; i <= LEVELS.length; i++) { const v = o.stars && Number(o.stars[i]); if (v >= 1 && v <= 3) stars[i] = Math.floor(v); }
   return { unlocked: Math.max(1, Math.min(LEVELS.length, Math.max(Math.floor(Number(o.unlocked)) || 1, ...Object.keys(stars).map((k) => Number(k) + 1)))), stars, muted: !!o.muted };
 }

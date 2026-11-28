@@ -1,7 +1,7 @@
 import { makeI18n } from '../../cozy_kit/ui.js';
 
 const S = {
-  title: ['معسكر الشتاء', 'Winter Camp'],
+  title: ['معسكر سانت كاترين', 'Saint Catherine Camp'],
   play: ['يلا نبدأ', 'Start'],
   how: ['اسحب إصبعك عشان تمشي — الأشجار بتتقطع لوحدها', 'Drag to walk: trees get chopped by themselves'],
   exit: ['خروج', 'Exit'],
@@ -19,9 +19,11 @@ const S = {
   built: ['اتبنى', 'Built'],
   gate: ['البوابة المتجمدة اتفتحت!', 'The frozen gate opens!'],
   done: ['أراضي جديدة!', 'New lands!'],
-  doneText: ['بنيت المعسكر وفتحت البوابة. رحلة سعيدة!', 'You built the camp and opened the gate. Happy travels!'],
+  doneText: ['بنيت المعسكر ومعسكر القمة وفتحت البوابة. رحلة سعيدة!', 'You built the camp and the summit camp and opened the gate. Happy travels!'],
   logs: ['خشب اتوصّل', 'Logs delivered'],
   helpers: ['مساعدين', 'Helpers'],
+  summits: ['معسكرات قمة', 'Summit camps built'],
+  summit: ['الزلاجة جاهزة! يلا نطلع لقمة سانت كاترين ونبني معسكر القمة ⛰️', 'The sled is ready! Let us climb to the Saint Catherine summit and build the summit camp ⛰️'],
   win_m: ['شطوووووور! ❄️', 'Well done! ❄️'],
   win_f: ['شطووووورة! ❄️', 'Well done! ❄️'],
   sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
@@ -29,7 +31,12 @@ const S = {
   cabin: ['الكوخ الخشبي', 'Log cabin'],
   workshop: ['الورشة', 'Workshop'],
   sawmill: ['المنشرة', 'Sawmill'],
+  greenhouse: ['الصوبة الزجاجية', 'Glass greenhouse'],
+  tower: ['برج المراقبة', 'Watch tower'],
   sled: ['زلاجة المؤن', 'Supply sled'],
+  trail: ['درب القمة', 'Summit trail'],
+  shelter: ['ملجأ القمة', 'Summit shelter'],
+  beacon: ['منارة القمة', 'Summit beacon'],
 };
 
 export const { setLang, setGirl, getLang, t, num } = makeI18n(S);

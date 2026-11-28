@@ -5,17 +5,30 @@
 // barrels into the dragon's path to blast many segments at once, and break every armored segment to win. three.js, art and sound
 // made in code. The hero is never hurt. No network, no ads, no tracking.
 import * as THREE from 'three';
-import { Hunt, LEVELS, WALLS, AREA, LOOP, normalizeSave } from './sim.js';
+import { Hunt, LEVELS, AREA, LOOP, normalizeSave } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 import { VoiceCoach } from '../../cozy_kit/voice.js';
 
 const DRAGON_CLIPS = { trick: 3, nitro: 2, charge: 2, win: 2, count: 1 };
 
+// Per-hunt looks (Certification Sweep A): hunts used to share ONE scene — same sky, water, island and wall
+// colours on all 6 levels; only the maze/serpent changed every two hunts. Each hunt now has its own
+// code-drawn palette (sky/fog, water, island, maze walls, distant peaks), applied in start(). Colours only —
+// no new files, no per-frame work (materials are recoloured once when a hunt starts).
+const LEVEL_LOOKS = [
+  { sky: 0x9ae8f8, water: 0x28c8d0, deep: 0x08484a, island: 0xe8fbff, top: 0xbfeaff, wall: 0xa8e8ff, cone: 0xd8f4ff }, // 1 Snow Oasis — pale dawn (original look)
+  { sky: 0x5fd0f2, water: 0x10a8c8, deep: 0x063a4a, island: 0xd0f4ff, top: 0x8fd8ff, wall: 0x74c4f4, cone: 0xb4e2ff }, // 2 Turquoise Lake — bright noon blue
+  { sky: 0x8fe8c8, water: 0x18b878, deep: 0x064a30, island: 0xe0fff0, top: 0xa2ecc2, wall: 0x84e2ae, cone: 0xc2f6d8 }, // 3 Oasis Dragon Lair — emerald
+  { sky: 0xffc890, water: 0x2a9ab8, deep: 0x0a3a4a, island: 0xfff0d8, top: 0xffd2a0, wall: 0xf4c184, cone: 0xffdfb4 }, // 4 Oasis Bridge — warm sunset
+  { sky: 0xb8a8f0, water: 0x4a6ac8, deep: 0x1a2450, island: 0xe8e0ff, top: 0xbcb0ee, wall: 0xa294e2, cone: 0xd6ccff }, // 5 Calm Oasis Lake — violet dusk
+  { sky: 0x2a4a8a, water: 0x145a8a, deep: 0x081c38, island: 0xc8dcf8, top: 0x86aede, wall: 0x6490cc, cone: 0xa4c2ee }, // 6 Heart of Mount Catherine — deep night blue
+];
+
 const S = {
-  title: ['تنين الجليد', 'Ice Dragon'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'],
-  again: ['تاني', 'Again'], next: ['المرحلة الجاية', 'Next level'], level: ['المرحلة', 'Level'], how: ['اسحب عشان تمشي — النار أوتوماتيك. ادفع البراميل ناحية التنين!', 'Drag to walk: it fires by itself. Push barrels toward the dragon!'],
-  won: ['كسرت التنين! 🐉', 'Dragon defeated! 🐉'], left: ['أجزاء باقية', 'Segments left'], allies: ['حلفاء', 'Allies'], locked: ['خلّص المرحلة اللي قبلها', 'Finish the level before'],
+  title: ['تنين الواحة', 'Oasis Dragon'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], paused: ['استراحة', 'Paused'], resume: ['كمّل', 'Continue'],
+  again: ['تاني', 'Again'], next: ['المرحلة الجاية', 'Next level'], level: ['المرحلة', 'Level'], how: ['اسحب عشان تمشي — النار أوتوماتيك. درع التنين الجليدي حابس مية الواحة: كسّر الدرع عشان تحرّر العين وتصاحب التنين! ادفع البراميل ناحية التنين!', 'Drag to walk: it fires by itself. The dragon\'s ice armour traps the oasis spring — crack the armour to free the water and befriend the dragon! Push barrels toward the dragon!'],
+  won: ['حرّرت الواحة! 🐉', 'You freed the oasis! 🐉'], left: ['أجزاء باقية', 'Segments left'], allies: ['حلفاء', 'Allies'], locked: ['خلّص المرحلة اللي قبلها', 'Finish the level before'],
   shrine: ['اكسر المعبد المرقّم عشان حليف أو ثلاثية!', 'Break a numbered shrine for an ally or triple shot!'], barrel: ['ادفع البرميل في طريق التنين!', 'Push the barrel into the dragon\'s path!'],
   sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'], win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'], time: ['الوقت', 'Time'],
 };
@@ -43,6 +56,9 @@ class Sound extends SynthBase {
 }
 
 const geo = { sphere: new THREE.SphereGeometry(0.5, 12, 8), cyl: new THREE.CylinderGeometry(0.5, 0.5, 1, 12), box: new THREE.BoxGeometry(1, 1, 1), cone: new THREE.ConeGeometry(0.5, 1, 8) };
+// shared scratch objects for the render loop — no per-frame allocations (Certification Sweep A tidy-up)
+const _tmpMat = new THREE.Matrix4();
+const _tmpVec = new THREE.Vector3();
 const mats = new Map();
 const M = (c, em = 0) => { const k = `${c}|${em}`; if (!mats.has(k)) mats.set(k, new THREE.MeshLambertMaterial({ color: c, emissive: em })); return mats.get(k); };
 function mesh(g, m, x, y, z, sx = 1, sy = 1, sz = 1) { const o = new THREE.Mesh(g, m); o.position.set(x, y, z); o.scale.set(sx, sy, sz); return o; }
@@ -109,12 +125,16 @@ class Game {
     this.camera = new THREE.PerspectiveCamera(50, 1, 0.3, 300);
     this.scene.add(new THREE.HemisphereLight(0xffffff, 0x5ab8c8, 1.6));
     const sun = new THREE.DirectionalLight(0xffffff, 1.2); sun.position.set(-10, 30, 10); this.scene.add(sun);
-    // turquoise water and the ice island
-    this.scene.add(mesh(geo.box, M(0x28c8d0, 0x08484a), 0, -0.6, 0, 120, 0.2, 120));
-    this.scene.add(mesh(geo.box, M(0xe8fbff), 0, -0.1, 0, AREA * 2 + 1, 0.8, AREA * 2 + 1));
-    this.scene.add(mesh(geo.box, M(0xbfeaff), 0, 0.31, 0, AREA * 2, 0.04, AREA * 2));
-    for (const w of WALLS) { this.scene.add(mesh(geo.box, M(0xa8e8ff, 0x104858), w.x, 0.9, w.z, w.hw * 2, 1.6, w.hd * 2)); this.scene.add(mesh(geo.box, M(0xffffff), w.x, 1.75, w.z, w.hw * 2 + 0.1, 0.15, w.hd * 2 + 0.1)); }
-    for (let i = 0; i < 18; i++) { const a = (i / 18) * 6.28; this.scene.add(mesh(geo.cone, M(0xd8f4ff), Math.cos(a) * 24, 1.5, Math.sin(a) * 24, 3, 4 + (i % 3), 3)); }
+    // turquoise water and the ice island — dedicated materials so start() can recolour them per hunt
+    this.matWater = new THREE.MeshLambertMaterial({ color: 0x28c8d0, emissive: 0x08484a });
+    this.matIsland = new THREE.MeshLambertMaterial({ color: 0xe8fbff });
+    this.matTop = new THREE.MeshLambertMaterial({ color: 0xbfeaff });
+    this.matCone = new THREE.MeshLambertMaterial({ color: 0xd8f4ff });
+    this.scene.add(mesh(geo.box, this.matWater, 0, -0.6, 0, 120, 0.2, 120));
+    this.scene.add(mesh(geo.box, this.matIsland, 0, -0.1, 0, AREA * 2 + 1, 0.8, AREA * 2 + 1));
+    this.scene.add(mesh(geo.box, this.matTop, 0, 0.31, 0, AREA * 2, 0.04, AREA * 2));
+    // maze walls are per-level (3 layouts) — built in start() into the dynamic group
+    for (let i = 0; i < 18; i++) { const a = (i / 18) * 6.28; this.scene.add(mesh(geo.cone, this.matCone, Math.cos(a) * 24, 1.5, Math.sin(a) * 24, 3, 4 + (i % 3), 3)); }
     this.dynamic = new THREE.Group(); this.scene.add(this.dynamic);
     this.bulletMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(0.18, 6, 4), new THREE.MeshBasicMaterial({ color: 0x7affff }), 200);
     this.bulletMesh.frustumCulled = false;
@@ -175,11 +195,17 @@ class Game {
     this.layer.replaceChildren(); this.sound.setMode(true);
     this._clearDyn();
     const r = this.run;
+    // per-hunt look (Certification Sweep A): recolour sky/fog/water/island/peaks/walls for THIS hunt
+    const look = LEVEL_LOOKS[i] || LEVEL_LOOKS[0];
+    this.scene.background.set(look.sky); this.scene.fog.color.set(look.sky);
+    this.matWater.color.set(look.water); this.matWater.emissive.set(look.deep);
+    this.matIsland.color.set(look.island); this.matTop.color.set(look.top); this.matCone.color.set(look.cone);
+    for (const w of r.walls) { this.dynamic.add(mesh(geo.box, M(look.wall, 0x104858), w.x, 0.9, w.z, w.hw * 2, 1.6, w.hd * 2)); this.dynamic.add(mesh(geo.box, M(0xffffff), w.x, 1.75, w.z, w.hw * 2 + 0.1, 0.15, w.hd * 2 + 0.1)); }
     this.heroM = makeHero(0x2a8ae8); this.dynamic.add(this.heroM);
     this.segM = r.segs.map((sg, k) => {
       const g = new THREE.Group();
-      const sz = k === 0 ? 2.2 : 1.7;
-      g.add(mesh(geo.sphere, M(k === 0 ? 0x2a8ae8 : 0x3ad8c8, 0x0a3a4a), 0, 0.9, 0, sz, sz * 0.9, sz));
+      const sz = (k === 0 ? 2.2 : 1.7) * r.layout.scale;
+      g.add(mesh(geo.sphere, M(k === 0 ? r.layout.head : r.layout.tint, 0x0a3a4a), 0, 0.9, 0, sz, sz * 0.9, sz));
       g.add(mesh(geo.sphere, M(0xe8fbff), 0, 1.5, 0, sz * 0.7, sz * 0.4, sz * 0.7));
       if (k === 0) { g.add(mesh(geo.cone, M(0xffd23a), -0.5, 2.1, 0, 0.4, 1.0, 0.4), mesh(geo.cone, M(0xffd23a), 0.5, 2.1, 0, 0.4, 1.0, 0.4), mesh(geo.sphere, M(0xff2a2a, 0xff0000), -0.5, 1.3, 1.0, 0.3, 0.3, 0.3), mesh(geo.sphere, M(0xff2a2a, 0xff0000), 0.5, 1.3, 1.0, 0.3, 0.3, 0.3)); } else g.add(mesh(geo.cone, M(0xe8fbff), 0, 2.0, 0, 0.5, 0.9, 0.5));
       g.userData.label = sprite(String(Math.ceil(sg.hp)), '#1a5a88', 0.9); g.userData.label.position.y = 3.2; g.add(g.userData.label); g.userData.hp = Math.ceil(sg.hp);
@@ -211,7 +237,7 @@ class Game {
   _won() {
     const r = this.run; const lv = this.levelIdx + 1;
     this.save.stars[lv] = Math.max(this.save.stars[lv] || 0, r.stars);
-    this.save.unlocked = Math.max(this.save.unlocked, Math.min(3, lv + 1));
+    this.save.unlocked = Math.max(this.save.unlocked, Math.min(LEVELS.length, lv + 1));
     this.post({ type: 'save', save: this.save });
     this.sound.play('win');
     this.voice.say('win');
@@ -268,7 +294,7 @@ class Game {
       this.heroM.position.set(r.hero.x, 0.3, r.hero.z); this.heroM.rotation.y = -r.hero.face + Math.PI / 2;
       while (this.allyM.length < r.allies) { const a = makeHero(0x5af08a); a.scale.setScalar(0.85); this.dynamic.add(a); this.allyM.push(a); }
       this.allyM.forEach((a, k) => { const t = r.trail[Math.min(r.trail.length - 1, (k + 1) * 14)]; if (t) a.position.set(t.x, 0.3, t.z); });
-      const m = new THREE.Matrix4(); let n = 0;
+      const m = _tmpMat; let n = 0;
       for (const b of r.bullets) { if (n >= 200) break; m.makeTranslation(b.x, 1.2, b.z); this.bulletMesh.setMatrixAt(n++, m); }
       m.makeScale(0, 0, 0); for (let j = n; j < Math.max(n, this.lastB || 0); j++) this.bulletMesh.setMatrixAt(j, m);
       this.lastB = n; this.bulletMesh.instanceMatrix.needsUpdate = true; this.bulletMesh.count = Math.max(1, n);
@@ -285,7 +311,7 @@ class Game {
 
   _floaters() {
     if (!this.fxEls) this.fxEls = [];
-    const v = new THREE.Vector3();
+    const v = _tmpVec;
     this.fx.forEach((f, i) => {
       let el = this.fxEls[i];
       if (!el) { el = h('div', { style: 'position:absolute;font-weight:900;color:#fff;text-shadow:0 0 6px #000;pointer-events:none;font-size:calc(var(--u)*5)' }); this.layer.append(el); this.fxEls[i] = el; }

@@ -14,7 +14,7 @@ const TYCOON_CLIPS = { go: 2, trick: 3, pickup: 2, bump: 2, charge: 2, near: 1, 
 import { loadArt } from '../../cozy_kit/art.js';
 
 const S = {
-  title: ['مبدع الذكاء', 'AI Creator'], play: ['يلا نبدأ', 'Start'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], again: ['من الأول', 'Play again'],
+  title: ['استوديو النيل', 'Nile Studio'], play: ['يلا نبدأ', 'Start'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], again: ['من الأول', 'Play again'],
   tapGreen: ['دوس على الزرار لما المؤشر يبقى في الأخضر!', 'Tap a button when the needle is in the GREEN!'],
   master: ['تحفة!', 'MASTERPIECE!'], perfect: ['ممتاز!', 'PERFECT!'], ok: ['كويس', 'OK'], slop: ['زبالة!', 'SLOP'], bad: ['توقيت غلط', 'BAD TIMING'],
   slopMsg: ['أوه.. زبالة ذكاء اصطناعي!', 'Oops... slop!'],
@@ -27,7 +27,7 @@ const S = {
   newVideo: ['جديد: فيديو +٢ نجوم', 'NEW: VIDEO +2 STARS'], newGame: ['جديد: لعبة +٣ نجوم', 'NEW: GAME +3 STARS'],
   newOrders: ['جديد: طلبات العملاء', 'NEW: CLIENT ORDERS'], newHot: ['جديد: سلسلة ×٢', 'NEW: HOT STREAKS'], newEvents: ['جديد: ترند وسيرفر بطيء', 'NEW: TRENDS AND SERVER LAG'],
   levelDone: ['المستوى اتمّ', 'LEVEL COMPLETE'], more: ['نجوم كمان للترقية', 'more stars to level up'],
-  won: ['وصلت لمجلس الإدارة! 🎉', 'You reached the board! 🎉'], wonText: ['بقيت أنجح مبدع في الشركة.', 'You are the top creator of the company.'],
+  won: ['بقيت صاحب الاستوديو! 🎉', 'You own the studio now! 🎉'], wonText: ['بقيت أنجح صانع محتوى في استوديو النيل.', 'You are the top creator at Nile Studio.'],
   masters: ['تحف', 'Masterpieces'], trash: ['زبالة', 'Slop'], sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'], max: ['أقصى', 'Max'],
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'], stars: ['نجوم', 'STARS'], gpuHint: ['المولّد اشتغل لوحده', 'The GPU made one by itself'],
 };

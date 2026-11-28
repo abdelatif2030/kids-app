@@ -1,12 +1,35 @@
 // Hop World with no drawing: a classic side-scrolling platformer (in the spirit of the games kids remember, with an ORIGINAL hero).
 // Run right, jump over pits and pipes, bump question blocks for coins and a power-up, stomp the walking bugs, grab coins and reach the
-// flag. 8 levels over 4 worlds, each longer. Falling into a pit or touching a bug puts you back at the start of the level (3 lives
+// flag. 16 levels over 8 worlds, each longer. Falling into a pit or touching a bug puts you back at the start of the level (3 lives
 // per level, never a hard game over: when lives run out the level simply restarts). Tile grid, AABB physics. Deterministic with a seed.
 import { rng, clamp } from '../../cozy_kit/ui.js';
 
 export const T = 1; // tile size in world units
-export const LEVELS = 8;
-export const WORLDS = ['hills', 'cave', 'desert', 'snow'];
+export const LEVELS = 16;
+// Phase 2F: 8 worlds, 2 consecutive levels each. The first four keep their
+// exact slots, so levels 1-8 generate byte-identically to before (the world
+// formula below yields the same world for level 0-7); the four NEW worlds
+// host levels 9-16 and the journey ends at the Siwa oasis finale.
+export const WORLDS = ['hills', 'cave', 'desert', 'snow', 'nile', 'temple', 'shore', 'oasis'];
+// Nile Hops: the world keys wear Egyptian places (display names only —
+// palettes, tunes and generation keyed by the same ids are unchanged).
+export const WORLD_NAMES = {
+  hills: { ar: 'ضفة النيل', en: 'Nile Bank' },
+  cave: { ar: 'مغارة الجبل', en: 'Mountain Cave' },
+  desert: { ar: 'واحة الصحراء', en: 'Desert Oasis' },
+  snow: { ar: 'قمة سانت كاترين', en: 'Catherine Summit' },
+  nile: { ar: 'جزيرة النيل', en: 'Nile Island' },
+  temple: { ar: 'معبد الكرنك', en: 'Karnak Temple' },
+  shore: { ar: 'شاطئ الإسكندرية', en: 'Alexandria Shore' },
+  oasis: { ar: 'واحة سيوة', en: 'Siwa Oasis' },
+};
+// One signature set-piece landmark per world: pure decoration placed by the
+// generator (deterministic x, no rng consumed, never solid, no new mechanic).
+export const LANDMARKS = {
+  hills: 'sail', cave: 'tomb', desert: 'sphinx', snow: 'monastery',
+  nile: 'saqia', temple: 'columns', shore: 'lighthouse', oasis: 'palms',
+};
+export const worldName = (world, lang) => (WORLD_NAMES[world] || WORLD_NAMES.hills)[lang === 'en' ? 'en' : 'ar'];
 const G = 38;
 const RUN = 6.2;
 const JUMP = 14.4;
@@ -69,16 +92,52 @@ export function buildLevel(level, seed) {
   // a bug somewhere on a long flat road is never inside a pit
   const flagX = len - 6;
   for (let q = 0; q < 8; q++) set(flagX, ground - 1 - q, 'F');
-  return { grid, H, len, enemies, flagX, ground, cps, world: WORLDS[Math.floor(level / 2) % 4] };
+  const world = WORLDS[Math.floor(level / 2) % WORLDS.length];
+  // Set-piece landmark: decoration only, placed AFTER all rng use, so the
+  // layouts of levels 1-8 stay exactly as they were. Drawn by art.js. Its x
+  // is the first clear flat stretch past 42% of the level (6 solid ground
+  // tiles, nothing standing on them), so it never hides behind steps/pipes.
+  let lx = Math.floor(len * 0.52);
+  outer: for (let cand = Math.floor(len * 0.42); cand < len - 16; cand++) {
+    for (let dx = 0; dx < 6; dx++) {
+      if (grid[ground][cand + dx] !== '#') continue outer;
+      for (let up = 1; up <= 3; up++) if (grid[ground - up][cand + dx] !== ' ') continue outer;
+    }
+    lx = cand + 2; break;
+  }
+  const landmark = { kind: LANDMARKS[world], x: lx };
+  // New worlds only (levels 9-16): a bonus coin arc tucked above the
+  // landmark, collectable with an ordinary held jump — no new mechanic.
+  // (A true hidden "coin room" would need doors/digging, so it is NOT faked
+  // here; see docs/REVIEW_hop_world.md Phase 2F.) Only empty air cells are
+  // used, and this also runs after all rng use.
+  let bonus = 0;
+  if (level >= 8) {
+    const arc = [[0, 4], [1, 5], [2, 5], [3, 4]];
+    // slide the arc sideways until all four cells are clear air (question
+    // blocks live exactly at ground-5); fall back to a partial arc.
+    let placed = false;
+    for (let shift = -2; shift <= 8 && !placed; shift++) {
+      if (arc.every(([dx, up]) => landmark.x + shift + dx < len && grid[ground - up][landmark.x + shift + dx] === ' ')) {
+        for (const [dx, up] of arc) grid[ground - up][landmark.x + shift + dx] = 'c';
+        bonus = 4; placed = true;
+      }
+    }
+    if (!placed) for (const [dx, up] of arc) {
+      const cx = landmark.x + dx; const cy = ground - up;
+      if (cx < len && grid[cy][cx] === ' ') { grid[cy][cx] = 'c'; bonus++; }
+    }
+  }
+  return { grid, H, len, enemies, flagX, ground, cps, world, landmark, bonus };
 }
 
 export class World {
-  /** opts: { level (0..7), seed, easy } */
+  /** opts: { level (0..15), seed, easy } */
   constructor(opts = {}) {
     this.level = clamp(opts.level ?? 0, 0, LEVELS - 1);
     this.easy = !!opts.easy;
     const lv = buildLevel(this.level, opts.seed ?? 5);
-    this.grid = lv.grid; this.H = lv.H; this.len = lv.len; this.enemies = lv.enemies.map((e) => ({ ...e, vx: e.dir * 1.6 })); this.flagX = lv.flagX; this.world = lv.world; this.cps = lv.cps; this.cp = lv.cps[0]; this.maxLives = this.easy ? 5 : 3;
+    this.grid = lv.grid; this.H = lv.H; this.len = lv.len; this.enemies = lv.enemies.map((e) => ({ ...e, vx: e.dir * 1.6 })); this.flagX = lv.flagX; this.world = lv.world; this.landmark = lv.landmark; this.cps = lv.cps; this.cp = lv.cps[0]; this.maxLives = this.easy ? 5 : 3;
     this.lives = this.maxLives; this.coins = 0; this.state = 'play'; this.time = 0; this.events = []; this.big = false; this.mush = [];
     this.p = null; this._spawn();
     this.score = 0;

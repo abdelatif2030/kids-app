@@ -1,7 +1,7 @@
 import { makeI18n } from '../../cozy_kit/ui.js';
 
 const S = {
-  title: ['ينابيع القرية', 'Hot Spring Village'],
+  title: ['عين كليوباترا', "Cleopatra's Spring"],
   play: ['يلا نبدأ', 'Start'],
   how: ['اسحب إصبعك عشان تمشي: هات شرائح الزنجبيل من المطحنة وحطها في الينبوع عشان الميّة تفضل سخنة', 'Drag to walk: bring ginger slices from the mill to the spring to keep the water hot'],
   goal: ['ضوّي كل فوانيس الوادي!', 'Light every lantern of the valley!'],
@@ -37,6 +37,14 @@ const S = {
   win_m: ['شطوووووور! ♨️', 'Well done! ♨️'],
   win_f: ['شطووووورة! ♨️', 'Well done! ♨️'],
   sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
+  cleoName: ['عين كليوباترا ♨️', "Cleopatra's Spring ♨️"],
+  birName: ['بير سيجم 🏜️', 'Bir Sigam 🏜️'],
+  birLocked: ['بير سيجم لسه مقفول: دفّي عين كليوباترا الأول', 'Bir Sigam is still locked: warm Cleopatra\'s Spring first'],
+  toBir: ['لبير سيجم 🏜️', 'To Bir Sigam 🏜️'],
+  birOpened: ['اتفتح بير سيجم! عين سخنة تانية في واحة بحرية', 'Bir Sigam is open! Another hot spring in the Bahariya Oasis'],
+  birHi: ['أهلًا بيك في بير سيجم! عين سخنة وسط رمل بحرية', 'Welcome to Bir Sigam! A hot spring in the Bahariya sands'],
+  doneBir: ['بير سيجم دفي!', 'Bir Sigam is warm!'],
+  doneTextBir: ['نورت فوانيس بير سيجم وسخّنت ميّته المعدنية. الضيوف سعداء!', 'Every Bir Sigam lantern is lit and its mineral water is warm. The guests are happy!'],
   min: ['د', 'm'],
   sec: ['ث', 's'],
 };

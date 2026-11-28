@@ -121,3 +121,12 @@ test('saves are cleaned', () => {
   assert.equal(s.up.power, 0);
   assert.deepEqual(normalizeSave(null).weapons, ['blaster']);
 });
+
+test('Cairo Rooftops anchor: Cairo roof names, light-tool ids unchanged for saves', () => {
+  assert.equal(ROOFS.length, 8);
+  assert.match(ROOFS[0].en, /Downtown/);
+  assert.match(ROOFS[1].ar, /الإسلامية/);
+  assert.match(ROOFS[7].en, /Qaitbey/);
+  // weapon ids are save data — the light-tool renames must not change them
+  assert.deepEqual(ROOFS.map((r) => r.crate && r.crate.weapon).filter(Boolean), ['bomb', 'bomb', 'rocket', 'rocket', 'fireworks', 'fireworks', 'fireworks']);
+});

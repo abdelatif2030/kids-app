@@ -6,7 +6,7 @@
 // a GOAL per level (stars), a bank finale where the shovel tips everything into the giant bank, and a coin shop.
 // three.js, art and sound made in code. No network, no ads.
 import * as THREE from 'three';
-import { Run, LEVELS, UPG, HALF, FIN, THEMES, themeOf, panoOf, upgradeCost, normalizeSave, goalFor, robotSteer, shovelW } from './sim.js';
+import { Run, LEVELS, UPG, HALF, FIN, THEMES, themeOf, panoOf, dressOf, upgradeCost, normalizeSave, goalFor, robotSteer, shovelW, STOPS, tourCards } from './sim.js';
 import { Pile, heapPoints, DECOR_MAX } from './pile.js';
 import { R, TUB, tubBoxes } from './physics.js';
 import { Sound } from './audio.js';
@@ -22,6 +22,7 @@ const S = {
   bank: ['البنك الكبير', 'The giant bank'], coins: ['عملات', 'coins'], shop: ['المتجر', 'Shop'], max: ['أقصى', 'MAX'], locked: ['خلّص المرحلة اللي قبلها', 'Finish the level before'],
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'], sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'], balls: ['كور', 'balls'], best: ['أحسن', 'Best'],
   hitWall: ['الحيطة وقّعت كور!', 'The wall knocked balls out!'], buy: ['اشتري', 'Buy'], back: ['رجوع', 'Back'], banked: ['في البنك', 'In the bank'],
+  tour: ['بطاقة الجولة', 'Tour card'], tourSub: ['خلّص أي مرحلة عشان تفتح بطاقة مكانها', 'Finish a level to earn its place card'], cardLocked: ['سرّي لسه!', 'Still a secret!'], newCard: ['بطاقة جديدة وصلت!', 'A new card arrived!'],
   meadow: ['ساحل قلعة قايتباي', 'Qaitbey Coast'], desert: ['خان الخليلي', 'Khan el-Khalili'], snow: ['ثلج سانت كاترين', 'Catherine Snow'], candy: ['ملاهي المولد', 'Moulid Funfair'], space: ['طريق قوس قزح', 'Rainbow Sky Road'],
   start: ['كور بداية', 'Start balls'], wide: ['مجرفة أعرض', 'Wider shovel'], coin: ['عملات أكتر', 'Coin value'], magnet: ['مغناطيس', 'Magnet range'], armor: ['درع للحيطان', 'Wall armour'],
 };
@@ -75,6 +76,54 @@ function makeTruck(W) {
     const o = mesh(geo.box, m, b.c[0], b.c[1], b.c[2], b.h[0] * 2, b.h[1] * 2, b.h[2] * 2); o.rotation.x = b.pitch; inner.add(o);
   }
   g.userData = { tilt, body };
+  return g;
+}
+
+/** Code-drawn landmark of a tour stop's REAL place (Director Protocol per-level backgrounds).
+    Primitives only — no image/audio files. Built once per level, placed beside the road. */
+function buildLandmark(kind) {
+  const g = new THREE.Group();
+  const B = (c, x, y, z, sx, sy, sz) => { const o = mesh(geo.box, M(c), x, y, z, sx, sy, sz); g.add(o); return o; };
+  const CY = (c, x, y, z, sx, sy, sz) => { const o = mesh(geo.cyl, M(c), x, y, z, sx, sy, sz); g.add(o); return o; };
+  const CO = (c, x, y, z, sx, sy, sz) => { const o = mesh(geo.cone, M(c), x, y, z, sx, sy, sz); g.add(o); return o; };
+  const SP = (c, x, y, z, s, sy) => { const o = mesh(geo.sphere, M(c), x, y, z, s, sy || s, s); g.add(o); return o; };
+  const stone = 0xd8c8a0, sand = 0xe8d0a0, white = 0xf4f0e8, teal = 0x2a9ab0, gold = 0xffd23a;
+  const palm = (x, z, s = 1) => { CY(0x8a6a3a, x, 2 * s, z, 0.5 * s, 4 * s, 0.5 * s); SP(0x2a9a4a, x, 4.4 * s, z, 2.2 * s, 1.2 * s); };
+  const minaret = (x, z, hgt, c = white) => { CY(c, x, hgt / 2, z, 0.8, hgt, 0.8); CY(c, x, hgt * 0.72, z, 1.7, 0.5, 1.7); CO(0x2ab05a, x, hgt + 0.8, z, 1.1, 1.8, 1.1); };
+  const dome = (x, z, y, s, c = 0x2ab05a) => SP(c, x, y, z, s, s * 0.8);
+  switch (kind) {
+    case 'citadel': B(stone, 0, 2, 0, 14, 4, 3); CY(stone, -6, 4.5, 0, 3.4, 9, 3.4); CY(stone, 6, 4.5, 0, 3.4, 9, 3.4); CO(0xc8452a, -6, 10.4, 0, 3.6, 3, 3.6); CO(0xc8452a, 6, 10.4, 0, 3.6, 3, 3.6); B(gold, 0, 8.6, 0, 0.25, 3.4, 0.25); B(0xff4a4a, 1, 9.8, 0, 1.8, 1, 0.1); break;
+    case 'boats': for (const [x, z, c] of [[-3, 0, 0xc8452a], [3.4, 1.5, teal]]) { B(c, x, 0.8, z, 4.6, 1.4, 1.8); B(0x8a6a3a, x, 3.2, z, 0.22, 5, 0.22); const s = B(white, x + 1, 3.4, z, 0.08, 3.4, 2.2); s.rotation.z = 0.35; } CY(0x9fd8e8, 0, -0.4, 0, 16, 0.5, 7); break;
+    case 'library': { const d = CY(0xe8e0d0, 0, 3.4, 0, 11, 6.4, 11); d.rotation.z = 0.42; dome(0, 0, 7.6, 3.4, 0x8ab8d8); B(0x3a6a9a, 0, 1, 5.8, 9, 2, 0.4); break; }
+    case 'bridge': B(0x9a8a7a, -5, 5, 0, 1.6, 10, 1.6); B(0x9a8a7a, 5, 5, 0, 1.6, 10, 1.6); B(0x9a8a7a, 0, 9.6, 0, 12, 1, 1.4); for (let i = -4; i <= 4; i += 2) { const c = B(0x6a6e78, i, 7.4, 0, 0.14, 4.4, 0.14); c.rotation.z = i * 0.16; } SP(gold, -5, 10.8, 0, 0.9); SP(gold, 5, 10.8, 0, 0.9); break;
+    case 'towers': B(0xe8d8c8, -3.4, 7, 0, 4.6, 14, 4.6); B(0xd8c8e8, 3.4, 8.5, 0, 4.6, 17, 4.6); for (let y = 3; y < 13; y += 2.4) { B(0x4ab8ff, -3.4, y, 2.4, 3.4, 1, 0.15); B(0x4ab8ff, 3.4, y + 1, 2.4, 3.4, 1, 0.15); } B(gold, 0, 0.6, 3, 10, 1.2, 1); break;
+    case 'palace': B(0xf0d8b8, 0, 3, 0, 12, 6, 5); dome(0, 0, 6.8, 3.6, 0xc89a1a); B(0xc89a1a, -5, 4.4, 0, 2, 2.8, 5); B(0xc89a1a, 5, 4.4, 0, 2, 2.8, 5); palm(-8, 2); palm(8, 2); palm(-9, -2, 0.8); palm(9, -2, 0.8); break;
+    case 'bazaar': for (let i = -2; i <= 2; i++) { B(i % 2 ? 0xc88a5a : 0xb87a4a, i * 3.4, 2, 0, 3.2, 4, 3.4); const a = B(i % 2 ? 0xff4a6a : 0x2ab05a, i * 3.4, 4.3, 0.8, 3.4, 0.25, 2.6); a.rotation.x = 0.4; } for (let i = -3; i <= 3; i++) SP(gold, i * 2.2, 5.6, 1.6, 0.42); break;
+    case 'azhar': B(white, 0, 2.4, 0, 11, 4.8, 5); dome(0, 0, 5.6, 3); minaret(-6.4, 0, 13); minaret(6.4, 0, 11); break;
+    case 'muizz': B(stone, -4.6, 4, 0, 2.2, 8, 2.6); B(stone, 4.6, 4, 0, 2.2, 8, 2.6); B(stone, 0, 8.6, 0, 11.4, 1.6, 2.6); dome(0, 0, 10.2, 2.2, 0x8a9a5a); B(0x6a4a2a, -4.6, 1.6, 1.4, 1.6, 3.2, 0.2); B(0x6a4a2a, 4.6, 1.6, 1.4, 1.6, 3.2, 0.2); break;
+    case 'bab': B(stone, 0, 3.4, 0, 13, 6.8, 3); minaret(-4.4, 0, 15); minaret(4.4, 0, 15); B(0x3a2a1a, 0, 2, 1.6, 3.4, 4, 0.3); break;
+    case 'tulun': B(sand, 3, 1.6, 2, 10, 3.2, 4); for (let i = 0; i < 5; i++) CY(sand, -3, 1.6 + i * 2.1, 0, 3.6 - i * 0.45, 2.2, 3.6 - i * 0.45); CO(0x8a6a3a, -3, 12.6, 0, 1.6, 2.6, 1.6); break;
+    case 'saladin': B(stone, 0, 2, 2, 15, 4, 3); B(white, 0, 4.6, 0, 9, 5.2, 6); dome(0, 0, 8.6, 3.8, 0x9ad8c8); minaret(-6.8, 0, 14, stone); minaret(6.8, 0, 14, stone); break;
+    case 'monastery': B(0xc8a878, 0, 2.6, 0, 12, 5.2, 6); B(0xb89868, -4, 5.4, 0, 3, 5.6, 3); CO(0x8a6a3a, -4, 9.4, 0, 2.6, 2.4, 2.6); SP(gold, -4, 7.6, 0, 0.8); B(0x6a4a2a, 1.5, 1.8, 3.1, 2.4, 3.6, 0.25); CO(0xd8ecff, 8, 3, -3, 5, 6, 5); break;
+    case 'moses': CO(0x8a97a8, -2, 5, 0, 13, 10, 13); CO(0xffffff, -2, 8.8, 0, 5.4, 3.6, 5.4); SP(0xffb81a, 7.5, 8.6, -2, 2.6); CO(0x9aa8b8, 6, 3.4, 2, 8, 6.8, 8); CO(0xffffff, 6, 6.2, 2, 3.4, 2.2, 3.4); break;
+    case 'catherine': CO(0x7a8a9e, -3.4, 6.4, 0, 11, 12.8, 11); CO(0xffffff, -3.4, 11.4, 0, 4.4, 4.4, 4.4); CO(0x8a97a8, 4.4, 4.6, 1, 9, 9.2, 9); CO(0xffffff, 4.4, 8.2, 1, 3.6, 3.2, 3.6); SP(gold, 0, 14.6, 0, 0.7); break;
+    case 'canyon': { const cols = [0xc8452a, 0xe8a02a, 0xb86aff, 0xe8d03a, 0xff7a4a]; cols.forEach((c, i) => { const s = B(c, (i - 2) * 2.6, 1.6 + i * 0.7, 0, 2.4, 3.2 + i * 1.4, 5 - Math.abs(i - 2)); s.rotation.y = i * 0.22; }); break; }
+    case 'bluehole': { const ring = new THREE.Mesh(new THREE.TorusGeometry(4.4, 1.1, 8, 20), M(0xff7a9a)); ring.rotation.x = Math.PI / 2; ring.position.y = 0.4; g.add(ring); CY(0x1a4a9a, 0, 0.1, 0, 8.4, 0.5, 8.4); for (let i = 0; i < 6; i++) CO(i % 2 ? 0xff4a6a : 0xff8a2a, Math.cos(i) * 5.4, 0.9, Math.sin(i) * 5.4, 1.2, 1.8, 1.2); break; }
+    case 'ras': CY(white, 0, 5, 0, 2.2, 10, 2.2); CY(0xe02a3a, 0, 3.4, 0, 2.3, 2.2, 2.3); CY(0xe02a3a, 0, 7.4, 0, 2.3, 2.2, 2.3); SP(gold, 0, 10.8, 0, 1.1); CO(0xff4a6a, -5, 1, 2, 2.4, 2, 2.4); CO(0x2ab05a, 5, 1, -2, 2.4, 2, 2.4); CO(0xb86aff, 6, 0.8, 3, 1.8, 1.6, 1.8); break;
+    case 'tanta': B(white, 0, 2.4, 0, 10, 4.8, 5); dome(0, 0, 5.8, 3.6); minaret(6.2, 0, 12); for (let i = -4; i <= 4; i++) SP([0xff4a6a, gold, 0x4ab8ff, 0x5af08a][(i + 4) % 4], i * 1.6, 7.6 - Math.abs(i) * 0.35, 3.4, 0.5); break;
+    case 'zaynab': B(0xf8f4ec, 0, 2.2, 0, 9, 4.4, 5); dome(0, 0, 5.4, 3.2, 0xd8b84a); minaret(-5.6, 0, 10); minaret(5.6, 0, 10); SP(gold, 0, 9.2, 0, 0.55); break;
+    case 'desouk': B(0x8a9aa8, 0, 3.4, 0, 13, 0.8, 2.4); B(0x8a9aa8, -5, 1.7, 0, 1, 3.4, 2); B(0x8a9aa8, 5, 1.7, 0, 1, 3.4, 2); CY(teal, 0, -0.3, 4.4, 15, 0.5, 5); B(0xe8e0d0, 3, 1, 4.4, 3.6, 1.2, 1.4); { const s = B(white, 3.9, 3.2, 4.4, 0.08, 3.6, 2.4); s.rotation.z = 0.3; } break;
+    case 'luxor': { const p1 = B(sand, -4.2, 4, 0, 3.6, 8, 5); p1.rotation.z = 0.06; const p2 = B(sand, 4.2, 4, 0, 3.6, 8, 5); p2.rotation.z = -0.06; const ob = CY(sand, 0, 5.4, 2.6, 1.1, 10.8, 1.1); ob.geometry = geo.cyl; CO(gold, 0, 11.4, 2.6, 1, 1.4, 1); B(0xc8a878, 0, 1, 0, 5.4, 2, 4); break; }
+    case 'hussein': B(0xe8dcc8, 0, 2.8, 0, 11, 5.6, 4.6); dome(0, 0, 6.4, 3, 0x3a9a7a); minaret(-6.6, 0, 13); for (let i = -5; i <= 5; i++) SP(i % 2 ? 0xff8aff : gold, i * 1.35, 8.4 - Math.abs(i) * 0.3, 2.8, 0.42); for (let i = -3; i <= 3; i++) SP(0x5af08a, i * 2, 4.6, 2.5, 0.36); break;
+    case 'gaber': B(white, 0, 2.2, 1, 8, 4.4, 4.4); dome(0, 1, 5.2, 2.8, teal); minaret(5.2, 1, 11); for (let i = -2; i <= 2; i++) SP(i % 2 ? white : 0x9fd8e8, i * 2.6, 0.5, -3.4, 1.5, 0.7); palm(-6.4, -1); break;
+    case 'cairotower': for (let i = 0; i < 6; i++) CY(0xb8a888, 0, 1.6 + i * 2.4, 0, 3.4 - i * 0.36, 2.5, 3.4 - i * 0.36); SP(0xd8c8a8, 0, 16.4, 0, 2.2, 1.6); CY(0xff4a6a, 0, 18.4, 0, 0.3, 2.4, 0.3); SP(0xff4a6a, 0, 19.8, 0, 0.5); break;
+    case 'pyramids': { const p = (x, z, s) => { const o = new THREE.Mesh(new THREE.ConeGeometry(s, s * 1.05, 4), M(sand)); o.position.set(x, s * 0.52, z); o.rotation.y = Math.PI / 4; g.add(o); }; p(-3.4, 0, 6.4); p(4.4, 1, 4.4); p(1, -3.4, 2.6); B(0xc8a878, 6.4, 0.9, -2.6, 3.4, 1.8, 1.4); SP(sand, 6.4, 2.3, -2.6, 1.1); break; }
+    case 'siwa': palm(-4, 0); palm(-1, 2, 1.2); palm(3.4, -1); palm(6, 1.4, 0.85); CY(0x4ab8e8, 1, 0.05, 4.6, 11, 0.35, 5); SP(0xffe8a0, -6.4, 1, 4, 2, 0.8); break;
+    case 'blackdesert': for (const [x, z, s] of [[-4, 0, 5], [1, 2, 7], [5.4, -1, 4], [-7, 2.4, 3.4]]) { CO(0x2a2430, x, s * 0.4, z, s, s * 0.8, s); SP(0x4a4450, x, s * 0.72, z, s * 0.3, s * 0.18); } break;
+    case 'wadi': for (let i = 0; i < 6; i++) { const rib = new THREE.Mesh(new THREE.TorusGeometry(3.4, 0.32, 6, 12, Math.PI), M(0xe8e0d0)); rib.position.set((i - 2.5) * 1.7, 0.4, 0); g.add(rib); } B(0xd8d0c0, 0, 3.6, 0, 11, 0.7, 0.9); SP(0xe8e0d0, -6.4, 3.4, 0, 1.5, 1.2); break;
+    case 'aswan': SP(0xffb81a, 0, 9.4, -3, 3.8); palm(-6.4, 0); palm(6.8, 1); CY(teal, 0, -0.3, 4.2, 15, 0.5, 5); B(0xe8e0d0, -1.6, 0.9, 4.2, 3.8, 1.2, 1.4); { const s = B(white, -0.7, 3.1, 4.2, 0.08, 3.8, 2.6); s.rotation.z = 0.3; } CO(0x9a8a7a, 5.6, 1.6, -1, 3.4, 3.2, 3.4); break;
+    default: B(gold, 0, 3, 0, 4, 6, 4); break;
+  }
   return g;
 }
 
@@ -166,7 +215,8 @@ class Game {
     if (this.truck) this.scene.remove(this.truck);
     const th = THEME[run.theme];
     this.th = th;
-    this.scene.background.setHex(th.sky); this.scene.fog.color.setHex(th.sky);
+    const dress = dressOf(run.level); this.dress = dress;
+    this.scene.background.setHex(dress.sky); this.scene.fog.color.setHex(dress.sky);
     this.hemi.color.setHex(run.theme === 'space' ? 0x8a8aff : 0xffffff); this.hemi.groundColor.setHex(run.theme === 'space' ? 0x303060 : 0xd8a868); this.hemi.intensity = run.theme === 'space' ? 1.3 : 1.7;
     this.built = new Map(); this.things = run.things;
     const L = run.L, ze = run.zEdge, m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), sc = new THREE.Vector3();
@@ -189,8 +239,8 @@ class Game {
       railL.setColorAt(i, i % 2 ? cA : cB); railR.setColorAt(i, i % 2 ? cB : cA);
     }
     for (const o of [road, stripe, railL, railR]) { o.frustumCulled = false; this.world.add(o); }
-    // ground, with the bank pit cut out
-    const gm = M(th.ground), Wd = 240;
+    // ground, with the bank pit cut out (tinted a touch toward this level's sky so legs read differently)
+    const gm = new THREE.MeshLambertMaterial({ color: new THREE.Color(th.ground).lerp(new THREE.Color(dress.sky), 0.14) }), Wd = 240;
     this.world.add(mesh(geo.box, gm, 0, -0.5, (ze - 80) / 2 + 5, Wd, 0.6, ze + 80 - 0.1 + 0));
     const ph = FIN.pitHalf, pl = FIN.pitLen;
     for (const s of [-1, 1]) this.world.add(mesh(geo.box, gm, s * (ph + 1.2 + (Wd / 2 - ph - 1.2) / 2), -0.5, ze + pl / 2 + 0.6, Wd / 2 - ph - 1.2, 0.6, pl + 1.2));
@@ -208,6 +258,7 @@ class Game {
     this.world.add(bank); this.bank = bank;
     // scenery props on both sides
     this._props(run, th);
+    this._dress(run);
     // decor ball piles (static instanced spheres; vanish when scooped)
     let total = 0; const sizes = [];
     for (const t of run.things) if (t.kind === 'pile') { const n = Math.min(t.n, DECOR_MAX); sizes.push(n); total += n; }
@@ -248,6 +299,35 @@ class Game {
       this.world.add(new THREE.Points(g, new THREE.PointsMaterial({ color: 0xffffff, size: 0.8, fog: false })));
       this.world.add(mesh(geo.sphere, new THREE.MeshBasicMaterial({ color: 0xff8acd, fog: false }), -60, 40, run.zEdge * 0.6, 18, 18, 18));
     }
+  }
+
+  /** Per-level dressing: this stop's landmark twice along the road (different side/scale each
+      time) + lamp posts in the level's own accent colour. Presentation only, all beside the road. */
+  _dress(run) {
+    const dress = dressOf(run.level);
+    const spots = [{ z: 52, side: -1, s: 1.5 }, { z: Math.round(run.L * 0.58), side: 1, s: 1.9 }];
+    for (const sp of spots) {
+      const lm = buildLandmark(dress.lm);
+      lm.position.set(-(run.centerAt(sp.z)) + sp.side * (HALF + 15), run.groundAt(sp.z), sp.z);
+      lm.scale.setScalar(sp.s);
+      if (sp.side < 0) lm.rotation.y = Math.PI;
+      this.world.add(lm);
+    }
+    // lamp posts: instanced poles + glowing heads in the level accent colour
+    const zs = [];
+    for (let z = 16; z < run.L - 8; z += 34) zs.push(z);
+    const pole = new THREE.InstancedMesh(geo.cyl, M(0x5a5e68), zs.length * 2);
+    const head = new THREE.InstancedMesh(geo.sphere, new THREE.MeshBasicMaterial({ color: dress.lamp }), zs.length * 2);
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), sc = new THREE.Vector3();
+    let i = 0;
+    for (const z of zs) for (const sd of [-1, 1]) {
+      const x = -(run.centerAt(z)) + sd * (run.halfAt(z) + 1.7), y = run.groundAt(z);
+      m4.compose(v.set(x, y + 1.9, z), q.identity(), sc.set(0.28, 3.8, 0.28)); pole.setMatrixAt(i, m4);
+      m4.compose(v.set(x, y + 4, z), q.identity(), sc.set(0.62, 0.62, 0.62)); head.setMatrixAt(i, m4);
+      i++;
+    }
+    pole.frustumCulled = head.frustumCulled = false;
+    this.world.add(pole, head);
   }
 
   /** Build a thing's 3D object when the truck gets near. */
@@ -313,6 +393,7 @@ class Game {
       card = h('div', { class: 'bs-card' }, h('div', { class: 'bs-logo' }, '🚜 ', I.t('title')), coins, h('div', { class: 'bs-small' }, I.t('how')),
         h('button', { class: 'bs-btn', onclick: () => { this.sound.play('tap'); this.start(next - 1); } }, `▶ ${I.t('play')} — ${I.t('level')} ${I.num(next)}`),
         h('button', { class: 'bs-btn dark', onclick: () => { this.sound.play('tap'); this.showMenu('levels'); } }, `🗺️ ${I.t('levels')}`),
+        h('button', { class: 'bs-btn dark', onclick: () => { this.sound.play('tap'); this.page = Math.min(4, Math.floor((this.save.unlocked - 1) / 6)); this.showMenu('tour'); } }, `✉️ ${I.t('tour')} ${I.num(tourCards(this.save).filter((c) => c.earned).length)}/${I.num(LEVELS)}`),
         h('button', { class: 'bs-btn dark', onclick: () => { this.sound.play('tap'); this.showMenu('shop'); } }, `🛒 ${I.t('shop')}`),
         h('button', { class: 'bs-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')));
     } else if (screen === 'levels') {
@@ -328,6 +409,18 @@ class Game {
         h('button', { class: 'bs-round', onclick: () => { this.page = (this.page + 1) % 5; this.showMenu('levels'); } }, ar ? '◀' : '▶'));
       const dots = h('div', { class: 'bs-dots' }, THEMES.map((_, i) => h('b', { class: i === this.page ? 'on' : '' })));
       card = h('div', { class: 'bs-card' }, h('div', { class: 'bs-title' }, `🗺️ ${I.t('levels')}`), nav, grid, dots, h('button', { class: 'bs-btn dark', onclick: () => this.showMenu() }, I.t('back')));
+    } else if (screen === 'tour') {
+      const th = THEMES[this.page];
+      const cards = tourCards(this.save).slice(this.page * 6, this.page * 6 + 6);
+      const grid = h('div', { class: 'bs-tour' }, cards.map((c) => c.earned
+        ? h('div', { class: 'bs-tcard' }, h('i', {}, THEME[th].icon), h('div', { class: 'bs-tname' }, ar ? c.ar : c.en), h('span', { class: 'bs-st' }, '★'.repeat(c.stars) + '☆'.repeat(3 - c.stars)), h('div', { class: 'bs-tfact' }, ar ? c.factAr : c.factEn))
+        : h('div', { class: 'bs-tcard lock' }, h('i', {}, '🔒'), h('div', { class: 'bs-tname' }, '؟؟؟'), h('div', { class: 'bs-tfact' }, I.t('cardLocked')))));
+      const nav = h('div', { class: 'bs-nav' },
+        h('button', { class: 'bs-round', onclick: () => { this.page = (this.page + 4) % 5; this.showMenu('tour'); } }, ar ? '▶' : '◀'),
+        h('div', { class: 'bs-pill' }, `${THEME[th].icon} ${I.t(th)}`),
+        h('button', { class: 'bs-round', onclick: () => { this.page = (this.page + 1) % 5; this.showMenu('tour'); } }, ar ? '◀' : '▶'));
+      const dots = h('div', { class: 'bs-dots' }, THEMES.map((_, i) => h('b', { class: i === this.page ? 'on' : '' })));
+      card = h('div', { class: 'bs-card' }, h('div', { class: 'bs-title' }, `✉️ ${I.t('tour')}`), h('div', { class: 'bs-small' }, I.t('tourSub')), nav, grid, dots, h('button', { class: 'bs-btn dark', onclick: () => this.showMenu() }, I.t('back')));
     } else {
       const eff = (u, lv) => {
         if (u.id === 'start') return `${10 + lv * 8}`; if (u.id === 'wide') return `${shovelW(lv).toFixed(1)} m`; if (u.id === 'coin') return `${Math.round(100 + lv * 30)}%`;
@@ -369,6 +462,7 @@ class Game {
 
   _done(stars) {
     const r = this.run; const lv = this.levelIdx + 1;
+    const firstCard = !(this.save.stars[lv] > 0);
     this.save.coins += r.coins; this.save.best[lv] = Math.max(this.save.best[lv] || 0, r.balls);
     this.save.stars[lv] = Math.max(this.save.stars[lv] || 0, stars);
     this.save.unlocked = Math.max(this.save.unlocked, Math.min(LEVELS, lv + 1));
@@ -376,6 +470,7 @@ class Game {
     const st = h('div', { class: 'bs-stars' }, [1, 2, 3].map((k) => h('span', { class: k <= stars ? 'on' : 'off', style: `animation-delay:${k * 0.25}s` }, '★')));
     this.layer.append(h('div', { class: 'bs-dim' }, h('div', { class: 'bs-card' }, h('div', { class: 'bs-title' }, I.t('win')), st,
       h('div', { class: 'bs-pill' }, `🏦 ${I.num(r.balls)} / 🎯 ${I.num(r.goal)}`), h('div', { class: 'bs-pill' }, `🪙 +${I.num(r.coins)}`),
+      firstCard ? h('div', { class: 'bs-pill bs-newcard' }, `✉️ ${I.t('newCard')} ${I.getLang() === 'en' ? STOPS[this.levelIdx].en : STOPS[this.levelIdx].ar}`) : null,
       this.levelIdx < LEVELS - 1 ? h('button', { class: 'bs-btn', onclick: () => this.start(this.levelIdx + 1) }, I.t('next')) : null, h('div', { class: 'bs-row' }, h('button', { class: 'bs-btn alt', onclick: () => this.start(this.levelIdx) }, I.t('again')), h('button', { class: 'bs-btn dark', onclick: () => { this._needDemo = true; this.showMenu('levels'); } }, I.t('menu'))))));
   }
 
@@ -514,6 +609,15 @@ const EXTRA_CSS = `
 .bs-dots{display:flex;gap:calc(var(--u)*1.4)}.bs-dots b{width:calc(var(--u)*2.2);height:calc(var(--u)*2.2);border-radius:50%;background:rgba(255,255,255,.35)}.bs-dots b.on{background:#fff}
 .bs-shop{display:grid;grid-template-columns:repeat(2,1fr);gap:calc(var(--u)*1.6);width:100%}
 @media (orientation:landscape){.bs-shop{grid-template-columns:repeat(5,1fr)}.bs-lvs6{grid-template-columns:repeat(6,1fr)!important}}
+.bs-tour{display:grid;grid-template-columns:repeat(2,1fr);gap:calc(var(--u)*1.2);width:100%}
+@media (orientation:landscape){.bs-tour{grid-template-columns:repeat(3,1fr)}}
+.bs-tcard{background:linear-gradient(180deg,#fff8e6,#ffe9b8);color:#4a3208;border:calc(var(--u)*.4) dashed #c89a1a;border-radius:calc(var(--u)*2.4);padding:calc(var(--u)*1.1);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.4);text-align:center;min-height:calc(var(--u)*19)}
+.bs-tcard i{font-style:normal;font-size:calc(var(--u)*5)}
+.bs-tcard .bs-st{color:#e0a010}
+.bs-tname{font-weight:900;font-size:calc(var(--u)*3.4)}
+.bs-tfact{font-size:calc(var(--u)*2.5);font-weight:700;line-height:1.3}
+.bs-tcard.lock{background:rgba(0,0,0,.35);color:rgba(255,255,255,.75);border-color:rgba(255,255,255,.35);filter:grayscale(1)}
+.bs-newcard{background:linear-gradient(180deg,#ffe36a,#e0a010);color:#4a3208;font-weight:900}
 .bs-shopc{background:rgba(0,0,0,.28);border:calc(var(--u)*.4) solid rgba(255,255,255,.7);border-radius:calc(var(--u)*3);padding:calc(var(--u)*1.6);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.8);text-align:center}
 .bs-shopc.can{border-color:#6ae08a;box-shadow:0 0 calc(var(--u)*2) #6ae08a}
 .bs-shopc i{font-style:normal;font-size:calc(var(--u)*7)}.bs-sn{font-weight:900;font-size:calc(var(--u)*3.2)}

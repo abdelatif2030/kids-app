@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { Puzzle, LEVELS, normalizeSave } from '../src/sim.js';
+import fs from 'node:fs';
 
 const DT = 1 / 60;
 
@@ -86,4 +87,12 @@ test('damaged saves load safely', () => {
   assert.equal(normalizeSave(null).unlocked, 1);
   assert.equal(normalizeSave({ unlocked: 99, stars: { 1: 9, 2: 3 } }).unlocked, 12);
   assert.deepEqual(normalizeSave({ stars: 5 }).stars, {});
+});
+
+test('Sweet-Maker\'s Pins anchor + kind rules: stars are solved + no-loss + full-jar sparkle, never move-par', () => {
+  const src = fs.readFileSync(new URL('../src/sim.js', import.meta.url), 'utf8');
+  assert.ok(!/stars = .*moves <= this\.par/.test(src), 'move-par still grades stars');
+  assert.ok(/inJar >= this\.balls\.length/.test(src), 'sparkle star missing');
+  const main = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes("title: ['دبابيس الحلواني', \"Sweet-Maker's Pins\"]"));
 });

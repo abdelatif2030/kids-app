@@ -14,10 +14,10 @@ const HONEY_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 2, bump: 2, win: 2 };
 const CUR = () => (I.getLang() === 'en' ? 'EGP' : 'ج.م');
 
 const S = {
-  title: ['مزرعة العسل', 'Honey Farm'], play: ['يلا نبدأ', 'Start'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], again: ['من الأول', 'Play again'],
+  title: ['عسل سيوة', 'Siwa Honey'], play: ['يلا نبدأ', 'Start'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], again: ['من الأول', 'Play again'],
   how: ['اسحب المزارع: خد البرطمانات من الخلايا للماكينة، وصّل الصناديق للزبون، وخد الفلوس', 'Drag the farmer: jars from hives to the machine, crates to customers, then pick up the cash'],
   hive: ['خلية جديدة', 'New hive'], bag: ['شنطة أكبر', 'Bigger stack'], conveyor: ['سير ناقل', 'Conveyor belt'], machine2: ['ماكينة ثانية', 'Second machine'],
-  have: ['عندك', 'Owned'], won: ['كبّرت المشروع! 🍯', 'Business grown! 🍯'], wonText: ['بقيت أشهر مربّي نحل على الطريق.', 'You run the best honey stand on the road.'],
+  have: ['عندك', 'Owned'], won: ['كبّرت المشروع! 🍯', 'Business grown! 🍯'], wonText: ['بقيت أشهر مربّي نحل في واحة سيوة.', 'You run the best honey stand in Siwa Oasis.'],
   goal: ['الهدف', 'Goal'], hintDrag: ['اقرب من الخلية تاخد العسل', 'Walk up to a hive to collect honey'], sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
   win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'], served: ['زباين', 'Served'],
 };

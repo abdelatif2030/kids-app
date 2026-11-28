@@ -3,7 +3,7 @@
 // An idle logistics game: diggers fill a pile of purple-gem crates, you tap the pile to load the waiting truck, trucks drive the
 // winding road to the depot and pay coins, coins buy upgrade pads. A full pile only pauses the diggers (red "!"), nothing is lost.
 // 2.5D isometric canvas, all art and sound made in code. Rules live in sim.js.
-import { Quarry, LEVELS, KINDS, MAXLV, normalizeSave, recordWin } from './sim.js';
+import { Quarry, LEVELS, KINDS, MAXLV, normalizeSave, recordWin, museumEntries, chapterOf } from './sim.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 import { VoiceCoach } from '../../cozy_kit/voice.js';
@@ -11,7 +11,7 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 const GEM_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 2, near: 1, win: 2 };
 
 const S = {
-  title: ['محجر الجواهر', 'Gemlode Quarry'], play: ['يلا نبدأ', 'Play'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'],
+  title: ['محاجر أسوان', 'Aswan Quarries'], play: ['يلا نبدأ', 'Play'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'],
   banner: ['فاض المحجر! تلحق؟', 'Quarry overflow! Can you keep up?'],
   how: ['دوس على الصناديق عشان تحمّلها على الشاحنة، والشاحنات توصّلها للمخزن وتجيب فلوس. اشتري التطويرات!', 'Tap the crates to load the truck. Trucks haul them to the depot for coins. Buy upgrades!'],
   levels: ['اختار مرحلة', 'Choose a level'], level: ['مرحلة', 'Level'], resume: ['كمّل', 'Resume'], restart: ['من الأول', 'Restart'], map: ['المراحل', 'Levels'],
@@ -19,6 +19,8 @@ const S = {
   shipped: ['صناديق اتشحنت', 'Crates shipped'], overflow: ['وقت الازدحام', 'Overflow time'], sec: ['ث', 's'],
   warn: ['المخزن مليان!', 'Pile is full!'], tapHint: ['دوس على الصناديق عشان تحمّلها', 'Tap the crates to load the truck'],
   goal: ['شحن', 'Ship'], max: ['أقصى', 'MAX'], sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'], wait: ['استنى الشاحنة', 'Truck is on its way'],
+  museum: ['كتاب المتحف', 'MUSEUM BOOK'], museumSub: ['كل محجر تخلّصه بيبقى معرض في المتحف!', 'Every quarry site you finish becomes a museum exhibit!'],
+  museumLocked: ['خلّص المحجر ده عشان تفتح المعرض', 'Finish this quarry site to open its exhibit'],
   diggers: ['عمال حفر', 'Diggers'], trucks: ['شاحنة', 'Truck'], pile: ['مخزن أكبر', 'Bigger pile'], truckCap: ['حمولة أكبر', 'Bigger load'],
   road: ['طريق أسرع', 'Faster road'], loader: ['عامل تحميل', 'Loader'], polish: ['ورشة تلميع', 'Polish shop'], mine2: ['منجم ثاني', 'Second mine'],
 };
@@ -138,6 +140,7 @@ class Game {
       h('div', { class: 'gq-ribbon' }, `⚠️ ${I.t('banner')}`),
       h('div', { class: 'gq-small' }, I.t('how')),
       h('button', { class: 'gq-btn', onclick: () => { this.sound.play('tap'); this.showMap(); } }, I.t('play')),
+      h('button', { class: 'gq-btn dark', onclick: () => { this.sound.play('tap'); this.showMuseum(); } }, '🏛️ ', I.t('museum')),
       h('button', { class: 'gq-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));
     this._soundPill();
   }
@@ -147,11 +150,29 @@ class Game {
     const grid = h('div', { class: 'gq-lvs' });
     for (const L of LEVELS) {
       const open = L.id <= this.save.unlocked; const st = this.save.stars[L.id] || 0;
-      grid.append(h('button', { class: `gq-lv${open ? '' : ' lock'}`, disabled: !open, 'aria-label': `${I.t('level')} ${L.id}`, onclick: () => { this.sound.play('tap'); this.startLevel(L.id); } },
+      grid.append(h('button', { class: `gq-lv${open ? '' : ' lock'}${chapterOf(L) === 'tura' ? ' tura' : ''}`, disabled: !open, 'aria-label': `${I.t('level')} ${L.id}`, onclick: () => { this.sound.play('tap'); this.startLevel(L.id); } },
         h('i', {}, open ? I.num(L.id) : '🔒'), h('span', { class: 'gq-ln' }, I.getLang() === 'en' ? L.en : L.ar), h('span', { class: 'gq-st' }, open ? '★'.repeat(st) + '☆'.repeat(3 - st) : '')));
     }
     this.layer.append(h('div', { class: 'gq-dim' }, h('div', { class: 'gq-card' },
       h('div', { class: 'gq-title' }, I.t('levels')), grid, h('button', { class: 'gq-btn dark', onclick: () => this.showMenu() }, I.t('menu')))));
+    this._soundPill();
+  }
+
+  /** Museum book: one exhibit per quarry site, derived from the existing save (museumEntries). A finished site
+   *  shows its icon, name, stars and a one-line true fact; an unfinished site stays a locked silhouette with its
+   *  progress hint. Read-only — it never writes to the save. */
+  showMuseum() {
+    this.mode = 'museum'; this._clear(); this.sound.setMode(false);
+    const en = I.getLang() === 'en';
+    const cards = museumEntries(this.save).map((e) => {
+      const nm = en ? e.en : e.ar; const alt = en ? e.ar : e.en;
+      if (!e.complete) return h('div', { class: 'gq-exhibit lock' }, h('div', { class: 'ic' }, '🔒'), h('div', { class: 'nm' }, nm), h('div', { class: 'alt' }, alt), h('div', { class: 'fact' }, I.t('museumLocked')));
+      return h('div', { class: `gq-exhibit${e.chapter === 'tura' ? ' tura' : ''}` }, h('div', { class: 'ic' }, e.icon), h('div', { class: 'nm' }, nm), h('div', { class: 'alt' }, alt), h('div', { class: 'fact' }, en ? e.fact[1] : e.fact[0]), h('div', { class: 'meta' }, `⭐ ${I.num(e.stars)}`));
+    });
+    this.layer.append(h('div', { class: 'gq-dim' }, h('div', { class: 'gq-card wide' },
+      h('div', { class: 'gq-title' }, '🏛️ ', I.t('museum')), h('div', { class: 'gq-small' }, I.t('museumSub')),
+      h('div', { class: 'gq-museum' }, cards),
+      h('button', { class: 'gq-btn dark', onclick: () => this.showMenu() }, I.t('menu')))));
     this._soundPill();
   }
 
@@ -308,8 +329,10 @@ class Game {
     this._shadow(g, x + 0.3, y + 0.3, w * 1.2, w * 0.5);
     const T = [bx, by - hh]; const L = [bx - ww, by - hh * 0.38]; const R = [bx + ww, by - hh * 0.38];
     const BL = [bx - ww * 0.8, by]; const BR = [bx + ww * 0.8, by]; const BC = [bx, by + ww * 0.4];
-    this._poly(g, [T, L, BL, BC], '#6a2bd0', '#2e0a66', Math.max(1, s * 0.07));
-    this._poly(g, [T, R, BR, BC], '#a35cf5', '#2e0a66', Math.max(1, s * 0.07));
+    // Tura dressing: the crystals become pale white-limestone blocks (the quarry's famous stone), not purple gems.
+    const tura = this.q && chapterOf(this.q.cfg) === 'tura';
+    this._poly(g, [T, L, BL, BC], tura ? '#cfc3a4' : '#6a2bd0', tura ? '#7a6a48' : '#2e0a66', Math.max(1, s * 0.07));
+    this._poly(g, [T, R, BR, BC], tura ? '#f4ecd8' : '#a35cf5', tura ? '#7a6a48' : '#2e0a66', Math.max(1, s * 0.07));
     this._poly(g, [T, [bx + ww * 0.25, by - hh * 0.55], [bx - ww * 0.15, by - hh * 0.4]], `rgba(255,255,255,${0.55 + glow * 0.3})`);
     if (glow) { g.fillStyle = `rgba(230,190,255,${0.25 * glow})`; g.beginPath(); g.arc(bx, by - hh * 0.5, ww * 1.8, 0, 6.3); g.fill(); }
   }
@@ -376,15 +399,20 @@ class Game {
     const c = document.createElement('canvas'); c.width = this.cv.width; c.height = this.cv.height;
     const g = c.getContext('2d'); g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     const W = this.cw; const H = this.ch; const s = this.s;
-    const sky = g.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, '#f6dca0'); sky.addColorStop(0.5, '#ebce8c'); sky.addColorStop(1, '#d9b070'); g.fillStyle = sky; g.fillRect(0, 0, W, H);
+    // Tura dressing: pale limestone world — bright cream sky, white hills, near-white ground (vs Aswan's gold sand).
+    const tura = this.q && chapterOf(this.q.cfg) === 'tura';
+    const sky = g.createLinearGradient(0, 0, 0, H);
+    if (tura) { sky.addColorStop(0, '#fdf6e0'); sky.addColorStop(0.5, '#f7ecd2'); sky.addColorStop(1, '#eee0bc'); } else { sky.addColorStop(0, '#f6dca0'); sky.addColorStop(0.5, '#ebce8c'); sky.addColorStop(1, '#d9b070'); }
+    g.fillStyle = sky; g.fillRect(0, 0, W, H);
     // dunes / hills behind the scene
     const hill = (cx, cy, rx, ry, col) => { g.fillStyle = col; g.beginPath(); g.ellipse(cx, cy, rx, ry, 0, Math.PI, 0); g.fill(); };
     const [tx, ty] = this.P(0, 0, 0);
-    hill(tx - s * 9, ty - s * 2, s * 9, s * 5, '#dfc07a'); hill(tx + s * 8, ty - s * 3, s * 10, s * 6.5, '#d6b46e'); hill(tx, ty - s * 6, s * 13, s * 5.5, '#e8cd8e');
-    hill(tx - s * 4, ty - s * 7.5, s * 8, s * 3.5, '#efd8a0');
+    const hills = tura ? ['#e9dcba', '#e2d2a8', '#f2e7c8', '#f8f0da'] : ['#dfc07a', '#d6b46e', '#e8cd8e', '#efd8a0'];
+    hill(tx - s * 9, ty - s * 2, s * 9, s * 5, hills[0]); hill(tx + s * 8, ty - s * 3, s * 10, s * 6.5, hills[1]); hill(tx, ty - s * 6, s * 13, s * 5.5, hills[2]);
+    hill(tx - s * 4, ty - s * 7.5, s * 8, s * 3.5, hills[3]);
     // sandy ground disc under the whole site
     const [mx, my] = this.P(5, 9, 0);
-    const gr = g.createRadialGradient(mx, my, s * 2, mx, my, s * 16); gr.addColorStop(0, '#f0d99c'); gr.addColorStop(1, 'rgba(240,217,156,0)'); g.fillStyle = gr; g.beginPath(); g.ellipse(mx, my, s * 17, s * 12, 0, 0, 6.3); g.fill();
+    const gr = g.createRadialGradient(mx, my, s * 2, mx, my, s * 16); gr.addColorStop(0, tura ? '#f8efdb' : '#f0d99c'); gr.addColorStop(1, tura ? 'rgba(248,239,219,0)' : 'rgba(240,217,156,0)'); g.fillStyle = gr; g.beginPath(); g.ellipse(mx, my, s * 17, s * 12, 0, 0, 6.3); g.fill();
     // pebbles and dry tufts (fixed pattern)
     for (let i = 0; i < 70; i++) { const x = ((i * 7.31) % 22) - 3; const y = ((i * 11.7) % 22) - 3; const [px, py] = this.P(x, y, 0); g.fillStyle = i % 3 ? 'rgba(150,110,50,.35)' : 'rgba(255,245,210,.5)'; g.beginPath(); g.ellipse(px, py, s * (0.12 + (i % 4) * 0.05), s * 0.07, 0, 0, 6.3); g.fill(); }
     // the road (parallelogram strips on the ground)
@@ -420,7 +448,7 @@ class Game {
     const g = this.g; g.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     if (!this.q || !this.s) return;
     const q = this.q;
-    const bgKey = `${this.cw}x${this.ch}|${q.up.road}|${q.up.mine2}`;
+    const bgKey = `${this.cw}x${this.ch}|${q.up.road}|${q.up.mine2}|${chapterOf(q.cfg)}`;
     if (!this.bg || this.bgKey !== bgKey) { this.bg = this._bgRender(); this.bgKey = bgKey; }
     g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(this.bg, 0, 0); g.restore();
     const items = [];
@@ -533,6 +561,18 @@ const STYLE = `
 .gq-ln{font-size:calc(var(--u)*2.4)}.gq-st{color:#ffe27a;font-size:calc(var(--u)*3.4);letter-spacing:.05em}
 .gq-lv{background:linear-gradient(180deg,#a870e8,#6a38b8);box-shadow:0 calc(var(--u)*.6) 0 #2e1058}
 .gq-lv.lock{background:linear-gradient(180deg,#b8b0c4,#8a8498);box-shadow:0 calc(var(--u)*.6) 0 #5a5468}
+.gq-lv.tura{background:linear-gradient(180deg,#e8c96a,#b8862e);box-shadow:0 calc(var(--u)*.6) 0 #6a4a10}
+.gq-lv.tura.lock{background:linear-gradient(180deg,#b8b0c4,#8a8498);box-shadow:0 calc(var(--u)*.6) 0 #5a5468}
+.gq-card.wide{max-width:calc(var(--u)*150)}
+.gq-museum{display:grid;grid-template-columns:repeat(auto-fill,minmax(calc(var(--u)*34),1fr));gap:calc(var(--u)*1.6);max-height:52vh;overflow-y:auto;padding:calc(var(--u)*.6)}
+.gq-exhibit{background:rgba(255,255,255,.14);border:calc(var(--u)*.35) solid rgba(255,255,255,.5);border-radius:calc(var(--u)*2.4);padding:calc(var(--u)*1.6);text-align:center;color:#fff}
+.gq-exhibit.tura{background:rgba(255,240,200,.22)}
+.gq-exhibit.lock{opacity:.55;filter:grayscale(.8)}
+.gq-exhibit .ic{font-size:calc(var(--u)*6)}
+.gq-exhibit .nm{font-weight:900;font-size:calc(var(--u)*3.4)}
+.gq-exhibit .alt{font-size:calc(var(--u)*2.6);opacity:.85}
+.gq-exhibit .fact{font-size:calc(var(--u)*2.8);line-height:1.5;margin-top:calc(var(--u)*.8)}
+.gq-exhibit .meta{color:#ffe27a;font-weight:900;margin-top:calc(var(--u)*.6)}
 .gq-lvs{grid-template-columns:repeat(5,1fr)}
 @media (orientation:landscape){.gq-lvs{grid-template-columns:repeat(5,1fr)}.gq-root.land .gq-panel{left:auto;top:calc(var(--u)*14);bottom:0;width:calc(var(--u)*50);grid-template-columns:repeat(2,1fr);align-content:center;background:none}}
 .gq-root.land .gq-hud{right:calc(var(--u)*50)}

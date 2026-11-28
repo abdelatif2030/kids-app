@@ -11,14 +11,14 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 
 const TT_CLIPS = { go: 2, pickup: 2, charge: 2, trick: 3, bump: 3, near: 2, win: 2 };
 
-const NAMES = [['زقاق اليقطين', 'Pumpkin Lane'], ['الحديقة الضبابية', 'Foggy Park'], ['القصر الودود', 'Friendly Mansion'], ['مزرعة القش', 'Haystack Farm'], ['تلّة حلوى الذرة', 'Candy-Corn Hill'], ['جسر الفوانيس', 'Lantern Bridge'], ['موكب منتصف الليل', 'Midnight Parade']];
-const CNAMES = { ghost: ['شبح الملاية', 'Sheet ghost'], pumpkin: ['بدلة يقطينة', 'Pumpkin suit'], witch: ['ساحرة صغيرة', 'Little witch'], robot: ['روبوت كرتون', 'Cardboard robot'], cat: ['قطة', 'Kitty'], mummy: ['مومياء لطيفة', 'Friendly mummy'], dino: ['ديناصور', 'Dino'], bat: ['خفّاش', 'Bat'] };
+const NAMES = [['زقاق الفوانيس', 'Lantern Lane'], ['حديقة النيل', 'Nile Park'], ['بيت الحارة الكبير', 'Big Hara House'], ['مزرعة البرسيم', 'Clover Farm'], ['تلّة الحلويات', 'Sweet Hill'], ['جسر الفوانيس', 'Lantern Bridge'], ['موكب الوحاوي', 'Wahawy Parade']];
+const CNAMES = { ghost: ['شبح الملاية', 'Sheet ghost'], pumpkin: ['بدلة فانوس', 'Lantern suit'], witch: ['ساحرة صغيرة', 'Little witch'], robot: ['روبوت كرتون', 'Cardboard robot'], cat: ['قطة', 'Kitty'], mummy: ['مومياء لطيفة', 'Friendly mummy'], dino: ['ديناصور', 'Dino'], bat: ['خفّاش', 'Bat'] };
 const S = {
-  title: ['حلاوة ولا مقلب', 'Trick or Treat'], sub: ['قُد شلّة الأطفال في شارع الهالوين!', 'Lead the trick-or-treat crowd!'],
+  title: ['ليلة الوحاوي', 'Wahawy Night Run'], sub: ['قُد شلّة الأطفال بفوانيس الوحاوي!', 'Lead the kids with their wahawy lanterns!'],
   play: ['يلا نلعب', 'PLAY'], levels: ['الشوارع', 'STREETS'], costumes: ['الأزياء', 'COSTUMES'], settings: ['الإعدادات', 'SETTINGS'], exit: ['خروج', 'Exit'], back: ['رجوع', 'Back'],
   resume: ['كمّل', 'Resume'], restart: ['من الأول', 'Restart'], menu: ['القائمة', 'Menu'], next: ['الشارع التالي', 'Next street'], again: ['العب تاني', 'Play again'],
   sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'], soundOn: ['الصوت', 'Sound'], lang: ['اللغة', 'Language'], on: ['شغّال', 'On'], off: ['مقفول', 'Off'],
-  paused: ['استراحة', 'Paused'], won: ['خلّصنا الشارع! 🎃', 'Street done! 🎃'], kids: ['الأطفال', 'Kids'], candy: ['حلاوة', 'Candy'], earned: ['كسبت', 'Earned'],
+  paused: ['استراحة', 'Paused'], won: ['خلّصنا الشارع! 🏮', 'Street done! 🏮'], kids: ['الأطفال', 'Kids'], candy: ['حلاوة', 'Candy'], earned: ['كسبت', 'Earned'],
   hintJump: ['دوس للنط، وكمّل دوس لنطّة أعلى', 'Tap to jump, hold to jump higher'],
   hintHedge: ['السور محتاج أطفال كتير!', 'The hedge needs a big crowd!'],
   hintBoss: ['العنكبوت المنفوخ! استنى التحذير وانط', 'The inflatable spider! Watch the warning'],
@@ -119,7 +119,7 @@ class Game {
     if (!this.sim || this.sim.state !== 'run') this._attract(this.menuLevel);
     const next = Math.min(this.save.unlocked, NUM_LEVELS);
     this.layer.append(this.card(
-      h('div', { class: 'tt-logo' }, '🎃 ', I.t('title')), h('div', { class: 'tt-small' }, I.t('sub')),
+      h('div', { class: 'tt-logo' }, '🏮 ', I.t('title')), h('div', { class: 'tt-small' }, I.t('sub')),
       this.btn(`${I.t('play')} · ${I.t('street')} ${I.num(next)}`, () => this.startLevel(next)),
       this.btn(I.t('levels'), () => this.showLevels(), 'dark'), this.btn(`${I.t('costumes')} 👻`, () => this.showShop(), 'dark'),
       this.btn(I.t('settings'), () => this.showSettings(), 'dark'), this.btn(I.t('exit'), () => this.post({ type: 'exit' }), 'alt')));

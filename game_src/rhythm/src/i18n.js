@@ -1,6 +1,6 @@
 const S = {
-  title: ['البقاء على الإيقاع', 'Rhythm Survival'],
-  tour: ['جولة حول العالم', 'World Tour'],
+  title: ['إيقاع القاهرة', 'Cairo Rhythm'],
+  tour: ['جولة مصر', 'Egypt Tour'],
   track: ['أغنية', 'Track'],
   left: ['باقي', 'left'],
   locked: ['اكسب الأغنية اللي قبلها', 'Win the track before'],
@@ -28,6 +28,10 @@ const S = {
   loading: ['بنشغّل الأسطوانة...', 'Putting the record on...'],
   noWebgl: ['الجهاز ده مش بيشغّل اللعبة ثلاثية الأبعاد.', 'This device cannot run the 3D game.'],
   sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
+  encore: ['إعادة احتفالية', 'Encore'],
+  encoreOn: ['الإعادة الاحتفالية شغالة 🎉 نفس الأغنية أسرع شوية!', 'Encore on 🎉 same song, a little faster!'],
+  encoreOff: ['الإعادة الاحتفالية وقفت', 'Encore off'],
+  encoreNote: ['إعادة احتفالية — للمتعة بس، من غير نجوم جديدة 🎉', 'Encore replay — just for fun, no new stars 🎉'],
 };
 
 let lang = 'ar';

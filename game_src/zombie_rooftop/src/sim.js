@@ -1,7 +1,8 @@
-// «البقاء على قيد الحياة» — the rules with no drawing. A cartoon fighter on a city rooftop runs around (swipe or keys)
-// while the blaster aims and fires by itself at the nearest zombie. Goofy cartoon zombies climb over the parapet in
+// «سطوح القاهرة / Cairo Rooftops» — the rules with no drawing. A rooftop kid runs around Cairo roofs (swipe or keys)
+// while the light torch aims and fires by itself at the nearest night-ghoul (عفريت الليل) — the ghouls are scared of
+// light, so light tools pop them into green puffs. Goofy cartoon ghouls climb over the parapet in
 // waves; beaten ones pop into green puffs and drop coins and experience. Each level up offers three perks "for this
-// roof". Blue gas tanks blow up a crowd. A weapon crate on some roofs gives the bomb launcher, then the rocket
+// roof". Blue gas tanks blow up a crowd. A weapon crate on some roofs gives the light-orb launcher, then the sparkler
 // launcher, then the fireworks launcher (kept for later roofs). When every wave is cleared the pink launch pad lights
 // up: stand on it to leap across the gap to the next building. Eight roofs, plus Endless after roof 8.
 // Deterministic with a seed so a robot test can play it. Nobody is hurt: the hero is only "knocked out" and tries again.
@@ -15,23 +16,23 @@ export const KINDS = {
 
 /** Weapons: the blaster is always there; the others come from crates and stay unlocked. */
 export const WEAPONS = [
-  { id: 'blaster', icon: '🔫', ar: 'البلاستر', en: 'Blaster', rate: 3.3, dmg: 1, range: 9.5 },
-  { id: 'bomb', icon: '💣', ar: 'قاذف القنابل', en: 'Bomb launcher', rate: 1.05, dmg: 3.2, range: 9, radius: 2.2 },
-  { id: 'rocket', icon: '🚀', ar: 'قاذف الصواريخ', en: 'Rocket launcher', rate: 1.5, dmg: 3.6, range: 10, radius: 2.4 },
+  { id: 'blaster', icon: '🔦', ar: 'كشاف النور', en: 'Light torch', rate: 3.3, dmg: 1, range: 9.5 },
+  { id: 'bomb', icon: '🔆', ar: 'قاذف كرات النور', en: 'Light-orb launcher', rate: 1.05, dmg: 3.2, range: 9, radius: 2.2 },
+  { id: 'rocket', icon: '✨', ar: 'قاذف الشرارات', en: 'Sparkler launcher', rate: 1.5, dmg: 3.6, range: 10, radius: 2.4 },
   { id: 'fireworks', icon: '🎆', ar: 'قاذف الألعاب النارية', en: 'Fireworks launcher', rate: 0.95, dmg: 4.2, range: 9.5, radius: 2.6 },
 ];
 export const weaponOf = (id) => WEAPONS.find((w) => w.id === id) || WEAPONS[0];
 
 /** Eight roofs. waves: [shamblers, sprinters, brutes]; crate: a weapon that drops at the start of that wave. */
 export const ROOFS = [
-  { id: 1, ar: 'عمارات الغروب', en: 'Sunset Blocks', look: 'sunset', W: 6.5, D: 9, waves: [[8, 0, 0], [11, 0, 0], [14, 0, 0]], tanks: 2, vents: 3, tip: 'move', face: 'shambler' },
-  { id: 2, ar: 'صف خزانات المياه', en: 'Water Tower Row', look: 'towers', W: 7, D: 9.5, waves: [[10, 0, 0], [10, 4, 0], [12, 6, 0]], tanks: 3, vents: 3, crate: { wave: 1, weapon: 'bomb' }, tip: 'tanks', face: 'sprinter' },
-  { id: 3, ar: 'سطح الحديقة', en: 'Garden Roof', look: 'garden', W: 7.5, D: 10, waves: [[12, 3, 0], [12, 5, 1], [14, 6, 1], [16, 6, 2]], tanks: 3, vents: 2, crate: { wave: 0, weapon: 'bomb' }, tip: 'brute', face: 'brute' },
-  { id: 4, ar: 'لافتات النيون', en: 'Neon Signs', look: 'neon', W: 7.5, D: 10, waves: [[14, 5, 1], [16, 6, 1], [16, 8, 2], [18, 8, 2]], tanks: 3, vents: 3, crate: { wave: 1, weapon: 'rocket' }, tip: 'crate', face: 'sprinter' },
-  { id: 5, ar: 'موقع البناء', en: 'Crane Yard', look: 'crane', W: 8, D: 10.5, waves: [[16, 6, 1], [18, 8, 2], [18, 10, 2], [20, 10, 3]], tanks: 4, vents: 2, crate: { wave: 0, weapon: 'rocket' }, tip: 'level', face: 'shambler' },
-  { id: 6, ar: 'أسطح الثلج', en: 'Snowy Tops', look: 'snow', W: 8, D: 10.5, waves: [[18, 8, 2], [20, 8, 2], [20, 10, 3], [22, 12, 3]], tanks: 4, vents: 3, crate: { wave: 1, weapon: 'fireworks' }, tip: 'crowd', face: 'brute' },
-  { id: 7, ar: 'برج المهبط', en: 'Helipad Tower', look: 'helipad', W: 8.5, D: 11, waves: [[20, 10, 2], [22, 10, 3], [24, 12, 3], [26, 14, 4]], tanks: 4, vents: 2, crate: { wave: 0, weapon: 'fireworks' }, tip: 'pad', face: 'sprinter' },
-  { id: 8, ar: 'برج الساعة', en: 'Clock Tower', look: 'clock', W: 8.5, D: 11, waves: [[20, 10, 2], [22, 12, 3], [24, 12, 4], [18, 10, 2, 1]], tanks: 4, vents: 2, crate: { wave: 0, weapon: 'fireworks' }, tip: 'king', face: 'king' },
+  { id: 1, ar: 'أسطح وسط البلد', en: 'Downtown Roofs', look: 'sunset', W: 6.5, D: 9, waves: [[8, 0, 0], [11, 0, 0], [14, 0, 0]], tanks: 2, vents: 3, tip: 'move', face: 'shambler' },
+  { id: 2, ar: 'أسطح القاهرة الإسلامية', en: 'Islamic Cairo Roofs', look: 'towers', W: 7, D: 9.5, waves: [[10, 0, 0], [10, 4, 0], [12, 6, 0]], tanks: 3, vents: 3, crate: { wave: 1, weapon: 'bomb' }, tip: 'tanks', face: 'sprinter' },
+  { id: 3, ar: 'أسطح الزمالك', en: 'Zamalek Garden Roofs', look: 'garden', W: 7.5, D: 10, waves: [[12, 3, 0], [12, 5, 1], [14, 6, 1], [16, 6, 2]], tanks: 3, vents: 2, crate: { wave: 0, weapon: 'bomb' }, tip: 'brute', face: 'brute' },
+  { id: 4, ar: 'أسطح التحرير', en: 'Tahrir Neon Roofs', look: 'neon', W: 7.5, D: 10, waves: [[14, 5, 1], [16, 6, 1], [16, 8, 2], [18, 8, 2]], tanks: 3, vents: 3, crate: { wave: 1, weapon: 'rocket' }, tip: 'crate', face: 'sprinter' },
+  { id: 5, ar: 'موقع بناء العاصمة الجديدة', en: 'New Capital Crane Yard', look: 'crane', W: 8, D: 10.5, waves: [[16, 6, 1], [18, 8, 2], [18, 10, 2], [20, 10, 3]], tanks: 4, vents: 2, crate: { wave: 0, weapon: 'rocket' }, tip: 'level', face: 'shambler' },
+  { id: 6, ar: 'أسطح إسكندرية الشتوية', en: 'Alexandria Winter Roofs', look: 'snow', W: 8, D: 10.5, waves: [[18, 8, 2], [20, 8, 2], [20, 10, 3], [22, 12, 3]], tanks: 4, vents: 3, crate: { wave: 1, weapon: 'fireworks' }, tip: 'crowd', face: 'brute' },
+  { id: 7, ar: 'برج المنتزه', en: 'Montazah Tower', look: 'helipad', W: 8.5, D: 11, waves: [[20, 10, 2], [22, 10, 3], [24, 12, 3], [26, 14, 4]], tanks: 4, vents: 2, crate: { wave: 0, weapon: 'fireworks' }, tip: 'pad', face: 'sprinter' },
+  { id: 8, ar: 'سطح قلعة قايتباي', en: 'Qaitbey Citadel Roof', look: 'clock', W: 8.5, D: 11, waves: [[20, 10, 2], [22, 12, 3], [24, 12, 4], [18, 10, 2, 1]], tanks: 4, vents: 2, crate: { wave: 0, weapon: 'fireworks' }, tip: 'king', face: 'king' },
 ];
 
 /** Perks offered at a level up; they last for this roof only (like the video: "Pick one for this roof"). */
@@ -47,7 +48,7 @@ export const PERKS = [
 
 /** Shop upgrades bought with coins between roofs (nothing is ever taken away). */
 export const UPGRADES = [
-  { id: 'power', icon: '⚡', ar: 'سلاح أقوى', en: 'Stronger weapon' },
+  { id: 'power', icon: '⚡', ar: 'نور أقوى', en: 'Stronger light' },
   { id: 'vest', icon: '🦺', ar: 'سترة أقوى', en: 'Stronger vest' },
   { id: 'magnet', icon: '🧲', ar: 'مغناطيس العملات', en: 'Coin magnet' },
 ];

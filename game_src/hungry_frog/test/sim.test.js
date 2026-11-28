@@ -56,7 +56,7 @@ test('the frog only eats critters that are not bigger, and grows by their number
   assert.ok(sizeOf(40) > sizeOf(4) * 2);
 });
 
-test('a bigger frog aims first (a warning) and costs a heart only if the frog stays; leaping is safe', () => {
+test('a bigger frog aims first (a warning) and costs a splash only if the frog stays; leaping is safe', () => {
   const p = new Pond({ level: 0, seed: 4 });
   p.critters = [];
   p.rand = () => 0.99;
@@ -65,9 +65,10 @@ test('a bigger frog aims first (a warning) and costs a heart only if the frog st
   p.t = 20; // bullies wait a few seconds at the start
   const ev = p.step(1 / 30);
   assert.ok(ev.some((e) => e.type === 'aim'));
-  assert.equal(p.hearts, 3);
+  assert.equal(p.splashes, 0);
   for (let i = 0; i < 40; i++) p.step(1 / 30);
-  assert.equal(p.hearts, 2);
+  assert.equal(p.splashes, 1);
+  assert.equal(p.state, 'play'); // a splash never ends the run
   const q = new Pond({ level: 0, seed: 4 });
   q.critters = [{ ...big, cool: 0 }];
   q.rand = () => 0.99;
@@ -75,14 +76,15 @@ test('a bigger frog aims first (a warning) and costs a heart only if the frog st
   q.step(1 / 30);
   q.leap();
   for (let i = 0; i < 12; i++) q.step(1 / 30);
-  assert.equal(q.hearts, 3);
+  assert.equal(q.splashes, 0);
 });
 
-test('gulped after the last heart; easy mode has an extra heart and slower warnings', () => {
+test('never gulped: an idle frog gets splashed but is never lost; easy mode starts splash-free', () => {
   const { p } = play({ level: 2, seed: 9 }, 'none', 300);
-  console.log(`idle on level 3: ${p.state}, hearts ${p.hearts}`);
-  assert.equal(p.state, 'lost');
-  assert.equal(new Pond({ easy: true }).hearts, 4);
+  console.log(`idle on level 3: ${p.state}, splashes ${p.splashes}`);
+  assert.notEqual(p.state, 'lost'); // kind rules: being caught can never lose the run
+  assert.ok(p.splashes >= 1);
+  assert.equal(new Pond({ easy: true }).splashes, 0);
   assert.ok(KINDS.frog.danger);
 });
 
@@ -93,4 +95,13 @@ test('saves are cleaned', () => {
   assert.equal(s.drops, 0);
   assert.deepEqual(s.stars, { 1: 3 });
   assert.deepEqual(s.best, { 1: 50 });
+});
+
+test('Farfour anchor: six Lake Burullus ponds, ids and thresholds unchanged', () => {
+  assert.equal(LEVELS.length, 6);
+  assert.deepEqual(LEVELS.map((l) => l.id), [1, 2, 3, 4, 5, 6]);
+  assert.equal(LEVELS[0].en, 'Burullus Dawn');
+  assert.equal(LEVELS[5].en, 'Lake Burullus');
+  assert.equal(LEVELS[0].evolve, 15);
+  assert.equal(LEVELS[0].boss, 26);
 });

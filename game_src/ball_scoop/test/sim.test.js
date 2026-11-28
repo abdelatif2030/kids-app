@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Run, buildRoad, levelLen, LEVELS, UPG, upgradeCost, normalizeSave, robotRun, robotSteer, goalFor, themeOf, panoOf, THEMES, THEME_PANO, FIN } from '../src/sim.js';
+import { Run, buildRoad, levelLen, LEVELS, UPG, upgradeCost, normalizeSave, robotRun, robotSteer, goalFor, themeOf, panoOf, THEMES, THEME_PANO, FIN, STOPS, tourCards, DRESS, dressOf } from '../src/sim.js';
 import { Pile, capFor } from '../src/pile.js';
 
 test('thirty levels in five themes, each road longer, ending at the bank', () => {
@@ -128,6 +128,112 @@ test('panoramas follow the theme, not a rotation (B2: pano keyed to what the pai
   assert.equal(panoOf(24), 5, 'space levels get the rainbow sky road');
   assert.equal(panoOf(LEVELS - 1), 6, 'the finale gets the treasure vault');
   for (let n = 1; n <= 6; n++) assert.ok(existsSync(`${artDir}pano${n}.webp`), `missing pano${n}.webp`);
+});
+
+test('Phase 2H freeze: the 30 levels/roads/goals are byte-identical after the tour was added', () => {
+  assert.equal(LEVELS, 30);
+  assert.equal(buildRoad(0).things.length, 22); assert.equal(buildRoad(0).L, 230);
+  assert.equal(buildRoad(7).things.length, 43); assert.equal(buildRoad(7).L, 412);
+  assert.equal(buildRoad(29).things.length, 108); assert.equal(buildRoad(29).L, 984);
+  assert.equal(goalFor(0), 150); assert.equal(goalFor(29), 700);
+  assert.deepEqual(THEMES, ['meadow', 'desert', 'snow', 'candy', 'space']);
+});
+
+test('Phase 2H tour stops: exactly 30, one per level, six per theme leg, named ar+en with facts', () => {
+  assert.equal(STOPS.length, LEVELS);
+  const names = new Set();
+  STOPS.forEach((s, i) => {
+    assert.ok(s.ar && s.en && s.factAr && s.factEn, `stop ${i + 1} needs ar/en names and facts`);
+    names.add(s.en);
+    assert.equal(tourCards({})[i].theme, themeOf(i), 'card leg follows the level theme');
+  });
+  assert.equal(names.size, 30, 'stop names are unique');
+  // the Corniche leg runs west→east as the REVIEW promised: Qaitbey first, Montazah last of the leg
+  assert.equal(STOPS[0].en, 'Qaitbey Citadel'); assert.equal(STOPS[5].en, 'Montazah Palace');
+  assert.equal(STOPS[29].en, 'Aswan Sky');
+});
+
+test('Phase 2H tour cards: derived from the save only — fresh all locked, facts never leak', () => {
+  const fresh = tourCards(null);
+  assert.equal(fresh.length, 30);
+  assert.ok(fresh.every((c) => !c.earned && c.stars === 0 && c.factAr === null && c.factEn === null));
+  const partial = tourCards({ unlocked: 3, stars: { 1: 3, 2: 1 }, best: { 1: 400 } });
+  assert.equal(partial[0].earned, true); assert.equal(partial[0].stars, 3); assert.equal(partial[0].best, 400);
+  assert.ok(partial[0].factAr.includes('فنار') && partial[0].factEn.includes('Pharos'));
+  assert.equal(partial[1].earned, true); assert.equal(partial[1].stars, 1);
+  assert.ok(partial.slice(2).every((c) => !c.earned && c.factAr === null && c.factEn === null), 'mid-tour unearned cards stay secret');
+  const full = tourCards({ unlocked: 30, stars: Object.fromEntries(Array.from({ length: 30 }, (_, i) => [i + 1, 2])) });
+  assert.ok(full.every((c) => c.earned && c.factAr && c.factEn));
+});
+
+test('Phase 2H old-save migration: a pre-tour save keeps everything and gains its cards for free', () => {
+  const legacy = { unlocked: 5, stars: { 1: 2, 2: 3, 3: 1, 4: 1 }, best: { 1: 260, 2: 300 }, coins: 123, up: { start: 2 }, muted: true };
+  const n = normalizeSave(legacy);
+  assert.equal(n.unlocked, 5); assert.deepEqual(n.stars, legacy.stars); assert.deepEqual(n.best, legacy.best);
+  assert.equal(n.coins, 123); assert.equal(n.up.start, 2); assert.equal(n.muted, true);
+  const cards = tourCards(legacy);
+  assert.deepEqual(cards.filter((c) => c.earned).map((c) => c.n), [1, 2, 3, 4], 'exactly the finished levels hold cards');
+  assert.equal(tourCards({ stars: { 1: 9 } })[0].stars, 3, 'damaged saves clamp safely');
+  assert.equal(tourCards('junk').filter((c) => c.earned).length, 0);
+});
+
+test('Phase 2H campaign proof: the robot plays level 1→30 in order under the game’s own progression, and the tour completes', () => {
+  // mirrors main.js _done(): stars/best recorded, unlocked advances by one, card earned on finish
+  const save = normalizeSave(null);
+  for (let i = 0; i < LEVELS; i++) {
+    assert.ok(i + 1 <= save.unlocked, `level ${i + 1} must be open when the campaign reaches it`);
+    const r = robotRun(i, save.up);
+    assert.equal(r.state, 'done', `level ${i + 1}`);
+    const stars = r.starsFor();
+    assert.ok(stars >= 1, 'finishing always earns at least one star (kind rules)');
+    save.best[i + 1] = Math.max(save.best[i + 1] || 0, r.balls);
+    save.stars[i + 1] = Math.max(save.stars[i + 1] || 0, stars);
+    save.unlocked = Math.max(save.unlocked, Math.min(LEVELS, i + 2));
+    const cards = tourCards(save);
+    assert.equal(cards.filter((c) => c.earned).length, i + 1, `after level ${i + 1} exactly ${i + 1} cards are earned`);
+    assert.equal(cards[i].earned, true); assert.ok(cards[i].factAr && cards[i].factEn);
+  }
+  assert.equal(save.unlocked, LEVELS);
+  assert.ok(tourCards(save).every((c) => c.earned), 'the full 30-stop tour card is complete');
+});
+
+test('Phase 2H tour screen is wired into the menu (main.js)', () => {
+  const main = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes("showMenu('tour')"), 'menu reaches the tour screen');
+  assert.ok(main.includes('tourCards(this.save)'), 'cards are save-derived in the UI');
+  assert.ok(main.includes("tour: ['بطاقة الجولة', 'Tour card']"));
+});
+
+test('Director Protocol: gentle rules — a child who never steers still finishes every level (no fail state)', () => {
+  for (let i = 0; i < LEVELS; i++) {
+    const r = new Run({ level: i });
+    let t = 0;
+    while (r.state !== 'done' && t < 400) { r.step(1 / 30); t += 1 / 30; }
+    assert.equal(r.state, 'done', `level ${i + 1}: driving straight (hitting everything) must still finish kindly`);
+    assert.ok(r.starsFor() >= 1, 'finishing always earns a star');
+    assert.ok(r.balls >= 0, 'ball count never goes negative');
+  }
+});
+
+test('Director Protocol dressing: every level has a DIFFERENT background identity', () => {
+  assert.equal(DRESS.length, LEVELS, 'one dress entry per level');
+  assert.equal(new Set(DRESS.map((d) => d.lm)).size, LEVELS, 'all 30 landmarks are different');
+  assert.equal(new Set(DRESS.map((d) => d.sky)).size, LEVELS, 'all 30 sky colours are different — no two levels share a backdrop colour');
+  assert.equal(new Set(DRESS.map((d) => d.lamp)).size, LEVELS, 'all 30 lamp accents are different too');
+  for (let i = 0; i < LEVELS; i++) assert.equal(dressOf(i), DRESS[i], 'dressOf is the level table, append-only');
+  assert.equal(dressOf(999), DRESS[LEVELS - 1], 'out-of-range levels clamp to the finale dress');
+  // inside a leg the pano is shared (it is the leg painting) — the dress is what separates the levels
+  for (let leg = 0; leg < 5; leg++) {
+    const skies = new Set(Array.from({ length: 6 }, (_, k) => dressOf(leg * 6 + k).sky));
+    assert.equal(skies.size, 6, `leg ${leg + 1}: six different skies inside the leg`);
+  }
+});
+
+test('Director Protocol dressing is wired into the renderer (main.js)', () => {
+  const main = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes('dressOf(run.level)'), 'renderer asks the sim for the level dress');
+  assert.ok(main.includes('buildLandmark(dress.lm)'), 'the stop landmark is built per level');
+  assert.ok(main.includes('setHex(dress.sky)'), 'the sky comes from the dress, not only the theme');
 });
 
 import fs from 'node:fs';

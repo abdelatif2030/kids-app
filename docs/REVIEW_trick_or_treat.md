@@ -36,3 +36,24 @@ Still off: the painted houses sit far bigger than the code houses, so the code p
 **Tested.** npm test 16/16 (sim untouched). Browser differential through the real `_won()`: girl instance shows «شطووووورة!» and boy «شطووووور!»; zero page errors. fps 8.2 rAF under CDP 4× CPU throttling in headless SwiftShader — low in this software-GL environment (full-screen canvas painting predates this change; the fix touches only the win card). A comparable lower bound, not a device number; canvas paint cost logged as a Phase-2 perf item in docs/AI_WORK_LOG.md.
 
 **Not verified.** German/French feminine forms not eyeballed (the guard falls back to win_m wherever forms are identical). No real-device test. Voice clips for this game are not installed yet; VoiceCoach is wired and the lines are on the owner's "add to instinct" list.
+
+---
+
+## Phase 2D — Egypt anchor: «ليلة الوحاوي / Wahawy Night Run» (2026-11-27)
+
+**What changed (names only):** Halloween becomes the Egyptian wahawy
+lantern night. Title «حلاوة ولا مقلب / Trick or Treat» → **«ليلة
+الوحاوي / Wahawy Night Run»**; the subtitle leads "the kids with their
+wahawy lanterns"; the logo pumpkin is a lantern 🏮; the seven streets
+are Lantern Lane → Nile Park → Big Hara House → Clover Farm → Sweet
+Hill → Lantern Bridge → **Wahawy Parade**; the pumpkin costume is a
+lantern suit (the friendly mummy was already Egyptian). Crowd
+mechanics, costumes, the Phase 1 girl-line fix and saves untouched.
+
+**Tested:** `npm test` 17/17 (+1 anchor test); build green; real
+click-flow verify PASS — menu title and subtitle, street-1 run HUD
+with kids/candy counters, frames at 3 sizes, 0 page errors.
+
+**Not done (Batch F):** lantern-light trail effects and a Ramadan
+street backdrop pass are not built — the night street art is unchanged
+beyond names. Not tested on a real device.

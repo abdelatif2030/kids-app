@@ -125,3 +125,12 @@ test('the head-charge is the rhino\u2019s alone: charging smashes gates for a bo
   // and the alien truly has no charge to call
   assert.equal(alien.charge(), false);
 });
+
+import fs from 'node:fs';
+
+test('Zoomi over the Pyramids anchor: alien config flies over Egypt now', () => {
+  const game = fs.readFileSync(new URL('../src/game.js', import.meta.url), 'utf8');
+  assert.ok(game.includes("title: ['زومي فوق الأهرامات', 'Zoomi over the Pyramids']"));
+  assert.ok(game.includes('أهرامات الجيزة'));
+  assert.ok(!game.includes('Zoomi in Space'));
+});

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Trip, LEVELS, COLS, normalizeSave } from '../src/sim.js';
+import { Trip, LEVELS, COLS, normalizeSave, PICNIC, picnicEntries, picnicClipName, LEVEL_TINTS } from '../src/sim.js';
 
 /** Is it safe to stand on row r at column x for the next `secs`? */
 function safe(trip, r, x, secs = 0.7) {
@@ -140,4 +140,101 @@ test('damaged saves load safely', () => {
     const s = normalizeSave(bad);
     assert.ok(s.unlocked >= 1 && s.unlocked <= LEVELS.length && s.berries >= 0);
   }
+});
+
+test('Fennec Family anchor: the first six Western Desert journeys are unchanged', () => {
+  // levels 1–6 are save data: ids, names, seasons, lanes and speeds byte-for-byte as Phase 2D left them
+  assert.deepEqual(LEVELS.slice(0, 6), [
+    { id: 1, ar: 'واحة سيوة', en: 'Siwa Oasis', season: 'summer', lanes: 'ggrrgwggrrgtglggrgd', speed: 1 },
+    { id: 2, ar: 'الواحات البحرية', en: 'Bahariya Oasis', season: 'autumn', lanes: 'ggrrrgwwgtgrrgtglwgrrgd', speed: 1.15 },
+    { id: 3, ar: 'الصحراء البيضاء', en: 'The White Desert', season: 'winter', lanes: 'ggrrgwwgttgrrrglwgtgrrwgd', speed: 1.25 },
+    { id: 4, ar: 'واحة الفرافرة', en: 'Farafra Oasis', season: 'summer', lanes: 'ggrrgwwgtgrrrgwlgttgrrgwgtgrrgd', speed: 1.35 },
+    { id: 5, ar: 'واحة الداخلة', en: 'Dakhla Oasis', season: 'autumn', lanes: 'ggrrrgwwgttgrrgtlwwgrrrgtgwgrrgtgrrgd', speed: 1.45 },
+    { id: 6, ar: 'هضبة الجلف الكبير', en: 'Gilf Kebir Plateau', season: 'winter', lanes: 'ggrrgwwgttgrrrgwwlgtgrrwgttgrrrgwgtgrrwwgd', speed: 1.5 },
+  ]);
+});
+
+test('Phase 2F: twelve journeys — the road home through Fayoum, the Nile and the Delta', () => {
+  assert.equal(LEVELS.length, 12);
+  assert.deepEqual(LEVELS.map((l) => l.id), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  assert.deepEqual(LEVELS.slice(6).map((l) => l.en), ['The Black Desert', 'Wadi El Hitan', 'Fayoum Oasis', 'Nile Bank Reeds', 'Delta Farm Roads', 'Delta Canal Den']);
+  // no place repeats across all twelve journeys
+  assert.equal(new Set(LEVELS.map((l) => l.en)).size, 12);
+  assert.equal(new Set(LEVELS.map((l) => l.ar)).size, 12);
+  // the season cycle (the palette machinery) continues, speeds creep gently from level 6, boards stay long
+  assert.deepEqual(LEVELS.map((l) => l.season), ['summer', 'autumn', 'winter', 'summer', 'autumn', 'winter', 'summer', 'autumn', 'winter', 'summer', 'autumn', 'winter']);
+  for (let i = 1; i < LEVELS.length; i++) assert.ok(LEVELS[i].speed > LEVELS[i - 1].speed, 'speeds rise gently');
+  assert.ok(LEVELS[11].speed <= 1.7, 'and never rush a small child');
+  for (const lv of LEVELS.slice(6)) {
+    assert.ok(lv.lanes.length >= 44, `level ${lv.id} is a long journey`);
+    assert.ok(lv.lanes.startsWith('gg') && lv.lanes.endsWith('gd'), `level ${lv.id} starts on grass and ends at the den`);
+  }
+  // each new journey has its own signature mix of lanes, not just bigger numbers
+  const mixes = LEVELS.slice(6).map((l) => [...'rwtl'].map((c) => [...l.lanes].filter((x) => x === c).length).join('/'));
+  assert.equal(new Set(mixes).size, 6, `signatures differ: ${mixes.join(' | ')}`);
+  const count = (lv, c) => [...lv.lanes].filter((x) => x === c).length;
+  assert.ok(count(LEVELS[10], 'r') > count(LEVELS[8], 'r'), 'Delta farm roads are road country');
+  assert.ok(count(LEVELS[8], 'w') + count(LEVELS[8], 'l') > count(LEVELS[10], 'w') + count(LEVELS[10], 'l'), 'Fayoum is canal country');
+  assert.ok(count(LEVELS[9], 'l') >= 6, 'the Nile banks are a lily-pad reed maze');
+  assert.ok(count(LEVELS[6], 't') >= 4, 'the Black Desert is rail country');
+});
+
+test('Phase 2F: the unlock chain runs 1 → 12, one journey at a time', () => {
+  // simulate a child finishing each level in order: the save normalizeSave derives must open exactly the next one
+  let save = normalizeSave(null);
+  assert.equal(save.unlocked, 1);
+  for (let id = 1; id <= 12; id++) {
+    assert.ok(id <= save.unlocked, `level ${id} is open when its turn comes`);
+    save = normalizeSave({ ...save, stars: { ...save.stars, [id]: 2 }, unlocked: Math.min(12, id + 1) });
+    assert.equal(save.unlocked, Math.min(12, id + 1), `finishing ${id} opens ${id + 1 <= 12 ? id + 1 : 'nothing new'}`);
+  }
+  // and a star alone (an old or partial record) still implies the next journey is open
+  assert.equal(normalizeSave({ stars: { 7: 1 } }).unlocked, 8);
+  assert.equal(normalizeSave({ stars: { 11: 3 } }).unlocked, 12);
+});
+
+test('Phase 2F: an old 6-level save migrates with stars and berries intact, level 7 locked until earned', () => {
+  const old = { unlocked: 7, stars: { 1: 3, 2: 2, 3: 3, 4: 1, 5: 2, 6: 3 }, berries: 137, muted: true };
+  const s = normalizeSave(old);
+  assert.deepEqual(s.stars, old.stars);
+  assert.equal(s.berries, 137);
+  assert.equal(s.muted, true);
+  // the old save's unlocked=7 was "everything finished"; under 12 levels that reads as: 7 open, 8+ still locked
+  assert.equal(s.unlocked, 7);
+  // a save that had finished only level 5 keeps level 7 firmly locked
+  const mid = normalizeSave({ unlocked: 6, stars: { 1: 3, 2: 3, 3: 2, 4: 3, 5: 1 }, berries: 40 });
+  assert.equal(mid.unlocked, 6);
+  assert.ok(mid.unlocked < 7, 'level 7 stays locked until level 6 is earned');
+  // damaged new-level data is dropped, never crashes
+  const dmg = normalizeSave({ unlocked: 99, stars: { 12: 9, 7: -1, x: 2 }, berries: 'lots' });
+  assert.equal(dmg.unlocked, 12);
+  assert.deepEqual(dmg.stars, {});
+  assert.equal(dmg.berries, 0);
+});
+
+test('Phase 2F: the berry picnic album opens a card per finished journey, and only then', () => {
+  assert.equal(PICNIC.length, 12);
+  for (const p of PICNIC) { assert.ok(p.ar.length > 10 && p.en.length > 10 && p.icon, `picnic ${p.id} has both lines`); }
+  assert.deepEqual(PICNIC.map((p) => p.id), LEVELS.map((l) => l.id), 'one picnic per journey, in order');
+  const fresh = picnicEntries(null);
+  assert.equal(fresh.length, 12);
+  assert.ok(fresh.every((e) => !e.unlocked), 'a fresh save has every picnic still a secret');
+  const old = picnicEntries({ unlocked: 7, stars: { 1: 3, 2: 2, 3: 3, 4: 1, 5: 2, 6: 3 }, berries: 137 });
+  assert.deepEqual(old.map((e) => e.unlocked), [true, true, true, true, true, true, false, false, false, false, false, false], 'the old save keeps its six picnics and the new six stay secret');
+  const all = picnicEntries({ stars: Object.fromEntries(LEVELS.map((l) => [l.id, 1])) });
+  assert.ok(all.every((e) => e.unlocked), 'finishing everything opens the whole album');
+  for (const e of all) assert.equal(e.picnic.id, e.level.id, 'each card shows its own journey');
+  assert.equal(picnicClipName(LEVELS[6]), 'picnic7_1');
+  assert.equal(picnicClipName(LEVELS[11]), 'picnic12_1');
+});
+
+test('Certification Sweep A: every journey has its own background tint', () => {
+  assert.equal(LEVEL_TINTS.length, LEVELS.length, 'one tint per journey');
+  const pairs = LEVEL_TINTS.map((t) => `${t.sky}/${t.ground}/${t.grass}`);
+  assert.equal(new Set(pairs).size, LEVELS.length, 'no two journeys share a sky+ground+grass palette');
+  for (const season of ['summer', 'autumn', 'winter']) {
+    const skies = LEVELS.map((l, i) => (l.season === season ? LEVEL_TINTS[i].sky : null)).filter((x) => x !== null);
+    assert.equal(new Set(skies).size, skies.length, `the ${season} journeys no longer share one sky`);
+  }
+  assert.deepEqual(LEVEL_TINTS[0], { sky: 0xbfe8ff, ground: 0x7cc85a, grass: null }, 'Siwa keeps the original summer colours');
 });

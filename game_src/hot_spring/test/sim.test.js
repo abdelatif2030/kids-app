@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Village, UPGRADES, LANTERN_AT, SPRING, SIZE, normalizeSave } from '../src/sim.js';
+import { Village, UPGRADES, LANTERN_AT, SPRING, SIZE, normalizeSave, SITES, BIR_UPGRADES, BIR_LANTERN_AT, MILL_SPOTS, TEAHOUSE } from '../src/sim.js';
 
 const go = (me, tx, ty) => { const d = Math.hypot(tx - me.x, ty - me.y); return d < 0.5 ? { dx: 0, dy: 0 } : { dx: (tx - me.x) / d, dy: (ty - me.y) / d }; };
 
@@ -149,4 +149,96 @@ test('damaged saves load safely', () => {
   assert.equal(normalizeSave(null).finished, 0);
   assert.equal(normalizeSave({ bestTime: 'x', finished: -4 }).bestTime, 0);
   assert.equal(normalizeSave({ bestTime: 200.7 }).bestTime, 200);
+});
+
+import fs from 'node:fs';
+
+test('Cleopatra\'s Spring anchor: the village spring is Cleopatra\'s Spring in Siwa', () => {
+  const i18n = fs.readFileSync(new URL('../src/i18n.js', import.meta.url), 'utf8');
+  assert.ok(i18n.includes("title: ['عين كليوباترا', \"Cleopatra's Spring\"]"));
+});
+
+// ---- Phase 2G: Bir Sigam, the second site --------------------------------------------------------------------------------
+
+test('freeze: Cleopatra site content is unchanged (ids, order, costs, spots, lantern curve)', () => {
+  assert.deepEqual(UPGRADES.map((u) => [u.id, u.cost, u.x, u.y]), [
+    ['teahouse', 12, 44, 20], ['stack', 18, 22, 24.5], ['speed', 28, 9.5, 23.5], ['mill2', 40, 21.5, 34],
+    ['seats', 55, 35, 25.5], ['stack2', 75, 22, 24.5], ['helper', 95, 35.5, 11], ['seats2', 115, 35, 25.5],
+  ]);
+  assert.deepEqual(LANTERN_AT, [2, 4, 7, 11, 16, 22, 29, 37, 46, 56]);
+  assert.deepEqual(MILL_SPOTS, [{ x: 13, y: 17, pad: { x: 14.5, y: 21 } }, { x: 16, y: 30, pad: { x: 17.5, y: 33.5 } }]);
+  assert.deepEqual(TEAHOUSE, { x: 44, y: 14, door: { x: 41.5, y: 18 } });
+  assert.equal(SITES.cleopatra.upgrades, UPGRADES);
+  assert.equal(SITES.cleopatra.lanternAt, LANTERN_AT);
+  const v = new Village({ seed: 1 });
+  assert.equal(v.site, 'cleopatra');
+  assert.equal(v.cfg, SITES.cleopatra);
+});
+
+test('Bir Sigam is append-only: same effects in the same order, mirrored spots, costs keep rising', () => {
+  assert.deepEqual(BIR_UPGRADES.map((u) => u.id), UPGRADES.map((u) => u.id));
+  assert.deepEqual(BIR_UPGRADES.map((u) => u.cost), [15, 22, 34, 48, 66, 90, 115, 140]);
+  for (let i = 1; i < BIR_UPGRADES.length; i++) assert.ok(BIR_UPGRADES[i].cost > BIR_UPGRADES[i - 1].cost);
+  for (const u of BIR_UPGRADES) {
+    const old = UPGRADES.find((o) => o.id === u.id);
+    assert.equal(u.x, SIZE.w - old.x, `${u.id} is the mirrored spot`);
+    assert.equal(u.y, old.y);
+  }
+  assert.deepEqual(BIR_LANTERN_AT, [3, 6, 10, 15, 21, 28, 36, 45, 55, 66]);
+  assert.ok(BIR_LANTERN_AT[BIR_LANTERN_AT.length - 1] > LANTERN_AT[LANTERN_AT.length - 1], 'gently rising curve');
+  const v = new Village({ seed: 1, site: 'bir' });
+  assert.equal(v.site, 'bir');
+  assert.equal(v.mills[0].x, SIZE.w - MILL_SPOTS[0].x);
+  assert.equal(v.cfg.teahouse.x, SIZE.w - TEAHOUSE.x);
+  // the Bir lantern curve drives the Bir village, not Cleopatra's
+  v.thawed = BIR_LANTERN_AT[2];
+  v.step(0.05);
+  assert.equal(v.lit, 3);
+});
+
+test('old saves migrate: past finishes were Cleopatra\'s, Bir Sigam newly available, site 1 intact', () => {
+  const old = normalizeSave({ bestTime: 300, finished: 2, guests: 120, muted: true });
+  assert.equal(old.finishedCleopatra, 2);
+  assert.equal(old.finishedBir, 0);
+  assert.equal(old.finished, 2);
+  assert.equal(old.birUnlocked, true);
+  assert.equal(old.site, 'cleopatra');
+  assert.equal(old.bestTime, 300);
+  assert.equal(old.guests, 120);
+  // a fresh save has Bir Sigam locked, and a save claiming Bir early is forced back to site 1
+  const fresh = normalizeSave({ finished: 0, site: 'bir' });
+  assert.equal(fresh.birUnlocked, false);
+  assert.equal(fresh.site, 'cleopatra');
+  // an unlocked save may sit on Bir Sigam and round-trips with both sites' progress intact
+  const onBir = normalizeSave({ finishedCleopatra: 1, finishedBir: 0, site: 'bir', bestTimeBir: 410 });
+  assert.equal(onBir.site, 'bir');
+  assert.equal(onBir.finished, 1);
+  assert.equal(onBir.bestTimeBir, 410);
+  assert.deepEqual(normalizeSave(onBir), onBir);
+});
+
+test('scripted campaign proof: robot warms Cleopatra, Bir Sigam unlocks, robot warms Bir Sigam', () => {
+  // chapter 1
+  const c1 = run(3);
+  assert.equal(c1.v.state, 'done');
+  assert.equal(c1.v.site, 'cleopatra');
+  // the save update the result card performs, through the real migration path
+  let save = normalizeSave({ finished: 0, guests: 0 });
+  assert.equal(save.birUnlocked, false);
+  save = normalizeSave({ ...save, finishedCleopatra: save.finishedCleopatra + 1, guests: save.guests + c1.v.thawed });
+  assert.equal(save.birUnlocked, true, 'Bir Sigam opens after the first Cleopatra finish');
+  // chapter 2, played in a Bir village
+  const v = new Village({ seed: 7, site: 'bir' });
+  let t = 0;
+  while (v.state !== 'done' && t < 2400) { v.step(1 / 30, robot(v)); t += 1 / 30; }
+  assert.equal(v.state, 'done', `Bir not done after ${t | 0}s, lit ${v.lit}, thawed ${v.thawed}, up ${v.up}`);
+  assert.equal(v.lit, BIR_LANTERN_AT.length);
+  assert.ok(v.thawed >= BIR_LANTERN_AT[BIR_LANTERN_AT.length - 1]);
+  console.log(`Bir Sigam robot finished in ${t.toFixed(0)}s, thawed ${v.thawed}, coins earned ${v.coinsTotal}, upgrades ${v.up}/${BIR_UPGRADES.length}`);
+  // finishing Bir never regresses chapter 1, and the whole game survives a save round-trip
+  save = normalizeSave({ ...save, finishedBir: save.finishedBir + 1, guests: save.guests + v.thawed, site: 'bir' });
+  assert.equal(save.finishedCleopatra, 1);
+  assert.equal(save.finishedBir, 1);
+  assert.equal(save.finished, 2);
+  assert.deepEqual(normalizeSave(save), save);
 });

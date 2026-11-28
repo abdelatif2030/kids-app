@@ -366,7 +366,7 @@ class Game {
     this.crane = null;
     this.clockTower = null;
     if (look.neon) {
-      const a = makeNeonSign(getLang() === 'en' ? 'ZOMBIE PIZZA' : 'بيتزا الزومبي', '#ff5ab8');
+      const a = makeNeonSign(getLang() === 'en' ? 'NILE PIZZA' : 'بيتزا النيل', '#ff5ab8');
       a.position.set(W + 6, -1, -D + 2);
       a.rotation.y = -Math.PI / 2;
       w.add(a);

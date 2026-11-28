@@ -147,3 +147,10 @@ test('stars, upgrades and skins economy', () => {
   assert.equal(finishStage(f, 1, { won: true, stars: 1, score: 10, coins: 0 }).stars[1], 2);
   assert.equal(finishStage(normalizeSave(null), 1, { won: false, stars: 0, score: 0, coins: 5 }).unlocked, 1);
 });
+
+import fs from 'node:fs';
+
+test('Nile Sky Ace internal rename (the game stays out of the fun sections by owner decision)', () => {
+  const main = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes("title: ['طيّار النيل', 'Nile Sky Ace']"));
+});

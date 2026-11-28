@@ -14,7 +14,7 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 const COURSE_CLIPS = { go: 2, nitro: 3, pickup: 2, charge: 2, trick: 2, bump: 3, win: 2, lose: 2, count: 1 };
 
 const THEME = {
-  alien: { id: 'alien', glob: 'AlienSky', prefix: 'as', title: ['زومي في الفضا', 'Zoomi in Space'], icon: '👽', sky: 0x2a1060, fog: 0x4a2a90, panel: ['#7a3ad8', '#3a1a88'], accent: '#7affc8', end: ['الصاروخ', 'Rocket'], names: ['جزر الإقلاع', 'حقل النيازك', 'سباق الصاروخ', 'مدار الأقمار', 'عاصفة الشهب', 'قلب المجرة'] },
+  alien: { id: 'alien', glob: 'AlienSky', prefix: 'as', title: ['زومي فوق الأهرامات', 'Zoomi over the Pyramids'], icon: '👽', sky: 0x2a1060, fog: 0x4a2a90, panel: ['#7a3ad8', '#3a1a88'], accent: '#7affc8', end: ['الصاروخ', 'Rocket'], names: ['جزر النيل', 'أهرامات الجيزة', 'سباق فوق النيل', 'برج القاهرة', 'سماء الإسكندرية', 'قلب القاهرة'] },
   rhino: { id: 'rhino', glob: 'RhinoSummit', prefix: 'rs', title: ['كركوز وقمم مصر', 'Karkoz Climbs Egypt'], icon: '🦏', sky: 0x7ac8ff, fog: 0xbfe8ff, panel: ['#4a9ad8', '#1a5aa8'], accent: '#ffd23a', end: ['البوابة الدهبية', 'Golden gate'], names: ['سفوح الجلالة', 'جبال البحر الأحمر', 'وادي فيران', 'سانت كاترين', 'قمة موسى', 'قمة كاترين الكبرى'] },
 };
 

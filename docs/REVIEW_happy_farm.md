@@ -33,3 +33,35 @@ Nothing changed (no code edits, bundle untouched). `npm test`: 19/19 pass.
 ## Still unknown / different
 * Video missing: look and feel of the original cannot be verified.
 * Not tested on a real phone; frame rate and sound not judged by a person.
+
+---
+
+## Phase 2D — Egypt anchor + Batch C fix: «مزرعة الدلتا / Delta Farm» (2026-11-27)
+
+**What was wrong:** (1) the third star was gated on `bumps <= 2` — a
+child who gently bumped three rocks lost a star for it, the exact
+pressure rule Batch C listed for this game; (2) a generic "Happy Farm"
+with farms named for nowhere.
+
+**What changed:**
+- **Bump grading removed.** Stars are now: finishing the harvest +
+  herding every animal + a **completion star** for bringing in (almost)
+  every last crop (progress ≥ 0.99 instead of the 0.95 finish line).
+  Bumps are still counted for the result card; they just never grade.
+  A guard test pins the formula.
+- Title: «مزرعتي السعيدة / Happy Farm» → **«مزرعة الدلتا / Delta
+  Farm»** — with Uncle Saeed's farm now explicitly in the Delta.
+- The eight farms are Delta places: Golden Delta Valley → Delta Clover
+  Hill → Mansoura Corn Corner → Tanta Sunny Fields → Faiyum Sakieh Farm
+  (the windmill is a sakieh now) → Great Delta Plain → Rosetta Branch
+  Valley → Grand Delta Farm. ids/layouts/crops/rocks/saves unchanged.
+
+**Tested:** `npm test` 21/21 (+2: Delta anchor; star-formula guard — the
+suite's robot farmer still completes every farm). Build green. Real
+click-flow: the generic harness cannot start this game (its menu is a
+farm map with no Play button), so gameplay was confirmed with a targeted
+click on farm node 1 — driving HUD with the drag-to-drive tutorial,
+0 page errors; menu frames at 3 sizes from the harness run.
+
+**Not done (Batch F):** the four-season calendar with a flood week is
+not built. Not tested on a real device.

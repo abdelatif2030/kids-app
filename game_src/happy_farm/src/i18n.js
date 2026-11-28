@@ -1,5 +1,5 @@
 const S = {
-  title: ['مزرعتي السعيدة', 'Happy Farm'],
+  title: ['مزرعة الدلتا', 'Delta Farm'],
   farm: ['مزرعة', 'Farm'],
   pick: ['اختار المزرعة', 'Choose a farm'],
   shed: ['مخزن العدة', 'Tool shed'],

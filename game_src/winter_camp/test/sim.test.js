@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Camp, BUILDS, SITE, FIRE, normalizeSave } from '../src/sim.js';
+import { Camp, BUILDS, SUMMIT_START, SITE, FIRE, normalizeSave } from '../src/sim.js';
 
 /** A robot survivor: walks to the nearest tree, chops, carries to the site; buys helpers and bags when it can. */
 function robot(c) {
@@ -17,10 +17,10 @@ function robot(c) {
   return d < 1.2 ? { dx: 0, dy: 0 } : { dx: (tx - me.x) / d, dy: (ty - me.y) / d };
 }
 
-test('a lone survivor with helpers builds all six buildings (cabin to sled) and opens the gate', () => {
+test('a lone survivor with helpers builds all nine buildings (cabin to summit beacon) and opens the gate', () => {
   const c = new Camp({ seed: 4 });
   let t = 0;
-  while (c.state !== 'done' && t < 1500) {
+  while (c.state !== 'done' && t < 2400) {
     c.hireHelper();
     if (c.coins > 60) c.upgradeBag();
     c.step(1 / 30, robot(c));
@@ -28,8 +28,9 @@ test('a lone survivor with helpers builds all six buildings (cabin to sled) and 
   }
   assert.equal(c.state, 'done', `not done after ${t | 0}s, stage ${c.stage}`);
   assert.equal(c.stage, BUILDS.length);
+  assert.equal(c.logsTotal, 374); // 170 original + 204 summit camp
   console.log(`finished in ${t.toFixed(0)}s, helpers ${c.helpers.length}, logs ${c.logsTotal}`);
-  assert.ok(t < 900);
+  assert.ok(t < 1500);
 });
 
 test('logs go in the bag, then to the site: one coin per log; the build advances', () => {
@@ -71,4 +72,80 @@ test('helpers and the bag cost coins', () => {
 test('damaged saves load safely', () => {
   assert.equal(normalizeSave(null).best, 0);
   assert.equal(normalizeSave({ best: 'x' }).best, 0);
+});
+
+import fs from 'node:fs';
+
+test('Saint Catherine Camp anchor: title placed on Egypt\'s snowy mountain', () => {
+  const i18n = fs.readFileSync(new URL('../src/i18n.js', import.meta.url), 'utf8');
+  assert.ok(i18n.includes("title: ['معسكر سانت كاترين', 'Saint Catherine Camp']"));
+  assert.equal(BUILDS[0].logs, 8);
+});
+
+// ---- Phase 2G: the summit camp (append-only finale) ----
+
+const ORIGINAL_SIX = [
+  { id: 'cabin', ar: 'الكوخ الخشبي', en: 'Log cabin', logs: 8 },
+  { id: 'workshop', ar: 'الورشة', en: 'Workshop', logs: 14 },
+  { id: 'sawmill', ar: 'المنشرة', en: 'Sawmill', logs: 20 },
+  { id: 'greenhouse', ar: 'الصوبة الزجاجية', en: 'Glass greenhouse', logs: 34 },
+  { id: 'tower', ar: 'برج المراقبة', en: 'Watch tower', logs: 42 },
+  { id: 'sled', ar: 'زلاجة المؤن', en: 'Supply sled', logs: 52 },
+];
+
+test('freeze: the original six builds are byte-identical and the summit tier is appended after them', () => {
+  assert.deepEqual(BUILDS.slice(0, 6), ORIGINAL_SIX);
+  assert.equal(BUILDS.length, 9);
+  assert.deepEqual(BUILDS.slice(SUMMIT_START).map((b) => b.id), ['trail', 'shelter', 'beacon']);
+  assert.equal(SUMMIT_START, 6);
+});
+
+test('unlock chain: builds complete strictly in order, the summit opens only after the sled, the gate only after the beacon', () => {
+  const c = new Camp({ seed: 7 });
+  const builtOrder = [];
+  let summitEvents = 0;
+  let gateBeforeBeacon = false;
+  const watch = (evs) => {
+    for (const e of evs) {
+      if (e.type === 'built') builtOrder.push(e.id);
+      if (e.type === 'summit') summitEvents += 1;
+      if (e.type === 'gate' && !builtOrder.includes('beacon')) gateBeforeBeacon = true;
+    }
+  };
+  while (c.state === 'play') {
+    const b = c.build;
+    assert.ok(b, 'a build is always available while playing');
+    c.me.x = SITE.x; c.me.y = SITE.y;
+    c.me.bag = Math.min(c.bagMax, b.logs - c.progress);
+    watch(c.step(0.1));
+    if (c.stage < SUMMIT_START) assert.equal(c.atSummit, false);
+    if (builtOrder.length > 0 && builtOrder.length < BUILDS.length) assert.notEqual(c.state, 'gate');
+  }
+  assert.equal(c.state, 'gate'); // the gate phase follows the beacon, then done
+  assert.equal(c.build, null);
+  while (c.state !== 'done') watch(c.step(0.1));
+  assert.deepEqual(builtOrder, BUILDS.map((b) => b.id));
+  assert.equal(summitEvents, 1); // announced exactly once, when the sled is done
+  assert.equal(gateBeforeBeacon, false);
+  assert.equal(c.atSummit, true);
+});
+
+test('the summit tier is the gentle finale of the same curve (no spike, no new harsh mechanic)', () => {
+  for (let i = SUMMIT_START; i < BUILDS.length; i++) {
+    assert.ok(BUILDS[i].logs > BUILDS[i - 1].logs, 'each summit build costs a little more');
+    assert.ok(BUILDS[i].logs - BUILDS[i - 1].logs <= 10, 'increments stay as gentle as the existing ladder');
+  }
+  const total = BUILDS.reduce((s, b) => s + b.logs, 0);
+  assert.equal(total, 374);
+});
+
+test('old saves migrate: a pre-summit save keeps best/finished and gains summits = 0', () => {
+  const old = normalizeSave({ best: 170, finished: 1, muted: true });
+  assert.equal(old.best, 170);
+  assert.equal(old.finished, 1);
+  assert.equal(old.summits, 0);
+  assert.equal(old.muted, true);
+  assert.equal(normalizeSave({ summits: 3 }).summits, 3);
+  assert.equal(normalizeSave({ summits: 'x' }).summits, 0);
+  assert.equal(normalizeSave(undefined).summits, 0);
 });

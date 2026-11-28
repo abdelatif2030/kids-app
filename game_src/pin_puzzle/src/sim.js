@@ -291,8 +291,9 @@ export class Puzzle {
       if (this.reachedAt < 0) { this.reachedAt = this.time; ev.push({ type: 'goal' }); }
       if (calm || this.time - this.reachedAt > 3) {
         this.state = 'won';
-        const loss = this.lost / Math.max(1, this.balls.length);
-        this.stars = this.lost === 0 && this.moves <= this.par ? 3 : loss <= 0.3 ? 2 : 1;
+        // Kind rules (Batch C): move-par no longer grades. Stars = solved, plus a
+        // no-loss star, plus the SPARKLE star for landing every single ball in the jar.
+        this.stars = 1 + (this.lost === 0 ? 1 : 0) + (this.inJar >= this.balls.length ? 1 : 0);
         ev.push({ type: 'won', stars: this.stars });
       }
     } else if (calm) {

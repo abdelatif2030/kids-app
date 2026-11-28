@@ -234,3 +234,12 @@ test('determinism: same input gives same state', () => {
   const run = () => { const s = new Sim({ level: 3, seed: 2 }); for (let i = 0; i < 600; i++) s.step(DT, { held: i % 50 < 12 }); return JSON.stringify({ x: s.hero.x, y: s.hero.y, k: s.kids, c: s.candy }); };
   assert.equal(run(), run());
 });
+
+import fs from 'node:fs';
+
+test('Wahawy Night Run anchor: Halloween becomes the wahawy lantern night', () => {
+  const main = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes("title: ['ليلة الوحاوي', 'Wahawy Night Run']"));
+  assert.ok(main.includes('Wahawy Parade') && main.includes('Lantern Lane'));
+  assert.ok(!main.includes('Pumpkin Lane'));
+});

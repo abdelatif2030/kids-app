@@ -2,7 +2,8 @@
 // jump (safe in the air). The long sticky tongue snaps by itself at the nearest critter whose number is not bigger
 // than the frog's; eating it adds its number, and the frog grows. Critters with a bigger number cannot be eaten;
 // big frogs, snakes and herons with a bigger number try to eat the frog (a red dotted line or a shadow warns first).
-// Being caught costs a heart (nothing else). Each level: grow to evolve, grow more, then beat the boss.
+// Being caught costs a SPLASH (nothing else): the frog slips free, wet and wiser — a catch can never end the
+// run (kind rules, Batch C: hearts became splashes). Each level: grow to evolve, grow more, then beat the boss.
 // Six levels (the first three: Misty Dawn (Big Bo the bully frog), Lily Marsh (Sly the snake), Sunset Swamp (the Grand Heron).
 // Deterministic with a seed for the robot tests.
 
@@ -21,13 +22,13 @@ export const KINDS = {
 };
 
 export const LEVELS = [
-  { id: 1, ar: 'فجر ضبابي', en: 'Misty Dawn', start: 4, evolve: 15, boss: 26, kinds: ['fly', 'fly', 'mosquito', 'beetle', 'dragonfly', 'frog'], heron: false, bossKind: 'bigbo', bossPower: 40, bossHp: 40 },
-  { id: 2, ar: 'مستنقع الزنابق', en: 'Lily Marsh', start: 8, evolve: 30, boss: 50, kinds: ['fly', 'mosquito', 'beetle', 'dragonfly', 'dragonfly', 'fish', 'frog', 'snake'], heron: true, bossKind: 'snake', bossPower: 70, bossHp: 60 },
-  { id: 3, ar: 'مستنقع الغروب', en: 'Sunset Swamp', start: 15, evolve: 60, boss: 90, kinds: ['mosquito', 'dragonfly', 'dragonfly', 'fish', 'fish', 'frog', 'snake', 'snake'], heron: true, bossKind: 'heron', bossPower: 130, bossHp: 90 },
+  { id: 1, ar: 'فجر البرلس', en: 'Burullus Dawn', start: 4, evolve: 15, boss: 26, kinds: ['fly', 'fly', 'mosquito', 'beetle', 'dragonfly', 'frog'], heron: false, bossKind: 'bigbo', bossPower: 40, bossHp: 40 },
+  { id: 2, ar: 'مستنقع زنابق البرلس', en: 'Burullus Lily Marsh', start: 8, evolve: 30, boss: 50, kinds: ['fly', 'mosquito', 'beetle', 'dragonfly', 'dragonfly', 'fish', 'frog', 'snake'], heron: true, bossKind: 'snake', bossPower: 70, bossHp: 60 },
+  { id: 3, ar: 'غروب البرلس', en: 'Burullus Sunset', start: 15, evolve: 60, boss: 90, kinds: ['mosquito', 'dragonfly', 'dragonfly', 'fish', 'fish', 'frog', 'snake', 'snake'], heron: true, bossKind: 'heron', bossPower: 130, bossHp: 90 },
   // 2026-11-21: three more ponds after the first three (the boss comes back bigger, with a new name)
-  { id: 4, ar: 'بركة القمر', en: 'Moonlit Pond', start: 20, evolve: 80, boss: 130, kinds: ['mosquito', 'dragonfly', 'dragonfly', 'fish', 'fish', 'frog', 'snake', 'frog'], heron: true, bossKind: 'bigbo2', bossPower: 190, bossHp: 110 },
-  { id: 5, ar: 'مستنقع الزمرد', en: 'Emerald Fen', start: 30, evolve: 110, boss: 180, kinds: ['dragonfly', 'fish', 'fish', 'fish', 'frog', 'snake', 'snake', 'snake'], heron: true, bossKind: 'snake2', bossPower: 260, bossHp: 130 },
-  { id: 6, ar: 'بحيرة الأساطير', en: 'Legend Lake', start: 40, evolve: 150, boss: 250, kinds: ['dragonfly', 'fish', 'fish', 'frog', 'frog', 'snake', 'snake', 'beetle'], heron: true, bossKind: 'heron2', bossPower: 360, bossHp: 160 },
+  { id: 4, ar: 'بركة قمر البرلس', en: 'Burullus Moon Pond', start: 20, evolve: 80, boss: 130, kinds: ['mosquito', 'dragonfly', 'dragonfly', 'fish', 'fish', 'frog', 'snake', 'frog'], heron: true, bossKind: 'bigbo2', bossPower: 190, bossHp: 110 },
+  { id: 5, ar: 'مستنقع البرلس الزمردي', en: 'Emerald Burullus Fen', start: 30, evolve: 110, boss: 180, kinds: ['dragonfly', 'fish', 'fish', 'fish', 'frog', 'snake', 'snake', 'snake'], heron: true, bossKind: 'snake2', bossPower: 260, bossHp: 130 },
+  { id: 6, ar: 'بحيرة البرلس', en: 'Lake Burullus', start: 40, evolve: 150, boss: 250, kinds: ['dragonfly', 'fish', 'fish', 'frog', 'frog', 'snake', 'snake', 'beetle'], heron: true, bossKind: 'heron2', bossPower: 360, bossHp: 160 },
 ];
 
 export const BOSS = {
@@ -68,8 +69,7 @@ export class Pond {
     this.easy = !!opts.easy;
     this.rand = rng(opts.seed ?? 3);
     this.frog = { x: 0, z: 6, power: this.level.start, face: Math.PI, hopT: 0, leapT: 0, leapCd: 0, vx: 0, vz: 0, invul: 0, stage: 1 };
-    this.hearts = this.easy ? 4 : 3;
-    this.maxHearts = this.hearts;
+    this.splashes = 0; // times caught — counted for the result card, never a life
     this.critters = [];
     this.tongue = null;
     this.herons = [];
@@ -224,21 +224,16 @@ export class Pond {
   _hurt(by) {
     const f = this.frog;
     if (f.invul > 0 || this.airborne || this.state !== 'play') return;
-    this.hearts--;
+    this.splashes++;
     f.invul = 2;
     this.combo = 0;
-    // knocked back a little (the frog slips free)
+    // knocked back a little (the frog slips free with a splash — always recoverable)
     const dx = f.x - (by ? by.x : f.x);
     const dz = f.z - (by ? by.z : f.z + 1);
     const l = Math.hypot(dx, dz) || 1;
     f.kx = (dx / l) * 8;
     f.kz = (dz / l) * 8;
-    this.events.push({ type: 'hurt', by: by ? by.kind : 'heron', hearts: this.hearts });
-    if (this.hearts <= 0) {
-      this.state = 'lost';
-      this.result = this._result(false, by ? by.kind : 'heron');
-      this.events.push({ type: 'gulped', by: this.result.by });
-    }
+    this.events.push({ type: 'hurt', by: by ? by.kind : 'heron', splashes: this.splashes });
   }
 
   // ---- tongue -------------------------------------------------------------------------------------------------------
@@ -442,8 +437,8 @@ export class Pond {
   }
 
   _result(won, by) {
-    const lost = this.maxHearts - this.hearts;
-    return { won, stars: won ? 1 + (lost <= 1 ? 1 : 0) + (lost === 0 ? 1 : 0) : 0, power: this.frog.power, eaten: this.eaten, drops: this.drops, by };
+    // Stars reward the feast (collection), never the mistakes: splashes are reported, not graded.
+    return { won, stars: won ? 1 + (this.eaten >= 8 ? 1 : 0) + (this.eaten >= 16 ? 1 : 0) : 0, power: this.frog.power, eaten: this.eaten, drops: this.drops, splashes: this.splashes, by };
   }
 }
 

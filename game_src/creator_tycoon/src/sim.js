@@ -10,8 +10,8 @@ export const RANKS = [
   { id: 'junior', ar: 'مبتدئ', en: 'Junior', goal: 10 },
   { id: 'lead', ar: 'قائد فريق', en: 'Lead', goal: 16 },
   { id: 'art', ar: 'مدير فني', en: 'Art Director', goal: 22 },
-  { id: 'vp', ar: 'نائب الرئيس', en: 'VP', goal: 30 },
-  { id: 'board', ar: 'مجلس الإدارة', en: 'Board of Directors', goal: 0 },
+  { id: 'vp', ar: 'مدير الاستوديو', en: 'Studio Manager', goal: 30 },
+  { id: 'board', ar: 'صاحب الاستوديو', en: 'Studio Owner', goal: 0 },
 ];
 export const KINDS = {
   photo: { ar: 'صورة', en: 'PHOTO', icon: '📷', cash: 6, stars: 1, unlock: 0 },

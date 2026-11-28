@@ -163,3 +163,20 @@ test('save: damaged data loads safely; upgrades cost coins; farms open one by on
   assert.equal(save.stars[1], 2, 'best stars kept');
   assert.equal(CELL, 0.5);
 });
+
+import fs from 'node:fs';
+
+test('Delta Farm anchor: eight Delta farms, ids and layouts unchanged', () => {
+  assert.equal(LEVELS.length, 8);
+  assert.deepEqual(LEVELS.map((l) => l.id), [1, 2, 3, 4, 5, 6, 7, 8]);
+  assert.equal(LEVELS[0].en, 'Golden Delta Valley');
+  assert.equal(LEVELS[4].en, 'Faiyum Sakieh Farm');
+  assert.equal(LEVELS[7].en, 'Grand Delta Farm');
+  assert.ok(LEVELS.every((l) => /Delta|Mansoura|Tanta|Faiyum|Rosetta|الدلتا|المنصورة|طنطا|الفيوم|رشيد/.test(l.en + l.ar)));
+});
+
+test('kind rules: rock bumps never grade stars — the third star is full completion', () => {
+  const src = fs.readFileSync(new URL('../src/sim.js', import.meta.url), 'utf8');
+  assert.ok(!/stars = .*bumps/.test(src), 'star formula still uses bumps');
+  assert.ok(/stars = 1 \+ \(herdAll \? 1 : 0\) \+ \(this\.progress >= 0\.99 \? 1 : 0\)/.test(src), 'completion star missing');
+});

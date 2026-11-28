@@ -11,7 +11,7 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 const SKY_CLIPS = { trick: 3, pickup: 2, charge: 2, bump: 3, nitro: 2, near: 2, win: 2, lose: 2, count: 1 };
 
 const S = {
-  title: ['طيار السحاب', 'Sky Ace'], play: ['العب', 'PLAY'], stages: ['المراحل', 'STAGES'], hangar: ['الورشة', 'HANGAR'], settings: ['الإعدادات', 'SETTINGS'],
+  title: ['طيّار النيل', 'Nile Sky Ace'], play: ['العب', 'PLAY'], stages: ['المراحل', 'STAGES'], hangar: ['الورشة', 'HANGAR'], settings: ['الإعدادات', 'SETTINGS'],
   exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], back: ['رجوع', 'Back'], resume: ['كمّل', 'Resume'], again: ['جرّب تاني', 'Try again'], next: ['المرحلة الجاية', 'Next stage'],
   demo: ['تجربة — دوس عشان القائمة', 'DEMO — TAP FOR MENU'], paused: ['وقفة', 'Paused'], sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
   how: ['اسحب إصبعك لتحريك الطيارة — بتضرب لوحدها!', 'Drag to fly — it shoots by itself!'], bomb: ['قنبلة', 'FIRE'],

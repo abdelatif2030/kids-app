@@ -1,17 +1,17 @@
 // «عالم القفز» — Hop World. Entry: window.HopWorld.start(container, config, post).
 //   config: { lang, age, gender, save, base }   post: { type: 'save', save } | { type: 'exit' }
 // A classic side-scrolling platformer with an original hero: run, jump over pits and pipes, bump question blocks, grab the
-// power-up, stomp bugs, reach the flag. 8 levels in 4 worlds. Canvas 2D, all art and sound made in code.
-import { World, LEVELS, WORLDS, normalizeSave } from './sim.js';
+// power-up, stomp bugs, reach the flag. 16 levels in 8 worlds. Canvas 2D, all art and sound made in code.
+import { World, LEVELS, WORLDS, worldName, normalizeSave } from './sim.js';
 import { Sound } from './audio.js';
 import { h, css, makeI18n, clamp } from '../../cozy_kit/ui.js';
 import { VoiceCoach } from '../../cozy_kit/voice.js';
 
 const HOP_CLIPS = { go: 2, pickup: 2, trick: 2, charge: 2, bump: 3, lap: 1, win: 2, lose: 2 };
-import { PAL, makeSprites, drawBackground, drawHero, drawBug, drawMushroom, drawCoin, drawPipe, drawFlag, drawCastle } from './art.js';
+import { PAL, makeSprites, drawBackground, bgVariant, drawHero, drawBug, drawMushroom, drawCoin, drawPipe, drawFlag, drawCastle, drawLandmark } from './art.js';
 
 const S = {
-  title: ['عالم القفز', 'Hop World'], sub: ['اختار المستوى', 'Pick a level'], exit: ['خروج', 'Exit'], menu: ['المستويات', 'Levels'],
+  title: ['نطّات النيل', 'Nile Hops'], sub: ['اختار المستوى', 'Pick a level'], exit: ['خروج', 'Exit'], menu: ['المستويات', 'Levels'],
   again: ['من الأول', 'Try again'], next: ['المستوى الجاي', 'Next level'], resume: ['كمّل', 'Resume'], pausedT: ['استراحة', 'Paused'],
   sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'], hint1: ['اجري يمين وانط فوق الحفر!', 'Run right and jump over the pits!'],
   hintMush: ['خد الفطرة! 💜', 'Grab the mushroom! 💜'], hintCp: ['علامة حفظ ✔', 'Checkpoint ✔'], hintBig: ['كبرت! 💪', 'You grew! 💪'],
@@ -21,7 +21,7 @@ const S = {
   jump: ['قفز', 'Jump'], left: ['شمال', 'Left'], right: ['يمين', 'Right'], mute: ['الصوت', 'Sound'], coins: ['عملات', 'Coins'],
 };
 const I = makeI18n(S);
-const WORLD_ICON = ['🌳', '🦇', '🏜️', '❄️'];
+const WORLD_ICON = ['🌳', '🦇', '🏜️', '❄️', '⛵', '🏛️', '🌊', '🌴'];
 
 class Game {
   constructor(el, config, post) {
@@ -123,7 +123,7 @@ class Game {
       const open = i + 1 <= this.save.unlocked;
       const st = this.save.stars[i + 1] || 0;
       const b = h('button', { class: `hw-lv${open ? '' : ' lock'}`, 'aria-label': `${I.t('title')} ${i + 1}`, onclick: () => { if (!open) return; this.sound.play('tap'); this.startLevel(i); } },
-        h('i', {}, open ? WORLD_ICON[Math.floor(i / 2) % 4] : '🔒'), h('span', {}, I.num(i + 1)), h('span', {}, st ? '⭐'.repeat(st) : '·'));
+        h('i', {}, open ? WORLD_ICON[Math.floor(i / 2) % WORLD_ICON.length] : '🔒'), h('span', {}, I.num(i + 1)), h('span', {}, st ? '⭐'.repeat(st) : '·'));
       lvs.append(b);
     }
     this.layer.append(h('div', { class: 'hw-dim' }, h('div', { class: 'hw-card' },
@@ -145,7 +145,7 @@ class Game {
     const pause = h('button', { class: 'hw-round', 'aria-label': I.t('pausedT'), onclick: () => this.pauseGame() }, '⏸');
     this.hint = h('div', { class: 'hw-hint' }, '');
     this.layer.append(this.flash,
-      h('div', { class: 'hw-top' }, pause, h('div', { class: 'hw-pill' }, '🪙 ', this.coinEl), h('div', { class: 'hw-pill' }, '❤️ ', this.lifeEl), h('div', { class: 'hw-pill' }, `${WORLD_ICON[Math.floor(i / 2) % 4]} ${I.num(i + 1)}`), this._muteBtn()),
+      h('div', { class: 'hw-top' }, pause, h('div', { class: 'hw-pill' }, '🪙 ', this.coinEl), h('div', { class: 'hw-pill' }, '❤️ ', this.lifeEl), h('div', { class: 'hw-pill' }, `${WORLD_ICON[Math.max(0, WORLDS.indexOf(this.w.world))]} ${worldName(this.w.world, I.getLang())} ${I.num(i + 1)}`), this._muteBtn()),
       this.hint, this._pad(), this._jump());
     this._soundPill();
     if (i === 0) this._say(I.t('hint1'), 4);
@@ -280,7 +280,7 @@ class Game {
     const world = w.world; const P = PAL[world];
     if (inMenu) this._sprites(world);
     const gy = sy(12);
-    drawBackground(g, world, W, H, camX, ts, gy, this.clock);
+    drawBackground(g, world, W, H, camX, ts, gy, this.clock, inMenu ? 0 : bgVariant(this.level));
     const grid = w.grid; const sp = this.sprites; const T = Math.ceil(ts) + 1;
     const x0 = Math.max(0, Math.floor(camX) - 1); const x1 = Math.min(w.len - 1, Math.ceil(camX + vw) + 1);
     const y0 = Math.max(0, Math.floor(camY)); const y1 = Math.min(w.H - 1, Math.ceil(camY + vh));
@@ -288,6 +288,8 @@ class Game {
     // end of the level: castle and flag
     drawCastle(g, P, ts, sx(w.flagX + 1.7), sy(12), this.clock);
     drawFlag(g, ts, sx(w.flagX + 0.5), sy(5), sy(12), this.clock, '#ff5a8a');
+    // the world's signature set-piece landmark (decoration only)
+    if (w.landmark && w.landmark.x > camX - 5 && w.landmark.x < camX + vw + 5) drawLandmark(g, w.landmark.kind, sx(w.landmark.x), sy(12), ts, this.clock);
     for (let ty = y0; ty <= y1; ty++) {
       for (let tx = x0; tx <= x1; tx++) {
         const c = grid[ty][tx];

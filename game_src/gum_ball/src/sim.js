@@ -1,8 +1,9 @@
 // «كرة العلكة العملاقة» — the rules with no drawing. A small pink ball of sticky gum rolls around a colourful city
 // (drag anywhere to roll). Everything small enough (not bigger than about 60% of the ball) sticks to it and the ball
 // grows; anything bigger is a wall: the ball bounces off and a little bit falls off. Street clutter first, then
-// street stuff (carts, bikes, umbrellas), cars, buses and finally buildings. Reach a gigantic size before time runs
-// out — there is no losing: the stars say how big the ball got. Deterministic with a seed for the robot tests.
+// street stuff (carts, bikes, umbrellas), cars, buses and finally buildings. There is no clock and no losing:
+// the roll ends only when the whole course is rolled up (every growth stop, up to the whole city), and the
+// stars say how many stops the ball finished. Deterministic with a seed for the robot tests.
 
 /** What can be rolled up: size (m), group, label. */
 export const THINGS = {
@@ -36,15 +37,16 @@ export const THINGS = {
 
 /** Size goals and what can be rolled up next (the "BIGGER!" banner). */
 export const GOALS = [
-  { d: 1.3, next: 'street', ar: 'حاجات الشارع', en: 'street stuff' },
-  { d: 3.2, next: 'carts', ar: 'العربيات الصغيرة والشماسي', en: 'carts and umbrellas' },
+  { d: 1.3, next: 'street', ar: 'حاجات الكورنيش', en: 'corniche stuff' },
+  { d: 3.2, next: 'carts', ar: 'عربيات الترام والشماسي', en: 'tram carts and umbrellas' },
   { d: 6.6, next: 'cars', ar: 'العربيات', en: 'cars' },
   { d: 16, next: 'buses', ar: 'الأتوبيسات', en: 'buses' },
-  { d: 22, next: 'buildings', ar: 'العمارات', en: 'buildings' },
-  { d: 45, next: 'giant', ar: 'ناطحات السحاب', en: 'skyscrapers' },
+  { d: 22, next: 'buildings', ar: 'عمارات الكورنيش', en: 'corniche buildings' },
+  { d: 45, next: 'giant', ar: 'أبراج إسكندرية', en: 'Alex towers' },
   { d: 60, next: 'done', ar: 'كل المدينة', en: 'the whole city' },
 ];
-export const STARS = [20, 40, 60]; // metres for one, two, three stars
+export const STARS = [20, 40, 60]; // (legacy diameter table — no longer grades; kept for reference)
+export const STOP_STARS = [2, 4, 6]; // growth stops completed for one, two, three stars
 export const PICK = 0.6; // a thing sticks when its size is at most this part of the ball
 export const HALF = 230; // the city is from -HALF to HALF
 
@@ -128,15 +130,18 @@ export function buildCity(seed = 11) {
 }
 
 export class Roll {
-  /** opts: { easy, seed, time } */
+  /** opts: { easy, seed } — `easy` is accepted for the young-age mode; it used
+   * to buy extra time, and with no clock left it changes nothing in the sim. */
   constructor(opts = {}) {
     this.easy = !!opts.easy;
     this.things = opts.things || buildCity(opts.city ?? 11);
     for (const t of this.things) t.taken = false;
     this.d = 0.5;
     this.ball = { x: 0, z: 12, vx: 0, vz: 0 };
-    this.time = opts.time ?? (this.easy ? 150 : 120);
-    this.left = this.time;
+    // Kind rule (owner decision): there is NO countdown. The roll can never be
+    // cut short — it ends only by completing the course. `elapsed` merely
+    // measures how long the roll has been going (shown in the HUD).
+    this.elapsed = 0;
     this.state = 'count'; // count -> roll -> done
     this.countT = 3;
     this.goal = 0;
@@ -181,9 +186,7 @@ export class Roll {
       return this.events;
     }
     if (this.state !== 'roll') return this.events;
-    const tick = Math.ceil(this.left);
-    this.left -= dt;
-    if (Math.ceil(this.left) !== tick && this.left <= 10 && this.left > 0) this.events.push({ type: 'tick', n: Math.ceil(this.left) });
+    this.elapsed += dt;
     const b = this.ball;
     // rolling: speed grows with the ball, a soft push towards the finger
     const top = 3 + this.d * 1.5;
@@ -199,6 +202,7 @@ export class Roll {
     // touching things: stick or bounce
     const r = this.r;
     for (const t of this._near(b.x, b.z, r + 20)) {
+      if (this.state !== 'roll') break; // the course was completed mid-step
       const dx = b.x - t.x;
       const dz = b.z - t.z;
       const dist = Math.hypot(dx, dz);
@@ -235,12 +239,6 @@ export class Roll {
         }
       }
     }
-    if (this.left <= 0) {
-      this.left = 0;
-      this.state = 'done';
-      this.result = this._result();
-      this.events.push({ type: 'timeUp' });
-    }
     return this.events;
   }
 
@@ -250,10 +248,19 @@ export class Roll {
       this.goal++;
       this.events.push({ type: 'bigger', goal: this.goal, reached: g.d, next: g.next });
     }
+    if (this.goal >= GOALS.length && this.state === 'roll') {
+      // The whole course is rolled up — the whole city is on the ball. Only
+      // this ends the roll, and it ends in celebration (never a clock).
+      this.state = 'done';
+      this.result = this._result();
+      this.events.push({ type: 'finished' });
+    }
   }
 
   _result() {
-    const stars = STARS.filter((s) => this.d >= s * (this.easy ? 0.75 : 1)).length;
+    // Kind rules (Batch C): stars come from STOP COMPLETION — how many growth
+    // stops the roll completed — never from the raw final diameter.
+    const stars = STOP_STARS.filter((s) => this.goal >= s).length;
     return { d: this.d, stars, collected: this.collected, byGroup: this.byGroup.slice() };
   }
 }
@@ -262,7 +269,7 @@ export class Roll {
 export function robotRoll(g) {
   const b = g.ball;
   g._skip = g._skip || new Map();
-  const now = g.time - g.left;
+  const now = g.elapsed;
   // stuck against something? try another target for a while
   if (Math.hypot(b.vx, b.vz) < 0.8 && g.state === 'roll') g._stuckT = (g._stuckT ?? 0) + 1 / 30; else g._stuckT = 0;
   if (g._stuckT > 0.8 && g._target) { g._skip.set(g._target.id, now + 6); g._stuckT = 0; }

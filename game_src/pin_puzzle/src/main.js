@@ -11,7 +11,7 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 const PIN_CLIPS = { go: 2, pickup: 2, charge: 2, bump: 2, win: 2, lose: 2 };
 
 const S = {
-  title: ['اسحب الدبوس', 'Pull the Pin'], play: ['يلا نلعب', 'Play'], levels: ['المراحل', 'Levels'], exit: ['خروج', 'Exit'],
+  title: ['دبابيس الحلواني', "Sweet-Maker's Pins"], play: ['يلا نلعب', 'Play'], levels: ['المراحل', 'Levels'], exit: ['خروج', 'Exit'],
   menu: ['القائمة', 'Menu'], resume: ['كمّل', 'Resume'], paused: ['استراحة', 'Paused'], again: ['من الأول', 'Try again'], next: ['المرحلة الجاية', 'Next level'],
   how: ['اسحب الدبوس الدهبي عشان الحلويات تنزل في البرطمان. خلي بالك من الحمم!', 'Pull the golden pins so the candies drop into the jar. Watch out for the lava!'],
   tip1: ['اضغط على الدبوس الدهبي واسحبه', 'Tap the golden pin and pull it out'], tip2: ['الحمم الحمرا تحرق الحلويات: متسحبش دبوسها!', 'Lava burns candies: leave its pin alone!'],

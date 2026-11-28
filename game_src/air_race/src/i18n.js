@@ -1,5 +1,5 @@
 const S = {
-  title: ['سباق الطيارات', 'Plane Race'],
+  title: ['جولة النيل الجوية', 'Nile Air Tour'],
   laps: ['دورتين', '2 LAPS'],
   lap: ['دورة', 'LAP'],
   locked: ['خلّص السباق اللي قبله', 'Finish the race before'],
@@ -35,6 +35,10 @@ const S = {
   loading: ['بنجهّز الطيارة...', 'Getting the plane ready...'],
   noWebgl: ['الجهاز ده مش بيشغّل اللعبة ثلاثية الأبعاد.', 'This device cannot run the 3D game.'],
   sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
+  postcards: ['بطاقات الجولة', 'Tour postcards'],
+  postcardsSub: ['كل سباق تخلّصه بيفتح لك بطاقة من مكانه!', 'Finish a race to earn the postcard from its place!'],
+  cardLocked: ['بطاقة سرية — خلّص السباق ده عشان تفتحها', 'Secret postcard — finish this race to open it'],
+  cardNew: ['بطاقة جديدة وصلت من', 'A new postcard arrived from'],
 };
 
 let lang = 'ar';

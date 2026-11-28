@@ -1,7 +1,7 @@
 import { makeI18n } from '../../cozy_kit/ui.js';
 
 const S = {
-  title: ['طوف الناجي', 'Castaway Raft'],
+  title: ['فلوكة النيل', 'Nile Felucca'],
   play: ['يلا نبحر', 'Set sail'],
   level: ['المرحلة', 'Level'],
   exit: ['خروج', 'Exit'],
@@ -14,14 +14,14 @@ const S = {
   locked: ['خلّص المرحلة اللي قبلها', 'Finish the level before'],
   hookWood: ['اصطاد الخشب بالخطّاف وابني!', 'Hook wood to build!'],
   needBuild: ['خلّص البناء عشان تنزل الجزيرة!', 'Finish building to land!'],
-  tapSea: ['دوس على البحر عشان ترمي الخطّاف', 'Tap the sea to throw the hook'],
-  shark: ['قرش جعان! دوس عليه عشان يهرب!', 'Hungry shark! Tap it to scare it off!'],
-  scared: ['هرب القرش! 🦈', 'The shark swam away! 🦈'],
-  bitten: ['القرش خد خشبة', 'The shark took a log'],
-  islandReached: ['وصلنا الجزيرة!', 'Island reached!'],
-  landed: ['نزلنا على الجزيرة', 'Landed on the island'],
+  tapSea: ['دوس على النيل عشان ترمي الخطّاف', 'Tap the Nile to throw the hook'],
+  shark: ['تمساح النيل! دوس عليه عشان يمشي!', 'Nile crocodile! Tap it to send it off!'],
+  scared: ['مشي التمساح! 🐊', 'The crocodile swam away! 🐊'],
+  bitten: ['التمساح خد خشبة', 'The crocodile took a log'],
+  islandReached: ['وصلنا جزيرة النيل!', 'Nile island reached!'],
+  landed: ['نزلنا على جزيرة النيل', 'Landed on the Nile island'],
   bottles: ['الزجاجات الدهبية', 'Golden bottles'],
-  noLogs: ['القرش ماخدش خشب', 'No logs lost'],
+  noLogs: ['التمساح ماخدش خشب', 'No logs lost'],
   treasure: ['لقينا الكنز! 🪙', 'Treasure found! 🪙'],
   raftTile: ['قطعة طوف', 'Raft tile'],
   sail: ['شراع', 'Sail'],
@@ -37,6 +37,9 @@ const S = {
   crate: ['صندوق', 'crate'],
   bottle: ['زجاجة', 'bottle'],
   fishCoin: ['سمك', 'fish'],
+  logbook: ['📖 دفتر المحطات', '📖 Stops logbook'],
+  logbookSub: ['كل جزيرة نزلت عليها وليها حكاية', 'Every island you landed on has a story'],
+  lockedFact: ['لسه سر… كمّل الرحلة عشان تكتشفها!', 'Still a secret… sail on to discover it!'],
 };
 
 export const { setLang, setGirl, getLang, t, num } = makeI18n(S);

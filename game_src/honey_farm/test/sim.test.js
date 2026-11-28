@@ -83,3 +83,11 @@ test('normalizeSave validates the farm snapshot and never restores a finished go
   assert.equal(bad.farm.bag, 4);
   assert.deepEqual(bad.farm.hives.slice(0, 2), [true, true]); // starter hives always open
 });
+
+import fs from 'node:fs';
+
+test('Siwa Honey anchor: title and win line placed in Siwa Oasis', () => {
+  const main = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes("title: ['عسل سيوة', 'Siwa Honey']"));
+  assert.ok(main.includes('واحة سيوة'));
+});

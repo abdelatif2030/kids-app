@@ -117,3 +117,13 @@ test('normalizeSave validates the career: garbage is clamped, a missing career s
   const good = normalizeSave({ career: { cash: 10, rank: 1, up: { needle: 2 } } });
   assert.equal(good.career.rank, 1); assert.equal(good.career.up.needle, 2);
 });
+
+import fs from 'node:fs';
+
+test('Nile Studio anchor: studio ladder tops out at Studio Owner, goals unchanged', () => {
+  assert.deepEqual(RANKS.map((r) => r.id), ['intern', 'junior', 'lead', 'art', 'vp', 'board']);
+  assert.deepEqual(RANKS.map((r) => r.goal), [5, 10, 16, 22, 30, 0]);
+  assert.equal(RANKS[5].en, 'Studio Owner');
+  const main = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes("title: ['استوديو النيل', 'Nile Studio']"));
+});

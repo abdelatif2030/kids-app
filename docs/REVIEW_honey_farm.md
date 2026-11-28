@@ -46,3 +46,22 @@ Phase 1, item 1.3 of docs/GAMES_ROLLOUT_PLAN.md. Commit 28f2956e on ai/moss-work
 - No real-device or iOS WebView test exists in this environment.
 - VoiceCoach is wired, but no owner-generated clips are installed for this game yet;
   the lines are on the owner's "add to instinct" list.
+
+---
+
+## Phase 2D — Egypt anchor: «عسل سيوة / Siwa Honey» (2026-11-27)
+
+**What changed (name only):** the title «مزرعة العسل / Honey Farm» →
+**«عسل سيوة / Siwa Honey»** — the apiary now sits in Siwa Oasis, famous
+for its honey, and the win line says so ("the best honey stand in Siwa
+Oasis"). Sim, goal, spots, prices and the Phase 1 saved-progress fix are
+untouched.
+
+**Tested:** `npm test` 7/7 (+1 anchor test); build green; click-flow:
+the generic harness's second click hit the in-game ☰ menu button (same
+harness quirk as ice_dragon), so gameplay was confirmed with a
+single-click check — the farm floor with its honey goal counter and
+build pads, 0 page errors; menu frames at 3 sizes.
+
+**Not done (Batch F):** the 3-garden growth target (Siwa → Faiyum →
+Delta blossom seasons) is not built. Not tested on a real device.

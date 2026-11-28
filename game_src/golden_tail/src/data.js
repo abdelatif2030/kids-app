@@ -1,20 +1,11 @@
-// «مغامرة الذيل الذهبي» — the treetop playground: round tree-house decks at different heights, rope bridges (one is
-// broken: only a jump crosses it), ramps down to the forest floor, slides, and big bouncy mushrooms that throw you up
-// onto a high deck. Pure data and geometry helpers, no DOM, no three.js.
+// «الذيل الذهبي في الواحة» — the oasis playground, one arena per level: round palm decks at different heights, rope
+// bridges (some broken: only a jump crosses them), ramps down to the oasis floor, slides, and big bouncy mushrooms
+// that throw you up onto a high deck. Level 1 (Palm Plaza) keeps the original shared arena byte-for-byte; levels
+// 2–6 each get their own Siwa-themed geometry (bridges over the spring pools, bouncer groves, sand-slide terraces,
+// the Shali fortress lookout, and the wide Oasis Cup final). Pure data and geometry helpers, no DOM, no three.js.
 
 export const GROUND_R = 25;
 export const G = 24; // gravity
-
-export const PLATFORMS = [
-  { id: 'p0', x: 0, z: 0, r: 3.4, y: 3 },
-  { id: 'p1', x: -10, z: -6, r: 2.6, y: 4.5 },
-  { id: 'p2', x: 10, z: -6, r: 2.6, y: 4 },
-  { id: 'p3', x: -10, z: 7, r: 2.6, y: 2.4 },
-  { id: 'p4', x: 10, z: 8, r: 2.6, y: 5 },
-  { id: 'p5', x: 0, z: -13, r: 2.8, y: 6 },
-  { id: 'p6', x: 0, z: 12.5, r: 2.3, y: 1.2 },
-];
-const P = Object.fromEntries(PLATFORMS.map((p) => [p.id, p]));
 
 /** A straight walkable strip from a to b ({x,y,z}); kind bridge / ramp / slide. */
 function strip(kind, a, b, w, extra = {}) {
@@ -24,66 +15,234 @@ function edgeOf(p, dx, dz, inset = 0.3) {
   const l = Math.hypot(dx, dz);
   return { x: p.x + (dx / l) * (p.r - inset), y: p.y, z: p.z + (dz / l) * (p.r - inset) };
 }
-function bridge(a, b, extra) {
+function bridge(P, a, b, extra) {
   const A = P[a];
   const B = P[b];
   return strip('bridge', edgeOf(A, B.x - A.x, B.z - A.z), edgeOf(B, A.x - B.x, A.z - B.z), 1.5, { from: a, to: b, ...extra });
 }
-function down(kind, p, dx, dz, len) {
+function brokenBridge(P, a, b) {
+  // two halves with a gap only a jump can cross
+  const A = P[a];
+  const B = P[b];
+  const p = edgeOf(A, B.x - A.x, B.z - A.z);
+  const q = edgeOf(B, A.x - B.x, A.z - B.z);
+  const mx = (p.x + q.x) / 2;
+  const mz = (p.z + q.z) / 2;
+  const my = (p.y + q.y) / 2;
+  const dx = q.x - p.x;
+  const dz = q.z - p.z;
+  const l = Math.hypot(dx, dz);
+  const g = 0.9; // half the gap
+  return [
+    strip('bridge', p, { x: mx - (dx / l) * g, y: my, z: mz - (dz / l) * g }, 1.5, { broken: true }),
+    strip('bridge', { x: mx + (dx / l) * g, y: my, z: mz + (dz / l) * g }, q, 1.5, { broken: true }),
+  ];
+}
+function down(P, kind, p, dx, dz, len) {
   const top = edgeOf(P[p], dx, dz);
   const l = Math.hypot(dx, dz);
   return strip(kind, top, { x: top.x + (dx / l) * len, y: 0, z: top.z + (dz / l) * len }, kind === 'slide' ? 1.3 : 1.8, { from: p });
 }
 
-export const STRIPS = [
-  bridge('p0', 'p1'),
-  bridge('p0', 'p3'),
-  bridge('p1', 'p5'),
-  bridge('p2', 'p5'),
-  bridge('p0', 'p6'),
-  bridge('p2', 'p4'),
-  down('ramp', 'p3', -1, 0, 4.6),
-  down('ramp', 'p6', 0, 1, 3.4),
-  down('ramp', 'p2', 1, 0, 6),
-  down('slide', 'p5', 0.8, -0.6, 8.4),
-  down('slide', 'p4', 0.6, 0.8, 7),
-  down('slide', 'p1', -0.8, -0.6, 6.3),
+// ---- the six arenas -------------------------------------------------------------------------------------------------
+// A link is ['bridge', a, b] | ['broken', a, b] | ['down', 'ramp'|'slide', from, dx, dz, len].
+const ARENA_DEFS = [
+  { // 1 · Palm Plaza — the original shared arena, unchanged (the opening experience stays exactly as shipped)
+    platforms: [
+      { id: 'p0', x: 0, z: 0, r: 3.4, y: 3 },
+      { id: 'p1', x: -10, z: -6, r: 2.6, y: 4.5 },
+      { id: 'p2', x: 10, z: -6, r: 2.6, y: 4 },
+      { id: 'p3', x: -10, z: 7, r: 2.6, y: 2.4 },
+      { id: 'p4', x: 10, z: 8, r: 2.6, y: 5 },
+      { id: 'p5', x: 0, z: -13, r: 2.8, y: 6 },
+      { id: 'p6', x: 0, z: 12.5, r: 2.3, y: 1.2 },
+    ],
+    links: [
+      ['bridge', 'p0', 'p1'], ['bridge', 'p0', 'p3'], ['bridge', 'p1', 'p5'], ['bridge', 'p2', 'p5'],
+      ['bridge', 'p0', 'p6'], ['bridge', 'p2', 'p4'],
+      ['down', 'ramp', 'p3', -1, 0, 4.6], ['down', 'ramp', 'p6', 0, 1, 3.4], ['down', 'ramp', 'p2', 1, 0, 6],
+      ['down', 'slide', 'p5', 0.8, -0.6, 8.4], ['down', 'slide', 'p4', 0.6, 0.8, 7], ['down', 'slide', 'p1', -0.8, -0.6, 6.3],
+      ['broken', 'p0', 'p2'],
+    ],
+    mushrooms: [
+      { x: -4.5, z: -4.5, to: 'p1' },
+      { x: -4, z: -17.5, to: 'p5' },
+      { x: 14.5, z: 2.5, to: 'p4' },
+      { x: -5.2, z: 8.6, to: 'p0' },
+    ],
+  },
+  { // 2 · Oasis Bridges — a ring of decks over the spring pools, joined by long rope bridges
+    platforms: [
+      { id: 'p0', x: 0, z: 0, r: 3.2, y: 3 },
+      { id: 'p1', x: -11, z: -7, r: 2.6, y: 4 },
+      { id: 'p2', x: 11, z: -7, r: 2.6, y: 4 },
+      { id: 'p3', x: -11, z: 8, r: 2.6, y: 3.5 },
+      { id: 'p4', x: 11, z: 8, r: 2.6, y: 3.5 },
+      { id: 'p5', x: 0, z: -14, r: 2.8, y: 5.5 },
+      { id: 'p6', x: 0, z: 14, r: 2.4, y: 2 },
+      { id: 'p7', x: -17, z: 0, r: 2.2, y: 5 },
+      { id: 'p8', x: 17, z: 0, r: 2.2, y: 5 },
+    ],
+    links: [
+      ['bridge', 'p0', 'p1'], ['bridge', 'p0', 'p2'], ['bridge', 'p0', 'p3'], ['bridge', 'p0', 'p4'],
+      ['bridge', 'p1', 'p5'], ['bridge', 'p2', 'p5'], ['bridge', 'p3', 'p6'], ['bridge', 'p4', 'p6'],
+      ['bridge', 'p1', 'p7'], ['bridge', 'p2', 'p8'],
+      ['down', 'ramp', 'p3', -1, 0, 4.6], ['down', 'ramp', 'p6', 0, 1, 3.4], ['down', 'ramp', 'p8', 1, 0, 4.2],
+      ['down', 'slide', 'p5', 0.8, -0.6, 8], ['down', 'slide', 'p7', -0.6, -0.8, 6.5],
+      ['broken', 'p0', 'p5'],
+    ],
+    mushrooms: [
+      { x: -5, z: -10, to: 'p5' },
+      { x: -14, z: 4, to: 'p7' },
+      { x: 14, z: 4, to: 'p8' },
+      { x: -4, z: 5, to: 'p0' },
+    ],
+  },
+  { // 3 · Oasis Bouncers — a palm-canopy climb: few bridges, the mushrooms do the lifting
+    platforms: [
+      { id: 'p0', x: 0, z: 0, r: 3.4, y: 2.5 },
+      { id: 'p1', x: -11, z: -8, r: 2.6, y: 5 },
+      { id: 'p2', x: 11, z: -8, r: 2.6, y: 6 },
+      { id: 'p3', x: -11, z: 9, r: 2.6, y: 4 },
+      { id: 'p4', x: 11, z: 9, r: 2.6, y: 7 },
+      { id: 'p5', x: 0, z: -14, r: 2.8, y: 8 },
+      { id: 'p6', x: 0, z: 14, r: 2.3, y: 3.5 },
+    ],
+    links: [
+      ['bridge', 'p0', 'p3'], ['bridge', 'p0', 'p6'], ['bridge', 'p1', 'p5'], ['bridge', 'p2', 'p5'], ['bridge', 'p4', 'p6'],
+      ['down', 'ramp', 'p3', -1, 0, 5], ['down', 'ramp', 'p6', 0, 1, 3.6],
+      ['down', 'slide', 'p5', 0.8, -0.6, 8.4], ['down', 'slide', 'p4', 0.6, 0.8, 7], ['down', 'slide', 'p2', 1, -0.3, 6.5],
+      ['broken', 'p0', 'p2'],
+    ],
+    mushrooms: [
+      { x: -7, z: -12, to: 'p1' },
+      { x: 7, z: -12, to: 'p2' },
+      { x: 7, z: 13, to: 'p4' },
+      { x: -4, z: -19, to: 'p5' },
+      { x: -5.2, z: 8.6, to: 'p0' },
+    ],
+  },
+  { // 4 · Sand Slides — terraced decks on the salt-lake shore, five slides pour down to the flats
+    platforms: [
+      { id: 'p0', x: 0, z: 0, r: 3.2, y: 4 },
+      { id: 'p1', x: -10, z: -6, r: 2.6, y: 6 },
+      { id: 'p2', x: 10, z: -6, r: 2.6, y: 5 },
+      { id: 'p3', x: -10, z: 7, r: 2.6, y: 3 },
+      { id: 'p4', x: 10, z: 8, r: 2.6, y: 6.5 },
+      { id: 'p5', x: 0, z: -13, r: 2.8, y: 7.5 },
+      { id: 'p6', x: 0, z: 13, r: 2.3, y: 2 },
+      { id: 'p7', x: -15, z: -1, r: 2.2, y: 4.5 },
+      { id: 'p8', x: 15, z: -1, r: 2.2, y: 3.5 },
+    ],
+    links: [
+      ['bridge', 'p0', 'p1'], ['bridge', 'p0', 'p3'], ['bridge', 'p1', 'p5'], ['bridge', 'p2', 'p5'],
+      ['bridge', 'p0', 'p6'], ['bridge', 'p3', 'p7'], ['bridge', 'p4', 'p8'],
+      ['down', 'ramp', 'p3', -1, 0, 4.6], ['down', 'ramp', 'p6', 0, 1, 3.4], ['down', 'ramp', 'p8', 1, 0, 5],
+      ['down', 'slide', 'p5', 0.8, -0.6, 8.4], ['down', 'slide', 'p4', 0.6, 0.8, 7], ['down', 'slide', 'p1', -0.8, -0.6, 6.3],
+      ['down', 'slide', 'p7', -0.5, 0.8, 6], ['down', 'slide', 'p2', 0.8, 0.6, 6.5],
+      ['broken', 'p0', 'p2'],
+    ],
+    mushrooms: [
+      { x: -5, z: -18, to: 'p5' },
+      { x: 14, z: 3, to: 'p4' },
+      { x: 5, z: -5, to: 'p0' },
+      { x: -12, z: 4, to: 'p7' },
+    ],
+  },
+  { // 5 · Oasis Lookout — the Shali fortress ruins: tall wall-top decks around a high keep
+    platforms: [
+      { id: 'p0', x: 0, z: 0, r: 3.4, y: 5 },
+      { id: 'p1', x: -12, z: -9, r: 2.6, y: 7 },
+      { id: 'p2', x: 12, z: -9, r: 2.6, y: 7 },
+      { id: 'p3', x: -12, z: 10, r: 2.6, y: 6 },
+      { id: 'p4', x: 12, z: 10, r: 2.6, y: 8 },
+      { id: 'p5', x: 0, z: -14, r: 2.8, y: 9 },
+      { id: 'p6', x: 0, z: 16, r: 2.3, y: 4 },
+      { id: 'p7', x: -16, z: 0, r: 2.2, y: 5.5 },
+      { id: 'p8', x: 16, z: 0, r: 2.2, y: 5.5 },
+    ],
+    links: [
+      ['bridge', 'p0', 'p1'], ['bridge', 'p0', 'p3'], ['bridge', 'p1', 'p5'], ['bridge', 'p2', 'p5'],
+      ['bridge', 'p3', 'p6'], ['bridge', 'p4', 'p6'], ['bridge', 'p1', 'p7'], ['bridge', 'p2', 'p8'],
+      ['bridge', 'p7', 'p3'], ['bridge', 'p8', 'p4'],
+      ['down', 'ramp', 'p6', 0, 1, 3.6], ['down', 'ramp', 'p3', -1, 0, 5.5],
+      ['down', 'slide', 'p5', 0.8, -0.6, 8.4], ['down', 'slide', 'p4', 0.6, 0.8, 5.5], ['down', 'slide', 'p1', -0.8, -0.6, 5.5],
+      ['broken', 'p0', 'p5'],
+    ],
+    mushrooms: [
+      { x: -8, z: -13, to: 'p1' },
+      { x: 8, z: -13, to: 'p2' },
+      { x: 8, z: 14, to: 'p4' },
+      { x: -5, z: 6, to: 'p0' },
+      { x: 11, z: -5, to: 'p8' },
+    ],
+  },
+  { // 6 · Oasis Cup — the final: the widest arena, two broken bridges, every route mixed together
+    platforms: [
+      { id: 'p0', x: 0, z: 0, r: 3.6, y: 4 },
+      { id: 'p1', x: -13, z: -9, r: 2.8, y: 5.5 },
+      { id: 'p2', x: 13, z: -9, r: 2.8, y: 5 },
+      { id: 'p3', x: -13, z: 10, r: 2.8, y: 4.5 },
+      { id: 'p4', x: 13, z: 10, r: 2.8, y: 6.5 },
+      { id: 'p5', x: 0, z: -15, r: 3, y: 8 },
+      { id: 'p6', x: 0, z: 16, r: 2.5, y: 3 },
+      { id: 'p7', x: -17, z: 0, r: 2.4, y: 6 },
+      { id: 'p8', x: 17, z: 0, r: 2.4, y: 6 },
+    ],
+    links: [
+      ['bridge', 'p0', 'p1'], ['bridge', 'p0', 'p3'], ['bridge', 'p1', 'p5'], ['bridge', 'p2', 'p5'],
+      ['bridge', 'p3', 'p6'], ['bridge', 'p4', 'p6'], ['bridge', 'p1', 'p7'], ['bridge', 'p3', 'p7'],
+      ['bridge', 'p2', 'p8'], ['bridge', 'p4', 'p8'],
+      ['down', 'ramp', 'p3', -1, 0, 5], ['down', 'ramp', 'p6', 0, 1, 3.6], ['down', 'ramp', 'p7', -1, 0, 4],
+      ['down', 'slide', 'p5', 0.8, -0.6, 8.4], ['down', 'slide', 'p4', 0.6, 0.8, 5], ['down', 'slide', 'p1', -0.8, -0.6, 5.5],
+      ['broken', 'p0', 'p2'], ['broken', 'p0', 'p4'],
+    ],
+    mushrooms: [
+      { x: -5, z: -19, to: 'p5' },
+      { x: -13, z: 5, to: 'p7' },
+      { x: 13, z: 5, to: 'p8' },
+      { x: 5, z: 6, to: 'p0' },
+      { x: 9, z: -13, to: 'p2' },
+    ],
+  },
 ];
 
-// the broken bridge between the big deck and the east deck: two halves with a gap only a jump can cross
-{
-  const a = edgeOf(P.p0, 1, -0.6);
-  const b = edgeOf(P.p2, -1, 0.6);
-  const mx = (a.x + b.x) / 2;
-  const mz = (a.z + b.z) / 2;
-  const my = (a.y + b.y) / 2;
-  const dx = b.x - a.x;
-  const dz = b.z - a.z;
-  const l = Math.hypot(dx, dz);
-  const g = 0.9; // half the gap
-  STRIPS.push(strip('bridge', a, { x: mx - (dx / l) * g, y: my, z: mz - (dz / l) * g }, 1.5, { broken: true }));
-  STRIPS.push(strip('bridge', { x: mx + (dx / l) * g, y: my, z: mz + (dz / l) * g }, b, 1.5, { broken: true }));
+function buildArena(def) {
+  const platforms = def.platforms.map((p) => ({ ...p }));
+  const P = Object.fromEntries(platforms.map((p) => [p.id, p]));
+  const strips = [];
+  for (const l of def.links) {
+    if (l[0] === 'bridge') strips.push(bridge(P, l[1], l[2]));
+    else if (l[0] === 'broken') strips.push(...brokenBridge(P, l[1], l[2]));
+    else strips.push(down(P, l[1], l[2], l[3], l[4], l[5]));
+  }
+  /** Bouncy mushrooms on the oasis floor: stepping on one throws you onto a deck. */
+  const mushrooms = def.mushrooms.map((m) => ({ ...m, r: 0.8 }));
+  /** Tree trunks under the decks (only in the way below the deck). */
+  const trunks = platforms.map((p) => ({ x: p.x, z: p.z, r: 0.75, top: p.y - 0.3 }));
+  return { platforms, strips, mushrooms, trunks };
 }
 
-/** Bouncy mushrooms on the forest floor: stepping on one throws you onto a deck. */
-export const MUSHROOMS = [
-  { x: -4.5, z: -4.5, to: 'p1' },
-  { x: -4, z: -17.5, to: 'p5' },
-  { x: 14.5, z: 2.5, to: 'p4' },
-  { x: -5.2, z: 8.6, to: 'p0' },
-].map((m) => ({ ...m, r: 0.8 }));
+export const ARENAS = ARENA_DEFS.map(buildArena);
+/** The arena of level `i` (0-based index into LEVELS). */
+export function getArena(i) { return ARENAS[Math.max(0, Math.min(ARENAS.length - 1, i | 0))]; }
+/** A stable fingerprint of an arena's geometry (for tests that prove the arenas really differ). */
+export function arenaSignature(a) { return JSON.stringify([a.platforms, a.strips, a.mushrooms]); }
 
-/** Tree trunks under the decks (only in the way below the deck). */
-export const TRUNKS = PLATFORMS.map((p) => ({ x: p.x, z: p.z, r: 0.75, top: p.y - 0.3 }));
+// Level 1's arena, kept as the classic module-level names (its geometry is the original shared arena, unchanged).
+export const PLATFORMS = ARENAS[0].platforms;
+export const STRIPS = ARENAS[0].strips;
+export const MUSHROOMS = ARENAS[0].mushrooms;
+export const TRUNKS = ARENAS[0].trunks;
 
 /** Six levels: longer rounds, more and faster rivals. */
 export const LEVELS = [
-  { id: 1, ar: 'ساحة الشجر', en: 'Canopy Commons', time: 40, rivals: 2, speed: 3.7 },
-  { id: 2, ar: 'جسر الحبال', en: 'Rope Bridges', time: 45, rivals: 3, speed: 3.9 },
-  { id: 3, ar: 'المشروم النطّاط', en: 'Bouncy Mushrooms', time: 50, rivals: 3, speed: 4.1 },
-  { id: 4, ar: 'الزحاليق', en: 'Slide Hill', time: 55, rivals: 4, speed: 4.2 },
-  { id: 5, ar: 'برج المراقبة', en: 'Lookout Tower', time: 60, rivals: 4, speed: 4.25 },
-  { id: 6, ar: 'بطولة الغابة', en: 'Forest Cup', time: 60, rivals: 4, speed: 4.3 },
+  { id: 1, ar: 'ساحة النخيل', en: 'Palm Plaza', time: 40, rivals: 2, speed: 3.7 },
+  { id: 2, ar: 'جسور الواحة', en: 'Oasis Bridges', time: 45, rivals: 3, speed: 3.9 },
+  { id: 3, ar: 'نطّاطات الواحة', en: 'Oasis Bouncers', time: 50, rivals: 3, speed: 4.1 },
+  { id: 4, ar: 'زحاليق الرمل', en: 'Sand Slides', time: 55, rivals: 4, speed: 4.2 },
+  { id: 5, ar: 'برج مراقبة الواحة', en: 'Oasis Lookout', time: 60, rivals: 4, speed: 4.25 },
+  { id: 6, ar: 'كأس الواحة', en: 'Oasis Cup', time: 60, rivals: 4, speed: 4.3 },
 ];
 
 export const RIVALS = [
@@ -107,14 +266,15 @@ export function onStrip(s, x, z) {
   return { t, side, y: s.ay + (s.by - s.ay) * Math.max(0, Math.min(1, t)) };
 }
 
-/** The highest floor under (x, z) that something at height y can stand on (it can step up a little). */
-export function floorAt(x, z, y, step = 0.45) {
+/** The highest floor under (x, z) that something at height y can stand on (it can step up a little).
+ *  Defaults to level 1's arena, exactly as before; the sim passes its own level's arena. */
+export function floorAt(x, z, y, step = 0.45, arena = ARENAS[0]) {
   let best = 0;
   let surf = null;
-  for (const p of PLATFORMS) {
+  for (const p of arena.platforms) {
     if (p.y <= y + step && p.y > best && Math.hypot(x - p.x, z - p.z) <= p.r) { best = p.y; surf = p; }
   }
-  for (const s of STRIPS) {
+  for (const s of arena.strips) {
     const o = onStrip(s, x, z);
     if (o.t < -0.02 || o.t > 1.02 || Math.abs(o.side) > s.w / 2) continue;
     if (o.y <= y + step && o.y > best - 0.001) { best = o.y; surf = s; }
@@ -124,7 +284,10 @@ export function floorAt(x, z, y, step = 0.45) {
 
 // ---- the walking graph (for the animals; they cannot jump the broken bridge) --------------------------------------
 
-export function buildGraph() {
+export function buildGraph(arena = ARENAS[0]) {
+  const PLATFORMS = arena.platforms;
+  const STRIPS = arena.strips;
+  const MUSHROOMS = arena.mushrooms;
   const nodes = [];
   const add = (x, y, z, tag) => { nodes.push({ i: nodes.length, x, y, z, tag, out: [] }); return nodes.length - 1; };
   const link = (a, b, both = true, extra = 0) => {

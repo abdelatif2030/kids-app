@@ -7,11 +7,11 @@ import { rng, clamp } from '../../cozy_kit/ui.js';
 
 export const LANES = [-2.6, 0, 2.6];
 export const ENVS = [
-  { id: 'city', ar: 'شوارع المدينة', en: 'City Streets', len: 1200 },
-  { id: 'downtown', ar: 'وسط البلد المزدحم', en: 'Busy Downtown', len: 1300 },
-  { id: 'shops', ar: 'منطقة المحلات', en: 'Shopping District', len: 1400 },
-  { id: 'industry', ar: 'المنطقة الصناعية', en: 'Industrial Area', len: 1500 },
-  { id: 'highway', ar: 'الطريق السريع', en: 'Highway', len: 1600 },
+  { id: 'city', ar: 'شوارع القاهرة', en: 'Cairo Streets', len: 1200 },
+  { id: 'downtown', ar: 'وسط البلد', en: 'Downtown Cairo', len: 1300 },
+  { id: 'shops', ar: 'خان الخليلي', en: 'Khan el-Khalili', len: 1400 },
+  { id: 'industry', ar: 'ورش حلوان', en: 'Helwan Workshops', len: 1500 },
+  { id: 'highway', ar: 'طريق الكورنيش', en: 'Corniche Road', len: 1600 },
   { id: 'bonus', ar: 'مرحلة الفيز السحرية', en: 'Fizzy Bonus', len: 1000 },
 ];
 const G = 32;
@@ -52,6 +52,7 @@ export class Run {
     this.speed = this.easy ? 12 : 15;
     this.cans = 0; this.stars = 0; this.score = 0; this.stuntsDone = 0; this.dodged = 0; this.magnets = 0;
     this.magnet = 0; this.shield = 0; this.starT = 0; this.inv = 0; this.hit = 0;
+    this.hearts = 3; // kind rules: a hit is a stumble, not the end — the run ends only at 0 hearts
     this.things = []; this.next = 0; this.state = 'run'; this.time = 0; this.events = [];
     this.fill();
   }
@@ -92,7 +93,8 @@ export class Run {
       if (hits && this.inv <= 0) {
         if (this.starT > 0) { t.done = true; this.score += 100; ev.push({ type: 'smash' }); }
         else if (this.shield > 0) { this.shield = 0; this.inv = 1.2; t.done = true; ev.push({ type: 'shieldHit' }); }
-        else { this.state = 'over'; this.finalScore = Math.round(this.score); ev.push({ type: 'over' }); }
+        else if (this.hearts > 1) { this.hearts -= 1; this.inv = 1.5; t.done = true; ev.push({ type: 'stumble', hearts: this.hearts }); }
+        else { this.hearts = 0; this.state = 'over'; this.finalScore = Math.round(this.score); ev.push({ type: 'over' }); }
       }
     }
     this.things = this.things.filter((t) => t.z > this.z - 8 && !(t.done && t.kind !== 'ramp'));

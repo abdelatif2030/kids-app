@@ -10,13 +10,76 @@ const BUMP_T = 0.9;
 
 // lane codes: g grass, r road, w river (logs), l lily pads, t railway, d den
 export const LEVELS = [
-  { id: 1, ar: 'مرج الصيف', en: 'Summer Meadow', season: 'summer', lanes: 'ggrrgwggrrgtglggrgd', speed: 1 },
-  { id: 2, ar: 'غابة الخريف', en: 'Autumn Woods', season: 'autumn', lanes: 'ggrrrgwwgtgrrgtglwgrrgd', speed: 1.15 },
-  { id: 3, ar: 'تلال الشتا', en: 'Winter Hills', season: 'winter', lanes: 'ggrrgwwgttgrrrglwgtgrrwgd', speed: 1.25 },
+  { id: 1, ar: 'واحة سيوة', en: 'Siwa Oasis', season: 'summer', lanes: 'ggrrgwggrrgtglggrgd', speed: 1 },
+  { id: 2, ar: 'الواحات البحرية', en: 'Bahariya Oasis', season: 'autumn', lanes: 'ggrrrgwwgtgrrgtglwgrrgd', speed: 1.15 },
+  { id: 3, ar: 'الصحراء البيضاء', en: 'The White Desert', season: 'winter', lanes: 'ggrrgwwgttgrrrglwgtgrrwgd', speed: 1.25 },
   // 2026-11-21: three longer journeys
-  { id: 4, ar: 'سباق الحقول', en: 'Field Dash', season: 'summer', lanes: 'ggrrgwwgtgrrrgwlgttgrrgwgtgrrgd', speed: 1.35 },
-  { id: 5, ar: 'غابة الأوراق الحمرا', en: 'Red Leaf Forest', season: 'autumn', lanes: 'ggrrrgwwgttgrrgtlwwgrrrgtgwgrrgtgrrgd', speed: 1.45 },
-  { id: 6, ar: 'قمة الثلج', en: 'Snow Summit', season: 'winter', lanes: 'ggrrgwwgttgrrrgwwlgtgrrwgttgrrrgwgtgrrwwgd', speed: 1.5 },
+  { id: 4, ar: 'واحة الفرافرة', en: 'Farafra Oasis', season: 'summer', lanes: 'ggrrgwwgtgrrrgwlgttgrrgwgtgrrgd', speed: 1.35 },
+  { id: 5, ar: 'واحة الداخلة', en: 'Dakhla Oasis', season: 'autumn', lanes: 'ggrrrgwwgttgrrgtlwwgrrrgtgwgrrgtgrrgd', speed: 1.45 },
+  { id: 6, ar: 'هضبة الجلف الكبير', en: 'Gilf Kebir Plateau', season: 'winter', lanes: 'ggrrgwwgttgrrrgwwlgtgrrwgttgrrrgwgtgrrwwgd', speed: 1.5 },
+  // Phase 2F (2026-11-27): six more journeys — the family turns home: out of the deep desert, past the whale
+  // fossils and Fayoum, down to the Nile banks and the green Delta, where the new den waits by a canal.
+  // Each one plays differently, not just longer: the Black Desert is rail country, Wadi El Hitan rides long
+  // rivers, Fayoum is canal water and lily pads, the Nile banks are a lily-pad reed maze, the Delta farm
+  // roads are tractor country (roads, roads, roads), and the last journey mixes everything. Speeds only
+  // creep up (1.52 → 1.66 against level 6's 1.5); the cub parade keeps growing on its own (2 + id).
+  { id: 7, ar: 'الصحراء السوداء', en: 'The Black Desert', season: 'summer', lanes: 'ggrrgttgwggrrgtglggrrwggtgrrglwggrrgwwgrrwggd', speed: 1.52 },
+  { id: 8, ar: 'وادي الحيتان', en: 'Wadi El Hitan', season: 'autumn', lanes: 'ggrrgwwglggrrgtgwwgrwglgtgrrgwwggrrgtgtrrggd', speed: 1.55 },
+  { id: 9, ar: 'واحة الفيوم', en: 'Fayoum Oasis', season: 'winter', lanes: 'ggwlgwwgrrglgtgwwgrglggrrgtwwglggrrgwwglwgggd', speed: 1.58 },
+  { id: 10, ar: 'ضفاف النيل', en: 'Nile Bank Reeds', season: 'summer', lanes: 'gglggrrwlgttglggrrwglggrrgtglwwgrrglgglgrrgd', speed: 1.6 },
+  { id: 11, ar: 'طرق مزارع الدلتا', en: 'Delta Farm Roads', season: 'autumn', lanes: 'ggrrrgwggrrrgtgrrwggrrrglggtgrrrgwggrrgwggrgd', speed: 1.63 },
+  { id: 12, ar: 'بيت الدلتا على القناة', en: 'Delta Canal Den', season: 'winter', lanes: 'ggrrgwwgtglggrrrgwwlgtgrrwgttgglwwgrrgtgwwgrrglggd', speed: 1.66 },
+];
+
+/** Berry picnic album: one picnic moment per journey — where the family stops, spreads the berries and
+ * rests. One true, simple line per place, in both languages. Kept apart from LEVELS so the first six
+ * level objects (ids, lanes, seasons, speeds — save data) stay byte-for-byte what they always were. */
+export const PICNIC = [
+  { id: 1, icon: '🌴', ar: 'في سيوة بنقعد تحت النخل وناكل تمر وزيتون من الواحة نفسها.', en: 'In Siwa we sit under the palms and eat dates and olives from the oasis itself.' },
+  { id: 2, icon: '♨️', ar: 'في البحرية عيون مية دافية طالعة من الأرض، بنرتاح جنبها بعد الطريق.', en: 'Bahariya has warm springs bubbling out of the ground, and we rest beside one after the road.' },
+  { id: 3, icon: '🍄', ar: 'صخور الصحراء البيضاء البيضا شكلها زي فطر عملاق وحيوانات نايمة!', en: 'The white rocks of the White Desert look like giant mushrooms and sleeping animals!' },
+  { id: 4, icon: '🌅', ar: 'الفرافرة من أهدى واحات مصر، وغروبها بيخلي الرمل دهبي.', en: 'Farafra is one of the quietest oases in Egypt, and its sunset turns the sand to gold.' },
+  { id: 5, icon: '🏺', ar: 'في الداخلة بيوت قديمة من الطوب اللبن عمرها مئات السنين.', en: 'Dakhla has old mud-brick villages that are hundreds of years old.' },
+  { id: 6, icon: '🎨', ar: 'في الجلف الكبير ناس من آلاف السنين رسموا نفسهم على الصخر وهم بيسبحوا!', en: 'At Gilf Kebir, people thousands of years ago painted themselves swimming on the rock!' },
+  { id: 7, icon: '⛰️', ar: 'تلال الصحراء السوداء متغطية بصخور سودا من براكين قديمة قوي.', en: 'The hills of the Black Desert are covered in black rocks from very old volcanoes.' },
+  { id: 8, icon: '🐋', ar: 'في وادي الحيتان عظام حيتان في قلب الصحرا، لأن البحر كان هناك زمان!', en: 'Wadi El Hitan has whale bones in the middle of the desert, because the sea was there long ago!' },
+  { id: 9, icon: '🦆', ar: 'الفيوم فيها بحيرة قارون، وطيور كتير بتيجي تقعد على شطها.', en: 'Fayoum has Lake Qarun, and lots of birds come to sit on its shore.' },
+  { id: 10, icon: '🌾', ar: 'البوص الطويل بيكبر على ضفاف النيل، والضفادع الصغيرة بتستخبى بينه.', en: 'Tall reeds grow on the banks of the Nile, and tiny frogs hide among them.' },
+  { id: 11, icon: '🚜', ar: 'أرض الدلتا خضرا طول السنة، عشان مية النيل بتسقيها بقنوات صغيرة.', en: 'Delta land stays green all year, because Nile water feeds it through little canals.' },
+  { id: 12, icon: '🧺', ar: 'وصلنا! بيتنا الجديد جنب قناة في الدلتا، ودي أكبر سلة توت في الرحلة كلها.', en: 'We made it! Our new den sits beside a Delta canal, and this is the biggest berry basket of the whole journey.' },
+];
+
+/** Berry picnic album entries for a save: a journey's card is unlocked once that journey has been
+ * completed (stars > 0). No new persistence — stars ARE the save, so an old 6-level save shows its six
+ * picnics open and the new six locked. Pure, so the album logic is testable. */
+export function picnicEntries(save) {
+  const s = normalizeSave(save);
+  return LEVELS.map((level) => ({ level, picnic: PICNIC[level.id - 1], unlocked: (s.stars[level.id] ?? 0) > 0 }));
+}
+
+/** Voice clip file stem (no extension) narrating a journey's picnic line:
+ * voice/<lang>/picnic<id>_1.mp3 under the game's assets. Pure, so the
+ * album's tap-to-listen wiring is testable. */
+export function picnicClipName(level) { return `picnic${level.id}_1`; }
+
+/** Per-journey background tints (Certification Sweep A). The season cycle alone made every summer
+ * journey share one sky/ground palette (Siwa ≡ Farafra ≡ Black Desert ≡ Nile Bank). Each journey now
+ * carries its own sky + ground colours — levels 1–3 keep the original season colours, the Black Desert
+ * gets its dark volcanic olive ground, and the rest vary by time-of-day within their season. Kept apart
+ * from LEVELS (like PICNIC) so the level objects stay byte-for-byte what they always were. */
+export const LEVEL_TINTS = [
+  { sky: 0xbfe8ff, ground: 0x7cc85a, grass: null }, // 1 Siwa — original summer
+  { sky: 0xffe0b8, ground: 0x9aa84a, grass: null }, // 2 Bahariya — original autumn
+  { sky: 0xe4eef8, ground: 0xeef3f8, grass: null }, // 3 White Desert — original winter
+  { sky: 0x9fd4ff, ground: 0xc0b268, grass: 0xd8c268 }, // 4 Farafra — sandy gold desert edge
+  { sky: 0xffd49c, ground: 0xa89a44, grass: 0xb8a848 }, // 5 Dakhla — olive-gold autumn
+  { sky: 0xd6e6fa, ground: 0xe2ecf7, grass: 0xcfe0ee }, // 6 Gilf Kebir — steel-blue winter
+  { sky: 0xf7df9e, ground: 0x55663f, grass: 0x44543c }, // 7 Black Desert — dark volcanic green-grey
+  { sky: 0xffe8c4, ground: 0x93a24e, grass: 0x8fae4e }, // 8 Wadi El Hitan — dry yellow-green
+  { sky: 0xe6f2e4, ground: 0xe9f2ec, grass: 0xa8c8b0 }, // 9 Fayoum — soft lake green-white
+  { sky: 0xa8ecd2, ground: 0x57b364, grass: 0x2f9e4f }, // 10 Nile Bank — deep lush green
+  { sky: 0xffe2ae, ground: 0x9fae4a, grass: 0x7fae3e }, // 11 Delta Farm — rich farm green
+  { sky: 0xdfeaf2, ground: 0xe4edf2, grass: 0xbfd4de }, // 12 Delta Canal Den — cool grey-blue winter
 ];
 
 function rng(seed) {

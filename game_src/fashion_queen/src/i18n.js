@@ -1,7 +1,7 @@
 import { makeI18n } from '../../cozy_kit/ui.js';
 
 export const S = {
-  title: ['ملكة الموضة', 'FASHION QUEEN'], subtitle: ['عالم البنات الأجمل', 'Ultimate Girls World'], play: ['يلا نلعب', 'PLAY'],
+  title: ['ليلى ملكة أزياء مصر', 'LAYLA, FASHION QUEEN OF EGYPT'], subtitle: ['عالم ليلى', "Layla's World"], play: ['يلا نلعب', 'PLAY'],
   m_studio: ['استوديو الأزياء', 'Fashion Studio'], m_salon: ['صالون الجمال', 'Beauty Salon'], m_pets: ['عالم الحيوانات', 'Pet World'], m_house: ['بيت الأحلام', 'Dream House'],
   m_runway: ['المنصة', 'Runway'], m_shop: ['المتجر', 'Shop'], m_missions: ['المهام', 'Missions'], m_settings: ['الإعدادات', 'Settings'], m_exit: ['خروج', 'Exit'],
   back: ['رجوع', 'Back'], sound: ['الصوت', 'Sound'], tapSound: ['🔊 دوسي هنا عشان الصوت', '🔊 Tap here for sound'],
@@ -20,8 +20,9 @@ export const S = {
   hint_house: ['اختاري قطعة أثاث وبعدين دوسي على مربع', 'Pick furniture, then tap a square'], hint_place: ['دوسي على مربع فاضي عشان تحطيها', 'Tap an empty square to place it'], hint_picked: ['دوسي على مربع فاضي عشان تنقليها', 'Tap an empty square to move it'],
   flip: ['اقلبي', 'Flip'], recolor: ['لوّني', 'Recolour'], remove: ['شيلي', 'Remove'], saveRoom: ['احفظي الغرفة', 'Save room'], roomSaved: ['اتحفظت الغرفة 🏠', 'Room saved 🏠'], roomSame: ['لسه مفيش تغيير جديد', 'No new changes'], wallpaper: ['ورق الحيطة', 'Wallpaper'], floor: ['الأرضية', 'Floor'], furniture: ['أثاث', 'Furniture'],
   runwayTitle: ['المنصة الملكية', 'Royal Runway'], runwayPick: ['اختاري موضوع العرض', 'Pick a show theme'],
-  tag_casual: ['كاجوال', 'casual'], tag_school: ['مدرسة', 'school'], tag_party: ['حفلة', 'party'], tag_royal: ['ملكي', 'royal'], tag_princess: ['أميرة', 'princess'], tag_wedding: ['فرح', 'wedding'], tag_beach: ['شاطئ', 'beach'], tag_summer: ['صيف', 'summer'], tag_winter: ['شتا', 'winter'], tag_fantasy: ['خيال', 'fantasy'],
-  judge1: ['حلو! ممكن أحلى', 'Nice! Even better next time'], judge2: ['جميل جداً!', 'Very pretty!'], judge3: ['ملكة الموضة! 👑', 'Fashion Queen! 👑'],
+  tag_casual: ['كاجوال', 'casual'], tag_school: ['مدرسة', 'school'], tag_party: ['حفلة', 'party'], tag_royal: ['ملكي', 'royal'], tag_princess: ['أميرة', 'princess'], tag_wedding: ['فرح', 'wedding'], tag_beach: ['شاطئ', 'beach'], tag_summer: ['صيف', 'summer'], tag_winter: ['شتا', 'winter'], tag_fantasy: ['خيال', 'fantasy'], tag_egypt: ['مصري', 'egypt'],
+  m_passport: ['جواز الأناقة', 'Style Passport'], passportHint: ['الأختام بتتجمّع لوحدها من العروض والعوالم والإطلالات المحفوظة', 'Stamps collect themselves from shows, worlds and saved looks'], stampGot: ['اتختم!', 'Stamped!'],
+  judge1: ['الجمهور بيصفق لك! 👏', 'The crowd claps for you! 👏'], judge2: ['الجمهور فرحان قوي! 🎉', 'The crowd is thrilled! 🎉'], judge3: ['الجمهور بيهتف باسمك! 👑', 'The crowd chants your name! 👑'],
   tipStyle: ['جرّبي قطع فيها كلمات الموضوع', 'Try pieces that match the theme words'], tipBasics: ['البسي فستان (أو بلوزة وتنورة) وحذاء', 'Wear a dress (or top and skirt) and shoes'], tipMakeup: ['الميك أب بيزوّد النقط', 'Makeup adds points'], tipGreat: ['إطلالة رائعة!', 'A wonderful look!'],
   themes: ['المواضيع', 'Themes'], again: ['تاني', 'Again'], menu: ['القائمة', 'Menu'],
   worlds: ['عوالم الموضة', 'Fashion Worlds'], needStars: ['محتاجة نجوم', 'Needs stars'], worldDone: ['العالم خلص!', 'World complete!'], level: ['المستوى', 'Level'], collect: ['استلمي', 'Collect'], goDo: ['يلا', 'Go'], chest: ['صندوق الجوايز', 'Reward chest'],

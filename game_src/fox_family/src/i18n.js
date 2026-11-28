@@ -1,5 +1,5 @@
 const S = {
-  title: ['أم الثعلب ومغامرات العيور', 'Fox Family Rescue'],
+  title: ['عيلة الفنك', 'Fennec Family Rescue'],
   level: ['المرحلة', 'Level'],
   locked: ['خلّص المرحلة اللي قبلها', 'Finish the level before'],
   play: ['يلا نروح البيت!', "Let's go home!"],
@@ -27,6 +27,11 @@ const S = {
   loading: ['بنجهّز الطريق...', 'Getting the road ready...'],
   noWebgl: ['الجهاز ده مش بيشغّل اللعبة ثلاثية الأبعاد.', 'This device cannot run the 3D game.'],
   sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
+  album: ['ألبوم نزهة التوت', 'Berry Picnic Album'],
+  albumSub: ['كل رحلة ليها نزهة وحكاية — كمّل الرحلة عشان تفتحها!', 'Every journey has a picnic and a story — finish the journey to open it!'],
+  lockedFact: ['لسه سرّ! كمّل الرحلة دي عشان تعرف حكاية النزهة', "Still a secret! Finish this journey to learn the picnic's story"],
+  back: ['رجوع', 'Back'],
+  listen: ['اسمع', 'Listen'],
 };
 
 let lang = 'ar';

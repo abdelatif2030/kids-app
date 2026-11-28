@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Show, TRACKS, R, normalizeSave } from '../src/sim.js';
+import { Show, TRACKS, R, normalizeSave, panoOf, tourComplete } from '../src/sim.js';
 
 const wrap = (a) => { while (a > Math.PI) a -= Math.PI * 2; while (a < -Math.PI) a += Math.PI * 2; return a; };
 
@@ -149,11 +149,17 @@ test('damaged saves load safely', () => {
   }
 });
 
-test('every track has a shipped panorama wired for its venue (art/pano<track+1>.webp)', async () => {
+test('every track has a shipped panorama wired for its venue (tracks 1–7 their own, 8–12 a reused one)', async () => {
   const { existsSync } = await import('node:fs');
   const { fileURLToPath } = await import('node:url');
   const artDir = fileURLToPath(new URL('../../../assets/games/rhythm/art/', import.meta.url));
-  for (let i = 0; i < TRACKS.length; i++) assert.ok(existsSync(`${artDir}pano${i + 1}.webp`), `missing pano${i + 1}.webp for track ${i}`);
+  for (const tk of TRACKS) {
+    const p = panoOf(tk);
+    assert.ok(p >= 1 && p <= 7, `track ${tk.id} pano ${p} out of shipped range`);
+    assert.ok(existsSync(`${artDir}pano${p}.webp`), `missing pano${p}.webp for track ${tk.id}`);
+  }
+  // the original seven keep their own panorama, in order
+  assert.deepEqual(TRACKS.slice(0, 7).map(panoOf), [1, 2, 3, 4, 5, 6, 7]);
 });
 
 import fs from 'node:fs';
@@ -161,5 +167,134 @@ import fs from 'node:fs';
 test('Cairo Rhythm anchor + kind rules: Egyptian venues, and three lives for everyone', () => {
   const i18n = fs.readFileSync(new URL('../src/i18n.js', import.meta.url), 'utf8');
   assert.ok(i18n.includes("title: ['إيقاع القاهرة', 'Cairo Rhythm']"));
-  assert.deepEqual(TRACKS.map((t) => t.en), ['Hara Café', 'Khan el-Khalili Records', 'Hara Rooftop', 'Nile Lounge', "Grandma's Music Box", 'Cairo Opera House', 'Cairo Grand Orchestra']);
+  assert.deepEqual(TRACKS.map((t) => t.en), ['Hara Café', 'Khan el-Khalili Records', 'Hara Rooftop', 'Nile Lounge', "Grandma's Music Box", 'Cairo Opera House', 'Cairo Grand Orchestra',
+    'Mohamed Ali Street', 'Salah El-Din Citadel', 'Nile Boat', 'Al-Azhar Park', 'A Night in Al-Hussein']);
+});
+
+// ---- Phase 2F ---------------------------------------------------------------------------------------------
+
+const FIRST7 = [
+  { id: 1, ar: 'مقهى الحارة', en: 'Hara Café', bpm: 112, len: 40, arms: [['low', 8]], high: false, gaps: false, flip: false, tonearm: false },
+  { id: 2, ar: 'أسطوانات خان الخليلي', en: 'Khan el-Khalili Records', bpm: 116, len: 45, arms: [['low', 8], ['high', 12]], gaps: false, flip: false, tonearm: false },
+  { id: 3, ar: 'سطح الحارة', en: 'Hara Rooftop', bpm: 120, len: 50, arms: [['low', 8], ['high', 10]], gaps: true, flip: false, tonearm: false },
+  { id: 4, ar: 'صالة النيل', en: 'Nile Lounge', bpm: 124, len: 55, arms: [['low', 6], ['high', 10]], gaps: true, flip: true, tonearm: false },
+  { id: 5, ar: 'صندوق موسيقى الجدة', en: "Grandma's Music Box", bpm: 128, len: 60, arms: [['low', 6], ['high', 8], ['low', 12]], gaps: true, flip: true, tonearm: true },
+  { id: 6, ar: 'دار الأوبرا', en: 'Cairo Opera House', bpm: 132, len: 64, arms: [['low', 6], ['high', 7], ['low', 9]], gaps: true, flip: true, tonearm: true },
+  { id: 7, ar: 'أوركسترا القاهرة', en: 'Cairo Grand Orchestra', bpm: 136, len: 70, arms: [['high', 6], ['low', 6], ['high', 8], ['low', 10]], gaps: true, flip: true, tonearm: true },
+];
+
+test('Phase 2F: 12 tracks, and the first seven are byte-equivalent in behaviour (unchanged data)', () => {
+  assert.equal(TRACKS.length, 12);
+  assert.deepEqual(TRACKS.slice(0, 7), FIRST7);
+  assert.deepEqual(TRACKS.map((t) => t.id), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+});
+
+test('Phase 2F: the five new tracks each lead with an Egyptian instrument, at new venues', () => {
+  const news = TRACKS.slice(7);
+  assert.deepEqual(news.map((t) => t.lead), ['oud', 'tabla', 'rababa', 'mizmar', 'qanun']);
+  const oldVenues = new Set(TRACKS.slice(0, 7).map((t) => t.en));
+  for (const tk of news) assert.ok(!oldVenues.has(tk.en), `venue ${tk.en} collides with the first seven`);
+  // difficulty rises gently: bpm and length never drop below the track before
+  for (let i = 1; i < TRACKS.length; i++) {
+    assert.ok(TRACKS[i].bpm >= TRACKS[i - 1].bpm - 14, `bpm cliff at track ${TRACKS[i].id}`);
+    assert.ok(TRACKS[i].len > TRACKS[i - 1].len, `track ${TRACKS[i].id} not longer than the one before`);
+  }
+  // every new lead has a synth voice + an original melody in audio.js, and the tour sums to ≈15 minutes
+  const audio = fs.readFileSync(new URL('../src/audio.js', import.meta.url), 'utf8');
+  for (const lead of ['oud', 'tabla', 'rababa', 'mizmar', 'qanun']) {
+    assert.ok(audio.includes(`_${lead === 'tabla' ? 'tablaStroke' : lead}(`), `no synth voice for ${lead}`);
+    assert.ok(audio.includes(`${lead}: [`), `no melody for ${lead}`);
+  }
+  const totalSec = TRACKS.reduce((s, tk) => s + tk.len + 240 / tk.bpm, 0); // track length + 4-beat count-in
+  assert.ok(totalSec >= 14 * 60 && totalSec <= 16 * 60, `tour is ${Math.round(totalSec)}s, target ≈15 min`);
+});
+
+test('Phase 2F: unlock chain runs 1→12 and old 7-track saves migrate safely', () => {
+  // an old save from the 7-track era: stars on 1–7, unlocked 7 → opens track 8, keeps every star
+  const old = normalizeSave({ unlocked: 7, stars: { 1: 3, 2: 2, 3: 1, 4: 1, 5: 2, 6: 1, 7: 3 } });
+  assert.equal(old.unlocked, 8);
+  assert.deepEqual(old.stars, { 1: 3, 2: 2, 3: 1, 4: 1, 5: 2, 6: 1, 7: 3 });
+  assert.equal(tourComplete(old), false);
+  // winning forward: a star on track k unlocks k+1, all the way to 12, never beyond
+  for (let k = 1; k <= 12; k++) {
+    const stars = {};
+    for (let j = 1; j <= k; j++) stars[j] = 1;
+    const s = normalizeSave({ unlocked: 1, stars });
+    assert.equal(s.unlocked, Math.min(12, k + 1), `after track ${k}`);
+    assert.equal(tourComplete(s), k === 12);
+  }
+  // a wild save still clamps to the 12-track tour
+  assert.equal(normalizeSave({ unlocked: 99 }).unlocked, 12);
+});
+
+test('Phase 2F: the music scheduler runs every lead (sax + 5 Egyptian) for full song cycles without throwing', async () => {
+  const { Sound, LEADS } = await import('../src/audio.js');
+  const param = () => ({ value: 0, setValueAtTime() {}, exponentialRampToValueAtTime() {}, setTargetAtTime() {} });
+  const node = () => ({ gain: param(), frequency: param(), Q: { value: 1 }, type: '', connect: (n) => n || node(), start() {}, stop() {} });
+  for (const lead of LEADS) {
+    const s = new Sound();
+    s.ctx = { state: 'running', currentTime: 0, createOscillator: node, createGain: node, createBiquadFilter: node, createBufferSource: node };
+    s.music = node();
+    s.sfx = node();
+    s.noiseBuf = {};
+    s.mode = 'play';
+    s.tempo = 126;
+    s.step = 0;
+    s.nextTime = 0;
+    let leadNotes = 0;
+    const origLead = s._leadNote.bind(s);
+    s._leadNote = (...a) => { leadNotes++; return origLead(...a); };
+    const origSax = s._sax.bind(s);
+    s._sax = (...a) => { leadNotes++; return origSax(...a); };
+    for (let k = 0; k < 300; k++) { s.ctx.currentTime = k * 0.1; s._schedule(); }
+    assert.ok(s.step > 100, `${lead}: only ${s.step} steps scheduled`);
+    assert.ok(leadNotes > 0, `${lead}: no lead notes scheduled`);
+    s.setLead(lead);
+    assert.equal(s.lead, lead);
+  }
+  const s2 = new Sound();
+  s2.setLead('not-an-instrument');
+  assert.equal(s2.lead, 'sax', 'unknown leads fall back to the sax');
+});
+
+test('Phase 2F: encore is faster by the sim tempo only — same chart, same lives, robot still finishes', () => {
+  const normal = new Show({ track: 0, seed: 1 });
+  const encore = new Show({ track: 0, seed: 1, encore: true });
+  assert.equal(normal.bpm, 112);
+  assert.equal(encore.bpm, Math.round(112 * 1.15));
+  assert.ok(encore.beat < normal.beat);
+  assert.equal(encore.track, normal.track); // the same fixed chart data — nothing regenerated
+  assert.equal(encore.lives, 3);
+  assert.equal(normal.encore, false);
+  for (const i of [0, 7, 11]) {
+    let wins = 0;
+    for (let seed = 1; seed <= 4; seed++) {
+      const s = new Show({ track: i, seed, encore: true });
+      let t = 0;
+      while ((s.state === 'intro' || s.state === 'play') && t < 240) { s.step(1 / 30, robot(s)); t += 1 / 30; }
+      if (s.state === 'won') wins++;
+    }
+    assert.ok(wins >= 2, `encore track ${TRACKS[i].id} too hard: ${wins}/4`);
+  }
+});
+
+test('Certification Sweep A: tracks 8-12 have distinct mechanic mixes and distinct code-drawn motifs', () => {
+  const news = TRACKS.slice(7);
+  // no two of the five share the same challenge shape (gaps/flip/tonearm/arm-count)
+  const mixes = news.map((t) => [t.gaps, t.flip, t.tonearm, t.arms.length].join('/'));
+  assert.equal(new Set(mixes).size, 5, `mechanic mixes collide: ${mixes.join(' ')}`);
+  // only the finale combines every pressure at once; track 8 re-introduces gently (gaps only)
+  assert.deepEqual([news[0].gaps, news[0].flip, news[0].tonearm], [true, false, false]);
+  assert.deepEqual([news[4].gaps, news[4].flip, news[4].tonearm], [true, true, true]);
+  // distinct venue motifs, all implemented as code-drawn canvas art in main.js
+  assert.deepEqual(news.map((t) => t.motif), ['oud', 'citadel', 'boat', 'park', 'lanterns']);
+  const main = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes('drawMotifCanvas'), 'motif compositor missing from main.js');
+  for (const m of ['oud', 'citadel', 'boat', 'park', 'lanterns']) assert.ok(main.includes(`motif === '${m}'`), `motif ${m} not drawn`);
+  // the robot still finishes every re-mixed track
+  for (const tk of news) {
+    let wins = 0;
+    for (let seed = 1; seed <= 4; seed++) { const s = new Show({ track: tk.id - 1, seed }); let t = 0; while ((s.state === 'intro' || s.state === 'play') && t < 200) { s.step(1 / 30, robot(s)); t += 1 / 30; } if (s.state === 'won') wins++; }
+    assert.ok(wins >= 2, `track ${tk.id} robot wins ${wins}/4 after mechanic remix`);
+  }
 });

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Race, COURSES, LAPS, normalizeSave, TUBE_X, RING_R } from '../src/sim.js';
+import { Race, COURSES, LAPS, normalizeSave, postcards, TUBE_X, RING_R } from '../src/sim.js';
 
 const DT = 1 / 60;
 
@@ -102,7 +102,7 @@ test('flying into a bridge deck is a soft bump, never the end', () => {
 
 test('damaged saves load safely', () => {
   assert.deepEqual(normalizeSave(null), { unlocked: 1, stars: {}, best: {}, muted: false });
-  assert.deepEqual(normalizeSave({ unlocked: 9, stars: { 1: 7, 2: 2 }, best: { 1: 'x', 2: 61.234 }, muted: 'yes' }), { unlocked: 3, stars: { 2: 2 }, best: { 2: 61.23 }, muted: false });
+  assert.deepEqual(normalizeSave({ unlocked: 42, stars: { 1: 7, 2: 2 }, best: { 1: 'x', 2: 61.234 }, muted: 'yes' }), { unlocked: 3, stars: { 2: 2 }, best: { 2: 61.23 }, muted: false });
 });
 
 test('every course flies over its own real place (B2: explicit pano, no ice over Cairo)', async () => {
@@ -125,5 +125,79 @@ import fs from 'node:fs';
 test('Nile Air Tour anchor: title renamed; five landmark courses unchanged', () => {
   const i18n = fs.readFileSync(new URL('../src/i18n.js', import.meta.url), 'utf8');
   assert.ok(i18n.includes("title: ['جولة النيل الجوية', 'Nile Air Tour']"));
-  assert.deepEqual(COURSES.map((c) => c.en), ['Cairo Airport', 'New Capital', 'Alex Library', 'Montaza Palace', 'Baron Palace']);
+  assert.deepEqual(COURSES.slice(0, 5).map((c) => c.en), ['Cairo Airport', 'New Capital', 'Alex Library', 'Montaza Palace', 'Baron Palace']);
+});
+
+// ---- Phase 2G: southern leg + postcards ---------------------------------------------------------------------------------
+
+// The pre-2G data of courses 1–5, field for field (the new `fact` field is additive and excluded here).
+const FROZEN_FIVE = [
+  { id: 1, ar: 'مطار القاهرة', en: 'Cairo Airport', world: 'sunset', pano: 1, rx: 380, rz: 300, wob: [0.22, 3, 0.4], hy: [34, 10], rings: 26, golden: 4, bridges: [5, 14, 21], pillars: [3, 9, 17, 24], arches: [12] },
+  { id: 2, ar: 'العاصمة الجديدة', en: 'New Capital', world: 'desert', pano: 2, rx: 420, rz: 330, wob: [0.28, 2, 1.1], hy: [46, 14], rings: 28, golden: 4, bridges: [19], pillars: [4, 10, 15, 23, 26], arches: [7, 13, 21], canyon: [0.62, 0.74] },
+  { id: 3, ar: 'مكتبة إسكندرية', en: 'Alex Library', world: 'lagoon', pano: 3, rx: 400, rz: 340, wob: [0.3, 4, 2.2], hy: [38, 12], rings: 30, golden: 5, bridges: [4, 11, 18, 26], pillars: [2, 8, 15, 22, 28], arches: [6, 20] },
+  { id: 4, ar: 'قصر المنتزه', en: 'Montaza Palace', world: 'lagoon', pano: 4, rx: 440, rz: 340, wob: [0.3, 4, 1.5], hy: [40, 12], rings: 30, golden: 5, bridges: [3, 9, 15, 22, 27], pillars: [2, 7, 12, 18, 25], arches: [5, 13, 20] },
+  { id: 5, ar: 'قصر البارون', en: 'Baron Palace', world: 'sunset', pano: 5, rx: 460, rz: 360, wob: [0.3, 3, 2.6], hy: [48, 14], rings: 32, golden: 5, bridges: [10, 24], pillars: [3, 8, 14, 19, 27, 30], arches: [6, 12, 17, 23, 29], canyon: [0.5, 0.64] },
+];
+const dataOf = (c) => Object.fromEntries(Object.entries(c).filter(([k]) => k !== 'fact'));
+
+test('2G freeze: the first five courses are byte-identical data; the southern leg is appended only', () => {
+  assert.equal(COURSES.length, 9);
+  assert.deepEqual(COURSES.map((c) => c.id), [1, 2, 3, 4, 5, 6, 7, 8, 9], 'ids stay sequential, nothing renumbered');
+  for (let i = 0; i < 5; i++) assert.deepEqual(dataOf(COURSES[i]), FROZEN_FIVE[i], `course ${i + 1} data changed`);
+  assert.deepEqual(COURSES.slice(5).map((c) => c.en), ['Luxor Temples', 'Aswan & the Nile', 'Abu Simbel', 'Hurghada & the Red Sea']);
+  assert.deepEqual(COURSES.slice(5).map((c) => c.world), ['desert', 'lagoon', 'sunset', 'lagoon']);
+  // the difficulty curve continues gently: rings and course size never shrink along the tour
+  for (let i = 1; i < COURSES.length; i++) assert.ok(COURSES[i].rings >= COURSES[i - 1].rings - 2, `rings dip at course ${COURSES[i].id}`);
+  for (const c of COURSES) {
+    assert.ok(c.fact && c.fact.ar.length > 10 && c.fact.en.length > 10, `course ${c.id} needs a postcard fact in both languages`);
+    for (const k of [...c.bridges, ...c.pillars, ...c.arches]) assert.ok(k >= 0 && k < c.rings, `course ${c.id} obstacle ring ${k} out of range`);
+  }
+});
+
+test('2G unlock chain reaches the end of the southern leg', () => {
+  for (let k = 1; k <= 8; k++) {
+    const stars = {};
+    for (let id = 1; id <= k; id++) stars[id] = 1;
+    assert.ok(normalizeSave({ stars }).unlocked >= k + 1, `finishing course ${k} must open course ${k + 1}`);
+  }
+  const all = {};
+  for (let id = 1; id <= 9; id++) all[id] = 3;
+  assert.equal(normalizeSave({ stars: all }).unlocked, 9);
+  assert.equal(normalizeSave({ unlocked: 9 }).unlocked, 9, 'the cap rose with the tour');
+});
+
+test('2G old-save migration: a finished pre-2G save keeps everything and earns its five postcards', () => {
+  const old = { unlocked: 5, stars: { 1: 3, 2: 3, 3: 2, 4: 1, 5: 3 }, best: { 1: 88.5, 5: 120.25 }, muted: true };
+  assert.deepEqual(normalizeSave(old), { unlocked: 6, stars: { 1: 3, 2: 3, 3: 2, 4: 1, 5: 3 }, best: { 1: 88.5, 5: 120.25 }, muted: true },
+    'stars/best/muted survive untouched; unlocked follows the stars into the new leg (course 5 done → 6 open)');
+  const cards = postcards(old);
+  assert.deepEqual(cards.map((e) => e.got), [true, true, true, true, true, false, false, false, false]);
+});
+
+test('2G postcards: locked cards are secrets, earned cards show name, stars and fact', () => {
+  const fresh = postcards(null);
+  assert.equal(fresh.length, 9);
+  assert.ok(fresh.every((e) => !e.got && e.fact === null), 'a fresh save leaks no fact');
+  const some = postcards({ stars: { 1: 2, 6: 3 } });
+  assert.deepEqual(some.map((e) => e.got), [true, false, false, false, false, true, false, false, false]);
+  assert.equal(some[0].stars, 2);
+  assert.equal(some[0].fact, COURSES[0].fact);
+  assert.equal(some[5].fact.en, COURSES[5].fact.en);
+  assert.equal(some[1].fact, null, 'an unearned card stays a secret even mid-tour');
+});
+
+test('2G campaign proof: the pilot flies the whole tour in order, first race to last, and collects every postcard', () => {
+  // the same progression rule main.js applies on the results screen
+  let save = normalizeSave(null);
+  for (let i = 0; i < COURSES.length; i++) {
+    assert.ok(i + 1 <= save.unlocked, `course ${i + 1} should be open by now (unlocked=${save.unlocked})`);
+    const { r } = fly(i, pilot);
+    assert.equal(r.state, 'done', `course ${i + 1}`);
+    assert.ok(r.result.stars >= 1, `course ${i + 1} finished`);
+    save.stars[COURSES[i].id] = Math.max(save.stars[COURSES[i].id] ?? 0, r.result.stars);
+    if (i + 2 > save.unlocked && i + 1 < COURSES.length) save.unlocked = i + 2;
+    save = normalizeSave(save);
+  }
+  assert.equal(save.unlocked, 9);
+  assert.ok(postcards(save).every((e) => e.got), 'every postcard earned by the end of the tour');
 });

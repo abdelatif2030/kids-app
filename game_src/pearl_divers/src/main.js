@@ -5,7 +5,7 @@
 // coins fly to your cash. Per ledge: HIRE (a diver who works alone) and an up-arrow x3 button; below the last ledge NEW LEDGE.
 // A bar at the top races your wealth to the rival's fortune on the pink yacht. 2D canvas, art and sound made in code.
 // No network, nothing lost for good.
-import { Lagoon, LEDGES, RIVAL_GOAL, MAX_HIRE, MAX_UP, BELL_TIME, UP_MULT, recordBest, normalizeSave } from './sim.js';
+import { Lagoon, LEDGES, RIVAL_GOAL, MAX_HIRE, MAX_UP, BELL_TIME, UP_MULT, recordBest, normalizeSave, recordZone, pearlAlbum, depthOf, ZONE_THEMES } from './sim.js';
 import { SynthBase, hz } from '../../cozy_kit/audio.js';
 import { h, css, makeI18n } from '../../cozy_kit/ui.js';
 import { loadArt } from '../../cozy_kit/art.js';
@@ -14,11 +14,14 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 const PEARL_CLIPS = { go: 2, pickup: 2, charge: 2, win: 2 };
 
 const S = {
-  title: ['غوّاصو اللؤلؤ', 'Pearl Divers'], play: ['يلا نغوص', 'Dive in'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], again: ['من الأول', 'Play again'],
+  title: ['غوّاصو لؤلؤ البحر الأحمر', 'Red Sea Pearl Divers'], play: ['يلا نغوص', 'Dive in'], exit: ['خروج', 'Exit'], menu: ['القائمة', 'Menu'], again: ['من الأول', 'Play again'],
   how: ['دوس عشان الغوّاص ينزل — وظّف غوّاصين وافتح أعماق جديدة عشان تعدّي المنافس', 'Tap to dive — hire divers and open new ledges to beat the rival'],
   you: ['أنت', 'YOU'], hire: ['وظّف', 'HIRE'], ledge: ['عمق جديد', 'NEW LEDGE'], max: ['أقصى', 'MAX'], tapDive: ['دوس عشان يغوص!', 'TAP TO DIVE!'],
-  allMine: ['كله بتاعي!', 'ALL MINE!'], youWin: ['كسبت!', 'YOU WIN!'], won: ['عدّيت المنافس! 🏆', 'You overtook the rival! 🏆'], wonText: ['بقيت أغنى تاجر لؤلؤ في البحيرة.', 'You are the richest pearl trader in the lagoon.'],
+  allMine: ['كله بتاعي!', 'ALL MINE!'], youWin: ['كسبت!', 'YOU WIN!'], won: ['عدّيت المنافس! 🏆', 'You overtook the rival! 🏆'], wonText: ['بقيت أغنى تاجر لؤلؤ على ساحل البحر الأحمر.', 'You are the richest pearl trader on the Red Sea coast.'],
   sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'], win_m: ['شطوووووور!', 'Well done!'], win_f: ['شطووووورة!', 'Well done!'],
+  album: ['ألبوم اللؤلؤ', 'Pearl album'], albumSub: ['كل عمق جديد ليه كنز وحكاية — افتح الأعماق عشان تجمعهم!', 'Every new depth hides a treasure and a tale — open the depths to collect them!'],
+  lockedFact: ['لسه مقفول — اغوص أعمق عشان تفتحه!', 'Still locked — dive deeper to open it!'], back: ['رجوع', 'Back'],
+  depth: ['متر', 'm deep'],
 };
 const I = makeI18n(S);
 
@@ -45,8 +48,8 @@ const CUR = () => (I.getLang() === 'en' ? 'EGP' : 'ج.م');
 const f = (n) => (n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e4 ? `${(n / 1e3).toFixed(1)}K` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : String(Math.round(n)));
 // Optional generated pictures (assets/games/pearl_divers/art/*.webp). Each one is optional: a missing picture is drawn in code as before.
 const ART_NAMES = ['sky_lagoon', 'island', 'stall_boat', 'yacht', 'rival', 'diver', 'clam_open', 'clam_closed', 'bell', 'basket', 'coral', 'water_a', 'water_b'];
-const ROCK = ['#e6c9a0', '#d8a0b8', '#a898c8', '#6a5a98'];
-const WATER = [['#5ae0ee', '#2aa8d0'], ['#3ab8dc', '#1a80b8'], ['#2a88c0', '#14589a'], ['#1a60a0', '#0a3a78']];
+const ROCK = ['#e6c9a0', '#d8a0b8', '#a898c8', '#6a5a98', '#4a4a88', '#2e2a68'];
+const WATER = [['#5ae0ee', '#2aa8d0'], ['#3ab8dc', '#1a80b8'], ['#2a88c0', '#14589a'], ['#1a60a0', '#0a3a78'], ['#124a8a', '#082a66'], ['#0c3670', '#051e4e']];
 
 class Game {
   constructor(el, config, post) {
@@ -89,6 +92,14 @@ class Game {
 .pd-wt{font-size:calc(var(--u)*8.4);font-weight:900;color:#ffe04a;-webkit-text-stroke:calc(var(--u)*.7) #0a3a50;paint-order:stroke fill;text-align:center;line-height:1.05}
 .pd-stars{font-size:calc(var(--u)*13);letter-spacing:calc(var(--u)*1)}.pd-stars span:nth-child(2){font-size:calc(var(--u)*17);vertical-align:calc(var(--u)*2)}
 .pd-mon{display:flex;align-items:center;gap:calc(var(--u)*1.4);background:linear-gradient(180deg,#1a78a8,#0e4a78);border:calc(var(--u)*.5) solid #fff;border-radius:999px;padding:calc(var(--u)*.6) calc(var(--u)*4);font-weight:900;font-size:calc(var(--u)*6);color:#ffe04a}
+.pd-album{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:calc(var(--u)*2);max-height:52vh;overflow-y:auto;width:100%}
+.pd-acard{background:rgba(255,255,255,.14);border:calc(var(--u)*.4) solid rgba(255,255,255,.55);border-radius:calc(var(--u)*2.4);padding:calc(var(--u)*1.8);display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*.8);text-align:center;color:#fff}
+.pd-acard .ic{font-size:calc(var(--u)*8);line-height:1}
+.pd-acard .ic.shadow{filter:brightness(0);opacity:.55}
+.pd-acard .nm{font-weight:900;font-size:calc(var(--u)*3.4)}
+.pd-acard .alt{font-size:calc(var(--u)*2.6);opacity:.85}
+.pd-acard .fact{font-size:calc(var(--u)*2.8);line-height:1.5}
+.pd-acard .dep{font-size:calc(var(--u)*2.4);opacity:.8}
 ` ));
     this.root = h('div', { class: 'pd-root', dir: I.getLang() === 'en' ? 'ltr' : 'rtl' });
     el.append(this.root);
@@ -149,7 +160,35 @@ class Game {
     this.layer.append(h('div', { class: 'pd-dim' }, h('div', { class: 'pd-card' },
       h('div', { class: 'pd-logo' }, '🦪 ', I.t('title')), h('div', { class: 'pd-small' }, I.t('how')),
       h('button', { class: 'pd-btn', onclick: () => { this.sound.play('buy'); this.start(); } }, I.t('play')),
+      h('button', { class: 'pd-btn dark', onclick: () => this.showAlbum() }, '📖 ', I.t('album')),
       h('button', { class: 'pd-btn dark', onclick: () => this.post({ type: 'exit' }) }, I.t('exit')))));
+    this._soundPill();
+  }
+
+  /** Pearl album: save-derived collection, one card per ladder zone.
+   * Earned cards show icon + name + fact; locked cards are silhouettes and
+   * the derivation (pearlAlbum) never hands their facts to this screen. */
+  showAlbum() {
+    this.mode = 'album';
+    this.layer.replaceChildren();
+    this.sound.setMode(false);
+    const en = I.getLang() === 'en';
+    const cards = pearlAlbum(this.save).map((e) => e.unlocked
+      ? h('div', { class: 'pd-acard' },
+        h('div', { class: 'ic' }, e.icon),
+        h('div', { class: 'nm' }, en ? e.en : e.ar),
+        h('div', { class: 'alt' }, en ? e.ar : e.en),
+        h('div', { class: 'fact' }, en ? e.fact.en : e.fact.ar),
+        h('div', { class: 'dep' }, `${e.depth} ${I.t('depth')}`))
+      : h('div', { class: 'pd-acard' },
+        h('div', { class: 'ic shadow' }, '🦪'),
+        h('div', { class: 'nm' }, '🔒 ؟؟؟'),
+        h('div', { class: 'fact' }, I.t('lockedFact')),
+        h('div', { class: 'dep' }, `${e.depth} ${I.t('depth')}`)));
+    this.layer.append(h('div', { class: 'pd-dim' }, h('div', { class: 'pd-card' },
+      h('div', { class: 'pd-logo' }, '📖 ', I.t('album')), h('div', { class: 'pd-small' }, I.t('albumSub')),
+      h('div', { class: 'pd-album' }, cards),
+      h('button', { class: 'pd-btn dark', onclick: () => this.showMenu() }, I.t('back')))));
     this._soundPill();
   }
 
@@ -235,6 +274,10 @@ class Game {
         for (let i = 0; i < n; i++) this.coins.push({ x: b.x, y: Math.max(b.y, this.u * 16), t: -i * 0.07, dx: (Math.random() - 0.5) * this.u * 8 });
       }
       if (e.type === 'buy' && e.kind === 'up') { const i = l.areas.findIndex((a) => a.id === e.id); this.fx.push({ x: L.x0 + L.Wc * 0.82, y: L.surf + i * L.rowH - this.cam + L.rowH * 0.2, t: 0, text: `x${UP_MULT}`, big: true }); }
+      if (e.type === 'buy' && e.kind === 'area') { // a new ladder rung opened: remember it in the save (feeds the pearl album)
+        for (const a of l.areas) if (a.isOpen) this.save.zones = recordZone(this.save, a.id);
+        this.post({ type: 'save', save: this.save });
+      }
       if (e.type === 'won') this._won();
     }
     // camera follows the deepest open ledge, with room for the NEW LEDGE button
@@ -254,11 +297,16 @@ class Game {
     // shop buttons sit on their ledge (right side), the NEW LEDGE button under the last one
     this.shopEls.forEach((s, i) => {
       const a = l.areas[i];
-      const y = L.surf + i * L.rowH - this.cam + L.rowH * 0.1;
+      const y = L.surf + i * L.rowH - this.cam + L.rowH * 0.17;
       const vis = a.isOpen && y > this.u * 14 - L.rowH * 0.2 && y < this.ch;
       const hc = l.cost('hire', a.id); const uc = l.cost('up', a.id);
       this._place(s.hire, vis && hc !== null, L.x0 + L.Wc * 0.03, y, hc, l.cash, a.hired >= MAX_HIRE);
-      this._place(s.up, vis && uc !== null, L.x0 + L.Wc * 0.45, y, uc, l.cash, a.upLvl >= MAX_UP);
+      // the x3 button sits AFTER the hire button's real width — never on top of its label.
+      // On the narrow landscape column it may spill over the open water beside the column;
+      // covering the hire label is worse. Only the screen edge caps it.
+      let upX = L.x0 + L.Wc * 0.45;
+      if (vis && hc !== null && uc !== null) { s.up.b.style.display = 'flex'; upX = Math.min(s.hire.b.offsetLeft + s.hire.b.offsetWidth + this.u * 1.2, this.cw - s.up.b.offsetWidth - this.u * 0.6); }
+      this._place(s.up, vis && uc !== null, upX, y, uc, l.cash, a.upLvl >= MAX_UP);
       s.up.lab.textContent = `x${UP_MULT}`;
     });
     const nx = l.nextLedge;
@@ -278,6 +326,7 @@ class Game {
 
   _won() {
     this.save.wins += 1;
+    for (const a of this.l.areas) if (a.isOpen) this.save.zones = recordZone(this.save, a.id);
     this.save.best = recordBest(this.save.best, this.l.time); // fastest dive is the best — never the slowest
     this.post({ type: 'save', save: this.save });
     this.sound.play('win');
@@ -328,16 +377,19 @@ class Game {
       g.fillStyle = wg; g.fillRect(0, top, W, y1 - top);
       this._cover(g, i < 2 ? 'water_a' : 'water_b', 0, top, W, y1 - top, a.isOpen ? 0.7 : 0.55);
       if (!a.isOpen) { g.fillStyle = 'rgba(10,0,40,.62)'; g.fillRect(0, top, W, y1 - top); this._rock(g, 0, y1 - rowH * 0.2, W, rowH * 0.2, i, u); continue; }
-      // light rays
-      g.fillStyle = 'rgba(255,255,255,.07)';
-      for (let k = 0; k < 4; k++) { const rx = x0 + Wc * (0.15 + k * 0.25) + Math.sin(this.clock * 0.6 + k) * u * 2; g.beginPath(); g.moveTo(rx, top); g.lineTo(rx + u * 5, top); g.lineTo(rx + u * 12, y1); g.lineTo(rx - u * 3, y1); g.fill(); }
+      // per-zone background tint (Director Protocol: no two zones share a background)
+      g.fillStyle = ZONE_THEMES[i].overlay; g.fillRect(0, top, W, y1 - top);
+      // light rays — strong in the shallows, fading with depth, gone in the abyss
+      if (i < 3) { g.fillStyle = `rgba(255,255,255,${0.09 - i * 0.03})`;
+        for (let k = 0; k < 4; k++) { const rx = x0 + Wc * (0.15 + k * 0.25) + Math.sin(this.clock * 0.6 + k) * u * 2; g.beginPath(); g.moveTo(rx, top); g.lineTo(rx + u * 5, top); g.lineTo(rx + u * 12, y1); g.lineTo(rx - u * 3, y1); g.fill(); } }
       const floor = y1 - rowH * 0.2;
       this._rock(g, 0, floor, W, rowH * 0.2, i, u);
-      // plants and corals
-      this._reef(g, x0, Wc, floor, u, i);
+      // plants and corals only where they belong; every zone then gets its own motif
+      if (i === 0 || i === 1 || i === 4) this._reef(g, x0, Wc, floor, u, i);
+      this._zoneDress(g, i, x0, Wc, top, y1, floor, u);
       // ledge name
       g.fillStyle = 'rgba(255,255,255,.55)'; g.font = `900 ${u * 2.4}px Tajawal, system-ui`; g.textAlign = I.getLang() === 'en' ? 'left' : 'right';
-      g.fillText(I.getLang() === 'en' ? a.en : a.ar, I.getLang() === 'en' ? x0 + u * 2 : x0 + Wc - u * 2, top + u * 3.4);
+      g.fillText(`${I.getLang() === 'en' ? a.en : a.ar} · ${depthOf(i)}${I.getLang() === 'en' ? 'm' : ' م'}`, I.getLang() === 'en' ? x0 + u * 2 : x0 + Wc - u * 2, top + u * 3.4);
       // rope + ladder + bell + basket
       const bx = x0 + Wc * 0.09;
       g.strokeStyle = '#d8b050'; g.lineWidth = u * 0.5; g.beginPath(); g.moveTo(bx - u * 1, top); g.lineTo(bx - u * 1, floor); g.moveTo(bx + u * 1, top); g.lineTo(bx + u * 1, floor); g.stroke();
@@ -378,6 +430,44 @@ class Game {
     for (const x of this.fx) { g.globalAlpha = Math.max(0, 1 - x.t / 1.3); g.font = `900 ${u * (x.big ? 5.4 : 4)}px Tajawal, system-ui`; g.fillStyle = x.big ? '#ffe04a' : '#fff'; g.strokeStyle = 'rgba(40,20,0,.95)'; g.lineWidth = u * 0.9; const yy = x.y - x.t * u * 6; g.strokeText(x.text, x.x, yy); g.fillText(x.text, x.x, yy); }
     g.globalAlpha = 1;
     for (const c of this.coins) { if (c.t < 0 || c.px === undefined) continue; g.fillStyle = '#ffd23a'; g.strokeStyle = '#a87a0a'; g.lineWidth = u * 0.3; g.beginPath(); g.arc(c.px, c.py, u * 1.5, 0, 6.3); g.fill(); g.stroke(); g.fillStyle = '#fff2a0'; g.beginPath(); g.arc(c.px - u * 0.4, c.py - u * 0.4, u * 0.5, 0, 6.3); g.fill(); }
+  }
+
+  /** Director Protocol dressing: one unmistakable motif per zone, all code-drawn
+   * (no new files). Deterministic positions; only sway/glow use the clock. */
+  _zoneDress(g, i, x0, Wc, top, y1, floor, u) {
+    const motif = ZONE_THEMES[i].motif; const mid = (top + floor) / 2;
+    g.save();
+    if (motif === 'sand_garden') { // 1 Shallows: bright sand, starfish, a little fish school
+      g.fillStyle = 'rgba(246,222,160,.55)'; for (let k = 0; k < 4; k++) { g.beginPath(); g.ellipse(x0 + Wc * (0.18 + k * 0.2), floor - u * 0.4, u * 5, u * 1.1, 0, 0, 6.3); g.fill(); }
+      g.fillStyle = '#ff9a3a'; for (const fx of [0.3, 0.62]) { const cx = x0 + Wc * fx; const cy = floor - u * 1.2; for (let p = 0; p < 5; p++) { const a = -Math.PI / 2 + p * 1.257; g.beginPath(); g.ellipse(cx + Math.cos(a) * u * 0.9, cy + Math.sin(a) * u * 0.9, u * 0.75, u * 0.38, a, 0, 6.3); g.fill(); } g.beginPath(); g.arc(cx, cy, u * 0.6, 0, 6.3); g.fill(); }
+      g.fillStyle = 'rgba(255,140,60,.85)'; const off = (this.clock * u * 2.2) % (Wc * 0.5);
+      for (let k = 0; k < 5; k++) { const fx = x0 + Wc * 0.12 + off + k * u * 3.2; const fy = top + u * 4 + Math.sin(this.clock * 2 + k) * u * 0.7 + (k % 2) * u * 1.6; g.beginPath(); g.ellipse(fx, fy, u * 1.3, u * 0.55, 0, 0, 6.3); g.fill(); g.beginPath(); g.moveTo(fx - u * 1.2, fy); g.lineTo(fx - u * 2.1, fy - u * 0.7); g.lineTo(fx - u * 2.1, fy + u * 0.7); g.closePath(); g.fill(); }
+    } else if (motif === 'coral_branch') { // 2 Reef: tall branching staghorn coral + anemones
+      g.strokeStyle = '#ff7a4a'; g.lineWidth = u * 0.65; g.lineCap = 'round';
+      for (const bx of [0.22, 0.55, 0.72]) { const x = x0 + Wc * bx; g.beginPath(); g.moveTo(x, floor); g.lineTo(x, floor - u * 6); g.moveTo(x, floor - u * 3.4); g.lineTo(x - u * 2.4, floor - u * 6.4); g.moveTo(x, floor - u * 4.2); g.lineTo(x + u * 2.2, floor - u * 7); g.moveTo(x, floor - u * 5.4); g.lineTo(x - u * 1.4, floor - u * 8); g.stroke(); }
+      for (const ax of [0.36, 0.66]) { g.fillStyle = '#c86aff'; for (let p = 0; p < 7; p++) { const a = p / 7 * 6.28; g.beginPath(); g.arc(x0 + Wc * ax + Math.cos(a) * u * 1.1, floor - u * 1 + Math.sin(a) * u * 0.5, u * 0.42, 0, 6.3); g.fill(); } g.fillStyle = '#ffd2f2'; g.beginPath(); g.arc(x0 + Wc * ax, floor - u * 1, u * 0.55, 0, 6.3); g.fill(); }
+    } else if (motif === 'cave_arch') { // 3 Cave: rock arch + stalactites + a dark cave mouth + crystals
+      g.fillStyle = '#3a2f58'; for (let k = 0; k < 7; k++) { const x = x0 + k * Wc / 6; g.beginPath(); g.moveTo(x - u * 2.4, top); g.lineTo(x + u * 2.4, top); g.lineTo(x, top + u * (3 + (k % 3) * 1.6)); g.closePath(); g.fill(); }
+      g.fillStyle = 'rgba(4,2,18,.78)'; g.beginPath(); g.ellipse(x0 + Wc * 0.6, mid + u * 2, Wc * 0.2, (floor - top) * 0.34, 0, 0, 6.3); g.fill();
+      g.fillStyle = '#8ae8ff'; for (const [cx, cs] of [[0.14, 1], [0.2, 0.6], [0.88, 0.8]]) { const x = x0 + Wc * cx; g.beginPath(); g.moveTo(x, floor); g.lineTo(x + u * cs, floor - u * 2.6 * cs); g.lineTo(x + u * 2 * cs, floor); g.closePath(); g.globalAlpha = 0.55 + Math.sin(this.clock * 2 + cx * 9) * 0.2; g.fill(); g.globalAlpha = 1; }
+    } else if (motif === 'glow_deep') { // 4 Abyss: near-dark, glowing jellyfish + plankton dots (no coral, no rays)
+      g.fillStyle = 'rgba(2,0,16,.35)'; g.fillRect(x0 - u * 4, top, Wc + u * 8, floor - top);
+      for (let k = 0; k < 14; k++) { const px = x0 + Wc * ((k * 37 % 90) / 100 + 0.05); const py = top + ((k * 53 % 70) / 100) * (floor - top); g.fillStyle = `rgba(140,240,255,${0.35 + 0.3 * Math.sin(this.clock * 1.6 + k * 1.7)})`; g.beginPath(); g.arc(px, py, u * 0.32, 0, 6.3); g.fill(); }
+      for (const jx of [0.3, 0.62]) { const x = x0 + Wc * jx + Math.sin(this.clock * 0.7 + jx * 8) * u * 1.4; const y = mid - u * 2 + Math.sin(this.clock + jx * 5) * u; g.fillStyle = 'rgba(255,150,220,.75)'; g.beginPath(); g.arc(x, y, u * 1.7, Math.PI, 0); g.fill(); g.strokeStyle = 'rgba(255,180,235,.6)'; g.lineWidth = u * 0.28; for (let t2 = -1; t2 <= 1; t2++) { g.beginPath(); g.moveTo(x + t2 * u, y); g.quadraticCurveTo(x + t2 * u + Math.sin(this.clock * 2 + t2) * u * 0.6, y + u * 2.2, x + t2 * u, y + u * 3.6); g.stroke(); } }
+    } else if (motif === 'garden_fans') { // 5 Giftun: vivid sea fans, a turtle and a dolphin silhouette
+      for (const [fx, col] of [[0.18, '#ff5aa8'], [0.4, '#b86aff'], [0.68, '#ff8a3a']]) { const x = x0 + Wc * fx; g.fillStyle = col; g.globalAlpha = 0.8; g.beginPath(); g.moveTo(x, floor); g.arc(x, floor, u * 4.2, Math.PI, 0); g.fill(); g.globalAlpha = 1; g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = u * 0.2; for (let r = 1; r < 4; r++) { g.beginPath(); g.arc(x, floor, u * r * 1.3, Math.PI, 0); g.stroke(); } }
+      const tx = x0 + Wc * (0.55 + 0.08 * Math.sin(this.clock * 0.35)); const ty = top + u * 5;
+      g.fillStyle = '#1f8a70'; g.beginPath(); g.ellipse(tx, ty, u * 3.4, u * 1.7, 0, 0, 6.3); g.fill(); g.beginPath(); g.arc(tx + u * 3.8, ty - u * 0.4, u * 0.9, 0, 6.3); g.fill(); g.beginPath(); g.ellipse(tx - u * 2.6, ty + u * 1.2, u * 1.2, u * 0.5, 0.7, 0, 6.3); g.fill();
+      const dx = x0 + Wc * (0.3 + 0.1 * Math.sin(this.clock * 0.22 + 2)); const dy = top + u * 2.6;
+      g.fillStyle = 'rgba(30,90,140,.85)'; g.beginPath(); g.ellipse(dx, dy, u * 4.4, u * 1.15, -0.12, 0, 6.3); g.fill(); g.beginPath(); g.moveTo(dx - u * 4.2, dy); g.lineTo(dx - u * 6, dy - u * 1.4); g.lineTo(dx - u * 5.6, dy + u * 0.9); g.closePath(); g.fill(); g.beginPath(); g.moveTo(dx + u * 0.4, dy - u * 1); g.lineTo(dx + u * 1.6, dy - u * 2.4); g.lineTo(dx + u * 2.2, dy - u * 0.8); g.closePath(); g.fill();
+    } else if (motif === 'temple_ruins') { // 6 Ras Mohammed: sunken columns, a fallen column, a pediment
+      g.fillStyle = '#cbb27a'; g.strokeStyle = 'rgba(90,70,30,.55)'; g.lineWidth = u * 0.25;
+      for (const cx of [0.16, 0.34]) { const x = x0 + Wc * cx; g.fillRect(x - u * 1.5, floor - u * 11, u * 3, u * 11); g.strokeRect(x - u * 1.5, floor - u * 11, u * 3, u * 11); g.fillRect(x - u * 2.1, floor - u * 12.2, u * 4.2, u * 1.2); g.fillRect(x - u * 2.1, floor - u * 1.1, u * 4.2, u * 1.1); for (let s2 = 1; s2 < 4; s2++) { g.beginPath(); g.moveTo(x - u * 1.5, floor - u * 11 + s2 * u * 2.7); g.lineTo(x + u * 1.5, floor - u * 11 + s2 * u * 2.7); g.stroke(); } }
+      g.save(); g.translate(x0 + Wc * 0.58, floor - u * 1.6); g.rotate(-0.16); g.fillRect(-u * 5.4, -u * 1.3, u * 10.8, u * 2.6); g.strokeRect(-u * 5.4, -u * 1.3, u * 10.8, u * 2.6); g.restore();
+      g.beginPath(); g.moveTo(x0 + Wc * 0.12, top + u * 1); g.lineTo(x0 + Wc * 0.38, top + u * 1); g.lineTo(x0 + Wc * 0.25, top + u * 5.4); g.closePath(); g.fillStyle = 'rgba(203,178,122,.9)'; g.fill(); g.stroke();
+      g.fillStyle = 'rgba(90,70,30,.6)'; for (let k = 0; k < 5; k++) g.fillRect(x0 + Wc * (0.78 + (k % 2) * 0.05), floor - u * (2 + k * 1.5), u * (1.6 - (k % 2) * 0.6), u * 0.5);
+    }
+    g.restore();
   }
 
   _rock(g, x, y, w, hgt, i, u) {
@@ -449,7 +539,7 @@ class Game {
 
   _clam(g, x, floor, u, open, i) {
     if (this._pic(g, open ? 'clam_open' : 'clam_closed', x, floor + u * 0.3, u * 8)) return;
-    const col = ['#b87ad8', '#d86a9a', '#8a6ad8', '#6a8ad8'][i];
+    const col = ['#b87ad8', '#d86a9a', '#8a6ad8', '#6a8ad8', '#4ac8b8', '#c8a83a'][i];
     g.fillStyle = col; g.strokeStyle = 'rgba(40,0,60,.6)'; g.lineWidth = u * 0.3;
     g.beginPath(); g.ellipse(x, floor - u * 1, u * 3.4, u * 1.4, 0, 0, Math.PI); g.fill(); g.stroke();
     const lift = open ? u * 2.6 : u * 0.5;

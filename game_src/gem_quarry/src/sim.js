@@ -15,24 +15,65 @@ export const PILE_BASE = 12;
 export const PILE_STEP = 8;
 export const CAP_BASE = 6;
 export const CAP_STEP = 3;
-export const STAR_FLAT = 6;         // overflow seconds allowed for 3 stars
-export const STAR_OK = 20;          // ... for 2 stars
+export const STAR_EXTRA_3 = 15;      // extra gems collected beyond the goal for 3 stars
+export const STAR_EXTRA_2 = 6;       // ... for 2 stars
 
 const RATEFIX = (r) => Math.round(r * 1.5 * 100) / 100;
 const TRIPFIX = (t) => Math.round(t * 0.7 * 10) / 10;
 const T_ALL = ['diggers', 'trucks', 'pile', 'truckCap', 'road', 'loader', 'polish', 'mine2'];
 export const LEVELS = [
-  { id: 1, goal: 30, price: 10, rate: RATEFIX(0.45), trip: TRIPFIX(5.0), coins: 0, tools: ['diggers', 'trucks'], up: {}, ar: 'المدخل', en: 'The Gate' },
-  { id: 2, goal: 45, price: 11, rate: RATEFIX(0.46), trip: TRIPFIX(5.2), coins: 60, tools: ['diggers', 'trucks', 'pile'], up: {}, ar: 'التل الرملي', en: 'Sandy Hill' },
-  { id: 3, goal: 60, price: 12, rate: RATEFIX(0.47), trip: TRIPFIX(5.5), coins: 80, tools: ['diggers', 'trucks', 'pile', 'truckCap'], up: {}, ar: 'الصناديق الكبيرة', en: 'Big Crates' },
-  { id: 4, goal: 80, price: 13, rate: RATEFIX(0.48), trip: TRIPFIX(5.8), coins: 100, tools: ['diggers', 'trucks', 'pile', 'truckCap', 'road'], up: {}, ar: 'الطريق الطويل', en: 'Long Road' },
-  { id: 5, goal: 100, price: 14, rate: RATEFIX(0.49), trip: TRIPFIX(6.0), coins: 120, tools: ['diggers', 'trucks', 'pile', 'truckCap', 'road', 'loader'], up: {}, ar: 'العامل المساعد', en: 'The Helper' },
+  { id: 1, goal: 30, price: 10, rate: RATEFIX(0.45), trip: TRIPFIX(5.0), coins: 0, tools: ['diggers', 'trucks'], up: {}, ar: 'بوابة المحجر', en: 'Quarry Gate' },
+  { id: 2, goal: 45, price: 11, rate: RATEFIX(0.46), trip: TRIPFIX(5.2), coins: 60, tools: ['diggers', 'trucks', 'pile'], up: {}, ar: 'تل الجرانيت الوردي', en: 'Pink Granite Hill' },
+  { id: 3, goal: 60, price: 12, rate: RATEFIX(0.47), trip: TRIPFIX(5.5), coins: 80, tools: ['diggers', 'trucks', 'pile', 'truckCap'], up: {}, ar: 'صناديق الجرانيت', en: 'Granite Crates' },
+  { id: 4, goal: 80, price: 13, rate: RATEFIX(0.48), trip: TRIPFIX(5.8), coins: 100, tools: ['diggers', 'trucks', 'pile', 'truckCap', 'road'], up: {}, ar: 'طريق النيل', en: 'Nile Road' },
+  { id: 5, goal: 100, price: 14, rate: RATEFIX(0.49), trip: TRIPFIX(6.0), coins: 120, tools: ['diggers', 'trucks', 'pile', 'truckCap', 'road', 'loader'], up: {}, ar: 'مساعد المحجر', en: 'Quarry Helper' },
   { id: 6, goal: 130, price: 15, rate: RATEFIX(0.5), trip: TRIPFIX(6.2), coins: 150, tools: ['diggers', 'trucks', 'pile', 'truckCap', 'road', 'loader', 'polish'], up: { diggers: 2 }, ar: 'ورشة التلميع', en: 'Polish Shop' },
-  { id: 7, goal: 160, price: 16, rate: RATEFIX(0.5), trip: TRIPFIX(6.4), coins: 200, tools: T_ALL, up: { diggers: 2, trucks: 2 }, ar: 'المنجم الثاني', en: 'Second Mine' },
-  { id: 8, goal: 200, price: 18, rate: RATEFIX(0.52), trip: TRIPFIX(6.6), coins: 250, tools: T_ALL, up: { diggers: 3, trucks: 2, pile: 1, truckCap: 1 }, ar: 'ساعة الذروة', en: 'Rush Hour' },
+  { id: 7, goal: 160, price: 16, rate: RATEFIX(0.5), trip: TRIPFIX(6.4), coins: 200, tools: T_ALL, up: { diggers: 2, trucks: 2 }, ar: 'محجر المسلة', en: 'Obelisk Quarry' },
+  { id: 8, goal: 200, price: 18, rate: RATEFIX(0.52), trip: TRIPFIX(6.6), coins: 250, tools: T_ALL, up: { diggers: 3, trucks: 2, pile: 1, truckCap: 1 }, ar: 'المحجر الكبير', en: 'The Great Quarry' },
   { id: 9, goal: 250, price: 20, rate: RATEFIX(0.54), trip: TRIPFIX(6.8), coins: 300, tools: T_ALL, up: { diggers: 3, trucks: 3, pile: 1, truckCap: 1, road: 1 }, ar: 'فيضان الجواهر', en: 'Gem Flood' },
-  { id: 10, goal: 320, price: 22, rate: RATEFIX(0.56), trip: TRIPFIX(7.0), coins: 400, tools: T_ALL, up: { diggers: 4, trucks: 3, pile: 2, truckCap: 1, road: 1, loader: 1 }, ar: 'ملك المحجر', en: 'Quarry King' },
+  { id: 10, goal: 320, price: 22, rate: RATEFIX(0.56), trip: TRIPFIX(7.0), coins: 400, tools: T_ALL, up: { diggers: 4, trucks: 3, pile: 2, truckCap: 1, road: 1, loader: 1 }, ar: 'سيد محاجر أسوان', en: 'Master of Aswan Quarries' },
+  // ---- Phase 2G: the second quarry — Tura (طرة), the famous white-limestone quarries south of Cairo whose
+  // stone cased the Giza pyramids. Append-only: ids 11–15 come after Aswan; ids 1–10 are frozen. Same mechanics,
+  // same tools, gently rising goals/prices/trips and slightly richer starting crews so the curve stays kind.
+  { id: 11, goal: 360, price: 24, rate: RATEFIX(0.57), trip: TRIPFIX(7.2), coins: 450, tools: T_ALL, up: { diggers: 4, trucks: 3, pile: 2, truckCap: 1, road: 1, loader: 1 }, ar: 'بوابة طرة', en: 'Tura Gate', chapter: 'tura' },
+  { id: 12, goal: 420, price: 26, rate: RATEFIX(0.58), trip: TRIPFIX(7.4), coins: 500, tools: T_ALL, up: { diggers: 4, trucks: 3, pile: 2, truckCap: 2, road: 1, loader: 1 }, ar: 'الحجر الأبيض', en: 'White Limestone', chapter: 'tura' },
+  { id: 13, goal: 480, price: 28, rate: RATEFIX(0.59), trip: TRIPFIX(7.6), coins: 550, tools: T_ALL, up: { diggers: 5, trucks: 4, pile: 2, truckCap: 2, road: 2, loader: 1 }, ar: 'كسوة الأهرامات', en: 'Pyramid Casing', chapter: 'tura' },
+  { id: 14, goal: 560, price: 30, rate: RATEFIX(0.60), trip: TRIPFIX(7.8), coins: 600, tools: T_ALL, up: { diggers: 5, trucks: 4, pile: 3, truckCap: 2, road: 2, loader: 2 }, ar: 'محجر طرة الكبير', en: 'Great Tura Quarry', chapter: 'tura' },
+  { id: 15, goal: 650, price: 32, rate: RATEFIX(0.62), trip: TRIPFIX(8.0), coins: 700, tools: T_ALL, up: { diggers: 6, trucks: 4, pile: 3, truckCap: 3, road: 2, loader: 2, polish: 1 }, ar: 'سيد محاجر طرة', en: 'Master of Tura', chapter: 'tura' },
 ];
+/** The quarry chapter a level belongs to ('aswan' for the original ten, 'tura' for the Phase 2G second quarry). */
+export const chapterOf = (l) => l.chapter || 'aswan';
+
+/** Museum exhibits: one per quarry site, each with a true one-line fact (ar+en). Display-only text — no voices. */
+export const EXHIBITS = [
+  { level: 1, icon: '💎', fact: ['محاجر الجرانيت في أسوان كانت تمدّ مصر القديمة بالحجر لبناء المعابد والتماثيل.', 'Aswan\u2019s granite quarries supplied ancient Egypt with stone for temples and statues.'] },
+  { level: 2, icon: '🩷', fact: ['جرانيت أسوان وردي اللون لأن فيه كتير من معدن الفلسبار الوردي.', 'Aswan granite is pink because it holds lots of pink feldspar.'] },
+  { level: 3, icon: '🪨', fact: ['العمال كانوا يشكّلوا كتل الجرانيت الصلبة بحجارة الدوليريت القوية.', 'Workers shaped hard granite blocks with strong dolerite pounding stones.'] },
+  { level: 4, icon: '⛵', fact: ['كتل الحجر الثقيلة كانت تسافر من أسوان على النيل في مراكب خشبية كبيرة.', 'Heavy stone blocks travelled from Aswan down the Nile on big wooden boats.'] },
+  { level: 5, icon: '🧑‍🏭', fact: ['عمال المحاجر كانوا يعيشوا في قرى قريبة من المحجر ويشتغلوا في فرق.', 'Quarry workers lived in villages near the quarries and worked in teams.'] },
+  { level: 6, icon: '✨', fact: ['تلميع الجرانيت بالرمل والمية كان يخلي سطحه يلمع زي المراية.', 'Polishing granite with sand and water made its surface shine like a mirror.'] },
+  { level: 7, icon: '🗿', fact: ['في محجر أسوان لسه فيه مسلة ضخمة لم تكتمل — كانت هتبقى أكبر مسلة في مصر.', 'A giant unfinished obelisk still lies in Aswan\u2019s quarry — it would have been Egypt\u2019s biggest.'] },
+  { level: 8, icon: '🏛️', fact: ['الجرانيت من أصلب الحجارة، فنحته كان محتاج صبر ووقت طويل.', 'Granite is one of the hardest stones, so carving it took great patience.'] },
+  { level: 9, icon: '💜', fact: ['المصريون القدماء كانوا يحبوا الحجارة الملونة زي الجمشت والعقيق لعمل الحُلي.', 'Ancient Egyptians loved colourful stones like amethyst and carnelian for jewellery.'] },
+  { level: 10, icon: '👑', fact: ['تماثيل ملوك منحوتة من جرانيت أسوان لسه واقفة في متاحف العالم لحد النهاردة.', 'Statues of kings carved from Aswan granite still stand in museums today.'] },
+  { level: 11, icon: '🏺', fact: ['طرة، جنوب القاهرة، كانت أشهر محاجر الحجر الجيري في مصر القديمة.', 'Tura, south of Cairo, was ancient Egypt\u2019s most famous limestone quarry.'] },
+  { level: 12, icon: '🤍', fact: ['حجر طرة الجيري أبيض ناصع وحبيباته ناعمة، فبيتقطع بسلاسة.', 'Tura limestone is bright white and fine-grained, so it cuts smoothly.'] },
+  { level: 13, icon: '🔺', fact: ['الهرم الأكبر كان مغطى بحجر طرة الأبيض الأملس وكان بيلمع في الشمس.', 'The Great Pyramid was once covered in smooth white Tura limestone that shone in the sun.'] },
+  { level: 14, icon: '⛏️', fact: ['محاجر طرة عبارة عن صالات ضخمة محفورة جوه التلال تحت الأرض.', 'Tura\u2019s quarries are huge underground galleries carved into the hills.'] },
+  { level: 15, icon: '⛴️', fact: ['المراكب كانت تنقل حجر طرة عبر النيل لبناء أهرامات الجيزة.', 'Boats carried Tura limestone across the Nile to build the pyramids at Giza.'] },
+];
+
+/** Museum book entries for a save: one exhibit per quarry site. An exhibit is OPEN once its level has been
+ * completed (stars > 0); it then shows the site's name, its stars and its fact. Pure and derived entirely from
+ * the existing save (stars map) — no new persistence, so old saves show their sites exactly as completed. */
+export function museumEntries(save) {
+  const s = normalizeSave(save);
+  return EXHIBITS.map((ex) => {
+    const L = levelCfg(ex.level);
+    const stars = s.stars[ex.level] || 0;
+    return { level: ex.level, icon: ex.icon, ar: L.ar, en: L.en, chapter: chapterOf(L), stars, complete: stars > 0, fact: ex.fact };
+  });
+}
 export const levelCfg = (id) => LEVELS[Math.max(0, Math.min(LEVELS.length - 1, (id | 0) - 1))];
 
 export class Quarry {
@@ -87,9 +128,14 @@ export class Quarry {
   canBuy(kind) { const c = this.cost(kind); return this.state === 'play' && this.has(kind) && c !== null && this.coins >= c; }
   onTrucks() { return this.trucks.reduce((s, t) => s + t.load, 0); }
   isFull() { return this.pile >= this.pileCap(); }
+  /** Every gem the quarry has collected: shipped + waiting in the pile + loaded on trucks. */
+  collected() { return this.shipped + this.pile + this.onTrucks(); }
   stars() {
     if (this.state !== 'won') return 0;
-    return this.overflowT <= STAR_FLAT ? 3 : this.overflowT <= STAR_OK ? 2 : 1;
+    // Kind rules (Batch C): stars come from COLLECTION, never from efficiency or
+    // time — how long the pile sat full (overflowT) no longer grades anything.
+    const extra = this.collected() - this.goal;
+    return extra >= STAR_EXTRA_3 ? 3 : extra >= STAR_EXTRA_2 ? 2 : 1;
   }
 
   // ---- actions ----------------------------------------------------------------------------------------------------

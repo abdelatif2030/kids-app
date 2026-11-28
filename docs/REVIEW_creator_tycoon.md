@@ -48,3 +48,24 @@ Menu, start, real mouse click on PHOTO, generating card, result card, promotion 
 **Tested.** npm test 11/11 (2 new: snapshot round-trip; garbage-career clamping). Browser via the real shell entry with real mouse clicks (~/tools/recorder/phase1_verify.mjs): seeded career {rank 2, cash 432, gpu 2} restored through the Play click (cash 440 after ~3 s — the restored GPU upgrade auto-earns, so the restore is live); scene background = office_sunset with the rank-2 tint; zero requests for the two missing backgrounds; a real shop purchase (المتجر button → item click) posted a save whose career upgrade total rose 7 → 8; zero page errors. fps 57.5 rAF under CDP 4× CPU throttling, headless SwiftShader, 1024×768 (phase1_fps.mjs) — a software-GL lower bound, not a device measurement.
 
 **Not verified.** A full intern→board career across two separate browser sessions (unit robot reaches the board in one session; cross-session restore verified at rank 2). No real-device/iOS WebView test exists here. VoiceCoach is wired but no owner clips are installed for this game yet (expected go_1.mp3 404 in the standalone page); clips arrive via the owner's generator.
+
+---
+
+## Phase 2D — Egypt anchor: «استوديو النيل / Nile Studio» (2026-11-27)
+
+**What changed (names only):** the title «مبدع الذكاء / AI Creator» →
+**«استوديو النيل / Nile Studio»** — the corporate ladder is now a kids'
+media studio on the Nile: the last two ranks are Studio Manager and
+**Studio Owner** (was VP / Board of Directors), and the win line reads
+"You own the studio now… the top creator at Nile Studio". Rank ids,
+goals, shop, unlocks and the Phase 1 saved-progress fix are untouched.
+
+**Tested:** `npm test` 12/12 (+1 anchor test: ladder ids/goals
+unchanged, new top rank). Build green. Click-flow: menu title via the
+harness; gameplay confirmed with a single-click check — career HUD with
+rank, goal stars and the generator/shop row, 0 page errors; menu frames
+at 3 sizes.
+
+**Not done (Batch F):** studio-room dressing (a Nile-view window, a
+team wall) and a second ladder (music studio) are not built. Not tested
+on a real device.

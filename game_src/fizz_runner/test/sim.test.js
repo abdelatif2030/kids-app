@@ -33,10 +33,17 @@ test('a robot runner survives long stretches on every environment, collects cans
   }
 });
 
-test('a crash ends the run, a shield absorbs one hit, jumping clears a barrier, sliding clears an overhead bar', () => {
+test('a crash is a stumble (hearts), three crashes end the run, a shield absorbs one hit, jumping clears a barrier, sliding clears an overhead bar', () => {
   const r = new Run({ env: 0, seed: 1 });
   r.things = [{ kind: 'barrier', lane: 1, z: 5, done: false, id: 1 }];
   for (let i = 0; i < 120 && r.state === 'run'; i++) r.step(1 / 60);
+  assert.equal(r.state, 'run'); // kind rules: one hit no longer ends the run
+  assert.equal(r.hearts, 2);
+  for (const left of [1, 0]) {
+    r.inv = 0; r.things = [{ kind: 'barrier', lane: 1, z: r.z + 5, done: false, id: 2 }];
+    for (let i = 0; i < 120 && r.state === 'run'; i++) r.step(1 / 60);
+    assert.equal(r.hearts, left);
+  }
   assert.equal(r.state, 'over');
   const s = new Run({ env: 0, seed: 1 });
   s.shield = 5; s.things = [{ kind: 'barrier', lane: 1, z: 5, done: false, id: 1 }];
@@ -66,3 +73,12 @@ test('cans are collected, magnets pull them, ramps give stunt points', () => {
 });
 
 test('damaged saves load safely', () => { assert.equal(normalizeSave(null).unlocked, 1); assert.equal(normalizeSave({ unlocked: 99 }).unlocked, 6); });
+
+import fs from 'node:fs';
+
+test('Fizzo in Egypt anchor: title and the six runs are Egyptian places', () => {
+  const main = fs.readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+  assert.ok(main.includes("title: ['فيزو في مصر', 'Fizzo in Egypt']"));
+  assert.deepEqual(ENVS.map((e) => e.en), ['Cairo Streets', 'Downtown Cairo', 'Khan el-Khalili', 'Helwan Workshops', 'Corniche Road', 'Fizzy Bonus']);
+  assert.deepEqual(ENVS.map((e) => e.id), ['city', 'downtown', 'shops', 'industry', 'highway', 'bonus']); // ids unchanged
+});

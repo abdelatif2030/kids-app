@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Quarry, LEVELS, KINDS, normalizeSave, recordWin } from '../src/sim.js';
+import { Quarry, LEVELS, KINDS, normalizeSave, recordWin, museumEntries, chapterOf, EXHIBITS } from '../src/sim.js';
 
 /** A robot player: taps the pile, then buys whatever makes the weaker side (digging or hauling) stronger. */
 export function robotStep(q, tick) {
@@ -20,7 +20,7 @@ function play(level, easy = false, limit = 900) {
   return q;
 }
 
-test('a robot completes all 10 levels', () => {
+test('a robot completes all 15 levels', () => {
   const times = [];
   for (const l of LEVELS) {
     const q = play(l.id);
@@ -103,14 +103,101 @@ test('price tags follow the video: 150 diggers, 300 trucks, 1350 second mine', (
   assert.equal(q.cost('mine2'), 1350);
 });
 
-test('stars follow overflow time, saves normalise', () => {
+test('stars follow collection, never overflow time; saves normalise', () => {
   const q = new Quarry({ level: 1 }); q.state = 'won';
-  q.overflowT = 2; assert.equal(q.stars(), 3);
-  q.overflowT = 10; assert.equal(q.stars(), 2);
-  q.overflowT = 60; assert.equal(q.stars(), 1);
+  q.shipped = q.goal; q.pile = 0;
+  q.overflowT = 0; assert.equal(q.stars(), 1);
+  q.overflowT = 600; assert.equal(q.stars(), 1); // a full pile for ages changes nothing
+  q.pile = 6; assert.equal(q.stars(), 2);
+  q.pile = 15; assert.equal(q.stars(), 3);
+  q.pile = 0; q.overflowT = 2; assert.equal(q.stars(), 1); // fast and tidy but nothing extra collected
   assert.deepEqual(normalizeSave(null), { unlocked: 1, stars: {}, muted: false });
   const s = normalizeSave({ unlocked: 99, stars: { 1: 9, x: 1, 12: 3 }, muted: 'yes' });
-  assert.equal(s.unlocked, 10); assert.deepEqual(s.stars, { 1: 3 }); assert.equal(s.muted, false);
+  assert.equal(s.unlocked, 15); assert.deepEqual(s.stars, { 1: 3, 12: 3 }); assert.equal(s.muted, false);
   const r = recordWin(null, 3, 2);
   assert.equal(r.unlocked, 4); assert.equal(recordWin(r, 3, 1).stars[3], 2);
+});
+
+test('Aswan Quarries anchor: ten quarry sites, ids and goals unchanged', () => {
+  assert.equal(LEVELS[0].en, 'Quarry Gate');
+  assert.equal(LEVELS[6].en, 'Obelisk Quarry');
+  assert.equal(LEVELS[9].en, 'Master of Aswan Quarries');
+  assert.equal(LEVELS[0].goal, 30);
+  assert.equal(LEVELS[9].goal, 320);
+});
+
+// ---- Phase 2G: freeze, Tura second quarry, museum, migration, campaign -------------------------------------------
+
+const FROZEN_1_10 = [
+  [1, 30, 10, 0.68, 3.5, 0, 'Quarry Gate'], [2, 45, 11, 0.69, 3.6, 60, 'Pink Granite Hill'],
+  [3, 60, 12, 0.71, 3.9, 80, 'Granite Crates'], [4, 80, 13, 0.72, 4.1, 100, 'Nile Road'],
+  [5, 100, 14, 0.74, 4.2, 120, 'Quarry Helper'], [6, 130, 15, 0.75, 4.3, 150, 'Polish Shop'],
+  [7, 160, 16, 0.75, 4.5, 200, 'Obelisk Quarry'], [8, 200, 18, 0.78, 4.6, 250, 'The Great Quarry'],
+  [9, 250, 20, 0.81, 4.8, 300, 'Gem Flood'], [10, 320, 22, 0.84, 4.9, 400, 'Master of Aswan Quarries'],
+];
+
+test('FREEZE: Aswan levels 1-10 data unchanged (Phase 2G append-only)', () => {
+  for (const [id, goal, price, rate, trip, coins, en] of FROZEN_1_10) {
+    const L = LEVELS[id - 1];
+    assert.equal(L.id, id); assert.equal(L.goal, goal); assert.equal(L.price, price);
+    assert.equal(L.rate, rate); assert.equal(L.trip, trip); assert.equal(L.coins, coins); assert.equal(L.en, en);
+    assert.equal(chapterOf(L), 'aswan');
+  }
+});
+
+test('Tura second quarry: levels 11-15 appended, gently rising, existing mechanics only', () => {
+  assert.equal(LEVELS.length, 15);
+  assert.deepEqual(LEVELS.map((l) => l.id), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+  const tura = LEVELS.slice(10);
+  assert.deepEqual(tura.map((l) => l.en), ['Tura Gate', 'White Limestone', 'Pyramid Casing', 'Great Tura Quarry', 'Master of Tura']);
+  for (const L of tura) {
+    assert.equal(chapterOf(L), 'tura');
+    assert.ok(L.ar && L.en, 'bilingual name');
+    for (const k of Object.keys(L.up)) assert.ok(KINDS.includes(k), `no new mechanic: ${k}`);
+    for (const t of L.tools) assert.ok(KINDS.includes(t));
+  }
+  for (let i = 1; i < tura.length; i++) {
+    assert.ok(tura[i].goal > tura[i - 1].goal, 'goals rise');
+    assert.ok(tura[i].price >= tura[i - 1].price, 'prices never drop');
+    assert.ok(tura[i].trip >= tura[i - 1].trip, 'trips never shorten');
+  }
+  assert.ok(tura[0].goal > LEVELS[9].goal, 'Tura continues past the Aswan finale');
+});
+
+test('campaign proof: recordWin chain walks first to last, Tura unlocks only after Aswan', () => {
+  let save = normalizeSave(null);
+  for (let id = 1; id <= 15; id++) {
+    assert.equal(save.unlocked, id, `level ${id} is the frontier`);
+    assert.equal(play(id).state, 'won', `level ${id} robot-completes in the chain`);
+    save = recordWin(save, id, 2);
+  }
+  assert.equal(save.unlocked, 15);
+  assert.equal(Object.keys(save.stars).length, 15);
+});
+
+test('museum: exhibits lock/unlock purely from the save stars', () => {
+  const fresh = museumEntries(null);
+  assert.equal(fresh.length, 15);
+  assert.ok(fresh.every((e) => !e.complete && e.stars === 0));
+  assert.equal(EXHIBITS.length, 15);
+  for (const e of fresh) { assert.ok(e.fact[0] && e.fact[1], 'fact ar+en'); assert.ok(e.icon); }
+  const mid = museumEntries({ unlocked: 11, stars: { 1: 3, 7: 2, 10: 1 } });
+  assert.equal(mid.filter((e) => e.complete).length, 3);
+  assert.equal(mid[0].stars, 3); assert.equal(mid[6].en, 'Obelisk Quarry');
+  assert.ok(mid.slice(10).every((e) => !e.complete), 'Tura exhibits stay locked until played');
+  const full = museumEntries(recordWin(recordWin(null, 14, 3), 15, 3));
+  assert.ok(full[13].complete && full[14].complete && full[14].chapter === 'tura');
+});
+
+test('old-save migration: a finished 10-level Aswan save keeps progress, Tura opens at 11', () => {
+  const old = { unlocked: 10, stars: { 1: 3, 2: 3, 3: 2, 4: 2, 5: 3, 6: 1, 7: 2, 8: 3, 9: 2, 10: 3 }, muted: true };
+  const s = normalizeSave(old);
+  assert.deepEqual(s.stars, old.stars);
+  assert.equal(s.unlocked, 11, 'beating level 10 already opened the road to Tura');
+  assert.equal(s.muted, true);
+  const entries = museumEntries(old);
+  assert.equal(entries.filter((e) => e.complete).length, 10);
+  assert.ok(entries.slice(10).every((e) => !e.complete));
+  const capped = normalizeSave({ unlocked: 99, stars: {} });
+  assert.equal(capped.unlocked, 15);
 });

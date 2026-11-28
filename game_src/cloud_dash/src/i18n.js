@@ -1,5 +1,5 @@
 const S = {
-  title: ['ركضة السحاب', 'Cloud Dash'],
+  title: ['ركضة فوق مصر', 'Dash Over Egypt'],
   play: ['يلا نجري', 'Run'],
   level: ['المرحلة', 'Level'],
   levels: ['المراحل', 'Levels'],

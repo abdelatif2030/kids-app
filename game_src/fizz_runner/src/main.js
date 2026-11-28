@@ -13,7 +13,7 @@ import { VoiceCoach } from '../../cozy_kit/voice.js';
 const FIZZ_CLIPS = { pickup: 2, trick: 3, charge: 2, bump: 2, near: 1, win: 2, lose: 2, go: 2 };
 
 const S = {
-  title: ['فيزو الشاطر', 'Fizzo the Brave'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], high: ['أعلى النقاط', 'HIGH SCORE'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'], missions: ['المهمات', 'MISSIONS'],
+  title: ['فيزو في مصر', 'Fizzo in Egypt'], play: ['العب', 'PLAY'], levels: ['المراحل', 'LEVELS'], high: ['أعلى النقاط', 'HIGH SCORE'], settings: ['الإعدادات', 'SETTINGS'], quit: ['خروج', 'QUIT'], missions: ['المهمات', 'MISSIONS'],
   score: ['النقاط', 'SCORE'], best: ['الأفضل', 'BEST'], restart: ['إعادة', 'RESTART'], home: ['الرئيسية', 'HOME'], paused: ['استراحة', 'PAUSED'], resume: ['كمّل', 'RESUME'], sound: ['الصوت', 'Sound'],
   over: ['انتهت اللعبة', 'GAME OVER'], won: ['وصلت للنهاية! 🏆', 'LEVEL COMPLETE! 🏆'], select: ['اختار المرحلة', 'SELECT LEVEL'], locked: ['خلّص المرحلة اللي قبلها', 'Finish the level before'],
   how: ['اسحب يمين/شمال لتغيير الحارة، فوق للقفز، تحت للانزلاق', 'Swipe left/right to change lane, up to jump, down to slide'], m: ['م', 'm'], tapSound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
@@ -246,9 +246,9 @@ class Game {
     this._look(this.run.env.id); this._clearThings();
     this.mode = 'play'; this.paused = false; this.shake = 0; this.fx = [];
     this._clear(); this.sound.setMode(true);
-    this.scoreEl = h('span', {}, ''); this.canEl = h('span', {}, ''); this.distEl = h('span', {}, ''); this.pwrEl = h('span', {}, '');
+    this.scoreEl = h('span', {}, ''); this.canEl = h('span', {}, ''); this.distEl = h('span', {}, ''); this.pwrEl = h('span', {}, ''); this.heartEl = h('span', {}, '❤️❤️❤️');
     const pause = h('button', { class: 'fz-round', 'aria-label': I.t('paused'), onclick: () => this.togglePause() }, '⏸');
-    this.layer.append(h('div', { class: 'fz-top' }, pause, h('div', { class: 'fz-pill' }, this.scoreEl), h('div', { style: 'display:flex;flex-direction:column;gap:calc(var(--u)*.8);align-items:flex-end' }, h('div', { class: 'fz-pill' }, this.canEl), h('div', { class: 'fz-pill' }, this.distEl))), h('div', { class: 'fz-pill', style: 'position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--u)*16)' }, this.pwrEl));
+    this.layer.append(h('div', { class: 'fz-top' }, pause, h('div', { class: 'fz-pill' }, this.scoreEl), h('div', { class: 'fz-pill' }, this.heartEl), h('div', { style: 'display:flex;flex-direction:column;gap:calc(var(--u)*.8);align-items:flex-end' }, h('div', { class: 'fz-pill' }, this.canEl), h('div', { class: 'fz-pill' }, this.distEl))), h('div', { class: 'fz-pill', style: 'position:absolute;left:50%;transform:translateX(-50%);top:calc(var(--u)*16)' }, this.pwrEl));
     this.hintEl = h('div', { class: 'fz-hint', style: 'top:calc(var(--u)*26)' }); this.layer.append(this.hintEl); this._soundPill(); this.hint(I.t('how'), 3500);
   }
 
@@ -283,11 +283,12 @@ class Game {
         case 'stunt': this.sound.play('stunt'); this.voice.say('trick'); this.fx.push({ t: 0, life: 1.1, text: '⭐ STUNT +300' }); break; case 'ramp': this.sound.play('jump'); break;
         case 'power': this.sound.play('power'); this.voice.say('charge'); this.fx.push({ t: 0, life: 1, text: { magnet: '🧲', shield: '🛡️', star: '⭐' }[e.kind] }); break;
         case 'shieldHit': this.sound.play('shield'); this.voice.say('near'); this.shake = 0.4; break; case 'smash': this.sound.play('crash'); this.voice.say('bump'); break;
+        case 'stumble': this.sound.play('crash'); this.voice.say('bump'); this.shake = 0.5; this.fx.push({ t: 0, life: 1, text: '💪' }); break;
         case 'over': this.sound.play('crash'); this.shake = 0.8; this._finish(false); break; case 'won': this._finish(true); break;
         default: break;
       }
     }
-    this.scoreEl.textContent = `${I.t('score')} ${I.num(Math.round(r.score))}`; this.canEl.textContent = `🥤 ${I.num(r.cans)}`; this.distEl.textContent = `🏃 ${I.num(Math.round(r.z))} ${I.t('m')}`;
+    this.scoreEl.textContent = `${I.t('score')} ${I.num(Math.round(r.score))}`; this.canEl.textContent = `🥤 ${I.num(r.cans)}`; this.distEl.textContent = `🏃 ${I.num(Math.round(r.z))} ${I.t('m')}`; this.heartEl.textContent = '❤️'.repeat(Math.max(0, r.hearts));
     this.pwrEl.textContent = [r.magnet > 0 ? '🧲' : '', r.shield > 0 ? '🛡️' : '', r.starT > 0 ? '⭐' : ''].join(' ');
     this.pwrEl.parentElement.style.display = this.pwrEl.textContent.trim() ? 'flex' : 'none';
     for (const f of this.fx) f.t += dt; this.fx = this.fx.filter((f) => f.t < f.life);

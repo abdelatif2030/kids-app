@@ -37,3 +37,9 @@ test('a robot walks a fashion show in every place: a star only after THREE finis
 test('tapping the same item again takes it off', () => {
   const o = new Outfit(); o.wear('dress', 5); o.wear('dress', 5); assert.equal(o.worn.dress, 0);
 });
+
+test('dress places: Nile garden and Alexandria beach are in', () => {
+  assert.equal(PLACES.length, 6);
+  assert.equal(PLACES[1].en, 'Nile garden party');
+  assert.equal(PLACES[3].en, 'Alexandria beach party');
+});

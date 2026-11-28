@@ -7,9 +7,9 @@ import { loadAll, makeStage } from '../kit/kit.js';
 
 export const PLACES = [
   { ar: 'غرفة القلعة', en: 'Castle room', emoji: '🏰' },
-  { ar: 'حفلة الشاي في الجنينة', en: 'Garden tea party', emoji: '🫖' },
+  { ar: 'حفلة حديقة النيل', en: 'Nile garden party', emoji: '🫖' },
   { ar: 'قلعة الثلج', en: 'Ice castle', emoji: '❄️' },
-  { ar: 'حفلة البحر', en: 'Beach party', emoji: '🏖️' },
+  { ar: 'حفلة شاطئ إسكندرية', en: 'Alexandria beach party', emoji: '🏖️' },
   { ar: 'الغابة السحرية', en: 'Magic forest', emoji: '🍄' },
   { ar: 'قاعة قوس قزح', en: 'Rainbow ballroom', emoji: '🌈' },
 ];
@@ -86,7 +86,7 @@ class Game {
   _build() {
     const A = this.art;
     const bgs = [1, 2, 3, 4, 5, 6].map((i) => A[`bgp_${i}`] || null);
-    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, fairy: Object.fromEntries([1,2,3,4,5,6,7,8,9,10,11,12].map((n) => [n, this.art[`fairy_${String(n).padStart(2, '0')}`]])), title: this.en ? 'Little princess' : 'ألبسي الأميرة', places: PLACES, bgs, onPlace: () => { this._tray(); } });
+    this.stage = makeStage(this.el, { post: this.post, lang: this.en ? 'en' : 'ar', base: this.base, fairy: Object.fromEntries([1,2,3,4,5,6,7,8,9,10,11,12].map((n) => [n, this.art[`fairy_${String(n).padStart(2, '0')}`]])), title: this.en ? 'Dress up Nour' : 'ألبسي نور', places: PLACES, bgs, onPlace: () => { this._tray(); } });
     this.layer = this.stage.layer;
     this.dollEl = h('div', { class: 'dr-doll gk-idle', onclick: () => { this.doll = (this.doll + 1) % DOLLS.length; this._doll(); this.stage.say(this.en ? 'A new princess!' : 'أميرة جديدة!'); } });
     this.layer.append(this.dollEl);

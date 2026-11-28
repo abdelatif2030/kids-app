@@ -11,7 +11,11 @@ const JUMP_T = 0.62; // seconds in the air
 const DUCK_T = 0.7;
 const FRICTION = 5;
 
-/** Seven tracks of the world tour, each adding something new. bpm sets the beat everything follows. */
+/** Twelve tracks of the Egypt tour, each adding something new. bpm sets the beat everything follows.
+    Tracks 1–7 are the original tour (unchanged). Tracks 8–12 (Phase 2F) each feature a synthesized
+    Egyptian lead instrument (`lead`; tracks 1–7 default to the sax) and reuse a shipped panorama
+    (`pano`, 1-based; tracks 1–7 default to their own). Saves key stars/unlocks by track id, so the
+    appended ids never disturb an old save. */
 export const TRACKS = [
   { id: 1, ar: 'مقهى الحارة', en: 'Hara Café', bpm: 112, len: 40, arms: [['low', 8]], high: false, gaps: false, flip: false, tonearm: false },
   { id: 2, ar: 'أسطوانات خان الخليلي', en: 'Khan el-Khalili Records', bpm: 116, len: 45, arms: [['low', 8], ['high', 12]], gaps: false, flip: false, tonearm: false },
@@ -20,7 +24,25 @@ export const TRACKS = [
   { id: 5, ar: 'صندوق موسيقى الجدة', en: "Grandma's Music Box", bpm: 128, len: 60, arms: [['low', 6], ['high', 8], ['low', 12]], gaps: true, flip: true, tonearm: true },
   { id: 6, ar: 'دار الأوبرا', en: 'Cairo Opera House', bpm: 132, len: 64, arms: [['low', 6], ['high', 7], ['low', 9]], gaps: true, flip: true, tonearm: true },
   { id: 7, ar: 'أوركسترا القاهرة', en: 'Cairo Grand Orchestra', bpm: 136, len: 70, arms: [['high', 6], ['low', 6], ['high', 8], ['low', 10]], gaps: true, flip: true, tonearm: true },
+  // Phase 2F: the Egyptian-instrument leg of the tour. Venues are new (Khan el-Khalili is already
+  // track 2, so it is NOT reused); each lead instrument is Egyptian and the lengths stretch the tour.
+  // Certification Sweep A: tracks 8–12 previously ALL shared gaps+flip+tonearm — identical
+  // mechanics differing only in numbers. Each now owns a distinct mechanic mix (a gentle
+  // re-introduction on 8, one new pressure at a time, everything together only in the finale)
+  // and a distinct code-drawn venue `motif` composited over its reused panorama in main.js,
+  // so no two tracks share a background or a challenge shape.
+  { id: 8, ar: 'شارع محمد علي', en: 'Mohamed Ali Street', bpm: 122, len: 90, arms: [['low', 7], ['high', 9], ['low', 11]], gaps: true, flip: false, tonearm: false, lead: 'oud', pano: 2, motif: 'oud' },
+  { id: 9, ar: 'قلعة صلاح الدين', en: 'Salah El-Din Citadel', bpm: 126, len: 94, arms: [['low', 6], ['high', 8], ['low', 10]], gaps: true, flip: true, tonearm: false, lead: 'tabla', pano: 6, motif: 'citadel' },
+  { id: 10, ar: 'مركب في النيل', en: 'Nile Boat', bpm: 130, len: 98, arms: [['low', 6], ['high', 7], ['low', 9]], gaps: false, flip: true, tonearm: true, lead: 'rababa', pano: 4, motif: 'boat' },
+  { id: 11, ar: 'حديقة الأزهر', en: 'Al-Azhar Park', bpm: 134, len: 100, arms: [['high', 6], ['low', 6], ['high', 9]], gaps: true, flip: false, tonearm: true, lead: 'mizmar', pano: 3, motif: 'park' },
+  { id: 12, ar: 'ليلة في الحسين', en: 'A Night in Al-Hussein', bpm: 138, len: 104, arms: [['high', 6], ['low', 5], ['high', 8], ['low', 9]], gaps: true, flip: true, tonearm: true, lead: 'qanun', pano: 7, motif: 'lanterns' },
 ];
+
+/** The panorama (1-based art/pano<N>.webp) a track's venue shows. */
+export const panoOf = (track) => track.pano ?? track.id;
+
+/** True when every track of the tour has been completed (≥1 star) — the encore gate. */
+export const tourComplete = (save) => TRACKS.every((tk) => ((save && save.stars && save.stars[tk.id]) || 0) >= 1);
 
 export const ANIMALS = ['bear', 'bunny', 'fox', 'cat', 'raccoon', 'panda', 'sheep', 'chick', 'frog', 'mouse', 'pig', 'koala'];
 
@@ -36,12 +58,16 @@ function rng(seed) {
 const wrap = (a) => { while (a > Math.PI) a -= Math.PI * 2; while (a < -Math.PI) a += Math.PI * 2; return a; };
 
 export class Show {
-  /** opts: { track (0..6), easy, seed } */
+  /** opts: { track (0..11), easy, seed, encore } — encore raises the tempo one notch (bpm ×1.15);
+      the beat drives the count-in, the arm sweeps and the music, so the whole show runs faster
+      with the same charts, the same 3 lives and the same safe respawn. */
   constructor(opts = {}) {
     this.track = TRACKS[opts.track ?? 0];
     this.easy = !!opts.easy;
+    this.encore = !!opts.encore;
+    this.bpm = this.encore ? Math.round(this.track.bpm * 1.15) : this.track.bpm;
     this.rand = rng(opts.seed ?? 4);
-    this.beat = 60 / this.track.bpm;
+    this.beat = 60 / this.bpm;
     this.time = 0;
     this.state = 'intro'; // intro (count-in) -> play -> won | out
     this.introT = this.beat * 4;
@@ -370,7 +396,8 @@ function segDist(ax, az, bx, bz, px, pz) {
   return Math.hypot(ax + vx * t - px, az + vz * t - pz);
 }
 
-/** Save: { unlocked (1..5), stars, muted } made safe. */
+/** Save: { unlocked (1..TRACKS.length), stars, muted } made safe. Old saves (7-track era) load
+    unchanged in meaning: their stars stay keyed by id and `unlocked` simply clamps to the longer tour. */
 export function normalizeSave(raw) {
   const s = raw && typeof raw === 'object' ? raw : {};
   const stars = {};

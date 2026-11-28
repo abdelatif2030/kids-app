@@ -1,5 +1,6 @@
 const S = {
-  title: ['سباق السباحة', 'Swim Race'],
+  title: ['جولة مياه مصر', 'Egypt Waters Tour'],
+  stamp: ['🏅 ختم الإنهاء! الجولة الجاية مفتوحة', "🏅 Finisher's stamp! The next round is open"],
   round: ['الجولة', 'Round'],
   locked: ['اتأهل من الجولة اللي قبلها', 'Qualify in the round before'],
   swim: ['يلا نعوم!', 'Swim!'],
@@ -33,6 +34,10 @@ const S = {
   loading: ['بنملا الحمّام...', 'Filling the pool...'],
   noWebgl: ['الجهاز ده مش بيشغّل اللعبة ثلاثية الأبعاد.', 'This device cannot run the 3D game.'],
   sound: ['🔊 دوس هنا عشان الصوت', '🔊 Tap here for sound'],
+  album: ['ألبوم أختام المياه', 'Water Stamps Album'],
+  albumSub: ['كل ما تخلّص سباق، تختم ختم مكانه وتتعلم حاجة عنه!', 'Finish a race to stamp its place and learn about it!'],
+  stampGot: ['اتختم! ✓', 'Stamped! ✓'],
+  back: ['رجوع', 'Back'],
 };
 
 let lang = 'ar';

@@ -14,12 +14,28 @@ const LEAP_T = 0.9;
 
 /** The rounds of the island tour: swimmers in, places that go on, course length and what is on it. */
 export const ROUNDS = [
-  { id: 1, ar: 'أكوا بارك', en: 'Aqua Park', swimmers: 12, qualify: 8, len: 250, bpm: 100, bumpers: 10, noodles: 1, walls: 1, waves: 1, slides: 1 },
-  { id: 2, ar: 'دريم بارك', en: 'Dream Park', swimmers: 10, qualify: 6, len: 280, bpm: 104, bumpers: 10, noodles: 3, walls: 2, waves: 1, slides: 1 },
+  { id: 1, ar: 'حمّام النيل', en: 'Nile Pool', swimmers: 12, qualify: 8, len: 250, bpm: 100, bumpers: 10, noodles: 1, walls: 1, waves: 1, slides: 1 },
+  { id: 2, ar: 'بركة الفيوم', en: 'Faiyum Pool', swimmers: 10, qualify: 6, len: 280, bpm: 104, bumpers: 10, noodles: 3, walls: 2, waves: 1, slides: 1 },
   { id: 3, ar: 'بحيرة قارون', en: 'Qarun Lake', swimmers: 8, qualify: 4, len: 300, bpm: 108, bumpers: 12, noodles: 3, walls: 3, waves: 2, slides: 2 },
-  { id: 4, ar: 'عيون موسى', en: 'Moses Springs', swimmers: 8, qualify: 4, len: 310, bpm: 110, bumpers: 12, noodles: 3, walls: 3, waves: 2, slides: 2 },
+  { id: 4, ar: 'عيون موسى', en: 'Moses Springs', swimmers: 8, qualify: 4, len: 310, bpm: 110, bumpers: 10, noodles: 4, walls: 2, waves: 3, slides: 1 },
   { id: 5, ar: 'جزيرة أسوان', en: 'Aswan Island', swimmers: 7, qualify: 3, len: 320, bpm: 112, bumpers: 14, noodles: 4, walls: 3, waves: 2, slides: 2 },
-  { id: 6, ar: 'نهائي الأبطال', en: 'Champions Final', swimmers: 6, qualify: 1, len: 340, bpm: 114, bumpers: 14, noodles: 4, walls: 3, waves: 3, slides: 2 },
+  { id: 6, ar: 'نهائي البحر الأحمر', en: 'Red Sea Final', swimmers: 6, qualify: 1, len: 340, bpm: 114, bumpers: 14, noodles: 4, walls: 3, waves: 3, slides: 2 },
+];
+
+/** Stamp-album definitions (Phase 2H), one per tour round, aligned by round id
+ * with ROUNDS above (ids/order frozen, pinned by tests). `fact` is one true,
+ * simple line about the round's real Egyptian water, in both languages, and is
+ * DISPLAY-ONLY: it is shown (and listed for Instinct) only once the stamp is
+ * earned — stampEntries never returns it for a locked stamp. `hint` is the
+ * only text a locked stamp may show. Stamps reward FINISHING a round (the
+ * Phase 2D finisher's stamp), never speed, place or beating anyone. */
+export const STAMPS = [
+  { roundId: 1, icon: '🌊', fact: { ar: 'نهر النيل بيجري في مصر من الجنوب للشمال، وبيصب في البحر المتوسط.', en: 'The Nile flows through Egypt from south to north, into the Mediterranean Sea.' }, hint: { ar: 'خلّص سباق حمّام النيل عشان تختم الختم ده!', en: 'Finish the Nile Pool race to earn this stamp!' } },
+  { roundId: 2, icon: '💦', fact: { ar: 'الفيوم واحة خضرا مشهورة بشلالات وادي الريان الجميلة.', en: 'Faiyum is a green oasis famous for the pretty Wadi El Rayan waterfalls.' }, hint: { ar: 'خلّص سباق بركة الفيوم عشان تختم الختم ده!', en: 'Finish the Faiyum Pool race to earn this stamp!' } },
+  { roundId: 3, icon: '🦩', fact: { ar: 'بحيرة قارون في الفيوم من أقدم البحيرات الطبيعية في مصر، وطيور النحام بتيجي تعيش عندها.', en: "Lake Qarun in Faiyum is one of Egypt's oldest natural lakes, and flamingos come to live by it." }, hint: { ar: 'خلّص سباق بحيرة قارون عشان تختم الختم ده!', en: 'Finish the Qarun Lake race to earn this stamp!' } },
+  { roundId: 4, icon: '🌴', fact: { ar: 'عيون موسى في سيناء عيون مياه طبيعية وسط النخل، قريب من قناة السويس.', en: 'Moses Springs in Sinai are natural springs among palm trees, near the Suez Canal.' }, hint: { ar: 'خلّص سباق عيون موسى عشان تختم الختم ده!', en: 'Finish the Moses Springs race to earn this stamp!' } },
+  { roundId: 5, icon: '⛵', fact: { ar: 'أسوان مدينة في جنوب مصر على النيل، مشهورة بجزرها ومراكبها الشراعية البيضا.', en: 'Aswan is a city in the south of Egypt on the Nile, famous for its islands and white sailboats.' }, hint: { ar: 'خلّص سباق جزيرة أسوان عشان تختم الختم ده!', en: 'Finish the Aswan Island race to earn this stamp!' } },
+  { roundId: 6, icon: '🪸', fact: { ar: 'البحر الأحمر مشهور بشعابه المرجانية الملونة وأسماكه الكتير الملونة.', en: 'The Red Sea is famous for its colourful coral reefs and its many colourful fish.' }, hint: { ar: 'خلّص سباق نهائي البحر الأحمر عشان تختم الختم ده!', en: 'Finish the Red Sea Final race to earn this stamp!' } },
 ];
 
 export const SWIMMERS = [
@@ -319,6 +335,33 @@ export function normalizeSave(raw) {
   const s = raw && typeof raw === 'object' ? raw : {};
   const stars = {};
   if (s.stars && typeof s.stars === 'object') for (const r of ROUNDS) { const v = Math.floor(Number(s.stars[r.id])); if (v >= 1 && v <= 3) stars[r.id] = v; }
+  // Finisher stamps (kind rules): every child who finishes a round is stamped,
+  // and a stamp unlocks the next round just like qualifying does.
+  const stamps = {};
+  if (s.stamps && typeof s.stamps === 'object') for (const r of ROUNDS) if (s.stamps[r.id]) stamps[r.id] = true;
   const u = Math.floor(Number(s.unlocked));
-  return { unlocked: clamp(Math.max(Number.isFinite(u) ? u : 1, ...Object.keys(stars).map((k) => Number(k) + 1)), 1, ROUNDS.length), stars, muted: s.muted === true };
+  return { unlocked: clamp(Math.max(Number.isFinite(u) ? u : 1, ...Object.keys(stars).map((k) => Number(k) + 1), ...Object.keys(stamps).map((k) => Number(k) + 1)), 1, ROUNDS.length), stars, stamps, muted: s.muted === true };
+}
+
+/** Stamp-album entries for a save (Phase 2H, sky_jumper passport / ocean_defense
+ * album pattern): one stamp per tour round, earned by FINISHING that round.
+ * Derived PURELY from the existing save — no new persistence, so old saves
+ * migrate for free. Basis, exactly: a round counts as finished when its
+ * finisher's stamp is recorded (`stamps[id]`, written on every finish since
+ * Phase 2D) OR when it holds stars (`stars[id] > 0`) — stars are only ever
+ * awarded in the results step of a finished, qualifying race, so a pre-stamp
+ * save that qualified still shows the stamp it earned. A fresh save (no
+ * stamps, no stars) shows every stamp locked.
+ * Earned entries carry { round, icon, fact }; locked entries carry ONLY
+ * { roundId, unlocked:false, hint } — the fact and the icon are not returned
+ * at all, so an unearned place's fact can never leak (the hint only names
+ * the race to finish, exactly like the tour map already does). */
+export function stampEntries(save) {
+  const s = normalizeSave(save);
+  return STAMPS.map((def) => {
+    const unlocked = !!s.stamps[def.roundId] || (s.stars[def.roundId] ?? 0) > 0;
+    if (!unlocked) return { roundId: def.roundId, unlocked: false, hint: def.hint };
+    const round = ROUNDS.find((r) => r.id === def.roundId);
+    return { roundId: def.roundId, unlocked: true, round, icon: def.icon, fact: def.fact };
+  });
 }

@@ -1,5 +1,5 @@
 const S = {
-  title: ['مغامرة الذيل الذهبي', 'Golden Tail Chase'],
+  title: ['الذيل الذهبي في الواحة', 'Golden Tail Oasis'],
   level: ['المرحلة', 'Level'],
   locked: ['اكسب المرحلة اللي قبلها', 'Win the level before'],
   play: ['يلا نلعب!', "Let's play!"],

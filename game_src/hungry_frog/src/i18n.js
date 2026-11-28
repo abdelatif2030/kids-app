@@ -1,5 +1,5 @@
 const S = {
-  title: ['لعبة الضفدع الجائع', 'Hungry Frog'],
+  title: ['فرفور بحيرة البرلس', 'Farfour of Lake Burullus'],
   play: ['يلا نلعب', 'Play'],
   map: ['خريطة البركة', 'Pond map'],
   level: ['المرحلة', 'Level'],

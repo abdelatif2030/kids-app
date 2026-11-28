@@ -255,7 +255,9 @@ export class Farm {
     if (!this.done && this.progress >= DONE_AT && this.load === 0) {
       this.done = true;
       const herdAll = this.animals.length === 0 || this.penned === this.animals.length;
-      const stars = 1 + (herdAll ? 1 : 0) + (this.bumps <= 2 ? 1 : 0);
+      // Kind rules (Batch C): rock bumps never grade. The third star is a
+      // completion star — bringing in (almost) every last crop (progress >= 0.99).
+      const stars = 1 + (herdAll ? 1 : 0) + (this.progress >= 0.99 ? 1 : 0);
       this.result = { stars, coins: this.coins, bumps: this.bumps, penned: this.penned, animals: this.animals.length, time: this.time };
       this.emit('done', this.result);
     }

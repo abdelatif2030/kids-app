@@ -787,7 +787,7 @@ class Game {
     if (!this.hud) return;
     const hc = this._hc;
     const f = p.frog;
-    if (hc.hearts !== p.hearts) { hc.hearts = p.hearts; this.hud.hearts.replaceChildren(...Array.from({ length: p.maxHearts }, (_, i) => h('b', { class: i < p.hearts ? '' : 'off' }, '♥'))); }
+    if (hc.splashes !== p.splashes) { hc.splashes = p.splashes; this.hud.hearts.replaceChildren(...(p.splashes ? [h('b', {}, `💦 ${num(p.splashes)}`)] : [])); }
     let goalText;
     let w;
     if (p.phase === 'grow') { goalText = t('growTo', { n: num(p.level.evolve) }); w = (f.power - p.level.start) / (p.level.evolve - p.level.start); } else if (p.phase === 'grow2') { goalText = t('growTo2', { n: num(p.level.boss) }); w = (f.power - p.level.evolve) / (p.level.boss - p.level.evolve); } else { goalText = t('beat', { b: name(BOSS[p.level.bossKind]) }); w = p.boss ? p.boss.hp / p.boss.max : 0; }
